@@ -162,7 +162,7 @@ sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   fts_set_symbol(a + 2, type);
   fts_object_new(0, 3, a, &track);  
       
-  /* add it to the track */
+  /* add it to the sequence */
   sequence_add_track(this, (track_t *)track);
       
   /* create track at client */
@@ -340,6 +340,63 @@ sequence_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
 
 /******************************************************
  *
+ *  load/save bmax
+ *
+ */
+
+static void
+sequence_add_track_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_symbol_t name = fts_get_symbol(at + 0);
+  fts_symbol_t type = fts_get_symbol(at + 1);
+  fts_object_t *track;
+  fts_atom_t a[3];
+  
+  fts_set_symbol(a + 0, seqsym_eventtrk);
+  fts_set_symbol(a + 1, name);
+  fts_set_symbol(a + 2, type);
+  fts_object_new(0, 3, a, &track);  
+      
+  /* add it to the sequence */
+  sequence_add_track(this, (track_t *)track);
+  this->currently_loaded_event_track = (track_t *)track;
+      
+  if(0) /* no upload */
+  {
+    /* create track at client */
+    fts_client_upload(track, seqsym_track, 2, a + 1);
+    
+    /* add track to sequence at client */
+    fts_set_object(a + 0, (fts_object_t *)track);	    
+    fts_client_send_message(o, seqsym_addTracks, 1, a);
+  }
+}
+
+static void
+sequence_add_event_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  fts_send_message((fts_object_t *)this->currently_loaded_event_track, fts_SystemInlet, seqsym_bmax_add_event, ac, at);
+}  
+
+static void
+sequence_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);  
+  track_t *track = sequence_get_first_track(this);
+
+  while(track)
+    {
+      fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_save_bmax, ac, at);
+      track = track_get_next(track);
+    }
+}
+
+/******************************************************
+ *
  *  class
  *
  */
@@ -356,6 +413,10 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sequence_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sequence_delete);
+
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_bmax_add_track, sequence_add_track_from_bmax);
+      fts_method_define_varargs(cl, fts_SystemInlet, seqsym_bmax_add_event, sequence_add_event_from_bmax);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, sequence_save_bmax);
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), sequence_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), sequence_close_editor);
@@ -382,3 +443,4 @@ sequence_config(void)
 {
   fts_class_install(seqsym_sequence, sequence_instantiate);
 }
+

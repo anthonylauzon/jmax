@@ -145,6 +145,21 @@ messevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   post("\n");
 }
 
+static void
+messevt_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messevt_t *this = (messevt_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
+
+  fts_bmax_code_push_symbol(file, this->s);
+  fts_bmax_code_push_int(file, this->pos);
+  fts_bmax_code_push_symbol(file, seqsym_messevt);
+  fts_bmax_code_push_float(file, event_get_time(&this->head));
+
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 4);
+  fts_bmax_code_pop_args(file, 4);
+}
+
 /**************************************************************
  *
  *  set event methods
@@ -175,6 +190,8 @@ messevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(messevt_t), 0, 0, 0); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messevt_init);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, messevt_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), messevt_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), messevt_move);

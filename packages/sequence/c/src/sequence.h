@@ -43,6 +43,7 @@ typedef struct _sequence_
   int size; /* # of tracks */ 
 
   int open; /* flag: is 1 if sequence editor is open */
+  track_t *currently_loaded_event_track; /* its more like a hack for loading bmax files */
 } sequence_t;
 
 #define sequence_get_size(s) ((s)->size)

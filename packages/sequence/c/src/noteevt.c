@@ -108,6 +108,21 @@ noteevt_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_set_int(a + 3, noteevt_get_midi_velocity(this));
 }
 
+static void
+noteevt_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  noteevt_t *this = (noteevt_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
+
+  fts_bmax_code_push_float(file, this->duration);
+  fts_bmax_code_push_int(file, this->pitch);
+  fts_bmax_code_push_symbol(file, seqsym_noteevt);
+  fts_bmax_code_push_float(file, event_get_time(&this->head));
+
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 4);
+  fts_bmax_code_pop_args(file, 4);
+}
+
 /**************************************************************
  *
  *  set event methods
@@ -210,6 +225,8 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_add_daemon(cl, obj_property_get, seqsym_midi_velocity, noteevt_get_midi_velocity_property);
   fts_class_add_daemon(cl, obj_property_put, seqsym_midi_velocity, noteevt_set_midi_velocity_property);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, noteevt_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), noteevt_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), noteevt_move);

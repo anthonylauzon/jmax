@@ -436,6 +436,43 @@ eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_
   fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
+static void
+eventtrk_add_event_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  double time = fts_get_float(at + 0);
+  fts_object_t *event;
+  
+  /* make new event object */
+  fts_object_new(0, ac - 1, at + 1, &event);
+  
+  /* add event to track */
+  eventtrk_append_event(this, (event_t *)event);
+
+  event_set_track((event_t *)event, this);
+  event_set_time((event_t *)event, time);
+}
+
+static void 
+eventtrk_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
+  event_t *event = eventtrk_get_first(this);
+
+  fts_bmax_code_push_symbol(file, this->type);
+  fts_bmax_code_push_symbol(file, track_get_name(&this->head));
+
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 2);
+  fts_bmax_code_pop_args(file, 2);
+  
+  while(event)
+    {
+      fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_save_bmax, ac, at);
+      event = event_get_next(event);
+    }  
+}
+
 static fts_status_t
 eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -443,6 +480,9 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, eventtrk_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, eventtrk_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, eventtrk_save_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_bmax_add_event, eventtrk_add_event_from_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_lock, eventtrk_lock);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_unlock, eventtrk_unlock);

@@ -50,6 +50,8 @@ fts_symbol_t seqsym_import_midi = 0;
 fts_symbol_t seqsym_import_midi_dialog = 0;
 fts_symbol_t seqsym_lock = 0;
 fts_symbol_t seqsym_unlock = 0;
+fts_symbol_t seqsym_bmax_add_track = 0;
+fts_symbol_t seqsym_bmax_add_event = 0;
 
 /* messages to client */
 fts_symbol_t seqsym_createEditor = 0;
@@ -88,6 +90,8 @@ seqsym_config(void)
   seqsym_import_midi_dialog = fts_new_symbol("import_midi_dialog");
   seqsym_lock = fts_new_symbol("lock");
   seqsym_unlock = fts_new_symbol("unlock");
+  seqsym_bmax_add_track = fts_new_symbol("bmax_add_track");
+  seqsym_bmax_add_event = fts_new_symbol("bmax_add_event");
 
   /* messages to client */
   seqsym_createEditor = fts_new_symbol("createEditor");

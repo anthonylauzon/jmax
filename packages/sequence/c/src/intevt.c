@@ -92,6 +92,20 @@ intevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   post("\n");
 }
 
+static void
+intevt_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  intevt_t *this = (intevt_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
+
+  fts_bmax_code_push_int(file, fts_get_int(&this->value));
+  fts_bmax_code_push_symbol(file, seqsym_intevt);
+  fts_bmax_code_push_float(file, event_get_time(&this->head));
+
+  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 3);
+  fts_bmax_code_pop_args(file, 3);
+}
+
 /**************************************************************
  *
  *  set event methods
@@ -109,6 +123,8 @@ intevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(intevt_t), 0, 0, 0); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, intevt_init);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, intevt_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), intevt_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), intevt_move);
