@@ -21,6 +21,9 @@ make all ARCH=i386-linux
 %ifarch i686
 make all ARCH=i686-linux
 %endif
+%ifarch ppc
+make all ARCH=ppc-linux
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -29,6 +32,9 @@ make install ARCH=i386-linux prefix=$RPM_BUILD_ROOT/usr
 %endif
 %ifarch i686
 make install ARCH=i686-linux prefix=$RPM_BUILD_ROOT/usr
+%endif
+%ifarch ppc
+make install ARCH=ppc-linux prefix=$RPM_BUILD_ROOT/usr
 %endif
 
 %clean
