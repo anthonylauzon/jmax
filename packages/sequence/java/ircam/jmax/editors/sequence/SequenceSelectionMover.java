@@ -296,9 +296,9 @@ public void XORDraw(int dx, int dy)
 			if(movTrackEvent == last) 
 			{
 				if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-					((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+tempEvent.getTime());
+					((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+Displayer.numberFormat.format(tempEvent.getTime()));
 				if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-					((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
+					((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+Displayer.numberFormat.format( a.getInvY( a.getY(tempEvent))));
 			}
 	  }
 	}

@@ -35,7 +35,7 @@ public interface Displayer {
     DisplayNumberFormat()
     {
       super();
-      setMaximumFractionDigits(3);
+      setMaximumFractionDigits(2);
       setGroupingUsed(false);
     }
   }

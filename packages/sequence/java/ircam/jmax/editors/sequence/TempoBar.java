@@ -51,7 +51,7 @@ public class TempoBar extends JPanel
     
 		if( !isInSequence)
 		{
-			createDisplayer();
+			//createDisplayer();
 			
 			gc.getDataModel().addTrackStateListener(new TrackStateListener(){
 				public void lock(boolean lock){}
@@ -98,7 +98,7 @@ public class TempoBar extends JPanel
 		});				
 	}
 
-public void createDisplayer()
+/*public void createDisplayer()
 {
 	JPanel labelPanel = new JPanel();
 	labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
@@ -128,7 +128,7 @@ public void createDisplayer()
 		}
 	});
 	validate();
-}
+}*/
 
 public void paintComponent(Graphics g)
 {
@@ -231,10 +231,8 @@ int getXIndentation()
 		return 0;
 }
 
-void setDisplayer(Displayer d)
+/*void setDisplayer(Displayer d)
 {
-	/*oldDisplayer = gc.getDisplayer();
-	gc.setDisplayer(d);*/
 	oldDisplayer = d;
 }
 
@@ -243,7 +241,7 @@ public void resetDisplayer()
 	Displayer disp = gc.getDisplayer();
 	gc.setDisplayer(oldDisplayer);
 	oldDisplayer = disp;
-}
+}*/
 
 public Dimension getPreferredSize()
 { return tempoDimension; }
@@ -258,8 +256,8 @@ PartitionAdapter utilityPartitionAdapter;
 Geometry geometry;
 SequenceGraphicContext gc;
 public final static int TEMPO_HEIGHT = 20; 
-JLabel displayLabel;
-Displayer oldDisplayer;
+/*JLabel displayLabel;
+Displayer oldDisplayer;*/
 
 Color tempoColor = new Color(165, 165, 165, 100);
 Color selTempoColor = new Color(255, 0, 0, 100);

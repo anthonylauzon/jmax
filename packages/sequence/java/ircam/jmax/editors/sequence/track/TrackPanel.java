@@ -190,13 +190,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 					if( grid == MidiTrackEditor.MEASURES_GRID)
 					{
 						centerSection.add( tempoBar, BorderLayout.NORTH);
-						tempoBar.resetDisplayer();
+						/*tempoBar.resetDisplayer();*/
 						revalidate();
 					}
 					else
 					{
 						centerSection.remove( tempoBar);
-						tempoBar.resetDisplayer();
+						/*tempoBar.resetDisplayer();*/
 						revalidate();
 					}
 				}

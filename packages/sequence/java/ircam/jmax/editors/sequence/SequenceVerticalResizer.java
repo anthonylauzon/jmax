@@ -65,7 +65,7 @@ public class SequenceVerticalResizer extends SelectionResizer {
 
     int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
     
-    egc.getDisplayer().display( "dy "+deltaY);
+    egc.getDisplayer().display( "dy "+Displayer.numberFormat.format(deltaY));
 
     super.mouseDragged(e);
   }

@@ -301,14 +301,12 @@ private void drawVerticalGrid(Graphics g)
 	UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), gc.getDataModel());
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
-	int timeStep;
+	int timeStep, xPosition, snappedTime;
+	int maxY = ((PartitionAdapter)gc.getAdapter()).getMaxScoreY();
 	
 	timeStep = findBestTimeStep(windowTime);	
 	
 	g.setColor(ScoreRenderer.verticalLinesColor);
-	
-	int xPosition;
-	int snappedTime;
 	
 	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
 	{
@@ -316,7 +314,7 @@ private void drawVerticalGrid(Graphics g)
 		tempEvent.setTime(snappedTime);
 		xPosition = gc.getAdapter().getX(tempEvent);
 		
-		g.drawLine(xPosition, 0, xPosition, d.height);
+		g.drawLine(xPosition, 0, xPosition, maxY);
 	}
 }
 
@@ -368,8 +366,6 @@ SequenceGraphicContext gc;
 Image itsImage;
 boolean toRepaintBack = false;
 boolean locked = false;
-
-/*public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);*/
 
 public static final int KEYX = 27;
 public static final int KEYWIDTH = 28;

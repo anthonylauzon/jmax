@@ -69,7 +69,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
       getListener().updateStartingPoint(-delta, 0);
 	    
       PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-      getGc().getDisplayer().display( pa.LenghtMapper.getName()+" "+pa.getInvX(x));
+      getGc().getDisplayer().display( pa.LenghtMapper.getName()+" "+Displayer.numberFormat.format(pa.getInvX(x)));
     }
     void setScrollManager( ScrollManager mng)
     {
@@ -172,7 +172,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
 	  aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
 	  
 	  if( aTrackEvent == last) 
-	    egc.getDisplayer().display( a.LenghtMapper.getName()+" "+a.getInvLenght(tempEvent));
+	    egc.getDisplayer().display( a.LenghtMapper.getName()+" "+Displayer.numberFormat.format( a.getInvLenght(tempEvent)));
 	}
     else
       for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
@@ -188,7 +188,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
 	  aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
 	  
 	  if( aTrackEvent == last) 
-	    egc.getDisplayer().display( a.HeigthMapper.getName()+" "+a.getHeigth( tempEvent));
+	    egc.getDisplayer().display( a.HeigthMapper.getName()+" "+Displayer.numberFormat.format( a.getHeigth( tempEvent)));
 	}
 	 
     g.setPaintMode();

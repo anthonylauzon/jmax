@@ -274,22 +274,20 @@ private void drawVerticalGrid(Graphics g)
 	UtilTrackEvent tempEvent = new UtilTrackEvent(value, gc.getDataModel());
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
-	int timeStep;
+	int timeStep, xPosition, snappedTime;
+	int maxY = ((PartitionAdapter)gc.getAdapter()).getMaxScoreY();
 	
 	timeStep = findBestTimeStep(windowTime);
 	
 	g.setColor(ScoreRenderer.verticalLinesColor);
-	
-	int xPosition;
-	int snappedTime;
-	
+
 	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
 	{
 		snappedTime = (i/timeStep)*timeStep;
 		tempEvent.setTime(snappedTime);
 		xPosition = gc.getAdapter().getX(tempEvent);
 		
-		g.drawLine(xPosition, 0, xPosition, d.height);
+		g.drawLine(xPosition, 0, xPosition, maxY);
 	}
 }
 
