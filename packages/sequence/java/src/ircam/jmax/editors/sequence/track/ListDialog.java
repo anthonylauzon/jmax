@@ -91,15 +91,6 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 	scroll.repaint();	
     }
     
-    public void showEvent(int index, TrackEvent evt, Rectangle r)
-    {
-	if((!scroll.getViewport().getViewRect().contains(r.x, r.y))||(!scroll.getViewport().getViewRect().contains(r.x, r.y+r.height)))
-	    {
-		scroll.getVerticalScrollBar().setValue(0);//??
-		scroll.getViewport().scrollRectToVisible(r);
-	    }
-    }
-
     /**
      * PopupProvider interface
      */

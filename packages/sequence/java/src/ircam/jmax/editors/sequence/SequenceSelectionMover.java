@@ -24,6 +24,7 @@
 // 
 
 package ircam.jmax.editors.sequence;
+
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
@@ -32,6 +33,7 @@ import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * an interaction module used to move a selection of objects.
@@ -39,10 +41,77 @@ import java.awt.event.*;
  */
 public class SequenceSelectionMover extends SelectionMover  implements XORPainter {
 
-  public SequenceSelectionMover(DragListener theListener, int theMovement) 
-  {
-    super(theListener, theMovement); 
-  }
+    public SequenceSelectionMover(DragListener theListener, int theMovement) 
+    {
+	super(theListener, theMovement); 
+	
+	initAutoScroll();
+    }
+
+
+    /******************* autoscrolling *******************/
+
+    Timer scrollTimer;
+    SequenceScrollDragAction scroller;
+
+    private void initAutoScroll()
+    {
+	scroller    = new SequenceScrollDragAction();
+	scrollTimer = new Timer(8, scroller);
+	scrollTimer.setCoalesce(true);
+	scrollTimer.setRepeats(true);
+    }
+
+    class SequenceScrollDragAction implements ActionListener
+    {
+	SequencePanel sequencePanel;
+	TrackEvent event;
+	private int delta = 10;
+	
+	public void actionPerformed(ActionEvent ae)
+	{
+	    //sequencePanel.makeVisible(evt);	    
+	    int time = (int)event.getTime();
+	    if(sequencePanel.scrollBy(time))
+		event.setTime(time+delta);
+	    else
+		event.setTime(time-delta);
+	
+	}
+	void setEditor(SequencePanel editor)
+	{
+	    this.sequencePanel = editor;
+	}
+	void setEvent(TrackEvent evt)
+	{
+	    event = evt;
+	}
+    }
+
+    void autoScrollIfNeeded()
+    {
+	SequencePanel panel = (SequencePanel)((Sequence)gc.getFrame()).getEditor();
+	if (! panel.eventIsVisible(tempEvent))
+	    {
+		if (scrollTimer.isRunning())
+		    {
+			// Ignore
+		    }
+		else
+		    {
+			scroller.setEditor(panel);
+			scroller.setEvent(tempEvent);
+			scrollTimer.start();
+		    }
+	    }
+	else 
+	    {
+		if (scrollTimer.isRunning())
+		    {
+			scrollTimer.stop();
+		    }
+	    }
+    }
 
   /**
    * sets the point on which to start the movement
@@ -117,26 +186,30 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
    */
   public void mouseDragged(MouseEvent e) 
   {
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-
-    int deltaX = (int) (egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x));
-    int deltaY = (int) (egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y));
+      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+      
+      int deltaX = (int) (egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x));
+      int deltaY = (int) (egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y));
     
-    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX));
-    else if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
-    else egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX)+", dy "+(deltaY));
+      if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+	  egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX));
+      else if ((itsMovements & VERTICAL_MOVEMENT) != 0)
+	  egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
+      else egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX)+", dy "+(deltaY));
+      
+      super.mouseDragged(e);
 
-    super.mouseDragged(e);
+      autoScrollIfNeeded();
   }
 
   /**
    * from the XORPainter interface. The actual drawing function.
    */
+
+
   public void XORDraw(int dx, int dy) 
   {
-
+    TrackEvent movTrackEvent;
     Graphics g = gc.getGraphicDestination().getGraphics();
     g.setColor(Color.gray);
     g.setXORMode(Color.white); 
@@ -153,24 +226,23 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     }
     else // move every element
       {
-	TrackEvent aTrackEvent;
 	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
 	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
 	for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
-	    aTrackEvent = (TrackEvent) e.nextElement();
+	    movTrackEvent = (TrackEvent) e.nextElement();
 
-	    a.setX(tempEvent, a.getX(aTrackEvent));
-	    a.setY(tempEvent, a.getY(aTrackEvent));
-	    a.setLenght(tempEvent, a.getLenght(aTrackEvent));
-	    a.setHeigth(tempEvent, a.getHeigth(aTrackEvent));
+	    a.setX(tempEvent, a.getX(movTrackEvent));
+	    a.setY(tempEvent, a.getY(movTrackEvent));
+	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
+	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-	      a.setX(tempEvent, a.getX(aTrackEvent)+dx);
+	      a.setX(tempEvent, a.getX(movTrackEvent)+dx);
 	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
-	      a.setY(tempEvent, a.getY(aTrackEvent)+dy);
-	    
-	    aTrackEvent.getRenderer().render(tempEvent, g, true, gc);
+	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
+
+	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
 	    // and make the keyboard in the MidiTrack a listener of such movements.
@@ -194,4 +266,5 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }
+
 

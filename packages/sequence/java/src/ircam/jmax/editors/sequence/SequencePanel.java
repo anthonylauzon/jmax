@@ -48,7 +48,6 @@ import ircam.jmax.toolkit.*;
    */
 public class SequencePanel extends JPanel implements Editor, TrackListener, TrackDataListener, ListSelectionListener {
     
-    //SequenceRemoteData sequenceRemoteData;
     FtsSequenceObject ftsSequenceObject;
 
     EditorToolbar toolbar;
@@ -59,7 +58,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     Box trackPanel;
     JScrollPane scrollTracks;
-
+    
     Hashtable trackContainers = new Hashtable();
     MutexPropertyHandler mutex = new MutexPropertyHandler("active");
     //---
@@ -88,8 +87,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     sequenceData = data;
 
     setDoubleBuffered(false);
-    //sequenceRemoteData = (SequenceRemoteData)data;
-    //sequenceRemoteData.addTrackListener(this);
     ftsSequenceObject = (FtsSequenceObject)data;
     ftsSequenceObject.addTrackListener(this);
 
@@ -148,7 +145,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      ********** so we insert some false track to test the track editors */
 
 
-    //sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
     ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(FricativeValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(CueValue.info)));
@@ -158,12 +154,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     JPanel separate_tracks = new JPanel();
     separate_tracks.setLayout(new BorderLayout());
 
-    //sequenceRemoteData.getTrackAt(0).setProperty("active", Boolean.TRUE);
     ftsSequenceObject.getTrackAt(0).setProperty("active", Boolean.TRUE);
 
     trackPanel.setSize(500, 50);
 
-    //separate_tracks.add(trackPanel, BorderLayout.CENTER);
     separate_tracks.add(scrollTracks, BorderLayout.CENTER);
     
     //-- prepares the Status bar
@@ -420,7 +414,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     public MaxDocument getDocument()
     {
-	//return sequenceRemoteData.getDocument();
 	return ftsSequenceObject.getDocument();
     }
 
@@ -439,18 +432,50 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	if (SequenceSelection.getCurrent().size()==1)
 	    {
 		TrackEvent evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
-		int time = (int)evt.getTime();
-		int dur = ((Integer)evt.getProperty("duration")).intValue();
-		int startTime = -geometry.getXTransposition(); 
-		int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-		
-		if(time<startTime)
-		    itsTimeScrollbar.setValue(time);
-		else if(time>endTime)
-		    itsTimeScrollbar.setValue(time-endTime+startTime+dur+10);
+		makeVisible(evt);
 	    }
     }
     
+    public boolean eventIsVisible(TrackEvent evt)
+    {
+	int time = (int)evt.getTime();
+	int dur = ((Integer)evt.getProperty("duration")).intValue();
+	int startTime = -geometry.getXTransposition(); 
+	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+	return ((time>startTime)&&(time+dur<endTime));
+    }
+
+    private int scrollingDelta = 10; 
+    public boolean scrollBy(int eventTime)
+    {
+	int startTime = -geometry.getXTransposition(); 
+	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+	if(eventTime<startTime)
+	    {
+		itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
+		return false;//going to left
+	    }
+	else
+	    {
+		if(eventTime>endTime)
+		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()+scrollingDelta);
+		return true;//going to rigth
+	    }
+    }
+
+    public void makeVisible(TrackEvent evt)
+    {
+	int time = (int)evt.getTime();
+	int duration = ((Integer)evt.getProperty("duration")).intValue();
+	int startTime = -geometry.getXTransposition(); 
+	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+	
+	if(time<startTime)
+	    itsTimeScrollbar.setValue(time);
+	else if(time>endTime)
+	    itsTimeScrollbar.setValue(time-endTime+startTime+duration+10);
+    }
+
     public int getMaximumVisibleTime()
     {
 	return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
@@ -518,9 +543,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//--- Ruler fields
 	Dimension rulerDimension = new Dimension(200, 30);
 	FontMetrics fm;
-    }
-
-    
+    }    
 }
 
 

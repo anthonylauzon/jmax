@@ -10,5 +10,4 @@ public interface TrackListListener
 {
     public abstract void eventSelected(int index, int paramIndex, TrackEvent evt);   
     public abstract void eventDeselected(int index, TrackEvent evt);   
-    public abstract void showEvent(int index, TrackEvent evt, Rectangle r);   
 }

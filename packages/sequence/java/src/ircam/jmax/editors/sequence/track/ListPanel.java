@@ -218,12 +218,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	    ((TrackListListener) e.nextElement()).eventDeselected(index, evt);
     }    
 
-    void notifyShow(int index, TrackEvent evt, Rectangle r)
-    {
-	for(Enumeration e = listeners.elements(); e.hasMoreElements();)
-	    ((TrackListListener) e.nextElement()).showEvent(index, evt, r);
-    }
-
     public TrackEvent getCurrentEvent()
     {
 	return currentEvent;
@@ -240,7 +234,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	notifySelection(currentIndex, currentParamInEvent, currentEvent);
 
 	selRect.setBounds(currentParamInEvent*xstep, currentIndex*ystep, xstep, ystep);
-	notifyShow(currentIndex, currentEvent, selRect);
+	scrollRectToVisible(selRect);
     }
 
     public void deselect(TrackEvent evt, int index)

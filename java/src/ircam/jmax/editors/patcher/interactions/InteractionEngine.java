@@ -361,6 +361,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     }
   }
 
+
   void autoScrollIfNeeded(ErmesSketchPad editor, int squeack, Point mouse, Point oldMouse)
   {
     // Handle the auto scrolling and autoresizing

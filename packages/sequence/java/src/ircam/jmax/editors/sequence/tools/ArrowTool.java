@@ -55,7 +55,6 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
   }
 
-  
   /**
    * called when this tool is unmounted
    */
