@@ -560,8 +560,16 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
     tools = new Vector();
     String fs = File.separator;
+    String path = null;
+    try
+      {
+	path  = MaxApplication.getPackageHandler().locatePackage("table").getPath()+fs+"images"+fs;
+      }
+    catch(FileNotFoundException e){
+      System.err.println("Couldn't locate table images");
+    }
     //String path1 = MaxApplication.getProperty("root")+fs+"packages/table/images"+fs;
-    String path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;
+    //String path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;
     
     itsDefaultTool = new TableSelecter(new ImageIcon(path+"table_selecter.gif"));
 
