@@ -274,6 +274,7 @@ public class JMaxApplication extends FtsClient {
     Platform.setValues();
 
     properties.put( "jmaxVersion", JMaxVersion.getVersion());
+    System.setProperty( "com.apple.macos.useScreenMenuBar", "true");
 
     parseCommandLineOptions( args);
 
