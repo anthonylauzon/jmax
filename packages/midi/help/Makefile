@@ -23,31 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-all:
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all_c
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean_c
-
-all_java:
-.PHONY: all_java
-
-clean_java:
-.PHONY: clean_java
-
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/midi
-	$(INSTALL_DATA) midi.jpk $(lib_install_dir)/packages/midi/midi.jpk
-	( cd c ; $(MAKE) $@)
-	( cd help ; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/midi/help
+	for f in *.tcl *.jmax *.gif *.env; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/midi/help/$$f ; done
 .PHONY: install
+
+
