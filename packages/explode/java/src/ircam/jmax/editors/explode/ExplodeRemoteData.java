@@ -136,11 +136,11 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     
     Object args[] = new Object[6];
     args[0] = new Integer(index);
-    args[1] = new evt.getTime();
-    args[2] = new evt.getPitch();
-    args[3] = new evt.getVelocity();
-    args[4] = new evt.getDuration();
-    args[5] = new evt.getSomething();
+    args[1] = new Integer(evt.getTime());
+    args[2] = new Integer(evt.getPitch());
+    args[3] = new Integer(evt.getVelocity());
+    args[4] = new Integer(evt.getDuration());
+    args[5] = new Integer(evt.getSomething());
     remoteCall(REMOTE_ADD, args);
 
     notifyListeners();
