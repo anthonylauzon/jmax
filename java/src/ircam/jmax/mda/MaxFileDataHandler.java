@@ -40,7 +40,17 @@ abstract public class MaxFileDataHandler extends MaxDataHandler
       {
 	File file = ((MaxFileDataSource)source).getFile();
 
-	return ((! file.exists()) || file.canWrite()) && canSaveTo(file);
+	if (file.exists())
+	  {
+	    // If the file exists, we write into it 
+	    // only if we can and if we can load (and save) from it
+	    // this avoid rewriting over a file in a format that we don't
+	    // understand.
+	    
+	    return file.canWrite() && canSaveTo(file) && canLoadFrom(source);
+	  }
+	else
+	  return canSaveTo(file);
       }
     else
       return false;
@@ -72,16 +82,10 @@ abstract public class MaxFileDataHandler extends MaxDataHandler
 
   public MaxData loadInstance(MaxDataSource source) throws MaxDataException
   {
-    MaxFileDataSource fileSource = (MaxFileDataSource) source;
-    File file = fileSource.getFile();
-    MaxData obj;
+    File file = ((MaxFileDataSource) source).getFile();
 
-    obj = makeInstance(file);
+    return  makeInstance(file);
     
-    obj.setDataHandler(this);
-    obj.setDataSource(source);
-
-    return obj;
   }
 
   /** Actually build and return an Max Data from a file */

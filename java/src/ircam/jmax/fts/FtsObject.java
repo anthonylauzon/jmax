@@ -349,22 +349,22 @@ abstract public class FtsObject implements MaxTclInterpreter
       }
     else if (name.equals("x"))
       {
-	posX = ((Integer)value).intValue();
+	x = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("y"))
       {
-	posY = ((Integer)value).intValue();
+	y = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("w"))
       {
-	sizeW = ((Integer)value).intValue();
+	width = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("h"))
       {
-	sizeH = ((Integer)value).intValue();
+	height = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("name"))
@@ -395,13 +395,13 @@ abstract public class FtsObject implements MaxTclInterpreter
     else if (name.equals("outs"))
       return new Integer(getNumberOfOutlets());
     else if (name.equals("x"))
-      return new Integer(posX);
+      return new Integer(x);
     else if (name.equals("y"))
-      return new Integer(posY);
+      return new Integer(y);
     else if (name.equals("w"))
-      return new Integer(sizeW);
+      return new Integer(width);
     else if (name.equals("h"))
-      return new Integer(sizeH);
+      return new Integer(height);
     else if (name.equals("name"))
       return getObjectName();
     else
@@ -621,52 +621,52 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   /** Test: x, y, to cache locally the position */
 
-  int posX; // @@@@
-  int posY;
-  int sizeW;
-  int sizeH;
+  protected int x; 
+  protected int y;
+  protected int width;
+  protected int height;
 
   /** Direct access to geometric properties; recomended when possible */
   /** They don't fire listener, they should !!! */
 
-  public final int getPosX()
+  public final int getX()
   {
-    return posX;
+    return x;
   }
 
-  public final void setPosX(int p)
+  public final void setX(int p)
   {
-    posX = p;
+    x = p;
   }
 
-  public final int getPosY()
+  public final int getY()
   {
-    return posY;
+    return y;
   }
 
-  public final void setPosY(int p)
+  public final void setY(int p)
   {
-    posY = p;
+    y = p;
   }
 
-  public final int getSizeW()
+  public final int getWidth()
   {
-    return sizeW;
+    return width;
   }
 
-  public final void setSizeW(int p)
+  public final void setWidth(int p)
   {
-    sizeW = p;
+    width = p;
   }
 
-  public final int getSizeH()
+  public final int getHeight()
   {
-    return sizeH;
+    return height;
   }
 
-  public final void setSizeH(int p)
+  public final void setHeight(int p)
   {
-    sizeH = p;
+    height = p;
   }
 
   /*****************************************************************************/
@@ -705,7 +705,11 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public String toString()
   {
-    return "FtsObject:" + ftsId + "{" + description + "}";
+    String name;
+
+    name = this.getClass().getName();
+
+    return "<" + name.substring(name.lastIndexOf('.') + 1) + " " + "{" + description + "}" + " #" + ftsId + ">";
   }
 
   /*****************************************************************************/

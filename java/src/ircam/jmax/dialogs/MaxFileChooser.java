@@ -4,18 +4,14 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.preview.*;
-
-import ircam.jmax.*;
 import ircam.jmax.mda.*;
-
 /**
  * 
  * A File Dialog that provide the concept
- * of current directory, and a few more things, using the JFileChooser.
+ * of current directory, and a few more things.
  * Use the *static* methods.
  * 
+Substitute getOpenFileName <<<
  */
 
 public class MaxFileChooser {
@@ -24,33 +20,29 @@ public class MaxFileChooser {
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
 
-
-  /** CHoose a file for opening, in the current directory, with a given f ilename filter */
+  /** CHoose a file for opening, in the current directory */
 
   public static MaxDataSource chooseFileToOpen(Frame frame, String title)
   {
-    JFileChooser fd;
+    FileDialog fd = new FileDialog(frame, title);
+    String file;
 
-    if (currentOpenDirectory == null)
-      currentOpenDirectory = MaxApplication.jmaxProperties.getProperty("user.dir");
+    fd.setFile("");
 
-    fd = new JFileChooser(currentOpenDirectory);
+    if (currentOpenDirectory != null)
+      fd.setDirectory(currentOpenDirectory);
 
-    fd.setOkayTitle("Open");
+    fd.setMode(FileDialog.LOAD);
 
-    if (fd.showDialog(frame) == 0)
-      {
-	File file;
+    fd.show();
 
-	file = fd.getSelectedFile();
-	
-	if (file != null)
-	  currentOpenDirectory = file.getParent();
+    currentOpenDirectory = fd.getDirectory();
+    file = fd.getFile();
 
-	return MaxDataSource.makeDataSource(file);
-      }
-    else
+    if ((file == null) || file.equals(""))
       return null;
+    else
+      return MaxDataSource.makeDataSource(new File(currentOpenDirectory, file));
   }
 
   /* CHoose a file to save */
@@ -64,39 +56,53 @@ public class MaxFileChooser {
 
   public static MaxDataSource chooseFileToSave(Frame frame, String title, MaxDataSource source)
   {
-    JFileChooser fd;
+    FileDialog fd = new FileDialog(frame, title);
+    String file;
+    String dir;
+    String oldDir = null;
     File oldFile = null;
 
     if ((source != null) && (source instanceof MaxFileDataSource))
       oldFile = ((MaxFileDataSource) source).getFile();
 
-    // if (oldFile != null)
-    // fd = new JFileChooser(oldFile);
-    // else
-
+    if (oldFile != null)
       {
-	if (currentOpenDirectory == null)
-	  currentOpenDirectory = MaxApplication.jmaxProperties.getProperty("user.dir");
-
-	fd = new JFileChooser(currentOpenDirectory);
-      }
-
-    fd.setPrompt("Save");
-    fd.setOkayTitle("Save");
-
-    if (fd.showDialog(frame) == 0)
-      {
-	File file;
-	
-	file = fd.getSelectedFile();    
-
-	if ((oldFile == null) && (file != null))
-	  currentOpenDirectory = file.getParent();
-
-	return MaxDataSource.makeDataSource(file);
+	fd.setFile(oldFile.getName());
+	oldDir = oldFile.getParent();
+	fd.setDirectory(oldDir);
       }
     else
+      {
+	fd.setFile("");
+
+	if (currentOpenDirectory != null)
+	  {
+	    oldDir = currentOpenDirectory;
+	    fd.setDirectory(oldDir);
+	  }
+      }
+
+    fd.setMode(FileDialog.SAVE);
+    fd.show();
+
+    file = fd.getFile();    
+    dir  = fd.getDirectory();
+
+    // Patch for the Motif file box  ???
+
+    if(dir!=null){
+      if (dir.equals(".") || dir.equals("./"))
+	if (oldDir != null)
+	  dir = oldDir;
+    }
+      
+    if ((file == null) || file.equals(""))
       return null;
+
+    if (oldFile == null)
+      currentOpenDirectory = dir;
+
+    return MaxDataSource.makeDataSource(new File(dir, file));
   }
 }
 

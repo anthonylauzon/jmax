@@ -24,7 +24,7 @@ class FtsDotPatTokenizer
 
   int ttype;
   String sval;
-  Vector env;
+  Vector env = null;
 
   InputStream in;
 
@@ -212,43 +212,39 @@ class FtsDotPatTokenizer
 		break;
 		
 	      case tt_in_var:
-		if (isDigit(c))
+		if (isDigit(c) && (env != null))
 		  {
-		    if (env != null)
-		      {
-			int v = c - '0'; 
+		    int v = c - '0'; 
 
-			if (v == 0)
+		    if (v == 0)
+		      {
+			buf.append(Integer.toString(unique_var));
+			status = tt_in_string;
+		      }
+		    else
+		      {
+			Object value = getEnvValue(v);
+
+			if (value instanceof Integer)
 			  {
-			    buf.append(Integer.toString(unique_var));
+			    buf.append(value.toString());
+			    status = tt_in_number;
+			  }
+			else if (value instanceof Float)
+			  {
+			    buf.append(value.toString());
+			    status = tt_in_float;
+			  }
+			else if (value instanceof String)
+			  {
+			    buf.append((String) value);
 			    status = tt_in_string;
 			  }
 			else
 			  {
-			    Object value = getEnvValue(v);
-
-			    if (value instanceof Integer)
-			      {
-				buf.append(value.toString());
-				status = tt_in_number;
-			      }
-			    else if (value instanceof Float)
-			      {
-				buf.append(value.toString());
-				status = tt_in_float;
-			      }
-			    else if (value instanceof String)
-			      {
-				buf.append((String) value);
-				status = tt_in_string;
-			      }
-			    else
-			      {
-				buf.append(value.toString());
-				status = tt_in_string;
-			      }
+			    buf.append(value.toString());
+			    status = tt_in_string;
 			  }
-			
 		      }
 		  }
 		else

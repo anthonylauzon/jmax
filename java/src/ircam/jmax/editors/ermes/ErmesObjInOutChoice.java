@@ -43,7 +43,6 @@ public class ErmesObjInOutChoice extends Choice implements ItemListener {
   //this method is called (I hope) when the user choosed a number
   
   public boolean action(Event event, Object arg) {
-    System.err.println("booh!");
     int numberChoosen = getSelectedIndex();
     if (itsOwner instanceof ircam.jmax.editors.ermes.ErmesObjIn) {
     ((ErmesObjIn) itsOwner).ChangeInletNo(numberChoosen);
@@ -61,7 +60,6 @@ public class ErmesObjInOutChoice extends Choice implements ItemListener {
   public void itemStateChanged(ItemEvent e){
     int numberChoosen = getSelectedIndex();
     
-    System.err.println("yhoo-hoo! Era un "+itsOwner.getClass().getName() );
     if(itsOwner instanceof ircam.jmax.editors.ermes.ErmesObjIn) {
       ((ErmesObjIn) itsOwner).ChangeInletNo(numberChoosen);
     }

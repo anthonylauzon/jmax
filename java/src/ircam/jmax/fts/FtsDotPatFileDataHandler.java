@@ -78,6 +78,14 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
     throw new MaxDataException("Cannot save in .pat file format");
   }
 
+  // Overwrite upper class method; we cannot save to a .pat file.
+
+  public boolean canSaveTo(MaxDataSource source)
+  {
+    return false;
+  }
+       
+
   protected boolean canSaveTo(File file)
   {
     return false;

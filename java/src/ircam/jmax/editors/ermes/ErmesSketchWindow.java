@@ -772,7 +772,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   private boolean SaveBody(){
-    setTitle(itsData.getName());
+    // This line will not work for patches loaded from
+    // sources that are not files !!!
+      
+    setTitle(((MaxFileDataSource)itsData.getDataSource()).getFile().getName()); 
 
     CreateFtsGraphics(this);
 
@@ -801,24 +804,18 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
     // we should RECEIVE this FILE, or contruct it when we load this document
-    String oldTitle = getTitle();
 		
-    if (itsData.getDataSource() == null)
+    // The "canSave" method of a data tell if it can be saved
+    // i.e. if it have a data source, and if we can write to its data source
+
+    if (itsData.canSave())
       {
-	MaxDataSource source;
-
-	source = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
-
-	if (source == null)
-	  return false; //user cancelled the dialog
-	else
-	  itsData.setDataSource(source);
-      } 
-
-    if(!SaveBody()) return false;
-    alreadySaved = true;
-    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
-    return true;
+	if(!SaveBody()) return false;
+	alreadySaved = true;
+	return true;
+      }
+    else
+      return SaveAs();
   }
 
   public boolean SaveAs() {

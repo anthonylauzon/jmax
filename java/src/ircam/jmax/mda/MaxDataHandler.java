@@ -52,8 +52,7 @@ abstract public class MaxDataHandler
 	  {
 	    newInstance = dataHandler.loadInstance(source);
 
-	    newInstance.setDataHandler(dataHandler);
-	    newInstance.setDataSource(source);
+	    newInstance.setDataSourceAndHandler(source, dataHandler);
 
 	    // here, raise the new instance event  ??
 

@@ -89,6 +89,16 @@ abstract public class MaxData
     this.handler = MaxDataHandler.findDataHandlerFor(source);
   }
 
+  /** To set both the handler and the source at the same time;
+    used in initialization
+    */
+
+  void setDataSourceAndHandler(MaxDataSource source, MaxDataHandler handler)
+  {
+    this.source = source;
+    this.handler = handler;
+  }
+
   /** Getting the type */
 
   public MaxDataType getDataType()
@@ -160,10 +170,12 @@ abstract public class MaxData
 
   public boolean canSave()
   {
-    if (handler != null)
-      return handler.canSaveTo(source);
-    else
+    if (source == null)
       return false;
+    else if (handler == null)
+      return false;
+    else
+      return  handler.canSaveTo(source);
   }
     
   /** Save the instance to its data source */

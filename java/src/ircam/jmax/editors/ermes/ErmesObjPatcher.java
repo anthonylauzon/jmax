@@ -88,10 +88,10 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     //the parent patcher could destroy connections...
     GetSketchWindow().itsPatcher.watch("deletedConnection",GetSketchWindow());
     //the children could destroy connections AND objects
-    //if (itsSubWindow != null) {
-    /*itsSubWindow.itsPatcher*/itsFtsObject.watch("deletedObject", itsSubWindow);
-    /*itsSubWindow.itsPatcher.*/itsFtsObject.watch("deletedConnection", itsSubWindow);
-    //}
+    if (itsSubWindow != null) {
+    itsFtsObject.watch("deletedObject", itsSubWindow);
+    itsFtsObject.watch("deletedConnection", itsSubWindow);
+    }
     ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);
    if (itsSubWindow != null)  itsFtsObject.removeWatch(itsSubWindow);  
   }
