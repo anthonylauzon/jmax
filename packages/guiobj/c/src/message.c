@@ -24,7 +24,6 @@
  *
  */
 
-
 /* 
    New implementation of the message.
 
@@ -32,15 +31,11 @@
    memory hungry implementation of the old binbuf concept).
 
    MDC
-   */
+*/
 
 #include "fts.h"
 
 #define DEFAULT_DURATION 125.0f
-
-static void init_eval(void);
-
-/********************* message ************************/
 
 typedef struct 
 {
@@ -50,260 +45,14 @@ typedef struct
   int value;
 } message_t;
 
-static void fts_eval_atom_list(message_t *this,
-			       fts_atom_list_t *list,
-			       int env_ac, const fts_atom_t *env_at,
-			       fts_object_t *default_dst, int outlet);
-
-static void message_tick(fts_alarm_t *alarm, void *calldata);
-
-static void
-message_update(fts_object_t *o)
-{
-  message_t *this = (message_t *) o;
-  fts_atom_list_iterator_t *iterator;
-
-  iterator = fts_atom_list_iterator_new(this->atom_list);
-
-  fts_client_mess_start_msg(CLIENTMESS_CODE);
-  fts_client_mess_add_object((fts_object_t *)this);
-
-  while (! fts_atom_list_iterator_end(iterator))
-    {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
-      fts_atom_list_iterator_next(iterator);
-    }
-
-  fts_client_mess_send_msg();
-  fts_atom_list_iterator_free(iterator);
-}
-
-static void
-message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_update(o);
-}
-
-
-/* message_eval is installed for bang, int, float and list.
-   It is not installed for anything, because the semantic
-   of message do not allow other messages to trigger the
-   evalution of the box content.
-*/
-
-
-static void 
-message_tick(fts_alarm_t *alarm, void *calldata)
-{
-  message_t *this = (message_t *)calldata;
-
-  this->value = 0;
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
-}
-
-
-static void
-message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{  
-  message_t *this = (message_t *) o;
-
-  this->value = 1;
-  fts_object_ui_property_changed(o, fts_s_value);
-
-  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
-  fts_alarm_arm(&(this->alarm));
-
-  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
-}
-
-
-static void
-message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{  
-  message_t *this = (message_t *) o;
-
-  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
-}
-
-
-static void
-message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_set(this->atom_list, ac, at);
-
-  if (fts_object_patcher_is_open((fts_object_t *) this))
-    message_update(o);
-}
-
-/* Set without update, for the editing */
-
-static void
-message__set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_set(this->atom_list, ac, at);
-}
-
-static void
-message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_append(this->atom_list, ac, at);
-
-  if (fts_object_patcher_is_open((fts_object_t *) this))
-    message_update(o);
-}
-
-static void
-message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_append(this->atom_list, ac, at);
-}
-
-
-static void
-message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_clear(this->atom_list);
-}
-
-
-static void
-message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  this->atom_list = fts_atom_list_new();
-  fts_alarm_init(&(this->alarm), 0, message_tick, this);
-  this->value = 0;
-}
-
-
-static void
-message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-
-  fts_atom_list_free(this->atom_list);
-  fts_alarm_unarm(&(this->alarm));
-}
-
-
-static void
-message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
-
-  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
-}
-
-
-static void
-message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  message_t *this = (message_t *) o;
-  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
-
-  if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
-    fts_object_set_add(set, o);
-}
-
-
-/* daemon to get the "value" property: the value property is set to 
- * one to actually bang the message, and reset to zero after a timer elapse;
- * it is used to make the message box flash like the messages; java is not
- * reialable for this kind of real time flashing.
+/************************************************************
+ *
+ *  utils
+ *
  */
 
-static void
-message_get_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
-{
-  message_t *this = (message_t *)obj;
-
-  fts_set_int(value, this->value);
-}
-
-
-static fts_status_t
-message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t a[1];
-
-  fts_class_init(cl, sizeof(message_t), 1, 1, 0);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, message_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, message_delete, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, message_set);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, message_find);
-  fts_method_define(cl, fts_SystemInlet, fts_s_bang, message_eval_and_update, 0, 0);
-
-  /* Atom list saving/loading/update support */
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_upload, message_upload, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  message_append_noupdate);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  message_clear_noupdate);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, message_save_bmax, 1, a);
-
-  /* Application methods */
-
-  fts_method_define(cl, 0, fts_s_bang, message_eval, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, message_eval, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, message_eval, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, message_eval, 1, a);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, message_eval);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, message_set);
-
-  fts_method_define_varargs(cl, 0, fts_s_append,  message_append);
-
-  /* value daemons */
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, message_get_value);
-
-  return fts_Success;
-}
-
-
-void
-message_config(void)
-{
-  init_eval();
-
-  fts_class_install(fts_new_symbol("messbox"), message_instantiate);
-}
-
-
-/*********************************************************************/
-/*                                                                   */
-/*      The eval function: local because not of general utility      */
-/*                                                                   */
-/*********************************************************************/
-
-
 /* 
-   atom list eval.
+   atom list eval (the eval function is local because not of general utility)
 
    Inspired to the binbuf eval, but with a clean structure.
 
@@ -333,8 +82,6 @@ message_config(void)
 
 */
 
-
-
 /* init function: essentially, initialize some atoms */
 
 static fts_symbol_t ev_s_star;
@@ -352,7 +99,7 @@ init_eval(void)
    No overflow checks are done, but a check macro is provided.
 */
 
-#define ATOM_STACK_SIZE (1024*16)
+#define ATOM_STACK_SIZE (1024 * 16)
 
 static fts_atom_t  atom_stack[ATOM_STACK_SIZE];
 static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
@@ -386,7 +133,6 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
    "reader engine" controlled by specific opcode.
    
  */
-
 static void
 fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
 		   fts_object_t *default_dst, int outlet)
@@ -397,17 +143,16 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 
   fts_atom_list_iterator_t *iter; /* iterator to read the list */
 
-  int       rd_env_count;	/* counter for reading the env  */
+  int rd_env_count = 0;	/* counter for reading the env  */
 
-  const fts_atom_t *rd_out;	/* reader output; NULL if end of the list or end of the
-				   env */
+  const fts_atom_t *rd_out = 0;	/* reader output; NULL if end of the list or end of the env */
 
   /* lexical machine status */
 
   enum {lex_list_read, lex_eval, lex_quoting, lex_env_read} lex_status; /* the lex machine status */
 
-  enum {lex_type_void, lex_type_value, lex_type_comma, lex_type_semi, lex_type_end, lex_type_error} lex_out_type; 
-  const fts_atom_t *lex_out_value;
+  enum {lex_type_void, lex_type_value, lex_type_comma, lex_type_semi, lex_type_end, lex_type_error} lex_out_type = lex_type_void;
+  const fts_atom_t *lex_out_value = 0;
 
   /* eval machine status, including message under construction */
 
@@ -417,7 +162,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
   int ev_dest_is_name = 0;
   fts_atom_t   *ev_fp;		/* frame pointer */
   int           ev_argc;
-  fts_symbol_t ev_sym;	/* the message symbol */
+  fts_symbol_t ev_sym = 0;	/* the message symbol */
 
   /* LOCAL MACRO for the evaluation engine */
 
@@ -528,7 +273,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 		}
 	      else
 		{
-		  post("Invalid $ argument in message box\n"); /*ERROR: should be an event ? */
+		  post("message: invalid $ argument\n"); /*ERROR: should be an event ? */
 		  lex_out_type = lex_type_error;
 		  lex_status = lex_list_read;
 		}
@@ -547,19 +292,29 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 		}
 	      else if (fts_variable_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out)))
 		{
-		  lex_out_type = lex_type_value;
 		  lex_out_value = fts_variable_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out));
-		  lex_status = lex_list_read;
+
+		  if(!fts_is_void(lex_out_value))
+		    {
+		      lex_out_type = lex_type_value;
+		      lex_status = lex_list_read;
+		    }
+		  else
+		    lex_out_type = lex_type_error;	
 		}
 	      else
+		lex_out_type = lex_type_error;
+	      
+	      if(lex_out_type == lex_type_error)
 		{
-		  post("Invalid symbol after a $ in message box\n"); /*ERROR: should be an event ? */
-		  lex_out_type = lex_type_error;
+		  fts_symbol_t var_name = fts_get_symbol(rd_out);
+		  
+		  post("message: undefined variable %s\n", fts_symbol_name(var_name)); /*ERROR: should be an event ? */
 		}
 	    }
 	  else
 	    {
-	      post("Invalid float value after a $ in message box\n"); /*ERROR: should be an event ? */
+	      post("message: syntax error after $\n"); /*ERROR: should be an event ? */
 	      lex_out_type = lex_type_error;
 	    }
 	  break;
@@ -618,7 +373,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 	      switch (lex_out_type)
 		{
 		case lex_type_void:
-		  post("Invalid void message destination after a ; in message box\n");
+		  post("message: invalid void message destination after a ;\n");
 		  break;
 		case lex_type_value:
 		  if (fts_is_symbol(lex_out_value))
@@ -630,23 +385,22 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 		      ev_status = ev_get_first_arg;
 
 		      if (! fts_named_object_exists(target_name))
-			post("Invalid message destination \"%s\" after a ; in message box\n",
-			     fts_symbol_name(target_name));
+			post("message: invalid message destination \"%s\"\n", fts_symbol_name(target_name));
 		    }
 		  else
 		    {
-		      post("Invalid message destination type after a ; in message box\n");
+		      post("message: invalid message destination\n");
 		      ev_status = ev_end;
 		    }
 		  break;
 
 		case lex_type_comma:
-		  post("Invalid comma as  message destination  after a ; in message box\n");
+		  post("message: invalid message destination \",\"\n");
 		  ev_status = ev_end;
 		  break;
 
 		case lex_type_semi:
-		  post("Invalid semi colon as  message destination  after a ; in message box\n");
+		  post("message: invalid message destination  \";\"\n");
 		  ev_status = ev_end;
 		  break;
 		case lex_type_end:
@@ -667,16 +421,9 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 		      ev_sym = fts_get_symbol(lex_out_value);
 		      ev_status = ev_get_args;
 		    }
-		  else if (fts_is_float(lex_out_value))
+		  else
 		    {
-		      ev_sym = fts_s_float;
-		      PUSH_ATOM(lex_out_value);
-		      ev_argc++;
-		      ev_status = ev_got_first;
-		    }
-		  else if (fts_is_long(lex_out_value))
-		    {
-		      ev_sym = fts_s_int;
+		      ev_sym = fts_get_selector(lex_out_value);
 		      PUSH_ATOM(lex_out_value);
 		      ev_argc++;
 		      ev_status = ev_got_first;
@@ -766,5 +513,275 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
   fts_atom_list_iterator_free(iter);
 }
 
+static int
+message_list_is_primitive(int ac, const fts_atom_t *at)
+{
+  int i;
+
+  for(i=0; i<ac; i++)
+    {
+      if(!fts_is_primitive(at + i))
+	{
+	  post("message: can not set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
+	  return 0;
+	}
+    }
+
+  return 1;
+}
+
+static void
+message_update(fts_object_t *o)
+{
+  message_t *this = (message_t *) o;
+  fts_atom_list_iterator_t *iterator;
+
+  iterator = fts_atom_list_iterator_new(this->atom_list);
+
+  fts_client_mess_start_msg(CLIENTMESS_CODE);
+  fts_client_mess_add_object((fts_object_t *)this);
+
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
+    }
+
+  fts_client_mess_send_msg();
+  fts_atom_list_iterator_free(iterator);
+}
+
+/************************************************************
+ *
+ *  tick
+ *
+ */
+
+static void 
+message_tick(fts_alarm_t *alarm, void *calldata)
+{
+  message_t *this = (message_t *)calldata;
+
+  this->value = 0;
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+}
 
 
+/************************************************************
+ *
+ *  system methods
+ *
+ */
+
+static void
+message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  this->atom_list = fts_atom_list_new();
+  fts_alarm_init(&(this->alarm), 0, message_tick, this);
+  this->value = 0;
+}
+
+
+static void
+message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  fts_atom_list_free(this->atom_list);
+  fts_alarm_unarm(&(this->alarm));
+}
+
+
+static void
+message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_update(o);
+}
+
+static void
+message_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+  
+  if(message_list_is_primitive(ac, at))
+    fts_atom_list_set(this->atom_list, ac, at);
+}
+
+static void
+message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  if(message_list_is_primitive(ac, at))
+    fts_atom_list_append(this->atom_list, ac, at);
+}
+
+
+static void
+message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  fts_atom_list_clear(this->atom_list);
+}
+
+
+static void
+message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *)o;
+  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
+
+  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
+}
+
+
+static void
+message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
+
+  if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
+    fts_object_set_add(set, o);
+}
+
+/************************************************************
+ *
+ *  user methods
+ *
+ */
+
+/* message_eval is installed for bang, int, float and list.
+   It is not installed for anything, because the semantic
+   of message do not allow other messages to trigger the
+   evalution of the box content.
+*/
+
+static void
+message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  if(message_list_is_primitive(ac, at))
+    fts_atom_list_set(this->atom_list, ac, at);
+
+  if (fts_object_patcher_is_open((fts_object_t *) this))
+    message_update(o);
+}
+
+static void
+message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+
+  if(message_list_is_primitive(ac, at))
+    fts_atom_list_append(this->atom_list, ac, at);
+
+  if (fts_object_patcher_is_open((fts_object_t *) this))
+    message_update(o);
+}
+
+static void
+message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{  
+  message_t *this = (message_t *) o;
+
+  this->value = 1;
+  fts_object_ui_property_changed(o, fts_s_value);
+
+  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
+  fts_alarm_arm(&(this->alarm));
+
+  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
+}
+
+static void
+message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{  
+  message_t *this = (message_t *) o;
+
+  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
+}
+
+/************************************************************
+ *
+ *  class
+ *
+ */
+
+/* daemon to get the "value" property: the value property is set to 
+ * one to actually bang the message, and reset to zero after a timer elapse;
+ * it is used to make the message box flash like the messages; java is not
+ * reialable for this kind of real time flashing.
+ */
+static void
+message_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  message_t *this = (message_t *)obj;
+
+  fts_set_int(value, this->value);
+}
+
+
+static fts_status_t
+message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[1];
+
+  fts_class_init(cl, sizeof(message_t), 1, 1, 0);
+
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, message_init, 1, a);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, message_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, message_set);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, message_find);
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, message_eval_and_update, 0, 0);
+
+  /* Atom list saving/loading/update support */
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_upload, message_upload, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  message_append_noupdate);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  message_clear_noupdate);
+
+  a[0] = fts_s_ptr;
+  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, message_save_bmax, 1, a);
+
+  /* Application methods */
+
+  fts_method_define(cl, 0, fts_s_bang, message_eval, 0, 0);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, message_eval, 1, a);
+
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, message_eval, 1, a);
+
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_s_symbol, message_eval, 1, a);
+
+  fts_method_define_varargs(cl, 0, fts_s_list, message_eval);
+
+  fts_method_define_varargs(cl, 0, fts_s_set, message_set);
+
+  fts_method_define_varargs(cl, 0, fts_s_append,  message_append);
+
+  /* value daemons */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_value, message_get_value);
+
+  return fts_Success;
+}
+
+
+void
+message_config(void)
+{
+  init_eval();
+
+  fts_class_install(fts_new_symbol("messbox"), message_instantiate);
+}
