@@ -11,29 +11,46 @@ import java.io.*;
  * time efficent.
  */
 
-public class FtsMessage
+final public class FtsMessage
 {
   /** Message command. */
 
-  int command;
+  private int command;
+
+  /** Message Content */
+
+  private int args_fill = 0;
+  private Object[] args = new Object[256];
 
   /** Get the message command. */
 
-  public int getCommand()
+  public final int getCommand()
   {
     return this.command;
   }
 
   /** Set the message command. */
 
-  public void setCommand(int command)
+  final void setCommand(int command)
   {
     this.command = command;
   }
 
-  /** Message Content */
+  /** 
+   * Private method to resize the
+   * arg array
+   */
 
-  Vector args;
+  final private void doubleSize()
+  {
+    Object[] new_args;
+
+    new_args = new Object[2 * args.length];
+
+    System.arraycopy(args, 0, new_args, 0, args.length);
+
+    args = new_args;
+  }
 
   /**
    * Clean the message content.
@@ -42,43 +59,48 @@ public class FtsMessage
    * @see FtsMessage#getArguments
    */
 
-  public void reset()
+  public final void reset()
   {
-    args = null;
+    args_fill = 0;
   }
 
   /**
-   * Get the message content. 
-   *
-   * @see FtsMessage#setArguments
-   * @see FtsMessage#reset
+   * Get a message argument
    */
 
-  public Vector getArguments()
+  public final Object getArgument(int i)
   {
-    return args;
+    if (i < args_fill)
+      return args[i];
+    else
+      return null;
   }
 
   /**
-   * Set the message content. 
-   * The message content is a Vector, that should include
-   * Only Integer, Float and String. <br>
-   * The vector is created by the message when read from a stream,
-   * or put by the user; don't worry about management, let the java gc
-   * do it ...
-   *
-   * @see FtsMessage#getArguments
-   * @see FtsMessage#reset
+   * Get a the number of arguments
    */
 
-  public void  setArguments(Vector args)
+  public final int getNumberOfArguments()
   {
-    this.args = args;
+    return args_fill;
+  }
+
+
+  /**
+   * Add an argument at the end
+   */
+
+  final void addArgument(Object obj)
+  {
+    args[args_fill++] = obj;
+
+    if (args_fill > args.length)
+      doubleSize();
   }
 
   /** Write the message to a Connection. */
 
-  void writeTo(FtsPort outputStream) throws java.io.IOException
+  final void writeTo(FtsPort outputStream) throws java.io.IOException
   {
     // Write first the message properties
 
@@ -87,7 +109,7 @@ public class FtsMessage
     // Write the message body
 
     if (args != null)
-      outputStream.sendVector(args);
+      outputStream.sendArray(args);
 
     // Write the end of the message
 
@@ -100,9 +122,17 @@ public class FtsMessage
 
   public String toString()
   {
-    return " " + command + args.toString();
-  }
+    StringBuffer buf = new StringBuffer();
 
+    buf.append("FtsMessage<" + command + " [");
+
+    for (int i = 0; i < args_fill ; i++)
+      buf.append(args[i].toString());
+
+    buf.append("]>");
+
+    return buf.toString();
+  }
 }
 
 

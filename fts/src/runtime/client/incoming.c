@@ -58,8 +58,6 @@ fts_client_incoming_restart(void)
 
 /* the state of an input channel from a host program */
 
-#define MAX_ARGLEN 1024
-
 static struct inmess
 {
   enum
@@ -76,12 +74,11 @@ static struct inmess
     } status;
 
   char type;
-  char i_buf[MAX_ARGLEN];
-  char *i_pt;
-  int i_ac;
-  fts_atom_t i_av[MARG];
-  fts_atom_t *i_ap;
-} cp_in;
+  char buf[MAX_MESSAGE_LENGTH];
+  char *buf_fill_p;
+  int ac;
+  fts_atom_t av[MAX_NARGS];
+} parser;
 
 
 /* The message parser */
@@ -89,7 +86,7 @@ static struct inmess
 static void
 init_parser(void)
 {
-  cp_in.status = waiting_type;
+  parser.status = waiting_type;
 }
 
 /* Convert a string to long, taking in account the sign,
@@ -132,65 +129,48 @@ dtol(char *s)
   Should simplify more the code.
 */
 
-#define LCHECK() \
-if (cp_in.i_pt >= cp_in.i_buf + MAX_ARGLEN) \
-fprintf(stderr,"overflow %d %d\n", cp_in.i_pt,  cp_in.i_buf + MAX_ARGLEN)
 
 void
 fts_client_parse_char(char c)
 {
   int eom = 0;
 
-  switch (cp_in.status)
+  switch (parser.status)
     {
     case waiting_type:
       {
-	if ((c >= '0') && (c <= '9'))
-	  {
-	    /* Skip the client id (old ftsd compatibility *only*) */
-
-	    cp_in.status = waiting_type;
-	  }
-	else if ((c == ' ') || (c == '\t'))
-	  cp_in.status = waiting_type;
-	else
-	  {
-	    cp_in.type = c;
-	    cp_in.status = waiting_value;
-	    cp_in.i_ac   = 0;
-	    cp_in.i_ap   = cp_in.i_av;
-	  }
+	parser.type = c;
+	parser.status = waiting_value;
+	parser.ac   = 0;
       }
       break;
 
     case waiting_value:
       {
-	if ((c == ' ') || (c == '\t'))
-	  cp_in.status = waiting_value;
-	else if (c == LONG_POS_CODE)
+	if (c == LONG_POS_CODE)
 	  {
-	    cp_in.status = in_long;
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.status = in_long;
+	    parser.buf_fill_p = parser.buf;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
-	    cp_in.status = in_float;
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.status = in_float;
+	    parser.buf_fill_p = parser.buf;
 	  }
 	else if (c == OBJECT_CODE)
 	  {
-	    cp_in.status = in_object;
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.status = in_object;
+	    parser.buf_fill_p = parser.buf;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
-	    cp_in.status = in_string;
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.status = in_string;
+	    parser.buf_fill_p = parser.buf;
 	  }
 	else if (c == EOM_CODE)
 	  eom = 1;
 	else
-	  cp_in.status = input_error;
+	  parser.status = input_error;
 
 	break;
       }
@@ -199,30 +179,25 @@ fts_client_parse_char(char c)
       {
 	int value_found = 0;
 	
-	if ((c == ' ') || (c == '\t'))
+	if (c == LONG_POS_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = waiting_value;
-	  }
-	else if (c == LONG_POS_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_long;
+	    parser.status = in_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_float;
+	    parser.status = in_float;
 	  }
 	else if (c == OBJECT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_object;
+	    parser.status = in_object;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_string;
+	    parser.status = in_string;
 	  }
 	else if (c == EOM_CODE)
 	  {
@@ -231,27 +206,24 @@ fts_client_parse_char(char c)
 	  }
 	else
 	  {
-
-	    LCHECK();
-	    if (cp_in.i_pt == cp_in.i_buf + MAX_ARGLEN)
-	      cp_in.status = input_error;
+	    if (parser.buf_fill_p >= parser.buf + MAX_MESSAGE_LENGTH)
+	      parser.status = input_error;
 	    else
-	      *((cp_in.i_pt)++) = c;
+	      *((parser.buf_fill_p)++) = c;
 	  }
 
 	if (value_found)
 	  {
-	    *(cp_in.i_pt) = '\0';
+	    *(parser.buf_fill_p) = '\0';
 
-	    fts_set_long(cp_in.i_ap, dtol(cp_in.i_buf));
+	    fts_set_long(&(parser.av[parser.ac]), dtol(parser.buf));
 
-	    (cp_in.i_ac)++;
-	    (cp_in.i_ap)++;
+	    (parser.ac)++;
 
-	    if (cp_in.i_ac >= MARG) 
-	      cp_in.status = input_error;
+	    if (parser.ac >= MAX_NARGS) 
+	      parser.status = input_error;
 
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.buf_fill_p = parser.buf;
 	  }
       }
       break;
@@ -260,30 +232,25 @@ fts_client_parse_char(char c)
       {
 	int value_found = 0;
 
-	if ((c == ' ') || (c == '\t'))
+	if (c == LONG_POS_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = waiting_value;
-	  }
-	else if (c == LONG_POS_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_long;
+	    parser.status = in_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_float;
+	    parser.status = in_float;
 	  }
 	else if (c == OBJECT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_object;
+	    parser.status = in_object;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_string;
+	    parser.status = in_string;
 	  }
 	else if (c == EOM_CODE)
 	  {
@@ -292,27 +259,25 @@ fts_client_parse_char(char c)
 	  }
 	else
 	  {
-	    LCHECK();
-	    if (cp_in.i_pt == cp_in.i_buf + MAX_ARGLEN)
-	      cp_in.status = input_error;
+	    if (parser.buf_fill_p == parser.buf + MAX_MESSAGE_LENGTH)
+	      parser.status = input_error;
 	    else
-	      *((cp_in.i_pt)++) = c;
+	      *((parser.buf_fill_p)++) = c;
 	  }
 
 	if (value_found)
 	  {
 	    float f;
-	    *(cp_in.i_pt) = '\0';
-	    sscanf(cp_in.i_buf, "%f", &f);
+	    *(parser.buf_fill_p) = '\0';
+	    sscanf(parser.buf, "%f", &f);
 
-	    fts_set_float(cp_in.i_ap, f);
+	    fts_set_float(&(parser.av[parser.ac]), f);
+	    (parser.ac)++;
 
-	    (cp_in.i_ac)++;
-	    (cp_in.i_ap)++;
-	    if (cp_in.i_ac >= MARG) 
-	      cp_in.status = input_error;
+	    if (parser.ac >= MAX_NARGS) 
+	      parser.status = input_error;
 
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.buf_fill_p = parser.buf;
 	  }
       }
 
@@ -322,30 +287,25 @@ fts_client_parse_char(char c)
       {
 	int value_found = 0;
 	
-	if ((c == ' ') || (c == '\t'))
+	if (c == LONG_POS_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = waiting_value;
-	  }
-	else if (c == LONG_POS_CODE)
-	  {
-	    value_found = 1;
-	    cp_in.status = in_long;
+	    parser.status = in_long;
 	  }
 	else if (c == FLOAT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_float;
+	    parser.status = in_float;
 	  }
 	else if (c == OBJECT_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_object;
+	    parser.status = in_object;
 	  }
 	else if (c == STRING_START_CODE)
 	  {
 	    value_found = 1;
-	    cp_in.status = in_string;
+	    parser.status = in_string;
 	  }
 	else if (c == EOM_CODE)
 	  {
@@ -354,32 +314,27 @@ fts_client_parse_char(char c)
 	  }
 	else
 	  {
-
-	    LCHECK();
-	    if (cp_in.i_pt == cp_in.i_buf + MAX_ARGLEN)
-	      cp_in.status = input_error;
+	    if (parser.buf_fill_p == parser.buf + MAX_MESSAGE_LENGTH)
+	      parser.status = input_error;
 	    else
-	      *((cp_in.i_pt)++) = c;
+	      *((parser.buf_fill_p)++) = c;
 	  }
 
 	if (value_found)
 	  {
 	    int id;
-	    extern fts_object_t *fts_object_table_get(int id); /* @@@ waiting for type merge */
 
+	    *(parser.buf_fill_p) = '\0';
 
-	    *(cp_in.i_pt) = '\0';
+	    id = dtol(parser.buf);
+	    fts_set_object(&(parser.av[parser.ac]), fts_object_table_get(id));
 
-	    id = dtol(cp_in.i_buf);
-	    fts_set_object(cp_in.i_ap, fts_object_table_get(id));
+	    (parser.ac)++;
 
-	    (cp_in.i_ac)++;
-	    (cp_in.i_ap)++;
+	    if (parser.ac >= MAX_NARGS) 
+	      parser.status = input_error;
 
-	    if (cp_in.i_ac >= MARG) 
-	      cp_in.status = input_error;
-
-	    cp_in.i_pt = cp_in.i_buf;
+	    parser.buf_fill_p = parser.buf;
 	  }
       }
       break;
@@ -387,47 +342,37 @@ fts_client_parse_char(char c)
     case in_string:
       if (c == STRING_END_CODE)
 	{
-	  *(cp_in.i_pt) = '\0';
-	  fts_set_symbol(cp_in.i_ap, fts_new_symbol_copy(cp_in.i_buf));
+	  *(parser.buf_fill_p) = '\0';
+	  fts_set_symbol(&(parser.av[parser.ac]), fts_new_symbol_copy(parser.buf));
 
-	  (cp_in.i_ac)++;
-	  (cp_in.i_ap)++;
-	  if (cp_in.i_ac >= MARG) 
-	    cp_in.status = input_error;
+	  (parser.ac)++;
 
-	  cp_in.status = waiting_value;
-	}
-      else if (c == STRING_QUOTE_CODE)
-	{
-	  cp_in.status = in_string_quoted;
+	  if (parser.ac >= MAX_NARGS) 
+	    parser.status = input_error;
+
+	  parser.status = waiting_value;
 	}
       else
 	{
-	  LCHECK();
-	  if (cp_in.i_pt == cp_in.i_buf + MAX_ARGLEN)
-	    cp_in.status = input_error;
+	  if (parser.buf_fill_p == parser.buf + MAX_MESSAGE_LENGTH)
+	    parser.status = input_error;
 	  else
-	    *((cp_in.i_pt)++) = c;
+	    *((parser.buf_fill_p)++) = c;
 	}
-      break;
-
-    case in_string_quoted:
-      *((cp_in.i_pt)++) = c;
-      cp_in.status = in_string;
       break;
 
     case input_error:
       if (c == EOM_CODE)
 	{
-	  cp_in.status = waiting_type;
+	  parser.status = waiting_type;
 	}
       break;
     }
 
   if (eom)
     {
-      fts_client_mess_dispatch(cp_in.type, cp_in.i_ac, cp_in.i_av);
-      cp_in.status = waiting_type;
+      fts_client_mess_dispatch(parser.type, parser.ac, parser.av);
+      parser.status = waiting_type;
     }
 }
 
@@ -462,4 +407,12 @@ fts_client_mess_dispatch(char type, int ac, const fts_atom_t *av)
 {
   (* mess_dispatch_table[(int) type]) (ac, av);
 }
+
+
+
+
+
+
+
+
 

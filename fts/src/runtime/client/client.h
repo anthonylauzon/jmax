@@ -17,8 +17,8 @@ extern fts_module_t fts_client_module;
 
 /* parameters that might fix the size of some structure */
 
-#define MSIZE 4096		/* maximum size of a host->CP message */
-#define MARG 256		/* maximum number of args in a host->CP message */
+#define MAX_MESSAGE_LENGTH  (16*1024)		/* maximum size of a host->CP message */
+#define MAX_NARGS           1024 		/* maximum number of args in a host->CP message */
 
 
 /* Receive Subsystem installation */

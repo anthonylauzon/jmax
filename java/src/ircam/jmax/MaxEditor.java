@@ -1,4 +1,3 @@
-
 package ircam.jmax;
 
 import java.awt.*;
@@ -9,15 +8,13 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.editors.ermes.*; // @@@ !!
-import ircam.jmax.editors.console.*; // @@@ !!
 import com.sun.java.swing.*;
 
 /**
  * The abstract base class for all the Ermes editors. It provides utility methods
  * such as the Window menu handling, initialisation, and others.
  */
-public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener, ActionListener {
+public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener {
   MaxDataType editedType;
 
   public Menu itsFileMenu;
@@ -25,8 +22,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
 
-  Vector itsWindowMenuList;
-	
   public MaxEditor(String title, MaxDataType type)
   {
     super(title);
@@ -62,12 +57,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public final void Init()
   {
-    itsWindowMenuList = new Vector();
-    
     MenuBar mb = new MenuBar();
     itsFileMenu = CreateFileMenu();
     itsEditMenu = CreateEditMenu();
-    itsWindowsMenu = CreateWindowsMenu();
+
     mb.add(itsFileMenu);
     mb.add(itsEditMenu);
 
@@ -77,9 +70,20 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     addWindowListener(this);
     SetupMenu();
 
+    // New Window Manager based Menu
+
+    itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowMenu("Windows", this);
     mb.add(itsWindowsMenu);
   }
 
+  /** Intercept the setTitle method to tell the window manager */
+
+  public synchronized void setTitle(String title)
+  {
+    super.setTitle(title);
+
+    MaxWindowManager.getWindowManager().windowChanged(this);
+  }
 
   /** Use an Action object to do this stuff */
 
@@ -169,16 +173,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     fileMenu.add(new MenuItem("-"));
 
-    aCheckItem = new CheckboxMenuItem("Open with Autorouting");
-    aCheckItem.setState(true);
-    fileMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new ItemListener()
-			       {
-				 public  void itemStateChanged(ItemEvent e)
-				   { MaxApplication.doAutorouting = !MaxApplication.doAutorouting;}});
-
-    fileMenu.add(new MenuItem("-"));
-
     aMenuItem = new MenuItem("Save  Ctrl+S");
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new ActionListener()
@@ -220,223 +214,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     return fileMenu;
   }
 
-  private Menu CreateWindowsMenu()
-  {
-    MenuItem aMenuItem;
-    Menu windowsMenu = new Menu("Windows");
-
-    aMenuItem = new MenuItem("Stack");
-    windowsMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().StackWindows();}});
-
-    aMenuItem = new MenuItem("Tile");
-    windowsMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().TileWindows();}});
-
-    aMenuItem = new MenuItem("Tile Vertical");
-    windowsMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().TileVerticalWindows();}});
-
-    windowsMenu.add(new MenuItem("-"));
-
-    aMenuItem = new MenuItem("jMax Console  Ctrl+J");
-    windowsMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { ConsoleWindow.getConsoleWindow().toFront();}});
-
-    AddWindowItems(windowsMenu);
-
-    return windowsMenu;
-  }
-
-  public String GetTitle()
-  {
-    return getTitle();
-  }
-  
-  private void AddWindowItems(Menu theWindowMenu)
-  {
-    ErmesSketchWindow aSketchWindow;
-    ErmesSketchWindow aSubWindow;
-    MaxEditor aWindow;
-    MenuItem aMenuItem;
-    Menu aMenu;
-
-    if (MaxApplication.itsSketchWindowList != null)
-      {
-	for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++)
-	  {
-	    aSketchWindow= (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-	    if (!aSketchWindow.isSubPatcher)
-	      {
-		if (aSketchWindow.itsSubWindowList.size()==0)
-		  {
-		    theWindowMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
-		    aMenuItem.addActionListener(this);
-		  }
-		else
-		  {
-		    aMenu = new Menu(aSketchWindow.getTitle());
-		    aMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
-		    aMenuItem.addActionListener(this);
-		    for (int k=0; k<aSketchWindow.itsSubWindowList.size(); k++ )
-		      {
-			aSubWindow = (ErmesSketchWindow)aSketchWindow.itsSubWindowList.elementAt(k);
-			aMenu.add(aMenuItem = new MenuItem(aSubWindow.getTitle()));
-			aMenuItem.addActionListener(this);
-		      }
-		    theWindowMenu.add(aMenu);
-		    itsWindowMenuList.addElement(aMenu);
-		  }
-	      }
-	  }
-      }
-
-    if (MaxApplication.itsEditorsFrameList != null)
-      {
-	for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++)
-	  {
-	    aWindow = (MaxEditor) MaxApplication.itsEditorsFrameList.elementAt(j);
-	    if (aWindow!=this)
-	      {
-		theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetTitle()));
-		aMenuItem.addActionListener(this);
-	      }
-	  }
-      }
-  }
-
-  public void AddWindowToMenu(String theName)
-  {
-    MenuItem aMenuItem;
-    itsWindowsMenu.add(aMenuItem = new MenuItem(theName));
-    aMenuItem.addActionListener(this);
-  }
-
-  public void AddToSubWindowsMenu(String theTopWindowName, String theSubWindowName, boolean theFirstItem)
-  {
-    MenuItem aItem, aMenuItem;
-    Menu aMenu;
-    int aIndex = 0;
-    if (theFirstItem)
-      {
-	for (int i=0; i<itsWindowsMenu.getItemCount();i++)
-	  {
-	    aItem = itsWindowsMenu.getItem(i);
-	    if (aItem.getLabel().equals(theTopWindowName))
-	      {
-		itsWindowsMenu.remove(aItem);
-		aIndex = i;
-		break;
-	      }
-	  }
-	aMenu = new Menu(theTopWindowName);
-	aMenu.add(aMenuItem = new MenuItem(theTopWindowName));
-	aMenuItem.addActionListener(this);
-	aMenu.add(aMenuItem = new MenuItem(theSubWindowName));
-	aMenuItem.addActionListener(this);
-	itsWindowsMenu.insert(aMenu, aIndex);
-	itsWindowMenuList.addElement(aMenu);
-      }
-    else
-      {
-	for (Enumeration e = itsWindowMenuList.elements(); e.hasMoreElements();)
-	  {
-	    aMenu = (Menu) e.nextElement();
-	    if (theTopWindowName.equals(aMenu.getLabel()))
-	      {
-		aMenu.add(aMenuItem = new MenuItem(theSubWindowName));
-		aMenuItem.addActionListener(this);
-		return;
-	      }
-	  }
-      }
-  }
-
-  public void RemoveFromSubWindowsMenu(String theTopWindowName,String theSubWindowName,boolean theLastItem)
-  {
-    MenuItem aItem;
-    MenuItem aItem1;
-    Menu aMenu;
-    int aIndex = 0;
-    if (theLastItem)
-      {
-	for (int i=0; i<itsWindowsMenu.getItemCount();i++)
-	  {
-	    aItem = itsWindowsMenu.getItem(i);
-	    if (aItem.getLabel().equals(theTopWindowName))
-	      {
-		itsWindowsMenu.remove(aItem);
-		itsWindowMenuList.removeElement(aItem);
-		aIndex = i;
-		break;
-	      }
-	  }
-	aItem = new MenuItem(theTopWindowName);
-	itsWindowsMenu.insert(aItem, aIndex);
-	aItem.addActionListener(this);
-      }
-    else
-      {
-	for (Enumeration e = itsWindowMenuList.elements(); e.hasMoreElements();)
-	  {
-	    aMenu = (Menu) e.nextElement();
-	    if (theTopWindowName.equals(aMenu.getLabel()))
-	      {
-		for (int j=0; j<aMenu.getItemCount();j++)
-		  {
-		    aItem1 = aMenu.getItem(j);
-		    if (aItem1.getLabel().equals(theSubWindowName))
-		      {
-			aMenu.remove(aItem1);
-			return;
-		      }
-		  }
-		return;
-	      }
-	  }
-      }
-  }
-
-  public void RemoveWindowFromMenu(String theName)
-  {
-    MenuItem aItem;
-    for (int i=0; i<itsWindowsMenu.getItemCount();i++)
-      {
-	aItem = itsWindowsMenu.getItem(i);
-	if (aItem.getLabel().equals(theName))
-	  {
-	    itsWindowsMenu.remove(aItem);
-	    return;
-	  }
-      }
-  }
-
-  public void ChangeWinNameMenu(String theOldName, String theNewName)
-  {
-    MenuItem aItem;
-    for (int i=0; i<itsWindowsMenu.getItemCount();i++)
-      {
-	aItem = itsWindowsMenu.getItem(i);
-	if (aItem.getLabel().equals(theOldName))
-	  {
-	    aItem.setLabel(theNewName);
-	    return;
-	  }
-      }
-  }
-
 
   protected Menu CreateEditMenu()
   {
@@ -475,52 +252,13 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   }
 
 
-  private boolean IsInWindowsMenu(String theName)
-  {
-    return(IsAWindowName(theName)|| IsAnEditorFrameName(theName));
-  }
-  
-  private boolean IsAWindowName(String theName)
-  {
-    ErmesSketchWindow aSketchWindow; 
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++)
-      {
-	aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-	if (aSketchWindow.getTitle().equals(theName)) return true;
-      }
-    return false;
-  }
-  
-  private boolean IsAnEditorFrameName(String theName)
-  {
-    MaxEditor aWindow; 
-    for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++)
-      {
-	aWindow = (MaxEditor)MaxApplication.itsEditorsFrameList.elementAt(i);
-	if (aWindow.GetTitle().equals(theName)) return true;
-      }
-    return false;
-  } 
-  
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --inizio
-  public void actionPerformed(ActionEvent e)
-  {
-    if (e.getSource() instanceof MenuItem )
-      {
-	MenuItem aMenuItem = (MenuItem)e.getSource();
-	String itemName = aMenuItem.getLabel();
-    
-	if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
-      }
-  }
-
   public void Print()
   {}
   public void Save()
   {}//override this function if you want to save your content
   public void SaveAs(){}//override this function if you want to save your content
   public boolean ShouldSave(){return false;}//override this function if your data changed
+
   public void Close()
   {
     // Removed the code that save the file, because at the 
@@ -532,9 +270,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     //    < ask to save the file if we have a file ...>
     //    super.Close()
     //
-    
-    MaxApplication.RemoveThisWindowFromMenus(this);
-    MaxApplication.itsEditorsFrameList.removeElement(this);
     setVisible(false);
     dispose();
   }
@@ -544,42 +279,20 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   protected void Paste(){};
   protected void Clear(){};
   
-  private void WindowsMenuAction(MenuItem theMenuItem, String theName)
-  {
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++)
-      {
-	aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-	if (aSketchWindow.getTitle().equals(theName))
-	  {
-	    aSketchWindow.toFront();
-	    return;
-	  }
-      }
-    for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++)
-      {
-	aWindow = (MaxEditor) MaxApplication.itsEditorsFrameList.elementAt(j);
-	if (aWindow.GetTitle().equals(theName))
-	  {
-	    aWindow.toFront();
-	    return;
-	  }
-      }
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e)
   {
-    MaxApplication.SetCurrentWindow(this);
+    MaxApplication.setCurrentWindow(this);
   }
+
   public void focusLost(FocusEvent e){}
 
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////focusListener --fine
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --inizio  
+
   public void windowClosing(WindowEvent e)
   {
     Close();
@@ -630,12 +343,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   }
 
 
-  public Frame GetFrame()
-  {
-    return this;
-  }
-  
-  
   public abstract void SetupMenu();
 
   /////////////////////////////////////////////////////////////////////////////
@@ -650,8 +357,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     int aInt = e.getKeyCode();
     if (e.isControlDown())
       {
-	if (aInt == 74) ConsoleWindow.getConsoleWindow().toFront();//j
-	else if (aInt == 67) Copy();//c
+	if (aInt == 67) Copy();//c
 	else if (aInt == 78)
 	  {
 	    // Ctrl-N always create a new patcher

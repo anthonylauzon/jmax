@@ -155,7 +155,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public ErmesSketchWindow(MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
     //super(theData.getName());
-    super(MaxApplication.GetWholeWinName(chooseWindowName(theFtsPatcher)),
+    super(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(theFtsPatcher)),
 	  MaxDataType.getTypeByName("patcher"));
     itsPatcher = theFtsPatcher;
     itsData = theData;
@@ -181,7 +181,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     InitSketchWin();
     validate();
     itsPatcher.open();
-    MaxApplication.itsWindow = this;
     InitFromContainer(itsPatcher);
     setVisible(true);
   }
@@ -262,7 +261,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       if (((String)(patcher.get("autorouting"))).equals("on"))
 	SetAutorouting(true);
       else SetAutorouting(false);
-      //      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting(false);//???
+
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
       itsSketchPad.repaint();//force a repaint to build an offGraphics context
@@ -650,57 +649,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     }
   }
 	
-  public void AddToSubWindowList(ErmesSketchWindow theSketchWindow){
-    MenuItem aMenuItem;
-    if(isSubPatcher) itsTopWindow.AddToSubWindowList(theSketchWindow);
-    else{
-      boolean aFirstItem = false;
-      if(itsSubWindowList.size()==0){
-	itsSubWindowsMenu.add(aMenuItem = new MenuItem(theSketchWindow.getTitle()));
-	aMenuItem.addActionListener(this);
-	itsWindowsMenu.insert(itsSubWindowsMenu, 5);
-	aFirstItem = true;
-      }
-      else{
-	itsSubWindowsMenu.add(aMenuItem = new MenuItem(theSketchWindow.getTitle()));
-	aMenuItem.addActionListener(this);
-      }
-      MaxApplication.AddToSubWindowsList(this, theSketchWindow, aFirstItem);
-      itsSubWindowList.addElement(theSketchWindow);
-    }
-  }
-
-
-  public void RemoveFromSubWindowList(ErmesSketchWindow theSubWindow){
-    if(isSubPatcher)itsTopWindow.RemoveFromSubWindowList(theSubWindow);
-    else{
-      boolean aLastItem = true;
-      MenuItem aItem;
-      itsSubWindowList.removeElement(theSubWindow);
-      if(itsSubWindowList.size()==0){
-	itsSubWindowsMenu.removeAll();
-	itsWindowsMenu.remove(itsSubWindowsMenu);
-      }
-      else{
-	for(int i=0; i<itsSubWindowsMenu.getItemCount();i++){
-	  aItem = itsSubWindowsMenu.getItem(i);
-	  if(aItem.getLabel().equals(theSubWindow.getTitle())){
-	    itsSubWindowsMenu.remove(aItem);
-	    break;
-	  }
-	}
-	aLastItem = false;
-      }
-      MaxApplication.RemoveFromSubWindowsList(this, theSubWindow, aLastItem);
-    }
-  }
-
-  //--------------------------------------------------------
-  //	GetFrame
-  //--------------------------------------------------------
-  public Frame GetFrame(){
-    return this;
-  }
   //--------------------------------------------------------
   //	GetSketchPad
   //	returns the associated ErmesSketchPad
@@ -785,7 +733,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ///////////////////////////////////////////////////////////////// keyListener --fine
   public void Close(){
     if (isSubPatcher){
-      itsTopWindow.RemoveFromSubWindowList(this);
       setVisible(false);
     }
     else {
@@ -819,8 +766,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       //}
     //}
     CloseAllSubWindows();//?????
-    MaxApplication.RemoveThisWindowFromMenus(this);
-    MaxApplication.itsSketchWindowList.removeElement(this);
     if (deleteOnFts) itsPatcher.delete();
     itsClosing = false;
     setVisible(false);
@@ -879,8 +824,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else
       itsData.bindToDataSource(source);
     
-    if(SaveBody())
-      MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
+    SaveBody();
   }
 
 
@@ -1097,7 +1041,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){
     if(!itsClosing){
-      MaxApplication.SetCurrentWindow(this);
+      MaxApplication.setCurrentWindow(this);
       ErmesSketchPad.RequestOffScreen(itsSketchPad);
       if(itsSketchPad.getGraphics()!= null)
 	itsSketchPad.update(itsSketchPad.getGraphics());
@@ -1119,7 +1063,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public void windowActivated(WindowEvent e){
     requestFocus();
     if(!itsClosing){
-      MaxApplication.SetCurrentWindow(this);
+      MaxApplication.setCurrentWindow(this);
       ErmesSketchPad.RequestOffScreen(itsSketchPad);
       if(itsSketchPad.getGraphics()!= null)
 	itsSketchPad.update(itsSketchPad.getGraphics());

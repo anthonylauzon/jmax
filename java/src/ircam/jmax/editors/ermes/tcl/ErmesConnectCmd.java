@@ -31,7 +31,7 @@ class ErmesConnectCmd implements Command
 
     if (argv.length == 5)
       {
-	ErmesSketchPad pad = MaxApplication.itsSketchWindow.itsSketchPad;
+	ErmesSketchPad pad = MaxApplication.getCurrentWindow().itsSketchPad;
 
 	aConnection = pad.AddConnectionByInOut((ErmesObject) ReflectObject.get(interp, argv[1]),
 					       TclInteger.get(interp, argv[2]),

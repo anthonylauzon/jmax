@@ -238,36 +238,40 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     public void removeWatch(Object owner)
     {
+      // Shitty code; actually, the handler table should 
+      // not be a vector ... may be a linked list
+
+      Vector toRemove = new Vector();
+
       for (int i = 0; i < table.size(); i++)
 	{
 	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
 
-	  // Shitty code; actually, the handler table should 
-	  // not be a vector ... may be a linked list
-
 	  if (ph.owner == owner)
-	    {
-	      table.removeElement(ph);
-	      i--; // to compensate for the shift in the vector
-	    }
+	    toRemove.addElement(ph);
 	}
+
+      for (int i = 0; i < toRemove.size(); i++)
+	table.removeElement((PropertyHandlerEntry)toRemove.elementAt(i));
     }
 
     public void removeWatch(Object owner, String name)
     {
+      // Shitty code; actually, the handler table should 
+      // not be a vector ... may be a linked list
+
+      Vector toRemove = new Vector();
+
       for (int i = 0; i < table.size(); i++)
 	{
 	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
 
-	  // Shitty code; actually, the handler table should 
-	  // not be a vector ... may be a linked list
-
 	  if ((ph.owner == owner) && (ph.name == name))
-	    {
-	      table.removeElement(ph);
-	      i--; // to compensate for the shift in the vector
-	    }
+	    toRemove.addElement(ph);
 	}
+
+      for (int i = 0; i < toRemove.size(); i++)
+	table.removeElement((PropertyHandlerEntry)toRemove.elementAt(i));
     }
 
     public void watch(String property, FtsPropertyHandler handler, Object owner)
@@ -501,27 +505,6 @@ abstract public class FtsObject implements MaxTclInterpreter
 	  }
 
 	return FtsPropertyDescriptor.getDefaultValue(name);
-      }
-  }
-
-  /** Remove a propery value; not all the properties can
-   *  be removed; in particular, remove will not be propagated
-   * to FTS, will have no effect on builtin properties, but will
-   * anyhow delete the property from the object, and if the property
-   * is persistent, it will not be saved.
-   */
-
-  public void remove(String prop)
-  {
-    if (properties != null)
-      {
-	for (int i = 0; i < properties.size(); i++)
-	  {
-	    Property p = (Property)(properties.elementAt(i));
-
-	    if (p.name.equals(prop))
-	      properties.removeElement(p);
-	  }
       }
   }
 

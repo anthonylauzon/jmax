@@ -16,8 +16,6 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
     if (theData.getName()!=null) //loading
       aSketchWindow.setRunMode(true);//bug24
 
-    MaxApplication.itsSketchWindowList.addElement(aSketchWindow);
-    MaxApplication.AddThisWindowToMenus(aSketchWindow);
 
     return aSketchWindow;
   }

@@ -35,7 +35,6 @@ class ErmesObjSlider extends ErmesObject {
   int transmission_index = 0;
   int receiving_index = 0;
   int last_value = 0;
-  boolean noSync = false;
   
   public ErmesObjSlider(){
     super();

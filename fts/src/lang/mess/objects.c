@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/03/25 16:42:50 $
+ *      $Revision: 1.8 $ IRCAM $Date: 1998/03/27 16:10:16 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -38,6 +38,7 @@ fts_status_description_t fts_ArgumentMissing = {"argument missing"};
 fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
 fts_status_description_t fts_ExtraArguments = {"extra arguments"};
 fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
+fts_status_description_t fts_DoubleConnection = {"the connection already exists"};
 
 /******************************************************************************/
 /*                                                                            */
@@ -381,6 +382,21 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
   fts_class_mess_t *mess = 0;
   fts_connection_t *outconn;
   int anything;
+
+  /* First, check againsts double connections */
+  { 
+    fts_connection_t *p;		/* indirect precursor */
+
+    for (p = out->out_conn[woutlet]; p ; p = p->next_same_src)
+    {
+      if ((p->dst == in) && (p->winlet == winlet))
+	{
+	  /* Found, return error message */
+
+	  return &fts_DoubleConnection;
+	}
+    }
+  }
 
   /* check the range */
 

@@ -30,10 +30,10 @@ class ErmesGraphicsOffCmd implements Command
   {
     if (argv.length == 1)
       {
-	if (MaxApplication.itsSketchWindow == null)
+	if (MaxApplication.getCurrentWindow() == null)
 	  System.err.println("Cavoli amari");
 	else
-	  MaxApplication.itsSketchWindow.itsSketchPad.itsGraphicsOn = false;
+	  MaxApplication.getCurrentWindow().itsSketchPad.itsGraphicsOn = false;
       }
     else
       throw new TclNumArgsException(interp, 1, argv, "");

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1997/12/11 16:44:42 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/03/25 16:42:50 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -57,6 +57,7 @@ typedef struct fts_outlet		 fts_outlet_t;
 struct fts_symbol_descr
 {
   const char *name;		/* name */
+  int index;			/* index in the builtin table, -1 otherwise */
   struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
 };
 

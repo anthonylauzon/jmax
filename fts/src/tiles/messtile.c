@@ -2,9 +2,6 @@
    Support for FOS client/server messages
 */
 
-#ifdef DEBUG
-#define MESS_DEBUG 
-#endif
 
 #include <string.h>
 #include <stdio.h>
@@ -106,14 +103,30 @@ post_mess(const char *msg, int ac, const fts_atom_t *av)
 }
 
 #ifdef DEBUG
-static void
-print_mess(const char *msg, int ac, const fts_atom_t *av)
-{
-  fprintf(stderr, "%s: ", msg); 
-  fprintf_atoms(stderr, ac, av);
-  fprintf(stderr, "\n");
-}
+#define INIT_TRACE 1
+#else
+#define INIT_TRACE 0
 #endif
+
+static int do_mess_trace = INIT_TRACE;
+
+void fts_set_mess_trace(int b)
+{
+  do_mess_trace = b;
+}
+
+
+static void
+trace_mess(const char *msg, int ac, const fts_atom_t *av)
+{
+  if (do_mess_trace)
+    {
+      fprintf(stderr, "%s: ", msg); 
+      fprintf_atoms(stderr, ac, av);
+      fprintf(stderr, "\n");
+    }
+}
+
 
 /******************************************************************************/
 /*                                                                            */
@@ -129,9 +142,7 @@ print_mess(const char *msg, int ac, const fts_atom_t *av)
 static void
 fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received open patcher ", ac, av);
-#endif
+  trace_mess("Received open patcher ", ac, av);
 
   if (ac == 1 && fts_is_object(&av[0]))
     {
@@ -157,9 +168,7 @@ fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received close patcher ", ac, av);
-#endif
+  trace_mess("Received close patcher ", ac, av);
 
   if (ac == 1 && fts_is_object(&av[0]))
     {
@@ -186,9 +195,7 @@ fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received patcher loaded", ac, av);
-#endif
+  trace_mess("Received patcher loaded", ac, av);
 
   if (ac == 1 && fts_is_object(&av[0]))
     {
@@ -216,9 +223,7 @@ fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_new(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received new", ac, av);
-#endif
+  trace_mess("Received new", ac, av);
 
   if (ac >= 3 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
     {
@@ -249,9 +254,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_redefine(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received redefine", ac, av);
-#endif
+  trace_mess("Received redefine", ac, av);
 
   if (ac >= 1 && fts_is_object(&av[0]))
     {
@@ -287,9 +290,7 @@ fts_mess_client_redefine(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_replace(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received replace", ac, av);
-#endif
+  trace_mess("Received replace", ac, av);
 
   if (ac == 2 && fts_is_object(&av[0]) && fts_is_object(&av[0]))
     {
@@ -330,9 +331,7 @@ fts_mess_client_replace(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_free(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received free", ac, av);
-#endif
+  trace_mess("Received free", ac, av);
 
   if (ac == 1 && fts_is_object(&av[0]))
     {
@@ -362,9 +361,7 @@ fts_mess_client_free(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_connect(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received connect", ac, av);
-#endif
+  trace_mess("Received connect", ac, av);
 
   if ((ac == 4) &&
       fts_is_object(&av[0]) &&
@@ -410,9 +407,7 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 static void
 fts_mess_client_disconnect(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received disconnect", ac, av);
-#endif
+  trace_mess("Received disconnect", ac, av);
 
   if ((ac == 4) &&
       fts_is_object(&av[0]) &&
@@ -436,7 +431,8 @@ fts_mess_client_disconnect(int ac, const fts_atom_t *av)
 	  ret = fts_object_disconnect(from, outlet, to, inlet);
 
 	  if (ret)
-	    post("System Error in FOS message DISCONNECT: %s\n", ret->description);
+	    post("System Error in DISCONNECT: from %d, outlet %d to %d inlet %d: %s\n",
+		 from->id, outlet, to->id, inlet, ret->description);
 	}
       else
 	post_mess("System Error in FOS message DISCONNECT: disconnecting non existing object", ac, av);
@@ -456,9 +452,8 @@ fts_mess_client_disconnect(int ac, const fts_atom_t *av)
 static void 
 fts_mess_client_mess(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received mess", ac, av);
-#endif
+  trace_mess("Received mess", ac, av);
+
   if ((ac >= 3) &&
       fts_is_object(&av[0]) &&
       fts_is_int(&av[1]) &&
@@ -507,9 +502,7 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 static void 
 fts_mess_client_nmess(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received nmess", ac, av);
-#endif
+  trace_mess("Received nmess", ac, av);
 
   /* Note that at the moment the inlet is ignored, because
      named "receives" recevies only on in let 0 */
@@ -547,9 +540,7 @@ fts_mess_client_nmess(int ac, const fts_atom_t *av)
 static void 
 fts_mess_client_put_prop(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received put prop", ac, av);
-#endif
+  trace_mess("Received put prop", ac, av);
 
   if ((ac == 3) &&
       fts_is_object(&av[0]) &&
@@ -577,9 +568,7 @@ fts_mess_client_put_prop(int ac, const fts_atom_t *av)
 static void 
 fts_mess_client_get_prop(int ac, const fts_atom_t *av)
 {
-#ifdef MESS_DEBUG
-  print_mess("Received get prop", ac, av);
-#endif
+  trace_mess("Received get prop", ac, av);
 
   if ((ac == 2) &&
       fts_is_object(&av[0]) &&

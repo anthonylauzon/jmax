@@ -33,7 +33,7 @@ class ErmesObjNewObjCmd implements Command
       {
 	ErmesSketchPad pad;
 
-	pad = MaxApplication.itsSketchWindow.itsSketchPad;
+	pad = MaxApplication.getCurrentWindow().itsSketchPad;
 
 	if (argv.length == 4)
 	  {

@@ -680,9 +680,9 @@ public class FtsServer
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject) msg.getArguments().elementAt(0);
-	  obj.localPut((String) msg.getArguments().elementAt(1), 
-		       msg.getArguments().elementAt(2));
+	  obj = (FtsObject) msg.getArgument(0);
+	  obj.localPut((String) msg.getArgument(1), 
+		       msg.getArgument(2));
 
 	}
       break;
@@ -691,13 +691,13 @@ public class FtsServer
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject) msg.getArguments().elementAt(0);
+	  obj = (FtsObject) msg.getArgument(0);
 	  obj.handleMessage(msg);
 	}
       break;
 
       case FtsClientProtocol.post_cmd:
-	System.out.print(msg.getArguments().elementAt(0)); // print the first argument
+	System.out.print(msg.getArgument(0)); // print the first argument
 	break;
 
       case FtsClientProtocol.sync_done_cmd:

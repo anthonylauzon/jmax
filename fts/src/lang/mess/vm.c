@@ -16,12 +16,13 @@
 
    PUSH_INT   <int>   // push an int value in the argument stack
    PUSH_FLOAT <float> // push a float value in the argument stack
-   PUSH_SYM   <int>   // push a symbol (by idx) value in the argument stack
-   POP_ARG    <int>   // pop n values  from the argument stack
+   PUSH_SYM   <int>   // push a symbol from the file symbol table (by idx) value in the argument stack
+   PUSH_BUILTIN_SYM   <int>   // push a builtin symbol (by idx) value in the argument stack
+   POP_ARGS    <int>   // pop n values  from the argument stack
 
    PUSH_OBJ   <int>   // Push an object table entry in the object stack
    MV_OBJ     <objidx>    // Copy the top of object stack to an object table entry
-   POP_OBJ    <int>   // Push n objects from the object stack
+   POP_OBJS    <int>   // Push n objects from the object stack
    
 
    MAKE_OBJ   <nargs>   // Take <nargs> argument from the evaluation stack
@@ -34,7 +35,16 @@
 		    // of the object stack
 		    // don't touch either stack.
 
+   PUT_BUILTIN_PROP   <sym> // Like PUT_PROP, but using a builtin symbol as property name
+
    OBJ_MESS   <inlet> <sel> <nargs>  // Send a message <sel> to the inlet <in> object top of the object stack
+                         // with <nargs> arguments from the evaluation stack
+			 // don't touch the stacks
+
+
+   OBJ_BUILTIN_MESS   <inlet> <sel> <nargs>
+                         // Send a message <sel> (builtin-symbol) to the inlet <in>
+			 // object top of the object stack
                          // with <nargs> arguments from the evaluation stack
 			 // don't touch the stacks
 
@@ -89,7 +99,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	{
 	  /* Eval stack manipulation */
 
-	case PUSH_INT:
+	case FVM_PUSH_INT:
 	  {
 	    /* PUSH_INT   <int> */
 
@@ -99,7 +109,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case PUSH_FLOAT:
+	case FVM_PUSH_FLOAT:
 	  {
 	    /* PUSH_FLOAT <float> */
 	    
@@ -109,7 +119,18 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case PUSH_SYM:
+	case FVM_PUSH_BUILTIN_SYM:
+	  {
+	    /* PUSH_SYM   <idx> */
+
+	    eval_tos--;
+	    fts_set_symbol(eval_tos, fts_get_builtin_symbol(fts_word_get_int(p)));
+	    p++;
+	  }
+	break;
+
+
+	case FVM_PUSH_SYM:
 	  {
 	    /* PUSH_SYM   <idx> */
 
@@ -119,9 +140,9 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case POP_ARG:
+	case FVM_POP_ARGS:
 	  {
-	    /* POP_ARG    <int> */
+	    /* POP_ARGS    <int> */
 
 	    eval_tos += fts_word_get_int(p);
 	    p++;
@@ -130,7 +151,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 
 	/* Object stack manipulation */
 
-	case PUSH_OBJ:
+	case FVM_PUSH_OBJ:
 	  {
 	    /* PUSH_OBJ   <objidx> */
 
@@ -140,7 +161,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case MV_OBJ:
+	case FVM_MV_OBJ:
 	  {
 	    /* MV_OBJ     <objidx> */
 
@@ -149,9 +170,9 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	break;
 
 
-	case POP_OBJ:
+	case FVM_POP_OBJS:
 	  {
-	    /* POP_OBJ    <int> */
+	    /* POP_OBJS    <int> */
 
 	    object_tos += fts_word_get_int(p);
 	    p++;
@@ -160,7 +181,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 
 	/* Object Manipulatation */
 
-	case MAKE_OBJ:
+	case FVM_MAKE_OBJ:
 	  {
 	    /* MAKE_OBJ   <nargs> */
 
@@ -176,7 +197,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	  break;	
 
-	case PUT_PROP:
+	case FVM_PUT_PROP:
 	  {
 	    /* PUT_PROP   <sym> */
 
@@ -185,7 +206,16 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case OBJ_MESS:
+	case FVM_PUT_BUILTIN_PROP:
+	  {
+	    /* PUT_BUILTIN_PROP   <sym> */
+
+	    fts_symbol_t prop = fts_get_builtin_symbol(fts_word_get_int(p++));
+	    fts_object_put_prop(*object_tos, prop, eval_tos);
+	  }
+	break;
+
+	case FVM_OBJ_MESS:
 	  {
 	    /* OBJ_MESS   <inlet> <sel> <nargs> */
 
@@ -197,7 +227,19 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case CONNECT:
+	case FVM_OBJ_BUILTIN_MESS:
+	  {
+	    /* OBJ_BUILTIN_MESS   <inlet> <sel> <nargs> */
+
+	    int inlet = fts_word_get_int(p++);
+	    fts_symbol_t sel = fts_get_builtin_symbol(fts_word_get_int(p++));
+	    int nargs = fts_word_get_int(p++);
+
+	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
+	  }
+	break;
+
+	case FVM_CONNECT:
 	  {
 	    /* CONNECT */
 
@@ -207,7 +249,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 
 	/* Object table stack */
 
-	case PUSH_OBJ_TABLE:
+	case FVM_PUSH_OBJ_TABLE:
 	  {
 	    /* PUSH_OBJ_TABLE <int> */
 
@@ -224,7 +266,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case POP_OBJ_TABLE:
+	case FVM_POP_OBJ_TABLE:
 	  {
 	    /* POP_OBJ_TABLE */
 	    fts_free(object_table);
@@ -233,7 +275,7 @@ void fts_run_mess_vm(fts_word_t *program, fts_symbol_t symbol_table[])
 	  }
 	break;
 
-	case RETURN:
+	case FVM_RETURN:
 	  return;
 	}
 

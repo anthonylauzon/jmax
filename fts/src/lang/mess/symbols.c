@@ -8,6 +8,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 
+static fts_symbol_t fts_new_builtin_symbol(const char *name);
 
 /* Predefined ATOM TYPE symbols */
 
@@ -34,34 +35,56 @@ fts_symbol_t fts_s_noutlets;
 fts_symbol_t fts_s_bang;
 fts_symbol_t fts_s_list;
 fts_symbol_t fts_s_set;
+fts_symbol_t fts_s_print;
+fts_symbol_t fts_s_clear;
+fts_symbol_t fts_s_stop;
+fts_symbol_t fts_s_start;
+fts_symbol_t fts_s_open;
+fts_symbol_t fts_s_close;
+fts_symbol_t fts_s_load;
+fts_symbol_t fts_s_read;
+fts_symbol_t fts_s_write;
+fts_symbol_t fts_s_comma;
+fts_symbol_t fts_s_semi;
 fts_symbol_t fts_s_anything;
 
 
 static void 
 fts_predefine_symbols(void)
 {
-  fts_s_void   = fts_new_symbol("void");
-  fts_s_float  = fts_new_symbol("float");
-  fts_s_int    = fts_new_symbol("int");
-  fts_s_number = fts_new_symbol("number");
-  fts_s_ptr    = fts_new_symbol("ptr");
-  fts_s_string = fts_new_symbol("string");
-  fts_s_symbol = fts_new_symbol("symbol");
-  fts_s_object = fts_new_symbol("object");
-  fts_s_true   = fts_new_symbol("true");
-  fts_s_false  = fts_new_symbol("false");
+  fts_s_void   = fts_new_builtin_symbol("void");
+  fts_s_float  = fts_new_builtin_symbol("float");
+  fts_s_int    = fts_new_builtin_symbol("int");
+  fts_s_number = fts_new_builtin_symbol("number");
+  fts_s_ptr    = fts_new_builtin_symbol("ptr");
+  fts_s_string = fts_new_builtin_symbol("string");
+  fts_s_symbol = fts_new_builtin_symbol("symbol");
+  fts_s_object = fts_new_builtin_symbol("object");
+  fts_s_true   = fts_new_builtin_symbol("true");
+  fts_s_false  = fts_new_builtin_symbol("false");
 
-  fts_s_init 	          = fts_new_symbol("$init");
-  fts_s_delete	          = fts_new_symbol("$delete");
-  fts_s_replace	          = fts_new_symbol("$replace");
-  fts_s_value             = fts_new_symbol("value");
-  fts_s_name              = fts_new_symbol("name");
-  fts_s_ninlets           = fts_new_symbol("ins");
-  fts_s_noutlets          = fts_new_symbol("outs");
-  fts_s_bang              = fts_new_symbol("bang");
-  fts_s_list              = fts_new_symbol("list");
-  fts_s_set               = fts_new_symbol("set");
-  fts_s_anything          = fts_new_symbol("anything");
+  fts_s_init 	          = fts_new_builtin_symbol("$init");
+  fts_s_delete	          = fts_new_builtin_symbol("$delete");
+  fts_s_replace	          = fts_new_builtin_symbol("$replace");
+  fts_s_value             = fts_new_builtin_symbol("value");
+  fts_s_name              = fts_new_builtin_symbol("name");
+  fts_s_ninlets           = fts_new_builtin_symbol("ins");
+  fts_s_noutlets          = fts_new_builtin_symbol("outs");
+  fts_s_bang              = fts_new_builtin_symbol("bang");
+  fts_s_list              = fts_new_builtin_symbol("list");
+  fts_s_set               = fts_new_builtin_symbol("set");
+  fts_s_print             = fts_new_builtin_symbol("print");
+  fts_s_clear             = fts_new_builtin_symbol("clear");
+  fts_s_stop              = fts_new_builtin_symbol("stop");
+  fts_s_start             = fts_new_builtin_symbol("start");
+  fts_s_open              = fts_new_builtin_symbol("open");
+  fts_s_close             = fts_new_builtin_symbol("close");
+  fts_s_load              = fts_new_builtin_symbol("load");
+  fts_s_read              = fts_new_builtin_symbol("read");
+  fts_s_write             = fts_new_builtin_symbol("write");
+  fts_s_anything          = fts_new_builtin_symbol("anything");
+  fts_s_comma             = fts_new_builtin_symbol(",");
+  fts_s_semi              = fts_new_builtin_symbol(";");
 }
 
 
@@ -73,6 +96,9 @@ fts_predefine_symbols(void)
 
 #define SYMTABSIZE 511		/* Initial Size of the symbol table  */
 
+#define BUILTIN_SYMBOL_SIZE 32	/* symbols that have and associated index, used in the
+				 * protocols and binary format (to reduce symbol table size)
+				 */
 fts_heap_t symbol_heap;
 
 static struct _symbol_table
@@ -80,7 +106,12 @@ static struct _symbol_table
   /* the hash table */
 
   fts_symbol_t symbol_hash_table[SYMTABSIZE];
+
+  fts_symbol_t builtin_symbols[BUILTIN_SYMBOL_SIZE];
+
+  int builtin_counter;
 } symbol_table;
+
 
 
 void
@@ -92,6 +123,8 @@ fts_symbols_init(void)
     symbol_table.symbol_hash_table[i] = 0;
 
   fts_heap_init(&symbol_heap, sizeof(struct fts_symbol_descr), 32);
+
+  symbol_table.builtin_counter = 0;
 
   fts_predefine_symbols();
 }
@@ -146,6 +179,7 @@ fts_new_symbol(const char *name)
 
   sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
   sp->name = name;
+  sp->index = -1;
 
   /* third, add the new symbol in the hash table */
 
@@ -184,6 +218,7 @@ fts_new_symbol_copy(const char *name)
   sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
 
   sp->name = s;
+  sp->index = -1;
 
   /* third, add the new symbol in the has table */
 
@@ -193,7 +228,42 @@ fts_new_symbol_copy(const char *name)
   return sp;
 }
 
+/* USed here to define the predefined symbols */
+
+static fts_symbol_t 
+fts_new_builtin_symbol(const char *name)
+{
+  struct fts_symbol_descr *s;		/* use the structure, not the type, so it is not 'const' */
+
+  s = (struct fts_symbol_descr *) fts_new_symbol(name);
+
+  if (symbol_table.builtin_counter < BUILTIN_SYMBOL_SIZE)
+    {
+      s->index = symbol_table.builtin_counter;
+      symbol_table.builtin_counter++;
+      symbol_table.builtin_symbols[s->index] = s;
+    }
+
+  return (fts_symbol_t) s;
+}
 
 
+/* These function are reserved to those protocol/binary format modules */
+
+fts_symbol_t fts_get_builtin_symbol(int idx)
+{
+  return symbol_table.builtin_symbols[idx];
+}
+
+int fts_is_builtin_symbol(fts_symbol_t s)
+{
+  return s->index != -1;
+}
+
+
+int fts_get_builtin_symbol_index(fts_symbol_t s)
+{
+  return s->index;
+}
 
 

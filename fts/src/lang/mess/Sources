@@ -4,11 +4,12 @@ class.c		\
 classes.c	\
 events.c	\
 loader.c	\
+saver.c         \
+vm.c		\
 mess.c		\
 objects.c	\
 objtable.c	\
 patcher.c	\
 properties.c	\
 symbols.c	\
-vm.c		\
 send.c

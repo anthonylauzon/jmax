@@ -9,7 +9,6 @@ public class MaxWriterDataSource extends MaxDataSource
 {
   Writer writer;
 
-
   public MaxWriterDataSource(Writer writer)
   {
     this.writer = writer;

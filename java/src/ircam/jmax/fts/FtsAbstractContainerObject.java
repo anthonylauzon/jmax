@@ -57,14 +57,28 @@ abstract public class FtsAbstractContainerObject extends FtsObject
   {
     put("deletedObject", obj); // the deleteObject property keep the last object deleted
 
-    // First, look in the connections, and delete the 
-    // connections from/to the object
+    // First, look in the connections, and collect the connections
+    // to be deleted then delete them
+    // WARNING: doing like that *because* FtsConnection.delete change
+    // the connections vector, so the loop would not work.
+
+    Vector toDelete = new Vector();
 
     for (int i = 0; i < connections.size() ; i++)
       {
 	FtsConnection c;
 
 	c = (FtsConnection) connections.elementAt(i);
+	
+	if ((c.from == obj) || (c.to == obj))
+	  toDelete.addElement(c);
+      }
+
+    for (int i = 0; i < toDelete.size() ; i++)
+      {
+	FtsConnection c;
+
+	c = (FtsConnection) toDelete.elementAt(i);
 	
 	if ((c.from == obj) || (c.to == obj))
 	  c.delete();
@@ -79,17 +93,25 @@ abstract public class FtsAbstractContainerObject extends FtsObject
   void replaceInConnections(FtsObject oldObject, FtsObject newObject)
   {    
     // delete the connections that no more consistent
+    // First collect them in a aux vector, then remove them
+    // It is slow, but safer because removing elements in vector
+    // shift the content
+
+    Vector toDelete = new Vector();
 
     for (int i = 0; i < connections.size(); i++)
       {
 	FtsConnection conn = (FtsConnection)connections.elementAt(i);
 
 	if (! (conn.checkConsistency()))
-	  {
-	    conn.delete();
-	    connections.removeElementAt(i);
-	    i--; // to compensate for the shift
-	  }
+	  toDelete.addElement(conn);
+      }
+
+    for (int i = 0; i < toDelete.size(); i++)
+      {
+	FtsConnection conn = (FtsConnection)connections.elementAt(i);
+
+	conn.delete();
       }
 
     // replace it in all the survived connections

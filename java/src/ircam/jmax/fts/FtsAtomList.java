@@ -6,9 +6,9 @@ package ircam.jmax.fts;
  * A string representation is supported for atom lists
  */
 
-class FtsAtomList
+public class FtsAtomList
 {
-  FtsAtomVector()
+  FtsAtomList()
   {
   }
 

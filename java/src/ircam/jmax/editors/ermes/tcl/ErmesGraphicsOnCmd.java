@@ -33,8 +33,8 @@ class ErmesGraphicsOnCmd implements Command
   {
     if (argv.length == 1)
       {
-	MaxApplication.itsSketchWindow.itsSketchPad.itsGraphicsOn = true;
-	MaxApplication.itsSketchWindow.itsSketchPad.repaint();
+	MaxApplication.getCurrentWindow().itsSketchPad.itsGraphicsOn = true;
+	MaxApplication.getCurrentWindow().itsSketchPad.repaint();
       }
     else
       throw new TclNumArgsException(interp, 1, argv, "");

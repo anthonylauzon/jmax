@@ -84,21 +84,19 @@ are the same, so the users can add as many message type as they want.
    
 #define LONG_POS_CODE 'i'
 #define FLOAT_CODE 'z'
-#define STRING_START_CODE '\"'
-#define STRING_END_CODE '\"'
+#define STRING_START_CODE 0x01
+#define STRING_END_CODE   0x02
 #define STRING_QUOTE_CODE '\\'
 #define OBJECT_CODE 'o'
+
 /*
    End of message: this character cannot be changed, and cannot
-   appear inside the message itself; inside strings is coded 
-   as two characters (see above).
-
-   NOTE THAT YOU CANNOT define EOM_CODE as '\n', beacause
-   '\n' means different things in different systems; on Unix
-   is 0x0a, in the Macintosh is 0x0d, in DOS depend :-< ...
+   appear inside the message itself; strings do not support
+   control character below 0x08. (temporary situation, waiting for
+   the binary protocol).
  */
 
-#define EOM_CODE  0x0a
+#define EOM_CODE  0x03
 
 
 #endif

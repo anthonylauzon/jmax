@@ -15,10 +15,9 @@ class FtsClientProtocol
   static final int int_type_code = 'i';
   static final int float_type_code   = 'z';
   static final int object_type_code   = 'o';
-  static final int string_start_code = '\"';
-  static final int string_end_code   = '\"';
-  static final int string_quote_code   = '\\';
-  static final int end_of_message_code = 0x0a;
+  static final int string_start_code = 0x01;
+  static final int string_end_code   = 0x02;
+  static final int end_of_message_code = 0x03;
   
   // predicated coding protocol character sets
 

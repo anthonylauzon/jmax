@@ -126,6 +126,9 @@ fts_get_client_logical_dev(int ac, const fts_atom_t *at)
 
 static int restart_on_eof = 0;
 static int poll_count = 0;
+
+static int debug_count = 0;
+
 static void
 client_poll(void)
 {

@@ -39,7 +39,7 @@
    We don't check the message length here. (we should.).
 */
 
-static char outbuf[MAX_CLIENT_MESS_SIZE];
+static char outbuf[MAX_MESSAGE_LENGTH];
 static char *outbuf_fill;
 
 void
@@ -85,7 +85,7 @@ fts_client_mess_add_sym(fts_symbol_t s)
   if (s)
     fts_client_mess_add_string(fts_symbol_name(s));
   else
-    fts_client_mess_add_string("(null symbol)");
+    fts_client_mess_add_string("(null)");
 }
 
 void
@@ -94,39 +94,8 @@ fts_client_mess_add_string(const char *sp)
   *outbuf_fill = STRING_START_CODE;
   outbuf_fill++;
 
-  while (*sp != '\0')
-    {
-      /* Warning: the coding of '\n' is done to solve the problems
-	 with EOM_CODE chars inside the strings; but the problem
-	 is actually solved only if the EOM_CODE is == to '\n'
-	 should be done in a more general way !! */
-
-      if ((*sp == STRING_END_CODE) || (*sp == STRING_QUOTE_CODE))
-	{
-	  *outbuf_fill = STRING_QUOTE_CODE;
-	  outbuf_fill++;
-	  *outbuf_fill = *sp;
-	}
-      else if (*sp == '\n')
-	{
-	  *outbuf_fill = STRING_QUOTE_CODE;
-	  outbuf_fill++;
-	  *outbuf_fill = 'n';
-	}
-      else if (*sp == '\t')
-	{
-	  *outbuf_fill = STRING_QUOTE_CODE;
-	  outbuf_fill++;
-	  *outbuf_fill = 't';
-	}
-      else
-	{
-	  *outbuf_fill = *sp;
-	}
-      sp++;
-      outbuf_fill++;
-    }
-
+  strcpy(outbuf_fill, sp);
+  outbuf_fill = outbuf_fill + strlen(outbuf_fill);
 
   *outbuf_fill = STRING_END_CODE;
   outbuf_fill++;
@@ -159,7 +128,7 @@ fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 void
 fts_client_mess_send_msg(void)
 {
-  /*  Add the eom code,  and end the string with a NUL */
+  /*  Add the eom code  */
 
   *outbuf_fill = EOM_CODE;
   outbuf_fill++;

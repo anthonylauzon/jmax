@@ -185,8 +185,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
 	itsSubWindow.itsSketchPad.PrepareInChoice();//???????
 	itsSubWindow.itsSketchPad.PrepareOutChoice();///?????????
-	MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
-	GetSketchWindow().AddToSubWindowList(itsSubWindow);
 	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
       }
       return true;

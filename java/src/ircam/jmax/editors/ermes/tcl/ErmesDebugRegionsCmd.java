@@ -25,9 +25,11 @@ class ErmesDebugRegionsCmd implements Command
   {
 	ErmesSketchPad pad;
 
-	pad = ((ErmesSketchWindow)MaxApplication.itsSketchWindowList.elementAt(0)).itsSketchPad;
+	/* SOrry, itsSketchWindowList do not exist any more */
 
-	pad.paintAllRegions();
+	pad = ((ErmesSketchWindow)MaxApplication.getCurrentWindow()).itsSketchPad;
+
+	//pad.paintAllRegions();
   }
 }
 

@@ -20,8 +20,9 @@
    to catch memory problems without purify
 */
 
-/* #define HELP_PURIFY 
-#include "smem.h"  */
+/* #define HELP_PURIFY  */
+
+/* #include "smem.h"  */
 
 #include <stdlib.h>
 #include "sys.h"

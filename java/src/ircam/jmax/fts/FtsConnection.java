@@ -11,6 +11,7 @@ import java.util.*;
 
 public class FtsConnection 
 {
+  boolean active = true;
   FtsObject from;
   int outlet;
 
@@ -53,9 +54,19 @@ public class FtsConnection
 
   public void delete()
   {
-    FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
+    if (active)
+      {
+	FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
 
-    from.getParent().removeConnectionFromContainer(this);
+	from.getParent().removeConnectionFromContainer(this);
+
+	active = false;
+      }
+    else
+      {
+	System.err.println("Deleting delete connection" + this);
+	(new Exception()).printStackTrace();
+      }
   }
 
   /** Access the From. The From is the FtsObject origin of the connection. */

@@ -119,6 +119,8 @@ public class FtsDotPatParser
 
     FtsContainerObject obj;
 
+    Thread.yield(); 
+
     obj = new FtsPatcherObject(server.getRootObject());
 
     try
@@ -215,6 +217,8 @@ public class FtsDotPatParser
 
 	while (in.ttype != FtsDotPatTokenizer.TT_EOF)
 	  {
+	    Thread.yield();  // ???
+
 	    in.nextToken(); 
 
 	    if (in.sval.equals("#N"))
@@ -409,6 +413,10 @@ public class FtsDotPatParser
   static public FtsObject importAbstraction(FtsContainerObject parent, File inputFile, Vector env) throws java.io.IOException, FtsException
   {
     FtsDotPatTokenizer in = null; 
+
+    // Yield 
+
+    Thread.yield();
 
     // open the file
     

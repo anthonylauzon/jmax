@@ -6,6 +6,10 @@
 extern fts_symbol_t fts_new_symbol(const char *name);
 extern fts_symbol_t fts_new_symbol_copy(const char *name);
 
+extern fts_symbol_t fts_get_builtin_symbol(int idx);
+extern int fts_is_builtin_symbol(fts_symbol_t s);
+extern int fts_get_builtin_symbol_index(fts_symbol_t s);
+
 /* Get the symbol name from a symbol;
    note that users should never access the internal structure
    of the symbol, but they should use this macros
@@ -45,6 +49,17 @@ extern fts_symbol_t fts_s_noutlets;
 extern fts_symbol_t fts_s_bang;
 extern fts_symbol_t fts_s_list;
 extern fts_symbol_t fts_s_set;
+extern fts_symbol_t fts_s_print;
+extern fts_symbol_t fts_s_clear;
+extern fts_symbol_t fts_s_stop;
+extern fts_symbol_t fts_s_start;
+extern fts_symbol_t fts_s_open;
+extern fts_symbol_t fts_s_close;
+extern fts_symbol_t fts_s_load;
+extern fts_symbol_t fts_s_read;
+extern fts_symbol_t fts_s_write;
+extern fts_symbol_t fts_s_comma;
+extern fts_symbol_t fts_s_semi;
 extern fts_symbol_t fts_s_anything;
 
 #endif

@@ -4,8 +4,6 @@
 /* Sending a message */
 
 
-#define MAX_CLIENT_MESS_SIZE 1024
-
 extern void fts_client_mess_start_msg(int type);
 extern void fts_client_mess_add_long(long value);
 extern void fts_client_mess_add_float(float value);

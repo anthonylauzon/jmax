@@ -52,6 +52,7 @@
 #include "lang.h"
 #include "runtime.h"
 #include "tiles/ucs.h"
+#include "tiles/messtile.h"
 
 
 /******************************************************************************/
@@ -546,6 +547,19 @@ fts_ucs_audio_set_default_out(int argc, const fts_atom_t *argv)
 }
 
 
+static fts_status_t
+fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
+{
+  if ((argc == 1)  && fts_is_int(&argv[0]))
+    {
+
+      fts_set_mess_trace(fts_get_int(&argv[0]));
+    }
+
+  return fts_Success;
+}
+
+
 /* Install all of them */
 
 static void
@@ -608,6 +622,9 @@ fts_ucs_install_commands()
 			 "set msgmode [check | fast]",
 			 "Set the FTS message mode\ncheck mode give you more tests\nduring object developement");
 
+  fts_ucs_define_command(fts_new_symbol("mess"), fts_new_symbol("trace"),  fts_ucs_set_mess_trace,
+			 "mess trace [1 | 0]",
+			 "Activate the trace of messages received by FTS");
 
   /* DEVICE related commands  */
 

@@ -833,7 +833,7 @@ sgi_midi_prepare_next_event(sgimidi_dev_data *data)
 
   midi_event = &(data->in_midi_event[data->in_current_event]);
 
-  if ((midi_event->msg[0] == MD_SYSEX) &&  midi_event->sysexmsg)
+  if ((midi_event->msg[0] == MD_SYSEX) &&  midi_event->sysexmsg && midi_event->msglen > 0)
     {
       /* received sysex */
       data->input_status = reading_sysex;
@@ -879,7 +879,7 @@ sgi_midi_get(fts_dev_t *dev, unsigned char *cp)
       return fts_Success;
 
     case reading_sysex:
-      *cp = (char) ((data->in_sysex_buf)[data->in_current_char_count ++]);
+      *cp = (char) (data->in_sysex_buf[data->in_current_char_count ++]);
       if (data->in_current_char_count == data->in_current_event_length)
 	{
 	  data->in_current_event++;

@@ -1,6 +1,8 @@
 package ircam.jmax.fts;
 
 import java.io.*;
+
+import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
@@ -45,6 +47,7 @@ class FtsErrorStreamer implements Runnable
 	    if (out == null)
 	      {
 		window = new TextWindow("FTS Standard Error");
+		MaxWindowManager.getWindowManager().addWindow(window);
 		out = window.getPrintStream();
 		window.pack();
 		window.show();

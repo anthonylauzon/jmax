@@ -7,7 +7,7 @@
 
 #define DEBUG_DSP_COMPILER
 
-#define ASSERT(e) if (!(e)) { post("assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
+#define ASSERT(e) if (!(e)) { fprintf( stderr, "assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 
 /* clocks for use with timer primitives.
@@ -351,22 +351,24 @@ dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, 
 		  dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * ninputs);
 
       nin = dsp_input_get(dest->o, winlet);
+
+      ASSERT( nin < ninputs);
+
       previous_sig = dest->descr->in[nin];
       if ((! previous_sig) || (previous_sig == sig_zero))
-		  {
-			 if (sig)
-			   Sig_reference(sig);
-			 dest->descr->in[nin] = sig;
-		  }
+	{
+	  if (sig)
+	    Sig_reference(sig);
+	  dest->descr->in[nin] = sig;
+	}
+      else
+	{
 #if DSP_MULTIPLE_CONN_WARN
-
-else
-  {
-	 post( "Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
-	       woutlet, fts_symbol_name(fts_object_get_class_name(src->o)),
-	       winlet, fts_symbol_name(fts_object_get_class_name(dest->o)));
-  }
+	  post( "Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
+		woutlet, fts_symbol_name(fts_object_get_class_name(src->o)),
+		winlet, fts_symbol_name(fts_object_get_class_name(dest->o)));
 #endif
+	}
     }
 }
 

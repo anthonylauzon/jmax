@@ -23,7 +23,6 @@ import com.sun.java.swing.*;
   This class is used by the MaxWindowMenu in ircam.jmax.toolkit.
   */
 
-
 public class MaxWindowManager implements WindowListener
 {
   int windowOperationCount = 0;
@@ -44,6 +43,10 @@ public class MaxWindowManager implements WindowListener
   {
   }
 
+  /** Call this method to add a window to 
+   * from  the window manager window list
+   */
+
   public void addWindow(Frame window)
   {
     windowOperationCount++;
@@ -51,12 +54,33 @@ public class MaxWindowManager implements WindowListener
     window.addWindowListener(this);
   }
 
+  /** Call this method to remove a window to
+   * from  the window manager window list
+   */
+
   public void removeWindow(Frame window)
   {
     windowOperationCount++;
     windows.removeElement(window);
     window.removeWindowListener(this);
   }
+
+  /** call this method to tell the window 
+   * manager that something about the window
+   * changed (i.e. the title, for now).
+   * Actually, this will be obsolete the day
+   * we use a swing list as a menu
+   */
+
+  public void windowChanged(Frame window)
+  {
+    // Provoke a null change in the vector,
+    // to get an event for the listeners
+
+    windowOperationCount++;
+    windows.setElementAt(window, windows.indexOf(window));
+  }
+
 
   void suspendWindow(Frame window)
   {
@@ -68,11 +92,6 @@ public class MaxWindowManager implements WindowListener
   {
     windowOperationCount++;
     windows.addElement(window);
-  }
-
-  void retitleWindow(Frame window)
-  {
-    windowOperationCount++;
   }
 
   public ListModel getWindowList()
@@ -97,6 +116,34 @@ public class MaxWindowManager implements WindowListener
     else
       return null;
   }
+
+
+
+  /** Produce a unique window title for the Name 
+   *  the technique is the following (naive, but usefull)
+   *  it look all the window titles, and count those
+   *  which start exactly with theName; finally,
+   *  add this count to theName string and return it 
+   */
+
+  public String makeUniqueWindowTitle(String theName)
+  {
+    int count = 0;
+
+    for (int i = 0; i < windows.size(); i++)
+      {
+	Frame w = (Frame) windows.elementAt(i);
+
+	if (w.getTitle().startsWith(theName))
+	  count++;
+      }
+
+    if (count > 0)
+      return theName +" (" + count + ")";
+    else
+      return theName;
+  }
+  
 
   // Event handler for WindowListener
 

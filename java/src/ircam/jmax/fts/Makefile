@@ -212,8 +212,6 @@ FtsParseToPort:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParseToPort.java)
 .PHONY: FtsParseToPort
 
-
-
 FtsIntegerVectorData:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorData.java)
 .PHONY: FtsIntegerVectorData
@@ -222,9 +220,6 @@ FtsIntegerVectorDataType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorDataType.java)
 .PHONY: FtsIntegerVectorDataType
 
-FtsIntegerVectorData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorData.java)
-.PHONY: FtsIntegerVectorData
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

@@ -32,7 +32,8 @@ import tcl.lang.*;
  * - quit of the application
  */
 
-public class MaxApplication extends Object {
+public class MaxApplication extends Object
+{
 
   // Static global services
 
@@ -45,147 +46,23 @@ public class MaxApplication extends Object {
 
   public static Clipboard systemClipboard = new Clipboard("system");
   static Interp itsInterp;//e.m.
-  public static Vector itsSketchWindowList;
-  public static Vector itsEditorsFrameList;
-  static ConnectionDialog itsConnDialog;
-  public static boolean doAutorouting = true; // Should become a static in the Patcher editor
 
   public static Properties jmaxProperties;
 
-  public static ErmesSketchWindow itsSketchWindow;
-  public static MaxEditor itsWindow;
+  private static ErmesSketchWindow itsSketchWindow;
 
   static MaxWhenHookTable  itsHookTable;
 
+  /**
+   * @deprecated
+   */
 
-  static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    if(!theSketchWindow.isSubPatcher){
-      for(int i=0;i<itsSketchWindowList.size();i++){
-	aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
-	if(aSketchWindow != theSketchWindow) 
-	  aSketchWindow.AddWindowToMenu(theSketchWindow.getTitle());
-      }
-      for(int i=0;i<itsEditorsFrameList.size();i++){
-	aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
-      }
-
-      if (ConsoleWindow.getConsoleWindow() != null)
-	ConsoleWindow.getConsoleWindow().AddWindowToMenu(theSketchWindow.getTitle());
-    }
+  public static void setCurrentWindow(MaxEditor theWindow){
+    if (theWindow instanceof ErmesSketchWindow)
+      itsSketchWindow = (ErmesSketchWindow)theWindow;
   }
 
-  static public void AddThisFrameToMenus(String theName){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for(int i=0;i<itsSketchWindowList.size();i++){
-      aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
-      aSketchWindow.AddWindowToMenu(theName);
-    }
-    for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-	if(!theName.equals(aWindow.GetTitle()))
-	  aWindow.AddWindowToMenu(theName);
-    }
-
-    if (ConsoleWindow.getConsoleWindow() != null)
-      ConsoleWindow.getConsoleWindow().AddWindowToMenu(theName);
-  }
-
-  public static void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for(int i=0;i<itsSketchWindowList.size();i++){
-      aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
-      if(aSketchWindow != theTopWindow) 
-	aSketchWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
-    }
-    for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-      aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
-    }
-
-    if (ConsoleWindow.getConsoleWindow() != null)
-      ConsoleWindow.getConsoleWindow().AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
-  }
-
-   public static void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for(int i=0;i<itsSketchWindowList.size();i++){
-      aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
-      if(aSketchWindow != theTopWindow) 
-	aSketchWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(),theSubWindow.getTitle(),theLastItem);
-    }
-    for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-      aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
-    }
-
-    if (ConsoleWindow.getConsoleWindow() != null)
-      ConsoleWindow.getConsoleWindow().RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
-
-    itsSketchWindowList.removeElement(theSubWindow);
-  }
-
-
-  public static void RemoveThisWindowFromMenus(MaxEditor theWindow){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for(int i=0;i<itsSketchWindowList.size();i++){
-      aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
-      if(aSketchWindow != theWindow) 
-	aSketchWindow.RemoveWindowFromMenu(theWindow.GetTitle());
-    }
-    for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-      if(aWindow != theWindow)
-	aWindow.RemoveWindowFromMenu(theWindow.GetTitle());
-    }
-    if (ConsoleWindow.getConsoleWindow() != null)
-      ConsoleWindow.getConsoleWindow().RemoveWindowFromMenu(theWindow.GetTitle());
-  }
-  
-  public static void ChangeWinNameMenus(String theOldName, String theNewName){
-    ErmesSketchWindow aSketchWindow;
-    MaxEditor aWindow;
-    for(int i=0;i<itsSketchWindowList.size();i++){
-      aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i); 
-      aSketchWindow.ChangeWinNameMenu(theOldName,theNewName);
-    }
-    for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
-      aWindow.ChangeWinNameMenu(theOldName,theNewName);
-    }
-
-    if (ConsoleWindow.getConsoleWindow() != null)
-      ConsoleWindow.getConsoleWindow().ChangeWinNameMenu(theOldName, theNewName);
-  }
-  
-
-
-
-  public static void SetCurrentWindow(MaxEditor theWindow){
-    if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
-    itsWindow = theWindow;
-  }
-
-  public static String GetWholeWinName(String theName){
-    ErmesSketchWindow aSketchWindow;
-    int number = 0;
-    String aName;
-    for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
-      aSketchWindow = (ErmesSketchWindow)e.nextElement();
-      if(theName.equals(aSketchWindow.itsPatcher.getClassName())) number++;
-    }
-    if(number>1) aName = theName+" ("+number+")";
-    else aName = theName;
-    return aName;
-  }
-  
-  public static ErmesSketchWindow GetCurrentWindow() {
+  public static ErmesSketchWindow getCurrentWindow() {
     return itsSketchWindow;
   }
 	
@@ -238,9 +115,6 @@ public class MaxApplication extends Object {
 
     ircam.jmax.utils.Platform.setValues();
 
-    itsSketchWindowList = new Vector(); // move to MaxWindowManager :->
-    itsEditorsFrameList = new Vector();
-
     // Create and initialize the tcl interpreter
 
     makeTclInterp(); 
@@ -267,7 +141,7 @@ public class MaxApplication extends Object {
       }
     catch (TclException e)
       {
-	System.out.println("TCL error in initialization " + e + " : " + itsInterp.getResult());
+	System.out.println("TCL error in initialization: " + itsInterp.getResult());
       }
     
     // Splash screen moved to a tcl command
@@ -307,26 +181,35 @@ public class MaxApplication extends Object {
 
   }
 
+  /**
+   * Quit verify if there is anything to save
+   * Currently, this is done in the wrong way: we get the list
+   * of windows from the MaxWindowManager, and for those that 
+   * are MaxEditor, we do the check;
+   * In reality, we should look in the MDA instance data base
+   * to do the work.
+   */
+
   public static void Quit()
   {
-    MaxEditor aWindow;
-    ErmesSketchWindow aSketchWindow;
+    ListModel windows;
+
+
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
 
+    windows = MaxWindowManager.getWindowManager().getWindowList();
+
     // First, search if there is anything to save,
 
-    for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
-      aSketchWindow = (ErmesSketchWindow)e.nextElement();
-      if (aSketchWindow.ShouldSave())
-	someOneNeedSave = true;
-    }
+    for (int i = 0; i < windows.getSize(); i++)
+      {
+	Frame w = (Frame) windows.getElementAt(i);
 
-    for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
-      aWindow = (MaxEditor)e.nextElement();
-      if (aWindow.ShouldSave())
-	someOneNeedSave = true;
-    }
+	if (w instanceof MaxEditor)
+	  if (((MaxEditor) w).ShouldSave())
+	    someOneNeedSave = true;
+      }
 
     // in such case, should give the offer to cancel the quit.
 
@@ -367,15 +250,13 @@ public class MaxApplication extends Object {
 
     if (doTheSave)
       {
-	for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
-	  aSketchWindow = (ErmesSketchWindow)e.nextElement();
-	  aSketchWindow.Close();
-	}
+	for (int i = 0; i < windows.getSize(); i++)
+	  {
+	    Frame w = (Frame) windows.getElementAt(i);
 
-	for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
-	  aWindow = (MaxEditor)e.nextElement();
-	  aWindow.Close();
-	}
+	    if (w instanceof MaxEditor)
+	      ((MaxEditor) w).Close();
+	  }
       }
 
     if (ConsoleWindow.getConsoleWindow() != null)

@@ -1058,7 +1058,7 @@ Rectangle previousResizeRect = new Rectangle();
   public void mouseClicked(MouseEvent e){}
 
   public void mousePressed(MouseEvent e){
-    MaxApplication.itsSketchWindow = itsSketchWindow; //demo only: 4/03/98 0:55
+    MaxApplication.setCurrentWindow(itsSketchWindow); //demo only: 4/03/98 0:55
     itsSketchWindow.requestFocus();//???
     
     //create the object whose name is 
@@ -1140,7 +1140,7 @@ Rectangle previousResizeRect = new Rectangle();
     //(a repaint foreach mouseup...)
     //itsFirstClick = true;
     //RequestOffScreen(this);
-    MaxApplication.itsSketchWindow = itsSketchWindow;
+    MaxApplication.setCurrentWindow(itsSketchWindow);
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {

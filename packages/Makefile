@@ -4,6 +4,7 @@ all:
 #	(cd iana; $(MAKE) -k all)
 	(cd icebrowser; $(MAKE) -k all)
 	(cd espresso; $(MAKE) -k all)
+	(cd table; $(MAKE) -k all)
 .PHONY: all
 
 clean:
@@ -12,4 +13,5 @@ clean:
 #	(cd iana; $(MAKE) clean)
 	(cd icebrowser; $(MAKE) clean)
 	(cd espresso; $(MAKE) clean)
+	(cd table; $(MAKE) clean)
 .PHONY: clean

@@ -22,8 +22,7 @@ class ErmesObjectSetSizeCmd implements Command
 {
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {  
-    ErmesSketchPad aSketchPad = MaxApplication.itsSketchWindow.itsSketchPad; 
-    Enumeration e = aSketchPad.itsElements.elements();
+    ErmesSketchPad aSketchPad = MaxApplication.getCurrentWindow().itsSketchPad; 
     
     if (argv.length == 4)
       {
