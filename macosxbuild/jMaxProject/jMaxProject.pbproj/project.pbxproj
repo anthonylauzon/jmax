@@ -13979,8 +13979,6 @@
 				F880FE330283013E01664092,
 				F880FE340283013E01664092,
 				F880FE350283013E01664092,
-				F880FE360283013E01664092,
-				F880FE370283013E01664092,
 				F880FE380283013E01664092,
 				F880FE390283013E01664092,
 				F880FE3A0283013E01664092,
@@ -14687,18 +14685,6 @@
 			isa = PBXFileReference;
 			name = EditField.java;
 			path = ../../java/src/ircam/jmax/editors/patcher/EditField.java;
-			refType = 2;
-		};
-		F880FE360283013E01664092 = {
-			isa = PBXFileReference;
-			name = ErmesModule.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/ErmesModule.java;
-			refType = 2;
-		};
-		F880FE370283013E01664092 = {
-			isa = PBXFileReference;
-			name = ErmesPatcherListener.java;
-			path = ../../java/src/ircam/jmax/editors/patcher/ErmesPatcherListener.java;
 			refType = 2;
 		};
 		F880FE380283013E01664092 = {
@@ -15827,8 +15813,6 @@
 				F880FEFA0283013E01664092,
 				F880FEFB0283013E01664092,
 				F880FEFC0283013E01664092,
-				F880FEFD0283013E01664092,
-				F880FEFE0283013E01664092,
 				F880FEFF0283013E01664092,
 				F880FF000283013E01664092,
 				F880FF010283013E01664092,
@@ -16236,18 +16220,6 @@
 		};
 		F880FEFC0283013E01664092 = {
 			fileRef = F880FE350283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FEFD0283013E01664092 = {
-			fileRef = F880FE360283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FEFE0283013E01664092 = {
-			fileRef = F880FE370283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17835,6 +17807,8 @@
 		<string>JMaxWrapper</string>
 		<key>Properties</key>
 		<dict>
+			<key>com.apple.hwaccel</key>
+			<string>true</string>
 			<key>com.apple.macos.useScreenMenuBar</key>
 			<string>true</string>
 		</dict>
