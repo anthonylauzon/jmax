@@ -285,7 +285,10 @@ class ErmesObjSlider extends ErmesObject {
   }
 
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY) {
-    return true;
+    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
+       (getItsHeight()+theDeltaY < getMinimumSize().height))
+      return false;
+    else return true;
   }
   
   public boolean IsInThrottle(int theX, int theY){
