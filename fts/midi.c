@@ -1152,8 +1152,9 @@ fts_midiport_open(fts_midiport_t ** port, int ac, fts_atom_t* at)
   fts_atom_t a[1];
 
   if (*port != NULL) {
-    fts_object_delete_from_patcher( (fts_object_t*) *port);
-    *port = NULL;
+/*      fts_object_delete_from_patcher( (fts_object_t*) *port); */
+/*      *port = NULL; */
+    fts_log("[midi]: Help! Cannot and should not open a MIDI port twice (fts_midiport_open)\n");
   }
   
   /* try to instanciate */
@@ -1249,7 +1250,7 @@ fts_midiport_get_default_in(void)
 
   /* if a midi port was already instantiated, use that one, instead */
   if (default_midiport != NULL) {
-    default_midiport;
+    return default_midiport;
   }
 
   /* no midi port has been instantiated. ask the project if the user
@@ -1303,7 +1304,7 @@ fts_midiport_get_default_out(void)
 
   /* if a midi port was already instantiated, use that one, instead */
   if (default_midiport != NULL) {
-    default_midiport;
+    return default_midiport;
   }
 
   /* no midi port has been instantiated. ask the project if the user
