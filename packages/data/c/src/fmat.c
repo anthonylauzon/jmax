@@ -1205,6 +1205,8 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   if(i >= 0 && i < fmat_get_m(self) && j >= 0 && j < fmat_get_n(self))
     fts_return_float(fmat_get_element(self, i, j));
+
+  /* todo: index < 0: from end */
 }
 
 static void
@@ -2007,6 +2009,7 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *  complex arithmetics
  *
  */
+
 static void
 fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2021,7 +2024,7 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(in_n == m)
   {
-    float *res = alloca(sizeof(float) * in_m * n);
+    float *res = malloc(sizeof(float) * in_m * n);
     float *res_row = res;
     int i_row, i_col, i, j;
     
