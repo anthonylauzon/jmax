@@ -6,6 +6,7 @@
 ## automake --add-missing --copy --foreign
 SUBDIRS=client fts include java packages bin images tutorials config utils help
 
+EXTRA_DIST= AUTHORS CHANGES ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
 
 #
 # TAGS
@@ -74,3 +75,4 @@ mrproper: maintainer-clean
 	-rm -f install-sh
 	-rm -f ltconfig ltmain.sh
 	-rm -f missing mkinstalldirs 
+
