@@ -276,6 +276,8 @@ dict_upload_data(dict_t *self)
         
         fts_client_send_message((fts_object_t *)self, sym_register_obj, 3, b);
         
+        fts_send_message(dobj, fts_s_update_gui, 0, 0);
+        
         fts_set_object(&a[2+i], dobj);
       }
       else

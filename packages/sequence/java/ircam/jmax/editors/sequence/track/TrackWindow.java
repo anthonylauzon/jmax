@@ -115,7 +115,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
       }
 		});		
     
-		if( !trackData.editorObject.haveContent())
+		if(trackData.editorObject != null && !trackData.editorObject.haveContent())
 			pack();
 		
     if(JMaxApplication.getProperty("no_menus") == null)

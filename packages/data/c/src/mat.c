@@ -533,6 +533,8 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
         
         fts_client_send_message((fts_object_t *)self, sym_register_obj, 3, b);
         
+        fts_send_message(dobj, fts_s_update_gui, 0, 0);
+        
         fts_set_object(&a[2+i], dobj);               
       }
       else

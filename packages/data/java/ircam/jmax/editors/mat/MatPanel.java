@@ -242,11 +242,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       return currentObject;
     }
       
-    //Implement the one method defined by TableCellEditor.
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) 
+    {
       currentObject = (FtsGraphicObject)value;
-      button.setText("< "+currentObject.getClassName()+" >");
-      button.setHorizontalTextPosition(SwingConstants.LEFT);
+      /*button.setText(currentObject.getClassName()+" "+currentObject.getID());
+      button.setHorizontalTextPosition(SwingConstants.LEFT);*/
       return button;
     }
   }
@@ -263,7 +263,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,int row, int column) 
     {      
-      setText("< "+((FtsGraphicObject)value).getClassName()+" >");
+      setText(((FtsGraphicObject)value).getClassName()+" "+((FtsGraphicObject)value).getID());
       setHorizontalTextPosition(SwingConstants.CENTER);
       return this;
     }

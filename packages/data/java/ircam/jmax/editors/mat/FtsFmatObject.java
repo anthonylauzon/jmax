@@ -261,7 +261,7 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   
   public String getColumnName(int col_id)
   {
-    return "col "+col_id;
+    return ""+col_id;
   }
   
   public String getType()
