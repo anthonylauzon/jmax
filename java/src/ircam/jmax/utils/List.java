@@ -1,7 +1,6 @@
 
 package ircam.jmax.utils;
 import java.util.*;
-import ircam.jmax.editors.ermes.ErmesArea; //debug only. Please remove soon
 
 public class List {
   ListObject head;
