@@ -287,7 +287,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int newp = (int)(nArgs-1)/2;
     double[] t_temp = new double[pixelsSize + 10];    
     double[] b_temp = new double[pixelsSize + 10];    
-
+    
     if(startIndex==0)
       {
 	if( isIvec())
@@ -332,6 +332,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	    {
 	      t_temp[pixelsSize-newp-1+j] = args[i].doubleValue;
 	      b_temp[pixelsSize-newp-1+j] = args[i+1].doubleValue;
+              j++;
 	    }
       }
     t_pixels = t_temp;

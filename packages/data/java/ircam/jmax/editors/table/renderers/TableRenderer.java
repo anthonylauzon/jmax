@@ -64,30 +64,31 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.fillRect( x, startY, width, height);
   }
 
-  public void drawPixSolidPoint( Graphics g, int x, int topy, int bottomy, int zero)
+  public void drawPixSolidPoint( Graphics g, int x, double topy, double bottomy, int zero)
   {
     int width = (int)( gc.getAdapter().getXZoom());
     if (width < 1) width = 1;
     int height, y;
     
     if( topy*bottomy > 0)
-      {
-	if( topy > 0)
-	  {
-	    height = zero-bottomy;
-	    y = zero;
-	  }
-	else
-	  {
-	    height = topy-bottomy;
-	    y = topy;
-	  }
-      }
+    {
+        if( topy > 0)
+        {
+            y = gc.getAdapter().getY( topy);
+            height =  zero-y;
+        }
+        else
+        {
+            height = gc.getAdapter().getY( bottomy)-zero;
+            y = zero;
+        }
+    }
     else
-      {
-	height = topy-bottomy;
-	y = topy;
-      }
+    {
+        y = gc.getAdapter().getY( topy);
+        height = gc.getAdapter().getY( bottomy) - y;
+    }
+
     g.fillRect( x, y, width, height);
   }
 
@@ -102,7 +103,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.fillRect(x,  y, width, height);
   }
 
-  public void drawPixHollowPoint( Graphics g, int x, int topy, int bottomy)
+  public void drawPixHollowPoint( Graphics g, int x, double topy, double bottomy)
   {
     int width = (int)( gc.getAdapter().getXZoom());
     int height = (int) gc.getAdapter().getYZoom();
@@ -110,8 +111,8 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     if (width < 1) width = 1;    
     if (height == 0) height = 1;
 
-    g.fillRect(x,  topy, width, height);
-    g.fillRect(x,  bottomy, width, height);
+    g.fillRect(x,  gc.getAdapter().getY( topy), width, height);
+    g.fillRect(x,  gc.getAdapter().getY( bottomy), width, height);
   }
   /**
    * From the Layer interface: renders the content of the table (except the
@@ -162,22 +163,15 @@ public class TableRenderer extends AbstractRenderer implements Layer{
       }
     else
       {
-	/*int pixSize = gc.getFtsObject().getPixelsSize();	      
-	  if( itsMode == SOLID)
-	  for (int i = 0 ; i < pixSize; i++)
-	  drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
-	  else
-	  for (int i = 0; i < pixSize; i++)
-	  drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));*/	
 	int pixSize = gc.getFtsObject().getPixelsSize();	      
 	if( itsMode == SOLID)
-	  for (int i = 0 ; i < pixSize-1; i++)
-	    drawPixSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getTopPixel(i)), 
-			       gc.getAdapter().getY(gc.getFtsObject().getBottomPixel(i)), zero);
-	else
+            for (int i = 0 ; i < pixSize-1; i++)
+                drawPixSolidPoint( g, i, gc.getFtsObject().getTopPixel(i), 
+                                   gc.getFtsObject().getBottomPixel(i), zero);
+        else
 	  for (int i = 0; i < pixSize-1; i++)
-	    drawPixHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getTopPixel(i)), 
-				gc.getAdapter().getY(gc.getFtsObject().getBottomPixel(i)));
+	    drawPixHollowPoint( g, i, gc.getFtsObject().getTopPixel(i), 
+				gc.getFtsObject().getBottomPixel(i));
       }
     
     g.setColor( Color.red);
