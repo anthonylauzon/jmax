@@ -59,7 +59,7 @@ static fts_symbol_t sym_bounds = 0;
 static void
 vecdisplay_deliver(vecdisplay_t *this)
 {
-  if(fts_object_patcher_is_open((fts_object_t *)this))
+  if(fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *)this)))
     {
       if(this->gate)
 	{
@@ -87,7 +87,7 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
-  if(fts_object_patcher_is_open((fts_object_t *)this) && this->pending)
+  if(fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *)this)) && this->pending)
     {
       this->gate = 0;
       this->pending = 0;

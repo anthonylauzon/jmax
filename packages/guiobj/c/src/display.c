@@ -138,7 +138,7 @@ append_atom(char *str, const fts_atom_t *a)
 static void
 display_deliver(display_t *this)
 {
-  if(fts_object_patcher_is_open((fts_object_t *)this))
+  if(fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *)this)))
     {
       if(this->gate)
 	{
@@ -159,7 +159,7 @@ display_alarm(fts_alarm_t *alarm, void *o)
 {
   display_t * this = (display_t *)o;
 
-  if(fts_object_patcher_is_open((fts_object_t *)this))
+  if(fts_patcher_is_open( fts_object_get_patcher( (fts_object_t *)this)))
     {
       if(this->dsp)
 	{

@@ -1090,7 +1090,7 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
 
 void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
-  if (fts_object_patcher_is_open(obj))
+  if (fts_patcher_is_open( fts_object_get_patcher( obj)))
       fts_object_property_changed(obj, property);
 }
 

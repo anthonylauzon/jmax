@@ -49,7 +49,8 @@ struct fts_patcher
   fts_env_t env;
 };    
 
-#define fts_patcher_get_args(p)           ((p)->args)
+#define fts_patcher_get_args(p)    ((p)->args)
+#define fts_patcher_is_open(p)     ((p)->open)
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
