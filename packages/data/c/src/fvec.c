@@ -702,6 +702,7 @@ fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
  *  misc math funs
  *
  */
+
 static void
 fslice_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -836,6 +837,7 @@ fslice_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *  min, max & co
  *
  */
+
 static void
 fslice_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1067,9 +1069,35 @@ fslice_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 /****************************************************************************
  *
+ *  element access
+ *
+ */
+
+/* called by get element message */
+static void
+_fslice_get_element (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    fslice_t *self = (fslice_t *) o;
+    int i = 0;
+  
+    if (ac > 0  &&  fts_is_number(at))
+	i = fts_get_number_int(at);
+
+    if (i >= 0  &&  i < fslice_get_size(self))
+	fts_return_float(fslice_get_element(self, i));
+
+    /* todo: index < 0: from end */
+}
+
+
+
+
+/****************************************************************************
+ *
  *  post and print
  *
  */
+
 static void
 fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1172,7 +1200,11 @@ fslice_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_m
 static void
 fslice_instantiate(fts_class_t *cl)
 {
+  /* standard functions */
+  fts_class_set_post_function(cl, fslice_post);
   fts_class_message_varargs(cl, fts_s_print, fslice_print);
+  fts_class_message_varargs(cl, fts_s_get_element, _fslice_get_element);
+  fts_class_message_varargs(cl, fts_s_get, _fslice_get_element);
   
   fts_class_set_post_function(cl, fslice_post_function);
   fts_class_set_array_function(cl, fslice_array_function);
@@ -1182,6 +1214,7 @@ fslice_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("set"), frow_class, fslice_set_fmat_or_fslice);
   fts_class_message(cl, fts_new_symbol("set"), fmat_class, fslice_set_fmat_or_fslice);
 
+  /* arithmetics */
   fslice_message(cl, fts_new_symbol("add"), fslice_add_fslice, fslice_add_number);
   fslice_message(cl, fts_new_symbol("sub"), fslice_sub_fslice, fslice_sub_number);
   fslice_message(cl, fts_new_symbol("mul"), fslice_mul_fslice, fslice_mul_number);
