@@ -1,0 +1,15 @@
+jmax (4.0.20030330-1) unstable; urgency=low
+
+  * Updated to last CVS.
+  * Splitted into jmax-{common,devel,java,client,jack,doc}.
+  * Moved usr/share/jmax/packages/*/help to jmax-doc
+  * Removed usr/bin/test1 from install
+
+ -- Paul Brossier <piem@altern.org>  Sun,  3 Mar 2003 14:33:03 +0000
+
+jmax (4.0.20030208-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Paul Brossier <piem@altern.org>  Sun,  9 Feb 2003 01:08:03 +0000
+

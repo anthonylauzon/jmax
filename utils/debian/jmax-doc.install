@@ -1,0 +1,14 @@
+usr/share/jmax/doc
+usr/share/jmax/tutorials
+usr/share/jmax/help
+usr/share/jmax/packages/control/help
+usr/share/jmax/packages/data/help
+usr/share/jmax/packages/guiobj/help
+usr/share/jmax/packages/io/help
+usr/share/jmax/packages/ispw/help
+usr/share/jmax/packages/ispwmath/help
+usr/share/jmax/packages/midi/help
+usr/share/jmax/packages/numeric/help
+usr/share/jmax/packages/sequence/help
+usr/share/jmax/packages/signal/help
+usr/share/jmax/packages/system/help
