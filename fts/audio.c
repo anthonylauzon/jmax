@@ -766,6 +766,7 @@ void fts_audio_config( void)
   fts_class_t *audio_sched_class;
   fts_class_t* nullaudioport_class;
   fts_object_t *audio_sched;
+  fts_object_t* nullaudioport;
 
   audiolabel_listeners_heap = fts_heap_new( sizeof( audiolabel_listener_t));
 
@@ -782,7 +783,9 @@ void fts_audio_config( void)
   audio_sched = fts_object_create( audio_sched_class, 0, 0);
 
   nullaudioport_class = fts_class_install(NULL, nullaudioport_instantiate);
-  fts_audiomanager_put_port(fts_s_unconnected, (fts_audioport_t*)(fts_object_create(nullaudioport_class, 0, NULL)));
+  nullaudioport = fts_object_create(nullaudioport_class, 0, NULL);
+  fts_object_refer(nullaudioport);
+  fts_audiomanager_put_port(fts_s_unconnected, (fts_audioport_t*)(nullaudioport));
 }
 
 /** EMACS **
