@@ -62,7 +62,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	int snappedTime;
 	String timeString;
 	Dimension d = getSize();
-	Rectangle clip = g.getClipRect();
+	Rectangle clip = g.getClipBounds();
 
 	int logicalTime = -geometry.getXTransposition();
 	int windowTime = sequencePanel.getMaximumVisibleTime();	    
@@ -183,6 +183,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 
 	hhTime = time;
     }
+
     //--- Ruler fields
     boolean hh = false;
     double hhTime;

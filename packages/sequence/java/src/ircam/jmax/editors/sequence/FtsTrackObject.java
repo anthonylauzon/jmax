@@ -67,38 +67,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	    flavors = new DataFlavor[1];
 	flavors[0] = sequenceFlavor;
 
-	addInfoType(info);
+	this.info = info;
     }
 
-    void addInfoType(ValueInfo info)
+    public void setUntitled()
     {
-	String name;
-
-	infos.addElement(info);
-	
-	for(Enumeration e = info.getPropertyNames(); e.hasMoreElements();)
-	    {
-		name = (String)e.nextElement();
-		if(!propertyNameExist(name))
-		    {
-			namePropertyVector.addElement(name);
-			numProperties++;
-		    }
-	    }
-
-	addFlavor(info.getDataFlavor());
-    }
-
-    boolean propertyNameExist(String name)
-    {
-	String aName;
-	for(Enumeration e = namePropertyVector.elements(); e.hasMoreElements();)
-	    {
-		aName = (String)e.nextElement();
-		if(aName.equals(name))
-		    return true;
-	    }
-	return false;
+	trackName = "untitled";
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1007,92 +981,40 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
 
     /**
-     * Move all the events of the given model in this MultiSequence, and
-     * remove them from the original one. After this operation, the old
-     * model is empty, but its content can be get back using the unmergeModel() call.
+     * Move all the events of the given model in this model. Merging is allowed only between 
+     * tracks of the same type. Merging is not undoable.      
      */
-    /*public void mergeModel(TrackDataModel model)
-      {
-      for (Enumeration e = model.getEvents(); e.hasMoreElements();)
-      {
-      
-      addEvent((TrackEvent) e.nextElement());
-      }
-      
-      for (Enumeration e = model.getTypes(); e.hasMoreElements();)
-      infos.addElement(e.nextElement());
-      
-      model.removeAllEvents();
-      }*/
-
-
-    /**
-     * Fill the given TrackDataModel with all the event of type info
-     * contained in this MultiSequence. This function could be used to
-     * reverse the effect of a mergeModel call. 
-     * The resulting models can have a different content if the MultiSequence
-     * object have been edited in the meanwhile.
-     */
-    /*public void unmergeModel(TrackDataModel model, ValueInfo info)
-      {
-      if (!infos.contains(info))
-      return; 
-      // no elements of type info are present.
-      
-      infos.removeElement(info);
-      
-      TrackEvent temp;
-      for (Enumeration e = getEvents(); e.hasMoreElements();)
-      {
-      temp = (TrackEvent) e.nextElement();
-      if (temp.getValue().getValueInfo().equals(info))
-      {
-      model.addEvent(temp);
-      }
-      }
-
-      }*/
-
-    /**
-     * Returns an enumeration of all the ValueInfo merged in this model
-     */
-    public Enumeration getTypes()
+    public void mergeModel(TrackDataModel model)
     {
-	return infos.elements();
+	Event event;
+
+	beginUpdate(); 
+	
+	try {
+	    for (Enumeration e = model.getEvents(); e.hasMoreElements();)
+		{
+		    event = (Event) e.nextElement();
+		    requestEventCreationWithoutUpload((float)event.getTime(), 
+						      event.getValue().getValueInfo().getName(), 
+						      event.getValue().getPropertyCount(), 
+						      event.getValue().getPropertyValues());
+		}	    
+	    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
+	}
+	catch (Exception e) {}
     }
 
-    public ValueInfo getTypeAt(int i)
-    {
-	return (ValueInfo) infos.elementAt(i);
-    }
     /**
-     * Returns true if this models currently contains events of the given type */
-    public boolean containsType(ValueInfo info)
+     * Returns the ValueInfo contained in this model
+     */
+    public ValueInfo getType()
     {
-	return infos.contains(info);
-    }
-
-
-    /**
-     * Returns the number of types */
-    public int getNumTypes()
-    {
-	return infos.size();
+	return info;
     }
 
     public String getName()
     {
 	return trackName;
-    }
-
-    public int getNumProperty()
-    {
-	return numProperties;
-    }
-
-    public Enumeration getPropertyNames()
-    {
-	return namePropertyVector.elements();
     }
 
     public DataFlavor[] getDataFlavors()
@@ -1144,8 +1066,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     }
 
     //---  AbstractSequence fields
-    int numProperties = 0;
-    Vector namePropertyVector = new Vector();
+    ValueInfo info;
 
     int events_size   = 256;	// 
     int events_fill_p  = 0;	// next available position
@@ -1154,17 +1075,17 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     private MaxVector hhListeners;
     private MaxVector lockListeners;
     private MaxVector tempVector = new MaxVector();
-    MaxVector infos = new MaxVector();
     private String trackName;
     public DataFlavor flavors[];
+
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-  public static FtsAtom[] sendArgs = new FtsAtom[128];
-  static
-  {
-    for(int i=0; i<128; i++)
-      sendArgs[i]= new FtsAtom();
-  }
+    public static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
 }
 
 

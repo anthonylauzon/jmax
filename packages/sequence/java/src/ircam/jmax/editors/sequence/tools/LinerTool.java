@@ -164,7 +164,8 @@ public class LinerTool extends Tool implements LineListener{
     {
 	float coeff;
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;	
-	ValueInfo info = (ValueInfo)(egc.getTrack().getTrackDataModel().getTypes().nextElement());
+	//ValueInfo info = (ValueInfo)(egc.getTrack().getTrackDataModel().getTypes().nextElement());
+	ValueInfo info = egc.getTrack().getTrackDataModel().getType();
 	
 	if (x1 != x2) 
 	    coeff = ((float)(y2 - y1))/(x2 - x1);

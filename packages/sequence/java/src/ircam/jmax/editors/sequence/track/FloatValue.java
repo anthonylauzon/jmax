@@ -43,11 +43,11 @@ public class FloatValue extends AbstractEventValue
     {
 	super();
 
-	properties.put("float", new Float(0.0));
+	setProperty("float", new Float(0.0));
 	setProperty("duration", new Double(64.0));
     }
 
-    Object floatValue;
+    Object floatValue, duration;
     public void setProperty(String name, Object value)
     {
 	if(name.equals("float"))
@@ -55,13 +55,16 @@ public class FloatValue extends AbstractEventValue
 		floatValue = new Float(((Double)value).floatValue());
 	    else
 		floatValue = value;
-      
-      super.setProperty(name, value);
+	else if(name.equals("duration"))
+	    duration = value;
+	else super.setProperty(name, value);
     }
     public Object getProperty(String name)
     {
 	if(name.equals("float"))
 	    return floatValue;
+	if(name.equals("duration"))
+	    return duration;
 	else
 	    return super.getProperty(name);
     }

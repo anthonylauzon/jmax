@@ -53,12 +53,10 @@ public class Sequence extends JFrame implements EditorContainer{
     FtsSequenceObject sequenceData;
 
     public final static int DEFAULT_WIDTH  = 800;
-    public final static int DEFAULT_HEIGHT = 553;
     public final static int MAX_HEIGHT     = 800;
     public final static int EMPTY_HEIGHT   = 78;
   /**
-   * Constructor with the SequenceRemoteData
-   * It creates the panels that will display the datas of the maxData
+   * Constructor with FtsSequenceObject
    */
     public Sequence(FtsSequenceObject data)
     {
@@ -79,27 +77,12 @@ public class Sequence extends JFrame implements EditorContainer{
 	itsSequencePanel = new SequencePanel(this, data);
 	
 	getContentPane().add(itsSequencePanel);
-	setSize(new Dimension(DEFAULT_WIDTH, /*DEFAULT*/EMPTY_HEIGHT));
+	setSize(new Dimension(DEFAULT_WIDTH, EMPTY_HEIGHT));
 	
 	validate();
 	setVisible(true);
     }
 
-    /* Code to interact with the "appmatch" score recognition module. PLEASE, don't delete !
-       void translateToAgrep(Writer w)
-       {
-       PrintWriter pw = new PrintWriter(w);
-       
-       try {
-       for (int i = 0; i<sequenceData.length(); i++)
-       {
-       pw.print((char) (128+sequenceData.getEventAt(i).getPitch()));
-      }
-      }
-      catch(Exception e){}
-      pw.println();
-      }*/
-    
     private final void initTrackEditorFactoryTable()
     {
 	TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
@@ -107,9 +90,6 @@ public class Sequence extends JFrame implements EditorContainer{
 	TrackEditorFactoryTable.setFactoryFor(FloatValue.info, FloatTrackEditorFactory.instance);
 	TrackEditorFactoryTable.setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
 	TrackEditorFactoryTable.setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
-	//TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonoTrackEditorFactory.instance);
-	//TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonoTrackEditorFactory.instance);
-	//TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonoTrackEditorFactory.instance);	
     }
 
     private final void makeTitle(FtsSequenceObject maxData){
@@ -117,13 +97,10 @@ public class Sequence extends JFrame implements EditorContainer{
 	MaxWindowManager.getWindowManager().windowChanged(this);
     } 
 
-
     private final void makeMenuBar(){
 	JMenuBar mb = new JMenuBar();
 	
-	// Build the file menu
-	
-	//mb.add( new DefaultFileMenu());
+	// Build the file menu	
 	mb.add( new FileMenu());
 	
 	// Build the edit menu
@@ -133,7 +110,7 @@ public class Sequence extends JFrame implements EditorContainer{
 	mb.add(new TrackMenu(this, sequenceData)) ; 	
 
 	// Build the options menu
-	mb.add(new OptionsMenu(this) );
+	//mb.add(new OptionsMenu(this) );
 	    
 	// New Tool menu 
 	mb.add(new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools")); 
@@ -155,7 +132,6 @@ public class Sequence extends JFrame implements EditorContainer{
 	return getLocation();
     }
     public Rectangle getViewRectangle(){
-	//return getContentPane().getBounds();
 	return itsSequencePanel.scrollTracks.getViewport().getViewRect();
     }
 }

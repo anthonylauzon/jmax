@@ -142,6 +142,14 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	component = this;
     }
 
+    public void reinit()
+    {
+	track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
+	track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));	
+	setViewMode(PIANOROLL_VIEW);		
+	((FtsTrackObject)track.getTrackDataModel()).setUntitled();
+    }
+
     public JMenu getToolsMenu()
     {
 	return gc.getToolbar().itsMenu;
@@ -336,11 +344,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     private void createListDialog()
     {
-	/*****************/
-	//list-->table//
-	//listDialog = new ListDialog(track, gc.getFrame(), gc);
 	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
-	/*****************/
     }
 
     public boolean isDisplayLabels()
@@ -432,9 +436,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     ScorePanel itsScore;
 
     MaxVector oldElements = new MaxVector();
-    /*****************/
-    //list-->table//
-    //ListDialog listDialog = null;
     SequenceTableDialog listDialog = null;
     /*****************/
 

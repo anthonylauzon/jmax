@@ -61,6 +61,14 @@ public class IntegerTrackEditor extends MonoTrackEditor
 	super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
     }
     
+    public void reinit()
+    {
+	itsTrack.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+	itsTrack.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+	itsTrack.setProperty("viewMode", new Integer(PEAKS_VIEW));
+	((FtsTrackObject)itsTrack.getTrackDataModel()).setUntitled();
+    }
+
     void updateRange(Object obj)
     {
 	int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	

@@ -25,42 +25,49 @@ public class AmbitusValue extends AbstractEventValue
   
   private void setDefaultProperties()
   {
-    for (Enumeration e = getPropertyNames(); e.hasMoreElements();)
-      {
-	properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
-      }
-    
     setProperty("duration", new Double(100.0));
-    setProperty("ambitus", new Integer(0));
+    setProperty("pitch", new Integer(0));
     setProperty("midi_velocity", new Integer(64));
     setProperty("midi_channel", new Integer(1));
+    setProperty("ambitus", new Integer(0));
   }
 
-  Object duration, velocity, channel;
+  Object pitch, duration, velocity, channel, ambitus;
   
   public void setProperty(String name, Object value)
   {
-    if(name.equals("duration"))
-      duration = value;
-    else if(name.equals("pitch") && ((Integer)value).intValue() > 127)
-      value = new Integer(127);
-    else if(name.equals("midi_velocity"))
-      velocity = value;
-    else if(name.equals("midi_channel"))
-      channel = value;
-
-    super.setProperty(name, value);
+  
+      if(name.equals("pitch"))
+	  {
+	      if(((Integer)value).intValue() > 127)
+		  value = new Integer(127);
+	      pitch = value;
+	  }
+      else if(name.equals("duration"))
+	  duration = value;
+      else if(name.equals("midi_velocity"))
+	  velocity = value;
+      else if(name.equals("midi_channel"))
+	  channel = value;
+       else if(name.equals("ambitus"))
+	  ambitus = value;
+      else
+	  super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
-    if(name.equals("duration"))
-      return duration;
-    else if(name.equals("midi_velocity"))
-      return velocity;
-    else if(name.equals("midi_channel"))
-      return channel;
-    else
-      return super.getProperty(name);
+      if(name.equals("pitch"))
+	  return pitch;
+      else if(name.equals("duration"))
+	  return duration;
+      else if(name.equals("midi_velocity"))
+	  return velocity;
+      else if(name.equals("midi_channel"))
+	  return channel;
+      else if(name.equals("ambitus"))
+	  return ambitus;
+      else
+	  return super.getProperty(name);
   }
 
   public ValueInfo getValueInfo()
@@ -208,3 +215,11 @@ public class AmbitusValue extends AbstractEventValue
   static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE, INTEGER_TYPE, INTEGER_TYPE};
   static int propertyCount = 4;
 }
+
+
+
+
+
+
+
+

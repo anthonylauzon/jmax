@@ -43,22 +43,26 @@ public class IntegerValue extends AbstractEventValue
     {
 	super();
 
-	properties.put("integer", new Integer(0));
+	setProperty("integer", new Integer(0));
 	setProperty("duration", new Double(64.0));
     }
 
-    Object intValue;
+    Object intValue, duration;
     public void setProperty(String name, Object value)
     {
 	if(name.equals("integer"))
 	    intValue = value;
-      
-      super.setProperty(name, value);
+	else if(name.equals("duration"))
+	    duration = value;
+	else
+	    super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
       if(name.equals("integer"))
 	  return intValue;
+      else if(name.equals("duration"))
+	  return duration;
       else
 	  return super.getProperty(name);
   }

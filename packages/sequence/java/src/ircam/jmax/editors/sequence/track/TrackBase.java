@@ -81,7 +81,8 @@ public class TrackBase implements Track{
     }
 
     public boolean canEditType(ValueInfo info){
-	return model.containsType(info);
+	//return model.containsType(info);
+	return (model.getType() == info);
     }
 
     //--- Fields

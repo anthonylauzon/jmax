@@ -180,16 +180,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     return (Track) tracks.elementAt(i);
   }
 
-    /*public Track getTrackByName(String name)
-      {
-      Track track;
-      for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-      {
-      track = (Track)e.nextElement();
-      if(track.getName().equals(name)) return track;
-      }
-      return null;
-      }*/
     public Enumeration getTracks()
     {
 	return tracks.elements();
@@ -223,12 +213,8 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 						"Warning",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE);
-
-    if (result == JOptionPane.OK_OPTION)
-	{
-	    sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
-	    sendMessage(FtsObject.systemInlet, "remove_track", 1, sendArgs);
-	}
+    if(result == JOptionPane.OK_OPTION)
+	requestTrackRemove(track);
   }
 
   public void changeTrack(Track track)
@@ -255,15 +241,21 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
     public void requestTrackCreation(String type)
     {
-	sendArgs[0].setString(type); 
-	sendMessage(FtsObject.systemInlet, "add_track", 1, sendArgs);
+	FtsTrackObject.sendArgs[0].setString(type); 
+	sendMessage(FtsObject.systemInlet, "add_track", 1, FtsTrackObject.sendArgs);
     }
 
     public void requestTrackMove(Track track, int position)
     {
-	sendArgs[0].setObject(track.getFtsTrack()); 
-	sendArgs[1].setInt(position); 
-	sendMessage(FtsObject.systemInlet, "move_track", 2, sendArgs);
+	FtsTrackObject.sendArgs[0].setObject(track.getFtsTrack()); 
+	FtsTrackObject.sendArgs[1].setInt(position); 
+	sendMessage(FtsObject.systemInlet, "move_track", 2, FtsTrackObject.sendArgs);
+    }
+
+    public void requestTrackRemove(Track track)
+    {
+	FtsTrackObject.sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
+	sendMessage(FtsObject.systemInlet, "remove_track", 1, FtsTrackObject.sendArgs);
     }
 
     public void importMidiFile()
@@ -316,22 +308,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       ((TrackListener)(e.nextElement())).trackChanged(track);
   }
 
-  //----- Fields
-  static FtsAtom[] sendArgs = new FtsAtom[128];
-  static
-  {
-      for(int i=0; i<128; i++)
-	  sendArgs[i]= new FtsAtom();
-  }
   Sequence sequence = null;  
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
-
-  //unic id for a track, starting from zero;
-  private int trackId = 0; 
-  static final int REMOTE_TRACK_ADD = 0; 
 }
 
 

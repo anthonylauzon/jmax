@@ -95,8 +95,6 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 		
 	itsTrackDataModel.moveEvent(this, time);
 		
-	//((FtsTrackObject)itsTrackDataModel).endUpdate();
-
 	((FtsTrackObject)itsTrackDataModel).setDirty();    
     }
     
@@ -149,17 +147,9 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     void sendSetMessage(String type, int nArgs, Object args[])
     {
 	for(int i=0; i<nArgs; i++)
-	    sendArgs[i].setValue(args[i]);
+	    FtsTrackObject.sendArgs[i].setValue(args[i]);
 
-	sendMessage(FtsObject.systemInlet, "set", nArgs, sendArgs);
-    }
-
-    void sendThisMessage(String mess, String type, int nArgs, Object args[])
-    {
-	for(int i=0; i<nArgs; i++)
-	    sendArgs[i].setValue(args[i]);
-	
-	sendMessage(FtsObject.systemInlet, mess, nArgs, sendArgs);
+	sendMessage(FtsObject.systemInlet, "set", nArgs, FtsTrackObject.sendArgs);
     }
 
     /**
@@ -258,15 +248,6 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
     public Event duplicate () throws CloneNotSupportedException
     {
-	//qui dovrebbe restituire un oggetto che ocntiene gli stessi dati ma che non e' un fts object
-	//per esempio un UtilTrackEvent
-
-	//return (TrackEvent) clone();
-	/*((FtsTrackObject)itsTrackDataModel).requestEventCreation((float)getTime(), 
-				      getValue().getValueInfo().getName(), 
-				      getValue().getPropertyCount(), 
-				      getValue().getPropertyValues());
-				      return null;*/
 	UtilTrackEvent evt = new UtilTrackEvent();
 	evt.setTime(getTime());
 	EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
@@ -285,13 +266,6 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     public static double DEFAULT_TIME = 0;
 
     private TrackDataModel itsTrackDataModel;
-
-    static FtsAtom[] sendArgs = new FtsAtom[128];
-    static
-    {
-	for(int i=0; i<128; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
 }
 
 

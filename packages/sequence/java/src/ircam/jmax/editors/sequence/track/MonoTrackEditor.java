@@ -152,6 +152,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
 	setOpaque(false);
     }
+
+    public void reinit(){}
     
     public JMenu getToolsMenu()
     {

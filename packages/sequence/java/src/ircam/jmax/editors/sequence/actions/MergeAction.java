@@ -23,43 +23,26 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.menus;
+package ircam.jmax.editors.sequence.actions;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.datatransfer.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
-
 import ircam.jmax.editors.sequence.*;
-import ircam.jmax.editors.sequence.actions.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
-
-public class OptionsMenu extends EditorMenu
+public class MergeAction extends EditorAction
 {
-  EditorContainer container;
-  
-  public OptionsMenu(EditorContainer container)
+  public void doAction(EditorContainer container)
   {
-    super("Options");
-
-    this.container = container;
-
-    setHorizontalTextPosition(AbstractButton.LEFT);
-
-    add(Actions.settingsAction, "Settings...");
+    ((SequencePanel)container.getEditor()).Merge();    
   }
 }
-
 
 

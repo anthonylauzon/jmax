@@ -60,6 +60,14 @@ public class FloatTrackEditor extends MonoTrackEditor
 
 	super.setAdapter(new FloatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
     }
+
+    public void reinit()
+    {
+	itsTrack.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
+	itsTrack.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
+	itsTrack.setProperty("viewMode", new Integer(PEAKS_VIEW));
+    	((FtsTrackObject)itsTrack.getTrackDataModel()).setUntitled();
+    }
     
     void updateRange(Object obj)
     {

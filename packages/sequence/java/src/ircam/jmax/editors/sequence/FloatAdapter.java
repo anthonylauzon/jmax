@@ -83,18 +83,7 @@ public class FloatAdapter extends IntegerAdapter implements VerticalZoomable, Ve
     {
 	yZoomFactor = (yZoomFactor*100+delta)/(float)100;
 	if(yZoomFactor<0.01) yZoomFactor = (float)0.01;
-	if(yZoomFactor>10) yZoomFactor = (float)10.0;
-    	
-	/*float max = getFloatInvY(0);
-	  float min = getFloatInvY(gc.getGraphicDestination().getSize().height);
-
-	  System.err.println("max "+max+" min "+min);
-	  System.err.println("maximum "+getMaximumValue()+" minimum "+getMinimumValue());
-	  
-	  if(max > getMaximumValue())
-	  gc.getTrack().setProperty("maximumValue", new Integer((int)max+1));
-	  if(min < getMinimumValue())
-	  gc.getTrack().setProperty("minimumValue", new Integer((int)min-1));*/
+	if(yZoomFactor>10) yZoomFactor = (float)10.0;    	
     }
     public void setYZoom(int factor)
     {
