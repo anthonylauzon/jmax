@@ -62,7 +62,7 @@ source $jmaxRootDir/config/defaults.tcl
 #
 
 # set server connection to defaults
-if [catch {set foo $jmaxHost}] then { set jmaxHost $jmaxDefaultHost}
+if [catch {set foo $jmaxHost}] then { set jmaxHost "local"}
 if [catch {set foo $jmaxConnection}] then { set jmaxConnection $jmaxDefaultConnection}
 if [catch {set foo $jmaxPort}] then { set jmaxPort $jmaxDefaultPort}
 

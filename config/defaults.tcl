@@ -6,17 +6,7 @@
 #
 
 ####################################
-## default host settings
-
-## jMax servers default host name (it must be the full host name with the domain)
-## should default to the local host
-
-#if it works on your platform like this, fine:
-#set jmaxDefaultHost [exec "canonhost `hostname`"]
-
-#... else try like this (with YOUR domain)
-set LocalDomain "ircam.fr"
-set jmaxDefaultHost "[exec hostname].$LocalDomain"
+## default host arch settings
 
 ## set jMax servers host architectures (array of host names)
 # (IRCAM's SGI machines)
