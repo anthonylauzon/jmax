@@ -27,16 +27,8 @@ ifeq ($(PLATFORM),sgi)
 ARCH_SOURCES = unixdev.c
 endif
 
-ifeq ($(PLATFORM),linux-intel)
+ifeq ($(PLATFORM),linux)
 ARCH_SOURCES = unixdev.c
-endif
-
-ifeq ($(PLATFORM),linux-ppc)
-ARCH_SOURCES = unixdev.c
-endif
-
-ifeq ($(OS_TYPE),solaris2)
-ARCH_SOURCES = unixdev.c 
 endif
 
 ifeq ($(PLATFORM),macosx)
