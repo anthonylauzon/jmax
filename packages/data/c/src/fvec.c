@@ -332,7 +332,7 @@ fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
   }
 }
 
-static void
+void
 fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 {
   fmat_t *fmat = fvec->fmat;
@@ -667,6 +667,29 @@ fvec_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_set_void(fts_get_return_value());
   
   fts_return_object(o);
+}
+
+/* get element, no checks */
+float
+fvec_get_element (fvec_t *self, int i)
+{
+  float *ptr;
+  int    size, stride;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  return ptr[i * stride];
+}
+
+
+/* set element, no checks */
+void
+fvec_set_element (fvec_t *self, int i, float value)
+{
+  float *ptr;
+  int    size, stride;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  ptr[i * stride] = value;
 }
 
 
@@ -1439,6 +1462,7 @@ _fvec_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if (i >= 0  &&  i < size)
     fts_return_float(ptr[i * stride]);
 }
+
 
 static void
 fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
