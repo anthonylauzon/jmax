@@ -39,6 +39,13 @@ static const char *get_readsf_path(fts_symbol_t filename)
   return buf;
 }
 
+static const char *get_writesf_path(fts_symbol_t filename)
+{
+  fts_file_get_write_path(fts_symbol_name(filename), buf);
+  
+  return buf;
+}
+
 /*
  * readsf~
  *
@@ -398,13 +405,12 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  * of continuing to add only experimental features.
  */
 
-#ifdef WRITESF_NOT_READY
 typedef struct
 {
   fts_object_t _o;
   fts_symbol_t filename;
   fts_dev_t *device;
-  enum {idle, playing, pause} status;
+  enum {read_idle, write_playing, write_pause} status;
   int nchans;
 } writesf_t;
 
@@ -412,16 +418,19 @@ typedef struct
 
 static void writesf_file_open(writesf_t *this, fts_symbol_t format)
 {
-  if (this->status == idle)
+  if (this->status == read_idle)
     {
+      const char *filename;
       fts_status_t ret;
       fts_atom_t a[7];
       int ac;
 
       /* Build the open arg list: current version, use the default device fifosize and fileblock size */
 
+      filename = get_writesf_path(this->filename);
+
       ac = 0;
-      fts_set_symbol(&a[ac], fts_new_symbol( get_writesf_path( this->filename))); ac++;
+      fts_set_symbol(&a[ac], fts_new_symbol(filename)); ac++;
       fts_set_symbol(&a[ac], fts_new_symbol("channels")); ac++;
       fts_set_int(&a[ac],    this->nchans); ac++;
       fts_set_symbol(&a[ac], fts_s_sampling_rate);  ac++;
@@ -440,7 +449,7 @@ static void writesf_file_open(writesf_t *this, fts_symbol_t format)
       if (ret != fts_Success)
 	post("writesf~: cannot open file '%s' for reading\n", fts_symbol_name(this->filename));
       else
-	this->status = pause;
+	this->status = write_pause;
     }
 }
 
@@ -448,11 +457,11 @@ static void writesf_file_open(writesf_t *this, fts_symbol_t format)
 static void
 writesf_file_close(writesf_t *this)
 {
-  if (this->status != idle)
+  if (this->status != read_idle)
     {
       fts_dev_close(this->device);
       this->device = 0;
-      this->status = idle;
+      this->status = read_idle;
     }
 }
 
@@ -460,10 +469,10 @@ writesf_file_close(writesf_t *this)
 static void
 writesf_file_start(writesf_t *this)
 {
-  if (this->status == pause)
+  if (this->status == write_pause)
     {
       fts_sig_dev_activate(this->device);
-      this->status = playing;
+      this->status = write_playing;
     }
 }
 
@@ -471,10 +480,10 @@ writesf_file_start(writesf_t *this)
 static void
 writesf_file_pause(writesf_t *this)
 {
-  if (this->status == playing)
+  if (this->status == write_playing)
     {
       fts_sig_dev_deactivate(this->device);
-      this->status = pause;
+      this->status = write_pause;
     }
 }
 
@@ -513,7 +522,7 @@ writesf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   fts_symbol_t filename = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 1, fts_s_void);
 
-  if (this->status != idle)
+  if (this->status != read_idle)
     writesf_file_close(this);
 
   if (filename)
@@ -543,13 +552,13 @@ writesf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   switch(this->status)
     {
-    case idle:
+    case read_idle:
       post("writesf~: idle\n");
       break;
-    case playing:
+    case write_playing:
       post("writesf~: opened, writing\n");
       break;
-    case pause:
+    case write_pause:
       post("writesf~: opened, paused\n");
       break;
     }
@@ -572,12 +581,12 @@ writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_set_ptr(argv + 0, &(this->device));
   fts_set_long(argv + 1, this->nchans);
-  fts_set_long(argv + 2, fts_dsp_get_output_size(dsp, 0));
+  fts_set_long(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
   for (i = 0; i < this->nchans; i++)
-    fts_set_symbol(argv + 3 + i, fts_dsp_get_output_name(dsp, i));
+    fts_set_symbol(argv + 3 + i, fts_dsp_get_input_name(dsp, i));
 
-  dsp_add_funcall(fts_dev_class_get_sig_get_fun_name(fts_dev_class_get_by_name(fts_new_symbol("writesf"))),
+  dsp_add_funcall(fts_dev_class_get_sig_put_fun_name(fts_dev_class_get_by_name(fts_new_symbol("writesf"))),
 		  3 + this->nchans,
 		  argv);	  
 
@@ -597,7 +606,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     this->nchans = nchans;
 
   this->device = 0;
-  this->status = idle;
+  this->status = read_idle;
 
   dsp_list_insert(o); /* just put object in list */
 }
@@ -608,7 +617,7 @@ writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   writesf_t *this = (writesf_t *)o;
 
-  if (this->status != idle)
+  if (this->status != read_idle)
     writesf_file_close(this);
 
   dsp_list_remove(o);
@@ -626,7 +635,7 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if (nchans < 1)
     nchans = 1;
 
-  fts_class_init(cl, sizeof(writesf_t), 1, nchans, 0);
+  fts_class_init(cl, sizeof(writesf_t), nchans, 0, 0);
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_int;
@@ -657,21 +666,17 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_new_symbol("print"), writesf_print, 0, 0);
 
-  dsp_sig_inlet(cl, 0);	/* only for order forcing (usefull ?) */
-
   for (i = 0; i < nchans; i++)
-    dsp_sig_outlet(cl, i);
+    dsp_sig_inlet(cl, i);
 
   return fts_Success;
 }
-#endif
+
 
 void disk_config(void)
 {
   fts_metaclass_create(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
-#ifdef WRITESF_NOT_READY
   fts_metaclass_create(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
-#endif
 }
 
 

@@ -887,6 +887,7 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 	format_name = fts_soundfile_format_get_default();
     }
 
+
   dev_data->format_descr = fts_soundfile_format_get_descriptor(format_name);
   dev_data->file_block = fts_get_int_by_name(nargs, args, fts_new_symbol("fileblock"), 16 * 1024);
   dev_data->fifo_size  = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
@@ -1014,6 +1015,8 @@ static void *fts_writesf_worker(void *data)
   int frames_for_block = (dev_data->file_block / dev_data->nch);
   AFfilesetup setup;
 
+  fts_sample_fifo_describe("Starting writesf_worker", fifo);
+
   /* Actually Open the audio file  */
 
   setup = afNewFileSetup();
@@ -1022,7 +1025,7 @@ static void *fts_writesf_worker(void *data)
   afInitRate(setup, AF_DEFAULT_TRACK, dev_data->sr);
   afInitChannels(setup, AF_DEFAULT_TRACK, dev_data->nch);
 
-  file = afOpenFile(fts_symbol_name(dev_data->file_name), "w", 0);
+  file = afOpenFile(fts_symbol_name(dev_data->file_name), "w", setup);
 
   afFreeFileSetup(setup);
 
@@ -1048,8 +1051,6 @@ static void *fts_writesf_worker(void *data)
 
       if (! eof)
 	{
-	  /* @@@ CHECK THIS CALL */
-
 	  ret = afWriteFrames(file, AF_DEFAULT_TRACK, p, frames_for_block);
 
 	  if (ret != frames_for_block)

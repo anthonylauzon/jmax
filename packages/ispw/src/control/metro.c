@@ -114,7 +114,7 @@ static void
 metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *x = (metro_t *)o;
-  fts_symbol_t clock;
+  fts_symbol_t clock = 0;
   float n;
 
   if (ac > 1 && fts_is_symbol(at + 1))
@@ -126,7 +126,7 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       n = (float) fts_get_float_arg(ac, at, 1, 0.0f);    
     }
-
+  
   if (clock)
     {
       if (! fts_clock_exists(clock))

@@ -594,6 +594,7 @@ fts_alarm_unarm(fts_alarm_t *alarm)
   for (p = &(alarm->clock->alarm_list); *p ; p = &((*p)->next))
     if ((*p) == alarm)
       {
+	(*p)->active = 0;
 	*p = alarm->next;
 	return;
       }
