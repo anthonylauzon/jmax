@@ -109,7 +109,7 @@ public class ErmesObjPatcher extends ErmesObject {
     //Font f = itsSketchPad.getFont();
     //FontMetrics fm = itsSketchPad.getFontMetrics(f);
     int lenght = itsFontMetrics.stringWidth(theString);
-    Dimension d1 = minimumSize();
+    Dimension d1 = getMinimumSize();
     d1.width = MaxWidth(itsFontMetrics.stringWidth(theString)+32,
 			    (itsInletList.size())*12, (itsOutletList.size())*12, d1.width);
     int height = itsFontMetrics.getHeight();
@@ -251,15 +251,15 @@ public class ErmesObjPatcher extends ErmesObject {
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
+  public Dimension getMinimumSize() {
     return new Dimension(80,24);
   }
     
   //--------------------------------------------------------
   // preferredSize()
   //--------------------------------------------------------
-  public Dimension preferredSize() {
-    return minimumSize();
+  public Dimension getPreferredSize() {
+    return getMinimumSize();
   }
 }
 
