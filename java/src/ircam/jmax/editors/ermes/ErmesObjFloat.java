@@ -23,7 +23,8 @@ class ErmesObjFloat extends ErmesObject {
   boolean firstClick = true;
   boolean fastMode = true;
   Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
-	
+  Dimension minimumSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
+  
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -296,7 +297,8 @@ class ErmesObjFloat extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return new Dimension(itsFontMetrics.stringWidth("0.0")+itsFontMetrics.getHeight()/2+15,itsFontMetrics.getHeight()+4);
+    if(currentRect==null)return minimumSize;
+    else return new Dimension(itsFontMetrics.stringWidth("0.0")+itsFontMetrics.getHeight()/2+15,itsFontMetrics.getHeight()+4);
   }
   
   //--------------------------------------------------------

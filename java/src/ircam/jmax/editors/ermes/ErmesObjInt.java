@@ -28,6 +28,7 @@ class ErmesObjInt extends ErmesObject {
   int itsStartingY, itsFirstY;
   boolean firstClick = true;
   Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
+  Dimension minimumSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -319,7 +320,8 @@ class ErmesObjInt extends ErmesObject {
   // minimumSize
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return new Dimension(currentRect.height/2+13+itsFontMetrics.stringWidth("0"),itsFontMetrics.getHeight()+4); 
+    if(currentRect==null) return minimumSize;
+    else return new Dimension(currentRect.height/2+13+itsFontMetrics.stringWidth("0"),itsFontMetrics.getHeight()+4); 
   }
 
   //--------------------------------------------------------
