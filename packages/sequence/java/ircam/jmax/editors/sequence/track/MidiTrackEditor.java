@@ -51,7 +51,7 @@ public class MidiTrackEditor extends TrackBaseEditor
       track.setProperty("maximumPitch", new Integer(SequenceDefaults.DEFAULT_MAX_PITCH));
 		if(track.getProperty("minimumPitch")==null)
       track.setProperty("minimumPitch", new Integer(SequenceDefaults.DEFAULT_MIN_PITCH));
-
+		
     viewMode = PIANOROLL_VIEW;
   }
 
@@ -135,6 +135,12 @@ public class MidiTrackEditor extends TrackBaseEditor
 			((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
   }
 	
+	public void setGridMode(int gridMode)
+  {
+		this.gridMode = gridMode;
+		geometry.setProperty("gridMode", new Integer(gridMode));
+	}
+	
 	public void setRangeMode(int rangeMode)
   {
 		super.setRangeMode(rangeMode);
@@ -175,10 +181,10 @@ public class MidiTrackEditor extends TrackBaseEditor
     return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
   }
 
-   //--- MidiTrack fields
+   //--- MidiTrackEditor fields
   transient MaxVector oldElements = new MaxVector();
   transient SequenceTableDialog listDialog = null;
-  
+  	
   public static int DEFAULT_HEIGHT = 430;
   static public final int PIANOROLL_VIEW = 0;
   static public final int NMS_VIEW = 1;

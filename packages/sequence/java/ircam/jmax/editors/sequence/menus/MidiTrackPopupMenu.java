@@ -42,6 +42,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 	JRadioButtonMenuItem usedRangeItem, wholeRangeItem;
   LabelTypesAction labelAction;
   JRadioButtonMenuItem pianoItem, stavesItem;
+	JRadioButtonMenuItem timeItem, measuresItem;
 	
   public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
@@ -117,6 +118,29 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     viewsMenuGroup.add(stavesItem);
     add(stavesItem);
     pianoItem.setSelected(true);
+		
+		/************** Time or Measures Grid *******************/
+    ButtonGroup gridMenuGroup = new ButtonGroup();
+    
+    timeItem = new JRadioButtonMenuItem("Show Time Grid");
+		timeItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).setGridMode( TrackEditor.TIME_GRID);
+			}		
+		});		
+    gridMenuGroup.add(timeItem);
+    add(timeItem);    
+    measuresItem = new JRadioButtonMenuItem("Show Measures");
+		measuresItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).setGridMode( TrackEditor.MEASURES_GRID);
+			}		
+		});		
+    gridMenuGroup.add(measuresItem);
+    add(measuresItem);
+    timeItem.setSelected(true);		
 
     return true;
   }

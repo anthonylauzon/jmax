@@ -27,26 +27,25 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
 public class SequenceSelecter extends Selecter {
-    
-    public SequenceSelecter(GraphicSelectionListener theListener) 
-    {    
-	super(theListener);
-    }
+	
+	public SequenceSelecter(GraphicSelectionListener theListener) 
+  {    
+		super(theListener);
+	}
 
-    public void XORDraw(int dx, int dy) 
-    {
+	public void XORDraw(int dx, int dy) 
+  {	
+		Rectangle tempr, clip;
 	
-      Rectangle tempr, clip;
-      
-      tempr = (Rectangle) itsRunningG.getClip();
-      clip = ((SequenceGraphicContext)gc).getTrackClip();
-	
-      itsRunningG.clipRect(clip.x, clip.y, clip.width, clip.height);
-      
-      super.XORDraw(dx, dy);
-      
-      itsRunningG.setClip(tempr);
-    }
+		tempr = (Rectangle) itsRunningG.getClip();
+		clip = ((SequenceGraphicContext)gc).getTrackClip();
+				
+		itsRunningG.clipRect(clip.x, clip.y, clip.width, clip.height);
+		
+		super.XORDraw(dx, dy);
+		
+		itsRunningG.setClip(tempr);
+	}
 }
 
 

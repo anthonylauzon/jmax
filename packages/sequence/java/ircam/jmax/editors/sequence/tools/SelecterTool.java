@@ -130,12 +130,12 @@ public void selectionChoosen(int x, int y, int w, int h)
 	
 	gc.getGraphicDestination().requestFocus();//???
     
-    if (w ==0) w=1;// at least 1 pixel wide
-			if (h==0) h=1;
+	if (w ==0) w=1;// at least 1 pixel wide
+	if (h==0) h=1;
 			
-			selectArea(x, y, w, h);
+	selectArea(x, y, w, h);
 			
-			multipleObjectSelected();
+	multipleObjectSelected();
 }
 
 /**

@@ -22,6 +22,7 @@
 package ircam.jmax.toolkit;
 
 import java.util.*;
+import java.beans.*;
 
 /**
 * A class that handles the scroll and zoom values for a group of listeners.
@@ -40,7 +41,6 @@ public class Geometry
 		yTranspose = 0;
 		xInvertion = false;
 		yInvertion = false;
-		
 }
 
 /**
@@ -225,6 +225,35 @@ private void notifyTransposition(int newTransposition)
 	
 }
 
+/****************
+      Properties
+***************************************************/
+
+public void setProperty(String name, Object value)
+{
+	Object old = properties.get(name);
+	
+	if (value == null) 
+		return;
+	
+	properties.put(name, value);
+	
+	propertySupport.firePropertyChange(name, old, value);
+}
+
+public  Object getProperty(String name)
+{
+	return properties.get(name);
+}
+
+/**
+* Returns the PropertyChangeSupport object associated to this track.
+ * Clients can use this object to add specific listeners for specific properties.*/
+public PropertyChangeSupport getPropertySupport()
+{
+	return propertySupport;
+}
+
 //-------  Geometry fields
 float xZoomFactor;
 float yZoomFactor;
@@ -235,5 +264,6 @@ boolean yInvertion;
 
 Vector zoomListeners = new Vector();
 Vector transpositionListeners = new Vector();
-
+transient Hashtable properties = new Hashtable();
+transient PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
 }

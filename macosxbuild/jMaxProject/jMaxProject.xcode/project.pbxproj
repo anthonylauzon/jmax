@@ -32,6 +32,21 @@
 			settings = {
 			};
 		};
+		3B75E8D906624AD4005BE87F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = TempoBar.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B75E8DA06624AD4005BE87F = {
+			fileRef = 3B75E8D906624AD4005BE87F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B7ADDF00611B6320098F129 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -9973,6 +9988,7 @@
 				3B7ADDF10611B6320098F129,
 				3BD62EDD0621C07400C689DC,
 				3BCA11930624183A008FC824,
+				3B75E8DA06624AD4005BE87F,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18086,6 +18102,7 @@
 				F8512405028BEAB301664092,
 				F8512407028BEAB301664092,
 				F8512408028BEAB301664092,
+				3B75E8D906624AD4005BE87F,
 				F8512409028BEAB301664092,
 				F851240A028BEAB301664092,
 				F851240B028BEAB301664092,

@@ -63,6 +63,17 @@ public class PartitionBackground implements Layer, ImageObserver{
 					}
 		}
 		});
+		gc.getAdapter().getGeometry().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e)
+				{		
+				String name = e.getPropertyName();
+				if( name.equals("gridMode"))
+				{
+					toRepaintBack = true;
+					gc.getGraphicDestination().repaint();
+				}
+				}
+		});				
 }
 
 public static int getMaxPitchInStaff(int max)
@@ -154,7 +165,9 @@ private void drawBlackStaff(Graphics g, int startLine, int key)
 		g.setFont( SequenceFonts.getFont(36));
 		g.drawString( SequenceFonts.bassKey, KEYX+6, positionY+26); 
 	}
-	g.drawLine(KEYX, start, KEYX, start-4*STEP);     /*draw vertical line*/
+	g.drawLine(KEYX, start, KEYX, start-4*STEP);     /*draw vertical lines*/
+	g.setColor(Color.gray);
+	g.drawLine(KEYEND, start, KEYEND, start-4*STEP);
 }
 
 private void drawGrayStaff(Graphics g, int startLine)
@@ -170,8 +183,10 @@ private void drawGrayStaff(Graphics g, int startLine)
 		positionY = start-(j-1)*STEP;
 		g.drawLine(KEYX, positionY, d.width, positionY);
 	}
-	g.setColor(Color.black);
+	g.setColor(Color.black);                           /*draw vertical lines*/
 	g.drawLine(KEYX, start+STEP, KEYX, start-2*STEP);
+	g.setColor(Color.gray);
+	g.drawLine(KEYEND, start+STEP, KEYEND, start-2*STEP);
 }
 
 /** builds an horizontal grid in the given graphic port
@@ -182,7 +197,6 @@ private void drawHorizontalGrid(Graphics g)
 	int maxPitch = pa.getMaxPitch();
 	int minPitch = pa.getMinPitch();
 	int transp = pa.getVerticalTransp();
-	//int bracket = 0;
 	
 	Dimension d = gc.getGraphicDestination().getSize();
 	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
@@ -219,20 +233,16 @@ private void drawHorizontalGrid(Graphics g)
 		g.drawLine(KEYX, positionY, d.width, positionY);
 		g.setColor(Color.black);
 		g.drawLine(KEYX, positionY+STEP, KEYX, positionY-STEP);
+		g.setColor(Color.gray);
+		g.drawLine(KEYEND, positionY+STEP, KEYEND, positionY-STEP);
 	}
 	if(staffIsDrawable(5, maxPitch, minPitch))
-	{
 		drawBlackStaff( g, 14, BASS_KEY);
-		//bracket++;
-	}
 	/********* First Violin Line **********************************************/	
 	if(staffIsDrawable(8, maxPitch, minPitch))
 		drawGrayStaff( g, 25);	
 	if(staffIsDrawable(7, maxPitch, minPitch))
-	{
 		drawBlackStaff( g, 20, VIOLIN_KEY);
-		//bracket++;
-	}
 	/********* Second Violin Line *********************************************/	
 	if(staffIsDrawable(10, maxPitch, minPitch))
 		drawGrayStaff( g, 32);
@@ -241,15 +251,9 @@ private void drawHorizontalGrid(Graphics g)
 	/********* Third Violin Line **********************************************/	
 	if(staffIsDrawable(11, maxPitch, minPitch))
 		drawBlackStaff( g, 34, VIOLIN_KEY);
-	/********* Bracket of staff 3 and 4 **************************/
-	/*if(bracket == 2)
-	 {
-		g.setFont(bracketFont);
-		g.drawString("{", KEYX-30, SC_BOTTOM-16*STEP-transp+3);
-	 }*/
 	/********* Vertical Lines at the end of keyboard **************************/
-	g.setColor(Color.gray);
-	g.drawLine(KEYEND, 0, KEYEND, d.height);
+	/*g.setColor(Color.gray);
+	g.drawLine(KEYEND, 0, KEYEND, d.height);*/
 }
 
 //???????????????????????????????
@@ -284,9 +288,15 @@ public void render( Graphics g, int order)
 	if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
 		System.err.println("something wrong: incomplete Image  ");
 	
-	drawVerticalGrid(g);
+	if( gc.getGridMode() == MidiTrackEditor.TIME_GRID)
+		drawVerticalGrid(g);
+	else
+		drawMeasures(g);
 }
 
+private void drawMeasures(Graphics g)
+{
+}
 
 private void drawVerticalGrid(Graphics g)
 {

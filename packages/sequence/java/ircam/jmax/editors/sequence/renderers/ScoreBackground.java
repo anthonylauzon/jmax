@@ -48,13 +48,14 @@ public class ScoreBackground implements Layer{
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
 		  {		
-				if (e.getPropertyName().equals("rangeMode") || e.getPropertyName().equals("trackName"))
+				String name = e.getPropertyName();
+				if (name.equals("rangeMode") || name.equals("trackName"))
 				{
 					toRepaintBack = true;
 					gc.getGraphicDestination().repaint();
 				}
 				else
-					if(e.getPropertyName().equals("locked"))
+					if(name.equals("locked"))
 					{
 						locked = ((Boolean)e.getNewValue()).booleanValue();
 						toRepaintBack = true;
@@ -62,6 +63,18 @@ public class ScoreBackground implements Layer{
 					}
 			}
 		});
+		gc.getAdapter().getGeometry().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e)
+		  {		
+				String name = e.getPropertyName();
+				if( name.equals("gridMode"))
+				{
+					toRepaintBack = true;
+					gc.getGraphicDestination().repaint();
+				}
+			}
+		});
+		
 	}
 
 public static int getMaxPitchInStaff(int max)
@@ -253,9 +266,15 @@ public void render( Graphics g, int order)
 	if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
 		System.err.println("something wrong: incomplete Image  ");
 	
-	drawVerticalGrid(g);
+	if( gc.getGridMode() == TrackEditor.TIME_GRID)
+		drawVerticalGrid(g);
+	else
+		drawMeasures(g);
 }
 
+private void drawMeasures(Graphics g)
+{
+}
 
 private void drawVerticalGrid(Graphics g)
 {

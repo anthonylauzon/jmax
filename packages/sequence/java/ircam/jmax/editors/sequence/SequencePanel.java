@@ -180,38 +180,38 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     mutex.add(track);
     trackContainers.put(track, trackContainer);
 		
-    teditor.getSelection().addListSelectionListener(this);//????
-			track.setProperty("selected", Boolean.TRUE);
+		teditor.getSelection().addListSelectionListener(this);
+		track.setProperty("selected", Boolean.TRUE);
 			
-			//added to update maximum time if needed
-			track.getTrackDataModel().addListener(this);    
-			//add sequenceRuler as highlighting listener 
-			track.getTrackDataModel().addHighlightListener(ruler);    
+		//added to update maximum time if needed
+		track.getTrackDataModel().addListener(this);    
+		//add sequenceRuler as highlighting listener 
+		track.getTrackDataModel().addHighlightListener(ruler);    
 			
-			//resize the frame //////////////////////////////////////////////////////////////
-			int height;	
-			Dimension dim = itsContainer.getFrame().getSize();
-			if(dim.height < SequenceWindow.MAX_HEIGHT)
-      {
-				int tcHeight = trackContainer.getSize().height;
-				
-				if(sequenceData.trackCount() == 1)
-					itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
-				else
-					if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
-						itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
-				else 
-					if(dim.height < SequenceWindow.MAX_HEIGHT)
-						itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
-      }
+		//resize the frame //////////////////////////////////////////////////////////////
+		int height;	
+		Dimension dim = itsContainer.getFrame().getSize();
+		if(dim.height < SequenceWindow.MAX_HEIGHT)
+		{
+			int tcHeight = trackContainer.getSize().height;
 			
-			///////////////////////////////////////////////////////////////////////////////////
-			//updates events in track
+			if(sequenceData.trackCount() == 1)
+				itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
+			else
+				if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
+					itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
+			else 
+				if(dim.height < SequenceWindow.MAX_HEIGHT)
+					itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
+		}
 			
-			for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
-				teditor.updateNewObject((TrackEvent)e.nextElement());
-			
-			itsContainer.getFrame().validate();
+		///////////////////////////////////////////////////////////////////////////////////
+		//updates events in track
+		
+		for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
+			teditor.updateNewObject((TrackEvent)e.nextElement());
+		
+		itsContainer.getFrame().validate();
   }
 	
   public void tracksAdded(int maxTime)

@@ -99,17 +99,17 @@ static class AmbitusValueInfo extends AbstractValueInfo {
 	* Returns the name of this value object */
 	public String getName()
 	{
-		return AMBITUS_NAME;
+		return SCOOB_NAME;
 	}
 	
 	public String getPublicName()
 	{
-		return AMBITUS_PUBLIC_NAME;
+		return SCOOB_PUBLIC_NAME;
 	}
 	
 	public ImageIcon getIcon()
 	{
-		return AMBITUS_ICON;
+		return SCOOB_ICON;
 	}
 	
 	/**
@@ -150,16 +150,16 @@ public void setPropertyValues(int nArgs, Object args[])
 
 //--- Fields
 public static final String fs = File.separator;
-public static final String AMBITUS_NAME = "scoob";
-public static final String AMBITUS_PUBLIC_NAME = "scoob";
+public static final String SCOOB_NAME = "scoob";
+public static final String SCOOB_PUBLIC_NAME = "scoob";
 static String path;
-public static ImageIcon AMBITUS_ICON;
+public static ImageIcon SCOOB_ICON;
 public static AmbitusValueInfo info = new AmbitusValueInfo();
 
 static 
 {
 	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-	AMBITUS_ICON = new ImageIcon(path+"note.gif");
+	SCOOB_ICON = new ImageIcon(path+"note.gif");
 }
 }
 

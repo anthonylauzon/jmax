@@ -28,6 +28,7 @@ import ircam.jmax.fts.*;
 
 import java.awt.*;
 import javax.swing.event.*;
+import java.beans.*;
 
 /**
  * The context for an sequence editing session.
@@ -60,14 +61,24 @@ public class SequenceGraphicContext extends GraphicContext {
 			   (itsAdapter.getGeometry().getXZoom()));
   }
 
-
   /**
    * sets the adapter to be used in this context
    */
   public void setAdapter(Adapter theAdapter) 
   {
     itsAdapter = theAdapter;
-  }
+  
+		itsAdapter.getGeometry().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e)
+			{		
+				String name = e.getPropertyName();
+				if( name.equals("gridMode"))
+				{
+					gridMode = ((Integer)e.getNewValue()).intValue();
+				}
+			}
+		});				
+	}
 
   /**
    * gets the current adapter
@@ -168,6 +179,11 @@ public class SequenceGraphicContext extends GraphicContext {
     return (getFtsObject() instanceof FtsSequenceObject);
   }
 
+	public int getGridMode()
+{
+		return gridMode;
+}
+	
   //---- Fields 
   
   TrackDataModel itsDataModel;
@@ -185,6 +201,8 @@ public class SequenceGraphicContext extends GraphicContext {
   TrackEditor itsEditor;
 
   Displayer displayer;
+	
+	int gridMode = TrackEditor.TIME_GRID;
 }
 
 

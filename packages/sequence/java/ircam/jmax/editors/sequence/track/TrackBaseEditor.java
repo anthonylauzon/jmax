@@ -52,7 +52,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		
     gc = createGraphicContext(geometry, track);
 		
-    setDisplayer();
+		setDisplayer();
 		
     track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
@@ -423,6 +423,8 @@ public int DEFAULT_HEIGHT = 430;
 public int viewMode, rangeMode;
 TrackBasePopupMenu popup = null;
 JLabel displayLabel;
+
+int gridMode = TIME_GRID;
 }
 
 

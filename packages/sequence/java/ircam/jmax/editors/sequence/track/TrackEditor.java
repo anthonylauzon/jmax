@@ -50,6 +50,9 @@ public interface TrackEditor {
     public void reinit();
 
     public void showListDialog();    
+		
+		static public final int TIME_GRID = 0;
+		static public final int MEASURES_GRID = 1;
 }
 
 

@@ -32,6 +32,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.undo.*;
+import java.beans.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -53,8 +54,10 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   transient TrackDataModel trackData;
   transient EditorContainer itsContainer;
   public SequenceRuler ruler;
+	public TempoBar tempoBar;
 	
   transient JScrollPane scrollTracks;
+	transient JPanel centerSection;
   //---
   transient JLabel itsZoomLabel;
   transient JScrollBar itsTimeScrollbar;
@@ -88,6 +91,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       geometry.setYZoom(300);
       geometry.setYInvertion(true);
       geometry.setYTransposition(136);
+			geometry.setProperty("gridMode", new Integer(TrackEditor.TIME_GRID));
     }
     //------------------------------------------------
     // Create the ruler
@@ -114,26 +118,44 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 																		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		setLayout( new BorderLayout());
 		
+		//------------------------------------------------
 		JPanel separate_tracks = new JPanel();
 		separate_tracks.setLayout( new BorderLayout());
-		separate_tracks.add( scrollTracks, BorderLayout.CENTER);
 		
-		//------------------ prepares the Status bar    
-		Box northSection = new Box(BoxLayout.Y_AXIS);
+		if( trackData.getType().getPublicName().equals( AmbitusValue.SCOOB_PUBLIC_NAME))
+		{
+			// Create TempoBar
+			tempoBar = new TempoBar(geometry, trackEditor.getGraphicContext(), false);
+			tempoBar.setSize(SequenceWindow.DEFAULT_WIDTH, TempoBar.TEMPO_HEIGHT);
+			//------------------ prepares Center Section
+			centerSection = new JPanel();			
+			Border border = scrollTracks.getBorder();
+			scrollTracks.setBorder(BorderFactory.createEmptyBorder());
+			centerSection.setBorder(border);
+			centerSection.setLayout( new BorderLayout());
+			/*centerSection.add( tempoBar, BorderLayout.NORTH);*/
+			centerSection.add( scrollTracks, BorderLayout.CENTER);
 		
-		ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
+			separate_tracks.add( centerSection, BorderLayout.CENTER);
+		}
+		else
+			separate_tracks.add( scrollTracks, BorderLayout.CENTER);
+
+		//------------------ prepares ruler & northSection
+		Box northSection = new Box(BoxLayout.Y_AXIS); 
+		ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);		
+		northSection.add(ruler);
 		
-		northSection.add(ruler);	
 		separate_tracks.add(northSection, BorderLayout.NORTH);
+		
 		//---------- prepares the time zoom listeners
 		geometry.addZoomListener( new ZoomListener() {
 			public void zoomChanged(float zoom, float oldZoom)
-			{
+		  {
 				repaint();
 				TrackEvent lastEvent = trackData.getLastEvent();
 				if(lastEvent != null)
-					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
-																							 ((Double)lastEvent.getProperty("duration")).intValue()));
+					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime() + ((Double)lastEvent.getProperty("duration")).intValue()));
 				ftsTrackObject.editorObject.setZoom(zoom);
 			}
 		});
@@ -152,12 +174,35 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 		});
 		separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
 		add( separate_tracks, BorderLayout.CENTER);
-		
+				
 		validate();
 		
 		for(Enumeration e = data.getEvents(); e.hasMoreElements();)
 			trackEditor.updateNewObject((TrackEvent)e.nextElement());
-  }
+  
+		geometry.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e)
+		  {	  
+				String name = e.getPropertyName();
+				if( name.equals("gridMode"))
+				{
+					int grid = ((Integer) e.getNewValue()).intValue();
+					if( grid == MidiTrackEditor.MEASURES_GRID)
+					{
+						centerSection.add( tempoBar, BorderLayout.NORTH);
+						tempoBar.resetDisplayer();
+						revalidate();
+					}
+					else
+					{
+						centerSection.remove( tempoBar);
+						tempoBar.resetDisplayer();
+						revalidate();
+					}
+				}
+			}
+		});
+	}
 	
   boolean isVisible(int y)
   {

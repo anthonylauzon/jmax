@@ -49,6 +49,7 @@ SequenceSelectionResizer.java \
 SequenceVerticalResizer.java \
 SequenceWindow.java \
 StringMapper.java \
+TempoBar.java \
 TimeMapper.java \
 TrackContainer.java \
 UndoableAdd.java \

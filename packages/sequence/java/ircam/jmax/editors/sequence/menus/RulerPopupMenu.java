@@ -48,53 +48,48 @@ public class RulerPopupMenu extends JPopupMenu
     ruler = rul;
     rulerMenuGroup = new ButtonGroup();
     ActionListener listener = new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	    JCheckBoxMenuItem itm = (JCheckBoxMenuItem)e.getSource();
-	    if(itm.getState())
-	    {
-		ruler.setUnityName(itm.getText());
-	    } 
-	}
+			public void actionPerformed(ActionEvent e)
+	  	{
+				JCheckBoxMenuItem itm = (JCheckBoxMenuItem)e.getSource();
+				if(itm.getState())
+				{
+					ruler.setUnityName(itm.getText());
+				} 
+			}
     };
     item = new JCheckBoxMenuItem("Seconds");
     item.addActionListener(listener);
-	
+		
     add(item);
     rulerMenuGroup.add(item);
-
+		
     item = new JCheckBoxMenuItem("Milliseconds");
     item.addActionListener(listener);
     add(item);
     rulerMenuGroup.add(item);
-
-    item = new JCheckBoxMenuItem("Samples");
-    item.addActionListener(listener);
-    add(item);
-    rulerMenuGroup.add(item);
-
+				
     pack();
-  }
+	}
 
-    public void update()
-    {
-	JCheckBoxMenuItem item;
-	String unitName = ruler.getUnityName();
+	public void update()
+  {
+		JCheckBoxMenuItem item;
+		String unitName = ruler.getUnityName();
+	
+		for( int i = 0; i < getComponentCount(); i++)
+		{
+			item = (JCheckBoxMenuItem)getComponent(i);
+			
+			if (item.getText().equals(unitName))
+			{
+				item.setSelected(true);
+				break;
+			}
+		}
+	}
 
-	for( int i = 0; i < getComponentCount(); i++)
-	    {
-		item = (JCheckBoxMenuItem)getComponent(i);
-		
-		if (item.getText().equals(unitName))
-		    {
-			item.setSelected(true);
-			break;
-		    }
-	    }
-    }
- 
-  SequenceRuler ruler;
-  private ButtonGroup rulerMenuGroup;
+	SequenceRuler ruler;
+	private ButtonGroup rulerMenuGroup;
 }
 
 
