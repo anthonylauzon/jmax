@@ -51,9 +51,11 @@ main(int argc, char **argv)
   while (argc && **argv == '-')
     {
       if (! strcmp(*argv, "-help"))
-	fprintf(stderr, "Usage: fts [-help] [-s] <client dev description>\n");
+	fprintf(stderr, "Usage: fts [-help] [-s] -norealtime <client dev description>\n");
       else if (! strcmp(*argv, "-s"))
 	set_restart_on_eof(1);
+      else if (! strcmp( *argv, "-norealtime"))
+	fts_set_no_real_time();
 
       /* others ???  */
 
