@@ -72,7 +72,7 @@ public class DefaultHelpMenu extends EditorMenu
     while (en.hasMoreElements())
     {
 	final String str = (String) en.nextElement();
-	add( new OpenHelpSummaryAction(str), str + " summary");
+	add( new OpenHelpSummaryAction(str), str);
     }   
   }
 }

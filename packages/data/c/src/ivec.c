@@ -561,6 +561,9 @@ ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   ivec_t *this = (ivec_t *)o;
 
+  if(!fts_object_has_id(o))
+    fts_client_upload(o, ivec_symbol, 0, 0);
+
   ivec_set_editor_open(this);
   fts_client_send_message(o, sym_openEditor, 0, 0);
 }
@@ -972,10 +975,14 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ivec_t *this = (ivec_t *)o;
   
+  if(fts_object_has_id(o))
+    fts_client_send_message(o, sym_destroyEditor, 0, 0);
+
   if(this->copy)
     fts_object_destroy((fts_object_t *)this->copy);
-  fts_free(this->values);
-  fts_client_send_message(o, sym_destroyEditor, 0, 0);
+
+  if(this->values)
+    fts_free(this->values);
 }
 
 static int
@@ -1020,6 +1027,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
 
       fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
+
       /* graphical editor */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);

@@ -40,7 +40,8 @@ typedef struct
   fts_symbol_t name;
 } table_t;
 
-
+static fts_symbol_t sym_open_editor = 0;
+static fts_symbol_t sym_close_editor = 0;
 
 static void
 table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -95,6 +96,14 @@ table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     ispw_unregister_named_object((fts_object_t *)this->vec, this->name);
 
   fts_object_release((fts_object_t *)this->vec);
+}
+
+static void
+table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+
+  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, sym_open_editor, 0, 0);
 }
 
 /********************************************************************
@@ -354,6 +363,8 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete);
 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), table_open_editor);
+
       /* save/load bmax file if not instantiated with reference */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
@@ -391,6 +402,9 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 table_config(void)
 {
+  sym_open_editor = fts_new_symbol("open_editor");
+  sym_close_editor = fts_new_symbol("close_editor");
+
   fts_metaclass_install(fts_new_symbol("table"), table_instantiate, fts_arg_type_equiv);
 }
 
