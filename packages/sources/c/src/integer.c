@@ -91,7 +91,7 @@ static fts_status_t integer_instantiate(fts_class_t *cl, int ac, const fts_atom_
 {
   fts_type_t t[2];
 
-  post( "Instantiating class `integer' of package `sources'\n");
+  post( "Instantiating class `SRCinteger' of package `sources'\n");
 
   /* initialize the class */
   fts_class_init( cl, sizeof(integer_t), 2, 1, 0);
@@ -124,15 +124,15 @@ static fts_status_t integer_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
 /* -------------------- the class installation function -------------------- */
 
-void integer_config(void)
+void src_integer_config(void)
 {
-  post( "Installing class `integer' of package `sources'\n");
+  post( "Installing class `SRCinteger' of package `sources'\n");
 
   /* Uses a bizarre class name no to overwrite the "int" standard class */
-  fts_class_install( fts_new_symbol("_int"), integer_instantiate);
+  fts_class_install( fts_new_symbol("SRCint"), integer_instantiate);
 
   /* ... and register 2 aliases: "i" and "integer" */
-  fts_class_alias( fts_new_symbol("_integer"), fts_new_symbol("_int"));
-  fts_class_alias( fts_new_symbol("_i"), fts_new_symbol("_int"));
+  fts_class_alias( fts_new_symbol("SRCinteger"), fts_new_symbol("SRCint"));
+  fts_class_alias( fts_new_symbol("SRCi"), fts_new_symbol("SRCint"));
 }
 

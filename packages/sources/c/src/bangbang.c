@@ -45,7 +45,7 @@ static void bangbang_init( fts_object_t *object, int winlet, fts_symbol_t s, int
 {
   bangbang_t *this = (bangbang_t *)object;
 
-  this->noutlets = fts_get_int_arg( ac, at, 0, 2);
+  this->noutlets = fts_get_int_arg( ac, at, 1, 2);
 }
 
 static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_atom_t *at)
@@ -54,9 +54,9 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
   int noutlets;
   fts_type_t t[2];
 
-  post( "Instantiating class `bangbang' of package `sources'\n");
+  post( "Instantiating class `SRCbangbang' of package `sources'\n");
 
-  if ((ac >= 1)  && fts_is_int( &(at[1])))
+  if ((ac >= 2)  && fts_is_int( &(at[1])))
     noutlets = fts_get_int( &(at[1]));
   else
     noutlets = 2;
@@ -85,10 +85,10 @@ static int bangbang_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_at
     return 0;
 }
 
-void bangbang_config(void)
+void src_bangbang_config(void)
 {
-  post( "Installing class `bangbang' of package `sources'\n");
+  post( "Installing class `SRCbangbang' of package `sources'\n");
 
   /* Uses a bizarre class name no to overwrite the "bangbang" standard class */
-  fts_metaclass_install( fts_new_symbol( "_bangbang"), bangbang_instantiate, bangbang_equiv);
+  fts_metaclass_install( fts_new_symbol( "SRCbangbang"), bangbang_instantiate, bangbang_equiv);
 }

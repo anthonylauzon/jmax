@@ -120,7 +120,7 @@ static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
 {
   fts_type_t t[2];
 
-  post( "Instantiating class `.*+~' of package `sources'\n");
+  post( "Instantiating class `SRC*+~' of package `sources'\n");
 
   /* Class initialization : 2 inlets, 1 outlet */
 
@@ -158,10 +158,10 @@ static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
   return fts_Success;
 }
 
-void sma_config( void)
+void src_sma_config( void)
 {
-  post( "Installing class `s*+~' of package `sources'\n");
+  post( "Installing class `SRC*+~' of package `sources'\n");
 
-  fts_class_install( fts_new_symbol( ".*+~"), sma_instantiate);
+  fts_class_install( fts_new_symbol( "SRC*+~"), sma_instantiate);
 }
 

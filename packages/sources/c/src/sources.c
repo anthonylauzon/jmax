@@ -26,15 +26,15 @@
 
 #include "fts.h"
 
-extern void integer_config(void);
-extern void bangbang_config(void);
-extern void sma_config(void);
+extern void src_integer_config(void);
+extern void src_bangbang_config(void);
+extern void src_sma_config(void);
 
 static void sources_init(void)
 {
-  integer_config();
-  bangbang_config();
-  sma_config();
+  src_integer_config();
+  src_bangbang_config();
+  src_sma_config();
 }
 
 fts_module_t sources_module = { "sources", "objects examples with sources", sources_init, 0, 0, 0};
