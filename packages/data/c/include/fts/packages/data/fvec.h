@@ -24,11 +24,11 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-/*****************************************************************************/
-/** @defgroup fvec fvec: fmat row or column ref
+
+/** @defgroup fvec fvec: fmat slice ref
  *  @ingroup  data
  *
- *  an fmat slice is a reference to a colum, row or diagonal of an fmat
+ *  an fvec is a reference to a colum, row or diagonal of an fmat
  *
  *  @{
  */
@@ -43,6 +43,9 @@ typedef struct
   int index; /* index of column (col) or index of row (row)  or row onset (diag) */
   int onset; /* row onset (col) or column onset (row) or column onset (diag) */
   int size; /* number of elements  */
+
+  int opened; /* non zero if editor open */
+  fts_object_t *editor;
 } fvec_t;
 
 #define fvec_get_fmat(f) ((f)->fmat)
@@ -57,8 +60,16 @@ typedef struct
 #define fvec_set_onset(f, x) ((f)->onset = (x))
 #define fvec_set_size(f, x) ((f)->size = (x))
 
+/* editor */
+#define fvec_set_editor_open(v) ((v)->opened = 1)
+#define fvec_set_editor_close(v) ((v)->opened = 0)
+#define fvec_editor_is_open(v) ((v)->opened)
+
+
+/* globals */
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
+
 
 /** get element, no checks */
 DATA_API float fvec_get_element(fvec_t *self, int i);
