@@ -53,7 +53,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private EditMenu itsEditMenu;	
   private ScriptMenu itsScriptMenu;	
   private JMenu itsWindowsMenu;
-    //private JMenu itsToolsMenu;
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
 
@@ -93,6 +92,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     return (! gotMessage);
   }
+  
+    public static void touch(Fts fts)
+    {	
+	FtsPatcherData data = (FtsPatcherData)(Mda.getDocumentTypeByName( "patcher").newDocument(fts)).getRootData();
+	ErmesSketchWindow win = new ErmesSketchWindow(data);
+	win.dispose();
+    }
+
   // -----------------------------------------------
 
   /****************************************************************************/
@@ -106,11 +113,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     super("");
 
     MaxWindowManager.getWindowManager().addWindow(this);
-
-    //set the GlassPane for the rootPane
-    /*GlassPanel glass = new GlassPanel();
-      glass.setDoubleBuffered(false);
-      setGlassPane(new GlassPanel());*/
 
     // Create the ClipboardManager
     PatcherClipboardManager.createManager();
@@ -162,7 +164,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(this);
 
     // Make it visible, at the end
-    setVisible( true);
+    //setVisible( true);
   }
 
   private final void makeTitle()
@@ -191,10 +193,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Build the script menu
     itsScriptMenu = new ScriptMenu();
     mb.add( itsScriptMenu);
-
-    // New Tool menu 
-    /*itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-      mb.add(itsToolsMenu);*/
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

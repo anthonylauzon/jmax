@@ -110,8 +110,3 @@
     (open-default-audio-out "profile"))
 
 
-;;
-;; init console's control panel
-;;
-(init-console)
-

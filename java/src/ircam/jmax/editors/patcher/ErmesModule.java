@@ -58,7 +58,6 @@ public class ErmesModule
 	Mda.installEditorFactory(new ErmesPatcherFactory());
 
 	// Register the find panel and the fpe panel
-
 	FindPanel.registerFindPanel();
 	FpePanel.registerFpePanel();
       }

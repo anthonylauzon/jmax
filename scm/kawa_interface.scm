@@ -376,12 +376,6 @@
     ())
   ))
 
-(define (init-console-window)
-  ((primitive-static-method
-    <ircam.jmax.editors.console.ConsoleWindow>
-    "init" <void> ())
-  ))
-
 (define (new-splash-dialog a0 a1)
   ((primitive-constructor
     <ircam.jmax.dialogs.SplashDialog>

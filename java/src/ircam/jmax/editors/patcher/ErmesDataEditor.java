@@ -41,6 +41,8 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
     super(p);
 
     setSketchWindow(new ErmesSketchWindow(p));
+    window.setVisible(true);
+
     fireEditorReadyListeners();
   }
 

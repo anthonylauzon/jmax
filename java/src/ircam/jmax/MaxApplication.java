@@ -291,6 +291,8 @@ public class MaxApplication extends Object
 	}
     
     // Splash screen moved to a tcl command
+    ircam.jmax.editors.console.ConsoleWindow.init();
+    ircam.jmax.editors.patcher.ErmesSketchWindow.touch(fts);
     
     //if there were no connection statements in startup.tcl, ask the user
 
