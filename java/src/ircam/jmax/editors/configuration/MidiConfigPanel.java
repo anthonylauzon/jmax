@@ -57,7 +57,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     /*********** Table  ******************************************/
     initCellEditors();
-    defaultLabelFont = tableFont.deriveFont(Font.BOLD+Font.ITALIC);
+    defaultLabelFont = tableFont.deriveFont( Font.BOLD);
 
     midiTable = new JTable( midiModel){
 	public TableCellEditor getCellEditor(int row, int column){
@@ -73,22 +73,18 @@ public class MidiConfigPanel extends JPanel implements Editor
 	      return super.getCellEditor(row, column);
 	    }
 	}
-	public TableCellRenderer getCellRenderer(int row, int column){
-	  switch( column)
-	    {
-	    case 0:
-	      DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getCellRenderer(row, column);
-	      if( row == 0)
-		renderer.setFont( defaultLabelFont);
-	      else
-		renderer.setFont( tableFont);
-
-	      return renderer;
-	    default: 
-	      return super.getCellRenderer(row, column);
-	    }
-	}
       }; 
+    midiTable.setDefaultRenderer( String.class, 
+				  new DefaultTableCellRenderer()
+				    {
+				      public Component getTableCellRendererComponent(JTable table, Object value, 
+										     boolean isSelected, boolean hasFocus,
+										     int row, int column) {
+					if(row == 0 && column == 0)
+					  setForeground( Color.magenta);
+					return this;
+				      }
+				    });
 
     midiTable.setPreferredScrollableViewportSize( new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     midiTable.setRowHeight(17);
