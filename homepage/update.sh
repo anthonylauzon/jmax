@@ -1,6 +1,10 @@
 #! /bin/sh
 DSTDIR=/usr/local/www/ircam/equipes/temps-reel/jmax
+
+set -x
+
 rm -rf ${DSTDIR}/*
+
 cat <<EOF > ${DSTDIR}/index.html
 <HTML>
 <BODY>
@@ -8,8 +12,29 @@ cat <<EOF > ${DSTDIR}/index.html
 </BODY>
 </HTML>
 EOF
-cd ${DSTDIR}
-cvs checkout max/homepage
-mv -f max/homepage/* .
-/bin/rm -rf CVS
+
+copy_file ()
+{
+    cp $1 $2
+    chmod 664 $2/`basename $1`
+}
+
+for i in *.html
+do
+    copy_file $i ${DSTDIR}
+done
+
+for d in `find doc -type d`
+do
+    echo "directory " $d
+    mkdir -p ${DSTDIR}/$d
+    chmod 775 ${DSTDIR}/$d
+done
+
+for i in `find doc -type f \( -name '*.html' -o -name '*.gif' \)`
+do
+    echo "file " $d
+    copy_file $i ${DSTDIR}
+done
+
 
