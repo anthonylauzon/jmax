@@ -148,27 +148,30 @@ fts_load_project( void)
 
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( fts_s_project);
-  if (project_file != NULL)
+  if (fts_s_none != project_file)
   {
-    project_found = fts_file_exists( project_file) && fts_is_file( project_file);
-  }
-
-  /* check if the user has a project file in the home directory  */
-  if (!project_found)
+    if (project_file != NULL)
+    {
+      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+    }
+    
+    /* check if the user has a project file in the home directory  */
+    if (!project_found)
     {
       project_file = fts_get_user_project();
       project_found = fts_file_exists( project_file) && fts_is_file( project_file);
     }
-
-  /* check if there's a system wide project */
-  if (!project_found)
+    
+    /* check if there's a system wide project */
+    if (!project_found)
     {
       project_file = fts_get_system_project();
       project_found = fts_file_exists( project_file) && fts_is_file( project_file);
     }
 
-  if (project_found)
-    project = fts_project_open(project_file);
+    if (project_found)
+      project = fts_project_open(project_file);
+  }
 
   /* create an empty project */
   if (project == NULL)
@@ -196,41 +199,43 @@ fts_load_config( void)
 
   /* check if the user specified a config file on the command line  */
   config_file = fts_cmd_args_get( fts_s_config);
-  if (config_file != NULL)
+  if (fts_s_none != config_file)
   {
-    config_found = fts_file_exists( config_file) && fts_is_file( config_file);
-  }
-
-  /* check if the user has a config file in the home directory  */
-  if (!config_found)
+    if (config_file != NULL)
+    {
+      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+    }
+    
+    /* check if the user has a config file in the home directory  */
+    if (!config_found)
     {
       config_file = fts_get_user_configuration();
       config_found = fts_file_exists( config_file) && fts_is_file( config_file);
     }
 
-  /* check if there's a system wide config */
-  if (!config_found)
+    /* check if there's a system wide config */
+    if (!config_found)
     {
       config_file = fts_get_system_configuration();
       config_found = fts_file_exists( config_file) && fts_is_file( config_file);
     }
-  
+  }    
   if (!config_found)
-    {
-      fts_config_t *config;
-
-      /* create an empty config */
-      fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
-      config = (fts_config_t*)fts_object_create(config_type, 0, 0);
-      fts_midiconfig_set_defaults(config->midi_config);
-      fts_audioconfig_set_defaults(config->audio_config);
-
-      fts_config_set(config);
-    }
+  {
+    fts_config_t *config;
+    
+    /* create an empty config */
+    fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
+    config = (fts_config_t*)fts_object_create(config_type, 0, 0);
+    fts_midiconfig_set_defaults(config->midi_config);
+    fts_audioconfig_set_defaults(config->audio_config);
+    
+    fts_config_set(config);
+  }
   else
-    {
-      fts_config_open(config_file);
-    }
+  {
+    fts_config_open(config_file);
+  }
 }
 
 /***********************************************************************
