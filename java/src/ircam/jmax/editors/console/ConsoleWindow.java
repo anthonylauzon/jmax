@@ -43,7 +43,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     // Register this console window 
     // as *the* console window
 
-    if (theConsoleWindow != null)
+    if (theConsoleWindow == null)
       theConsoleWindow = this;
 
     Init();

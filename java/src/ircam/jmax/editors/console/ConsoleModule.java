@@ -1,6 +1,7 @@
 package ircam.jmax.editors.console;
 
 import ircam.jmax.editors.console.tcl.*;
+import ircam.jmax.editors.console.tcl.TclConsolePackage.*;
 
 /** The console module; the initModule function is called at init time
  *  by jmax, and install module related things
@@ -15,3 +16,5 @@ public class ConsoleModule
     ircam.jmax.editors.console.tcl.TclConsolePackage.installPackage();
   }
 }
+
+
