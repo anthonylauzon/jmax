@@ -426,12 +426,14 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 static fts_status_t
 fts_ucs_default_audio(int argc, const fts_atom_t *argv)
 {
-  post( "ucs default audio ");
-  post_atoms( argc, argv);
-  post( "\n");
-
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     {
+      post( "Setting default audio port to \"");
+      post_atoms( 1, argv);
+      post( "\" (arguments: ");
+      post_atoms( argc-1, argv+1);
+      post( ")\n");
+
       fts_audioport_set_default( argc, argv);
     }
 

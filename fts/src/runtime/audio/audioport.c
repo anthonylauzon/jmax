@@ -132,7 +132,7 @@ void fts_audioport_delete( fts_audioport_t *port)
     }
 }
 
-static void audioport_default_idle_fun( fts_audioport_t *port, ftl_wrapper_t fun, int len, int channels, float *sig)
+static void audioport_default_idle_function( fts_audioport_t *port, ftl_wrapper_t fun, int len, int channels, float *sig)
 {
   fts_word_t *at;
   int i;
@@ -167,22 +167,22 @@ void fts_audioport_idle( fts_word_t *args)
     {
       if ( port->idle_function == AUDIOPORT_DEFAULT_IDLE)
 	{
-	  audioport_default_idle_fun( port, fts_audioport_get_input_fun( port), tick_size, fts_audioport_get_input_channels( port), sig_dummy);
-	  audioport_default_idle_fun( port, fts_audioport_get_output_fun( port), tick_size, fts_audioport_get_output_channels( port), sig_zero);
+	  audioport_default_idle_function( port, fts_audioport_get_input_function( port), tick_size, fts_audioport_get_input_channels( port), sig_dummy);
+	  audioport_default_idle_function( port, fts_audioport_get_output_function( port), tick_size, fts_audioport_get_output_channels( port), sig_zero);
 	}
       else if ( port->idle_function)
 	(*port->idle_function)( port);
     }
 }
 
-void __fts_audioport_set_input_fun( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun)
+void __fts_audioport_set_input_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun)
 {
   port->input_fun_name = name;
   port->input_fun = fun;
   fts_dsp_declare_function( name, fun);
 }
 
-void __fts_audioport_set_output_fun( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun)
+void __fts_audioport_set_output_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun)
 {
   port->output_fun_name = name;
   port->output_fun = fun;
@@ -234,7 +234,7 @@ static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for ( i = 0; i < channels; i++)
     fts_set_symbol( args+2+i, fts_dsp_get_output_name( dsp, i));
 
-  fts_dsp_add_function( fts_audioport_get_input_fun_name( this->port), channels+2, args);
+  fts_dsp_add_function( fts_audioport_get_input_function_name( this->port), channels+2, args);
 }
 
 static fts_status_t audioportin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -313,7 +313,7 @@ static void audioportout_put( fts_object_t *o, int winlet, fts_symbol_t s, int a
   for ( i = 0; i < channels; i++)
     fts_set_symbol( args+2+i, fts_dsp_get_input_name( dsp, i));
 
-  fts_dsp_add_function( fts_audioport_get_output_fun_name( this->port), channels+2, args);
+  fts_dsp_add_function( fts_audioport_get_output_function_name( this->port), channels+2, args);
 }
 
 static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -439,6 +439,26 @@ fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet)
 
   return out;
 }
+
+
+int fts_audioport_report_xrun( void)
+{
+  fts_audioport_t *port;
+  int xrun;
+
+  xrun = 0;
+  for ( port = audioport_list; port; port = port->next)
+    {
+      if (port->xrun_function)
+	{
+	  xrun |= (*port->xrun_function)( port);
+	}
+    }
+
+  return xrun;
+}
+
+
 
 
 

@@ -62,6 +62,7 @@ typedef struct _fts_audioport_t {
   fts_object_t *audioportin;
   fts_object_t *audioportout;
   void (*idle_function)( struct _fts_audioport_t *port);
+  int (*xrun_function)( struct _fts_audioport_t *port);
 } fts_audioport_t;
 
 extern void fts_audioport_init( fts_audioport_t *port);
@@ -69,15 +70,15 @@ extern void fts_audioport_delete( fts_audioport_t *port);
 
 extern int fts_object_is_audioport( fts_object_t *obj);
 
-#define fts_audioport_get_input_fun(P) (((fts_audioport_t *)(P))->input_fun)
-#define fts_audioport_get_input_fun_name(P) (((fts_audioport_t *)(P))->input_fun_name)
-#define fts_audioport_set_input_fun(P,F) __fts_audioport_set_input_fun((fts_audioport_t *)(P),fts_new_symbol(#F),F)
-extern void __fts_audioport_set_input_fun( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
+#define fts_audioport_get_input_function(P) (((fts_audioport_t *)(P))->input_fun)
+#define fts_audioport_get_input_function_name(P) (((fts_audioport_t *)(P))->input_fun_name)
+#define fts_audioport_set_input_function(P,F) __fts_audioport_set_input_function((fts_audioport_t *)(P),fts_new_symbol(#F),F)
+extern void __fts_audioport_set_input_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
 
-#define fts_audioport_get_output_fun(P) (((fts_audioport_t *)(P))->output_fun)
-#define fts_audioport_get_output_fun_name(P) (((fts_audioport_t *)(P))->output_fun_name)
-#define fts_audioport_set_output_fun(P,F) __fts_audioport_set_output_fun((fts_audioport_t *)(P),fts_new_symbol(#F),F)
-extern void __fts_audioport_set_output_fun( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
+#define fts_audioport_get_output_function(P) (((fts_audioport_t *)(P))->output_fun)
+#define fts_audioport_get_output_function_name(P) (((fts_audioport_t *)(P))->output_fun_name)
+#define fts_audioport_set_output_function(P,F) __fts_audioport_set_output_function((fts_audioport_t *)(P),fts_new_symbol(#F),F)
+extern void __fts_audioport_set_output_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
 
 #define fts_audioport_get_input_channels(P) (((fts_audioport_t *)(P))->input_channels)
 #define fts_audioport_set_input_channels(P,C) (((fts_audioport_t *)(P))->input_channels = (C))
@@ -92,6 +93,13 @@ extern void __fts_audioport_set_output_fun( fts_audioport_t *port, fts_symbol_t 
 
 extern fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *target, int outlet);
 extern fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet);
+
+/* dac slip report:
+ the audioport xrun function returns an int saying that there has been an xrun since last call
+ the dspcontrol calls fts_audioport_report_xrun to know the state of xrun
+*/
+#define fts_audioport_set_xrun_function(P,F) (((fts_audioport_t *)(P))->xrun_function = (F))
+extern int fts_audioport_report_xrun( void);
 
 extern void fts_audioport_set_default( int argc, const fts_atom_t *argv);
 extern fts_audioport_t *fts_audioport_get_default( void);

@@ -65,15 +65,12 @@
 #define DSP_CONTROL_SET_CHECK_NAN      13
 
 
-extern fts_dev_t * fts_dsp_get_dac_slip_dev(void);
-
 static fts_data_class_t *fts_dsp_control_data_class = 0;
 
 typedef struct fts_dsp_control
 {
   fts_data_t dataobj;
 
-  fts_dev_t *dac_slip_dev;
   fts_alarm_t poll_alarm;
   int poll_interval;
 
@@ -98,7 +95,7 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
   int denormalized_fpe;
   unsigned int fpe_state;
 
-  if (this->dac_slip_dev &&  fts_dsp_is_running() && fts_sig_dev_get_nerrors(this->dac_slip_dev) > 0)
+  if (fts_dsp_is_running() && fts_audioport_report_xrun())
     dac_slip = 1;
   else
     dac_slip = 0;
@@ -186,8 +183,6 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
   fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
   fts_alarm_arm(&(this->poll_alarm));
 
-  this->dac_slip_dev = fts_dsp_get_dac_slip_dev();
-
   fts_param_add_listener(fts_s_dsp_on, this, fts_dsp_control_dsp_on_listener);
 
   return (fts_data_t *) this;
@@ -198,11 +193,13 @@ static void fts_dsp_control_export_fun(fts_data_t *d)
 {
   fts_atom_t a;
   fts_dsp_control_t *this = (fts_dsp_control_t *)d;
+  float sr;
 
   fts_set_int(&a, fts_param_get_int(fts_s_fifo_size, 0));
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_FIFO_SIZE, 1, &a);
 
-  fts_set_int(&a, (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f));
+  sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+  fts_set_int(&a, (int)sr );
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_SAMPLING_RATE, 1, &a);
 }
 
