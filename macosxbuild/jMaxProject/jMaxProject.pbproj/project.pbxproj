@@ -11839,7 +11839,6 @@
 			dstPath = lib;
 			dstSubfolderSpec = 7;
 			files = (
-				F8F010DB028D870301664092,
 				F8F010DC028D870301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
@@ -12159,7 +12158,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F880008F0283072101664092,
-				F8F01107028D8B1701664092,
 				F8F01108028D8B1701664092,
 			);
 			isa = PBXFrameworksBuildPhase;
@@ -12216,11 +12214,9 @@
 			productRefGroup = F880FCF00282F80D01664092;
 			projectDirPath = "";
 			targets = (
-				F880FFF80283022401664092,
-				F880FFEE028301DA01664092,
-				F880FCF20282F80D01664092,
-				F880FD0F0282F90B01664092,
 				F880FD830282FA3901664092,
+				F880FFEE028301DA01664092,
+				F880FD0F0282F90B01664092,
 				F880FEDE0283013E01664092,
 				F880007B0283072101664092,
 				F8B8E4B002867E1C01664092,
@@ -12239,6 +12235,7 @@
 				F8512352028BE5ED01664092,
 				F8512385028BE77D01664092,
 				F85123A0028BE77D01664092,
+				F880FFF80283022401664092,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {
@@ -12319,7 +12316,6 @@
 				F8F010C9028D830301664092,
 				F8F010EA028D875901664092,
 				F8F010F1028D890E01664092,
-				F880FCF10282F80D01664092,
 				F880FD0E0282F90B01664092,
 				F880FD820282FA3901664092,
 				F880FEDD0283013E01664092,
@@ -12347,109 +12343,6 @@
 			name = Products;
 			refType = 4;
 		};
-		F880FCF10282F80D01664092 = {
-			isa = PBXFrameworkReference;
-			path = ftsclient.framework;
-			refType = 3;
-		};
-		F880FCF20282F80D01664092 = {
-			buildPhases = (
-				F880FCF30282F80D01664092,
-				F880FCF40282F80D01664092,
-				F880FCF50282F80D01664092,
-				F880FCF60282F80D01664092,
-				F880FCF70282F80D01664092,
-			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				HEADER_SEARCH_PATHS = ../../client/include;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRINCIPAL_CLASS = "";
-				PRODUCT_NAME = ftsclient;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = framework;
-			};
-			dependencies = (
-			);
-			isa = PBXFrameworkTarget;
-			name = ftsclient;
-			productInstallPath = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-			productName = ftsclient;
-			productReference = F880FCF10282F80D01664092;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
-<plist version=\"0.9\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>ftsclient</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>FMWK</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.0.1d1</string>
-</dict>
-</plist>
-";
-			shouldUseHeadermap = 0;
-		};
-		F880FCF30282F80D01664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXHeadersBuildPhase;
-			name = Headers;
-		};
-		F880FCF40282F80D01664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-			name = "Bundle Resources";
-		};
-		F880FCF50282F80D01664092 = {
-			buildActionMask = 2147483647;
-			files = (
-				F880FCFB0282F8A501664092,
-			);
-			isa = PBXSourcesBuildPhase;
-			name = Sources;
-		};
-		F880FCF60282F80D01664092 = {
-			buildActionMask = 2147483647;
-			files = (
-				F880FCFC0282F8A501664092,
-			);
-			isa = PBXFrameworksBuildPhase;
-			name = "Frameworks & Libraries";
-		};
-		F880FCF70282F80D01664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXRezBuildPhase;
-			name = "ResourceManager Resources";
-		};
 		F880FCF80282F8A501664092 = {
 			isa = PBXFileReference;
 			name = ftsclient.cpp;
@@ -12472,18 +12365,6 @@
 			name = Carbon.framework;
 			path = /System/Library/Frameworks/Carbon.framework;
 			refType = 0;
-		};
-		F880FCFB0282F8A501664092 = {
-			fileRef = F880FCF80282F8A501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FCFC0282F8A501664092 = {
-			fileRef = F880FCFA0282F8A501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F880FD0E0282F90B01664092 = {
 			isa = PBXLibraryReference;
@@ -13304,7 +13185,6 @@
 			files = (
 				F8448E630286DC0201664092,
 				F8448E670286DD3701664092,
-				F8F010CA028D83D501664092,
 			);
 			isa = PBXFrameworksBuildPhase;
 			name = "Frameworks & Libraries";
@@ -17270,7 +17150,6 @@
 		F880FFF2028301DA01664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8F010C6028D827E01664092,
 				F8F010C8028D829E01664092,
 			);
 			isa = PBXFrameworksBuildPhase;
@@ -19720,7 +19599,6 @@
 		F8B8E5C30286822601664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8F01103028D8A9401664092,
 				F8F01104028D8A9401664092,
 			);
 			isa = PBXFrameworksBuildPhase;
@@ -21168,18 +21046,6 @@
 			isa = PBXRezBuildPhase;
 			name = "ResourceManager Resources";
 		};
-		F8F010C5028D827E01664092 = {
-			isa = PBXFrameworkReference;
-			name = ftsclient.framework;
-			path = build/ftsclient.framework;
-			refType = 4;
-		};
-		F8F010C6028D827E01664092 = {
-			fileRef = F8F010C5028D827E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8F010C7028D829E01664092 = {
 			isa = PBXFrameworkReference;
 			name = libfts.framework;
@@ -21194,19 +21060,12 @@
 		};
 		F8F010C9028D830301664092 = {
 			children = (
-				F8F010C5028D827E01664092,
 				F8F010C7028D829E01664092,
 			);
 			isa = PBXGroup;
 			name = "jMax Frameworks";
 			path = "";
 			refType = 4;
-		};
-		F8F010CA028D83D501664092 = {
-			fileRef = F8F010C5028D827E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8F010CC028D861401664092 = {
 			children = (
@@ -21306,12 +21165,6 @@
 			name = libutils.bundle;
 			path = build/libutils.bundle;
 			refType = 4;
-		};
-		F8F010DB028D870301664092 = {
-			fileRef = F8F010C5028D827E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8F010DC028D870301664092 = {
 			fileRef = F8F010C7028D829E01664092;
@@ -21556,12 +21409,6 @@
 			settings = {
 			};
 		};
-		F8F01103028D8A9401664092 = {
-			fileRef = F8F010C5028D827E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8F01104028D8A9401664092 = {
 			fileRef = F8F010C7028D829E01664092;
 			isa = PBXBuildFile;
@@ -21576,12 +21423,6 @@
 		};
 		F8F01106028D8AD001664092 = {
 			fileRef = F8F010C7028D829E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F01107028D8B1701664092 = {
-			fileRef = F8F010C5028D827E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
