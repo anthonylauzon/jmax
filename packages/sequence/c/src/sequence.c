@@ -187,6 +187,7 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     /* add track at client and upload events */
     sequence_add_track_at_client(this, track);
     fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
+		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);/* to create trackeditor */
 
     /* next track */
     track = track_get_next(track);
@@ -197,7 +198,8 @@ static void
 sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-
+	track_t *track;
+	
   sequence_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
   sequence_upload(o, 0, 0, 0, 0);
@@ -411,8 +413,6 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_object_create(track_class, 1, at);
 
-  fts_log("add_track 1 \n");
-
   /* add it to the sequence */
   sequence_add_track(this, track);
 
@@ -426,6 +426,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   {
     sequence_add_track_at_client(this, track);
     fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
+		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
     fts_object_set_state_dirty(o);
   }
 }

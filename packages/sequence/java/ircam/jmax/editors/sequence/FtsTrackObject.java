@@ -1431,7 +1431,7 @@ protected void addFlavor(DataFlavor flavor)
 *  FtsObjectWithEditor
 ********************************************************/
 public void setFtsTrackEditorObject(int id)
-{
+{	
   editorObject = new FtsTrackEditorObject( JMaxApplication.getFtsServer(), this, id);
 }
 public void setSaveEditor(boolean save)

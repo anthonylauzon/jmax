@@ -156,15 +156,17 @@ public class TrackBasePopupMenu extends JPopupMenu
     });
     add(item);
 		
-		saveItem = new JCheckBoxMenuItem("Save Editor State");
-    saveItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				target.getTrack().getFtsTrack().requestSetSaveEditor(saveItem.getState());
-			}
-		});
-    add(saveItem);    
-		
+		if(!isInSequence)
+		{
+			saveItem = new JCheckBoxMenuItem("Save Editor State");
+			saveItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+		    {
+					target.getTrack().getFtsTrack().requestSetSaveEditor(saveItem.getState());
+				}
+			});
+			add(saveItem);    
+		}
     moveToAction = new MoveTrackToAction(target);
 		
     pack();
@@ -197,16 +199,19 @@ public class TrackBasePopupMenu extends JPopupMenu
   {
     if(isInSequence)
       updateMoveToMenu();
-    
-    updateViewMenu();
+			
+	    updateViewMenu();
 		
     if(JMaxApplication.getProperty("no_menus") != null)
       updateCutCopyPaste();
-		
-		boolean saveEditor = target.getTrack().getFtsTrack().saveEditor;
-		if(saveItem.getState() != saveEditor)
-			saveItem.setState(saveEditor);
-  }
+	
+		if(!isInSequence)
+		{
+			boolean saveEditor = target.getTrack().getFtsTrack().saveEditor;
+			if(saveItem.getState() != saveEditor)
+				saveItem.setState(saveEditor);			
+		}		
+	}
 	
   void updateMoveToMenu()
   {

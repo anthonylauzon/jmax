@@ -908,7 +908,7 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   track_t *this = (track_t *)o;
   fts_atom_t a;
-	
+	   
   if(this->type != NULL)
   {
     fts_set_symbol(&a, fts_class_get_name(this->type));
@@ -1068,19 +1068,31 @@ track_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+track_set_editor_at_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+	track_t *this = (track_t *)o;
+	fts_atom_t a;
+	
+	if(this->editor == NULL)
+	{
+		fts_set_object(&a, o);
+		this->editor = (track_editor_t *)fts_object_create(track_editor_class, 1, &a);	
+	}
+	if(!fts_object_has_id((fts_object_t *)this->editor))
+		fts_client_register_object((fts_object_t *)this->editor, fts_object_get_client_id(o));	
+		
+	fts_set_int(&a, fts_object_get_id((fts_object_t *)this->editor));
+	fts_client_send_message(o, seqsym_editor, 1, &a);		
+}	
+
+static void
 track_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
 	track_t *this = (track_t *)o;
 	
 	if(this->editor == NULL)
-	{
-		fts_atom_t a;
-		fts_set_object(&a, o);
-		this->editor = (track_editor_t *)fts_object_create(track_editor_class, 1, &a);
-		fts_client_register_object((fts_object_t *)this->editor, fts_object_get_client_id(o));	
-		fts_set_int(&a, fts_object_get_id((fts_object_t *)this->editor));
-		fts_client_send_message(o, seqsym_editor, 1, &a);		
-	}
+		track_set_editor_at_client(o, 0, 0, 0, 0);
+	
   track_set_editor_open( this);
   fts_client_send_message( o, fts_s_openEditor, 0, 0);
   track_upload(o, 0, 0, 0, 0);
@@ -1374,6 +1386,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
 	fts_class_message_varargs(cl, seqsym_save_editor, track_set_save_editor);
+	fts_class_message_varargs(cl, seqsym_set_editor, track_set_editor_at_client);
 	  
   fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
   fts_class_message_varargs(cl, fts_s_dump_gui, track_dump_gui);

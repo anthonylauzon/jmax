@@ -74,6 +74,7 @@ extern fts_symbol_t seqsym_zoom;
 extern fts_symbol_t seqsym_transp;
 extern fts_symbol_t seqsym_save_editor;
 extern fts_symbol_t seqsym_editor_state;
+extern fts_symbol_t seqsym_set_editor;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_addTracks;
