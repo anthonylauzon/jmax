@@ -28,6 +28,7 @@ fts_class_t *mat_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
+static fts_symbol_t sym_mat_append_row = 0;
 
 #define mat_set_editor_open(m) ((m)->opened = 1)
 #define mat_set_editor_close(m) ((m)->opened = 0)
@@ -410,6 +411,16 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
 */
 #define MAT_CLIENT_BLOCK_SIZE 128
 
+static fts_memorystream_t *mat_memory_stream ;
+
+static fts_memorystream_t * mat_get_memory_stream()
+{
+  if(!mat_memory_stream)
+    mat_memory_stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_class, 0, 0);
+  
+  return mat_memory_stream;
+}
+
 static void 
 mat_upload_size(mat_t *self)
 {
@@ -426,8 +437,9 @@ static void
 mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
 {
   fts_atom_t a[MAT_CLIENT_BLOCK_SIZE];
+  fts_atom_t *d;
+  fts_memorystream_t *stream = mat_get_memory_stream();
   
-  int n_rows = mat_get_m(self);
   int n_cols = mat_get_n(self);
   int sent = 0;
   int data_size = size;
@@ -450,8 +462,20 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
     fts_set_int(a+1, ns);
     
     for(i=0; i<n; i++)
-      fts_atom_copy(&self->data[start_id  + sent + i], &a[2+i]);
-    
+    {
+      d = self->data + start_id  + sent + i;
+      
+      /* upload only an object description */
+      if(fts_is_object(d))
+      {
+        fts_memorystream_reset(stream);
+        fts_spost_object((fts_bytestream_t *)stream, fts_get_object(d));
+        fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+        fts_set_symbol(&a[2+i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));                
+      }
+      else
+        fts_atom_copy(d, &a[2+i]);
+    }
     fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
     
     sent += n;
@@ -567,8 +591,10 @@ mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   mat_set_with_onset_from_atoms(self, m * n, ac, at);
   
   if(mat_editor_is_open(self))
-    mat_upload(self);
-  
+  {
+    fts_client_send_message(o, sym_mat_append_row, 0, 0);
+    mat_upload_from_index(self, m, 0, n);
+  }
   fts_object_set_state_dirty(o);
 }
 
@@ -855,6 +881,7 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   self->m = 0;
   self->n = 0;
   self->alloc = 0;
+  self->opened = 0;
   
   if (ac == 0)
     mat_set_size(self, 0, 0);
@@ -924,7 +951,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
   fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
-  fts_class_message_varargs(cl, fts_new_symbol("append"), mat_append_row);
+  fts_class_message_varargs(cl, fts_s_append, mat_append_row);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);
@@ -968,6 +995,7 @@ mat_config(void)
 {
   sym_text = fts_new_symbol("text");
   sym_comma = fts_new_symbol(",");
+  sym_mat_append_row = fts_new_symbol("mat_append_row");
   mat_symbol = fts_new_symbol("mat");
   
   mat_type = fts_class_install(mat_symbol, mat_instantiate);
