@@ -28,7 +28,6 @@ SOURCES = \
 	modules.c	\
 	smem.c		\
 	version.c	\
-	welcome.c	\
 
 
 
