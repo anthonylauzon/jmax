@@ -29,6 +29,7 @@ import ircam.jmax.editors.bpf.renderers.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
+import javax.swing.*;
 import javax.swing.event.*;
 
 /**
@@ -137,7 +138,15 @@ public class BpfGraphicContext extends GraphicContext {
 	return scrollManager;
     }
 
+    public void display(String text)
+    {
+	display.setText(text);;
+    }
 
+    public void setDisplay(JLabel label)
+    {
+	display = label;
+    }
   //---- Fields 
     
     BpfDataModel itsDataModel;
@@ -151,6 +160,8 @@ public class BpfGraphicContext extends GraphicContext {
     BpfToolManager toolManager;
 
     ScrollManager scrollManager;
+    
+    JLabel display;
 }
 
 

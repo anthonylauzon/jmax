@@ -273,6 +273,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 
 	if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
 	else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
+
 	////////////////////////
 
 	for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)

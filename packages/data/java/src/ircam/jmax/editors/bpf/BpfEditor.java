@@ -51,6 +51,14 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	this.geometry = g;
 	this.model = model;
 
+	setLayout(null);
+	displayLabel = new JLabel();
+	displayLabel.setFont(BpfPanel.rulerFont);
+	displayLabel.setBackground(Color.white);
+	displayLabel.setBounds(2, 2, 102, 15);
+	add(displayLabel);
+	validate();
+	
 	model.addBpfListener(new BpfDataListener() {
 		public void pointsDeleted(int[] oldIndexs){BpfEditor.this.repaint();}
 		public void pointAdded(int index) {
@@ -120,6 +128,8 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	renderer = new BpfRenderer(gc);
 	gc.setRenderManager(renderer);
 	gc.setToolManager(manager);
+	
+	gc.setDisplay(displayLabel);
     }
 
     public void setAdapter(BpfAdapter adapter)
@@ -228,6 +238,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     MaxVector oldElements = new MaxVector();
     BpfTableDialog listDialog = null;
+    JLabel displayLabel;
 }
 
 

@@ -130,6 +130,8 @@ public class ArrowTool extends SelecterTool implements DragListener{
 
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
+
+    bgc.display("");
     
     if(bgc.getSelection().isInSelection(ftsObj.getPointAt(0)))
 	deltaX = 0;

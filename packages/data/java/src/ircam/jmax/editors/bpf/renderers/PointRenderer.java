@@ -113,10 +113,9 @@ public class PointRenderer implements ObjectRenderer {
 		//draw the cross and the current values
 		if(bgc.getSelection().size()==1)
 		    {
-			g.drawLine(x, y-15, x, y+15);
-			g.drawLine(x-15, y, x+15, y);
-			g.drawString(""+point.getTime(), x+2, y-15);
-			g.drawString(""+point.getValue(), x+15, y+10);
+			g.drawLine(x, y-10, x, y+10);
+			g.drawLine(x-10, y, x+10, y);
+			bgc.display(point.getTime()+" - "+point.getValue());
 		    }
 	    }
 	else //normal paint
