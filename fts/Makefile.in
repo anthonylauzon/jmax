@@ -112,15 +112,17 @@ TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/OLDpatcherdata.P .deps/abstraction.P .deps/array.P .deps/atom.P \
-.deps/autosave.P .deps/class.P .deps/clipboard.P .deps/connection.P \
-.deps/doctor.P .deps/dsp.P .deps/dspgraph.P .deps/errobj.P \
-.deps/expression.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P \
-.deps/hashtable.P .deps/inout.P .deps/loader.P .deps/mem.P \
-.deps/message.P .deps/object.P .deps/objectlist.P .deps/objectset.P \
-.deps/objtable.P .deps/param.P .deps/patcher.P .deps/patparser.P \
-.deps/property.P .deps/saver.P .deps/selection.P .deps/sigconn.P \
-.deps/symbol.P .deps/template.P .deps/variable.P .deps/version.P \
-.deps/vm.P
+.deps/atomfile.P .deps/autosave.P .deps/class.P .deps/clipboard.P \
+.deps/connection.P .deps/doctor.P .deps/dsp.P .deps/dspgraph.P \
+.deps/errobj.P .deps/expression.P .deps/file.P .deps/fpe.P .deps/ftl.P \
+.deps/ftlmem.P .deps/hashtable.P .deps/inout.P .deps/loader.P \
+.deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
+.deps/object.P .deps/objectlist.P .deps/objectset.P .deps/objtable.P \
+.deps/param.P .deps/patcher.P .deps/patparser.P .deps/post.P \
+.deps/property.P .deps/saver.P .deps/sched.P .deps/selection.P \
+.deps/sigconn.P .deps/soundfile.P .deps/soundfile_af.P \
+.deps/soundfile_def.P .deps/srconv.P .deps/symbol.P .deps/template.P \
+.deps/time.P .deps/variable.P .deps/version.P .deps/vm.P
 SOURCES = $(libfts_la_SOURCES)
 OBJECTS = $(libfts_la_OBJECTS)
 
@@ -128,7 +130,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign fts/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu fts/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -263,7 +265,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign fts/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu fts/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

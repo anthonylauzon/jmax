@@ -56,6 +56,7 @@ static fts_soundfile_format_t format_signed16 = {"raw 16 bit twos complement int
 static fts_soundfile_format_t format_signed24 = {"raw 24 bit twos complement integers", FTS_NULL};
 static fts_soundfile_format_t format_signed32 = {"raw 32 bit twos complement integers", FTS_NULL};
 
+
 /************************************************************************
  *
  *  standard formats hash table
@@ -171,12 +172,13 @@ fts_soundfile_format_is_raw(fts_symbol_t name)
 
 /************************************************************************
  *
- *  init standard formats hash table and symbols
+ *  Initialization of the soundfile module: init standard formats hash 
+ *  table and symbols
  *
  */
 
 void
-fts_soundfile_format_init(void)
+fts_kernel_soundfile_init(void)
 {
   fts_soundfile_format_t format;
   fts_hashtable_init(&the_fts_soundfile_standard_formats_hashtable, 0, FTS_HASHTABLE_MEDIUM);

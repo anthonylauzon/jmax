@@ -40,6 +40,17 @@ symbol.c \
 template.c \
 variable.c \
 version.c \
-vm.c 
+vm.c \
+sched.c \
+time.c \
+file.c \
+atomfile.c \
+midifile.c \
+srconv.c \
+soundfile.c \
+soundfile_af.c \
+soundfile_def.c \
+midi.c \
+post.c 
 
 INCLUDES=-I$(top_srcdir)/include

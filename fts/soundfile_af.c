@@ -43,10 +43,11 @@
  *    Used also in other file, like sfdev.c; used here to choose.
  */
 
+#include <fts/fts.h>
+#include <fts/private/srconv.h>
 
 #include <audiofile.h>
 #include <string.h>
-#include <fts/fts.h>
 
 #ifndef HAVE_AF_VIRTUAL_PARAMETERS 
 #define READ_BLOCK_SIZE 1024

@@ -79,13 +79,13 @@ fts_symbol_t fts_new_symbol_copy(const char *name)
 
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) fts_symbol_t V;
-#include <fts/lang/mess/predefsymbols.h>
+#include <fts/predefsymbols.h>
 
 static void fts_predefine_symbols(void)
 {
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) V = fts_new_symbol(S);
-#include <fts/lang/mess/predefsymbols.h>
+#include <fts/predefsymbols.h>
 }
 
 

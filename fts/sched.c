@@ -18,6 +18,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <fts/fts.h>
 
 #include <stdarg.h>
@@ -297,14 +302,13 @@ void fts_sched_halt( void)
 
 /*****************************************************************************
  *
- *  scheduler module
+ *  Initialization of the scheduler module
  *
  */
 
-static void fts_sched_module_init(void)
+void 
+fts_kernel_sched_init(void)
 {
   fts_sched_init(&main_sched);
 }
-
-fts_module_t fts_sched_module = { "sched", "the sched module", fts_sched_module_init, 0, 0};
 

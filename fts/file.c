@@ -26,6 +26,10 @@
 
 #include <fts/fts.h>
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -39,28 +43,26 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
+#ifdef WIN32
+
+#define fts_path_separator      ';'
+#define fts_path_is_absolute(_p) \
+ ((_p[0] == '/') || \
+  ((_p[1] == ':') && (_p[2] == '/')) || \
+  ((_p[1] == ':') && (_p[2] == '\\')))
+
+#else
+#define fts_path_separator      ':'
+#define fts_path_is_absolute(_p) (_p[0] == '/')
+#endif
+
+
 /* global search path */
 static fts_symbol_t fts_search_path = 0;
 
 /* global project path */
 static fts_symbol_t fts_project_dir = 0;
 
-
-/*******************************************************
- *
- *  files module
- *
- */
-
-extern void fts_soundfile_format_init(void);
-
-static void
-fts_files_init(void)
-{
-  fts_soundfile_format_init();
-}
-
-fts_module_t fts_files_module = {"FTS Files", "FTS File handling", fts_files_init, 0, 0};
 
 
 

@@ -34,6 +34,7 @@ AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+ACX_C_RESTRICT
 
 dnl Checks for library functions.
 AC_FUNC_ALLOCA

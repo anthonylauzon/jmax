@@ -93,9 +93,8 @@ struct fts_midiport_listeners
  *  Initialization of the midi module
  */ 
 
-fts_module_t fts_midi_module = {"MIDI", "MIDI communication", midi_init, 0, 0};
-
-static void midi_init(void)
+void 
+fts_kernel_midi_init(void)
 {
   fts_s_midiport = fts_new_symbol("midiport");
   fts_s__superclass = fts_new_symbol("_superclass");
@@ -885,7 +884,7 @@ void fts_midiport_set_default( int argc, const fts_atom_t *argv)
       fts_object_delete_from_patcher( (fts_object_t *)default_midiport);
     }
 
-  default_midiport = (fts_audioport_t *)fts_get_object( a);
+  default_midiport = (fts_midiport_t *)fts_get_object( a);
 }
 
 fts_midiport_t *fts_midiport_get_default(void)

@@ -33,16 +33,17 @@
 static fts_heap_t *alarms_heap = 0;
 static fts_heap_t *timers_heap = 0;
 
-/*
- * Module initialization
+/***************************************************
+ *
+ *     Module initialization
+ *
  */
-static void fts_time_module_init(void)
+void 
+fts_kernel_time_init(void)
 {
   alarms_heap = fts_heap_new(sizeof(fts_alarm_t));
   timers_heap = fts_heap_new(sizeof(fts_timer_t));
 }
-
-fts_module_t fts_time_module = { "time", "the time module", fts_time_module_init, 0, 0};
 
 
 /****************************************************************************
