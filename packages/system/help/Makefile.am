@@ -1,10 +1,13 @@
 
 helpdir=$(pkgdatadir)/packages/system/help
 help_DATA=\
- bus.help.jmax \
- bus~.help.jmax \
- const.help.jmax \
+ system.summary.jmax \
+ jpatcher.help.jmax \
+ param.help.jmax \
+ preset.help.jmax \
+ print~.help.jmax \
  print.help.jmax \
- system.summary.jmax 
+ receive.help.jmax \
+ send.help.jmax
 
 EXTRA_DIST= $(help_DATA)
