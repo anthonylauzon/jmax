@@ -226,3 +226,5 @@ fts_assign_boot_devices(int argc, char **argv)
   fts_open_logical_device(fts_new_symbol("client"), 0, 0,
 			  class_name, pd_argc, pd_argv);
 }
+
+

@@ -211,9 +211,10 @@ copy_files ()
 		else
 
 		    echo "File or directory $3/$NAME not found" >&2
-		    remove_dest_dir
+
 		    if [ $QUIET = "false" ]
 		    then
+		        remove_dest_dir
 			exit 2
 		    fi
 
@@ -231,7 +232,7 @@ create_tar ()
 {
     if [ $DEST_FILE != "none" ]
     then
-	echo "Creating tar file $DEST_FILE"
+	echo "(A) Creating tar file $DEST_FILE"
 	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $DEST_FILE
     else
 	TARDIR=${RELEASES_DIR}/${VERSION}
@@ -251,7 +252,7 @@ create_tar ()
 	    chmod u+w ${TARFILE}
 	fi
 
-	echo "Creating tar file $TARFILE"
+	echo "(B) Creating tar file $TARFILE"
 	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
 
 	chmod 444 ${TARFILE}
