@@ -542,8 +542,8 @@ public class JMaxApplication {
         {
             // Mac OS X MRJAppBuilder and ProjectBuilder case
             root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root"));
-            properties.put( "jmaxServerName", "fts.wrapper");
-        }
+            properties.put( "macosx", "true");
+	}
         else
         {
             // Linux case, Mac OS X shell script case
@@ -612,7 +612,10 @@ public class JMaxApplication {
 	  ftsName = "fts";
 
 	argv[argc++] = ftsDir + "/" + ftsName;
-		
+
+	if((String)properties.get("macosx") != null)
+	  argv[argc++] = "--root="+((String)properties.get( "jmaxRoot"));
+
 	if (connectionType.equals("pipe"))
 	  argv[argc++] = "--stdio";
 	    
