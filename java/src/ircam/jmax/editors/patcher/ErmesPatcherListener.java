@@ -53,10 +53,9 @@ class ErmesPatcherListener implements FtsPatcherListener
     // pasting;
     // in reality, this should be the only way to add objects
     // to the sketch.
-
-
-    if (window.isPasting())
-      window.addPastedObject(object);
+    if(PatcherClipboardManager.getManager().isPasting()){
+      PatcherClipboardManager.getManager().addPastedObject(object);
+    }
   }
 
   public void objectRemoved(FtsPatcherData data, FtsObject object)
@@ -77,8 +76,8 @@ class ErmesPatcherListener implements FtsPatcherListener
     // in reality, this should be the only way to add connections 
     // to the sketch.
 
-    if (window.isPasting())
-      window.addPastedConnection(connection);
+    if(PatcherClipboardManager.getManager().isPasting())
+      PatcherClipboardManager.getManager().addPastedConnection(connection);
   }
 
   public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
@@ -134,4 +133,6 @@ class ErmesPatcherListener implements FtsPatcherListener
     window.showMessage(msg);
   }
 }
+
+
 

@@ -38,6 +38,8 @@ public class CutAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    editor.Cut();
+    PatcherClipboardManager.getManager().Cut(editor);
   }
 }
+
+

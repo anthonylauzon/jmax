@@ -68,7 +68,7 @@ public class OpenAction extends MenuAction
 	      }
 
 	    frame.setCursor(temp);
-	  }
+ 	  }
 	catch (MaxDocumentException e)
 	  {
 	    frame.setCursor(temp);

@@ -38,6 +38,6 @@ public class DuplicateAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    editor.Duplicate();
+    PatcherClipboardManager.getManager().Duplicate(editor);   
   }
 }

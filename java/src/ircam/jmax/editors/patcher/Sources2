@@ -65,6 +65,9 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/KeyMap.java      \
 	$(INCLUDE_PATH)/KeyEventClient.java  \
 	$(INCLUDE_PATH)/Settings.java \
+	$(INCLUDE_PATH)/PatcherClipboardManager.java \
+	$(INCLUDE_PATH)/PatcherSaveManager.java \
+	$(INCLUDE_PATH)/PatcherPrintManager.java \
 	$(INCLUDE_PATH)/MaxRepaintManager.java 
 
 

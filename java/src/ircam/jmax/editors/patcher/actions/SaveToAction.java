@@ -37,6 +37,6 @@ public class SaveToAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    editor.SaveTo();
+     PatcherSaveManager.SaveTo(editor);
   }
 }

@@ -38,6 +38,6 @@ public class PrintAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    editor.Print();
+    PatcherPrintManager.Print(editor);
   }
 }

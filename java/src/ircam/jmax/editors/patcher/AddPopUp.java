@@ -44,6 +44,7 @@ public class AddPopUp extends JPopupMenu
 
   int x;
   int y;
+  static public boolean initDone = false;
 
   static class AddPopUpListener implements ActionListener
   {
@@ -105,6 +106,7 @@ public class AddPopUp extends JPopupMenu
   {
     popup.x = x;
     popup.y = y;
+    popup.setPopupSize(100, 200);
     popup.show(invoker, x - 2, y - 2);
   }
 
@@ -119,6 +121,7 @@ public class AddPopUp extends JPopupMenu
 
     item.addActionListener(new AddPopUpListener(descr, message, edit));
     popup.add(item);
+    popup.pack();
   }
 
 
@@ -135,6 +138,7 @@ public class AddPopUp extends JPopupMenu
       menu = new JMenu(name);
 
     popup.add(menu);
+    popup.pack();
     subMenus.put(name, menu);
 
     return menu;
@@ -158,7 +162,19 @@ public class AddPopUp extends JPopupMenu
     item.addActionListener(new AddPopUpSubMenuListener(descr, message, edit));
     menu.add(item);
   }
+
+  public static void initDone(){
+    initDone = true;
+  }
 }
+
+
+
+
+
+
+
+
 
 
 

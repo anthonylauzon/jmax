@@ -163,6 +163,8 @@ public class ErmesToolBar extends JPanel  {
   private void addButton( String descr, String iconName, String message)
   {
     toolBar.add( new ErmesToolButton(this, descr, Icons.get(iconName), message));
+    if(!AddPopUp.initDone)
+      AddPopUp.addAbbreviation(iconName, descr, message, true);
   }
 
   private void insertButtons()
@@ -178,5 +180,7 @@ public class ErmesToolBar extends JPanel  {
     addButton( "slider",  "_slider_", "Adding New Slider");
     addButton( "intbox",   "_intbox_", "Adding New Integer Box");
     addButton( "floatbox", "_floatbox_", "Adding New Float Box");
+    AddPopUp.initDone();//????
   }
 }
+

@@ -24,5 +24,6 @@
 #
 
 SOURCES = AbbreviationCmd.java\
+	  PatcherMenuCmd.java\
 	  TclErmesPackage.java
 

@@ -105,6 +105,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   ErmesSketchWindow itsSketchWindow;
 
+  final public ErmesSketchWindow getSketchWindow()
+  {
+    return itsSketchWindow;
+  }
+
   private Fts fts;
 
   public Fts getFts()
@@ -121,12 +126,14 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   FtsPatcherData itsPatcherData;
 
+  public FtsPatcherData getFtsPatcherData()
+  {
+    return itsPatcherData;
+  }
 
-  // Shouldn't/Couldn't the popup being static, or created on the fly ?
-
-  private EditField itsEditField;
-
-  // FONT HANDLING
+  // ---------------------------------------------------------------------
+  // font handling
+  // --------------------------------------------------------------------
 
   private String defaultFontName;
   private int defaultFontSize;
@@ -151,104 +158,49 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     defaultFontSize = v;
   }
 
-  final public ErmesSketchWindow getSketchWindow()
-  {
-    return itsSketchWindow;
-  }
-  
+  // ---------------------------------------------------------
+  // paste/copy/past  related variables and methods
+  // ---------------------------------------------------------
   private int incrementalPasteOffsetX;
   private int incrementalPasteOffsetY;
-  int numberOfPaste = 0;
+  private int numberOfPaste = 0;
   private FtsObject anOldPastedObject = null;
-  
+  private int lastCopyCount;
+
+  int getPasteNumber(){
+    return ++numberOfPaste;
+  }
   void resetPaste(int n)
   {
     numberOfPaste = n;
+  }  
+  void setOldPastedObject(FtsObject obj){
+    anOldPastedObject = obj;
+  }
+  FtsObject getOldPastedObject(){
+    return anOldPastedObject;
+  }
+  void setIncrementalPasteOffsets(int offsetX, int offsetY){
+    incrementalPasteOffsetX = offsetX;
+    incrementalPasteOffsetY = offsetY;
+  }
+  int getPasteOffsetX(){
+    return incrementalPasteOffsetX;
+  }
+  int getPasteOffsetY(){
+    return incrementalPasteOffsetY;
+  }
+  void setLastCopyCount(int count){
+    lastCopyCount = count;
+  }
+  int getLastCopyCount(){
+    return lastCopyCount;
   }
 
-  // note: the following function is a reduced version of InitFromFtsContainer.
-  // better organization urges
+  // --------------------------------------------------------------
+  // init
+  // --------------------------------------------------------------
 
-  void PasteObjects( MaxVector objectVector, MaxVector connectionVector) 
-  {
-    FtsObject	fo;
-    FtsConnection fc;
-    GraphicObject object;
-    GraphicConnection connection;
-
-    numberOfPaste += 1;
-
-    if (isTextEditingObject())
-      stopTextEditing();
-
-    ErmesSelection.patcherSelection.setOwner(this); 
-
-    if (! ErmesSelection.patcherSelection.isEmpty())
-      {
-	ErmesSelection.patcherSelection.redraw(); 
-	ErmesSelection.patcherSelection.deselectAll();
-      }
-
-    fo = (FtsObject)objectVector.elementAt( 0);
-
-    if (numberOfPaste == 0) 
-      {
-	incrementalPasteOffsetX = 0;
-	incrementalPasteOffsetY = 0;
-      }
-    else if (numberOfPaste == 1) 
-      {
-	anOldPastedObject = fo;
-
-	incrementalPasteOffsetX = 20;
-	incrementalPasteOffsetY = 20;
-      }
-    else if (numberOfPaste == 2) 
-      {
-	incrementalPasteOffsetX = (anOldPastedObject.getX() - fo.getX());
-	incrementalPasteOffsetY = (anOldPastedObject.getY() - fo.getY());
-      }
-
-    for ( Enumeration e = objectVector.elements(); e.hasMoreElements();) 
-      {
-	fo = (FtsObject)e.nextElement();
-
-	int newPosX = fo.getX() + numberOfPaste*incrementalPasteOffsetX;
-	int newPosY = fo.getY() + numberOfPaste*incrementalPasteOffsetY;
-
-	fo.setX( newPosX);
-	fo.setY( newPosY);
-
-	object = GraphicObject.makeGraphicObject( this, fo);
-	displayList.add( object);
-	ErmesSelection.patcherSelection.select( object);
-	object.redraw();
-      }
-
-    GraphicObject fromObj, toObj;
-    
-    for ( Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) 
-      {
-	fc = (FtsConnection)e2.nextElement();
-
-	connection = new GraphicConnection( this, 
-					  displayList.getGraphicObjectFor(fc.getFrom()),
-					  fc.getFromOutlet(), 
-					  displayList.getGraphicObjectFor(fc.getTo()),
-					  fc.getToInlet(),
-					  fc);
-
-	displayList.add( connection);
-
-	ErmesSelection.patcherSelection.select( connection);
-	connection.updateDimensions();
-	connection.redraw();
-      }
-
-    displayList.reassignLayers();
-    displayList.sortDisplayList();
-  }
-  
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
   {
     FtsPatcherData aFtsPatcherData = theContainerObject;
@@ -259,12 +211,12 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     for ( int i = 0; i < osize; i++)
       {
 	GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsObject)objects[i]);
+
 	displayList.add( object);
 
 	if (object.getLayer() < 0)
 	  doLayers = true;
       }
-		
 
     MaxVector connectionVector = aFtsPatcherData.getConnections();
     Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
@@ -289,6 +241,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       displayList.reassignLayers();
 
     displayList.sortDisplayList();
+
+    //fix bug 170
+    aFtsPatcherData.getDocument().setSaved(true);
   }
 
   //--------------------------------------------------------
@@ -354,7 +309,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     fixSize();
 
-    requestDefaultFocus(); // ???
+    requestDefaultFocus(); 
   }
 	
 
@@ -419,6 +374,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     revalidate(); // ????
   }
 
+  // ----------------------------------------------------------------
+  // scrolling support
+  // ----------------------------------------------------------------
 
   public boolean pointIsVisible(Point point, int margin)
   {
@@ -466,7 +424,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   // if the selection is outside the current visible 
   // area, rescroll to show it
-
   void showSelection()
   {
     Rectangle selectionBounds = ErmesSelection.patcherSelection.getBounds();
@@ -482,7 +439,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       }
   }
 
-
   static final private Dimension minSize = new Dimension(30, 20);
 
   public Dimension getMinimumSize() 
@@ -490,6 +446,10 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return minSize;
   }
 	
+  // ---------------------------------------------------------------
+  // create a graphic Object
+  // ---------------------------------------------------------------
+
   GraphicObject makeObject( String description, int x, int y)
   {
     FtsObject fo;
@@ -517,9 +477,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return object;
   }
 
-  /* Handling of the object text editing */
-
+  // -----------------------------------------------------------------------
+  // Handling of the object text editing
+  // -----------------------------------------------------------------------
   Editable editedObject = null;
+  private EditField itsEditField;
 
   final public EditField getEditField()
   {
@@ -558,7 +520,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     editedObject = null;
   }
 
-
+  //////////////////////////////////////////////////
   public void showObject( Object obj)
   {
     // Should select or highlight obj if it is an FtsObject
@@ -600,6 +562,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
 
+  // ------------------------------------------------------------------------
+  // toolbar support
+  // ------------------------------------------------------------------------
   private ErmesToolBar toolBar;
 
   final void setToolBar( ErmesToolBar toolBar)
@@ -640,7 +605,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     anOldPastedObject = null;
   }
   
+  // -----------------------------------------------------------------------
   // The waiting/stopWaiting service
+  // -----------------------------------------------------------------------
 
   private int waiting = 0;
 
@@ -660,10 +627,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       setCursor( Cursor.getDefaultCursor());
   }
 
-  // ----------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // Mode handling
-  // ----------------------------------------------------------------------
-
+  // ------------------------------------------------------------------------
 
   private boolean locked = false;
 
@@ -693,10 +659,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return locked;
   }
 
-  /* Temporary support for text cut/pasting; will work only between objects,
-     not in the general case; the general case need to use the real JDK clipboard
-     support, and will be done when the patcher editor will be based on the toolkit.
-     */
+  // ------------------------------------------------------------------------
+  //Temporary support for text cut/pasting; will work only between objects,
+  //not in the general case; the general case need to use the real JDK clipboard
+  //support, and will be done when the patcher editor will be based on the toolkit.
+  // ------------------------------------------------------------------------
      
   void pasteText()
   {
@@ -738,8 +705,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     itsEditField.deleteSelectedText();
   }
 
+  // ------------------------------------------------------------------------
   // Annotations; should be done better ..
-
+  // ------------------------------------------------------------------------
   private boolean annotating = false;
 
   public void setAnnotating()
@@ -761,9 +729,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       }
   }
 
+  // ------------------------------------------------------------------------
   // Support for keeping a unique supplementary keylistener
   // in the sketchpad; used currently by the number box, the other
   // are Swing components and use the focus.
+  // ------------------------------------------------------------------------
 
   KeyEventClient keyEventClient;
 
@@ -787,14 +757,18 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       }
   }
 
-
-  // Support for the new Interaction Model
-
+  // ------------------------------------------------------------------------
+  // popoup
+  // ------------------------------------------------------------------------
   public void showAddPopUp(Point p)
   {
     AddPopUp.popup(this, p.x, p.y);
   }
 
+
+  // ------------------------------------------------------------------------
+  // Support for the new Interaction Model
+  // ------------------------------------------------------------------------
   private InteractionEngine engine;
 
   public void setRunModeInteraction()
@@ -857,10 +831,11 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     engine.popInteraction();
   }
 
-  
+  // ------------------------------------------------------------------------
   // Support for the inlet/outlet highligthing;
   // to avoid adding to much memory to every object,
   // we store here the id of the higlighted inlet and outlet
+  // ------------------------------------------------------------------------
 
   private int highlightedInlet;
   private GraphicObject  highlightedInletObject = null;
@@ -965,14 +940,15 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
   // General Highlighting reset function
-
   public void resetHighlighted()
   {
     resetHighlightedOutlet();
     resetHighlightedInlet();
   }
 
+  // -----------------------------------------------------------------
   // Messages 
+  // -----------------------------------------------------------------
 
   public void showMessage(String text)
   {
@@ -989,3 +965,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return itsSketchWindow.isMessageReset();
   }
 }
+
+
+
+
+
+

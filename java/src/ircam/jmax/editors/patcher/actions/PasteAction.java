@@ -38,6 +38,6 @@ public class PasteAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    editor.Paste();
+    PatcherClipboardManager.getManager().Paste(editor);    
   }
 }

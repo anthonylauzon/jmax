@@ -45,7 +45,6 @@ public class TclErmesPackage
     Interp interp = MaxApplication.getTclInterp();
 
     /* TCL generic */
-
     interp.createCommand("patcherMenu", new AbbreviationCmd());
   }
 }

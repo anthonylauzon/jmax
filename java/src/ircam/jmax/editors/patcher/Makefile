@@ -132,5 +132,23 @@ ObjectAction:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ObjectAction.java)
 .PHONY: ObjectAction
 
+PatcherClipboardManager:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) PatcherClipboardManager.java)
+.PHONY: PatcherClipboardManager
+
+PatcherSaveManager:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) PatcherSaveManager.java)
+.PHONY: PatcherSaveManager
+
+PatcherPrintManager:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) PatcherPrintManager.java)
+.PHONY: PatcherPrintManager
+
+AddPopUp:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) AddPopUp.java)
+.PHONY: AddPopUp
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+
