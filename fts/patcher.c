@@ -1051,7 +1051,7 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if(!fts_object_is_error((fts_object_t *)self))
   {
     fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
-    
+
     fts_object_get_prop((fts_object_t *)self, fts_s_wx, a);
     fts_object_get_prop((fts_object_t *)self, fts_s_wy, a+1);
     fts_object_get_prop((fts_object_t *)self, fts_s_ww, a+2);
