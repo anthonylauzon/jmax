@@ -27,11 +27,7 @@ typedef struct _seqfind_
 {
   fts_object_t head;
   track_t *track;
-  fts_symbol_t mode;
 } seqfind_t;
-
-static fts_symbol_t sym_first = 0;
-static fts_symbol_t sym_all = 0;
 
 /************************************************************
  *
@@ -39,42 +35,128 @@ static fts_symbol_t sym_all = 0;
  *
  */
 
-static void 
-seqfind_find_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
+static void
+seqfind_all_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   seqfind_t *this = (seqfind_t *)o;
   event_t *event = track_get_first(this->track);
-	  
+
   while(event)
+  {
+    fts_atom_t *value = event_get_value(event);
+
+    if(fts_atom_equals(value, at))
     {
-      fts_atom_t *value = event_get_value(event);
+      fts_outlet_float(o, 1, (float)event_get_time(event));
+      fts_outlet_atom(o, 0, value);
+    }
 
-      if(fts_atom_compare(value, at))
-	{
-	  fts_outlet_float(o, 1, (float)event_get_time(event));
-	  fts_outlet_varargs(o, 0, 1, value);
-
-	  if(this->mode == sym_first)
-	    break;
-	}
-      
-      event = event_get_next(event);
-    }  
+    event = event_get_next(event);
+  }
 }
 
 static void
-seqfind_find_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_first_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac == 1)
-    seqfind_find_single(o, 0, 0, 1, at);
-  else if(ac > 1)
+  seqfind_t *this = (seqfind_t *)o;
+  event_t *event = track_get_first(this->track);
+
+  while(event)
+  {
+    fts_atom_t *value = event_get_value(event);
+
+    if(fts_atom_equals(value, at))
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      seqfind_find_single(o, 0, 0, 1, &a);
+      fts_outlet_float(o, 1, (float)event_get_time(event));
+      fts_outlet_atom(o, 0, value);
+
+      break;
     }
+
+    event = event_get_next(event);
+  }
+}
+
+static void
+seqfind_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqfind_t *this = (seqfind_t *)o;
+  track_t *track = this->track;
+  double time = 0.0;
+  double epsilon = 0.0;
+
+  if(ac > 0 && fts_is_number(at))
+    time = fts_get_number_float(at);
+
+  if(time < 0.0)
+    time = 0.0;
+
+  if(ac > 1 && fts_is_number(at))
+    epsilon = fts_get_number_float(at);
+
+  if(epsilon < 0.0)
+    epsilon = 0.0;
+
+  if(track_get_size(track) > 0 && time - epsilon <= event_get_time(track_get_last(track)))
+  {
+    event_t *event = track_get_first(track);
+
+    while(time - epsilon > event_get_time(event))
+      event = event_get_next(event);
+
+    while(event && time + epsilon >= event_get_time(event))
+    {
+      fts_atom_t *value = event_get_value(event);
+
+      fts_outlet_float(o, 1, (float)event_get_time(event));
+      fts_outlet_varargs(o, 0, 1, value);
+
+      event = event_get_next(event);
+    }
+  }
+}
+
+static void
+seqfind_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqfind_t *this = (seqfind_t *)o;
+  track_t *track = this->track;
+  double time = 0.0;
+  double epsilon = 0.0;
+
+  if(ac > 0 && fts_is_number(at))
+    time = fts_get_number_float(at);
+
+  if(time < 0.0)
+    time = 0.0;
+
+  if(ac > 1 && fts_is_number(at))
+    epsilon = fts_get_number_float(at);
+
+  if(epsilon < 0.0)
+    epsilon = 0.0;
+
+  if(track_get_size(track) > 0 &&
+     time - epsilon <= event_get_time(track_get_last(track)) + event_get_duration(track_get_last(track)))
+  {
+    event_t *event = track_get_first(track);
+
+    while(time - epsilon >= event_get_time(event) + event_get_duration(event))
+      event = event_get_next(event);
+
+    while(event && time + epsilon >= event_get_time(event))
+    {
+      if(time - epsilon < event_get_time(event) + event_get_duration(event))
+      {
+        fts_atom_t *value = event_get_value(event);
+
+        fts_outlet_float(o, 1, (float)event_get_time(event));
+        fts_outlet_varargs(o, 0, 1, value);
+      }
+
+      event = event_get_next(event);
+    }
+  }
 }
 
 static void
@@ -85,32 +167,6 @@ seqfind_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_object_release(this->track);
   this->track = (track_t *)fts_get_object(at);
   fts_object_refer(this->track);
-}
-
-static void
-seqfind_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqfind_t *this = (seqfind_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-    {
-      fts_symbol_t mode = fts_get_symbol(at);
-      
-      if(mode == sym_first)
-	this->mode = sym_first;
-      else if(mode == sym_all)
-	this->mode = sym_all;
-      else
-	fts_object_error(o, "doesn't understand mode %s", mode);
-    }
-  else
-    fts_object_error(o, "symbol argument required for message mode");
-}
-
-static void
-seqfind_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  seqfind_set_mode(o, 0, 0, 1, value);
 }
 
 /************************************************************
@@ -125,7 +181,6 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   seqfind_t *this = (seqfind_t *)o;
 
   this->track = 0;
-  this->mode = sym_first;
 
   if(ac > 0 && fts_is_a(at, track_class))
     {
@@ -149,24 +204,20 @@ static void
 seqfind_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqfind_t), seqfind_init, seqfind_delete);
-  
-  fts_class_message_varargs(cl, fts_new_symbol("mode"), seqfind_set_mode);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), seqfind_set_mode_prop);
 
-  fts_class_inlet_number(cl, 0, seqfind_find_single);
-  fts_class_inlet_symbol(cl, 0, seqfind_find_single);
-  fts_class_inlet_varargs(cl, 0, seqfind_find_varargs);
+  fts_class_message_varargs(cl, fts_new_symbol("first"), seqfind_first_value);
+  fts_class_message_varargs(cl, fts_new_symbol("event"), seqfind_event);
+  fts_class_message_varargs(cl, fts_new_symbol("segment"), seqfind_segment);
+
+  fts_class_inlet_atom(cl, 0, seqfind_all_values);
   fts_class_inlet(cl, 1, track_class, seqfind_set_track);
 
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_atom(cl, 0);
   fts_class_outlet_float(cl, 1);
 }
 
 void
 seqfind_config(void)
 {
-  sym_first = fts_new_symbol("first");
-  sym_all = fts_new_symbol("all");
-
   fts_class_install(fts_new_symbol("find"), seqfind_instantiate);
 }

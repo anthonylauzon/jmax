@@ -800,13 +800,6 @@ messbox_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
  *
  */
 
-static void messbox_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messbox_t *this = (messbox_t *)obj;
-
-  fts_set_int(value, this->value);
-}
-
 static void messbox_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(messbox_t), messbox_init, messbox_delete);
@@ -822,8 +815,6 @@ static void messbox_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, messbox_update_gui); 
   fts_class_message_varargs(cl, fts_s_update_real_time, messbox_update_real_time); 
   fts_class_message_varargs(cl, fts_s_spost_description, messbox_spost_description); 
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
   fts_class_message_varargs(cl, fts_new_symbol("click"), messbox_click);
   

@@ -199,9 +199,7 @@ static void fts_binary_file_dispose( fts_binary_file_descr_t *descr)
    */
 fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
-  fts_status_t status;
   FILE *f;
-  fts_object_t *obj;
   fts_binary_file_descr_t descr;
 
   if ( !(f = fopen( name, "rb")))
@@ -231,7 +229,6 @@ fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac,
 
 fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
-  fts_object_t *obj;
   fts_binary_file_descr_t descr;
 
   /* Rewind the file */

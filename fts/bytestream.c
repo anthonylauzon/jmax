@@ -434,7 +434,6 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
 {
   fts_udpstream_t* self = (fts_udpstream_t*)o;
   struct sockaddr_in addr;
-  fts_atom_t a;
 
   self->port = fts_get_int_arg(ac, at, 0, FTS_UDP_DEFAULT_PORT);
   self->connected_port = -1;

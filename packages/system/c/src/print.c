@@ -91,6 +91,8 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   else if(s == NULL)
     fts_spost(this->stream, "<bang>\n");
+  else
+    fts_spost(this->stream, "\n");
 }
 
 /**********************************************************************

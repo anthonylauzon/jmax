@@ -60,6 +60,27 @@ tuple_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
+tuple_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+
+  fts_array_set(&this->args, ac, at);
+}
+
+static void
+tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess;
+
+  /* send size message */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append(mess, fts_array_get_size(&this->args), fts_array_get_atoms(&this->args));
+  fts_dumper_message_send(dumper, mess);
+}
+
+static void
 tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
@@ -79,13 +100,10 @@ static void
 tuple_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
-  int index = fts_get_int_arg( ac, at, 0, -1);
-  fts_atom_t a;
+  int index = fts_get_int_arg(ac, at, 0, -1);
 
   if (index >= 0 && index < fts_array_get_size( &this->args))
-    {
-      fts_return( fts_array_get_atoms( &this->args) + index);
-    }
+    fts_return( fts_array_get_atoms( &this->args) + index);
 }
 
 static void
@@ -95,6 +113,9 @@ tuple_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_post, tuple_post);
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
+
+  fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);
+  fts_class_message_varargs(cl, fts_s_set, tuple_set);
 
   fts_class_set_equals_function(cl, tuple_equals);
 }

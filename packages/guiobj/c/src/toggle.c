@@ -95,14 +95,6 @@ toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-toggle_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  toggle_t *this = (toggle_t *)obj;
-
-  fts_set_int(value, this->value);
-}
-
-static void 
 toggle_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(toggle_t), 0, 0);
@@ -117,8 +109,6 @@ toggle_instantiate(fts_class_t *cl)
   fts_class_inlet_bang(cl, 0, toggle_toggle);
   fts_class_inlet_number(cl, 0, toggle_number);
   fts_class_inlet_varargs(cl, 0, toggle_number);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, toggle_get_value);
 
   fts_class_outlet_int(cl, 0);
 }

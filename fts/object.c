@@ -21,6 +21,7 @@
  */
 
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include <ftsconfig.h>
 #if HAVE_ALLOCA_H

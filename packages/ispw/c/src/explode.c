@@ -1027,34 +1027,31 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-explode_put_name_daemon(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+explode_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  explode_t *this = (explode_t *)obj;
+  explode_t *this = (explode_t *)o;
 
-  if (this->data.name == 0)
+  if (this->data.name == 0 && ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_atom_t av[3];
+
+    if (register_explode(this, name))
+      this->data.name = name;
+    else
     {
-      fts_atom_t av[2];
-      fts_symbol_t name;
+      post("explode: %s: named already exists\n", name);
+      this->data.name = 0;
 
-      name = fts_get_symbol(value);
-
-      if (register_explode(this, name))
-	this->data.name = name;
-      else
-	{
-	  post("explode: %s: named already exists\n", name);
-	  this->data.name = 0;
-
-	  return;
-	}
-      
-      /* change its description */
-
-      fts_set_symbol(&av[0], fts_new_symbol("explode"));
-      fts_set_symbol(&av[1], name);
-      
-      fts_object_set_description(obj, 2, av);
+      return;
     }
+
+    /* change its description */
+    fts_set_symbol(&av[0], fts_s_colon);
+    fts_set_symbol(&av[1], fts_new_symbol("explode"));
+    fts_set_symbol(&av[2], name);
+    fts_object_set_description(o, 3, av);
+  }
 }
 
 static void
@@ -1413,6 +1410,7 @@ explode_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("startat"), explode_startat_mth);
   fts_class_message_varargs(cl, fts_new_symbol("followat"), explode_followat_mth);
   fts_class_message_varargs(cl, fts_new_symbol("params"), explode_params_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("name"), explode_set_name);
 
   /* export standard MIDI file */
   fts_class_message_varargs(cl, fts_s_export, explode_export);
@@ -1429,9 +1427,6 @@ explode_instantiate(fts_class_t *cl)
   fts_class_outlet_int(cl, 2);
   fts_class_outlet_int(cl, 3);
   fts_class_outlet_int(cl, 4);
-
-  /* add the rename daemon */
-  fts_class_add_daemon(cl, obj_property_put, fts_s_name, explode_put_name_daemon);
 }
 
 void explay_config(void);

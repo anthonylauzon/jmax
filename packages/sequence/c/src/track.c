@@ -610,6 +610,8 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     else
       fts_object_error(o, "insert: event type missmatch\n");
   }
+  else
+    fts_object_error(o, "insert: bad time value\n");
 }
 
 static void

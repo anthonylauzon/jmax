@@ -280,5 +280,5 @@ seqstep_instantiate(fts_class_t *cl)
 void
 seqstep_config(void)
 {
-  fts_class_install(fts_new_symbol("seqstep"), seqstep_instantiate);
+  fts_class_install(fts_new_symbol("step"), seqstep_instantiate);
 }

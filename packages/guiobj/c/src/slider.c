@@ -112,8 +112,6 @@ slider_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 slider_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
-
   if(ac > 0 && fts_is_number(at))
     slider_number(o, 0, 0, 1, at);
 }
@@ -121,8 +119,6 @@ slider_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void
 slider_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
-
   slider_set_and_output(o, 0, 0, 1, at);
 }
 
@@ -205,24 +201,6 @@ slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_set_int(&a, this->persistence);
       fts_return(&a);
     }
-}
-
-static void
-slider_put_min(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  slider_set_min(o, 0, 0, 1, value);
-}
-
-static void
-slider_put_max(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  slider_set_max(o, 0, 0, 1, value);
-}
-
-static void
-slider_put_orientation(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  slider_set_orientation(o, 0, 0, 1, value);
 }
 
 static void 
@@ -331,16 +309,12 @@ slider_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_max_value, slider_set_max); 
   fts_class_message_varargs(cl, fts_s_orientation, slider_set_orientation); 
 
-  /* property daemons for compatibilty with older bmax files */
-  fts_class_add_daemon(cl, obj_property_put, fts_s_min_value, slider_put_min);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_max_value, slider_put_max);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_orientation, slider_put_orientation);
-
   fts_class_message_varargs(cl, fts_s_set, slider_set);
   fts_class_message_varargs(cl, fts_s_range, slider_set_range);
 
   fts_class_message_varargs(cl, fts_s_send, slider_set_and_output);
 
+  fts_class_inlet_void(cl, 0, slider_bang);
   fts_class_inlet_number(cl, 0, slider_number);
   fts_class_inlet_varargs(cl, 0, slider_varargs);
 

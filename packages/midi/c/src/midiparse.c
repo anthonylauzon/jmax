@@ -20,6 +20,8 @@
  * 
  */
 
+#include <stdlib.h>
+
 #include <fts/fts.h>
 #include <ftsconfig.h>
 

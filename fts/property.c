@@ -262,10 +262,6 @@ fts_property_daemon_list_get(fts_daemon_entry_t **list,
   return 0;
 }
 
-
-
-
-
 /* Object put */
 
 void
@@ -281,14 +277,15 @@ _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t 
 void
 fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value)
 {
-  fts_property_daemon_t d;
+  if(!fts_is_void(value) && !fts_send_message(obj, property, 1, value))
+  {
+    fts_property_daemon_t d = fts_property_daemon_list_get(&(fts_object_get_class(obj)->daemons), obj_property_put, property);
 
-  d = fts_property_daemon_list_get(&(fts_object_get_class(obj)->daemons), obj_property_put, property);
-  
-  if (d)
-    (* d)(obj_property_put, obj, property, (fts_atom_t *)value);
-  else
-    _fts_object_put_prop(obj, property, value);
+    if (d)
+      (* d)(obj_property_put, obj, property, (fts_atom_t *)value);
+    else
+      _fts_object_put_prop(obj, property, value);
+  }
 }
 
 

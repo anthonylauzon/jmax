@@ -130,12 +130,6 @@ comment_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-static void
-comment_put_text(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  comment_set_text(o, 0, 0, 1, value);
-}
-
 static void 
 comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -184,9 +178,6 @@ comment_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_comment, comment_set_text);
   fts_class_message_varargs(cl, fts_s_color, comment_set_color); 
-
-  /* property daemon for compatibilty with older bmax files */
-  fts_class_add_daemon(cl, obj_property_put, fts_s_comment, comment_put_text);
 }
 
 void 

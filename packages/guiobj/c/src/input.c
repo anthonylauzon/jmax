@@ -123,7 +123,6 @@ static void
 input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   input_t *self = (input_t *)o;
-  int outlets, i;
 
   fts_dsp_object_init((fts_dsp_object_t*)self);
 

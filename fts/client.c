@@ -301,6 +301,7 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
 
 /* Actions */
 
+#ifndef WORDS_BIGENDIAN
 static void swap_bytes( unsigned char *p, int n)
 {
   int i, tmp;
@@ -312,6 +313,7 @@ static void swap_bytes( unsigned char *p, int n)
     p[n-i-1] = tmp;
   }
 }
+#endif
 
 static int get_int_from_bytes( unsigned char *p)
 {
@@ -649,7 +651,7 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 {
   client_t *this = (client_t *)o;
   int i;
-  FILE* log;
+
   if ( size <= 0)
   {
     client_error( "[client] error in reading message, client stopped");
@@ -1260,10 +1262,6 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 void fts_client_done_message( fts_object_t *obj)
 {
   client_t *client = object_get_client( obj);
-  FILE* log;
-  unsigned char* buff;
-
-  int i;
 
   if ( !client || client->stream == NULL)
     return;

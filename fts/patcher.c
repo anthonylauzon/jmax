@@ -43,7 +43,6 @@ static fts_class_t *patcher_inout_class = 0;
 static fts_class_t *receive_class = 0;
 static fts_class_t *send_class = 0;
 
-static fts_symbol_t sym_set_title = 0;
 static fts_symbol_t sym_showObject = 0;
 static fts_symbol_t sym_stopWaiting = 0;
 static fts_symbol_t sym_redefineStart = 0;
@@ -1138,26 +1137,26 @@ patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_put_prop(o, fts_s_wx, at);
+  _fts_object_put_prop(o, fts_s_wx, at);
 }
 
 static void
 patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_put_prop(o, fts_s_wy, at);
+  _fts_object_put_prop(o, fts_s_wy, at);
 }
 
 static void
 patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_put_prop(o, fts_s_ww, at);
+  _fts_object_put_prop(o, fts_s_ww, at);
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void
 patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_put_prop(o, fts_s_wh, at);
+  _fts_object_put_prop(o, fts_s_wh, at);
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
@@ -1930,7 +1929,7 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("set_wy"), patcher_set_wy);
   fts_class_message_varargs(cl, fts_new_symbol("set_ww"), patcher_set_ww);
   fts_class_message_varargs(cl, fts_new_symbol("set_wh"), patcher_set_wh);
-
+  
   fts_class_message_varargs(cl, fts_new_symbol("add_object"), patcher_add_object_from_client);
   fts_class_message_varargs(cl, fts_new_symbol("delete_objects"), patcher_delete_objects_from_client);
   fts_class_message_varargs(cl, fts_new_symbol("add_connection"), patcher_add_connection_from_client);

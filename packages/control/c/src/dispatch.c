@@ -43,7 +43,6 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(a && fts_is_object(a))
     {
       fts_object_t *obj = fts_get_object(a);
-      fts_class_t *class = fts_object_get_class(obj);
       fts_method_t method = NULL;;
 
       if(method)

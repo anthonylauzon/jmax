@@ -41,8 +41,6 @@ static char *loading_project_dir = NULL;
 fts_package_t * 
 fts_project_open(const char* filename)
 {
-  fts_symbol_t sym;
-  char name[256];
   char *fnm;
   fts_package_t *package;
 

@@ -26,6 +26,8 @@ typedef int (*fts_equals_function_t)( const fts_atom_t *, const fts_atom_t *);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
+FTS_API void fts_class_instantiate(fts_class_t *cl);
+
 /* Predefined typeids */
 #define FTS_FIRST_OBJECT_TYPEID   16
 

@@ -1103,12 +1103,6 @@
 			path = ../../packages/sequence/help/find.help.jmax;
 			refType = 2;
 		};
-		F5734E9703868CCA01664092 = {
-			isa = PBXFileReference;
-			name = locate.help.jmax;
-			path = ../../packages/sequence/help/locate.help.jmax;
-			refType = 2;
-		};
 		F5734E9803868CCA01664092 = {
 			isa = PBXFileReference;
 			name = play.help.jmax;
@@ -1123,9 +1117,9 @@
 		};
 		F5734E9B03868CCA01664092 = {
 			isa = PBXFileReference;
-			name = seqstep.help.jmax;
-			path = ../../packages/sequence/help/seqstep.help.jmax;
-			refType = 2;
+			name = step.help.jmax;
+			path = /Users/schnell/Projects/jmax/packages/sequence/help/step.help.jmax;
+			refType = 0;
 		};
 		F5734E9C03868CCA01664092 = {
 			isa = PBXFileReference;
@@ -1135,12 +1129,6 @@
 		};
 		F5734EA503868D0401664092 = {
 			fileRef = F5734E9503868CCA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5734EA703868D0401664092 = {
-			fileRef = F5734E9703868CCA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -8808,7 +8796,6 @@
 				F851250E028BEC7D01664092,
 				F851250F028BEC7D01664092,
 				F5734E9503868CCA01664092,
-				F5734E9703868CCA01664092,
 				F5734E9803868CCA01664092,
 				F5734E9A03868CCA01664092,
 				F5734E9B03868CCA01664092,
@@ -11601,7 +11588,6 @@
 				F8512533028BED1101664092,
 				F8512534028BED1101664092,
 				F5734EA503868D0401664092,
-				F5734EA703868D0401664092,
 				F5734EA803868D0401664092,
 				F5734EAA03868D0401664092,
 				F5734EAB03868D0401664092,

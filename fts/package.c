@@ -1209,7 +1209,6 @@ void
 __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
-  fts_atom_t a;
 
   if ((ac > 0) && fts_is_symbol(at)) { 
     pkg->name = fts_get_symbol(at);
