@@ -20,6 +20,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
+import java.awt.print.*;
 
 public class PatcherPrintManager
 {
@@ -37,20 +38,17 @@ public class PatcherPrintManager
 
     RepaintManager.currentManager(sketch).setDoubleBufferingEnabled(false);
 
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Patcher", MaxApplication.getProperties());
+    PrinterJob printJob = PrinterJob.getPrinterJob();
+    PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+    printJob.setPrintable(sketch, format);
 
-    if (aPrintjob != null)
-      {
-	Graphics aPrintGraphics = aPrintjob.getGraphics();
-
-	if (aPrintGraphics != null)
-	  {
-	    sketch.print( aPrintGraphics);
-	    aPrintGraphics.dispose();
-	  }
-	aPrintjob.end();
-      }
-
+    if (printJob.printDialog()) {
+	try {
+	    printJob.print();
+	} catch (Exception ex) {
+	    ex.printStackTrace();
+	}
+    }
     RepaintManager.currentManager(sketch).setDoubleBufferingEnabled(true);
   }
 }
