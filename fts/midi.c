@@ -31,6 +31,7 @@
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/variable.h>
+#include <ftsprivate/midi.h>
 
 /*
  * This file contains everything related to MIDI:
@@ -75,13 +76,13 @@ fts_midi_get_type(const fts_atom_t *at)
   if(fts_is_int(at))
     return fts_get_int(at);
   else if(fts_is_symbol(at))
-    {
-      fts_atom_t a;
+  {
+    fts_atom_t a;
 
-      fts_hashtable_get(&midi_type_hash, &k, &a);
+    fts_hashtable_get(&midi_type_hash, &k, &a);
       
-      return fts_get_int(&a);
-    }
+    return fts_get_int(&a);
+  }
   else
     return midi_type_any;
 }
@@ -231,64 +232,64 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_midievent_t *this = (fts_midievent_t *)o;
 
   if(ac > 0)
-    {
-      enum midi_type type = fts_midi_get_type(at);
+  {
+    enum midi_type type = fts_midi_get_type(at);
       
-      if(fts_midievent_is_system_exclusive(this))
-	fts_array_destroy(&this->data.system_exclusive);
+    if(fts_midievent_is_system_exclusive(this))
+      fts_array_destroy(&this->data.system_exclusive);
 
-      /* set type */
-      fts_midievent_set_type(this, type);
+    /* set type */
+    fts_midievent_set_type(this, type);
 
-      /* set event data */
-      if(fts_midievent_is_channel_message(this) <= midi_system_exclusive)
-	{
-	  switch(ac)
-	    {
-	    default:
-	    case 3:
-	      if(fts_is_number(at + 3))
-		fts_midievent_channel_message_set_channel(this, fts_get_number_int(at + 3));
-	    case 2:	
-	      if(fts_is_number(at + 2))
-		fts_midievent_channel_message_set_second(this, fts_get_number_int(at + 2));
-	    case 1:
-	      if(fts_is_number(at + 1))
-		fts_midievent_channel_message_set_first(this, fts_get_number_int(at + 1));	
-	    case 0:
-	      break;
-	    }
-	}
-      else if(fts_midievent_is_system_exclusive(this))
-	fts_array_init(&this->data.system_exclusive, ac, at);
-      else if(fts_midievent_is_time_code(this))
-	{
-	  switch(ac)
-	    {
-	    default:
-	    case 5:
-	      if(fts_is_number(at + 5))
-		fts_midievent_time_code_set_frame(this, fts_get_number_int(at + 5));
-	    case 4:
-	      if(fts_is_number(at + 4))
-		fts_midievent_time_code_set_second(this, fts_get_number_int(at + 4));
-	    case 3:
-	      if(fts_is_number(at + 3))
-		fts_midievent_time_code_set_minute(this, fts_get_number_int(at + 3));
-	    case 2:
-	      if(fts_is_number(at + 2))
-		fts_midievent_time_code_set_hour(this, fts_get_number_int(at + 2));
-	    case 1:
-	      if(fts_is_number(at + 1))
-		fts_midievent_time_code_set_type(this, fts_get_number_int(at + 1));
-	    case 0:
-	      break;
-	    }
-	}
-      else if(fts_midievent_is_real_time(this))
+    /* set event data */
+    if(fts_midievent_is_channel_message(this) <= midi_system_exclusive)
+    {
+      switch(ac)
+      {
+      default:
+      case 3:
+	if(fts_is_number(at + 3))
+	  fts_midievent_channel_message_set_channel(this, fts_get_number_int(at + 3));
+      case 2:	
+	if(fts_is_number(at + 2))
+	  fts_midievent_channel_message_set_second(this, fts_get_number_int(at + 2));
+      case 1:
 	if(fts_is_number(at + 1))
-	  fts_midievent_real_time_set(this, fts_get_number_int(at + 1));
+	  fts_midievent_channel_message_set_first(this, fts_get_number_int(at + 1));	
+      case 0:
+	break;
+      }
     }
+    else if(fts_midievent_is_system_exclusive(this))
+      fts_array_init(&this->data.system_exclusive, ac, at);
+    else if(fts_midievent_is_time_code(this))
+    {
+      switch(ac)
+      {
+      default:
+      case 5:
+	if(fts_is_number(at + 5))
+	  fts_midievent_time_code_set_frame(this, fts_get_number_int(at + 5));
+      case 4:
+	if(fts_is_number(at + 4))
+	  fts_midievent_time_code_set_second(this, fts_get_number_int(at + 4));
+      case 3:
+	if(fts_is_number(at + 3))
+	  fts_midievent_time_code_set_minute(this, fts_get_number_int(at + 3));
+      case 2:
+	if(fts_is_number(at + 2))
+	  fts_midievent_time_code_set_hour(this, fts_get_number_int(at + 2));
+      case 1:
+	if(fts_is_number(at + 1))
+	  fts_midievent_time_code_set_type(this, fts_get_number_int(at + 1));
+      case 0:
+	break;
+      }
+    }
+    else if(fts_midievent_is_real_time(this))
+      if(fts_is_number(at + 1))
+	fts_midievent_real_time_set(this, fts_get_number_int(at + 1));
+  }
 }
   
 static void
@@ -301,29 +302,29 @@ midievent_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   /* append event data */
   if(fts_midievent_is_channel_message(this))
-    {
-      fts_array_append_int(array, fts_midievent_channel_message_get_first(this));
+  {
+    fts_array_append_int(array, fts_midievent_channel_message_get_first(this));
 	  
-      if(fts_midievent_channel_message_has_second_byte(this))
-	fts_array_append_int(array, fts_midievent_channel_message_get_second(this));
+    if(fts_midievent_channel_message_has_second_byte(this))
+      fts_array_append_int(array, fts_midievent_channel_message_get_second(this));
 
-      fts_array_append_int(array, fts_midievent_channel_message_get_channel(this));
-    }
+    fts_array_append_int(array, fts_midievent_channel_message_get_channel(this));
+  }
   else if(fts_midievent_is_system_exclusive(this))
-    {
-      int size = fts_midievent_system_exclusive_get_size(this);
-      fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
+  {
+    int size = fts_midievent_system_exclusive_get_size(this);
+    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
 	  
-      fts_array_append(array, size, atoms);
-    }
+    fts_array_append(array, size, atoms);
+  }
   else if(fts_midievent_is_time_code(this))
-    {
-      fts_array_append_int(array, fts_midievent_time_code_get_type(this));
-      fts_array_append_int(array, fts_midievent_time_code_get_hour(this));
-      fts_array_append_int(array, fts_midievent_time_code_get_minute(this));
-      fts_array_append_int(array, fts_midievent_time_code_get_second(this));
-      fts_array_append_int(array, fts_midievent_time_code_get_frame(this));
-    }
+  {
+    fts_array_append_int(array, fts_midievent_time_code_get_type(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_hour(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_minute(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_second(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_frame(this));
+  }
   else if(fts_midievent_is_real_time(this))
     fts_array_append_int(array, fts_midievent_real_time_get(this));
 }
@@ -344,64 +345,64 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_spost(stream, "(:midievent %s ", fts_midi_types[type]);
 
   switch (type)
-    {
-    case midi_note:
-      fts_spost(stream, "%d %d %d", 
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_second(this),
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  {
+  case midi_note:
+    fts_spost(stream, "%d %d %d", 
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_second(this),
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_poly_pressure:
-      fts_spost(stream, "%d %d %d", 
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_second(this),
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  case midi_poly_pressure:
+    fts_spost(stream, "%d %d %d", 
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_second(this),
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_control_change:
-      fts_spost(stream, "%d %d %d", 
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_second(this),
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  case midi_control_change:
+    fts_spost(stream, "%d %d %d", 
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_second(this),
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_program_change:
-      fts_spost(stream, "%d %d",
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  case midi_program_change:
+    fts_spost(stream, "%d %d",
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_channel_pressure:		
-      fts_spost(stream, "%d %d",
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  case midi_channel_pressure:		
+    fts_spost(stream, "%d %d",
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_pitch_bend:
-      fts_spost(stream, "%d %d %d",
-		fts_midievent_channel_message_get_first(this), 
-		fts_midievent_channel_message_get_second(this),
-		fts_midievent_channel_message_get_channel(this));
-      break;
+  case midi_pitch_bend:
+    fts_spost(stream, "%d %d %d",
+	      fts_midievent_channel_message_get_first(this), 
+	      fts_midievent_channel_message_get_second(this),
+	      fts_midievent_channel_message_get_channel(this));
+    break;
       
-    case midi_system_exclusive:
-      post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
-      break;
+  case midi_system_exclusive:
+    post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
+    break;
       
-    case midi_time_code:
-      fts_spost(stream, "%d %d %d %d %d",
-		fts_midievent_time_code_get_type(this),
-		fts_midievent_time_code_get_hour(this),
-		fts_midievent_time_code_get_minute(this),
-		fts_midievent_time_code_get_second(this),
-		fts_midievent_time_code_get_frame(this));
-      break;
+  case midi_time_code:
+    fts_spost(stream, "%d %d %d %d %d",
+	      fts_midievent_time_code_get_type(this),
+	      fts_midievent_time_code_get_hour(this),
+	      fts_midievent_time_code_get_minute(this),
+	      fts_midievent_time_code_get_second(this),
+	      fts_midievent_time_code_get_frame(this));
+    break;
       
-    case midi_real_time:
-      fts_spost(stream, "%d", fts_midievent_real_time_get(this));
-      break;
-    }
+  case midi_real_time:
+    fts_spost(stream, "%d", fts_midievent_real_time_get(this));
+    break;
+  }
 
   fts_spost(stream, ")");  
 }
@@ -428,10 +429,10 @@ midievent_instantiate(fts_class_t *cl)
 }
 
 /***************************************************
-*
-*  midi fifo
-*
-*/
+ *
+ *  midi fifo
+ *
+ */
 void
 fts_midififo_init(fts_midififo_t *fifo, int size)
 {
@@ -443,11 +444,11 @@ fts_midififo_init(fts_midififo_t *fifo, int size)
   entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
 
   for(i=0; i<size; i++) 
-    {
-      fts_object_t *obj = fts_object_create(fts_midievent_type, NULL, 0, 0);
-      fts_object_refer(obj);
-      entries[i].event = (fts_midievent_t *)obj;
-    }
+  {
+    fts_object_t *obj = fts_object_create(fts_midievent_type, NULL, 0, 0);
+    fts_object_refer(obj);
+    entries[i].event = (fts_midievent_t *)obj;
+  }
 
   fifo->delta = 0.0;
   fifo->size = size;
@@ -470,56 +471,56 @@ void
 fts_midififo_poll(fts_midififo_t *fifo)
 {
   if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
-    {
-      fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
-      double time = entry->time - fts_get_time();
-      double delay;
-      fts_atom_t a;
+  {
+    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
+    double time = entry->time - fts_get_time();
+    double delay;
+    fts_atom_t a;
       
-      /* set midievent argument */
-      fts_set_object(&a, entry->event);
+    /* set midievent argument */
+    fts_set_object(&a, entry->event);
       
-      /* time == 0.0 means: send now */
-      if(time > 0.0) 
-	{        
-	  /* adjust delta time on very first fifo entry */
-	  if(fifo->delta == 0.0)
-	    fifo->delta = time;
+    /* time == 0.0 means: send now */
+    if(time > 0.0) 
+    {        
+      /* adjust delta time on very first fifo entry */
+      if(fifo->delta == 0.0)
+	fifo->delta = time;
 	  
-	  /* translate event time to delay */
-	  delay = time - fifo->delta;
+      /* translate event time to delay */
+      delay = time - fifo->delta;
           	  
-	  /* adjust delta time */
-	  if(delay < 0.0) 
-	    {
-	      delay = 0.0;
-	      fifo->delta = time;
-	    }
+      /* adjust delta time */
+      if(delay < 0.0) 
+      {
+	delay = 0.0;
+	fifo->delta = time;
+      }
 	  
-	  /* schedule midiport input call */
-	  fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
-	} 
-      else
-	fts_midiport_input(entry->port, 0, 0, 1, &a);
+      /* schedule midiport input call */
+      fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
+    } 
+    else
+      fts_midiport_input(entry->port, 0, 0, 1, &a);
       
-      fts_object_release(entry->event);
+    fts_object_release(entry->event);
       
-      /* insert a new midievent into fifo and claim it */
-      entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
-      fts_object_refer(entry->event);
+    /* insert a new midievent into fifo and claim it */
+    entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, NULL, 0, 0);
+    fts_object_refer(entry->event);
       
-      fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
-    }
+    fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
+  }
 }
 
 fts_midievent_t *
 fts_midififo_get_event(fts_midififo_t *fifo)
 {
   if(fts_fifo_write_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
-    {
-      fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
-      return entry->event;
-    } 
+  {
+    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+    return entry->event;
+  } 
   else
     return NULL;
 }
@@ -610,15 +611,15 @@ void
 fts_midiparser_set_event(fts_midiparser_t *parser, fts_midievent_t *event)
 {
   if(event != parser->event) 
-    {
-      if(parser->event != NULL)
-	fts_object_release(parser->event);
+  {
+    if(parser->event != NULL)
+      fts_object_release(parser->event);
       
-      parser->event = event;
+    parser->event = event;
       
-      if(event != NULL)
-	fts_object_refer(event);
-    }
+    if(event != NULL)
+      fts_object_refer(event);
+  }
 }
 
 void
@@ -638,297 +639,297 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
   fts_midievent_t *event = midiparser_get_event(parser);
 
   if(byte >= midi_status_timing_clock)
+  {
+    /* system real-time messages */
+    fts_midievent_real_time_init(event, (int)byte - midi_status_timing_clock);
+    parser->event = NULL;
+    return event;
+  }
+  else if(byte >= midi_status_system_exclusive)
+  {
+    /* system common messages */
+    switch (byte)
     {
-      /* system real-time messages */
-      fts_midievent_real_time_init(event, (int)byte - midi_status_timing_clock);
+    case midi_status_system_exclusive:
+      parser->status = midiparser_status_system_exclusive;
+      break;
+	  
+    case midi_status_quarter_frame:
+      parser->status = midiparser_status_quarter_frame;
+      break;
+	  
+    case midi_status_song_position_pointer:
+      parser->status = midiparser_status_song_position_pointer;
+      break;
+	  
+    case midi_status_song_select:
+      parser->status = midiparser_status_song_select;
+      break;
+
+    case midi_status_tune_request:
+      break;
+
+    case midi_status_system_exclusive_end:
+      /* send sysex */
+      if(fts_array_get_size(&parser->system_exclusive) > 0)
+      {
+	fts_midievent_system_exclusive_init(event, fts_array_get_size(&parser->system_exclusive), fts_array_get_atoms(&parser->system_exclusive));
+	parser->event = NULL;
+	return event;
+      }
+
+      parser->status = midiparser_status_reset;
+      break;
+	  
+    default:
+      break;
+    }
+  }
+  else if(byte > 127)
+  {
+    /* channel message status byte */
+    parser->status = (byte >> 4) - 7;
+    parser->channel = (byte & 0xf) + 1;
+    parser->store = MIDI_EMPTY_BYTE;
+  }
+  else
+  {	      
+    /* channel message data bytes */
+    switch (parser->status)
+    {
+    case midiparser_status_note_off:
+	  
+      if (parser->store == MIDI_EMPTY_BYTE)
+	parser->store = byte;
+      else
+      {
+	fts_midievent_channel_message_init(event, midi_note, parser->channel, parser->store, 0);
+	parser->store = MIDI_EMPTY_BYTE;  /* reset for running status */
+	parser->event = NULL;
+	return event;
+      }
+	  
+      break;
+	  
+    case midiparser_status_note_on:
+	  
+      if (parser->store == MIDI_EMPTY_BYTE)
+	parser->store = byte;
+      else
+      {
+	fts_midievent_channel_message_init(event, midi_note, parser->channel, parser->store, byte);
+	parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
+	parser->event = NULL;
+	return event;
+      }
+	  
+      break;
+	  
+    case midiparser_status_poly_pressure:
+	  
+      if (parser->store == MIDI_EMPTY_BYTE)
+	parser->store = byte;
+      else
+      {
+	fts_midievent_channel_message_init(event, midi_poly_pressure, parser->channel, parser->store, byte);
+	parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
+	parser->event = NULL;
+	return event;
+      }
+      break;
+		      
+    case midiparser_status_control_change:
+		      
+      if (parser->store == MIDI_EMPTY_BYTE)
+	parser->store = byte;
+      else
+      {
+	fts_midievent_channel_message_init(event, midi_control_change, parser->channel, parser->store, byte);
+	parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
+	parser->event = NULL;
+	return event;
+      }
+      break;
+		      
+    case midiparser_status_program_change:
+    {
+      fts_midievent_channel_message_init(event, midi_program_change, parser->channel, byte, MIDI_EMPTY_BYTE);
       parser->event = NULL;
       return event;
     }
-  else if(byte >= midi_status_system_exclusive)
+	  
+    break;
+		      
+    case midiparser_status_channel_pressure:		
     {
-      /* system common messages */
+      fts_midievent_channel_message_init(event, midi_channel_pressure, parser->channel, byte, MIDI_EMPTY_BYTE);
+      parser->event = NULL;
+      return event;
+    }
+		      
+    break;
+		      
+    case midiparser_status_pitch_bend:
+		      
+      if (parser->store == MIDI_EMPTY_BYTE)
+	parser->store = byte;
+      else
+      {
+	fts_midievent_channel_message_init(event, midi_pitch_bend, parser->channel, parser->store, byte);
+	parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
+	parser->event = NULL;
+	return event;
+      }
+      break;
+
+    case midiparser_status_system_exclusive:
+	  
       switch (byte)
-	{
-	case midi_status_system_exclusive:
-	  parser->status = midiparser_status_system_exclusive;
-	  break;
-	  
-	case midi_status_quarter_frame:
-	  parser->status = midiparser_status_quarter_frame;
-	  break;
-	  
-	case midi_status_song_position_pointer:
-	  parser->status = midiparser_status_song_position_pointer;
-	  break;
-	  
-	case midi_status_song_select:
-	  parser->status = midiparser_status_song_select;
-	  break;
-
-	case midi_status_tune_request:
-	  break;
-
-	case midi_status_system_exclusive_end:
-          /* send sysex */
-          if(fts_array_get_size(&parser->system_exclusive) > 0)
-            {
-              fts_midievent_system_exclusive_init(event, fts_array_get_size(&parser->system_exclusive), fts_array_get_atoms(&parser->system_exclusive));
-              parser->event = NULL;
-              return event;
-            }
-
-          parser->status = midiparser_status_reset;
-	  break;
-	  
-	default:
-	  break;
-	}
-    }
-  else if(byte > 127)
-    {
-      /* channel message status byte */
-      parser->status = (byte >> 4) - 7;
-      parser->channel = (byte & 0xf) + 1;
-      parser->store = MIDI_EMPTY_BYTE;
-    }
-  else
-    {	      
-      /* channel message data bytes */
-      switch (parser->status)
-	{
-	case midiparser_status_note_off:
-	  
-	  if (parser->store == MIDI_EMPTY_BYTE)
-	    parser->store = byte;
-	  else
-	    {
-	      fts_midievent_channel_message_init(event, midi_note, parser->channel, parser->store, 0);
-              parser->store = MIDI_EMPTY_BYTE;  /* reset for running status */
-              parser->event = NULL;
-              return event;
-	    }
-	  
-	  break;
-	  
-	case midiparser_status_note_on:
-	  
-	  if (parser->store == MIDI_EMPTY_BYTE)
-	    parser->store = byte;
-	  else
-	    {
-	      fts_midievent_channel_message_init(event, midi_note, parser->channel, parser->store, byte);
-              parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
-              parser->event = NULL;
-              return event;
-	    }
-	  
-	  break;
-	  
-	case midiparser_status_poly_pressure:
-	  
-	  if (parser->store == MIDI_EMPTY_BYTE)
-	    parser->store = byte;
-	  else
-	    {
-	      fts_midievent_channel_message_init(event, midi_poly_pressure, parser->channel, parser->store, byte);
-              parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
-              parser->event = NULL;
-              return event;
-	    }
-	  break;
-		      
-	case midiparser_status_control_change:
-		      
-	  if (parser->store == MIDI_EMPTY_BYTE)
-	    parser->store = byte;
-	  else
-	    {
-	      fts_midievent_channel_message_init(event, midi_control_change, parser->channel, parser->store, byte);
-              parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
-              parser->event = NULL;
-              return event;
-            }
-	  break;
-		      
-	case midiparser_status_program_change:
-	  {
-	    fts_midievent_channel_message_init(event, midi_program_change, parser->channel, byte, MIDI_EMPTY_BYTE);
-            parser->event = NULL;
-            return event;
-	  }
-	  
-	  break;
-		      
-	case midiparser_status_channel_pressure:		
-	  {
-	    fts_midievent_channel_message_init(event, midi_channel_pressure, parser->channel, byte, MIDI_EMPTY_BYTE);
-            parser->event = NULL;
-            return event;
-          }
-		      
-	  break;
-		      
-	case midiparser_status_pitch_bend:
-		      
-	  if (parser->store == MIDI_EMPTY_BYTE)
-	    parser->store = byte;
-	  else
-	    {
-	      fts_midievent_channel_message_init(event, midi_pitch_bend, parser->channel, parser->store, byte);
-              parser->store = MIDI_EMPTY_BYTE; /* reset for running status */
-              parser->event = NULL;
-              return event;
-	    }
-	  break;
-
-	case midiparser_status_system_exclusive:
-	  
-	  switch (byte)
-	    {
-	    case MIDI_SYSTEM_EXCLUSIVE_REALTIME:
-	      parser->status = midiparser_status_system_exclusive_realtime;
-	      break;
+      {
+      case MIDI_SYSTEM_EXCLUSIVE_REALTIME:
+	parser->status = midiparser_status_system_exclusive_realtime;
+	break;
 	      
-	    default:
-	      /* start sysex block with vendor or sysex non real-time id */
-              fts_array_clear(&parser->system_exclusive);
-              fts_array_append_int(&parser->system_exclusive, byte & 0x7f);
-	      parser->status = midiparser_status_system_exclusive_byte;
-	    }
+      default:
+	/* start sysex block with vendor or sysex non real-time id */
+	fts_array_clear(&parser->system_exclusive);
+	fts_array_append_int(&parser->system_exclusive, byte & 0x7f);
+	parser->status = midiparser_status_system_exclusive_byte;
+      }
 	  
-	  break;
+      break;
 	  
-	case midiparser_status_system_exclusive_realtime:
+    case midiparser_status_system_exclusive_realtime:
 	  
-	  switch (byte)
-	    {
-	    case 0x01:
-	      /* start MTC full frame block */
-	      parser->status = midiparser_status_system_exclusive_full_frame;
-	      parser->mtc_frame_count = -1;
-	      break;
+      switch (byte)
+      {
+      case 0x01:
+	/* start MTC full frame block */
+	parser->status = midiparser_status_system_exclusive_full_frame;
+	parser->mtc_frame_count = -1;
+	break;
 	      
-	    default:
-	      /* sysex real-time id and byte */
-              fts_array_clear(&parser->system_exclusive);
-	      fts_array_append_int(&parser->system_exclusive, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
-	      fts_array_append_int(&parser->system_exclusive, (int)byte);
-	      parser->status = midiparser_status_system_exclusive_byte;
-	      break;
-	    }
+      default:
+	/* sysex real-time id and byte */
+	fts_array_clear(&parser->system_exclusive);
+	fts_array_append_int(&parser->system_exclusive, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
+	fts_array_append_int(&parser->system_exclusive, (int)byte);
+	parser->status = midiparser_status_system_exclusive_byte;
+	break;
+      }
 	  
-	  break;
+      break;
 	  
-	case midiparser_status_system_exclusive_byte:
-	  /* ordinary sysex byte */
+    case midiparser_status_system_exclusive_byte:
+      /* ordinary sysex byte */
+      fts_array_append_int(&parser->system_exclusive, (int)byte);
+      break;
+	  
+    case midiparser_status_system_exclusive_full_frame:
+	  
+      /* handle MTC full frame */
+      switch (parser->mtc_frame_count)
+      {
+      case -1:
+	if(byte == 0x01)
+	  parser->mtc_frame_count = 0;
+	else
+	{
+	  /* oops was ordinary sysex message starting with 0x7f 0x01 */
+	  fts_array_clear(&parser->system_exclusive);
+	  fts_array_append_int(&parser->system_exclusive, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
+	  fts_array_append_int(&parser->system_exclusive, (int)0x01);
 	  fts_array_append_int(&parser->system_exclusive, (int)byte);
-	  break;
-	  
-	case midiparser_status_system_exclusive_full_frame:
-	  
-	  /* handle MTC full frame */
-	  switch (parser->mtc_frame_count)
-	    {
-	    case -1:
-	      if(byte == 0x01)
-		parser->mtc_frame_count = 0;
-	      else
-		{
-		  /* oops was ordinary sysex message starting with 0x7f 0x01 */
-                  fts_array_clear(&parser->system_exclusive);
-		  fts_array_append_int(&parser->system_exclusive, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
-		  fts_array_append_int(&parser->system_exclusive, (int)0x01);
-		  fts_array_append_int(&parser->system_exclusive, (int)byte);
 
-		  parser->status = midiparser_status_system_exclusive_byte;
-		}
-	      break;
-	    case 0:
-	      parser->mtc_type = (byte & 0x60) >> 5;
-	      parser->mtc_hour = (byte & 0x1f);
-	      break;
-	    case 1:
-	      parser->mtc_minute = byte;
-	      break;
-	    case 2:
-	      parser->mtc_second = byte;
-	      break;
-	    case 3:
-	      parser->mtc_frame = byte;
-	      break;
-	    default:
-	      break;
-	    }
-	  
-	  parser->mtc_frame_count++;
-	  
-	  break;
-	  
-	case midiparser_status_quarter_frame:
-	  {
-	    switch ((byte & 0xf0) >> 4)
-	      {
-	      case 0:
-		parser->mtc_frame = (parser->mtc_frame & 0xf0) | (byte & 0x0f);
-
-		if(parser->mtc_status == mtc_status_backward)
-		  {
-                    fts_midievent_time_code_init(event, parser->mtc_type, parser->mtc_hour, parser->mtc_minute, parser->mtc_second, parser->mtc_frame);
-                    parser->mtc_status = mtc_status_ready;
-                    parser->event = NULL;
-                    return event;
-		  }
-		else
-		  parser->mtc_status = mtc_status_forward;
-
-		break;
-	      case 1:
-		parser->mtc_frame = (parser->mtc_frame & 0x0f) | (byte & 0x0f) << 4;
-		break;
-	      case 2:
-		parser->mtc_second = (parser->mtc_second & 0xf0) | (byte & 0x0f);
-		break;
-	      case 3:
-		parser->mtc_second = (parser->mtc_second & 0x0f) | (byte & 0x0f) << 4;
-		break;
-	      case 4:
-		parser->mtc_minute = (parser->mtc_minute & 0xf0) | (byte & 0x0f);
-		break;
-	      case 5:
-		parser->mtc_minute = (parser->mtc_minute & 0x0f) | (byte & 0x0f) << 4;
-		break;
-	      case 6:
-		parser->mtc_hour = (parser->mtc_hour & 0xf0) | (byte & 0x0f);
-		break;
-	      case 7:
-		parser->mtc_hour = (parser->mtc_hour & 0x0f) | (byte & 0x01) << 4;
-		parser->mtc_type = (byte & 0x60) >> 5;
-
-		if(parser->mtc_status == mtc_status_forward)
-		  {
-                    fts_midievent_time_code_init(event, parser->mtc_type, parser->mtc_hour, parser->mtc_minute, parser->mtc_second, parser->mtc_frame);
-                    parser->mtc_status = mtc_status_ready;
-                    parser->event = NULL;
-                    return event;
-		  }
-		else
-		  parser->mtc_status = mtc_status_backward;
-
-		break;
-
-	      default:
-		break;
-	      }
-	    
-	    parser->status = midiparser_status_reset;
-	  }
-	  
-	  break;
-	  
-	default:
-	  break;
+	  parser->status = midiparser_status_system_exclusive_byte;
 	}
+	break;
+      case 0:
+	parser->mtc_type = (byte & 0x60) >> 5;
+	parser->mtc_hour = (byte & 0x1f);
+	break;
+      case 1:
+	parser->mtc_minute = byte;
+	break;
+      case 2:
+	parser->mtc_second = byte;
+	break;
+      case 3:
+	parser->mtc_frame = byte;
+	break;
+      default:
+	break;
+      }
+	  
+      parser->mtc_frame_count++;
+	  
+      break;
+	  
+    case midiparser_status_quarter_frame:
+    {
+      switch ((byte & 0xf0) >> 4)
+      {
+      case 0:
+	parser->mtc_frame = (parser->mtc_frame & 0xf0) | (byte & 0x0f);
+
+	if(parser->mtc_status == mtc_status_backward)
+	{
+	  fts_midievent_time_code_init(event, parser->mtc_type, parser->mtc_hour, parser->mtc_minute, parser->mtc_second, parser->mtc_frame);
+	  parser->mtc_status = mtc_status_ready;
+	  parser->event = NULL;
+	  return event;
+	}
+	else
+	  parser->mtc_status = mtc_status_forward;
+
+	break;
+      case 1:
+	parser->mtc_frame = (parser->mtc_frame & 0x0f) | (byte & 0x0f) << 4;
+	break;
+      case 2:
+	parser->mtc_second = (parser->mtc_second & 0xf0) | (byte & 0x0f);
+	break;
+      case 3:
+	parser->mtc_second = (parser->mtc_second & 0x0f) | (byte & 0x0f) << 4;
+	break;
+      case 4:
+	parser->mtc_minute = (parser->mtc_minute & 0xf0) | (byte & 0x0f);
+	break;
+      case 5:
+	parser->mtc_minute = (parser->mtc_minute & 0x0f) | (byte & 0x0f) << 4;
+	break;
+      case 6:
+	parser->mtc_hour = (parser->mtc_hour & 0xf0) | (byte & 0x0f);
+	break;
+      case 7:
+	parser->mtc_hour = (parser->mtc_hour & 0x0f) | (byte & 0x01) << 4;
+	parser->mtc_type = (byte & 0x60) >> 5;
+
+	if(parser->mtc_status == mtc_status_forward)
+	{
+	  fts_midievent_time_code_init(event, parser->mtc_type, parser->mtc_hour, parser->mtc_minute, parser->mtc_second, parser->mtc_frame);
+	  parser->mtc_status = mtc_status_ready;
+	  parser->event = NULL;
+	  return event;
+	}
+	else
+	  parser->mtc_status = mtc_status_backward;
+
+	break;
+
+      default:
+	break;
+      }
+	    
+      parser->status = midiparser_status_reset;
     }
+	  
+    break;
+	  
+    default:
+      break;
+    }
+  }
 
   return NULL;
 }
@@ -958,34 +959,34 @@ remove_listener(fts_midiport_listener_t **list, fts_object_t *o)
   fts_midiport_listener_t *l = *list;
 
   if(l)
+  {
+    fts_midiport_listener_t *freeme = 0;
+      
+    if(l->listener == o)
     {
-      fts_midiport_listener_t *freeme = 0;
-      
-      if(l->listener == o)
-	{
-	  freeme = l;
-	  *list = l->next;
-	}
-      else
-	{
-	  while(l->next)
-	    {
-	      if(l->next->listener == o)
-		{
-		  freeme = l->next;
-		  l->next = l->next->next;
-		  
-		  break;
-		}
-	      
-	      l = l->next;
-	    }
-	}
-      
-      /* free removed listener */
-      if(freeme)
-	fts_free(freeme);
+      freeme = l;
+      *list = l->next;
     }
+    else
+    {
+      while(l->next)
+      {
+	if(l->next->listener == o)
+	{
+	  freeme = l->next;
+	  l->next = l->next->next;
+		  
+	  break;
+	}
+	      
+	l = l->next;
+      }
+    }
+      
+    /* free removed listener */
+    if(freeme)
+      fts_free(freeme);
+  }
 }
 
 void 
@@ -1005,7 +1006,7 @@ fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int chan
 
   if (NULL != list)
   {
-      remove_listener(list, obj);
+    remove_listener(list, obj);
   }
 }
 
@@ -1019,65 +1020,65 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_midiport_listener_t *l;
 
   if(type <= midi_control_change)
+  {
+    /* note, poly pressure, control_change */
+    int channel = fts_midievent_channel_message_get_channel(event);
+    int number = fts_midievent_channel_message_get_first(event); /* note or controller number */
+    int onset = (number + 1) * (n_midi_channels + 1);
+
+    /* fire callbacks for given channel and number */
+    l = type_list[onset + channel];
+    while(l)
     {
-      /* note, poly pressure, control_change */
-      int channel = fts_midievent_channel_message_get_channel(event);
-      int number = fts_midievent_channel_message_get_first(event); /* note or controller number */
-      int onset = (number + 1) * (n_midi_channels + 1);
-
-      /* fire callbacks for given channel and number */
-      l = type_list[onset + channel];
-      while(l)
-	{
-	  l->callback(l->listener, 0, 0, 1, at);
-	  l = l->next;
-	}
-
-      /* fire callbacks for given channel and any number */
-      l = type_list[channel];
-      while(l)
-	{
-	  l->callback(l->listener, 0, 0, 1, at);
-	  l = l->next;
-	}
-
-      /* fire callbacks for any channel and given number*/
-      l = type_list[onset];
-      while(l)
-	{
-	  l->callback(l->listener, 0, 0, 1, at);
-	  l = l->next;
-	}
+      l->callback(l->listener, 0, 0, 1, at);
+      l = l->next;
     }
+
+    /* fire callbacks for given channel and any number */
+    l = type_list[channel];
+    while(l)
+    {
+      l->callback(l->listener, 0, 0, 1, at);
+      l = l->next;
+    }
+
+    /* fire callbacks for any channel and given number*/
+    l = type_list[onset];
+    while(l)
+    {
+      l->callback(l->listener, 0, 0, 1, at);
+      l = l->next;
+    }
+  }
 
   /* fire callbacks for given event type */
   l = type_list[0];
   while(l)
-    {
-      l->callback(l->listener, 0, 0, 1, at);
-      l = l->next;
-    }
+  {
+    l->callback(l->listener, 0, 0, 1, at);
+    l = l->next;
+  }
 
   /* fire callbacks for any event */
   l = *(port->listeners[0]);
   while(l)
-    {
-      l->callback(l->listener, 0, 0, 1, at);
-      l = l->next;
-    }
+  {
+    l->callback(l->listener, 0, 0, 1, at);
+    l = l->next;
+  }
 }
 
 void 
 fts_midiport_output(fts_midiport_t *port, fts_midievent_t *event, double time)
 {
   if(port->output != NULL)
-    {
-      fts_object_refer((fts_object_t *)event);
+  {
+    fts_object_refer((fts_object_t *)event);
 
-      port->output((fts_object_t *)port, event, time);
+    port->output((fts_object_t *)port, event, time);
 
-      fts_object_release((fts_object_t *)event);
-    }
+    fts_object_release((fts_object_t *)event);
+  }
 }
 
 void
@@ -1096,12 +1097,12 @@ fts_midiport_reset(fts_midiport_t *port)
 {
   /* free listeners */
   if(port->listeners[midi_type_any])
-    {
+  {
     int type;
 
     for(type=midi_type_any; type<n_midi_types; type++)
       fts_free(port->listeners[type + 1]);
-    }
+  }
 }
 
 void
@@ -1110,68 +1111,68 @@ fts_midiport_set_input(fts_midiport_t *port)
   enum midi_type type;
 
   for(type=midi_type_any; type<n_midi_types; type++)
-    {
+  {
     switch(type)
-      {
-      case midi_type_any:
-        {
-          fts_midiport_listener_t **any_list;
+    {
+    case midi_type_any:
+    {
+      fts_midiport_listener_t **any_list;
 
-          any_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *));
-          *any_list = 0;
+      any_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *));
+      *any_list = 0;
 
-          port->listeners[type + 1] = any_list;
-        }
-        break;
-
-      case midi_note:
-      case midi_poly_pressure:
-      case midi_control_change:
-        {
-          /* channel and poly listeners */
-          fts_midiport_listener_t **poly_list;
-          int size = (n_midi_channels + 1) * (n_midi_controllers + 1);
-          int i;
-
-          poly_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * size);
-
-          for(i=0; i<size; i++)
-            poly_list[i] = 0;
-
-          port->listeners[type + 1] = poly_list;
-        }
-        break;
-
-      case midi_program_change:
-      case midi_channel_pressure:
-      case midi_pitch_bend:
-        {
-          /* channel listeners */
-          fts_midiport_listener_t **chan_list;
-          int i;
-
-          chan_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * (n_midi_channels + 1));
-
-          for(i=0; i<n_midi_channels; i++)
-            chan_list[i] = 0;
-
-          port->listeners[type + 1] = chan_list;
-        }
-        break;
-
-      default:
-        {
-          /* system message listeners */
-          fts_midiport_listener_t **sys_list;
-
-          sys_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *));
-          *sys_list = 0;
-
-          port->listeners[type + 1] = sys_list;
-        }
-        break;
-      }
+      port->listeners[type + 1] = any_list;
     }
+    break;
+
+    case midi_note:
+    case midi_poly_pressure:
+    case midi_control_change:
+    {
+      /* channel and poly listeners */
+      fts_midiport_listener_t **poly_list;
+      int size = (n_midi_channels + 1) * (n_midi_controllers + 1);
+      int i;
+
+      poly_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * size);
+
+      for(i=0; i<size; i++)
+	poly_list[i] = 0;
+
+      port->listeners[type + 1] = poly_list;
+    }
+    break;
+
+    case midi_program_change:
+    case midi_channel_pressure:
+    case midi_pitch_bend:
+    {
+      /* channel listeners */
+      fts_midiport_listener_t **chan_list;
+      int i;
+
+      chan_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * (n_midi_channels + 1));
+
+      for(i=0; i<n_midi_channels; i++)
+	chan_list[i] = 0;
+
+      port->listeners[type + 1] = chan_list;
+    }
+    break;
+
+    default:
+    {
+      /* system message listeners */
+      fts_midiport_listener_t **sys_list;
+
+      sys_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *));
+      *sys_list = 0;
+
+      port->listeners[type + 1] = sys_list;
+    }
+    break;
+    }
+  }
 }
 
 void
@@ -1274,16 +1275,6 @@ midinull_instantiate(fts_class_t *cl)
  *
  */
 
-typedef struct _midilabel
-{
-  fts_symbol_t name;
-  fts_midiport_t *input;
-  fts_midiport_t *output;
-  fts_symbol_t input_name;
-  fts_symbol_t output_name;
-  struct _midilabel *next;
-} midilabel_t;
-
 static midilabel_t *
 midilabel_new(fts_symbol_t name)
 {
@@ -1315,32 +1306,32 @@ static void
 midilabel_set_input(midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
   if(port != label->input) 
-    {
-      if(label->input != NULL)
-	fts_object_release(label->input);
+  {
+    if(label->input != NULL)
+      fts_object_release(label->input);
       
-      label->input = port;
-      label->input_name = name;
+    label->input = port;
+    label->input_name = name;
       
-      if(port != NULL)
-	fts_object_refer(port);
-    }
+    if(port != NULL)
+      fts_object_refer(port);
+  }
 }
 
 static void
 midilabel_set_output(midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
   if(port != label->output) 
-    {
-      if(label->output != NULL)
-	fts_object_release(label->output);
+  {
+    if(label->output != NULL)
+      fts_object_release(label->output);
       
-      label->output = port;
-      label->output_name = name;
+    label->output = port;
+    label->output_name = name;
       
-      if(port != NULL)
-	fts_object_refer(port);
-    }
+    if(port != NULL)
+      fts_object_refer(port);
+  }
 }
 
 /************************************************************
@@ -1349,19 +1340,8 @@ midilabel_set_output(midilabel_t *label, fts_midiport_t *port, fts_symbol_t name
  *
  */
 
-typedef struct _midiconfig
-{
-  fts_object_t o;
-  midilabel_t *labels;
-  int n_labels;
-
-  int dirty;
-  fts_symbol_t file_name;
-
-} midiconfig_t;
-
 /* current MIDI configuration */
-static midiconfig_t *midiconfig = NULL;
+/* static midiconfig_t *midiconfig = NULL; */
 
 /* array of device names */
 static fts_array_t midiconfig_inputs;
@@ -1395,17 +1375,17 @@ midimanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
   fts_midiport_t *port = NULL;
 
   if(device_name != NULL)
-    {
-      fts_midimanager_t *mm;
-      fts_atom_t args[3];
+  {
+    fts_midimanager_t *mm;
+    fts_atom_t args[3];
       
-      fts_set_pointer(args + 0, &port);
-      fts_set_symbol(args + 1, device_name);
-      fts_set_symbol(args + 2, label_name);
+    fts_set_pointer(args + 0, &port);
+    fts_set_symbol(args + 1, device_name);
+    fts_set_symbol(args + 2, label_name);
       
-      for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-	fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_input, 3, args);
-    }
+    for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
+      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_input, 3, args);
+  }
 
   return port;      
 }
@@ -1416,17 +1396,17 @@ midimanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
   fts_midiport_t *port = NULL;
 
   if(device_name != NULL)
-    {
-      fts_midimanager_t *mm;
-      fts_atom_t args[3];
+  {
+    fts_midimanager_t *mm;
+    fts_atom_t args[3];
       
-      fts_set_pointer(args + 0, &port);
-      fts_set_symbol(args + 1, device_name);
-      fts_set_symbol(args + 2, label_name);
+    fts_set_pointer(args + 0, &port);
+    fts_set_symbol(args + 1, device_name);
+    fts_set_symbol(args + 2, label_name);
       
-      for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-	fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_output, 3, args);
-    }
+    for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
+      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_output, 3, args);
+  }
       
   return port;
 }
@@ -1521,15 +1501,15 @@ midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
 
   /* send new label to client */
   if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t args[4];
+  {
+    fts_atom_t args[4];
       
-      fts_set_int(args, index);
-      fts_set_symbol(args + 1, name);
-      fts_set_symbol(args + 2, midiconfig_s_unconnected);
-      fts_set_symbol(args + 3, midiconfig_s_unconnected);
-      fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
-    }
+    fts_set_int(args, index);
+    fts_set_symbol(args + 1, name);
+    fts_set_symbol(args + 2, midiconfig_s_unconnected);
+    fts_set_symbol(args + 3, midiconfig_s_unconnected);
+    fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
+  }
   
   midiconfig_set_dirty( config, 1);
 
@@ -1547,23 +1527,23 @@ midiconfig_label_remove(midiconfig_t *config, int index)
     p = &(*p)->next;
 
   if(*p) 
-    {
-      midilabel_t *label = *p;
+  {
+    midilabel_t *label = *p;
       
-      *p = (*p)->next;
-      config->n_labels--;
+    *p = (*p)->next;
+    config->n_labels--;
       
-      midilabel_delete(label);
-    }
+    midilabel_delete(label);
+  }
 
   /* send remove to client */
   if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t arg;
+  {
+    fts_atom_t arg;
       
-      fts_set_int(&arg, index);
-      fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
-    }
+    fts_set_int(&arg, index);
+    fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
+  }
 
   midiconfig_set_dirty( config, 1);
 }
@@ -1575,20 +1555,20 @@ midiconfig_label_set_input(midiconfig_t *config, midilabel_t *label, int index, 
     name = midiconfig_s_unconnected;
 
   if(midiport != label->input || name != label->input_name) 
-    {
-      midilabel_set_input(label, midiport, name);
+  {
+    midilabel_set_input(label, midiport, name);
       
-      if(fts_object_has_id((fts_object_t *)config)) 
-	{
-	  fts_atom_t args[2];
+    if(fts_object_has_id((fts_object_t *)config)) 
+    {
+      fts_atom_t args[2];
 	  
-	  fts_set_int(args + 0, index);
-	  fts_set_symbol(args + 1, name);
-	  fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
-	}
-
-      midiconfig_set_dirty( config, 1);
+      fts_set_int(args + 0, index);
+      fts_set_symbol(args + 1, name);
+      fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
     }
+
+    midiconfig_set_dirty( config, 1);
+  }
 }
 
 static void
@@ -1598,20 +1578,20 @@ midiconfig_label_set_output(midiconfig_t *config, midilabel_t *label, int index,
     name = midiconfig_s_unconnected;
   
   if(midiport != label->output || name != label->output_name) 
-    {
-      midilabel_set_output(label, midiport, name);
+  {
+    midilabel_set_output(label, midiport, name);
       
-      if(fts_object_has_id((fts_object_t *)config)) 
-	{
-	  fts_atom_t args[2];
+    if(fts_object_has_id((fts_object_t *)config)) 
+    {
+      fts_atom_t args[2];
 	  
-	  fts_set_int(args + 0, index);
-	  fts_set_symbol(args + 1, name);
-	  fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
-	}
-    
-      midiconfig_set_dirty( config, 1);
+      fts_set_int(args + 0, index);
+      fts_set_symbol(args + 1, name);
+      fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
     }
+    
+    midiconfig_set_dirty( config, 1);
+  }
 }
 
 static void
@@ -1672,21 +1652,21 @@ midiconfig_get_fresh_label_name(midiconfig_t *config, fts_symbol_t name)
 
   /* separate base name and index */
   for(i=len-1; i>=0; i--) 
-    {
-      if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
-	num += (str[len = i] - '0') * dec;
-      else
-	new_str[i] = str[i];
+  {
+    if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+      num += (str[len = i] - '0') * dec;
+    else
+      new_str[i] = str[i];
       
-      dec *= 10;
-    }
+    dec *= 10;
+  }
   
   /* generate new label name */
   while(midiconfig_label_get_by_name(config, name) != NULL) 
-    {
-      sprintf(new_str + len, "%d", ++num);
-      name = fts_new_symbol(new_str);
-    }
+  {
+    sprintf(new_str + len, "%d", ++num);
+    name = fts_new_symbol(new_str);
+  }
 
   return name;
 }
@@ -1696,7 +1676,7 @@ midiconfig_restore(midiconfig_t *config)
 {
   fts_atom_t a;
 
-  fts_set_object(&a, midiconfig);
+  fts_set_object(&a, config);
   fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, fts_null);
   fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, &a);
 }
@@ -1737,31 +1717,31 @@ midiconfig_update_labels(midiconfig_t *config)
 
   /* check inout and output midiports */
   for(i=0; i<n; i++) 
+  {
+    if(label->input == NULL || fts_object_get_class((fts_object_t *)label->input) != midibus_type) 
     {
-      if(label->input == NULL || fts_object_get_class((fts_object_t *)label->input) != midibus_type) 
-	{
-	  fts_midiport_t *input = NULL;
-	  fts_midiport_t *output = NULL;
+      fts_midiport_t *input = NULL;
+      fts_midiport_t *output = NULL;
 	  
-	  if(label->input != NULL)
-	    {
-	      input = midimanagers_get_input(label->input_name, label->name);
+      if(label->input != NULL)
+      {
+	input = midimanagers_get_input(label->input_name, label->name);
 	      
-	      if(input != label->input) 
-		midiconfig_label_set_input(config, label, i, input, label->input_name);
-	    }	  
+	if(input != label->input) 
+	  midiconfig_label_set_input(config, label, i, input, label->input_name);
+      }	  
 
-	  if(label->output != NULL)
-	    {
-	      output = midimanagers_get_output(label->output_name, label->name);
+      if(label->output != NULL)
+      {
+	output = midimanagers_get_output(label->output_name, label->name);
 	      
-	      if(output != label->output) 
-		midiconfig_label_set_output(config, label, i, output, label->output_name);
-	    }
-	}
-      
-      label = label->next;
+	if(output != label->output) 
+	  midiconfig_label_set_output(config, label, i, output, label->output_name);
+      }
     }
+      
+    label = label->next;
+  }
 }
 
 static void
@@ -1770,12 +1750,12 @@ midiconfig_erase_labels(midiconfig_t *config)
   midilabel_t *label = config->labels;
   
   while(label != NULL)
-    {
-      midilabel_t *next = label->next;
+  {
+    midilabel_t *next = label->next;
       
-      midilabel_delete(label);
-      label = next;
-    }
+    midilabel_delete(label);
+    label = next;
+  }
   
   config->labels = NULL;
   config->n_labels = 0;
@@ -1784,37 +1764,69 @@ midiconfig_erase_labels(midiconfig_t *config)
 static void
 midiconfig_set_defaults()
 {
+  midiconfig_t* midiconfig = (midiconfig_t*)fts_midiconfig_get();
   if(midiconfig != NULL)
+  {
+    midilabel_t *label = midiconfig_label_get_by_index(midiconfig, 0);
+      
+    if(label == NULL)
+      label = midiconfig_label_insert(midiconfig, 0, fts_s_default);
+      
+    if(label->input == NULL)
     {
-      midilabel_t *label = midiconfig_label_get_by_index(midiconfig, 0);
-      
-      if(label == NULL)
-	label = midiconfig_label_insert(midiconfig, 0, fts_s_default);
-      
-      if(label->input == NULL)
-	{
-	  fts_symbol_t name = midimanagers_get_default_input();
-	  fts_midiport_t *port = midimanagers_get_input(name, fts_s_default);
+      fts_symbol_t name = midimanagers_get_default_input();
+      fts_midiport_t *port = midimanagers_get_input(name, fts_s_default);
 	  
-	  midiconfig_label_set_input(midiconfig, label, 0, port, name);
-	}
-
-      if(label->output == NULL)
-	{
-	  fts_symbol_t name = midimanagers_get_default_output();
-	  fts_midiport_t *port = midimanagers_get_output(name, fts_s_default);
-	  
-	  midiconfig_label_set_output(midiconfig, label, 0, port, name);
-	}
-
-      midiconfig_set_dirty( midiconfig, 0);
+      midiconfig_label_set_input(midiconfig, label, 0, port, name);
     }
+
+    if(label->output == NULL)
+    {
+      fts_symbol_t name = midimanagers_get_default_output();
+      fts_midiport_t *port = midimanagers_get_output(name, fts_s_default);
+	  
+      midiconfig_label_set_output(midiconfig, label, 0, port, name);
+    }
+
+    midiconfig_set_dirty( midiconfig, 0);
+  }
+}
+
+void
+fts_midiconfig_set_defaults(midiconfig_t* midiconfig)
+{
+  if(midiconfig != NULL)
+  {
+    midilabel_t *label = midiconfig_label_get_by_index(midiconfig, 0);
+      
+    if(label == NULL)
+      label = midiconfig_label_insert(midiconfig, 0, fts_s_default);
+      
+    if(label->input == NULL)
+    {
+      fts_symbol_t name = midimanagers_get_default_input();
+      fts_midiport_t *port = midimanagers_get_input(name, fts_s_default);
+	  
+      midiconfig_label_set_input(midiconfig, label, 0, port, name);
+    }
+
+    if(label->output == NULL)
+    {
+      fts_symbol_t name = midimanagers_get_default_output();
+      fts_midiport_t *port = midimanagers_get_output(name, fts_s_default);
+	  
+      midiconfig_label_set_output(midiconfig, label, 0, port, name);
+    }
+
+    midiconfig_set_dirty( midiconfig, 0);
+  }
 }
 
 /* midi manager API */
 void
 fts_midiconfig_update()
 {
+  midiconfig_t* midiconfig = (midiconfig_t*)fts_midiconfig_get();
   midiconfig_update_labels(midiconfig);
   midiconfig_update_devices(midiconfig);
 }
@@ -1838,13 +1850,14 @@ fts_midiconfig_add_manager(fts_midimanager_t *mm)
 fts_midiport_t *
 fts_midiconfig_get_input(fts_symbol_t name)
 {
+  midiconfig_t* midiconfig = (midiconfig_t*)fts_midiconfig_get();
   if(midiconfig != NULL)
-    {
-      midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
+  {
+    midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
       
-      if(label != NULL && label->input != NULL)
-	return label->input;
-    }
+    if(label != NULL && label->input != NULL)
+      return label->input;
+  }
 
   return midinull;
 }
@@ -1852,13 +1865,14 @@ fts_midiconfig_get_input(fts_symbol_t name)
 fts_midiport_t *
 fts_midiconfig_get_output(fts_symbol_t name)
 {
+  midiconfig_t* midiconfig = (midiconfig_t*)fts_midiconfig_get();
   if(midiconfig != NULL)
-    {
-      midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
+  {
+    midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
       
-      if(label != NULL && label->output != NULL)
-	return label->output;
-    }
+    if(label != NULL && label->output != NULL)
+      return label->output;
+  }
   
   return midinull;
 }
@@ -1869,32 +1883,33 @@ fts_midiconfig_add_listener(fts_object_t *obj)
   fts_name_add_listener(fts_get_root_patcher(), midiconfig_s_name, obj);
 }
 
-fts_object_t *
-fts_midiconfig_get(void)
-{
-  return (fts_object_t *)midiconfig;
-}
+/* fts_object_t * */
+/* fts_midiconfig_get(void) */
+/* { */
+/*   return (fts_object_t *)midiconfig; */
+/* } */
 
-static void
-midiconfig_set(midiconfig_t *config)
+void
+fts_midiconfig_set(midiconfig_t *config)
 {
+  midiconfig_t* midiconfig = (midiconfig_t*)fts_midiconfig_get();
   if(config != NULL)
-    {
-      fts_object_refer((fts_object_t *)config);
+  {
+    fts_object_refer((fts_object_t *)config);
  
-      if( (midiconfig != NULL) && fts_object_has_id( (fts_object_t *)midiconfig))
-	{
-	  fts_atom_t a;
+    if( (midiconfig != NULL) && fts_object_has_id( (fts_object_t *)midiconfig))
+    {
+      fts_atom_t a;
       
-	  if( ! fts_object_has_id( (fts_object_t *)config))
-	    fts_client_register_object(  (fts_object_t *)config, fts_get_client_id( (fts_object_t *)midiconfig));
+      if( ! fts_object_has_id( (fts_object_t *)config))
+	fts_client_register_object(  (fts_object_t *)config, fts_get_client_id( (fts_object_t *)midiconfig));
 	  
-	  fts_set_int(&a, fts_get_object_id( (fts_object_t *)config));
-	  fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)config), fts_s_midi_config, 1, &a);
+      fts_set_int(&a, fts_get_object_id( (fts_object_t *)config));
+      fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)config), fts_s_midi_config, 1, &a);
       
-	  fts_send_message( (fts_object_t *)config, fts_s_upload, 0, 0);
-	}
+      fts_send_message( (fts_object_t *)config, fts_s_upload, 0, 0);
     }
+  }
   
   if(midiconfig != NULL)
     fts_object_release((fts_object_t *)midiconfig);
@@ -1907,7 +1922,7 @@ midiconfig_set(midiconfig_t *config)
  *  MIDI configuration class
  *
  */
-static fts_class_t *midiconfig_type = NULL;
+fts_class_t *midiconfig_type = NULL;
 
 static void
 midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1934,10 +1949,10 @@ midiconfig_restore_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   
   /* make sure that first label is "default" */
   if(index == 0 && name != fts_s_default)
-    {
-      midiconfig_label_insert(this, 0, fts_s_default);
-      index = 1;
-    }
+  {
+    midiconfig_label_insert(this, 0, fts_s_default);
+    index = 1;
+  }
     
   midiconfig_label_insert(this, index, name);
   midiconfig_set_input(this, index, input);
@@ -2008,27 +2023,27 @@ midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   /* upload labels with inputs and outputs */
   for(i=0; i<this->n_labels; i++) 
-    {
-      fts_atom_t args[4];
+  {
+    fts_atom_t args[4];
       
-      fts_set_int(args, i);
-      fts_set_symbol(args + 1, label->name);
-      fts_set_symbol(args + 2, label->input_name);
-      fts_set_symbol(args + 3, label->output_name);
-      fts_client_send_message((fts_object_t *)this, fts_s_insert, 4, args);
+    fts_set_int(args, i);
+    fts_set_symbol(args + 1, label->name);
+    fts_set_symbol(args + 2, label->input_name);
+    fts_set_symbol(args + 3, label->output_name);
+    fts_client_send_message((fts_object_t *)this, fts_s_insert, 4, args);
       
-      label = label->next;
-    }
+    label = label->next;
+  }
 
   midiconfig_update_labels(this);
   midiconfig_update_devices(this);
 
-  if( this->file_name != NULL)
-    {
-      fts_atom_t a[1];
-      fts_set_symbol( a, this->file_name);
-      fts_client_send_message((fts_object_t *)this, fts_s_name, 1, a);
-    }
+/*   if( this->file_name != NULL) */
+/*   { */
+/*     fts_atom_t a[1]; */
+/*     fts_set_symbol( a, this->file_name); */
+/*     fts_client_send_message((fts_object_t *)this, fts_s_name, 1, a); */
+/*   } */
 }
 
 static void
@@ -2044,14 +2059,14 @@ midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   obj = fts_binary_file_load(path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
 
   if(obj != NULL && fts_object_get_class(obj) == midiconfig_type) 
-    {
-      /* replace current config by loaded config */
-      midiconfig_set((midiconfig_t *)obj);
+  {
+    /* replace current config by loaded config */
+    fts_midiconfig_set((midiconfig_t *)obj);
 
-      ((midiconfig_t *)obj)->file_name = fts_new_symbol( path);
+/*     ((midiconfig_t *)obj)->file_name = fts_new_symbol( path); */
       
-      midiconfig_set_dirty( (midiconfig_t *)obj, 0);
-    }
+    midiconfig_set_dirty( (midiconfig_t *)obj, 0);
+  }
   else
     fts_log( "midiconfig load: cannot read MIDI configuration from file %s\n", file_name);
 }
@@ -2065,31 +2080,33 @@ midiconfig_save( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   char path[MAXPATHLEN];
   fts_bmax_file_t f;
 
+  post("MIDI CONFIG SAVE \n");
+
   fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
 
   if (fts_bmax_file_open(&f, path, 0, 0, 0) >= 0)
-    {
-      midilabel_t *label = this->labels;
+  {
+    midilabel_t *label = this->labels;
 
-      fts_bmax_code_new_object(&f, o, -1);
+    fts_bmax_code_new_object(&f, o, -1);
       
-      while(label) 
-	{
-	  /* code insert message for each label */
-	  fts_bmax_code_push_symbol(&f, label->output_name);
-	  fts_bmax_code_push_symbol(&f, label->input_name);
-	  fts_bmax_code_push_symbol(&f, label->name);
-	  fts_bmax_code_obj_mess(&f, fts_s_restore, 3);
-	  fts_bmax_code_pop_args(&f, 3);
+    while(label) 
+    {
+      /* code insert message for each label */
+      fts_bmax_code_push_symbol(&f, label->output_name);
+      fts_bmax_code_push_symbol(&f, label->input_name);
+      fts_bmax_code_push_symbol(&f, label->name);
+      fts_bmax_code_obj_mess(&f, fts_s_restore, 3);
+      fts_bmax_code_pop_args(&f, 3);
 
-	  label = label->next;	  
-	}
-
-      fts_bmax_code_return(&f);
-      fts_bmax_file_close(&f);
-    
-      midiconfig_set_dirty( this, 0);
+      label = label->next;	  
     }
+
+    fts_bmax_code_return(&f);
+    fts_bmax_file_close(&f);
+    
+    midiconfig_set_dirty( this, 0);
+  }
   else
     fts_log( "midiconfig save: cannot open file %s\n", file_name);
 }
@@ -2099,7 +2116,7 @@ midiconfig_set_to_defaults( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   midiconfig_t *this = (midiconfig_t *)o;
   midiconfig_clear( o, winlet, fts_s_clear, 0, 0);
-  this->file_name = NULL;
+/*   this->file_name = NULL; */
   midiconfig_upload( o, winlet, fts_s_upload, 0, 0); 
   
   midiconfig_set_dirty( this, 0);
@@ -2112,17 +2129,17 @@ static void
 midiconfig_set_dirty(midiconfig_t *this, int is_dirty)
 {
   if(this->dirty != is_dirty)
-    {
-      this->dirty = is_dirty;
+  {
+    this->dirty = is_dirty;
 
-      if ( fts_object_has_id( (fts_object_t *)this))
-	{
-	  fts_atom_t a[1];
+    if ( fts_object_has_id( (fts_object_t *)this))
+    {
+      fts_atom_t a[1];
 	  
-	  fts_set_int(&a[0], is_dirty);
-	  fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
-	}
+      fts_set_int(&a[0], is_dirty);
+      fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
     }
+  }
 }
 
 
@@ -2153,7 +2170,7 @@ midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->n_labels = 0;
 
   this->dirty = 0;
-  this->file_name = NULL;
+/*   this->file_name = NULL; */
 
   /* modify object description */
   fts_set_symbol(&a, midiconfig_s_name);
@@ -2199,7 +2216,7 @@ fts_midi_config(void)
 {
   fts_atom_t a;
   int i;
-
+  
   fts_midi_types[midi_note] = fts_new_symbol("note");
   fts_midi_types[midi_poly_pressure] = fts_new_symbol("poly");
   fts_midi_types[midi_control_change] = fts_new_symbol("ctl");
@@ -2212,13 +2229,13 @@ fts_midi_config(void)
 
   fts_hashtable_init( &midi_type_hash, FTS_HASHTABLE_SMALL);
   for(i=0; i<n_midi_types; i++)
-    {
-      fts_atom_t key;
+  {
+    fts_atom_t key;
 
-      fts_set_symbol(&key, fts_midi_types[i]);
-      fts_set_int(&a, i);
-      fts_hashtable_put(&midi_type_hash, &key, &a);
-    }
+    fts_set_symbol(&key, fts_midi_types[i]);
+    fts_set_int(&a, i);
+    fts_hashtable_put(&midi_type_hash, &key, &a);
+  }
 
   fts_s_midievent = fts_new_symbol("midievent");
   fts_midievent_type = fts_class_install(fts_s_midievent, midievent_instantiate);
@@ -2248,12 +2265,11 @@ fts_midi_config(void)
   /* create global NULL MIDI port */
   midinull = (fts_midiport_t *)fts_object_create(midinull_type, NULL, 0, 0);
   fts_object_refer((fts_object_t *)midinull);
-
-  /* create first default midi configuration */
-  midiconfig_set((midiconfig_t *)fts_object_create(midiconfig_type, NULL, 0, 0));
-  midiconfig_set_defaults();
-
-  /* define global midiconfig variable */
-  fts_set_object(&a, midiconfig);
-  fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, &a);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
