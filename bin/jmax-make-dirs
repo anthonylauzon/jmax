@@ -71,11 +71,14 @@ do_it ()
 	echo $i
 	if [ -d $i/../src ]
 	then
-	    for a in $ARCHS
-	    do
-		echo mkdir -p $i/$a/debug $i/$a/opt
-		mkdir -p $i/$a/debug $i/$a/opt
-	    done
+	    if [ ! -d $i/../../java ]
+	    then
+		for a in $ARCHS
+		do
+		    echo mkdir -p $i/$a/debug $i/$a/opt
+		    mkdir -p $i/$a/debug $i/$a/opt
+		done
+	   fi
        fi
     done
 }
