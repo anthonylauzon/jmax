@@ -25,18 +25,18 @@ interface TransitionAction {
   public void fire( byte input);
 }
 
-class StringCache {
-  StringCache( int initialCapacity)
+class SymbolCache {
+  SymbolCache( int initialCapacity)
   {
     cache = new String[initialCapacity];
   }
 
-  StringCache()
+  SymbolCache()
   {
-    this( 256);
+    this( 512);
   }
 
-  void put( int index, String s)
+  final String put( int index, String s)
   {
     if ( index >= cache.length)
       {
@@ -51,6 +51,8 @@ class StringCache {
       }
 
     cache[index] = s.intern();
+
+    return cache[index];
   }
 
   String[] cache;
@@ -58,16 +60,16 @@ class StringCache {
 
 class State {
   class Transition {
-    Transition( byte input, State state, TransitionAction action, Transition next)
+    Transition( byte input, State targetState, TransitionAction action, Transition next)
     {
       this.input = input; 
-      this.state = state;
+      this.targetState = targetState;
       this.action = action;
       this.next = next;
     }
 
     byte input;
-    State state;
+    State targetState;
     TransitionAction action;
     Transition next;
   }
@@ -77,14 +79,14 @@ class State {
     this.name = name;
   }
 
-  void addTransition( byte input, State state, TransitionAction action)
+  void addTransition( byte input, State targetState, TransitionAction action)
   {
-    transitions = new Transition( input, state, action, transitions);
+    transitions = new Transition( input, targetState, action, transitions);
   }
 
-  void addTransition( State state, TransitionAction action)
+  void addTransition( State targetState, TransitionAction action)
   {
-    defaultTransition = new Transition( (byte)0, state, action, null);
+    defaultTransition = new Transition( (byte)0, targetState, action, null);
   }
 
   final State next( byte input)
@@ -96,7 +98,7 @@ class State {
 	if (transition.input == input)
 	  {
 	    transition.action.fire( input);
-	    return transition.state;
+	    return transition.targetState;
 	  }
 
 	transition = transition.next;
@@ -105,7 +107,7 @@ class State {
     if (defaultTransition != null)
       {
 	defaultTransition.action.fire( input);
-	return defaultTransition.state;
+	return defaultTransition.targetState;
       }
 
     return null;
@@ -123,7 +125,7 @@ class State {
 
 class FtsProtocolDecoder {
 
-  private void buildStateMachine()
+  private State buildStateMachine()
   {
     TransitionAction clearAction = new TransitionAction() {
 	public void fire( byte input)
@@ -153,50 +155,77 @@ class FtsProtocolDecoder {
 	}
       };
 
-    TransitionAction endTargetAction = new TransitionAction() {
+    TransitionAction endIntAction = new TransitionAction() {
 	public void fire( byte input)
 	{
 	  ival = ival << 8 | input;
-	  target = server.getObject( ival);
+	  if (argsCount >= 2)
+	    args.add( ival);
+	  argsCount++;
 	}
       };
 
-    TransitionAction endSelectorAction = new TransitionAction() {
-	public void fire( byte input)
-	{
-	  selector = buffer.toString();
-	  args.clear();
-	}
-      };
-
-    TransitionAction endIntArgAction = new TransitionAction() {
+    TransitionAction endFloatAction = new TransitionAction() {
 	public void fire( byte input)
 	{
 	  ival = ival << 8 | input;
-	  args.add( ival);
+	  if (argsCount >= 2)
+	    args.add( Float.intBitsToFloat(ival) );
+	  argsCount++;
 	}
       };
 
-    TransitionAction endFloatArgAction = new TransitionAction() {
+    TransitionAction endStringAction = new TransitionAction() {
+	public void fire( byte input)
+	{
+	  if (argsCount >= 2)
+	    args.add( buffer.toString());
+	  argsCount++;
+	}
+      };
+
+    TransitionAction endSymbolIndexAction = new TransitionAction() {
 	public void fire( byte input)
 	{
 	  ival = ival << 8 | input;
-	  args.add( Float.intBitsToFloat(ival) );
+	  String s = symbolCache.cache[ival];
+
+	  if (argsCount == 1)
+	    selector = s;
+	  else
+	    args.add( s);
+
+	  argsCount++;
 	}
       };
 
-    TransitionAction endStringArgAction = new TransitionAction() {
+    TransitionAction endSymbolCacheAction = new TransitionAction() {
 	public void fire( byte input)
 	{
-	  args.add( buffer.toString());
+	  String s = symbolCache.put( ival, buffer.toString());
+
+	  if (argsCount == 1)
+	    selector = s;
+	  else
+	    args.add( s);
+
+	  argsCount++;
 	}
       };
 
-    TransitionAction endObjectArgAction = new TransitionAction() {
+    TransitionAction endObjectAction = new TransitionAction() {
 	public void fire( byte input)
 	{
 	  ival = ival << 8 | input;
-	  args.add( server.getObject( ival));
+
+	  FtsObject obj = server.getObject( ival);
+
+	  if (argsCount == 0)
+	    args.add( obj);
+	  else
+	    target = obj;
+
+	  argsCount++;
 	}
       };
 
@@ -204,20 +233,12 @@ class FtsProtocolDecoder {
 	public void fire( byte input)
 	{
   	  FtsObject.invokeCallback( target, selector, args);
+	  args.clear();
+	  argsCount = 0;
 	}
       };
 
-    initialState = new State( "initial");
-
-    State qTarget0 = new State( "Target0");
-    State qTarget1 = new State( "Target1");
-    State qTarget2 = new State( "Target2");
-    State qTarget3 = new State( "Target3");
-
-    State qSelectorTag = new State( "SelectorTag");
-    State qSelector = new State( "Selector");
-
-    State qArg = new State( "Arg");
+    State qStart = new State( "Start");
 
     State qInt0 = new State( "Int0");
     State qInt1 = new State( "Int1");
@@ -236,40 +257,56 @@ class FtsProtocolDecoder {
     State qObject2 = new State( "Object2");
     State qObject3 = new State( "Object3");
 
-    initialState.addTransition( FtsProtocol.OBJECT, qTarget0, clearAction);
-    qTarget0.addTransition( qTarget1, shiftAction);
-    qTarget1.addTransition( qTarget2, shiftAction);
-    qTarget2.addTransition( qTarget3, shiftAction);
-    qTarget3.addTransition( qSelectorTag, endTargetAction);
+    State qSymbolIndex0 = new State( "SymbolIndex0");
+    State qSymbolIndex1 = new State( "SymbolIndex1");
+    State qSymbolIndex2 = new State( "SymbolIndex2");
+    State qSymbolIndex3 = new State( "SymbolIndex3");
 
-    qSelectorTag.addTransition( FtsProtocol.STRING, qSelector, bufferClearAction);
+    State qSymbolCache0 = new State( "SymbolCache0");
+    State qSymbolCache1 = new State( "SymbolCache1");
+    State qSymbolCache2 = new State( "SymbolCache2");
+    State qSymbolCache3 = new State( "SymbolCache3");
+    State qSymbolCache4 = new State( "SymbolCache4");
 
-    qSelector.addTransition( FtsProtocol.STRING_END, qArg, endSelectorAction);
-    qSelector.addTransition( qSelector, bufferShiftAction);
-
-    qArg.addTransition( FtsProtocol.INT, qInt0, clearAction);
-    qArg.addTransition( FtsProtocol.FLOAT, qFloat0, clearAction);
-    qArg.addTransition( FtsProtocol.STRING, qString, bufferClearAction);
-    qArg.addTransition( FtsProtocol.OBJECT, qObject0, clearAction);
-    qArg.addTransition( FtsProtocol.END_OF_MESSAGE, initialState, endMessageAction);
+    qStart.addTransition( FtsProtocol.INT, qInt0, clearAction);
+    qStart.addTransition( FtsProtocol.FLOAT, qFloat0, clearAction);
+    qStart.addTransition( FtsProtocol.SYMBOL_INDEX, qSymbolIndex0, clearAction);
+    qStart.addTransition( FtsProtocol.SYMBOL_CACHE, qSymbolCache0, clearAction);
+    qStart.addTransition( FtsProtocol.STRING, qString, bufferClearAction);
+    qStart.addTransition( FtsProtocol.OBJECT, qObject0, clearAction);
+    qStart.addTransition( FtsProtocol.END_OF_MESSAGE, qStart, endMessageAction);
 
     qInt0.addTransition( qInt1, shiftAction);
     qInt1.addTransition( qInt2, shiftAction);
     qInt2.addTransition( qInt3, shiftAction);
-    qInt3.addTransition( qArg, endIntArgAction);
+    qInt3.addTransition( qStart, endIntAction);
 
     qFloat0.addTransition( qFloat1, shiftAction);
     qFloat1.addTransition( qFloat2, shiftAction);
     qFloat2.addTransition( qFloat3, shiftAction);
-    qFloat3.addTransition( qArg, endFloatArgAction);
+    qFloat3.addTransition( qStart, endFloatAction);
 
-    qString.addTransition( FtsProtocol.STRING_END, qArg, endStringArgAction);
+    qSymbolIndex0.addTransition( qSymbolIndex1, shiftAction);
+    qSymbolIndex1.addTransition( qSymbolIndex2, shiftAction);
+    qSymbolIndex2.addTransition( qSymbolIndex3, shiftAction);
+    qSymbolIndex3.addTransition( qStart, endSymbolIndexAction);
+
+    qSymbolCache0.addTransition( qSymbolCache1, shiftAction);
+    qSymbolCache1.addTransition( qSymbolCache2, shiftAction);
+    qSymbolCache2.addTransition( qSymbolCache3, shiftAction);
+    qSymbolCache3.addTransition( qSymbolCache4, shiftAction);
+    qSymbolCache4.addTransition( FtsProtocol.SYMBOL_CACHE_END, qStart, endSymbolCacheAction);
+    qSymbolCache4.addTransition( qSymbolCache4, bufferShiftAction);
+
+    qString.addTransition( FtsProtocol.STRING_END, qStart, endStringAction);
     qString.addTransition( qString, bufferShiftAction);
 
     qObject0.addTransition( qObject1, shiftAction);
     qObject1.addTransition( qObject2, shiftAction);
     qObject2.addTransition( qObject3, shiftAction);
-    qObject3.addTransition( qArg, endObjectArgAction);
+    qObject3.addTransition( qStart, endObjectAction);
+
+    return qStart;
   }
 
   FtsProtocolDecoder( FtsServer server)
@@ -278,10 +315,11 @@ class FtsProtocolDecoder {
 
     buffer = new StringBuffer();
     args = new FtsArgs();
+    argsCount = 0;
 
-    buildStateMachine();
+    symbolCache = new SymbolCache();
 
-    currentState = initialState;
+    currentState = buildStateMachine();
   }
 
   void decode( byte[] data, int offset, int length) throws FtsClientException
@@ -302,7 +340,9 @@ class FtsProtocolDecoder {
   private FtsObject target;
   private String selector;
   private FtsArgs args;
+  private int argsCount;
 
-  private State initialState;
   private State currentState;
+
+  private SymbolCache symbolCache;
 }
