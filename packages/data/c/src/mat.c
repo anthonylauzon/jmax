@@ -528,7 +528,7 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
         fts_set_object(&a[2+i], dobj);               
       }
       else
-        fts_atom_copy(d, &a[2+i]);
+        a[2+i] = *d;
     }
     fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
     
@@ -1348,16 +1348,16 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if (fts_is_tuple(at + i))
       {
-              fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
-              int size = fts_tuple_get_size(tup);
+	fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
+	int size = fts_tuple_get_size(tup);
               
-              if(size > n)
+	if (size > n)
           n = size;
               
-              m++;
+	m++;
       }
       else
-              break;
+	break;
     }
     
     mat_set_size(self, m, n);

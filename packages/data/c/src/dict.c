@@ -151,8 +151,8 @@ dict_copy(dict_t *org, dict_t *copy)
     fts_iterator_next(&value_iterator, &value);
     
     /* copy entry */
+    fts_set_void(&value_copy);
     fts_atom_copy(&value, &value_copy);
-    fts_atom_refer(&value_copy);
     
     /* store entry to copy hash table */
     fts_hashtable_put(&copy->hash, &key, &value_copy);
@@ -265,7 +265,7 @@ dict_upload_data(dict_t *self)
         fts_set_object(&a[2+i], dobj);
       }
       else
-        fts_atom_copy(d, &a[2+i]);
+        a [2+i] = *d;
     }
     fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
     
