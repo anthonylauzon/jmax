@@ -22,7 +22,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 		File.separator +
 		"images" + 
 		File.separator +
-		"tool_ext.gif");
+		"mini_icon_jmax.gif");
 
     jMaxDocumentIcon = new ImageIcon(iconName);
   }

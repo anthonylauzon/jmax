@@ -4,6 +4,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+import com.sun.java.swing.*;
 
 /** An instance of this document handler can load MaxDocument from
  *  a bmax binary file.
@@ -13,8 +14,19 @@ import ircam.jmax.mda.*;
 
 public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 {
+  private ImageIcon PatDocumentIcon;
+
   public FtsDotPatRemoteDocumentHandler()
   {
+    String iconName;
+
+    iconName = (MaxApplication.getProperty( "root" ) +
+		File.separator +
+		"images" + 
+		File.separator +
+		"mini_icon_pat.gif");
+
+    PatDocumentIcon = new ImageIcon(iconName);
   }
 
   /** We can load from a file start with the "max v2" string*/
@@ -114,6 +126,11 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
   public String getDescription()
   {
     return "Max Patches";
+  }
+
+  public Icon getIcon()
+  {
+    return PatDocumentIcon;
   }
 }
 
