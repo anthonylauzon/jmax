@@ -150,7 +150,7 @@ double fts_systime()
 /*                                                                             */
 /* *************************************************************************** */
 
-void fts_platform_init( int argc, char **argv)
+void fts_platform_init( void)
 {
   WORD wVersionRequested;
   WSADATA wsaData;
