@@ -330,7 +330,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	textClipboard = itsSketchPad.getSelectedText(); 
 	itsSketchPad.deleteSelectedText();
       }
-    else
+    else if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
@@ -351,7 +351,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       {
 	textClipboard = itsSketchPad.getSelectedText(); 
       }
-    else
+    else if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
@@ -445,20 +445,40 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	  Help();
 	}
     });
+
+    // Adding the summaries 
+
+    Enumeration en = FtsHelpPatchTable.getSummaries(); 
+
+    while (en.hasMoreElements())
+       {
+	 final String str = (String) en.nextElement();
+
+	aMenuItem = new MenuItem( str + " summary");
+	menu.add( aMenuItem);
+	aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
+	  public  void actionPerformed( ActionEvent e)
+	    {
+	      FtsHelpPatchTable.openHelpSummary( str);
+	    }
+	});
+       }
   }
 
 
   void Help()
   {
-    //ask help for the selected element...
-    ErmesObject aObject;
-      
-    for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements(); )
+    if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
-	aObject = (ErmesObject) en.nextElement();
+	ErmesObject aObject;
+      
+	for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements(); )
+	  {
+	    aObject = (ErmesObject) en.nextElement();
 	
-	if (! FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject))
-	  new ErrorDialog( this, "Sorry, no help for object " + aObject.itsFtsObject.getClassName());
+	    if (! FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject))
+	      new ErrorDialog( this, "Sorry, no help for object " + aObject.itsFtsObject.getClassName());
+	  }
       }
   }
 

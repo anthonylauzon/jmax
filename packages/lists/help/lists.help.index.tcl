@@ -10,3 +10,4 @@ helpPatch listreverse $dir/listreverse.help.jmax
 helpPatch lists $dir/lists.overview.jmax
 helpPatch listsublist $dir/listsublist.help.jmax
 helpPatch listtail $dir/listtail.help.jmax
+helpSummary Lists $dir/lists.summary.jmax

@@ -1503,7 +1503,7 @@ fts_expressions_init(void)
   fts_symbol_set_operator(fts_s_times, FTS_OP_TIMES);
   fts_symbol_set_operator(fts_s_div,   FTS_OP_DIV);
   fts_symbol_set_operator(fts_s_dollar, FTS_OP_DOLLAR);
-  fts_symbol_set_operator(fts_s_dot,    FTS_OP_DOT);
+  /* fts_symbol_set_operator(fts_s_dot,    FTS_OP_DOT); */
   fts_symbol_set_operator(fts_s_percent,     FTS_OP_REMAINDER);
   fts_symbol_set_operator(fts_s_shift_left,  FTS_OP_SHIFT_LEFT);
   fts_symbol_set_operator(fts_s_shift_right, FTS_OP_SHIFT_RIGHT);

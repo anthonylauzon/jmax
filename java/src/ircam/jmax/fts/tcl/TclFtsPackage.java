@@ -44,6 +44,7 @@ public class TclFtsPackage
     interp.createCommand("templatePath",  new FtsTemplatePathCmd());
 
     interp.createCommand("helpPatch",  new FtsHelpPatchCmd());
+    interp.createCommand("helpSummary",  new FtsHelpSummaryCmd());
     interp.createCommand("referenceURL",  new FtsReferenceURLCmd());
 
     // UCS

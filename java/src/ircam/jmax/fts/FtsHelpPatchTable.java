@@ -16,10 +16,16 @@ import ircam.jmax.mda.*;
 public class FtsHelpPatchTable
 {
   static Hashtable helpTable = new Hashtable(256, 0.99f);
+  static Hashtable helpSummaryTable = new Hashtable();
 
   static public void add(String className, String patch)
   {
     helpTable.put(className, patch);
+  }
+
+  static public void addSummary(String name, String patch)
+  {
+    helpSummaryTable.put(name, patch);
   }
 
   static public boolean exists(String className)
@@ -27,9 +33,19 @@ public class FtsHelpPatchTable
     return helpTable.containsKey(className);
   }
 
+  static public boolean summaryExists(String name)
+  {
+    return helpSummaryTable.containsKey(name);
+  }
+
   static String getHelpPatch(String className)
   {
     return (String) helpTable.get(className);
+  }
+
+  static String getHelpSummaryPatch(String className)
+  {
+    return (String) helpSummaryTable.get(className);
   }
 
   static public boolean openHelpPatch(FtsObject obj)
@@ -53,6 +69,34 @@ public class FtsHelpPatchTable
       }
     else
       return false;
+  }
+
+  static public boolean openHelpSummary(String name)
+  {
+    if (summaryExists(name))
+      {
+	try
+	  {
+	    File file = new File(getHelpSummaryPatch(name));
+	    MaxDocument document;
+
+	    document = Mda.loadDocument(file);
+	    document.edit();
+	  }
+	catch (MaxDocumentException e)
+	  {
+	    return false;
+	  }
+
+	return true;
+      }
+    else
+      return false;
+  }
+
+  static public Enumeration getSummaries()
+  {
+    return helpSummaryTable.keys();
   }
 }
 
