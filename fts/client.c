@@ -247,10 +247,10 @@ static void client_register_object( client_t *this, fts_object_t *object, int ob
   fts_atom_t k, v;
 
   if (object_id <= FTS_NO_ID)
-    {
-      object_id = this->object_id_count;
-      this->object_id_count += 2; 
-    }
+  {
+    object_id = this->object_id_count;
+    this->object_id_count += 2; 
+  }
 
   fts_set_int( &k, object_id);
   fts_set_object( &v, object);
@@ -281,15 +281,15 @@ static void symbol_cache_destroy( symbol_cache_t *cache)
 static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
 {
   if (index >= cache->length)
-    {
-      int i, old_length = cache->length;
+  {
+    int i, old_length = cache->length;
 
-      cache->length = index+1;
-      cache->symbols = fts_realloc( cache->symbols, cache->length * sizeof( fts_symbol_t));
+    cache->length = index+1;
+    cache->symbols = fts_realloc( cache->symbols, cache->length * sizeof( fts_symbol_t));
 
-      for ( i = old_length; i < cache->length; i++)
-	cache->symbols[i] = 0;
-    }
+    for ( i = old_length; i < cache->length; i++)
+      cache->symbols[i] = 0;
+  }
 
   cache->symbols[index] = s;
 }
@@ -306,11 +306,11 @@ static void swap_bytes( unsigned char *p, int n)
   int i, tmp;
 
   for ( i = 0; i < n/2; i++)
-    {
-      tmp = p[i];
-      p[i] = p[n-i-1];
-      p[n-i-1] = tmp;
-    }
+  {
+    tmp = p[i];
+    p[i] = p[n-i-1];
+    p[n-i-1] = tmp;
+  }
 }
 
 static int get_int_from_bytes( unsigned char *p)
@@ -428,10 +428,10 @@ static void end_object_action( unsigned char input, client_t *client)
   obj = client_get_object( client, id);
 
   if (obj == NULL)
-    {
-      fts_log( "[client] invalid object id: %d\n", id);
-      fts_set_void( &v);
-    }
+  {
+    fts_log( "[client] invalid object id: %d\n", id);
+    fts_set_void( &v);
+  }
   else
     fts_set_object( &v, obj);
 
@@ -451,10 +451,10 @@ static void end_message_action( unsigned char input, client_t *client)
   selector = fts_get_symbol( argv+1);
 
   if ( fts_is_void( argv))
-    {
-      fts_log( "[client] message %s to null object\n", selector);
-      goto skipped;
-    }
+  {
+    fts_log( "[client] message %s to null object\n", selector);
+    goto skipped;
+  }
     
   target = fts_get_object( argv);
   argc -= 2;
@@ -470,7 +470,7 @@ static void end_message_action( unsigned char input, client_t *client)
   if (target)
     fts_send_message( target, selector, argc, argv);
 
- skipped:
+skipped:
   fts_stack_clear( &client->input_args);
 }
 
@@ -651,24 +651,24 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
   int i;
   FILE* log;
   if ( size <= 0)
-    {
-      client_error( "[client] error in reading message, client stopped");
-      fts_log( "[client] error in reading message, client stopped\n");
+  {
+    client_error( "[client] error in reading message, client stopped");
+    fts_log( "[client] error in reading message, client stopped\n");
 
-      fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
-      fts_bytestream_destroy( this->stream);
-      this->stream = NULL;
-      fts_patcher_remove_object(fts_get_root_patcher(), (fts_object_t *) this);
+    fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
+    fts_bytestream_destroy( this->stream);
+    this->stream = NULL;
+    fts_patcher_remove_object(fts_get_root_patcher(), (fts_object_t *) this);
 
-      return;
-    }
+    return;
+  }
 
   for ( i = 0; i < size; i++)
-    {
-      state_next( this, buffer[i]);
-      if (this->state == 0)
-	fts_log( "[client] protocol error\n");
-    }
+  {
+    state_next( this, buffer[i]);
+    if (this->state == 0)
+      fts_log( "[client] protocol error\n");
+  }
 }
 
 static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -682,20 +682,20 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   id = fts_get_int_arg( ac, at, 1, -1);
 
   if (!parent || id < 0)
-    {
-      post( "client: invalid arguments\n");
-      return;
-    }
+  {
+    post( "client: invalid arguments\n");
+    return;
+  }
 
   newobj = fts_eval_object_description( (fts_patcher_t *)parent, ac-2, at+2);
 
   if (!newobj || fts_object_is_error( newobj))
-    {
-      post( "error in object instantiation (");
-      post_atoms( ac-2, at+2);
-      post( ")\n");
-      return;
-    }
+  {
+    post( "error in object instantiation (");
+    post_atoms( ac-2, at+2);
+    post( ")\n");
+    return;
+  }
 
   client_register_object( this, newobj, id);
 }
@@ -705,17 +705,17 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
   if ((ac == 3) &&
       fts_is_object(&at[0]) &&
       fts_is_symbol(&at[1]))
-    {
-      fts_object_t *obj;
-      fts_symbol_t name;
+  {
+    fts_object_t *obj;
+    fts_symbol_t name;
 
-      obj  = fts_get_object(&at[0]);
-      name = fts_get_symbol(&at[1]);
+    obj  = fts_get_object(&at[0]);
+    name = fts_get_symbol(&at[1]);
 
-      fts_object_put_prop(obj, name, &at[2]);
+    fts_object_put_prop(obj, name, &at[2]);
 
-      fts_patcher_set_dirty(fts_object_get_patcher(obj), 1);
-    }
+    fts_patcher_set_dirty(fts_object_get_patcher(obj), 1);
+  }
   else
     fts_log("[client]: System Error set_object_property: bad args\n");
 }
@@ -764,10 +764,10 @@ static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int a
   chdir( dir_name);
 
   if ((status = fts_file_load( file_name, parent, 0, 0, &object)) != fts_ok)
-    {
-      /* FIXME: signal the error */
-      fts_log("[client]: cannot open file %s\n", file_name);
-    }
+  {
+    /* FIXME: signal the error */
+    fts_log("[client]: cannot open file %s\n", file_name);
+  }
 
   /* Inform the object that it has been loaded from a file and tell it the file name */
   fts_set_symbol( a, file_name);
@@ -821,10 +821,10 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   chdir( dir_name);
 
   if (fts_bmax_file_load( file_name, parent, 0, 0, (fts_object_t **)&patcher) != fts_ok)
-    {
-      fts_log("[patcher]: Cannot read file %s\n", file_name);
-      return 0;
-    }
+  {
+    fts_log("[patcher]: Cannot read file %s\n", file_name);
+    return 0;
+  }
 
   client_register_object( client, (fts_object_t *)patcher, FTS_NO_ID);
 
@@ -863,20 +863,20 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
   project = fts_project_open(project_file);
 
   if(project == NULL || project->state == fts_package_corrupt) 
-    {
-      sprintf(message, "Invalid project file: \n%s\n", project_file);
-      fts_set_symbol( a, message);
-      fts_client_send_message( o, s_show_message, 1, a);
-    }  
+  {
+    sprintf(message, "Invalid project file: \n%s\n", project_file);
+    fts_set_symbol( a, message);
+    fts_client_send_message( o, s_show_message, 1, a);
+  }  
   else
-    {
-      client_register_object( this, (fts_object_t *)project, FTS_NO_ID);
+  {
+    client_register_object( this, (fts_object_t *)project, FTS_NO_ID);
 
-      fts_set_int(a, fts_get_object_id( (fts_object_t *)project));
-      fts_client_send_message(o, fts_s_project, 1, a);
+    fts_set_int(a, fts_get_object_id( (fts_object_t *)project));
+    fts_client_send_message(o, fts_s_project, 1, a);
       
-      fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0);
-    }
+    fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0);
+  }
 }
 
 static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -892,23 +892,23 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
   package = fts_package_load_from_file(package_name, package_file);
 
   if(package == NULL || package->state == fts_package_corrupt) 
-    {
-      sprintf(message, "Invalid package file: \n%s\n", package_file);
-      fts_set_symbol( a, message);
-      fts_client_send_message( o, s_show_message, 1, a);
-    }  
+  {
+    sprintf(message, "Invalid package file: \n%s\n", package_file);
+    fts_set_symbol( a, message);
+    fts_client_send_message( o, s_show_message, 1, a);
+  }  
   else
+  {
+    if (!fts_object_has_id( (fts_object_t *)package))
     {
-      if (!fts_object_has_id( (fts_object_t *)package))
-	{
-	  client_register_object( this, (fts_object_t *)package, FTS_NO_ID);
+      client_register_object( this, (fts_object_t *)package, FTS_NO_ID);
 
-	  fts_set_int(a, fts_get_object_id( (fts_object_t *)package));
-	  fts_client_send_message(o, fts_s_package, 1, a);    
-	  fts_send_message( (fts_object_t *)package, fts_s_upload, 0, 0);
-	}
-      fts_send_message( (fts_object_t *)package, fts_s_openEditor, 0, 0);
+      fts_set_int(a, fts_get_object_id( (fts_object_t *)package));
+      fts_client_send_message(o, fts_s_package, 1, a);    
+      fts_send_message( (fts_object_t *)package, fts_s_upload, 0, 0);
     }
+    fts_send_message( (fts_object_t *)package, fts_s_openEditor, 0, 0);
+  }
 }
 
 static void client_load_summary( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -936,10 +936,10 @@ static void client_predefine_objects( client_t *this)
   this->root_patcher = fts_object_create_in_patcher( patcher_class, fts_get_root_patcher(), 0, 0);
 
   if ( !this->root_patcher)
-    {
-      fts_object_error( (fts_object_t *)this, "cannot create client root patcher");
-      return;
-    }
+  {
+    fts_object_error( (fts_object_t *)this, "cannot create client root patcher");
+    return;
+  }
 
   fts_patcher_add_object(fts_get_root_patcher(), this->root_patcher);
   fts_object_refer( this->root_patcher);
@@ -960,10 +960,10 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
        || !fts_bytestream_check( (fts_object_t *)this->stream) 
        || !fts_bytestream_is_input( this->stream) 
        || !fts_bytestream_is_output( this->stream))
-    {
-      fts_object_error( (fts_object_t *)this, "invalid stream");
-      return;
-    }
+  {
+    fts_object_error( (fts_object_t *)this, "invalid stream");
+    return;
+  }
 
   this->client_id = client_table_add( this);
   this->object_id_count = 17;
@@ -1010,17 +1010,17 @@ static void client_get_config( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_object_t *config = fts_config_get();
 
   if(config != NULL) 
-    {
-      fts_atom_t a;
+  {
+    fts_atom_t a;
 
-      if ( !fts_object_has_id( config))
-	client_register_object((client_t *)o, config, FTS_NO_ID);
+    if ( !fts_object_has_id( config))
+      client_register_object((client_t *)o, config, FTS_NO_ID);
       
-      fts_set_int(&a, fts_get_object_id(config));
-      fts_client_send_message(o, fts_s_config, 1, &a);
+    fts_set_int(&a, fts_get_object_id(config));
+    fts_client_send_message(o, fts_s_config, 1, &a);
       
-      fts_send_message(config, fts_s_upload, 0, 0);
-    }
+    fts_send_message(config, fts_s_upload, 0, 0);
+  }
 }
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1121,36 +1121,36 @@ static void client_write_symbol( client_t *client, fts_symbol_t s)
   index = (unsigned int)s % cache->length;
 
   if (cache->symbols[index] == s)
-    {
+  {
 #ifdef CACHE_REPORT
-      cache->nhit++;
+    cache->nhit++;
 #endif
 
-      /* just send the index */
-      put_byte( client, FTS_PROTOCOL_SYMBOL_INDEX);
-      put_int( client, index);
-    }
+    /* just send the index */
+    put_byte( client, FTS_PROTOCOL_SYMBOL_INDEX);
+    put_int( client, index);
+  }
   else 
-    {
-      const char *p = s;
+  {
+    const char *p = s;
 
-      cache->symbols[index] = s;
+    cache->symbols[index] = s;
 
-      /* send both the cache index and the symbol */
-      put_byte( client, FTS_PROTOCOL_SYMBOL_CACHE);
-      put_int( client, index);
+    /* send both the cache index and the symbol */
+    put_byte( client, FTS_PROTOCOL_SYMBOL_CACHE);
+    put_int( client, index);
 
-      while (*p)
-	put_byte( client, (unsigned char)*p++);
+    while (*p)
+      put_byte( client, (unsigned char)*p++);
 
-      put_byte( client, 0);
-    }
+    put_byte( client, 0);
+  }
 
 #ifdef CACHE_REPORT
   if (cache->naccess % 1024 == 0)
-    {
-      fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
-    }
+  {
+    fts_log( "[client] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
+  }
 #endif
 }
 
@@ -1239,20 +1239,20 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
     return;
 
   while (ac--)
-    {
-      if ( fts_is_int( at))
-	client_write_int( client, fts_get_int( at));
-      else if ( fts_is_float( at))
-	client_write_float( client, fts_get_float( at));
-      else if ( fts_is_symbol( at))
-	client_write_symbol( client, fts_get_symbol( at));
-      else if ( fts_is_string( at))
-	client_write_string( client, fts_get_string( at));
-      else if ( fts_is_object( at))
-	client_write_object( client, fts_get_object( at));
+  {
+    if ( fts_is_int( at))
+      client_write_int( client, fts_get_int( at));
+    else if ( fts_is_float( at))
+      client_write_float( client, fts_get_float( at));
+    else if ( fts_is_symbol( at))
+      client_write_symbol( client, fts_get_symbol( at));
+    else if ( fts_is_string( at))
+      client_write_string( client, fts_get_string( at));
+    else if ( fts_is_object( at))
+      client_write_object( client, fts_get_object( at));
 
-      at++;
-    }
+    at++;
+  }
 }
 
 void fts_client_done_message( fts_object_t *obj)
@@ -1301,10 +1301,10 @@ void fts_client_register_object(fts_object_t *obj, int client_id)
   client = client_table_get(client_id);
 
   if(!client)
-    {
-      fts_log("[client] fts_client_register_object: cannot get id\n");      
-      return;
-    }
+  {
+    fts_log("[client] fts_client_register_object: cannot get id\n");      
+    return;
+  }
 
   client_register_object( client, obj, FTS_NO_ID);
 }
@@ -1319,16 +1319,16 @@ void fts_client_release_object(fts_object_t *obj)
   client = client_table_get(client_id);
 
   if ( !client)
-    {
-      fts_log("[client] fts_client_release_object: Cannot release object\n");      
-      return;
-    }
+  {
+    fts_log("[client] fts_client_release_object: Cannot release object\n");      
+    return;
+  }
 
   if(fts_object_get_patcher(obj) != NULL)
-    {
-      fts_set_object(a, obj);
-      fts_client_send_message( (fts_object_t *)fts_object_get_patcher(obj), s_remove_object, 1, a);
-    }
+  {
+    fts_set_object(a, obj);
+    fts_client_send_message( (fts_object_t *)fts_object_get_patcher(obj), s_remove_object, 1, a);
+  }
 
   client_release_object( client, obj);
 }
@@ -1339,7 +1339,8 @@ void fts_client_release_object(fts_object_t *obj)
  *
  */
 
-static void client_tcp_manager_install( void)
+/* old function name: void client_tcp_manager_install */
+int fts_client_tcp_start( void)
 {
   int ac = 0;
   fts_atom_t at[1];
@@ -1347,19 +1348,25 @@ static void client_tcp_manager_install( void)
   fts_symbol_t s;
 
   if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
-    {
-      fts_set_int( at, atoi( s));
-      ac++;
-    }
+  {
+    fts_set_int( at, atoi( s));
+    ac++;
+  }
     
   client_manager_object = fts_object_create_in_patcher( client_manager_class, fts_get_root_patcher(), ac, at);
   fts_patcher_add_object(fts_get_root_patcher(), client_manager_object);
   
   if ( !client_manager_object)
+  {
     fprintf( stderr, "[client] cannot create client manager\n");
+    return -1;
+  }
+
+  return 0;
 }
 
-static void client_pipe_install( void)
+/* old function name: client_pipe_install */
+int fts_client_pipe_start( void)
 {
   fts_atom_t a;
   fts_object_t *client_object;
@@ -1373,18 +1380,20 @@ static void client_pipe_install( void)
   fts_patcher_add_object(fts_get_root_patcher(), client_object);
   
   if (!client_object)
-    {
-      fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
-      return;
-    }
+  {
+    fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
+    return -1;
+  }
+
+  return 0;
 }
 
 /***********************************************************************
-*
-* client_manager object
-* (the object that listens for client connections)
-*
-*/
+ *
+ * client_manager object
+ * (the object that listens for client connections)
+ *
+ */
 
 typedef struct {
   fts_object_t head;
@@ -1499,9 +1508,12 @@ void fts_client_config( void)
   client_manager_class = fts_class_install( NULL, client_manager_instantiate);
   client_class = fts_class_install( NULL, client_instantiate);
 
-  /* check whether we should use a piped connection thru the stdio file handles */
-  if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
-    client_pipe_install();
-  else
-    client_tcp_manager_install();
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
+
