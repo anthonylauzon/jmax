@@ -20,6 +20,7 @@
 // 
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
+
 package ircam.jmax.toolkit;
 
 /** Interface of the objects that wants to listen to a selection's content.

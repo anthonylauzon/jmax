@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1999 by IRCAM
 // 
@@ -20,11 +20,12 @@
 // 
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
+
+package ircam.jmax.mda; 
+
 // ^^^^ The loadDocument method should be changed to take in accout
 // ^^^^ the loading context (the Fts instance); usual scripting and multiserver
 // ^^^^ problem.
-
-package ircam.jmax.mda; 
 
 import java.io.*;
 import tcl.lang.*;

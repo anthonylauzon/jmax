@@ -20,6 +20,7 @@
 // 
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
+
 package ircam.jmax.mda;
 
 /** The mda module; the init function is called at init time

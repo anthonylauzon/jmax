@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1999 by IRCAM
 // 
@@ -21,9 +21,6 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-// ^^^^ As all the other tcl commands, not work with multiserver.
-
-
 package ircam.jmax.tcl;
 
 import tcl.lang.*;
@@ -33,6 +30,8 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
+
+// ^^^^ As all the other tcl commands, not work with multiserver.
 
 
 /**

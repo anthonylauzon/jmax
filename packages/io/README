@@ -6,4 +6,3 @@ The first implementation contains 2 objects:
   udp : to receive raw bytes on a udp port
   udpmessage: to receive messages on a udp port
 
-As a "premiere", this package is distributed with the sources...
