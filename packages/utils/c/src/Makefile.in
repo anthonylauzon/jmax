@@ -91,13 +91,11 @@ MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+PKG_CONFIG = @PKG_CONFIG@
 PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
-SDIF_INCLUDE = @SDIF_INCLUDE@
-SDIF_LIBDIR = @SDIF_LIBDIR@
-SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -120,13 +118,12 @@ vec_fft.c
 
 noinst_HEADERS = \
 cfft.h \
-rfft_shuffle.h \
-utils.h
+rfft_shuffle.h
 
 
 libutils_la_LDFLAGS = -module
 
-INCLUDES = -I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/packages -I$(top_srcdir)/include 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

@@ -91,13 +91,11 @@ MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+PKG_CONFIG = @PKG_CONFIG@
 PLATFORM = @PLATFORM@
 PLATFORM_PACKAGES = @PLATFORM_PACKAGES@
 RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
-SDIF_INCLUDE = @SDIF_INCLUDE@
-SDIF_LIBDIR = @SDIF_LIBDIR@
-SDIF_LIBNAME = @SDIF_LIBNAME@
 STRIP = @STRIP@
 VERSION = @VERSION@
 YACC = @YACC@
@@ -131,7 +129,7 @@ matdisplay.c \
 xypad.c
 
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/utils/c/src -I$(top_srcdir)/packages/data/c/src
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages
 
 noinst_HEADERS = \
 guiobj.h \

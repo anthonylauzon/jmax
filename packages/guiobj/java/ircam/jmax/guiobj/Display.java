@@ -65,7 +65,10 @@ public class Display extends GraphicObject implements FtsMessageListener
     else
       underWidth = underWidthMax;
 
+    // fix.... to be removed....
     setCurrentFont( getFont());
+    ftsObject.setCurrentFontName( null);
+    ///////////////////////
   }
 
   // ---------------------------------------- 
