@@ -1,4 +1,4 @@
-SUBDIRS=c java help 
+SUBDIRS=c java help sounds
 
 packagedir=$(pkgdatadir)/packages/ispw
 package_DATA=ispw.jmax 
