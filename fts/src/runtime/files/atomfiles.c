@@ -66,16 +66,12 @@ struct _fts_atom_file_t_
   char mode;			/* "r" for read, "w" for write */
 
   /* read part  */
-
   char buf[ATOM_FILE_BUF_SIZE];	/* buffer of character read */
   int  count;			/* the current size of the buffer */
   int  read;			/* the index of the last char read */
 
   /* write part: nothing needed */
-
 };
-
-
 
 fts_atom_file_t *
 fts_atom_file_open(const char *name, const char *mode)
@@ -105,7 +101,6 @@ fts_atom_file_open(const char *name, const char *mode)
     return f;
 }
 
-
 void
 fts_atom_file_close(fts_atom_file_t *f)
 {
@@ -114,13 +109,13 @@ fts_atom_file_close(fts_atom_file_t *f)
 }
 
 #define IS_SEPARATOR(c) ((((c) == ' ') || ((c) == '\t') || ((c) == '\r') || ((c) == '\n') || ((c) == '\0'))? (c): 0)
-#define IS_DIGIT(c)     (('0' <= (c)) && ((c) <= '9'))
-#define IS_SIGN(c)      (((c) == '+') || ((c) == '-'))
-#define IS_POINT(c)     ('.' == (c))
-#define IS_BACKSLASH_QUOTE(c)     ('\\' == (c))
-#define IS_DOUBLE_QUOTE(c)     ('\"' == (c))
+#define IS_DIGIT(c) (('0' <= (c)) && ((c) <= '9'))
+#define IS_SIGN(c) (((c) == '+') || ((c) == '-'))
+#define IS_POINT(c) ('.' == (c))
+#define IS_BACKSLASH_QUOTE(c) ('\\' == (c))
+#define IS_DOUBLE_QUOTE(c) ('\"' == (c))
 #define IS_ATOM_CHAR(c) (((c) == ';') || ((c) == ',') || ((c) == '$') || ((c) == '\''))
-#define IS_EOF(c)       (0xff == (c))
+#define IS_EOF(c) (0xff == (c))
 
 static void
 fts_atom_file_read_more(fts_atom_file_t *f)
@@ -395,10 +390,10 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
     {
     case an_int:
       {
-	long l;
+	int l;
 	
-	sscanf(buf, "%ld", &l);
-	fts_set_long(at, l);
+	sscanf(buf, "%d", &l);
+	fts_set_int(at, l);
       }
     break;
     case a_float:
@@ -432,53 +427,64 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
 {
   char buf[1024];
   int offset = 0;
+  int i;
 
-  if (! IS_SEPARATOR(separator))
+  if (!IS_SEPARATOR(separator))
     separator = ' ';
-    
-  if (fts_is_long(at))
-    sprintf(buf, "%d", fts_get_int(at));
+
+  if (fts_is_int(at))
+    sprintf(buf, "%d%c", fts_get_int(at), separator);
   else if (fts_is_float(at))
-    sprintf(buf, "%#f", fts_get_float(at));
+    sprintf(buf, "%#f%c", fts_get_float(at), separator);
   else if (fts_is_symbol(at))
     {
-      int do_quote = 0;
-      const char *src = fts_symbol_name(fts_get_symbol(at));
-      char *dst = buf + 1;
-      
-      offset = 1;
-      
-      while(*src)
-	{
-	  if (IS_SEPARATOR(*src) || IS_DIGIT(*src) || IS_ATOM_CHAR(*src))
-	    do_quote = 1;
-	  else if (IS_BACKSLASH_QUOTE(*src) || IS_DOUBLE_QUOTE(*src))
-	    {
-	      do_quote = 1;
-	      *(dst++) = '\\';
- 	    }
-	  
- 	  *dst++ = *src++;
- 	}
-      
-      if(do_quote)
- 	{
-	  /* set double quotesat beginning and end of string */
- 	  buf[0] = '\"';
- 	  offset = 0;
- 	  *dst++ = '\"';	  
- 	}
-      
-      /* set end of string */
-      *dst++ = '\0';
+      const char *sym_str = fts_symbol_name(fts_get_symbol(at));
 
-      /* sprintf(buf, "%s", fts_symbol_name(fts_get_symbol(at))); */
+      if(strlen(sym_str) == 1 && IS_ATOM_CHAR(sym_str[0]))
+	{
+	  buf[0] = sym_str[0];
+	  buf[1] = separator;
+	  buf[2] = '\0';
+	  offset = 0;
+	}
+      else
+	{
+	  int needs_double_quotes = 0;
+	  char *buf_ptr = buf;
+	  
+	  *buf_ptr++ = '\"';
+	  offset = 1;
+
+	  while(*sym_str != '\0')
+	    {
+	      if (IS_SEPARATOR(*sym_str) || IS_DIGIT(*sym_str) || IS_ATOM_CHAR(*sym_str))
+		needs_double_quotes = 1;
+	      else if (IS_BACKSLASH_QUOTE(*sym_str) || IS_DOUBLE_QUOTE(*sym_str))
+		{
+		  needs_double_quotes = 1;
+		  *(buf_ptr++) = '\\';
+		}
+
+	      *buf_ptr++ = *sym_str++;
+	    }
+
+	  if(needs_double_quotes)
+	    {
+	      /* set double quotes at beginning and end of string */
+	      offset = 0;
+	      *buf_ptr++ = '\"';
+	    }
+
+	  /* concatenate speparator */
+	  *buf_ptr++ = separator;
+
+	  /* set end of string */
+	  *buf_ptr++ = '\0';
+	}
     }
   else
     /* write void atom: symbol "()" */
-    sprintf(buf, "()");
-
-  sprintf(buf + strlen(buf), "%c", separator);
+    sprintf(buf, "()%c", separator);
 
   write(f->fd, buf + offset, strlen(buf) - offset);
 

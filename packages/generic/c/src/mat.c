@@ -27,6 +27,8 @@
 #include "fts.h"
 #include "atommx.h"
 
+static fts_symbol_t sym_ascii = 0;
+
 /******************************************************************
  *
  *  object mat
@@ -160,21 +162,31 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
+  atom_matrix_t *mx = this->mx;
+  int size;
 
-  if(file_name)
+  if(!file_name)
+    return;
+
+  if(file_type == sym_ascii)
     {
-      int m_read = 0;
-      int n_read = 0; 
-      int size = atom_matrix_import_ascii(this->mx, file_name, &m_read, &n_read);
+      fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
 
-      if(size)
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_int(a + 0, m_read);
-	  fts_set_int(a + 1, n_read);
-	  fts_outlet_send(o, 1, fts_s_list, 2, a);
-	}
+      if(separator)
+	size = atom_matrix_import_ascii_separator(mx, file_name, separator, ac - 3, at + 3);
+      else
+	size = atom_matrix_import_ascii_newline(mx, file_name);
+
+    }
+
+  if(size >= 0)
+    {
+      fts_atom_t a[2];
+      
+      fts_set_int(a + 0, atom_matrix_get_m(mx));
+      fts_set_int(a + 1, atom_matrix_get_n(mx));
+      fts_outlet_send(o, 1, fts_s_list, 2, a);
     }
 }
 
@@ -183,9 +195,21 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
+  atom_matrix_t *mx = this->mx;
 
-  if(file_name)
-    atom_matrix_export_ascii(this->mx, file_name);
+  if(!file_name)
+    return;
+
+  if(file_type == sym_ascii)
+    {
+      fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
+
+      if(separator)
+	atom_matrix_export_ascii_separator(mx, file_name, separator);
+      else
+	atom_matrix_export_ascii_newline(mx, file_name);
+    }
 }
 
 static void
@@ -285,6 +309,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 mat_config(void)
 {
-  sym_atom_matrix = fts_new_symbol("atom_matrix");
+  sym_ascii = fts_new_symbol("ascii");
+
   fts_metaclass_install(fts_new_symbol("mat"), mat_instantiate, fts_narg_equiv);
 }

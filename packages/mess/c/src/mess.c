@@ -14,11 +14,13 @@
 #include "fts.h"
 
 extern void messtab_config(void);
+extern message_table_config(void);
 
 static void
 mess_init(void)
 {
   messtab_config();
+  message_table_config();
 }
 
 fts_module_t mess_module = {"mess", "message classes", mess_init};

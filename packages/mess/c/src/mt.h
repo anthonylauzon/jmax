@@ -54,7 +54,7 @@ extern message_table_t *message_table_new(int size);
 extern void message_table_clear(message_table_t *mt);
 extern void message_table_delete(message_table_t *mt);
 extern void message_table_set_size(message_table_t *mt, int size);
-extern int message_table_file_read(message_table_t *mt, fts_symbol_t file_name);
-extern int message_table_file_write(message_table_t *mt, fts_symbol_t file_name);
+extern int message_table_file_import_ascii(message_table_t *mt, fts_symbol_t file_name);
+extern int message_table_file_export_ascii(message_table_t *mt, fts_symbol_t file_name);
 
 #endif

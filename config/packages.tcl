@@ -28,32 +28,19 @@
 ## Packages installed by default in this site
 ##
 
-# Max 0.26 compatibilty package
-
+# ISPW classes
 package require ispw
-
-
-# Table object and editor
-
 package require table
-
-
-# Qlist object and editor
-
 package require qlist
-
-
-# Explode object and editor
-
 package require explode
 
-
-# List handling package
-
+# new classes
+package require control
+package require mess
+package require generic
+package require numeric
 package require lists
 
-
 # I/O package
-
 package require io
 

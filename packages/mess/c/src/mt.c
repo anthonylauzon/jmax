@@ -227,7 +227,7 @@ message_table_atom_buf_grow(fts_atom_t *buf, int size, int more)
 }
 
 int 
-message_table_file_read(message_table_t *mt, fts_symbol_t file_name)
+message_table_file_read_acsii(message_table_t *mt, fts_symbol_t file_name)
 {
   fts_atom_file_t *file;
   fts_atom_t a;
@@ -258,7 +258,7 @@ message_table_file_read(message_table_t *mt, fts_symbol_t file_name)
 	  /* next row */
 
 	  if(i >= mt->alloc)
-	    message_table_set_size(mt, mt->size + MESSAGE_TABLE_BLOCK_SIZE);
+	    message_table_set_size(mt, mt->alloc + MESSAGE_TABLE_BLOCK_SIZE);
 	  
 	  message_set(mt->mess + i, s, ac, at);
 	  
@@ -300,7 +300,7 @@ message_table_file_read(message_table_t *mt, fts_symbol_t file_name)
 }
 
 int 
-message_table_file_write(message_table_t *mt, fts_symbol_t file_name)
+message_table_file_write_ascii(message_table_t *mt, fts_symbol_t file_name)
 {
   fts_atom_t  a;
   fts_atom_file_t *file;

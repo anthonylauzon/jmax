@@ -48,7 +48,6 @@
    found.
    */
 
-
 static int file_exists(const char *path)
 {
   struct stat statbuf;

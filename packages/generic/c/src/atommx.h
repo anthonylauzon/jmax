@@ -43,6 +43,8 @@ typedef struct
 #define atom_matrix_get_m(mx) ((mx)->m)
 #define atom_matrix_get_n(mx) ((mx)->n)
 
+#define atom_matrix_get_row(mx, i) ((mx)->data + (i) * (mx)->n)
+
 #define atom_matrix_set_element(mx, i, j, v) ((mx)->data[(i) * (mx)->n + (j)] = (v))
 #define atom_matrix_get_element(mx, i, j) ((mx)->data[(i) * (mx)->n + (j)])
 
@@ -51,7 +53,12 @@ extern atom_matrix_t *atom_matrix_new(int m, int n);
 extern void atom_matrix_delete(atom_matrix_t *mx);
 extern void atom_matrix_set_size(atom_matrix_t *mx, int m, int n);
 extern void atom_matrix_fill(atom_matrix_t *mx, fts_atom_t atom);
-extern int atom_matrix_import_ascii(atom_matrix_t *mx, fts_symbol_t file_name, int *m_read, int *n_read);
-extern int atom_matrix_export_ascii(atom_matrix_t *mx, fts_symbol_t file_name);
+
+extern int atom_matrix_import_ascii_newline(atom_matrix_t *mx, fts_symbol_t file_name);
+extern int atom_matrix_export_ascii_newline(atom_matrix_t *mx, fts_symbol_t file_name);
+
+extern int atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, 
+					      fts_symbol_t separator, int ac, fts_atom_t *at);
+extern int atom_matrix_export_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator);
 
 #endif
