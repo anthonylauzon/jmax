@@ -83,31 +83,6 @@ static void dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, i
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-static void expand_patcher( fts_patcher_t *p, char *s)
-{
-  if (p)
-    {
-      fts_atom_t name;
-
-      expand_patcher( p->o.patcher, s);
-
-      fts_object_get_prop((fts_object_t *)p, fts_s_name, &name);
-      strcat( s, fts_symbol_name(fts_get_symbol(&name)));
-      strcat( s, ".");
-    }
-}
-
-static char *full_name( fts_object_t *o)
-{
-  static char buffer[1024];
-
-  buffer[0] = '\0';
-  expand_patcher( o->patcher, buffer);
-  strcat( buffer, fts_symbol_name( fts_object_get_class_name(o)));
-
-  return buffer;
-}
-
 static void cat_sig_name( char *s, dsp_signal *sig)
 {
   char tmp[64];
@@ -225,7 +200,9 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 	  invs = (*iop)->length;
 	else if (invs != (*iop)->length)
 	  {
-	    post_error(o, "DSP [%d] inputs don't match for object %s\n", depth, full_name( o));
+	    post("DSP [%d] inputs don't match for object ", depth);
+	    post_object( o);
+	    post("\n");
 	    return 0;
 	  }
       }
@@ -310,8 +287,11 @@ static void dsp_object_schedule(dsp_node_t *node)
   if ( dsp_gen_outputs(node->o, node->descr))
     {
       if ( verbose)
-	post( "DSP [%d] scheduling %s %s->%s\n", depth, full_name( node->o), 
-	      inputs_name( node->descr), outputs_name( node->descr));
+	{
+	  post( "DSP [%d] scheduling ", depth);
+	  post_object( node->o);
+	  post( "%s->%s\n", inputs_name( node->descr), outputs_name( node->descr));
+	}
 
       /*
 	(fd) Hack to add debugging info to the FTL program.
@@ -445,7 +425,6 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
 #if 0
       if (nin >= ninputs)
 	{
-	  /* fprintf( stderr, "nin(%d) >= ninputs(%d) for object %s\n", nin, ninputs, full_name( dest->o)); */
 	  return;
 	}
 #endif
@@ -460,7 +439,7 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
       else
 	{
 #if DSP_MULTIPLE_CONN_WARN
-	  post_error( src->o,  "Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
+	  post("Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
 		woutlet, fts_symbol_name(fts_object_get_class_name(src->o)),
 		winlet, fts_symbol_name(fts_object_get_class_name(dest->o)));
 #endif
@@ -551,7 +530,9 @@ static void dsp_graph_check_loop( void)
   for( node = dsp_graph; node; node = node->next)
     if ( !IS_SCHEDULED(node))
       {
-	post_error(node->o, "Loop in dsp graph: object %s not scheduled\n", full_name( node->o));
+	post("Loop in dsp graph: object ");
+	post_object( node->o);
+	post(" not scheduled\n");
       }
 }
 
