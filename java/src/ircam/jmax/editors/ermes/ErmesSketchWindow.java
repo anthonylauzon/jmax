@@ -412,6 +412,27 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     setCursor( temp);
   }
 
+  protected void Duplicate()
+  {
+    Copy(); 
+    Paste();
+
+    // (fd) if only one object duplicated, then edit it with all text selected
+    if (itsSketchPad.currentSelection.itsObjects.size() == 1)
+      {
+	ErmesObject obj = (ErmesObject)itsSketchPad.currentSelection.itsObjects.elementAt( 0);
+
+	if (obj instanceof ErmesObjEditable)
+	  {
+	    itsSketchPad.currentSelection.deselectAll();
+
+	    ((ErmesObjEditable)obj).restartEditing();
+
+	    itsSketchPad.GetEditField().selectAll();
+	  }
+      }
+  }
+
   boolean isPasting()
   {
     return pasting;

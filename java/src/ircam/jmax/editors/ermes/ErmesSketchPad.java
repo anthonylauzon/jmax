@@ -696,20 +696,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	currentSelection.select( aConnection);
       }
 
-    if (currentSelection.itsObjects.size() == 1)
-      {
-	ErmesObject obj = (ErmesObject)currentSelection.itsObjects.elementAt( 0);
-
-	if (obj instanceof ErmesObjEditable)
-	  {
-	    currentSelection.deselectAll();
-
-	    ((ErmesObjEditable)obj).restartEditing();
-
-	    itsEditField.selectAll();
-	  }
-      }
-
     editStatus = START_SELECT;
     paintDirtyList();
   }
