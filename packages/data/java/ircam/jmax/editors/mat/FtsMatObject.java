@@ -285,6 +285,22 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }    
   }
   
+  public void requestDeleteCols(int startIndex, int size)
+  {
+    args.clear();
+    args.addInt( startIndex);
+    args.addInt(size);
+    
+    try{
+      send( FtsSymbol.get("delete_cols"), args);
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsMatObject: I/O Error sending delete_cols Message!");
+      e.printStackTrace(); 
+    }    
+  }
+  
   /************************************************************************************
   ** MatDataModel interface
   *************************************************************************************/

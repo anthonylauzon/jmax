@@ -38,7 +38,7 @@ import ircam.jmax.toolkit.actions.*;
 public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
 {
   EditorContainer container;
-  EditorAction deleteAction;
+  EditorAction deleteAction, deleteColAction;
   MatDataModel model;
   JTable table;
   int selRowIndex = -1;
@@ -77,6 +77,15 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
     		
     if(model.canAppendColumn())
     {
+      deleteColAction = new EditorAction("Delete Selected Columns", "delete columns", KeyEvent.VK_C, KeyEvent.VK_C, true){
+        public void doAction(EditorContainer container)
+        {
+          if( table.getSelectedColumnCount() > 0)
+            model.requestDeleteCols( table.getSelectedColumn(), table.getSelectedColumnCount());
+        } 
+      };
+      add( deleteColAction);
+      
       add( new EditorAction("Insert Column", "insert col", KeyEvent.VK_L, KeyEvent.VK_L, true){
         public void doAction(EditorContainer container)
         {
@@ -130,6 +139,7 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
       selRowIndex = selection.getMinSelectionIndex();
       selRowSize = selection.getMaxSelectionIndex() - selRowIndex + 1;
     }
+    deleteColAction.setEnabled( (table.getSelectedColumnCount() > 0));
   }
 }
 
