@@ -86,6 +86,8 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
   {
     JButton aButton = new JButton(theTool.getIcon());
     
+    aButton.setToolTipText(theTool.getName());
+
     add(aButton);
     validate();
     
@@ -125,11 +127,11 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
     if (itsToolbar == null) 
       {
 	itsToolbar = new ScrToolbar(theProvider);
-	JFrame aFrame = new JFrame("tools");    
-	aFrame.getContentPane().add(itsToolbar);
+	itsFrame = new JFrame("tools");    
+	itsFrame.getContentPane().add(itsToolbar);
 	
-	aFrame.pack();
-	aFrame.setVisible(true);
+	itsFrame.pack();
+	itsFrame.setVisible(true);
 
 	setTool(theProvider.getDefaultTool());
       }
@@ -176,6 +178,7 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
     GraphicContext gc = (GraphicContext) itsClients.get(e.getWindow());
     currentContext = gc;
     currentTool.reActivate(gc);
+    itsFrame.toFront();
   }
 
   public void windowDeactivated(WindowEvent e)
@@ -188,6 +191,7 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
   static ScrTool currentTool = null;
   static GraphicContext currentContext;
 
+  static JFrame itsFrame;
   static Hashtable itsClients = new Hashtable();
   Vector listeners = new Vector();
 

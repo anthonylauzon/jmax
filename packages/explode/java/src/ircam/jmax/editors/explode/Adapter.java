@@ -102,6 +102,7 @@ abstract public class Adapter implements MappingListener{
   public void setXZoom(int factor) 
   {
     xZoomFactor = factor/(float)100;
+    notifyZoom(factor);
   }
 
 
@@ -136,6 +137,15 @@ abstract public class Adapter implements MappingListener{
   public void setXTransposition(int xT) 
   {
     xTranspose = xT;
+    notifyTransposition(xT);
+  }
+
+  /**
+   * the x transposition 
+   */
+  public int getXTransposition() 
+  {
+    return xTranspose;
   }
 
   /**
@@ -189,6 +199,63 @@ abstract public class Adapter implements MappingListener{
    */
   public void mappingChanged(String graphicName, String scoreName) {}
 
+
+  /**
+   * called by objects that will be informed when the zoom factor changes
+   */
+  public void addZoomListener(ZoomListener listener)
+  {
+    zoomListeners.addElement(listener);
+  }
+
+  /**
+   * called by objects that will be informed when the zoom factor changes
+   */
+  public void removeZoomListener(ZoomListener listener)
+  {
+    zoomListeners.removeElement(listener);
+  }
+
+  private void notifyZoom(int newZoom)
+  {
+    ZoomListener aListener;
+
+    for (Enumeration e = zoomListeners.elements(); e.hasMoreElements();) 
+      {
+	aListener = (ZoomListener) e.nextElement();
+
+	aListener.zoomChanged(newZoom);
+      }
+  }
+
+  /**
+   * called by objects that will be informed when the transposition factor changes
+   */
+  public void addTranspositionListener(TranspositionListener listener)
+  {
+    transpositionListeners.addElement(listener);
+  }
+
+  /**
+   * remove the listener
+   */
+  public void removeTranspositionListener(TranspositionListener listener)
+  {
+    zoomListeners.removeElement(listener);
+  }
+
+  private void notifyTransposition(int newTransposition)
+  {
+    TranspositionListener aListener;
+
+    for (Enumeration e = transpositionListeners.elements(); e.hasMoreElements();) 
+      {
+	aListener = (TranspositionListener) e.nextElement();
+
+	aListener.transpositionChanged(newTransposition);
+      }
+  }
+
   //--- Fields
   Mapper XMapper;
   Mapper YMapper;
@@ -203,5 +270,7 @@ abstract public class Adapter implements MappingListener{
   boolean yInvertion;
 
   String itsName;
+  Vector zoomListeners = new Vector();
+  Vector transpositionListeners = new Vector();
 }
 

@@ -161,6 +161,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
     pow = pow/10;
 
     if (windowTime/pow < 5) pow = pow/5;
+    if (pow == 0) return 1;
     return pow;
   }
 

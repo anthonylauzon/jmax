@@ -79,13 +79,23 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     //-- prepares the zoom scrollbar (time stretching) and its listeners
     itsTimeZoom = new Scrollbar(Scrollbar.HORIZONTAL, INITIAL_ZOOM, 5, 1, 1000);
 
+    itsZoomLabel = new JLabel("Zoom: "+INITIAL_ZOOM+"%");
+    
+    gc.getAdapter().addZoomListener( new ZoomListener() {
+      public void zoomChanged(int zoom)
+	{
+	  itsZoomLabel.setText("Zoom: "+zoom+"%"); 
+
+	}
+    });
+
+
     itsTimeZoom.addAdjustmentListener(new AdjustmentListener() {
       
       public void adjustmentValueChanged(AdjustmentEvent e) {
 	
 	gc.getAdapter().setXZoom(e.getValue());
 	itsTimeScrollbar.setVisibleAmount(windowTimeWidth()/2);
-	itsZoomLabel.setText("Zoom: "+e.getValue()+"%"); 
 	itsScore.repaint();
       }
       
@@ -102,6 +112,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     itsTimeScrollbar.setUnitIncrement(windowTimeWidth()/10);//WARN: setUnitIncrement seems not to work
     itsTimeScrollbar.setBlockIncrement(windowTimeWidth());
+
+
     itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
     
       public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -171,6 +183,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     tools.addElement(new MoverTool(gc, new ImageIcon(path+"hmover.gif"), 
 				   MoverTool.HORIZONTAL_MOVEMENT));
     tools.addElement(new ResizerTool(gc, new ImageIcon(path+"resizer.gif")));
+    tools.addElement(new ZoomTool(gc, new ImageIcon(path+"zoomer.gif")));
 
   }
 
@@ -325,7 +338,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   public final int INITIAL_ZOOM = 20;
   Scrollbar itsTimeScrollbar;
   Scrollbar itsTimeZoom;
-  JLabel itsZoomLabel = new JLabel("Zoom: "+INITIAL_ZOOM+"%");
+  JLabel itsZoomLabel;
 
   InfoPanel itsStatusBar;
   JPanel itsScore;
