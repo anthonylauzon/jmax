@@ -96,6 +96,7 @@ static void
 input_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_active_remove_listener(o);
+  fts_dsp_object_delete((fts_dsp_object_t*)o);
 }
 
 static void 

@@ -119,10 +119,10 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   self->right_label = fts_audiolabel_get( fts_new_symbol( "default R"));
 
   if ( !self->left_label || !self->right_label)
-    {
-      self->left_label = fts_audiolabel_get( fts_new_symbol( "default"));
-      self->right_label = NULL;
-    }
+  {
+    self->left_label = fts_audiolabel_get( fts_new_symbol( "default"));
+    self->right_label = NULL;
+  }
 
   fts_dsp_active_add_listener(o, monitor_dsp_active);
 }
@@ -131,6 +131,7 @@ static void
 monitor_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_active_remove_listener(o);
+  fts_dsp_object_delete((fts_dsp_object_t*)o);
 }
 
 static void 
@@ -162,3 +163,10 @@ monitor_config( void)
 
   fts_dsp_declare_function( monitor_symbol, monitor_ftl);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
