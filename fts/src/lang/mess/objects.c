@@ -994,7 +994,7 @@ static void
 fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
 {
   fts_object_t *obj = (fts_object_t *)data;
-
+  
   fts_object_put_prop(obj, name, value); 
 }
 

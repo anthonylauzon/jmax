@@ -70,7 +70,7 @@ extern int fts_fourpoint_table_make(void);
   do { \
     float* q = (p) + ((i) >> FTS_FOURPOINT_FRAC_BITS); \
     fts_fourpoint_t *ft = fts_fourpoint_table + (((i) >> FTS_FOURPOINT_LOST_BITS) & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
-    if(q > (a) && q < (a) + (n) - 2) *(y) = fts_fourpoint_calc(q, ft); \
+    if(q > (a) + 1 && q < (a) + (n) - 2) *(y) = fts_fourpoint_calc(q, ft); \
     else *(y) = 0.0; \
   } while(0)
 

@@ -114,7 +114,7 @@ r10k-irix6.5:
 # do the TAGS file
 #
 TAGS:
-	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.scm" -o -name "*.tcl" \) -print | etags -t -
+	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.scm" -o -name "*.tcl" -name "*.jpk" \) -print | etags -t -
 .PHONY: TAGS
 
 #

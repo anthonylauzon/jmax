@@ -77,42 +77,6 @@ set_size(ivec_t *vec, int size)
   vec->size = size;
 }
 
-int
-ivec_get_atoms(ivec_t *vec, int ac, fts_atom_t *at)
-{
-  int i;
-  int size = vec->size;
-
-  if(ac > size)
-    ac = size;
-
-  for(i=0; i<ac; i++)
-    fts_set_int(at + i, vec->values[i]);
-
-  return size;
-}
-
-/* copy & zero */
-void
-ivec_copy(ivec_t *in, ivec_t *out)
-{
-  int i;
-
-  set_size(out, in->size);
-
-  for(i=0; i<in->size; i++)
-      out->values[i] = in->values[i];
-}
-
-void
-ivec_zero(ivec_t *vec)
-{
-  int i;
-
-  for(i=0; i<vec->size; i++)
-      vec->values[i] = 0;
-}
-
 void
 ivec_set_const(ivec_t *vec, int c)
 {
@@ -134,17 +98,6 @@ ivec_set_size(ivec_t *vec, int size)
   /* when extending: zero new values */
   for(i=old_size; i<size; i++)
     vec->values[i] = 0;
-}
-
-void 
-ivec_set_from_ptr(ivec_t *vec, int *ptr, int size)
-{
-  int i;
-
-  set_size(vec, size);
-
-  for(i=0; i<vec->size; i++)
-    vec->values[i] = ptr[i];
 }
 
 void

@@ -62,42 +62,6 @@ set_size(fvec_t *vec, int size)
   vec->size = size;
 }
 
-int
-fvec_get_atoms(fvec_t *vec, int ac, fts_atom_t *at)
-{
-  int i;
-  int size = vec->size;
-
-  if(ac > size)
-    ac = size;
-
-  for(i=0; i<ac; i++)
-    fts_set_float(at + i, vec->values[i]);
-
-  return size;
-}
-
-/* copy & zero */
-void
-fvec_copy(fvec_t *in, fvec_t *out)
-{
-  int i;
-
-  set_size(out, in->size);
-
-  for(i=0; i<in->size; i++)
-    out->values[i] = in->values[i];
-}
-
-void
-fvec_zero(fvec_t *vec)
-{
-  int i;
-
-  for(i=0; i<vec->size; i++)
-    vec->values[i] = 0.0;
-}
-
 void
 fvec_set_const(fvec_t *vec, float c)
 {
@@ -119,17 +83,6 @@ fvec_set_size(fvec_t *vec, int size)
   /* when extending: zero new values */
   for(i=old_size; i<size; i++)
     vec->values[i] = 0.0;
-}
-
-void 
-fvec_set_from_ptr(fvec_t *vec, float *ptr, int size)
-{
-  int i;
-
-  set_size(vec, size);
-
-  for(i=0; i<vec->size; i++)
-    vec->values[i] = ptr[i];
 }
 
 void

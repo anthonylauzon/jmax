@@ -40,20 +40,52 @@ static fts_symbol_t sym_comma = 0;
  *
  */
 
-void
-mat_void(mat_t *mat)
+static void
+mat_realloc(mat_t *mat, int size)
 {
-  int i;
-  int size = mat->m * mat->n;
-
-  for(i=0; i<size; i++)
+  if(size > mat->alloc)
     {
-      fts_atom_t *ap = mat->data + i;
+      int i;
 
-      if(fts_is_object(ap))
-	fts_release(ap);
+      if(mat->alloc)
+	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
+      else
+	mat->data = fts_malloc(size * sizeof(fts_atom_t));
 
-      fts_set_void(ap); /* void atom */
+      /* set newly allocated region to void */
+      for(i=mat->alloc; i<size; i++)
+	fts_set_void(mat->data + i);
+      
+      mat->m = size;
+      mat->n = 1;
+      mat->alloc = size;
+    }
+  else
+    {
+      int old_size = mat->m * mat->n;
+      int i;
+
+      /* void region cut off */
+      for(i=size; i<old_size; i++)
+	{
+	  fts_atom_t *ap = mat->data + i;
+
+	  if(fts_is_object(ap))
+	    fts_release(ap);
+
+	  fts_set_void(ap);
+	}
+      
+      if(size > 0)
+	{
+	  mat->m = size;
+	  mat->n = 1;
+	}
+      else
+	{
+	  mat->m = 0;
+	  mat->n = 0;
+	}
     }
 }
 
@@ -65,10 +97,10 @@ mat_set_size(mat_t *mat, int m, int n)
   if(size > mat->alloc)
     {
       int i;
+      fts_atom_t *data = fts_malloc(size * sizeof(fts_atom_t));
+
       if(mat->alloc)
 	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
-      else
-	mat->data = fts_malloc(size * sizeof(fts_atom_t));
 
       /* set newly allocated region to void */
       for(i=mat->alloc; i<size; i++)
@@ -150,6 +182,23 @@ mat_set_const(mat_t *mat, fts_atom_t value)
 }
 
 void
+mat_void(mat_t *mat)
+{
+  int i;
+  int size = mat->m * mat->n;
+
+  for(i=0; i<size; i++)
+    {
+      fts_atom_t *ap = mat->data + i;
+
+      if(fts_is_object(ap))
+	fts_release(ap);
+
+      fts_set_void(ap); /* void atom */
+    }
+}
+
+void
 mat_set_from_atom_list(mat_t *mat, int onset, int ac, const fts_atom_t *at)
 {
   fts_atom_t *ap = mat->data + onset;
@@ -225,7 +274,7 @@ mat_grow(mat_t *mat, int size)
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
 
-  mat_set_size(mat, alloc, 1);
+  mat_realloc(mat, alloc);
 }
 
 int 

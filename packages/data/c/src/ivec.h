@@ -45,25 +45,18 @@ extern fts_class_t *ivec_class;
 extern fts_symbol_t ivec_symbol;
 extern fts_type_t ivec_type;
 
-extern void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
-extern int ivec_get_atoms(ivec_t *vector, int ac, fts_atom_t *at);
-
-extern void ivec_copy(ivec_t *in, ivec_t *out);
-extern void ivec_zero(ivec_t *vector);
-
-#define ivec_get_size(vector) ((vector)->size)
+#define ivec_get_size(v) ((v)->size)
 extern void ivec_set_size(ivec_t *vector, int size);
 
-#define ivec_is_empty(vector) ((vector)->size == 0)
+#define ivec_get_ptr(v) ((v)->values)
 
-#define ivec_get_element(vector, index) ((vector)->values[index])
-#define ivec_set_element(vector, index, value) ((vector)->values[index] = (value))
+#define ivec_get_element(v, i) ((v)->values[i])
+#define ivec_set_element(v, i, x) ((v)->values[i] = (x))
 
 void ivec_set_const(ivec_t *vector, int c);
-void ivec_zero(ivec_t *vector);
+#define ivec_zero(v) ivec_set_const((v), 0)
 
-#define ivec_get_ptr(vector) ((vector)->values)
-extern void ivec_set_from_ptr(ivec_t *vector, int *ptr, int size);
+extern void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 extern int ivec_get_sum(ivec_t *vector);
 extern int ivec_get_sub_sum(ivec_t *vector, int from, int to);

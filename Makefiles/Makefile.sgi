@@ -29,7 +29,7 @@ CC_ALL_FLAG := -all
 CC_NONE_FLAG := -none
 LDSO=ld
 LDSOFLAGS=-elf -shared -rdata_shared
-SOLIBS=-lc
+SOLIBS=-lc -lm
 
 ## This is to help Purify, that currently does not work with pthreads
 ifeq ($(ENABLE_PURIFY),yes)

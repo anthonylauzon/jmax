@@ -41,25 +41,18 @@ extern fts_class_t *fvec_class;
 extern fts_symbol_t fvec_symbol;
 extern fts_type_t fvec_type;
 
-extern void fvec_set_from_atom_list(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
-extern int fvec_get_atoms(fvec_t *vector, int ac, fts_atom_t *at);
-
-extern void fvec_copy(fvec_t *in, fvec_t *out);
-extern void fvec_zero(fvec_t *vector);
-
-#define fvec_get_size(vector) ((vector)->size)
+#define fvec_get_size(v) ((v)->size)
 extern void fvec_set_size(fvec_t *vector, int size);
 
-#define fvec_is_empty(vector) ((vector)->size == 0)
+#define fvec_get_ptr(v) ((v)->values)
 
-#define fvec_get_element(vector, index) ((vector)->values[index])
-#define fvec_set_element(vector, index, value) ((vector)->values[index] = (value))
+#define fvec_get_element(v, i) ((v)->values[i])
+#define fvec_set_element(v, i, x) ((v)->values[i] = (x))
 
 extern void fvec_set_const(fvec_t *vector, float c);
-extern void fvec_zero(fvec_t *vector);
+#define fvec_zero(v) fvec_set_const((v), 0.0)
 
-#define fvec_get_ptr(vector) ((vector)->values)
-extern void fvec_set_from_ptr(fvec_t *vector, float *ptr, int size);
+extern void fvec_set_from_atom_list(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 extern float fvec_get_sum(fvec_t *vector);
 extern float fvec_get_sub_sum(fvec_t *vector, int from, int to);
