@@ -1,5 +1,11 @@
 2003-07-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* java/src/ircam/jmax/editors/configuration/ConfigurationEditor.java: displayed path of configuration file in "Configuration Editor" window title.
+
+	* java/src/ircam/jmax/editors/project/ProjectEditor.java: displayed path of project file in "Project Editor" window title.
+
+	* fixed bug "[ 772296 ] where is the default_config.jprj file?".
+
 	* packages/numeric/c/src/count.c (count_set_mode): fixed handling of message "mode wrap".
 
 	* fixed bug "[ 772378 ] Small error in help patch".
