@@ -194,10 +194,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     BpfGraphicContext bgc = (BpfGraphicContext)gc;
     BpfAdapter a = bgc.getAdapter();
     FtsBpfObject ftsObj = bgc.getFtsObject();
-
-    if(bgc.getSelection().isInSelection(bgc.getFtsObject().getPointAt(0)))
-	dx = 0;
-
     Rectangle tempr, clip; 
     tempr = (Rectangle) g.getClip();
     clip = bgc.getEditorClip();
@@ -208,7 +204,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if(dy > 0)
     {
 	int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	/*int hMin = bgc.getGraphicDestination().getSize().height;*/
 	int hMin = a.getY(ftsObj.getMinimumValue());
 	if(minY + dy > hMin)
 	  dy = hMin - minY;
@@ -219,8 +214,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	int hMax = a.getY(ftsObj.getMaximumValue());
 	if(maxY + dy < hMax)
 	  dy = hMax - maxY;
-	/*if(maxY + dy < 0)
-	  dy = -maxY;*/
     }
 	
     //// Clip deltaX
@@ -245,7 +238,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
       prevX = a.getX(0);
 
     if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
-    else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
+    else if(firstX+dx < prevX) dx = prevX-firstX;
 
     ////////////////////////
     g.setColor(Color.gray);
