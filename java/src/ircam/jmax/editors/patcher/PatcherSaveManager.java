@@ -67,10 +67,14 @@ public class PatcherSaveManager
       return saveAsFromSubPatcher( container, patcherObj.getRootPatcher());
 
     File file = MaxFileChooser.chooseFileToSave( container.getFrame(), null, 
-					    "Save As", MaxFileChooser.JMAX_FILE_TYPE);
+						 "Save As", MaxFileChooser.JMAX_FILE_TYPE);
     
     if (file == null)
       return false;
+    
+    String path = file.getAbsolutePath();
+    if( ! path.endsWith(".jmax"))
+      file = new File( path+".jmax");
 
     if (file.exists())
       {
@@ -79,7 +83,7 @@ public class PatcherSaveManager
 						    "Warning",
 						    JOptionPane.YES_NO_OPTION,
 						    JOptionPane.WARNING_MESSAGE);
-
+	
 	if ( result != JOptionPane.OK_OPTION)
 	  return false;
       }
