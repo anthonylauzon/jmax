@@ -475,7 +475,7 @@ public class DisplayList
     if (! doneOnce)
       {
 	doneOnce = true;
-
+ 
 	for ( int i = 0; i < size; i++)
 	  {
 	    DisplayObject object = (DisplayObject) values[i];
