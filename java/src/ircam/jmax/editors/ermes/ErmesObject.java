@@ -82,7 +82,7 @@ abstract class ErmesObject implements ErmesDrawable {
       eobj = new ErmesObjInt( sketch, object);
     else if (theName.equals( "floatbox"))
       eobj = new ErmesObjFloat( sketch, object);
-    else if (theName.equals( "comment"))
+    else if (theName.equals( "jcomment"))
       eobj = new ErmesObjComment( sketch, object);
     else if ( theName.equals( "slider"))
       eobj = new ErmesObjSlider( sketch, object);

@@ -94,7 +94,7 @@ public class FtsObject
 	  obj =  new FtsOutletObject(parent, stream.getNextIntArgument(), objId);
 	else if (className == "messbox")
 	  obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(stream), objId);
-	else if (className == "comment")
+	else if (className == "jcomment")
 	  obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
 	else if (className == "intbox")
 	  obj =  new FtsIntValueObject(parent, className, "intbox", objId);
