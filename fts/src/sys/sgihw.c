@@ -73,7 +73,7 @@ enable_fpes(void)
   f.fc_struct.en_divide0 = 1;
   f.fc_struct.en_overflow = 1;
   f.fc_struct.en_underflow = 0;
-  f.fc_struct.en_inexact = 0;
+  f.fc_struct.en_inexact = 1;
 
   set_fpc_csr(f.fc_word);
 }
@@ -245,6 +245,9 @@ unsigned int fts_check_fpe(void)
 
       if (f.fc_struct.se_overflow)
 	ret |= FTS_OVERFLOW_FPE;
+
+      if (f.fc_struct.se_inexact)
+	ret |= FTS_INEXACT_FPE;
     }
 
   /* put the flags to zero anyway */
@@ -252,8 +255,7 @@ unsigned int fts_check_fpe(void)
   f.fc_struct.se_invalid = 0;
   f.fc_struct.se_divide0 = 0;
   f.fc_struct.se_overflow = 0;
-
-  /* f.fc_struct.se_inexact = 0; */
+  f.fc_struct.se_inexact = 0;
 
   set_fpc_csr(f.fc_word);
 
