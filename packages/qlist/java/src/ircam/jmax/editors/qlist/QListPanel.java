@@ -204,19 +204,29 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
     }
   }
 
-  public void Get(){
-    if(changed){
-      boolean risposta = YesOrNo.ask(itsEditorContainer.getFrame(), "Do you want really discard changes in QList text?", "Discard changes", "Cancel");
-      
-      if(risposta){
-	itsData.forceUpdate();
-	fillContent(itsData);
-      }
-    }else{
-      itsData.forceUpdate();
-      fillContent(itsData);
+    public void Get(){
+      if(changed)
+	  {
+	      Object[] options = { "DIscard changes", "Cancel"};
+	      int result = JOptionPane.showOptionDialog(itsEditorContainer.getFrame(),
+							"Do you want really discard changes in QList text?",
+							"Warning",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null, options, options[0]);  
+
+	      if(result == JOptionPane.YES_OPTION)
+		  {
+		      itsData.forceUpdate();
+		      fillContent(itsData);
+		  }
+	  }
+      else
+	  {
+	      itsData.forceUpdate();
+	      fillContent(itsData);
+	  }
     }
-  }
 
   public void Set(){
     itsData.setValuesAsText(getText());
@@ -252,7 +262,9 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
 	  }
 	catch (java.io.IOException e)
 	  {
-	    new ErrorDialog(itsEditorContainer.getFrame(), "Cannot open qlist: " + e);
+	      JOptionPane.showMessageDialog(itsEditorContainer.getFrame(), 
+					    "Cannot open qlist "+e, 
+					    "Error", JOptionPane.ERROR_MESSAGE); 
 	  }
       }
   }
@@ -284,7 +296,9 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
       }
     catch (java.io.IOException e)
       {
-	new ErrorDialog(itsEditorContainer.getFrame(), "Cannot save qlist: " + e);
+	  JOptionPane.showMessageDialog(itsEditorContainer.getFrame(), 
+					"Cannot save qlist: "+e, 
+					"Error", JOptionPane.ERROR_MESSAGE); 
       }
   }
   //------------------- Editor interface ---------------
