@@ -1,3 +1,8 @@
+2004-02-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/signal/c/src/playfvec.c (segment_set): Fixed bug "[ 891290 ] play~ with zero size vector".
+	Added empty flag in segment_t structure.
+
 2004-01-29  Alexandre Pages  <Alexandre.Pages@ircam.fr>
 
       * added sample format conversion routines in the ASIO package (sample_converters.h/c)
