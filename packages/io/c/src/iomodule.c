@@ -46,10 +46,10 @@ io_config(void)
 #ifndef WIN32
   udp_config();
   udpreceive_config();
+  udpsend_config();
+
 #if 0
   serial_config();
-
-  udpsend_config();
   wacom_config();
 #endif
 #endif
