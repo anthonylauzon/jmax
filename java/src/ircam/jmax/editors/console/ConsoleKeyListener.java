@@ -61,6 +61,10 @@ public class ConsoleKeyListener implements KeyListener {
 	sbuf.append(key);
 	console.LineReadyNotify(sbuf.toString());
 	sbuf.setLength(0);
+
+	//qui  posiziona il cursore in fondo alla stringa
+	console.getTextArea().setCaretPosition(console.getTextArea().getText().length());
+
       } else if (((int) key == BACK_SPACE) || ((int) key ==  DELETE)) {
 	/*
 	 * Delete and backspace erase the last character from both
