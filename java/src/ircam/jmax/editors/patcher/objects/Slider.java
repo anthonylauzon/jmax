@@ -49,7 +49,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   // The graphic throttle contained into a 'slider' object.
   //
 
-  static final int THROTTLE_LATERAL_OFFSET = 2;
+    static final int THROTTLE_LATERAL_OFFSET = /*2*/3;
   static final int THROTTLE_HEIGHT = 3;
   private static final int MINIMUM_DIMENSION = 15;
   protected final static int BOTTOM_OFFSET = 5;
