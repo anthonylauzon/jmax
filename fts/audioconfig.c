@@ -196,9 +196,10 @@ static void
 audioconfig_update_labels(fts_audioconfig_t* config)
 {
 /* #warning NOT YET IMPLEMENTED (audioconfig_update_labels) */
-  fts_audiolabel_t* label = config->labels;
-  int n = config->n_labels;
-  int i;
+
+/*  fts_audiolabel_t* label = config->labels; */
+/*  int n = config->n_labels; */
+/*  int i; */
    
   /* Make a query on audiomanagers to know which input and output audioport are available */
   /* check input and output audioports */
@@ -707,7 +708,7 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
-  self->sample_rate = AUDIO_CONFIG_DEFAULT_SAMPLE_RATE;
+  self->sample_rate = (unsigned int)AUDIO_CONFIG_DEFAULT_SAMPLE_RATE;
   self->buffer_size = AUDIO_CONFIG_DEFAULT_BUFFER_SIZE;
 }
 
