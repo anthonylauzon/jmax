@@ -168,10 +168,12 @@ input_instantiate(fts_class_t *cl)
 
 void input_config( void)
 {
+  fts_class_t* cl;
   input_symbol = fts_new_symbol("input~");
 
-  fts_class_install( input_symbol, input_instantiate);
-
+  cl = fts_class_install( input_symbol, input_instantiate);
+  
+  fts_class_alias(cl, fts_new_symbol("adc~"));
   fts_dsp_declare_function(input_symbol, input_ftl);
 }
 

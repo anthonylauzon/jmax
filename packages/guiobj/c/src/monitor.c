@@ -149,9 +149,12 @@ monitor_instantiate(fts_class_t *cl)
 void 
 monitor_config( void)
 {
+  fts_class_t* cl;
   monitor_symbol = fts_new_symbol( "monitor~");
 
-  fts_class_install( monitor_symbol, monitor_instantiate);
+  cl = fts_class_install( monitor_symbol, monitor_instantiate);
+
+  fts_class_alias(cl, fts_new_symbol("dac~"));
 
   fts_dsp_declare_function( monitor_symbol, monitor_ftl);
 }
