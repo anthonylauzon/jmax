@@ -44,6 +44,7 @@ public class IntegerValue extends AbstractEventValue
 	super();
 
 	properties.put("integer", new Integer(0));
+	setProperty("duration", new Double(64.0));
     }
 
     Object intValue;

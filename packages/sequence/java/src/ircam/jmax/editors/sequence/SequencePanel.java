@@ -164,16 +164,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    {
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
-		//deve anche controllare che l'evento piu' lontano sia ancora visibile
 		TrackEvent lastEvent = sequenceData.getLastEvent();
 		if(lastEvent!=null)
-		    {
-			int duration = 3;
-		    	Object dur = lastEvent.getProperty("duration");
-			if((dur!=null)&&(dur instanceof Double))
-			    duration = ((Double)dur).intValue();
-			resizePanelToTimeWithoutScroll((int) (lastEvent.getTime()+duration));//*@*//
-		    }
+		    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
+							 ((Double)lastEvent.getProperty("duration")).intValue()));
 	    }
     });
 
@@ -313,11 +307,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     //controll if the object is in the actual scrollable area. if not extend the area
     private void resizePanelToEventTime(TrackEvent evt)
     {
-	int duration = 3;
-	Object dur = evt.getProperty("duration");
-	if((dur!=null)&&(dur instanceof Double))
-	    duration =((Double)dur).intValue();
-	int evtTime = (int)(evt.getTime()) +duration;//*@*//
+	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
 	resizePanelToTime(evtTime);
     }
 
@@ -456,10 +446,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public boolean eventIsVisible(Event evt)
     {
 	int time = (int)evt.getTime();
-	int duration = 3;
-	Object dur = evt.getProperty("duration");
-	if((dur!=null)&&(dur instanceof Double))
-	    duration = ((Double)dur).intValue();
+	int duration = ((Double)evt.getProperty("duration")).intValue();
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	return ((time>startTime)&&(time+duration<endTime));
@@ -504,12 +491,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public void makeVisible(TrackEvent evt)
     {
 	int time = (int)evt.getTime();
-	int duration = 3;
-	//int duration = ((Integer)evt.getProperty("duration")).intValue();
-	Object dur = evt.getProperty("duration");
-	if((dur!=null)&&(dur instanceof Double))
-	    duration = (int) ((Double)dur).doubleValue();//*@*//
-
+	int duration = ((Double)evt.getProperty("duration")).intValue();
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	
