@@ -6,7 +6,7 @@
  */
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 import ircam.jmax.*;
@@ -19,40 +19,22 @@ import ircam.jmax.editors.ermes.*;
 
 class ErmesObjectGetSizeWCmd implements Command 
 {
-
-  public Object CmdProc(Interp interp, CmdArgs ca) 
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {  
     ErmesSketchPad aSketchPad = MaxApplication.getApplication().itsSketchWindow.itsSketchPad; 
     Enumeration e = aSketchPad.itsElements.elements();
-    ErmesObject aObject = null;
     
-    if (ca.argc != 2) // <command> <id>
+    if (argv.length == 2)
       {
-	throw new EvalException("wrong # args: should be \"" + ca.argv(0) + "<id>\"");
-      }
-    
-    //looking for the object associated with the id
-    int id = ca.intArg(1);
-    
-    for(; e.hasMoreElements();) 
-      {
-	aObject = (ErmesObject) e.nextElement();
-	if (aObject.itsFtsObject.getObjId() == id) 
-	  {
-	    break;
-	  }
-      }
-    
-    if (aObject == null) 
-      {
-	throw new EvalException("no such id ("+id+")");
-      }
-    
-    StringBuffer sbuf = new StringBuffer();
-    
-    String key = String.valueOf(aObject.currentRect.width);
-    cornell.Jacl.Util.AppendElement(sbuf, key);
+	ErmesObject aObject;
 
-    return sbuf.toString();    
+	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
+
+	interp.setResult(TclInteger.newInstance(aObject.currentRect.width));
+      }
+    else
+      {
+	throw new TclException(interp, "wrong # args: should be \"" + argv[0].toString() + "<id>\"");
+      }
   }
 }

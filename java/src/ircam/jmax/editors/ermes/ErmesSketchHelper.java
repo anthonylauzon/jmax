@@ -134,37 +134,25 @@ class ErmesSketchHelper extends Object{
   //	delete one connection routine
   //--------------------------------------------------------
   
-  public boolean DeleteConnectionByInOut(int srcId, int srcOut, int destId, int destIn) {
-    ErmesObjOutlet out = null;
-    ErmesObjInlet	in = null;
+  public void DeleteConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn)
+  {
+    ErmesObjOutlet out;
+    ErmesObjInlet  in;
     ErmesObject aObject = null;
     ErmesConnection aConnection = null;
-    //looking for the src & dest:
-    for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-      aObject = (ErmesObject) e.nextElement();
-      if (aObject.itsFtsObject.getObjId() == srcId) {
-	if(aObject.itsOutletList.size() <= srcOut)return false;
-	out = (ErmesObjOutlet) aObject.itsOutletList.elementAt(srcOut);
-	if (in != null) break; //if we already found also the in, it's over
-      }
-      if (aObject.itsFtsObject.getObjId() == destId) {
-	if(aObject.itsInletList.size() <= destIn)return false;
-	in = (ErmesObjInlet) aObject.itsInletList.elementAt(destIn);
-	if (out != null) break; //if we already found also the out, it's over
-      }
-    }
-    if (out == null || in == null ) return false;
+
+    out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
+    in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
     
     for(Enumeration e = out.itsConnections.elements(); e.hasMoreElements();) {
       aConnection = (ErmesConnection) e.nextElement();
       if(aConnection.itsInlet == in) break;
     }
+
     if(aConnection!=null) {
       DeleteConnection(aConnection);
       itsSketchPad.repaint();
-      return true;
     }
-    else return false;
   }
 
 

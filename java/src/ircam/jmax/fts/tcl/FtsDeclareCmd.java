@@ -1,11 +1,10 @@
 package ircam.jmax.fts.tcl;
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
-import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -25,37 +24,37 @@ class FtsDeclareCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 3)
+    if ((argv.length >= 3) && (argv.length <= 4))
       {
-	throw new EvalException("missing argument; usage: declare <patcher> <description> [<graphic>]");
+	FtsObject object;
+	FtsObject parent;
+	String    description;
+
+	// Retrieve the arguments
+
+	parent = (FtsObject) ReflectObject.get(interp, argv[1]);
+	description = argv[2].toString();
+
+	if (argv.length == 4)
+	  object = FtsObject.makeFtsObject(parent, description,
+					   new FtsGraphicDescription(argv[3].toString()), true);
+	else
+	  object = FtsObject.makeFtsObject(parent, description, null, true);
+
+	interp.setResult(ReflectObject.newInstance(interp, object));
       }
-
-    FtsObject patcher;
-    FtsObject object;
-    String    description;
-    FtsServer server;
-
-    // Retrieve the fts server (should be got from a Tcl variable ??)
-
-    server = MaxApplication.getFtsServer();
-
-    // Retrieve the arguments
-    // this call should be substituted by a registration service call
-
-    patcher            = server.getObjectByFtsId(Integer.parseInt(ca.argv(1)));
-    description        = ca.argv(2);
-
-
-    if (ca.argc > 3)
-      object = FtsObject.makeFtsObject(patcher, description,
-				       new FtsGraphicDescription(ca.argv(3)), true);
     else
-      object = FtsObject.makeFtsObject(patcher, description, null, true);
-
-    return String.valueOf(object.getObjId());
+      {
+	throw new TclException(interp, "missing argument; usage: declare <parent> <description> [<graphic>]");
+      }
   }
 }
+
+
+
+
+
 
 

@@ -9,7 +9,7 @@
 
 package ircam.jmax.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -34,31 +34,35 @@ class MaxOpenCmd implements Command {
    * It is able to load everything that can be opened by the "open" menu
    */
   
-  public Object CmdProc(Interp interp, CmdArgs ca) {
-    
-    if (ca.argc < 2) {	//open <filename>
-      
-      throw new EvalException("wrong # args: should be \"" + ca.argv(0)+" <filename>");
-      
-    }
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    if (argv.length == 2)
+      {
+	ProjectWindow aProjectWindow = MaxApplication.getApplication().itsProjectWindow;
+	String pathName, fileName;
+	String fileSeparator = System.getProperty("file.separator");
+	String name = argv[1].toString();
+	int lastSeparatorIndex = name.lastIndexOf(fileSeparator);
 
-    ProjectWindow aProjectWindow = MaxApplication.getApplication().itsProjectWindow;
-    String pathName, fileName;
-    String fileSeparator = System.getProperty("file.separator");
-    int lastSeparatorIndex = ca.argv(1).lastIndexOf(fileSeparator);
-    if (lastSeparatorIndex == -1) {
-      pathName = "./";
-      fileName = ca.argv(1);
-    }
-    else {
-      fileName = ca.argv(1).substring(lastSeparatorIndex+1);
-      pathName = ca.argv(1).substring(0, lastSeparatorIndex)+"/";
-    }
-    System.out.println("opening "+pathName+fileName);
-    aProjectWindow.OpenFile(fileName, pathName);
-    return "";
+	if (lastSeparatorIndex == -1)
+	  {
+	    pathName = "./";
+	    fileName = name;
+	  }
+	else
+	  {
+	    fileName = name.substring(lastSeparatorIndex+1);
+	    pathName = name.substring(0, lastSeparatorIndex)+"/";
+	  }
+
+	aProjectWindow.OpenFile(fileName, pathName);
+	// Should return the document produced !!!
+      }
+    else
+      {	
+      	throw new TclException(interp, "wrong # args: should be open <filename>");
+      }
   }
-
 }
 
 

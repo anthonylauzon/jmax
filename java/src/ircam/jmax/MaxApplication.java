@@ -49,9 +49,9 @@ public class MaxApplication extends Object {
 
   /** Get the unique active TCL interpreter */
 
-  public static Interp/*MaxInterp*/ getTclInterp()
+  public static Interp getTclInterp()
   {
-    return /*(MaxInterp)*/ itsInterp;
+    return itsInterp;
   }
 
   /** Get the Post stream (usually the console, otherwise the stderr ?) */
@@ -116,6 +116,13 @@ public class MaxApplication extends Object {
     itsEditorsFrameList = new Vector();
     
     itsInterp = new tcl.lang.Interp();
+
+    // Installing the kernel packages 
+
+    ircam.jmax.tcl.TclMaxPackage.installPackage(itsInterp);
+    ircam.jmax.fts.tcl.TclFtsPackage.installPackage(itsInterp);
+    ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage(itsInterp);
+
     itsConsole = new Console(itsInterp, 40, 40);//e.m.
     itsConsole.getFrame().resize(150, 300);//e.m.
     itsConsole.start();
@@ -139,19 +146,25 @@ public class MaxApplication extends Object {
 
     //      FIRST SCRIPT: user defined	
 
-    /*try {
-      itsShell.interp.EvalFile(ermesProperties.getProperty("user.home")+ermesProperties.getProperty("file.separator")+".ermesrc");
-    } catch (cornell.Jacl.EvalException e) {
-      itsPrintWriter.println("TCL error reading local .ermesrc " + e.info);
-    }
+    try
+      {
+	itsInterp.evalFile(ermesProperties.getProperty("user.home")+ermesProperties.getProperty("file.separator")+".ermesrc");
+      }
+    catch (TclException e)
+      {
+	itsPrintWriter.println("TCL error reading local .ermesrc " + e);
+      }
 
     //      SECOND SCRIPT: installation (system)
 
-    try {
-      itsShell.interp.EvalFile(ermesProperties.getProperty("root")+ermesProperties.getProperty("file.separator")+"config"+ermesProperties.getProperty("file.separator")+"ermesrc.tcl");
-    } catch (cornell.Jacl.EvalException e) {
-      itsPrintWriter.println("TCL error reading system ermesrc :"+ e.info);
-    }*/
+    try
+      {
+	itsInterp.evalFile(ermesProperties.getProperty("root")+ermesProperties.getProperty("file.separator")+"config"+ermesProperties.getProperty("file.separator")+"ermesrc.tcl");
+      }
+    catch (TclException e)
+      {
+	itsPrintWriter.println("TCL error reading system ermesrc :"+ e);
+      }
 
     //if there were no connection statements in startup.tcl, ask the user
     if (itsServer == null) ObeyCommand(REQUIRE_CONNECTION);	// maybe to be moved in ConnectionDialog
@@ -805,13 +818,14 @@ public class MaxApplication extends Object {
     return itsProjectWindow;
   }
 	
-  /*e.m.public Console GetConsole() {
+  public Console GetConsole() {
     return itsConsole;
-  }*/
+  }
 
-  /*e.m. public ConsShell GetShell() {
-    return itsShell;
-  }*/
+  // just for compatibility with the current menus
+  public Console GetShell() {
+    return itsConsole;
+  }
 
   public Project GetCurrentProject() {
     return itsProjectWindow.itsProject;

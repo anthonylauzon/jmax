@@ -202,23 +202,15 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
   //  adding a connection given the source, dest, inlet, outlet.
   //	Used by scripts
   //--------------------------------------------------------
-  public ErmesConnection AddConnectionByInOut(int srcId, int srcOut, int destId, int destIn) {
-    ErmesObjOutlet out = null;
-    ErmesObjInlet in = null;
+  public ErmesConnection AddConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn)
+  {
+    ErmesObjOutlet out;
+    ErmesObjInlet in;
     ErmesObject aObject = null;
-    //looking for the src & dest:
-    for(Enumeration e = itsElements.elements(); e.hasMoreElements();) {
-      aObject = (ErmesObject) e.nextElement();
-      if (aObject.itsFtsObject.getObjId() == srcId) {
-	out = (ErmesObjOutlet) aObject.itsOutletList.elementAt(srcOut);
-	if (in != null) break; //if we already found also the in, it's over
-      }
-      if (aObject.itsFtsObject.getObjId() == destId) {
-	in = (ErmesObjInlet) aObject.itsInletList.elementAt(destIn);
-	if (out != null) break; //if we already found also the out, it's over
-      }
-    }
-    if (out == null || in == null ) return null;
+
+    out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
+    in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
+
     in.ChangeState(false, true); //warning: how many repaint() this function costs?
     out.ChangeState(false, true);//warning: how many repaint() this function costs?
     ToSave();

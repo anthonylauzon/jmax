@@ -1,6 +1,6 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -25,49 +25,42 @@ class FtsSetPropertyCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 4)
+    if (argv.length == 4)
       {
-	throw new EvalException("missing argument; usage: setProperty  <obj> <prop> <value>");
-      }
+	FtsObject object;
+	String    prop;
+	Object    value;
 
-    FtsServer server;
-    FtsObject object;
-    String    prop;
-    String    sValue;
-    Object    value;
+	// Retrieve the arguments
+	// this call should be substituted by a registration service call
 
-    // Retrieve the fts server (should be got from a Tcl variable ??)
+	object = (FtsObject) ReflectObject.get(interp, argv[1]);
+	prop   = argv[2].toString();
 
-    server = MaxApplication.getFtsServer();
-
-    // Retrieve the arguments
-    // this call should be substituted by a registration service call
-
-    object = server.getObjectByFtsId(ca.intArg(1));
-    prop   = ca.argv(2);
-    sValue = ca.argv(3);
-
-    try
-      {
-	value= new Integer (Integer.parseInt(sValue));
-      }
-    catch (NumberFormatException e)
-      {
 	try
 	  {
-	    value = Float.valueOf(sValue);
+	    value = new Integer(TclInteger.get(interp, argv[3]));
 	  }
-	catch (NumberFormatException e2)
+	catch (TclException e)
 	  {
-	    value = sValue;
+	    try
+	      {
+		value = new Float(TclDouble.get(interp, argv[3]));
+	      }
+	    catch (TclException e2)
+	      {
+		value = argv[3].toString();
+	      }
 	  }
+
+	object.putProperty(prop, value);
       }
-
-    object.putProperty(prop, value);
-
-    return value;
+    else
+      {
+	throw new TclException(interp, "missing argument; usage: setProperty  <obj> <prop> <value>");
+      }
   }
 }
 

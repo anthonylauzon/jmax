@@ -1,7 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 import ircam.jmax.*;
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 import ircam.jmax.fts.*;
 
@@ -24,14 +24,20 @@ class FtsInitCmd implements Command
   
   /** Method implementing the TCL command */
   
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 2)
-      throw new EvalException("wrong # args: should be \"" + ca.argv(0)+" <id>");
+    if (argv.length == 2)
+      {
+	FtsObject obj;
 
-    MaxApplication.getFtsServer().getObjectByFtsId(ca.intArg(1)).loaded();
+	obj = (FtsObject) ReflectObject.get(interp, argv[1]);
 
-    return "";
+	obj.loaded();
+      }
+    else
+      {
+	throw new TclException(interp, "wrong number of args: usage:  init  <patcher>");
+      }
   }
 }
 

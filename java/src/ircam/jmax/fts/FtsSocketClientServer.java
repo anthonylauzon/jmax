@@ -27,7 +27,7 @@ public class FtsSocketClientServer extends FtsServer
    * @param stream the stream to use as post stream.
    */
 
-  public FtsSocketClientServer(String name, PrintStream stream)
+  public FtsSocketClientServer(String name, PrintWriter stream)
   {
     super(name, new FtsSocketServerPort(name), stream);
   }

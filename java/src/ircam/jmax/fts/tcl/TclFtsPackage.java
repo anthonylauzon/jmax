@@ -1,9 +1,9 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 /**
- * Tcl FAL package.
+ * Tcl FTS extension.
  * Add all the application layer TCL commands to the tcl interpreter.
  * 
  * @see FtsPatcherCmd
@@ -23,52 +23,51 @@ import cornell.Jacl.*;
  * @see FtsSetPropertyCmd
  */
 
-public class TclFtsPackage extends cornell.Jacl.Package
+public class TclFtsPackage
 {
   /**
-   * Create the package.
    * Add all the commands to the given intepreter.
    *
    * @param interp the TCL interpreter instance
    */
 
-  public TclFtsPackage(Interp interp)
+  static public void installPackage(Interp interp)
   {
-    super(interp);
-
     // Patcher creation
 
-    interp.CreateCommand("patcher",  new FtsPatcherCmd());
-    interp.CreateCommand("object",   new FtsObjectCmd());
-    interp.CreateCommand("declare",  new FtsDeclareCmd());
-    interp.CreateCommand("connection",  new FtsConnectionCmd());
+    interp.createCommand("patcher",  new FtsPatcherCmd());
+    interp.createCommand("object",   new FtsObjectCmd());
+    interp.createCommand("declare",  new FtsDeclareCmd());
+    interp.createCommand("connection",  new FtsConnectionCmd());
 
-    interp.CreateCommand("init",  new FtsInitCmd());
-    interp.CreateCommand("sync", new FtsSyncCmd());
+    interp.createCommand("init",  new FtsInitCmd());
+    interp.createCommand("sync", new FtsSyncCmd());
 
     // Abstraction and templates declaration, help and blah blah
 
-    interp.CreateCommand("abstraction",  new FtsAbstractionCmd());
+    interp.createCommand("abstraction",  new FtsAbstractionCmd());
 
-    interp.CreateCommand("template",  new FtsTemplateCmd());
-    interp.CreateCommand("helpPatch",  new FtsHelpPatchCmd());
-    interp.CreateCommand("referenceURL",  new FtsReferenceURLCmd());
+    interp.createCommand("template",  new FtsTemplateCmd());
+    interp.createCommand("helpPatch",  new FtsHelpPatchCmd());
+    interp.createCommand("referenceURL",  new FtsReferenceURLCmd());
 
     // Messages
 
-    interp.CreateCommand("mess", new FtsMessCmd());
-    interp.CreateCommand("ucs", new FtsUcsCmd());
+    interp.createCommand("mess", new FtsMessCmd());
+    interp.createCommand("ucs", new FtsUcsCmd());
 
     // Access to object characteristic
 
-    interp.CreateCommand("className", new FtsClassNameCmd());
+    interp.createCommand("className", new FtsClassNameCmd());
 
     // Access to object FTS properties
 
-    interp.CreateCommand("setProperty", new FtsSetPropertyCmd());
-    interp.CreateCommand("addListener", new FtsAddListenerCmd());
+    interp.createCommand("setProperty", new FtsSetPropertyCmd());
+    interp.createCommand("addListener", new FtsAddListenerCmd());
 
     // version control ?
-    interp.CreateCommand("version", new FtsVersionCmd());
+    interp.createCommand("version", new FtsVersionCmd());
   }
 }
+
+

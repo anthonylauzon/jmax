@@ -1,6 +1,6 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -21,24 +21,24 @@ class FtsReferenceURLCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 3)
+    if (argv.length == 3)
       {
-	throw new EvalException("missing argument; usage: referenceURL <name> <url>");
+	String name;
+	String url;
+
+	// Retrieve the arguments
+
+	name = argv[1].toString();
+	url  = argv[2].toString();
+
+	FtsReferenceURLTable.add(name, url);
       }
-
-    String name;
-    String url;
-
-    // Retrieve the arguments
-
-    name = ca.argv(1);
-    url = ca.argv(2);
-
-    FtsReferenceURLTable.add(name, url);
-
-    return "";
+    else
+      {
+	throw new TclException(interp, "missing argument; usage: referenceURL <name> <url>");
+      }
   }
 }
 

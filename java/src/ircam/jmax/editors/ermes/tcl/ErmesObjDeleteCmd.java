@@ -16,7 +16,7 @@ package ircam.jmax.editors.ermes.tcl;
 
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 import java.lang.*;
 import java.io.*;
@@ -29,21 +29,20 @@ import ircam.jmax.editors.ermes.*;
  * The "delete" TCL command in ERMES.
  */
 
-class ErmesObjDeleteCmd implements Command {
+class ErmesObjDeleteCmd implements Command
+{
 
-
-    public Object CmdProc(Interp interp, CmdArgs ca) {
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
       ErmesObject aObject = null;
       Object oneObject = null;
      
-      for (int i = 1; i<ca.argc; i++) {
-	aObject = ((MaxInterp) interp).getErmesObject(ca.intArg(i));
-	if(aObject != null){
+      for (int i = 1; i < argv.length; i++)
+	{
+	  aObject = (ErmesObject) ReflectObject.get(interp, argv[i]);
 	  aObject.itsSketchPad.itsHelper.DeleteObject(aObject);
 	}
-      }
-      return "";
-    }
+  }
 }
 
 

@@ -544,7 +544,7 @@ public class FtsServer
    * @deprecated
    */
 
-  public FtsObject getObjectByFtsId(int id)
+  FtsObject getObjectByFtsId(int id)
   {
     if (id == 0)
       return null;

@@ -7,7 +7,7 @@
 
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -19,34 +19,47 @@ import ircam.jmax.editors.ermes.*;
  * given its name, its position, its arguments.
  */
 
-class ErmesObjNewObjCmd implements Command {
-
-
-
+class ErmesObjNewObjCmd implements Command
+{
     /**
-
      * This procedure is invoked to execute a "new object" operation in Ermes
-
      */
 
-    public Object CmdProc(Interp interp, CmdArgs ca) {
-	ErmesObject aObject = null;
-	if (ca.argc < 4) {	//at least newobj, name, x, y
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    ErmesObject aObject = null;
 
-            throw new EvalException("wrong # args: should be \"" + ca.argv(0) +
-            						" <name> <x> <y>");
+    if (argv.length >= 4)
+      {
+	ErmesSketchPad pad;
 
-        }
-	if (ca.argc == 4) //all the modules except the externals and messages
-	aObject  = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.AddObjectByName(
-										ca.argv(1), ca.intArg(2), ca.intArg(3), "");
-	else if (ca.argc == 5) // externals and messages
-	aObject = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.AddObjectByName(
-										ca.argv(1), ca.intArg(2), ca.intArg(3), ca.argv(4));
+	pad = MaxApplication.getApplication().itsSketchWindow.itsSketchPad;
 
-	if (aObject != null) return String.valueOf(aObject.itsFtsObject.getObjId());
-	else return "Object creation error";
+	if (argv.length == 4)
+	  {
+	    //all the modules except the externals and messages
+	    aObject  = pad.AddObjectByName(argv[1].toString(), TclInteger.get(interp, argv[2]),
+					   TclInteger.get(interp, argv[3]), "");
+	  }
+	else if (argv.length == 5)
+	  {
+	    // externals and messages
 
-    }
+	    aObject  = pad.AddObjectByName(argv[1].toString(), TclInteger.get(interp, argv[2]),
+					   TclInteger.get(interp, argv[3]), argv[4].toString());
+	  }
+
+	if (aObject != null)
+	  interp.setResult(ReflectObject.newInstance(interp, aObject));
+	else 
+	  throw new TclException(interp, "error in object creation");
+      }
+    else
+      throw new TclException(interp, "wrong number of arguments: usage: new <name> <x> <y>");
+  }
 }
+
+
+
+
 

@@ -11,7 +11,7 @@ package ircam.jmax.editors.ermes.tcl;
 
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 import java.io.*;
 import java.util.*;
@@ -23,19 +23,25 @@ import ircam.jmax.editors.ermes.*;
  * The "connect" TCL command in ERMES.
  */
 
-class ErmesConnectCmd implements Command {
-
-  public Object CmdProc(Interp interp, CmdArgs ca) {
+class ErmesConnectCmd implements Command
+{
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
     ErmesConnection aConnection = null;
-    if (ca.argc != 5) {	// connect, srcId, srcOut, destId, destOut
-      throw new EvalException("wrong # args: should be \"" + ca.argv(0) +
-			      " srcObjId, srcOutlet, destObjId, destInlet");
-    }
 
-    aConnection = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.AddConnectionByInOut(
-						ca.intArg(1), ca.intArg(2), ca.intArg(3), ca.intArg(4));
-    if (aConnection == null) return "connection error";
-    else return "";
+    if (argv.length == 5)
+      {
+	ErmesSketchPad pad = MaxApplication.getApplication().itsSketchWindow.itsSketchPad;
+
+	aConnection = pad.AddConnectionByInOut((ErmesObject) ReflectObject.get(interp, argv[1]),
+					       TclInteger.get(interp, argv[2]),
+					       (ErmesObject) ReflectObject.get(interp, argv[3]),
+					       TclInteger.get(interp, argv[4]));
+	
+	interp.setResult(ReflectObject.newInstance(interp, aConnection));
+      }
+    else
+      throw new TclException(interp, "wrong number of arguments: usage: connect srcObjId, srcOutlet, destObjId, destInlet");
   }
 }
 

@@ -1,6 +1,6 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -26,28 +26,28 @@ class FtsTemplateCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 2)
+    if (argv.length >= 2)
       {
-	throw new EvalException("missing argument; usage: template <name> [<proc>]");
+	String name;
+	String proc;
+
+	// Retrieve the arguments
+
+	name = argv[1].toString();
+
+	if (argv.length == 3)
+	  proc = argv[2].toString();
+	else
+	  proc = name;
+
+	FtsTemplateTable.add(name, proc);
       }
-
-    String name;
-    String proc;
-
-    // Retrieve the arguments
-
-    name = ca.argv(1);
-
-    if (ca.argc == 3)
-      proc = ca.argv(2);
     else
-      proc = name;
-
-    FtsTemplateTable.add(name, proc);
-
-    return "";
+      {
+	throw new TclException(interp, "missing argument; usage: template <name> [<proc>]");
+      }
   }
 }
 

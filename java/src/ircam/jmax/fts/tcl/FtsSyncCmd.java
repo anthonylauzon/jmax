@@ -1,7 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -32,24 +32,18 @@ class FtsSyncCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     long before;
-
-    FtsServer server;
-
-    // Retrieve the fts server (should be got from a Tcl variable ??)
-
-    server = MaxApplication.getFtsServer();
 
     // Retrieve the arguments
     // this call should be substituted by a registration service call
 
     before = System.currentTimeMillis();
 
-    server.syncToFts();
+    MaxApplication.getFtsServer().syncToFts();
 
-    return String.valueOf(System.currentTimeMillis() - before);
+    interp.setResult((int) (System.currentTimeMillis() - before));
   }
 }
 

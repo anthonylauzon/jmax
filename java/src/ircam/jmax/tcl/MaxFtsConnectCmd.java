@@ -13,7 +13,7 @@ package ircam.jmax.tcl;
 import java.io.*;
 import java.util.*;
 import ircam.jmax.*;
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 /**
  * The "FtsConnect" TCL command in ERMES.
@@ -27,36 +27,22 @@ class MaxFtsConnectCmd implements Command
 
    */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-
-    if (ca.argc < 2)
-      {
-
-	throw new EvalException("wrong # args: should be \"" + ca.argv(0)+"\" "+
-				"none | local | ftsdir ftsname socket server port");
-
-      }
-
-    if (ca.argc == 2)
-      {
-	if (ca.argv(1).equals("none"))
-	  throw new EvalException("\'none\' connections not implemented yet");
-	else
-	  throw new EvalException("wrong # args: should be \"" + ca.argv(0)+"\" "+
-				  "none | local | ftsdir ftsname socket server port");
-      }
-	
-    //remote connection: ftsdir, ftsname, connection_type, server, port
-
-    if (ca.argc == 6)
-      MaxApplication.getApplication().FTSConnect(ca.argv(1), ca.argv(2), ca.argv(3), ca.argv(4), ca.argv(5));
+    if (argv.length == 6)
+      MaxApplication.getApplication().FTSConnect(argv[1].toString(),
+						 argv[2].toString(),
+						 argv[3].toString(),
+						 argv[4].toString(),
+						 argv[5].toString());
+    else if (argv.length == 5)
+      MaxApplication.getApplication().FTSConnect(argv[1].toString(),
+						 argv[2].toString(),
+						 argv[3].toString(),
+						 argv[4].toString(),
+						 null);
     else
-      MaxApplication.getApplication().FTSConnect(ca.argv(1), ca.argv(2), ca.argv(3), ca.argv(4), null);
-
-    return "";
-
+      throw new TclException(interp, "wrong # args: should be ftsconnect  <type> ftsdir ftsname socket server port");
   }
-
 }
 

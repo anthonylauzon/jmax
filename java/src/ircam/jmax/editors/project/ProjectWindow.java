@@ -407,7 +407,7 @@ public class ProjectWindow extends Frame {
 
     if(aExtension.equals("tpa")){
             try {
-	      MaxApplication.getTclInterp().EvalFile(theDirectory+theFileName);
+	      MaxApplication.getTclInterp().evalFile(theDirectory+theFileName);
 	}
 	catch (Exception e) {
 	MaxApplication.getPostStream().println("error while opening .tpa"+theDirectory+theFileName+" "+e.toString());

@@ -2,7 +2,7 @@
 
 package ircam.jmax;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.util.*;
 import ircam.jmax.editors.ermes.*; // ????
 import ircam.jmax.*;
@@ -11,7 +11,7 @@ import ircam.jmax.fts.*;
 /**
  * An extension of the TCL interpreter with knowledge of MaxApplication
  */
-public class MaxInterp extends cornell.Jacl.Interp {
+public class MaxInterp extends Interp {
 	public MaxInterp(Console con) {
 		super(con);
 	}

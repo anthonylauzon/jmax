@@ -128,9 +128,9 @@ public class ErmesPatcherDoc implements MaxDocument {
   public boolean Load(String theName){   //this is the new format (tpa) loading routine
     // itsMaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
     try {
-      MaxApplication.getTclInterp().EvalFile(theName);
-    } catch (cornell.Jacl.EvalException e) {
-      MaxApplication.getPostStream().println("error reading .tpa "+ theName + e.info);
+      MaxApplication.getTclInterp().evalFile(theName);
+    } catch (tcl.lang.TclException e) {
+      MaxApplication.getPostStream().println("error reading .tpa "+ theName + e);
       e.printStackTrace();// proviamo ...
     }
     return true;  //change this!

@@ -1,12 +1,11 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-
 
 
 /**
@@ -31,9 +30,9 @@ class FtsPatcherCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if ((ca.argc == 1) || (ca.argc == 2))
+    if ((argv.length == 1) || (argv.length == 2))
       {
 	// Building a root patcher
 
@@ -45,8 +44,8 @@ class FtsPatcherCmd implements Command
 	// Retrieve the arguments
 	// this call should be substituted by a registration service call
 
-	if (ca.argc == 2)
-	  windowDescription = ca.argv(1);
+	if (argv.length == 2)
+	  windowDescription = argv[1].toString();
 
 	args = new Vector();
 	args.addElement("unnamed");
@@ -59,9 +58,9 @@ class FtsPatcherCmd implements Command
 	if (windowDescription != null)
 	  object.setWindowDescription(new FtsWindowDescription(windowDescription));
 
-	return String.valueOf(object.getObjId());
+	interp.setResult(ReflectObject.newInstance(interp, object));
       }
-    else if (ca.argc >= 5)
+    else if (argv.length >= 5) 
       {
 	Vector args;
 	FtsObject object;
@@ -71,27 +70,21 @@ class FtsPatcherCmd implements Command
 	String    name;
 	String    windowDescription = null;
 	String    graphicDescription = null;
-	FtsServer server;
-
-	// Retrieve the fts server (should be got from a Tcl variable ??)
-
-	server = MaxApplication.getFtsServer();
 
 	// Retrieve the arguments
 	// this call should be substituted by a registration service call
 
-	parent   = server.getObjectByFtsId(ca.intArg(1));
-	name      = ca.argv(2);
-	ninlets   = ca.intArg(3);
-	noutlets  = ca.intArg(4);
+	parent    = (FtsObject) ReflectObject.get(interp, argv[1]);
+	name      = argv[2].toString();
+	ninlets   = TclInteger.get(interp, argv[3]);
+	noutlets  = TclInteger.get(interp, argv[4]);
 
 
+	if (argv.length > 5) 
+	  graphicDescription = argv[5].toString();
 
-	if (ca.argc > 5)
-	  graphicDescription = ca.argv(5);
-
-	if (ca.argc > 6)
-	  windowDescription = ca.argv(6);
+	if (argv.length > 6) 
+	  windowDescription = argv[6].toString();
 
 	args = new Vector();
 	args.addElement(name);
@@ -107,12 +100,13 @@ class FtsPatcherCmd implements Command
 	if (windowDescription != null)
 	  object.setWindowDescription(new FtsWindowDescription(windowDescription));
 
-	return String.valueOf(object.getObjId());
+	interp.setResult(ReflectObject.newInstance(interp, object));
       }
     else
       {
-	throw new EvalException("missing argument; usage: patcher <patcher> <name> <ninlets> <noutlets> [<graphic_data> <window_data>], patcher [<window_data>]");
+	throw new TclException(interp, "missing argument; usage: patcher <patcher> <name> <ninlets> <noutlets> [<graphic_data> <window_data>], patcher [<window_data>]");
       }
   }
 }
+
 

@@ -7,7 +7,7 @@
 
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 import ircam.jmax.*;
@@ -20,48 +20,41 @@ import ircam.jmax.editors.ermes.*;
 
 class ErmesObjectSetSizeCmd implements Command 
 {
-  public Object CmdProc(Interp interp, CmdArgs ca) 
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {  
     ErmesSketchPad aSketchPad = MaxApplication.getApplication().itsSketchWindow.itsSketchPad; 
     Enumeration e = aSketchPad.itsElements.elements();
-    ErmesObject aObject = null;
     
-    if (ca.argc != 4) // <command> <id> <w> <h>
+    if (argv.length == 4)
       {
-	throw new EvalException("wrong # args: should be \"" + ca.argv(0) + "<id> <width> <height>\"");
-      }
-    
-    //looking for the object associated with the id
-    int id = ca.intArg(1);
-    
-    for(; e.hasMoreElements();) 
-      {
-	aObject = (ErmesObject) e.nextElement();
-	if (aObject.itsFtsObject.getObjId() == id) 
-	  {
-	    break;
-	  }
-      }
-    
-    if (aObject == null) 
-      {
-	throw new EvalException("no such id ("+id+")");
-      }
-    
-    //we have the object: set the size
-    int width = ca.intArg(2);
-    int height = ca.intArg(3);
-    aSketchPad.RemoveElementRgn(aObject);
+	ErmesObject aObject;
 
-    if(aObject.IsResizeTextCompat(width, height)) 
-      aObject.Resize(width - aObject.currentRect.width, height - aObject.currentRect.height);
-    else 
-      aObject.ResizeToText(width - aObject.currentRect.width, height - aObject.currentRect.height);
+	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
 
-    aSketchPad.SaveOneElementRgn(aObject);
+	//we have the object: set the size
+
+	int width  = TclInteger.get(interp, argv[2]);
+	int height = TclInteger.get(interp, argv[3]);
+	
+	aSketchPad.RemoveElementRgn(aObject);
+
+	if(aObject.IsResizeTextCompat(width, height)) 
+	  aObject.Resize(width - aObject.currentRect.width, height - aObject.currentRect.height);
+	else 
+	  aObject.ResizeToText(width - aObject.currentRect.width, height - aObject.currentRect.height);
+
+	aSketchPad.SaveOneElementRgn(aObject);
     
-    aSketchPad.repaint();
-    return "";
+	aSketchPad.repaint();
+      }
+    else
+      throw new TclException(interp, "wrong # args: should be \"" + argv[0].toString() + "<id> <width> <height>\"");
   }
 }
+
+
+
+
+
+
 

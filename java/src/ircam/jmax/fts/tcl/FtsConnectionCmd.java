@@ -1,6 +1,6 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -26,34 +26,26 @@ class FtsConnectionCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 5)
+    if (argv.length == 5)
       {
-	throw new EvalException("missing argument; usage: connect <from> <outlet> <to> <inlet>");
+	FtsObject from   = (FtsObject) ReflectObject.get(interp, argv[1]);
+	int       outlet = TclInteger.get(interp, argv[2]);
+	FtsObject to     = (FtsObject) ReflectObject.get(interp, argv[3]);
+	int       inlet  = TclInteger.get(interp, argv[4]);
+	FtsConnection c;
+
+	c = new FtsConnection(from, outlet, to, inlet);
+
+	interp.setResult(ReflectObject.newInstance(interp, c));
       }
-
-    FtsObject from;
-    int       outlet;
-    FtsObject to;
-    int       inlet;
-    FtsServer server;
-
-    // Retrieve the fts server (should be got from a Tcl variable ??)
-
-    server = MaxApplication.getFtsServer();
-
-    // Retrieve the arguments
-    // these calls should be substituted by a registration service call
-
-    from   = server.getObjectByFtsId(ca.intArg(1));
-    outlet = ca.intArg(2);
-    to     = server.getObjectByFtsId(ca.intArg(3));
-    inlet  = ca.intArg(4);
-
-    new FtsConnection(from, outlet, to, inlet);
-
-    return "";			// should return the connection ID in the registration service
+    else
+      {
+	throw new TclException(interp, "missing argument; usage: connect <from> <outlet> <to> <inlet>");
+      }
   }
 }
+
+
 

@@ -22,7 +22,7 @@ class ConsoleWriter extends Writer {
 		      temp.setLength(0);
 		      temp.append(cbuf, off, len);
 		      itsConsole.text.append(temp.toString());
-		      System.out.println("mi hanno chiesto di stampare"+temp.toString());
+		      System.err.println("Console Output:"+temp.toString());
   }
   public void flush() {
   }

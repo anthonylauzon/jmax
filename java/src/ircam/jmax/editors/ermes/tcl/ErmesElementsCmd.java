@@ -10,8 +10,7 @@
 package ircam.jmax.editors.ermes.tcl;
 
 
-
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 import java.io.*;
 import java.util.*;
@@ -24,35 +23,33 @@ import ircam.jmax.editors.ermes.*;
  * Returns the list of all the objects in the sketch.
  */
 
-class ErmesElementsCmd implements Command {
-
-
-
-    public Object CmdProc(Interp interp, CmdArgs ca) {
-
-	Enumeration e = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsElements.elements();
-	ErmesObject aObject = null;
+class ErmesElementsCmd implements Command
+{
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    Enumeration e = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsElements.elements();
+    ErmesObject aObject = null;
 	
-	if (ca.argc != 1) {	//only the word "selected"
+    if (argv.length == 1)
+      {
+	TclObject list;
 
-            throw new EvalException("wrong # args: should be \"" + ca.argv(0) + "\"");
+	list = TclList.newInstance();
 
-        }
+	while (e.hasMoreElements())
+	  {
 
-	StringBuffer sbuf = new StringBuffer();
+	    aObject = (ErmesObject) e.nextElement();
 
-	while (e.hasMoreElements()) {
+	    TclList.append(interp, list, ReflectObject.newInstance(interp, aObject));
+	  }
 
-		aObject = (ErmesObject) e.nextElement();
-		
-	    String key = String.valueOf(aObject.itsFtsObject.getObjId());
-
-	    cornell.Jacl.Util.AppendElement(sbuf, key);
-
-	}
-
-	return sbuf.toString();
-
-    }
+	interp.setResult(list);
+      }
+    else
+      throw new TclException(interp, "wrong number of args: usage: elements");
+  }
 }
+
+
 

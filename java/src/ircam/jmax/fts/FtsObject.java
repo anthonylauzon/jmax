@@ -459,11 +459,12 @@ public class FtsObject
 
 	try
 	  {
-	    MaxApplication.getTclInterp().Eval(FtsTemplateTable.getProc(className) + " " + ftsId + " " + getArgumentsDescription()); // Ids shuold go away
+	    // ??? !!!! @@@@
+	    MaxApplication.getTclInterp().eval(FtsTemplateTable.getProc(className) + " " + ftsId + " " + getArgumentsDescription()); 
 	  }
- 	catch (cornell.Jacl.EvalException e)
+ 	catch (tcl.lang.TclException e)
 	  {
-	    System.err.println("TCL Error in template " + className + ":" + e.info);
+	    MaxApplication.getPostStream().println("TCL Error in template " + className + ":" + e);
 	  }
 
 	loaded();	// activate the post-load init, like loadbangs
@@ -1022,7 +1023,7 @@ public class FtsObject
    * @deprecated
    */
 
-  public int getObjId()
+  int getObjId()
   {
     return ftsId;
   }

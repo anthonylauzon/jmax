@@ -17,7 +17,7 @@ package ircam.jmax.tcl;
 
 import java.util.*;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import ircam.jmax.*;
 
 
@@ -25,16 +25,14 @@ import ircam.jmax.*;
  * The "when" TCL command in ERMES.
  */
 
-class MaxRunHooksCmd implements Command {
-
-  public Object CmdProc(Interp interp, CmdArgs ca) {
-
-    if (ca.argc != 2)
-      throw new EvalException("usage: runHooks name");
-
-    MaxApplication.getApplication().runHooks(ca.argv(1));
-
-    return ca.argv(1);
+class MaxRunHooksCmd implements Command
+{
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    if (argv.length == 2)
+      MaxApplication.getApplication().runHooks(argv[1].toString());
+    else
+      throw new TclException(interp, "usage: runHooks name");
   }
 }
 

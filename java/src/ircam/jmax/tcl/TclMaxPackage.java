@@ -5,7 +5,7 @@
 
 package ircam.jmax.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
@@ -15,41 +15,26 @@ import java.util.*;
  */
 
 
-public class TclMaxPackage extends cornell.Jacl.Package 
+public class TclMaxPackage 
 {
-  /**
-   * Default constructor. Create the built-in commands and load the
-   * start-up scripts (ToDo).
-   */
-  public TclMaxPackage(Interp interp) {
-    super(interp);
-
+  static public void installPackage(Interp interp)
+  {
     /* FTS */
-    interp.CreateCommand("ftsconnect", new MaxFtsConnectCmd());
+    interp.createCommand("ftsconnect", new MaxFtsConnectCmd());
 
     /* misc */
-    interp.CreateCommand("post", new MaxPostCmd());
+    interp.createCommand("post", new MaxPostCmd());
 
     /* browser */
-    interp.CreateCommand("open", new MaxOpenCmd());
+    interp.createCommand("open", new MaxOpenCmd());
 
     /* hooks */
 
-    interp.CreateCommand("when", new MaxWhenCmd());
-    interp.CreateCommand("runHooks", new MaxRunHooksCmd());
+    interp.createCommand("when", new MaxWhenCmd());
+    interp.createCommand("runHooks", new MaxRunHooksCmd());
 
-    interp.CreateCommand("systemProperty", new MaxSystemPropertyCmd());
-    interp.CreateCommand("quit", new MaxQuitCmd());
-  }
-  
-  
-  /**
-   * This method is called when the "exit" command is issued.
-   * @return false iff the "System.exit()" method shouldn't be
-   * called.
-   */
-  public boolean ExitNotify() {    
-    return false;
+    interp.createCommand("systemProperty", new MaxSystemPropertyCmd());
+    interp.createCommand("quit", new MaxQuitCmd());
   }
 }
 

@@ -1,7 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 import ircam.jmax.*;
-import cornell.Jacl.*;
+import tcl.lang.*;
 
 import java.io.*;
 import java.util.*;
@@ -24,42 +24,35 @@ class FtsUcsCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (MaxApplication.getFtsServer() == null)
-      throw new EvalException("Tcl error: ucs commands require an FTS connection");
-
-    if (ca.argc < 2)
+    if (argv.length < 2)
       {
-	throw new EvalException("wrong # args: usage: ucs <arg_list>");
+	throw new TclException(interp, "wrong # args: usage: ucs <arg_list>");
       }
 
     Vector args = new Vector();
 
-    for (int i = 1; i < ca.argc; i++)
+    for (int i = 4; i < argv.length; i++)
       {
 	try
 	  {
-	    args.addElement(new Integer(ca.argv(i)));
+	    args.addElement(new Integer(TclInteger.get(interp, argv[i])));
 	  }
-	catch (NumberFormatException e)
+	catch (TclException e)
 	  {
 	    try
 	      {
-		args.addElement(new Float(ca.argv(i)));
+		args.addElement(new Float(TclDouble.get(interp, argv[i])));
 	      }
-	    catch (NumberFormatException e1)
+	    catch (TclException e2)
 	      {
-		// the arguments are always strings
-
-		args.addElement(ca.argv(i));
+		args.addElement(argv[i].toString());
 	      }
 	  }
       }
 
     MaxApplication.getFtsServer().ucsMessage(args);
-
-    return "";
   }
 }
 

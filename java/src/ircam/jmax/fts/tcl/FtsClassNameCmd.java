@@ -1,7 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -25,26 +25,18 @@ class FtsClassNameCmd implements Command
 {
   /** Method implementing the TCL command. */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 2)
+    if (argv.length == 2)
       {
-	throw new EvalException("missing argument; usage: className <obj>");
+	FtsObject obj = (FtsObject) ReflectObject.get(interp, argv[1]);
+
+	interp.setResult(obj.getClassName());
       }
-
-    FtsServer server;
-    FtsObject obj;
-
-    // Retrieve the fts server (should be got from a Tcl variable ??)
-
-    server = MaxApplication.getFtsServer();
-
-    // Retrieve the arguments
-    // these calls should be substituted by a registration service call
-
-    obj   = server.getObjectByFtsId(ca.intArg(1));
-
-    return obj.getClassName();
+    else
+      {
+	throw new TclException(interp, "missing or wrong argument; usage: className <obj>");
+      }
   }
 }
 

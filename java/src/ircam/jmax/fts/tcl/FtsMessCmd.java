@@ -1,7 +1,7 @@
 package ircam.jmax.fts.tcl;
 
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -15,7 +15,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *     mess <i> id inlet selector arg_list</i>
+ *     mess <i> obj inlet selector arg_list</i>
  * </code>
  *
  * @deprecated
@@ -25,70 +25,52 @@ class FtsMessCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     String idarg;
 
-    if (ca.argc < 4)
+    if (argv.length < 4)
       {
-
-	throw new EvalException("wrong # args: usage: mess <id> <inlet> <selector> <arg_list>");
-
+	throw new TclException(interp, "wrong number of args: usage: mess <obj> <inlet> <selector> <arg_list>");
       }
-
-    FtsServer server;
-
-    // Retrieve the fts server (should be got from a Tcl variable ??)
-
-    server = MaxApplication.getFtsServer();
 
     Vector args = new Vector();
 	
-    for (int i = 4; i < ca.argc; i++)
+    for (int i = 4; i < argv.length; i++)
       {
 	try
 	  {
-	    args.addElement(new Integer(ca.argv(i)));
+	    args.addElement(new Integer(TclInteger.get(interp, argv[i])));
 	  }
-	catch (NumberFormatException e)
+	catch (TclException e)
 	  {
 	    try
 	      {
-		args.addElement(new Float(ca.argv(i)));
+		args.addElement(new Float(TclDouble.get(interp, argv[i])));
 	      }
-	    catch (NumberFormatException e2)
+	    catch (TclException e2)
 	      {
-		// the arguments are always strings
-
-		args.addElement(ca.argv(i));
+		args.addElement(argv[i].toString());
 	      }
 	  }
       }
-
-    idarg = ca.argv(1);
 
     try
       {
-	FtsObject fo = null;
+	FtsObject fo = (FtsObject) ReflectObject.get(interp, argv[1]);
 	
-	fo = server.getObjectByFtsId(Integer.parseInt(idarg));
-
-	if (fo != null)
-	  {
-	    fo.sendMessage(ca.intArg(2), ca.argv(3), args);
-	    return "";
-	  }
-	else
-	  throw new EvalException("no objects with id " + ca.argv(1));	
+	fo.sendMessage(TclInteger.get(interp, argv[2]), argv[3].toString(), args);
       }
-    catch (NumberFormatException e)
+    catch (TclException e)
       {
-	server.sendNamedObjectMessage(idarg, ca.intArg(2), ca.argv(3), args);
+	MaxApplication.getFtsServer().sendNamedObjectMessage(argv[1].toString(),
+							  TclInteger.get(interp, argv[2]),
+							  argv[3].toString(),
+							  args);
       }
-
-    return "";
   }
 }
+
 
 
 

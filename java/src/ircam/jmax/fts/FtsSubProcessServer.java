@@ -27,7 +27,7 @@ public class FtsSubProcessServer extends FtsServer
    * @param stream the stream to use as post stream.
    */
 
-  public FtsSubProcessServer(PrintStream stream)
+  public FtsSubProcessServer(PrintWriter stream)
   {
     super("fts", new FtsSubProcessPort("fts"), stream);
   }

@@ -5,7 +5,7 @@
 
 package ircam.jmax;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.util.*;
 import ircam.jmax.*;
 
@@ -22,15 +22,15 @@ class MaxWhenHookTable
       this.code = code;
     }
 
-    void runHook(String name, MaxInterp interp)
+    void runHook(String name, Interp interp)
     {
       if (this.name.equals(name))
 	try
 	{
-	  interp.Eval(code);
+	  interp.eval(code);
 	}
-      catch (cornell.Jacl.EvalException e) {
-	MaxApplication.getPostStream().println("TCL error running hook " + name + " : " + e.info);
+      catch (TclException e) {
+	MaxApplication.getPostStream().println("TCL error running hook " + name + " : " + e);
       }
     }
   }

@@ -5,7 +5,7 @@
 
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -14,56 +14,45 @@ import java.util.*;
  */
 
 
-public class TclErmesPackage extends cornell.Jacl.Package 
+public class TclErmesPackage 
 {
   /**
    * Default constructor. Create the built-in commands and load the
    * start-up scripts (ToDo).
    */
-  public TclErmesPackage(Interp interp) {
-    super(interp);
-    
-    /* Ermes commands*/
+
+  static public void  installPackage(Interp interp)
+  {
+      /* Ermes commands*/
     
     /* patcher commands */
-    interp.CreateCommand("PatNew", new ErmesPatNewCmd());
+    interp.createCommand("PatNew", new ErmesPatNewCmd());
     
     /* object commands */
-    interp.CreateCommand("ObjNew", new ErmesObjNewObjCmd());
-    interp.CreateCommand("ObjConnect", new ErmesConnectCmd());
-    interp.CreateCommand("ObjDisconnect", new ErmesDisconnectCmd());
+    interp.createCommand("ObjNew", new ErmesObjNewObjCmd());
+    interp.createCommand("ObjConnect", new ErmesConnectCmd());
+    interp.createCommand("ObjDisconnect", new ErmesDisconnectCmd());
     
-    interp.CreateCommand("ObjSetPos", new ErmesObjectSetPositionCmd());
-    interp.CreateCommand("ObjSetSize", new ErmesObjectSetSizeCmd());
-    interp.CreateCommand("ObjGetPosX", new ErmesObjectGetPositionXCmd());
-    interp.CreateCommand("ObjGetPosY", new ErmesObjectGetPositionYCmd());
-    interp.CreateCommand("ObjGetSizeW", new ErmesObjectGetSizeWCmd());
-    interp.CreateCommand("ObjGetSizeH", new ErmesObjectGetSizeHCmd());
-
+    interp.createCommand("ObjSetPos", new ErmesObjectSetPositionCmd());
+    interp.createCommand("ObjSetSize", new ErmesObjectSetSizeCmd());
+    interp.createCommand("ObjGetPosX", new ErmesObjectGetPositionXCmd());
+    interp.createCommand("ObjGetPosY", new ErmesObjectGetPositionYCmd());
+    interp.createCommand("ObjGetSizeW", new ErmesObjectGetSizeWCmd());
+    interp.createCommand("ObjGetSizeH", new ErmesObjectGetSizeHCmd());
 
     /* current selection */
-    interp.CreateCommand("SelGetObjList", new ErmesSelectedCmd());
+    interp.createCommand("SelGetObjList", new ErmesSelectedCmd());
 
     /* graphics */
-    interp.CreateCommand("graphicson", new ErmesGraphicsOnCmd());
-    interp.CreateCommand("graphicsoff", new ErmesGraphicsOffCmd());
-    interp.CreateCommand("show", new ErmesShowCmd());
+    interp.createCommand("graphicson", new ErmesGraphicsOnCmd());
+    interp.createCommand("graphicsoff", new ErmesGraphicsOffCmd());
+    interp.createCommand("show", new ErmesShowCmd());
 
     /* obsolete */
-    interp.CreateCommand("new",	new ErmesPatNewCmd());
-    interp.CreateCommand("newobj", new ErmesObjNewObjCmd());
-    interp.CreateCommand("connect", new ErmesConnectCmd());
-    interp.CreateCommand("selected", new ErmesSelectedCmd());
-  }
-  
-  
-  /**
-   * This method is called when the "exit" command is issued.
-   * @return false iff the "System.exit()" method shouldn't be
-   * called.
-   */
-  public boolean ExitNotify() {    
-    return false;
+    interp.createCommand("new",	new ErmesPatNewCmd());
+    interp.createCommand("newobj", new ErmesObjNewObjCmd());
+    interp.createCommand("connect", new ErmesConnectCmd());
+    interp.createCommand("selected", new ErmesSelectedCmd());
   }
 }
 

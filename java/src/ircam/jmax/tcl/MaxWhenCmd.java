@@ -7,10 +7,10 @@
 
 package ircam.jmax.tcl;
 
-import ircam.jmax.*;
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.util.*;
 
+import ircam.jmax.*;
 
 /**
  * The "when" TCL command in ERMES.
@@ -18,14 +18,12 @@ import java.util.*;
 
 class MaxWhenCmd implements Command {
 
-  public Object CmdProc(Interp interp, CmdArgs ca) {
-
-    if (ca.argc != 3)
-      throw new EvalException("usage: when name { body } ");
-
-    MaxApplication.getApplication().addHook(ca.argv(1), ca.argv(2));
-
-    return ca.argv(1);
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    if (argv.length == 3)
+      MaxApplication.getApplication().addHook(argv[1].toString(), argv[2].toString());
+    else
+      throw new TclException(interp, "usage: when name { body } ");
   }
 }
 

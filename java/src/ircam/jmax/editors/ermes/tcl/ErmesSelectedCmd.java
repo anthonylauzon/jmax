@@ -7,7 +7,7 @@
 
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 import ircam.jmax.*;
@@ -21,32 +21,33 @@ import ircam.jmax.editors.ermes.*;
 
 class ErmesSelectedCmd implements Command 
 {
-  public Object CmdProc(Interp interp, CmdArgs ca) {
-    
-    Enumeration e;
-    
-    if (MaxApplication.getApplication().itsSketchWindow != null)
-    e =  MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsSelectedList.elements();
-    else {
-     throw new EvalException("no windows!"); 
-    }
-    ErmesObject aObject = null;
-    
-    if (ca.argc != 1) 
-      {	//only the word "selected"
-	throw new EvalException("wrong # args: should be \"" + ca.argv(0) + "\"");
-      }
-    
-    StringBuffer sbuf = new StringBuffer();
-    
-    
-    while (e.hasMoreElements()) 
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
+    if (argv.length == 1)
       {
-	aObject = (ErmesObject) e.nextElement();
-	String key = String.valueOf(aObject.itsFtsObject.getObjId());
-	cornell.Jacl.Util.AppendElement(sbuf, key);
-      }
+	Enumeration e;
+    
+	if (MaxApplication.getApplication().itsSketchWindow != null)
+	  e =  MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsSelectedList.elements();
+	else
+	  throw new TclException(interp, "no windows!"); 
 
-    return sbuf.toString();    
+	ErmesObject aObject = null;
+        
+	TclObject list;
+
+	list = TclList.newInstance();
+
+	while (e.hasMoreElements())
+	  {
+	    aObject = (ErmesObject) e.nextElement();
+
+	    TclList.append(interp, list, ReflectObject.newInstance(interp, aObject));
+	  }
+
+	interp.setResult(list);
+      }
+    else
+      throw new TclException(interp, "wrong number of args: usage: selected");
   }
 }

@@ -7,7 +7,7 @@
 
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -18,26 +18,16 @@ import ircam.jmax.fts.*;
  * The "version" TCL command, used during load.
  */
 
-class FtsVersionCmd implements Command {
 
+class FtsVersionCmd implements Command {
   /**
    * This procedure is invoked to execute a "version" operation in Ermes
    */
   
-  public Object CmdProc(Interp interp, CmdArgs ca) {
-    
-    if (ca.argc < 2) {	//version <string>
-      
-      throw new EvalException("wrong # args: should be \"" + ca.argv(0)+" <string>");
-      
-    }
-
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {
     // Nop, for now
-	  
-    return "";
-    
   }
-
 }
 
 

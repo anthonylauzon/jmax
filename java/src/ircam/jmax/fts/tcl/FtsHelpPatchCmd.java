@@ -1,6 +1,6 @@
 package ircam.jmax.fts.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
@@ -22,24 +22,24 @@ class FtsHelpPatchCmd implements Command
 {
   /** Method implementing the TCL command */
 
-  public Object CmdProc(Interp interp, CmdArgs ca)
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (ca.argc < 3)
+    if (argv.length == 3)
       {
-	throw new EvalException("missing argument; usage: helpPatch <name> <filename>");
+	String name;
+	String patch;
+
+	// Retrieve the arguments
+
+	name  = argv[1].toString();
+	patch = argv[2].toString();
+
+	FtsHelpPatchTable.add(name, patch);
       }
-
-    String name;
-    String patch;
-
-    // Retrieve the arguments
-
-    name  = ca.argv(1);
-    patch = ca.argv(2);
-
-    FtsHelpPatchTable.add(name, patch);
-
-    return "";
+    else
+      {
+	throw new TclException(interp, "missing argument; usage: helpPatch <name> <filename>");
+      }
   }
 }
 

@@ -7,7 +7,7 @@
 
 package ircam.jmax.editors.ermes.tcl;
 
-import cornell.Jacl.*;
+import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 import ircam.jmax.*;
@@ -20,45 +20,33 @@ import ircam.jmax.editors.ermes.*;
 
 class ErmesObjectSetPositionCmd implements Command 
 {
-  public Object CmdProc(Interp interp, CmdArgs ca) 
-  {
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
+  {  
     ErmesSketchPad aSketchPad = MaxApplication.getApplication().itsSketchWindow.itsSketchPad; 
     Enumeration e = aSketchPad.itsElements.elements();
-    ErmesObject aObject = null;
     
-    if (ca.argc != 4) // <command> <id> <x> <y>      
+    if (argv.length == 4)
       {
-	throw new EvalException("wrong # args: should be \"" + ca.argv(0) + "<id> <x> <y>\"");
+	ErmesObject aObject;
+
+	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
+
+	//we have the object: set the position
+
+	int theDeltaX = TclInteger.get(interp, argv[2]) - aObject.itsX; 
+	int theDeltaY = TclInteger.get(interp, argv[3]) - aObject.itsY;
+
+	aSketchPad.RemoveElementRgn(aObject);
+	aObject.MoveBy(theDeltaX, theDeltaY);
+
+	Vector aVector = new Vector();
+	aVector.addElement(aObject);
+	aObject.itsSketchPad.itsHelper.MoveElementListConnections(aVector, theDeltaX, theDeltaY); 
+	aSketchPad.SaveOneElementRgn(aObject);		
+	aSketchPad.repaint();
       }
-    
-    //looking for the object associated with the id
-    int id = ca.intArg(1);
-    
-    for(; e.hasMoreElements();) 
-      {
-	aObject = (ErmesObject) e.nextElement();
-	if (aObject.itsFtsObject.getObjId() == id) 
-	  {
-	    break;
-	  }
-      }
-    
-    if (aObject == null) 
-      {
-	throw new EvalException("no such id ("+id+")");
-      }
-    
-    //we have the object: set the position
-    //we have the object: set the position
-    int theDeltaX = ca.intArg(2)-aObject.itsX; 
-    int theDeltaY = ca.intArg(3)-aObject.itsY;
-    aSketchPad.RemoveElementRgn(aObject);
-    aObject.MoveBy(theDeltaX, theDeltaY);
-    Vector aVector = new Vector();
-    aVector.addElement(aObject);
-    aObject.itsSketchPad.itsHelper.MoveElementListConnections(aVector, theDeltaX, theDeltaY); 
-    aSketchPad.SaveOneElementRgn(aObject);		
-    aSketchPad.repaint();
-    return "";
+    else
+      throw new TclException(interp, "wrong # args: should be \"" + argv[0].toString() + "<id> <x> <y>\"");
   }
 }
+
