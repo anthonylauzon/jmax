@@ -48,7 +48,7 @@ class PopUpInteraction extends Interaction
 
     //deselect
     if (ErmesSelection.patcherSelection.hasObjects()){
-      ErmesSelection.patcherSelection.deselectAll( );
+      ErmesSelection.patcherSelection.deselectAll();
       editor.repaint();
     }
 
@@ -56,8 +56,11 @@ class PopUpInteraction extends Interaction
       {
 	locked = true;
 	object = (GraphicObject) area.getTarget();
-	object.popUpUpdate(Squeack.onInlet(squeack), Squeack.onOutlet(squeack), area);
-	object.popUpEdit(mouse);
+	if(!object.isPopUpVisible())
+	    {
+		object.popUpUpdate(Squeack.onInlet(squeack), Squeack.onOutlet(squeack), area);
+		object.popUpEdit(mouse);
+	    }
 	locked = false;
 	editor.endInteraction();
       }

@@ -985,9 +985,13 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     ObjectPopUp.update(wherePopup, text); 
   }
 
+  public boolean isPopUpVisible()
+  {
+      return ObjectPopUp.getInstance().isVisible();
+  }
   public void popUpEdit(Point p)
   {
-    ObjectPopUp.popup(itsSketchPad, this, p.x, p.y);
+      ObjectPopUp.popup(itsSketchPad, this, p.x, p.y);
   }
 
   public void runModePopUpEdit(Point p)
@@ -1000,9 +1004,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
       return null;
   }
-  public void popUpReset()
-  {
-  }
+  public void popUpReset(){}
 
   // This method is called when we want to edit the object 
   // within this editor (its text content or equivalent)

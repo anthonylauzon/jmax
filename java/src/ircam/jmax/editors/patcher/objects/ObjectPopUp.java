@@ -61,7 +61,6 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
 
     add(Actions.bringToFrontObjectAction, "Bring To Front");
     add(Actions.sendToBackObjectAction, "Send To Back");
-    //addSeparator();
     pack();
 
     addPopupMenuListener(this);
@@ -129,12 +128,12 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
 
   static public void popup(Component invoker, GraphicObject object, int x, int y)
   {
-    popup.target = object;
-    popup.x = x;
-    popup.y = y;
+      popup.target = object;
+      popup.x = x;
+      popup.y = y;
    
-    popup.setPopupSize(100, 200);
-    popup.show(invoker, x - 2, y - 2);
+      popup.setPopupSize(100, 200);
+      popup.show(invoker, x - 2, y - 2);
   }
 
   public JMenuItem add(EditorAction action, String name)
@@ -225,12 +224,10 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   }
   
   //PopupMenuListener interface
-  public void popupMenuCanceled(PopupMenuEvent e)
-  {    
-  }
+  public void popupMenuCanceled(PopupMenuEvent e){}
   public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
   {
-    target.popUpReset();
+      target.popUpReset();
   } 
   public void popupMenuWillBecomeVisible(PopupMenuEvent e)
   {

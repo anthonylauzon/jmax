@@ -80,6 +80,7 @@ class FtsErrorStreamer implements Runnable
 
   public void run()
   {
+
     while (running)
       {
 	try
