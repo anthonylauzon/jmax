@@ -292,10 +292,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_object_set_error(o, "Error opening DirectSound device (failed to create the primary buffer object)");
     return;
   }
+#if CAPTURE
   if (fts_direct_sound_capture == NULL) {
     fts_object_set_error(o, "Error opening DirectSound device (failed to create the DirectSoundCapture object)");
     return;
   }
+#endif
 
   fts_audioport_set_xrun_function((fts_audioport_t *) dev, dsaudioport_xrun);
 
