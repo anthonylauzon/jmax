@@ -27,7 +27,7 @@
 #include "fts.h"
 #include "intvec.h"
 
-static fts_symbol_t sym_ascii = 0;
+static fts_symbol_t sym_text = 0;
 
 /********************************************************************
  *
@@ -71,16 +71,32 @@ ivec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   int_vector_t *vec = ((ivec_t *)o)->vec;
 
-  int_vector_set_const(vec, 0.0f);
+  int_vector_zero(vec);
 }
 
 static void
 ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int_vector_t *vec = ((ivec_t *)o)->vec;
-  int constant = fts_get_int_arg(ac, at, 0, 0);
+  int c = fts_get_int_arg(ac, at, 0, 0);
 
-  int_vector_set_const(vec, constant);
+  int_vector_set_const(vec, c);
+}
+
+static void
+ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int_vector_t *ivec = (int_vector_t *)this->vec;
+
+  if(ac > 1 && fts_is_number(at))
+    {
+      int size = int_vector_get_size(ivec);
+      int offset = fts_get_number_int(at);
+
+      if(offset >= 0 && offset < size)
+	int_vector_set_from_atom_list(ivec, offset, ac - 1, at + 1);
+    }
 }
 
 static void
@@ -110,33 +126,46 @@ static void
 ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
-  enum {ascii} file_type = ascii;
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_name;
-  int n_read = 0;
-
-  if(file_format == sym_ascii)
-    {
-      file_type = ascii;
-      ac--;
-      at++;
-    }      
-
-  file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
+  int_vector_t *vec = this->vec;
 
   if(!file_name)
+    return;
+
+  if(file_format == sym_text)
     {
-      post("ivec import: no file name given\n");
-      return;
+      int size = int_vector_read_atom_file(vec, file_name);
+      
+      if(size >= 0)
+	fts_outlet_int(o, 0, size);
+      else
+	post("ivec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
-
-  if(file_type == ascii)
-    n_read = int_vector_import_ascii(this->vec, file_name);
-
-  if(n_read > 0)
-    fts_outlet_int(o, 0, n_read);
   else
-    post("ivec: can not import int vector from file \"%s\"\n", fts_symbol_name(file_name));
+    post("ivec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+}
+
+static void
+ivec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
+  int_vector_t *vec = this->vec;
+
+  if(!file_name)
+    return;
+
+  if(file_format == sym_text)
+    {
+      int size = int_vector_write_atom_file(vec, file_name);
+      
+      if(size < 0)
+	post("ivec: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
+    }
+  else
+    post("ivec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
 /********************************************************************
@@ -212,11 +241,14 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
 
       /* user methods */
-      fts_method_define(cl, 0, fts_new_symbol("clear"), ivec_clear, 0, 0);
-      fts_method_define(cl, 0, fts_new_symbol("fill"), ivec_fill, 1, a);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), ivec_clear);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), ivec_fill);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), ivec_set);
       
       fts_method_define_varargs(cl, 0, fts_new_symbol("size"), ivec_size);
+
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
@@ -238,7 +270,7 @@ ivec_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 void
 ivec_config(void)
 {
-  sym_ascii = fts_new_symbol("ascii");
+  sym_text = fts_new_symbol("text");
 
   fts_metaclass_install(fts_new_symbol("ivec"), ivec_instantiate, ivec_equiv);
 }

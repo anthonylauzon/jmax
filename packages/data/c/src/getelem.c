@@ -19,7 +19,6 @@
 #include "floatvec.h"
 #include "matrix.h"
 
-
 /******************************************************
  *
  *  objects getelem and setelem
@@ -51,8 +50,17 @@ elem_vector_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   elem_t *this = (elem_t *)o;
 
-  this->i = fts_get_int_arg(ac, at, 1, 0);
-  this->ref.data = refdata_atom_get(at + 2);
+  if(ac == 2)
+    {
+      this->i = 0;
+      this->ref.data = refdata_atom_get(at + 1);
+    }
+  else
+    {
+      this->i = fts_get_number_int(at + 1);
+      this->ref.data = refdata_atom_get(at + 2);
+    }
+
   refdata_refer(this->ref.data);
 }
 
@@ -61,9 +69,19 @@ elem_matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   elem_t *this = (elem_t *)o;
 
-  this->i = fts_get_int_arg(ac, at, 1, 0);
-  this->j = fts_get_int_arg(ac, at, 2, 0);
-  this->ref.data = refdata_atom_get(at + 3);
+  if(ac == 2)
+    {
+      this->i = 0;
+      this->j = 0;
+      this->ref.data = refdata_atom_get(at + 1);
+    }
+  else
+    {
+      this->i = fts_get_number_int(at + 1);
+      this->j = fts_get_number_int(at + 2);
+      this->ref.data = refdata_atom_get(at + 3);
+    }
+
   refdata_refer(this->ref.data);
 }
 
@@ -403,8 +421,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  if(ac == 3 && fts_is_number(at + 1) &&
-     (vector_atom_is(at + 2) || int_vector_atom_is(at + 2) || float_vector_atom_is(at + 2)))
+  if((ac == 2 || (ac == 3 && fts_is_number(at + 1))) &&
+     (vector_atom_is(at + ac - 1) || int_vector_atom_is(at + ac - 1) || float_vector_atom_is(at + ac - 1)))
     {
       fts_class_init(cl, sizeof(elem_t), 2, 1, 0); 
       
@@ -412,7 +430,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, elem_vector_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, elem_delete);
       
-      if(vector_atom_is(at + 2))
+      if(vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, getelem_vector_list);
 
@@ -421,7 +439,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 0, fts_s_float, getelem_vector_index);
 	  fts_method_define_varargs(cl, 1, vector_symbol, elem_set_reference);
 	}
-      else if(int_vector_atom_is(at + 2))
+      else if(int_vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, getelem_int_vector_list);
 
@@ -430,7 +448,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 0, fts_s_float, getelem_int_vector_index);
 	  fts_method_define_varargs(cl, 1, int_vector_symbol, elem_set_reference);
 	}
-      else if(float_vector_atom_is(at + 2))
+      else if(float_vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, getelem_float_vector_list);
 
@@ -441,7 +459,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
     }
   else if(ac == 4 && fts_is_number(at + 1) && fts_is_number(at + 2) &&
-	  (matrix_atom_is(at + 3)))
+	  (matrix_atom_is(at + ac - 1)))
     {
       fts_class_init(cl, sizeof(elem_t), 3, 1, 0); 
       
@@ -472,8 +490,8 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  if(ac == 3 && fts_is_number(at + 1) &&
-     (vector_atom_is(at + 2) || int_vector_atom_is(at + 2) || float_vector_atom_is(at + 2)))
+  if((ac == 2 || (ac == 3 && fts_is_number(at + 1))) &&
+     (vector_atom_is(at + ac - 1) || int_vector_atom_is(at + ac - 1) || float_vector_atom_is(at + ac - 1)))
     {
       fts_class_init(cl, sizeof(elem_t), 3, 0, 0); 
       
@@ -484,14 +502,14 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 1, fts_s_int, setelem_set_i);
       fts_method_define_varargs(cl, 1, fts_s_float, setelem_set_i);
 
-      if(vector_atom_is(at + 2))
+      if(vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, setelem_vector_list);
 
 	  fts_method_define_varargs(cl, 0, fts_s_anything, setelem_vector);
 	  fts_method_define_varargs(cl, 2, vector_symbol, elem_set_reference);
 	}
-      else if(int_vector_atom_is(at + 2))
+      else if(int_vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, setelem_int_vector_list);
 
@@ -499,7 +517,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 0, fts_s_float, setelem_int_vector);
 	  fts_method_define_varargs(cl, 2, int_vector_symbol, elem_set_reference);
 	}
-      else if(float_vector_atom_is(at + 2))
+      else if(float_vector_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, setelem_float_vector_list);
 
@@ -508,10 +526,10 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 2, float_vector_symbol, elem_set_reference);
 	}
     }
-  else if(ac == 4 && fts_is_number(at + 1) && fts_is_number(at + 2) &&
-	  (matrix_atom_is(at + 3)))
+  else if((ac == 2 || (ac == 4 && fts_is_number(at + 1) && fts_is_number(at + 2))) &&
+	  (matrix_atom_is(at + ac - 1)))
     {
-      fts_class_init(cl, sizeof(elem_t), 3, 1, 0); 
+      fts_class_init(cl, sizeof(elem_t), 4, 0, 0); 
       
       /* init/delete */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, elem_matrix_init);
@@ -522,7 +540,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 2, fts_s_int, setelem_set_j);
       fts_method_define_varargs(cl, 2, fts_s_float, setelem_set_j);
 
-      if(matrix_atom_is(at + 3))
+      if(matrix_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, setelem_matrix_list);
 

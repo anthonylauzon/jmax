@@ -27,7 +27,7 @@
 #include "fts.h"
 #include "matrix.h"
 
-static fts_symbol_t sym_ascii = 0;
+static fts_symbol_t sym_text = 0;
 
 /******************************************************************
  *
@@ -40,7 +40,7 @@ static fts_symbol_t sym_ascii = 0;
 typedef struct 
 {
   fts_object_t ob;
-  matrix_t *mx; /* atom matrix */
+  matrix_t *mat; /* atom matrix */
   fts_atom_t buf;
 } mat_t;
 
@@ -49,8 +49,8 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   mat_t *this = (mat_t *)o;
 
-  this->mx = matrix_create(ac - 1, at + 1);
-  matrix_refer(this->mx);
+  this->mat = matrix_create(ac - 1, at + 1);
+  matrix_refer(this->mat);
 
   fts_set_void(&this->buf);
 }
@@ -60,9 +60,8 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
 
-  matrix_release(this->mx);
+  matrix_release(this->mat);
 }
-
 /********************************************************************
  *
  *   user methods
@@ -70,37 +69,29 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_send(fts_object_t *o, matrix_t *mat)
+{
+  fts_atom_t a;
+  
+  matrix_atom_set(&a, mat);
+  fts_outlet_send(o, 0, matrix_symbol, 1, &a);  
+}
+
+static void
+mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  matrix_t *mx = (matrix_t *)this->mx;
-  int m = matrix_get_m(mx);
-  int n = matrix_get_n(mx);
-  int size = m * n;
 
-  if(ac >= 3 && fts_is_number(at) && fts_is_number(at + 1))
-    {
-      int i = fts_get_number_int(at);
-      int j = fts_get_number_int(at + 1);
-      int offset = i * n + j;
-
-      ac -= 2;
-      at += 2;
-
-      if(ac + offset > size)
-	ac = size - offset;
-
-      matrix_set_from_atom_list(mx, offset, ac, at);
-    }
+  mat_send(o, this->mat);
 }
 
 static void
 mat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  matrix_t *mx = (matrix_t *)this->mx;
-  int m = matrix_get_m(mx);
-  int n = matrix_get_n(mx);
+  matrix_t *mat = (matrix_t *)this->mat;
+  int m = matrix_get_m(mat);
+  int n = matrix_get_n(mat);
   
   if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
     {
@@ -108,7 +99,7 @@ mat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       int j = fts_get_number_int(at + 1);
 
       if(i >= 0 && i < m && j >= 0 && j < n)
-	matrix_void_element(mx, i, j);
+	matrix_void_element(mat, i, j);
     }
   else if(ac == 1)
     {
@@ -120,20 +111,72 @@ mat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 	  /* void row */
 	  for(j=0; j<n; j++)
-	    matrix_void_element(mx, i, j);
+	    matrix_void_element(mat, i, j);
 	}
     }
   else
-    matrix_void(mx);
+    matrix_void(mat);
 }
 
 static void
 mat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
+  matrix_t *mat = (matrix_t *)this->mat;
 
   if(ac > 0)
-    matrix_fill(this->mx, at[0]);
+    matrix_fill(mat, at[0]);
+}
+
+static void
+mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+  matrix_t *mat = (matrix_t *)this->mat;
+
+  if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
+    {
+      int m = matrix_get_m(mat);
+      int n = matrix_get_n(mat);
+      int size = m * n;
+      int i = fts_get_number_int(at);
+      int j = fts_get_number_int(at + 1);
+
+      if(i >= 0 && i < m && j >= 0 && j < n)
+	{
+	  int offset = i * n + j;
+
+	  matrix_set_from_atom_list(mat, offset, ac - 2, at + 2);
+	}
+    }
+}
+
+static void
+mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matrix_t *mat = ((mat_t *)o)->mat;
+  int m = 0;
+  int n = 0;
+
+  if(ac == 1 && fts_is_number(at))
+    {
+      m = fts_get_number_int(at);
+      n = matrix_get_n(mat);
+      
+      if(m >= 0 && n >= 0)
+	matrix_set_size(mat, m, n);
+    }  
+  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+    {
+      m = fts_get_number_int(at);
+      n = fts_get_number_int(at + 1);
+      
+      if(m >= 0 && n >= 0)
+	matrix_set_size(mat, m, n);
+    }
+  
+  if(m >= 0 && n >= 0)
+    mat_send(o, mat);
 }
 
 static void
@@ -141,32 +184,29 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
-  matrix_t *mx = this->mx;
-  int size = 0;
+  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
+  matrix_t *mat = this->mat;
 
   if(!file_name)
     return;
 
-  if(file_type == sym_ascii)
+  if(file_format == sym_text)
     {
       fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
+      int size = 0;
 
       if(separator)
-	size = matrix_import_ascii_separator(mx, file_name, separator, ac - 3, at + 3);
+	size = matrix_read_atom_file_separator(mat, file_name, separator, ac - 3, at + 3);
       else
-	size = matrix_import_ascii_newline(mx, file_name);
+	size = matrix_read_atom_file_newline(mat, file_name);
 
+      if(size >= 0)
+	mat_send(o, mat);
+      else
+	post("mat: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
-
-  if(size >= 0)
-    {
-      fts_atom_t a[2];
-      
-      fts_set_int(a + 0, matrix_get_m(mx));
-      fts_set_int(a + 1, matrix_get_n(mx));
-      fts_outlet_send(o, 1, fts_s_list, 2, a);
-    }
+  else
+    post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
 static void
@@ -174,21 +214,27 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
-  matrix_t *mx = this->mx;
+  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
+  matrix_t *mat = this->mat;
 
   if(!file_name)
     return;
 
-  if(file_type == sym_ascii)
+  if(file_format == sym_text)
     {
       fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
+      int size = 0;
 
       if(separator)
-	matrix_export_ascii_separator(mx, file_name, separator);
+	size = matrix_write_atom_file_separator(mat, file_name, separator);
       else
-	matrix_export_ascii_newline(mx, file_name);
+	size = matrix_write_atom_file_newline(mat, file_name);
+
+      if(size < 0)
+	post("mat: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
+  else
+    post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
 static void
@@ -205,10 +251,8 @@ mat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       switch(n)
 	{
 	case 0:
-	  fts_object_blip(o, "list <int> <int>: row and col index to recall/store value from/to matrix");
+	  fts_object_blip(o, "matrix commands");
 	  break;
-	case 1:
-	  fts_object_blip(o, "<anything>: set value to be stored");
 	}
     }
   else if (cmd == fts_s_outlet)
@@ -218,10 +262,8 @@ mat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       switch(n)
 	{
 	case 0:
-	  fts_object_blip(o, "<anything>: recalled value", n);
+	  fts_object_blip(o, "<mat>: the matrix", n);
 	  break;
-	case 1:
-	  fts_object_blip(o, "list <int> <int>: # of rows and columns read from file");
 	}
     }
 }
@@ -237,7 +279,7 @@ mat_get_matrix(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 {
   mat_t *this = (mat_t *)obj;
 
-  matrix_atom_set(value, this->mx);
+  matrix_atom_set(value, this->mat);
 }
 
 static fts_status_t
@@ -247,7 +289,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(matrix_get_constructor(ac - 1, at + 1))
     {
-      fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
+      fts_class_init(cl, sizeof(mat_t), 1, 2, 0);
   
       /* init/delete */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init);
@@ -265,12 +307,15 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       /* user methods */
       fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), mat_clear);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), mat_fill);
-      
+      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), mat_fill);      
       fts_method_define_varargs(cl, 0, fts_new_symbol("set"), mat_set);
+
+      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), mat_size);
             
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), mat_import); 
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), mat_export); 
+
+      fts_method_define_varargs(cl, 0, fts_s_bang, mat_output); 
       
       return fts_Success;
     }
@@ -288,7 +333,7 @@ mat_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 void
 mat_config(void)
 {
-  sym_ascii = fts_new_symbol("ascii");
+  sym_text = fts_new_symbol("text");
 
   fts_metaclass_install(fts_new_symbol("mat"), mat_instantiate, mat_equiv);
 }
