@@ -28,7 +28,7 @@ $(CYGWIN_HOME)\bin directory
 Build Procedure. 
 
 On the first built after checkout (download), start a bash shell and move (cd) into 
-the top jmax directory (jmax root directory), execute command:
+the jmax\winbuild directory, execute command:
 ./winprep.sh
 
 (Notice, jmax will not compile if this command is not ran at least once)
