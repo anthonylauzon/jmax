@@ -45,7 +45,7 @@
 
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
-
+#include <fts/thread.h>
 
 /***********************************************************************
  *
@@ -501,3 +501,130 @@ double fts_systime()
   return (double) now.tv_sec * 1000.0 + (double) now.tv_usec / 1000.0;
 }
 
+/* ************************************************** */
+/*                                                    */
+/* Thread manager platform dependent function         */
+/*                                                    */
+/* ************************************************** */
+int thread_manager_start(thread_manager_t* self)
+{
+    int success;
+    /* Time to create the thread */
+    success = pthread_create(&self->thread_manager_ID,
+			     NULL,
+			     thread_manager_main,
+			     (void*)self);
+
+    return success;
+}
+
+void* thread_manager_run_thread(void* arg)
+{
+    fts_thread_function_t* thread_func = (fts_thread_function_t*)arg;
+    fts_object_t* object = thread_func->object;
+    fts_method_t method = thread_func->method;
+    fts_symbol_t symbol = thread_func->symbol;
+    int ac = thread_func->ac;
+    fts_atom_t* at = thread_func->at;
+    int delay_ms = thread_func->delay_ms;
+    struct timespec time_req;
+    struct timespec time_rem;
+    time_req.tv_sec = 0;
+    time_req.tv_nsec = delay_ms * 1000 * 1000;
+
+    while(1)
+    {
+	if (0 == thread_func->is_dead)
+	{
+	    method(object, fts_system_inlet, symbol, ac, at);
+	}
+	nanosleep(&time_req, &time_rem);
+    }
+
+    return 0;
+}
+
+
+/** 
+ * Main function of the thread manager
+ * 
+ * @param arg 
+ * 
+ * @return 
+ */
+void* thread_manager_main(void* arg)
+{
+    int work_done;
+    int success;
+    thread_manager_t* manager = (thread_manager_t*)arg;
+
+    while(1)
+    {
+	work_done = 0;
+	/* Is there some data in create FIFO */
+	if (fts_fifo_read_level(&manager->create_fifo) >= sizeof(fts_atom_t))
+	{
+	    fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->create_fifo);	    
+	    fts_thread_worker_t* worker;
+
+	    fts_fifo_incr_read(&manager->create_fifo, sizeof(fts_atom_t));
+
+	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+	    
+	    success = pthread_create(&worker->id,
+				     NULL,
+				     thread_manager_run_thread,
+				     (void*)worker->thread_function);
+	    if (0 != success)
+	    {
+		post("[thread_manager] cannot start a new thread \n");
+	    }
+	    else
+	    {
+		/* try to detach thread */
+		success = pthread_detach(worker->id);
+		if (0 != success)
+		{
+		    post("[thread manager] cannot detach thread %d \n", worker->id);
+		}
+		work_done++;
+
+	    }
+
+	}
+	/* Is there some data in cancel FIFO */
+	if (fts_fifo_read_level(&manager->cancel_fifo) >= sizeof(fts_atom_t))
+	{
+	    fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->cancel_fifo);	    
+	    fts_thread_worker_t* worker;
+
+	    fts_fifo_incr_read(&manager->cancel_fifo, sizeof(fts_atom_t));
+
+	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+	    
+	    success = pthread_cancel(worker->id);
+	    if (0 != success)
+	    {
+		if (ESRCH == success)
+		{
+		    post("[thread manager] no such thread \n");
+		}
+		post("[thread manager] error while cancelling thread \n");
+	    }
+	    work_done++;
+	}
+	if (0 == work_done)
+	{	
+	    int delay_ms = manager->delay_ms;
+	    struct timespec time_req;
+	    struct timespec time_rem;
+	    time_req.tv_sec = 0;
+	    time_req.tv_nsec = delay_ms * 1000 * 1000;
+	    
+	    /* post("[thread_manager] thread is running \n"); */
+	    nanosleep(&time_req, &time_rem);
+	}
+    }
+    
+    return NULL;
+}
