@@ -1,0 +1,241 @@
+<html>
+<head>
+<title>jMax TODO list</title>
+</head>
+
+<body bgcolor="white">
+
+<p>
+<center>
+<h1>jMax TODO list</h1>
+</center>
+
+
+
+<h2>Version 2.5.1</h2>
+
+<p>
+Fix adc~ bug (and other DSP objects ???)
+
+<p>
+Fix DTD bugs (dtd runs as root, error messages, writesf~)
+
+
+
+
+
+<h2>Client, protocol and devices</h2>
+
+<p>
+Create a udpstream derived from bytestream
+
+<p>
+Make one single protocol (instead of 2 now because of symbols, cached symbols & co):
+integrate the symbol cache in the proto_(decode|encode) structure, using a hash table for 
+the cache, remove the cache info in the symbol structure, remove the command as first element 
+(remove the command or put it in an integer value). Use proto_(decode|encode) in "client device" 
+instead of specific code
+
+<p>
+After this done, do a typedef const char *fts_symbol_t and remove fts_symbol_name()
+
+<p>
+Remove also devices.c (all logical devices bazar)
+
+<p>
+Replace udpsend/udpreceive by the object used in protocol
+
+
+<h2>Multi-thread</h2>
+
+<p>
+Implement a message fifo. The message arguments should be in 
+a separate buffer (allocator?) so that one message arguments
+are contiguous and cannot overlap.
+
+<p>
+Reimplement the udp, serial, midi using threads and not select()
+
+
+<h2>Misc</h2>
+
+<p>
+Use same mechanism for fts_midiport_class_init and fts_bytestream_class_init
+as in fts_audioport_class_init
+
+<p>
+Do a DSP profiler using a thread and an object set for viewing results (sorted
+by objects, classes and patches)
+
+<p>
+Fix adc~ with 0 channels
+
+<p>
+Do GNOME and KDE apps
+
+<p>
+Do an async file reader (based on methods callback)
+
+<p>
+Do a threaded Direct-to-Disk, using fifos and inter-thread messages
+
+
+
+
+<h2>Portability</h2>
+
+<p>
+Put fts_soundfile_t in a separate package, that can be loaded
+dynamicaly (as audio and MIDI ports).<br>
+Question: do we want to support several sound file access libraries
+simultaneously or not ? <BR>
+This is related to autoconf subject.
+
+<P>
+Do a very simple implementation of audio file access, working only
+for .wav for instance.
+
+
+
+
+
+<h2>Configuration, packages</h2>
+
+<p>
+Remove Tcl configuration commands and use a patch for audio and midi configuration
+
+<p>
+Remove ucs
+
+<p>
+Add something to "protect" variables so that a patch cannot redefine DefaultAudio
+or SamplingRate
+
+<p>
+Replace Tcl definition of packages and projects by patches (objects or messages)
+
+<p>
+Add an "import" directive in a patch (template) that defines the packages imported
+by a patch, and create classes, templates, abstractions in packages.
+
+
+
+
+<h2>Compilation issues</h2>
+
+<p>
+Make all FTS include files C++ compliant with #ifndef __cplusplus extern "C" { #endif
+
+<p>
+Move Makefiles to automake and autoconf
+
+<p>
+Compile to libfts.so and then link the executable against it
+
+<p>
+Create the fts binary in jmax/fts/bin/fts instead of $(ARCH)/$(MODE).
+This way, you no longer have to specify jmaxHostType to specify which
+executable to start.<br>
+Note: this is related to packages because it is still usefull to have
+ARCH in package's library path (to be able to share installations).
+The ARCH can be known from inside fts (defined at compile time).
+
+
+<h2>Objects development API</h2>
+
+<p>
+A lot of things to do
+
+
+
+<h2>From Forum TODO</h2>
+
+<p>
+check for editor on-line help
+
+<p>
+Make a rpm from tutorials
+
+<p>
+Packaging: distribute JRE (test running with JRE first) ?
+
+<p>
+Bugs:
+readsf/writesf
+
+<p>
+Audioports: ALSA: ardour-like mmap mode with snd_pcm_mmap_forward, fix arguments (mmap + interleaved),
+help patches for SGI audio port
+
+<p>
+Add doxygen for audioport
+
+<p>
+Configuration script for installation (see contributions from Christian Klippel)
+
+<p>
+
+<h2>User interface</h2>
+
+<p>
+Give the splash screen immediately (so that you know that something is going on...)
+
+<p>
+Unique menu for all editors (fits better in Mac OS X l&F):
+<ul>
+<li>standards menus (File, Edit, Windows, Help)
+<li>a unique menu bar
+<li>each editor can add its menu when class is loaded: either one menu per
+editor, or one "Editors" menu with either sub-menus or item with separators
+<li>first, needs to check all the current menu items
+</ul>
+
+<p>
+Errors:
+<ul>
+<li>automaticaly display error panel after loading a patch
+<li>remove CTRL-Z and error display can be toggled on/off with a menu
+<li> make a separate error panel (currently, it reuses the find panel...)
+</ul>
+
+<p>
+Move graphic objects to packages:
+<ul>
+<li>graphic object defines Java class, FTS class, button, cursor
+<li>use of reflection API and JavaBeans property descriptors
+</ul>
+
+
+<h2>Object set</h2>
+
+<p>
+Finish integration of variables (sampread/write,...)
+
+<p>
+Table float
+
+<p>
+Control scroll 
+
+
+
+<h2>Forum</h2>
+
+<p>
+update site FTP
+
+<p>
+site Web Forum
+
+
+<h2>Documentation</h2>
+
+<p>
+Update compiling
+
+<p>
+Make automaticaly a list of packages and classes
+
+
+</body>
+</html>
