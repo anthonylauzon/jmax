@@ -37,9 +37,8 @@ typedef struct
 {
   fts_object_t o;
   fts_object_t **objects;
-  fts_list_t *states;
+  fts_hashtable_t hash;
   int n_objects;
-  int n_presets;
 } preset_t;
 
 static int
@@ -53,24 +52,21 @@ preset_check_object(preset_t *this, fts_object_t *obj)
 }
 
 static void
-preset_clear(preset_t *this, int n)
+preset_remove(preset_t *this, const fts_atom_t *key)
 {
-  int n_objects = this->n_objects;
-  fts_list_t *states = this->states + n_objects * n;
-  int i;
+  fts_atom_t value;
 
-  for(i=0; i<n_objects; i++)
-    fts_list_reset(states + i);
-}
+  if(fts_hashtable_get(&this->hash, key, &value))
+    {
+      fts_list_t *states = (fts_list_t *)fts_get_ptr(&value);
+      int i;
 
-static void
-preset_clear_all(preset_t *this)
-{
-  int n_presets = this->n_presets;
-  int i;
+      for(i=0; i<this->n_objects; i++)
+	fts_list_reset(states + i);
 
-  for(i=0; i<n_presets; i++)
-    preset_clear(this, i);
+      fts_free(states);
+      fts_hashtable_remove(&this->hash, key);      
+    }
 }
 
 /******************************************************
@@ -80,31 +76,62 @@ preset_clear_all(preset_t *this)
  */
 
 static void
+preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preset_t *this = (preset_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_int(at))
+	preset_remove(this, at);
+    }
+  else
+    {
+      /* clear all */
+      fts_iterator_t iterator;
+      
+      fts_hashtable_get_keys(&this->hash, &iterator);
+      
+      while(fts_iterator_has_more( &iterator))
+	{
+	  fts_atom_t key;
+	  fts_list_t *states;
+	  int i;
+	  
+	  fts_iterator_next( &iterator, &key);
+	  preset_remove(this, &key);
+	}
+      
+      fts_hashtable_clear(&this->hash);
+    }
+}
+
+static void
 preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
 
-  if(fts_is_number(at))
+  if(fts_is_int(at))
     {
-      int n = fts_get_number_int(at);
+      fts_list_t *states = (fts_list_t *)fts_malloc(sizeof(fts_list_t) * this->n_objects);
+      fts_atom_t value;
+      int i;
 
-      if(n >= 0 && n < this->n_presets)
+      preset_remove(this, at);
+      
+      for(i=0; i<this->n_objects; i++)
 	{
-	  int n_objects = this->n_objects;
-	  fts_list_t *states = this->states + n_objects * n;
 	  fts_atom_t a;
-	  int i;
-
-	  for(i=0; i<n_objects; i++)
-	    {
-	      /* clear eventual previous content */
-	      fts_list_reset(states + i);
-
-	      /* get object state as array */
-	      fts_set_list(&a, states + i);
-	      fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &a);
-	    }
+	  
+	  fts_list_init(states + i, 0, 0);
+	  
+	  /* get object state as array */
+	  fts_set_list(&a, states + i);
+	  fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &a);
 	}
+
+      fts_set_ptr(&value, (void *)states);
+      fts_hashtable_put(&this->hash, at, &value);
     }
 }
 
@@ -113,26 +140,25 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   preset_t *this = (preset_t *)o;
 
-  if(fts_is_number(at))
+  if(fts_is_int(at))
     {
-      int n = fts_get_number_int(at);
+      fts_atom_t value;
 
-      if(n >= 0 && n < this->n_presets)
+      if(fts_hashtable_get(&this->hash, at, &value))
 	{
-	  int n_objects = this->n_objects;
-	  fts_list_t *states = this->states + n_objects * n;
-	  fts_atom_t a;
+	  fts_list_t *states = fts_get_list(&value);
 	  int i;
-
-	  for(i=0; i<n_objects; i++)
+	  
+	  for(i=0; i<this->n_objects; i++)
 	    {
 	      fts_list_t *atoms = states + i;
 	      fts_atom_t *ptr = fts_list_get_ptr(states + i);
 	      int size = fts_list_get_size(states + i);
 
-	      if(size)
-		fts_message_send(this->objects[i], fts_SystemInlet, sym_restore_state_from_array, size, ptr);
+	      fts_message_send(this->objects[i], fts_SystemInlet, sym_restore_state_from_array, size, ptr);
 	    }
+
+	  fts_outlet_send(o, 0, fts_s_int, 1, at);
 	}
     }
 }
@@ -148,28 +174,15 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   preset_t *this = (preset_t *)o;
   int n_objects = 0;
-  int n_presets = 0;
   int i;
 
   ac--;
   at++;
 
-  if(fts_is_number(at))
+  /* check arguments */
+  for(i=0; i<ac; i++)
     {
-      n_presets = fts_get_number_int(at);
-
-      ac--;
-      at++;
-    }
-
-  if(n_presets <= 0)
-    n_presets = 16;
-
-  n_objects = ac;
-
-  for(i=0; i<n_objects; i++)
-    {
-      if(fts_is_object(at))
+      if(fts_is_object(at + i))
 	{
 	  fts_object_t *obj = fts_get_object(at + i);
 	  
@@ -182,27 +195,23 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	}
       else
 	{
-	  fts_object_set_error(o, "Wrong arguments");
+	  fts_object_set_error(o, "Arguments of object required", i);
 	  return;
 	}
     }
 
-  this->objects = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * n_objects);
+  fts_hashtable_init(&this->hash, fts_t_int, 16);
 
-  for(i=0; i<n_objects; i++)
+  this->objects = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * ac);
+
+  for(i=0; i<ac; i++)
     {
       fts_object_t *obj = fts_get_object(at + i);
       this->objects[i] = obj;
       fts_object_refer(obj);
     }
 
-  this->states = (fts_list_t *)fts_malloc(sizeof(fts_list_t) * n_objects * n_presets);
-
-  for(i=0; i<n_objects * n_presets; i++)
-    fts_list_init(this->states + i, 0, 0);
-
-  this->n_objects = n_objects;
-  this->n_presets = n_presets;
+  this->n_objects = ac;
 }
 
 static void
@@ -211,9 +220,7 @@ preset_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   preset_t *this = (preset_t *)o;
   int i;
 
-  preset_clear_all(this);
-
-  fts_free(this->states);
+  preset_clear(o, 0, 0, 0, 0);
 
   for(i=0; i<this->n_objects; i++)
     fts_object_release(this->objects[i]);
@@ -229,6 +236,7 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("store"), preset_store);
   fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), preset_recall);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), preset_clear);
 
   return fts_Success;
 }

@@ -62,11 +62,7 @@ set_size(bpf_t *bpf, int size)
       while(alloc < size)
 	alloc += BPF_BLOCK_SIZE;
 
-      if(bpf->alloc)
-	fts_block_free((void *)bpf->points, sizeof(bp_t) * alloc);
-      
-      bpf->points = (bp_t *)fts_block_alloc(sizeof(bp_t) * alloc);
-
+      bpf->points = (bp_t *)fts_realloc((void *)bpf->points, sizeof(bp_t) * alloc);
       bpf->alloc = alloc;
     }
 

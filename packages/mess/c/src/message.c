@@ -139,10 +139,8 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_symbol_t name = fts_get_symbol(at);
 	  fts_class_t *cl;
 
-	  if(name == fts_s_list)
-	    message_set(this, fts_s_list, ac - 1, at + 1); /* list constructor: "list" [<value> ...] */
-	  else if(fts_atom_type_lookup(name, &cl))
-	    fts_object_set_error(o, "Message cannot start with type name %s", fts_symbol_name(name));
+	  if(fts_atom_type_lookup(name, &cl))
+	    fts_object_set_error(o, "Symbol %s cannot be used as message", fts_symbol_name(name));
 	  else
 	    message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}

@@ -62,5 +62,9 @@ extern void message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_
     fts_object_release((fts_object_t *)(m)); \
   } while(0);
 
+/* message atoms */
+#define message_atom_set(ap, x) fts_set_object_with_type((ap), (x), message_type)
+#define message_atom_get(ap) ((message_t *)fts_get_object(ap))
+#define message_atom_is(ap) (fts_is_a((ap), message_type))
 
 #endif
