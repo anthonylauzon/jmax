@@ -1,3 +1,8 @@
+2003-02-21  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* cleaned the default project/configuration search
+	* fixed Mac OS X default project/configuration file names
+
 2003-02-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fix bug "[690449] osc~ help patcher does not define $w" submitted by etienne (edelefile) on sourceforge

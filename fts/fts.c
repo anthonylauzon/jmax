@@ -122,7 +122,6 @@ fts_symbol_t fts_get_root_directory( void)
 {
   fts_symbol_t r;
 
-  
   /* get it from command line */
   r = fts_cmd_args_get( fts_new_symbol( "root"));
   
@@ -133,28 +132,45 @@ fts_symbol_t fts_get_root_directory( void)
   return fts_get_default_root_directory();
 }
 
-void fts_load_project( void)
+
+/***********************************************************************
+ *
+ * Project and configuration loading
+ *
+ */
+
+static void 
+fts_load_project( void)
 {
   fts_symbol_t project_file;
-  fts_package_t* project = NULL;
+  fts_package_t *project = NULL;
+  int project_found = 0;
 
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( fts_s_project);
+  project_found = fts_file_exists( project_file) && fts_is_file( project_file);
 
   /* check if the user has a project file in the home directory  */
-  if (project_file == NULL)
-    project_file = fts_get_user_project( 0);
+  if (!project_found)
+    {
+      project_file = fts_get_user_project();
+      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+    }
 
   /* check if there's a system wide project */
-  if (project_file == NULL)
-    project_file = fts_get_system_project();
+  if (!project_found)
+    {
+      project_file = fts_get_system_project();
+      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+    }
 
-  if (project_file)
+  if (project_found)
     project = fts_project_open(project_file);
 
   /* create an empty project */
   if (project == NULL)
     {
+      /* create an empty project */
       project = fts_package_new( fts_s_project);
 
       fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
@@ -169,42 +185,46 @@ void fts_load_project( void)
 }
 
 
-void fts_load_config( void)
+static void 
+fts_load_config( void)
 {
-  fts_symbol_t config_symbol;
   fts_symbol_t config_file;
-  fts_config_t* config = NULL;
+  int config_found = 0;
 
-  config_symbol = fts_new_symbol( "config");
-  
   /* check if the user specified a config file on the command line  */
-  config_file = fts_cmd_args_get( config_symbol);
+  config_file = fts_cmd_args_get( fts_s_config);
+  config_found = fts_file_exists( config_file) && fts_is_file( config_file);
 
   /* check if the user has a config file in the home directory  */
-  if (config_file == NULL) {
-    config_file = fts_get_user_configuration( 0);
-  }
+  if (!config_found)
+    {
+      config_file = fts_get_user_configuration();
+      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+    }
 
   /* check if there's a system wide config */
-  if (config_file == NULL) {
-    config_file = fts_get_system_configuration();
-  }
+  if (!config_found)
+    {
+      config_file = fts_get_system_configuration();
+      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+    }
   
-  /* @@@@@@ TODO @@@@@@@@ */
-  /* create an empty config */
-  if (config_file == NULL)
-  {
-    fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
-    config = (fts_config_t*)fts_object_create(config_type, 0, 0);
-    fts_midiconfig_set_defaults(config->midi_config);
-    fts_audioconfig_set_defaults(config->audio_config);
+  if (!config_found)
+    {
+      fts_config_t *config;
 
-    fts_config_set(config);
-  }
+      /* create an empty config */
+      fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
+      config = (fts_config_t*)fts_object_create(config_type, 0, 0);
+      fts_midiconfig_set_defaults(config->midi_config);
+      fts_audioconfig_set_defaults(config->audio_config);
+
+      fts_config_set(config);
+    }
   else
-  {
-    fts_config_open(config_file);
-  }
+    {
+      fts_config_open(config_file);
+    }
 }
 
 /***********************************************************************

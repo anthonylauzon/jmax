@@ -54,24 +54,40 @@ fts_symbol_t fts_get_default_root_directory( void)
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
-fts_symbol_t fts_get_user_project( int create)
+/***********************************************************************
+ *
+ * Project and configuration files
+ *
+ */
+
+#define PREF_DIR ".jmax"
+
+static fts_symbol_t get_user_directory(void)
 {
-  char* home;
+  char dir[MAXPATHLEN];
+
+  strcpy( dir, getenv("HOME"));
+  strcat( dir, "/");
+  strcat( dir, PREF_DIR);
+  
+  /* create the directory if necessary */
+  if (!fts_file_exists(path) && mkdir( path, 0755) < 0)
+    fts_log( "[user] error: cannot create directory %s\n", path);
+
+  if (fts_is_file( path))
+    fts_log( "[user] error: %s is a file, but must be a directory\n", path);
+
+  return fts_new_symbol(path);
+}
+
+fts_symbol_t
+fts_get_user_project( void)
+{
   char path[MAXPATHLEN];
 
-  home = getenv("HOME");
-  fts_make_absolute_path(home, ".jmax.jprj", path, MAXPATHLEN);
-  if (!create)
-  {
-    if (fts_file_exists(path) && fts_is_file(path)) {
-      return fts_new_symbol(path);
-    }
-    
-    return NULL;
-  }
-  
-  /* if we want to create, here we suppose that home directory always exists */
-  return fts_new_symbol(path);
+  fts_make_absolute_path( get_user_directory(), fts_s_default_project, path, MAXPATHLEN);
+
+  return fts_new_symbol( path);
 }
 
 fts_symbol_t 
@@ -79,34 +95,18 @@ fts_get_system_project( void)
 {
   char path[MAXPATHLEN];
 
-  fts_make_absolute_path( fts_get_root_directory(), fts_s_default_project, path, MAXPATHLEN);
-  
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
+  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_project, path, MAXPATHLEN);
 
-  return NULL;  
+  return fts_new_symbol(path);
 }
 
 fts_symbol_t 
-fts_get_user_configuration( int create)
+fts_get_user_configuration( void)
 {
-  char* home;
   char path[MAXPATHLEN];
 
-  home = getenv("HOME");
-  /* @@@@@ Change default configuration file name here @@@@@ */
-  fts_make_absolute_path(home, ".jmax.jcfg", path, MAXPATHLEN);
-  if (! create)
-  {
-    if (fts_file_exists(path) && fts_is_file(path)) {
-      return fts_new_symbol(path);
-    }
-    
-    return NULL;  
-  }
-  
-  /* if we want to create, here we suppose that home directory always exits */
+  fts_make_absolute_path( get_user_directory(), fts_s_default_config, path, MAXPATHLEN);
+
   return fts_new_symbol(path);
 }
 
@@ -114,12 +114,10 @@ fts_symbol_t
 fts_get_system_configuration(void)
 {
   char path[MAXPATHLEN];
-  fts_make_absolute_path(fts_get_root_directory(), fts_s_default_config, path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
 
-  return NULL;  
+  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_config, path, MAXPATHLEN);
+
+  return fts_new_symbol(path);
 }
 
 /* *************************************************************************** */

@@ -136,7 +136,7 @@ config_save_as_default(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 {
   fts_atom_t a[1];
   
-  fts_set_symbol(a, fts_get_user_configuration(1));
+  fts_set_symbol(a, fts_get_user_configuration());
   config_save(o, 0, s, 1, a);
 }
 

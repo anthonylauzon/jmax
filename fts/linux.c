@@ -62,74 +62,36 @@ fts_symbol_t fts_get_default_root_directory( void)
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
-static fts_symbol_t fts_get_default_user_directory(void)
+/***********************************************************************
+ *
+ * Project and configuration files
+ *
+ */
+
+static fts_symbol_t get_user_directory(void)
 {
-  char* home;
-  char* jmax_user_dir;
-  int size;
-  int cumul = 0;
-  fts_symbol_t s_jmax_user_dir;
+  char dir[MAXPATHLEN];
 
-  jmax_user_dir = getenv("JMAX_PREF_DIR");
-  if (NULL == jmax_user_dir)
-    {
-      home = getenv("HOME");
-      /* don'"t forget to add '/' and '\0' */
-      size = strlen(home) + strlen(PREF_DIR) + 2;
-      jmax_user_dir = (char*)malloc(size * sizeof(char*)); 
-      strncpy(jmax_user_dir + cumul, home, strlen(home));
-      cumul += strlen(home);
-      strncpy(jmax_user_dir + cumul , "/", 1);
-      cumul += 1;
-      strncpy(jmax_user_dir + cumul, PREF_DIR, strlen(PREF_DIR));
-      cumul += strlen(PREF_DIR);
-      jmax_user_dir[cumul] = '\0';
-      s_jmax_user_dir = fts_new_symbol(jmax_user_dir);
-      free(jmax_user_dir);
-    }
-  else
-    {
-      s_jmax_user_dir = fts_new_symbol(jmax_user_dir);
-    }
+  strcpy( dir, getenv("HOME"));
+  strcat( dir, "/");
+  strcat( dir, PREF_DIR);
+  
+  /* create the directory if necessary */
+  if (!fts_file_exists(dir) && mkdir( dir, 0755) < 0)
+    fts_log( "[user] error: cannot create directory %s\n", dir);
 
-  return s_jmax_user_dir;
+  if (fts_is_file( dir))
+    fts_log( "[user] error: %s is a file, but must be a directory\n", dir);
+
+  return fts_new_symbol(dir);
 }
 
 fts_symbol_t
-fts_get_user_project( int create)
+fts_get_user_project( void)
 {
   char path[MAXPATHLEN];
-  char *p;
 
-  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_project, path, MAXPATHLEN);
-  if ( !create)
-    {
-      if (fts_file_exists(path) && fts_is_file(path))
-	return fts_new_symbol(path);
-
-      return NULL;
-    }
-
-  if (fts_file_exists(path) && fts_is_file(path))
-    return fts_new_symbol(path);
-
-  /* create the directory if necessary */
-  p = path+1;
-  while ((p = strchr( p, '/')) != NULL)
-    {
-      *p = '\0';
-
-      fprintf( stderr, "Creating \"%s\"\n", path);
-
-      if (mkdir( path, 0755) < 0)
-	{
-	  if (errno != EEXIST)
-	    return NULL;
-	}
-
-      *p = '/';
-      p++;
-    }
+  fts_make_absolute_path( get_user_directory(), fts_s_default_project, path, MAXPATHLEN);
 
   return fts_new_symbol( path);
 }
@@ -140,64 +102,28 @@ fts_get_system_project( void)
   char path[MAXPATHLEN];
 
   fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_project, path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path))
-    return fts_new_symbol(path);
 
-  return NULL;  
+  return fts_new_symbol(path);
 }
 
-
 fts_symbol_t 
-fts_get_user_configuration( int create)
+fts_get_user_configuration( void)
 {
   char path[MAXPATHLEN];
-  char* p;
 
-  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_config, path, MAXPATHLEN);
+  fts_make_absolute_path( get_user_directory(), fts_s_default_config, path, MAXPATHLEN);
 
-  if (!create)
-  {
-    if (fts_file_exists(path) && fts_is_file(path)) {
-      return fts_new_symbol(path);
-    }
-
-    return NULL;  
-  }
-  
-  if (fts_file_exists(path) && fts_is_file(path))
-    return fts_new_symbol(path);
-
-  /* create the directory if necessary */
-  p = path + 1;
-  while ((p = strchr( p, '/')) != NULL)
-  {
-    *p = '\0';
-    
-    fprintf( stderr, "Creating \"%s\"\n", path);
-    
-    if (mkdir( path, 0755) < 0)
-    {
-      if (errno != EEXIST)
-	return NULL;
-    }
-    
-    *p = '/';
-    p++;
-  }
-  
-  return fts_new_symbol( path);
+  return fts_new_symbol(path);
 }
 
 fts_symbol_t 
 fts_get_system_configuration(void)
 {
   char path[MAXPATHLEN];
-  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_config, path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
 
-  return NULL;  
+  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_config, path, MAXPATHLEN);
+
+  return fts_new_symbol(path);
 }
 
 /***********************************************************************

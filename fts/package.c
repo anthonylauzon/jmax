@@ -1478,7 +1478,7 @@ __fts_package_save_as_default(fts_object_t *o, int winlet, fts_symbol_t s, int a
 {
   fts_atom_t a[1];
 
-  fts_set_symbol( a, fts_get_user_project( 1));
+  fts_set_symbol( a, fts_get_user_project());
   __fts_package_save( o, 0, s, 1, a);
 }
 
