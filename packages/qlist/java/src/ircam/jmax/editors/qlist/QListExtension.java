@@ -36,11 +36,17 @@ import ircam.jmax.mda.*;
  * and the qlist file data handler
  */
 
-public class QListExtension implements JavaExtension
+public class QListExtension extends tcl.lang.Extension implements JavaExtension
 {
   public void init(Interpreter interp)
   {
     Mda.installEditorFactory( new QListFactory());
+  }
+
+    /* this method should be removed as soon as jacl is completely forgotten about */
+  public void init(tcl.lang.Interp interp)
+  {
+    Mda.installEditorFactory(new QListFactory());
   }
 }
 

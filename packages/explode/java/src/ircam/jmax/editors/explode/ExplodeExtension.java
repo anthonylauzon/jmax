@@ -35,13 +35,17 @@ import ircam.jmax.script.*;
  * register the remote data class, installs
  * the explode editor factory
  */
-public class ExplodeExtension implements JavaExtension
+public class ExplodeExtension extends tcl.lang.Extension implements JavaExtension
 {
-
-  /**
-   * overrides JavaExtension.init()
-   */
   public void init(Interpreter interp)
+  {
+    Mda.installEditorFactory( new ExplodeFactory());
+
+    Fts.registerRemoteDataClass( "explode_data", ircam.jmax.editors.explode.ExplodeRemoteData.class);
+  }
+
+    /* this method should be removed as soon as jacl is completely forgotten about */
+  public void init(tcl.lang.Interp interp)
   {
     Mda.installEditorFactory( new ExplodeFactory());
 

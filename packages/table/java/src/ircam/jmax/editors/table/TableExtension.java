@@ -34,9 +34,15 @@ import ircam.jmax.mda.*;
  * The table extension; install the table data type
  * and the table file data handler
  */
-public class TableExtension implements JavaExtension
+public class TableExtension extends tcl.lang.Extension implements JavaExtension
 {
   public void init(Interpreter interp)
+  {
+    Mda.installEditorFactory(new TableFactory());
+  }
+
+    /* this method should be removed as soon as jacl is completely forgotten about */
+  public void init(tcl.lang.Interp interp)
   {
     Mda.installEditorFactory(new TableFactory());
   }
