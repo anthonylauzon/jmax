@@ -39,6 +39,7 @@
 #endif
 
 #include <ftsprivate/connection.h>
+#include <ftsprivate/errobj.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 
@@ -667,16 +668,24 @@ int fts_audioport_report_xrun( void)
 static fts_audioport_t *default_audioport = 0;
 static fts_symbol_t default_audioport_class = 0;
 
-void fts_audioport_set_default_class( fts_symbol_t name)
+fts_symbol_t fts_audioport_get_default_class( void)
 {
-  default_audioport_class = name;
+  return default_audioport_class;
 }
 
-static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
+void fts_audioport_set_default_class( fts_symbol_t name)
 {
-  fts_object_t *obj = fts_eval_object_description( fts_get_root_patcher(), argc, argv);
+  fts_object_t *obj;
+  fts_atom_t a[1];
 
-  if (!obj || !fts_object_is_audioport(obj) )
+  default_audioport_class = name;
+
+  fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", default_audioport_class);
+
+  fts_set_symbol(a, default_audioport_class);
+  obj = fts_eval_object_description( fts_get_root_patcher(), 1, a);
+
+  if (fts_object_is_error(obj) || !fts_object_is_audioport(obj) )
     {
       fts_patcher_remove_object(fts_get_root_patcher(), obj);
       return;
@@ -690,22 +699,7 @@ static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 
 fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 {
-  if ((default_audioport == 0) && (default_audioport_class != 0))
-    {
-      fts_atom_t a[1];
-
-      fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", default_audioport_class);
-
-      fts_set_symbol(a, default_audioport_class);
-      fts_audioport_set_default(1, a);
-  }
-
   return default_audioport;  
-}
-
-fts_symbol_t fts_audioport_get_default_class( void)
-{
-  return default_audioport_class;
 }
 
 /***********************************************************************

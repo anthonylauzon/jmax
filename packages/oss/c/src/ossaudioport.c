@@ -299,7 +299,12 @@ void ossaudioport_config( void)
 {
   fts_symbol_t s = fts_new_symbol("ossaudioport");
 
+  s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
+  s_read_only = fts_new_symbol( "read_only");
+  s_write_only = fts_new_symbol( "write_only");
+
   fts_class_install( s, ossaudioport_instantiate);
+
   /*
    * If a default class is not installed, install it.
    * If ALSA package has already installed a default,
@@ -307,8 +312,4 @@ void ossaudioport_config( void)
    */
   if (!fts_audioport_get_default_class())
     fts_audioport_set_default_class(s);
-
-  s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
-  s_read_only = fts_new_symbol( "read_only");
-  s_write_only = fts_new_symbol( "write_only");
 }

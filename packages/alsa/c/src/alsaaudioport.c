@@ -1062,10 +1062,6 @@ void alsaaudioport_config( void)
 {
     fts_symbol_t s = fts_new_symbol("alsaaudioport");
 
-    fts_class_install( s, alsaaudioport_instantiate);
-
-    fts_audioport_set_default_class( s);
-
     s_default = fts_new_symbol( "default"); 
     s_hw_0_0 = fts_new_symbol("hw:0,0");
     s_plug_0_0 = fts_new_symbol("plughw:0,0");
@@ -1075,4 +1071,7 @@ void alsaaudioport_config( void)
     s_mmap_interleaved = fts_new_symbol( "mmap_interleaved");
     s_rw_noninterleaved = fts_new_symbol( "rw_noninterleaved");
     s_rw_interleaved = fts_new_symbol( "rw_interleaved");
+
+    fts_class_install( s, alsaaudioport_instantiate);
+    fts_audioport_set_default_class( s);
 }

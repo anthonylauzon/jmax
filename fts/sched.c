@@ -240,20 +240,6 @@ static void run_always( fts_sched_t *sched)
     }
 }
 
-#ifdef USE_JACK
-void fts_sched_run_one_tick(void)
-{
-    fts_sched_t* sched = fts_sched_get_current();
-    fts_sched_do_select(sched);
-}
-
-void fts_sched_run_one_tick_without_select(void)
-{
-    fts_sched_t* sched = fts_sched_get_current();
-    run_always(sched);
-}
-#endif /* USE_JACK */
-
 static void fts_sched_do_select(fts_sched_t *sched)
 {
   fd_set readfds, writefds, exceptfds;
