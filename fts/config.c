@@ -78,7 +78,6 @@ fts_config_open(fts_symbol_t file_name)
     /* replace current config by loaded config */
     fts_config_set((fts_config_t*)obj);
     fts_log("[config]: Opening configuration %s\n", file_name);
-    post("Open configuration: %s\n", file_name);
   }
   else
   {
@@ -86,17 +85,20 @@ fts_config_open(fts_symbol_t file_name)
   }
 }
 
-/* static void */
-/* config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at) */
-/* { */
-/*   fts_symbol_t file_name = fts_get_symbol(at); */
-/*   fts_symbol_t project_dir = fts_project_get_dir(); */
-/*   fts_object_t* obj = NULL; */
-/*   char path[MAXPATHLEN]; */
+static void
+config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_config_t* self = (fts_config_t*)o;
+  fts_symbol_t file_name = fts_get_symbol(at);
+  fts_object_t* obj = NULL;
+  char path[MAXPATHLEN];
 
-/*   fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN); */
-/*   fts_config_open(path); */
-/* } */
+  fts_log("[config] load file %s\n", file_name);
+  fts_config_open(file_name);
+  /* @@@@@ upload config @@@@@ */
+  self->uploaded = 0;
+  fts_send_message(fts_config_get(), fts_s_openEditor,0, NULL);
+}
 
 static void
 config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -109,7 +111,6 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
   fts_make_absolute_path( project_dir, file_name, path, MAXPATHLEN);
 
-  post("CONFIG SAVE \n");
   if (fts_bmax_file_open( &f, path, 0, 0, 0) >= 0)
   {
     /* write config object */
@@ -125,6 +126,7 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_bmax_file_close( &f);    
     
     fts_config_set_dirty( this, 0);
+    fts_log("config save in file %s \n", path);
   }
   else
     fts_log( "config save: cannot open file %s\n", file_name);
@@ -234,7 +236,10 @@ config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 config_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  fts_object_release( o);
+  fts_config_t* self = (fts_config_t*)o;
+/*   fts_object_release( o); */
+  config_clear(o, 0, 0, 0, 0);
+  self->uploaded = 0;  
 }
 
 static void
@@ -252,17 +257,12 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   midi_config = (fts_midiconfig_t*)fts_object_create( fts_midiconfig_class, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
   self->midi_config = midi_config;
-  /* @@@@@ default midi is set in fts_load_config @@@@@ 
-     fts_midiconfig_set_defaults(self->midi_config); 
-  */
 
   /* create audio config object */
   audio_config = (fts_audioconfig_t*)fts_object_create( fts_audioconfig_class, 0, 0);
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
-  /* @@@@@ defautlt audio is now set in fts_load_config @@@@@ 
-     fts_audioconfig_set_defaults(self->audio_config); 
-  */
+
   /* modify object description */
   fts_set_symbol(&a, config_s_name);
   fts_object_set_description(o, 1, &a);
@@ -283,7 +283,7 @@ config_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(fts_config_t), config_init, config_delete);
 
-/*   fts_class_message_varargs(cl, fts_s_load, config_load); */
+  fts_class_message_varargs(cl, fts_s_load, config_load);
   fts_class_message_varargs(cl, fts_s_save, config_save);
   fts_class_message_varargs(cl, fts_s_midi_config, config_midi_message);
   fts_class_message_varargs(cl, fts_s_audio_config, config_audio_message);
