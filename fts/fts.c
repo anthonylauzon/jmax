@@ -196,7 +196,10 @@ fts_load_config( void)
 
   /* check if the user specified a config file on the command line  */
   config_file = fts_cmd_args_get( fts_s_config);
-  config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+  if (config_file != NULL)
+  {
+    config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+  }
 
   /* check if the user has a config file in the home directory  */
   if (!config_found)
