@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include <fts/fts.h>
-#include <ftsprivate/atom.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/package.h>
 

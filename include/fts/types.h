@@ -20,7 +20,6 @@
  * 
  */
 
-typedef int fts_typeid_t;
 typedef const char *fts_symbol_t;
 typedef void (*fts_fun_t)(void);
 typedef struct fts_object fts_object_t;

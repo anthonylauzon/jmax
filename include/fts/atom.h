@@ -137,7 +137,7 @@ FTS_API fts_metaclass_t *fts_t_connection;
 /**
  * Set the object value
  * 
- * @fn fts_set_object( const fts_atom_t *p, fts_object_t v)
+ * @fn fts_set_object( const fts_atom_t *p, fts_object_t *v)
  * @param p pointer to the atom
  * @param v the value
  * @ingroup atom
