@@ -410,25 +410,29 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
    */
 
-/*    if (dsdevice_list == NULL) { */
-/*      DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);               */
-/*    } */
 
-  device = dsdevice_list;
-  while (device != NULL) {
-    if ((device->guid != NULL) && (strcmp(device->description, fts_symbol_name(dev->device)) == 0)) {
-      fts_log("[dsdev]: Opening device '%s'\n", device->description);
-      dev->guid = device->guid;
-    } else if (device->guid == NULL) {
-      fts_log("[dsdev]: Default device '%s'\n", device->description);
-      dev->guid = NULL;
-    } else {
-      fts_log("[dsdev]: Alternative device '%s'\n", device->description);
+
+  if (dev->device != fts_s_default) {
+
+    if (device_list == NULL) {
+      DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);              
     }
-    device = device->next;
-  }
+    
+    device = dsdevice_list;
+    while (device != NULL) {
+      if ((device->guid != NULL) && (strcmp(device->description, fts_symbol_name(dev->device)) == 0)) {
+	fts_log("[dsdev]: Opening device '%s'\n", device->description);
+	dev->guid = device->guid;
+      } else if (device->guid == NULL) {
+	fts_log("[dsdev]: Default device '%s'\n", device->description);
+	dev->guid = NULL;
+      } else {
+	fts_log("[dsdev]: Alternative device '%s'\n", device->description);
+      }
+      device = device->next;
+    }
 
-  if (dev->guid == NULL) {
+  } else {
     fts_log("[dsdev]: Opening default device\n");
   }
 
