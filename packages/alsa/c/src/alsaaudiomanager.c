@@ -35,73 +35,9 @@ typedef struct _alsaaudiomanager
   /* Need to store array of device name and corresponding alsa audioport */
 } alsaaudiomanager_t;
 
-/* From aplay source code by Jaroslav Kysela */
 static void alsaaudiomanager_device_list(snd_pcm_stream_t stream, fts_bytestream_t* bytestream)
 {
-  snd_ctl_t *handle;
-  int card, err, dev, idx;
-  snd_ctl_card_info_t *info;
-  snd_pcm_info_t *pcminfo;
 
-
-
-  snd_ctl_card_info_alloca(&info);
-  snd_pcm_info_alloca(&pcminfo);
-
-  card = -1;
-  if (snd_card_next(&card) < 0 || card < 0) {
-    fts_spost(bytestream,"no soundcards found...");
-    return;
-  }
-  while (card >= 0) {
-    char name[32];
-    sprintf(name, "hw:%d", card);
-    if ((err = snd_ctl_open(&handle, name, 0)) < 0) {
-      fts_spost(bytestream,"control open (%i): %s", card, snd_strerror(err));
-      continue;
-    }
-    if ((err = snd_ctl_card_info(handle, info)) < 0) {
-      fts_spost(bytestream,"control hardware info (%i): %s", card, snd_strerror(err));
-      snd_ctl_close(handle);
-      continue;
-    }
-    dev = -1;
-    while (1) {
-      unsigned int count;
-      if (snd_ctl_pcm_next_device(handle, &dev)<0)
-	fts_spost(bytestream,"snd_ctl_pcm_next_device");
-      if (dev < 0)
-	break;
-      snd_pcm_info_set_device(pcminfo, dev);
-      snd_pcm_info_set_subdevice(pcminfo, 0);
-      snd_pcm_info_set_stream(pcminfo, stream);
-      if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
-	if (err != -ENOENT)
-	  fts_spost(bytestream,"control digital audio info (%i): %s", card, snd_strerror(err));
-	continue;
-      }
-      fts_spost(bytestream, "card %i: %s [%s], device %i: %s [%s]\n",
-	      card, snd_ctl_card_info_get_id(info), snd_ctl_card_info_get_name(info),
-	      dev,
-	      snd_pcm_info_get_id(pcminfo),
-	      snd_pcm_info_get_name(pcminfo));
-      count = snd_pcm_info_get_subdevices_count(pcminfo);
-      fts_spost(bytestream, "  Subdevices: %i/%i\n", snd_pcm_info_get_subdevices_avail(pcminfo), count);
-      for (idx = 0; idx < count; idx++) {
-	snd_pcm_info_set_subdevice(pcminfo, idx);
-	if ((err = snd_ctl_pcm_info(handle, pcminfo)) < 0) {
-	  fts_spost(bytestream,"control digital audio playback info (%i): %s", card, snd_strerror(err));
-	} else {
-	  fts_spost(bytestream, "  Subdevice #%i: %s\n", idx, snd_pcm_info_get_subdevice_name(pcminfo));
-	}
-      }
-    }
-    snd_ctl_close(handle);
-    if (snd_card_next(&card) < 0) {
-      fts_spost(bytestream,"snd_card_next");
-      break;
-    }
-  }
 }
 
 
