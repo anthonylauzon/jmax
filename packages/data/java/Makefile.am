@@ -1,9 +1,21 @@
-SUBDIRS= src
+SUBDIRS= icons ircam
 
 packagedir=$(pkgdatadir)/packages/data/java
-package_DATA = data.jar
+JAR= data.jar
+package_DATA= $(JAR)
+package_JAVA= Data.java
 
-JAR_DEP=$(shell find src -name "*.java")
+JAVAC= @JAVACX@
+JAVACFLAGS= @JAVACFLAGSX@
+JAVAROOT= @top_srcdir@/packages/data/java
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
-data.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../data.jar `find ircam -name "*.class"` )
+JAR_DEP= \
+classpackage.stamp \
+icons/time.stamp \
+ircam/jmax/data/classpackage.stamp
+
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	jar -cvf $(JAR) *.class icons/*.gif ircam/jmax/data/*.class
+
