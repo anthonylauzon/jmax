@@ -117,7 +117,7 @@ fts_atom_file_close(fts_atom_file_t *f)
 #define IS_DIGIT(c)     (('0' <= (c)) && ((c) <= '9'))
 #define IS_SIGN(c)      (((c) == '+') || ((c) == '-'))
 #define IS_POINT(c)     ('.' == (c))
-#define IS_QUOTE(c)     ('\\' == (c))
+#define IS_BACKSLASH_QUOTE(c)     ('\\' == (c))
 #define IS_DOUBLE_QUOTE(c)     ('\"' == (c))
 #define IS_ATOM_CHAR(c) (((c) == ';') || ((c) == ',') || ((c) == '$') || ((c) == '\''))
 #define IS_EOF(c)       (0xff == (c))
@@ -132,234 +132,28 @@ fts_atom_file_read_more(fts_atom_file_t *f)
 int
 fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 {
+  char buf[1024];
   enum
     {
       read_begin,
-      read_in_int,
+      read_in_int, 
       read_in_float,
-      read_in_symbol,
+      read_in_symbol, 
       read_in_quoted_symbol,
       read_separator,
       read_end
     } status = read_begin;
 
-  enum  {an_int, a_float, a_symbol} read_type;
-  char buf[1024];
-  int fill_p;
-  unsigned char c;
-  int quoted;
+  enum {unkown, an_int, a_float, a_symbol} read_type = unkown;
+
+  int fill_p = 0;
+  int backslash_quoted = 0;
+  unsigned char c = '\0';
   char sep = 0;
 
-  if (f->read >= f->count)
-    fts_atom_file_read_more(f);
-  
-  if (f->count == 0)
-    c = 0xff;
-  else
-    c = f->buf[f->read];
-
-  fill_p = 0;
-  quoted = 0;
-
-  while (status != read_end)
+  while(status != read_end)
     {
-      if (IS_QUOTE(c))
-	quoted = 1;
-      else
-	switch (status)
-	  {
-	  case read_begin:
-	    if (IS_EOF(c))
-	      {
-		return 0;
-	      }
-	    else if (IS_SEPARATOR(c))
-	      {
-		(f->read)++;
-  	      }
-	    else if (IS_DIGIT(c) || IS_SIGN(c))
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_int;
-	      }
-	    else if (IS_DOUBLE_QUOTE(c) && (! quoted))
-	      {
-		(f->read)++;
-		status = read_in_quoted_symbol;
-	      }
-	    else if (IS_ATOM_CHAR(c))
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-
-		if (quoted)
-		  status = read_in_symbol;
-		else
-		  {
-		    buf[fill_p++] = '\0';
-		    read_type = a_symbol;
-		    status = read_separator;
-		  }
-	      }
-	    else
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_symbol;
-	      }
-	    
-	    break;
-
-	  case read_in_int:
-	    if (IS_EOF(c))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = an_int;
-		status = read_end;
-	      }
-	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = an_int;
-		status = read_separator;
-		/* do not avance the read pointer */
-	      }
-	    else if (IS_DIGIT(c))
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_int;
-	      }
-	    else if (IS_POINT(c))
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_float;
-	      }
-	    else
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_symbol;
-	      }
-	    break;
-
-	  case read_in_float:
-	    if (IS_EOF(c))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = a_float;
-		status = read_end;
-	      }
-	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = a_float;
-		status = read_separator;
-		/* do not avance the read pointer */
-	      }
-	    else if (IS_DIGIT(c))
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_float;
-	      }
-	    else
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_symbol;
-	      }
-	    break;
-
-	  case read_in_symbol:
-
-	    if (IS_EOF(c))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = a_symbol;
-		status = read_end;
-	      }
-	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = a_symbol;
-		status = read_separator;
-		/* do not avance the read pointer */
-	      }
-	    else
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_symbol;
-	      }
-	    break;
-
-	  case read_in_quoted_symbol:
-	    if (IS_EOF(c))
-	      {
-		buf[fill_p++] = '\0';
-		read_type = a_symbol;
-		status = read_end;
-	      }
-	    else if (IS_DOUBLE_QUOTE(c) && (! quoted))
-	      {
-		buf[fill_p++] = '\0';
-		(f->read)++;
-		read_type = a_symbol;
-		status = read_separator;
-	      }
-	    else
-	      {
-		buf[fill_p++] = c;
-		(f->read)++;
-		status = read_in_quoted_symbol;
-	      }
-	    break;
-
-	  case read_separator:
-	    if(IS_SEPARATOR(c))
-	      {
-		switch(sep)
-		  {  
-		  case 0:
-		    if(c == ' ')
-		      {
-			sep = ' ';	  
-			break;
-		      }
-		  case ' ':
-		    if(c == '\r')
-		      {
-			sep = '\r';
-			break;
-		      }
-		  case '\r':
-		    if(c == '\t')
-		      {
-			sep = '\t';
-			break;
-		      }
-		  case '\t':
-		    if(c == '\n')
-		      {
-			sep = '\n';
-			break;
-		      }
-		  }
-
-		(f->read)++;
-	      }
-	    else
-	      status = read_end;
-	    break;
-
-	  case read_end:
-	    break;
-	  }
-      
-      if(!IS_EOF(c) && status != read_end)
+      if(!IS_EOF(c))
 	{
 	  if (f->read >= f->count)
 	    fts_atom_file_read_more(f);
@@ -369,6 +163,232 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 	  else
 	    c = f->buf[f->read];
 	}
+
+      if (IS_BACKSLASH_QUOTE(c) && !backslash_quoted)
+	{
+	  
+	  (f->read)++;
+	  backslash_quoted = 1;
+	}
+      else
+	{
+	  switch (status)
+	    {
+	    case read_begin:
+	      if (IS_EOF(c))
+		{
+		  /* file end before anything found */
+		  return 0;
+		}
+	      else if (IS_SEPARATOR(c))
+		{
+		  /* skip seperators at file beginning */
+		  (f->read)++;
+		}
+	      else if (IS_DIGIT(c) || IS_SIGN(c))
+		{
+		  /* might be an integer (might be just a "-") */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_int;
+		}
+	      else if (IS_DOUBLE_QUOTE(c) && !backslash_quoted)
+		{
+		  /* begin of quoted symbol */
+		  (f->read)++;
+		  status = read_in_quoted_symbol;
+		}
+	      else if (IS_ATOM_CHAR(c))
+		{
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  
+		  if(backslash_quoted)
+		    /* begin of symbol starting with quoted single atom char */
+		    status = read_in_symbol;
+		  else
+		    {
+		      /* end of single atom character */
+		      buf[fill_p++] = '\0';
+		      read_type = a_symbol;
+		      status = read_separator;
+		    }
+		}
+	      else
+		{
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_symbol;
+		}
+	      
+	      break;
+	      
+	    case read_in_int:
+	      if (IS_EOF(c))
+		{
+		  /* end of file */
+		  buf[fill_p++] = '\0';
+		  read_type = an_int;
+		  status = read_end;
+		}
+	      else if ((IS_SEPARATOR(c) || IS_DOUBLE_QUOTE(c) || IS_ATOM_CHAR(c)) && !backslash_quoted)
+		{
+		  /* end of integer atom (do not avance the read pointer) */
+		  if(buf[fill_p - 1] == '-')
+		    read_type = a_symbol;
+		  else
+		    read_type = an_int;
+		    
+		  buf[fill_p++] = '\0';
+		  status = read_separator;
+		}
+	      else if (IS_DIGIT(c))
+		{
+		  /* continue with integer */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_int;
+		}
+	      else if (IS_POINT(c))
+		{
+		  /* change to float */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_float;
+		}
+	      else
+		{
+		  /* change to symbol */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_symbol;
+		}
+	      break;
+	      
+	    case read_in_float:
+	      if (IS_EOF(c))
+		{
+		  /* end of file */
+		  buf[fill_p++] = '\0';
+		  read_type = a_float;
+		  status = read_end;
+		}
+	      else if ((IS_SEPARATOR(c) || IS_DOUBLE_QUOTE(c) || IS_ATOM_CHAR(c)) && !backslash_quoted)
+		{
+		  /* end of float atom (do not avance the read pointer) */
+		  buf[fill_p++] = '\0';
+		  read_type = a_float;
+		  status = read_separator;
+		}
+	      else if (IS_DIGIT(c))
+		{
+		  /* go on in float */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_float;
+		}
+	      else
+		{
+		  /* change to symbol */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_symbol;
+		}
+	      break;
+	      
+	    case read_in_symbol:
+	      if (IS_EOF(c))
+		{
+		  /* end of file */
+		  buf[fill_p++] = '\0';
+		  read_type = a_symbol;
+		  status = read_end;
+		}
+	      else if ((IS_SEPARATOR(c) || IS_DOUBLE_QUOTE(c) || IS_ATOM_CHAR(c)) && !backslash_quoted)
+		{
+		  /* end of symbol atom (do not avance the read pointer) */
+		  buf[fill_p++] = '\0';
+		  read_type = a_symbol;
+		  status = read_separator;
+		}
+	      else
+		{
+		  /* go on in symbol */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_symbol;
+		}
+	      break;
+	      
+	    case read_in_quoted_symbol:
+	      if (IS_EOF(c))
+		{
+		  /* end of file */
+		  buf[fill_p++] = '\0';
+		  read_type = a_symbol;
+		  status = read_end;
+		}
+	      else if (IS_DOUBLE_QUOTE(c) && !backslash_quoted)
+		{
+		  /* end of quoted symbol */
+		  buf[fill_p++] = '\0';
+		  (f->read)++;
+		  read_type = a_symbol;
+		  status = read_separator;
+		}
+	      else
+		{
+		  /* go on in quoted symbol */
+		  buf[fill_p++] = c;
+		  (f->read)++;
+		  status = read_in_quoted_symbol;
+		}
+	      break;
+	      
+	    case read_separator:
+	      if(IS_SEPARATOR(c))
+		{
+		  switch(sep)
+		    {  
+		    case 0:
+		      if(c == ' ')
+			{
+			  sep = ' ';	  
+			  break;
+			}
+		    case ' ':
+		      if(c == '\r')
+			{
+			  sep = '\r';
+			  break;
+			}
+		    case '\r':
+		      if(c == '\t')
+			{
+			  sep = '\t';
+			  break;
+			}
+		    case '\t':
+		      if(c == '\n')
+			{
+			  sep = '\n';
+			  break;
+			}
+		    }
+		  
+		  (f->read)++;
+		}
+	      else
+		status = read_end;
+	      break;
+	      
+	    case read_end:
+	      break;
+	    }
+
+	  if(backslash_quoted)
+	    backslash_quoted = 0;
+	}
     }
   
   switch (read_type)
@@ -376,21 +396,24 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
     case an_int:
       {
 	long l;
-
+	
 	sscanf(buf, "%ld", &l);
 	fts_set_long(at, l);
       }
-      break;
+    break;
     case a_float:
       {
 	float f;
-
+	
 	sscanf(buf, "%f", &f);
 	fts_set_float(at, f);
       }
-      break;
+    break;
     case a_symbol:
-      fts_set_symbol(at, fts_new_symbol_copy(buf));
+      if(strcmp("()", buf) == 0)
+	fts_set_void(at);
+      else
+	fts_set_symbol(at, fts_new_symbol_copy(buf));
       break;
     }
 
@@ -419,40 +442,45 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
     sprintf(buf, "%#f", fts_get_float(at));
   else if (fts_is_symbol(at))
     {
-      sprintf(buf, "%s", fts_symbol_name(fts_get_symbol(at)));
-      /*
       int do_quote = 0;
       const char *src = fts_symbol_name(fts_get_symbol(at));
       char *dst = buf + 1;
-
+      
       offset = 1;
-
-      for (; *src; src++, dst++)
+      
+      while(*src)
 	{
 	  if (IS_SEPARATOR(*src) || IS_DIGIT(*src) || IS_ATOM_CHAR(*src))
 	    do_quote = 1;
-	  else if (IS_QUOTE(*src) || IS_DOUBLE_QUOTE(*src))
+	  else if (IS_BACKSLASH_QUOTE(*src) || IS_DOUBLE_QUOTE(*src))
 	    {
 	      do_quote = 1;
 	      *(dst++) = '\\';
-	    }
+ 	    }
+	  
+ 	  *dst++ = *src++;
+ 	}
+      
+      if(do_quote)
+ 	{
+	  /* set double quotesat beginning and end of string */
+ 	  buf[0] = '\"';
+ 	  offset = 0;
+ 	  *dst++ = '\"';	  
+ 	}
+      
+      /* set end of string */
+      *dst++ = '\0';
 
-	  *dst = *src;
-	}
-
-      if (do_quote)
-	{
-	  buf[0] = '\"';
-	  offset = 0;
-	}
-	*/
+      /* sprintf(buf, "%s", fts_symbol_name(fts_get_symbol(at))); */
     }
   else
+    /* write void atom: symbol "()" */
     sprintf(buf, "()");
 
   sprintf(buf + strlen(buf), "%c", separator);
 
-  write(f->fd, buf, strlen(buf));
+  write(f->fd, buf + offset, strlen(buf) - offset);
 
   return 1;
 }
