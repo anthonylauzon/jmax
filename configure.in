@@ -132,8 +132,6 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(socket)
 
-AM_CONDITIONAL(MACOSX, echo "$host" | grep powerpc-apple-darwin)
-
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
