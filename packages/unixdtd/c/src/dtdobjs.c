@@ -63,9 +63,7 @@ typedef struct {
   readsf_state_t state;
   dtdserver_t *server;
   dtdfifo_t *fifo;
-  fts_timer_t eof_timer;
   int can_post_data_late;
-  fts_timer_t post_data_late_timer;
   fts_symbol_t filename;
 } readsf_t;
 
@@ -219,7 +217,6 @@ static void
 readsf_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_timer_t *timer = (fts_timer_t *)fts_get_ptr(at);
 
   if(timer == this->eof_timer)
     fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
@@ -258,9 +255,6 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   this->state = readsf_closed;
   this->can_post_data_late = 1;
-
-  this->eof_timer = fts_timer_new(o, 0);
-  this->post_data_late_timer = fts_timer_new(o, 0);	
 
   fts_dsp_add_object(o);
 }
@@ -493,7 +487,6 @@ typedef struct {
   dtdserver_t *server;
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
-  fts_timer_t *post_fifo_overflow_timer;
   fts_symbol_t filename;
 } writesf_t;
 
@@ -633,8 +626,6 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->state = writesf_closed;
   this->can_post_fifo_overflow = 1;
-
-  this->post_fifo_overflow_timer = fts_timer_new(o, 0);
 
   fts_dsp_add_object(o);
 }

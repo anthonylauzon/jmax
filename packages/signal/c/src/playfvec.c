@@ -205,7 +205,7 @@ play_fvec_ftl(fts_word_t *argv)
 			    fts_idefix_set_float(&index, position);
 			    this->mode = mode_stop;
 
-			    fts_timer_set_delay(this->timer, 0.0, 0);
+			    fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, signal_play_bang_at_end, 0, 0.0);
 			  }
 			}
 		    }

@@ -245,7 +245,7 @@ play_bpf_ftl(fts_word_t *argv)
 			    
 			    play->mode = mode_stop;
 			    
-			    fts_timer_set_delay(play->timer, 0.0, 0);
+			    fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)play, signal_play_bang_at_end, 0, 0.0);
 			  }
 			}
 		    }

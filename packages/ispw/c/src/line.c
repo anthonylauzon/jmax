@@ -29,44 +29,57 @@
 typedef struct 
 {
   fts_object_t ob;
-  enum {line_int, line_float} type;
+  int running;
   double target;
   double cur;
   double inc;
-  double grain;
+  double period;
   int steps;	
-  int inval;	/* last value sent to inlet */
-  fts_timer_t *timer;
+  int inval; /* last value sent to inlet */
 } line_t;
 
 static void
-line_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_int_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double out = 0.0;
   
-  if (this->steps)
+  if(this->steps)
     this->steps--;
   
-  if (this->steps)
+  if(this->steps)
     {
       this->cur += this->inc;
-      fts_timer_set_delay(this->timer, this->grain, 0);
-      
-      out = this->cur;
+      fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
+      fts_outlet_int(o, 0, this->cur);	
     }
   else
-    fts_outlet_int((fts_object_t *)o, 0, this->target);
-
-  if(this->type == line_int)
-    fts_outlet_int((fts_object_t *)o, 0, out);	
-  else
-    fts_outlet_float((fts_object_t *)o, 0, out);	
+    {
+      fts_outlet_int(o, 0, this->target);
+      this->running = 0;
+    }
 }
 
-/* Methods */
+static void
+line_float_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  line_t *this = (line_t *)o;
+  
+  if(this->steps)
+    this->steps--;
+  
+  if(this->steps)
+    {
+      this->cur += this->inc;
+      fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
+      fts_outlet_float(o, 0, this->cur);	
+    }
+  else
+    {
+      fts_outlet_float(o, 0, this->target);
+      this->running = 0;
+    }
+}
 
-/* STOP alarm */
 static void
 line_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -75,11 +88,10 @@ line_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->steps = 0;
   this->target = this->cur;
 
-  fts_timer_reset(this->timer);
+  fts_timebase_remove_object(fts_get_timebase(), o);
+  this->running = 0;
 }
 
-
-/* jump to given target val and STOP alarm */
 
 static void
 line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -87,7 +99,11 @@ line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   line_t *this = (line_t *)o;
   double target = (double) fts_get_int_arg(ac, at, 0, 0);
 
-  /* if some dweezul has talked to middle inlet, do fixfix */
+  if(this->running)
+    {
+      fts_timebase_remove_object(fts_get_timebase(), o);
+      this->running = 0;
+    }
 
   if (this->inval)
     {
@@ -103,14 +119,13 @@ line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(this->inval < 1)
 	this->inval = 1;
 
-      this->steps = (( this->inval - 1)/this->grain ) + 1;
+      this->steps = (( this->inval - 1) / this->period ) + 1;
       this->inc   = distance / this->steps;
       this->cur   = old_target;
       this->target = target;
       this->inval = 0;
 
-      fts_timer_reset(this->timer);
-      line_tick(o, 0, 0, 0, 0);
+      line_int_advance(o, 0, 0, 0, 0);
     }
   else
     {
@@ -127,7 +142,11 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   line_t *this = (line_t *)o;
   double target = (double) fts_get_float_arg(ac, at, 0, 0.0f);
 
-  /* if some dweezul has talked to middle inlet, do fixfix */
+  if(this->running)
+    {
+      fts_timebase_remove_object(fts_get_timebase(), o);
+      this->running = 0;
+    }
 
   if (this->inval)
     {
@@ -143,14 +162,13 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       if(this->inval < 1)
 	this->inval = 1;
 
-      this->steps = (( this->inval - 1)/this->grain ) + 1;
+      this->steps = (( this->inval - 1)/this->period ) + 1;
       this->inc   = distance / this->steps;
       this->cur   = old_target;
       this->target = target;
       this->inval = 0;
 
-      fts_timer_reset(this->timer);
-      line_tick(o, 0, 0, 0, 0);
+      line_float_advance(o, 0, 0, 0, 0);
     }
   else
     {
@@ -161,18 +179,20 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     }
 }
 
-/* jump to given target val and STOP alarm */
-
 static void
 line_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
   double target = (double)fts_get_int_arg(ac, at, 0, 0);
 
+  if(this->running)
+    {
+      fts_timebase_remove_object(fts_get_timebase(), o);
+      this->running = 0;
+    }
+
   this->target = target;
   this->steps = 0;
-
-  fts_timer_reset(this->timer);
 }
 
 static void
@@ -181,100 +201,94 @@ line_float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   line_t *this = (line_t *)o;
   double target = (double)fts_get_float_arg(ac, at, 0, 0.0f);
 
+  if(this->running)
+    {
+      fts_timebase_remove_object(fts_get_timebase(), o);
+      this->running = 0;
+    }
+
   this->target = target;
   this->steps = 0;
-
-  fts_timer_reset(this->timer);
 }
 
-/* fix message into rite corner */
-
 static void
-line_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double grain = fts_get_double_arg(ac, at, 0, 0);
+  double period = fts_get_number_float(at);
 
-  if( grain < 1.0)
-    this->grain = 20.0;
+  if( period < 1.0)
+    this->period = 20.0;
   else
-    this->grain = grain;
+    this->period = period;
 }
 
-/* fix message into middle corner */
-
 static void
-line_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  int n = fts_get_int_arg(ac, at, 0, 0);
+  int time = fts_get_number_int(at);
 
-  if (n < 0)
+  if(time < 0)
     this->inval = 0;
   else 
-    this->inval = n;
+    this->inval = time;
 }
-
-/* list method */
 
 static void
 line_int_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac >= 3) && (fts_is_number(&at[2])))
-    line_number_2(o, winlet, s, 1, at + 2);
-
-  if ((ac >= 2) && (fts_is_number(&at[1])))
-    line_number_1(o, winlet, s, 1, at + 1);
-
-  if ((ac >= 1) && (fts_is_number(&at[0])))
-    line_int_number(o, winlet, s, 1, at + 0);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	line_set_period(o, winlet, s, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	line_set_time(o, winlet, s, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
+	line_int_number(o, winlet, s, 1, at + 0);
+    }
 }
 
 static void
 line_float_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac >= 3) && (fts_is_number(&at[2])))
-    line_number_2(o, winlet, s, 1, at + 2);
-
-  if ((ac >= 2) && (fts_is_number(&at[1])))
-    line_number_1(o, winlet, s, 1, at + 1);
-
-  if ((ac >= 1) && (fts_is_number(&at[0])))
-    line_float_number(o, winlet, s, 1, at + 0);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	line_set_period(o, winlet, s, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	line_set_time(o, winlet, s, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
+	line_float_number(o, winlet, s, 1, at + 0);
+    }
 }
 
 static void
 line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this   = (line_t *)o;
-  double target = (double) fts_get_float_arg(ac, at, 1, 0.0f);
-  double grain =  fts_get_double_arg(ac, at, 2, 0);    
-  
-  if(ac < 1 || fts_is_int(at + 1))
-    this->type = line_int;
-  else
-    this->type = line_float;
+  double target =  fts_get_float_arg(ac, at, 1, 0.0f);
+  double period =  fts_get_float_arg(ac, at, 2, 0);    
   
   this->target = target;
   this->steps  = 0;
   this->inval  = 0;
 
-  if (grain < 1.0)
-    this->grain = 20.0;
+  if(this->period < 1.0)
+    this->period = 20.0;
   else
-    this->grain = grain;
+    this->period = period;
 
-  this->timer = fts_timer_new(o, 0);
+  this->running = 0;
 }
-
-static void
-line_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  line_t *this = (line_t *)o;
-
-  fts_timer_delete(this->timer);
-}
-
 
 static fts_status_t
 line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -283,9 +297,6 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* define the system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, line_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, line_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, line_tick);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), line_stop);
 
@@ -308,26 +319,17 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_outlet_type_define_varargs(cl, 0, fts_s_float);
     }
 
-  fts_method_define_varargs(cl, 1, fts_s_int, line_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, line_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_int, line_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, line_set_time);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, line_number_2);
-  fts_method_define_varargs(cl, 2, fts_s_float, line_number_2);
+  fts_method_define_varargs(cl, 2, fts_s_int, line_set_period);
+  fts_method_define_varargs(cl, 2, fts_s_float, line_set_period);
 
   return fts_Success;
-}
-
-static int
-line_class_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return(
-	 ((ac0 < 2 || fts_is_int(at0+1)) && (ac1 < 2 || fts_is_int(at1+1))) ||
-	 ((ac0 >= 2 && fts_is_float(at0+1)) && (ac0 >= 2 && fts_is_float(at1+1)))
-	 );
 }
 
 void
 line_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("line"), line_instantiate, line_class_equiv);
+  fts_metaclass_install(fts_new_symbol("line"), line_instantiate, fts_arg_type_equiv);
 }

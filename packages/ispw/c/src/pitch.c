@@ -38,15 +38,6 @@
 #define CLASS_NAME "pitch~"
 #define DSP_NAME "_pitch"
 
-#define INLET_sig 0
-#define N_INLETS 1
-
-#define OUTLET_midi_pitch 0
-#define OUTLET_attack 1
-#define OUTLET_micro_pitch 2
-#define OUTLET_power 3
-#define N_OUTLETS 4
-
 /* shared by all objects of class */
 static fts_symbol_t dsp_symbol = 0;
 
@@ -88,7 +79,7 @@ typedef struct{
 
 typedef struct{
   int attack;
-  float midi_pitch;    /* pitch to send to outlet on timer tick */
+  float midi_pitch;    /* pitch to send to outlet */
   float power;
   float micro_pitch;
   float time;
@@ -96,13 +87,33 @@ typedef struct{
 
 typedef struct{
   pt_common_obj_t pt;    /* the mandatory fts_object */
-  fts_timer_t *timer;
   float *wind;
   pitch_ctl_t ctl;
   pitch_hist_t hist;
   pitch_stat_t stat;
   pitch_out_t out;
 } pitch_t;
+
+static void 
+pitch_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  pitch_t *x = (pitch_t *)o;
+
+  fts_outlet_float(o, 2, x->out.micro_pitch);
+  fts_outlet_float(o, 3, x->out.power + POWER_OUT_OFFSET);
+
+  if(x->out.midi_pitch > 0.0f)
+    {
+      fts_outlet_float(o, 0, x->out.midi_pitch);
+      x->out.midi_pitch = 0.0f;
+    }
+
+  if(x->out.attack)
+    {
+      fts_outlet_bang(o, 1);
+      x->out.attack = 0;
+    } 
+}
 
 /*************************************************
  *
@@ -121,9 +132,7 @@ analysis(pitch_t *x)
   x->out.power = (new_power > 0.0f)? (DB_POW(new_power)): (-120);
 
   if(x->ctl.print_me)
-    { 
-      post("  power measure (in dB) %f\n", x->out.power); 
-    }
+    post("  power measure (in dB) %f\n", x->out.power); 
   
   found_candidate = pt_common_find_pitch_candidate(&x->pt, &candidate, &pitch_power, &total_power, x->ctl.print_me);
 
@@ -182,61 +191,62 @@ analysis(pitch_t *x)
    */
   if(!x->stat.peaked)
     {
-      if(x->hist.n_power && (new_power * (x->ctl.reattack_thresh + 1) < x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power))
+      if(x->hist.n_power && 
+	 (new_power * (x->ctl.reattack_thresh + 1) < x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power))
 	{
 	  x->stat.peaked = 1;
 	}
     }
-  else{
-    if(x->hist.n_power &&
-      pitch_power > x->pt.ctl.power_on &&
-      (new_power > (x->ctl.reattack_thresh + 1) * x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power)
-    ){
-      x->stat.pitch = 0.0f;
-
-      if(x->ctl.loud)
+  else
+    {
+      if(x->hist.n_power &&
+	 pitch_power > x->pt.ctl.power_on &&
+	 (new_power > (x->ctl.reattack_thresh + 1) * x->hist.ory[(x->hist.idx - x->hist.n_power) & HISTORY_MASK].power))
 	{
-	  post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
-	}
-      
-      /* here's the good part:
-       * there's a reattack and we haven't reported a note yet since the last one,
-       * look again RETROACTIVELY, using laxer criteria
-       */
-      if(x->hist.count < 100)
-	{ /* '100' seems like a value god gave to you, right? Miller? */
-	  float best_pitch = 0.0f;
-	  float best_power = 0.0f;
-	  float recent_power = new_power;
-	  int look_for_best = 0;
-	  int hist_depth = (x->hist.count > N_HISTORY)? N_HISTORY: x->hist.count;
+	  x->stat.pitch = 0.0f;
 	  
-	  for(i=1; i<hist_depth; i++)
-	    {
-	      float history_power = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].power;
+	  if(x->ctl.loud)
+	    post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
+	  
+	  /* here's the good part:
+	   * there's a reattack and we haven't reported a note yet since the last one,
+	   * look again RETROACTIVELY, using laxer criteria
+	   */
+	  if(x->hist.count < 100)
+	    { /* '100' seems like a value god gave to you, right? Miller? */
+	      float best_pitch = 0.0f;
+	      float best_power = 0.0f;
+	      float recent_power = new_power;
+	      int look_for_best = 0;
+	      int hist_depth = (x->hist.count > N_HISTORY)? N_HISTORY: x->hist.count;
 	      
-	      if(!look_for_best)
+	      for(i=1; i<hist_depth; i++)
 		{
-		  if(history_power > recent_power) 
-		    look_for_best = 1;
-
-		  recent_power = history_power;
+		  float history_power = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].power;
+		  
+		  if(!look_for_best)
+		    {
+		      if(history_power > recent_power) 
+			look_for_best = 1;
+		      
+		      recent_power = history_power;
+		    }
+		  else if(history_power > best_power)
+		    {
+		      best_power = history_power;
+		      best_pitch = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].pitch;
+		    }
 		}
-	      else if(history_power > best_power)
-		{
-		  best_power = history_power;
-		  best_pitch = x->hist.ory[(x->hist.idx - i) & HISTORY_MASK].pitch;
-		}
+	      
+	      if(best_power > 0) 
+		x->stat.pitch = x->out.midi_pitch = best_pitch;
 	    }
-	  
-	  if(best_power > 0) 
-	    x->stat.pitch = x->out.midi_pitch = best_pitch;
+
+	  x->hist.count = 0; 
+	  x->stat.peaked = 0;
+	  x->out.attack = 1;
 	}
-      x->hist.count = 0; 
-      x->stat.peaked = 0;
-      x->out.attack = 1;
     }
-  }
   
   x->hist.count++; /* count the ticks since the last reattack */
   
@@ -248,70 +258,78 @@ analysis(pitch_t *x)
   if(x->stat.pitch == 0.0f &&
     found_candidate &&
     pitch_power > x->pt.ctl.power_on &&
-    pitch_power > x->pt.ctl.quality_on * total_power
-  ){
-    int int_pitch;
-    int deviated = 0;
-    float error, pitch_average;
-    
-    /* in addition we must have a stable pitch in the sense that it
-     * does not deviate more than x->ctl.vib_depth from the mean over the
-     * last x->hist.n_pitch values.
-     */
-    int_pitch = (int)(new_pitch + 0.5f);
-    error = new_pitch - int_pitch;
-    if(x->hist.n_pitch){
-      pitch_average = 0;
-      for(i=0; i<x->hist.n_pitch; i++)
-        pitch_average += x->hist.ory[(x->hist.idx-i) & HISTORY_MASK].pitch;
-      pitch_average /= x->hist.n_pitch;
+    pitch_power > x->pt.ctl.quality_on * total_power)
+    {
+      int int_pitch;
+      int deviated = 0;
+      float error, pitch_average;
       
-      for(i=0; i<x->hist.n_pitch; i++){
-        float deviation = x->hist.ory[(x->hist.idx-i) & HISTORY_MASK].pitch - pitch_average;
-        if(x->ctl.print_me){
-	  post("  deviation %f\n", deviation);
+      /* in addition we must have a stable pitch in the sense that it
+       * does not deviate more than x->ctl.vib_depth from the mean over the
+       * last x->hist.n_pitch values.
+       */
+      int_pitch = (int)(new_pitch + 0.5f);
+      error = new_pitch - int_pitch;
+      if(x->hist.n_pitch)
+	{
+	  pitch_average = 0;
+	  for(i=0; i<x->hist.n_pitch; i++)
+	    pitch_average += x->hist.ory[(x->hist.idx-i) & HISTORY_MASK].pitch;
+	  pitch_average /= x->hist.n_pitch;
+	  
+	  for(i=0; i<x->hist.n_pitch; i++){
+	    float deviation = x->hist.ory[(x->hist.idx-i) & HISTORY_MASK].pitch - pitch_average;
+	    if(x->ctl.print_me){
+	      post("  deviation %f\n", deviation);
+	    }
+	    if(deviation < -x->ctl.vib_depth || deviation > x->ctl.vib_depth)
+	      {
+		if(x->ctl.print_me) 
+		  post("  pitch deviated! -> called off\n");
+		deviated = 1;
+	      }
+	  }
 	}
-        if(deviation < -x->ctl.vib_depth || deviation > x->ctl.vib_depth){
-          if(x->ctl.print_me) 
-	    post("  pitch deviated! -> called off\n");
-          deviated = 1;
-        }
-      }
-    }else{
-      pitch_average = new_pitch;
+      else
+	pitch_average = new_pitch;
+      
+      if(error < x->ctl.max_error &&
+	 error > -x->ctl.max_error &&
+	 !deviated)
+	{
+	  int last_int_pitch = x->stat.last_int_pitch;
+
+	  if(pt_common_debounce_time_is_up(&x->pt, &x->out.time) ||
+	     (int_pitch != last_int_pitch &&
+	      int_pitch != last_int_pitch + 12 &&
+	      int_pitch != last_int_pitch - 12))
+	    {
+	      if(x->ctl.loud)
+		{
+		  post("%s: ongoing note: %f\n", CLASS_NAME, pitch_average);
+		  post("  power: %f\n", new_power);
+		  post("  relative power (in %): %f\n", pitch_power / total_power);
+		  
+		  if(x->hist.n_pitch) 
+		    post("  stable over %d points!\n", x->hist.n_pitch);
+		  else 
+		    post("  no stability criterion!\n");
+		}
+
+	      x->stat.last_int_pitch = int_pitch;
+	      x->stat.peaked = 0;
+	      x->hist.count = 1000; /* acts like last reattack has been a long long time ago */
+	      x->stat.pitch = x->out.midi_pitch = pitch_average;
+	    }
+	}
+      else if(x->ctl.print_me) 
+	post("  out of tune!\n");
     }
-    
-    if(
-      error < x->ctl.max_error &&
-      error > -x->ctl.max_error &&
-      !deviated
-    ){
-      int last_int_pitch = x->stat.last_int_pitch;
-      if(pt_common_debounce_time_is_up(&x->pt, &x->out.time) ||
-        (int_pitch != last_int_pitch &&
-        int_pitch != last_int_pitch + 12 &&
-        int_pitch != last_int_pitch - 12)
-      ){
-        if(x->ctl.loud){
-          post("%s: ongoing note: %f\n", CLASS_NAME, pitch_average);
-	  post("  power: %f\n", new_power);
-	  post("  relative power (in %): %f\n", pitch_power / total_power);
-          if(x->hist.n_pitch) 
-	    post("  stable over %d points!\n", x->hist.n_pitch);
-          else 
-	    post("  no stability criterion!\n");
-        }
-        x->stat.last_int_pitch = int_pitch;
-        x->stat.peaked = 0;
-        x->hist.count = 1000; /* acts like last reattack has been a long long time ago */
-        x->stat.pitch = x->out.midi_pitch = pitch_average;
-      }
-    }else if(x->ctl.print_me) post("  out of tune!\n");
-  }
+
   x->out.micro_pitch = new_pitch;
   
   x->ctl.print_me = 0;
-  fts_timer_set_delay(x->timer, 0.0, 0);
+  fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)x, pitch_output, 0, 0.0);
 }
 
 /*************************************************
@@ -329,8 +347,11 @@ pitch_vibrato(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   x->ctl.vib_time = (n >= 0)? n: 0;
   x->ctl.vib_depth = (f >= 0)? f: 0;
   x->hist.n_pitch = (x->ctl.vib_time * 0.001f * x->pt.srate)/(x->pt.n_points - x->pt.n_overlap);
-  if(x->hist.n_pitch >= N_HISTORY) x->hist.n_pitch = N_HISTORY-1;
-  else if(x->hist.n_pitch < 2) x->hist.n_pitch = 0;
+
+  if(x->hist.n_pitch >= N_HISTORY) 
+    x->hist.n_pitch = N_HISTORY-1;
+  else if(x->hist.n_pitch < 2) 
+    x->hist.n_pitch = 0;
 }
 
 static void 
@@ -339,8 +360,11 @@ pitch_max_error(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   pitch_t *x = (pitch_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0);
   
-  if(f < 0.0f) f = 0.0f;
-  else if(f > 0.5f) f = 0.5f;
+  if(f < 0.0f) 
+    f = 0.0f;
+  else if(f > 0.5f) 
+    f = 0.5f;
+
   x->ctl.max_error = f;
 }
 
@@ -386,29 +410,8 @@ pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 /*************************************************
  *
- *    system called methods
+ *  class
  */
-
-static void 
-pitch_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  pitch_t *x = (pitch_t *)o;
-
-  fts_outlet_float(o, OUTLET_micro_pitch, x->out.micro_pitch);
-  fts_outlet_float(o, OUTLET_power, x->out.power + POWER_OUT_OFFSET);
-
-  if(x->out.midi_pitch > 0.0f)
-    {
-      fts_outlet_float(o, OUTLET_midi_pitch, x->out.midi_pitch);
-      x->out.midi_pitch = 0.0f;
-    }
-
-  if(x->out.attack)
-    {
-      fts_outlet_bang(o, OUTLET_attack);
-      x->out.attack = 0;
-    } 
-}
 
 static void 
 pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -486,7 +489,6 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   x->out.micro_pitch = 0.0f;
   x->out.time = 0.0;
   
-  x->timer = fts_timer_new(o, 0);
   dsp_list_insert(o);
 }
 
@@ -495,7 +497,6 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   pitch_t *x = (pitch_t *)o;
 
-  fts_timer_delete(x->timer);  
   pt_common_delete(&x->pt);
 
   if(x->wind) 
@@ -507,7 +508,7 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t 
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(pitch_t), N_INLETS, N_OUTLETS, 0);
+  fts_class_init(cl, sizeof(pitch_t), 1, 4, 0);
   pt_common_instantiate(cl);
 
   /* the system methods */
@@ -515,7 +516,6 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pitch_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, pitch_put);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, pitch_tick);
   
   /* class' own methods */
   fts_method_define_varargs(cl, 0, fts_new_symbol("vibrato"), pitch_vibrato);
@@ -526,13 +526,13 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("print"), pitch_print);
 
   /* classes signal inlets and outlets */
-  dsp_sig_inlet(cl, INLET_sig);
+  dsp_sig_inlet(cl, 0);
 
   /* classes outlets */
-  fts_outlet_type_define_varargs(cl, OUTLET_attack, fts_s_bang);
-  fts_outlet_type_define_varargs(cl, OUTLET_midi_pitch, fts_s_float);
-  fts_outlet_type_define_varargs(cl, OUTLET_power, fts_s_float);
-  fts_outlet_type_define_varargs(cl, OUTLET_micro_pitch, fts_s_float);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
+  fts_outlet_type_define_varargs(cl, 1, fts_s_bang);
+  fts_outlet_type_define_varargs(cl, 2, fts_s_float);
+  fts_outlet_type_define_varargs(cl, 3, fts_s_float);
 
   dsp_symbol = fts_new_symbol(DSP_NAME);
   dsp_declare_function(dsp_symbol, pt_common_dsp_function);

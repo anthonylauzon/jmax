@@ -36,13 +36,12 @@ typedef struct sigprint_t {
   int alloc;
   int index;
   float *buf;
-  fts_timer_t *timer;
 } sigprint_t;
 
 static fts_symbol_t print_dsp_function = 0;
 
 static void
-sigprint_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigprint_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigprint_t *x = (sigprint_t *)o;
 
@@ -66,7 +65,6 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   x->size = 0;
   x->alloc = 0;
 
-  x->timer = fts_timer_new(o, 0);
   dsp_list_insert(o);
 }
 
@@ -77,7 +75,6 @@ sigprint_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(x->buf) fts_free(x->buf);
 
-  fts_timer_delete(x->timer);
   dsp_list_remove(o);
 }
 
@@ -115,7 +112,7 @@ static void ftl_sigprint(fts_word_t *argv)
       x->index = 0;
 
       if(x->n_print)
-	fts_timer_set_delay(x->timer, 0.0, 0);
+	fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)x, sigprint_post, 0, 0.0);
     }
   else
     x->index = index;
@@ -160,7 +157,6 @@ sigprint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigprint_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigprint_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigprint_tick);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigprint_put);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, sigprint_bang);

@@ -29,13 +29,12 @@
 typedef struct 
 {
   fts_object_t head;
-  int vel;
-  float dur;
-  fts_timer_t *timer;
+  int velocity;
+  float duration;
 } makenote_t;
 
 static void
-makenote_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_send_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *this = (makenote_t *)o;
 
@@ -44,34 +43,38 @@ makenote_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-makenote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *this = (makenote_t *)o;
 
-  if(fts_is_number(at) && this->dur > 0.0)
+  if(fts_is_number(at))
     {
-      fts_timer_set_delay(this->timer, this->dur, at);
+      fts_timebase_add_call(fts_get_timebase(), o, makenote_send_off, at, this->duration);
       
       /* send the output messages */
-      fts_outlet_int(o, 1, this->vel);
+      fts_outlet_int(o, 1, this->velocity);
       fts_outlet_int(o, 0, fts_get_number_int(at));
     }
 }
 
 static void
-makenote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_set_velocity(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *this = (makenote_t *)o;
 
-  this->vel = fts_get_number_int(at);
+  this->velocity = fts_get_number_int(at);
 }
 
 static void
-makenote_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *this = (makenote_t *)o;
+  double duration = fts_get_number_float(at);
 
-  this->dur = fts_get_number_float(at);
+  if(duration > 0.0)
+    this->duration = duration;
+  else
+    this->duration = 0.0;
 }
 
 static void
@@ -84,25 +87,23 @@ makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     default:
     case 3:
       if(fts_is_number(at + 2))
-	this->dur = fts_get_number_float(at + 2);
+	makenote_set_duration(o, 0, 0, 1, at + 2);
     case 2:
       if(fts_is_number(at + 1))
-	this->vel = fts_get_number_int(at + 1);
+	makenote_set_velocity(o, 0, 0, 1, at + 1);
     case 1:
-      makenote_number(o, winlet, s, 1, at);
+      makenote_pitch(o, winlet, s, 1, at);
     case 0:
       break;
     }      
 }
-
-/* makenote stop method is also installed as method for the $delete message */
 
 static void
 makenote_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   makenote_t *this = (makenote_t *)o;
 
-  fts_timer_reset(this->timer);
+  fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
@@ -110,7 +111,7 @@ makenote_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   makenote_t *this = (makenote_t *)o;
 
-  fts_timer_reset(this->timer);
+  fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 
@@ -119,20 +120,20 @@ makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   makenote_t *this = (makenote_t *)o;
 
-  this->vel = fts_get_int_arg(ac, at, 1, 0);
-  this->dur = fts_get_float_arg(ac, at, 2, 0.0f);
+  ac--;
+  at++;
 
-  this->timer = fts_timer_new(o, 0);
+  switch(ac)
+    {
+    default:
+    case 2:
+      makenote_set_duration(o, 0, 0, 1, at + 1);
+    case 1:
+      makenote_set_velocity(o, 0, 0, 1, at + 0);
+    case 0:
+      break;
+    }
 }
-
-static void
-makenote_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  makenote_t *this = (makenote_t *)o;
-  
-  fts_timer_delete(this->timer);  
-}
-
 
 static fts_status_t
 makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -140,21 +141,18 @@ makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(makenote_t), 3, 2, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, makenote_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, makenote_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, makenote_alarm);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), makenote_clear);
   fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), makenote_stop);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, makenote_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, makenote_number);
+  fts_method_define_varargs(cl, 0, fts_s_int, makenote_pitch);
+  fts_method_define_varargs(cl, 0, fts_s_float, makenote_pitch);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, makenote_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, makenote_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_int, makenote_set_velocity);
+  fts_method_define_varargs(cl, 1, fts_s_float, makenote_set_velocity);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, makenote_number_2);
-  fts_method_define_varargs(cl, 2, fts_s_float, makenote_number_2);
+  fts_method_define_varargs(cl, 2, fts_s_int, makenote_set_duration);
+  fts_method_define_varargs(cl, 2, fts_s_float, makenote_set_duration);
 
   fts_method_define_varargs(cl, 0, fts_s_list, makenote_list);
 

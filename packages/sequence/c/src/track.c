@@ -61,7 +61,7 @@ create_event(int ac, const fts_atom_t *at)
 	    {
 	      fts_atom_t a[1];
 	      
-	      fts_set_object(a, obj);
+	      fts_set_object_with_type(a, obj, fts_get_class_name(class));
 	      event = (event_t *)fts_object_create(event_class, 1, a);
 	    }
 	}
@@ -355,73 +355,66 @@ track_highlight_event(track_t *track, event_t *event)
 {
   if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
     {
-      fts_atom_t a[1];
+      fts_atom_t a;
       
-      fts_set_object(a, (fts_object_t *)event);
-      fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, 1, a);
+      fts_set_object(&a, (fts_object_t *)event);
+      fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, 1, &a);
     }
 }
   
-event_t *
-track_get_next_and_highlight(track_t *track, event_t *event, double time)
+void
+track_highlight_cluster(track_t *track, event_t *event, event_t *next)
 {
-  event_t *next = event_get_next(event);
-
   if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
     {
       fts_atom_t at[64];
-      int ac;
-      
-      fts_set_object(at, (fts_object_t *)event);
-      ac = 1;
-      
-      while(next && event_get_time(next) <= time)
-	{
-	  fts_set_object(at + ac, (fts_object_t *)next);
-	  ac++;
-	  next = event_get_next(next);
-	}
-      
-      fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
-    }
-  else
-    {      
-      while(next && event_get_time(next) <= time)
-	next = event_get_next(next);
-    }
+      int ac = 0;
 
-  return next;
+      while(event && event != next)
+	{
+	  fts_set_object(at + ac, (fts_object_t *)event);
+	  ac++;
+	  event = event_get_next(event);
+	}
+
+      if(ac)
+	fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
+    }
 }
 
 event_t *
-track_get_prev_and_highlight(track_t *track, event_t *event, double time)
+track_highlight_and_next(track_t *track, event_t *event)
 {
-  event_t *prev = event_get_prev(event);
+  double time = event_get_time(event);
 
   if(sequence_editor_is_open(track_get_sequence((track_t *)track)))
     {
       fts_atom_t at[64];
-      int ac;
+      int ac = 0;
       
-      fts_set_object(at, (fts_object_t *)event);
-      ac = 1;
-      
-      while(prev && event_get_time(prev) >= time)
+      fts_set_object(at + ac, (fts_object_t *)event);
+      ac++;
+      event = event_get_next(event);
+
+      while(event && event_get_time(event) == time)
 	{
-	  fts_set_object(at + ac, (fts_object_t *)prev);
+	  fts_set_object(at + ac, (fts_object_t *)event);
 	  ac++;
-	  prev = event_get_prev(prev);
+	  event = event_get_next(event);
 	}
-      
-      fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
+
+      if(ac)
+	fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
     }
   else
-    {
-      while(prev && event_get_time(prev) >= time)
-	prev = event_get_prev(prev);
+    {      
+      event = event_get_next(event);
+
+      while(event && event_get_time(event) == time)
+	event = event_get_next(event);
     }
 
-  return prev;
+  return event;
 }
 
 /******************************************************

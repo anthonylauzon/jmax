@@ -62,8 +62,6 @@ struct fts_object
 };
 
 
-
-
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /* create/destroy object without patcher (attention: hack in fts_object_create()!) */

@@ -75,16 +75,23 @@ typedef struct
 typedef struct
 {
   pt_common_obj_t pt; /* the pt object (is also an fts object) */
-  fts_timer_t *timer;
   pt_ctl_t ctl;
   pt_stat_t stat;
   pt_out_t out;
 } pt_t;
 
 
+static void pt_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  pt_t *x = (pt_t *)o;
+
+  fts_outlet_int(o, OUTLET_midi, x->out.pitch);
+}
+
 /*************************************************
  *
- *		analysis
+ *  analysis
+ *
  */
 static void analysis(fts_object_t *o)
 {
@@ -95,6 +102,7 @@ static void analysis(fts_object_t *o)
   int found_candidate = 0; /* reasonable doubt */
 	
   found_candidate = pt_common_find_pitch_candidate(&x->pt, &candidate, &pitch_power, &total_power, x->ctl.print_me);
+
   if(found_candidate)
     {
       new_pitch = pt_common_candidate_midi_pitch(&x->pt, candidate);
@@ -151,12 +159,13 @@ static void analysis(fts_object_t *o)
      found_candidate &&
      pitch_power > x->pt.ctl.power_on &&
      pitch_power > x->pt.ctl.quality_on * total_power && 
-     (x->ctl.gliss_time == 0 || (new_pitch >= x->stat.pitch - x->stat.gliss_frame && new_pitch <= x->stat.pitch + x->stat.gliss_frame)))
+     (x->ctl.gliss_time == 0 || 
+      (new_pitch >= x->stat.pitch - x->stat.gliss_frame && new_pitch <= x->stat.pitch + x->stat.gliss_frame)))
     {
       int int_pitch = new_pitch + 0.5f;
       float error = new_pitch - int_pitch;
       if(x->ctl.print_me) post("  error %f\n", error);
-		
+      
       if(error < 0.4f && error > -0.4f)
 	{
 	  int pitch_last_out = x->stat.pitch_last_out;
@@ -164,19 +173,20 @@ static void analysis(fts_object_t *o)
 	  if(pt_common_debounce_time_is_up(&x->pt, &x->out.time) || 
 	     (int_pitch != pitch_last_out &&
 	      int_pitch != pitch_last_out + 12 &&
-	      int_pitch != pitch_last_out - 12)
-	     )
+	      int_pitch != pitch_last_out - 12))
 	    {
 	      x->stat.pitch_last_out = int_pitch;
 	      x->stat.peaked = 0;
 	      x->stat.reattack_slope = 0;
-	      fts_timer_set_delay(x->timer, 0.0, 0);
+
+	      fts_timebase_add_call(fts_get_timebase(), o, pt_output, 0, 0.0);
 	    }
 	  x->out.pitch = int_pitch;
 	}
       else if(x->ctl.print_me)
 	post("  out of tune!\n");
     }
+
   x->ctl.print_me = 0;
   x->stat.pitch = new_pitch;
 }
@@ -240,15 +250,9 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 /*************************************************
  *
- *  system called methods
+ *  class
+ *
  */
-
-static void pt_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  pt_t *x = (pt_t *)o;
-
-  fts_outlet_int(o, OUTLET_midi, x->out.pitch);
-}
 
 static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -298,15 +302,12 @@ static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   x->out.pitch = 0;
   x->out.time = 0.0;
 	
-  x->timer = fts_timer_new(o, 0);
   dsp_list_insert(o);
 }
 
 static void pt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-
-  fts_timer_delete(x->timer);	
 
   pt_common_delete(&x->pt);	
 
@@ -323,7 +324,6 @@ static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pt_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_fun_put);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, pt_tick);
 	
   /* class' own methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, pt_bang);

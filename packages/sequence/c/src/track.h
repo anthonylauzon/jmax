@@ -74,8 +74,8 @@ extern event_t *track_get_event_by_time_after(track_t *track, double time, event
 
 /* high-lighting events in editor */
 extern void track_highlight_event(track_t *track, event_t *event);
-extern event_t *track_get_next_and_highlight(track_t *track, event_t *event, double time);
-extern event_t *track_get_prev_and_highlight(track_t *track, event_t *event, double time);
+extern void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
+extern event_t *track_highlight_and_next(track_t *track, event_t *event);
 
 /* track atoms */
 #define track_atom_set(ap, x) fts_set_object_with_type((ap), (x), seqsym_track)

@@ -30,8 +30,8 @@ typedef struct
 {
   fts_object_t ob;
   double period;
-  long run;
-  fts_timer_t *timer;
+  int run;
+  int pending;
 } metro_t;
 
 
@@ -40,8 +40,7 @@ metro_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   metro_t *this = (metro_t *)o;
 
-  fts_timer_set_delay(this->timer, this->period, 0);
-  
+  fts_timebase_add_call(fts_get_timebase(), o, metro_tick, 0, this->period);
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
@@ -51,10 +50,11 @@ metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   metro_t *this = (metro_t *)o;
 
-  this->run = 1;
+  if(this->run)
+    fts_timebase_remove_object(fts_get_timebase(), o);
 
-  fts_timer_reset(this->timer);
-  fts_timer_set_delay(this->timer, this->period, 0);
+  fts_timebase_add_call(fts_get_timebase(), o, metro_tick, 0, this->period);
+  this->run = 1;
 
   fts_outlet_bang((fts_object_t *)o, 0);
 }
@@ -64,17 +64,19 @@ metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   metro_t *this = (metro_t *)o;
 
+  if(this->run)
+    fts_timebase_remove_object(fts_get_timebase(), o);
+
   this->run = 0;
-  fts_timer_reset(this->timer);
 }
 
 static void
 metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *this = (metro_t *)o;
-  long n = (long) fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_number_int(at);
 
-  if (n)
+  if(n)
     metro_start(o, 0, 0, 0, 0);
   else
     metro_stop(o, 0, 0, 0, 0);
@@ -84,7 +86,7 @@ static void
 metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *this = (metro_t *)o;
-  double n = fts_get_double_arg(ac, at, 0, 0);
+  double n = fts_get_number_float(at);
 
   if (n <= 0.0)
     n = 5.0;
@@ -93,27 +95,15 @@ metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  metro_t *this = (metro_t *)o;
-
-  fts_timer_delete(this->timer);
-}
-
-static void
 metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *this = (metro_t *)o;
-  float n;
 
-  n = (float) fts_get_float_arg(ac, at, 1, 0.0f);    
-  
-  this->timer = fts_timer_new(o, 0);
+  ac--;
+  at++;
 
-  if (n <= 0.0)
-    this->period = 5.0;
-  else
-    this->period = n;
+  if(fts_is_number(at))
+    metro_set_period(o, 0, 0, 1, at);
 }
 
 
@@ -123,9 +113,6 @@ metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(metro_t), 2, 1, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, metro_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, metro_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, metro_tick);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, metro_start);
   fts_method_define_varargs(cl, 0, fts_new_symbol("start"), metro_start);

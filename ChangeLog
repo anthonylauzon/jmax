@@ -1,3 +1,8 @@
+2001-11-29  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* removed timer from time.c and added timebase scheduling functions
+	* added object referencing to client updates
+	
 2001-11-20  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* rewrote midiport and midifile modules based on new fts_midievent_t class

@@ -90,9 +90,7 @@ vec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
       int i = fts_get_number_int(at);
 
       if(i >= 0 && i < size)
-	{
-	  vec_set_from_atom_list(this, i, ac - 2, at + 2);
-	}
+	vec_set_from_atom_list(this, i, ac - 2, at + 2);
     }
 }
 
@@ -163,6 +161,32 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     }
   else
     post("vec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+}
+
+static void
+vec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+  fts_atom_t *values = vec_get_ptr(this);
+  int size = vec_get_size(this);
+  fts_array_t *array = fts_get_array(at);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i;
+  
+  fts_array_set_size(array, onset + size);  
+  atoms = fts_array_get_atoms(array) + onset;
+
+  for(i=0; i<size; i++)
+    fts_atom_assign(atoms + i, values + i);
+}
+
+static void
+vec_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+
+  vec_set_from_atom_list(this, 0, ac, at);
 }
 
 static void
@@ -339,6 +363,8 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vec_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vec_delete);
 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, vec_append_state_to_array);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, vec_set_state_from_array);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, vec_print); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), vec_assist); 
       

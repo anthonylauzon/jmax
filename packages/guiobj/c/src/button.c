@@ -35,7 +35,6 @@ typedef struct
   int value;
   float flash;
   int color;
-  fts_timer_t *timer;
 } button_t;
 
 /************************************************
@@ -62,34 +61,35 @@ button_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
  *
  */
  
-static void
-button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-
-  fts_outlet_bang(o, 0);
-
-  this->value = this->color;
-
-  fts_object_ui_property_changed(o, fts_s_value);
-
-  fts_timer_reset(this->timer);
-  fts_timer_set_delay(this->timer, this->flash, 0);
-}
-
-/************************************************
- *
- *  timer
- *
- */
- 
 static void 
-button_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   button_t *this = (button_t *)o;
 
   this->value = 0;
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+}
+
+static void
+button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  button_t *this = (button_t *)o;
+  fts_patcher_t *patcher = fts_object_get_patcher(o);
+
+  if(patcher && fts_patcher_is_open(patcher))
+    {
+      if(this->value > 0)
+	fts_timebase_remove_object(fts_get_timebase(), o);
+
+      /* button on */
+      this->value = this->color;
+      fts_object_ui_property_changed(o, fts_s_value);
+      
+      /* schedule button off */
+      fts_timebase_add_call(fts_get_timebase(), o, button_off, 0, this->flash);
+    }
+
+  fts_outlet_bang(o, 0);
 }
 
 /************************************************
@@ -109,17 +109,11 @@ button_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
 
 
 static void
-button_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+button_put_value(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  button_t *this = (button_t *)obj;
+  button_t *this = (button_t *)o;
 
-  fts_outlet_bang(obj, 0);
-
-  this->value = this->color;
-  fts_object_ui_property_changed(obj, fts_s_value);
-
-  fts_timer_reset(this->timer);
-  fts_timer_set_delay(this->timer, this->flash, 0);
+  button_on(o, 0, 0, 0, 0);
 }
 
 /* Daemon for the color  propriety */
@@ -130,7 +124,6 @@ button_get_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
 
   fts_set_int(value, this->color);
 }
-
 
 static void
 button_put_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
@@ -149,7 +142,6 @@ button_get_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
   fts_set_int(value, this->flash);
 }
 
-
 static void
 button_put_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
@@ -158,7 +150,8 @@ button_put_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
   this->flash = fts_get_int(value);
 }
 
-static void button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   FILE *file;
   int x, y, w;
@@ -188,43 +181,25 @@ button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   button_t *this = (button_t *)o;
 
-  this->timer = fts_timer_new(o, 0);
   this->value = 0;
   this->flash = DEFAULT_FLASH;
   this->color = 1;
 }
 
-static void
-button_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-
-  fts_timer_delete(this->timer);
-}
-
 static fts_status_t
 button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_type_t t[1];
-
   fts_class_init(cl, sizeof(button_t), 1, 1, 0);
 
-  t[0] = fts_t_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, button_init, 1, t);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, button_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, button_init);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_timer_alarm, button_tick, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties); 
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties, 0, 0); 
-  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties, 0, 0); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, button_save_dotpat); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, button_on);
 
-  t[0] = fts_t_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, button_save_dotpat, 1, t); 
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_bang, button_bang, 0, 0);
-
-  /* user methods */
-  fts_method_define_varargs(cl, 0, fts_s_anything, button_bang);
+  fts_method_define_varargs(cl, 0, fts_s_anything, button_on);
 
   /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
@@ -238,8 +213,7 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_flash, button_get_flash);
   fts_class_add_daemon(cl, obj_property_put, fts_s_flash, button_put_flash);
 
-  t[0] = fts_t_int;
-  fts_outlet_type_define(cl, 0, fts_s_bang, 1, t);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
   return fts_Success;
 }
@@ -248,5 +222,5 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 button_config(void)
 {
-  fts_class_install(fts_new_symbol("button"),button_instantiate);
+  fts_class_install(fts_new_symbol("button"), button_instantiate);
 }

@@ -34,10 +34,13 @@
 typedef struct _seqrec_
 {
   fts_object_t head; /* sequence reference object */
+  fts_timebase_t *timebase;
   track_t *track;
   fts_class_t *class;
-  track_t *recording;
-  event_t *event;
+  track_t *recording; /* recording track */
+
+  /* status */
+  enum {status_reset, status_ready, status_recording} status;
   double start_location;
   double start_time;
 } seqrec_t;
@@ -53,60 +56,44 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   seqrec_t *this = (seqrec_t *)o;
 
-  if(this->event)
+  if(this->status != status_reset)
     {
-      fts_object_release(this->event);
-      this->event = 0;
-    }
-  
-  /* merge and upload track after recording */
-  track_merge(this->track, this->recording);
-
-  if(fts_object_has_id((fts_object_t *)this->track))
-    fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);
-  
-  this->start_time = 0.0;
-}
-
-static void 
-seqrec_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqrec_t *this = (seqrec_t *)o;
-  event_t *event;
-  double locate;
-
-  seqrec_stop(o, 0, 0, 0, 0);
-  
-  if(ac && fts_is_number(at))
-    locate = fts_get_number_float(at);
-  else
-    locate = 0.0;
-
-  event = track_get_event_by_time(this->track, locate);
-  
-  if(event)
-    {
-      this->event = event;
-      fts_object_refer(this->event);
-    }
+      /* merge and upload track after recording */
+      track_merge(this->track, this->recording);
       
-  this->start_location = locate;
-  this->start_time = 0.0;
+      if(fts_object_has_id((fts_object_t *)this->track))
+	fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);
+
+      this->start_location = 0.0;
+      this->start_time = 0.0;
+      this->status = status_reset;
+    }
 }
 
 static void 
 seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqrec_t *this = (seqrec_t *)o;
+  double time = 0.0;
 
-  if(this->start_time == 0.0)
+  switch(this->status)
     {
-      double now = fts_get_time();
+    case status_reset:
+      if(ac && fts_is_number(at))
+	time = fts_get_number_float(at);
 
-      if(!this->event)
-	seqrec_locate(o, 0, 0, 0, 0);
+      /* set start location  */
+      this->start_location = time;
       
-      this->start_time = now;
+    case status_ready:
+      /* remember current time as start time */
+      this->start_time = fts_timebase_get_time(this->timebase);
+
+      /* record */
+      this->status = status_recording;
+      
+    case status_recording:
+      break;
     }
 }
 
@@ -114,9 +101,13 @@ static void
 seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqrec_t *this = (seqrec_t *)o;
-  double now = fts_get_time();
+  double now = fts_timebase_get_time(this->timebase);
       
+  /* set location to restart*/
   this->start_location += now - this->start_time;
+
+  /* pause */
+  this->status = status_ready;
 }
 
 static void 
@@ -126,28 +117,28 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->start_time != 0.0)
     {
-      double time = fts_get_time() - this->start_time + this->start_location;
-      event_t *event = 0;
+      /* compute current time */
+      double here = fts_timebase_get_time(this->timebase) - this->start_time + this->start_location;
 
-      if(this->class)
+      if(here > 0.0)
 	{
-	  fts_object_t *obj = fts_object_create(this->class, ac, at);
-	  fts_atom_t a[1];
-
-	  fts_set_object(a, obj);
-	  event = (event_t *)fts_object_create(event_class, 1, a);
+	  event_t *event;
+	  
+	  /* create event */
+	  if(this->class)
+	    {
+	      fts_object_t *obj = fts_object_create(this->class, ac, at);
+	      fts_atom_t a[1];
+	      
+	      fts_set_object(a, obj);
+	      event = (event_t *)fts_object_create(event_class, 1, a);
+	    }
+	  else
+	    event = (event_t *)fts_object_create(event_class, 1, at);
+	  
+	  /* add event to recording track */
+	  track_append_event(this->recording, here, event);
 	}
-      else
-	event = (event_t *)fts_object_create(event_class, 1, at);
-
-      /* add event to track (look for right position starting from last event) */
-      track_add_event_after(this->track, time, event, this->event);
-
-      if(this->event)
-	fts_object_release(this->event);
-
-      this->event = event;
-      fts_object_refer(event);  
     }
 }
 
@@ -177,8 +168,9 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
+  this->status = status_reset;
+  this->timebase = fts_get_timebase();
   this->track = 0;
-  this->event = 0;
   this->start_location = 0.0;
   this->start_time = 0.0;
 
@@ -196,7 +188,6 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	this->class = 0;
       else
 	this->class = fts_class_get_by_name(type);
-      
 
       fts_set_symbol(&a, type);
       this->recording = (track_t *)fts_object_create(track_class, 1, &a);
@@ -222,7 +213,6 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqrec_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqrec_delete);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqrec_locate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqrec_start);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqrec_pause);
   fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqrec_stop);

@@ -34,6 +34,7 @@
 typedef struct _seqstep_
 {
   fts_object_t head;
+  enum {status_reset, status_ready} status; /* status */
   track_t *track;
   event_t *prev;
   event_t *next;
@@ -46,86 +47,8 @@ typedef struct _seqstep_
  *
  */
 
-static void
-seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqstep_t *this = (seqstep_t *)o;
-  event_t *event = this->next;
-
-  if(event)
-    {
-      double time = event_get_time(event);
-      event_t *next = track_get_next_and_highlight(this->track, event, time);
-      
-      fts_object_release(event);
-
-      if(this->prev)
-	fts_object_release(this->prev);
-
-      this->prev = event_get_prev(event);
-      this->next = next;
-
-      if(this->prev)
-	fts_object_refer(this->prev);
-
-      if(this->next)
-	fts_object_refer(this->next);
-      
-      fts_outlet_float(o, 1, (float)time);
-
-      do{
-	fts_array_clear(&this->array);
-	event_append_state_to_array(event, &this->array);
-	
-	fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
-
-	event = event_get_next(event);
-      }
-      while(event != next);
-    }
-}
-
-static void
-seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqstep_t *this = (seqstep_t *)o;
-  event_t *event = this->prev;
-
-  if(event)
-    {
-      double time = event_get_time(event);
-      event_t *prev = track_get_prev_and_highlight(this->track, event, time);
-      
-      fts_object_release(event);
-
-      if(this->next)
-	fts_object_release(this->next);
-
-      this->prev = prev;
-      this->next = event_get_next(event);
-      
-      if(this->prev)
-	fts_object_refer(this->prev);
-
-      if(this->next)
-	fts_object_refer(this->next);
-      
-      fts_outlet_float(o, 1, (float)time);
-
-      do{
-	fts_array_clear(&this->array);
-	event_append_state_to_array(event, &this->array);
-	
-	fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
-
-	event = event_get_prev(event);
-      }
-      while(event != prev);
-    }
-}
-
 static void 
-seqstep_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
 
@@ -140,38 +63,38 @@ seqstep_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_release(this->next);
       this->next = 0;
     }
+
+  this->status = status_reset;
 }
 
 static void 
-seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
   event_t *event;
-  double locate;
+  double here;
   double time;
 
-  seqstep_stop(o, 0, 0, 0, 0);
+  seqstep_reset(o, 0, 0, 0, 0);
   
   if(ac && fts_is_number(at))
-    locate = fts_get_number_float(at);
+    here = fts_get_number_float(at);
   else
-    locate = 0.0;
+    here = 0.0;
 
-  event = track_get_event_by_time(this->track, locate);
+  event = track_get_event_by_time(this->track, here);
   
   if(event)
     {
       time = event_get_time(event);
       
-      if(locate == time)
+      if(here == time)
 	{
 	  this->next = event;
 	  this->prev = event;
 
 	  fts_object_refer(event);
 	  fts_object_refer(event);
-
-	  seqstep_next(o, 0, 0, 0, 0);
 	}
       else
 	{
@@ -184,6 +107,127 @@ seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    fts_object_refer(this->prev);
 	}
     }
+
+
+  this->status = status_ready;
+}
+
+static void
+seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqstep_t *this = (seqstep_t *)o;
+  event_t *event;
+
+  if(this->status == status_reset)
+    seqstep_goto(o, 0, 0, 0, 0);
+
+  event = this->next;
+
+  if(event)
+    {
+      double time = event_get_time(event);
+      event_t *prev = event_get_prev(event);
+      event_t *next;
+
+      fts_object_release(event);
+
+      if(this->prev)
+	fts_object_release(this->prev);
+
+      /* make sure to be at the beginning of the cluster */
+      while(prev && event_get_time(prev) == time)
+	{
+	  event = prev;
+	  prev = event_get_prev(prev);
+	}	
+
+      /* output events */
+      fts_outlet_float(o, 1, (float)time);
+
+      /* output events of cluster */
+      next = event;
+      while(next && event_get_time(next) == time)
+	{
+	  fts_array_clear(&this->array);
+	  event_append_state_to_array(next, &this->array);
+	  
+	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+	  
+	  event = next;
+	  next = event_get_next(next);
+	}
+	
+      /* highligh in open edtior */
+      track_highlight_cluster(this->track, event, next);
+      
+      this->prev = prev;
+      this->next = next;
+
+      if(this->prev)
+	fts_object_refer(this->prev);
+
+      if(this->next)
+	fts_object_refer(this->next);
+    }
+}
+
+static void
+seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqstep_t *this = (seqstep_t *)o;
+  event_t *event;
+
+  if(this->status == status_reset)
+    seqstep_goto(o, 0, 0, 0, 0);
+
+  event = this->prev;
+
+  if(event)
+    {
+      double time = event_get_time(event);
+      event_t *next = event_get_next(event);
+      event_t *prev;
+
+      if(this->next)
+	fts_object_release(this->next);
+
+      fts_object_release(event);
+
+      /* make sure to be at the end of the cluster */
+      while(next && event_get_time(next) == time)
+	{
+	  event = next;
+	  next = event_get_next(event);
+	}	
+
+      /* output time */
+      fts_outlet_float(o, 1, (float)time);
+
+      /* output events of cluster */
+      prev = event;
+      while(prev && event_get_time(prev) == time)
+	{
+	  fts_array_clear(&this->array);
+	  event_append_state_to_array(prev, &this->array);
+	  
+	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+	  
+	  event = prev;
+	  prev = event_get_prev(prev);
+	}
+	
+      /* highligh in open edtior */
+      track_highlight_cluster(this->track, event, next);
+      
+      this->prev = prev;
+      this->next = next;
+
+      if(this->prev)
+	fts_object_refer(this->prev);
+
+      if(this->next)
+	fts_object_refer(this->next);
+    }
 }
 
 static void
@@ -191,7 +235,7 @@ seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   seqstep_t *this = (seqstep_t *)o;
 
-  seqstep_stop(o, 0, 0, 0, 0);
+  seqstep_reset(o, 0, 0, 0, 0);
 
   fts_object_release(this->track);
   this->track = track_atom_get(at);
@@ -211,6 +255,8 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   ac--;
   at++;
+
+  this->status = status_reset;
 
   this->prev = 0;
   this->next = 0;
@@ -246,8 +292,8 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqstep_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqstep_delete);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqstep_locate);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqstep_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("goto"), seqstep_goto);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), seqstep_reset);
   fts_method_define_varargs(cl, 0, fts_new_symbol("prev"), seqstep_prev);
   fts_method_define_varargs(cl, 0, fts_new_symbol("next"), seqstep_next);
   

@@ -321,7 +321,7 @@ bpf_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(array, onset + size * 2);  
+  fts_array_set_size(array, onset + size * 2); 
   atoms = fts_array_get_atoms(array) + onset;
 
   for(i=0; i<size; i++)
@@ -332,15 +332,18 @@ bpf_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 void
-bpf_copy(bpf_t *bpf, bpf_t *copy)
+bpf_copy(bpf_t *org, bpf_t *copy)
 {
-  int size = bpf_get_size(copy);
+  int size = bpf_get_size(org);
   int i;
 
   set_size(copy, size);
 
   for(i=0; i<size; i++)
-    copy->points[i] = bpf->points[i];
+    copy->points[i] = org->points[i];
+
+  if(bpf_editor_is_open(copy))
+    bpf_set_client(copy);
 }
 
 /************************************************************

@@ -51,8 +51,7 @@ typedef struct _wacom_
   unsigned char answer_string[WACOM_ANSWER_SIZE + 1];
   int answer_index;
   int init_trials;
-  int init_wait;
-  fts_timer_t *timer;
+  int initializing;
 
   /* tablet parameters */
   float version;
@@ -495,7 +494,9 @@ wacom_reset_buttons(wacom_t *this)
 static void
 wacom_init_stop(wacom_t *this)
 {
-  fts_timer_reset(this->timer);
+  if(this->initializing)
+    fts_timebase_remove_object(fts_get_timebase(), (fts_object_t *)this);
+
   fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
 }
 
@@ -675,6 +676,9 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
   this->answer_index = index;
 }
 
+static void wacom_init_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void wacom_init_timeout(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 static void
 wacom_init_start(wacom_t *this)
 {
@@ -688,38 +692,35 @@ wacom_init_start(wacom_t *this)
   wacom_init_send_string(this, wacom_string_reset);
 
   /* wait for reset */
-  this->init_wait = 1;
+  this->initializing = 1;
 
-  fts_timer_reset(this->timer);
-  fts_timer_set_delay(this->timer, WACOM_WAIT_RESET, 0);
+  fts_timebase_remove_object(fts_get_timebase(), (fts_object_t *)this);
+  fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, wacom_init_send, 0, WACOM_WAIT_RESET);
 }
 
 static void
-wacom_init_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wacom_init_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wacom_t *this = (wacom_t *)o;
 
-  if(this->init_wait)
-    {
-      /* waited for reset */
-      this->init_wait = 0;
+  /* now request model string */
+  wacom_init_send_string(this, wacom_string_request_model);
+  
+  /* set init timeout (all the rest is handled by the init callback) */
+  fts_timebase_add_call(fts_get_timebase(), o, wacom_init_timeout, 0, WACOM_REQUEST_TIMEOUT);
+}
 
-      /* now request model string */
-      wacom_init_send_string(this, wacom_string_request_model);
-      
-      /* set init timeout (all the rest is handled by the init callback) */
-      fts_timer_set_delay(this->timer, WACOM_REQUEST_TIMEOUT, 0);
-    }
+static void
+wacom_init_timeout(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  wacom_t *this = (wacom_t *)o;
+
+  wacom_init_stop(this);
+  
+  if(this->init_trials-- > 0)
+    wacom_init_start(this); /* retry */
   else
-    {
-      /* init timeout */
-      wacom_init_stop(this);
-      
-      if(this->init_trials-- > 0)
-	wacom_init_start(this);
-      else
-	post("wacom: can't init device (request timeout)\n");
-    }
+    post("wacom: can't init device (timeout after %d trials)\n", WACOM_INIT_TRIALS);
 }
 
 /************************************************************
@@ -792,8 +793,7 @@ wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  this->b3 = 0;
 	  this->fun = 0;
 
-	  this->timer = fts_timer_new(o, 0);
-	  this->init_wait = 0;
+	  this->initializing = 0;
 	  this->init_trials = 0;
 	  
 	  wacom_init_start(this);
@@ -811,10 +811,7 @@ wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   wacom_t *this = (wacom_t *)o;
 
   if(this->stream)
-    {
-      fts_timer_delete(this->timer);
-      fts_bytestream_remove_listener(this->stream, o);
-    }
+    fts_bytestream_remove_listener(this->stream, o);
 }
 
 static fts_status_t
@@ -824,8 +821,6 @@ wacom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wacom_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wacom_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, wacom_init_alarm);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), wacom_reset);
   

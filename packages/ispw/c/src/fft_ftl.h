@@ -22,7 +22,9 @@
 #include <utils.h>
 
 /* the control structure */
-typedef struct{
+typedef struct
+{
+  fts_object_t *object;
   complex *buf; /* input buffer */
   complex *spec; /* buffer for spectrum (has double size in tandem mode) */
   long in_idx;
@@ -30,7 +32,6 @@ typedef struct{
   int gap_size; /* number of samples to wait before collecting new input */
   int gap_count; /* counts down gap_ticks */
   long size; /* number of complex points in buffer */
-  fts_timer_t *timer;
 } fft_ctl_t;
 
 /* the dsp symbols */
@@ -67,8 +68,9 @@ extern void ftl_ifft_tandem(fts_word_t *argv);
 extern void ftl_fft_tandem_half(fts_word_t *argv);
 extern void ftl_ifft_tandem_half(fts_word_t *argv);
 
-
 extern void ftl_fft_real_miller(fts_word_t *argv);
 extern void ftl_ifft_real_miller(fts_word_t *argv);
 extern void ftl_fft_tandem_miller(fts_word_t *argv);
 extern void ftl_ifft_tandem_miller(fts_word_t *argv);
+
+extern void fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);

@@ -42,7 +42,6 @@
 typedef struct {
   fts_object_t o;
   fts_atom_list_t *atom_list;
-  fts_timer_t *timer;
   int value;
 } messbox_t;
 
@@ -550,21 +549,6 @@ static void messbox_update(fts_object_t *o)
 
 /************************************************************
  *
- *  tick
- *
- */
-
-static void messbox_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messbox_t *this = (messbox_t *)o;
-
-  this->value = 0;
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
-}
-
-
-/************************************************************
- *
  *  system methods
  *
  */
@@ -575,7 +559,6 @@ static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
    this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
 
-  this->timer = fts_timer_new(o, 0);
   this->value = 0;
 }
 
@@ -585,7 +568,6 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   messbox_t *this = (messbox_t *) o;
 
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
-  fts_timer_delete(this->timer);
 }
 
 
@@ -752,15 +734,26 @@ static void messbox_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     messbox_update(o);
 }
 
+static void messbox_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messbox_t *this = (messbox_t *)o;
+
+  this->value = 0;
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+}
+
+
 static void messbox_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
   messbox_t *this = (messbox_t *) o;
 
-  this->value = 1;
-  fts_object_ui_property_changed(o, fts_s_value);
+  if(this->value == 0)
+    {
+      this->value = 1;
+      fts_object_ui_property_changed(o, fts_s_value);
 
-  fts_timer_reset(this->timer);
-  fts_timer_set_delay(this->timer, DEFAULT_DURATION, 0);
+      fts_timebase_add_call(fts_get_timebase(), o, messbox_off, 0, DEFAULT_DURATION);
+    }
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
@@ -778,11 +771,6 @@ static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
  *
  */
 
-/* daemon to get the "value" property: the value property is set to 
- * one to actually bang the message, and reset to zero after a timer elapse;
- * it is used to make the message box flash like the messages; java is not
- * reialable for this kind of real time flashing.
- */
 static void messbox_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   messbox_t *this = (messbox_t *)obj;
@@ -796,8 +784,6 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messbox_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messbox_delete);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, messbox_tick);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, messbox_set);
 

@@ -19,280 +19,153 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
- * This files provides the time related objects:
+/***************************************************************************
  *
- *  - fts_timebase
- *  - fts_timer
- *  - fts_alarm
+ *  FTS time
  *
  */
 #include <fts/fts.h>
 #include <ftsprivate/time.h>
 #include <math.h>
 
-static fts_heap_t *timer_heap = 0;
-static fts_heap_t *alarm_heap = 0;
+/* the FTS master timebase */
 static fts_timebase_t *main_timebase = 0;
 
+static fts_heap_t *timebase_entry_heap = 0;
+
+
 /****************************************************************************
  *
- *  alarm
+ *  timebase scheduling entry
  *
  */
 
-static alarm_t *
-alarm_new(fts_timer_t *timer, double time, fts_atom_t *atom)
+typedef struct _timebase_entry_
 {
-  alarm_t *alarm = fts_heap_alloc(alarm_heap);
+  double time; /* when to trigger this entry */
+  fts_object_t *object;
+  fts_method_t method; /* entry callback method */
+  fts_atom_t atom; /* entry callback argument */
+  struct _timebase_entry_ *next; /* next entry in timebase */
+} timebase_entry_t;
 
-  alarm->timer = timer;
-  alarm->time = time;
-  fts_set_void(&alarm->atom);
 
+static timebase_entry_t *
+timebase_entry_new(fts_object_t *object, fts_method_t method, fts_atom_t *atom, double time)
+{
+  timebase_entry_t *entry = fts_heap_alloc(timebase_entry_heap);
+
+  entry->time = time;
+  entry->object = object;
+  entry->method = method;
+  fts_set_void(&entry->atom);
+
+  /* claim object */
+  fts_object_refer(object);
+
+  /* claim atom if object */
   if(atom)
-    fts_atom_assign(&alarm->atom, atom);
+    fts_atom_assign(&entry->atom, atom);
 
-  return alarm;
+  return entry;
 }
 
 static void
-alarm_free(alarm_t *alarm)
+timebase_entry_free(timebase_entry_t *entry)
 {
-  fts_atom_void(&alarm->atom);
-  fts_heap_free(alarm, alarm_heap);
+  fts_object_release(entry->object);
+  fts_atom_void(&entry->atom);
+  fts_heap_free(entry, timebase_entry_heap);
 }
+
 
 /****************************************************************************
  *
- *  timebase alarm utilities
+ *  timebase reset utilities
  *
  */
 
 static void
-timebase_insert_alarm(fts_timebase_t *timebase, alarm_t *alarm)
+timebase_insert_entry(fts_timebase_t *timebase, timebase_entry_t *entry)
 {
-  alarm_t **p = &timebase->alarms;
+  timebase_entry_t **p = &timebase->entries;
   
-  /* search in ordered list */
-  while(*p && (alarm->time >= (*p)->time))
+  /* place in ordered list */
+  while(*p && (entry->time >= (*p)->time))
     p = &((*p)->next);
   
   /* insert to list */
-  alarm->next = (*p);
-  *p = alarm;
+  entry->next = (*p);
+  *p = entry;
 }
 
 static void
-timebase_remove_alarms(fts_timebase_t *timebase)
+timebase_remove_entries(fts_timebase_t *timebase)
 {
-  /* remove all alarms */
-  while(timebase->alarms)
+  /* remove all entries */
+  while(timebase->entries)
     {
-      alarm_t *freeme = timebase->alarms;
-      fts_timer_t *timer = freeme->timer;
+      timebase_entry_t *freeme = timebase->entries;
       
-      /* remove the alarm from the list */
-      timebase->alarms = timebase->alarms->next;
-      timer->n_alarms--;
+      /* remove the entry from the list */
+      timebase->entries = timebase->entries->next;
       
-      /* free alarm */
-      alarm_free(freeme);
+      /* free entry */
+      timebase_entry_free(freeme);
     }
 }
 
 static void 
-timebase_fire_alarms(fts_timebase_t *timebase, double time)
+timebase_remove_slaves(fts_timebase_t *timebase)
 {
-  /* fire all current alarms */	  
-  while(timebase->alarms && timebase->alarms->time < time)
+  /* remove slaves form list and set their master to 0 */
+  while(timebase->slaves)
     {
-      alarm_t *fireme = timebase->alarms;
-      fts_timer_t *timer = fireme->timer;
-      
-      /* set logical time */
-      timebase->time = fireme->time;
-      
-      /* remove the alarm from the list */
-      timebase->alarms = timebase->alarms->next;
-      timer->n_alarms--;
-      
-      /* call the function */
-      timer->alarm(timer->object, 0, 0, 1, &fireme->atom);
+      /* get first slave in the list */
+      fts_timebase_t *slave = timebase->slaves;
 
-      /* free alarm */
-      alarm_free(fireme);
-    }
-}
+      /* remove slave from list */
+      timebase->slaves = slave->next;
 
+      /* reset master */
+      slave->master = 0;
+      slave->origin = 0;
 
-/****************************************************************************
- *
- *  timebase timer utilities
- *
- */
-
-static void
-timebase_add_timer(fts_timer_t **list, fts_timer_t *timer)
-{
-  /* insert to timer list */
-  timer->next = *list;
-  *list = timer;
-}
-
-static void
-timebase_remove_timer(fts_timer_t **list, fts_timer_t *timer)
-{
-  fts_timer_t **p;
-
-  for (p=list; *p; p=&(*p)->next)
-    {
-      if (*p == timer)
-	{
-	  /* remove from timer list */
-	  *p = (*p)->next;
-
-	  return;
-	}
-    }
-}
-
-static void
-timer_activate(fts_timer_t *timer)
-{
-  fts_timebase_t *timebase = timer->timebase;
-  
-  if(timer->locate)
-    timebase_remove_timer(&timebase->locate, timer);
-  else
-    timebase_remove_timer(&timebase->silent, timer);
-  
-  timebase_add_timer(&timebase->active, timer);
-  timer->active = 1;
-}
-
-static void
-timer_desactivate(fts_timer_t *timer)
-{
-  fts_timebase_t *timebase = timer->timebase;
-
-  timebase_remove_timer(&timebase->active, timer);
-  timer->active = 0;
-
-  if(timer->locate)
-    timebase_add_timer(&timebase->locate, timer);
-  else
-    timebase_add_timer(&timebase->silent, timer);
-}
-
-static void
-timer_remove_alarms(fts_timer_t *timer)
-{
-  fts_timebase_t *timebase = timer->timebase;
-  alarm_t **p = &timebase->alarms;
-  
-  while(*p)
-    {
-      if ((*p)->timer == timer)
-	{
-	  alarm_t *freeme = *p;
-	  
-	  /* remove from list */
-	  *p = (*p)->next;
-	  timer->n_alarms--;
-	  
-	  /* free alarm */
-	  alarm_free(freeme);
-
-	  if(timer->n_alarms == 0)
-	    return;
-	}
-      
-      p = &((*p)->next);
-    }
-}
-
-static void
-timer_flush_alarms(fts_timer_t *timer)
-{
-  fts_timebase_t *timebase = timer->timebase;
-  alarm_t **p = &timebase->alarms;
-  
-  while(*p)
-    {
-      if ((*p)->timer == timer)
-	{
-	  alarm_t *firenfreeme = *p;
-	  
-	  /* remove from list */
-	  *p = (*p)->next;
-	  timer->n_alarms--;
-	  
-	  /* call the function */
-	  timer->alarm(timer->object, 0, 0, 1, &firenfreeme->atom);
-
-	  /* free alarm */
-	  alarm_free(firenfreeme);
-
-	  if(timer->n_alarms == 0)
-	    return;
-	}
-      
-      p = &((*p)->next);
-    }
-}
-
-static void 
-timebase_call_active_timers(fts_timebase_t *timebase)
-{
-  fts_timer_t *timer;
-
-  for(timer=timebase->active; timer; timer=timer->next)
-    {
-      if(timer->tick)
-	timer->tick(timer->object, 0, 0, 0, 0);
-    }
-}
-
-static void 
-timebase_desactivate_timers(fts_timebase_t *timebase)
-{
-  /* remove active timers */
-  while(timebase->active)
-    {
-      /* get first timer in the list */
-      fts_timer_t *timer = timebase->active;
-
-      /* set inactive */
-      timer->active = 0;
-
-      /* remove from list of active timers */
-      timebase->active = timer->next;
-
-      /* add to one of the silent lists */
-      if(timer->locate)
-	timebase_add_timer(&timebase->locate, timer);
-      else
-	timebase_add_timer(&timebase->silent, timer);
+      /* release slave */
+      fts_object_release(slave);
     }
 }
   
+
 /****************************************************************************
  *
  *  timebase API
  *
  */
 void 
-fts_timebase_init(fts_timebase_t *timebase, double step)
+fts_timebase_init(fts_timebase_t *timebase)
 {
+  fts_class_t *class = fts_object_get_class((fts_object_t *)timebase);
+  fts_method_t tick = fts_class_get_method(class, fts_SystemInlet, fts_s_timebase_tick);
+  fts_method_t locate = fts_class_get_method(class, fts_SystemInlet, fts_s_timebase_locate);
+
   timebase->time = 0.0;
-  timebase->step = step;
+  timebase->step = 0.0;
 
-  timebase->silent = 0;
-  timebase->locate = 0;
-  timebase->active = 0;
+  /* time scheduling entries */
+  timebase->entries = 0;
 
-  timebase->alarms = 0;
+  /* for master */
+  timebase->slaves = 0;
+
+  /* for slave */
+  timebase->master = 0;
+  timebase->origin = 0;
+
+  timebase->tick = tick;
+  timebase->locate = locate;
+
+  timebase->next = 0;
 }
 
 void 
@@ -300,144 +173,214 @@ fts_timebase_reset(fts_timebase_t *timebase)
 {
   timebase->time = 0.0;
 
-  timebase_remove_alarms(timebase);
-  timebase_desactivate_timers(timebase);
+  timebase_remove_entries(timebase);
+  timebase_remove_slaves(timebase);
+}
+
+/***************************************************
+ *
+ *  derived timebases (slaves)
+ *
+ */
+
+void
+fts_timebase_add_slave(fts_timebase_t *timebase, fts_timebase_t *slave)
+{
+  /* timebase is inactive (never true for master!) and has a tick method */
+  if(!slave->master && slave->tick)
+    {
+      /* insert slave to list of slaves of timebase */
+      slave->next = timebase->slaves;
+      timebase->slaves = slave;
+
+      /* claim slave */
+      fts_object_refer(slave);
+
+      /* set timebase as master of slave */
+      slave->master = timebase;
+      slave->origin = timebase->origin;
+    }
+}
+
+void
+fts_timebase_remove_slave(fts_timebase_t *timebase, fts_timebase_t *slave)
+{
+  if(slave->master)
+    {
+      fts_timebase_t **p;
+      
+      /* search slave in list */
+      for (p=&timebase->slaves; *p; p=&(*p)->next)
+	{
+	  if (*p == slave)
+	    {
+	      /* remove from list */
+	      *p = (*p)->next;
+	      
+	      return;
+	    }
+	}
+      
+      /* reset master */
+      slave->master = 0;
+      slave->origin = 0;
+
+      /* release slave */
+      fts_object_release(slave);
+    }
+}
+
+void
+fts_timebase_advance_slaves(fts_timebase_t *timebase)
+{
+  fts_timebase_t *slave = timebase->slaves;
+
+  /* call timebase slaves */
+  while(slave)
+    {
+      fts_timebase_t *next = slave->next;
+
+      /* send tick */
+      if(slave->tick)
+	slave->tick((fts_object_t *)slave, 0, 0, 0, 0);
+      
+      /* reschedule all current entries to origin */
+      while(slave->entries && slave->entries->time < slave->time + slave->step)
+	{
+	  timebase_entry_t *entry = slave->entries;
+	  double retime = slave->origin->time + (entry->time - slave->time) * slave->origin->step / slave->step;
+	  
+	  /* remove the entry from the list */
+	  slave->entries = slave->entries->next;
+	  
+	  /* set time and schedule in origin */
+	  entry->time = retime;
+	  timebase_insert_entry(slave, entry);
+	}
+      
+      slave->time += slave->step;
+      
+      slave = next;
+    }
 }
 
 void 
-fts_timebase_tick(fts_timebase_t *timebase)
+fts_timebase_advance(fts_timebase_t *timebase)
 {
+  double tick_start = timebase->time;
   double time = timebase->time + timebase->step;
 
-  timebase_call_active_timers(timebase);
-  timebase_fire_alarms(timebase, time);
+  fts_timebase_advance_slaves(timebase);
+
+  /* fire all current entries */	  
+  while(timebase->entries && timebase->entries->time < time)
+    {
+      timebase_entry_t *entry = timebase->entries;
+      
+      /* remove the entry from the list */
+      timebase->entries = timebase->entries->next;
+
+      /* set logical time */
+      timebase->time = entry->time;
+      
+      /* call the function */
+      entry->method(entry->object, 0, 0, 1, &entry->atom);
+      
+      /* free entry */
+      timebase_entry_free(entry);
+    }
 
   timebase->time = time;
 }
 
 void
-fts_timebase_set_time(fts_timebase_t *timebase, double time)
+fts_timebase_locate(fts_timebase_t *timebase)
 {
-  fts_timer_t *timer;
+  fts_timebase_t *slave = timebase->slaves;
 
-  /* remove all pending alarms */
-  timebase_remove_alarms(timebase);
+  /* remove all scheduled entries */
+  timebase_remove_entries(timebase);
 
-  /* call or desactivate active timers */
-  for(timer=timebase->active; timer; timer=timer->next)
+  /* call slaves */
+  while(slave)
     {
-      if(timer->locate)
-	timer->locate(timer->object, 0, 0, 0, 0);
+      fts_timebase_t *next = slave->next;
+
+      if(slave->locate)
+	slave->locate((fts_object_t *)slave, 0, 0, 0, 0);
       else
-	timer_desactivate(timer);
+	{
+	  fts_timebase_locate(slave);
+	  fts_timebase_remove_slave(timebase, slave);
+	}
+
+      slave = next;
     }
-
-  /* call silent locatable timers */
-  for(timer=timebase->locate; timer; timer=timer->next)
-    timer->locate(timer->object, 0, 0, 0, 0);
 }
 
-double
-fts_timebase_get_time(fts_timebase_t *timebase)
-{
-  return timebase->time;
-}
-
-
-/****************************************************************************
+/***************************************************
  *
- *  timer
+ *  timebase method scheduling
  *
  */
-fts_timer_t *
-fts_timer_new(fts_object_t *object, fts_timebase_t *timebase)
-{ 
-  fts_timer_t *timer = fts_heap_alloc(timer_heap);
-  fts_class_t *class = fts_object_get_class(object);
-  fts_method_t tick = fts_class_get_method(class, fts_SystemInlet, fts_s_timer_tick);
-  fts_method_t alarm = fts_class_get_method(class, fts_SystemInlet, fts_s_timer_alarm);
-  fts_method_t locate = fts_class_get_method(class, fts_SystemInlet, fts_s_timer_locate);
-  
-  if(timebase)
-    timer->timebase = timebase;
-  else
-    timer->timebase = main_timebase;
-  
-  timer->object = object;
-
-  timer->tick = tick;
-  timer->alarm = alarm;
-  timer->locate = locate;
-
-  timer->active = 0;
-  timer->n_alarms = 0.0;
-  timer->next = 0;
-
-  if(locate)
-    timebase_add_timer(&timer->timebase->locate, timer);
-  else
-    timebase_add_timer(&timer->timebase->silent, timer);    
-
-  return timer;
-}
-
-void
-fts_timer_reset(fts_timer_t *timer)
-{
-  if(timer->n_alarms > 0)
-    timer_remove_alarms(timer);
-
-  if(timer->active)
-    timer_desactivate(timer);
-}
-
-void
-fts_timer_flush(fts_timer_t *timer)
-{
-  if(timer->n_alarms > 0)
-    timer_flush_alarms(timer);
-}
-
-void
-fts_timer_delete(fts_timer_t *timer)
-{
-  fts_timer_reset(timer);
-  fts_heap_free(timer, timer_heap);
-}
 
 void 
-fts_timer_activate(fts_timer_t *timer)
+fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, fts_atom_t *atom, double delay)
 {
-  if(timer->tick)
-    timer_activate(timer);
+  timebase_entry_t *entry;
+
+  if(delay > 0.0)
+    entry = timebase_entry_new(object, method, atom, timebase->time + delay);
+  else
+    entry = timebase_entry_new(object, method, atom, timebase->time);
+    
+  timebase_insert_entry(timebase, entry);
 }
 
 void
-fts_timer_set_alarm(fts_timer_t *timer, double time, fts_atom_t *atom)
+fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object)
 {
-  fts_timebase_t *timebase = timer->timebase;
-
-  if(timer->alarm && time >= timebase->time)
+  timebase_entry_t **p = &timebase->entries;
+  
+  while(*p)
     {
-      alarm_t *alarm = alarm_new(timer, time, atom);
-
-      timebase_insert_alarm(timebase, alarm);
-      timer->n_alarms++;
+      if ((*p)->object == object)
+	{
+	  timebase_entry_t *freeme = *p;
+	  
+	  /* remove from list */
+	  *p = (*p)->next;
+	  
+	  /* free entry */
+	  timebase_entry_free(freeme);
+	}
+      else
+	p = &((*p)->next);
     }
 }
 
-void 
-fts_timer_set_delay(fts_timer_t *timer, double delay, fts_atom_t *atom)
+void
+fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object)
 {
-  fts_timebase_t *timebase = timer->timebase;
-  double time = timebase->time + delay;
-      
-  if(timer->alarm && time >= timebase->time)
+  timebase_entry_t **p = &timebase->entries;
+  
+  while(*p)
     {
-      alarm_t *alarm = alarm_new(timer, time, atom);
+      if ((*p)->object == object)
+	{
+	  timebase_entry_t *freeme = *p;
+	  
+	  /* remove from list */
+	  *p = (*p)->next;
+	  
+	  /* call the function */
+	  freeme->method(freeme->object, 0, 0, 1, &freeme->atom);
 
-      timebase_insert_alarm(timebase, alarm);
-      timer->n_alarms++;
+	  /* free entry */
+	  timebase_entry_free(freeme);
+	}
+      else
+	p = &((*p)->next);
     }
 }
 
@@ -448,9 +391,15 @@ fts_timer_set_delay(fts_timer_t *timer, double delay, fts_atom_t *atom)
  */
 
 void
-fts_time_set_timebase(fts_timebase_t *timebase)
+fts_set_timebase(fts_timebase_t *timebase)
 {
   main_timebase = timebase;
+}
+
+fts_timebase_t *
+fts_get_timebase(void)
+{
+  return main_timebase;
 }
 
 double 
@@ -462,6 +411,5 @@ fts_get_time(void)
 void 
 fts_kernel_time_init(void)
 {
-  timer_heap = fts_heap_new(sizeof(fts_timer_t));
-  alarm_heap = fts_heap_new(sizeof(alarm_t));
+  timebase_entry_heap = fts_heap_new(sizeof(timebase_entry_t));
 }

@@ -79,7 +79,7 @@ VERSION = @VERSION@
 
 packagedir = $(pkgdatadir)/packages/midi/c
 package_LTLIBRARIES = libmidi.la
-libmidi_la_SOURCES =  midi.c midiin.c midiout.c rawmidiport.c sysex.c 
+libmidi_la_SOURCES =  midi.c midiin.c midiout.c midiport.c rawmidiport.c sysex.c 
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
@@ -93,8 +93,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libmidi_la_LDFLAGS = 
 libmidi_la_LIBADD = 
-libmidi_la_OBJECTS =  midi.lo midiin.lo midiout.lo rawmidiport.lo \
-sysex.lo
+libmidi_la_OBJECTS =  midi.lo midiin.lo midiout.lo midiport.lo \
+rawmidiport.lo sysex.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -108,7 +108,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/midi.P .deps/midiin.P .deps/midiout.P \
-.deps/rawmidiport.P .deps/sysex.P
+.deps/midiport.P .deps/rawmidiport.P .deps/sysex.P
 SOURCES = $(libmidi_la_SOURCES)
 OBJECTS = $(libmidi_la_OBJECTS)
 

@@ -34,47 +34,42 @@ typedef struct _pipe_
   fts_object_t o;
   int ac;
   fts_atom_t *at;
-  double del_time;
+  double delay;
   fts_heap_t *heap;
-  fts_timer_t *timer;
 } pipe_t;
 
 static void
-pipe_delay_list(pipe_t *this)
-{
-  fts_atom_t *at = (fts_atom_t *)fts_heap_alloc(this->heap);
-  int i;
-  
-  for(i=0; i<this->ac; i++)
-    {
-      fts_set_void(at + i);
-      fts_atom_assign(at + i, this->at + i);
-    }
-
-  /* reset alarm to first list member */
-  fts_timer_set_delay(this->timer, this->del_time, at);
-}
-
-/****************************************************
- *
- *  methods
- *
- */
-
-static void
-pipe_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pipe_t *this = (pipe_t *)o;
+  fts_atom_t *atoms = (fts_atom_t *)fts_get_ptr(at);
   int i;
 
   /* output single atoms of current list */
   for(i=this->ac-1; i>=0; i--)
     {
-      fts_outlet_send(o, i, fts_get_selector(at + i), 1, at + i);
-      fts_atom_void(at + i);
+      fts_outlet_send(o, i, fts_get_selector(atoms + i), 1, atoms + i);
+      fts_atom_void(atoms + i);
     }
 
-  fts_heap_free(at, this->heap);
+  fts_heap_free(atoms, this->heap);
+}
+
+static void
+pipe_delay_list(pipe_t *this)
+{
+  fts_atom_t *atoms = (fts_atom_t *)fts_heap_alloc(this->heap);
+  fts_atom_t a;
+  int i;
+  
+  for(i=0; i<this->ac; i++)
+    {
+      fts_set_void(atoms + i);
+      fts_atom_assign(atoms + i, this->at + i);
+    }
+
+  fts_set_ptr(&a, atoms);
+  fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, pipe_output, &a, this->delay);
 }
 
 static void
@@ -103,15 +98,15 @@ pipe_atom_middle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-pipe_atom_del_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_atom_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pipe_t *this = (pipe_t *)o;
-  double del_time = fts_get_number_float(at);
+  double delay = fts_get_number_float(at);
 
-  if(del_time < 0)
-    del_time = 0.0;
+  if(delay < 0)
+    delay = 0.0;
 
-  this->del_time = del_time;
+  this->delay = delay;
 }
 
 static void
@@ -128,7 +123,7 @@ pipe_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_atom_assign(this->at + i, at + i);
 
   if(ac > this->ac && fts_is_number(at + this->ac))
-    pipe_atom_del_time(o, 0, 0, 1, at + this->ac);
+    pipe_atom_delay(o, 0, 0, 1, at + this->ac);
   
   pipe_delay_list(this);
 }
@@ -138,7 +133,7 @@ pipe_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   pipe_t *this = (pipe_t *)o;
 
-  fts_timer_reset(this->timer);
+  fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 static void
@@ -146,7 +141,7 @@ pipe_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   pipe_t *this = (pipe_t *)o;
 
-  fts_timer_flush(this->timer);
+  fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 /****************************************************
@@ -180,9 +175,9 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       
       if(fts_is_number(at + this->ac))
-	pipe_atom_del_time(o, 0, 0, 1, at + this->ac);
+	pipe_atom_delay(o, 0, 0, 1, at + this->ac);
       else
-	this->del_time = 0.0;
+	this->delay = 0.0;
     }
   else
     {
@@ -193,12 +188,10 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_set_int(this->at, 0);
 
       if(ac > 0 && fts_is_number(at))
-	pipe_atom_del_time(o, 0, 0, 1, at);
+	pipe_atom_delay(o, 0, 0, 1, at);
       else
-	this->del_time = 0.0;
+	this->delay = 0.0;
     }
-
-  this->timer = fts_timer_new(o, 0);
 }
 
 static void
@@ -232,8 +225,6 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pipe_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pipe_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, pipe_alarm);
-
   fts_method_define_varargs(cl, 0, fts_s_bang,  pipe_bang);
   fts_method_define_varargs(cl, 0, fts_s_clear, pipe_clear);
   fts_method_define_varargs(cl, 0, fts_s_flush, pipe_flush);
@@ -250,8 +241,8 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, i, fts_s_symbol, pipe_atom_middle);
     }
 
-  fts_method_define_varargs(cl, i, fts_s_int, pipe_atom_del_time);
-  fts_method_define_varargs(cl, i, fts_s_float, pipe_atom_del_time);
+  fts_method_define_varargs(cl, i, fts_s_int, pipe_atom_delay);
+  fts_method_define_varargs(cl, i, fts_s_float, pipe_atom_delay);
 
   return fts_Success;
 }

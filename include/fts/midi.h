@@ -231,12 +231,12 @@ typedef struct fts_midievent
 
 /* channel events */
 #define fts_midievent_is_channel_message(e) ((e)->type <= midi_type_pitch_bend)
-#define fts_midievent_is_note(e) ((e)->type = midi_type_note)
-#define fts_midievent_is_poly_pressure(e) ((e)->type = midi_type_poly_pressure)
-#define fts_midievent_is_control_change(e) ((e)->type = midi_type_control_change)
-#define fts_midievent_is_program_change(e) ((e)->type = midi_type_program_change)
-#define fts_midievent_is_channel_pressure(e) ((e)->type = midi_type_channel_pressure)
-#define fts_midievent_is_pitch_bend(e) ((e)->type = midi_type_pitch_bend)
+#define fts_midievent_is_note(e) ((e)->type == midi_type_note)
+#define fts_midievent_is_poly_pressure(e) ((e)->type == midi_type_poly_pressure)
+#define fts_midievent_is_control_change(e) ((e)->type == midi_type_control_change)
+#define fts_midievent_is_program_change(e) ((e)->type == midi_type_program_change)
+#define fts_midievent_is_channel_pressure(e) ((e)->type == midi_type_channel_pressure)
+#define fts_midievent_is_pitch_bend(e) ((e)->type == midi_type_pitch_bend)
 
 #define fts_midievent_channel_message_get_channel(e) ((e)->id)
 #define fts_midievent_channel_message_get_first(e) ((e)->data.channel_message.first)
@@ -256,6 +256,12 @@ FTS_API fts_midievent_t *fts_midievent_control_change_new(int channel, int numbe
 FTS_API fts_midievent_t *fts_midievent_program_change_new(int channel, int number);
 FTS_API fts_midievent_t *fts_midievent_channel_pressure_new(int channel, int value);
 FTS_API fts_midievent_t *fts_midievent_pitch_bend_new(int channel, int LSB, int MSB);
+
+
+#define fts_set_midievent(ap, x) \
+     do {fts_set_object_type(ap, fts_s_midievent); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
+#define fts_get_midievent(ap) ((fts_midievent_t *)fts_word_get_object(fts_atom_value(ap)))
+#define fts_is_midievent(ap) fts_is_a(ap, fts_s_midievent)
 
 /* system exclusive events */
 #define fts_midievent_is_system_exclusive(e) ((e)->type == midi_type_system && (e)->id == midi_system_exclusive)

@@ -45,7 +45,6 @@ extern void route_config(void);
 extern void select_config(void);
 extern void speedlim_config(void);
 extern void split_config(void);
-extern void time_config(void);
 extern void timer_config(void);
 extern void trigger_config(void);
 extern void unpack_config(void);
@@ -166,7 +165,6 @@ ispw_config(void)
   select_config();
   speedlim_config();
   split_config();
-  time_config();
   timer_config();
   trigger_config();
   unpack_config();

@@ -4,5 +4,6 @@ libmidi_la_SOURCES= \
 midi.c \
 midiin.c \
 midiout.c \
+midiport.c \
 rawmidiport.c \
 sysex.c 

@@ -44,11 +44,11 @@ typedef struct{
 typedef struct{
   fts_object_t head;
   fts_symbol_t name;
+  int bang_out;
   fft_ctl_t ctl; /* pointer to control block */
   long hop; /* hop in samples of FFT (at least size) */
   long phase; /* onset of fft frame within the hop size */
   long spec_size;
-  int bang_out;
 } fft_t;
 
 enum{
@@ -65,7 +65,7 @@ enum{
  *
  */
 
-static void
+void
 fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_bang((fts_object_t *)o, ((fft_t *)o)->bang_out);
@@ -83,8 +83,6 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   complex *buf = 0;
   complex *spec = 0;
   long spec_size;
-
-  x->ctl.timer = fts_timer_new(o, 0);
 
   x->name = fts_get_symbol_arg(ac, at, 0, sym_fft);
   x->bang_out = fft_class->bang_out;
@@ -138,6 +136,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       return;
     }
 
+  x->ctl.object = o;
   x->ctl.buf = buf;
   x->ctl.spec = spec;
   x->ctl.size = size;
@@ -153,8 +152,6 @@ static void
 fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
-
-  fts_timer_delete(x->ctl.timer);
 
   if(x->ctl.buf) 
     fts_free((void *)x->ctl.buf);
@@ -461,8 +458,6 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fft_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fft_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_put_all);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, fft_output_bang);
 
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);

@@ -71,23 +71,28 @@ pt_common_init_millers_kernels(void)
 void 
 pt_common_print_millers_kernels(int channel)
 {
-  if(channel < 0 || channel >= filter_bank_max->n_channels){
-    post("filter bank:\n");
-    post("# of filters: %d\n", filter_bank_max->n_channels);
-    post("coeffs in total: %d\n", filter_bank_max->n_all_coeffs);
-    post("channels per octave: %d\n", filter_bank_max->channels_per_octave);
-    post("q-factor: %f\n", filter_bank_max->q_factor);
-    post("coefficient cutoff: %f\n", filter_bank_max->coeff_cut);
-  }else{
-    int j;
-    post("___________________\n");
-    post("kernel #%d\n", channel);
-    post("  onset: %d\n",filter_bank_max->kernels[channel].onset);
-    post("  correct: %f\n", filter_bank_max->kernels[channel].pow_corr);
-    post("  %d coeffs:\n", filter_bank_max->kernels[channel].n_filter_coeffs);
-    for(j=0; j<filter_bank_max->kernels[channel].n_filter_coeffs; j++)
-      post("\t%f\n", filter_bank_max->kernels[channel].filter_coeffs[j]);
-  }
+  if(channel < 0 || channel >= filter_bank_max->n_channels)
+    {
+      post("filter bank:\n");
+      post("# of filters: %d\n", filter_bank_max->n_channels);
+      post("coeffs in total: %d\n", filter_bank_max->n_all_coeffs);
+      post("channels per octave: %d\n", filter_bank_max->channels_per_octave);
+      post("q-factor: %f\n", filter_bank_max->q_factor);
+      post("coefficient cutoff: %f\n", filter_bank_max->coeff_cut);
+    }
+  else
+    {
+      int j;
+
+      post("___________________\n");
+      post("kernel #%d\n", channel);
+      post("  onset: %d\n",filter_bank_max->kernels[channel].onset);
+      post("  correct: %f\n", filter_bank_max->kernels[channel].pow_corr);
+      post("  %d coeffs:\n", filter_bank_max->kernels[channel].n_filter_coeffs);
+
+      for(j=0; j<filter_bank_max->kernels[channel].n_filter_coeffs; j++)
+	post("\t%f\n", filter_bank_max->kernels[channel].filter_coeffs[j]);
+    }
 }
 
 /*************************************************
@@ -100,18 +105,21 @@ void
 pt_common_millers_bounded_q(complex *fft_spectrum, kernel_t *filter, float *q_pow_spec, int n_channels)
 {
   int i, j;
-  for(i=0; i<n_channels; i++){
-    float re = 0;
-    float im = 0;
-    complex *band = fft_spectrum + filter[i].onset/2; /* onset made for float buffer */
-    
-    for(j=0; j<filter[i].n_filter_coeffs; j++){
-      float coef = filter[i].filter_coeffs[j];
-      re += band[j].re * coef;
-      im += band[j].im * coef;
+
+  for(i=0; i<n_channels; i++)
+    {
+      float re = 0;
+      float im = 0;
+      complex *band = fft_spectrum + filter[i].onset/2; /* onset made for float buffer */
+      
+      for(j=0; j<filter[i].n_filter_coeffs; j++)
+	{
+	  float coef = filter[i].filter_coeffs[j];
+	  re += band[j].re * coef;
+	  im += band[j].im * coef;
+	}
+      q_pow_spec[i] = re * re + im * im;
     }
-    q_pow_spec[i] = re * re + im * im;
-  }
 }
 
 
@@ -143,18 +151,23 @@ pt_common_init_millers_dumsqrt(void)
 {
   int i;
   
-  if(millers_dumbtabs_are_allready_initialized) return;
+  if(millers_dumbtabs_are_allready_initialized) 
+    return;
   
-  for (i=0; i<256; i++){
-    float f;
-    long l = (i ? (i == 256-1 ? 256-2 : i) : 1)<< 23;
-    *(long *)(&f) = l;
-    millers_dumbtab1[i] = sqrt(f);  
-  }
-  for (i=0; i<1024; i++){
-    float f = 1 + (1.0f/1024) * i;
-    millers_dumbtab2[i] = sqrt(f);  
-  }
+  for (i=0; i<256; i++)
+    {
+      float f;
+      long l = (i ? (i == 256-1 ? 256-2 : i) : 1)<< 23;
+      *(long *)(&f) = l;
+      millers_dumbtab1[i] = sqrt(f);  
+    }
+
+  for (i=0; i<1024; i++)
+    {
+      float f = 1 + (1.0f/1024) * i;
+      millers_dumbtab2[i] = sqrt(f);  
+    }
+
   millers_dumbtabs_are_allready_initialized = 1;
 }
 
@@ -162,8 +175,11 @@ double pt_common_millers_dumsqrt(double d)
 {
   float f = d;
   long l = *(long *)(&f);
-  if (f < 0) return (0.0f);
-  else return (millers_dumbtab1[(l >> 23) & 0xff] * millers_dumbtab2[(l >> 13) & 0x3ff]);
+  
+  if (f < 0) 
+    return (0.0f);
+  else 
+    return (millers_dumbtab1[(l >> 23) & 0xff] * millers_dumbtab2[(l >> 13) & 0x3ff]);
 }
 #endif
 
@@ -202,7 +218,9 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
   }
 */
   pt_common_millers_bounded_q((complex *)fft_buf, filter_bank_max->kernels, q_pow_spec, n_channels);
-  for(i=n_channels; i<n_channels+pt_common_EXTRA_CHANNELS; i++) q_pow_spec[i] = 0; /* zero end of buffer */
+
+  for(i=n_channels; i<n_channels+pt_common_EXTRA_CHANNELS; i++) 
+    q_pow_spec[i] = 0; /* zero end of buffer */
 /*
   if(print_out >= 2){
     post("  raw filter output:\n");
@@ -211,8 +229,11 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
   }
 */
   /* compute amplitudes (????... ask Miller why and why like this!) */
-  for(i=0; i<n_channels; i++) q_amp_spec[i] = pt_common_millers_dumsqrt(q_pow_spec[i]);
-  for( ; i<n_channels+pt_common_EXTRA_CHANNELS; i++) q_amp_spec[i] = 0;
+  for(i=0; i<n_channels; i++) 
+    q_amp_spec[i] = pt_common_millers_dumsqrt(q_pow_spec[i]);
+
+  for( ; i<n_channels+pt_common_EXTRA_CHANNELS; i++) 
+    q_amp_spec[i] = 0;
   
 /*
   if(print_out >= 2){
@@ -232,41 +253,39 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
 
     /* look for bin with max. power in itself and first few partials */
     index = 0;
-    for(i=0; i<n_channels; i++){ /* for each filter band */
-      float *bin = q_amp_spec + i;
-      float tone_weight =
-        bin[PB_0] * coeffs[0] + bin[PB_1] * coeffs[1] +
-        bin[PB_2] * coeffs[2] + bin[PB_3] * coeffs[3] +
-        bin[PB_4] * coeffs[4] + bin[PB_5] * coeffs[5] +
-        bin[PB_6] * coeffs[6] + bin[PB_7] * coeffs[7];
-      tone_weights[i] = tone_weight;
-      if(
-        tone_weight > best_weight &&
-        i >= index_low &&
-        i <= index_high
-      ){
-        best_weight = tone_weight;
-        index = i;
+    for(i=0; i<n_channels; i++)
+      { /* for each filter band */
+	float *bin = q_amp_spec + i;
+	float tone_weight =
+	  bin[PB_0] * coeffs[0] + bin[PB_1] * coeffs[1] +
+	  bin[PB_2] * coeffs[2] + bin[PB_3] * coeffs[3] +
+	  bin[PB_4] * coeffs[4] + bin[PB_5] * coeffs[5] +
+	  bin[PB_6] * coeffs[6] + bin[PB_7] * coeffs[7];
+	tone_weights[i] = tone_weight;
+	if(tone_weight > best_weight && i >= index_low && i <= index_high)
+	  {
+	    best_weight = tone_weight;
+	    index = i;
+	  }
       }
-    }
-
-    if(index < index_low) return(0);
+    
+    if(index < index_low) 
+      return(0);
 
     /* possibly stick to previous pitch */
-    if(last_index){
-      if(tone_weights[last_index-1] > tone_weights[last_index] && last_index > index_low) last_index--;
-      else if(tone_weights[last_index+1] > tone_weights[last_index] && last_index < index_high) last_index++;
-      if(tone_weights[last_index] > (1.0f - x->ctl.pitch_stick) * best_weight) index = last_index;
-    }
+    if(last_index)
+      {
+	if(tone_weights[last_index-1] > tone_weights[last_index] && last_index > index_low) 
+	  last_index--;
+	else if(tone_weights[last_index+1] > tone_weights[last_index] && last_index < index_high) 
+	  last_index++;
+
+	if(tone_weights[last_index] > (1.0f - x->ctl.pitch_stick) * best_weight) 
+	  index = last_index;
+      }
+
     found = q_pow_spec + index;
   }
-  
-/*
-  if(print_out){
-    post("  candidate\n");
-    post("    index: %d\n", index);
-  }
-*/
   
   /* total and harmonic power */
   {
@@ -288,52 +307,56 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
      */
   }
 
-/*
-  if(print_out){
-    float quality = (*total_power > 0.0f)? (100.0f * sqrt(*pitch_power / *total_power)): (0.0f);
-    post("    power: %f pitched, %f total (%f%%)\n",
-      sqrt(*pitch_power)/n_points,
-      sqrt(*total_power)/n_points,
-      quality
-    );
-  }
-*/
-
   /* do a parabolic correction to increase precision */
-  if(!x->ctl.pitch_rough){
-    float lower = (
-      found[PB_0-1] + 2.0f * found[PB_1-1] + 3.0f * found[PB_2-1] + 4.0f * found[PB_3-1] +
-      5.0f * found[PB_4-1] + 6.0f * found[PB_5-1] + 7.0f * found[PB_6-1] + 8.0f * found[PB_7-1]
-    );
-    float this = (
-      found[PB_0] + 2.0f * found[PB_1] + 3.0f * found[PB_2] + 4.0f * found[PB_3] +
-      5.0f * found[PB_4] + 6.0f * found[PB_5] + 7.0f * found[PB_6] + 8.0f * found[PB_7]
-    );  
-    float higher = (
-      found[PB_0+1] + 2.0f * found[PB_1+1] + 3.0f * found[PB_2+1] + 4.0f * found[PB_3+1] +
-      5.0f * found[PB_4+1] + 6.0f * found[PB_5+1] + 7.0f * found[PB_6+1] + 8.0f * found[PB_7+1]
-    );  
-  
-    if(lower >= this) correct = -0.5f;
-    else if(higher >= this) correct = 0.5f;
-    else{
-      float a = 1.0f - lower / this;
-      float b = 1.0f - higher / this;
-      correct = (a - b) / (2.0f * (a + b) - 3.0f * a * b);
+  if(!x->ctl.pitch_rough)
+    {
+      float lower = (found[PB_0-1] + 
+		     2.0f * found[PB_1-1] + 
+		     3.0f * found[PB_2-1] + 
+		     4.0f * found[PB_3-1] +
+		     5.0f * found[PB_4-1] + 
+		     6.0f * found[PB_5-1] + 
+		     7.0f * found[PB_6-1] + 
+		     8.0f * found[PB_7-1]);
+      float this = (found[PB_0] + 
+		    2.0f * found[PB_1] + 
+		    3.0f * found[PB_2] + 
+		    4.0f * found[PB_3] +
+		    5.0f * found[PB_4] + 
+		    6.0f * found[PB_5] + 
+		    7.0f * found[PB_6] + 
+		    8.0f * found[PB_7]);  
+      float higher = (found[PB_0+1] + 
+		      2.0f * found[PB_1+1] + 
+		      3.0f * found[PB_2+1] + 
+		      4.0f * found[PB_3+1] +
+		      5.0f * found[PB_4+1] + 
+		      6.0f * found[PB_5+1] + 
+		      7.0f * found[PB_6+1] + 
+		      8.0f * found[PB_7+1]);  
+      
+      if(lower >= this) 
+	correct = -0.5f;
+      else if(higher >= this) 
+	correct = 0.5f;
+      else
+	{
+	  float a = 1.0f - lower / this;
+	  float b = 1.0f - higher / this;
+	  correct = (a - b) / (2.0f * (a + b) - 3.0f * a * b);
+	}
+
+      *candidate = index + correct;
     }
-    *candidate = index + correct;
-  }else{
+  else
     *candidate = index;
-  }
   
   /* pitch o.k.? */
-  if(
-    *pitch_power < x->ctl.power_off ||
-    *pitch_power < x->ctl.quality_off * *total_power
-  ){
-    x->stat.last_index = 0;
-    return(0);
-  }
+  if(*pitch_power < x->ctl.power_off || *pitch_power < x->ctl.quality_off * *total_power)
+    {
+      x->stat.last_index = 0;
+      return(0);
+    }
   
   /* remember the index for pitch-stick test next time if note is still really on */
   if(*pitch_power <= x->ctl.power_on)
@@ -363,12 +386,11 @@ float pt_common_candidate_midi_pitch(pt_common_obj_t *x, float candidate)
 static filter_bank_t *
 filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
 {
-  int i;
   int n_channels = (channels_per_octave * (log(n_points) * 1.442695041f - 2)); /* 1.0f/ln(2) = 1.442695041 */
-    /* - 2: drops negative frequencies and lowest two points */
+  /* - 2: drops negative frequencies and lowest two points */
   float q_factor = exp(0.693147181f / (float) channels_per_octave) - 1.0f; /* ln(2) = 0.693147181 */
   int coeff_space = (4 * n_channels + 2 * n_points);
-    /* estimates total size of kernels: cover the whole spectrum 4 times and overlap 4 points apiece */
+  /* estimates total size of kernels: cover the whole spectrum 4 times and overlap 4 points apiece */
   float cutoff = exp(2.302585093f * coeff_cut/20); /* ln(10) = 2.302585093 */
   int n_all_coeffs = 0;
   complex *fft_buf = (complex *)0;
@@ -376,6 +398,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   kernel_t *kernels = (kernel_t *)0;
   float *all_coeffs = (float *)0;
   float freq;
+  int i;
   
   fft_buf = (complex *)fts_malloc(n_points * sizeof(complex));
   if ( !fft_buf)
@@ -413,62 +436,73 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
 
   /* lowest octave starts at point #2 -> freq=2./n_points */
   freq = 2.0f/n_points;
-  for(i=0; i<n_channels; i++){
-    float bandwidth = q_factor * freq;
-    float filter_length = 1.0f / bandwidth; /* fixed filter cross over at 0.5f amplitude of hanning fr. */
-    float wind_length = (filter_length > (float)n_points)? ((float)n_points): (filter_length);
-    float wind_norm = 1.0f / wind_length;    /* normalize window */
-    float correct = wind_length / filter_length;
-    float d_wind_phase = FTS_TWO_PI / wind_length;
-    float d_sine_phase = freq * FTS_TWO_PI;
-    int down, up, j;
-    int n_filter_coeffs;
-    int i;
-    
-    for(i=0; i<n_points; i++)
-      fft_buf[i].re = fft_buf[i].im = 0.0;
-
-    fft_buf[n_points/2].re = wind_norm;
-    fft_buf[n_points/2].im = 0;
-    for(down=n_points/2-1, up=n_points/2+1, j=1; j<wind_length/2; j++, up++, down--){
-      double wind = wind_norm * (0.5f + 0.5f * cos(j * d_wind_phase));
-      fft_buf[down].re = fft_buf[up].re = cos(j * d_sine_phase) * wind;
-      fft_buf[down].im = -(fft_buf[up].im = sin(j * d_sine_phase) * wind);
-    }
-    
-    fts_fft_declaresize(n_points);
-    fts_cfft_inplc(fft_buf, n_points);
-    
-    for(down = n_points/2-1; down >= 0; down--){
-      float f = fft_buf[down].re;
-      if(f > cutoff || f < -cutoff) break;
-    }
-    for(up = 0; up < n_points/2; up++){
-      float f = fft_buf[up].re;
-      if(f > cutoff || f < -cutoff) break;
-    }
-    if(up>=down){
-      static int bugged = 0;
-      if(!bugged){
-        post("filter bank initialisation failed\n");
-        bugged = 1;
-      }
-      up = down;
-    }
+  for(i=0; i<n_channels; i++)
+    {
+      float bandwidth = q_factor * freq;
+      float filter_length = 1.0f / bandwidth; /* fixed filter cross over at 0.5f amplitude of hanning fr. */
+      float wind_length = (filter_length > (float)n_points)? ((float)n_points): (filter_length);
+      float wind_norm = 1.0f / wind_length;    /* normalize window */
+      float correct = wind_length / filter_length;
+      float d_wind_phase = FTS_TWO_PI / wind_length;
+      float d_sine_phase = freq * FTS_TWO_PI;
+      int n_filter_coeffs;
+      int down, up;
+      int j;
       
-    n_filter_coeffs = down - up + 1;
-    
-    kernels[i].filter_coeffs = all_coeffs + n_all_coeffs; /* here the coeffs are found then */
-    kernels[i].n_filter_coeffs = n_filter_coeffs;
-    kernels[i].onset = up * 2; /* * 2: onset for float instead of complex */
-    kernels[i].pow_corr = correct;
-    /* copy coeffs to the *all_coeffs vector */
-
-    for(j=n_all_coeffs; j<n_all_coeffs+n_filter_coeffs; j++, up++) all_coeffs[j] = fft_buf[up].re;
-    n_all_coeffs += n_filter_coeffs;
-
-    freq += freq * q_factor;
-  }
+      for(j=0; j<n_points; j++)
+	fft_buf[j].re = fft_buf[j].im = 0.0;
+      
+      fft_buf[n_points/2].re = wind_norm;
+      fft_buf[n_points/2].im = 0;
+       
+      for(down=n_points/2-1, up=n_points/2+1, j=1; j<wind_length/2; j++, up++, down--)
+	{
+	  double wind = wind_norm * (0.5f + 0.5f * cos(j * d_wind_phase));
+	  fft_buf[down].re = fft_buf[up].re = cos(j * d_sine_phase) * wind;
+	  fft_buf[down].im = -(fft_buf[up].im = sin(j * d_sine_phase) * wind);
+	}
+      
+      fts_fft_declaresize(n_points);
+      fts_cfft_inplc(fft_buf, n_points);
+      
+      for(down = n_points/2-1; down >= 0; down--)
+	{
+	  float f = fft_buf[down].re;
+	  if(f > cutoff || f < -cutoff) break;
+	}
+      
+      for(up = 0; up < n_points/2; up++)
+	{
+	  float f = fft_buf[up].re;
+	  if(f > cutoff || f < -cutoff) break;
+	}
+      
+      if(up >= down)
+	{
+	  static int bugged = 0;
+	  if(!bugged)
+	    {
+	      post("filter bank initialisation failed\n");
+	      bugged = 1;
+	    }
+	  up = down;
+	}
+      
+      n_filter_coeffs = down - up + 1;
+      
+      kernels[i].filter_coeffs = all_coeffs + n_all_coeffs; /* here the coeffs are found then */
+      kernels[i].n_filter_coeffs = n_filter_coeffs;
+      kernels[i].onset = up * 2; /* * 2: onset for float instead of complex */
+      kernels[i].pow_corr = correct;
+      
+      /* copy coeffs to the *all_coeffs vector */
+      for(j=n_all_coeffs; j<n_all_coeffs+n_filter_coeffs; j++, up++) 
+	all_coeffs[j] = fft_buf[up].re;
+      
+      n_all_coeffs += n_filter_coeffs;
+      
+      freq += freq * q_factor;
+    }
   
   filter_bank->kernels = kernels;
   filter_bank->n_channels = n_channels;
@@ -477,6 +511,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   filter_bank->channels_per_octave = channels_per_octave;
   filter_bank->q_factor = q_factor;
   filter_bank->coeff_cut = coeff_cut;
+
   fts_free(fft_buf);
   
   return(filter_bank);

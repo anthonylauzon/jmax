@@ -27,10 +27,9 @@ fts_symbol_t cut_symbol = 0;
 
 typedef struct _cut_ftl_
 {
-  fts_object_t o;
+  fts_object_t *object;
   fvec_t *fvec;
   int index;
-  fts_timer_t *timer;
 } cut_ftl_t;
 
 
@@ -115,9 +114,7 @@ cut_ftl(fts_word_t *argv)
   if(n > n_tick)
     n = n_tick;
   else if(n)
-    {
-      fts_timer_set_delay(data->timer, 0.0, 0);
-    }
+    fts_timebase_add_call(fts_get_timebase(), data->object, cut_output, 0, 0.0);
 
   for(i=0; i<n; i++)
     buf[index + i] = in[i];
@@ -151,9 +148,8 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   fts_object_refer((fts_object_t *)data->fvec);
 
+  data->object = o;
   data->index = fvec_get_size(data->fvec);
-
-  data->timer = fts_timer_new(o, 0);
 
   fts_dsp_add_object((fts_object_t *)this);
 }
@@ -166,8 +162,6 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(data->fvec)
     fts_object_release((fts_object_t *)data->fvec);    
-
-  fts_timer_delete(data->timer);
 
   ftl_data_free(this->data);
 
@@ -188,7 +182,6 @@ cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, cut_output);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
     }
@@ -200,7 +193,6 @@ cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, cut_output);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
       fts_method_define_varargs(cl, 1, fvec_symbol, cut_set_fvec);

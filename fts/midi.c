@@ -268,6 +268,51 @@ midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
+midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  int type = this->type;
+  
+  if(fts_midievent_is_channel_message(this))
+    {
+      int byte1 = this->data.channel_message.first;
+      int byte2 = this->data.channel_message.second;
+      
+      switch (this->type)
+	{
+	case midi_type_note:
+	  post("note (%d) %d %d", this->id, byte1, byte2);
+	  break;
+	  
+	case midi_type_poly_pressure:
+	  post("poly pressure (%d) %d %d", this->id, byte1, byte2);
+	  break;
+	  
+	case midi_type_control_change:
+	  post("control change (%d) %d %d", this->id, byte1, byte2);
+	  break;
+	  
+	case midi_type_program_change:
+	  post("program change (%d) %d", this->id, byte1);
+	  break;
+	  
+	case midi_type_channel_pressure:		
+	  post("channel pressure (%d) %d", this->id, byte1);
+	  break;
+	  
+	case midi_type_pitch_bend:
+	  post("pitch bend (%d) %d %d", this->id, byte1, byte2);
+	  break;
+
+	default:
+	  break;	  
+	}
+    }
+  else
+    post("midi system message");
+}
+
+static void
 midievent_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
@@ -283,6 +328,8 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midievent_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midievent_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, midievent_print);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, midievent_append_state_to_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, midievent_set_state_from_array);

@@ -36,6 +36,97 @@
  * @defgroup time the timing system
  */
 
+/*********************************************************************
+ *
+ *  timebase
+ *
+ */
+
+/** 
+ * @name timebase
+ */
+/*@{*/
+
+/**
+ * The FTS timebase structure.
+ *
+ * @typedef fts_timebase_t
+ *
+ * @ingroup time
+ */
+
+typedef struct fts_timebase fts_timebase_t;
+
+struct fts_timebase
+{ 
+  fts_object_t head;
+
+  /* time base parameters */
+  double tick_time; /* tick time */
+  double time; /* logical time */
+  double step; /* tick step */
+
+  struct _timebase_entry_ *entries; /* list of schedule entries */
+
+  /* master timebase */
+  fts_timebase_t *slaves; /* list of slaves */
+
+  /* derived timebase (slave) */
+  fts_timebase_t *origin; /* "ur"-timebase (master of master of ...)*/
+  fts_timebase_t *master; /* master timebase */
+
+  fts_method_t tick; /* tick method */
+  fts_method_t locate; /* locate method */
+
+  fts_timebase_t *next; /* next slave in list of master */
+};
+
+/*@}*/ /* timebase */
+
+#define fts_timebase_is_slaved(t) ((t)->master)
+
+#define fts_timebase_get_time(t) ((t)->time)
+#define fts_timebase_set_time(t, x) ((t)->time = (x))
+
+#define fts_timebase_get_step(t) ((t)->step)
+#define fts_timebase_set_step(t, x) ((t)->step = (x))
+
+#define fts_timebase_get_master(t) ((t)->master)
+
+void fts_timebase_init(fts_timebase_t *timebase);
+void fts_timebase_reset(fts_timebase_t *timebase);
+
+/***************************************************
+ *
+ *  timebase method scheduling
+ *
+ */
+
+void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, fts_atom_t *a, double delay);
+void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object);
+void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
+
+
+/*********************************************************************
+ *
+ *  derived timebases (slaves)
+ *
+ */
+
+void fts_timebase_add_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
+void fts_timebase_remove_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
+void fts_timebase_advance_slaves(fts_timebase_t *timebase);
+
+
+/*********************************************************************
+ *
+ *  origin time base
+ *
+ */
+
+void fts_timebase_advance(fts_timebase_t *timebase);
+void fts_timebase_locate(fts_timebase_t *timebase);
+
 /** 
  * @name logical time
  */
@@ -50,134 +141,8 @@
  * @ingroup time
  */
 FTS_API double fts_get_time(void);
+FTS_API fts_timebase_t *fts_get_timebase(void);
 
 /*@}*/ /* logical time */
-
-/*********************************************************************
- *
- *  timebase
- *
- */
-
-/** 
- * @name timebase and timers
- */
-/*@{*/
-
-/**
- * The FTS timebase structure.
- *
- * @typedef fts_timebase_t
- *
- * @ingroup time
- */
-
-/**
- * The FTS timer structure.
- *
- * @typedef fts_timer_t
- *
- * @ingroup time
- */
-
-typedef struct fts_timebase fts_timebase_t;
-typedef struct fts_timer fts_timer_t;
-
-/**
- * Initializes timebase structure.
- *
- * @fn void fts_timebase_init(fts_timebase_t *timebase)
- * @param timebase the timebase
- *
- * @ingroup time
- */
-FTS_API void fts_timebase_init(fts_timebase_t *timebase, double tick);
-
-/**
- * Reset timebase to zero and delete all active alarms and timers.
- *
- * @fn void fts_timebase_reset(fts_timebase_t *timebase)
- * @param timebase the timebase
- *
- * @ingroup time
- */
-FTS_API void fts_timebase_reset(fts_timebase_t *timebase);
-
-/**
- * Get current timebase time.
- *
- * @fn double fts_timebase_get_time(fts_timebase_t *timebase)
- * @param timebase the timebase
- * @return current (logical) time
- *
- * @ingroup time
- */
-FTS_API double fts_timebase_get_time(fts_timebase_t *timebase);
-
-/**
- * Set current timebase time.
- *
- * @fn void fts_timebase_set_time(fts_timebase_t *timebase, double time)
- * @param timebase the timebase
- * @param time new time
- *
- * @ingroup time
- */
-FTS_API void fts_timebase_set_time(fts_timebase_t *timebase, double time);
-
-/**
- * Advance timebase one tick
- *
- * @fn void fts_timebase_tick(fts_timebase_t *timebased)
- * @param timebase the timebase
- * @param step time step to advance by
- *
- * @ingroup time
- */
-
-FTS_API void fts_timebase_tick(fts_timebase_t *timebase);
-
-/**
- * Set global master timebase
- *
- * @fn void fts_time_set_timebase(fts_timebase_t *timebase)
- * @param timease the timebase
- *
- * @ingroup time
- */
-FTS_API void fts_time_set_timebase(fts_timebase_t *timebase);
-
-/*@}*/ /* timebase */
-
-/*********************************************************************
- *
- *  timer
- *
- */
-
-struct fts_timer
-{
-  fts_timebase_t *timebase; /* the timers timebase */
-  fts_object_t *object; /* its object */
-  fts_method_t tick; /* tick callback */
-  fts_method_t alarm; /* alarm callback */
-  fts_method_t locate; /* locate callback */
-  int active; /* timer is active */
-  int n_alarms; /* number of active alarms */
-  struct fts_timer *next; /* timebase list of timers */
-};
-
-#define fts_timer_get_timebase(t) ((t)->timebase)
-#define fts_timer_is_active(t) ((t)->active)
-#define fts_timer_has_alarm(t) ((t)->n_alarms > 0)
-
-FTS_API fts_timer_t *fts_timer_new(fts_object_t *object, fts_timebase_t *timebase);
-FTS_API void fts_timer_delete(fts_timer_t *timer);
-
-FTS_API void fts_timer_activate(fts_timer_t *timer);
-FTS_API void fts_timer_set_alarm(fts_timer_t *timer, double time, fts_atom_t *atom);
-FTS_API void fts_timer_set_delay(fts_timer_t *timer, double delay, fts_atom_t *atom);
-FTS_API void fts_timer_reset(fts_timer_t *timer);
-FTS_API void fts_timer_flush(fts_timer_t *timer);
 
 #endif

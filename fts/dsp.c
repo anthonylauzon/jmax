@@ -44,6 +44,8 @@ static double dsp_sample_rate;
 static int dsp_tick_size;
 static double dsp_tick_duration;
 
+static double dsp_time = 0.0;
+
 static fts_symbol_t dsp_zero_fun_symbol = 0;
 static fts_symbol_t dsp_copy_fun_symbol = 0;
 
@@ -58,7 +60,7 @@ static fts_timebase_t *dsp_timebase = 0;
 static void 
 dsp_timebase_advance( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_timebase_tick(dsp_timebase);
+  fts_timebase_advance(dsp_timebase);
 
   /* run DSP chain (or idle) */
   if (fts_dsp_graph_is_compiled(&main_dsp_graph))
@@ -70,13 +72,18 @@ dsp_timebase_advance( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void
 dsp_timebase_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_timebase_init((fts_timebase_t *)o, dsp_tick_duration);
+  fts_timebase_t *this = (fts_timebase_t *)o;
+
+  fts_timebase_init(this);
+  fts_timebase_set_step(this, dsp_tick_duration);
 }
 
 static void
 dsp_timebase_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_timebase_reset((fts_timebase_t *)o);
+  fts_timebase_t *this = (fts_timebase_t *)o;
+
+  fts_timebase_reset(this);
 }
 
 static fts_status_t
@@ -103,7 +110,7 @@ fts_dsp_timebase_configure(void)
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, &a, (fts_object_t **)&dsp_timebase);
 
   /* set DSP time base as FTS master and add add it to the scheduler */  
-  fts_time_set_timebase(dsp_timebase);
+  fts_set_timebase(dsp_timebase);
   fts_sched_add((fts_object_t *)dsp_timebase, FTS_SCHED_ALWAYS);
 }
 

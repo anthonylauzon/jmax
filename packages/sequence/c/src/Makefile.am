@@ -13,4 +13,4 @@ seqrec.c \
 seqstep.c \
 seqsym.c \
 sequence.c \
-track.c 
+track.c

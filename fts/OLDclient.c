@@ -74,7 +74,6 @@ static fts_symbol_t s_tcp, s_udp;
  */
 
 static void fts_client_parse_char( char c);
-static void fts_client_updates_sched( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /***********************************************************************
  *
@@ -100,7 +99,7 @@ typedef struct _oldclient_t {
   /* Output */
   char sequence;
   fts_stack_t output_buffer;
-  fts_timer_t *update_timer;
+  int updates_scheduled;
 } oldclient_t;
 
 static void oldclient_flush( oldclient_t *this);
@@ -260,10 +259,10 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       fts_log("[oldclient]: Connected\n");
     }
 
+  this->updates_scheduled = 0;
+
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
-
-  this->update_timer = fts_timer_new(o, 0);
 }
 
 static void
@@ -299,8 +298,6 @@ static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, oldclient_init);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, oldclient_delete, 0, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, fts_client_updates_sched);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, oldclient_receive);
 
@@ -1058,12 +1055,6 @@ static void fts_client_sync_init(void)
    The update scheduler use the property change registration mechanism:
    when scheduled, it get the first N property change in the change fifo,
    and send them to the client.
-
-   The scheduler is started by an alarm; the first property change start
-   the alarm with a small time (actually 0) to have the maximal reactivity,
-   and then the alarm is automatically rearmed iff there are elements in the fifo.
-   In this way for burst of events with a period larger than the alarm we answer
-   in real-time.
    */
 
 /* #define UPDATE_TRACE  */
@@ -1169,35 +1160,30 @@ static void update_group_end(void)
 static void 
 fts_client_updates_sched( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int update_count;
-
   if (changes_queue_head)
     {
+      int update_count;
+
       update_group_start();
 
-      for (update_count = 0;
-	   (update_count < fts_updates_per_ticks) && changes_queue_head ;
-	   update_count++)
+      for(update_count=0; changes_queue_head && (update_count<fts_updates_per_ticks); update_count++)
 	{
-	  struct changes *p;
+	  struct changes *p = changes_queue_head;
 
-	  p = changes_queue_head;
 	  changes_queue_head = p->next;
 
 	  fts_client_send_property(p->obj, p->property);
+	  fts_object_release(p->obj);
 	  fts_heap_free(p, changes_heap);
 	}
 
       update_group_end();
 
-      fts_timer_set_delay(oldclient->update_timer, fts_update_period, 0);
+      fts_timebase_add_call(fts_get_timebase(), o, fts_client_updates_sched, 0, fts_update_period);
     }
+  else
+    oldclient->updates_scheduled = 0;
 }
-
-/* Sync empty the change fifo; this is used to introduce a sequence
-   point between the client and the server, with the sync protocol,
-   under request from the server; it do not touch the alarm.
-   */
 
 void fts_client_updates_sync(void)
 {
@@ -1207,9 +1193,8 @@ void fts_client_updates_sync(void)
 
       while (changes_queue_head)
 	{
-	  struct changes *p;
+	  struct changes *p = changes_queue_head;
 
-	  p = changes_queue_head;
 	  changes_queue_head = p->next;
 
 	  /* Note that fts_client_send_property may
@@ -1218,6 +1203,7 @@ void fts_client_updates_sync(void)
 	     before the call */
 
 	  fts_client_send_property(p->obj, p->property);
+	  fts_object_release(p->obj);
 	  fts_heap_free(p, changes_heap);
 	}
 
@@ -1244,23 +1230,15 @@ void fts_updates_set_update_period(int upt)
    when some bandwith is available; please note that the function
    fts_client_send_property can be used to send the property
    sychroniusly, in  contexts like uploading */
-
-
 void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
   struct changes *p;
   struct changes *last = 0;
 
   /* check if the object is already in the evsched list */
-
   for (p = changes_queue_head; p; last = p, p = p->next)
     if ((p->obj == obj) && p->property == property)
       return;
-
-  /* 
-     Here, if last is not null, is the last element of the list;
-     if it is null, there are no element in the list.
-   */
 
   p = (struct changes *)fts_heap_alloc(changes_heap);
 
@@ -1268,17 +1246,20 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
   p->obj = obj;
   p->next = 0;
 
+  fts_object_refer(obj);
+
   /* add the new queue element to the end of the list */
   if (last)
     last->next = p;
   else
     changes_queue_head = p;
 
-  /* If the update timer is not armed, arm it with a zero period,
-     so it will fire immediately */
-
-  if (!fts_timer_has_alarm(oldclient->update_timer))
-    fts_timer_set_delay(oldclient->update_timer, 0, 0);
+  /* if updates are not scheduled yet, schedule them now */
+  if (!oldclient->updates_scheduled)
+    {
+      fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)oldclient, fts_client_updates_sched, 0, 0.0);
+      oldclient->updates_scheduled = 1;
+    }
 }
 
 
@@ -1293,8 +1274,10 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
 
 void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
-  if (fts_patcher_is_open( fts_object_get_patcher( obj)))
-      fts_object_property_changed(obj, property);
+  fts_patcher_t *patcher = fts_object_get_patcher( obj);
+
+  if (patcher && fts_patcher_is_open(patcher))
+    fts_object_property_changed(obj, property);
 }
 
 
@@ -1318,6 +1301,7 @@ void fts_object_reset_changed(fts_object_t *obj)
 
 	  (*pp) = (*pp)->next;
 
+	  fts_object_release(p->obj);
 	  fts_heap_free((char *)p, changes_heap);
 	}
       else

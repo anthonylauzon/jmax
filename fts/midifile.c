@@ -336,11 +336,11 @@ midifile_read_track(fts_midifile_t *file)
 	  break;
 	  
 	case PROGRAM_CHANGE:
-	  midifile_channel_message_call(file, midi_type_program_change, channel, data1, 0);
+	  midifile_channel_message_call(file, midi_type_program_change, channel, data1, MIDI_EMPTY_BYTE);
 	  break;
 	  
 	case CHANNEL_PRESSURE:
-	  midifile_channel_message_call(file, midi_type_channel_pressure, channel, data1, 0);
+	  midifile_channel_message_call(file, midi_type_channel_pressure, channel, data1, MIDI_EMPTY_BYTE);
 	  break;
 	  
 	case PITCH_BEND:

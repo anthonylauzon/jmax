@@ -45,10 +45,9 @@ typedef struct {
   int samples_count;
   int estimated_sample_rate;
   double last_time;
-  fts_timer_t *output_timer;
 } profileaudioport_t;
 
-static void profileaudioport_output_alarm( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void profileaudioport_output_estimation( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
@@ -57,11 +56,8 @@ static void profileaudioport_output_alarm( fts_object_t *o, int winlet, fts_symb
 
 static void profileaudioport_output( fts_word_t *argv)
 {
-  profileaudioport_t *this;
-  int n;
-
-  this = (profileaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_int(argv + 1);
+  profileaudioport_t *this = (profileaudioport_t *)fts_word_get_ptr( argv+0);
+  int n = fts_word_get_int(argv + 1);
 
   this->samples_count += n;
 
@@ -80,8 +76,7 @@ static void profileaudioport_output( fts_word_t *argv)
       this->estimated_sample_rate = (int)(this->samples_count / (now - this->last_time));
       this->last_time = now;
 
-      fts_timer_reset(this->output_timer);
-      fts_timer_set_delay(this->output_timer, 0.0f, 0);
+      fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, profileaudioport_output_estimation, 0, 0.0);
 
       this->samples_count = 0;
     }
@@ -105,8 +100,6 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   this->profile_interval = fts_get_int_arg( ac, at, 0, DEFAULT_PROFILE_INTERVAL);
 
-  this->output_timer = fts_timer_new(o, 0);	
-
 #ifdef WIN32
   this->last_time = GetTickCount() * 1000.0;
 #else
@@ -121,7 +114,6 @@ static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
-  fts_timer_delete(this->output_timer);	
   fts_audioport_delete( &this->head);
 }
 
@@ -136,8 +128,6 @@ static fts_status_t profileaudioport_instantiate(fts_class_t *cl, int ac, const 
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, profileaudioport_init);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete);
-
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_timer_alarm, profileaudioport_output_alarm);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, profileaudioport_get_state);
 
