@@ -63,6 +63,7 @@ public interface MatDataModel {
     
     public abstract void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex);
     public abstract void requestAppendRow();
+    public abstract void requestInsertRow(int index);
     public abstract void requestAppendColumn();
     public abstract void requestDeleteRows(int startIndex, int size);
 }

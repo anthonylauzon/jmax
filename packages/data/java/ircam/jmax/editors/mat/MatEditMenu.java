@@ -54,10 +54,13 @@ public class MatEditMenu extends EditorMenu implements ListSelectionListener
     
     setHorizontalTextPosition(AbstractButton.LEFT);
     
-		add( new EditorAction("Append Row", "append row", KeyEvent.VK_R, KeyEvent.VK_R, true){
+		add( new EditorAction("Insert Row", "insert row", KeyEvent.VK_R, KeyEvent.VK_R, true){
       public void doAction(EditorContainer container)
       {
-        model.requestAppendRow();
+        if(selSize == 0)
+          model.requestAppendRow();
+        else
+          model.requestInsertRow(selIndex+1);        
       }
     });
     

@@ -741,10 +741,8 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* update editor if open */
   if(mat_editor_is_open(self))
-  {
-    fts_client_send_message(o, sym_mat_insert_rows, 0, 0);
-    mat_upload_from_index(self, pos, 0, tomove + num);
-  }
+    mat_upload(self);
+  
   fts_object_set_state_dirty(o);
 }
 
