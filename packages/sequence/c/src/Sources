@@ -24,20 +24,20 @@
 #
 
 SOURCES = \
+event.c \
+eventtrk.c \
+message.c \
+midival.c \
 module.c \
+note.c \
+seqf9.c \
+seqfind.c \
+seqmidi.c \
+seqplay.c \
+seqplode.c \
+seqrec.c \
+seqref.c \
+seqstep.c \
 seqsym.c \
 sequence.c \
 track.c \
-event.c \
-seqmidi.c \
-eventtrk.c \
-note.c \
-midival.c \
-message.c \
-seqref.c \
-seqfind.c \
-seqstep.c \
-seqplay.c \
-seqrec.c \
-seqplode.c \
-seqf9.c \

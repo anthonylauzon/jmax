@@ -216,7 +216,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   /* Create enough fifos so that there number_of_fifos is at least X*number_of_objects
    * where X is something like 1.5
    */
-#define X 1.5
+#define X 2.0
 
   while ( dtdfifo_get_number_of_fifos() < (int) (ceil( X * number_of_dtdobjs)) )
     {
