@@ -45,7 +45,7 @@ typedef struct
 {
   fts_object_t  obj;
   fts_symbol_t name;
-  fts_object_t *next; /* DCE: pointer to the other delread for the same delay line */
+  fts_object_t *next; /* pointer to the other delread for the same delay line */
 } delay_table_delreader_t;
 
 extern void delay_table_add_delreader(fts_object_t *o, fts_symbol_t delay_name);

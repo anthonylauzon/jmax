@@ -52,7 +52,7 @@ typedef struct
 {
   fts_object_t  obj;
   fts_symbol_t name;
-  fts_object_t *next; /* DCE: pointer to the other vd for the same delay line */ 
+  fts_object_t *next; /* pointer to the other delreader for the same delay line */ 
   fts_symbol_t unit;
   float max_incr;
   float millers_fix_del;
@@ -73,7 +73,6 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     return;
   
   this->vd_data = ftl_data_new(ftl_vd_t);
-  this->next = 0;
 
   if(unit)
     {

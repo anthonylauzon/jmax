@@ -54,6 +54,7 @@ void refdata_init(refdata_t *data, reftype_t *type);
   } while(0)
 
 #define refdata_no_reference(r) (((refdata_t *)(r))->cnt == 0)
+#define refdata_one_reference(r) (((refdata_t *)(r))->cnt == 1)
 
 extern refdata_t *refdata_create(reftype_t *type, int ac, const fts_atom_t* at);
 #define refdata_destroy(r) (reftype_get_destructor(((refdata_t *)(r))->type))((refdata_t *)(r))

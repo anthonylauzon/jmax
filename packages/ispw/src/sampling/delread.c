@@ -44,7 +44,7 @@ typedef struct
 {
   fts_object_t  obj;
   fts_symbol_t name;
-  fts_object_t *next; /* DCE: pointer to the other delread for the same delay line */
+  fts_object_t *next; /* pointer to the other delreader for the same delay line */
   float conv;
   fts_symbol_t unit;
   float time; /* nominal delay time */

@@ -29,69 +29,82 @@
 #include "fts.h"
 #include "table.h"
 
-/********************************************************************
+/*******************************************************************
  *
- *   named tables house keeping
+ *   named integer vector
  *
  */
 
-static fts_hash_table_t table_int_vector_table; /* the name binding table */
+static fts_symbol_t sym_niv = 0;
+
+typedef struct 
+{
+  fts_object_t ob;
+  fts_symbol_t name;
+  int_vector_t *vec;
+} niv_t;
+
+static void
+niv_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  niv_t *this = (niv_t *)o;
+
+  this->name = fts_get_symbol(at + 1);
+  this->vec = int_vector_atom_get(at + 2);
+
+  fts_register_named_object(o, this->name);
+  int_vector_set_creator(this->vec, o);
+}
+
+static void
+niv_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  niv_t *this = (niv_t *)o;
+
+  fts_unregister_named_object(o, this->name);
+  int_vector_set_creator(this->vec, 0);
+}
+
+/* set by atom list */
+static void
+niv_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  int_vector_t *vec = ((niv_t *)o)->vec;
+  int offset;
+
+  offset = fts_get_int_arg(ac, at, 0, 0);
+
+  if (ac > 1)
+    int_vector_set_from_atom_list(vec, offset, ac - 1, at + 1);
+}
+
+static fts_status_t
+niv_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(niv_t), 0, 0, 0);
+      
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, niv_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, niv_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, niv_set);
+
+  return fts_Success;
+}
 
 /* find a tables int_vector by name */
 int_vector_t *
 table_int_vector_get_by_name(fts_symbol_t name)
 {
-  fts_atom_t atom;
+  fts_object_t *obj = fts_get_object_by_name(name);
 
-  if (fts_hash_table_lookup(&table_int_vector_table, name, &atom))
-    {
-      int_vector_t *vec = int_vector_atom_get(&atom);
-      return vec;
-    }
+  if(obj && (fts_object_get_class_name(obj) == sym_niv))
+    return ((niv_t *)obj)->vec;
   else
     return 0;
 }
 
 /********************************************************************
  *
- *   utils
- *
- */
-
-static int
-quantile(int_vector_t *vector, int n)
-{
-  int index, i;
-  int v = 0;
-  int size = int_vector_get_size(vector);
-
-  v = 0;
-  for(i=0; i<size; i++)
-    v += int_vector_get_element(vector, i);
-
-  if(v == 0)
-    return 0;
-  else
-    {
-      index = ((n * v) >> 15) + 1;
-      
-      for (i=0; i<size; i++)
-	{
-	  index -= int_vector_get_element(vector, i);
-	  if (index <= 0)
-	    break;
-	}
-  
-      if (i >= size)
-	return (size - 1);
-      else
-	return i;
-    }
-}
-
-/********************************************************************
- *
- *   object
+ *   table object
  *
  */
 
@@ -130,42 +143,34 @@ table_init_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   table_t *this = (table_t *)o;
   fts_symbol_t name = fts_get_symbol(at + 1);
   int size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
-  fts_atom_t atom;
-  int_vector_t *vec;
+  int_vector_t *vec = table_int_vector_get_by_name(name);
 
-  if(fts_hash_table_lookup(&table_int_vector_table, name, &atom))
+  if(vec)
     {
       /* refer to existing vector */
-      int stored_size;
-
-      vec = int_vector_atom_get(&atom);
       int_vector_refer(vec);
 
-      stored_size = int_vector_get_size(vec);
-      if(size != stored_size)
-	{
-	  post("table %s: size mismatch (fit to larger)\n", fts_symbol_name(name));
-	  
-	  if(size > stored_size)
-	    int_vector_set_size(vec, size);
-	}
+      if(size > int_vector_get_size(vec))
+	int_vector_set_size(vec, size);
     }
   else
     {
+      fts_atom_t a[3];
+      fts_object_t *obj;
+
       /* new vector */
       vec = int_vector_new(size);
       int_vector_refer(vec);
-      int_vector_set_creator(vec, o);
 
-      /* put to hashtable */
-      int_vector_atom_set(&atom, vec);
-      fts_hash_table_insert(&table_int_vector_table, name, &atom);
+      /* new niv */
+      fts_set_symbol(a, sym_niv);
+      fts_set_symbol(a + 1, name);
+      int_vector_atom_set(a + 2, vec);
+      fts_object_new(0, 3, a, &obj);
     }
 
   this->vector = vec;
   this->name = name;
-
-  fts_register_named_object(o, name);
 }
 
 static void
@@ -190,14 +195,16 @@ table_delete_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   table_t *this = (table_t *)o;
   int_vector_t *vec = this->vector;
   fts_symbol_t name = this->name;
-  
-  /* remove from hash table if last reference *&!^%%&*!)@#!$^& */
-  if(vec->refdata.cnt == 1)
-    fts_hash_table_remove(&table_int_vector_table, name);
-  
+
+  if(vec && vec->refdata.cnt == 1)
+    {       
+      fts_object_t *obj = fts_get_object_by_name(name);
+      
+      if(obj && (fts_object_get_class_name(obj) == sym_niv))
+	fts_object_delete(obj);
+    }
+
   int_vector_release(vec);
-  
-  fts_unregister_named_object(o, name);
 }
 
 /*********************************************************************
@@ -227,6 +234,8 @@ table_get_data(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
  *   user methods
  *
  */
+
+static int quantile(int_vector_t *vector, int n);
 
 static void
 table_store_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -526,7 +535,45 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 table_config(void)
 {
-  fts_hash_table_init(&table_int_vector_table);
+  sym_niv = fts_new_symbol("niv");
 
+  fts_class_install(sym_niv, niv_instantiate);
   fts_metaclass_install(fts_new_symbol("table"), table_instantiate, fts_arg_type_equiv);
+}
+
+/********************************************************************
+ *
+ *   utils
+ *
+ */
+
+static int
+quantile(int_vector_t *vector, int n)
+{
+  int index, i;
+  int v = 0;
+  int size = int_vector_get_size(vector);
+
+  v = 0;
+  for(i=0; i<size; i++)
+    v += int_vector_get_element(vector, i);
+
+  if(v == 0)
+    return 0;
+  else
+    {
+      index = ((n * v) >> 15) + 1;
+      
+      for (i=0; i<size; i++)
+	{
+	  index -= int_vector_get_element(vector, i);
+	  if (index <= 0)
+	    break;
+	}
+  
+      if (i >= size)
+	return (size - 1);
+      else
+	return i;
+    }
 }

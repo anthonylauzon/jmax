@@ -41,6 +41,11 @@ typedef struct {
   int is_init;			/* flag if init was called for current DSP compiling */
 } del_buf_t;
 
+#define delbuf_get_tick_size(b) ((b)->n_tick)
+#define delbuf_get_size_in_samples(b) ((b)->size)
+#define delbuf_get_ring_size(b) ((b)->ring_size)
+#define delbuf_get_phase(b) ((b)->phase)
+#define delbuf_get_ptr(b) ((b)->delay_line)
 
 /* Allocate and zero delbuf object (called by dewrite_init) */
 extern del_buf_t *delbuf_new(float raw_size, fts_symbol_t unit);
@@ -57,10 +62,6 @@ extern void delbuf_clear_is_init_flag(del_buf_t *buf);
 extern void delbuf_delete_delayline(del_buf_t *buf); /* free delayline */
 extern void delbuf_clear_delayline(del_buf_t *buf); /* clear delayline (fill with 0.0) */
 
-
 extern void delbuf_set_size(del_buf_t *buf, float raw_size, fts_symbol_t unit);
 
-#define delbuf_get_tick_size(buf) ((buf)->n_tick)
-#define delbuf_get_size_in_samples(buf) ((buf)->size)
-
-#endif /* _DELBUF_H_ */
+#endif

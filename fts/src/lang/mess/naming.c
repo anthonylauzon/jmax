@@ -98,7 +98,7 @@ void fts_named_object_send(fts_symbol_t name, fts_symbol_t s, int argc, const ft
       fts_atom_t d;
 
       if (fts_hash_table_lookup(&global_name_table, name, &d))
-	fts_message_send((fts_object_t *) fts_get_object(&d), 0,  s, argc, argv);
+	fts_message_send((fts_object_t *) fts_get_object(&d), fts_SystemInlet,  s, argc, argv);
     }
 }
 

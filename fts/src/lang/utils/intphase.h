@@ -33,6 +33,8 @@ typedef int fts_intphase_t;
 #define FTS_INTPHASE_BITS (31)
 #define FTS_INTPHASE_MAX (0x7fffffffL)
 #define FTS_INTPHASE_RANGE (2147483648.)
+#define FTS_INTPHASE_RANGE_HALF (1073741824.)
+#define FTS_INTPHASE_RANGE_QUARTER (536870912.)
 
 #define fts_intphase_wrap(phi) \
   ((phi) & FTS_INTPHASE_MAX)

@@ -415,9 +415,13 @@ sigtable_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_symbol;
   a[1] = fts_s_int;
   fts_method_define_optargs(cl, 0, fts_new_symbol("read"), sigtable_read, 2, a, 1);
+  /* for remote sending compatibility */
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_new_symbol("read"), sigtable_read, 2, a, 1);
   
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_new_symbol("write"), sigtable_write, 1, a);
+  /* for remote sending compatibility */
+  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("write"), sigtable_write, 1, a);
   
   a[0] = fts_s_symbol; /* file name */
   a[1] = fts_s_number; /* onset */
