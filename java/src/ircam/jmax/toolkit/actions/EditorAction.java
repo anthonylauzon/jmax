@@ -42,6 +42,12 @@ abstract public class EditorAction extends AbstractAction
   public EditorAction(String name)
   {
     super(name);
+    this.name = name;
+  }
+
+  public String getName()
+  {
+    return name;
   }
 
   public  void actionPerformed(ActionEvent e)
@@ -69,5 +75,7 @@ abstract public class EditorAction extends AbstractAction
   }
 
   abstract public void doAction(EditorContainer container);
+  
+  String name;
 }
 

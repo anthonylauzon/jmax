@@ -35,7 +35,7 @@ public class FitToTextAction extends EditorAction
 {
   public FitToTextAction()
   {
-    super("Fit To Text");
+    super("fit to text");
   }
 
   public void doAction(EditorContainer container)

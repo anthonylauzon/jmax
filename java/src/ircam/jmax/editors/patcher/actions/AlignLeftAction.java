@@ -33,6 +33,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class AlignLeftAction extends EditorAction
 {
+  public AlignLeftAction()
+  {
+    super("align left");
+  }
+
   public  void doAction(EditorContainer container)
   {
     if (ErmesSelection.patcherSelection.ownedBy((ErmesSketchPad)container.getEditor()))

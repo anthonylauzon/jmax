@@ -35,7 +35,7 @@ public class DeleteSelectionAction extends EditorAction
 {
   public DeleteSelectionAction()
   {
-    super("Delete Selection");
+    super("delete selection");
   }
 
   /*public  void actionPerformed(ActionEvent e)
@@ -59,6 +59,7 @@ public class DeleteSelectionAction extends EditorAction
 	  {
 	    // Don't have the selection, look if there is a 
 	    // highligheted inlet or outlet in this sketch
+
 
 	    GraphicObject gobj;
 

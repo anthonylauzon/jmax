@@ -35,9 +35,9 @@ public class MoveAction extends EditorAction
 {
   int dx, dy;
 
-  public MoveAction(int dx, int dy)
+  public MoveAction(int dx, int dy, String name)
   {
-    super("Move");
+    super( name);
     this.dx = dx;
     this.dy = dy;
   }

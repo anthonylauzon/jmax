@@ -35,7 +35,7 @@ public class ResizeToMaxHeightAction extends EditorAction
 {
   public ResizeToMaxHeightAction()
   {
-    super("Max Height");
+    super("resize to max height");
   }
 
   public void doAction(EditorContainer container)

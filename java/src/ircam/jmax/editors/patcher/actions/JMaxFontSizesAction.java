@@ -41,7 +41,7 @@ public class JMaxFontSizesAction extends EditorAction
 {
   public JMaxFontSizesAction()
   {
-    super("Font Sizes");
+    super("jmax font sizes");
   }
 
   int size;  

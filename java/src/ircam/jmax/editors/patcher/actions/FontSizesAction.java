@@ -41,7 +41,7 @@ public class FontSizesAction extends EditorAction
 {
   public FontSizesAction()
   {
-    super("Font Sizes");
+    super("font sizes");
   }
 
   int size;  

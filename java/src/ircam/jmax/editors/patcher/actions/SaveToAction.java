@@ -31,8 +31,14 @@ import ircam.jmax.toolkit.actions.*;
 
 public class SaveToAction extends EditorAction
 {
+  public SaveToAction()
+  {
+    super("save to");
+  }
+
   public void doAction(EditorContainer container)
   {
      PatcherSaveManager.saveTo(container);
   }
 }
+

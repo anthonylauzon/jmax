@@ -35,6 +35,11 @@ public class FindAction extends EditorAction
 {
   EditorContainer container;
 
+  public FindAction()
+  {
+    super("find");
+  }
+
   public void doAction(EditorContainer c)
   {
     container = c;

@@ -41,7 +41,7 @@ public class FontStylesAction extends EditorAction
 {
   public FontStylesAction()
   {
-    super("Font Styles");
+    super("font styles");
   }
 
   String style;  

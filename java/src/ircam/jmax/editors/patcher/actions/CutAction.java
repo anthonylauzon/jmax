@@ -32,6 +32,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class CutAction extends EditorAction
 {
+  public CutAction()
+  {
+    super("cut");
+  }
+
   public void doAction(EditorContainer container)
   {
     PatcherClipboardManager.getManager().Cut(container);

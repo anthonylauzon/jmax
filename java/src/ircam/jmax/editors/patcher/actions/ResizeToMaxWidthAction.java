@@ -35,7 +35,7 @@ public class ResizeToMaxWidthAction extends EditorAction
 {
   public ResizeToMaxWidthAction()
   {
-    super("Max Width");
+    super("resize to max width");
   }
 
   public void doAction(EditorContainer container)

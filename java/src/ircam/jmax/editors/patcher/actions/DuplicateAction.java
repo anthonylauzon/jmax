@@ -32,6 +32,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class DuplicateAction extends EditorAction
 {
+  public DuplicateAction()
+  {
+    super("duplicate");
+  }
+
   public void doAction(EditorContainer container)
   {
     PatcherClipboardManager.getManager().Duplicate(container);   

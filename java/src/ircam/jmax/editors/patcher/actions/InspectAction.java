@@ -33,6 +33,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class InspectAction extends EditorAction
 {
+  public InspectAction()
+  {
+    super("inspect");
+  }
+
   public void doAction(EditorContainer container)
   {
     if (ErmesSelection.patcherSelection.ownedBy((ErmesSketchPad)container.getEditor()))

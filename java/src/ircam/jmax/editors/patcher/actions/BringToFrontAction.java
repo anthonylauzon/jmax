@@ -33,6 +33,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class BringToFrontAction extends EditorAction
 {
+  public BringToFrontAction()
+  {
+    super("bring to front");
+  }
+
   public  void doAction(EditorContainer container)
   {
     if (ErmesSelection.patcherSelection.ownedBy((ErmesSketchPad)container.getEditor()))

@@ -41,7 +41,7 @@ public class JMaxFontAction extends EditorAction
 {
   public JMaxFontAction()
   {
-    super("Font");
+    super("jmax font");
   }
 
   String font;

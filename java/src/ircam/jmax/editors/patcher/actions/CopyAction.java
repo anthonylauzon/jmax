@@ -32,6 +32,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class CopyAction extends EditorAction
 {
+  public CopyAction()
+  {
+    super("copy");
+  }
+
   public  void doAction(EditorContainer container)
   {
     PatcherClipboardManager.getManager().Copy(container);

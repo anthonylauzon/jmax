@@ -34,7 +34,7 @@ public class SelectAllAction extends EditorAction
 {
   public SelectAllAction()
   {
-    super("Select All");
+    super("select all");
   }
 
   public void doAction(EditorContainer container)

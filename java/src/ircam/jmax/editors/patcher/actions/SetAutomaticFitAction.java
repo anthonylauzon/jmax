@@ -39,7 +39,7 @@ public class SetAutomaticFitAction extends EditorAction
 {
   public SetAutomaticFitAction()
   {
-    super("");
+    super("set automatic fit");
   }
 
   boolean selected = false;  

@@ -38,25 +38,25 @@ public class Actions
 {
   // Keyboard actions
 
-  public static EditorAction moveTenLeftAction  = new MoveAction(-10,   0);
-  public static EditorAction moveTenRightAction = new MoveAction( 10,   0);
-  public static EditorAction moveTenUpAction    = new MoveAction(  0, -10);
-  public static EditorAction moveTenDownAction  = new MoveAction(  0,  10);
+  public static EditorAction moveTenLeftAction  = new MoveAction(-10,   0, "move ten left");
+  public static EditorAction moveTenRightAction = new MoveAction( 10,   0, "move ten right");
+  public static EditorAction moveTenUpAction    = new MoveAction(  0, -10, "move ten up");
+  public static EditorAction moveTenDownAction  = new MoveAction(  0,  10, "move ten down");
 
-  public static EditorAction moveLeftAction  = new MoveAction(-1,  0);
-  public static EditorAction moveRightAction = new MoveAction( 1,  0);
-  public static EditorAction moveUpAction    = new MoveAction( 0, -1);
-  public static EditorAction moveDownAction  = new MoveAction( 0,  1);
+  public static EditorAction moveLeftAction  = new MoveAction(-1,  0, "move left");
+  public static EditorAction moveRightAction = new MoveAction( 1,  0, "move right");
+  public static EditorAction moveUpAction    = new MoveAction( 0, -1, "move up");
+  public static EditorAction moveDownAction  = new MoveAction( 0,  1, "move down");
 
-  public static EditorAction resizeTenLeftAction  = new ResizeAction(-10,   0);
-  public static EditorAction resizeTenRightAction = new ResizeAction( 10,   0);
-  public static EditorAction resizeTenUpAction    = new ResizeAction(  0, -10);
-  public static EditorAction resizeTenDownAction  = new ResizeAction(  0,  10);
+  public static EditorAction resizeTenLeftAction  = new ResizeAction(-10,   0, "resize ten left");
+  public static EditorAction resizeTenRightAction = new ResizeAction( 10,   0, "resize ten right");
+  public static EditorAction resizeTenUpAction    = new ResizeAction(  0, -10, "resize ten up");
+  public static EditorAction resizeTenDownAction  = new ResizeAction(  0,  10, "resize ten down");
 
-  public static EditorAction resizeLeftAction  = new ResizeAction(-1, 0);
-  public static EditorAction resizeRightAction = new ResizeAction( 1, 0);
-  public static EditorAction resizeUpAction    = new ResizeAction( 0,-1);
-  public static EditorAction resizeDownAction  = new ResizeAction( 0, 1);
+  public static EditorAction resizeLeftAction  = new ResizeAction(-1, 0, "resize left");
+  public static EditorAction resizeRightAction = new ResizeAction( 1, 0, "resize right");
+  public static EditorAction resizeUpAction    = new ResizeAction( 0,-1, "resize up");
+  public static EditorAction resizeDownAction  = new ResizeAction( 0, 1, "resize down");
 
   public static EditorAction resizeToMaxWidthAction  = new ResizeToMaxWidthAction();
   public static EditorAction resizeToMaxHeightAction = new ResizeToMaxHeightAction();

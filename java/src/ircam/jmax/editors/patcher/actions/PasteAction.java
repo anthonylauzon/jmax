@@ -32,6 +32,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class PasteAction extends EditorAction
 {
+  public PasteAction()
+  {
+    super("paste");
+  }
+
   public void doAction(EditorContainer container)
   {
     PatcherClipboardManager.getManager().Paste(container);    

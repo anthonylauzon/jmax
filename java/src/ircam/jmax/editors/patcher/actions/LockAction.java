@@ -32,6 +32,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class LockAction extends EditorAction
 {
+  public LockAction()
+  {
+    super("lock");
+  }
+
   public void doAction(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();

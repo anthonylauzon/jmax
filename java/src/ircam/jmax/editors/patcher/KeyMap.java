@@ -33,6 +33,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.toolkit.actions.*;
 
 /** Implement the key handling for the sketchpad, using the registerKeyboardAction
     mechanism; note that this can be easily extend for adding scripts commands.
@@ -94,16 +95,14 @@ class KeyMap
 
   /** Add a Action to the keymap */
 
-  public void add(Action action, int modifiers, int mnemonic)
+  public void add( EditorAction action, int modifiers, int mnemonic)
   {
-    add(action, modifiers, mnemonic, JComponent.WHEN_FOCUSED);
-  }
+    KeyStroke ks = KeyStroke.getKeyStroke(mnemonic, modifiers);
+    String name = action.getName();
 
-  public void add(Action action, int modifiers, int mnemonic, int condition)
-  {
-    component.registerKeyboardAction(action, 
-				     KeyStroke.getKeyStroke(mnemonic, modifiers),
-				     condition);
+    component.getInputMap().put( ks, name);
+    component.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW).put( ks, name);    
+    component.getActionMap().put(name, action);
   }
 }
 

@@ -35,7 +35,7 @@ public class ShowErrorAction extends EditorAction
 {
   public ShowErrorAction()
   {
-    super("ShowError");
+    super("show error");
   }
 
   public void doAction(EditorContainer container)

@@ -35,7 +35,7 @@ public class FontSmallerAction extends EditorAction
 {
   public FontSmallerAction()
   {
-    super("Font Smaller");
+    super("font smaller");
   }
 
   public void doAction(EditorContainer container)

@@ -36,9 +36,9 @@ public class ResizeAction extends EditorAction
   int dx;
   int dy;
   
-  public ResizeAction(int dx, int dy)
+  public ResizeAction(int dx, int dy, String name)
   {
-    super("Resize");
+    super( name);
 
     this.dx = dx;
     this.dy = dy;

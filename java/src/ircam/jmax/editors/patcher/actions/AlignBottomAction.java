@@ -33,6 +33,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class AlignBottomAction extends EditorAction
 {
+  public AlignBottomAction()
+  {
+    super("align bottom");
+  }
+
   public  void doAction(EditorContainer container)
   {
     if (ErmesSelection.patcherSelection.ownedBy((ErmesSketchPad)container.getEditor()))
