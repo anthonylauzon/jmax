@@ -20,7 +20,8 @@ import java.net.*;
 
 class FtsDatagramClientStream extends FtsStream
 {
-  final static private int max_packet_size = 256;
+  int sequence = -1;
+  final static private int max_packet_size = 512;
   DatagramSocket socket = null;
   byte in_data[]  = new byte[max_packet_size]; 
   byte out_data[] = new byte[max_packet_size];
@@ -110,7 +111,21 @@ class FtsDatagramClientStream extends FtsStream
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 
 	socket.receive(in_packet);
-	in_fill_p = 0;
+
+	if (sequence < -1)
+	  sequence = in_data[0];
+	else
+	  {
+	    sequence = (sequence + 1) % 128;
+
+	    if (sequence != in_data[0])
+	      {
+		System.out.println("UDP: packet out of sequence, use a client connection !");
+		sequence = in_data[0];
+	      }
+	  }
+
+	in_fill_p = 1;
       }
 
     c = in_data[in_fill_p++];

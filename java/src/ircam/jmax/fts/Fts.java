@@ -49,7 +49,7 @@ public class Fts
     else if (mode.equals("udpclient")) 
       server = new FtsServer(serverName + ":" + port,
 			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, Integer.parseInt(port)));
-    else if (mode.equals("client"))
+    else if (mode.equals("client") || mode.equals("tcp"))
       server = new FtsServer(serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
     else if (mode.equals("local"))
       server = new FtsServer("fts", new FtsSubProcessStream(ftsDir, ftsName));

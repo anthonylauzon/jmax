@@ -15,7 +15,7 @@
 /* #define MIDI_SYSEX_DEBUG */
 
 #include <unistd.h>
-#ifdef IRIX63
+#ifdef IRIX6_3
 #include <sys/dmcommon.h>	/* for stamp_t on IRIX 6.3 */
 #endif
 #include <dmedia/audio.h>

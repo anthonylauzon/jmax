@@ -406,15 +406,11 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Close()
   {
-    // Removed the code that save the file, because at the 
-    // MaxEditor level we *don't* know if we are editing 
-    // a file or other stuff; the correct thing to do 
-    // is to overwrite the method in the subclass and
-    // inside the redefined close do something like:
-    //  
-    //    < ask to save the file if we have a file ...>
-    //    super.Close()
-    //
+    Close(true);
+  }
+
+  public void Close(boolean doCancel)
+  {
     setVisible(false);
   }
 
@@ -447,7 +443,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void windowClosing(WindowEvent e)
   {
-    Close();
+    Close(false);
   }
   public void windowOpened(WindowEvent e)
   {

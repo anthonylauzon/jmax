@@ -696,7 +696,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       || code == Platform.DOWN_KEY;
   }
 
-  public void Close()
+  public void Close(boolean doCancel)
   {
     if (! itsDocument.isRootData(itsPatcherData))
       {
@@ -708,12 +708,12 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       {
 	if ( ShouldSave()) 
 	  {
-	    FileNotSavedDialog aDialog = new FileNotSavedDialog( this, itsDocument);
+	    FileNotSavedDialog aDialog = new FileNotSavedDialog( this, itsDocument, doCancel);
 
 	    aDialog.setLocation( 300, 300);
 	    aDialog.setVisible( true);
 
-	    if (aDialog.GetNothingToDoFlag()) 
+	    if (aDialog.GetNothingToDoFlag())
 	      return;
 
 	    if (aDialog.GetToSaveFlag())

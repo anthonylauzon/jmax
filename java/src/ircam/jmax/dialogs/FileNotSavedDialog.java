@@ -13,9 +13,14 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
   String itsMessage;
   Button itsSaveButton, itsCancelButton, itsNoButton;
   boolean itsToSave = true;
-  boolean itsNothingToDo;
+  boolean itsNothingToDo = false;
 
   public FileNotSavedDialog(Frame theFrame, MaxDocument theDocument) {
+    this(theFrame, theDocument, true);
+  }
+
+  public FileNotSavedDialog(Frame theFrame, MaxDocument theDocument, boolean doCancel)
+  {
     super(theFrame, "File Not Saved Message", true);
 
     if (theDocument.getDocumentFile() != null)
@@ -46,14 +51,18 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
     itsNoButton = new Button("Don't Save");
     itsNoButton.setBackground(Color.white);
     itsNoButton.addActionListener(this);
-    
+
     //p2.add("Center", itsNoButton);
     p2.add(itsNoButton);
-    itsCancelButton = new Button("Cancel");
-    itsCancelButton.setBackground(Color.white);
-    itsCancelButton.addActionListener(this);
-    //p2.add("West", itsCancelButton);
-    p2.add(itsCancelButton);
+    
+    if (doCancel)
+      {
+	itsCancelButton = new Button("Cancel");
+	itsCancelButton.setBackground(Color.white);
+	itsCancelButton.addActionListener(this);
+	//p2.add("West", itsCancelButton);
+	p2.add(itsCancelButton);
+      }
     
     add("South", p2);
     

@@ -113,7 +113,7 @@ make_fd_data()
   p = fts_malloc(sizeof(fd_dev_data_t));
   p->get_read_p = 0;
   p->get_size = 0;
-  p->put_buf_fill = 0;
+  p->put_buf_fill = 0;		/* leave place for the sequence number */
   p->block_on_listen = 0;	/* by default, don't block on listen */
 
   return p;
@@ -1069,7 +1069,7 @@ file_dev_seek(fts_dev_t *dev, long offset, int whence)
   */
 
 
-#define UDP_PACKET_SIZE 256
+#define UDP_PACKET_SIZE 512
 
 typedef struct udp_dev_data
 {
@@ -1088,6 +1088,11 @@ typedef struct udp_dev_data
 
   int  socket;
   struct sockaddr_in client_addr;
+
+  /* Sequence control */
+
+  char sequence;
+
 } udp_dev_data_t;
 
 
@@ -1101,8 +1106,8 @@ make_udp_data()
   p = fts_malloc(sizeof(udp_dev_data_t));
   p->get_read_p = 0;
   p->get_size = 0;
-  p->put_buf_fill = 0;
-
+  p->put_buf_fill = 1;
+  p->sequence = 0;
   return p;
 }
 
@@ -1169,6 +1174,7 @@ udp_dev_get(fts_dev_t *dev, unsigned char *cp)
 
 /* output buffering */
 
+static fts_status_t udp_dev_flush(fts_dev_t *dev);
 
 static fts_status_t
 udp_dev_put(fts_dev_t *dev, unsigned char c)
@@ -1179,18 +1185,7 @@ udp_dev_put(fts_dev_t *dev, unsigned char c)
 
   if (dev_data->put_buf_fill >= UDP_PACKET_SIZE)
     {
-      int r;
-
-      r = sendto(dev_data->socket, dev_data->put_buf, dev_data->put_buf_fill, 0,
-		 &(dev_data->client_addr), sizeof(dev_data->client_addr));
-
-      if (r != dev_data->put_buf_fill)
-	{
-	  dev_data->put_buf_fill = 0;
-	  return &fts_dev_io_error; /* error: File IO error */
-	}
-      else
-	dev_data->put_buf_fill = 0;
+      udp_dev_flush(dev);
     }
   
   return fts_Success;
@@ -1201,20 +1196,26 @@ udp_dev_flush(fts_dev_t *dev)
 {
   udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
 
-  if (dev_data->put_buf_fill > 0)
+  if (dev_data->put_buf_fill > 1)
     {
       int r;
 
+      /* set the sequence number and send */
+
+      dev_data->put_buf[0] = dev_data->sequence;
+      
       r = sendto(dev_data->socket, dev_data->put_buf, dev_data->put_buf_fill, 0,
-		 &(dev_data->client_addr), sizeof(dev_data->client_addr))	;
+		 &(dev_data->client_addr), sizeof(dev_data->client_addr));
+
+      dev_data->sequence = (dev_data->sequence + 1) % 128;
 
       if (r != dev_data->put_buf_fill)
 	{
-	  dev_data->put_buf_fill = 0;
+	  dev_data->put_buf_fill = 1; /* leave place for the sequence number */
 	  return &fts_dev_io_error; /* error: File IO error */
 	}
       else
-	dev_data->put_buf_fill = 0;
+	dev_data->put_buf_fill = 1;/* leave place for the sequence number */
     }
   
   return fts_Success;
