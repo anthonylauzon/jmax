@@ -43,8 +43,7 @@ table_integer_vector_get(fts_symbol_t name, int size)
     }
   else
     {
-      fts_set_int(&atom, size);
-      data = fts_data_new(fts_s_integer_vector, 1, &atom);
+      data = (fts_data_t *)fts_integer_vector_new(size);
 
       fts_data_refer(data);
       fts_data_set_name(data, name);
@@ -64,10 +63,13 @@ table_integer_vector_release(fts_symbol_t name)
 
   if (fts_hash_table_lookup(&table_integer_vector_table, name, &atom))
     {
-      fts_data_t *data = (fts_data_t *)fts_get_ptr(&atom);
+      fts_data_t *data = fts_get_data(&atom);
       
-      if(!fts_data_release(data))
-	fts_hash_table_remove(&table_integer_vector_table, name);
+      if(fts_data_derefer(data) == 0)
+	{
+	  fts_integer_vector_delete((fts_integer_vector_t *)data);
+	  fts_hash_table_remove(&table_integer_vector_table, name);
+	}
     }
   else
     return;
@@ -144,45 +146,32 @@ static void
 table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  fts_symbol_t name;
+  fts_symbol_t name = 0;
   int size;
   
-  if(ac > 1 && fts_is_data(at + 1))
+  if(ac == 2 && fts_is_data(at + 1))
     {
-      fts_data_t *data = fts_get_data(at + 1);
-
-      this->vector = data;
-      fts_data_refer(data);
+      this->vector = fts_get_data(at + 1);
+      fts_data_refer(this->vector);
+    }
+  else if(ac > 1 && fts_is_symbol(at + 1))
+    {
+      name = fts_get_symbol(at + 1);
+      size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
+      
+      this->vector = table_integer_vector_get(name, size);
+      fts_register_named_object(o, name);
     }
   else
     {
-      if(ac > 1 && fts_is_symbol(at + 1))
-	{
-	  name = fts_get_symbol(at + 1);
-	  size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
-	}
-      else
-	{
-	  name = 0;
-	  size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
-	}
+      size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
       
-      this->name = name;
-      
-      if(name)
-	{
-	  this->vector = table_integer_vector_get(name, size);
-	  fts_register_named_object(o, name);
-	}
-      else
-	{
-	  fts_atom_t a;
-	  fts_set_int(&a, size);
-	  this->vector = (fts_data_t *)fts_data_new(fts_s_integer_vector, 1, &a);
-	}
+      this->vector = (fts_data_t *)fts_integer_vector_new(size);
+      fts_data_refer(this->vector);
     }
-}
 
+  this->name = name;    
+}
 
 static void
 table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -195,7 +184,15 @@ table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_unregister_named_object(o, this->name);
     }
   else
-    fts_data_release(this->vector);
+    {
+      if(fts_data_derefer(this->vector) == 0)
+	{
+	  if(fts_data_is(this->vector, fts_s_integer_vector))
+	    fts_integer_vector_delete((fts_integer_vector_t *)this->vector);
+	  else
+	    fts_float_vector_delete((fts_float_vector_t *)this->vector);
+	}
+    }
 }
 
 /*********************************************************************
@@ -215,7 +212,7 @@ table_get_data(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 {
   table_t *this = (table_t *)obj;
 
-  fts_set_data(value, (fts_data_t *) this->vector);
+  fts_set_data(value, (fts_data_t *)this->vector);
 }
 
 /********************************************************************
@@ -275,7 +272,7 @@ table_int_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 /* set by atom list */
 static void
-table_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_int_set_from_atom_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_integer_vector_t *vec = (fts_integer_vector_t *)((table_t *)o)->vector;
   int offset;
@@ -284,6 +281,28 @@ table_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if (ac > 1)
     fts_integer_vector_set_from_atom_list(vec, offset, ac - 1, at + 1);
+}
+
+/* set by float vector */
+static void
+table_int_set_from_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_integer_vector_t *ivec = (fts_integer_vector_t *)((table_t *)o)->vector;
+  fts_float_vector_t *fvec = (fts_float_vector_t *)fts_get_data(at);
+  int iv_size = fts_integer_vector_get_size(ivec);
+  int fv_size = fts_float_vector_get_size(fvec);
+  int i, n;
+
+  if(iv_size > fv_size)
+    n = fv_size;
+  else
+    n = iv_size;
+
+  for(i=0; i<n; i++)
+    {
+      int value = (int)(fts_float_vector_get_element(fvec, i) + 0.5);
+      fts_integer_vector_set_element(ivec, i, value);
+    }
 }
 
 static void
@@ -358,10 +377,10 @@ table_int_resize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 table_int_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_data_t *vec = ((table_t *)o)->vector;
+  fts_integer_vector_t *vec = (fts_integer_vector_t *)((table_t *)o)->vector;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
   
-  fts_integer_vector_save_bmax((fts_integer_vector_t *)vec, f);
+  fts_integer_vector_save_bmax(vec, f);
 }
 
 /********************************************************************
@@ -478,10 +497,10 @@ table_float_resize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 table_float_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_data_t *vec = ((table_t *)o)->vector;
+  fts_float_vector_t *vec = (fts_float_vector_t *)((table_t *)o)->vector;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
   
-  fts_float_vector_save_bmax((fts_float_vector_t *)vec, f);
+  fts_float_vector_save_bmax(vec, f);
 }
 
 /********************************************************************
@@ -538,14 +557,16 @@ table_int_define_methods(fts_class_t *cl, int ac, const fts_atom_t *at)
   if(!table_is_const(ac, at))
     {
       /* the method set is also installed on the system inlet, and is used for .bmax loading */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_int_set);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_int_set_from_atom_list);
       
       /* save to bmax file */
       a[0] = fts_s_ptr;
       fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, table_int_save_bmax, 1, a);
 
       fts_method_define_varargs(cl, 0, fts_s_list, table_int_list);
-      fts_method_define_varargs(cl, 0, fts_s_set, table_int_set);
+      fts_method_define_varargs(cl, 0, fts_s_set, table_int_set_from_atom_list);
+      a[0] = fts_s_data;
+      fts_method_define_varargs(cl, 0, fts_s_float_vector, table_int_set_from_float_vector);
       fts_method_define(cl, 0, fts_new_symbol("const"), table_int_const, 1, a);
       fts_method_define(cl, 0, fts_s_clear, table_int_clear, 0, 0);
     }

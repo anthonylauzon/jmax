@@ -57,8 +57,9 @@ const_obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   const_obj_t *this = (const_obj_t *) o;
 
-  if (fts_is_data(&this->a))
-    fts_data_release(fts_get_data(&this->a));
+  /* this is NOT garbage collected! */
+  if(fts_is_data(&this->a))
+    fts_data_derefer(fts_get_data(&this->a));
 }
 
 /********************************************************************

@@ -118,7 +118,6 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
   fts_method_define_float(cl, 0, print_atoms);
   fts_method_define_symbol(cl, 0, print_atoms);
   fts_method_define_list(cl, 0, print_list);
-  fts_method_define_data(cl, 0, print_atoms);
   fts_method_define_anything(cl, 0, print_anything);
 
   return fts_Success;

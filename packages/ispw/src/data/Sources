@@ -17,7 +17,6 @@ SOURCES = \
   float.c \
   symbol.c \
   const.c \
-  var.c \
   funbuff.c \
   integer.c \
   pbank.c \
