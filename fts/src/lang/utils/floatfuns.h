@@ -1,6 +1,8 @@
 #ifndef _FLOATFUNS_H_
 #define _FLOATFUNS_H_
 
+#include "fts.h"
+
 /***************************************************************************************
  *
  *  float functions
@@ -20,33 +22,27 @@ extern fts_float_function_t fts_ffun_get_ptr(fts_symbol_t name);
 /***************************************************************************************
  *
  *  float function tables
- *  (float arrays asssociated to fts_ffuns for fast function lookups)
+ *  (float arrays asssociated to fts_ffuns for function table lookups)
  *
- *     physical size is their instantiation size + 1
- *     fftab[0] = ffun(min)
- *     fftab[size] = ffun(max)
+ *     the physical size is the instantiation size + 1, so that
+ *       fftab[0] = ffun(min)
+ *       fftab[size] = ffun(max)
  *
  */
 
-typedef struct _fts_fftab
-{
-  float *values;
-  int size; /* table size must be a power of two (for fast lookups) */
-  float min;
-  float max;
-  float scale; /* size. / (max - min) */
-  struct _fts_fftab *next_in_list; /* for list of tables for one float function */
-  int ref; /* reference counter */
-} fts_fftab_t;
-
 /* get (or create) table for existing function */
-extern fts_fftab_t *fts_fftab_get(fts_symbol_t name, float min, float max, int size);
+extern float *fts_fftab_get(fts_symbol_t name, int size, float min, float max);
 
-/* release (maybe destroy) table of given function */
-extern void fts_fftab_release(fts_symbol_t name, fts_fftab_t *fftab);
-
-#define fts_fftab_get_float_ptr(fftab) ((fftab)->values)
-#define fts_fftab_get_size(fftab) ((fftab)->size)
-
+/* get sine and cosine tables */
+extern float *fts_fftab_get_sine(int size); /* size must be a multiple of 4 */
+extern float *fts_fftab_get_sine_first_half(int size); /* size must be a multiple of 2 */
+extern float *fts_fftab_get_sine_second_half(int size); /* size must be a multiple of 2 */
+extern float *fts_fftab_get_sine_first_quarter(int size);
+extern float *fts_fftab_get_sine_second_quarter(int size);
+extern float *fts_fftab_get_sine_third_quarter(int size);
+extern float *fts_fftab_get_sine_fourth_quarter(int size);
+extern float *fts_fftab_get_cosine(int size); /* size must be a multiple of 4 */
+extern float *fts_fftab_get_cosine_first_half(int size); /* size must be a multiple of 2 */
+extern float *fts_fftab_get_cosine_second_half(int size); /* size must be a multiple of 2 */
 
 #endif

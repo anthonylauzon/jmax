@@ -73,4 +73,3 @@ fts_wto_run_freq(fts_wto_t *wto, float *freq, float *out, long n)
 
   wto->index = fts_wrap_value_get_wrapped(&wv, wto->size);
 }
-
