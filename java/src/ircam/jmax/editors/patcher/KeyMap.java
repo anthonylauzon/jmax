@@ -67,8 +67,7 @@ class KeyMap
 
     // Fixed Resize Actions
     add(Actions.resizeTenLeftAction,  Event.SHIFT_MASK, KeyEvent.VK_SUBTRACT);
-    add(Actions.resizeTenRightAction, Event.SHIFT_MASK, KeyEvent.VK_ADD);
-    
+    add(Actions.resizeTenRightAction, Event.SHIFT_MASK, KeyEvent.VK_ADD);    
     //add(Actions.resizeTenUpAction,    Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
     //add(Actions.resizeTenDownAction,  Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
@@ -77,13 +76,18 @@ class KeyMap
     //add(Actions.resizeUpAction,    Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_UP);
     //add(Actions.resizeDownAction,  Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_DOWN);
 
-    // Resize Align operations
+    // Resize Align operations    
+    add(Actions.resizeToMaxWidthAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeToMaxHeightAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | Event.SHIFT_MASK, KeyEvent.VK_UP);
+    add(Actions.resizeToMinWidthAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
+    add(Actions.resizeToMinHeightAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
-    add(Actions.resizeToMaxWidthAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
-    add(Actions.resizeToMaxHeightAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
-    add(Actions.resizeToMinWidthAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
-    add(Actions.resizeToMinHeightAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
-
+     // Align operations
+    add(Actions.alignTopAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_UP);
+    add(Actions.alignLeftAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_LEFT);
+    add(Actions.alignBottomAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_DOWN);
+    add(Actions.alignRightAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_RIGHT);
+    
     // Delete selection
 
     add(Actions.deleteSelectionAction, 0, KeyEvent.VK_DELETE);
