@@ -32,8 +32,6 @@
 /*                                                                            */
 /******************************************************************************/
 
-static void oss_init(void);
-
 extern void ossaudioport_config( void);
 
 void oss_config(void)

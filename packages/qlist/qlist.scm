@@ -27,14 +27,14 @@
 (require-package "ispw" "0.0.0")
 
 ; load server module
-(ucs "load" "module" "qlist" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "qlist")))
+(ucs "load" "module" "qlist" (file-cat dir "c" "lib" (libname "qlist")))
 
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.qlist.QListExtension")
 
 ; just one help patch to declare
-(help-patch "qlist" (file-cat dir "qlist.help.jmax"))
+(help-patch "qlist" (file-cat dir "help" "qlist.help.jmax"))
 
 (println "package: qlist (ISPW queue file class with editor)")
 

@@ -1,4 +1,9 @@
-2001-08-22    <Standard@PC-TEMPS-REEL>
+2001-08-29    <peter@hanappe.com>
+
+	* Scheme.java: added setOutput(), getOutput(), setInput(), and
+	getInput() to be able to redirect IO to the jMax console.
+
+2001-08-22    <peter@hanappe.com>
 
 	* InputPort.java: 
 

@@ -52,17 +52,21 @@ public class SilkInterpreter extends SchemeInterpreter
     /** The Silk object ued for the evaluation. */
     Scheme itsInterp;
 
-    public Scheme getScheme() {
+    public Scheme getScheme() 
+    {
 	return itsInterp;
     } 
 
-    /** The input port. */
-    InputPort input;
+    public void outputToConsole()
+    {
+	/* the jMax console installs a new System.out
+           stream. reinitialize the interpreter's output port with the
+           new System.out. */
+	itsInterp.setOutput(new PrintWriter(System.out, true));
+    }
 
-    /** The output print writer. */
-    PrintWriter output;
-
-    class loadProcedure extends Procedure {
+    class loadProcedure extends Procedure 
+    {
 	public Object apply(Scheme interpreter, Object args) {
 	    String name = "<unknown>";
 	    try {
@@ -90,10 +94,6 @@ public class SilkInterpreter extends SchemeInterpreter
 
 	Primitive.installPrimitives(schemeEnvironment); 
 	load(new InputPort(new StringReader(SchemePrimitives.CODE)));
-
-	/* By default use the standard in/out */
-	setInput(new InputPort(System.in));
-	setOutput(new PrintWriter(System.out));
 
 	/* We substitute Silk's "new", "method", and load primitives
 	 * with our own. The "method" converts strings as
@@ -158,27 +158,6 @@ public class SilkInterpreter extends SchemeInterpreter
 	    {
 		throw new ScriptException("Scheme error in initialization: " + e.getMessage());
 	    }	
-    }
-
-    /** Sets input port. */
-    public void setInput(InputPort input) {
-	this.input = input;
-    }
-
-    /** Returns the input port. */
-    public InputPort getInput() {
-	return input;
-    }
-
-    /** Sets output print writer. */
-    public void setOutput(PrintWriter output) {
-	this.output = output;
-    }
-
-    /** Returns the output print writer. */
-    public PrintWriter getOutput() 
-    {
-	return output;
     }
 
     /** Sets the current environment. */
@@ -276,15 +255,12 @@ public class SilkInterpreter extends SchemeInterpreter
     /* Quick & Dirty, that is FIXME */
     public boolean commandComplete(String s) 
     {
-	try  
-	    {
-		Object x = new InputPort(new StringReader(s)).read();
-		return true;
-	    }
-	catch (Exception e) 
-	    {
-		return false;
-	    }
+	try  {
+	    Object x = new InputPort(new StringReader(s)).read();
+	    return true;
+	} catch (Exception e) {
+	    return false;
+	}
     }
 
     public Project loadProject(JMaxPackage context, File proj) throws ScriptException
@@ -331,19 +307,19 @@ public class SilkInterpreter extends SchemeInterpreter
 	Object y;
 	while (true) {
 	    try {
-		output.print("> "); 
-		output.flush();
-		x = input.read();
+		itsInterp.getOutput().print("> "); 
+		itsInterp.getOutput().flush();
+		x = itsInterp.getInput().read();
 		if (InputPort.isEOF(x)) {
 		    return;
 		}
 		y = itsInterp.eval(x, currEnvironment); 
-		SchemeUtils.write(y, output, true); 
-		output.println(); 
-		output.flush();
+		SchemeUtils.write(y, itsInterp.getOutput(), true); 
+		itsInterp.getOutput().println(); 
+		itsInterp.getOutput().flush();
 	    } catch (Exception e) { 
 		e.printStackTrace();
-		output.println("**** ERROR: " + e.getMessage());
+		itsInterp.getOutput().println("**** ERROR: " + e.getMessage());
 	    }
 	}
     }

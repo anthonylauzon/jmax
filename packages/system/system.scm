@@ -25,7 +25,7 @@
 (provide-package "system" "0.0.0")
 
 ; load dynamic libraries into the server
-(ucs "load" "module" "system" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "system")))
+(ucs "load" "module" "system" (file-cat dir "c" "lib" (libname "system")))
 
 ;help
 (sshh-load (file-cat dir "help" "system.help.index.scm"))

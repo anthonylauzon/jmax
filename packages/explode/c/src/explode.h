@@ -24,7 +24,23 @@
  *
  */
 
+#ifndef _EXPLODE_H
+#define _EXPLODE_H
 
+#include <fts/fts.h>
+
+#ifdef WIN32
+#if defined(EXPLODE_EXPORTS)
+#define EXPLODE_API __declspec(dllexport)
+#else
+#define EXPLODE_API __declspec(dllimport)
+#endif
+#else
+#define EXPLODE_API extern
+#endif
+
+EXPLODE_API void
+explode_config(void);
 
 typedef struct _evt
 {
@@ -119,3 +135,4 @@ extern explode_t *explode_get_by_name(fts_symbol_t name);
 #define explode_set_editor_close(e) ((e)->open = 0)
 #define explode_editor_is_open(e) ((e)->open != 0)
 
+#endif /* _EXPLODE_H */

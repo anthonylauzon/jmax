@@ -22,6 +22,57 @@
 
 #include <fts/fts.h>
 
+#ifdef WIN32
+
+#include <windows.h>
+
+/**************************************
+ *
+ *      WinMain
+ */
+int PASCAL 
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+	LPSTR lpszCmdLine, int nCmdShow) 
+{
+  int argc = 0;
+  char* argv[32];
+  char* s;
+  int expect_string = 1;
+
+  /* Tokenize the command line */
+  argv[argc++] = "fts";
+  
+  s = lpszCmdLine;
+  while (*s != 0) {
+    if (isgraph(*s) && expect_string) {
+      argv[argc++] = s;
+      expect_string = 0;
+    } else if (!isgraph(*s) && !expect_string) {
+      *s = 0;
+      expect_string = 1;
+    }
+    s++;
+  }
+  argv[argc] = NULL;
+
+  /* Initialize FTS */
+  fts_init( argc, argv);
+
+  /* Run the scheduler */
+  fts_sched_run();
+
+  /* When and if the scheduler exit, run the shutdown functions and return */
+/*    fts_modules_shutdown(); */
+
+  return 0;
+}
+
+#else
+
+/**************************************
+ *
+ *      main
+ */
 int
 main( int argc, char **argv)
 {
@@ -35,3 +86,4 @@ main( int argc, char **argv)
 
   return 0;
 }
+#endif

@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "naming.h"
 
 /*
  * Basic naming services; for now, just provide global names,

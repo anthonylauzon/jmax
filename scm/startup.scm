@@ -81,7 +81,7 @@
 ;; load installation default packages
 ;; Use sourceFile as a protection against user errors
 ;;
-(sshh-load (file-cat jmax-root "tutorials" "basics" "project.env"))
+(sshh-load (file-cat jmax-root "tutorials" "basics" "project.scm"))
 
 ;;
 ;; Load installation default packages.

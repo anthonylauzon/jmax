@@ -57,11 +57,11 @@ typedef struct _fts_object_set_t
 
 /*@}*/
 
-extern fts_symbol_t objectset_symbol;
-extern fts_symbol_t sym_objectset_add;
-extern fts_symbol_t sym_objectset_remove;
-extern fts_symbol_t sym_objectset_clear;
-extern fts_symbol_t sym_objectset_get_objects;
+FTS_API fts_symbol_t objectset_symbol;
+FTS_API fts_symbol_t sym_objectset_add;
+FTS_API fts_symbol_t sym_objectset_remove;
+FTS_API fts_symbol_t sym_objectset_clear;
+FTS_API fts_symbol_t sym_objectset_get_objects;
 
 /**
  * Initializes an objectset

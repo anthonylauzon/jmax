@@ -58,7 +58,6 @@
 (define get-property                 max-application-get-property)
 (define set-property                 max-application-set-property)
 (define quit                         max-application-quit)
-(define open-console                 new-console-window)
 (define exit                         max-application-quit)
 
 ;;
@@ -145,6 +144,13 @@
 ;;
 (define (sshh-load file)
   (scheme-interpreter-load-silently jmax-interp file))
+
+;;
+;; console
+;;
+(define (open-console)
+  (new-console-window)
+  (scheme-interpreter-output-to-console jmax-interp))
 
 ;;
 ;; key-stroke

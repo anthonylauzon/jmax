@@ -24,8 +24,12 @@
  *
  */
 
-#include <fts/fts.h>
 #include "atomlist.h"
+#include <ftsconfig.h>
+
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 /* Heaps */
 
@@ -127,8 +131,14 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   fts_atom_list_iterator_t *iterator;
-  fts_atom_t a[this->size+1];
+  fts_atom_t* a;
   int i =0;
+
+#if HAVE_ALLOCA
+  a = alloca((this->size + 1) * sizeof(fts_atom_t));
+#else
+  a = malloc((this->size + 1) * sizeof(fts_atom_t));
+#endif
 
   if(!fts_object_has_id((fts_object_t *)this))
     fts_client_upload((fts_object_t *)this, atomlist_symbol, 0, 0);
@@ -150,6 +160,10 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
   fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
 
   fts_atom_list_iterator_free(iterator);
+
+#ifndef HAVE_ALLOCA
+  free(a);
+#endif
 }
 
 /* list manipulation */
@@ -223,8 +237,14 @@ static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, i
 {
     fts_atom_list_t *this = (fts_atom_list_t *)o;
     fts_atom_list_iterator_t *iterator;
-    fts_atom_t a[this->size]; 
+    fts_atom_t* a; 
     int i =0;
+
+#if HAVE_ALLOCA
+  a = alloca(this->size * sizeof(fts_atom_t));
+#else
+  a = malloc(this->size * sizeof(fts_atom_t));
+#endif
 
     iterator = fts_atom_list_iterator_new(this);
 
@@ -238,6 +258,10 @@ static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, i
     fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
 
     fts_atom_list_iterator_free(iterator);
+
+#ifndef HAVE_ALLOCA
+    free(a);
+#endif
 }
 
 /* Check for subsequences */

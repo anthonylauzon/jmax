@@ -26,7 +26,7 @@
 
 
 #include <stdio.h>
-#include <fts/fts.h>
+#include <ftsconfig.h>
 #include "explode.h"
 
 static long explode_nextserial;
@@ -48,6 +48,8 @@ static fts_symbol_t sym_change_time   = 0;
 static fts_symbol_t sym_change_event  = 0;
 static fts_symbol_t sym_remove_event  = 0;
 static fts_symbol_t sym_add_event     = 0;
+
+void explay_config(void);
 
 /****************************************************************************/
 /*                                                                          */
@@ -1577,4 +1579,6 @@ explode_config(void)
   fts_class_install(explode_symbol, explode_instantiate);
 
   init_explode_register();
+
+  explay_config();
 }

@@ -1,0 +1,17 @@
+(help-summary "Basics Tuturial" (file-cat dir "BASICS.jmax"))
+
+(template "bang & buttons" (file-cat dir "bang.tutorial.jmax"))
+(template "the comment" (file-cat dir "comment.tutorial.jmax"))
+(template "connecting via labels" (file-cat dir "labels.tutorial.jmax"))
+(template "lists" (file-cat dir "lists.tutorial.jmax"))
+(template "simple messages" (file-cat dir "message.tutorial.jmax"))
+(template "a metronome object" (file-cat dir "metro.tutorial.jmax"))
+(template "numbers" (file-cat dir "numbers.tutorial.jmax"))
+(template "execution order I" (file-cat dir "order1.tutorial.jmax"))
+(template "execution order II" (file-cat dir "order2.tutorial.jmax"))
+(template "execution order III" (file-cat dir "order3.tutorial.jmax"))
+(template "patchers & templates" (file-cat dir "patchers.tutorial.jmax"))
+(template "about recursion" (file-cat dir "recursion.tutorial.jmax"))
+(template "using variables" (file-cat dir "variables.tutorial.jmax"))
+
+(template "coucou" (file-cat dir "coucou.jmax"))

@@ -28,7 +28,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "qlist.h"
 #include "atomlist.h"
 #include "naming.h"
 

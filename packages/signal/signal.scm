@@ -27,7 +27,7 @@
 
 (require-package "data" "0.0.0")
 
-(ucs "load" "module" "signal" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "signal")))
+(ucs "load" "module" "signal" (file-cat dir "c" "lib" (libname "signal")))
 
 (println "package: signal (basic signal classes)")
 

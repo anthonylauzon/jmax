@@ -24,6 +24,5 @@
 #
 
 SOURCES = \
-module.c \
 explay.c \
 explode.c \

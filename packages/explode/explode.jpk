@@ -35,7 +35,7 @@ java::load -classpath "$dir/java/classes" ircam.jmax.editors.explode.ExplodeExte
 
 ## load the help patch data base
 sourceFile $dir/help/explode.help.index.tcl
-helpSummary "explode summary" $dir/explode.summary.jmax
+helpSummary "explode summary" $dir/help/explode.summary.jmax
 
 puts "package: explode (ISPW sequencing class with editor)"
 

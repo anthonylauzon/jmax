@@ -25,7 +25,7 @@
 
 (provide-package "numeric" "0.0.0")
 
-(ucs "load" "module" "numeric" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "numeric")))
+(ucs "load" "module" "numeric" (file-cat dir "c" "lib" (libname "numeric")))
 
 (println "package: numeric (numeric classes)")
 

@@ -13,6 +13,26 @@ public class Scheme extends SchemeUtils {
   PrintWriter output = new PrintWriter(System.out, true);
   Environment globalEnvironment = new Environment();
 
+  /** Sets output print writer. */
+  public void setOutput(PrintWriter output) {
+    this.output = output;
+  }
+
+  /** Returns the output print writer. */
+  public PrintWriter getOutput() {
+    return output;
+  }
+
+  /** Sets input port. */
+  public void setInput(InputPort input) {
+    this.input = input;
+  }
+
+  /** Returns the input port. */
+  public InputPort getInput() {
+    return input;
+  }
+
   /** Create a Scheme interpreter and load an array of files into it.
    * Also load SchemePrimitives.CODE. **/
   public Scheme(String[] files) { 

@@ -63,6 +63,10 @@ public abstract class SchemeInterpreter implements Interpreter
 	}
     }
 
+    public void outputToConsole()
+    {
+    }
+
     /** Creates a KeyStroke object, given a key (as string) and the
      *  values of the modifiers. The only keys currently accepted are
      *  [0-9] and [a-z]. */

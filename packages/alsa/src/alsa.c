@@ -32,8 +32,6 @@
 /*                                                                            */
 /******************************************************************************/
 
-static void alsa_init(void);
-
 extern void alsaaudioport_config( void);
 extern void alsarawmidiport_config( void);
 

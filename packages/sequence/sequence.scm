@@ -25,7 +25,7 @@
 (provide-package "sequence" "0.0.0")
 
 ; load server module
-(ucs "load" "module" "sequence" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "sequence")))
+(ucs "load" "module" "sequence" (file-cat dir "c" "lib" (libname "sequence")))
 
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))

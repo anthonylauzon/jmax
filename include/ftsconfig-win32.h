@@ -29,6 +29,7 @@
 #undef HAVE_ALLOCA_H 
 #undef HAVE_SYS_TIME_H
 #undef HAVE_SYS_PARAM_H 
+#define HAVE_ALLOCA 1
 #define HAVE_DIRECT_H 1
 #define HAVE_PROCESS_H 1
 #define HAVE_IO_H 1
@@ -49,6 +50,7 @@
 #define alloca _alloca
 #define getpid _getpid
 #define snprintf _snprintf
+#define alloca _alloca
 #define bcopy(src,dst,n)  memcpy(dst,src,n)
 
 /* file handling macros */

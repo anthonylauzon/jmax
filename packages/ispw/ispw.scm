@@ -25,7 +25,7 @@
 (provide-package "ispw" "0.0.0")
 
 ; load the dynamic libraries in FTS
-(ucs "load" "module" "ispw" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "ispw")))
+(ucs "load" "module" "ispw" (file-cat dir "c" "lib" (libname "ispw")))
 
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.ispw.ISPWExtension")

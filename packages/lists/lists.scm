@@ -25,7 +25,7 @@
 (provide-package "lists" "0.0.0")
 
 ; load the dynamic libraries into the server
-(ucs "load" "module" "lists" (file-cat dir "lib" jmax-arch jmax-mode (libname "lists")))
+(ucs "load" "module" "lists" (file-cat dir "lib" (libname "lists")))
 
 ; require ISPW classes for the templates
 (require-package "ispw" "0.0.0")

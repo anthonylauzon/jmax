@@ -19,6 +19,7 @@
 (define scheme-interpreter-load-silently (method "loadSilently" "ircam.jmax.script.scm.SchemeInterpreter" "java.lang.String"))
 (define scheme-interpreter-to-java-string (method "toJavaString" "ircam.jmax.script.scm.SchemeInterpreter" "java.lang.Object"))
 (define scheme-interpreter-is-null (method "isNull" "ircam.jmax.script.scm.SchemeInterpreter" "java.lang.Object"))
+(define scheme-interpreter-output-to-console (method "outputToConsole" "ircam.jmax.script.scm.SchemeInterpreter"))
 (define package-handler-set-unknown-script (method "setUnknownScript" "ircam.jmax.script.pkg.PackageHandler" "ircam.jmax.script.Script"))
 (define package-handler-get-unknown-script (method "getUnknownScript" "ircam.jmax.script.pkg.PackageHandler"))
 (define package-handler-provide (method "provide" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String" "java.lang.String"))

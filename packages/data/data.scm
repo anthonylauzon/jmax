@@ -27,7 +27,7 @@
 
 (provide-package "data" "0.0.0")
 
-(ucs "load" "module" "data" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "data")))
+(ucs "load" "module" "data" (file-cat dir "c" "lib" (libname "data")))
 
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))

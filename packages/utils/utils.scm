@@ -25,7 +25,7 @@
 
 (provide-package "utils" "0.0.0")
 
-(ucs "load" "module" "utils" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "utils")))
+(ucs "load" "module" "utils" (file-cat dir "c" "lib" (libname "utils")))
 
 (println "package: utils (utility functions)")
 

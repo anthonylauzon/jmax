@@ -28,7 +28,7 @@
 (provide-package "guiobj" "0.0.0")
 
 ; load dynamic libraries into the server
-(ucs "load" "module" "guiobj" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "guiobj")))
+(ucs "load" "module" "guiobj" (file-cat dir "c" "lib" (libname "guiobj")))
 
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.guiobj.GuiObjExtension")

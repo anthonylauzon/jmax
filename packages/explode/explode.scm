@@ -25,7 +25,7 @@
 (provide-package "explode" "0.0.0")
 
 ; load server module
-(ucs "load" "module" "explode" (file-cat dir "c" "lib" jmax-arch jmax-mode "libexplode.so"))
+(ucs "load" "module" "explode" (file-cat dir "c" "lib" (libname "explode")))
 
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
@@ -33,6 +33,7 @@
 
 ;; load the help patch data base
 (sshh-load (file-cat dir "help" "explode.help.index.scm"))
+(help-summary "explode summary" (file-cat dir "help" "explode.summary.jmax"))
 
 (println "package: explode (ISPW sequencing class with editor)")
 
