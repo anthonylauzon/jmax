@@ -50,6 +50,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
   static private ConsoleWindow consoleWindowSingleInstance = null;
 
   private ConsoleArea consoleArea;
+  private boolean noConsole;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
@@ -60,7 +61,9 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
 
   public static void append( String line)
   {
-    if ( consoleWindowSingleInstance != null)
+    if ( consoleWindowSingleInstance.noConsole)
+      System.out.println( line);
+    else
       consoleWindowSingleInstance.consoleArea.append( line);
   }
 
@@ -74,10 +77,12 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
 
     consoleArea = new ConsoleArea( 1000, 80);
 
+    noConsole = true;
     if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 
 	 (MaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
 	System.setOut( new PrintStream( new ConsoleOutputStream( consoleArea)));
+	noConsole = false;
       }
     else
       consoleArea.append( "Output redirected to Java standard output");
@@ -94,7 +99,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
     JScrollPane jsp = new JScrollPane( consoleArea);
 
     jsp.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    jsp.getViewport().setBackingStoreEnabled( true);
+    //jsp.getViewport().setBackingStoreEnabled( true);
 
     getContentPane().add( BorderLayout.CENTER, jsp);
 
