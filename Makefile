@@ -31,7 +31,6 @@ endif
 
 all:
 	(cd fts; $(MAKE) $@)
-
 	(cd java ; $(MAKE) $@)
 	(cd lib; $(MAKE) $@)
 	(cd packages; $(MAKE) $@)
@@ -222,6 +221,14 @@ install-bin:
 install-includes:
 	( cd fts/src ; $(MAKE_INSTALL) include_install_dir=$(include_install_dir) install )
 .PHONY: install-includes
+
+
+# Another hack that allows to install one single package...
+install-one-package:
+	(cd packages/$(PACKAGE) ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd packages/$(PACKAGE) ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install-noarch )
+.PHONY: install-one-package
+
 
 #
 # new-patch, new-minor, new-major

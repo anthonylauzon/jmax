@@ -228,15 +228,18 @@ for example)
 <p>
 You can install the Swing classes in the directory of your choice,
 as long as the Swing directory is defined in environment variables.
-The following place can be used for example: <code>/usr/share/jfc</code>.
+The following place can be used for example: <code>/usr/local</code>.
+If you untar file swing1_1_1.tar.Z (that you have downloaded from
+Sun's site) in /usr/local, you will end up with a directory
+named /usr/local/swing-1.1.1fcs.
 
 <p>
 Once you have defined installation directory, you must add environment 
 variables definition. This can be done by adding the following lines
 (modify <code>SWING_HOME</code> to reflect the current settings of your system):
 <pre>
-SWING_HOME="/usr/share/jfc/swing1.1.1"
-CLASSPATH="$SWING_HOME/lib/swingall.jar"
+SWING_HOME="/usr/local/swing-1.1.1fcs"
+CLASSPATH="$SWING_HOME/swingall.jar"
 export CLASSPATH
 </pre>
 to your <code>.bashrc</code> or <code>.cshrc</code> file in your home directory (modify

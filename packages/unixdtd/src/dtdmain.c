@@ -526,7 +526,6 @@ static void dtd_main_loop( int fd)
 
       FD_ZERO( &rfds);
 
-      FD_SET( 0, &rfds);
       FD_SET( fd, &rfds);
       
       retval = select( fd+1, &rfds, NULL, NULL, &tv);

@@ -1,3 +1,11 @@
+2000-11-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* I think I've fixed the bug of dtd server going up to 99% CPU.
+	(file descriptor 0 was set in the select() for dtd server)
+
+	* added a hack in toplevel Makefile to allow to install a single package.
+	The correct fix would be to include one single Makefile for the architecture.
+
 2000-10-26  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* added compile hint ENABLE_ALSA0.6 to compile package alsa0.6dev
