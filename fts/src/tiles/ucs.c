@@ -70,12 +70,14 @@
    and without.
 
 */
+#include <fts/sys.h>
 
 #include <string.h>
 
+#if HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
 
-#include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
 #include "ucs.h"

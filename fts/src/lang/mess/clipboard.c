@@ -37,12 +37,20 @@
    It should  not be an object, but a specialized fts_data_t.
 */
 
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
+
+#include <stdlib.h>
+#include <sys/types.h>
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_PROCESS_H
+#include <process.h>
+#endif
+
 #include "clipboard.h"
 
 typedef struct 

@@ -23,18 +23,32 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#include <fts/sys.h>
+
 #include <stdarg.h>
 #include <stdlib.h>
+
+#if HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
+
 #include <sys/types.h>
+
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 
-#include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime/time/time.h>
 #include <fts/runtime/sched/sched.h>
+
 
 
 typedef struct sched_callback

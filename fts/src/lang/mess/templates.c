@@ -47,14 +47,21 @@
 
 /* #define TEMPLATE_DEBUG */
 
+#include <fts/sys.h>
+
 #include <string.h>
 #include <stdlib.h>
-#include <sys/param.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-#include <fts/sys.h>
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <fts/lang/mess.h>
 #include <fts/lang/utils.h>
 #include <fts/lang/datalib.h>

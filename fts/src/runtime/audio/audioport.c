@@ -27,14 +27,16 @@
 
 
 #include <stdlib.h>
-#ifndef MACOSX
-#include <alloca.h>
-#endif
+
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
 #include <fts/runtime/sched/sched.h>
 #include <fts/runtime/audio/audioport.h>
+
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)( struct _fts_audioport_t *port))-1)
 

@@ -26,6 +26,7 @@
 
 
 #include <signal.h>
+#include <stdlib.h>
 
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
@@ -87,14 +88,20 @@ void fts_autosave_init( void)
 #ifndef DEBUG 
   /* Standard quit/int signals */
 
+#ifndef WIN32
   signal(SIGHUP,  autosave_signal_handler);
+#endif
   signal(SIGINT,  autosave_signal_handler);
+#ifndef WIN32
   signal(SIGQUIT, autosave_signal_handler);
+#endif
   signal(SIGABRT, autosave_signal_handler);
 
   /* Corruption signals */
 
+#ifndef WIN32
   signal(SIGBUS, autosave_signal_handler);
+#endif
   signal(SIGSEGV, autosave_signal_handler);
   signal(SIGTERM, autosave_signal_handler);
 #endif

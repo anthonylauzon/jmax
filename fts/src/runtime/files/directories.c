@@ -24,10 +24,17 @@
  *
  */
 
-#include <unistd.h>
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_DIRECT_H
+#include <direct.h>
+#endif
 
 
 static fts_symbol_t fts_search_path = 0;

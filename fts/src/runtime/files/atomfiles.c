@@ -50,12 +50,18 @@
    Atoms are read and written to/from "fts_atom_file_t" 
    
 */
-
-#include <unistd.h>
 #include <string.h>
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_IO_H
+#include <io.h>
+#endif
 
 #define ATOM_FILE_BUF_SIZE 512
 

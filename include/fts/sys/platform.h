@@ -47,6 +47,13 @@
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
 #define HAS_IEEE_FLOAT
+#define HAVE_UNISTD_H 1
+#define HAVE_ALLOCA_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_PARAM_H 1
+#undef HAVE_DIRECT_H
+#undef HAVE_PROCESS_H
+#undef HAVE_IO_H 
 
 #elif defined(LINUXPPC)
 
@@ -56,6 +63,13 @@
 #define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
+#define HAVE_UNISTD_H 1
+#define HAVE_ALLOCA_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_PARAM_H 1
+#undef HAVE_DIRECT_H
+#undef HAVE_PROCESS_H
+#undef HAVE_IO_H 
 
 #elif defined(MACOSX)
 
@@ -65,6 +79,13 @@
 #undef HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
+#define HAVE_UNISTD_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_PARAM_H 1
+#undef HAVE_ALLOCA_H
+#undef HAVE_DIRECT_H
+#undef HAVE_PROCESS_H
+#undef HAVE_IO_H 
 
 
 /*********************************************************************
@@ -82,6 +103,13 @@
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_HAS_BIG_ENDIAN
 #define HAS_IEEE_FLOAT
+#define HAVE_UNISTD_H 1
+#define HAVE_ALLOCA_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_PARAM_H 1
+#undef HAVE_DIRECT_H
+#undef HAVE_PROCESS_H
+#undef HAVE_IO_H 
 
 /*********************************************************************
  *
@@ -94,6 +122,13 @@
 #define restrict /* needed for compatibility with the newer restrict keyword */
 #define HAS_UNIX
 #define FTS_HAS_BIG_ENDIAN
+#define HAVE_UNISTD_H 1
+#define HAVE_ALLOCA_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_PARAM_H 1
+#undef HAVE_DIRECT_H
+#undef HAVE_PROCESS_H
+#undef HAVE_IO_H 
 
 /*********************************************************************
  *
@@ -105,20 +140,36 @@
 
 #define FTS_ARCH_NAME "Win32 (Intel and compatible processors)"
 #define restrict
-#define HAS_UNIX
-#define HAS_PTHREADS
+/*  #undef HAS_UNIX */
+/*  #undef HAS_PTHREADS */
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
 #define HAS_IEEE_FLOAT
 
-/* This is included for the null device only (null.c) */
-struct timespec {
-  long tv_sec;
-  long tv_nsec;
-};
-#define nanosleep  win32_nanosleep
-int win32_nanosleep(struct timespec *, int);
+#undef HAVE_UNISTD_H 
+#undef HAVE_ALLOCA_H 
+#undef HAVE_SYS_TIME_H
+#undef HAVE_SYS_PARAM_H 
+#define HAVE_DIRECT_H 1
+#define HAVE_PROCESS_H 1
+#define HAVE_IO_H 1
+
+/*  #include <io.h> */
+
+#define MAXPATHLEN _MAX_PATH
+#define open  _open
+#define read  _read
+#define write  _write
+#define close  _close
+#define getcwd _getcwd
+#define isatty _isatty
+#define alloca _alloca
+#define getpid _getpid
+#define bcopy(src,dst,n)  memcpy(dst,src,n)
+
+#define realpath  win32_realpath
+char* win32_realpath(const char* path, char* resolved_path);
 
 #else
 

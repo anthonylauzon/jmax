@@ -173,7 +173,7 @@ static float hanning( float f)
   return (0.5 - 0.5 * cos(f));
 }
 
-#ifdef MACOSX
+#if defined(MACOSX) || defined(WIN32)
 static float sinf( float f)
 {
   return (float)sin( f);
