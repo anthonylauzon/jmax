@@ -1,3 +1,9 @@
+2001-07-13  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added method for "incr" to intbox and floatbox
+
+	* added tutorials to source tree
+
 2001-07-10  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed bug introduced in fts_dsp_declare_inlet by fts_class_get_method
