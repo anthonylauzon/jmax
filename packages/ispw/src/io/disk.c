@@ -145,7 +145,8 @@ readsf_file_pause(readsf_t *this)
 
 /* Methods */
 
-static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
 
@@ -419,31 +420,36 @@ typedef struct
 
 /* Service functions */
 
-static fts_status_t writesf_file_open(writesf_t *this)
+static fts_status_t 
+writesf_file_open(writesf_t *this)
 {
   char file_path[1024];
   fts_status_t ret;
   fts_atom_t a[7];
-  int ac;
 
   /* Build the open arg list: current version, use the default device fifosize and fileblock size */
-  ac = 0;
-  fts_set_symbol(&a[ac], fts_new_symbol_copy(file_path)); ac++;
-  fts_set_symbol(&a[ac], fts_new_symbol("channels")); ac++;
-  fts_set_int(&a[ac], this->nchans); ac++;
-  fts_set_symbol(&a[ac], fts_s_sampling_rate);  ac++;
-  fts_set_float(&a[ac], this->sampling_rate); ac++;
+  fts_file_get_write_path(fts_symbol_name(this->file_name), file_path);
+  
+  /* Build the open arg list: current version, use the default device fifosize and fileblock size */
+  fts_set_symbol(&a[0], fts_new_symbol_copy(file_path));
+  fts_set_symbol(&a[1], fts_new_symbol("channels"));
+  fts_set_int(&a[2], this->nchans); 
+  fts_set_symbol(&a[3], fts_s_sampling_rate);
+  fts_set_float(&a[4], this->sampling_rate);
   
   if (this->format != fts_s_void)
     {
-      fts_set_symbol(&a[ac], fts_new_symbol("format")); ac++;
-      fts_set_symbol(&a[ac], this->format); ac++;
+      fts_set_symbol(&a[5], fts_new_symbol("format"));
+      fts_set_symbol(&a[6], this->format);
+      
+      /* Open the device; note that the device is opened not active !! */      
+      return fts_dev_open(&(this->device), fts_new_symbol("writesf"), 7, a);
     }
-  
-  /* Open the device; note that the device is opened not active !! */      
-  return fts_dev_open(&(this->device), fts_new_symbol("writesf"), ac, a);
+  else
+    /* Open the device; note that the device is opened not active !! */      
+    return fts_dev_open(&(this->device), fts_new_symbol("writesf"), 5, a);
 
-  /* post("readsf~: cannot open file '%s' for writing\n", fts_symbol_name(this->file_name)); */
+  /* post("writesf~: cannot open file '%s' for writing\n", fts_symbol_name(this->file_name)); */
 }
 
 
@@ -459,7 +465,8 @@ writesf_file_close(writesf_t *this)
 
 /* Methods */
 
-static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
 
