@@ -1,5 +1,5 @@
-all	all	Makefiles
-all	ircam	src
-all	all	scripts
-all	all	bin/ARCH/opt/fts
+ircam	all	Makefiles
+ircam	all	src
+ircam	all	scripts
+all	all	bin
 

@@ -1,7 +1,8 @@
+all	all	INSTALL.sh
+free	all	LICENSE
 all	all 	README
 all	all	RELEASE_NOTES.html
 all	all	VERSION
-all	all	INSTALL.sh
 all	all	bin
 all	all	config
 all	all	doc

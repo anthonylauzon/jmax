@@ -1,4 +1,21 @@
 all	all     qlist.jpk
 all	all     java/classes/qlist.jar
-all	all	c/lib/ARCH/opt/libqlist.so
 all	all	help/qlist.help.jmax
+
+all	irix62r4k	c/lib/irix62r4k/opt/libqlist.so
+all	irix63r10k	c/lib/irix63r10k/opt/libqlist.so
+all	irix63r5k	c/lib/irix63r5k/opt/libqlist.so
+all	irix64r10k	c/lib/irix64r10k/opt/libqlist.so
+all	irix65r10k	c/lib/irix65r10k/opt/libqlist.so
+all	irix65r4k	c/lib/irix65r4k/opt/libqlist.so
+all	irix65r5k	c/lib/irix65r5k/opt/libqlist.so
+all	sgi		c/lib/irix62r4k/opt/libqlist.so
+all	sgi		c/lib/irix63r10k/opt/libqlist.so
+all	sgi		c/lib/irix63r5k/opt/libqlist.so
+all	sgi		c/lib/irix64r10k/opt/libqlist.so
+all	sgi		c/lib/irix65r10k/opt/libqlist.so
+all	sgi		c/lib/irix65r4k/opt/libqlist.so
+all	sgi		c/lib/irix65r5k/opt/libqlist.so
+all	linuxpc		c/lib/linuxpc/opt/libqlist.so
+all	linuxppc	c/lib/linuxppc/opt/libqlist.so
+all	solaris		c/lib/solaris/opt/libqlist.so
