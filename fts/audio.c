@@ -673,7 +673,12 @@ int fts_audioport_report_xrun( void)
 static fts_audioport_t *default_audioport = 0;
 static fts_symbol_t default_audioport_class = 0;
 
-void fts_audioport_set_default( int argc, const fts_atom_t *argv)
+void fts_audioport_set_default_class( fts_symbol_t name)
+{
+  default_audioport_class = name;
+}
+
+static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 {
   fts_object_t *obj;
   fts_atom_t a[1];
@@ -697,11 +702,6 @@ void fts_audioport_set_default( int argc, const fts_atom_t *argv)
     }
 
   default_audioport = (fts_audioport_t *)fts_get_object( a);
-}
-
-void fts_audioport_set_default_class( fts_symbol_t name)
-{
-  default_audioport_class = name;
 }
 
 fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)

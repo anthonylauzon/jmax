@@ -42,8 +42,7 @@ static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleav
 #define DEFAULT_FIFO_SIZE 256
 #define DEFAULT_INPUT_CHANNELS 0
 #define DEFAULT_OUTPUT_CHANNELS 2
-
-enum transfer_mode_t { MMAP_NONINTERLEAVED, MMAP_INTERLEAVED, RW_NONINTERLEAVED, RW_INTERLEAVED};
+#define DEFAULT_ACCESS s_mmap_interleaved
 
 /* ---------------------------------------------------------------------- */
 /* Structure used for both capture and playback                           */
@@ -119,7 +118,7 @@ static snd_output_t *get_post_log( void)
 /* alsatream_open: opens a stream                                         */
 /* ---------------------------------------------------------------------- */
 
-static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, int format, int channels, int sampling_rate, int fifo_size, enum transfer_mode_t transfer_mode)
+static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, int format, int channels, int sampling_rate, int fifo_size, snd_pcm_access_t access)
 {
   snd_pcm_access_mask_t *mask;
   snd_pcm_hw_params_t *hwparams;
@@ -144,24 +143,8 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
   /*
    * Set the access mode:
    */
-  switch ( transfer_mode) {
-  case MMAP_NONINTERLEAVED:
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0)
-      return err;
-    break;
-  case MMAP_INTERLEAVED:
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0)
-      return err;
-    break;
-  case RW_NONINTERLEAVED:
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_RW_NONINTERLEAVED)) < 0)
-      return err;
-    break;
-  case RW_INTERLEAVED:
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
-      return err;
-    break;
-  }
+  if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, access)) < 0)
+    return err;
 
   /*
    * Set the sample format
@@ -504,11 +487,11 @@ static ftl_wrapper_t functions_table[4][2][2] = {
 /* alsaaudioport methods                                                  */
 /* ********************************************************************** */
 
-static void *alsaaudioport_allocate_buffer( int transfer_mode, int channels, int tick_size, int sample_bytes)
+static void *alsaaudioport_allocate_buffer( snd_pcm_access_t access, int channels, int tick_size, int sample_bytes)
 {
   void *buffer;
 
-  if ( transfer_mode == MMAP_NONINTERLEAVED || transfer_mode == RW_NONINTERLEAVED)
+  if ( access == SND_PCM_ACCESS_MMAP_NONINTERLEAVED || access == SND_PCM_ACCESS_RW_NONINTERLEAVED)
     {
       int ch;
       void **buffers;
@@ -547,11 +530,12 @@ static void pcm_dump_post( snd_pcm_t *handle)
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, err;
-  int transfer_mode = 0;
   float sr;
   char pcm_name[256];
   const char *format_name;
-  fts_symbol_t s_transfer_mode;
+  snd_pcm_access_t access;
+  fts_symbol_t s_access;
+  int access_index;
   alsaaudioport_t *this = (alsaaudioport_t *)o;
 
   fts_audioport_init( &this->head);
@@ -571,20 +555,33 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   format = snd_pcm_format_value( format_name);
   format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 
-  s_transfer_mode = fts_get_symbol_arg( ac, at, 4, s_rw_interleaved);
-  if (s_transfer_mode == s_mmap_noninterleaved)
-    transfer_mode = MMAP_NONINTERLEAVED;
-  else if (s_transfer_mode == s_mmap_interleaved)
-    transfer_mode = MMAP_INTERLEAVED;
-  else if (s_transfer_mode == s_rw_noninterleaved)
-    transfer_mode = RW_NONINTERLEAVED;
-  else if (s_transfer_mode == s_rw_interleaved)
-    transfer_mode = RW_INTERLEAVED;
+  s_access = fts_get_symbol_arg( ac, at, 4, DEFAULT_ACCESS);
+
+  if (s_access == s_mmap_noninterleaved)
+    {
+      access = SND_PCM_ACCESS_MMAP_NONINTERLEAVED;
+      access_index = 0;
+    }
+  else if (s_access == s_mmap_interleaved)
+    {
+      access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
+      access_index = 1;
+    }
+  else if (s_access == s_rw_noninterleaved)
+    {
+      access = SND_PCM_ACCESS_RW_NONINTERLEAVED;
+      access_index = 2;
+    }
+  else
+    {
+      access = SND_PCM_ACCESS_RW_INTERLEAVED;
+      access_index = 3;
+    }
 
   if ( capture_channels != 0)
     {
       post ("opening input\n");
-      if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
+      if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, access)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
 	  post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
@@ -592,15 +589,15 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 	}
 
       fts_audioport_set_input_channels( (fts_audioport_t *)this, this->capture.channels);
-      fts_audioport_set_input_function( (fts_audioport_t *)this, functions_table[transfer_mode][format_is_32][0]);
+      fts_audioport_set_input_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][0]);
 
-      this->input_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
+      this->input_buffer = alsaaudioport_allocate_buffer( access, this->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
     }
 
   if ( playback_channels != 0)
     {
       post ("opening output\n");
-      if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
+      if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, access)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
 
@@ -612,9 +609,9 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
       post ("output opened OK\n");
 
       fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels);
-      fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[transfer_mode][format_is_32][1]);
+      fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][1]);
 
-      this->output_buffer = alsaaudioport_allocate_buffer( transfer_mode, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
+      this->output_buffer = alsaaudioport_allocate_buffer( access, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
   }
 
   fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function);
@@ -662,18 +659,21 @@ static fts_status_t alsaaudioport_instantiate(fts_class_t *cl, int ac, const fts
   return fts_Success;
 }
 
-/* ********************************************************************** */
-/* init function                                                          */
-/* ********************************************************************** */
-
+/***********************************************************************
+ *
+ * Config
+ *
+ */
 void alsaaudioport_config( void)
 {
-  fts_class_install( fts_new_symbol("alsaaudioport"), alsaaudioport_instantiate);
+  fts_symbol_t s = fts_new_symbol("alsaaudioport");
+
+  fts_class_install( s, alsaaudioport_instantiate);
+  fts_audioport_set_default_class( s);
 
   s_default = fts_new_symbol( "default");
   s_s32_le = fts_new_symbol( "S32_LE");
   s_s16_le = fts_new_symbol( "S16_LE");
-
   s_mmap_noninterleaved = fts_new_symbol( "mmap_noninterleaved");
   s_mmap_interleaved = fts_new_symbol( "mmap_interleaved");
   s_rw_noninterleaved = fts_new_symbol( "rw_noninterleaved");

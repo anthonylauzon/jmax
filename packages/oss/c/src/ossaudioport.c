@@ -300,7 +300,16 @@ static fts_status_t ossaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 
 void ossaudioport_config( void)
 {
-  fts_class_install( fts_new_symbol("ossaudioport"), ossaudioport_instantiate);
+  fts_symbol_t s = fts_new_symbol("ossaudioport");
+
+  fts_class_install( s, ossaudioport_instantiate);
+  /*
+   * If a default class is not installed, install it.
+   * If ALSA package has already installed a default,
+   * we don't overwrite it
+   */
+  if ( !fts_audioport_get_default_class())
+    fts_audioport_set_default_class( s);
 
   s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
   s_read_only = fts_new_symbol( "read_only");

@@ -96,6 +96,9 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
+/* Define if you have the asound library (-lasound).  */
+#undef HAVE_LIBASOUND
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
