@@ -97,18 +97,47 @@ FTS_API int fts_sched_remove( fts_object_t *obj);
 
 /*@}*/ /* Handling scheduler callbacks */
 
-/* system functions */
-FTS_API void fts_sched_run(void);
-FTS_API void fts_sched_halt(void);
 
-FTS_API void fts_sleep(void);
-
+/**
+ * Run scheduler one tick
+ *
+ * This function is used when fts is running under a callback (Jack, ASIO, LADSPA ....)
+ *
+ * @fn void fts_sched_run_one_tick(void)
+ *
+ * @ingroup sched
+ */
 FTS_API void fts_sched_run_one_tick(void);
+
 
 FTS_API void fts_sched_set_run_under_callback(void);
 FTS_API void fts_sched_unset_run_under_callback(void);
 
+/**
+ * Check if FTS scheduler is running 
+ *
+ * @fn int fts_sched_is_running(void)
+ * @return true if scheduler is running
+ *
+ * @ingroup sched
+ */
 FTS_API int fts_sched_is_running(void);
+
+/**
+ *
+ * 
+ * @fn void fts_sched_running_add_listener(fts_object_t* object, fts_method_t method)
+ *
+ * @ingroup scheduler 
+ */
 FTS_API void fts_sched_running_add_listener(fts_object_t* object, fts_method_t method);
+
+/**
+ *
+ *
+ * @fn void fts_sched_running_remove_listener(fts_object_t* object)
+ *
+ * @ingroup sched
+ */
 FTS_API void fts_sched_running_remove_listener(fts_object_t* objet);
 
