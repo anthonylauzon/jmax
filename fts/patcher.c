@@ -917,32 +917,36 @@ patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   fts_object_t *obj = fts_get_object(&at[0]);
   fts_package_t *pkg = fts_object_get_package(obj);
-  fts_symbol_t dir = fts_package_get_dir( pkg);
-  fts_symbol_t class_name = fts_object_get_class_name(obj);
-  fts_symbol_t file_name;
-  fts_patcher_t *help_patch;
-  const char *help_name;
-  char path[256];
-
-  help_name = fts_package_get_help( pkg, class_name);
-  if( help_name)
-    snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, help_name);
-  else
-    snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
   
-  file_name = fts_new_symbol(path);
-
-  fts_log("[patcher] help %s\n", file_name);
-
-  help_patch = get_patcher_by_file_name(file_name);
-
-  if(help_patch)
-    patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
+  if( fts_object_is_error( obj) && (pkg == NULL))
+    return;
   else
-    help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
+    {
+      fts_symbol_t dir = fts_package_get_dir( pkg);
+      fts_symbol_t class_name = fts_object_get_class_name(obj);
+      fts_symbol_t file_name;
+      fts_patcher_t *help_patch;
+      const char *help_name;
+      char path[256];
 
-  if(!help_patch)
-    fts_client_send_message(o, sym_noHelp, 1, at); 
+      help_name = fts_package_get_help( pkg, class_name);
+      if( help_name)
+	snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, help_name);
+      else
+	snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
+  
+      file_name = fts_new_symbol(path);
+      
+      help_patch = get_patcher_by_file_name(file_name);
+
+      if(help_patch)
+	patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
+      else
+	help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
+
+      if(!help_patch)
+	fts_client_send_message(o, sym_noHelp, 1, at); 
+    }
 }
 
 /* find utility */
