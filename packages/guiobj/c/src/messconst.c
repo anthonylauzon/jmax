@@ -53,10 +53,13 @@ messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
-  if (fts_is_symbol( at))
-    fts_outlet_send( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
-  else
-    fts_outlet_varargs( (fts_object_t *)data, 0, ac, at);
+  if (ac > 0)
+    {
+      if (fts_is_symbol( at))
+	fts_outlet_send( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
+      else
+	fts_outlet_varargs( (fts_object_t *)data, 0, ac, at);
+    }
 
   return fts_ok;
 }

@@ -495,13 +495,17 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       fts_method_t mth = fts_class_get_method( fts_get_class( at), selector);
 
       if (mth)
-	(*mth)( fts_get_object( at), fts_system_inlet, selector, ac-1, at+1);
+	{
+	  fts_set_void( fts_get_return_value());
+	  (*mth)( fts_get_object( at), fts_system_inlet, selector, ac-1, at+1);
+	}
       else
 	return invalid_selector_error;
     }
 
     expression_stack_pop_frame( exp);
-    expression_stack_push( exp, fts_get_return_value());
+    if (!fts_is_void( fts_get_return_value()))
+      expression_stack_push( exp, fts_get_return_value());
 
     break;
 
@@ -770,6 +774,7 @@ static void expression_print_aux( fts_parsetree_t *tree, int indent)
   case TK_SMALLER: fprintf( stderr, "<\n"); break;
   case TK_SMALLER_EQUAL: fprintf( stderr, "<=\n"); break;
   case TK_COLON: fprintf( stderr, ":\n"); break;
+  case TK_DOT: fprintf( stderr, ".\n"); break;
   default: fprintf( stderr, "UNKNOWN %d\n", tree->token); 
   }
 
