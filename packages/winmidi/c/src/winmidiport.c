@@ -558,8 +558,8 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 	    (strstr(out_caps.szPname, "Map") == NULL)) {  /* No message for "Mappeur MIDI Microsoft" */
 	  if (MessageBox(NULL, "The Microsoft Soft Synth is not supported by FTS and \n"
 			 "might cause FTS to crash. If you have any problems, please \n"
-			 "select an other MIDI device in the Windows Configuration Panels \n"
-			 "and restart FTS. Do you want to continue?", 
+			 "select an other MIDI device in your settings. \n"
+			 "Do you want to continue?", 
 			 "jMax - Warning", 
 			 MB_YESNO | MB_ICONSTOP | MB_SYSTEMMODAL | MB_SETFOREGROUND) == IDNO) {
 	    
