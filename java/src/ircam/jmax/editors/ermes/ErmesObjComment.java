@@ -49,6 +49,7 @@ class ErmesObjComment extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
+
     itsArgs = theFtsObject.getDescription();
     preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
 
@@ -222,11 +223,6 @@ class ErmesObjComment extends ErmesObject {
     }
   }
 
-  /*  void putOtherProperties(FtsObject theFObject){
-    if (getJustification() != itsSketchPad.itsJustificationMode)
-      theFObject.put("jsf", getJustification());
-  }*/
-  
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------

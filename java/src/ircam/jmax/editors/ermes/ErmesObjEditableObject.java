@@ -272,10 +272,10 @@ import ircam.jmax.fts.*;
     }
   }
 
-  void putOtherProperties(FtsObject theFObject){
+  /*void putOtherProperties(FtsObject theFObject){
     if (getJustification() != itsSketchPad.itsJustificationMode)
       theFObject.put("jsf", getJustification());
-  }
+  }*/
 
   protected void DrawParsedString(Graphics theGraphics){
     String aString;

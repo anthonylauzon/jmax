@@ -27,8 +27,8 @@ class ErmesObjSlider extends ErmesObject {
   final static int UP_OFFSET = /*10*/5;
   final static int PREFERRED_RANGE_MAX = 127;
   final static int PREFERRED_RANGE_MIN = 0;
-  int itsRangeMax = PREFERRED_RANGE_MAX;
-  int itsRangeMin = PREFERRED_RANGE_MIN;
+  private int itsRangeMax = PREFERRED_RANGE_MAX;
+  private int itsRangeMin = PREFERRED_RANGE_MIN;
   int itsRange = itsRangeMax-itsRangeMin;
   int itsPixelRange = itsRangeMax-itsRangeMin;
   static Dimension preferredSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE_MAX+UP_OFFSET);
@@ -58,9 +58,9 @@ class ErmesObjSlider extends ErmesObject {
     //oldsuper.Init(theSketchPad,  theFtsObject); 
     {
       Integer aInteger = (Integer)theFtsObject.get("minValue");
-      itsRangeMin = aInteger.intValue();
+      setMinValue(aInteger.intValue());
       aInteger = (Integer)theFtsObject.get("maxValue");
-      itsRangeMax = aInteger.intValue();
+      setMaxValue(aInteger.intValue());
       itsRange = itsRangeMax-itsRangeMin;
       itsStep = (float)itsRange/itsPixelRange;
       aInteger = (Integer)theFtsObject.get("value");
@@ -70,6 +70,23 @@ class ErmesObjSlider extends ErmesObject {
     return true;
   }
 
+  public void setMinValue(int theValue) {
+    itsRangeMin = theValue;
+    itsFtsObject.put("minValue", itsRangeMin);
+  }
+
+  public int getMinValue() {
+    return itsRangeMin;
+  }
+
+  public void setMaxValue(int theValue) {
+    itsRangeMax = theValue;
+    itsFtsObject.put("maxValue", itsRangeMax);
+  }
+
+  public int getMaxValue() {
+    return itsRangeMax;
+  }
 
   public void Resize(int theDeltaH, int theDeltaV){
     super.Resize(theDeltaH, theDeltaV);
@@ -100,8 +117,8 @@ class ErmesObjSlider extends ErmesObject {
 
 
   public void FromDialogValueChanged(Integer theCurrentInt, Integer theMaxInt, Integer theMinInt){
-    itsRangeMax = theMaxInt.intValue();
-    itsRangeMin = theMinInt.intValue();
+    setMaxValue(theMaxInt.intValue());
+    setMinValue(theMinInt.intValue());
     itsRange = itsRangeMax-itsRangeMin;
     itsStep = (float)itsRange/itsPixelRange;
 
@@ -151,12 +168,6 @@ class ErmesObjSlider extends ErmesObject {
   }
 
 
-  public void putOtherProperties(FtsObject theFObject) {
-    theFObject.put("minValue", new Integer(itsRangeMin));
-    theFObject.put("maxValue", new Integer(itsRangeMax));
-  }
-
-
   private void SetSliderDialog(){
     Point aPoint = GetSketchWindow().getLocation();
     if (itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(MaxWindowManager.getTopFrame());
@@ -182,7 +193,7 @@ class ErmesObjSlider extends ErmesObject {
 	  //compute the value and send to FTS
 	  itsInteger = (int)(((getItsY()+getItsHeight())-y-BOTTOM_OFFSET)*itsStep);
 	  Trust(itsInteger);
-	  itsFtsObject.put("value", new Integer(itsInteger/*+itsRangeMin*/));
+	  itsFtsObject.put("value", new Integer(itsInteger));
 
 	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;

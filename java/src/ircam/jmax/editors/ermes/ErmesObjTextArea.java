@@ -11,7 +11,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   static String filler = " ";
   ErmesObjComment itsOwner = null;
   ErmesSketchPad itsSketchPad = null;
-  boolean laidOut = false;
+  
   boolean focused = false;
   int DEFAULT_COLS = 20;
   

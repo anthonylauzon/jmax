@@ -9,7 +9,7 @@ import ircam.jmax.utils.*;
  * The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
  */
 public class ErmesObjEditField extends TextArea implements KeyListener, FocusListener {
-  boolean laidOut = false;
+  
   boolean focused = false;    
   ErmesObjEditableObject itsOwner= null;
   ErmesSketchPad itsSketchPad = null;

@@ -25,7 +25,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   private int itsX, itsY;
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
-  boolean laidOut;
   private Rectangle currentRect = new Rectangle();
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
@@ -161,6 +160,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void setJustification(int theJustification) {
     itsJustification = theJustification;
+    itsFtsObject.put("jsf", theJustification);
   }
 
   public int getJustification(){
@@ -356,9 +356,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return false;
   }
 
-  //to be redefinded if needed.
-  void putOtherProperties(FtsObject theFObject){}
-  
 
 // This init method is only called in "from skratch" initializations
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
@@ -368,16 +365,14 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     itsSketchPad = theSketchPad;
     setFont(itsSketchPad.sketchFont);
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
-    //laidOut = false;
+    
     setItsX(x);
     setItsY(y);
 		
-    /*if (currentRect == null)*/ makeCurrentRect(x, y);
+    makeCurrentRect(x, y);
 
     Reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
-    //here was itsFtsPatcher = itsSketchPad.GetSketchWindow().itsPatcher;
-    //here was makeFtsObject();
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
     itsSketchPad.addToDirtyObjects(this);
@@ -408,9 +403,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     
     makeCurrentRect(theFtsObject);
-    
-    laidOut = false; //??
-    
+        
     itsFtsObject = theFtsObject;
     update(itsFtsObject);
     itsFtsPatcher = GetSketchWindow().itsPatcher;
