@@ -5,13 +5,13 @@ import java.awt.event.*;
 import java.awt.image.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
-
+import com.sun.java.swing.Timer;
 
 /**
  * The initial dialog.
  */
 
-public class SplashDialog extends Dialog implements KeyListener, MouseListener{
+public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener{
   static final int SPLASH_WIDTH = 500;
   static final int SPLASH_HEIGHT = 280;
   String itsVersionString;
@@ -20,36 +20,36 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
    * dialog go away, after a while.
    */
 
-  class SplashDialogTimeout extends Thread
-  {
+  /*2003  class SplashDialogTimeout extends Thread
+    {
     int time;
-
+    
     public SplashDialogTimeout(int time)
     {
-      super("SplashDialogTimeoutThread");
-      this.time = time;
-
-      run();
+    super("SplashDialogTimeoutThread");
+    this.time = time;
+    
+    run();
     }
     
     public void run()
     {
-      try
-	{
-	  sleep(time);
-	}
-      catch (InterruptedException e)
-	{
-	}
-
-      SplashDialog.this.setVisible(false);
-      SplashDialog.this.dispose();
+    try
+    {
+    sleep(time);
     }
-  }
-
+    catch (InterruptedException e)
+    {
+    }
+    
+    SplashDialog.this.setVisible(false);
+    SplashDialog.this.dispose();
+    }
+    }*/
+  
   Image itsImage;
-  SplashDialogTimeout to;
-
+  //2003SplashDialogTimeout to;
+  
 
   public SplashDialog(Frame dw, String filename, String version) {
     super(dw, "jMax",/* true*/false);
@@ -65,9 +65,21 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
     pack();
     setVisible(true);
     
-    to = new SplashDialogTimeout(2000);
+    //2003to = new SplashDialogTimeout(2000);
+    //start2003
+    Timer aTimer = new Timer(2000, this);
+    //aTimer.setInitialDelay(2000);
+    aTimer.setRepeats(false);
+    aTimer.start();
+    //end 2003
   }
 	
+  public void actionPerformed(ActionEvent e) {
+    setVisible(false);
+    dispose();
+    Timer aTimer = (Timer) e.getSource();
+    aTimer.stop();
+  }
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}
