@@ -150,6 +150,29 @@ midiunparse_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  }
 	  break;
 	  
+    case midi_song_position_pointer:
+      {
+        fts_atom_t a[3];
+        
+        fts_set_int(a + 0, fts_midievent_song_position_pointer_status_byte);
+        fts_set_int(a + 1, fts_midievent_song_position_pointer_get_first(event) & 0x7f);
+        fts_set_int(a + 2, fts_midievent_song_position_pointer_get_second(event) & 0x7f);
+
+        fts_outlet_varargs(o, 0, 3, a);
+      }
+      break;
+      
+    case midi_song_select:
+      {
+        fts_atom_t a[2];
+        
+        fts_set_int(a + 0, fts_midievent_song_select_status_byte);
+        fts_set_int(a + 1, fts_midievent_song_select_get(event) & 0x7f);
+        
+        fts_outlet_varargs(o, 0, 2, a);
+      }
+      break;
+      
 	case midi_real_time:
 	  fts_outlet_int(o, 0, fts_midievent_real_time_get_status_byte(event));
 	  break;

@@ -143,6 +143,49 @@ alsaseqmidiport_output(fts_object_t* o, fts_midievent_t* event, double time)
       }	    
     }
   }
+  else
+  {
+    switch(fts_midievent_get_type(event))
+    {
+      case midi_song_position_pointer:
+      {
+        unsigned char buffer[3];
+        
+        buffer[0] = (unsigned char)fts_midievent_song_position_pointer_status_byte;
+        buffer[1] = (unsigned char)(fts_midievent_song_position_pointer_get_first(event) & 0x7f);
+        buffer[2] = (unsigned char)(fts_midievent_song_position_pointer_get_second(event) & 0x7f);
+
+	/* Encode MIDI bytecode to alsa sequencer event structure */
+	buf_size = snd_midi_event_encode(this->midi_event_parser, buffer, 3, &ev);
+	/* Check value of buf_size */
+	if (3 != buf_size)
+	{
+	  fts_log("[alsaseqmidiport] Error while encoding midi message ... \n");
+	}	
+      }
+      break;
+
+    case midi_song_select:
+    {
+      unsigned char buffer[2];
+      
+      buffer[0] = (unsigned char)fts_midievent_song_select_status_byte;
+      buffer[1] = (unsigned char)(fts_midievent_song_select_get(event) & 0x7f);
+      
+      /* Encode MIDI bytecode to alsa sequencer event structure */
+      buf_size = snd_midi_event_encode(this->midi_event_parser, buffer, 2, &ev);
+      /* Check value of buf_size */
+      if (2 != buf_size)
+      {
+	fts_log("[alsaseqmidiport] Error while encoding midi message ... \n");
+      }	
+    }
+    break;
+    
+    default:
+      break;
+    }
+  }
     
   snd_seq_ev_set_subs(&ev);
   snd_seq_ev_set_direct(&ev);

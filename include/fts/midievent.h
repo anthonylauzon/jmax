@@ -37,6 +37,8 @@ enum midi_type
   midi_pitch_bend,
   midi_system_exclusive,
   midi_time_code,
+  midi_song_position_pointer,
+  midi_song_select,
   midi_real_time,
   n_midi_types
 };
@@ -280,10 +282,23 @@ FTS_API fts_midievent_t *fts_midievent_time_code_new(int type, int hour, int min
 FTS_API fts_midievent_t *fts_midievent_real_time_new(enum midi_real_time_event tag);
 
 /* other system events */
+#define fts_midievent_is_song_position_pointer(e) ((e)->type == midi_song_position_pointer)
 #define fts_midievent_song_position_pointer_get(e) ((e)->data.song_position_pointer)
 #define fts_midievent_song_position_pointer_set(e, x) ((e)->data.song_position_pointer = (x))
+#define fts_midievent_song_position_pointer_get_first(e) (((e)->data.song_position_pointer >> 8) & 0x00ff)
+#define fts_midievent_song_position_pointer_set_first(e, x) ((e)->data.song_position_pointer = ((e)->data.song_position_pointer & 0x00ff) | ((x & 0x00ff) << 8))
+#define fts_midievent_song_position_pointer_get_second(e) (((e)->data.song_position_pointer) & 0x00ff)
+#define fts_midievent_song_position_pointer_set_second(e, x) ((e)->data.song_position_pointer = ((e)->data.song_position_pointer & 0xff00) | (x & 0x00ff))
+#define fts_midievent_song_position_pointer_status_byte 242
+
+FTS_API fts_midievent_t *fts_midievent_song_position_pointer_message_new(int byte1, int byte2);
+
+#define fts_midievent_is_song_select(e) ((e)->type == midi_song_select)
 #define fts_midievent_song_select_get(e) ((e)->data.song_select)
 #define fts_midievent_song_select_set(e, x) ((e)->data.song_select = (x))
+#define fts_midievent_song_select_status_byte 243
+
+FTS_API fts_midievent_t *fts_midievent_song_select_message_new(int byte1);
 
 /*****************************************************
  *

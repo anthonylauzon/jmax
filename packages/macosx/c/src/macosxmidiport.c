@@ -148,6 +148,25 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
         }
         break;
 
+      case midi_song_position_pointer:
+        {
+          Byte buffer[3];
+          buffer[0] = (unsigned char)fts_midievent_song_position_pointer_status_byte;
+          buffer[1] = (unsigned char)(fts_midievent_song_position_pointer_get_first(event) & 0x7f);
+          buffer[2] = (unsigned char)(fts_midievent_song_position_pointer_get_second(event) & 0x7f);
+          MIDIPacketListAdd(&pktlist, sizeof(MIDIPacketList), pkt, 0, 3, buffer);
+        }
+        break;
+        
+      case midi_song_select:
+        {
+          Byte buffer[2];
+          buffer[0] = (unsigned char)fts_midievent_song_select_status_byte;
+          buffer[1] = (unsigned char)(fts_midievent_song_select_get(event) & 0x7f);
+          MIDIPacketListAdd(&pktlist, sizeof(MIDIPacketList), pkt, 0, 2, buffer);
+        }
+        break;
+        
       case midi_real_time:
         {
           Byte byte = fts_midievent_real_time_get_status_byte(event);
