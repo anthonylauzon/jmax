@@ -10,6 +10,7 @@ errobj.h \
 fpe.h \
 label.h \
 message.h \
+midi.h \
 object.h \
 package.h \
 parser.h \
