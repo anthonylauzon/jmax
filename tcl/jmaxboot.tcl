@@ -67,8 +67,9 @@ source $jmaxRootDir/tcl/icons.tcl
 ##
 ## Define the patcher editor popup menu
 ## 
-
-source $jmaxRootDir/tcl/menu.tcl
+if {[systemProperty new] == "true"} then {
+    source $jmaxRootDir/tcl/menu.tcl
+}
 
 ##
 ## Declare the 'virtual' jmax package
