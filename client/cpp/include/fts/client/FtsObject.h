@@ -19,8 +19,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#include <typeinfo>
-
 namespace ircam {
 namespace fts {
 namespace client {
@@ -33,6 +31,8 @@ namespace client {
 
   class FTSCLIENT_API FtsObject {
   public:
+    static const int NO_ID = -1;
+
     FtsObject( FtsServer *server, FtsObject *parent, FtsSymbol *ftsClassName) throw( FtsClientException);
 
     FtsObject( FtsServer *server, FtsObject *parent, FtsSymbol *ftsClassName, FtsArgs *args) throw( FtsClientException);

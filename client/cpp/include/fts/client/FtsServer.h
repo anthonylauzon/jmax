@@ -19,59 +19,32 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#include <fts/ftsclient.h>
-
-#include "Buffer.h"
-#include "SymbolCache.h"
-
 namespace ircam {
 namespace fts {
 namespace client {
 
-  class FtsServer;
+  template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
+  class BinaryProtocolEncoder;
 
-  class BinaryProtocolDecoder {
-
+  class FTSCLIENT_API FtsServer {
   public:
+    static const int CLIENT_OBJECT_ID = 0;
 
-    BinaryProtocolDecoder( FtsServer *server);
+    FtsServer( FtsServerConnection *connection);
 
-    void decode( const unsigned char *data, int length) throw( FtsClientException);
+    BinaryProtocolEncoder *getEncoder() { return _encoder; }
 
-  private:
+    int getNewObjectID();
 
-    void clearAction( int input);
-    void shiftAction( int input);
-    void shiftLongAction( int input);
-    void bufferClearAction( int input);
-    void clearAllAction( int input);
-    void bufferShiftAction( int input);
-    void endIntAction( int input);
-    void endFloatAction( int input);
-    void endSymbolIndexAction( int input);
-    void endSymbolCacheAction( int input);
-    void endStringAction( int input);
-    void endObjectAction( int input);
-    void endMessageAction( int input);
-
-    void nextState( int input);
+    FtsObject *getObject( int id);
+    void putObject( int id, FtsObject *obj);
 
   private:
+    int _newObjectID;
+    BinaryProtocolEncoder *_encoder;
+    Hashtable< int, FtsObject *> *_objectTable;
 
-    FtsServer *_server;
     FtsServerConnection *_connection;
-
-    long _lval;
-    Buffer *_buffer;
-
-    FtsObject *_target;
-    const FtsSymbol *_selector;
-    FtsArgs *_args;
-    int _argsCount;
-
-    int _currentState;
-
-    SymbolCache *_symbolCache;
   };
 
 };

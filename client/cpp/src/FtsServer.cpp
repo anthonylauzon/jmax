@@ -19,29 +19,48 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#ifndef _FTSCLIENT_H_
-#define _FTSCLIENT_H_
+#include <typeinfo>
+#include <fts/ftsclient.h>
+#include "Hashtable.h"
+#include "BinaryProtocolEncoder.h"
 
-#ifdef WIN32
-#if defined(FTSCLIENT_EXPORTS)
-#define FTSCLIENT_API __declspec(dllexport)
-#else
-#define FTSCLIENT_API __declspec(dllimport)
-#endif
-#else
-#define FTSCLIENT_API
-#endif
+namespace ircam {
+namespace fts {
+namespace client {
 
-#include <iostream>
+  FtsServer::FtsServer( FtsServerConnection *connection)
+  {
+    _connection = connection;
 
-#include <fts/client/FtsSymbol.h>
-#include <fts/client/FtsAtom.h>
-#include <fts/client/FtsArgs.h>
-#include <fts/client/FtsClientException.h>
-#include <fts/client/FtsMessageHandler.h>
-#include <fts/client/FtsServerConnection.h>
-#include <fts/client/FtsSocketConnection.h>
-#include <fts/client/FtsObject.h>
-#include <fts/client/FtsServer.h>
+    _newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
 
-#endif
+    _objectTable = new Hashtable<int, FtsObject*>();
+    _encoder = new BinaryProtocolEncoder( _connection);
+  }
+
+  int FtsServer::getNewObjectID()
+  {
+    int id = _newObjectID;
+
+    _newObjectID += 2;
+
+    return id;
+  }
+
+  FtsObject *FtsServer::getObject( int id)
+  {
+    FtsObject *obj;
+    
+    if (_objectTable->get( id, obj))
+      return obj;
+
+    return NULL;
+  }
+
+  void FtsServer::putObject( int id, FtsObject *obj)
+  {
+    _objectTable->put( id, obj);
+  }
+};
+};
+};

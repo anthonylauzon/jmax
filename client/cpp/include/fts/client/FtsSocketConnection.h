@@ -19,29 +19,32 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#ifndef _FTSCLIENT_H_
-#define _FTSCLIENT_H_
+#include <fts/ftsclient.h>
 
-#ifdef WIN32
-#if defined(FTSCLIENT_EXPORTS)
-#define FTSCLIENT_API __declspec(dllexport)
-#else
-#define FTSCLIENT_API __declspec(dllimport)
-#endif
-#else
-#define FTSCLIENT_API
-#endif
+namespace ircam {
+namespace fts {
+namespace client {
 
-#include <iostream>
+  class FTSCLIENT_API FtsSocketConnection : public FtsServerConnection {
+  public:
+    FtsSocketConnection( const char *hostname = "127.0.0.1", int port = DEFAULT_PORT, int connectTimeout = DEFAULT_CONNECT_TIMEOUT) throw( FtsClientException);
 
-#include <fts/client/FtsSymbol.h>
-#include <fts/client/FtsAtom.h>
-#include <fts/client/FtsArgs.h>
-#include <fts/client/FtsClientException.h>
-#include <fts/client/FtsMessageHandler.h>
-#include <fts/client/FtsServerConnection.h>
-#include <fts/client/FtsSocketConnection.h>
-#include <fts/client/FtsObject.h>
-#include <fts/client/FtsServer.h>
+    void close() throw (FtsClientException);
+    int read( unsigned char *b, int len) throw (FtsClientException);
+    void write( const unsigned char *b, int len) throw (FtsClientException);
 
-#endif
+  private:
+    void connect() throw( FtsClientException );
+    int connectOnce() throw( FtsClientException );
+    static const int DEFAULT_PORT;
+    static const int DEFAULT_CONNECT_TIMEOUT;
+
+    int _socket;
+    const char *_hostname;
+    int _port;
+    int _connectTimeout;
+  };
+
+};
+};
+};

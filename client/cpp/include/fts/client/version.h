@@ -19,29 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#ifndef _FTSCLIENT_H_
-#define _FTSCLIENT_H_
+#define FTSCLIENT_LIB_VERSION_STR "4.0.1_latest_cvs"
 
-#ifdef WIN32
-#if defined(FTSCLIENT_EXPORTS)
-#define FTSCLIENT_API __declspec(dllexport)
-#else
-#define FTSCLIENT_API __declspec(dllimport)
-#endif
-#else
-#define FTSCLIENT_API
-#endif
 
-#include <iostream>
 
-#include <fts/client/FtsSymbol.h>
-#include <fts/client/FtsAtom.h>
-#include <fts/client/FtsArgs.h>
-#include <fts/client/FtsClientException.h>
-#include <fts/client/FtsMessageHandler.h>
-#include <fts/client/FtsServerConnection.h>
-#include <fts/client/FtsSocketConnection.h>
-#include <fts/client/FtsObject.h>
-#include <fts/client/FtsServer.h>
-
-#endif

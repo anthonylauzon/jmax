@@ -26,13 +26,10 @@ namespace fts {
 namespace client {
 
   class FTSCLIENT_API FtsServerConnection {
-
   public:
     virtual void close() throw (FtsClientException) = 0;
-
-    virtual int read( const unsigned char *b, int off, int len) throw (FtsClientException) = 0;
-
-    virtual void write( const unsigned char *b, int off, int len) throw (FtsClientException) = 0;
+    virtual int read( const unsigned char *b, int len) throw (FtsClientException) = 0;
+    virtual void write( const unsigned char *b, int len) throw (FtsClientException) = 0;
   };
 
 };

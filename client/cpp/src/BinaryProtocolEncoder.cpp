@@ -120,7 +120,7 @@ void BinaryProtocolEncoder::flush() throw( FtsClientException)
 {
   _outputBuffer->append( BinaryProtocol::END_OF_MESSAGE);
 
-  _connection->write( _outputBuffer->getBytes(), 0, _outputBuffer->getLength());
+  _connection->write( _outputBuffer->getBytes(), _outputBuffer->getLength());
 
   _outputBuffer->clear();
 }

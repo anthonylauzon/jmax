@@ -5,6 +5,8 @@ FtsSymbol.cpp \
 FtsArgs.cpp \
 FtsException.cpp \
 FtsObject.cpp \
+FtsServer.cpp \
+FtsSocketConnection.cpp \
 BinaryProtocolDecoder.cpp \
 BinaryProtocolEncoder.cpp
 

@@ -63,7 +63,7 @@ namespace client {
 
     static int equals( const char *s1, const char *s2)
       {
-	return strcmp(s1, s2) == 0; 
+	return std::strcmp(s1, s2) == 0; 
       }
 
     static int equals( void *p1, void *p2)

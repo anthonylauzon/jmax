@@ -152,7 +152,8 @@ void BinaryProtocolDecoder::endObjectAction( int input)
 {
   _lval = _lval << 8 | input;
 
-  //  FtsObject *obj = server.getObject( (int)_lval);
+  // FIXME
+  // FtsObject *obj = server.getObject( (int)_lval);
   FtsObject *obj = NULL;
 
   if (_argsCount == 0)
@@ -345,9 +346,9 @@ BinaryProtocolDecoder::BinaryProtocolDecoder( FtsServer *server)
   _currentState = qInitial;
 }
 
-void BinaryProtocolDecoder::decode( const char *data, int offset, int length) throw( FtsClientException)
+void BinaryProtocolDecoder::decode( const unsigned char *data, int length) throw( FtsClientException)
 {
-  for ( int i = offset; i < length; i++)
+  for ( int i = 0; i < length; i++)
     {
       int c = data[i];
 

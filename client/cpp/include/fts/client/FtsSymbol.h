@@ -48,7 +48,6 @@ namespace client {
     char *_s;
   };
 
-  unsigned int getNextPrime(unsigned int n);
 };
 };
 };
