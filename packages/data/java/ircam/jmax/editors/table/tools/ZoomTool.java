@@ -43,6 +43,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   {
     super("zoomer", theImageIcon);
 
+    setCursor( theImageIcon);
     itsDirectionChooser = new DirectionChooser(this);
     itsMouseTracker = new TableMouseDragTracker(this);
   }
@@ -54,7 +55,6 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   {
     return itsMouseTracker;
   }
-
 
   /**
    * called when this tool is "unmounted"
@@ -142,6 +142,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   int tempX = 0;
   int tempY = 0;
   int direction;
+  Cursor cursor;
 }
 
 

@@ -47,6 +47,7 @@ public class PencilTool extends TableTool implements DynamicDragListener {
   {
     super("pencil", theImageIcon);
 
+    setCursor(theImageIcon);
     itsFreeHand = new FreeHandDrawer(this);
   }
 
@@ -129,6 +130,7 @@ public class PencilTool extends TableTool implements DynamicDragListener {
   FreeHandDrawer itsFreeHand;
   int previousX;
   int previousY;
+  Cursor cursor;
 }
 
 

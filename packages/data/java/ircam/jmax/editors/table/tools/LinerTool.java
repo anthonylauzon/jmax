@@ -46,6 +46,7 @@ public class LinerTool extends TableTool implements LineListener{
   {
     super("liner", theImageIcon);
 
+    setCursor( theImageIcon);
     itsLiner = new LineDrawer(this);
   }
 
@@ -115,7 +116,7 @@ public class LinerTool extends TableTool implements LineListener{
   LineDrawer itsLiner;
 
   Point startingPoint = new Point();
-  
+  Cursor cursor;
 }
 
 

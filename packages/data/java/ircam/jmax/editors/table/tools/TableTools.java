@@ -42,21 +42,8 @@ public class TableTools implements ToolProvider{
 
   public TableTools()
   {
-    String path = null;
     String fs = File.separator;
-    /*
-      WARNING:
-      Waiting for a method to get the packagePath from the package name
-    */
-    /*try
-      {
-      path  = MaxApplication.getPackageHandler().locatePackage("data").getPath()+fs+"images"+fs;
-      }
-      catch(FileNotFoundException e){
-      path = JMaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
-      }*/
-     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;//??????????????????	 
-     /*************************************************************/
+    String path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;
 
     tools[0] = new PencilTool(new ImageIcon(path+"edit.gif"));
     tools[1] = new TableSelecter(new ImageIcon(path+"arrow.gif"));
