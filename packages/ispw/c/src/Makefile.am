@@ -1,10 +1,6 @@
 packagedir=$(pkgdatadir)/packages/ispw/c
 package_LTLIBRARIES=libispw.la
 
-# The following are architecture dependant and must be determined by configure script
-#osc_ieeewrap.c \
-#osc_intphase.c \
-
 libispw_la_SOURCES= \
 osc_ieeewrap.c \
 accum.c \
