@@ -116,6 +116,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     
 	// ends the undoable transition
 	endUpdate();
+
+	setDirty();
     }
     public void addEvents(int nArgs , FtsAtom args[])
     {
@@ -132,6 +134,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
 	// ends the undoable transition
 	endUpdate();
+
+	setDirty();
     }
 
   public void deleteEvents(int nArgs , FtsAtom args[])
@@ -147,6 +151,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       }
     // ends the undoable transition
     endUpdate();
+
+    setDirty();
   }
     
   public void highlightEvents(int nArgs , FtsAtom args[])

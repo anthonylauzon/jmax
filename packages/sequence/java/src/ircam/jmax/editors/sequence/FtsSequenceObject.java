@@ -134,8 +134,10 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	      if(time>trackTime) trackTime = time;
 	      
 	  }
+
+      setDirty();
       
-    notifyTracksAdded(trackTime);
+      notifyTracksAdded(trackTime);
   }
    
   public void deleteTracks(int nArgs , FtsAtom args[])
@@ -152,6 +154,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	      tracks.removeElement(track);
 	      notifyTrackRemoved(track);
 	  }    
+      setDirty();
   }
  
   /**
