@@ -354,7 +354,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   protected void Paste() {
     String tclScriptToExecute = null;
-    
+    if(itsSketchPad.itsRunMode) return;
     // take the objects list from the clipboard, if any. Only tclGroups for now
     Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
     if ((aTransferable == null) || !aTransferable.isDataFlavorSupported(ErmesClipboardProvider.tclGroupFlavor))
