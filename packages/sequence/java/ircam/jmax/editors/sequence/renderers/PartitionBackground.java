@@ -118,8 +118,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 	  }
       }
     g.setColor(Color.black);
-    g.drawString("15", KEYEND-15, SC_BOTTOM-3 -delta);
-    g.drawString("8", KEYEND-14, SC_BOTTOM-step*7-3 -delta);    
+    /*g.drawString("15", KEYEND-15, SC_BOTTOM-3 -delta);
+    g.drawString("8", KEYEND-14, SC_BOTTOM-step*7-3 -delta);*/
 
     for (int i = 14; i < 19; i++)
       {
@@ -162,8 +162,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 
     g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, SC_TOP-7 -delta, this);
 
-    g.drawString("15", KEYEND-9, SC_TOP+2 -delta);
-    g.drawString("8", KEYEND-6, SC_TOP+step*7+2 -delta);    
+    /*g.drawString("15", KEYEND-9, SC_TOP+2 -delta);
+    g.drawString("8", KEYEND-6, SC_TOP+step*7+2 -delta);*/
 
     // the vertical line at the end of keyboard
     g.drawLine(KEYX, SC_TOP-delta, KEYX, SC_BOTTOM-delta);

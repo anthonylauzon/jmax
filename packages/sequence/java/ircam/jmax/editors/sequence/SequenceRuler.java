@@ -112,10 +112,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	    stringWidth = fm.stringWidth(timeString);
 	    
 	    if((xPosition <= clip.x+clip.width+20)&&(xPosition+stringWidth >= clip.x-20))
-	      {				
-		g.drawLine(xPosition, d.height-4, xPosition, d.height);				
-		g.drawString(timeString, xPosition-stringWidth/2, 12);		  
-	      }
+		g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
 	  }
 	
 	int hhX = utilityPartitionAdapter.getX(hhTime)+getXIndentation();
@@ -130,7 +127,6 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	  {
 	    snappedTime = (i/timeStep)*timeStep;
 	    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
-	    g.drawLine(xPosition, d.height-4, xPosition, d.height);
 	    
 	    if(unity==MILLISECONDS_UNITY)		    
 	      timeString = ""+snappedTime;
@@ -138,7 +134,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	      timeString = ""+(float)(snappedTime/(float)1000.0);
 	    
 	    stringWidth = fm.stringWidth(timeString);
-	    g.drawString(timeString, xPosition-stringWidth/2, 12);		  
+	    g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
 	  }
       }
   }
@@ -230,7 +226,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
   public final static int SECONDS_UNITY      = 1; 
   public final static int SAMPLES_UNITY      = 2; 
 
-  public final static int RULER_HEIGHT = 20; 
+  public final static int RULER_HEIGHT = 15; 
 }    
 
 
