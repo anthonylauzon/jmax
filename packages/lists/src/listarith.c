@@ -270,7 +270,7 @@ listarith_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       list_set_size(&(this->list), ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_sub(at + i, &(this->right_atom), &(this->list.at[i]));
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -297,7 +297,7 @@ listarith_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       list_set_size(&(this->list), ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_mul(at + i, &(this->right_atom), &(this->list.at[i]));
     }
 
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -324,7 +324,7 @@ listarith_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       list_set_size(&(this->list), ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+	atom_div(at + i, &(this->right_atom), &(this->list.at[i]));
     }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
@@ -393,11 +393,11 @@ listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(class_name == fts_new_symbol("list+"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_add);
-  if(class_name == fts_new_symbol("list-"))
+  else if(class_name == fts_new_symbol("list-"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_sub);
-  if(class_name == fts_new_symbol("list*"))
+  else if(class_name == fts_new_symbol("list*"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_mul);
-  if(class_name == fts_new_symbol("list/"))
+  else if(class_name == fts_new_symbol("list/"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_div);
   else 
     return &fts_CannotInstantiate;
