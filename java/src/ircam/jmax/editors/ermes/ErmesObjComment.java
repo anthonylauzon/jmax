@@ -86,7 +86,7 @@ class ErmesObjComment extends ErmesObject {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    Resize(itsFontMetrics.stringWidth(itsMaxString)-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
+    Resize(itsFontMetrics.stringWidth(itsMaxString)+10-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
@@ -148,7 +148,7 @@ class ErmesObjComment extends ErmesObject {
   
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString) - currentRect.width,
+      Resize(itsFontMetrics.stringWidth(itsMaxString)+10 - currentRect.width,
 	     itsFontMetrics.getHeight()*itsParsedTextVector.size()- currentRect.height);
     }
     else ResizeToText(0,0);
@@ -158,14 +158,14 @@ class ErmesObjComment extends ErmesObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsMaxString)) aWidth = itsFontMetrics.stringWidth(itsMaxString);
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString)+10) aWidth = itsFontMetrics.stringWidth(itsMaxString)+10;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size()) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size();
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString))||
+    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+10)||
        (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size()))
       return false;
     else return true;
@@ -245,7 +245,10 @@ class ErmesObjComment extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return getPreferredSize(); //(depending on the layout manager).
+    if(itsParsedTextVector.size()==0) return getPreferredSize();
+    else
+      return new Dimension(itsFontMetrics.stringWidth(itsMaxString)+10,
+			   itsFontMetrics.getHeight()*itsParsedTextVector.size());
   }
 
   //If we don't specify this, the canvas might not show up at all

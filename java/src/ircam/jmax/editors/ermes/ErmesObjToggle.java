@@ -101,6 +101,21 @@ class ErmesObjToggle extends ErmesObject {
      if(!itsSketchPad.itsRunMode) 
        g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
+
+  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+    if((currentRect.width+theDeltaX < getPreferredSize().width)||
+       (currentRect.height+theDeltaY < getPreferredSize().height))
+      return false;
+    else return true;
+  }
+  //resize to preferredSize()
+  public void ResizeToText(int theDeltaX, int theDeltaY){
+    int aWidth = currentRect.width+theDeltaX;
+    int aHeight = currentRect.height+theDeltaY;
+    if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
+    if(aHeight<getPreferredSize().width) aHeight = getPreferredSize().height;
+    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+  }
   
   //--------------------------------------------------------
   // minimumSize()

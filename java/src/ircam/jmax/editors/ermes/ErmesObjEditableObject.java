@@ -240,7 +240,10 @@ import ircam.jmax.fts.*;
   // minimumSize
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return getPreferredSize();
+    if(itsParsedTextVector.size()==0) return getPreferredSize();
+    else
+      return new Dimension(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF+10,
+			   itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF);
   }
   
   //--------------------------------------------------------
@@ -251,6 +254,9 @@ import ircam.jmax.fts.*;
   }
 	
 }
+
+
+
 
 
 

@@ -73,7 +73,8 @@ public class ErmesObject implements FtsPropertyHandler {
     }
   }
 
-  /*abstract */Dimension getPreferredSize() {return new Dimension(0,0);};
+  Dimension getPreferredSize() {return new Dimension(0,0);};
+  Dimension getMinimumSize() {return new Dimension(0,0);};
   
   final ErmesSketchWindow GetSketchWindow() {
 

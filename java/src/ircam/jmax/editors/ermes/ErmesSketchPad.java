@@ -1291,16 +1291,35 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       return;
     } 
     if(editStatus == RESIZING_OBJECT) {
-      if((java.lang.Math.abs(x-currentResizeRect.x)<5)||
-	 (java.lang.Math.abs(y-currentResizeRect.y)<5)) return;
+      int aWidth, aHeight;
+      if((java.lang.Math.abs(x-currentResizeRect.x)<itsResizingObject.getMinimumSize().width)||
+	 (x<currentResizeRect.x)) aWidth = currentResizeRect.width;
+      else aWidth = x-currentResizeRect.x;
+
+      if((java.lang.Math.abs(y-currentResizeRect.y)<itsResizingObject.getMinimumSize().height)||
+	(y<currentResizeRect.y)) aHeight = currentResizeRect.height;
+      else aHeight = y-currentResizeRect.y;
+
       if(itsResizeMode == BOTH_RESIZING)
-	currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
+	currentResizeRect.setSize(aWidth, aHeight);
       else if(itsResizeMode == HORIZONTAL_RESIZING)
-	currentResizeRect.setSize(x-currentResizeRect.x, currentResizeRect.height);
+	currentResizeRect.setSize(aWidth, currentResizeRect.height);
       else if(itsResizeMode == VERTICAL_RESIZING)
-	currentResizeRect.setSize(currentResizeRect.width, y-currentResizeRect.y);
+	currentResizeRect.setSize(currentResizeRect.width, aHeight);
       update(getGraphics());
       return;
+
+      /*if((java.lang.Math.abs(x-currentResizeRect.x)<itsResizingObject.getMinimumSize().width)||
+	(java.lang.Math.abs(y-currentResizeRect.y)<itsResizingObject.getMinimumSize().height)||
+	(x<currentResizeRect.x)||(y<currentResizeRect.y)) return;
+	if(itsResizeMode == BOTH_RESIZING)
+	currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
+	else if(itsResizeMode == HORIZONTAL_RESIZING)
+	currentResizeRect.setSize(x-currentResizeRect.x, currentResizeRect.height);
+	else if(itsResizeMode == VERTICAL_RESIZING)
+	currentResizeRect.setSize(currentResizeRect.width, y-currentResizeRect.y);
+	update(getGraphics());
+	return;*/
     } 
     else if (editStatus == MOVING){
       repaint();
@@ -1799,11 +1818,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     else if (editStatus == RESIZING_OBJECT) {
       int x, y, w, h;
       g.drawImage(offImage,0,0, this);
-      if ((currentResizeRect.x + currentResizeRect.width >=itsResizingObject.currentRect.x + 20)&&
-	  (currentResizeRect.y + currentResizeRect.height>=itsResizingObject.currentRect.y+20)) {
+      //if ((currentResizeRect.x + currentResizeRect.width >=itsResizingObject.currentRect.x + 20)&&
+      //  (currentResizeRect.y + currentResizeRect.height>=itsResizingObject.currentRect.y+20)) {
 	g.setColor(Color.black);
 	g.drawRect(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width-1, currentResizeRect.height-1);
-      }
+	//}
     }
     else if (editStatus == MOVING){
       g.drawImage(offImage,0,0, this);

@@ -83,7 +83,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     ///qui accorcia se il testo e' piu' corto dell'oggetto
     //dovrebbe farlo anche per l'altezza...
 
-    int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
+    //int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
+    int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
   
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
       Dimension d1 = itsOwner.Size();
