@@ -40,6 +40,7 @@
   <LI><A HREF="#resizing">Resizing an Object</A>
   <LI><A HREF="#copy_cut_paste">Copy, Cut & Paste</A>
   <LI><A HREF="#editing">Editing an Object</A>
+  <LI><A HREF="#obtaining help">Obtaining help</A>
   <LI><A HREF="#patcher">The Patcher Object</A>
   <LI><A HREF="#editor">Opening an Editor</A>
   <LI><A HREF="#key_bindings">Key Bindings</A>
@@ -243,6 +244,23 @@ Editing text inside objects is done by first selecting the object,
 then clicking on it (<I>Warning</I>: not a double click). 
 This opens a text edit field that will be dynamically enlarged to contain the text.
 
+
+<p>
+<a name="obtaining help">
+<hr>
+<h2>Obtaining help</h2></a>
+
+<p>
+Help can be obtained by ALT-click on an object.
+
+<p>
+Help on a selection of objects can be obtained via the help menu, or via
+CTRL-H (the "Help ... on object" menu shortcut).
+
+<p>
+The help menu gives also access to summary patches, that present an overview
+of the objects offered by a package.
+
 <P>
 <A NAME="patcher">
 <HR>
@@ -341,15 +359,20 @@ The following key bindings are currently available:
 </TR>
 <TR>
   <TD> CTRL-c </TD>
-  <TD> copy the selection to the clipboard </TD>
+  <TD> copy the selection<A HREF="#selection"><sup>*</sup></A> to the clipboard </TD>
 </TR>
 <TR>
   <TD> CTRL-x </TD>
-  <TD> move the selection to the clipboard </TD>
+  <TD> move the selection<A HREF="#selection"><sup>*</sup></A> to the clipboard </TD>
 </TR>
 <TR>
   <TD> CTRL-v </TD>
   <TD> paste the clipboard </TD>
+</TR>
+<TR>
+  <TD> CTRL-d </TD>
+  <TD> duplicate the selection<A HREF="#selection"><sup>*</sup></A> 
+  (copy it to the clipboard and paste it) </TD>
 </TR>
 <TR>
   <TD> CTRL-e </TD>
@@ -375,6 +398,12 @@ The following key bindings are currently available:
   <TD> CTRL-q </TD>
   <TD> quit <I>j</I>Max </TD>
 </TR>
+
+<tr>
+  <td colspan=2> (<A NAME="selection">*</a>) For copy, cut, paste and duplicate actions, selection can be 
+  either objects or text if an object is being edited.
+  </td>
+</tr>
 </TABLE>
 </CENTER>
 
