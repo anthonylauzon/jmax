@@ -136,31 +136,45 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     Object newVal;
     double doubleVal;
     
-    for(int i = 0; i < nArgs-1; i+=2)
+    if( nArgs == 1)
       {
-	name = args[i].symbolValue.toString();
-	newVal = args[i].getValue();
-
+	newVal = args[0].getValue();
 	if (itsTrackDataModel != null)
 	  {
-	    if (((UndoableData) itsTrackDataModel).isInGroup()&&( !name.equals("time")))
-	      ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
+	    if (((UndoableData) itsTrackDataModel).isInGroup())
+	      ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, "value", newVal));
 	  }
-      
-	if (newVal instanceof Double) 
-	  {
-	    doubleVal = ((Double)newVal).doubleValue();
-	    if ( name.equals("time"))
-	      setTime( doubleVal);
-	    else  {
-	      if ( value != null) value.setProperty(name, newVal); //unknown Double property
+	  if (value != null)
+	    value.setProperty( "value", newVal);
+	  
+	  itsTrackDataModel.changeEvent( this, "value", newVal);
+      }
+    else
+      for(int i = 0; i < nArgs-1; i+=2)
+	{
+	  name = args[i].symbolValue.toString();
+	  newVal = args[i].getValue();
+	  
+	  if (itsTrackDataModel != null)
+	    {
+	      if (((UndoableData) itsTrackDataModel).isInGroup()&&( !name.equals("time")))
+		((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
 	    }
-	  }
-	else if (value != null)
-	  value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
-	
-	itsTrackDataModel.changeEvent(this, name, newVal);
-      }    
+      
+	  if (newVal instanceof Double) 
+	    {
+	      doubleVal = ((Double)newVal).doubleValue();
+	      if ( name.equals("time"))
+		setTime( doubleVal);
+	      else  {
+		if ( value != null) value.setProperty(name, newVal); //unknown Double property
+	      }
+	    }
+	  else if (value != null)
+	    value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
+	  
+	  itsTrackDataModel.changeEvent(this, name, newVal);
+	}    
   }
 
   /**
