@@ -34,7 +34,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libsources.so 
 
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 

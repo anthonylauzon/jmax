@@ -31,7 +31,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libnumeric.so
 
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 

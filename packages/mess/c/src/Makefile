@@ -21,7 +21,7 @@ MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 
 PACKAGELIB=$(LIBDIR)/libmess.so
 
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 

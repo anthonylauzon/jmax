@@ -31,7 +31,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libmidi.so
 
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 

@@ -35,7 +35,7 @@ endif
 
 PACKAGELIB=$(LIBDIR)/libio.so
 
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 
