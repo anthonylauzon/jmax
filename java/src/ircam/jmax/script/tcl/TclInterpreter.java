@@ -123,7 +123,7 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 
     public Object eval(Script script) throws ScriptException 
     {
-	return script.eval(this);
+	return script.eval();
     }
 
     public Object load(File file) throws ScriptException 
