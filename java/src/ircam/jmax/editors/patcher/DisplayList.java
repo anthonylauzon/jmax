@@ -659,7 +659,7 @@ public class DisplayList
 	break;
 
       case NO_DRAG:
-	break;
+	break;     
       }
   }		
 
