@@ -33,7 +33,7 @@
 
 #elif defined(LINUX)		/* Linux/gnu (gcc) standard basic platform */
 
-#define HI_OPT			/* hyper experimental optimizations */
+#undef HI_OPT			/* hyper experimental optimizations */
 #define HAS_DL
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
