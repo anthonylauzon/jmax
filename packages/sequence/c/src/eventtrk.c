@@ -75,15 +75,22 @@ prepend_event(eventtrk_t *track, event_t *event)
 {
   if(track->size == 0)
     {
-      track->first = track->last = event;
-      event->next = event->prev = 0;
+      event->next = 0;
+      event->prev = 0;
+
+      track->first = event;
+      track->last = event;
+
       track->size = 1;
     }
   else
     {
       event->next = track->first;
       event->prev = 0;
-      track->first = event->next->prev = event;
+
+      track->first->prev = event;
+      track->first = event;
+
       track->size++;
     }
 }
@@ -93,16 +100,22 @@ append_event(eventtrk_t *track, event_t *event)
 {
   if(track->size == 0)
     {
-      track->first = track->last = event;
-      event->next = event->prev = 0;
+      event->next = 0;
+      event->prev = 0;
+
+      track->first = event;
+      track->last = event;
+
       track->size = 1;
     }
   else
     {
       event->prev = track->last;
       event->next = 0;
-      track->last->next = event;      
+
+      track->last->next = event;
       track->last = event;
+
       track->size++;
     }  
 }
@@ -119,7 +132,9 @@ insert_event_before(eventtrk_t *track, event_t *here, event_t *event)
       event->prev = here->prev;
       event->next = here;
 
-      here->prev->next = here->prev = event;
+      here->prev->next = event;
+      here->prev = event;
+
       track->size++;
     }  
 }
@@ -127,14 +142,18 @@ insert_event_before(eventtrk_t *track, event_t *here, event_t *event)
 static void
 insert_event_behind(eventtrk_t *track, event_t *here, event_t *event)
 {
-  if(here == track->last)
+  if(here == 0)
+    append_event(track, event);
+  else if(here == track->last)
     append_event(track, event);
   else
     {
       event->next = here->next;
       event->prev = here;
 
-      here->next->prev = here->next = event;
+      here->next->prev = event;
+      here->next = event;
+
       track->size++;
     }  
 }
@@ -148,20 +167,20 @@ insert_event_behind(eventtrk_t *track, event_t *here, event_t *event)
 void
 eventtrk_add_event(eventtrk_t *track, double time, event_t *event)
 {
-  event_t *next = eventtrk_get_event_by_time(track, time);
+  event_t *here = eventtrk_get_event_by_time(track, time);
 
-  insert_event_before(track, next, event);
+  insert_event_before(track, here, event);
 
   event_set_track(event, track);
   event_set_time(event, time);
 }
 
 void
-eventtrk_add_event_after(eventtrk_t *track, double time, event_t *event, event_t *here)
+eventtrk_add_event_after(eventtrk_t *track, double time, event_t *event, event_t *after)
 {
-  event_t *next = eventtrk_get_event_by_time_after(track, time, here);
+  event_t *here = eventtrk_get_event_by_time_after(track, time, after);
   
-  insert_event_before(track, next, event);
+  insert_event_before(track, here, event);
 
   event_set_track(event, track);
   event_set_time(event, time);
