@@ -1259,6 +1259,10 @@ fts_midiport_get_default_in(void)
   fts_project_get_default_midi_in(&ac, &at);
   
   if ((ac > 0) && (at != NULL)) {
+    
+    fts_log("[midi]: Opening default MIDI in: ");
+    fts_log_atoms(ac, at);
+    fts_log("\n");
 
     if (fts_midiport_open(&default_midiport_in, ac, at) != 0) {
       return NULL;
@@ -1270,6 +1274,10 @@ fts_midiport_get_default_in(void)
 
     /* no default midi in port was specified. check if the user
        specified a default midi port */
+
+    fts_log("[midi]: Opening default MIDI in: ");
+    fts_log_atoms(ac, at);
+    fts_log("\n");
 
     fts_project_get_default_midi(&ac, &at);
 
@@ -1314,6 +1322,10 @@ fts_midiport_get_default_out(void)
   
   if ((ac > 0) && (at != NULL)) {
 
+    fts_log("[midi]: Opening default MIDI out: ");
+    fts_log_atoms(ac, at);
+    fts_log("\n");
+
     if (fts_midiport_open(&default_midiport_out, ac, at) != 0) {
       return NULL;
     }
@@ -1324,6 +1336,10 @@ fts_midiport_get_default_out(void)
 
     /* no default midi in port was specified. check if the user
        specified a default midi port */
+
+    fts_log("[midi]: Opening default MIDI out: ");
+    fts_log_atoms(ac, at);
+    fts_log("\n");
 
     fts_project_get_default_midi(&ac, &at);
 
