@@ -74,17 +74,17 @@ public class TablePopupMenu extends JPopupMenu
     ButtonGroup viewGroup = new ButtonGroup();
 
     filledItem = new JRadioButtonMenuItem( "Filled view");
-    filledItem.addActionListener( Actions.filledViewAction);
+    filledItem.addActionListener( new Actions.FilledViewAction());
     viewGroup.add( filledItem);
     add( filledItem);
 
     pointsItem = new JRadioButtonMenuItem( "Points view");
-    pointsItem.addActionListener( Actions.pointsViewAction);
+    pointsItem.addActionListener( new Actions.PointsViewAction());
     viewGroup.add( pointsItem);
     add( pointsItem);    
 
     linesItem = new JRadioButtonMenuItem( "Lines view");
-    linesItem.addActionListener( Actions.linesViewAction);
+    linesItem.addActionListener( new Actions.LinesViewAction());
     viewGroup.add( linesItem);
     add( linesItem);    
 
@@ -92,11 +92,11 @@ public class TablePopupMenu extends JPopupMenu
     
     /* Color */
     JMenuItem item = new JMenuItem( "Background Color...");
-    item.addActionListener( Actions.backColorAction);
+    item.addActionListener( new Actions.BackColorAction());
     add( item);
     
     item = new JMenuItem( "Foreground Color...");
-    item.addActionListener( Actions.foreColorAction);
+    item.addActionListener( new Actions.ForeColorAction());
     add( item);
 
     validate();

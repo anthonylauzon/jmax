@@ -82,9 +82,9 @@ public class BpfWindow extends JFrame implements EditorContainer{
 	  }
 	});
       pack();
-      
-      // Build The Menus and Menu Bar
-      makeMenuBar();
+
+      if(JMaxApplication.getProperty("no_menus") == null)
+        makeMenuBar();
       
       validate();
       pack();
@@ -104,14 +104,11 @@ public class BpfWindow extends JFrame implements EditorContainer{
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
     
-    // Build the file menu	
     EditorMenu fileMenu = new DefaultFileMenu();
     fileMenu.setEnabled( false, 3);
     fileMenu.setEnabled( false, 4);
     fileMenu.setEnabled( false, 7);
     mb.add( fileMenu);
-    
-    // New Window Manager based Menu
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
     
     setJMenuBar(mb);

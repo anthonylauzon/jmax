@@ -39,10 +39,6 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.toolkit.actions.*;
 
-
-
-
-
 public class EditMenu extends EditorMenu
 {
   EditorContainer container;
@@ -61,20 +57,20 @@ public class EditMenu extends EditorMenu
     this.container = container;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-	setMnemonic(KeyEvent.VK_E);
+    setMnemonic(KeyEvent.VK_E);
 
-	add(undoAction);
-	add(redoAction);
+    add(undoAction);
+    add(redoAction);
     addSeparator();
-	add(cutAction);
-	add(copyAction);
-	add(pasteAction);
-	add(duplicateAction);
+    add(cutAction);
+    add(copyAction);
+    add(pasteAction);
+    add(duplicateAction);
 
     Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
     pasteAction.setEnabled((flavors != null) &&
-			 clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()));
+                           clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()));
   }
 
   public void updateMenu()

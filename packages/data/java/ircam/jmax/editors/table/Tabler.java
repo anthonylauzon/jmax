@@ -74,7 +74,9 @@ public class Tabler extends JFrame implements EditorContainer {
     });
     
     pack();
-    makeMenuBar();    
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();    
     validate();
     pack();
   }

@@ -42,29 +42,29 @@ public class Actions
 
   public static class CutAction extends EditorAction
   {
-	 public CutAction()
-		{
-		   super("Cut", null, KeyEvent.VK_C, KeyEvent.VK_X, false);
-		}
+    public CutAction()
+    {
+      super("Cut", null, KeyEvent.VK_C, KeyEvent.VK_X, false);
+    }
 
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).cut();
-      }
+    public void doAction(EditorContainer container)
+    {
+      ((SequenceEditor)container.getEditor()).cut();
+    }
   }
 
-   public static class CopyAction extends EditorAction
-   {
-     public CopyAction()
-     {
-       super("Copy", null, KeyEvent.VK_C, KeyEvent.VK_C, false);
-     }
+  public static class CopyAction extends EditorAction
+  {
+    public CopyAction()
+    {
+      super("Copy", null, KeyEvent.VK_C, KeyEvent.VK_C, false);
+    }
 
-     public void doAction(EditorContainer container)
-     {
-       ((SequenceEditor)container.getEditor()).copy();
-     }
-   }
+    public void doAction(EditorContainer container)
+    {
+      ((SequenceEditor)container.getEditor()).copy();
+    }
+  }
   
    public static class PasteAction extends EditorAction
    {

@@ -270,23 +270,22 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   {
     ((ClipableData) trackData).copy();
 
-	if(itsContainer instanceof TrackWindow)
-	{
-	   TrackWindow window = (TrackWindow)itsContainer;
-	   window.getEditMenu().pasteAction.setEnabled(true);
-	}
-
+    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
+    {
+      TrackWindow window = (TrackWindow)itsContainer;
+      window.getEditMenu().pasteAction.setEnabled(true);
+    }    
   }
 
   public void cut()
   {
     ((ClipableData) trackData).cut();
 
-	if(itsContainer instanceof TrackWindow)
-	{
-	   TrackWindow window = (TrackWindow)itsContainer;
-	   window.getEditMenu().pasteAction.setEnabled(true);
-	}
+    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
+    {
+      TrackWindow window = (TrackWindow)itsContainer;
+      window.getEditMenu().pasteAction.setEnabled(true);
+    }
   }
 
   public void paste()
@@ -372,18 +371,18 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     int numSelected = trackEditor.getSelection().size();
 
     if (numSelected == 1)
-      {
-	TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
-	makeVisible(evt);
-      }
-    
-    if(itsContainer instanceof TrackWindow)
-      {
-	TrackWindow window = (TrackWindow)itsContainer;
-	window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-	window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-	window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
-      }
+    {
+      TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
+      makeVisible(evt);
+    }
+
+    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
+    {
+      TrackWindow window = (TrackWindow)itsContainer;
+      window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+      window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+      window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+    }
   }
     
   public boolean eventIsVisible(Event evt)

@@ -36,11 +36,16 @@ import ircam.jmax.editors.table.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
-
+import ircam.jmax.toolkit.actions.*;
 
 public class ViewMenu extends EditorMenu
 {
-  JMenuItem pointsItem, filledItem, linesItem;
+  public EditorAction pointsAction = new Actions.PointsViewAction();
+  public EditorAction filledAction = new Actions.FilledViewAction();
+  public EditorAction linesAction = new Actions.LinesViewAction();
+  public EditorAction backAction = new Actions.BackColorAction();
+  public EditorAction foreAction = new Actions.ForeColorAction();
+  public EditorAction zoomAction = new Actions.ZoomToWindowAction();
 
   EditorContainer container;
   
@@ -52,18 +57,18 @@ public class ViewMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    pointsItem   = add(Actions.pointsViewAction, "Points");
-    filledItem    = add(Actions.filledViewAction, "Filled");
-    linesItem  = add(Actions.linesViewAction, "Lines");
-
-    addSeparator();
-    
-    add(Actions.backColorAction, "Background Color");
-    add(Actions.foreColorAction, "Foreground Color");
+    add(pointsAction);
+    add(filledAction);
+    add(linesAction);
     
     addSeparator();
     
-    add(Actions.zoomToWindowAction, "Zoom to Window");
+    add(backAction);
+    add(foreAction);
+    
+    addSeparator();
+    
+    add(zoomAction);
   }
 }
 

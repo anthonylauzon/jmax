@@ -77,11 +77,11 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     itsContainer = container;
     sequenceData = data;
 
-    if(itsContainer instanceof SequenceWindow)
-      {
-	SequenceWindow window = (SequenceWindow)itsContainer;
-	editMenu = window.getEditMenu();
-      }
+    if(itsContainer instanceof SequenceWindow && (JMaxApplication.getProperty("no_menus") == null))
+    {
+      SequenceWindow window = (SequenceWindow)itsContainer;
+      editMenu = window.getEditMenu();
+    }
 
     setDoubleBuffered(false);
     ftsSequenceObject = (FtsSequenceObject)data;
@@ -465,20 +465,22 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-      {
-	((ClipableData) track.getTrackDataModel()).copy();
-	editMenu.pasteAction.setEnabled(true);
-      }	  
+    {
+      ((ClipableData) track.getTrackDataModel()).copy();
+      if(JMaxApplication.getProperty("no_menus") == null)
+        editMenu.pasteAction.setEnabled(true);
+    }
   }
 
   public void cut()
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-      {
-	((ClipableData) track.getTrackDataModel()).cut();
-	editMenu.pasteAction.setEnabled(true);
-      }
+    {
+      ((ClipableData) track.getTrackDataModel()).cut();
+      if(JMaxApplication.getProperty("no_menus") == null)
+        editMenu.pasteAction.setEnabled(true);
+    }
   }
   
   public void paste()
@@ -571,7 +573,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	makeVisible(evt);
       }
 
-   if(itsContainer instanceof SequenceWindow)
+   if(itsContainer instanceof SequenceWindow && (JMaxApplication.getProperty("no_menus") == null))
      {
        SequenceWindow window = (SequenceWindow)itsContainer;
        window.getEditMenu().copyAction.setEnabled(numSelected > 0);

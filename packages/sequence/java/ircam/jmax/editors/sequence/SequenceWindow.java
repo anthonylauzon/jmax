@@ -91,9 +91,9 @@ public class SequenceWindow extends JFrame implements EditorContainer{
 	public void windowDeactivated(WindowEvent e){}
       });
     pack();
-    
-    // Build The Menus and Menu Bar
-    makeMenuBar();
+
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
     
     validate();
     pack();
@@ -110,25 +110,18 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
 
-   public EditMenu getEditMenu()
-	  {
-		 return editMenu;
-	  }
+  public EditMenu getEditMenu()
+  {
+     return editMenu;
+  }
 
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
     
-    // Build the file menu	
     mb.add( new FileMenu());
-    
-    // Build the edit menu
-	editMenu = new EditMenu(this);
+    editMenu = new EditMenu(this);
     mb.add(editMenu); 
-    
-    // Build the track menu
     mb.add(new TrackMenu(this, sequenceData)) ; 	
-    
-    // New Window Manager based Menu
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
     
     setJMenuBar(mb);

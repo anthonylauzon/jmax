@@ -36,6 +36,7 @@ import ircam.jmax.editors.table.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
 
 public class EditMenu extends EditorMenu
@@ -43,13 +44,13 @@ public class EditMenu extends EditorMenu
   EditorContainer container;
   FtsTableObject ftsObject;
 
-  JMenuItem undoItem;
-  JMenuItem redoItem;
-  JMenuItem copyItem;
-  JMenuItem cutItem;
-  JMenuItem insertItem;
-  JMenuItem pasteItem;
-  JMenuItem refreshItem;
+  public EditorAction undoAction = new Actions.UndoAction();
+  public EditorAction redoAction = new Actions.RedoAction();
+  public EditorAction copyAction = new Actions.CopyAction();
+  public EditorAction cutAction = new Actions.CutAction();
+  public EditorAction insertAction = new Actions.InsertAction();
+  public EditorAction pasteAction = new Actions.PasteAction();
+  public EditorAction refreshAction = new Actions.RefreshAction();
   
   public EditMenu(EditorContainer container)
   {
@@ -57,41 +58,43 @@ public class EditMenu extends EditorMenu
 
     this.container = container;
     this.ftsObject = (FtsTableObject)((TablePanel)container.getEditor()).getData();
-
     setHorizontalTextPosition(AbstractButton.LEFT);
+    setMnemonic(KeyEvent.VK_E);
 
-    undoItem      = add(Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Z);
-    redoItem      = add(Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_R);
+    add(undoAction);
+    add(redoAction);
 
     addSeparator();
     
-    cutItem       = add(Actions.cutAction, "Cut", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_X);
-    copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
-    pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
-    insertItem    = add(Actions.insertAction, "Insert", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_I);
-
+    add(cutAction);
+    add(copyAction);
+    add(pasteAction);
+    add(insertAction);
+    
     addSeparator();
 
-    refreshItem   = add(Actions.refreshAction, "Refresh");
+    add(refreshAction);
+    
+    pasteAction.setEnabled(ftsObject.thereIsACopy());    
   }
 
   public void updateMenu()
   {
     if(TableSelection.current.isSelectionEmpty())
-      {
-	//Empty selection	
-	copyItem.setEnabled(false);
-	cutItem.setEnabled(false);
-      }
-    else 
-      {
-	// Object selection
-	copyItem.setEnabled(true);
-	cutItem.setEnabled(true);
-      }
-    
-    pasteItem.setEnabled(ftsObject.thereIsACopy());
-    insertItem.setEnabled(ftsObject.thereIsACopy());
+    {
+      //Empty selection
+      copyAction.setEnabled(false);
+      cutAction.setEnabled(false);
+    }
+    else
+    {
+      // Object selection
+      copyAction.setEnabled(true);
+      cutAction.setEnabled(true);
+    }
+
+    pasteAction.setEnabled(ftsObject.thereIsACopy());
+    insertAction.setEnabled(ftsObject.thereIsACopy());
   }
 }
 
