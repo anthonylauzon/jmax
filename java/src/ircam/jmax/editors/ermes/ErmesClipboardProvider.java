@@ -49,8 +49,8 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
 
     try 
       {
-	PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
-	IndentedPrintWriter pw = new IndentedPrintWriter(aPrintWriter); 
+	//PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
+	IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter/*aPrintWriter*/); 
 	FtsSelection selection = FtsServer.getServer().getRootObject().getSelection();
 
 	for(Enumeration e = theSelectedList.elements(); e.hasMoreElements();)

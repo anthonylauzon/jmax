@@ -363,7 +363,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     try {
       itsPatcher.eval(MaxApplication.getTclInterp(), tclScriptToExecute);
     } catch (TclException e) {
-      System.out.println("bad format: cannot paste");
+      System.out.println("bad format, cannot paste:" + e.toString());
     }
     
     //ftsObjectPasted vector contains the needed new, pasted objects
