@@ -178,17 +178,9 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	return selection;
     }
 
-    // good old f*****g HTML-style...
-
-    public Dimension getMinimumSize()
-    {
-	return new Dimension(400, /*80*/127);
-	//return new Dimension(400, 40);for split
-    }
-
     public Dimension getPreferredSize()
     {
-	return new Dimension(400, /*80*/127);
+	return new Dimension(800, 127);
     }
 
     public Track getTrack()

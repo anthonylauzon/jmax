@@ -35,6 +35,7 @@ import java.awt.image.ImageObserver;
 import java.io.File;
 
 import javax.swing.*;
+import java.beans.*;
 
 /**
  * The background layer of a monodimensionalTrackeditor. It builds the background Image */
@@ -45,6 +46,17 @@ public class MonoTrackBackground implements Layer{
   {
     super();
     gc = theGc;
+
+    gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	public void propertyChange(PropertyChangeEvent e)
+	    {		
+		if (e.getPropertyName().equals("maximumValue") || e.getPropertyName().equals("minimumValue"))
+		{
+		    toRepaintBack = true;
+		    gc.getGraphicDestination().repaint();
+		}
+	    }
+    });
   }
 
   /**
@@ -58,7 +70,7 @@ public class MonoTrackBackground implements Layer{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
       }
-    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width)
+    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
       {
 	itsImage.flush();
 	itsImage = null;
@@ -68,6 +80,7 @@ public class MonoTrackBackground implements Layer{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
 	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+	toRepaintBack = false;
       } 
     
     if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
@@ -152,8 +165,8 @@ public class MonoTrackBackground implements Layer{
 
   //--- Fields
   SequenceGraphicContext gc;
-  static Image itsImage;
-  static boolean imageReady = true/*false*/;
+  Image itsImage;
+  boolean toRepaintBack = false;
 
   public static final int KEYX = 31;
   public static final int KEYWIDTH = 24;

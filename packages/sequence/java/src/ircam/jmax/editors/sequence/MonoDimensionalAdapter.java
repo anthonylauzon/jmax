@@ -113,7 +113,7 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
     {
 	int y = getY(e);
 	int y0 = getY(0); 
-	if(y>y0) return (y-y0);
+	if(y>y0)  return (y-y0);
 	else return (y0-y);
     }
 

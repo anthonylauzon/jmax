@@ -79,6 +79,18 @@ public class MonoTrackPopupMenu extends JPopupMenu
 	}
     });
     add(item);
+    
+    addSeparator();
+    
+    item = new JMenuItem("Remove Track");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
+		removeTrack(MonoTrackPopupMenu.getPopupTarget().getTrack());
+	}
+    });
+    add(item);
 
     pack();
   }

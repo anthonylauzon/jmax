@@ -73,6 +73,10 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int heigth = gc.getAdapter().getHeigth(e);    
     int lenght = gc.getAdapter().getLenght(e); //fixed length
 
+    //negative value
+    if(((Integer)e.getProperty("integer")).intValue() < 0) 
+	y -= heigth;
+
     if (selected) 
 	g.setColor(Color.red);
     else 
@@ -101,12 +105,12 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);    
     int evtheigth = gc.getAdapter().getHeigth(e);
-    //int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-    //	                                          : gc.getGraphicDestination().getSize().height/2;
     int evtlenght = gc.getAdapter().getLenght(e);
 
-    evtheigth = (evtheigth > 0)? evtheigth : -evtheigth;
-
+    //negative value
+    if(((Integer)e.getProperty("integer")).intValue() < 0) 
+	evty -= evtheigth;
+    
     return  (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
   }
 
@@ -133,11 +137,11 @@ public class IntegerEventRenderer implements ObjectRenderer {
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);    
     int evtheigth = gc.getAdapter().getHeigth(e);
-    //int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-    //                                          : gc.getGraphicDestination().getSize().height/2;
     int evtlenght = gc.getAdapter().getLenght(e);
 
-    evtheigth = (evtheigth > 0)? evtheigth:-evtheigth;
+    //negative value
+    if(((Integer)e.getProperty("integer")).intValue() < 0) 
+	evty -= evtheigth;
 
     eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     tempRect.setBounds(x, y, w, h);

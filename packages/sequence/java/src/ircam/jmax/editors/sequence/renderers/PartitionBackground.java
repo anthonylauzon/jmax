@@ -198,7 +198,6 @@ public class PartitionBackground implements Layer, ImageObserver{
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep;
 	
-	
 	timeStep = findBestTimeStep(windowTime);
 	
 	g.setColor(Color.lightGray);

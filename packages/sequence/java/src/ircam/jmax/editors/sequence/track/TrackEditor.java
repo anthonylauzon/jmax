@@ -18,6 +18,7 @@ public interface TrackEditor {
 
     public void dispose();
     public SequenceSelection getSelection();
+
 }
 
 
