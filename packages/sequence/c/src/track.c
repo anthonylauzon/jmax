@@ -1270,6 +1270,39 @@ track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_name_dump_method(o, 0, 0, ac, at);
 }
 
+static void 
+track_add_gui_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  
+  if(ac > 0 && fts_is_object(at))
+    this->gui_listeners = fts_list_append( this->gui_listeners, at);
+}
+
+static void 
+track_remove_gui_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  
+  if(ac > 0 && fts_is_object(at))
+    this->gui_listeners = fts_list_remove( this->gui_listeners, at);
+}
+
+static void 
+track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_atom_t a;
+  fts_iterator_t i;
+  fts_list_get_values( this->gui_listeners, &i);
+  
+  while( fts_iterator_has_more( &i))
+  {
+    fts_iterator_next( &i, &a);
+    fts_send_message_varargs( fts_get_object(&a), fts_s_send, ac, at);
+  }
+}
+
 /******************************************************
  *
  *  class
@@ -1295,6 +1328,8 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->last = 0;
   this->size = 0;
   this->type = NULL;
+  
+  this->gui_listeners = 0;
   
   if(ac > 0)
   {
@@ -1365,6 +1400,10 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, track_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
+
+  fts_class_message_varargs(cl, fts_s_add_gui_listener, track_add_gui_listener);
+  fts_class_message_varargs(cl, fts_s_remove_gui_listener, track_remove_gui_listener);
+  fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);
 
   fts_class_message_void(cl, fts_new_symbol("duration"), track_return_duration);
 

@@ -76,8 +76,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 
     egc.getTrack().setProperty("selected", Boolean.TRUE);	    
     
-    if(egc.getDataModel().isLocked()) return;
-    
     egc.getGraphicDestination().requestFocus();//???
     
     TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
@@ -96,15 +94,21 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	  egc.getSelection().setLastSelectedEvent(aTrackEvent);
 	
 	singleObjectSelected(x, y, modifiers);
+        
+        egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
       }
-    else //click on empty
+    else 
+    {//click on empty
       if ((modifiers & InputEvent.SHIFT_MASK) == 0)
 	if ( !egc.getSelection().isSelectionEmpty())
 	  egc.getSelection().deselectAll(); 
+     
+       egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+    }
   }
   
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
-  {
+  {  
       edit(x, y, modifiers);
   }
 

@@ -2,7 +2,8 @@
 CONFIGURATION_FILES = \
 	default_config_linux_alsa.jcfg \
 	default_config_linux_jack.jcfg \
-	default_config_linux_oss.jcfg 
+	default_config_linux_oss.jcfg \
+	default_config_macosx.jcfg 
 
 PROJECT_FILE = default_project.jprj 
 

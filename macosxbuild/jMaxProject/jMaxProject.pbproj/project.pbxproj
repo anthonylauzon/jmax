@@ -2236,6 +2236,18 @@
 //F72
 //F73
 //F74
+		F746F84603F3D4BE01664058 = {
+			isa = PBXFileReference;
+			name = guilistener.c;
+			path = /Users/borghesi/projects/jmax/packages/guiobj/c/src/guilistener.c;
+			refType = 0;
+		};
+		F746F84703F3D4BE01664058 = {
+			fileRef = F746F84603F3D4BE01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F774414203F0114C01664058 = {
 			isa = PBXFileReference;
 			name = Finder.java;
@@ -18943,6 +18955,7 @@
 				F8B8E57F0286822501664092,
 				F8B8E5800286822501664092,
 				F8B8E5810286822501664092,
+				F746F84603F3D4BE01664058,
 				F8B8E5820286822501664092,
 				F5A3896C03AA484A01664092,
 				F8B8E5840286822501664092,
@@ -19320,6 +19333,7 @@
 				F86E9E9902A532B001664092,
 				F820646002AE147B01664092,
 				F5A3896D03AA484A01664092,
+				F746F84703F3D4BE01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

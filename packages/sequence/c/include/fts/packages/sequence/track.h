@@ -47,6 +47,8 @@ struct _track_
   event_t *last; /* pointer to last event */
   int size; /* # of events in track */
 
+  fts_list_t *gui_listeners; /* list of guilisteners */
+
   fts_object_t *load_obj; /* object (event value) of currently loaded event */
 };
 

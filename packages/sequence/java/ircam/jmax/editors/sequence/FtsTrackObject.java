@@ -444,6 +444,25 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       }   
   }    
 
+  public void requestNotifyGuiListeners( double time, TrackEvent evt)
+  {
+    args.clear();
+    
+    if( evt == null)
+        args.addFloat( (float)time);
+    else
+        args.addFloat( (float)evt.getTime());
+
+    try{
+      send( FtsSymbol.get("notify_gui_listeners"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsTrackObject: I/O Error sending notify_gui_listeners Message!");
+	e.printStackTrace(); 
+      }   
+  }    
+
   public void export()
   {
     try{

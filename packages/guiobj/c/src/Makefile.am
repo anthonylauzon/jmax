@@ -11,6 +11,7 @@ finder.c \
 fork.c \
 gfloat.c \
 gint.c \
+guilistener.c \
 guiobj.c \
 key.c \
 keyserver.c \
