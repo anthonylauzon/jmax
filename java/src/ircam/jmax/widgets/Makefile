@@ -26,4 +26,10 @@ ObjectSetViewer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ObjectSetViewer.java)
 .PHONY: ObjectSetViewer
 
+IndicatorWithMemory:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) IndicatorWithMemory.java)
+.PHONY: IndicatorWithMemory
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+

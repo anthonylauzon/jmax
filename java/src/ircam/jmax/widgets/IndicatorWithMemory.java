@@ -10,6 +10,7 @@ import java.lang.*;
 import java.util.*;
 
 public class IndicatorWithMemory extends JPanel {
+  boolean value = false;
 
   public IndicatorWithMemory(String name)
   {
@@ -61,6 +62,8 @@ public class IndicatorWithMemory extends JPanel {
 
   public void setValue( boolean value)
   {
+    this.value = value;
+
     indicatorLed.setState( value ? Led.ON : Led.OFF);
 
     if (value)
@@ -69,8 +72,8 @@ public class IndicatorWithMemory extends JPanel {
 
   public void reset()
   {
-    indicatorLed.setState( Led.OFF);
-    indicatorLed.setState( Led.OFF);
+    if (! value)
+      memoryLed.setState( Led.OFF);
   }
 
   protected Led indicatorLed;

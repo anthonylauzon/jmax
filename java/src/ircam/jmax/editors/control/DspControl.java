@@ -3,7 +3,7 @@ package ircam.jmax.editors.control;
 import java.beans.*;
 import ircam.jmax.fts.*;
 
-class DspControl extends FtsRemoteData
+public class DspControl extends FtsRemoteData
 {
   static final int DAC_SLIP_STATE     = 1;
   static final int INVALID_FPE_STATE  = 2;
@@ -17,7 +17,7 @@ class DspControl extends FtsRemoteData
 
   protected PropertyChangeSupport listeners;
 
-  DspControl()
+  public DspControl()
   {
     super();
 
