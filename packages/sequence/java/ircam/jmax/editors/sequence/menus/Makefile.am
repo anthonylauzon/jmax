@@ -3,6 +3,7 @@ package_JAVA = \
 ClosedTrackPopupMenu.java \
 EditMenu.java \
 FileMenu.java \
+AnythingTrackPopupMenu.java \
 MessageTrackPopupMenu.java \
 MidiEventPopupMenu.java \
 MidiTrackPopupMenu.java \

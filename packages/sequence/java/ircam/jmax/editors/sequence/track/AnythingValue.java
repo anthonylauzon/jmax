@@ -39,11 +39,23 @@ public class AnythingValue extends AbstractEventValue
 {
   public AnythingValue()
   {
-    super();
-  
-    setProperty("duration", new Double(1));
+    super();  
+    setProperty("duration", new Double(64.0));
   }
   
+  public Object getProperty(String name)
+  {
+    if(name.equals("type"))
+      return type;
+    else return super.getProperty(name);
+  }
+
+  public void setProperty( String name, Object value)
+  { 
+    if( name.equals("type"))
+      type = (String)value;
+    else super.setProperty(name, value);
+  }
   public ValueInfo getValueInfo()
   {
     return info;
@@ -87,17 +99,20 @@ public class AnythingValue extends AbstractEventValue
 
     public DataFlavor getDataFlavor()
     {
-	//return AnythingValueDataFlavor.getInstance();
-	return null;
+      //return AnythingValueDataFlavor.getInstance();
+      return null;
     }
 
     public Class getPropertyType(int index)
     {
+      if(index==0)
+	return String.class;
+      else
 	return Integer.class;
     }
  
-    String defNamesArray[] = {};
-    int defPropertyCount = 0;
+    String defNamesArray[] = {"type"};
+    int defPropertyCount = 1;
   }
 
   public JPopupMenu getPopupMenu()
@@ -152,31 +167,21 @@ public class AnythingValue extends AbstractEventValue
   public static final String ANYTHING_NAME = "any";
   public static final String ANYTHING_PUBLIC_NAME = "any";
   static String path;
+  String type;
   public static ImageIcon ANYTHING_ICON;
   public static AnythingValueInfo info = new AnythingValueInfo();
 
   static 
   {
-      /*
-	WARNING:
-	Waiting for a method to get the packagePath from the package name
-      */
-      /*try
-	{
-	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	}
-	catch(FileNotFoundException e){
-	path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}*/
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-      /*************************************************************/
-      
-      ANYTHING_ICON = new ImageIcon(path+"anything.gif");
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
+    /*************************************************************/
+    
+    ANYTHING_ICON = new ImageIcon(path+"anything.gif");
   }
 
-  static String nameArray[] = {};
-  static int propertyTypes[] = {};
-  static int propertyCount = 0;
+  static String nameArray[] = {"type"};
+  static int propertyTypes[] = {STRING_TYPE};
+  static int propertyCount = 1;
 }
 
 

@@ -47,9 +47,9 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     super(server, parent, objId);
 	
     this.time = (double)args[offset].doubleValue;
-    
+
     EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[offset+1].symbolValue.toString()).newInstance());
-    
+
     for(int i = 0; i< length-2-offset; i++)
       {
 	Object obj = args[offset+2+i].getValue();

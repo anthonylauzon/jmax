@@ -68,19 +68,19 @@ public class AnythingTrackRenderer extends AbstractRenderer{
    * the topmost in the visual hyerarchy*/
   public Object firstObjectContaining(int x, int y)
   {
-      TrackEvent aTrackEvent;
-      TrackEvent last = null;
-		    
-      double time = gc.getAdapter().getInvX(x);
-
-      for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1); e.hasMoreElements();) 
-	  {      
-	      aTrackEvent = (TrackEvent) e.nextElement();
-	      
-	      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-		  last = aTrackEvent;
-	  }
-      return last;
+    TrackEvent aTrackEvent;
+    TrackEvent last = null;
+    
+    double time = gc.getAdapter().getInvX(x);
+   
+    for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1); e.hasMoreElements();) 
+      {      
+	aTrackEvent = (TrackEvent) e.nextElement();
+	
+	if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+	  last = aTrackEvent;
+      }
+    return last;
   }
 
   /**

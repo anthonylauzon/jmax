@@ -1226,6 +1226,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       while (index < length() && events[index].getTime() <= endTime)
 	{
 	  e = events[index++];	
+
 	  if (e.getTime() >= startTime || 
 	      e.getTime()+((Double)e.getProperty("duration")).intValue()>= startTime)
 	    {

@@ -65,12 +65,12 @@ class TrackTableModel extends AbstractTableModel{
   {
       int type;
       if(col == 0)
-	  return Integer.class;
+	return Integer.class;
       else 
-	  if(col == 1) 
-	      return Double.class;
-	  else	      
-	      return model.getType().getPropertyType(col-2);
+	if(col == 1) 
+	  return Double.class;
+	else	      
+	  return model.getType().getPropertyType(col-2);
   }
 
   /**

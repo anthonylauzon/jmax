@@ -561,7 +561,8 @@ track_event_upload(track_t *this, event_t *event)
       /* anything else is uploaded as void event */
       fts_set_float(a + 0, (float)event_get_time(event));
       fts_set_symbol(a + 1, fts_s_void);
-      fts_client_add_atoms( (fts_object_t *)this, 2, a);
+      fts_set_symbol(a + 2, type);
+      fts_client_add_atoms( (fts_object_t *)this, 3, a);
       fts_client_done_message( (fts_object_t *)this);
     }
 }

@@ -52,7 +52,7 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 
     scrollPane = new JScrollPane(table);
 
-    setUpEditors();
+    //setUpEditors();
     
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollPane);
@@ -64,25 +64,25 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 
     trackModel.addHighlightListener(new HighlightListener() {
 	public void highlight(Enumeration hhElements, double time)
-	  {
-	      TrackEvent evt;
-	      int index;	      
-	      Rectangle rect = null;
-	      for (Enumeration e = hhElements; e.hasMoreElements();) 
-		{
-		    evt = (TrackEvent) e.nextElement();			  
-		    index = tmodel.getTrackDataModel().indexOf(evt);
-		    
-		    if(rect!=null)
-			rect = rect.union(table.getCellRect(index, 0, true));
-		    else
-			rect = table.getCellRect(index, 0, true);
-		}
-	      if(rect != null)
-		  table.scrollRectToVisible(rect);
-	  }
-	});
-
+	{
+	  TrackEvent evt;
+	  int index;	      
+	  Rectangle rect = null;
+	  for (Enumeration e = hhElements; e.hasMoreElements();) 
+	    {
+	      evt = (TrackEvent) e.nextElement();			  
+	      index = tmodel.getTrackDataModel().indexOf(evt);
+	      
+	      if(rect!=null)
+		rect = rect.union(table.getCellRect(index, 0, true));
+	      else
+		rect = table.getCellRect(index, 0, true);
+	    }
+	  if(rect != null)
+	    table.scrollRectToVisible(rect);
+	}
+      });
+    
     // make this panel a listener of the Sequence data base: changing
     // of the content will result in the right repaint()
     trackModel.addListener( new TrackDataListener() {
@@ -133,49 +133,49 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     */
   public void valueChanged(ListSelectionEvent e)
   {
-      Rectangle rect;
-      ListSelectionModel selection = table.getSelectionModel();
-      
-      if(selection.isSelectionEmpty() || selection.getValueIsAdjusting()) return;
-
-      int minIndex = selection.getMinSelectionIndex();
-      int maxIndex = selection.getMaxSelectionIndex();
-      
-      rect = table.getCellRect(minIndex, 0, true);
-
-      if(minIndex!=maxIndex)
-	  rect = rect.union(table.getCellRect(maxIndex, 0, true));
-
-      table.scrollRectToVisible(rect);      
-    }
+    Rectangle rect;
+    ListSelectionModel selection = table.getSelectionModel();
+    
+    if(selection.isSelectionEmpty() || selection.getValueIsAdjusting()) return;
+    
+    int minIndex = selection.getMinSelectionIndex();
+    int maxIndex = selection.getMaxSelectionIndex();
+    
+    rect = table.getCellRect(minIndex, 0, true);
+    
+    if(minIndex!=maxIndex)
+      rect = rect.union(table.getCellRect(maxIndex, 0, true));
+    
+    table.scrollRectToVisible(rect);      
+  }
 
     /*
      * Setup typed editors in table
      */
-    private void setUpEditors() 
+  /*private void setUpEditors() 
     {
-	table.setDefaultEditor(String.class,  new CellEditorArea(new JTextField()));
-    }
+    table.setDefaultEditor(String.class,  new CellEditorArea(new JTextField()));
+    }*/
   
   //--- Fields
-    public class CellEditorArea extends DefaultCellEditor
+  /*public class CellEditorArea extends DefaultCellEditor
     {
-	JTextArea area = new JTextArea();
-	JScrollPane scroll;
-	public CellEditorArea(JTextField field)
-	{
-	    super(field);
-	    scroll = new JScrollPane(area,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	}
-	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
-	{
-	    area.setText(""+table.getValueAt(row, column));
-	    return scroll;
-	}
-	public Object getCellEditorValue() {
-	    return area.getText();
-	}
+    JTextArea area = new JTextArea();
+    JScrollPane scroll;
+    public CellEditorArea(JTextField field)
+    {
+    super(field);
+    scroll = new JScrollPane(area,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
+    {
+    area.setText(""+table.getValueAt(row, column));
+    return scroll;
+    }
+    public Object getCellEditorValue() {
+    return area.getText();
+    }
+    }*/
 
   TrackTableModel tmodel;
   SequenceGraphicContext gc;

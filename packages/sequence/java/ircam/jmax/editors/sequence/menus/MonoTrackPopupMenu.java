@@ -118,9 +118,9 @@ public class MonoTrackPopupMenu extends JPopupMenu
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
-	    {
-		MonoTrackPopupMenu.getPopupTarget().showListDialog();
-	    }
+	{
+	  MonoTrackPopupMenu.getPopupTarget().showListDialog();
+	}
     });
     add(item);
 

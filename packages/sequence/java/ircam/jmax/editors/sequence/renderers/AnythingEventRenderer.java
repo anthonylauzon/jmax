@@ -55,9 +55,9 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected)
-    {
-	render(obj, g, selected, gc);
-    } 
+  {
+    render(obj, g, selected, gc);
+  } 
 
   /**
    * draw the given event in the given graphic context.
@@ -65,48 +65,48 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-      if(((Event)obj).isHighlighted())
-	  render(obj, g, Event.HIGHLIGHTED, theGc); 
+    if(((Event)obj).isHighlighted())
+      render(obj, g, Event.HIGHLIGHTED, theGc); 
+    else
+      if(selected)
+	render(obj, g, Event.SELECTED, theGc); 
       else
-	  if(selected)
-	      render(obj, g, Event.SELECTED, theGc); 
-	  else
-	      render(obj, g, Event.DESELECTED, theGc); 
+	render(obj, g, Event.DESELECTED, theGc); 
   }
   
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
-      Event e = (Event) obj;
-      MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
-      TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
+    Event e = (Event) obj;
+    MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
+    TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
 
-      int x = adapter.getX(e);
-      int y = adapter.getY(e);;    
+    int x = adapter.getX(e);
+    int y = adapter.getY(e);;    
 
-      switch(state)
-	  {
-	  case Event.SELECTED:
-	      g.setColor(Color.red);
-	      break;
-	  case Event.DESELECTED:
-	      g.setColor(Color.black);
-	      break;
-	  case Event.HIGHLIGHTED:
-	      g.setColor(Color.green);
-	      break;
-	  }
+    switch(state)
+      {
+      case Event.SELECTED:
+	g.setColor(Color.red);
+	break;
+      case Event.DESELECTED:
+	g.setColor(Color.black);
+	break;
+      case Event.HIGHLIGHTED:
+	g.setColor(Color.green);
+	break;
+      }
       
-      g.fillRect(x, y, ANY_LENGTH, ANY_HEIGHT);
-      g.fillOval(x-1, y-1, 5, 5);
+    g.fillRect(x, y, ANY_LENGTH, ANY_HEIGHT);
+    g.fillOval(x-1, y-1, 5, 5);
   }
   
   /**
    * returns true if the given event contains the given (graphic) point
    */
   public boolean contains(Object obj, int x, int y) 
-    {
-	return contains(obj, x, y, gc);
-    }
+  {
+    return contains(obj, x, y, gc);
+  }
 
   /**
    * returns true if the given event contains the given (graphic) point
@@ -118,14 +118,14 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
 
     int evtx = adapter.getX(e);
     int evty = adapter.getY(e);    
-
+    
     int evtheigth = ANY_HEIGHT;
     int evtlenght = ANY_LENGTH;
     if(evtheigth<0)
-	{
-	    evty += evtheigth;
-	    evtheigth = -evtheigth;
-	}
+      {
+	evty += evtheigth;
+	evtheigth = -evtheigth;
+      }
     
     return (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
   }
@@ -137,9 +137,9 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
    * returns true if the representation of the given event "touches" the given rectangle
    */
   public boolean touches(Object obj, int x, int y, int w, int h)
-    {
-	return touches(obj, x, y, w, h, gc);
-    } 
+  {
+    return touches(obj, x, y, w, h, gc);
+  } 
 
   /**
    * returns true if the representation of the given event "touches" the given rectangle
@@ -165,10 +165,10 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
 
     public static AnythingEventRenderer getRenderer()
     {
-	if (staticInstance == null)
-	    staticInstance = new AnythingEventRenderer();
-
-	return staticInstance;
+      if (staticInstance == null)
+	staticInstance = new AnythingEventRenderer();
+      
+      return staticInstance;
     }
 
     SequenceGraphicContext gc;

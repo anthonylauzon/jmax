@@ -44,7 +44,7 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class AnythingTrackEditor extends JPanel implements ListSelectionListener, TrackEditor
+public class AnythingTrackEditor extends PopupToolbarPanel implements ListSelectionListener, TrackEditor
 {
   public AnythingTrackEditor(Geometry g, Track track)
   {
@@ -75,6 +75,7 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
 	public void endPaste(){}
 	public void objectAdded(Object whichObject, int index) 
 	{ 
+	  //((TrackEvent)whichObject).getValue().setType();
 	  if( !uploading)
 	    AnythingTrackEditor.this.repaint();
 	}
@@ -187,7 +188,8 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
     
   public JPopupMenu getMenu()
   {
-    return null;
+    AnythingTrackPopupMenu.getInstance().update(this);
+    return AnythingTrackPopupMenu.getInstance();
   }
 
   public int trackCount()
@@ -233,7 +235,17 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
     gc.setRenderManager(renderer);
   }
 
-  public void showListDialog(){}
+  public void showListDialog()
+  {
+    if(listDialog==null) 
+      createListDialog();
+    listDialog.setVisible(true);
+  }
+  private void createListDialog()
+  {
+    listDialog = new SequenceTableDialog(itsTrack, gc.getFrame(), gc);
+  }
+
   public void updateNewObject(Object obj){};
   void updateEventProperties(Object whichObject, String propName, Object propValue){}
   void updateRange(Object whichObject){}  
@@ -264,7 +276,11 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
   {
     return DEFAULT_HEIGHT;
   }
-  public void dispose(){}
+  public void dispose()
+  {
+    if(listDialog != null)
+      listDialog.dispose();
+  }
   public SequenceSelection getSelection()
   {
     return selection;
@@ -306,6 +322,7 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
   static public int DEFAULT_HEIGHT = 70;
   AnythingTrackRenderer renderer;
   AnythingAdapter ad;
+  SequenceTableDialog listDialog = null;
   Track itsTrack;
   MaxVector oldElements = new MaxVector();
 }

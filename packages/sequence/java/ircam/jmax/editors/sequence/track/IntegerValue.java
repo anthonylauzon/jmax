@@ -110,15 +110,10 @@ public class IntegerValue extends AbstractEventValue
 	}
 	public Class getPropertyType(int index)
 	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    return Integer.class;
+	  return Integer.class;
 	}
 
 	String defNamesArray[] = {"integer"};
-	//Class propertyTypesArray[] = {Integer.class};
 	int defPropertyCount = 1;
     }
 
@@ -181,18 +176,10 @@ public class IntegerValue extends AbstractEventValue
 
     static 
     {
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  //System.err.println("Can't locate sequence images");
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+      /*************************************************************/
 	
-	INTEGER_ICON = new ImageIcon(path+"integer.gif");
+      INTEGER_ICON = new ImageIcon(path+"integer.gif");
     }
 }
 
