@@ -324,7 +324,7 @@ int getXIndentation()
 	if( isInSequence)
 		return 2+TrackContainer.BUTTON_WIDTH;
 	else
-		return /*0*/2;
+		return 2;
 }
 
 public TrackEvent firstMarkerContaining(int x, int y)
@@ -372,13 +372,13 @@ public void processKeyEvent(KeyEvent e)
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
 {  
-  if(markersTrack != null)
+  int x = e.getX();
+  int y = e.getY();
+  int modifiers = e.getModifiers();
+  
+  if((modifiers & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) // add markers
   {
-    int x = e.getX();
-    int y = e.getY();
-    int modifiers = e.getModifiers();
-    
-    if((modifiers & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) // add markers
+    if(markersTrack != null)
     {
       if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
         markersSelection.deselectAll();
@@ -386,16 +386,22 @@ public void mousePressed(MouseEvent e)
       markersTrack.requestInsertMarker( pa.getInvX(x));
     }
     else
+      if(!isInSequence) 
+        ((FtsTrackObject)ftsObj).requestInsertMarker( pa.getInvX(x));
+  }
+  else
+  {
+    if(markersTrack != null)
     {
       TrackEvent currMark = firstMarkerContaining(x, y);
-
+      
       if(currMark!=null)
       { //click on marker				
         if ( !markersSelection.isInSelection( currMark)) 
         {
           if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
             markersSelection.deselectAll();
-        
+          
           markersSelection.select( currMark);
         }
       }

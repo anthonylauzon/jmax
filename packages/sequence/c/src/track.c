@@ -36,7 +36,7 @@
 
 fts_class_t *track_class = 0;
 
-
+static void track_upload_markers(track_t *self);
 static void track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array);
 static void track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
@@ -644,6 +644,8 @@ track_get_or_make_markers(track_t *track)
     fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
     
     track_set_markers(track, markers);
+    
+    track_upload_markers(track);
   }
   
   return markers;
