@@ -235,6 +235,17 @@
 				JAVA_ARCHIVE_SUBDIR = "";
 			};
 		};
+		F5F80BF203420AB201664092 = {
+			isa = PBXFileReference;
+			path = jmax_file.icns;
+			refType = 2;
+		};
+		F5F80BF403420AC901664092 = {
+			fileRef = F5F80BF203420AB201664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5FDEF8D0328BD2801664092 = {
 			isa = PBXFileReference;
 			path = JMaxWrapper.java;
@@ -11310,6 +11321,7 @@
 				F8A9635302D36AC001664092,
 				F88000010283043C01664092,
 				F880002F0283043C01664092,
+				F5F80BF203420AB201664092,
 				F854950002D2514001664092,
 			);
 			isa = PBXGroup;
@@ -17095,7 +17107,36 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>jmax</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>jmax_file.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>jmax patch</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSTypeIsPackage</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pat</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>jmax_file.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>.pat patch</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSTypeIsPackage</key>
+			<true/>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>jMax</string>
 	<key>CFBundleGetInfoString</key>
@@ -17145,6 +17186,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F88000300283043C01664092,
+				F5F80BF403420AC901664092,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
