@@ -12,7 +12,7 @@ PasteAction.java \
 SetAction.java 
 
 JAVAC = @JAVACX@
-JAVACFLAGS=@JAVACFLAGSX@ -sourcepath $(top_srcdir)/packages/ispw/java
+JAVACFLAGS=@JAVACFLAGSX@
 JAVAROOT=$(top_builddir)/packages/ispw/java
-CLASSPATH_ENV=CLASSPATH=$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar:$(top_builddir)/packages/ispw/java
+CLASSPATH_ENV=CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar:$(top_srcdir)/packages/ispw/java
 
