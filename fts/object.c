@@ -166,7 +166,13 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 	{
 	  cl = (fts_class_t *)fts_get_object( at);
 
+	  /* TEMPLATE: if (class is template, make a template instance) */
+
+	  /* eval_data->obj = fts_template_make_instance(...) */
+
+	  /* else class is not template, call object_create */
 	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
+
 	  if (eval_data->obj == NULL)
 	    return class_instantiation_error;
 

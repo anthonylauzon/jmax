@@ -711,6 +711,12 @@ fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
 {
   fts_atom_t data, k;
   
+  /* TEMPLATE: here, do the search :
+     1) declared template
+     2) class
+     3) template in path
+  */
+
   fts_set_symbol( &k, name);
   
   if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data))
