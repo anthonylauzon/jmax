@@ -7,10 +7,13 @@
 	objects = {
 		3B513E2806A4274500F1664A = {
 			children = (
+				3BA9870506AD60A600D18F4E,
+				3B8B4B8906AFC7E90067B1E0,
 				3B513E2906A4277B00F1664A,
 				3B513E2D06A4299A00F1664A,
 				3B513E2E06A4299A00F1664A,
 				3BA405E106A572AD0097A99B,
+				3B84FF2606AEAF6300862F13,
 				3BB5F25C06A696CD00739298,
 				3B513E2F06A4299A00F1664A,
 			);
@@ -151,6 +154,36 @@
 			settings = {
 			};
 		};
+		3B84FF2606AEAF6300862F13 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatRowIndex.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatRowIndex.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B84FF2706AEAF6300862F13 = {
+			fileRef = 3B84FF2606AEAF6300862F13;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B8B4B8906AFC7E90067B1E0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FtsFmatObject.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B8B4B8A06AFC7E90067B1E0 = {
+			fileRef = 3B8B4B8906AFC7E90067B1E0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B9E15010621ADD500CDEBB6 = {
 			children = (
 				3B9E150B0621AE1200CDEBB6,
@@ -275,6 +308,21 @@
 		};
 		3BA5DEB706789BC90010BF0D = {
 			fileRef = 3BA5DEB606789BC90010BF0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BA9870506AD60A600D18F4E = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FtsDictObject.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BA9870606AD60A600D18F4E = {
+			fileRef = 3BA9870506AD60A600D18F4E;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -9240,6 +9288,9 @@
 				3B513E3206A4299A00F1664A,
 				3BA405E206A572AD0097A99B,
 				3BB5F25D06A696CD00739298,
+				3BA9870606AD60A600D18F4E,
+				3B84FF2706AEAF6300862F13,
+				3B8B4B8A06AFC7E90067B1E0,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
