@@ -178,19 +178,19 @@ src-dist: spec_files cvs-tag
 # install
 # copies the files to the right directories
 #
-install: install_doc install_bin install_includes
+install: install-doc install-bin install-includes
 .PHONY: install
 
-install_doc:
+install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)
 	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)
 	$(INSTALL_DATA) LICENSE $(doc_install_dir)
 	$(INSTALL_DATA) README $(doc_install_dir)
 	$(INSTALL_DATA) VERSION $(doc_install_dir)
 	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" doc_install_dir=$(doc_install_dir) install )
-.PHONY: install_doc
+.PHONY: install-doc
 
-install_bin:
+install-bin:
 	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) install-noarch )
 	$(INSTALL_DIR) $(lib_install_dir)
 	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
