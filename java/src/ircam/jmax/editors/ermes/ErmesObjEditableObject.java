@@ -12,8 +12,10 @@ import ircam.jmax.fts.*;
 abstract class ErmesObjEditableObject extends ErmesObject {
 	
 	
-  int WIDTH_DIFF = 10;
-  int HEIGHT_DIFF = 2;
+
+  int HEIGHT_DIFF = 3;
+  int TEXT_OFFSET;
+  final int TEXT_INSET = 2;
 	
   protected int FIELD_HEIGHT;
   protected int FIELD_WIDTH;
@@ -32,7 +34,10 @@ abstract class ErmesObjEditableObject extends ErmesObject {
   //--------------------------------------------------------
   public ErmesObjEditableObject(){
     super();
+    TEXT_OFFSET = getWhiteOffset()+TEXT_INSET;
   }
+
+  protected int getWhiteOffset() {return 0;}
 
   //--------------------------------------------------------
   // Init from skratch
@@ -51,7 +56,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
       setJustification(itsSketchPad.itsJustificationMode);
       makeCurrentRect(x,y); //redo it..
       
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight() + 20);
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight() + 20);
 
       itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
       
@@ -73,7 +78,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     FIELD_HEIGHT = temporaryFM.getHeight();
 
     int lenght = temporaryFM.stringWidth(itsArgs);	//*
-    preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
+    preferredSize = new Dimension(lenght+2*TEXT_OFFSET, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
     super.Init(theSketchPad, theFtsObject);
     
     Integer aJustification = (Integer)theFtsObject.get("jsf");
@@ -110,9 +115,9 @@ abstract class ErmesObjEditableObject extends ErmesObject {
 
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight()*2);
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight()+20);
     else
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
 
     itsMaxString = "";
@@ -128,14 +133,9 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     else return super.MouseUp(evt, x, y);
   }
 
-  public boolean IsResizedObject(int theWidth){
-    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+2*WIDTH_DIFF,
-			    (itsInletList.size())*12, (itsOutletList.size())*12));
-  }
-
   public void RestoreDimensions(boolean paintNow){
 
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF,
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+TEXT_OFFSET+getWhiteOffset(),
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
     int aHeightDiff = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-getItsHeight();
@@ -175,7 +175,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     preferredSize = d1;	
     resize(d1.width, d1.height);	
     itsSketchPad.GetEditField().setText(theString);
-    itsSketchPad.GetEditField().setSize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
+    itsSketchPad.GetEditField().setSize(d1.width-TEXT_OFFSET, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();
     itsSketchPad.validate();//??
     itsSketchPad.repaint();
@@ -189,7 +189,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     int aWidth = getItsWidth()+theDeltaX;
     int aHeight = getItsHeight()+theDeltaY;
     
-    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + TEXT_OFFSET+getWhiteOffset()) aWidth = itsFontMetrics.stringWidth(itsMaxString) + TEXT_OFFSET+getWhiteOffset();
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
 
     resizeBy(aWidth-getItsWidth(), aHeight-getItsHeight());
@@ -197,7 +197,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
   
   public boolean canResizeBy(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +2*WIDTH_DIFF)||
+    if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +TEXT_OFFSET+getWhiteOffset())||
        (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
       return false;
     else return true;
@@ -262,14 +262,14 @@ abstract class ErmesObjEditableObject extends ErmesObject {
     else if(getJustification() == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+WIDTH_DIFF/*-4*/, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+TEXT_OFFSET, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
     else if(getJustification() == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(TEXT_OFFSET), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
@@ -281,7 +281,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
   public Dimension getMinimumSize() {
     if(itsParsedTextVector.size()==0) return getPreferredSize();
     else {
-      currentMinimumSize.width = itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF;
+      currentMinimumSize.width = itsFontMetrics.stringWidth(itsMaxString)+2*getWhiteOffset();
       currentMinimumSize.height = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF;
       return currentMinimumSize;
     }

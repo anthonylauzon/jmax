@@ -15,7 +15,7 @@ import tcl.lang.*;
 
 public class Console extends JPanel{
   StringBuffer itsSbuf = new StringBuffer();
-  TextArea itsTextArea;
+  ConsoleTextArea itsTextArea;
   Interp itsInterp;
   PrintStream itsPrintStream; 
   ConsoleThread itsConsoleThread;
@@ -24,7 +24,7 @@ public class Console extends JPanel{
 
   public Console(Interp i) {
     StringBuffer itsSbuf = new StringBuffer();
-    itsTextArea = new TextArea(40, 40);
+    itsTextArea = new ConsoleTextArea(40, 40);
     itsInterp = i;
 
     setLayout(new BorderLayout());
@@ -55,7 +55,7 @@ public class Console extends JPanel{
     return itsPrintStream;
   }
 
-  public TextArea getTextArea() {
+  public ConsoleTextArea getTextArea() {
     return itsTextArea;
   }
   
@@ -75,7 +75,7 @@ public class Console extends JPanel{
    * (Example: system messages)
    */
   public void PutLine(String s) {
-    //e.m.text.insert(s + "\n", 100000);
+    
     itsTextArea.append(s + "\n");
     itsKeyListener.intercept+=s.length();
   }
@@ -83,7 +83,6 @@ public class Console extends JPanel{
   public void Put(String s) {
     itsTextArea.append(s);
     itsKeyListener.intercept+=s.length();
-    //e.m.text.insert(s, 100000);
   }
     
   /*

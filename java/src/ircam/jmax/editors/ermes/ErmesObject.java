@@ -25,6 +25,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   private int itsX, itsY;
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
+
   private Rectangle currentRect = new Rectangle();
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
@@ -151,6 +152,17 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   abstract protected void Paint_specific(Graphics g);
 
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
+  public void inspect() {
+    if (inspectorAlreadyOpen()) return;
+    else openInspector();
+  }
+
+  public boolean inspectorAlreadyOpen() {
+    return false;
+  }
+
+  public void openInspector() {}
+
   public void setJustification(int theJustification) {
     itsJustification = theJustification;
     itsFtsObject.put("jsf", theJustification);
@@ -181,15 +193,17 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
 
   protected void DoublePaint() {
+    
     //this double paint is usefull when an object change its state in run mode
     Graphics aGraphics = itsSketchPad.getGraphics();
-
+    
     if (aGraphics != null) {	
       Paint(aGraphics);	
     }
 
     if (itsSketchPad.offScreenPresent && !itsSketchPad.itsRunMode)
       Paint(itsSketchPad.GetOffGraphics());
+      
   }
 	
   // This method is called during the inits
@@ -340,7 +354,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     int aIntSize;
     
     itsFtsObject = theFtsObject;
-    makeCurrentRect(theFtsObject);//0406
+    makeCurrentRect(theFtsObject);
     if((aFont == null)&&(aSize == null)) setFont(itsSketchPad.sketchFont);
     else{
       if(aFont == null) aFont = itsSketchPad.sketchFont.getName();
@@ -350,9 +364,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     
-    //0406makeCurrentRect(theFtsObject);
-        
-    //0406itsFtsObject = theFtsObject;
     update(itsFtsObject);
     itsFtsPatcher = GetSketchWindow().itsPatcher;
     return true;
@@ -392,7 +403,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
       height  = getMinimumSize().height;
     }
     currentRect = new Rectangle(itsX, itsY, width, height);
-    setItsWidth(width);setItsHeight(height);//0406
+    setItsWidth(width);setItsHeight(height);
   }
 
   public boolean Select(boolean paintNow)
@@ -453,10 +464,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     theRequester.ChangeState(false, theRequester.connected, paintNow);
     itsSketchPad.ResetConnect();
     return true;	//for now, everything is allowed
-  }
-  
-  public boolean IsResizedObject(int theWidth){
-    return false;
   }
   
   public boolean MouseMove(MouseEvent e,int x,int y){

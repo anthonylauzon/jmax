@@ -48,8 +48,8 @@ ConsoleThread:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleThread.java)
 .PHONY: ConsoleThread
 
-ConsoleDocument:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleDocument.java)
-.PHONY: ConsoleDocument
+ConsoleTextArea:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleTextArea.java)
+.PHONY: ConsoleTextArea
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

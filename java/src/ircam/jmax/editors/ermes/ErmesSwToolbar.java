@@ -166,10 +166,10 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
   }
 
   public Dimension getMinimumSize(){
-    return new Dimension(600, 30);
+    return new Dimension(600, /*150630*/25);
   }
   public Dimension getPreferredSize(){
-    return new Dimension(600, 30);
+    return new Dimension(600, /*150630*/25);
   }
   
   /*public Dimension minimumSize(){

@@ -10,6 +10,8 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandler{
   boolean itsFlashing = false;
+  public static final int WHITE_OFFSET = 4;
+
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -38,7 +40,10 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   }
 
 
-	
+  protected int getWhiteOffset() {
+    return WHITE_OFFSET;
+  }
+
   //--------------------------------------------------------
   // makeFtsObject, redefineFtsObject
   //--------------------------------------------------------
@@ -134,7 +139,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
       else g.setColor(Color.white);
     }
   
-    g.fillRect(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF-/*6*/2), getItsHeight()-HEIGHT_DIFF);
+    g.fillRect(getItsX()+getWhiteOffset(), getItsY()+1, getItsWidth()-(getWhiteOffset()*2), getItsHeight()-HEIGHT_DIFF);
+    
     g.setColor(Color.black);
     g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
     

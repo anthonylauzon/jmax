@@ -92,14 +92,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsOwner.makeFtsObject();
     }
         
-    int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
-    int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
-    Dimension d1 = itsOwner.Size();
-    d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
-    d1.height = height+2*itsOwner.HEIGHT_DIFF;    
-
-    //itsOwner.resize(d1.width, d1.height); 
-    
     if(itsOwner.itsOutletList.size()>0)
       itsOwner.MoveOutlets();
       
@@ -255,7 +247,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
     Dimension r = itsOwner.getPreferredSize();
-    Dimension d = new Dimension(r.width-itsOwner.WIDTH_DIFF, r.height-itsOwner.HEIGHT_DIFF);
+    Dimension d = new Dimension(r.width-itsOwner.getWhiteOffset(), r.height-itsOwner.HEIGHT_DIFF);
     return d;
   }
   

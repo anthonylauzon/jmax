@@ -107,8 +107,8 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
     Paint_specific(itsSketchPad.getGraphics());
   }
 	
-  public void FromDialogValueChanged(Float theFloat){
-    itsFloat = theFloat.floatValue();
+  public void FromDialogValueChanged(float theFloat){
+    itsFloat = theFloat;
 
     itsFtsObject.put("value", theFloat);
     DoublePaint();
@@ -163,14 +163,10 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
     itsFirstY = y;
     previousY = y;
 
-    if(evt.getClickCount()>1) {
-      Point aPoint = GetSketchWindow().getLocation();
-      if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(MaxWindowManager.getTopFrame());
-      itsFloatDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
-      itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
-      itsFloatDialog.setVisible(true);
+    /*if(evt.getClickCount()>1) {
+      inspect();
       return true;
-    }
+    }*/
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       if (firstClick) {
 	itsStartingValue = itsFloat;
@@ -185,6 +181,18 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
     return true;
   }
 	
+  public boolean inspectorAlreadyOpen() {
+    return (itsFloatDialog != null && itsFloatDialog.isVisible());
+  }
+  
+  public void openInspector() {
+    Point aPoint = GetSketchWindow().getLocation();
+    if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(MaxWindowManager.getTopFrame());
+    itsFloatDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
+    itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
+    //itsFloatDialog.setVisible(true);
+  }
+
   //--------------------------------------------------------
   //  mouseUp
   //--------------------------------------------------------

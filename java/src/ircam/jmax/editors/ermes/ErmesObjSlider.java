@@ -112,13 +112,13 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
   }
 
 
-  public void FromDialogValueChanged(Integer theCurrentInt, Integer theMaxInt, Integer theMinInt){
-    setMaxValue(theMaxInt.intValue());
-    setMinValue(theMinInt.intValue());
+  public void FromDialogValueChanged(int theCurrentInt, int theMaxInt, int theMinInt){
+    setMaxValue(theMaxInt);
+    setMinValue(theMinInt);
     itsRange = itsRangeMax-itsRangeMin;
     itsStep = (float)itsRange/itsPixelRange;
 
-    int temp = theCurrentInt.intValue();        
+    int temp = theCurrentInt;        
     int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
     itsInteger = clippedValue;
     sendValue(new Integer(itsInteger));
@@ -150,22 +150,25 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
     
   }
 
+  public boolean inspectorAlreadyOpen() {
+    return (itsSliderDialog != null && itsSliderDialog.isVisible());
+  }
 
-  private void SetSliderDialog(){
+  public void openInspector(){
     Point aPoint = GetSketchWindow().getLocation();
     if (itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(MaxWindowManager.getTopFrame());
     itsSliderDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY() - 25);
     itsSliderDialog.ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin), String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
-    itsSliderDialog.setVisible(true);
+    //itsSliderDialog.setVisible(true);
   }
 
 
 
   public boolean MouseDown_specific(MouseEvent evt, int x, int y){
-    if(evt.getClickCount()>1) {
-      SetSliderDialog();
+    /*if(evt.getClickCount()>1) {
+      inspect();
       return true;
-    }
+    }*/
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
       
       if(IsInThrottle(x,y)){

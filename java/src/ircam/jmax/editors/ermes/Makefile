@@ -120,6 +120,10 @@ ErmesObjSliderDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjSliderDialog.java)
 .PHONY: ErmesObjSliderDialog
 
+ErmesObjIntegerDialog:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjIntegerDialog.java)
+.PHONY: ErmesObjIntegerDialog
+
 ErmesObjTextArea:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjTextArea.java)
 .PHONY: ErmesObjTextArea

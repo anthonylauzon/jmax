@@ -7,7 +7,7 @@ import ircam.jmax.utils.*;
 /**
  * A dialog used to edit the value inside a "float box".
  */
-class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListener, WindowListener{
+class ErmesObjIntegerDialog extends Dialog implements ActionListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -29,7 +29,7 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
     p1.add(new Label("Integer Value"));
     value = new TextField("", 20);
     value.addActionListener(this);
-    value.addKeyListener(this);
+    
     p1.add(value);
     
     add("North",p1);
@@ -51,19 +51,21 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
     //Initialize this dialog to its preferred size.
     pack();
 
-    addKeyListener(this);
-    addWindowListener(this);
   }
 
    ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --inizio
 
   public void actionPerformed(ActionEvent e){        
-    Integer  aInt = null;
-    if (e.getSource() == okButton) {
+    int  aInt = 0;
+    
+    if (e.getSource()==cancelButton) {
+      setVisible(false);
+    }
+    else  {
       itsValue = value.getText();
       try{
-	aInt = new Integer(itsValue);
+	aInt = Integer.parseInt(itsValue);
       }
       catch (NumberFormatException e1){
 	setVisible(false);
@@ -71,58 +73,21 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
       }
       itsIntObject.FromDialogValueChanged(aInt);
       setVisible(false);
-    }
-    else if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else if (e.getSource()==value) {
-      itsValue = value.getText();
     }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
   public void ReInit(String theValue, ErmesObjInt theInt, Frame theParent){
+    
     itsValue = theValue;
     value.setText(theValue);
     itsIntObject = theInt;
     itsParent = theParent;
+    setVisible(true);
+    value.requestFocus();
   }
  
-  /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio
-  
-  public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-
-  public void keyPressed(KeyEvent e){
-    Integer aInt = null;
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
-      itsValue = value.getText();
-      try{
-	aInt = new Integer(itsValue);
-      }
-      catch (NumberFormatException e1){
-	setVisible(false);
-	return;
-      }
-      itsIntObject.FromDialogValueChanged(aInt);
-      setVisible(false);
-    }
-  }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// keyListener --fine
-  public void windowClosing(WindowEvent e){}
-  public void windowOpened(WindowEvent e){}
-  public void windowClosed(WindowEvent e){}
-  public void windowIconified(WindowEvent e){}       
-  public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e)
-  {
-    requestFocus();
-    value.selectAll();
-  }
-  public void windowDeactivated(WindowEvent e){}  
 }
 
 

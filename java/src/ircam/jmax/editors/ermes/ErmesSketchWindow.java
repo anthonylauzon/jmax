@@ -84,6 +84,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public void componentHidden(ComponentEvent e){}  
 
   
+  //TextField itsToolbarTextField = new TextField("    ");//1506
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
   Vector ftsConnectionsPasted = new Vector();
@@ -276,12 +277,25 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsSelection = Fts.getSelection();
     itsSelection.clean();
     setSize(new Dimension(600, 300));
-    itsToolBar.setSize(600, 30);    
+    itsToolBar.setSize(600, /*150630*/25);    
     getContentPane().add(itsToolBar);
     if (isAbstraction ) {
-      ErmesSwVarEdit itsVarEdit = new ErmesSwVarEdit(itsSketchPad, 1);///***era 3
+      ErmesSwVarEdit itsVarEdit = new ErmesSwVarEdit(itsSketchPad, 1);
       getContentPane().add(itsVarEdit, "stick_both");
     }
+    /*{//1506
+      JPanel aPanel = new JPanel();
+
+      aPanel.setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.HORIZONTAL));
+      Button aButton = new Button("RUN");
+      aButton.setSize(60, 28);
+      aPanel.add(aButton);
+      
+      aPanel.add(itsToolbarTextField);
+      aPanel.setSize(600, 30);
+      aPanel.validate();
+      getContentPane().add(aPanel, "stick_both");
+    }*/
     getContentPane().add(itsScrollerView, "fill");
     validate();
   }
@@ -660,7 +674,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   // for all the standard key bindings
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
-    
+
       //arrows first:
       if (isAnArrow(aInt)) {
 
@@ -708,6 +722,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	  if (itsSketchPad.GetRunMode()) setRunMode(false);
 	  else setRunMode(true);
 	  return;
+	}
+	else if (aInt == 73) { //i
+	  itsSketchPad.inspectSelection();
 	}
 	else if (aInt == 47){//?
 	  //ask help for the reference Manual for the selected element...

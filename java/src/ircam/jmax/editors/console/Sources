@@ -4,5 +4,6 @@ SOURCES = ConsoleModule.java \
 	  ConsoleWriter.java \
           ConsoleWindow.java \
 	  ConsoleThread.java \
+	  ConsoleTextArea.java \
 	  ConsoleMouseListener.java
 

@@ -409,6 +409,14 @@ Rectangle previousResizeRect = new Rectangle();
     repaint();
   }
 
+  public void inspectSelection() {
+    ErmesObject aObject;
+    for (Enumeration e=currentSelection.itsObjects.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject)(e.nextElement());
+      aObject.inspect();
+    }
+  }
+
   public void ChangeJustification(String theJustification){
     int aJustificationMode = 0;
     if(theJustification.equals("Center")) aJustificationMode = CENTER_JUSTIFICATION;

@@ -5,7 +5,7 @@ import java.awt.event.*;
 import ircam.jmax.utils.*;
 
 
-class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener{
+class ErmesObjSliderDialog extends /*1506Dialog*/Frame implements  ActionListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -16,7 +16,7 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   String itsCurrentValue = "";
   
   public ErmesObjSliderDialog(Frame theFrame) {
-    super(theFrame, "Slider setting", true);
+    super(/*1506theFrame,*/ "Slider setting"/*1506, true*/);
     
     itsParent = theFrame;
     setLayout(new BorderLayout());
@@ -63,25 +63,26 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     add("South", p2);
     //Initialize this dialog to its preferred size.
     pack();
-
-    addKeyListener(this);
   }
 
    ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --inizio
 
   public void actionPerformed(ActionEvent e){        
-    Integer aMaxInt = null;
-    Integer aCurrentInt = null;
-    Integer aMinInt = null;
-    if (e.getSource() == okButton) {
+    int aMaxInt = 0;
+    int aCurrentInt = 0;
+    int aMinInt = 0;
+    if (e.getSource()==cancelButton) {
+      setVisible(false);
+    }
+    else  { //OK button and the editable field are handled the same
       itsMaxValue = itsMaxValueField.getText();
       itsCurrentValue = itsCurrentValueField.getText();
       itsMinValue = itsMinValueField.getText();
       try{
-	aMaxInt = new Integer(itsMaxValue);
-	aCurrentInt = new Integer(itsCurrentValue);
-	aMinInt = new Integer(itsMinValue);
+	aMaxInt = Integer.parseInt(itsMaxValue);
+	aCurrentInt = Integer.parseInt(itsCurrentValue);
+	aMinInt = Integer.parseInt(itsMinValue);
       }
       catch (NumberFormatException e1){
 	setVisible(false);
@@ -89,18 +90,6 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
       }
       itsSliderObject.FromDialogValueChanged(aCurrentInt, aMaxInt, aMinInt);
       setVisible(false);
-    }
-    else if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else if (e.getSource()==itsMaxValueField) {
-      itsMaxValue = itsMaxValueField.getText();
-    }
-    else if (e.getSource()==itsCurrentValueField) {
-      itsCurrentValue = itsCurrentValueField.getText();
-    }
-    else if (e.getSource()==itsMinValueField) {
-      itsMinValue = itsMinValueField.getText();
     }
   }
   ////////////////////////////////////////////////////////////////////////////
@@ -115,38 +104,10 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     itsCurrentValueField.setText(theCurrentValue);
     itsSliderObject = theSlider;
     itsParent = theParent;
-  }
-    
+    setVisible(true);
 
- /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio
-  
-  public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-
-  public void keyPressed(KeyEvent e){
-    Integer aMaxInt = null;
-    Integer aCurrentInt = null;
-    Integer aMinInt = null;
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
-      itsMaxValue = itsMaxValueField.getText();
-      itsCurrentValue = itsCurrentValueField.getText();
-      itsMinValue = itsMinValueField.getText();
-      try{
-	aMaxInt = new Integer(itsMaxValue);
-	aCurrentInt = new Integer(itsCurrentValue);
-	aMinInt = new Integer(itsMinValue);
-      }
-      catch (NumberFormatException e1){
-	setVisible(false);
-	return;
-      }
-      itsSliderObject.FromDialogValueChanged(aCurrentInt, aMaxInt, aMinInt);
-      setVisible(false);
-    }
+    itsMaxValueField.requestFocus();
   }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// keyListener --fine
 }
 
 

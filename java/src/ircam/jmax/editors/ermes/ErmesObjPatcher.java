@@ -15,6 +15,7 @@ import ircam.jmax.editors.ermes.*;
 public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   String itsNameString = new String();
+
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
@@ -25,9 +26,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public ErmesObjPatcher(){
     super();
     HEIGHT_DIFF = 5;
-    WIDTH_DIFF = 11;
+    //WIDTH_DIFF = 11;
   }
 	
+  protected int getWhiteOffset() {
+    return 10;
+  }
+
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     // Added by MDC; get the correct String from the object, and then call super
 
@@ -42,12 +47,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     
     return true;
   }
-
-  public boolean IsResizedObject(int theWidth){
-    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+getItsHeight()/2+20,
-			    (itsInletList.size())*12, (itsOutletList.size())*12));
-  }
-
 
   // temporary, should probabily change
 
@@ -163,15 +162,16 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     g.drawRect(getItsX()+0,getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
     g.drawRect(getItsX()+4, getItsY()+4, getItsWidth()-8, getItsHeight()-8);
     
-    //the triangle
+    /*//the triangle
     g.drawLine(getItsX()+7,getItsY()+6,getItsX()+7,getItsY()+getItsHeight()-6);
     g.drawLine(getItsX()+7, getItsY()+6, getItsX()+getItsHeight()/2+2, getItsY()+getItsHeight()/2);
     g.drawLine(getItsX()+getItsHeight()/2+2,getItsY()+getItsHeight()/2, getItsX()+7, getItsY()+getItsHeight()-6);
-
+    */
 
     g.setFont(getFont());
-    g.drawString(itsArgs, getItsX()+getItsHeight()/2+5,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
-    
+    DrawParsedString(g);
+    /*g.drawString(itsArgs, getItsX()+getItsHeight()/2,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
+    */
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
@@ -197,7 +197,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     else return true;
   }
 
-  public void RestoreDimensions(){
+    public void RestoreDimensions(){
 
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
     resizeBy(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());

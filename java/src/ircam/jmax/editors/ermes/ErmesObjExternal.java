@@ -16,6 +16,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public boolean iAmPatcher = false;
   private String itsBackupText = new String();
+  public static final int WHITE_OFFSET = 6;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -28,6 +29,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     return iAmPatcher;
   }
   
+  protected int getWhiteOffset() {
+    return WHITE_OFFSET;
+  }
+
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
@@ -144,10 +149,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.fillRect(getItsX()+1,getItsY()+1,getItsWidth()-2, getItsHeight()-2);
     g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
     
+    //paint white square
     if(!itsSelected) g.setColor(Color.white);
     else g.setColor(itsLangNormalColor);
-    g.fillRect(getItsX()+8, getItsY()+2, getItsWidth()-(WIDTH_DIFF+4), getItsHeight()-HEIGHT_DIFF-4);
+
+    g.fillRect(getItsX()+getWhiteOffset(), getItsY()+2, getItsWidth()-(getWhiteOffset()*2), getItsHeight()-2*HEIGHT_DIFF);
     
+
     g.setColor(Color.black);
     g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
     

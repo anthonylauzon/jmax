@@ -120,8 +120,8 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
     }		
   }
 
-  public void FromDialogValueChanged(Integer theInt){
-    itsInteger = theInt.intValue();
+  public void FromDialogValueChanged(int theInt){
+    itsInteger = theInt;
 
     itsFtsObject.put("value", theInt);
     DoublePaint();
@@ -167,14 +167,10 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     
-    if(evt.getClickCount()>1) {
-      Point aPoint = GetSketchWindow().getLocation();
-    if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(MaxWindowManager.getTopFrame());
-      itsIntegerDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
-      itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
-      itsIntegerDialog.setVisible(true);
+    /*if(evt.getClickCount()>1) {
+      inspect();
       return true;
-    }
+    }*/
     if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsFirstY = y;
       if (firstClick) {
@@ -190,6 +186,18 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
     return true;
   }
   
+  public boolean inspectorAlreadyOpen() {
+    return (itsIntegerDialog != null && itsIntegerDialog.isVisible());
+  }
+
+  public void openInspector() {
+    Point aPoint = GetSketchWindow().getLocation();
+    if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(MaxWindowManager.getTopFrame());
+    itsIntegerDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
+    itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
+    //itsIntegerDialog.setVisible(true);
+  }
+
   void Trust (int theInt) {
     if (transmission_index == TRUST) {
       //we sent more then TRUST values without acknowledge...

@@ -7,7 +7,7 @@ import ircam.jmax.utils.*;
 /**
  * A dialog used to edit the value inside a "float box".
  */
-class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener, WindowListener{
+class ErmesObjFloatDialog extends Dialog implements ActionListener {
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -29,7 +29,7 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener,
     p1.add(new Label("Float Value"));
     value = new TextField("", 20);
     value.addActionListener(this);
-    value.addKeyListener(this);
+    
     p1.add(value);
     
     add("North",p1);
@@ -51,19 +51,21 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener,
     //Initialize this dialog to its preferred size.
     pack();
 
-    addKeyListener(this);
-    addWindowListener(this);
   }
 
    ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --inizio
 
   public void actionPerformed(ActionEvent e){        
-    Float aFloat = null;
-    if (e.getSource() == okButton) {
+    float aFloat = 0;
+    if (e.getSource()==cancelButton) {
+      setVisible(false);
+    }
+    else  {
       itsValue = value.getText();
       try{
-	aFloat = new Float(itsValue);
+	aFloat = (Float.valueOf(itsValue)).floatValue();
+	//why Float doesn't have a "parseFloat" method, like Integers?
       }
       catch (NumberFormatException e1){
 	setVisible(false);
@@ -71,12 +73,6 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener,
       }
       itsFloatObject.FromDialogValueChanged(aFloat);
       setVisible(false);
-    }
-    else if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else if (e.getSource()==value) {
-      itsValue = value.getText();
     }
   }
   ////////////////////////////////////////////////////////////////////////////
@@ -87,44 +83,10 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener,
     value.setText(theValue);
     itsFloatObject = theFloat;
     itsParent = theParent;
+    setVisible(true);
+    value.requestFocus();
   }
  
-  /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio
-  
-  public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-
-  public void keyPressed(KeyEvent e){
-    Float aFloat = null;
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
-      itsValue = value.getText();
-      try{
-	aFloat = new Float(itsValue);
-      }
-      catch (NumberFormatException e1){
-	setVisible(false);
-	return;
-      }
-      itsFloatObject.FromDialogValueChanged(aFloat);
-      setVisible(false);
-    }
-  }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// keyListener --fine
-  public void windowClosing(WindowEvent e){}
-  public void windowOpened(WindowEvent e){
-  }
-  public void windowClosed(WindowEvent e){}
-  public void windowIconified(WindowEvent e){}       
-  public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e)
-  {
-    requestFocus();
-    value.selectAll();
-  }
-  public void windowDeactivated(WindowEvent e){}  
-
 }
 
 
