@@ -1,3 +1,8 @@
+2003-08-22  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	*  packages/guiobj/java/ircam/jmax/guiobj/Display>java (messageChanged): 
+	fixed bug "[ 783632 ] repaint of generic display in edit mode".
+
 2003-08-08  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* java/src/ircam/jmax/editors/patcher/EditField.java: fixed EditFieldKeyListener that introduced
