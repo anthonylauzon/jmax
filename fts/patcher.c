@@ -1243,8 +1243,12 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     if(fts_class_get_name(class) != NULL)
       fts_client_add_symbol( o, fts_class_get_name(class));
     else
-      fts_client_add_symbol( o, fts_s_error);
-
+      {
+	if( obj->argc > 0)	  
+	  fts_client_add_symbol( o, fts_get_symbol( obj->argv));
+	else
+	  fts_client_add_symbol( o, fts_s_error);
+      }
     fts_client_add_int( o, fts_object_is_template(obj));
 
     stream = patcher_get_memory_stream();
