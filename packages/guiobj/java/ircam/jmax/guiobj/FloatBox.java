@@ -92,6 +92,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     
     formatter = new DecimalFormat("0.######;-0.######");
     formatter.setGroupingUsed(false);
+    formatter.getDecimalFormatSymbols().setDecimalSeparator('.');
     formatter.setDecimalSeparatorAlwaysShown(true);
   }
 
