@@ -1,3 +1,7 @@
+2004-02-13  Alexandre Pages  <Alexandre.Pages@ircam.fr>
+
+	* packages/control/c/src/sync.c: raised the maximum inlet number to 32	
+
 2004-02-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/*/Makefile.am: added -release version libtool flag.
