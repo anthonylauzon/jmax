@@ -203,7 +203,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 install-data-local:
-	$(INSTALL_DATA) @CONFIG_FILE@ $(pkgdatadir)/config.jmax
+	$(INSTALL_DATA) @CONFIG_FILE@ $(pkgdatadir)/config.jprj
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
