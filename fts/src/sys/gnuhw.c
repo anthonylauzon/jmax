@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sched.h>
+#include <signal.h>
 
 #include "sys.h"
 
@@ -57,6 +58,8 @@ void fts_platform_init(void)
   /* Get rid of root privilege if we have them */
   if (setreuid(geteuid(), getuid()) == -1)
     fprintf( stderr, "setreuid failed (%s) continuing\n", strerror(errno));
+
+  signal( SIGFPE, SIG_IGN);
 }
 
 void fts_set_no_real_time()
