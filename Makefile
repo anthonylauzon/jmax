@@ -154,14 +154,14 @@ spec-files:
 dist:
 	( \
 		umask 22 ; \
+		VVV=`cat VERSION` ; \
+		TTT=V`sed 's/\./_/g' VERSION` ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
-		VVV=`cat ../VERSION` ; \
-		TTT=V`sed 's/\./_/g' ../VERSION` ; \
 		cvs export -r$$TTT jmax ; \
-		mv jmax jmax-$$VVV ; \
-		tar cvf - jmax-$$VVV | gzip -c --best > ../../jmax-$$VVV-src.tar.gz ; \
-		chmod 644 ../../jmax-$$VVV-src.tar.gz ; \
+		mv jmax jmax-$${VVV} ; \
+		tar cvf - jmax-$${VVV} | gzip -c --best > ../../jmax-$${VVV}-src.tar.gz ; \
+		chmod 644 ../../jmax-$${VVV}-src.tar.gz ; \
 		cd .. ; \
 		/bin/rm -rf .$$$$ ; \
 	)
