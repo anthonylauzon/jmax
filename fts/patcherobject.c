@@ -337,7 +337,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     if (ac > 0 && fts_is_symbol(at))
     {
       /* send message to fresh object */
-      if (fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
+      if (fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1) != NULL)
       {
         if(fts_object_get_status(eval_data->obj) == FTS_OBJECT_STATUS_INVALID)
           status = fts_status_new(fts_get_error());
@@ -744,7 +744,7 @@ fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t wanted_name, int glo
     fts_patcher_set_dirty(patcher, 1);
   
     /* update gui */
-    if(fts_object_has_id(obj))
+    if(fts_object_has_client(obj))
     {
       fts_symbol_t name = fts_patcher_object_get_name(obj);
       int global = fts_patcher_object_is_global(obj);
@@ -845,19 +845,14 @@ void
 fts_patcher_object_set_state_persistence(fts_object_t *obj, int persistence)
 {
   fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
+  fts_atom_t a;
   
   data->persistence = persistence;
 
   fts_patcher_set_dirty(data->patcher, 1);
 
-  /* update gui */
-  if(fts_object_has_id(obj))
-  {
-    fts_atom_t a;
-    
-    fts_set_int(&a, data->persistence);    
-    fts_client_send_message(obj, fts_s_persistence, 1, &a);
-  }        
+  fts_set_int(&a, data->persistence);    
+  fts_client_send_message(obj, fts_s_persistence, 1, &a);
 }
 
 void
@@ -1027,7 +1022,7 @@ object_move_properties(fts_object_t *old, fts_object_t *new)
 void
 fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value)
 {
-  if(!fts_is_void(value) && !fts_send_message(obj, property, 1, value))
+  if(!fts_is_void(value) && fts_send_message(obj, property, 1, value) == NULL)
   {
     fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
 

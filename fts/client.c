@@ -67,12 +67,6 @@ static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
 static fts_symbol_t s_show_message;
 
-
-/* Predefined ids */
-#define FTS_CLIENT_ROOT_OBJECT_ID 0
-#define FTS_CLIENT_CLIENT_OBJECT_ID 1
-
-
 /***********************************************************************
  *
  * client table handling
@@ -108,9 +102,7 @@ client_table_init( void)
 client_t *
 object_get_client( fts_object_t *obj)
 {
-  int index;
-
-  index = fts_object_get_client_id( obj );
+  int index = fts_object_get_client_id( obj );
 
   if (index < 0 || index >= fts_stack_size( &client_table))
     return NULL;
@@ -134,32 +126,23 @@ typedef struct {
 #endif
 } symbol_cache_t;
 
-struct _client_t {
+struct _client_t 
+{
   fts_object_t head;
-  /* Client id */
   int client_id;
-  /* Object table */
   fts_hashtable_t object_table;
-  /* object id count */
   int object_id_count;
-  /* Root patcher */
   fts_object_t *root_patcher;
-  /* Protocol stream */
   fts_bytestream_t *stream;
 
   /* Input protocol decoder */
-  /* Automata state */
   int state;
-  /* Input decoding */
   fts_stack_t input_args;
   fts_stack_t input_buffer;
-  /* Symbol caches */
   symbol_cache_t input_cache;
 
   /* Output protocol encoder */
-  /* Output buffer */
   fts_stack_t output_buffer;
-  /* Symbol caches */
   symbol_cache_t output_cache;
 };
 
@@ -186,25 +169,27 @@ static void client_release_object( client_t *this, fts_object_t *object)
   fts_set_int( &k, fts_object_get_id( object));
   fts_hashtable_remove( &this->object_table, &k);
 
-  fts_object_set_id( object, FTS_NO_ID);
   fts_object_set_client_id( object, FTS_NO_ID);
 }
 
-static void client_register_object( client_t *this, fts_object_t *object, int object_id)
+static void 
+client_register_object( client_t *this, fts_object_t *object)
 {
+  int object_id = fts_object_get_id(object);
   fts_atom_t k, v;
 
-  if (object_id <= FTS_NO_ID)
+  if(object_id < 0)
   {
     object_id = this->object_id_count;
-    this->object_id_count += 2; 
-  }
+    this->object_id_count += 2;
 
+    fts_object_set_id( object, object_id);
+  }
+  
   fts_set_int( &k, object_id);
   fts_set_object( &v, object);
   fts_hashtable_put( &this->object_table, &k, &v);
 
-  fts_object_set_id( object, object_id);
   fts_object_set_client_id( object, this->client_id);
 }
 
@@ -637,17 +622,18 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
     return;
   }
 
-  newobj = fts_eval_object_description( (fts_patcher_t *)parent, ac-2, at+2);
+  newobj = fts_eval_object_description( (fts_patcher_t *)parent, ac - 2, at + 2);
 
   if (!newobj || fts_object_is_error( newobj))
   {
     fts_post( "error in object instantiation (");
-    fts_post_atoms( ac-2, at+2);
+    fts_post_atoms( ac - 2, at + 2);
     fts_post( ")\n");
     return;
   }
 
-  client_register_object( this, newobj, id);
+  fts_object_set_id(newobj, id);
+  client_register_object( this, newobj);
 }
 
 static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -724,12 +710,7 @@ static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int a
   fts_send_message( object, fts_s_loaded, 1, a);
 
   /* upload the object to the client */
-  client_register_object( this, object, FTS_NO_ID);
-
-/*   fts_set_int(a, fts_object_get_id( object)); */
-/*   fts_set_symbol(a+1, file_name); */
-/*   fts_set_int(a+2, type); */
-/*   fts_client_send_message( (fts_object_t *)this, fts_new_symbol( "patcher_loaded"), 3, a); */
+  client_register_object( this, object);
 
   fts_send_message( object, fts_s_upload, 0, 0);
 
@@ -782,7 +763,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
     return 0;
   }
 
-  client_register_object( client, (fts_object_t *)patcher, FTS_NO_ID);
+  client_register_object( client, (fts_object_t *)patcher);
 
   /* Save the file name, for future autosaves and other services */
   fts_patcher_set_file_name(patcher, file_name);
@@ -828,7 +809,7 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
   {
     fts_project_set( project);
 
-    client_register_object( this, (fts_object_t *)project, FTS_NO_ID);
+    client_register_object( this, (fts_object_t *)project);
 
     fts_set_int(a, fts_object_get_id( (fts_object_t *)project));
     fts_client_send_message(o, fts_s_project, 1, a);
@@ -857,9 +838,9 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
   }  
   else
   {
-    if (!fts_object_has_id( (fts_object_t *)package))
+    if (fts_object_has_client( (fts_object_t *)package) == 0)
     {
-      client_register_object( this, (fts_object_t *)package, FTS_NO_ID);
+      client_register_object( this, (fts_object_t *)package);
 
       fts_set_int(a, fts_object_get_id( (fts_object_t *)package));
       fts_client_send_message(o, fts_s_package, 1, a);    
@@ -886,8 +867,8 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_atom_t a[1];
   fts_object_t *project = (fts_object_t *)fts_project_get();
 
-  if (!fts_object_has_id( project))
-    client_register_object( (client_t *)o, project, FTS_NO_ID);
+  if (fts_object_has_client( project) == 0)
+    client_register_object( (client_t *)o, project);
 
   fts_set_int(a, fts_object_get_id( project));
   fts_client_send_message(o, fts_s_project, 1, a);
@@ -898,19 +879,19 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
 static void client_get_config( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_t *config = fts_config_get();
-
+  
   if (config != NULL) 
-    {
-      fts_atom_t a;
-
-      if ( !fts_object_has_id( config))
-	client_register_object((client_t *)o, config, FTS_NO_ID);
-      
-      fts_set_int(&a, fts_object_get_id(config));
-      fts_client_send_message(o, fts_s_config, 1, &a);
-      
-      fts_send_message(config, fts_s_upload, 0, 0);
-    }
+  {
+    fts_atom_t a;
+    
+    if (fts_object_has_client( config) == 0)
+      client_register_object((client_t *)o, config);
+    
+    fts_set_int(&a, fts_object_get_id(config));
+    fts_client_send_message(o, fts_s_config, 1, &a);
+    
+    fts_send_message(config, fts_s_upload, 0, 0);
+  }
 }
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -921,11 +902,13 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static void client_predefine_objects( client_t *this)
 {
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
-  client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
+  fts_object_set_id((fts_object_t *)fts_get_root_patcher(), FTS_OBJECT_ID_ROOT);
+  client_register_object( this, (fts_object_t *)fts_get_root_patcher());
 #else
   this->root_patcher = fts_object_create_in_patcher( patcher_class, fts_get_root_patcher(), 0, 0);
+  fts_object_set_id((fts_object_t *)this->root_patcher, FTS_OBJECT_ID_ROOT);
 
-  if ( !this->root_patcher)
+  if (!this->root_patcher)
   {
     fts_object_error( (fts_object_t *)this, "cannot create client root patcher");
     return;
@@ -934,10 +917,11 @@ static void client_predefine_objects( client_t *this)
   fts_patcher_add_object(fts_get_root_patcher(), this->root_patcher);
   fts_object_refer( this->root_patcher);
 
-  client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
+  client_register_object( this, this->root_patcher);
 #endif
 
-  client_register_object( this, (fts_object_t *)this, FTS_CLIENT_CLIENT_OBJECT_ID);
+  fts_object_set_id((fts_object_t *)this, FTS_OBJECT_ID_CLIENT);
+  client_register_object( this, (fts_object_t *)this);
 }
 
 static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -956,7 +940,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   }
 
   this->client_id = client_table_add( this);
-  this->object_id_count = 17;
 
   /* output protocol encoder */
   fts_stack_init( &this->output_buffer, unsigned char);
@@ -971,6 +954,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_bytestream_add_listener( this->stream, (fts_object_t *) this, client_receive);
 
   fts_hashtable_init( &this->object_table, FTS_HASHTABLE_MEDIUM);
+  this->object_id_count = 17;
 
   client_predefine_objects( this);
 
@@ -1128,11 +1112,11 @@ void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client || client->stream == NULL)
-    return;
-
-  client_write_object( client, obj);
-  client_write_symbol( client, selector);
+  if (client != NULL && client->stream != NULL)
+  {
+    client_write_object( client, obj);
+    client_write_symbol( client, selector);
+  }
 }
 
 void fts_client_add_int( fts_object_t *obj, int v)
@@ -1225,20 +1209,23 @@ void fts_client_done_message( fts_object_t *obj)
 
 void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
-  client_t *client = object_get_client( obj);
-
-  if ( !client || client->stream == NULL)
-    return;
+  if(fts_object_has_client(obj))
+  {
+    client_t *client = object_get_client( obj);
+    
+    if (client->stream == NULL)
+      return;
 
 #ifdef CLIENT_LOG
-  fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", obj, selector, ac);
-  fts_log_atoms( ac, at);
-  fts_log( "\n");
+    fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", obj, selector, ac);
+    fts_log_atoms( ac, at);
+    fts_log( "\n");
 #endif
-
-  fts_client_start_message( obj, selector);
-  fts_client_add_atoms( obj, ac, at);
-  fts_client_done_message( obj);
+    
+    fts_client_start_message( obj, selector);
+    fts_client_add_atoms( obj, ac, at);
+    fts_client_done_message( obj);
+  }
 }
 
 void fts_client_register_object(fts_object_t *obj, int client_id)
@@ -1256,36 +1243,36 @@ void fts_client_register_object(fts_object_t *obj, int client_id)
     return;
   }
 
-  client_register_object( client, obj, FTS_NO_ID);
+  client_register_object( client, obj);
 }
 
 void fts_client_release_object(fts_object_t *obj)
 {
-  if(fts_object_has_id(obj))
+  if(fts_object_has_client(obj))
+  {
+    int client_id;
+    client_t *client;
+    fts_atom_t a[1];
+    fts_object_t *patcher;
+    
+    client_id = fts_object_get_client_id( obj);
+    client = client_table_get(client_id);
+    
+    if ( !client)
     {
-      int client_id;
-      client_t *client;
-      fts_atom_t a[1];
-      fts_object_t *patcher;
-
-      client_id = fts_object_get_client_id( obj);
-      client = client_table_get(client_id);
-      
-      if ( !client)
-	{
-	  fts_log("[client] fts_client_release_object: Cannot release object\n");      
-	  return;
-	}
-      
-      patcher = (fts_object_t *)fts_object_get_patcher(obj);
-      if(patcher != NULL && fts_object_has_id(patcher))
-	{
-	  fts_set_object(a, obj);
-	  fts_client_send_message( patcher, s_remove_object, 1, a);
-	}
-      
-      client_release_object( client, obj);
+      fts_log("[client] fts_client_release_object: Cannot release object\n");      
+      return;
     }
+    
+    patcher = (fts_object_t *)fts_object_get_patcher(obj);
+    if(patcher != NULL && fts_object_has_client(patcher))
+    {
+      fts_set_object(a, obj);
+      fts_client_send_message( patcher, s_remove_object, 1, a);
+    }
+    
+    client_release_object( client, obj);
+  }
 }
 
 /***********************************************************************

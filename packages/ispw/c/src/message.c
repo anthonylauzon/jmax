@@ -543,29 +543,23 @@ static fts_memorystream_t * message_get_memory_stream()
   return message_memory_stream;
 }
 
-static void messbox_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
+static void 
+messbox_update(fts_object_t *o)
 {
+  messbox_t *this = (messbox_t *) o;
   fts_memorystream_t *stream = message_get_memory_stream();
-  int size = fts_atom_list_get_size( atom_list);
-  fts_atom_t *a;
-
-  a = alloca( size * sizeof( fts_atom_t));
+  int size = fts_atom_list_get_size(this->atom_list);
+  fts_atom_t *a = alloca( size * sizeof( fts_atom_t));
+  
   fts_atom_list_get_atoms( atom_list, a);
   
   fts_memorystream_reset( stream);      
   fts_spost_object_description_args( (fts_bytestream_t *)stream, size, a);
   fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-
-  fts_client_start_message(obj, fts_s_set);
-  fts_client_add_string( obj, fts_memorystream_get_bytes( stream));
-  fts_client_done_message(obj);
-}
-
-static void messbox_update(fts_object_t *o)
-{
-  messbox_t *this = (messbox_t *) o;
-
-  messbox_send_message_from_atom_list(o, fts_s_set, this->atom_list);
+  
+  fts_client_start_message(o, fts_s_set);
+  fts_client_add_string( o, fts_memorystream_get_bytes( stream));
+  fts_client_done_message(o);
 }
 
 /************************************************************

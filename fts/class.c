@@ -217,14 +217,12 @@ class_outlet_has_declaration (fts_class_outlet_t * out, const fts_atom_t * p)
  */
 
 static void
-dummy_method (fts_object_t * o, int winlet, fts_symbol_t s, int ac,
-	      const fts_atom_t * at)
+dummy_method (fts_object_t * o, int winlet, fts_symbol_t s, int ac, const fts_atom_t * at)
 {
 }
 
 void
-fts_class_init (fts_class_t * cl, unsigned int size, fts_method_t constructor,
-		fts_method_t deconstructor)
+fts_class_init (fts_class_t * cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
 {
   cl->size = size;
   cl->heap = fts_heap_new (size);
@@ -305,80 +303,31 @@ method_key_new (fts_symbol_t selector, fts_class_t * type)
   return key;
 }
 
-typedef struct
-{
-  fts_method_t method;
-  int varargs;
-} method_handle_t;
-
-static method_handle_t *
-method_handle_new (fts_method_t method, int varargs)
-{
-  method_handle_t *handle =
-    (method_handle_t *) fts_malloc (sizeof (method_handle_t));
-
-  handle->method = method;
-  handle->varargs = varargs;
-
-  return handle;
-}
-
-enum method_check_e
-{ found_no_method = -1, found_method = 0, found_varargs_method = 1 };
-
-static enum method_check_e
-method_check (fts_class_t * cl, const void *selector, fts_class_t * type)
-{
-  fts_atom_t a;
-
-  /* make sure the class is instantiated */
-  fts_class_instantiate (cl);
-
-  method_key->selector = selector;
-  method_key->type = type;
-
-  if (fts_hashtable_get (cl->methods, &method_key_atom, &a))
-    {
-      method_handle_t *handle = fts_get_pointer (&a);
-      return handle->varargs;
-    }
-
-  return -1;			/* method not found */
-}
-
 static fts_method_t
-method_get (fts_class_t * cl, const void *selector, fts_class_t * type,
-	    int *varargs)
+method_get (fts_class_t * cl, const void *selector, fts_class_t * type)
 {
   fts_atom_t a;
-
-  if (cl->methods)
-    {
-      method_key->selector = selector;
-      method_key->type = type;
-
-      if (fts_hashtable_get (cl->methods, &method_key_atom, &a))
-	{
-	  method_handle_t *handle = fts_get_pointer (&a);
-
-	  *varargs = handle->varargs;
-	  return handle->method;
-	}
-    }
-
+  
+  if(cl->methods)
+  {
+    method_key->selector = selector;
+    method_key->type = type;
+    
+    if (fts_hashtable_get (cl->methods, &method_key_atom, &a))
+      return (fts_method_t)fts_get_pointer(&a);
+  }
+  
   return NULL;
 }
 
 static void
-method_put (fts_class_t * cl, const void *selector, fts_class_t * type,
-	    fts_method_t method, int varargs)
+method_put (fts_class_t * cl, const void *selector, fts_class_t * type, fts_method_t method)
 {
-  method_key_t *key = method_key_new ((fts_symbol_t) selector, type);
-  method_handle_t *handle = method_handle_new (method, varargs);
+  method_key_t *key = method_key_new((fts_symbol_t) selector, type);
   fts_atom_t k, a;
 
   fts_set_object (&k, key);
-  fts_set_pointer (&a, handle);
+  fts_set_pointer (&a, method);
 
   fts_hashtable_put (cl->methods, &k, &a);
 }
@@ -389,59 +338,28 @@ method_put (fts_class_t * cl, const void *selector, fts_class_t * type,
  *
  */
 void
-fts_class_message (fts_class_t * cl, fts_symbol_t s, fts_class_t * type,
-		   fts_method_t method)
+fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t method)
 {
-  enum method_check_e check = method_check (cl, s, type);
+  fts_method_t declared = method_get(cl, (const void *)s, type);
 
-  if (check == found_varargs_method && type != fts_void_class)
-    fts_post
-      ("warning: redefinition of varargs method for message %s of class %s\n",
-       fts_symbol_name (s), fts_symbol_name (fts_class_get_name (cl)));
-  else if (check != found_no_method && type != NULL)
-    fts_post
-      ("warning: redefinition of %s method for message %s of class %s\n",
-       fts_symbol_name (fts_class_get_name (type)), fts_symbol_name (s),
-       fts_symbol_name (fts_class_get_name (cl)));
-  else if (check != found_no_method && type == NULL)
-    fts_post
-      ("warning: redefinition of generic atom method for message %s of class %s\n",
-       fts_symbol_name (s), fts_symbol_name (fts_class_get_name (cl)));
-
-  method_put (cl, s, type, method, 0);
-}
-
-void
-fts_class_message_varargs (fts_class_t * cl, fts_symbol_t s,
-			   fts_method_t method)
-{
-  enum method_check_e check = method_check (cl, s, NULL);
-
-  if (check == found_method)
-    fts_post
-      ("warning: redefinition of generic atom method for message %s of class %s by varargs declaration\n",
-       fts_symbol_name (s), fts_symbol_name (fts_class_get_name (cl)));
-  else if (check == found_varargs_method)
-    fts_post
-      ("warning: redefinition of varargs method for message %s of class %s\n",
-       fts_symbol_name (s), fts_symbol_name (fts_class_get_name (cl)));
-
-  if (method_check (cl, s, fts_tuple_class) != found_no_method)
-    fts_post
-      ("warning: redefinition of tuple method for message %s of class %s by varargs declaration\n",
-       fts_symbol_name (s), fts_symbol_name (fts_class_get_name (cl)));
-
-  /* register method void if void method not already defined */
-  if (method_check (cl, s, fts_void_class) != found_method)
-    method_put (cl, s, fts_void_class, method, 1);
-
-  /* register method for NULL and tuple */
-  method_put (cl, s, NULL, method, 1);
-  method_put (cl, s, fts_tuple_class, method, 1);
+  if(declared != NULL)
+  {
+    fts_symbol_t cl_name = fts_class_get_name(cl);
+    
+    if(type != NULL)
+    {
+      fts_symbol_t type_name = fts_class_get_name(type);
+      fts_post("warning: redefinition of %s method for message %s of class %s\n", fts_symbol_name(type_name), fts_symbol_name(s), fts_symbol_name(cl_name));      
+    }
+    else
+      fts_post("warning: redefinition of varargs method for message %s of class %s\n", fts_symbol_name(s), fts_symbol_name(cl_name));
+  }
+  
+  method_put (cl, s, type, method);
 }
 
 static int
-class_adjust_inlet (fts_class_t * cl, int winlet)
+class_adjust_inlet(fts_class_t * cl, int winlet)
 {
   if (winlet < 0)
     winlet = 0;
@@ -455,7 +373,7 @@ class_adjust_inlet (fts_class_t * cl, int winlet)
 }
 
 static int
-class_clip_inlet (fts_class_t * cl, int winlet)
+class_clip_inlet(fts_class_t * cl, int winlet)
 {
   if (winlet < 0)
     return 0;
@@ -466,67 +384,35 @@ class_clip_inlet (fts_class_t * cl, int winlet)
 }
 
 void
-fts_class_inlet (fts_class_t * cl, int winlet, fts_class_t * type,
-		 fts_method_t method)
+fts_class_inlet(fts_class_t * cl, int winlet, fts_class_t * type, fts_method_t method)
 {
-  int n = class_adjust_inlet (cl, winlet);
+  int n = class_adjust_inlet(cl, winlet);
+  fts_method_t declared = method_get(cl, (const void *)n, type);
+  
+  if(declared != NULL)
+  {
+    fts_symbol_t cl_name = fts_class_get_name(cl);
+    
+    if(type != NULL)
+    {
+      fts_symbol_t type_name = fts_class_get_name(type);
+      fts_post("warning: redefinition of %s method for inlet %d of class %s\n", fts_symbol_name(type_name), n, fts_symbol_name(cl_name));      
+    }
+    else
+      fts_post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_symbol_name(cl_name));
+  }
 
-  enum method_check_e check = method_check (cl, (const void *) n, type);
-
-  if (check == found_varargs_method && type != fts_void_class)
-    fts_post
-      ("warning: redefinition of varargs method for inlet %d of class %s\n",
-       n, fts_symbol_name (fts_class_get_name (cl)));
-  else if (check != found_no_method && type != NULL)
-    fts_post ("warning: redefinition of %s method for inlet %d of class %s\n",
-	      fts_symbol_name (fts_class_get_name (type)), n,
-	      fts_symbol_name (fts_class_get_name (cl)));
-  else if (check != found_no_method && type == NULL)
-    fts_post
-      ("warning: redefinition of generic atom method for inlet %d of class %s\n",
-       fts_symbol_name (fts_class_get_name (type)), n,
-       fts_symbol_name (fts_class_get_name (cl)));
-
-  method_put (cl, (const void *) n, type, method, 0);
+  method_put (cl, (const void *) n, type, method);
 }
 
 void
-fts_class_inlet_varargs (fts_class_t * cl, int winlet, fts_method_t method)
+fts_class_inlet_thru(fts_class_t * cl, int winlet)
 {
-  int n = class_adjust_inlet (cl, winlet);
-  enum method_check_e check = method_check (cl, (const void *) n, NULL);
-
-  if (check == found_method)
-    fts_post
-      ("warning: redefinition of generic atom method for inlet %d of class %s by varargs declaration\n",
-       n, fts_symbol_name (fts_class_get_name (cl)));
-  else if (check == found_varargs_method)
-    fts_post
-      ("warning: redefinition of varargs method for inlet %d of class %s\n",
-       n, fts_symbol_name (fts_class_get_name (cl)));
-
-  if (method_check (cl, (const void *) n, fts_tuple_class) != found_no_method)
-    fts_post
-      ("warning: redefinition of tuple method for inlet %d of class %s by varargs declaration\n",
-       fts_symbol_name (fts_class_get_name (cl)));
-
-  /* register method void if void method not already defined */
-  if (method_check (cl, (const void *) n, fts_void_class) != found_method)
-    method_put (cl, (const void *) n, fts_void_class, method, 1);
-
-  /* register method for NULL and tuple */
-  method_put (cl, (const void *) n, NULL, method, 1);
-  method_put (cl, (const void *) n, fts_tuple_class, method, 1);
+  class_adjust_inlet(cl, winlet);
 }
 
 void
-fts_class_inlet_thru (fts_class_t * cl, int winlet)
-{
-  class_adjust_inlet (cl, winlet);
-}
-
-void
-fts_class_input_handler (fts_class_t * cl, fts_method_t method)
+fts_class_input_handler(fts_class_t * cl, fts_method_t method)
 {
   cl->input_handler = method;
 
@@ -540,7 +426,7 @@ fts_class_input_handler (fts_class_t * cl, fts_method_t method)
  *
  */
 void
-fts_class_outlet (fts_class_t * cl, int woutlet, fts_class_t * class)
+fts_class_outlet(fts_class_t * cl, int woutlet, fts_class_t * class)
 {
   fts_class_outlet_t *out;
   fts_atom_t a;
@@ -560,13 +446,13 @@ fts_class_outlet (fts_class_t * cl, int woutlet, fts_class_t * class)
  *
  */
 fts_method_t
-fts_class_get_method (fts_class_t * cl, fts_symbol_t s, fts_class_t * type,
-		      int *varargs)
+fts_class_get_method(fts_class_t * cl, fts_symbol_t s, fts_class_t * type)
 {
-  fts_method_t method = method_get (cl, (const void *) s, type, varargs);
+  fts_method_t method = method_get (cl, (const void *) s, type);
 
-  if (method == NULL && type != fts_void_class)
-    method = method_get (cl, (const void *) s, NULL, varargs);
+  /* try varargs if not found with given type */
+  if(method == NULL)
+    method = method_get (cl, (const void *) s, NULL);
 
   return method;
 }
@@ -574,25 +460,18 @@ fts_class_get_method (fts_class_t * cl, fts_symbol_t s, fts_class_t * type,
 fts_method_t
 fts_class_get_method_varargs (fts_class_t * cl, fts_symbol_t s)
 {
-  int varargs = 0;
-
-  fts_method_t method = method_get (cl, (const void *) s, NULL, &varargs);
-
-  if (varargs != 0)
-    return method;
-
-  return NULL;
+  return method_get (cl, (const void *) s, NULL);
 }
 
 fts_method_t
-fts_class_get_inlet_method (fts_class_t * cl, int winlet, fts_class_t * type,
-			    int *varargs)
+fts_class_get_inlet_method(fts_class_t * cl, int winlet, fts_class_t * type)
 {
   int n = class_clip_inlet (cl, winlet);
-  fts_method_t method = method_get (cl, (const void *) n, type, varargs);
+  
+  fts_method_t method = method_get(cl, (const void *) n, type);
 
   if (method == NULL && type != fts_void_class)
-    method = method_get (cl, (const void *) n, NULL, varargs);
+    method = method_get (cl, (const void *) n, NULL);
 
   return method;
 }

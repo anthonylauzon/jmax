@@ -31,18 +31,18 @@
 #include <ftsprivate/variable.h>
 
 /******************************************************************************
-*
-* create an object from a class and arguments
-*
-*/
+ *
+ * create an object from a class and arguments
+ *
+ */
 fts_object_t *
 fts_object_new( fts_class_t *cl)
 {
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
   obj->cl = cl;
-  fts_object_set_id( obj, FTS_NO_ID);
   fts_object_set_client_id( obj, FTS_NO_ID);
+  fts_object_set_id( obj, FTS_NO_ID);
   fts_object_set_status( obj, FTS_OBJECT_STATUS_CREATE);
 
   return obj;
@@ -106,23 +106,26 @@ fts_object_destroy(fts_object_t *obj)
 void
 fts_object_upload(fts_object_t *obj)
 {
-  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
-
-  if(container != NULL)
+  if(fts_object_has_client(obj) == 0)
   {
-    fts_atom_t a;
-
-    fts_client_register_object(obj, -1);
-
-    fts_set_object(&a, obj);
-    fts_send_message(container, fts_s_member_upload, 1, &a);
+    fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
+    
+    if(container != NULL)
+    {
+      fts_atom_t a;
+      
+      fts_client_register_object(obj, -1);
+      
+      fts_set_object(&a, obj);
+      fts_send_message(container, fts_s_member_upload, 1, &a);
+    }
   }
 }
 
 void
 fts_object_reset_client(fts_object_t *obj)
 {
-  if(fts_object_has_id( obj))
+  if(fts_object_has_client(obj))
   {
     fts_send_message(obj, fts_s_closeEditor, 0, 0);
     fts_client_release_object(obj);

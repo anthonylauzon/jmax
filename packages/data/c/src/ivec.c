@@ -358,24 +358,24 @@ ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   ivec_t *this = (ivec_t *)o;
   fts_atom_t a;
-
+  
   if(this->editor == NULL)
-    {
-      fts_set_object(&a, o);
-      this->editor = fts_object_create( tabeditor_type, 1, &a);
-      fts_object_refer( this->editor);
-    }
-
-  if( !fts_object_has_id( (fts_object_t *)this->editor))
-    {
-      fts_client_register_object( (fts_object_t *)this->editor, fts_object_get_client_id( o));
+  {
+    fts_set_object(&a, o);
+    this->editor = fts_object_create( tabeditor_type, 1, &a);
+    fts_object_refer( this->editor);
+  }
+  
+  if(fts_object_has_client( (fts_object_t *)this->editor) == 0)
+  {
+    fts_client_register_object( (fts_object_t *)this->editor, fts_object_get_client_id( o));
 	  
-      fts_set_int(&a, fts_object_get_id( (fts_object_t *)this->editor));
-      fts_client_send_message( o, fts_s_editor, 1, &a);
-      
-      fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0);
-    }
-
+    fts_set_int(&a, fts_object_get_id( (fts_object_t *)this->editor));
+    fts_client_send_message( o, fts_s_editor, 1, &a);
+    
+    fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0);
+  }
+  
   ivec_set_editor_open( this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
 }
@@ -854,13 +854,11 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ivec_t *this = (ivec_t *)o;
   
   if(this->editor) 
-    {  
-      if(fts_object_has_id( this->editor))
-	fts_client_send_message( (fts_object_t *)this->editor, fts_s_destroyEditor, 0, 0);
-    
-      fts_object_destroy((fts_object_t *)this->editor);
-    }  
-
+  {  
+    fts_client_send_message( (fts_object_t *)this->editor, fts_s_destroyEditor, 0, 0);
+    fts_object_destroy((fts_object_t *)this->editor);
+  }  
+  
   if(this->values)
     fts_free(this->values);
 }

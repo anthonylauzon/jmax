@@ -164,17 +164,14 @@ config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
 void fts_config_set_dirty(fts_config_t *this, int is_dirty)
 {
   if(( this)&&(this->dirty != is_dirty))
-    {
-      this->dirty = is_dirty;
-      
-      if ( fts_object_has_id( (fts_object_t *)this))
-	{
-	  fts_atom_t a[1];
-	  
-	  fts_set_int(&a[0], is_dirty);
-	  fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
-	}
-    }
+  {
+    fts_atom_t a[1];
+
+    this->dirty = is_dirty;
+    
+    fts_set_int(&a[0], is_dirty);
+    fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
+  }
 }
 
 static void
@@ -205,7 +202,7 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_config_t *this = (fts_config_t *)o;
   fts_atom_t a;
 
-  if ( !fts_object_has_id( ((fts_object_t *)this->audio_config)))
+  if (fts_object_has_client( ((fts_object_t *)this->audio_config)) == 0)
     fts_client_register_object( ((fts_object_t *)this->audio_config), fts_object_get_client_id( o));
 
   fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->audio_config)));
@@ -213,7 +210,7 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
   fts_send_message( ((fts_object_t *)this->audio_config), fts_s_upload, 0, 0);
 
-  if ( !fts_object_has_id( ((fts_object_t *)this->midi_config)))
+  if (fts_object_has_client( ((fts_object_t *)this->midi_config)) == 0)
     fts_client_register_object( ((fts_object_t *)this->midi_config), fts_object_get_client_id( o));
 
   fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->midi_config)));
@@ -330,28 +327,28 @@ void
 fts_config_set( fts_config_t *new_config)
 {
   fts_config_t* old_config = (fts_config_t*)fts_config_get();
-
+  
   if( new_config != NULL)
+  {
+    fts_object_refer((fts_object_t *)new_config);
+    
+    if( (old_config != NULL) && fts_object_has_client( (fts_object_t *)old_config))
     {
-      fts_object_refer((fts_object_t *)new_config);
- 
-      if( (old_config != NULL) && fts_object_has_id( (fts_object_t *)old_config))
-	{
-	  fts_atom_t a;
+      fts_atom_t a;
       
-	  if( ! fts_object_has_id( (fts_object_t *)new_config))
-	    fts_client_register_object(  (fts_object_t *)new_config, fts_object_get_client_id( (fts_object_t *)old_config));
-	  
-	  fts_set_int(&a, fts_object_get_id( (fts_object_t *)new_config));
-	  fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)new_config), fts_s_config, 1, &a);
+      if(fts_object_has_client( (fts_object_t *)new_config) == 0)
+        fts_client_register_object(  (fts_object_t *)new_config, fts_object_get_client_id( (fts_object_t *)old_config));
       
-	  fts_send_message( (fts_object_t *)new_config, fts_s_upload, 0, 0);
-	}
+      fts_set_int(&a, fts_object_get_id( (fts_object_t *)new_config));
+      fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)new_config), fts_s_config, 1, &a);
+      
+      fts_send_message( (fts_object_t *)new_config, fts_s_upload, 0, 0);
     }
+  }
   
   if( old_config != NULL)
     fts_object_release((fts_object_t *)old_config);
-    
+  
   config = new_config;
 }
 

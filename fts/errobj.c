@@ -76,15 +76,11 @@ error_object_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if(ac > 0 && fts_is_symbol(at))
   {
+    fts_atom_t a;
     this->name = fts_get_symbol(at);
-
-    if(fts_object_has_id(o))
-    {
-      fts_atom_t a;
-
-      fts_set_symbol(&a, this->name);
-      fts_client_send_message(o, fts_s_name, 1, &a);
-    }
+    
+    fts_set_symbol(&a, this->name);
+    fts_client_send_message(o, fts_s_name, 1, &a);
   }
 }
 

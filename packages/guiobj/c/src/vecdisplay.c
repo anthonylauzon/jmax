@@ -352,31 +352,28 @@ vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   vecdisplay_t * this = (vecdisplay_t *)o;
   
   if(ac)
+  {
+    fts_atom_t a[2];
+
+    switch(ac)
     {
-      switch(ac)
-	{
-	case 2:
-	  if(fts_is_number(at + 1))
-	    this->max = fts_get_number_float(at + 1);
-	case 1:
-	  if(fts_is_number(at))
-	    this->min = fts_get_number_float(at);
-	  
-	default:
-	  break;
-	}
-
-      if(fts_object_has_id(o))
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_float(a + 0, this->min);
-	  fts_set_float(a + 1, this->max);
-	  fts_client_send_message(o, sym_bounds, 2, a);
-
-	  fts_object_set_dirty(o);
-	}
+      case 2:
+        if(fts_is_number(at + 1))
+          this->max = fts_get_number_float(at + 1);
+      case 1:
+        if(fts_is_number(at))
+          this->min = fts_get_number_float(at);
+        
+      default:
+        break;
     }
+    
+    fts_set_float(a + 0, this->min);
+    fts_set_float(a + 1, this->max);
+    fts_client_send_message(o, sym_bounds, 2, a);
+    
+    fts_object_set_dirty(o);
+  }
 }
 
 static void

@@ -107,32 +107,29 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   fts_atom_list_iterator_t *iterator;
-  fts_atom_t* a;
+  fts_atom_t *a = alloca((this->size + 1) * sizeof(fts_atom_t));
   int i =0;
-
-  a = alloca((this->size + 1) * sizeof(fts_atom_t));
-
-  if(!fts_object_has_id((fts_object_t *)this))
-    fts_object_upload((fts_object_t *)this);
-
+  
+  fts_object_upload((fts_object_t *)this);
+  
   if (this->name)
-    {
-      fts_set_symbol(a, this->name);
-      fts_client_send_message((fts_object_t *)this, sym_setName, 1, a);
-    }
-
+  {
+    fts_set_symbol(a, this->name);
+    fts_client_send_message((fts_object_t *)this, sym_setName, 1, a);
+  }
+  
   iterator = fts_atom_list_iterator_new(this);
-
+  
   while (! fts_atom_list_iterator_end(iterator))
-    {
-      a[i] = *fts_atom_list_iterator_current(iterator);
-      fts_atom_list_iterator_next(iterator);
-      i++;
-    }
+  {
+    a[i] = *fts_atom_list_iterator_current(iterator);
+    fts_atom_list_iterator_next(iterator);
+    i++;
+  }
   fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
-
+  
   fts_atom_list_iterator_free(iterator);
-
+  
 #ifndef HAVE_ALLOCA
   free(a);
 #endif

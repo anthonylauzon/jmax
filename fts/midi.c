@@ -725,6 +725,7 @@ midiconfig_label_insert(fts_midiconfig_t *config, int index, fts_symbol_t name)
   fts_midilabel_t **p = &config->labels;
   fts_midilabel_t *label = midilabel_new(name);
   int n = index;
+  fts_atom_t args[4];
 
   label->input_name = fts_s_unconnected;
   label->output_name = fts_s_unconnected;
@@ -739,16 +740,12 @@ midiconfig_label_insert(fts_midiconfig_t *config, int index, fts_symbol_t name)
   config->n_labels++;
 
   /* send new label to client */
-  if(fts_object_has_id((fts_object_t *)config)) 
-  {
-    fts_atom_t args[4];
       
-    fts_set_int(args, index);
-    fts_set_symbol(args + 1, name);
-    fts_set_symbol(args + 2, fts_s_unconnected);
-    fts_set_symbol(args + 3, fts_s_unconnected);
-    fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
-  }
+  fts_set_int(args, index);
+  fts_set_symbol(args + 1, name);
+  fts_set_symbol(args + 2, fts_s_unconnected);
+  fts_set_symbol(args + 3, fts_s_unconnected);
+  fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
   
   fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 
@@ -760,6 +757,7 @@ midiconfig_label_remove(fts_midiconfig_t *config, int index)
 {
   fts_midilabel_t **p = &config->labels;
   int n = index;
+  fts_atom_t arg;
 
   /* remove label and send to client */
   while((*p) && n--)
@@ -775,14 +773,8 @@ midiconfig_label_remove(fts_midiconfig_t *config, int index)
     midilabel_delete(label);
   }
 
-  /* send remove to client */
-  if(fts_object_has_id((fts_object_t *)config)) 
-  {
-    fts_atom_t arg;
-      
-    fts_set_int(&arg, index);
-    fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
-  }
+  fts_set_int(&arg, index);
+  fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
 
   fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 }
@@ -795,16 +787,13 @@ midiconfig_label_set_input(fts_midiconfig_t *config, fts_midilabel_t *label, int
 
   if(midiport != label->input || name != label->input_name) 
   {
+    fts_atom_t args[2];
+
     midilabel_set_input(label, midiport, name);
       
-    if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t args[2];
-	  
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
-    }
+    fts_set_int(args + 0, index);
+    fts_set_symbol(args + 1, name);
+    fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
 
     fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
@@ -818,16 +807,13 @@ midiconfig_label_set_output(fts_midiconfig_t *config, fts_midilabel_t *label, in
   
   if(midiport != label->output || name != label->output_name) 
   {
+    fts_atom_t args[2];
+
     midilabel_set_output(label, midiport, name);
-      
-    if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t args[2];
 	  
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
-    }
+    fts_set_int(args + 0, index);
+    fts_set_symbol(args + 1, name);
+    fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
     
     fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
@@ -1120,9 +1106,7 @@ midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   midiconfig_erase_labels(this);
   midiconfig_label_insert(this, 0, fts_s_default);  
 
-  if(fts_object_has_id( o)) 
-    fts_client_send_message( o, fts_s_clear, 0, 0);
-  
+  fts_client_send_message( o, fts_s_clear, 0, 0);
   fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 }
 

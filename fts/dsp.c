@@ -225,9 +225,7 @@ dsp_object_get_n_inlets( fts_dsp_object_t *obj)
 
   for( i=0; i<fts_object_get_inlets_number( o); i++)
     {
-    int varargs = 0;
-    
-      if( fts_class_get_inlet_method( cl, i, fts_dsp_signal_class, &varargs) == NULL)
+      if( fts_class_get_inlet_method( cl, i, fts_dsp_signal_class) == NULL)
 	break;
     }
 
@@ -301,8 +299,7 @@ fts_dsp_add_function( fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet( fts_object_t *o, int num)
 {
-  int varargs = 0;
-  return fts_class_get_inlet_method( fts_object_get_class( o), num, fts_dsp_signal_class, &varargs) != NULL;
+  return fts_class_get_inlet_method( fts_object_get_class( o), num, fts_dsp_signal_class) != NULL;
 }
 
 int 

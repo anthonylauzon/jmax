@@ -163,15 +163,12 @@ messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
     if(n_inlets != fts_object_get_inlets_number(o))
     {
+      fts_atom_t a;
+
       fts_object_set_inlets_number(o, n_inlets);
 
-      if (fts_object_has_id((fts_object_t *)this))
-      {
-        fts_atom_t a;
-
-        fts_set_int(&a, n_inlets);
-        fts_client_send_message(o, fts_s_n_inlets, 1, &a);
-      }
+      fts_set_int(&a, n_inlets);
+      fts_client_send_message(o, fts_s_n_inlets, 1, &a);
     }
   }
   else

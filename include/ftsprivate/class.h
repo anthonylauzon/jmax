@@ -47,7 +47,7 @@ struct fts_class_outlet
 #define fts_class_set_name(m, s) ((m)->name = (s))
 
 /* get inlet methods */
-extern fts_method_t fts_class_get_inlet_method(fts_class_t *cl, int winlet, fts_class_t *type, int *varargs);
+extern fts_method_t fts_class_get_inlet_method(fts_class_t *cl, int winlet, fts_class_t *type);
 
 extern int fts_class_outlet_get_declarations(fts_class_t *cl, int woutlet, fts_iterator_t *iter);
 extern int fts_class_outlet_has_type(fts_class_t *cl, int woutlet, fts_class_t *type);

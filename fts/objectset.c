@@ -49,9 +49,7 @@ void
 fts_objectset_clear( fts_objectset_t *set)
 {
   fts_hashtable_clear( &set->hashtable);  
-  
-  if (fts_object_has_id( (fts_object_t *)set))
-    fts_client_send_message((fts_object_t *)set, fts_s_clear, 0, 0);
+  fts_client_send_message((fts_object_t *)set, fts_s_clear, 0, 0);
 }
 
 void 
@@ -66,8 +64,8 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
   exits_already = fts_hashtable_put( &set->hashtable, &k, &v);
 
   /* inform the client if necessary */
-  if (fts_object_has_id((fts_object_t *) set) && !exits_already) {
-
+  if(!exits_already) 
+  {
     fts_set_object(&a[0], object);
     fts_client_send_message((fts_object_t *) set, sym_objectset_append, 1, a);
   }
@@ -82,11 +80,8 @@ fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
   fts_set_pointer( &k, object);
   fts_hashtable_remove( &set->hashtable, &k);
   
-  if (fts_object_has_id( (fts_object_t *)set))
-    {
-      fts_set_object(&a[0], object);
-      fts_client_send_message((fts_object_t *)set, sym_objectset_remove, 1, a);
-    }
+  fts_set_object(&a[0], object);
+  fts_client_send_message((fts_object_t *)set, sym_objectset_remove, 1, a);
 }
 
 void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)

@@ -343,47 +343,40 @@ matdisplay_set_zoom_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
   matdisplay_t * this = (matdisplay_t *)o;
   
   if(ac)
-    {
-      switch(ac)
-	{
-	case 2:
-	  if(fts_is_number(at + 1))
-	    this->n_zoom = fts_get_number_int(at + 1);
-	case 1:
-	  if(fts_is_number(at))
-	    this->m_zoom = fts_get_number_int(at);
-	  
-	default:
-	  break;
-	}
+  {
+    fts_atom_t a[2];
 
-      if(fts_object_has_id(o))
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_int(a + 0, this->m_zoom);
-	  fts_set_int(a + 1, this->n_zoom);
-	  fts_client_send_message(o, sym_zoom, 2, a);
-	}
+    switch(ac)
+    {
+      case 2:
+        if(fts_is_number(at + 1))
+          this->n_zoom = fts_get_number_int(at + 1);
+      case 1:
+        if(fts_is_number(at))
+          this->m_zoom = fts_get_number_int(at);
+        
+      default:
+        break;
     }
+    
+    fts_set_int(a + 0, this->m_zoom);
+    fts_set_int(a + 1, this->n_zoom);
+    fts_client_send_message(o, sym_zoom, 2, a);
+  }
 }
 
 static void
 matdisplay_set_window_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
+  fts_atom_t a[2];
 
   this->m_wind = fts_get_int(at);
   this->n_wind = fts_get_int(at + 1);
 
-  if(fts_object_has_id(o))
-    {
-      fts_atom_t a[2];
-      
-      fts_set_int(a + 0, this->m_wind);
-      fts_set_int(a + 1, this->n_wind);
-      fts_client_send_message(o, sym_window, 2, a);
-    }
+  fts_set_int(a + 0, this->m_wind);
+  fts_set_int(a + 1, this->n_wind);
+  fts_client_send_message(o, sym_window, 2, a);
 }
 
 static void
@@ -392,29 +385,26 @@ matdisplay_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   matdisplay_t * this = (matdisplay_t *)o;
   
   if(ac)
+  {
+    fts_atom_t a[2];
+    
+    switch(ac)
     {
-      switch(ac)
-	{
-	case 2:
-	  if(fts_is_number(at + 1))
-	    this->max = fts_get_number_float(at + 1);
-	case 1:
-	  if(fts_is_number(at))
-	    this->min = fts_get_number_float(at);
-	  
-	default:
-	  break;
-	}
-
-      if(fts_object_has_id(o))
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_float(a + 0, this->min);
-	  fts_set_float(a + 1, this->max);
-	  fts_client_send_message(o, sym_range, 2, a);
-	}
+      case 2:
+        if(fts_is_number(at + 1))
+          this->max = fts_get_number_float(at + 1);
+      case 1:
+        if(fts_is_number(at))
+          this->min = fts_get_number_float(at);
+        
+      default:
+        break;
     }
+    
+    fts_set_float(a + 0, this->min);
+    fts_set_float(a + 1, this->max);
+    fts_client_send_message(o, sym_range, 2, a);
+  }
 }
 
 static void
@@ -423,29 +413,26 @@ matdisplay_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   matdisplay_t * this = (matdisplay_t *)o;
   
   if(ac)
+  {
+    fts_atom_t a[2];
+
+    switch(ac)
     {
-      switch(ac)
-	{
-	case 2:
-	  if(fts_is_number(at + 1))
-	    this->max_color = fts_get_number_int(at + 1);
-	case 1:
-	  if(fts_is_number(at))
-	    this->min_color = fts_get_number_int(at);
-	  
-	default:
-	  break;
-	}
-      
-      if(fts_object_has_id(o))
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_int(a + 0, this->min_color);
-	  fts_set_int(a + 1, this->max_color);
-	  fts_client_send_message(o, sym_color, 2, a);
-	}
+      case 2:
+        if(fts_is_number(at + 1))
+          this->max_color = fts_get_number_int(at + 1);
+      case 1:
+        if(fts_is_number(at))
+          this->min_color = fts_get_number_int(at);
+        
+      default:
+        break;
     }
+    
+    fts_set_int(a + 0, this->min_color);
+    fts_set_int(a + 1, this->max_color);
+    fts_client_send_message(o, sym_color, 2, a);
+  }
 }
 
 static void 

@@ -520,7 +520,7 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
         fts_atom_t b[3];
         fts_object_t *dobj = fts_get_object(d);
         
-        if(!fts_object_has_id(dobj))
+        if(fts_object_has_client(dobj) == 0)
           fts_client_register_object(dobj, fts_object_get_client_id((fts_object_t *)self));	
         
         fts_set_int(b, fts_object_get_id(dobj));
@@ -990,8 +990,7 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *self = (mat_t *) o;
   
-  if(fts_object_has_id(o))
-    fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
+  fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
   
   if (self->data != NULL)
     fts_free(self->data);

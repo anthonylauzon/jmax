@@ -1,3 +1,19 @@
+2004-08-13  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* expression.c: (bug fix) undefined but formerly used variables were void but not stated as undefined
+
+2004-08-12  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* expression.c/h: added fts_expression_is_valid()
+
+2004-08-11  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* removed tuple and varargs confusion from message system
+	* removed method invocation (message sending) cache from object
+	* introduced fts_message_cache_t (with API) and fts_send_message_with_cache() instead
+	* (re-)introduced message cache to connections
+	* removed or replaced calls of fts_object_has_id() by calls to fts_object_has_client() checking client id inplace of id
+
 2004-07-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in: added flag for profiling and handling of FPE.

@@ -88,7 +88,7 @@ event_set_at_client(event_t *this)
       /* register value and send object id as value-property */
       fts_object_t *valobj = fts_get_object( event_get_value( this));
       
-      if(!fts_object_has_id(valobj))
+      if(fts_object_has_client(valobj) == 0)
         fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)this));	
       
       fts_array_append_symbol(&event_client_array, seqsym_objid);

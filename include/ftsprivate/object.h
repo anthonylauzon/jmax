@@ -28,6 +28,9 @@
 #define FTS_OBJECT_STATUS_INVALID ((unsigned long)2)
 #define FTS_OBJECT_STATUS_PENDING_DELETE ((unsigned long)3)
 
+#define FTS_OBJECT_ID_ROOT 0
+#define FTS_OBJECT_ID_CLIENT 1
+
 #define fts_object_get_status(o) ((o)->flag.status)
 #define fts_object_set_status(o,f) ((o)->flag.status = (f))
 

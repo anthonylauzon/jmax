@@ -959,9 +959,9 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
   int result;
-
+  
   pkg->packages = NULL; 
-
+  
   for (i = 0; i < ac; i++)
   {
     if (fts_is_symbol(&at[i]))
@@ -969,18 +969,17 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       result = fts_package_require(pkg, fts_get_symbol(&at[i]));
       if (result != 0)
       {
-	fts_post("[package] error with package %s\n", fts_get_symbol(&at[i]));
-	if (fts_object_has_id(o))
-	{
-	  fts_atom_t a[1];
-	  fts_set_int(a, i);
-	  fts_client_send_message(o, fts_new_symbol("requireError"), 1, a);
-	}
+        fts_atom_t a[1];
+
+        fts_post("[package] error with package %s\n", fts_get_symbol(&at[i]));
+
+        fts_set_int(a, i);
+        fts_client_send_message(o, fts_new_symbol("requireError"), 1, a);
       }
     }
   }
   
-  if( fts_object_has_id( o) && pkg->packages)
+  if( fts_object_has_client( o) && pkg->packages)
     fts_package_upload_requires( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -993,11 +992,9 @@ __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   int i;
   
   for (i = 0; i < ac; i += 2)
-    fts_package_add_template(pkg, fts_get_symbol(&at[i]), 
-			     fts_package_make_relative_path(pkg, fts_get_symbol(&at[i+1])), 
-			     -1);
+    fts_package_add_template(pkg, fts_get_symbol(&at[i]), fts_package_make_relative_path(pkg, fts_get_symbol(&at[i+1])), -1);
   
-  if( fts_object_has_id( o))
+  if( fts_object_has_client( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -1012,7 +1009,7 @@ __fts_package_template_insert(fts_object_t *o, int winlet, fts_symbol_t s, int a
 			   fts_package_make_relative_path(pkg, fts_get_symbol(&at[1])), 
 			   fts_get_int( &at[2]));
   
-  if( fts_object_has_id( o))
+  if( fts_object_has_client( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -1025,7 +1022,7 @@ __fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   fts_package_remove_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
 
-  if( fts_object_has_id( o))
+  if( fts_object_has_client( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -1049,7 +1046,7 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 	}
     }
 
-  if( fts_object_has_id( o) && pkg->template_paths)
+  if( fts_object_has_client( o) && pkg->template_paths)
     fts_package_upload_template_paths( pkg);
 
   fts_package_set_dirty( pkg, 1);
@@ -1074,7 +1071,7 @@ __fts_package_package_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 	}
     }
 
-  if( fts_object_has_id( o) && pkg->package_paths)
+  if( fts_object_has_client( o) && pkg->package_paths)
     fts_package_upload_package_paths( pkg);
 
   fts_package_set_dirty( pkg, 1);
@@ -1098,7 +1095,7 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	}
     }
 
-  if( fts_object_has_id( o) && pkg->data_paths)
+  if( fts_object_has_client( o) && pkg->data_paths)
     fts_package_upload_data_paths( pkg);
 
   fts_package_set_dirty( pkg, 1);
@@ -1174,7 +1171,7 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for (i = 0; i < ac; i += 2)
     fts_package_add_help(pkg, fts_get_symbol(&at[i]), fts_get_symbol(&at[i+1]));
 
-  if( fts_object_has_id( o) && pkg->help)
+  if( fts_object_has_client( o) && pkg->help)
     fts_package_upload_help( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -1322,17 +1319,14 @@ void
 fts_package_set_dirty(fts_package_t *this, int is_dirty)
 {
   if(this->dirty != is_dirty)
-    {
-      this->dirty = is_dirty;
-
-      if ( fts_object_has_id( (fts_object_t *)this))
-	{
-	  fts_atom_t a[1];
-	  
-	  fts_set_int(&a[0], is_dirty);
-	  fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
-	}
-    }
+  {
+    fts_atom_t a[1];
+    
+    this->dirty = is_dirty;
+    
+    fts_set_int(&a[0], is_dirty);
+    fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
+  }
 }
 
 /***********************************************
@@ -1435,25 +1429,25 @@ fts_package_upload_requires( fts_package_t *this)
   fts_package_t *pkg;
   fts_atom_t a[1]; 
   fts_iterator_t i;
-
+  
   fts_list_get_values( this->packages, &i);
   fts_client_start_message( (fts_object_t *)this, fts_s_require);
-
+  
   while (fts_iterator_has_more( &i))
+  {
+    fts_iterator_next( &i, a);
+    
+    pkg = fts_package_get( fts_get_symbol( a));
+    if(pkg != NULL)
     {
-      fts_iterator_next( &i, a);
-
-      pkg = fts_package_get( fts_get_symbol( a));
-      if(pkg != NULL)
-	{
-	  fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));
-	
-	  if (!fts_object_has_id( (fts_object_t *)pkg))
-	    fts_client_register_object( (fts_object_t *)pkg, fts_object_get_client_id( (fts_object_t *)this));
-	
-	  fts_client_add_int( (fts_object_t *)this, fts_object_get_id( (fts_object_t *)pkg));
-	}
+      fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));
+      
+      if (fts_object_has_client( (fts_object_t *)pkg) == 0)
+        fts_client_register_object( (fts_object_t *)pkg, fts_object_get_client_id( (fts_object_t *)this));
+      
+      fts_client_add_int( (fts_object_t *)this, fts_object_get_id( (fts_object_t *)pkg));
     }
+  }
   
   fts_client_done_message( (fts_object_t *)this);    
 }

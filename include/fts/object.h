@@ -26,8 +26,8 @@
 #define FTS_NO_ID -1
 
 #define FTS_OBJECT_BITS_STATUS 2
-#define FTS_OBJECT_BITS_CLIENT 8
-#define FTS_OBJECT_BITS_ID (32 - FTS_OBJECT_BITS_STATUS-FTS_OBJECT_BITS_CLIENT)
+#define FTS_OBJECT_BITS_CLIENT 4
+#define FTS_OBJECT_BITS_ID (32 - FTS_OBJECT_BITS_STATUS - FTS_OBJECT_BITS_CLIENT)
 
 typedef struct
 {
@@ -39,20 +39,12 @@ struct fts_object {
   
   struct { 
     unsigned int status:FTS_OBJECT_BITS_STATUS;
-
-    /* IDs for the client communication */
     int client_id:FTS_OBJECT_BITS_CLIENT;
     int id:FTS_OBJECT_BITS_ID;
   } flag; 
   
   /* reference counter */
   int refcnt;
-
-  /* message cache */
-  fts_symbol_t cache_selector;
-  fts_class_t *cache_type;
-  int cache_varargs;
-  fts_method_t cache_method;
 
   fts_context_t *context; /* (back) pointer to container (or container related data structure) */
 };
@@ -89,8 +81,8 @@ FTS_API void fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s,
 
 /* client */
 #define fts_object_get_id(o) ((o)->flag.id)
-#define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
 #define fts_object_get_client_id(o) ((o)->flag.client_id)
+#define fts_object_has_client(o) (fts_object_get_client_id(o) > FTS_NO_ID)
 FTS_API void fts_object_upload(fts_object_t *obj);
 
 /* class */
@@ -101,16 +93,5 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 #define fts_object_get_context(o) ((o)->context)
 #define fts_object_set_context(o, c) ((o)->context = c)
 #define fts_object_get_container(o) (((o)->context != NULL)? ((o)->context->container): NULL)
-
-/* message cache */
-#define fts_object_message_cache_get_selector(o) ((o)->cache_selector)
-#define fts_object_message_cache_get_type(o) ((o)->cache_type)
-#define fts_object_message_cache_get_varargs(o) ((o)->cache_varargs)
-#define fts_object_message_cache_get_method(o) ((o)->cache_method)
-
-#define fts_object_message_cache_set_selector(o, s) ((o)->cache_selector = (s))
-#define fts_object_message_cache_set_type(o, t) ((o)->cache_type = (t))
-#define fts_object_message_cache_set_varargs(o, v) ((o)->cache_varargs = (v))
-#define fts_object_message_cache_set_method(o, m) ((o)->cache_method = (m))
 
 #endif

@@ -179,9 +179,9 @@ fts_definition_set_global(fts_definition_t *def)
   if(!fts_is_void(&def->value) && def->global == NULL)
   {
     fts_definition_t *global = fts_definition_get(fts_get_root_patcher(), def->name);
-    fts_atom_t *value = fts_definition_get_value(global);
+    fts_atom_t *global_value = fts_definition_get_value(global);
     
-    if(fts_is_void(value))
+    if(fts_is_void(global_value))
     {
       /* set global definition to local value */
       fts_definition_update(global, fts_definition_get_value(def));

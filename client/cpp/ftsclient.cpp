@@ -945,7 +945,7 @@ void FtsServer::decode( unsigned char *buffer, int size) throw (FtsClientExcepti
 FtsObject::FtsObject( FtsServer *server, FtsObject *parent, const char *ftsClassName) throw( FtsClientException)
   : _server( server), _callbacks( 0)
 {
-  _id = _server->_newObjectId++;
+  _id = _server->_newObjectId += 2;
   _server->_objectTable.put( _id, this);
 
   // Send a "new_object" message
@@ -961,7 +961,7 @@ FtsObject::FtsObject( FtsServer *server, FtsObject *parent, const char *ftsClass
 FtsObject::FtsObject( FtsServer *server, FtsObject *parent, const char *ftsClassName, FtsArgs &args) throw( FtsClientException)
   : _server( server), _callbacks( 0)
 {
-  _id = _server->_newObjectId++;
+  _id = _server->_newObjectId += 2;
   _server->_objectTable.put( _id, this);
 
   // Send a "new_object" message

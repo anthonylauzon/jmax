@@ -41,21 +41,17 @@ typedef struct
 static void
 slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *self = (slider_t *)o;
+  slider_t *self = (slider_t *)o;  
+  fts_atom_t a;
   
-  if(fts_object_has_id(o))
-  {
-    fts_atom_t a;
-    
-    fts_set_int(&a, self->orientation);
-    fts_client_send_message(o, sym_setOrientation, 1, &a);
-    
-    fts_set_int(&a, self->min);
-    fts_client_send_message(o, sym_setMinValue, 1, &a);
-    
-    fts_set_int(&a, self->max);
-    fts_client_send_message(o, sym_setMaxValue, 1, &a);
-  }
+  fts_set_int(&a, self->orientation);
+  fts_client_send_message(o, sym_setOrientation, 1, &a);
+  
+  fts_set_int(&a, self->min);
+  fts_client_send_message(o, sym_setMinValue, 1, &a);
+  
+  fts_set_int(&a, self->max);
+  fts_client_send_message(o, sym_setMaxValue, 1, &a);
 }
 
 static void
@@ -220,7 +216,7 @@ slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   self->min = in->min;
   self->max = in->max;
 
-  if(fts_object_has_id(o))
+  if(fts_object_has_client(o))
   {
     fts_atom_t a;
     

@@ -530,7 +530,7 @@ track_upload_markers(track_t *this)
 {
 	if(this->markers != NULL)
   {
-    if(!fts_object_has_id((fts_object_t *)this->markers))
+    if(!fts_object_has_client((fts_object_t *)this->markers))
     {
       fts_atom_t a[2];
       fts_class_t *markers_type = track_get_type(this->markers);
@@ -1017,7 +1017,7 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
   fts_class_t *type = event_get_type(event);
   fts_atom_t a[4];
   
-  if(!fts_object_has_id((fts_object_t *)event))
+  if(fts_object_has_client((fts_object_t *)event) == 0)
   {
     fts_client_register_object((fts_object_t *)event, fts_object_get_client_id((fts_object_t *)this));
     
@@ -1046,7 +1046,7 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
         /* register value and send object id as value-property */
         fts_object_t *valobj = fts_get_object( event_get_value( event));
         
-        if(!fts_object_has_id(valobj))
+        if(fts_object_has_client(valobj) == 0)
           fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)this));	
         
         fts_array_append_symbol(temp_array, seqsym_objid);
@@ -1101,7 +1101,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   while(event)
   {
     /* create event at client */
-    if(!fts_object_has_id((fts_object_t *)event))
+    if(fts_object_has_client((fts_object_t *)event))
       track_upload_event(this, event, &temp_array);
     else
       event_set_at_client(event);/*?????????*/
@@ -1109,7 +1109,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     event = event_get_next(event);
   }
 	
-	if( this->markers != NULL /*&& !fts_object_has_id((fts_object_t *)this->markers)*/)
+	if( this->markers != NULL)
 		track_upload_markers(this);
 	
   fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);
@@ -1137,9 +1137,10 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	
 	if(this->editor!=NULL)
 	{
-		if(!fts_object_has_id((fts_object_t *)this->editor))
+		if(fts_object_has_client((fts_object_t *)this->editor) == 0)
 		{
 			fts_atom_t a;
+      
 			fts_client_register_object((fts_object_t *)this->editor, fts_object_get_client_id(o));	
 			
 			fts_set_int(&a, fts_object_get_id((fts_object_t *)this->editor));
@@ -1440,7 +1441,7 @@ track_set_editor_at_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_object_refer((fts_object_t *)this->editor);
 	}
   
-	if(!fts_object_has_id((fts_object_t *)this->editor))
+	if(fts_object_has_client((fts_object_t *)this->editor) == 0)
 		fts_client_register_object((fts_object_t *)this->editor, fts_object_get_client_id(o));	
 		
 	fts_set_int(&a, fts_object_get_id((fts_object_t *)this->editor));
@@ -1835,7 +1836,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
   
   fts_class_message_varargs(cl, seqsym_insert, track_insert);  
-  fts_class_message_atom(cl, seqsym_remove, track_remove);
+  fts_class_message_varargs(cl, seqsym_remove, track_remove);
   
   fts_class_message_void(cl, fts_s_import, track_import_dialog);
   fts_class_message_symbol(cl, fts_s_import, track_import);

@@ -731,8 +731,7 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   bpf_t *this = (bpf_t *)o;
 
-  if(fts_object_has_id(o))
-    fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
+  fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 
   if(this->points)
     fts_free(this->points);

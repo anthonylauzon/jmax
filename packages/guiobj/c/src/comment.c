@@ -88,17 +88,14 @@ comment_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a;  
 
   if( this->color != fts_get_int(at))
-    {
-      this->color = fts_get_int(at);
- 
-      if( fts_object_has_id(o))
-	{
-	  fts_set_int( &a, this->color);
-	  fts_client_send_message( o, fts_s_color, 1, &a);
-	}
-
-      fts_object_set_dirty(o);
-    }
+  {
+    this->color = fts_get_int(at);
+    
+    fts_set_int( &a, this->color);
+    fts_client_send_message( o, fts_s_color, 1, &a);
+    
+    fts_object_set_dirty(o);
+  }
 }
 
 static void

@@ -1031,7 +1031,7 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   explode_clear(this);
   forget_explode(this, this->data.name);
 
-  /*  if(fts_object_has_id(o))
+  /*  if(fts_object_has_client(o))
       fts_client_send_message(o, fts_s_destroyEditor, 0, 0);*/
 }
 

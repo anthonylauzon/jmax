@@ -263,7 +263,7 @@ dict_upload_data(dict_t *self)
         fts_atom_t b[3];
         fts_object_t *dobj = fts_get_object(d);
         
-        if(!fts_object_has_id(dobj))
+        if(fts_object_has_client(dobj) == 0)
           fts_client_register_object(dobj, fts_object_get_client_id((fts_object_t *)self));	
         
         fts_set_int(b, fts_object_get_id(dobj));

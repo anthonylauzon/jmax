@@ -88,12 +88,12 @@ extern "C" {
 #include <fts/object.h>
 #include <fts/class.h>
 #include <fts/function.h>
-#include <fts/connection.h>
 #include <fts/tokenizer.h>
 #include <fts/expression.h>
 #include <fts/objectset.h>
 #include <fts/tuple.h>
 #include <fts/message.h>
+#include <fts/connection.h>
 #include <fts/outlet.h>
 #include <fts/patcher.h>
 #include <fts/errobj.h>

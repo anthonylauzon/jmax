@@ -419,7 +419,16 @@ cotup_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
-  fts_tuple_append(this, 1, at);
+  if(ac == 1)
+    fts_tuple_append(this, 1, at);
+  else if(ac > 1)
+  {
+    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+    fts_atom_t a;
+    
+    fts_set_object(&a, (fts_object_t *)tuple);
+    fts_tuple_append(this, 1, &a);
+  }  
 }
 
 static void
@@ -429,10 +438,10 @@ cotup_instantiate(fts_class_t *cl)
 
   fts_class_message_void(cl, fts_s_clear, cotup_clear);
   fts_class_message_void(cl, fts_s_flush, cotup_flush);
-  fts_class_message_atom(cl, fts_s_append, cotup_append);
+  fts_class_message_varargs(cl, fts_s_append, cotup_append);
 
   fts_class_inlet_bang(cl, 0, tuple_output);
-  fts_class_inlet_atom(cl, 1, cotup_append);
+  fts_class_inlet_varargs(cl, 1, cotup_append);
   
   fts_class_outlet_varargs(cl, 0);
 }
@@ -546,7 +555,7 @@ messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_tuple_t *this = (fts_tuple_t *)o;
   
   if(s == 0)
-    fts_invoke_varargs(messtup_varargs, o, ac, at);
+    fts_invoke_method(messtup_varargs, o, ac, at);
   else
   {
     /* set tuple to selector */
@@ -554,7 +563,7 @@ messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_tuple_append_symbol(this, s);
 
     /* append the arguments  */
-    fts_invoke_varargs(messtup_message, o, ac, at);
+    fts_invoke_method(messtup_message, o, ac, at);
   }
 }
 

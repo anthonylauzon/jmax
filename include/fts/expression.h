@@ -23,9 +23,9 @@
 typedef struct _fts_expression_t fts_expression_t;
 
 FTS_API fts_status_t fts_expression_new( int ac, const fts_atom_t *at, fts_expression_t **pexp);
-
 FTS_API void fts_expression_delete( fts_expression_t *exp);
 
+FTS_API void fts_expression_clear( fts_expression_t *exp);
 FTS_API fts_status_t fts_expression_set( fts_expression_t *exp, int ac, const fts_atom_t *at);
 
 FTS_API int fts_expression_get_env_count( fts_expression_t *exp);
@@ -37,6 +37,4 @@ typedef fts_status_t (*fts_expression_callback_t)( int ac, const fts_atom_t *at,
 FTS_API fts_status_t fts_expression_reduce( fts_expression_t *exp, fts_patcher_t *scope, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data);
 FTS_API fts_status_t fts_expression_evaluate( fts_expression_t *exp, fts_hashtable_t *locals, fts_hashtable_t *globals, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data);
 
-#if 0
-FTS_API void fts_expression_declare_function( fts_symbol_t name, fts_function_t function);
-#endif
+FTS_API int fts_expression_is_valid( fts_expression_t *exp);

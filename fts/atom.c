@@ -120,10 +120,6 @@ static fts_class_t void_class =
     0, /* class */
     {0,0,0}, /* flags */
     0, /* reference counter */
-    0, /* message cache */
-    0,
-    0,
-    0,
     0 /* patcher data */
   },
   /* class structure */
@@ -152,10 +148,6 @@ static fts_class_t int_class = {
     0,
   {0,0,0},
     0,
-    0,
-    0,
-    0,
-    0,
     0
   },
   0,
@@ -181,10 +173,6 @@ static fts_class_t float_class = {
   {
     0,
   {0,0,0},
-    0,
-    0,
-    0,
-    0,
     0,
     0
   },
@@ -212,10 +200,6 @@ static fts_class_t symbol_class = {
     0,
   {0,0,0},
     0,
-    0,
-    0,
-    0,
-    0,
     0
   },
   0,
@@ -242,10 +226,6 @@ static fts_class_t pointer_class = {
     0,
   {0,0,0},
     0,
-    0,
-    0,
-    0,
-    0,
     0
   },
   0,
@@ -271,10 +251,6 @@ static fts_class_t string_class = {
   {
     0,
   {0,0,0},
-    0,
-    0,
-    0,
-    0,
     0,
     0
   },

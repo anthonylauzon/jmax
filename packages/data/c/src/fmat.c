@@ -3949,17 +3949,17 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fmat_set_size(self, 0, 1);
   else if(ac == 1)
   {
-    int size = 0;
-    
     if(fts_is_number(at))
     {
-      size = fts_get_number_int(at);
+      int size = fts_get_number_int(at);
      
       if(size < 0)
         size = 0;
+
+      fmat_set_size(self, size, 1);
     }
-    
-    fmat_set_size(self, size, 1);
+    else if(fts_is_symbol(at))
+      fmat_import(o, 0, s, 1, at);
   }  
   else
   {

@@ -280,6 +280,7 @@ audioconfig_label_remove(fts_audioconfig_t* config, int index)
 {
   fts_audiolabel_t** p = &config->labels;
   int n = index;
+  fts_atom_t arg;
   
   /* remove label and send to client */
   while((*p) && n--)
@@ -294,14 +295,8 @@ audioconfig_label_remove(fts_audioconfig_t* config, int index)
     fts_object_release((fts_object_t*)label);
   }
 
-  /* send reomve to client */
-  if(fts_object_has_id((fts_object_t *)config)) 
-  {
-    fts_atom_t arg;
-      
-    fts_set_int(&arg, index);
-    fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
-  }
+  fts_set_int(&arg, index);
+  fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
 
   fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 }
@@ -358,9 +353,7 @@ audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
   audioconfig_erase_labels(self);
-
-  if (fts_object_has_id(o))
-    fts_client_send_message(o, fts_s_clear, 0, 0);
+  fts_client_send_message(o, fts_s_clear, 0, 0);
 }
 
 /* name utility */
@@ -398,7 +391,7 @@ fts_audioconfig_get_fresh_label_name(fts_audioconfig_t *config, fts_symbol_t nam
 static void
 audioconfig_upload_label(fts_object_t *o, fts_audiolabel_t *label, int index)
 {
-  if (fts_object_has_id(o))
+  if (fts_object_has_client(o))
   {
     fts_symbol_t name = fts_audiolabel_get_name(label);
     fts_atom_t args[7];

@@ -123,18 +123,18 @@ struct fts_class {
 /**
  * Get a method of a class by its message symbol and argument type
  *
- * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, int *varargs)
+ * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
  * @param cl the class
  * @param s message symbol
  * @param type class of argument (NULL for a single argument of any type, fts_void_class for a void method)
  * @return the method or NULL if failed
  */
-FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, int *varargs);
+FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type);
 
 /**
  * Get the varargs method of a class by its message symbol
  *
- * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, int *varargs)
+ * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
  * @param cl the class
  * @return the method or NULL if failed
  * @param s message symbol
@@ -209,17 +209,6 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
  */
 FTS_API void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t mth);
 
-/**
- * Register a varargs method for a given message.
- *
- * @fn void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth)
- * @param cl the class
- * @param s message symbol
- * @param mth the method
- * @ingroup class_api
- */
-FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
-
 /* marcros for most popular message types */
 #define fts_class_message_void(c, s, m) fts_class_message((c), (s), fts_void_class, (m))
 #define fts_class_message_int(c, s, m) fts_class_message((c), (s), fts_int_class, (m))
@@ -228,6 +217,9 @@ FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_meth
   fts_class_message((c), (s), fts_int_class, (m)); \
     fts_class_message((c), (s), fts_float_class, (m));} while(0)
 #define fts_class_message_symbol(c, s,  m) fts_class_message((c), (s), fts_symbol_class, (m))
+#define fts_class_message_varargs(c, s,  m) fts_class_message((c), (s), NULL, (m))
+
+/* deprecated */
 #define fts_class_message_atom(c, s,  m) fts_class_message((c), (s), NULL, (m))
 
 /**
@@ -242,17 +234,6 @@ FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_meth
  */
 FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth);
 
-/**
- * Declare an inlet and register a varargs method.
- *
- * @fn void fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t mth)
- * @param cl the class
- * @param winlet index of the inlet
- * @param mth the method
- * @ingroup class_api
- */
-FTS_API void fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t mth);
-
 /* marcros for most popular inlet types */
 #define fts_class_inlet_bang(c, i, m) fts_class_inlet((c), (i), fts_void_class, (m))
 #define fts_class_inlet_void(c, i, m) fts_class_inlet((c), (i), fts_void_class, (m))
@@ -262,6 +243,9 @@ FTS_API void fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t m
   fts_class_inlet((c), (i), fts_int_class, (m)); \
     fts_class_inlet((c), (i), fts_float_class, (m));} while(0)
 #define fts_class_inlet_symbol(c, i, m) fts_class_inlet((c), (i), fts_symbol_class, (m))
+#define fts_class_inlet_varargs(c, i, m) fts_class_inlet((c), (i), NULL, (m))
+
+/* deprecated */
 #define fts_class_inlet_atom(c, i, m) fts_class_inlet((c), (i), NULL, (m))
 
 /**
@@ -294,10 +278,12 @@ FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
   fts_class_outlet((c), (i), fts_int_class); \
     fts_class_outlet((c), (i), fts_float_class);} while(0)
 #define fts_class_outlet_symbol(c, i) fts_class_outlet((c), (i), fts_symbol_class)
-#define fts_class_outlet_atom(c, i) fts_class_outlet((c), (i), NULL)
 
 #define fts_class_outlet_varargs(c, i) fts_class_outlet((c), (i), NULL)
 #define fts_class_outlet_thru(c, i) fts_class_outlet((c), (i), NULL)
+
+/* deprecated */
+#define fts_class_outlet_atom(c, i) fts_class_outlet((c), (i), NULL)
 
 /*****************************************************************************
  *

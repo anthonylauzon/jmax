@@ -184,7 +184,7 @@ DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
 /** @name fvec fvec backwards compatibility
  *
- * A float vector fvec is a mere alias to fmat, with the constraint of having 
+ * fvec is an alias/macro to fmat, with the constraint of having 
  * only one column.
  *
  * @{
@@ -194,7 +194,7 @@ typedef fmat_t fvec_t;
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
-#define fvec_type fvec_class
+#define fvec_type fmat_class
 
 /** @} end of group fvec */
 

@@ -197,6 +197,25 @@ FTS_API void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
+/* message cache */
+typedef struct
+{
+  fts_symbol_t selector;
+  fts_class_t *type;
+  fts_method_t method;
+} fts_message_cache_t;
+
+FTS_API fts_message_cache_t *fts_message_cache_new(void);
+FTS_API void fts_message_cache_free(fts_message_cache_t *cache);
+
+#define fts_message_cache_get_selector(c) ((c)->selector)
+#define fts_message_cache_get_type(c) ((c)->type)
+#define fts_message_cache_get_method(c) ((c)->method)
+
+#define fts_message_cache_set_selector(c, s) ((c)->selector = (s))
+#define fts_message_cache_set_type(c, t) ((c)->type = (t))
+#define fts_message_cache_set_method(c, m) ((c)->method = (m))
+
 /**
  * Method invokation, message sending and outlet API.
  *
@@ -204,26 +223,15 @@ FTS_API void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const
  */
 
 /**
- * Invoke a method with an unfolded list of arguments (tuple is converted to varargs).
+ * Invoke a method.
  *
- * @fn int fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+ * @fn int fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
  * @param method the method
  * @param o the target object
  * @param ac argument count
  * @param at argument values
  */
-FTS_API void fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
-
-/**
- * Invoke a method with a single argument (ac, at is converted to tuple).
- *
- * @fn int fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
- * @param method the method
- * @param o the target object
- * @param ac argument count
- * @param at argument values
- */
-FTS_API void fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
+FTS_API void fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
 
 /**
  * Send an arbitrary message to an object (invoke method).
@@ -235,19 +243,24 @@ FTS_API void fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const
  * @param at argument values
  * @return non-zero if succeeded, 0 if no method found for given arguments
  */
-FTS_API int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_t fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /**
- * Send a varargs message to an object (invoke method).
+ * Send an arbitrary cached message to an object (invoke method).
  *
- * @fn int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache)
  * @param o the target object
  * @param s the message symbol
  * @param ac argument count
  * @param at argument values
- * @return non-zero if succeeded, 0 if no varargs method found
+ * @param cache message cache
+ * @return non-zero if succeeded, 0 if no method found for given arguments
  */
-FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_t fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache);
+
+/* deprecated */
+#define fts_invoke_varargs(m, o, n, a) fts_invoke_method((m), (o), (n), (a))
+#define fts_send_message_varargs(o, s, n, a) fts_send_message((o), (s), (n), (a))
 
 /**
  * Return a value from a method.

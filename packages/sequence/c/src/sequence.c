@@ -194,7 +194,7 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 {
   fts_class_t *track_type = track_get_type(track);
 
-  if( !fts_object_has_id((fts_object_t *)track))
+  if(fts_object_has_client((fts_object_t *)track) == 0)
   {
 		fts_atom_t a[2];
     
@@ -510,9 +510,7 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_get_object(at);
 
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message(o, seqsym_removeTracks, 1, at);
-
+  fts_client_send_message(o, seqsym_removeTracks, 1, at);
   sequence_remove_track(this, track);
 
   /* fts_name_update(o); */
@@ -527,9 +525,7 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
   int index = fts_get_int(at + 1);
 
   sequence_move_track(this, track, index);
-
-  if(fts_object_has_id((fts_object_t *)track))
-    fts_client_send_message(o, seqsym_moveTrack, 2, at);
+  fts_client_send_message(o, seqsym_moveTrack, 2, at);
 
   /* fts_name_update(o); */
   fts_object_set_state_dirty(o);

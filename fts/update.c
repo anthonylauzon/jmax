@@ -131,13 +131,13 @@ static void update_group_instantiate(fts_class_t *cl)
 static update_group_t *
 object_get_update_group( fts_object_t *obj)
 {
-  if (fts_object_has_id( obj))
-    {
-      int index = fts_object_get_client_id( obj);
-      
-      if (index >= 0 && index < update_group_table_length)
-	return update_group_table[ index];
-    }
+  if (fts_object_has_client( obj))
+  {
+    int index = fts_object_get_client_id( obj);
+    
+    if (index >= 0 && index < update_group_table_length)
+      return update_group_table[ index];
+  }
 
   return NULL;
 }

@@ -54,6 +54,7 @@ struct _fts_expression_t {
 static fts_status_description_t invalid_expression_error_description = {
   "invalid expression"
 };
+
 static fts_status_t invalid_expression_error = &invalid_expression_error_description;
 
 static fts_status_description_t operand_type_mismatch_error_description = {
@@ -434,7 +435,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
     fts_set_void( fts_get_return_value());
 
-    if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1) || fts_is_void( fts_get_return_value()))
+    if(fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1) == NULL || fts_is_void( fts_get_return_value()))
     {
       fts_object_t *obj = fts_get_object( at);
       fts_symbol_t class_name = fts_object_get_class_name(obj);
@@ -508,7 +509,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       
       fts_set_void( fts_get_return_value());
       
-      if(!fts_send_message(obj, selector, ac - 2, at + 2))
+      if(fts_send_message(obj, selector, ac - 2, at + 2) == NULL)
       {
         fts_symbol_t clname = fts_object_get_class_name(obj);
         
@@ -595,6 +596,9 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
         if(fts_is_pointer(&value))
           value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
 
+        if(fts_is_void(&value))
+          return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
+        
         expression_stack_push( exp, &value);
         fts_atom_refer(&value);
       }
@@ -891,7 +895,17 @@ fts_status_t fts_expression_set( fts_expression_t *exp, int ac, const fts_atom_t
   return fts_ok;
 }
 
-void fts_expression_delete( fts_expression_t *exp)
+void 
+fts_expression_clear( fts_expression_t *exp)
+{
+  if (exp->tree)
+    fts_parsetree_delete( exp->tree);
+  
+  exp->tree = NULL;
+}
+
+void 
+fts_expression_delete( fts_expression_t *exp)
 {
   if (exp->tree)
     fts_parsetree_delete( exp->tree);
@@ -899,6 +913,12 @@ void fts_expression_delete( fts_expression_t *exp)
   fts_stack_destroy( &exp->stack);
 
   fts_heap_free( exp, expression_heap);
+}
+
+int
+fts_expression_is_valid( fts_expression_t *exp)
+{
+  return exp->tree != NULL;
 }
 
 /***********************************************************************

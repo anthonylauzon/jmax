@@ -140,253 +140,125 @@ fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *
   dumper->send((fts_object_t *)dumper, 0, s, ac, at);  
 }
 
-/************************************************
- *
- *  send message utils
- *
- */
-
-static void
-create_tuple(int ac, const fts_atom_t *at, fts_atom_t *atup)
-{
-  if(fts_is_void(atup))
-  {
-    fts_object_t *tup = fts_object_create(fts_tuple_class, ac, at);
-
-    fts_set_object(atup, tup);
-    fts_object_refer(tup);
-  }
-}
-
 /*****************************************************************
  *
- *  unfold method args
+ *  message cache
  *
  */
-static int unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t* atup, const fts_atom_t** rat);
 
-static int
-unfold_atom(const fts_atom_t *at, const fts_atom_t** rat)
-{
-  if(fts_is_tuple(at))
-  {
-    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-    int tup_ac = fts_tuple_get_size(tup);
-    fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
-
-    return unfold_varargs(tup_ac, tup_at, (fts_atom_t *)at, rat);
-  }
-  else if(fts_is_void(at))
-  {
-    *rat = NULL;
-    return 0;
-  }
-  else
-  {
-    *rat = at;
-    return 1;
-  }
-}
-
-static int
-unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t** rat)
-{
-  switch(ac)
-  {
-  case 0:
-    rat = NULL;
-    return 0;
-  case 1:
-    return unfold_atom(at, rat);
-  default:
-    *rat = at;
-    return ac;
-  }
-}
-
-/*****************************************************************
- *
- *  method invokation API
- *
- */
+static fts_heap_t *message_cache_heap = NULL;
 
 void
-fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+fts_message_cache_init(fts_message_cache_t *cache)
 {
-  int meth_ac = 0;
-  const fts_atom_t *meth_at = NULL;
-  fts_atom_t atup;
+  cache->selector = NULL;
+  cache->type = NULL;
+  cache->method = NULL;
+}
 
-  meth_ac = unfold_varargs(ac, at, &atup, &meth_at);
-  (*method)(o, 0, NULL, meth_ac, meth_at);
+fts_message_cache_t *
+fts_message_cache_new(void)
+{
+  fts_message_cache_t *cache;
+  
+  if(message_cache_heap == NULL)
+    message_cache_heap = fts_heap_new(sizeof(fts_message_cache_t));
+    
+  cache = (fts_message_cache_t *)fts_heap_alloc(message_cache_heap);
+  fts_message_cache_init(cache);
+    
+  return cache;
 }
 
 void
-fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+fts_message_cache_free(fts_message_cache_t *cache)
 {
-  int meth_ac = 0;
-  const fts_atom_t *meth_at = NULL;
-  fts_atom_t atup;
-
-  fts_set_void(&atup);
-
-  meth_ac = unfold_varargs(ac, at, &atup, &meth_at);
-
-  if(meth_ac > 0)
-  {
-    create_tuple(meth_ac, meth_at, &atup);
-    (*method)(o, 0, NULL, 1, &atup);
-  }
-  else
-    (*method)(o, 0, NULL, 1, meth_at);
-
-  /* release temporary tuple (if needed) */
-  fts_atom_release(&atup);
-}
-
-/***************************************************
- *
- *  send messages
- *
- */
-
-/* send message with single argument or void */
-static fts_method_t
-send_message_atom(fts_object_t *o, fts_symbol_t s, const fts_atom_t *at)
-{
-  fts_class_t *cl = fts_object_get_class(o);
-  fts_class_t *type = fts_get_class(at);
-  fts_symbol_t cache_s = fts_object_message_cache_get_selector(o);
-  fts_method_t method = fts_object_message_cache_get_method(o);
-
-  if(cache_s != s || fts_object_message_cache_get_type(o) != type)
-  {
-    int varargs = 0;
-    method = fts_class_get_method(cl, s, type, &varargs);
-
-    fts_object_message_cache_set_selector(o, s);
-    fts_object_message_cache_set_type(o, type);
-    fts_object_message_cache_set_varargs(o, 0 );
-    fts_object_message_cache_set_method(o, method);
-  }
-
-  if(method != NULL)
-    (*method)(o, fts_system_inlet, s, !fts_is_void(at), at);
-
-  return method;
-}
-
-/* send message with tuple argument or varargs */
-static fts_method_t
-send_message_tuple(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *atup)
-{
-  fts_class_t *cl = fts_object_get_class(o);
-  fts_symbol_t cache_s = fts_object_message_cache_get_selector(o);
-  fts_class_t *type = fts_object_message_cache_get_type(o);
-  int varargs = fts_object_message_cache_get_varargs(o);
-  fts_method_t method = fts_object_message_cache_get_method(o);
-
-  if(cache_s != s || type != fts_tuple_class)
-  {    
-    method = fts_class_get_method(cl, s, fts_tuple_class, &varargs);
-    type = fts_tuple_class;
-
-    fts_object_message_cache_set_selector(o, s);
-    fts_object_message_cache_set_type(o, type);
-    fts_object_message_cache_set_varargs(o, varargs);
-    fts_object_message_cache_set_method(o, method);
-  }
-
-  if(method != NULL)
-  {
-    if(varargs == 0)
-    {
-      create_tuple(ac, at, atup);
-      (*method)(o, fts_system_inlet, s, 1, atup);
-    }
-    else
-      (*method)(o, fts_system_inlet, s, ac, at);
-  }
-
-  return method;
-}
-
-/*****************************************************************
- *
- *  dispatch message args
- *
- */
-static fts_method_t dispatch_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t* atup);
-
-static fts_method_t
-dispatch_message_atom(fts_object_t *o, fts_symbol_t s, const fts_atom_t *at)
-{
-  if(fts_is_tuple(at))
-  {
-    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-    int tup_ac = fts_tuple_get_size(tup);
-    fts_atom_t *tup_at = fts_tuple_get_atoms(tup);
-    return dispatch_message_varargs(o, s, tup_ac, tup_at, (fts_atom_t *)at);
-  }
-  else
-    return send_message_atom(o, s, at);
-}
-
-static fts_method_t
-dispatch_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *atup)
-{
-  switch(ac)
-  {
-  case 0:
-    return send_message_atom(o, s, fts_null);
-  case 1:
-    return dispatch_message_atom(o, s, at);
-  default:
-    return send_message_tuple(o, s, ac, at, atup);
-  }
+  fts_heap_free(cache, message_cache_heap);
 }
 
 /***********************************************************************
  *
- * message sending API
+ *  message sending API
  *
  */
+void
+fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+{
+  (*method)(o, 0, NULL, ac, at);
+}
 
-int
+fts_method_t
 fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_method_t method;
-  fts_atom_t atup;
+  fts_class_t *cl = fts_object_get_class(o);
+  fts_method_t method = NULL;
+  fts_class_t *type = NULL;
   
-  fts_set_void(&atup);
-  method = dispatch_message_varargs(o, s, ac, at, &atup);
+  switch(ac)
+  {
+    case 0:
+      type = fts_void_class;
+      break;
+    case 1:
+      type = fts_get_class(at);
+      if(type == fts_void_class)
+        ac = 0;
+        break;
+    default:
+      break;
+  }
   
-  /* release temporary tuple (if needed) */
-  fts_atom_release(&atup);
-
-  return (method != NULL);
+  method = fts_class_get_method(cl, s, type);
+  
+  if(method != NULL)
+    (*method)(o, fts_system_inlet, s, ac, at);
+  
+  return method;
 }
 
-int
-fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_t
+fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache)
 {
-  fts_method_t method = fts_class_get_method_varargs(fts_object_get_class(o), s);
-
-  if(method != NULL)
+  fts_class_t *cl = fts_object_get_class(o);
+  fts_method_t method = NULL;
+  fts_class_t *type = NULL;
+  
+  switch(ac)
   {
-    (*method)(o, fts_system_inlet, s, ac, at);
-    return 1;
+    case 0:
+      type = fts_void_class;
+      break;
+    case 1:
+      type = fts_get_class(at);
+      if(type == fts_void_class)
+        ac = 0;
+        break;
+    default:
+      break;
   }
+  
+  if(fts_message_cache_get_selector(cache) == s && fts_message_cache_get_type(cache) == type)
+    method = fts_message_cache_get_method(cache);
   else
-    return 0;
+  {
+    method = fts_class_get_method(cl, s, type);
+    
+    fts_message_cache_set_selector(cache, s);
+    fts_message_cache_set_type(cache, type);
+    fts_message_cache_set_method(cache, method);
+  }
+  
+  if(method != NULL)
+    (*method)(o, fts_system_inlet, s, ac, at);
+  
+  return method;
 }
 
 /***********************************************************************
  *
- * return mechanism for methods/functions
+ *  return mechanism for methods/functions
  *
  */
-
 static fts_atom_t fts_return_value;
 
 void fts_return( fts_atom_t *p)
