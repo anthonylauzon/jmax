@@ -70,7 +70,8 @@ extern int fts_object_description_defines_variable(int ac, const fts_atom_t *at)
 #define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)
 
 extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
-extern int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s);
+
+#define fts_object_has_method(o, i, s) fts_class_has_method((o)->head.cl, i, s)
 
 /* variables */
 #define fts_object_get_variable(o) ((o)->varname)

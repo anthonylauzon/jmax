@@ -36,10 +36,19 @@ import java.util.*;
 
 public class FtsConnection 
 {
+  /* numbering doubled on server side (mess_types.h) */
+  public static final int fts_connection_invalid = 0; /* from error object or type missmatch */
+  public static final int fts_connection_anything = 1; /* message which is not one of the following */
+  public static final int fts_connection_atom = 2; /* single atom (value) */
+  public static final int fts_connection_object = 3; /* objects */
+  public static final int fts_connection_signal = 4; /* signal connection */
+
   Fts  fts; // the server this connection belong to.
 
   private int id;
 
+  protected FtsConnectionListener listener;
+  
   boolean deleted = false; 
   FtsObject from;
   int outlet;
@@ -47,35 +56,53 @@ public class FtsConnection
   FtsObject to;
   int inlet;
 
+  int type;
+
   /** Create a FTS connection instance.
    * The FTS side of the connection is created in the Fts class.
    * @see ircam.jmax.fts.Fts#makeFtsConnection
    */
 
-  FtsConnection(Fts fts,
-		FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
+  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet, int type)
   {
-    super();
-
     this.fts    = fts;
     this.id     = id;
     this.from   = from;
     this.outlet = outlet;
     this.to     = to;
     this.inlet  = inlet;
+    this.type   = type;
 
     if (data != null)
       data.addConnection(this);
   }
 
-  /** Locally redefine a connection */
+  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
+  {
+    this(fts, data, id, from, outlet, to, inlet, fts_connection_anything);
+  }
 
-  void redefine(FtsObject from, int outlet, FtsObject to, int inlet)
+  /** Set the unique object listener */
+  public void setConnectionListener(FtsConnectionListener obj)
+  {
+    listener = obj;
+  }
+
+  /** Get the current object listener */
+  public FtsConnectionListener getConnectionListener()
+  {
+    return listener;
+  }
+
+  void redefine(FtsObject from, int outlet, FtsObject to, int inlet, int type)
   {
     this.from   = from;
     this.outlet = outlet;
     this.to     = to;
     this.inlet  = inlet;
+    this.type   = type;
+
+    listener.typeChanged(type);
   }
 
   /**
@@ -158,16 +185,16 @@ public class FtsConnection
     return inlet;
   }
 
+  public int getType()
+  {
+    return type;
+  }
+
   /** Get a string debug representation for the connection */
 
   public String  toString()
   {
-    return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ")";
+    return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ", <" + type + ">)";
   }
 }
-
-
-
-
-
 

@@ -49,7 +49,7 @@ class Display extends GraphicObject implements FtsMessageListener
   {
     super(theSketchPad, theFtsObject);
 
-    redefine("     ");
+    redefine("###");
 
     setFont(getFont());
   }

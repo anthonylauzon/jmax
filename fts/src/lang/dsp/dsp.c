@@ -52,10 +52,8 @@ extern void fts_dsp_control_config(void);
 extern void Sig_init(void);
 
 fts_symbol_t fts_s_put;
-fts_symbol_t fts_s_sig;
 fts_symbol_t fts_s_sig_zero;
 fts_symbol_t fts_s_dsp_descr;
-fts_symbol_t fts_s_dspgraph_replace;
 
 /* up and down sampling factors are now specified with properties */
 fts_symbol_t fts_s_dsp_upsampling;
@@ -71,13 +69,11 @@ dsp_module_init(void)
 
   /* symbols used in DSP */
   fts_s_put = fts_new_symbol("put");
-  fts_s_sig = fts_new_symbol("sig");
   fts_s_sig_zero = fts_new_symbol("_sig_0");
   fts_s_dsp_upsampling   = fts_new_symbol("DSP_UPSAMPLING");
   fts_s_dsp_downsampling = fts_new_symbol("DSP_DOWNSAMPLING");
   fts_s_dsp_outputsize = fts_new_symbol("DSP_OUTPUTSIZE");
   fts_s_dsp_descr = fts_new_symbol("__DSP_DESCR");
-  fts_s_dspgraph_replace = fts_new_symbol("dspgraph_replace");
 
   /* Initialize signals management */
   Sig_init();

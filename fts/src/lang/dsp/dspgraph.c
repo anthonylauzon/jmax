@@ -31,6 +31,7 @@
 #include "lang/ftl.h"
 #include "lang/dsp.h"
 #include "gphiter.h"
+#include "sigconn.h"
 
 #include "runtime/files.h"
 #include "runtime/sched.h"
@@ -45,23 +46,21 @@ extern double fts_sched_get_tick_duration(void);
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 /* 
-   Time must be zeroed in the same place it is incremented, 
-   otherwise it will never be zero in fts_alarm_sched.
-*/
+ * Time must be zeroed in the same place it is incremented, 
+ * otherwise it will never be zero in fts_alarm_sched.
+ */
 static int  please_zero_dsp_time = 0;
 
 /* 
-   Clocks for use with timer primitives.
-   We provide (see the dsp_timer_install function below), two timers
-   (dsp_msec and dsp_tick) that measure the elapsed time after the dac start.
-   Their values is zero after a delete 
-*/
+ * Clocks for use with timer primitives.
+ * We provide (see the dsp_timer_install function below), two timers
+ * (dsp_msec and dsp_tick) that measure the elapsed time after the dac start.
+ * Their values is zero after a delete 
+ */
 static double dsp_ms_clock = 0;
 static double dsp_tick_clock = 0;
 
-
 /* Heaps for graph and descriptors */
-
 static fts_heap_t *dsp_graph_heap;
 static fts_heap_t *dsp_descr_heap;
 
@@ -75,13 +74,13 @@ static dsp_signal *sig_zero;
 static int verbose = 0;
 static int depth = 0;
 
+static fts_signal_connection_table_t signal_connection_table;
 
-/* --------------------------------------------------------------------------- */
-/*                                                                             */
-/* The dsp_node structure                                                      */
-/*                                                                             */
-/* --------------------------------------------------------------------------- */
-
+/******************************************************************************
+ *
+ * The dsp_node structure
+ *
+ */
 typedef struct dsp_node_t dsp_node_t;
 
 struct dsp_node_t {
@@ -97,11 +96,10 @@ struct dsp_node_t {
 
 static dsp_node_t *dsp_graph;
 
-
 typedef void (*edge_fun_t)(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, dsp_signal *sig); 
 
 /* Generic graph traversal function */
-static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun);
+static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun, int mark_connections);
 /* Edge function used to count predecessors */
 static void inc(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, dsp_signal *sig);
 /* Edge function used to decrement predecessors count and increment reference count of signals */
@@ -176,7 +174,7 @@ static int dsp_input_get(fts_object_t *obj, int winlet)
   int i, n;
 
   for (i = 0, n = 0; i < winlet; i++)
-    if (fts_object_handle_message(obj, i, fts_s_sig))
+    if (fts_object_has_method(obj, i, fts_s_sig))
       n++;
 
   return n;
@@ -369,7 +367,7 @@ dsp_object_schedule(dsp_node_t *node)
 
   SET_SCHEDULED( node);
 
-  dsp_succ_realize(node, dec_pred_inc_refcnt);
+  dsp_succ_realize(node, dec_pred_inc_refcnt, 0);
 
   /* This is to free the unreferenced signals, after having computed
      the reference count of all the outputs signals. This happens in case
@@ -396,8 +394,30 @@ dsp_object_schedule(dsp_node_t *node)
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
+/* mark connections as signal (adding to table ...) */
+static void
+mark_signal_connection(fts_connection_t* connection, void *arg)
+{
+  fts_signal_connection_table_t *table = (fts_signal_connection_table_t *)arg;
+  fts_object_t *source = fts_connection_get_source(connection);
+  int outlet = fts_connection_get_outlet(connection);
+  fts_object_t *destination = fts_connection_get_destination(connection);
+  int inlet = fts_connection_get_inlet(connection);
+
+  if ( verbose)
+    {
+      post("  mark:  ");
+      post_object(source);
+      post(" (%d) --> ", outlet);
+      post_object(destination);
+      post(" (%d)\n", inlet);
+    }
+
+  fts_signal_connection_add(table, connection);
+}
+
 /* Generic graph traversal function */
-static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun)
+static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun, int mark_connections)
 {
   fts_outlet_decl_t *outlet;
   int woutlet;
@@ -421,17 +441,36 @@ static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun)
 
 	  while ( !graph_iterator_end( &iter))
 	    {
+	      fts_connection_t *conn;
 	      fts_object_t *succ_obj;
 	      dsp_node_t *succ_node;
 	      int winlet;
 
 	      graph_iterator_get_current( &iter, &succ_obj, &winlet);
+	      conn = graph_iterator_get_current_connection( &iter);
 
 	      succ_node = dsp_list_lookup( succ_obj);
 
 	      if (succ_node)
-		(*fun)( node, woutlet, succ_node, winlet, *sig);
-	  
+		{
+		  if(mark_connections)
+		    {
+		      if (verbose)
+			{
+			  post("dsp connection:  ");
+			  post_object(node->o);
+			  post(" (%d) --> ", woutlet);
+			  post_object(succ_node->o);
+			  post(" (%d)\n", winlet);
+			}
+		      
+		      mark_signal_connection(conn, (void *)&signal_connection_table);
+		      graph_iterator_apply_to_connection_stack(&iter, mark_signal_connection, (void *)&signal_connection_table);
+		    }
+
+		  (*fun)( node, woutlet, succ_node, winlet, *sig);
+		}
+
 	      graph_iterator_next( &iter);
 	    }
 
@@ -514,22 +553,22 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
 }
 
 /* Edge function used to realize a depth first sequentialization of the graph */
-static void dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, dsp_signal *sig)
+static void 
+dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, dsp_signal *sig)
 {
   ASSERT( dest != 0);
 
   if ( dest->pred_cnt == 0)
     {
       dsp_object_schedule( dest);
-
+      
       depth++;
-      dsp_succ_realize( dest, dsp_schedule_depth);
+      dsp_succ_realize( dest, dsp_schedule_depth, fts_c_signal);
       depth--;
 
       fts_message_send( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
     }
 }
-
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -550,7 +589,7 @@ static void dsp_pred_count( dsp_node_t *graph)
   dsp_node_t *node;
 
   for( node = graph; node; node = node->next)
-    dsp_succ_realize( node, inc);
+    dsp_succ_realize( node, inc, 0);
 }
 
 static void dsp_chain_create_start(int vs)
@@ -642,17 +681,18 @@ void dsp_chain_delete(void)
 {
   if ( !dsp_is_running())
     return;
-
+  
   if ( dsp_chain_on)
     ftl_program_destroy( dsp_chain_on);
 
   dsp_chain = dsp_chain_off;
 
   fts_audio_deactivate_devices();
+
+  fts_signal_connection_remove_all(&signal_connection_table);
 }
 
 /* DSP ON parameter listener */
-
 static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
 {
   if (fts_is_int(value))
@@ -882,7 +922,6 @@ void fts_dsp_chain_poll( void)
   ftl_program_run(dsp_chain);
 }
 
-
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
 /* DSP compiler control                                                        */
@@ -894,7 +933,8 @@ void dsp_compiler_init(void)
   dsp_graph_heap = fts_heap_new(sizeof(dsp_node_t));
   dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));
 
-  /* Install the dsp_on parameter listener */
-  
+  fts_signal_connection_table_init(&signal_connection_table);
+
+  /* Install the dsp_on parameter listener */  
   fts_param_add_listener(fts_s_dsp_on, 0, dsp_on_listener);
 }

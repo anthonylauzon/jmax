@@ -107,7 +107,6 @@ extern void dsp_make_dsp_off_chain(void);
 extern ftl_program_t *dsp_get_current_dsp_chain( void);
 
 extern fts_symbol_t fts_s_put;
-extern fts_symbol_t fts_s_sig;
 extern fts_symbol_t fts_s_sig_zero;
 extern fts_symbol_t fts_s_dsp_upsampling;
 extern fts_symbol_t fts_s_dsp_downsampling;
@@ -116,23 +115,5 @@ extern fts_symbol_t fts_s_dsp_descr;
 
 /* the function that is called by the scheduler */
 extern void fts_dsp_chain_poll( void);
-
-/************************************************************************
- * 
- *  message "dspgraph_replace"
- *  
- *   this message is send to each object while dsp graph building in order to
- *   give them chance to replace themselves by other objects in the graph
- *   (usefull for objects like patcher in/outlets and send/receive)
- *
- *   the replaced object calls fts_dspgraph_insert() in order to add others
- *   in place of itself
- *
- */
-extern fts_symbol_t fts_s_dspgraph_replace;
-typedef graph_iterator_t fts_dspgraph_t;
-
-extern void fts_dspgraph_insert(fts_dspgraph_t *graph, fts_object_t *object, int outlet);
-#define fts_dspgraph_insert(g, obj, out) graph_iterator_push((g), (obj), (out))
 
 #endif

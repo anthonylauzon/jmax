@@ -24,9 +24,10 @@
 #
 
 SOURCES = \
-dsp.c		\
-dspgraph.c	\
-gphiter.c	\
-signal.c	\
-dspcontrol.c
+dsp.c \
+dspgraph.c \
+gphiter.c \
+signal.c \
+dspcontrol.c \
+sigconn.c \
 

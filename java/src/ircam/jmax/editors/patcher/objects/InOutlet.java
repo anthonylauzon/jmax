@@ -38,15 +38,12 @@ import ircam.jmax.editors.patcher.*;
 
 abstract public class InOutlet extends Editable implements FtsObjectErrorListener{
 
-  protected String target;
   private static final int DEFAULT_WIDTH = 64;
   private static final int MINIMUM_WIDTH = 30;
 
-  InOutlet( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String target) 
+  InOutlet( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
-
-    this.target = target;
 
     int width = getWidth();
 
@@ -115,7 +112,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   // ----------------------------------------
 
   private static final int TEXT_X_OFFSET = 3;
-  private static final int TEXT_Y_OFFSET = 4;
+  private static final int TEXT_Y_OFFSET = 2;
 
   public int getTextXOffset()
   {
@@ -134,7 +131,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public int getTextHeightOffset()
   {
-      return 7;
+    return 5;
   }
     
   public Color getTextForeground()
@@ -169,7 +166,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
     g.setColor(getTextBackground());
 
     g.fillRect( x + 1, y + 1, w - 2,  h - 2);
-    g.fill3DRect( x + 1, y + 1, hLine-2,  h-2, true);
+    g.fill3DRect( x + 1, y + 1, hLine - 2,  h-2, true);
 
     drawTriangle(g, x, y, w, hLine);
     drawContent( g);
@@ -179,5 +176,3 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   abstract void drawTriangle(Graphics g, int x, int y, int w, int h);
 }
-
-

@@ -41,10 +41,16 @@ extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new, in
 extern void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
 extern void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);
 
-#define fts_connection_get_id(c)     ((c)->id)
+#define fts_connection_get_id(c) ((c)->id)
+#define fts_connection_get_source(c) ((c)->src)
+#define fts_connection_get_outlet(c) ((c)->woutlet)
+#define fts_connection_get_destination(c) ((c)->dst)
+#define fts_connection_get_inlet(c) ((c)->winlet)
+#define fts_connection_get_type(c) ((c)->type)
+
+extern void fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type);
 
 /* Debug print */
-
 extern void fprintf_connection(FILE *f, fts_connection_t *conn);
 
 

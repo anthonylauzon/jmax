@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -25,46 +25,7 @@
 
 package ircam.jmax.fts;
 
-import java.io.*;
-import java.util.*;
-
-import ircam.jmax.*;
-
-/**
- * SuperClass for proxies of an Inlet or Outlet FTS object.
- */
-
-public class FtsInOutletObject  extends FtsObject
+public interface FtsConnectionListener
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  FtsAtom target;
-
-  /**
-   * Create a FtsInOutletObject object.
-   */
-  
-  public FtsInOutletObject(Fts fts, FtsObject parent, String className, FtsAtom target)
-  {
-      super(fts, parent, null, className, ""+
-	    ((target.type == FtsAtom.INT) ? ""+target.intValue : target.getString()));
-      
-      this.target = target;
-  }
-
-  public FtsAtom getTarget()
-  {
-      return target;
-  }
+  public void typeChanged(int type);
 }
-
-
-
-
-
-
-

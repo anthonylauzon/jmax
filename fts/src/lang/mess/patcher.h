@@ -59,11 +59,12 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_object_is_object(o) ((! fts_object_is_patcher((o))) || fts_object_is_error((o)))
 
+/* thru objects */
+#define fts_object_is_thru(o) fts_class_is_thru((o)->head.cl)
+extern void fts_object_set_connection_type(fts_object_t *obj, fts_connection_type_t type);
+
 #define fts_patcher_is_open(p)    ((p)->open)
 #define fts_object_patcher_is_open(o)    ((fts_object_get_patcher(o))->open)
-
-extern void fts_patcher_inlet_reposition(fts_object_t *o, int pos);
-extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
 
 extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
 extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
@@ -76,11 +77,3 @@ extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
 extern fts_patcher_t *fts_get_root_patcher(void);
 
 #endif
-
-
-
-
-
-
-
-

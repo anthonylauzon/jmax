@@ -89,10 +89,6 @@ const char *protocol_printable_cmd( int cmd)
     return "REDEFINE_PATCHER_CODE";
   case REMOTE_CALL_CODE:
     return "REMOTE_CALL_CODE";
-  case REPOSITION_INLET:
-    return "REPOSITION_INLET";
-  case REPOSITION_OUTLET:
-    return "REPOSITION_OUTLET";
   case SAVE_PATCHER_BMAX_CODE:
     return "SAVE_PATCHER_BMAX_CODE";
   case SYNC_CODE:

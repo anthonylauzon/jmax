@@ -408,7 +408,6 @@ fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property)
 }
 
 /* null if no prop */
-
 const fts_atom_t *
 fts_class_get_prop(fts_class_t *cl, fts_symbol_t property)
 {

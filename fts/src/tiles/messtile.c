@@ -53,8 +53,6 @@
    NEW  (obj) p (int)id [<args>]*
    REDEFINE_PATCHER (obj)patcher <name> <ins> <outs>
    REDEFINE_OBJECT (obj)object [<args>]*
-   REPOSITION_INLET (obj)obj <pos>
-   REPOSITION_OUTLET (obj)obj <pos>
    DELETE_OBJECT (obj)obj
    DELETE_CONNECTION (conn)c
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
@@ -546,68 +544,6 @@ fts_mess_client_redefine_object(int ac, const fts_atom_t *av)
 }
 
 
-/*
-  REPOSITION_INLET (obj)obj <pos>
-  
-  */
-
-static void
-fts_mess_client_reposition_inlet(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received reposition inlet", ac, av);
-
-  if (ac == 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
-    {
-      fts_object_t  *obj;
-      int            pos;
-
-      obj = fts_get_object(&av[0]);
-      pos = fts_get_int(&av[1]);
-
-      if (! obj)
-	{
-	  printf_mess("System Error in FOS message REPOSITION INLET: repositioning a non existing inlet", ac, av);
-	  return;
-	}
-
-      fts_patcher_inlet_reposition(obj, pos);
-    }
-  else
-    printf_mess("System Error in FOS message REPOSITION INLET: bad args", ac, av);
-}
-
-
-/*
-  REPOSITION_OUTLET (obj)obj <pos>
-  
-  */
-
-static void
-fts_mess_client_reposition_outlet(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received reposition outlet", ac, av);
-
-  if (ac == 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
-    {
-      fts_object_t  *obj;
-      int            pos;
-
-      obj = fts_get_object(&av[0]);
-      pos = fts_get_int(&av[1]);
-
-      if (! obj)
-	{
-	  printf_mess("System Error in FOS message REPOSITION OUTLET: repositioning a non existing outlet",
-		    ac, av);
-	  return;
-	}
-
-      fts_patcher_outlet_reposition(obj, pos);
-    }
-  else
-    printf_mess("System Error in FOS message REPOSITION OUTLET: bad args", ac, av);
-}
-
 /* 
    DELETE_OBJECT (obj)obj
 
@@ -915,8 +851,6 @@ fts_messtile_install_all(void)
   fts_client_install(NEW_OBJECT_CODE,  fts_mess_client_new);
   fts_client_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
   fts_client_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
-  fts_client_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
-  fts_client_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
   fts_client_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
 
   fts_client_install(NEW_CONNECTION_CODE,  fts_mess_client_new_connection);

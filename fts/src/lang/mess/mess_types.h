@@ -39,9 +39,11 @@
  */
 
 typedef const struct fts_symbol_descr *fts_symbol_t;
-typedef union  fts_word          fts_word_t;
-typedef struct fts_atom          fts_atom_t;
-typedef struct fts_plist                 fts_plist_t;
+typedef union  fts_word fts_word_t;
+typedef struct fts_atom fts_atom_t;
+typedef struct fts_plist fts_plist_t;
+
+typedef void (*fts_fun_t)(void);
 
 /* (fd) 
    For now, fts_type_t is an alias of fts_symbol_t, in order
@@ -54,9 +56,20 @@ typedef struct fts_plist                 fts_plist_t;
 #define fts_type_get_by_name(n) (n)
 
 typedef enum fts_daemon_action {
-  obj_property_put, obj_property_get, obj_property_remove
+  obj_property_put, 
+  obj_property_get, 
+  obj_property_remove
 } fts_daemon_action_t;
 
+/* user visible connection cathogeries */
+typedef enum fts_connection_type
+{
+  fts_c_invalid = 0, /* from error object or type missmatch */
+  fts_c_anything = 1, /* message which is not one of the following */
+  fts_c_atom = 2, /* single atom (value) */
+  fts_c_object = 3, /* objects */
+  fts_c_signal = 4 /* signal connection */
+} fts_connection_type_t;
 
 typedef struct fts_metaclass fts_metaclass_t;
 typedef struct fts_class fts_class_t;
@@ -221,7 +234,7 @@ struct fts_class
   fts_class_t *next;
 
   /* property list handling */
-  fts_plist_t *properties;		/* class dynamic properties */
+  fts_plist_t *properties;		/* class' dynamic properties */
 
   struct daemon_list *daemons;
 
@@ -236,7 +249,7 @@ struct fts_mess_type
 
   int mandatory_args;
   int nargs;
-  fts_symbol_t *arg_types;	/* now atom are symbols */
+  fts_symbol_t *arg_types;
 };
 
 
@@ -255,10 +268,12 @@ struct fts_connection
   fts_object_t *dst;
   int winlet;
 
-  int id;                        /* the connection ID, when defined */
+  int id; /* the connection ID, when defined */
  
-  fts_symbol_t symb;		/* the message cache: the symbol: if null, means anything ! */
-  fts_method_t  mth;		/* the message  cache: the method */
+  fts_symbol_t symb; /* the message cache: the symbol: if null, means anything ! */
+  fts_method_t  mth; /* the message  cache: the method */
+
+  fts_connection_type_t type; /* user visible connection cathogeries */
 
   fts_connection_t *next_same_dst;
   fts_connection_t *next_same_src;

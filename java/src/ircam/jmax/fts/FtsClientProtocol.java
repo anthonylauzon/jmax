@@ -123,8 +123,6 @@ class FtsClientProtocol
   static final int fts_redefine_patcher_cmd = 'Q';
   static final int fts_redefine_object_cmd = 'R';
   static final int fts_redefine_connection_cmd = 'V';
-  static final int fts_reposition_inlet_cmd = 'X';
-  static final int fts_reposition_outlet_cmd = 'Y';
 
   static final int fts_delete_connection_cmd = 'a';
   static final int fts_new_connection_cmd   = 'c';
@@ -189,10 +187,6 @@ class FtsClientProtocol
 	return "fts_redefine_object";
       case 'V':
 	return "fts_redefine_connection";
-      case 'X':
-	return "fts_reposition_inlet";
-      case 'Y':
-	return "fts_reposition_outlet";
       case 'f':
 	return "fts_delete_object";
       case 'c':

@@ -239,7 +239,7 @@ public class Fts implements MaxContext
     */
 
   public FtsConnection makeFtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
-       throws FtsException
+    throws FtsException
   {
     FtsConnection conn;
     int id;
@@ -250,7 +250,6 @@ public class Fts implements MaxContext
     server.sendDownloadConnection(id);
 
     // Wait for FTS to do his work
-
     sync();
 
     conn = server.getConnectionByFtsId(id);

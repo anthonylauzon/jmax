@@ -34,7 +34,7 @@ import ircam.jmax.*;
  * Proxy of an Inlet FTS object.
  */
 
-public class FtsInletObject  extends FtsInOutletObject
+public class FtsInletObject extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -46,9 +46,9 @@ public class FtsInletObject  extends FtsInOutletObject
    * Create a FtsInletObject object.
    */
   
-  public FtsInletObject(Fts fts, FtsObject parent, FtsAtom arg)
+  public FtsInletObject(Fts fts, FtsObject parent, String description)
   {
-      super(fts, parent, "inlet", arg);
+      super(fts, parent, null, "inlet", description);
 
       ninlets = 0;
       noutlets = 1;

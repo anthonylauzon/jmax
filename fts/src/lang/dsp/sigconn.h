@@ -24,25 +24,18 @@
  *
  */
 
-#ifndef _FTS_GPHITER_H_
-#define _FTS_GPHITER_H_
+#ifndef _FTS_SIGCONN_H_
+#define _FTS_SIGCONN_H_
 
-typedef struct graph_iterator graph_iterator_t;
+typedef struct _fts_signal_connection_table_
+{
+  fts_connection_t **connections;
+  int size;
+  int alloc;
+} fts_signal_connection_table_t;
 
-struct graph_iterator {
-  struct stack_element *top;
-};
-
-typedef void (*graph_iterator_connection_function_t)(fts_connection_t *connection, void *arg);
-
-extern void graph_iterator_init( graph_iterator_t *iter, fts_object_t *object, int outlet);
-
-extern void graph_iterator_next( graph_iterator_t *iter);
-extern int graph_iterator_end( const graph_iterator_t *iter);
-extern void graph_iterator_get_current( const graph_iterator_t *iter, fts_object_t **obj, int *inlet);
-
-extern fts_connection_t *graph_iterator_get_current_connection(const graph_iterator_t *iter);
-extern int graph_iterator_has_connection_stack(const graph_iterator_t *iter);
-extern void graph_iterator_apply_to_connection_stack(const graph_iterator_t *iter, graph_iterator_connection_function_t fun, void *arg);
+extern void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
+extern void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
+extern void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
 
 #endif

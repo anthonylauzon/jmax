@@ -93,7 +93,6 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
       renderer = new TextRenderer(this);
   }
 
-
   public void redefine( String text) 
   {
     computeRenderer();

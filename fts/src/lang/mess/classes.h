@@ -105,11 +105,29 @@ extern fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet,
 
 extern fts_symbol_t fts_get_class_name(fts_class_t *cl);
 
+extern int fts_class_has_method(fts_class_t *cl, int inlet, fts_symbol_t s);
+
 #define fts_class_get_user_data(c) ((cl)->user_data)
 #define fts_class_set_user_data(c, d) ((cl)->user_data = (d))
 
 extern const int fts_SystemInlet;
 
+/*****************************************************************************
+ *
+ *  "thru" classes
+ *
+ */
+
+typedef void (*fts_propagate_fun_t)(void *ptr, fts_object_t *object, int outlet);
+
+extern void fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input);
+extern int fts_class_is_thru(fts_class_t *class);
+
+/*****************************************************************************
+ *
+ *  equivalence function library
+ *
+ */
 extern int fts_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 extern int fts_arg_equiv_or_float( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 extern int fts_first_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);

@@ -452,49 +452,6 @@ public class FtsServer implements Runnable
   }
 
 
-  /** Reposition an inlet  */
-  final void repositionInletObject(FtsObject obj, int pos)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("> repositionInletObject(" + obj + ", " + pos + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_reposition_inlet_cmd);
-	stream.sendObject(obj);
-	stream.sendInt(pos);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  /** Reposition an outlet  */
-  final void repositionOutletObject(FtsObject obj, int pos)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("> repositionOutletObject(" + obj + ", " + pos + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_reposition_outlet_cmd);
-	stream.sendObject(obj);
-	stream.sendInt(pos);
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
   /** Send a "free object" messages to FTS.*/
   final void deleteObject(FtsObject obj)
   {
@@ -1645,6 +1602,7 @@ public class FtsServer implements Runnable
 	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
+	  int type;
 	  FtsConnection c;
 
 	  data   = (FtsPatcherData) stream.getNextDataArgument();
@@ -1653,8 +1611,9 @@ public class FtsServer implements Runnable
 	  outlet = stream.getNextIntArgument();
 	  to     = stream.getNextObjectArgument();
 	  inlet  = stream.getNextIntArgument();
+	  type  = stream.getNextIntArgument();
 
-	  c = new FtsConnection(fts, data, id, from, outlet, to, inlet);
+	  c = new FtsConnection(fts, data, id, from, outlet, to, inlet, type);
 
 	  registerConnection(c);
 
@@ -1668,6 +1627,7 @@ public class FtsServer implements Runnable
 	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
+	  int type;
 	  FtsConnection c;
 
 	  c      = stream.getNextConnectionArgument();
@@ -1675,8 +1635,9 @@ public class FtsServer implements Runnable
 	  outlet = stream.getNextIntArgument();
 	  to     = stream.getNextObjectArgument();
 	  inlet  = stream.getNextIntArgument();
+	  type   = stream.getNextIntArgument();
 
-	  c.redefine(from, outlet, to, inlet);
+	  c.redefine(from, outlet, to, inlet, type);
 
 	  if (FtsServer.debug)
 	    System.err.println("< Connection Redefined " + c);

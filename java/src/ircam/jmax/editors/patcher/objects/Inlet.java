@@ -41,31 +41,19 @@ import ircam.jmax.utils.*;
 public class Inlet extends InOutlet {
   public Inlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-      super(theSketchPad, theFtsObject, theFtsObject.getDescription());
+    super(theSketchPad, theFtsObject);
   }
 
   public void drawTriangle(Graphics g, int x, int y, int w, int h) 
   {
     Color color = g.getColor();
-    int offset = 2*h/7;
+    int offset = 2 * h/7;
       
     g.setColor( color.brighter());
-    g.drawLine( x + h - offset, y + h/2 -1, x + offset, y + h - offset - 1);
+    g.drawLine( x + h - offset, y + offset, x + h/2, y + h - offset);
       
     g.setColor( color.darker());
-    g.drawLine( x + offset, y + offset - 1, x + offset, y + h - offset - 1);
-    g.drawLine( x + offset, y + offset - 1, x + h - offset, y + h/2 - 1);
+    g.drawLine( x + offset, y + offset, x + h - offset, y + offset);
+    g.drawLine( x + offset, y + offset, x + h/2 - 1, y + h - offset - 1);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -79,6 +79,12 @@ PREDEF_SYMBOL( fts_s_find_friends, "find_friends")
 PREDEF_SYMBOL( fts_s_anything, "anything")
 PREDEF_SYMBOL( fts_s_send_properties, "send_properties")
 PREDEF_SYMBOL( fts_s_send_ui_properties, "send_ui_properties")
+PREDEF_SYMBOL( fts_s_propagate_input, "propagate_input")
+PREDEF_SYMBOL( fts_s_connection_type, "connection_type")
+PREDEF_SYMBOL( fts_s_thru, "thru")
+PREDEF_SYMBOL( fts_s_sig, "sig")
+
+/* syntax symbols */
 PREDEF_SYMBOL( fts_s_comma, ",")
 PREDEF_SYMBOL( fts_s_quote, "'")
 PREDEF_SYMBOL( fts_s_dollar, "$")

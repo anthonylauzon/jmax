@@ -262,11 +262,9 @@ public class PatcherClipboardManager implements ClipboardOwner
 	fc = (FtsConnection)e2.nextElement();
 
 	connection = new GraphicConnection( sketch, 
-					  displayList.getGraphicObjectFor(fc.getFrom()),
-					  fc.getFromOutlet(), 
-					  displayList.getGraphicObjectFor(fc.getTo()),
-					  fc.getToInlet(),
-					  fc);
+					  displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
+					  displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
+					  fc.getType(), fc);
 
 	displayList.add( connection);
 

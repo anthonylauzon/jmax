@@ -120,9 +120,9 @@ public class FtsObject
 	else if (className == "jpatcher")
 	  obj =  new FtsPatcherObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
-	    obj =  new FtsInletObject(fts, parent, args[0]);
+	    obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "outlet")
-	  obj =  new FtsOutletObject(fts, parent, args[0]);
+	  obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "fork")
 	  obj =  new FtsForkObject(fts, parent, args[0].intValue);
 	else if (className == "jcomment")

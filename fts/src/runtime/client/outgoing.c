@@ -406,6 +406,7 @@ void fts_client_upload_connection(fts_connection_t *c)
   fts_client_add_int(c->woutlet);
   fts_client_add_object(c->dst);
   fts_client_add_int(c->winlet);
+  fts_client_add_int(c->type);
   fts_client_done_msg();
 }
 
@@ -428,6 +429,7 @@ void fts_client_redefine_connection(fts_connection_t *c)
   fts_client_add_int(c->woutlet);
   fts_client_add_object(c->dst);
   fts_client_add_int(c->winlet);
+  fts_client_add_int(c->type);
   fts_client_done_msg();
 }
 

@@ -72,9 +72,6 @@ static void fts_mess_init( void )
   /* Create the patcher class */
   fts_patcher_init();
 
-  /* Create the channel (send/receive) class */
-  fts_channel_config();
-
   /* Initialize the .pat parser */
   fts_patparser_init();
 
@@ -96,6 +93,9 @@ static void fts_mess_init( void )
 
   /* Initialize the template subsystem */
   fts_template_init();
+
+  /* Create the channel (send/receive) class */
+  fts_channel_config();
 
   /* Now that everything is up and running, create the root patcher */
   fts_create_root_patcher();

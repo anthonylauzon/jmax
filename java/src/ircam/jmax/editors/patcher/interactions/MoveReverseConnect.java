@@ -66,17 +66,13 @@ class MoveReverseConnect extends Interaction
 	FtsConnection fc;
 	GraphicConnection connection;
 
-	fc = editor.getFts().makeFtsConnection(src.getFtsObject(),
-					       outlet, 
-					       dst.getFtsObject(),
-					       inlet);
-		    
-	connection = new GraphicConnection(editor,
-					 src,
-					 outlet,
-					 dst,
-					 inlet,
-					 fc);
+	fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
+					       dst.getFtsObject(), inlet);
+	
+	connection = new GraphicConnection(editor, 
+					   src, outlet,
+					   dst, inlet,
+					   fc.getType(), fc);
 		
 	editor.getDisplayList().add(connection);
 	editor.getDisplayList().sortDisplayList();

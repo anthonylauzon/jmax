@@ -291,12 +291,10 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 	GraphicConnection connection;
 	FtsConnection fc = (FtsConnection)connections[i];
 
-	connection = new GraphicConnection( this, 
-					  displayList.getGraphicObjectFor(fc.getFrom()),
-					  fc.getFromOutlet(), 
-					  displayList.getGraphicObjectFor(fc.getTo()),
-					  fc.getToInlet(),
-					  fc);
+	connection = new GraphicConnection(this, 
+					   displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
+					   displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
+					   fc.getType(), fc);
 	displayList.add(connection);
 	connection.updateDimensions();
       }
@@ -1175,12 +1173,3 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       itsPatcherData.startUpdates();
   }
 }
-
-
-
-
-
-
-
-
-

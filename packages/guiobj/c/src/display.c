@@ -119,10 +119,11 @@ display_alarm(fts_alarm_t *alarm, void *o)
 	    {
 	      sprintf(this->string, "~ %g", this->absmax);
 	      this->last = this->absmax;
-	      this->absmax = MIN_FLOAT;
 	      
 	      fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
 	    }
+
+	  this->absmax = MIN_FLOAT;
 	  
 	  fts_alarm_set_delay(&this->alarm, this->period);
 	  fts_alarm_arm(&this->alarm);

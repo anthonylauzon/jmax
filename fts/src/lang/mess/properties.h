@@ -80,7 +80,6 @@ extern void fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts
 extern void fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property);
 extern const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
 
-
 /* 
    Daemon handling
  */

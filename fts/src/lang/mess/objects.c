@@ -971,17 +971,6 @@ fts_object_get_class_name(fts_object_t *obj)
   return fts_get_class_name(obj->head.cl);
 }
 
-int 
-fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
-{
-  int anything;
-
-  if (fts_class_mess_get(o->head.cl, winlet, s, &anything))  /* @@@anything */
-    return 1;
-  else
-    return 0;
-}
-
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 int 
 fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
@@ -993,7 +982,6 @@ fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
   else
     return fts_object_is_in_patcher((fts_object_t *) fts_object_get_patcher(obj), patcher);
 }
-
 
 /*****************************************************************************
  *
@@ -1140,7 +1128,7 @@ fts_object_blip(fts_object_t *obj, const char *format , ...)
 
   fts_patcher_blip(fts_object_get_patcher(obj), buf);
 }
-    
+
 /**************************************************************************************
  *
  *  debug print 

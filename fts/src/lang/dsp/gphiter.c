@@ -28,22 +28,21 @@
 #include "lang/mess.h"
 #include "gphiter.h"
 
-extern fts_symbol_t fts_s_dspgraph_replace;
+extern fts_symbol_t fts_s_propagate_input;
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
-typedef struct stack_element_t stack_element_t;
+typedef struct stack_element stack_element_t;
 
-struct stack_element_t {
+struct stack_element {
   fts_object_t *object;
+  fts_connection_t *remember;
   fts_connection_t *connection;
   stack_element_t *next;
 };
 
 static fts_heap_t *stack_element_heap;
-
 static int inited = 0;
-
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -80,10 +79,12 @@ dump_iter( graph_iterator_t *iter, char *msg)
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-void 
-graph_iterator_push( graph_iterator_t *iter, fts_object_t *object, int outlet)
+static void 
+graph_iterator_push(void *ptr, fts_object_t *object, int outlet)
 {
+  graph_iterator_t *iter = (graph_iterator_t *)ptr;
   stack_element_t *new, *elem;
+  fts_connection_t* connection;
 
   if (!inited)
     {
@@ -101,9 +102,12 @@ graph_iterator_push( graph_iterator_t *iter, fts_object_t *object, int outlet)
   new->object = object;
 
   if (object->out_conn)
-    new->connection = object->out_conn[outlet];
+    connection = object->out_conn[outlet];
   else
-    new->connection = 0;
+    connection = 0;
+
+  new->connection = connection;
+  new->remember = 0;
 
   new->next = iter->top;
 
@@ -128,7 +132,7 @@ graph_iterator_step( graph_iterator_t *iter)
   if (!iter->top)
     return;
 
-  if ( !iter->top->connection)
+  if (!iter->top->connection)
     {
       graph_iterator_pop( iter);
       graph_iterator_step( iter);
@@ -138,18 +142,20 @@ graph_iterator_step( graph_iterator_t *iter)
       /* try to replace object by */
       stack_element_t *oldtop = iter->top;
       fts_object_t *dest = iter->top->connection->dst;
-      fts_atom_t a[2];
+      fts_atom_t a[3];
       fts_status_t stat;
 
-      fts_set_ptr(a + 0, iter);
-      fts_set_int(a + 1, iter->top->connection->winlet);
-      stat = fts_message_send(dest, fts_SystemInlet, fts_s_dspgraph_replace, 2, a);
+      /* try to get successor of eventual "thru" object */
+      fts_set_fun(a + 0, (fts_fun_t)graph_iterator_push);
+      fts_set_ptr(a + 1, iter);
+      fts_set_int(a + 2, iter->top->connection->winlet);
+      stat = fts_message_send(dest, fts_SystemInlet, fts_s_propagate_input, 2, a);
 
       if(stat == fts_Success)
 	{
-	  /* advance to skip replaced object */
-	  oldtop->connection = oldtop->connection->next_same_src;
-	  
+	  /* skip "thru" object */
+	  oldtop->remember = oldtop->connection;
+	  oldtop->connection = oldtop->connection->next_same_src;	  
 	  graph_iterator_step( iter);
 	}
     }
@@ -199,5 +205,31 @@ graph_iterator_get_current( const graph_iterator_t *iter, fts_object_t **obj, in
     {
       *obj = iter->top->connection->dst;
       *inlet = iter->top->connection->winlet;
+    }
+}
+
+int
+graph_iterator_has_connection_stack(const graph_iterator_t *iter)
+{
+  return (iter->top != 0);
+}
+
+fts_connection_t *
+graph_iterator_get_current_connection(const graph_iterator_t *iter)
+{
+  return iter->top->connection;
+}
+
+void 
+graph_iterator_apply_to_connection_stack(const graph_iterator_t *iter, graph_iterator_connection_function_t fun, void *arg)
+{
+  stack_element_t *elem = iter->top;
+
+  while(elem)
+    {
+      if(elem->remember)
+	fun(elem->remember, arg);
+
+      elem = elem->next;
     }
 }

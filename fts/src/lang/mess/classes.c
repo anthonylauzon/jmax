@@ -493,7 +493,7 @@ fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything)
 
   messtable = in->messlist;
 
-  for (i = 0; i < in->nmess; i++)
+  for (i = 0; i < (int)in->nmess; i++)
     {
       if (messtable[i]->tmess.symb == s)
 	{
@@ -553,13 +553,76 @@ fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg)
   return 0;
 }
 
+int
+fts_class_has_method(fts_class_t *cl, int inlet, fts_symbol_t s)
+{
+  fts_inlet_decl_t *in;
+  fts_class_mess_t **mess;
+  int i; 
 
-/******************************************************************************/
-/*                                                                            */
-/*                    Equivalence Function Library                            */
-/*                                                                            */
-/******************************************************************************/
+  if (inlet == fts_SystemInlet)
+    in = cl->sysinlet;
+  else if (inlet < cl->ninlets && inlet >= 0)
+    in = &cl->inlets[inlet];
 
+  mess = in->messlist;
+
+  for(i=0; i<(int)in->nmess; i++)
+    {
+      if ((*mess)->tmess.symb == s)
+	return 1;
+
+      mess++; 
+    }
+  
+  return 0;
+}
+
+/*****************************************************************************
+ *
+ *  "thru" classes
+ *
+ *  Thru classes don't type in- and outlets.
+ *  The input propagates directly to the output or the output of another object.
+ *
+ *  Thru classes must implement a method fts_s_propagate_input.
+ *  This message is send to each object while traversing the graph in order 
+ *  propagate there input to their outputs (e.g. fork) or directly to the output 
+ *  of other objects connected by index, name or variable (e.g. inlet/outlet, send/receive).
+ *
+ *  The called method will declare one by one the outlets to which the input 
+ *  is propagated using the received function and context (structure).
+ *    
+ *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+ *     void *propagate_context = (fts_dspgraph_t *)fts_get_ptr(at + 1);
+ *
+ *     propagate_fun(propagate_context, <object>, <outlet>);
+ *
+ */
+
+void
+fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input)
+{
+  fts_atom_t a;
+
+  if(propagate_input)
+    fts_method_define_varargs(class, fts_SystemInlet, fts_s_propagate_input, propagate_input);
+
+  fts_set_int(&a, 1);
+  fts_class_put_prop(class, fts_s_thru, &a);
+}
+
+int
+fts_class_is_thru(fts_class_t *class)
+{
+  return (fts_class_get_prop(class, fts_s_thru) != 0);
+}
+
+/*****************************************************************************
+ *
+ *  equivalence function library
+ *
+ */
 int
 fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
 {

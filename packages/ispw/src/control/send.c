@@ -257,17 +257,17 @@ send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-send_dspgraph_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this  = (send_t *)o;
-  fts_dspgraph_t *graph = (fts_dspgraph_t *)fts_get_ptr(at + 0);
-  int in = fts_get_int(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+  void *propagate_context = fts_get_ptr(at + 1);
   receive_t *rcv;
 
   rcv = this->receive_list->first_receive;
   while(rcv)
     {
-      fts_dspgraph_insert(graph, (fts_object_t *)rcv, 0);
+      propagate_fun(propagate_context, (fts_object_t *)rcv, 0);
       rcv = rcv->next_receive;
     }
 }
@@ -286,7 +286,7 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_init, send_init, 2, a);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, send_delete, 0, 0);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dspgraph_replace, send_dspgraph_replace);
+  fts_class_define_thru(cl, send_propagate_input);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
 
@@ -340,8 +340,8 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
   fts_method_define(cl, fts_SystemInlet, fts_s_init, receive_init, 2, a);
-
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, receive_delete, 0, 0);
+  fts_class_define_thru(cl, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
 

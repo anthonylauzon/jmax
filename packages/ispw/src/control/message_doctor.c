@@ -60,4 +60,4 @@ void messbox_doctor_init(void)
 {
   fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);
 }
-    
+

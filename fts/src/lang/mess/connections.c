@@ -28,6 +28,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+#include "lang/dsp/gphiter.h"
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while
@@ -48,7 +49,8 @@ static fts_heap_t *connection_heap;
 /*                                                                            */
 /******************************************************************************/
 
-void fts_connections_init()
+void 
+fts_connections_init()
 {
   connection_heap = fts_heap_new(sizeof(fts_connection_t));
 }
@@ -59,25 +61,30 @@ void fts_connections_init()
 /*                                                                            */
 /******************************************************************************/
 
-fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+fts_connection_t *
+fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
   fts_class_mess_t *mess = 0;
   fts_connection_t *conn;
+  int invalid = 0;
   int anything;
 
-  /* first of all, if one of the two object is an error object,
-     add the required inlets/outlets to it */
-
+  /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
   if (fts_object_is_error(out))
-    fts_error_object_fit_outlet(out, woutlet);
+    {
+      fts_error_object_fit_outlet(out, woutlet);
+      invalid = 1;
+    }
 
   if (fts_object_is_error(in))
-    fts_error_object_fit_inlet(in, winlet);
+    {
+      fts_error_object_fit_inlet(in, winlet);
+      invalid = 1;
+    }
 
   /* check the outlet range (should never happen, a part from loading) */
-
   if (woutlet >= out->head.cl->noutlets || woutlet < 0)
     {
       fts_object_blip(out, "Outlet out of range");
@@ -101,7 +108,6 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
   }
 
   /* find the outlet and the inlet in the class structure */
-
   outlet = &out->head.cl->outlets[woutlet];
 
   if (winlet == fts_SystemInlet)
@@ -114,11 +120,11 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
       return 0;
     }
 
-  if (outlet->tmess.symb)
+  if(outlet->tmess.symb)
     {
       mess = fts_class_mess_inlet_get(inlet, outlet->tmess.symb, &anything);
 
-      if (! mess)
+      if(!mess)
 	{
 	  fts_object_blip(out, "Type mismatch, cannot connect");
 	  return 0;
@@ -132,6 +138,11 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
   conn->woutlet = woutlet;
   conn->dst = in;
   conn->winlet = winlet;
+
+  if(invalid)
+    conn->type = fts_c_invalid;
+  else
+    conn->type = fts_c_anything;
 
   if (id != FTS_NO_ID)
     fts_connection_table_put(id, conn);
@@ -168,7 +179,6 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
     }
 
   /* add the connection to the outlet list and to the inlet list  */
-
   if (! out->out_conn[woutlet])
     {
       conn->next_same_src = 0;
@@ -191,21 +201,27 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
       in->in_conn[winlet] = conn;
     }
 
+  /* if(conn->type == fts_c_signal)
+     connection_propagate_signal_type(conn, fts_c_signal);
+  */
+
   return conn;
 }
 
-
-
-static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
+static void 
+fts_object_do_disconnect(fts_connection_t *conn, int do_client)
 { 
   fts_object_t *src;
   fts_object_t *dst;
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
 
-  /* First, release the client representation of the connection,
-     if any */
-  
+  /*
+  if(conn->type == fts_c_signal)
+    connection_propagate_signal_type(conn, fts_c_anything);
+  */
+
+  /* First, release the client representation of the connection, if any */
   if (do_client)
     {
       if (conn->id != FTS_NO_ID)
@@ -216,7 +232,6 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
   dst  = conn->dst;
 
   /* look for the connection in the output list of src, and remove it */
-
   for (p = &src->out_conn[conn->woutlet]; *p ; p = &((*p)->next_same_src))
     {
       if ((*p) == conn)
@@ -227,7 +242,6 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
     }
 
   /* look for it  in the input list of in, and remove it*/
-
   for (p = &dst->in_conn[conn->winlet]; *p ; p = &((*p)->next_same_dst))
     if ((*p) == conn)
       {
@@ -236,12 +250,10 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
       }
 
   /* Unregister the connection */
-
   if (do_client && conn->id != FTS_NO_ID)
     fts_connection_table_remove(conn->id);
 
   /* Free the connection, and return */
-
   fts_heap_free((char *) conn, connection_heap);
 }
 
@@ -250,19 +262,20 @@ void fts_connection_delete(fts_connection_t *conn)
   fts_object_do_disconnect(conn, 1);
 }
 
-static void fts_connection_delete_ignore_id(fts_connection_t *conn)
+static void 
+fts_connection_delete_ignore_id(fts_connection_t *conn)
 {
   fts_object_do_disconnect(conn, 0);
 }
 
 /*   
-   This function move the connection of the object old to
-   the object new; it delete the connections that are
-   no more pertinent; if the connection have an ID, it
-   is kept.
-   */
-
-void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
+ * This function move the connection of the object old to
+ * the object new; it delete the connections that are
+ * no more pertinent; if the connection have an ID, it
+ * is kept.
+ */
+void 
+fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 {
   int inlet, outlet;
   fts_atom_t at[1];
@@ -292,16 +305,13 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 		{
 		  fts_connection_delete_ignore_id(p);
 
-		  /* Redefine the connection on the client side if needed*/
-		  
+		  /* Redefine the connection on the client side if needed */
 		  if (do_client && (new_c->id != FTS_NO_ID))
 		    fts_client_redefine_connection(new_c);
 		}
 	      else
 		{
-		  /* we got an error in redoing the connection,
-		     simply throw the old one away */
-
+		  /* we got an error in redoing the connection, simply throw the old one away */
 		  fts_connection_delete(p);
 		}
 	    }
@@ -312,9 +322,7 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 
     }
 
-  /* reproduce in new, and delete in old,  
-     all the old incoming connections */
-
+  /* reproduce in new, and delete in old, all the old incoming connections */
   for (inlet = 0; inlet < old->head.cl->ninlets; inlet++)
     {
       fts_connection_t *p;
@@ -361,9 +369,8 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
  * delete all the connections that will be not pertinent
  * anymore; tell the client also !!
  */
-
-
-void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
+void 
+fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
 {
   int inlet;
 
@@ -381,7 +388,8 @@ void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
 }
 
 
-void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
+void 
+fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
 {
   int outlet;
   fts_patcher_t *patcher;
@@ -400,15 +408,11 @@ void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
     }
 }
 
-
-/* Debug print 
-
-   A connection is printed as 
-
-   <CONNECTION fromId.outlet toId.inlet #id>
-*/
-
-void fprintf_connection(FILE *f, fts_connection_t *conn)
+/* (debug) print a connection as:
+ * <CONNECTION fromId.outlet toId.inlet #id>
+ */
+void 
+fprintf_connection(FILE *f, fts_connection_t *conn)
 {
   if (conn != 0)
     fprintf(f, "<CONNECTION %d.%d %d.%d #%d>",
@@ -417,8 +421,19 @@ void fprintf_connection(FILE *f, fts_connection_t *conn)
     fprintf(f, "<CONNECTION null>");
 }
 
-
-
-
-
-
+/**********************************************************************
+ *
+ *  mark signal connections
+ *
+ */
+void 
+fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type)
+{
+  if(connection->type != type)
+    {
+      connection->type = type;
+      
+      if (connection->id != FTS_NO_ID)
+	fts_client_redefine_connection(connection);
+    }
+}

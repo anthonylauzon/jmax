@@ -42,13 +42,15 @@ import ircam.jmax.editors.patcher.interactions.*;
 // methods (mouseclick, move, doubleclick...).
 //
 
-public class GraphicConnection implements DisplayObject
+public class GraphicConnection implements DisplayObject, FtsConnectionListener
 {
   private GraphicObject from;
   private int         outlet;
 
   private GraphicObject to;
   private int         inlet;
+
+  private int         type;
 
   private ErmesSketchPad sketch;
   private FtsConnection ftsConnection;
@@ -65,9 +67,10 @@ public class GraphicConnection implements DisplayObject
   private float length;
 
   public GraphicConnection(ErmesSketchPad theSketchPad,
-			 GraphicObject fromObj, int theOutlet,
-			 GraphicObject toObj, int theInlet,
-			 FtsConnection theFtsConnection) 
+			   GraphicObject fromObj, int theOutlet,
+			   GraphicObject toObj, int theInlet, 
+			   int theType, 
+			   FtsConnection theFtsConnection) 
   {
     ftsConnection = theFtsConnection;
     from    = fromObj;
@@ -75,7 +78,10 @@ public class GraphicConnection implements DisplayObject
     sketch     = theSketchPad;
     inlet      = theInlet;
     outlet     = theOutlet;
+    type = theType;
     selected         = false;
+
+    ftsConnection.setConnectionListener(this);
   }
 
   public void updateDimensions()
@@ -91,6 +97,10 @@ public class GraphicConnection implements DisplayObject
     length = (float) Math.sqrt((start.x - end.x)*(start.x - end.x) + (start.y - end.y)*(start.y - end.y));
   }
 
+  public void updateType()
+  {
+    type = ftsConnection.getType();
+  }
 
   public GraphicObject getSourceObject() 
   {
@@ -130,6 +140,12 @@ public class GraphicConnection implements DisplayObject
   {
     ftsConnection.delete();
     sketch.getDisplayList().remove(this);
+  }
+
+  public void typeChanged(int theType)
+  {
+    type = theType;
+    redraw();
   }
 
   //--------------------------------------------------------
@@ -192,7 +208,14 @@ public class GraphicConnection implements DisplayObject
 
   public void paint( Graphics g) 
   {
-    g.setColor( Color.black);
+    Color aubergine = new Color(100, 100, 190);
+
+    if(type == FtsConnection.fts_connection_invalid)
+      g.setColor( Color.gray);
+    else if(type == FtsConnection.fts_connection_signal)
+      g.setColor( Color.magenta.darker());
+    else
+      g.setColor( Color.black);
 
     if ( selected) 
       {
@@ -283,5 +306,3 @@ public class GraphicConnection implements DisplayObject
   }
   
 }
-
-

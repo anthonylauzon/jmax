@@ -184,12 +184,21 @@ static void
 send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this = (send_t *) o;
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  channel_t *channel = (channel_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, channel_class);
+  channel_t *channel = 0;
+
+  if(fts_is_symbol(at + 1))
+    {
+      fts_symbol_t name = fts_get_symbol(at + 1);
+      
+      channel = (channel_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, channel_class);
+      
+      fts_variable_add_user(fts_object_get_patcher(o), name, o);
+    }
+  else if(fts_is_a(at + 1, fts_s_channel))
+    channel = (channel_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)channel);
   channel_add_send(channel, this);
-  fts_variable_add_user(fts_object_get_patcher(o), name, o);
   this->channel = channel;
 }
 
@@ -236,15 +245,24 @@ static void
 receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   receive_t *this = (receive_t *) o;
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  channel_t *channel = (channel_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, channel_class);
+  channel_t *channel = 0;
+
+  if(fts_is_symbol(at + 1))
+    {
+      fts_symbol_t name = fts_get_symbol(at + 1);
+      
+      channel = (channel_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, channel_class);
+      
+      fts_variable_add_user(fts_object_get_patcher(o), name, o);
+    }
+  else if(fts_is_a(at + 1, fts_s_channel))
+    channel = (channel_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)channel);
   channel_add_receive(channel, this);
-  fts_variable_add_user(fts_object_get_patcher(o), name, o);
   this->channel = channel;
 }
-
+  
 static void
 receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -282,4 +300,5 @@ fts_channel_config(void)
 {
   fts_class_install(fts_s_channel, channel_instantiate);
   channel_class = fts_class_get_by_name(fts_s_channel);
+  fts_atom_type_register(fts_s_channel, channel_class);
 }

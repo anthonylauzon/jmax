@@ -80,8 +80,6 @@
 #define REDEFINE_OBJECT_CODE               'R'
 #define REDEFINE_PATCHER_CODE              'Q'
 #define REMOTE_CALL_CODE                   '!'
-#define REPOSITION_INLET                   'X'
-#define REPOSITION_OUTLET                  'Y'
 #define SAVE_PATCHER_BMAX_CODE             'S'
 #define SYNC_CODE                          '>'
 #define SYNC_DONE_CODE                     '<'
