@@ -28,6 +28,8 @@ package ircam.jmax.mda;
 import java.util.*;
 import javax.swing.*;
 
+import ircam.jmax.script.*;
+
 /**
  * This class represent a type of editable document, with 
  * all its interesting properties.
@@ -62,6 +64,15 @@ abstract public class MaxDocumentType
   /** The document list */
 
   DefaultListModel documentList = new DefaultListModel();
+
+  /** The scripts defined for this document type */
+  
+  Vector itsScripts;
+
+  /** The scripts defined for this all document types */
+  
+  static Vector itsGlobalScripts;
+
 
   /*****************************************************************************/
   /*                                                                           */
@@ -179,6 +190,48 @@ abstract public class MaxDocumentType
   public DefaultListModel getDocuments()
   {
     return documentList;
+  }
+
+  /*****************************************************************************/
+  /*                                                                           */
+  /*                             Scripts                                       */
+  /*                                                                           */
+  /*****************************************************************************/
+
+  public void addScript(ScriptAction a) 
+  {
+      if (itsScripts == null) {
+	itsScripts = new Vector();
+      }
+      itsScripts.addElement(a);
+  }
+
+  public int countScripts() 
+  {
+      return (itsScripts != null) ? itsScripts.size() : 0;
+  }
+
+  public ScriptAction getScript(int i) 
+  {
+      return (ScriptAction) itsScripts.elementAt(i);
+  }
+
+  public static void addGlobalScript(ScriptAction a) 
+  {
+      if (itsGlobalScripts == null) {
+	itsGlobalScripts = new Vector();
+      }
+      itsGlobalScripts.addElement(a);
+  }
+
+  public static int countGlobalScripts() 
+  {
+      return (itsGlobalScripts != null) ? itsGlobalScripts.size() : 0;
+  }
+
+  public static ScriptAction getGlobalScript(int i) 
+  {
+      return (ScriptAction) itsGlobalScripts.elementAt(i);
   }
 }
 
