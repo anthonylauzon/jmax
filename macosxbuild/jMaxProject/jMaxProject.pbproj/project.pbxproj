@@ -450,6 +450,172 @@
 			settings = {
 			};
 		};
+		F5FC7B010354298B01664092 = {
+			fileRef = F544CD9303387B6001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B0303542A3901664092 = {
+			buildActionMask = 2147483647;
+			files = (
+				F5FC7B0E03542B6B01664092,
+				F5FC7B1003542B6C01664092,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B0403542A3901664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B0503542A3901664092 = {
+			buildActionMask = 2147483647;
+			files = (
+				F5FC7B0B03542B6901664092,
+				F5FC7B0C03542B6A01664092,
+				F5FC7B0D03542B6A01664092,
+				F5FC7B0F03542B6C01664092,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B0603542A3901664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B0703542A3901664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B0803542A3901664092 = {
+			buildPhases = (
+				F5FC7B0303542A3901664092,
+				F5FC7B0403542A3901664092,
+				F5FC7B0503542A3901664092,
+				F5FC7B0603542A3901664092,
+				F5FC7B0703542A3901664092,
+			);
+			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
+				HEADER_SEARCH_PATHS = "../../include ../../packages";
+				OPTIMIZATION_CFLAGS = "-O3";
+				OTHER_CFLAGS = "-Wno-unused";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = libdtd;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = libdtd;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = libdtd;
+			productReference = F5FC7B0903542A3901664092;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F5FC7B0903542A3901664092 = {
+			isa = PBXBundleReference;
+			path = libdtd.bundle;
+			refType = 3;
+		};
+		F5FC7B0B03542B6901664092 = {
+			fileRef = F544CDA30338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B0C03542B6A01664092 = {
+			fileRef = F544CDAF0338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B0D03542B6A01664092 = {
+			fileRef = F544CDB00338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B0E03542B6B01664092 = {
+			fileRef = F587D35B0339D10401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B0F03542B6C01664092 = {
+			fileRef = F587D35C0339D10401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B1003542B6C01664092 = {
+			fileRef = F587D35D0339D10401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FC7B1103542BB101664092 = {
+			isa = PBXTargetDependency;
+			target = F5FC7B0803542A3901664092;
+		};
+		F5FC7B1203542EAD01664092 = {
+			buildActionMask = 12;
+			dstPath = share/jmax/packages/dtd/c;
+			dstSubfolderSpec = 7;
+			files = (
+				F5FC7B1403542EF901664092,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FC7B1403542EF901664092 = {
+			fileRef = F544CDC10338861901664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5FDEF8D0328BD2801664092 = {
 			isa = PBXFileReference;
 			path = JMaxWrapper.java;
@@ -567,6 +733,7 @@
 				F80A5F55028FD44C01664092,
 				F80A5F56028FD44C01664092,
 				F80A5F57028FD44C01664092,
+				F5FC7B1103542BB101664092,
 				F80A5F58028FD44C01664092,
 			);
 			isa = PBXAggregateTarget;
@@ -12378,6 +12545,7 @@
 				F8512352028BE5ED01664092,
 				F8512385028BE77D01664092,
 				F85123A0028BE77D01664092,
+				F5FC7B0803542A3901664092,
 				F880FFF80283022401664092,
 			);
 		};
@@ -12481,6 +12649,7 @@
 				F823078302916C7401664092,
 				F823078402916C7401664092,
 				F823078502916C7401664092,
+				F5FC7B0903542A3901664092,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -13208,6 +13377,7 @@
 				F8677A6002E5C2CF01664092,
 				F82C2A0A02E5DB1001664092,
 				F5EF54350352D8FC01664092,
+				F5FC7B010354298B01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17102,6 +17272,7 @@
 				F8512515028BED1101664092,
 				F851252E028BED1101664092,
 				F8512535028BED1101664092,
+				F5FC7B1203542EAD01664092,
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;

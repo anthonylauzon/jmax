@@ -22,7 +22,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include <fts/fts.h> 
 #include <fts/thread.h>
 #include "dtd_buffer.h"
 #include "dtd_thread.h"

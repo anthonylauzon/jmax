@@ -30,6 +30,7 @@
 #define DEFAULT_DELAY_MS 50
 
 static fts_symbol_t dtd_thread_symbol;
+fts_class_t* dtd_thread_type;
 
 /* 
    !!!! No return because must be in a infinite thread !!!
