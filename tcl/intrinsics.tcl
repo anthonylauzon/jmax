@@ -55,3 +55,13 @@ proc defineHost {name type} {
 
     set jmaxHostTypeTable($name) $type
 }
+
+##
+## Load a module following the standard  naming conventions
+##
+
+proc loadModule { name libdir } {
+    global jmaxArch jmaxMode
+
+    ucs load module $name "$libdir/$jmaxArch/$jmaxMode/lib$name.so"
+}
