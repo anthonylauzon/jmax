@@ -40,4 +40,10 @@ extern fts_object_t *fts_template_new_search(fts_patcher_t *patcher, int ac, con
 
 extern void fts_template_file_modified(fts_symbol_t filename);
 
+fts_template_t* fts_new_declared_template(fts_symbol_t name, fts_symbol_t filename);
+fts_template_t* fts_new_cached_template(fts_symbol_t name, fts_symbol_t filename);
+fts_template_t* fts_new_binary_template(fts_symbol_t name, unsigned char *program, fts_symbol_t *symbol_table);
+
+
+
 #endif

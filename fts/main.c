@@ -26,6 +26,10 @@
 
 #include <windows.h>
 
+#define is_white(_c)   (strchr(" \t\n\r", _c) != NULL)
+#define is_black(_c)   (strchr(" \t\n\r", _c) == NULL)
+#define is_quote(_c)   ((_c) == '"')
+
 /**************************************
  *
  *      WinMain
@@ -34,22 +38,51 @@ int PASCAL
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
 	LPSTR lpszCmdLine, int nCmdShow) 
 {
+#define MAX_ARGC  64
+  char* argv[MAX_ARGC];
   int argc = 0;
-  char* argv[32];
   char* s;
-  int expect_string = 1;
+  int state = 0;  
 
-  /* Tokenize the command line */
   argv[argc++] = "fts";
-  
+
+  /* Tokenize the command line and append them to the command line */
   s = lpszCmdLine;
+
+  /* Basic state machine:
+       state 0 = in white, 
+       state 1 = in unquoted string, 
+       state 2 = in quoted string 
+  */
   while (*s != 0) {
-    if (isgraph(*s) && expect_string) {
-      argv[argc++] = s;
-      expect_string = 0;
-    } else if (!isgraph(*s) && !expect_string) {
-      *s = 0;
-      expect_string = 1;
+    switch (state) {
+    case 0:
+      if (is_quote(*s)) {
+	argv[argc++] = s + 1;
+	state = 2;
+      } else if (is_black(*s)) {
+	argv[argc++] = s;
+	state = 1;	
+      }
+      break;
+
+    case 1:
+      if (is_quote(*s)) {
+	*s = 0;
+	argv[argc++] = s + 1;
+	state = 2;
+      } else if (is_white(*s)) {
+	*s = 0;
+	state = 0;	
+      }
+      break;
+
+    case 2:
+      if (is_quote(*s)) {
+	*s = 0;
+	state = 0;
+      }
+      break;
     }
     s++;
   }

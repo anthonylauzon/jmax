@@ -21,6 +21,11 @@
  */
 #include <fts/fts.h>
 #include <windows.h>
+#include <direct.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "ftsconfig-win32.h"
 
 HINSTANCE fts_hinstance = NULL;
@@ -178,4 +183,73 @@ void fts_platform_init( int argc, char **argv)
   /* boost the priority of the fts thread */
   SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+}
+
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Root                                                                        */
+/*                                                                             */
+/* *************************************************************************** */
+
+#define JMAX_KEY        "Software\\Ircam\\jMax\\3.0" 
+
+static int
+fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
+{
+  DWORD type, size;
+  
+  if (RegQueryValueEx(key, name, 0, &type, 0, &size) == 0
+      && type == REG_SZ
+      && (size < (unsigned int)bufsize)) {
+    if (RegQueryValueEx(key, name, 0, 0, buf, &size) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int 
+fts_get_root_from_registry(char *buf, int bufsize)
+{
+  HKEY key;
+
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
+    post("Error opening registry key '%s'\n", JMAX_KEY);
+    return 0;
+  }
+  
+  if (!fts_get_string_from_registry(key, "ftsRoot", buf, bufsize)) {
+    post("Failed reading value of registry key:\n\t%s\\ftsRoot\n", JMAX_KEY);
+    RegCloseKey(key);
+    return 0;
+  }
+
+  return 1;
+}
+
+fts_symbol_t 
+fts_get_default_root_directory( void)
+{
+  char root[_MAX_PATH];
+  int i;
+
+  /* first check the registry */
+  if (!fts_get_root_from_registry(root, _MAX_PATH)) {
+
+    /* otherwise, calculate the root from the current directory */
+    if (_getcwd(root, _MAX_PATH) == NULL) {
+      return NULL;
+    }
+    /* move one directory up */
+    i = strlen(root);
+    while (--i >= 0) {
+      if (root[i] == '\\') {
+	root[i] = 0;
+	break;
+      }
+    }
+  }
+
+  return fts_new_symbol( root);
 }

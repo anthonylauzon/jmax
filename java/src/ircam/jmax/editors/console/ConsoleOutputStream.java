@@ -37,6 +37,7 @@ class ConsoleOutputStream extends OutputStream
 {
   private ConsoleArea consoleArea;
   private StringBuffer buffer;
+  int prev;
 
   public ConsoleOutputStream( ConsoleArea consoleArea)
   {
@@ -46,17 +47,31 @@ class ConsoleOutputStream extends OutputStream
 
   public void write( int b) 
   {
-      if (b != '\n')
-	  buffer.append( (char)b );
-      else
-	  flush();
+      System.err.println("c=" + (char) b + "=" + b);
+
+      /* We have to handle the "\r\n" sequence on the windows
+         systems. */
+      if (b == '\r') {
+	appendToConsole();
+      } else if (b == '\n') {
+	if (prev != '\r') {
+  	  appendToConsole();
+	}
+      } else {
+	buffer.append( (char)b );
+      }
+      
+      prev = b;
+  }
+
+  public void appendToConsole()
+  {
+    consoleArea.append( buffer.toString());
+    buffer.setLength(0);
   }
 
   public void flush()
   {
-    consoleArea.append( buffer.toString());
-
-    buffer.setLength(0);
   }
 
   public void close()

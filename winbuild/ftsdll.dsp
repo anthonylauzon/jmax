@@ -181,6 +181,10 @@ SOURCE=..\fts\inout.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\list.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\loader.c
 # End Source File
 # Begin Source File

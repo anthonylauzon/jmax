@@ -334,7 +334,8 @@ public class ConsoleArea extends JComponent implements Scrollable {
       }
 
     // add the line to the buffer
-    buffer[ (first + nLines) % rows] = line;
+    int linenum = (first + nLines) % rows;
+    buffer[linenum] = line;
     nLines++;
 
     int y = (nLines - 1) * lineHeight;

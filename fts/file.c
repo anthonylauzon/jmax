@@ -36,6 +36,10 @@
 #include <io.h>
 #endif
 
+#if HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+
 #if HAVE_DIRECT_H
 #include <direct.h>
 #endif
@@ -48,6 +52,7 @@
 #ifdef WIN32
 
 #define fts_path_separator      ';'
+#define fts_file_separator      '\\'
 #define fts_path_is_absolute(_p) \
  ((_p[0] == '/') || \
   ((_p[1] == ':') && (_p[2] == '/')) || \
@@ -55,6 +60,7 @@
 
 #else
 #define fts_path_separator      ':'
+#define fts_file_separator      '/'
 #define fts_path_is_absolute(_p) (_p[0] == '/')
 #endif
 
@@ -323,3 +329,15 @@ fts_get_project_dir(void)
     }
 }
 
+fts_symbol_t 
+fts_make_absolute_path(fts_symbol_t parent, fts_symbol_t file)
+{
+  char buf[MAXPATHLEN];
+  
+  if (!fts_path_is_absolute(fts_symbol_name(file))) {
+    sprintf(buf, "%s%c%s", fts_symbol_name(parent), fts_file_separator, fts_symbol_name(file));
+    return fts_new_symbol(buf);
+  } else {
+    return file;
+  }
+}

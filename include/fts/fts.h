@@ -82,6 +82,7 @@ extern "C" {
 #include <fts/stack.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
+#include <fts/list.h>
 #include <fts/objectlist.h>
   /*#include <fts/objectset.h>*/
 

@@ -70,4 +70,6 @@ FTS_API fts_symbol_t fts_get_search_path(void);
 FTS_API void fts_set_project_dir(fts_symbol_t project_dir);
 FTS_API fts_symbol_t fts_get_project_dir(void);
 
+FTS_API fts_symbol_t fts_make_absolute_path(fts_symbol_t parent, fts_symbol_t file);
+
 #endif

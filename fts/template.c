@@ -64,7 +64,6 @@
 #include <ftsprivate/loader.h>
 
 /* Template */
-
 enum template_mode {fts_template_filename_cached, fts_template_declaration, fts_template_binary_cached};
 
 struct fts_template
@@ -120,6 +119,7 @@ static void fts_template_register_filename(fts_symbol_t name, fts_symbol_t filen
 #endif
 }
 
+
 void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts_symbol_t *symbol_table)
 {
   fts_template_t *template;
@@ -144,6 +144,83 @@ void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts
   fprintf(stderr, "Registered binary template %s\n", fts_symbol_name(name)); /* @@@@ */
 #endif
 }
+
+/****************************************************************/
+/****************************************************************/
+/****************************************************************/
+/****************************************************************/
+
+fts_template_t* 
+fts_new_file_template(fts_symbol_t name, fts_symbol_t filename, enum template_mode mode);
+
+fts_template_t* 
+fts_new_declared_template(fts_symbol_t name, fts_symbol_t filename)
+{
+  return fts_new_file_template(name, filename, fts_template_declaration);
+}
+
+fts_template_t* 
+fts_new_cached_template(fts_symbol_t name, fts_symbol_t filename)
+{
+  return fts_new_file_template(name, filename, fts_template_filename_cached);
+}
+
+fts_template_t* 
+fts_new_file_template(fts_symbol_t name, fts_symbol_t filename, enum template_mode mode)
+{
+  char buf[MAXPATHLEN];
+  fts_template_t *template;
+  fts_atom_t d, k;
+
+  /* resolve the links in the path, so that we have a unique name 
+     for the file */
+  realpath(fts_symbol_name(filename), buf);
+  filename = fts_new_symbol_copy(buf);
+
+  /* Make the template */
+  template = (fts_template_t *) fts_heap_alloc(template_heap);
+
+  template->name = name;
+  template->filename = filename;
+  template->instances = 0;
+  template->mode = mode;
+
+#ifdef TEMPLATE_DEBUG 
+  fprintf(stderr, "Registered template %s file %s mode %s\n",
+	  fts_symbol_name(name), fts_symbol_name(filename),
+	  ( mode == fts_template_declaration ? "declaration" : "cache")); /* @@@@ */
+#endif
+
+  return template;
+}
+
+fts_template_t* 
+fts_new_binary_template(fts_symbol_t name, unsigned char *program, fts_symbol_t *symbol_table)
+{
+  fts_template_t *template;
+  fts_atom_t d, k;
+
+  /* Make the template */
+  template = (fts_template_t *) fts_heap_alloc(template_heap);
+
+  template->name = name;
+  template->instances = 0;
+  template->binary.program = program;
+  template->binary.symbol_table = symbol_table;
+
+  template->mode = fts_template_binary_cached;
+
+#ifdef TEMPLATE_DEBUG 
+  fprintf(stderr, "Registered binary template %s\n", fts_symbol_name(name)); /* @@@@ */
+#endif
+
+  return template;
+}
+
+/****************************************************************/
+/****************************************************************/
+/****************************************************************/
+/****************************************************************/
 
 
 static void fts_template_redefine(fts_template_t *template, fts_symbol_t filename)

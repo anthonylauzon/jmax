@@ -210,6 +210,7 @@ extern void fts_kernel_soundfile_init( void);
 extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
+extern void fts_kernel_list_init( void);
 
 extern void fts_oldclient_start( void);
 
@@ -251,6 +252,7 @@ void fts_init( int argc, char **argv)
   fts_kernel_soundfile_init();
   fts_kernel_oldclient_init();
   fts_kernel_olducs_init();
+  fts_kernel_list_init();
 
   fts_cmd_args_parse( argc, argv);
 

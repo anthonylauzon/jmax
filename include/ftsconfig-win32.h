@@ -22,7 +22,9 @@
 #ifndef _CONFIG_WIN32_H
 #define _CONFIG_WIN32_H
 
+#ifndef M_PI
 #define M_PI  3.1415926535897932384626433832795
+#endif
 
 /* defines for included headers */
 #undef HAVE_UNISTD_H 
@@ -37,14 +39,13 @@
 #define HAVE_STRING_H 1
 
 /* defines for language features */
-#define restrict 
+#ifndef restrict
+#define restrict
+#endif
+ 
 #undef WORDS_BIGENDIAN 
 
 /* mapping posix names to win32 names */
-/*  #define open  _open */
-/*  #define read  _read */
-/*  #define write  _write */
-/*  #define close  _close */
 #define getcwd _getcwd
 #define isatty _isatty
 #define alloca _alloca
