@@ -694,8 +694,8 @@ fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth
   fts_set_pointer(&v, meth);
   fts_hashtable_put(&cl->export_handlers, &k, &v);
 
-  if(!fts_class_get_method_varargs(cl, fts_s_export))
-  {
+  if (fts_class_get_method_varargs(cl, fts_s_export) == NULL)
+  { /* no export message was defined, so define it now */
     fts_class_message_varargs(cl, fts_s_export, fts_object_export);
     fts_class_message_varargs(cl, fts_s_exportas, fts_object_export_as);
   }
