@@ -54,7 +54,7 @@ public class MidiConfigPanel extends JPanel implements Editor
     setBorder( BorderFactory.createEtchedBorder());
 
     /*********** Table  ******************************************/
-    //initCellEditors();
+    initCellEditors();
 
     midiTable = new JTable( midiModel){
 	public TableCellEditor getCellEditor(int row, int column){
