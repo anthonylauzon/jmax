@@ -33,9 +33,11 @@ ARCH_OPT_SOFLAGS = $(SYSTEM_OPT_SOFLAGS)
 ## FTS specific declarations
 ##
 
-#FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm 
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm 
 # (fd) replaced by (great move...)
-FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lpthread
+# BUT it doesn't work with purify...
+# FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lpthread
+# SO DON'T LINK WITH -lpthread NOW
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 FTS_USER_LIBS_FLAGS = -all
 
