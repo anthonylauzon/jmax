@@ -1,4 +1,3 @@
-
 all:
 	(cd fts; $(MAKE) all)
 	(cd java ; $(MAKE) all)

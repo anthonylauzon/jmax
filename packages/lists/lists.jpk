@@ -6,7 +6,7 @@ global jmaxArch jmaxMode
 ucs load module lists $dir/lib/$jmaxArch/$jmaxMode/liblists.so
 
 ## declare abstractions
-soiurceFile $dir/abs/lists.abs.index.tcl
+sourceFile $dir/abs/lists.abs.index.tcl
 
 ## load the help patch data base
 sourceFile $dir/help/lists.help.index.tcl
