@@ -868,8 +868,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	if(aPatcher.itsSubWindow!=null){
 	  aPatcher.itsSubWindow.CloseAllSubWindows();
 	  aPatcher.itsSubWindow.setVisible(false);
-	  aPatcher.itsSubWindow.dispose();
-	  aPatcher.itsSubWindow = null;
+	  //bug11 aPatcher.itsSubWindow.dispose();
+	  //bug11 aPatcher.itsSubWindow = null;
 	}
       }
     }
@@ -1249,7 +1249,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	CreateFtsGraphics(((ErmesObjExternal)aErmesObject).itsSubWindow); //recursive call
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjPatcher &&
 	  ((ErmesObjPatcher)aErmesObject).itsSubWindow != null)
-	CreateFtsGraphics(((ErmesObjPatcher)aErmesObject).itsSubWindow); //recursive call
+	CreateFtsGraphics(((ErmesObjPatcher)aErmesObject).itsSubWindow);
     }
   }
 }
