@@ -723,18 +723,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   public final void requestSubPatcherUpload()
   {
     if(getEditorFrame() == null)
-      {
-	setEditorFrame( new ErmesSketchWindow(FtsPatcherObject.this));
+    {
+      setEditorFrame( new ErmesSketchWindow(FtsPatcherObject.this));
 
-	try{
-	  send( FtsSymbol.get("upload"));
-	}
-	catch(IOException e)
-	  {
-	    System.err.println("FtsPatcherObject: I/O Error sending upload Message!");
-	    e.printStackTrace(); 
-	  }
+      try{
+        send( FtsSymbol.get("upload"));
       }
+      catch(IOException e)
+      {
+        System.err.println("FtsPatcherObject: I/O Error sending upload Message!");
+        e.printStackTrace(); 
+      }
+    }
     requestOpenEditor();
   }
 
@@ -859,7 +859,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	e.printStackTrace(); 
       }
   }
-
  
   public void requestDeleteObject(FtsObject obj)
   {
@@ -874,6 +873,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	System.err.println("FtsPatcherObject: I/O Error sending delete_objects Message!");
 	e.printStackTrace(); 
       }
+  }
+  
+  public void requestUnregisterObjects()
+  {
+    try{
+      send( FtsSymbol.get("unregister_objects"));
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsPatcherObject: I/O Error sending unregister_ojects Message!");
+      e.printStackTrace(); 
+    }
   }
 
   //used in addObject method to start editing in added object if needed 

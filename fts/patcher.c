@@ -838,6 +838,7 @@ static void
 patcher_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *self = (fts_patcher_t *)o;
+  fts_object_t *p = self->objects;
   set_editor_close(self);
 }
 
@@ -846,7 +847,7 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   fts_patcher_t *self = (fts_patcher_t *) o;
   fts_object_t *p;
-
+  
   if(editor_is_open(self))
   {
     set_editor_close(self);
@@ -859,6 +860,32 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     fts_send_message_varargs(p, fts_s_closeEditor, 0, 0);
     p = fts_object_get_next_in_patcher(p);
   }
+}
+
+static void
+patcher_unregister_objects(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *self = (fts_patcher_t *)o;
+  fts_object_t *p = self->objects;
+  int outlet;
+  
+  while (p)
+  {
+    fts_client_unregister_object( p);
+    
+    for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
+    {
+      fts_connection_t *c;
+      
+      for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
+      {
+        if(fts_object_has_client( (fts_object_t *)c))
+          fts_client_unregister_object((fts_object_t *)c);
+      }
+    }    
+    
+    p = fts_object_get_next_in_patcher(p);
+  }  
 }
 
 /* tool panel support */
@@ -1065,9 +1092,9 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_patcher_t *self = (fts_patcher_t *)o;
   fts_atom_t a[4];
   fts_object_t *p;
-
+  
   if(!fts_object_is_error((fts_object_t *)self))
-  {
+  {    
     fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
 
     fts_object_get_prop((fts_object_t *)self, fts_s_wx, a);
@@ -1077,10 +1104,10 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
     if( fts_get_int( a) && fts_get_int( a+1) && fts_get_int( a+2) && fts_get_int( a+3))
       fts_client_send_message((fts_object_t *)self, sym_setPatcherBounds, 4, a);
-
+    
     for (p = self->objects; p ; p = fts_object_get_next_in_patcher(p))
       fts_object_upload( p);
-
+ 
     for (p = self->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       int outlet;
@@ -2031,6 +2058,7 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, patcher_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, patcher_close_editor);
+  fts_class_message_varargs(cl, fts_new_symbol("unregister_objects"), patcher_unregister_objects);
   fts_class_message_varargs(cl, fts_new_symbol("show_object"), patcher_show_object);
   fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), patcher_stop_waiting);
 

@@ -1275,6 +1275,22 @@ void fts_client_release_object(fts_object_t *obj)
   }
 }
 
+void fts_client_unregister_object(fts_object_t *obj)
+{
+  if(fts_object_has_client(obj))
+  {
+    int client_id = fts_object_get_client_id( obj);
+    client_t *client = client_table_get(client_id);
+    
+    if ( !client)
+    {
+      fts_log("[client] fts_client_release_object: Cannot release object\n");      
+      return;
+    }
+    client_release_object( client, obj);
+  }
+}
+
 /***********************************************************************
 *
 * Initialization

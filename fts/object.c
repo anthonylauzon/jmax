@@ -136,7 +136,6 @@ fts_object_upload(fts_object_t *obj)
     if(container != NULL)
     {
       fts_atom_t a;
-      
       fts_client_register_object(obj, -1);
       
       fts_set_object(&a, obj);
