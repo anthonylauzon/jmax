@@ -184,7 +184,7 @@ fts_package_load(fts_symbol_t name)
   char filename[MAXPATHLEN];
 
   /* locate the directory of the package */
-  if (!fts_find_file(fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
+  if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
       || !fts_is_directory(path)) {
     fprintf(stderr, "Couldn't find package %s\n", fts_symbol_name(name));
     pkg = fts_package_new(name);
@@ -887,9 +887,12 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
     char path[MAXPATHLEN];
     fts_template_t* t;
     fts_atom_t n, p;
+    const char* root;
+
+    root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
 
     snprintf(filename, MAXPATHLEN, "%s.jmax", fts_symbol_name(name));
-    if (!fts_find_file(pkg->template_paths, filename, path, MAXPATHLEN)) {
+    if (!fts_find_file(root, pkg->template_paths, filename, path, MAXPATHLEN)) {
       return NULL;
     }
 
@@ -1035,9 +1038,12 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
     char path[MAXPATHLEN];
     fts_abstraction_t* t;
     fts_atom_t n, p;
+    const char* root;
+
+    root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
 
     snprintf(filename, MAXPATHLEN, "%s.abs", fts_symbol_name(name));
-    if (!fts_find_file(pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
+    if (!fts_find_file(root, pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
       return NULL;
     }
 
@@ -1154,7 +1160,9 @@ fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path)
 int 
 fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len)
 {
-  return fts_find_file(pkg->data_paths, fts_symbol_name(filename), buf, len);
+  const char* root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+
+  return fts_find_file(root, pkg->data_paths, fts_symbol_name(filename), buf, len);
 }
 
 /********************************************************************

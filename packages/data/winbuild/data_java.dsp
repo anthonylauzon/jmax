@@ -62,7 +62,7 @@ CFG=data_java - Win32 Debug
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "data_java___Win32_Debug"
 # PROP Intermediate_Dir "data_java___Win32_Debug"
-# PROP Cmd_Line "NMAKE /f data_java.mak JAVA_HOME=c:\jdk1.3.1\bin"
+# PROP Cmd_Line "NMAKE /f data_java.mak JAVA_HOME="C:\Program Files\IBM\Java13""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "data_java.exe"
 # PROP Bsc_Name ""

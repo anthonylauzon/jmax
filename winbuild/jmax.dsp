@@ -28,7 +28,7 @@ CFG=jmax - Win32 Debug
 
 !IF  "$(CFG)" == "jmax - Win32 Release"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
 # PROP BASE Output_Dir "Release"
 # PROP BASE Intermediate_Dir "Release"
@@ -37,7 +37,7 @@ CFG=jmax - Win32 Debug
 # PROP BASE Target_File "jmax.exe"
 # PROP BASE Bsc_Name "jmax.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
@@ -49,7 +49,7 @@ CFG=jmax - Win32 Debug
 
 !ELSEIF  "$(CFG)" == "jmax - Win32 Debug"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
 # PROP BASE Output_Dir "jmax___Win32_Debug"
 # PROP BASE Intermediate_Dir "jmax___Win32_Debug"
@@ -58,11 +58,11 @@ CFG=jmax - Win32 Debug
 # PROP BASE Target_File "jmax.exe"
 # PROP BASE Bsc_Name "jmax.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "jmax___Win32_Debug"
 # PROP Intermediate_Dir "jmax___Win32_Debug"
-# PROP Cmd_Line "nmake /f "jmax.mak" JAVA_HOME=c:\jdk1.3.1\bin"
+# PROP Cmd_Line "nmake /f "jmax.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "..\java\jmax.jar"
 # PROP Bsc_Name ""

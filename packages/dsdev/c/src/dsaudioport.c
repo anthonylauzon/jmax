@@ -159,7 +159,6 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   /* get the basic audio settings */
   sample_rate = (int) fts_dsp_get_sample_rate();
   channels = fts_get_int_arg( ac, at, 0, DEFAULT_CHANNELS);
-  fts_audioport_set_output_channels((fts_audioport_t *)this, channels);
 
   frames = fts_dsp_get_tick_size();
   this->buffer_sample_size = channels * frames;
@@ -190,6 +189,13 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->desc.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY;
   this->desc.lpwfxFormat = this->format;
   this->desc.dwBufferBytes = this->buffer_byte_size * this->num_buffers;  
+
+  /* set the primary sound buffer to this format */
+/*    hr = IDirectSoundBuffer_SetFormat(fts_primary_buffer, this->format); */
+/*    if (hr != DS_OK) { */
+/*      post("Warning: dsaudioport: can't set format of primary sound buffer: %s\n", fts_win32_error(hr)); */
+/*      goto error_recovery;     */
+/*    } */
 
   /* create the sound buffer */
   hr = IDirectSound_CreateSoundBuffer(fts_direct_sound, &this->desc, &this->dsBuffer, NULL);
@@ -243,6 +249,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   return;
 
  error_recovery:
+
+  fts_audioport_set_input_channels( (fts_audioport_t *)this, 0);
+  fts_audioport_set_input_function( (fts_audioport_t *)this, NULL);
+  fts_audioport_set_output_channels( (fts_audioport_t *)this, 0);
+  fts_audioport_set_output_function( (fts_audioport_t *)this, NULL);
+  fts_audioport_set_xrun_function( (fts_audioport_t *)this, NULL);
 
   this->state = dsaudioport_corrupted;
 }
@@ -312,6 +324,8 @@ fts_win32_error(HRESULT hr) {
   case DSERR_OUTOFMEMORY: s = "Out of memory"; break;
   case DSERR_UNINITIALIZED: s = "Uninitialized"; break;
   case DSERR_UNSUPPORTED: s = "Function not supported"; break;
+  case DSERR_INVALIDCALL: s = "Invalid call"; break;
+  case DSERR_PRIOLEVELNEEDED: s = "Priority level needed"; break;
   }
   return s;
 }
@@ -327,9 +341,9 @@ fts_open_direct_sound(char *device)
     return -1;
   }
 
-  if (fts_wnd == NULL) {
-    err = fts_win32_create_window();
-    if (err != 0) return err;
+  err = fts_win32_create_window();
+  if (err != 0) {
+    return err;
   }
 
   hr = DirectSoundCreate(NULL, &fts_direct_sound, NULL);

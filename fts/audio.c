@@ -721,28 +721,48 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 
 typedef struct {
   fts_audioport_t head;
-  fts_timer_t timer;
 #ifdef WIN32
-  HANDLE event;
-  UINT mmtimer;
+  int count;
+  DWORD sysstart;
+  double ftsstart;
+#else
+  fts_timer_t timer;
 #endif
 } nullaudioport_t;
 
+#define DEBUG_NULLAUDIODEVICE 1
+
 static void nullaudioport_output( fts_word_t *argv)
 {
-  nullaudioport_t *port = (nullaudioport_t *)fts_word_get_ptr( argv+0);
+  nullaudioport_t *this = (nullaudioport_t *)fts_word_get_ptr( argv+0);
 
 #ifdef WIN32
-  if ( fts_timer_get_time( &port->timer) >= (double)10.0)
-    {
-      DWORD result;
-      result = WaitForSingleObject(port->event, 100);
-      if (result != WAIT_OBJECT_0) {
-	/* FIXME: then what? */
-      }
+  if (this->count == -1) {
+    this->count = 0;
+    this->sysstart = GetTickCount();
+    this->ftsstart = fts_get_time();
+    return;
+  }
+  if ( ++this->count == 5) {
+    double ftstime = fts_get_time() - this->ftsstart;
+    double systime = GetTickCount() - this->sysstart;
+    double delta = ftstime - systime;
+
+#if DEBUG_NULLAUDIODEVICE
+    FILE* log = fopen("C:\\nullaudiolog.txt", "a");
+    fprintf(log, "fts time=%f, sys time=%f, delta=%f\n", ftstime, systime, delta);
+    fclose(log);
+#endif
+    
+    this->count = 0;
+    
+    if (delta > 0) {
+      Sleep((DWORD) delta);
     }
+  }
+
 #else
-  if ( fts_timer_get_time( &port->timer) >= (double)100.0)
+  if ( fts_timer_get_time( &this->timer) >= (double)100.0)
     {
       struct timespec pause_time;
 
@@ -751,7 +771,7 @@ static void nullaudioport_output( fts_word_t *argv)
 
       nanosleep( &pause_time, 0);
 
-      fts_timer_reset( &port->timer);
+      fts_timer_reset( &this->timer);
     }
 #endif
 }
@@ -769,13 +789,11 @@ static void nullaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
    * its DSP objects which would be scheduled...
    */
 
+#ifdef WIN32
+  this->count = -1;
+#else
   fts_timer_init( &this->timer, 0);
   fts_timer_start( &this->timer);
-
-#ifdef WIN32
-  this->event = CreateEvent(NULL, FALSE, TRUE, "FtsNullAudioDevice");
-  
-  this->mmtimer = timeSetEvent(10, 0, (LPTIMECALLBACK) this->event, 0, TIME_PERIODIC | TIME_CALLBACK_EVENT_SET);
 #endif
 }
 
@@ -784,15 +802,6 @@ static void nullaudioport_delete( fts_object_t *o, int winlet, fts_symbol_t s, i
   nullaudioport_t *this = (nullaudioport_t *)o;
 
   fts_audioport_delete( (fts_audioport_t *) this);
-
-#ifdef WIN32
-  if (this->mmtimer) {
-    timeKillEvent(this->mmtimer);
-  }
-  if (this->event) {
-    CloseHandle(this->event);
-  }
-#endif
 }
 
 static void nullaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)

@@ -185,18 +185,62 @@ fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
   return buf;
 }
 
-int 
-fts_find_file(fts_list_t* paths, const char* filename, char* buf, int len)
+/*  fts_find_file_aux
+ *
+ * Takes 3 arguments: root, path, filename. root and path can be
+ * null. filename cannot be null. it tests if following files exists:
+ *
+ *    root/path/filename      (root!=null, path!=null)
+ *    root/filename           (root!=null, path==null)
+ *    path/filename           (root==null, path!=null)
+ *    filename                (root==null, path==null)
+*/        
+static int 
+fts_find_file_aux(const char* root, const char* path, const char* filename, char* buf, int len)
 {
+  char newroot[MAXPATHLEN];
+
+  if (root != NULL) {
+    if (path != NULL) {
+      fts_make_absolute_path(root, path, newroot, MAXPATHLEN);
+      fts_make_absolute_path(newroot, filename, buf, len);
+    } else {
+      snprintf(newroot, "%s", root);
+      fts_make_absolute_path(newroot, filename, buf, len);
+    }
+  } else {
+    if (path != NULL) {
+      snprintf(newroot, "%s", path);
+      fts_make_absolute_path(newroot, filename, buf, len);
+    } else {
+      snprintf(buf, "%s", filename);      
+    }
+  }
+
+  return fts_file_exists(buf);
+}
+
+int 
+fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
+{
+  const char* path;
+
+  if ((filename == NULL) || (strlen(filename) == 0)) {
+    return 0;
+  }
+
   while (paths) {
-    fts_make_absolute_path(fts_symbol_name(fts_get_symbol(fts_list_get(paths))), filename, buf, len);
-    if (fts_file_exists(buf)) {
+    path = fts_symbol_name(fts_get_symbol(fts_list_get(paths)));
+    if (fts_find_file_aux(root, path, filename, buf, len)) {
       return 1;
     }
     paths = fts_list_next(paths);
   }
 
-  buf[0] = 0;
+  if ((root != NULL) && fts_find_file_aux(root, NULL, filename, buf, len)) {
+    return 1;
+  }
+
   return 0;
 }
 

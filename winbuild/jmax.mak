@@ -1,6 +1,6 @@
 
-JAVAC=$(JAVA_HOME)\javac
-JAR=$(JAVA_HOME)\jar
+JAVAC="$(JAVA_HOME)\bin\javac"
+JAR="$(JAVA_HOME)\bin\jar"
 
 all: dir silk jmax jar
 
@@ -40,14 +40,6 @@ jmax:
 	cd src\ircam\jmax\editors\console
 	$(JAVAC) -classpath ..\..\..\..\..\classes;..\..\..\..\..\src -d ..\..\..\..\..\classes *.java
 	-@cd ..\..\..\..\..
-
-	cd src\ircam\jmax\editors\console\actions 
-	$(JAVAC) -classpath ..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..\..\..\..
-
-	cd src\ircam\jmax\editors\console\menus 
-	$(JAVAC) -classpath ..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..\..\..\..
 
 	cd src\ircam\jmax\editors\patcher
 	$(JAVAC) -classpath ..\..\..\..\..\classes;..\..\..\..\..\src -d ..\..\..\..\..\classes *.java

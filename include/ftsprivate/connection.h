@@ -29,9 +29,6 @@ extern void fts_connections_init(void);
 
 /* Connections */
 
-extern fts_connection_t *fts_connection_new(int id, fts_object_t *, int woutlet, fts_object_t *, int winlet);
-extern void fts_connection_delete(fts_connection_t *conn);
-
 extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int doclient);
 extern void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
 extern void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);

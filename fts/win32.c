@@ -181,7 +181,7 @@ void fts_platform_init( int argc, char **argv)
   }
 
   /* boost the priority of the fts thread */
-  SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+/*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 }
 
@@ -219,8 +219,8 @@ fts_get_root_from_registry(char *buf, int bufsize)
     return 0;
   }
 
-  if (!fts_get_string_from_registry(key, "ftsRoot", buf, bufsize)) {
-    post("Failed to read the value of registry key: %s\\ftsRoot\n", JMAX_KEY);
+  if (!fts_get_string_from_registry(key, "jmaxRoot", buf, bufsize)) {
+    post("Failed to read the value of registry key: %s\\jmaxRoot\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }

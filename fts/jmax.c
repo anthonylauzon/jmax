@@ -141,7 +141,7 @@ int jmax_run(int argc, char** argv)
   }
   vm_args.classpath = classpath;
 
-  vm_args.vfprintf = jmax_vfprintf;
+/*    vm_args.vfprintf = jmax_vfprintf; */
 
   /* load and initialize a Java VM, return a JNI interface 
    * pointer in env */
@@ -373,12 +373,12 @@ jmax_get_available_jvm(void)
   }
   
   /* check in the windows registry for IBM's and Sun's JVMs */
-  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_13, SUN_RELEASE_13)) {
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, IBM_JRE_13, IBM_RELEASE_13)) {
     if (_stat(buf, &statbuf) == 0) {
       jmax_append_jvm(buf);
     }
   }
-  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, IBM_JRE_13, IBM_RELEASE_13)) {
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_13, SUN_RELEASE_13)) {
     if (_stat(buf, &statbuf) == 0) {
       jmax_append_jvm(buf);
     }
@@ -412,7 +412,7 @@ jmax_get_root_from_registry(char *buf, jint bufsize)
   }
 
   if (!jmax_get_string_from_registry(key, "jmaxRoot", buf, bufsize)) {
-    jmax_log("Failed reading value of registry key:\n\t%s\\jmaxRoot\n", JMAX_KEY);
+    jmax_log("Failed reading value of registry key: %s\\jmaxRoot\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
@@ -433,7 +433,7 @@ jmax_get_jvm_from_registry(char *buf, jint bufsize, char* jre, char* release)
   }
   
   if (!jmax_get_string_from_registry(key, "CurrentVersion", version, sizeof(version))) {
-    jmax_log("Failed reading value of registry key:\n\t%s\\CurrentVersion\n", jre);
+    jmax_log("Failed reading value of registry key: %s\\CurrentVersion\n", jre);
     RegCloseKey(key);
     return 0;
   }
@@ -452,7 +452,7 @@ jmax_get_jvm_from_registry(char *buf, jint bufsize, char* jre, char* release)
   }
   
   if (!jmax_get_string_from_registry(subkey, "RuntimeLib", buf, bufsize)) {
-    jmax_log("Failed reading value of registry key:\n\t%s\\%s\\JavaHome\n", jre, version);
+    jmax_log("Failed reading value of registry key: %s\\%s\\JavaHome\n", jre, version);
     RegCloseKey(key);
     RegCloseKey(subkey);
     return 0;

@@ -79,10 +79,6 @@ void CALLBACK
 winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, 
 			DWORD dwParam1, DWORD dwParam2);
 
-void CALLBACK 
-winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance,  
-			 DWORD dwParam1, DWORD dwParam2);
-
 /*************************************************
  *
  *  Open/close Win midi port
@@ -109,7 +105,7 @@ winmidiport_open(winmidiport_t *this)
   }
 
   /* try opening the default midi mapper */
-  err = midiOutOpen(&this->hmidiout, MIDI_MAPPER, (DWORD) winmidiport_callback_out, (DWORD) this, CALLBACK_FUNCTION);
+  err = midiOutOpen(&this->hmidiout, MIDI_MAPPER, 0, 0, CALLBACK_NULL);
   if (err != MMSYSERR_NOERROR) {
     post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
     this->hmidiout = NULL;
@@ -120,7 +116,7 @@ winmidiport_open(winmidiport_t *this)
     for (i = 0; i < num; i++) {
       res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
       if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology == MOD_MIDIPORT)) {
-	err = midiOutOpen(&this->hmidiout, i, (DWORD) winmidiport_callback_out, (DWORD) this, CALLBACK_FUNCTION);
+	err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
 	if (err == MMSYSERR_NOERROR) {
 	  post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
 	  break;
@@ -136,7 +132,7 @@ winmidiport_open(winmidiport_t *this)
     for (i = 0; i < num; i++) {
       res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
       if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
-	err = midiOutOpen(&this->hmidiout, i, (DWORD) winmidiport_callback_out, (DWORD) this, CALLBACK_FUNCTION);
+	err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
 	if (err == MMSYSERR_NOERROR) {
 	  post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
 	  break;
@@ -241,26 +237,6 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
     break;
     
   case MIM_MOREDATA:
-    break;
-  }
-}
-
-void CALLBACK 
-winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance,  
-			 DWORD dwParam1, DWORD dwParam2)
-{
-  winmidiport_t *this = (winmidiport_t *) dwInstance;
-  MIDIHDR* hdr;
-
-  switch (wMsg) {
-  case MOM_OPEN:
-    break;
-
-  case MOM_DONE:  
-    hdr = (MIDIHDR*) dwParam1;
-    break;
-
-  case MOM_CLOSE:
     break;
   }
 }

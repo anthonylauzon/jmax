@@ -28,7 +28,7 @@ CFG=ispw_java - Win32 Debug
 
 !IF  "$(CFG)" == "ispw_java - Win32 Release"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
 # PROP BASE Output_Dir "ispw_java___Win32_Release"
 # PROP BASE Intermediate_Dir "ispw_java___Win32_Release"
@@ -37,7 +37,7 @@ CFG=ispw_java - Win32 Debug
 # PROP BASE Target_File "ispw_java.exe"
 # PROP BASE Bsc_Name "ispw_java.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "ispw_java___Win32_Release"
 # PROP Intermediate_Dir "ispw_java___Win32_Release"
@@ -49,7 +49,7 @@ CFG=ispw_java - Win32 Debug
 
 !ELSEIF  "$(CFG)" == "ispw_java - Win32 Debug"
 
-# PROP BASE Use_MFC
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
 # PROP BASE Output_Dir "ispw_java___Win32_Debug"
 # PROP BASE Intermediate_Dir "ispw_java___Win32_Debug"
@@ -58,11 +58,11 @@ CFG=ispw_java - Win32 Debug
 # PROP BASE Target_File "ispw_java.exe"
 # PROP BASE Bsc_Name "ispw_java.bsc"
 # PROP BASE Target_Dir ""
-# PROP Use_MFC
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "ispw_java___Win32_Debug"
 # PROP Intermediate_Dir "ispw_java___Win32_Debug"
-# PROP Cmd_Line "nmake /f "ispw_java.mak"  JAVA_HOME=c:\jdk1.3.1\bin"
+# PROP Cmd_Line "nmake /f "ispw_java.mak"  JAVA_HOME="C:\Program Files\IBM\Java13""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "ispw_java.exe"
 # PROP Bsc_Name ""

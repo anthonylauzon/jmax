@@ -1,6 +1,6 @@
 
-JAVAC=$(JAVA_HOME)\javac
-JAR=$(JAVA_HOME)\jar
+JAVAC="$(JAVA_HOME)\bin\javac"
+JAR="$(JAVA_HOME)\bin\jar"
 PKG=sequence
 
 all: dir classes jar

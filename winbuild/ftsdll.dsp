@@ -121,6 +121,10 @@ SOURCE=..\fts\class.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\client.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\clipboard.c
 # End Source File
 # Begin Source File
@@ -146,6 +150,10 @@ SOURCE=..\fts\errobj.c
 # Begin Source File
 
 SOURCE=..\fts\expression.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\fifo.c
 # End Source File
 # Begin Source File
 
@@ -226,10 +234,6 @@ SOURCE=..\fts\OLDftsdata.c
 # Begin Source File
 
 SOURCE=..\fts\OLDpatcherdata.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\OLDucs.c
 # End Source File
 # Begin Source File
 

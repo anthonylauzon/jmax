@@ -107,7 +107,10 @@ fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original
   template->instances = 0;
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "New template %s, file %s\n", fts_symbol_name(name), fts_symbol_name(original_filename)); /* @@@ */
+  {
+    const char* file = (filename)? fts_symbol_name(filename) : (original_filename)? fts_symbol_name(original_filename) : "unknown"; 
+    fprintf(stderr, "New template %s, file %s\n", fts_symbol_name(name), file); /* @@@ */
+  }
 #endif
 
   return template;
