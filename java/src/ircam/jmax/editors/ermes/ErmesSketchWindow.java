@@ -314,17 +314,25 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
   protected void Cut(){
-    Copy();
+    Cursor temp = getCursor();
+
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    CreateFtsGraphics(this);
+    itsSketchPad.ftsClipboard.copy(Fts.getSelection());
+    MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     itsSketchPad.itsHelper.DeleteSelected();
+    setCursor(temp);
   }
 
   // clipboard handling
   protected void Copy() {
+    Cursor temp = getCursor();
+
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     CreateFtsGraphics(this);
-
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
-
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
+    setCursor(temp);
   }
 
 
@@ -333,6 +341,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     //it does no more use ErmesClipboardProvider
 
     if(itsSketchPad.itsRunMode) return;
+
+    Cursor temp = getCursor();
+
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
     ftsObjectsPasted.removeAllElements();
     ftsConnectionsPasted.removeAllElements();
@@ -350,6 +362,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
     ErmesSketchPad.RequestOffScreen(itsSketchPad);
     itsSketchPad.repaint();
+
+    setCursor(temp);
   }
 
   

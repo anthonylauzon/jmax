@@ -168,10 +168,9 @@ fts_predefine_symbols(void)
 
 #define SYMTABSIZE 511		/* Initial Size of the symbol table  */
 
-#define BUILTIN_SYMBOL_SIZE 128	/* symbols that have and associated index, used in the
+#define BUILTIN_SYMBOL_SIZE 256	/* symbols that have and associated index, used in the
 				 * protocols and binary format (to reduce symbol table size)
-				 * You can grow this value, but never make it smaller, otherwise
-				 * it will brake the compatibility with old patches.
+				 * The system support 256 symbols like this.
 				 */
 fts_heap_t symbol_heap;
 
@@ -185,6 +184,24 @@ static struct _symbol_table
 } symbol_table;
 
 
+
+static void
+fts_print_symbol_table(const char *msg, const char *name)
+{
+  int i;
+
+  fprintf(stderr, "Symbol table %s adding %s\n", msg, name);
+
+  for (i = 0; i < SYMTABSIZE; i++)
+    {
+      struct fts_symbol_descr *sp;		/* use the structure, not the type, so it is not 'const' */
+
+      sp = (struct fts_symbol_descr *) symbol_table.symbol_hash_table[i];
+
+      for (; sp; sp = sp->next_in_table)
+	fprintf(stderr, "-\t%s\n", sp->name);
+    }
+}
 
 void
 fts_symbols_init(void)

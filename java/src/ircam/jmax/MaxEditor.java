@@ -99,14 +99,18 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     public void actionPerformed(ActionEvent e)
     {
       MaxDocument document;
+      Cursor temp = getCursor();
 
       try
 	{
+	  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	  document = type.newDocument();
 	  document.edit();
+	  setCursor(temp);
 	}
       catch (MaxDocumentException ex)
 	{
+	  setCursor(temp);
 	  new ErrorDialog(MaxEditor.this, ex.toString());
 	}
     }
@@ -318,10 +322,13 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     if (file != null)
       {
+	Cursor temp = getCursor();
+
 	try
 	  {
 	    MaxDocument document;
 
+	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    document = Mda.loadDocument(file);
 	
 	    try
@@ -335,9 +342,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 		// May be an hack, may be is ok; move this stuff to an action
 		// handler !!
 	      }
+
+	    setCursor(temp);
 	  }
 	catch (MaxDocumentException e)
 	  {
+	    setCursor(temp);
 	    new ErrorDialog(this, e.toString());
 	  }
       }
@@ -365,6 +375,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
 	    if (editedType != null)
 	      {
+		Cursor temp = getCursor();
+
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
 		try
 		  {
 		    editedType.newDocument().edit();
@@ -373,6 +387,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 		  {
 		    // Ingnore exceptions here
 		  }
+
+		setCursor(temp);
 	      }
 	  }
 	else if (aInt == 79) Open();//o
