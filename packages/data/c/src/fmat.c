@@ -915,6 +915,27 @@ fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
+fmat_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  bpf_t *bpf = (bpf_t *)fts_get_object(at);
+  int size = bpf_get_size(bpf);
+  float *ptr;
+  int i, j;
+  
+  fmat_reshape(self, size, 2);
+  ptr = fmat_get_ptr(self);
+  
+  for(i=0, j=0; i<size; i++, j+=2)
+  {
+    ptr[j] = bpf_get_time(bpf, i);
+    ptr[j + 1] = bpf_get_value(bpf, i);
+  }
+  
+  fts_return_object(o);
+}
+
+static void
 fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
@@ -1570,7 +1591,7 @@ fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   int	n = fmat_get_n(self);
   int	pos = 0;	// col position at which to insert
   int numcols = 1;	// number of rows to insert
-  int num, tomove, i, j, start, new_n;
+  int tomove, i, j, start, new_n;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
@@ -1612,7 +1633,7 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   int	n = fmat_get_n(self);
   int	pos = 0;	
   int numcols = 1;	// number of rows to delete
-  int num, tomove, i, j, start;
+  int tomove, i, j, start;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
@@ -1658,7 +1679,7 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int	n = fmat_get_n(self);
   int	pos = 0;
   int numrows = 1;
-  int num, tomove, i;
+  int num, tomove;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
@@ -4224,6 +4245,7 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set, fmat_set_from_list);
   fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
+  fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
 
   fts_class_message_number(cl, fts_s_row, fmat_get_row);
