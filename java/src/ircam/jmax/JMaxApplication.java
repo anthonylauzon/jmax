@@ -464,7 +464,7 @@ public class JMaxApplication {
       {
 	URL url = ClassLoader.getSystemResource( "jmax.jar.root");
 
-	String root, u;
+	String root="", u;
         u = url.toString();
 
         if ( u.endsWith( "/Contents/Resources/Java/jmax.jar!/jmax.jar.root"))
@@ -476,7 +476,14 @@ public class JMaxApplication {
         else
         {
             // Linux case, Mac OS X shell script case
-            root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
+	    int from = u.indexOf( '/');
+	    int to = u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root");
+	    if(from!=-1 && to!=-1)
+		root = u.substring( from, to);
+	    else {
+		System.out.println("couldn't find root directory, did you install JMax properly ?");
+		System.exit(1);
+	    }
         }
 
 	properties.put( "jmaxRoot", root + "/share/jmax");
@@ -529,10 +536,6 @@ public class JMaxApplication {
 	String connectionType = ((String)properties.get("jmaxConnection"));
 	String hostName = (String)properties.get("jmaxHost");
 
-	System.out.println( "jMax starting server on "
-			    + ((hostName == null) ? "localhost" : hostName)
-			    + " via "+ connectionType + " connection"); 
-
 	String ftsDir = (String)properties.get( "jmaxServerDir");
 	String ftsName = (String)properties.get( "jmaxServerName");
 
@@ -554,9 +557,13 @@ public class JMaxApplication {
 	    killFtsOnQuit = false;
 	  }	
 	else
-	  {                 
-	    fts = new FtsProcess( argc, argv);
-	    killFtsOnQuit = true;
+	  {
+	     System.out.println( "jMax starting server"+ argv[0] + " on "
+				 + ((hostName == null) ? "localhost" : hostName)
+				 + " via "+ connectionType + " connection"); 
+	     
+	     fts = new FtsProcess( argc, argv);
+	     killFtsOnQuit = true;
 	  }
 	FtsServerConnection connection;
 		
