@@ -1,0 +1,63 @@
+
+audio port:
+ - input function: appelle la fonction de lecture native (qui copie éventuellement
+dans un buffer au format du driver, 32 bits par exemple)
+ - copy_in function(float *buffer, int size, int channel): copie avec conversion
+de format éventuelle depuis le canal 'channel' du buffer d'entrée (au format 32bits) vers
+le buffer de flottants
+ - copy_out function( float *buffer, int size, int channel): copie avec conversion
+de format éventuelle depuis le buffer de flottants vers le canal 'channel' du buffer d'entrée 
+(au format 32bits) 
+- output function: appelle la fonction d'écriture native (qui copie éventuellement
+dans un buffer au format du driver)
+- mute function( int channel): met à zéro un canal qui n'est plus utilisé
+
+
+l'objet audio:
+- a 2 fonctions DSP insérées dans la DSP chain prelude et postlude
+- DSP prelude:
+  . appel de toutes les fonctions d'input des audio ports (voir pour le null audio port)
+  . mise à 0 des buffers de sortie
+- DSP postlude:
+  . appel de toutes les fonctions d'output des audio ports (idem pr null audio port)
+
+audiolabel:
+- input: appelle copy_in du audioport
+- output: mixe dans le buffer de sortie 
+
+
+open/close audio port: il faut marquer le audio port comme actif (actif entrée, actif sortie).
+Le open est un message ou une fonction ???
+
+
+DSP prélude:
+ pour tous les audioport actifs, appeler audioport.input
+ mettre à 0 les buffers des audiolabels
+
+DSP chain:
+ input~_dsp: audiolabel->audioport->copy_in( outputbuffer, tick_size, audiolabel->channel)
+ output~_dsp: add*( inputbuffer, tick_size, audiolabel->audioport->mix_buffer)
+
+DSP postlude:
+ pour tous les audioports actifs, pour tous les canaux utilisés, appeler copy_out( mix_buffer, channel)
+ pour tous les audioport actifs, appeler audioport.output
+
+
+Le buffer de mix est dans le audioport.
+
+Lors d'un changement de canal, il faut faire un mute( ancien canal)
+
+
+======================================================================
+
+audiomanager:
+API publique:
+fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t port_name)
+{
+}
+
+void fts_audiomanager_put_port( fts_symbol_t port_name, fts_audioport_t *port);
+void fts_audiomanager_remove_port( fts_symbol_t port_name);
+API privée:
+fts_symbol_t *fts_audiomanager_get_input_names(void);
+fts_symbol_t *fts_audiomanager_get_output_names(void);
