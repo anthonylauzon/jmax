@@ -1275,8 +1275,8 @@ public class FtsServer  implements Runnable
   // Incoming message handling
   //
 
-  boolean running  = true;
-  Thread inputThread;
+  private Thread inputThread;
+
   /** Start the server. */
 
   public void start()
@@ -1300,17 +1300,15 @@ public class FtsServer  implements Runnable
 
   public void stop()
   {
-    running = false;
-
-    /* This will cause the actual close to happen */
-
-    syncToFts();
+    sendShutdown();
   }
 
   /** the main loop of the input listener thread. */
 
   public void run()
   {
+    boolean running  = true;
+
     while (running && stream.isOpen())
       {
 	try
@@ -1334,10 +1332,6 @@ public class FtsServer  implements Runnable
 	    // e.printStackTrace();
 	  }
       }
-
-    // Send a shutdown message to fts
-
-    sendShutdown();
 
     // close the thread and the streams
 
@@ -1435,15 +1429,15 @@ public class FtsServer  implements Runnable
 	break;
 	
       case FtsClientProtocol.fts_update_group_start_cmd:
-	// if (updateGroupListeners != null)
-	//for (int i = 0; i < updateGroupListeners.size(); i++)
-	// ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	if (updateGroupListeners != null)
+	  for (int i = 0; i < updateGroupListeners.size(); i++)
+	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
 	break;
 
       case FtsClientProtocol.fts_update_group_end_cmd:
-	// if (updateGroupListeners != null)
-	// for (int i = 0; i < updateGroupListeners.size(); i++)
-	// ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+	if (updateGroupListeners != null)
+	  for (int i = 0; i < updateGroupListeners.size(); i++)
+	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
 
 	if (Fts.getSyncToolkitOnUpdates())
 	  Toolkit.getDefaultToolkit().sync();

@@ -51,7 +51,7 @@ static void fts_client_updates_sched(void);
 /* Default values are for 400 updates per seconds,
  */
 
-static int fts_updates_per_ticks = 20;
+static int fts_updates_per_ticks = 40;
 static int fts_update_period = 20; /* every how many ticks we do an update */
 
 void fts_client_updates_init(void)

@@ -33,6 +33,7 @@ static fts_object_t *comment_doctor(fts_patcher_t *patcher, int ac, const fts_at
 
       fts_set_symbol(&a, fts_new_symbol("jcomment"));
       fts_make_object(patcher, 1, &a, &obj);
+      fts_object_set_description(obj, 1, &a);
 
       fts_set_symbol(&v, get_comment_symbol(ac - 1, at + 1));
       fts_object_put_prop(obj, fts_s_comment, &v);

@@ -68,10 +68,9 @@ public class DisplayList
     displayObjects.insertElementAt( object, 0);
   }
 
-  public void remove( GraphicObject object)
+  public void remove(GraphicObject object)
   {
     displayObjects.removeElement( object);
-    reassignLayers();
   }
 
   GraphicObject getGraphicObjectFor(FtsObject obj)

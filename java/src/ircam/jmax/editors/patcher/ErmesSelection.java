@@ -122,21 +122,11 @@ public class ErmesSelection implements Transferable
   
   public void deselectAll() 
   {
-    GraphicObject object;
+    for (Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
+      ((GraphicObject) e.nextElement()).setSelected(false);
 
-    for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
-      {
-	object = ( GraphicObject) e.nextElement();
-	object.setSelected(false);
-      }
-
-    GraphicConnection connection;
-
-    for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
-      {
-	connection = (GraphicConnection) e.nextElement();
-	connection.setSelected(false);
-      }
+    for (Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
+      ((GraphicConnection) e.nextElement()).setSelected(false);
 
     objects.removeAllElements();
     connections.removeAllElements();
@@ -205,11 +195,18 @@ public class ErmesSelection implements Transferable
 
   public void deleteAll()
   {
-    while (! connections.isEmpty())
-      ((GraphicConnection) connections.elementAt( 0)).delete();
-    
-    while (! objects.isEmpty())
-      ((GraphicObject) objects.elementAt( 0)).delete();
+    for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
+	((GraphicConnection) e.nextElement()).delete();
+
+    for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
+	((GraphicObject) e.nextElement()).delete();
+
+    objects.removeAllElements();
+    connections.removeAllElements();
+    Fts.getSelection().clean();
+
+    if (owner != null)
+      owner.getDisplayList().reassignLayers();
   }
 
 

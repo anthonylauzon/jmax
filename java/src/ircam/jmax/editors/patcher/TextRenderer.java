@@ -45,10 +45,17 @@ public class TextRenderer implements ObjectRenderer
 
   public void update()
   {
-    area.setBounds(owner.getX() + owner.getTextXOffset(),
-	      owner.getY() + owner.getTextYOffset(),
-	      owner.getWidth() - owner.getTextWidthOffset(),
-	      owner.getHeight() - owner.getTextHeightOffset());
+    if (owner.getHeight() > 0)
+      area.setBounds(owner.getX() + owner.getTextXOffset(),
+		     owner.getY() + owner.getTextYOffset(),
+		     owner.getWidth() - owner.getTextWidthOffset(),
+		     owner.getHeight() - owner.getTextHeightOffset());
+    else
+      area.setBounds(owner.getX() + owner.getTextXOffset(),
+		     owner.getY() + owner.getTextYOffset(),
+		     owner.getWidth() - owner.getTextWidthOffset(),
+		     5);
+
 
     area.setFont(owner.getFont());
     area.setText(owner.getArgs());

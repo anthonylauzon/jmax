@@ -119,6 +119,7 @@ class FtsRexecDatagramStream extends FtsStream
 
   void close()
   {
+    FtsErrorStreamer.stopFtsErrorStreamer();
     socket.close();
     in_packet = null;
     out_packet = null;

@@ -72,7 +72,7 @@ class Bang extends GraphicObject implements FtsIntValueListener
 
     if (flash <= 0)
       itsFlashColor = Settings.sharedInstance().getUIColor();
-    else if (flash >= bangColors.length) 
+    else if (flash > bangColors.length) 
       itsFlashColor = Color.yellow;
     else 
       itsFlashColor = bangColors[flash - 1];

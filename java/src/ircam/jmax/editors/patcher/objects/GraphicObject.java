@@ -121,7 +121,7 @@ abstract public class GraphicObject implements DisplayObject
       eobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
     else if (theName.equals( "floatbox"))
       eobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
-    else if (theName.equals( "comment"))
+    else if (theName.equals( "jcomment"))
       eobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
     else if ( theName.equals( "slider"))
       eobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
@@ -168,11 +168,7 @@ abstract public class GraphicObject implements DisplayObject
 
   public void delete()
   {
-    if (selected)
-      ErmesSelection.patcherSelection.deselect(this);
-    
     itsSketchPad.getDisplayList().remove(this);
-
     dispose();
     ftsObject.delete();
   }
@@ -369,17 +365,17 @@ abstract public class GraphicObject implements DisplayObject
   {
     itsSketchPad.repaint(ftsObject.getX(),
 			 ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
 			 ftsObject.getWidth(),
 			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
 			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
   }
 
   public void updateRedraw()
   {
     if (itsSketchPad.isLocked())
-      itsSketchPad.paintImmediately(ftsObject.getX(),
+      itsSketchPad.paintAtUpdateEnd(ftsObject.getX(),
 				    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
 				    ftsObject.getWidth(),
@@ -472,7 +468,7 @@ abstract public class GraphicObject implements DisplayObject
     final int y = ftsObject.getY();
     final int w = ftsObject.getWidth();
     final int h = ftsObject.getHeight();
-    final int verticalInOutletSensibility = h / 4;
+    final int verticalInOutletSensibility;
     final int horizontalInletSensibility;
     final int horizontalOutletSensibility;
     final int inletsAnchorY  = getY() - 1;
@@ -489,6 +485,8 @@ abstract public class GraphicObject implements DisplayObject
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, w / 2);
     else
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, outletDistance / 2);
+
+    verticalInOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, h / 4);
 
     if (followingInOutletLocations)
       {

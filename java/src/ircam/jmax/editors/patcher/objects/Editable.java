@@ -27,10 +27,12 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     super( theSketchPad, theFtsObject);
 
     computeRenderer();
-    renderer.update();
 
     if ((renderer instanceof TextRenderer) && (getWidth() == -1))
-      setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+      {
+	renderer.update();
+	setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+      }
     else
       updateDimensions();
   }

@@ -52,6 +52,8 @@ class FtsSubProcessStream extends FtsStream
 
   void close()
   {
+    FtsErrorStreamer.stopFtsErrorStreamer();
+
     try
       {
 	in_stream.close();

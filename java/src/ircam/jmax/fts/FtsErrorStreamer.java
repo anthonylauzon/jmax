@@ -34,14 +34,22 @@ class FtsErrorStreamer implements Runnable
   InputStream in;
   TextWindow window = null;
   PrintStream out = null;
+  boolean running = true;
+  static FtsErrorStreamer errorStreamer;
 
   static void startFtsErrorStreamer(InputStream in)
-  {
+  {  
     Thread streamer;
 
-    streamer = new Thread(new FtsErrorStreamer(in), "Error Streamer");
+    errorStreamer = new FtsErrorStreamer(in);
+    streamer = new Thread(errorStreamer, "Error Streamer");
     streamer.setDaemon(true);
     streamer.start();
+  }
+
+  static void stopFtsErrorStreamer()
+  {
+    errorStreamer.running = false;
   }
 
   FtsErrorStreamer(InputStream in)
@@ -51,8 +59,6 @@ class FtsErrorStreamer implements Runnable
 
   public void run()
   {
-    boolean running = true;
-
     while (running)
       {
 	try
@@ -60,6 +66,9 @@ class FtsErrorStreamer implements Runnable
 	    int c;
 
 	    c = in.read();
+
+	    if ((c == -1) && (! running))
+	      return;
 
 	    if (out == null)
 	      {

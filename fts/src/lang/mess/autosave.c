@@ -11,7 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-
+#define DEBUG
 #include <signal.h>
 
 #include "sys.h"
@@ -66,6 +66,7 @@ static void autosave_signal_handler(int sig)
 
 void fts_autosave_init()
 {
+#ifndef DEBUG 
   /* Standard quit/int signals */
 
   signal(SIGHUP,  autosave_signal_handler);
@@ -79,4 +80,6 @@ void fts_autosave_init()
   signal(SIGSEGV, autosave_signal_handler);
   signal(SIGTERM, autosave_signal_handler);
   signal(SIGPWR, autosave_signal_handler);
+#endif
 }
+

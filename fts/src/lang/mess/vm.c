@@ -102,7 +102,7 @@
 		     // by the C function; the stack is popped by one.
    */
 
-/*#define  VM_DEBUG */
+/* #define  VM_DEBUG  */
 
 #ifdef DEBUG
 #define  VM_SAFE

@@ -79,6 +79,10 @@ class ErmesPatcherListener implements FtsPatcherListener
 	  if (conn != null)
 	    {
 	      conn.redraw();
+
+	      if (conn.isSelected())
+		ErmesSelection.patcherSelection.deselect(conn);
+
 	      conn.delete();
 	    }
 	}

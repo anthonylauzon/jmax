@@ -93,10 +93,6 @@ public class GraphicConnection implements DisplayObject
   public void delete()
   {
     ftsConnection.delete();
-
-    if (selected)
-      ErmesSelection.patcherSelection.deselect(this);
-
     sketch.getDisplayList().remove(this);
   }
 

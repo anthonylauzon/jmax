@@ -19,7 +19,7 @@
 #include "lang/mess.h"
 #include "lang/utils.h"
 
-/* #define LOAD_DEBUG */
+/* #define LOAD_DEBUG  */
 
 /* Private structure */
 typedef struct fts_binary_file_desc_t {
@@ -62,6 +62,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   off_t file_size;
   unsigned int symbols_size;
   char *symbuf;
+  int i;
 
 #ifdef LOAD_DEBUG
   fprintf(stderr, "Reading binary file %s\n", name);
@@ -148,6 +149,13 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   if (header.n_symbols > 0)
     {
       desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
+
+      /* In case of corrupted file, we initialize the
+	 table with the error symbol, so to have some hope
+	 of opening the result */
+
+      for (i = 0; i < header.n_symbols; i++)
+	desc->symbols[i] = fts_s_error;
 
       if (!desc->symbols)
 	{

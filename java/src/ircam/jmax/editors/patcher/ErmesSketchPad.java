@@ -25,9 +25,32 @@ import ircam.jmax.editors.patcher.interactions.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JPanel 
+public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 {
   Rectangle invalid = new Rectangle();
+  boolean somethingToDraw = false;
+
+  public void updateGroupStart()
+  {
+    somethingToDraw = false;
+  }
+
+  public void updateGroupEnd()
+  {
+    if (somethingToDraw)
+      paintImmediately(invalid);
+  }
+
+  public void paintAtUpdateEnd(int x, int y, int w, int h)
+  {
+    if (somethingToDraw)
+      SwingUtilities.computeUnion(x, y, w, h, invalid);
+    else
+      {
+	somethingToDraw = true;
+	invalid.setBounds(x, y, w, h);
+      }
+  }
 
   private DisplayList displayList;
 
@@ -239,6 +262,8 @@ public class ErmesSketchPad extends JPanel
     itsPatcherData  = thePatcherData;
     itsPatcher      = thePatcherData.getContainerObject(); // ???
 
+    Fts.getServer().addUpdateGroupListener( this);
+
     // Get the defaultFontName and Size
 
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
@@ -274,7 +299,6 @@ public class ErmesSketchPad extends JPanel
       }
 
     setOpaque(true);
-
     setLayout( null);
 
     itsEditField = new EditField( this);
@@ -345,6 +369,8 @@ public class ErmesSketchPad extends JPanel
 
     if (redraw)
       redraw();
+
+    revalidate(); // ????
   }
 
 
@@ -550,6 +576,8 @@ public class ErmesSketchPad extends JPanel
 
   void cleanAll()
   {
+    Fts.getServer().removeUpdateGroupListener( this);
+
     engine.dispose();
 
     if (ErmesSelection.patcherSelection.ownedBy(this))
@@ -718,6 +746,8 @@ public class ErmesSketchPad extends JPanel
   {
     stopTextEditing();
     toolBar.reset();
+    resetHighlightedInlet();
+    resetHighlightedOutlet();
     engine.setTopInteraction(Interactions.runModeInteraction);
   }
 
