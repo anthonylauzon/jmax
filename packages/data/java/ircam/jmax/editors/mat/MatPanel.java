@@ -258,11 +258,13 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       setOpaque(true); 
       setBorder(BorderFactory.createEtchedBorder());
       setBackground(Color.lightGray);
+      setHorizontalTextPosition(SwingConstants.CENTER);
     }
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,int row, int column) 
     {      
       setText("< "+((FtsGraphicObject)value).getClassName()+" >");
+      setHorizontalTextPosition(SwingConstants.CENTER);
       return this;
     }
   }  

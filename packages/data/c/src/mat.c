@@ -29,6 +29,7 @@ fts_class_t *mat_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
 static fts_symbol_t sym_mat_append_row = 0;
+static fts_symbol_t sym_register_obj = 0;
 
 #define mat_set_editor_open(m) ((m)->opened = 1)
 #define mat_set_editor_close(m) ((m)->opened = 0)
@@ -516,10 +517,23 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
       /* upload only an object description */
       if(fts_is_object(d))
       {
+        fts_atom_t b[3];
+        fts_object_t *dobj = fts_get_object(d);
+        
+        if(!fts_object_has_id(dobj))
+          fts_client_register_object(dobj, fts_object_get_client_id((fts_object_t *)self));	
+        
+        fts_set_int(b, fts_object_get_id(dobj));
+        fts_set_symbol(b+1, fts_object_get_class_name(dobj));
+        
         fts_memorystream_reset(stream);
-        fts_spost_object((fts_bytestream_t *)stream, fts_get_object(d));
+        fts_spost_object((fts_bytestream_t *)stream, dobj);
         fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-        fts_set_symbol(&a[2+i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));                
+        fts_set_symbol(b+2,  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
+        
+        fts_client_send_message((fts_object_t *)self, sym_register_obj, 3, b);
+        
+        fts_set_object(&a[2+i], dobj);               
       }
       else
         fts_atom_copy(d, &a[2+i]);
@@ -1046,6 +1060,7 @@ mat_config(void)
   sym_comma = fts_new_symbol(",");
   sym_mat_append_row = fts_new_symbol("mat_append_row");
   mat_symbol = fts_new_symbol("mat");
+  sym_register_obj = fts_new_symbol("register_obj");
   
   mat_type = fts_class_install(mat_symbol, mat_instantiate);
 }

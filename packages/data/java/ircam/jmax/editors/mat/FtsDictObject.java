@@ -179,7 +179,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
       args.addString(className);
       JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
     }
-}
+  }
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES to the server
   //////////////////////////////////////////////////////////////////////////////////////
