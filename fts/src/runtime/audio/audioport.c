@@ -608,7 +608,7 @@ static void fts_audioport_create_out_objects( fts_audioport_t *port)
   fts_set_symbol( a+0, s_outdispatcher);
   fts_set_int( a+1, channels);
   fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->output.dispatcher);
-  if ( !port->input.dispatcher)
+  if ( !port->output.dispatcher)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create output dispatcher)\n");
       return;
@@ -617,7 +617,7 @@ static void fts_audioport_create_out_objects( fts_audioport_t *port)
   fts_set_symbol( a+0, s_audioportout);
   fts_set_object( a+1, (fts_object_t *)port);
   fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->output.dsp_object);
-  if ( !port->input.dsp_object)
+  if ( !port->output.dsp_object)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create output dsp object)\n");
       return;

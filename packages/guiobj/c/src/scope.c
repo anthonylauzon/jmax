@@ -446,7 +446,6 @@ static void
 scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
-  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
   fts_atom_t a[1];
 

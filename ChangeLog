@@ -1,3 +1,8 @@
+2001-06-05  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fixed multichannel bug (all outlets of a dsp objects were allocated the
+	same buffer. Came from a stupid bug in fts/src/lang/dsp/signal.c)
+
 2001-05-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* moved all platform specific code to one file per platform (instead of
