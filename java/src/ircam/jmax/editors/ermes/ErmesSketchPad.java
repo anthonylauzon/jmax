@@ -970,10 +970,12 @@ Rectangle previousResizeRect = new Rectangle();
   public void mousePressed(MouseEvent e)
   {
     itsSketchWindow.requestFocus();//???
-    
+
     int x = e.getX();
     int y = e.getY();
     int i;
+
+    cleanAnnotations(); // MDC    
     
     if ( !offScreenPresent)
       {
@@ -1090,6 +1092,8 @@ Rectangle previousResizeRect = new Rectangle();
     int x = e.getX();
     int y = e.getY();
 
+    cleanAnnotations(); // MDC    
+
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode || e.isControlDown()) {
@@ -1201,11 +1205,12 @@ Rectangle previousResizeRect = new Rectangle();
     else if(editStatus == DOING_NOTHING) return;
   }
 
-  public void mouseClicked(MouseEvent e){}
+  public void mouseClicked(MouseEvent e){    cleanAnnotations(); } // MDC
 
-  public void mouseEntered(MouseEvent e){}
+  public void mouseEntered(MouseEvent e){    cleanAnnotations(); } // MDC   
 
   public void mouseExited(MouseEvent e){
+    cleanAnnotations(); // MDC    
     if (itsRunMode) return;		
     if(itsSketchWindow.getCursor().getType()==Cursor.CROSSHAIR_CURSOR){ 
       itsSketchWindow.setCursor(Cursor.getDefaultCursor());
@@ -1343,6 +1348,8 @@ Rectangle previousResizeRect = new Rectangle();
     Rectangle aRect;
     int x = e.getX();
     int y = e.getY();
+
+    cleanAnnotations(); // MDC
     
     if(itsRunMode || e.isControlDown()) {
       if(itsStartDragObject != null) itsStartDragObject.MouseDrag(e, x, y);
@@ -1413,6 +1420,9 @@ Rectangle previousResizeRect = new Rectangle();
   public void mouseMoved(MouseEvent e){
     int x = e.getX();
     int y = e.getY();
+
+    cleanAnnotations(); // MDC
+
     if (itsRunMode) return;
     if(itsHelper.IsInInOutLet(x,y)) {
       itsSketchWindow.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
@@ -1968,6 +1978,42 @@ Rectangle previousResizeRect = new Rectangle();
     }
     return aMaxX;
    }
+
+  // Experimental MDC
+
+  private boolean annotating = false;
+
+  public void showAnnotations(String property)
+  {
+    if (! annotating)
+      {
+	ErmesObject aObject;
+
+	annotating = true;
+
+	if (currentSelection.itsObjects.size() == 0)
+	  for (Enumeration e =itsElements.elements(); e.hasMoreElements();)
+	    {
+	      aObject = (ErmesObject) e.nextElement();
+	      aObject.drawAnnotation(property);
+	    }
+	else
+	  for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();)
+	    {
+	      aObject = (ErmesObject) e.nextElement();
+	      aObject.drawAnnotation(property);
+	    }
+      }
+  }
+
+  public void cleanAnnotations()
+  {
+    if (annotating)
+      {
+	annotating = false;
+	repaint();
+      }
+  }
 }
 
 

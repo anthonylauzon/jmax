@@ -26,6 +26,8 @@ typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *r
 
 
 extern int  fts_expression_get_status(fts_expression_state_t *e);
+const char *fts_expression_get_msg(fts_expression_state_t *e);
+extern const char *fts_expression_get_err_arg(fts_expression_state_t *e);
 extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
 
 

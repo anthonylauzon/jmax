@@ -151,6 +151,7 @@ struct fts_expression_state
   int in;			/* current input atom in expression list*/
   int count;			/* result counter */
   int ret;			/* return code */
+  const char *err_arg;		/* argument for error messages */
   const char *msg;		/* error message */
   fts_expr_assignement_t *assignements;	/* properties expressed in the expression */
 
@@ -159,9 +160,11 @@ struct fts_expression_state
 
 /* Error utility */
 
-static int expression_error(fts_expression_state_t *e, int err, const char *msg)
+static int expression_error(fts_expression_state_t *e, int err, const char *msg,
+			    const char *arg)
 {
   e->msg = msg;
+  e->err_arg = arg;
   e->ret = err;
   return err;
 }
@@ -382,7 +385,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
       if (status == waiting_arg)
 	{
 	  if (fts_is_closed_par(current_in(e)))
-	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis");	
+	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis", 0);	
 	  else if (fts_is_operator(current_in(e)))
 	    {
 	      /* Unary operator, push it and still wait for an argument */
@@ -391,7 +394,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		op_stack_push(e, fts_get_operator(current_in(e)), FTS_UNARY_OP_TYPE);
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
-					"Syntax error, expression start with operator");
+					"Syntax error, expression start with operator", 0);
 	    }
 	  else  if (fts_is_open_cpar(current_in(e)))
 	    {
@@ -413,7 +416,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 		  if (! more_in(e))
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector");
+					    "Syntax error in vector constant", 0);
 
 		  if (fts_is_closed_cpar(current_in(e)))
 		    break;	
@@ -424,7 +427,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 		  if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_cpar(current_in(e))))
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector");
+					    "Syntax error in vector constant", 0);
 
 		  args++;
 		}
@@ -451,7 +454,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  TRY(fts_expression_eval_one(e));
 
 		  if (! fts_is_closed_par(current_in(e)))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced parentesis");	
+		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced parentesis", 0);	
 
 		  status = waiting_arg;
 		}
@@ -489,7 +492,8 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 	      if (! fts_is_closed_sqpar(current_in(e)))
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					"Syntax error in Array access");
+					"Syntax error in Array access",
+					0);
 
 	      /* Push the array reference operator in the op stack */
 
@@ -516,7 +520,8 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 		      if (! more_in(e))
 			return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-						"Syntax error in function call");
+						"Syntax error in calling function %s",
+						fts_symbol_name(name));
 
 		      if (fts_is_closed_par(current_in(e)))
 			break;	
@@ -527,7 +532,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 		      if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_par(current_in(e))))
 			return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-						"Syntax error in function arguments");
+						"Syntax error in function arguments", 0);
 
 		      args++;
 		    }
@@ -546,11 +551,13 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 			ret = (* f)(args, tos, &result);
 
 			if (ret != FTS_EXPRESSION_OK)
-			  return expression_error(e, ret, "Error in function call");
+			  return expression_error(e, ret, "Error in function %s",
+						  fts_symbol_name(name));
 		      }
 		    else
 		      return expression_error(e, FTS_EXPRESSION_UNDEFINED_FUNCTION,
-					      "Undefined function");
+					      "Undefined function %s",
+					      fts_symbol_name(name));
 		  }
 
 		  /* Pop the stack, and push the result */
@@ -560,7 +567,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					"Syntax error in function call");
+					"Syntax error in function call", 0);
 	    }
 	  else if (fts_is_operator(current_in(e)) && (! fts_is_equal(current_in(e))))
 	    {
@@ -615,7 +622,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
     return FTS_EXPRESSION_OK;
   else
     return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
-			    "Syntax error in expression");
+			    "Syntax error in expression", 0);
 }
 
 
@@ -658,7 +665,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	  /* Dollars are the only unary operator accepted in simple expressions */
 
 	  if (fts_is_closed_par(current_in(e)))
-	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis");	
+	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis", 0);	
 	  else if (fts_is_dollar(current_in(e)))
 	    {
 	      /* Unary operator, push it and still wait for an argument */
@@ -684,7 +691,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 		  if (! more_in(e))
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector");
+					    "Syntax error in vector constant", 0);
 
 		  if (fts_is_closed_cpar(current_in(e)))
 		    break;	
@@ -695,7 +702,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 		  if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_cpar(current_in(e))))
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector");
+					    "Syntax error in vector constant", 0);
 
 		  args++;
 		}
@@ -722,7 +729,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		  TRY(fts_expression_eval_one(e));
 
 		  if (! fts_is_closed_par(current_in(e)))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced parentesis");	
+		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced parentesis", 0);	
 
 		  status = waiting_arg;
 		}
@@ -762,7 +769,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 	      if (! fts_is_closed_sqpar(current_in(e)))
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					"Syntax error in Array access");
+					"Syntax error in Array access", 0);
 
 	      /* Push the array reference operator in the op stack */
 
@@ -822,7 +829,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
     return FTS_EXPRESSION_OK;
   else
     return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
-			    "Syntax error in expression");
+			    "Syntax error in expression", 0);
 }
 
 
@@ -859,24 +866,27 @@ static int fts_op_eval(fts_expression_state_t *e)
 		  fts_expression_add_var_ref(e, varname);
 
 		  if (fts_is_void(value))
-		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Undefined Variable");
+		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
+					    fts_symbol_name(varname));
 		  else if (fts_is_error(value))
 		    return expression_error(e, FTS_EXPRESSION_ERROR_OBJECT_REFERENCE,
-					    "Reference to a value defined by an error object");
+					    "Variable %s value is an error object, cannot be used",
+					    fts_symbol_name(varname));
 		  else
 		    *tos = *value;
 		}
 	      else
-		return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Undefined Variable");
+		return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
+					fts_symbol_name(varname));
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error");
+	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error", 0);
 	  break;
 
 	case FTS_OP_PLUS:
 	  /* NOP, really */
 	  if (! (fts_is_int(tos) || fts_is_float(tos)))
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator +", 0);
 	  break;
 
 	case FTS_OP_MINUS:
@@ -885,23 +895,23 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  else if (fts_is_float(tos))
 	    fts_set_float(tos, (-1) * fts_get_float(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for  operator -", 0);
 	  break;
 
 	case FTS_OP_BIT_NOT:
 	  if (fts_is_int(tos))
 	    fts_set_int(tos, (~ fts_get_int(tos)));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator ~", 0);
 
 	case FTS_OP_LOGICAL_NOT:
 	  if (fts_is_int(tos))
 	    fts_set_int(tos, (! fts_get_int(tos)));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator !", 0);
 
 	default:
-	  return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error");
+	  return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error", 0);
 	}
 
       return FTS_EXPRESSION_OK;
@@ -962,7 +972,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 			  fts_get_int(ptos) + fts_get_int(tos));
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator + ", 0);
 	  break;
 
 	case FTS_OP_MINUS:
@@ -973,7 +983,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	    fts_set_int(ptos,
 			fts_get_int(ptos) - fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator -", 0);
 	  break;
 
 	case FTS_OP_TIMES:
@@ -984,7 +994,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	    fts_set_int(ptos,
 			fts_get_int(ptos) * fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator *", 0);
 	  break;
 
 	case FTS_OP_DIV:
@@ -995,7 +1005,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	    fts_set_int(ptos,
 			fts_get_int(ptos) / fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator /", 0);
 	  break;
 
 	case FTS_OP_DOT:
@@ -1029,63 +1039,63 @@ static int fts_op_eval(fts_expression_state_t *e)
 		}
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator .", 0);
 	  break;
 
 	case FTS_OP_REMAINDER:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) % fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator %", 0);
 	  break;
 
 	case FTS_OP_SHIFT_LEFT:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) << fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <<", 0);
 	  break;
 
 	case FTS_OP_SHIFT_RIGHT:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) >> fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >>", 0);
 	  break;
 
 	case FTS_OP_BIT_AND:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) & fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator &", 0);
 	  break;
 
 	case FTS_OP_BIT_OR:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) | fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator |", 0);
 	  break;
 
 	case FTS_OP_BIT_XOR:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) ^ fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator ^", 0);
 	  break;
 
 	case FTS_OP_LOGICAL_AND:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) && fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator &&", 0);
 	  break;
 
 	case FTS_OP_LOGICAL_OR:
 	  if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) || fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator ||", 0);
 	  break;
 
 	case FTS_OP_EQUAL:
@@ -1110,7 +1120,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  else if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) > fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
 	  break;
 
 	case FTS_OP_GREATER_EQUAL:
@@ -1119,7 +1129,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  else if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) >= fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
 	  break;
 
 	case FTS_OP_SMALLER:
@@ -1128,7 +1138,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  else if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) < fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
 	  break;
 
 	case FTS_OP_SMALLER_EQUAL:
@@ -1138,7 +1148,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  else if (fts_is_int(tos) && fts_is_int(ptos))
 	    fts_set_int(ptos, fts_get_int(ptos) <= fts_get_int(tos));
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <=", 0);
 	  break;
 
 	case FTS_OP_ELSE:
@@ -1152,7 +1162,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 		*value_stack_top(e) = *ptos;
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator ?:", 0);
 	  break;
 
 	case FTS_OP_ASSIGN:
@@ -1162,7 +1172,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      value_stack_pop(e, 1); /* forget the value */
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator =", 0);
 	  break;
 
 	case FTS_OP_ARRAY_REF:
@@ -1171,12 +1181,12 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      *value_stack_top(e) = fts_atom_array_get(fts_get_atom_array(ptos), fts_get_int(tos));
 	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator");
+	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for array access", 0);
 
 	  break;
 
 	default:
-	  return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error");
+	  return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error", 0);
 	}
 
       return FTS_EXPRESSION_OK;
@@ -1194,6 +1204,17 @@ int fts_expression_get_status(fts_expression_state_t *e)
 {
   return e->ret;
 }
+
+const char *fts_expression_get_msg(fts_expression_state_t *e)
+{
+  return e->msg;
+}
+
+const char *fts_expression_get_err_arg(fts_expression_state_t *e)
+{
+  return e->err_arg;
+}
+
 
 
 /*
@@ -1324,7 +1345,6 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 	}
       else
 	{
-	  post("Error in Expression: %s\n", e->msg);	/* @@@ */
 #ifdef EXPRESSION_TRACE_DEBUG
 	  fprintf(stderr, "Error in Expression: %s\n", e->msg);	/* @@@ */
 #endif

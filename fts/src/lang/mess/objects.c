@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.36 $ IRCAM $Date: 1998/08/25 12:52:21 $
+ *      $Revision: 1.37 $ IRCAM $Date: 1998/08/28 13:52:36 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -40,10 +40,12 @@ void fts_objects_init()
 /*                                                                            */
 /******************************************************************************/
 
+static fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
+
 /* A static function making the real FTS object if possible. */
 
-fts_object_t *
-fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_status_t 
+fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_status_t   status;
   fts_class_t   *cl;
@@ -69,10 +71,8 @@ fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
   if (! cl)
     {
-      fprintf(stderr, "Cannot instantiate class for %s\n",
-	      fts_symbol_name(fts_get_symbol(at))); /* @@@ */
-
-      return 0;
+      *ret = 0;
+      return &fts_CannotInstantiate;
     }
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
@@ -121,9 +121,6 @@ fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
   if (status != fts_Success && status != &fts_MethodNotFound)
     {
-      fprintf(stderr, "Cannot instantiate object for %s\n",
-	      fts_symbol_name(fts_get_symbol(at))); /* @@@@ */
-
       if (patcher)
 	fts_patcher_remove_object(patcher, obj);
 
@@ -140,11 +137,13 @@ fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 	}
 
       fts_block_free((char *)obj, obj->cl->size);
+      *ret = 0;
 
-      return 0;
+      return status;
     }
 
-  return obj;
+  *ret = obj;
+  return fts_Success;
 }
 
 
@@ -204,9 +203,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	{
 	  /* Error: redefined variable */
 
-	  fprintf(stderr, "@@@ Error: redefining variable %s\n", fts_symbol_name(var));
-
-	  obj = fts_error_object_new(patcher, aoc, aot);
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     "Variable %s is already defined", fts_symbol_name(var));
 	  obj->is_wannabe = 1;
 
 	  fts_variable_add_wannabe((fts_object_t *) patcher, var, obj);
@@ -245,9 +243,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
     {
       /* error: zero arguments */
 
-      fprintf(stderr, "@@@ Error: zero arguments in object\n");
-
-      obj = fts_error_object_new(patcher, aoc, aot);
+      obj = fts_error_object_new(patcher, aoc, aot, "Zero arguments in object");
     }
 
   /* 
@@ -298,9 +294,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	{
 	  /* Error in object doctor */
 
-	  fprintf(stderr, "@@@ Error: Error in object doctor \n");
-
-	  obj = fts_error_object_new(patcher, aoc, aot);
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     "Error in object doctor for %s", fts_symbol_name(fts_get_symbol(&at[0])));
 	}
     }
 
@@ -318,17 +313,16 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	    {
 	      /* Error in expression */
 
-	      fprintf(stderr, "@@@ Error: Error in expression \n");
-
-	      obj = fts_error_object_new(patcher, aoc, aot);
+	      obj = fts_error_object_new(patcher, aoc, aot,
+					 fts_expression_get_msg(e),
+					 fts_expression_get_err_arg(e));
 	    }
 	  else if (! fts_is_symbol(&new_args[0]))
 	    {
 	      /* Missing class name, or class name is not a symbol */
 
-	      fprintf(stderr, "@@@ Error: class name is not a symbol\n");
-
-	      obj = fts_error_object_new(patcher, aoc, aot);
+	      obj = fts_error_object_new(patcher, aoc, aot,
+					 "The first argument should be a class name, but is not a symbol");
 	    }
 	  else
 	    {
@@ -354,9 +348,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	{
 	  /* Error in object doctor */
 
-	  fprintf(stderr, "@@@ Error: Error in object doctor \n");
-
-	  obj = fts_error_object_new(patcher, aoc, aot);
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     "Error in object doctor for %s", fts_symbol_name(fts_get_symbol(&at[0])));
 	}
     }
 
@@ -387,17 +380,23 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
       /* We have a metaclass: this prevent looking for 
 	 further abstractions */
 
-      obj =  fts_make_object(patcher, ac, at);
+      fts_status_t ret;
 
-      if (! obj)
+      ret = fts_make_object(patcher, ac, at, &obj);
+
+      if (ret != fts_Success)
 	{
 	  /* Standard FTS instantiation error  */
-
-	  obj = fts_error_object_new(patcher, aoc, aot);
-
-	  fprintf(stderr, "@@@ Error: FTS Error object instantiation for description :");
-	  fprintf_atoms(stderr, aoc, aot);
-	  fprintf(stderr, "\n");
+	  if (ret == &fts_CannotInstantiate)
+	    obj = fts_error_object_new(patcher, aoc, aot, "Error in class instantiation");
+	  else if (ret == &fts_ArgumentMissing)
+	    obj = fts_error_object_new(patcher, aoc, aot, "Missing argument in object");
+	  else if (ret == &fts_ExtraArguments)
+	    obj = fts_error_object_new(patcher, aoc, aot, "Extra argument in object");
+	  else if (ret == &fts_ArgumentTypeMismatch)
+	    obj = fts_error_object_new(patcher, aoc, aot, "Wrong types for the object arguments");
+	  else
+	    obj = fts_error_object_new(patcher, aoc, aot, "Error in object instantiation");
 	}
     }
 
@@ -418,8 +417,8 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
     {
       /* Object not found */
 
-      fprintf(stderr, "@@@ Error: Object not found %s\n", fts_symbol_name(fts_get_symbol(aot)));
-      obj = fts_error_object_new(patcher, aoc, aot);
+      obj = fts_error_object_new(patcher, aoc, aot,
+				 "Object or template %s not found", fts_symbol_name(fts_get_symbol(aot)));
     }
 
   /* 10 - check if we are defining a variable *and* we have a state;
@@ -437,11 +436,9 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	  /* ERROR: the object cannot define a variable,
 	     it does not have a "state" property */
 
-	  fprintf(stderr, "@@@ Error: Object %s cannot define a variable\n",
-		  fts_symbol_name(fts_get_symbol(aot)));
-
 	  fts_object_delete(obj);
-	  obj = fts_error_object_new(patcher, aoc, aot);
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     "Object %s cannot define a variable",fts_symbol_name(fts_get_symbol(aot)));
 	}
     }
 

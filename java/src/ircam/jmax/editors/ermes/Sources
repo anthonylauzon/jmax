@@ -7,7 +7,6 @@ SSOURCES = \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \
 	  ErmesSwToolbar.java \
-	  ErmesSwVarEdit.java \
 	  ErmesToolBarLayout.java \
 	  ErmesSwToggleButton.java \
 	  ErmesPatcherFactory.java \

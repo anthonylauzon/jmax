@@ -89,6 +89,7 @@ extern fts_symbol_t fts_s_font;
 extern fts_symbol_t fts_s_fontSize;
 extern fts_symbol_t fts_s_size;
 extern fts_symbol_t fts_s_error;
+extern fts_symbol_t fts_s_error_description;
 extern fts_symbol_t fts_s_state;
 
 /* Symbols related to builtin classes */

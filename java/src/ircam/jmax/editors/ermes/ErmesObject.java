@@ -693,10 +693,46 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   public Rectangle Bounds() {
     Rectangle aRect = new Rectangle (currentRect.x, currentRect.y, currentRect.width, currentRect.height);
     return aRect;
+
+    // return currentRect;// ???? Why not ??
   }
 	
   public Dimension Size() {
     return (new Dimension(currentRect.width, currentRect.height));
   }
 
+  // Experimental MDC
+
+  public void drawAnnotation(String property)
+  {
+    if (itsFtsObject != null)
+      {
+	int ax, ay, ah, aw;
+	String annotation;
+	Object value;
+	Graphics g;
+
+	itsFtsObject.ask(property);
+	Fts.sync();
+	value= itsFtsObject.get(property);
+
+	if (value != null)
+	  {
+	    annotation  = value.toString();
+	    ax = currentRect.x + currentRect.width / 2;
+	    ay = currentRect.y + currentRect.height / 2;
+	    aw = itsFontMetrics.stringWidth(annotation);
+	    ah = itsFontMetrics.getHeight();
+
+	    g = itsSketchPad.getGraphics();
+	    
+	    g.setColor(Color.white);
+	    g.fillRect(ax  - 1 , ay - ah - 1, aw + 2, ah + 2);
+
+	    g.setColor(Color.black);
+	    g.drawRect(ax - 1, ay - ah - 1, aw + 2, ah + 2);
+	    g.drawString(annotation, ax, ay);
+	  }
+      }
+  }
 }

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.10 $ IRCAM $Date: 1998/06/04 14:01:19 $
+ *      $Revision: 1.11 $ IRCAM $Date: 1998/08/19 15:15:51 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -32,7 +32,7 @@ extern void          fts_object_send_properties(fts_object_t *obj);
 
 /* This is only for object doctors (macros) */
 
-extern fts_object_t *fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+fts_status_t fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /* Change the object description; more "system" oriented */
 

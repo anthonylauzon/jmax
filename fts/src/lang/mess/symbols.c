@@ -73,6 +73,7 @@ fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
 fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
+fts_symbol_t fts_s_error_description;
 fts_symbol_t fts_s_state;
 
 /* Symbols related to builtin classes */
@@ -178,6 +179,7 @@ fts_predefine_symbols(void)
   fts_s_font       = fts_new_symbol("font");
   fts_s_fontSize   = fts_new_symbol("fs");
   fts_s_error      = fts_new_symbol("error");
+  fts_s_error_description  = fts_new_symbol("errdesc");
   fts_s_size       = fts_new_symbol("size");
   fts_s_state      = fts_new_symbol("state");
 

@@ -687,6 +687,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   {
     int aInt = e.getKeyCode();
 
+    itsSketchPad.cleanAnnotations(); // MDC
+
     //arrows first:
     if ( isAnArrow(aInt)) 
       {
@@ -725,7 +727,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       }
     else if(e.isControlDown()) 
       {
-	if(aInt == 65)
+	if (aInt == 90)
+	  itsSketchPad.showAnnotations("errdesc"); // z ??
+	else if(aInt == 65)
 	  itsSketchPad.SelectAll();//a
 	else if(aInt == 69)
 	  {//e

@@ -1089,7 +1089,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
   if (ac >= 2)
     {
       a[1] = at[1];
-      obj = fts_make_object(patcher, 2, a);
+      fts_make_object(patcher, 2, a, &obj);
       fts_object_set_description(obj, 2, a);
 
       if (ac >= 3)
@@ -1099,7 +1099,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
 	fts_object_put_prop(obj, fts_s_noutlets, &at[3]);
     }
   else
-    obj = fts_make_object(patcher, 1, at);
+    fts_make_object(patcher, 1, at , &obj);
 
   return obj;
 }

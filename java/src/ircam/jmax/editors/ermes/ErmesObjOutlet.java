@@ -18,7 +18,6 @@ public class ErmesObjOutlet extends ErmesObjInOutlet{
   public ErmesObjOutlet(int theOutletNum, ErmesObject theOwner, int x_coord, int y_coord){
     
     super(theOwner, x_coord, y_coord);
-    Rectangle aRect = itsOwner.Bounds();
     itsOutletNum = theOutletNum;
   }
 	

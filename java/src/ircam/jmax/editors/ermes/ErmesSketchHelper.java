@@ -524,12 +524,10 @@ class ErmesSketchHelper extends Object{
   public Rectangle StartMoveInclusionRect(){
     ErmesRegion aRegion = new ErmesRegion();
     ErmesObject aObject;
-    Rectangle aRect;
     ErmesObjOutlet aOutlet;
     ErmesConnection aConnection;
     for(int i=0; i<ErmesSketchPad.currentSelection.itsObjects.size(); i++){
       aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(i);
-      //aRect = aObject.Bounds();
       aRegion.addArea(aObject);
     }
     return aRegion.MinimumRect();
