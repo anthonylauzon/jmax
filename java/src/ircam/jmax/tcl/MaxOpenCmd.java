@@ -36,7 +36,12 @@ class MaxOpenCmd implements Command {
   {
     if (argv.length == 2)
       {
-	File file = new File(argv[1].toString());
+	String inputPath = argv[1].toString();
+	String path = new String();
+	if (inputPath.charAt(0) == '~') {
+	  path = ((String) MaxApplication.getProperty("user.home"))+ inputPath.substring(1);
+	}
+	File file = new File(path);
 
 	try
 	  {
