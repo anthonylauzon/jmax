@@ -69,6 +69,9 @@
 #define fts_set_atom_array(ap, x)       \
      do {fts_set_type(ap, fts_s_atom_array); fts_word_set_atom_array( fts_get_value(ap), (x));} while (0)
 
+#define fts_set_user_type(ap, x, type)       \
+     do {fts_set_type(ap, type); fts_word_set_ptr( fts_get_value(ap), (x));} while (0)
+
 #define fts_set_void(ap)           (fts_set_type(ap, fts_s_void))
 #define fts_set_error(ap)           (fts_set_type(ap, fts_s_error))
 

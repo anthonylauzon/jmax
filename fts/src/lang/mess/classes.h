@@ -36,16 +36,38 @@ extern void fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name);
 
 extern fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
 
+/* method definition */
+
 #define fts_method_define(class, winlet, s, fun, argc, at)  \
-          fts_method_define_optargs(class, winlet, s, fun, argc, at, argc) 
+  fts_method_define_optargs(class, winlet, s, fun, argc, at, argc) 
 
 #define fts_method_define_varargs(class, winlet, s, fun)  \
-          fts_method_define_optargs(class, winlet, s, fun, 0, 0, FTS_VAR_ARGS) 
+  fts_method_define_optargs(class, winlet, s, fun, 0, 0, FTS_VAR_ARGS) 
 
 
-extern fts_status_t fts_method_define_optargs(fts_class_t *, int winlet,
-					      fts_symbol_t , fts_method_t, int, fts_symbol_t *, int);
+extern fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
+					      fts_method_t fun, int, fts_symbol_t *at, int mandatory_args);
 
+#define fts_method_define_int(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_int, fun, 1, &fts_s_int, 1);
+
+#define fts_method_define_float(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_float, fun, 1, &fts_s_float, 1);
+
+#define fts_method_define_number(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_int, fun, 1, &fts_s_int, 1); \
+  fts_method_define_optargs(class, winlet, fts_s_float, fun, 1, &fts_s_float, 1);
+
+#define fts_method_define_symbol(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_symbol, fun, 1, &fts_s_symbol, 1);
+
+#define fts_method_define_bang(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_bang, fun, 0, 0, 0);
+
+#define fts_method_define_list(class, winlet, fun) \
+  fts_method_define_optargs(class, winlet, fts_s_list, fun, 0, 0, FTS_VAR_ARGS);
+
+/* outlet type definition */
 
 #define fts_outlet_type_define(class, woutlet, s, ac, at)  \
           fts_outlet_type_define_optargs(class, woutlet, s, ac, at, ac) 
