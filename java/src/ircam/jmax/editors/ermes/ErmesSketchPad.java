@@ -24,12 +24,14 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, FtsUpdateGroupListener{
-
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener/*, FtsUpdateGroupListener*/{
+  
   //2703...
   public boolean isInGroup = false;
   public boolean drawPending = false;
   public boolean copyPending = false;
+  
+  /*
   public void updateGroupStart() {
     isInGroup = true;
   }
@@ -44,9 +46,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
       drawPending = false;
       copyPending = false;
-  }
+  }*/
   //...2703
-
+  
   ErmesSketchWindow itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -888,7 +890,7 @@ Rectangle previousResizeRect = new Rectangle();
   public ErmesSketchPad(ErmesSketchWindow theSketchWindow) {    
     super();
     itsHelper = new ErmesSketchHelper(this);
-    FtsServer.getServer().addUpdateGroupListener(this);
+    //FtsServer.getServer().addUpdateGroupListener(this);
     setLayout(null);
     preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
     itsSketchWindow = theSketchWindow;

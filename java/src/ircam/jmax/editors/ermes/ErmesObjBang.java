@@ -4,10 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-//import ircam.jmax.MaxApplication; //using the global probe...
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.ermes.*;
-//import com.sun.java.swing.Timer;
+import ircam.jmax.utils.*;
 
 /**
  * The "bang" graphic object.
@@ -16,9 +15,18 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
 
   boolean itsFlashing = false;
   static Dimension preferredSize = new Dimension(20,20);
+  //static Probe itsProbe;
+  //static ErmesObjBang whichToProbe;
 
   public ErmesObjBang(){
     super();
+    /*if (itsProbe == null) {
+      itsProbe = new Probe("bang");
+      itsProbe.start();
+      }
+      if (whichToProbe == null) {
+      whichToProbe = this;
+    }*/
   }
 
   /*  public void actionPerformed(ActionEvent e) {
@@ -34,7 +42,6 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
 
   public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
     super.Init(theSketchPad, theFtsObject);
-    //itsFlashingThread = new FlashingThread("aFlash");
     return true;
   }
 
@@ -55,34 +62,28 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   }
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    //    itsProbe.stop();
+    //itsProbe.reportToFile("bang_test");
     if (itsSketchPad.itsRunMode) {
       itsFtsObject.sendMessage(0, "bang", null);
-      //itsFlashing = true;
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
 
-  /*  public boolean MouseUp_specific(MouseEvent e, int x, int y) {
-    if (!userInitiatedFlash) return false; //fts is controlling this flash
-    else {
-      itsFlashing = false;
-      Paint_specific(itsSketchPad.getGraphics());
-      userInitiatedFlash = false;
-      return true;
-    }
-  }*/
 
   protected void FtsValueChanged(Object value) {
     int on_off = ((Integer) value).intValue();
-
+    
     if (on_off == 1) {
-	itsFlashing = true;
+      itsFlashing = true;
+      //      if (whichToProbe == this) 
+      //itsProbe.mark("bang");
     }
     else {
-	itsFlashing = false;
-    }
+       itsFlashing = false;
+    } 
     Paint_specific(itsSketchPad.getGraphics());
   }
 	

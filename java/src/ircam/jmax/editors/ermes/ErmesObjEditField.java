@@ -203,7 +203,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	
 	aCurrentLineWidth = GetCurrentLineWidth(fm, s);
 	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	if (aCurrentLineWidth >= getSize().width-5) {  
+	if (aCurrentLineWidth >= getSize().width-20) {  
 	  int step;
 	  if(aWidth>20) step = aWidth;
 	  else step = 30;
