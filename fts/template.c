@@ -122,7 +122,11 @@ fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int
 {
   fts_object_t *obj;
 
+  fts_package_push(template->package);
+
   obj = fts_binary_file_load(fts_symbol_name(template->filename), (fts_object_t *) patcher, ac, at, e);
+
+  fts_package_pop(template->package);
     
   /* flag the patcher as template, and set the template */
   if (obj) 

@@ -150,20 +150,40 @@ void fts_platform_init( int argc, char **argv)
   WORD wVersionRequested;
   WSADATA wsaData;
   int result;
-  
+  struct hostent *hostptr;
+  SOCKET sock;
+
   wVersionRequested = MAKEWORD(2, 2);
   
   result = WSAStartup( wVersionRequested, &wsaData );
   if (result != 0) {
-    /* Couldn't initiate WinSock */
+    MessageBox(NULL, "Couldn't initialize the TCP/IP layer", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
     return /* FIXME */;
   }
   
   if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
     WSACleanup();
-    /* Bad WinSock version */
+    MessageBox(NULL, "The version of the TCP/IP layer installed on your machine is invalid", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
     return /* FIXME */;
   }
+
+  hostptr = gethostbyname("127.0.0.1");
+  if (!hostptr) {
+    MessageBox(NULL, "Couldn't find local TCP/IP address. " 
+	       "Make sure your machine is configured with TCP/IP and uses a recent TCP/IP library.", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
+    return;
+  }
+  
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0) ) == -1)	{
+    MessageBox(NULL, "Coulnd't create a socket. " 
+	       "Make sure your machine is configured with TCP/IP and uses a recent TCP/IP library.", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
+    return;
+  }
+  closesocket(sock);
 
   /* boost the priority of the fts thread */
 /*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
@@ -206,8 +226,8 @@ fts_get_root_from_registry(char *buf, int bufsize)
     return 0;
   }
 
-  if (!fts_get_string_from_registry(key, "CurrentVersion", version, 256)) {
-    post("Failed to read the value of registry key: '%s\\CurrentVersion'\n", JMAX_KEY);
+  if (!fts_get_string_from_registry(key, "FtsVersion", version, 256)) {
+    post("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
@@ -217,8 +237,8 @@ fts_get_root_from_registry(char *buf, int bufsize)
     return 0;
   }
 
-  if (!fts_get_string_from_registry(version_key, "jmaxRoot", buf, bufsize)) {
-    post("Failed to read the value of registry key: '%s\\%s\\jmaxRoot'\n", JMAX_KEY, version);
+  if (!fts_get_string_from_registry(version_key, "ftsRoot", buf, bufsize)) {
+    post("Failed to read the value of registry key: '%s\\%s\\ftsRoot'\n", JMAX_KEY, version);
     RegCloseKey(key);
     RegCloseKey(version_key);
     return 0;
@@ -252,6 +272,8 @@ fts_get_default_root_directory( void)
       }
     }
   }
+
+  fts_log("[win32]: Using '%s' as document root\n", root);
 
   return fts_new_symbol_copy( root);
 }

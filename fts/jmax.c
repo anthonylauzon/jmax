@@ -42,6 +42,8 @@ typedef void* jmax_dlsymbol_t;
 int jmax_run(int argc, char** argv);
 void jmax_set_root(char* s);
 char* jmax_get_root(void);
+void jmax_set_server_root(char* s);
+char* jmax_get_server_root(void);
 
 /* common private functions */
 static void jmax_get_default_jvm(char* buffer, int size);
@@ -54,6 +56,7 @@ jint JNICALL jmax_vfprintf(FILE *fp, const char *format, va_list args);
 
 /* platform specific functions */
 static void jmax_init_root(void);
+static void jmax_init_server_root(void);
 static void jmax_get_available_jvm(void);
 static jmax_dl_t jmax_dl_load(char* path);
 static jmax_dlsymbol_t jmax_dl_symbol(jmax_dl_t lib, char* name);
@@ -82,6 +85,7 @@ static char* jmax_classpath = NULL;
 static char* jmax_jvm[MAX_JVM];
 static int jmax_num_jvm = 0;
 static char* jmax_root = NULL;
+static char* jmax_server_root = NULL;
 
 /*
  * start the JVM and run MaxApplication
@@ -308,6 +312,30 @@ jmax_set_root(char* s)
   jmax_root = strcpy((char*) malloc(strlen(s) + 1), s);
 }
 
+static char* 
+jmax_get_server_root(void)
+{
+  if (jmax_server_root == NULL) {
+    jmax_init_server_root();
+  }
+  return jmax_server_root;
+}
+
+static void 
+jmax_set_server_root(char* s)
+{
+  if (jmax_server_root != NULL) {
+    free(jmax_server_root);
+  }
+  if (s == NULL) {
+    return;
+  }
+
+  jmax_log("settings server root to %s\n", s);
+
+  jmax_server_root = strcpy((char*) malloc(strlen(s) + 1), s);
+}
+
 static int 
 jmax_log(const char *format, ...)
 {
@@ -390,6 +418,23 @@ jmax_init_root(void)
   jmax_set_root(root);
 }
 
+
+static void 
+jmax_init_server_root(void)
+{
+  char root[_MAX_PATH];
+
+  /* first check the registry */
+  if (!jmax_get_server_root_from_registry(root, _MAX_PATH)) {
+    
+    /* use the jmax root */
+    jmax_set_server_root(jmax_get_root());
+    return;
+  }
+
+  jmax_set_server_root(root);
+}
+
 static void 
 jmax_get_available_jvm(void)
 {
@@ -449,7 +494,7 @@ jmax_get_root_from_registry(char *buf, jint bufsize)
   }
 
   if (!jmax_get_string_from_registry(key, "CurrentVersion", version, 256)) {
-    jmax_log("Failed to read the value of registry key: '%s\\CurrentVersion'\n", JMAX_KEY);
+    jmax_log("Failed to read the value of registry key: '%s\\jMaxVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
@@ -461,6 +506,42 @@ jmax_get_root_from_registry(char *buf, jint bufsize)
 
   if (!jmax_get_string_from_registry(version_key, "jmaxRoot", buf, bufsize)) {
     jmax_log("Failed to read the value of registry key: '%s\\%s\\jmaxRoot'\n", JMAX_KEY, version);
+    RegCloseKey(key);
+    RegCloseKey(version_key);
+    return 0;
+  }
+
+  RegCloseKey(key);
+  RegCloseKey(version_key);
+
+  return 1;
+}
+
+static int 
+jmax_get_server_root_from_registry(char *buf, jint bufsize)
+{
+  HKEY key;
+  HKEY version_key;
+  char version[256];
+
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
+    jmax_log("Error opening registry key '%s'\n", JMAX_KEY);
+    return 0;
+  }
+
+  if (!jmax_get_string_from_registry(key, "CurrentVersion", version, 256)) {
+    jmax_log("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
+    RegCloseKey(key);
+    return 0;
+  }
+
+  if (RegOpenKeyEx(key, version, 0, KEY_READ, &version_key) != 0) {
+    jmax_log("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
+    return 0;
+  }
+
+  if (!jmax_get_string_from_registry(version_key, "ftsRoot", buf, bufsize)) {
+    jmax_log("Failed to read the value of registry key: '%s\\%s\\ftsRoot'\n", JMAX_KEY, version);
     RegCloseKey(key);
     RegCloseKey(version_key);
     return 0;
@@ -551,6 +632,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #define MAX_ARGC  64
   char* argv[MAX_ARGC];
   int argc = 0;
+  char server_dir[_MAX_PATH];
   int err;
   char* mess = NULL;
   char* s;
@@ -565,6 +647,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   /* the default arguments */
   argv[argc++] = "-jmaxRoot";
   argv[argc++] = jmax_get_root();
+  argv[argc++] = "-jmaxServerDir";
+  argv[argc++] = snprintf(server_dir, _MAX_PATH, "%s%c%s", jmax_get_server_root(), FILE_SEPARATOR, "bin");
   argv[argc++] = "-jmaxConnection";
   argv[argc++] = "tcp";
   argv[argc++] = "-jmaxPort";
