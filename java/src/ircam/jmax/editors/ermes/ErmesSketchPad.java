@@ -67,7 +67,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public boolean itsRunMode = false;
   boolean doSnapToGrid = false;
   public boolean doAutorouting = true;
-  public boolean itsSelectionRouting = true;
+  //  public boolean itsSelectionRouting = true;
   public boolean itsGraphicsOn = true;
   
   ErmesObjEditField itsEditField = null;
@@ -1745,18 +1745,53 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     itsElementRgn.Add(aRect);	
   }
   
-  //??	void SaveSegmRgn(ErmesConnSegment theSegment){}
-  public void SetAutorouting(){
+  public void SetAutorouting(boolean t) {
+    //setting the routing mode could happen in two cases:
+    //1). The demand is global (no connections selected)
+    if(itsSelectedConnections.size()==0) {
+      SetPatcherAutorouting(t);
+    }
+    else {
+      //2. connections were selected, the demand is local to those connections
+      SetSelectionAutorouting(t);
+      repaint();
+    }
+  } 
+  
+  public void SetSelectionAutorouting(boolean t) {
     ErmesConnection aConnection;
-    itsSelectionRouting = !itsSelectionRouting;
-    if(itsSelectedConnections.size()==0) doAutorouting = !doAutorouting;
-    //qui sulla lista delle connessioni selezionate adatta l'autorouting
+
+    int selectionState = getSelectionRouting();
+
+    if ((t?1:0) == selectionState) return; //nothing to do
     for (Enumeration e = itsSelectedConnections.elements(); e.hasMoreElements();) {
       aConnection = (ErmesConnection)e.nextElement();
-      if(aConnection.GetAutorouted() != itsSelectionRouting) aConnection.ChangeRoutingMode();
+      if(aConnection.GetAutorouted() != t) aConnection.ChangeRoutingMode();
     }
+  }
+
+  //returns 1 if all the selected connections are autorouted,
+  //0 if all the selected connections are not autorouted,
+  //-1 otherwise 
+  public int getSelectionRouting() {
+    ErmesConnection aConnection;
+    boolean currentValue;
+    boolean allEquals = true;
+    
+    if (itsSelectedConnections.size() == 0) return -1;
+    else if (itsSelectedConnections.size() == 1) return (((ErmesConnection)itsSelectedConnections.elementAt(0)).GetAutorouted())?1:0;
+    //(else)
+    currentValue = ((ErmesConnection)itsSelectedConnections.elementAt(0)).GetAutorouted();
+    for (int i=0; i<itsSelectedConnections.size();i++) {
+      allEquals = currentValue && ((ErmesConnection)itsSelectedConnections.elementAt(i)).GetAutorouted();
+      if (!allEquals) return -1;
+    }
+    return (currentValue)?1:0;
+  }
+
+  public void SetPatcherAutorouting(boolean t){
+    doAutorouting = t;
     ToSave();
-    repaint();
   }
   
   public void SetResizeState(ErmesObject theResizingObject){

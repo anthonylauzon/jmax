@@ -36,7 +36,7 @@ public class FtsPropertyDescriptor
       return false;
   }
 
-  static void setPersistent(String property, boolean v)
+  public static void setPersistent(String property, boolean v)
   {
     if (propertyDescriptors.containsKey(property))
       ((FtsPropertyDescriptor) propertyDescriptors.get(property)).persistent = v;
@@ -105,7 +105,7 @@ public class FtsPropertyDescriptor
    *  default value are not saved.
    */
 
-  static void setDefaultValue(String property, Object v)
+  public static void setDefaultValue(String property, Object v)
   {
     if (propertyDescriptors.containsKey(property))
       ((FtsPropertyDescriptor) propertyDescriptors.get(property)).defaultValue = v;

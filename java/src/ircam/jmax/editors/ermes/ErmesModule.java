@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 
 /** The ermes module; the init function is called at init time
  *  by jmax, and install module related things
@@ -17,5 +18,10 @@ public class ErmesModule
     // Install the module tcl commands.
 
     ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage();
+
+    //List of persistent properties
+
+    FtsPropertyDescriptor.setPersistent("autorouting", true);    
+    FtsPropertyDescriptor.setDefaultValue("autorouting", "on");
   }
 }

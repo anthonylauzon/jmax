@@ -253,7 +253,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     //	CONSTRUCTOR FROM DOCUMENT
     //
     //--------------------------------------------------------
-    public void InitFromDocument(MaxDocument theDocument) {
+  /*public void InitFromDocument(MaxDocument theDocument) {
 		
       Object aObject;
       int x, y, width, height;
@@ -272,12 +272,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
       //assigning the right name to the window.
 
-      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
+      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting(false);//???
       validate();
       itsSketchPad.InitFromDocument(itsDocument);
       itsSketchPad.repaint();//force a repaint to build an offGraphics context
       validate();
-    }
+    }*/
 
     public void InitFromContainer(FtsContainerObject patcher) {
 		
@@ -307,9 +307,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
       setBounds(x, y, width, height+80);
 
-      //assigning the right name to the window.
+      //assigning the autorouting mode.
 
-      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
+      System.err.println(patcher.get("autorouting"));
+      if (((String)(patcher.get("autorouting"))).equals("on"))
+	SetAutorouting(true);
+      else SetAutorouting(false);
+      //      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting(false);//???
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
       itsSketchPad.repaint();//force a repaint to build an offGraphics context
@@ -920,9 +924,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
 
   private void GraphicsItemStateChanged(MenuItem theMenuItem, String theString){
-    CheckboxMenuItem aCheckItem;
     if (theString.equals("Autorouting")) {
-      SetAutorouting();
+      SetAutorouting(((CheckboxMenuItem) theMenuItem).getState());
     }
   }
   
@@ -961,7 +964,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsSelectedJustificationMenu = itsSketchJustificationMenu;
     itsSelectedJustificationMenu.setState(true);
     itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
-    itsSketchPad.itsSelectionRouting = itsSketchPad.doAutorouting;
+    //itsSketchPad.itsSelectionRouting = itsSketchPad.doAutorouting;
   }
 
   public void SelectionUpdateMenu(String theFont, Integer theSize, Integer theJustification){
@@ -1033,18 +1036,22 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   public void UpdateRoutingMenuWithSelection(){
-    if(itsSketchPad.itsSelectedConnections.size()!=0){
-      boolean aAutorouting = ((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(0)).GetAutorouted();
-      boolean aBothRoutingMode = false;
-      for(int i=1; i<itsSketchPad.itsSelectedConnections.size(); i++){
-	if(aAutorouting!=((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(i)).GetAutorouted()){
+    int temp = itsSketchPad.getSelectionRouting();
+    if (temp == 1) itsAutoroutingMenu.setState(true);
+    else if (temp ==0) itsAutoroutingMenu.setState(false);
+    else itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
+    /*    if(itsSketchPad.itsSelectedConnections.size()!=0){
+	  boolean aAutorouting = ((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(0)).GetAutorouted();
+	  boolean aBothRoutingMode = false;
+	  for(int i=1; i<itsSketchPad.itsSelectedConnections.size(); i++){
+	  if(aAutorouting!=((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(i)).GetAutorouted()){
 	  aBothRoutingMode = true;
 	  break;
-	}
-      }
-      if(aBothRoutingMode) itsAutoroutingMenu.setState(false);
-      else itsAutoroutingMenu.setState(aAutorouting);
-    }
+	  }
+	  }
+	  if(aBothRoutingMode) itsAutoroutingMenu.setState(false);
+	  else itsAutoroutingMenu.setState(aAutorouting);
+	  }*/
   }
 
   private void ExecutionMenuAction(MenuItem theMenuItem, String theString) {
@@ -1170,11 +1177,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   //--------------------------------------------------------
   //	SetAutorouting
   //--------------------------------------------------------
-  public void SetAutorouting(){
-    itsSketchPad.SetAutorouting();
+  public void SetAutorouting(boolean t){
+    itsSketchPad.SetAutorouting(t);
   }
   
-
   private MenuItem getRunModeMenuItem() {
     return itsRunModeMenuItem;
   }
@@ -1235,6 +1241,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsPatcher.put("win.pos.y", aRect.y);
     itsPatcher.put("win.size.w", aRect.width);
     itsPatcher.put("win.size.h", aRect.height);
+    if (itsSketchPad.doAutorouting) itsPatcher.put("autorouting", "on");
+    else itsPatcher.put("autorouting", "off");
 
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
