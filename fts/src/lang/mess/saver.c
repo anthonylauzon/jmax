@@ -882,6 +882,8 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_font);
   fts_bmax_code_new_property(f, obj, fts_s_fontSize);
 
+  /* slider properties */
+  fts_bmax_code_new_property(f, obj, fts_s_orientation);
   fts_bmax_code_new_property(f, obj, fts_s_min_value);
   fts_bmax_code_new_property(f, obj, fts_s_max_value);
 

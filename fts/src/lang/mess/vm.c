@@ -143,7 +143,7 @@ static int            object_table_size_stack[OBJECT_TABLE_STACK_DEPTH];
 static int            object_table_tos = OBJECT_TABLE_STACK_DEPTH;
 static fts_object_t **object_table = 0;
 
-#define MAX_BUILTIN_SYMBOLS 88
+#define MAX_BUILTIN_SYMBOLS 89
 static fts_symbol_t builtin_symbols[MAX_BUILTIN_SYMBOLS];
 
 /* Macros to do checks operations */
@@ -1127,9 +1127,12 @@ void fts_vm_init()
   builtin_symbols[32] =  fts_s_quote;
   builtin_symbols[33] =  fts_s_dollar;
   builtin_symbols[34] =  fts_s_semi;
+
+  /* slider properties (see #88 down!)*/
   builtin_symbols[35] =  fts_s_value;
   builtin_symbols[36] =  fts_s_max_value;
   builtin_symbols[37] =  fts_s_min_value;
+
   builtin_symbols[38] =  fts_s_name;
   builtin_symbols[39] =  fts_s_x;
   builtin_symbols[40] =  fts_s_wx;
@@ -1179,23 +1182,7 @@ void fts_vm_init()
   builtin_symbols[85] =  fts_s_size;
   builtin_symbols[86] =  fts_s_patcher;
   builtin_symbols[87] =  fts_s_data;
+
+  /* slider properties */
+  builtin_symbols[88] =  fts_s_orientation;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

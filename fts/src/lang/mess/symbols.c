@@ -92,9 +92,12 @@ fts_symbol_t fts_s_send_ui_properties;
 
 /* Predefined symbol for properties */
 
+/* slider properties */
 fts_symbol_t fts_s_value;
+fts_symbol_t fts_s_orientation;
 fts_symbol_t fts_s_min_value;
 fts_symbol_t fts_s_max_value;
+
 fts_symbol_t fts_s_name;
 fts_symbol_t fts_s_x;
 fts_symbol_t fts_s_wx;
@@ -221,9 +224,13 @@ fts_predefine_symbols(void)
   fts_s_quote      = fts_new_symbol("'");
   fts_s_dollar     = fts_new_symbol("$");
   fts_s_semi       = fts_new_symbol(";");
-  fts_s_value      = fts_new_symbol("value");
-  fts_s_max_value  = fts_new_symbol("maxValue");
-  fts_s_min_value  = fts_new_symbol("minValue");
+
+  /* slider properties */
+  fts_s_value = fts_new_symbol("value");
+  fts_s_orientation = fts_new_symbol("orientation");
+  fts_s_max_value = fts_new_symbol("maxValue");
+  fts_s_min_value = fts_new_symbol("minValue");
+
   fts_s_name       = fts_new_symbol("name");
   fts_s_x          = fts_new_symbol("x");
   fts_s_wx         = fts_new_symbol("wx");

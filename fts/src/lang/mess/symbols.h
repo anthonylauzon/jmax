@@ -133,9 +133,12 @@ extern fts_symbol_t fts_s_send_ui_properties;
 
 /* Symbols related to object properties */
 
+/* slider properties */
 extern fts_symbol_t fts_s_value;
+extern fts_symbol_t fts_s_orientation;
 extern fts_symbol_t fts_s_min_value;
 extern fts_symbol_t fts_s_max_value;
+
 extern fts_symbol_t fts_s_name;
 extern fts_symbol_t fts_s_x;
 extern fts_symbol_t fts_s_wx;
