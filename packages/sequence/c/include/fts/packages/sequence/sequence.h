@@ -65,13 +65,13 @@ typedef struct _sequence_
 #define sequence_set_editor_close(s) ((s)->open = 0)
 #define sequence_editor_is_open(s) ((s)->open != 0)
 
-extern void sequence_add_track(sequence_t *sequence, track_t *track);
-extern void sequence_remove_track(sequence_t *sequence, track_t *track);
-extern void sequence_set_dirty(sequence_t *sequence);
+SEQUENCE_API void sequence_add_track(sequence_t *sequence, track_t *track);
+SEQUENCE_API void sequence_remove_track(sequence_t *sequence, track_t *track);
+SEQUENCE_API void sequence_set_dirty(sequence_t *sequence);
 
-extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
-extern track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
+SEQUENCE_API track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
+SEQUENCE_API track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 
-extern void sequence_config(void);
+SEQUENCE_API void sequence_config(void);
 
 #endif
