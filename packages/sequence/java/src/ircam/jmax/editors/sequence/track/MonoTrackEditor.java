@@ -45,7 +45,7 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionListener, TrackEditor
+public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implements ListSelectionListener, TrackEditor
 {
     public MonoTrackEditor(Geometry g, Track track)
     {
