@@ -31,7 +31,6 @@ delwrite.c \
 ftl_delay.c \
 ftl_samprw.c \
 sampbuf.c \
-sampfilt.c \
 sampling.c \
 samppeek.c \
 sampread.c \
@@ -40,4 +39,6 @@ sigtable.c \
 tabcycle.c \
 tabpeek.c \
 tabpoke.c \
-vd.c
+vd.c \
+sampunit.c \
+

@@ -25,9 +25,9 @@
  */
 
 #include "fts.h"
-
 #include "delbuf.h"
 #include "deltable.h"
+#include "sampunit.h"
 
 #define CLASS_NAME "delread~"
 
@@ -73,15 +73,14 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   delread_t *this = (delread_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
   float time = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
   float conv;
-  float sr;
 
-  if(!unit) unit = fts_s_msec; /* default */
+  if(!unit) 
+    unit = samples_unit_get_default();
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-  conv = fts_unit_convert_to_base(unit, 1.0f, &sr);
+  conv = samples_unit_convert(unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
   
   this->name = name;
   this->time = time;
@@ -152,7 +151,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       if(!success) return;
     }
 
-  this->conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
+  this->conv = samples_unit_convert(this->unit, 1.0f, sr);
   this->buf = buf;      
   
   delread_set_delay(this);

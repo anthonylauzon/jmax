@@ -25,7 +25,6 @@
  */
 
 #include "fts.h"
-#include "sampfilt.h"
 
 extern void sampbuf_table_init(void);
 extern void sigtable_config(void);
@@ -41,11 +40,10 @@ extern void delwrite_config(void);
 extern void delread_config(void);
 extern void vd_config(void);
 
+extern void samples_unit_init(void);
+
 static void sampling_module_init(void)
 {
-  if(!make_sampfilt_tab())
-    post("fts_sampling_init: out of memory\n");
-
   sampbuf_table_init();
   
   sigtable_config();
@@ -60,6 +58,8 @@ static void sampling_module_init(void)
   delwrite_config();
   delread_config();
   vd_config();
+
+  samples_unit_init();
 }
 
 fts_module_t sampling_module = {"sampling", "ISPW sampling and delayline classes", sampling_module_init, 0};

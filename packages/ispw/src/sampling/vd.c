@@ -28,6 +28,7 @@
 #include "deltable.h"
 #include "delbuf.h"
 #include "vd.h"
+#include "sampunit.h"
 
 /* buf_ptr is incremented each sample and corresponds to zero delay;
    at the outset it points into the buffer proper but at the end it
@@ -64,7 +65,7 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   vd_t *this = (vd_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
 
   this->name = name;
 
@@ -82,7 +83,7 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     }
   else
     {
-      this->unit = fts_s_msec;
+      this->unit = samples_unit_get_default();
       at += 2; 
       ac -= 2;
     }
@@ -173,7 +174,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
       else
 	ftl->write_advance = 0.0f;
 
-      ftl->conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
+      ftl->conv = samples_unit_convert(this->unit, 1.0f, sr);
       ftl->max_span = this->max_incr * (float)n_tick;
   
       if(this->millers_fix_del == 0.0f)

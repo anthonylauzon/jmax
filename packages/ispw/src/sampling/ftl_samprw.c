@@ -26,20 +26,18 @@
 
 #include "fts.h"
 #include "sampbuf.h"
-#include "sampfilt.h"
 #include "sampwrite.h"
 #include "sampread.h"
-
 
 void ftl_sampwrite(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_ptr(argv + 0);
   sampwrite_ctl_t *ctl = (sampwrite_ctl_t *)fts_word_get_ptr(argv + 1);
-  long n_tick = fts_word_get_long(argv + 2);
-  long onset = ctl->onset;
+  int n_tick = fts_word_get_int(argv + 2);
+  int onset = ctl->onset;
   sampbuf_t *buf = ctl->buf;
   float *xp = buf->samples + onset;
-  long n_left = buf->size + GUARDPTS - onset;
+  int n_left = buf->size + GUARDPTS - onset;
 
   if(n_left <= 0) return;
   if(n_left >= n_tick){
@@ -56,23 +54,30 @@ void ftl_sampread(fts_word_t *argv)
   float *in = (float *)fts_word_get_ptr(argv);
   float *out = (float *)fts_word_get_ptr(argv + 1);
   sampread_ctl_t * restrict ctl = (sampread_ctl_t *)fts_word_get_ptr(argv + 2);
-  long n_tick = fts_word_get_long(argv + 3);
+  int n_tick = fts_word_get_int(argv + 3);
   sampbuf_t *buf = ctl->buf;
-  float f1, f2, extent;
-  long index, incr, n1;
+  float begin, end, length;
+  float max = (float)(buf->size - 4);
+  int index, incr, start;
   float *onset;
   int i;
 
-  f1 = ctl->last_in;
-  f2 = in[n_tick-1] * ctl->conv;
-  ctl->last_in = f2;
+  begin = ctl->last_in;
+  end = in[n_tick - 1] * ctl->conv;
+  ctl->last_in = end;
 
-  extent = f2 - f1;
+  length = end - begin;
 
-  if(extent > 0.0f && f1 >= 0.0f && f2 < buf->size - 4 && extent <= ctl->max_extent)
-    n1 = f1;
-  else if(extent < 0.0f && f2 >= 0 && f1 < buf->size - 4 && extent >= -ctl->max_extent)
-    n1 = f2 - 0.5f;
+  if(length > 0.0f && begin >= 0.0f && end < max && length <= ctl->max_extent)
+    {
+      /* end > begin: forward */
+      start = begin;
+    }
+  else if(length < 0.0f && end >= 0 && begin < max && length >= -ctl->max_extent)
+    {
+      /* end < begin: backwards */
+      start = end - 0.5f; 
+    }
   else
     {
       for(i=0; i<n_tick; i++)
@@ -81,15 +86,13 @@ void ftl_sampread(fts_word_t *argv)
       return;
     }
   
-  onset = buf->samples + n1;
-  index = (f1 - n1) * 65536.0f;
-  incr = 65536.0f * extent * ctl->inv_n;
+  onset = buf->samples + start;
+  index = fts_fourpoint_index_scale(begin - (float)start);
+  incr = fts_fourpoint_index_scale(length * ctl->inv_n);
   
   for(i=0; i<n_tick; i++)
     {
-      sampfilt_t * restrict sampfilt = sampfilt_tab + ((index >> 8) & 255);
-      float * restrict fp = onset + (index >> 16);
-      out[i] = sampfilt->f1 * fp[0] + sampfilt->f2 * fp[1] + sampfilt->f3 * fp[2] + sampfilt->f4 * fp[3];
+      fts_fourpoint_interpolate(onset + 1, index, out + i);
       index += incr;
     }
 }

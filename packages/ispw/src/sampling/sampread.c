@@ -27,6 +27,7 @@
 #include "fts.h"
 #include "sampbuf.h"
 #include "sampread.h"
+#include "sampunit.h"
 
 
 static fts_symbol_t fts_s_jump;
@@ -55,7 +56,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sampread_t *this = (sampread_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit =     fts_unit_get_samples_arg(ac, at, 2, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
   float max_speed = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
   sampbuf_t *null = 0;
   float    zero = 0.0f;
@@ -63,7 +64,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   this->tab_name = tab_name;
 
   if (! unit)
-    unit = fts_s_msec; /* default */
+    unit = samples_unit_get_default();
   
   this->max_speed = (max_speed > 1.0f ? max_speed : 4.0f);
   this->unit = unit;
@@ -100,9 +101,9 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sampread_t *this = (sampread_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   fts_atom_t argv[4];
-  float      sr     = fts_dsp_get_input_srate(dsp, 0);
-  long       n_tick = fts_dsp_get_input_size(dsp, 0);
-  sampbuf_t *buf    = sampbuf_get(this->tab_name);
+  float sr = fts_dsp_get_input_srate(dsp, 0);
+  long n_tick = fts_dsp_get_input_size(dsp, 0);
+  sampbuf_t *buf = sampbuf_get(this->tab_name);
 
   if (buf)
     {
@@ -116,7 +117,7 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       ftl_data_set(sampread_ctl_t, this->sampread_data, buf, &buf);
 
-      f = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
+      f = samples_unit_convert(this->unit, 1.0f, sr);
       this->conv = f;
       ftl_data_set(sampread_ctl_t, this->sampread_data, conv, &f);
 

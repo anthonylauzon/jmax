@@ -30,6 +30,7 @@
 
 #include "fts.h"
 #include "sampbuf.h"
+#include "sampunit.h"
 
 
 typedef struct{
@@ -46,7 +47,7 @@ typedef struct{
 #define SND_FORMAT_LINEAR_16 (3)
 
 #define TEMPBUFSIZE 16384
-#define TEMPBUFSAMPS (TEMPBUFSIZE/sizeof(filesamp_t))
+#define TEMPBUFSAMPS (int)(TEMPBUFSIZE/sizeof(filesamp_t))
 
 /******************************************************************
  *
@@ -68,16 +69,15 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
   float size = (unit ? fts_get_float_arg(ac, at, 3, 0.0f) : fts_get_float_arg(ac, at, 2, 0.0f));
-  long n_samps;
+  int n_samps;
   float *samp_buf;
-  float sr;
 
   this->name = 0;
 
   if (!unit)
-    unit = fts_s_msec; /* default */
+    unit = samples_unit_get_default();
   
   if (sampbuf_name_already_registered(name))
     {
@@ -90,8 +90,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   if (size < 0)
     size = 0;
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-  n_samps = fts_unit_convert_to_base(unit, size, &sr);
+  n_samps = samples_unit_convert(unit, size, fts_param_get_float(fts_s_sampling_rate, 44100.));
   
   sampbuf_init(&this->buf, n_samps);
 
@@ -139,11 +138,7 @@ put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     post("table~: dead object\n");
   else
     {
-      float sr;
-      long n_samps;
-
-      sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-      n_samps = fts_unit_convert_to_base(this->unit, this->check_size, &sr);
+      int n_samps = samples_unit_convert(this->unit, this->check_size, fts_param_get_float(fts_s_sampling_rate, 44100.));
 
       sampbuf_realloc(&this->buf, n_samps);
     }
@@ -160,10 +155,10 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  long int onset = fts_get_long_arg(ac, at, 1, 0);
-  long size = this->buf.size;
+  int onset = fts_get_int_arg(ac, at, 1, 0);
+  int size = this->buf.size;
   float *buf_ptr = this->buf.samples;
-  long samps_left, samps_to_read, samps_read;
+  int samps_left, samps_to_read, samps_read;
   char tempbuf[TEMPBUFSIZE+320];
   int fd;
 
@@ -183,7 +178,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   samps_left = samps_to_read = size + GUARDPTS;
   while(samps_left > 0){
-    long gimme = samps_left, n_bytes, bytes_read;
+    int gimme = samps_left, n_bytes, bytes_read;
     char *rats;
     if (gimme > TEMPBUFSAMPS) gimme = TEMPBUFSAMPS;
 
@@ -219,7 +214,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   int fd;
-  long samps_to_write;
+  int samps_to_write;
   char tempbuf[TEMPBUFSIZE];
   SNDSoundStruct header;
   float *buf_ptr;
@@ -236,11 +231,11 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.dataLocation = sizeof(header);
   header.dataSize = 0x10000000;
   header.dataFormat = SND_FORMAT_LINEAR_16;
-  header.samplingRate = (long)fts_param_get_float(fts_s_sampling_rate, 44100.f);
+  header.samplingRate = fts_param_get_float(fts_s_sampling_rate, 44100.f);
   header.channelCount = 1;
   header.info = 0x0;
 
-  if (write(fd, (char *)&header, sizeof(header)) < sizeof(header)){
+  if (write(fd, (char *)&header, sizeof(header)) < (int)sizeof(header)){
     post("table~: write error in header of file: %s\n", fts_symbol_name(file_name));
     fts_file_close(fd);
     return;
@@ -270,7 +265,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
         shit[1] = rats[0];
       }
     }
-    if (write(fd, tempbuf, writehere*sizeof(filesamp_t)) < writehere*sizeof(filesamp_t)){
+    if (write(fd, tempbuf, writehere*sizeof(filesamp_t)) < (int)(writehere * sizeof(filesamp_t))){
       post("table~: error writing file: %s\n",  fts_symbol_name(file_name));
       break;
     }
@@ -289,7 +284,7 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float onset = fts_get_float_arg(ac, at, 1, 0.0f);
   float sr = fts_get_float_arg(ac, at, 2, 0.0f);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
-  long size = this->buf.size;
+  int size = this->buf.size;
   float *buf = this->buf.samples;
   int n_onset;
 
@@ -297,13 +292,13 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     return;
 
   if(onset > 0)
-    n_onset = fts_unit_convert_to_base(this->unit, onset, &sr);
+    n_onset = samples_unit_convert(this->unit, onset, fts_param_get_float(fts_s_sampling_rate, 44100.));
   else
     n_onset = 0;
 
   if(file_name)
     {
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, onset);
+      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, n_onset);
       
       if(sf)
 	{
@@ -329,9 +324,9 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float save_size = fts_get_float_arg(ac, at, 1, 0.0f);
   float sr = fts_get_float_arg(ac, at, 2, 0.0f);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
-  long size = this->buf.size;
+  int size = this->buf.size;
   float *buf = this->buf.samples;
-  long n_save;
+  int n_save;
 
   if(!this->name)
     return;
@@ -340,7 +335,7 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
 
   if(save_size > 0)
-    n_save = fts_unit_convert_to_base(this->unit, save_size, &sr);
+    n_save = samples_unit_convert(this->unit, save_size, sr);
   else
     n_save = size;
 
@@ -369,7 +364,7 @@ static void
 sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
-  long i;
+  int i;
 
   if(!this->name)
     return;  
@@ -385,8 +380,7 @@ sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
 
   if(this->name && size > 0)
     {
-      float sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-      long n_samps = fts_unit_convert_to_base(this->unit, size, &sr);
+      int n_samps = samples_unit_convert(this->unit, size, fts_param_get_float(fts_s_sampling_rate, 44100.));
       
       sampbuf_realloc(&this->buf, n_samps);
       

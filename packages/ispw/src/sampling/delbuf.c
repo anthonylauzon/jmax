@@ -26,6 +26,7 @@
 
 #include "fts.h"
 #include "delbuf.h"
+#include "sampunit.h"
 
 /*
   Consistency requirements for delwrite, delread to work: the logical length
@@ -90,13 +91,14 @@ delbuf_new(float raw_size, fts_symbol_t unit)
 
 /* init delbuf object (allocate delbuf if necsssary) */
 int 
-delbuf_init(del_buf_t *buf, float sr, long n_tick)
+delbuf_init(del_buf_t *buf, float sr, int n_tick)
 {
-  long size, ring_size;
+  int size, ring_size;
 
-  if(!buf) return(0);
+  if(!buf)
+    return(0);
   
-  size = (long)fts_unit_convert_to_base(buf->unit, buf->raw_size, (void *) &sr);
+  size = samples_unit_convert(buf->unit, buf->raw_size, sr);
   if(size < n_tick) size = n_tick;
   
   /* check if new size matches old size */

@@ -46,7 +46,7 @@ typedef struct {
 extern del_buf_t *delbuf_new(float raw_size, fts_symbol_t unit);
 
 /* init delbuf object (allocate delay line if necsssary) */
-extern int delbuf_init(del_buf_t *buf, float sr, long n_tick);
+extern int delbuf_init(del_buf_t *buf, float sr, int n_tick);
 
 /* ask if delbuf was already initialized (during current DSP compilation) */
 extern int delbuf_is_init(del_buf_t *buf);

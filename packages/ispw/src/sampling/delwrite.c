@@ -28,6 +28,7 @@
 
 #include "delbuf.h"
 #include "deltable.h"
+#include "sampunit.h"
 
 static fts_symbol_t dsp_symbol = 0;
 extern void ftl_delwrite(fts_word_t *a);
@@ -52,13 +53,15 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   delwrite_t *this = (delwrite_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
   float size;
+
   if(unit)
     size = fts_get_float_arg(ac, at, 3, 0.0f);
   else{
     size = fts_get_float_arg(ac, at, 2, 0.0f);
-    unit = fts_s_msec; /* default */
+    unit = samples_unit_get_default();
+
   }
 
   this->name = 0;

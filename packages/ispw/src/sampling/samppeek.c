@@ -26,7 +26,7 @@
 
 #include "fts.h"
 #include "sampbuf.h"
-#include "sampfilt.h"
+#include "sampunit.h"
 
 
 /******************************************************************
@@ -40,23 +40,21 @@ typedef struct{
   fts_symbol_t tab_name;
   fts_symbol_t unit;
   float conv;
-} obj_t;
+} samppeek_t;
 
 static void
-obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
+  samppeek_t *obj = (samppeek_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
-  float sr;
+  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
 
   obj->tab_name = name;
 
-  if (! unit)
-    unit = fts_s_msec; /* default */
+  if (!unit)
+    unit = samples_unit_get_default();
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-  obj->conv = fts_unit_convert_to_base(unit, 1.0f, &sr);
+  obj->conv = samples_unit_convert(unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
 }
 
 /******************************************************************
@@ -66,19 +64,17 @@ obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  */
  
 static void
-meth_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
-  float sr;
+  samppeek_t *obj = (samppeek_t *)o;
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
-  obj->conv = fts_unit_convert_to_base(obj->unit, 1.0f, &sr);
+  obj->conv = samples_unit_convert(obj->unit, 1.0f, fts_param_get_float(fts_s_sampling_rate, 44100.));
 }
 
 static void
-meth_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+samppeek_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
+  samppeek_t *obj = (samppeek_t *)o;
   float f = fts_get_float(at);
   sampbuf_t *buf = sampbuf_get(obj->tab_name);
 
@@ -86,31 +82,27 @@ meth_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
   if (buf)
     {
       float onset = obj->conv * f;
-      long index = onset;
-      long frac = SAMP_NPOINTS * (onset - index);
+      int i_onset = onset;
+      float frac = onset - i_onset;
 
-      if (onset < 0 || index >= buf->size)
+      if (onset < 0 || i_onset >= buf->size)
 	fts_outlet_float(o, 0, 0.0f);
       else
 	{
-	  if (frac)
-	    {
-	      sampfilt_t *t = sampfilt_tab + frac;
-	      if (index)
-		{
-		  float *samp = buf->samples + index - 1;
-		  fts_outlet_float(o, 0,
-				   t->f1 * samp[0] + t->f2 * samp[1] + t->f3 * samp[2] + t->f4 * samp[3]);
-		}
-	      else
-		{
-		  float *samp = buf->samples + index - 1;
-		  fts_outlet_float(o, 0,
-				   t->f1 * samp[1] + t->f2 * samp[1] + t->f3 * samp[2] + t->f4 * samp[3]);
-		}
-	  }
+	  if(frac == 0.0f)
+	    fts_outlet_float(o, 0, buf->samples[i_onset]);
 	  else
-	    fts_outlet_float(o, 0, buf->samples[index]);
+	    {
+	      float *samp = buf->samples + i_onset;
+	      float f;
+	      
+	      if(i_onset > 0)
+		fts_fourpoint_interpolate_frac(samp, frac, &f);
+	      else
+		fts_fourpoint_interpolate_first_frac(samp, frac, &f);
+	      
+	      fts_outlet_float(o, 0, f);
+	    }
 	}
     }
   else
@@ -118,17 +110,17 @@ meth_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 }
 
 static void
-meth_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a;
-  fts_set_float(&a, (float)fts_get_long(at));
-  meth_float(o, winlet, s, 1, &a);
+  fts_set_float(&a, (float)fts_get_int(at));
+  samppeek_float(o, winlet, s, 1, &a);
 }
 
 static void
-meth_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
+  samppeek_t *obj = (samppeek_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
 
   if (sampbuf_get(tab_name))
@@ -138,14 +130,14 @@ meth_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-meth_set_by_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   char buf[64];
   fts_atom_t a;
 
-  gensampname(buf, "sample", fts_get_long_arg(ac, at, 0, 0));
+  gensampname(buf, "sample", fts_get_int_arg(ac, at, 0, 0));
   fts_set_symbol(&a, fts_new_symbol_copy(buf));
-  meth_set(o, winlet, s, 1, &a);
+  samppeek_set(o, winlet, s, 1, &a);
 }
 
 /******************************************************************
@@ -159,28 +151,28 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  fts_class_init(cl, sizeof(obj_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(samppeek_t), 2, 1, 0);
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
   a[2] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, obj_init, 3, a, 2);
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, samppeek_init, 3, a, 2);
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, 0,  fts_new_symbol("init"), meth_init, 2, a, 0);
+  fts_method_define_varargs(cl, 0,  fts_new_symbol("init"), samppeek_mess_init);
 
   a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, meth_int, 1, a);
+  fts_method_define(cl, 0, fts_s_int, samppeek_int, 1, a);
   
   a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, meth_float, 1, a);
+  fts_method_define(cl, 0, fts_s_float, samppeek_float, 1, a);
   
   a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_set, meth_set, 1, a);
+  fts_method_define(cl, 0, fts_s_set, samppeek_set, 1, a);
   
   a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, meth_set_by_int, 1, a);
+  fts_method_define(cl, 1, fts_s_int, samppeek_set_by_int, 1, a);
   
   a[0] = fts_s_float;
   fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
