@@ -1,5 +1,15 @@
 2003-10-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/control/help/change.help.jmax: updated the help patch.
+	
+	* packages/control/c/src/change.c: fixed bug "[ 832367 ] [change] does not register a difference".
+	  Now toggle implements an input handler.
+	  You can change the state of toggle with sending a set message to the 2nd inlet.
+	  The new state is the set message argument.
+	  If set is send to the 1st inlet, the message is understood as a new value 
+	  (so it explains why toggle as 2 inlets..)
+	  Added a "get" message handler.
+
 	* include/fts/tuple.h: added the following functions:
 	  fts_tuple_prepend_int
 	  fts_tuple_prepend_float
