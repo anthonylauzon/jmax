@@ -111,3 +111,32 @@ function call by pointer
 4- Inter-thread communication
 
 Inter-thread communication can be implemented by message fifos. The 
+
+
+
+
+Client manager thread:
+ - loops on select() with connection socket, and sends the new socket to its parent (i.e. the
+main thread)
+
+Client thread:
+ - loops on bytestream blocking read (note: bytestreams do not provide yet a blocking call for
+input. Must be added)
+ - when unblocked, reads the bytes and sends them to the parent thread that will run the protocol
+decoder
+
+
+1 thread for client manager
+1 thread for each client
+
+
+Optimization:
+ - the main thread has an array of ring buffers
+ - on each tick, it polls the ring buffers and calls the poll function only if the ring buffer
+is not empty
+
+Problem:
+ - if MIDI is read in a thread, this thread is not SCHED_FIFO and can be delayed if main audio
+thread blocks the machine for too long
+
+
