@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/dialogs
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/dialogs
 package_JAVA = \
 HTMLDialog.java\
 InputDialog.java\

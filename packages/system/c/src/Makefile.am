@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/system/c
+packagedir=$(pkglibdir)/packages/system/c
 package_LTLIBRARIES=libsystem.la
 libsystem_la_SOURCES= \
 sysinfo.c \

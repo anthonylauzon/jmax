@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/signal/c
+packagedir=$(pkglibdir)/packages/signal/c
 package_LTLIBRARIES=libsignal.la
 libsignal_la_SOURCES= \
 abs.c \

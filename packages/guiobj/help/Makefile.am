@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/guiobj/help
+helpdir=$(pkglibdir)/packages/guiobj/help
 help_DATA=\
  guiobj.summary.jmax \
  button.help.jmax \

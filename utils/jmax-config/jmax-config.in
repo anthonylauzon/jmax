@@ -20,7 +20,7 @@ while test $# -gt 0; do
 
   case $1 in
     --package-dir)
-      echo @datadir@/@PACKAGE@/packages
+      echo @libdir@/@PACKAGE@/packages
       ;;
     --version)
       echo @JMAX_VERSION@

@@ -1,6 +1,6 @@
 SUBDIRS= icons ircam
 
-packagedir=$(pkgdatadir)/packages/guiobj/java/classes
+packagedir=$(pkglibdir)/packages/guiobj/java/classes
 package_JAVA= Guiobj.java
 
 JAVAC= @JAVACX@
@@ -8,7 +8,7 @@ JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/guiobj/java
 CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
-jardir=$(pkgdatadir)/packages/guiobj/java
+jardir=$(pkglibdir)/packages/guiobj/java
 JARFILE= guiobj.jar
 jar_DATA= $(JARFILE)
 

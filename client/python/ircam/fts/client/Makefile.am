@@ -1,4 +1,4 @@
-pythonclientdir = $(datadir)/jmax/client/python/ircam/fts/client
+pythonclientdir = $(libdir)/jmax/client/python/ircam/fts/client
 
 #python_PYTHON= 
 pythonclient_DATA = \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/control/c
+packagedir=$(pkglibdir)/packages/control/c
 package_LTLIBRARIES=libcontrol.la
 libcontrol_la_SOURCES= \
 bus.c \

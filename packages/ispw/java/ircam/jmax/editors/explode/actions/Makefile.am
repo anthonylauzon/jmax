@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/ispw/java/classes/ircam/jmax/editors/explode/actions
+packagedir=$(pkglibdir)/packages/ispw/java/classes/ircam/jmax/editors/explode/actions
 package_JAVA = \
 Actions.java \
 CopyAction.java \

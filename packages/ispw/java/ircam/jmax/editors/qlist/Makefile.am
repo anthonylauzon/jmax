@@ -1,6 +1,6 @@
 SUBDIRS=actions menus
 
-packagedir=$(pkgdatadir)/packages/ispw/java/classes/ircam/jmax/editors/qlist
+packagedir=$(pkglibdir)/packages/ispw/java/classes/ircam/jmax/editors/qlist
 package_JAVA = \
 FtsQListObject.java \
 KeyConsumer.java \

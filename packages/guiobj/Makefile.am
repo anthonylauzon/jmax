@@ -6,7 +6,7 @@ endif
 
 SUBDIRS=c $(JAVA_SRC_DIR) help winbuild
 
-packagedir=$(pkgdatadir)/packages/guiobj
+packagedir=$(pkglibdir)/packages/guiobj
 package_DATA=guiobj.jpkg
 
 EXTRA_DIST= $(package_DATA)

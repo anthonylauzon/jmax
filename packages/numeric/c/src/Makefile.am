@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/numeric/c
+packagedir=$(pkglibdir)/packages/numeric/c
 package_LTLIBRARIES=libnumeric.la
 libnumeric_la_SOURCES= \
 numeric.c \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/track/
+packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/track/
 package_JAVA = \
 AbstractEventValue.java \
 AbstractValueInfo.java \

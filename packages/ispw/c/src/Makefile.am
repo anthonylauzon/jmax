@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/ispw/c
+packagedir=$(pkglibdir)/packages/ispw/c
 package_LTLIBRARIES=libispw.la
 
 libispw_la_SOURCES= \

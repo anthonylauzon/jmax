@@ -1,6 +1,6 @@
 SUBDIRS=actions menus
 
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/toolkit
 package_JAVA = \
 AbstractLayer.java\
 AbstractRenderer.java\

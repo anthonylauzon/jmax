@@ -1,5 +1,5 @@
 
-imgdir=$(pkgdatadir)/packages/sequence/images
+imgdir=$(pkglibdir)/packages/sequence/images
 img_DATA=\
  violinClef.gif \
  faClef.gif \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/patcher/actions
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/editors/patcher/actions
 package_JAVA = \
 Actions.java\
 AlignBottomAction.java\

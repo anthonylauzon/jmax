@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit/menus
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/toolkit/menus
 package_JAVA = \
 DefaultFileMenu.java    \
 DefaultHelpMenu.java    \

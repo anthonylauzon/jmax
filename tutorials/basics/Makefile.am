@@ -1,5 +1,5 @@
 
-tutorialdir=$(pkgdatadir)/tutorials/basics
+tutorialdir=$(pkglibdir)/tutorials/basics
 tutorial_DATA=\
  BASICS.jmax \
  bang.tutorial.jmax \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/renderers
+packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/renderers
 package_JAVA = \
 AdderTool.java \
 ArrowTool.java \

@@ -5,7 +5,7 @@ else
 SUBDIRS= images
 endif
 
-htmldir=$(pkgdatadir)/doc
+htmldir=$(pkglibdir)/doc
 
 # html_DATA=\
 # compiling.html \

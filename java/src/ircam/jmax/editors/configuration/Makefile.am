@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/configuration/
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/editors/configuration/
 package_JAVA = \
 AudioConfigPanel.java\
 MidiConfigPanel.java\

@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/control/help
+helpdir=$(pkglibdir)/packages/control/help
 help_DATA=\
  control.summary.jmax \
  bus.help.jmax \

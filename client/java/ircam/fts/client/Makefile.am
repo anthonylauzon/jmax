@@ -1,6 +1,6 @@
 #noinst_JAVA= 
 
-packagedir=$(datadir)/jmax/client/java/classes/ircam/fts/client
+packagedir=$(libdir)/jmax/client/java/classes/ircam/fts/client
 package_JAVA =					\
 BinaryProtocolDecoder.java			\
 BinaryProtocolEncoder.java			\

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/console/
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/editors/console/
 package_JAVA = \
 ConsoleOutputStream.java\
 ConsoleWindow.java\

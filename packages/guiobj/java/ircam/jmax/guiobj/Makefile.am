@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/guiobj/java/classes/ircam/jmax/guiobj
+packagedir=$(pkglibdir)/packages/guiobj/java/classes/ircam/jmax/guiobj
 package_JAVA = \
 Bang.java \
 BangControlPanel.java \

@@ -1,6 +1,6 @@
 SUBDIRS=c help winbuild
 
-packagedir=$(pkgdatadir)/packages/ispwmath
+packagedir=$(pkglibdir)/packages/ispwmath
 package_DATA=ispwmath.jpkg
 
 EXTRA_DIST= $(package_DATA)

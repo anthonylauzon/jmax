@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/project/
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/editors/project/
 package_JAVA = \
 ConfigPackagePanel.java\
 NewProjectDialog.java\

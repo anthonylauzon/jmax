@@ -1,4 +1,4 @@
 SUBDIRS=c winbuild
 
-packagedir=$(pkgdatadir)/packages/utils
+packagedir=$(pkglibdir)/packages/utils
 

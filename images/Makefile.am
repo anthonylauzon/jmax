@@ -1,5 +1,5 @@
 
-pkgimgdir=$(pkgdatadir)/images
+pkgimgdir=$(pkglibdir)/images
 pkgimg_DATA=\
 Splash.gif \
 arrow_down.gif \

@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/sequence/help
+helpdir=$(pkglibdir)/packages/sequence/help
 help_DATA=\
  play.help.jmax \
  record.help.jmax \

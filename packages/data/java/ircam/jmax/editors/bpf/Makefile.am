@@ -1,5 +1,5 @@
 SUBDIRS=renderers tools
-packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/bpf
+packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/bpf
 package_JAVA = \
 BpfWindow.java \
 BpfAdapter.java \

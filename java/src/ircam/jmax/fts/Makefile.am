@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/fts
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/fts
 package_JAVA = \
 FtsAudioLabel.java \
 FtsAudioConfig.java\

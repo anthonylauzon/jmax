@@ -1,6 +1,6 @@
 SUBDIRS= src
 
-jardir=$(pkgdatadir)/java
+jardir=$(pkglibdir)/java
 JARFILE=jmax.jar
 jar_DATA = $(JARFILE)
 
@@ -41,4 +41,4 @@ $(JARFILE): $(JAR_DEP)
 
 
 install-data-hook:
-	cd $(DESTDIR)$(pkgdatadir)/java; find . -name "*.class" -exec rm {} \;
+	cd $(DESTDIR)$(pkglibdir)/java; find . -name "*.class" -exec rm {} \;

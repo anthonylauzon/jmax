@@ -1,3 +1,8 @@
+2003-07-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in, java/src/ircam/jmax/JMaxApplication.java, utils/jmax-config/jmax-config.in, utils/pkgconfig/jmax.pc.in and all Makefile.am in packages: changed installation directory of packages.
+	Now packages are installed in ${libdir}/jmax/packages/
+		
 2003-07-22  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* moved license to GNU Lesser General Public License. Changed all headers,

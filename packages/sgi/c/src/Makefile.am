@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/sgi/c
+packagedir=$(pkglibdir)/packages/sgi/c
 package_LTLIBRARIES=libsgi.la
 libsgi_la_SOURCES= \
 sgi.c \

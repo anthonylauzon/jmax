@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.12 2002/12/02 12:10:02 diemo Exp $
+# $Id: Makefile.am,v 1.13 2003/05/26 11:28:47 p_tisserand Exp $
 #
 # sequence package Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.13  2003/05/26 11:28:47  p_tisserand
+# Added Visual C++ files in distribution.
+#
 # Revision 1.12  2002/12/02 12:10:02  diemo
 # Fixed include scheme for internal/external headers
 # (doc in c/src/Makefile.am)
@@ -17,7 +20,7 @@ endif
 
 SUBDIRS=c $(JAVA_SRC_DIR) help images winbuild
 
-packagedir=$(pkgdatadir)/packages/sequence
+packagedir=$(pkglibdir)/packages/sequence
 package_DATA=sequence.jpkg
 
 EXTRA_DIST= $(package_DATA)

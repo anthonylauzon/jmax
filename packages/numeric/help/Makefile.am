@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/numeric/help
+helpdir=$(pkglibdir)/packages/numeric/help
 help_DATA=\
  numeric.summary.jmax \
  abs.help.jmax \

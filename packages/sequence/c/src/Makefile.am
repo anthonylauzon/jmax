@@ -1,8 +1,12 @@
-# $Id: Makefile.am,v 1.17 2003/03/27 18:14:38 p_tisserand Exp $
+# $Id: Makefile.am,v 1.18 2003/06/06 11:35:08 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.18  2003/06/06 11:35:08  p_tisserand
+# Fixed compilation on linux (not tested).
+# Added internal_sequence.h for Windows dll export.
+#
 # Revision 1.17  2003/03/27 18:14:38  p_tisserand
 # Add link to fts in packages Makefiles to fix link problems with LADSPA standard applyplugin
 #
@@ -41,7 +45,7 @@
 # seqsym.h exported, too.
 
 
-packagedir=$(pkgdatadir)/packages/sequence/c
+packagedir=$(pkglibdir)/packages/sequence/c
 package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \

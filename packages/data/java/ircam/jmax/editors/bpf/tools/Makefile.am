@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/bpf/tools
+packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/bpf/tools
 package_JAVA = \
 ArrowTool.java \
 BpfTools.java \

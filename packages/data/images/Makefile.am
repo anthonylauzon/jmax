@@ -1,5 +1,5 @@
 
-imgdir=$(pkgdatadir)/packages/data/images
+imgdir=$(pkglibdir)/packages/data/images
 img_DATA=\
  arrow.gif \
  delete.gif \

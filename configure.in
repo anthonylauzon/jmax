@@ -251,15 +251,17 @@ AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
 
 
-dnl Check installation directories
-if test "x${prefix}" = "xNONE"; then
-  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${ac_default_prefix}/share/jmax")
-else
-  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}/share/jmax")
-fi
-
 FTSDIR=${bindir}
-ROOTDIR="${datadir}/jmax"
+dnl Packages are now installed in pkglibdir/jmax/package_name
+ROOTDIR="${libdir}/jmax"
+
+
+dnl dnl Check installation directories
+if test "x${prefix}" = "xNONE"; then
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${ac_default_prefix}/lib/jmax")
+else
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}/lib/jmax")
+fi
 
 AC_SUBST(FTSDIR)
 AC_SUBST(ROOTDIR)

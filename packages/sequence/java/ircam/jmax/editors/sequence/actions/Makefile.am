@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/actions
+packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/actions
 package_JAVA = \
 Actions.java \
 ExportAction.java \

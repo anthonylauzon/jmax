@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/dtd/c
+packagedir=$(pkglibdir)/packages/dtd/c
 package_LTLIBRARIES=libdtd.la
 libdtd_la_SOURCES= \
 dtd.c \

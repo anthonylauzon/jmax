@@ -1,6 +1,6 @@
 SUBDIRS= icons ircam
 
-packagedir=$(pkgdatadir)/packages/ispw/java/classes
+packagedir=$(pkglibdir)/packages/ispw/java/classes
 package_JAVA= Ispw.java
 
 JAVAC= @JAVACX@
@@ -8,7 +8,7 @@ JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/ispw/java
 CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
-jardir=$(pkgdatadir)/packages/ispw/java
+jardir=$(pkglibdir)/packages/ispw/java
 JARFILE = ispw.jar
 jar_DATA= $(JARFILE)
 

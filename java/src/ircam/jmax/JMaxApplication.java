@@ -584,10 +584,10 @@ public class JMaxApplication {
         else
         {
             // Linux case, Mac OS X shell script case
-            root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
+            root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/lib/jmax/java/jmax.jar!/jmax.jar.root"));
         }
 
-	properties.put( "jmaxRoot", root + "/share/jmax");
+	properties.put( "jmaxRoot", root + "/lib/jmax");
 	if (properties.get( "jmaxServerDir") == null)
 	  properties.put( "jmaxServerDir", root + "/bin");
       }

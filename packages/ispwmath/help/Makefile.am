@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/ispwmath/help
+helpdir=$(pkglibdir)/packages/ispwmath/help
 help_DATA=\
  arith.help.jmax \
  compare.help.jmax \

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/ispw/java/classes
+packagedir=$(pkglibdir)/packages/ispw/java/classes
 package_JAVA = \
 FtsAtomList.java \
 FtsAtomListListener.java \

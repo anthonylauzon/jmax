@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/io/help
+helpdir=$(pkglibdir)/packages/io/help
 help_DATA=\
  bytestream.help.jmax \
  filestream.help.jmax \

@@ -1,3 +1,3 @@
 SUBDIRS=c 
 
-packagedir=$(pkgdatadir)/packages/oss
+packagedir=$(pkglibdir)/packages/oss

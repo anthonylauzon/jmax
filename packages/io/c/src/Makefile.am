@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/io/c
+packagedir=$(pkglibdir)/packages/io/c
 package_LTLIBRARIES=libio.la
 libio_la_SOURCES= \
 filestream.c \

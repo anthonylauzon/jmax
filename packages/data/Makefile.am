@@ -6,7 +6,7 @@ endif
 
 SUBDIRS=c $(JAVA_SRC_DIR) help images winbuild
 
-packagedir=$(pkgdatadir)/packages/data
+packagedir=$(pkglibdir)/packages/data
 package_DATA=data.jpkg
 
 EXTRA_DIST= $(package_DATA)

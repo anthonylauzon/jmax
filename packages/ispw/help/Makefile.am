@@ -1,4 +1,4 @@
-helpdir=$(pkgdatadir)/packages/ispw/help
+helpdir=$(pkglibdir)/packages/ispw/help
 help_DATA= \
  2p2z~.help.jmax \
  accum.help.jmax \

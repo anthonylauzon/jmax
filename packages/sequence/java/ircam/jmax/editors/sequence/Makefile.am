@@ -1,5 +1,5 @@
 SUBDIRS=actions menus renderers tools track
-packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/sequence
+packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence
 package_JAVA = \
 AbstractValueDataFlavor.java \
 Adapter.java \

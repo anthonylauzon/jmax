@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/oss/c
+packagedir=$(pkglibdir)/packages/oss/c
 package_LTLIBRARIES=liboss.la
 liboss_la_SOURCES= \
 oss.c \

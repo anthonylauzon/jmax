@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/ispw/java/classes/ircam/jmax/editors/explode/menus
+packagedir=$(pkglibdir)/packages/ispw/java/classes/ircam/jmax/editors/explode/menus
 package_JAVA = \
 EditMenu.java \
 OptionsMenu.java 

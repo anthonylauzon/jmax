@@ -11,6 +11,6 @@ PROJECT_FILE = default_project.jprj
 EXTRA_DIST= $(CONFIGURATION_FILES) $(PROJECT_FILE)
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)
-	$(INSTALL_DATA) $(top_srcdir)/config/$(PROJECT_FILE) $(DESTDIR)$(pkgdatadir)/default_project.jprj
-	$(INSTALL_DATA) $(top_srcdir)/config/@DEFAULT_CONFIG_FILE@ $(DESTDIR)$(pkgdatadir)/default_config.jcfg
+	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)
+	$(INSTALL_DATA) $(top_srcdir)/config/$(PROJECT_FILE) $(DESTDIR)$(pkglibdir)/default_project.jprj
+	$(INSTALL_DATA) $(top_srcdir)/config/@DEFAULT_CONFIG_FILE@ $(DESTDIR)$(pkglibdir)/default_config.jcfg

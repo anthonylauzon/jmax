@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit/actions
+packagedir=$(pkglibdir)/java/classes/ircam/jmax/toolkit/actions
 package_JAVA = \
 DefaultActions.java\
 EditorAction.java\

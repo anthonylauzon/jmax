@@ -1,4 +1,4 @@
-# packagedir=$(pkgdatadir)/packages/macosx/c
+# packagedir=$(pkglibdir)/packages/macosx/c
 # package_LTLIBRARIES=libmacosx.la
 # libmacosx_la_SOURCES=halaudioport.c macosxmidiport.c macosx.c qtfile.c
 

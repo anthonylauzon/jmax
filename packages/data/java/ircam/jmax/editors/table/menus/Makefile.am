@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/table/actions/menus
+packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/table/actions/menus
 package_JAVA = \
 EditMenu.java \
 TablePopupMenu.java \

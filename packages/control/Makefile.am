@@ -1,6 +1,6 @@
 SUBDIRS=c help winbuild
 
-packagedir=$(pkgdatadir)/packages/control
+packagedir=$(pkglibdir)/packages/control
 package_DATA=control.jpkg 
 
 EXTRA_DIST= $(package_DATA)

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/data/c
+packagedir=$(pkglibdir)/packages/data/c
 package_LTLIBRARIES=libdata.la
 libdata_la_SOURCES= \
 bpf.c \

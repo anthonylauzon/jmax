@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/data/help
+helpdir=$(pkglibdir)/packages/data/help
 help_DATA=\
  data.summary.jmax \
  bpf.help.jmax \

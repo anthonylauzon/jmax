@@ -1,6 +1,6 @@
 SUBDIRS= ircam
 
-jardir=$(datadir)/jmax/client/java
+jardir=$(libdir)/jmax/client/java
 JARFILE=ftsclient.jar
 jar_DATA = $(JARFILE)
 

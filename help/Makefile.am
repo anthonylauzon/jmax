@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/help
+helpdir=$(pkglibdir)/help
 help_DATA= \
  define.help.jmax \
  jpatcher.help.jmax \

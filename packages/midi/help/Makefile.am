@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/midi/help
+helpdir=$(pkglibdir)/packages/midi/help
 help_DATA= \
  midi.summary.jmax \
  bend.help.jmax \

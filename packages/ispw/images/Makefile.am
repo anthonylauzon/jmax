@@ -1,5 +1,5 @@
 
-imgdir=$(pkgdatadir)/packages/ispw/images
+imgdir=$(pkglibdir)/packages/ispw/images
 img_DATA=\
  adder.gif \
  eraser.gif \

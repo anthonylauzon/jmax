@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/menus
+packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/menus
 package_JAVA = \
 ClosedTrackPopupMenu.java \
 EditMenu.java \

@@ -1,6 +1,6 @@
 SUBDIRS= ircam
 
-packagedir=$(pkgdatadir)/packages/sequence/java/classes
+packagedir=$(pkglibdir)/packages/sequence/java/classes
 package_JAVA= Sequence.java
 
 JAVAC= @JAVACX@
@@ -8,7 +8,7 @@ JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/sequence/java
 CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
-jardir=$(pkgdatadir)/packages/sequence/java
+jardir=$(pkglibdir)/packages/sequence/java
 JARFILE= sequence.jar
 jar_DATA= $(JARFILE)
 

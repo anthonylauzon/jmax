@@ -1,4 +1,4 @@
-imagedir=$(pkgdatadir)/doc/images
+imagedir=$(pkglibdir)/doc/images
 
 image_DATA=\
 control_panel.gif  \

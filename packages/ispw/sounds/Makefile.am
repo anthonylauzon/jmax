@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/ispw/sounds
+packagedir=$(pkglibdir)/packages/ispw/sounds
 package_DATA=					\
 hanning.aiff					\
 hanning.snd					\

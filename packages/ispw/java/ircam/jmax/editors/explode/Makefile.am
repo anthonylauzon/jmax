@@ -1,6 +1,6 @@
 SUBDIRS=actions menus
 
-packagedir=$(pkgdatadir)/packages/ispw/java/classes/ircam/jmax/editors/explode
+packagedir=$(pkglibdir)/packages/ispw/java/classes/ircam/jmax/editors/explode
 package_JAVA = \
 AAAReadme.java \
 Adapter.java \

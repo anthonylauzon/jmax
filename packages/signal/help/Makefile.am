@@ -1,5 +1,5 @@
 
-helpdir=$(pkgdatadir)/packages/signal/help
+helpdir=$(pkglibdir)/packages/signal/help
 help_DATA=\
  signal.summary.jmax	\
  abs~.help.jmax		\

@@ -1,4 +1,4 @@
-packagedir=$(pkgdatadir)/packages/unixdtd/c
+packagedir=$(pkglibdir)/packages/unixdtd/c
 package_LTLIBRARIES=libunixdtd.la
 libunixdtd_la_SOURCES= \
 dtdfifo.c \
