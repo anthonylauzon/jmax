@@ -361,7 +361,7 @@ void fts_convert_int24L_to_float32(long size,long* src,float* dest)
     sc[1] = csrc[2];
     sc[2] = csrc[3];
 
-    long l = *(long*)(sc);
+    l = *((long*)(sc));
     *dest++ = (float)(l * fIScaler24);
     src += 4;
   }
