@@ -18,42 +18,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-// 
-// Author: 
-//
 
 package ircam.jmax;
 
-import java.util.*;
-import java.io.*;
+import java.util.jar.*;
 
 /**
- *  Class JMaxPackage
- * 
+ * Interface JMaxPackage
  */
-public abstract class JMaxPackage {
 
-    protected String name;
-    protected String path;
-    protected PackageClassLoader classLoader;
-
-    public JMaxPackage(String name) 
-    {
-	this.name = name;
-	classLoader = null;
-    }
-
-    public String getPath() 
-    {
-	return path;
-    }
-
-    public void setPath(String path) 
-    {
-	this.path = path;
-    }
-
-    abstract public void load();
- }
+public interface JMaxPackage {
+  public void load( JarFile jarFile);
+}
 
