@@ -126,20 +126,16 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public  void setWidth(int w) 
   {
     if( w <= 0)
-      {
-	super.setWidth( /*getDefaultWidth()*/ getMinimumWidth() + getVariableWidth());
-	super.setHeight( renderer.getHeight() + getTextHeightOffset());
-      }    
+      super.setWidth( getMinimumWidth() + getVariableWidth());
     else
-      if (renderer.canResizeWidthTo(w - getVariableWidth() - getTextWidthOffset()))
-	{
-	  super.setWidth(w);
-	  super.setHeight(renderer.getHeight() + getTextHeightOffset());
-	}
-      else{
+      if( renderer.canResizeWidthTo(w - getVariableWidth() - getTextWidthOffset()))
+	super.setWidth( w);
+      else
 	super.setWidth( getMinimumWidth() + getVariableWidth());
-	super.setHeight( renderer.getHeight() + getTextHeightOffset());
-      } 
+ 
+    int height = renderer.getHeight() + getTextHeightOffset();
+    if( getHeight() != height) 
+      super.setHeight( height);	
   }
 
   public void forceWidth( int w)

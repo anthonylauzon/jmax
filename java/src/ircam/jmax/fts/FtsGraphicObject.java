@@ -302,7 +302,7 @@ public class FtsGraphicObject extends FtsObject {
 	args.clear();
 	args.addSymbol(FtsSymbol.get("h"));
 	args.addInt((int)h);
-
+	
 	try{
 	  sendProperty( args);
 	}
