@@ -367,7 +367,7 @@ static fts_object_t *create_instance_in_package( fts_package_t *package, fts_pat
   if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
     obj = fts_template_make_instance( template, patcher, ac-offset, at+offset);
 
-  if (obj)
+  if (obj && fts_object_get_description_size(obj) == 0)
     fts_object_set_description( obj, ac, at);
 
   return obj;
