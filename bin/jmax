@@ -177,11 +177,28 @@ build_classpath ()
     #      echo > /dev/null
     #  fi
 
+    if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
+    then
+	echo > /dev/null
+    else
+	if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
+	then
+	    SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
+	else
+	    echo "Swing classes not found. Trying without..."
+	fi
+    fi
+
     if [ $CLASSPATH ]
     then
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+	if [ $SWING_DISTRIB_CLASSPATH ]
+	then
+	    CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
+	else
+	    CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+	fi
     else
-	CLASSPATH=${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+	CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
     fi
 }
 
