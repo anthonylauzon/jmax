@@ -14,6 +14,8 @@ connection.c \
 doctor.c \
 errobj.c \
 expression.c \
+ftl.c \
+ftlmem.c \
 hashtable.c \
 inout.c \
 loader.c \
@@ -34,8 +36,5 @@ template.c \
 variable.c \
 version.c \
 vm.c 
-
-#ftl.c \
-
 
 INCLUDES=-I$(top_srcdir)/include

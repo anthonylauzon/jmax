@@ -291,13 +291,13 @@ static fts_status_t ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_
 {
   fts_atom_t a;
 
-  fts_set_long( &a, FTL_OPCODE_CALL);
+  fts_set_int( &a, FTL_OPCODE_CALL);
   fts_array_append( &subr->instructions, 1, &a);
 
   fts_set_symbol( &a, name);
   fts_array_append( &subr->instructions, 1, &a);
 
-  fts_set_long( &a, argc);
+  fts_set_int( &a, argc);
   fts_array_append( &subr->instructions, 1, &a);
 
   fts_array_append( &subr->instructions, argc, argv);
@@ -312,7 +312,7 @@ static fts_status_t ftl_subroutine_add_return( ftl_subroutine_t *subr)
 {
   fts_atom_t a;
 
-  fts_set_long( &a, FTL_OPCODE_RETURN);
+  fts_set_int( &a, FTL_OPCODE_RETURN);
   fts_array_append( &subr->instructions, 1, &a);
 
   /* add debugging info */
@@ -503,9 +503,9 @@ static fts_status_t ftl_state_machine( fts_array_t *array, state_fun_t fun, void
     {
       switch( state) {
       case ST_OPCODE:
-	if ( fts_is_long( a) )
+	if ( fts_is_int( a) )
 	  {
-	    switch( fts_get_long( a)) {
+	    switch( fts_get_int( a)) {
 	    case FTL_OPCODE_CALL:
 	      newstate = ST_CALL_FUN;
 	      break;
@@ -527,9 +527,9 @@ static fts_status_t ftl_state_machine( fts_array_t *array, state_fun_t fun, void
 	  return &ftl_error_invalid_program;
 	break;
       case ST_CALL_ARGC:
-	if ( fts_is_long( a) )
+	if ( fts_is_int( a) )
 	  {
-	    argc = fts_get_long(a);
+	    argc = fts_get_int(a);
 	    if ( argc > 0)
 	      newstate = ST_CALL_ARGV;
 	    else
@@ -678,9 +678,9 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
   bytecode = info->bytecode;
   switch( state) {
   case ST_OPCODE:
-    if ( fts_get_long( a) == FTL_OPCODE_RETURN)
+    if ( fts_get_int( a) == FTL_OPCODE_RETURN)
       {
-	fts_word_set_long( bytecode, 0);
+	fts_word_set_int( bytecode, 0);
 	bytecode++;
       }
     break;
@@ -695,7 +695,7 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
     }
     break;
   case ST_CALL_ARGC:
-    fts_word_set_long( bytecode, fts_get_long(a));
+    fts_word_set_int( bytecode, fts_get_int(a));
     bytecode++;
     break;
   case ST_CALL_ARGV:
@@ -725,11 +725,11 @@ static fts_status_t bytecode_size_state_fun( int state, int newstate, fts_atom_t
 
   switch( state) {
   case ST_OPCODE:
-    if (fts_get_long( a) == FTL_OPCODE_RETURN)
+    if (fts_get_int( a) == FTL_OPCODE_RETURN)
       *ps += 1;
     return fts_Success;
   case ST_CALL_ARGC:
-    *ps += (fts_get_long( a) + 2);
+    *ps += (fts_get_int( a) + 2);
     return fts_Success;
   default:
     return fts_Success;
@@ -785,7 +785,7 @@ int ftl_program_compile( ftl_program_t *prog)
 
 static void ftl_print_atom( char *s, const fts_atom_t *a)
 {
-  if (fts_is_long(a))
+  if (fts_is_int(a))
     sprintf( s, "%d", fts_get_int(a));
   else if (fts_is_float(a))
     sprintf( s, "%f", fts_get_float(a));
@@ -874,7 +874,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
   buffer[0] = ' ';
   switch( state) {
   case ST_OPCODE:
-    switch( fts_get_long( a)) {
+    switch( fts_get_int( a)) {
     case FTL_OPCODE_RETURN:
       post( "/* %5d */   return;\n", info->pc);
       break;
@@ -953,7 +953,7 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
   buffer[0] = ' ';
   switch( state) {
   case ST_OPCODE:
-    switch( fts_get_long( a)) {
+    switch( fts_get_int( a)) {
     case FTL_OPCODE_RETURN:
       fprintf(info->f, "/* %5d */   return;\n", info->pc);
       break;
@@ -1049,13 +1049,13 @@ void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
   bytecode = subr->bytecode;
   subr->pc = 0;
 
-  while (fts_word_get_long(bytecode))
+  while (fts_word_get_int(bytecode))
     {
       ftl_wrapper_t w;
       int argc;
       
       w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
-      argc = fts_word_get_long( bytecode+1);
+      argc = fts_word_get_int( bytecode+1);
       (*w)(bytecode+2);
       bytecode += (argc + 2);
       subr->pc++;
