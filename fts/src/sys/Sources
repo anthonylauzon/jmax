@@ -40,6 +40,7 @@ SOURCES = $(ARCH_SOURCES) \
 	mem.c	          \
 	modules.c         \
 	sys.c             \
+	version.c	\
 	welcome.c
 
 
