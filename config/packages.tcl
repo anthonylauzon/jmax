@@ -8,3 +8,7 @@ package require table
 # load the qlist editor
 
 package require qlist
+
+# load the explode editor
+
+package require explode
