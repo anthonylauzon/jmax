@@ -1595,7 +1595,6 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
       if (to && from)
 	{
 	  connection = fts_connection_new(from, outlet, to, inlet, fts_c_anything);
-		  
 	  if (! connection)
 	    {
 	      return;
@@ -1641,6 +1640,7 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (!fts_object_has_id(p))
       {
+	/* shift object during paste */
 	fts_object_get_prop(p, fts_s_x, a);
 	fts_object_get_prop(p, fts_s_y, a+1);
 
@@ -1661,11 +1661,14 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
       for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
 	{
 	  fts_connection_t *c;
-
+	  
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
 	    {
-	      ((fts_object_t *)c)->patcher = this;
-	      fts_client_upload_object((fts_object_t *)c, -1);
+	      if( !fts_object_has_id( (fts_object_t *)c))
+		{
+		  ((fts_object_t *)c)->patcher = this;
+		  fts_client_upload_object((fts_object_t *)c, -1);
+		}
 	    }
 	}
     }
