@@ -710,6 +710,20 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     requestOpenEditor();
   }
 
+  public final void requestOpenHelpPatch( FtsObject obj)
+  {
+    args.clear();
+    args.addObject( obj);
+    try{
+      send( FtsSymbol.get("open_help_patch"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending open_help_patch Message!");
+	e.printStackTrace(); 
+      }
+  }
+
   /** Tell FTS that this patcher is not "alive".
    * Fts will stop sending updates for this patcher.
    */

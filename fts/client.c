@@ -28,6 +28,7 @@
 #include <ftsconfig.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/patparser.h>
+#include <ftsprivate/package.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -105,6 +106,7 @@ static fts_symbol_t s_client_manager;
 static fts_symbol_t s_update_group_begin;
 static fts_symbol_t s_update_group_end;
 static fts_symbol_t s_set_value;
+static fts_symbol_t s_package_loaded;
 
 static fts_heap_t *update_heap;
 
@@ -1005,14 +1007,23 @@ static void client_delete_object( fts_object_t *o, int winlet, fts_symbol_t s, i
 static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
-  fts_object_t *parent;
+  fts_client_load_patcher( fts_get_symbol( at), fts_get_object( at+1), this->client_id);
+}
+
+void fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
+{
   fts_atom_t a[3];
   fts_object_t *patcher;
   int type = 1;
+  int client_id;
+  client_t *client;
 
-  const char *filename = fts_get_symbol( at);
+  if(id == -1)
+    client_id = fts_get_client_id( parent);  
+  else
+    client_id = id;
 
-  parent = fts_get_object( at+1);
+  client = client_table_get(client_id);
 
   fts_log("[client]: Load patcher %s\n", filename);
 
@@ -1035,10 +1046,11 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
       return;
     }
 
-  client_register_object( this, patcher);
+  client_register_object( client, patcher);
 
   /* Save the file name, for future autosaves and other services */
-  fts_object_put_prop( patcher, fts_s_filename, at);
+  fts_set_symbol(a, filename);
+  fts_object_put_prop( patcher, fts_s_filename, a);
 
   /* activate the post-load init, like loadbangs */	  
   fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
@@ -1046,7 +1058,7 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
   fts_set_int(a, fts_get_object_id(patcher));
   fts_set_symbol(a+1, filename);
   fts_set_int(a+2, type);
-  fts_client_send_message( o, fts_new_symbol( "patcher_loaded"), 3, a);
+  fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
   /* uploaod the patcher to the client */
   fts_send_message( patcher, fts_SystemInlet, fts_s_upload, 0, 0);
@@ -1054,6 +1066,7 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
 
   fts_log("[patcher]: Finished loading patcher %s\n", filename);
 }
+
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1174,16 +1187,34 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
 static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_iterator_t i;
+  fts_iterator_t i, j;
+  fts_package_t *pkg;
+  fts_atom_t a[2];
 
   fts_get_package_names( &i);
 
   while (fts_iterator_has_more( &i))
     {
-      fts_atom_t a[1];
-
       fts_iterator_next( &i, a);
-      fts_client_send_message( o, fts_new_symbol( "package_loaded"), 1, a);
+      
+      pkg = fts_package_get( fts_get_symbol( a));
+      
+      fts_client_start_message( o, s_package_loaded);
+      fts_client_add_symbol( o, fts_get_symbol( a));
+      
+      if( pkg != NULL && pkg->summaries !=NULL)
+	{
+	  fts_hashtable_get_keys( pkg->summaries, &j);
+
+	  while (fts_iterator_has_more( &j))
+	    {
+	      fts_iterator_next( &j, a);
+	      fts_hashtable_get( pkg->summaries, a, &a[1]);
+	      fts_client_add_symbol( o, fts_get_symbol( a));
+	      fts_client_add_symbol( o, fts_get_symbol( a+1));
+	    }
+	}
+      fts_client_done_message( o);
     }
 }
 
@@ -1643,6 +1674,7 @@ void fts_client_config( void)
   s_update_group_begin = fts_new_symbol( "update_group_begin");
   s_update_group_end = fts_new_symbol( "update_group_end");
   s_set_value = fts_new_symbol( "setValue");
+  s_package_loaded = fts_new_symbol( "package_loaded");
 
   update_heap = fts_heap_new( sizeof( update_entry_t));
 

@@ -62,6 +62,7 @@ host_triplet = i686-pc-linux-gnu
 AS = @AS@
 CC = gcc
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = 
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin

@@ -28,6 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
+import ircam.jmax.*;
 import ircam.fts.client.*;
 
 /**
@@ -117,27 +118,20 @@ public class FtsHelpPatchTable
 
   /** Open an help summary patch */
 
-  static public boolean openHelpSummary(/*MaxContext context, */String name)
+  static public void openHelpSummary( String name)
   {
-      /*if (summaryExists(name))
-	{
+    if (summaryExists(name))
+      {
+	String file = getHelpSummaryPatch(name);
 	try
-	{
-	File file = new File(getHelpSummaryPatch(name));
-	MaxDocument document;
-	
-	document = Mda.loadDocument(context, file);
-	document.edit();
-	}
-	catch (MaxDocumentException e)
-	{
-	return false;
-	}
-
-	return true;
-	}
-	else*/
-      return false;
+	  {
+	    JMaxApplication.getFtsServer().getRoot().load( file);
+	  }
+	catch(IOException e)
+	  {
+	    System.err.println("[FtsHelpPatchTable]: I/O error opening Help Summary file "+file);
+	  }
+      }
   }
 
   /** Get an enumeration of the available summaries */

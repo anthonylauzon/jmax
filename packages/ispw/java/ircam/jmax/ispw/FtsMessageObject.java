@@ -66,7 +66,7 @@ public class FtsMessageObject extends FtsIntValueObject
     
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
-    
+
     /*message =  FtsMessageObject.preParseMessage(FtsParse.unparseArguments(args, offset+1, length-1));*/    
     message = getDescription();
   }
@@ -106,7 +106,7 @@ public class FtsMessageObject extends FtsIntValueObject
   public void setCurrentMessage(int nArgs, FtsAtom args[])
   {
     this.message = FtsMessageObject.preParseMessage( FtsParse.unparseArguments(args, 0, nArgs));
-	
+
     if (listener instanceof FtsMessageListener)
       ((FtsMessageListener) listener).messageChanged(message);
   }

@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
@@ -97,6 +98,15 @@ noinst_HEADERS = \
 binop.h \
 math.h
 
+
+# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
+
+# This causes libtool to issue a warning and not to produce the .so 
+@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
+@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/packages/data/c/src/.libs -ldata -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
+
+libmath_la_LDFLAGS = $(XLDFLAGS)
+libmath_la_LIBADD = $(XLIBADD)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -107,8 +117,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libmath_la_LDFLAGS = 
-libmath_la_LIBADD = 
+@MACOSX_TRUE@libmath_la_DEPENDENCIES = 
+@MACOSX_FALSE@libmath_la_DEPENDENCIES = 
 libmath_la_OBJECTS =  binop.lo binop_fvec.lo binop_ivec.lo \
 binop_number.lo math.lo
 CFLAGS = @CFLAGS@
@@ -299,7 +309,7 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-packageLTLIBRARIES
+install-data-am: install-packageLTLIBRARIES install-data-local
 install-data: install-data-am
 
 install-am: all-am
@@ -307,7 +317,7 @@ install-am: all-am
 install: install-am
 uninstall-am: uninstall-packageLTLIBRARIES
 uninstall: uninstall-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS) all-local
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -361,11 +371,20 @@ distclean-tags clean-tags maintainer-clean-tags distdir \
 mostlyclean-depend distclean-depend clean-depend \
 maintainer-clean-depend info-am info dvi-am dvi check check-am \
 installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+install-data-local install-data-am install-data install-am install \
+uninstall-am uninstall all-local all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+# So we add this explicitely !!!
+@MACOSX_TRUE@all-local: .libs/libmath.so
+
+@MACOSX_TRUE@.libs/libmath.so: $(libmath_la_OBJECTS) $(libmath_la_DEPENDENCIES)
+@MACOSX_TRUE@	cc -bundle -undefined error -o $@ $(libmath_la_OBJECTS) $(XLIBADD) -lm -lc 
+
+@MACOSX_TRUE@install-data-local: .libs/libmath.so
+@MACOSX_TRUE@	$(INSTALL_DATA) .libs/libmath.so $(DESTDIR)$(packagedir)/libmath.so
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

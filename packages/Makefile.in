@@ -10,7 +10,9 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-#SUBDIRS=control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils @PLATFORM_PACKAGES@
+# Attention !!! The order is important: since some packages are linked versus others on Mac OS X,
+# the linked packages must be compiled first
+# Note: the order can be derived from the "require" order
 
 
 SHELL = @SHELL@
@@ -64,6 +66,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
@@ -83,7 +86,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-SUBDIRS = control data guiobj io ispw ispwmath lists math midi numeric qlist signal system utils @PLATFORM_PACKAGES@
+SUBDIRS = utils control data guiobj io ispw ispwmath lists math midi numeric qlist signal system @PLATFORM_PACKAGES@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -292,6 +295,9 @@ uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+# Not compiled yet
+# explode sequence
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

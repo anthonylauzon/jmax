@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
@@ -111,6 +112,15 @@ samplepool.h \
 signal.h \
 wave.h
 
+
+# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
+
+# This causes libtool to issue a warning and not to produce the .so 
+@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
+@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/packages/data/c/src/.libs -ldata -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
+
+libsignal_la_LDFLAGS = $(XLDFLAGS)
+libsignal_la_LIBADD = $(XLIBADD)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -121,8 +131,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libsignal_la_LDFLAGS = 
-libsignal_la_LIBADD = 
+@MACOSX_TRUE@libsignal_la_DEPENDENCIES = 
+@MACOSX_FALSE@libsignal_la_DEPENDENCIES = 
 libsignal_la_OBJECTS =  binop.lo cut.lo matrix.lo osc.lo osc_ieeewrap.lo \
 pink.lo play.lo playbpf.lo playfvec.lo recfvec.lo samplepool.lo \
 signal.lo tilda.lo wave.lo wave_ieeewrap.lo white.lo
@@ -316,7 +326,7 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-packageLTLIBRARIES
+install-data-am: install-packageLTLIBRARIES install-data-local
 install-data: install-data-am
 
 install-am: all-am
@@ -324,7 +334,7 @@ install-am: all-am
 install: install-am
 uninstall-am: uninstall-packageLTLIBRARIES
 uninstall: uninstall-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS) all-local
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -378,11 +388,20 @@ distclean-tags clean-tags maintainer-clean-tags distdir \
 mostlyclean-depend distclean-depend clean-depend \
 maintainer-clean-depend info-am info dvi-am dvi check check-am \
 installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+install-data-local install-data-am install-data install-am install \
+uninstall-am uninstall all-local all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+# So we add this explicitely !!!
+@MACOSX_TRUE@all-local: .libs/libsignal.so
+
+@MACOSX_TRUE@.libs/libsignal.so: $(libsignal_la_OBJECTS) $(libsignal_la_DEPENDENCIES)
+@MACOSX_TRUE@	cc -bundle -undefined error -o $@ $(libsignal_la_OBJECTS) $(XLIBADD) -lm -lc 
+
+@MACOSX_TRUE@install-data-local: .libs/libsignal.so
+@MACOSX_TRUE@	$(INSTALL_DATA) .libs/libsignal.so $(DESTDIR)$(packagedir)/libsignal.so
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

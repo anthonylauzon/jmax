@@ -763,6 +763,11 @@ static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
+static void messbox_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messbox_update(o);
+}
+
 /************************************************************
  *
  *  class
@@ -795,6 +800,8 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messbox_dump);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat); 
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_send_properties, messbox_send_properties); 
 
   fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);
   fts_method_define_varargs(cl, 0, fts_s_int, messbox_eval);

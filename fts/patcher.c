@@ -1250,8 +1250,26 @@ static void fts_patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int
   /*  fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 
-/****************************************************************/
-/********* ASYNCRONOUS ADDING       ******************************/
+static void 
+fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj = fts_get_object(&at[0]);
+  fts_package_t *pkg = fts_object_get_package(obj);
+  fts_symbol_t dir = fts_package_get_dir( pkg);
+  fts_symbol_t class_name = fts_object_get_class_name(obj);
+  fts_symbol_t filename;
+  char path[256];
+
+  snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, 
+	   class_name, ".help.jmax");
+  filename = fts_new_symbol_copy(path);
+
+  fts_log("[patcher] help %s\n", filename);
+
+  fts_client_load_patcher(filename, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o));
+}
+
 static void 
 fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1575,6 +1593,8 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("load_init"), patcher_load_init); 
   fts_method_define_varargs(cl,fts_SystemInlet, fts_s_open, patcher_open); 
   fts_method_define_varargs(cl,fts_SystemInlet, fts_s_close, patcher_close); 
+
+  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
 
   fts_method_define_varargs(cl,fts_SystemInlet, fts_s_save, fts_patcher_save_from_client); 
 

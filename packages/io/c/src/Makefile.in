@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
@@ -90,16 +91,26 @@ in.c \
 in_out_tilda.c \
 iomodule.c \
 loopback.c \
-out.c \
-profileaudioport.c \
-serial.c \
-udp.c \
-wacom.c 
+out.c 
 
+
+# Not compiled yet (MAC OS X)
+#profileaudioport.c 
+#serial.c \
+#udp.c \
+#wacom.c 
 
 noinst_HEADERS = \
 iomodule.h
 
+
+# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
+
+@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
+@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
+
+libio_la_LDFLAGS = $(XLDFLAGS)
+libio_la_LIBADD = $(XLIBADD)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -110,11 +121,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libio_la_LDFLAGS = 
-libio_la_LIBADD = 
+@MACOSX_TRUE@libio_la_DEPENDENCIES = 
+@MACOSX_FALSE@libio_la_DEPENDENCIES = 
 libio_la_OBJECTS =  fakestream.lo filestream.lo in.lo in_out_tilda.lo \
-iomodule.lo loopback.lo out.lo profileaudioport.lo serial.lo udp.lo \
-wacom.lo
+iomodule.lo loopback.lo out.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -130,8 +140,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/fakestream.P .deps/filestream.P .deps/in.P \
-.deps/in_out_tilda.P .deps/iomodule.P .deps/loopback.P .deps/out.P \
-.deps/profileaudioport.P .deps/serial.P .deps/udp.P .deps/wacom.P
+.deps/in_out_tilda.P .deps/iomodule.P .deps/loopback.P .deps/out.P
 SOURCES = $(libio_la_SOURCES)
 OBJECTS = $(libio_la_OBJECTS)
 

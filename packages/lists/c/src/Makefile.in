@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
@@ -101,6 +102,14 @@ listcomp.c
 noinst_HEADERS = \
 lists.h
 
+
+# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
+
+@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
+@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
+
+liblists_la_LDFLAGS = $(XLDFLAGS)
+liblists_la_LIBADD = $(XLIBADD)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -111,8 +120,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-liblists_la_LDFLAGS = 
-liblists_la_LIBADD = 
+@MACOSX_TRUE@liblists_la_DEPENDENCIES = 
+@MACOSX_FALSE@liblists_la_DEPENDENCIES = 
 liblists_la_OBJECTS =  list.lo listarith.lo listelement.lo listhead.lo \
 listjoin.lo listreverse.lo lists.lo listsize.lo listsublist.lo \
 listsum.lo listtail.lo listcomp.lo

@@ -96,6 +96,7 @@ struct fts_package {
   fts_list_t* abstraction_paths;
 
   fts_hashtable_t* help;
+  fts_hashtable_t* summaries;
   fts_list_t* data_paths;
 };
 
@@ -338,3 +339,4 @@ void fts_data_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 
 #endif /* _FTS_PRIVATE_PACKAGE_H_ */
+

@@ -705,6 +705,21 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
   fts_hashtable_put(pkg->help, &n, &p);
 }
 
+void 
+fts_package_add_summary(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
+{
+  fts_atom_t n, p;
+
+  if (pkg->summaries == NULL) {
+    pkg->summaries = fts_malloc(sizeof(fts_hashtable_t));
+    fts_hashtable_init(pkg->summaries, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  }
+
+  fts_set_symbol(&n, name);
+  fts_set_symbol(&p, file);
+  fts_hashtable_put(pkg->summaries, &n, &p);
+}
+
 /***********************************************
  *
  *  print and save utilities for methods
@@ -908,6 +923,16 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
+__fts_package_summary(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 1) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_summary(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
 __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
@@ -951,6 +976,9 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->help) {
     fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
   }
+  if ( this->summaries) {
+    fts_package_save_hashtable( &f, this->summaries, fts_s_summary, NULL);
+  }
 
   fts_bmax_code_return( &f);
 
@@ -985,6 +1013,9 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
   if ( this->help) {
     fts_package_print_hashtable( this->help, fts_s_help, NULL);
+  }
+  if ( this->summaries) {
+    fts_package_print_hashtable( this->summaries, fts_s_summary, NULL);
   }
 }
 
@@ -1022,6 +1053,7 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->abstraction_paths = NULL;
 
   pkg->help = NULL;
+  pkg->summaries = NULL;
   pkg->data_paths = NULL;
 }
 
@@ -1059,6 +1091,9 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (pkg->help != NULL) {
     fts_hashtable_destroy(pkg->help);
   }
+  if (pkg->summaries != NULL) {
+    fts_hashtable_destroy(pkg->summaries);
+  }
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
@@ -1081,6 +1116,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
+  fts_method_define_varargs(cl, 0, fts_s_summary, __fts_package_summary);
   fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
 
   /* All these methods are also defined for SystemInlet, as bmax saving

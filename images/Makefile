@@ -62,6 +62,7 @@ host_triplet = i686-pc-linux-gnu
 AS = @AS@
 CC = gcc
 DLLTOOL = @DLLTOOL@
+DOT_LIBS = 
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
@@ -101,6 +102,7 @@ hot.gif \
 info.gif \
 ircam.gif \
 jmax_app.gif \
+jmax.icns \
 jmax_icon.gif \
 jmax_logo_small.gif \
 jmax_logo_small_transp.gif \

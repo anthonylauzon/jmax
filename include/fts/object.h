@@ -123,5 +123,6 @@ FTS_API void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutle
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)
 
+FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);
 
 

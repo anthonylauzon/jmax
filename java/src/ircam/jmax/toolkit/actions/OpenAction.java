@@ -81,41 +81,6 @@ public class OpenAction extends EditorAction
 	  }
       }
   }
-
-  /*public static int getFileType(File file)
-    {
-    int type = -1;
-    
-    try
-    {
-    FileReader fr = new FileReader(file);
-    char buf[] = new char[6];
-    String codeBMax, codeDotPat;
-    
-    fr.read(buf);
-    fr.close();
-	    
-    codeBMax = new String(buf, 0, 4);
-    
-    if (codeBMax.equals("bMax") || codeBMax.equals("Mbxa"))
-    type = MaxFileChooser.JMAX_FILE_TYPE;
-    else 
-    {
-    codeDotPat = new String(buf, 0, 6);
-    if ( codeDotPat.equals("max v2"))
-    type = MaxFileChooser.PAT_FILE_TYPE;
-    }
-    return type;
-    }
-    catch (FileNotFoundException e)
-    {
-    return -1;
-    }
-    catch (IOException e)
-    {
-    return -1;
-    }
-    }*/
 }
 
 
