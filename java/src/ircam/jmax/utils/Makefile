@@ -52,6 +52,10 @@ Probe:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Probe.java)
 .PHONY: Probe
 
+GlobalProbe:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) GlobalProbe.java)
+.PHONY: GlobalProbe
+
 ListObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ListObject.java)
 .PHONY: ListObject

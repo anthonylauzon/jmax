@@ -11,4 +11,5 @@ SOURCES = \
            MetaListIterator.java \
            Enumeration2.java \
 	   MetaList.java \
+	   GlobalProbe.java \
            Probe.java
