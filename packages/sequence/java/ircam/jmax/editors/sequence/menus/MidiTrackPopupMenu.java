@@ -39,54 +39,54 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 {
   JMenu labelTypesMenu;
   private ButtonGroup labelTypesMenuGroup;
-
+	
   JLabel maxLabel, minLabel;
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
   LabelTypesAction labelAction;
   JRadioButtonMenuItem pianoItem, stavesItem;
-
+	
   public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
     super(editor, isInSequence);
-
+		
     addSeparator();
-
+		
     labelTypesMenu = new JMenu("Labels");
     add( labelTypesMenu);
-
+		
     labelAction = new LabelTypesAction((MidiTrackEditor)target);
-
+		
     pack();
   }
-
+	
   boolean addRangeMenu()
   {
     JMenu rangeMenu = new JMenu("Range");
     JMenu maxRangeMenu = new JMenu("Maximum");
     JMenu minRangeMenu = new JMenu("Minimum");
-
+		
     maxLabel = new JLabel(" 127 ", JLabel.CENTER);
     maxLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+		
     maxSlider = new JSlider(JSlider.VERTICAL, 0, 127, 127);
     maxSlider.setMajorTickSpacing(12);
     maxSlider.setMinorTickSpacing(6);
     maxSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     maxSlider.setPaintTicks(true);
     maxSlider.addChangeListener(new ChangeListener(){
-	public void stateChanged(ChangeEvent e) {
-	  JSlider source = (JSlider)e.getSource();
-	  int max = (int)source.getValue();
-	  int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
-	  if(max<min) max = min+1;
-	    
-	  if(!source.getValueIsAdjusting())
-	    target.getTrack().setProperty("maximumPitch", new Integer(max));
-	  
-	  maxLabel.setText(""+max);
-	}
-      });
+			public void stateChanged(ChangeEvent e) {
+				JSlider source = (JSlider)e.getSource();
+				int max = (int)source.getValue();
+				int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
+				if(max<min) max = min+1;
+				
+				if(!source.getValueIsAdjusting())
+					target.getTrack().setProperty("maximumPitch", new Integer(max));
+				
+				maxLabel.setText(""+max);
+			}
+		});
     maxBox = new Box(BoxLayout.Y_AXIS);
     maxBox.add(maxSlider);
     maxBox.add(maxLabel);
@@ -101,18 +101,18 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     minSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     minSlider.setPaintTicks(true);
     minSlider.addChangeListener(new ChangeListener(){
-	public void stateChanged(ChangeEvent e) {
-	  JSlider source = (JSlider)e.getSource();
-	  int min = (int)source.getValue();
-	  int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
-	  if(min>max) min = max-1;
-	  
-	  if (!source.getValueIsAdjusting())
-	    target.getTrack().setProperty("minimumPitch", new Integer(min));
-	  
-	  minLabel.setText(""+min);
-	}
-      });
+			public void stateChanged(ChangeEvent e) {
+				JSlider source = (JSlider)e.getSource();
+				int min = (int)source.getValue();
+				int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
+				if(min>max) min = max-1;
+				
+				if (!source.getValueIsAdjusting())
+					target.getTrack().setProperty("minimumPitch", new Integer(min));
+				
+				minLabel.setText(""+min);
+			}
+		});
     minBox = new Box(BoxLayout.Y_AXIS);
     minBox.add(minSlider);
     minBox.add(minLabel);
@@ -128,7 +128,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     
     return true;
   }
-
+	
   boolean addViewMenu()
   {
     ButtonGroup viewsMenuGroup = new ButtonGroup();
@@ -142,33 +142,33 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     viewsMenuGroup.add(stavesItem);
     add(stavesItem);
     pianoItem.setSelected(true);
-  
+		
     return true;
   }
-
+	
   public void update()
   {
     updateChangeRangeMenu();
-
+		
     updateLabelTypesMenu();
-
+		
     super.update();
   }
-
+	
   void updateViewMenu()
   {
     switch( target.getViewMode())
-      {
+		{
       case MidiTrackEditor.NMS_VIEW:
-	stavesItem.setSelected(true);
-	break;
+				stavesItem.setSelected(true);
+				break;
       case MidiTrackEditor.PIANOROLL_VIEW:
       default:
-	pianoItem.setSelected(true);
-	break;
-      }
+				pianoItem.setSelected(true);
+				break;
+		}
   }
-
+	
   void updateLabelTypesMenu()
   {
     labelTypesMenu.removeAll();
@@ -176,7 +176,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     
     String currentType = ((MidiTrackEditor)target).getLabelType();
     String type;
-
+		
     JRadioButtonMenuItem selectItem = null;
     JRadioButtonMenuItem item =  new JRadioButtonMenuItem( "none"); 
     item.addActionListener( labelAction);
@@ -184,20 +184,20 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     labelTypesMenuGroup.add(item);
     if( currentType.equals("none"))
       selectItem = item;
-
+		
     for (Enumeration e = target.getTrack().getFtsTrack().getPropertyNames() ; e.hasMoreElements();)
-      {
-	type = (String)e.nextElement();
-	item = new JRadioButtonMenuItem( type);
-	item.addActionListener( labelAction);
-	labelTypesMenu.add(item);
-	labelTypesMenuGroup.add(item);
-	if( currentType.equals(type)) selectItem = item;
-      }
-
+		{
+			type = (String)e.nextElement();
+			item = new JRadioButtonMenuItem( type);
+			item.addActionListener( labelAction);
+			labelTypesMenu.add(item);
+			labelTypesMenuGroup.add(item);
+			if( currentType.equals(type)) selectItem = item;
+		}
+		
     if( selectItem != null) selectItem.setSelected( true);
   }
-
+	
   void updateChangeRangeMenu()
   {
     int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();

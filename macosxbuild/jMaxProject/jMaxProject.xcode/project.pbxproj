@@ -4317,7 +4317,7 @@
 				HEADER_SEARCH_PATHS = "../../include ../../packages/data/c/include ../../packages/utils/c/include";
 				INFOPLIST_FILE = "libdata-info.plist";
 				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress -lmx";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libdata;
 				SECTORDER_FLAGS = "";

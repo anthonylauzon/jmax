@@ -43,17 +43,17 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.Geometry;
 
-  /**
-   * The graphic component containing the tracks of a Sequence.
-   */
+/**
+* The graphic component containing the tracks of a Sequence.
+ */
 public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListener, ListSelectionListener, ScrollManager, Serializable {
-    
+	
   transient FtsTrackObject ftsTrackObject;
-
+	
   transient TrackDataModel trackData;
   transient EditorContainer itsContainer;
   public SequenceRuler ruler;
-    
+	
   transient JScrollPane scrollTracks;
   //---
   transient JLabel itsZoomLabel;
@@ -63,24 +63,24 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   transient TrackBase track;
   transient TrackEditor trackEditor;
   transient JProgressBar progressBar;
-
+	
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
   
   /**
-   * Constructor based on a SequenceDataModel containing the tracks to edit.
+		* Constructor based on a SequenceDataModel containing the tracks to edit.
    */
   public TrackPanel( EditorContainer container, TrackDataModel data) 
   {  
     itsContainer = container;
     trackData = data;
-
+		
     setDoubleBuffered(false);
     ftsTrackObject = (FtsTrackObject)data;
     
     track = new TrackBase( ftsTrackObject);
     track.setProperty("selected", Boolean.TRUE);
-
+		
     //Create abd init a Geometry object for this sequencer 
     {
       geometry = new Geometry();
@@ -92,13 +92,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     //------------------------------------------------
     // Create the ruler
     ruler = new SequenceRuler(geometry, this);
-
+		
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
     manager = new SequenceToolManager( SequenceTools.instance);
     Tool arrow = manager.getToolByName("edit");     
     manager.activate(arrow, null); //we do not have a gc yet...
-
+		
     //------------------- prepare track editor:
     trackEditor = TrackEditorFactoryTable.newEditor( track, geometry);
     trackEditor.getGraphicContext().setToolManager( manager);
@@ -109,70 +109,72 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     data.addListener(this); 
     data.addHighlightListener(ruler);
     manager.addContextSwitcher(new ComponentContextSwitcher( trackEditor.getComponent(), trackEditor.getGraphicContext()));//???
-    manager.contextChanged( trackEditor.getGraphicContext());//????
-    scrollTracks = new JScrollPane( trackEditor.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-				    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    setLayout( new BorderLayout());
-
-    JPanel separate_tracks = new JPanel();
-    separate_tracks.setLayout( new BorderLayout());
-    separate_tracks.add( scrollTracks, BorderLayout.CENTER);
-    
-    //------------------ prepares the Status bar    
-    Box northSection = new Box(BoxLayout.Y_AXIS);
-    
-    ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
-
-    northSection.add(ruler);	
-    separate_tracks.add(northSection, BorderLayout.NORTH);
-    //---------- prepares the time zoom listeners
-    geometry.addZoomListener( new ZoomListener() {
-	public void zoomChanged(float zoom, float oldZoom)
-	{
-	  repaint();
-	  TrackEvent lastEvent = trackData.getLastEvent();
-	  if(lastEvent != null)
-	    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
-						 ((Double)lastEvent.getProperty("duration")).intValue()));
-	}
-      });
-
-    //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
-    int totalTime = MINIMUM_TIME;
-    itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
-    itsTimeScrollbar.setUnitIncrement(10);
-    itsTimeScrollbar.setBlockIncrement(1000);
-    itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {	
-	public void adjustmentValueChanged(AdjustmentEvent e) {
-          int currentTime = e.getValue();
-          geometry.setXTransposition(-currentTime);
-        }
-    });
-    separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
-    add( separate_tracks, BorderLayout.CENTER);
-
-    validate();
-    
-    for(Enumeration e = data.getEvents(); e.hasMoreElements();)
-      trackEditor.updateNewObject((TrackEvent)e.nextElement());
+		manager.contextChanged( trackEditor.getGraphicContext());//????
+		scrollTracks = new JScrollPane( trackEditor.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+																		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		setLayout( new BorderLayout());
+		
+		JPanel separate_tracks = new JPanel();
+		separate_tracks.setLayout( new BorderLayout());
+		separate_tracks.add( scrollTracks, BorderLayout.CENTER);
+		
+		//------------------ prepares the Status bar    
+		Box northSection = new Box(BoxLayout.Y_AXIS);
+		
+		ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
+		
+		northSection.add(ruler);	
+		separate_tracks.add(northSection, BorderLayout.NORTH);
+		//---------- prepares the time zoom listeners
+		geometry.addZoomListener( new ZoomListener() {
+			public void zoomChanged(float zoom, float oldZoom)
+			{
+				repaint();
+				TrackEvent lastEvent = trackData.getLastEvent();
+				if(lastEvent != null)
+					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
+																							 ((Double)lastEvent.getProperty("duration")).intValue()));
+				ftsTrackObject.editorState.setZoom(zoom);
+			}
+		});
+		
+		//-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
+		int totalTime = MINIMUM_TIME;
+		itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
+		itsTimeScrollbar.setUnitIncrement(10);
+		itsTimeScrollbar.setBlockIncrement(1000);
+		itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {	
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				int currentTime = e.getValue();
+				geometry.setXTransposition(-currentTime);
+				ftsTrackObject.editorState.setTransposition(-currentTime);
+			}
+		});
+		separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
+		add( separate_tracks, BorderLayout.CENTER);
+		
+		validate();
+		
+		for(Enumeration e = data.getEvents(); e.hasMoreElements();)
+			trackEditor.updateNewObject((TrackEvent)e.nextElement());
   }
-
+	
   boolean isVisible(int y)
   {
     Rectangle r = scrollTracks.getViewport().getViewRect();
     return ((y >= r.y)&&(y <= r.y +r.height));
   }
-
+	
   public TrackEditor getTrackEditor()
   {
     return trackEditor;
   }
-
+	
   /**
-   * called when the database is changed: DataTrackListener interface
+		* called when the database is changed: DataTrackListener interface
    */
   boolean uploading = false;
-
+	
   public void objectChanged(Object spec, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
@@ -190,12 +192,12 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   {
     uploading = true;
     /*progressBar.setMaximum( size);
-      progressBar.setValue( 0);
-      SwingUtilities.invokeLater( new Runnable(){
+		progressBar.setValue( 0);
+		SwingUtilities.invokeLater( new Runnable(){
       public void run(){
-      progressBar.setVisible( true);
+				progressBar.setVisible( true);
       }
-      });*/
+		});*/
   }
   public void endTrackUpload( TrackDataModel track)
   {
@@ -204,9 +206,9 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       resizePanelToEventTimeWithoutScroll( track.getLastEvent());
     /*SwingUtilities.invokeLater( new Runnable(){
       public void run(){
-      progressBar.setVisible( false);
+				progressBar.setVisible( false);
       }
-      });*/
+		});*/
   }
   public void startPaste(){}
   public void endPaste(){}
@@ -218,48 +220,48 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void trackNameChanged(String oldName, String newName)
   {
     if( itsContainer instanceof TrackWindow)
-        ((TrackWindow)itsContainer).setName( newName);
+			((TrackWindow)itsContainer).setName( newName);
   }
-
+	
   //controll if the object is in the actual scrollable area. if not extend the area
   private void resizePanelToEventTime(TrackEvent evt)
   {
     if( evt != null)
-      {
-	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
-	resizePanelToTime(evtTime);
-      }
+		{
+			int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
+			resizePanelToTime(evtTime);
+		}
   }
-
+	
   private void resizePanelToTime(int time)
   {
     int maxVisibleTime = getMaximumVisibleTime();
     int maximumTime = getMaximumTime();
     
     if(time > maximumTime)
-      {
-	int delta = maximumTime-itsTimeScrollbar.getMaximum();
-	
-	itsTimeScrollbar.setMaximum(time-delta);
-	itsTimeScrollbar.setValue(time);
-      }
+		{
+			int delta = maximumTime-itsTimeScrollbar.getMaximum();
+			
+			itsTimeScrollbar.setMaximum(time-delta);
+			itsTimeScrollbar.setValue(time);
+		}
     else 
       if( time > maxVisibleTime)		
-	itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
-      else
-	if(time < -geometry.getXTransposition())
-	  itsTimeScrollbar.setValue(time);
+				itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
+		else
+			if(time < -geometry.getXTransposition())
+				itsTimeScrollbar.setValue(time);
   }
-
+	
   private void resizePanelToTimeWithoutScroll(int time)
   {
     int maximumTime = getMaximumTime();
     
     if(time > maximumTime)
-      {
-	int delta = maximumTime-itsTimeScrollbar.getMaximum();
-	itsTimeScrollbar.setMaximum(time-delta);
-      }
+		{
+			int delta = maximumTime-itsTimeScrollbar.getMaximum();
+			itsTimeScrollbar.setMaximum(time-delta);
+		}
   }
   private void resizePanelToEventTimeWithoutScroll(TrackEvent evt)
   {
@@ -274,49 +276,49 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     ((ClipableData) trackData).copy();
     Actions.pasteAction.setEnabled(true);
   }
-
+	
   public void cut()
   {
     ((ClipableData) trackData).cut();
     Actions.pasteAction.setEnabled(true);
   }
-
+	
   public void paste()
   {
     ((ClipableData) trackData).paste();
   }
-
+	
   public void duplicate()
   {
     copy();
     paste();
   }
-
+	
   public void undo()
   {
     try 
-      {
-	((UndoableData) trackData).undo();
-      } catch (CannotUndoException e1) {
-	System.out.println("Can't undo");
-      }
+	{
+		((UndoableData) trackData).undo();
+	} catch (CannotUndoException e1) {
+		System.out.println("Can't undo");
+	}
   }
-
+	
   public void redo()
   {
     try 
-      {
-	((UndoableData) trackData).redo();
-      } catch (CannotRedoException e1) {
-	System.out.println("Can't redo");
-      }
+	{
+		((UndoableData) trackData).redo();
+	} catch (CannotRedoException e1) {
+		System.out.println("Can't redo");
+	}
   }
-
+	
   public FtsGraphicObject getFtsObject()
   {
     return ftsTrackObject;
   }
-
+	
   public Frame getFrame()
   {
     return itsContainer.getFrame();
@@ -328,6 +330,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void close(boolean doCancel)
   {
     itsContainer.getFrame().setVisible(false);
+		ftsTrackObject.requestSetEditorState();
     ftsTrackObject.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
@@ -336,33 +339,33 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void print()
   {
     TrackWindow win = (TrackWindow)itsContainer;
-
+		
     RepaintManager.currentManager(win).setDoubleBufferingEnabled(false);
-
+		
     PrintJob aPrintjob = win.getToolkit().getPrintJob( win, "Printing Track", null, null);
-
+		
     if (aPrintjob != null)
-      {
-	Graphics aPrintGraphics = aPrintjob.getGraphics();
-
-	if (aPrintGraphics != null)
-	  {
-	    win.print( aPrintGraphics);
-	    aPrintGraphics.dispose();
-	  }
-	aPrintjob.end();
-      }
+		{
+			Graphics aPrintGraphics = aPrintjob.getGraphics();
+			
+			if (aPrintGraphics != null)
+			{
+				win.print( aPrintGraphics);
+				aPrintGraphics.dispose();
+			}
+			aPrintjob.end();
+		}
     
     RepaintManager.currentManager(win).setDoubleBufferingEnabled(true);
   }
-
+	
   /**
-   * ListSelectionListener interface
+		* ListSelectionListener interface
    */    
   public void valueChanged(ListSelectionEvent e)
   {
     int numSelected = trackEditor.getSelection().size();
-
+		
     if (numSelected == 1)
     {
       TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
@@ -377,7 +380,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       menu.duplicateAction.setEnabled(numSelected > 0);
     }
   }
-    
+	
   public boolean eventIsVisible(Event evt)
   {
     int time = (int)evt.getTime();
@@ -386,9 +389,9 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
     return ((time>startTime)&&(time+duration<endTime));
   }
-
+	
   /************ ScrollManager Interface *****************************/
-    
+	
   //AUTOMATIC SCROLLING  
   public boolean pointIsVisible(int x, int y)
   {
@@ -397,72 +400,72 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   } 
   
   private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
-  private int scrolledDelta = 2;//the corresponding graphic delta
-  public int scrollBy(int x, int y)
-  {
-    Rectangle r = itsContainer.getViewRectangle();
-    if(x < r.x  + ScoreBackground.KEYEND)
-      {
-	if(itsTimeScrollbar.getValue()-scrollingDelta >0)
-	  {
-	    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
-	    return -scrolledDelta;//scroll to left
-	  }
-	else return 0;//is already scrolled to zero
-      }
-    else
-      {		
-	if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
-	  {
-	    int value = itsTimeScrollbar.getValue()+scrollingDelta;
-	    if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
-	      itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
-	    
-	    itsTimeScrollbar.setValue(value);
-	    return scrolledDelta;//scroll to rigth
-	  }
-	else return 0;//the mouse is in the window
-      }
-  }
-
-  public void makeVisible(TrackEvent evt)
-  {
-    int time = (int)evt.getTime();
-    int duration = ((Double)evt.getProperty("duration")).intValue();
-    int startTime = -geometry.getXTransposition(); 
-    int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-    
-    if((time<startTime)||(time+duration>endTime))
-      itsTimeScrollbar.setValue(time);
-  }
-
-  public int getMaximumVisibleTime()
-  {
-    return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-  }
-  public int getMaximumTime()
-  {
-    int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
-    int size = getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND;
-    
-    if (geometry.getXInvertion()) 
-      return (int) (maxTransp -(size)/geometry.getXZoom())-1;
-    
-    else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
-  }
-
-  public void scrollIfNeeded(int time)
-  {
-    resizePanelToTime(time);
-  }
-  public void scrollToValue(int value)
-  {
-    itsTimeScrollbar.setValue(value);
-  }
-  public Rectangle getViewRectangle()
-  {
-    return scrollTracks.getViewport().getViewRect();
-  }
+		private int scrolledDelta = 2;//the corresponding graphic delta
+			public int scrollBy(int x, int y)
+			{
+				Rectangle r = itsContainer.getViewRectangle();
+				if(x < r.x  + ScoreBackground.KEYEND)
+				{
+					if(itsTimeScrollbar.getValue()-scrollingDelta >0)
+					{
+						itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
+						return -scrolledDelta;//scroll to left
+					}
+					else return 0;//is already scrolled to zero
+				}
+				else
+				{		
+					if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
+					{
+						int value = itsTimeScrollbar.getValue()+scrollingDelta;
+						if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
+							itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+						
+						itsTimeScrollbar.setValue(value);
+						return scrolledDelta;//scroll to rigth
+					}
+					else return 0;//the mouse is in the window
+				}
+			}
+			
+			public void makeVisible(TrackEvent evt)
+			{
+				int time = (int)evt.getTime();
+				int duration = ((Double)evt.getProperty("duration")).intValue();
+				int startTime = -geometry.getXTransposition(); 
+				int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+				
+				if((time<startTime)||(time+duration>endTime))
+					itsTimeScrollbar.setValue(time);
+			}
+			
+			public int getMaximumVisibleTime()
+			{
+				return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+			}
+			public int getMaximumTime()
+			{
+				int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
+				int size = getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND;
+				
+				if (geometry.getXInvertion()) 
+					return (int) (maxTransp -(size)/geometry.getXZoom())-1;
+				
+				else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
+			}
+			
+			public void scrollIfNeeded(int time)
+			{
+				resizePanelToTime(time);
+			}
+			public void scrollToValue(int value)
+			{
+				itsTimeScrollbar.setValue(value);
+			}
+			public Rectangle getViewRectangle()
+			{
+				return scrollTracks.getViewport().getViewRect();
+			}
 }
 
 

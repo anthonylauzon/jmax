@@ -66,6 +66,7 @@ extern fts_symbol_t seqsym_dump_mess;
 extern fts_symbol_t seqsym_properties;
 extern fts_symbol_t seqsym_get_property_list;
 extern fts_symbol_t seqsym_append_properties;
+extern fts_symbol_t seqsym_editor_state;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_addTracks;
@@ -82,6 +83,7 @@ extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_highlightEventsAndTime;
 extern fts_symbol_t seqsym_openFileDialog;
 extern fts_symbol_t seqsym_endPaste;
+extern fts_symbol_t seqsym_editorState;
 
 #endif
 

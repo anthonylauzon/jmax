@@ -28,6 +28,17 @@
 
 extern fts_class_t *track_class;
 
+typedef struct editor_state
+{
+  int win_x; /* editor window's bounds */
+  int win_y;
+  int win_w;
+  int win_h;
+  fts_symbol_t label; /* property event label */
+  float zoom; /* editor zoom_factor */
+  int transp; /* editor x_transposition */
+} ed_state_t;
+
 struct _track_
 { 
   fts_object_t o;
@@ -42,6 +53,8 @@ struct _track_
 
   int open; /* flag: is 1 if track editor is open */
 
+  ed_state_t *ed_state;
+  
   fts_class_t *type; /* type of events */
   event_t *first; /* pointer to first event */
   event_t *last; /* pointer to last event */

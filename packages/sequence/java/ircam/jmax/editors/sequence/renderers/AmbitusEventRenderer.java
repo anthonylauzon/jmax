@@ -220,14 +220,12 @@ public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContex
 		g.setColor(Color.black);
 	
 	g.drawRect( x, y, length, height);
-
+	
 	if(cue != -1)
 	{
-		int cuex = 7;
 		g.drawLine( x, 2, x, g.getClipBounds().height-2);
 		g.drawLine( x-CUE_WIDTH, 2, x, 2);
 	}	
-		
 }
 /**
 * returns true if the given event contains the given (graphic) point

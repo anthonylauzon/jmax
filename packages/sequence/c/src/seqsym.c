@@ -79,6 +79,8 @@ fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
+fts_symbol_t seqsym_editorState = 0;
+fts_symbol_t seqsym_editor_state = 0;
 
 void
 seqsym_config(void)
@@ -124,7 +126,8 @@ seqsym_config(void)
   seqsym_properties = fts_new_symbol("properties");
   seqsym_get_property_list = fts_new_symbol("get_property_list");
   seqsym_append_properties = fts_new_symbol("append_properties");
-  
+	seqsym_editor_state = fts_new_symbol("editor_state");
+		
   /* messages to client */
   seqsym_addTracks = fts_new_symbol("addTracks");
   seqsym_removeTracks = fts_new_symbol("removeTracks");
@@ -140,4 +143,5 @@ seqsym_config(void)
   seqsym_highlightEventsAndTime = fts_new_symbol("highlightEventsAndTime");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
   seqsym_endPaste = fts_new_symbol("endPaste");
+  seqsym_editorState = fts_new_symbol("editorState");
 }

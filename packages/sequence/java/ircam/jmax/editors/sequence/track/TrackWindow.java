@@ -38,64 +38,78 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 
 /**
- * This implementation builds a SequencePanel to represent the data.
+* This implementation builds a SequencePanel to represent the data.
  */
 public class TrackWindow extends JFrame implements EditorContainer{
-
+	
   //------------------- fields
   transient TrackPanel trackPanel;
   FtsTrackObject trackData;
-   EditMenu editMenu;
+	EditMenu editMenu;
   
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
   public final static int MAX_HEIGHT     = 800;
   public final static int EMPTY_HEIGHT   = 94;
   /**
-   * Constructor with FtsSequenceObject
+		* Constructor with FtsSequenceObject
    */
   public TrackWindow(FtsTrackObject data)
   {
     super();
-        
+		
     trackData = data;
-
+		
     TrackEditorFactoryTable.init();
     
     makeTitle();
-        
+		
     //... then the SequencePanel
     trackPanel = new TrackPanel( this, data);
-
-    setSize( new Dimension( DEFAULT_WIDTH, EMPTY_HEIGHT));
+				
     getContentPane().add( trackPanel);
     
     addWindowListener(new WindowListener(){
-	public void windowOpened(WindowEvent e){}
-	public void windowClosed(WindowEvent e){}
-	public void windowClosing(WindowEvent e)
-	{
-	  MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	}
-	public void windowDeiconified(WindowEvent e){}
-	public void windowIconified(WindowEvent e){}
-	public void windowActivated(WindowEvent e)
-	{
-	  TrackEditor editor = trackPanel.getTrackEditor();
-	  SequenceSelection.setCurrent( editor.getSelection());
-	}
-	public void windowDeactivated(WindowEvent e){}
-      });
-
-    pack();
-
+			public void windowOpened(WindowEvent e){}
+			public void windowClosed(WindowEvent e){}
+			public void windowClosing(WindowEvent e)
+		  {
+				trackPanel.close(true);
+		  }
+			public void windowDeiconified(WindowEvent e){}
+			public void windowIconified(WindowEvent e){}
+			public void windowActivated(WindowEvent e)
+		  {
+				TrackEditor editor = trackPanel.getTrackEditor();
+				SequenceSelection.setCurrent( editor.getSelection());
+	    }
+			public void windowDeactivated(WindowEvent e){}
+		});
+		
+		addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e)
+		  {
+				Rectangle bounds = TrackWindow.this.getBounds();
+				trackData.editorState.setSize(bounds.width, bounds.height);
+		  }
+			public void componentMoved(ComponentEvent e)
+		  {
+				Rectangle bounds = TrackWindow.this.getBounds();
+				trackData.editorState.setLocation(bounds.x, bounds.y);
+		  }
+		});
+		
+		if( !trackData.editorState.haveContent())
+			pack();
+		
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
-
+		
     validate();
-    pack();
+		if( !trackData.editorState.haveContent())
+			pack();
   }
-
+	
   private final void makeTitle(){
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track"));
     MaxWindowManager.getWindowManager().windowChanged(this);
@@ -106,7 +120,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
     setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track " + name));
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
-
+	
   private final void makeMenuBar()
   {
     JMenuBar mb = new JMenuBar();
@@ -114,15 +128,15 @@ public class TrackWindow extends JFrame implements EditorContainer{
     editMenu = new EditMenu(this);
     mb.add(editMenu);
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this));
-
+		
     setJMenuBar(mb);
   }
-
+	
   public EditMenu getEditMenu()
   {
     return editMenu;
   }
-    
+	
   // ------ editorContainer interface ---------------
   public Editor getEditor(){
     return trackPanel;

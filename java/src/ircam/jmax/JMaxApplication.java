@@ -53,11 +53,11 @@ class FtsSystemOutConsole extends FtsObject {
   static
   {
     FtsObject.registerMessageHandler( FtsSystemOutConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  System.out.println( args.getString(0)); 
-	}
-      });
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				System.out.println( args.getString(0)); 
+			}
+		});
   }
 }
 
