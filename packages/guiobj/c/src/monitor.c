@@ -41,9 +41,17 @@ monitor_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-monitor_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
+  fts_object_ui_property_changed(o, fts_s_value);
+}
+
+static void 
+monitor_listen_dsp_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
+{
+  monitor_t *this = (monitor_t *)listener;
+  
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
 }
 
 static void 
@@ -93,14 +101,14 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   this->port = 0;
 
-  /*
   this->port = fts_audioport_get_default(o);
   if (!this->port)
     {
       fts_object_set_error( o, "Default audio port is not defined");
       return;    
     }
-  */
+
+  fts_param_add_listener(fts_s_dsp_on, this, monitor_listen_dsp_on);
 }
 
 static void 
@@ -117,8 +125,8 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, monitor_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, monitor_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, monitor_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, monitor_send_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, monitor_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, monitor_send_ui_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, monitor_bang);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);

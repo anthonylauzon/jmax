@@ -580,7 +580,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( capture_channels != 0)
     {
-      post ("opening input\n");
       if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, access)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
@@ -596,7 +595,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( playback_channels != 0)
     {
-      post ("opening output\n");
       if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, access)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
@@ -605,8 +603,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
 	  return;
 	}
-
-      post ("output opened OK\n");
 
       fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels);
       fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][1]);
@@ -669,6 +665,7 @@ void alsaaudioport_config( void)
   fts_symbol_t s = fts_new_symbol("alsaaudioport");
 
   fts_class_install( s, alsaaudioport_instantiate);
+
   fts_audioport_set_default_class( s);
 
   s_default = fts_new_symbol( "default");

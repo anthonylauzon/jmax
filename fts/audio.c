@@ -719,6 +719,10 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
   return default_audioport;  
 }
 
+fts_symbol_t fts_audioport_get_default_class( void)
+{
+  return default_audioport_class;
+}
 
 /***********************************************************************
  *

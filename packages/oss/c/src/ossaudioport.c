@@ -308,8 +308,8 @@ void ossaudioport_config( void)
    * If ALSA package has already installed a default,
    * we don't overwrite it
    */
-  if ( !fts_audioport_get_default_class())
-    fts_audioport_set_default_class( s);
+  if (!fts_audioport_get_default_class())
+    fts_audioport_set_default_class(s);
 
   s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
   s_read_only = fts_new_symbol( "read_only");

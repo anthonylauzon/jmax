@@ -43,8 +43,6 @@ extern void signal_cut_config(void);
 extern void signal_play_fvec_config(void);
 extern void signal_rec_fvec_config(void);
 
-
-
 void
 signal_config(void)
 {

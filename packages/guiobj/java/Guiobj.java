@@ -148,6 +148,6 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
     JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
-    JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monior_cursor.gif", this);
+    JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_cursor.gif", this);
   }
 }
