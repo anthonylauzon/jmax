@@ -1979,7 +1979,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     fts_midifile_t *file = fts_midifile_open_read(name);
     fts_class_t *type = track_get_type(self);
     
-    if(file != NULL && type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
+    if(file != NULL && (type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL))
     {
       int size;
       char *error;
@@ -2006,7 +2006,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
           {
             int n = fts_get_number_int(at + i + 1);
             
-            if(n >= 0)
+            if(n > 0)
               fts_midifile_select_channel(file, n);
           }
         }

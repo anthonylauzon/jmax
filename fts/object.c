@@ -314,7 +314,7 @@ fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
       
       if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-        fts_object_error(o, "import: no handler to import file from %s", fts_symbol_name(fts_object_get_class_name(o)));
+        fts_object_error(o, "import: cannot open file %", fts_symbol_name(name));
     }
     else
       fts_object_import_dialog(o, winlet, s, ac - 1, at + 1);
@@ -336,7 +336,7 @@ fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
       
       if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-        fts_object_error(o, "no handler to export file from %s", fts_symbol_name(fts_object_get_class_name(o)));
+        fts_object_error(o, "export: cannot open file %", fts_symbol_name(name));
     }
     else
       fts_object_export_dialog(o, winlet, s, ac - 1, at + 1);

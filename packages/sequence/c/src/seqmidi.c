@@ -31,6 +31,7 @@
 #include <fts/packages/sequence/seqsym.h>
 
 #define STRING_SIZE 1024
+#define ABSOLUTE_END 1.7976931348623157e+308
 
 static void
 get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
@@ -75,6 +76,7 @@ typedef struct _seqmidi_read_data_
   int n_note_on[n_midi_channels][n_midi_notes]; /* counter for overlapping notes */
   scomark_t *last_marker;
   double last_marker_time;
+  double next_bar_time;
   event_t *last;
 } seqmidi_read_data_t;
 
@@ -88,6 +90,7 @@ seqmidi_read_data_init(seqmidi_read_data_t *data)
   data->size = 0;
   data->last_marker = NULL;
   data->last_marker_time = 0.0;
+  data->next_bar_time = ABSOLUTE_END;
   data->last = NULL;
 } 
 
@@ -135,15 +138,16 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     int pitch = fts_midievent_channel_message_get_first(midievt);
     int velocity = fts_midievent_channel_message_get_second(midievt);
     
-    if(velocity == 0 && data->note_is_on[channel - 1][pitch] != 0)
+    if(velocity == 0 && data->note_is_on[channel - 1][pitch] != NULL)
     {
+      /* note off */
       if(data->n_note_on[channel - 1][pitch] == 1)
       {
-        event_t *event = data->note_is_on[channel - 1][pitch];
-        scoob_t *scoob = (scoob_t *)event_get_object(event);
+        event_t *e = data->note_is_on[channel - 1][pitch];
+        scoob_t *s = (scoob_t *)event_get_object(e);
         
-        scoob_set_duration(scoob, time - event_get_time(event));
-        data->note_is_on[channel - 1][pitch] = 0;
+        scoob_set_duration(s, time - event_get_time(e));
+        data->note_is_on[channel - 1][pitch] = NULL;
         data->n_note_on[channel - 1][pitch] = 0;
       }
       else
@@ -151,16 +155,21 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     }
     else if(velocity > 0)
     {
+      /* note on */
       scoob_t *scoob;
       event_t *event;
       fts_atom_t a[3];
       
-      if(data->note_is_on[channel - 1][pitch] != 0)
+      if(data->note_is_on[channel - 1][pitch] != NULL)
       {
-        event_t *event = data->note_is_on[channel - 1][pitch];
-        scoob_t *scoob = (scoob_t *)event_get_object(event);
+        event_t *e = data->note_is_on[channel - 1][pitch];
+        scoob_t *s = (scoob_t *)event_get_object(e);
+        double dur = time - event_get_time(e);
         
-        scoob_set_duration(scoob, time - event_get_time(event));
+        if(dur > 0.0)
+          scoob_set_duration(s, dur);
+        else
+          track_remove_event(track, e);
       }          
       
       /* create a scoob */
@@ -230,8 +239,8 @@ scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   double time = fts_midifile_get_time(file);
-  double old_tempo = 0.0;
   scomark_t *scomark = data->last_marker;
+  double old_tempo = 0.0;
   
   if(scomark == NULL || time > data->last_marker_time)
     scomark = track_insert_marker(data->merge, time, seqsym_marker);
@@ -271,13 +280,13 @@ scoobtrack_read_track_end(fts_midifile_t *file)
   for(i=0; i<n_midi_channels; i++)
   {
     for(j=0; j<n_midi_notes; j++)
-      if(data->note_is_on[i][j] != 0)
+      if(data->note_is_on[i][j] != NULL)
       {
         event_t *event = data->note_is_on[i][j];
         scoob_t *scoob = (scoob_t *)event_get_object(event);
         
         scoob_set_duration(scoob, time - event_get_time(event));
-        data->note_is_on[i][j] = 0;
+        data->note_is_on[i][j] = NULL;
         data->n_note_on[i][j] = 0;
       }
   }
@@ -378,7 +387,7 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
     {
       for(j=0; j<n_midi_notes; j++)
       {
-        data.note_is_on[i][j] = 0;
+        data.note_is_on[i][j] = NULL;
         data.n_note_on[i][j] = 0;
       }
     }

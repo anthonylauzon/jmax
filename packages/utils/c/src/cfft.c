@@ -242,26 +242,26 @@ cfft_make_bitreversed_table(unsigned int size)
   unsigned int *bitrev;
   unsigned int idx, xdi;
   unsigned int i, j;
-
+  
   bitrev = (unsigned int *)fts_malloc(size * sizeof(unsigned int));
-
+  
   for(log_size=-1, i=size; i; i>>=1, log_size++)
     ;
-
+  
   for(i=0; i<size; i++)
+  {
+    idx = i;
+    xdi = 0;
+    
+    for(j=1; j<log_size; j++)
     {
-      idx = i;
-      xdi = 0;
-
-      for(j=1; j<log_size; j++)
-	{
-	  xdi += (idx & 1);
-	  xdi <<= 1;
-	  idx >>= 1;
-	}
-      
-      bitrev[i] = xdi + (idx & 1);
+      xdi += (idx & 1);
+      xdi <<= 1;
+      idx >>= 1;
     }
+    
+    bitrev[i] = xdi + (idx & 1);
+  }
   
   return bitrev;
 }

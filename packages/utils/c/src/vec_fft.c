@@ -55,22 +55,22 @@ get_lookups(unsigned int size)
   fft_lookup_t *lookups = 0;
   unsigned int log2_size = 0;
   int i;
-
+  
   for(i=size>>1; i; i>>=1)
     log2_size++;
-
+  
   lookups = the_fft_lookups + log2_size;
-
+  
   if(lookups->size == 0 && size >= FTS_FFT_MIN_SIZE)
-    {
-      int fft_size = 1 << log2_size;
-
-      lookups->size = fft_size;
-      lookups->cos = fts_fftab_get_cosine(fft_size);
-      lookups->sin = fts_fftab_get_sine(fft_size);
-      lookups->bitrev = cfft_make_bitreversed_table(fft_size);
-    }
-
+  {
+    int fft_size = 1 << log2_size;
+    
+    lookups->size = fft_size;
+    lookups->cos = fts_fftab_get_cosine(fft_size);
+    lookups->sin = fts_fftab_get_sine(fft_size);
+    lookups->bitrev = cfft_make_bitreversed_table(fft_size);
+  }
+  
   return lookups;
 }
 
