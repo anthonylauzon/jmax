@@ -138,36 +138,36 @@ eventtrk_insert_event_behind(eventtrk_t *track, event_t *here, event_t *event)
     }  
 }
 
-static event_t *
+event_t *
 eventtrk_get_event_by_time(eventtrk_t *track, double time)
 {
-  event_t *event = 0;
-
   if(eventtrk_get_size(track) > 0 && time <= track->last->time)
     {
-      event = track->first;
+      event_t *event = track->first;
       
       while(time > event->time)
 	event = event->next;
+
+      return event;  
     }
-  
-  return event;  
+  else
+    return 0;
 }
 
-static event_t *
+event_t *
 eventtrk_get_event_by_time_after(eventtrk_t *track, double time, event_t *here)
 {
-  event_t *event = 0;
-
   if(eventtrk_get_size(track) > 0 && time <= track->last->time)
     {
-      event = here;
+      event_t *event = here;
       
       while(time > event->time)
 	event = event->next;
+
+      return event;  
     }
-  
-  return event;  
+  else
+    return 0;
 }
 
 
@@ -316,17 +316,18 @@ eventtrk_remove_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_
 
   if(!track_is_locked(&this->head))
     {
-      fts_object_t *event = fts_get_object(at + 0);
-      fts_atom_t a[1];
+      int i;
 
-      eventtrk_cut_event(this, (event_t *)event);
-      
-      /* add track to sequence at client */
-      fts_set_object(a + 0, (fts_object_t *)event);
-      fts_client_send_message(o, seqsym_deleteEvents, 1, a);
-      
-      /* delete event object and remove from client */
-      fts_object_delete(event);
+      /*  remove event objects from client */
+      fts_client_send_message(o, seqsym_deleteEvents, ac, at);
+
+      for(i=0; i<ac; i++)
+	{
+	  fts_object_t *event = fts_get_object(at + i);
+	  
+	  eventtrk_cut_event(this, (event_t *)event);
+	  fts_object_delete(event);
+	}
     }
 }
 

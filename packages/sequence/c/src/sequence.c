@@ -443,4 +443,3 @@ sequence_config(void)
 {
   fts_class_install(seqsym_sequence, sequence_instantiate);
 }
-
