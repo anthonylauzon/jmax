@@ -25,6 +25,7 @@
 
 package ircam.jmax.dialogs;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -36,52 +37,111 @@ import ircam.jmax.fts.*;
  * The "system statistics" dialog.
  */
 
-public class StatisticsDialog extends Dialog implements ActionListener, KeyListener{
+public class StatisticsDialog extends JDialog implements ActionListener, KeyListener{
   Frame parent;
-  Button okButton;
+  JButton okButton;
   private FtsDspControl control;
 
   public StatisticsDialog( Frame dw) {
+
     super(dw, "System statistics", false);
+
     parent = (Frame)dw;
   
     control = MaxApplication.getFts().getDspController();
     
-    // Do a gc before giving statistics (added by mdc).
-    
+    // Do a gc before giving statistics (added by mdc).    
     System.gc();
     
     //Create middle section.
-    Panel p1 = new Panel();
-    p1.setLayout(new GridLayout(0, 1));
+    JPanel p1 = new JPanel();
+    p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
 
-    Label label1 = new Label("jMax "+  MaxApplication.getProperty("jmaxVersion"));
+    JPanel p11 = new JPanel();
+    p11.setLayout(new BoxLayout(p11, BoxLayout.X_AXIS));
+    p11.setBorder(BorderFactory.createEtchedBorder());
 
-    p1.add(label1);
-    Label label2 = new Label("running on " + (String)(System.getProperties().getProperty("os.name")));
-    p1.add(label2);
-    Label label3 = new Label("host architecture:"+(String)(System.getProperties().getProperty("os.arch")));
-    p1.add(label3);
-    Label label4 = new Label("Java version" + (String)(System.getProperties().getProperty("java.version")));
-    p1.add(label4);
-    Label label8 = new Label("Total memory " + Runtime.getRuntime().totalMemory());
-    p1.add(label8);
-    Label label9 = new Label("Used memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-    p1.add(label9);
-    Label label10 = new Label("Sampling Rate " + control.getSamplingRate().toString());
-    p1.add(label10);
-    Label label11 = new Label("Audio Buffer " + control.getFifoSize().toString());
-    p1.add(label11);
+    JPanel pNames = new JPanel();
+    pNames.setLayout(new BoxLayout(pNames, BoxLayout.Y_AXIS));
+    pNames.setPreferredSize(new Dimension(130, 90));
+    
+    JLabel name1 = new JLabel("jMax");
+    pNames.add(name1);
+    JLabel name2 = new JLabel("running on ");
+    pNames.add(name2);
+    JLabel name3 = new JLabel("host architecture");
+    pNames.add(name3);
+    JLabel name4 = new JLabel("Java version");
+    pNames.add(name4);
+    JLabel name5 = new JLabel("Total memory ");
+    pNames.add(name5);
+    JLabel name6 = new JLabel("Used memory ");
+    pNames.add(name6);
 
-    add("Center", p1);
+    p11.add(pNames);
+
+    p11.add(Box.createHorizontalGlue());
+
+    JPanel pValues = new JPanel();
+    pValues.setLayout(new BoxLayout(pValues, BoxLayout.Y_AXIS));
+    pValues.setPreferredSize(new Dimension(130, 90));
+    
+    JLabel value1 = new JLabel(MaxApplication.getProperty("jmaxVersion"));
+    pValues.add(value1);
+    JLabel value2 = new JLabel((String)(System.getProperties().getProperty("os.name")));
+    pValues.add(value2);
+    JLabel value3 = new JLabel((String)(System.getProperties().getProperty("os.arch")));
+    pValues.add(value3);
+    JLabel value4 = new JLabel((String)(System.getProperties().getProperty("java.version")));
+    pValues.add(value4);
+    JLabel value5 = new JLabel("" + Runtime.getRuntime().totalMemory());
+    pValues.add(value5);
+    JLabel value6 = new JLabel("" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+    pValues.add(value6);
+
+    p11.add(pValues);
+
+    p1.add(p11);
+
+    JPanel p12 = new JPanel();
+    p12.setLayout(new BoxLayout(p12, BoxLayout.X_AXIS));
+    p12.setBorder(BorderFactory.createEtchedBorder());
+
+    JPanel pNames2 = new JPanel();
+    pNames2.setLayout(new BoxLayout(pNames2, BoxLayout.Y_AXIS));
+    pNames2.setPreferredSize(new Dimension(130, 30));
+    
+    JLabel name7 = new JLabel("Sampling Rate");
+    pNames2.add(name7);
+    JLabel name8 = new JLabel("Audio Buffer");
+    pNames2.add(name8);
+
+    p12.add(pNames2);
+
+    p12.add(Box.createHorizontalGlue());
+
+    JPanel pValues2 = new JPanel();
+    pValues2.setLayout(new BoxLayout(pValues2, BoxLayout.Y_AXIS));
+    pValues2.setPreferredSize(new Dimension(130, 30));
+    JLabel value7 = new JLabel(control.getSamplingRate().toString());
+    pValues2.add(value7);
+    JLabel value8 = new JLabel(control.getFifoSize().toString());
+    pValues2.add(value8);
+    
+    p12.add(pValues2);
+
+    p1.add(p12);
+
+    getContentPane().add("Center", p1);
     
     //Create bottom row.
-    Panel p2 = new Panel();
-    p2.setLayout(new FlowLayout(FlowLayout.RIGHT));
-    Button okButton = new Button("OK");
+    JPanel p2 = new JPanel();
+    p2.setPreferredSize(new Dimension(200, 35));
+    p2.setLayout(new FlowLayout(FlowLayout.CENTER));
+    JButton okButton = new JButton("OK");
     okButton.addActionListener(this);
     p2.add(okButton);
-    add("South", p2);
+    getContentPane().add("South", p2);
 
     addKeyListener(this);
 
