@@ -672,55 +672,28 @@ FTS_API fts_midievent_t *fts_midiparser_byte(fts_midiparser_t *parser, unsigned 
  *  MIDI Manager
  *
  */
-FTS_API fts_symbol_t fts_s_midimanager;
-FTS_API fts_symbol_t fts_s_sources;
-FTS_API fts_symbol_t fts_s_destinations;
 
-typedef struct fts_midilabel
-{
-  fts_symbol_t name;
-  fts_midiport_t *input;
-  fts_midiport_t *output;
-  fts_symbol_t input_name;
-  fts_symbol_t output_name;
-  struct fts_midilabel *next;
-} fts_midilabel_t;
-
-#define fts_midilabel_get_name(l) ((l)->name)
-#define fts_midilabel_get_input(l) ((l)->input)
-#define fts_midilabel_get_output(l) ((l)->output)
-#define fts_midilabel_get_next(l) ((l)->next)
+typedef struct _midilabel midilabel_t;
 
 typedef struct fts_midimanager
 {
   fts_object_t o;
-  fts_midilabel_t *labels;
+  midilabel_t *labels;
   int n_labels;
 } fts_midimanager_t;
 
-#define fts_midimanager_get_labels(m) ((m)->labels)
-#define fts_midimanager_get_n_labels(m) ((m)->n_labels)
 
-/* MIDI manager API */
-FTS_API void fts_midimanager_insert_label_at_index(fts_midimanager_t *mm, int index, fts_symbol_t name);
-FTS_API void fts_midimanager_remove_label_at_index(fts_midimanager_t *mm, int index);
-FTS_API fts_midilabel_t *fts_midimanager_get_label_by_index(fts_midimanager_t *mm, int index);
-FTS_API fts_midilabel_t *fts_midimanager_get_label_by_name(fts_midimanager_t *mm, fts_symbol_t name);
-FTS_API void fts_midimanager_upload(fts_midimanager_t *mm);
+/* MIDI manager messages */
+FTS_API fts_symbol_t fts_midimanager_s_get_default_devices;
+FTS_API fts_symbol_t fts_midimanager_s_append_device_names;
+FTS_API fts_symbol_t fts_midimanager_s_get_input;
+FTS_API fts_symbol_t fts_midimanager_s_get_output;
 
-FTS_API void fts_midimanager_set_input(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);
-FTS_API void fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);
-FTS_API void fts_midimanager_set_internal(fts_midimanager_t *mm, int index);
-
-#define fts_midimanager_reset_input(m, i) fts_midimanager_set_input((m), (i), NULL, fts_s_none)
-#define fts_midimanager_reset_output(m, i) fts_midimanager_set_output((m), (i), NULL, fts_s_none)
-
-FTS_API fts_symbol_t fts_midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name);
-
-FTS_API void fts_midimanager_set(fts_midimanager_t *mm);
-FTS_API fts_midimanager_t *fts_midimanager_get(void);
-FTS_API void fts_midimanager_update(void);
-
-/* midi objects API */
+/* MIDI objects API */
 FTS_API fts_midiport_t *fts_midimanager_get_input(fts_symbol_t name);
 FTS_API fts_midiport_t *fts_midimanager_get_output(fts_symbol_t name);
+
+/* MIDI manager API */
+FTS_API void fts_midimanager_class_init(fts_class_t *class);
+FTS_API void fts_midimanager_set(fts_midimanager_t *mm);
+FTS_API fts_midimanager_t *fts_midimanager_get(void);

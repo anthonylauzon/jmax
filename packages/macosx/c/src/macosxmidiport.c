@@ -167,7 +167,8 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_midiparser_t *parser = &this->parser;
   macosxmidi_t *manager;
   fts_symbol_t name;
-
+  fts_atom_t k, a;
+  
   ac--;
   at++;
 
@@ -175,53 +176,46 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   name = fts_get_symbol(at + 1);
 
   this->manager = manager;
-  this->name = NULL;
+  this->name = name;
   this->port = NULL;
   this->ref = NULL;
   this->id = 0;
 
   if(ac > 2) {
-    fts_atom_t k, a;
-
-    this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_source);
+    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_input);
 
     if(this->ref != NULL) {
-      
-      /* create Mac OS X port */
+      /* create Mac OS X MIDI port */
       MIDIInputPortCreate(manager->client, CFSTR("jMax port"), macosxmidiport_parse_input, (void *)&this->parser, &this->port);
 
       if(this->port != NULL) {
-        
         /* connect port to source */
         MIDIPortConnectSource(this->port, this->ref, NULL);
 
-        /* insert into source hashtable */
+        /* insert into input hashtable */
         fts_set_symbol(&k, name);
         fts_set_object(&a, o);
-        fts_hashtable_put(&manager->sources, &k, &a);
-        
+        fts_hashtable_put(&manager->inputs, &k, &a);
       } else {
         fts_object_set_error(o, "cannot create port");
         return;
       }
-      
     } else {
-      fts_object_set_error(o, "invalid id");
+      fts_object_set_error(o, "invalid Mac OS MIDI object id");
       return;
     }
-    
-  } else {
-    
-    /* set midiport name to "export" */
-    this->name = fts_s_export;
-    
-    /* create destination */
+  } else {    
+    /* create Mac OS virtual MIDI destination */
     MIDIDestinationCreate(manager->client, CFStringCreateWithCString(NULL, name, CFStringGetSystemEncoding()), macosxmidiport_parse_input, (void *)&this->parser, &this->ref);
 
-    if(this->ref == NULL) {
-      fts_object_set_error(o, "cannot create MIDI destination");
+    if(this->ref != NULL) {
+      /* insert into destination hashtable */
+      fts_set_symbol(&k, name);
+      fts_set_object(&a, o);
+      fts_hashtable_put(&manager->destinations, &k, &a);
+    } else {
+      fts_object_set_error(o, "cannot create Mac OS virtual MIDI destination");
       return;
     }
   }
@@ -238,7 +232,8 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   fts_midiparser_t *parser = &this->parser;
   macosxmidi_t *manager;
-  fts_symbol_t name;  
+  fts_symbol_t name;
+  fts_atom_t k, a;
 
   ac--;
   at++;
@@ -247,7 +242,7 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   name = fts_get_symbol(at + 1);
 
   this->manager = manager;
-  this->name = NULL;
+  this->name = name;
   this->port = NULL;
   this->ref = NULL;
   this->id = 0;
@@ -255,14 +250,10 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_midiport_init((fts_midiport_t *)this);
   
   if(ac > 2) {
-    fts_atom_t k, a;
-
-    this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_destination);
+    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_output);
 
     if(this->ref != NULL) {
-
       /* create Mac OS X port */
       MIDIOutputPortCreate(manager->client, CFSTR("jMax port"), &this->port);
 
@@ -271,34 +262,32 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
         /* set parser output function */
         fts_midiport_set_output((fts_midiport_t *)this, macosxmidiport_output);
 
-        /* insert into destination hashtable */
+        /* insert into output hashtable */
         fts_set_symbol(&k, name);
         fts_set_object(&a, o);
-        fts_hashtable_put(&manager->destinations, &k, &a);
-        
+        fts_hashtable_put(&manager->outputs, &k, &a);
       } else {
-        fts_object_set_error(o, "cannot create port");
+        fts_object_set_error(o, "cannot create Mac OS MIDI port");
         return;
       }
-
     } else {
-      fts_object_set_error(o, "invalid id");
+      fts_object_set_error(o, "invalid Mac OS MIDI object id");
       return;
     }
-
   } else {
-    
-    /* set midiport name to "export" */
-    this->name = fts_s_export;
-    
-    /* create destination */
+    /* create source */
     MIDISourceCreate(manager->client, CFStringCreateWithCString(NULL, name, CFStringGetSystemEncoding()), &this->ref);
 
     if(this->ref != NULL) {
       /* set parser output function */
       fts_midiport_set_output((fts_midiport_t *)this, macosxmidiport_output);
+
+      /* insert into sources hashtable */
+      fts_set_symbol(&k, name);
+      fts_set_object(&a, o);
+      fts_hashtable_put(&manager->sources, &k, &a);
     } else {
-      fts_object_set_error(o, "cannot create MIDI destination");
+      fts_object_set_error(o, "cannot create Mac OS virtual MIDI source");
       return;
     }    
   }
@@ -319,12 +308,13 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       /* disconnect from source */
       MIDIPortDisconnectSource(this->port, this->ref);
 
-      ht = &this->manager->sources;
-      type = macosxmidi_source;
-    } else {
-      ht = &this->manager->destinations;
-      type = macosxmidi_destination;
-    }
+      ht = &this->manager->inputs;
+      type = macosxmidi_input;
+    } else if(fts_midiport_is_output((fts_midiport_t *)this)) {
+      ht = &this->manager->outputs;
+      type = macosxmidi_output;
+    } else
+      return;
 
     /* remove midiport from hashtable and put back id if still valid */
     fts_set_symbol(&k, this->name);
@@ -340,6 +330,20 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     /* destroy port */
     MIDIPortDispose(this->port);
   } else {
+    fts_hashtable_t *ht;
+    
+    /* virtual MIDI sources or destination */
+    if(fts_midiport_is_input((fts_midiport_t *)this))
+      ht = &this->manager->destinations;
+    else if(fts_midiport_is_output((fts_midiport_t *)this))
+      ht = &this->manager->sources;
+    else
+      return;
+
+    /* remove from hashtable */
+    fts_set_symbol(&k, this->name);
+    fts_hashtable_remove(ht, &k);
+
     /* destroy created source or destination */
     MIDIEndpointDispose(this->ref);
   }

@@ -28,6 +28,9 @@
 #include <fts/fts.h>
 #include "macosxmidi.h"
 
+static fts_symbol_t macosxmidi_symbol_iac_midi_source;
+static fts_symbol_t macosxmidi_symbol_iac_midi_destination;
+
 static int
 macosxmidi_reference_get_id(MIDIEndpointRef ref)
 {
@@ -66,7 +69,7 @@ macosxmidi_get_reference_by_id(int id, macosxmidi_type_t type)
   MIDIEndpointRef obj;
   int i;
 
-  if(type == macosxmidi_any || type == macosxmidi_source) {
+  if(type == macosxmidi_any || type == macosxmidi_input) {
     for(i=0; i<MIDIGetNumberOfSources(); i++) {
       obj = MIDIGetSource(i);
 
@@ -75,7 +78,7 @@ macosxmidi_get_reference_by_id(int id, macosxmidi_type_t type)
     }
   }
 
-  if(type == macosxmidi_any || type == macosxmidi_destination) {
+  if(type == macosxmidi_any || type == macosxmidi_output) {
     for(i=0; i<MIDIGetNumberOfDestinations(); i++) {
       obj = MIDIGetDestination(i);
 
@@ -186,273 +189,152 @@ macosxmidi_insert_reference(fts_hashtable_t *ht, MIDIEndpointRef ref)
   return macosxmidi_hash_insert_id(ht, macosxmidi_reference_get_name(ref), macosxmidi_reference_get_id(ref));
 }
 
-static fts_symbol_t
-macosxmidi_get_port_name(macosxmidiport_t *port)
+static fts_midiport_t *
+macosxmidi_create_midiport(macosxmidi_t *this, fts_metaclass_t *mcl, fts_symbol_t name, int id)
 {
-  fts_symbol_t name = fts_s_none;
+  fts_object_t *port = NULL;
+  fts_atom_t args[3];
 
-  if(port == NULL)
-    name = fts_s_none;
-  else if(fts_object_get_metaclass((fts_object_t *)port) == fts_midiport_type)
-    name = fts_s_internal;
-  else
-    name = macosxmidiport_get_name(port);
+  /* create midiport */
+  fts_set_object(args + 0, (fts_object_t *)this);
+  fts_set_symbol(args + 1, name);
+  fts_set_int(args + 2, id);
+  port = fts_object_create(mcl, 2 + (id != 0), args);
 
-  if(name == NULL)
-    name = fts_s_export;
-
-  return name;
+  if(port == NULL || fts_object_get_error(port) == NULL)
+    return (fts_midiport_t *)port;
+  else {
+    fts_object_destroy(port);
+    return NULL;
+  }
 }
 
 static void
-macosxmidi_update_sources( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_default_devices( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
+  fts_midiport_t **input = (fts_midiport_t **)fts_get_pointer(at + 0);
+  fts_symbol_t *input_name = (fts_symbol_t *)fts_get_pointer(at + 1);
+  fts_midiport_t **output = (fts_midiport_t **)fts_get_pointer(at + 2);
+  fts_symbol_t *output_name = (fts_symbol_t *)fts_get_pointer(at + 3);
+
+  if(*input == NULL && MIDIGetNumberOfSources() > 0) {
+    MIDIEndpointRef ref = MIDIGetSource(0);
+    fts_symbol_t name = macosxmidi_insert_reference(&this->inputs, ref);
+    *input = macosxmidi_create_midiport(this, macosxmidi_input_type, name, macosxmidi_reference_get_id(ref));
+    *input_name = name;
+  }
+
+  if(*output == NULL && MIDIGetNumberOfDestinations() > 0) {
+    MIDIEndpointRef ref = MIDIGetDestination(0);
+    fts_symbol_t name = macosxmidi_insert_reference(&this->outputs, ref);
+    *output = macosxmidi_create_midiport(this, macosxmidi_output_type, name, macosxmidi_reference_get_id(ref));
+    *output_name = name;
+  }
+}
+
+static void
+macosxmidi_append_device_names( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  macosxmidi_t *this = (macosxmidi_t *)o;
+  fts_array_t *inputs = (fts_array_t *)fts_get_pointer(at + 0);
+  fts_array_t *outputs = (fts_array_t *)fts_get_pointer(at + 1);
   int i;
 
-  macosxmidi_hash_remove_invalid(&this->sources, macosxmidi_source);
-  
-  /* send source names to client */
-  fts_client_start_message(o, fts_s_sources);
-  fts_client_add_symbol(o, fts_s_none);
-  fts_client_add_symbol(o, fts_s_internal);
-  
+  macosxmidi_hash_remove_invalid(&this->inputs, macosxmidi_input);
+  macosxmidi_hash_remove_invalid(&this->outputs, macosxmidi_output);
+
   for(i=0; i<MIDIGetNumberOfSources(); i++) {
     MIDIEndpointRef ref = MIDIGetSource(i);
-    fts_symbol_t name = macosxmidi_insert_reference(&this->sources, ref);
-    fts_client_add_symbol(o, name);
+    fts_symbol_t name = macosxmidi_insert_reference(&this->inputs, ref);
+    fts_array_append_symbol(inputs, name);
   }
-  
-  fts_client_add_symbol(o, fts_s_export);
-  fts_client_done_message( o);
-}
-
-static void
-macosxmidi_update_destinations( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  macosxmidi_t *this = (macosxmidi_t *)o;
-  int i;
-
-  macosxmidi_hash_remove_invalid(&this->destinations, macosxmidi_destination);
-  
-  /* send source names to client */
-  fts_client_start_message(o, fts_s_destinations);
-  fts_client_add_symbol(o, fts_s_none);
-  fts_client_add_symbol(o, fts_s_internal);
 
   for(i=0; i<MIDIGetNumberOfDestinations(); i++) {
     MIDIEndpointRef ref = MIDIGetDestination(i);
-    fts_symbol_t name = macosxmidi_insert_reference(&this->destinations, ref);
-    fts_client_add_symbol(o, name);
+    fts_symbol_t name = macosxmidi_insert_reference(&this->outputs, ref);
+    fts_array_append_symbol(outputs, name);
   }
 
-  fts_client_add_symbol(o, fts_s_export);
-  fts_client_done_message( o);
+  fts_array_append_symbol(inputs, macosxmidi_symbol_iac_midi_destination);
+  fts_array_append_symbol(outputs, macosxmidi_symbol_iac_midi_source);
 }
 
 static void
-macosxmidi_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  fts_midilabel_t *label = fts_midimanager_get_labels(mm);
-  int n = fts_midimanager_get_n_labels(mm);
-  int i;
-
-  /* upload labels with inputs and outputs */
-  for(i=0; i<n; i++) {
-    fts_symbol_t name = fts_midilabel_get_name(label);
-    macosxmidiport_t *input = (macosxmidiport_t *)fts_midilabel_get_input(label);
-    macosxmidiport_t *output = (macosxmidiport_t *)fts_midilabel_get_output(label);
-
-    /* check input */
-    if(input != NULL) {
-      int id = macosxmidiport_get_id(input);
-
-      if(id != 0 && macosxmidi_get_reference_by_id(id, macosxmidi_source) == NULL)
-        fts_midimanager_set_input(mm, i, NULL, fts_s_none);
-    }
-
-    /* check output */
-    if(output != NULL) {
-      int id = macosxmidiport_get_id(output);
-
-      if(id != 0 && macosxmidi_get_reference_by_id(id, macosxmidi_destination) == NULL)
-        fts_midimanager_set_output(mm, i, NULL, fts_s_none);
-    }
-
-    label = fts_midilabel_get_next(label);
-  }
-
-  /* upload sources and destinations */
-  macosxmidi_update_sources(o, 0, 0, 0, 0);
-  macosxmidi_update_destinations(o, 0, 0, 0, 0);
-
-  fts_midimanager_update();
-}
-
-static void
-macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-
-  macosxmidi_update(o, 0, 0, 0, 0);
-  fts_midimanager_upload(mm);
-}
-
-/* insert <index> <name> */
-static void
-macosxmidi_insert_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-
-  /* check if name is not already used */
-  if(fts_midimanager_get_label_by_name(mm, name) != NULL)
-    name = fts_midimanager_get_fresh_label_name(mm, name);
-
-  /* insert label and send to client */
-  fts_midimanager_insert_label_at_index(mm, index, name);
-}
-
-/* remove <index> */
-static void
-macosxmidi_remove_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
-
-  /* remove label and send to client */
-  fts_midimanager_remove_label_at_index(mm, index);
-
-  macosxmidi_update(o, 0, 0, 0, 0);
-}
-
-static void
-macosxmidi_create_input(fts_midimanager_t *mm, int index, fts_symbol_t name, int id)
-{
-  fts_object_t *port;
-  fts_atom_t args[3];
-
-  /* create midiport */
-  fts_set_object(args + 0, (fts_object_t *)mm);
-  fts_set_symbol(args + 1, name);
-  fts_set_int(args + 2, id);
-  port = fts_object_create(macosxmidi_input_type, 2 + (id != 0), args);
-
-  if(fts_object_get_error(port) == NULL) {
-    fts_midimanager_set_input(mm, index, (fts_midiport_t *)port, macosxmidiport_get_name((macosxmidiport_t *)port));
-  } else {
-    fts_object_destroy(port);
-    fts_midimanager_reset_input(mm, index);
-  }
-}
-
-static void
-macosxmidi_create_output(fts_midimanager_t *mm, int index, fts_symbol_t name, int id)
-{
-  fts_object_t *port;
-  fts_atom_t args[3];
-
-  /* create midiport */
-  fts_set_object(args + 0, (fts_object_t *)mm);
-  fts_set_symbol(args + 1, name);
-  fts_set_int(args + 2, id);
-  port = fts_object_create(macosxmidi_output_type, 2 + (id != 0), args);
-
-  if(fts_object_get_error(port) == NULL) {
-    fts_midimanager_set_output(mm, index, (fts_midiport_t *)port, macosxmidiport_get_name((macosxmidiport_t *)port));
-  } else {
-    fts_object_destroy(port);
-    fts_midimanager_reset_output(mm, index);
-  }
-}
-
-static void
-macosxmidi_set_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
   macosxmidi_t *this = (macosxmidi_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
+  fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
+  fts_symbol_t device_name = fts_get_symbol(at + 1);
+  fts_symbol_t label_name = fts_get_symbol(at + 2);
+  fts_atom_t k, a;
 
-  /* reset output to none if it is set to internal */
-  if(macosxmidi_get_port_name((macosxmidiport_t *)fts_midilabel_get_output(label)) == fts_s_internal) {
+  if(device_name == macosxmidi_symbol_iac_midi_destination) {
+    fts_set_symbol(&k, label_name);
     
-    /* no need to change internal to internal */
-    if(name == fts_s_internal)
-      return;
-
-    fts_midimanager_reset_output(mm, index);
-  }
-
-  if (name == fts_s_none)
-    fts_midimanager_reset_input(mm, index);
-  else if(name == fts_s_internal)
-    fts_midimanager_set_internal(mm, index);
-  else if(name == fts_s_export)
-    macosxmidi_create_input(mm, index, fts_midilabel_get_name(label), 0); /* create Mac OS X MIDI destination */
-  else {
-    fts_atom_t k, a;
-    
-    fts_set_symbol(&k, name);
-    if(fts_hashtable_get(&this->sources, &k, &a)) {
-      if(fts_is_object(&a))
-        fts_midimanager_set_input(mm, index, (fts_midiport_t *)fts_get_object(&a), name);
-      else
-        macosxmidi_create_input(mm, index, name, fts_get_int(&a)); /* create Mac OS X MIDI port */
-    }
-  }
-
-  macosxmidi_update(o, 0, 0, 0, 0);
-}
-
-static void
-macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  macosxmidi_t *this = (macosxmidi_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
-
-  /* reset input to none if it is set to internal */
-  if(macosxmidi_get_port_name((macosxmidiport_t *)fts_midilabel_get_input(label)) == fts_s_internal) {
-    
-    /* no need to change internal to internal */
-    if(name == fts_s_internal)
-      return;
-
-    fts_midimanager_reset_input(mm, index);
-  }
-
-  if (name == fts_s_none)
-    fts_midimanager_reset_output(mm, index);
-  else if(name == fts_s_internal)
-    fts_midimanager_set_internal(mm, index);
-  else if(name == fts_s_export)
-    macosxmidi_create_output(mm, index, fts_midilabel_get_name(label), 0); /* create Mac OS X MIDI source */
-  else {
-    fts_atom_t k, a;
-
-    fts_set_symbol(&k, name);
     if(fts_hashtable_get(&this->destinations, &k, &a)) {
-      if(fts_is_object(&a))
-        fts_midimanager_set_output(mm, index, (fts_midiport_t *)fts_get_object(&a), name);
-      else
-        macosxmidi_create_output(mm, index, name, fts_get_int(&a)); /* create Mac OS X MIDI port */
+      /* take midiport from Mac OS X virtual MIDI destination hashtable */
+      *ptr = (fts_midiport_t *)fts_get_object(&a);
+    } else {
+      /* create Mac OS X virtual MIDI destination */
+      *ptr = macosxmidi_create_midiport(this, macosxmidi_input_type, label_name, 0);
+    }
+  } else {
+    fts_set_symbol(&k, device_name);
+    
+    if(fts_hashtable_get(&this->inputs, &k, &a)) {
+      if(fts_is_object(&a)) {
+        /* take midiport from inputs hashtable */
+        macosxmidiport_t *port = (macosxmidiport_t *)fts_get_object(&a);
+        int id = macosxmidiport_get_id(port);
+
+        /* check if midiport is still valid */
+        if(macosxmidi_get_reference_by_id(id, macosxmidi_input) == macosxmidiport_get_reference(port))
+          *ptr = (fts_midiport_t *)port;
+      } else if(fts_is_int(&a)) {
+        /* create Mac OS X MIDI port */
+        *ptr = macosxmidi_create_midiport(this, macosxmidi_input_type, device_name, fts_get_int(&a));
+      }
     }
   }
-
-  macosxmidi_update(o, 0, 0, 0, 0);
 }
 
-/* restore <name> <source id> <destination id> */
 static void
-macosxmidi_restore_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  macosxmidi_t *this = (macosxmidi_t *)o;
+  fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
+  fts_symbol_t device_name = fts_get_symbol(at + 1);
+  fts_symbol_t label_name = fts_get_symbol(at + 2);
+  fts_atom_t k, a;
+  
+  if(device_name == macosxmidi_symbol_iac_midi_source) {
+    fts_set_symbol(&k, label_name);
 
+    if(fts_hashtable_get(&this->sources, &k, &a)) {
+      /* take midiport from Mac OS X virtual MIDI source hashtable */
+      *ptr = (fts_midiport_t *)fts_get_object(&a);
+    } else {
+      /* create Mac OS X virtual MIDI source */
+      *ptr = macosxmidi_create_midiport(this, macosxmidi_output_type, label_name, 0);
+    }
+  } else {
+    fts_set_symbol(&k, device_name);
+    
+    if(fts_hashtable_get(&this->outputs, &k, &a)) {
+      if(fts_is_object(&a)) {
+        /* take midiport from inputs hashtable */
+        macosxmidiport_t *port = (macosxmidiport_t *)fts_get_object(&a);
+        int id = macosxmidiport_get_id(port);
+
+        /* check if midiport is still valid */
+        if(macosxmidi_get_reference_by_id(id, macosxmidi_output) == macosxmidiport_get_reference(port))
+          *ptr = (fts_midiport_t *)port;
+      } else
+        /* create Mac OS X MIDI port */
+        *ptr = macosxmidi_create_midiport(this, macosxmidi_output_type, device_name, fts_get_int(&a));
+    }
+  }
 }
 
 static void
@@ -474,56 +356,19 @@ macosxmidi_scan_hashtable(fts_hashtable_t *ht)
 
     if(fts_is_int(&a)) {
       int id = fts_get_int(&a);
-      
       if(macosxmidi_get_reference_by_id(id, macosxmidi_any) != NULL)
         post("  %s inactive (%d)\n", name, id);
       else
         post("  %s invalid id: %d!!\n", name, id);
-      
     } else if(fts_is_object(&a)) {
       macosxmidiport_t *port = (macosxmidiport_t *)fts_get_object(&a);
       int id = macosxmidiport_get_id(port);
-
       if(macosxmidi_get_reference_by_id(id, macosxmidi_any) != NULL)
         post("  %s active (%d)\n", name, id);
       else
         post("  %s invalid midiport!! (%d)\n", name, id);
-
-    } else {
-      
+    } else 
       post("  %s ivalid atom in hashtable\n", name);
-      
-    }
-  }
-}
-
-static void
-macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  macosxmidi_t *this = (macosxmidi_t *)o;
-  fts_midilabel_t *label = fts_midimanager_get_labels(mm);
-
-  post("sources\n");
-  macosxmidi_scan_hashtable(&this->sources);
-    
-  post("destinations\n");
-  macosxmidi_scan_hashtable(&this->destinations);
-
-  post("labels\n");
-  while(label) {
-    fts_symbol_t name = fts_midilabel_get_name(label);
-    macosxmidiport_t *input = (macosxmidiport_t *)fts_midilabel_get_input(label);
-    macosxmidiport_t *output = (macosxmidiport_t *)fts_midilabel_get_output(label);
-    fts_symbol_t input_name;
-    fts_symbol_t output_name;
-
-    input_name = macosxmidi_get_port_name(input);
-    output_name = macosxmidi_get_port_name(output);
-    
-    post("  %s %s %s\n", name, input_name, output_name);
-
-    label = fts_midilabel_get_next(label);
   }
 }
 
@@ -534,7 +379,8 @@ macosxmidi_state( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int i, n;
 
   n = MIDIGetNumberOfSources();
-  post("%d source(s)\n", n);
+  post("\n");
+  post("Mac OS X proposes %d sources(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetSource(i);
     MIDIEntityRef entity = NULL;
@@ -545,7 +391,8 @@ macosxmidi_state( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
 
   n = MIDIGetNumberOfDestinations();
-  post("%d destination(s)\n", n);
+  post("\n");
+  post("Mac OS X proposes %d destinations(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetDestination(i);
     MIDIEntityRef entity = NULL;
@@ -554,6 +401,22 @@ macosxmidi_state( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     post("  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
     post("\n");
   }
+
+  post("\n");
+  post("Mac OS X MIDI manager inputs\n");
+  macosxmidi_scan_hashtable(&this->inputs);
+
+  post("\n");
+  post("Mac OS X MIDI manager outputs\n");
+  macosxmidi_scan_hashtable(&this->outputs);
+
+  post("\n");
+  post("Mac OS X MIDI manager declared sources\n");
+  macosxmidi_scan_hashtable(&this->sources);
+
+  post("\n");
+  post("Mac OS X MIDI manager declared destinations\n");
+  macosxmidi_scan_hashtable(&this->destinations);
 }
 
 static void
@@ -567,44 +430,17 @@ macosxmidi_notify(const MIDINotification *message, void *o)
 }
 
 static void
-macosxmidi_set_default_label(macosxmidi_t *this)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)this;
-  fts_midilabel_t *label = fts_midimanager_get_labels(mm);
-  fts_midiport_t *input = NULL;
-  fts_midiport_t *output = NULL;
-
-  if(label == NULL) {
-    fts_midimanager_insert_label_at_index(mm, 0, fts_s_default);
-    label = fts_midimanager_get_labels(mm);
-  }
-
-  input = fts_midilabel_get_input(label);
-  output = fts_midilabel_get_output(label);
-
-  if(input == NULL && MIDIGetNumberOfSources > 0) {
-    MIDIEndpointRef ref = MIDIGetSource(0);
-    macosxmidi_create_input(mm, 0, fts_s_default, macosxmidi_reference_get_id(ref));
-  }
-
-  if(output == NULL && MIDIGetNumberOfDestinations > 0) {
-    MIDIEndpointRef ref = MIDIGetDestination(0);
-    macosxmidi_create_output(mm, 0, fts_s_default, macosxmidi_reference_get_id(ref));
-  }
-}
-
-static void
 macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   int i;
 
+  fts_hashtable_init(&this->inputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&this->outputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
    
   MIDIClientCreate(CFSTR("jMax"), macosxmidi_notify, (void *)o, &this->client);
-
-  macosxmidi_set_default_label(this);
 }
 
 static void
@@ -622,21 +458,15 @@ macosxmidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, macosxmidi_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, macosxmidi_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, macosxmidi_upload);
+
+  fts_midimanager_class_init(cl);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_devices, macosxmidi_get_default_devices);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_device_names, macosxmidi_append_device_names);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_input, macosxmidi_get_input);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_output, macosxmidi_get_output);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_state, macosxmidi_state);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, macosxmidi_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_update, macosxmidi_update);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_insert, macosxmidi_insert_label); /* insert <index> <name> */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_remove, macosxmidi_remove_label); /* remove <name>  */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_restore, macosxmidi_restore_label); /* restore <name> <source id> <destination id> */
-  
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_input, macosxmidi_set_input); /* input <name> <source> */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_output, macosxmidi_set_output); /* output <name> <destination> */
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sources, macosxmidi_update_sources);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destinations, macosxmidi_update_destinations);
 
   return fts_Success;
 }
@@ -659,6 +489,9 @@ mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void 
 macosxmidi_config( void)
 {
+  macosxmidi_symbol_iac_midi_source = fts_new_symbol("IAC Source");
+  macosxmidi_symbol_iac_midi_destination = fts_new_symbol("IAC Destination");
+  
   fts_metaclass_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
   fts_midimanager_t *mm = (fts_midimanager_t *)fts_object_create(mc, 0, 0);
 

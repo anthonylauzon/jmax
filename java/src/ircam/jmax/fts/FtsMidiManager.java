@@ -34,13 +34,13 @@ public class FtsMidiManager extends FtsObject
 
   static
   {
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("sources"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("inputs"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).setSources( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("destinations"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("outputs"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).setDestinations( args.getLength(), args.getAtoms());

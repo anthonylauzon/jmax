@@ -27,12 +27,14 @@
 
 #include <CoreMIDI/MIDIServices.h>
 
-typedef enum macosxmidi_type {macosxmidi_any = -1, macosxmidi_source = 2, macosxmidi_destination = 3} macosxmidi_type_t;
+typedef enum macosxmidi_type {macosxmidi_any = -1, macosxmidi_input = 2, macosxmidi_output = 3} macosxmidi_type_t;
 
 typedef struct _macosxmidi_
 {
   fts_midimanager_t manager;
   MIDIClientRef client;
+  fts_hashtable_t inputs;
+  fts_hashtable_t outputs;
   fts_hashtable_t sources;
   fts_hashtable_t destinations;
 } macosxmidi_t;
@@ -50,6 +52,7 @@ typedef struct _macosxmidiport_
 
 #define macosxmidiport_get_name(p) ((p)->name)
 #define macosxmidiport_get_id(p) ((p)->id)
+#define macosxmidiport_get_reference(p) ((p)->ref)
 
 extern fts_metaclass_t *macosxmidi_input_type;
 extern fts_metaclass_t *macosxmidi_output_type;
