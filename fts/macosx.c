@@ -130,6 +130,9 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
   static int dl_init = 0;
   char *full_sym_name;
+  char *tmp;
+  char macosx_filename[MAXPATHLEN];
+
   NSSymbol s; 
   NSObjectFileImage image; 
   NSModule module;
@@ -149,10 +152,19 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
       dl_init = 1;
     }
 
-  if ( (ret = NSCreateObjectFileImageFromFile( filename, &image)) != NSObjectFileImageSuccess )
+    if( strstr(filename, ".so"))
+        snprintf(macosx_filename, MAXPATHLEN, "%s", filename);
+    else
+    {
+        snprintf(macosx_filename, MAXPATHLEN, "%s%cContents%cMacOS", filename, fts_file_separator, fts_file_separator);
+        tmp = strrchr(filename, fts_file_separator);
+        strncat( macosx_filename, tmp, strlen(tmp) - 7);
+    }
+    
+  if ( (ret = NSCreateObjectFileImageFromFile( macosx_filename, &image)) != NSObjectFileImageSuccess )
     return &load_library_error;
 
-  module = NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW | NSLINKMODULE_OPTION_RETURN_ON_ERROR);
+  module = NSLinkModule( image, macosx_filename, NSLINKMODULE_OPTION_BINDNOW | NSLINKMODULE_OPTION_RETURN_ON_ERROR);
 
   if ( !module)
     {

@@ -11162,9 +11162,9 @@
 			children = (
 				F88000010283043C01664092,
 				F880002D0283043C01664092,
-				F880002E0283043C01664092,
 				F880002F0283043C01664092,
 				F8DC5F0C0286A61D01664092,
+				F8F01109028D91E301664092,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -11484,12 +11484,6 @@
 			path = ../../bin/fts.wrapper;
 			refType = 2;
 		};
-		F880002E0283043C01664092 = {
-			isa = PBXFileReference;
-			name = MRJApp.properties;
-			path = ../../../../Desktop/MRJApp.properties;
-			refType = 2;
-		};
 		F880002F0283043C01664092 = {
 			isa = PBXFileReference;
 			name = jmax.icns;
@@ -11498,12 +11492,6 @@
 		};
 		F88000300283043C01664092 = {
 			fileRef = F880002F0283043C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F88000310283043C01664092 = {
-			fileRef = F880002E0283043C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17420,7 +17408,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F88000300283043C01664092,
-				F88000310283043C01664092,
+				F8F0110A028D91E301664092,
 			);
 			isa = PBXResourcesBuildPhase;
 			name = "Bundle Resources";
@@ -21600,6 +21588,18 @@
 		};
 		F8F01108028D8B1701664092 = {
 			fileRef = F8F010C7028D829E01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F8F01109028D91E301664092 = {
+			isa = PBXFileReference;
+			name = MRJApp.properties;
+			path = ../MRJApp.properties;
+			refType = 2;
+		};
+		F8F0110A028D91E301664092 = {
+			fileRef = F8F01109028D91E301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

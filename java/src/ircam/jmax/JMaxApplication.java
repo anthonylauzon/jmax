@@ -350,12 +350,12 @@ public class JMaxApplication extends FtsClient {
 	    
 		root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root"));
 		properties.put( "jmaxServerName", "fts.wrapper");
-	      }
+            }
 	    else
 	      {
 		// Linux case, Mac OS X shell script case
 		root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
-	      }
+              }
 	  }
 	else
 	  {
@@ -463,7 +463,7 @@ public class JMaxApplication extends FtsClient {
 	    killFtsOnQuit = false;
 	  }	
 	else
-	  {
+	  {                 
 	    fts = new FtsProcess( argc, argv);
 	    killFtsOnQuit = true;
 	  }

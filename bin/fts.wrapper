@@ -3,7 +3,7 @@ rootdir=`dirname $0`
 rootdir=`dirname $rootdir`
 if [ $# -ge 1 ] ; then shift 1 ; fi
 echo `date` ": fts.wrapper $$" >> /tmp/fts.log
-echo `date` ": " DYLD_LIBRARY_PATH=$rootdir/lib exec $rootdir/bin/fts -root "$rootdir/share/jmax" $* >> /tmp/fts.log
-DYLD_LIBRARY_PATH=$rootdir/lib exec $rootdir/bin/fts -root "$rootdir/share/jmax" $*
+echo `date` ": " DYLD_LIBRARY_PATH=$rootdir/lib exec $rootdir/bin/fts --root="$rootdir/share/jmax" $* >> /tmp/fts.log
+DYLD_LIBRARY_PATH=$rootdir/lib exec $rootdir/bin/fts --root="$rootdir/share/jmax" $*
 
 

@@ -55,12 +55,15 @@ static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass
 #if defined(WIN32)
 #define fts_lib_prefix   ""
 #define fts_lib_postfix  ".dll"
-/* #elif defined(__APPLE__) && defined(__MACH__) */
-/* #define fts_lib_prefix   "lib" */
-/* #define fts_lib_postfix  ".dylib" */
+#define fts_other_lib_postfix  ""
+#elif defined(__APPLE__) && defined(__MACH__) 
+#define fts_lib_prefix   "lib"
+#define fts_lib_postfix  ".so"
+#define fts_other_lib_postfix  ".bundle"
 #else
 #define fts_lib_prefix   "lib"
 #define fts_lib_postfix  ".so"
+#define fts_other_lib_postfix  ""
 #endif
 
 static void fts_package_load_default_files(fts_package_t* pkg);
@@ -300,7 +303,22 @@ static void fts_package_load_default_files(fts_package_t* pkg)
       fts_log("[package]: Loaded %s library\n", pkg->name);
     }
   } else {
-    fts_log("[package]: Didn't found no library for %s (tried %s)\n", pkg->name, filename);
+    sprintf(filename, "%s%c%s%c%s%s%s", 
+	  pkg->dir, fts_file_separator, 
+	  "c", fts_file_separator, 
+	  fts_lib_prefix, pkg->name, fts_other_lib_postfix);
+    
+    if (fts_file_exists(filename)) {
+        snprintf(function, 256, "%s_config", pkg->name);
+        ret = fts_load_library(filename, function);
+        if (ret != fts_Success) {
+            fts_log("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
+        } else {
+            fts_log("[package]: Loaded %s library\n", pkg->name);
+        }
+    }
+    else
+        fts_log("[package]: Didn't found no library for %s (tried %s)\n", pkg->name, filename);
   }
 
   fts_package_pop(pkg);

@@ -108,6 +108,7 @@ fts_symbol_t fts_get_root_directory( void)
 
   /* get it from command line */
   r = fts_cmd_args_get( fts_new_symbol( "root"));
+  
   if ( r)
     return r;
 
