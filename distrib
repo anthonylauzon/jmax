@@ -1,5 +1,6 @@
 all	all 	README
 all	all	VERSION
+all	all	INSTALL.sh
 all	all	bin
 all	all	config
 all	all	doc

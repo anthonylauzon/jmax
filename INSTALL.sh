@@ -27,6 +27,7 @@ for fts in `find . -name fts -type f -perm -a+x`
 do
     echo "Changing mode of $fts to allow high priority execution"
     chown root $fts
+    chgrp root $fts
     chmod u+s $fts
 done
 
