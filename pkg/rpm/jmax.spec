@@ -1,6 +1,6 @@
 Summary: graphical programming environment for developing audio applications
 Name: jMax
-Version: 2.4.8
+Version: 2.4.8a
 Release: 1
 Copyright: GPL
 Group: Development/Languages
@@ -13,7 +13,7 @@ for developing real-time, interactive audio applications.
 
 %prep
 
-%setup -q
+%setup -n jmax-%{version}
 
 %build
 make all ARCH=linuxpc
