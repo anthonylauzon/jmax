@@ -77,6 +77,7 @@ static void fts_package_upload_template_paths( fts_package_t* pkg);
 static void fts_package_upload_data_paths( fts_package_t* pkg);
 static void fts_package_upload_help( fts_package_t* pkg);
 static void fts_package_upload_templates( fts_package_t* pkg);
+static void fts_package_upload_windows( fts_package_t* pkg);
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t path);
 
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t file)
@@ -1048,6 +1049,61 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void 
+__fts_package_save_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i; 
+  fts_atom_t n;
+  fts_symbol_t file_name;
+
+  pkg->windows = NULL;  
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol( &at[i])) {
+      file_name = fts_package_make_relative_path( pkg, fts_get_symbol(&at[i]));
+      fts_set_symbol( &n, file_name);
+      pkg->windows = fts_list_append( pkg->windows, &n);
+    }
+  }
+}
+
+static void 
+__fts_package_open_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i; 
+
+  pkg->windows = NULL;  
+
+  for (i = 0; i < ac; i++) {
+    if ( fts_is_symbol( &at[i]))
+      pkg->windows = fts_list_append( pkg->windows, &at[i]);
+  }
+}
+
+static void 
+fts_package_upload_windows( fts_package_t *this)
+{
+  fts_iterator_t i;
+  fts_atom_t a[1];
+  fts_symbol_t file_name;
+  char buf[MAXPATHLEN];
+
+  fts_list_get_values( this->windows, &i);
+  
+  while (fts_iterator_has_more( &i))
+    {
+      fts_iterator_next( &i, a);
+      fts_make_absolute_path( this->dir, fts_get_symbol( a), buf, MAXPATHLEN);
+      if ( fts_file_exists(buf) && fts_is_file(buf)) 
+	{
+	  file_name = fts_new_symbol(buf);
+	  fts_client_load_patcher( file_name, fts_get_client_id( (fts_object_t *)this));
+	} 
+    }
+}
+
+static void 
 __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
@@ -1227,6 +1283,11 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_pop_args(&f, 1);
     }
 
+  if( this->windows)
+    {
+      fts_package_save_list( &f, this->windows, fts_s_windows);
+    }
+
   fts_bmax_code_return( &f);
 
   fts_bmax_file_close( &f);
@@ -1332,6 +1393,8 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   pkg->data_paths = NULL;
 
+  pkg->windows = NULL;
+
   pkg->midi_config = NULL;
   pkg->audio_config = NULL;
 
@@ -1348,6 +1411,9 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   if (pkg->data_paths != NULL) {
     fts_list_delete(pkg->data_paths);
+  }
+  if (pkg->windows != NULL) {
+    fts_list_delete(pkg->windows);
   }
   if (pkg->classes != NULL) {
     fts_hashtable_destroy(pkg->classes);
@@ -1540,6 +1606,9 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_set_int(a, fts_file_exists( summary));
   fts_client_send_message( o, s_hasSummary, 1, a);  
 
+  if ( this->windows)
+    fts_package_upload_windows( this);
+
   fts_client_send_message( o, s_uploadDone, 0, 0);  
 
   fts_package_set_dirty( this, 0);
@@ -1585,6 +1654,8 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_data_path, __fts_package_data_path);
   fts_class_message_varargs(cl, fts_s_help, __fts_package_help);
   fts_class_message_varargs(cl, fts_s_save, __fts_package_save);
+  fts_class_message_varargs(cl, fts_new_symbol("save_windows"), __fts_package_save_windows);
+  fts_class_message_varargs(cl, fts_s_windows, __fts_package_open_windows);
   fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
   fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
   fts_class_message_varargs(cl, fts_s_midi_config, __fts_package_midi_config);

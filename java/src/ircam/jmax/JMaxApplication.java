@@ -28,12 +28,12 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-// import javax.swing.*;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ListModel;
+import javax.swing.*;
+/*import javax.swing.JLabel;
+  import javax.swing.JOptionPane;
+  import javax.swing.JScrollPane;
+  import javax.swing.JTextArea;
+  import javax.swing.ListModel;*/
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -197,8 +197,6 @@ public class JMaxApplication {
    * Currently, this is done in the wrong way: we get the list
    * of windows from the MaxWindowManager, and for those that 
    * are MaxEditor, we do the check;
-   * In reality, we should look in the MDA document data base
-   * to do the work.
    */
 
   public static void Quit()
@@ -211,13 +209,14 @@ public class JMaxApplication {
     // Loop in all the documents in all the  types.
     
     ListModel windows = MaxWindowManager.getWindowManager().getWindowList();
-
+    
   search: for (int i = 0; i < windows.getSize(); i++)
     {
       Frame win = (Frame) windows.getElementAt(i);
       if( win instanceof ErmesSketchWindow)
 	{
 	  patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+
 	  if(patcher.isDirty())
 	    {      
 	      someOneNeedSave = true;
@@ -244,60 +243,9 @@ public class JMaxApplication {
       }
       
     // dispose (and optionally save) all the documents
-    Frame win;
-    for (int i = 0; i < windows.getSize(); i++)
-      {
-	win = (Frame) windows.getElementAt(i);
-	if( win instanceof ErmesSketchWindow)
-	  {
-	    patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
-	    
-	    if( patcher.isARootPatcher() )
-	      {
-		if( doTheSave && patcher.isDirty())
-		  {		 
-		    if( patcher.canSave())
-		      patcher.save();
-		    else
-		      {
-			File file = MaxFileChooser.chooseFileToSave(null, null, "Save As", MaxFileChooser.JMAX_FILE_TYPE);
-		      
-			if( file != null)
-			  {
-			    
-			    int result = JOptionPane.showConfirmDialog( win,
-									"File \"" + file.getName()+"\" exists.\nOK to overwrite ?",
-									"Warning",
-									JOptionPane.YES_NO_OPTION,
-									JOptionPane.WARNING_MESSAGE);
+    closeAllWindows( doTheSave);
+    getProject().save( null);	
 
-			    if ( result == JOptionPane.OK_OPTION)
-			      patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
-			  }		    
-		      }
-		  }
-		patcher.stopUpdates();		      
-		patcher.requestDestroyEditor();
-		getRootPatcher().requestDeleteObject( patcher);
-		((ErmesSketchWindow)win).Destroy();
-	      }
-	  }
-      }
-    
-    //Look if current project needs to be saved
-    if( getProject().isDirty())
-      {
-	Object[] options = { "Save", "Don't save"};
-	int result = JOptionPane.showOptionDialog( getConsoleWindow(), 
-						   "Project File is not saved.\nDo you want to save it now?",
-						   "Project Not Saved", 
-						   JOptionPane.YES_NO_CANCEL_OPTION,
-						   JOptionPane.QUESTION_MESSAGE,
-						   null, options, options[0]);
-	
-	if( result == JOptionPane.YES_OPTION)
-	  getProject().save( null);	
-      }
     //Look if current midi configuration needs to be saved
     if( getMidiManager().isDirty() && ( getMidiManager().getFileName() != null))
       {
@@ -334,6 +282,63 @@ public class JMaxApplication {
     FtsErrorStreamer.stopFtsErrorStreamer();
 
     Runtime.getRuntime().exit(0);
+  }
+
+  public static void closeAllWindows( boolean save)
+  {
+    Frame win;
+    FtsPatcherObject patcher;
+    Vector fileNames = new Vector();
+    Object[] windows = MaxWindowManager.getWindowManager().getWindowListArrayCopy();
+
+    for (int i = 0; i < windows.length ; i++)
+      {
+	win = (Frame) windows[i];
+	if( win instanceof ErmesSketchWindow)
+	  {
+	    patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+
+	    if( patcher.isARootPatcher() )
+	      {
+		if( save && patcher.isDirty())
+		  {		 
+		    if( patcher.canSave())
+		      patcher.save();
+		    else
+		      {
+			File file = MaxFileChooser.chooseFileToSave(null, null, "Save As", MaxFileChooser.JMAX_FILE_TYPE);
+			
+			if( file != null)
+			  {
+			    if( file.exists())
+			      {
+				int result = JOptionPane.showConfirmDialog( win,
+									    "File \"" + file.getName()+"\" exists.\nOK to overwrite ?",
+									    "Warning",
+									    JOptionPane.YES_NO_OPTION,
+									    JOptionPane.WARNING_MESSAGE);
+			    
+				if ( result == JOptionPane.OK_OPTION)
+				  patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+			      }		    
+			    else
+			      patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+			  }
+		      }
+		  }
+		if( patcher.getName() != null)
+		  fileNames.add( patcher.getName());
+
+		patcher.stopUpdates();		      
+		patcher.requestDestroyEditor();
+		getRootPatcher().requestDeleteObject( patcher);
+		((ErmesSketchWindow)win).Destroy();
+	      }
+	  }
+      }
+    /* save the open windows in the project */
+    if( fileNames.size() > 0)
+      getProject().saveWindows( fileNames.elements());
   }
 
   private static boolean shown = false;

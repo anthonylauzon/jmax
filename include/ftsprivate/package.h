@@ -103,6 +103,8 @@ struct fts_package {
 
   fts_list_t* data_paths;
 
+  fts_list_t* windows;
+
   fts_symbol_t midi_config;
   fts_symbol_t audio_config;
 

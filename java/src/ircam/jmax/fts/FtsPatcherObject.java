@@ -427,6 +427,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	System.err.println("FtsPatcherObject: I/O Error sending save Message!");
 	e.printStackTrace(); 
       }
+    this.name = name;
+    this.type = type;
   }
 
   public final int getWindowX()

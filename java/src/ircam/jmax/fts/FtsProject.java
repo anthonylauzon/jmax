@@ -76,8 +76,6 @@ public class FtsProject extends FtsPackage
 	
     if( !packages.containsKey( pkgName))
       {
-	System.out.println( "package: " + pkgName);  
-
 	try
 	  {
 	    JMaxPackageLoader.load( pkgName);
@@ -165,8 +163,29 @@ public class FtsProject extends FtsPackage
     return audioConfig;
   } 
 
+  public void saveWindows( Enumeration windows)
+  {
+    String name;
+
+    args.clear();
+
+    for(Enumeration e = windows; e.hasMoreElements();)
+      args.addSymbol( FtsSymbol.get( (String)e.nextElement()));
+     
+    try
+      {
+	send( FtsSymbol.get("save_windows"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsProject: I/O Error sending saveWindows Message!");
+	e.printStackTrace(); 
+      }
+  }
+
   Hashtable packages = new Hashtable();
   String midiConfig = null;
   String audioConfig = null;
+  public static Vector alreadyLoaded = new Vector();
 }
 

@@ -25,12 +25,12 @@
 
 package ircam.jmax.editors.project;
 
-// import javax.swing.*;
-import javax.swing.Box;
-import javax.swing.JFrame;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuBar;
-import javax.swing.WindowConstants;
+import javax.swing.*;
+/*import javax.swing.Box;
+  import javax.swing.JFrame;
+  import javax.swing.JFileChooser;
+  import javax.swing.JMenuBar;
+  import javax.swing.WindowConstants;*/
 
 import java.util.*;
 import java.awt.*;
@@ -42,6 +42,7 @@ import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.editors.patcher.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
@@ -99,6 +100,8 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	String location = NewProjectDialog.getResultLocation();
 	String fileName = location+name;
 
+	closeWindowsAndSave();
+
 	if( ! NewProjectDialog.copyCurrentProject())
 	  {
 	    try{
@@ -145,6 +148,8 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
 	if ( project != null)
 	  {
+	    closeWindowsAndSave();
+
 	    try
 	      {	
 		JMaxApplication.loadProject( project.getAbsolutePath());
@@ -157,6 +162,106 @@ public class ProjectEditor extends JFrame implements EditorContainer
       }
   }
 
+  static void closeWindowsAndSave()
+  { 
+    Frame win;
+    FtsPatcherObject patcher;
+    Vector fileNames = new Vector();
+    Object[] windows = MaxWindowManager.getWindowManager().getWindowListArrayCopy();
+    boolean someOneNeedSave = false;
+    boolean somePatcherIsOpen = false;
+
+    // First, search if there is anything to save
+    // Loop in all the documents in all the  types.
+    
+  search: for (int i = 0; i < windows.length; i++)
+    {
+      win = (Frame) windows[i];
+      if( win instanceof ErmesSketchWindow)
+	{
+	  patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+	  somePatcherIsOpen = true;
+	  
+	  if(patcher.isDirty())
+	    {      
+	      someOneNeedSave = true;
+	      break search;
+	    }
+	}
+    }
+
+    int result = JOptionPane.NO_OPTION;
+    if( someOneNeedSave)
+      {
+	/* ask if has to save windows */
+	Object[] options = { "Save", "Don't save"};
+	result = JOptionPane.showOptionDialog( JMaxApplication.getConsoleWindow(), 
+					       "Closing Project!\nAll open patchers will be closed. \nDo you want save the unsaved patchers?",
+					       "Closing Project", 
+					       JOptionPane.YES_NO_CANCEL_OPTION,
+					       JOptionPane.QUESTION_MESSAGE,
+					       null, options, options[0]);
+	
+      }
+    if( somePatcherIsOpen)
+      {
+	/* close all windows and save if needed */
+	for (int i = 0; i < windows.length ; i++)
+	  {
+	    win = (Frame) windows[i];
+	    if( win instanceof ErmesSketchWindow)
+	      {
+		patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+		
+		if( patcher.isARootPatcher() )
+		  {
+		    if( (result == JOptionPane.YES_OPTION)  && patcher.isDirty())
+		      {		 
+			if( patcher.canSave())
+			  patcher.save();
+			else
+			  {
+			    File file = MaxFileChooser.chooseFileToSave(null, null, "Save As", MaxFileChooser.JMAX_FILE_TYPE);
+			    
+			    if( file != null) 
+			      {
+				
+				if( file.exists())
+				  {
+				    int res = JOptionPane.showConfirmDialog( win,
+									     "File \"" + file.getName()+"\" exists.\nOK to overwrite ?",
+									     "Warning",
+									     JOptionPane.YES_NO_OPTION,
+									     JOptionPane.WARNING_MESSAGE);
+				    
+				    if ( res == JOptionPane.OK_OPTION)
+				      patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+				  }		    
+				else
+				  patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+			      }
+			  }
+		      }
+
+		    if( patcher.getName() != null)
+		      fileNames.add( patcher.getName());
+
+		    patcher.stopUpdates();		      
+		    patcher.requestDestroyEditor();
+		    JMaxApplication.getRootPatcher().requestDeleteObject( patcher);
+		    ((ErmesSketchWindow)win).Destroy();
+		  }
+	      }
+	  }
+      }
+    /* save the open windows in the project */
+    if( fileNames.size() > 0)
+      JMaxApplication.getProject().saveWindows( fileNames.elements());
+    
+    JMaxApplication.getProject().save( null);
+  }
+
+  /****************** Packages ***********************************/
   public static void newPackage( Frame frame)
   {
     int result = NewProjectDialog.showDialog( frame, NewProjectDialog.PACKAGE_TYPE);

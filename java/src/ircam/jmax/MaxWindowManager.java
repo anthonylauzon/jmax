@@ -111,7 +111,7 @@ public class MaxWindowManager implements WindowListener
     windowOperationCount++;
 
     if(/*(windows.size() > 0)&&(*/windows.contains(window))/*)*/
-	windows.setElementAt(window, windows.indexOf(window));
+      windows.setElementAt(window, windows.indexOf(window));
   }
 
 
@@ -130,6 +130,13 @@ public class MaxWindowManager implements WindowListener
   public ListModel getWindowList()
   {
     return windows;
+  }
+
+  public Object[] getWindowListArrayCopy()
+  {
+    Object[] array = new Object[  windows.getSize()];
+    windows.copyInto( array);
+    return array;
   }
 
   public ListModel getToolFinderList()
