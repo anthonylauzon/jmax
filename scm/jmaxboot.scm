@@ -88,8 +88,12 @@
 ;; User Configuration
 ;;
 (define usr-jmaxrc (file-cat (get-property "user.home") ".jmaxrc.scm"))
+(define sys-jmaxrc (file-cat jmax-root "jmaxrc.scm"))
+
 (if (file-exists (new-file usr-jmaxrc))
-    (load usr-jmaxrc))
+    (load usr-jmaxrc)
+    (if (file-exists (new-file sys-jmaxrc))
+	(load sys-jmaxrc)))
 
 ;;
 ;; Site specific configurations
