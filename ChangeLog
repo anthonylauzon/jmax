@@ -1,5 +1,10 @@
 2001-04-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* remove fts/src/runtime/devices/null.c and fts/src/runtime/devices/profdev.c: no longer used
+
+	* added profileaudioport (in package io). It outputs on its outlet
+	the estimated sample rate.
+
 	* changed the default audio port mechanism: now the default audio
 	port is defined by a variable (DefaultAudioPort). This way, the
 	default audio port can be set from a patch (we are moving slowly

@@ -31,6 +31,7 @@ in_out_tilda.c \
 iomodule.c \
 loopback.c \
 out.c \
+profileaudioport.c \
 serial.c \
 udp.c \
 udpreceive.c \

@@ -37,14 +37,8 @@
 #include <fts/runtime/devices/unixdev.h>
 #endif
 
-extern void null_init(void);
-extern void profdev_init(void);
-
 void fts_dev_configure(void)
 {
-  null_init();
-  profdev_init();
-
 #ifdef HAS_UNIX
   unixdev_init();
 #endif
