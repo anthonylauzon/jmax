@@ -21,6 +21,8 @@
  */
 
 #include <fts/fts.h>
+#include <stdlib.h>
+
 #include <ftsconfig.h>
 
 #include <string.h>
