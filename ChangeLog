@@ -1,3 +1,7 @@
+2003-01-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* make adc~/dac~ aliases to input~/monitor~
+
 2003-01-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* rename default project files:
