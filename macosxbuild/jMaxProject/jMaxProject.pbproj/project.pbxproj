@@ -5,6 +5,39 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F80902C002B7627F01664092 = {
+			children = (
+				F80902C102B762B101664092,
+				F80902C202B762B101664092,
+			);
+			isa = PBXGroup;
+			name = project;
+			refType = 4;
+		};
+		F80902C102B762B101664092 = {
+			isa = PBXFileReference;
+			name = ConfigPackagePanel.java;
+			path = ../../java/src/ircam/jmax/editors/project/ConfigPackagePanel.java;
+			refType = 2;
+		};
+		F80902C202B762B101664092 = {
+			isa = PBXFileReference;
+			name = ProjectEditor.java;
+			path = ../../java/src/ircam/jmax/editors/project/ProjectEditor.java;
+			refType = 2;
+		};
+		F80902C302B762B101664092 = {
+			fileRef = F80902C102B762B101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F80902C402B762B101664092 = {
+			fileRef = F80902C202B762B101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F80A5F42028FD44C01664092 = {
 			buildPhases = (
 			);
@@ -307,18 +340,6 @@
 			name = fifo.c;
 			path = ../../fts/fifo.c;
 			refType = 2;
-		};
-		F829DA4402B6757F01664092 = {
-			isa = PBXFileReference;
-			name = ConfigPackagePanel.java;
-			path = ../../java/src/ircam/jmax/ConfigPackagePanel.java;
-			refType = 2;
-		};
-		F829DA4502B6757F01664092 = {
-			fileRef = F829DA4402B6757F01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8386E97028D3F9101664092 = {
 			fileRef = F88000960283082801664092;
@@ -11493,18 +11514,6 @@
 			settings = {
 			};
 		};
-		F86A04F902B4ADAB01664092 = {
-			isa = PBXFileReference;
-			name = ProjectEditor.java;
-			path = ../../java/src/ircam/jmax/ProjectEditor.java;
-			refType = 2;
-		};
-		F86A04FE02B4ADAB01664092 = {
-			fileRef = F86A04F902B4ADAB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F86A04FF02B4ADF501664092 = {
 			isa = PBXFileReference;
 			name = project_root.gif;
@@ -13554,8 +13563,6 @@
 				F880FEDA0283013E01664092,
 				F880FEDB0283013E01664092,
 				F880FEDC0283013E01664092,
-				F86A04F902B4ADAB01664092,
-				F829DA4402B6757F01664092,
 			);
 			isa = PBXGroup;
 			name = java;
@@ -13607,6 +13614,7 @@
 			children = (
 				F880FDCD0283013E01664092,
 				F880FDD20283013E01664092,
+				F80902C002B7627F01664092,
 			);
 			isa = PBXGroup;
 			name = editors;
@@ -15785,8 +15793,8 @@
 				F848668602A2745401664092,
 				F848668702A2745401664092,
 				F86A04F402B4AD8401664092,
-				F86A04FE02B4ADAB01664092,
-				F829DA4502B6757F01664092,
+				F80902C302B762B101664092,
+				F80902C402B762B101664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
