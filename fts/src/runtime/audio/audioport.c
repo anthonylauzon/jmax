@@ -398,7 +398,7 @@ static void fts_audioport_create_audioportin( fts_audioport_t *port)
 {
   fts_atom_t a[2];
 
-  if ( !port->audioportin)
+  if ( !port->audioportin && port->input_channels)
     {
       fts_set_symbol( a+0, s_audioportin);
       fts_set_ptr( a+1, port);
@@ -445,7 +445,7 @@ static void fts_audioport_create_audioportout( fts_audioport_t *port)
 {
   fts_atom_t a[2];
 
-  if ( !port->audioportout)
+  if ( !port->audioportout && port->output_channels)
     {
       fts_set_symbol( a+0, s_audioportout);
       fts_set_ptr( a+1, port);
