@@ -41,6 +41,7 @@ extern void key_config(void);
 extern void display_config(void);
 extern void vecdisplay_config(void);
 extern void scope_config(void);
+extern void dspcontrol_config(void);
 
 void
 guiobj_config(void)
@@ -60,4 +61,5 @@ guiobj_config(void)
   display_config();
   vecdisplay_config();
   scope_config();
+  dspcontrol_config();
 }

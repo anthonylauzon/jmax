@@ -40,3 +40,7 @@ key.c \
 display.c \
 vecdisplay.c \
 scope.c \
+dspcontrol.c \
+
+
+
