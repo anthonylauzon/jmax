@@ -35,7 +35,6 @@ For the moment, no DSP implementation !!!
 
 /* The object Structures are defined in mess_sys.h
 */
-
 #include "sys.h"
 #include "lang.h"
 
