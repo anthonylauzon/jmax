@@ -35,7 +35,9 @@ static scomark_t *marker_track_get_next_bar_by_time(track_t *marker_track, scoma
 static void marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload);
 static void marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbol_t old_meter, fts_symbol_t new_meter, int upload);
 
-/**************************************************************************************
+
+
+/******************************************************************************
  *
  *  scomark, score marker (tempo change, bar, etc.)
  *
@@ -265,7 +267,7 @@ scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym, fts_symbol_t *old
     
     if(*old_meter == NULL)
       marker_track_get_previous_meter(marker_track, self, old_meter);
-	
+        
     if(meter_sym == sym_meter_empty)
       set_ok = 1;
     else
@@ -303,7 +305,7 @@ scomark_bar_set_meter_quotient(scomark_t *self, int meter_num, int meter_den)
   {
     fts_symbol_t meter = scomark_meter_quotient_get_symbol(meter_num, meter_den);
     fts_symbol_t old_meter;
-	
+        
     if(meter != NULL)
       scomark_bar_set_meter(self, meter, &old_meter);
   }
@@ -325,17 +327,32 @@ scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den)
   }
 }
 
+
+
 /************************************************************
  *
  *  methods
  *
  */
+
+/* set or get type */
 static void
-_scomark_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_scomark_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  scomark_t *self = (scomark_t *)o;
+  scomark_t *self = (scomark_t *) o;
   
-  fts_return_symbol(self->type);
+  if (ac > 0)
+  {
+    if (fts_is_symbol(at)  &&  (fts_get_symbol(at) == seqsym_marker ||
+                                fts_get_symbol(at) == seqsym_bar))
+    { 
+      self->type = fts_get_symbol(at);
+    }
+    else
+    {
+      fts_return_symbol(self->type);
+    }
+  }
 }
 
 static void
@@ -368,7 +385,7 @@ _scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
     track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));   
     fts_symbol_t meter = fts_get_symbol(at);
     fts_symbol_t old_meter = NULL;
-	
+        
     scomark_bar_set_meter(self, meter, &old_meter);
     
     marker_track_meter_changed(marker_track, self, old_meter, meter, 1);
@@ -460,6 +477,7 @@ scomark_set_properties(scomark_t *self, int ac, const fts_atom_t *at)
   }
 }
 
+
 static void
 scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -477,6 +495,7 @@ scomark_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   propobj_delete(o);
 }
+
 
 static void
 scomark_instantiate(fts_class_t *cl)
@@ -502,6 +521,9 @@ scomark_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, seqsym_get_property_list, _scomark_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, _scomark_append_properties);
+
+  fts_class_message_void  (cl, fts_s_type, _scomark_type);      /* get type */
+  fts_class_message_symbol(cl, fts_s_type, _scomark_type);      /* set type */
   fts_class_message_varargs(cl, fts_new_symbol("tempo_change"), _scomark_set_tempo_from_client);
   fts_class_message_varargs(cl, fts_new_symbol("meter_change"), _scomark_set_meter_from_client);
 }
@@ -539,7 +561,7 @@ marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_s
   {
     marker = (scomark_t *)fts_get_object( event_get_value(prev));
     if(scomark_is_bar(marker))
-		scomark_bar_get_meter(marker, meter);
+                scomark_bar_get_meter(marker, meter);
     prev = event_get_prev(prev);
   }
   
@@ -1028,7 +1050,7 @@ marker_track_append_bar(track_t *marker_track)
       new_bar = marker_track_insert_marker(marker_track, 0.0, seqsym_bar, &new_event);      
       scomark_bar_set_meter( new_bar, sym_meter_4_4, &old_meter);
       scomark_set_tempo( new_bar, 60, &old_tempo);
-      scomark_bar_set_number( new_bar, 0);
+      scomark_bar_set_number( new_bar, FIRST_BAR_NUMBER);
     }
     else
     {      

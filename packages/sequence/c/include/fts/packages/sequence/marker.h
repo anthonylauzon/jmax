@@ -27,6 +27,10 @@
 #include <fts/packages/data/data.h>
 #include <fts/packages/sequence/event.h>
 
+/* number of the first bar */
+#define FIRST_BAR_NUMBER   1
+
+
 /*{ 
 *  scomark, score marker (bars, tempo, etc.)
 */
