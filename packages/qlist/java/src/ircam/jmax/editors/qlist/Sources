@@ -1,0 +1,6 @@
+SOURCES = \
+	  QList.java \
+	  QListExtension.java \
+	  QListFactory.java \
+	  QListPanel.java
+
