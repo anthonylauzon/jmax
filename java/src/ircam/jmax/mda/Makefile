@@ -35,7 +35,6 @@ local_all: $(CLASSES)
 .PHONY: local_all
 
 clean: local_clean
-	(cd tcl ; $(MAKE) clean)
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

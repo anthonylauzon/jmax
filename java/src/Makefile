@@ -47,6 +47,10 @@ all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
+clean:
+	(cd ircam ; $(MAKE) clean)
+.PHONY: clean
+
 doc:  
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(DOC_PACKAGES))
 .PHONY: doc

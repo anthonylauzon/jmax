@@ -25,11 +25,11 @@
 
 SOURCES = \
 arch.c \
+argument.c \
+blip.c \
+const.c \
 dsp1.c \
+print.c \
 system.c \
 ucsobj.c \
-const.c \
-argument.c \
-print.c \
-blip.c \
 

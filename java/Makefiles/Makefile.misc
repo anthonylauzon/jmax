@@ -28,9 +28,6 @@
 ## Support makefile, with additional targets 
 ##
 
-clean: local_clean
-.PHONY: clean
-
 local_clean:
 	-/bin/rm -f $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR)/*.class
 .PHONY: local_clean

@@ -28,4 +28,3 @@
 ## Package Makefile.misc, just call the standard package misc 
 ## 
 
-include $(ROOTDIR)/java/Makefiles/Makefile.package.misc

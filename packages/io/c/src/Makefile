@@ -23,8 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXROOTDIR=../../../..
-DISTDIR=$(JMAXROOTDIR)/fts
+JMAXROOTDIR= ../../../../../max
+DISTDIR= $(JMAXROOTDIR)/fts
 
 PACKAGEROOT = ..
 

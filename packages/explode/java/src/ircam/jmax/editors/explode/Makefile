@@ -23,10 +23,13 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXROOTDIR = ../../../../../../../..
 ROOTDIR = ../../../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/explode
 
 include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.common
+
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 all: local_all
 	(cd actions ; $(MAKE) all)
@@ -40,6 +43,6 @@ clean: local_clean
 	(cd actions ; $(MAKE) clean)
 	(cd menus ; $(MAKE) clean)
 
-include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.misc
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
 
 

@@ -29,14 +29,11 @@ PACKAGE_DIR = ircam/jmax/fts
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-all: local_all
+all: $(CLASSES)
 .PHONY: all
 
-local_all: $(CLASSES)
-.PHONY: local_all
-
 clean: local_clean
-	(cd tcl ; $(MAKE) clean)
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

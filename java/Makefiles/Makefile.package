@@ -61,14 +61,14 @@ endif
 
 ## includes
 
-include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
-JAVA_MAX_CLASSES_ROOT =  $(ROOTDIR)/java/classes
+JAVA_MAX_CLASSES_ROOT =  $(JMAXROOTDIR)/java/classes
 
 # JAVA_LIBS_CLASSPATH does not contain Swing: Swing classes are either
 # in environment's CLASSPATH (for JDK1.1) or are system classes (for 
 # JDK1.2)
-JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl/jacl.jar
+JAVA_LIBS_CLASSPATH = $(JMAXROOTDIR)/java/lib/jacl/jacl.jar
 
 ##
 ## JAVA_CLASSES_ROOT is where the .class files will be put

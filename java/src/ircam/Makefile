@@ -31,4 +31,8 @@ all:
 	( cd jmax ; $(MAKE) all )
 .PHONY: all
 
+clean: 
+	( cd jmax ; $(MAKE) clean )
+.PHONY: clean
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

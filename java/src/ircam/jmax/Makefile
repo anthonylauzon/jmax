@@ -32,10 +32,10 @@ all: local_all
 	(cd editors ; $(MAKE) all)
 	(cd fts ; $(MAKE) all)
 	(cd mda ; $(MAKE) all)
+	(cd script ; $(MAKE) all)
 	(cd toolkit ; $(MAKE) all)
 	(cd utils ; $(MAKE) all)
 	(cd widgets ; $(MAKE) all)
-	(cd script ; $(MAKE) all)
 .PHONY: all
 
 local_all: MaxVersion.java $(CLASSES) 
@@ -62,10 +62,11 @@ clean: local_clean
 	(cd editors ; $(MAKE) clean)
 	(cd fts ; $(MAKE) clean)
 	(cd mda ; $(MAKE) clean)
-	(cd tcl ; $(MAKE) clean)
+	(cd script ; $(MAKE) clean)
 	(cd toolkit ; $(MAKE) clean)
 	(cd utils ; $(MAKE) clean)
 	(cd widgets ; $(MAKE) clean)
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

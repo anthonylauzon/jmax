@@ -23,13 +23,18 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXROOTDIR = ../../../../..
 ROOTDIR = ../../../../..
 PACKAGE_DIR =  ircam
 
-include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.common
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 all: 
 	(cd jmax ; $(MAKE) all)
 .PHONY: all
 
-include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.misc
+clean: 
+	(cd jmax ; $(MAKE) clean)
+.PHONY: clean
+
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc

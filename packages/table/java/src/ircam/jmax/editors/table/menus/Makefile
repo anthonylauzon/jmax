@@ -24,18 +24,16 @@
 
 
 
+JMAXROOTDIR = ../../../../../../../../..
 ROOTDIR = ../../../../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/table/menus
 
-include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.common
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 all: $(CLASSES)
 .PHONY: all
 
-local_all: $(CLASSES)
-.PHONY: local_all
+clean: local_clean
+.PHONY: local_clean
 
-include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.misc
-
-
-
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc

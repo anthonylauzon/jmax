@@ -23,19 +23,26 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXROOTDIR = ../../../..
 ROOTDIR = ../../../..
-PACKAGE_DIR =  $(ROOTDIR)/packages/qlist
+PACKAGE_DIR = 
 
-include $(PACKAGE_DIR)/java/Makefiles/Makefile.common
+MAX_PACKAGE_NAME = qlist
 
-ALL_PACKAGES =  ircam.jmax.editors.qlist
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
+
+DOC_PACKAGES =  ircam.jmax.editors.qlist
 
 all: $(JAVA_CLASSES_ROOT)
-	(cd ircam ; $(MAKE) all)
+	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) all)
 .PHONY: all
 
+clean:
+	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) clean)
+.PHONY: clean
+
 doc:  
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -d $(PACKAGE_DIR)/java/doc $(ALL_PACKAGES))
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -d $(PACKAGE_DIR)/java/doc $(DOC_PACKAGES))
 .PHONY: doc
 
 doc_private:  
@@ -47,4 +54,4 @@ jar:
 .PHONY: jar
 
 
-include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.misc
+include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc

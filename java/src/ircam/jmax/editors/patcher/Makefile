@@ -44,7 +44,7 @@ clean: local_clean
 	(cd interactions ; $(MAKE) clean)
 	(cd menus ; $(MAKE) clean)
 	(cd objects ; $(MAKE) clean)
-	(cd tcl ; $(MAKE) clean)
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
