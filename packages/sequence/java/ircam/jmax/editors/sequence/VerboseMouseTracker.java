@@ -39,9 +39,7 @@ public class VerboseMouseTracker extends MouseTracker {
   {  
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
-       egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-			       (egc.getAdapter().getInvX(e.getX()))+
-			       ", "+
-			       (egc.getAdapter().getInvY(e.getY())));
+    egc.getDisplayer().display( (egc.getAdapter().getInvX(e.getX()))+", "+
+				(egc.getAdapter().getInvY(e.getY())));
   }
 }

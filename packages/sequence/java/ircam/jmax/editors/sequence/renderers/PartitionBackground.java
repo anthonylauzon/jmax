@@ -48,22 +48,22 @@ public class PartitionBackground implements Layer, ImageObserver{
 
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
-	    {		
-		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
-		    e.getPropertyName().equals("repaint"))
-		    {
-			toRepaintBack = true;
-			gc.getGraphicDestination().repaint();
-		    }
-		else
-		    if(e.getPropertyName().equals("locked"))
-			{
-			    locked = ((Boolean)e.getNewValue()).booleanValue();
-			    toRepaintBack = true;
-			    gc.getGraphicDestination().repaint();
-			}
+	{		
+	  if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
+	      e.getPropertyName().equals("repaint"))
+	    {
+	      toRepaintBack = true;
+	      gc.getGraphicDestination().repaint();
 	    }
-    });
+	  else
+	    if(e.getPropertyName().equals("locked"))
+	      {
+		locked = ((Boolean)e.getNewValue()).booleanValue();
+		toRepaintBack = true;
+		gc.getGraphicDestination().repaint();
+	      }
+	}
+      });
   }
   /** builds an horizontal grid in the given graphic port
    * using the destination size*/
@@ -88,11 +88,11 @@ public class PartitionBackground implements Layer, ImageObserver{
     g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
     
     // the track name
-    if( gc.getFtsObject() instanceof FtsSequenceObject)
+    if( gc.isInSequence())
       {
 	g.setColor(Color.gray);
-	g.setFont(ToggleBar.toggleBarFont);
-	g.drawString(gc.getTrack().getName(), 2, 10);
+	g.setFont(ToggleBar.toggleBarFont);	
+	g.drawString(gc.getTrack().getName(), 2, d.height - 2);
       }
 
     int positionY = SC_BOTTOM;

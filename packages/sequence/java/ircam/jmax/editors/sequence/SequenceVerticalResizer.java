@@ -43,22 +43,18 @@ public class SequenceVerticalResizer extends SelectionResizer {
     
   }
   
-
-    public void interactionBeginAt(int x, int y)
-    {
-	SequenceGraphicContext sgc = (SequenceGraphicContext) gc;
-
-
-	try {
-
-	    tempEvent = new UtilTrackEvent();
-
-	}
-	catch (Exception e ){}
-
-	super.interactionBeginAt(x, y);
-
+  public void interactionBeginAt(int x, int y)
+  {
+    SequenceGraphicContext sgc = (SequenceGraphicContext) gc;
+    
+    try {
+      tempEvent = new UtilTrackEvent();
     }
+    catch (Exception e ){}
+
+    super.interactionBeginAt(x, y);
+
+  }
 
   /**
    * overrides SelectionResizer.mouseDragged()
@@ -69,7 +65,7 @@ public class SequenceVerticalResizer extends SelectionResizer {
 
     int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
     
-    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
+    egc.getDisplayer().display( "dy "+deltaY);
 
     super.mouseDragged(e);
   }

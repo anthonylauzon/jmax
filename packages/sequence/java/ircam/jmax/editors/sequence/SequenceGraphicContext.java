@@ -49,7 +49,7 @@ public class SequenceGraphicContext extends GraphicContext {
    * Change the selection ownership when this graphic context become active... troppo */
   public void activate()
   {
-      //SequenceSelection.setCurrent(itsSelection);
+    //SequenceSelection.setCurrent(itsSelection);
   }
 
   /**
@@ -139,27 +139,9 @@ public class SequenceGraphicContext extends GraphicContext {
     return itsEditor;
   }
 
-  // IMPLEMENTATION NOTES:
-  /*
-   * This is not very elegant.
-   * The idea behind is that the status bar cannot be static (A tool will 
-   * infact write in every window...). Construct a SequenceGraphicContext
-   * With a statusBar argument, on the other side, imposes the knowledge
-   * of that statusBar to the object that builds the SequenceGraphicContext
-   * (in our case, the tracks...*/
-  public StatusBar getStatusBar()
-  {
-    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getStatusBar();
-  }
-  
   public FtsGraphicObject getFtsObject()
   {
     return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getFtsObject();
-  }
-
-  public  EditorToolbar getToolbar()
-  {
-    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getToolbar();
   }
 
   public void setScrollManager(ScrollManager manager)
@@ -169,6 +151,21 @@ public class SequenceGraphicContext extends GraphicContext {
   public ScrollManager getScrollManager()
   {
     return scrollManager;
+  }
+
+  public void setDisplayer(Displayer displayer)
+  {
+    this.displayer = displayer; 
+  }
+
+  public Displayer getDisplayer()
+  {
+    return displayer; 
+  }
+
+  public boolean isInSequence()
+  {
+    return (getFtsObject() instanceof FtsSequenceObject);
   }
 
   //---- Fields 
@@ -186,6 +183,8 @@ public class SequenceGraphicContext extends GraphicContext {
   ScrollManager scrollManager;
 
   TrackEditor itsEditor;
+
+  Displayer displayer;
 }
 
 

@@ -64,49 +64,41 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y, MouseEvent e)
-    {
-	((SequenceGraphicContext)gc).getTrack().setProperty("selected", Boolean.TRUE);
-
-       /* workaround: right-mouse events used when popup is visible */	
-        if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
-
-	mountIModule(itsDirectionChooser, x, y);
-	tempX = x;
-	tempY = y;
-    }
-    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
-    {
-        /* workaround: right-mouse events used when popup is visible */	
-        if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
-        
-	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	Geometry geometry = egc.getAdapter().getGeometry();
-	if(egc.getAdapter().isVerticalZoomable())
-	{
-	    if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
-	    {
-		geometry.incrXZoom(deltaX);
-		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
-	    }	
-	    else
-		if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
-		    {
-			//vertical zoom
-			((VerticalZoomable)egc.getAdapter()).incrYZoom(deltaY);
-			egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
-						""+((VerticalZoomable)egc.getAdapter()).getYZoom()+"%");
-			egc.getGraphicDestination().repaint();
-		    }
-	}
+  public void dragStart(int x, int y, MouseEvent e)
+  {
+    ((SequenceGraphicContext)gc).getTrack().setProperty("selected", Boolean.TRUE);
+    
+    /* workaround: right-mouse events used when popup is visible */	
+    if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
+    
+    mountIModule(itsDirectionChooser, x, y);
+    tempX = x;
+    tempY = y;
+  }
+  public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
+  {
+    /* workaround: right-mouse events used when popup is visible */	
+    if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
+    
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    Geometry geometry = egc.getAdapter().getGeometry();
+    if(egc.getAdapter().isVerticalZoomable())
+      {
+	if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
+	  geometry.incrXZoom(deltaX);
 	else
+	  if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 	    {
-		geometry.incrXZoom(deltaX);
-		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
-	    }	
-    }
-    public void dragEnd(int x, int y, MouseEvent e){}
-    public void updateStartingPoint(int deltaX, int deltaY){}
+	      //vertical zoom
+	      ((VerticalZoomable)egc.getAdapter()).incrYZoom(deltaY);
+	      egc.getGraphicDestination().repaint();
+	    }
+      }
+    else
+      geometry.incrXZoom(deltaX);
+  }
+  public void dragEnd(int x, int y, MouseEvent e){}
+  public void updateStartingPoint(int deltaX, int deltaY){}
   
     /**
      * DirectionListener interface

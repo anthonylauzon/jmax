@@ -63,7 +63,7 @@ public class MidiTrackEditor extends TrackBaseEditor
   
   void createPopupMenu()
   {
-    popup = new MidiTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
+    popup = new MidiTrackPopupMenu( this, gc.isInSequence());
   }
 
   SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
@@ -80,6 +80,7 @@ public class MidiTrackEditor extends TrackBaseEditor
     gc.setAdapter(ad);
     
     renderer = new ScoreRenderer(gc);
+
     return gc;
   }
   

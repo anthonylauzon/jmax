@@ -47,19 +47,16 @@ import ircam.jmax.toolkit.Geometry;
 public class SequencePanel extends JPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
     
   FtsSequenceObject ftsSequenceObject;
-
-  transient EditorToolbar toolbar;
   SequenceDataModel sequenceData;
   transient EditorContainer itsContainer;
    private EditMenu editMenu;
-  transient public InfoPanel statusBar;
   transient public SequenceRuler ruler;
   
   Box trackPanel;
   transient JScrollPane scrollTracks;
   transient Hashtable trackContainers = new Hashtable();
   transient MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
-    //---
+  //---
   transient JLabel itsZoomLabel;
   transient JScrollBar itsTimeScrollbar;
   transient Geometry geometry;
@@ -80,11 +77,11 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     itsContainer = container;
     sequenceData = data;
 
-	if(itsContainer instanceof SequenceWindow)
-	{
-	   SequenceWindow window = (SequenceWindow)itsContainer;
-	   editMenu = window.getEditMenu();
-	}
+    if(itsContainer instanceof SequenceWindow)
+      {
+	SequenceWindow window = (SequenceWindow)itsContainer;
+	editMenu = window.getEditMenu();
+      }
 
     setDoubleBuffered(false);
     ftsSequenceObject = (FtsSequenceObject)data;
@@ -103,16 +100,10 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     ruler = new SequenceRuler(geometry, this);
 
     //-------------------------------------------------
-    //-- Tools, toolbar and status bar:
     //- Create the ToolManager with the needed tools
-    //- Create a toolbar associated to this ToolManager
-    //- Create a status bar containing the toolbar
     
     manager = new SequenceToolManager( SequenceTools.completeInstance);
-    toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize( 156, 25);    
-    toolbar.setPreferredSize(new Dimension( 156, 25));    
-    Tool arrow = manager.getToolByName("arrow");     
+    Tool arrow = manager.getToolByName("edit");     
     manager.activate(arrow, null); //we do not have a gc yet...
 
     //------------------- prepare the track panel:
@@ -133,34 +124,8 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     //------------------ prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
-    statusBar = new InfoPanel();
-
-    manager.addToolListener(new ToolListener() {
-	public void toolChanged(ToolChangeEvent e) 
-	{
-	  
-	  if (e.getTool() != null) 
-	    {
-	      statusBar.post(e.getTool(), "");
-	    }
-	}
-      });
- 
-    statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
-    //statusBar.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 30));
-
-    JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(228, 25);
-    toolbarPanel.setPreferredSize(new Dimension(228, 25));
-    toolbarPanel.setLayout(new BorderLayout());
-    toolbarPanel.add(toolbar, BorderLayout.CENTER);
-    toolbarPanel.validate();
-    statusBar.addWidgetAt(toolbarPanel, 2);
-    statusBar.validate();
-
     ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
 
-    northSection.add(statusBar);
     northSection.add(ruler);	
     separate_tracks.add(northSection, BorderLayout.NORTH);
 
@@ -173,7 +138,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
 	{
-	  statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 	  repaint();
 	  TrackEvent lastEvent = sequenceData.getLastEvent();
 	  if(lastEvent!=null)
@@ -192,10 +156,8 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
 	
 	public void adjustmentValueChanged(AdjustmentEvent e) {
-	    
-	    int currentTime = e.getValue();
-	    
-	    geometry.setXTransposition(-currentTime);	    
+	  int currentTime = e.getValue();	    
+	  geometry.setXTransposition(-currentTime);	    
 	}
     });
 
@@ -245,7 +207,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	
 	if(sequenceData.trackCount() == 1)
 	  itsContainer.getFrame().
-	    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
+	    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT /*+ ruler.getSize().height*/ + tcHeight);
 	else
 	  if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
 	    itsContainer.getFrame().
@@ -397,133 +359,132 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     int maximumTime = getMaximumTime();
     
     if(time > maximumTime)
-	{
-	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
+      {
+	int delta = maximumTime-itsTimeScrollbar.getMaximum();
+	
+	itsTimeScrollbar.setMaximum(time-delta);
+	itsTimeScrollbar.setValue(time);
+      }
+    else 
+      if( time > maxVisibleTime)		
+	itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
+      else
+	if(time < -geometry.getXTransposition())
+	  itsTimeScrollbar.setValue(time);
+  }
 
-	    itsTimeScrollbar.setMaximum(time-delta);
-	    itsTimeScrollbar.setValue(time);
-	}
-	else 
-	    if( time > maxVisibleTime)		
-		itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
-	    else
-		if(time < -geometry.getXTransposition())
-		    itsTimeScrollbar.setValue(time);
-    }
-
-    private void resizePanelToTimeWithoutScroll(int time)
-    {
-	int maximumTime = getMaximumTime();
-
-	if(time > maximumTime)
-	{
-	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
-	    itsTimeScrollbar.setMaximum(time-delta);
-	}
-    }
-    private void resizePanelToEventTimeWithoutScroll(TrackEvent evt)
-    {
-	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
-	resizePanelToTimeWithoutScroll(evtTime);
-    }
-
-    //******** Merge reintroduction *******************//
-    public void Merge(){
-	ValueInfo type;
-	Track track;
-	boolean first = true;
-	TrackDataModel firstTrackModel = null;
-
-	int result = JOptionPane.showConfirmDialog( this,
-						    "Merging tracks is not Undoable.\nOK to merge ?",
-						    "Warning",
-						    JOptionPane.YES_NO_OPTION,
-						    JOptionPane.WARNING_MESSAGE);
-	if (result == JOptionPane.OK_OPTION)
-	    {
-		for(Enumeration e = ftsSequenceObject.getTypes(); e.hasMoreElements();)
-		    {
-			type = (ValueInfo) e.nextElement();
-			first = true;
-			for (Enumeration en = ftsSequenceObject.getTracks(type); en.hasMoreElements();)
-			    {
-				track = (Track) en.nextElement();				
-				if((track.getProperty("mute") == null)||!((Boolean)track.getProperty("mute")).booleanValue())
-				    {
-					if(first) 
-					    {
-						firstTrackModel = track.getTrackDataModel();
-						reinitTrackEditor(track);
-						first = false;
-					    }
-					else
-					    {				
-						firstTrackModel.mergeModel(track.getTrackDataModel());
-						ftsSequenceObject.requestTrackRemove(track);
-					    }
-				    }
-			    }
-		    }
-
-	    }	
-    }
+  private void resizePanelToTimeWithoutScroll(int time)
+  {
+    int maximumTime = getMaximumTime();
     
-    public void reinitTrackEditor(Track track)
-    {
-	((TrackContainer) trackContainers.get(track)).getTrackEditor().reinit();	
-    }
+    if(time > maximumTime)
+      {
+	int delta = maximumTime-itsTimeScrollbar.getMaximum();
+	itsTimeScrollbar.setMaximum(time-delta);
+      }
+  }
+  private void resizePanelToEventTimeWithoutScroll(TrackEvent evt)
+  {
+    int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
+    resizePanelToTimeWithoutScroll(evtTime);
+  }
+  
+  //******** Merge reintroduction *******************//
+  public void Merge(){
+    ValueInfo type;
+    Track track;
+    boolean first = true;
+    TrackDataModel firstTrackModel = null;
+    
+    int result = JOptionPane.showConfirmDialog( this,
+						"Merging tracks is not Undoable.\nOK to merge ?",
+						"Warning",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+    if (result == JOptionPane.OK_OPTION)
+      {
+	for(Enumeration e = ftsSequenceObject.getTypes(); e.hasMoreElements();)
+	  {
+	    type = (ValueInfo) e.nextElement();
+	    first = true;
+	    for (Enumeration en = ftsSequenceObject.getTracks(type); en.hasMoreElements();)
+	      {
+		track = (Track) en.nextElement();				
+		if((track.getProperty("mute") == null)||!((Boolean)track.getProperty("mute")).booleanValue())
+		  {
+		    if(first) 
+		      {
+			firstTrackModel = track.getTrackDataModel();
+			reinitTrackEditor(track);
+			first = false;
+		      }
+		    else
+		      {				
+			firstTrackModel.mergeModel(track.getTrackDataModel());
+			ftsSequenceObject.requestTrackRemove(track);
+		      }
+		  }
+	      }
+	  }
+	
+      }	
+  }
+  
+  public void reinitTrackEditor(Track track)
+  {
+    ((TrackContainer) trackContainers.get(track)).getTrackEditor().reinit();	
+  }
     
 
-    public void removeActiveTrack()
-    {
-	Track track = mutex.getCurrent();
-	if(track!=null)
-	    sequenceData.removeTrack(track);
-    }
+  public void removeActiveTrack()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      sequenceData.removeTrack(track);
+  }
     
-    public Track getCurrentTrack()
-    {
-	return mutex.getCurrent();
-    }
+  public Track getCurrentTrack()
+  {
+    return mutex.getCurrent();
+  }
+  
+  public TrackEditor getCurrentTrackEditor()
+  {
+    Track current = mutex.getCurrent();
+    if(current != null)
+      return ((TrackContainer) trackContainers.get(current)).getTrackEditor();
+    else
+      return null;
+  }
 
-    public TrackEditor getCurrentTrackEditor()
-    {
-	Track current = mutex.getCurrent();
-	if(current != null)
-	    return ((TrackContainer) trackContainers.get(current)).getTrackEditor();
-	else
-	    return null;
-    }
+  public Frame getFrame(){
+    return itsContainer.getFrame();
+  }
 
-    public Frame getFrame(){
-	return itsContainer.getFrame();
-    }
-
-    public FtsSequenceObject getFtsSequenceObject()
-    {
-	return ftsSequenceObject;
-    }
+  public FtsSequenceObject getFtsSequenceObject()
+  {
+    return ftsSequenceObject;
+  }
   ////////////////////////////////////////////////////////////
   //------------------- Editor interface ---------------
   public void copy()
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-	{
-      ((ClipableData) track.getTrackDataModel()).copy();
-	  editMenu.pasteAction.setEnabled(true);
-	}
-	  
+      {
+	((ClipableData) track.getTrackDataModel()).copy();
+	editMenu.pasteAction.setEnabled(true);
+      }	  
   }
 
   public void cut()
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-	{
-      ((ClipableData) track.getTrackDataModel()).cut();
-	  editMenu.pasteAction.setEnabled(true);
-	}
+      {
+	((ClipableData) track.getTrackDataModel()).cut();
+	editMenu.pasteAction.setEnabled(true);
+      }
   }
   
   public void paste()
@@ -569,16 +530,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     return ftsSequenceObject;
   }
 
-  public EditorToolbar getToolbar()
-  {
-    return toolbar;
-  }
-
-  public StatusBar getStatusBar()
-  {
-    return statusBar;
-  }
-
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
@@ -618,7 +569,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
    */    
   public void valueChanged(ListSelectionEvent e)
   {
-	 int numSelected = SequenceSelection.getCurrent().size();
+    int numSelected = SequenceSelection.getCurrent().size();
 
     if (numSelected == 1)
       {
@@ -627,13 +578,12 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
       }
 
    if(itsContainer instanceof SequenceWindow)
-   {
-	  SequenceWindow window = (SequenceWindow)itsContainer;
-	  window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-	  window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-	  window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
-   }
-	
+     {
+       SequenceWindow window = (SequenceWindow)itsContainer;
+       window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+       window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+       window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+     }
   }
     
     public boolean eventIsVisible(Event evt)

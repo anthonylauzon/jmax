@@ -50,7 +50,6 @@ public class ScoreRenderer extends AbstractRenderer{
     super();
     gc = theGc;
     gc.setRenderManager(this);
-    //gc.setAdapter(new PartitionAdapter());
     {//-- prepares the parameters for the geometry object
 
 	Geometry g = gc.getAdapter().getGeometry();

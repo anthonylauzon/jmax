@@ -23,7 +23,6 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.toolkit.*;
 import java.awt.event.*;
-import java.text.NumberFormat;
 
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
@@ -45,10 +44,8 @@ public class MidiMouseTracker extends MouseTracker {
 
     if(!(egc.getAdapter() instanceof MonoDimensionalAdapter))//only for midi editor
       {
-	egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-				numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
-				", "+
-				(egc.getAdapter().getInvY(e.getY())));
+	egc.getDisplayer().display( Displayer.numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
+				    ", "+egc.getAdapter().getInvY(e.getY()));
 	
 	//press keys in the pianoroll representation
 	
@@ -56,18 +53,19 @@ public class MidiMouseTracker extends MouseTracker {
 	  ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
       }
     else
-      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-			      numberFormat.format(egc.getAdapter().getInvX(e.getX())));
+      egc.getDisplayer().display( Displayer.numberFormat.format(egc.getAdapter().getInvX(e.getX())));
   }
-
-    static public NumberFormat numberFormat;
-    static 
-    {
-	numberFormat = NumberFormat.getInstance();
-	numberFormat.setMaximumFractionDigits(4);
-	numberFormat.setGroupingUsed(false);
-    }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

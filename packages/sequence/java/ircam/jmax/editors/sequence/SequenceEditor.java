@@ -28,8 +28,6 @@ import ircam.jmax.fts.*;
   */
 public interface SequenceEditor extends Editor
 {
-  public EditorToolbar getToolbar();
-  public StatusBar getStatusBar();
   public FtsGraphicObject getFtsObject();
   public void copy();
   public void cut();

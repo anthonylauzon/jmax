@@ -140,13 +140,13 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     add(viewMenu);
   }
 
-  public void update( MidiTrackEditor editor)
+  public void update()
   {
     updateChangeRangeMenu();
 
     updateLabelTypesMenu();
     
-    super.update(editor);
+    super.update();
   }
 
   void updateLabelTypesMenu()

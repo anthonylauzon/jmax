@@ -156,22 +156,10 @@ public class MonoTrackBackground implements Layer, ImageObserver{
     int y0;
     String maxString, minString;
     if(gc.getAdapter() instanceof FloatAdapter)
-	{	
-	    y0 = ((FloatAdapter)gc.getAdapter()).getY((float)0.0); 
-	    maxString = ""+numberFormat.format(((FloatAdapter)gc.getAdapter()).getFloatInvY(0));
-	    minString = ""+numberFormat.format(((FloatAdapter)gc.getAdapter()).getFloatInvY(gc.getGraphicDestination().getSize().height));  
-	}
+      y0 = ((FloatAdapter)gc.getAdapter()).getY((float)0.0); 
     else
-	{
-	    y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
-	    maxString = ""+numberFormat.format(((MonoDimensionalAdapter)gc.getAdapter()).getInvY(0));
-	    minString = ""+numberFormat.format(((MonoDimensionalAdapter)gc.getAdapter()).getInvY(gc.getGraphicDestination().getSize().height));  
-	}
-    g.setColor(Color.gray);
+      y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
     g.setFont(ToggleBar.toggleBarFont);
-    g.drawString(maxString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, maxString)-2, 10);
-    g.drawString(minString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, minString)-2, h-2);   
-    
     g.setColor(Color.black);
     g.drawLine(0, y0, w, y0);
   }

@@ -118,10 +118,10 @@ public class ScoreBackground implements Layer{
     g.drawString(""+127, 10, SC_TOP+3-delta);
       
     // the track name
-    if( gc.getFtsObject() instanceof FtsSequenceObject)
+    if( gc.isInSequence())
       {
 	g.setFont(backFont);
-	g.drawString(gc.getTrack().getName(), 2, 10);
+	g.drawString(gc.getTrack().getName(), 2, d.height - 2);
       }
 
     // the piano keys...

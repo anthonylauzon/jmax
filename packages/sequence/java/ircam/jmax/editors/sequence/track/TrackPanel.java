@@ -47,10 +47,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     
   transient FtsTrackObject ftsTrackObject;
 
-  transient EditorToolbar toolbar;
   transient TrackDataModel trackData;
   transient EditorContainer itsContainer;
-  transient public InfoPanel statusBar;
   public SequenceRuler ruler;
     
   transient JScrollPane scrollTracks;
@@ -99,21 +97,11 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     //- Create a status bar containing the toolbar
 
     if( ftsTrackObject.getType().getName().equals( AmbitusValue.AMBITUS_NAME) )
-      {
-	manager = new SequenceToolManager( SequenceTools.scoobInstance);
-	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
-	toolbar.setSize( 110, 25);    
-	toolbar.setPreferredSize( new Dimension( 110, 25));    
-      }    
+      manager = new SequenceToolManager( SequenceTools.scoobInstance);
     else
-      {
-	manager = new SequenceToolManager( SequenceTools.numberInstance);
-	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
-	toolbar.setSize( 156, 25);    
-	toolbar.setPreferredSize( new Dimension( 156, 25));    
-      }
+      manager = new SequenceToolManager( SequenceTools.numberInstance);
 
-    Tool arrow = manager.getToolByName("arrow");     
+    Tool arrow = manager.getToolByName("edit");     
     manager.activate(arrow, null); //we do not have a gc yet...
 
     //------------------- prepare track editor:
@@ -138,52 +126,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     //------------------ prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
-    statusBar = new InfoPanel();
-    manager.addToolListener(new ToolListener() {
-      public void toolChanged(ToolChangeEvent e)
-    {
-
-        if (e.getTool() != null)
-        {
-          statusBar.post(e.getTool(), "");
-	    }
-	}
-      });
-    statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
-
-    JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(228, 25);
-    toolbarPanel.setPreferredSize(new Dimension(228, 25));
-    toolbarPanel.setLayout(new BorderLayout());
-    toolbarPanel.add(toolbar, BorderLayout.CENTER);
-    toolbarPanel.validate();
-    statusBar.addWidgetAt(toolbarPanel, 2);
-      
-    JPanel panel = new JPanel();
-    panel.setSize( 150, 10);
-    panel.setVisible( false);
-    statusBar.addWidget( panel);
-
-    progressBar = new JProgressBar( 0, 100);
-    progressBar.setPreferredSize(new Dimension(150, 20));
-    progressBar.setSize( 150, 20);
-    progressBar.setStringPainted( true);
-    progressBar.setValue( 0);
-    progressBar.setVisible( false);
-    statusBar.addWidget( progressBar);
-
-    statusBar.validate();
-
     ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
 
-    northSection.add(statusBar);
     northSection.add(ruler);	
     separate_tracks.add(northSection, BorderLayout.NORTH);
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
 	{
-	  statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 	  repaint();
 	  TrackEvent lastEvent = trackData.getLastEvent();
 	  if(lastEvent != null)
@@ -233,7 +183,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   {
     if( !uploading)
       resizePanelToEventTime((TrackEvent)spec);	
-    progressBar.setValue( index);
+    /*progressBar.setValue( index);*/
   }
   public void objectsAdded(int maxTime) 
   {
@@ -244,24 +194,24 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void startTrackUpload( TrackDataModel track, int size)
   {
     uploading = true;
-    progressBar.setMaximum( size);
-    progressBar.setValue( 0);
-    SwingUtilities.invokeLater( new Runnable(){
+    /*progressBar.setMaximum( size);
+      progressBar.setValue( 0);
+      SwingUtilities.invokeLater( new Runnable(){
       public void run(){
-          progressBar.setVisible( true);
+      progressBar.setVisible( true);
       }
-    });
+      });*/
   }
   public void endTrackUpload( TrackDataModel track)
   {
     uploading = false;
     if( track.length() > 0)
       resizePanelToEventTimeWithoutScroll( track.getLastEvent());
-    SwingUtilities.invokeLater( new Runnable(){
+    /*SwingUtilities.invokeLater( new Runnable(){
       public void run(){
-        progressBar.setVisible( false);
+      progressBar.setVisible( false);
       }
-    });
+      });*/
   }
   public void startPaste(){}
   public void endPaste(){}
@@ -383,22 +333,16 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     return ftsTrackObject;
   }
 
-  public EditorToolbar getToolbar()
+  public Frame getFrame()
   {
-    return toolbar;
-  }
-
-  public StatusBar getStatusBar()
-  {
-    return statusBar;
-  }
-  public Frame getFrame(){
     return itsContainer.getFrame();
   }
-  public EditorContainer getEditorContainer(){
+  public EditorContainer getEditorContainer()
+  {
     return itsContainer;
   }
-  public void close(boolean doCancel){
+  public void close(boolean doCancel)
+  {
     itsContainer.getFrame().setVisible(false);
     ftsTrackObject.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
@@ -433,21 +377,21 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
    */    
   public void valueChanged(ListSelectionEvent e)
   {
-	 int numSelected = trackEditor.getSelection().size();
+    int numSelected = trackEditor.getSelection().size();
 
     if (numSelected == 1)
       {
-		 TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
-		 makeVisible(evt);
+	TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
+	makeVisible(evt);
       }
-
-	if(itsContainer instanceof TrackWindow)
-	{
-	   TrackWindow window = (TrackWindow)itsContainer;
-	   window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-	   window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-	   window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
-	}
+    
+    if(itsContainer instanceof TrackWindow)
+      {
+	TrackWindow window = (TrackWindow)itsContainer;
+	window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+	window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+	window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+      }
   }
     
   public boolean eventIsVisible(Event evt)

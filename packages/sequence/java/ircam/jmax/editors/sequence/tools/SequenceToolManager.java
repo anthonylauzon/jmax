@@ -28,27 +28,8 @@ import java.awt.event.*;
 
 import ircam.jmax.toolkit.*;
 
-/**
- * A specific component used as a container of JToggleButtons 
- * corresponding to Tools. 
- * The EditorToolbar class keeps a JPopupMenu with all the tools inserted;
- * this Popup can be accessed and used as an alternative for choosing 
- * a tool (example, right-mouse click). 
- */
-//--------------------------------
-// implementation notes:
-// starting from 2.4.8, this class have been reduced to a simple 
-// graphic component that is able to select tools. The model for this
-// UI element is represented by the ToolManager class
-//--------------------------------
-
 public class SequenceToolManager extends ToolManager implements ActionListener{
   
-  public SequenceToolManager()
-  {
-    super();
-  }
-
   public SequenceToolManager(ToolProvider theProvider) 
   {
     super(theProvider);    

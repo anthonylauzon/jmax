@@ -38,16 +38,16 @@ import javax.swing.*;
  */
 public class SequenceSelectionMover extends SelectionMover  implements XORPainter {
 
-    public SequenceSelectionMover(DragListener theListener, int theMovement) 
-    {
-	super(theListener, theMovement); 
-	
-	initAutoScroll();
-    }
+  public SequenceSelectionMover(DragListener theListener, int theMovement) 
+  {
+    super(theListener, theMovement); 
+    
+    initAutoScroll();
+  }
 
 
-    /******************* autoscrolling *******************/
-
+  /******************* autoscrolling *******************/
+  
   javax.swing.Timer scrollTimer;
   SequenceScrollDragAction scroller;
   
@@ -70,7 +70,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       getListener().updateStartingPoint(-delta, 0);
       
       PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-      getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+pa.getInvX(x));
+      getGc().getDisplayer().display("time "+pa.getInvX(x));
     }
     void setScrollManager( ScrollManager man)
     {
@@ -292,13 +292,9 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    if(movTrackEvent == last) 
 	      {
 		if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-		  ((SequenceGraphicContext)gc).getStatusBar().
-		    post(((SequenceGraphicContext)gc).
-			 getToolManager().getCurrentTool(), a.XMapper.getName()+" "+tempEvent.getTime());
+		  ((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+tempEvent.getTime());
 		if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-		  ((SequenceGraphicContext)gc).getStatusBar().
-		    post(((SequenceGraphicContext)gc).
-			 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
+		  ((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
 	      }
 	  }
       }

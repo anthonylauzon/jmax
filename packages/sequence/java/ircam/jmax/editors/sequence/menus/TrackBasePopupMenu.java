@@ -165,7 +165,7 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
     return target;
   }
 
-  public void update( TrackBaseEditor editor)
+  public void update()
   {
     if(isInSequence)
       updateMoveToMenu();

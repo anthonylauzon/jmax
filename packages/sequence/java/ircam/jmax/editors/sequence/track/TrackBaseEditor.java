@@ -46,10 +46,13 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
     this.geometry = geom;
 
     setBackground(Color.white);
+    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
 
     setOpaque(false);
-    
+
     gc = createGraphicContext(geometry, track);
+
+    setDisplayer();
 
     track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
@@ -129,7 +132,60 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 	}
       });
     
+    addMouseListener(new MouseListener(){
+	public void mouseClicked(MouseEvent e){}
+	public void mousePressed(MouseEvent e){}
+	public void mouseReleased(MouseEvent e){}
+	public void mouseEntered(MouseEvent e)
+	{
+	  requestFocus();
+	}
+	public void mouseExited(MouseEvent e){
+	  gc.getDisplayer().display("");
+	}
+      });
+    addMouseMotionListener(new MouseMotionListener(){
+	public void mouseMoved(MouseEvent e)
+	{
+	  double time = gc.getAdapter().getInvX(e.getX());
+	  if(time < 0) time = 0;	      
+	  int val =  gc.getAdapter().getInvY(e.getY());
+	      
+	  gc.getDisplayer().display(Displayer.numberFormat.format(time)+" , "+
+				    Displayer.numberFormat.format(val));	
+	}
+	public void mouseDragged(MouseEvent e){}
+      });
+
     component = this;
+  }
+
+  void setDisplayer()
+  {
+    JPanel labelPanel = new JPanel();
+    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+    labelPanel.setOpaque(false);
+    
+    displayLabel = new JLabel();
+    displayLabel.setFont( Displayer.displayFont);
+    displayLabel.setForeground( Color.gray);
+    displayLabel.setPreferredSize( new Dimension(102, 15));
+    displayLabel.setMaximumSize( new Dimension(102, 15));
+    displayLabel.setMinimumSize( new Dimension(102, 15));
+    
+    labelPanel.add( Box.createRigidArea( new Dimension(5, 0)) );
+    labelPanel.add( displayLabel);
+    labelPanel.add( Box.createHorizontalGlue());
+    
+    add(labelPanel);
+    add(Box.createVerticalGlue());
+    
+    gc.setDisplayer( new Displayer(){
+	public void display(String text)
+	{
+	  displayLabel.setText( text);
+	}
+      });	
   }
 
   public abstract void reinit();
@@ -138,9 +194,11 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
   public abstract int getDefaultHeight();
 
   public JPopupMenu getMenu()
-  {
+  {    
     if( popup ==null)
       createPopupMenu();
+    
+    popup.update();
     return popup;
   }
 
@@ -329,6 +387,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
   public int DEFAULT_HEIGHT = 430;
   public int viewMode;
   TrackBasePopupMenu popup = null;
+  JLabel displayLabel;
 }
 
 
