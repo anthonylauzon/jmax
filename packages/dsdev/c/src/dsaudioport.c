@@ -33,6 +33,13 @@
 #define DEFAULT_SAMPLING_RATE (44100.0f)
 #define DEFAULT_CHANNELS 2
 
+typedef struct _dsdevice_t dsdevice_t;
+
+struct _dsdevice_t {
+  dsdevice_t* next;
+  LPGUID guid;
+  char* description;  
+};
 
 /* for some fsck'ing reason, direct sound needs a window! */
 static HWND fts_wnd = NULL;
@@ -40,6 +47,8 @@ static HWND fts_wnd = NULL;
 /* the handle to this dll instance to create the fsck'ing window */
 static HINSTANCE dsdev_instance = NULL;
 
+/* the list of DirectSound devices */
+static dsdevice_t* dsdevice_list = NULL;
 
 int fts_win32_create_window();
 int fts_win32_destroy_window();
@@ -282,31 +291,34 @@ dsaudioport_xrun(fts_audioport_t *port)
   return 0;
 }
 
+
+dsdevice_t* new_dsdevice(LPGUID guid, const char* description)
+{
+  dsdevice_t* dev = (dsdevice_t*) fts_malloc(sizeof(dsdevice_t));
+
+  dev->next = NULL;
+  dev->description = description ? strdup(description) : strdup("unknown device");
+
+  if (guid == NULL) {
+    dev->guid = NULL;
+  } else {
+    dev->guid = fts_malloc(sizeof(GUID));
+    memcpy(dev->guid, guid, sizeof(GUID));
+  }
+
+  return dev;
+}
+
 static BOOL 
 dsaudioport_enum_callback(LPGUID guid, LPCSTR description, 
 			  LPCSTR module, LPVOID context)
 {
-  dsaudioport_t *dev = (dsaudioport_t *) context;
+  dsdevice_t* dev = new_dsdevice(guid, description);
 
-  if (description != NULL) {
-    fts_log("[dsaudioport]: audio device \"%s\"\n", description);
+  dev->next = dsdevice_list;
+  dsdevice_list = dev;
 
-    if ((dev->device != NULL) && (strcmp(fts_symbol_name(dev->device), description) == 0)) {
-      fts_log("[dsaudioport]: found default audio device\n");
-      dev->guid = guid;
-    }
-  }
-
-  if ((dev->device == fts_s_default) && (dev->guid == NULL)) {
-    dev->guid = guid;
-    if (description != NULL) {
-      dev->device = fts_new_symbol_copy(description);
-    } else {
-      dev->device = fts_new_symbol_copy("device without a name");
-    }
-  }
-
-  return 1;
+  return TRUE;
 }
 
 static void 
@@ -320,6 +332,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int err = 0;
   DSCBUFFERDESC cdesc;
   DSCAPS caps;
+  dsdevice_t* device;
 
 
   ac--;
@@ -385,8 +398,27 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 
   /* try to find the GUID of the audio device */
-  DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, (LPVOID) dev);              
+  if (dsdevice_list == NULL) {
+    DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);              
+  }
 
+  device = dsdevice_list;
+  while (device != NULL) {
+    if ((device->guid != NULL) && (strcmp(device->description, fts_symbol_name(dev->device)) == 0)) {
+      fts_log("[dsdev]: Opening device '%s'\n", device->description);
+      dev->guid = device->guid;
+    } else if (device->guid == NULL) {
+      fts_log("[dsdev]: Default device '%s'\n", device->description);
+      dev->guid = NULL;
+    } else {
+      fts_log("[dsdev]: Alternative device '%s'\n", device->description);
+    }
+    device = device->next;
+  }
+
+  if (dev->guid == NULL) {
+    fts_log("[dsdev]: Opening default device\n");
+  }
 
   /************************ set basic parameters ***********************************/
 
