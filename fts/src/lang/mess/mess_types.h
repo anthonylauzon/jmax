@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.11 $ IRCAM $Date: 1998/05/27 13:36:46 $
+ *      $Revision: 1.12 $ IRCAM $Date: 1998/06/03 11:42:21 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -30,7 +30,12 @@ typedef union  fts_word          fts_word_t;
 typedef struct fts_atom          fts_atom_t;
 
 typedef struct fts_plist                 fts_plist_t;
-typedef enum   fts_daemon_action         fts_daemon_action_t;
+
+typedef enum fts_daemon_action {
+  obj_property_put, obj_property_get, obj_property_remove, 
+  inlet_property_put, inlet_property_get, inlet_property_remove, 
+  outlet_property_put, outlet_property_get, outlet_property_remove
+} fts_daemon_action_t;
 
 typedef struct fts_metaclass		 fts_metaclass_t;
 typedef struct fts_class		 fts_class_t;
@@ -77,13 +82,14 @@ struct fts_symbol_descr
 
 union fts_word
 {
-  long         fts_long;
-  float        fts_float;
-  fts_symbol_t fts_symbol;
-  void        *fts_ptr;		/*  just a pointer somewhere */
-  char        *fts_str;
-  fts_object_t *fts_obj;
-  fts_connection_t *fts_connection;
+  long                fts_long;
+  unsigned long       fts_ulong;
+  float               fts_float;
+  fts_symbol_t        fts_symbol;
+  void                *fts_ptr;		/*  just a pointer somewhere */
+  char                *fts_str;
+  fts_object_t        *fts_obj;
+  fts_connection_t    *fts_connection;
 };
 
 
@@ -130,13 +136,6 @@ struct fts_plist {
  * For put actions, the value argument is the pointer where the value is passed.
  * For remove actions, the value argument is ignored.
  */
-
-enum fts_daemon_action
-{
-  obj_property_put, obj_property_get, obj_property_remove, 
-  inlet_property_put, inlet_property_get, inlet_property_remove, 
-  outlet_property_put, outlet_property_get, outlet_property_remove
-};
 
 
 typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t *obj, int idx, fts_symbol_t property, fts_atom_t *value);
