@@ -14,9 +14,13 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-make-dirs
+    jmax-make-dirs [-n]
 
 Creates all directories obj and lib for all the architectures.
+
+Options:
+  -n
+    Print the commands that would be executed, but do not execute them.
 
 Current architectures are : $ARCHS
 
@@ -27,15 +31,15 @@ HELP_EOF
 decrypt_options ()
 {
     OPT="none"
-    TYPE="none"
+    NOEXEC=
 
     for ARG in $@
     do
 	if [ $OPT = "none" ]
 	then
 	    case $ARG in
-	    \-type )
-		OPT=$ARG ;;
+	    \-n )
+		NOEXEC="yes" ;;
 	    \-help | \-h | \-\? )
 		help ;
 		exit 2 ;;
@@ -66,17 +70,22 @@ check_directory ()
 # ---------------------------------------------------------------------------
 do_it ()
 {
-    for i in `find . \( -name "obj" -o -name "lib" \) -type d`
+    for i in `find . \( -name "obj" -o -name "lib" -o -name "bin" \) -type d`
     do
 	echo $i
 	if [ -d $i/../src ]
 	then
-	    if [ ! -d $i/../../java ]
+	    if [ ! -h $i ]
 	    then
 		for a in $ARCHS
 		do
 		    echo mkdir -p $i/$a/debug $i/$a/opt
-		    mkdir -p $i/$a/debug $i/$a/opt
+		    if [ $NOEXEC ]
+		    then
+			echo > /dev/null
+		    else
+			mkdir -p $i/$a/debug $i/$a/opt
+		   fi
 		done
 	   fi
        fi
