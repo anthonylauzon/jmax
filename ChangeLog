@@ -1,4 +1,12 @@
-2003-20-05	Diemo Schwarz  <schwarz@ircam.fr>
+2003-05-22  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* utils/m4/jmax.m4: added a m4 file which contains AM_JMAX_CONFIG m4 macro.
+	AM_JMAX_CONFIG set the following variables:
+	    - JMAX_INCLUDES: compilation flag.
+	    - JMAX_LDFLAGS: link flag.
+	    - JMAX_PACKAGE_DIR: path to standard package installation directory.
+	
+2003-20-05  Diemo Schwarz  <schwarz@ircam.fr>
 
 	* Added fvec methods get(min|max) and get(min|max)index that
 	  return the value.
