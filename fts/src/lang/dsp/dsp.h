@@ -71,8 +71,6 @@ extern void	    dsp_chain_delete(void);
 
 extern void	    dsp_chain_print(void);
 extern void         dsp_chain_print_signals(void);
-extern void         dsp_chain_print_bytecode( void);
-extern void         dsp_chain_generate_C_code(void);
 
 extern int          dsp_is_running( void);
 extern void         dsp_chain_poll(void);
@@ -84,6 +82,7 @@ extern fts_symbol_t fts_s_sig_zero;
 extern fts_symbol_t fts_s_dsp_upsampling;
 extern fts_symbol_t fts_s_dsp_downsampling;
 extern fts_symbol_t fts_s_dsp_outputsize;
+extern fts_symbol_t fts_s_dsp_descr;
 
 extern float fts_dsp_get_sampling_rate(void);
 extern void  fts_dsp_set_sampling_rate(float sr);

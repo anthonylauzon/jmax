@@ -17,8 +17,7 @@
 /*                                                                            */
 /******************************************************************************/
 
-extern void dsp_graph_init_protocols(void);
-extern void dsp_init(void);
+extern void dsp_compiler_init(void);
 extern void dsp_install_clocks(void);
 static void dsp_module_init(void);
 static void dsp_module_restart(void);
@@ -28,6 +27,7 @@ static void dsp_module_shutdown(void);
 fts_symbol_t fts_s_put;
 fts_symbol_t fts_s_sig;
 fts_symbol_t fts_s_sig_zero;
+fts_symbol_t fts_s_dsp_descr;
 
 /* up and down sampling factors are now specified with properties */
 
@@ -43,17 +43,22 @@ dsp_module_init(void)
   dsp_install_clocks();
 
   /* symbols used in DSP */
-
   fts_s_put = fts_new_symbol("put");
   fts_s_sig = fts_new_symbol("sig");
   fts_s_sig_zero = fts_new_symbol("_sig_0");
   fts_s_dsp_upsampling   = fts_new_symbol("DSP_UPSAMPLING");
   fts_s_dsp_downsampling = fts_new_symbol("DSP_DOWNSAMPLING");
   fts_s_dsp_outputsize = fts_new_symbol("DSP_OUTPUTSIZE");
+  fts_s_dsp_descr = fts_new_symbol("__DSP_DESCR");
 
-  /* Initialize the dsp *after* creating the symbols  */
+  /* Initialize signals management */
+  Sig_init();
 
-  dsp_init();
+  /* Initialize DSP compilation unit */
+  dsp_compiler_init();
+
+  /* Make the dsp off program  */
+  dsp_make_dsp_off_chain();
 }
 
 

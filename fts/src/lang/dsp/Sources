@@ -1,5 +1,6 @@
 SOURCES = \
-	dspgraph.c	\
-	signal.c	\
-	dsp.c	
+dsp.c		\
+dspgraph.c	\
+gphiter.c	\
+signal.c	\
 
