@@ -1,7 +1,6 @@
 lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
-@PLATFORM@.c \
 OLDclient.c \
 OLDftsdata.c \
 OLDpatcherdata.c \
@@ -28,6 +27,7 @@ ftlmem.c \
 fts.c \
 hashtable.c \
 inout.c \
+list.c \
 loader.c \
 mem.c \
 message.c \
@@ -37,10 +37,13 @@ object.c \
 objectlist.c \
 objectset.c \
 objtable.c \
+package.c \
 param.c \
 patcher.c \
 patparser.c \
+platform.c \
 post.c \
+project.c \
 property.c \
 saver.c \
 sched.c \
@@ -55,15 +58,10 @@ template.c \
 time.c \
 variable.c \
 version.c \
-vm.c \
-list.c \
-package.c \
-project.c  
+vm.c 
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD=-L.libs -lfts -ldl -laudiofile -lm
-#fts_LDFLAGS=-rpath @ABS_TOP_SRCDIR@/fts/.libs
-
 
 INCLUDES=-I$(top_srcdir)/include

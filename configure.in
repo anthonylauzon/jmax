@@ -56,22 +56,26 @@ AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(socket)
 
 dnl Check for platform-specific code
-PLATFORM=linux
-AC_SUBST(PLATFORM)
+AC_CANONICAL_HOST
+case "$host" in
+i*86-pc-linux-gnu) platform=linux ;;
+mips-sgi-irix6.5) platform=sgi ;;
+powerpc-apple-darwin*) platform=macosx ;;
+esac
+AC_LINK_FILES(fts/${platform}.c, fts/platform.c) 
 
+dnl Check installation directories
 if test "x${prefix}" = "xNONE"; then
   AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "/usr/share/jmax")
 else
   AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}/share/jmax")
 fi
 
-
 FTSDIR=${bindir}
 ROOTDIR="${datadir}/jmax"
 
 AC_SUBST(FTSDIR)
 AC_SUBST(ROOTDIR)
-
 
 dnl Check for Java compiler
 dnl AC_PROG_JAVAC

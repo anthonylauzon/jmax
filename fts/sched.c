@@ -171,7 +171,7 @@ static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, f
 static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
 {
   struct timeval tv;
-  sched_callback_t *callback;
+  sched_callback_t *callback, *next;
   int r;
 
   tv.tv_sec = 0;
@@ -187,10 +187,16 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
   else if ( r == 0)
     return;
 
-  for ( callback = sched->callback_head; callback; callback = callback->next)
+  /* Attention:
+     the callback method ***can*** call fts_sched_remove, thus removing
+     the entry in the scheduler callback list.
+  */
+  for ( callback = sched->callback_head; callback; callback = next)
     {
       int fd = callback->fd;
       fts_atom_t a;
+
+      next = callback->next;
 
       fts_set_int( &a, fd);
 
