@@ -2,7 +2,7 @@
 # Makefile.debug
 #
 
-MODE_CFLAGS  = -g -DDEBUG
+MODE_CFLAGS  = -g -DDEBUG $(ARCH_DEBUG_CFLAGS)
 MODE_LDFLAGS = -g
 MODE_SOFLAGS = 
 
