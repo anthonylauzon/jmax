@@ -89,7 +89,7 @@ public class TrackContainer extends JPanel {
     activationButton.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e)
 	{
-	  track.setProperty("active", Boolean.TRUE);
+	  track.setProperty("selected", Boolean.TRUE);
 	}
     });
 
@@ -149,18 +149,18 @@ public class TrackContainer extends JPanel {
     
     public void propertyChange(PropertyChangeEvent evt)
     {
-      boolean active = false;	    
+      boolean sel = false;	    
       boolean opened = true;	    
       String name = evt.getPropertyName();
 
-      if (name.equals("active"))
+      if (name.equals("selected"))
 	  {
-	      active = ((Boolean) evt.getNewValue()).booleanValue();
+	      sel = ((Boolean) evt.getNewValue()).booleanValue();
 
-	      if(active) b.setForeground(Color.green);
+	      if(sel) b.setForeground(Color.green);
 	      else b.setForeground(Color.gray);
 
-	      b.setSelected(active);
+	      b.setSelected(sel);
 	  }
       else if (name.equals("opened"))
 	  {
@@ -189,10 +189,10 @@ public class TrackContainer extends JPanel {
 	      //muteButton.setSelected(mute);
 	      if(active)
 		  //muteButton.setForeground(Color.red);
-		  activeButton.setIcon(SequenceImages.getImageIcon("mute"));
+		  activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
 	      else
 		  //muteButton.setForeground(Color.green);
-		  activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
+		  activeButton.setIcon(SequenceImages.getImageIcon("mute"));
 	  }
 	  else if(name.equals("maximumPitch") || name.equals("minimumPitch"))
 	      {

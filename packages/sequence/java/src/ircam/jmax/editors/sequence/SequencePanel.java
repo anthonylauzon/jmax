@@ -61,7 +61,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     Box trackPanel;
     JScrollPane scrollTracks;
     Hashtable trackContainers = new Hashtable();
-    MutexPropertyHandler mutex = new MutexPropertyHandler("active");
+    MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
     //---
     JLabel itsZoomLabel;
     JScrollBar itsTimeScrollbar;
@@ -229,7 +229,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainers.put(track, trackContainer);
 
 	teditor.getSelection().addListSelectionListener(this);//????
-	track.setProperty("active", Boolean.TRUE);
+	track.setProperty("selected", Boolean.TRUE);
 
 	//added to update maximum time if needed
 	track.getTrackDataModel().addListener(this);    
@@ -352,7 +352,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackPanel.validate();
 	scrollTracks.validate();
 	scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
-	track.setProperty("active", Boolean.TRUE);
+	track.setProperty("selected", Boolean.TRUE);
     }
 
    /**

@@ -70,7 +70,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
    */
     public void dragStart(int x, int y, MouseEvent e)
     {
-	((SequenceGraphicContext)gc).getTrack().setProperty("active", Boolean.TRUE);
+	((SequenceGraphicContext)gc).getTrack().setProperty("selected", Boolean.TRUE);
 	mountIModule(itsDirectionChooser, x, y);
 	tempX = x;
 	tempY = y;

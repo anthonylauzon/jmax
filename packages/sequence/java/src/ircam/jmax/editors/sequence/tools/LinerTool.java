@@ -115,7 +115,7 @@ public class LinerTool extends Tool implements LineListener{
   public void lineStart(int x, int y, int modifiers) 
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;	
-    egc.getTrack().setProperty("active", Boolean.TRUE);
+    egc.getTrack().setProperty("selected", Boolean.TRUE);
 
     if(egc.getDataModel().isLocked()) return;
 

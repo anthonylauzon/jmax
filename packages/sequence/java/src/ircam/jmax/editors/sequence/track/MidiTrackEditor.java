@@ -427,7 +427,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	public void propertyChange(PropertyChangeEvent e)
 	{
-	    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
+	    if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
 		SequenceSelection.setCurrent(selection);
 	}
     }
