@@ -103,8 +103,12 @@ int jmax_run(int argc, char** argv)
   jmax_dl_t handle;
   int i, err;
 
+  jmax_log("jmax_run @ 1\n");
+
   /* find the available virtual machines */
   jmax_get_available_jvm();
+
+  jmax_log("jmax_run @ 2\n");
 
   /* load the jvm library */
   for (i = 0; ; i++) {
@@ -115,10 +119,14 @@ int jmax_run(int argc, char** argv)
       return -2;
     }
 
+    jmax_log("trying to load %s\n", library);
+
     handle = jmax_dl_load(library);
     if (handle == NULL) {
       continue;
     }
+
+    jmax_log("succeeded\n");
 
     init_args  = (jni_init_args_t) jmax_dl_symbol(handle, "JNI_GetDefaultJavaVMInitArgs");
     create_jvm  = (jni_create_jvm_t) jmax_dl_symbol(handle, "JNI_CreateJavaVM");
@@ -127,13 +135,20 @@ int jmax_run(int argc, char** argv)
       break;
     }
 
+    jmax_log("found jvm symbols\n");
+
     jmax_dl_close(handle);
   }
+
+
+  jmax_log("jmax_run @ 3: jvm library loaded\n");
 
   /* get the default initialization arguments and set the class 
    * path */
   vm_args.version = 0x00010001; /* New in 1.1.2: VM version */
   init_args((void*) &vm_args);
+
+  jmax_log("jmax_run @ 4: jvm args initialized\n");
 
   classpath = jmax_get_classpath(vm_args.classpath);
   if (classpath == NULL) {
@@ -143,6 +158,8 @@ int jmax_run(int argc, char** argv)
 
 /*    vm_args.vfprintf = jmax_vfprintf; */
 
+  jmax_log("jmax_run @ 5\n");
+
   /* load and initialize a Java VM, return a JNI interface 
    * pointer in env */
   err = create_jvm(&jvm, (void**) &env, (void*) &vm_args);
@@ -150,17 +167,23 @@ int jmax_run(int argc, char** argv)
     return -3;
   }
 
+  jmax_log("jmax_run @ 6: jvm created\n");
+
   /* get a reference to the MaxApplication class */
   cls = (*env)->FindClass(env, "ircam/jmax/MaxApplication");
   if (cls == NULL) {
     return -4;
   }
 
+  jmax_log("jmax_run @ 7: MaxApplication loaded\n");
+
   /* get a reference to the main function */
   mid = (*env)->GetStaticMethodID(env, cls, "main", "([Ljava/lang/String;)V");
   if (mid == NULL) {
     return -5;
   }
+
+  jmax_log("jmax_run @ 8: main function found\n");
 
   /* create the array of string arguments */
   args = (*env)->NewObjectArray(env, argc, (*env)->FindClass(env, "java/lang/String"), NULL);
@@ -176,13 +199,21 @@ int jmax_run(int argc, char** argv)
     (*env)->SetObjectArrayElement(env, args, i, jstr);
   }
 
+  jmax_log("jmax_run @ 9: main arguments created, starting main function\n");
+
   /* invoke the MaxApplication.main method using the JNI */
   (*env)->CallStaticVoidMethod(env, cls, mid, args);
+
+  jmax_log("jmax_run @ 10: main function returned\n");
 	
   /* cleanup */
   (*jvm)->DestroyJavaVM(jvm);
 
+  jmax_log("jmax_run @ 11: destroyed jvm\n");
+
   jmax_dl_close(handle);
+
+  jmax_log("jmax_run @ 12: closed jvm library\n");
 
   jmax_free_available_jvm();
 
@@ -246,6 +277,8 @@ jmax_get_default_jvm(char* buffer, int size)
 
 static void jmax_append_jvm(char* s)
 {
+  jmax_log("adding jvm: %s\n", s);
+
   if (jmax_num_jvm < MAX_JVM) {
     jmax_jvm[jmax_num_jvm++] = strcpy((char*) malloc(strlen(s) + 1), s);  
   }
@@ -269,6 +302,9 @@ jmax_set_root(char* s)
   if (s == NULL) {
     return;
   }
+
+  jmax_log("settings root to %s\n", s);
+
   jmax_root = strcpy((char*) malloc(strlen(s) + 1), s);
 }
 

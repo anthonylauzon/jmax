@@ -1875,6 +1875,8 @@ public class FtsServer implements Runnable
       {
 	// This is usually the case at the creation of the root patcher
 
+	  System.out.println("** getObjectByFtsId: id=0");
+
 	return null;
       }
     else if (id == -1)
@@ -1888,6 +1890,9 @@ public class FtsServer implements Runnable
 	FtsObject object = (FtsObject) objectTable.elementAt(id);
 
 	// Returned obj can be null here !!
+
+	if (object == null)
+	  System.out.println("** getObjectByFtsId: object=null");
 
 	return object;
       }

@@ -153,10 +153,6 @@ SOURCE=..\fts\expression.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\fifo.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\file.c
 # End Source File
 # Begin Source File

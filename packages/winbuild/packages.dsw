@@ -3,30 +3,6 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "client"=..\client\winbuild\client.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "config"=..\config\winbuild\config.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "control"=..\control\winbuild\control.dsp - Package Owner=<4>
 
 Package=<5>
@@ -55,18 +31,6 @@ Package=<4>
 ###############################################################################
 
 Project: "data_java"=..\data\winbuild\data_java.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "discuss"=..\discuss\winbuild\discuss.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
