@@ -86,10 +86,22 @@ Additional system properties can be defined by using the same syntax
 <H2> <B><TT>.jmaxrc</TT></B> file </H2>
 
 <P>
-To start it, you must first install a .jmaxrc file in
-your home directory. A set of template <TT>.jmaxrc</TT> files
-can be found in the distribution.
+The <B><TT>.jmaxrc</TT></B> file is a Tcl script that is loaded at <I>j</I>Max startup.
+It can contain any Tcl code, though the following is probably of main interest:
+<UL>
+<LI> set system properties to customize your environmnet
+<LI> declare a number of <I>hooks</I>, Tcl code that will be executed at precise
+points during the initialization process. In particular, the <B><I>start</I></B>
+hook is executed after server start and is especially usefull for configuration
+purpose.
+</UL>
 
+<P>
+A set of template <TT>.jmaxrc</TT> files can be found in the distribution.
+
+<P>
+As an example, the following file can be used for an Octane configuration,
+using the ADAT audio I/O:
 <PRE>
 # --- .jmaxrc
 set jmaxArch  origin
