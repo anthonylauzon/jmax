@@ -152,3 +152,27 @@ fts_project_get_data_file(fts_symbol_t filename)
 
   return filename;
 }
+
+
+/***********************************************************************
+ *
+ * The project object to access the current project
+ *
+ */
+
+
+struct _fts_project_t {
+  fts_object_t object;
+};
+
+
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+void 
+fts_kernel_project_init(void)
+{
+}

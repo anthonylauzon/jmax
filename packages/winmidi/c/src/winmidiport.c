@@ -414,7 +414,10 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   UINT i, err, num;
   MIDIOUTCAPS out_caps;
   MIDIINCAPS in_caps;
+  char devname[256];
   char msg[256];
+  int in_num = 0;
+  int out_num = MIDI_MAPPER;
 
   fts_midiport_init(&this->port);
   fts_midiport_set_input(&this->port);
@@ -427,6 +430,11 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->cur_outhdr = 0;
 
   /* open midi output device */
+  if (fts_get_regvalue_string("MidiOut", devname, 256) != 0) {
+    devname[0] = 0;
+  }
+
+  fts_log("[winmidiport]: default midi out port: %s\n", devname);
 
   /* check if there any midi devices installed */
   num = midiOutGetNumDevs(); 
@@ -437,25 +445,31 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   } else {
 
-    /* for debugging */
+    /* search the id of the default midi out (print out the list to the log for debugging) */
     for (i = 0; i < num; i++) {
       res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
       if (res == MMSYSERR_NOERROR) {
 	fts_log("[winmidiport]: midi out port %d: \"%s\"\n", i, out_caps.szPname);
+	if (strcmp(out_caps.szPname, devname) == 0) {
+	  out_num = i;
+	  fts_log("[winmidiport]: found default midi out port in device list\n");
+	}
       }
     }
 
     /* try opening the default port */
-    res = midiOutGetDevCaps(0, &out_caps, sizeof(MIDIOUTCAPS));
+    res = midiOutGetDevCaps(out_num, &out_caps, sizeof(MIDIOUTCAPS));
     if (res == MMSYSERR_NOERROR) {
       fts_log("[winmidiport]: trying to open midi out port \"%s\"\n", out_caps.szPname);
     }
-    err = midiOutOpen(&this->hmidiout, MIDI_MAPPER, 0, 0, CALLBACK_NULL);
+    err = midiOutOpen(&this->hmidiout, out_num, 0, 0, CALLBACK_NULL);
     if (err != MMSYSERR_NOERROR) {
       post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
       fts_log("[winmidiport]: Couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
       this->hmidiout = NULL;
-    } 
+    } else {
+      fts_set_regvalue_string("MidiOut", out_caps.szPname);
+    }
     
     /* if the default midi mapper failed, try opening a hardware port */
     if (this->hmidiout == NULL) {
@@ -464,9 +478,10 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology == MOD_MIDIPORT)) {
 	  err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
 	  if (err == MMSYSERR_NOERROR) {
+	    fts_set_regvalue_string("MidiOut", out_caps.szPname);
 	    post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
 	    fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-	    break;
+    	    break;
 	  } else {
 	    this->hmidiout = NULL;
 	  }
@@ -481,6 +496,7 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
 	  err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
 	  if (err == MMSYSERR_NOERROR) {
+	    fts_set_regvalue_string("MidiOut", out_caps.szPname);
 	    post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
 	    fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
 	    break;
@@ -513,6 +529,12 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   /* check if there any midi devices installed */
   num = midiInGetNumDevs(); 
 
+  if (fts_get_regvalue_string("MidiIn", devname, 256) != 0) {
+    devname[0] = 0;
+  }
+
+  fts_log("[winmidiport]: default midi in port: %s\n", devname);
+
   if (num == 0) {
     post("Warning: winmidiport: no MIDI in devices found\n");
     fts_log("[winmidiport]: No MIDI in devices found\n");
@@ -522,21 +544,27 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for (i = 0; i < num; i++) {
       res = midiInGetDevCaps(i, &in_caps, sizeof(MIDIINCAPS));
       if (res == MMSYSERR_NOERROR) {
-	fts_log("[winmidiport]: midi in port %d: %s\n", i, in_caps.szPname);
+	fts_log("[winmidiport]: midi in port %d: \"%s\"\n", i, in_caps.szPname);
+	if (strcmp(in_caps.szPname, devname) == 0) {
+	  in_num = i;
+	  fts_log("[winmidiport]: found default midi in port in device list\n");
+	}
       }
     }
 
-    /* try opening device 0 */
-    res = midiInGetDevCaps(0, &in_caps, sizeof(MIDIINCAPS));
+    /* try opening device  */
+    res = midiInGetDevCaps(in_num, &in_caps, sizeof(MIDIINCAPS));
     if (res == MMSYSERR_NOERROR) {
       fts_log("[winmidiport]: trying to open midi in port \"%s\"\n", in_caps.szPname);
     }
-    err = midiInOpen(&this->hmidiin, 0, (DWORD) winmidiport_callback_in, (DWORD) this, CALLBACK_FUNCTION);
+    err = midiInOpen(&this->hmidiin, in_num, (DWORD) winmidiport_callback_in, (DWORD) this, CALLBACK_FUNCTION);
     if (err != MMSYSERR_NOERROR) {
       post("Warning: winmidiport: couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
       fts_log("[winmidiport]: Couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
       this->hmidiin = NULL;
-    } 
+    } else {
+      fts_set_regvalue_string("MidiIn", in_caps.szPname);
+    }
     
     /* if the default midi device failed, try opening any port */
     if (this->hmidiin == NULL) {
@@ -545,6 +573,7 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	if (res == MMSYSERR_NOERROR) {
 	  err = midiInOpen(&this->hmidiin, i, (DWORD) winmidiport_callback_in, (DWORD) this, CALLBACK_FUNCTION);
 	  if (err == MMSYSERR_NOERROR) {
+	    fts_set_regvalue_string("MidiIn", in_caps.szPname);
 	    post("Warning: winmidiport: instead, opened MIDI in device: %s (id=%d)\n", in_caps.szPname, i);
 	    fts_log("[winmidiport]: Instead, opened MIDI in device: %s (id=%d)\n", in_caps.szPname, i);
 	    break;

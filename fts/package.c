@@ -537,14 +537,17 @@ fts_package_get_declared_abstraction(fts_package_t* pkg, fts_symbol_t name)
   char buf[MAXPATHLEN];
 
   fts_set_symbol( &k, name);
-  if ((pkg->declared_abstractions != NULL) 
-      && fts_hashtable_get(pkg->declared_abstractions, &k, &a)) {
+
+  if ((pkg->declared_abstractions != NULL) && fts_hashtable_get(pkg->declared_abstractions, &k, &a)) {
+
     abstraction = (fts_abstraction_t *) fts_get_ptr(&a);
 
     if (fts_abstraction_get_filename(abstraction) == NULL) {
+
       fts_make_absolute_path(fts_symbol_name(pkg->dir), 
 			     fts_symbol_name(fts_abstraction_get_original_filename(abstraction)), 
 			     buf, MAXPATHLEN);
+
       fts_abstraction_set_filename(abstraction, fts_new_symbol_copy(buf));
     }
 
@@ -573,9 +576,19 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
 
     root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
 
+    /* try to find the file with a .abs extension */
     snprintf(filename, MAXPATHLEN, "%s.abs", fts_symbol_name(name));
     if (!fts_find_file(root, pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
-      return NULL;
+
+      /* try to find the file with a .pat extension */
+      snprintf(filename, MAXPATHLEN, "%s.pat", fts_symbol_name(name));
+      if (!fts_find_file(root, pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
+
+	/* try to find the file without an extension */
+	if (!fts_find_file(root, pkg->abstraction_paths, fts_symbol_name(name), path, MAXPATHLEN)) {
+	  return NULL;
+	}
+      }
     }
 
     /* Register the abstraction */

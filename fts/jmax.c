@@ -93,19 +93,19 @@ static char* jmax_server_root = NULL;
  */
 int jmax_run(int argc, char** argv)
 { 
-  JDK1_1InitArgs vm_args;
   JavaVM *jvm;
   JNIEnv *env;
   jclass cls;
   jmethodID mid;
   jobjectArray args;
   jstring jstr;
-  char* classpath;
   char* library;
-  jni_init_args_t init_args;
   jni_create_jvm_t create_jvm;
   jmax_dl_t handle;
   int i, err;
+  char classpath_v12[2048];
+  JavaVMInitArgs vm_args_v12;
+  JavaVMOption options[4];
 
   /* find the available virtual machines */
   jmax_get_available_jvm();
@@ -128,10 +128,9 @@ int jmax_run(int argc, char** argv)
 
     jmax_log("Succeeded\n");
 
-    init_args  = (jni_init_args_t) jmax_dl_symbol(handle, "JNI_GetDefaultJavaVMInitArgs");
     create_jvm  = (jni_create_jvm_t) jmax_dl_symbol(handle, "JNI_CreateJavaVM");
 
-    if ((init_args != NULL) && (create_jvm != NULL)) {
+    if (create_jvm != NULL) {
       break;
     }
 
@@ -140,24 +139,20 @@ int jmax_run(int argc, char** argv)
     jmax_dl_close(handle);
   }
 
-  /* get the default initialization arguments and set the class 
-   * path */
-  vm_args.version = 0x00010001; /* New in 1.1.2: VM version */
-  init_args((void*) &vm_args);
+  vm_args_v12.version = JNI_VERSION_1_2;
+  vm_args_v12.options = options;
+  vm_args_v12.nOptions = 2;
+  vm_args_v12.ignoreUnrecognized = TRUE;
 
-  classpath = jmax_get_classpath(vm_args.classpath);
-  if (classpath == NULL) {
-    return -1;
-  }
+  snprintf(classpath_v12, 2048, "-Djava.class.path=%s", jmax_get_classpath("dummy"));
 
-  jmax_log("classpath=%s\n", classpath);
-  vm_args.classpath = classpath;
-
-/*    vm_args.vfprintf = jmax_vfprintf; */
-
+  options[0].optionString = classpath_v12;
+  options[1].optionString = "vfprintf";
+  options[1].extraInfo  = jmax_vfprintf;
+ 
   /* load and initialize a Java VM, return a JNI interface 
    * pointer in env */
-  err = create_jvm(&jvm, (void**) &env, (void*) &vm_args);
+  err = create_jvm(&jvm, (void**) &env, &vm_args_v12);
   if (err != 0) {
     return -3;
   }
@@ -340,14 +335,12 @@ jmax_vfprintf(FILE *fp, const char *format, va_list args)
  *
  */
 
-#define JMAX_KEY        "Software\\Ircam\\jMax" 
-#define IBM_RELEASE_13  "1.3" 
-#define IBM_JRE_13	"Software\\IBM\\Java2 Runtime Environment"
-#define SUN_RELEASE_13  "1.3" 
-#define SUN_JRE_13	"Software\\JavaSoft\\Java Runtime Environment"
-#define LOG_FILE        "C:\\jmax_log.txt"
+#define JMAX_KEY  "Software\\Ircam\\jMax" 
+#define IBM_JRE	  "Software\\IBM\\Java2 Runtime Environment"
+#define SUN_JRE	  "Software\\JavaSoft\\Java Runtime Environment"
+#define LOG_FILE  "C:\\jmax_log.txt"
 
-static int jmax_get_jvm_from_registry(char *buf, jint bufsize, char* key, char* release);
+static int jmax_get_jvm_from_registry(char *buf, jint bufsize, char* key);
 static int jmax_get_root_from_registry(char *buf, jint bufsize);
 static int jmax_get_server_root_from_registry(char *buf, jint bufsize);
 static int jmax_get_string_from_registry(HKEY key, const char *name, char *buf, jint bufsize);
@@ -432,12 +425,12 @@ jmax_get_available_jvm(void)
   }
   
   /* check in the windows registry for IBM's and Sun's JVMs */
-  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, IBM_JRE_13, IBM_RELEASE_13)) {
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE)) {
     if (_stat(buf, &statbuf) == 0) {
       jmax_append_jvm(buf);
     }
   }
-  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_13, SUN_RELEASE_13)) {
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, IBM_JRE)) {
     if (_stat(buf, &statbuf) == 0) {
       jmax_append_jvm(buf);
     }
@@ -532,7 +525,7 @@ jmax_get_server_root_from_registry(char *buf, jint bufsize)
 }
 
 static int
-jmax_get_jvm_from_registry(char *buf, jint bufsize, char* jre, char* release)
+jmax_get_jvm_from_registry(char *buf, jint bufsize, char* jre)
 {
   HKEY key, subkey;
   char version[_MAX_PATH];
@@ -545,12 +538,6 @@ jmax_get_jvm_from_registry(char *buf, jint bufsize, char* jre, char* release)
   
   if (!jmax_get_string_from_registry(key, "CurrentVersion", version, sizeof(version))) {
     jmax_log("Failed reading value of registry key: %s\\CurrentVersion\n", jre);
-    RegCloseKey(key);
-    return 0;
-  }
-  
-  if (strcmp(version, release) != 0) {
-    jmax_log("Registry key '%s\\CurrentVersion'\nhas value '%s', but '%s' is required.\n", jre, version, release);
     RegCloseKey(key);
     return 0;
   }

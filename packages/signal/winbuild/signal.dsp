@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /Op /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -52,7 +52,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  fts.lib data.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\data\c" /libpath:"..\..\utils\c"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\data\c" /libpath:"..\..\utils\c"
 
 !ELSEIF  "$(CFG)" == "signal - Win32 Debug"
 
@@ -96,6 +96,10 @@ SOURCE=..\c\src\cut.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\env.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\matrix.c
 # End Source File
 # Begin Source File
@@ -121,10 +125,6 @@ SOURCE=..\c\src\play.c
 # Begin Source File
 
 SOURCE=..\c\src\play.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\playbpf.c
 # End Source File
 # Begin Source File
 

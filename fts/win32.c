@@ -30,6 +30,8 @@
 
 HINSTANCE fts_hinstance = NULL;
 
+#define JMAX_KEY        "Software\\Ircam\\jMax" 
+
 void fts_set_hinstance(HINSTANCE hinstance)
 {
   if (fts_hinstance == NULL) {
@@ -42,34 +44,6 @@ HINSTANCE fts_get_hinstance()
   return fts_hinstance;
 }
 
-/*  void  */
-/*  fts_create_pid_file(void) */
-/*  { */
-/*    HANDLE file; */
-/*    DWORD count; */
-/*    char path[_MAX_PATH]; */
-/*    char pid[64]; */
-
-/*    snprintf(path, _MAX_PATH, "%s\\%s", fts_symbol_name(fts_get_root_directory()), "pid"); */
-/*    snprintf(pid, 64, "%u", GetCurrentProcessId()); */
-
-/*    file = CreateFile(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL); */
-/*    if (file == INVALID_HANDLE_VALUE) { */
-/*      fts_log("[win32] Failed to create the pid file\n"); */
-/*      return; */
-/*    } */
-/*    WriteFile(file, pid, strlen(pid), &count, NULL); */
-/*    CloseHandle(file); */
-/*  } */
-
-/*  void  */
-/*  fts_delete_pid_file(void) */
-/*  { */
-/*    char path[_MAX_PATH]; */
-/*    snprintf(path, _MAX_PATH, "%s\\%s", fts_symbol_name(fts_get_root_directory()), "pid"); */
-/*    DeleteFile(path); */
-/*  } */
-
 BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
   fts_set_hinstance((HINSTANCE) hModule);
@@ -79,7 +53,6 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
     break;
 
   case DLL_PROCESS_DETACH:
-/*      fts_delete_pid_file(); */
     break;
   }
   return TRUE;
@@ -188,50 +161,6 @@ double fts_systime()
   return (double) GetTickCount();
 }
 
-/* *************************************************************************** */
-/*                                                                             */
-/* Platform specific initialization                                            */
-/*                                                                             */
-/* *************************************************************************** */
-
-void fts_platform_init( int argc, char **argv)
-{
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  int result;
-  SOCKET sock;
-
-  wVersionRequested = MAKEWORD(2, 2);
-  
-  result = WSAStartup( wVersionRequested, &wsaData );
-  if (result != 0) {
-    MessageBox(NULL, "Couldn't initialize the TCP/IP layer", 
-	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
-    return /* FIXME */;
-  }
-  
-  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-    WSACleanup();
-    MessageBox(NULL, "The version of the TCP/IP layer installed on your machine is invalid", 
-	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
-    return /* FIXME */;
-  }
-  
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0) ) == -1)	{
-    MessageBox(NULL, "Coulnd't create a socket. " 
-	       "Make sure your machine is configured with TCP/IP and uses a recent TCP/IP library.", 
-	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
-    return;
-  }
-  closesocket(sock);
-
-  /* boost the priority of the fts thread */
-/*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
-  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-
-/*    fts_create_pid_file(); */
-}
-
 
 /* *************************************************************************** */
 /*                                                                             */
@@ -239,10 +168,8 @@ void fts_platform_init( int argc, char **argv)
 /*                                                                             */
 /* *************************************************************************** */
 
-#define JMAX_KEY        "Software\\Ircam\\jMax" 
-
 static int
-fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
+fts_get_registry_string(HKEY key, const char *name, char *buf, int bufsize)
 {
   DWORD type, size;
 
@@ -250,46 +177,89 @@ fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
       && type == REG_SZ
       && (size < (unsigned int)bufsize)) {
     if (RegQueryValueEx(key, name, 0, 0, buf, &size) == 0) {
-      return 1;
+      return 0;
     }
   }
-  return 0;
+  return -1;
 }
 
-static int 
-fts_get_root_from_registry(char *buf, int bufsize)
+int
+fts_get_regvalue_string(char* name, char* buf, int len)
 {
   HKEY key;
   HKEY version_key;
   char version[256];
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
-    post("Error opening registry key '%s'\n", JMAX_KEY);
-    return 0;
+    return -1;
   }
-
-  if (!fts_get_string_from_registry(key, "FtsVersion", version, 256)) {
-    post("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
+  if (fts_get_registry_string(key, "FtsVersion", version, 256) != 0) {
     RegCloseKey(key);
-    return 0;
+    return -1;
   }
-
   if (RegOpenKeyEx(key, version, 0, KEY_READ, &version_key) != 0) {
-    post("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
-    return 0;
+    return -1;
   }
-
-  if (!fts_get_string_from_registry(version_key, "ftsRoot", buf, bufsize)) {
-    post("Failed to read the value of registry key: '%s\\%s\\ftsRoot'\n", JMAX_KEY, version);
+  if (fts_get_registry_string(version_key, name, buf, len) != 0) {
     RegCloseKey(key);
     RegCloseKey(version_key);
-    return 0;
+    return -1;
   }
 
   RegCloseKey(key);
   RegCloseKey(version_key);
 
-  return 1;
+  return 0;  
+}
+
+int
+fts_set_regvalue_string(char* name, const char* value)
+{
+  HKEY key;
+  HKEY version_key;
+  char version[256];
+
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
+    return -1;
+  }
+  if (fts_get_registry_string(key, "FtsVersion", version, 256) != 0) {
+    RegCloseKey(key);
+    return -1;
+  }
+  if (RegOpenKeyEx(key, version, 0, KEY_WRITE, &version_key) != 0) {
+    return -1;
+  }
+  if (RegSetValueEx(version_key, name, 0, REG_SZ, value, strlen(value) + 1) != ERROR_SUCCESS) {
+    RegCloseKey(key);
+    RegCloseKey(version_key);
+    return -1;
+  }
+
+  RegCloseKey(key);
+  RegCloseKey(version_key);
+
+  return 0;  
+}
+
+int
+fts_get_regvalue_int(char* name, int* value)
+{
+  char buf[256];
+
+  if (fts_get_regvalue_string(name, buf, 256) != 0) {
+    return -1;
+  }
+  *value = atoi(buf);
+  return 0;
+}
+
+int
+fts_set_regvalue_int(char* name, int value)
+{
+  char buf[256];
+
+  _snprintf(buf, 256, "%i", value);
+  return fts_set_regvalue_string(name, buf);
 }
 
 fts_symbol_t 
@@ -299,7 +269,7 @@ fts_get_default_root_directory( void)
   int i;
 
   /* first check the registry */
-  if (!fts_get_root_from_registry(root, _MAX_PATH)) {
+  if (fts_get_regvalue_string("ftsRoot", root, _MAX_PATH) != 0) {
 
     /* otherwise, calculate the root from the current directory */
     if (GetCurrentDirectory(_MAX_PATH, root) == 0) {
@@ -313,9 +283,12 @@ fts_get_default_root_directory( void)
 	break;
       }
     }
-  }
 
-  fts_log("[win32]: Using '%s' as fts root directory\n", root);
+    fts_log("[win32]: Using a fts root based on current directory: '%s'\n", root);
+
+  } else {
+    fts_log("[win32]: Using the fts root from the registry: '%s'\n", root);
+  }
 
   return fts_new_symbol_copy( root);
 }
@@ -365,5 +338,59 @@ fts_get_system_config( void)
   }
 
   return NULL;
+}
+
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Platform specific initialization                                            */
+/*                                                                             */
+/* *************************************************************************** */
+
+void fts_platform_init( int argc, char **argv)
+{
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int result;
+  SOCKET sock;
+
+  HKEY key;
+  char version[256];
+
+  wVersionRequested = MAKEWORD(2, 2);
+  
+  result = WSAStartup( wVersionRequested, &wsaData );
+  if (result != 0) {
+    MessageBox(NULL, "Couldn't initialize the TCP/IP layer", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
+    return /* FIXME */;
+  }
+  
+  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    WSACleanup();
+    MessageBox(NULL, "The version of the TCP/IP layer installed on your machine is invalid", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
+    return /* FIXME */;
+  }
+  
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0) ) == -1)	{
+    MessageBox(NULL, "Coulnd't create a socket. " 
+	       "Make sure your machine is configured with TCP/IP and uses a recent TCP/IP library.", 
+	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
+    return;
+  }
+  closesocket(sock);
+
+  /* boost the priority of the fts thread */
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+
+  /* print out the current version in the log file */
+  if ((RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) == 0) &&
+      (fts_get_registry_string(key, "FtsVersion", version, 256) == 0)) {
+    fts_log("[win32]: FtsVersion %s\n", version);
+  } else {
+    post("Error opening registry key '%s'\n", JMAX_KEY);
+    fts_log("[win32]: Error opening registry key '%s'\n", JMAX_KEY);
+  }
 }
 

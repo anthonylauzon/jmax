@@ -21,26 +21,6 @@
  */
 
 
-/*
- * Handling of old .abs/.pat abstractions.
- * 
- * We handle a table of direct declarations (name --> file)
- * and a table of search directory.
- *
- * The table of direct declarations actually contains a abstraction
- * declaration object, including the file name, and possibly 
- * a cache of the declaration text.
- *
- * There is only one group of search path (at least, for the moment)
- * and when an abstraction is found, a new declaration is dynamically
- * created, this to avoid searching again; also, in the short future,
- * the abstraction text can be cached under some condition (size of the
- * text, global cache size limits, ...)
- *
- * Later, the fts_abstraction will also include a table of pointers
- * to all the instances, to allow dynamic redefinition
- */
-
 #include <string.h>
 #include <sys/stat.h>
 
@@ -57,22 +37,29 @@ struct fts_abstraction
   fts_symbol_t original_filename;
 };
 
+static fts_object_t *
+fts_make_abstraction_instance(fts_abstraction_t *abstraction, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+
+
+static fts_heap_t *abstraction_heap;
+
+
 
 fts_abstraction_t* 
 fts_abstraction_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
-  fts_abstraction_t *abs;
+  fts_abstraction_t *abstraction;
 
-  abs = (fts_abstraction_t *) fts_malloc(sizeof(fts_abstraction_t));
-  if (abs == NULL) {
+  abstraction = (fts_abstraction_t *) fts_heap_alloc(abstraction_heap);
+  if (abstraction == NULL) {
     return NULL;
   }
 
-  abs->name = name;
-  abs->filename = filename;
-  abs->original_filename = original_filename;
+  abstraction->name = name;
+  abstraction->filename = filename;
+  abstraction->original_filename = original_filename;
   
-  return abs;
+  return abstraction;
 }
 
 fts_symbol_t 
@@ -97,120 +84,69 @@ fts_abstraction_get_original_filename(fts_abstraction_t *abstraction)
 fts_object_t* 
 fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  /* FIXME [pH07] */
-/*    fts_symbol_t name; */
-/*    FILE *file; */
+  fts_abstraction_t *abstraction;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-/*    name = get_name_without_extension( fts_get_symbol( at)); */
-/*    file = fts_abstraction_find_declared_file( name); */
+  pkg = fts_get_current_package();
+  abstraction = fts_package_get_declared_abstraction(pkg, fts_get_symbol(&at[0]));
 
-/*    if (file) */
-/*      return fts_make_abstraction(file, patcher, ac, at); */
-/*    else */
-    return 0;
-}
+  if (abstraction)
+    return fts_make_abstraction_instance(abstraction, patcher, ac, at);
+  
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
 
-
-fts_object_t*
-fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  /* FIXME [pH07] */
-/*    fts_symbol_t name; */
-/*    FILE *file; */
-
-/*    name = get_name_without_extension( fts_get_symbol( at)); */
-/*    file = fts_abstraction_find_path_file(name); */
-
-/*    if (file) */
-/*      return fts_make_abstraction(file, patcher, ac, at); */
-/*    else */
-    return 0;
-}
-
-
-/***********************************************************************/
-/***********************************************************************/
-/***********************************************************************/
-/***********************************************************************/
-
-#if 0
-
-static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
-{
-  FILE *file;
-  fts_atom_t a, k;
-
-  /* First, look in the abstraction declaration table */
-
-  fts_set_symbol( &k, name);
-  if (fts_hashtable_get(&abstraction_table, &k, &a))
+  while (fts_iterator_has_more( &pkg_iter)) 
     {
-      fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_ptr(&a);
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+      
+      if (pkg == NULL)
+	continue;
+      
+      abstraction = fts_package_get_declared_abstraction(pkg, fts_get_symbol(&at[0]));
 
-      file = fopen(fts_symbol_name(abs->filename), "rb");
-
-      /* Here, we should handle differently declarations that are
-	 caches, and declarations that are user declaration;
-	 a failing cache is not a failure, just look again in the
-	 path (the abstraction moved); a user declaration failure
-	 is an error !!
-	 */
-
-      return file;
+      if (abstraction)
+	return fts_make_abstraction_instance(abstraction, patcher, ac, at);
     }
   
   return 0;
 }
 
 
-
-static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
+fts_object_t*
+fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  int i;
-  FILE *file;
-  struct stat statbuf;
+  fts_abstraction_t *abstraction;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-  /*
-   * Look in the search path, either with or without ".pat" or ".abs"
-   * extensions; declare the abstraction if found !!
-   * Problem: in this way, an already path loaded abstraction overwrite
-   * a C object dynamically loaded after the first abstraction instantiation.
-   * this path thing should just have a private cache.
-   */
+  pkg = fts_get_current_package();
+  abstraction = fts_package_get_abstraction_in_path(pkg, fts_get_symbol(&at[0]));
 
-  for (i = 0; i < search_path_fill ; i++)
+  if (abstraction)
+    return fts_make_abstraction_instance(abstraction, patcher, ac, at);
+  
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) 
     {
-      fts_symbol_t filename = search_path_table[i];
-      char *extensions[] = { "", ".abs", ".pat" };
-      char buf[1024];
-      int k;
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+      
+      if (pkg == NULL)
+	continue;
+      
+      abstraction = fts_package_get_abstraction_in_path(pkg, fts_get_symbol(&at[0]));
 
-      file = 0;
-
-      for ( k = 0; k < sizeof( extensions)/sizeof( char *); k++)
-	{
-	  sprintf(buf, "%s/%s%s", fts_symbol_name(filename), fts_symbol_name(name), extensions[k]);
-
-	  /* If the file is there and it is a regular file and not a directory , open it */
-	  if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
-	    {
-	      file = fopen( buf, "rb");
-	      break;
-	    }
-	}
-
-      if (file)
-	{
-	  /* found, declare it and return */
-
-	  fts_abstraction_add_declaration(name, fts_new_symbol_copy(buf));
-
-	  return file;
-	}
+      if (abstraction)
+	return fts_make_abstraction_instance(abstraction, patcher, ac, at);
     }
-
-  /* Not found anywhere, return null */
-
+  
   return 0;
 }
 
@@ -221,7 +157,8 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
  *
  */
 
-static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+static fts_object_t *
+fts_make_abstraction_instance(fts_abstraction_t *abstraction, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
   fts_patlex_t *in; 
@@ -231,19 +168,22 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
   fts_object_new_to_patcher((fts_patcher_t *)patcher, 1, description, &obj);
 
   /* flag the patcher as abstraction */
-
   fts_patcher_set_abstraction((fts_patcher_t *)obj);
 
   /* get the lexer */
 
-  in = fts_patlex_open_file(file, ac - 1, at + 1);
+  in = fts_patlex_open(fts_symbol_name(abstraction->filename), ac - 1, at + 1);
+  if (in == NULL) {
+    fts_object_set_error(obj, "failed to open the abstraction file");
+    return obj;
+  }
 
   fts_patparse_parse_patlex(obj, in);
 
   fts_patcher_reassign_inlets_outlets((fts_patcher_t *) obj);
 
   /* Add the template like variables in order to support direct
-     .abs to template traslation */
+     .abs to template translation */
 
   {
     fts_atom_t rat[256];
@@ -262,38 +202,6 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
   return obj;
 }
 
-static fts_symbol_t get_name_without_extension( fts_symbol_t name)
-{
-  const char *pname;
-  char *pdot;
-
-  pname = fts_symbol_name( name);
-  pdot = strrchr( pname, '.');
-
-  if ( pdot && ( !strcmp( pdot, ".abs") || !strcmp( pdot, ".pat")) )
-    {
-      char buff[1024];
-
-      /* .pat or .abs Extension used, generate a new name symbol */
-
-      strcpy( buff, pname);
-
-      buff[ pdot - pname]  = '\0';
-
-      return fts_new_symbol_copy( buff);
-    }
-
-  return name;
-}
-
-
-#endif
-
-/***********************************************************************/
-/***********************************************************************/
-/***********************************************************************/
-/***********************************************************************/
-
 
 /***********************************************************************
  *
@@ -303,9 +211,5 @@ static fts_symbol_t get_name_without_extension( fts_symbol_t name)
 
 void fts_kernel_abstraction_init()
 {
-/*    fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM); */
-
-/*    search_path_size  = INIT_SEARCH_PATH_SIZE; */
-/*    search_path_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *)); */
-/*    search_path_fill  = 0; */
+  abstraction_heap = fts_heap_new(sizeof(fts_abstraction_t));
 }

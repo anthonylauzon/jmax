@@ -78,41 +78,31 @@ bpf_append_point(bpf_t *bpf, double time, double value)
 {
   int size = bpf->size;
 
+  set_size(bpf, size + 1);
+
   if(size > 0)
     {
-      double duration = bpf_get_time(bpf, size - 1);
-      
-      if(time <= duration)
-	{
-	  time = duration;
-	  
-	  /* set jump for previous point */
-	  bpf->points[size - 1].slope = DBL_MAX;
-	}
-      else
+      /* Keeping trace of a marvelous optimization bug in VC++ compiler. Beats me! */
+      if(time > bpf->points[size - 1].time)
 	{
 	  /* set slope for previous point */
 	  bpf->points[size - 1].slope = 
 	    (value - bpf->points[size - 1].value) / 
 	    (time - bpf->points[size - 1].time);
 	}
-      
-      set_size(bpf, size + 1);
-
-      /* set point */
-      bpf->points[size].time = time;
-      bpf->points[size].value = value;
-      bpf->points[size].slope = 0.0;
+      else
+ 	{
+	  time = bpf->points[size - 1].time;
+	  
+	  /* set jump for previous point */
+	  bpf->points[size - 1].slope = DBL_MAX;
+	}
     }
-  else
-    {
-      set_size(bpf, 1);
-      
-      /* set point */
-      bpf->points[0].time = time;
-      bpf->points[0].value = value;
-      bpf->points[0].slope = 0.0;
-    }
+  
+  /* set point */
+  bpf->points[size].time = time;
+  bpf->points[size].value = value;
+  bpf->points[size].slope = 0.0;
 }
 
 void
@@ -157,14 +147,12 @@ void
 bpf_insert_point(bpf_t *bpf, double time, double value)
 {
   int size = bpf->size;
-  int i;
 
   if(time > bpf->points[size - 1].time)
     bpf_append_point(bpf, time, value);
   else
     {
       int i, j;
-      double dt;
 
       for(i=0; i<size; i++)
 	{
