@@ -415,7 +415,7 @@ public class JMaxApplication extends FtsClient {
   private void openConnection()
   {
     if (properties.get("jmaxConnection") == null)
-      properties.put("jmaxConnection", "pipe");
+      properties.put("jmaxConnection", "socket");
 
     try
       {
