@@ -333,12 +333,19 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      */
     
     public void objectChanged(Object spec) {}
-    public void objectAdded(Object spec, int index) {}
+    public void objectAdded(Object spec, int index) 
+    {
+	resizePanelToEventTime((TrackEvent)spec);	
+    }
     public void objectDeleted(Object whichObject, int index){}
     public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
     {
-	//controll if the object is in the actual scrollable area. if not extend the area
-	TrackEvent evt = (TrackEvent)whichObject;
+	resizePanelToEventTime((TrackEvent)whichObject);
+    }
+
+    //controll if the object is in the actual scrollable area. if not extend the area
+    private void resizePanelToEventTime(TrackEvent evt)
+    {
 	int evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
 	int maxVisibleTime = getMaximumVisibleTime();
 
@@ -353,8 +360,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    else
 		if(evtTime < -geometry.getXTransposition())
 		    itsTimeScrollbar.setValue(evtTime);
-    }
 
+    }
 
   ////////////////////////////////////////////////////////////
   public void Copy()
@@ -462,13 +469,16 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	if(eventTime<startTime)
 	    {
+		System.err.println("troppo piccino ");
 		itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
 		return false;//going to left
 	    }
 	else
 	    {
-		if(eventTime>endTime)
+		if(eventTime>endTime){
+		    System.err.println("troppo grande ");
 		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()+scrollingDelta);
+		}
 		return true;//going to rigth
 	    }
     }

@@ -120,32 +120,11 @@ public class AdderTool extends Tool implements PositionListener {
 	  // ends the undoable transition
 	  ((UndoableData) egc.getDataModel()).endUpdate();*/
 
-	/*requestEventCreation(egc.getTrack().getName(),
-	  (float)aEvent.getTime(), 
-	  value.getValueInfo().getName(), 
-	  value.getPropertyCount(), 
-	  value.getPropertyValues());*/
-
 	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
 							  value.getValueInfo().getName(), 
 							  value.getPropertyCount(), 
 							  value.getPropertyValues());
     }
-
-  /*private void requestEventCreation(String trackName, float time, String type, int nArgs, Object args[])
-    {
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-      
-    //////////////////////////////////////
-    sendArgs[0].setString(trackName); 
-    sendArgs[1].setFloat(time); 
-    sendArgs[2].setString(type);
-      
-    for(int i=0; i<nArgs; i++)
-    sendArgs[3+i].setValue(args[i]);
-
-    egc.getFtsSequenceObject().sendMessage(FtsObject.systemInlet, "event_new", 3+nArgs, sendArgs);
-    }*/
 
     void popupChoose(int x, int y, Track track)
     {
@@ -190,6 +169,14 @@ public class AdderTool extends Tool implements PositionListener {
 
   MidiMouseTracker itsMidiMouseTracker;
 }
+
+
+
+
+
+
+
+
 
 
 
