@@ -43,7 +43,7 @@ INSTALL_SETUID=$(INSTALL) -m 4755
 INSTALL_LIB=$(INSTALL) -m 755
 INSTALL_DIR=$(INSTALL) -d -m 755
 prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jmax
+doc_install_dir=$(prefix)/webdocs/jMax
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
@@ -57,7 +57,7 @@ INSTALL_SETUID=$(INSTALL) --mode=4755
 INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 prefix=/usr
-doc_install_dir=$(prefix)/doc/jmax-$(version)
+doc_install_dir=$(prefix)/doc/jMax-$(version)
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
