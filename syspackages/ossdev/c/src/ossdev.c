@@ -746,10 +746,12 @@ static void oss_adc_get( fts_word_t *argv)
 
 #define MIDI_BUFSIZE 256
 
+static fts_symbol_t fts_s_r, fts_s_w, fts_s_rw;
+
 static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
 {
   fts_symbol_t name, mode;
-  int open_flag;
+  int flags;
   fd_dev_data_t *p;
   int fd;
 
@@ -758,9 +760,16 @@ static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
 
   name = fts_get_symbol_by_name( ac, av, fts_new_symbol("device"), fts_new_symbol( "/dev/midi00"));
 
-  mode = fts_get_symbol_by_name( ac, av, fts_new_symbol("mode"), fts_new_symbol( "rw"));
-  
-  fd = open( fts_symbol_name( name), O_RDWR);
+  mode = fts_get_symbol_by_name( ac, av, fts_new_symbol("mode"), fts_s_rw);
+
+  if ( mode == fts_s_r)
+    flags = O_RDONLY;
+  else if ( mode == fts_s_w)
+    flags = O_WRONLY;
+  else
+    flags = O_RDWR;
+
+  fd = open( fts_symbol_name( name), flags);
 
   if (fd < 0)
     {
@@ -827,5 +836,9 @@ static void ossdev_init(void)
   oss_adc_init();
 
   oss_midi_init();
+
+  fts_s_r = fts_new_symbol( "r");
+  fts_s_w = fts_new_symbol( "w");
+  fts_s_rw = fts_new_symbol( "rw");
 }
 
