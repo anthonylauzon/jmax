@@ -1613,7 +1613,7 @@ fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
       if (fts_is_int(a))
 	fts_bmax_code_push_int(f, fts_get_int(a));
       else if (fts_is_float(a))
-	fts_bmax_code_push_float(f, fts_get_float(a));
+	fts_bmax_code_push_float(f, (float)fts_get_float(a));
       else if (fts_is_symbol(a))
 	fts_bmax_code_push_symbol(f, fts_get_symbol(a));
     }
@@ -1626,7 +1626,7 @@ fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a)
   if (fts_is_int(a))
     fts_bmax_code_set_int(f, fts_get_int(a));
   else if (fts_is_float(a))
-    fts_bmax_code_set_float(f, fts_get_float(a));
+    fts_bmax_code_set_float(f,(float)fts_get_float(a));
   else if (fts_is_symbol(a))
     fts_bmax_code_set_symbol(f, fts_get_symbol(a));
 }
