@@ -22,6 +22,8 @@
 
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
+#include "floatfuns.h"
+
 
 fts_symbol_t fmat_symbol = 0;
 fts_class_t *fmat_type = 0;
@@ -143,7 +145,7 @@ fmat_adapt_format(fmat_t *self)
 void
 fmat_reshape(fmat_t *self, int m, int n)
 {
-  int size, i;
+  int size;
   
   if(n <= 0)
     n = 1;
@@ -397,7 +399,7 @@ fmat_set_from_atoms(fmat_t *mat, int onset, int step, int ac, const fts_atom_t *
   for(i=0; i<ac; i++)
   {
     if(fts_is_number(at + i))
-      mat->values[onset + i * step] = fts_get_number_float(at + i);
+      mat->values[onset + i * step] = (float)fts_get_number_float(at + i);
     else
       mat->values[onset + i * step] = 0.0f;
   }
@@ -424,7 +426,7 @@ fmat_set_from_tuples(fmat_t *mat, int ac, const fts_atom_t *at)
         fts_atom_t *a = fts_tuple_get_element(tup, j);
 
         if(fts_is_number(a))
-          mat->values[i * n + j] = fts_get_number_float(a);
+          mat->values[i * n + j] = (float)fts_get_number_float(a);
         else
           mat->values[i * n + j] = 0.0;
       }
@@ -502,7 +504,7 @@ fmat_read_atom_file(fmat_t *fmat, fts_symbol_t file_name)
     if(j < n)
     {
       if(fts_is_number(&a))
-        fmat->values[i * n + j] = fts_get_number_float(&a);
+        fmat->values[i * n + j] = (float)fts_get_number_float(&a);
       else
         fmat->values[i * n + j] = 0.0;
 
@@ -659,7 +661,7 @@ fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac == 0)
   {
     if(fts_is_number(at))
-      fmat_set_const(self, fts_get_number_float(at));
+      fmat_set_const(self, (float)fts_get_number_float(at));
   }
   
 }
@@ -930,7 +932,7 @@ static void
 fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
@@ -965,7 +967,7 @@ static void
 fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
@@ -1000,7 +1002,7 @@ static void
 fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
@@ -1040,7 +1042,7 @@ static void
 fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
@@ -1075,7 +1077,7 @@ static void
 fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
@@ -1115,7 +1117,7 @@ static void
 fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
 
@@ -1160,20 +1162,20 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] == r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] == r[i * n + j]);
 }
 
 static void
 fmat_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] == r;
+    p[i] = (float)(p[i] == r);
 }
 
 static void
@@ -1195,20 +1197,20 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] != r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] != r[i * n + j]);
 }
 
 static void
 fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] != r;
+    p[i] = (float)(p[i] != r);
 }
 
 static void
@@ -1230,20 +1232,20 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] > r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] > r[i * n + j]);
 }
 
 static void
 fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] > r;
+    p[i] = (float)(p[i] > r);
 }
 
 static void
@@ -1265,20 +1267,20 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] >= r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] >= r[i * n + j]);
 }
 
 static void
 fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] >= r;
+    p[i] = (float)(p[i] >= r);
 }
 
 static void
@@ -1300,20 +1302,20 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] < r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] < r[i * n + j]);
 }
 
 static void
 fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] < r;
+    p[i] = (float)(p[i] < r);
 }
 
 static void
@@ -1335,20 +1337,20 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<m; i++)
     for(j=0; j<n; j++)
-      l[i * n + j] = l[i * n + j] <= r[i * n + j];
+      l[i * n + j] = (float)(l[i * n + j] <= r[i * n + j]);
 }
 
 static void
 fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = fmat_get_m(self) * fmat_get_n(self);
   float *p = fmat_get_ptr(self);
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = p[i] <= r;
+    p[i] = (float)(p[i] <= r);
 }
 
 static void
@@ -1540,7 +1542,7 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         float re = ptr[j];
         float im = ptr[j + 1];
       
-        ptr[i] = 0.5 * logf(re * re + im * im);
+        ptr[i] = (float)(0.5 * logf(re * re + im * im));
       }
       
       fmat_reshape(self, m, 1);
@@ -1583,8 +1585,8 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         float re = ptr[i];
         float im = ptr[i + 1];
       
-        ptr[i] = 0.5 * log(re * re + im * im);
-        ptr[i + 1] = atan2(im, re);
+        ptr[i]     = (float)(0.5 * log(re * re + im * im));
+        ptr[i + 1] = (float)atan2(im, re);
       }
       break;
     
@@ -1594,8 +1596,8 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         float re = logf(ptr[i]);
         float im = ptr[i + 1];
       
-        ptr[i] = sqrtf(re * re + im * im);
-        ptr[i + 1] = atan2(im, re);
+        ptr[i]     = sqrtf(re * re + im * im);
+        ptr[i + 1] = (float)atan2(im, re);
       }
       break;
     
@@ -1689,7 +1691,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       int size = fmat_get_m(self);
       unsigned int fft_size = fts_get_fft_size(size);
       complex *fft_ptr;
-      int i;
+      unsigned int i;
 
       fmat_reshape(self, fft_size, 2);
       fft_ptr = (complex *)fmat_get_ptr(self);
