@@ -95,6 +95,7 @@ static fts_symbol_t fts_s_bytestream = 0;
 
 fts_metaclass_t *fts_socketstream_type = 0;
 fts_metaclass_t *fts_pipestream_type = 0;
+fts_metaclass_t *fts_memorystream_type = 0;
 
 void fts_bytestream_init(fts_bytestream_t *stream)
 {
@@ -554,6 +555,77 @@ static fts_status_t fts_pipestream_instantiate(fts_class_t *cl, int ac, const ft
 
 /***********************************************************************
  *
+ * Memory bytestream
+ * (the object that implements a bidirectional byte stream over a TCP/IP socket) 
+ *
+ */
+
+typedef struct _fts_memorystream_t {
+  fts_bytestream_t bytestream;
+  fts_stack_t output_buffer;
+  int input_size;
+} fts_memorystream_t;
+
+static void fts_memorystream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
+{
+  fts_memorystream_t *this = (fts_memorystream_t *) stream;
+  int i;
+
+  for ( i = 0; i < n; i++)
+    fts_stack_push( &this->output_buffer, unsigned char, c[i]);
+}
+
+static void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c)
+{
+  fts_memorystream_output(stream, 1, &c);
+}
+
+static void fts_memorystream_flush(fts_bytestream_t *stream)
+{
+}
+
+static void fts_memorystream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_memorystream_t *this = (fts_memorystream_t *) o;
+
+  fts_bytestream_init((fts_bytestream_t *) this);
+
+  fts_bytestream_set_output((fts_bytestream_t *) this, 
+			    fts_memorystream_output,
+			    fts_memorystream_output_char,
+			    fts_memorystream_flush);
+  
+  fts_stack_init( &this->output_buffer, unsigned char);
+}
+
+static void fts_memorystream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_memorystream_t *this = (fts_memorystream_t *) o;
+
+  fts_bytestream_destroy((fts_bytestream_t *) this);
+
+  fts_stack_destroy( &this->output_buffer);
+}
+
+static fts_status_t fts_memorystream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_memorystream_t), 0, 0, 0);
+
+  fts_bytestream_class_init(cl);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_memorystream_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_memorystream_delete);
+
+  return fts_Success;
+}
+
+unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)
+{
+  return (unsigned char *)fts_stack_get_base( &((fts_memorystream_t *)stream)->output_buffer);
+}
+
+/***********************************************************************
+ *
  * Initialization
  *
  */
@@ -565,5 +637,6 @@ void fts_bytestream_config( void)
 
   fts_socketstream_type = fts_class_install(fts_new_symbol("socketstream"), fts_socketstream_instantiate);
   fts_pipestream_type = fts_class_install(fts_new_symbol("pipestream"), fts_pipestream_instantiate);
+  fts_memorystream_type = fts_class_install(fts_new_symbol("memorystream"), fts_memorystream_instantiate);
 }
 

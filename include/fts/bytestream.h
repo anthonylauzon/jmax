@@ -57,10 +57,6 @@
  * @defgroup bytestream byte stream
  */
 
-/* system byte stream implementation */
-FTS_API fts_metaclass_t *fts_socketstream_type;
-FTS_API fts_metaclass_t *fts_pipestream_type;
-
 typedef struct fts_bytestream fts_bytestream_t;
 
 /**
@@ -391,4 +387,10 @@ FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 #define fts_bytestream_output(s, n, c) ((s)->output((s), (n), (c)))
 #define fts_bytestream_output_char(s, c) ((s)->output_char((s), (c)))
 #define fts_bytestream_flush(s) {if((s)->flush) (s)->flush(s);}
+
+
+/* system byte stream implementation */
+FTS_API fts_metaclass_t *fts_socketstream_type;
+FTS_API fts_metaclass_t *fts_pipestream_type;
+FTS_API fts_metaclass_t *fts_memorystream_type;
 

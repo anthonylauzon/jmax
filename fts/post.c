@@ -186,6 +186,106 @@ void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
   fts_bytestream_flush( stream);
 }
 
+
+static int check_symbol_in( fts_atom_t *p, fts_symbol_t *symbols)
+{
+  int i;
+
+  if ( !fts_is_symbol( p))
+    return 0;
+
+  for ( i = 0; symbols[i]; i++)
+    if ( symbols[i] == fts_get_symbol( p))
+      return 1;
+
+  return 0;
+}
+
+static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^", ">>", ">", "<<", "<=", "<", "?", "::", ":", 0 };
+static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", 0};
+static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "::", ":", "^", ";", 0 };
+static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", 0 };
+
+#define want_a_space_before(value) check_symbol_in( value, want_a_space_before_symbols)
+#define dont_want_a_space_before(value) check_symbol_in( value, dont_want_a_space_before_symbols)
+#define want_a_space_after(value) check_symbol_in( value, want_a_space_after_symbols)
+#define dont_want_a_space_after(value) check_symbol_in( value, dont_want_a_space_after_symbols)
+
+static void init_punctuation( void)
+{
+  int i, j;
+  fts_symbol_t *p, *tab[] = { want_a_space_before_symbols, dont_want_a_space_before_symbols, want_a_space_after_symbols, dont_want_a_space_after_symbols};
+
+  for ( i = 0; i < sizeof( tab)/sizeof( fts_symbol_t *); i++)
+    for ( j = 0, p = tab[i]; *p; p++)
+      *p = fts_new_symbol( *p);
+}
+
+void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
+{
+  int ac;
+  fts_atom_t *at;
+  int do_new_line = 0;
+  int add_blank = 0;
+  fts_atom_t *value1;
+  fts_atom_t *value2;
+  int i;
+
+  ac = fts_object_get_description_size( obj);
+  at = fts_object_get_description_atoms( obj);
+
+  if (ac == 0)
+    return;
+  
+  value2 = at;
+  value1 = value2;
+  i = 1;
+
+  while (value1)
+    {
+      if (do_new_line)
+	fts_spost( stream, "\n"); 
+      else if ( add_blank)
+	fts_spost( stream, " ");
+
+      do_new_line = 0;
+
+      if (i >= ac)
+	value2 = 0;
+      else
+	value2 = at + i;
+
+      if ( fts_is_int( value1))
+	fts_spost( stream, "%d", fts_get_int( value1));
+      else if ( fts_is_float( value1))
+	fts_spost( stream, "%g", fts_get_float( value1));
+      else if ( fts_is_symbol( value1))
+	fts_spost( stream, "%s", fts_get_symbol( value1));
+      else
+	fts_spost( stream, "??");
+
+      /* decide to put or not a blank between the two */
+      if (want_a_space_after( value1))
+	add_blank = 1;
+      else if (dont_want_a_space_after( value1))
+	add_blank = 0;
+      else if (value2)
+	{
+	  if (want_a_space_before( value2))
+	    add_blank = 1;
+	  else if (dont_want_a_space_before( value2))
+	    add_blank = 0;
+	  else
+	    add_blank = 1;	// if no body care, do a blank
+	}
+
+      value1 = value2;
+      i++;
+    }
+
+  fts_bytestream_flush( stream);
+}
+
 /***********************************************************************
  *
  * Compatibility
@@ -381,5 +481,16 @@ void fts_set_default_console_stream( fts_bytestream_t *stream)
       fts_bytestream_output( stream, fts_stack_get_top( post_stack), fts_stack_get_base( post_stack));
       fts_bytestream_flush( stream);
     }
+}
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_post_init( void)
+{
+  init_punctuation();
 }
 
