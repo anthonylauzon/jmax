@@ -577,7 +577,8 @@ public class TablePanel extends JPanel implements ToolProvider, ToolListener, St
 	path  = MaxApplication.getPackageHandler().locatePackage("table").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-      System.err.println("Couldn't locate table images");
+	//System.err.println("Couldn't locate table images");
+	path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;
     }
     //String path1 = MaxApplication.getProperty("root")+fs+"packages/table/images"+fs;
     //String path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;

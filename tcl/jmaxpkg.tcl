@@ -80,9 +80,6 @@ proc jmaxPkgUnknown {name version {exact {}}} {
 	set packageDir [file join [lindex $jmaxPkgPath $i] $name]
 	set file [file join $packageDir $name.jpk ]
 
-	#qui bisognerebbe registrare da qualche parte nomePkg/packageDir 
-	setSystemProperty "$name\PackageDir" $packageDir
-
 	if {[file exists $file]} then {
 
 	    if [catch {sourceFile $file} msg] {
@@ -92,6 +89,7 @@ proc jmaxPkgUnknown {name version {exact {}}} {
 		tclLog "error reading jMax package $file: $msg"
 		return ""
 	    } else {
+		setSystemProperty "$name\PackageDir" $packageDir
 		set package_loaded "yes"
 	    }
         }
@@ -113,6 +111,7 @@ proc jmaxPkgUnknown {name version {exact {}}} {
 		tclLog "error reading system jMax package $file: $msg"
 		return;
 	    } else {
+		setSystemProperty "$name\PackageDir" $packageDir
 		set package_loaded "yes"
 	    }
         }
