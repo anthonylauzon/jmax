@@ -38,29 +38,7 @@ public class FtsAtomList extends FtsRemoteData
 
   public String getValuesAsText()
   {
-    StringBuffer buffer = new StringBuffer();
-    boolean addBlank = false ;
-
-    for (int i = 0; i < values.size(); i++)
-      {
-	Object element = values.elementAt(i);
-	int n;
-
-	if (addBlank)
-	  buffer.append(" ");
-	else
-	  addBlank = true;
-
-	buffer.append(element.toString());
-
-	if (element.equals(";"))
-	  {
-	    buffer.append("\n");
-	    addBlank = false;
-	  }
-      }
-
-    return buffer.toString();
+    return FtsParse.unparseDescription(values);
   }
 
   /** Set the list as text */

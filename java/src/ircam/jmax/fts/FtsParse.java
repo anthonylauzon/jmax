@@ -969,6 +969,96 @@ public class FtsParse
 
     return descr.toString();
   }
+
+  // Unparse a description passed as a vector of values
+  // Used by atom list, available as a service for anybody.
+
+  static String unparseDescription(MaxVector values)
+  {
+    boolean doNewLine = false;
+    boolean addBlank = false;
+    boolean noNewLine = false;
+    Object value1 = null;
+    Object value2 = null;
+
+    Enumeration en = values.elements();
+    StringBuffer descr = new StringBuffer();
+
+    value2 = en.nextElement();
+    value1 = value2;
+
+    while (value1 != null)
+      {
+	if (doNewLine)
+	  descr.append("\n");
+	else if (addBlank)
+	  descr.append(" ");
+
+	doNewLine = false;
+
+	if (! en.hasMoreElements())
+	  value2 = null;
+	else
+	  value2 = en.nextElement();
+
+	if (value1 instanceof Float)
+	  descr.append(numberFormat.format(value1));
+	else if (value1 instanceof Integer)
+	  descr.append(value1);
+	else if (value1 instanceof String)
+	  {
+	    /* Lexical quoting check */
+
+	    if (isAnInt((String) value1) || 
+		isAFloat((String) value1) ||
+		((! isAKeyword((String) value1)) &&
+		includeStartToken((String) value1)))
+	      {
+		descr.append("\"");
+		descr.append(value1);
+		descr.append("\"");
+	      }
+	    else
+	      descr.append(value1);
+
+	    if (value1.equals("'"))
+	      noNewLine = true;
+	    else if (value1.equals(";"))
+	      {
+		if (noNewLine)
+		  noNewLine = false;
+		else
+		  doNewLine = true;
+	      }
+	    else
+	      noNewLine = false;
+	  }
+	else
+	  descr.append(value1);
+
+	/* decide to put or not a blank between the two */
+
+	if (wantASpaceAfter(value1))
+	  addBlank = true;
+	else if (dontWantASpaceAfter(value1))
+	  addBlank = false;
+	else if (value2 != null)
+	  {
+	    if (wantASpaceBefore(value2))
+	      addBlank = true;
+	    else if (dontWantASpaceBefore(value2))
+	      addBlank = false;
+	    else
+	      addBlank = true;	// if no body care, do a blank
+	  }
+
+	value1 = value2;
+      }
+
+    return descr.toString();
+  }
+
+
 }
 
 
