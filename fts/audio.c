@@ -46,10 +46,6 @@
 
 static fts_audioport_t *audioport_list = 0;
 
-static fts_symbol_t s_open_input;
-static fts_symbol_t s_open_output;
-static fts_symbol_t s_close_input;
-static fts_symbol_t s_close_output;
 
 void
 fts_audioport_init( fts_audioport_t *port)
@@ -124,7 +120,7 @@ void
 fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
   fts_audiolabel_t **p = lookup_label( port, direction, label);
-  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? s_open_input : s_open_output;
+  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_open_input : fts_s_open_output;
 
   if (!*p)
     {
@@ -136,7 +132,9 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
       /* Increment labels count and call "open" method if count becomes 1 */
       port->inout[direction].nlabels++;
       if (port->inout[direction].nlabels == 1)
+      {
 	fts_send_message( (fts_object_t *)port, selector, 0, 0);
+      }
     }
 }
 
@@ -144,7 +142,7 @@ void
 fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
   fts_audiolabel_t **p = lookup_label( port, direction, label);
-  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? s_close_input : s_close_output;
+  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_close_input : fts_s_close_output;
 
   if (*p)
     {
@@ -589,10 +587,6 @@ void fts_audio_idle( void)
 
 void fts_audio_config( void)
 {
-  s_open_input = fts_new_symbol( "open_input");
-  s_open_output = fts_new_symbol( "open_output");
-  s_close_input = fts_new_symbol( "close_input");
-  s_close_output = fts_new_symbol( "close_output");
 
   audiolabel_listeners_heap = fts_heap_new( sizeof( audiolabel_listener_t));
 
