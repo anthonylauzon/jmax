@@ -525,7 +525,7 @@ static void oss_dac_put(fts_word_t *argv)
 
 	  in = (float *) fts_word_get_ptr( argv + 3 + channel);
 
-	  j = 0;
+	  j = channel;
 	  for ( i = 0; i < n; i++)
 	    {
 	      aud->dac_fmtbuf[j] = (short) ( 32767.0f * in[i]);
@@ -658,7 +658,7 @@ static void oss_adc_get( fts_word_t *argv)
 
 	  out = (float *) fts_word_get_ptr( argv + 3 + channel);
 
-	  j = 0;
+	  j = channel;
 	  for ( i = 0; i < n; i++)
 	    {
 	      out[i] = (float)aud->adc_fmtbuf[j] / 32767.0f;
