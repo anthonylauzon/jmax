@@ -1,0 +1,67 @@
+//
+// jMax
+// Copyright (C) 1999 by IRCAM
+// 
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// See file LICENSE for further informations on licensing terms.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
+
+package ircam.jmax.script.tcl;
+import ircam.jmax.mda.*;
+
+
+/**
+ * Class defining the an executable tcl document.
+ */
+
+public class MaxTclExecutedDocumentType extends MaxDocumentType
+{
+  public MaxTclExecutedDocumentType()
+  {
+    super(".tcl");
+    setPrettyName("Tcl");
+  }
+
+  /** Tcl executed documents are not editable */
+
+  public boolean isEditable()
+  {
+    return false;
+  }
+
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
+
+  public MaxDocument newDocument(MaxContext ignore)
+  {
+    return null;
+  }
+
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
+
+  public boolean canMakeNewDocument(MaxContext ignore)
+  {
+    return false;
+  }
+}
+
+
+
+
+
