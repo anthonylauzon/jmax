@@ -76,3 +76,9 @@ mrproper: maintainer-clean
 	-rm -f ltconfig ltmain.sh
 	-rm -f missing mkinstalldirs 
 
+
+### documentation
+doc-dummy:
+
+doc: doc-dummy
+	$(MAKE) -C doc doc
