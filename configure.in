@@ -38,7 +38,8 @@ AC_PROG_INSTALL
 
 dnl Check for libtool
 AC_LIBTOOL_DLOPEN
-AM_PROG_LIBTOOL
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m, sin)
@@ -208,6 +209,8 @@ include/ftsprivate/Makefile
 bin/Makefile
 bin/jmax
 config/Makefile
+doc/Makefile
+doc/images/Makefile
 images/Makefile
 help/Makefile
 tutorials/Makefile
