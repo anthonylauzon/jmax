@@ -161,18 +161,37 @@ void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
     }
 }
 
+#define SIZE_BITS 6
+#define SIZE_RANGE (1 << 6)
 
+/*
+In the Max ISPW .pat format the font size is saved like an index (from 0 to 7) of a vector containing sizes from 9 to 24.
+In the actual Max .pat format the Mac font Id and the font size are saved together like a long integer. There is only a 
+little set of Mac Fonts with a fixed Id, the others Id are platform dependents and the conversion
+Id -->font_name is possible only with a systen_call on Mac Systems. So for the moment we are using font size only.    
+ */
 static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
 {
   int i;
+  int font_id, font_size;
  
   fts_patlex_next_token(in);
 
   i = fts_get_int(&(in->val));
-  if ( i < 0 || i >= FONTINDEXTABLE_SIZE)
-    i = 2;
 
-  fts_set_int(&(this->fontSize), fontIndexTable[i]);
+  if(i >= FONTINDEXTABLE_SIZE)
+    {
+      font_id = i >> SIZE_BITS;
+      font_size = i & (SIZE_RANGE - 1);
+      fts_set_int(&(this->fontSize), font_size);
+    }
+  else
+    {
+      if ( i < 0 )
+	i = 2;
+    
+      fts_set_int(&(this->fontSize), fontIndexTable[i]);
+    }
 }
 
 static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
@@ -229,13 +248,9 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
       fts_object_t *patcher;
 
       fts_set_symbol(&description[0], fts_s_patcher);
-
       patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
-
       fts_patparse_parse_patlex(patcher, in);
-
       fts_patlex_close(in);
-
       fts_patcher_reassign_inlets_outlets((fts_patcher_t *) patcher);
 
       /* activate the post-load init, like loadbangs */
@@ -429,7 +444,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	  else if (token_sym_equals(in, fts_s_pop))
 	    {
 	      fts_patlex_next_token(in);	/* skip ';' */
-		    
+	      
 	      if  (in->ttype != FTS_LEX_EOC)
 		{
 		  /* the open patcher flag has been specified */
@@ -442,7 +457,6 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	  else
 	    {
 	      /* Otherwise, we are parsing an object */
-
 	      fts_patparse_parse_object(parent, in, lastNObject, lastNObjectType);
 	      lastNObject = 0;
 	      lastNObjectType = 0;
@@ -473,6 +487,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	}
       else if (token_sym_equals(in, fts_s_diesX))
 	{
+
 	  if (lastNObjectType == fts_s_qlist)
 	    {
 	      int argc;
