@@ -53,10 +53,10 @@ static fts_status_description_t operand_type_mismatch_error_description = {
 };
 static fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
 
-static fts_status_description_t array_access_error_error_description = {
+static fts_status_description_t array_access_error_description = {
   "Array access error"
 };
-static fts_status_t array_access_error_error = &array_access_error_error_description;
+static fts_status_t array_access_error = &array_access_error_description;
 
 static fts_status_description_t invalid_environment_variable_error_description = {
   "Invalid environment variable"
@@ -403,6 +403,33 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     break;
 
+  case TK_SQPAR:
+    expression_stack_push_frame( exp);
+
+    if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+
+    ac = expression_stack_frame_count( exp);
+    at = expression_stack_frame( exp);
+
+    if (!fts_is_object( at))
+      return operand_type_mismatch_error;
+
+    {
+      fts_method_t mth = fts_class_get_method( fts_get_class( at), fts_s_get_element);
+      if (mth)
+	(*mth)( fts_get_object( at), fts_system_inlet, fts_s_get_element, ac-1, at+1);
+      else
+	return array_access_error;
+    }
+
+    expression_stack_pop_frame( exp);
+    expression_stack_push( exp, fts_get_return_value());
+
+    break;
+
   case TK_TUPLE:
     if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
@@ -423,7 +450,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     else
       {
 	fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
-	fts_symbol_t class_name = fts_get_symbol( &tree->right->value);
+	fts_symbol_t class_name = fts_get_symbol( &tree->value);
 	fts_class_t *cl = fts_class_get_by_name( package_name, class_name);
 
 	if ( !cl)
