@@ -424,7 +424,6 @@ FTS_API fts_class_t *fts_string_class;
 /**
  * Checks if atoms are strictly equals (type and value)
  *
- * @fn int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2))
  * @param p1 pointer to atom
  * @param p2 pointer to atom
  * @return 1 if atoms are equals, 0 if not
@@ -435,7 +434,6 @@ FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 /**
  * Compares atoms of number, symbol, and objects (pointer!)
  *
- * @fn int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2))
  * @param p1 pointer to atom
  * @param p2 pointer to atom
  * @return 1 if atoms are equal, 0 if not

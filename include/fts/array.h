@@ -211,7 +211,6 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 /**
  * Get the number of elements in an array
  * 
- * @fn int fts_array_get_size( fts_array_t *array)
  * @param array the array
  * @return the size of the array
  * @ingroup array

@@ -59,10 +59,12 @@ typedef struct _fts_fifo_t {
   int size;
 } fts_fifo_t;
 
+/*@}*/
+
 #define fts_fifo_get_buffer(f) ((f)->buffer)
 #define fts_fifo_set_buffer(f, b) ((f)->buffer = (b))
 
-/*@}*/
+
 
 /**
  * Initializes a fifo

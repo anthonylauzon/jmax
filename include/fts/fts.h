@@ -121,6 +121,7 @@ extern "C" {
 #include <fts/client.h>
 #include <fts/update.h>
 
+#include <fts/binaryprotocol.h>
 
 /*
  * FTS version 

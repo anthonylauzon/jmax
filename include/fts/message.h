@@ -35,7 +35,7 @@
  *   fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, NULL, ac, at);
  * @endcode
  *
- * @defgroup mess_class
+ * @defgroup mess_class message class
  */
 FTS_API fts_class_t *fts_message_class;
 
@@ -111,7 +111,7 @@ FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_a
  * The message dumper is an abstraction permitting objects to dump their state in form of messages in any context (file saving, protocols, etc.).
  * The current dumper structure includes a message which can be re-used for dumping. 
  *
- * @defgroup mess_dumper
+ * @defgroup mess_dumper message dumper
  */
 
 typedef struct fts_dumper
@@ -234,7 +234,7 @@ FTS_API fts_object_t *fts_objstack[];
 /**
  * Method invokation, message sending and outlet API.
  *
- * @defgroup mess_api
+ * @defgroup mess_api method invokation, message sending and outlet API
  */
 
 /**
