@@ -1,5 +1,5 @@
 # SUBDIRS= api arch HOWTO images
-SUBDIRS= images
+SUBDIRS= images api
 
 htmldir=$(pkgdatadir)/doc
 
@@ -21,3 +21,7 @@ server-kernel-api.html
 
 
 EXTRA_DIST=$(html_DATA)
+
+doc:
+	$(MAKE) -C api doc
+
