@@ -32,6 +32,7 @@
 
 
 static char l_appName[1024];
+static char l_vendorName[1024];
 
 /***********************************************************************
  * 
@@ -89,6 +90,18 @@ static void fts_cmd_args_parse( int argc, char **argv, int pass)
 
             if(pass==1) {
                 strcpy(l_appName, *argv);
+            }
+        }
+        // special hard coded arguments
+        else if (!strcmp( *argv, "-vendorname"))
+        {
+            argv++;
+            argc--;
+            if(!argc)
+                break;
+
+            if(pass==1) {
+                strcpy(l_vendorName, *argv);
             }
         }
         
@@ -333,6 +346,7 @@ void fts_init( int argc, char **argv)
   char cmdline[2048];
 
   strcpy(l_appName, "fts");
+  strcpy(l_vendorName, "Ircam");
 
   /* PREPARING further log of command line args */
   strcpy(cmdline, "");
@@ -346,7 +360,7 @@ void fts_init( int argc, char **argv)
   fts_cmd_args_parse(argc, argv, 1);
 
   /* config.c initialization */
-  fts_config_init(l_appName, fts_log);
+  fts_config_init(l_vendorName, l_appName, fts_log);
 
   /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
   /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
@@ -367,7 +381,7 @@ void fts_init( int argc, char **argv)
   fts_log("[fts]: Parsing command line arguments:\n");
 
   /* 2nd pass */
-  fts_cmd_args_parse( argc, argv, 2);
+  fts_cmd_args_parse(argc, argv, 2);
 
   /* Logging command line */
   fts_log("[fts]: FTS Command line (rebuilt from argc/argv): '%s'\n", cmdline);
