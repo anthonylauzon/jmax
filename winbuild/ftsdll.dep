@@ -141,7 +141,6 @@
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\connection.h"\
-	"..\include\ftsprivate\oldftsdata.h"\
 	
 
 ..\fts\atomfile.c : \
@@ -431,7 +430,9 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\client.h"\
 	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\patcher.h"\
 	
 
 ..\fts\clipboard.c : \
@@ -780,6 +781,7 @@
 	"..\include\ftsprivate\expression.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\symbol.h"\
+	"..\include\ftsprivate\variable.h"\
 	
 
 ..\fts\file.c : \
@@ -1110,6 +1112,7 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\inout.h"\
 	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\variable.h"\
 	
 
 ..\fts\list.c : \
@@ -1439,6 +1442,7 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\abstraction.h"\
 	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\client.h"\
 	"..\include\ftsprivate\connection.h"\
 	"..\include\ftsprivate\doctor.h"\
 	"..\include\ftsprivate\errobj.h"\
@@ -1648,110 +1652,12 @@
 	"..\include\ftsprivate\object.h"\
 	"..\include\ftsprivate\objtable.h"\
 	"..\include\ftsprivate\oldclient.h"\
-	"..\include\ftsprivate\oldftsdata.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\patparser.h"\
 	"..\include\ftsprivate\platform.h"\
 	"..\include\ftsprivate\saver.h"\
 	"..\include\ftsprivate\symbol.h"\
 	"..\include\ftsprivate\template.h"\
-	
-
-..\fts\OLDftsdata.c : \
-	"..\include\fts\array.h"\
-	"..\include\fts\atom.h"\
-	"..\include\fts\atomfile.h"\
-	"..\include\fts\audio.h"\
-	"..\include\fts\bytestream.h"\
-	"..\include\fts\class.h"\
-	"..\include\fts\client.h"\
-	"..\include\fts\connection.h"\
-	"..\include\fts\doctor.h"\
-	"..\include\fts\dsp.h"\
-	"..\include\fts\errobj.h"\
-	"..\include\fts\expression.h"\
-	"..\include\fts\file.h"\
-	"..\include\fts\fpe.h"\
-	"..\include\fts\ftl.h"\
-	"..\include\fts\ftlmem.h"\
-	"..\include\fts\fts.h"\
-	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
-	"..\include\fts\iterator.h"\
-	"..\include\fts\mem.h"\
-	"..\include\fts\message.h"\
-	"..\include\fts\midi.h"\
-	"..\include\fts\midifile.h"\
-	"..\include\fts\object.h"\
-	"..\include\fts\objectlist.h"\
-	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
-	"..\include\fts\package.h"\
-	"..\include\fts\param.h"\
-	"..\include\fts\patcher.h"\
-	"..\include\fts\post.h"\
-	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\project.h"\
-	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
-	"..\include\fts\sched.h"\
-	"..\include\fts\soundfile.h"\
-	"..\include\fts\stack.h"\
-	"..\include\fts\status.h"\
-	"..\include\fts\symbol.h"\
-	"..\include\fts\variable.h"\
-	"..\include\fts\word.h"\
-	"..\include\ftsprivate\oldclient.h"\
-	"..\include\ftsprivate\oldftsdata.h"\
-	
-
-..\fts\OLDpatcherdata.c : \
-	"..\include\fts\array.h"\
-	"..\include\fts\atom.h"\
-	"..\include\fts\atomfile.h"\
-	"..\include\fts\audio.h"\
-	"..\include\fts\bytestream.h"\
-	"..\include\fts\class.h"\
-	"..\include\fts\client.h"\
-	"..\include\fts\connection.h"\
-	"..\include\fts\doctor.h"\
-	"..\include\fts\dsp.h"\
-	"..\include\fts\errobj.h"\
-	"..\include\fts\expression.h"\
-	"..\include\fts\file.h"\
-	"..\include\fts\fpe.h"\
-	"..\include\fts\ftl.h"\
-	"..\include\fts\ftlmem.h"\
-	"..\include\fts\fts.h"\
-	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
-	"..\include\fts\iterator.h"\
-	"..\include\fts\mem.h"\
-	"..\include\fts\message.h"\
-	"..\include\fts\midi.h"\
-	"..\include\fts\midifile.h"\
-	"..\include\fts\object.h"\
-	"..\include\fts\objectlist.h"\
-	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
-	"..\include\fts\package.h"\
-	"..\include\fts\param.h"\
-	"..\include\fts\patcher.h"\
-	"..\include\fts\post.h"\
-	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\project.h"\
-	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
-	"..\include\fts\sched.h"\
-	"..\include\fts\soundfile.h"\
-	"..\include\fts\stack.h"\
-	"..\include\fts\status.h"\
-	"..\include\fts\symbol.h"\
-	"..\include\fts\variable.h"\
-	"..\include\fts\word.h"\
-	"..\include\ftsprivate\oldclient.h"\
-	"..\include\ftsprivate\oldftsdata.h"\
-	"..\include\ftsprivate\oldpatcherdata.h"\
 	
 
 ..\fts\package.c : \
@@ -1908,8 +1814,8 @@
 	"..\include\ftsprivate\inout.h"\
 	"..\include\ftsprivate\loader.h"\
 	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\objtable.h"\
 	"..\include\ftsprivate\oldclient.h"\
-	"..\include\ftsprivate\oldpatcherdata.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\template.h"\
 	"..\include\ftsprivate\variable.h"\
@@ -2008,6 +1914,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
 	"..\include\ftsprivate\oldclient.h"\
 	
 
@@ -2589,6 +2497,7 @@
 	"..\include\ftsprivate\object.h"\
 	"..\include\ftsprivate\package.h"\
 	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\template.h"\
 	"..\include\ftsprivate\vm.h"\
 	
 

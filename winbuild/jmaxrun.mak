@@ -31,35 +31,32 @@ RSC=rc.exe
 
 !IF  "$(CFG)" == "jmaxrun - Win32 Release"
 
-OUTDIR=.\Release
-INTDIR=.\Release
-# Begin Custom Macros
-OutDir=.\Release
-# End Custom Macros
+OUTDIR=.\jMaxRunRelease
+INTDIR=.\jMaxRunRelease
 
-ALL : "$(OUTDIR)\jmaxrun.exe"
+ALL : "..\bin\jmax.exe"
 
 
 CLEAN :
 	-@erase "$(INTDIR)\jmax.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(OUTDIR)\jmaxrun.exe"
+	-@erase "..\bin\jmax.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "C:\Program Files\IBM\Java13\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\jmaxrun.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\jmaxrun.pdb" /machine:I386 /out:"$(OUTDIR)\jmaxrun.exe" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\jmax.pdb" /machine:I386 /out:"..\bin\jmax.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\jmax.obj"
 
-"$(OUTDIR)\jmaxrun.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"..\bin\jmax.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -83,7 +80,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "C:\Program Files\IBM\Java13\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_JMAX_MAIN" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "C:\Program Files\IBM\Java13\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\jmaxrun.bsc" 

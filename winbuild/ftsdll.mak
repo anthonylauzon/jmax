@@ -34,7 +34,7 @@ RSC=rc.exe
 OUTDIR=.\..\fts\lib
 INTDIR=.\Release
 
-ALL : ".\Release\fts.dll"
+ALL : "..\bin\fts.dll"
 
 
 CLEAN :
@@ -72,8 +72,6 @@ CLEAN :
 	-@erase "$(INTDIR)\objectset.obj"
 	-@erase "$(INTDIR)\objtable.obj"
 	-@erase "$(INTDIR)\OLDclient.obj"
-	-@erase "$(INTDIR)\OLDftsdata.obj"
-	-@erase "$(INTDIR)\OLDpatcherdata.obj"
 	-@erase "$(INTDIR)\package.obj"
 	-@erase "$(INTDIR)\param.obj"
 	-@erase "$(INTDIR)\patcher.obj"
@@ -99,7 +97,7 @@ CLEAN :
 	-@erase "$(INTDIR)\win32.obj"
 	-@erase "$(OUTDIR)\fts.exp"
 	-@erase "$(OUTDIR)\fts.lib"
-	-@erase ".\Release\fts.dll"
+	-@erase "..\bin\fts.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -114,7 +112,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"Release/fts.dll" /implib:"$(OUTDIR)\fts.lib" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"..\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\abstraction.obj" \
 	"$(INTDIR)\array.obj" \
@@ -150,8 +148,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\objectset.obj" \
 	"$(INTDIR)\objtable.obj" \
 	"$(INTDIR)\OLDclient.obj" \
-	"$(INTDIR)\OLDftsdata.obj" \
-	"$(INTDIR)\OLDpatcherdata.obj" \
 	"$(INTDIR)\package.obj" \
 	"$(INTDIR)\param.obj" \
 	"$(INTDIR)\patcher.obj" \
@@ -175,7 +171,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\vm.obj" \
 	"$(INTDIR)\win32.obj"
 
-".\Release\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -223,8 +219,6 @@ CLEAN :
 	-@erase "$(INTDIR)\objectset.obj"
 	-@erase "$(INTDIR)\objtable.obj"
 	-@erase "$(INTDIR)\OLDclient.obj"
-	-@erase "$(INTDIR)\OLDftsdata.obj"
-	-@erase "$(INTDIR)\OLDpatcherdata.obj"
 	-@erase "$(INTDIR)\package.obj"
 	-@erase "$(INTDIR)\param.obj"
 	-@erase "$(INTDIR)\patcher.obj"
@@ -304,8 +298,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\objectset.obj" \
 	"$(INTDIR)\objtable.obj" \
 	"$(INTDIR)\OLDclient.obj" \
-	"$(INTDIR)\OLDftsdata.obj" \
-	"$(INTDIR)\OLDpatcherdata.obj" \
 	"$(INTDIR)\package.obj" \
 	"$(INTDIR)\param.obj" \
 	"$(INTDIR)\patcher.obj" \
@@ -578,18 +570,6 @@ SOURCE=..\fts\objtable.c
 SOURCE=..\fts\OLDclient.c
 
 "$(INTDIR)\OLDclient.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\OLDftsdata.c
-
-"$(INTDIR)\OLDftsdata.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\OLDpatcherdata.c
-
-"$(INTDIR)\OLDpatcherdata.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

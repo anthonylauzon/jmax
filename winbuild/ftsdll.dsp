@@ -225,14 +225,6 @@ SOURCE=..\fts\OLDclient.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\OLDftsdata.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\OLDpatcherdata.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\package.c
 # End Source File
 # Begin Source File
