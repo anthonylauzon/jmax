@@ -33,6 +33,7 @@
 
 #elif defined(LINUX)		/* Linux/gnu (gcc) standard basic platform */
 
+#define HAS_DL
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
@@ -46,6 +47,7 @@
 
 #elif defined(SGI)
 
+#define HAS_DTD			/* direct to disk support */
 #define HAS_DL
 #define HI_OPT			/* hyper experimental optimizations */
 #define HAS_TIME_OF_THE_DAY

@@ -111,7 +111,6 @@ static fts_status_description_t  module_loaded = { "Module already loaded."};
 static fts_status_description_t  library_not_found = { "Library Not Found."};
 static fts_status_description_t  error_loading = { "Error loading module."};
 static fts_status_description_t  module_not_found = { "Module Not Found."};
-static fts_status_description_t  dynamic_load_not_supported  = { "Dynamic Load Not Supported."};
 
 /* for architecuture with dynamic loading, load the module;
    the module variable name *must* be called <name>_module;
@@ -197,7 +196,7 @@ fts_module_load(const char *name, const char *filename)
 
   if (! module)
     {
-      perror("Looking for the module");
+      fprintf(stderr, "Looking for module: %s\n",dlerror());
       return &module_not_found;
     }
 

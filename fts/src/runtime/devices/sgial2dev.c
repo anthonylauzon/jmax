@@ -147,6 +147,7 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
   int deviceId;
   int ret;
+  fts_symbol_t sym;
   sgi_dac_data_t *dev_data;
 
   fts_atom_t local_args[10];
@@ -239,16 +240,21 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  and setting: device name */
 
-  dev_data->name = fts_symbol_name(fts_get_symbol_by_name(nargs, args, fts_new_symbol("ALdevice"), fts_new_symbol(" ")));
-
-  deviceId = alGetResourceByName(AL_SYSTEM, (char *)dev_data->name, AL_DEVICE_TYPE);
-
-  if (! deviceId)
+  sym = fts_get_symbol_by_name(nargs, args, fts_new_symbol("ALdevice"), 0);
+  
+  if (sym)
     {
-      return &fts_dev_invalid_value_error;/* error: invalid argument for parameter */
-    }
+      dev_data->name = fts_symbol_name(sym);
 
-  alSetDevice(dev_data->config, deviceId);
+      deviceId = alGetResourceByName(AL_SYSTEM, (char *)dev_data->name, AL_DEVICE_TYPE);
+
+      if (! deviceId)
+	{
+	  return &fts_dev_invalid_value_error;/* error: invalid argument for parameter */
+	}
+
+      alSetDevice(dev_data->config, deviceId);
+    }
 
   /* Assume the config structure is ok, after all the configuration parameters,
      and open the audio port

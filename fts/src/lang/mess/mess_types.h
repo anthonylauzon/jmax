@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:42 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1997/12/09 18:17:20 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -284,6 +284,7 @@ struct fts_patcher
   fts_object_t *objects;	/* the patcher content, organized as a list */
 
   int open;			/* the open flag */
+  int load_init_fired;		/* the multiple load init protection flag*/
 };
 
 

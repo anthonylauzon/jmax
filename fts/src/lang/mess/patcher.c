@@ -352,6 +352,8 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
    it send recursively load_init to all the included objects, *first* to subpatchers,
    and then to the other objects; this guarantee that any loadbang or similar
    objects are executed first in the external patches and then in the external ones
+
+   The patchers have a protection against multiple load-init firing.
    */
 
 
@@ -360,6 +362,11 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_object_t *p;
+
+  if (this->load_init_fired)
+    return;
+
+  this->load_init_fired = 1;
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (fts_object_is_patcher(p))
