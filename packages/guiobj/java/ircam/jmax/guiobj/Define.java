@@ -36,7 +36,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class Define extends Editable implements FtsObjectErrorListener{
 
-  private static final int DEFAULT_WIDTH = 54;
+  private static final int DEFAULT_WIDTH = 44;
   private static final int MINIMUM_WIDTH = 20;
 
   private String variableName;
@@ -50,13 +50,14 @@ public class Define extends Editable implements FtsObjectErrorListener{
     setDefaultWidth(MINIMUM_WIDTH);
         
     setNameAndValue();
-    boldFont = getFont().deriveFont( Font.BOLD);
+    boldFont = getFont().deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
   }
 
   void setNameAndValue()
   {
-    String descr = ftsObject.getDescription();
+    String descr = ftsObject.getDescription().trim();
+
     if(descr != null)
       {
 	int space = descr.indexOf(' ');
@@ -70,6 +71,11 @@ public class Define extends Editable implements FtsObjectErrorListener{
 	    variableName = descr;
 	    variableValue = "";
 	  }
+      }
+    else
+      {
+	variableName = "";
+	variableValue = "";
       }
   }
 
@@ -87,17 +93,14 @@ public class Define extends Editable implements FtsObjectErrorListener{
   public int getVariableWidth()
   {
     if( variableName!= null && !isEditing())
-      return boldFontMetrics.stringWidth( variableName) + 2;
+      return boldFontMetrics.stringWidth( variableName);
     else
       return 0;
   }
 
   public String getArgs()
   {
-    if( variableName != null)
-      return variableName+" "+variableValue;
-    else 
-      return "";
+    return ftsObject.getDescription();
   }
 
   // redefined from base class
@@ -114,7 +117,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
   public void setFont( Font theFont)
   {
     super.forceFont( theFont);
-    boldFont = getFont().deriveFont( Font.BOLD);
+    boldFont = getFont().deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
     
     forceWidth( getWidth());
@@ -126,7 +129,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
   public void setCurrentFont( Font font)
   {
     super.setCurrentFont( font);
-    boldFont = font.deriveFont( Font.BOLD);
+    boldFont = font.deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
   }
 
@@ -156,7 +159,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   public void fitToText()
   {
-    forceWidth(  getTextHeightOffset() + getVariableWidth() + 4 + getFontMetrics().stringWidth( variableValue) + 3);
+    forceWidth(  getTextHeightOffset() + getVariableWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( variableValue) + 6);
   }
 
   public Dimension getMinimumSize() 
@@ -229,7 +232,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int hLine = getTextHeightOffset() + getVariableWidth()+2;
+    int hLine = (getVariableWidth() > 0) ? getTextHeightOffset() + getVariableWidth() + 4 : getTextHeightOffset() + 2;
 
     g.setColor( getTextBackground());
 
