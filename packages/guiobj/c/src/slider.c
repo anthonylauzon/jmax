@@ -223,6 +223,19 @@ slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   this->n = in->n;
   this->min = in->min;
   this->max = in->max;
+
+  if(fts_object_has_id(o))
+  {
+    fts_atom_t a;
+    
+    fts_set_int(&a, this->min);
+    fts_client_send_message(o, sym_setMinValue, 1, &a);
+
+    fts_set_int(&a, this->max);
+    fts_client_send_message(o, sym_setMaxValue, 1, &a);
+
+    fts_update_request(o);
+  }
 }
 
 static void

@@ -2760,6 +2760,7 @@
 				F8446947028BCB2301664092,
 				F8446949028BCB2301664092,
 				F8EE4B60031CE6C301664092,
+				F87A3036040F011001E6D181,
 				F8EE4B61031CE6C301664092,
 				F844694B028BCB2301664092,
 				F8EE4B62031CE6C301664092,
@@ -2919,6 +2920,7 @@
 				F8EE4B72031CE6C301664092,
 				F8EE4B74031CE6C301664092,
 				F5632C2B0349A14001664092,
+				F87A3038040F011001E6D181,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11885,6 +11887,18 @@
 		};
 		F871C22A02EDBE4F01664092 = {
 			fileRef = F871C22802EDBE2D01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F87A3036040F011001E6D181 = {
+			isa = PBXFileReference;
+			name = sogs.c;
+			path = ../../packages/signal/c/src/sogs.c;
+			refType = 2;
+		};
+		F87A3038040F011001E6D181 = {
+			fileRef = F87A3036040F011001E6D181;
 			isa = PBXBuildFile;
 			settings = {
 			};

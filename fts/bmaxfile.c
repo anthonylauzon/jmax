@@ -399,86 +399,110 @@ static float GET_F(unsigned char *p)
 }
 
 static fts_symbol_t s_sequence = 0;
+static fts_symbol_t s_const = 0;
 
 static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   if (version == 1 && fts_is_symbol(at))
+  {
+    fts_atom_t *a = alloca(ac * sizeof(fts_atom_t));
+    fts_symbol_t class_name = NULL;
+    fts_symbol_t name = NULL;
+    int persistence = 0;
+    fts_object_t *obj;
+    int i;
+
+    /* scan for "{", "}" and "=" */
+    for(i=0; i<ac; i++)
     {
-      fts_symbol_t class_name = fts_get_symbol(at);
-      fts_atom_t *a = alloca(ac * sizeof(fts_atom_t));
-      int persistence = 0;
-      fts_object_t *obj;
-      int i;
-
-      /* scan for "{", "}" and "=" */
-      for(i=0; i<ac; i++)
-	{
-	  if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_open_cpar)
-	    fts_set_symbol(a + i, fts_s_open_par);
-	  else if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_closed_cpar)
-	    fts_set_symbol(a + i, fts_s_closed_par);
-	  else if(i > 0 && fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_equal)
-	    {
-	      if(fts_is_symbol(at + i - 1) && fts_get_symbol(at + i - 1) == fts_s_keep)
-		{
-		  ac = i - 1;
-		  persistence = 1;
-		  
-		  break;
-		}
-	      else
-		{
-		  a[i] = at[i - 1];
-		  fts_set_symbol(a + i - 1, fts_s_comma);
-		}
-	    }
-	  else
-	    a[i] = at[i];
-	}
-
-      if(class_name == fts_s_jpatcher)
+      if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_open_cpar)
+        fts_set_symbol(a + i, fts_s_open_par);
+      else if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_closed_cpar)
+        fts_set_symbol(a + i, fts_s_closed_par);
+      else if(i > 0 && fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_equal)
       {
-        obj = fts_eval_object_description(patcher, 1, a);
+        if(fts_is_symbol(at + i - 1) && fts_get_symbol(at + i - 1) == fts_s_keep)
+        {
+          ac = i - 1;
+          persistence = 1;
 
-        if(ac > 1)
-          fts_send_message_varargs(obj, fts_s_set_arguments, ac - 1, a + 1);
-
-        return obj;
-      }
-      else if(class_name == fts_s_comment)
-      {
-        fts_atom_t s;
-
-        fts_set_symbol(&s, fts_s_jcomment);
-        obj = fts_eval_object_description(patcher, 1, &s);
-
-        if(ac > 1)
-          fts_send_message_varargs(obj, fts_s_set, ac - 1, a + 1);
-
-        return obj;
-      }
-
-      /* fix variable definition */
-      if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon && fts_is_symbol(a + 2))
-      {
-        class_name = fts_get_symbol(a + 2);
-        obj = fts_eval_object_description(patcher, ac - 2, a + 2);
-        fts_send_message_varargs(obj, fts_s_name, 1, a);
+          break;
+        }
+        else
+        {
+          a[i] = at[i - 1];
+          fts_set_symbol(a + i - 1, fts_s_comma);
+        }
       }
       else
-	obj = fts_eval_object_description( patcher, ac, at);
+        a[i] = at[i];
+    }
 
-      /* fix persistence (keep = yes) */
-      if(persistence > 0 || class_name == s_sequence)
-	{
-	  fts_atom_t a;
-	  
-	  fts_set_int(&a, 1);
-	  fts_send_message_varargs(obj, fts_s_persistence, 1, &a);
-	}
-      
+    /* get class name and variable definition */
+    if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon && fts_is_symbol(a + 2))
+    {
+      name = fts_get_symbol(a);
+      class_name = fts_get_symbol(a + 2);
+      ac -= 2;
+      a += 2;
+    }
+    else
+      class_name = fts_get_symbol(at);
+
+    /* some particular objects */
+    if(class_name == fts_s_jpatcher)
+    {
+      obj = fts_eval_object_description(patcher, 1, a);
+
+      if(ac > 1)
+        fts_send_message_varargs(obj, fts_s_set_arguments, ac - 1, a + 1);
+
       return obj;
-   }
+    }
+    else if(class_name == fts_s_comment)
+    {
+      fts_atom_t s;
+
+      fts_set_symbol(&s, fts_s_jcomment);
+      obj = fts_eval_object_description(patcher, 1, &s);
+
+      if(ac > 1)
+        fts_send_message_varargs(obj, fts_s_set, ac - 1, a + 1);
+
+      return obj;
+    }
+    else if(class_name == s_const)
+    {
+      fts_atom_t s;
+
+      fts_set_symbol(&s, fts_s_define);
+      obj = fts_eval_object_description(patcher, 1, &s);
+
+      fts_send_message_varargs(obj, fts_s_set, ac, a);      
+    }
+    else
+      obj = fts_eval_object_description(patcher, ac, at);
+
+    /* fix persistence (keep = yes) */
+    if(name != NULL)
+    {
+      fts_atom_t s;
+
+      fts_set_symbol(&s, name);
+      fts_send_message_varargs(obj, fts_s_name, 1, &s);
+    }
+
+    /* fix persistence (keep = yes) */
+    if(persistence > 0 || class_name == s_sequence)
+    {
+      fts_atom_t n;
+
+      fts_set_int(&n, 1);
+      fts_send_message_varargs(obj, fts_s_persistence, 1, &n);
+    }
+
+    return obj;
+  }
 
   return fts_eval_object_description( patcher, ac, at);
 
@@ -1983,4 +2007,5 @@ fts_saver_config(void)
 {
   saver_dumper_type = fts_class_install(NULL, saver_dumper_instantiate);
   s_sequence = fts_new_symbol("sequence");
+  s_const = fts_new_symbol("const");
 }

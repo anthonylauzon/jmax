@@ -22,6 +22,7 @@ samphold.c \
 samplepool.c \
 signal.c \
 snapshot.c \
+sogs.c \
 threshold.c \
 tilda.c \
 wahwah.c \

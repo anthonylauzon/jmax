@@ -156,6 +156,7 @@ param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_param_t *param = (fts_param_t *)fts_get_object(at);
 
   fts_atom_assign(&this->value, &param->value);
+  param_call_listeners(this);
 }
 
 static void
@@ -328,6 +329,7 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui);
 
   fts_class_message_varargs(cl, fts_s_dump_state, param_dump_state);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_persistence, param_persistence);
   fts_class_message_varargs(cl, fts_s_dump, param_dump);
@@ -345,7 +347,6 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_atom(cl, fts_s_send, param_input_atom);
 
   fts_class_message_atom(cl, fts_s_set, param_set);
-  fts_class_message(cl, fts_s_set_from_instance, cl, param_set_from_instance);
   
   fts_class_inlet_bang(cl, 0, param_update);
   fts_class_inlet_atom(cl, 0, param_input_atom);

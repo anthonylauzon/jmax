@@ -783,7 +783,7 @@ vtap_ftl(fts_word_t *argv)
   double conv = 0.001 * delayline->sr;
   int delay_size = delayline->delay_size;
   int ring_size = delayline->ring_size;
-  int phase = delayline->phase - n_tick;
+  int phase = delayline->phase;
   double f_ring_size = (double)ring_size;
   double f_phase = (double)phase;
   double f_max_delay =(double)delay_size;
