@@ -102,7 +102,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   }    
   public void endTrackUpload( TrackDataModel track)
   {
-    uploading = true;
+    uploading = false;
   }    
   public void startPaste(){}    
   public void endPaste(){}    

@@ -33,307 +33,310 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * an interaction module used to move a selection of objects.
+* an interaction module used to move a selection of objects.
  * At the end of a move operation, it communicates the new position to the listener
  */
 public class SequenceSelectionMover extends SelectionMover  implements XORPainter {
-
+	
   public SequenceSelectionMover(DragListener theListener, int theMovement) 
-  {
+{
     super(theListener, theMovement); 
     
     initAutoScroll();
-  }
+}
 
 
-  /******************* autoscrolling *******************/
-  
-  javax.swing.Timer scrollTimer;
-  SequenceScrollDragAction scroller;
-  
-  private void initAutoScroll()
-  {
-    scroller    = new SequenceScrollDragAction();
-    scrollTimer = new javax.swing.Timer(8, scroller);
-    scrollTimer.setCoalesce(true);
-    scrollTimer.setRepeats(true);
-  }
+/******************* autoscrolling *******************/
 
-  class SequenceScrollDragAction implements ActionListener
-  {
-    ScrollManager scrollManager;
-    int x, y, delta;
-    public void actionPerformed(ActionEvent ae)
-    {
-      delta = scrollManager.scrollBy(x, y);
-      updateStart(-delta, 0);
-      getListener().updateStartingPoint(-delta, 0);
-      
-      PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-      getGc().getDisplayer().display("time "+pa.getInvX(x));
-    }
-    void setScrollManager( ScrollManager man)
-    {
-      this.scrollManager = man;
-    }
-    void setXY(int x, int y)
-    {
-      this.x = x;
-      this.y = y;
-    }
-  }
+javax.swing.Timer scrollTimer;
+SequenceScrollDragAction scroller;
 
-  void autoScrollIfNeeded(int x, int y)
-  {
-    ScrollManager manager = ((SequenceGraphicContext)gc).getScrollManager();
-    if (! manager.pointIsVisible(x , y))
-      {
-	scroller.setXY(x, y);
-	if (!scrollTimer.isRunning())
+private void initAutoScroll()
+{
+	scroller    = new SequenceScrollDragAction();
+	scrollTimer = new javax.swing.Timer(8, scroller);
+	scrollTimer.setCoalesce(true);
+	scrollTimer.setRepeats(true);
+}
+
+class SequenceScrollDragAction implements ActionListener
+{
+	ScrollManager scrollManager;
+	int x, y, delta;
+	public void actionPerformed(ActionEvent ae)
+	{
+		delta = scrollManager.scrollBy(x, y);
+		updateStart(-delta, 0);
+		getListener().updateStartingPoint(-delta, 0);
+		
+		PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
+		getGc().getDisplayer().display("time "+pa.getInvX(x));
+	}
+	void setScrollManager( ScrollManager man)
+	{
+		this.scrollManager = man;
+	}
+	void setXY(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+}
+
+void autoScrollIfNeeded(int x, int y)
+{
+	ScrollManager manager = ((SequenceGraphicContext)gc).getScrollManager();
+	if (! manager.pointIsVisible(x , y))
+	{
+		scroller.setXY(x, y);
+		if (!scrollTimer.isRunning())
 	  {
 	    scroller.setScrollManager( manager);
 	    scrollTimer.start();
 	  }
-      }
-    else 
-      {
-	if (scrollTimer.isRunning())
+	}
+	else 
+	{
+		if (scrollTimer.isRunning())
 	  {
 	    scrollTimer.stop();
 	  }
-      }
-  }
-  
-  /**
-   * sets the point on which to start the movement
-   */
-  public void interactionBeginAt(int x, int y) 
-  {
-    super.interactionBeginAt(x, y);
-
-    if (gc == null)
-      System.err.println("-------------- GC NULL");
-
-    if (((SequenceGraphicContext)gc).getSelection().size() > 20) 
-	{
-	    dragMode = RECT_DRAG;
-	    previousX=0;previousY=0;
-	    computeEnclosure(enclosingRect);
 	}
-    else dragMode = GROUP_DRAG;
+}
 
-  }
-
-  /**
-   * computes the rectangle that surrounds the selection
-   * and sets the given rectangle.
-   */
-  private void computeEnclosure(Rectangle destination) 
-  {  
-    TrackEvent min_x;
-    TrackEvent min_y;
-    TrackEvent max_x;
-    TrackEvent max_y;
-    
-    TrackEvent aEvent;
-    
-    Enumeration e=((SequenceGraphicContext)gc).getSelection().getSelected();
-    aEvent = (TrackEvent) e.nextElement();    
-    
-    if (aEvent == null) return; //empty selection...
-    else 
-      {
-	min_x = aEvent;
-	max_x = aEvent;
-	min_y = aEvent;
-	max_y = aEvent;
-      }
-
-    Adapter a = ((SequenceGraphicContext) gc).getAdapter();
-    
-    for (; e.hasMoreElements();)
-      {
-	aEvent = (TrackEvent) e.nextElement();
-
-	if (a.getX(aEvent) < a.getX(min_x)) 
-	 min_x = aEvent;
-     
-	if (a.getY(aEvent) < a.getY(min_y)) 
-	  min_y = aEvent;
+/**
+* sets the point on which to start the movement
+ */
+public void interactionBeginAt(int x, int y) 
+{
+	super.interactionBeginAt(x, y);
 	
-	if (a.getX(aEvent)+a.getLenght(aEvent) > a.getX(max_x)+a.getLenght(max_x)) 
-	  max_x = aEvent;
+	if (gc == null)
+		System.err.println("-------------- GC NULL");
 	
-	if (a.getY(aEvent) > a.getY(max_y)) 
-	  max_y = aEvent;
-      }
+	if (((SequenceGraphicContext)gc).getSelection().size() > 20) 
+	{
+		dragMode = RECT_DRAG;
+		previousX=0;previousY=0;
+		computeEnclosure(enclosingRect);
+	}
+	else dragMode = GROUP_DRAG;
+	
+}
 
-    destination.setBounds(a.getX(min_x), a.getY(min_y),
-			  a.getX(max_x)+a.getLenght(max_x)-a.getX(min_x),
-			  a.getY(max_y)-a.getY(min_y)+10);
-  }
+/**
+* computes the rectangle that surrounds the selection
+ * and sets the given rectangle.
+ */
+private void computeEnclosure(Rectangle destination) 
+{  
+	TrackEvent min_x;
+	TrackEvent min_y;
+	TrackEvent max_x;
+	TrackEvent max_y;
+	
+	TrackEvent aEvent;
+	
+	Enumeration e=((SequenceGraphicContext)gc).getSelection().getSelected();
+	aEvent = (TrackEvent) e.nextElement();    
+	
+	if (aEvent == null) return; //empty selection...
+	else 
+	{
+		min_x = aEvent;
+		max_x = aEvent;
+		min_y = aEvent;
+		max_y = aEvent;
+	}
+	
+	Adapter a = ((SequenceGraphicContext) gc).getAdapter();
+	
+	for (; e.hasMoreElements();)
+	{
+		aEvent = (TrackEvent) e.nextElement();
+		
+		if (a.getX(aEvent) < a.getX(min_x)) 
+			min_x = aEvent;
+		
+		if (a.getY(aEvent) < a.getY(min_y)) 
+			min_y = aEvent;
+		
+		if (a.getX(aEvent)+a.getLenght(aEvent) > a.getX(max_x)+a.getLenght(max_x)) 
+			max_x = aEvent;
+		
+		if (a.getY(aEvent) > a.getY(max_y)) 
+			max_y = aEvent;
+	}
+	
+	destination.setBounds(a.getX(min_x), a.getY(min_y),
+												a.getX(max_x)+a.getLenght(max_x)-a.getX(min_x),
+												a.getY(max_y)-a.getY(min_y)+10);
+}
 
-    public void mouseReleased(MouseEvent e)
-    {
+public void mouseReleased(MouseEvent e)
+{
 	if (scrollTimer.isRunning())
-	    scrollTimer.stop();
+		scrollTimer.stop();
 	super.mouseReleased(e);
-    }
+}
 
-  /**
-   * overrides SelectionMover.mouseDragged()
-   */
-  public void mouseDragged(MouseEvent e) 
-  {
-      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-      
-      if(!scrollTimer.isRunning())
+/**
+* overrides SelectionMover.mouseDragged()
+ */
+public void mouseDragged(MouseEvent e) 
+{
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	
+	if(!scrollTimer.isRunning())
 	  super.mouseDragged(e);
-      
-      autoScrollIfNeeded(e.getX(), e.getY());
-  }
-
-  /**
-   * from the XORPainter interface. The actual drawing function.
-   */
-
-
-  public void XORDraw(int dx, int dy) 
-  {
-    TrackEvent movTrackEvent;
-    Graphics g = gc.getGraphicDestination().getGraphics();
-    
-    Rectangle tempr, clip; 
-    tempr = (Rectangle) g.getClip();
-    clip = ((SequenceGraphicContext)gc).getTrackClip();
-
-    g.clipRect(clip.x, clip.y, clip.width, clip.height);
-    
-    g.setColor(Color.gray);
-
-    if (dragMode == RECT_DRAG) {
-
-      g.setXORMode(Color.white);
-
-      if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-	enclosingRect.x += dx-previousX;
-      
-      if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
-	enclosingRect.y += dy-previousY;
-      
-      g.drawRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
-    }
-    else // move every element
-      {
-	g.setXORMode(Color.gray); 
 	
-	UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), ((SequenceGraphicContext) gc).getDataModel());
+	autoScrollIfNeeded(e.getX(), e.getY());
+}
 
-	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
-	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
+/**
+* from the XORPainter interface. The actual drawing function.
+ */
+
+
+public void XORDraw(int dx, int dy) 
+{
+	TrackEvent movTrackEvent;
+	Graphics g = gc.getGraphicDestination().getGraphics();
 	
-	TrackEvent last = ((SequenceGraphicContext)gc).getSelection().getLastSelectedEvent();
-
-	for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
+	Rectangle tempr, clip; 
+	tempr = (Rectangle) g.getClip();
+	clip = ((SequenceGraphicContext)gc).getTrackClip();
+	
+	g.clipRect(clip.x, clip.y, clip.width, clip.height);
+	
+	g.setColor(Color.gray);
+	
+	if (dragMode == RECT_DRAG) {
+		
+		g.setXORMode(Color.white);
+		
+		if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
+			enclosingRect.x += dx-previousX;
+		
+		if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
+			enclosingRect.y += dy-previousY;
+		
+		g.drawRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
+	}
+	else // move every element
+	{
+		g.setXORMode(Color.gray); 
+		
+		UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), ((SequenceGraphicContext) gc).getDataModel());
+		
+		PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
+		boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
+		
+		TrackEvent last = ((SequenceGraphicContext)gc).getSelection().getLastSelectedEvent();
+		
+		for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movTrackEvent = (TrackEvent) e.nextElement();
 	    
 	    tempEvent.setOriginal(movTrackEvent);
-
+			
 	    tempEvent.setTime(movTrackEvent.getTime());
 	    
 	    a.setY(tempEvent, a.getY(movTrackEvent));
 	    a.setLabel(tempEvent, a.getLabel(movTrackEvent));
 	    a.setType( tempEvent, a.getType(movTrackEvent));
-
+			
 	    tempEvent.setLocalProperties(movTrackEvent);
-
+			
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
-	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
+	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));			
 	    
-	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
+	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+			{
 	      if(a.isHorizontalMovementAllowed())
-		if(!a.isHorizontalMovementBounded())
-		  a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-		else
-		  {
-		    int prevX = 0;
-		    int nextX = 0;
-		    FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
-		    TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
-		    if(next!=null)
-		      nextX = a.getX(next)-1;
-		    TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
-		    if(prev!=null)
-		      prevX = a.getX(prev)+1;
-		    
-		    if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
-		      a.setX(tempEvent, nextX);
-		    else
-		      if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
-			a.setX(tempEvent, prevX);
-		      else
-			a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-		  }		    
+					if(!a.isHorizontalMovementBounded())
+						a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+					else
+					{
+						int prevX = 0; 
+						int nextX = 0;
+						FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
+						TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
+						if(next!=null)
+							nextX = a.getX(next)-1;
+						TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
+						if(prev!=null)
+							prevX = a.getX(prev)+1;
+						
+						if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
+							a.setX(tempEvent, nextX);
+						else
+							if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
+								a.setX(tempEvent, prevX);
+						else
+							a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+					}
+						
+				a.setCue(tempEvent, a.getCue(movTrackEvent));
+			}			
+			if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
+				a.setY(tempEvent, a.getY(movTrackEvent)+dy);
 	    
-	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
-	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
-	    
-	    tempEvent.setDeltaX(dx);//?????
-
-	    movTrackEvent.getRenderer().renderBounds(tempEvent, g, true, gc);
-
-	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
-	    // and make the keyboard in the MidiTrack a listener of such movements.
-	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).
-	    if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
-	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
-	  
-	    if(movTrackEvent == last) 
-	      {
-		if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-		  ((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+tempEvent.getTime());
-		if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-		  ((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
-	      }
+	    tempEvent.setDeltaX(dx);
+				
+			movTrackEvent.getRenderer().renderBounds(tempEvent, g, true, gc);
+			
+			// e_m_ incorrect! instead, make this object communicate the new position to the listeners,
+			// and make the keyboard in the MidiTrack a listener of such movements.
+			// (something like using the ircam.jmax.toolkit.DynamicDragListener).
+			if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
+				ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
+			
+			if(movTrackEvent == last) 
+			{
+				if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+					((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+tempEvent.getTime());
+				if ((itsMovements & VERTICAL_MOVEMENT) != 0)
+					((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
+			}
 	  }
-      }
-    
-    g.setPaintMode();
-    g.setColor(Color.black);
-    
-    previousX = dx;
-    previousY = dy;
-    
-    g.setClip(tempr);//????
+	}
+	
+	g.setPaintMode();
+	g.setColor(Color.black);
+	
+	previousX = dx;
+	previousY = dy;
+	
+	g.setClip(tempr);//????
     g.dispose();
-  }
+}
 
-    void updateStart(int deltaX, int deltaY)
-    {
+void updateStart(int deltaX, int deltaY)
+{
 	itsStartingPoint.x+=deltaX;
 	itsXORHandler.updateBegin(deltaX, deltaY);
-    }
+}
 
-    DragListener getListener()
-    {
+DragListener getListener()
+{
 	return itsListener;
-    }
+}
 
-    SequenceGraphicContext getGc()
-    {
+SequenceGraphicContext getGc()
+{
 	return (SequenceGraphicContext)gc;
-    }
+}
 
-    int getMovements()
-    {
+int getMovements()
+{
 	return itsMovements;
-    }
+}
 
-  //--- Fields
-    Rectangle enclosingRect = new Rectangle();
-    // every event type would be OK, but we also need to handle the little keyboard in the
-    // left side of the window... so we need an event that knows about the "pitch" property
+//--- Fields
+Rectangle enclosingRect = new Rectangle();
+// every event type would be OK, but we also need to handle the little keyboard in the
+// left side of the window... so we need an event that knows about the "pitch" property
 }
 
 

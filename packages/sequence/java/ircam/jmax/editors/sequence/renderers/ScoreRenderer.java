@@ -34,7 +34,7 @@ import java.io.File;
 import ircam.jmax.JMaxApplication;
 
 /**
- * The main class for a score representation.
+* The main class for a score representation.
  * It provides the support for piano-roll editing,
  * using a background layer and a foreground.
  * The grid is rendered in the ScoreBackground
@@ -43,150 +43,147 @@ import ircam.jmax.JMaxApplication;
 public class ScoreRenderer extends AbstractRenderer{
   
   /**
-   * Constructor.
+	* Constructor.
    */
   public ScoreRenderer(SequenceGraphicContext theGc) 
-  {  
+{  
     super();
     gc = theGc;
     gc.setRenderManager(this);
     {//-- prepares the parameters for the geometry object
-
-	Geometry g = gc.getAdapter().getGeometry();
-	g.setXZoom(20);
-	g.setYZoom(300);
-	g.setYInvertion(true);
-	g.setYTransposition(136);//??
+			
+			Geometry g = gc.getAdapter().getGeometry();
+			g.setXZoom(20);
+			g.setYZoom(300);
+			g.setYInvertion(true);
+			g.setYTransposition(136);//??
     }
-
+		
     tempList = new MaxVector();
-
+		
     scoreBackground = new ScoreBackground(gc);
     partitionBackground = new PartitionBackground(gc);
-
+		
     itsForegroundLayer = new ScoreForeground(gc);
-
+		
     itsLayers.addElement(scoreBackground);
     itsLayers.addElement(itsForegroundLayer);
-  }
-  
-  public int getViewMode()
-  {
-    return viewMode;
-  }
+}
 
-  public void setViewMode(int mode)
-  {
-      //per ora solo il background
-      if(viewMode!=mode)
-      {
-	viewMode=mode;
-	itsLayers.removeElementAt(0);
-	if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
-	  itsLayers.insertElementAt(scoreBackground, 0);
-	else
-	  itsLayers.insertElementAt(partitionBackground, 0);
-      }
-  }
-  /**
-   * returns its (current) event renderer
-   */
-  public ObjectRenderer getObjectRenderer() 
-  {
-      return null;
-      //the renderer depends from the object, here...
-      //return itsForegroundLayer.getObjectRenderer();
-  }
+public int getViewMode()
+{
+	return viewMode;
+}
 
+public void setViewMode(int mode)
+{
+	//per ora solo il background
+	if(viewMode!=mode)
+	{
+		viewMode=mode;
+		itsLayers.removeElementAt(0);
+		if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+			itsLayers.insertElementAt(scoreBackground, 0);
+		else
+			itsLayers.insertElementAt(partitionBackground, 0);
+	}
+}
+/**
+* returns its (current) event renderer
+ */
+public ObjectRenderer getObjectRenderer() 
+{
+	return null;
+	//the renderer depends from the object, here...
+	//return itsForegroundLayer.getObjectRenderer();
+}
 
-  
-  /**
-   * returns the events whose graphic representation contains
-   * the given point.
-   */
-  public Enumeration objectsContaining(int x, int y) 
-  {  
-    TrackEvent aTrackEvent;
+/**
+* returns the events whose graphic representation contains
+ * the given point.
+ */
+public Enumeration objectsContaining(int x, int y) 
+{  
+	TrackEvent aTrackEvent;
+	
+	tempList.removeAllElements();
+	
+	double startTime = gc.getAdapter().getInvX(0);
+	double endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
+	
+	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
+	{      
+		aTrackEvent = (TrackEvent) e.nextElement();
+		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+			tempList.addElement(aTrackEvent);
+	}
+	
+	return tempList.elements();
+}
 
-    tempList.removeAllElements();
+/**
+* Returns the first event containg the given point.
+ * If there are more then two objects, it returns the
+ * the topmost in the visual hyerarchy*/
+public Object firstObjectContaining(int x, int y)
+{
+	TrackEvent aTrackEvent;
+	TrackEvent last = null;
+	
+	double startTime = gc.getAdapter().getInvX(x);
+	double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
+		
+	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+	{      
+		aTrackEvent = (TrackEvent) e.nextElement();
+				
+		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+			last = aTrackEvent;
+	}
+	
+	return last;
+}
 
-    double startTime = gc.getAdapter().getInvX(0);
-    double endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
-      {      
-	aTrackEvent = (TrackEvent) e.nextElement();
-
-	if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	  tempList.addElement(aTrackEvent);
-      }
-
-    return tempList.elements();
-  }
-
-  /**
-   * Returns the first event containg the given point.
-   * If there are more then two objects, it returns the
-   * the topmost in the visual hyerarchy*/
-  public Object firstObjectContaining(int x, int y)
-  {
-    TrackEvent aTrackEvent;
-    TrackEvent last = null;
-
-    /*int*/double time = gc.getAdapter().getInvX(x);
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
-      
-      {      
-	aTrackEvent = (TrackEvent) e.nextElement();
-
-	if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	  last = aTrackEvent;
-      }
-
-    return last;
-  }
-
-  /**
-   * returns an enumeration of all the events whose graphic representation
-   * intersects the given rectangle.
-   */
-  public Enumeration objectsIntersecting(int x, int y, int w, int h) 
-  {
-    TrackEvent aTrackEvent;
-
-    tempList.removeAllElements();
-    double startTime = gc.getAdapter().getInvX(x);
-    double endTime = gc.getAdapter().getInvX(x+w);
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-      {
-	aTrackEvent = (TrackEvent) e.nextElement();
-
-	if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
+/**
+* returns an enumeration of all the events whose graphic representation
+ * intersects the given rectangle.
+ */
+public Enumeration objectsIntersecting(int x, int y, int w, int h) 
+{
+	TrackEvent aTrackEvent;
+	
+	tempList.removeAllElements();
+	double startTime = gc.getAdapter().getInvX(x);
+	double endTime = gc.getAdapter().getInvX(x+w);
+	
+	for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+	{
+		aTrackEvent = (TrackEvent) e.nextElement();
+		
+		if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
 	  {
 	    tempList.addElement(aTrackEvent);
 	  }
-      }
-    return tempList.elements();
-  }
+	}
+	return tempList.elements();
+}
 
 
-  //------------------  Fields
-  SequenceGraphicContext gc;
-  int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+//------------------  Fields
+SequenceGraphicContext gc;
+int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
 
-  TrackDataModel itsTrackDataModel;
+TrackDataModel itsTrackDataModel;
 
-  public ScoreForeground itsForegroundLayer;
+public ScoreForeground itsForegroundLayer;
 
-  public ScoreBackground scoreBackground;
-  PartitionBackground partitionBackground;
-  
-  public static final int XINTERVAL = 10;
-  public static final int YINTERVAL = 3;
+public ScoreBackground scoreBackground;
+PartitionBackground partitionBackground;
 
-  private MaxVector tempList;
+public static final int XINTERVAL = 10;
+public static final int YINTERVAL = 3;
+
+private MaxVector tempList;
 }
 
 

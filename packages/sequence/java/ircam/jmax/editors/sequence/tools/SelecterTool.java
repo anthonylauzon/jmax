@@ -32,7 +32,7 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * The base class of all the tools that use a selection
+* The base class of all the tools that use a selection
  * to establish the "target" of their action and that have the
  * Selecter as the basic (default) interaction module.
  * It takes care of handling the selection process.
@@ -44,132 +44,132 @@ import javax.swing.*;
 public abstract class SelecterTool extends Tool implements GraphicSelectionListener{
   
   public SelecterTool(String theName, ImageIcon theImageIcon)
-  {
+{
     super(theName, theImageIcon);
-
+		
     //itsSelecter = new Selecter(this);
     itsSelecter = new SequenceSelecter(this);
-  }
+}
 
-  /**
-   * the default InteractionModule for this kind of tools
-   */
-  public InteractionModule getDefaultIM() 
-  {
-    return itsSelecter;
-  }
+/**
+* the default InteractionModule for this kind of tools
+ */
+public InteractionModule getDefaultIM() 
+{
+	return itsSelecter;
+}
 
-  public void controlAction(int x, int y, int modifiers)
-  {
-    //
-  }
+public void controlAction(int x, int y, int modifiers)
+{
+	//
+}
 
-  /**
-   * Called at double-click. Interested tools will derive this method
-   * with the specific semantic */
-  public void edit(int x, int y, int modifiers)
-  {
-  }
+/**
+* Called at double-click. Interested tools will derive this method
+ * with the specific semantic */
+public void edit(int x, int y, int modifiers)
+{
+}
 
-  /**
-   * called by the Selecter UI module at mouse down
-   */
-  public void selectionPointChoosen(int x, int y, int modifiers) 
-  {
-    if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)==0)
-      controlAction(x, y, modifiers);
-    else
-    {
-      SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-
-      egc.getTrack().setProperty("selected", Boolean.TRUE);	    
-
-      egc.getGraphicDestination().requestFocus();//???
-
-      TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-      if (aTrackEvent != null) 
-      { //click on event
-	startingPoint.setLocation(x,y);
-	
-	if ( !egc.getSelection().isInSelection(aTrackEvent)) 
-	  {
-	    if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-	      egc.getSelection().deselectAll();
-	    
-	    egc.getSelection().select(aTrackEvent);
-	  }
+/**
+* called by the Selecter UI module at mouse down
+ */
+public void selectionPointChoosen(int x, int y, int modifiers) 
+{
+	if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)==0)
+		controlAction(x, y, modifiers);
 	else
-	  egc.getSelection().setLastSelectedEvent(aTrackEvent);
+	{
+		SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+		
+		egc.getTrack().setProperty("selected", Boolean.TRUE);	    
+		
+		egc.getGraphicDestination().requestFocus();//???
+			
+		TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+		if (aTrackEvent != null) 
+		{ //click on event
+			startingPoint.setLocation(x,y);
+			
+			if ( !egc.getSelection().isInSelection(aTrackEvent)) 
+			{
+				if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+					egc.getSelection().deselectAll();
+				
+				egc.getSelection().select(aTrackEvent);
+			}
+			else
+				egc.getSelection().setLastSelectedEvent(aTrackEvent);
+			
+			singleObjectSelected(x, y, modifiers);
+			
+			egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
+		}
+		else
+		{//click on empty
+			if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+				if ( !egc.getSelection().isSelectionEmpty())
+					egc.getSelection().deselectAll(); 
+			
+			egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+		}
+	}
+}
+
+public void selectionPointDoubleClicked(int x, int y, int modifiers) 
+{  
+	edit(x, y, modifiers);
+}
+
+/**
+* called by the selecter UI module
+ */
+public void selectionChoosen(int x, int y, int w, int h) 
+{
+	if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
 	
-	singleObjectSelected(x, y, modifiers);
-        
-        egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
-      }
-      else
-      {//click on empty
-        if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-          if ( !egc.getSelection().isSelectionEmpty())
-            egc.getSelection().deselectAll(); 
-
-        egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
-      }
-    }
-  }
-  
-  public void selectionPointDoubleClicked(int x, int y, int modifiers) 
-  {  
-      edit(x, y, modifiers);
-  }
-
-  /**
-   * called by the selecter UI module
-   */
-  public void selectionChoosen(int x, int y, int w, int h) 
-  {
-    if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
-    
-    gc.getGraphicDestination().requestFocus();//???
+	gc.getGraphicDestination().requestFocus();//???
     
     if (w ==0) w=1;// at least 1 pixel wide
-    if (h==0) h=1;
-    
-    selectArea(x, y, w, h);
-    
-    multipleObjectSelected();
-  }
+			if (h==0) h=1;
+			
+			selectArea(x, y, w, h);
+			
+			multipleObjectSelected();
+}
 
-  /**
-   * Selects all the objects in a given rectangle
-   */
-  void selectArea(int x, int y, int w, int h) 
-  { 
-    SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-    selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
-  }
+/**
+* Selects all the objects in a given rectangle
+ */
+void selectArea(int x, int y, int w, int h) 
+{ 
+	SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+	selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
+}
 
-  
-  /**
-   * Graphically selects all the objects in a given rectangle, given a Render
-   * and a Selection
-   */
-  public static void selectArea(RenderManager r, SequenceSelection s, int x, int y, int w, int h) 
-  {
-    s.select(r.objectsIntersecting(x, y, w, h));
-  }
 
-  /**
-   * a single object has been selected, in coordinates x, y */
-  abstract void singleObjectSelected(int x, int y, int modifiers);
+/**
+* Graphically selects all the objects in a given rectangle, given a Render
+ * and a Selection
+ */
+public static void selectArea(RenderManager r, SequenceSelection s, int x, int y, int w, int h) 
+{
+	s.select(r.objectsIntersecting(x, y, w, h));
+}
 
-  /** 
-   * a group of objects was selected */
-  abstract void multipleObjectSelected();
+/**
+* a single object has been selected, in coordinates x, y */
+abstract void singleObjectSelected(int x, int y, int modifiers);
 
-  //--- Fields
-  SequenceSelecter itsSelecter;
+/** 
+* a group of objects was selected */
+abstract void multipleObjectSelected();
 
-  Point startingPoint = new Point();
-  public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+//--- Fields
+SequenceSelecter itsSelecter;
+
+Point startingPoint = new Point();
+public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 }
 
 
