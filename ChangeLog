@@ -1,5 +1,13 @@
 2003-07-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* utils/rpm/jmax.spec.in: added macros to set path for java, javac and jar.
+	 - use --define='java path_to_java' when calling rpm (rpmbuild) if you want to use a particular java, javac or jar:
+	  e.g:
+	  If you want to use Java SDK 1.4.1_02 from SUN:
+	  $ rpmbuild --define='java /usr/java/j2sdk1.4.1_02/bin/java' --define='javac /usr/java/j2sdk1.4.1_02/bin/javac' -ba jmax.spec
+	 - removed obsolete files (LICENCE.fr, LICENSE) and added COPYING, ChangeLog and AUTHORS
+	 - reflected change of package installation directory.
+	 
 	* fixed distcheck for jMax.
 
 	* java/src/Makefile.am: removed jmax.jar.root in distclean.
