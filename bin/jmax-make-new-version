@@ -161,47 +161,34 @@ generate_file /tmp/$$ VERSION
 cat <<EOF >/tmp/$$
 <HTML>
 <HEAD>
-<TITLE> jMax release notes for version $NEW_VERSION </TITLE>
+<TITLE> jMax $NEW_VERSION release notes </TITLE>
 </HEAD>
 
-<CENTER> <H1> jMax release notes for version $NEW_VERSION </H1> </CENTER>
+<CENTER> <H2> <I>j</I>Max $NEW_VERSION release notes </H2> </CENTER>
+
+<P>
+This is release $NEW_VERSION of <I>j</I>Max.
+
+<H3>Status</H3>
 
 
-<H2> Fixed bugs </H2>
-
-The following bugs have been fixed:
-<UL>
-<LI> 
-</UL>
-
-For bugs reported via the bug report system
-(<A HREF="http://www.ircam.fr/bugs">http://www.ircam.fr/bugs</A>, 
-please refer to this page for information.
+<H3>Supported platforms</H3>
 
 
-<H2> New features </H2>
+<H3>Bug tracking system</H3>
 
-<UL>
-<LI> 
-</UL>
+<P>
+Bugs are repertoried in the Ircam bug tracking system, at the following URL:
+<A HREF="http://www.ircam.fr/Bugs/">http://www.ircam.fr/Bugs/</A> ; 
+you will find there a list of known and fixed bugs, updated
+on a daily base, and a bug report submission page that must be used for
+bug report submission.
 
-
-<H2> Known bugs </H2>
-
-<UL>
-<LI> 
-</UL>
-
-
-<H2> Outstanding bugs and features </H2>
-
-<UL>
-<LI> 
-</UL>
 
 </HTML>
 EOF
-generate_file /tmp/$$ RELEASE_NOTES.html
+( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
+generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
 
 # ---------------------------------------------------------------------------
 cat <<EOF >/tmp/$$
