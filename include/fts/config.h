@@ -19,5 +19,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define @FTS_CONFIG_BYTE_ORDER@
-@FTS_DEFINE_RESTRICT@
+#ifdef WIN32 /* Windows 32 bits OS */
+#include <fts/config-win32.h>
+#elif defined(__APPLE__) && defined(__MACH__) /* Macintosh */
+#include <fts/config-macosx.h>
+#else /* use autoconf stuff */
+#include <fts/config-ac.h>
+#endif

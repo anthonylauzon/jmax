@@ -8,6 +8,8 @@ audiofile.h \
 bytestream.h \
 class.h \
 client.h \
+config-ac.h \
+config.h \
 connection.h \
 dsp.h \
 errobj.h \

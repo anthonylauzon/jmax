@@ -19,5 +19,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define @FTS_CONFIG_BYTE_ORDER@
-@FTS_DEFINE_RESTRICT@
+#define FTS_CONFIG_LITTLEENDIAN
+
+/* defines for language features */
+#ifndef restrict
+#define restrict
+#endif
