@@ -112,7 +112,7 @@ extern const fts_atom_t fts_null;
 #define fts_get_fun(ap)            (fts_word_get_fun(fts_atom_value(ap)))
 #define fts_get_int(ap)            (fts_word_get_int(fts_atom_value(ap)))
 #define fts_get_long(ap)           fts_get_int(ap)
-#define fts_get_float(ap)          (fts_word_get_float(fts_get_value(ap)))
+#define fts_get_float(ap)          (fts_word_get_float(fts_atom_value(ap)))
 #define fts_get_number_int(ap)     (fts_is_a(ap, fts_s_float) ? (int)fts_get_float(ap) : fts_get_int(ap))
 #define fts_get_number_float(ap)   (fts_is_a(ap, fts_s_float) ? fts_get_float(ap) : (float)fts_get_int(ap))
 
