@@ -1360,8 +1360,8 @@ void FtsProcess::findDefaultPath() throw( FtsClientException)
   HKEY key, version_key;
   DWORD type, size;
   char* jmax_key = "Software\\Ircam\\jMax";
-  char* jmax_version = "CurrentVersion";
-  char* jmax_root = "jmaxRoot";
+  char* jmax_version = "FtsVersion";
+  char* jmax_root = "ftsRoot";
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, jmax_key, 0, KEY_READ, &key) != 0) {
     throw FtsClientException("Failed to open the jMax registry key\n");
