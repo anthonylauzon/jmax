@@ -482,6 +482,15 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     *access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
     fts_log("[alsaaudioport] %s is not a Kernel Level PCM, so we start with mmap_interleaved \n", pcm_name);
   }
+
+  /* if this is a null plugin type, we don't open it */
+  if (SND_PCM_TYPE_NULL == pcm_type)
+  {
+    fts_log("[alsaaudioport] null plugin selected => audioport not opened \n");
+    snd_pcm_close(stream->handle);
+    stream->handle = NULL;
+    return -1;
+  }
   /* 
      Check if acces type is available,
      return a better choice if not 
@@ -937,7 +946,6 @@ alsaaudioport_update_audioport_input_functions(alsaaudioport_t* self, alsastream
   int access_index = convert_alsa_access_to_access_index(stream->access);
   if (-1 == access_index)
   {
-    post("[alsaaudioport] playback access type unknown \n");
     fts_object_error((fts_object_t*)self,"playback access type unknown \n");
     return;
   }
@@ -961,7 +969,6 @@ alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastrea
   int access_index = convert_alsa_access_to_access_index(stream->access);
   if (-1 == access_index)
   {
-    post("[alsaaudioport] playback access type unknown \n");
     fts_object_error((fts_object_t*)self,"playback access type unknown \n");
     return;
   }
@@ -1059,7 +1066,10 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
   fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
 
   if (self->capture.handle != 0)
+  {
     snd_pcm_close(self->capture.handle);
+    self->capture.handle = 0;
+  }
 
   fts_dsp_sample_rate_remove_listener(o);
 }
@@ -1068,12 +1078,13 @@ static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
-  post("[alsaaudioport_close_output]\n");
-
   fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 
   if (self->playback.handle != 0)
+  {
     snd_pcm_close(self->playback.handle);
+    self->playback.handle = 0;
+  }
 
   fts_dsp_sample_rate_remove_listener(o);
 }
