@@ -75,6 +75,8 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
 	      editorFrame.setVisible(true);
 	      MaxWindowManager.getWindowManager().addWindow(editorFrame);
 	  }   
+      
+      if(editorFrame.getState()==Frame.ICONIFIED) editorFrame.setState(Frame.NORMAL);
       editorFrame.toFront();
   }
 
