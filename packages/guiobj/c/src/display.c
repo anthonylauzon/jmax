@@ -206,8 +206,8 @@ display_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_memorystream_reset(this->stream);  
 
-  if(ac == 1)
-    fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+  if(ac == 1 && !fts_is_symbol(at))
+    fts_spost_atoms((fts_bytestream_t *)this->stream, 1, at);	
   else
     {
       fts_spost((fts_bytestream_t *)this->stream, "(");

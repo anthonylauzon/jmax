@@ -130,14 +130,32 @@ slider_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_outlet_int(o, 0, n);
 }
 
-/* in case of list, only the first value is significative */
 static void
-slider_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (fts_is_int(at))
     slider_int(o, winlet, fts_s_int, 1, at);
   else if (fts_is_float(at))
     slider_float(o, winlet, fts_s_float, 1, at);
+}
+
+static void 
+slider_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  slider_t *this = (slider_t *)o;
+
+  if(fts_is_number(at))
+    {
+      int n = fts_get_number_int(at);
+      
+      if (this->n != n)
+	{
+	  fts_update_request(o);
+	  this->n = n;
+	}
+      
+      fts_outlet_int(o, 0, n);
+    }
 }
 
 static void
@@ -364,11 +382,12 @@ slider_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_bang, slider_bang);
   fts_class_message_varargs(cl, fts_s_set, slider_set);
+  fts_class_message_varargs(cl, fts_s_send, slider_send);
   fts_class_message_varargs(cl, fts_s_range, slider_set_range);
 
   fts_class_inlet_int(cl, 0, slider_int);
   fts_class_inlet_float(cl, 0, slider_float);
-  fts_class_inlet_varargs(cl, 0, slider_list);
+  fts_class_inlet_varargs(cl, 0, slider_varargs);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_min_value, slider_put_min);

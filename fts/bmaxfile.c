@@ -416,31 +416,45 @@ static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, vo
 
 static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  if (version == 1)
+  if (version == 1 && fts_is_symbol(at))
     {
-      if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_jpatcher)
+      fts_symbol_t class_name = fts_get_symbol(at);
+      fts_atom_t *a = alloca(ac * sizeof(fts_atom_t));
+      int i;
+
+      /* scan for "{", "}" and "=" */
+      for(i=0; i<ac; i++)
 	{
-	  return fts_eval_object_description( patcher, 1, at);	  
+	  if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_open_cpar)
+	    fts_set_symbol(a + i, fts_s_open_par);
+	  else if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_closed_cpar)
+	    fts_set_symbol(a + i, fts_s_closed_par);
+	  else if(i > 0 && fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_equal)
+	    {
+	      a[i] = at[i - 1];
+	      fts_set_symbol(a + i - 1, fts_s_comma);
+	    }
+	  else
+	    a[i] = at[i];
 	}
-      else if(ac >= 3 && fts_is_symbol(at) && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon)
+
+      if(class_name == fts_s_jpatcher)
 	{
-	  int new_ac, i;
-	  fts_atom_t *new_at;
+	  fts_object_t *obj = fts_eval_object_description(patcher, 1, a);
+	  
+	  if(ac > 1)
+	    fts_send_message(obj, fts_s_set_arguments, ac - 1, a + 1);
 
-	  new_ac = ac + 3;
-	  new_at = (fts_atom_t *)alloca( new_ac * sizeof( fts_atom_t));
-	  
-	  fts_set_symbol( new_at+0, fts_s_define);
-	  new_at[1] = at[0];
-	  fts_set_symbol( new_at+2, fts_s_open_par);
-	  fts_set_symbol( new_at+3, fts_s_colon);
-	  
-	  for (i = 2; i < ac; i++)
-	    new_at[i+2] = at[i];
-	  
-	  fts_set_symbol( new_at+new_ac-1, fts_s_closed_par);
+	  return obj;
+	}
+      else if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon)
+	{
+	  /* fix bmax 1 variable definition */
+	  fts_object_t *obj = fts_eval_object_description(patcher, ac - 2, a + 2);
 
-	  return fts_eval_object_description( patcher, new_ac, new_at);
+	  fts_send_message(obj, fts_s_name, 1, a);
+
+	  return obj;
 	}
     }
 

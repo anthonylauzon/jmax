@@ -136,6 +136,63 @@ env_start(env_t *this)
 }
 
 static void 
+env_continue(env_t *this)
+{
+  bpf_t *bpf = this->current;
+  int size = bpf_get_size(bpf);
+  int index = this->index;
+  
+  if(index < 1)
+    index = 1;
+
+  if(index < size)
+    this->status = status_running;
+      
+  /* advance after next sustain or to last segment */
+  if(index < size - 1)
+    {
+      double time = bpf_get_time(bpf, size - 2);
+      double value = this->value;
+	  
+      if(this->mode == mode_sustain)
+	{
+	  /* search for release slope after sustain */
+	  while(index < size - 1)
+	    {
+	      if(bpf_get_slope(bpf, index - 1) == 0.0)
+		{
+		  /* get time after sustain */
+		  time = bpf_get_time(bpf, index);
+		  index++;
+		  break;
+		}
+	      
+	      index++;
+	    }
+	  
+	  /* skip jump values after sustain */
+	  while(index < size - 1 && time == bpf_get_time(bpf, index))
+	    index++;
+	}
+      else
+	index = size - 1;
+
+      /* set jump value */
+      if(time == bpf_get_time(bpf, index - 2))
+	value = bpf_get_value(bpf, index - 1);
+	  
+      /* set base values */
+      this->base_time = time;
+      this->base_value = value;
+      this->base_slope = (bpf_get_value(bpf, index) - value) / (bpf_get_time(bpf, index) - time);
+      
+      this->index = index;
+      this->time = time;
+      this->value = value;
+    }
+}
+
+static void 
 env_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
@@ -296,15 +353,6 @@ env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-env_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  env_t *this = (env_t *)o;
-
-  /* just go */
-  env_start(this);
-}
-
-static void 
 env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
@@ -313,61 +361,14 @@ env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  bpf_t *bpf = this->current;
-  int size = bpf_get_size(bpf);
-  int index = this->index;
-  
-  if(index < 1)
-    index = 1;
 
-  if(index < size)
-    this->status = status_running;
-      
-  /* advance after next sustain or to last segment */
-  if(index < size - 1)
-    {
-      double time = bpf_get_time(bpf, size - 2);
-      double value = this->value;
-	  
-      if(this->mode == mode_sustain)
-	{
-	  /* search for release slope after sustain */
-	  while(index < size - 1)
-	    {
-	      if(bpf_get_slope(bpf, index - 1) == 0.0)
-		{
-		  /* get time after sustain */
-		  time = bpf_get_time(bpf, index);
-		  index++;
-		  break;
-		}
-	      
-	      index++;
-	    }
-	  
-	  /* skip jump values after sustain */
-	  while(index < size - 1 && time == bpf_get_time(bpf, index))
-	    index++;
-	}
-      else
-	index = size - 1;
-
-      /* set jump value */
-      if(time == bpf_get_time(bpf, index - 2))
-	value = bpf_get_value(bpf, index - 1);
-	  
-      /* set base values */
-      this->base_time = time;
-      this->base_value = value;
-      this->base_slope = (bpf_get_value(bpf, index) - value) / (bpf_get_time(bpf, index) - time);
-      
-      this->index = index;
-      this->time = time;
-      this->value = value;
-    }
+  if(this->mode == mode_sustain && this->status != status_hold)
+    env_continue(this);  
+  else
+    env_start(this);
 }
 
 static void
@@ -552,18 +553,20 @@ static void
 env_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  fts_symbol_t mode = fts_get_symbol(at);
-
-  if(mode == sym_sustain)
-    this->mode = mode_sustain;
-  else if(mode == sym_continue)
-    this->mode = mode_continue;
-}
-
-static void
-env_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  env_set_mode(o, 0, 0, 1, value);
+  
+  if(fts_is_symbol(at))
+    {
+      fts_symbol_t mode = fts_get_symbol(at);
+      
+      if(mode == sym_sustain)
+	this->mode = mode_sustain;
+      else if(mode == sym_continue)
+	this->mode = mode_continue;
+      else
+	fts_object_signal_runtime_error(o, "cannot understand mode %s", mode);
+    }
+  else
+    fts_object_signal_runtime_error(o, "bad argument for message mode");    
 }
 
 static void
@@ -592,10 +595,7 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->editid = 0;
 
-  if(fts_is_a(at, bpf_type))
-    env_set_bpf(o, 0, 0, 1, at);
-  else
-    env_set_current(this, this->local);
+  env_set(o, 0, 0, ac, at);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
@@ -619,24 +619,20 @@ env_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, env_put);
 
-  fts_class_message_varargs(cl, fts_new_symbol("mode"), env_set_mode);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), env_set_mode_prop);
-
-  fts_class_message_varargs(cl, fts_s_bang, env_go);
-  fts_class_message_varargs(cl, fts_new_symbol("release"), env_release);
-
+  fts_class_message_varargs(cl, fts_s_bang, env_bang);
   fts_class_message_varargs(cl, fts_s_stop, env_stop);
-
-  fts_class_message_varargs(cl, bpf_symbol, env_bpf);
-  fts_class_inlet_int(cl, 0, env_number);
-  fts_class_inlet_float(cl, 0, env_number);
-  fts_class_inlet_varargs(cl, 0, env_array);
-
   fts_class_message_varargs(cl, fts_new_symbol("adsr"), env_adsr);
   fts_class_message_varargs(cl, fts_new_symbol("speed"), env_set_speed);
   fts_class_message_varargs(cl, fts_new_symbol("duration"), env_set_duration);
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), env_set_mode);
+
+  fts_class_inlet_int(cl, 0, env_number);
+  fts_class_inlet_float(cl, 0, env_number);
+  fts_class_inlet_varargs(cl, 0, env_array);
+  fts_class_inlet(cl, 0, bpf_type, env_bpf);
 
   fts_dsp_declare_outlet(cl, 0);
+  fts_class_outlet_bang(cl, 1);
 }
 
 void

@@ -360,7 +360,7 @@ public class FtsPackage extends FtsObjectWithEditor
   void uploadDone()
   {    
     if( hasSummaryHelp)
-      FtsHelpPatchTable.addSummary( name.toString()+" summary", dir+"/help/"+name+".summary.jmax");
+      FtsHelpPatchTable.addSummary( name.toString(), dir + "/help/" + name + ".summary.jmax");
   }
 
   public void openEditor(int nArgs, FtsAtom[] args)
