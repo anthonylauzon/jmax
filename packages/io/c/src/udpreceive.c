@@ -20,13 +20,7 @@
  *
  */
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <string.h>
-#include <ctype.h>
 
 #include <stdio.h>
 
@@ -80,7 +74,6 @@ static void udpreceive_receive( fts_object_t *o, int size, const unsigned char* 
 static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpreceive_t *self = (udpreceive_t *)o;
-  int port = fts_get_int_arg( ac, at, 0, 0);
 
   /* create binary protocol decoder */
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
