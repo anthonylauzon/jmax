@@ -1,3 +1,13 @@
+2003-02-04  Diemo Schwarz  <schwarz@ligeti.ircam.fr>
+
+	* sequence package changes by Norbert, Riccardo, Diemo:
+	Removed spurious "A track with this name already exist!" message.
+	Editors	update track/sequence name in window.
+	Fixed bug with track persistence -> no more crash on loading saved tracks.
+	Added track_highlight_events* functions.
+	Added message "start" for play object.
+
+
 2003-02-04  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* add command line arguments for project and AUDIO/MIDI configuration files
