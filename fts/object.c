@@ -117,7 +117,7 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
     if(fts_object_get_definition(obj) != NULL)
       fts_definition_update(fts_object_get_definition(obj), fts_null);
 
-    if(sym != fts_s_empty_string)
+    if(sym != fts_s_empty_string && sym != fts_s_none)
     {
       fts_patcher_t *scope = fts_patcher_get_scope(patcher);
       fts_symbol_t name = fts_name_get_unused(scope, sym);

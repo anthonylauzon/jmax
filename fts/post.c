@@ -167,7 +167,7 @@ mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
       n += mempost( pp, psize, offset + n, ")");
     }
     else if(fts_object_get_class_name(obj) != NULL)
-      n = mempost( pp, psize, offset, "(:%s)", fts_object_get_class_name(obj));
+      n = mempost( pp, psize, offset, "(:%s)", fts_symbol_name(fts_object_get_class_name(obj)));
     else
       n = mempost( pp, psize, offset, "(:\?\?\?)");
   }
@@ -348,9 +348,9 @@ void fts_spost_float( fts_bytestream_t *stream, double f)
 void fts_spost_symbol( fts_bytestream_t *stream, fts_symbol_t s)
 {
   if( needs_quote(s))
-    fts_spost( stream, "\'%s\'", s);
+    fts_spost( stream, "\'%s\'", fts_symbol_name(s));
   else
-    fts_spost( stream, "%s", s);
+    fts_spost( stream, "%s", fts_symbol_name(s));
 }
 
 void 
@@ -401,7 +401,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
 	      n += mempost( &post_buffer, &post_buffer_size, n, ")");
 	    }
 	  else if(fts_object_get_class_name(obj) != NULL)
-	    n += mempost( &post_buffer, &post_buffer_size, 0, "(:%s)", fts_object_get_class_name(obj));
+	    n += mempost( &post_buffer, &post_buffer_size, 0, "(:%s)", fts_symbol_name(fts_object_get_class_name(obj)));
 	  else
 	    n += mempost( &post_buffer, &post_buffer_size, 0, "(:\?\?\?)");
 	}
