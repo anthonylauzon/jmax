@@ -40,11 +40,11 @@ public class FtsAtomList
   public String getValuesAsText()
   {
     StringBuffer buffer = new StringBuffer();
+    boolean addBlank = false ;
 
     for (int i = 0; i < values.size(); i++)
       {
 	Object element = values.elementAt(i);
-	boolean addBlank = false ;
 	int n;
 
 	if (addBlank)

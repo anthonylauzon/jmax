@@ -157,7 +157,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(aFtsLocation));
 	   if (aData == null) System.err.println("MaxData nullo ");
 	   aData.edit();
-	   } catch (MaxDataException e){System.err.println("Max Data Exception");}
+	   } catch (MaxDataException e){System.err.println("Max Data Exception: " + e);}
        }
      }
      else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);

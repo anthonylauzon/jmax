@@ -1,5 +1,7 @@
 package ircam.jmax.fts;
 
+import ircam.jmax.*;
+
 import java.util.*;
 import java.io.*;
 
@@ -61,12 +63,26 @@ public class FtsServer
   
   Vector updateGroupListeners;
 
+  /** If true, put a 10 sec timeout on Sync;
+    You can avoid the timeout with the -noTimeOut yes
+    command line flag
+   */
+
+  private boolean timeoutOnSync = true;
+
   /** Create an FTS Server. With a given port. */
 
   FtsServer(String name, FtsPort port)
   {
+    String timeOut;
+
     this.name = name;
     this.port = port;
+
+    timeOut = MaxApplication.getProperty("noTimeOut");
+
+    if (timeOut != null)
+      timeoutOnSync = false;
 
     this.port.setServer(this);
   }
@@ -900,8 +916,10 @@ public class FtsServer
 	// it should be smarter, detect the problem,
 	// and set the server as halted.
 
-	// wait(10000);
-	wait();
+	if (timeoutOnSync)
+	  wait(10000);
+	else
+	  wait();
       }
     catch (java.lang.InterruptedException e)
       {

@@ -336,7 +336,6 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
      otherwise we loose the updates for open redefined patchers */
 
   new->open = old->open;
-  new->is_abstraction = old->is_abstraction;
 
   /* first, delete the inlets that will not be used in the new patcher,
      if any

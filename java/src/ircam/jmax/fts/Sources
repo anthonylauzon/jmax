@@ -52,8 +52,8 @@ SOURCES = \
 	  FtsAtomListData.java \
 	  FtsAtomListObject.java \
 	  FtsTableObject.java      \
-	  FtsQlistObject.java 
-	
+	  FtsQlistObject.java       \
+          FtsBmaxRemoteDataHandler.java 	
 
 
 

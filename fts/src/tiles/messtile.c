@@ -499,8 +499,8 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      /* No, too much !!; must be smarted, may be an explicit request */
-      /* fts_object_send_properties(new); */
+      if (parent && fts_patcher_is_open(parent))
+	fts_object_send_properties(new);
     }
   else
     post_mess("System Error in FOS message NEW: bad args", ac, av);

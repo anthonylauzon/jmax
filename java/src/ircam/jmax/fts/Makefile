@@ -228,9 +228,26 @@ FtsIntegerVectorDataType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorDataType.java)
 .PHONY: FtsIntegerVectorDataType
 
+
+FtsAtomList:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomList.java)
+.PHONY: FtsAtomList
+
+FtsAtomListData:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomListData.java)
+.PHONY: FtsAtomListData
+
+FtsAtomListDataType:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomListDataType.java)
+.PHONY: FtsAtomListDataType
+
 FtsTableObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTableObject.java)
 .PHONY: FtsTableObject
+
+FtsQlistObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsQlistObject.java)
+.PHONY: FtsQlistObject
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

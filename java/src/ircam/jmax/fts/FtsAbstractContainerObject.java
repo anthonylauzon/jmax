@@ -59,7 +59,7 @@ abstract public class FtsAbstractContainerObject extends FtsObject
   final void addObjectToContainer(FtsObject obj)
   {
     objects.addElement(obj);
-    put("newObject", obj); // the newObject property keep the last object created
+    localPut("newObject", obj); // the newObject property keep the last object created
   }
 
   /** Remove an object from this container. */
@@ -137,14 +137,14 @@ abstract public class FtsAbstractContainerObject extends FtsObject
   final void addConnectionToContainer(FtsConnection obj)
   {
     connections.addElement(obj);
-    put("newConnection", obj); // the newConnection property keep the last connection created
+    localPut("newConnection", obj); // the newConnection property keep the last connection created
   }
 
   /** Remove an connection from this container. */
 
   final void removeConnectionFromContainer(FtsConnection obj)
   {
-    put("deleteConnection", obj); // the deleteConnection property keep the last connection deleted
+    localPut("deleteConnection", obj); // the deleteConnection property keep the last connection deleted
     connections.removeElement(obj);
   }
 

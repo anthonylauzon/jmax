@@ -5,6 +5,7 @@ all:
 	(cd icebrowser; $(MAKE) -k all)
 	(cd espresso; $(MAKE) -k all)
 	(cd table; $(MAKE) -k all)
+	(cd qlist; $(MAKE) -k all)
 
 all_c:
 	(cd fts1.5; $(MAKE) -k all)
@@ -15,6 +16,7 @@ all_java:
 	(cd icebrowser; $(MAKE) -k all)
 	(cd espresso; $(MAKE) -k all)
 	(cd table; $(MAKE) -k all)
+	(cd qlist; $(MAKE) -k all)
 
 clean:
 	(cd fts1.5; $(MAKE) clean)

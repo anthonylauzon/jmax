@@ -143,15 +143,37 @@ fts_client_updates_sync(void)
 {
   fts_symbol_t property;
   fts_object_t *obj;
+  int one_done = 0;
 
-  update_group_start();
+  /* First, do all the update in the urgent list, then the
+     standards.
+     */
 
-  while (fts_object_get_next_change(&property, &obj))
+  while (fts_object_get_next_change_urgent(&property, &obj))
     {
+      if (one_done == 0)
+	{
+	  update_group_start();
+	  one_done = 1;
+	}
+
       fts_client_send_prop(obj, property);
     }
 
-  update_group_end();
+
+  while (fts_object_get_next_change(&property, &obj))
+    {
+      if (one_done == 0)
+	{
+	  update_group_start();
+	  one_done = 1;
+	}
+
+      fts_client_send_prop(obj, property);
+    }
+
+  if (one_done)
+    update_group_end();
 }
 
 

@@ -97,7 +97,7 @@ public class FtsAtomListData extends MaxData implements MaxTclData, MaxFtsData
 	FtsObject object = ((MaxFtsDataSource) newSource).getFtsLocation().getObject();
 
 	if (object instanceof FtsAtomListObject)
-	  oldObject = (FtsAtomListObject) object;
+	  newObject = (FtsAtomListObject) object;
       }
 
     /** If the new Object is the same good old one, nothing to do */
@@ -115,8 +115,11 @@ public class FtsAtomListData extends MaxData implements MaxTclData, MaxFtsData
 
     /** And, if we have a new one, bind it to the list */
 
-    newObject.bindList(list);
-    ((FtsDataObject) newObject).setData(this);
+    if (newObject != null)
+      {
+	newObject.bindList(list);
+	((FtsDataObject) newObject).setData(this);
+      }
   }
 
   // WARNING: TCL FORMAT TO BE DEFINED, ALSO EMBEDDED TCL FORMAT

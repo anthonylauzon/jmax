@@ -107,7 +107,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	}
       catch (MaxDataException ex)
 	{
-	  new ErrorDialog(MaxEditor.this, "Error " + ex + "while creating new "+ type.getName());
+	  new ErrorDialog(MaxEditor.this, ex.toString());
 	}
     }
   }
@@ -337,7 +337,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	  }
 	catch (MaxDataException e)
 	  {
-	    new ErrorDialog(this, "Error " + e + "while opening "+ source);
+	    new ErrorDialog(this, e.toString());
 	  }
       }
   }

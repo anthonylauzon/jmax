@@ -22,6 +22,8 @@ public class FtsModule
 
     MaxDataHandler.installDataHandler( new FtsDataHandler()); 
 
+    MaxDataHandler.installDataHandler( new FtsBmaxRemoteDataHandler());
+
     MaxDataType.installDataType(new FtsPatchDataType());
     MaxDataType.installDataType(new FtsIntegerVectorDataType());
     MaxDataType.installDataType(new FtsAtomListDataType());

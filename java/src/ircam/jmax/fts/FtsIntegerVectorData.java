@@ -113,8 +113,11 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
 
     /** And, if we have a new one, bind it to the vector */
 
-    newObject.bindVector(vector);
-    ((FtsDataObject) newObject).setData(this);
+    if (newObject != null)
+      {
+	newObject.bindVector(vector);
+	((FtsDataObject) newObject).setData(this);
+      }
   }
 
   // WARNING: TCL FORMAT TO BE DEFINED, ALSO EMBEDDED TCL FORMAT

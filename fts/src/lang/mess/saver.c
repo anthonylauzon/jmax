@@ -33,7 +33,7 @@ fts_open_bmax_file_for_writing(const char *name)
 
   /* Open the file */
 
-  f->fd = open(name, O_WRONLY | O_CREAT);
+  f->fd = open(name, O_WRONLY | O_CREAT, 0666);
 
   if (f->fd < 0)
     {
@@ -62,16 +62,23 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 
   /* Write the symbol table */
 
+  fprintf(stderr, "Writing symbol table [%d symbols]\n", f->header.n_symbols);
+
   for (i = 0; i < f->header.n_symbols; i++)
-    write(f->fd, fts_symbol_name(f->symbol_table[i]), strlen(fts_symbol_name(f->symbol_table[i]))+1);
+    {
+      fprintf(stderr, "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
+      write(f->fd, fts_symbol_name(f->symbol_table[i]), strlen(fts_symbol_name(f->symbol_table[i]))+1);
+    }
   
   /* seek to the beginning and rewrite the header */
 
+  fprintf(stderr, "Writing header\n");
   lseek(f->fd, 0, SEEK_SET);
   write(f->fd, &(f->header), sizeof(fts_binary_file_header_t));
 
   /* close the file */
 
+  fprintf(stderr, "Closed file\n");
   close(f->fd);
 
   /* free the bmax file descriptor */
@@ -151,6 +158,7 @@ static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     }
 
   f->symbol_table[f->symbol_table_fill] = sym;
+  f->header.n_symbols = f->symbol_table_fill;
 
   return (f->symbol_table_fill)++;
 }
@@ -166,6 +174,8 @@ fts_bmax_code_return(fts_bmax_file_t *f)
 
   fts_word_t w;
 
+  fprintf(stderr, "RETURN\n");
+
   fts_word_set_int(&w, FVM_RETURN);
   write(f->fd, &w, sizeof(fts_word_t));
 }
@@ -177,6 +187,8 @@ fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 
   fts_word_t w;
   fts_word_t i;
+
+  fprintf(stderr, "FVM_PUSH_INT %d\n", value);
 
   fts_word_set_int(&w, FVM_PUSH_INT);
   fts_word_set_int(&i, value);
@@ -192,6 +204,8 @@ fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 
   fts_word_t w;
   fts_word_t fw;
+
+  fprintf(stderr, "FVM_PUSH_FLOAT %f\n", value);
 
   fts_word_set_int(&w, FVM_PUSH_FLOAT);
   fts_word_set_float(&fw, value);
@@ -210,6 +224,10 @@ fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* PUSH_BUILTIN_SYM   <int>  */
 
+      fprintf(stderr, "FVM_PUSH_BUILTIN_SYM %d (%s)\n",
+	      fts_get_builtin_symbol_index(sym),
+	      fts_symbol_name(sym));
+
       fts_word_set_int(&w, FVM_PUSH_BUILTIN_SYM);
       fts_word_set_int(&s, fts_get_builtin_symbol_index(sym));
     }
@@ -217,7 +235,11 @@ fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* PUSH_SYM   <int>   */
 
-      fts_word_set_int(&w, FVM_PUSH_FLOAT);
+      fprintf(stderr, "FVM_PUSH_SYM %d (%s)\n",
+	      fts_bmax_add_symbol(f, sym),
+	      fts_symbol_name(sym));
+
+      fts_word_set_int(&w, FVM_PUSH_SYM);
       fts_word_set_int(&s, fts_bmax_add_symbol(f, sym));
     }
 
@@ -234,6 +256,7 @@ fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
   fts_word_t w;
   fts_word_t i;
 
+  fprintf(stderr, "FVM_POP_ARGS %d\n", value);
 
   fts_word_set_int(&w, FVM_POP_ARGS);
   fts_word_set_int(&i, value);
@@ -251,6 +274,7 @@ fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
   fts_word_t w;
   fts_word_t i;
 
+  fprintf(stderr, "FVM_PUSH_OBJ %d\n", value);
 
   fts_word_set_int(&w, FVM_PUSH_OBJ);
   fts_word_set_int(&i, value);
@@ -266,6 +290,8 @@ fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
 
   fts_word_t w;
   fts_word_t i;
+
+  fprintf(stderr, "FVM_MV_OBJ %d\n", value);
 
   fts_word_set_int(&w, FVM_MV_OBJ);
   fts_word_set_int(&i, value);
@@ -284,6 +310,8 @@ fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
   fts_word_t w;
   fts_word_t i;
 
+  fprintf(stderr, "FVM_POP_OBJS %d\n", value);
+
   fts_word_set_int(&w, FVM_POP_OBJS);
   fts_word_set_int(&i, value);
 
@@ -299,6 +327,8 @@ fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
 
   fts_word_t w;
   fts_word_t i;
+
+  fprintf(stderr, "FVM_MAKE_OBJ %d\n", value);
 
   fts_word_set_int(&w, FVM_MAKE_OBJ);
   fts_word_set_int(&i, value);
@@ -317,12 +347,20 @@ fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* PUT_BUILTIN_PROP   <sym> */
 
+      fprintf(stderr, "FVM_PUT_BUILTIN_PROP %d (%s)\n",
+	      fts_get_builtin_symbol_index(sym),
+	      fts_symbol_name(sym));
+
       fts_word_set_int(&w, FVM_PUT_BUILTIN_PROP);
       fts_word_set_int(&s, fts_get_builtin_symbol_index(sym));
     }
   else
     {
       /* PUT_PROP   <sym> */
+
+      fprintf(stderr, "FVM_PUT_PROP %d (%s)\n",
+	      fts_bmax_add_symbol(f, sym),
+	      fts_symbol_name(sym));
 
       fts_word_set_int(&w, FVM_PUT_PROP);
       fts_word_set_int(&s, fts_bmax_add_symbol(f, sym));
@@ -347,12 +385,24 @@ fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int narg
     {
       /* OBJ_BUILTIN_MESS   <inlet> <sel> <nargs> */
 
+      fprintf(stderr, "FVM_OBJ_BUILTIN_MESS %d %d (%s) %d\n",
+	      inlet,
+	      fts_get_builtin_symbol_index(sel),
+	      fts_symbol_name(sel),
+	      nargs);
+
       fts_word_set_int(&w, FVM_PUT_BUILTIN_PROP);
       fts_word_set_int(&s, fts_get_builtin_symbol_index(sel));
     }
   else
     {
       /* OBJ_MESS   <inlet> <sel> <nargs> */
+
+      fprintf(stderr, "FVM_OBJ_BUILTIN_MESS %d %d (%s) %d\n",
+	      inlet,
+	      fts_bmax_add_symbol(f, sel),
+	      fts_symbol_name(sel),
+	      nargs);
 
       fts_word_set_int(&w, FVM_PUT_PROP);
       fts_word_set_int(&s, fts_bmax_add_symbol(f, sel));
@@ -373,6 +423,8 @@ fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
   fts_word_t w;
   fts_word_t i;
 
+  fprintf(stderr, "FVM_PUSH_OBJ_TABLE %d\n", value);
+
   fts_word_set_int(&w, FVM_PUSH_OBJ_TABLE);
   fts_word_set_int(&i, value);
 
@@ -387,6 +439,8 @@ fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
 
   fts_word_t w;
 
+  fprintf(stderr, "FVM_POP_OBJ_TABLE\n");
+
   fts_word_set_int(&w, FVM_POP_OBJ_TABLE);
 
   write(f->fd, &w, sizeof(fts_word_t));
@@ -398,6 +452,8 @@ fts_bmax_code_connect(fts_bmax_file_t *f)
   /* CONNECT */
 
   fts_word_t w;
+
+  fprintf(stderr, "FVM_CONNECT\n");
 
   fts_word_set_int(&w, FVM_CONNECT);
 
@@ -487,6 +543,8 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj)
   fts_patcher_t *patcher = (fts_patcher_t *) obj;
   fts_object_t *p;
 
+  fprintf(stderr, "Saving Patcher %d\n", obj->id);
+
   /* Allocate a new object table frame of the right dimension */
 
   fts_bmax_code_push_obj_table(f, fts_bmax_count_childs(patcher));
@@ -496,6 +554,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj)
   i = 0;
   for (p = patcher->objects; p ; p = p->next_in_patcher)
     {
+      fprintf(stderr, "\tSaving Object %d\n", p->id);
       fts_bmax_code_new_object(f, p, i);
       i++;
     }
@@ -512,7 +571,11 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj)
 	  fts_connection_t *c;
 
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    fts_bmax_code_new_connection(f, c, i);
+	    {
+	      fprintf(stderr, "\tSaving Connection (%d.%d -> %d.%d)\n",
+		      c->src->id, c->woutlet, c->dst->id, c->winlet);
+	      fts_bmax_code_new_connection(f, c, i);
+	    }
 	}
     }
 
