@@ -11,12 +11,6 @@
 			path = ../../packages/macosx/c/src/macosxmidi.c;
 			refType = 2;
 		};
-		F78563C002BA3BCE016640F1 = {
-			fileRef = F78563BF02BA3BCE016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 //F70
 //F71
 //F72
@@ -27,6 +21,18 @@
 //F82
 //F83
 //F84
+		F800EB8F02CB316E01664092 = {
+			fileRef = F8DC5EF80286A1FA01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F800EB9002CB316F01664092 = {
+			fileRef = F78563BF02BA3BCE016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F80902C002B7627F01664092 = {
 			children = (
 				F80902C102B762B101664092,
@@ -789,8 +795,8 @@
 			productName = libsignal;
 			productReference = F8446931028BCAD101664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -2325,8 +2331,8 @@
 			productName = libispw;
 			productReference = F8446A09028BCC2301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -6513,8 +6519,8 @@
 			productName = libcontrol;
 			productReference = F8512291028BDFF301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -6939,8 +6945,8 @@
 			productName = libio;
 			productReference = F85122CC028BE16601664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -7286,8 +7292,8 @@
 			productName = libispwmath;
 			productReference = F85122FB028BE32B01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -7501,8 +7507,8 @@
 			productName = libmidi;
 			productReference = F8512315028BE41301664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -7948,8 +7954,8 @@
 			productName = libnumeric;
 			productReference = F8512351028BE5ED01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -8405,8 +8411,8 @@
 			productName = libsequence;
 			productReference = F8512383028BE77C01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -11459,8 +11465,8 @@
 			productName = "file-generation";
 			productReference = F85C878F0290238D01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -12452,8 +12458,8 @@
 			productName = libutils;
 			productReference = F880007A0283072001664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -13025,7 +13031,7 @@
 				F880FD5F0282FA3901664092,
 				F880FD600282FA3901664092,
 				F880FD610282FA3901664092,
-				F880FD620282FA3901664092,
+				F8D6E22B02CE2D9701664092,
 				F880FD630282FA3901664092,
 				F880FD640282FA3901664092,
 				F880FD650282FA3901664092,
@@ -13224,12 +13230,6 @@
 			path = ../../fts/macosx.c;
 			refType = 2;
 		};
-		F880FD620282FA3901664092 = {
-			isa = PBXFileReference;
-			name = main.c;
-			path = ../../fts/main.c;
-			refType = 2;
-		};
 		F880FD630282FA3901664092 = {
 			isa = PBXFileReference;
 			name = mem.c;
@@ -13424,8 +13424,8 @@
 			productName = libfts;
 			productReference = F880FD820282FA3901664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -13526,6 +13526,7 @@
 				F8386ECE028D3F9101664092,
 				F848668902A2751001664092,
 				F848669502A2758B01664092,
+				F8FE337102CC778F01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -17326,15 +17327,9 @@
 		F880FFF0028301DA01664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F880FFF1028301DA01664092,
+				F8D6E22C02CE2D9701664092,
 			);
 			isa = PBXSourcesBuildPhase;
-		};
-		F880FFF1028301DA01664092 = {
-			fileRef = F880FD620282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F880FFF2028301DA01664092 = {
 			buildActionMask = 2147483647;
@@ -17432,8 +17427,8 @@
 			productName = jMax;
 			productReference = F880FFF70283022401664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -17850,8 +17845,8 @@
 			productName = libdata;
 			productReference = F8B8E4AE02867E1C01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -19601,8 +19596,8 @@
 			productName = libguiobj;
 			productReference = F8B8E5A30286822501664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -19933,6 +19928,18 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+		};
+		F8D6E22B02CE2D9701664092 = {
+			isa = PBXFileReference;
+			name = main.c;
+			path = ../../fts/main.c;
+			refType = 2;
+		};
+		F8D6E22C02CE2D9701664092 = {
+			fileRef = F8D6E22B02CE2D9701664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F8DC5E4B028683C301664092 = {
 			children = (
@@ -20894,8 +20901,8 @@
 			productName = libmacosx;
 			productReference = F8DC5EFA0286A1FB01664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -20941,9 +20948,9 @@
 			files = (
 				F8DC5EFF0286A1FB01664092,
 				F8DC5F000286A1FB01664092,
-				F8DC5F010286A1FB01664092,
 				F8DC5F020286A1FB01664092,
-				F78563C002BA3BCE016640F1,
+				F800EB8F02CB316E01664092,
+				F800EB9002CB316F01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -20955,12 +20962,6 @@
 		};
 		F8DC5F000286A1FB01664092 = {
 			fileRef = F8DC5EF70286A1FA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5F010286A1FB01664092 = {
-			fileRef = F8DC5EF80286A1FA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -21132,8 +21133,8 @@
 			productName = libsystem;
 			productReference = F8DC5F1B0286BF2501664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
@@ -21659,6 +21660,12 @@
 		};
 		F8F0110A028D91E301664092 = {
 			fileRef = F8F01109028D91E301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F8FE337102CC778F01664092 = {
+			fileRef = F829DA4202B674E601664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

@@ -1196,7 +1196,7 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   if( !fts_object_is_error( o))
     {
       if( fts_patcher_is_template( (fts_patcher_t *)o) || fts_patcher_is_abstraction( (fts_patcher_t *)o))
-	fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc, o->argv);
+	fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
       else
 	fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
     }  
