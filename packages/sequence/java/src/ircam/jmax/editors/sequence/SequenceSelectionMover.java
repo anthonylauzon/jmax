@@ -68,6 +68,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	SequencePanel sequencePanel;
 	//Event event;
 	private int delta = 10;
+	private int count = 0;
 	int x, y;
 	public void actionPerformed(ActionEvent ae)
 	{
@@ -84,7 +85,10 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	      else
 	      event.setTime(time-delta);*/
 
-	    sequencePanel.scrollBy(x, y);//version 3
+	    if(sequencePanel.scrollBy(x, y))
+		count = count+delta;
+	    else
+		count = count-delta;
 	}
 	void setEditor(SequencePanel editor)
 	{
@@ -103,6 +107,14 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    this.x = x;
 	    this.y = y;
 	}
+	int getCount()
+	{
+	    return count;
+	}
+	void resetCount()
+	{
+	    count = 0;
+	}
     }
 
     void autoScrollIfNeeded(int x, int y)
@@ -115,6 +127,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    if (!scrollTimer.isRunning())
 		{
 		    scroller.setEditor(panel);
+		    scroller.resetCount();
 		    //scroller.setEvent(tempEvent);
 		    scrollTimer.start();
 		}
@@ -202,9 +215,10 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	if (scrollTimer.isRunning())
 	{
 	    scrollTimer.stop();
-	    PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
+	    scroller.resetCount();
+	    //PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
 	    //Event evt = scroller.getEvent();
-	    a.setX(/*evt*/tempEvent, e.getX());
+	    //a.setX(/*evt*/tempEvent, a.getX(tempEvent)+scroller.getCount());
 	}
 	super.mouseReleased(e);
     }
@@ -227,6 +241,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       
       if(!scrollTimer.isRunning())
 	  super.mouseDragged(e);
+      
+      System.err.println("count "+scroller.getCount());
 
       autoScrollIfNeeded(e.getX(), e.getY());
   }
@@ -266,7 +282,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-	      a.setX(tempEvent, a.getX(movTrackEvent)+dx);
+		a.setX(tempEvent, a.getX(movTrackEvent)+dx);
 	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);

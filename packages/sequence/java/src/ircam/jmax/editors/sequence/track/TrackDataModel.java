@@ -47,6 +47,11 @@ public interface TrackDataModel {
      * how many events in the database
      */
     public abstract int length();
+
+    /**
+     * return the time of the last event
+     */
+    public abstract double getMaximumTime();
     
     
     /**
@@ -182,4 +187,5 @@ public interface TrackDataModel {
     public int NO_SUCH_EVENT = Integer.MIN_VALUE;
   
 }
+
 

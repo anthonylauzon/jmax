@@ -262,6 +262,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	track.getTrackDataModel().addListener(this);
     }
 
+    public void tracksAdded(int maxTime)
+    {
+	if(maxTime>0)
+	    resizePanelToTime(maxTime);
+    }
 
     /**
      * Callback from the model. It can be called when two tracks are merged into one */

@@ -176,6 +176,18 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	return events_fill_p;
     }
     
+    public double getMaximumTime()
+    {
+	double time;
+	double max = 0;
+
+	for (int i=0 ; i<events_fill_p;i++) 
+	    {
+		time = events[i].getTime()+((Integer)events[i].getProperty("duration")).intValue();
+		if(time>max) max = time;
+	    }
+	return max;
+    }
     
     /**
      * returns an enumeration of all the events

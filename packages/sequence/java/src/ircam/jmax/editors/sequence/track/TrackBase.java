@@ -67,6 +67,12 @@ public class TrackBase implements Track{
 	return (FtsTrackObject)model;
     }
 
+    public int getMaximumTime()
+    {
+	System.err.println("trackBase getMaximumTime");
+	return (int)model.getMaximumTime();
+    }
+
     /*public void setId(int id)
       {
       this.id = id;

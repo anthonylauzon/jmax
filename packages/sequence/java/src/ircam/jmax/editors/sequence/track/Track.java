@@ -66,6 +66,10 @@ public interface Track {
     public abstract Object getProperty(String name);
 
     /**
+     * Returns the time of the last event*/
+    public abstract int getMaximumTime(); 
+
+    /**
      * Returns the PropertyChangeSupport object associated to this track.
      * Clients can add specific listeners for specific properties as in
      * track.getPropertySupport().addChangeListener(myChangeListener); .*/

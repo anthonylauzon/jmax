@@ -102,13 +102,34 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    * Fts callback: add a new Track(first arg) . 
    * 
    */
-  public void addTrack(int nArgs , FtsAtom args[])
-  {
-    FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
-    Track track = new TrackBase(trackObj);
-    tracks.addElement(track);
+    /*public void addTrack(int nArgs , FtsAtom args[])
+      {
+      FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
+      Track track = new TrackBase(trackObj);
+      tracks.addElement(track);
+      
+      notifyTrackAdded(track);
+      }*/
     
-    notifyTrackAdded(track);
+  public void addTracks(int nArgs , FtsAtom args[])
+  {
+      FtsTrackObject trackObj;
+      TrackBase track;
+      int time;
+      int trackTime = 0;
+      
+      for(int i=0; i<nArgs; i++)
+	  {
+	      trackObj = (FtsTrackObject)(args[i].getObject());
+	      track = new TrackBase(trackObj);
+	      tracks.addElement(track);
+	      notifyTrackAdded(track);
+	      time = (int)trackObj.getMaximumTime();
+	      if(time>trackTime) trackTime = time;
+	      
+	  }
+      
+    notifyTracksAdded(trackTime);
   }
     
   /**
@@ -211,6 +232,12 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   {
     for (Enumeration e=listeners.elements(); e.hasMoreElements();)
       ((TrackListener)(e.nextElement())).trackAdded(track);
+  }
+
+  private void notifyTracksAdded(int maxTime)
+  {
+    for (Enumeration e=listeners.elements(); e.hasMoreElements();)
+      ((TrackListener)(e.nextElement())).tracksAdded(maxTime);
   }
 
   private void notifyTrackRemoved(Track track)

@@ -8,6 +8,7 @@ import java.awt.event.*;
 public interface TrackListener
 {
     public abstract void trackAdded(Track track);   
+    public abstract void tracksAdded(int maxTime);   
     public abstract void trackRemoved(Track track);   
     public abstract void trackChanged(Track track);   
 }
