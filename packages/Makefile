@@ -78,7 +78,7 @@ clean_java:
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages
 	for i in $(C_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
-	for i in $(JAVA_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	if [ _$(JAVA_PACKAGES)_ != __ ] ; then for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done ; fi
 	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
 .PHONY: install
 
