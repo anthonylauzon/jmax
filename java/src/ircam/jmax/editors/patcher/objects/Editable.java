@@ -152,17 +152,15 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     super.setFont( f);
     renderer.update();
-    //if(getWidth() >= ((TextRenderer)renderer).getColWidth()){//***
     super.setHeight(renderer.getHeight() + getTextHeightOffset());
     redraw();
-    /*}//*** when font width is greater than object width (to avoid the text disappear)
-      else{
-      super.setWidth(((TextRenderer)renderer).getColWidth()+ getTextWidthOffset());
-      super.setHeight(renderer.getHeight() + getTextHeightOffset());
-      redraw();
-      }*/
   }
 
+  public void setCurrentFont(Font font)
+  {
+    super.setCurrentFont(font);
+    renderer.update();
+  }
   public void fitToText()
   {
     renderer.update();
