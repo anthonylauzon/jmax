@@ -70,15 +70,20 @@ class KeyMap
 
     // Fixed Resize Actions
 
-    add(Actions.resizeTenLeftAction,  Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
-    add(Actions.resizeTenRightAction, Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
-    add(Actions.resizeTenUpAction,    Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
-    add(Actions.resizeTenDownAction,  Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
+    //add(Actions.resizeTenLeftAction,  Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
+    //add(Actions.resizeTenRightAction, Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeTenLeftAction,  Event.SHIFT_MASK, KeyEvent.VK_SUBTRACT);
+    add(Actions.resizeTenRightAction, Event.SHIFT_MASK, KeyEvent.VK_ADD);
+    
+    //add(Actions.resizeTenUpAction,    Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
+    //add(Actions.resizeTenDownAction,  Event./*CTRL_MASK*/META_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
-    add(Actions.resizeLeftAction,  Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_LEFT);
-    add(Actions.resizeRightAction, Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_RIGHT);
-    add(Actions.resizeUpAction,    Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_UP);
-    add(Actions.resizeDownAction,  Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_DOWN);
+    //add(Actions.resizeLeftAction,  Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_LEFT);
+    //add(Actions.resizeRightAction, Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeLeftAction,  0, KeyEvent.VK_SUBTRACT);
+    add(Actions.resizeRightAction, 0, KeyEvent.VK_ADD);
+    //add(Actions.resizeUpAction,    Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_UP);
+    //add(Actions.resizeDownAction,  Event./*CTRL_MASK*/META_MASK, KeyEvent.VK_DOWN);
 
     // Resize Align operations
 
