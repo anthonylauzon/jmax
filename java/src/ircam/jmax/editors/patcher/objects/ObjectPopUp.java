@@ -159,12 +159,11 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
 
   static public void popup(Component invoker, GraphicObject object, int x, int y)
   {
-      popup.target = object;
-      popup.x = x;
-      popup.y = y;
-   
-      popup.setPopupSize(100, 200);
-      popup.show(invoker, x - 2, y - 2);
+    popup.target = object;
+    popup.x = x;
+    popup.y = y;
+    
+    popup.show(invoker, x - 2, y - 2);
   }
 
   public JMenuItem add(EditorAction action, String name)
