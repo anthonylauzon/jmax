@@ -66,43 +66,79 @@ class ErmesToolButton extends JToggleButton
     }     
   };
 
-  ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String cursorName, String message)
-  {
-    super( theIcon);
-
-    setDoubleBuffered( false);
-    setMargin( new Insets(0,0,0,0));
-    this.description = description;
-    this.message = message;
-    this.toolBar = toolBar;
-    
-    setToolTipText(description+" object");
-    
-    tracker = new MediaTracker(this); 
-
-    if(Cursors.get(description) == null)
-    {
-	Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
-	tracker.addImage(image, 0);
-	Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
-	BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
-	tracker.addImage(bi, 1);
+    /*ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String cursorName, String message)
+      {
+      super( theIcon);
+      
+      setDoubleBuffered( false);
+      setMargin( new Insets(0,0,0,0));
+      this.description = description;
+      this.message = message;
+      this.toolBar = toolBar;
+      
+      setToolTipText(description+" object");
+      
+      tracker = new MediaTracker(this); 
+      
+      if(Cursors.get(description) == null)
+      {
+      Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
+      tracker.addImage(image, 0);
+      Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
+      BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
+      tracker.addImage(bi, 1);
 	
-	try
-	    {
-		tracker.waitForAll();
+      try
+      {
+      tracker.waitForAll();
 		
+      bi.createGraphics().drawImage(image, 0, 0, this);
+      Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
+      Cursors.loadCursor(description, cursor);
+      }
+      catch (InterruptedException e)
+      {
+      System.err.println("Error loading "+description+" object cursor!");
+      }	    
+      }    
+      addMouseListener(ErmesToolButton.mListener);
+      }*/
+
+    ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String cursorName, String message)
+    {
+	super( theIcon);
+
+	setDoubleBuffered( false);
+	setMargin( new Insets(0,0,0,0));
+	this.description = description;
+	this.message = message;
+	this.toolBar = toolBar;
+    
+	setToolTipText(description+" object");
+    
+	tracker = new MediaTracker(this); 
+	
+	if(Cursors.get(description) == null)
+	    {
+		Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
+		tracker.addImage(image, 0);
+		try
+		    {
+			tracker.waitForID(0);
+		    }
+		catch (InterruptedException e)
+		    {
+			System.err.println("Error loading "+description+" object cursor!");
+		    }           
+          
+		Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
+		BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
 		bi.createGraphics().drawImage(image, 0, 0, this);
 		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
-		Cursors.loadCursor(description, cursor);
+		Cursors.loadCursor(description, cursor);        
 	    }
-	catch (InterruptedException e)
-	    {
-		System.err.println("Error loading "+description+" object cursor!");
-	    }	    
-    }    
-    addMouseListener(ErmesToolButton.mListener);
-  }
+	addMouseListener(ErmesToolButton.mListener);
+    }
 
   void reset(){
     state = false;
