@@ -102,8 +102,7 @@ static void delete_reader_thread(readsf_t* self)
   fts_free(self->thread_worker);
 }
 
-/* static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)*/
-static void readsf_eof_alarm(fts_object_t* o)
+static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   /* set bang to last outlet */
   fts_outlet_bang(o, fts_object_get_outlets_number(o) - 1);
@@ -148,8 +147,8 @@ static void readsf_dsp( fts_word_t *argv)
   {
     fts_post ("[readsf~] end of file\n");
     self->is_started = 0;
-    /* call eof file method */
-    readsf_eof_alarm((fts_object_t*)self);
+    /* add callback  eof file method */
+    fts_timebase_add_call(fts_get_timebase(),(fts_object_t*)self, readsf_eof_alarm, NULL, 0.0);
     return;
   }
 
@@ -235,6 +234,8 @@ static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 /* forward declaration */
 static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
+
+
 static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t* self = (readsf_t*)o;
@@ -274,7 +275,14 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     fts_set_symbol(a, fts_s_open);
     fts_set_symbol(a + 1, s_open_file);
     fts_set_symbol(a + 2, fts_project_get_dir());
-    fts_set_symbol(a + 3, fts_new_symbol(" "));
+    if (NULL != self->filename)
+    {
+      fts_set_symbol(a + 3, self->filename);
+    }
+    else
+    {
+      fts_set_symbol(a + 3, fts_new_symbol(" "));
+    }
     fts_client_send_message(o, fts_s_openFileDialog, 4, a);
   }
 }
