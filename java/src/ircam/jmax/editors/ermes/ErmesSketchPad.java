@@ -1095,6 +1095,11 @@ Rectangle previousResizeRect = new Rectangle();
     if (itsRunMode || e.isControlDown()) {
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
+      //all the modifications done with the control down were not reported
+      //in the offScreen. Do it now!
+      //Optimization: use the dirty lists. Try to avoid to repaint in case
+      //of CTRL click on the sketch when nothing was changed "pseudo run mode" 
+      repaint();
       return;
     }
 
@@ -1404,7 +1409,7 @@ Rectangle previousResizeRect = new Rectangle();
     if (itsRunMode) return;
     if(itsHelper.IsInInOutLet(x,y)) {
       itsSketchWindow.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-      if((e.isControlDown())&&(!itsCurrentInOutlet.itsAlreadyMoveIn)){
+      if((e.isMetaDown())&&(!itsCurrentInOutlet.itsAlreadyMoveIn)){
 	if (e.isShiftDown()) MultiConnect(itsCurrentInOutlet);
 	else{
 	  if (!itsCurrentInOutlet.GetSelected())
