@@ -1,3 +1,8 @@
+2003-12-15  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/ispw/c/src/route.c (route_bang): fixed bug "[ 832360 ] sending bang into [route] does nothing".
+	Sending a bang or 'bang' is the same for route.
+	
 2003-12-15  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* added fts_symbol_name() calls to several files
