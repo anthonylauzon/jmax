@@ -298,10 +298,6 @@ SOURCE=..\fts\project.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\property.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\sched.c
 # End Source File
 # Begin Source File
