@@ -93,11 +93,11 @@ if {[runHooks "start"] != "true"} {
 # and install the profile device; this after
 #the when start, i.e. including user configuration
 
-#if {[systemProperty "profile"] == "true"} {
-#    puts "running with pseudo audio device for profiling"
-#    resetAudioOut
-#    resetAudioIn
-#    openDefaultAudioOut profile
-#} 
+if {[systemProperty "profile"] == "true"} {
+    puts "running with pseudo audio device for profiling"
+    resetAudioOut
+    resetAudioIn
+    openDefaultAudioOut profile
+} 
 
 
