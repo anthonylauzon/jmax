@@ -180,7 +180,7 @@ static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *
 static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
   fts_atom_t zero;
-
+  fts_atom_t max_value;
   fts_set_int(&zero, 0);
 
   fts_object_put_prop(obj, fts_s_x, &(this->x));
@@ -188,7 +188,9 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
   fts_object_put_prop(obj, fts_s_width, &(this->width));
   fts_object_put_prop(obj, fts_s_height, &(this->range));
   fts_object_put_prop(obj, fts_s_min_value, &zero);
-  fts_object_put_prop(obj, fts_s_max_value, &(this->range));
+
+  fts_set_int(&max_value, fts_get_int(&(this->range)) - 1);
+  fts_object_put_prop(obj, fts_s_max_value, &max_value);
 }
 
 
@@ -851,7 +853,9 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_set_symbol(&description[0], fts_s_messbox);
 
+      fts_patparse_set_messbox_mode(in);
       argc = fts_patparse_read_object_arguments(description + 1, in);
+      fts_patparse_set_normal_mode(in);
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1, description);
 

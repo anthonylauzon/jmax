@@ -11,9 +11,9 @@
 
 /**
  * A lexical analyser for .pat files
- * But: it reconize int as separate then floats, and
+ * It reconize int as separate then floats, and
  * it parse the ending ';' in TT_EOC (end of command). <br>
- * Also, it do backslash quoting. <p>
+ * Also, it do backslash to quote transformation for message box , and backslash quoting suppression. <p>
  * It handle also variable substitution
  * for abstractions (in max, they are handled before the lexical
  * analisys: $0-foo is expanded to a single string). <p>
@@ -43,6 +43,7 @@ fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
   this->env_argc = env_argc;
   this->env_argv = env_argv;
   this->buf_fill = 0;
+  this->messbox_mode = 0;
 
   return this;
 }
@@ -66,6 +67,7 @@ fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
   this->env_argc = env_argc;
   this->env_argv = env_argv;
   this->buf_fill = 0;
+  this->messbox_mode = 0;
 
   return this;
 }
@@ -121,7 +123,6 @@ static int fts_patlex_is_backslash(int c)
 #define tt_in_var       1
 #define tt_in_string    2
 #define tt_in_quoted_char  3
-#define tt_in_qquoted_char 4
 #define tt_in_number       5
 #define tt_in_number_or_sign 6
 #define tt_in_float    7
@@ -262,6 +263,25 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
+	      else if (fts_patlex_is_dollar(c))
+		{
+		  /* A dollar at the beginning of a word become
+		     a sigle $ symbol, otherwise is just another char */
+
+		  if (this->buf_fill == 0)
+		    {
+		      this->buf[this->buf_fill++] = c;
+		      this->buf[this->buf_fill++] = '\0';
+		      fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		      this->ttype = FTS_LEX_SYMBOL;
+		      return;
+		    }
+		  else
+		    {
+		      this->buf[this->buf_fill++] = c;
+		      status = tt_in_string;
+		    }
+		}
 	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
@@ -290,29 +310,51 @@ void fts_patlex_next_token(fts_patlex_t *this)
 	      break;
 
 	    case tt_in_quoted_char:
-	      if (fts_patlex_is_backslash(c))
+	      if (feof(this->fd))
 		{
-		  status = tt_in_qquoted_char;
+		  this->buf[this->buf_fill++] = '\0';
+		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  this->ttype = FTS_LEX_SYMBOL;
+		  return;
 		}
 	      else if (fts_patlex_is_dollar(c))
 		{
+		  /* A dollar at the beginning of a word become
+		     a single $ symbol */
 		  this->buf[this->buf_fill++] = c;
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      else
+	      else if (fts_patlex_is_blank(c))
 		{
-		  this->buf[this->buf_fill++] = c;
-		  status = tt_in_string;
+		  this->buf[this->buf_fill++] = '\0';
+		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  this->ttype = FTS_LEX_SYMBOL;
+		  return;
 		}
-	      break;
+	      else if (fts_patlex_is_backslash(c))
+		{
+		  if (this->messbox_mode)
+		    {
+		      /* in messbox, a double '\' become a
+			 single quote token 
+			 */
 
-	    case tt_in_qquoted_char:
-	      if (fts_patlex_is_backslash(c))
-		{
-		  status = tt_in_quoted_char;
+		      this->buf[this->buf_fill++] = '\'';
+		      this->buf[this->buf_fill++] = '\0';
+		      fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		      this->ttype = FTS_LEX_SYMBOL;
+		      return;
+		    }
+		  else
+		    {
+		      /* In normal mode, a double '\' is just consumed
+		       */
+
+		      status = tt_in_string;
+		    }
 		}
 	      else
 		{
@@ -320,7 +362,6 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		  status = tt_in_string;
 		}
 	      break;
-		    
 
 	    case tt_in_number:
 	      if (feof(this->fd))
@@ -330,7 +371,7 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		  this->ttype = FTS_LEX_NUMBER;
 		  return;
 		}
-	      if (fts_patlex_is_semi(c))
+	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_int(&(this->val), atoi(this->buf));
@@ -372,7 +413,7 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      if (fts_patlex_is_semi(c))
+	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));

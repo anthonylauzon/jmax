@@ -146,6 +146,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   static String makeDescription(int offset, FtsMessage msg)
   {
+    boolean noNewLine = false;
     boolean addBlank = false;
     StringBuffer descr = new StringBuffer();
 
@@ -168,11 +169,25 @@ abstract public class FtsObject implements MaxTclInterpreter
 	  {
 	    descr.append(value);
 
-	    if (value.equals(";"))
+	    if (value.equals("$"))
+	      addBlank = false;
+	    else if (value.equals("'"))
 	      {
-		descr.append("\n");
+		noNewLine = true;
 		addBlank = false;
 	      }
+	    else if (value.equals(";"))
+	      {
+		if (noNewLine)
+		  noNewLine = false;
+		else
+		  {
+		    descr.append("\n");
+		    addBlank = false;
+		  }
+	      }
+	    else
+	      noNewLine = false;
 	  }
       }
 

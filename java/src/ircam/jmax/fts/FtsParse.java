@@ -107,7 +107,8 @@ public class FtsParse
 
   final private boolean isStartToken()
   {
-    return (str.charAt(pos) == '$') || (str.charAt(pos) == ',') || (str.charAt(pos) == ';');
+    return ((str.charAt(pos) == '$') || (str.charAt(pos) == ',') ||
+	    (str.charAt(pos) == ';') || (str.charAt(pos) == '\''));
   }
 
   /** Identify the lexical char quote character */
@@ -202,6 +203,12 @@ public class FtsParse
       {
 	nextChar();
 	parsedToken = "$";
+	return true;
+      }
+    else if (currentChar() == '\'')
+      {
+	nextChar();
+	parsedToken = "'";
 	return true;
       }
     else

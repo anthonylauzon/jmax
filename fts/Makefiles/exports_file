@@ -48,6 +48,10 @@ fts_s_bang
 fts_s_list
 fts_s_set
 fts_s_anything
+fts_s_comma
+fts_s_quote
+fts_s_dollar
+fts_s_semi
 fts_ClassAlreadyInitialized
 fts_InletOutOfRange
 fts_OutletOutOfRange
