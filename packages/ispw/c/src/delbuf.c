@@ -93,50 +93,52 @@ delbuf_new(float raw_size, fts_symbol_t unit)
 int 
 delbuf_init(del_buf_t *buf, float sr, int n_tick)
 {
-  int size, ring_size;
+  long size, ring_size;
 
   if(!buf)
     return(0);
   
-  size = samples_unit_convert(buf->unit, buf->raw_size, sr);
+  size = (long)samples_unit_convert(buf->unit, buf->raw_size, sr);
   if(size < n_tick) size = n_tick;
   
   /* check if new size matches old size */
   if(size > buf->malloc_size) /* need to reallocate */
-    {
-      if(buf->malloc_size != 0) 
-	delbuf_delete_delayline(buf); /* delete to reallocate */  
+  {
+    if(buf->malloc_size != 0) 
+    delbuf_delete_delayline(buf); /* delete to reallocate */  
       
-      /* allocate delayline */
+    /* allocate delayline */
 
-      ring_size = size + n_tick + VD_TAIL;
-      ring_size += (-ring_size) & (n_tick - 1);
-      buf->delay_line = (float *)fts_malloc((ring_size + n_tick) * sizeof(float));
+    ring_size = size + n_tick + VD_TAIL;
+    ring_size += (-ring_size) & (n_tick - 1);
+    buf->delay_line = (float *)fts_malloc((ring_size + n_tick) * sizeof(float));
 
-      /* init delbuf with new delayline or exit */
-      if(!buf->delay_line){
-	buf->phase = 0;
-	buf->ring_size = 0;
-	buf->size = 0;
-	buf->malloc_size = 0;
-	buf->n_tick = 0;
-	fts_post("error: delay line: out of memory\n");
-	return(0);
-      }
-      else{
-	buf->ring_size = ring_size;
-	buf->size = size;
-	buf->malloc_size = size;
-      }
-    }
-  else if(size < buf->malloc_size) /* no allocation */
+    /* init delbuf with new delayline or exit */
+    if(!buf->delay_line)
     {
+      buf->phase = 0;
+      buf->ring_size = 0;
+      buf->size = 0;
+      buf->malloc_size = 0;
+      buf->n_tick = 0;
+      fts_post("error: delay line: out of memory\n");
+      return(0);
+    }
+    else
+    {
+      buf->ring_size = ring_size;
+      buf->size = size;
+      buf->malloc_size = size;
+    }
+  }
+  else if(size < buf->malloc_size) /* no allocation */
+  {
       ring_size = size + n_tick + VD_TAIL;
       ring_size += (-ring_size) & (n_tick - 1);
 
       buf->ring_size = ring_size;
       buf->size = size;
-    }
+  }
     
   buf->n_tick = n_tick;
   delbuf_clear_delayline(buf);
