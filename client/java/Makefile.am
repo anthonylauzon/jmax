@@ -4,11 +4,10 @@ packagedir=$(datadir)/jmax/client/java
 JAR=ftsclient.jar
 package_DATA = $(JAR)
 
-JAR_DEP=$(shell find ircam -name "*.class")
+JAR_DEP=ircam/ftsclient/classpackage.stamp
 
-clean-compile:
-	rm -f ${JAR}
+CLEANFILES=${JAR}
 
 $(JAR): $(JAR_DEP)
-	-rm $(JAR)
-	jar -cvf $(JAR) `find ircam -name '*.class'`
+	-test -f $(JAR) || rm -f $(JAR)
+	jar -cvf $(JAR) `find ircam/ftsclient -name '*.class'`

@@ -1,5 +1,7 @@
-noinst_PROGRAMS = package
-package_SOURCES = \
+#noinst_JAVA= 
+
+packagedir=$(pkgdatadir)
+package_JAVA = \
 FtsArgs.java \
 FtsAtom.java \
 FtsBinaryProtocolDecoder.java \
@@ -17,18 +19,8 @@ FtsServerConnection.java \
 FtsSocketConnection.java \
 FtsSymbol.java 
 
-JAVACX = @JAVACX@
-JAVACFLAGSX=@JAVACFLAGSX@
-JAVAROOTX=@top_srcdir@/java
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java
-
-SUFFIXES = .java .class
-
-.java.class:
-	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
-
-package: $(package_OBJECTS) $(package_DEPENDENCIES)
-
-clean-compile:
-	rm -f *.class
+JAVAC= @JAVACX@
+JAVACFLAGS= @JAVACFLAGSX@
+JAVAROOT= @top_srcdir@/java
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT)
 
