@@ -44,64 +44,64 @@ typedef struct {
     char buffer[UDP_PACKET_SIZE];
 } udp_t;
 
-static void udp_fd_fun( int fd, void *data)
+static void udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    udp_t *this = (udp_t *)data;
-    int size;
+  udp_t *this = (udp_t *)o;
+  int size;
 
-    size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
-    if ( size > 0)
-	{
-	  int i;
+  size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
+  if ( size > 0)
+    {
+      int i;
 
-	  for ( i = 0; i < size; i++)
-	    fts_outlet_int( (fts_object_t *)this, 0, this->buffer[i]);
-	}
+      for ( i = 0; i < size; i++)
+	fts_outlet_int( (fts_object_t *)this, 0, this->buffer[i]);
+    }
 }
 
-static void udp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    udp_t *this = (udp_t *)o;
-    int port;
-    struct sockaddr_in addr;
+  udp_t *this = (udp_t *)o;
+  int port;
+  struct sockaddr_in addr;
 
-    port = fts_get_int_arg( ac, at, 1, 0);
+  port = fts_get_int_arg( ac, at, 1, 0);
 
-    post( "Created UDP object on port %d\n", port);
+  post( "Created UDP object on port %d\n", port);
 
-    this->socket = socket(AF_INET, SOCK_DGRAM, 0);
+  this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if (this->socket == -1)
-	{
-	    post( "Cannot open socket\n");
-	    return;
-	}
+  if (this->socket == -1)
+    {
+      post( "Cannot open socket\n");
+      return;
+    }
 
-    memset( &addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port);
+  memset( &addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(port);
 
-    if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
-	{
-	    post( "Cannot bind socket\n");
-	    close( this->socket);
-	    return;
-	}
+  if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
+    {
+      post( "Cannot bind socket\n");
+      close( this->socket);
+      return;
+    }
 
-  fts_thread_add_fd( fts_thread_get_current(), this->socket, udp_fd_fun, this);
+  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, udp_receive, (fts_object_t *)this);
 }
 
 static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    udp_t *this = (udp_t *)o;
+  udp_t *this = (udp_t *)o;
 
-    if ( this->socket >= 0)
-      {
-	fts_thread_remove_fd( fts_thread_get_current(), this->socket);
+  if ( this->socket >= 0)
+    {
+      fts_sched_remove_fd( fts_sched_get_current(), this->socket);
 
-	close( this->socket);
-      }
+      close( this->socket);
+    }
 }
 
 static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -126,3 +126,5 @@ void udp_config( void)
 {
   fts_class_install( fts_new_symbol("udp"), udp_instantiate);
 }
+
+

@@ -27,14 +27,10 @@
 #ifndef _FTSTIME_H
 #define _FTSTIME_H
 
-/* Time handling module.
+/* Time handling module */
+extern void fts_alarm_poll( void);
 
-
-*/
-
-/* module declaration */
-
-extern fts_module_t fts_time_module;
+/* The function that is called by the scheduler */
 
 /* Clock */
 

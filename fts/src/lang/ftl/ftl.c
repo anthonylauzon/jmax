@@ -46,7 +46,7 @@
 static void ftl_module_init( void);
 static void ftl_module_shutdown( void);
 
-fts_module_t fts_ftl_module = {"FTL", "FTL engine", ftl_module_init, 0, ftl_module_shutdown};
+fts_module_t fts_ftl_module = {"FTL", "FTL engine", ftl_module_init, ftl_module_shutdown, 0};
 
 static void ftl_module_init(void)
 {

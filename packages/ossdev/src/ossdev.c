@@ -826,7 +826,7 @@ static void oss_midi_init( void)
 
 static void ossdev_init(void);
 
-fts_module_t ossdev_module = {"ossdev", "OSS devices", ossdev_init, 0, 0, 0};
+fts_module_t ossdev_module = {"ossdev", "OSS devices", ossdev_init, 0, 0};
 
 static void ossdev_init(void)
 {

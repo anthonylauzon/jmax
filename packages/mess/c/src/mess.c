@@ -23,5 +23,5 @@ mess_init(void)
   message_table_config();
 }
 
-fts_module_t mess_module = {"mess", "message classes", mess_init};
+fts_module_t mess_module = {"mess", "message classes", mess_init, 0, 0};
 

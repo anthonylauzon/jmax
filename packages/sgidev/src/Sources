@@ -23,40 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-
-##
-## Packages installed by default in this site
-##
-
-# new classes
-package require data
-package require control
-package require mess
-package require numeric
-package require lists
-
-# ISPW classes
-package require ispw
-package require ispwmath
-package require table
-package require qlist
-package require explode
-package require sequence
-
-
-# I/O package
-package require io
-
-
-
-
-
-
-
-
-
-
-
-
-
+SOURCES= \
+sgiaudiodev.c	\
+shmdev.c	\
+sgidev.c	\
 

@@ -24,39 +24,11 @@
 #
 
 
-##
-## Packages installed by default in this site
-##
+## package declaration
+package provide sgidev
 
-# new classes
-package require data
-package require control
-package require mess
-package require numeric
-package require lists
+# load dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module sgidev $dir/lib/$jmaxArch/$jmaxMode/libsgidev.so
 
-# ISPW classes
-package require ispw
-package require ispwmath
-package require table
-package require qlist
-package require explode
-package require sequence
-
-
-# I/O package
-package require io
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+post "package: SGI devices"

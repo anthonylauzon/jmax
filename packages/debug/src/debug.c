@@ -36,5 +36,5 @@ debug_init(void)
   cheese_config();
 }
 
-fts_module_t debug_module = {"debug", "Debug oriented objects", debug_init};
+fts_module_t debug_module = {"debug", "Debug oriented objects", debug_init, 0, 0};
 

@@ -24,25 +24,31 @@
  *
  */
 
-
 #include "fts.h"
+#include "sgiaudiodev.h"
+#include "shmdev.h"
 
-extern void biquad_config(void);
-extern void sigcoef_bpass2_config(void);
-extern void sigcoef_hlshelf1_config(void);
-extern void iir_config(void);
-extern void sigapass3_config(void);
-extern void wahwah_config(void);
+/******************************************************************************/
+/*                                                                            */
+/* Module declaration for SGI devices                                         */
+/*                                                                            */
+/******************************************************************************/
 
-static void
-ispw_filters_module_init(void)
+static void sgidev_init(void);
+
+fts_module_t sgidev_module = {"sgidev", "SGI devices", sgidev_init, 0, 0};
+
+extern void shmdev_init( void);
+
+static void sgidev_init( void)
 {
-  biquad_config();
-  sigcoef_bpass2_config();
-  sigcoef_hlshelf1_config();
-  iir_config();
-  sigapass3_config();
-  wahwah_config();
+  sgi_dac_init();
+  sgi_adc_init();
+
+  sgi_midi_init();
+
+  sgi_soundfile_init();
+
+  shmdev_init();
 }
 
-fts_module_t ispw_filters_module = {"filters", "ISPW signal filter classes", ispw_filters_module_init, 0, 0};

@@ -106,7 +106,6 @@ extern void         dsp_chain_fprint_signals(FILE *f);
 extern fts_object_t *dsp_get_current_object(void);
 
 extern int          dsp_is_running( void);
-extern void         dsp_chain_poll(void);
 extern void         dsp_make_dsp_off_chain(void);
 extern ftl_program_t *dsp_get_current_dsp_chain( void);
 
@@ -117,6 +116,9 @@ extern fts_symbol_t fts_s_dsp_upsampling;
 extern fts_symbol_t fts_s_dsp_downsampling;
 extern fts_symbol_t fts_s_dsp_outputsize;
 extern fts_symbol_t fts_s_dsp_descr;
+
+/* The function that is called by the scheduler */
+extern void fts_dsp_chain_poll( void);
 
 #endif
 

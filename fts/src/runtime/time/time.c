@@ -57,26 +57,12 @@ static void fts_alarm_describe(char *msg, fts_clock_t *clock);
 /*                                                                            */
 /******************************************************************************/
 
-static void fts_alarm_sched(void);
-static void fts_time_init(void);
-
 /* Heaps */
-
 static fts_heap_t *clocks_heap;
 static fts_heap_t *callbacks_heap;
 static fts_heap_t *alarms_heap;
 static fts_heap_t *timers_heap;
 static fts_heap_t *time_gates_heap;
-
-fts_module_t fts_time_module = {"Time", "Generic Time handling", fts_time_init, 0, 0};
-
-static void
-fts_time_init(void)
-{
-  fts_sched_declare(fts_alarm_sched, provide, fts_new_symbol("control"), "fts_alarm_poll"); 
-}
-
-
 
 static void fts_time_do_heaps(void)
 {
@@ -602,8 +588,7 @@ int fts_alarm_is_armed(fts_alarm_t *alarm)
  */
 
 
-static void
-fts_alarm_sched(void)	
+void fts_alarm_poll(void)	
 {
   fts_clock_t *clock;
 

@@ -37,4 +37,4 @@ static void sources_init(void)
   src_sma_config();
 }
 
-fts_module_t sources_module = { "sources", "objects examples with sources", sources_init, 0, 0, 0};
+fts_module_t sources_module = { "sources", "objects examples with sources", sources_init, 0, 0};

@@ -102,6 +102,25 @@ gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_object_ui_property_changed(o, fts_s_value);
 }
 
+static void gfloat_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *file;
+  int x, y, w, font_index;
+  fts_atom_t a;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P flonum %d %d %d %d;\n", x, y, w, font_index);
+}
+
 /* Daemons to put the "value" property*/
 
 static void
@@ -130,7 +149,7 @@ gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj,
 static fts_status_t
 gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
+  fts_type_t t[1];
 
   fts_class_init(cl, sizeof(gfloat_t), 1, 1, 0);
 
@@ -139,24 +158,27 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_s_bang, gfloat_bang, 0, 0);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, gfloat_int, 1, a);
+  t[0] = fts_t_int;
+  fts_method_define(cl, 0, fts_s_int, gfloat_int, 1, t);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, gfloat_float, 1, a);
-
+  t[0] = fts_t_float;
+  fts_method_define(cl, 0, fts_s_float, gfloat_float, 1, t);
+ 
   fts_method_define_varargs(cl, 0, fts_s_list, gfloat_list);
 
-  a[0] = fts_s_anything;	/* number */
-  fts_method_define(cl, 0, fts_s_set, gfloat_set, 1, a);
+  t[0] = fts_t_anything;	/* number */
+  fts_method_define(cl, 0, fts_s_set, gfloat_set, 1, t);
+
+  t[0] = fts_t_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, gfloat_save_dotpat, 1, t); 
 
   /* Add  the value daemons */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, gfloat_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, gfloat_put_value);
 
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
+  t[0] = fts_t_float;
+  fts_outlet_type_define(cl, 0, fts_s_float, 1, t);
 
   return fts_Success;
 }

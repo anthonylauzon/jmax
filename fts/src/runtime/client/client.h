@@ -27,6 +27,11 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
+#include "runtime/devices.h"
+
+/* The function that is called by the scheduler */
+extern void fts_client_poll( void);
+
 /* The client module */
 
 extern fts_module_t fts_client_module;

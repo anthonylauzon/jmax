@@ -1146,7 +1146,7 @@ fts_writesf_forker(void *data)
  
 static void pdtddev_init(void);
 
-fts_module_t pdtddev_module = {"pdtddev", "POSIX direct-to-disk devices", pdtddev_init, 0, 0, 0};
+fts_module_t pdtddev_module = {"pdtddev", "POSIX direct-to-disk devices", pdtddev_init, 0, 0};
 
 static void pdtddev_init( void)
 {

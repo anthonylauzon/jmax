@@ -83,7 +83,7 @@ reftype_init(void)
   matrix_config();
 }
 
-fts_module_t reftype_module = {"reftype", "reftype classes", reftype_init};
+fts_module_t reftype_module = {"reftype", "reftype classes", reftype_init, 0, 0};
 
 
 

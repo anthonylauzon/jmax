@@ -23,34 +23,28 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 all:
-	(cd sched; $(MAKE) all)
-	(cd time; $(MAKE) all)
-	(cd files; $(MAKE) all)
-	(cd midi; $(MAKE) all)
-	(cd audio; $(MAKE) all)
-	(cd client; $(MAKE) all)
-	(cd devices; $(MAKE) all)
-	(cd thread; $(MAKE) all)
+	(cd sched; $(MAKE) $@)
+	(cd time; $(MAKE) $@)
+	(cd files; $(MAKE) $@)
+	(cd midi; $(MAKE) $@)
+	(cd audio; $(MAKE) $@)
+	(cd client; $(MAKE) $@)
+	(cd devices; $(MAKE) $@)
 .PHONY: all
 
 clean:
-	(cd sched; $(MAKE) clean)
-	(cd time; $(MAKE) clean)
-	(cd files; $(MAKE) clean)
-	(cd midi; $(MAKE) clean)
-	(cd audio; $(MAKE) clean)
-	(cd client; $(MAKE) clean)
-	(cd devices; $(MAKE) clean)
-	(cd thread; $(MAKE) clean)
+	(cd sched; $(MAKE) $@)
+	(cd time; $(MAKE) $@)
+	(cd files; $(MAKE) $@)
+	(cd midi; $(MAKE) $@)
+	(cd audio; $(MAKE) $@)
+	(cd client; $(MAKE) $@)
+	(cd devices; $(MAKE) $@)
 .PHONY: all
 
 install-includes:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime ; done
-	for d in audio client devices files midi sched thread time ; do ( cd $$d ; $(MAKE) $@ ) ; done
+	for d in audio client devices files midi sched time ; do ( cd $$d ; $(MAKE) $@ ) ; done
 .PHONY: install-includes
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
 

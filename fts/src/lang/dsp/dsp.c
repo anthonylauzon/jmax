@@ -62,7 +62,7 @@ fts_symbol_t fts_s_dsp_upsampling;
 fts_symbol_t fts_s_dsp_downsampling;
 fts_symbol_t fts_s_dsp_outputsize; /* give an absolute size for output vector */
 
-fts_module_t fts_dsp_module = {"Dsp", "Dsp compiler", dsp_module_init, 0, dsp_module_shutdown};
+fts_module_t fts_dsp_module = {"Dsp", "Dsp compiler", dsp_module_init, dsp_module_shutdown, 0};
 
 static void
 dsp_module_init(void)

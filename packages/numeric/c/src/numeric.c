@@ -38,5 +38,5 @@ numeric_init(void)
   rewrap_config();
 }
 
-fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init};
+fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init, 0, 0};
 

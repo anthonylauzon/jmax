@@ -34,5 +34,5 @@ ispwmath_init(void)
   binop_config();
 }
 
-fts_module_t ispwmath_module = {"ispwmath", "ISPW math classes", ispwmath_init};
+fts_module_t ispwmath_module = {"ispwmath", "ISPW math classes", ispwmath_init, 0, 0};
 

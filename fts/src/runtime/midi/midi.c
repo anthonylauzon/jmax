@@ -74,7 +74,6 @@ static fts_status_description_t invalid_midi_dev =
 
 static void midi_init(void);
 static void midi_shutdown(void);
-static void midi_poll(void);
 
 static fts_status_t fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_get_midi_logical_dev(int ac, const fts_atom_t *at);
@@ -82,13 +81,10 @@ static fts_status_t fts_unset_midi_logical_dev(int ac, const fts_atom_t *at);
 static fts_status_t fts_reset_midi_logical_dev(void);
 static void         fts_midi_close_all(void);
 
-fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, 0, midi_shutdown};
+fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, midi_shutdown, 0};
 
-static void
-midi_init(void)
+static void midi_init(void)
 {
-  fts_sched_declare(midi_poll, provide, fts_new_symbol("control"), "midi_poll"); 
-
   fts_declare_logical_dev(fts_new_symbol("midi"),
 			  fts_char_dev,
 			  fts_set_midi_logical_dev,
@@ -99,8 +95,7 @@ midi_init(void)
 }
 
 
-static void
-midi_shutdown(void)
+static void midi_shutdown(void)
 {
   fts_midi_close_all();
 }
@@ -339,8 +334,7 @@ fts_midi_close_all(void)
 
 static void fts_run_midi_parser(fts_midi_port_t *port, int nextbyte);
 
-static void
-midi_poll(void)
+void fts_midi_poll(void)
 {
   fts_midi_port_t *p;
 

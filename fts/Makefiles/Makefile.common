@@ -139,7 +139,6 @@ FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libTime.a   \
 	   $(LIBDIR)/libDevices.a \
 	   $(LIBDIR)/libSched.a  \
-	   $(LIBDIR)/libThread.a  \
 	   $(LIBDIR)/libDsp.a    \
 	   $(LIBDIR)/libFtl.a    \
 	   $(LIBDIR)/libVecLib.a \

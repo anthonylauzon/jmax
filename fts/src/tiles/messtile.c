@@ -105,7 +105,7 @@ static void fts_messtile_init(void);
 
 /* Init function */
 
-fts_module_t fts_messtile_module = {"MessTile", "The interpreter of the client commands for the message system", fts_messtile_init, 0};
+fts_module_t fts_messtile_module = {"MessTile", "The interpreter of the client commands for the message system", fts_messtile_init, 0, 0};
 
 static void
 fts_messtile_init(void)

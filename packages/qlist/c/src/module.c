@@ -34,4 +34,4 @@ fts_qlist_init(void)
   qlist_config();
 }
 
-fts_module_t qlist_module = {"qlist", "qlist que file classes", fts_qlist_init};
+fts_module_t qlist_module = {"qlist", "qlist que file classes", fts_qlist_init, 0, 0};

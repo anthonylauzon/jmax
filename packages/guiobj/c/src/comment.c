@@ -36,23 +36,42 @@
 #include "fts.h"
 
 
-typedef struct
+static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t o;
+  FILE *file;
+  int x, y, w, font_index;
+  fts_symbol_t text;
+  fts_atom_t a;
 
-} comment_t;
+  file = (FILE *)fts_get_ptr( at);
 
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
 
-static fts_status_t
-comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+  fprintf( file, "#P comment %d %d %d %d ", x, y, w, font_index);
+
+  fts_object_get_prop( o, fts_s_comment, &a);
+  fprintf( file, "%s;\n", fts_symbol_name( fts_get_symbol( &a)) );
+}
+
+static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(comment_t), 0, 0, 0);
+  fts_type_t t[1];
+
+  fts_class_init(cl, sizeof( fts_object_t), 0, 0, 0);
+
+  t[0] = fts_t_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat, 1, t); 
 
   return fts_Success;
 }
 
-void
-comment_config(void)
+void comment_config(void)
 {
   fts_class_install(fts_new_symbol("jcomment"), comment_instantiate);
 }

@@ -72,6 +72,7 @@ PREDEF_SYMBOL( fts_s_load, "load");
 PREDEF_SYMBOL( fts_s_read, "read");
 PREDEF_SYMBOL( fts_s_write, "write");
 PREDEF_SYMBOL( fts_s_save_bmax, "save_bmax");
+PREDEF_SYMBOL( fts_s_save_dotpat, "save_dotpat");
 PREDEF_SYMBOL( fts_s_redefining, "redefining");
 PREDEF_SYMBOL( fts_s_release, "release");
 PREDEF_SYMBOL( fts_s_find, "find");

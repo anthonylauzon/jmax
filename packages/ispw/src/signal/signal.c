@@ -83,4 +83,4 @@ static void ispw_signal_module_init(void)
   sigsamphold_config();
 }
 
-fts_module_t ispw_signal_module = {"ISPW signal", "ISPW miscellaneous signal classes", ispw_signal_module_init};
+fts_module_t ispw_signal_module = {"ISPW signal", "ISPW miscellaneous signal classes", ispw_signal_module_init, 0, 0};

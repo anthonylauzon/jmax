@@ -1694,7 +1694,7 @@ solaris_soundfile_get(fts_dev_t *dev, float **buf, int n)
 
 static void solarisdev_init(void);
 
-fts_module_t solarisdev_module = {"solarisdev", "SOLARIS devices", solarisdev_init, 0, 0, 0};
+fts_module_t solarisdev_module = {"solarisdev", "SOLARIS devices", solarisdev_init, 0, 0};
 
 extern void shmdev_init( void);
 

@@ -130,7 +130,7 @@ static fts_hash_table_t fts_audio_output_logical_device_table;
 static int fts_audio_pending_close = 0; 
 
 fts_module_t fts_audio_module = {"FTS Audio", "FTS Audio Input Output system ",
-				    fts_audio_init, 0, fts_audio_shutdown};
+				    fts_audio_init, fts_audio_shutdown, 0};
 
 
 

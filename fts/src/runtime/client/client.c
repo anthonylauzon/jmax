@@ -65,14 +65,12 @@ extern void fts_client_sync_init(void);
 static void client_init(void);
 static void client_shutdown(void);
 
-static void client_poll(void);
-
 static fts_status_t fts_set_client_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_status_t fts_unset_client_logical_dev(int ac, const fts_atom_t *at);
 static fts_status_t fts_reset_client_logical_dev(void);
 static fts_dev_t   *fts_get_client_logical_dev(int ac, const fts_atom_t *at);
 
-fts_module_t fts_client_module = {"Client", "Client communication", client_init, 0, client_shutdown, 0};
+fts_module_t fts_client_module = {"Client", "Client communication", client_init, client_shutdown, 0};
 
 static void
 client_init(void)
@@ -81,10 +79,6 @@ client_init(void)
 
   fts_client_sync_init();
   fts_client_updates_init();
-
-  /* schedule declaration */
-
-  fts_sched_declare(client_poll, provide, fts_new_symbol("control"), "client_poll");
 
   /* client logical device  */
 
@@ -151,7 +145,7 @@ fts_get_client_logical_dev(int ac, const fts_atom_t *at)
 
 /* experimentally, we do the real polling every 3 ticks */
 
-static void client_poll(void)
+void fts_client_poll(void)
 {
   static int poll_count = 0;
 

@@ -59,11 +59,8 @@ set jmaxHost "local"
 ## By default, use the jmax Console
 set jmaxNoConsole "false"
 
-## By default, show the register panel
-set jmaxNoRegister "false"
-
 ## Set the system packages path
-set jmaxSysPkgPath "$jmaxRootDir/packages $jmaxRootDir/syspackages"
+set jmaxSysPkgPath "$jmaxRootDir/packages"
 
 ## Splash screen setting
 set jmaxSplashScreen "show"

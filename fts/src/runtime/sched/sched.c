@@ -31,6 +31,9 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime/sched.h"
+#include "runtime/client.h"
+#include "runtime/midi.h"
+#include "runtime/time.h"
 
 /* The two clock variables */
 
@@ -53,17 +56,34 @@ static float tick_length = ((MAXVS * 1000) / 44100.0); /* set the default schedu
 
 static int fts_pause_period = 12;
 
+/*
+ * The structure holding the file descriptors of the scheduler
+ */
+
+typedef struct _fd_callback_t {
+  int fd;
+  int read; /* if 1, the file descriptor will be added to the read fdset, if not to the write fd set */
+  fts_method_t method;
+  fts_object_t *object;
+  struct _fd_callback_t *next;
+} fd_callback_t;
+
+struct _fts_sched {
+  fd_callback_t *fd_callback_head;
+};
+
+static struct _fts_sched _mschd;
+static fts_sched_t *main_sched = 0;
+
 /* forward declarations */
 
 static void fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const fts_atom_t *value);
 
 /*****************************************************************************/
-/*                                                                           */
-/*          Scheduler initialization                                         */
-/*                                                                           */
+/* sched module                                                              */
 /*****************************************************************************/
 
-void fts_sched_setup(void)
+static void fts_sched_init(void)
 {
   /* Install the timer */
 
@@ -82,129 +102,112 @@ void fts_sched_setup(void)
   fts_param_add_listener(fts_s_sampling_rate, 0, fts_sched_set_sampling_rate);
 }
 
+fts_module_t fts_sched_module = { "sched", "the sched module", fts_sched_init, 0, 0};
 
-typedef struct _fd_entry_t {
-  int fd;
-  fts_thread_fd_fun_t fun;
-  void *data;
-} fts_fd_entry_t;
+/*****************************************************************************/
+/* scheduler functions                                                       */
+/*****************************************************************************/
 
-typedef struct _fts_fd_set_t {
-  fts_fd_entry_t *entries;
-  int n_fd;
-} fts_fd_set_t;
-
-struct _fts_thread {
-  fts_fd_set_t fd_set;
-};
-
-static struct _fts_thread _mthrd;
-static fts_thread_t main_thread = 0;
-
-
-static void fts_fd_set_init( fts_fd_set_t *set)
+fts_sched_t *fts_sched_get_current( void)
 {
-  set->entries = NULL;
-  set->n_fd = 0;
-}
-
-static void fts_fd_set_add( fts_fd_set_t *set, int fd, fts_thread_fd_fun_t fun, void *data)
-{
-  fts_fd_entry_t *e;
-
-  if ( set->n_fd < fd + 1)
+  if (!main_sched)
     {
-      int i, new_size;
-
-      new_size = fd + 1;
-      set->entries = (fts_fd_entry_t *)fts_realloc( set->entries, new_size * sizeof( fts_fd_entry_t));
-      for ( i = set->n_fd; i < new_size; i++)
-	{
-	  set->entries[i].fd = -1;
-	  set->entries[i].fun = (fts_thread_fd_fun_t)0;
-	  set->entries[i].data = 0;
-	}
-
-      set->n_fd = new_size;
+      _mschd.fd_callback_head = 0;
+      main_sched = &_mschd;
     }
 
-  e = &(set->entries[fd]);
-  e->fd = fd;
-  e->fun = fun;
-  e->data = data;
+  return main_sched;
 }
 
-static void fts_fd_set_remove( fts_fd_set_t *set, int fd)
+void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
 {
-  set->entries[fd].fd = -1;
-  set->entries[fd].fun = (fts_thread_fd_fun_t)0;
-  set->entries[fd].data = 0;
+  fd_callback_t *callback;
+
+  callback = (fd_callback_t *)fts_malloc( sizeof( fd_callback_t));
+  callback->fd = fd;
+  callback->read = read;
+  callback->method = method;
+  callback->object = object;
+  callback->next = sched->fd_callback_head;
+
+  sched->fd_callback_head = callback;
 }
 
-static void fts_fd_set_do_select( fts_fd_set_t *set)
+void fts_sched_remove_fd( fts_sched_t *sched, int fd)
 {
-  fd_set fds;
+  fd_callback_t **p;
+
+  for ( p = &sched->fd_callback_head; *p; p = &(*p)->next )
+    {
+      if ( (*p)->fd == fd)
+	{
+	  fd_callback_t *to_remove;
+
+	  to_remove = *p;
+	  *p = (*p)->next;
+
+	  fts_free( to_remove);
+	}
+    }
+}
+
+/*
+  Function: fts_sched_do_select
+  Description:
+    Do a single select() on all the files in the file descriptor set of the sched.
+  Arguments:
+    sched: the sched owning the file descriptor set
+  Returns: nothing.
+*/
+static void fts_sched_do_select( fts_sched_t *sched)
+{
+  fd_set rfds, wfds;
   struct timeval tv;
-  int r, i;
+  fd_callback_t *callback;
+  int r, n_fd;
 
   tv.tv_sec = 0;
   tv.tv_usec = 0;
 
-  FD_ZERO( &fds);
+  FD_ZERO( &rfds);
+  FD_ZERO( &wfds);
 
-  for ( i = 0; i < set->n_fd; i++)
-    if ( set->entries[i].fd >= 0)
-	FD_SET( set->entries[i].fd, &fds);
+  n_fd = 0;
+  for ( callback = sched->fd_callback_head; callback; callback = callback->next)
+      {
+	if ( callback->fd > n_fd)
+	  n_fd = callback->fd;
 
-  r = select( set->n_fd, &fds, NULL, NULL, &tv);
+	if (callback->read)
+	  FD_SET( callback->fd, &rfds);
+	else
+	  FD_SET( callback->fd, &wfds);
+      }
 
-  for ( i = 0; i < set->n_fd; i++)
-    if ( set->entries[i].fd >= 0)
-	if ( FD_ISSET( set->entries[i].fd, &fds))
-	    (*(set->entries[i].fun))( set->entries[i].fd, set->entries[i].data);
-}
+  r = select( n_fd, &rfds, &wfds, NULL, &tv);
 
-fts_thread_t fts_thread_get_current( void)
-{
-  if (!main_thread)
+  for ( callback = sched->fd_callback_head; callback; callback = callback->next)
     {
-      fts_fd_set_init( &(_mthrd.fd_set));
-      main_thread = &_mthrd;
+      int fd;
+
+      fd = callback->fd;
+      if ( fd >= 0)
+	{
+	  if ( FD_ISSET( fd, &rfds) || FD_ISSET( fd, &wfds))
+	    {
+	      fts_atom_t a;
+
+	      fts_set_int( &a, fd);
+	      (*(callback->method))( callback->object, -1, 0, 1, &a);
+	    }
+	}
     }
-
-  return main_thread;
-}
-
-fts_thread_t fts_thread_new( void (*start)( void *))
-{
-  return NULL;
-}
-
-void fts_thread_start( fts_thread_t thread, void *arg)
-{
-}
-
-void fts_thread_add_fd( fts_thread_t thread, int fd, fts_thread_fd_fun_t fun, void *data)
-{
-  fts_fd_set_add( &(thread->fd_set), fd, fun, data);
-}
-
-void fts_thread_remove_fd( fts_thread_t thread, int fd)
-{
-  fts_fd_set_remove( &(thread->fd_set), fd);
-}
-
-void fts_thread_do_select( fts_thread_t thread)
-{
-  fts_fd_set_do_select( &(thread->fd_set));
 }
 
 
 
 /*****************************************************************************/
-/*                                                                           */
-/*          Run Time Scheduler                                               */
-/*                                                                           */
+/* scheduler run                                                             */
 /*****************************************************************************/
 
 static enum {running, halted} fts_running_status;
@@ -214,7 +217,7 @@ void fts_halt(void)
   fts_running_status = halted;
 }
 
-void fts_sched_run(void)
+void fts_sched_run()
 {
   int tick_counter = 0;
 
@@ -222,11 +225,11 @@ void fts_sched_run(void)
 
   while (fts_running_status == running)
     {
-      midi_poll();
+      fts_midi_poll();
       fts_alarm_poll();
-      client_poll();
-      fd_set_poll();
-      dsp_chain_poll();
+      fts_client_poll();
+      fts_sched_do_select( fts_sched_get_current());
+      fts_dsp_chain_poll();
 
       schedtime_tick_clock += 1.0;
       schedtime_ms_clock =  schedtime_tick_clock * tick_length;
@@ -241,6 +244,10 @@ void fts_sched_run(void)
     }
 }
 
+
+/*****************************************************************************/
+/* miscellaneous functions                                                   */
+/*****************************************************************************/
 
 /* Tick length handling */
 float fts_sched_get_tick_length(void)
@@ -262,6 +269,9 @@ static void fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const
 
 
 /* Pause handling  */
+/* (fd)
+   Note: the pause mechanism does not work... (see non-portable/linux.../syssched.c) 
+*/
 void fts_sched_set_pause(int p)
 {
   fts_pause_period = p;

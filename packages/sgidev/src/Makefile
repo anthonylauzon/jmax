@@ -23,40 +23,19 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXROOTDIR= ../../..
+DISTDIR= $(JMAXROOTDIR)/fts
 
-##
-## Packages installed by default in this site
-##
+PACKAGEROOT = ..
 
-# new classes
-package require data
-package require control
-package require mess
-package require numeric
-package require lists
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
 
-# ISPW classes
-package require ispw
-package require ispwmath
-package require table
-package require qlist
-package require explode
-package require sequence
+PACKAGELIB=$(LIBDIR)/libsgidev.so
 
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 
-# I/O package
-package require io
+TOCLEAN = $(PACKAGELIB)
 
-
-
-
-
-
-
-
-
-
-
-
-
+include $(DISTDIR)/Makefiles/Makefile.lib.end
 

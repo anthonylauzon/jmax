@@ -62,4 +62,4 @@ static void ispw_sampling_module_init(void)
   samples_unit_init();
 }
 
-fts_module_t ispw_sampling_module = {"ISPW sampling", "ISPW sampling and delayline classes", ispw_sampling_module_init, 0};
+fts_module_t ispw_sampling_module = {"ISPW sampling", "ISPW sampling and delayline classes", ispw_sampling_module_init, 0, 0};

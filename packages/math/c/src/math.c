@@ -34,5 +34,5 @@ math_init(void)
   math_binop_config();
 }
 
-fts_module_t math_module = {"math", "math classes", math_init};
+fts_module_t math_module = {"math", "math classes", math_init, 0, 0};
 

@@ -42,8 +42,6 @@ import ircam.jmax.utils.*;
 //
 public class Standard extends Editable implements FtsObjectErrorListener
 {
-  //boolean ignoreError = false;
-    
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -63,7 +61,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
     
   public void errorChanged(boolean value) 
   {
-    //ignoreError = false;
     redraw();
   }
     
@@ -120,7 +117,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   // Text area offset
   // ----------------------------------------
 
-  private static final int TEXT_X_OFFSET = 4;
+  private static final int TEXT_X_OFFSET = 2; /*was 4 */
   private static final int TEXT_Y_OFFSET = 2;
 
   public int getTextXOffset()
@@ -135,7 +132,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public int getTextWidthOffset()
   {
-    return /*6*/8;
+    return 6; /* was 8 */
   }
 
   public int getTextHeightOffset()

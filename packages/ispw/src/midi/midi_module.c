@@ -50,4 +50,4 @@ ispw_midi_module_init(void)
   sustain_config();
 }
 
-fts_module_t ispw_midi_module = {"ISPW midi", "ISPW midi classes", ispw_midi_module_init};
+fts_module_t ispw_midi_module = {"ISPW midi", "ISPW midi classes", ispw_midi_module_init, 0, 0};

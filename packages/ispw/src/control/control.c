@@ -99,5 +99,5 @@ ispw_control_module_init(void)
   scale_config();
 }
 
-fts_module_t ispw_control_module = {"ISPW control", "ISPW miscellaneous control classes", ispw_control_module_init};
+fts_module_t ispw_control_module = {"ISPW control", "ISPW miscellaneous control classes", ispw_control_module_init, 0, 0};
 

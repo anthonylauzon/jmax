@@ -24,10 +24,12 @@
  *
  */
 
-#ifndef _DSPTILE_H_
-#define _DSPTILE_H_
+#ifndef _SGIAUDIODEV_H_
+#define _SGIAUDIODEV_H_
 
-extern fts_module_t fts_dsptile_module;
+extern void sgi_dac_init( void);
+extern void sgi_adc_init( void);
+extern void sgi_midi_init( void);
+extern void sgi_soundfile_init(void);
 
 #endif
-

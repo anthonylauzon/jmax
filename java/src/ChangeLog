@@ -1,3 +1,7 @@
+2000-03-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Removed registration panel and the related code.
+
 2000-03-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed MaxFileChooser.java to find better the file format combo box.

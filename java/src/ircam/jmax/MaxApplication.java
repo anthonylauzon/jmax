@@ -166,43 +166,6 @@ public class MaxApplication extends Object
   }
 
 
-  /** Registration method */
-  private static void askForRegister()
-  {
-    boolean alreadyRegistered = false;
-    File registerFile = null;
-
-    // Open the register panel if needed
-    try
-      {
-	registerFile = new File( System.getProperty("user.home"), ".jmaxregistered");
-	alreadyRegistered = registerFile.exists();
-      }
-    catch( SecurityException e)
-      {
-	return;
-      }
-
-    if ( !alreadyRegistered)
-      {
-	RegisterDialog.popup();
-
-	try
-	  {
-	    FileOutputStream fos = new FileOutputStream( registerFile);
-	    fos.write( 42);
-	    fos.close();
-	  }
-	catch ( IOException e)
-	  {
-	  }
-	catch ( SecurityException e)
-	  {
-	  }
-
-      }
-  }
-
   /** His majesty the main method */
 
   public static void main(String args[]) 
@@ -343,11 +306,6 @@ public class MaxApplication extends Object
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
     ircam.jmax.editors.control.ControlModule.initModule();
-
-    /* Show register dialog if not disabled by option */
-    if ( MaxApplication.getProperty("jmaxNoRegister") == null
-	 || !MaxApplication.getProperty("jmaxNoRegister").equals("true"))
-      MaxApplication.askForRegister();
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer

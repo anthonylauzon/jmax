@@ -61,4 +61,4 @@ ispw_data_module_init(void)
   expr_doctor_init();
 }
 
-fts_module_t ispw_data_module = {"ISPW data", "ISPW data classes", ispw_data_module_init};
+fts_module_t ispw_data_module = {"ISPW data", "ISPW data classes", ispw_data_module_init, 0, 0};

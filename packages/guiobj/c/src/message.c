@@ -37,8 +37,7 @@
 
 #define DEFAULT_DURATION 125.0f
 
-typedef struct 
-{
+typedef struct {
   fts_object_t o;
   fts_atom_list_t *atom_list;
   fts_alarm_t alarm;
@@ -86,8 +85,7 @@ typedef struct
 
 static fts_symbol_t ev_s_star;
 
-static void
-init_eval(void)
+static void init_eval(void)
 {
   ev_s_star  = fts_new_symbol("*");
 }
@@ -133,8 +131,7 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
    "reader engine" controlled by specific opcode.
    
  */
-static void
-fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
+static void fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
 		   fts_object_t *default_dst, int outlet)
 {
   /* reader command and status */
@@ -513,8 +510,7 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
   fts_atom_list_iterator_free(iter);
 }
 
-static int
-message_list_is_primitive(int ac, const fts_atom_t *at)
+static int message_list_is_primitive(int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -543,8 +539,7 @@ static void message_update(fts_object_t *o)
  *
  */
 
-static void 
-message_tick(fts_alarm_t *alarm, void *calldata)
+static void message_tick(fts_alarm_t *alarm, void *calldata)
 {
   message_t *this = (message_t *)calldata;
 
@@ -559,8 +554,7 @@ message_tick(fts_alarm_t *alarm, void *calldata)
  *
  */
 
-static void
-message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -570,8 +564,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 
-static void
-message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -580,14 +573,12 @@ message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 
-static void
-message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_update(o);
 }
 
-static void
-message_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
   
@@ -595,8 +586,7 @@ message_set_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     fts_atom_list_set(this->atom_list, ac, at);
 }
 
-static void
-message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -605,8 +595,7 @@ message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 
-static void
-message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -614,8 +603,7 @@ message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 
-static void
-message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
@@ -623,9 +611,55 @@ message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
+static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  message_t *this = (message_t *) o;
+  FILE *file;
+  int x, y, w, font_index;
+  int first_atom;
+  fts_symbol_t text;
+  fts_atom_t a;
+  fts_atom_list_iterator_t *iterator;
 
-static void
-message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+  file = (FILE *)fts_get_ptr( at);
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P message %d %d %d %d", x, y, w, font_index);
+
+  iterator = fts_atom_list_iterator_new( this->atom_list);
+
+  while (! fts_atom_list_iterator_end( iterator))
+    {
+      fts_atom_t *a = fts_atom_list_iterator_current( iterator);
+
+      if ( fts_is_int( a))
+	fprintf( file, " %d", fts_get_int( a));
+      else if ( fts_is_float( a) )
+	fprintf( file, " %f", fts_get_float( a));
+      else if ( fts_is_symbol( a) )
+	{
+	  fts_symbol_t s = fts_get_symbol( a);
+
+	  if (s == fts_s_semi)
+	    fprintf( file, " \\;");
+	  else
+	    fprintf( file, " %s", fts_symbol_name( fts_get_symbol( a)) );
+	}
+
+      fts_atom_list_iterator_next( iterator);
+    }
+
+  fprintf( file, ";\n");
+}
+
+static void message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
   fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
@@ -646,8 +680,7 @@ message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
    evalution of the box content.
 */
 
-static void
-message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -658,8 +691,7 @@ message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     message_update(o);
 }
 
-static void
-message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
 
@@ -670,8 +702,7 @@ message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     message_update(o);
 }
 
-static void
-message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
   message_t *this = (message_t *) o;
 
@@ -684,8 +715,7 @@ message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
-static void
-message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
   message_t *this = (message_t *) o;
 
@@ -703,8 +733,7 @@ message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  * it is used to make the message box flash like the messages; java is not
  * reialable for this kind of real time flashing.
  */
-static void
-message_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+static void message_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   message_t *this = (message_t *)obj;
 
@@ -712,8 +741,7 @@ message_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 }
 
 
-static fts_status_t
-message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
 
@@ -736,6 +764,9 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, message_save_bmax, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, message_save_dotpat, 1, a); 
 
   /* Application methods */
 
@@ -763,9 +794,7 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-
-void
-message_config(void)
+void message_config(void)
 {
   init_eval();
 

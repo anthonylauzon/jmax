@@ -118,7 +118,7 @@ static void fts_ucs_install_commands(void );
 
 static void fts_ucs_init(void);
 
-fts_module_t fts_ucs_module = {"UCS", "FTS Universal Configuration System", fts_ucs_init, 0};
+fts_module_t fts_ucs_module = {"UCS", "FTS Universal Configuration System", fts_ucs_init, 0, 0};
 
 static void
 fts_ucs_init(void)

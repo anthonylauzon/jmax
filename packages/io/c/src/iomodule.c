@@ -36,4 +36,4 @@ fts_io_init(void)
   udpmessage_config();
 }
 
-fts_module_t io_module = {"io", "I/O objects", fts_io_init, 0, 0, 0};
+fts_module_t io_module = {"io", "I/O objects", fts_io_init, 0, 0};

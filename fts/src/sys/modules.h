@@ -67,7 +67,6 @@ typedef struct _fts_module
   const char *doc;		/* for documentation purpose */
 
   void (* init_f)(void);	/* the init function */
-  void (* restart_f)(void);	/* the restart function */
   void (* shutdown_f)(void);	/* the shutdown function */
 
   struct _fts_module *next;	/* pointer for list handling */

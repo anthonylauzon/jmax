@@ -37,4 +37,4 @@ static void fts_veclib_init(void)
 }
 
 fts_module_t fts_veclib_module =
-  {"VecLib", "The vector function library", fts_veclib_init, 0};
+  {"VecLib", "The vector function library", fts_veclib_init, 0, 0};

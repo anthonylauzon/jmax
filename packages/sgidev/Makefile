@@ -23,40 +23,21 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+all:
+	(cd src; $(MAKE) $@)
+.PHONY: all
 
-##
-## Packages installed by default in this site
-##
+clean:
+	(cd src; $(MAKE) $@)
+.PHONY: clean
 
-# new classes
-package require data
-package require control
-package require mess
-package require numeric
-package require lists
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/sgidev
+	$(INSTALL_DATA) sgidev.jpk $(lib_install_dir)/packages/sgidev
+	$(INSTALL_DATA) sgidev.scm $(lib_install_dir)/packages/sgidev
+.PHONY: install-noarch
 
-# ISPW classes
-package require ispw
-package require ispwmath
-package require table
-package require qlist
-package require explode
-package require sequence
-
-
-# I/O package
-package require io
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/sgidev/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libsgidev.so $(lib_install_dir)/packages/sgidev/lib/$(ARCH)/opt )
+.PHONY: install-arch

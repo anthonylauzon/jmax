@@ -227,7 +227,7 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties, 0, 0); 
 
   t[0] = fts_t_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_new_symbol("save_dotpat"), button_save_dotpat, 1, t); 
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, button_save_dotpat, 1, t); 
 
   fts_method_define(cl, fts_SystemInlet, fts_s_bang, button_bang, 0, 0);
 

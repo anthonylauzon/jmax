@@ -845,7 +845,7 @@ void dsp_install_clocks(void)
 
 /* This function should be moved to a tile, or to the runtime */
 
-void dsp_chain_poll(void)
+void fts_dsp_chain_poll( void)
 {
   if (dsp_chain == dsp_chain_on)
     {

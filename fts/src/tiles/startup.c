@@ -26,11 +26,7 @@
 
 /* 
    This file contain the initial configuration of  the FTS modules and  device assignement,
-   and the main; FTS don't support "foregneir" main anymore.
-
-   Should be modularized by layer (there should be a sys_init, runtime_init 
-   and lang_init).
-
+   and the main.
 */
 
 #include <string.h>
@@ -41,7 +37,6 @@
 
 #include "tiles/ucs.h"
 #include "tiles/messtile.h"
-#include "tiles/dsptile.h"
 
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
@@ -95,9 +90,6 @@ int main(int argc, char **argv)
   post( "%s\n", FTS_ARCH_NAME);
 #endif
 
-  /* After module initialization, compile the scheduler list */
-  fts_sched_compile();
-
   /* Run the scheduler */
   fts_sched_run();
 
@@ -121,18 +113,16 @@ static void fts_kernel_config(void)
 
   /* RUNTIME modules */
 
-  fts_sched_setup();  /* the fts scheduler module */
+  fts_install_module( &fts_sched_module);    /* the fts scheduler module */
   fts_install_module( &fts_dev_module);      /* the device support  system */
   fts_install_module( &fts_midi_module);     /* the fts MIDI system */
-  fts_install_module( &fts_time_module);     /* the time handling module */
   fts_install_module( &fts_client_module);   /* the fts <--> client communication system */
   fts_install_module( &fts_audio_module);    /* the fts AUDIO I/O  system */
-  fts_install_module( &fts_files_module);   /* the fts file handling module */
+  fts_install_module( &fts_files_module);    /* the fts file handling module */
 
   /* TILES modules */
 
   fts_install_module( &fts_ucs_module);      /* the fts universal configuration  system */
-  fts_install_module( &fts_dsptile_module);      /* the fts universal configuration  system */
   fts_install_module( &fts_messtile_module);      /* the fts universal configuration  system */
 }
 

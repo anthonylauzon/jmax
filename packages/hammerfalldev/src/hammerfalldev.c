@@ -644,7 +644,7 @@ static int hammerfall_adc_get_nchans(fts_dev_t *dev)
 
 static void hammerfalldev_init(void);
 
-fts_module_t hammerfalldev_module = {"hammerfalldev", "HAMMERFALL devices", hammerfalldev_init, 0, 0, 0};
+fts_module_t hammerfalldev_module = {"hammerfalldev", "HAMMERFALL devices", hammerfalldev_init, 0, 0};
 
 static void hammerfalldev_init(void)
 {

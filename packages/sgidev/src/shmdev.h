@@ -24,32 +24,9 @@
  *
  */
 
-/*
-   Temporary definition of the dsp chain tile.
+#ifndef _SHMDEV_H_
+#define _SHMDEV_H_
 
-   Soon to be reorganized.
+extern void shmdev_init( void);
 
-   Actually, just install the dsp_poll funciton; really, it should incorporate
-   the installation of the good dsp chain, and it should incorporate
-   the polled function (?? or should just go away in runtime ???).
-
-*/
-
-#include "sys.h"
-#include "lang.h"
-#include "runtime.h"
-
-static void dsp_tile_init(void);
-
-fts_module_t fts_dsptile_module = {"Dsp", "Dsp executor", dsp_tile_init, 0};
-
-static void
-dsp_tile_init(void)
-{
-  fts_sched_declare(dsp_chain_poll, require, fts_new_symbol("control"), "dsp_chain_poll");
-}
-
-
-
-
-
+#endif

@@ -31,7 +31,6 @@
 # Get commandline argument
 
 if {[systemProperty "jmaxNoConsole"] != ""} then { set jmaxNoConsole [systemProperty "jmaxNoConsole"]}
-if {[systemProperty "jmaxNoRegister"] != ""} then { set jmaxNoRegister [systemProperty "jmaxNoRegister"]}
 if {[systemProperty "jmaxHost"] != ""} then { set jmaxHost [systemProperty "jmaxHost"]}
 if {[systemProperty "jmaxConnection"] != ""} then { set jmaxConnection [systemProperty "jmaxConnection"]}
 if {[systemProperty "jmaxPort"] != ""} then { set jmaxPort [systemProperty "jmaxPort"]}
@@ -48,7 +47,6 @@ if {[systemProperty "jmaxFastFileBox"] != ""} then { set jmaxFastFileBox [system
 
 setSystemProperty "jmaxFastFileBox" $jmaxFastFileBox
 setSystemProperty "jmaxNoConsole" $jmaxNoConsole
-setSystemProperty "jmaxNoRegister" $jmaxNoRegister
 
 
 ##

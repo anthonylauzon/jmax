@@ -52,4 +52,4 @@ fts_guiobj_init(void)
   button_config();
 }
 
-fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init};
+fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};

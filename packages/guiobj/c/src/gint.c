@@ -115,6 +115,25 @@ gint_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 
+static void gint_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *file;
+  int x, y, w, font_index;
+  fts_atom_t a;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P number %d %d %d %d;\n", x, y, w, font_index);
+}
+
 static void
 gint_get_value(fts_daemon_action_t action, fts_object_t *obj,
 	       fts_symbol_t property, fts_atom_t *value)
@@ -140,8 +159,7 @@ gint_put_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_outlet_send(obj, 0, fts_s_int, 1, value);
 }
 
-static fts_status_t
-gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
 
@@ -162,6 +180,9 @@ gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_anything;	/* number */
   fts_method_define(cl, 0, fts_s_set, gint_set, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, gint_save_dotpat, 1, a); 
 
    /* Add  the value daemon */
 

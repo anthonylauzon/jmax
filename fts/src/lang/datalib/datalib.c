@@ -38,4 +38,4 @@ fts_datalib_init(void)
   fts_atom_list_config();
 }
 
-fts_module_t fts_datalib_module = {"Datalib", "Message system utilities", fts_datalib_init, 0};
+fts_module_t fts_datalib_module = {"Datalib", "Message system utilities", fts_datalib_init, 0, 0};

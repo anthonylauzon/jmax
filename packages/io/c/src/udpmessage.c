@@ -47,12 +47,12 @@ typedef struct {
 
 #define MAXATOMS 128
 
-static void updmessage_fd_fun( int fd, void *data)
+static void updmessage_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  updmessage_t *this = (updmessage_t *)data;
-  fts_atom_t at[MAXATOMS];
+  updmessage_t *this = (updmessage_t *)o;
+  fts_atom_t argv[MAXATOMS];
   fts_symbol_t selector = fts_s_list;
-  int size, i, ac, first_token;
+  int size, i, argc, first_token;
   protodecode_t pr;
 
   size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
@@ -61,7 +61,7 @@ static void updmessage_fd_fun( int fd, void *data)
     return;
 
   protodecode_init( &pr);
-  ac = 0;
+  argc = 0;
   first_token = 0;
 
   for ( i = 0; i < size; i++)
@@ -75,16 +75,16 @@ static void updmessage_fd_fun( int fd, void *data)
 	  if (first_token == 0)
 	    first_token = 1;
 
-	  fts_set_int( &(at[ac]), protodecode_get_int( &pr));
-	  ac++;
+	  fts_set_int( &(argv[argc]), protodecode_get_int( &pr));
+	  argc++;
 	}
       else if ( t == FLOAT_TOKEN)
 	{
 	  if (first_token == 0)
 	    first_token = 1;
 
-	  fts_set_float( &(at[ac]), protodecode_get_float( &pr));
-	  ac++;
+	  fts_set_float( &(argv[argc]), protodecode_get_float( &pr));
+	  argc++;
 	}
       else if ( t == STRING_TOKEN)
 	{
@@ -95,15 +95,15 @@ static void updmessage_fd_fun( int fd, void *data)
 	    }
 	  else
 	    {
-	      fts_set_symbol( &(at[ac]), fts_new_symbol_copy( protodecode_get_string( &pr)));
-	      ac++;
+	      fts_set_symbol( &(argv[argc]), fts_new_symbol_copy( protodecode_get_string( &pr)));
+	      argc++;
 	    }
 	}
       else if ( t == EOM_TOKEN)
 	break;
     }
 
-  fts_outlet_send( (fts_object_t *)this, 0, selector, ac, at);
+  fts_outlet_send( (fts_object_t *)this, 0, selector, argc, argv);
 }
 
 
@@ -137,7 +137,7 @@ static void updmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;
     }
 
-  fts_thread_add_fd( fts_thread_get_current(), this->socket, updmessage_fd_fun, this);
+  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, updmessage_receive, (fts_object_t *)this);
 }
 
 static void updmessage_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -146,7 +146,7 @@ static void updmessage_delete(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
     if ( this->socket >= 0)
       {
-	fts_thread_remove_fd( fts_thread_get_current(), this->socket);
+	fts_sched_remove_fd( fts_sched_get_current(), this->socket);
 
 	close( this->socket);
       }

@@ -62,6 +62,6 @@ data_init(void)
   copy_config();
 }
 
-fts_module_t data_module = {"data", "data structures", data_init};
+fts_module_t data_module = {"data", "data structures", data_init, 0, 0};
 
 

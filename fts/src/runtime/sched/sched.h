@@ -63,10 +63,10 @@ typedef void (*fts_sched_fd_fun_t)( int fd, void *data);
     fd: the file descriptor
     read: if one, the file descriptor is added to the read set, else to the write set
     method: the method to call when file descriptor is set
-    obj: the object on which to call the method
+    object: the object on which to call the method
   Returns: nothing.
 */
-extern void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *obj);
+extern void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object);
 
 /*
   Function: fts_sched_remove_fd
@@ -77,18 +77,8 @@ extern void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t
     fd: the file descriptor
   Returns: nothing.
 */
-extern void fts_sched_remove_fd( fts_sched_t sched, int fd);
+extern void fts_sched_remove_fd( fts_sched_t *sched, int fd);
 
-
-/*
-  Function: fts_sched_do_select
-  Description:
-    Do a single select() on all the files in the file descriptor set of the sched.
-  Arguments:
-    sched: the sched owning the file descriptor set
-  Returns: nothing.
-*/
-extern void fts_sched_do_select( fts_sched_t sched);
 
 /* run time */
 extern void fts_sched_run(void);
@@ -98,5 +88,10 @@ extern void fts_halt(void);
 extern float fts_sched_get_tick_length(void);
 
 extern void fts_sched_set_pause(int p);
+
+/**
+ * The sched module
+ */
+extern fts_module_t fts_sched_module;
 
 #endif

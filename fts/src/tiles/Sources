@@ -23,21 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ifdef STATIC
-
 SOURCES = \
-dsptile.c	\
-messtile.c	\
-startup_static.c	\
-ucs.c		\
-
-else
-
-SOURCES = \
-dsptile.c	\
 messtile.c	\
 startup.c	\
 ucs.c		\
 
-endif
 

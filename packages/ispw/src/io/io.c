@@ -48,4 +48,4 @@ ispw_io_module_init(void)
 #endif
 }
 
-fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init};
+fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};

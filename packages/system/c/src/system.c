@@ -50,4 +50,4 @@ system_module_init(void)
   blip_config();
 }
 
-fts_module_t system_module = {"system", "Basic System Objects", system_module_init};
+fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};

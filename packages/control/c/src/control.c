@@ -44,4 +44,4 @@ control_init(void)
   demux_config();
 }
 
-fts_module_t control_module = {"control", "control classes", control_init};
+fts_module_t control_module = {"control", "control classes", control_init, 0, 0};

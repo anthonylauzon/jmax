@@ -36,5 +36,5 @@ ispw_pitch_module_init(void)
   pt_config();
 }
 
-fts_module_t ispw_pitch_module = {"ISPW pitch", "ISPW pitch analysis classes", ispw_pitch_module_init};
+fts_module_t ispw_pitch_module = {"ISPW pitch", "ISPW pitch analysis classes", ispw_pitch_module_init, 0, 0};
 

@@ -53,6 +53,6 @@ extern void fts_platform_init( void);
 extern void fts_real_time_on( void);
 extern void fts_real_time_off( void);
 
-
+extern void fts_pause( void);
 
 #endif

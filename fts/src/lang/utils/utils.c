@@ -38,4 +38,4 @@ fts_utils_init(void)
   fts_fourpoint_init();
 }
 
-fts_module_t fts_utils_module = {"Utils", "Message system utilities", fts_utils_init, 0};
+fts_module_t fts_utils_module = {"Utils", "Message system utilities", fts_utils_init, 0, 0};

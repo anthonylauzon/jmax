@@ -1,3 +1,8 @@
+2000-03-31  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* sys/modules.[ch]: removed the restart function (which has never been tested nor used).
+	Changed all modules accordingly.
+
 2000-03-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* runtime/sched/* and runtime/thread/*: removing the thread directory

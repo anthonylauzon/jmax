@@ -32,6 +32,9 @@ extern fts_module_t fts_midi_module;
 struct _fts_midi_port;
 typedef struct _fts_midi_port fts_midi_port_t;
 
+/* The function that is called by the scheduler */
+extern void fts_midi_poll( void);
+
 extern fts_midi_port_t *fts_midi_get_port(int idx);
 
 extern double *fts_get_midi_time_code_p(int idx); /*return a pointer to a long keeping

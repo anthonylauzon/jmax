@@ -413,7 +413,7 @@ static void alsa_adc_get( fts_word_t *argv)
 
 static void halsadev_init(void);
 
-fts_module_t halsadev_module = { "halsadev", "Hammerfall ALSA devices", halsadev_init, 0, 0, 0};
+fts_module_t halsadev_module = { "halsadev", "Hammerfall ALSA devices", halsadev_init, 0, 0};
 
 static void halsadev_init(void)
 {

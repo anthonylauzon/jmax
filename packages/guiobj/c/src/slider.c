@@ -167,11 +167,33 @@ slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
+static void slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *file;
+  int x, y, w, min_value, max_value;
+  fts_atom_t a;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_min_value, &a);
+  min_value = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_max_value, &a);
+  max_value = fts_get_int( &a);
+
+  fprintf( file, "#P slider %d %d %d %d;\n", x, y, w, max_value - min_value + 1);
+}
+
 
 static fts_status_t
 slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
+  fts_type_t t[1];
 
   fts_class_init(cl, sizeof(slider_t), 1, 1, 0);
 
@@ -182,23 +204,26 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_s_bang, slider_bang, 0, 0);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, slider_int, 1, a);
+  t[0] = fts_t_int;
+  fts_method_define(cl, 0, fts_s_int, slider_int, 1, t);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, slider_float, 1, a);
+  t[0] = fts_t_float;
+  fts_method_define(cl, 0, fts_s_float, slider_float, 1, t);
 
   fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
 
-  a[0] = fts_s_anything; /* number */
-  fts_method_define(cl, 0, fts_s_set, slider_set, 1, a);
+  t[0] = fts_t_anything; /* number */
+  fts_method_define(cl, 0, fts_s_set, slider_set, 1, t);
+
+  t[0] = fts_t_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, slider_save_dotpat, 1, t); 
 
    /* Add  the value daemon */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_put_value);
 
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
+  t[0] = fts_t_int;
+  fts_outlet_type_define(cl, 0, fts_s_int, 1, t);
 
   return fts_Success;
 }
