@@ -62,15 +62,18 @@ public class FtsPatcherDocumentType extends MaxDocumentType
       {
 	patcher = fts.makeFtsObject(fts.getServer().getRootObject(), "jpatcher");
 
-	// Put a new empty patch in edit mode
+	//hack to avoid null pointer exception 
+	//(in case of new patcher action during the jmax startup)
+	if(!(patcher instanceof FtsPatcherObject)) return null;
 
+	// Put a new empty patch in edit mode
 	FtsPatcherDocument document = new FtsPatcherDocument(context);
 
 	patcher.updateData();
 	fts.sync();
 
 	// Put some default geometrical property for the window.
-
+	
 	FtsPatcherData data = (FtsPatcherData) 	patcher.getData();
 
 	data.setWindowX(100);

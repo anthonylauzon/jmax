@@ -47,7 +47,8 @@ public class NewAction extends EditorAction
     try
       {
 	container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	Mda.getDocumentTypeByName( "patcher").newDocument( container.getEditor().getFts() ).edit();
+	MaxDocument doc = Mda.getDocumentTypeByName( "patcher").newDocument( container.getEditor().getFts());
+	if(doc!=null) doc.edit();
 	container.getFrame().setCursor(temp);
       }
     catch (MaxDocumentException ex)
