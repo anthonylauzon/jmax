@@ -1242,6 +1242,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if (aErmesObject.itsFont.getSize() != itsSketchPad.sketchFont.getSize())
 	aFObject.put("fs", aErmesObject.itsFont.getSize());
 
+      if(aErmesObject.itsResized) aFObject.put("resized", "on");
       // if (aErmesObject.itsJustification != itsSketchPad.itsJustificationMode)
       //aFObject.put("jsf", aErmesObject.itsJustification);
       //moved to putOtherProperties

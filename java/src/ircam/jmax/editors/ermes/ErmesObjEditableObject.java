@@ -98,6 +98,11 @@ import ircam.jmax.fts.*;
     int lenght = temporaryFM.stringWidth(itsArgs);	//*
     preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
     super.Init(theSketchPad, theFtsObject);
+    
+    Integer aJustification = (Integer)theFtsObject.get("jsf");
+    if(aJustification == null) itsJustification = itsSketchPad.itsJustificationMode;
+    else itsJustification = aJustification.intValue();
+
     itsInEdit = false;
     //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
     return true;

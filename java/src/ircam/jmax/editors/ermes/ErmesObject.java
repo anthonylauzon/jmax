@@ -313,7 +313,7 @@ public class ErmesObject implements FtsPropertyHandler {
     itsSketchPad = theSketchPad;
     String aFont = (String)theFtsObject.get("font");
     Integer  aSize = (Integer)theFtsObject.get("fs");
-    Integer aJustification = (Integer)theFtsObject.get("jsf");
+    String aResized = (String)theFtsObject.get("resized");
     int aIntSize;
     
     if((aFont == null)&&(aSize == null)) itsFont = itsSketchPad.sketchFont;
@@ -325,8 +325,8 @@ public class ErmesObject implements FtsPropertyHandler {
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
 
-    if(aJustification == null) itsJustification = itsSketchPad.itsJustificationMode;
-    else itsJustification = aJustification.intValue();
+    if(aResized==null) itsResized = false;
+    else itsResized = true;
 
     laidOut = false;
     itsX = ((Integer)theFtsObject.get("x")).intValue();

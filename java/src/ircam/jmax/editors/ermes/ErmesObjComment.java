@@ -62,9 +62,12 @@ class ErmesObjComment extends ErmesObject {
     itsArgs = theFtsObject.getDescription();
     preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
     super.Init(theSketchPad,  theFtsObject);
+    
+    Integer aJustification = (Integer)theFtsObject.get("jsf");
+    if(aJustification == null) itsJustification = itsSketchPad.itsJustificationMode;
+    else itsJustification = aJustification.intValue();
+
     itsSketchPad.GetTextArea().setBackground(Color.white);
-    // MDC:
-    //itsArgs = theFtsObject.getArgumentsDescription().trim();
     
     ParseText(itsArgs);
     RestoreDimensions();    
