@@ -351,7 +351,7 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
 {
   fts_audioportin_t *this = (fts_audioportin_t *)o;
 
-  this->port = (fts_audioport_t *)fts_get_object( at+1);
+  this->port = (fts_audioport_t *)fts_get_object(at);
 
   fts_dsp_add_object(o);
 }
@@ -512,7 +512,7 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 {
   fts_audioportout_t *this = (fts_audioportout_t *)o;
 
-  this->port = (fts_audioport_t *)fts_get_object( at+1);
+  this->port = (fts_audioport_t *)fts_get_object(at);
 
   fts_dsp_add_object(o);
 }
