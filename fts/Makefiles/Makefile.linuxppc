@@ -1,0 +1,39 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
+#
+#Gnu mode, force the compilation with the gcc compiler on any architecture
+# with the -Wall flag set, and no other special flags; may not work in all the
+# architectures
+#
+
+VENDOR := gnu
+AUDIO_LIBRARY := oss
+OS_TYPE := unix
+CC := gcc
+
+ARCH_CFLAGS := -Wall -DLINUX
+ARCH_LDFLAGS :=
+LD_ALL_FLAG := --whole-archive
+LD_NONE_FLAG := --no-whole-archive
+CC_ALL_FLAG := -Xlinker --whole-archive
+CC_NONE_FLAG := -Xlinker --no-whole-archive
+
+ARCH_OPT_CFLAGS := -O6 -funroll-all-loops
+ARCH_OPT_LDFLAGS := 
+
+FTS_SYS_LIBS = -lm -ldl
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
+
+

@@ -1,0 +1,37 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+ifeq ($(VENDOR),sgi)
+  ARCH_SOURCES = sgiaf.c
+endif
+
+ifeq ($(VENDOR),gnu)
+  ARCH_SOURCES = sttools.c
+endif
+
+ifeq ($(VENDOR),solaris2)
+  ARCH_SOURCES = sttools.c
+endif
+
+SOURCES = \
+  $(ARCH_SOURCES) \
+  files.c \
+  directories.c \
+  atomfiles.c \
+  post.c \
+  parser.c \
+  soundformats.c
+
+
+
+

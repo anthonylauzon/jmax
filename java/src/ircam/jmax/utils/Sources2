@@ -1,0 +1,38 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES := \
+           $(INCLUDE_PATH)/ExtensionFilter.java \
+           $(INCLUDE_PATH)/TextWindow.java    \
+	   $(INCLUDE_PATH)/IndentedPrintWriter.java \
+	   $(INCLUDE_PATH)/KeyConsumer.java \
+	   $(INCLUDE_PATH)/Platform.java \
+	   $(INCLUDE_PATH)/List.java \
+	   $(INCLUDE_PATH)/ListObject.java \
+	   $(INCLUDE_PATH)/ListIterator.java \
+           $(INCLUDE_PATH)/MetaListIterator.java \
+           $(INCLUDE_PATH)/Enumeration2.java \
+	   $(INCLUDE_PATH)/MetaList.java \
+	   $(INCLUDE_PATH)/GlobalProbe.java \
+           $(INCLUDE_PATH)/Oscilloscope.java \
+           $(INCLUDE_PATH)/TDTree.java \
+           $(INCLUDE_PATH)/TwoOrderObject.java \
+           $(INCLUDE_PATH)/Probe.java          \
+           $(INCLUDE_PATH)/ChooseNumberPopUp.java  \
+           $(INCLUDE_PATH)/ChooseColorIdPopUp.java  \
+           $(INCLUDE_PATH)/NumberChoosenListener.java \
+
+
+
+
+
+

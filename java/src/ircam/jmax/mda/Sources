@@ -1,0 +1,31 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+	AbstractMaxDataEditor.java \
+	MaxData.java \
+	MaxDataEditor.java \
+	MaxDataEditorFactory.java \
+	MaxDataEditorReadyListener.java \
+	MaxDocument.java \
+	MaxDocumentException.java \
+	MaxDocumentHandler.java \
+	MaxDocumentType.java \
+	MaxEnv.java \
+	MaxTclDocument.java \
+	MaxTclExecutedDocument.java \
+	MaxTclExecutedDocumentHandler.java \
+	MaxTclExecutedDocumentType.java \
+	MaxTclFileDocumentHandler.java \
+	MaxTclInterpreter.java \
+	Mda.java \
+	MdaModule.java

@@ -1,0 +1,42 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
+EDITORS_PATH := $(INCLUDE_PATH)
+EDITORS_ACC:=
+
+############################### ermes
+INCLUDE_PATH := $(EDITORS_PATH)/ermes
+include $(INCLUDE_PATH)/Sources2
+
+EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### patcher
+#INCLUDE_PATH := $(EDITORS_PATH)/patcher
+#include $(INCLUDE_PATH)/Sources2
+
+#EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### console
+INCLUDE_PATH := $(EDITORS_PATH)/console
+include $(INCLUDE_PATH)/Sources2
+
+EDITORS_ACC := $(EDITORS_ACC) $(SOURCES)
+
+############################### control
+INCLUDE_PATH := $(EDITORS_PATH)/control
+include $(INCLUDE_PATH)/Sources2
+
+SOURCES := $(EDITORS_ACC) $(SOURCES)
+
+

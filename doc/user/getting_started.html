@@ -1,0 +1,211 @@
+<!                                                                      >
+<! jMax                                                                 >
+<!                                                                      >
+<! Copyright (C) 1999 by IRCAM                                          >
+<! All rights reserved.                                                 >
+<!                                                                      >
+<! This program may be used and distributed under the terms of the      >
+<! accompanying LICENSE.                                                >
+<!                                                                      >
+<! This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    >
+<! for DISCLAIMER OF WARRANTY.                                          >
+<!                                                                      >
+<HTML>
+<HEAD>
+<TITLE>jMax Documentation - Getting Started</TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>Documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>User Documentation</A>
+  </UL>
+</UL>
+
+<p>
+<font size=+3 color=#FFFFFF><b>Getting Started</b></font>
+
+<p>
+<hr noshade size=1>
+
+<UL TYPE=DOT>
+  <LI><A HREF="#running">Running jMax</A>
+  <LI><A HREF="#arguments">Command Line Arguments</A>
+  <LI><A HREF="#.jmaxrc">The file <TT>.jmaxrc</TT></A>
+</UL>
+
+<p>
+<hr noshade size=1>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<A NAME="running">
+<h2>Running <I>j</I>Max</h2>
+
+<P>
+<I>j</I>Max can be run by executing the <I>j</I>Max shell script:
+
+<UL>
+  <DT><b>&lt;<i>jMax root directory</i>&gt;/bin/<tt>jmax</tt></b><BR>
+    <tt>/usr/local/max/bin/jmax</tt>
+</UL>
+
+This script accepts a set of options (see <B><TT> jmax -help </TT></B> for description)
+that are either interpreted by the script or passed as command line arguments
+to the Java application.
+
+<p>
+<A NAME="arguments"> 
+<HR>
+<h2>Command Line Arguments</h2>
+
+<P>
+<I>j</I>Max uses a number of <I>configuration parameters</I> to parametrize the system
+at startup.
+
+These parameters appear as TCL variables and can be also set via the command line:
+
+<UL>
+  <DT><B><TT>jmax</TT> -&lt;<I>parameter name</I>&gt; &lt;<I>parameter value</I>&gt; . . .</B>
+</UL>
+
+<p>
+The parameter values given in the command line overwrite all default values given
+in the user or site specific configuration files (see down).
+
+<p>
+The chapters
+<A HREF="config/system.html">system configuration</A> and 
+<A HREF="config/io.html">i/o configuration</A>
+of this documentaion explain the different <i>j</i>Max configuration parameters.
+At least one of the <A HREF="config/system.html#host">host parameters</A> 
+should be set properly in order to start <i>j</i>Max in a default setup.
+
+<P>
+The user can implicitly define his own options in the command line using the same syntax
+like for the configuration parameters.
+For example, the command
+<ul>
+  <dt><TT>jmax -jmaxHost jack -myOption pho</TT><BR>
+</ul>
+sets the <i>j</i>Max server host name to <i>jack</i> and the user option
+named <i>myOption</i> to the value <i>pho</i> while starting up <i>j</i>Max.
+The value of this user option can be accessed through the TCL command
+<tt>systemProperty</tt>
+
+<ul>
+  <dt><b><tt>systemProperty</tt> &lt;<i>option name</i>&gt;</b>
+</ul>
+
+For example in the following construct:
+
+<ul>
+  <dt><tt>if{[systemProperty myOption] == "pho"} {...}</tt>
+</ul>
+
+<p>
+<A NAME=".jmaxrc">
+<HR>
+<h2>The file <B><TT>.jmaxrc</TT></B></h2>
+
+<P>
+The user can customize the <i>j</i>Max environment including the configuration parameters
+in the <TT>.jmaxrc</TT> file in his home directory:
+
+<UL>
+  <LI>set the <A HREF="config/system.html">system configuration </A> and 
+      <A HREF="config/io.html">i/o configuration</A>
+  <LI>customize the <A HREF="projects.html">project environment</A> for your patches
+  <LI>preload <i>j</i>Max <A HREF="packages.html">packages</A>
+</UL>
+
+<P>
+The configuration parameters set in the <TT>.jmaxrc</TT> file overwrite the site specific
+default values (see down) and they are overwritten by values set via the command line.
+
+<P>
+<strong>NOTE:</strong>
+In the current release the system and i/o configuration 
+<strong>must</strong> be set in the <TT>.jmaxrc</TT> file.
+
+<p>
+The file is loaded at startup and can contain any TCL code.<BR>
+It is possible to declare declare a number of <I>hooks</I>. 
+These hooks contain TCL code that will be executed at precise points during the initialization process.
+In particular, the <B><I>start</I></B> hook is executed after server start and must be used for I/O, 
+environment and package loading purpose.
+
+<P>
+A template <TT>.jmaxrc</TT> file can be found in the distribution.<BR>
+An example is given the following:
+
+<PRE>
+# Lines starting with # are comments
+# --- beginning of .jmaxrc
+
+#set jmaxArch linuxpc
+#set jmaxArch irix65r10k
+#set jmaxArch irix63r5k
+
+#set jmaxHost "astor.ircam.fr"
+#set jmaxHost "amati.ircam.fr"
+#set jmaxHost "marimba.ircam.fr"
+
+set jmaxSplashScreen "hide"
+set jmaxFastFileBox "true"
+
+when start {
+
+if {$jmaxHost == "astor.ircam.fr"} {
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 1024
+
+	openDefaultAudioIn stereoIn1
+	openDefaultAudioOut stereoOut1
+	openDefaultMidi midi1
+} elseif {$jmaxHost=="amati.ircam.fr"} {
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 1024
+
+	openDefaultAudioIn adatIn
+	openDefaultAudioOut adatOut
+	openDefaultMidi midi
+}  elseif {$jmaxHost == "marimba.ircam.fr"} {
+	jmaxSetSampleRate 32000
+	jmaxSetAudioBuffer 2048
+
+	openDefaultAudioIn analogIn
+	openDefaultAudioOut analogOut
+}
+}
+
+# --- end of .jmaxrc
+</PRE>
+
+<P>
+Site specific configuration parameter settings and commands should
+go in the file <A HREF=../user/installation.html#site><tt>config/site.tcl</tt></A>, 
+which is customized when <A HREF="../user/installation.html">installing</A> 
+<i>j</i>Max on a specific machine or several machines in a local network.
+
+
+</TABLE>
+
+<HR NOSHADE SIZE=1>
+
+</BODY>
+</HTML>

@@ -1,0 +1,62 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = $(SSOURCES) $(DSOURCES) 
+
+SSOURCES = \
+	ErmesConnection.java		\
+	ErmesDataEditor.java		\
+	ErmesDrawable.java		\
+	ErmesModule.java		\
+	ErmesNumberDialog.java		\
+	ErmesObjBang.java		\
+	ErmesObjComment.java		\
+	ErmesObjEditField.java		\
+	ErmesObjEditableObject.java	\
+	ErmesObjExternal.java		\
+	ErmesObjFloat.java		\
+	ErmesObjIn.java			\
+	ErmesObjInOut.java		\
+	ErmesObjInOutPop.java		\
+	ErmesObjInt.java		\
+	ErmesObjMessage.java		\
+	ErmesObjNumberBox.java		\
+	ErmesObjOut.java		\
+	ErmesObjPatcher.java		\
+	ErmesObjSlider.java		\
+	ErmesObjSliderDialog.java	\
+	ErmesObjTextArea.java		\
+	ErmesObjThrottle.java		\
+	ErmesObjToggle.java		\
+	ErmesObject.java		\
+	ErmesPatcherFactory.java	\
+	ErmesPatcherListener.java	\
+	ErmesSelection.java		\
+	ErmesSketchPad.java		\
+	ErmesSketchWindow.java		\
+	ErmesSwToggleButton.java	\
+	ErmesSwToolbar.java		\
+	FindPanel.java			\
+	FontCache.java			\
+	InletOutletSensibilityArea.java	\
+	InletSensibilityArea.java	\
+	KeyEventClient.java		\
+	MultiLineText.java		\
+	NothingSensibilityArea.java	\
+	OutletSensibilityArea.java	\
+	ResizeSensibilityArea.java	\
+	SensibilityArea.java		\
+
+
+
+
+

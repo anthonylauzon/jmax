@@ -1,0 +1,3 @@
+SOURCES = \
+debug.c \
+cheese.c

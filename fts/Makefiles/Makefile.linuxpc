@@ -1,0 +1,64 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+#
+
+
+VENDOR := gnu
+AUDIO_LIBRARY := oss
+OS_TYPE := unix
+
+# *** Standard compiler for FTS ***IS*** Pentium-gcc ***
+# Pentium gcc
+# This name is not standard...
+CC := pentium-gcc
+LD := pentium-gcc
+ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC
+ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops
+ARCH_LDFLAGS := -rdynamic
+
+LD_ALL_FLAG := --whole-archive
+LD_NONE_FLAG := --no-whole-archive
+CC_ALL_FLAG := -Xlinker --whole-archive
+CC_NONE_FLAG := -Xlinker --no-whole-archive
+
+
+# Portland compiler
+#CC := pgcc
+#LD := pgcc
+#ARCH_CFLAGS := -DLINUX -DLINUXPC
+#ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
+#ARCH_OPT_LDFLAGS := -v
+
+# *** Do not commit a Makefile with standard gcc enabled ***
+# Standard gcc
+# CC := gcc
+# LD := gcc
+# These flags are quite strict and give a lot of warning. But they are safe
+#ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused -DLINUX -DLINUXPC 
+# For now, we use
+#ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC 
+#ARCH_OPT_CFLAGS := -O6
+#ARCH_LDFLAGS := -rdynamic 
+#LD_ALL_FLAG := --whole-archive
+#LD_NONE_FLAG := --no-whole-archive
+#CC_ALL_FLAG := -Xlinker --whole-archive
+#CC_NONE_FLAG := -Xlinker --no-whole-archive
+
+
+FTS_SYS_LIBS = -lm -ldl
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
+
+
+
+
+

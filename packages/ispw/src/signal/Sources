@@ -1,0 +1,50 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+ifeq ($(VENDOR),sgi)
+  ARCH_SOURCES = osc_ftl_sgi.c
+endif
+
+ifeq ($(VENDOR),gnu)
+  ARCH_SOURCES = osc_ftl_linuxpc.c
+endif
+
+SOURCES = \
+  $(ARCH_SOURCES) \
+fft.c \
+fft_ftl.c \
+noise.c \
+osc.c \
+phas1.c \
+resample.c \
+samphold.c \
+sbinop.c \
+sig1.c \
+sigabs.c \
+sigarctan2.c \
+sigline.c \
+signal.c \
+sigparam.c \
+sigprint.c \
+sigsnap.c \
+sigswitch.c \
+sigthres.c \
+sigthrow.c \
+sigthru.c \
+vecarithm.c \
+vecclip.c \
+veclog.c \
+vecsqrt.c \
+vectrigon.c \
+wavetab.c \
+zerocross.c \

@@ -1,0 +1,12 @@
+src	all	Console.java
+src	all	ConsoleKeyListener.java
+src	all	ConsoleModule.java
+src	all	ConsoleMouseListener.java
+src	all	ConsoleTextArea.java
+src	all	ConsoleThread.java
+src	all	ConsoleWindow.java
+src	all	ConsoleWriter.java
+src	all	Makefile
+src	all	Sources
+src	all	Sources2
+src	all	tcl

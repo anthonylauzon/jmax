@@ -1,0 +1,79 @@
+<!                                                                      >
+<! jMax                                                                 >
+<!                                                                      >
+<! Copyright (C) 1999 by IRCAM                                          >
+<! All rights reserved.                                                 >
+<!                                                                      >
+<! This program may be used and distributed under the terms of the      >
+<! accompanying LICENSE.                                                >
+<!                                                                      >
+<! This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    >
+<! for DISCLAIMER OF WARRANTY.                                          >
+<!                                                                      >
+<HTML>
+<HEAD>
+<TITLE> jMax 2.3.13 release notes </TITLE>
+</HEAD>
+
+<CENTER> <H2> <I>j</I>Max 2.3.13 release notes </H2> </CENTER>
+
+<P>
+This is release 2.3.13 of <I>j</I>Max.
+
+
+<h3>Supported platform</h3>
+
+<p>
+This release have been compiled on:
+<ul>
+<li> IRIX 6.5 for R10000, R5000, R4x00 processors.
+<li> IRIX 6.3 for R5000 processors.
+</ul>
+
+
+<h3> Fixed bugs </h3>
+
+<p>
+The following bugs have been fixed:
+<ul>
+<li> #129: numberbox
+<li> #127: changing connected abstraction for template
+<li> #114: CTRL-e in text field
+<li> #109: copy in an object/message/comment
+<li> #83: Duplicate = CTL-C + Ctl-V
+<li> #130: table
+<li> (not in bug report base): changing number of inlets and outlets of a patcher
+<li> (not in bug report base): unparsing of symbols looking like numbers ("-0" for example)
+</ul> 
+
+
+<h3>New features</h3>
+
+<p>
+The following features have been added:
+<ul>
+<li> an "up" button in toolbar, that opens the parent patch
+<li> a DSP on/off button in control panel, that starts/stops dsp
+and reflect the current state of DSP execution
+<li> pasting to a locked patch will unlock it and do the paste
+<li> find will unlock the destination patch (no more selected objects in lock mode)
+<li> a first version of a Help Menu has been implemented. Help on an object
+can be accessed via the Help shortcut (Ctrl-H) or via Alt-click on an object.
+The help menu has also items for help summary patches.
+</ul>
+
+
+<h3>Bug tracking system</h3>
+
+<p>
+Bugs are repertoried in the Ircam bug tracking system, at the following URL:
+<a href="http://www.ircam.fr/Bugs/">http://www.ircam.fr/Bugs/</a> ; 
+you will find there a list of known and fixed bugs, updated
+on a daily base, and a bug report submission page that must be used for
+bug report submission.
+
+<p>
+In order to ease bug tracking and fixing, users are required to use
+the previously mentionned URL to report bugs.
+
+</HTML>

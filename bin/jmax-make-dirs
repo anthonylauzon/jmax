@@ -1,0 +1,118 @@
+#!/bin/sh
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
+# ***************************************************************************
+# Constants
+# ***************************************************************************
+
+ARCHS="irix63r5k irix63r10k irix65r4k irix65r5k irix65r10k linuxpc linuxppc"
+
+# ***************************************************************************
+# Functions
+# ***************************************************************************
+help ()
+{
+    cat >&2 << HELP_EOF
+
+Usage:
+    jmax-make-dirs [-n]
+
+Creates all directories obj and lib for all the architectures.
+
+Options:
+  -n
+    Print the commands that would be executed, but do not execute them.
+
+Current architectures are : $ARCHS
+
+HELP_EOF
+}
+
+# ---------------------------------------------------------------------------
+decrypt_options ()
+{
+    NOEXEC=
+
+    for ARG in $@
+    do
+	case $ARG in
+	\-n )
+	    NOEXEC="yes" ;;
+	\-help | \-h | \-\? )
+	    help ;
+	    exit 2 ;;
+	*)
+	    help ;
+	    exit 2 ;;
+	esac
+    done
+}
+
+# ---------------------------------------------------------------------------
+check_directory ()
+{
+    if [ \! -r VERSION ]
+    then
+	echo "You're not in jMax top directory ..."
+	exit 1
+    fi
+}
+
+# ---------------------------------------------------------------------------
+do_it ()
+{
+    for i in `find packages -name "src" -type d`
+    do
+	if echo $i | grep -s java > /dev/null
+	then
+	    echo > /dev/null
+	else
+	    echo $i
+	    for d in "lib" "obj"
+	    do
+		for a in $ARCHS
+		do
+		    echo mkdir -p $i/../$d/$a/debug $i/../$d/$a/opt  $i/../$d/$a/profile
+		    if [ _${NOEXEC}_ = __ ]
+		    then
+			mkdir -p $i/../$d/$a/debug $i/../$d/$a/opt  $i/../$d/$a/profile
+		    fi
+		done
+	    done
+       fi
+    done
+
+    for a in $ARCHS
+    do
+	for d in "lib" "obj" "bin"
+	do
+	    echo mkdir -p fts/$d/$a/debug fts/$d/$a/opt  fts/$d/$a/profile
+	    if [ _${NOEXEC}_ = __ ]
+	    then
+		mkdir -p fts/$d/$a/debug fts/$d/$a/opt  fts/$d/$a/profile
+	    fi
+	done
+    done
+}
+
+# ***************************************************************************
+# Beginning of script
+# ***************************************************************************
+
+decrypt_options $@
+
+check_directory
+
+do_it

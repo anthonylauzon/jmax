@@ -1,0 +1,6 @@
+src	all	Makefile
+src	all	Sources
+src	all	explay.c
+src	all	explode.c
+src	all	explode.h
+src	all	module.c

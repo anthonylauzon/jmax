@@ -1,0 +1,67 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+#
+
+
+#depend:
+#	$(MAKEDEPEND) $(SOURCES)
+
+#include $(DEPENDFILE)
+
+cleanobjs:
+	rm -f $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS)
+	rm -f $(TOCLEAN)
+
+cleanall:
+	rm -f $(TODELETE)
+	rm -f $(TOCLEAN)
+	rm -f $(OBJECTS)
+
+
+
+##
+## Compilation rules for all architectures, not worth separatings.
+## 
+
+$(OBJDIR)/%.o : %.c
+	$(CC) -c  $(CFLAGS) $< -o $@
+
+.SUFFIXES: .so
+
+ifeq ($(VENDOR),sgi)
+$(LIBDIR)/%.so : $(LIBDIR)/%.a
+	ld $(FTS_SOFLAGS) -elf -shared -rdata_shared -o $@ $(LD_ALL_FLAG) $< $(LD_NONE_FLAG) $(SOLIBS) -lc  $(MORESOLIBS)
+endif
+
+ifeq ($(VENDOR),gnu)
+ifneq ($(ARCH),rhapsody)
+
+$(LIBDIR)/%.so : $(LIBDIR)/%.a
+	ld $(FTS_SOFLAGS) -export-dynamic -shared -o $@ $(LD_ALL_FLAG) $<  $(LD_NONE_FLAG) $(SOLIBS) -lc $(MORESOLIBS)
+else
+$(LIBDIR)/%.so : $(LIBDIR)/%.a
+	echo "Rhapsody does not support dynamic linking..."
+	touch $@
+endif
+endif
+
+ifeq ($(VENDOR),solaris2)
+$(LIBDIR)/%.so : $(OBJECTS)
+	ld $(FTS_SOFLAGS) -o $@ $(LD_ALL_FLAG) $+ $(LD_NONE_FLAG) $(MORESOLIBS) -lc -lm
+endif
+
+
+

@@ -1,0 +1,22 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+	$(INCLUDE_PATH)/IndicatorWithMemory.java		\
+	$(INCLUDE_PATH)/IncrementController.java		\
+	$(INCLUDE_PATH)/IncrementListener.java		\
+	$(INCLUDE_PATH)/Led.java		\
+	$(INCLUDE_PATH)/SimpleLed.java			\
+	$(INCLUDE_PATH)/MemoryLed.java			\
+	$(INCLUDE_PATH)/ObjectSelectedListener.java			\
+	$(INCLUDE_PATH)/ObjectSetViewer.java			\
+	$(INCLUDE_PATH)/BeanPanel.java			\

@@ -1,0 +1,46 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+SOURCES = $(ARCH_SOURCES) \
+atoms.c		\
+classes.c	\
+clipboard.c	\
+doctor.c	\
+errobj.c	\
+events.c	\
+expressions.c	\
+templates.c     \
+ftsdata.c	\
+ftsdataid.c	\
+loader.c	\
+mess.c		\
+naming.c	\
+objects.c	\
+connections.c   \
+messages.c      \
+objtable.c	\
+patabs.c	\
+patcher.c	\
+patcherdata.c   \
+patlex.c	\
+patparser.c	\
+properties.c	\
+autosave.c	\
+saver.c		\
+selection.c	\
+send.c		\
+symbols.c	\
+variables.c	\
+vm.c	        \
+params.c        \
+fpe.c

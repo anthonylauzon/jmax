@@ -1,0 +1,14 @@
+src	all	Makefile
+src	all	Rreceive.c
+src	all	Rsend.c
+src	all	Rsend.h
+src	all	Sources
+src	all	makenote.c
+src	all	midi.c
+src	all	midi_module.c
+src	all	midicd.h
+src	all	mididecrypt.c
+src	all	midiformat.c
+src	all	midiparse.c
+src	all	stripnote.c
+src	all	sustain.c

@@ -1,0 +1,9 @@
+src	all	Makefile
+all	all	abs
+all	all	help
+all	all	ispw.jpk
+ircam	all	lib
+free	all	lib
+all	all	sounds
+src	all	src
+all	all	templates

@@ -1,0 +1,28 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+SOURCES := \
+	$(INCLUDE_PATH)/DialogsModule.java	\
+	$(INCLUDE_PATH)/ErrorDialog.java	\
+	$(INCLUDE_PATH)/FileNotSavedDialog.java	\
+	$(INCLUDE_PATH)/QuitDialog.java		\
+	$(INCLUDE_PATH)/RegisterDialog.java	\
+	$(INCLUDE_PATH)/SplashDialog.java	\
+	$(INCLUDE_PATH)/MaxFileChooser.java	\
+	$(INCLUDE_PATH)/StatisticsDialog.java	\
+	$(INCLUDE_PATH)/YesOrNo.java		\
+
+	
+
+
+

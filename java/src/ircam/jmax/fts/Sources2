@@ -1,0 +1,72 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+FTS_PATH := $(INCLUDE_PATH)
+INCLUDE_PATH := $(INCLUDE_PATH)/tcl
+include $(INCLUDE_PATH)/Sources2
+
+INCLUDE_PATH := $(FTS_PATH)
+SOURCES := $(SOURCES)\
+	$(INCLUDE_PATH)/Fts.java			\
+	$(INCLUDE_PATH)/FtsPatcherListener.java		\
+	$(INCLUDE_PATH)/FtsEditListener.java		\
+	$(INCLUDE_PATH)/FtsBmaxRemoteDocumentHandler.java		\
+	$(INCLUDE_PATH)/FtsClientProtocol.java		\
+	$(INCLUDE_PATH)/FtsCommentObject.java		\
+	$(INCLUDE_PATH)/FtsConnection.java		\
+	$(INCLUDE_PATH)/FtsDatagramClientStream.java	\
+	$(INCLUDE_PATH)/FtsDatagramStream.java		\
+	$(INCLUDE_PATH)/FtsDotPatRemoteDocumentHandler.java		\
+	$(INCLUDE_PATH)/FtsErrorStreamer.java		\
+	$(INCLUDE_PATH)/FtsException.java		\
+	$(INCLUDE_PATH)/FtsQuittedException.java	\
+	$(INCLUDE_PATH)/FtsHelpPatchTable.java		\
+	$(INCLUDE_PATH)/FtsInOutletObject.java          \
+	$(INCLUDE_PATH)/FtsInletObject.java		\
+	$(INCLUDE_PATH)/FtsIntegerVector.java		\
+	$(INCLUDE_PATH)/FtsObjectSet.java               \
+	$(INCLUDE_PATH)/FtsMessageObject.java		\
+	$(INCLUDE_PATH)/FtsMessageListener.java		\
+	$(INCLUDE_PATH)/FtsModule.java			\
+	$(INCLUDE_PATH)/FtsObject.java			\
+	$(INCLUDE_PATH)/FtsIntValueObject.java          \
+	$(INCLUDE_PATH)/FtsIntValueListener.java        \
+	$(INCLUDE_PATH)/FtsFloatValueObject.java        \
+	$(INCLUDE_PATH)/FtsFloatValueListener.java      \
+	$(INCLUDE_PATH)/FtsInletsListener.java          \
+	$(INCLUDE_PATH)/FtsOutletsListener.java         \
+	$(INCLUDE_PATH)/FtsNewDataListener.java         \
+	$(INCLUDE_PATH)/FtsSliderObject.java            \
+	$(INCLUDE_PATH)/FtsOutletObject.java		\
+	$(INCLUDE_PATH)/FtsParse.java			\
+	$(INCLUDE_PATH)/FtsPatcherDocument.java		\
+	$(INCLUDE_PATH)/FtsPatcherDocumentType.java	\
+	$(INCLUDE_PATH)/FtsPatcherObject.java		\
+	$(INCLUDE_PATH)/FtsStream.java			\
+	$(INCLUDE_PATH)/FtsReferenceURLTable.java	\
+	$(INCLUDE_PATH)/FtsRemoteData.java		\
+	$(INCLUDE_PATH)/FtsRemoteUndoableData.java	\
+	$(INCLUDE_PATH)/FtsRemoteDataID.java		\
+	$(INCLUDE_PATH)/FtsRemoteMetaData.java		\
+	$(INCLUDE_PATH)/FtsSelection.java		\
+	$(INCLUDE_PATH)/FtsServer.java			\
+	$(INCLUDE_PATH)/FtsSocketStream.java		\
+	$(INCLUDE_PATH)/FtsSocketServerStream.java	\
+	$(INCLUDE_PATH)/FtsSubProcessStream.java		\
+	$(INCLUDE_PATH)/FtsUpdateGroupListener.java    \
+	$(INCLUDE_PATH)/FtsDspControl.java
+
+
+
+
+

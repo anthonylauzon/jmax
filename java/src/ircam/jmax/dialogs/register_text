@@ -1,0 +1,30 @@
+
+Welcome to jMax !
+
+Please consider registering yourself as jMax user. 
+Note that:
+ - it is not required
+ - it is free
+ - it will not add you to mailing distributions
+
+This registration is only intended to support the jMax 
+project by giving us an approximate idea of the number 
+of users, and particularly the number of users of the 
+Linux version.
+
+To register, simply send a mail to jmax-register@ircam.fr,
+and indicate the platform that you run jMax on.
+
+Please visit jMax home page at: http://www.ircam.fr/jmax
+and subscribe to the jMax mailing list.
+
+Please also consider subscribing to the Ircam Forum:
+http://www.ircam.fr/forum
+
+NOTE:
+ This panel is automatically disabled and will not show 
+ again next time you start jMax. If this does not happen,
+ you can disable it by hand either by creating a file named
+ .jmaxregistered in your home directory, start jMax with 
+ the option '-jmaxNoRegister true' or put in your .jmaxrc 
+ file the command 'set jmaxNoRegister true'.

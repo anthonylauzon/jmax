@@ -1,0 +1,8 @@
+src	all	Makefile
+src	all	Makefiles
+src	all	src
+ircam	all	Makefiles
+ircam	all	bin
+ircam	all	src
+free	all	bin
+

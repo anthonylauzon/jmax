@@ -1,0 +1,13 @@
+all	all	datalib
+all	all	datalib.h
+all	all	dsp
+all	all	dsp.h
+all	all	ftl
+all	all	ftl.h
+all	all	mess
+all	all	mess.h
+all	all	utils
+all	all	utils.h
+all	all	veclib
+all	all	veclib.h
+src	all	Makefile

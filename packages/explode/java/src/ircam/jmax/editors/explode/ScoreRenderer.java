@@ -1,0 +1,156 @@
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
+package ircam.jmax.editors.explode;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
+
+import java.awt.*;
+import java.awt.image.*;
+import java.util.*;
+import java.io.File;
+import ircam.jmax.MaxApplication;
+
+/**
+ * The main class for a score representation.
+ * It provides the support for piano-roll editing,
+ * using a background layer and a foreground.
+ * The grid is rendered in the ScoreBackground
+ * The events are painted by the ScoreForeground.
+ */
+public class ScoreRenderer extends AbstractRenderer{
+  
+  /**
+   * Constructor.
+   */
+  public ScoreRenderer(ExplodeGraphicContext theGc) 
+  {  
+    super();
+    gc = theGc;
+    gc.setAdapter(new PartitionAdapter(gc));
+    {//-- prepares the parameters for the adapter
+      gc.getAdapter().setXZoom(20);
+      gc.getAdapter().setYZoom(300);
+      gc.getAdapter().setYInvertion(true);
+      gc.getAdapter().setYTransposition(136);
+    }
+
+    tempList = new MaxVector();
+
+    itsForegroundLayer = new ScoreForeground(gc);
+
+    itsLayers.addElement(new ScoreBackground(gc));
+    itsLayers.addElement(itsForegroundLayer);
+  }
+  
+
+
+  /**
+   * returns its (current) event renderer
+   */
+  public ObjectRenderer getObjectRenderer() 
+  {
+    return itsForegroundLayer.getObjectRenderer();
+  }
+
+
+  
+  /**
+   * returns the events whose graphic representation contains
+   * the given point.
+   */
+  public Enumeration objectsContaining(int x, int y) 
+  {  
+    ScrEvent aScrEvent;
+
+    tempList.removeAllElements();
+
+    int startTime = gc.getAdapter().getInvX(0);
+    int endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
+
+    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
+      {      
+	aScrEvent = (ScrEvent) e.nextElement();
+
+	if (getObjectRenderer().contains(aScrEvent, x, y))
+	  tempList.addElement(aScrEvent);
+      }
+
+    return tempList.elements();
+  }
+
+  /**
+   * Returns the first event containg the given point.
+   * If there are more then two objects, it returns the
+   * the topmost in the visual hyerarchy*/
+  public Object firstObjectContaining(int x, int y)
+  {
+    ScrEvent aScrEvent;
+    ScrEvent last = null;
+
+    int time = gc.getAdapter().getInvX(x);
+
+    for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
+      
+      {      
+	aScrEvent = (ScrEvent) e.nextElement();
+
+	if (getObjectRenderer().contains(aScrEvent, x, y))
+	  last = aScrEvent;
+      }
+
+    return last;
+  }
+
+  /**
+   * returns an enumeration of all the events whose graphic representation
+   * intersects the given rectangle.
+   */
+  public Enumeration objectsIntersecting(int x, int y, int w, int h) 
+  {
+    ScrEvent aScrEvent;
+
+    tempList.removeAllElements();
+    int startTime = gc.getAdapter().getInvX(x);
+    int endTime = gc.getAdapter().getInvX(x+w);
+
+
+    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+      {
+	aScrEvent = (ScrEvent) e.nextElement();
+
+	if (getObjectRenderer().touches(aScrEvent, x, y, w, h))
+	  {
+	    tempList.addElement(aScrEvent);
+	  }
+      }
+    return tempList.elements();
+  }
+
+
+  //------------------  Fields
+  ExplodeGraphicContext gc;
+
+  ExplodeDataModel itsExplodeDataModel;
+
+  ScoreForeground itsForegroundLayer;
+  
+  public static final int XINTERVAL = 10;
+  public static final int YINTERVAL = 3;
+
+  private MaxVector tempList;
+}
+
+
+

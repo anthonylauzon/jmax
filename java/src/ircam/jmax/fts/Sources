@@ -1,0 +1,52 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+	Fts.java			\
+	FtsBmaxRemoteDocumentHandler.java		\
+	FtsClientProtocol.java		\
+	FtsCommentObject.java		\
+	FtsConnection.java		\
+	FtsDatagramClientPort.java	\
+	FtsDatagramPort.java		\
+	FtsDotPatRemoteDocumentHandler.java		\
+	FtsErrorStreamer.java		\
+	FtsException.java		\
+	FtsHelpPatchTable.java		\
+	FtsInletObject.java		\
+	FtsIntegerVector.java		\
+	FtsObjectSet.java               \
+	FtsMessage.java			\
+	FtsMessageObject.java		\
+	FtsModule.java			\
+	FtsObject.java			\
+	FtsOutletObject.java		\
+	FtsParse.java			\
+	FtsPatcherDocument.java		\
+	FtsPatcherDocumentType.java	\
+	FtsPatcherObject.java		\
+	FtsPort.java			\
+	FtsPropertyDescriptor.java	\
+	FtsPropertyHandler.java		\
+	FtsReferenceURLTable.java	\
+	FtsRemoteData.java		\
+	FtsRemoteUndoableData.java		\
+	FtsRemoteDataID.java		\
+	FtsRemoteMetaData.java		\
+	FtsRexecDatagramPort.java	\
+	FtsSelection.java		\
+	FtsServer.java			\
+	FtsSocketPort.java		\
+	FtsSocketServerPort.java	\
+	FtsSubProcessPort.java		\
+	FtsUpdateGroupListener.java    \
+	FtsVoid.java

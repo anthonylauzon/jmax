@@ -1,0 +1,7 @@
+all	sgi		irix63r5k/opt/fts
+all	sgi		irix63r10k/opt/fts
+all	sgi		irix65r10k/opt/fts
+all	sgi		irix65r10k/opt/fts.on1
+all	linuxpc		linuxpc/opt/fts
+free	sgi		irix65r4k/opt/fts
+free	sgi		irix65r5k/opt/fts

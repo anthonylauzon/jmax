@@ -1,0 +1,5 @@
+src	all	Makefile
+all	all	c
+all	all	help
+all	all	java
+all	all     qlist.jpk

@@ -1,0 +1,33 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+	  Tabler.java \
+	  TableExtension.java \
+	  TableFactory.java \
+	  TableDataEditor.java \
+	  TableDisplay.java \
+	  TableDataModel.java \
+	  TableRemoteData.java \
+	  TableSelection.java \
+	  FreeHandDrawer.java \
+	  TableRenderer.java \
+	  TableGraphicContext.java \
+	  LinerTool.java \
+	  LineDrawer.java \
+	  TableSelecter.java \
+	  PencilTool.java \
+	  TablePanel.java
+
+
+
+

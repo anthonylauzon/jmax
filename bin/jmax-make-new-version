@@ -1,0 +1,250 @@
+#!/bin/sh
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
+# ***************************************************************************
+# Constants
+# ***************************************************************************
+
+HOST_FOR_CVS=maelzel
+
+# ***************************************************************************
+# Functions
+# ***************************************************************************
+help ()
+{
+    cat >&2 << HELP_EOF
+
+Usage:
+    jmax-make-new-version -type [patch|minor|major] [-nomail]
+
+Makes a new version of jMax:
+  - increments the version number in file VERSION
+  - generates new files for FTS and Java to know the new version number
+  - send a mail to the development team to inform of the change
+
+Options:
+  -type patch|minor|major           (mandatory)
+    defines which number will change in the new version number
+  -nomail                           (optional)
+    tells jmax-make-new-version not to send a mail after doing his job
+
+HELP_EOF
+}
+
+# ---------------------------------------------------------------------------
+inform ()
+{
+    echo "... $@"
+}
+
+# ---------------------------------------------------------------------------
+decrypt_options ()
+{
+    OPT="none"
+    TYPE="none"
+    NOMAIL=
+
+    for ARG in $@
+    do
+	if [ $OPT = "none" ]
+	then
+	    case $ARG in
+	    \-type )
+		OPT=$ARG ;;
+	    \-help | \-h | \-\? )
+		help ;
+		exit 2 ;;
+	    \-nomail )
+		NOMAIL="true" ;;
+	    *)
+		help ;
+		exit 2 ;;
+	    esac
+	else
+	    case $OPT in
+	    \-type )
+		TYPE=$ARG ;;
+	    esac
+	    OPT="none";
+	fi
+    done
+}
+
+# ---------------------------------------------------------------------------
+check_options ()
+{
+    case $TYPE in
+    patch | minor | major )
+	;;
+    *)
+	help ;
+	exit 2 ;;
+    esac
+
+    if [ `hostname` != $HOST_FOR_CVS ]
+    then
+	echo "Incorrect host (log on $HOST_FOR_CVS to call this script, because CVS ...)"
+	exit 1
+    fi
+
+    if [ \! -r VERSION ]
+    then
+	echo "Cannot find file VERSION (probably you're not in the correct directory ...)"
+	exit 1
+    fi
+}
+
+# ---------------------------------------------------------------------------
+compute_new_version_number ()
+{
+    MAJOR=`awk '$1=="MAJOR" { print $2; }' VERSION`
+    MINOR=`awk '$1=="MINOR" { print $2; }' VERSION`
+    PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
+
+    OLD_VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
+
+    case $TYPE in
+    major )
+	NEW_MAJOR=`echo $MAJOR + 1 | bc`
+	NEW_MINOR=0
+	NEW_PATCH_LEVEL=0 ;;
+    minor )
+	NEW_MAJOR=$MAJOR
+	NEW_MINOR=`echo $MINOR + 1 | bc`
+	NEW_PATCH_LEVEL=0 ;;
+    patch )
+	NEW_MAJOR=$MAJOR
+	NEW_MINOR=$MINOR
+	NEW_PATCH_LEVEL=`echo $PATCH_LEVEL + 1 | bc` ;;
+    esac
+
+    NEW_VERSION=$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH_LEVEL
+}
+
+
+# ---------------------------------------------------------------------------
+generate_file ()
+{
+    inform Generating new file $2
+
+    cat $1 > $2
+
+    inform Commiting file $2
+    ( cd `dirname $2` ; cvs commit -l -m "$CVS_MESSAGE" `basename $2` )
+}
+
+# ---------------------------------------------------------------------------
+send_a_mail ()
+{
+    TEAM="dechelle@ircam.fr dececco@ircam.fr maggi@ircam.fr schnell@ircam.fr"
+    inform Sending a mail to $TEAM
+    echo "Don't forget to do 'cvs update'\n" | Mail -s "New jMax version is now $NEW_VERSION" $TEAM
+}
+
+# ***************************************************************************
+# Beginning of script
+# ***************************************************************************
+
+decrypt_options $@
+
+check_options
+
+compute_new_version_number
+
+CVS_MESSAGE="Automatic commit (version number changed to $NEW_VERSION)"
+
+# ---------------------------------------------------------------------------
+cat <<EOF >/tmp/$$
+MAJOR        $NEW_MAJOR
+MINOR        $NEW_MINOR
+PATCH_LEVEL  $NEW_PATCH_LEVEL 
+EOF
+generate_file /tmp/$$ VERSION
+
+# ---------------------------------------------------------------------------
+( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
+
+cat <<EOF >/tmp/$$
+<HTML>
+<HEAD>
+<TITLE> jMax $NEW_VERSION release notes </TITLE>
+</HEAD>
+
+<CENTER> <H2> <I>j</I>Max $NEW_VERSION release notes </H2> </CENTER>
+
+<P>
+This is release $NEW_VERSION of <I>j</I>Max.
+
+<H3>Status</H3>
+
+
+<H3>Supported platforms</H3>
+
+
+<H3>Bug tracking system</H3>
+
+<P>
+Bugs are repertoried in the Ircam bug tracking system, at the following URL:
+<A HREF="http://www.ircam.fr/Bugs/">http://www.ircam.fr/Bugs/</A> ; 
+you will find there a list of known and fixed bugs, updated
+on a daily base, and a bug report submission page that must be used for
+bug report submission.
+
+<p>
+In order to ease bug tracking and fixing, users are kindly required to use
+the previously mentionned URL to report bugs.
+
+</body>
+</HTML>
+EOF
+generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
+cat <<EOF >> doc/release_notes/distrib
+all	all	release_notes.${NEW_VERSION}.html
+EOF
+( cd doc/release_notes ; cvs commit -l -m "$CVS_MESSAGE" distrib )
+
+# ---------------------------------------------------------------------------
+cat <<EOF >/tmp/$$
+/* DO NOT EDIT THIS FILE: it is generated automatically by the script ``jmax-make-new-version'' */
+
+#define FTS_VERSION_STRING "jMax version $NEW_VERSION\n"
+
+EOF
+generate_file /tmp/$$ fts/src/sys/version.h
+
+# ---------------------------------------------------------------------------
+cat <<EOF >/tmp/$$
+// DO NOT EDIT THIS FILE: it is generated automatically by the script ``jmax-make-new-version''
+
+package ircam.jmax;
+
+public class MaxVersion {
+  public static String getMaxVersion()
+  {
+     return "jMax version $NEW_VERSION";
+  } 
+}
+EOF
+generate_file /tmp/$$ java/src/ircam/jmax/MaxVersion.java
+# ---------------------------------------------------------------------------
+
+if [ $NOMAIL ]
+then
+    echo > /dev/null
+else
+    send_a_mail
+fi
+
+inform Done

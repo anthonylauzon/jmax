@@ -1,0 +1,24 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+filters_module.c \
+biquad.c \
+cfbpass2.c \
+coef_h1.c \
+filters.c \
+ftl_biquad.c \
+ftl_fir.c \
+ftl_iir.c \
+iir.c     \
+sigapass3.c \
+wahwah.c

@@ -1,0 +1,6 @@
+src	all	Makefile
+all	all	help
+all	all	templates
+all	all	lists.jpk
+src	all	src
+all	all	lib

@@ -1,0 +1,11 @@
+src	all	Makefile
+src	all	Sources
+src	all	dsptile.c
+src	all	dsptile.h
+src	all	messtile.c
+src	all	messtile.h
+src	all	startup.c
+src	all	startup.h
+src	all	startup_static.c
+src	all	ucs.c
+src	all	ucs.h

@@ -1,0 +1,57 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+SOURCES := \
+	$(INCLUDE_PATH)/ErmesConnection.java		\
+	$(INCLUDE_PATH)/ErmesDataEditor.java		\
+	$(INCLUDE_PATH)/ErmesDrawable.java		\
+	$(INCLUDE_PATH)/ErmesModule.java		\
+	$(INCLUDE_PATH)/ErmesObjBang.java		\
+	$(INCLUDE_PATH)/ErmesObjComment.java		\
+	$(INCLUDE_PATH)/ErmesObjEditField.java		\
+	$(INCLUDE_PATH)/ErmesObjEditableObject.java	\
+	$(INCLUDE_PATH)/ErmesObjExternal.java		\
+	$(INCLUDE_PATH)/ErmesObjFloat.java		\
+	$(INCLUDE_PATH)/ErmesObjIn.java			\
+	$(INCLUDE_PATH)/ErmesObjInOut.java		\
+	$(INCLUDE_PATH)/ErmesObjInOutPop.java		\
+	$(INCLUDE_PATH)/ErmesObjInt.java		\
+	$(INCLUDE_PATH)/ErmesObjMessage.java		\
+	$(INCLUDE_PATH)/ErmesObjNumberBox.java		\
+	$(INCLUDE_PATH)/ErmesObjOut.java		\
+	$(INCLUDE_PATH)/ErmesObjPatcher.java		\
+	$(INCLUDE_PATH)/ErmesObjSlider.java		\
+	$(INCLUDE_PATH)/ErmesObjSliderDialog.java	\
+	$(INCLUDE_PATH)/ErmesObjThrottle.java		\
+	$(INCLUDE_PATH)/ErmesObjToggle.java		\
+	$(INCLUDE_PATH)/ErmesObject.java		\
+	$(INCLUDE_PATH)/ErmesPatcherFactory.java	\
+	$(INCLUDE_PATH)/ErmesPatcherListener.java	\
+	$(INCLUDE_PATH)/ErmesSelection.java		\
+	$(INCLUDE_PATH)/ErmesSketchPad.java		\
+	$(INCLUDE_PATH)/ErmesSketchWindow.java		\
+	$(INCLUDE_PATH)/ErmesSwToggleButton.java	\
+	$(INCLUDE_PATH)/ErmesSwToolbar.java		\
+	$(INCLUDE_PATH)/FindPanel.java			\
+	$(INCLUDE_PATH)/FpePanel.java			\
+	$(INCLUDE_PATH)/FontCache.java			\
+	$(INCLUDE_PATH)/HResizeSensibilityArea.java	\
+	$(INCLUDE_PATH)/InletOutletSensibilityArea.java	\
+	$(INCLUDE_PATH)/InletSensibilityArea.java	\
+	$(INCLUDE_PATH)/KeyEventClient.java		\
+	$(INCLUDE_PATH)/MultiLineText.java		\
+	$(INCLUDE_PATH)/NothingSensibilityArea.java	\
+	$(INCLUDE_PATH)/OutletSensibilityArea.java	\
+	$(INCLUDE_PATH)/SensibilityArea.java		\
+	$(INCLUDE_PATH)/VResizeSensibilityArea.java	\
+

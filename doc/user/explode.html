@@ -1,0 +1,328 @@
+<!                                                                      >
+<! jMax                                                                 >
+<!                                                                      >
+<! Copyright (C) 1999 by IRCAM                                          >
+<! All rights reserved.                                                 >
+<!                                                                      >
+<! This program may be used and distributed under the terms of the      >
+<! accompanying LICENSE.                                                >
+<!                                                                      >
+<! This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    >
+<! for DISCLAIMER OF WARRANTY.                                          >
+<!                                                                      >
+<HTML>
+<HEAD>
+   <TITLE> jMax documentation </TITLE>
+</HEAD>
+
+<HTML>
+<HEAD>
+<TITLE> jMax documentation </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC" LINK="#000000" VLINK="#000000">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>user documentation</A>
+  </UL>
+</UL>
+
+<FONT COLOR=#FFFFFF SIZE=+3><b>the explode editor</b></FONT>
+<UL>
+  <LI><A HREF="#The toolbar">Toolbar</A>
+  <LI><A HREF="#The status bar">Status bar</A>
+  <LI><A HREF="#The score panel">Score panel</A>
+  <LI><A HREF="#The tools">Tools</A>
+  <UL>
+    <LI><A HREF="#Arrow tool">Arrow</A></LI>
+    <LI><A HREF="#Adder tool">Adder</A></LI>
+    <LI><A HREF="#Eraser tool">Eraser</A></LI>
+    <LI><A HREF="#Mover tools">Vertical and horizontal movers</A></LI>
+    <LI><A HREF="#Zoomer tool">Zoomer</A></LI>
+  </UL>
+  <LI><A HREF="#Zoom and scroll sliders">Zoom and scroll sliders</A></LI>
+  <LI><A HREF="#The settings panel">Settings panel</A></LI>
+</UL>
+
+<HR NOSHADE SIZE=1>
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+
+<P>The aim of the explode editor editor is to represent the data contained in an 
+<I>explode</I> object. 
+It is activated with a double-click on the corresponding object in the patcher.</P>
+
+<P>The data contained in an explode is essentially a collection of <I>events</I>,
+caracterized by a starting time and a set of MIDI parameters. Every event
+consists of:</P>
+
+<UL>
+<LI>starting time, in msec</LI>
+
+<LI>duration in msec</LI>
+
+<LI>pitch as MIDI note (0-128)</LI>
+
+<LI>velocity as MIDI velocity (0-128)</LI>
+
+<LI>channel as MIDI&nbsp;channel (0-16)</LI>
+</UL>
+
+<P>The explode editor allow the visualization of events under a &quot;piano-roll&quot;
+representation.</P>
+
+<P>A <A HREF="#The settings panel">setting panel</A>, that 
+can be retrieved by selecting the options-&gt;settings menu, allows the user to choose the association between the score parameters and the graphic parameters of the events.</P>
+
+<A NAME="The toolbar">
+<h3>The toolbar</h3>
+
+<P>It contains the tools selectable by the user: every tool as an associated
+icon and name, and once selected, it is active until next tool's selection.</P>
+
+<P>The toolbar has a floating behaviour: it can be dragged away from the
+status bar, so that it can stand into an independent window. When floating,
+the toolbar can be dragged again in the place from where it was extracted.</P>
+
+<P>The toolbar in explode is unique, i.e. there is just one explode toolbar
+active in every moment; if a second explode window is opened while the
+toolbar is anchored into a window, the toolbar will be moved in the second
+window. This (sort of non-standard) UI behaviour is under testing, and
+will be eventually fine-tuned in the next releases.</P>
+
+<P>Selecting a new tool in the toolbar results in selecting the same tool
+for all the currently opened explode windows. The new icon's tool is also
+shown in the status bar of every window.</P>
+
+<P>See <A HREF="#The tools">later</A> for a description of the tool's behaviour.</P>
+
+<A NAME="The status bar"></A>The status bar</h2>
+
+<P>This component, placed in the top of the window, show the following
+informations:</P>
+
+<UL>
+<LI>the currently active tool</LI>
+
+<LI>The tool's messages (depending on the tool, it can be coordinates,
+or offsets, or other informations meaningfull for the current operation)</LI>
+
+<LI>a set of fields for the editing of single parameters of (a group of)
+events: time, pitch, duration, velocity, channel.</LI>
+</UL>
+
+<P>The value fields indicate the parameters of the curently selected event,
+if one (and just one) is selected. In the other cases, the fields are empty.
+Entrering a value in a field (i.e. typing a value and hit the return/enter
+key) changes the value of the specified parameter for all the current selected
+events.</P>
+
+<A NAME="The score panel">
+<h2>The score panel </h2>
+
+<P>The central area of the window contains the piano roll representation
+of the events in the data base. The vertical grid indicates time values
+along the x-axis, while the horizontal grid indicates parameter values
+(for the 0-127 parameters). As we will see later in the <A HREF="#The settings panel">settings
+panel</A> paragraph, the parameter associated to the y axis can be choosen
+by the user, as well as almost every other graphic parameter of the events.</P>
+
+<P>In the left side of the window, a vertical keyboard shows the pitch
+associated to an event, during moving, resizing and adding operations.
+This is true even when the y axis does not represent the pitch; moving
+an event along the y axis when this axis is associated with the velocity,
+will show in the keybord the <I>pitch</I> of the moving note (that of course
+will <I>not</I> move)...</P>
+
+<P>Every event is represented as a line with the following graphic parameters:</P>
+
+<UL>
+<LI>An x position, always associated to the initial <I>time</I> of the
+event. This value takes into account the current zooming factor.</LI>
+
+<LI>An y position, that can be associated to the pitch, duration, velocity,
+channel parameters via the <A HREF="#The settings panel">setting panel.</A>
+The default setting associates y to <I>pitch</I>.</LI>
+
+<LI>A length, that can be associated in the usual way to pitch, duration,
+velocity, channel. The default setting associates the length to the <I>duration</I>.</LI>
+
+<LI>A label, that can be associated in the usual way to pitch, duration,
+velocity, channel. The default setting associate the label to the <I>pitch</I>.</LI>
+
+<LI>A color, that always represent the selected (red) or unselected (black)
+state of the event.</LI>
+</UL>
+
+<A NAME="The tools"></A>The tools</h2>
+
+<P>The initial, default tool for the explode editor is the selecter (the
+arrow). </P>
+
+<A NAME="Arrow tool">
+<h3>Arrow tool</h3>
+
+<P>The tasks of the Arrow are the following:</P>
+
+<UL>
+<LI><A NAME="Selection"></A>Selection: clicking (and releasing) the mouse
+on an object selects it, and at the same time deselects all the other selected
+ones. SHIFT-click on an object adds it to the current selection. Click
+and drag the mouse starting in an empty area of the score deselects all
+the selected objects and draws a selection rectangle following the mouse
+movements. At mouse up, the objects that intersect the rectangle will be
+selected. SHIFT-select area does not deselect the currently selected ones:
+it just add the objects to the current selection.</LI>
+
+<LI>Moving: clicking and dragging the mouse on a selected object dinamically
+moves the selected object(s). The move is always constrained to be vertical
+or horizontal: the first mouse move will identify the direction of move
+(see also the <A HREF="#Mover tools">mover tools</A>).
+Please note that since the y parameter (vertical) can be assigned to a
+parameter other then the pitch, moving an object along the y axis can be
+used to modify every parameter of an event (except the starting time).
+Moving cannot produce negative values (time for horizontal movements, or
+the ssigned parameter for the vertical movements). <I>Upper</I> clipping
+is implemented just for the channel parameter, whose maximum value is 15.</LI>
+</UL>
+
+<A NAME="Adder tool">
+<h3>Adder tool</h3>
+
+<P>This tool, whose icon is a little note, allows entering new notes in
+the explode data base. The status bar reports the current position of the
+mouse in terms of starting time and y parameter, after having made all
+the necessary coordinate conversions and zooms.</P>
+
+<P>Clicking in the score with the adder tool adds a note of the specified
+time, y-parameter values.</P>
+
+<P>Since just two parameters can be specified in a mouse click (x, y positions),
+the newly added note will have just two parameters specified: the remaining
+will be assigned use the following default values</P>
+
+<UL>
+<LI>Pitch = 64</LI>
+
+<LI>Velocity = 64</LI>
+
+<LI>Duration = 100 msec</LI>
+
+<LI>channel = 0</LI>
+</UL>
+
+<P>Example:</P>
+
+<P>In the default configuration where x parameter = time, y parameter =
+pitch, length parameter = duration and label parameter = pitch, adding
+a new note will produce an event in the score with </P>
+
+<UL>
+<LI>time = &lt;x of the click&gt;</LI>
+
+<LI>pitch = &lt;y of the click&gt;</LI>
+
+<LI>duration = 100</LI>
+
+<LI>velocity = 64</LI>
+
+<LI>channel = 0</LI>
+</UL>
+
+<A NAME="Eraser tool">
+<h3>Eraser tool</h3>
+
+<P>The icon of this tool is a little blue eraser gum. The status bar reports
+the current mouse coordinates (time, y parameter).</P>
+
+<P>Clicking on an event with the eraser deletes it from the data base.
+If the note was selected, the click erases all the selection (please remember
+that in explode the undo/redo is unlimited...)</P>
+
+<A NAME="Mover tools">
+<h3>Vertical and Horizontal mover tools</h3>
+
+<P>These tools are used to move selections of objects. Their icons are
+double vertical/horizontal red arrows with a black circle (a little note)
+in the middle. The only difference between a mover tool and the moving
+capability of the arrow tool is the direction of movement, that is fixed
+for these specific movers.</P>
+
+<A NAME="Resizer tool">
+<h3>Resizer tool</h3>
+
+<P>This tool allows the resizing (changing the length) of a selection of
+object. Its icon is a thick horizontal black line with two red arrows at
+both ends.</P>
+
+<P>The resizer, as well as the arrow, is a <I>selection based</I> tool;
+it allows the user to specify a selection of objects (as explained in the
+<A HREF="#Selection">Arrow tool</A> paragraph) on which to perform the
+resize operation.</P>
+
+<P>Clicking on a selected event dynamically resizes the lenght of every
+event in the selection. Please note that since the lenght parameter can
+be assigned to a parameter other then the duration, changing the length
+of an event can be used to modify every parameter of an event (except the
+starting time). Resizing cannot produce negative values for the length.</P>
+
+<P>Note also that, since the length and the y can be assigned to the same
+parameter (example, the velocity), resizing an event could result in changing
+<I>also</I> its y position, and vice-versa...</P>
+
+<A NAME="Zoomer tool">
+<h3>Zoomer tool</h3>
+
+<P>This tool allows the changing of the x zoom factor of the current representation.
+A click everywhere in the score multiply the current zoom factor by two,
+while an ALT-click divide the zoom factor by the same amount. Note that
+a more fine tuned zoom can be achieved via the <A HREF="#Zoom and scroll sliders">zoom
+slider</A> at the bottom of the window.</P>
+
+<A NAME="Zoom and scroll sliders">
+<h2>Zoom and scroll sliders</h2>
+
+<P>Since the x-axis is always associated with time, scrolling the score
+panel always means moving the initial time of the representation's window.
+The little zoom slider on the right allows the specification of a <I>x</I>
+zoom factor, whose range is bottom limited at 1%. The zoom affects the
+x conversion algorithm and it is not a time zooming; the length of the
+represented events will change after a zoom even if this length is <I>not
+</I>associated to the duration. This behaviour will be eventually revised
+in future versions.</P>
+
+<A NAME="The settings panel">
+<h2>The settings panel</h2>
+
+<P>This panel is composed by a set of rows of radio buttons, where each
+row represents a graphic parameter, and each column an event's (score)
+parameter. The aim of this panel is to specify wich parameters will be
+represented with which graphic appearence. Only one &quot;score&quot; parameter
+(pitch, duration, velocity, channel) can be represented by a given graphic
+parameter (y, lenght, label) . On the other side, the same score parameter
+can be represented by more then one graphic parameter.</P>
+
+<P>In this version, only the &quot;Cancel&quot; button in the panel is
+active, because the modifications are reported immediately in the score
+and there's no need to explicitly &quot;apply&quot; them.</P>
+
+<P>
+</TABLE>
+<HR NOSHADE SIZE=1>
+
+</BODY>
+</HTML>

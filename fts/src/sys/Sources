@@ -1,0 +1,34 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+ifeq ($(VENDOR),sgi)
+	ARCH_SOURCES = sgihw.c
+endif
+
+ifeq ($(VENDOR),gnu)
+	ARCH_SOURCES = gnuhw.c
+endif
+
+ifeq ($(VENDOR),solaris2)
+	ARCH_SOURCES = solaris2hw.c
+endif
+
+SOURCES = $(ARCH_SOURCES) \
+	smem.c	          \
+	mem.c	          \
+	modules.c         \
+	sys.c             \
+	welcome.c
+
+
+
+

@@ -1,0 +1,109 @@
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
+package ircam.jmax.editors.ermes;
+
+import java.awt.*;
+import java.awt.event.*;
+import ircam.jmax.*;
+
+//
+// The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
+//
+public class ErmesObjInOutPop extends PopupMenu
+{
+  ErmesObjInOut itsOwner;
+  ErmesSketchWindow window;  
+
+  class ErmesInOutPopActionListener implements ActionListener, MaxEditor.Disposable
+  {
+    MenuItem item;
+    int idx;
+
+    ErmesInOutPopActionListener( MenuItem item, int idx)
+    {
+      window.disposeAtDestroy( this);
+      this.item = item;
+      this.idx = idx;
+    }
+
+    public void actionPerformed( ActionEvent e)
+    { 
+      itsOwner.ChangeNo( idx);
+    }
+
+    public void dispose()
+    {
+      item.removeActionListener( this);
+    }
+  };
+    
+  void SetNewOwner( ErmesObjInOut theObject) 
+  {
+    itsOwner = theObject;
+    //setSize(itsOwner.currentRect.width, itsOwner.currentRect.height * 2);
+  }
+		
+  public void Redefine( int numbers)
+  {
+    MenuItem aMenuItem;
+
+    if ( numbers == getItemCount()) 
+      return;
+
+    if ( numbers > getItemCount())
+      {
+	removeAll();	
+	
+	for (int i = getItemCount(); i < numbers; i++)
+	  {
+	    aMenuItem = new MenuItem( Integer.toString( i));
+
+	    add(aMenuItem);
+	    aMenuItem.addActionListener(new ErmesInOutPopActionListener(aMenuItem, i));
+	  }
+      }
+    else 
+      {
+	int temp = getItemCount();
+	while ( numbers < temp)
+	  {
+	    remove( temp-1);
+	    temp--;
+	  }
+      }
+  }
+
+
+  //
+  // Constructor accepting the number of in/out to show in the popup
+  //
+  public ErmesObjInOutPop(ErmesSketchWindow window, int numbers) 
+  {
+    super( "Change:");
+
+    this.window = window;
+
+    itsOwner = null;
+
+    for (int i = 0; i < numbers; i++) 
+      {
+	MenuItem aMenuItem;
+
+	aMenuItem = new MenuItem( Integer.toString( i ));
+	add( aMenuItem);
+
+	aMenuItem.addActionListener( new ErmesInOutPopActionListener(aMenuItem, i));
+      }
+  }
+}

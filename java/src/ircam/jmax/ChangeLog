@@ -1,0 +1,225 @@
+Thu Mar 19 12:03:22 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the menu handler part of ErmesSketchWindow, using
+	  specialized inner classes as listener; this in order to 
+	  delete the String based handling of menu in MaxEditor;
+	  left to do, the window menu management.
+
+	* Removed the interface MaxWindow; it is not enough for most
+	  of the purposes (see the Close problem: MaxWindow had close, but
+	  had no ShouldSave, so the right check before close could not be done);
+	  on the other side, it was too much; window management should just assume
+	  awt Frames, no more; it will be changed ASAP, for the moment it use
+	  MaxEditors as type.
+	  
+
+	* Changed the Menus in MaxEditor to use ActionListeners implemented
+	  as anonymous inner classes; soon also the ErmesWindow editor
+	  will be changed to this, in order to dismount the string based
+	  dispatching in MaxEditor.
+
+Tue Mar 10 11:38:04 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Removed the MaxDocument interface, and removed the related functions
+	  and methods from ErmesPatcherDoc; remove the useless ConsoleDocument
+	  class.
+
+	* Removed sources of the old Project Manager, to simplify working
+	  with tag search and so on; added file project.save.tar to keep
+	  them for the moment.
+
+Thu Mar  5 12:37:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the FtsAsbstractContainer class and the FtsSelection class
+	  to handle selection.
+
+Mon Mar  2 14:47:16 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the "canMakeNewInstance" method to MaxDataType, to check 
+	  if a type can new instances from scratch, and so if can be put
+	  in the "new" menu.
+
+	* Moved the itsServer variable and the ConnectToFts and getFtsServer methods
+	  from ircam.jmax.MaxApplication to ircam.jmax.fts.FtsServer, to which they really
+	  belong.
+
+	* Moved all the tcl package initialization commands to
+ 	  <module>Module classes; i.e. now each module do its own tcl
+ 	  initialization (make sense, doesn't it :).
+
+	* Removed the file jmaxEditors.tcl, and added for each module a <module>Module
+	  class with a static init methods, to be called from MaxApplication.main.
+
+	  There are multiple reasons:
+
+	  1- a MDA entity (data type, data handler) is not a Java class, is a Java object; the tcl 
+	     command in jmaxEditor could not specify constructor arguments, so it force
+	     a mapping Java Class == MDA object that is not what we want; for example,
+	     different instances of the MaxTclFileDataHandler may exists, one for each
+	     file extension.
+	  2- The mechanism do not work for external modules, beacause of the use of the
+	     default class loaded; mda entities must be installed from Java code in order
+	     to work with the correct class loader.
+	  3- Installing a MDA entity from the module that define it is more consistent
+	     than having a global installation; so the module class and init method
+	     are defined.
+	  4- Since an editor is defined for a given data type, and cannot really be
+	     applied to others, it do not make a lot of sense to separate its implementation
+	     from the binding to the data type.
+	  5- The tcl file brake completely the makefiles, and make impossible to 
+	     compile the whole system in a sigle compile command, thing that is very important
+	     to have the method calls inlined across Java classes and modules.
+
+	* editors/ermes/ErmesSketchPad.java: Changed searchFtsName to return
+	  the Java Class itself, and not the name, of the graphic object to
+	  build; this make the complex 'dynamic' makefile thing useless, without
+	  doing anything for the genericity and dynamicity of the mechanism.
+	  The trick work because the nameTable is filled using JDK 1.1 class literals,
+	  i.e. class constants known to the compiler (like 
+	  ircam.jmax.editors.ermes.ErmesSketchPad.class), that allow the compiler
+	  to discover which classes it need to compile.
+
+Wed Feb 11 18:07:21 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the Application layer structure: delete FtsPatcher, and
+	  organized FtsObjects in a inheritance structure; simplified the handling
+	  of redefinition of patchers and inlets/outlets.
+
+	* Added the MDA architecture; still not completely functional.
+
+Mon Feb  2 14:59:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Completed the transition to everything static in MaxApplication; half
+	  of the methods and variables where static, half where not, but at the end
+	  one unique of MaxApplication existed, so the confusion had no reason to exists.
+	  Now, everything is static, and no instance of MaxApplication are ever created.
+	  
+	* editors/ermes/ErmesPatcherDoc.java: Now when importing a .pat file, the
+	  old file name is forgot, so the next Save a new filename will be asked;
+	  this avoid rewriting on top of the .pat files.
+
+	* Moved the getOpenFileName function to a separate class, in dialogs,
+	  called MaxFileChooser, and renamed to chooseFileToOpen; added the corresponding
+	  chooseFileToSave, with an optional file argument to give old name
+	  and directory.
+
+Fri Jan 30 12:50:41 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed *all* the methods previously using directory/name string
+	  pairs or pathnames, to method accepting/returning File objects, including
+	  MaxDocument and MaxEditor.
+
+	* Added the static method MaxApplication.getOpenFileName(frame, title)
+	  and its brother getOpenFileName(frame, title, fileNameFilter)
+	  that return a file for opening/loading/adding after asking to the user;
+	  This function handle the current directory for loading, so that successive
+	  load from the same directory do not need to manually rechange directory
+	  each time.
+
+	  The method return an instance of the "File" object, that is the proper
+	  way to send files around; all the functions using the name/directory string
+	  pair should be converted to use the File object.
+
+	  All calls to FileDialog *for loading* in the code have been converted to
+	  use the new method; the current directory is appropriate for saving,
+	  so code for saving is unchanged.
+	
+
+Thu Jan 29 16:32:27 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the site configuration file name to "jmax.cfg"
+	
+	* Changed the user configuration file name to ~/.jmaxrc.
+
+	* Changed the name of all the TCL configuration variables to
+	  have a "jmax" prefix instead of "fts".
+	  The variable ftsName is now called jmaxServerName.
+
+	* The ICE browser has been reintroduced as a separate package; to 
+	  load it, the command "package require icebrowser" is invoked; 
+	  since at the moment is the only browser we have, this command
+	  is by default added to the jmax.cfg site configuration file.
+
+	  All the invokation to the documentation in the code are done by
+	  evaluating the tcl script "browse <url>"; there is no more a direct
+	  JAVA Api to browse the documentation; at bootstrap, the browse command
+	  is empty (give an error message); loading a browser package (icebrowser
+	  by default, at the moment) redefine to run the loaded browser.
+
+        * Added the tcl command "help"; open the max/doc/help.html file.
+
+        * Delete the max/ermes directory has been deleted; 
+ 	  The max/ermes/images directory become max/images
+	  The ermes.zip file become jmax.jar, and will be located
+          in max/java.
+
+Tue Jan 27 20:51:32 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* dialogs/StatisticsDialog.java: changed "freeMemory" to "UsedMemory".
+	  Free memory doesn't really means a lot, after all.
+
+Tue Jan 27 19:44:30 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the way Ermes map the fts objects to the graphic representation.
+	  The assumption that the Max names where uniques for the graphic representation
+	  did not hold anymore with table, explode and qlist (all newobj, like
+	  patcher).
+	  Now Ermes have an explicit mapping of className to ErmesObject subclasses 
+	  names, implemented using an hashtable.
+	  The Graphic Representation do not hold the object name any more; an
+	  alternative non default graphic representation will be specifiable
+	  with FtsObject properties; same thing for the value stored in
+	  the field ermesInfo, for which an explicit API will be provided.
+	  As a consequence, new "i_*" names are not dropped.
+	  The file format has changed accordingly, but will change again
+	  during the week.
+	  For the same reason, all the object names have been disambiguated
+	  now, in FTS, slider and intbox are two different objects.
+	  
+
+	* Implemented parsers for table, qlist and explode in the
+	  .pat files.
+
+Tue Jan 27 17:27:38 1998  Enzo Maggi  <maggi@astor.ircam.fr>
+
+	* added a "requestFocus()" in ErmesSketchWindow, when "windowActivate".
+	In the 1.1.3 JDK, the "gotFocus" and "lostFocus" are not sent 
+	directly to the window when the mouse enters (or when the window is
+	clicked, depending on the WManager configuration). A request is needed
+	when the window is activated. This is likely to be a JDK bug.
+	
+	* did the same thing on the ProjectWindow
+
+Mon Jan 26 16:27:46 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the "splash" tcl command, to pop up a splash screen;
+	  any gif filename can be given as argument, the image will
+	  be scaled; the jMax splash screen run from it, and user packages
+	  can use it to have special additional splash screen.
+
+	* Added the jMax package system, and converted the boot file to
+	  use it; fts1.5 is a normal package now.
+
+	* Added the "sourceFile" tcl command, that do not stop recursive
+	  loading in case of errors like the built-in "source"; this allow
+          finishing the boot process in case of errors in sub files.
+	
+	* Added tcl command openConsole, that create and install the system
+	  console; the command will be executed by the installation configuration
+	  script, so that a dedicated installation can work without the console;
+	  note that if the console is not there, all the printouts go to the
+	  standard output.
+
+	* Changed the bootstrap tcl structure: there is only one boot file,
+	  jmaxboot.tcl, stored in ~/projects/max/tcl, that actually include
+	  the config/ermesrc.tcl and ~/.ermesrc file; see the comments in the
+	  file for more information.
+	  
+	* MaxApplication.java: Changed PrintWriter back to PrintStream (also
+	in all the code), in order to use the console as System.out; System.out
+	has not yet been converted to printwriter in 1.1. !!
+	The tcl 
+
+
+
+	

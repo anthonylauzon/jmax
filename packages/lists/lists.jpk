@@ -1,0 +1,30 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+## package declaration
+package provide lists
+
+# load the dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module lists $dir/lib/$jmaxArch/$jmaxMode/liblists.so
+
+# require ISPW classes for the templates
+package require ispw
+
+## declare templates
+template listcompose $dir/templates/listcompose.jmax
+template listdecompose $dir/templates/listdecompose.jmax
+
+## load the help patch data base
+sourceFile $dir/help/lists.help.index.tcl
+
+post "package: lists (basic list handling classes)"

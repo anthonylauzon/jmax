@@ -1,0 +1,7 @@
+SOURCES := $(SOURCES)\
+	$(INCLUDE_PATH)/AlignMenu.java \
+	$(INCLUDE_PATH)/EditMenu.java  \
+	$(INCLUDE_PATH)/FileMenu.java  \
+	$(INCLUDE_PATH)/HelpMenu.java   \
+	$(INCLUDE_PATH)/PatcherMenu.java \
+	$(INCLUDE_PATH)/TextMenu.java \

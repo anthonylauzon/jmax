@@ -1,0 +1,171 @@
+<!                                                                      >
+<! jMax                                                                 >
+<!                                                                      >
+<! Copyright (C) 1999 by IRCAM                                          >
+<! All rights reserved.                                                 >
+<!                                                                      >
+<! This program may be used and distributed under the terms of the      >
+<! accompanying LICENSE.                                                >
+<!                                                                      >
+<! This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    >
+<! for DISCLAIMER OF WARRANTY.                                          >
+<!                                                                      >
+<HTML>
+<HEAD>
+<TITLE> jMax Documentation - System Configuration </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#CCCCCC">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+
+<UL TYPE=SQUARE>
+  <LI><A HREF=../../index.html>Documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=../index.html>User Documentation</A>
+  </UL>
+</UL>
+
+<p>
+<font size=+3 color=#FFFFFF><b>System Configuration</b></font>
+
+<p>
+<hr noshade size=1>
+
+<UL TYPE=DOT>
+  <LI><A HREF="#disclamier">Disclamier</A>
+  <LI><A HREF="#introduction">Introduction</A>
+  <LI><A HREF="#host">Host Parameters</A>
+  <LI><A HREF="#misc">Miscellaneous Parameters</A>
+</UL>
+
+<p>
+<hr noshade size=1>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR><TD>
+  
+<A NAME="disclamier"> 
+<H2> Disclamier </H2>
+
+<P>
+The current version of <I>j</I>Max use TCL as its
+scripting language, and the feature described in this document is
+currently based on TCL; future version of <I>j</I>Max may
+use a different scripting language, so the features described here
+will change, will be implemented with a different language and/or
+syntax, or will simply vanish.
+
+<p>
+<HR>
+
+<A NAME="introduction">
+<H2> Introduction </H2>
+
+<P>
+The system configuration is based on system parameters that are configuration options that 
+can be set either by setting a TCL variable in the
+<A HREF="../getting_started.html#.jmaxrc"><tt>.jmaxrc</tt></A> file or giving a 
+<A HREF="../getting_started.html#arguments">command line argument</A> when running <I>j</I>Max.
+
+<P>
+(Note that not all the options of the <tt>jmax</tt> script are documented here.<BR>
+To see all other options, run the <tt>jmax -help</tt> command.)
+
+
+<A NAME="host">
+<p>
+<HR>
+<H2>Host Parameters</H2>
+
+<p>
+Since <i>j</i>Max has a client/server architecture the host parameters are to be set
+in order to specify the host on which the <i>j</i>Max server should be run.
+By default this is the local host where <i>j</i>Max is launched (and so the client is started up).<BR>
+In this case the host type must be specified using the <i>jmaxHostType</i> parameter.
+
+<p>
+When the parameter <i>jmaxHost</i> is given, the server will run on the named remote host.<BR>
+In this case <i>j</i>Max automaticly should find the host type in the host table of the 
+<A HREF="../installation.html#site">site specific configuration file</A> 
+(so that is doesn't has to be explicitly set by the user when running <i>j</i>Max).
+
+<p>
+The parameter <i>jmaxArch</i> is automaticly set for a specific host type
+so it should not be set by the user at all!
+
+
+<DL>
+  <DT><tt><b>jmaxHost</tt></b><P>
+  <DD>
+    Specifies the host where to run the server.
+    The value can be either </tt>local</tt> (default) to specify the host where the client run, 
+    or a complete canonical internet name for an other host, like <tt>mymachine.mycompany.com</tt>.<BR>
+    Beware that <i>j</i>Max currently uses the <tt>rsh</tt> Unix command to run 
+    the server remotely, so in order to work you must set your <tt>.rhosts</tt>
+    file correctly (see the <tt>rsh</tt> and <tt>rhosts</tt> man page for details).<p>
+
+  <DT><tt><b>jmaxHostType</tt></b><P>
+  <DD>
+    Sets the type of the host running the server.<BR>
+    The host type determines the hardware architecture and the implementation of the i/o devices.<BR>
+    See the index of <A HREF="hosttypes.html">supported host types</A>.<p>
+
+  <DT><tt><b>jmaxArch</b></tt><P>
+  <DD> 
+    Sets the hardware architecture of the host running the server.<BR>
+    It is used to choose the proper binaries for the given architecture (do not set).
+</DL>
+
+
+<A NAME="misc">
+<p>
+<HR>
+<H2>Miscellaneous Parameters</H2>
+
+<DL>
+  <DT><tt><b>jmaxConnection</b></tt><P>
+  <DD>
+    Choose the kind of connection between the Java client and the server;
+    Supported values are currently <i>udp</i> (default) for an UDP based connection, 
+    and <i>client</i> for a TCP based connection.
+    UDP will give a better real time response for controllers. 
+    Use TCP only if your network is complex and you need the reialability of a TCP connection.<p>
+
+  <DT><tt><b>jmaxSplashScreen</b></tt><P>
+  <DD>
+    If this value is <i>hide</i> the splash screen will not be shown during startup.<br>
+    The deafault value is <i>show</i>.<p>
+
+  <DT><tt><b>jmaxFastFileBox</b></tt><P>
+  <dd>
+    If the value is <i>true</i>, the file selection box used by
+    <i>j</i>Max will not shown specific icons for known file types, and
+    will always show all the files in a directory, and not only the files
+    of a known file type, so it's use will be substantially faster. <br>
+    Depending on your installation, the default speed can be ok, or you
+    may need to specify this option.<p>
+
+  <DT><tt><b>jmaxDefaultFont</b></tt><P>
+  <DD> 
+    Specify the default font used in the patch editor.<br>
+    Default to <i>SansSerif</i>.
+</DL>
+
+</TABLE>
+
+<HR NOSHADE SIZE=1>
+
+</BODY>
+</HTML>
+
+

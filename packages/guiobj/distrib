@@ -1,0 +1,4 @@
+src	all	Makefile
+all	all	guiobj.jpk
+all	all	c
+

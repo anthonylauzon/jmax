@@ -1,0 +1,30 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+## package declaration
+package provide explode
+
+# load server module
+global jmaxArch jmaxMode
+ucs load module explode $dir/c/lib/$jmaxArch/$jmaxMode/libexplode.so
+
+# load client java class
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.explode.ExplodeExtension
+
+## load the help patch data base
+sourceFile $dir/help/explode.help.index.tcl
+
+puts "package: explode (ISPW sequencing class with editor)"
+
+
+

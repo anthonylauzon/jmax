@@ -1,0 +1,48 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+at.c \
+bangbang.c \
+change.c \
+clock.c \
+control.c \
+delay.c \
+drunk.c \
+gate.c \
+line.c \
+loadbang.c \
+metro.c \
+nbangs.c \
+pack.c \
+pipe.c \
+poly.c \
+prepend.c \
+print.c \
+random.c \
+route.c \
+select.c \
+speedlim.c \
+split.c \
+time.c \
+timer.c \
+trigger.c \
+unpack.c \
+voxalloc.c \
+abs.c \
+clip.c \
+exscale.c \
+ftom.c \
+binop.c \
+logscale.c \
+mtof.c \
+scale.c

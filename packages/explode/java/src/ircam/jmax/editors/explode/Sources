@@ -1,0 +1,63 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+	AAAReadme.java		\
+	Adapter.java		\
+	ArrowTool.java		\
+	ChannelMapper.java		\
+	DeleteTool.java	\
+	DurationMapper.java	\
+	Explode.java		\
+	ExplodeDataEditor.java  \
+	ExplodeDataFlavor.java  \
+	ExplodeDataListener.java	\
+	ExplodeDataModel.java	\
+	ExplodeExtension.java	\
+	ExplodeFactory.java	\
+	ExplodeGraphicContext.java	\
+	ExplodeRemoteData.java	\
+	ExplodeSelection.java	\
+	ExplodeSelectionMover.java	\
+	ExplodeSelectionResizer.java	\
+	Mapper.java		\
+	MappingListener.java	\
+	MoverTool.java		\
+	PartitionAdapter.java	\
+	PartitionEventRenderer.java	\
+	PitchMapper.java	\
+	ResizerTool.java		\
+	ScoreBackground.java	\
+	ScoreForeground.java	\
+	ScoreRenderer.java	\
+	ScrAddingTool.java	\
+	ScrEvent.java		\
+	ScrEventWidget.java		\
+	ScrPanel.java		\
+	SettingsDialog.java	\
+	SelecterTool.java	\
+	TimeMapper.java		\
+	TranspositionListener.java	\
+	VerboseMouseTracker.java		\
+	UndoableAdd.java		\
+	UndoableDelete.java		\
+	UndoableEventTransformation.java		\
+	UndoableMove.java		\
+	ZoomTool.java		\
+	VelocityMapper.java	
+
+	
+	
+
+
+
+

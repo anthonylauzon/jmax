@@ -1,0 +1,12 @@
+src	all	DialogsModule.java
+src	all	ErrorDialog.java
+src	all	FileNotSavedDialog.java
+src	all	Makefile
+src	all	MaxFileChooser.java
+src	all	QuitDialog.java
+src	all	RegisterDialog.java
+src	all	Sources
+src	all	Sources2
+src	all	SplashDialog.java
+src	all	StatisticsDialog.java
+src	all	YesOrNo.java

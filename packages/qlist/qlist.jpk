@@ -1,0 +1,26 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+## package declaration
+package provide qlist
+
+# load server module
+global jmaxArch jmaxMode
+ucs load module qlist $dir/c/lib/$jmaxArch/$jmaxMode/libqlist.so
+
+# load client java class
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtension
+
+# just one help patch to declare
+helpPatch qlist $dir/qlist.help.jmax
+
+puts "package: qlist (ISPW queue file class with editor)"

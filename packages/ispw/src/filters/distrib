@@ -1,0 +1,16 @@
+src	all	Makefile
+src	all	Sources
+src	all	biquad.c
+src	all	biquad.h
+src	all	cfbpass2.c
+src	all	coef_h1.c
+src	all	filters.c
+src	all	filters_module.c
+src	all	fir.h
+src	all	ftl_biquad.c
+src	all	ftl_fir.c
+src	all	ftl_iir.c
+src	all	iir.c
+src	all	iir.h
+src	all	sigapass3.c
+src	all	wahwah.c

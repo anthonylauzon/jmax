@@ -1,0 +1,9 @@
+all	all	ftl.h
+all	all	ftlmem.h
+all	all	ftlutils.h
+src	all	Makefile
+src	all	Sources
+src	all	ftl.c
+src	all	ftlmem.c
+src	all	ftlutils.c
+

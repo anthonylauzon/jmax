@@ -1,0 +1,192 @@
+#!/bin/sh
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+
+# ***************************************************************************
+# Constants
+# ***************************************************************************
+JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
+
+
+# ***************************************************************************
+# Functions
+# ***************************************************************************
+help ()
+{
+    cat << HELP_EOF
+
+Usage:
+    jmax [-javaopt <java-option>]
+	    [-nofork]
+	    [-nojar]
+	    [-verbose] [<other-jmax-options>]
+
+Starts jMax.
+
+Options and arguments:
+  -javaopt <java-option>     (optional)
+    Defines an option that is to be passed directly to the Java interpreter.
+    Several [-javaopt java-option] can appear in the command line.
+
+  -nofork
+    Do not go into the background.  By default, jMax forks itself to give control 
+    back to the shell.
+
+  -nojar
+    Do not use the jMax Java classes in JAR file jmax.jar. Use the .class files
+    in their package directories instead.
+    By default, jMax uses the jMax Java classes in JAR file jmax.jar
+
+  <other-jmax-options>       (optional)
+    Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
+    command line options (for instance, jmaxArch, jmaxMode, ...)
+
+  -verbose                   (optional)
+    prints the command line before starting jMax
+
+  -help
+    to print this help
+
+Notes:
+  - jMax is started in background (i.e. the script terminates immediately). To overide this,
+    use ``-nofork'' option
+  - the Java interpreter (started by the command ``java'') must be in the PATH
+
+HELP_EOF
+}
+
+
+# ---------------------------------------------------------------------------
+decrypt_options ()
+{
+    opt="none"
+    JAVAOPT=""
+    JMAXOPT=""
+    VERBOSE=
+    NOFORK=
+    NOJAR=
+
+    for arg in $@
+    do
+	if [ $opt = "none" ]
+	then
+	    case $arg in
+	    \-javaopt)
+		opt=$arg ;;
+	    \-help | \-h | \-\? )
+		help ;
+		exit 2 ;;
+	    \-verbose | \-v)
+		VERBOSE="yes" ;;
+	    \-nofork)
+		NOFORK="yes" ;;
+	    \-nojar)
+		NOJAR="yes" ;;
+	    *)
+		JMAXOPT="${JMAXOPT} $arg" ;;
+	    esac
+	else
+	    case $opt in
+	    \-javaopt)
+		JAVAOPT="${JAVAOPT} $arg" ;;
+	    esac
+	    opt="none";
+	fi
+
+    done
+
+}
+
+# ---------------------------------------------------------------------------
+start_it ()
+{
+    if [ $VERBOSE ]
+    then
+	echo "CLASSPATH=${CLASSPATH}"
+    fi
+
+    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT "
+
+    ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
+
+    if [ _${NOFORK}_ = __ ]
+    then
+	ECHO_CMD="$ECHO_CMD &"
+    fi
+
+    if [ $VERBOSE ]
+    then
+	echo "( $ECHO_CMD )"
+    fi
+
+    if [ _${NOFORK}_ = __ ]
+    then
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD & )
+    else
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD )
+    fi
+}
+
+# ***************************************************************************
+# Beginning of script
+# ***************************************************************************
+
+decrypt_options $@
+
+DIR=`dirname $0`
+ROOTDIR=`(cd ${DIR}/.. ; pwd)`
+
+if [ $NOJAR ]
+then
+    JMAX_CLASSPATH=${ROOTDIR}/java/classes
+else
+    JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
+fi
+
+JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl/jacl.jar
+
+SWING_DISTRIB_CLASSPATH=
+
+if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
+then
+    echo "CLASSPATH already contains Swing:"
+    echo "Using $CLASSPATH as CLASSPATH"
+else
+    if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
+    then
+	SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
+    else
+	echo "Swing classes (swingall.jar) not found."
+	exit 2
+    fi
+fi
+
+if [ $CLASSPATH ]
+then
+    if [ $SWING_DISTRIB_CLASSPATH ]
+    then
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
+    else
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+    fi
+else
+    CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
+fi
+
+# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
+# further explainations.
+JAVA_SMALL_FONTS=true
+export JAVA_SMALL_FONTS
+
+start_it

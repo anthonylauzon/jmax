@@ -1,0 +1,35 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+#ifndef _CLIENT_H_
+#define _CLIENT_H_
+
+/* The client module */
+
+extern fts_module_t fts_client_module;
+
+/* Receive Subsystem installation */
+
+extern fts_dev_t *client_dev;
+
+/* EOF control */
+
+extern void set_restart_on_eof(int v);
+
+#endif
+
+
+
+
+
+

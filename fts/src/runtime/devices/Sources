@@ -1,0 +1,43 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+ifeq ($(AUDIO_LIBRARY),sgial)
+AUDIO_SOURCES = sgidev.c
+endif
+
+ifeq ($(AUDIO_LIBRARY),sgial2)
+AUDIO_SOURCES = sgial2dev.c
+endif
+
+ifeq ($(AUDIO_LIBRARY),oss)
+AUDIO_SOURCES = ossdev.c
+endif
+
+ifeq ($(OS_TYPE),unix)
+OS_SOURCES = unixdev.c
+endif
+
+ifeq ($(OS_TYPE),solaris2)
+	OS_SOURCES = unixdev.c 
+	AUDIO_SOURCES = solaris2dev.c
+endif
+
+SOURCES = devconf.c \
+	  devices.c \
+	  profdev.c \
+	  null.c    \
+	  $(OS_SOURCES) \
+	  $(AUDIO_SOURCES)
+
+
+
+

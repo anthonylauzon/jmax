@@ -1,0 +1,6 @@
+src	all	Makefile
+all	all	explode.jpk
+all	all	c
+all	all	java
+all	all	help
+all	all	images
