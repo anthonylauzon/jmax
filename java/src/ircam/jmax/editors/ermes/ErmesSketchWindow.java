@@ -992,6 +992,12 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public void windowDeiconified(WindowEvent e){}
   public void windowActivated(WindowEvent e){
     requestFocus();
+    if(!itsClosing){
+      MaxApplication.SetCurrentWindow(this);
+      ErmesSketchPad.RequestOffScreen(itsSketchPad);
+      if(itsSketchPad.getGraphics()!= null)
+	itsSketchPad.update(itsSketchPad.getGraphics());
+    }
   }
   public void windowDeactivated(WindowEvent e){}  
 

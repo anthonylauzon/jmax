@@ -372,9 +372,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       GetDocument().Save();
     }
     else if (theString.equals("Save As...")) {
-      GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this,
-							    "Save As ",
-							    GetDocument().GetFile()));;
+      GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this, "Save As ", GetDocument().GetFile()));
       GetDocument().Save();
     }
     else if (theString.equals("Close Ctrl+W")) {

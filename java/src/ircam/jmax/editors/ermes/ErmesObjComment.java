@@ -68,7 +68,7 @@ class ErmesObjComment extends ErmesObject {
     //itsArgs = theFtsObject.getArgumentsDescription().trim();
     
     ParseText(itsArgs);
-        
+    RestoreDimensions();    
     return true;
   }
 	
