@@ -166,7 +166,7 @@ dsp_set_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
 
       if(on)
 	fts_dsp_graph_compile(&main_dsp_graph);
-      else
+      else if(fts_dsp_graph_is_compiled(&main_dsp_graph))
 	fts_dsp_graph_reset(&main_dsp_graph);
     }
 }
