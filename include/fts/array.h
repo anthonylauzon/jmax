@@ -133,6 +133,8 @@ FTS_API void fts_array_append_int( fts_array_t *array, int i);
 FTS_API void fts_array_append_float( fts_array_t *array, float f);
 FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 
+FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
+
 /**
  * Prepend elements at the beginning of the array
  * 

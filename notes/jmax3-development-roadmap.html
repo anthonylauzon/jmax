@@ -7,10 +7,10 @@
 </head>
  <body style="font-family: sans-serif; ">
  
-<h1>jMax 3 development roadmap</h1>
+<h1>jMax 3 development road map</h1>
   jMax 3 should be released as soon as possible. The developments mentioned
  in this paper are considered as urgent and have to be completed to be included
- to this release. The exact release date depends on this list.<br>
+ to this release.<br>
  <br>
   The release of jMax 3 can be split into two steps: First a user release 
 which provides the user with an interface (modules and syntax) introducing 
@@ -29,7 +29,13 @@ the dynamic client/server connection, a user friendly configuration and launcher
   <li>SGI</li>
  
 </ul>
-  The development of a portable  soundfile<br>
+  The implementation of a package for soundfile access on all four platforms
+is to be considered as critical for this release.<br>
+<br>
+<h2>portable soundfile i/o</h2>
+  The reading and writing of soundfiles must be handles by a platform dependent
+ package and implemented for all  four platforms.<br>
+<br>
  
 <h2>dynamic client/server connection</h2>
   This is the most important group of new features for jMax 3:<br>
@@ -45,42 +51,43 @@ the dynamic client/server connection, a user friendly configuration and launcher
  
 </ul>
  
-<h2><font>project, </font>package &amp; configuaration</h2>
-  A graphical editor should be provided for the editting of packages/projects.<br>
+<h2><font>project, </font>package &amp; configuration</h2>
+  A graphical editor should be provided for the editing of packages/projects.<br>
   How to handle the configuration???<br>
+<br>
+Default midiport and audioport becomes a configuration field instead of global
+variable.<br>
+<h2>variables and expression parsing</h2>
+The current expression parsing and mechanism to resolve variable names are
+major sources of instability and annoyance. jMax 3 should include a very
+first version of a new parser providing  at least a very simple syntax for
+messages close to the current jMax (MAX)  syntax for messages and simple
+expressions. <br>
+<ul>
+  <li>parsing of strings to FTS' internal representations is done by the
+server</li>
+  <li>the client/server protocol permits to send parsed message and atoms 
+ as well as unparsed strings<br>
+  </li>
+</ul>
+  The parser has to be compatible with the future developments of jMax (implemented
+ with a minimal effort!!). The parser should try to keep a maximum compatibility
+ with MAX style messages and the expression syntax of jMax.<br>
+<br>
+  The parser should introduce the possibility to specify the package of class
+ at the instantiation of an object. This way the transition towards a new
+object set can be simplified.<br>
+<br>
+<br>
  
 <h2>platform embedding</h2>
-  At least for MacOsX and Windows version but aswell for Linux a jMax launcher
+  At least for MacOsX and Windows version but as well for Linux a jMax launcher
  application should be provided, which fully integrates into the given OS
 in a way that opening of jMax documents such as patches and projects can
 be done in the standard way provided by a given OS (double-click, drag and
 drop, etc.).<br>
  
 <h2>parsing</h2>
-   The current parser is a source of constant annoyance in the development
- of jMax. jMax 3 should include a very first version of a new parser providing
- at least a very simple syntax for messages close to the current jMax (MAX)
- syntax for messages and simple expressions. <br>
- 
-<ul>
-   
-  <li>parsing of strings to FTS' internal representations is done by the
-server</li>
-   
-  <li>the client/server protocol permits to send parsed message and atoms 
- as well as unparsed strings<br>
-   </li>
- 
-</ul>
-  The parser has to be compatible with the future developments of jMax (implemented
- with a minimal effort!!). The parser should try to keep a maximum compatibility
- with MAX style messages and the expression syntax of jMax.<br>
- <br>
-  The parser should introduce the possiblilty to specify the package of class
- at the instantiation of an object. This way the transition towards a new
-object set can be simplyfied.<br>
- <br>
- 
 <h2>message system</h2>
   For the first user release the changes of the message system should be
 minimal.  Nevertheless some changes has to be done in order to support the
@@ -92,11 +99,6 @@ system for FTS  <br>
 <h2>GUI features</h2>
   Editors should be provided for fvec, messtab (maybe to be renamed to "dictionary"
 or so?),  and the MIDI track.<br>
- <br>
- 
-<h2>portable soundfile i/o</h2>
-  The reading and writing of soundfiles must be handles by a platform depended
- package and implemented for all  four platforms.<br>
  <br>
  
 <h2>multi-thread</h2>

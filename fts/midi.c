@@ -333,6 +333,7 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, midievent_get_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, midievent_set_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, midievent_set_from_array);
 
   return fts_Success;
 }

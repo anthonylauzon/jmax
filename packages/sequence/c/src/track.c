@@ -807,7 +807,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->first = 0;
   this->last = 0;
   this->size = 0;
-  this->type = seqsym_note;
+  this->type = fts_s_void;
   
   this->keep = fts_s_no;
 

@@ -123,18 +123,6 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  event_t *event;
 	  
-	  /* create event */
-	  if(this->class)
-	    {
-	      fts_object_t *obj = fts_object_create(this->class, ac, at);
-	      fts_atom_t a[1];
-	      
-	      fts_set_object(a, obj);
-	      event = (event_t *)fts_object_create(event_class, 1, a);
-	    }
-	  else
-	    event = (event_t *)fts_object_create(event_class, 1, at);
-	  
 	  /* add event to recording track */
 	  track_append_event(this->recording, here, event);
 	}
@@ -182,11 +170,6 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_object_refer(this->track);
       
       type = track_get_type(this->track);
-
-      if(type == fts_s_int || type == fts_s_float || type == fts_s_symbol)
-	this->class = 0;
-      else
-	this->class = fts_class_get_by_name(type);
 
       fts_set_symbol(&a, type);
       this->recording = (track_t *)fts_object_create(track_class, 1, &a);

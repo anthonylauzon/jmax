@@ -148,11 +148,25 @@ fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
   fts_array_set_size(array, old_size + ac);
 
   /* shift array towards end */
-  for(i=old_size-1; i>=0; i++)
+  for(i=old_size-1; i>=0; i--)
     array->atoms[ac + i] = array->atoms[i];
 
   for(i=0; i<ac; i++)
     fts_atom_assign(array->atoms + i, at + i);
+}
+
+void 
+fts_array_copy(fts_array_t *org, fts_array_t *copy)
+{
+  int size = org->size;
+  int i;
+
+  fts_array_clear(copy);
+  fts_array_set_size(copy, size);
+
+  /* shift array towards end */
+  for(i=0; i<size; i++)
+    fts_atom_assign(copy->atoms + i, org->atoms + i);
 }
 
 /************************************************
