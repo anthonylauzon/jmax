@@ -281,27 +281,27 @@ midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       switch (this->type)
 	{
 	case midi_type_note:
-	  post("note (%d) %d %d", this->id, byte1, byte2);
+	  post("{note (%d) %d %d}\n", this->id, byte1, byte2);
 	  break;
 	  
 	case midi_type_poly_pressure:
-	  post("poly pressure (%d) %d %d", this->id, byte1, byte2);
+	  post("{poly pressure (%d) %d %d}\n", this->id, byte1, byte2);
 	  break;
 	  
 	case midi_type_control_change:
-	  post("control change (%d) %d %d", this->id, byte1, byte2);
+	  post("{control change (%d) %d %d}\n", this->id, byte1, byte2);
 	  break;
 	  
 	case midi_type_program_change:
-	  post("program change (%d) %d", this->id, byte1);
+	  post("{program change (%d) %d}\n", this->id, byte1);
 	  break;
 	  
 	case midi_type_channel_pressure:		
-	  post("channel pressure (%d) %d", this->id, byte1);
+	  post("{channel pressure (%d) %d}\n", this->id, byte1);
 	  break;
 	  
 	case midi_type_pitch_bend:
-	  post("pitch bend (%d) %d %d", this->id, byte1, byte2);
+	  post("{pitch bend (%d) %d %d}\n", this->id, byte1, byte2);
 	  break;
 
 	default:

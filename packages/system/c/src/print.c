@@ -105,18 +105,15 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   post("%s: ", fts_symbol_name(this->prompt));
   
   if(ac == 0)
-    {
-      post_symbol(s);
-      post("\n");
-    }
+    post("%s\n", fts_symbol_name(s));
   else if(ac == 1 && fts_is_object(at))
     {
+      /* print object */
       fts_object_t *obj = fts_get_object(at);
 
       if(s == fts_object_get_class_name(obj))
 	{
-	  post_symbol(s);
-	  post(" ");
+	  post("<%s> ", fts_symbol_name(s));
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
 	    post("???");
@@ -126,13 +123,14 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
   else if(ac == 1 && s == fts_get_selector(at))
     {
+      /* simple value */
       post_atoms(1, at);
       post("\n");
     }
   else
     {
-      post_symbol(s);
-      post(" ");
+      /* ordinary message */
+      post("%s ", fts_symbol_name(s));
       post_atoms(ac, at);
       post("\n");
     }

@@ -168,7 +168,7 @@ row_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for(i=0; i<size; i++)
     post_atoms(1, &row_get_element(this, i));
 
-  post("}");
+  post("}\n");
 }
 
 static void

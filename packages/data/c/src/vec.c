@@ -317,7 +317,7 @@ vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   post("{");
   post_atoms(vec_get_size(this), vec_get_ptr(this));
-  post("}");
+  post("}\n");
 }
 
 static void

@@ -322,7 +322,7 @@ public class MessageValue extends AbstractEventValue
 
     //--- Fields
     public static final String fs = File.separator;
-    public static final String MESSAGE_NAME = "message";
+    public static final String MESSAGE_NAME = "seqmess";
     public static final String MESSAGE_PUBLIC_NAME = "message";
     public static MessageValueInfo info = new MessageValueInfo();
     public static final int DEFAULT_WIDTH = 290;

@@ -315,14 +315,19 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   display_t * this = (display_t *)o;
   int i;
-
-  if(symbol_contains_blank(s))
-    sprintf(this->string, "\"%s\"", fts_symbol_name(s));
-  else
-    sprintf(this->string, "%s", fts_symbol_name(s));
-
-  for(i=0; i<ac; i++)
-    append_blank_and_atom(this->string, at + i);
+  
+  if(ac == 1 && fts_is_object(at) && s == fts_object_get_class_name(fts_get_object(at)))
+    sprintf(this->string, "<%s> ", fts_symbol_name(s));
+  else 
+    {
+      if(symbol_contains_blank(s))
+	sprintf(this->string, "\"%s\"", fts_symbol_name(s));
+      else
+	sprintf(this->string, "%s", fts_symbol_name(s));
+      
+      for(i=0; i<ac; i++)
+	append_blank_and_atom(this->string, at + i);
+    }
 
   display_deliver(this);
 }

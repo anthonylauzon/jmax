@@ -1,3 +1,22 @@
+2001-12-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* adjusted objects of sequence package
+	* introduced track of midievents with import from midifiles (todo: export)
+	* added void type to track and removed midival
+	* moved seqplay to play
+	* moved seqrec to record
+	* new (experimental) object dumpfile in package data 
+	* introduced keep property to sequence and track
+	* implemented templates ldeco and lcomp as classes in package lists
+
+2001-12-07  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* introduced fts_dumper_t as general mechanism for save and dump (adapted saver.c)
+	* implemented dump for all data classes in packages data and sequence
+	* moved check of keep property to bmax saver
+	* changed preset: now is based on set_from_instance method and dumper (for saving)
+	* moved all method declarations to fts_method_define_varargs
+
 2001-11-29  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* removed timer from time.c and added timebase scheduling functions

@@ -955,7 +955,7 @@ ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       post("%d}", ivec_get_element(this, size - 1));
     }
   else
-    post("}");
+    post("}\n");
 }
 
 static void

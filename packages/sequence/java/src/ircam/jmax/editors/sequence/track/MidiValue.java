@@ -201,6 +201,3 @@ public class MidiValue extends AbstractEventValue
 	MIDI_ICON = new ImageIcon(path+"midi.gif");
     }
 }
-
-
-

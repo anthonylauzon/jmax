@@ -719,10 +719,10 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       for(i=0; i<size-1; i++)
 	post("%f ", fvec_get_element(this, i));
 
-      post("%f}", fvec_get_element(this, size - 1));
+      post("%f}\n", fvec_get_element(this, size - 1));
     }
   else
-    post("}");
+    post("}\n");
 }
 
 static void

@@ -306,7 +306,7 @@ bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for(i=0; i<size; i++)
     post("  (%f %f)\n", this->points[i].time, this->points[i].value);
 
-  post("}");
+  post("}\n");
 }
 
 static void

@@ -48,13 +48,17 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	this.time = (double)args[0].getFloat();
 
 	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].getString()).newInstance());
+
 	for(int i = 0; i< nArgs-2; i++)
-	{
+	  {
 	    Object obj = args[2+i].getValue();
+	    
 	    if(obj instanceof Float) 
-		obj = new Double(((Float)obj).doubleValue());
+	      obj = new Double(((Float)obj).doubleValue());
+	    
 	    evtArgs[i] = obj;	  
-	}
+	  }
+	
 	evtValue.setPropertyValues(nArgs-2, evtArgs);   
 	setValue(evtValue);
     }
