@@ -28,6 +28,7 @@ package ircam.jmax.editors.sequence.renderers;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.*;
 
+import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;

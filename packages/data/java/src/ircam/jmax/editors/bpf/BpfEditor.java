@@ -28,6 +28,7 @@ package ircam.jmax.editors.bpf;
 
 import ircam.jmax.editors.bpf.renderers.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
