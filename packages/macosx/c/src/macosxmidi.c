@@ -205,15 +205,17 @@ macosxmidi_set_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       }
     else if(source_name == fts_s_internal)
       {
-      fts_midilabel_set_internal(label);
+	fts_midilabel_set_internal(label);
 
-      /* send to client */
-      fts_client_send_message(o, fts_s_input, 2, at);
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else
       {
 	/* get or create MIDI port */
 	/* set input */
+
+	/* send Sources to client ? */
 
 	/* send to client */
 	fts_client_send_message(o, fts_s_input, 2, at);
@@ -261,6 +263,8 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	/* get or create MIDI port */
 	/* set output */
 	
+	/* send Destinations to client ? */
+
 	/* send to client */
 	fts_client_send_message(o, fts_s_output, 2, at);
       }

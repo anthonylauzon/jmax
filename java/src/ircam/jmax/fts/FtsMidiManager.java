@@ -70,14 +70,6 @@ public class FtsMidiManager extends FtsObject
 	   ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
-
-     /*FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
-       public void invoke( FtsObject obj, FtsArgs args)
-       {
-       ((FtsPackage)obj).listener.ftsActionDone();
-       }
-       });
-     */
   }
     
   public FtsMidiManager(FtsServer server, FtsObject parent, int id)
@@ -91,7 +83,7 @@ public class FtsMidiManager extends FtsObject
     super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("slider"));
   }
 
-  public void setFtsActionListener(FtsActionListener listener)
+  public void setListener( ircam.jmax.editors.configuration.MidiConfigPanel listener)
   {
     this.listener = listener;
   }
@@ -185,6 +177,9 @@ public class FtsMidiManager extends FtsObject
     sources = new String[ nArgs];
     for(int i = 0; i < nArgs; i++)
       sources[i] = args[i].symbolValue.toString();
+  
+    if(listener != null)
+      listener.sourcesChanged();
   }
 
   public String[] getSources()
@@ -196,6 +191,9 @@ public class FtsMidiManager extends FtsObject
     destinations = new String[ nArgs];
     for(int i = 0; i < nArgs; i++)
       destinations[i] = args[i].symbolValue.toString();
+  
+    if(listener != null)
+      listener.destinationsChanged();
   }
   public String[] getDestinations()
   {
@@ -244,6 +242,6 @@ public class FtsMidiManager extends FtsObject
   private String[] sources;
   private String[] destinations;
   private Vector labels; 
-  private FtsActionListener listener;
+  private ircam.jmax.editors.configuration.MidiConfigPanel listener;
 }
 

@@ -46,15 +46,7 @@ public class MidiConfigPanel extends JPanel implements Editor
   {
     window = win;
     midiMan = mm;
-
-    if( midiMan != null)
-      midiMan.setFtsActionListener( new FtsActionListener(){
-	  public void ftsActionDone()
-	  {
-	    update();
-	    window.setVisible( true);
-	  }
-	});
+    midiMan.setListener( this);
 
     initDataModel();
 
@@ -125,12 +117,26 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   void update()
   {    
-    //?????????????????????
     initDataModel();
     midiTable.setModel( midiModel);
+    initCellEditors();
     midiTable.revalidate();
     revalidate();    
     window.pack();
+  }
+
+  public void sourcesChanged()
+  {
+    initCellEditors();
+    midiTable.revalidate();
+    revalidate(); 
+  }
+
+  public void destinationsChanged()
+  {
+    initCellEditors();
+    midiTable.revalidate();
+    revalidate(); 
   }
 
   void Add()
