@@ -17,7 +17,7 @@
 #include "lang/mess/messP.h"
 #include "lang/datalib.h"
 
-/* #define TRACE_DEBUG */
+/* #define TRACE_DEBUG  */
 
 /* Errors */
 
@@ -66,7 +66,6 @@ static fts_binding_t *fts_binding_new(fts_env_t *env, fts_symbol_t name, fts_ato
 static void fts_binding_delete(fts_binding_t *var)
 {
   fts_binding_t **b;		/* indirect precursor */
-  fts_object_list_t   *u;
 
 #ifdef TRACE_DEBUG
   if (var->env)
@@ -94,32 +93,26 @@ static void fts_binding_delete(fts_binding_t *var)
 
   /* The binding is no more in the environment; we can now
      redefine the object, without any risk of inference.
-     In the same moment, we Free the users list
+     We don't free the list, because is freed by the redefined
+     objects automatically.
      */
 
-  u = var->users;
-  while (u)
+
+  while (var->users)
     {
+      fts_object_list_t   *u;
       fts_object_t *obj;
       fts_object_list_t *tmp;
 
-      tmp = u;
-      u = u->next;
-      obj = tmp->obj;
+      u = var->users;
 
 #ifdef TRACE_DEBUG
       fprintf(stderr, "\t");
-      fprintf_object(stderr, obj);
+      fprintf_object(stderr, u->obj);
       fprintf(stderr, "\n");
 #endif
 
-      fts_object_recompute(obj);
-
-      /* Free after the recomputing, because will
-	 be read by the recomputed object */
-
-      fts_heap_free((char *)tmp, objlist_heap);
-
+      fts_object_recompute(u->obj);
     }
 
 #ifdef TRACE_DEBUG
@@ -305,7 +298,8 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
     }
 #endif
 
-  /* Remove the user from the binding */
+  /* Remove the user from the binding; ignore the case where the binding
+     is not there any more */
 
   for (u = &(var->users); *u; u = &((*u)->next))
     if ((*u)->obj == object)
@@ -839,12 +833,7 @@ void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object
   b = fts_variable_get_binding(scope, name);
 
   if (b)
-    {
-      fprintf(stderr, "Looking for users of binding %s\n", fts_symbol_name(name));
-      fts_binding_add_users_to_set(b, set);
-    }
-  else
-    fprintf(stderr, "Binding not found: %s\n", fts_symbol_name(name));
+    fts_binding_add_users_to_set(b, set);
 }
 
 void fts_variable_assign(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value)

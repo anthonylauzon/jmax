@@ -414,7 +414,7 @@ fts_client_parse_char(char c)
 static void
 fts_client_mess_unknown(int ac, const  fts_atom_t *av)
 {
-  /* Should raise an error of some kind @@@ */
+  /* Should raise an error of some kind */
 }
 
 

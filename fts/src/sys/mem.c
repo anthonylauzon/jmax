@@ -20,7 +20,9 @@
    to catch memory problems without purify
 */
 
+#ifdef DEBUG
 #define HELP_PURIFY 
+#endif
 
 /* #include "smem.h"  */
 
@@ -272,7 +274,7 @@ fts_block_alloc(int size)
       idx = (size / sizeof(long)) - 1;
 
       if (! fts_heaps[idx])
-	fts_heaps[idx] = fts_heap_new((i + 1) * sizeof(long));
+	fts_heaps[idx] = fts_heap_new((idx + 1) * sizeof(long));
 
       return fts_heap_alloc(fts_heaps[idx]);
     }
@@ -295,7 +297,7 @@ fts_block_zalloc(int size)
       idx = (size / sizeof(long)) - 1;
 
       if (! fts_heaps[idx])
-	fts_heaps[idx] = fts_heap_new((i + 1) * sizeof(long));
+	fts_heaps[idx] = fts_heap_new((idx + 1) * sizeof(long));
 
       return fts_heap_zalloc(fts_heaps[idx]);
     }

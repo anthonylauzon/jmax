@@ -61,7 +61,6 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       perror( "fts_binary_file_map");
       return fd;
     }
-  desc->fd = fd;
 
   /* get file size */
   {
@@ -70,6 +69,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     if ( fstat(fd, &buf) < 0)
       {
 	perror( "fts_binary_file_map");
+	close(fd);
 	return -1;
       }
     file_size = buf.st_size;
@@ -79,6 +79,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   if (read( fd, &header, sizeof( header)) < sizeof( header))
     {
       perror( "fts_binary_file_map");
+      close(fd);
       return -1;
     }
 
@@ -91,6 +92,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
   if (header.magic_number != FTS_BINARY_FILE_MAGIC)
     {
+      close(fd);
       return -1;
     }
 
@@ -103,6 +105,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   desc->code = (unsigned char *)fts_malloc( header.code_size);
   if (!desc->code)
     {
+      close(fd);
       return -1;
     }
 
@@ -111,6 +114,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   if (read( fd, desc->code, header.code_size) < header.code_size)
     {
       perror( "fts_binary_file_map");
+      close(fd);
       return -1;
     }
 
@@ -126,6 +130,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
       if (!desc->symbols)
 	{
+	  close(fd);
 	  return -1;
 	}
 
@@ -135,6 +140,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       symbuf = (char *) fts_malloc( symbols_size);
       if ( !symbuf)
 	{
+	  close(fd);
 	  return -1;
 	}
 
@@ -142,6 +148,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       if (read( fd, symbuf, symbols_size) < symbols_size)
 	{
 	  perror( "fts_binary_file_map");
+	  close(fd);
 	  return -1;
 	}
 
@@ -183,12 +190,12 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       fts_free( symbuf);
     }
 
+  close(fd);
   return 1;
 }
 
 static void fts_binary_file_dispose( fts_binary_file_desc_t *desc)
 {
-  close( desc->fd);
   fts_free( desc->code);
   fts_free( desc->symbols);
 }

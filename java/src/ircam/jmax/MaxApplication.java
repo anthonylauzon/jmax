@@ -377,7 +377,7 @@ public class MaxApplication extends Object
 		    if (! document.canSave())
 		      {
 			File file;
-			file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile());
+			file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile(), "Save As");
 
 			if (file != null)
 			  document.bindToDocumentFile(file);

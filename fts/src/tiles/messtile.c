@@ -1053,6 +1053,7 @@ fts_messtile_install_all()
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
   fts_client_mess_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
+  fts_client_mess_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
   fts_client_mess_install(RECOMPUTE_ERRORS_CODE, fts_mess_client_recompute_errors);
   fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }

@@ -69,7 +69,7 @@ public class MaxFileChooser
 
   /* CHoose a file to save, having an old File as initial content of the dialog box */
 
-  public static File chooseFileToSave(Frame frame, File oldFile)
+  public static File chooseFileToSave(Frame frame, File oldFile, String title)
   {
     File dir;
 
@@ -77,12 +77,12 @@ public class MaxFileChooser
       makeFileChooser();
 
     dir = fd.getCurrentDirectory();
-    fd.setDialogTitle("Save As");
+    fd.setDialogTitle(title);
     fd.rescanCurrentDirectory();
     if (oldFile != null)
       fd.setSelectedFile(oldFile);
 
-    if (fd.showDialog(frame, "Save As") == JFileChooser.APPROVE_OPTION)
+    if (fd.showDialog(frame, title) == JFileChooser.APPROVE_OPTION)
       return fd.getSelectedFile();
     else
       {
