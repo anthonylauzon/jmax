@@ -62,6 +62,66 @@
 			path = build/libdtd.bundle;
 			refType = 2;
 		};
+		F5632C2203499A0701664092 = {
+			fileRef = F85494EB02D2501E01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2303499A1501664092 = {
+			fileRef = F85494FA02D250E101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2403499A2301664092 = {
+			fileRef = F85494DE02D24EEB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2503499A3101664092 = {
+			fileRef = F85494E802D24FEF01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2603499AD201664092 = {
+			fileRef = F85494EE02D2504501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2703499AE001664092 = {
+			fileRef = F85494F102D2506A01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2803499AEC01664092 = {
+			fileRef = F85494F402D2508A01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2903499AFD01664092 = {
+			fileRef = F85494F702D250C101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5632C2A0349A14001664092 = {
+			isa = PBXFileReference;
+			name = bus.c;
+			path = ../../packages/signal/c/src/bus.c;
+			refType = 2;
+		};
+		F5632C2B0349A14001664092 = {
+			fileRef = F5632C2A0349A14001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F56C3E180338D3DC01664092 = {
 			isa = PBXFileReference;
 			name = Actions.java;
@@ -233,6 +293,12 @@
 			isa = PBXBuildFile;
 			settings = {
 				JAVA_ARCHIVE_SUBDIR = "";
+			};
+		};
+		F5F40D720348A14401664092 = {
+			fileRef = F8F010CD028D861401664092;
+			isa = PBXBuildFile;
+			settings = {
 			};
 		};
 		F5F80BF203420AB201664092 = {
@@ -1008,6 +1074,7 @@
 				F8EE4B61031CE6C301664092,
 				F8EE4B62031CE6C301664092,
 				F8EE4B64031CE6C301664092,
+				F5632C2A0349A14001664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -1150,6 +1217,7 @@
 				F8EE4B71031CE6C301664092,
 				F8EE4B72031CE6C301664092,
 				F8EE4B74031CE6C301664092,
+				F5632C2B0349A14001664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5767,7 +5835,7 @@
 			dstPath = share/jmax/packages/ispw;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494ED02D2502E01664092,
+				F5632C2203499A0701664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5841,6 +5909,7 @@
 			dstPath = share/jmax/packages/signal;
 			dstSubfolderSpec = 7;
 			files = (
+				F5632C2303499A1501664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6223,7 +6292,7 @@
 			dstPath = share/jmax/packages/control/c;
 			dstSubfolderSpec = 7;
 			files = (
-				F8F010E4028D870301664092,
+				F5F40D720348A14401664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6295,7 +6364,7 @@
 			dstPath = share/jmax/packages/control;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494E102D24F7101664092,
+				F5632C2403499A2301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6675,7 +6744,7 @@
 			dstPath = share/jmax/packages/io;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494EA02D2500601664092,
+				F5632C2503499A3101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6936,7 +7005,7 @@
 			dstPath = share/jmax/packages/ispwmath;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494F002D2505401664092,
+				F5632C2603499AD201664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7305,7 +7374,7 @@
 			dstPath = share/jmax/packages/midi;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494F302D2507601664092,
+				F5632C2703499AE001664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7576,7 +7645,7 @@
 			dstPath = share/jmax/packages/numeric;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494F602D2509701664092,
+				F5632C2803499AEC01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10861,7 +10930,7 @@
 			dstPath = share/jmax/packages/sequence;
 			dstSubfolderSpec = 7;
 			files = (
-				F85494F902D250D001664092,
+				F5632C2903499AFD01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10877,12 +10946,6 @@
 			name = control.jpkg;
 			path = ../../packages/control/control.jpkg;
 			refType = 2;
-		};
-		F85494E102D24F7101664092 = {
-			fileRef = F85494DE02D24EEB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85494E202D24F9901664092 = {
 			isa = PBXFileReference;
@@ -10914,23 +10977,11 @@
 			path = ../../packages/io/io.jpkg;
 			refType = 2;
 		};
-		F85494EA02D2500601664092 = {
-			fileRef = F85494E802D24FEF01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85494EB02D2501E01664092 = {
 			isa = PBXFileReference;
 			name = ispw.jpkg;
 			path = ../../packages/ispw/ispw.jpkg;
 			refType = 2;
-		};
-		F85494ED02D2502E01664092 = {
-			fileRef = F85494EB02D2501E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85494EE02D2504501664092 = {
 			isa = PBXFileReference;
@@ -10938,23 +10989,11 @@
 			path = ../../packages/ispwmath/ispwmath.jpkg;
 			refType = 2;
 		};
-		F85494F002D2505401664092 = {
-			fileRef = F85494EE02D2504501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85494F102D2506A01664092 = {
 			isa = PBXFileReference;
 			name = midi.jpkg;
 			path = ../../packages/midi/midi.jpkg;
 			refType = 2;
-		};
-		F85494F302D2507601664092 = {
-			fileRef = F85494F102D2506A01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85494F402D2508A01664092 = {
 			isa = PBXFileReference;
@@ -10962,23 +11001,11 @@
 			path = ../../packages/numeric/numeric.jpkg;
 			refType = 2;
 		};
-		F85494F602D2509701664092 = {
-			fileRef = F85494F402D2508A01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85494F702D250C101664092 = {
 			isa = PBXFileReference;
 			name = sequence.jpkg;
 			path = ../../packages/sequence/sequence.jpkg;
 			refType = 2;
-		};
-		F85494F902D250D001664092 = {
-			fileRef = F85494F702D250C101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85494FA02D250E101664092 = {
 			isa = PBXFileReference;
@@ -20445,8 +20472,6 @@
 		F8DC5F0F0286BF2401664092 = {
 			children = (
 				F8DC5F110286BF2401664092,
-				F8DC5F120286BF2401664092,
-				F8DC5F130286BF2401664092,
 				F8DC5F140286BF2401664092,
 				F8DC5F150286BF2401664092,
 				F8DC5F160286BF2401664092,
@@ -20464,18 +20489,6 @@
 			isa = PBXFileReference;
 			name = argument.c;
 			path = ../../packages/system/c/src/argument.c;
-			refType = 2;
-		};
-		F8DC5F120286BF2401664092 = {
-			isa = PBXFileReference;
-			name = bus_tilda.c;
-			path = ../../packages/system/c/src/bus_tilda.c;
-			refType = 2;
-		};
-		F8DC5F130286BF2401664092 = {
-			isa = PBXFileReference;
-			name = bus.c;
-			path = ../../packages/system/c/src/bus.c;
 			refType = 2;
 		};
 		F8DC5F140286BF2401664092 = {
@@ -20613,8 +20626,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8DC5F230286BF2501664092,
-				F8DC5F240286BF2501664092,
-				F8DC5F250286BF2501664092,
 				F8DC5F260286BF2501664092,
 				F8DC5F270286BF2501664092,
 				F8DC5F280286BF2501664092,
@@ -20627,18 +20638,6 @@
 		};
 		F8DC5F230286BF2501664092 = {
 			fileRef = F8DC5F110286BF2401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5F240286BF2501664092 = {
-			fileRef = F8DC5F120286BF2401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5F250286BF2501664092 = {
-			fileRef = F8DC5F130286BF2401664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -21483,12 +21482,6 @@
 		};
 		F8F010E3028D870301664092 = {
 			fileRef = F8F010D7028D861401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8F010E4028D870301664092 = {
-			fileRef = F8F010CD028D861401664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
