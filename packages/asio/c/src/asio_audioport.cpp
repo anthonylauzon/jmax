@@ -32,7 +32,7 @@
 
 
 /* Define this if you want to post debug messages */
- #define WANT_TO_DEBUG_ASIO_PACKAGES 
+/* #define WANT_TO_DEBUG_ASIO_PACKAGES */
 
 /* 
    ASIO Callback:
@@ -104,13 +104,6 @@ void copy_from_fts_to_asio(asio_audioport_t* port, int frames, int index)
       port_output_buffer += port->output_buffer_offset * port->size_of_asio_type;
       /* copy buffsize sample to audio card buffer */
       memcpy(asio_output_buffer, port_output_buffer, frames * port->size_of_asio_type);
-/*
-          for(int ii=0; ii < frames * port->size_of_asio_type; ii++)
-          {
-            //if(buff[ii]!=0.0) fts_post("Not zero !!!\n");
-            port_output_buffer[ii] = (char)sin(ii*10);//port_output_buffer[ii];
-asio_output_buffer[ii] = (char)sin(ii*10);
-          }*/
     }
   }
 }
@@ -561,12 +554,6 @@ asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
 
       if(fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
       {
-         /* for(int ii=0; ii < buffsize; ii++)
-          {
-            if(buff[ii]!=0.0) fts_post("Not zero !!!\n");
-            buff[ii] = *(float*)(current_port + ii);
-          }*/
-
           //fts_post("Type %d Channel Index: %d\n",current_port->channelInfos[0].type,channelIndex);
 
         // ASIO -> jMax type conversion 
@@ -667,6 +654,7 @@ static void asio_audioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int
   current_port->driver->driver_interface->disposeBuffers();
 
   /* We now return the hand to the FTS scheduler loop */
+
   current_port = NULL;
 }
 
@@ -691,18 +679,16 @@ asio_audioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int a
   
   if(!fts_sched_is_running())
   {
-    fts_post("[asio] sched not running, stop, dispose and release\n");
+    fts_log("[asio] sched not running, stop, dispose and release\n");
+
+    /* force close the audioport */
+    if(self)
+    {
+      fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+      fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+    }
 
     asio_restart_fts_scheduler();
-
-    /* stop process ... */
-    //self->driver->driver_interface->stop();
-
-    /* dispose buffer ... */
-    //self->driver->driver_interface->disposeBuffers();
-      
-    /* exit asio ... */
-    //self->driver->driver_interface->Release();
   }
 }
 
@@ -724,6 +710,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
     if(asio_audioport_create_buffers(current_port)!=ASE_OK)
     {
       fts_post("[asio] Error : could not prepare audio buffers\n");
+
       current_port = NULL;
       return 0; /* error */
     }
@@ -742,6 +729,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
 
         current_port->driver->driver_interface->start();
     }
+
     nb_port_opened++;
   }
   else if((current_port)&&(port!=current_port)) /* user is trying to open a different port */
@@ -749,6 +737,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
      fts_post("ASIO allows to use only one driver at a time\n");
      fts_post("Current driver is : %s\n",current_port->driver->name);
      nb_port_opened++;
+
      return 0; /* error */
   }
   else /* user is trying to open another channel of the current port */
@@ -780,11 +769,13 @@ static void asio_audioport_close()
     asio_restart_fts_scheduler();
     nb_port_opened = 0;
 
+
     fts_sched_running_remove_listener((fts_object_t*)current_port);
   }
   else
   {
       nb_port_opened--;
+
       if(nb_port_opened<0) nb_port_opened = 0;
   }
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
