@@ -1213,6 +1213,9 @@ fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
       fts_set_void(fts_get_return_value());
     }
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
   }
   
   fts_return_object(o);
