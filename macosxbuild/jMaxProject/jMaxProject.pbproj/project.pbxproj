@@ -382,6 +382,18 @@
 			path = ../../fts/fifo.c;
 			refType = 2;
 		};
+		F82C2A0902E5DB1001664092 = {
+			isa = PBXFileReference;
+			name = patfile.c;
+			path = ../../fts/patfile.c;
+			refType = 2;
+		};
+		F82C2A0A02E5DB1001664092 = {
+			fileRef = F82C2A0902E5DB1001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F8386E97028D3F9101664092 = {
 			fileRef = F88000960283082801664092;
 			isa = PBXBuildFile;
@@ -538,12 +550,6 @@
 			settings = {
 			};
 		};
-		F8386EB1028D3F9101664092 = {
-			fileRef = F880FD600282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8386EB2028D3F9101664092 = {
 			fileRef = F880FD610282FA3901664092;
 			isa = PBXBuildFile;
@@ -610,12 +616,6 @@
 			settings = {
 			};
 		};
-		F8386EBD028D3F9101664092 = {
-			fileRef = F880FD700282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8386EBE028D3F9101664092 = {
 			fileRef = F880FD710282FA3901664092;
 			isa = PBXBuildFile;
@@ -630,12 +630,6 @@
 		};
 		F8386EC0028D3F9101664092 = {
 			fileRef = F880FD730282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8386EC1028D3F9101664092 = {
-			fileRef = F880FD740282FA3901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -696,12 +690,6 @@
 		};
 		F8386ECB028D3F9101664092 = {
 			fileRef = F880FD800282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8386ECC028D3F9101664092 = {
-			fileRef = F880FD810282FA3901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -11525,6 +11513,18 @@
 			isa = PBXTargetDependency;
 			target = F85C87900290238D01664092;
 		};
+		F8677A5F02E5C2CF01664092 = {
+			isa = PBXFileReference;
+			name = bmaxfile.c;
+			path = ../../fts/bmaxfile.c;
+			refType = 2;
+		};
+		F8677A6002E5C2CF01664092 = {
+			fileRef = F8677A5F02E5C2CF01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F86A04F302B4AD8401664092 = {
 			isa = PBXFileReference;
 			name = FtsPackage.java;
@@ -13044,7 +13044,6 @@
 				F880FD5C0282FA3901664092,
 				F880FD5E0282FA3901664092,
 				F880FD5F0282FA3901664092,
-				F880FD600282FA3901664092,
 				F880FD610282FA3901664092,
 				F8D6E22B02CE2D9701664092,
 				F880FD630282FA3901664092,
@@ -13057,11 +13056,9 @@
 				F880FD6A0282FA3901664092,
 				F880FD6B0282FA3901664092,
 				F880FD6F0282FA3901664092,
-				F880FD700282FA3901664092,
 				F880FD710282FA3901664092,
 				F880FD720282FA3901664092,
 				F880FD730282FA3901664092,
-				F880FD740282FA3901664092,
 				F880FD770282FA3901664092,
 				F880FD780282FA3901664092,
 				F880FD790282FA3901664092,
@@ -13072,12 +13069,13 @@
 				F880FD7E0282FA3901664092,
 				F880FD7F0282FA3901664092,
 				F880FD800282FA3901664092,
-				F880FD810282FA3901664092,
 				F88000950283082801664092,
 				F88000960283082801664092,
 				F848668802A2751001664092,
 				F848669402A2758B01664092,
 				F829DA4202B674E601664092,
+				F8677A5F02E5C2CF01664092,
+				F82C2A0902E5DB1001664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -13233,12 +13231,6 @@
 			path = ../../fts/list.c;
 			refType = 2;
 		};
-		F880FD600282FA3901664092 = {
-			isa = PBXFileReference;
-			name = loader.c;
-			path = ../../fts/loader.c;
-			refType = 2;
-		};
 		F880FD610282FA3901664092 = {
 			isa = PBXFileReference;
 			name = macosx.c;
@@ -13305,12 +13297,6 @@
 			path = ../../fts/patcher.c;
 			refType = 2;
 		};
-		F880FD700282FA3901664092 = {
-			isa = PBXFileReference;
-			name = patparser.c;
-			path = ../../fts/patparser.c;
-			refType = 2;
-		};
 		F880FD710282FA3901664092 = {
 			isa = PBXFileReference;
 			name = post.c;
@@ -13327,12 +13313,6 @@
 			isa = PBXFileReference;
 			name = property.c;
 			path = ../../fts/property.c;
-			refType = 2;
-		};
-		F880FD740282FA3901664092 = {
-			isa = PBXFileReference;
-			name = saver.c;
-			path = ../../fts/saver.c;
 			refType = 2;
 		};
 		F880FD770282FA3901664092 = {
@@ -13393,12 +13373,6 @@
 			isa = PBXFileReference;
 			name = version.c;
 			path = ../../fts/version.c;
-			refType = 2;
-		};
-		F880FD810282FA3901664092 = {
-			isa = PBXFileReference;
-			name = vm.c;
-			path = ../../fts/vm.c;
 			refType = 2;
 		};
 		F880FD820282FA3901664092 = {
@@ -13511,7 +13485,6 @@
 				F8386EAE028D3F9101664092,
 				F8386EAF028D3F9101664092,
 				F8386EB0028D3F9101664092,
-				F8386EB1028D3F9101664092,
 				F8386EB2028D3F9101664092,
 				F8386EB3028D3F9101664092,
 				F8386EB4028D3F9101664092,
@@ -13523,11 +13496,9 @@
 				F8386EBA028D3F9101664092,
 				F8386EBB028D3F9101664092,
 				F8386EBC028D3F9101664092,
-				F8386EBD028D3F9101664092,
 				F8386EBE028D3F9101664092,
 				F8386EBF028D3F9101664092,
 				F8386EC0028D3F9101664092,
-				F8386EC1028D3F9101664092,
 				F8386EC2028D3F9101664092,
 				F8386EC3028D3F9101664092,
 				F8386EC4028D3F9101664092,
@@ -13538,11 +13509,12 @@
 				F8386EC9028D3F9101664092,
 				F8386ECA028D3F9101664092,
 				F8386ECB028D3F9101664092,
-				F8386ECC028D3F9101664092,
 				F8386ECE028D3F9101664092,
 				F848668902A2751001664092,
 				F848669502A2758B01664092,
 				F8FE337102CC778F01664092,
+				F8677A6002E5C2CF01664092,
+				F82C2A0A02E5DB1001664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
