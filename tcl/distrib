@@ -4,3 +4,4 @@ all	jmaxpkg.tcl
 all	packages.tcl
 all	config.tcl
 all	wrappers.tcl
+all	startup.tcl

@@ -55,16 +55,7 @@ if {[file exists [systemProperty user.home]/.jmaxrc]} then {
 }
 
 ##
-## Standard config.
+## startup with configuration
 ##
 
-sourceFile $jmaxRootDir/config/jmax.cfg
-
-
-
-
-
-
-
-
-
+sourceFile $jmaxRootDir/tcl/startup.tcl
