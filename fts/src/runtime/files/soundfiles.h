@@ -57,5 +57,6 @@ extern int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, 
 
 extern int fts_soundfile_get_size(fts_soundfile_t *soundfile);
 extern double fts_soundfile_get_samplerate(fts_soundfile_t *soundfile);
+extern int fts_soundfile_get_n_channels(fts_soundfile_t *soundfile);
 
 #endif

@@ -375,8 +375,10 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
       int n_read = 0;
       int sampfmt;
       int sampwidth;
+      int n_chan;
 
       afGetSampleFormat(soundfile->af_handle, AF_DEFAULT_TRACK, &sampfmt, &sampwidth);
+      n_chan = afGetChannels(soundfile->af_handle, AF_DEFAULT_TRACK);
 
       if ((sampfmt == AF_SAMPFMT_TWOSCOMP) && (sampwidth == 16))
 	{
@@ -388,6 +390,7 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 	      int n_got;
 
 	      read_size = (size > READ_BLOCK_SIZE)? READ_BLOCK_SIZE: size;
+	      read_size /= n_chan;
 
 	      n_got = afReadFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)short_buf, read_size);
 
@@ -399,11 +402,11 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 		{
 		  float float_buf[READ_BLOCK_SIZE];
 		  int n_got_conv;
-		  int i;
+		  int i, j;
 
 		  /* convert to float */
-		  for(i=0; i<n_got; i++)
-		    float_buf[i] =  ((float) short_buf[i] / 32768.0f);
+		  for(i=0, j=0; i<n_got; i++, j+=n_chan)
+		    float_buf[i] =  ((float) short_buf[j] / 32767.0f);
 
 		  /* convert sample rate from float_buffer to buffer */
 		  n_got_conv = fts_srconv(soundfile->srconv, float_buf, buffer + n_read, n_got, size, 1);
@@ -414,10 +417,10 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
 	      else
 		{
 		  /* just convert to float */
-		  int i;
+		  int i, j;
 
-		  for(i=0; i<n_got; i++)
-		    buffer[n_read + i] =  ((float) short_buf[i] / 32768.0f);
+		  for(i=0, j=0; i<n_got; i++, j+=n_chan)
+		    buffer[n_read + i] =  ((float) short_buf[j] / 32767.0f);
 
 		  size -= n_got;
 		  n_read += n_got;
@@ -465,7 +468,7 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
 
 	      /* Convert to short  */
 	      for (i=0; i<frames; i++)
-		buf[wrote++] =  (short) (buffer[i] / 32768.0f);
+		buf[i] =  (short)(buffer[wrote++] * 32767.0f);
 
 	      n = afWriteFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf, frames);
 
@@ -500,6 +503,12 @@ double
 fts_soundfile_get_samplerate(fts_soundfile_t *soundfile)
 {
   return afGetRate(soundfile->af_handle, AF_DEFAULT_TRACK);
+}
+
+int
+fts_soundfile_get_n_channels(fts_soundfile_t *soundfile)
+{
+  return afGetChannels(soundfile->af_handle, AF_DEFAULT_TRACK);
 }
 
 
