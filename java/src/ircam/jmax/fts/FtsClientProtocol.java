@@ -98,6 +98,7 @@ class FtsClientProtocol
   static final int sync_cmd = '>';
   static final int sync_done_cmd = '<';
   static final int post_cmd = 'h';
+  static final int post_line_cmd = 'L';
 
   static final int remote_call = '!';
 
