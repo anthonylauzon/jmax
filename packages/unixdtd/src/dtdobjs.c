@@ -112,7 +112,8 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
     if (message == s_open)
       readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
     else if (message == s_close)
-      readsf_close_realize( this);
+      {
+      }
     else if (message == s_play)
       post( "readsf~: error: no file opened\n");
     else if (message == s_pause)

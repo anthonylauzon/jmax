@@ -251,6 +251,8 @@ static int search_file_in_path( const char *filename, const char *path, char *fu
       strcat( full_path, "/");
       strcat( full_path, filename);
 
+      DTD_DEBUG( __debug( "searching `%s'", full_path) );
+
       if (file_exists( full_path))
 	  return 1;
     }
@@ -276,8 +278,9 @@ static AFfilehandle dtd_open_file_read( const char *filename, const char *path, 
       return AF_NULL_FILEHANDLE;
     }
 
-  file_channels = afGetChannels( file, AF_DEFAULT_TRACK);
+  DTD_DEBUG( __debug( "opened `%s'", full_path) );
 
+  file_channels = afGetChannels( file, AF_DEFAULT_TRACK);
   if ( file_channels != n_channels)
     {
       fprintf( stderr, "[dtdserver] invalid number of channels (%d)\n", file_channels);
@@ -285,7 +288,6 @@ static AFfilehandle dtd_open_file_read( const char *filename, const char *path, 
     }
 
   afGetSampleFormat( file, AF_DEFAULT_TRACK, &sampfmt, &sampwidth);
-
   if ((sampfmt != AF_SAMPFMT_TWOSCOMP) || (sampwidth != 16))
     {
       fprintf( stderr, "[dtdserver] invalid format\n");
@@ -350,20 +352,19 @@ static void dtd_open( const char *line)
       handle->file = AF_NULL_FILEHANDLE;
     }
 
-  if ((file = dtd_open_file_read( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
+  if ((handle->file = dtd_open_file_read( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
-  handle->file = file;
   handle->n_channels = n_channels;
 
   for ( i = 0; i < BLOCK_FRAMES/PRELOAD_BLOCK_FRAMES; i++)
     {
       int ret;
 
-      ret = dtd_read_block( file, fifo, read_block, PRELOAD_BLOCK_FRAMES, n_channels);
+      ret = dtd_read_block( handle->file, fifo, read_block, PRELOAD_BLOCK_FRAMES, n_channels);
     }
 
-  DTD_DEBUG( __debug( "opened `%s'", filename) );
+  DTD_DEBUG( __debug( "preloaded `%s'", filename) );
 }
 
 static void dtd_close( const char *line)
