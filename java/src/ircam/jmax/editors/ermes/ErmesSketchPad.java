@@ -46,14 +46,40 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     return normalizedRect;
   }
   
-  
+  public boolean drawPending = false;
+  public boolean copyPending = false;
+
+  private long lastUpdateGroupStartTime = 0;
+  private long updateGroupStartTime = 0;
+  private long lastUpdateGroupEndTime = 0;
+  private long updateGroupEndTime = 0;
+  private int count = 0;
+
   public void updateGroupStart() 
   {
+    // (fd)
+    // Measurement code
+    lastUpdateGroupStartTime = updateGroupStartTime;
+    updateGroupStartTime = System.currentTimeMillis();
   }
   
   public void updateGroupEnd() 
   {
     theToolkit.sync();
+
+    // (fd)
+    // Measurement code
+    lastUpdateGroupEndTime = updateGroupEndTime;
+    updateGroupEndTime = System.currentTimeMillis();
+
+    count++;
+
+    if (count % 20 == 0)
+      {
+	double p = (100.0 * (lastUpdateGroupEndTime - lastUpdateGroupStartTime)) / (updateGroupStartTime - lastUpdateGroupStartTime);
+
+	//System.err.println( "update load " + p + "%");
+      }
   }
 
   ErmesSketchWindow itsSketchWindow;
