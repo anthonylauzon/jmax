@@ -84,13 +84,7 @@ install:
 	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
 .PHONY: install
 
-
-
-
-
-
-
-
-
-
-
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages
+	for i in $(ARCH_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
+.PHONY: install

@@ -418,7 +418,7 @@ public class MaxApplication extends Object
 	{
 	  MaxDocument document = (MaxDocument) documents.getElementAt(j);
 	
-	  if (document.getName() != null && ! document.isSaved())
+	  if (! document.isSaved())
 	    {
 	      someOneNeedSave = true;
 	      break search;

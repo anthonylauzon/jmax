@@ -45,7 +45,7 @@ static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
 
 /* ********************************************************************** */
-/* This code is to be changed when we move to settings */
+/* This code is to be changed when we move to package loading from FTS */
 
 /*
  * The root directory (necessary for DTD server exec)

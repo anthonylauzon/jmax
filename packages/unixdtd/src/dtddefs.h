@@ -29,10 +29,7 @@
 #ifndef _FTS_DTDDEFS_H_
 #define _FTS_DTDDEFS_H_
 
-#define N_FIFOS 8
-
 #define BLOCK_FRAMES  65536
-#define BLOCK_MAX_CHANNELS  8
 #define BLOCKS_PER_FIFO 4
 
 #define PRELOAD_BLOCK_FRAMES  2048

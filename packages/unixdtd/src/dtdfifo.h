@@ -30,8 +30,8 @@
 #define _FTS_DTDFIFO_H_
 
 typedef struct {
-  volatile int read_used;
-  volatile int write_used;
+  volatile int read_serial;
+  volatile int write_serial;
   volatile int eof;
   volatile int read_index;
   volatile int write_index;
@@ -39,14 +39,14 @@ typedef struct {
   volatile double buffer[1]; /* double for alignement */
 } dtdfifo_t;
 
-#define dtdfifo_compute_size(BUFFER_SIZE) ( sizeof( dtdfifo_t) - sizeof( double) + (BUFFER_SIZE))
+#define DTDFIFO_SIZE(BS) ((BS) + sizeof( dtdfifo_t) - sizeof( double))
 
-extern void dtdfifo_init( dtdfifo_t *fifo);
-
-extern dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size);
+/*
+ * Macros 
+ */
+#define dtdfifo_get_buffer_size(F) ((F)->buffer_size)
 
 #define dtdfifo_get_buffer(F) ((F)->buffer)
-#define dtdfifo_get_buffer_size(F) ((F)->buffer_size)
 
 #define dtdfifo_get_read_index(F) ((F)->read_index)
 #define dtdfifo_set_read_index(F,I) ((F)->read_index = (I))
@@ -57,14 +57,26 @@ extern dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size);
 #define dtdfifo_get_read_pointer(F) (((volatile char *)((F)->buffer)) + (F)->read_index)
 #define dtdfifo_get_write_pointer(F) (((volatile char *)((F)->buffer)) + (F)->write_index)
 
-#define dtdfifo_is_read_used(F) ((F)->read_used)
-#define dtdfifo_set_read_used(F,U) ((F)->read_used = (U))
-
-#define dtdfifo_is_write_used(F) ((F)->write_used)
-#define dtdfifo_set_write_used(F,U) ((F)->write_used = (U))
-
 #define dtdfifo_is_eof(F) ((F)->eof)
 #define dtdfifo_set_eof(F,E) ((F)->eof = (E))
+
+#define dtdfifo_get_read_serial(F) ((F)->read_serial)
+
+#define dtdfifo_get_write_serial(F) ((F)->write_serial)
+
+
+/*
+ * Functions
+ */
+
+extern int dtdfifo_new( int id, const char *dirname, int buffer_size);
+extern void dtdfifo_delete( int id);
+
+extern dtdfifo_t *dtdfifo_get( int id);
+extern void dtdfifo_put( int id, dtdfifo_t *fifo);
+
+extern void *dtdfifo_get_user_data( int id);
+extern void dtdfifo_put_user_data( int id, void *user_data);
 
 extern int dtdfifo_get_read_level( const dtdfifo_t *fifo);
 extern int dtdfifo_get_write_level( const dtdfifo_t *fifo);
@@ -72,8 +84,13 @@ extern int dtdfifo_get_write_level( const dtdfifo_t *fifo);
 extern void dtdfifo_incr_read_index( dtdfifo_t *fifo, int incr);
 extern void dtdfifo_incr_write_index( dtdfifo_t *fifo, int incr);
 
+extern void dtdfifo_incr_read_serial( dtdfifo_t *fifo);
+extern void dtdfifo_incr_write_serial( dtdfifo_t *fifo);
+
 #ifdef DEBUG
 extern void dtdfifo_debug( dtdfifo_t *fifo, const char *msg);
 #endif
+
+extern void dtdfifo_apply( void (*fun)( int id, dtdfifo_t *, void *));
 
 #endif

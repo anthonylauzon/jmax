@@ -41,3 +41,12 @@ install:
 		$(INSTALL_LIB) libossdev.so $(lib_install_dir)/packages/ossdev/lib/$(ARCH)/opt/libossdev.so ; \
 	)
 .PHONY: install
+
+# The following line is a hack that installs the <package>.jpk file on all platforms
+# (this is so that you can load the sgidev package even if you are running the GUI
+# on Linux
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/ossdev
+	$(INSTALL_DATA) ossdev.jpk $(lib_install_dir)/packages/ossdev/ossdev.jpk
+	$(INSTALL_DATA) ossdev.scm $(lib_install_dir)/packages/ossdev/ossdev.scm
+.PHONY: install-noarch

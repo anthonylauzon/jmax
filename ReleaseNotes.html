@@ -17,7 +17,7 @@
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
 </head>
-<body>
+<body bgcolor=white>
 &nbsp;
 <table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
 <tr>
@@ -78,7 +78,7 @@ and is only available via CVS. The current state of the CVS version
 is the following:
 <ul>
 <li> the new implementation of readsf~ and writesf~ is not finished yet:
-readsf~ has still some bugs on big audio files, writesf~ is not yet implemented
+writesf~ is not yet implemented
 </ul>
 </strong>
 
@@ -89,9 +89,26 @@ readsf~ has still some bugs on big audio files, writesf~ is not yet implemented
 <h4>Automatic selection of isolated processor (SGI platform)</h4>
 
 <p>
-On SGI platform, FTS automatically runs on an isolated processor if there is one
+On SGI platform, the default behaviour is that FTS automatically runs on an isolated processor 
+if there is one
 processor that is isolated, thus taking advantage of multi-processors machines 
 for better audio latency.
+
+<p>
+In order to be able to select by hand the processor on which FTS will run,
+the option <code>--cpu=N</code> has been added to FTS, where N is the selected
+processor numbered starting at 0. This option is only meaningfull on SGI platform.
+
+<p>
+The jMax property <code>jmaxServerOptions</code> is used to pass options to 
+FTS; this property can be set:
+<ul>
+<li> on the command line:<br>
+<code>jmax -jmaxServerOptions --cpu=0</code>
+<p>
+<li> in the <code>.jmaxrc</code> file:<br>
+<code>set jmaxServerOptions "--cpu=0"</code>
+</ul>
 
 <p>
 To find what is an isolated processor and how to isolate a processor, check the

@@ -96,33 +96,17 @@ static int __debug( const char *format, ...)
 #define DTD_DEBUG(x)
 #endif
 
-#define ZZZ
-
-static struct dtd_handle {
-  dtdfifo_t *fifo;
+typedef struct {
   AFfilehandle file;
   int n_channels;
-#ifdef ZZZ
-  int samples_count;
-#endif
-} dtd_handle_table[N_FIFOS];
+} dtd_handle_t;
 
 /* One read block for all */
+/* @@@@ HACK */
+#define BLOCK_MAX_CHANNELS 8
 static short read_block[BLOCK_FRAMES*BLOCK_MAX_CHANNELS];
 
 #define N 256
-
-static void dtd_init_fifos( void)
-{
-  int n;
-
-  /* For now, the number of fifos, the block size and the number of blocks are fixed */
-  for ( n = 0; n < N_FIFOS; n++)
-    {
-      dtd_handle_table[n].fifo = dtdfifo_new( n, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
-      dtd_handle_table[n].file = AF_NULL_FILEHANDLE;
-    }
-}
 
 static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
 {
@@ -148,21 +132,21 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
     {
       for ( n = 0; n < size; n++)
 	{
-	  *dst++ = *buffer++ / 32767.0f;
+	  *dst++ = ((float)*buffer++) / 32767.0f;
 	}
     }
   else
     {
       for ( n = 0; n < buffer_size - index; n++)
 	{
-	  *dst++ = *buffer++ / 32767.0f;
+	  *dst++ = ((float)*buffer++) / 32767.0f;
 	}
 
       dst = (volatile float *)dtdfifo_get_buffer( fifo);
 
       for ( ; n < size; n++)
 	{
-	  *dst++ = *buffer++ / 32767.0f;
+	  *dst++ = ((float)*buffer++) / 32767.0f;
 	}
     }
 
@@ -266,47 +250,44 @@ static void dtd_open( const char *line)
 {
   AFfilehandle file;
   dtdfifo_t *fifo;
-  int fifo_number, n_channels, i;
-  char command[N], filename[N], path[N];
-  
-  sscanf( line, "%s%d%s%s%d", command, &fifo_number, filename, path, &n_channels);
+  int id, n_channels, i;
+  char filename[N], path[N];
+  dtd_handle_t *handle;
 
-  fifo = dtd_handle_table[fifo_number].fifo;
-  file = dtd_handle_table[fifo_number].file;
-  dtd_handle_table[fifo_number].n_channels = n_channels;
+  sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
-#ifdef ZZZ
-  dtd_handle_table[fifo_number].samples_count = 0;
-#endif
+  fifo = dtdfifo_get( id);
 
-  if ( dtdfifo_is_write_used( fifo))
+  if (fifo == 0)
     {
-      fprintf( stderr, "[dtdserver] warning: opening an already active fifo\n");
+      fprintf( stderr, "[dtdserver] fifo == 0 in open !!! \n");
+      return;
     }
 
-  dtdfifo_set_write_used( fifo, 1);
+  handle = (dtd_handle_t *)dtdfifo_get_user_data( id);
+  
+  file = handle->file;
+  handle->n_channels = n_channels;
 
   /* This should not happen */
   if ( file != AF_NULL_FILEHANDLE)
     {
       afCloseFile( file);
-      dtd_handle_table[fifo_number].file = AF_NULL_FILEHANDLE;
+      handle->file = AF_NULL_FILEHANDLE;
     }
 
   if ((file = dtd_open_and_check_file( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
-  dtd_handle_table[fifo_number].file = file;
+  handle->file = file;
 
+  dtdfifo_incr_write_serial( fifo);
+  
   for ( i = 0; i < BLOCK_FRAMES/PRELOAD_BLOCK_FRAMES; i++)
     {
       int ret;
 
-      ret = dtd_read_block( file, fifo, read_block, PRELOAD_BLOCK_FRAMES, dtd_handle_table[fifo_number].n_channels);
-
-#ifdef ZZZ
-      dtd_handle_table[fifo_number].samples_count += ret;
-#endif
+      ret = dtd_read_block( file, fifo, read_block, PRELOAD_BLOCK_FRAMES, handle->n_channels);
     }
 
   DTD_DEBUG( __debug( "opened `%s'", filename) );
@@ -314,33 +295,58 @@ static void dtd_open( const char *line)
 
 static void dtd_close( const char *line)
 {
-  int fifo_number;
-  char command[N];
+  int id;
+  dtdfifo_t *fifo;
+  dtd_handle_t *handle;
 
-  sscanf( line, "%s%d", command, &fifo_number);
+  sscanf( line, "%*s%d", &id);
+
+  fifo = dtdfifo_get( id);
+  handle = (dtd_handle_t *)dtdfifo_get_user_data( id);
 
   /*
-   * A "close" is send by FTS when it releases the fifo.
-   * It will not reallocate the fifo till it is marked
-   * as write_used, so we can safely reinitialize it here.
+   * A "close" command is send by FTS when it closes the fifo.
+   * As it will not start reading the fifo till the write serial
+   * number has incremented, which results from the next "open"
+   * command, we can safely reinitialize the fifo here.
    */
-  dtdfifo_set_eof( dtd_handle_table[fifo_number].fifo, 0);
-  dtdfifo_set_read_index( dtd_handle_table[fifo_number].fifo, 0);
-  dtdfifo_set_write_index( dtd_handle_table[fifo_number].fifo, 0);
+  dtdfifo_set_eof( fifo, 0);
+  dtdfifo_set_read_index( fifo, 0);
+  dtdfifo_set_write_index( fifo, 0);
 
-  dtdfifo_set_write_used( dtd_handle_table[fifo_number].fifo, 0);
-
-  if ( dtd_handle_table[fifo_number].file != AF_NULL_FILEHANDLE)
+  if ( handle->file != AF_NULL_FILEHANDLE)
     {
-      afCloseFile( dtd_handle_table[fifo_number].file);
-      dtd_handle_table[fifo_number].file = AF_NULL_FILEHANDLE;
+      afCloseFile( handle->file);
+      handle->file = AF_NULL_FILEHANDLE;
     }
 }
 
+static void dtd_new( const char *line)
+{
+  int id, buffer_size;
+  char dirname[N], filename[N];
+
+  sscanf( line, "%*s%d%s%s%d", &id, dirname, filename, &buffer_size);
+
+  dtdfifo_new( id, dirname, buffer_size);
+}
+
+
+static void dtd_delete( const char *line)
+{
+  int id;
+
+  sscanf( line, "%*s%d", &id);
+
+  dtdfifo_delete( id);
+}
+
+
 /*
  * Commands are:
- * open <fifo_number> <sound_file_name> <search_path> <number_of_channels>
- * close <fifo_number>
+ * new <id> <dirname> <filename> <buffer_size>
+ * open <id> <sound_file_name> <search_path>
+ * close <id>
  */
 static void dtd_process_command( const char *line)
 {
@@ -354,54 +360,43 @@ static void dtd_process_command( const char *line)
     dtd_open( line);
   else if ( !strcmp( "close", command))
     dtd_close( line);
+  else if ( !strcmp( "new", command))
+    dtd_new( line);
+  else if ( !strcmp( "delete", command))
+    dtd_delete( line);
 }
 
-static void dtd_process_fifos( void)
+static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 {
-  int i;
+  AFfilehandle file;
+  dtd_handle_t *handle;
 
-  for ( i = 0; i < N_FIFOS; i++)
+  handle = (dtd_handle_t *)user_data;
+
+  if ( handle->file != AF_NULL_FILEHANDLE && !dtdfifo_is_eof( fifo))
     {
-      AFfilehandle file;
-      dtdfifo_t *fifo;
+      int n_channels, block_size;
 
-      file = dtd_handle_table[i].file;
-      fifo = dtd_handle_table[i].fifo;
+      n_channels = handle->n_channels;
 
-      if ( file != AF_NULL_FILEHANDLE 
-	   && dtdfifo_is_read_used( fifo) 
-	   && dtdfifo_is_write_used( fifo)
-	   && !dtdfifo_is_eof( fifo))
+      block_size = BLOCK_FRAMES * n_channels * sizeof( float);
+
+      DTD_DEBUG( __debug( "polling fifo %d", id));
+
+      if ( dtdfifo_get_write_level( fifo) >= block_size )
 	{
-	  int n_channels, block_size;
+	  int ret;
 
-	  n_channels = dtd_handle_table[i].n_channels;
+	  ret = dtd_read_block( handle->file, fifo, read_block, BLOCK_FRAMES, n_channels);
 
-	  block_size = BLOCK_FRAMES * n_channels * sizeof( float);
+	  DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, id));
 
-	  DTD_DEBUG( __debug( "polling fifo %d", i));
-
-	  if ( dtdfifo_get_write_level( fifo) >= block_size )
-	    {
-	      int ret;
-
-	      ret = dtd_read_block( file, fifo, read_block, BLOCK_FRAMES, n_channels);
-
-	      DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, i));
-
-	      if (dtdfifo_is_eof( fifo))
-		DTD_DEBUG( __debug("EOF on fifo %d", i));
-
-#ifdef ZZZ
-	      dtd_handle_table[i].samples_count += ret;
-	      if ( ret<BLOCK_FRAMES)
-		DTD_DEBUG( __debug("fifo %d: total read %d frames", i, dtd_handle_table[i].samples_count));
-#endif
-	    }
-	  else
-	    {
-	      DTD_DEBUG( __debug( "fifo %d full", i) );
-	    }
+	  if (dtdfifo_is_eof( fifo))
+	    DTD_DEBUG( __debug("EOF on fifo %d", id));
+	}
+      else
+	{
+	  DTD_DEBUG( __debug( "fifo %d full", id));
 	}
     }
 }
@@ -476,7 +471,7 @@ static void dtd_main_loop( int fd)
 	    }
 	}
       
-      dtd_process_fifos();
+      dtdfifo_apply( dtd_process_fifo);
     }
 
   DTD_DEBUG( __debug( "DTD server exiting") );
@@ -583,8 +578,6 @@ int main( int argc, char **argv)
 #endif
 
   dtd_no_real_time();
-
-  dtd_init_fifos();
 
   signal( SIGUSR1, signal_handler);
 

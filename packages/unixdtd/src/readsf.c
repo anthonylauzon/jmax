@@ -27,6 +27,7 @@
  */
 
 #include "fts.h"
+#include "dtddefs.h"
 #include "dtdfifo.h"
 #include "dtdserver.h"
 
@@ -44,6 +45,7 @@ typedef struct {
   int can_post_data_late;
   readsf_state_t state;
   dtdfifo_t *fifo;
+  int id;
   fts_alarm_t eof_alarm;
   fts_alarm_t data_late_post_alarm;
 } readsf_t;
@@ -57,23 +59,18 @@ static fts_symbol_t s_pause;
 
 static void readsf_open_realize( readsf_t *this, const char *filename)
 {
-  this->fifo = dtdserver_open( filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
+  dtdserver_open( this->id, filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
 
-  if ( !this->fifo)
-    {
-      post( "readsf~: error: cannot allocate fifo for DTD server\n");
-      return;
-    }
+  dtdfifo_incr_read_serial( this->fifo);
 
   this->state = readsf_opened;
 }
 
 static void readsf_close_realize( readsf_t *this)
 {
-  if (this->fifo)
-    dtdserver_close( this->fifo);
+  if (this->id >= 0)
+    dtdserver_close( this->id);
 
-  this->fifo = 0;
   this->state = readsf_closed;
 }
 
@@ -182,6 +179,16 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   n_channels = fts_get_long_arg(ac, at, 1, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
+  this->id = dtdserver_new( DTD_BASE_DIR, BLOCK_FRAMES * n_channels * BLOCKS_PER_FIFO * sizeof( float));
+
+  if ( !this->id < 0)
+    {
+      post( "readsf~: error: cannot allocate fifo for DTD server\n");
+      return;
+    }
+
+  this->fifo = dtdfifo_get( this->id);
+
   this->state = readsf_closed;
   this->can_post_data_late = 1;
 
@@ -195,8 +202,8 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   readsf_t *this = (readsf_t *)o;
 
-  if (this->fifo)
-    dtdserver_close( this->fifo);
+  if (this->id >= 0)
+    dtdserver_delete( this->id);
 
   fts_alarm_unarm( &this->eof_alarm);	
   fts_alarm_unarm( &this->data_late_post_alarm);	
@@ -265,7 +272,11 @@ static void readsf_dsp( fts_word_t *argv)
     break;
 
   case readsf_pending:
-    if ( dtdfifo_get_read_level( this->fifo) < read_size )
+    if (dtdfifo_get_read_serial( this->fifo) != dtdfifo_get_write_serial( this->fifo))
+      {
+	clear_outputs( n, n_channels, outputs);
+      }
+    else if ( dtdfifo_get_read_level( this->fifo) < read_size )
       {
 	clear_outputs( n, n_channels, outputs);
       }

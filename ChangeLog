@@ -1,3 +1,8 @@
+2000-09-28  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	*  package/unixdtd/src/*: changed a little bit the implementation of
+	DTD. Now, a fifo is allocated for each readsf~ object.
+
 2000-09-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed with Norbert remaining bug in DTD (strange pauses in readsf~)

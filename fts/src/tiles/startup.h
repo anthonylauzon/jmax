@@ -24,9 +24,11 @@
  *
  */
 
-#ifndef _FTS_KERNEL_H_
-#define _FTS_KERNEL_H_
-extern void fts_kernel_init(int argc, char **argv);
-extern void fts_run(const char **bootdata);
-extern void fts_halt(void);
+#ifndef _FTS_STARTUP_H_
+#define _FTS_STARTUP_H_
+
+extern char *fts_get_root_dir( void);
+extern char *fts_get_arch( void);
+extern char *fts_get_mode( void);
+
 #endif

@@ -41,3 +41,12 @@ install:
 		$(INSTALL_LIB) libsgidev.so $(lib_install_dir)/packages/sgidev/lib/$(ARCH)/opt/libsgidev.so ; \
 	)
 .PHONY: install
+
+# The following line is a hack that installs the <package>.jpk file on all platforms
+# (this is so that you can load the sgidev package even if you are running the GUI
+# on Linux
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/sgidev
+	$(INSTALL_DATA) sgidev.jpk $(lib_install_dir)/packages/sgidev/sgidev.jpk
+	$(INSTALL_DATA) sgidev.scm $(lib_install_dir)/packages/sgidev/sgidev.scm
+.PHONY: install-noarch

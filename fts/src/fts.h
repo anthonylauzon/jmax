@@ -35,6 +35,7 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime.h"
+#include "tiles/startup.h"
 
 #endif
 

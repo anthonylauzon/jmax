@@ -39,4 +39,11 @@ install:
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev.so $(lib_install_dir)/packages/alsadev/lib/$(ARCH)/opt/libalsadev.so )
 .PHONY: install
 
-
+# The following line is a hack that installs the <package>.jpk file on all platforms
+# (this is so that you can load the sgidev package even if you are running the GUI
+# on Linux
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/alsadev
+	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/packages/alsadev/alsadev.jpk
+	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/packages/alsadev/alsadev.scm
+.PHONY: install-noarch

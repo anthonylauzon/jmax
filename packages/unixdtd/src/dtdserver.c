@@ -56,26 +56,6 @@ static int server_socket = 0;
 static int server_port = 0;
 #endif
 
-static dtdfifo_t *dtd_fifos[N_FIFOS];
-
-static void dtdserver_create_fifos( void)
-{
-  int n;
-
-  /* For now, the number of fifos, the block size and the number of blocks are fixed */
-  for ( n = 0; n < N_FIFOS; n++)
-    dtd_fifos[n] = dtdfifo_new( n, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
-}
-
-/*
- * (HACK)
- * These functions are actually defined in fts/src/tiles/startup.c.
- * They should be defined by settings.
- */
-extern char *fts_get_root_dir( void);
-extern char *fts_get_arch( void);
-extern char *fts_get_mode( void);
-
 static void dtdserver_fork( void)
 {
   int to_child_pipe[2];
@@ -154,7 +134,6 @@ static int dtdserver_create_socket( void)
 
 void dtdserver_init( void)
 {
-  dtdserver_create_fifos();
   dtdserver_fork();
 
 #ifdef USE_UDP
@@ -167,6 +146,7 @@ void dtdserver_init( void)
 
 void dtdserver_exit( void)
 {
+  fprintf( stderr, "Killing DTD server (pid = %d)\n", server_pid);
   kill( server_pid, SIGKILL);
 }
 
@@ -198,54 +178,42 @@ static void dtdserver_send_command( const char *command)
 }
 #endif
 
-dtdfifo_t *dtdserver_open( const char *filename, const char *path, int n_channels)
+int dtdserver_new( const char *dirname, int buffer_size)
 {
-  int n;
+  char buffer[1024];
+  int id;
 
-  for ( n = 0; n < N_FIFOS; n++)
-    {
-      if ( ! dtdfifo_is_read_used( dtd_fifos[n]) && ! dtdfifo_is_write_used( dtd_fifos[n]))
-	{
-	  char buffer[1024];
+  id = dtdfifo_new( 0, dirname, buffer_size);
 
-	  dtdfifo_set_read_used( dtd_fifos[n], 1);
-
-	  sprintf( buffer, "open %d %s %s %d", n, filename, path, n_channels);
-	  dtdserver_send_command( buffer);
-
-	  return dtd_fifos[n];
-	}
-    }
-
-  return NULL;
+  sprintf( buffer, "new %d %s %d", id, dirname, buffer_size);
+  dtdserver_send_command( buffer);
+  
+  return id;
 }
 
-static int dtdserver_fifo_get( dtdfifo_t *fifo)
+void dtdserver_open( int id, const char *filename, const char *path, int n_channels)
 {
-  int n;
+  char buffer[1024];
 
-  for ( n = 0; n < N_FIFOS; n++)
-    {
-      if ( dtd_fifos[n] == fifo)
-	return n;
-    }
-
-  assert( n != N_FIFOS);
-
-  return -1;
-}
-
-void dtdserver_close( dtdfifo_t *fifo)
-{
-  int n;
-  char buffer[256];
-
-  n = dtdserver_fifo_get( fifo);
-
-  dtdfifo_set_read_used( dtd_fifos[n], 0);
-
-  sprintf( buffer, "close %d", n);
+  sprintf( buffer, "open %d %s %s %d", id, filename, path, n_channels);
   dtdserver_send_command( buffer);
 }
 
+void dtdserver_close( int id)
+{
+  char buffer[128];
+
+  sprintf( buffer, "close %d", id);
+  dtdserver_send_command( buffer);
+}
+
+void dtdserver_delete( int id)
+{
+  char buffer[128];
+
+  dtdfifo_delete( id);
+
+  sprintf( buffer, "delete %d", id);
+  dtdserver_send_command( buffer);
+}
 
