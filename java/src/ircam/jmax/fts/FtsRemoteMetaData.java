@@ -66,14 +66,14 @@ class FtsRemoteMetaData extends FtsRemoteData
     FtsRemoteData data;
     int id;
 
-    id = fts.getServer().getRemoteTable().getNewDataID();
+    id = getFts().getServer().getRemoteTable().getNewDataID();
 
     remoteCall(REMOTE_NEW, id, name, args);
    
-    fts.sync();
+    getFts().sync();
 
-    data = fts.getServer().getRemoteTable().get(id);
-    data.setFts(fts);
+    data = getFts().getServer().getRemoteTable().get(id);
+    data.setFts(getFts());
     data.setMaster();
     return data;
   }
@@ -137,9 +137,9 @@ class FtsRemoteMetaData extends FtsRemoteData
 	return;
       }
 
-    newRemoteData.setFts( fts);
+    newRemoteData.setFts( getFts());
     newRemoteData.setId( newId);
-    fts.getServer().getRemoteTable().put( newId, newRemoteData);
+    getFts().getServer().getRemoteTable().put( newId, newRemoteData);
   }
 
 

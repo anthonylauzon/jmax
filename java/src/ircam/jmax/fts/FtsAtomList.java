@@ -94,7 +94,7 @@ public class FtsAtomList extends FtsRemoteData
   public void forceUpdate()
   {
     remoteCall(REMOTE_UPDATE);
-    fts.sync();
+    getFts().sync();
   }
 
 

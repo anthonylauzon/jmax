@@ -162,7 +162,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.InitLock();
     itsSketchPad.setMessageDisplayer(this);
     
-    patcherData.getFts().addUpdateGroupListener(itsSketchPad);//bug fix 11/5 
+    patcherData.getFts().addUpdateGroupListener(itsSketchPad);
 
     // Finally, activate the updates
     patcherData.startUpdates();

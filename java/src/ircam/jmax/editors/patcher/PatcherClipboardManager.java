@@ -122,8 +122,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	  MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
 	  ftsClipboard.copy( sketch.getFts().getSelection());
 	  sketch.setLastCopyCount(ftsClipboard.getCopyCount());
-	  sketch.resetPaste(0);
-	  
+	  sketch.resetPaste(0);	  
 	  container.getFrame().setCursor( temp);
 	}
   }
@@ -151,55 +150,56 @@ public class PatcherClipboardManager implements ClipboardOwner
       return; // Should never happen, protection against system clipboard bug.
 
     if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
-      {
-	if (sketch.canPasteText())
-	  {
-	    try
-	      {
-		sketch.pasteText();
-	      }
-	    catch (Exception e)
-	      {
-		System.err.println("error while pasting text: " + e);
-	      }
-	  }
-      }
-    else if (clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor))
-      {
-	Cursor temp = container.getFrame().getCursor();
-	container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	{
+	    if (sketch.canPasteText())
+		{
+		    try
+			{
+			    sketch.pasteText();
+			}
+		    catch (Exception e)
+			{
+			    System.err.println("error while pasting text: " + e);
+			}
+		}
+	}
+    else //if(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor))
+	{
 
-	// Should get the fts clipboard from the System.clipboard content !!!!!
+	    Cursor temp = container.getFrame().getCursor();
+	    container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	    
+	    // Should get the fts clipboard from the System.clipboard content !!!!!
+	    
+	    pasting = true;
+	    
+	    if (sketch.getLastCopyCount() != ftsClipboard.getCopyCount())
+		{
+		    sketch.resetPaste(-1);
+		    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
+		}
 
-	pasting = true;
+	    ftsClipboard.paste( sketch.getFtsPatcher());
+	    
+	    sketch.getFtsPatcherData().update();
+    
+	    sketch.getFts().sync();
 
-	if (sketch.getLastCopyCount() != ftsClipboard.getCopyCount())
-	  {
-	    sketch.resetPaste(-1);
-	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
-	  }
+	    pasting = false;
+	    
+	    // make the sketch do the graphic job
 
-	ftsClipboard.paste( sketch.getFtsPatcher());
+	    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
+		{
+		    PasteObjects(sketch);
+		    sketch.fixSize();
+		}
+	    
+	    ftsObjectsPasted.removeAllElements();
+	    ftsConnectionsPasted.removeAllElements();
 
-	sketch.getFtsPatcherData().update();
-
-	sketch.getFts().sync();
-
-	pasting = false;
-	
-	// make the sketch do the graphic job
-
-	if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
-	  {
-	    PasteObjects(sketch);
-	    sketch.fixSize();
-	  }
-	  
-	ftsObjectsPasted.removeAllElements();
-	ftsConnectionsPasted.removeAllElements();
-
-	container.getFrame().setCursor(temp);
-      }
+	    container.getFrame().setCursor(temp);
+	}
   }
 
   void PasteObjects(ErmesSketchPad sketch) 

@@ -112,12 +112,12 @@ public class FtsObjectSet extends FtsRemoteData
     super.setFts(fts);
 
     editListener = new ObjectSetEditListener();
-    fts.addEditListener(editListener);
+    getFts().addEditListener(editListener);
   }
 
   public void release()
   {
-    fts.removeEditListener(editListener);
+    getFts().removeEditListener(editListener);
     super.release();
   }
 
@@ -165,7 +165,7 @@ public class FtsObjectSet extends FtsRemoteData
     remoteCallAddArg(name);
     remoteCallEnd();
 
-    fts.sync();
+    getFts().sync();
   }
 
 

@@ -115,7 +115,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     widgets.add( toSaveButton);
     /////////////////////
 
-    if ((sketch.itsPatcher.getParent() != null) &&
+    if ((sketch.getFtsPatcher().getParent() != null) &&
 	(!sketch.isARootPatcher()))
       {
 	upButton = new JButton(SystemIcons.get( "_up_"));
@@ -126,7 +126,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 	  public void actionPerformed( ActionEvent e)
 	    {
 	      sketch.waiting();
-	      sketch.getFts().editPropertyValue(sketch.itsPatcher.getParent(), sketch.itsPatcher, 
+	      sketch.getFts().editPropertyValue(sketch.getFtsPatcher().getParent(), sketch.getFtsPatcher(), 
 						new MaxDataEditorReadyListener()
 						{
 						  public void editorReady(MaxDataEditor editor)

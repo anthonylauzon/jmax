@@ -59,8 +59,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void redefinePatcher(String description)
   {
-    fts.getServer().redefinePatcherObject(this, description);
-    fts.sync();
+    getFts().getServer().redefinePatcherObject(this, description);
+    getFts().sync();
 
     setDirty();
   }

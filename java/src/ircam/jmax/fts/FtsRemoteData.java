@@ -25,6 +25,7 @@
 
 package ircam.jmax.fts;
 
+import java.io.*;
 import java.lang.*;
 import java.util.*;
 
@@ -37,7 +38,7 @@ import ircam.jmax.utils.*;
 
 public abstract class FtsRemoteData implements MaxData
 {
-  Fts fts;
+  private Fts fts;
 
   void setFts(Fts fts)
   {

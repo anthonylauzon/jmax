@@ -62,12 +62,12 @@ public class FtsClipboard  extends FtsObject
   {
     empty = false;
     copyCount++;
-    fts.getServer().sendObjectMessage(this, -1, "copy", sel);
+    getFts().getServer().sendObjectMessage(this, -1, "copy", sel);
   }
 
   public void paste(FtsObject patcher)
   {
-    fts.getServer().sendObjectMessage(this, -1, "paste", patcher);
+    getFts().getServer().sendObjectMessage(this, -1, "paste", patcher);
   }
 
   public int getCopyCount()

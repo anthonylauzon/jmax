@@ -61,7 +61,7 @@ public class FtsIntValueObject extends FtsObject
     public void setValue(int value)
     {
 	this.value = value;
-	fts.getServer().putObjectProperty(this, "value", value);
+	getFts().getServer().putObjectProperty(this, "value", value);
     }
 
     /** Get the current value */
@@ -75,7 +75,7 @@ public class FtsIntValueObject extends FtsObject
 
     public void updateValue()
     {
-	fts.getServer().askObjectProperty(this, "value");
+	getFts().getServer().askObjectProperty(this, "value");
     }
        
     /* Over write the localPut message to handle value changes;

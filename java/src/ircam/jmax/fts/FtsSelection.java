@@ -36,7 +36,7 @@ import ircam.jmax.utils.*;
  * Only one instance for server is built.
  */
 
-public class FtsSelection  extends FtsObject
+public class FtsSelection extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -46,11 +46,11 @@ public class FtsSelection  extends FtsObject
 
   /** The objects contained in the patcher */
 
-  private MaxVector objects     = new MaxVector();
+    private MaxVector objects     = new MaxVector();
 
   /** All the connections between these objects */
 
-  private MaxVector connections = new MaxVector();
+    private MaxVector connections = new MaxVector();
 
   /**
    * Create a Fts selection;
@@ -58,7 +58,7 @@ public class FtsSelection  extends FtsObject
 
     protected FtsSelection(Fts fts, FtsObject parent/*, int objId*/)
   {
-      super(fts, parent/*, objId*/, null, "__selection", "");
+      super(fts, parent, null, "__selection", "");
   }
 
   /** Add an object to this container  */
@@ -67,7 +67,7 @@ public class FtsSelection  extends FtsObject
   {
     objects.addElement(obj);
 
-    fts.getServer().sendObjectMessage(this, -1, "add_object", obj);
+    getFts().getServer().sendObjectMessage(this, -1, "add_object", obj);
   }
 
   /** Remove an object from this container. */
@@ -77,13 +77,13 @@ public class FtsSelection  extends FtsObject
     if (objects.contains(obj))
       {
 	objects.removeElement(obj);
-	fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
+	getFts().getServer().sendObjectMessage(this, -1, "remove_object", obj);
       }
   }
 
   /** Get the objects */
 
-  final public MaxVector getObjects()
+    final public MaxVector getObjects()
   {
     return objects;
   }
@@ -94,7 +94,7 @@ public class FtsSelection  extends FtsObject
   {
     connections.addElement(obj);
 
-    fts.getServer().sendObjectMessage(this, -1, "add_connection", obj);
+    getFts().getServer().sendObjectMessage(this, -1, "add_connection", obj);
   }
 
   /** Remove an connection from this container. */
@@ -104,13 +104,13 @@ public class FtsSelection  extends FtsObject
     if (connections.contains(obj))
       {
 	connections.removeElement(obj);
-	fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
+	getFts().getServer().sendObjectMessage(this, -1, "remove_connection", obj);
       }
   }
 
   /** Get the connections */
 
-  final public MaxVector getConnections()
+    final public MaxVector getConnections()
   {
     return connections;
   }

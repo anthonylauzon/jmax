@@ -29,6 +29,7 @@ import java.awt.*;
 import java.lang.reflect.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -51,7 +52,7 @@ import ircam.jmax.editors.patcher.actions.*;
 
 // A survivor...
 
-abstract public class GraphicObject implements DisplayObject
+abstract public class GraphicObject implements DisplayObject, Serializable
 {
   public static class ObjectGeometry
   {
@@ -143,14 +144,14 @@ abstract public class GraphicObject implements DisplayObject
     followingLocations = v;
   }
 
-  protected ErmesSketchPad itsSketchPad;
+  protected transient ErmesSketchPad itsSketchPad;
 
-  protected FtsObject ftsObject = null;
+  protected transient FtsObject ftsObject = null;
 
-  private boolean selected = false;
+  private transient boolean selected = false;
 
-  int inletDistance; // the distance between two inlets anchor point
-  int outletDistance; // the distance between two outlets anchor point
+  private transient int inletDistance; // the distance between two inlets anchor point
+  private transient int outletDistance; // the distance between two outlets anchor point
   public int getInletDistance(){return inletDistance;}
   public int getOutletDistance(){return outletDistance;}
   public void setInletDistance(int dist){inletDistance=dist;}

@@ -57,8 +57,8 @@ import ircam.jmax.toolkit.*;
 public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGroupListener, Printable
 {
   
-  boolean somethingToUpdate = false;
-  Rectangle invalid = new Rectangle();
+  private boolean somethingToUpdate = false;
+  private Rectangle invalid = new Rectangle();
   
   //GlassPanel glass;
   public void paintAtUpdateEnd(GraphicObject object, int x, int y, int w, int h)
@@ -133,7 +133,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     return keyMap;
   }
 
-  EditorContainer itsEditorContainer;
+  private EditorContainer itsEditorContainer;
 
   public EditorContainer getEditorContainer(){
     return itsEditorContainer;
@@ -146,7 +146,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     return fts;
   }
 
-  FtsObject itsPatcher;
+  private FtsObject itsPatcher;
 
   public FtsObject getFtsPatcher()
   {
@@ -167,7 +167,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     return ((!itsDocument.isRootData(itsPatcherData))&&!(itsPatcher instanceof FtsPatcherObject));
   }
 
-  FtsPatcherData itsPatcherData;
+  private FtsPatcherData itsPatcherData;
 
   public FtsPatcherData getFtsPatcherData()
   {
@@ -236,7 +236,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 	      }
   }
 
-  boolean automaticFitToText = false;
+  private boolean automaticFitToText = false;
   public void setAutomaticFitToText(boolean fit){
     automaticFitToText = fit;
   }
@@ -408,7 +408,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     //glass = ((GlassPanel)((JFrame)itsEditorContainer.getFrame()).getGlassPane());
   }
   
-  float sx, sy;
+  private float sx, sy;
   public void scale(float scaleX, float scaleY)
   {
       sx = scaleX;
@@ -620,7 +620,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // -----------------------------------------------------------------------
   // Handling of the object text editing
   // -----------------------------------------------------------------------
-  Editable editedObject = null;
+  private Editable editedObject = null;
   private EditField itsEditField;
 
   final public EditField getEditField()
@@ -943,7 +943,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // are Swing components and use the focus.
   // ------------------------------------------------------------------------
 
-  KeyEventClient keyEventClient;
+  private KeyEventClient keyEventClient;
 
   public void setKeyEventClient( KeyEventClient kv)
   {
@@ -1002,8 +1002,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     setEditModeInteraction();
   }
 
-  String newObjectDescription = null;
-  boolean newObjectEdit;
+  private String newObjectDescription = null;
+  private boolean newObjectEdit;
 
   public void setAddModeInteraction(String description, String message, boolean edit)
   {
@@ -1108,8 +1108,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     highlightedInletObject = null;
   }
 
-  int highlightedOutlet;
-  GraphicObject  highlightedOutletObject = null;
+  private int highlightedOutlet;
+  private GraphicObject  highlightedOutletObject = null;
 
   public int getHighlightedOutlet()
   {
@@ -1171,7 +1171,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // ------------------------------------------------------------------------
   // current object during a connection drawing (used in getSensibleArea in GraphicObject
   // ------------------------------------------------------------------------
-  GraphicObject connectingObject = null;
+  private GraphicObject connectingObject = null;
   public void setConnectingObject(GraphicObject obj){
     connectingObject = obj;
   }
@@ -1181,7 +1181,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // -----------------------------------------------------------------
   // Messages 
   // -----------------------------------------------------------------
-  MessageDisplayer itsMessageDisplayer;
+  private MessageDisplayer itsMessageDisplayer;
   public void setMessageDisplayer(MessageDisplayer displayer){
       itsMessageDisplayer = displayer;
   }
@@ -1235,3 +1235,10 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       itsPatcherData.startUpdates();
   }
 }
+
+
+
+
+
+
+

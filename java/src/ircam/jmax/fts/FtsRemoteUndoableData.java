@@ -90,7 +90,7 @@ public abstract class FtsRemoteUndoableData extends FtsRemoteData implements Und
 
   //----- Fields
 
-  UndoableEditSupport undo;
+  private UndoableEditSupport undo;
   UndoManager undoM;
 
   boolean inGroup = false;

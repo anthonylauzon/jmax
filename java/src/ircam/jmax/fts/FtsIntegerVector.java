@@ -119,7 +119,7 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
   public void forceUpdate()
   {
     remoteCall(REMOTE_UPDATE);
-    fts.sync();
+    getFts().sync();
   }
 
   /** Declare that a range in the vector has been changed

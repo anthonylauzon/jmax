@@ -96,7 +96,7 @@ public class FtsUndoableObject extends FtsObject implements UndoableData{
 
   //----- Fields
 
-  UndoableEditSupport undo;
+  private UndoableEditSupport undo;
   UndoManager undoM;
 
   boolean inGroup = false;

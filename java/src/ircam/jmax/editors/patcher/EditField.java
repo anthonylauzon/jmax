@@ -121,7 +121,7 @@ public class EditField extends JTextArea implements FocusListener
     }
   }
 
-  EditFieldListener  listener = new EditFieldListener();
+  private EditFieldListener  listener = new EditFieldListener();
 
   //--------------------------------------------------------
   // CONSTRUCTOR

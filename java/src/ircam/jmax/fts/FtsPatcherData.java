@@ -342,7 +342,7 @@ public class FtsPatcherData extends FtsRemoteData
   // Edit And Change Listener
   //
 
-  FtsPatcherListener listener;
+  private FtsPatcherListener listener;
 
   /** Set the patcher data listener */
 
