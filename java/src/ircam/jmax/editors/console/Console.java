@@ -27,9 +27,14 @@ package ircam.jmax.editors.console;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.script.*;
+
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+
+import ircam.jmax.toolkit.*;
+import java.awt.datatransfer.*;
+
 /**
  A generic reusable panel containing a ConsoleThread
   */
@@ -38,7 +43,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class Console extends JPanel {
+public class Console extends JPanel implements Editor, ClipboardOwner, Transferable{
   StringBuffer itsSbuf = new StringBuffer();
   ConsoleTextArea itsTextArea;
   Interpreter itsInterp;
@@ -47,14 +52,26 @@ public class Console extends JPanel {
   ConsoleKeyListener itsKeyListener;
   KeyListener itsContainer;
 
-  public Console(Interpreter i) {
+  JScrollPane itsScrollerView;
+  String itsCopiedText;
+
+  public Console(EditorContainer container, Interpreter i) {
     StringBuffer itsSbuf = new StringBuffer();
     itsTextArea = new ConsoleTextArea(40, 40);
+
+    itsScrollerView = new JScrollPane();
+    itsScrollerView.setViewportView(itsTextArea); 
+    itsScrollerView.getHorizontalScrollBar().setUnitIncrement( 10);
+    itsScrollerView.getVerticalScrollBar().setUnitIncrement( 10);
+    itsScrollerView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    itsScrollerView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+    itsEditorContainer = container;
 
     itsInterp = i;
 
     setLayout(new BorderLayout());
-    add("Center", itsTextArea);
+    add("Center", itsScrollerView);
 
     itsKeyListener = new ConsoleKeyListener(this);
     itsTextArea.addKeyListener(itsKeyListener);
@@ -164,6 +181,58 @@ public class Console extends JPanel {
       Put("> ");
     }
   }
+  
+  //------------------- Editor interface ---------------
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
+
+  EditorContainer itsEditorContainer;
+
+  public EditorContainer getEditorContainer(){
+    return itsEditorContainer;
+  }
+  public void Close(boolean doCancel){}
+  //-------------------------------------------
+
+  // ----------ClipboardOwner interface methods
+  public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+
+  //-----------Tranferable interface methods-------------
+  public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+    return itsCopiedText;
+  }
+
+  public DataFlavor[] getTransferDataFlavors() {
+    DataFlavor flavorList[] = new DataFlavor[1];
+    flavorList[0] = DataFlavor.plainTextFlavor;
+    return (flavorList);
+  }
+
+  public boolean isDataFlavorSupported(DataFlavor flavor) {
+    return true;
+  }
+  //end
+
+  public void Copy() {
+    if (! itsTextArea.getSelectedText().equals(""))
+      {
+	MaxApplication.systemClipboard.setContents(this, this);
+	itsCopiedText = itsTextArea.getSelectedText();
+      }
+  }
+
+  public void Paste(){
+    String aPastingString = new String();
+    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
+    
+    try {
+      aPastingString = (String) aTransferable.getTransferData(DataFlavor.plainTextFlavor);
+    } catch (Exception e) {}
+    
+    PutInKeyboardBuffer(aPastingString);
+  } 
 }
 
 

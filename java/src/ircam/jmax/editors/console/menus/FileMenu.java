@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,35 +23,30 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.console;
+package ircam.jmax.editors.console.menus;
 
 import java.awt.*;
+import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
 
-public class ConsoleTextArea extends JTextArea {
-  static final int CHAR_SAVED=1000; 
+import ircam.jmax.editors.console.*;
+import ircam.jmax.editors.console.actions.*;
 
-  public ConsoleTextArea(int r, int c) {
-    super(r, c);
-  }
-  
-  public boolean isSelectedText(){
-    String text = getSelectedText();
-    if(text==null) return false;
-    if(text.equals("")) return false;
-    else return true;
-  }
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
-  public void append(String str) {
-    super.append(str);
-    /*if (getText().length() < CHAR_SAVED) {
-      super.append(str);
-    }
-    else {
-      String temp = getText();
-      setText(temp.substring(temp.length()-CHAR_SAVED, temp.length()));
-      setCaretPosition(getText().length());
-    }*/
+/** Implement the patcher editor File Menu */
+
+public class FileMenu extends DefaultFileMenu
+{
+  public FileMenu()
+  {
+    super();
+    insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 3);
+
+    remove(4);
   }
 }
 

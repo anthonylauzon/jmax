@@ -38,17 +38,20 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.console.menus.*;
 
 /**
   Window containing a tcl console
   */
-
-
  
-public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transferable{
+public class ConsoleWindow extends JFrame implements WindowListener, EditorContainer, KeyListener {
   StringBuffer itsSbuf = new StringBuffer();
   Console itsConsole;
-  String itsCopiedText;
+
+  private FileMenu itsFileMenu;
+  private EditMenu itsEditMenu;	
+  private JMenu itsWindowsMenu;
+  private JMenu itsToolsMenu;
 
   static private ConsoleWindow theConsoleWindow = null;
 
@@ -61,25 +64,25 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
 
   public ConsoleWindow() {
-    super("jMax Console", false);
+    super("jMax Console");
 
     MaxWindowManager.setTopFrame(this);
 
-    itsConsole = new Console(MaxApplication.getInterpreter());
+    itsConsole = new Console(this, MaxApplication.getInterpreter());
     itsConsole.Start();
 
     if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 
-	(MaxApplication.getProperty("jmaxNoConsole").equals("false")))
+	 (MaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
-	  System.setOut(itsConsole.getPrintStream());
+	System.setOut(itsConsole.getPrintStream());
       }
     else
-	{
-	    itsConsole.getTextArea().setRows( 10);
-	}
-
+      {
+	itsConsole.getTextArea().setRows( 10);
+      }
+    
     getContentPane().setLayout(new BorderLayout());
-
+    
     getContentPane().add("Center", itsConsole);
     itsConsole.SetContainer(this);
 
@@ -88,8 +91,9 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
     if (theConsoleWindow == null)
       theConsoleWindow = this;
-
-    Init();
+    
+    // Build The Menus and Menu Bar
+    makeMenuBar();
 
     validate();
 
@@ -100,82 +104,71 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     if ((MaxApplication.getProperty("jmaxNoConsole") != null) &&
 	(MaxApplication.getProperty("jmaxNoConsole").equals("true")))
 	{
-	    itsConsole.getPrintStream().println( "Output redirected to Java standard output");
+	  itsConsole.getPrintStream().println( "Output redirected to Java standard output");
 	}
 
     itsConsole.getTextArea().setCaretPosition(itsConsole.getTextArea().getText().length());
   }
   
+  private final void makeMenuBar(){
+    JMenuBar mb = new JMenuBar();
+    
+    // Build the file menu
+    itsFileMenu = new FileMenu();
+    mb.add( itsFileMenu); 
+    
+    // Build the edit menu
+    itsEditMenu = new EditMenu(this); 
+    mb.add( itsEditMenu); 
+    
+    // New Tool menu 
+    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
+    mb.add(itsToolsMenu);
 
-  public void SetupMenu(){
-    getCloseMenu().setEnabled(false);
-    getSaveMenu().setEnabled(false);
-    getSaveAsMenu().setEnabled(false);
-    getPrintMenu().setEnabled(true);
-    getCutMenu().setEnabled(false);
-    getCopyMenu().setEnabled(true);//clipboard test
-    getPasteMenu().setEnabled(true);
-    getDuplicateMenu().setEnabled(true);
+    // New Window Manager based Menu
+    itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
+    mb.add(itsWindowsMenu);
+
+    setJMenuBar(mb);
   }
 
-  // start of ClipboardOwner, Tranferable interface methods
-  public void lostOwnership(Clipboard clipboard, Transferable contents) {
-    //nun me ne po' frega' de meno
+  // ------ editorContainer interface ---------------
+  public Editor getEditor(){
+    return itsConsole;
   }
-  //--
-  public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-    return itsCopiedText;
+  public Frame getFrame(){
+    return this;
   }
-
-  public DataFlavor[] getTransferDataFlavors() {
-    DataFlavor flavorList[] = new DataFlavor[1];
-    flavorList[0] = DataFlavor.plainTextFlavor;
-    //    System.err.println("quali flavor supporto? io dico plainText "+DataFlavor.plainTextFlavor.toString());
-    return (flavorList);
+  public Point getContainerLocation(){
+    return getLocation();
   }
-
-  public boolean isDataFlavorSupported(DataFlavor flavor) {
-    //System.err.println("is supported "+flavor.toString()+"? io dico si");
-    return true;
+  public Rectangle getViewRectangle(){
+    return getContentPane().getBounds();
   }
-  //end
-
-  protected void Copy() {
-    if (! itsConsole.itsTextArea.getSelectedText().equals(""))
-      {
-	MaxApplication.systemClipboard.setContents(this, this);
-	itsCopiedText = itsConsole.itsTextArea.getSelectedText();//tout simplement
-      }
+  // ----------------- WindowListener ---------------  
+  public void windowClosing(WindowEvent e){
+    MaxApplication.Quit();
   }
-
-  protected void Paste(){
-    String aPastingString = new String();
-    Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
-
-    try {
-      aPastingString = (String) aTransferable.getTransferData(DataFlavor.plainTextFlavor);
-    } catch (Exception e) {
-    }
-
-    itsConsole.PutInKeyboardBuffer(aPastingString);
+  public void windowOpened(WindowEvent e){}
+  public void windowClosed(WindowEvent e){}
+  public void windowIconified(WindowEvent e){}
+  public void windowDeiconified(WindowEvent e){}
+  public void windowActivated(WindowEvent e){
+    requestFocus();
   }
-
-  //redefini parce-que la console ne doit pas se fermer sans quitter
-  public void Close(){}
-
-  public void Print(){
-    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Console", MaxApplication.getProperties());
-    if(aPrintjob != null){
-      Graphics aPrintGraphics = aPrintjob.getGraphics();
-      if(aPrintGraphics != null){
-	//aPrintGraphics.setClip(0, 0, 400, 400);
-	printAll(aPrintGraphics);
-	aPrintGraphics.dispose();
-      }
-      aPrintjob.end();
-    }
-  }
+  public void windowDeactivated(WindowEvent e){}
+  ////////////////////////////////////////////////////////////WindowListener --fine
+ ////////////////////////////////////////////////////////////////keyListener --inizio  
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+  public void keyPressed(KeyEvent e){}
+  ///////////////////////////////////////////////////////////////// keyListener --fine
 }
+
+
+
+
+
 
 
 

@@ -23,35 +23,26 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.console;
+package ircam.jmax.editors.console.actions;
 
 import java.awt.*;
+import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
 
-public class ConsoleTextArea extends JTextArea {
-  static final int CHAR_SAVED=1000; 
+import ircam.jmax.*;
+import ircam.jmax.editors.console.*;
 
-  public ConsoleTextArea(int r, int c) {
-    super(r, c);
-  }
-  
-  public boolean isSelectedText(){
-    String text = getSelectedText();
-    if(text==null) return false;
-    if(text.equals("")) return false;
-    else return true;
-  }
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-  public void append(String str) {
-    super.append(str);
-    /*if (getText().length() < CHAR_SAVED) {
-      super.append(str);
-    }
-    else {
-      String temp = getText();
-      setText(temp.substring(temp.length()-CHAR_SAVED, temp.length()));
-      setCaretPosition(getText().length());
-    }*/
+public class CopyAction extends EditorAction
+{
+  public  void doAction(EditorContainer container)
+  {
+    ((Console)container.getEditor()).Copy();
   }
 }
+
 
