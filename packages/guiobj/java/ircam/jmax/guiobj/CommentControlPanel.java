@@ -85,7 +85,7 @@ public class CommentControlPanel extends JPanel implements ObjectControlPanel
     add(colorPanel);
 
     /*********************** transparency *********************/
-    JLabel transpLabel = new JLabel("Transparency", JLabel.CENTER);
+    JLabel transpLabel = new JLabel("Opacity", JLabel.CENTER);
     transpLabel.setForeground(Color.black);
     alphaLabel = new JLabel("", JLabel.CENTER);
     
