@@ -26,8 +26,9 @@
 package ircam.jmax.utils;
 
 import java.util.*;
+import java.io.*;
 
-public class MaxVector
+public class MaxVector implements Serializable
 {
   protected Object objects[];
   protected int fillPointer; // point to the next not used element 

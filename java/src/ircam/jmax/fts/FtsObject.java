@@ -43,7 +43,7 @@ import java.awt.*;
  * FTS instantiation 
  */
 
-public class FtsObject 
+public class FtsObject implements Serializable
 {
   static final public int systemInlet = -1;
   
@@ -293,7 +293,7 @@ public class FtsObject
   }
 
 
-  protected Object listener;
+  protected transient Object listener;
 
   /** Set the unique object listener */
 
@@ -317,19 +317,19 @@ public class FtsObject
 
   /** The Fts Server this object belong to */
 
-  Fts fts;
+  private transient Fts fts;
 
   /** Fts Object ID  */
 
-  private int ftsId = -1;
+  private transient int ftsId = -1;
 
   /** A flag to handle double deletes from the editor; should be done better */
 
-  private boolean deleted = false;
+  private transient boolean deleted = false;
 
   /** The parent object. Usually the container patcher or abstraction or template */
 
-  FtsObject parent;
+  private transient FtsObject parent;
 
   /** The Fts class Name */
 
@@ -663,7 +663,7 @@ public class FtsObject
       return "";
   }
 
-  FtsPatcherDocument document;
+  private transient FtsPatcherDocument document;
 
   /** Get the MaxDocument this objects is part of;
    * Actually the patcher document should be
@@ -945,7 +945,7 @@ public class FtsObject
   /**
    * count of error-objects in a subpatcher or template (to paint this in orange !!!)
    */
-  int errcount = 0;
+  private transient int errcount = 0;
   public void removeErrorObject(FtsObject obj)
   {
     if(!isARootPatcher())
@@ -1001,10 +1001,10 @@ public class FtsObject
    */
 
   //final variables used by invokeLater method
-  JFileChooser fd;
-  Frame parentFrame;
-  String dialogText;
-  String callbackMethod;
+  private transient JFileChooser fd;
+  private transient Frame parentFrame;
+  private transient String dialogText;
+  private transient String callbackMethod;
   
   public void openFileDialog(int nArgs, FtsAtom args[])
   {

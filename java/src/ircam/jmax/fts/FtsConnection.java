@@ -34,7 +34,7 @@ import java.util.*;
  * Deals with the connection creation/deletion and saving/loading.
  */
 
-public class FtsConnection 
+public class FtsConnection implements Serializable
 {
   /* numbering doubled on server side (mess_types.h) */
   public static final int fts_connection_invalid = 0; /* from error object or type missmatch */
@@ -43,13 +43,13 @@ public class FtsConnection
   public static final int fts_connection_object = 3; /* objects */
   public static final int fts_connection_signal = 4; /* signal connection */
 
-  Fts  fts; // the server this connection belong to.
+  private transient Fts  fts; // the server this connection belong to.
 
-  private int id;
+  private transient int id;
 
-  protected FtsConnectionListener listener;
+  protected transient FtsConnectionListener listener;
   
-  boolean deleted = false; 
+  private transient boolean deleted = false; 
   FtsObject from;
   int outlet;
 
@@ -197,4 +197,5 @@ public class FtsConnection
     return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ", <" + type + ">)";
   }
 }
+
 
