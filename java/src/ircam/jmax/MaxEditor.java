@@ -15,6 +15,10 @@ import com.sun.java.swing.*;
  * such as the Window menu handling, initialisation, and others.
  */
 public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener {
+
+  // (fd) 
+  public static boolean IN_FILE = false; // (fd)
+
   MaxDocumentType editedType;
 
   public Menu itsFileMenu;
@@ -322,6 +326,9 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     if (file != null)
       {
+	// (fd)
+	IN_FILE = true;
+
 	Cursor temp = getCursor();
 
 	try
@@ -350,6 +357,9 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	    setCursor(temp);
 	    new ErrorDialog(this, e.toString());
 	  }
+
+	// (fd)
+	IN_FILE = false;
       }
   }
 

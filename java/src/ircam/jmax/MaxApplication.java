@@ -121,6 +121,9 @@ public class MaxApplication extends Object
 
   public static void main(String args[])
   {
+    GlobalProbe.setOutputToFile(); // (fd)
+
+
     Vector toOpen = new Vector();
 
     // Temporary: the look and feel must be metal, in order to use
