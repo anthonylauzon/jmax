@@ -151,9 +151,9 @@ public class TableGraphicContext extends GraphicContext{
     return getLastVisibleIndex() - getFirstVisibleIndex() + 1;
   }
 
-  public int getVisibleVerticalScope()
+  public double getVisibleVerticalScope()
   {
-    return (int)(itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height));
+    return (itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height));
   }
 
   public boolean isVerticalScrollbarVisible()

@@ -21,9 +21,9 @@
 
 #include <fts/fts.h>
 #include <utils/c/include/utils.h>
-#include <data/c/include/ivec.h>
-#include <data/c/include/fvec.h>
-#include <data/c/include/tabeditor.h>
+#include <fts/packages/data/ivec.h>
+#include <fts/packages/data/fvec.h>
+#include "tabeditor.h"
 
 #include <stdlib.h>
 

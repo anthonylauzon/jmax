@@ -139,6 +139,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     gc.setFrame(GraphicContext.getFrame(this));
     toolManager.addContextSwitcher(new WindowContextSwitcher(gc.getFrame(), gc));
     toolManager.activate(TableTools.getDefaultTool(), gc);
+
+    toolManager.addToolListener(new ToolListener() {
+	    public void toolChanged(ToolChangeEvent e) 
+	    {		    
+		if (e.getTool() != null) 
+		    itsCenterPanel.setCursor(e.getTool().getCursor());
+	    }
+	});
   }
 
   private void prepareToolbarPanel()
@@ -233,7 +241,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   void updateVerticalScrollbar()
   {
-    int verticalScope = (gc.isIvec()) ? gc.getVisibleVerticalScope() : gc.getVisibleVerticalScope()*100;
+    int verticalScope = (gc.isIvec()) ? (int)gc.getVisibleVerticalScope() : (int)(gc.getVisibleVerticalScope()*100);
 
     if(verticalScope >= gc.getVerticalRange())
       {
@@ -254,12 +262,11 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	int oldValue = itsVerticalControl.getValue();
 	
 	itsVerticalControl.setVisibleAmount( verticalScope);
-
 	if( oldAmount != 0)
 	  {
 	    int val = oldValue*verticalScope/oldAmount;
 	    if( val+itsVerticalControl.getModel().getExtent() < itsVerticalControl.getMaximum())
-	      itsVerticalControl.setValue( oldValue*verticalScope/oldAmount);
+		itsVerticalControl.setValue( oldValue*verticalScope/oldAmount);	  
 	  }
       }
   }
