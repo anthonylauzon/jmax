@@ -61,6 +61,12 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 dnl Check for Java compiler
+AC_ARG_WITH(javac,
+  [  --with-javac=JAVAC       give java compiler (optional)],
+  [JAVAC="$withval"])
+AC_ARG_WITH(java,
+  [  --with-java=JAVA         give java virtual machine (optional)],
+  [JAVA="$withval"])
 CLASSPATH=
 export CLASSPATH
 AC_PROG_JAVAC
