@@ -11,13 +11,11 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionListener*/{
   boolean itsFlashing = false;
-  //static Timer itsTimer;
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
   public ErmesObjMessage(){
     super();
-    //    if (itsTimer == null)  itsTimer = new Timer(50, this);
   }
 	
 	
@@ -46,7 +44,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
-    //Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
     if(!IsResizeTextCompat(0,0)) RestoreDimensions(false);
     return true;  
   }
@@ -83,7 +80,9 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   protected void FtsValueChanged(Object value) {
     itsArgs = (String) value;
     ParseText(itsArgs);
-    //DoublePaint();
+    if(IsResizeTextCompat(0, 0)) Resize(0, 0);
+    else ResizeToText(0, 0);
+    itsSketchPad.repaint();
     Paint(itsSketchPad.getGraphics());
   }
 
