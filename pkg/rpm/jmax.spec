@@ -4,7 +4,7 @@ Version: 2.4.10
 Release: 1
 Copyright: GPL
 Group: Development/Languages
-Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}.tar.gz
+Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}-src.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 %description
 jMax (``Java Max'') is a graphical programming environment 
