@@ -374,7 +374,7 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      ret = fts_send_message(p, winlet, s, ac, at);
 	      
 	      if (ret == &fts_MethodNotFound)
-	        if (fts_atom_is_subsequence(p->argc, p->argv, ac - 1, at + 1))
+	        if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
 		  fts_objectset_add(set, p);
 	    }
 	  else

@@ -848,7 +848,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    p += 4;
 	    sel = symbol_table[GET_L(p)];
 	    p += 4;
-	    nargs = GET_L(p++);
+	    nargs = GET_L(p);
 	    p += 4;
 
 #ifdef VM_DEBUG

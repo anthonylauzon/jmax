@@ -65,7 +65,7 @@ abstract public class FtsObject
     else if (className.equals("messbox"))
       return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className.equals("comment"))
-      return new FtsCommentObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
+      return new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(3, msg), objId);
     else if (className.equals("__selection"))
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))

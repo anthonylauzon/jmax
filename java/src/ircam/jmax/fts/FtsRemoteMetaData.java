@@ -18,6 +18,7 @@ class FtsRemoteMetaData extends FtsRemoteData
   {
     metaData = new FtsRemoteMetaData();
     FtsRemoteDataID.put( 1, metaData);
+    metaData.setId(1);
   }
 
   static FtsRemoteMetaData getRemoteMetaData()

@@ -805,6 +805,85 @@ public class FtsParse
 
     return descr.toString();
   }
+
+  // Version used for the comments, to avoid introducing quotes
+  // in comments
+
+  static String simpleUnparseObjectDescription(int offset, FtsMessage msg)
+  {
+    boolean doNewLine = true;
+    boolean addBlank = false;
+    boolean noNewLine = false;
+    Object value1 = null;
+    Object value2 = null;
+
+    StringBuffer descr = new StringBuffer();
+
+    if (msg.getNumberOfArguments() == offset)
+      return "";
+
+    value2 = msg.getArgument(offset);
+
+    for (int i = offset + 1; i < (msg.getNumberOfArguments() + 1); i++)
+      {
+	if (doNewLine)
+	  descr.append("\n");
+	else if (addBlank)
+	  descr.append(" ");
+
+	doNewLine = false;
+
+	value1 = value2;
+
+	if (i < msg.getNumberOfArguments())
+	  value2 = msg.getArgument(i);
+	else
+	  value2 = null;
+
+	if (value1 instanceof Float)
+	  descr.append(numberFormat.format(value1));
+	else if (value1 instanceof Integer)
+	  descr.append(value1);
+	else if (value1 instanceof String)
+	  {
+	    /* Lexical quoting check */
+
+	    descr.append(value1);
+
+	    if (value1.equals("'"))
+	      noNewLine = true;
+	    else if (value1.equals(";"))
+	      {
+		if (noNewLine)
+		  noNewLine = false;
+		else
+		  doNewLine = true;
+	      }
+	    else
+	      noNewLine = false;
+	  }
+	else
+	  descr.append(value1);
+
+	/* decide to put or not a blank between the two */
+
+	if (wantASpaceAfter(value1))
+	  addBlank = true;
+	else if (dontWantASpaceAfter(value1))
+	  addBlank = false;
+	else if (value2 != null)
+	  {
+	    if (wantASpaceBefore(value2))
+	      addBlank = true;
+	    else if (dontWantASpaceBefore(value2))
+	      addBlank = false;
+	    else
+	      addBlank = true;	// if no body care, do a blank
+	  }
+      }
+
+    return descr.toString();
+  }
 }
 
 

@@ -34,17 +34,20 @@ class ObjectCellRenderer extends JLabel implements ListCellRenderer {
 
   public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
   {
-    setText( ((FtsObject) obj).getDescription());
+    if (obj != null)
+      {
+	setText( ((FtsObject) obj).getDescription());
 
-    if ( selected)
-      setBackground( selectedColor);
-    else
-      setBackground( jlist.getBackground());
+	if ( selected)
+	  setBackground( selectedColor);
+	else
+	  setBackground( jlist.getBackground());
 
-    if ( ((FtsObject) obj) instanceof FtsPatcherObject)
-      setIcon( patcherIcon);
-    else
-      setIcon( objectIcon);
+	if ( ((FtsObject) obj) instanceof FtsPatcherObject)
+	  setIcon( patcherIcon);
+	else
+	  setIcon( objectIcon);
+      }
 
     return this;
   }

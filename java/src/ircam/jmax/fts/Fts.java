@@ -1,6 +1,7 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import ircam.jmax.mda.*;
 
 /**
  * This class export a number of global functionalities
@@ -161,6 +162,26 @@ public class Fts
     FtsObject newObject;
     FtsContainerObject parent;
     int oldInlets, oldOutlets;
+    MaxData data;
+
+    // Get the data, and quit the editors connected to the data
+
+    data = (MaxData) oldObject.get("data");	
+
+    if ((data == null) && (oldObject instanceof FtsObjectWithData))
+      {
+	// Fall back the old obsolete behaviour
+	// Should be substituted by the previous one
+	// need changes to table, qlist and patcher (?)
+	// for this
+
+	data = ((FtsObjectWithData) oldObject).getData();	   
+      }
+
+    if (data != null)
+      Mda.dispose(data);
+
+    // Get parent and ins/outs
 
     parent = oldObject.getParent();
 

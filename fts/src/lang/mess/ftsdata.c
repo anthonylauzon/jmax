@@ -171,8 +171,8 @@ static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
   if (ac < 2)
     return;			/* error */
 
-  data_class_name = fts_get_symbol(&at[0]);
-  id = fts_get_int(&at[1]);
+  data_class_name = fts_get_symbol(&at[1]);
+  id = fts_get_int(&at[0]);
 
   if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &data))
     class = (fts_data_class_t *) data;
@@ -293,8 +293,8 @@ void fts_data_start_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
     fts_data_export(d);
 
   fts_client_mess_start_msg( REMOTE_CALL_CODE);
-  fts_client_mess_add_int( d->id);
-  fts_client_mess_add_int( key);
+  fts_client_mess_add_data(d);
+  fts_client_mess_add_int(key);
 }
 
 void fts_data_end_remote_call()

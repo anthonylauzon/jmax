@@ -295,30 +295,45 @@ static void fts_objectset_find( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_object_t *scope = fts_get_object(at);
-  fts_atom_t a;
+  fts_atom_t a[256];
+  int i;
 
-  fts_set_data(&a, (fts_data_t *) this);
-  fts_send_message(scope, fts_SystemInlet, fts_s_find, 1, &a);
+  fts_set_data(&a[0], (fts_data_t *) this);
+
+  for (i = 1; i < ac; i++)
+    a[i] = at[i];
+
+  fts_send_message(scope, fts_SystemInlet, fts_s_find, ac, a);
 }
 
 static void fts_objectset_find_errors( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_object_t *scope = fts_get_object(at);
-  fts_atom_t a;
+  fts_atom_t a[256];
+  int i;
 
-  fts_set_data(&a, (fts_data_t *) this);
-  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, 1, &a);
+  fts_set_data(&a[0], (fts_data_t *) this);
+
+  for (i = 1; i < ac; i++)
+    a[i] = at[i];
+
+  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, ac, a);
 }
 
 static void fts_objectset_find_friends( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_object_t *scope = fts_get_object(at);
-  fts_atom_t a;
+  fts_atom_t a[256];
+  int i;
 
-  fts_set_data(&a, (fts_data_t *) this);
-  fts_send_message(scope, fts_SystemInlet, fts_s_find_friends, 1, &a);
+  fts_set_data(&a[0], (fts_data_t *) this);
+
+  for (i = 1; i < ac; i++)
+    a[i] = at[i];
+
+  fts_send_message(scope, fts_SystemInlet, fts_s_find_friends, ac, a);
 }
 
 

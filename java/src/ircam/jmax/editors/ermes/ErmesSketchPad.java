@@ -2014,7 +2014,8 @@ Rectangle previousResizeRect = new Rectangle();
     if (annotating)
       {
 	annotating = false;
-	repaint();
+	System.err.println("Repainting");
+	paint(getGraphics());
       }
   }
 }
