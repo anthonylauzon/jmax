@@ -127,6 +127,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   }
 
   public void setCoordinates(int x, int y){
+    if (x < 0 || x > ((FtsIntegerVector)itsData.getContent()).getSize()) return;
     itsCoordX.setText(""+x);
     itsCoordY.setText(""+y);
     itsCurrentValue.setText(""+(itsTablePanel.values[x]));

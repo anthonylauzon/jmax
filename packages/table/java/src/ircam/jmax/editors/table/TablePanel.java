@@ -1,4 +1,6 @@
 package ircam.jmax.editors.table;
+
+import java.lang.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import java.awt.*;
@@ -26,13 +28,18 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     addMouseListener(this);
   }
 
-  public void initValues(int[] vector, int size) {
-    if (size != 0) {
+  public void initValues(int[] vector) {
+    if (vector != null && vector.length != 0) {
       values = vector;
-      N_POINTS = size;
+      N_POINTS = vector.length;
     }
   }
 
+  public int getValue(int i) {
+    if (i > 0 && i<values.length) return values[i];
+    else return 0;
+  }
+  
   public void paint(Graphics g) {
     for(int i = 0; i<N_POINTS;i++){
       PaintSingle(i, g);
@@ -40,7 +47,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   }
 
   public void fillTable(FtsIntegerVector aIntV) {
-    if(aIntV.getSize()!=0) initValues(aIntV.getValues(),aIntV.getSize());
+    if(aIntV.getSize()!=0) initValues(aIntV.getValues());
   }
 
    //////////////////////////////////////////////////////////////////
@@ -48,7 +55,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void mouseMoved(MouseEvent e){
     int x = e.getX()/x_scale_factor;
     int y = e.getY();
-    itsTabler.setCoordinates(x, getSize().height-y);
+    if (x < values.length) 
+      itsTabler.setCoordinates(x, getSize().height-y);
   }
   
   public void mouseDragged(MouseEvent e){
@@ -105,6 +113,24 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void mouseExited(MouseEvent e){}
   //////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////mouseListener--fine
+
+  /*void DrawPoint(int index, Graphics g) {
+    Dimension d = size();
+     for(int i=0;i<x_scale_factor;i++){
+       g.drawLine(index+i, d.height, index+i,0);
+     }   
+   }
+  
+   void PaintSingle(int index, Graphics g) {
+     Dimension d = size();
+     index = index*x_scale_factor;
+     g.setColor(Color.white);
+     DrawPoint(index, g);
+     g.setColor(Color.black);
+     DrawPoint(index, g);
+     g.setColor(Color.white);
+   }*/
+  
   void PaintSingle(int index, Graphics g) {
     Dimension d = size();
     index = index*x_scale_factor;
