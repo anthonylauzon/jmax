@@ -239,6 +239,21 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }    
   }
   
+  public void requestInsertColumn(int index)
+  {
+    args.clear();
+    args.addInt( index);
+    
+    try{
+      send( FtsSymbol.get("insert_cols"), args);
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsMatObject: I/O Error sending insert_cols Message!");
+      e.printStackTrace(); 
+    }    
+  }
+  
   public void requestInsertRow(int index)
   {
     args.clear();

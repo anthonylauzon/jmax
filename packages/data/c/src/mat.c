@@ -782,23 +782,12 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   start = (m-1)*new_n + pos;
   tomove = new_n-pos-numcols;
   
-  fts_post("start %d pos %d tomove %d numcols %d\n", start, pos, tomove, numcols);
-  fts_post("start %d val[start] %d\n", start, fts_get_int(&self->data[start]));
-  
   for(i = 0; i < m; i++)
   {
     for(j=tomove-1; j >= 0; j--)
-    {
       self->data[start+j+numcols] = self->data[start+j];
-      fts_post("-------- move line --------------%d\n", i);
-      fts_post("copyto %d copyfrom %d val %d\n", start+j+numcols, start+j, fts_get_int(&self->data[start+j]));
-    }
     for(j = 0; j < numcols; j++)
-    {
-      fts_post("-------- zero line --------------%d\n", j);
-      fts_post("zeroto %d  oldval %d\n", start+j, fts_get_int(&self->data[start+j]));
       fts_set_int(&self->data[start + j], 0);
-    }
     start = start - new_n;
   }
   

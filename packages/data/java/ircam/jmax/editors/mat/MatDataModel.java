@@ -65,6 +65,7 @@ public interface MatDataModel {
     public abstract void requestAppendRow();
     public abstract void requestInsertRow(int index);
     public abstract void requestAppendColumn();
+    public abstract void requestInsertColumn(int index);
     public abstract void requestDeleteRows(int startIndex, int size);
 }
 

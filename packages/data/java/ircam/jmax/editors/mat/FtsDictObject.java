@@ -234,6 +234,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   }
   
   public void requestAppendColumn(){}
+  public void requestInsertColumn(int index){}
   
   public void requestInsertRow(int index)
   {

@@ -85,7 +85,8 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     table.setRowHeight(ROW_HEIGHT);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
     table.getTableHeader().setReorderingAllowed(false);
-        
+    table.setColumnSelectionAllowed(true);  
+    
     scrollPane = new JScrollPane(table);
     add(BorderLayout.CENTER, scrollPane);
     
@@ -166,6 +167,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   public MatDataModel getMatModel()
   {
     return matData;
+  }
+  
+  public JTable getTable()
+  {
+    return table;
   }
   
   public void addTableSelectionListener(ListSelectionListener l)

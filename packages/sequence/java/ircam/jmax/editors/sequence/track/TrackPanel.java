@@ -154,13 +154,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
         //---------- prepares the time zoom listeners
         geometry.addZoomListener( new ZoomListener() {
           public void zoomChanged(float zoom, float oldZoom)
-        {
+          {
             repaint();
             TrackEvent lastEvent = trackData.getLastEvent();
             if(lastEvent != null)
               resizePanelToTimeWithoutScroll((int)(lastEvent.getTime() + ((Double)lastEvent.getProperty("duration")).intValue()));
-            ftsTrackObject.editorObject.setZoom(zoom);
-        }
+            if(ftsTrackObject.editorObject != null)
+              ftsTrackObject.editorObject.setZoom(zoom);
+          }
         });
         
         //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
@@ -172,7 +173,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
           public void adjustmentValueChanged(AdjustmentEvent e) {
             int currentTime = e.getValue();
             geometry.setXTransposition(-currentTime);
-            ftsTrackObject.editorObject.setTransposition(-currentTime);
+            if(ftsTrackObject.editorObject != null)
+              ftsTrackObject.editorObject.setTransposition(-currentTime);
           }
         });
         separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);

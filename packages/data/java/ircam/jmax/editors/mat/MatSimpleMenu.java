@@ -40,8 +40,9 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
   EditorContainer container;
   EditorAction deleteAction;
   MatDataModel model;
-  int selIndex = -1;
-  int selSize = 0;
+  JTable table;
+  int selRowIndex = -1;
+  int selRowSize = 0;
   
   public MatSimpleMenu(EditorContainer container, String type)
   {
@@ -49,7 +50,7 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
 
     this.container = container;
     model = ((MatPanel)container.getEditor()).getMatModel();
-    
+    table = ((MatPanel)container.getEditor()).getTable();
     ((MatPanel)container.getEditor()).addTableSelectionListener(this);
     
     setHorizontalTextPosition(AbstractButton.LEFT);
@@ -57,18 +58,18 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
 		add( new EditorAction("Insert Row", "insert row", KeyEvent.VK_R, KeyEvent.VK_R, true){
       public void doAction(EditorContainer container)
       {
-        if(selSize == 0)
+        if(selRowSize == 0)
           model.requestAppendRow();
         else
-          model.requestInsertRow(selIndex+1);
+          model.requestInsertRow(selRowIndex+1);
       }
     });
     
     deleteAction = new EditorAction("Delete Selected Rows", "delete rows", KeyEvent.VK_D, KeyEvent.VK_D, true){
       public void doAction(EditorContainer container)
       {
-        if( selSize > 0)
-          model.requestDeleteRows(selIndex, selSize);
+        if( selRowSize > 0)
+          model.requestDeleteRows(selRowIndex, selRowSize);
       }
     };
     
@@ -76,10 +77,13 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
     		
     if(model.canAppendColumn())
     {
-      add( new EditorAction("Append Column", "append col", KeyEvent.VK_L, KeyEvent.VK_L, true){
+      add( new EditorAction("Insert Column", "insert col", KeyEvent.VK_L, KeyEvent.VK_L, true){
         public void doAction(EditorContainer container)
         {
-          model.requestAppendColumn();
+          if( table.getSelectedColumnCount() == 0)
+            model.requestAppendColumn();
+          else
+            model.requestInsertColumn( table.getSelectedColumn()+1);
         }
       });
     }	    
@@ -117,14 +121,14 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
     if(selection.isSelectionEmpty())
     {
       deleteAction.setEnabled(false);
-      selSize = 0;
-      selIndex = -1;
+      selRowSize = 0;
+      selRowIndex = -1;
     }
     else
     {
       deleteAction.setEnabled(true);
-      selIndex = selection.getMinSelectionIndex();
-      selSize = selection.getMaxSelectionIndex() - selIndex + 1;
+      selRowIndex = selection.getMinSelectionIndex();
+      selRowSize = selection.getMaxSelectionIndex() - selRowIndex + 1;
     }
   }
 }

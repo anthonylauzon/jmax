@@ -159,6 +159,14 @@ Vector getTableColumnNames()
 	return names;
 }
 
+TableColumn getColumnByName(JTable table, String name)
+{
+  for(int i=0; i<table.getColumnCount(); i++)
+    if( name.equals( table.getColumnName(i)))
+      return table.getColumnModel().getColumn(i);
+  return null;
+}
+
 void restoreColumnNames()
 {
 	Enumeration names = trackObj.editorObject.getTableColumns();
@@ -173,7 +181,7 @@ void restoreColumnNames()
 		for(Enumeration e = names; e.hasMoreElements();)
 		{
 			name = (String)e.nextElement();
-			col = table.getColumn(name);
+			col = getColumnByName( table, name);
 			if(col != null)
 			{
 				for(int j = 0; j < table.getColumnCount(); j++)

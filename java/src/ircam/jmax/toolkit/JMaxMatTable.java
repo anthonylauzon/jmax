@@ -47,6 +47,9 @@ public class JMaxMatTable extends JTable
   public static final Color rowsIdColor = new Color(245, 245, 245);
   public static final int COLUMN_MIN_WIDTH = 60;
   
+  boolean shiftPressed = false;
+  boolean ctrlPressed = false;
+  
   public JMaxMatTable(TableModel model)
   {
     super(model);
