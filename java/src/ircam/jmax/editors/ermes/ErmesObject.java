@@ -205,10 +205,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	  else aErmesObjInlet = new ErmesObjInlet(i, this, itsX+2+(i)*in_local_distance, itsY);
 	  itsInletList.addElement(aErmesObjInlet);
 	}
-	if (offGraphics!= null) {
-	  aErmesObjInlet.Repaint();
-	  //itsSketchPad.CopyTheOffScreen(g);
-	}
+	if (offGraphics!= null) aErmesObjInlet.Repaint();
       }
       itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
@@ -220,14 +217,10 @@ public class ErmesObject implements FtsPropertyHandler {
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*aHDist,aErmesObjInlet.itsY);
 	  ReroutingConnections(aErmesObjInlet);
-	  if (offGraphics!= null) {
-	    aErmesObjInlet.Repaint(); 
-	    //itsSketchPad.CopyTheOffScreen(g);//e.m.
-	    }
+	  if (offGraphics!= null) aErmesObjInlet.Repaint(); 
 	}
 	else{
 	  //erase the inlet, and the associated connections
-	  //itsInletList.removeElementAt(0);
 	  itsInletList.removeElementAt(itsInletList.size()-1);
 	  //we should remove the connections. How?
 	}
@@ -249,10 +242,7 @@ public class ErmesObject implements FtsPropertyHandler {
        aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
        aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
        ReroutingConnections(aErmesObjOutlet);
-       if(offGraphics!= null){
-	 aErmesObjOutlet.Repaint();
-	 //itsSketchPad.CopyTheOffScreen(g); //e.m.
-	 }
+       if(offGraphics!= null) aErmesObjOutlet.Repaint();
      }
      itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
@@ -268,7 +258,9 @@ public class ErmesObject implements FtsPropertyHandler {
 	aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
 	aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
 	ReroutingConnections(aErmesObjOutlet);
+	if(offGraphics!= null) aErmesObjOutlet.Repaint();
       }
+      itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     
     //prepare to be waked up when values change
