@@ -49,6 +49,7 @@ typedef struct
     int write_index;
     int is_open;
     int is_started;
+    int is_eof;
 
     fts_thread_worker_t* thread_worker;
 } writesf_t;
@@ -73,6 +74,7 @@ static void writesf_dsp( fts_word_t *argv)
 
   com_buffer = &self->com_buffer[self->buffer_index];
   buffer = com_buffer->buffer;
+
 
   if (0 == self->is_started)
   {
@@ -149,6 +151,7 @@ static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	    writer->sf = sf;
 	    writer->com_buffer = self->com_buffer;		
 	    writer->buffer_index = &self->buffer_index;		
+	    writer->is_eof = &self->is_eof;
 	    thread_job->object = (fts_object_t*)writer;
 	    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
 						      fts_s_write);
@@ -205,6 +208,7 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 	}
 	self->is_open = 0;
 	self->is_started = 0;
+	self->is_eof = 0;
 	self->write_index = 0;
     }
 }
@@ -212,8 +216,7 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
     writesf_t* self = (writesf_t*)o;
-    /* not yet implemented */
-    post("[writesf~] want to start \n");
+    post("[writesf~] start \n");
     self->is_started = 1;
 }
 
@@ -221,16 +224,27 @@ static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
     writesf_t* self = (writesf_t*)o;
-    /* not yet implemented */
-    post("[writesf~] want to stop \n");
+    dtd_buffer_t* com_buffer;
+    /* tell thread writer to write all buffer */
+    self->is_eof = 1;
+
+    com_buffer = &self->com_buffer[self->buffer_index];
+    /* check if buffer is empty */
+    if (0 == com_buffer->full)
+    {
+	/* set full flag and end_index of current buffer */
+	com_buffer->full = 1;
+	com_buffer->end_index = self->write_index;
+    }
     self->is_started = 0;
+    /* reset write index */
+    self->write_index = 0;
 }
 
 static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
     writesf_t* self = (writesf_t*)o;
-    /* not yet implemented */
-    post("[writesf~] want to pause \n");
+    post("[writesf~] pause \n");
     self->is_started += 1;
     self->is_started = self->is_started % 2;
 }
@@ -272,6 +286,7 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   self->buffer_index = 0;
   self->is_open = 0;
   self->is_started = 0;
+  self->is_eof = 0;
 
   /* start the fts_thread_manager */
   fts_thread_manager_start();
@@ -314,7 +329,6 @@ writesf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
     fts_class_message_varargs(cl, fts_s_open, writesf_open);
     fts_class_message_varargs(cl, fts_s_close, writesf_close);
 
-    /* not yet implemented */
     fts_class_message_varargs(cl, fts_s_start, writesf_start);
     fts_class_message_varargs(cl, fts_s_stop, writesf_stop);
     fts_class_message_varargs(cl, s_pause, writesf_pause);
