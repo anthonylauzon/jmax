@@ -30,6 +30,9 @@
 */
 
 #include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 
 #include "sys.h"
 #include "lang.h"
@@ -41,9 +44,60 @@
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
 
+/* ********************************************************************** */
+/* This code is to be changed when we move to settings */
+
+/*
+ * The root directory (necessary for DTD server exec)
+ * is for now extracted from the FTS executable name.
+ * It should be given as a global setting.
+ */
+static char root_dir[256];
+
+static void fts_set_root_dir( const char *fts_exec_name)
+{
+  char *p;
+  int i;
+
+  strcpy( root_dir, fts_exec_name);
+
+  /* Example: executable name is $JMAXROOT/fts/bin/i686-linux/opt/fts */
+  for ( i = 0; i < 5; i++)
+    {
+      p = strrchr( root_dir, '/');
+      if ( p != NULL)
+	{
+	  *p = '\0';
+	}
+      else
+	break;
+    }
+
+  if (p == NULL)
+    root_dir[0] = '\0';
+}
+
+char *fts_get_root_dir( void)
+{
+  return root_dir;
+}
+
+char *fts_get_arch( void)
+{
+  return COMPILATION_ARCH_STRING;
+}
+
+char *fts_get_mode( void)
+{
+  return COMPILATION_MODE_STRING;
+}
+/* ********************************************************************** */
+
 
 int main(int argc, char **argv)
 {
+  fts_set_root_dir( argv[0]);
+
   /* Argument parsing */
 
   argv++;			/* skip the command name */
@@ -53,13 +107,7 @@ int main(int argc, char **argv)
     {
       if (! strcmp(*argv, "-help"))
 	fprintf(stderr, "Usage: fts [-help] <client dev description>\n");
-      /* (fd) This option is disabled and will disappear soon. I think it is useless,
-	 but you never know... */
-/*        else if (! strcmp( *argv, "-norealtime")) */
-/*  	should_run_real_time = 0; */
-
-      /* others ???  */
-
+      
       argc--;
       argv++;
     }
@@ -190,9 +238,3 @@ static void  fts_assign_boot_devices(int argc, char **argv)
     fts_audio_set_pending_close();
   }
 }
-
-
-
-
-
-

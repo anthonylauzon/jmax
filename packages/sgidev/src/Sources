@@ -25,6 +25,7 @@
 
 SOURCES= \
 sgiaudiodev.c	\
+sgimididev.c	\
 shmdev.c	\
 sgidev.c	\
 

@@ -145,7 +145,7 @@ static void fts_sched_do_select( fts_sched_t *sched)
 	  FD_SET( callback->fd, &wfds);
       }
 
-  r = select( n_fd, &rfds, &wfds, NULL, &tv);
+  r = select( n_fd+1, &rfds, &wfds, NULL, &tv);
 
   for ( callback = sched->fd_callback_head; callback; callback = callback->next)
     {

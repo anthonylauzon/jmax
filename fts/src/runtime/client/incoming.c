@@ -33,10 +33,10 @@
 #include "lang.h"
 
 /*
- * Uncommenting INCOMING_DEBUG_TRACE will produce a trace
+ * Defining INCOMING_DEBUG_TRACE will produce a trace
  * of the incoming messages on the standard error
  */
-/*  #define INCOMING_DEBUG_TRACE  */
+#undef INCOMING_DEBUG_TRACE
 
 static void (* mess_dispatch_table[256])(int, const fts_atom_t *);
 

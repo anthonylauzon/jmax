@@ -1,3 +1,14 @@
+2000-05-26  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fts/src/runtime/sched/sched.c: fixed in fts_sched_do_select the first argument
+	to select() (was n_fd, is now n_fd +1).
+
+Mon May 22 11:57:20 2000  Francois Dechelle  <dechelle@astor.ircam.fr>
+
+	* fts/src/non-portable/sgi/syssched.c: 
+	  added code for better use of multi-processor machines: if an isolated processor
+	  is found, it is choosed by fts for running on it.
+
 2000-05-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* added _FTS before #ifdef pp-commands in all header files

@@ -23,9 +23,12 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 all_c: all
-clean_c: clean
+.PHONY: all_c
 
-all:
+clean_c: clean
+.PHONY: clean_c
+
+all: 
 	(cd non-portable ; $(MAKE) $@)
 	(cd sys; $(MAKE) $@)
 	(cd lang; $(MAKE) $@)
@@ -39,7 +42,7 @@ clean:
 	(cd lang; $(MAKE) $@)
 	(cd runtime; $(MAKE) $@)
 	(cd tiles; $(MAKE) $@)
-.PHONY: all
+.PHONY: clean
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts

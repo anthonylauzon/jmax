@@ -33,6 +33,9 @@
 
 <ul>
 <li>
+<a href="#2.4.13">Release notes for <i>j</i>Max 2.4.13</a></li>
+
+<li>
 <a href="#2.4.12">Release notes for <i>j</i>Max 2.4.12</a></li>
 
 <li>
@@ -59,6 +62,30 @@
 <li>
 <a href="#2.3.11">Release notes for <i>j</i>Max 2.3.11</a></li>
 </ul>
+
+<!------------------------------------------------------------------------------->
+<br>
+<hr>
+
+<a NAME="2.4.13">
+ <h1> Release notes for <i>j</i>Max 2.4.13 </h1>
+</a>
+
+<h3>Features</h3>
+
+
+<h4>Automatic selection of isolated processor (SGI platform)</h4>
+
+<p>
+On SGI platform, FTS automatically runs on an isolated processor if there is one
+processor that is isolated, thus taking advantage of multi-processors machines 
+for better audio latency.
+
+<p>
+To find what is an isolated processor and how to isolate a processor, check the
+<i>mpadmin</i> man page. The better latency will be obtained when the processor
+is both isolated and non-preemptive. Isolating a processor requires a
+multi-processor system (Origin or Octane with 2 processors at least).
 
 <!------------------------------------------------------------------------------->
 <br>

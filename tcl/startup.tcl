@@ -46,8 +46,6 @@ if {[systemProperty "jmaxServerDir"] != ""} then {
     set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
 }
 
-puts $jmaxServerDir
-
 puts "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou"
 puts "jMax is free software with ABSOLUTELY NO WARRANTY."
 puts "(see file LICENSE for more details)"
