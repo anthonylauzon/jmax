@@ -33,8 +33,10 @@ PatcherClipboardManager.java\
 PatcherFontManager.java\
 PatcherPrintManager.java\
 PatcherSaveManager.java\
-RuntimeErrorsPanel.java\
 RuntimeError.java\
+RuntimeErrorsPanel.java\
+RuntimeErrorsTableModel.java\
+RuntimeErrorsTablePanel.java\
 ScaleDialog.java\
 ScaleTransform.java\
 Settings.java\

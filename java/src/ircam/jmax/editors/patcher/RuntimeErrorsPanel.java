@@ -105,54 +105,65 @@ public class RuntimeErrorsPanel extends JFrame implements FtsActionListener
 	    System.out.println("System error: cannot get runtimeErrors object");
 	}
     
-    jList = new JList(runtimeErrorsSource);
-    jList.setCellRenderer( new DefaultListCellRenderer()
-	{
-	    public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
-	    {
-		super.getListCellRendererComponent(jlist, obj, i, selected, hasFocus);
+    /*jList = new JList(runtimeErrorsSource);
+      jList.setCellRenderer( new DefaultListCellRenderer()
+      {
+      public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
+      {
+      super.getListCellRendererComponent(jlist, obj, i, selected, hasFocus);
 
-		if (obj != null)
-		    {
-			setText(((RuntimeError)obj).getDescription()+" "+((RuntimeError)obj).getCount());	   
-			setIcon(ObjectSetViewer.getObjectIcon(((RuntimeError)obj).getObject()));
-		    }
+      if (obj != null)
+      {
+      setText(((RuntimeError)obj).getDescription()+" "+((RuntimeError)obj).getCount());	   
+      setIcon(ObjectSetViewer.getObjectIcon(((RuntimeError)obj).getObject()));
+      }
       
-		return this;
-	    } 
-	});
+      return this;
+      } 
+      });
 
-    JScrollPane listScrollPane = new JScrollPane();
-    listScrollPane.getViewport().setView( jList);
+      JScrollPane listScrollPane = new JScrollPane();
+      listScrollPane.getViewport().setView( jList);
     
-    jList.addMouseListener(new MouseListener(){
-	    public void mouseEntered(MouseEvent e) {} 
-	    public void mouseExited(MouseEvent e) {}
-	    public void mousePressed(MouseEvent e) {}
-	    public void mouseReleased(MouseEvent e) {}
-	    public void mouseClicked(MouseEvent e)
+      jList.addMouseListener(new MouseListener(){
+      public void mouseEntered(MouseEvent e) {} 
+      public void mouseExited(MouseEvent e) {}
+      public void mousePressed(MouseEvent e) {}
+      public void mouseReleased(MouseEvent e) {}
+      public void mouseClicked(MouseEvent e)
+      {
+      if (e.getClickCount() == 2)
+      {
+      int index = jList.locationToIndex(e.getPoint());
+      
+      if ((index >= 0) && (index < jList.getModel().getSize()))
+      {
+      FtsObject object = ((RuntimeError)runtimeErrorsSource.getElementAt(index)).getObject();
+      RuntimeErrorsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+      ((FtsPatcherObject)object.getParent()).requestShowObject(object);
+      ((FtsPatcherObject)object.getParent()).requestStopWaiting(RuntimeErrorsPanel.runtimeErrorsPanel);
+      }
+      }
+      }
+      });*/
+    tableModel = new RuntimeErrorsTableModel(runtimeErrorsSource);
+    errorTable = new RuntimeErrorsTablePanel(tableModel);
+    errorTable.setObjectSelectedListener(new ObjectSelectedListener() {
+	    public void objectSelected(FtsObject object)
 	    {
-		if (e.getClickCount() == 2)
-		    {
-			int index = jList.locationToIndex(e.getPoint());
-	  
-			if ((index >= 0) && (index < jList.getModel().getSize()))
-			{
-			    FtsObject object = ((RuntimeError)runtimeErrorsSource.getElementAt(index)).getObject();
-			    RuntimeErrorsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-			    ((FtsPatcherObject)object.getParent()).requestShowObject(object);
-			    ((FtsPatcherObject)object.getParent()).requestStopWaiting(RuntimeErrorsPanel.runtimeErrorsPanel);
-			}
-		    }
+		RuntimeErrorsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+		((FtsPatcherObject)object.getParent()).requestShowObject(object);
+		((FtsPatcherObject)object.getParent()).requestStopWaiting(RuntimeErrorsPanel.runtimeErrorsPanel);
 	    }
 	});
-
-    jList.addListSelectionListener(new ListSelectionListener() {
+    
+    /*jList.addListSelectionListener(new ListSelectionListener() {*/
+    errorTable.setSelectionListener(new ListSelectionListener() {    
 	    public void valueChanged(ListSelectionEvent e) {
 
 		if (e.getValueIsAdjusting()) return;
 		
-		JList lsm = (JList)e.getSource();
+		ListSelectionModel lsm = (ListSelectionModel)e.getSource();
 		if (lsm.isSelectionEmpty()) 
 		    {
 			((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
@@ -250,7 +261,8 @@ public class RuntimeErrorsPanel extends JFrame implements FtsActionListener
 
     //Add the scroll panes to a split pane.
     JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    splitPane.setTopComponent(listScrollPane);
+    //splitPane.setTopComponent(listScrollPane);
+    splitPane.setTopComponent(errorTable);
     splitPane.setBottomComponent(treeView);
     splitPane.setDividerLocation(100); 
     splitPane.setPreferredSize(new Dimension(400, 200));
@@ -266,9 +278,11 @@ public class RuntimeErrorsPanel extends JFrame implements FtsActionListener
       setCursor(Cursor.getDefaultCursor());
   }
   private static RuntimeErrorsPanel runtimeErrorsPanel = null;
+  
   private FtsRuntimeErrors runtimeErrorsSource;
-
-  private JList jList;
+  private RuntimeErrorsTableModel tableModel;
+  //private JList jList;
+  private RuntimeErrorsTablePanel errorTable;
   private JTree tree;
   private DefaultTreeModel emptyTreeModel;
 }

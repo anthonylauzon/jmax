@@ -79,7 +79,7 @@ SUBDIRS = actions interactions menus objects
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesModule.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java ErrorPanel.java ErrorTableModel.java ErrorTablePanel.java FontCache.java FpePanel.java IconRenderer.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java RuntimeErrorsPanel.java RuntimeError.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java
+package_SOURCES =  AddPopUp.java ConnectionAction.java DisplayList.java EditField.java ErmesModule.java ErmesPatcherListener.java ErmesSelection.java ErmesSketchPad.java ErmesSketchWindow.java ErmesToolBar.java ErmesToolButton.java FindPanel.java ErrorPanel.java ErrorTableModel.java ErrorTablePanel.java FontCache.java FpePanel.java IconRenderer.java KeyEventClient.java KeyEventsManager.java KeyMap.java MaxRepaintManager.java MessageDisplayer.java MoreObjectsButton.java ObjectAction.java ObjectRenderer.java PatcherClipboardManager.java PatcherFontManager.java PatcherPrintManager.java PatcherSaveManager.java RuntimeError.java RuntimeErrorsPanel.java RuntimeErrorsTableModel.java RuntimeErrorsTablePanel.java ScaleDialog.java ScaleTransform.java Settings.java TextRenderer.java
 
 
 JAVACX = @JAVACX@
@@ -108,7 +108,8 @@ KeyEventClient.class KeyEventsManager.class KeyMap.class \
 MaxRepaintManager.class MessageDisplayer.class MoreObjectsButton.class \
 ObjectAction.class ObjectRenderer.class PatcherClipboardManager.class \
 PatcherFontManager.class PatcherPrintManager.class \
-PatcherSaveManager.class RuntimeErrorsPanel.class RuntimeError.class \
+PatcherSaveManager.class RuntimeError.class RuntimeErrorsPanel.class \
+RuntimeErrorsTableModel.class RuntimeErrorsTablePanel.class \
 ScaleDialog.class ScaleTransform.class Settings.class \
 TextRenderer.class
 package_LDADD = $(LDADD)
