@@ -23,7 +23,8 @@
 
 #include "utils.h"
 
-fts_cubic_coefs_t fts_cubic_table[FTS_CUBIC_TABLE_SIZE];
+static fts_cubic_coefs_t __fts_cubic_table[FTS_CUBIC_TABLE_SIZE];
+fts_cubic_coefs_t *fts_cubic_table = __fts_cubic_table;
 
 void
 fts_cubic_init(void)

@@ -22,6 +22,23 @@ value.c \
 vec.c \
 dumpfile.c
 
+INCLUDES=-I$(top_srcdir)/packages/utils/c/src
+
+noinst_HEADERS= \
+bpf.h \
+col.h \
+data.h \
+fmat.h \
+fvec.h \
+ivec.h \
+mat.h \
+message.h \
+messtab.h \
+preset.h \
+row.h \
+value.h \
+vec.h
+
 # Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
 if MACOSX
 
@@ -42,19 +59,3 @@ endif
 libdata_la_LDFLAGS=$(XLDFLAGS)
 libdata_la_LIBADD=$(XLIBADD)
 
-INCLUDES=-I$(top_srcdir)/packages/utils/c/src
-
-noinst_HEADERS= \
-bpf.h \
-col.h \
-data.h \
-fmat.h \
-fvec.h \
-ivec.h \
-mat.h \
-message.h \
-messtab.h \
-preset.h \
-row.h \
-value.h \
-vec.h

@@ -43,14 +43,13 @@ io_config(void)
   in_out_tilda_config();
   loopback_config();
   out_config();
-  profileaudioport_config();
 #ifndef WIN32
+#if 0
   serial_config();
   udp_config();
-#if 0
   udpreceive_config();
   udpsend_config();
-#endif
   wacom_config();
+#endif
 #endif
 }

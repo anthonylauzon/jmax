@@ -25,6 +25,7 @@
  */
 
 #include "signal.h"
+#include <utils.h>
 
 extern void signal_tilda_config(void);
 extern void signal_binop_config(void);
@@ -68,4 +69,9 @@ signal_config(void)
   signal_play_bpf_config();
 
   signal_rec_fvec_config();
+
+  {
+    complex c;
+    c = CZERO;
+  }
 }

@@ -5,21 +5,19 @@ halaudioport.c \
 macosx.c 
 
 # Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
 
-# This causes libtool to issue a warning and not to produce the .so 
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
+LINK=-$(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 
-# So we add this explicitely !!!
+XLDFLAGS=-no-undefined -module
+XLIBADD=-L$(top_srcdir)/fts/.libs -lfts
+
 all-local: .libs/libmacosx.so
 
 .libs/libmacosx.so: $(libmacosx_la_OBJECTS) $(libmacosx_la_DEPENDENCIES)
-	cc -bundle -undefined error -o $@ $(libmacosx_la_OBJECTS) $(XLIBADD) -lm -lc 
+	cc -bundle -undefined error -o $@ $(libmacosx_la_OBJECTS) $(XLIBADD) -lm -lc -framework CoreAudio
 
-install-data-local: .libs/libmacosx.so
-	$(INSTALL_DATA) .libs/libmacosx.so $(DESTDIR)$(packagedir)/libmacosx.so
-endif
+install-macosx-local: .libs/libmacosx.so
+	$(INSTALL_MACOSX) .libs/libmacosx.so $(DESTDIR)$(packagedir)/libmacosx.so
 
 libmacosx_la_LDFLAGS=$(XLDFLAGS)
 libmacosx_la_LIBADD=$(XLIBADD)

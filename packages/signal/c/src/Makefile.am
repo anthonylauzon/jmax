@@ -18,6 +18,15 @@ wave.c \
 wave_ieeewrap.c \
 white.c 
 
+INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
+
+noinst_HEADERS=  \
+osc.h \
+play.h \
+samplepool.h \
+signal.h \
+wave.h
+
 # Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
 if MACOSX
 
@@ -38,11 +47,3 @@ endif
 libsignal_la_LDFLAGS=$(XLDFLAGS)
 libsignal_la_LIBADD=$(XLIBADD)
 
-INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
-
-noinst_HEADERS=  \
-osc.h \
-play.h \
-samplepool.h \
-signal.h \
-wave.h

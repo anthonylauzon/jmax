@@ -18,25 +18,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
  */
-
-#include <fts/fts.h>
-
-/******************************************************************************/
-/*                                                                            */
-/* Module declaration                                                         */
-/*                                                                            */
-/******************************************************************************/
-
-static void macosx_init(void);
-
-fts_module_t macosx_module = { "macosx", "MAC OS X objects", macosx_init, 0, 0};
 
 extern void halaudioport_config( void);
 
-static void macosx_init(void)
+void macosx_config(void)
 {
   halaudioport_config();
 }

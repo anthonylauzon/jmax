@@ -135,7 +135,7 @@ typedef struct
   float p2;
 } fts_cubic_coefs_t;
 
-UTILS_API fts_cubic_coefs_t fts_cubic_table[];
+UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)

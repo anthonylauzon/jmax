@@ -48,7 +48,6 @@ system_config(void)
   argument_config();
 
   print_config();
-  blip_config();
 
   bus_config();
   bus_tilda_config();

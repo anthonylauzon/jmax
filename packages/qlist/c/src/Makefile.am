@@ -3,6 +3,11 @@ package_LTLIBRARIES=libqlist.la
 libqlist_la_SOURCES= \
 qlist.c 
 
+INCLUDES=-I@top_srcdir@/packages/ispw/c/src
+
+noinst_HEADERS= \
+qlist.h
+
 # Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
 if MACOSX
 
@@ -23,7 +28,3 @@ endif
 libqlist_la_LDFLAGS=$(XLDFLAGS)
 libqlist_la_LIBADD=$(XLIBADD)
 
-INCLUDES=-I@top_srcdir@/packages/ispw/c/src
-
-noinst_HEADERS= \
-qlist.h

@@ -59,12 +59,14 @@ i*86-pc-linux-gnu)
 mips-sgi-irix6.5)
     PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
+    DOT_LIBS=-L.libs
     FTS_SYS_LIBS="-ldl -laudiofile";
     ;;
 powerpc-apple-darwin*)
     PLATFORM=macosx ;
     dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code)
     AC_DEFINE(restrict,)
+    DOT_LIBS=-L.libs
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 
@@ -101,6 +103,7 @@ AM_CONDITIONAL(MACOSX, echo "$host" | grep powerpc-apple-darwin)
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
+AC_SUBST(DOT_LIBS)
 
 dnl Check installation directories
 if test "x${prefix}" = "xNONE"; then
@@ -268,6 +271,9 @@ packages/lists/Makefile
 packages/lists/c/Makefile
 packages/lists/c/src/Makefile
 packages/lists/help/Makefile
+packages/macosx/Makefile
+packages/macosx/c/Makefile
+packages/macosx/c/src/Makefile
 packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile
