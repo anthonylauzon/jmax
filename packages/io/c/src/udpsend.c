@@ -44,7 +44,11 @@ udpsend_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
   udpsend_t* self = (udpsend_t*)o;
   fts_binary_protocol_t* binary_protocol = self->binary_protocol;
 
-/*   fts_binary_protocol_start_message(binary_protocol, o, s); */
+  if (s != NULL)
+  {
+    /* add selector to message */
+    fts_binary_protocol_add_symbol(binary_protocol, s);
+  }
   fts_binary_protocol_add_atoms(binary_protocol, ac, at);
   fts_binary_protocol_end_message(binary_protocol);
 
@@ -88,8 +92,14 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpsend_t *self = (udpsend_t *)o;
-  fts_object_release((fts_object_t*)self->binary_protocol);
-  fts_object_release((fts_object_t*)self->udp_stream);
+  if (self->binary_protocol != NULL)
+  {
+    fts_object_release((fts_object_t*)self->binary_protocol);
+  }
+  if (self->udp_stream != NULL)
+  {
+    fts_object_release((fts_object_t*)self->udp_stream);
+  }
 }
 
 static void 
