@@ -228,6 +228,12 @@ class ErmesObjFloat extends ErmesObject {
     }
     else return false;
   }
+
+  public boolean NeedPropertyHandler(){
+    return true;
+  }
+
+
 	
   //--------------------------------------------------------
   // ConnectionRequested

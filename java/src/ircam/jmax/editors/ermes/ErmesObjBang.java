@@ -102,6 +102,10 @@ class ErmesObjBang extends ErmesObject {
     else itsFlashingThread.start();
   }
 	
+  public boolean NeedPropertyHandler(){
+    return true;
+  }
+
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
   {
     // HERE the checking: is the type of connection requested allowed?

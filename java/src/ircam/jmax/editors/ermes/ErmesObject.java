@@ -229,10 +229,16 @@ public class ErmesObject implements FtsPropertyHandler {
       if(offGraphics!= null) itsSketchPad.repaint();//???????
     }
     //prepare to be waked up when values change
-    itsFtsObject.installPropertyHandler("value", this);
-    itsFtsObject.getProperty("value");
+    if(NeedPropertyHandler()){
+      itsFtsObject.installPropertyHandler("value", this);
+      itsFtsObject.getProperty("value");
+    }
   }
   
+  public boolean NeedPropertyHandler(){
+    return false;
+  }
+
   
 // This init method is only called in "from skratch" initializations
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
@@ -300,6 +306,11 @@ public class ErmesObject implements FtsPropertyHandler {
     return true;
   }
   
+  public FtsObject GetFtsObject(){
+    return itsFtsObject;
+  }
+
+
   public Vector GetOutletList(){
     return itsOutletList;
   }

@@ -103,7 +103,7 @@ class ErmesObjSlider extends ErmesObject {
       itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -clippedValue/itsStep));
       DoublePaint();
     }
-}
+  }
   
 
   
@@ -181,6 +181,10 @@ class ErmesObjSlider extends ErmesObject {
       DoublePaint();//?
   }
 	
+  public boolean NeedPropertyHandler(){
+    return true;
+  }
+
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
     if (!theRequester.IsInlet())	
       return (itsSketchPad.OutletConnect(this, theRequester));

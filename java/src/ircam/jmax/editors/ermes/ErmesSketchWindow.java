@@ -805,8 +805,15 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       aDialog.dispose();
     }
     //else if(itsProjectEntry!=null) itsProjectEntry.Reset();
-    
-
+    ErmesObject aObject;
+    FtsObject aFtsObject;
+    for (Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();){
+      aObject = (ErmesObject)e.nextElement();
+      if(aObject.NeedPropertyHandler()){
+	aFtsObject = aObject.GetFtsObject();
+	if(aFtsObject!=null) aFtsObject.removePropertyHandler("value", aObject);
+      }
+    }
     CloseAllSubWindows();//?????
 
     MaxApplication.RemoveThisWindowFromMenus(this);

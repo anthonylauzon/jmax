@@ -208,6 +208,8 @@ class ErmesSketchHelper extends Object{
     itsSketchPad.RemoveElementRgn(theObject);
     DeleteObjectConnections(theObject);
     //removes theObject from the selected elements list	
+    if(theObject.NeedPropertyHandler())
+      if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removePropertyHandler("value",theObject);
     itsSketchPad.itsSelectedList.removeElement(theObject);
     //removes theObject from the element list (delete)
     itsSketchPad.itsElements.removeElement(theObject);
