@@ -33,3 +33,4 @@ seqobj.c \
 eventtrk.c \
 intevt.c \
 noteevt.c \
+messevt.c \

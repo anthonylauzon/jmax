@@ -37,7 +37,7 @@ typedef struct _intevt_
   fts_atom_t value;
 } intevt_t;
 
-#define intevt_set_value(n, v) ((n)->value = (v))
-#define intevt_get_value(n) ((n)->value)
+#define intevt_set_value(e, v) ((e)->value = (v))
+#define intevt_get_value(e) ((e)->value)
 
 #endif
