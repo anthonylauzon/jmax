@@ -40,26 +40,18 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 class VectorDisplay extends GraphicObject implements FtsDisplayListener
 {
-  private static final int minWidth = 20;
-  private static final int minHeight = 20;
+  private static final int minWidth = 18;
+  private static final int minHeight = 18;
 
-  private static final int maxSize = 1024;
-  private static final int maxWidth = maxSize + 2;
+  private int maxWidth = 0;
   private static final int maxHeight = 500;
 
   /* silent agreement with client */
-  private static final int defaultWidth = 256;
-  private static final int defaultHeight = 128;
-  private static final float defaultMin = (float)0.0;
-  private static final float defaultMax = (float)127.0;
+  private static final int defaultWidth = 130;
+  private static final int defaultHeight = 130;
 
   int size = 0;
   int range = 0;
-  int values[] = new int[maxSize];
-  int nValues = 0;
-  float min = defaultMin;
-  float max = defaultMax;
-  int zero = 0; /* y position of zero axis */
 
   public VectorDisplay(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -74,46 +66,19 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 	h = defaultHeight;
       }
 
+    maxWidth = FtsVectorDisplayObject.MAX_SIZE + 2;
+
     setWidth(w);
     setHeight(h);
   }
 
-  public void display(int nArgs, FtsAtom args[])
+  public void display()
   {
-    int i;
-
-    for(i=0; i<nArgs; i++)
-      values[i] = args[i].getInt();
-    
-    nValues = nArgs;
-
     redraw();
   }
 
-  public void computeZero()
-  {
-    if(min < (float)(0.0))
-      zero = (int)((float)range * min / (min - max));
-    else
-      zero = 0;
-  }
-
-  public void bounds(float a, float b)
-  {
-    /* clear display */
-    nValues = 0;
-
-    min = a;
-    max = b;
-
-    computeZero();
-  }
-    
   public void setWidth( int w) 
   {
-    /* clear display */
-    nValues = 0;
-
     if (w < minWidth)
       w = minWidth;
     else if (w > maxWidth)
@@ -128,16 +93,12 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void setHeight( int h)
   {
-    /* clear display */
-    nValues = 0;
-
     if (h < minHeight)
       h = minHeight;
     else if (h > maxHeight)
       h = maxHeight;
 
     range = h - 2;
-    computeZero();
 
     ((FtsVectorDisplayObject)ftsObject).setRange(range);
 
@@ -194,9 +155,13 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-    int n = nValues;
+
+    int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
+    int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
+    int zero = ((FtsVectorDisplayObject)ftsObject).getZero();
+
     int orgX = x + 1;
-    int orgY = y + h - 1;
+    int orgY = y + h - 2;
     Color backgroundColor = new Color((float)1.0, (float)0.98, (float)0.9);
     Color zeroColor = new Color((float)0.9, (float)0.88, (float)0.8);
     int i;
@@ -232,13 +197,14 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void updatePaint(Graphics g) 
   {
-    int n = nValues;
+    int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
+    int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
     int i;
 
     if(n > size)
       n = size;
 
     if(n > 1)
-      paintVector(g, getX() + 1, getY() + getHeight() - 1, values, n);
+      paintVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
   }
 }

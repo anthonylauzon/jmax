@@ -29,6 +29,5 @@ package ircam.jmax.fts;
 
 public interface FtsDisplayListener
 {
-  public void display(int nArgs, FtsAtom args[]);
-  public void bounds(float min, float max);
+  public void display();
 }

@@ -33,7 +33,17 @@ import ircam.jmax.*;
 
 public class FtsVectorDisplayObject extends FtsObject
 {
-  int size;
+  public static final int MAX_SIZE = 1024;
+  private static final float defaultMin = (float)-1.0;
+  private static final float defaultMax = (float)1.0;
+
+  int size = 0;
+  int range = 0;
+  int values[] = new int[MAX_SIZE];
+  int nValues = 0;
+  float min = defaultMin;
+  float max = defaultMax;
+  int zero = 0; /* y position of zero axis */
 
   public FtsVectorDisplayObject(Fts fts, FtsObject parent)
   {
@@ -43,6 +53,14 @@ public class FtsVectorDisplayObject extends FtsObject
     noutlets = 0;
   }
 
+  public void computeZero()
+  {
+    if(min < (float)(0.0))
+      zero = (int)((float)(range - 1) * min / (min - max) + (float)0.5);
+    else
+      zero = 0;
+  }
+
   public int getSize()
   {
     return size;
@@ -50,29 +68,71 @@ public class FtsVectorDisplayObject extends FtsObject
 
   public void setSize(int n)
   {
+    nValues = 0;
+
+    size = n;
+
     sendArgs[0].setInt(n); 
     sendMessage(FtsObject.systemInlet, "size", 1, sendArgs);
   }  
 
+  public int getRange()
+  {
+    return range;
+  }  
+
   public void setRange(int n)
   {
+    nValues = 0;
+
+    range = n;
+
     sendArgs[0].setInt(n); 
     sendMessage(FtsObject.systemInlet, "range", 1, sendArgs);
+
+    computeZero();
+  }  
+
+  public int getZero()
+  {
+    return zero;
+  }  
+
+  public int getNValues()
+  {
+    return nValues;
+  }  
+
+  public int[] getValues()
+  {
+    return values;
   }  
 
   public void display(int nArgs, FtsAtom args[])
   {
-    ((FtsDisplayListener) listener).display(nArgs, args);
+    int i;
+
+    for(i=0; i<nArgs; i++)
+      values[i] = args[i].getInt();
+    
+    nValues = nArgs;
+
+    ((FtsDisplayListener) listener).display();
   }
 
   public void bounds(int nArgs, FtsAtom args[])
   {
-    float min = args[0].getFloat();
-    float max = args[1].getFloat();
+    nValues = 0;
 
-    ((FtsDisplayListener) listener).bounds(min, max);
+    min = args[0].getFloat();
+    max = args[1].getFloat();
+
+    computeZero();
+
+    if(listener != null)
+      ((FtsDisplayListener) listener).display();
   }
-
+    
   /* argument vector for sending messages to server */
   public final static int NUM_ARGS = 2;
   public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
@@ -83,8 +143,3 @@ public class FtsVectorDisplayObject extends FtsObject
       sendArgs[i]= new FtsAtom();
   }
 }
-
-
-
-
-
