@@ -9694,7 +9694,6 @@
 		};
 		F85123D3028BEAB301664092 = {
 			children = (
-				F85123D4028BEAB301664092,
 				F85123D5028BEAB301664092,
 				F85123D6028BEAB301664092,
 				F851247E028BEBB201664092,
@@ -9708,12 +9707,6 @@
 			isa = PBXGroup;
 			name = tools;
 			refType = 4;
-		};
-		F85123D4028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = AdderTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/AdderTool.java;
-			refType = 2;
 		};
 		F85123D5028BEAB301664092 = {
 			isa = PBXFileReference;

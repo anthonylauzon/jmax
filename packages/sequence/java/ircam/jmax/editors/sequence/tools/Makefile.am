@@ -1,6 +1,5 @@
 packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/renderers
 package_JAVA = \
-AdderTool.java \
 ArrowTool.java \
 CombTool.java \
 LinerTool.java \
