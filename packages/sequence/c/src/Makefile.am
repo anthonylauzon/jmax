@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.16 2003/02/04 18:34:35 diemo Exp $
+# $Id: Makefile.am,v 1.17 2003/03/27 18:14:38 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.17  2003/03/27 18:14:38  p_tisserand
+# Add link to fts in packages Makefiles to fix link problems with LADSPA standard applyplugin
+#
 # Revision 1.16  2003/02/04 18:34:35  diemo
 # Removed spurious "A track with this name already exist!" message.
 # Editors update track/sequence name.
@@ -107,6 +110,7 @@ track.c
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/sequence/c/include
 
 noinst_HEADERS= \
+internal_sequence.h \
 seqmess.h \
 seqmidi.h 
 

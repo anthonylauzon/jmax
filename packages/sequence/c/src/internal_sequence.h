@@ -20,38 +20,17 @@
  * 
  */
 
-#include "internal_sequence.h"
+#ifndef INTERNAL_SEQUENCE_H
+#define INTERNAL_SEQUENCE_H
 
-extern void seqsym_config(void);
+#include <fts/fts.h>
+/* 
+   We include fts/packages/sequence/sequence.h 
+   for definition of SEQUENCE_API 
+*/
+#include <fts/packages/sequence/sequence.h>
 
-extern void sequence_class_config(void);
-extern void track_config(void);
-extern void event_config(void);
+SEQUENCE_API void
+sequence_config(void);
 
-extern void scoob_config(void);
-extern void seqmess_config(void);
-
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void locate_config(void);
-
-void
-sequence_config(void)
-{
-  seqsym_config();
-
-  sequence_class_config();
-  track_config();
-  event_config();
-
-  scoob_config();
-  seqmess_config();
-
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  locate_config();
-}
+#endif /* INTERNAL_SEQUENCE_H */
