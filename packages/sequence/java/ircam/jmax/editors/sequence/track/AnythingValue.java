@@ -23,6 +23,7 @@ package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
@@ -37,14 +38,25 @@ import java.util.*;
  * The EventValue object that represents a midi-like note with "ambitus" information */
 public class AnythingValue extends AbstractEventValue
 {
+  Object objId = new Integer(-1);
+  Object varname = "";
+  Object object  = null;
+  
   public AnythingValue()
   {
     super();  
     setProperty("duration", new Double(64.0));
+    setProperty("objid", objId);
   }
   
   public Object getProperty(String name)
   {
+    if(name.equals("objid"))
+      return objId;
+    else if(name.equals("object"))
+      return object;    
+    else if(name.equals("name"))
+      return varname;
     if(name.equals("type"))
       return type;
     else return super.getProperty(name);
@@ -52,10 +64,26 @@ public class AnythingValue extends AbstractEventValue
 
   public void setProperty( String name, Object value)
   { 
-    if( name.equals("type"))
+    if(name.equals("objid"))
+    {
+      if(((Integer)objId).intValue() != ((Integer)value).intValue())
+      {
+        objId = value;
+        FtsObject obj = JMaxApplication.getFtsServer().getObject(((Integer)objId).intValue());
+        setProperty("name", "#"+((Integer)objId).intValue());
+        setProperty("object", obj);
+      }
+    }
+    else if(name.equals("name"))
+      this.varname = value;
+    else if(name.equals("object"))
+      this.object = value;    
+    else if( name.equals("type"))
       type = (String)value;
-    else super.setProperty(name, value);
+    else 
+      super.setProperty(name, value);
   }
+  
   public ValueInfo getValueInfo()
   {
     return info;
@@ -102,11 +130,6 @@ public class AnythingValue extends AbstractEventValue
   {
     return AnythingEventRenderer.getRenderer();
   }
-  
-  /*public boolean samePropertyValues(Object args[])
-    {
-    return true;
-    }*/
 
   //--- Fields
   public static final String fs = File.separator;

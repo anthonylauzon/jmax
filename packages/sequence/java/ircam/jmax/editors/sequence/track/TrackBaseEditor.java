@@ -433,7 +433,7 @@ public void setContainer(SequenceEditor container)
   this.container = container;
 }
 
-private void createListDialog()
+void createListDialog()
 {
 	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
 }

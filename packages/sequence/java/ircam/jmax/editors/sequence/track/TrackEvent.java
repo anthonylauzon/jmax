@@ -55,7 +55,7 @@ public TrackEvent(FtsServer server, FtsObject parent, int objId, String classNam
   this.time = (double)args[offset].doubleValue;
   
   EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[offset+1].symbolValue.toString()).newInstance());
-  
+
   for(int i = 0; i< length-2-offset; i++)
   {
     Object obj = args[offset+2+i].getValue();
@@ -67,7 +67,7 @@ public TrackEvent(FtsServer server, FtsObject parent, int objId, String classNam
     
     evtArgs[i] = obj;	  
   }
-  
+
   evtValue.setPropertyValues(length-2-offset, evtArgs);   
   setValue(evtValue);
 }

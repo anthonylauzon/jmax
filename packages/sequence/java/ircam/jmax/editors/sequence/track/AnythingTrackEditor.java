@@ -46,9 +46,7 @@ public class AnythingTrackEditor extends TrackBaseEditor
   public AnythingTrackEditor(Geometry g, Track trk, boolean isInSequence)
   {
     super(g, trk, isInSequence);
-
     setBackground(Color.lightGray);
-    DEFAULT_HEIGHT = 70;
   }
 
   public void reinit(){}
@@ -93,9 +91,14 @@ public class AnythingTrackEditor extends TrackBaseEditor
 
   public int getDefaultHeight()
   {
-    return DEFAULT_HEIGHT;
+    return ANY_DEFAULT_HEIGHT;
   }
 
+  public int getInitialHeight()
+  {
+    return getDefaultHeight();
+  }  
+  
   public void objectsAdded(int maxTime) 
   {
     repaint();
@@ -108,8 +111,16 @@ public class AnythingTrackEditor extends TrackBaseEditor
     repaint();
   }
   
+  void createListDialog()
+  {
+    super.createListDialog();
+    listDialog.setSize( new Dimension(400, 200));
+  }
+  
   //--- AnythingTrackEditor fields
   static int MONODIMENSIONAL_TRACK_OFFSET = 0;
+  static int ANY_DEFAULT_HEIGHT = 70;
+
   AnythingAdapter ad;
 }
 
