@@ -1254,9 +1254,6 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   alsaaudioport_t *self = (alsaaudioport_t *)o;
 
-  fts_audioport_delete((fts_audioport_t*)self);
-
-
   if (self->input_buffer)
     fts_free( self->input_buffer);
   if (self->output_buffer)
@@ -1265,6 +1262,8 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
     snd_pcm_close(self->capture.handle);
   if (self->playback.handle)
     snd_pcm_close(self->playback.handle);
+
+  fts_audioport_delete((fts_audioport_t*)self);
 }
 
 static void
