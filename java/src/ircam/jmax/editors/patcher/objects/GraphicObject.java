@@ -1287,4 +1287,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     setWidth( rw); 
     setHeight( rh);
   }
+
+  public boolean instantEdit()
+  {
+    return false;
+  }
 }

@@ -903,13 +903,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     addObject(newObj.getFtsObject());
 
     boolean doEdit = false;
-    if( ((FtsGraphicObject)newObj.getFtsObject()).getClassName() == null)
+    if(( ( (FtsGraphicObject)newObj.getFtsObject()).getClassName() == null) || ( newObj.instantEdit()))
       doEdit = true;
     else
       {
 	String descr = ((FtsGraphicObject)newObj.getFtsObject()).getDescription();
 	if( descr!=null) descr.trim();
-	if((descr!=null) && descr.equals(""))
+	if(( descr != null) && descr.equals(""))
 	  doEdit = true;
       }
     newObj.getSketchPad().addNewObject(newObj, doEdit);

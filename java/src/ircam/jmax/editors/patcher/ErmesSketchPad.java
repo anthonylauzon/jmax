@@ -599,7 +599,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	// with an invoke later command.
 	
 	final Editable obj  = (Editable)object;
-	
+
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run()
 	    { textEditObject((Editable)obj);}});

@@ -285,6 +285,12 @@ public class Define extends Editable implements FtsObjectErrorListener{
     return ((FtsDefineObject)ftsObject).getType();
   }
 
+  public boolean instantEdit()
+  {
+    String expr = ((FtsDefineObject)ftsObject).getExpression().trim();
+    return expr.equals("");
+  }  
+  
   public void paint(Graphics g) 
   {
     int x = getX();
