@@ -31,7 +31,9 @@
  * The FTS hashtable maps keys to values, where both keys and values
  * are FTS atoms.
  *
- * <STRONG>NOTE:</STRONG>A FTS hashtable is restricted to contain only keys of the same <B>type</B>
+ * <STRONG>NOTE:</STRONG>A FTS hashtable is restricted to contain only keys of the same <B>type</B>.
+ *
+ * Currently supported key types are: fts_s_int, fts_s_ptr, fts_s_symbol and fts_s_string (i.e. char *)
  *
  * FTS hashtable performs automatic rehashing when the ration between number of inserted keys and the
  * capacity is greater than a "load factor" (typically 0.75).

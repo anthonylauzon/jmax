@@ -132,16 +132,21 @@ void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_ca
   if ( !iterator_heap)
     iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
 
+  if (key_type == fts_s_symbol)
+    h->key_type = 0;
+  else if (key_type && (key_type == fts_s_int || key_type == fts_s_ptr || key_type == fts_string))
+    h->key_type = key_type;
+  else
+    {
+      fprintf( stderr, "[hashtable] invalid key type \"%s\"\n", fts_symbol_name( key_type));
+      return;
+    }
+
   h->length = get_initial_capacity( initial_capacity);
   h->count = 0;
   h->rehash_count = (int)(h->length * FTS_HASHTABLE_STANDARD_LOAD_FACTOR);
 
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
-
-  if (key_type == fts_s_symbol)
-    h->key_type = 0;
-  else if (key_type)
-    h->key_type = key_type;
 
   hashtable_get_functions( h);
 }
@@ -387,7 +392,7 @@ static void hashtable_iterator_next( void *data, fts_atom_t *a)
   i->cell = i->cell->next;
 }
 
-static void hashtable_iterator_get( fts_hashtable_t *h, fts_iterator_t *i, int keys)
+static void hashtable_iterator_get( const fts_hashtable_t *h, fts_iterator_t *i, int keys)
 {
   fts_hashtable_iterator_t *hiter;
 
