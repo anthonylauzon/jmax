@@ -78,49 +78,20 @@ jackaudioport_output_fun( fts_audioport_t* port, float** buffers, int buffsize)
 
 
 
-
 static void
 jackaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  fts_symbol_t label_name = fts_get_symbol(at);
-  fts_symbol_t port_flag;
-  char* port_name;
-  int port_name_length = 0;
-  int char_written = 0;
+  jackaudioport_t* self = (jackaudioport_t*)o;
 
-  port_flag = fts_s_input;
-  port_name_length = strlen(label_name) + strlen("_in") + 1;
-  port_name = fts_malloc(sizeof(char) * port_name_length);
-  strncpy(port_name, label_name, strlen(label_name));
-  strncpy(port_name + strlen(label_name), "_in", strlen("_in"));
-  port_name[port_name_length - 1] = 0;
-  
-  
-  jackaudiomanager_open_port(o, fts_new_symbol(port_name), port_flag);
-
-  fts_free(port_name);
+  jackaudiomanager_open_port(o, self->port_name, fts_s_input);
 }
 
 static void
 jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  fts_symbol_t label_name = fts_get_symbol(at);
-  fts_symbol_t port_flag;
-  char* port_name;
-  int port_name_length = 0;
-  int char_written = 0;
+  jackaudioport_t* self = (jackaudioport_t*)o;
 
-  port_flag = fts_s_output;
-  port_name_length = strlen(label_name) + strlen("_out") + 1;
-  port_name = fts_malloc(sizeof(char) * port_name_length);
-  strncpy(port_name, label_name, strlen(label_name));
-  strncpy(port_name + strlen(label_name), "_out", strlen("_out"));
-  port_name[port_name_length - 1] = 0;        
-  
-  fts_log("[jackaudioport_open_output] port : %p \n", o);
-  jackaudiomanager_open_port(o, fts_new_symbol(port_name), port_flag);
-
-  fts_free(port_name);
+  jackaudiomanager_open_port(o, self->port_name, fts_s_output);
 }
 
 static void
