@@ -25,6 +25,7 @@
  */
 
 #include "iir.h"
+#include "filters.h"
 
 /****************************
  *  
@@ -55,21 +56,21 @@ ftl_iir_1(fts_word_t *argv)
   ynm1 = state[0]; /* y(n-1) */
   b1 = coefs[0]; 
 
-  ynp0 = x[0] - b1 * ynm1; /* y(n) */
-  ynp1 = x[1] - b1 * ynp0; /* y(n+1) */
-  ynp2 = x[2] - b1 * ynp1; /* y(n+2) */
-  ynp3 = x[3] - b1 * ynp2; /* y(n+3) */
+  ynp0 = FILTERS_FP_ONSET(x[0] - b1 * ynm1); /* y(n) */
+  ynp1 = FILTERS_FP_ONSET(x[1] - b1 * ynp0); /* y(n+1) */
+  ynp2 = FILTERS_FP_ONSET(x[2] - b1 * ynp1); /* y(n+2) */
+  ynp3 = FILTERS_FP_ONSET(x[3] - b1 * ynp2); /* y(n+3) */
 
   for(n=4; n<n_tick; n+=4)
   {
     y[n-4] = ynp0;
-    ynp0 = x[n+0] - b1 * ynp3; /* y(n) */
+    ynp0 = FILTERS_FP_ONSET(x[n+0] - b1 * ynp3); /* y(n) */
     y[n-3] = ynp1;
-    ynp1 = x[n+1] - b1 * ynp0; /* y(n+1) */
+    ynp1 = FILTERS_FP_ONSET(x[n+1] - b1 * ynp0); /* y(n+1) */
     y[n-2] = ynp2;
-    ynp2 = x[n+2] - b1 * ynp1; /* y(n+2) */
+    ynp2 = FILTERS_FP_ONSET(x[n+2] - b1 * ynp1); /* y(n+2) */
     y[n-1] = ynp3;
-    ynp3 = x[n+3] - b1 * ynp2; /* y(n+3) */
+    ynp3 = FILTERS_FP_ONSET(x[n+3] - b1 * ynp2); /* y(n+3) */
   }
 
   state[0] = ynp3; /* y(n-1) */
@@ -112,21 +113,21 @@ ftl_iir_2(fts_word_t *argv)
   b1 = coefs[0]; 
   b2 = coefs[1]; 
 
-  ynp0 = x[0] - b1 * ynm1 - b2 * ynm2; /* y(n) */
-  ynp1 = x[1] - b1 * ynp0 - b2 * ynm1; /* y(n+1) */
-  ynp2 = x[2] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-  ynp3 = x[3] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
+  ynp0 = FILTERS_FP_ONSET(x[0] - b1 * ynm1 - b2 * ynm2); /* y(n) */
+  ynp1 = FILTERS_FP_ONSET(x[1] - b1 * ynp0 - b2 * ynm1); /* y(n+1) */
+  ynp2 = FILTERS_FP_ONSET(x[2] - b1 * ynp1 - b2 * ynp0); /* y(n+2) */
+  ynp3 = FILTERS_FP_ONSET(x[3] - b1 * ynp2 - b2 * ynp1); /* y(n+3) */
 
   for(n=4; n<n_tick; n+=4)
   {
     y[n-4] = ynp0;
-    ynp0 = x[n+0] - b1 * ynp3 - b2 * ynp2; /* y(n) */
+    ynp0 = FILTERS_FP_ONSET(x[n+0] - b1 * ynp3 - b2 * ynp2); /* y(n) */
     y[n-3] = ynp1;
-    ynp1 = x[n+1] - b1 * ynp0 - b2 * ynp3; /* y(n+1) */
+    ynp1 = FILTERS_FP_ONSET(x[n+1] - b1 * ynp0 - b2 * ynp3); /* y(n+1) */
     y[n-2] = ynp2;
-    ynp2 = x[n+2] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
+    ynp2 = FILTERS_FP_ONSET(x[n+2] - b1 * ynp1 - b2 * ynp0); /* y(n+2) */
     y[n-1] = ynp3;
-    ynp3 = x[n+3] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
+    ynp3 = FILTERS_FP_ONSET(x[n+3] - b1 * ynp2 - b2 * ynp1); /* y(n+3) */
   }
 
   y[n_tick-4] = ynp0;
@@ -168,21 +169,21 @@ ftl_iir_3(fts_word_t *argv)
   b2 = coefs[1]; 
   b3 = coefs[2]; 
 
-  ynp0 = x[0] - b1 * ynm1 - b2 * ynm2 - b3 * ynm3; /* y(n) */
-  ynp1 = x[1] - b1 * ynp0 - b2 * ynm1 - b3 * ynm2; /* y(n+1) */
-  ynp2 = x[2] - b1 * ynp1 - b2 * ynp0 - b3 * ynm1; /* y(n+2) */
-  ynp3 = x[3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0; /* y(n+3) */
+  ynp0 = FILTERS_FP_ONSET(x[0] - b1 * ynm1 - b2 * ynm2 - b3 * ynm3); /* y(n) */
+  ynp1 = FILTERS_FP_ONSET(x[1] - b1 * ynp0 - b2 * ynm1 - b3 * ynm2); /* y(n+1) */
+  ynp2 = FILTERS_FP_ONSET(x[2] - b1 * ynp1 - b2 * ynp0 - b3 * ynm1); /* y(n+2) */
+  ynp3 = FILTERS_FP_ONSET(x[3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0); /* y(n+3) */
 
   for(n=4; n<n_tick; n+=4)
   {
     y[n-4] = ynp0;
-    ynp0 = x[n+0] - b1 * ynp3 - b2 * ynp2 - b3 * ynp1; /* y(n) */
+    ynp0 = FILTERS_FP_ONSET(x[n+0] - b1 * ynp3 - b2 * ynp2 - b3 * ynp1); /* y(n) */
     y[n-3] = ynp1;
-    ynp1 = x[n+1] - b1 * ynp0 - b2 * ynp3 - b3 * ynp2; /* y(n+1) */
+    ynp1 = FILTERS_FP_ONSET(x[n+1] - b1 * ynp0 - b2 * ynp3 - b3 * ynp2); /* y(n+1) */
     y[n-2] = ynp2;
-    ynp2 = x[n+2] - b1 * ynp1 - b2 * ynp0 - b3 * ynp3; /* y(n+2) */
+    ynp2 = FILTERS_FP_ONSET(x[n+2] - b1 * ynp1 - b2 * ynp0 - b3 * ynp3); /* y(n+2) */
     y[n-1] = ynp3;
-    ynp3 = x[n+3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0; /* y(n+3) */
+    ynp3 = FILTERS_FP_ONSET(x[n+3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0); /* y(n+3) */
   }
 
   y[n_tick-4] = ynp0;
@@ -226,21 +227,21 @@ ftl_iir_4(fts_word_t *argv)
   b3 = coefs[2]; 
   b4 = coefs[3]; 
 
-  ynp0 = x[0] - b1 * ynm1 - b2 * ynm2 - b3 * ynm3 - b4 * ynm4; /* y(n) */
-  ynp1 = x[1] - b1 * ynp0 - b2 * ynm1 - b3 * ynm2 - b4 * ynm3; /* y(n+1) */
-  ynp2 = x[2] - b1 * ynp1 - b2 * ynp0 - b3 * ynm1 - b4 * ynm2; /* y(n+2) */
-  ynp3 = x[3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0 - b4 * ynm1; /* y(n+3) */
+  ynp0 = FILTERS_FP_ONSET(x[0] - b1 * ynm1 - b2 * ynm2 - b3 * ynm3 - b4 * ynm4); /* y(n) */
+  ynp1 = FILTERS_FP_ONSET(x[1] - b1 * ynp0 - b2 * ynm1 - b3 * ynm2 - b4 * ynm3); /* y(n+1) */
+  ynp2 = FILTERS_FP_ONSET(x[2] - b1 * ynp1 - b2 * ynp0 - b3 * ynm1 - b4 * ynm2); /* y(n+2) */
+  ynp3 = FILTERS_FP_ONSET(x[3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0 - b4 * ynm1); /* y(n+3) */
 
   for(n=4; n<n_tick; n+=4)
   {
     y[n-4] = ynp0;
-    ynp0 = x[n+0] - b1 * ynp3 - b2 * ynp2 - b3 * ynp1 - b4 * ynp0; /* y(n) */
+    ynp0 = FILTERS_FP_ONSET(x[n+0] - b1 * ynp3 - b2 * ynp2 - b3 * ynp1 - b4 * ynp0); /* y(n) */
     y[n-3] = ynp1;
-    ynp1 = x[n+1] - b1 * ynp0 - b2 * ynp3 - b3 * ynp2 - b4 * ynp1; /* y(n+1) */
+    ynp1 = FILTERS_FP_ONSET(x[n+1] - b1 * ynp0 - b2 * ynp3 - b3 * ynp2 - b4 * ynp1); /* y(n+1) */
     y[n-2] = ynp2;
-    ynp2 = x[n+2] - b1 * ynp1 - b2 * ynp0 - b3 * ynp3 - b4 * ynp2; /* y(n+2) */
+    ynp2 = FILTERS_FP_ONSET(x[n+2] - b1 * ynp1 - b2 * ynp0 - b3 * ynp3 - b4 * ynp2); /* y(n+2) */
     y[n-1] = ynp3;
-    ynp3 = x[n+3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0 - b4 * ynp3; /* y(n+3) */
+    ynp3 = FILTERS_FP_ONSET(x[n+3] - b1 * ynp2 - b2 * ynp1 - b3 * ynp0 - b4 * ynp3); /* y(n+3) */
   }
 
   y[n_tick-4] = state[0] = ynp0; /* y(n-4) */
@@ -281,7 +282,7 @@ ftl_iir_n(fts_word_t *argv)
   for(n=0; n<n_order; n++)
     {
       int i;
-      y[n] = x[n];
+      y[n] = FILTERS_FP_ONSET(x[n]);
       for(i=0; i<n_order-n; i++)
 	y[n] -= coefs[i] * state[n_order-1-i];
       for( ; i<n_order; i++)
@@ -290,7 +291,7 @@ ftl_iir_n(fts_word_t *argv)
   for( ; n<n_tick; n++)
     {
       int i;
-      y[n] = x[n];
+      y[n] = FILTERS_FP_ONSET(x[n]);
       for(i=0; i<n_order; i++)
 	y[n] -= coefs[i] * y[n-1-i];
     }

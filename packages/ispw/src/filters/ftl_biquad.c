@@ -25,6 +25,7 @@
  */
 
 #include "fts.h"
+#include "filters.h"
 #include "biquad.h"
 
 /****************************
@@ -67,8 +68,7 @@ void ftl_biquad_df1(fts_word_t *argv)
       float xn, yn;
 
       xn = x[n];
-      yn = a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2;
-
+      yn = FILTERS_FP_ONSET(a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2);
       y[n] = yn;
 
       xnm2 = xnm1;
@@ -115,9 +115,7 @@ void ftl_biquad_df1_inplace(fts_word_t *argv)
       float xn, yn;
 
       xn = xy[n];
-
-      yn = a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2;
-
+      yn = FILTERS_FP_ONSET(a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2);
       xy[n] = yn;
 
       xnm2 = xnm1;
@@ -168,10 +166,10 @@ void ftl_biquad_df2(fts_word_t *argv)
   b1 = coefs->b1; 
   b2 = coefs->b2; 
 
-  wnp0 = x[0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
-  wnp1 = x[1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
-  wnp2 = x[2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
-  wnp3 = x[3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+  wnp0 = FILTERS_FP_ONSET(x[0] - b1 * wnm1 - b2 * wnm2); /* w(n) */
+  wnp1 = FILTERS_FP_ONSET(x[1] - b1 * wnp0 - b2 * wnm1); /* w(n+1) */
+  wnp2 = FILTERS_FP_ONSET(x[2] - b1 * wnp1 - b2 * wnp0); /* w(n+2) */
+  wnp3 = FILTERS_FP_ONSET(x[3] - b1 * wnp2 - b2 * wnp1); /* w(n+3) */
 
   y[0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
   y[1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;
@@ -183,10 +181,10 @@ void ftl_biquad_df2(fts_word_t *argv)
     wnm2 = wnp2;
     wnm1 = wnp3;
 
-    wnp0 = x[n+0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
-    wnp1 = x[n+1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
-    wnp2 = x[n+2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
-    wnp3 = x[n+3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+    wnp0 = FILTERS_FP_ONSET(x[n+0] - b1 * wnm1 - b2 * wnm2); /* w(n) */
+    wnp1 = FILTERS_FP_ONSET(x[n+1] - b1 * wnp0 - b2 * wnm1); /* w(n+1) */
+    wnp2 = FILTERS_FP_ONSET(x[n+2] - b1 * wnp1 - b2 * wnp0); /* w(n+2) */
+    wnp3 = FILTERS_FP_ONSET(x[n+3] - b1 * wnp2 - b2 * wnp1); /* w(n+3) */
 
     y[n+0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
     y[n+1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;
@@ -225,10 +223,10 @@ void ftl_biquad_df2_inplace(fts_word_t *argv)
   b1 = coefs->b1; 
   b2 = coefs->b2; 
 
-  wnp0 = xy[0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
-  wnp1 = xy[1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
-  wnp2 = xy[2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
-  wnp3 = xy[3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+  wnp0 = FILTERS_FP_ONSET(xy[0] - b1 * wnm1 - b2 * wnm2); /* w(n) */
+  wnp1 = FILTERS_FP_ONSET(xy[1] - b1 * wnp0 - b2 * wnm1); /* w(n+1) */
+  wnp2 = FILTERS_FP_ONSET(xy[2] - b1 * wnp1 - b2 * wnp0); /* w(n+2) */
+  wnp3 = FILTERS_FP_ONSET(xy[3] - b1 * wnp2 - b2 * wnp1); /* w(n+3) */
 
   xy[0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
   xy[1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;
@@ -240,10 +238,10 @@ void ftl_biquad_df2_inplace(fts_word_t *argv)
     wnm2 = wnp2;
     wnm1 = wnp3;
 
-    wnp0 = xy[n+0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
-    wnp1 = xy[n+1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
-    wnp2 = xy[n+2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
-    wnp3 = xy[n+3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+    wnp0 = FILTERS_FP_ONSET(xy[n+0] - b1 * wnm1 - b2 * wnm2); /* w(n) */
+    wnp1 = FILTERS_FP_ONSET(xy[n+1] - b1 * wnp0 - b2 * wnm1); /* w(n+1) */
+    wnp2 = FILTERS_FP_ONSET(xy[n+2] - b1 * wnp1 - b2 * wnp0); /* w(n+2) */
+    wnp3 = FILTERS_FP_ONSET(xy[n+3] - b1 * wnp2 - b2 * wnp1); /* w(n+3) */
 
     xy[n+0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
     xy[n+1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;

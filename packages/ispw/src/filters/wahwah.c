@@ -25,6 +25,7 @@
  */
 
 #include "fts.h"
+#include "filters.h"
 
 static fts_symbol_t wahwah_function = 0;
 
@@ -128,21 +129,21 @@ ftl_wahwah(fts_word_t *argv)
   b2 = r * r;
   c = (1.0f - r) * ((1.0f - r) + r * sin_theta);
 
-  ynp0 = x[0] - b1 * ynm1 - b2 * ynm2; /* y(n) */
-  ynp1 = x[1] - b1 * ynp0 - b2 * ynm1; /* y(n+1) */
-  ynp2 = x[2] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-  ynp3 = x[3] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
+  ynp0 = FILTERS_FP_ONSET(x[0] - b1 * ynm1 - b2 * ynm2); /* y(n) */
+  ynp1 = FILTERS_FP_ONSET(x[1] - b1 * ynp0 - b2 * ynm1); /* y(n+1) */
+  ynp2 = FILTERS_FP_ONSET(x[2] - b1 * ynp1 - b2 * ynp0); /* y(n+2) */
+  ynp3 = FILTERS_FP_ONSET(x[3] - b1 * ynp2 - b2 * ynp1); /* y(n+3) */
 
   for(n=4; n<n_tick; n+=4)
   {
     y[n-4] = c * ynp0;
-    ynp0 = x[n+0] - b1 * ynp3 - b2 * ynp2; /* y(n) */
+    ynp0 = FILTERS_FP_ONSET(x[n+0] - b1 * ynp3 - b2 * ynp2); /* y(n) */
     y[n-3] = c * ynp1;
-    ynp1 = x[n+1] - b1 * ynp0 - b2 * ynp3; /* y(n+1) */
+    ynp1 = FILTERS_FP_ONSET(x[n+1] - b1 * ynp0 - b2 * ynp3); /* y(n+1) */
     y[n-2] = c * ynp2;
-    ynp2 = x[n+2] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
+    ynp2 = FILTERS_FP_ONSET(x[n+2] - b1 * ynp1 - b2 * ynp0); /* y(n+2) */
     y[n-1] = c * ynp3;
-    ynp3 = x[n+3] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
+    ynp3 = FILTERS_FP_ONSET(x[n+3] - b1 * ynp2 - b2 * ynp1); /* y(n+3) */
   }
 
   y[n_tick-4] = c * ynp0;
