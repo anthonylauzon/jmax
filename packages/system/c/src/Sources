@@ -1,5 +1,0 @@
-SOURCES = \
-arch.c \
-dsp1.c \
-system.c \
-ucsobj.c \

@@ -1,3 +1,0 @@
-SOURCES = ControlModule.java \
-	  ControlPanelFrame.java \
-	  DspControl.java

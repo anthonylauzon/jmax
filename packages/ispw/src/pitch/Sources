@@ -1,6 +1,0 @@
-SOURCES = \
-pitch_module.c \
-pitch.c \
-pt.c \
-pt_meth.c \
-pt_tools.c

@@ -1,3 +1,0 @@
-SOURCES = \
-module.c \
-qlist.c \

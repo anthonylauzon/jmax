@@ -1,5 +1,0 @@
-all	all    protocol.h
-all	all    client.h
-all	all    incoming.h
-all	all    outgoing.h
-all	all    updates.h

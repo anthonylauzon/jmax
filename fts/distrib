@@ -1,5 +1,0 @@
-all	all	Makefiles
-all	all     src
-all	all	scripts
-all	all	bin/ARCH/opt/fts
-
