@@ -42,10 +42,8 @@ extern void ossdev_init(void);
 extern void sfdev_init(void);
 #endif
 
-#if 0
 #ifdef SGI
 extern void shmdev_init( void);
-#endif
 #endif
 
 void fts_dev_configure(void)
@@ -74,10 +72,8 @@ void fts_dev_configure(void)
 
 #endif
 
-#if 0
 #ifdef SGI
   shmdev_init();
-#endif
 #endif
 }
 
