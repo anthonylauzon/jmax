@@ -27,6 +27,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -343,10 +344,17 @@ public class FtsPatcherObject extends FtsObjectWithEditor implements MaxData
   */
   public void openEditor(int nArgs, FtsAtom args[])
   {
-      if(getEditorFrame() == null)	    
-	  setEditorFrame(new ErmesSketchWindow(this));
-
-      showEditor();
+       if(getEditorFrame() == null) 
+	  {
+	      SwingUtilities.invokeLater(new Runnable() {
+		      public void run() {
+			  setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+			  showEditor();
+		      }
+		  });
+	  }
+      else
+	  showEditor();
   }
 
   public void stopWaiting(int nArgs, FtsAtom args[])
