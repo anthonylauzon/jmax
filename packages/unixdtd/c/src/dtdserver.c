@@ -78,7 +78,7 @@ static dtdserver_t *default_instance;
 dtdserver_t *dtdserver_get_default_instance( void)
 {
   if (!default_instance)
-    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, NULL, 0, 0);
+    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0);
   
   return default_instance;
 }

@@ -35,7 +35,7 @@
 
 #define FTS_JACK_CREATE_THREAD 1
 
-#define JACK_AUDIO_MANAGER_DEBUG 1
+/* #define JACK_AUDIO_MANAGER_DEBUG 1 */
 
 typedef struct _jackaudiomanager_thread_t
 {
@@ -544,7 +544,7 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
     fts_log("[jackaudiomanager] append symbol : %s\n", ports[i]);
     fts_set_int(at, flags);
     fts_set_symbol(at + 1, fts_new_symbol(ports[i]));
-    port = (fts_audioport_t*)fts_object_create(jackaudioport_type, NULL, 2, at);
+    port = (fts_audioport_t*)fts_object_create(jackaudioport_type, 2, at);
     fts_audiomanager_put_port(cur_sym, port);
     ++i;
   }
@@ -743,7 +743,7 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   fts_thread_manager_start();
 
   /* create jack communication object */
-  self->jack_communication = fts_object_create(jackaudiomanager_thread_type, NULL, 0, 0);
+  self->jack_communication = fts_object_create(jackaudiomanager_thread_type, 0, 0);
   fts_object_refer(self->jack_communication);
 
   /* create connections thread */
@@ -824,7 +824,7 @@ void jackaudiomanager_config( void)
   jackaudiomanager_thread_type = fts_class_install(fts_new_symbol("jackaudiomanager_thread"), 
 							   jackaudiomanager_thread_instantiate);
 
-  jackaudiomanager_object = fts_object_create(jackaudiomanager_type, NULL, 0, NULL);
+  jackaudiomanager_object = fts_object_create(jackaudiomanager_type, 0, NULL);
 
   /* in case of fts quit */
   atexit(jackaudiomanager_at_exit);

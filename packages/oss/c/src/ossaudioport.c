@@ -65,11 +65,11 @@ ossaudiomanager_scan_devices()
   fts_atom_t at;
 
   fts_set_symbol(&at, s_slash_dev_slash_audio);
-  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, NULL, 1, &at);
+  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, 1, &at);
   fts_audiomanager_put_port(s_slash_dev_slash_audio, port);
 
   fts_set_symbol(&at, s_slash_dev_slash_dsp);
-  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, NULL, 1, &at);
+  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, 1, &at);
   fts_audiomanager_put_port(s_slash_dev_slash_dsp, port);
 
 }
