@@ -1,19 +1,19 @@
 src	all	Makefile
 src	all	Sources
 src	all	atomfiles.c
-src	all	atomfiles.h
+all	all	atomfiles.h
 src	all	directories.c
-src	all	directories.h
+all	all	directories.h
 src	all	files.c
-src	all	files.h
+all	all	files.h
 src	all	parser.c
-src	all	parser.h
+all	all	parser.h
 src	all	post.c
-src	all	post.h
+all	all	post.h
 src	all	sgiaf.c
 src	all	soundfiles.c
-src	all	soundfiles.h
+all	all	soundfiles.h
 src	all	soundformats.c
-src	all	soundformats.h
+all	all	soundformats.h
 src	all	sttools.c
 
