@@ -100,7 +100,6 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minPanel.validate();
 
     add(minPanel);
-    add( minValueField);
 
     add(new JSeparator());
 
