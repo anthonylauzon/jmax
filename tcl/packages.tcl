@@ -243,6 +243,3 @@ proc packageInit { } {
 ##
 
 packageInit
-
-
-
