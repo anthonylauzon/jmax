@@ -28,14 +28,6 @@
 ## Packages installed by default in this site
 ##
 
-global jmaxCompatibility
-
-if {$jmaxCompatibility == "ispw"} { 
-  package require ispwmath
-} else {
-  package require math
-}
-
 # new classes
 package require data
 package require control
@@ -45,6 +37,7 @@ package require lists
 
 # ISPW classes
 package require ispw
+package require ispwmath
 package require table
 package require qlist
 package require explode

@@ -67,6 +67,3 @@ set jmaxSysPkgPath "$jmaxRootDir/packages $jmaxRootDir/syspackages"
 
 ## Splash screen setting
 set jmaxSplashScreen "show"
-
-## compatibility mode
-set jmaxCompatibility "ispw"

@@ -26,12 +26,12 @@
 
 #include "fts.h"
 
-extern void binop_config(void);
+extern void math_binop_config(void);
 
 static void
 math_init(void)
 {
-  binop_config();
+  math_binop_config();
 }
 
 fts_module_t math_module = {"math", "math classes", math_init};
