@@ -40,7 +40,7 @@ import ircam.jmax.editors.patcher.interactions.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener, FocusListener
+public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 {
   static boolean syncPaint = false;
 
@@ -300,8 +300,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     fts.addUpdateGroupListener( this);
 
-    addFocusListener(this);
-
     // Get the defaultFontName and Size
 
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
@@ -320,7 +318,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     displayList = new DisplayList(this);
     engine      = new InteractionEngine(this);
-    keyMap = new KeyMap(this, this.getSketchWindow());
+    keyMap      = new KeyMap(this, this.getSketchWindow());
 
     // Next two temporary (mdc)
 
@@ -551,16 +549,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
 
-  public void focusGained(FocusEvent e)
-  {
-    // Ignore
-  }
-
-  public void focusLost(FocusEvent e)
-  {
-    stopTextEditing();
-  }
-
   public void showObject( Object obj)
   {
     // Should select or highlight obj if it is an FtsObject
@@ -623,8 +611,6 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   void cleanAll()
   {
     fts.removeUpdateGroupListener( this);
-
-    removeFocusListener(this);
 
     engine.dispose();
 

@@ -92,7 +92,7 @@ public class FtsAtomList extends FtsRemoteData
 
   /** Implement the remote calls from the server */
 
-  public final void call( int key, FtsStream stream)
+  protected final void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)

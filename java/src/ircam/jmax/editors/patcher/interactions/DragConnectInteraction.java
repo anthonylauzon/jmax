@@ -78,7 +78,7 @@ class DragConnectInteraction extends Interaction
       {
 	// Just don't do the connection in case of troubles.
 
-	editor.showMessage("Cannot connect");
+	// editor.showMessage("Cannot connect");
       }
   }
 

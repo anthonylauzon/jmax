@@ -60,7 +60,7 @@ public abstract class FtsRemoteData implements MaxData
     return this.getClass().getName() + "." + id;
   }
 
-  abstract public void call( int key, FtsStream stream)
+  abstract protected void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException;
 
   /* Subclasses should implement the release method (calling super !!) */

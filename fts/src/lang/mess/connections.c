@@ -17,8 +17,12 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-/* (fd) For post */
-#include "runtime/files.h"
+
+/* Note that in this code there are error messages sent as blip;
+   this is ok during editing, but the same error may occour while
+   loading a patch in an environment where some object changed
+   without keeping compatibility; we should send the messages to the 
+   console in this case ?*/
 
 extern void fts_client_release_connection(fts_connection_t *c);
 extern void fts_client_redefine_connection(fts_connection_t *c);
@@ -61,19 +65,13 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
   if (fts_object_is_error(in))
     fts_error_object_fit_inlet(in, winlet);
 
-  /* check the outlet range */
+  /* check the outlet range (should never happen, a part from loading) */
 
   if (woutlet >= out->cl->noutlets || woutlet < 0)
     {
-      post("Outlet out of range, connecting ");
-      post_object(out);
-      post(" outlet %d to ", woutlet);
-      post_object(in);
-      post(" inlet %d\n", winlet);
-
+      fts_object_blip(out, "Outlet out of range");
       return 0;
     }
-
 
   /* check againsts double connections */
   { 
@@ -85,13 +83,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 	{
 	  /* Found, return error message */
 
-	  post("Double Connection, connecting ");
-	  post_object(out);
-	  post(" outlet %d to ", woutlet);
-	  post_object(in);
-	  post(" inlet %d\n", winlet);
-
-
+	  fts_object_blip(out, "Double connection, cannot connect.");
 	  return 0;
 	}
     }
@@ -107,12 +99,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
     inlet = &in->cl->inlets[winlet];
   else
     {
-      post("Inlet out of range, connecting ");
-      post_object(out);
-      post(" outlet %d to ", woutlet);
-      post_object(in);
-      post(" inlet %d\n", winlet);
-
+      fts_object_blip(out, "Inlet out of range, cannot connect.");
       return 0;
     }
 
@@ -122,12 +109,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 
       if (! mess)
 	{
-	  post("Cannot connect, connecting ");
-	  post_object(out);
-	  post(" outlet %d to ", woutlet);
-	  post_object(in);
-	  post(" inlet %d\n", winlet);
-
+	  fts_object_blip(out, "Type mismatch, cannot connect");
 	  return 0;
 	}
     }

@@ -31,7 +31,7 @@ import javax.swing.event.*;
 // The edit field contained in the editable objects (Message, Editable).
 //
 
-public class EditField extends JTextArea
+public class EditField extends JTextArea implements FocusListener
 {
   private Editable owner = null;
   private ErmesSketchPad sketch = null;
@@ -141,7 +141,7 @@ public class EditField extends JTextArea
     setLineWrap(true);
     setWrapStyleWord(true);
 
-    selectAll();
+    addFocusListener(this);
   }
 
   // actually starts the edit operation.
@@ -267,5 +267,16 @@ public class EditField extends JTextArea
     String s = getText();
 
     setText(s.substring(0, getSelectionStart()) +  s.substring(getSelectionEnd(), s.length()));
+  }
+
+  public void focusGained(FocusEvent e)
+  {
+    // Ignore
+  }
+
+  public void focusLost(FocusEvent e)
+  {
+    if (owner != null)
+      sketch.stopTextEditing();
   }
 }
