@@ -47,7 +47,7 @@
 
 ;; set binary execution mode for jMax server executable
 
-(define jmax-mode "debug")
+(define jmax-mode "opt")
 
 ;; set name for jMax server executable
 

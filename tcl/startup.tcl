@@ -46,6 +46,8 @@ if {[systemProperty "jmaxServerDir"] != ""} then {
     set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
 }
 
+puts $jmaxServerDir
+
 puts "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou"
 puts "jMax is free software with ABSOLUTELY NO WARRANTY."
 puts "(see file LICENSE for more details)"
@@ -77,10 +79,14 @@ sourceFile $jmaxRootDir/config/packages.tcl
 jmaxSetSampleRate $jmaxSampleRate
 jmaxSetAudioBuffer $jmaxAudioBuffer
 
-# run the start Hooks, by hand !!!
+# run the start Hooks, if there
+# if not there, run the defaultStart hooks
+# that should be defined in the machine type declaration files
 # so we are sure the correct configuration is there ...
 
-runHooks start
+if {[runHooks "start"] != "true"} {
+    runHooks "defaultStart"
+}
 
 # if profiling is on, close audio device 
 # and install the profile device; this after
