@@ -41,12 +41,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_BIGENDIAN
 
-dnl Check for Electric Fence (a library to track memory corruption errors on Linux)
-AC_ARG_ENABLE(electric-fence,
-    [  --enable-electric-fence[=value]   link with ElectricFence, a library to track memory corruption errors on Linux  [default=no]],
-    electric_fence="yes",
-    electric_fence="no")
-
 dnl Check for memory allocation debug
 AC_ARG_ENABLE(check_memory,
   [  --enable-check-memory[=value]   compile with -fcheck-memory-usage [default=no]],
@@ -57,8 +51,8 @@ dnl Check for libtool version
 dnl Carefull: the character set of the shell is eaten by m4, so we must change quoting
 dnl (autoconf manual, section 7.3 quoting)
 changequote(<<,>>)dnl
-libtool_major_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*\([0-9]\)\.[0-9]*\..*/\1/'`
-libtool_minor_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*[0-9]*\.\([0-9]*\)\..*/\1/'`
+libtool_major_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*\([0-9][0-9]*\)\..*/\1/'`
+libtool_minor_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*[0-9][0-9]*\.\([0-9][0-9]*\)/\1/'`
 changequote([,])dnl
 if test "$libtool_major_version" -le 1 -a "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs ; fi
 AC_SUBST(DOT_LIBS)
@@ -99,7 +93,7 @@ else
 PLATFORM_PACKAGES="oss unixdtd"
 CONFIG_FILE=config_linux_oss.jmax
 fi
-FTS_SYS_LIBS="-ldl -lpthread `test $electric_fence = yes && echo -lefence`"
+FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty` "
 ACX_C_RESTRICT
 ;;
 
