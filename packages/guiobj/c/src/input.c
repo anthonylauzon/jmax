@@ -25,11 +25,46 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 typedef struct {
-  fts_object_t head;
-  fts_audioport_t *port;
+  fts_dsp_object_t head;
+  fts_audiolabel_t* left_label;
+  fts_audiolabel_t* right_label;
 } input_t;
+
+
+static fts_symbol_t input_symbol = 0;
+
+static void
+input_ftl(fts_word_t* argv)
+{
+  input_t* self = (input_t*)fts_word_get_pointer(argv+0);
+  float* restrict left_out = (float*)fts_word_get_pointer(argv+1);
+  float* restrict right_out = (float*)fts_word_get_pointer(argv+2);
+  int n_tick = fts_word_get_int(argv+3);
+
+  if (self->left_label)
+    fts_audiolabel_input(self->left_label, left_out, n_tick);
+
+  if (self->right_label)
+    fts_audiolabel_input(self->right_label, right_out, n_tick);
+}
+
+static void
+input_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  input_t* self = (input_t*)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
+  fts_atom_t argv[4];
+
+  fts_set_object(argv+0, self);
+  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
+  fts_set_symbol(argv+2, fts_dsp_get_output_name(dsp, 1));
+  fts_set_int(argv+3, fts_dsp_get_output_size(dsp, 0));
+
+  fts_dsp_add_function(input_symbol, 4, argv);
+}
 
 static void 
 input_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -40,51 +75,26 @@ input_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void 
 input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  input_t *this = (input_t *)o;
+  input_t *self = (input_t *)o;
   int outlets, i;
 
-  if (ac == 0)
-    outlets = 2;
-  else
-    outlets = ac;
+  fts_dsp_object_init((fts_dsp_object_t*)self);
 
-  this->port = 0;
-#warning (OLD API) input_init use fts_audioport_get_default (OLD API)
-/*   this->port = fts_audioport_get_default(o); */
-  if ( !this->port)
-    {
-      fts_object_error( o, "default audio port is not defined");
-      return;    
-    }
+  self->left_label = fts_audiolabel_get(fts_new_symbol("default L"));
+  self->right_label = fts_audiolabel_get(fts_new_symbol("default R"));
 
-  fts_object_set_outlets_number( o, outlets);
+  if (!self->left_label || !self->right_label)
+  {
+    self->left_label = fts_audiolabel_get(fts_new_symbol("default"));
+    self->right_label = NULL;
+  }
 
-  if ( ac != 0)
-    {
-#warning (OLD API) input_init use fts_audioport_add_input_object (OLD API)
-/*       for ( i = 0; i < outlets; i++) */
-/* 	fts_audioport_add_input_object( this->port, fts_get_int(at + i) - 1, (fts_object_t *)this); */
-    }
-  else
-    {
-/*       for ( i = 0; i < 2; i++) */
-/* 	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this); */
-    }
   fts_dsp_active_add_listener(o, input_dsp_active);
 }
 
 static void 
 input_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  input_t *this = (input_t *)o;
-
-  if(this->port)
-    {
-      int i;
-#warning (OLD API) input_delete use fts_audioport_remove_input_object (OLD API)
-/*       for ( i = 0; i < fts_object_get_outlets_number( o); i++) */
-/* 	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this); */
-    }
   fts_dsp_active_remove_listener(o);
 }
 
@@ -128,15 +138,28 @@ input_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_update_real_time, input_update_real_time);
 
+  fts_class_message_varargs(cl, fts_s_put, input_put);
+
   fts_class_message_varargs(cl, fts_s_start, input_start);
   fts_class_message_varargs(cl, fts_s_stop, input_stop);
 
   fts_class_message_varargs(cl, fts_new_symbol("click"), input_toggle);
 
   fts_dsp_declare_outlet( cl, 0);
+  fts_dsp_declare_outlet(cl, 1);
 }
 
 void input_config( void)
 {
-  fts_class_install( fts_new_symbol( "input~"), input_instantiate);
+  input_symbol = fts_new_symbol("input~");
+  fts_class_install( input_symbol, input_instantiate);
+
+  fts_dsp_declare_function(input_symbol, input_ftl);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
