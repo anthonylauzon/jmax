@@ -278,7 +278,7 @@ alsamidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   fts_array_init(&this->inputs, 0, 0);
   fts_array_init(&this->outputs, 0, 0);
-  fts_hashtable_init(&this->devices, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&this->devices, fts_symbol_class, FTS_HASHTABLE_SMALL);
 }
 
 static void

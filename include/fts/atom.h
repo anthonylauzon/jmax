@@ -58,15 +58,41 @@
 
 #define fts_is_a(p,c) ((p)->type == (c))
 
-/* 
- * Primitive types
+/**
+ * Class representing the 'void' primitive type
+ * @ingroup atom
  */
-FTS_API fts_class_t *fts_t_void;
-FTS_API fts_class_t *fts_t_int;
-FTS_API fts_class_t *fts_t_float;
-FTS_API fts_class_t *fts_t_symbol;
-FTS_API fts_class_t *fts_t_pointer;
-FTS_API fts_class_t *fts_t_string;
+FTS_API fts_class_t *fts_void_class;
+
+/**
+ * Class representing the 'int' primitive type
+ * @ingroup atom
+ */
+FTS_API fts_class_t *fts_int_class;
+
+/**
+ * Class representing the 'float' primitive type
+ * @ingroup atom
+ */
+FTS_API fts_class_t *fts_float_class;
+
+/**
+ * Class representing the 'symbol' primitive type
+ * @ingroup atom
+ */
+FTS_API fts_class_t *fts_symbol_class;
+
+/**
+ * Class representing the 'pointer' primitive type
+ * @ingroup atom
+ */
+FTS_API fts_class_t *fts_pointer_class;
+
+/**
+ * Class representing the 'string' primitive type
+ * @ingroup atom
+ */
+FTS_API fts_class_t *fts_string_class;
 
 /*
  * fts_word_t accessors
@@ -94,7 +120,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param p pointer to the atom
  * @ingroup atom
  */
-#define fts_set_void(p) ((p)->type = fts_t_void, fts_word_set_int( &(p)->value, 0))
+#define fts_set_void(p) ((p)->type = fts_void_class, fts_word_set_int( &(p)->value, 0))
 
 /**
  * Set the integer value
@@ -104,7 +130,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_int(p, v) ((p)->type = fts_t_int, fts_word_set_int( &(p)->value, (v)))
+#define fts_set_int(p, v) ((p)->type = fts_int_class, fts_word_set_int( &(p)->value, (v)))
 
 /**
  * Set the float value
@@ -114,7 +140,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_float(p, v) ((p)->type = fts_t_float, fts_word_set_float( &(p)->value, (v)))
+#define fts_set_float(p, v) ((p)->type = fts_float_class, fts_word_set_float( &(p)->value, (v)))
 
 /**
  * Set the symbol value
@@ -124,7 +150,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_symbol(p, v) ((p)->type = fts_t_symbol, fts_word_set_symbol( &(p)->value, (v)))
+#define fts_set_symbol(p, v) ((p)->type = fts_symbol_class, fts_word_set_symbol( &(p)->value, (v)))
 
 /**
  * Set the object value
@@ -144,7 +170,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_pointer(p, v) ((p)->type = fts_t_pointer, fts_word_set_pointer( &(p)->value, (v)))
+#define fts_set_pointer(p, v) ((p)->type = fts_pointer_class, fts_word_set_pointer( &(p)->value, (v)))
 
 /**
  * Set the string value
@@ -154,7 +180,7 @@ FTS_API fts_class_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_string(p, v) ((p)->type = fts_t_string, fts_word_set_string( &(p)->value, (v)))
+#define fts_set_string(p, v) ((p)->type = fts_string_class, fts_word_set_string( &(p)->value, (v)))
 
 /**
  * Tests if atom is void
@@ -164,7 +190,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is void
  * @ingroup atom
  */
-#define fts_is_void(p) ((p)->type == fts_t_void)
+#define fts_is_void(p) ((p)->type == fts_void_class)
 
 /**
  * Tests if atom contains an integer
@@ -174,7 +200,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is integer
  * @ingroup atom
  */
-#define fts_is_int(p) ((p)->type == fts_t_int)
+#define fts_is_int(p) ((p)->type == fts_int_class)
 
 /**
  * Tests if atom contains a float
@@ -184,7 +210,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is float
  * @ingroup atom
  */
-#define fts_is_float(p) ((p)->type == fts_t_float) 
+#define fts_is_float(p) ((p)->type == fts_float_class) 
 
 /**
  * Tests if atom contains a number (int or float)
@@ -194,7 +220,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is number (int or float)
  * @ingroup atom
  */
-#define fts_is_number(p) ((p)->type == fts_t_int || (p)->type == fts_t_float) 
+#define fts_is_number(p) ((p)->type == fts_int_class || (p)->type == fts_float_class) 
 
 /**
  * Tests if atom contains a symbol
@@ -204,7 +230,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is symbol
  * @ingroup atom
  */
-#define fts_is_symbol(p) ((p)->type == fts_t_symbol)
+#define fts_is_symbol(p) ((p)->type == fts_symbol_class)
 
 /**
  * Tests if atom contains an object
@@ -224,7 +250,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is pointer
  * @ingroup atom
  */
-#define fts_is_pointer(p) ((p)->type == fts_t_pointer)
+#define fts_is_pointer(p) ((p)->type == fts_pointer_class)
 
 /**
  * Tests if atom contains a string
@@ -234,7 +260,7 @@ FTS_API fts_class_t *fts_t_string;
  * @return 1 if atom type is string
  * @ingroup atom
  */
-#define fts_is_string(p) ((p)->type == fts_t_string)
+#define fts_is_string(p) ((p)->type == fts_string_class)
 
 /**
  * Get the integer value

@@ -62,18 +62,12 @@ typedef struct {
   int rehash_count;
   fts_hashtable_cell_t **table;
 
-  int key_type;
   hash_function_t hash_function;
   equals_function_t equals_function;
 
 } fts_hashtable_t;
 
 /*@}*/
-
-#define FTS_HASHTABLE_INT 1
-#define FTS_HASHTABLE_PTR 2
-#define FTS_HASHTABLE_SYMBOL 3
-#define FTS_HASHTABLE_STRING 4
 
 #define FTS_HASHTABLE_SMALL 1
 #define FTS_HASHTABLE_MEDIUM 2
@@ -84,16 +78,16 @@ typedef struct {
 /**
  * Initializes a hashtable
  *
- * @fn void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
+ * @fn void fts_hashtable_init( fts_hashtable_t *h, fts_class_t *key_class, int initial_capacity)
  * @param h the hashtable
- * @param key_type the type of the key.<BR>
- *  Must be one of FTS_HASHTABLE_INT, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_STRING
- *  If 0, the key type will be FTS_HASHTABLE_SYMBOL
+ * @param key_class the class of the key.<BR>
+ *  Must be one of fts_int_class, fts_symbol_class, fts_string_class, fts_pointer_class
+ *  If NULL, the key class will be fts_symbol_class
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
  * @ingroup hashtable
  */
-FTS_API void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity);
+FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_class_t *key_class, int initial_capacity);
 
 /**
  * Deinitializes a hashtable.
@@ -107,16 +101,16 @@ FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
 /**
  * Allocates and initializes a hashtable
  *
- * @fn fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity)
- * @param key_type the type of the key.<BR>
- *  Must be one of FTS_HASHTABLE_INT, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_STRING
- *  If 0, the key type will be FTS_HASHTABLE_SYMBOL
+ * @fn fts_hashtable_t *fts_hashtable_new( fts_class_t *key_class, int initial_capacity)
+ * @param key_class the class of the key.<BR>
+ *  Must be one of fts_int_class, fts_symbol_class, fts_string_class, fts_pointer_class
+ *  If NULL, the key class will be fts_symbol_class
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
  * @return the allocated hashtable
  * @ingroup hashtable
  */
-FTS_API fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity);
+FTS_API fts_hashtable_t *fts_hashtable_new( fts_class_t *key_class, int initial_capacity);
 
 /**
  * Frees a hashtable that was obtained by fts_hashtable_new().

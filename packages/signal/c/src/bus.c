@@ -181,7 +181,7 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       /* create hashtable if not existing yet */
       default_busses = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init( default_busses, 0, FTS_HASHTABLE_MEDIUM);
+      fts_hashtable_init( default_busses, NULL, FTS_HASHTABLE_MEDIUM);
     }
   else if(fts_hashtable_get(default_busses, &key, &a))
     return (bus_t *)fts_get_object(&a);

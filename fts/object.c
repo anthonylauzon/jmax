@@ -71,8 +71,8 @@ fts_object_new( fts_class_t *cl)
 {
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
-  obj->head.cl = cl;
-  obj->head.id = FTS_NO_ID;
+  obj->cl = cl;
+  obj->client_id = FTS_NO_ID;
 
   obj->n_inlets = cl->ninlets;
   if (cl->ninlets)
@@ -98,7 +98,7 @@ fts_object_free(fts_object_t *obj)
   if (obj->in_conn)
     fts_free( obj->in_conn);
 
-  fts_heap_free(obj, obj->head.cl->heap);
+  fts_heap_free(obj, fts_object_get_class( obj)->heap);
 }
 
 fts_object_t *
@@ -162,6 +162,17 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
   if (eval_data->obj == NULL)
     {
       /* create the object */
+      if (ac >= 1 && fts_get_class( at) == fts_class_class)
+	{
+	  cl = (fts_class_t *)fts_get_object( at);
+
+	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
+	  if (eval_data->obj == NULL)
+	    return class_instantiation_error;
+
+	  return fts_ok;
+	}
+
       if (ac == 1 && fts_is_object( at))
 	{
 	  eval_data->obj = fts_get_object( at);
@@ -181,16 +192,6 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 	  return fts_ok;
 	}
 
-      if (ac >= 1 && fts_is_pointer( at))
-	{
-	  cl = (fts_class_t *)fts_get_pointer( at);
-
-	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
-	  if (eval_data->obj == NULL)
-	    return class_instantiation_error;
-
-	  return fts_ok;
-	}
 
       return invalid_class_name_error;
     }
@@ -377,7 +378,7 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
-  if (obj->head.id > FTS_NO_ID)
+  if ( fts_object_get_id( obj) > FTS_NO_ID)
     fts_client_release_object(obj);
 }
 
@@ -431,7 +432,7 @@ fts_object_t *
 fts_object_recompute(fts_object_t *old)
 {
   fts_object_t *obj;
-  int old_id = old->head.id;
+  int old_id = fts_object_get_id( old);
 
   /* If the object being redefined is a standard patcher,
      redefine it using a patcher function, otherwise with 
@@ -471,7 +472,7 @@ fts_object_t *
 fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
   /* redefine object if not scheduled for removal */
-  if(old->head.id != FTS_DELETE)
+  if( fts_object_get_id( old) != FTS_DELETE)
     {
       fts_object_t  *new;
       
@@ -479,8 +480,8 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       fts_object_unbind(old);
 
       /* call deconstructor of old object */
-      if(old->refcnt == 1 && fts_class_get_deconstructor(old->head.cl))
-	fts_class_get_deconstructor(old->head.cl)(old, fts_system_inlet, fts_s_delete, 0, 0);
+      if(old->refcnt == 1)
+	fts_class_get_deconstructor( fts_object_get_class( old))(old, fts_system_inlet, fts_s_delete, 0, 0);
       
       /* make the new object  */
       new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
@@ -590,7 +591,7 @@ fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 fts_symbol_t 
 fts_object_get_class_name(fts_object_t *obj)
 {
-  return fts_class_get_name(obj->head.cl);
+  return fts_class_get_name( fts_object_get_class( obj));
 }
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */

@@ -636,8 +636,8 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   ac &= -2;
 
-  fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&this->table_int, fts_int_class, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&this->table_symbol, fts_symbol_class, FTS_HASHTABLE_SMALL);
 
   data_object_set_keep((data_object_t *)o, fts_s_no);
 

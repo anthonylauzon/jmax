@@ -28,6 +28,8 @@ typedef struct fts_class_outlet fts_class_outlet_t;
 #define FTS_FIRST_OBJECT_TYPEID   16
 
 struct fts_class {
+  fts_object_t head;
+
   fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
 
   /* A type id that separates primitive types from objects: lower values are primitive types */
@@ -92,21 +94,21 @@ FTS_API void fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t
 FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 
 /* marcros for most popular inlet types */
-#define fts_class_inlet_int(c, i, m) fts_class_inlet((c), (i), fts_t_int, (m))
-#define fts_class_inlet_float(c, i, m) fts_class_inlet((c), (i), fts_t_float, (m))
+#define fts_class_inlet_int(c, i, m) fts_class_inlet((c), (i), fts_int_class, (m))
+#define fts_class_inlet_float(c, i, m) fts_class_inlet((c), (i), fts_float_class, (m))
 #define fts_class_inlet_number(c, i, m) do{ \
-  fts_class_inlet((c), (i), fts_t_int, (m)); \
-  fts_class_inlet((c), (i), fts_t_float, (m));} while(0)
-#define fts_class_inlet_symbol(c, i, m) fts_class_inlet((c), (i), fts_t_symbol, (m))
+  fts_class_inlet((c), (i), fts_int_class, (m)); \
+  fts_class_inlet((c), (i), fts_float_class, (m));} while(0)
+#define fts_class_inlet_symbol(c, i, m) fts_class_inlet((c), (i), fts_symbol_class, (m))
 #define fts_class_inlet_varargs(c, i, m) fts_class_inlet((c), (i), NULL, (m))
 
 /* marcros for most popular outlet types */
-#define fts_class_outlet_int(c, i) fts_class_outlet((c), (i), fts_t_int)
-#define fts_class_outlet_float(c, i) fts_class_outlet((c), (i), fts_t_float)
+#define fts_class_outlet_int(c, i) fts_class_outlet((c), (i), fts_int_class)
+#define fts_class_outlet_float(c, i) fts_class_outlet((c), (i), fts_float_class)
 #define fts_class_outlet_number(c, i) do{ \
-  fts_class_outlet((c), (i), fts_t_int); \
-  fts_class_outlet((c), (i), fts_t_float);} while(0)
-#define fts_class_outlet_symbol(c, i) fts_class_outlet((c), (i), fts_t_symbol)
+  fts_class_outlet((c), (i), fts_int_class); \
+  fts_class_outlet((c), (i), fts_float_class);} while(0)
+#define fts_class_outlet_symbol(c, i) fts_class_outlet((c), (i), fts_symbol_class)
 #define fts_class_outlet_varargs(c, i) fts_class_outlet((c), (i), NULL)
 
 /* marcros for most popular outlet messages */

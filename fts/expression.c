@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/class.h>
 #include <ftsprivate/parser.h>
 #include <ftsprivate/message.h>
 #include "parser.h"
@@ -340,7 +341,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   int ac;
   fts_atom_t *at, *top, ret[1];
   fts_status_t status;
-  fts_object_t *tuple;
+  fts_object_t *obj;
 
   if (!tree)
     return fts_ok;
@@ -374,22 +375,27 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
-    /* if there is more than one term or if we are at toplevel, we always create a tuple */
-    if (ac > 1 || toplevel)
-      {
-	tuple = fts_object_create( fts_tuple_class, NULL, ac, at);
+    /* FIXME */
+    /* When creating an object (tuple or not tuple), when is this object released ? 
+       Should we go through the stack when popping a frame and release the objects ? */
 
-	/* FIXME */
-	/* When is this tuple released ? Should we go through the stack when
-	   popping a frame and release the tuples ? */
-	fts_object_refer( tuple);
-	
-	fts_set_object( ret, tuple);
+    /* Is first term a class ? */
+    if (fts_get_class( at) == fts_class_class)
+      {
+	obj = fts_object_create( (fts_class_t *)fts_get_object( at), NULL, ac-1, at+1);
+	fts_object_refer( obj);
+	fts_set_object( ret, obj);
+      }
+    /* Is there is more than one term or are we at toplevel ? If yes, we always create a tuple */
+    else if (ac > 1 || toplevel)
+      {
+	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
+	fts_object_refer( obj);
+	fts_set_object( ret, obj);
       }
     else
       {
-	if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
-	  return status;
+	ret[0] = *at;
       }
 
     expression_stack_pop_frame( exp);
@@ -411,12 +417,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_COLON:
-    /* for now, classes are returned as pointers.
-       Once moved to classes, they will be returned as objects of the class "class"
-    */
-
     /* is class cached ? */
-    if (fts_is_pointer( &tree->value))
+    if (fts_is_object( &tree->value))
       expression_stack_push( exp, &tree->value);
     else
       {
@@ -427,7 +429,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	if ( !cl)
 	  return undefined_class_error;
 
-	fts_set_pointer( &tree->value, cl);
+	fts_set_object( &tree->value, cl);
 	
 	expression_stack_push( exp, &tree->value);
       }

@@ -98,7 +98,7 @@ static void
 fts_objectset_method_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)o;
-  fts_hashtable_init( &this->hashtable, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->hashtable, fts_pointer_class, FTS_HASHTABLE_SMALL);
 }
 
 static void 

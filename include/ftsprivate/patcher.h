@@ -25,7 +25,7 @@
 
 extern fts_class_t *patcher_class;
 
-#define fts_object_is_patcher(o) ((o)->head.cl == patcher_class)
+#define fts_object_is_patcher(o) (fts_object_get_class(o) == patcher_class)
 
 #define fts_patcher_get_definitions(p) ((p)->definitions)
 #define fts_patcher_set_definitions(p, d) ((p)->definitions = (d))

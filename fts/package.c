@@ -415,7 +415,7 @@ static void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_
       if (pkg->declared_templates == NULL) 
 	{
 	  pkg->declared_templates = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	  fts_hashtable_init(pkg->declared_templates, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+	  fts_hashtable_init(pkg->declared_templates, fts_symbol_class, FTS_HASHTABLE_SMALL);
 	}
       
       /* Register the template */
@@ -505,7 +505,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
       if (pkg->templates_in_path == NULL) 
 	{
 	  pkg->templates_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	  fts_hashtable_init(pkg->templates_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+	  fts_hashtable_init(pkg->templates_in_path, fts_symbol_class, FTS_HASHTABLE_SMALL);
 	}
       
       fts_set_symbol(&n, name);
@@ -584,7 +584,7 @@ fts_package_add_abstraction(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t 
     /* Create the database if necessary */
     if (pkg->declared_abstractions == NULL) {
       pkg->declared_abstractions = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->declared_abstractions, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      fts_hashtable_init(pkg->declared_abstractions, fts_symbol_class, FTS_HASHTABLE_SMALL);
     }
 
     /* Register the abstraction */
@@ -662,7 +662,7 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
       /* Create the database if necessary */
       if (pkg->abstractions_in_path == NULL) {
 	pkg->abstractions_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	fts_hashtable_init(pkg->abstractions_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+	fts_hashtable_init(pkg->abstractions_in_path, fts_symbol_class, FTS_HASHTABLE_SMALL);
       }
 
       fts_set_symbol(&n, name);
@@ -688,7 +688,7 @@ fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
   if (pkg->classes == NULL) 
     {
       pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      fts_hashtable_init(pkg->classes, fts_symbol_class, FTS_HASHTABLE_SMALL);
     }
 
   fts_set_symbol( &k, name);
@@ -725,7 +725,7 @@ fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
   if(pkg->classes == NULL)
     {
       pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      fts_hashtable_init(pkg->classes, fts_symbol_class, FTS_HASHTABLE_SMALL);
     }
 
   fts_hashtable_get_keys(pkg->classes, iter);
@@ -763,7 +763,7 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 
   if (pkg->help == NULL) {
     pkg->help = fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init(pkg->help, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(pkg->help, fts_symbol_class, FTS_HASHTABLE_SMALL);
   }
   
   fts_set_symbol(&n, name);
@@ -1698,7 +1698,7 @@ fts_kernel_package_init(void)
     fts_package_stack[i] = NULL;
   }
 
-  fts_hashtable_init(&fts_packages, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&fts_packages, fts_symbol_class, FTS_HASHTABLE_MEDIUM);
 
   /* create the system package */
   system_symbol = fts_new_symbol("_system_");
@@ -1710,8 +1710,8 @@ fts_kernel_package_init(void)
      bootstrap the system */
   fts_system_package = fts_zalloc(sizeof(fts_package_t));
 
-  fts_system_package->object.head.cl = 0;
-  fts_system_package->object.head.id = FTS_NO_ID;
+  fts_system_package->object.cl = 0;
+  fts_system_package->object.client_id = FTS_NO_ID;
   fts_system_package->object.properties = 0;
   fts_system_package->object.refcnt = 0;
   fts_system_package->object.out_conn = 0;
@@ -1730,7 +1730,7 @@ fts_kernel_package_init(void)
   fts_package_type = fts_class_install(fts_s_package, fts_package_instantiate);
 
   /* update the system package with the correct class */
-  fts_system_package->object.head.cl = fts_package_type;
+  fts_system_package->object.cl = fts_package_type;
 
   /* Debug code */
   fts_class_install( fts_new_symbol( "loader"), loader_instantiate);

@@ -85,7 +85,7 @@ static void fts_predefine_symbols(void)
 
 void fts_kernel_symbol_init(void)
 {
-  fts_hashtable_init( &symbol_table, FTS_HASHTABLE_STRING, FTS_HASHTABLE_BIG);
+  fts_hashtable_init( &symbol_table, fts_string_class, FTS_HASHTABLE_BIG);
 
   fts_predefine_symbols();
 }

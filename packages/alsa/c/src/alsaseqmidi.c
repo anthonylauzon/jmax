@@ -324,10 +324,10 @@ alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
     alsaseqmidi_t* this = (alsaseqmidi_t*) o;
     int err;
     char client_name[NAME_SIZE];
-    fts_hashtable_init(&this->inputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-    fts_hashtable_init(&this->outputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-    fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-    fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->inputs, fts_symbol_class, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->outputs, fts_symbol_class, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->sources, fts_symbol_class, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->destinations, fts_symbol_class, FTS_HASHTABLE_SMALL);
 
     /* Open a client to sequencer */
     err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_DUPLEX, 0);

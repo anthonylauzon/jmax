@@ -98,134 +98,33 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 #define FTS_TYPEID_POINTER  5
 #define FTS_TYPEID_STRING   6
 
-static fts_class_t void_class = {
-  NULL,
-  FTS_TYPEID_VOID,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_void = &void_class;
+static fts_class_t void_class; 
+fts_class_t *fts_void_class = &void_class;
 
-static fts_class_t int_class = { 
-  NULL,
-  FTS_TYPEID_INT,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_int = &int_class;
+static fts_class_t int_class;
+fts_class_t *fts_int_class = &int_class;
 
-static fts_class_t float_class = { 
-  NULL,
-  FTS_TYPEID_FLOAT,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_float = &float_class;
+static fts_class_t float_class;
+fts_class_t *fts_float_class = &float_class;
 
-static fts_class_t symbol_class = { 
-  NULL,
-  FTS_TYPEID_SYMBOL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_symbol = &symbol_class;
+static fts_class_t symbol_class;
+fts_class_t *fts_symbol_class = &symbol_class;
 
-static fts_class_t pointer_class = { 
-  NULL,
-  FTS_TYPEID_POINTER,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_pointer = &pointer_class;
+static fts_class_t pointer_class;
+fts_class_t *fts_pointer_class = &pointer_class;
 
-static fts_class_t string_class = { 
-  NULL,
-  FTS_TYPEID_STRING,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  0,
-  0,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL
-}; 
-fts_class_t *fts_t_string = &string_class;
+static fts_class_t string_class;
+fts_class_t *fts_string_class = &string_class;
 
 void fts_kernel_atom_init( void)
 {
+  void_class.typeid = FTS_TYPEID_VOID;
+  int_class.typeid = FTS_TYPEID_INT;
+  float_class.typeid = FTS_TYPEID_FLOAT;
+  symbol_class.typeid = FTS_TYPEID_SYMBOL;
+  pointer_class.typeid = FTS_TYPEID_POINTER;
+  string_class.typeid = FTS_TYPEID_STRING;
+
   fts_class_set_name( &int_class, fts_s_int);
   fts_class_set_name( &float_class, fts_s_float);
   fts_class_set_name( &symbol_class, fts_s_symbol);

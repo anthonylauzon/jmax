@@ -129,7 +129,7 @@ fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       /* create hashtable if not existing yet */
       default_labels = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init( default_labels, 0, FTS_HASHTABLE_MEDIUM);
+      fts_hashtable_init( default_labels, NULL, FTS_HASHTABLE_MEDIUM);
     }
   else if(fts_hashtable_get(default_labels, &key, &a))
     return (fts_label_t *)fts_get_object(&a);

@@ -60,16 +60,6 @@ static int equals_int( const fts_atom_t *a, const fts_atom_t *b)
   return fts_get_int( a) == fts_get_int( b);
 }
 
-static unsigned int hash_ptr( const fts_atom_t *a)
-{
-  return (unsigned int)fts_get_pointer( a) >> 3;
-}
-
-static int equals_ptr( const fts_atom_t *a, const fts_atom_t *b)
-{
-  return fts_get_pointer( a) == fts_get_pointer( b);
-}
-
 static unsigned int hash_string( const fts_atom_t *a)
 {
   char *s = fts_get_string( a);
@@ -96,32 +86,42 @@ static int equals_symbol( const fts_atom_t *a, const fts_atom_t *b)
   return fts_get_symbol( a) == fts_get_symbol( b);
 }
 
-static void set_key_type( fts_hashtable_t *h, int key_type)
+static unsigned int hash_pointer( const fts_atom_t *a)
 {
-  h->key_type = key_type;
+  return (unsigned int)fts_get_pointer( a) >> 3;
+}
 
-  switch (h->key_type) {
-  case FTS_HASHTABLE_INT:
-    h->hash_function = hash_int;
-    h->equals_function = equals_int;
-    break;
-  case FTS_HASHTABLE_PTR:
-    h->hash_function = hash_ptr;
-    h->equals_function = equals_ptr;
-    break;
-  case FTS_HASHTABLE_STRING:
-    h->hash_function = hash_string;
-    h->equals_function = equals_string;
-    break;
-  case 0:
-  case FTS_HASHTABLE_SYMBOL:
-    h->hash_function = hash_symbol;
-    h->equals_function = equals_symbol;
-    break;
-  default:
-    fprintf( stderr, "[hashtable] invalid key type (%d)\n", key_type);
-    break;
-  }
+static int equals_pointer( const fts_atom_t *a, const fts_atom_t *b)
+{
+  return fts_get_pointer( a) == fts_get_pointer( b);
+}
+
+static void set_key_class( fts_hashtable_t *h, fts_class_t *key_class)
+{
+  if (key_class == fts_int_class)
+    {
+      h->hash_function = hash_int;
+      h->equals_function = equals_int;
+    }
+  else if (key_class == fts_string_class)
+    {
+      h->hash_function = hash_string;
+      h->equals_function = equals_string;
+    }
+  else if (key_class == fts_symbol_class || key_class == NULL)
+    {
+      h->hash_function = hash_symbol;
+      h->equals_function = equals_symbol;
+    }
+  else if (key_class == fts_pointer_class)
+    {
+      h->hash_function = hash_pointer;
+      h->equals_function = equals_pointer;
+    }
+  else
+    {
+      /* should use general hash and equal functions for atoms */
+    }
 }
 
 static int get_initial_capacity( int initial_capacity)
@@ -138,9 +138,9 @@ static int get_initial_capacity( int initial_capacity)
   }
 }
 
-void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
+void fts_hashtable_init( fts_hashtable_t *h, fts_class_t *key_class, int initial_capacity)
 {
-  set_key_type( h, key_type);
+  set_key_class( h, key_class);
 
   h->length = get_initial_capacity( initial_capacity);
   h->count = 0;
@@ -149,11 +149,11 @@ void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
 }
 
-fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity)
+fts_hashtable_t *fts_hashtable_new( fts_class_t *key_class, int initial_capacity)
 {
   fts_hashtable_t *h = (fts_hashtable_t *)fts_heap_alloc( hashtable_heap);
 
-  fts_hashtable_init( h, key_type, initial_capacity);
+  fts_hashtable_init( h, key_class, initial_capacity);
 
   return h;
 }

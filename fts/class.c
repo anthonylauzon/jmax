@@ -31,13 +31,13 @@
 #include <ftsprivate/package.h>
 #include <ftsprivate/patcher.h>
 
+fts_class_t *fts_class_class;
+
 const int fts_system_inlet = -1;
 static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
 #define CLASS_INLET_MAX 255
 #define CLASS_TYPEID_MAX ((1 << 23) - 1)
-
-enum fts_connection_type;
 
 /* Return Status declarations */
 fts_status_description_t fts_DuplicatedClass = {"Duplicated class"};
@@ -56,9 +56,7 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 fts_class_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_class_t *cl;
-
-  cl = fts_zalloc(sizeof(fts_class_t));
+  fts_class_t *cl = (fts_class_t *)fts_object_create( fts_class_class, NULL, 0, 0);
 
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
@@ -182,7 +180,7 @@ class_inlet_key(int winlet, fts_class_t *type)
   if(type == NULL)
     return winlet;
   else
-    return (fts_class_get_typeid(type) << 8) + winlet;
+    return (type->typeid << 8) + winlet;
 }
 
 static fts_class_outlet_t *
@@ -273,11 +271,11 @@ fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, ft
   cl->constructor = (constructor != NULL) ? constructor: dummy_method;
   cl->deconstructor = (deconstructor != NULL) ? deconstructor: dummy_method;
 
-  cl->messages= fts_hashtable_new( FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+  cl->messages= fts_hashtable_new( fts_symbol_class, FTS_HASHTABLE_MEDIUM);
   cl->default_handler = fts_class_default_error_handler;
 
   cl->ninlets = 0;
-  cl->inlets = fts_hashtable_new( FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
+  cl->inlets = fts_hashtable_new( fts_int_class, FTS_HASHTABLE_MEDIUM);
 
   cl->noutlets = 0;
   cl->out_alloc = 0;
@@ -323,7 +321,7 @@ fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth
   fts_set_int(&k, class_inlet_key(winlet, type));
   
   if (fts_hashtable_get( cl->inlets, &k, &a))
-    post("%s method doubly defined for class %s at inlet %d\n", type->name, fts_class_get_name(cl), winlet);
+    post("%s method doubly defined for class %s at inlet %d\n", (type) ? type->name : "anything", fts_class_get_name(cl), winlet);
   else
     {
       /* register inlet method */
@@ -463,3 +461,35 @@ fts_class_outlet_has_message(fts_class_t *cl, int woutlet, fts_symbol_t selector
     return 0;
 }
 
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+static void class_class_instantiate( fts_class_t *cl)
+{
+}
+
+void fts_kernel_class_init( void)
+{
+  /* As the 'class' class is used to create a class, it cannot be created using standard ways. */
+  fts_heap_t *heap = fts_heap_new( sizeof( fts_class_t));
+
+  fts_class_class = (fts_class_t *)fts_heap_zalloc( heap);
+
+  fts_class_class->head.cl = fts_class_class;
+  fts_class_class->name = NULL;
+  fts_class_class->instantiate_fun = class_class_instantiate;
+  fts_class_class->typeid = typeid++;
+
+  fts_class_class->size = sizeof( fts_class_t);
+  fts_class_class->heap = heap;
+  fts_class_class->constructor = dummy_method;
+  fts_class_class->deconstructor = dummy_method;
+  fts_class_class->messages = fts_hashtable_new( fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+  fts_class_class->default_handler = fts_class_default_error_handler;
+  fts_class_class->inlets = fts_hashtable_new( fts_int_class, FTS_HASHTABLE_MEDIUM);
+
+  fts_class_set_name( fts_class_class, fts_s_class);
+}

@@ -187,7 +187,7 @@ static float cosf( float f)
 void
 fts_ffuns_init( void)
 {
-  fts_hashtable_init( &the_fts_ffun_hashtable, 0, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &the_fts_ffun_hashtable, NULL, FTS_HASHTABLE_SMALL);
 
   fts_ffun_new( fts_new_symbol( "sin"), sinf);
   fts_ffun_new( fts_new_symbol( "cos"), cosf);

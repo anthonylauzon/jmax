@@ -168,7 +168,7 @@ fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
 void
 fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_class_t *cl = o->head.cl;
+  fts_class_t *cl = fts_object_get_class( o);
   fts_method_t meth = fts_class_get_method(cl, s);
 
   if(meth)

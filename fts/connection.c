@@ -116,6 +116,13 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       valid = 0;
     }
 
+  /* check the inlet range (should never happen, a part from loading) */
+  if (winlet >= fts_object_get_inlets_number(dst) || winlet < 0)
+    {
+      fts_object_signal_runtime_error(dst, "inlet out of range");
+      return NULL;
+    }
+
   /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {

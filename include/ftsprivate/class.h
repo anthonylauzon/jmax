@@ -23,6 +23,9 @@
 #ifndef _FTS_PRIVATE_CLASS_H_
 #define _FTS_PRIVATE_CLASS_H_
 
+/* the class of 'class' objects */
+fts_class_t *fts_class_class;
+
 struct fts_class_outlet
 {
   fts_list_t *declarations;
@@ -32,7 +35,6 @@ struct fts_class_outlet
 #define fts_class_set_package(m, p) ((m)->package = (p))
 
 #define fts_class_set_name(m, s) ((m)->name = (s))
-#define fts_class_get_typeid(m) ((m)->typeid)
 
 extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_class_t *type);
 

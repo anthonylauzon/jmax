@@ -25,7 +25,7 @@
 
 typedef struct _client_t client_t;
 
-#define CLIENT_DEFAULT_PORT 2023
+#define FTS_CLIENT_DEFAULT_PORT 2023
 
 /*
  * The object and client parts of the object ids

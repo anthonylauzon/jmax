@@ -70,7 +70,7 @@ fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
     {
       hash = (fts_hashtable_t *)fts_malloc(sizeof(fts_hashtable_t));
       
-      fts_hashtable_init(hash, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+      fts_hashtable_init(hash, fts_symbol_class, FTS_HASHTABLE_MEDIUM);
       fts_patcher_set_definitions(scope, hash);
     }
 
@@ -211,8 +211,13 @@ define_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
 }
 
-void 
-fts_kernel_variable_init(void)
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_variable_init(void)
 {
-  fts_class_install( fts_new_symbol( "define"), define_instantiate);
+  fts_class_install( fts_s_define, define_instantiate);
 }

@@ -30,6 +30,9 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #include <fts/fts.h>
 #include <ftsprivate/bmaxfile.h>
@@ -411,6 +414,35 @@ static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, vo
   eval_stack[eval_tos] = a;
 }
 
+static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  int new_ac, i;
+  fts_atom_t *new_at;
+
+  if (version == 1 && ac >= 3 && fts_is_symbol(at) && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon)
+    {
+      new_ac = ac + 3;
+      new_at = (fts_atom_t *)alloca( new_ac * sizeof( fts_atom_t));
+
+      fts_set_symbol( new_at+0, fts_s_define);
+      new_at[1] = at[0];
+      fts_set_symbol( new_at+2, fts_s_open_par);
+      fts_set_symbol( new_at+3, fts_s_colon);
+
+      for (i = 2; i < ac; i++)
+	new_at[i+2] = at[i];
+
+      fts_set_symbol( new_at+new_ac-1, fts_s_closed_par);
+    }
+  else
+    {
+      new_ac = ac;
+      new_at = (fts_atom_t *)at;
+    }
+
+  return fts_eval_object_description( patcher, new_ac, new_at);
+}
+
 static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_descr_t *descr, int ac, const fts_atom_t *at)
 {
   int i;
@@ -447,11 +479,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_INT_B:
 	  {
 	    /* PUSH_INT_B   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_INT_B %d\n", GET_B(p));
-#endif
-
 	    eval_tos--;
 	    fts_set_int(&eval_stack[eval_tos], GET_B(p));
 	    p++;
@@ -461,11 +488,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_INT_S:
 	  {
 	    /* PUSH_INT_S   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_INT_S %d\n", GET_S(p));
-#endif
-
 	    eval_tos--;
 	    fts_set_int(&eval_stack[eval_tos], GET_S(p));
 	    p += 2;
@@ -475,11 +497,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_INT_L:
 	  {
 	    /* PUSH_INT_L   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_INT_L %d\n", GET_L(p));
-#endif
-
 	    eval_tos--;
 	    fts_set_int(&eval_stack[eval_tos], GET_L(p));
 	    p += 4;
@@ -489,11 +506,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_FLOAT:
 	  {
 	    /* PUSH_FLOAT <float> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_FLOAT %f\n", GET_F(p));
-#endif
-	    
 	    eval_tos--;
 	    fts_set_float(&eval_stack[eval_tos], GET_F(p));
 	    p += 4;
@@ -503,14 +515,9 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_SYM_B:
 	  {
 	    /* PUSH_SYM_B   <idx> */
-
 	    fts_symbol_t s;
 
 	    s  = symbol_table[GET_B(p)];
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_SYM_B %d (%s)\n", GET_B(p), s);
-#endif
 
 	    eval_tos--;
 	    fts_set_symbol(&eval_stack[eval_tos], s);
@@ -521,14 +528,9 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_SYM_S:
 	  {
 	    /* PUSH_SYM_S   <idx> */
-
 	    fts_symbol_t s;
 
 	    s  = symbol_table[GET_S(p)];
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_SYM_S %s\n", s);
-#endif
 
 	    eval_tos--;
 	    fts_set_symbol(&eval_stack[eval_tos], s);
@@ -539,14 +541,9 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_SYM_L:
 	  {
 	    /* PUSH_SYM_L   <idx> */
-
 	    fts_symbol_t s;
 
 	    s  = symbol_table[GET_L(p)];
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_SYM_L %s\n", s);
-#endif
 
 	    eval_tos--;
 	    fts_set_symbol(&eval_stack[eval_tos], s);
@@ -557,11 +554,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_INT_B:
 	  {
 	    /* SET_INT_B   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_INT_B %d\n", GET_B(p));
-#endif
-
 	    fts_set_int(&eval_stack[eval_tos], GET_B(p));
 	    p++;
 	  }
@@ -570,11 +562,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_INT_S:
 	  {
 	    /* SET_INT_S   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_INT_S %d\n", GET_S(p));
-#endif
-
 	    fts_set_int(&eval_stack[eval_tos], GET_S(p));
 	    p += 2;
 	  }
@@ -583,11 +570,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_INT_L:
 	  {
 	    /* SET_INT_L   <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_INT_L %d\n", GET_L(p));
-#endif
-
 	    fts_set_int(&eval_stack[eval_tos], GET_L(p));
 	    p += 4;
 	  }
@@ -596,11 +578,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_FLOAT:
 	  {
 	    /* SET_FLOAT <float> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_FLOAT %f\n", GET_F(p));
-#endif
-	    
 	    fts_set_float(&eval_stack[eval_tos], GET_F(p));
 	    p += 4;
 	  }
@@ -609,11 +586,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_SYM_B:
 	  {
 	    /* SET_SYM_B   <idx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_SYM_B %d\n", GET_B(p));
-#endif
-
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_B(p)]);
 	    p++;
 	  }
@@ -622,11 +594,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_SYM_S:
 	  {
 	    /* SET_SYM_S   <idx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_SYM_S %d\n", GET_S(p));
-#endif
-
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_S(p)]);
 	    p += 2;
 	  }
@@ -635,11 +602,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_SET_SYM_L:
 	  {
 	    /* SET_SYM_L   <idx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "SET_SYM_L %d\n", GET_L(p));
-#endif
-
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_L(p)]);
 	    p += 4;
 	  }
@@ -648,11 +610,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_ARGS_B:
 	  {
 	    /* POP_ARGS_B    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_ARGS_B %d\n", GET_B(p));
-#endif
-
 	    eval_tos += GET_B(p);
 	    p++;
 	  }
@@ -661,11 +618,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_ARGS_S:
 	  {
 	    /* POP_ARGS_S    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_ARGS_S %d\n", GET_S(p));
-#endif
-
 	    eval_tos += GET_S(p);
 	    p += 2;
 	  }
@@ -674,11 +626,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_ARGS_L:
 	  {
 	    /* POP_ARGS_L    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_ARGS_L %d\n", GET_L(p));
-#endif
-
 	    eval_tos += GET_L(p);
 	    p += 4;
 	  }
@@ -690,11 +637,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_OBJ_B:
 	  {
 	    /* PUSH_OBJ_B   <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_B %d\n", GET_B(p));
-#endif
-
 	    object_tos--;
 	    object_stack[object_tos] = object_table[GET_B(p)];
 	    p += 1;
@@ -704,11 +646,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_OBJ_S:
 	  {
 	    /* PUSH_OBJ_S   <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_S %d\n", GET_S(p));
-#endif
-
 	    object_tos--;
 	    object_stack[object_tos] = object_table[GET_S(p)];
 
@@ -719,11 +656,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_OBJ_L:
 	  {
 	    /* PUSH_OBJ_L   <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_L %d\n", GET_L(p));
-#endif
-
 	    object_tos--;
 	    object_stack[object_tos] = object_table[GET_L(p)];
 
@@ -734,11 +666,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MV_OBJ_B:
 	  {
 	    /* MV_OBJ_B     <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "MV_OBJ_B %d\n", GET_B(p));
-#endif
-
 	    object_table[GET_B(p)] = object_stack[object_tos];
 	    p += 1;
 	  }
@@ -747,11 +674,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MV_OBJ_S:
 	  {
 	    /* MV_OBJ_S     <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "MV_OBJ_S %d\n", GET_S(p));
-#endif
-
 	    object_table[GET_S(p)] = object_stack[object_tos];
 	    p += 2;
 	  }
@@ -760,11 +682,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MV_OBJ_L:
 	  {
 	    /* MV_OBJ_L     <objidx> */
-
-#ifdef VM_DEBUG
-	    fts_log( "MV_OBJ_L %d\n", GET_L(p));
-#endif
-
 	    object_table[GET_L(p)] = object_stack[object_tos];
 	    p += 4;
 	  }
@@ -774,11 +691,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_OBJS_B:
 	  {
 	    /* POP_OBJS_B    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_OBJ_B %d\n", GET_B(p));
-#endif
-
 	    object_tos += GET_B(p);
 	    p += 1;
 	  }
@@ -787,11 +699,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_OBJS_S:
 	  {
 	    /* POP_OBJS_S    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_OBJ_S %d\n", GET_S(p));
-#endif
-
 	    object_tos += GET_S(p);
 	    p += 2;
 	  }
@@ -801,11 +708,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_OBJS_L:
 	  {
 	    /* POP_OBJS_L    <int> */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_OBJ_L %d\n", GET_L(p));
-#endif
-
 	    object_tos += GET_L(p);
 	    p += 4;
 	  }
@@ -816,24 +718,13 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_OBJ_B:
 	  {
 	    /* MAKE_OBJ_B   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_B(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_OBJ_B %d\n", nargs);
-#endif
-
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
-
-#ifdef VM_DEBUG
-	    fts_log( "\t");
-	    fprintf_object(stderr, new);
-	    fts_log( "\n");
-#endif
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 1;
@@ -843,18 +734,13 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_OBJ_S:
 	  {
 	    /* MAKE_OBJ_S   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_OBJ_S %d\n", nargs);
-#endif
-
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 2;
@@ -865,18 +751,13 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_OBJ_L:
 	  {
 	    /* MAKE_OBJ_L   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_OBJ_L %d\n", nargs);
-#endif
-
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 4;
@@ -886,19 +767,14 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_TOP_OBJ_B:
 	  {
 	    /* MAKE_TOP_OBJ_B   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_B(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_TOP_OBJ_B %d\n", nargs);
-#endif
 
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac,
-				  &eval_stack[eval_tos]);
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 1;
@@ -908,19 +784,14 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_TOP_OBJ_S:
 	  {
 	    /* MAKE_TOP_OBJ_S   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_TOP_OBJ_S %d\n", nargs);
-#endif
 
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac,
-				  &eval_stack[eval_tos]);
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 2;
@@ -931,18 +802,13 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_MAKE_TOP_OBJ_L:
 	  {
 	    /* MAKE_TOP_OBJ_L   <nargs> */
-
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-#ifdef VM_DEBUG
-	    fts_log( "MAKE_OBJ_L %d\n", nargs);
-#endif
-	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac,
-				  &eval_stack[eval_tos]);
+/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
-
 	    object_tos--;
 	    object_stack[object_tos] = new;
 	    p += 4;
@@ -952,14 +818,9 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUT_PROP_B:
 	  {
 	    /* PUT_PROP_B_   <sym> */
-
 	    fts_symbol_t prop;
 
 	    prop = symbol_table[GET_B(p)];
-
-#ifdef VM_DEBUG
-	    fts_log( "PUT_PROP_B %s\n", prop);
-#endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 1;
@@ -969,14 +830,10 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUT_PROP_S:
 	  {
 	    /* PUT_PROP_S_   <sym> */
-
 	    fts_symbol_t prop;
 
 	    prop = symbol_table[GET_S(p)];
 
-#ifdef VM_DEBUG
-	    fts_log( "PUT_PROP_S %s\n", prop);
-#endif
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 2;
 	  }
@@ -985,14 +842,9 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUT_PROP_L:
 	  {
 	    /* PUT_PROP_L_   <sym> */
-
 	    fts_symbol_t prop;
 
 	    prop = symbol_table[GET_L(p)];
-
-#ifdef VM_DEBUG
-	    fts_log( "PUT_PROP_S %s\n", prop);
-#endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 4;
@@ -1002,7 +854,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_OBJ_MESS:
 	  {
 	    /* OBJ_MESS   <inlet> <sel> <nargs> */
-
 	    int inlet;
 	    fts_symbol_t sel;
 	    int nargs;
@@ -1014,9 +865,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    nargs = GET_L(p);
 	    p += 4;
 
-#ifdef VM_DEBUG
-	    fts_log( "OBJ_MESS %d %s %d\n", inlet, sel, nargs);
-#endif
 
 	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
 	  }
@@ -1025,10 +873,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_CONNECT:
 	  {
 	    /* CONNECT */
-
-#ifdef VM_DEBUG
-	    fts_log( "CONNECT\n");
-#endif
 	    fts_connection_new(object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
 			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]), fts_c_anything);
 	  }
@@ -1039,11 +883,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_OBJ_TABLE_B:
 	  {
 	    /* PUSH_OBJ_TABLE_B <int> */
-
 	    int size;
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_TABLE_B %d\n", GET_B(p));
-#endif
 
 	    size = GET_B(p);
 	    p += 1;
@@ -1062,11 +902,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_PUSH_OBJ_TABLE_S:
 	  {
 	    /* PUSH_OBJ_TABLE_S <int> */
-
 	    int size;
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_TABLE_S %d\n", GET_S(p));
-#endif
 
 	    size = GET_S(p);
 	    p += 2;
@@ -1079,16 +915,10 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	  }
 	break;
 
-
-
 	case FVM_PUSH_OBJ_TABLE_L:
 	  {
 	    /* PUSH_OBJ_TABLE_L <int> */
-
 	    int size;
-#ifdef VM_DEBUG
-	    fts_log( "PUSH_OBJ_TABLE_L %d\n", GET_L(p));
-#endif
 
 	    size = GET_L(p);
 	    p += 1;
@@ -1104,11 +934,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	case FVM_POP_OBJ_TABLE:
 	  {
 	    /* POP_OBJ_TABLE */
-
-#ifdef VM_DEBUG
-	    fts_log( "POP_OBJ_TABLE\n");
-#endif
-
 	    if (object_table)
 	      fts_free(object_table);
 
@@ -1119,16 +944,10 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 
 	case FVM_RETURN:
 	  {
+	    /* RETURN */
 	    fts_object_t *obj = 0;
 
-	    /* RETURN */
-
-#ifdef VM_DEBUG
-	    fts_log( "RETURN\n");
-#endif
-
 	    /* Rewind the template/patcher argument */
-
 	    eval_tos += ac;
 
 	    /* This test is usefull only on copy/paste */

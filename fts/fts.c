@@ -63,7 +63,7 @@ static void fts_cmd_args_parse( int argc, char **argv)
   char filevar[32];
   fts_symbol_t name, value, s_yes;
 
-  fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &cmd_args, fts_symbol_class, FTS_HASHTABLE_SMALL);
 
   s_yes = fts_new_symbol( "yes");
 
@@ -167,6 +167,7 @@ static void fts_kernel_init( void)
    */
   _K_DECNCALL( fts_kernel_hashtable_init);
   _K_DECNCALL( fts_kernel_symbol_init);
+  _K_DECNCALL( fts_kernel_class_init);
   _K_DECNCALL( fts_kernel_atom_init);
   _K_DECNCALL( fts_kernel_post_init);
   _K_DECNCALL( fts_kernel_list_init);

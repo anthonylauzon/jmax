@@ -82,9 +82,9 @@ extern "C" {
 #include <fts/list.h>
 #include <fts/objectlist.h>
 #include <fts/variable.h>
-#include <fts/class.h>
 #include <fts/atom.h>
 #include <fts/object.h>
+#include <fts/class.h>
 #include <fts/connection.h>
 #include <fts/expression.h>
 #include <fts/objectset.h>

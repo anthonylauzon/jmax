@@ -1,3 +1,10 @@
+2002-10-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* classes are objects
+	* expressions can contain object expression (:class_name arg1 arg2 ...)
+	at any level
+	* hashtables key type is now a class
+
 2002-10-06  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* reimplemented error objects as seperated class

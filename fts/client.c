@@ -28,6 +28,7 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
 #include <ftsprivate/tokenizer.h>
@@ -221,7 +222,7 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
       return;
     }
 
-  port = fts_get_int_arg( ac, at, 0, CLIENT_DEFAULT_PORT);
+  port = fts_get_int_arg( ac, at, 0, FTS_CLIENT_DEFAULT_PORT);
 
   this->socket = socket( AF_INET, SOCK_STREAM, 0);
   if (this->socket == INVALID_SOCKET)
@@ -341,7 +342,7 @@ static void client_release_object( client_t *this, fts_object_t *object)
   fts_set_int( &k, fts_get_object_id( object));
   fts_hashtable_remove( &this->object_table, &k);
 
-  object->head.id = FTS_NO_ID;
+  fts_object_set_id( object, FTS_NO_ID);
 }
 
 static void client_register_object( client_t *this, fts_object_t *object, int object_id)
@@ -358,7 +359,7 @@ static void client_register_object( client_t *this, fts_object_t *object, int ob
   fts_set_object( &v, object);
   fts_hashtable_put( &this->object_table, &k, &v);
 
-  object->head.id = OBJECT_ID( object_id, this->client_id);
+  fts_object_set_id( object, OBJECT_ID( object_id, this->client_id));
 }
 
 /*----------------------------------------------------------------------
@@ -1017,7 +1018,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   this->object_id_count = 17;
 
   /* Set my client id */
-  this->head.head.id = OBJECT_ID( 1, this->client_id);
+  fts_object_set_id( (fts_object_t *)this, OBJECT_ID( 1, this->client_id));
 
   /* output protocol encoder */
   fts_stack_init( &this->output_buffer, unsigned char);
@@ -1031,7 +1032,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_bytestream_add_listener( this->stream, (fts_object_t *) this, client_receive);
 
-  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &this->object_table, fts_int_class, FTS_HASHTABLE_MEDIUM);
 
   client_predefine_objects( this);
 
