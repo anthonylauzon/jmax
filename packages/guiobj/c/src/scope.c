@@ -209,10 +209,14 @@ scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void 
-scope_send_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  scope_t *this = (scope_t *)o;
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
+  fts_update_request(o);
+}
+static void 
+scope_send_to_client(scope_t *this)
+{
+  fts_patcher_t *patcher = fts_object_get_patcher( (fts_object_t *)this);
 
   if(patcher && fts_patcher_is_open(patcher))
     {
@@ -261,10 +265,10 @@ scope_send_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	      index++;
 	    }
 	  
-	  fts_client_send_message(o, sym_display, data->size, this->a);
+	  fts_client_send_message( (fts_object_t *)this, sym_display, data->size, this->a);
 	}
       else
-	fts_client_send_message(o, sym_display, 0, 0);
+	fts_client_send_message( (fts_object_t *)this, sym_display, 0, 0);
     }
 }
 
@@ -331,7 +335,7 @@ scope_ftl(fts_word_t *argv)
 	    {
 	      /* send recorded data */
 	      data->send = size;
-	      fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
+	      fts_timebase_add_call(fts_get_timebase(), data->object, scope_data_changed, 0, 0.0);
 	    }
 
 	  count++;
@@ -373,7 +377,7 @@ scope_ftl(fts_word_t *argv)
 		      count = 0;
 
 		      data->send = 0;
-		      fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
+		      fts_timebase_add_call(fts_get_timebase(), data->object, scope_data_changed, 0, 0.0);
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
@@ -402,7 +406,7 @@ scope_ftl(fts_word_t *argv)
 		{
 		  /* send recorded data */
 		  data->send = size;
-		  fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
+		  fts_timebase_add_call(fts_get_timebase(), data->object, scope_data_changed, 0, 0.0);
 		  
 		  count++;
 		}
@@ -489,6 +493,13 @@ scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_client_send_message(o, sym_set_threshold, 1, &a);
 }
 
+static void 
+scope_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t *this = (scope_t *)o;
+  scope_send_to_client( this);
+}
+
 static void
 scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
@@ -540,6 +551,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, scope_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, scope_delete);      
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, scope_upload); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, scope_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, scope_put);
   

@@ -263,31 +263,31 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   
   public void updatePaint(Graphics g) 
   {
-      int x = getX();
-      int y = getY();
-      int w = getWidth();
-      int h = getHeight();
-      int range = rangeMax - rangeMin;
-      
-      /* Paint the box */ 
-      g.setColor( Settings.sharedInstance().getUIColor());
-      g.fillRect( x+2, y+2, w-4,  h-4);
-
-      /* Paint the throttle */ 
-      g.setColor( Color.black);
-      int pixels, pos;
-      if(orientation==VERTICAL_OR)
-	  {
-	      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / range;
-	      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    int range = rangeMax - rangeMin;
+    
+    /* Paint the box */ 
+    g.setColor( Settings.sharedInstance().getUIColor());
+    g.fillRect( x+2, y+2, w-4,  h-4);
+    
+    /* Paint the throttle */ 
+    g.setColor( Color.black);
+    int pixels, pos;
+    if(orientation==VERTICAL_OR)
+      {
+	pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / range;
+	g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
 	  }
-      else
-	  {
-	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
-	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
-	  }
+    else
+      {
+	pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
+	g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+      }
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)

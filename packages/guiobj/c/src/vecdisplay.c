@@ -133,7 +133,7 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  
 	  this->n++;
 	  
-	  vecdisplay_deliver(this);
+	  fts_update_request(o);
 	}
     }
 }
@@ -183,7 +183,7 @@ vecdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      vecdisplay_deliver(this);
+      fts_update_request(o);
     }
 }
 
@@ -226,7 +226,7 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      vecdisplay_deliver(this);
+      fts_update_request(o);
     }
 }
 
@@ -269,7 +269,7 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      vecdisplay_deliver(this);
+      fts_update_request(o);
     }
 }
 
@@ -312,7 +312,7 @@ vecdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       this->n = n;
       
-      vecdisplay_deliver(this);
+      fts_update_request(o);
     }
 }
 
@@ -324,7 +324,7 @@ vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->scroll = 0;
   this->n = 0;
   
-  vecdisplay_deliver(this);  
+  fts_update_request(o);
 }
 
 static void
@@ -388,6 +388,13 @@ vecdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
+vecdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vecdisplay_t *this = (vecdisplay_t *) o;
+  vecdisplay_deliver(this);  
+}
+
+static void 
 vecdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
@@ -433,6 +440,7 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, vecdisplay_dump);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, vecdisplay_update_gui); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, vecdisplay_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_size, vecdisplay_set_size_by_client);
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);

@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import java.awt.image.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
@@ -56,11 +57,17 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public static VecDispControlPanel controlPanel = new VecDispControlPanel();
 
+  private BufferedImage buff;
+  private Graphics2D buffG;
+
   public VectorDisplay(FtsGraphicObject theFtsObject)
   {
     super(theFtsObject);
 
     maxWidth = FtsVectorDisplayObject.MAX_SIZE + 2;
+
+    buff = new BufferedImage(  DEFAULT_WIDTH -2, DEFAULT_HEIGHT -2, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
   }
 
   public void setDefaults()
@@ -71,7 +78,8 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void display()
   {
-    redraw();
+    drawContent( buffG, 0, 0, getWidth()-2, getHeight()-2);
+    updateRedraw();
   }
 
   public void setCurrentBounds(int x, int y, int w, int h)
@@ -88,6 +96,11 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 	range = h-2;
 	((FtsVectorDisplayObject)ftsObject).setRange( range);
       }
+    
+    if( w <= 0) h = DEFAULT_WIDTH;
+    if( h <= 0) h = DEFAULT_HEIGHT;
+    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
   }
 
   public void setWidth(int w) 
@@ -103,6 +116,11 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     ((FtsVectorDisplayObject)ftsObject).setSize(size);
     
+    int h = getHeight() - 2;
+    if( h <= 0) h = DEFAULT_HEIGHT;
+    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+
     super.setWidth(w);
   }
 
@@ -118,6 +136,11 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     range = h - 2;
 
     ((FtsVectorDisplayObject)ftsObject).setRange(range);
+
+    int w = getWidth() - 2;
+    if( w <= 0) w = DEFAULT_WIDTH;
+    buff = new BufferedImage(  w-2, h-2, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
 
     super.setHeight(h);
   }
@@ -166,7 +189,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 	else
 	  g.setColor(markerYellow);
 	
-	g.drawLine(x, y - zero, x + size, y - zero);
+	g.drawLine(x, y - zero, x + size - 1, y - zero);
       }    
   }
 
@@ -258,58 +281,46 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     int y = getY();
     int w = getWidth();
     int h = getHeight();
+    
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
-    int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
-    int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
-
-    int orgX = x + 1;
-    int orgY = y + h - 2;
-    int i;
-
-    /* draw background */
-    g.setColor(getBackgroundColor());
-    g.fillRect( x, y, w - 1, h - 1);
-
-    drawMarkers(g, orgX, orgY);
+    drawContent( g, x+1, y+1, w-2, h-2);
 
     g.setColor(Color.black);
     g.drawRect( x, y, w - 1, h - 1);
     
     paintInlets(g);
 
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+  }
+
+  void drawContent( Graphics g, int x, int y, int w, int h)
+  {
+    int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
+    int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
+    
+    // draw background 
+    g.setColor(getBackgroundColor());
+    g.fillRect( x, y, w, h);
+
+    drawMarkers(g, x, y+h-2);
+
     if(n > size)
       n = size;
-
+    
     if(n > 1)
       {
 	int wrap = ((FtsVectorDisplayObject)ftsObject).getWrap();
-
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-
 	if(wrap > 0)
-	  drawWrappedVector(g, orgX, orgY, values, n, wrap);
+	  drawWrappedVector(g, x, y+h-2, values, n, wrap);
 	else
-	  drawVector(g, orgX, orgY, values, n);
-
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      }
+	  drawVector(g, x, y+h-2, values, n);
+    }
   }
 
   public void updatePaint(Graphics g) 
   {
-    int n = ((FtsVectorDisplayObject)ftsObject).getNValues();
-    int[] values = ((FtsVectorDisplayObject)ftsObject).getValues();
-    int i;
-
-    if(n > size)
-       n = size;
-
-    if(n > 1)
-      {
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-	drawVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      }
+    g.drawImage( buff, getX()+1, getY()+1, itsSketchPad);  
   }
 
   public JPopupMenu getRunModePopUpMenu()
