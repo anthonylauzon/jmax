@@ -25,13 +25,19 @@ import javax.swing.event.*;
  * consumes the VK_CONTROL codes) and attach it to your editable object */
 public class KeyConsumer implements KeyListener
 {
-  boolean consumeNext = false;
   
   /**
    * The default constructor eats KeyEvent.VK_CONTROL codes*/
   public KeyConsumer() 
   {
     consumeCode = KeyEvent.VK_CONTROL;
+  }
+
+  /**
+   * returns a static object that is able to eat VK_CONTROL keys */
+  public static KeyConsumer controlConsumer()
+  {
+    return ctrlConsumer;
   }
 
   /**
@@ -61,7 +67,9 @@ public class KeyConsumer implements KeyListener
   }
 
   //---
+  boolean consumeNext = false;
   int consumeCode;
+  static KeyConsumer ctrlConsumer = new KeyConsumer();
 }
 
 
