@@ -180,28 +180,8 @@ static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_pat
   fts_set_int(&(this->fontSize), fontIndexTable[i]);
 }
 
-static int fts_patparse_check_patch_protection( fts_graphic_description_t *this, fts_object_t *obj)
-{
-  if ( fts_get_int( &(this->x)) == (SCALE_MULT * 69696969)/ SCALE_DEN /* Magic number for patch protection */
-      || fts_get_int( &(this->y)) == (SCALE_MULT * 69696969)/ SCALE_DEN)
-    {
-      fts_atom_t a;
-
-      /* set the "no_upload" property of the object's patcher */
-      fts_set_int( &a, 1);
-      fts_object_put_prop( (fts_object_t *)fts_object_get_patcher( obj), fts_new_symbol( "no_upload"), &a);
-
-      return 1;
-    }
-
-  return 0;
-}
-
 static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
-  if (fts_patparse_check_patch_protection( this, obj))
-    return;
-
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
@@ -217,9 +197,6 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
   fts_atom_t max_value;
   fts_set_int(&zero, 0);
 
-  if (fts_patparse_check_patch_protection( this, obj))
-    return;
-
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
@@ -233,9 +210,6 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
 
 static void fts_patparse_set_square_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
-  if (fts_patparse_check_patch_protection( this, obj))
-    return;
-
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
@@ -974,18 +948,28 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
  * or the file contains an unimplemented construct.
  */
 
+static int fts_patparse_check_patch_protection( fts_graphic_description_t *this, fts_object_t *obj)
+{
+  if ( fts_get_int( &(this->x)) == (SCALE_MULT * 69696969)/ SCALE_DEN /* Magic number for patch protection */
+      || fts_get_int( &(this->y)) == (SCALE_MULT * 69696969)/ SCALE_DEN)
+    {
+    }
+
+  return 0;
+}
+
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in)
 {
-  int x2, y2;
+  int x1, y1, x2, y2;
   fts_atom_t x, y, height, width;
 
   /* We don't try to do many checks, for the moment */
 
   fts_patlex_next_token(in);
-  fts_set_int(&(x), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
+  x1 = fts_get_int(&(in->val));
     
   fts_patlex_next_token(in);
-  fts_set_int(&(y), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
+  y1 = fts_get_int(&(in->val));
 
   fts_patlex_next_token(in);
   x2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
@@ -993,6 +977,20 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
   fts_patlex_next_token(in);
   y2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
 
+  /* If patcher window has negative coordinates */
+  if (x1 < 0 || y1 < 0)
+    {
+      fts_atom_t a;
+
+      /* set the "no_upload" property of the object's patcher */
+      fts_set_int( &a, 1);
+      fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
+
+      return;
+    }
+
+  fts_set_int(&(x), (SCALE_MULT * x1)/ SCALE_DEN);
+  fts_set_int(&(y), (SCALE_MULT * y1)/ SCALE_DEN);
   fts_set_int(&width,  x2 - fts_get_int(&x));
   fts_set_int(&height, y2 - fts_get_int(&y));
 

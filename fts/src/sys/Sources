@@ -27,8 +27,8 @@ ifeq ($(VENDOR),sgi)
 	ARCH_SOURCES = sgihw.c
 endif
 
-ifeq ($(VENDOR),gnu)
-	ARCH_SOURCES = gnuhw.c
+ifeq ($(ARCH),linuxpc)
+	ARCH_SOURCES = linuxpchw.c
 endif
 
 ifeq ($(VENDOR),solaris2)
