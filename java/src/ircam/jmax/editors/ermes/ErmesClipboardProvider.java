@@ -27,7 +27,7 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
   StringWriter itsStringWriter = new StringWriter();
   Vector itsFtsGroup = new Vector();
   static String itsStoredText;
-
+  FtsSelection itsSelection;
   /**
    * Simple constructor.
    * Provides tcl script format, text format, ftsObject vector format.
@@ -39,6 +39,24 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
     flavorList[2] = DataFlavor.plainTextFlavor;
   }
 
+  /**
+   * Fill the clipboard starting from an FtsSelection
+   */
+  void addSelection(FtsSelection theSelection) {
+    flushContent();
+    itsSelection = theSelection;
+     try 
+      {
+	//PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
+	IndentedPrintWriter pw = new IndentedPrintWriter(itsStringWriter); 
+	itsSelection.saveAsTcl(pw);
+      }
+    catch (Exception e)
+      {
+	System.out.println("ERROR " + e + " while copying ");
+	e.printStackTrace(); // temporary
+      }   
+  }
 
   /**
    * Fill the clipboard starting from a list of graphic objects (ErmesObjects)
@@ -148,7 +166,6 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
    */ 
   private void flushContent() {
     itsStringWriter.close();
-
     itsStringWriter = new StringWriter();//we had to do so. flush seems not to work properly on StringWriters(printing again after a flush just appends)
     itsFtsGroup.removeAllElements();
   }

@@ -31,7 +31,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       ftsObjectsPasted.addElement(value);
   }
 
-  LookAndFeel normalLF;
+  FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   public boolean inAnApplet = false;
@@ -287,14 +287,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   //--------------------------------------------------------
   protected void InitSketchWin(){ 
     
-    getContentPane().setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.VERTICAL)); //provaSw: cancellare
+    getContentPane().setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.VERTICAL));
     
-    normalLF = UIManager.getLookAndFeel();
-    setSize(new Dimension(600, 300));//tintin...
-    //itsToolBar= new ErmesSwToolbar(null);
-    itsToolBar.setSize(600, 30);//provaSw: togliere
-    
-    getContentPane().add(itsToolBar);//che succedera'?
+    itsSelection = itsPatcher.getSelection();
+    itsSelection.clean();
+    setSize(new Dimension(600, 300));
+    itsToolBar.setSize(600, 30);    
+    getContentPane().add(itsToolBar);
     if (isAbstraction ) {
       ErmesSwVarEdit itsVarEdit = new ErmesSwVarEdit(itsSketchPad, 1);///***era 3
       getContentPane().add(itsVarEdit, "stick_both");
@@ -336,7 +335,15 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   // clipboard handling
   protected boolean Copy() {
     CreateFtsGraphics(this);
-    itsClipboardProvider.addGraphicObjects(itsSketchPad.itsSelectedList);
+    itsSelection.clean();
+    //fill the Fts selection
+    ErmesObject aObj;
+    for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
+      aObj = (ErmesObject)e.nextElement();
+      itsSelection.addObject(aObj.itsFtsObject);
+    }
+    itsClipboardProvider.addSelection(itsSelection);
+    //itsClipboardProvider.addGraphicObjects(itsSketchPad.itsSelectedList);
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     return true;
   }
@@ -359,7 +366,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     ftsObjectsPasted.removeAllElements();
     //evaluate the script
     itsPatcher.watch("newObject", this);
-    itsPatcher.watch("newContainer", this);
+    //    itsPatcher.watch("newContainer", this);
     try {
       itsPatcher.eval(MaxApplication.getTclInterp(), tclScriptToExecute);
     } catch (TclException e) {
@@ -368,7 +375,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     
     //ftsObjectPasted vector contains the needed new, pasted objects
     itsPatcher.removeWatch(this);    
-    itsPatcher.removeWatch(this);
+    //itsPatcher.removeWatch(this);
     // make the sketch do the graphic job
     itsSketchPad.PasteObjects(ftsObjectsPasted);
     ErmesSketchPad.RequestOffScreen(itsSketchPad);

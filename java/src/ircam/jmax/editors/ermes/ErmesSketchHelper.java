@@ -932,8 +932,10 @@ class ErmesSketchHelper extends Object{
   {
     if (itsSketchPad.nameTable.containsKey(theName))
       return (Class) itsSketchPad.nameTable.get(theName);
-    else
-      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
+    else {
+      return null;
+      //      return ircam.jmax.editors.ermes.ErmesObjExternal.class;
+    }
   }
   
   //??	public void SetSelectedSegment(ErmesConnSegment theSegment)

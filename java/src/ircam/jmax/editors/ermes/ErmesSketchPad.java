@@ -728,10 +728,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // the code will need a small change here
 
       Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      if (objectClass==null) continue; 
       aObject = itsHelper.AddObject(objectClass, fo);
-      //resizes the object to the dimensions 
-      //les deux dimensions ne correspondent pas directement aux dimensions effectives
-      //dans le format .pat??????????????????????????????????????
 
       if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
@@ -777,6 +775,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // the code will need a small change here
       
       Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      if (objectClass==null) continue;
       objectX = ((Integer)fo.get("pos.x")).intValue();
       objectY = ((Integer)fo.get("pos.y")).intValue();
       fo.put("pos.x", objectX+10);//offset by 10      
@@ -809,6 +808,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // the code will need a small change here
 
       Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      if (objectClass==null) continue;
       aObject = itsHelper.AddObject(objectClass, fo);
     
       if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
