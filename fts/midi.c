@@ -1948,16 +1948,27 @@ midiconfig_restore_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_symbol_t output = fts_get_symbol(at + 2);
   int index = this->n_labels;
   
-  /* make sure that first label is "default" */
-  if(index == 0 && name != fts_s_default)
-  {
-    midiconfig_label_insert(this, 0, fts_s_default);
-    index = 1;
-  }
-    
-  midiconfig_label_insert(this, index, name);
-  midiconfig_set_input(this, index, input);
-  midiconfig_set_output(this, index, output);
+  if( name == fts_s_default)
+    {
+      if( midiconfig_label_get_by_name( this, name) == NULL)
+	midiconfig_label_insert(this, 0, name);
+      
+      midiconfig_set_input(this, 0, input);
+      midiconfig_set_output(this, 0, output);
+    }  
+  else
+    {
+      /* make sure that first label is "default" */
+      if(index == 0)
+	{
+	  midiconfig_label_insert(this, 0, fts_s_default);
+	  index = 1;
+	}
+
+      midiconfig_label_insert(this, index, name);
+      midiconfig_set_input(this, index, input);
+      midiconfig_set_output(this, index, output);
+    }
 }
 
 static void
