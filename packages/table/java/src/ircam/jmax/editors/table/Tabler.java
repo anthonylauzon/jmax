@@ -137,6 +137,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 	  ((FtsIntegerVector)(itsData.getContent())).forceUpdate();
 	  //scure itsTablePanel.recreateOffScreen();
 	  itsTablePanel.paint(itsTablePanel.getGraphics());
+	  itsTablePanel.UpdateOldValues();
 	}});
   }
 
@@ -156,7 +157,9 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   public void keyPressed(KeyEvent e){  
     int key = e.getKeyCode();
     if(key == ircam.jmax.utils.Platform.RETURN_KEY || key == ircam.jmax.utils.Platform.ENTER_KEY){
+      itsFormula.setBackground(Color.gray);
       itsTablePanel.ApplyFormula(itsFormula.getText());
+      itsFormula.setBackground(Color.white);
     }
     else super.keyPressed(e);
   }
