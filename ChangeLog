@@ -1,3 +1,10 @@
+2003-10-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* utils/m4/jmax.m4: fixed checking of jMax version in AC_CHECK_JMAX_VERSION.
+
+	* utils/rpm/jmax.spec.in: added stuff for AGNULA/RehMuDi rpm building.
+	fixed list for jmax-client package.
+
 2003-09-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* utils/m4/jmax.m4: added a new m4 macro: AC_CHECK_JMAX_VERSION.
