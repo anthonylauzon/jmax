@@ -17,20 +17,19 @@ public class ScrEvent {
     itsVelocity = DEFAULT_VELOCITY;
     itsDuration = DEFAULT_DURATION;
     itsChannel = DEFAULT_CHANNEL;
-    itsSomethingElse = DEFAULT_SOMETHING;
   }
 
 
   /**
    * constructor with all the parameters
    */
-  public ScrEvent(int theTime, int thePitch, int theVelocity, int theDuration, int theSomething) 
+  public ScrEvent(int theTime, int thePitch, int theVelocity, int theDuration, int theChannel) 
   {
     itsTime = theTime;
     itsPitch = thePitch;
     itsVelocity = theVelocity;
     itsDuration = theDuration;
-    itsSomethingElse = theSomething;
+    itsChannel = theChannel;
     
   }
 
@@ -74,10 +73,6 @@ public class ScrEvent {
     return itsDuration;
   }
 
-  public final int getSomething() 
-  {
-    return itsSomethingElse;
-  }
   
   /* the corresponding set functions.. */
   public final void setTime(int time) 
@@ -112,14 +107,12 @@ public class ScrEvent {
   int itsVelocity;
   int itsDuration;
   int itsChannel;
-  int itsSomethingElse;
 
   public static int DEFAULT_TIME = 0;
   public static int DEFAULT_PITCH = 64;
   public static int DEFAULT_VELOCITY = 64;
   public static int DEFAULT_DURATION = 100;
   public static int DEFAULT_CHANNEL = 0;
-  public static int DEFAULT_SOMETHING = 0;
 
 }
 
