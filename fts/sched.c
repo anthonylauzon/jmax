@@ -27,7 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#ifdef HAVE_SYS_TYPES_H 
 #include <sys/types.h>
+#endif
 
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
@@ -139,6 +141,7 @@ int fts_sched_remove( fts_object_t *obj)
   return -1;
 }
 
+#if !defined(__POWERPC__) || (defined(__APPLE__) && defined(__MACH__))
 static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
 {
   sched_callback_t *callback;
@@ -210,6 +213,7 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
     }
   }
 }
+#endif
 
 static void run_always( fts_sched_t *sched)
 {
@@ -228,8 +232,10 @@ static void run_always( fts_sched_t *sched)
   }
 }
 
+
 static void fts_sched_do_select(fts_sched_t *sched)
 {
+#if !defined(__POWERPC__) || (defined(__APPLE__) && defined(__MACH__))
   fd_set readfds, writefds, exceptfds;
   int n_fd;
 
@@ -238,6 +244,7 @@ static void fts_sched_do_select(fts_sched_t *sched)
   if (n_fd != 0)
     run_select( sched, n_fd, &readfds, &writefds, &exceptfds);
 
+#endif	
   run_always( sched);
 }
 
@@ -359,12 +366,14 @@ fts_sleep(void)
 
   if (now - last_sleep >= (double)100.0)
   {
+#if !defined(__POWERPC__) || (defined(__APPLE__) && defined(__MACH__))
     struct timespec pause_time;
 
     pause_time.tv_sec = 0;
     pause_time.tv_nsec = 100000000L;
 
     nanosleep( &pause_time, 0);
+#endif
 
     last_sleep = now;
   }

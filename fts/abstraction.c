@@ -50,6 +50,7 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
+#include <ftsprivate/abstraction.h>
 
 struct fts_abstraction
 {

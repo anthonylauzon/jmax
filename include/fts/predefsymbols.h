@@ -151,7 +151,7 @@ PREDEF_SYMBOL( fts_s_quote, "'")
 PREDEF_SYMBOL( fts_s_dollar, "$")
 PREDEF_SYMBOL( fts_s_semi, ";")
 
-/* Object properties */;
+/* Object properties */
 PREDEF_SYMBOL( fts_s_value, "value")
 PREDEF_SYMBOL( fts_s_orientation, "orientation")
 PREDEF_SYMBOL( fts_s_max_value, "maxValue")
@@ -230,19 +230,19 @@ PREDEF_SYMBOL( fts_s_power, "**")
 PREDEF_SYMBOL( fts_s_open_par, "(")
 PREDEF_SYMBOL( fts_s_closed_par, ")")
 PREDEF_SYMBOL( fts_s_open_sqpar, "[")
-PREDEF_SYMBOL( fts_s_closed_sqpar, "]");
-PREDEF_SYMBOL( fts_s_open_cpar, "{");
-PREDEF_SYMBOL( fts_s_closed_cpar, "}");
-PREDEF_SYMBOL( fts_s_dot, ".");
-PREDEF_SYMBOL( fts_s_percent, "%");
-PREDEF_SYMBOL( fts_s_shift_left, "<<");
-PREDEF_SYMBOL( fts_s_shift_right, ">>");
-PREDEF_SYMBOL( fts_s_bit_and, "&");
-PREDEF_SYMBOL( fts_s_bit_or, "|");
-PREDEF_SYMBOL( fts_s_bit_xor, "^");
-PREDEF_SYMBOL( fts_s_bit_not, "~");
-PREDEF_SYMBOL( fts_s_logical_and, "&&");
-PREDEF_SYMBOL( fts_s_logical_or, "||");
+PREDEF_SYMBOL( fts_s_closed_sqpar, "]")
+PREDEF_SYMBOL( fts_s_open_cpar, "{")
+PREDEF_SYMBOL( fts_s_closed_cpar, "}")
+PREDEF_SYMBOL( fts_s_dot, ".")
+PREDEF_SYMBOL( fts_s_percent, "%")
+PREDEF_SYMBOL( fts_s_shift_left, "<<")
+PREDEF_SYMBOL( fts_s_shift_right, ">>")
+PREDEF_SYMBOL( fts_s_bit_and, "&")
+PREDEF_SYMBOL( fts_s_bit_or, "|")
+PREDEF_SYMBOL( fts_s_bit_xor, "^")
+PREDEF_SYMBOL( fts_s_bit_not, "~")
+PREDEF_SYMBOL( fts_s_logical_and, "&&")
+PREDEF_SYMBOL( fts_s_logical_or, "||")
 PREDEF_SYMBOL( fts_s_logical_not, "!")
 PREDEF_SYMBOL( fts_s_equal_equal, "==")
 PREDEF_SYMBOL( fts_s_not_equal, "!=")

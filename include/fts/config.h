@@ -24,6 +24,8 @@
 #include <fts/config-win32.h>
 #elif defined(__APPLE__) && defined(__MACH__) /* Macintosh */
 #include <fts/config-macosx.h>
+#elif defined(__POWERPC__)
+#include <ftsconfig-cwppc.h>
 #else /* use autoconf stuff */
 #include <fts/config-ac.h>
 #endif

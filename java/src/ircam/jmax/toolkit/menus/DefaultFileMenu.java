@@ -69,31 +69,29 @@ public class DefaultFileMenu extends EditorMenu
 
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
-  
-    recentFileListener =  new ListDataListener(){
-	public void contentsChanged(ListDataEvent e)
-	{
-	  buildRecentFiles();
-	}
-	public void intervalAdded(ListDataEvent e)
-	{
-	  buildRecentFiles();
-	}    
-	public void intervalRemoved(ListDataEvent e) 
-	{
-	  buildRecentFiles();
-	}
-      };
+
+    recentFileListener = new ListDataListener(){
+      public void contentsChanged(ListDataEvent e){
+        buildRecentFiles();
+      }
+      public void intervalAdded(ListDataEvent e){
+        buildRecentFiles();
+      }
+      public void intervalRemoved(ListDataEvent e){
+        buildRecentFiles();
+      }
+    };
+
     JMaxApplication.getRecentFileHistory().addListDataListener( recentFileListener);
-    
+
     buildRecentFiles();
   }
 
   public void reset()
   {
-    JMaxApplication.getRecentFileHistory().removeListDataListener( recentFileListener);
+     JMaxApplication.getRecentFileHistory().removeListDataListener( recentFileListener);
   }
-
+    
   public void updateMenu()
   {
     if(JMaxApplication.getFtsServer() != null)

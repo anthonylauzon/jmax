@@ -32,6 +32,10 @@
 
 #include <ftsconfig.h>
 
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
+#endif
+
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>

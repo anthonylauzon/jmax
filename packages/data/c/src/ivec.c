@@ -577,9 +577,9 @@ ivec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   
       ivec_set_size( this, size);
   
-      // when extending: zero new values
-      for(i=old_size; i<size; i++)
-	this->values[i] = 0.0;
+      /* when extending: zero new values*/
+      for(i=old_size; i<size; i++)	
+		this->values[i] = 0.0;		
   
       if( this->editor)
 	{

@@ -131,6 +131,9 @@ public class FtsObject implements Serializable
   {
     if (id != NO_ID)
       server.removeObject( id);
+    server = null;
+    parent = null;
+    encoder = null;
   }
 
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)

@@ -1264,7 +1264,7 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	fts_spost_object_description((fts_bytestream_t *)stream, obj);
 
       fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-      fts_client_add_string( o, fts_memorystream_get_bytes( stream));
+      fts_client_add_string( o, (char *)fts_memorystream_get_bytes( stream));
 
       fts_client_done_message( o);
 

@@ -14,6 +14,8 @@
 /* Define if you have alloca, as a function or macro.  */
 #define HAVE_ALLOCA 1
 
+#define STANDALONE 1
+
 /* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
 /* #undef HAVE_ALLOCA_H */
 
@@ -51,7 +53,7 @@
 /* #undef HAVE_ATANF */
 
 /* Define if you have the cosf function.  */
-/* #undef HAVE_COSF */
+#define HAVE_COSF 1
 
 /* Define if you have the expf function.  */
 /* #undef HAVE_EXPF */
@@ -62,53 +64,48 @@
 /* Define if you have the logf function.  */
 /* #undef HAVE_LOGF */
 
-/* Define if you have the signal function.  */
-#define HAVE_SIGNAL 1
-
 /* Define if you have the sinf function.  */
-/* #undef HAVE_SINF */
+#define HAVE_SINF 1
 
 /* Define if you have the socket function.  */
-#define HAVE_SOCKET 1
+/*#undef HAVE_SOCKET */
 
 /* Define if you have the tanf function.  */
 /* #undef HAVE_TANF */
 
 /* Define if you have the <alloca.h> header file.  */
-/* #undef HAVE_ALLOCA_H */
+#define HAVE_ALLOCA_H 1
 
 /* Define if you have the <arpa/inet.h> header file.  */
-#define HAVE_ARPA_INET_H 1
+/*#undef HAVE_ARPA_INET_H */
 
 /* Define if you have the <dlfcn.h> header file.  */
 /* #undef HAVE_DLFCN_H */
 
 /* Define if you have the <netdb.h> header file.  */
-#define HAVE_NETDB_H 1
+/*#undef HAVE_NETDB_H */
 
 /* Define if you have the <netinet/in.h> header file.  */
-#define HAVE_NETINET_IN_H 1
+/*#undef HAVE_NETINET_IN_H */
 
 /* Define if you have the <netinet/in.h> header file.  */
-#define HAVE_NETINET_TCP_H 1
+/*#undef HAVE_NETINET_TCP_H */
 
 /* Define if you have the <pthread.h> header file.  */
-#define HAVE_PTHREAD_H 1
+/*#undef HAVE_PTHREAD_H */
 
 /* Define if you have the <sys/param.h> header file.  */
-#define HAVE_SYS_PARAM_H 1
-
-/* Define if you have the <sys/signal.h> header file.  */
-#define HAVE_SYS_SIGNAL_H 1
+/*#undef HAVE_SYS_PARAM_H */
+#define	MAXPATHLEN	1024
 
 /* Define if you have the <sys/socket.h> header file.  */
-#define HAVE_SYS_SOCKET_H 1
+/*#undef HAVE_SYS_SOCKET_H */
 
 /* Define if you have the <sys/time.h> header file.  */
-#define HAVE_SYS_TIME_H 1
+/*#undef HAVE_SYS_TIME_H */
 
 /* Define if you have the <sys/time.h> header file.  */
-#define HAVE_SYS_TYPES_H 1
+/*#undef HAVE_SYS_TYPES_H */
 
 /* Define if you have the <time.h> header file.  */
 #define HAVE_TIME_H 1

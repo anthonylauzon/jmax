@@ -479,7 +479,7 @@ define_set_expression(define_t *this, int ac, const fts_atom_t *at)
     fts_spost_object_description_args((fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
     fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
 
-    this->string = fts_new_symbol(fts_memorystream_get_bytes(stream));
+    this->string = fts_new_symbol((char *)fts_memorystream_get_bytes(stream));
   }
   else
     this->string = fts_s_empty_string;

@@ -23,9 +23,15 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 #include <sys/stat.h>
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>

@@ -316,14 +316,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsTextMenu = null;
     itsHelpMenu = null;
 
-
     itsSketchPad = null;
     itsScrollerView = null;
     itsToolBar = null;
     itsMessageLabel = null;
     itsPatcher = null;
     mb = null;
-
+    setJMenuBar(null);
+    
     dispose();
 
     try{

@@ -20,11 +20,16 @@
  * 
  */
 
-#if defined(__APPLE__) && defined(__MACH__)
+#include <ftsconfig.h>
+
+#ifdef HAVE_SIGNAL
+#ifdef HAVE_SYS_SIGNAL_H
 #include <sys/signal.h>
 #else
 #include <signal.h>
 #endif
+#endif
+
 #include <stdlib.h>
 
 #include <fts/fts.h>
@@ -96,20 +101,23 @@ void fts_kernel_autosave_init( void)
 {
 #ifndef DEBUG
   /* Standard quit/int signals */
+#ifdef HAVE_SIGNAL
 
 #ifndef WIN32
   signal(SIGHUP,  autosave_signal_handler);
   signal(SIGQUIT, autosave_signal_handler);
 #endif
-  signal(SIGINT,  autosave_signal_handler);
-  signal(SIGABRT, autosave_signal_handler);
+signal(SIGINT,  autosave_signal_handler);
+signal(SIGABRT, autosave_signal_handler);
 
-  /* Corruption signals */
+/* Corruption signals */
 
 #ifndef WIN32
   signal(SIGBUS, autosave_signal_handler);
 #endif
-  signal(SIGSEGV, autosave_signal_handler);
-  signal(SIGTERM, autosave_signal_handler);
+signal(SIGSEGV, autosave_signal_handler);
+signal(SIGTERM, autosave_signal_handler);
+
+#endif
 #endif
 }

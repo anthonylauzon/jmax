@@ -65,6 +65,8 @@ extern "C" {
 #else
 #define FTS_API __declspec(dllimport)
 #endif
+/*#elif defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#define FTS_API __declspec(dllexport)*/
 #else
 #define FTS_API extern
 #endif

@@ -802,8 +802,11 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   void cleanAll()
   {
     itsPatcher.resetPatcherListener();
+
+    KeyEventsManager.removeProducer(this);
     
     engine.dispose();
+    engine = null;
 
     if (ErmesSelection.patcherSelection.ownedBy(this))
       ErmesSelection.patcherSelection.deselectAll();
@@ -845,6 +848,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     highlightedInletObject = null;
     highlightedOutletObject = null;
     connectingObject = null;
+
+    keyMap = null;
   }
 
 
@@ -871,8 +876,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	itsPatcher.resetPatcherListener();
 	((ErmesSketchWindow)itsEditorContainer).Destroy();
       }
-
-    KeyEventsManager.removeProducer(this);
   }
 
   public void save()

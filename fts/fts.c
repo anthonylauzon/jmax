@@ -246,7 +246,7 @@ fts_load_config( void)
 
 #define _K_DECNCALL(F) { extern void F(void); F(); }
 
-static void fts_kernel_init( void)
+void fts_kernel_init( void)
 {
   /*
    * Attention !!! The order is important (at least for the first lines)

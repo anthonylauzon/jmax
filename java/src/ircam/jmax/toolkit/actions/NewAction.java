@@ -56,7 +56,7 @@ public class NewAction extends EditorAction
 	    public void ftsActionDone()
 	    {
 	      frame.setCursor(Cursor.getDefaultCursor());
-	      frame = null;
+              frame = null;
 	    }
 	  });
       }

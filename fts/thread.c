@@ -1,6 +1,8 @@
 #include <time.h>
 #include <unistd.h>
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
+#endif
 #include <fts/fts.h>
 #include <fts/thread.h>
 

@@ -39,7 +39,11 @@
 
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#else
+#include <time.h>
+#endif
 #include <fts/packages/utils/utils.h>
 
 #define RA 16807 /* multiplier */
@@ -160,9 +164,11 @@ fts_random_float(void)
 void
 fts_random_init(void)
 {
+#ifdef HAVE_SYS_TIME_H
   struct timeval tv;
-
   gettimeofday(&tv, NULL);
-
   seed = tv.tv_usec;
+ #else
+  seed = time( NULL);
+ #endif		
 }

@@ -48,6 +48,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
+#define INVALID_SOCKET -1
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 
@@ -62,8 +67,9 @@ typedef unsigned int socklen_t;
 typedef SOCKET socket_t;
 
 #else
-
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 #include <fcntl.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -71,7 +77,9 @@ typedef SOCKET socket_t;
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+#if HAVE_NETINET_TCP_H
 #include <netinet/tcp.h>
+#endif
 #if HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif

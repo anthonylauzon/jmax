@@ -303,7 +303,7 @@ void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap)
 
   n = vmempost( &post_buffer, &post_buffer_size, 0, format, ap);
 
-  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
   fts_bytestream_flush( stream);
 }  
 
@@ -320,7 +320,7 @@ void fts_spost_float( fts_bytestream_t *stream, double f)
 {
   int n = mempost_float( &post_buffer, &post_buffer_size, 0, f);
 
-  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
   fts_bytestream_flush( stream);
 }
 
@@ -348,7 +348,7 @@ fts_spost_complex(fts_bytestream_t *stream, double re, double im)
       n += mempost_float( &post_buffer, &post_buffer_size, n, -im);
     }
 
-  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
   fts_bytestream_flush( stream);
 }
 
@@ -388,7 +388,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
   else
     n =  mempost( &post_buffer, &post_buffer_size, 0, "<null object>");
 
-  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_output( stream, n, (unsigned char *)post_buffer);
   fts_bytestream_flush( stream);
 }
 
@@ -491,7 +491,7 @@ fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t 
 	  else if (dont_want_a_space_before( value2))
 	    add_blank = 0;
 	  else
-	    add_blank = 1;	// if no body care, do a blank
+	    add_blank = 1;	/* if no body care, do a blank*/
 	}
 
       value1 = value2;
@@ -527,7 +527,7 @@ static void post_output_chars( char *buffer, int n)
 {
   if (fts_get_default_console_stream())
     {
-      fts_bytestream_output( fts_get_default_console_stream(), n, post_buffer);
+      fts_bytestream_output( fts_get_default_console_stream(), n, (unsigned char *)post_buffer);
       fts_bytestream_flush( fts_get_default_console_stream());
     }
   else

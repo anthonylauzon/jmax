@@ -41,6 +41,12 @@ extern void fts_audioconfig_set_defaults( fts_audioconfig_t* config);
 extern void fts_audioconfig_dump( fts_audioconfig_t *mc, fts_bmax_file_t *f);
 extern fts_symbol_t fts_audioconfig_get_fresh_label_name( fts_audioconfig_t *config, fts_symbol_t name);
 extern fts_audiolabel_t *fts_audioconfig_label_get_by_name( fts_audioconfig_t* config, fts_symbol_t name);
+extern int audioconfig_check_sample_rate(fts_audioconfig_t* config, double sample_rate);
+extern int audioconfig_check_buffer_size(fts_audioconfig_t* config, int buffer_size);
+extern int fts_audioconfig_get_buffer_size(fts_audioconfig_t* self);
+extern int fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size);
+extern int fts_audioconfig_get_sample_rate(fts_audioconfig_t* config);
+extern int fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate);
 
 #endif /* _FTS_PRIVATE_AUDIOCONFIG_H_ */
 
