@@ -616,6 +616,30 @@
 			settings = {
 			};
 		};
+		F5A0A8A503CB342F01664092 = {
+			isa = PBXFileReference;
+			name = drumloop.aiff;
+			path = ../../packages/signal/help/drumloop.aiff;
+			refType = 2;
+		};
+		F5A0A8A603CB342F01664092 = {
+			isa = PBXFileReference;
+			name = heureuse.aiff;
+			path = ../../packages/signal/help/heureuse.aiff;
+			refType = 2;
+		};
+		F5A0A8A903CB346D01664092 = {
+			fileRef = F5A0A8A503CB342F01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5A0A8AA03CB346D01664092 = {
+			fileRef = F5A0A8A603CB342F01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5A2D68A03A1193601664092 = {
 			isa = PBXFileReference;
 			name = audioconfig.c;
@@ -2339,6 +2363,8 @@
 				F5FB89EB035E0D75016640F1,
 				F5FB89EC035E0D75016640F1,
 				F5FB89ED035E0D75016640F1,
+				F5A0A8A503CB342F01664092,
+				F5A0A8A603CB342F01664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -6925,6 +6951,8 @@
 				F5FB89FD035E0D8F016640F1,
 				F5FB89FE035E0D8F016640F1,
 				F5FB89FF035E0D8F016640F1,
+				F5A0A8A903CB346D01664092,
+				F5A0A8AA03CB346D01664092,
 				F8EE4B4D031CE66401664092,
 				F8EE4B4E031CE66801664092,
 				F8EE4B4F031CE66B01664092,
