@@ -37,6 +37,7 @@ extern fts_object_t *fts_config_get( void);
 extern fts_object_t *fts_audioconfig_get( void);
 extern fts_object_t *fts_midiconfig_get( void);
 
+extern void fts_config_open(fts_symbol_t file_name);
 extern void fts_config_set( fts_config_t* config);
 extern void fts_config_set_dirty( fts_config_t* config, int is_dirty);
 

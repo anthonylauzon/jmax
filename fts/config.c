@@ -63,6 +63,28 @@ config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
 }
 
+void
+fts_config_open(fts_symbol_t file_name)
+{
+  fts_object_t* obj = NULL;
+  
+  obj = fts_binary_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0);
+  
+  if (obj != NULL && fts_object_get_class(obj) == config_type)
+  {
+    ((fts_config_t*)obj)->file_name = file_name;
+    
+    /* replace current config by loaded config */
+    fts_config_set((fts_config_t*)obj);
+    fts_log("[config]: Opening configuration %s\n", file_name);
+    post("Open configuration: %s\n", file_name);
+  }
+  else
+  {
+    fts_log("[config]: Cannot read AUDIO/MIDI configuration from file %s\n", file_name);
+  }
+}
+
 static void
 config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -72,23 +94,7 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   char path[MAXPATHLEN];
 
   fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
-    
-  /* return the top of the object stack */
-  obj = fts_binary_file_load(path, (fts_object_t*)fts_get_root_patcher(), 0, 0);
-    
-  if (obj != NULL && fts_object_get_class(obj) == config_type)
-  {
-    ((fts_config_t*)obj)->file_name = fts_new_symbol(path);
-
-    /* replace current config by loaded config */
-    fts_config_set( (fts_config_t*)obj);
-
-    fts_config_set_dirty((fts_config_t*)obj, 0);
-  }
-  else
-  {
-    fts_log("config load: cannot read AUDIO/MIDI configuration from file %s\n", file_name);
-  }      
+  fts_config_open(path);
 }
 
 static void
@@ -327,12 +333,15 @@ void fts_config_config(void)
   /* Configuration class */
   config_type = fts_class_install(config_s_name, config_instantiate);
 
+  /* @@@@@ Default config must be created in fts_load_config @@@@@@ */
+#if 0
   /* create config object */
   fts_config_set( (fts_config_t*)fts_object_create(config_type, 0, 0));
 
   /* define global config variable */
   fts_set_object(&a, config);
   fts_name_set_value(fts_get_root_patcher(), config_s_name, &a);
+#endif 
 }
 
 /** EMACS **
