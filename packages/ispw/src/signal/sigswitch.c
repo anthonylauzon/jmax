@@ -79,12 +79,7 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->previous = ftl_program_set_current_subroutine( dsp_get_current_dsp_chain(), this->current);
 
   if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
-    {
-      fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(argv+2, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
-    }
+    fts_dsp_add_function_copy(fts_dsp_get_input_name(dsp, 0), fts_dsp_get_output_name(dsp, 0), fts_dsp_get_input_size(dsp, 0));
 }
 
 static void

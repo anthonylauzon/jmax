@@ -41,12 +41,6 @@ enum
   N_OUTLETS
 };
 
-#define DEFINE_PUT_FUN(name)\
-  static void dsp_put_ ## name\
-    (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)\
-    {dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), ftl_sym.name.vec);}
-
-  
 /************************************************
  *
  *    object
@@ -98,24 +92,60 @@ dsp_put_all(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t dsp_symbol)
 
 /* a single put fun for each class */
 
-  DEFINE_PUT_FUN(sin)
-  DEFINE_PUT_FUN(cos)
-  DEFINE_PUT_FUN(tan)
-  DEFINE_PUT_FUN(asin)
-  DEFINE_PUT_FUN(acos)
-  DEFINE_PUT_FUN(atan)
-  DEFINE_PUT_FUN(sinh)
-  DEFINE_PUT_FUN(cosh)
-  DEFINE_PUT_FUN(tanh)
-  
-/************************************************
- *
- *    user methods
- *
- */
- 
-/* no methods */
- 
+static void 
+dsp_put_sin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sin);
+}
+
+static void 
+dsp_put_cos(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_cos);
+}
+
+static void 
+dsp_put_tan(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_tan);
+}
+
+static void 
+dsp_put_asin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_asin);
+}
+
+static void 
+dsp_put_acos(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_acos);
+}
+
+static void 
+dsp_put_atan(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_atan);
+}
+
+static void 
+dsp_put_sinh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sinh);
+}
+
+static void 
+dsp_put_cosh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_cosh);
+}
+
+static void 
+dsp_put_tanh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_tanh);
+}
+
 /************************************************
  *
  *    class

@@ -185,8 +185,11 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
   float correct;
   int i;
 
-  fts_vecx_fcpyre(x->buf.main, x->buf.for_fft, x->n_points);
-  fts_vecx_ffillim(0.0f, x->buf.for_fft, x->n_points);
+  for(i=0; i<x->n_points; i++)
+    {
+      x->buf.for_fft[i].re = x->buf.main[i];
+      x->buf.for_fft[i].im = 0.0;
+    }
 
   /* get a bounded-Q power spectrum, quarter-tone spaced */
      
@@ -420,8 +423,10 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
     float d_sine_phase = freq * FTS_TWO_PI;
     int down, up, j;
     int n_filter_coeffs;
+    int i;
     
-    fts_vecx_czero(fft_buf, n_points);
+    for(i=0; i<n_points; i++)
+      fft_buf[i].re = fft_buf[i].im = 0.0;
 
     fft_buf[n_points/2].re = wind_norm;
     fft_buf[n_points/2].im = 0;

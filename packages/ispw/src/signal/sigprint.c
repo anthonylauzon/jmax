@@ -31,10 +31,10 @@ typedef struct sigprint_t {
   fts_object_t _o;
   int n_print;
   fts_symbol_t sym;
-  long size;
-  long init;
-  long alloc;
-  long index;
+  int size;
+  int init;
+  int alloc;
+  int index;
   float *buf;
   fts_alarm_t alarm;
 } sigprint_t;
@@ -61,7 +61,7 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sigprint_t *x = ((sigprint_t *)o);
 
   x->sym = fts_get_symbol_arg(ac, at, 1, fts_new_symbol(""));
-  x->init = fts_get_long_arg(ac, at, 2, 0);
+  x->init = fts_get_int_arg(ac, at, 2, 0);
   x->buf = 0; /* will be allocated in _put */
   x->size = 0;
   x->alloc = 0;
@@ -94,17 +94,20 @@ sigprint_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   sigprint_t *x = ((sigprint_t *)o);
 
-  x->n_print = fts_get_long(at);
+  x->n_print = fts_get_int(at);
 }
 
 static void ftl_sigprint(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_ptr(argv);
   sigprint_t *x = (sigprint_t *)fts_word_get_ptr(argv + 1);
-  long n_tick = fts_word_get_long(argv + 2);
-  long index = x->index;
+  int n_tick = fts_word_get_int(argv + 2);
+  int index = x->index;
+  int i;
 
-  fts_vecx_fcpy(in, x->buf + index, n_tick);
+  for(i=0; i<n_tick; i++)
+    x->buf[index + i] = in[i];
+
   index = index + n_tick;
 
   if(index >= x->size)
@@ -112,9 +115,7 @@ static void ftl_sigprint(fts_word_t *argv)
       x->index = 0;
 
       if(x->n_print)
-	{
-	  fts_alarm_set_delay(&(x->alarm), 0.0);
-	}
+	fts_alarm_set_delay(&(x->alarm), 0.0);
     }
   else
     x->index = index;
@@ -126,8 +127,8 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sigprint_t *x = ((sigprint_t *)o);
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  long n_tick = fts_dsp_get_input_size(dsp, 0);
-  long size = x->init;
+  int n_tick = fts_dsp_get_input_size(dsp, 0);
+  int size = x->init;
 
   if(size < n_tick)
     size = n_tick;
@@ -147,7 +148,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_ptr(argv + 1, o);
-  fts_set_long(argv + 2, n_tick);
+  fts_set_int(argv + 2, n_tick);
   dsp_add_funcall(print_dsp_function, 3, argv);
 }
 

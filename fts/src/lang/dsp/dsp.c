@@ -55,6 +55,9 @@ static double dsp_tick_duration_minus_one_sample;
 /* DSP time */
 double fts_dsp_time;
 
+static fts_symbol_t dsp_zero_fun_symbol = 0;
+static fts_symbol_t dsp_copy_fun_symbol = 0;
+
 void 
 fts_dsp_run_tick(void)
 {
@@ -135,6 +138,56 @@ dsp_set_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
 
 /**************************************************************************
  *
+ *  kernel ftl functions
+ *
+ */
+
+static void
+dsp_zero_fun(fts_word_t *argv)
+{
+  float *out = (float *)fts_word_get_ptr(argv + 0);
+  int n = fts_word_get_int(argv + 1);
+  int i;
+
+  for(i=0; i<n; i++)
+    out[i] = 0.0;
+}
+
+static void
+dsp_copy_fun(fts_word_t *argv)
+{
+  float *in = (float *)fts_word_get_ptr(argv + 0);
+  float *out = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for(i=0; i<n; i++)
+    out[i] = 0.0;
+}
+
+void
+fts_dsp_add_function_zero(fts_symbol_t signal, int size)
+{
+  fts_atom_t a[2];
+
+  fts_set_symbol(a + 0, signal);
+  fts_set_int(a + 1, size);
+  dsp_add_funcall(dsp_zero_fun_symbol, 2, a);
+}
+
+void
+fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size)
+{
+  fts_atom_t a[3];
+
+  fts_set_symbol(a + 0, in);
+  fts_set_symbol(a + 1, out);
+  fts_set_int(a + 2, size);
+  dsp_add_funcall(dsp_copy_fun_symbol, 3, a);
+}
+
+/**************************************************************************
+ *
  *  DSP module
  *
  */
@@ -164,6 +217,12 @@ dsp_module_init(void)
 
   fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
   fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
+
+  dsp_zero_fun_symbol = fts_new_symbol("dsp_zero_fun_symbol");
+  fts_dsp_declare_function( dsp_zero_fun_symbol, dsp_zero_fun);
+
+  dsp_copy_fun_symbol = fts_new_symbol("dsp_copy_fun_symbol");
+  fts_dsp_declare_function( dsp_copy_fun_symbol, dsp_copy_fun);
 }
 
 static void

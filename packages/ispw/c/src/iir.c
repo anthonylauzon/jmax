@@ -82,6 +82,16 @@ iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   dsp_list_remove(o);
 }
 
+static void
+iir_clear(fts_object_t *o, int inlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  iir_t *this = (iir_t *)o;
+  float *state = (float *)ftl_data_get_ptr(this->state);
+  int i;
+
+  for(i=0; i<this->n_order; i++)
+    state[i] = 0.0;
+}
 
 /****************************************
  *
@@ -94,10 +104,9 @@ iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   iir_t *this = (iir_t *)o;
   fts_atom_t argv[6];
- 
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 
-  fts_vec_fzero((float *)ftl_data_get_ptr(this->state), this->n_order);
+  iir_clear(o, 0, 0, 0, 0);
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
@@ -114,14 +123,6 @@ iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
  *   user methods
  *
  */
-
-static void
-iir_clear(fts_object_t *o, int inlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  iir_t *this = (iir_t *)o;
-  
-  fts_vec_fzero((float *)ftl_data_get_ptr(this->state), this->n_order);
-}
 
 static void
 iir_set_coef(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -65,21 +65,23 @@ static void
 wahwah_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wahwah_t *this = (wahwah_t *)o;
-  fts_atom_t argv[8];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  float conv;
+  int n_tick = fts_dsp_get_input_size(dsp, 0);
+  double sr = fts_dsp_get_input_srate(dsp, 0);
+  float *state = (float *)ftl_data_get_ptr(this->state);
+  float conv = 2.0 * 3.14159265 / sr;
+  fts_atom_t argv[7];
 
-  fts_vec_fzero((float *)ftl_data_get_ptr(this->state), 2);
-
-  conv = (2.0f * 3.14159265f) / fts_dsp_get_input_srate(dsp, 0);
-
+  state[0] = 0.0;
+  state[1] = 0.0;
+  
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
   fts_set_symbol(argv + 2, fts_dsp_get_input_name(dsp, 2));
   fts_set_symbol(argv + 3, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(argv + 4, this->state);
   fts_set_float(argv + 5, conv);
-  fts_set_long(argv + 6, fts_dsp_get_input_size(dsp, 0));
+  fts_set_long(argv + 6, n_tick);
 
   dsp_add_funcall(wahwah_function, 7, argv);
 }

@@ -39,8 +39,8 @@ static fts_symbol_t tabcycle_fun_symbol = 0;
  
 typedef struct
 {
-  long size;			/* cycle size */
-  long offset;			/* sample offset (grows by the vectorSize) */
+  int size;			/* cycle size */
+  int offset;			/* sample offset (grows by the vectorSize) */
   sampbuf_t *buf;		/* samp tab buffer */
 } tabcycle_ctl_t;
 
@@ -51,7 +51,7 @@ typedef struct
   fts_symbol_t tab_name;		/* symbol bound to table we'll use */
   float value;			/* value to write ot samptab */
   int state;			/* inlet state - table style */
-  long size;			/* cache info: cycle size */
+  int size;			/* cache info: cycle size */
 } tabcycle_t;
 
 
@@ -60,7 +60,7 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   tabcycle_t *this = (tabcycle_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
-  long size = fts_get_long(at + 2);
+  int size = fts_get_int(at + 2);
 
   this->tab_name = tab_name;
   this->value = 0;
@@ -93,11 +93,15 @@ tabcycle_dsp_function(fts_word_t *argv)
 {
   float *out = (float *)fts_word_get_ptr(argv);
   tabcycle_ctl_t *ctl = (tabcycle_ctl_t *)fts_word_get_ptr(argv + 1);
-  long n_tick = fts_word_get_long(argv + 2);
-  long offset;
+  int n_tick = fts_word_get_int(argv + 2);
+  int offset;
+  int i;
 
   offset = ctl->offset;
-  fts_vecx_fcpy(ctl->buf->samples + offset, out, n_tick);
+  
+  for(i=0; i<n_tick; i++)
+    out[i] = ctl->buf->samples[offset + i];
+
   ctl->offset = (ctl->offset + n_tick) % ctl->size;
 }
 
@@ -108,8 +112,8 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   sampbuf_t *buf;
-  long n_tick;
-  long l;
+  int n_tick;
+  int l;
 
   buf = sampbuf_get(this->tab_name);
 
@@ -139,7 +143,7 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       fts_set_symbol(argv + 0, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv + 1, this->tabcycle_data);
-      fts_set_long(argv + 2, n_tick);
+      fts_set_int(argv + 2, n_tick);
       dsp_add_funcall(tabcycle_fun_symbol, 3, argv);
     }
   else
@@ -156,7 +160,7 @@ static void
 tabcycle_bang(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   tabcycle_t *this = (tabcycle_t *)o;
-  const long  l = 0;
+  const int  l = 0;
 
   ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, offset, &l);
 }
@@ -173,7 +177,7 @@ tabcycle_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
     {
       if (buf->size >= this->size)
 	{
-	  const long  l = 0;
+	  const int l = 0;
 	  
 	  ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, buf, &buf);
 	  ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, offset, &l);

@@ -66,19 +66,11 @@
  *
  *      FUN_re ... get real part of complex
  *      FUN_im ... get imaginary part of complex
- *      FUN_fcpyre ... copy float to real part of complex
- *      FUN_fcpyim ... copy float to imaginary part of complex
  *      FUN_fcpyc ... copy float to complex (im = 0)
- *
- *    convert complex / real (complex <-> real):
- *      FUN_cabsf ... absolute value of complex argument as real result
- *      FUN_csqrf ... square of complex argument as real result
  *
  *   complex functions (complex -> complex):
  *      FUN_conj ... conjugation of complex argument
  *      FUN_csqr ... square of complex argument
- *      FUN_cpolar ... converts rectangular to polar representation (using atan2 ANSI C function)
- *      FUN_crect ... converts polar to rectangular representation (using sin and cos ANSI C functions)
  *      FUN_cabs ... absolute value of complex argument
  *
  */
@@ -141,19 +133,7 @@
 
 #define FUN_re(in, out) ((out) = (in).re)
 #define FUN_im(in, out) ((out) = (in).im)
-#define FUN_fcpyre(in, out) ((out).re = (in))
-#define FUN_fcpyim(in, out) ((out).im = (in))
 #define FUN_fcpyc(in, out) ((out).re = (in), (out).im = 0)
-
-
-/***************************************************
- *
- *    convert complex to real (complex -> real)
- *
- */
-
-#define FUN_cabsf(in, out) ((out) = sqrt((in).re * (in).re + (in).im * (in).im))
-#define FUN_csqrf(in, out) ((out) = (in).re * (in).re + (in).im * (in).im)
 
 
 /***************************************************
@@ -168,10 +148,6 @@
  ((out).re = (in).re, (out).im = -(in).im)
 #define FUN_csqr(in, out)\
   ((out).re = (in).re * (in).re + (in).im * (in).im, (out).im = 0)
-#define FUN_cpolar(in, out)\
-  ((out).re = sqrt((in).re * (in).re + (in).im * (in).im), (out).im = atan2((in).im, (in).re))
-#define FUN_crect(in, out)\
- ((out).re = (in).re * cos((in).im), (out).im = (in).re * sin((in).im))
 
 
 #endif /* _KERNELSFUN_H_ */

@@ -653,6 +653,7 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
   fts_iterator_t iter;
   unsigned long total_size;
   float *p;
+  int i;
 
   total_size = 0;
 
@@ -680,7 +681,8 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
 
   prog->buffers = p;
 
-  fts_vecx_fzero(p, total_size);
+  for(i=0; i<total_size; i++)
+    p[i] = 0.0;
 
   fts_hashtable_get_values( &(prog->symbol_table), &iter);
 

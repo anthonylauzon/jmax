@@ -134,6 +134,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
+  int i;
  
   if(this->n_tick == 0)
     {
@@ -146,7 +147,8 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       return;
     }
   
-  fts_vecx_fzero(this->buf, n_tick);
+  for(i=0; i<n_tick; i++)
+    this->buf[i] = 0.0;
 
   if (n_tick == 64)
     {

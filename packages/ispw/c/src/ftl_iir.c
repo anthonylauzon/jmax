@@ -270,7 +270,7 @@ ftl_iir_n(fts_word_t *argv)
   float ynm2, ynm1;
   float b1, b2;
   float ynp0, ynp1, ynp2, ynp3;
-  int n;
+  int i, n;
 
   x = (float *)fts_word_get_ptr(argv); /* in0 */
   y = (float *)fts_word_get_ptr(argv + 1); /* out0 */
@@ -281,20 +281,23 @@ ftl_iir_n(fts_word_t *argv)
 
   for(n=0; n<n_order; n++)
     {
-      int i;
       y[n] = FILTERS_FP_ONSET(x[n]);
+
       for(i=0; i<n_order-n; i++)
 	y[n] -= coefs[i] * state[n_order-1-i];
+
       for( ; i<n_order; i++)
 	y[n] -= coefs[i] * y[n-1-i];
     }
+
   for( ; n<n_tick; n++)
     {
-      int i;
       y[n] = FILTERS_FP_ONSET(x[n]);
+
       for(i=0; i<n_order; i++)
 	y[n] -= coefs[i] * y[n-1-i];
     }
 
-  fts_vec_fcpy(y, state, n_order);
+  for(i=0; i<n_order; i++)
+    state[i] = y[i];
 }

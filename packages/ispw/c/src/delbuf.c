@@ -48,7 +48,11 @@
 void 
 delbuf_clear_delayline(del_buf_t *buf)
 {
-  fts_vecx_fzero(buf->delay_line, buf->ring_size + buf->n_tick);
+  int i;
+      
+  for(i=0; i<buf->ring_size + buf->n_tick; i++)
+    buf->delay_line[i] = 0.0;
+
   buf->phase = buf->ring_size;
 }
 

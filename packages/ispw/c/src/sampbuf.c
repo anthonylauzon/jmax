@@ -98,6 +98,8 @@ sampbuf_init(sampbuf_t *buf, long size)
 void
 sampbuf_realloc(sampbuf_t *buf, long size)
 {
+  int i;
+
   /* very lazy */
   if(size && size <= buf->alloc_size)
     buf->size = size;
@@ -106,11 +108,15 @@ sampbuf_realloc(sampbuf_t *buf, long size)
       float *samples;
 
       samples = (float *)fts_malloc((size + GUARDPTS) * sizeof(float));
-      fts_vec_fzero(samples, size + GUARDPTS);
+
+      for(i=0; i<size + GUARDPTS; i++)
+	samples[i] = 0.0;
       
       if(buf->samples)
 	{
-	  fts_vec_fcpy(buf->samples, samples, buf->size);
+	  for(i=0; i<buf->size; i++)
+	    samples[i] = buf->samples[i];
+	  
 	  fts_free((void *)buf->samples);
 	}
       

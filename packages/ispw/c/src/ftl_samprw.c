@@ -39,13 +39,17 @@ void ftl_sampwrite(fts_word_t *argv)
   sampbuf_t *buf = ctl->buf;
   float *xp = buf->samples + onset;
   int n_left = buf->size + GUARDPTS - onset;
+  int i;
 
-  if(n_left <= 0) return;
-  if(n_left >= n_tick){
-     fts_vecx_fcpy(in, buf->samples + onset, n_tick);
-  }else{
-     fts_vec_fcpy(in, buf->samples + onset, n_left);
-  }
+  if(n_left <= 0) 
+    return;
+
+  if(n_left > n_tick)
+    n_left = n_tick;
+
+  for(i=0; i<n_left; i++)
+    buf->samples[onset + i] = in[i];
+
   ctl->onset = onset + n_tick;
 }
 

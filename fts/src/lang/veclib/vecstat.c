@@ -27,18 +27,4 @@
 
 #include <fts/lang/veclib/vecstat.h>
 
-fts_status_description_t fts_vec_NoMemory = 
-{
-  "out of memory"
-};
-
-fts_status_description_t fts_vec_NoFftSize = 
-{
-  "size not possible for fft"
-};
-
-fts_status_description_t fts_vec_NoLookups = 
-{
-  "no appropriate lookup tables set up"
-};
 

@@ -92,9 +92,18 @@ static void dsp_put_all(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t dsp_
 
 /* a single put fun for each class */
 
-  DEFINE_PUT_FUN(sqrt)
-  DEFINE_PUT_FUN(rsqr)
-  
+static void 
+dsp_put_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sqrt);
+}
+
+static void 
+dsp_put_rsqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_rsqrt);
+}
+
 /************************************************
  *
  *    class

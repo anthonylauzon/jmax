@@ -541,7 +541,7 @@ static void audp_adc_get( fts_word_t *args)
   if (data->in_fifo.end - data->in_fifo.begin > data->in_fifo.high) 
     data->in_stats.fifo_high++;
 
-  /* pop the fts_vector */
+  /* pop the vector */
   sz = n * n_channels * sizeof(platform_sample_t);
 
   if (audp_fifo_read(&data->in_fifo, sz, data->samples_buffer) < 0) {

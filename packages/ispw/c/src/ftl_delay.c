@@ -169,7 +169,12 @@ void ftl_vd(fts_word_t *argv)
 	}
     }
   else
-    fts_vec_fzero(out, n);
+    {
+      int i;
+      
+      for(i=0; i<n; i++)
+	out[i] = 0.0;
+    }
 }
 
 
@@ -259,7 +264,12 @@ void ftl_vd_inplace(fts_word_t *argv)
 	}
     }
   else
-    fts_vec_fzero(inout, n);
+    {
+      int i;
+      
+      for(i=0; i<n; i++)
+	inout[i] = 0.0;
+    }
 }
 
 /* ISPW bug compatible version */
@@ -347,6 +357,11 @@ ftl_vd_miller(fts_word_t *argv)
 	}
     }
   else
-    fts_vec_fzero(out, n);
+    {
+      int i;
+      
+      for(i=0; i<n; i++)
+	out[i] = 0.0;
+    }
 }
 

@@ -63,12 +63,6 @@ DECLARE_VEC_FUN(FUN, (rsqr, float, float, FUN_rsqr))
 
 DECLARE_VEC_FUN(CFUN, (conj, complex, complex, FUN_conj))
 DECLARE_VEC_FUN(CFUN, (csqr, complex, complex, FUN_csqr))
-DECLARE_VEC_FUN(CFUN, (cpolar, complex, complex, FUN_cpolar))
-DECLARE_VEC_FUN(CFUN, (crect, complex, complex, FUN_crect))
-
-DECLARE_VEC_FUN(CFUN, (cabsf, complex, float, FUN_cabsf))
-DECLARE_VEC_FUN(CFUN, (csqrf, complex, float, FUN_csqrf))
-
 
 /***************************************************
  *

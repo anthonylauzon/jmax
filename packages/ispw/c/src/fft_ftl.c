@@ -25,15 +25,14 @@
  */
 
 #include <fts/fts.h>
-
 #include "fft_ftl.h"
 
 /* temporary here */
-void complete_symetric_spectrum_inplc_after_rfft(complex *buf, long n_points);
-void shuffle_after_cfft_for_tandem(complex *in, complex *out0, complex *out1, long n_points);
-void shuffle_before_cifft_for_tandem(complex *in0, complex *in1, complex *out, long n_points);
-void shuffle_after_cfft_for_tandem_half(complex *in, complex *out0, complex *out1, long n_points);
-void shuffle_before_cifft_for_tandem_half(complex *in0, complex *in1, complex *out, long n_points);
+void complete_symetric_spectrum_inplc_after_rfft(complex *buf, int n_points);
+void shuffle_after_cfft_for_tandem(complex *in, complex *out0, complex *out1, int n_points);
+void shuffle_before_cifft_for_tandem(complex *in0, complex *in1, complex *out, int n_points);
+void shuffle_after_cfft_for_tandem_half(complex *in, complex *out0, complex *out1, int n_points);
+void shuffle_before_cifft_for_tandem_half(complex *in0, complex *in1, complex *out, int n_points);
 
 /**************************************************************
  *
@@ -58,7 +57,7 @@ extern void ftl_fft_tandem_miller(fts_word_t *argv);
 extern void ftl_ifft_tandem_miller(fts_word_t *argv);
 
 fts_symbol_t
-  dsp_sym_fft_complex = 0,
+dsp_sym_fft_complex = 0,
   dsp_sym_ifft_complex = 0,
   dsp_sym_fft_real = 0,
   dsp_sym_ifft_real = 0,
@@ -110,50 +109,66 @@ ftl_fft_init(void)
   dsp_declare_function(dsp_sym_ifft_tandem_miller, ftl_ifft_tandem_miller);
 }
 
+
 /**************************************************************
  *
  *    the routines with lots of scrap (copy & paste)
  *
  */
- 
+
 /*** complex ***/
  
 void
 ftl_fft_complex(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
   float *out1 = (float *)fts_word_get_ptr(argv + 5);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
-  
-  if(out_idx < size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  buf[in_idx + i].re = in0[i];
+	  buf[in_idx + i].im = in1[i];
+	}
 
-  if(in_idx >= size){
-    fts_cfft(buf, spec, size);
-    /* fts_vecx_scl_cfmul(spec, (float)(1./size), spec, size); */
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      in_idx += n_tick;
+    }
+  
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_cfft(buf, spec, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -163,37 +178,53 @@ void
 ftl_ifft_complex(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
   float *out1 = (float *)fts_word_get_ptr(argv + 5);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
-    in_idx += n_tick;
-  }
-  
-  if(out_idx < size){
-    fts_vecx_csplit(buf + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  spec[in_idx + i].re = in0[i];
+	  spec[in_idx + i].im = in1[i];
+	}
 
-  if(in_idx >= size){
-    fts_cifft(spec, buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      in_idx += n_tick;
+    }
+  
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = buf[out_idx + i].re;
+	  out1[i] = buf[out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_cifft(spec, buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -205,38 +236,50 @@ void
 ftl_fft_real(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *out0 = (float *)fts_word_get_ptr(argv + 3);
   float *out1 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)(ctl->buf);
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_fcpy(in0, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
-  
-  if(out_idx < size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	buf[in_idx + i] = in0[i];
 
-  if(in_idx >= size){
-    fts_rfft(buf, spec, size);
-    /* fts_vecx_scl_cfmul(spec, (float)(1./size), spec, size >> 1); */
-    complete_symetric_spectrum_inplc_after_rfft(spec, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      in_idx += n_tick;
+    }
+  
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_rfft(buf, spec, size);
+      complete_symetric_spectrum_inplc_after_rfft(spec, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -246,34 +289,49 @@ void
 ftl_ifft_real(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    if(in_idx >= size){
-      fts_rifft(spec, buf, size);
-      in_idx = out_idx = 0;
-      ctl->gap_count = ctl->gap_size;
-      fts_alarm_set_delay(&ctl->alarm, 0.0);
-    }
-    fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      if(in_idx >= size)
+	{
+	  fts_rifft(spec, buf, size);
+	  in_idx = out_idx = 0;
+	  ctl->gap_count = ctl->gap_size;
+	  fts_alarm_set_delay(&ctl->alarm, 0.0);
+	}
 
-  if(out_idx < size){
-    fts_vecx_fcpy(buf + out_idx, out0, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-  }
+      for(i=0; i<n_tick; i++)
+	{
+	  spec[in_idx + i].re = in0[i];
+	  spec[in_idx + i].im = in1[i];
+	}
+
+      in_idx += n_tick;
+    }
+
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = buf[out_idx + i];
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = 0.0;
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -283,39 +341,52 @@ void
 ftl_fft_real_half(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *out0 = (float *)fts_word_get_ptr(argv + 3);
   float *out1 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
-  long n_out_tick = n_tick >> 1; /* down sampling */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int n_out_tick = n_tick >> 1; /* down sampling */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_fcpy(in0, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	buf[in_idx + i] = in0[i];
 
-  if(out_idx < spec_size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_out_tick); /* down sampled output */
-    out_idx += n_out_tick;
-  }else{
-    fts_vecx_fzero(out0, n_out_tick);
-    fts_vecx_fzero(out1, n_out_tick);
-  }
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= size){
-    fts_rfft(buf, spec, size);
-    /* fts_vecx_scl_cfmul(spec, (float)(1./size), spec, spec_size); */
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < spec_size)
+    {
+      /* down sampled output */
+      for(i=0; i<n_out_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	}
+
+      out_idx += n_out_tick;
+    }
+  else
+    {
+      for(i=0; i<n_out_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_rfft(buf, spec, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -325,37 +396,52 @@ void
 ftl_ifft_real_half(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
-  long n_out_tick = n_tick << 1; /* up sampling */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int n_out_tick = n_tick << 1; /* up sampling */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick); /* down sampled input */
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  spec[in_idx + i].re = in0[i];
+	  spec[in_idx + i].im = in1[i];
+	} 
 
-  if(out_idx < size){
-    fts_vecx_fcpy(buf + out_idx, out0, n_out_tick);
-    out_idx += n_out_tick;
-  }else{
-    fts_vecx_fzero(out0, n_out_tick);
-  }
+      /* down sampled input */
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= spec_size){
-    fts_rifft(spec, buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < size)
+    {
+      for(i=0; i<n_out_tick; i++)
+	out0[i] = buf[out_idx + i];
+
+      out_idx += n_out_tick;
+    }
+  else
+    {
+      for(i=0; i<n_out_tick; i++)
+	out0[i] = 0.0;
+    }
+
+  if(in_idx >= spec_size)
+    {
+      fts_rifft(spec, buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -367,7 +453,7 @@ void
 ftl_fft_tandem(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
@@ -376,35 +462,49 @@ ftl_fft_tandem(fts_word_t *argv)
   float *out3 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
   
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
-  
-  if(out_idx < size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_tick);
-    fts_vecx_csplit(spec + size + out_idx, out2, out3, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-    fts_vecx_fzero(out2, n_tick);
-    fts_vecx_fzero(out3, n_tick);
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  buf[in_idx + i].re = in0[i];
+	  buf[in_idx + i].im = in1[i];
+	}
 
-  if(in_idx >= size){
-    fts_cfft_inplc(buf, size);
-    /* fts_vecx_scl_cfmul(buf, (float)(1./size), buf, size); */
-    shuffle_after_cfft_for_tandem(buf, spec, spec + size, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      in_idx += n_tick;
+    }
+  
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	  out2[i] = spec[size + out_idx + i].re;
+	  out3[i] = spec[size + out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = out2[i] = out3[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_cfft_inplc(buf, size);
+      shuffle_after_cfft_for_tandem(buf, spec, spec + size, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -414,7 +514,7 @@ void
 ftl_ifft_tandem(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *in2 = (float *)fts_word_get_ptr(argv + 4);
@@ -423,32 +523,49 @@ ftl_ifft_tandem(fts_word_t *argv)
   float *out1 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int i;
   
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
-    fts_vecx_cmerge(in2, in3, spec + size + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  spec[in_idx + i].re = in0[i];
+	  spec[in_idx + i].im = in1[i];
+	  spec[size + in_idx + i].re = in2[i];
+	  spec[size + in_idx + i].im = in3[i];
+	}
 
-  if(out_idx < size){
-    fts_vecx_csplit(buf + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= size){
-    shuffle_before_cifft_for_tandem(spec, spec + size, buf, size);
-    fts_cifft_inplc(buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = buf[out_idx + i].re;
+	  out1[i] = buf[out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      shuffle_before_cifft_for_tandem(spec, spec + size, buf, size);
+      fts_cifft_inplc(buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -458,7 +575,7 @@ void
 ftl_fft_tandem_half(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
@@ -467,37 +584,51 @@ ftl_fft_tandem_half(fts_word_t *argv)
   float *out3 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
-  long n_out_tick = n_tick >> 1; /* down sampling */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int n_out_tick = n_tick >> 1; /* down sampling */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  buf[in_idx + i].re = in0[i];
+	  buf[in_idx + i].im = in1[i];
+	}
+      
+      in_idx += n_tick;
+    }
 
-  if(out_idx < spec_size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_out_tick);
-    fts_vecx_csplit(spec + spec_size + out_idx, out2, out3, n_out_tick);
-    out_idx += n_out_tick;
-  }else{
-    fts_vecx_fzero(out0, n_out_tick);
-    fts_vecx_fzero(out1, n_out_tick);
-    fts_vecx_fzero(out2, n_out_tick);
-    fts_vecx_fzero(out3, n_out_tick);
-  }
+  if(out_idx < spec_size)
+    {
+      for(i=0; i<n_out_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	  out2[i] = spec[spec_size + out_idx + i].re;
+	  out3[i] = spec[spec_size + out_idx + i].im;
+	}
 
-  if(in_idx >= size){
-    fts_cfft_inplc(buf, size);
-    /* fts_vecx_scl_cfmul(buf, (float)(1./size), buf, size); */
-    shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      out_idx += n_out_tick;
+    }
+  else
+    {
+      for(i=0; i<n_out_tick; i++)
+	out0[i] = out1[i] = out2[i] = out3[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_cfft_inplc(buf, size);
+      shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -507,7 +638,7 @@ void
 ftl_ifft_tandem_half(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *in2 = (float *)fts_word_get_ptr(argv + 4);
@@ -516,34 +647,52 @@ ftl_ifft_tandem_half(fts_word_t *argv)
   float *out1 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1;
-  long n_out_tick = n_tick << 1; /* up sampling */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1;
+  int n_out_tick = n_tick << 1; /* up sampling */
+  int i;
   
   ctl->gap_count -= n_tick; 
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick); /* down sampled input */
-    fts_vecx_cmerge(in2, in3, spec + spec_size + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  spec[in_idx + i].re = in0[i];
+	  spec[in_idx + i].im = in1[i];
+	  spec[spec_size + in_idx + i].re = in2[i];
+	  spec[spec_size + in_idx + i].im = in3[i];
+	} 
 
-  if(out_idx < size){
-    fts_vecx_csplit(buf + out_idx, out0, out1, n_out_tick);
-    out_idx += n_out_tick;
-  }else{
-    fts_vecx_fzero(out0, n_out_tick);
-    fts_vecx_fzero(out1, n_out_tick);
-  }
+      /* down sampled input */
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= spec_size){
-    shuffle_before_cifft_for_tandem_half(spec, spec + spec_size, buf, size);
-    fts_cifft_inplc(buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < size)
+    {
+      for(i=0; i<n_out_tick; i++)
+	{
+	  out0[i] = buf[out_idx + i].re;
+	  out1[i] = buf[out_idx + i].im;
+	}
+
+      out_idx += n_out_tick;
+    }
+  else
+    {
+      for(i=0; i<n_out_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= spec_size)
+    {
+      shuffle_before_cifft_for_tandem_half(spec, spec + spec_size, buf, size);
+      fts_cifft_inplc(buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -556,39 +705,50 @@ void
 ftl_fft_real_miller(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *out0 = (float *)fts_word_get_ptr(argv + 3);
   float *out1 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_fcpy(in0, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	buf[in_idx + i] = in0[i];
 
-  if(out_idx < spec_size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= size){
-    fts_rfft(buf, spec, size);
-    /* fts_vecx_scl
-_cfmul(spec, (float)(1./size), spec, spec_size); */
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < spec_size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_rfft(buf, spec, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -598,37 +758,53 @@ void
 ftl_ifft_real_miller(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    if(in_idx < spec_size)
-      fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      if(in_idx < spec_size)
+	{
+	  for(i=0; i<n_tick; i++)
+	    {
+	      spec[in_idx + i].re = in0[i];
+	      spec[in_idx + i].im = in1[i];
+	    }
+	}
 
-  if(out_idx < size){
-    fts_vecx_fcpy(buf + out_idx, out0, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-  }
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= size){
-    fts_rifft(spec, buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = buf[out_idx + i];
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_rifft(spec, buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -638,7 +814,7 @@ void
 ftl_fft_tandem_miller(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *out0 = (float *)fts_word_get_ptr(argv + 4);
@@ -647,36 +823,50 @@ ftl_fft_tandem_miller(fts_word_t *argv)
   float *out3 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1; /* half of spectrum */
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1; /* half of spectrum */
+  int i;
 
   ctl->gap_count -= n_tick;
-  if(ctl->gap_count < 0){
-    fts_vecx_cmerge(in0, in1, buf + in_idx, n_tick);
-    in_idx += n_tick;
-  }
+  if(ctl->gap_count < 0)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  buf[in_idx + i].re = in0[i];
+	  buf[in_idx + i].im = in1[i];
+	}
 
-  if(out_idx < spec_size){
-    fts_vecx_csplit(spec + out_idx, out0, out1, n_tick);
-    fts_vecx_csplit(spec + spec_size + out_idx, out2, out3, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-    fts_vecx_fzero(out2, n_tick);
-    fts_vecx_fzero(out3, n_tick);
-  }
+      in_idx += n_tick;
+    }
 
-  if(in_idx >= size){
-    fts_cfft_inplc(buf, size);
-    /* fts_vecx_scl_cfmul(buf, (float)(1./size), buf, size); */
-    shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+  if(out_idx < spec_size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = spec[out_idx + i].re;
+	  out1[i] = spec[out_idx + i].im;
+	  out2[i] = spec[spec_size + out_idx + i].re;
+	  out3[i] = spec[spec_size + out_idx + i].im;
+	}
+
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = out2[i] = out3[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      fts_cfft_inplc(buf, size);
+      shuffle_after_cfft_for_tandem_half(buf, spec, spec + spec_size, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -686,7 +876,7 @@ void
 ftl_ifft_tandem_miller(fts_word_t *argv)
 {
   fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
-  long n_tick = (long)fts_word_get_long(argv + 1);
+  int n_tick = (int)fts_word_get_int(argv + 1);
   float *in0 = (float *)fts_word_get_ptr(argv + 2);
   float *in1 = (float *)fts_word_get_ptr(argv + 3);
   float *in2 = (float *)fts_word_get_ptr(argv + 4);
@@ -695,35 +885,52 @@ ftl_ifft_tandem_miller(fts_word_t *argv)
   float *out1 = (float *)fts_word_get_ptr(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
-  long out_idx = ctl->out_idx;
-  long in_idx = ctl->in_idx;
-  long size = ctl->size;
-  long spec_size = size >> 1;
+  int out_idx = ctl->out_idx;
+  int in_idx = ctl->in_idx;
+  int size = ctl->size;
+  int spec_size = size >> 1;
+  int i;
   
   ctl->gap_count -= n_tick; 
-  if(ctl->gap_count < 0){
-    if(in_idx < spec_size){
-      fts_vecx_cmerge(in0, in1, spec + in_idx, n_tick);
-      fts_vecx_cmerge(in2, in3, spec + spec_size + in_idx, n_tick);
+  if(ctl->gap_count < 0)
+    {
+      if(in_idx < spec_size)
+	{
+	  for(i=0; i<n_tick; i++)
+	    {
+	      spec[in_idx + i].re = in0[i];
+	      spec[in_idx + i].im = in1[i];
+	      spec[spec_size + in_idx + i].re = in2[i];
+	      spec[spec_size + in_idx + i].im = in3[i];
+	    }
+	}
+      in_idx += n_tick;
     }
-    in_idx += n_tick;
-  }
 
-  if(out_idx < size){
-    fts_vecx_csplit(buf + out_idx, out0, out1, n_tick);
-    out_idx += n_tick;
-  }else{
-    fts_vecx_fzero(out0, n_tick);
-    fts_vecx_fzero(out1, n_tick);
-  }
+  if(out_idx < size)
+    {
+      for(i=0; i<n_tick; i++)
+	{
+	  out0[i] = buf[out_idx + i].re;
+	  out1[i] = buf[out_idx + i].im;
+	}
 
-  if(in_idx >= size){
-    shuffle_before_cifft_for_tandem_half(spec, spec + spec_size, buf, size);
-    fts_cifft_inplc(buf, size);
-    in_idx = out_idx = 0;
-    ctl->gap_count = ctl->gap_size;
-    fts_alarm_set_delay(&ctl->alarm, 0.0);
-  }
+      out_idx += n_tick;
+    }
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out0[i] = out1[i] = 0.0;
+    }
+
+  if(in_idx >= size)
+    {
+      shuffle_before_cifft_for_tandem_half(spec, spec + spec_size, buf, size);
+      fts_cifft_inplc(buf, size);
+      in_idx = out_idx = 0;
+      ctl->gap_count = ctl->gap_size;
+      fts_alarm_set_delay(&ctl->alarm, 0.0);
+    }
   
   ctl->out_idx = out_idx;
   ctl->in_idx = in_idx;
@@ -736,38 +943,40 @@ ftl_ifft_tandem_miller(fts_word_t *argv)
  *
  */
  
-void shuffle_after_cfft_for_tandem(complex *in, complex *out0, complex *out1, long n_points)
+void shuffle_after_cfft_for_tandem(complex *in, complex *out0, complex *out1, int n_points)
 {
-  long index, xedni;
+  int index, xedni;
   complex out0_index, out1_index;
     
   out0[0].re = in[0].re;
   out0[0].im = 0;
   out1[0].re = in[0].im;
   out1[0].im = 0;
-  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--){
-    out0_index.re = 0.5f * (in[index].re + in[xedni].re);
-    out0_index.im = 0.5f * (in[index].im - in[xedni].im);
-    out1_index.re = 0.5f * (in[xedni].im + in[index].im);
-    out1_index.im = 0.5f * (in[xedni].re - in[index].re);
-    out0[index].re = out0_index.re;
-    out0[xedni].re = out0_index.re;
-    out1[index].re = out1_index.re;
-    out1[xedni].re = out1_index.re;
-    out0[index].im = out0_index.im;
-    out0[xedni].im = -out0_index.im;
-    out1[index].im = out1_index.im;
-    out1[xedni].im = -out1_index.im;
-  }
+
+  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--)
+    {
+      out0_index.re = 0.5f * (in[index].re + in[xedni].re);
+      out0_index.im = 0.5f * (in[index].im - in[xedni].im);
+      out1_index.re = 0.5f * (in[xedni].im + in[index].im);
+      out1_index.im = 0.5f * (in[xedni].re - in[index].re);
+      out0[index].re = out0_index.re;
+      out0[xedni].re = out0_index.re;
+      out1[index].re = out1_index.re;
+      out1[xedni].re = out1_index.re;
+      out0[index].im = out0_index.im;
+      out0[xedni].im = -out0_index.im;
+      out1[index].im = out1_index.im;
+      out1[xedni].im = -out1_index.im;
+    }
   out0[index].re = in[index].re;
   out0[index].im = 0.0f;
   out1[index].re = in[index].im;
   out1[index].im = 0.0f;
 }
 
-void shuffle_before_cifft_for_tandem(complex *in0, complex *in1, complex *out, long n_points)
+void shuffle_before_cifft_for_tandem(complex *in0, complex *in1, complex *out, int n_points)
 {
-  long index;
+  int index;
   complex out_0, out_1;
 
   out_0.re = in0[0].re;
@@ -778,63 +987,69 @@ void shuffle_before_cifft_for_tandem(complex *in0, complex *in1, complex *out, l
   out[0].im = out_0.im;
   out[1].re = out_1.re;
   out[1].im = out_1.im;
-  for(index=2; index<n_points; index+=2){
-    out_0.re = in0[index].re - in1[index].im;
-    out_0.im = in0[index].im + in1[index].re;
-    out_1.re = in0[index + 1].re - in1[index + 1].im;
-    out_1.im = in0[index + 1].im + in1[index + 1].re;
-    out[index].re = out_0.re;
-    out[index].im = out_0.im;
-    out[index + 1].re = out_1.re;
-    out[index + 1].im = out_1.im;
-  }
+
+  for(index=2; index<n_points; index+=2)
+    {
+      out_0.re = in0[index].re - in1[index].im;
+      out_0.im = in0[index].im + in1[index].re;
+      out_1.re = in0[index + 1].re - in1[index + 1].im;
+      out_1.im = in0[index + 1].im + in1[index + 1].re;
+      out[index].re = out_0.re;
+      out[index].im = out_0.im;
+      out[index + 1].re = out_1.re;
+      out[index + 1].im = out_1.im;
+    }
 }
 
-void shuffle_after_cfft_for_tandem_half(complex *in, complex *out0, complex *out1, long n_points)
+void shuffle_after_cfft_for_tandem_half(complex *in, complex *out0, complex *out1, int n_points)
 {
-  long index, xedni;
+  int index, xedni;
   complex out0_index, out1_index;
     
   out0[0].re = in[0].re;
   out0[0].im = 0;
   out1[0].re = in[0].im;
   out1[0].im = 0;
-  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--){
-    out0_index.re = 0.5f * (in[index].re + in[xedni].re);
-    out0_index.im = 0.5f * (in[index].im - in[xedni].im);
-    out1_index.re = 0.5f * (in[xedni].im + in[index].im);
-    out1_index.im = 0.5f * (in[xedni].re - in[index].re);
-    out0[index].re = out0_index.re;
-    out1[index].re = out1_index.re;
-    out0[index].im = out0_index.im;
-    out1[index].im = out1_index.im;
-  }
+
+  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--)
+    {
+      out0_index.re = 0.5f * (in[index].re + in[xedni].re);
+      out0_index.im = 0.5f * (in[index].im - in[xedni].im);
+      out1_index.re = 0.5f * (in[xedni].im + in[index].im);
+      out1_index.im = 0.5f * (in[xedni].re - in[index].re);
+      out0[index].re = out0_index.re;
+      out1[index].re = out1_index.re;
+      out0[index].im = out0_index.im;
+      out1[index].im = out1_index.im;
+    }
 }
 
-void shuffle_before_cifft_for_tandem_half(complex *in0, complex *in1, complex *out, long n_points)
+void shuffle_before_cifft_for_tandem_half(complex *in0, complex *in1, complex *out, int n_points)
 {
-  long index, xedni;
+  int index, xedni;
   complex out_index, out_xedni;
 
   out[0].re = in0[0].re;
   out[0].im = in1[0].re;
-  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--){
-    out_index.re = in0[index].re - in1[index].im;
-    out_index.im = in0[index].im + in1[index].re;
-    out_xedni.re = in1[index].im + in0[index].re;
-    out_xedni.im = in1[index].re - in0[index].im;
-    out[index].re = out_index.re;
-    out[index].im = out_index.im;
-    out[xedni].re = out_xedni.re;
-    out[xedni].im = out_xedni.im;
-  }
+
+  for(index=1, xedni=n_points-1; index<n_points>>1; index++, xedni--)
+    {
+      out_index.re = in0[index].re - in1[index].im;
+      out_index.im = in0[index].im + in1[index].re;
+      out_xedni.re = in1[index].im + in0[index].re;
+      out_xedni.im = in1[index].re - in0[index].im;
+      out[index].re = out_index.re;
+      out[index].im = out_index.im;
+      out[xedni].re = out_xedni.re;
+      out[xedni].im = out_xedni.im;
+    }
   out[index].re = 0;
   out[index].im = 0;
 }
 
-void complete_symetric_spectrum_inplc_after_rfft(complex *buf, long n_points)
+void complete_symetric_spectrum_inplc_after_rfft(complex *buf, int n_points)
 {
-  long index, xedni;
+  int index, xedni;
   
   buf[n_points - 1].re = buf[1].re;
   buf[n_points - 1].im = -buf[1].im;
@@ -842,15 +1057,17 @@ void complete_symetric_spectrum_inplc_after_rfft(complex *buf, long n_points)
   buf[n_points - 2].im = -buf[2].im;
   buf[n_points - 3].re = buf[3].re;
   buf[n_points - 3].im = -buf[3].im;
-  for(index=4, xedni=n_points-4; index<n_points>>1; index+=4, xedni-=4){
-    buf[xedni].re = buf[index].re;
-    buf[xedni].im = -buf[index].im;
-    buf[xedni - 1].re = buf[index + 1].re;
-    buf[xedni - 1].im = -buf[index + 1].im;
-    buf[xedni - 2].re = buf[index + 2].re;
-    buf[xedni - 2].im = -buf[index + 2].im;
-    buf[xedni - 3].re = buf[index + 3].re;
-    buf[xedni - 3].im = -buf[index + 3].im;
-  }
+
+  for(index=4, xedni=n_points-4; index<n_points>>1; index+=4, xedni-=4)
+    {
+      buf[xedni].re = buf[index].re;
+      buf[xedni].im = -buf[index].im;
+      buf[xedni - 1].re = buf[index + 1].re;
+      buf[xedni - 1].im = -buf[index + 1].im;
+      buf[xedni - 2].re = buf[index + 2].re;
+      buf[xedni - 2].im = -buf[index + 2].im;
+      buf[xedni - 3].re = buf[index + 3].re;
+      buf[xedni - 3].im = -buf[index + 3].im;
+    }
   buf[index].re = 0;
 }

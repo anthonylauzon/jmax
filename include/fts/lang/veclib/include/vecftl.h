@@ -67,11 +67,6 @@ FTS_API void ftl_vec_rsqr(fts_word_t *argv); FTS_API void ftl_vecx_rsqr(fts_word
 
 FTS_API void ftl_vec_conj(fts_word_t *argv); FTS_API void ftl_vecx_conj(fts_word_t *argv);
 FTS_API void ftl_vec_csqr(fts_word_t *argv); FTS_API void ftl_vecx_csqr(fts_word_t *argv);
-FTS_API void ftl_vec_cpolar(fts_word_t *argv); FTS_API void ftl_vecx_cpolar(fts_word_t *argv);
-FTS_API void ftl_vec_crect(fts_word_t *argv); FTS_API void ftl_vecx_crect(fts_word_t *argv);
-
-FTS_API void ftl_vec_cabsf(fts_word_t *argv); FTS_API void ftl_vecx_cabsf(fts_word_t *argv);
-FTS_API void ftl_vec_csqrf(fts_word_t *argv); FTS_API void ftl_vecx_csqrf(fts_word_t *argv);
 
 FTS_API void ftl_vec_round(fts_word_t *argv); FTS_API void ftl_vecx_round(fts_word_t *argv);
 
@@ -164,14 +159,9 @@ FTS_API void ftl_vec_fcpy(fts_word_t *argv); FTS_API void ftl_vecx_fcpy(fts_word
 FTS_API void ftl_vec_icpy(fts_word_t *argv); FTS_API void ftl_vecx_icpy(fts_word_t *argv);
 FTS_API void ftl_vec_ccpy(fts_word_t *argv); FTS_API void ftl_vecx_ccpy(fts_word_t *argv);
 
-FTS_API void ftl_vec_fcpyre(fts_word_t *argv); FTS_API void ftl_vecx_fcpyre(fts_word_t *argv);
-FTS_API void ftl_vec_fcpyim(fts_word_t *argv); FTS_API void ftl_vecx_fcpyim(fts_word_t *argv);
-
 FTS_API void ftl_vec_ffill(fts_word_t *argv); FTS_API void ftl_vecx_ffill(fts_word_t *argv);
 FTS_API void ftl_vec_ifill(fts_word_t *argv); FTS_API void ftl_vecx_ifill(fts_word_t *argv);
 FTS_API void ftl_vec_cfill(fts_word_t *argv); FTS_API void ftl_vecx_cfill(fts_word_t *argv);
-FTS_API void ftl_vec_ffillre(fts_word_t *argv); FTS_API void ftl_vecx_ffillre(fts_word_t *argv);
-FTS_API void ftl_vec_ffillim(fts_word_t *argv); FTS_API void ftl_vecx_ffillim(fts_word_t *argv);
 
 FTS_API void ftl_vec_re(fts_word_t *argv); FTS_API void ftl_vecx_re(fts_word_t *argv);
 FTS_API void ftl_vec_im(fts_word_t *argv); FTS_API void ftl_vecx_im(fts_word_t *argv);
@@ -213,11 +203,5 @@ FTS_API void ftl_vec_fclip(fts_word_t *argv); FTS_API void ftl_vecx_fclip(fts_wo
 FTS_API void ftl_vec_iclip(fts_word_t *argv); FTS_API void ftl_vecx_iclip(fts_word_t *argv);
 
 #endif
-
-/* hand coded */
-FTS_API void ftl_vec_csplit(fts_word_t *a);
-FTS_API void ftl_vecx_csplit(fts_word_t *a);
-FTS_API void ftl_vec_cmerge(fts_word_t *a);
-FTS_API void ftl_vecx_cmerge(fts_word_t *a);
 
 #endif /* _VECFTL_H_ */

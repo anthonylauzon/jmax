@@ -26,202 +26,327 @@
 
 #include <fts/fts.h>
 
+static fts_symbol_t sin_symbol;
+static fts_symbol_t cos_symbol;
+static fts_symbol_t tan_symbol;
 
+static fts_symbol_t asin_symbol;
+static fts_symbol_t acos_symbol;
+static fts_symbol_t atan_symbol;
 
-/* the class */
-enum
-{
-  INLET_sig = 0,
-  N_INLETS
-};
-
-enum
-{
-  OUTLET_sig = 0,
-  N_OUTLETS
-};
-
-#define DEFINE_PUT_FUN(name)\
-  static void dsp_put_ ## name\
-    (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)\
-    {dsp_put_all(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), ftl_sym.name.vec);}
-
-  
-/************************************************
- *
- *    object
- *
- */
+static fts_symbol_t sinh_symbol;
+static fts_symbol_t cosh_symbol;
+static fts_symbol_t tanh_symbol;
 
 typedef struct
 {
   fts_object_t head;
-  float scl;
-} obj_t;
-
-/* objects creation arguments */
-enum
-{
-  OBJ_ARG_class,
-  N_OBJ_ARGS
-};
-
-static void
-obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dsp_list_insert(o);
-}
-
-static void
-obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dsp_list_remove(o);
-}
+} vectrigon_t;
 
 /************************************************
  *
- *    dsp
+ *  dsp
  *
  */
 
+static void
+ftl_sin (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = sin(in[i]); 
+} 
 
 static void
-dsp_put_all(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t dsp_symbol)
+ftl_cos (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = cos(in[i]); 
+} 
+
+static void
+ftl_tan (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = tan(in[i]); 
+} 
+
+static void
+ftl_asin (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = asin(in[i]); 
+} 
+
+static void
+ftl_acos (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = acos(in[i]); 
+} 
+
+static void
+ftl_atan (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = atan(in[i]); 
+} 
+
+static void
+ftl_sinh (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = sinh(in[i]); 
+} 
+
+static void
+ftl_cosh (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = cosh(in[i]); 
+} 
+
+static void
+ftl_tanh (fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = tanh(in[i]); 
+} 
+
+static void
+vectrigon_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 {
   fts_atom_t argv[3];
 
-  fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(dsp_symbol, 3, argv);
+  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+  fts_set_long  (argv + 2, fts_dsp_get_input_size(dsp, 0));
+  fts_dsp_add_function(name, 3, argv);
 }
 
-/* a single put fun for each class */
+static void 
+sin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sin_symbol);
+}
 
-  DEFINE_PUT_FUN(sin)
-  DEFINE_PUT_FUN(cos)
-  DEFINE_PUT_FUN(tan)
-  DEFINE_PUT_FUN(asin)
-  DEFINE_PUT_FUN(acos)
-  DEFINE_PUT_FUN(atan)
-  DEFINE_PUT_FUN(sinh)
-  DEFINE_PUT_FUN(cosh)
-  DEFINE_PUT_FUN(tanh)
-  
-/************************************************
- *
- *    user methods
- *
- */
- 
-/* no methods */
- 
+static void 
+cos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), cos_symbol);
+}
+
+static void 
+tan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), tan_symbol);
+}
+
+static void 
+asin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), asin_symbol);
+}
+
+static void 
+acos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), acos_symbol);
+}
+
+static void 
+atan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), atan_symbol);
+}
+
+static void 
+sinh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sinh_symbol);
+}
+
+static void 
+cosh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), cosh_symbol);
+}
+
+static void 
+tanh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), tanh_symbol);
+}
+
 /************************************************
  *
  *    class
  *
  */
 
+static void
+vectrigon_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dsp_add_object(o);
+}
+
+static void
+vectrigon_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dsp_remove_object(o);
+}
+
 static fts_status_t
-class_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t mth)
+vectrigon_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t put_method)
 {
   fts_symbol_t a[2];
 
-  fts_class_init(cl, sizeof(obj_t), N_INLETS, N_OUTLETS, 0);
+  fts_class_init(cl, sizeof(vectrigon_t), 1, 1, 0);
   
-  a[OBJ_ARG_class] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, obj_init, N_OBJ_ARGS, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vectrigon_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vectrigon_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, put_method);
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, mth, 1, a);
-
-  dsp_sig_inlet(cl, INLET_sig);
-  dsp_sig_outlet(cl, OUTLET_sig);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
 
-
 static fts_status_t
 sin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_sin);
+  return vectrigon_instantiate(cl, ac, at, sin_put);
 }
 
 static fts_status_t
 cos_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_cos);
+  return vectrigon_instantiate(cl, ac, at, cos_put);
 }
 
 static fts_status_t
 tan_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_tan);
+  return vectrigon_instantiate(cl, ac, at, tan_put);
 }
 
 static fts_status_t
 asin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_asin);
+  return vectrigon_instantiate(cl, ac, at, asin_put);
 }
-
 
 static fts_status_t
 acos_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_acos);
+  return vectrigon_instantiate(cl, ac, at, acos_put);
 }
-
 
 static fts_status_t
 atan_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_atan);
+  return vectrigon_instantiate(cl, ac, at, atan_put);
 }
-
 
 static fts_status_t
 sinh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_sinh);
+  return vectrigon_instantiate(cl, ac, at, sinh_put);
 }
-
 
 static fts_status_t
 cosh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_cosh);
+  return vectrigon_instantiate(cl, ac, at, cosh_put);
 }
-
 
 static fts_status_t
 tanh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  return class_instantiate_realize(cl, ac, at, dsp_put_tanh);
+  return vectrigon_instantiate(cl, ac, at, tanh_put);
 }
-
 
 void
 vectrigon_config(void)
 {
-  fts_class_install(fts_new_symbol("sin~"), sin_instantiate);
-  fts_class_install(fts_new_symbol("cos~"), cos_instantiate);
-  fts_class_install(fts_new_symbol("tan~"), tan_instantiate);
+  sin_symbol = fts_new_symbol("sin~");
+  cos_symbol = fts_new_symbol("cos~");
+  tan_symbol = fts_new_symbol("tan~");
 
-  fts_class_install(fts_new_symbol("asin~"), asin_instantiate);
-  fts_class_install(fts_new_symbol("acos~"), acos_instantiate);
-  fts_class_install(fts_new_symbol("atan~"), atan_instantiate);
+  asin_symbol = fts_new_symbol("asin~");
+  acos_symbol = fts_new_symbol("acos~");
+  atan_symbol = fts_new_symbol("atan~");
 
-  fts_class_install(fts_new_symbol("sinh~"), sinh_instantiate);
-  fts_class_install(fts_new_symbol("cosh~"), cosh_instantiate);
-  fts_class_install(fts_new_symbol("tanh~"), tanh_instantiate);
+  sinh_symbol = fts_new_symbol("sinh~");
+  cosh_symbol = fts_new_symbol("cosh~");
+  tanh_symbol = fts_new_symbol("tanh~");
+
+  fts_dsp_declare_function(sin_symbol, ftl_sin);
+  fts_dsp_declare_function(cos_symbol, ftl_cos);
+  fts_dsp_declare_function(tan_symbol, ftl_tan);
+
+  fts_dsp_declare_function(asin_symbol, ftl_asin);
+  fts_dsp_declare_function(acos_symbol, ftl_acos);
+  fts_dsp_declare_function(atan_symbol, ftl_atan);
+
+  fts_dsp_declare_function(sinh_symbol, ftl_sinh);
+  fts_dsp_declare_function(cosh_symbol, ftl_cosh);
+  fts_dsp_declare_function(tanh_symbol, ftl_tanh);
+
+  fts_class_install(sin_symbol, sin_instantiate);
+  fts_class_install(cos_symbol, cos_instantiate);
+  fts_class_install(tan_symbol, tan_instantiate);
+
+  fts_class_install(asin_symbol, asin_instantiate);
+  fts_class_install(acos_symbol, acos_instantiate);
+  fts_class_install(atan_symbol, atan_instantiate);
+
+  fts_class_install(sinh_symbol, sinh_instantiate);
+  fts_class_install(cosh_symbol, cosh_instantiate);
+  fts_class_install(tanh_symbol, tanh_instantiate);
 }
-
-
-
-
-
-
-

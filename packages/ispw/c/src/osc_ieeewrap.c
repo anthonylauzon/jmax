@@ -65,13 +65,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
       if (fts_dsp_is_input_null(dsp, 1))
 	{
 	  /* no phase input, no frequency input */
-
-	  /* Special case: always output zero */
-	  fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0)); /* input is zero, anyway */
-	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
-
-	  dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
+	  fts_dsp_add_function_copy(fts_dsp_get_input_name(dsp, 0), fts_dsp_get_output_name(dsp, 0), fts_dsp_get_input_size(dsp, 0));
 	}
       else
 	{

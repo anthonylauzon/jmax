@@ -188,6 +188,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   long spec_size = x->spec_size;
   int sig_tick; /* tick size in time domain */
   int spec_tick; /* tick size in spectral domain (is sig_tick/2 for real_spec = sym_half) */
+  int i, n;
 
   if(real_spec == sym_half)
   {
@@ -218,15 +219,29 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   x->ctl.gap_size = hop - size;
 
+  /* zero buffers */
+
   if(type == sym_real)
-    fts_vecx_fzero((float *)(x->ctl.buf), size); /* acctually a float buffer */
+    n = size / 2;
   else /* complex or tandem */
-    fts_vecx_czero(x->ctl.buf, size);
+    n = size;
+
+  for(i=0; i<n; i++)
+    {
+      x->ctl.buf[i].re = 0.0;
+      x->ctl.buf[i].im = 0.0;
+    }
  
   if(type == sym_tandem)
-    fts_vecx_czero(x->ctl.spec, 2 * spec_size);
-  else /* real or complex */
-    fts_vecx_czero(x->ctl.spec, spec_size);
+    n = 2 * spec_size;
+  else
+    n = spec_size;
+
+  for(i=0; i<n; i++)
+    {
+      x->ctl.spec[i].re = 0.0;
+      x->ctl.spec[i].im = 0.0;
+    }
  
   x->ctl.in_idx = 0;
   x->ctl.out_idx = size;

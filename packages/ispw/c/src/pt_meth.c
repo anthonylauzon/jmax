@@ -338,13 +338,17 @@ void pt_common_instantiate(fts_class_t *cl)
  
 void pt_common_dsp_fun_put(pt_common_obj_t *x, fts_dsp_descr_t *dsp) /* to set proper sampling rate */
 {
+  int i;
+
   if(x->n_overlap & (fts_dsp_get_input_size(dsp, 0)-1))
     post("%s: period must be multiple of vector size: %d\n", CLASS_NAME, fts_dsp_get_input_size(dsp, 0));
 		
   x->srate = fts_dsp_get_input_srate(dsp, 0);
   fix_pitch_base(x);
+      
+  for(i=0; i<x->n_points; i++)
+    x->buf.main[i] = 0.0;
   
-  fts_vecx_fzero(x->buf.main, x->n_points);
   x->buf.fill = x->buf.main + x->n_overlap;
 }
 
@@ -354,16 +358,22 @@ void pt_common_dsp_function(fts_word_t *a)
   analysis_t analysis = (analysis_t)fts_word_get_fun(a+1);
   float *in = (float *)fts_word_get_ptr(a+2);
   long n = fts_word_get_long(a+3);
+  int i;
 
-  fts_vecx_fcpy(in, x->buf.fill, n);
-  x->buf.fill += n;
-   
+  for(i=0; i<n; i++)
+    x->buf.fill[i] = in[i];
+  
+  x->buf.fill += n;   
 
-  if(x->buf.fill >= x->buf.end){
-     analysis((fts_object_t *)x);
-     if(x->n_overlap) fts_vecx_fcpy(x->buf.main + (x->n_points - x->n_overlap), x->buf.main, x->n_overlap);
-     x->buf.fill = x->buf.main + x->n_overlap;
-  }
+  if(x->buf.fill >= x->buf.end)
+    {
+      analysis((fts_object_t *)x);
+
+      for(i=0; i<x->n_overlap; i++)
+	x->buf.main[i] = x->buf.main[x->n_points - x->n_overlap + i];
+
+      x->buf.fill = x->buf.main + x->n_overlap;
+    }
 }
 
 /*************************************************

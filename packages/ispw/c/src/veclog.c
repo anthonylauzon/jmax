@@ -27,85 +27,17 @@
 #include <math.h>
 #include <fts/fts.h>
 
+static fts_symbol_t exp_symbol;
+static fts_symbol_t log_symbol;
+static fts_symbol_t log10_symbol;
+static fts_symbol_t expb_symbol;
+static fts_symbol_t logb_symbol;
 
-
-
-
-/* the class */
-enum{
-  INLET_sig = 0,
-  INLET_base = 1,
-  N_INLETS
-};
-
-enum{
-  OUTLET_sig = 0,
-  N_OUTLETS
-};
-
-#define DEFINE_PUT_VEC_FUN(name)\
-  static void dsp_put_ ## name\
-    (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)\
-    {dsp_put_vec(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), ftl_sym.name.vec);}
-
-#define DEFINE_PUT_VEC_SCL_FUN(name)\
-  static void dsp_put_ ## name\
-    (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)\
-    {dsp_put_vec_scl(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), ftl_sym.name.vec);}
-
-/************************************************
- *
- *    object
- *
- */
-
-typedef struct{
+typedef struct
+{
   fts_object_t head;
-  float scl; /* scalar in computation */
-} obj_t;
-
-/* objects creation arguments */
-enum
-{
-  OBJ_ARG_class,
-  OBJ_ARG_base,
-  N_OBJ_ARGS
-};
-
-static void
-sigexp_init_vec_scl(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  obj_t *obj = (obj_t *)o;
-  float base = fts_get_float_arg(ac, at, OBJ_ARG_base, 0.0f);
-  
-  dsp_list_insert(o);
-  
-  obj->scl = log(base);
-}
-
-static void
-siglog_init_vec_scl(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  obj_t *obj = (obj_t *)o;
-  float base = fts_get_float_arg(ac, at, OBJ_ARG_base, 0.0f);
-  
-  dsp_list_insert(o);
-  
-  obj->scl = 1.0f/log(base);
-}
-
-static void
-obj_init_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  obj_t *obj = (obj_t *)o;
-  dsp_list_insert(o);
-}
-
-static void
-obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dsp_list_remove(o);
-}
+  float scl;
+} veclog_t;
 
 /************************************************
  *
@@ -113,68 +45,150 @@ obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *
  */
 
+void 
+ftl_exp(fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = exp(in[i]); 
+} 
+
+void 
+ftl_log(fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = log(in[i]); 
+} 
+
+void 
+ftl_log10(fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  int size = fts_word_get_int(argv + 2); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = log10(in[i]); 
+} 
+
+void 
+ftl_expb(fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
+  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  int size = fts_word_get_int(argv + 3); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = exp(scl * in[i]);
+} 
+
+void 
+ftl_logb(fts_word_t *argv ) 
+{ 
+  float *in = (float *)fts_word_get_ptr(argv + 0); 
+  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
+  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  int size = fts_word_get_int(argv + 3); 
+  int i; 
+
+  for(i=0; i<size; i++)
+    out[i] = scl * log(in[i]);
+} 
+
 static void
-dsp_put_vec(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t dsp_symbol)
+veclog_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 {
+  veclog_t *this = (veclog_t *)o;
   fts_atom_t argv[4];
 
   fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv + 2, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(dsp_symbol, 3, argv);
+  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+  dsp_add_funcall(name, 3, argv);
 }
 
 static void
-dsp_put_vec_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t dsp_symbol)
+veclog_put_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 {
-  obj_t *obj = (obj_t *)o;
+  veclog_t *this = (veclog_t *)o;
   fts_atom_t argv[4];
 
-  fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));
-  fts_set_ptr   (argv + 1, &obj->scl);
+  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+  fts_set_ptr(argv + 1, &this->scl);
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv + 3, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(dsp_symbol, 4, argv);
+  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+  dsp_add_funcall(name, 4, argv);
 }
 
-/* a single put fun for each dsp function class */
-  DEFINE_PUT_VEC_FUN(exp)
-  DEFINE_PUT_VEC_FUN(log)
-  DEFINE_PUT_VEC_FUN(log10)
-  DEFINE_PUT_VEC_SCL_FUN(expb)
-  DEFINE_PUT_VEC_SCL_FUN(logb)
+static void 
+exp_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), exp_symbol);
+}
+
+static void 
+log_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), log_symbol);
+}
+
+static void 
+log10_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), log10_symbol);
+}
+
+static void 
+expb_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_ptr(at), expb_symbol);
+}
+
+static void 
+logb_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_ptr(at), logb_symbol);
+}
 
 /************************************************
  *
- *    user methods
+ *  user methods
  *
  */
 static void
-meth_float_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+veclog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
-  obj->scl = log(fts_get_float_arg(ac, at, 0, 0.0f));
+  veclog_t *obj = (veclog_t *)o;
+  float f = fts_get_number_float(at);
+
+  if(f > 0.0)
+    obj->scl = log(f);
+  else
+    obj->scl = 1.0;
 }
 
 static void
-meth_int_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+siglog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  obj_t *obj = (obj_t *)o;
-  obj->scl = log(fts_get_long_arg(ac, at, 0, 0));
-}
+  veclog_t *obj = (veclog_t *)o;
+  float f = fts_get_number_float(at);
 
-static void
-meth_float_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  obj_t *obj = (obj_t *)o;
-  obj->scl = 1.0f/log(fts_get_float_arg(ac, at, 0, 0.0f));
-}
-
-static void
-meth_int_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  obj_t *obj = (obj_t *)o;
-  obj->scl =  1.0f/log(fts_get_long_arg(ac, at, 0, 0));
+  if(f > 0.0)
+    obj->scl = 1.0 / log(f);
+  else
+    obj->scl = 1.0;
 }
 
 /************************************************
@@ -183,43 +197,70 @@ meth_int_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 
-static fts_status_t
-sigexp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
+  veclog_t *obj = (veclog_t *)o;
+
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_number(at))
+    veclog_set_base(o, 0, 0, 1, at);
+  else
+    obj->scl = 1.0;
+  
+  dsp_list_insert(o);  
+}
+
+static void
+siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  veclog_t *obj = (veclog_t *)o;
+
+  ac--;
+  at++;
  
-  if (ac > 1)
+  if(ac > 0 && fts_is_number(at))
+    siglog_set_base(o, 0, 0, 1, at);
+  else
+    obj->scl = 1.0;
+}
+
+static void
+veclog_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_list_remove(o);
+}
+
+static fts_status_t
+veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  ac--;
+  at++;
+
+  if (ac > 0)
     {
-      fts_class_init(cl, sizeof(obj_t), 2, 1, 0); /* 2 inlets + 1 outlet */
+      fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);
 
-      a[OBJ_ARG_class] = fts_s_symbol; /* class name */
-      a[OBJ_ARG_base] = fts_s_number; /* base */
-      fts_method_define(cl, fts_SystemInlet, fts_s_init, sigexp_init_vec_scl, 2, a);
-      fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, expb_put);
 
-      a[0] = fts_s_ptr;
-      fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_expb, 1, a);
-
-      a[0] = fts_s_int;
-      fts_method_define(cl, INLET_base, fts_s_int, meth_int_exp, 1, a);
-
-      a[0] = fts_s_float;
-      fts_method_define(cl, INLET_base, fts_s_float, meth_float_exp, 1, a);
+      fts_method_define_varargs(cl, 1, fts_s_int, veclog_set_base);
+      fts_method_define_varargs(cl, 1, fts_s_float, veclog_set_base);
     }
   else
     {
-      fts_class_init(cl, sizeof(obj_t), 1, 1, 0); /* 1 inlet + 1 outlet */
-      a[OBJ_ARG_class] = fts_s_symbol; /* class name */
-      fts_method_define(cl, fts_SystemInlet, fts_s_init, obj_init_vec, 1, a);
-      fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
+      fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-      a[0] = fts_s_ptr;
-      fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_exp, 1, a);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, exp_put);
     }
   
-  /* in any case */
-  dsp_sig_inlet(cl, INLET_sig);
-  dsp_sig_outlet(cl, OUTLET_sig);
+  dsp_sig_inlet(cl, 0);
+  dsp_sig_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -228,40 +269,31 @@ sigexp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
- 
-  if (ac > 1)
+  ac--;
+  at++;
+
+  if (ac > 0)
     {
-      fts_class_init(cl, sizeof(obj_t), 2, 1, 0); /* 2 inlets + 1 outlet */
+      fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);
 
-      a[OBJ_ARG_class] = fts_s_symbol; /* class name */
-      a[OBJ_ARG_base] = fts_s_number; /* base */
-      fts_method_define(cl, fts_SystemInlet, fts_s_init, siglog_init_vec_scl, 2, a);
-      fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, siglog_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, logb_put);
 
-      a[0] = fts_s_ptr;
-      fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_logb, 1, a);
-
-      a[0] = fts_s_int;
-      fts_method_define(cl, INLET_base, fts_s_int, meth_int_log, 1, a);
-
-      a[0] = fts_s_float;
-      fts_method_define(cl, INLET_base, fts_s_float, meth_float_log, 1, a);
+      fts_method_define_varargs(cl, 1, fts_s_int, siglog_set_base);
+      fts_method_define_varargs(cl, 1, fts_s_float, siglog_set_base);
     }
   else
     {
-      fts_class_init(cl, sizeof(obj_t), 1, 1, 0); /* 1 inlet + 1 outlet */
-      a[OBJ_ARG_class] = fts_s_symbol; /* class name */
-      fts_method_define(cl, fts_SystemInlet, fts_s_init, obj_init_vec, 1, a);
-      fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
+      fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-      a[0] = fts_s_ptr;
-      fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_log, 1, a);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log_put);
     }
   
-  /* in any case */
-  dsp_sig_inlet(cl, INLET_sig);
-  dsp_sig_outlet(cl, OUTLET_sig);
+  dsp_sig_inlet(cl, 0);
+  dsp_sig_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -269,27 +301,36 @@ siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 siglog10_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
+  fts_class_init(cl, sizeof(veclog_t), 1, 1, 0);
 
-  fts_class_init(cl, sizeof(obj_t), 1, 1, 0); /* 1 inlet + 1 outlet */
-  a[OBJ_ARG_class] = fts_s_symbol; /* class name */
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, obj_init_vec, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, obj_delete, 0, 0);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_log10, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, veclog_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log10_put);
   
-  /* in any case */
-
-  dsp_sig_inlet(cl, INLET_sig);
-  dsp_sig_outlet(cl, OUTLET_sig);
+  dsp_sig_inlet(cl, 0);
+  dsp_sig_outlet(cl, 0);
   
   return fts_Success;
 }
 
-void veclog_config(void)
+void 
+veclog_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("exp~"), sigexp_instantiate, fts_narg_equiv);
-  fts_metaclass_install(fts_new_symbol("log~"), siglog_instantiate, fts_narg_equiv);
-  fts_metaclass_install(fts_new_symbol("log10~"), siglog10_instantiate, fts_narg_equiv);
+  exp_symbol = fts_new_symbol("exp~");
+  log_symbol = fts_new_symbol("log~");
+  log10_symbol = fts_new_symbol("log10~");
+
+  expb_symbol = fts_new_symbol("exp~ <base>");
+  logb_symbol = fts_new_symbol("log~ <base>");
+
+  fts_dsp_declare_function(exp_symbol, ftl_exp);
+  fts_dsp_declare_function(log_symbol, ftl_log);
+  fts_dsp_declare_function(log10_symbol, ftl_log10);
+
+  fts_dsp_declare_function(expb_symbol, ftl_expb);
+  fts_dsp_declare_function(logb_symbol, ftl_logb);
+
+  fts_metaclass_install(exp_symbol, veclog_instantiate, fts_narg_equiv);
+  fts_metaclass_install(log_symbol, siglog_instantiate, fts_narg_equiv);
+  fts_class_install(log10_symbol, siglog10_instantiate);
 }

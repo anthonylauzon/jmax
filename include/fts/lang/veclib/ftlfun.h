@@ -68,12 +68,6 @@
  *
  */
 
-/*  sometimes there will be plain loop functions at the DSP chain...
-typedef struct{
-  fts_symbol_t loop;
-  fts_symbol_t unrolled;
-} ftl_vec_fun_t;
-... but so far this is enough: */
 typedef fts_symbol_t ftl_vec_fun_t;
 
 typedef struct{
@@ -86,12 +80,10 @@ typedef fts_symbol_t ftl_scl_op_t;
 
 typedef struct{
   ftl_vec_op_t vec;
-/*  ftl_scl_op_t scl; */ /* when scalars are on the dsp chain */
 } ftl_vec_and_scl_op_t;
 
 typedef struct{
   ftl_vec_fun_t vec;
-/*  ftl_scl_fun_t scl; */ /* when scalars are on the dsp chain */
 } ftl_vec_and_scl_fun_t;
 
 
@@ -105,20 +97,14 @@ typedef struct{
 
 typedef struct{
   ftl_vec_and_scl_fun_t f;
-/*  ftl_vec_and_scl_fun_t i; */ /* when int is on the dsp chain */
-/*  ftl_vec_and_scl_fun_t c; */ /* when complex is on the dsp chain */
 } ftl_all_type_fun_t;
 
 typedef struct{
   ftl_vec_and_scl_op_t f;
-/*  ftl_vec_and_scl_op_t i; */ /* when int is on the dsp chain */
-/*  ftl_vec_and_scl_op_t c; */ /* when complex is on the dsp chain */
 } ftl_all_type_op_t;
 
 typedef struct{
   ftl_vec_fun_t f;
-/*  ftl_vec_fun_t i; */ /* when int is on the dsp chain */
-/*  ftl_vec_fun_t c; */ /* when complex is on the dsp chain */
 } ftl_all_type_vec_fun_t;
 
 /* single type function classes */
@@ -149,16 +135,6 @@ typedef struct{
   ftl_all_type_op_t lt; /* never complex */
   ftl_all_type_op_t gt; /* never complex */
 
-  ftl_all_type_fun_t abs;
-  ftl_all_type_fun_t clip;
-  ftl_all_type_vec_fun_t fill;
-  ftl_all_type_vec_fun_t zero;
-  ftl_all_type_vec_fun_t cpy;
-
-  ftl_all_type_vec_fun_t min; /* never complex */
-  ftl_all_type_vec_fun_t max; /* never complex */
-  ftl_all_type_vec_fun_t sum;
-
   ftl_one_type_fun_t sin;
   ftl_one_type_fun_t cos;
   ftl_one_type_fun_t tan;
@@ -177,32 +153,6 @@ typedef struct{
   
   ftl_one_type_fun_t sqrt;
   ftl_one_type_fun_t rsqr;
-
-  ftl_one_type_fun_t not;
-  ftl_one_type_op_t and;
-  ftl_one_type_op_t or;
-  ftl_one_type_op_t xor;
-  ftl_one_type_op_t shl;
-  ftl_one_type_op_t shr;
-
-  ftl_one_type_fun_t conj;
-  ftl_one_type_fun_t csqr;
-  ftl_one_type_fun_t cpolar;
-  ftl_one_type_fun_t crect;
-
-  ftl_one_type_fun_t cabsf;
-  ftl_one_type_fun_t csqrf;
-  ftl_one_type_fun_t ffillre;
-  ftl_one_type_fun_t ffillim;
-  ftl_one_type_fun_t re;
-  ftl_one_type_fun_t im;
-  ftl_one_type_fun_t fcpyre;
-  ftl_one_type_fun_t fcpyim;
-  ftl_one_type_fun_t csplit;
-  ftl_one_type_fun_t cmerge;
-  ftl_one_type_fun_t fcasti;
-  ftl_one_type_fun_t icastf;
-  ftl_one_type_fun_t round;
 } ftl_function_symbols_t;
 
 FTS_API ftl_function_symbols_t ftl_sym;
