@@ -24,13 +24,13 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
 	openButton = new JButton(SequenceImages.getImageIcon("closed_track"));
-	openButton.setToolTipText("open/close");
+	openButton.setToolTipText("open");
 	openButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	openButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	openButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 
 	muteButton = new JButton(SequenceImages.getImageIcon("unmute"));
-	muteButton.setToolTipText("mute/unmute");
+ 	muteButton.setToolTipText("active/inactive");
 	muteButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	muteButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	muteButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
@@ -41,7 +41,7 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	barButton.setMargin(new Insets(0, 7, 0, 100));
 	barButton.setFont(toggleBarFont);
 	barButton.setText(trackIndex+" - "+track.getName());
-	
+	barButton.setToolTipText("open");
 	barButton.setPreferredSize(new Dimension(TOGGLEBAR_DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT));
 
 	add(openButton);

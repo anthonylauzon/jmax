@@ -32,14 +32,16 @@ public class TrackContainer extends JPanel {
     /////////////////////////
     openButton = new JButton(SequenceImages.getImageIcon("opened_track"));
     openButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 20));
-    openButton.setToolTipText("open/close");
+    openButton.setMinimumSize(new Dimension(BUTTON_WIDTH, 20));
+    openButton.setMaximumSize(new Dimension(BUTTON_WIDTH, 20));
+    openButton.setToolTipText("close");
 
     //muteButton = new JButton();
     muteButton = new JButton(SequenceImages.getImageIcon("unmute"));
     muteButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 14));
     muteButton.setMaximumSize(new Dimension(BUTTON_WIDTH, 14));
     muteButton.setMinimumSize(new Dimension(BUTTON_WIDTH, 14));
-    muteButton.setToolTipText("mute/unmute");
+    muteButton.setToolTipText("active/inactive");
 
     JPanel bp = new JPanel();
     bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
