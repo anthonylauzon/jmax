@@ -733,7 +733,7 @@ fvec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fvec_t *this = (fvec_t *)o;
   float *values = fvec_get_ptr(this);
   int size = fvec_get_size(this);
-  fts_list_t *array = fts_get_list(at);
+  fts_array_t *array = fts_get_list(at);
   fts_atom_t a;
   int i;
   

@@ -67,16 +67,24 @@ getlist_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getlist_t *this = (getlist_t *)o;
   ivec_t *ivec = ivec_atom_get(at);
   int size = ivec_get_size(ivec);
-  fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(&this->list, 0);
-  fts_array_set_size(&this->list, size);
+  if(size == 1)
+    fts_outlet_int(o, 0, ivec_get_element(ivec, 0));
+  else if(size > 1)
+    {
+      fts_atom_t *atoms;
 
-  atoms = fts_array_get_atoms(&this->list);
+      fts_array_set_size(&this->list, 0);
+      fts_array_set_size(&this->list, size);
+      
+      atoms = fts_array_get_atoms(&this->list);
+      
+      for(i=0; i<size; i++)
+	fts_set_int(atoms + i, ivec_get_element(ivec, i));
 
-  for(i=0; i<size; i++)
-    fts_set_int(atoms + i, ivec_get_element(ivec, i));
+      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+    }
 }
 
 static void
@@ -85,16 +93,24 @@ getlist_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getlist_t *this = (getlist_t *)o;
   fvec_t *fvec = fvec_atom_get(at);
   int size = fvec_get_size(fvec);
-  fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(&this->list, 0);
-  fts_array_set_size(&this->list, size);
+  if(size == 1)
+    fts_outlet_float(o, 0, fvec_get_element(fvec, 0));
+  else if(size > 1)
+    {
+      fts_atom_t *atoms;
 
-  atoms = fts_array_get_atoms(&this->list);
+      fts_array_set_size(&this->list, 0);
+      fts_array_set_size(&this->list, size);
+      
+      atoms = fts_array_get_atoms(&this->list);
+      
+      for(i=0; i<size; i++)
+	fts_set_float(atoms + i, fvec_get_element(fvec, i));
 
-  for(i=0; i<size; i++)
-    fts_set_float(atoms + i, fvec_get_element(fvec, i));
+      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+    }
 }
 
 static void
@@ -103,16 +119,18 @@ getlist_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   getlist_t *this = (getlist_t *)o;
   vec_t *vec = vec_atom_get(at);
   int size = vec_get_size(vec);
-  fts_atom_t *atoms;
-  int i;
   
-  fts_array_set_size(&this->list, 0);
-  fts_array_set_size(&this->list, size);
+  if(size == 1)
+    {
+      fts_atom_t a = vec_get_element(vec, 0);
 
-  atoms = fts_array_get_atoms(&this->list);
-
-  for(i=0; i<size; i++)
-    fts_atom_assign(atoms + i, &vec_get_element(vec, i));
+      fts_outlet_send(o, 0, fts_get_selector(&a), 1, &a);
+    }
+  else if(size > 1)
+    {
+      fts_array_set(&this->list, vec_get_size(vec), vec_get_ptr(vec));
+      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+    }
 }
 
 static void

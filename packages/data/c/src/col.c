@@ -252,6 +252,9 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 col_config(void)
 {
+  col_symbol = fts_new_symbol("col");
+  col_type = col_symbol;
+
   fts_class_install(col_symbol, col_instantiate);
   col_class = fts_class_get_by_name(col_symbol);
 

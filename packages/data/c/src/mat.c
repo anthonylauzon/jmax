@@ -188,7 +188,7 @@ mat_set_from_atom_list(mat_t *mat, int onset, int ac, const fts_atom_t *at)
     ac = size - onset;
   
   for(i=0; i<ac; i++)
-    fts_atom_assign(ap, at + i);
+    fts_atom_assign(ap + i, at + i);
 }
 
 void

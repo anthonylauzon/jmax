@@ -252,6 +252,9 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 row_config(void)
 {
+  row_symbol = fts_new_symbol("row");
+  row_type = row_symbol;
+
   fts_class_install(row_symbol, row_instantiate);
   row_class = fts_class_get_by_name(row_symbol);
 
