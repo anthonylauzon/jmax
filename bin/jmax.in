@@ -135,7 +135,7 @@ check_installation ()
 {
     if [ ! -f ${real_rootdir}/java/jmax.jar ]
     then
-        echo "Cannot find file ${rootdir}/java/jmax.jar"
+        echo "Cannot find file ${real_rootdir}/java/jmax.jar"
 	echo "You have probably installed a source distribution and did not compile it !"
 	exit 1
     fi
