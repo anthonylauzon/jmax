@@ -202,15 +202,18 @@ alsaaudiomanager_scan_plugins(void)
       fts_log("[alsaaudiomanager] Id Configuration Node: %s\n", id_configuration_node);
 #endif /* ALSA_AUDIO_MANAGER_DEBUG */
       s_device_name = fts_new_symbol(id_configuration_node);
-      fts_set_symbol(&at, s_device_name);
-      port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
-      if (NULL != port)
+      if (s_device_name != fts_new_symbol("dmix"))
       {
-	fts_object_refer((fts_object_t*)port);
-	fts_audiomanager_put_port(s_device_name, port);
+	fts_set_symbol(&at, s_device_name);
+	port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
+	if (NULL != port)
+	{
+	  fts_object_refer((fts_object_t*)port);
+	  fts_audiomanager_put_port(s_device_name, port);
 #ifdef ALSA_AUDIO_MANAGER_DEBUG
-	fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", s_device_name);
+	  fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", s_device_name);
 #endif /* ALSA_AUDIO_MANAGER_DEBUG */
+	}
       }
     }
     conf_it = snd_config_iterator_next(conf_it);
