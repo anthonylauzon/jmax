@@ -24,6 +24,9 @@ public class ErmesScrollerView extends ScrollPane {
     getHAdjustable().addAdjustmentListener((AdjustmentListener)theView);
     getVAdjustable().addAdjustmentListener((AdjustmentListener)theView);
     
+    System.err.println(theSketchWindow.getClass().getName());
+    //if (theSketchWindow instanceof KeyListener) System.err.println("e' un KeyListener");
+    //else System.err.println("non e' un KeyListener");
     addKeyListener((KeyListener)theSketchWindow);
   }
 }
