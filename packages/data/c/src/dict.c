@@ -29,6 +29,13 @@ fts_class_t *dict_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
 
+
+
+/* 
+ *  data write access functions 
+ */
+
+/* store one key-value pair */
 void
 dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
 {
@@ -46,6 +53,8 @@ dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
   fts_hashtable_put(&dict->hash, key, &a);
 }
 
+
+/* store tuple of values in at under key */
 void
 dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *at)
 {
@@ -60,6 +69,26 @@ dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *
       dict_store(dict, key, &a);
     }
 }
+
+
+/* store list of key-value pairs */
+void
+dict_store_list (dict_t *dict, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  ac &= -2;	/* round down to even number (drop last bit) */
+
+  for (i = 0; i < ac; i += 2)
+  {
+    if (fts_is_int(at + i)  ||  fts_is_symbol(at + i))
+      dict_store(dict, at + i, at + i + 1);
+    else
+      fts_object_error((fts_object_t *) dict, "set: wrong key type for arg %d", i);
+  }
+}
+
+
 
 static void
 dict_remove(dict_t *dict, const fts_atom_t *key)
@@ -129,6 +158,8 @@ dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
   dict_copy((dict_t *)fts_get_object(from), (dict_t *)fts_get_object(to));
 }
 
+
+
 /**********************************************************
  *
  *  user methods
@@ -138,35 +169,37 @@ dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
 static void
 dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   
-  dict_remove_all(this);
+  dict_remove_all(self);
+  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
 dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   
-  if(ac > 1 && (fts_is_symbol(at) || fts_is_int(at)))
-    dict_store_atoms(this, at, ac - 1, at + 1);
+  dict_store_list(self, ac, at);
+  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
 dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   
-  dict_remove(this, at);	
+  dict_remove(self, at);
+  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
 _dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_atom_t a;
   
-  if(fts_hashtable_get(&this->hash, at, &a))
+  if(fts_hashtable_get(&self->hash, at, &a))
     fts_return(&a);
   else if(fts_is_symbol(at))
     fts_object_error(o, "no entry for %s", fts_symbol_name(fts_get_symbol(at)));
@@ -177,20 +210,22 @@ _dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
 
-  dict_copy((dict_t *)fts_get_object(at), this);
+  dict_copy((dict_t *)fts_get_object(at), self);
+
+  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
 dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_iterator_t key_iterator, value_iterator;
 
-  fts_hashtable_get_keys(&this->hash, &key_iterator);
-  fts_hashtable_get_values(&this->hash, &value_iterator);
+  fts_hashtable_get_keys(&self->hash, &key_iterator);
+  fts_hashtable_get_values(&self->hash, &value_iterator);
 
   while(fts_iterator_has_more(&key_iterator))
   {
@@ -251,6 +286,8 @@ dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_name_dump_method(o, 0, 0, ac, at);
 }
 
+
+
 /**********************************************************
  *
  *  files
@@ -275,7 +312,7 @@ dict_atom_buf_free(fts_atom_t *buf, int size)
 }
 
 static int 
-dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
+dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int atoms_alloc = DICT_ATOM_BUF_BLOCK_SIZE;
@@ -293,7 +330,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
 
   atoms = dict_atom_buf_realloc(atoms, atoms_alloc);
 
-  dict_clear((fts_object_t *)this, 0, 0, 0, 0);
+  dict_remove_all(self);
   fts_set_void(&key);
 
   while(error == 0 && fts_atom_file_read(file, &a, &c))
@@ -334,10 +371,10 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
 			fts_symbol_t selector = fts_get_symbol(atoms + 0);
 			
 			if(selector == fts_s_int || selector == fts_s_float || selector == fts_s_symbol || fts_s_list)
-			  dict_store_atoms(this, &key, n - 1, atoms + 1);
+			  dict_store_atoms(self, &key, n - 1, atoms + 1);
 		      }
 		    else
-		      dict_store_atoms(this, &key, n, atoms);
+		      dict_store_atoms(self, &key, n, atoms);
 
 		    i++;
 		    n = 0;
@@ -371,7 +408,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
     {
       if(n > 0)
 	{
-	  dict_store_atoms(this, &key, n, atoms);
+	  dict_store_atoms(self, &key, n, atoms);
 	  i++;
 	}
       
@@ -385,7 +422,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
 }
 
 static int 
-dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
+dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(file_name, "w");
   fts_iterator_t key_iterator;
@@ -396,8 +433,8 @@ dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
   if(!file)
     return 0;
 
-  fts_hashtable_get_keys(&this->hash, &key_iterator);
-  fts_hashtable_get_values(&this->hash, &value_iterator);
+  fts_hashtable_get_keys(&self->hash, &key_iterator);
+  fts_hashtable_get_values(&self->hash, &value_iterator);
 
   while(fts_iterator_has_more(&key_iterator))
   {
@@ -464,7 +501,7 @@ dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
 static void
 dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_coll);
   int size = 0;
@@ -473,7 +510,7 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     return;
 
   if(file_format == sym_coll)
-    size = dict_import_from_coll(this, file_name);    
+    size = dict_import_from_coll(self, file_name);    
   else
     {
       fts_post("dict: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -481,13 +518,15 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     }
 
   if(size <= 0)
-    fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));  
+    fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
+
+  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
 dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_coll);
   int size = 0;
@@ -496,7 +535,7 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     return;
 
   if(file_format == sym_coll)
-    size = dict_export_to_coll(this, file_name);    
+    size = dict_export_to_coll(self, file_name);    
   else
     {
       fts_post("dict: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
@@ -510,11 +549,11 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 static void
 dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   fts_iterator_t iterator;
 
-  fts_hashtable_get_keys(&this->hash, &iterator);
+  fts_hashtable_get_keys(&self->hash, &iterator);
 
   while(fts_iterator_has_more(&iterator))
   {
@@ -538,9 +577,9 @@ dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int size = fts_hashtable_get_size(&this->hash);
+  int size = fts_hashtable_get_size(&self->hash);
 
   if(size == 0)
     fts_spost(stream, "<empty dictionary>\n");
@@ -556,8 +595,8 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
     fts_spost(stream, "{\n");
 
-    fts_hashtable_get_keys(&this->hash, &key_iterator);
-    fts_hashtable_get_values(&this->hash, &value_iterator);
+    fts_hashtable_get_keys(&self->hash, &key_iterator);
+    fts_hashtable_get_values(&self->hash, &value_iterator);
 
     while(fts_iterator_has_more(&key_iterator))
     {
@@ -579,6 +618,8 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   }
 }
 
+
+
 /**********************************************************
  *
  *  class
@@ -588,22 +629,22 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
+  dict_t *self = (dict_t *)o;
   int i;
 
-  ac &= -2;
+  ac &= -2;	/* round down to even number (drop last bit) */
 
   data_object_init(o);
 
-  fts_hashtable_init(&this->hash, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&self->hash, FTS_HASHTABLE_SMALL);
 
   for(i=0; i<ac; i+=2)
     {
       if(fts_is_int(at + i) || fts_is_symbol(at + i))
-	dict_store(this, at + i, at + i + 1);
+	dict_store(self, at + i, at + i + 1);
       else
 	{
-	  dict_clear(o, 0, 0, 0, 0);
+	  dict_remove_all(self);
 	  fts_object_error(o, "wrong key type in initialization");
 	}
 
@@ -611,11 +652,15 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
+
 static void
 dict_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_clear(o, 0, 0, 0, 0);
+  dict_t *self = (dict_t *)o;
+
+  dict_remove_all(self);
 }
+
 
 static void
 dict_instantiate(fts_class_t *cl)
@@ -658,10 +703,12 @@ dict_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, dict_symbol, "[<sym|int: key> <any: value> ...]", "dictionary");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");
-  fts_class_doc(cl, fts_s_set, "<sym|int: key> <any: value>", "set entry");
+  fts_class_doc(cl, fts_s_set, "<sym|int: key> <any: value> ...", 
+			       "set list of key-value pairs");
   fts_class_doc(cl, fts_s_remove, "<sym|int: key>", "remove entry");
   fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
 }
+
 
 void
 dict_config(void)
