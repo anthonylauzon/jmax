@@ -342,6 +342,15 @@ _scomark_set_tempo_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
+_scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scomark_t *self = (scomark_t *)o;
+  if(ac==1 && fts_is_symbol(at))
+  {
+    scomark_bar_set_meter(self, fts_get_symbol(at));
+  }
+}
+static void
 _scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
@@ -470,6 +479,7 @@ scomark_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_get_property_list, _scomark_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, _scomark_append_properties);
   fts_class_message_varargs(cl, fts_new_symbol("tempo_change"), _scomark_set_tempo_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("meter_change"), _scomark_set_meter_from_client);
 }
 
 void

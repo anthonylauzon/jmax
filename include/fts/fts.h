@@ -101,7 +101,7 @@ extern "C" {
 #include <fts/param.h>
 #include <fts/package.h>
 #include <fts/preset.h>
-#include <fts/time.h>
+#include <fts/timebase.h>
 #include <fts/ftl.h>
 #include <fts/ftlmem.h>
 #include <fts/dsp.h>

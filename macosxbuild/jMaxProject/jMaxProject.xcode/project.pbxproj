@@ -71,6 +71,24 @@
 			settings = {
 			};
 		};
+		3B51225F074CF53900C68D4D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = timebase.h;
+			path = ../../include/ftsprivate/timebase.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B512261074CF55300C68D4D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = timebase.h;
+			path = ../../include/fts/timebase.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
 		3B513E2806A4274500F1664A = {
 			children = (
 				3B56498006F729CB0065C807,
@@ -12573,6 +12591,7 @@
 				5C74563B06098F4800B69585,
 				5C74563C06098F4800B69585,
 				5C74563D06098F4800B69585,
+				3B512261074CF55300C68D4D,
 				5C74563F06098F4800B69585,
 				5C74564006098F4800B69585,
 				5C74564106098F4800B69585,
@@ -12616,6 +12635,7 @@
 				5C74566006098F6800B69585,
 				5C74566106098F6800B69585,
 				5C74566206098F6800B69585,
+				3B51225F074CF53900C68D4D,
 				5C74566506098F6900B69585,
 			);
 			isa = PBXGroup;

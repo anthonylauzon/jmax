@@ -105,6 +105,8 @@ public String getPropertyMessage(String property)
 {
   if(property.equals("tempo"))
     return "tempo_change";
+  else if(property.equals("meter"))
+    return "meter_change";
   else
     return property;
 }

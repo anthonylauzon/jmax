@@ -26,7 +26,7 @@
  *
  */
 #include <fts/fts.h>
-#include <ftsprivate/time.h>
+#include <ftsprivate/timebase.h>
 #include <math.h>
 
 /* the FTS master timebase */

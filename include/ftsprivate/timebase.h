@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_TIME_H_
-#define _FTS_PRIVATE_TIME_H_
+#ifndef _FTS_PRIVATE_TIME_BASE_H_
+#define _FTS_PRIVATE_TIME_BASE_H_
 
 extern void fts_set_timebase(fts_timebase_t *timebase);
 

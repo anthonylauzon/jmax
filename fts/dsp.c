@@ -28,7 +28,7 @@
 #include <ftsprivate/sigconn.h>
 #include <ftsprivate/dspgraph.h>
 #include <ftsprivate/audio.h>
-#include <ftsprivate/time.h>
+#include <ftsprivate/timebase.h>
 
 #define FTS_DSP_DEFAULT_SAMPLE_RATE 44100
 
