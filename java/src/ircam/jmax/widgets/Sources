@@ -5,6 +5,7 @@ SOURCES = \
 	MemoryLed.java			\
 	ObjectSelectedListener.java	\
 	ObjectSetViewer.java		\
+	BeanPanel.java			\
 
 
 
