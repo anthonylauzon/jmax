@@ -730,19 +730,16 @@ public class FtsGraphicObject extends FtsObject {
   public void openFileDialog(int nArgs, FtsAtom a[])
   {
     parentFrame = null;
-    String defaultPath, defaultName;
-	callbackMethod = a[0].symbolValue.toString();
+    String defaultPath = "";
+    String defaultName = "";
+    callbackMethod = a[0].symbolValue.toString();
     dialogText = a[1].symbolValue.toString();
     if(nArgs>2)
-	{
-		defaultPath = a[2].symbolValue.toString();
-		defaultName = a[3].symbolValue.toString();
-	}
-	else
-	{
-		defaultPath= JMaxApplication.getProject().getDir();
-		defaultName = " ";
-	}
+    {
+      defaultPath = a[2].symbolValue.toString();
+      defaultName = a[3].symbolValue.toString();
+    }
+
     fd = new JFileChooser(defaultPath);
     fd.setDialogTitle(dialogText);
     fd.setSelectedFile(new File(defaultPath, defaultName));
