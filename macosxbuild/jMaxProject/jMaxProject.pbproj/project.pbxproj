@@ -2254,6 +2254,18 @@
 //F72
 //F73
 //F74
+		F774414203F0114C01664058 = {
+			isa = PBXFileReference;
+			name = Finder.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/Finder.java;
+			refType = 2;
+		};
+		F774414303F0114C01664058 = {
+			fileRef = F774414203F0114C01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F78563BF02BA3BCE016640F1 = {
 			isa = PBXFileReference;
 			name = macosxmidi.c;
@@ -13729,6 +13741,7 @@
 				F880FE3A0283013E01664092,
 				F880FE3B0283013E01664092,
 				F880FE3C0283013E01664092,
+				F774414203F0114C01664058,
 				F880FE3D0283013E01664092,
 				F880FE3E0283013E01664092,
 				F880FE3F0283013E01664092,
@@ -15803,6 +15816,7 @@
 				F52946E7039E6B2001664092,
 				F52946E8039E6B2001664092,
 				F52946E9039E6B2001664092,
+				F774414303F0114C01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
