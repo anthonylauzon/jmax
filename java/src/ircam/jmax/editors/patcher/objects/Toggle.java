@@ -28,6 +28,8 @@ package ircam.jmax.editors.patcher.objects;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.awt.geom.*;
+
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 
@@ -96,10 +98,10 @@ class Toggle extends GraphicObject implements FtsIntValueListener
     int h = getHeight();
 
     if ( !isSelected())
-      g.setColor( Settings.sharedInstance().getUIColor());
+	g.setColor( Settings.sharedInstance().getUIColor());
     else
-      g.setColor( Settings.sharedInstance().getUIColor().darker());
-
+	g.setColor( Settings.sharedInstance().getUIColor().darker());
+    
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
     if (isToggled) 

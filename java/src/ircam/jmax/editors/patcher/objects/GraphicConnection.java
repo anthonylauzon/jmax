@@ -207,48 +207,106 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
   }
 
     
-  final static float dash1[] = {10.0f, 3.0f, 2.0f, 3.0f};
-  final static BasicStroke dashed = new BasicStroke(1.0f, 
-						    BasicStroke.CAP_BUTT, 
-						    BasicStroke.JOIN_MITER, 
-						    10.0f, dash1, 0.0f);
+    //final static float dash1[] = {10.0f, 3.0f, 2.0f, 3.0f};
+  final static float unity = 2.0f;
+  final static float dash1[] = {unity, 3*unity};
+  final static float dash2[] = {unity, unity};
+  final static BasicStroke dashed1 = new BasicStroke(1.0f, 
+						     BasicStroke.CAP_BUTT, 
+						     BasicStroke.JOIN_MITER, 
+						     10.0f, dash1, unity);
+  final static BasicStroke dashed2 = new BasicStroke(1.0f, 
+						     BasicStroke.CAP_BUTT, 
+						     BasicStroke.JOIN_MITER, 
+						     10.0f, dash2, 0);
+  final static BasicStroke dashed3 = new BasicStroke(1.0f, 
+						     BasicStroke.CAP_BUTT, 
+						     BasicStroke.JOIN_MITER, 
+						     10.0f, dash1, 3*unity);
   final static BasicStroke normal = new BasicStroke(1.0f, 
 						    BasicStroke.CAP_BUTT, 
 						    BasicStroke.JOIN_MITER, 
 						    10.0f);
+
   public void paint( Graphics g) 
   {
-    Color aubergine = new Color(100, 100, 190);
+      //Color aubergine = new Color(100, 100, 190);
 
-    if(type == FtsConnection.fts_connection_invalid)
-      g.setColor( Color.gray);
-    else
-	if(type == FtsConnection.fts_connection_signal)	
-	    {
-		g.setColor( Color.magenta.darker());
-		((Graphics2D)g).setStroke(dashed);
-	    }
-	else
-	    g.setColor( Color.black);
-	  
-    if ( selected) 
-      {
-	if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
-	  {
-	    g.drawLine(start.x, start.y, end.x, end.y);
-	    g.drawLine(start.x, start.y+1, end.x, end.y+1);
-	  } 
-	else 
-	  {
-	    g.drawLine(start.x, start.y, end.x, end.y); 
-	    g.drawLine(start.x+1, start.y, end.x+1, end.y);
-	  }
-      } 
-    else
-      g.drawLine(start.x, start.y, end.x, end.y);
-  
     if(type == FtsConnection.fts_connection_signal)	
-	((Graphics2D)g).setStroke(normal);
+	{
+	    //g.setColor( Color.magenta.darker().darker());
+	    g.setColor(Color.black);
+	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+	    double angle = Math.abs(Math.atan2((float)(start.y - end.y), (float)(end.x - start.x)));
+	    if((angle>Math.PI/4)&&(angle<Math.PI*3/4))
+		{		 
+		    if(selected)
+			{
+			    ((Graphics2D)g).setStroke(dashed1);
+			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
+			    g.drawLine(start.x+2, start.y, end.x+2, end.y);
+			    ((Graphics2D)g).setStroke(dashed2);
+			    g.drawLine(start.x, start.y, end.x, end.y);
+			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
+			    ((Graphics2D)g).setStroke(dashed3);
+			    g.drawLine(start.x-1, start.y, end.x-1, end.y);
+			    g.drawLine(start.x, start.y, end.x, end.y); 
+			}
+		    else
+			{
+			    ((Graphics2D)g).setStroke(dashed1);
+			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
+			    ((Graphics2D)g).setStroke(dashed2);
+			    g.drawLine(start.x, start.y, end.x, end.y);
+			    ((Graphics2D)g).setStroke(dashed3);
+			    g.drawLine(start.x-1, start.y, end.x-1, end.y);
+			}
+		}
+	    else
+		{
+		    if(selected)
+			{
+			    ((Graphics2D)g).setStroke(dashed1);
+			    g.drawLine(start.x, start.y-1, end.x, end.y-1);
+			    g.drawLine(start.x, start.y, end.x, end.y);
+			    ((Graphics2D)g).setStroke(dashed2);
+			    g.drawLine(start.x, start.y, end.x, end.y);
+			    g.drawLine(start.x, start.y+1, end.x, end.y+1);
+			    ((Graphics2D)g).setStroke(dashed3);
+			    g.drawLine(start.x, start.y+1, end.x, end.y+1); 
+			    g.drawLine(start.x, start.y+2, end.x, end.y+2); 
+			}
+		    else
+			{
+			    ((Graphics2D)g).setStroke(dashed1);
+			    g.drawLine(start.x, start.y-1, end.x, end.y-1);
+			    ((Graphics2D)g).setStroke(dashed2);
+			    g.drawLine(start.x, start.y, end.x, end.y);
+			    ((Graphics2D)g).setStroke(dashed3);
+			    g.drawLine(start.x, start.y+1, end.x, end.y+1); 
+			}
+		}
+
+	    ((Graphics2D)g).setStroke(normal);
+	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	}
+    else
+	{
+	    if(type == FtsConnection.fts_connection_invalid)
+		g.setColor( Color.gray);
+	    else
+		g.setColor( Color.black);
+		
+	    g.drawLine(start.x, start.y, end.x, end.y);
+	    if (selected) 
+		{
+		    if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
+			g.drawLine(start.x, start.y+1, end.x, end.y+1);
+		    else 
+			g.drawLine(start.x+1, start.y, end.x+1, end.y);
+		} 	    
+	}
   }
 
   public void updatePaint(Graphics g){}
