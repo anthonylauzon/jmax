@@ -98,7 +98,8 @@ class ErmesObjToggle extends ErmesObject {
       g.drawLine(itsX+currentRect.width-6, itsY+4,itsX+ 4,itsY+ currentRect.height-6);
     }
     g.setColor(Color.black);
-    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+     if(!itsSketchPad.itsRunMode) 
+       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
   
   //--------------------------------------------------------

@@ -40,8 +40,11 @@ public class ErmesObject implements FtsPropertyHandler {
   FontMetrics itsFontMetrics = null;
   int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
   boolean itsResized = false;
+  //static Color itsUILightColor = new Color(201, 226, 283);
   static Color itsUINormalColor = new Color(153, 204, 255);
+  //static Color itsUIMediumColor = new Color(102, 176, 228);
   static Color itsUISelectedColor = new Color(51, 153, 204);
+  //static Color itsUIDarkColor = new Color(21, 132, 180);
   static Color itsLangNormalColor = new Color(153, 204, 204);
   static Color itsLangSelectedColor = new Color(51, 153, 153);
   

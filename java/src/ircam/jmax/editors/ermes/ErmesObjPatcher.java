@@ -222,7 +222,8 @@ public class ErmesObjPatcher extends ErmesObject {
     g.drawString(itsNameString, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsNameString))/2/*currentRect.width/6+3*/,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);		
     
     g.setColor(Color.black);
-    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode) 
+      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   void ResizeToNewFont(Font theFont) {

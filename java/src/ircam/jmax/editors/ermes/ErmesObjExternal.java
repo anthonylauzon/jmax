@@ -191,7 +191,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
     
     g.setColor(Color.black);
-    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode) 
+      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont(itsFont);
     DrawParsedString(g);

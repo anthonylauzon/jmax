@@ -139,7 +139,8 @@ class ErmesObjBang extends ErmesObject {
       itsFlashing = false;
     }
     g.setColor(Color.black);
-    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode) 
+      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
 	

@@ -212,7 +212,8 @@ class ErmesObjSlider extends ErmesObject {
     g.drawLine(itsX+currentRect.width/2, itsY+UP_OFFSET, itsX+currentRect.width/2, itsY+currentRect.height-BOTTOM_OFFSET);
 	  
     //paint dragBox
-    g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode) 
+      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     //paint throttle
     // g.translate(itsX+itsThrottle.LATERAL_OFFSET, itsY+itsThrottle.AbsoluteToSlider(itsThrottle.itsY));
     itsThrottle.Paint(g);
