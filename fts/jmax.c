@@ -372,6 +372,7 @@ jmax_vfprintf(FILE *fp, const char *format, va_list args)
 
 static int jmax_get_jvm_from_registry(char *buf, jint bufsize, char* key, char* release);
 static int jmax_get_root_from_registry(char *buf, jint bufsize);
+static int jmax_get_server_root_from_registry(char *buf, jint bufsize);
 static int jmax_get_string_from_registry(HKEY key, const char *name, char *buf, jint bufsize);
 
 static jmax_dl_t 
@@ -632,6 +633,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #define MAX_ARGC  64
   char* argv[MAX_ARGC];
   int argc = 0;
+  char jmax_root[_MAX_PATH];
   char server_dir[_MAX_PATH];
   int err;
   char* mess = NULL;
@@ -644,11 +646,14 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return 0;
   }
 
+  snprintf(jmax_root, _MAX_PATH, "%s", jmax_get_root());
+  snprintf(server_dir, _MAX_PATH, "%s%c%s", jmax_get_server_root(), FILE_SEPARATOR, "bin");
+
   /* the default arguments */
   argv[argc++] = "-jmaxRoot";
-  argv[argc++] = jmax_get_root();
+  argv[argc++] = jmax_root;
   argv[argc++] = "-jmaxServerDir";
-  argv[argc++] = snprintf(server_dir, _MAX_PATH, "%s%c%s", jmax_get_server_root(), FILE_SEPARATOR, "bin");
+  argv[argc++] = server_dir;
   argv[argc++] = "-jmaxConnection";
   argv[argc++] = "tcp";
   argv[argc++] = "-jmaxPort";
