@@ -78,6 +78,7 @@ fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
+fts_symbol_t seqsym_endUpdate = 0;
 
 void
 seqsym_config(void)
@@ -138,4 +139,5 @@ seqsym_config(void)
   seqsym_highlightEventsAndTime = fts_new_symbol("highlightEventsAndTime");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
   seqsym_endPaste = fts_new_symbol("endPaste");
+  seqsym_endUpdate = fts_new_symbol("endUpdate");
 }
