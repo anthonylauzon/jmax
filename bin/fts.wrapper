@@ -1,0 +1,2 @@
+#!/bin/sh
+DYLD_LIBRARY_PATH=$1/lib $1/bin/fts

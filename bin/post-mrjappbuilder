@@ -1,0 +1,5 @@
+#!/bin/sh
+mkdir $HOME/jMax.app/Contents/Resources/jmax
+cp -r $HOME/projects/jmax-install/share/jmax/images $HOME/jMax.app/Contents/Resources/jmax/images
+cp -r $HOME/projects/jmax-install/bin $HOME/jMax.app/Contents/Resources/jmax/bin
+cp -r $HOME/projects/jmax-install/lib $HOME/jMax.app/Contents/Resources/jmax/lib
