@@ -1237,8 +1237,8 @@ void alsaaudioport_config( void)
 
   alsaaudioport_type = fts_class_install( s, alsaaudioport_instantiate);
 
-  alsaaudiomanager_scan_devices();
   alsaaudiomanager_scan_plugins();
+  alsaaudiomanager_scan_devices();
 }
 
 

@@ -33,6 +33,11 @@
 #define FTS_MAX_CHANNELS 32
 
 
+
+/* 
+   this function set default device if "default" is not already use,
+   so we need to call this function after plugins scanning 
+*/
 void
 alsaaudiomanager_scan_devices()
 {
@@ -45,6 +50,8 @@ alsaaudiomanager_scan_devices()
   snd_pcm_info_t* pcminfo;
 
   fts_audioport_t* port;
+  fts_audioport_t* default_port;
+
   fts_atom_t at;
   fts_symbol_t s_devicename = 0;
   
@@ -114,6 +121,37 @@ alsaaudiomanager_scan_devices()
 	fts_object_refer((fts_object_t*)port);
 	fts_audiomanager_put_port(fts_new_symbol(snd_pcm_info_get_name(pcminfo)), port);
 	fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", snd_pcm_info_get_name(pcminfo));
+
+	/* check if default port exists */
+	default_port = fts_audiomanager_get_port(fts_s_default);
+	if (NULL != default_port)
+	{
+	  if (!fts_audioport_is_input(default_port)
+	      || !fts_audioport_is_output(default_port))
+	  {
+	    fts_audiomanager_remove_port(fts_s_default);
+	    fts_object_release(default_port);	    
+	    if (fts_audioport_is_input(port)
+		&&  fts_audioport_is_output(port))
+	    {
+	      fts_object_refer((fts_object_t*) port);
+	      fts_audiomanager_put_port(fts_s_default, port);
+	      post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	      fts_log("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	    }	    
+	  }
+	}
+	else
+	{	  
+	  if (fts_audioport_is_input(port)
+	      &&  fts_audioport_is_output(port))
+	  {
+	    fts_object_refer((fts_object_t*) port);
+	    fts_audiomanager_put_port(fts_s_default, port);
+	    post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	    fts_log("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	  }	  
+	}	
       }
     }
     snd_card_next(&card);   
