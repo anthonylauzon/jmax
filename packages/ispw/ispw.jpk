@@ -31,7 +31,7 @@ package require data
 # load the dynamic libraries in FTS
 global jmaxArch jmaxMode
 
-ucs load module ispw $dir/lib/$jmaxArch/$jmaxMode/libispw.so
+ucs load module ispw $dir/c/lib/$jmaxArch/$jmaxMode/libispw.so
 
 # load client java class
 java::load -classpath "$dir/java/classes" ircam.jmax.ispw.ISPWExtension
