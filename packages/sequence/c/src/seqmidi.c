@@ -293,14 +293,17 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
       fts_midifile_set_user_data(file, &data);
       
       if(fts_midifile_read(file) <= 0)
-	post("error reading file %s: %s\n", file->name, (file->error)? file->error: "unknown error");
+	post("error reading MIDI file %s: %s\n", file->name, (file->error)? file->error: "unknown error");
       
       fts_midifile_close(file);
 
       return 1;
     }
   else
-    return 0;
+    {
+      post("MIDI file not found: %s\n", fts_symbol_name(name));
+      return 0;
+    }
 }
 
 /**************************************************************************
