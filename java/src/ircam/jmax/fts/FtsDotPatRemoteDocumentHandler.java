@@ -132,8 +132,13 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
-    System.err.println( this + " is trying to save document: " + document + " in file: " + file);
-    System.err.println( "Not yet ... sorry");
+    FtsObject patcher = ((FtsPatcherData) document.getRootData()).getContainerObject();
+
+    FtsAtom at[] = new FtsAtom[1];
+    at[0] = new FtsAtom();
+    at[0].setString( file.getAbsolutePath() );
+
+    patcher.sendMessage( -1, "save_dotpat_file", 1, at);
   }
 
   // Overwrite upper class method; we can save to a .pat file (or at least we try to...)

@@ -1,3 +1,7 @@
+2000-03-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Added: a method save_dotpat in guiobj/c/src/button.c
+
 2000-03-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Added this ChangeLog.

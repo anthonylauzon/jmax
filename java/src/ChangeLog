@@ -1,3 +1,7 @@
+2000-03-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed MaxFileChooser.java to find better the file format combo box.
+
 2000-03-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Fixed in FtsStream.java an incorrect parsing of SYMBOL_AND_DEF_CODE arguments.

@@ -1,3 +1,9 @@
+2000-03-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed patcher.c: moving to save .pat files. This is not complete yet...
+
+	* Changed patparser.c: removed the scaling that was applied when loading .pat files.
+
 2000-03-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed protocol handling: runtime/client/incoming.c, runtime/client/outgoing.c

@@ -136,20 +136,45 @@ public class MaxFileChooser
     return null;
   }
 
+  static class LabelMatcher implements ComponentMatcher {
+    public boolean match( Component c)
+      {
+	if ( ! (c instanceof JLabel) )
+	  return false;
+
+	if ( ! ( ((JLabel)c).getLabelFor() instanceof JComboBox ) )
+	  return false;
+
+	JComboBox cb = (JComboBox) ((JLabel)c).getLabelFor();
+
+	return cb.getItemAt( 0) instanceof FileFilter;
+      }
+  }
+
   private static void nickNackFileDialog()
   {
-    ComponentMatcher labelMatcher = new ComponentMatcher() {
+    ComponentMatcher fmatcher = new ComponentMatcher() {
 	public boolean match( Component c)
 	{
-	  return c instanceof JLabel && ((JLabel)c).getText().equals( "Files of type:");
+	  return c instanceof JComboBox && ((JComboBox)c).getItemAt(0) instanceof FileFilter;
 	}
       };
 
-    JLabel label = (JLabel)findInChilds( fd, labelMatcher);
+    ComponentMatcher lmatcher = new LabelMatcher();
 
-    label.setText( "Format:");
+    formatComboBox = (JComboBox)findInChilds( fd, fmatcher);
 
-    formatComboBox = (JComboBox)label.getLabelFor();
+    if ( formatComboBox == null)
+      {
+	System.err.println( "Cannot find file format combo box");
+      }
+
+    JLabel label = (JLabel)findInChilds( fd, lmatcher);
+
+    if (label != null && label.getLabelFor().equals( formatComboBox))
+      label.setText( "Format:");
+    else
+      System.err.println( "Cannot find label");
 
     formatComboBox.setModel( new DefaultComboBoxModel() );
 

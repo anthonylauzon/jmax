@@ -33,12 +33,6 @@
 /* (fd) For post */
 #include "runtime/files.h"
 
-/* Auto scretch  */
-
-#define SCALE_MULT 20
-#define SCALE_DEN  18
-
-
 /* Local symbols */
 
 
@@ -914,7 +908,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    fts_set_int(&(g->x), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
+    fts_set_int(&(g->x), fts_get_int(&(in->val)) );
   else
     {
       fts_patlex_push_back(in);
@@ -924,7 +918,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    fts_set_int(&(g->y), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
+    fts_set_int(&(g->y), fts_get_int(&(in->val)) );
   else
     {
       fts_patlex_push_back(in);
@@ -934,7 +928,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    fts_set_int(&(g->width), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
+    fts_set_int(&(g->width), fts_get_int(&(in->val)) );
   else
     {
       fts_patlex_push_back(in);
@@ -984,8 +978,8 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
 
   fts_set_int( &x, x_top_left);
   fts_set_int( &y, y_top_left);
-  fts_set_int( &width, (SCALE_MULT * (x_bottom_right - x_top_left) / SCALE_DEN) );
-  fts_set_int( &height, (SCALE_MULT * (y_bottom_right - y_top_left) / SCALE_DEN) );
+  fts_set_int( &width, (x_bottom_right - x_top_left) );
+  fts_set_int( &height, (y_bottom_right - y_top_left) );
 
   fts_object_put_prop(parent, fts_s_wx, &x);
   fts_object_put_prop(parent, fts_s_wy, &y);

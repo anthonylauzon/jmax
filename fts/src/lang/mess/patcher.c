@@ -771,9 +771,11 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 */
 static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file);
 
-static void patcher_open_and_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void patcher_save_dotpat_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   FILE *file;
+
+  post( "About to save %s\n", fts_symbol_name( fts_get_symbol( at)));
 
   file = fopen( fts_symbol_name( fts_get_symbol( at)), "w");
 
@@ -839,9 +841,9 @@ static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file)
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_wy, &a);
   y_top_left = fts_get_int( &a);
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_ww, &a);
-  x_bottom_right = fts_get_int( &a);
+  x_bottom_right = x_top_left + fts_get_int( &a);
   fts_object_get_prop( (fts_object_t *)patcher, fts_s_wh, &a);
-  y_bottom_right = fts_get_int( &a);
+  y_bottom_right = y_top_left + fts_get_int( &a);
 
   /* Save window properties */
   fprintf( file, "#N vpatcher %d %d %d %d;\n", x_top_left, y_top_left, x_bottom_right, y_bottom_right);
@@ -851,7 +853,7 @@ static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file)
     {
       if ( fts_object_handle_message( object, fts_SystemInlet, fts_new_symbol( "save_dotpat")))
 	{
-	  fts_atom_t a;
+ 	  fts_atom_t a;
 
 	  fts_set_ptr( &a, file);
 	  fts_message_send( object, fts_SystemInlet, fts_new_symbol( "save_dotpat"), 1, &a);
@@ -955,6 +957,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int ninlets;
   int noutlets;
   int i;
+  fts_type_t t[1];
 
   ninlets  = fts_get_long_arg(ac, at, 1, 0);
   noutlets = fts_get_long_arg(ac, at, 2, 0);
@@ -977,6 +980,11 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("load_init"), patcher_load_init, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("open"), patcher_open, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close, 0, 0); 
+
+  t[0] = fts_t_symbol;
+  fts_method_define( cl, fts_SystemInlet, fts_new_symbol("save_dotpat_file"), patcher_save_dotpat_file, 1, t); 
+  t[0] = fts_t_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_new_symbol("save_dotpat"), patcher_save_dotpat, 1, t); 
 
   /* daemon for properties */
   fts_class_add_daemon(cl, obj_property_get, fts_s_data, patcher_get_data);
@@ -1036,6 +1044,9 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   fts_atom_t a;
 
   obj = (fts_object_t *) this; 
+
+  /* change the patcher definition */
+  fts_object_set_description(obj, aoc, aot);
 
   /* check for the "var : <obj> syntax" and ignore the variable if any */
   if (fts_object_description_defines_variable(aoc, aot))

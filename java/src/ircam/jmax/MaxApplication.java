@@ -332,7 +332,6 @@ public class MaxApplication extends Object
 
     // Initialize all the submodules; first the kernel modules
 
-    ircam.jmax.mda.MdaModule.initModule();
     ircam.jmax.fts.FtsModule.initModule();
 
     // Initialize dialogs
