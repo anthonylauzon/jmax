@@ -14,6 +14,8 @@ jar:
 	-@if exist "$(PKG).jar" erase "$(PKG).jar"
 	-@cd classes
 	$(JAR) -cf ..\$(PKG).jar ircam  *.class
+	-@cd ..
+	$(JAR) -uf $(PKG).jar icons
 
 classes:
 	cd ..\java\ircam\jmax
