@@ -94,8 +94,8 @@ public class TrackWindow extends JMaxEditor {
 			public void componentResized(ComponentEvent e)
 		  {
 				Rectangle bounds = TrackWindow.this.getBounds();
-				trackData.editorObject.setSize(bounds.width, bounds.height);
-		  }
+        trackData.editorObject.setSize(bounds.width, bounds.height);
+      }
 			public void componentMoved(ComponentEvent e)
 		  {
 				Rectangle bounds = TrackWindow.this.getBounds();

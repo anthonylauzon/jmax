@@ -127,7 +127,7 @@ public void requestSetWindow()
 {	
 	if(wx == -1 || wy == -1 || ww == -1 || wh == -1)
 			return;
-			
+
 		args.clear();
 		args.addInt( wx);
 		args.addInt( wy);
@@ -155,13 +155,13 @@ public void setLocation(int x, int y)
 }
 
 public void setSize(int w, int h)
-{		
-		if(this.ww != w || this.wh != h)
-		{			
-			this.ww = w;
-			this.wh = h;
-			requestSetWindow();
-		}
+{		  
+  if(this.ww != w || this.wh != h)
+  {			
+    this.ww = w;
+    this.wh = h;
+    requestSetWindow();
+  }
 }
 
 public void setLabel(String lab)
@@ -224,7 +224,7 @@ public void setTransposition(int transp)
 public void setViewMode(int view)
 {	
 		if(this.view != view)
-		{
+		{    
 			this.view = view;
 			args.clear();
 			args.addInt( view);
@@ -243,7 +243,7 @@ public void setViewMode(int view)
 public void setRangeMode(int rangeMode)
 {	
 		if(this.rangeMode != rangeMode)
-		{
+		{     
 			this.rangeMode = rangeMode;
 			args.clear();
 			args.addInt( rangeMode);
