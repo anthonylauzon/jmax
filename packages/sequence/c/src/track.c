@@ -644,8 +644,6 @@ track_get_or_make_markers(track_t *track)
     fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
     
     track_set_markers(track, markers);
-    
-    track_upload_markers(track);
   }
   
   return markers;
@@ -673,8 +671,10 @@ track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_array_t temp_array;
   
   if(tr_type != seqsym_scomark)
+  {
     markers = track_get_or_make_markers(self);
-  
+    track_upload_markers(self);
+  }
   marker_track_insert_marker(markers, time, sc_type, &event);
   
   /* upload the event */
