@@ -15,6 +15,12 @@
 	* use predefined symbol fts_s_default_project in linux.c/macosx.c/sgi.c/win32.c
 	instead of old hardcoded "config.jprj"
 
+	* rename fts_get_user_config/fts_get_system_config into 
+	fts_get_user_project/fts_get_system_project
+	
+	* (linux) change jmax default user nmae into $JMAX_PREF_DIR/default-project.jprj
+	if environment variable JMAX_PREF_DIR is not set, use $HOME/.jmax 
+
 2003-01-23  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* update Mac OS X audio port for default device.
