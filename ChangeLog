@@ -2,22 +2,6 @@
 
 	* fixed dependency problem with parser.h.
 
-	* changed return value of fts_get_float, now fts_get_float really return a float.
-	If you need to store double in fts_atom_t, you can use the following functions:
-	  - fts_set_double
-	  - fts_get_double
-	
-	* fts/atom.c : added support for double type in atom.
-	
-	* include/ftsprivate/class.h (FTS_TYPEID_DOUBLE): added predefined type id for double.
-
-	* include/fts/atom.h: added fts_double_class, fts_word_get_double, fts_word_set_double, fts_set_double,
-	fts_is_double, fts_get_double, fts_get_number_double.
-
-	* include/fts/types.h (union fts_word): added fts_double field.
-
-	* include/fts/predefsymbols.h: added fts_s_double symbol.
-
 2003-08-25  Carl Seleborg  <seleborg@licorne.ircam.fr>
 
 	* fts/fts.c (fts_get_user_directory): Added fts_get_user_directory() as a wrapper

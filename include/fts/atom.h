@@ -85,12 +85,6 @@ FTS_API fts_class_t *fts_int_class;
  */
 FTS_API fts_class_t *fts_float_class;
 
-/** 
- * Class representing the 'double' primitive type
- * @ingroup atom 
- */
-FTS_API fts_class_t* fts_double_class;
-
 /**
  * Class representing the 'symbol' primitive type
  * @ingroup atom
@@ -115,7 +109,6 @@ FTS_API fts_class_t *fts_string_class;
 
 #define fts_word_set_int(p, v)         ((p)->fts_int = (v))
 #define fts_word_set_float(p, v)      ((p)->fts_float = (v))
-#define fts_word_set_double(p, v)      ((p)->fts_double = (v))
 #define fts_word_set_symbol(p, v)      ((p)->fts_symbol = (v))
 #define fts_word_set_object(p, v)      ((p)->fts_object = (v))
 #define fts_word_set_pointer(p, v)     ((p)->fts_pointer = (v))
@@ -123,7 +116,6 @@ FTS_API fts_class_t *fts_string_class;
 
 #define fts_word_get_int(p)            ((p)->fts_int)
 #define fts_word_get_float(p)         ((p)->fts_float)
-#define fts_word_get_double(p)         ((p)->fts_double)
 #define fts_word_get_symbol(p)         ((p)->fts_symbol)
 #define fts_word_get_object(p)         ((p)->fts_object)
 #define fts_word_get_pointer(p)        ((p)->fts_pointer)
@@ -158,17 +150,6 @@ FTS_API fts_class_t *fts_string_class;
  * @ingroup atom
  */
 #define fts_set_float(p, v) ((p)->type = fts_float_class, fts_word_set_float( &(p)->value, (v)))
-
-/** 
- * Set the double value
- * 
- * @fn fts_set_double(const fts_atom_t* p, double v)
- * @param p pointer to the atom
- * @param v the value
- * 
- * @ingroup atom
- */
-#define fts_set_double(p,v) ((p)->type = fts_double_class, fts_word_set_double(&(p)->value, (v)) 
 
 /**
  * Set the symbol value
@@ -240,27 +221,15 @@ FTS_API fts_class_t *fts_string_class;
  */
 #define fts_is_float(p) ((p)->type == fts_float_class) 
 
-/** 
- * Tests if atom contains a double
- * 
- * @fn int fts_is_double(const fts_atom_t* p)
- *
- * @param p pointer to the atom
- * 
- * @return 1 if atom type is float
- * @ingroup atom
- */
-#define fts_is_double(p) ((p)->type == fts_double_class)
-
 /**
- * Tests if atom contains a number (int or float or double)
+ * Tests if atom contains a number (int or float)
  * 
  * @fn int fts_is_number( const fts_atom_t *p)
  * @param p pointer to the atom
- * @return 1 if atom type is number (int or float or double)
+ * @return 1 if atom type is number (int or float)
  * @ingroup atom
  */
-#define fts_is_number(p) ((p)->type == fts_int_class || (p)->type == fts_float_class || (p)->type == fts_double_class) 
+#define fts_is_number(p) ((p)->type == fts_int_class || (p)->type == fts_float_class) 
 
 /**
  * Tests if atom contains a symbol
@@ -322,33 +291,16 @@ FTS_API fts_class_t *fts_string_class;
  */
 #define fts_get_float(p) fts_word_get_float( &(p)->value)
 
-/** 
- * Get the double value
- * 
- * @fn double fts_get_double( const fts_atom_t* p)
- *
- * @param p pointer to the atom
- * 
- * @return the double value of the atom
- * @ingroup atom
- */
-#define fts_get_double(p) fts_word_get_double( &(p)->value)
-
 /**
- * Get the number value as integer.
+ * Get the number value as integer
  * 
  * @fn int fts_get_number_int( const fts_atom_t *p)
  * @param p pointer to the atom
  * @return the integer value of the atom if atom is integer, the float value converted to an int
- * if atom is float, the double value converted to an int if atom is double.
+ * if atom is float
  * @ingroup atom
  */
-#define fts_get_number_int(p) (fts_is_int(p) ?               \
-			         fts_get_int(p) :            \
-			         fts_is_float(p) ?           \
-			           (int)fts_get_float(p) :   \
-			           (int)fts_get_double(p)) 
-			                                       
+#define fts_get_number_int(p) (fts_is_int(p) ? fts_get_int(p) : (int)fts_get_float(p))
 
 /**
  * Get the number value as float
@@ -356,31 +308,10 @@ FTS_API fts_class_t *fts_string_class;
  * @fn float fts_get_number_float( const fts_atom_t *p)
  * @param p pointer to the atom
  * @return the float value of the atom if atom is float, the integer value converted to a float
- * if atom is integer, the double value converted to a float if atom is double
+ * if atom is integer
  * @ingroup atom
  */
-#define fts_get_number_float(p) (fts_is_float(p) ?              \
-				   fts_get_float(p) :           \
-				   fts_is_int(p) ?              \
-				     (float)fts_get_int(p) :    \
-				     (float)fts_get_double(p))
-
-
-/** 
- * Get the number value as double
- * 
- * @fn double fts_get_number_double(const fts_atom_t* p)
- * @param p pointer to the atom
- * 
- * @return the double value of the atom if atom is double, the integer value converted to double
- * if atom is integer, the float value converted to a double if atom is float.
- * @ingroup atom
- */
-#define fts_get_number_double(p) (fts_is_double(p) ?            \
-				    fts_get_double(p) :         \
-				    fts_is_int(p) ?             \
-				      (double)fts_get_int(p) :  \
-				      (double)fts_get_float(p))
+#define fts_get_number_float(p) (fts_is_float(p) ? fts_get_float(p) : (float)fts_get_int(p))
 
 /**
  * Get the symbol value

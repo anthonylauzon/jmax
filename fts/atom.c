@@ -45,8 +45,6 @@ int fts_atom_identical( const fts_atom_t *p1, const fts_atom_t *p2)
     return fts_get_int( p1) == fts_get_int( p2);
   case FTS_TYPEID_FLOAT:
     return fts_get_float( p1) == fts_get_float( p2);
-  case FTS_TYPEID_DOUBLE:
-    return fts_get_double(p1) == fts_get_double(p2);
   case FTS_TYPEID_SYMBOL:
     return fts_get_symbol( p1) == fts_get_symbol( p2);
   case FTS_TYPEID_POINTER:
@@ -205,40 +203,6 @@ static fts_class_t float_class = {
 };
 fts_class_t *fts_float_class = &float_class;
 
-static fts_class_t double_class = { 
-  {
-    0,
-    {0,0,0},
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_DOUBLE,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_double_class = &double_class;
-
 static fts_class_t symbol_class = { 
   {
     0,
@@ -345,17 +309,9 @@ void fts_kernel_atom_init( void)
 {
   fts_class_set_name( &int_class, fts_s_int);
   fts_class_set_name( &float_class, fts_s_float);
-  fts_class_set_name( &double_class, fts_s_double);
   fts_class_set_name( &symbol_class, fts_s_symbol);
   fts_class_set_name( &pointer_class, fts_s_pointer);
   fts_class_set_name( &string_class, fts_s_string);
 
   fts_set_void( &__fts_null);
 }
-
-/** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */
