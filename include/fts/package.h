@@ -145,7 +145,7 @@ FTS_API fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name
  * <li> the required packages of the current package
  * </ul>
  *
- * @fn fts_class_t *fts_class_get_by_name(fts_symbol_t name)
+ * @fn fts_class_t *fts_get_class_by_name(fts_symbol_t name)
  * @param name the name
  * @return the class (handle) or NULL if no class found
  * @ingroup class_api
@@ -160,12 +160,12 @@ FTS_API fts_class_t *fts_get_class_by_name(fts_symbol_t name);
  * <li> the required packages of the current package
  * </ul>
  *
- * @fn fts_fun_t *fts_function_get_by_name(fts_symbol_t name)
+ * @fn fts_fun_t *fts_get_function_by_name(fts_symbol_t name)
  * @param name the name
  * @return the function or NULL if no function found
  * @ingroup class_api
  */
-FTS_API fts_fun_t fts_function_get_by_name(fts_symbol_t name);
+FTS_API fts_fun_t fts_get_function_by_name(fts_symbol_t name);
 
 
 
