@@ -19,7 +19,7 @@ import javax.swing.event.*;
 public class EditField extends JTextArea  {
 
   private ErmesObjEditableObject owner = null;
-  private ErmesSketchPad itsSketchPad = null;
+  private ErmesSketchPad sketch = null;
   private boolean focused = false;
 
   // Private action classes 
@@ -35,7 +35,7 @@ public class EditField extends JTextArea  {
     {
       EditField f = (EditField) getTextComponent(e);
       
-      f.itsSketchPad.stopTextEditing();
+      f.sketch.stopTextEditing();
     }
   }
 
@@ -103,11 +103,11 @@ public class EditField extends JTextArea  {
   // CONSTRUCTOR
   //--------------------------------------------------------
 
-  EditField( ErmesSketchPad theSketchPad) 
+  EditField(ErmesSketchPad editor) 
   {
     super();
 
-    itsSketchPad = theSketchPad;
+    sketch = editor;
 
     setFont(FontCache.lookupFont(ircam.jmax.utils.Platform.FONT_NAME,
 				 ircam.jmax.utils.Platform.FONT_SIZE));
@@ -136,22 +136,18 @@ public class EditField extends JTextArea  {
   public void doEdit(ErmesObjEditableObject obj, Point p)
   {
     owner = obj;
-    setFont( owner.getFont());
-    setText( owner.getArgs());
-    setBackground( owner.getTextBackground());
+    owner.setEditing(true);
+    setFont(owner.getFont());
+    setText(owner.getArgs());
+    setBackground(owner.getTextBackground());
 
-    if ( owner.getRows() == 0)
-      setBounds( owner.getX() + 3,
-		 owner.getY() + 3,
-		 owner.getWidth() - 6,
-		 owner.getFontMetrics().getHeight());
-    else
-      setBounds( owner.getX() + 3,
-		 owner.getY() + 3,
-		 owner.getWidth() - 6,
-		 owner.getFontMetrics().getHeight() * owner.getRows());
+    setBounds(owner.getTextEditorX(),
+	      owner.getTextEditorY(),
+	      owner.getTextEditorWidth(),
+	      owner.getTextEditorHeight());
 
-
+    if (owner.getTextEditorMargin() != null)
+      setMargin(owner.getTextEditorMargin());
 
     if (p != null)
       {
@@ -173,7 +169,7 @@ public class EditField extends JTextArea  {
 	    if (pos >= 0)
 	      setCaretPosition(pos);
 	    else
-	      setCaretPosition( owner.getArgs().length());
+	      setCaretPosition(owner.getArgs().length());
 	  }
 	else
 	  {
@@ -186,7 +182,7 @@ public class EditField extends JTextArea  {
 					     if (pos >= 0)
 					       setCaretPosition(pos);
 					     else
-					       setCaretPosition( owner.getArgs().length());
+					       setCaretPosition(owner.getArgs().length());
 					   }
 				       });
 	    doneOnce = true;
@@ -194,7 +190,7 @@ public class EditField extends JTextArea  {
       }
 
     getDocument().addDocumentListener(listener);
-    setVisible( true);
+    setVisible(true);
     requestFocus();
   }
 
@@ -202,15 +198,17 @@ public class EditField extends JTextArea  {
   {
     String aTextString = getText().trim();
 
+    owner.setEditing(false);
+
     getDocument().removeDocumentListener(listener);
 
-    if (! owner.getArgs().equals( aTextString) )
+    if (! owner.getArgs().equals(aTextString) )
       {
-	owner.redefine( aTextString);
+	owner.redefine(aTextString);
 	owner.redraw();
       } 
 
-    setVisible( false);
+    setVisible(false);
 
     owner = null;
   }
@@ -226,8 +224,14 @@ public class EditField extends JTextArea  {
 
 	    if (eol.y >= getHeight())
 	      {
-		owner.setHeight(getHeight() + getRowHeight());
-		reshape(getX(), getY(), getWidth(), getHeight() + getRowHeight());
+		owner.setHeight(owner.getHeight() + owner.getFontMetrics().getHeight());
+		owner.redraw();
+		reshape(owner.getTextEditorX(),
+			  owner.getTextEditorY(),
+			  owner.getTextEditorWidth(),
+			  owner.getTextEditorHeight());
+
+		sketch.fixSize();
 	      }
 	  }
 	catch (javax.swing.text.BadLocationException e)
@@ -242,8 +246,8 @@ public class EditField extends JTextArea  {
 
   public Dimension getMinimumSize() 
   {
-    minimumSize.setSize( owner.getWidth() - owner.getWhiteXOffset(),
-			 owner.getHeight() - owner.getWhiteYOffset());
+    minimumSize.setSize(owner.getWidth() - owner.getWhiteXOffset(),
+			owner.getHeight() - owner.getWhiteYOffset());
     return minimumSize;
   }
 
