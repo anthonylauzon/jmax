@@ -4,9 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import ircam.jmax.utils.*;
 
-/**
- * A dialog used to edit the value inside a "float box".
- */
+//
+// A dialog used to edit the value inside a "float box".
+//
 class ErmesObjIntegerDialog extends Dialog implements ActionListener{
   Frame itsParent;
   Button okButton;
@@ -15,8 +15,8 @@ class ErmesObjIntegerDialog extends Dialog implements ActionListener{
   ErmesObjInt itsIntObject = null;
   String itsValue = "";
   
-  
-  public ErmesObjIntegerDialog(Frame theFrame) {
+  public ErmesObjIntegerDialog(Frame theFrame) 
+  {
     super(theFrame, "Integer setting", false);
     
     itsParent = theFrame;
@@ -53,45 +53,41 @@ class ErmesObjIntegerDialog extends Dialog implements ActionListener{
 
   }
 
-   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --inizio
-
-  public void actionPerformed(ActionEvent e){        
+  public void actionPerformed(ActionEvent e)
+  {
     int  aInt = 0;
     
-    if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else  {
-      itsValue = value.getText();
-      try{
-	aInt = Integer.parseInt(itsValue);
-      }
-      catch (NumberFormatException e1){
+    if ( e.getSource() == cancelButton) 
+      {
 	setVisible(false);
-	return;
       }
-      itsIntObject.FromDialogValueChanged(aInt);
-      setVisible(false);
-    }
+    else  
+      {
+	itsValue = value.getText();
+
+	try
+	  {
+	    aInt = Integer.parseInt(itsValue);
+	  }
+	catch ( NumberFormatException e1)
+	  {
+	    setVisible(false);
+	    return;
+	  }
+
+	itsIntObject.FromDialogValueChanged( aInt);
+	setVisible(false);
+      }
   }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjInt theInt, Frame theParent){
-    
+  public void ReInit(String theValue, ErmesObjInt theInt, Frame theParent)
+  {
     itsValue = theValue;
-    value.setText(theValue);
+    value.setText( theValue);
     itsIntObject = theInt;
     itsParent = theParent;
-    setVisible(true);
+    setVisible( true);
     value.requestFocus();
   }
  
 }
-
-
-
-
-
-

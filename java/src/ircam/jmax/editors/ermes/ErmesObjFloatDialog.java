@@ -4,9 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import ircam.jmax.utils.*;
 
-/**
- * A dialog used to edit the value inside a "float box".
- */
+//
+// A dialog used to edit the value inside a "float box".
+//
 class ErmesObjFloatDialog extends Dialog implements ActionListener {
   Frame itsParent;
   Button okButton;
@@ -15,8 +15,8 @@ class ErmesObjFloatDialog extends Dialog implements ActionListener {
   ErmesObjFloat itsFloatObject = null;
   String itsValue = "";
   
-  
-  public ErmesObjFloatDialog(Frame theFrame) {
+  public ErmesObjFloatDialog(Frame theFrame) 
+  {
     super(theFrame, "Float setting", false);
     
     itsParent = theFrame;
@@ -50,48 +50,41 @@ class ErmesObjFloatDialog extends Dialog implements ActionListener {
     add("South", p2);
     //Initialize this dialog to its preferred size.
     pack();
-
   }
 
-   ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --inizio
-
-  public void actionPerformed(ActionEvent e){        
+  public void actionPerformed(ActionEvent e)
+  {
     float aFloat = 0;
-    if (e.getSource()==cancelButton) {
-      setVisible(false);
-    }
-    else  {
-      itsValue = value.getText();
-      try{
-	aFloat = (Float.valueOf(itsValue)).floatValue();
-	//why Float doesn't have a "parseFloat" method, like Integers?
-      }
-      catch (NumberFormatException e1){
+
+    if (e.getSource() == cancelButton) 
+      {
 	setVisible(false);
-	return;
       }
-      itsFloatObject.FromDialogValueChanged(aFloat);
-      setVisible(false);
-    }
+    else  
+      {
+	itsValue = value.getText();
+	try
+	  {
+	    aFloat = (Float.valueOf(itsValue)).floatValue();
+	  }
+	catch (NumberFormatException e1)
+	  {
+	    setVisible(false);
+	    return;
+	  }
+
+	itsFloatObject.FromDialogValueChanged(aFloat);
+	setVisible(false);
+      }
   }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjFloat theFloat, Frame theParent){
+  public void ReInit( String theValue, ErmesObjFloat theFloat, Frame theParent)
+  {
     itsValue = theValue;
-    value.setText(theValue);
+    value.setText( theValue);
     itsFloatObject = theFloat;
     itsParent = theParent;
-    setVisible(true);
+    setVisible( true);
     value.requestFocus();
   }
- 
 }
-
-
-
-
-
-
-

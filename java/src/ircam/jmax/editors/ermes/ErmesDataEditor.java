@@ -23,7 +23,7 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
 	fireEditorReadyListeners();
       }
     else
-      patcher.download(new Runnable() {
+      patcher.download( new Runnable() {
 	public void run() {
 	  ErmesDataEditor.this.setSketchWindow(new ErmesSketchWindow(patcher));
 	  ErmesDataEditor.this.fireEditorReadyListeners();

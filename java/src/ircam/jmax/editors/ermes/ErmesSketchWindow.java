@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
-import java.text.*;//DateFormat...
+import java.text.*;
 
 import tcl.lang.*;
 
@@ -17,16 +17,15 @@ import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
 
 
-/**
- * The window that contains the sketchpad. It knows the ftspatcher it is editing.
- * It handles all the sketch menus, it knows how to load from a ftspatcher.
- */
+//
+// The window that contains the sketchpad. It knows the ftspatcher it is editing.
+// It handles all the sketch menus, it knows how to load from a ftspatcher.
+//
+public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, ComponentListener {
 
-public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, ComponentListener{
-  // (fd)
   protected KeyEventClient keyEventClient;
 
-  public void propertyChanged(FtsObject object, String name, Object value)
+  public void propertyChanged( FtsObject object, String name, Object value)
   {
     if (name == "ins")
       {
@@ -40,24 +39,28 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	
 	itsSketchPad.RedefineOutChoice();
       }
-    else if (name == "newObject") {
-      ftsObjectsPasted.addElement(value);
-    }
+    else if (name == "newObject") 
+      {
+	ftsObjectsPasted.addElement( value);
+      }
     else if (name == "newConnection")
-      ftsConnectionsPasted.addElement(value);
-    else if (name == "deletedObject") {
-      // just an hack: remove the watch temporarly, add it just after
-      // to avoid recursion
-      itsSketchPad.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()), false);
-    }
-    else if (name == "deletedConnection") {
-      itsSketchPad.DeleteGraphicConnection((ErmesConnection) ((FtsConnection)value).getRepresentation(), false);
-    }
+      ftsConnectionsPasted.addElement( value);
+    else if (name == "deletedObject") 
+      {
+	// just an hack: remove the watch temporarly, add it just after
+	// to avoid recursion
+	itsSketchPad.DeleteGraphicObject( (ErmesObject)(((FtsObject)value).getRepresentation()), false);
+      }
+    else if (name == "deletedConnection") 
+      {
+	itsSketchPad.DeleteGraphicConnection( (ErmesConnection)((FtsConnection)value).getRepresentation(), false);
+      }
 
-    if (!pasting) itsSketchPad.paintDirtyList();
+    if (!pasting)
+      itsSketchPad.paintDirtyList();
   }
 
-  public void componentResized(ComponentEvent e) 
+  public void componentResized( ComponentEvent e) 
   {
     if (itsPatcher != null) 
       {
@@ -66,29 +69,34 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
   }
 
-  public void componentMoved(ComponentEvent e) {
-    if (itsPatcher == null) System.err.println("internal warning: patcher moved while FtsPatcher is null");    
-    else {
-      itsPatcher.put("wx", getLocation().x);
-      itsPatcher.put("wy", getLocation().y);
-    }
+  public void componentMoved( ComponentEvent e) 
+  {
+    if (itsPatcher == null)
+      System.err.println( "internal warning: patcher moved while FtsPatcher is null");    
+    else 
+      {
+	itsPatcher.put( "wx", getLocation().x);
+	itsPatcher.put( "wy", getLocation().y);
+      }
   }
-  public void componentShown(ComponentEvent e) {}
-  public void componentHidden(ComponentEvent e){}  
 
-  
-  //TextField itsToolbarTextField = new TextField("    ");//1506
+  public void componentShown( ComponentEvent e) 
+  {
+  }
+
+  public void componentHidden( ComponentEvent e)
+  {
+  }
+
   FtsSelection itsSelection;
   MaxVector ftsObjectsPasted = new MaxVector();
   MaxVector ftsConnectionsPasted = new MaxVector();
   boolean pasting = false;
 
-  //  public ErmesObject itsOwner;//in case this is a subpatcher
-
   final String FILEDIALOGMENUITEM = "File dialog...";
   public static int preferredWidth = 490;
   public static int preferredHeight = 450;
-  Dimension preferredsize = new Dimension(preferredWidth,preferredHeight);
+  Dimension preferredsize = new Dimension( preferredWidth,preferredHeight);
   public ErmesSketchPad itsSketchPad;
   ScrollPane itsScrollerView;
   ErmesSwToolbar itsToolBar;
@@ -96,20 +104,15 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   public FtsContainerObject itsPatcher;
   private Menu itsJustificationMenu;
 
-  // (fd) Made local in SetupMenu, as it was used only there 
-  //private Menu itsResizeObjectMenu;
-  //private Menu itsTextMenu;	
-  //private Menu itsGraphicsMenu;
-
   private Menu itsAlignObjectMenu;
   private Menu itsSizesMenu;	
   private Menu itsFontsMenu;
   private Menu itsExecutionMenu;
 
-  CheckboxMenuItem itsSelectedSizeMenu;//the Selected objects size MenuItem
-  CheckboxMenuItem itsSketchSizeMenu;//the SketchPad size MenuItem
-  CheckboxMenuItem itsSketchFontMenu;//the SketchPad font MenuItem
-  CheckboxMenuItem itsSelectedFontMenu;//the Selected objects font MenuItem
+  CheckboxMenuItem itsSelectedSizeMenu;   //the Selected objects size MenuItem
+  CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
+  CheckboxMenuItem itsSketchFontMenu;     //the SketchPad font MenuItem
+  CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
   CheckboxMenuItem itsSelectedJustificationMenu;
   CheckboxMenuItem itsSketchJustificationMenu;
   CheckboxMenuItem itsCurrentResizeMenu;
@@ -118,116 +121,113 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   MenuItem itsSelectAllMenuItem;
 
   boolean itsChangingRunEditMode = false;
-  //public String itsTitle;
   public MaxDocument itsDocument;
 
-
-  public void showObject(Object obj)
+  public void showObject( Object obj)
   {
-    // Should select or highlight obj if it is an
-    // FtsObject
+    // Should select or highlight obj if it is an FtsObject
     if (obj instanceof FtsObject) 
       {
 	ErmesObject aObject = (ErmesObject) (((FtsObject) obj).getRepresentation());
-	itsSketchPad.deselectAll(true);
-	itsSketchPad.currentSelection.addObject(aObject);
-	aObject.Select(true);
+	itsSketchPad.deselectAll( true);
+	itsSketchPad.currentSelection.addObject( aObject);
+	aObject.Select( true);
 	itsSketchPad.CheckCurrentFont();
       }
   }
 
-  //----------alternative contructors:
-  /**
-   * constructor 
-   * This is the only constructor actually called
-   */
-  public ErmesSketchWindow(FtsContainerObject patcher) {
-    
-    super(Mda.getDocumentTypeByName("patcher"));
+  //
+  // Constructor 
+  //
+  public ErmesSketchWindow( FtsContainerObject patcher) 
+  {
+    super( Mda.getDocumentTypeByName( "patcher"));
+
+    System.err.println( this.getClass().getName());
 
     // (fd)
-
     keyEventClient = null;
+
     itsDocument = patcher.getDocument();
     itsPatcher = patcher;
 
-    /* (mdc) deleteConnection watcher always active; 
-       connections can be deleted as side effect of 
-       editing on other windows; other watches should be istalled 
-       here also,*/
+    // (mdc) deleteConnection watcher always active; 
+    // connections can be deleted as side effect of 
+    // editing on other windows; other watches should be istalled here also,
 
-    itsPatcher.watch("deletedConnection", this);
+    itsPatcher.watch( "deletedConnection", this);
 
     if (itsDocument.getRootData() == itsPatcher)
-      setTitle(itsDocument.getName());
+      setTitle( itsDocument.getName());
     else
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(patcher)));
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle( chooseWindowName( patcher)));
 
-    itsSketchPad    = new ErmesSketchPad(this);
-    itsToolBar      = new ErmesSwToolbar(itsSketchPad);
+    itsSketchPad = new ErmesSketchPad( this);
+    itsToolBar = new ErmesSwToolbar( itsSketchPad);
 
     itsScrollerView = new ScrollPane();
-    itsScrollerView.add(itsSketchPad, 0);
-    itsScrollerView.getHAdjustable().setUnitIncrement(10);
-    itsScrollerView.getVAdjustable().setUnitIncrement(10);
-    itsScrollerView.getHAdjustable().addAdjustmentListener(itsSketchPad);
-    itsScrollerView.getVAdjustable().addAdjustmentListener(itsSketchPad);
-    itsScrollerView.addKeyListener(this);
+    itsScrollerView.add( itsSketchPad, 0);
+    itsScrollerView.getHAdjustable().setUnitIncrement( 10);
+    itsScrollerView.getVAdjustable().setUnitIncrement( 10);
+    itsScrollerView.getHAdjustable().addAdjustmentListener( itsSketchPad);
+    itsScrollerView.getVAdjustable().addAdjustmentListener( itsSketchPad);
+    itsScrollerView.addKeyListener( this);
     
 
-    itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
-    Init(); //MaxEditor base class init (standard menu handling)
+    itsSketchPad.setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME, 
+				    Font.PLAIN, 
+				    ircam.jmax.utils.Platform.FONT_SIZE));
 
-    itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
+    Init(); // MaxEditor base class init (standard menu handling)
 
-    getContentPane().setLayout(new BorderLayout());
+    itsSketchPad.SetToolBar( itsToolBar);	// inform the Sketch of the ToolBar to 
+
+    getContentPane().setLayout( new BorderLayout());
     
     itsSelection = Fts.getSelection();
     itsSelection.clean();
 
-    setSize(new Dimension(600, 300));
-    getContentPane().add("North", itsToolBar);
-    getContentPane().add("Center", itsScrollerView);
+    setSize( new Dimension( 600, 300));
+    getContentPane().add( "North", itsToolBar);
+    getContentPane().add( "Center", itsScrollerView);
 
-    InitFromContainer(itsPatcher);
+    InitFromContainer( itsPatcher);
 
     validate();
 
-    setVisible(true);
+    setVisible( true);
 
-    itsSketchPad.PrepareInChoice();//???????
-    itsSketchPad.PrepareOutChoice();///?????????
+    itsSketchPad.PrepareInChoice();  // ???????
+    itsSketchPad.PrepareOutChoice(); // ?????????
 
-    itsPatcher.watch("ins", this);
-    itsPatcher.watch("outs", this);
-    addComponentListener(this);
+    itsPatcher.watch( "ins", this);
+    itsPatcher.watch( "outs", this);
+    addComponentListener( this);
 
     itsPatcher.startUpdates();
 
-    /* To set the initial state: set to edit mode only if the
-       initialMode property of a patcher is set and it is set
-       to something different than "run" (usually, "edit" :)
-       */
+    // To set the initial state: set to edit mode only if the
+    // initialMode property of a patcher is set and it is set
+    // to something different than "run" (usually, "edit" :)
 
     FtsContainerObject p = itsPatcher;
     String mode;
 
-    mode = (String) p.get("initialMode");
+    mode = (String) p.get( "initialMode");
 
     p = p.getParent();
 
     while ((mode == null) && (p != null))
       {
-	mode = (String) p.get("editMode");
+	mode = (String) p.get( "editMode");
 	p = p.getParent();
       }
 
-    if ((mode == null) || mode.equals("run"))
-      setRunMode(true);
+    if ((mode == null) || mode.equals( "run"))
+      setRunMode( true);
   }
 
-
-  static String chooseWindowName(FtsContainerObject theFtsPatcher)
+  static String chooseWindowName( FtsContainerObject theFtsPatcher)
   {
     if (theFtsPatcher instanceof FtsPatcherObject)
       return "patcher " + theFtsPatcher.getObjectName();
@@ -235,55 +235,54 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       return theFtsPatcher.getClassName();
   }
 
-  int horizontalOffset() {
-    //    return 20+itsSketchPad.getLocation().x; //the size of the sketch
+  int horizontalOffset()
+  {
     return 40;
   }
   
-  int verticalOffset() {
-    //    return itsSketchPad.getLocation().y;//the size of the toolbar + menus
+  int verticalOffset() 
+  {
     return 130;
   }
   
-  private void InitFromContainer(FtsContainerObject patcher) {
-    
+  private void InitFromContainer( FtsContainerObject patcher)
+  {
     Object aObject;
-    int x=0;
-    int y=0;
-    int width=500;
-    int height=480;
+    int x = 0;
+    int y = 0;
+    int width = 500;
+    int height = 480;
     Integer x1, y1, width1, height1;
     
 
-    //double check the existence of the window properties. If there aren't, use defaults
-      
-    x1 = (Integer) patcher.get("wx");
+    // Double check the existence of the window properties. If there aren't, use defaults
+    x1 = (Integer) patcher.get( "wx");
     if (x1 == null) 
-      patcher.put("wx", new Integer(x));
-    else  
+      patcher.put( "wx", new Integer( x));
+    else
       x = x1.intValue();
 
-    y1 = (Integer) patcher.get("wy");
+    y1 = (Integer) patcher.get( "wy");
     if (y1 == null) 
-      patcher.put("wy", new Integer(y));
+      patcher.put( "wy", new Integer( y));
     else  
       y = y1.intValue();
 
-    width1  = (Integer) patcher.get("ww");
+    width1  = (Integer) patcher.get( "ww");
     if (width1 == null)
-      patcher.put("ww", new Integer (width));
+      patcher.put( "ww", new Integer ( width));
     else 
       width = width1.intValue();
 
-    height1 = (Integer) patcher.get("wh");
+    height1 = (Integer) patcher.get( "wh");
     if (height1 == null)
-      patcher.put("wh", new Integer(height));
+      patcher.put( "wh", new Integer( height));
     else
       height = height1.intValue();
       
-    setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
+    setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
 
-    itsSketchPad.InitFromFtsContainer(patcher);
+    itsSketchPad.InitFromFtsContainer( patcher);
   }
 
   public void SetupMenu()
@@ -296,23 +295,23 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // (fd) As the clear is not implemented, it is not there
     editMenu.remove( GetClearMenu());
 
-    editMenu.add(new MenuItem("-"));
+    editMenu.add( new MenuItem( "-"));
 
     itsSelectAllMenuItem = new MenuItem( "Select All  Ctrl+A");
     editMenu.add( itsSelectAllMenuItem);
     itsSelectAllMenuItem.addActionListener( new ActionListener() {
-      public  void actionPerformed(ActionEvent e)
+      public  void actionPerformed( ActionEvent e)
 	{
 	  GetSketchPad().SelectAll();
 	}
     });
 
-     editMenu.add(new MenuItem("-"));
+    editMenu.add( new MenuItem( "-"));
 
-     MenuItem findMenuItem = new MenuItem( "Find");
-     editMenu.add( findMenuItem);
-     findMenuItem.addActionListener( new ActionListener() {
-       public void actionPerformed( ActionEvent e)
+    MenuItem findMenuItem = new MenuItem( "Find");
+    editMenu.add( findMenuItem);
+    findMenuItem.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
  	{
 	  FindPanel p;
 	  p = FindPanel.open();
@@ -320,22 +319,22 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
 	  if (itsSelection.getObjects().size() > 0)
 	    {
-	      p.findFriends((FtsObject) itsSelection.getObjects().elementAt(0));
+	      p.findFriends((FtsObject) itsSelection.getObjects().elementAt( 0));
 	    }
  	}
-     });
+    });
 
-     MenuItem findErrorsMenuItem = new MenuItem( "Find Errors");
-     editMenu.add( findErrorsMenuItem);
-     findErrorsMenuItem.addActionListener( new ActionListener() {
-       public void actionPerformed( ActionEvent e)
+    MenuItem findErrorsMenuItem = new MenuItem( "Find Errors");
+    editMenu.add( findErrorsMenuItem);
+    findErrorsMenuItem.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
  	{
 	  FindPanel p;
 	  p = FindPanel.open();
 	  p.setPatcher( itsPatcher);
 	  p.findErrors();
  	}
-     });
+    });
 
     // (fd) {
     // As the inspector is not ready yet, the menu is not there.
@@ -343,20 +342,20 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // 1) implement an inspector for the object
     // 2) add a command in a menu that calls the inspector
     // and not the contrary...
-//     MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
-//     editMenu.add(inspectMenuItem);
+    //     MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
+    //     editMenu.add(inspectMenuItem);
 
-//     inspectMenuItem.addActionListener( new ActionListener() {
-//       public void actionPerformed(ActionEvent e) 
-// 	{
-// 	  inspectAction();
-// 	}
-//     });
-//     editMenu.add(new MenuItem("-"));
+    //     inspectMenuItem.addActionListener( new ActionListener() {
+    //       public void actionPerformed(ActionEvent e) 
+    // 	{
+    // 	  inspectAction();
+    // 	}
+    //     });
+    //     editMenu.add(new MenuItem("-"));
     // } (fd)
-    GetCutMenu().setEnabled(true);
-    GetCopyMenu().setEnabled(true);
-    GetPasteMenu().setEnabled(true);
+    GetCutMenu().setEnabled( true);
+    GetCopyMenu().setEnabled( true);
+    GetPasteMenu().setEnabled( true);
     //GetClearMenu().setEnabled(false);
     
     // Add the Graphics menu
@@ -372,82 +371,74 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     CheckDefaultFontItem();
 
     // Add the Execution menu
-    itsExecutionMenu = new Menu("Execution");
-    menuBar.add(itsExecutionMenu);
-    FillExecutionMenu(itsExecutionMenu);
+    itsExecutionMenu = new Menu( "Execution");
+    menuBar.add( itsExecutionMenu);
+    FillExecutionMenu( itsExecutionMenu);
   }
 
-  protected void Cut(){
-
+  protected void Cut()
+  {
     Copy();
     itsSketchPad.DeleteSelected();
-    
   }
 
-  public void inspectAction() {
-    if (itsSketchPad.currentSelection.isEmpty())
-      ErmesPatcherInspector.inspect(itsPatcher);
-    else itsSketchPad.inspectSelection();
-  }
-
-
-  // clipboard handling
-  protected void Copy() {
+  protected void Copy()
+  {
     Cursor temp = getCursor();
 
     Point tempPoint = itsSketchPad.selectionUpperLeft();
-    itsSketchPad.pasteDelta.setLocation(tempPoint.x-itsSketchPad.itsCurrentScrollingX, tempPoint.y - itsSketchPad.itsCurrentScrollingY);
+    itsSketchPad.pasteDelta.setLocation( tempPoint.x - itsSketchPad.itsCurrentScrollingX, 
+					 tempPoint.y - itsSketchPad.itsCurrentScrollingY);
     itsSketchPad.numberOfPaste = 0;
 
-    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     
-    itsSketchPad.ftsClipboard.copy(Fts.getSelection());
-    setCursor(temp);
+    itsSketchPad.ftsClipboard.copy( Fts.getSelection());
+    setCursor( temp);
   }
 
-
-
-  protected void Paste() {
-    if(itsSketchPad.itsRunMode) return;
+  protected void Paste()
+  {
+    if (itsSketchPad.itsRunMode)
+      return;
 
     Cursor temp = getCursor();
 
-    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
     ftsObjectsPasted.removeAllElements();
     ftsConnectionsPasted.removeAllElements();
     pasting = true;
-    //evaluate the script
-    itsPatcher.watch("newObject", this);
-    itsPatcher.watch("newConnection", this);
 
-    itsSketchPad.ftsClipboard.paste(itsPatcher);
+    itsPatcher.watch( "newObject", this);
+    itsPatcher.watch( "newConnection", this);
 
-    itsPatcher.removeWatch("newObject", this);    
-    itsPatcher.removeWatch("newConnection", this);    
+    itsSketchPad.ftsClipboard.paste( itsPatcher);
+
+    itsPatcher.removeWatch( "newObject", this);    
+    itsPatcher.removeWatch( "newConnection", this);    
     pasting = false;
+
     // make the sketch do the graphic job
-    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty()) {
-      itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
-      ErmesSketchPad.RequestOffScreen(itsSketchPad);
-      itsSketchPad.repaint();
-    }
-    setCursor(temp);
+    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
+      {
+	itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
+	ErmesSketchPad.RequestOffScreen( itsSketchPad);
+	itsSketchPad.repaint();
+      }
+    setCursor( temp);
   }
 
- 
   private void FillGraphicsMenu( Menu graphicsMenu)
   {
     Menu resizeObjectMenu =  new Menu( "Resize Object");
     graphicsMenu.add( resizeObjectMenu);
     FillResizeObjectMenu( resizeObjectMenu);
 
-    itsAlignObjectMenu =  new Menu("Align Objects");
-    graphicsMenu.add(itsAlignObjectMenu);
-    FillAlignObjectsMenu(itsAlignObjectMenu);
-    
+    itsAlignObjectMenu =  new Menu( "Align Objects");
+    graphicsMenu.add( itsAlignObjectMenu);
+    FillAlignObjectsMenu( itsAlignObjectMenu);
   }
-
 
   class ResizeMenuAdapter implements ItemListener
   {
@@ -489,72 +480,74 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   {
     String align;
 
-    AlignMenuAdapter(String align)
+    AlignMenuAdapter( String align)
     {
       this.align = align;
     }
 
-    public  void actionPerformed(ActionEvent e)
+    public  void actionPerformed( ActionEvent e)
     {
-      itsSketchPad.AlignSelectedObjects(align);
+      itsSketchPad.AlignSelectedObjects( align);
     }
   }
 
-  private void FillAlignObjectsMenu(Menu theAlignObjectMenu)
+  private void FillAlignObjectsMenu( Menu theAlignObjectMenu)
   {
     MenuItem aMenuItem;
 
-    aMenuItem = new MenuItem("Align Top");
-    theAlignObjectMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new AlignMenuAdapter("Top"));
+    aMenuItem = new MenuItem( "Align Top");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new AlignMenuAdapter( "Top"));
 
-    aMenuItem = new MenuItem("Align Left");
-    theAlignObjectMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new AlignMenuAdapter("Left"));
+    aMenuItem = new MenuItem( "Align Left");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new AlignMenuAdapter( "Left"));
 
-    aMenuItem = new MenuItem("Align Bottom");
-    theAlignObjectMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new AlignMenuAdapter("Bottom"));
+    aMenuItem = new MenuItem( "Align Bottom");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new AlignMenuAdapter( "Bottom"));
 
-    aMenuItem = new MenuItem("Align Right");
-    theAlignObjectMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new AlignMenuAdapter("Right"));
+    aMenuItem = new MenuItem( "Align Right");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new AlignMenuAdapter( "Right"));
   }
 
-  private void FillExecutionMenu(Menu theExecutionMenu){
-    itsRunModeMenuItem = new MenuItem("Run Mode Ctrl+E");
-    theExecutionMenu.add(itsRunModeMenuItem);
+  private void FillExecutionMenu( Menu theExecutionMenu)
+  {
+    itsRunModeMenuItem = new MenuItem( "Run Mode Ctrl+E");
+    theExecutionMenu.add( itsRunModeMenuItem);
 
-    itsRunModeMenuItem.addActionListener(new ActionListener() {
-      public  void actionPerformed(ActionEvent e)
+    itsRunModeMenuItem.addActionListener( new ActionListener() {
+      public  void actionPerformed( ActionEvent e)
 	{
-	  setRunMode(! itsSketchPad.itsRunMode);
+	  setRunMode( ! itsSketchPad.itsRunMode);
 	}
     });
   }
 
-  private void FillTextMenu(Menu theTextMenu) {
+  private void FillTextMenu( Menu theTextMenu)
+  {
     String aString;
     CheckboxMenuItem aCheckItem;
 
     //-- fonts
-    itsFontsMenu =  new Menu("Fonts");
-    FillFontMenu(itsFontsMenu);
-    theTextMenu.add(itsFontsMenu);
+    itsFontsMenu =  new Menu( "Fonts");
+    FillFontMenu( itsFontsMenu);
+    theTextMenu.add( itsFontsMenu);
 
-    theTextMenu.add(new MenuItem("-"));
+    theTextMenu.add( new MenuItem( "-"));
 
     //-- sizes
-    itsSizesMenu = new Menu("Sizes");
-    FillSizesMenu(itsSizesMenu);
-    theTextMenu.add(itsSizesMenu);
+    itsSizesMenu = new Menu( "Sizes");
+    FillSizesMenu( itsSizesMenu);
+    theTextMenu.add( itsSizesMenu);
 
-    theTextMenu.add(new MenuItem("-"));
+    theTextMenu.add( new MenuItem( "-"));
 
     //-- justification
-    itsJustificationMenu = new Menu("Justification");
-    FillJustificationMenu(itsJustificationMenu);
-    theTextMenu.add(itsJustificationMenu);
+    itsJustificationMenu = new Menu( "Justification");
+    FillJustificationMenu( itsJustificationMenu);
+    theTextMenu.add( itsJustificationMenu);
   }
 
   class SizesMenuAdapter implements ItemListener
@@ -562,40 +555,40 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     CheckboxMenuItem item;
     int size;
 
-    SizesMenuAdapter(CheckboxMenuItem item, int size)
+    SizesMenuAdapter( CheckboxMenuItem item, int size)
     {
       this.item = item;
       this.size = size;
     }
 
-    public  void itemStateChanged(ItemEvent e)
+    public  void itemStateChanged( ItemEvent e)
     {
-      SizesMenuAction(item, size);
+      SizesMenuAction( item, size);
     }
   }
 
-  private void FillSizesMenu(Menu theSizesMenu)
+  private void FillSizesMenu( Menu theSizesMenu)
   {
     CheckboxMenuItem aCheckItem;
 
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("8"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 8));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("9"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 9));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("10"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 10));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("12"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 12));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("14"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 14));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("18"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 18));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("24"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 24));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("36"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 36));
-    theSizesMenu.add(aCheckItem = new CheckboxMenuItem("48"));
-    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 48));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "8"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 8));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "9"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 9));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "10"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 10));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "12"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 12));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "14"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 14));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "18"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 18));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "24"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 24));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "36"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 36));
+    theSizesMenu.add( aCheckItem = new CheckboxMenuItem( "48"));
+    aCheckItem.addItemListener( new SizesMenuAdapter( aCheckItem, 48));
   }
 
   class FontMenuAdapter implements ItemListener
@@ -603,109 +596,115 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     CheckboxMenuItem item;
     String font;
 
-    FontMenuAdapter(CheckboxMenuItem item, String font)
+    FontMenuAdapter( CheckboxMenuItem item, String font)
     {
       this.item = item;
       this.font = font;
     }
 
-    public  void itemStateChanged(ItemEvent e)
+    public  void itemStateChanged( ItemEvent e)
     {
-      FontsMenuAction(item, font);
+      FontsMenuAction( item, font);
     }
   }
 
-  private void FillFontMenu(Menu theFontMenu)
+  private void FillFontMenu( Menu theFontMenu)
   {
     CheckboxMenuItem aCheckItem;
     String aString;
 
-    for(int i = 0;i<itsFontList.length;i++){
-      aString = (String) itsFontList[i];
-      theFontMenu.add(aCheckItem = new CheckboxMenuItem(aString));
-      aCheckItem.addItemListener(new FontMenuAdapter(aCheckItem, aString));
-    }
+    for ( int i = 0; i < itsFontList.length; i++)
+      {
+	aString = (String) itsFontList[i];
+	theFontMenu.add( aCheckItem = new CheckboxMenuItem( aString));
+	aCheckItem.addItemListener( new FontMenuAdapter( aCheckItem, aString));
+      }
   }
-
 
   class JustificationMenuAdapter implements ItemListener
   {
     CheckboxMenuItem item;
     String justification;
 
-    JustificationMenuAdapter(CheckboxMenuItem item,  String justification)
+    JustificationMenuAdapter( CheckboxMenuItem item,  String justification)
     {
       this.item = item;
       this.justification = justification;
     }
 
-    public  void itemStateChanged(ItemEvent e)
+    public  void itemStateChanged( ItemEvent e)
     {
-      JustificationMenuAction(item, justification);
+      JustificationMenuAction( item, justification);
     }
   }
 
-  private void FillJustificationMenu(Menu theJustificationMenu)
+  private void FillJustificationMenu( Menu theJustificationMenu)
   {
     CheckboxMenuItem aCheckItem;
 
-    aCheckItem = new CheckboxMenuItem("Left");
-    theJustificationMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Left"));
+    aCheckItem = new CheckboxMenuItem( "Left");
+    theJustificationMenu.add( aCheckItem);
+    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Left"));
 
-    aCheckItem = new CheckboxMenuItem("Center");
-    theJustificationMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Center"));
-    aCheckItem.setState(true);
+    aCheckItem = new CheckboxMenuItem( "Center");
+    theJustificationMenu.add( aCheckItem);
+    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Center"));
+    aCheckItem.setState( true);
     itsSelectedJustificationMenu = aCheckItem;
     itsSketchJustificationMenu = itsSelectedJustificationMenu;
 
-    aCheckItem = new CheckboxMenuItem("Right");
-    theJustificationMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Right"));
+    aCheckItem = new CheckboxMenuItem( "Right");
+    theJustificationMenu.add( aCheckItem);
+    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Right"));
   }
 
-  private void CheckDefaultSizeFontMenuItem(){
+  private void CheckDefaultSizeFontMenuItem()
+  {
     CheckboxMenuItem aCheckboxMenuItem;
-    String aFontSize = String.valueOf(itsSketchPad.getSketchFontSize());
-    for(int i=0; i<9;i++){
-      aCheckboxMenuItem = (CheckboxMenuItem)itsSizesMenu.getItem(i);
-      if(aCheckboxMenuItem.getLabel().compareTo(aFontSize) == 0){
-	itsSketchSizeMenu = aCheckboxMenuItem;
-	itsSelectedSizeMenu = itsSketchSizeMenu;
-	itsSelectedSizeMenu.setState(true);
-	return;
+    String aFontSize = String.valueOf( itsSketchPad.getSketchFontSize());
+
+    for ( int i = 0; i < 9; i++)
+      {
+	aCheckboxMenuItem = (CheckboxMenuItem)itsSizesMenu.getItem( i);
+
+	if (aCheckboxMenuItem.getLabel().compareTo( aFontSize) == 0)
+	  {
+	    itsSketchSizeMenu = aCheckboxMenuItem;
+	    itsSelectedSizeMenu = itsSketchSizeMenu;
+	    itsSelectedSizeMenu.setState( true);
+	    return;
+	  }
       }
-    }
   }
 	
-  private void CheckDefaultFontItem(){
+  private void CheckDefaultFontItem()
+  {
     CheckboxMenuItem aCheckboxMenuItem;
     String aFont = itsSketchPad.getFont().getName();
-    for(int i=0; i<itsFontList.length; i++){
-      aCheckboxMenuItem = (CheckboxMenuItem)itsFontsMenu.getItem(i);
-      if(aCheckboxMenuItem.getLabel().toLowerCase().compareTo(aFont.toLowerCase()) == 0){
-	itsSketchFontMenu = aCheckboxMenuItem;
-	itsSelectedFontMenu = aCheckboxMenuItem;
-	itsSketchFontMenu.setState(true);
-	return;
+
+    for( int i = 0; i < itsFontList.length; i++)
+      {
+	aCheckboxMenuItem = (CheckboxMenuItem)itsFontsMenu.getItem( i);
+	if ( aCheckboxMenuItem.getLabel().toLowerCase().compareTo( aFont.toLowerCase()) == 0)
+	  {
+	    itsSketchFontMenu = aCheckboxMenuItem;
+	    itsSelectedFontMenu = aCheckboxMenuItem;
+	    itsSketchFontMenu.setState( true);
+	    return;
+	  }
       }
-    }
   }
 	
-  //--------------------------------------------------------
-  //	GetSketchPad
-  //	returns the associated ErmesSketchPad
-  //--------------------------------------------------------
-  public ErmesSketchPad GetSketchPad(){
+  public ErmesSketchPad GetSketchPad()
+  {
     return itsSketchPad;
   }
   
-  public void keyTyped(KeyEvent e)
+  public void keyTyped( KeyEvent e)
   {
   }
 
-  public void keyReleased(KeyEvent e)
+  public void keyReleased( KeyEvent e)
   {
   }
 
@@ -718,7 +717,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     itsSketchPad.cleanAnnotations(); // MDC
 
     //arrows first:
-    if ( isAnArrow(aInt)) 
+    if ( isAnArrow( aInt)) 
       {
 	if (e.isShiftDown()) 
 	  {
@@ -730,11 +729,11 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	else if (e.isControlDown()) 
 	  {
 	    if (e.isMetaDown()) 
-	      itsSketchPad.alignSizeSelection(aInt);
+	      itsSketchPad.alignSizeSelection( aInt);
 	    else 
-	      itsSketchPad.resizeSelection(1, aInt);
-	      }
-	else if (e.isMetaDown()) 
+	      itsSketchPad.resizeSelection( 1, aInt);
+	  }
+	else if ( e.isMetaDown()) 
 	  {
 	    //align
 	    String where;
@@ -748,26 +747,24 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	    else 
 	      where = "Bottom";
 
-	    itsSketchPad.AlignSelectedObjects(where);
+	    itsSketchPad.AlignSelectedObjects( where);
 	  }
 	else 
-	  itsSketchPad.moveSelection(1, aInt);
+	  itsSketchPad.moveSelection( 1, aInt);
       }
-    else if(e.isControlDown()) 
+    else if (e.isControlDown()) 
       {
 	if (aInt == 90)
-	  itsSketchPad.showAnnotations("errdesc"); // z ??
-	else if(aInt == 65)
+	  itsSketchPad.showAnnotations( "errdesc"); // z ??
+	else if (aInt == 65)
 	  itsSketchPad.SelectAll();//a
-	else if(aInt == 69)
+	else if (aInt == 69)
 	  {//e
 	    if (itsSketchPad.GetRunMode()) 
-	      setRunMode(false);
+	      setRunMode( false);
 	    else 
-	      setRunMode(true);
+	      setRunMode( true);
 	  }
-	else if (aInt == 73) 
-	  inspectAction(); // i
 	else if (aInt == 47)
 	  {
 	    //ask help for the reference Manual for the selected element...
@@ -778,8 +775,8 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	  
 	    if (ErmesSketchPad.currentSelection.itsObjects.size() > 0)
 	      {
-		aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(0);
-		urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
+		aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt( 0);
+		urlToOpen = FtsReferenceURLTable.getReferenceURL( aObject.itsFtsObject);
 	    
 		if (urlToOpen != null)
 		  {
@@ -788,94 +785,101 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 			// Call the tcl browse function, with the URL as argument
 			// By default, the tcl browse function do nothing.
 			// if a user installed a browser package, this will show the documentation.
-			interp.eval("browse " + urlToOpen);
+			interp.eval( "browse " + urlToOpen);
 		      }
 		    catch (tcl.lang.TclException et)
 		      {
-			System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
+			System.out.println( "TCL error executing browse " + urlToOpen + " : " + interp.getResult());
 		      }
 		  }
 	      }   
 	  }
 	else
-	  super.keyPressed(e);
+	  super.keyPressed( e);
       } 
-    else if(aInt == 47)
-      {//this is a patch to trap the '?'
+    else if (aInt == 47)
+      {
 	//ask help for the selected element...
 	ErmesObject aObject = null;
       
-	for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements();) 
+	for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements(); )
 	  {
 	    aObject = (ErmesObject) en.nextElement();
 	
-	    FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
+	    FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject);
 	  }
       } 
-    // (fd) {
     else if ( keyEventClient != null)
       {
 	keyEventClient.keyPressed( e);
       }
     else if ( ( aInt == ircam.jmax.utils.Platform.DELETE_KEY)
-	     || ( aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY) )
+	      || ( aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY) )
       {
 	if (! itsSketchPad.GetEditField().HasFocus())
 	  itsSketchPad.DeleteSelected();
       }
-    // } (fd)
     else
       {
 	// Finally, if we don't redefine the key, call the superclass method that define the standard things.
-	super.keyPressed(e);
+	super.keyPressed( e);
       }
   }
 
-  public static boolean isAnArrow(int code) {
-    return (code == Platform.LEFT_KEY ||
-	     code == Platform.RIGHT_KEY ||
-	     code == Platform.UP_KEY ||
-	     code == Platform.DOWN_KEY 
-	     );
+  public static boolean isAnArrow( int code) 
+  {
+    return code == Platform.LEFT_KEY 
+      || code == Platform.RIGHT_KEY
+      || code == Platform.UP_KEY
+      || code == Platform.DOWN_KEY;
   }
 
-  public void Close(){
-    if (itsDocument.getRootData() != itsPatcher) {
-      itsPatcher.stopUpdates();
-      setVisible(false);
-    }
-    else {
-      if (ShouldSave()) {
-	FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsDocument);
-	aDialog.setLocation(300, 300);
-	aDialog.setVisible(true);
-	if(aDialog.GetNothingToDoFlag()) return;
-	if(aDialog.GetToSaveFlag()){
-	  Save();
-	}
-	aDialog.dispose();
+  public void Close()
+  {
+    if (itsDocument.getRootData() != itsPatcher) 
+      {
+	itsPatcher.stopUpdates();
+	setVisible( false);
       }
+    else 
+      {
+	if ( ShouldSave()) 
+	  {
+	    FileNotSavedDialog aDialog = new FileNotSavedDialog( this, itsDocument);
 
-      // Just call dispose on the document
-      // Mda will indirectly call Destroy,
-      // and will close all the other editors
+	    aDialog.setLocation( 300, 300);
+	    aDialog.setVisible( true);
 
-      itsDocument.dispose();
-    }
+	    if (aDialog.GetNothingToDoFlag()) 
+	      return;
+
+	    if (aDialog.GetToSaveFlag())
+	      Save();
+
+	    aDialog.dispose();
+	  }
+
+	// Just call dispose on the document
+	// Mda will indirectly call Destroy, and will close all the other editors
+
+	itsDocument.dispose();
+      }
   }
 
-  /** Method to close the editor (do not touch the patcher) */
+  // Method to close the editor (do not touch the patcher)
   void Destroy()
   {
-    setVisible(false);
+    setVisible( false);
     dispose();
   }
 
-  public boolean ShouldSave() {
+  public boolean ShouldSave()
+  {
     return (itsDocument.getRootData() == itsPatcher) && (! itsDocument.isSaved());
   }
 
-  public void Save() {
+  public void Save()
+  {
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
     // we should RECEIVE this FILE, or contruct it when we load this document
@@ -883,13 +887,12 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // The "canSave" method of a data tell if it can be saved
     // i.e. if it have a document , and if we can write to its document file
 
-    /* Change in semantic: now Save() is active *only* on root level patchers 
-       SHOULD BECOME Gray in the others
-     */
+    // Change in semantic: now Save() is active *only* on root level patchers 
+    // SHOULD BECOME Gray in the others
 
     if (itsDocument.getRootData() != itsPatcher)
       {
-	new ErrorDialog(this, "Only root patchers can be saved");
+	new ErrorDialog( this, "Only root patchers can be saved");
 	return;
       }
 
@@ -899,9 +902,9 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	  {
 	    itsDocument.save();
 	  }
-	catch (MaxDocumentException e)
+	catch ( MaxDocumentException e)
 	  {
-	    new ErrorDialog(this, e.getMessage());
+	    new ErrorDialog( this, e.getMessage());
 	  }
       }
     else
@@ -914,28 +917,26 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     if (itsDocument.getRootData() != itsPatcher)
       {
-	new ErrorDialog(this, "Only root patchers can be saved");
+	new ErrorDialog( this, "Only root patchers can be saved");
 	return;
       }
 
-    file = MaxFileChooser.chooseFileToSave(this, itsDocument.getDocumentFile());
+    file = MaxFileChooser.chooseFileToSave( this, itsDocument.getDocumentFile());
 
     if (file == null)
       return;
     else
-      itsDocument.bindToDocumentFile(file);
+      itsDocument.bindToDocumentFile( file);
 
-    //setVisible(false);
-    setTitle(file.toString()); 
-    // setVisible(true);
+    setTitle( file.toString()); 
 
     try
       {
 	itsDocument.save();
       }
-    catch (MaxDocumentException e)
+    catch ( MaxDocumentException e)
       {
-	new ErrorDialog(this, e.getMessage());
+	new ErrorDialog( this, e.getMessage());
       }
   }
 
@@ -943,7 +944,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   {
     File file;
 
-    file = MaxFileChooser.chooseFileToSave(this, itsDocument.getDocumentFile());
+    file = MaxFileChooser.chooseFileToSave( this, itsDocument.getDocumentFile());
 
     if (file == null)
       return;
@@ -953,280 +954,305 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	if (itsDocument.getRootData() == itsPatcher)
 	  {
 	    // Make a document save to
-
-	    itsDocument.saveTo(file);
+	    itsDocument.saveTo( file);
 	  }
 	else
 	  {
 	    // Make a subdocument save to
-
-	    itsDocument.saveSubDocumentTo(itsPatcher, file);
+	    itsDocument.saveSubDocumentTo( itsPatcher, file);
 	  }
       }
-    catch (MaxDocumentException e)
+    catch ( MaxDocumentException e)
       {
-	new ErrorDialog(this, e.getMessage());
+	new ErrorDialog( this, e.getMessage());
       }
   }
 
-  public void Print(){
-    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Patcher", MaxApplication.getProperties());
-    if(aPrintjob != null){
-      Graphics aPrintGraphics = aPrintjob.getGraphics();
-      if(aPrintGraphics != null){
-	//aPrintGraphics.setClip(0, 0, 400, 400);
-	itsSketchPad.printAll(aPrintGraphics);
-	aPrintGraphics.dispose();
+  public void Print()
+  {
+    PrintJob aPrintjob = getToolkit().getPrintJob( this, "Printing Patcher", MaxApplication.getProperties());
+
+    if (aPrintjob != null)
+      {
+	Graphics aPrintGraphics = aPrintjob.getGraphics();
+
+	if (aPrintGraphics != null)
+	  {
+	    itsSketchPad.printAll( aPrintGraphics);
+	    aPrintGraphics.dispose();
+	  }
+	aPrintjob.end();
       }
-      aPrintjob.end();
-    }
   }
 
-  private void FontsMenuAction(MenuItem theMenuItem, String theString) {
+  private void FontsMenuAction( MenuItem theMenuItem, String theString)
+  {
+    if (itsSelectedFontMenu!=null) 
+      itsSelectedFontMenu.setState( false);
     
-    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
-    
-    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchFontMenu=(CheckboxMenuItem) theMenuItem;
+    if (ErmesSketchPad.currentSelection.itsObjects.size() == 0)
+      itsSketchFontMenu=(CheckboxMenuItem) theMenuItem;
     
     itsSelectedFontMenu = (CheckboxMenuItem) theMenuItem;
     
-    if(ErmesSketchPad.currentSelection.itsObjects.size()==0)
-      itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
-    else itsSketchPad.ChangeNameFont(theString);
+    if (ErmesSketchPad.currentSelection.itsObjects.size()==0)
+      itsSketchPad.ChangeFont( new Font( theString, Font.PLAIN, itsSketchPad.sketchFontSize));
+    else
+      itsSketchPad.ChangeNameFont( theString);
     
-    itsSelectedFontMenu.setState(true);
+    itsSelectedFontMenu.setState( true);
   }
 
-  public void DeselectionUpdateMenu(){
-    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
+  public void DeselectionUpdateMenu()
+  {
+    if (itsSelectedFontMenu != null)
+      itsSelectedFontMenu.setState( false);
+
     itsSelectedFontMenu = itsSketchFontMenu;
-    itsSelectedFontMenu.setState(true);
-    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
+    itsSelectedFontMenu.setState( true);
+
+    if ( itsSelectedSizeMenu != null)
+      itsSelectedSizeMenu.setState( false);
     itsSelectedSizeMenu = itsSketchSizeMenu;
-    itsSelectedSizeMenu.setState(true);
-    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
+
+    itsSelectedSizeMenu.setState( true);
+    if (itsSelectedJustificationMenu != null)
+      itsSelectedJustificationMenu.setState( false);
     itsSelectedJustificationMenu = itsSketchJustificationMenu;
-    itsSelectedJustificationMenu.setState(true);
-    //itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
-    //itsSketchPad.itsSelectionRouting = itsSketchPad.doAutorouting;
+
+    itsSelectedJustificationMenu.setState( true);
   }
 
-  public void SelectionUpdateMenu(String theFont, Integer theSize, Integer theJustification){
+  public void SelectionUpdateMenu( String theFont, Integer theSize, Integer theJustification)
+  {
     CheckboxMenuItem aCheckItem = null;
-    int i;
-    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
-    if(theFont!=null){
-      for(i=0; i<itsFontsMenu.getItemCount(); i++){
-	aCheckItem = (CheckboxMenuItem)itsFontsMenu.getItem(i);
-	if(aCheckItem.getLabel().toLowerCase().equals(theFont)){
-	  itsSelectedFontMenu = aCheckItem;
-	  itsSelectedFontMenu.setState(true);
-	  break;
-	}
-      }
-    }
-    else itsSelectedFontMenu = null;
-    
-    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
-    if(theSize!=null){
-      for(i=0; i<itsSizesMenu.getItemCount(); i++){
-	aCheckItem = (CheckboxMenuItem)itsSizesMenu.getItem(i);
-	if(aCheckItem.getLabel().equals(theSize.toString())){
-	  itsSelectedSizeMenu = aCheckItem;
-	  itsSelectedSizeMenu.setState(true);
-	  break;
-	}
-      }
-    }
-    else itsSelectedSizeMenu = null;
 
-    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
-    if(theJustification!=null){
-      int aJust = theJustification.intValue();
-      if(aJust == ErmesSketchPad.CENTER_JUSTIFICATION){
-	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
-	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
-	  if(aCheckItem.getLabel().equals("Center")){
-	    itsSelectedJustificationMenu = aCheckItem;
-	    itsSelectedJustificationMenu.setState(true);
-	    break;
+    if (itsSelectedFontMenu != null)
+      itsSelectedFontMenu.setState( false);
+
+    if (theFont != null)
+      {
+	for( int i = 0; i < itsFontsMenu.getItemCount(); i++)
+	  {
+	    aCheckItem = (CheckboxMenuItem)itsFontsMenu.getItem( i);
+	    if (aCheckItem.getLabel().toLowerCase().equals( theFont))
+	      {
+		itsSelectedFontMenu = aCheckItem;
+		itsSelectedFontMenu.setState( true);
+		break;
+	      }
 	  }
-	}
       }
-      else if(aJust == ErmesSketchPad.LEFT_JUSTIFICATION){
-	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
-	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
-	  if(aCheckItem.getLabel().equals("Left")){
-	    itsSelectedJustificationMenu = aCheckItem;
-	    itsSelectedJustificationMenu.setState(true);
-	    break;
-	  }
-	}
-      }
-      else if(aJust == ErmesSketchPad.RIGHT_JUSTIFICATION){
-	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
-	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
-	  if(aCheckItem.getLabel().equals("Right")){
-	    itsSelectedJustificationMenu = aCheckItem;
-	    itsSelectedJustificationMenu.setState(true);
-	    break;
-	  }
-	}
-      }
-    }
-    else itsSelectedJustificationMenu = null;
+    else
+      itsSelectedFontMenu = null;
     
+    if (itsSelectedSizeMenu!=null)
+      itsSelectedSizeMenu.setState( false);
+
+    if (theSize != null)
+      {
+	for ( int i = 0; i < itsSizesMenu.getItemCount(); i++)
+	  {
+	    aCheckItem = (CheckboxMenuItem)itsSizesMenu.getItem( i);
+	    if (aCheckItem.getLabel().equals( theSize.toString()))
+	      {
+		itsSelectedSizeMenu = aCheckItem;
+		itsSelectedSizeMenu.setState( true);
+		break;
+	      }
+	  }
+      }
+    else
+      itsSelectedSizeMenu = null;
+
+    if (itsSelectedJustificationMenu != null)
+      itsSelectedJustificationMenu.setState( false);
+
+    if (theJustification != null)
+      {
+	int aJust = theJustification.intValue();
+	if (aJust == ErmesSketchPad.CENTER_JUSTIFICATION)
+	  {
+	    for ( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
+	      {
+		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
+		if (aCheckItem.getLabel().equals( "Center"))
+		  {
+		    itsSelectedJustificationMenu = aCheckItem;
+		    itsSelectedJustificationMenu.setState( true);
+		    break;
+		  }
+	      }
+	  }
+	else if (aJust == ErmesSketchPad.LEFT_JUSTIFICATION)
+	  {
+	    for( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
+	      {
+		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
+		if (aCheckItem.getLabel().equals( "Left"))
+		  {
+		    itsSelectedJustificationMenu = aCheckItem;
+		    itsSelectedJustificationMenu.setState( true);
+		    break;
+		  }
+	      }
+	  }
+	else if (aJust == ErmesSketchPad.RIGHT_JUSTIFICATION)
+	  {
+	    for( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
+	      {
+		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
+		if (aCheckItem.getLabel().equals( "Right")){
+		  itsSelectedJustificationMenu = aCheckItem;
+		  itsSelectedJustificationMenu.setState( true);
+		  break;
+		}
+	      }
+	  }
+      }
+    else
+      itsSelectedJustificationMenu = null;
   }
 
 
-  private void ExecutionMenuAction(MenuItem theMenuItem, String theString) {
+  private void ExecutionMenuAction( MenuItem theMenuItem, String theString) 
+  {
     ErmesObject aObject;
-    if (theString.equals("Run Mode Ctrl+E")) {
-      setRunMode(true);
-    }
-    else if (theString.equals("Edit Mode Ctrl+E")) {
-      setRunMode(false);
-    }
+    if (theString.equals( "Run Mode Ctrl+E")) 
+      setRunMode( true);
+    else if (theString.equals( "Edit Mode Ctrl+E")) 
+      setRunMode( false);
   }
   
-  private boolean SizesMenuAction(CheckboxMenuItem theMenuItem, int theFontSize) {
-    // UI action
-
-    if(itsSelectedSizeMenu != null)
-      itsSelectedSizeMenu.setState(false);
+  private boolean SizesMenuAction( CheckboxMenuItem theMenuItem, int theFontSize) 
+  {
+    if (itsSelectedSizeMenu != null)
+      itsSelectedSizeMenu.setState( false);
 
     itsSelectedSizeMenu = theMenuItem;
-    itsSelectedSizeMenu.setState(true);
+    itsSelectedSizeMenu.setState( true);
 
     //if we are here, a font size have been choosen from the FONT menu
-
-    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
+    if (ErmesSketchPad.currentSelection.itsObjects.size() ==0 )
+      itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
     
-    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) {
-      itsSketchPad.sketchFontSize = theFontSize;
-      itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), theFontSize));
-    }
-    else itsSketchPad.ChangeSizeFont(theFontSize);
+    if  (ErmesSketchPad.currentSelection.itsObjects.size() == 0) 
+      {
+	itsSketchPad.sketchFontSize = theFontSize;
+	itsSketchPad.ChangeFont( new Font( itsSketchPad.sketchFont.getName(), 
+					   itsSketchPad.sketchFont.getStyle(), 
+					   theFontSize));
+      }
+    else
+      itsSketchPad.ChangeSizeFont( theFontSize);
+
     return true;
   }
 
-  private boolean JustificationMenuAction(MenuItem theMenuItem, String theString) {
-    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
-    itsSketchPad.ChangeJustification(theString);
+  private boolean JustificationMenuAction( MenuItem theMenuItem, String theString) 
+  {
+    if (itsSelectedJustificationMenu != null)
+      itsSelectedJustificationMenu.setState( false);
+
+    itsSketchPad.ChangeJustification( theString);
     itsSelectedJustificationMenu = (CheckboxMenuItem)theMenuItem;
-    itsSelectedJustificationMenu.setState(true);
-    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchJustificationMenu = itsSelectedJustificationMenu;
+    itsSelectedJustificationMenu.setState( true);
+
+    if (ErmesSketchPad.currentSelection.itsObjects.size() == 0)
+      itsSketchJustificationMenu = itsSelectedJustificationMenu;
     return true;
   }
 
 
-  private boolean ResizeObjectMenuAction(MenuItem theMenuItem, int resize){
-    itsCurrentResizeMenu.setState(false);
-    itsSketchPad.ChangeResizeMode(resize);
+  private boolean ResizeObjectMenuAction( MenuItem theMenuItem, int resize)
+  {
+    itsCurrentResizeMenu.setState( false);
+    itsSketchPad.ChangeResizeMode( resize);
     itsCurrentResizeMenu = (CheckboxMenuItem)theMenuItem;
-    itsCurrentResizeMenu.setState(true);
+    itsCurrentResizeMenu.setState( true);
+
     return true;
   }
 
 	
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////focusListener --inizio
-  public void focusGained(FocusEvent e)
+  public void focusGained( FocusEvent e)
   {
-    ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    ErmesSketchPad.RequestOffScreen( itsSketchPad);
 
     Graphics g = getGraphics();
 
     if (g != null)
       {
-	itsSketchPad.update(g);
+	itsSketchPad.update( g);
 	g.dispose();
       }
   } 
 
-  public void focusLost(FocusEvent e){
-    
-    //?ErmesSketchPad.RequestOffScreen(itsSketchPad);
+  public void focusLost( FocusEvent e)
+  {
     itsSketchPad.itsScrolled = false;
   }
 
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////focusListener --fine
-  
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////WindowListener --inizio  
-
-  public void windowActivated(WindowEvent e){
+  public void windowActivated( WindowEvent e)
+  {
     requestFocus();
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////WindowListener --fine
 
-  //--------------------------------------------------------
-  //	paint
-  //--------------------------------------------------------
-  public void paint(Graphics g) {
-    super.paint(g);
-    //2203getContentPane().paintComponents(g);
+  public void paint( Graphics g)
+  {
+    super.paint( g);
   }
 
-  //--------------------------------------------------------
-  //	SetSnapToGrid
-  //--------------------------------------------------------
-  public void SetSnapToGrid(){
-    itsSketchPad.SetSnapToGrid();
-  }
-  
-  private MenuItem getRunModeMenuItem() {
+  private MenuItem getRunModeMenuItem() 
+  {
     return itsRunModeMenuItem;
   }
 
-  private MenuItem getSelectAllMenuItem() {
+  private MenuItem getSelectAllMenuItem() 
+  {
     return itsSelectAllMenuItem;
   }
 
-
-  public void setRunMode(boolean theRunMode) {
+  public void setRunMode( boolean theRunMode)
+  {
     ErmesObject aObject;
 
-    /** Store the mode in a non persistent, property of 
-      the patch, so that subpatcher can use it as their initial mode */
+    // Store the mode in a non persistent, property of 
+    // the patch, so that subpatcher can use it as their initial mode
     
-    itsPatcher.put("editMode", (theRunMode ? "run" : "edit"));
+    itsPatcher.put( "editMode", (theRunMode ? "run" : "edit"));
 
     itsChangingRunEditMode = true;
+
     MenuItem aRunEditItem = getRunModeMenuItem();
     MenuItem aSelectAllItem = getSelectAllMenuItem();
-    if(theRunMode)  
-      setBackground(Color.white);
-    else setBackground(ErmesSketchPad.sketchColor);
-    
-    itsSketchPad.SetRunMode(theRunMode);
-    
-    itsToolBar.setRunMode(theRunMode);
-    aSelectAllItem.setEnabled(!theRunMode);
 
-    itsRunModeMenuItem.setLabel(theRunMode ? "Edit Mode Ctrl+E" : "Run Mode Ctrl+E");
+    if (theRunMode)  
+      setBackground( Color.white);
+    else
+      setBackground( ErmesSketchPad.sketchColor);
+    
+    itsSketchPad.SetRunMode( theRunMode);
+    
+    itsToolBar.setRunMode( theRunMode);
+    aSelectAllItem.setEnabled( !theRunMode);
+
+    itsRunModeMenuItem.setLabel( theRunMode ? "Edit Mode Ctrl+E" : "Run Mode Ctrl+E");
     setKeyEventClient( null); //when changing mode, always remove key listeners
     requestFocus();
   }
 
-  //--------------------------------------------------------
-  // minimumSize()
-  //--------------------------------------------------------
-  public Dimension getMinimumSize() {
-      return getPreferredSize();//(depending on the layout manager).
-    }
+  public Dimension getMinimumSize() 
+  {
+    return getPreferredSize();
+  }
   
-  //--------------------------------------------------------
-  // preferredSize()
-  //--------------------------------------------------------
-  public Dimension getPreferredSize() {
-      return preferredsize;
+  public Dimension getPreferredSize()
+  {
+    return preferredsize;
   }
 
-  // (fd) {
   public void setKeyEventClient( KeyEventClient keyEventClient)
   {
     if ( this.keyEventClient != null && this.keyEventClient != keyEventClient)
@@ -1237,23 +1263,19 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (this.keyEventClient != null)
       this.keyEventClient.keyInputGained();
   }
-  // } (fd)
-
 
   // More window listening primitives
 
-  public void windowIconified(WindowEvent e)
+  public void windowIconified( WindowEvent e)
   {
-    // Do the test because the awt can call this before
-    // itsPatcher is ready
+    // Do the test because the awt can call this before itsPatcher is ready
     if (itsPatcher != null)
       itsPatcher.stopUpdates();
   }       
 
-  public void windowDeiconified(WindowEvent e){}
+  public void windowDeiconified( WindowEvent e)
   {
-    // Do the test because the awt can call this before
-    // itsPatcher is ready
+    // Do the test because the awt can call this before itsPatcher is ready
     if (itsPatcher != null)
       itsPatcher.startUpdates();
   }       

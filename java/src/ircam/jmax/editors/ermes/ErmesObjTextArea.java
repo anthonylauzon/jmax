@@ -2,249 +2,268 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import ircam.jmax.utils.*;
 
-/**
- * The text area contained in a "comment" object (ErmesObjComment)
- */
-class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
-  static String filler = " ";
+//
+// The text area contained in a "comment" object (ErmesObjComment)
+//
+class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
+
   ErmesObjComment itsOwner = null;
   ErmesSketchPad itsSketchPad = null;
   boolean focused = false;
-  int DEFAULT_COLS = 20;
   
-  //--------------------------------------------------------
-  // CONSTRUCTOR
-  //--------------------------------------------------------
-  ErmesObjTextArea(ErmesSketchPad theSketchPad) {
-    super(" ", 5, 20, TextArea.SCROLLBARS_NONE);
-    setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME,Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));
-    setEditable(true);
+  ErmesObjTextArea( ErmesSketchPad theSketchPad) 
+  {
+    super( " ", 5, 20, TextArea.SCROLLBARS_NONE);
+    setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME,Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));
+    setEditable( true);
     selectAll();
     itsSketchPad = theSketchPad;
     focused = true;
     
-    addKeyListener(this);
-    addFocusListener(this);
+    addKeyListener( this);
+    addFocusListener( this);
   }
 
-  public void AbortEdit(){
-    setVisible(false);
-    setLocation(-200,-200);
+  public void AbortEdit()
+  {
+    setVisible( false);
+    setLocation( -200,-200);
     focused = false;
     
-    if(itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
-    else itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-    //itsOwner.itsInEdit = false;
+    if( itsSketchPad.itsToolBar.locked) 
+      itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
+    else
+      itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
 
-    if (itsSketchPad != null)
-      itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    if ( itsSketchPad != null)
+      itsOwner.Paint( itsSketchPad.GetOffGraphics());
 
     Graphics g = itsSketchPad.getGraphics();
-    itsSketchPad.CopyTheOffScreen(g);
+    itsSketchPad.CopyTheOffScreen( g);
     g.dispose();
 
     itsOwner = null;  
   }
 
-  //--------------------------------------------------------
-  // lostFocus
-  //--------------------------------------------------------
-  public void LostFocus() {
-    if (!focused) return;
-    else {
-      focused = false;
-      itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-      itsSketchPad.itsSketchWindow.requestFocus();
-    }
+  public void LostFocus() 
+  {
+    if ( !focused) 
+      return;
+
+    focused = false;
+    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    itsSketchPad.itsSketchWindow.requestFocus();
+
     //try to test if this lost foscus happens in the following conditions:
     // an object was put on the sketchpad without writing into it
     // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
-    if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
-      AbortEdit();
-      return; 
-    }
+    if ( aTextString.compareTo( "") == 0 || aTextString.compareTo( " ") == 0) 
+      {
+	AbortEdit();
+	return; 
+      }
+
     //try to test if the object was already instantiated; in case, delete the object... (how?)
     
     //qui si prova a togliere gli spazi in fondo dalla parola....
     aTextString = aTextString.trim();
     
-    if (itsOwner == null) return; //this happens when the instatiation fails
+    if ( itsOwner == null) 
+      return; //this happens when the instatiation fails
     
     itsOwner.itsArgs = aTextString;
-    itsOwner.ParseText(aTextString);
+    itsOwner.ParseText( aTextString);
     itsOwner.redefineFtsObject();
     
-    itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
+    itsOwner.UpdateOnly( itsSketchPad.GetOffGraphics());
 
-    int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
+    int length = getFontMetrics( getFont()).stringWidth( itsOwner.itsMaxString);
     
-    if((lenght< getSize().width-20)/*#@!&&(!itsOwner.itsResized)*/){
-      Dimension d1 = itsOwner.Size();
-      d1.width = lenght+10;
-      itsOwner.setSize(d1.width, d1.height);
-    }
-    int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
-    if((height< getSize().height-10)/*&&(!itsOwner.itsResized)*/){
-      Dimension d1 = itsOwner.Size();
-      d1.height = height;
-      itsOwner.setSize(d1.width, d1.height);
-    }
+    if( ( length < getSize().width - 20) )
+      {
+	Dimension d1 = itsOwner.Size();
+	d1.width = length+10;
+	itsOwner.setSize( d1.width, d1.height);
+      }
+
+    int height = getFontMetrics(getFont()).getHeight() * itsOwner.itsParsedTextVector.size();
+
+    if( (height < getSize().height - 10))
+      {
+	Dimension d1 = itsOwner.Size();
+	d1.height = height;
+	itsOwner.setSize( d1.width, d1.height);
+      }
     
-    itsOwner.ResizeToText(0,0);
+    itsOwner.ResizeToText( 0,0);
     
-    //itsOwner.Repaint();
-   
     AbortEdit();
 
-    setRows(5);
-    setColumns(20);
+    setRows( 5);
+    setColumns( 20);
   }
 	
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////focusListener --inizio
-  public void focusGained(FocusEvent e){
+  public void focusGained( FocusEvent e)
+  {
     itsSketchPad.editStatus = ErmesSketchPad.EDITING_COMMENT;
-    if (focused) return;
-    else focused = true;
+    if ( !focused)
+      focused = true;
   }
 
-  public void focusLost(FocusEvent e){}
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////focusListener --fine
+  public void focusLost( FocusEvent e)
+  {
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio
-  public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-  public void keyPressed(KeyEvent e){
-    int lenght;
+  public void keyTyped( KeyEvent e)
+  {
+  }
+
+  public void keyReleased( KeyEvent e)
+  {
+  }
+
+  public void keyPressed( KeyEvent e)
+  {
     String s1, s2;
     int start = getSelectionStart();
     int end = getSelectionEnd();
     String s = getText();
-    FontMetrics fm = getFontMetrics(getFont());
+    FontMetrics fm = getFontMetrics( getFont());
     int aWidth = 0;
     int aCurrentLineWidth = 0;
     int aCurrentLineChars = 0;
     
-    if (isEditable()) {
-      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
-	itsOwner.itsTextRowNumber++;
-	if((itsOwner.itsTextRowNumber>4)||(getRows()<=5)){
-	  setRows(getRows()+1);
-	  Dimension d2 = itsOwner.Size();
-	  itsOwner.setSize(d2.width, d2.height+fm.getHeight());
-	  setSize(getSize().width, getSize().height + fm.getHeight());
-	  requestFocus();
-	}
-	return;
-      }
-      else if((e.getKeyCode()==37)||(e.getKeyCode()==38)||(e.getKeyCode()==39)||(e.getKeyCode()==40))//frecce
-	return;
-      else{//scrittura
-	aCurrentLineChars = GetCurrentLineChars(s);//s.length() - itsOldLineChars;
-	if(aCurrentLineChars+10 > getColumns())
-	  setColumns(getColumns()+20);
-
-	char k = e.getKeyChar();
-	if(start!=end){//cancella selezione
-	  if(!e.isShiftDown()){
-	    s1 = s.substring(0, start);
-	    s2 = s.substring(end, s.length());
-	    s = s1+s2;
+    if ( isEditable()) 
+      {
+	if( e.getKeyCode() == ircam.jmax.utils.Platform.ENTER_KEY
+	    || e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
+	  {//return
+	    itsOwner.itsTextRowNumber++;
+	    if( (itsOwner.itsTextRowNumber > 4) || ( getRows() <= 5))
+	      {
+		setRows( getRows()+1);
+		Dimension d2 = itsOwner.Size();
+		itsOwner.setSize( d2.width, d2.height + fm.getHeight());
+		setSize( getSize().width, getSize().height + fm.getHeight());
+		requestFocus();
+	      }
+	    return;
 	  }
-	}
-	if(start < s.length()){//inserisce testo intermedio
-	  s1 = s.substring(0, start);
-	  s2 = s.substring(start, s.length());
-	  s = s1+k+s2;
-	}
-	else//inserisce testo in coda
-	  s = s+k;
+	else if( (e.getKeyCode() == 37) || (e.getKeyCode() == 38) 
+		 || (e.getKeyCode() == 39) || (e.getKeyCode() == 40))
+	  return;
+	else
+	  {//scrittura
+	    aCurrentLineChars = GetCurrentLineChars( s);
+	    if( aCurrentLineChars + 10 > getColumns())
+	      setColumns( getColumns() + 20);
+
+	    char k = e.getKeyChar();
+
+	    if( start != end)
+	      {//cancella selezione
+		if( !e.isShiftDown())
+		  {
+		    s1 = s.substring( 0, start);
+		    s2 = s.substring( end, s.length());
+		    s = s1+s2;
+		  }
+	      }
+	    if( start < s.length())
+	      {//inserisce testo intermedio
+		s1 = s.substring( 0, start);
+		s2 = s.substring( start, s.length());
+		s = s1 + k + s2;
+	      }
+	    else//inserisce testo in coda
+	      s = s+k;
 	
-	aCurrentLineWidth = GetCurrentLineWidth(fm, s);//fm.stringWidth(s)-itsOldLineWidth;
-	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	if (aCurrentLineWidth >= getSize().width-5) {  
-	  int step;
-	  if(aWidth>20) step = aWidth;
-	  else step = 30;
+	    aCurrentLineWidth = GetCurrentLineWidth( fm, s);//fm.stringWidth( s)-itsOldLineWidth;
+	    aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
+	    if ( aCurrentLineWidth >= getSize().width - 5) 
+	      {
+		int step;
+		if( aWidth > 20) 
+		  step = aWidth;
+		else
+		  step = 30;
   
-	  itsOwner.setSize(itsOwner.Size().width+step, itsOwner.Size().height);
-	  setSize(getSize().width+step, getSize().height);
-	  requestFocus();
-	} 
+		itsOwner.setSize( itsOwner.Size().width + step, itsOwner.Size().height);
+		setSize( getSize().width + step, getSize().height);
+		requestFocus();
+	      } 
+	  }
       }
-    }
   }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// keyListener --fine
   
-  public int GetCurrentLineWidth(FontMetrics fm, String theString){
+  public int GetCurrentLineWidth( FontMetrics fm, String theString)
+  {
     int aPos = getCaretPosition();
-    int aIndex = theString.indexOf("\n");
+    int aIndex = theString.indexOf( "\n");
     int aOldIndex = -1;
-    while((aIndex!=-1)&&(aIndex<aPos)){
-      aOldIndex = aIndex;
-      aIndex = theString.indexOf("\n", aOldIndex+1);
-    } 
-    if(aIndex==-1){
-      if(aOldIndex==-1) return fm.stringWidth(theString);
-      else return fm.stringWidth(theString.substring(aOldIndex));
-    }
-    else {
-      if(aOldIndex==-1) return fm.stringWidth(theString.substring(0,aIndex));
-      else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
-    }
+
+    while( (aIndex != -1) && (aIndex < aPos))
+      {
+	aOldIndex = aIndex;
+	aIndex = theString.indexOf( "\n", aOldIndex + 1);
+      } 
+
+    if( aIndex == -1)
+      {
+	if (aOldIndex == -1) 
+	  return fm.stringWidth( theString);
+	else 
+	  return fm.stringWidth( theString.substring( aOldIndex));
+      }
+    else 
+      {
+	if( aOldIndex==-1) 
+	  return fm.stringWidth( theString.substring( 0,aIndex));
+	else 
+	  return fm.stringWidth( theString.substring( aOldIndex, aIndex));
+      }
   }  
   
-  public int GetCurrentLineChars(String theString){
+  public int GetCurrentLineChars( String theString)
+  {
     int aPos = getCaretPosition();
-    int aIndex = theString.indexOf("\n");
+    int aIndex = theString.indexOf( "\n");
     int aOldIndex = -1;
-    while((aIndex!=-1)&&(aIndex<aPos)){
-      aOldIndex = aIndex;
-      aIndex = theString.indexOf("\n", aOldIndex+1);
-    } 
-    if(aIndex==-1){
-      if(aOldIndex==-1) return theString.length();
-      else return theString.length()-aOldIndex;
-    }
-    else{
-      if(aOldIndex==-1) return aIndex;
-      else return aIndex-aOldIndex;
-    }
+
+    while ( (aIndex != -1) && (aIndex < aPos))
+      {
+	aOldIndex = aIndex;
+	aIndex = theString.indexOf( "\n", aOldIndex + 1);
+      } 
+    if (aIndex == -1)
+      {
+	if (aOldIndex == -1)
+	  return theString.length();
+	else
+	  return theString.length() - aOldIndex;
+      }
+    else
+      {
+	if (aOldIndex == -1) 
+	  return aIndex;
+	else
+	  return aIndex - aOldIndex;
+      }
   }
 
-  //--------------------------------------------------------
-  // minimumSize()
-  //--------------------------------------------------------
-  public Dimension getMinimumSize() {
+  public Dimension getMinimumSize() 
+  {
     Dimension r = itsOwner.getPreferredSize();
-    Dimension d = new Dimension(r.width-2, r.height-2);
+    Dimension d = new Dimension( r.width - 2, r.height - 2);
     return d;
   }
 
-  //--------------------------------------------------------
-  // preferredSize()
-  //--------------------------------------------------------
-  public Dimension getPreferredSize() {
+  public Dimension getPreferredSize() 
+  {
     return getMinimumSize();
   }    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

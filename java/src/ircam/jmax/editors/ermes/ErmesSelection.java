@@ -6,53 +6,57 @@ import java.util.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
-/**
- * A class representing a selection in Ermes, with its associated FtsSelection
- * object.
- * Some implementation choices:
- * 1) the class does not derives from MaxVector (the simplest solution) because
- * of the insertElementAt() problem: public this function is infact "final".
- * 2) This class is then a wrapper (redefinition) of a set of methods of Vector
- */
+//
+// A class representing a selection in Ermes, with its associated FtsSelection
+// object.
+// Some implementation choices:
+// 1) the class does not derives from MaxVector (the simplest solution) because
+// of the insertElementAt() problem: public this function is infact "final".
+// 2) This class is then a wrapper (redefinition) of a set of methods of Vector
+//
 public class ErmesSelection {
   public MaxVector itsObjects = new MaxVector();
   public MaxVector itsConnections = new MaxVector();
   FtsSelection itsFtsSelection;
 
-  public ErmesSelection(FtsSelection theFtsSelection) {
+  public ErmesSelection( FtsSelection theFtsSelection) 
+  {
     itsFtsSelection = theFtsSelection;
   }
 
-  public void addObject(Object theObject) {
-    //System.err.println("add the object in pos."+((ErmesObject)theObject).itsX+" "+((ErmesObject)theObject).itsY);
-    itsObjects.addElement(theObject);
-    itsFtsSelection.addObject(((ErmesObject)theObject).itsFtsObject);
+  public void addObject( Object theObject) 
+  {
+    itsObjects.addElement( theObject);
+    itsFtsSelection.addObject( ((ErmesObject)theObject).itsFtsObject);
   }
 
-  public void addConnection(Object theConnection) {
-    itsConnections.addElement(theConnection);
-    itsFtsSelection.addConnection(((ErmesConnection)theConnection).itsFtsConnection);
+  public void addConnection( Object theConnection) 
+  {
+    itsConnections.addElement( theConnection);
+    itsFtsSelection.addConnection( ((ErmesConnection)theConnection).itsFtsConnection);
   }
 
-  public void removeObject(Object theObject) {
-    itsObjects.removeElement(theObject);
-    itsFtsSelection.removeObject(((ErmesObject)theObject).itsFtsObject);
+  public void removeObject( Object theObject) 
+  {
+    itsObjects.removeElement( theObject);
+    itsFtsSelection.removeObject( ((ErmesObject)theObject).itsFtsObject);
   }
 
-  public void removeConnection(Object theConnection) {
-    itsConnections.removeElement(theConnection);
-    itsFtsSelection.removeConnection(((ErmesConnection)theConnection).itsFtsConnection);
+  public void removeConnection( Object theConnection) 
+  {
+    itsConnections.removeElement( theConnection);
+    itsFtsSelection.removeConnection( ((ErmesConnection)theConnection).itsFtsConnection);
   }
 
-  public void removeAllElements() {
+  public void removeAllElements() 
+  {
     itsObjects.removeAllElements();
     itsConnections.removeAllElements();
     itsFtsSelection.clean();
   }
 
-  public boolean isEmpty() {
+  public boolean isEmpty() 
+  {
     return itsObjects.isEmpty() && itsConnections.isEmpty();
   }
 }
-
-
