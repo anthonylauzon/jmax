@@ -32,6 +32,8 @@
 #include "eventtrk.h"
 #include "seqref.h"
 
+static fts_symbol_t sym_question = 0;
+
 typedef struct _seqfind_
 {
   seqref_t o; /* sequence reference object */
@@ -63,14 +65,16 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	{
 	  int i;
 
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
+	  event_get_atoms(event, &n_atoms, atoms);
 	      
 	  if(ac > n_atoms)
 	    ac = n_atoms;
 
 	  for(i=0; i<ac; i++)
 	    {
-	      if(fts_is_int(at + i) && fts_is_float(atoms + i) && fts_get_int(at + i) == (int)fts_get_float(atoms + i))
+	      if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == sym_question)
+		continue;
+	      else if(fts_is_int(at + i) && fts_is_float(atoms + i) && fts_get_int(at + i) == (int)fts_get_float(atoms + i))
 		continue;
 	      else if(fts_is_float(at + i) && fts_is_int(atoms + i) && fts_get_float(at + i) == (float)fts_get_int(atoms + i))
 		continue;
@@ -144,5 +148,6 @@ seqfind_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 seqfind_config(void)
 {
+  sym_question = fts_new_symbol("?");
   fts_metaclass_install(fts_new_symbol("seqfind"), seqfind_instantiate, fts_arg_type_equiv);
 }

@@ -217,6 +217,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "slider",  "_slider_", path+"cursor_slider.gif","Adding New Slider");
     addButton( "intbox",   "_intbox_", path+"cursor_integer.gif", "Adding New Integer Box");
     addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
+    addButton( "display", "_display_", path+"cursor_comment.gif", "Adding New Display Box");
     AddPopUp.initDone();//????
   }
 

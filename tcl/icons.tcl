@@ -45,6 +45,7 @@ declareIcon _toggle_            $jmaxRootDir/images/tool_toggle.gif
 declareIcon _slider_            $jmaxRootDir/images/tool_slider.gif
 declareIcon _intbox_            $jmaxRootDir/images/tool_int.gif
 declareIcon _floatbox_          $jmaxRootDir/images/tool_float.gif
+declareIcon _display_           $jmaxRootDir/images/tool_display.gif
 declareIcon _lock_mode_         $jmaxRootDir/images/tool_lock_mode.gif
 declareIcon _edit_mode_         $jmaxRootDir/images/tool_edit_mode.gif
 declareIcon _up_                $jmaxRootDir/images/tool_up.gif

@@ -43,6 +43,7 @@
 (declare-icon "_slider_"            (string-append jmax-image-root "tool_slider.gif"))
 (declare-icon "_intbox_"            (string-append jmax-image-root "tool_int.gif"))
 (declare-icon "_floatbox_"          (string-append jmax-image-root "tool_float.gif"))
+(declare-icon "_display_"              (string-append jmax-image-root "tool_display.gif"))
 (declare-icon "_lock_mode_"         (string-append jmax-image-root "tool_lock_mode.gif"))
 (declare-icon "_edit_mode_"         (string-append jmax-image-root "tool_edit_mode.gif"))
 (declare-icon "_up_"                (string-append jmax-image-root "tool_up.gif"))
