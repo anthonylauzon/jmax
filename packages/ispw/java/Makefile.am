@@ -25,11 +25,18 @@ JAR_DEP= \
 
 CLEANFILES=$(JARFILE)
 
+JAR=@JAR@
+JAR_SUPPORT_UPDATE=@JAR_SUPPORT_UPDATE@
+
 $(JARFILE): $(JAR_DEP)	
-	if test -f $(JARFILE); then \
-		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` `find . -name "*.gif" -newer $(JARFILE)` ; \
+	if test "$(JAR_SUPPORT_UPDATE)" = "yes"; then \
+		if test -f $(JARFILE); then \
+			$(JAR) -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` `find . -name "*.gif" -newer $(JARFILE)` ; \
+		else \
+			$(JAR) -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
+		fi \
 	else \
-		jar -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
+		$(JAR) -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
 	fi
 
 install-data-hook:
