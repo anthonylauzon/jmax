@@ -30,7 +30,7 @@ VENDOR := sgi
 OS_TYPE := unix
 PLATFORM := sgi
 
-SYS_PACKAGES="sgidev pdtddev"
+SYS_PACKAGES=sgidev pdtddev
 
 CC := cc
 LD := cc
