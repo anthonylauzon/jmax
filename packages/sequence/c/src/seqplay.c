@@ -162,6 +162,7 @@ seqplay_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       seqplay_position(this, this->begin);
       seqplay_go(this);
+      this->status = status_looping;
     }
   else
     {
@@ -341,6 +342,7 @@ static void
 seqplay_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
+  enum seqplay_status status = this->status;
   double time = 0.0;
   
   if(fts_is_number(at))
@@ -351,6 +353,12 @@ seqplay_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   seqplay_position(this, time);
 
+  if(status >= status_playing)
+  {
+    seqplay_go(this);
+    this->status = status;
+  }
+  
   /* show located position */
   if(this->track)
       track_highlight_time(this->track, time);
@@ -530,15 +538,16 @@ seqplay_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(seqplay_t), seqplay_init, seqplay_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("locate"), seqplay_jump);
-  fts_class_message_varargs(cl, fts_new_symbol("play"),   seqplay_play);
-  fts_class_message_varargs(cl, fts_new_symbol("start"),  seqplay_play);
-  fts_class_message_varargs(cl, fts_new_symbol("stop"),   seqplay_stop);
-  fts_class_message_varargs(cl, fts_new_symbol("pause"),  seqplay_pause);
-  fts_class_message_varargs(cl, fts_new_symbol("loop"),   seqplay_loop);
+  fts_class_message_varargs(cl, fts_new_symbol("jump"), seqplay_jump);
+  fts_class_message_varargs(cl, fts_new_symbol("play"), seqplay_play);
+  fts_class_message_varargs(cl, fts_new_symbol("start"), seqplay_play);
+  fts_class_message_varargs(cl, fts_new_symbol("stop"), seqplay_stop);
+  fts_class_message_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
+  fts_class_message_varargs(cl, fts_new_symbol("loop"), seqplay_loop);
 
-  fts_class_message_varargs(cl, fts_new_symbol("begin"),  seqplay_set_begin);
-  fts_class_message_varargs(cl, fts_new_symbol("end"),    seqplay_set_end);
-  fts_class_message_varargs(cl, fts_new_symbol("speed"),  seqplay_set_speed);
+  fts_class_message_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
+  fts_class_message_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
+  fts_class_message_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
 
   fts_class_message_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
   fts_class_message_varargs(cl, fts_s_set, seqplay_set);

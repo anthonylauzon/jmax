@@ -337,7 +337,7 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     
   if(this->port)
     {    
-      if(this->number == midi_channel_any)
+      if(this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_output);
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_output); 
@@ -360,7 +360,7 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->port)
     {    
-      if(this->number == midi_channel_any)
+      if(this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_output);
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_output); 
@@ -383,7 +383,7 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
   if(this->port)
     {    
-      if(this->number == midi_channel_any)
+      if(this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_output);
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_channel_output); 
@@ -406,7 +406,7 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->port)
     {    
-      if(this->number == midi_channel_any)
+      if(this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_output);
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_channel_output); 

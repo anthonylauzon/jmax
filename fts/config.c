@@ -62,28 +62,27 @@ config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   /* send message restore_labels to audio config and midi config */
   fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at);
   fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
-
 }
 
 void
 fts_config_open(fts_symbol_t file_name)
 {
-  fts_object_t* obj = NULL;
+  fts_config_t *config = NULL;
   
-  fts_bmax_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0, &obj);
+  fts_bmax_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0, (fts_object_t **)&config);
   
-  if (obj != NULL && fts_object_get_class(obj) == config_type)
+  if (config != NULL && fts_object_get_class((fts_object_t *)config) == config_type)
   {
-    ((fts_config_t*)obj)->file_name = file_name;
+    config->file_name = file_name;
     
     /* replace current config by loaded config */
-    fts_config_set((fts_config_t*)obj);
+    fts_config_set(config);
     fts_log("[config]: Opening configuration %s\n", file_name);
   }
   else
-  {
     fts_log("[config]: Cannot read AUDIO/MIDI configuration from file %s\n", file_name);
-  }
+
+  fts_midiconfig_set_defaults(config->midi_config);
 }
 
 static void
@@ -91,14 +90,13 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fts_config_t* self = (fts_config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
-  fts_object_t* obj = NULL;
-  char path[MAXPATHLEN];
 
   fts_log("[config] load file %s\n", file_name);
   fts_config_open(file_name);
+
   /* @@@@@ upload config @@@@@ */
   self->uploaded = 0;
-  fts_send_message(fts_config_get(), fts_s_openEditor,0, NULL);
+  fts_send_message(o, fts_s_openEditor,0, NULL);
 }
 
 static void
@@ -377,8 +375,6 @@ fts_config_get(void)
 
 void fts_config_config(void)
 {
-  fts_atom_t a;
-
   config_s_name = fts_new_symbol("__config");
 
   /* Configuration class */

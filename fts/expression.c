@@ -547,11 +547,12 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     if (!fts_is_object( at))
       return operand_type_mismatch_error;
 
-    if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac-1, at+1) ||
-       fts_is_void( fts_get_return_value()))
+    fts_set_void( fts_get_return_value());
+
+    if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac-1, at+1) || fts_is_void( fts_get_return_value()))
       return element_access_error;
 
-    fts_atom_refer(fts_get_return_value());
+      fts_atom_refer(fts_get_return_value());
 
     expression_stack_pop_frame( exp);
     expression_stack_push( exp, fts_get_return_value());

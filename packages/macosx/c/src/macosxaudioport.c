@@ -214,7 +214,7 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
     int val;
     read(sched_pipe_des[0], &val, sizeof(int));
   }
-  
+
   fts_log( "[macosxaudioport] RESTART FTS SCHEDULER \n");
   self->halted = 0;
   /* @@@@ Need to stop audio device ? @@@@@ */

@@ -358,38 +358,46 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
   int pitch = scoob_get_pitch(scoob);
+  int velocity = scoob_get_velocity(scoob);
+  int channel = scoob_get_channel(scoob);
   double off_time = time + scoob_get_duration(scoob);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
   event_t *off = track_get_first(data->free_track);
 
-  fts_midifile_write_channel_message(file, time_in_ticks, midi_note, 0, pitch, 64);
+  if(channel == 0)
+    channel = 1;
+
+  if(velocity == 0)
+    velocity = 64;
+  
+  fts_midifile_write_channel_message(file, time_in_ticks, midi_note, channel, pitch, velocity);
   data->size++;
 
   /* schedule note off */
   if(off)
-    {
-      /* prevent free event being destroyed when moved to off_track */
-      fts_object_refer(off);
+  {
+    /* prevent free event being destroyed when moved to off_track */
+    fts_object_refer(off);
 
-      /* set pitch and move free event to off track */
-      event_set_int(off, pitch);
-      track_remove_event(data->free_track, off);
-      track_add_event(data->off_track, off_time, off);
+    /* set pitch and move free event to off track */
+    event_set_int(off, (pitch << 8) + channel);
+    track_remove_event(data->free_track, off);
+    track_add_event(data->off_track, off_time, off);
 
-      /* remove reference */
-      fts_object_release(off);
-    }
+    /* remove reference */
+    fts_object_release(off);
+  }
   else
-    {
-      fts_atom_t a;
+  {
+    fts_atom_t a;
 
-      /* create new event */
-      fts_set_int(&a, pitch);
-      off = (event_t *)fts_object_create(event_class, 1, &a);
+    /* create new event */
+    fts_set_int(&a, pitch);
+    off = (event_t *)fts_object_create(event_class, 1, &a);
 
-      /* add event to note on track */
-      track_add_event(data->off_track, off_time, off);
-    }  
+    /* add event to note on track */
+    track_add_event(data->off_track, off_time, off);
+  }
 }
 
 /* write all pending note offs until given time */
@@ -402,10 +410,11 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
   while(off && event_get_time(off) <= time)
     {
       long off_time_in_ticks = fts_midifile_time_to_ticks(file, event_get_time(off));
-      int off_pitch = event_get_int(off);
+      int off_pitch = event_get_int(off) >> 8;
+      int off_channel = event_get_int(off) & 0xff;
       
       /* write note off */
-      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, 0, off_pitch, 0);
+      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, off_channel, off_pitch, 0);
       data->size++;
 
       /* prevent off event being destroyed when moved to free_track */
@@ -436,7 +445,6 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
     {
       seqmidi_write_data_t data;
       event_t *event;
-      fts_atom_t a[1];
       
       fts_midifile_set_user_data(file, &data);
       
@@ -444,9 +452,8 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
       data.size = 0;
       
       /* create dummy track for creating note offs */
-      fts_set_symbol(a, seqsym_export_midifile);  
-      data.off_track = (track_t *)fts_object_create(track_class, 1, a);
-      data.free_track = (track_t *)fts_object_create(track_class, 1, a);
+      data.off_track = (track_t *)fts_object_create(track_class, 0, 0);
+      data.free_track = (track_t *)fts_object_create(track_class, 0, 0);
       
       /* write file header */
       fts_midifile_write_header(file, 0, 1, 384);

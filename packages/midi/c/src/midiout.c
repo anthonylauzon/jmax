@@ -131,7 +131,7 @@ static void
 noteout_all_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiout_t *this = (midiout_t *)o;
-  int channel = 0;
+  int channel = -1;
 
   if(ac > 0 && fts_is_number(at))
     channel = fts_get_number_int(at);
@@ -386,7 +386,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   midiout_t *this = (midiout_t *)o;
 
   this->port = NULL;
-  this->channel = 0;
+  this->channel = 1;
   this->number = 0;
 
   if(ac > 0 && fts_is_symbol(at)) 
@@ -428,15 +428,9 @@ noteout_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("off"), noteout_all_off);
 
-  fts_class_inlet_int(cl, 0, noteout_send);
-  fts_class_inlet_float(cl, 0, noteout_send);
   fts_class_inlet_varargs(cl, 0, noteout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_number);
-  fts_class_inlet_float(cl, 1, midiout_set_number);
-  
-  fts_class_inlet_int(cl, 2, midiout_set_channel);
-  fts_class_inlet_float(cl, 2, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_number);  
+  fts_class_inlet_number(cl, 2, midiout_set_channel);
 }
 
 static void
@@ -444,15 +438,9 @@ polyout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
-  fts_class_inlet_int(cl, 0, polyout_send);
-  fts_class_inlet_float(cl, 0, polyout_send);
-  fts_class_inlet_varargs(cl, 0, polyout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_number);
-  fts_class_inlet_float(cl, 1, midiout_set_number);
-  
-  fts_class_inlet_int(cl, 2, midiout_set_channel);
-  fts_class_inlet_float(cl, 2, midiout_set_channel);
+  fts_class_inlet_varargs(cl, 0, polyout_send);  
+  fts_class_inlet_number(cl, 1, midiout_set_number);
+  fts_class_inlet_number(cl, 2, midiout_set_channel);
 }
 
 static void
@@ -460,15 +448,9 @@ ctlout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
-  fts_class_inlet_int(cl, 0, ctlout_send);
-  fts_class_inlet_float(cl, 0, ctlout_send);
   fts_class_inlet_varargs(cl, 0, ctlout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_number);
-  fts_class_inlet_float(cl, 1, midiout_set_number);
-  
-  fts_class_inlet_int(cl, 2, midiout_set_channel);
-  fts_class_inlet_float(cl, 2, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_number);
+  fts_class_inlet_number(cl, 2, midiout_set_channel);
 }
 
 static void
@@ -476,12 +458,8 @@ pgmout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
-  fts_class_inlet_int(cl, 0, pgmout_send);
-  fts_class_inlet_float(cl, 0, pgmout_send);
   fts_class_inlet_varargs(cl, 0, pgmout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_channel);
-  fts_class_inlet_float(cl, 1, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_channel);
 }
 
 static void
@@ -489,12 +467,8 @@ touchout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
-  fts_class_inlet_int(cl, 0, touchout_send);
-  fts_class_inlet_float(cl, 0, touchout_send);
   fts_class_inlet_varargs(cl, 0, touchout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_channel);
-  fts_class_inlet_float(cl, 1, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_channel);
 }
 
 
@@ -505,12 +479,8 @@ bendout_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("range"), bendout_range);
 
-  fts_class_inlet_int(cl, 0, bendout_send);
-  fts_class_inlet_float(cl, 0, bendout_send);
   fts_class_inlet_varargs(cl, 0, bendout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_channel);
-  fts_class_inlet_float(cl, 1, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_channel);
 }
 
 static void
@@ -520,12 +490,8 @@ xbendout_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("range"), bendout_range);
 
-  fts_class_inlet_int(cl, 0, xbendout_send);
-  fts_class_inlet_float(cl, 0, xbendout_send);
   fts_class_inlet_varargs(cl, 0, xbendout_send);
-  
-  fts_class_inlet_int(cl, 1, midiout_set_channel);
-  fts_class_inlet_float(cl, 1, midiout_set_channel);
+  fts_class_inlet_number(cl, 1, midiout_set_channel);
 }
 
 void

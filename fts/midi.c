@@ -75,20 +75,17 @@ fts_midi_get_type_by_name(fts_symbol_t name)
 enum midi_type
 fts_midi_get_type(const fts_atom_t *at)
 {
-  fts_atom_t k;
-  
   if(fts_is_int(at))
     return fts_get_int(at);
   else if(fts_is_symbol(at))
   {
     fts_atom_t a;
 
-    fts_hashtable_get(&midi_type_hash, &k, &a);
-      
-    return fts_get_int(&a);
+    if(fts_hashtable_get(&midi_type_hash, at, &a))
+      return fts_get_int(&a);
   }
-  else
-    return midi_type_any;
+
+  return midi_type_any;
 }
 
 /************************************************************
@@ -335,7 +332,167 @@ midievent_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   fts_return_object((fts_object_t *)tuple);
 }
-  
+
+static void
+_midievent_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  fts_return_symbol(fts_midi_types[this->type]);
+}
+
+static void
+_midievent_set_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this))
+  {
+    int byte = fts_get_number_int(at);
+
+    if(byte < 0)
+      fts_midievent_channel_message_set_first(this, 0);
+    else if(byte > 127)
+      fts_midievent_channel_message_set_first(this, 127);
+    else
+      fts_midievent_channel_message_set_first(this, byte);
+  }
+}
+
+static void
+_midievent_get_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this))
+    fts_return_int(fts_midievent_channel_message_get_first(this));
+}
+
+static void
+_midievent_set_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this) && fts_midievent_channel_message_has_second_byte(this))
+  {
+    int byte = fts_get_number_int(at);
+
+    if(byte < 0)
+      fts_midievent_channel_message_set_second(this, 0);
+    else if(byte > 127)
+      fts_midievent_channel_message_set_second(this, 127);
+    else
+      fts_midievent_channel_message_set_second(this, byte);
+  }
+}
+
+static void
+_midievent_get_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this) && fts_midievent_channel_message_has_second_byte(this))
+    fts_return_int(fts_midievent_channel_message_get_second(this));
+}
+
+static void
+_midievent_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this))
+  {
+    int channel = fts_get_number_int(at);
+
+    if(channel < 1)
+      fts_midievent_channel_message_set_second(this, 0);
+    else if(channel > 16)
+      fts_midievent_channel_message_set_second(this, 16);
+    else
+      fts_midievent_channel_message_set_second(this, channel);
+  }
+}
+
+static void
+_midievent_get_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this))
+    fts_return_int(fts_midievent_channel_message_get_channel(this));
+}
+
+static void
+_midievent_get_status(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+
+  if(fts_midievent_is_channel_message(this))
+    fts_return_int(fts_midievent_channel_message_get_status_byte(this));
+  else if(fts_midievent_is_real_time(this))
+    fts_return_int(fts_midievent_real_time_get_status_byte(this));
+}
+
+static void
+midievent_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  enum midi_type type = fts_midievent_get_type(this);
+  fts_message_t *mess;
+
+  /* send set message with pitch and duration */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_int(mess, type);
+
+  switch(type)
+  {
+    case midi_type_any:
+      break;
+      
+    case midi_note:
+    case midi_poly_pressure:
+    case midi_control_change:
+      fts_message_append_int(mess, fts_midievent_channel_message_get_first(this));
+      fts_message_append_int(mess, fts_midievent_channel_message_get_second(this));
+      fts_message_append_int(mess, fts_midievent_channel_message_get_channel(this));
+      break;
+
+    case midi_program_change:
+    case midi_channel_pressure:
+      fts_message_append_int(mess, fts_midievent_channel_message_get_first(this));
+      fts_message_append_int(mess, fts_midievent_channel_message_get_channel(this));
+      break;
+
+    case midi_pitch_bend:
+      fts_message_append_int(mess, fts_midievent_channel_message_get_first(this));
+      fts_message_append_int(mess, fts_midievent_channel_message_get_second(this));
+      fts_message_append_int(mess, fts_midievent_channel_message_get_channel(this));
+      break;
+
+    case midi_system_exclusive:
+      fts_message_append(mess, fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
+      break;
+
+    case midi_time_code:
+      fts_message_append_int(mess, fts_midievent_time_code_get_type(this));
+      fts_message_append_int(mess, fts_midievent_time_code_get_hour(this));
+      fts_message_append_int(mess, fts_midievent_time_code_get_minute(this));
+      fts_message_append_int(mess, fts_midievent_time_code_get_second(this));
+      fts_message_append_int(mess, fts_midievent_time_code_get_frame(this));
+      break;
+
+    case midi_real_time:
+      fts_message_append_int(mess, fts_midievent_real_time_get(this));
+      break;
+      
+    case n_midi_types:
+      break;
+  }
+
+  fts_dumper_message_send(dumper, mess);
+}
+
 static void
 midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -355,19 +512,7 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   switch (type)
   {
   case midi_note:
-    fts_spost(stream, "%d %d %d", 
-	      fts_midievent_channel_message_get_first(this), 
-	      fts_midievent_channel_message_get_second(this),
-	      fts_midievent_channel_message_get_channel(this));
-    break;
-      
   case midi_poly_pressure:
-    fts_spost(stream, "%d %d %d", 
-	      fts_midievent_channel_message_get_first(this), 
-	      fts_midievent_channel_message_get_second(this),
-	      fts_midievent_channel_message_get_channel(this));
-    break;
-      
   case midi_control_change:
     fts_spost(stream, "%d %d %d", 
 	      fts_midievent_channel_message_get_first(this), 
@@ -376,11 +521,6 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     break;
       
   case midi_program_change:
-    fts_spost(stream, "%d %d",
-	      fts_midievent_channel_message_get_first(this), 
-	      fts_midievent_channel_message_get_channel(this));
-    break;
-      
   case midi_channel_pressure:		
     fts_spost(stream, "%d %d",
 	      fts_midievent_channel_message_get_first(this), 
@@ -433,6 +573,21 @@ midievent_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_get_tuple, midievent_get_tuple);
   fts_class_message_varargs(cl, fts_s_set, midievent_set);
+
+  fts_class_message_varargs(cl, fts_s_dump_state, midievent_dump_state);
+  
+  fts_class_message_void(cl, fts_s_type, _midievent_get_type);
+
+  fts_class_message_number(cl, fts_new_symbol("first"), _midievent_set_first);
+  fts_class_message_void(cl, fts_new_symbol("first"), _midievent_get_first);
+
+  fts_class_message_number(cl, fts_new_symbol("second"), _midievent_set_second);
+  fts_class_message_void(cl, fts_new_symbol("second"), _midievent_get_second);
+
+  fts_class_message_number(cl, fts_new_symbol("channel"), _midievent_set_channel);
+  fts_class_message_void(cl, fts_new_symbol("channel"), _midievent_get_channel);
+
+  fts_class_message_void(cl, fts_new_symbol("status"), _midievent_get_status);
 }
 
 /***************************************************
@@ -1031,24 +1186,16 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int type = fts_midievent_get_type(event);
   fts_midiport_listener_t **type_list = port->listeners[type + 1]; 
   fts_midiport_listener_t *l;
+  int channel = fts_midievent_channel_message_get_channel(event);
 
   if(type <= midi_control_change)
   {
-    /* note, poly pressure, control_change */
-    int channel = fts_midievent_channel_message_get_channel(event);
+    /* fire number listeners (note, poly pressure, control_change only) */
     int number = fts_midievent_channel_message_get_first(event); /* note or controller number */
     int onset = (number + 1) * (n_midi_channels + 1);
 
     /* fire callbacks for given channel and number */
     l = type_list[onset + channel];
-    while(l)
-    {
-      l->callback(l->listener, 0, 0, 1, at);
-      l = l->next;
-    }
-
-    /* fire callbacks for given channel and any number */
-    l = type_list[channel];
     while(l)
     {
       l->callback(l->listener, 0, 0, 1, at);
@@ -1064,6 +1211,17 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
   }
 
+  if(type <= midi_pitch_bend)
+  {
+    /* fire callbacks for given channel and any number */
+    l = type_list[channel];
+    while(l)
+    {
+      l->callback(l->listener, 0, 0, 1, at);
+      l = l->next;
+    }
+  }
+  
   /* fire callbacks for given event type */
   l = type_list[0];
   while(l)
@@ -1779,37 +1937,6 @@ midiconfig_erase_labels(fts_midiconfig_t *config)
   config->n_labels = 0;
 }
 
-static void
-midiconfig_set_defaults()
-{
-  fts_midiconfig_t* midiconfig = (fts_midiconfig_t*)fts_midiconfig_get();
-  if(midiconfig != NULL)
-  {
-    fts_midilabel_t *label = midiconfig_label_get_by_index(midiconfig, 0);
-      
-    if(label == NULL)
-      label = midiconfig_label_insert(midiconfig, 0, fts_s_default);
-      
-    if(label->input == NULL)
-    {
-      fts_symbol_t name = midimanagers_get_default_input();
-      fts_midiport_t *port = midimanagers_get_input(name, fts_s_default);
-	  
-      midiconfig_label_set_input(midiconfig, label, 0, port, name);
-    }
-
-    if(label->output == NULL)
-    {
-      fts_symbol_t name = midimanagers_get_default_output();
-      fts_midiport_t *port = midimanagers_get_output(name, fts_s_default);
-	  
-      midiconfig_label_set_output(midiconfig, label, 0, port, name);
-    }
-
-    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 0);
-  }
-}
-
 void
 fts_midiconfig_set_defaults(fts_midiconfig_t* midiconfig)
 {
@@ -1845,6 +1972,7 @@ void
 fts_midiconfig_update()
 {
   fts_midiconfig_t* midiconfig = (fts_midiconfig_t*)fts_midiconfig_get();
+  
   midiconfig_update_labels(midiconfig);
   midiconfig_update_devices(midiconfig);
 }
@@ -1861,7 +1989,7 @@ fts_midiconfig_add_manager(fts_midimanager_t *mm)
   mm->next = NULL;
 
   /* update default devices */
-  midiconfig_set_defaults();
+  fts_midiconfig_set_defaults((fts_midiconfig_t*)fts_midiconfig_get());
 }
 
 /* midi objects API */

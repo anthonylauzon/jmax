@@ -280,14 +280,14 @@ _scoob_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   scoob_t *this = (scoob_t *)o;
 
-  fts_return_int(this->type);
+  fts_return_symbol(scoob_type_names[this->type]);
 }
 
 static void
 _scoob_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scoob_t *this = (scoob_t *)o;
-  int pitch = fts_get_number_float(at);
+  double pitch = fts_get_number_float(at);
 
   if(pitch < 0.0)
     pitch = 0.0;
@@ -307,7 +307,7 @@ static void
 _scoob_set_interval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scoob_t *this = (scoob_t *)o;
-  int interval = fts_get_number_float(at);
+  double interval = fts_get_number_float(at);
 
   if(interval < 0.0)
     interval = 0.0;
@@ -341,6 +341,15 @@ _scoob_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   scoob_t *this = (scoob_t *)o;
 
   fts_return_float(this->duration);
+}
+
+static void
+scoob_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scoob_t *this = (scoob_t *)o;
+  fts_symbol_t name = fts_get_symbol(at);
+
+  scoob_property_set(this, name, fts_null);
 }
 
 static void
@@ -540,6 +549,8 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, seqsym_pitch, _scoob_get_pitch);
   fts_class_message_void(cl, seqsym_interval, _scoob_get_interval);
   fts_class_message_void(cl, seqsym_duration, _scoob_get_duration);
+
+  fts_class_message_symbol(cl, fts_s_remove, scoob_remove_property);
 
   fts_hashtable_init(&scoob_property_indices, FTS_HASHTABLE_SMALL);
   

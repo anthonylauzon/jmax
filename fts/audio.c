@@ -96,6 +96,14 @@ void fts_audioport_set_channels( fts_audioport_t *port, int direction, int chann
   int i;
 
   port->inout[direction].channels = channels;
+
+  if (channels == 0)
+  {
+    port->inout[direction].channel_used = 0;
+    port->inout[direction].buffers = 0;
+    return;
+  }
+  
   port->inout[direction].channel_used = (int *)fts_malloc( channels * sizeof( int));
   port->inout[direction].buffers = (float **)fts_malloc( channels * sizeof( float *));
 
@@ -117,19 +125,21 @@ void fts_audioport_set_channels( fts_audioport_t *port, int direction, int chann
 static void
 fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel)
 {
-  port->inout[direction].channel_used[channel]++;
+  if (port->inout[direction].channel_used)
+    port->inout[direction].channel_used[channel]++;
 }
 
 static void
 fts_audioport_set_channel_unused( fts_audioport_t *port, int direction, int channel)
 {
-  port->inout[direction].channel_used[channel]--;
+  if (port->inout[direction].channel_used)
+    port->inout[direction].channel_used[channel]--;
 }
 
 int
 fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel)
 {
-  return port->inout[direction].channel_used[channel] > 0;
+  return port->inout[direction].channel_used && port->inout[direction].channel_used[channel] > 0;
 }
 
 static void

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <fts/fts.h>
 #include "macosxmidi.h"
@@ -460,7 +461,7 @@ static void
 macosxmidi_notify(const MIDINotification *message, void *o)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  
+
   this->notify++;
 }
 
@@ -470,17 +471,33 @@ macosxmidi_poll_fifo( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   macosxmidi_t *this = (macosxmidi_t *)o;
 
   fts_midififo_poll(&this->fifo);
-
-  if(this->acknowledge < this->notify) {
+  
+  if(this->acknowledge < this->notify)
+  {
     fts_midiconfig_update();
     this->acknowledge = this->notify;
   }
+}
+
+static void *
+macosxmidi_runloop_thread(void *o)
+{
+  macosxmidi_t *this = (macosxmidi_t *)o;
+
+  fts_log("[macosxmidi] create MIDI client\n");
+  MIDIClientCreate(CFSTR("jMax"), macosxmidi_notify, o, &this->client);
+  
+  fts_log("[macosxmidi] starting runloop\n");
+  CFRunLoopRun();
+
+  return NULL;
 }
 
 static void
 macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
+  pthread_t thread;
 
   fts_hashtable_init( &this->inputs, FTS_HASHTABLE_SMALL);
   fts_hashtable_init( &this->outputs, FTS_HASHTABLE_SMALL);
@@ -492,9 +509,11 @@ macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->acknowledge = 0;
   
   fts_midififo_init(&this->fifo, MACOSXMIDI_FIFO_SIZE);
-  fts_sched_add(o, FTS_SCHED_ALWAYS);
+
+  /* create thread for MacOS X event runloop */
+  pthread_create(&thread, NULL, macosxmidi_runloop_thread, (void *)o);
   
-  MIDIClientCreate(CFSTR("jMax"), macosxmidi_notify, (void *)o, &this->client);
+  fts_sched_add(o, FTS_SCHED_ALWAYS);
 }
 
 static void

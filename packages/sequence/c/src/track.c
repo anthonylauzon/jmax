@@ -890,11 +890,19 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-track_return_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_track_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
 
   fts_return_float(track_get_duration(this));
+}
+
+static void
+_track_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  fts_return_int(track_get_size(this));
 }
 
 /******************************************************
@@ -1094,7 +1102,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   fts_class_t *type = track_get_type(this);
 
-  if(type == fts_midievent_type || type == scoob_class || type == NULL)
+  if(type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
   {
     if(ac == 0)
       track_import_midifile_dialog(o, 0, 0, 0, 0);
@@ -1239,7 +1247,8 @@ track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   /* make new event object */
   if(ac == 2)
   {
-    event = (event_t *)fts_object_create(event_class, 1, at + 1); /* primitive value */
+    /* primitive value */
+    event = (event_t *)fts_object_create(event_class, 1, at + 1);
     this->load_obj = NULL;
   }
   else
@@ -1448,9 +1457,9 @@ track_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, seqsym_active, track_active);
 
-  fts_class_message_varargs(cl, fts_s_clear, track_clear_method);
+  fts_class_message_void(cl, fts_s_clear, track_clear_method);
   fts_class_message_varargs(cl, seqsym_insert, track_insert);
-  fts_class_message_varargs(cl, seqsym_remove, track_remove);
+  fts_class_message_atom(cl, seqsym_remove, track_remove);
   fts_class_message_varargs(cl, fts_s_import, track_import);
   fts_class_message_varargs(cl, fts_s_export, track_export);
 
@@ -1464,7 +1473,8 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_remove_gui_listener, track_remove_gui_listener);
   fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);
 
-  fts_class_message_void(cl, fts_new_symbol("duration"), track_return_duration);
+  fts_class_message_void(cl, fts_new_symbol("duration"), _track_get_duration);
+  fts_class_message_void(cl, fts_new_symbol("size"), _track_get_size);
 
   fts_class_inlet_thru(cl, 0);
 }

@@ -76,7 +76,7 @@ seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(ac > 0 && fts_is_number(at))
 	time = fts_get_number_float(at);
 
-      /* set start location  */
+      /* set start location */
       this->start_location = time;
       
     case status_ready:
@@ -128,26 +128,6 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	  else
 	    fts_object_error(o, "Cannot record event of type %s", fts_get_class_name(at));
 	}
-    }
-}
-
-static void 
-seqrec_record_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqrec_t *this = (seqrec_t *)o;
-
-  if(this->status == status_recording)
-    {
-      if(ac == 1)
-	seqrec_record_atom(o, 0, 0, 1, at);
-      else if(ac > 1)
-	{
-	  fts_object_t *tuple = fts_object_create(fts_tuple_class, ac, at);
-	  fts_atom_t a;
-	  
-	  fts_set_object(&a, tuple);
-	  seqrec_record_atom(o, 0, 0, 1, &a);
-	}  
     }
 }
 
@@ -209,10 +189,7 @@ seqrec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("pause"), seqrec_pause);
   fts_class_message_varargs(cl, fts_s_stop, seqrec_stop);
   
-  fts_class_inlet_int(cl, 0, seqrec_record_atom);
-  fts_class_inlet_float(cl, 0, seqrec_record_atom);
-  fts_class_inlet_symbol(cl, 0, seqrec_record_atom);
-  fts_class_inlet_varargs(cl, 0, seqrec_record_atoms);
+  fts_class_inlet_atom(cl, 0, seqrec_record_atom);
   
   fts_class_inlet(cl, 1, track_class, seqrec_set_reference);
 }
