@@ -1,90 +1,146 @@
+/*
+ * jMax
+ * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * See file LICENSE for further informations on licensing terms.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ */
+
 %{
 #include <stdio.h>
 #include <unistd.h>
 
 #include <fts/fts.h>
+
 #define YYSTYPE fts_atom_t
-#include <ftsprivate/parserdata.h>
-
-#define free fts_free
-
 #define YYPARSE_PARAM data
 #define YYLEX_PARAM data
+#define free fts_free
 
-#define yylex( lvalp, data) (*((fts_parser_data_t *)data)->yylex)( lvalp, data)
-
+static int yylex( YYSTYPE *lvalp, void *data);
 static int yyerror( const char *msg);
 
-#define action_int (*((fts_parser_data_t *)data)->actions->_int)
-#define action_float (*((fts_parser_data_t *)data)->actions->_float)
-#define action_symbol (*((fts_parser_data_t *)data)->actions->_symbol)
-#define action_begin_expression (*((fts_parser_data_t *)data)->actions->_begin_expression)
-#define action_end_expression (*((fts_parser_data_t *)data)->actions->_end_expression)
+/* Actions */
+static void push_frame( void);
+static void pop_frame( void);
+static void push_value( const fts_atom_t *yylval);
 
 %}
 
 %pure_parser
 
-/* **********************************************************************
- *
+/*
  * Tokens
- *
  */
 
 %token FTS_TOKEN_INT
 %token FTS_TOKEN_FLOAT
 %token FTS_TOKEN_SYMBOL
-%token FTS_TOKEN_DOLLAR "$"
-%token FTS_TOKEN_SEMICOLON ";"
-%token FTS_TOKEN_LPAR "("
-%token FTS_TOKEN_RPAR ")"
-%token FTS_TOKEN_DOT "."
-%token FTS_TOKEN_LSBRA "["
-%token FTS_TOKEN_RSBRA "]"
+
+%token FTS_TOKEN_SEMI
+%token FTS_TOKEN_OPEN_PAR
+%token FTS_TOKEN_CLOSED_PAR
+%token FTS_TOKEN_OPEN_SQPAR
+%token FTS_TOKEN_CLOSED_SQPAR
+
+/*
+ * Operators
+ */
+
+/*
+  Idea
+  add the +=, -= etc operators so that you can do soemthing like
+  x : fvec
+  $x += 1
+  (:fvec 1 2 3) += 3
+*/
+
+
+
+%left FTS_TOKEN_SPACE
+%right FTS_TOKEN_EQUAL
+%left FTS_TOKEN_LOGICAL_OR
+%left FTS_TOKEN_LOGICAL_AND
+%left FTS_TOKEN_EQUAL_EQUAL FTS_TOKEN_NOT_EQUAL
+%left FTS_TOKEN_GREATER	FTS_TOKEN_GREATER_EQUAL FTS_TOKEN_SMALLER FTS_TOKEN_SMALLER_EQUAL
+%left FTS_TOKEN_SHIFT_LEFT FTS_TOKEN_SHIFT_RIGHT
+%left FTS_TOKEN_PLUS FTS_TOKEN_MINUS
+%left FTS_TOKEN_TIMES FTS_TOKEN_DIV FTS_TOKEN_PERCENT
+%right FTS_TOKEN_UNARY_MINUS, FTS_TOKEN_UNARY_PLUS
+%right FTS_TOKEN_LOGICAL_NOT
+%left FTS_TOKEN_ARRAY_INDEX
+%left FTS_TOKEN_DOT
+%right FTS_TOKEN_DOLLAR
 
 %%
-
 /* **********************************************************************
  *
  * Rules
  *
  */
 
-program: expression_list ;
+program: list ;
 
-expression_list: expression_list ";" expression 
-	| expression ;
+list: list ";" tuple
+	| tuple ;
 
-expression: { action_begin_expression(); } tuple { action_end_expression(); } ;
-
-tuple: tuple term
+tuple: tuple term %prec FTS_TOKEN_SPACE
 	| /* empty */ ;
 
 term: primitive
-	| invocation
-	| "(" expression ")";
+	| par_op
+	| unary_op
+	| binary_op
+	| ref
+;
 
-primitive: FTS_TOKEN_INT { action_int( &($1)); }
-	| FTS_TOKEN_FLOAT { action_float( &($1)); }
-	| FTS_TOKEN_SYMBOL { action_symbol( &($1)); }
-	| reference ;
+primitive: FTS_TOKEN_INT { push_value( &($1)); }
+	| FTS_TOKEN_FLOAT { push_value( &($1)); }
+	| FTS_TOKEN_SYMBOL { push_value( &($1)); }
+;
 
-reference: variable
-	| array;
+par_op: FTS_TOKEN_OPEN_PAR term FTS_TOKEN_CLOSED_PAR
 
-variable: "$" FTS_TOKEN_SYMBOL {} ;
+unary_op: FTS_TOKEN_PLUS term %prec FTS_TOKEN_UNARY_PLUS
+	| FTS_TOKEN_MINUS term %prec FTS_TOKEN_UNARY_MINUS
+	| FTS_TOKEN_LOGICAL_NOT term
+;
 
-array: variable "[" term "]" {} ;
+binary_op: term FTS_TOKEN_PLUS term
+	| term FTS_TOKEN_MINUS term
+	| term FTS_TOKEN_TIMES term
+	| term FTS_TOKEN_DIV term
+	| term FTS_TOKEN_PERCENT term
+	| term FTS_TOKEN_SHIFT_LEFT term
+	| term FTS_TOKEN_SHIFT_RIGHT term
+	| term FTS_TOKEN_LOGICAL_AND term
+	| term FTS_TOKEN_LOGICAL_OR term
+	| term FTS_TOKEN_EQUAL_EQUAL term
+	| term FTS_TOKEN_NOT_EQUAL term
+	| term FTS_TOKEN_GREATER term
+	| term FTS_TOKEN_GREATER_EQUAL term
+	| term FTS_TOKEN_SMALLER term
+	| term FTS_TOKEN_SMALLER_EQUAL term
+;
 
-arguments: arguments term
-	   | /* empty */ ;
-
-invocation: dot_expression arguments;
-
-dot_expression: reference dot_list ;
-
-dot_list: dot_list "." FTS_TOKEN_SYMBOL 
-	| "." FTS_TOKEN_SYMBOL;
+ref: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
+	| ref FTS_TOKEN_OPEN_SQPAR term FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
+	| ref FTS_TOKEN_DOT FTS_TOKEN_SYMBOL
+;
 
 %%
 
@@ -94,12 +150,20 @@ dot_list: dot_list "." FTS_TOKEN_SYMBOL
  *
  */
 
-/*
- * These definitions are used only in the extra functions
- */
+static fts_stack_t interpreter_stack;
+static int fp = 0;
+
+#define PUSH(V) fts_stack_push( &interpreter_stack, fts_atom_t, (V))
+#define POP(N) fts_stack_pop( &interpreter_stack, (N))
+
+#define TOP fts_stack_get_top( &interpreter_stack)
+#define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
+
+static void print_stack( const char *msg);
 
 /*
-  Stack organization:
+
+Description of stack organization:
 
 Before calling a method or outputing a message:
            <- top
@@ -127,88 +191,6 @@ savedfp'
 retval'
 
 */
-
-static parser_actions_t standard_actions;
-
-static fts_stack_t interpreter_stack;
-static int fp = 0;
-
-#define PUSH(V) fts_stack_push( &interpreter_stack, fts_atom_t, (V))
-#define POP(N) fts_stack_pop( &interpreter_stack, (N))
-
-#define TOP fts_stack_get_top( &interpreter_stack)
-#define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
-
-extern int fts_string_lex( YYSTYPE *lvalp, void *data);
-extern int fts_atoms_lex( YYSTYPE *lvalp, void *data);
-
-
-static int yyerror( const char *msg)
-{
-  fprintf( stderr, "%s\n", msg);
-
-  return 0;
-}
-
-int fts_parse_atoms( int ac, fts_atom_t *at)
-{
-  fts_parser_data_t data;
-
-  data.actions = &standard_actions;
-  data.yylex = fts_atoms_lex;
-  data.ac = ac;
-  data.at = at;
-  data.buffer = NULL;
-
-  return yyparse( &data);
-}
-
-/*
-  problem: some code in the body of this function needs YY_BUFFER_STATE which is generated by flex.
-  so it must either be in scanner.l or use an intermediate function defined in scanner.l
-*/
-int fts_parse_string( const char *s)
-{
-  fts_parser_data_t data;
-
-  data.actions = &standard_actions;
-  data.yylex = fts_string_lex;
-  data.ac = 0;
-  data.at = NULL;
-  data.buffer = (char *)s;
-
-  return yyparse( &data);
-}
-
-/* **********************************************************************
- *
- * Action functions
- *
- */
-static void print_stack( const char *msg)
-{
-  int i, current_fp;
-  fts_atom_t *p = BASE;
-
-  post( "%s:\n", msg);
-
-  current_fp = fp;
-
-  for ( i = TOP - 1; i >= 0; i--)
-    {
-      post( "[%2d]", i);
-      if ( i == current_fp - 1)
-	{
-	  post( "* ");
-	  current_fp = fts_get_int( p+i);
-	}
-      else
-	post( "  ");
-
-      post_atoms( 1, p+i);
-      post( "\n");
-    }
-}
 
 static void push_frame()
 {
@@ -244,13 +226,123 @@ static void push_value( const fts_atom_t *yylval)
   PUSH( *yylval);
 }
 
-#ifdef HACK_DEBUG
+static int yyerror( const char *msg)
+{
+  fprintf( stderr, "%s\n", msg);
+
+  return 0;
+}
+
+/* **********************************************************************
+ * 
+ * Atom array parser + scanner
+ *
+ */
+
+static fts_hashtable_t token_table;
+
+typedef struct {
+  int ac;
+  fts_atom_t *at;
+} fts_parser_data_t;
+
+int fts_parse_atoms( int ac, fts_atom_t *at)
+{
+  fts_parser_data_t data;
+
+  data.ac = ac;
+  data.at = at;
+
+  return yyparse( &data);
+}
+
+static int yylex( YYSTYPE *lvalp, void *data)
+{
+  fts_parser_data_t *parser_data = (fts_parser_data_t *)data;
+  fts_atom_t *at = parser_data->at;
+  int token = -1;
+
+  if (parser_data->ac <= 0)
+    return 0; /* end of file */
+
+  if (fts_is_int( at))
+    {
+      *lvalp = *at;
+      token = FTS_TOKEN_INT;
+    }
+  else if (fts_is_float( at))
+    {
+      *lvalp = *at;
+      token = FTS_TOKEN_FLOAT;
+    }
+  else if (fts_is_symbol( at))
+    {
+      fts_atom_t k, v;
+
+      k = *at;
+      if (fts_hashtable_get( &token_table, &k, &v))
+	token = fts_get_int( &v);
+      else
+	{
+	  *lvalp = *at;
+	  token = FTS_TOKEN_SYMBOL;
+	}
+    }
+
+  parser_data->at++;
+  parser_data->ac--;
+
+  return token;
+}
+
+static void scanner_init( void)
+{
+  fts_atom_t k, v;
+
+  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+
+#define PUT(S,T) fts_set_symbol( &k, S); fts_set_int( &v, T); fts_hashtable_put( &token_table, &k, &v);
+  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
+  PUT( fts_s_semi, FTS_TOKEN_SEMI);
+  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
+  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
+  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
+  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
+  PUT( fts_s_dot, FTS_TOKEN_DOT);
+}
 
 /* **********************************************************************
  * 
  * Debug code
  *
  */
+
+static void print_stack( const char *msg)
+{
+  int i, current_fp;
+  fts_atom_t *p = BASE;
+
+  post( "%s:\n", msg);
+
+  current_fp = fp;
+
+  for ( i = TOP - 1; i >= 0; i--)
+    {
+      post( "[%2d]", i);
+      if ( i == current_fp - 1)
+	{
+	  post( "* ");
+	  current_fp = fts_get_int( p+i);
+	}
+      else
+	post( "  ");
+
+      post_atoms( 1, p+i);
+      post( "\n");
+    }
+}
+
+#ifdef HACK_DEBUG
 
 static void fts_stdoutstream_output(fts_bytestream_t *stream, int n, const unsigned char *buffer)
 {
@@ -294,19 +386,12 @@ static fts_status_t fts_stdoutstream_instantiate(fts_class_t *cl, int ac, const 
  * Kernel initialization
  *
  */
-static void init_actions( void)
-{
-  standard_actions._int = push_value;
-  standard_actions._float = push_value;
-  standard_actions._symbol = push_value;
-  standard_actions._begin_expression = push_frame;
-  standard_actions._end_expression = pop_frame;
-}
 
 void fts_kernel_parser_init( void)
 {
   fts_stack_init( &interpreter_stack, fts_atom_t);
-  init_actions();
+
+  scanner_init();
 }
 
 void fts_parser_config( void)

@@ -49,7 +49,6 @@ union fts_word
   fts_object_t        *fts_object;
   void                *fts_pointer;
   char                *fts_string;
-  fts_connection_t    *fts_connection;
 };
 
 /**

@@ -55,15 +55,14 @@ variable.c \
 version.c \
 vm.c \
 parser.y \
-scanner.l
+tokenizer.l
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
 libfts_la_LDFLAGS = -no-undefined
-AM_YFLAGS=-d
-AM_LFLAGS=-Pfts_string_ -olex.yy.c
-
+AM_YFLAGS=-d -v
+AM_LFLAGS=-olex.yy.c
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
 INCLUDES=-I$(top_srcdir)/include

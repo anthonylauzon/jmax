@@ -223,8 +223,6 @@ static int atom_is_null( const fts_atom_t *a)
     return fts_get_float(a) == 0.0;
   else if (fts_is_object(a))
     return fts_get_object(a) == 0;
-  else if (fts_is_connection(a))
-    return fts_get_connection(a) == 0;
   else
     return 0;
 }

@@ -51,10 +51,6 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
   if ( fts_is_string( p1))
     return ! strcmp( fts_get_string( p1), fts_get_string( p2));
 
-  /* To be removed */
-  if ( fts_is_connection( p1))
-    return fts_get_connection( p1) == fts_get_connection( p2);
-
   return 0;
 }
 

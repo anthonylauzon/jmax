@@ -164,9 +164,6 @@ FTS_API fts_metaclass_t *fts_t_connection;
  */
 #define fts_set_string(p, v) ((p)->typeid = fts_t_string, fts_word_set_string( &(p)->value, (v)))
 
-/* To be removed */
-#define fts_set_connection(p, v) ((p)->typeid = fts_t_connection, fts_word_set_connection( &(p)->value, (v)))
-
 /**
  * Tests if atom is void
  * 
@@ -246,9 +243,6 @@ FTS_API fts_metaclass_t *fts_t_connection;
  * @ingroup atom
  */
 #define fts_is_string(p) ((p)->typeid == fts_t_string)
-
-/* To be removed */
-#define fts_is_connection(p) ((p)->typeid == fts_t_connection)
 
 /**
  * Get the integer value
@@ -331,9 +325,6 @@ FTS_API fts_metaclass_t *fts_t_connection;
  * @ingroup atom
  */
 #define fts_get_string(p) fts_word_get_string( &(p)->value)
-
-/* To be removed */
-#define fts_get_connection(p) fts_word_get_connection( &(p)->value)
 
 /**
  * Increments object reference count if atom contains an object

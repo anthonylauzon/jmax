@@ -7,37 +7,54 @@
 #define	FTS_TOKEN_INT	257
 #define	FTS_TOKEN_FLOAT	258
 #define	FTS_TOKEN_SYMBOL	259
-#define	FTS_TOKEN_DOLLAR	260
-#define	FTS_TOKEN_SEMICOLON	261
-#define	FTS_TOKEN_LPAR	262
-#define	FTS_TOKEN_RPAR	263
-#define	FTS_TOKEN_DOT	264
-#define	FTS_TOKEN_LSBRA	265
-#define	FTS_TOKEN_RSBRA	266
+#define	FTS_TOKEN_SEMI	260
+#define	FTS_TOKEN_OPEN_PAR	261
+#define	FTS_TOKEN_CLOSED_PAR	262
+#define	FTS_TOKEN_OPEN_SQPAR	263
+#define	FTS_TOKEN_CLOSED_SQPAR	264
+#define	FTS_TOKEN_SPACE	265
+#define	FTS_TOKEN_EQUAL	266
+#define	FTS_TOKEN_LOGICAL_OR	267
+#define	FTS_TOKEN_LOGICAL_AND	268
+#define	FTS_TOKEN_EQUAL_EQUAL	269
+#define	FTS_TOKEN_NOT_EQUAL	270
+#define	FTS_TOKEN_GREATER	271
+#define	FTS_TOKEN_GREATER_EQUAL	272
+#define	FTS_TOKEN_SMALLER	273
+#define	FTS_TOKEN_SMALLER_EQUAL	274
+#define	FTS_TOKEN_SHIFT_LEFT	275
+#define	FTS_TOKEN_SHIFT_RIGHT	276
+#define	FTS_TOKEN_PLUS	277
+#define	FTS_TOKEN_MINUS	278
+#define	FTS_TOKEN_TIMES	279
+#define	FTS_TOKEN_DIV	280
+#define	FTS_TOKEN_PERCENT	281
+#define	FTS_TOKEN_UNARY_MINUS	282
+#define	FTS_TOKEN_UNARY_PLUS	283
+#define	FTS_TOKEN_LOGICAL_NOT	284
+#define	FTS_TOKEN_ARRAY_INDEX	285
+#define	FTS_TOKEN_DOT	286
+#define	FTS_TOKEN_DOLLAR	287
 
-#line 1 "parser.y"
+#line 23 "parser.y"
 
 #include <stdio.h>
 #include <unistd.h>
 
 #include <fts/fts.h>
+
 #define YYSTYPE fts_atom_t
-#include <ftsprivate/parserdata.h>
-
-#define free fts_free
-
 #define YYPARSE_PARAM data
 #define YYLEX_PARAM data
+#define free fts_free
 
-#define yylex( lvalp, data) (*((fts_parser_data_t *)data)->yylex)( lvalp, data)
-
+static int yylex( YYSTYPE *lvalp, void *data);
 static int yyerror( const char *msg);
 
-#define action_int (*((fts_parser_data_t *)data)->actions->_int)
-#define action_float (*((fts_parser_data_t *)data)->actions->_float)
-#define action_symbol (*((fts_parser_data_t *)data)->actions->_symbol)
-#define action_begin_expression (*((fts_parser_data_t *)data)->actions->_begin_expression)
-#define action_end_expression (*((fts_parser_data_t *)data)->actions->_end_expression)
+/* Actions */
+static void push_frame( void);
+static void pop_frame( void);
+static void push_value( const fts_atom_t *yylval);
 
 #ifndef YYSTYPE
 #define YYSTYPE int
@@ -52,11 +69,11 @@ static int yyerror( const char *msg);
 
 
 
-#define	YYFINAL		34
+#define	YYFINAL		62
 #define	YYFLAG		-32768
-#define	YYNTBASE	13
+#define	YYNTBASE	35
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 266 ? yytranslate[x] : 27)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 288 ? yytranslate[x] : 44)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -85,32 +102,42 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
-     7,     8,     9,    10,    11,    12
+     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+    27,    28,    29,    30,    31,    32,    33,    34
 };
 
 #if YYDEBUG != 0
 static const short yyprhs[] = {     0,
-     0,     2,     6,     8,     9,    12,    15,    16,    18,    20,
-    24,    26,    28,    30,    32,    34,    36,    39,    44,    47,
-    48,    51,    54,    58
+     0,     2,     6,     8,    11,    12,    14,    16,    18,    20,
+    22,    24,    26,    28,    32,    35,    38,    41,    45,    49,
+    53,    57,    61,    65,    69,    73,    77,    81,    85,    89,
+    93,    97,   101,   104,   109
 };
 
-static const short yyrhs[] = {    14,
-     0,    14,     7,    15,     0,    15,     0,     0,    16,    17,
-     0,    17,    18,     0,     0,    19,     0,    24,     0,     8,
-    15,     9,     0,     3,     0,     4,     0,     5,     0,    20,
-     0,    21,     0,    22,     0,     6,     5,     0,    21,    11,
-    18,    12,     0,    23,    18,     0,     0,    25,    23,     0,
-    20,    26,     0,    26,    10,     5,     0,    10,     5,     0
+static const short yyrhs[] = {    36,
+     0,    36,    34,    37,     0,    37,     0,    37,    38,     0,
+     0,    39,     0,    40,     0,    41,     0,    42,     0,    43,
+     0,     3,     0,     4,     0,     5,     0,     7,    38,     8,
+     0,    23,    38,     0,    24,    38,     0,    30,    38,     0,
+    38,    23,    38,     0,    38,    24,    38,     0,    38,    25,
+    38,     0,    38,    26,    38,     0,    38,    27,    38,     0,
+    38,    21,    38,     0,    38,    22,    38,     0,    38,    14,
+    38,     0,    38,    13,    38,     0,    38,    15,    38,     0,
+    38,    16,    38,     0,    38,    17,    38,     0,    38,    18,
+    38,     0,    38,    19,    38,     0,    38,    20,    38,     0,
+    33,     5,     0,    43,     9,    38,    10,     0,    43,    32,
+     5,     0
 };
 
 #endif
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    53,    55,    56,    58,    58,    60,    61,    63,    64,    65,
-    67,    68,    69,    70,    72,    73,    75,    77,    79,    80,
-    82,    84,    86,    87
+    85,    87,    88,    90,    91,    93,    94,    95,    96,    97,
+   100,   101,   102,   105,   107,   108,   109,   112,   113,   114,
+   115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+   125,   126,   129,   130,   131
 };
 #endif
 
@@ -118,66 +145,101 @@ static const short yyrline[] = { 0,
 #if YYDEBUG != 0 || defined (YYERROR_VERBOSE)
 
 static const char * const yytname[] = {   "$","error","$undefined.","FTS_TOKEN_INT",
-"FTS_TOKEN_FLOAT","FTS_TOKEN_SYMBOL","\"$\"","\";\"","\"(\"","\")\"","\".\"",
-"\"[\"","\"]\"","program","expression_list","expression","@1","tuple","term",
-"primitive","reference","variable","array","arguments","invocation","dot_expression",
-"dot_list", NULL
+"FTS_TOKEN_FLOAT","FTS_TOKEN_SYMBOL","FTS_TOKEN_SEMI","FTS_TOKEN_OPEN_PAR","FTS_TOKEN_CLOSED_PAR",
+"FTS_TOKEN_OPEN_SQPAR","FTS_TOKEN_CLOSED_SQPAR","FTS_TOKEN_SPACE","FTS_TOKEN_EQUAL",
+"FTS_TOKEN_LOGICAL_OR","FTS_TOKEN_LOGICAL_AND","FTS_TOKEN_EQUAL_EQUAL","FTS_TOKEN_NOT_EQUAL",
+"FTS_TOKEN_GREATER","FTS_TOKEN_GREATER_EQUAL","FTS_TOKEN_SMALLER","FTS_TOKEN_SMALLER_EQUAL",
+"FTS_TOKEN_SHIFT_LEFT","FTS_TOKEN_SHIFT_RIGHT","FTS_TOKEN_PLUS","FTS_TOKEN_MINUS",
+"FTS_TOKEN_TIMES","FTS_TOKEN_DIV","FTS_TOKEN_PERCENT","FTS_TOKEN_UNARY_MINUS",
+"FTS_TOKEN_UNARY_PLUS","FTS_TOKEN_LOGICAL_NOT","FTS_TOKEN_ARRAY_INDEX","FTS_TOKEN_DOT",
+"FTS_TOKEN_DOLLAR","\";\"","program","list","tuple","term","primitive","par_op",
+"unary_op","binary_op","ref", NULL
 };
 #endif
 
 static const short yyr1[] = {     0,
-    13,    14,    14,    16,    15,    17,    17,    18,    18,    18,
-    19,    19,    19,    19,    20,    20,    21,    22,    23,    23,
-    24,    25,    26,    26
+    35,    36,    36,    37,    37,    38,    38,    38,    38,    38,
+    39,    39,    39,    40,    41,    41,    41,    42,    42,    42,
+    42,    42,    42,    42,    42,    42,    42,    42,    42,    42,
+    42,    42,    43,    43,    43
 };
 
 static const short yyr2[] = {     0,
-     1,     3,     1,     0,     2,     2,     0,     1,     1,     3,
-     1,     1,     1,     1,     1,     1,     2,     4,     2,     0,
-     2,     2,     3,     2
+     1,     3,     1,     2,     0,     1,     1,     1,     1,     1,
+     1,     1,     1,     3,     2,     2,     2,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     2,     4,     3
 };
 
-static const short yydefact[] = {     4,
-     1,     3,     7,     4,     5,     2,    11,    12,    13,     0,
-     4,     6,     8,    14,    15,    16,     9,    20,    17,     0,
-     0,    22,     0,    21,    10,    24,     0,     0,    19,    23,
-    18,     0,     0,     0
+static const short yydefact[] = {     5,
+     1,     3,     5,    11,    12,    13,     0,     0,     0,     0,
+     0,     4,     6,     7,     8,     9,    10,     2,     0,    15,
+    16,    17,    33,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+    14,    26,    25,    27,    28,    29,    30,    31,    32,    23,
+    24,    18,    19,    20,    21,    22,     0,    35,    34,     0,
+     0,     0
 };
 
-static const short yydefgoto[] = {    32,
-     1,     2,     3,     5,    12,    13,    14,    15,    16,    24,
-    17,    18,    22
+static const short yydefgoto[] = {    60,
+     1,     2,    12,    13,    14,    15,    16,    17
 };
 
 static const short yypact[] = {-32768,
-     3,-32768,-32768,-32768,    -2,-32768,-32768,-32768,-32768,     0,
--32768,-32768,-32768,     1,     2,-32768,-32768,-32768,-32768,     5,
-     7,     6,    -2,    -2,-32768,-32768,    10,     8,-32768,-32768,
--32768,    17,    18,-32768
+   -23,    30,-32768,-32768,-32768,-32768,    30,    30,    30,    30,
+     7,    25,-32768,-32768,-32768,-32768,     4,    30,    51,-32768,
+-32768,-32768,-32768,    30,    30,    30,    30,    30,    30,    30,
+    30,    30,    30,    30,    30,    30,    30,    30,    30,    50,
+-32768,    83,    96,   107,   107,   -17,   -17,   -17,   -17,   112,
+   112,   -11,   -11,-32768,-32768,-32768,    69,-32768,-32768,    56,
+    57,-32768
 };
 
 static const short yypgoto[] = {-32768,
--32768,    -4,-32768,-32768,   -15,-32768,-32768,-32768,-32768,-32768,
--32768,-32768,-32768
+-32768,    55,    -7,-32768,-32768,-32768,-32768,-32768
 };
 
 
-#define	YYLAST		20
+#define	YYLAST		139
 
 
-static const short yytable[] = {     6,
-     7,     8,     9,    10,    19,    11,    20,    28,    29,     4,
-    21,    26,    23,    25,    30,    27,    33,    34,     0,    31
+static const short yytable[] = {    19,
+    20,    21,    22,    32,    33,    34,    35,    36,    37,    38,
+     3,    23,    39,    36,    37,    38,    42,    43,    44,    45,
+    46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+    56,    57,     4,     5,     6,    40,     7,    24,    25,    26,
+    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+    37,    38,     8,     9,    58,    61,    62,    18,    41,    10,
+     0,     0,    11,    24,    25,    26,    27,    28,    29,    30,
+    31,    32,    33,    34,    35,    36,    37,    38,    59,     0,
+     0,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+    33,    34,    35,    36,    37,    38,    25,    26,    27,    28,
+    29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+    36,    37,    38,    28,    29,    30,    31,    32,    33,    34,
+    35,    36,    37,    38,    34,    35,    36,    37,    38
 };
 
-static const short yycheck[] = {     4,
-     3,     4,     5,     6,     5,     8,    11,    23,    24,     7,
-    10,     5,    11,     9,     5,    10,     0,     0,    -1,    12
+static const short yycheck[] = {     7,
+     8,     9,    10,    21,    22,    23,    24,    25,    26,    27,
+    34,     5,     9,    25,    26,    27,    24,    25,    26,    27,
+    28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
+    38,    39,     3,     4,     5,    32,     7,    13,    14,    15,
+    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+    26,    27,    23,    24,     5,     0,     0,     3,     8,    30,
+    -1,    -1,    33,    13,    14,    15,    16,    17,    18,    19,
+    20,    21,    22,    23,    24,    25,    26,    27,    10,    -1,
+    -1,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+    22,    23,    24,    25,    26,    27,    14,    15,    16,    17,
+    18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
+    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+    25,    26,    27,    17,    18,    19,    20,    21,    22,    23,
+    24,    25,    26,    27,    23,    24,    25,    26,    27
 };
 #define YYPURE 1
 
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
-#line 3 "/usr/share/bison.simple"
+#line 3 "/usr/lib/bison.simple"
 /* This file comes from bison-1.28.  */
 
 /* Skeleton output parser for bison,
@@ -391,7 +453,7 @@ __yy_memcpy (char *to, char *from, unsigned int count)
 #endif
 #endif
 
-#line 217 "/usr/share/bison.simple"
+#line 217 "/usr/lib/bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
    into yyparse.  The argument should have type void *.
@@ -719,37 +781,21 @@ yyreduce:
 
   switch (yyn) {
 
-case 4:
-#line 58 "parser.y"
-{ action_begin_expression(); ;
-    break;}
-case 5:
-#line 58 "parser.y"
-{ action_end_expression(); ;
-    break;}
 case 11:
-#line 67 "parser.y"
-{ action_int( &(yyvsp[0])); ;
+#line 100 "parser.y"
+{ push_value( &(yyvsp[0])); ;
     break;}
 case 12:
-#line 68 "parser.y"
-{ action_float( &(yyvsp[0])); ;
+#line 101 "parser.y"
+{ push_value( &(yyvsp[0])); ;
     break;}
 case 13:
-#line 69 "parser.y"
-{ action_symbol( &(yyvsp[0])); ;
-    break;}
-case 17:
-#line 75 "parser.y"
-{;
-    break;}
-case 18:
-#line 77 "parser.y"
-{;
+#line 102 "parser.y"
+{ push_value( &(yyvsp[0])); ;
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
-#line 543 "/usr/share/bison.simple"
+#line 543 "/usr/lib/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -969,7 +1015,7 @@ yyerrhandle:
     }
   return 1;
 }
-#line 89 "parser.y"
+#line 134 "parser.y"
 
 
 /* **********************************************************************
@@ -978,12 +1024,20 @@ yyerrhandle:
  *
  */
 
-/*
- * These definitions are used only in the extra functions
- */
+static fts_stack_t interpreter_stack;
+static int fp = 0;
+
+#define PUSH(V) fts_stack_push( &interpreter_stack, fts_atom_t, (V))
+#define POP(N) fts_stack_pop( &interpreter_stack, (N))
+
+#define TOP fts_stack_get_top( &interpreter_stack)
+#define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
+
+static void print_stack( const char *msg);
 
 /*
-  Stack organization:
+
+Description of stack organization:
 
 Before calling a method or outputing a message:
            <- top
@@ -1011,88 +1065,6 @@ savedfp'
 retval'
 
 */
-
-static parser_actions_t standard_actions;
-
-static fts_stack_t interpreter_stack;
-static int fp = 0;
-
-#define PUSH(V) fts_stack_push( &interpreter_stack, fts_atom_t, (V))
-#define POP(N) fts_stack_pop( &interpreter_stack, (N))
-
-#define TOP fts_stack_get_top( &interpreter_stack)
-#define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
-
-extern int fts_string_lex( YYSTYPE *lvalp, void *data);
-extern int fts_atoms_lex( YYSTYPE *lvalp, void *data);
-
-
-static int yyerror( const char *msg)
-{
-  fprintf( stderr, "%s\n", msg);
-
-  return 0;
-}
-
-int fts_parse_atoms( int ac, fts_atom_t *at)
-{
-  fts_parser_data_t data;
-
-  data.actions = &standard_actions;
-  data.yylex = fts_atoms_lex;
-  data.ac = ac;
-  data.at = at;
-  data.buffer = NULL;
-
-  return yyparse( &data);
-}
-
-/*
-  problem: some code in the body of this function needs YY_BUFFER_STATE which is generated by flex.
-  so it must either be in scanner.l or use an intermediate function defined in scanner.l
-*/
-int fts_parse_string( const char *s)
-{
-  fts_parser_data_t data;
-
-  data.actions = &standard_actions;
-  data.yylex = fts_string_lex;
-  data.ac = 0;
-  data.at = NULL;
-  data.buffer = (char *)s;
-
-  return yyparse( &data);
-}
-
-/* **********************************************************************
- *
- * Action functions
- *
- */
-static void print_stack( const char *msg)
-{
-  int i, current_fp;
-  fts_atom_t *p = BASE;
-
-  post( "%s:\n", msg);
-
-  current_fp = fp;
-
-  for ( i = TOP - 1; i >= 0; i--)
-    {
-      post( "[%2d]", i);
-      if ( i == current_fp - 1)
-	{
-	  post( "* ");
-	  current_fp = fts_get_int( p+i);
-	}
-      else
-	post( "  ");
-
-      post_atoms( 1, p+i);
-      post( "\n");
-    }
-}
 
 static void push_frame()
 {
@@ -1128,13 +1100,123 @@ static void push_value( const fts_atom_t *yylval)
   PUSH( *yylval);
 }
 
-#ifdef HACK_DEBUG
+static int yyerror( const char *msg)
+{
+  fprintf( stderr, "%s\n", msg);
+
+  return 0;
+}
+
+/* **********************************************************************
+ * 
+ * Atom array parser + scanner
+ *
+ */
+
+static fts_hashtable_t token_table;
+
+typedef struct {
+  int ac;
+  fts_atom_t *at;
+} fts_parser_data_t;
+
+int fts_parse_atoms( int ac, fts_atom_t *at)
+{
+  fts_parser_data_t data;
+
+  data.ac = ac;
+  data.at = at;
+
+  return yyparse( &data);
+}
+
+static int yylex( YYSTYPE *lvalp, void *data)
+{
+  fts_parser_data_t *parser_data = (fts_parser_data_t *)data;
+  fts_atom_t *at = parser_data->at;
+  int token = -1;
+
+  if (parser_data->ac <= 0)
+    return 0; /* end of file */
+
+  if (fts_is_int( at))
+    {
+      *lvalp = *at;
+      token = FTS_TOKEN_INT;
+    }
+  else if (fts_is_float( at))
+    {
+      *lvalp = *at;
+      token = FTS_TOKEN_FLOAT;
+    }
+  else if (fts_is_symbol( at))
+    {
+      fts_atom_t k, v;
+
+      k = *at;
+      if (fts_hashtable_get( &token_table, &k, &v))
+	token = fts_get_int( &v);
+      else
+	{
+	  *lvalp = *at;
+	  token = FTS_TOKEN_SYMBOL;
+	}
+    }
+
+  parser_data->at++;
+  parser_data->ac--;
+
+  return token;
+}
+
+static void scanner_init( void)
+{
+  fts_atom_t k, v;
+
+  fts_hashtable_init( &token_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+
+#define PUT(S,T) fts_set_symbol( &k, S); fts_set_int( &v, T); fts_hashtable_put( &token_table, &k, &v);
+  PUT( fts_s_dollar, FTS_TOKEN_DOLLAR);
+  PUT( fts_s_semi, FTS_TOKEN_SEMI);
+  PUT( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
+  PUT( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
+  PUT( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
+  PUT( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
+  PUT( fts_s_dot, FTS_TOKEN_DOT);
+}
 
 /* **********************************************************************
  * 
  * Debug code
  *
  */
+
+static void print_stack( const char *msg)
+{
+  int i, current_fp;
+  fts_atom_t *p = BASE;
+
+  post( "%s:\n", msg);
+
+  current_fp = fp;
+
+  for ( i = TOP - 1; i >= 0; i--)
+    {
+      post( "[%2d]", i);
+      if ( i == current_fp - 1)
+	{
+	  post( "* ");
+	  current_fp = fts_get_int( p+i);
+	}
+      else
+	post( "  ");
+
+      post_atoms( 1, p+i);
+      post( "\n");
+    }
+}
+
+#ifdef HACK_DEBUG
 
 static void fts_stdoutstream_output(fts_bytestream_t *stream, int n, const unsigned char *buffer)
 {
@@ -1178,19 +1260,12 @@ static fts_status_t fts_stdoutstream_instantiate(fts_class_t *cl, int ac, const 
  * Kernel initialization
  *
  */
-static void init_actions( void)
-{
-  standard_actions._int = push_value;
-  standard_actions._float = push_value;
-  standard_actions._symbol = push_value;
-  standard_actions._begin_expression = push_frame;
-  standard_actions._end_expression = pop_frame;
-}
 
 void fts_kernel_parser_init( void)
 {
   fts_stack_init( &interpreter_stack, fts_atom_t);
-  init_actions();
+
+  scanner_init();
 }
 
 void fts_parser_config( void)

@@ -118,16 +118,6 @@ static int mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
   return mempost( pp, psize, offset, "<\"%s\" #%d>", fts_object_get_class_name(obj), fts_object_get_id(obj));
 }
 
-/* To be removed */
-static int mempost_connection( char **pp, int *psize, int offset, fts_connection_t *connection)
-{
-  if (connection != 0)
-    return mempost( pp, psize, offset, "<CONNECTION %d.%d %d.%d #%d>",
-		    connection->src->head.id, connection->woutlet, connection->dst->head.id, connection->winlet, connection->id);
-
-  return mempost( pp, psize, offset, "<CONNECTION null>");
-}
-
 static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)
 {
   int i, n = 0;
@@ -148,9 +138,6 @@ static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_a
 	n += mempost( pp, psize, offset+n, "%p", fts_get_pointer( at));
       else if ( fts_is_string( at))
 	n += mempost( pp, psize, offset+n, "%s", fts_get_string( at));
-      /* To be removed */
-      else if ( fts_is_connection( at))
-	n += mempost_connection( pp, psize, offset+n, fts_get_connection( at));
       else
 	n += mempost( pp, psize, offset+n, "<UNKNOWN TYPE>%x", fts_get_int( at));
 

@@ -177,7 +177,6 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_connection_init);
   _K_DECNCALL( fts_kernel_variable_init);
   _K_DECNCALL( fts_kernel_patcher_init);
-  _K_DECNCALL( fts_kernel_scanner_init);
   _K_DECNCALL( fts_kernel_parser_init);
   _K_DECNCALL( fts_kernel_expression_init);
   _K_DECNCALL( fts_kernel_ftl_init);
