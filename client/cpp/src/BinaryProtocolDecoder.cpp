@@ -152,9 +152,7 @@ void BinaryProtocolDecoder::endObjectAction( int input)
 {
   _lval = _lval << 8 | input;
 
-  // FIXME
-  // FtsObject *obj = server.getObject( (int)_lval);
-  FtsObject *obj = NULL;
+  FtsObject *obj = _server->getObject( (int)_lval);
 
   if (_argsCount == 0)
     _target = obj;
@@ -335,7 +333,6 @@ void BinaryProtocolDecoder::nextState( int input)
 BinaryProtocolDecoder::BinaryProtocolDecoder( FtsServer *server)
 {
   _server = server;
-  //  _connection = server.getConnection();
 
   _buffer = new Buffer();
   _args = new FtsArgs();

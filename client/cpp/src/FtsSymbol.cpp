@@ -24,19 +24,24 @@
 
 using namespace ircam::fts::client;
 
-Hashtable<const char*, FtsSymbol*> FtsSymbol::_symbolTable;
+Hashtable<const char*, FtsSymbol*> FtsSymbol::symbolTable;
+const FtsSymbol *FtsSymbol::sNewObject = FtsSymbol::get( "new_object");
+const FtsSymbol *FtsSymbol::sDelObject = FtsSymbol::get( "delete_object");
+const FtsSymbol *FtsSymbol::sInt = FtsSymbol::get( "int");
+const FtsSymbol *FtsSymbol::sFloat = FtsSymbol::get( "float");
+const FtsSymbol *FtsSymbol::sList = FtsSymbol::get( "list");
 
 const FtsSymbol *FtsSymbol::get( const char *s)
 {
   FtsSymbol *symbol;
 
-  _symbolTable.get( s, symbol);
+  symbolTable.get( s, symbol);
 
   if (symbol != NULL)
     return symbol;
 
   symbol = new FtsSymbol( s);
-  _symbolTable.put( s, symbol);
+  symbolTable.put( s, symbol);
   
   return symbol;
 }

@@ -30,6 +30,7 @@ namespace client {
   template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
 
   class FTSCLIENT_API FtsObject {
+    friend class BinaryProtocolEncoder;
   public:
     static const int NO_ID = -1;
 
@@ -66,7 +67,7 @@ namespace client {
   private:
     void invokeMessageHandler( FtsObject *obj, FtsSymbol *selector, FtsArgs *args);
 
-    int getID()
+    int getID() const
     {
       return _id;
     }
@@ -87,12 +88,6 @@ namespace client {
 
     static Hashtable<MessageHandlerEntry *, FtsMessageHandler *> *messageHandlersTable;
     static MessageHandlerEntry lookupEntry;
-
-    static FtsSymbol *sNewObject;
-    static FtsSymbol *sDelObject;
-    static FtsSymbol *sInt;
-    static FtsSymbol *sFloat;
-    static FtsSymbol *sList;
   };
 
 };

@@ -19,46 +19,47 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-/**
- * FtsSymbol instance are canonical representation of C string that
- * can be compared using == instead of strcmp.
- */
-
-#include <cstring>
-
 namespace ircam {
 namespace fts {
 namespace client {
+  
+  unsigned int getNextPrime( unsigned int n)
+  {
+    static const unsigned int primesSuite[] = {
+      7,
+      17,
+      31,
+      67,
+      127,
+      257,
+      521,
+      1031,
+      2053,
+      4099,
+      8191,
+      16411,
+      32771,
+      65537,
+      131071,
+      262147,
+      524287,
+      1048583,
+      2097169,
+      4194319,
+      8388617,
+      16777259,
+      33554467,
+    };
+    unsigned int i;
 
-  template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
+    for ( i = 0; i < sizeof (primesSuite) / sizeof (unsigned int); i++)
+      if (n < primesSuite[i])
+	return primesSuite[i];
 
-  class FTSCLIENT_API FtsSymbol {
-    friend class FtsObject;
-  public:
-    static const FtsSymbol *sNewObject;
-    static const FtsSymbol *sDelObject;
-    static const FtsSymbol *sInt;
-    static const FtsSymbol *sFloat;
-    static const FtsSymbol *sList;
-
-    static const FtsSymbol *get( const char *s);
-
-    const char *getString() const { return _s; }
-
-    operator const char *() const { return _s; }
-
-  private:
-    FtsSymbol( const char *s) { _s = std::strcpy( new char [std::strlen(s)+1], s); }
-
-    static Hashtable< const char *, FtsSymbol *> symbolTable;
-
-    char *_s;
-  };
+    return primesSuite[i-1];
+  }
 
 };
 };
 };
-
-std::ostream &operator<<( std::ostream &os, const ircam::fts::client::FtsSymbol &s);
-
 

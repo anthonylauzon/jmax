@@ -79,10 +79,10 @@ void BinaryProtocolEncoder::writeObject( const FtsObject *v) throw( FtsClientExc
 {
   _outputBuffer->append( BinaryProtocol::OBJECT);
 
-  //     if (v != null)
-  //       write( v.getID());
-  //     else
-  //       write( 0);
+  if (v != NULL)
+    write( v->getID());
+  else
+    write( 0);
 }
 
 /* This version is used for object that have predefined IDs */

@@ -59,7 +59,6 @@ namespace client {
   private:
 
     FtsServer *_server;
-    FtsServerConnection *_connection;
 
     long _lval;
     Buffer *_buffer;

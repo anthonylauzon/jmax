@@ -327,7 +327,6 @@ class BinaryProtocolDecoder {
   BinaryProtocolDecoder( FtsServer server)
   {
     this.server = server;
-    connection = server.getConnection();
 
     buffer = new StringBuffer();
     args = new FtsArgs();
@@ -355,7 +354,6 @@ class BinaryProtocolDecoder {
   }
 
   private FtsServer server;
-  private FtsServerConnection connection;
 
   private long lval;
   private StringBuffer buffer;

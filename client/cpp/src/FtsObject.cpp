@@ -48,7 +48,7 @@ namespace client {
     server->putObject(_id, this);
 
     _encoder->writeObject(FtsServer::CLIENT_OBJECT_ID);
-    _encoder->writeSymbol(sNewObject);
+    _encoder->writeSymbol( FtsSymbol::sNewObject);
 
     _encoder->writeObject(parent);
     _encoder->writeInt(_id);
@@ -67,7 +67,7 @@ namespace client {
     server->putObject(_id, this);
 
     _encoder->writeObject(FtsServer::CLIENT_OBJECT_ID);
-    _encoder->writeSymbol(sNewObject);
+    _encoder->writeSymbol( FtsSymbol::sNewObject);
     _encoder->writeObject(parent);
     _encoder->writeInt(_id);
     _encoder->writeSymbol(ftsClassName);
@@ -107,7 +107,7 @@ namespace client {
   void FtsObject::send(FtsArgs* args) throw(FtsClientException)
   {
     _encoder->writeObject(this);
-    _encoder->writeSymbol(sList);
+    _encoder->writeSymbol( FtsSymbol::sList);
     _encoder->writeArgs(*args);
     _encoder->flush();
   }
@@ -115,7 +115,7 @@ namespace client {
   void FtsObject::send(int n) throw(FtsClientException)
   {
     _encoder->writeObject(this);
-    _encoder->writeSymbol(sInt);
+    _encoder->writeSymbol( FtsSymbol::sInt);
     _encoder->writeInt(n);
     _encoder->flush();
   }
@@ -123,7 +123,7 @@ namespace client {
   void FtsObject::send(double d) throw(FtsClientException)
   {
     _encoder->writeObject(this);
-    _encoder->writeSymbol(sFloat);
+    _encoder->writeSymbol( FtsSymbol::sFloat);
     _encoder->writeDouble(d);
     _encoder->flush();
   }
