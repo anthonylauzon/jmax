@@ -80,8 +80,8 @@ package_SOURCES =  LinerTool.java PencilTool.java TableSelecter.java TableTool.j
 
 
 JAVACX = @JAVACX@
-JAVAROOTX = @top_srcdir@/java/src
-CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+JAVAROOTX = @top_srcdir@/packages/data/java/src
+CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/data/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -118,7 +118,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .class .java .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/data/java/src/ircam/jmax/editors/table/tools/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu packages/data/java/src/ircam/jmax/editors/table/tools/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -262,7 +262,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/data/java/src/ircam/jmax/editors/table/tools/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu packages/data/java/src/ircam/jmax/editors/table/tools/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
