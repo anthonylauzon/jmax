@@ -160,7 +160,7 @@ class BinaryProtocolDecoder {
   {
     if (debug)
       {
-	System.err.println( "[client] message: target " + target + " selector " + selector + " args [" + args + "]");
+	System.err.println( "[client] received message: target " + target + " selector " + selector + " args [" + args + "]");
       }
 
     FtsObject.invokeMessageHandler( target, selector, args);

@@ -181,7 +181,11 @@ public class FtsAtom implements java.io.Serializable
    */
   public final void setObject( FtsObject o)
   {
-    type = o.getClass();
+    if (o != null)
+      type = o.getClass();
+    else
+      type = FtsObject.class;
+
     objectValue = o;
   }
 
@@ -232,7 +236,7 @@ public class FtsAtom implements java.io.Serializable
     else if ( isString() || isRawString())
       return stringValue;
     else if ( isObject())
-      return objectValue.toString();
+      return (objectValue != null) ? objectValue.toString(): "null";
 
     return "unknown";
   }
