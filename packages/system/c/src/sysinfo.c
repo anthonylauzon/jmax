@@ -23,7 +23,6 @@
 #include <fts/fts.h>
 #include <string.h>
 
-extern fts_package_t* fts_get_system_package(void);
 
 typedef struct 
 {
