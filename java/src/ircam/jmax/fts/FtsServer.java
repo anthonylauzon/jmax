@@ -23,7 +23,7 @@ import java.io.*;
 public class FtsServer 
 {
   // Probe probe;
-  static final boolean debug = false;
+  public static boolean debug = false;
 
   /** The FtsPort used to communicate with FTS */
 

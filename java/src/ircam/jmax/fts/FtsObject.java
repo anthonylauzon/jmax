@@ -517,7 +517,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	    for (int i = 0; i < properties.size(); i++)
 	      {
 		Property p = (Property)(properties.elementAt(i));
-		
+
 		if (p.name.equals(name))
 		  return p.value;
 	      }
