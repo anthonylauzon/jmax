@@ -1,3 +1,8 @@
+2004-05-25  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/dtd/c/src/dtd_thread.c, dtd_thread.h, readsf.c, writesf.c: fixed compilation with gcc-3.3.3
+	closed bug "[ 949069 ] jMax doesn't compile with gcc-3.3".
+
 2004-05-25  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* data.c: introduced enumeration_t enum support
