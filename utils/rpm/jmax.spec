@@ -15,10 +15,10 @@ jMax is a visual programming environment for developing real-time, interactive m
 
 %build
 %ifarch i386
-make all ARCH=i386-linux ENABLE_ALSA=$ENABLE_ALSA
+make all ARCH=i386-linux ENABLE_ALSA=yes
 %endif
 %ifarch i686
-make all ARCH=i686-linux ENABLE_ALSA=$ENABLE_ALSA
+make all ARCH=i686-linux ENABLE_ALSA=yes
 %endif
 %ifarch ppc
 make all ARCH=ppc-linux
@@ -27,10 +27,10 @@ make all ARCH=ppc-linux
 %install
 rm -rf $RPM_BUILD_ROOT
 %ifarch i386
-make install ARCH=i386-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=$ENABLE_ALSA
+make install ARCH=i386-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=yes
 %endif
 %ifarch i686
-make install ARCH=i686-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=$ENABLE_ALSA
+make install ARCH=i686-linux prefix=$RPM_BUILD_ROOT/usr ENABLE_ALSA=yes
 %endif
 %ifarch ppc
 make install ARCH=ppc-linux prefix=$RPM_BUILD_ROOT/usr
