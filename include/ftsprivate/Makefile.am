@@ -10,8 +10,10 @@ dspgraph.h \
 errobj.h \
 fpe.h \
 label.h \
+message.h \
 object.h \
 package.h \
+parser.h \
 patcher.h \
 patfile.h \
 platform.h \
