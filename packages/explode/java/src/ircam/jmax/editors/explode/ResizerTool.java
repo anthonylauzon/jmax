@@ -77,7 +77,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
     egc.getDataModel().endUpdate();
     
     mountIModule(itsSelecter);
-    egc.getGraphicDestination().repaint();    
+
   }
 
 

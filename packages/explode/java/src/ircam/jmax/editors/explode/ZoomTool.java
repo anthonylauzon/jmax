@@ -60,7 +60,7 @@ public class ZoomTool extends Tool implements PositionListener {
 
       }
 
-    gc.getGraphicDestination().repaint();
+    //gc.getGraphicDestination().repaint();
   }
   
 

@@ -102,7 +102,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       public void zoomChanged(int zoom)
 	{
 	  itsZoomLabel.setText("Zoom: "+zoom+"%"); 
-
+	  repaint();
 	}
     });
 

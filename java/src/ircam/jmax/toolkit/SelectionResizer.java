@@ -43,10 +43,6 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
    */
   public void mouseDragged(MouseEvent e) 
   {
-    /*int deltaX = gc.getAdapter().getInvX(e.getX()) - gc.getAdapter().getInvX(itsStartingPoint.x);
-      int deltaY = gc.getAdapter().getInvY(e.getY()) - gc.getAdapter().getInvY(itsStartingPoint.y);
-      
-      gc.getStatusBar().post(ScrToolbar.getTool(), " dx "+deltaX);*/
 
     itsXORHandler.moveTo(e.getX(), e.getY());
   }

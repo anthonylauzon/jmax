@@ -58,7 +58,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	    ExplodeSelection.getSelection().select(aScrEvent);
 	  }
 
-	gc.getGraphicDestination().repaint();
 	singleObjectSelected(x, y, modifiers);
       }
     else //click on empty
@@ -68,7 +67,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	  if (ExplodeSelection.getSelection().size() != 0)
 	    {
 	      ExplodeSelection.getSelection().deselectAll(); 
-	      gc.getGraphicDestination().repaint();
 	    }
 	}
       
@@ -85,8 +83,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     
     selectArea(x, y, w, h);
     
-    if (ExplodeSelection.getSelection().size() != 0)
-      gc.getGraphicDestination().repaint();
     
     multipleObjectSelected();
   }
@@ -108,11 +104,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
     ScrEvent aScrEvent;
 
-    for (Enumeration e = r.objectsIntersecting(x, y, w, h); e.hasMoreElements();) 
-      {
-	aScrEvent = (ScrEvent)e.nextElement() ;
-	s.select(aScrEvent);
-      }
+    s.select(r.objectsIntersecting(x, y, w, h));
   }
 
   /**

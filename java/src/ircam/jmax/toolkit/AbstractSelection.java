@@ -35,9 +35,15 @@ public abstract class AbstractSelection implements SelectionHandler {
    */
   public void select(Enumeration e) 
   {
+    int count = 0;
     while(e.hasMoreElements())
-      selected.addElement(e.nextElement());
-    notifyListeners(GROUP_SELECTED);
+      {
+	selected.addElement(e.nextElement());
+	count++;
+      }
+
+    if (count == 1) notifyListeners(OBJECT_SELECTED);
+    else if (count > 1) notifyListeners(GROUP_SELECTED);
   }
 
   /**
@@ -54,9 +60,16 @@ public abstract class AbstractSelection implements SelectionHandler {
    */
   public void deSelect(Enumeration e) 
   {
+    int count = 0;
     while (e.hasMoreElements())
-      selected.removeElement(e.nextElement());
-    notifyListeners(GROUP_DESELECTED);
+      {
+	selected.removeElement(e.nextElement());
+	count++;
+      }
+
+    if (count ==1)
+      notifyListeners(OBJECT_DESELECTED);
+    else if (count > 1) notifyListeners(GROUP_DESELECTED);
   }
 
 
