@@ -271,16 +271,25 @@ public class JMaxApplication extends FtsClient {
 
   private void start( String[] args)
   {
-    parseCommandLineOptions( args);
-    findRootDirectory();
-    showSplashScreen();
+    Platform.setValues();
+
     properties.put( "jmaxVersion", JMaxVersion.getVersion());
-    ircam.jmax.Platform.setValues();
+
+    parseCommandLineOptions( args);
+
+    guessDirectories();
+
+    showSplashScreen();
+
     initModules();
+
     openConsole();
+
     openConnection();
+
     // This should be really here, right before we eventually open command line documents
     recentFileHistory.load();
+
     openCommandLineFiles();
   }
 
@@ -324,17 +333,30 @@ public class JMaxApplication extends FtsClient {
       }
   }
 
-  private void findRootDirectory()
+  private void guessDirectories()
   {
-    if (properties.get( "jmaxRoot") != null)
-      return;
+    if (properties.get( "jmaxRoot") == null)
+      {
+	URL url = ClassLoader.getSystemResource( "jmax.jar.root");
+	String u = url.toString();
+	String root;
 
-    URL url = ClassLoader.getSystemResource( "jmax.jar.root");
-    String u = url.toString();
+	if ( u.endsWith( "/Contents/Resources/Java/jmax.jar!/jmax.jar.root"))
+	  {
+	    // Mac OS X MRJAppBuilder case
+	    
+	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root"));
+	    properties.put( "jmaxServerName", "fts.wrapper");
+	  }
+	else
+	  {
+	    // Linux case, Mac OS X shell script case
+	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/share/jmax/java/jmax.jar!/jmax.jar.root"));
+	  }
 
-    String root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root")) + "/jmaxRoot";
-
-    properties.put( "jmaxRoot", root);
+	properties.put( "jmaxRoot", root + "/share/jmax");
+	properties.put( "jmaxServerDir", root + "/bin");
+      }
   }
 
   private void showSplashScreen()
@@ -406,12 +428,7 @@ public class JMaxApplication extends FtsClient {
 			    + ((hostName == null) ? "localhost" : hostName)
 			    + " via "+ connectionType + " connection"); 
 
-
 	String ftsDir = (String)properties.get( "jmaxServerDir");
-
-	if (ftsDir == null)
-	  ftsDir = (String)properties.get( "jmaxRoot") + "/../bin";
-
 	String ftsName = (String)properties.get( "jmaxServerName");
 
 	if (ftsName == null)

@@ -14,6 +14,17 @@ AC_PREFIX_DEFAULT(/usr)
 
 AM_CONFIG_HEADER(include/ftsconfig-ac.h)
 
+dnl Check for debug
+AC_ARG_ENABLE(debug,
+  [  --enable-debug[=value]   compile with debug [default=no]],
+  with_debug="yes",
+  with_debug="no")
+if test "$with_debug" = "yes"
+then
+  AC_DEFINE(DEBUG,1,[Define to enable debug])
+  CFLAGS="-g"
+fi
+
 dnl Guess the host
 AC_CANONICAL_HOST
 
@@ -55,11 +66,10 @@ dnl AC_PROG_JAVAC
 JAVACX=javac
 AC_SUBST(JAVACX)
 JAVACFLAGSX=
-case "$debug" in
- yes)
+if test "$with_debug" = "yes"
+then
   JAVACFLAGSX="-g"
-  ;;
-esac
+fi
 AC_SUBST(JAVACFLAGSX)
 
 dnl Big hack for Mac OS X (see ChangeLog about the -twolevel_namespace)
@@ -91,17 +101,6 @@ changequote([,])dnl
 AC_MSG_RESULT( "$libtool_minor_version")
 if test "$libtool_major_version" -le 1 -a "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs ; fi
 AC_SUBST(DOT_LIBS)
-
-dnl Check for debug
-AC_ARG_ENABLE(debug,
-  [  --enable-debug[=value]   compile with debug [default=no]],
-  with_debug="yes",
-  with_debug="no")
-if test "$with_debug" = "yes"
-then
-  AC_DEFINE(DEBUG,1,[Define to enable debug])
-  CFLAGS="-g"
-fi
 
 dnl Set platform specifics
 case "$host" in

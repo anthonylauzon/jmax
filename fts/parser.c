@@ -990,11 +990,11 @@ Before calling a method or outputing a message:
 arg3  
 arg2
 arg1       <- fp
-oldfp
+savedfp
 retval
 arg2'
 arg1'
-oldfp'
+savedfp'
 retval'
 
 After poping one frame:
@@ -1003,11 +1003,11 @@ After poping one frame:
 arg3  
 arg2
 arg1
-oldfp      <- top
+savedfp      <- top
 retval
 arg2'
-arg1'      <- fp
-oldfp'
+arg1'        <- fp
+savedfp'
 retval'
 
 */
@@ -1022,10 +1022,6 @@ static int fp = 0;
 
 #define TOP fts_stack_get_top( &interpreter_stack)
 #define BASE ((fts_atom_t *)fts_stack_get_base( &interpreter_stack))
-
-#define PUSHFRAME { fts_atom_t a; fts_set_void( &a); PUSH( a); fts_set_int( &a, fp); PUSH( a); fp = TOP; }
-#define POPFRAME { int old_fp = fp; fp = fts_get_int( BASE + fp - 1); POP( TOP - old_fp + 1); }
-
 
 extern int fts_string_lex( YYSTYPE *lvalp, void *data);
 extern int fts_atoms_lex( YYSTYPE *lvalp, void *data);
@@ -1073,10 +1069,12 @@ int fts_parse_string( const char *s)
  * Action functions
  *
  */
-static void print_stack( void)
+static void print_stack( const char *msg)
 {
   int i, current_fp;
   fts_atom_t *p = BASE;
+
+  post( "%s:\n", msg);
 
   current_fp = fp;
 
@@ -1098,21 +1096,31 @@ static void print_stack( void)
 
 static void push_frame()
 {
-  PUSHFRAME;
+  fts_atom_t a;
 
-  post( "Stack after pushing frame:\n");
-  print_stack();
+  /* return value */
+  fts_set_void( &a);
+  PUSH( a);
+
+  /* saved frame pointer */
+  fts_set_int( &a, fp);
+  PUSH( a);
+  fp = TOP;
+
+  print_stack( "Stack after pushing frame");
 }
 
 static void pop_frame()
 {
-  post( "Stack before poping frame:\n");
-  print_stack();
+  int old_fp;
 
-  POPFRAME;
+  print_stack( "Stack before poping frame");
 
-  post( "Stack after poping frame:\n");
-  print_stack();
+  old_fp = fp;
+  fp = fts_get_int( BASE + fp - 1);
+  POP( TOP - old_fp + 1);
+
+  print_stack( "Stack after poping frame");
 }
 
 static void push_value( const fts_atom_t *yylval)

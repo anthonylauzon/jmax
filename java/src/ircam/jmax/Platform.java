@@ -74,6 +74,7 @@ public class Platform
 
     if (SYSTEM.equalsIgnoreCase("Mac OS X"))
       {
+	SYSTEM = "Mac OS X";
 	setMacValues();
       }
     else if (SYSTEM.equals("Irix"))
