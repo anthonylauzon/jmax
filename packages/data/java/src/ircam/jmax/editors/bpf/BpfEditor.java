@@ -59,6 +59,9 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		public void pointChanged(int oldndex, int newIndex, float newTime, float newValue) {
 		    BpfEditor.this.repaint();
 		}
+		public void pointsChanged() {
+		    BpfEditor.this.repaint();
+		}
 		public void cleared(){BpfEditor.this.repaint();}
 	    });
 
@@ -144,6 +147,8 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     {
 	if(listDialog==null) 
 	    createListDialog();
+	else
+	    listDialog.relocate();
 	listDialog.setVisible(true);
     }
 
@@ -183,7 +188,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, DEFAULT_HEIGHT);
+	return new Dimension(Bpf.DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     public void processKeyEvent(KeyEvent e)
@@ -217,7 +222,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     FtsBpfObject model;
     BpfPopupMenu bpfPopupMenu;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    static public int DEFAULT_HEIGHT = 127;
+    static public int DEFAULT_HEIGHT = /*127*/Bpf.DEFAULT_HEIGHT - 30;
     BpfRenderer renderer;
     BpfAdapter ad;
 

@@ -107,17 +107,30 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
       int newIndex = oldIndex;
       float newTime = args[1].getFloat();
       float newValue = args[2].getFloat();
-
+     
       BpfPoint point = getPointAt(oldIndex);
       point.setValue(newValue);
-      if(point.getTime()!=newTime)
-	  {
-	      point.setTime(newTime);
-	      points.removeElementAt(oldIndex);
-	      newIndex = getPreviousPointIndex(newTime)+1;
-	      points.insertElementAt(point, newIndex);
-	  }
+      point.setTime(newTime);
       notifyPointChanged(oldIndex, newIndex, newTime, newValue);
+      setDirty();
+  }
+
+  public void setPoints(int nArgs , FtsAtom args[])
+  {
+      BpfPoint point;
+      int firstIndex = args[0].getInt();
+      int n = (nArgs - 1) / 2;
+
+      for(int i=0; i<n; i++)
+	  {
+	      float time = args[i * 2 + 1].getFloat();
+	      float value = args[i * 2 + 2].getFloat();
+	      point = getPointAt(firstIndex + i);
+	      point.setValue(value);
+	      point.setTime(time);	      
+	  }
+
+      notifyPointsChanged();
       setDirty();
   }
 
@@ -154,20 +167,31 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   /*
   ** Requests to the server
   */
-  public void requestPointCreation(int index, float time, float value)
-  {
-    sendArgs[0].setInt(index); 
-    sendArgs[1].setFloat(time); 
-    sendArgs[2].setFloat(value); 
-    sendMessage(FtsObject.systemInlet, "add_point", 3, sendArgs);
-  }
+    public void requestPointCreation(int index, float time, float value)
+    {
+	sendArgs[0].setInt(index); 
+	sendArgs[1].setFloat(time); 
+	sendArgs[2].setFloat(value); 
+	sendMessage(FtsObject.systemInlet, "add_point", 3, sendArgs);
+    }
 
     public void requestSetPoint(int index, float time, float value)
     {
 	sendArgs[0].setInt(index); 
 	sendArgs[1].setFloat(time); 
 	sendArgs[2].setFloat(value); 
-	sendMessage(FtsObject.systemInlet, "set_point", 3, sendArgs);
+	sendMessage(FtsObject.systemInlet, "set_points", 3, sendArgs);
+    }
+
+    public void requestSetPoints(int index, float[] times, float[] values)
+    {
+	sendArgs[0].setInt(index); 
+	for(int i=0; i<times.length; i++)
+	    {
+		sendArgs[i*2+1].setFloat(times[i]); 
+		sendArgs[i*2+2].setFloat(values[i]);
+	    } 
+	sendMessage(FtsObject.systemInlet, "set_points", times.length*2+1, sendArgs);
     }
 
     public void requestPointRemove(int index)
@@ -247,15 +271,17 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	    return null;
     }
 
+    public BpfPoint getPreviousPoint(BpfPoint pnt)
+    {
+	int id = indexOf(pnt);	
+	if((id!=-1)&&(id<length()))
+	    return getPointAt(id-1);
+	else return null;
+    }
+
     public BpfPoint getPreviousPoint(float time)
       {
-	  int i = -1;
-	  for(Enumeration e = points.elements(); e.hasMoreElements();)
-	    {
-		if(((BpfPoint)e.nextElement()).getTime() >= time) 
-		    break;
-		i++;
-	    }
+	  int i = getPreviousPointIndex(time);
 	  if((i<0)||(i >= points.size()))
 	      return null; 
 	  else
@@ -267,7 +293,9 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	  int i = -1;
 	  for(Enumeration e = points.elements(); e.hasMoreElements();)
 	    {
-		if(((BpfPoint)e.nextElement()).getTime() > time) 
+
+		BpfPoint point = (BpfPoint)e.nextElement();
+		if(point.getTime() >= time) 
 		    return i;
 		i++;
 	    }
@@ -293,6 +321,19 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	if((id!=-1)&&(id<length()))
 	    return getPointAt(id+1);
 	else return null;
+    }
+
+    public int getNextPointIndex(float time)
+    {
+	int i = 0;
+	for(Enumeration e = points.elements(); e.hasMoreElements();)
+	{
+	    BpfPoint point = (BpfPoint)e.nextElement();
+	    if(point.getTime() > time) 
+		return i;
+	    i++;
+	}
+	return i; 
     }
 
     public int indexOf(BpfPoint pnt)
@@ -357,6 +398,12 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	    ((BpfDataListener) e.nextElement()).pointChanged(oldIndex, newIndex, newTime, newValue);
     }
 
+    private void notifyPointsChanged()
+    {
+	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+	    ((BpfDataListener) e.nextElement()).pointsChanged();
+    }
+
     private void notifyClear()
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
@@ -415,7 +462,29 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	Object nextObject = null;
 	BpfAdapter adapter;
     }    
-
+    /////////////////////////////////////////////////
+    float maxValue = 1;
+    float minValue = 0;
+    public float getRange()
+    {
+	return (maxValue-minValue);
+    }
+    public float getMaximumValue()
+    {
+	return maxValue;
+    }
+    public float getMinimumValue()
+    {
+	return minValue;
+    }
+    public void setMaximumValue(float max)
+    {
+	maxValue = max;
+    }
+    public void setMinimumValue(float min)
+    {
+	minValue = min;
+    }
     ////////////////////////////////////////////////////////
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();

@@ -117,9 +117,9 @@ public class BpfAdapter {
    */
     public int getY(BpfPoint p) 
     {  
-	float value = p.getValue() - (float)minValue;
+	float value = p.getValue() - /*(float)minValue*/gc.getDataModel().getMinimumValue();
 	int height = gc.getGraphicDestination().getSize().height;
-	float range = getRange();
+	float range = gc.getDataModel().getRange();
 	float step = (float)((float)height/range);
 	
 	return height - (int)(value*step);
@@ -130,9 +130,9 @@ public class BpfAdapter {
      */
     public int getY(float y) 
     {  
-	float value = y - (float)minValue;
+	float value = y - /*(float)minValue*/ gc.getDataModel().getMinimumValue();
 	int height = gc.getGraphicDestination().getSize().height;
-	float range = getRange();
+	float range = gc.getDataModel().getRange();
 	float step = (float)((float)height/range);
 	return height - (int)(value*step);
     }
@@ -150,10 +150,10 @@ public class BpfAdapter {
   {
     float temp;
     int height = gc.getGraphicDestination().getSize().height;
-    float range = getRange();
+    float range = gc.getDataModel().getRange();
     float step = (float)(range/(float)height);
 	
-    temp = (((height-y)*step) + (float)minValue);
+    temp = (((height-y)*step) + /*(float)minValue*/gc.getDataModel().getMinimumValue());
 
     return temp;
   }
@@ -207,28 +207,6 @@ public class BpfAdapter {
 	displayLabels = display;
     }
 
-    public float getRange()
-    {
-	return (maxValue-minValue);
-    }
-
-    public float getMaximumValue()
-    {
-	return maxValue;
-    }
-    public float getMinimumValue()
-    {
-	return minValue;
-    }
-    public void setMaximumValue(float max)
-    {
-	maxValue = max;
-    }
-    public void setMinimumValue(float min)
-    {
-	minValue = min;
-    }
-
     public boolean isDrawable()
     {
 	return true;
@@ -236,8 +214,6 @@ public class BpfAdapter {
 
     //------------- Fields
     int constant;    
-    float maxValue = 1;
-    float minValue = 0;
     boolean displayLabels = true;
     Geometry geometry;
 

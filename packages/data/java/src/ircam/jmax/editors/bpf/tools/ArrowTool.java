@@ -86,16 +86,32 @@ public class ArrowTool extends SelecterTool implements DragListener{
       mountIModule(itsSelectionMover);
       
       BpfGraphicContext bgc = (BpfGraphicContext) gc;
-      ((UndoableData) ((BpfGraphicContext)gc).getDataModel()).beginUpdate();
+      FtsBpfObject ftsObj = bgc.getFtsObject();
+
+      ((UndoableData) ftsObj).beginUpdate();
 
       //with Shift add to selection
-      if((modifiers & InputEvent.SHIFT_MASK) == 0) ((BpfGraphicContext)gc).getSelection().deselectAll();
+      if((modifiers & InputEvent.SHIFT_MASK) == 0) bgc.getSelection().deselectAll();
 	       
       float time = bgc.getAdapter().getInvX(x);
       float value = bgc.getAdapter().getInvY(y);
-      int index = bgc.getFtsObject().getPreviousPointIndex(time)+1;
+      int index = ftsObj.getNextPointIndex(time);
 
-      bgc.getFtsObject().requestPointCreation(index, time, value); 
+      /* new time equals previous time */
+      if(time == ftsObj.getPointAt(index - 1).getTime())
+	  {
+	      if(index == ftsObj.length() || value == ftsObj.getPointAt(index - 1).getValue())
+		  {
+		      // do nothing! (don't add jump point at the end or double point)
+		  }
+	      else if(index == 1 || time == ftsObj.getPointAt(index - 2).getTime())
+		  {
+		      // set value of previous point (no add!)      
+		      ftsObj.requestSetPoint(index-1, time, value); 
+		  }
+	  }
+	  else
+	      ftsObj.requestPointCreation(index, time, value); 
   
       mountIModule(itsSelecter);
   }
@@ -110,41 +126,110 @@ public class ArrowTool extends SelecterTool implements DragListener{
     BpfPoint newPoint;
     BpfGraphicContext bgc = (BpfGraphicContext) gc;
     BpfAdapter a = bgc.getAdapter();
+    FtsBpfObject ftsObj = bgc.getFtsObject();
 
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
+    
+    if(bgc.getSelection().isInSelection(ftsObj.getPointAt(0)))
+	deltaX = 0;
+
+    if((deltaX==0)&&(deltaY==0)) 
+      {
+	mountIModule(itsSelecter);
+	gc.getGraphicDestination().repaint();    
+	return;
+      }
+    //clip deltaY///////////////////
+    if(deltaY > 0)
+	{
+	    int minY = a.getY(bgc.getSelection().getMinValueInSelection());
+	    int h = bgc.getGraphicDestination().getSize().height;
+	    if(minY + deltaY > h)
+		deltaY = h - minY;
+	}
+    else
+	{
+	    int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
+	    if(maxY + deltaY < 0)
+		deltaY = -maxY;
+	}
+
+    //clip deltaX///////////////////
+    BpfPoint last, first;
+    int firstIndex, lastIndex;
+    first =  bgc.getSelection().getFirstInSelection();
+    firstIndex = bgc.getSelection().getMinSelectionIndex();
+    if(bgc.getSelection().size()==1)
+	{
+	    last = first;
+	    lastIndex = firstIndex;
+	}
+    else
+	{
+	    last =  bgc.getSelection().getLastInSelection();
+	    lastIndex = bgc.getSelection().getMaxSelectionIndex();
+	}
+    int lastX =  a.getX(last);
+    int firstX = a.getX(first);
+	
+    BpfPoint next = ftsObj.getNextPoint(last);
+    BpfPoint prev = ftsObj.getPreviousPoint(first);
+    int nextX = -1;
+    int prevX = -1;
+    if(next!=null)
+      nextX = a.getX(next);
+    if(prev!=null)
+      prevX = a.getX(prev);
+
+    if((lastX+deltaX > nextX)&&(next!=null)) deltaX = nextX-lastX;
+	else if((firstX+deltaX < prevX)&&(prev!=null)) deltaX = prevX-firstX;
 
     // starts a serie of undoable moves
     ((UndoableData) bgc.getDataModel()).beginUpdate();
-	    
-    for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)
-	{
-	    int prevX = 0;
-	    int nextX = 0;
-	    float invX;
 
-	    aPoint = (BpfPoint) e.nextElement();
-	    
-	    FtsBpfObject ftsObj = bgc.getFtsObject();
-	    BpfPoint next = ftsObj.getNextPoint(aPoint);
-	    if(next!=null)
-		nextX = a.getX(next)-1;
-	    BpfPoint prev = ftsObj.getPreviousPoint(aPoint.getTime());
-	    if(prev!=null)
-		prevX = a.getX(prev)+1;
-	    
-	    if((a.getX(aPoint) + deltaX > nextX)&&(next!=null))
-		invX = a.getInvX(nextX);
-	    else
-		if((a.getX(aPoint) + deltaX < prevX)&&(prev!=null))
-		    invX = a.getInvX(prevX);
-		else
-		    invX = a.getInvX(a.getX(aPoint) + deltaX);
-	    
-	    bgc.getFtsObject().requestSetPoint(bgc.getFtsObject().indexOf(aPoint), 
-					       invX,
-					       a.getInvY(a.getY(aPoint)+deltaY));
+    //control of Jump and double points  ///////////////
+    if(firstX+deltaX <= prevX)
+	{
+	  if(firstIndex == ftsObj.length() - 1 || first.getValue() == prev.getValue())
+	      {
+		  //remove the first selected index and send the rest;
+		  bgc.getSelection().deSelect(first);
+		  ftsObj.requestPointRemove(firstIndex);
+	      }
+	  else if(firstIndex == 1 || a.getInvX(firstX + deltaX) <= ftsObj.getPointAt(firstIndex - 2).getTime())
+	      {
+		  //remove prev and  send the points with index -1
+		  ftsObj.requestPointRemove(firstIndex-1);
+		  firstIndex--;
+	      }
+      }
+    else if((lastX+deltaX == nextX) && (lastIndex < ftsObj.length() - 1 ))
+	{
+	    if(last.getValue() == next.getValue())
+		{
+		    //remove the last selected index and send the rest;
+		    bgc.getSelection().deSelect(last);
+		    ftsObj.requestPointRemove(lastIndex);
+		}
+	    else if(lastIndex == ftsObj.length() - 2 || a.getInvX(lastX + deltaX) >= ftsObj.getPointAt(lastIndex + 2).getTime())
+		// remove next and send all 
+		ftsObj.requestPointRemove(lastIndex+1);		    
 	}
+    /////////////////////////////////////////
+
+    int i = 0;
+    int selSize = bgc.getSelection().size();
+    float[] times = new float[selSize];
+    float[] values = new float[selSize];
+    for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)
+      {
+	aPoint = (BpfPoint) e.nextElement();
+	times[i] = a.getInvX(a.getX(aPoint) + deltaX);
+	values[i++] = a.getInvY(a.getY(aPoint)+deltaY);
+      }
+
+    ftsObj.requestSetPoints(firstIndex, times, values);
 
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    

@@ -85,18 +85,12 @@ public class PointRenderer implements ObjectRenderer {
 	if(point instanceof UtilBpfPoint)//during the XOR draw
 	    {
 		BpfPoint original = ((UtilBpfPoint)point).getOriginal();
-		next = model.getNextPoint(point.getTime());				
-		prev = model.getPreviousPoint(point.getTime());
-		      
-		if(prev == original)
-		    prev = model.getPreviousPoint(original.getTime());
+		next = model.getNextPoint(original);				
+		prev = model.getPreviousPoint(original);
 		
 		if((prev != null)&&(!bgc.getSelection().isInSelection(prev)))
 		    g.drawLine(adapter.getX(prev), adapter.getY(prev), x, y);
 
-		if(next == original)
-		    next = model.getNextPoint(original);
-		  
 		if(next != null)
 		    if (!bgc.getSelection().isInSelection(next))
 			g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
@@ -104,13 +98,14 @@ public class PointRenderer implements ObjectRenderer {
 			{//qui anche il next e' selezionato
 			    //qui deve vedere se il next e' < della sua posizione originale e clipparlo
 			    //deve fare la stessa cosa con se stesso rispetto al prev
+			    
 			    int nextX = adapter.getX(next)+((UtilBpfPoint)point).getDeltaX(adapter);
-			    if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
+			    //if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
 			    
 			    //si fa dare il next del next 
-			    BpfPoint nextnext = model.getNextPoint(next);
-			    if(nextnext!=null)
-				if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;		 
+			    /*BpfPoint nextnext = model.getNextPoint(next);
+			      if(nextnext!=null)
+			      if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;*/		 
 			    
 			    g.drawLine(x, y, nextX, adapter.getY(next)+((UtilBpfPoint)point).getDeltaY(adapter));
 			}
@@ -118,10 +113,10 @@ public class PointRenderer implements ObjectRenderer {
 		//draw the cross and the current values
 		if(bgc.getSelection().size()==1)
 		    {
-			g.drawLine(x, y-20, x, y+20);
-			g.drawLine(x-20, y, x+20, y);
-			g.drawString(""+point.getTime(), x+2, y-20);
-			g.drawString(""+point.getValue(), x+20, y+10);
+			g.drawLine(x, y-15, x, y+15);
+			g.drawLine(x-15, y, x+15, y);
+			g.drawString(""+point.getTime(), x+2, y-15);
+			g.drawString(""+point.getValue(), x+15, y+10);
 		    }
 	    }
 	else //normal paint

@@ -11,7 +11,7 @@ import java.awt.event.*;
  * This dialog sets the "integer" property of the client TrackEvent.
  * */
 
-class BpfTableDialog extends JDialog implements BpfDataListener/*, ListContainer*/{
+class BpfTableDialog extends JDialog implements BpfDataListener {
     
     BpfTableDialog(Frame frame, BpfGraphicContext gc)
     {
@@ -23,32 +23,29 @@ class BpfTableDialog extends JDialog implements BpfDataListener/*, ListContainer
 
 	getContentPane().add(tabPanel);
 	
-	getContentPane().validate();
-	
-	validate();
-	pack();
-
 	gc.getDataModel().addBpfListener(this);
 
-	setLocation(200, 200);
-	Dimension dim = tabPanel.getSize();
-	
-	if(dim.height+30>700) dim.height = 700;
-	else dim.height += 30;
-	setSize(dim);
+	relocate();
+
+	setSize(300, 208);
+
+	getContentPane().validate();
+	tabPanel.validate();
+	validate();
+	pack();
     }
 
     /**
      * BpfDataListener interface
      */
     public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue){}
+    public void pointsChanged(){}
       
     public void pointAdded(int index) 
     {
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
     }
       
     public void pointsDeleted(int[] indexs) 
@@ -56,7 +53,6 @@ class BpfTableDialog extends JDialog implements BpfDataListener/*, ListContainer
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
     }
     
     public void cleared()
@@ -64,8 +60,13 @@ class BpfTableDialog extends JDialog implements BpfDataListener/*, ListContainer
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
-    };
+    }
+
+    public void relocate()
+    {
+	Rectangle b = frame.getBounds();
+	setLocation(b.x+5, b.y+b.height);
+    }
 
     BpfTablePanel tabPanel;
     Frame frame;

@@ -78,6 +78,7 @@ public interface BpfDataModel {
      */
     public abstract int getPreviousPointIndex(float time);
     public abstract BpfPoint getPreviousPoint(float time);
+    public abstract BpfPoint getPreviousPoint(BpfPoint pnt);
     /**
      * return the index of the given event, if it exists, or the error constants
      * NO_SUCH_EVENT, EMPTY_COLLECTION 
@@ -134,6 +135,14 @@ public interface BpfDataModel {
      * removes the listener
      */
     public abstract void removeBpfListener(BpfDataListener theListener);    
+    
+    /**
+     */
+    public abstract float getRange();
+    public abstract float getMaximumValue();
+    public abstract float getMinimumValue();
+    public abstract void setMaximumValue(float max);
+    public abstract void setMinimumValue(float min);
 }
 
 

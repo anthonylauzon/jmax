@@ -67,7 +67,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   public BpfSelection(BpfDataModel model) 
   {
     itsModel = model;
-    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
+    setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION) ;
     model.addBpfListener(this);
   }
    
@@ -106,20 +106,38 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 	    addSelectionInterval(index, index);
 	}
   }
-
+  
   /** Select the given enumeration of objects.
    * When possible, use this method instead of
    * selecting single objects. 
    */
   public void select(Enumeration e)
   {
-      BpfPoint point;
+      /*BpfPoint point;
+	setValueIsAdjusting(true);
+	while(e.hasMoreElements())
+	{
+	point = (BpfPoint)e.nextElement();
+	select(point);
+	}
+	setValueIsAdjusting(false);*/
+      if(!e.hasMoreElements()) return;
+
       setValueIsAdjusting(true);
+
+      int index;
+      int min = itsModel.length()-1;
+      int max = 0;
       while(e.hasMoreElements())
-	  {
-	      point = (BpfPoint)e.nextElement();
-	      select(point);
-	  }
+	{
+	    index = itsModel.indexOf((BpfPoint) e.nextElement()); 
+	    if(index > max) max = index;
+	    if(index < min) min = index;
+	}
+
+      addSelectionInterval(min, max);
+      lastSelectedPoint = itsModel.getPointAt(max);
+      
       setValueIsAdjusting(false);
   }
 
@@ -144,7 +162,37 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
       }
   }
 
+  public BpfPoint getFirstInSelection()
+  {
+      return itsModel.getPointAt(getMinSelectionIndex());
+  }
+  public BpfPoint getLastInSelection()
+  {
+      return itsModel.getPointAt(getMaxSelectionIndex());
+  }
 
+    public float getMaxValueInSelection()
+    {
+	float value;
+	float max = itsModel.getMinimumValue();
+	for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
+	    {
+		value = itsModel.getPointAt(i).getValue();
+		if(value>max) max=value;
+	    }
+	return max;
+    }
+    public float getMinValueInSelection()
+    {
+	float value;
+	float min = itsModel.getMaximumValue();
+	for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
+	    {
+		value = itsModel.getPointAt(i).getValue();
+		if(value<min) min=value;
+	    }
+	return min;
+    }
   /** returns true if the object is currently selected
    */
   public boolean isInSelection(Object obj)
@@ -260,6 +308,8 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 	addSelectionInterval(newIndex, newIndex);
     
   }
+
+    public void pointsChanged(){}
 
     /** TrackDataListener interface */
     public void pointsDeleted(int[] oldIndexs) 

@@ -99,6 +99,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
+    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-30));
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
@@ -116,10 +117,10 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     northSection.add(ruler);	
     container_panel.add(northSection, BorderLayout.NORTH);
 
-    itsContainer.getFrame().validate();
-    itsContainer.getFrame().pack();
+    //itsContainer.getFrame().validate();
+    //itsContainer.getFrame().pack();
 
-    itsContainer.getFrame().setVisible(true);
+    //itsContainer.getFrame().setVisible(true);
     
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
@@ -150,7 +151,9 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     });
 
     container_panel.add(itsTimeScrollbar, BorderLayout.SOUTH);
+    container_panel.validate();
     add(container_panel, BorderLayout.CENTER);
+    validate();
   }
 
     /*boolean isVisible(int y)
@@ -171,6 +174,10 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     {
 	if(oldIndex!=newIndex)
 	    resizePanelToPointTime(bpfData.getPointAt(newIndex));
+    }
+    public void pointsChanged() 
+    {
+	//resizePanelToPointTime(bpfData.getPointAt(newIndex));//????????
     }
     public void cleared(){}
     /////////////////////////////////////////////////////////////

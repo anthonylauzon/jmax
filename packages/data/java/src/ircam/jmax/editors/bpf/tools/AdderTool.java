@@ -94,14 +94,31 @@ public class AdderTool extends Tool implements PositionListener {
     void addPoint(int x, int y)
     {
 	BpfGraphicContext bgc = (BpfGraphicContext) gc;
-	
+	FtsBpfObject ftsObj = bgc.getFtsObject();
+
 	float time = bgc.getAdapter().getInvX(x);
 
 	float value = bgc.getAdapter().getInvY(y);
 
-	int index = bgc.getFtsObject().getPreviousPointIndex(time)+1;
+	int index = ftsObj.getNextPointIndex(time);
 
-	bgc.getFtsObject().requestPointCreation(index, time, value); 
+	/* new time equals previous time */
+	if(time == ftsObj.getPointAt(index - 1).getTime())
+	    {
+		if(index == ftsObj.length() || value == ftsObj.getPointAt(index - 1).getValue())
+		    {
+			/* do nothing! (don't add jump point at the end or double point) */
+			return;
+		    }
+		else if(index == 1 || time == ftsObj.getPointAt(index - 2).getTime())
+		    {
+			/* set value of previous point (no add!) */     
+			ftsObj.requestSetPoint(index-1, time, value);
+			return;
+		    }
+	    }
+	else
+	    ftsObj.requestPointCreation(index, time, value); 
     }
 
   //-------------- Fields

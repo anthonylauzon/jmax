@@ -72,7 +72,6 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
     InteractionSemaphore.lock();
   }
   
-
   /**
    * overrides InteractionModule.mouseDragged()
    */

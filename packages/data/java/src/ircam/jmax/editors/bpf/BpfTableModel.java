@@ -76,15 +76,36 @@ class BpfTableModel extends AbstractTableModel{
   {
       if(columnIndex == 0) return;
       
+      float current;
       BpfPoint point = model.getPointAt(rowIndex);
 
       if (model instanceof UndoableData) //can't make assumptions...
 	  ((UndoableData) model).beginUpdate(); 
       
       if(columnIndex == 1)
-	  ((FtsBpfObject)model).requestSetPoint(rowIndex, ((Float) aValue).floatValue(), point.getValue());      
+	  {
+	      current = ((Float) aValue).floatValue();
+	      float prevTime = -1;
+	      float nextTime = -1;
+	      if(rowIndex>0)
+		  prevTime = model.getPointAt(rowIndex-1).getTime();
+	      if(rowIndex< model.length())
+		  nextTime = model.getPointAt(rowIndex+1).getTime();
+	      
+	      if(current > nextTime) current = nextTime;
+	      else if(current < prevTime) current = prevTime;
+	      
+	      ((FtsBpfObject)model).requestSetPoint(rowIndex, current, point.getValue());      	      
+	  }      
       else
-	  ((FtsBpfObject)model).requestSetPoint(rowIndex, point.getTime(), ((Float) aValue).floatValue());      
+	  {
+	      current = ((Float) aValue).floatValue();
+
+	      if(current > model.getMaximumValue()) current = model.getMaximumValue();
+	      else if(current < model.getMinimumValue()) current = model.getMinimumValue();
+
+	      ((FtsBpfObject)model).requestSetPoint(rowIndex, point.getTime(), current);      
+	  }
 
     if (model instanceof UndoableData)
 	((UndoableData) model).endUpdate();

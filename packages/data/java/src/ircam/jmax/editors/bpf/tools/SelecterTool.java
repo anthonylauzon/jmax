@@ -81,17 +81,33 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	      BpfSelection selection = ((BpfGraphicContext)gc).getSelection();
 	      gc.getGraphicDestination().requestFocus();//???
 
-	      BpfPoint point = (BpfPoint) gc.getRenderManager().firstObjectContaining(x, y);
+	      BpfPoint point = (BpfPoint) gc.getRenderManager().firstObjectContaining(x, y);	      
 	      if (point != null) 
 		  { //click on event
 		      startingPoint.setLocation(x,y);
-
 		      if (!selection.isInSelection(point)) 
 			  {
 			      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-				  selection.deselectAll();
-
-			      selection.select(point);
+				  {
+				      selection.deselectAll();
+				      selection.select(point);
+				  }
+			      else
+				  {
+				      int min = selection.getMinSelectionIndex();
+				      int max = selection.getMaxSelectionIndex();
+				      int index = ((BpfGraphicContext)gc).getFtsObject().indexOf(point);
+				      if((min<0)||(max<0)) selection.select(point);
+				      else
+					  {
+					      if(index < min) 					  
+						  selection.setSelectionInterval(index, max);
+					      else if(index > max)
+						  selection.setSelectionInterval(min, index);
+				  
+					      selection.setLastSelectedPoint(point);
+					  }
+				  }
 			  }
 		      else
 			  selection.setLastSelectedPoint(point);
@@ -122,8 +138,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
       gc.getGraphicDestination().requestFocus();//???
 
-      if (w ==0) w=1;// at least 1 pixel wide
-      if (h==0) h=1;
+      if((w==0)&&(h==0)) return;
     
       selectArea(x, y, w, h);
     

@@ -49,8 +49,8 @@ public class Bpf extends JFrame implements EditorContainer{
     BpfPanel itsBpfPanel;
     FtsBpfObject bpfData;
 
-    public final static int DEFAULT_WIDTH  = 800;
-    public final static int DEFAULT_HEIGHT = 400;
+    public final static int DEFAULT_WIDTH  = 312;
+    public final static int DEFAULT_HEIGHT = 239;
     public final static int MAX_HEIGHT     = 800;
     public final static int EMPTY_HEIGHT   = 78;
   /**
@@ -69,11 +69,11 @@ public class Bpf extends JFrame implements EditorContainer{
 	// Build The Menus and Menu Bar
 	makeMenuBar();
 
+	setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
 	//... then the SequencePanel
 	itsBpfPanel = new BpfPanel(this, data);
-	
 	getContentPane().add(itsBpfPanel);
-	setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
 	addWindowListener(new WindowListener(){
 		public void windowOpened(WindowEvent e){}
@@ -89,6 +89,7 @@ public class Bpf extends JFrame implements EditorContainer{
 	    });
 	
 	validate();
+	//pack();
 	setVisible(true);
     }
 

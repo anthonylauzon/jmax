@@ -374,16 +374,13 @@ bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   bpf_t *this = (bpf_t *)o;
   int index = fts_get_int(at);
+  int n = (ac - 1) / 2;
   int i;
 
-  ac--;
-  at++;
-
-  for(i=0; i<ac/2; i++)
+  for(i=0; i<n; i++)
     {
-      fts_atom_t a[3];
-      double time = fts_get_float(at + 2 * i);
-      double value = fts_get_float(at + 2 * i + 1);
+      double time = fts_get_float(at + 2 * i + 1);
+      double value = fts_get_float(at + 2 * i + 2);
       
       this->points[index + i].time = time;
       this->points[index + i].value = value;
@@ -602,7 +599,9 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);
 
       fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
-      
+
+      fts_method_define_varargs(cl, 0, fts_new_symbol("open_editor"), bpf_open_editor);
+
       return fts_Success;
     }
   else
