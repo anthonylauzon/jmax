@@ -267,7 +267,6 @@ java/src/ircam/jmax/toolkit/Makefile
 java/src/ircam/jmax/toolkit/actions/Makefile
 java/src/ircam/jmax/toolkit/menus/Makefile
 java/src/ircam/jmax/widgets/Makefile
-java/src/silk/Makefile
 packages/Makefile
 packages/alsa/Makefile
 packages/alsa/c/Makefile
