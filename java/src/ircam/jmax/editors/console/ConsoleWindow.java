@@ -34,18 +34,17 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     });
   }
 
-  static public ConsoleWindow getConsoleWindow()
-  {
-    return theConsoleWindow;
-  }
 
   public ConsoleWindow() {
     super("jMax Console", Mda.getDocumentTypeByName("patcher"), false);
 
+    MaxWindowManager.setTopFrame(this);
+
     itsConsole = new Console(MaxApplication.getTclInterp());
     itsConsole.Start();
 
-    System.setOut(itsConsole.getPrintStream());
+    // Should depend on a flag.
+    System.setOut(itsConsole.getPrintStream()); 
 
     getContentPane().setLayout(new BorderLayout());
 
@@ -77,7 +76,6 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     GetCutMenu().setEnabled(false);
     GetCopyMenu().setEnabled(true);//clipboard test
     GetPasteMenu().setEnabled(true);
-    GetClearMenu().setEnabled(false);
   }
 
   // start of ClipboardOwner, Tranferable interface methods

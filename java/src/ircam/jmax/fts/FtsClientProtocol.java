@@ -99,6 +99,8 @@ class FtsClientProtocol
   static final int fts_patcher_loaded_cmd = 'L';
 
   static final int fts_new_object_cmd = 'n';
+  static final int fts_delete_object_cmd = 'f';
+
   static final int fts_new_abstraction_cmd = 'A';
   static final int fts_redefine_patcher_cmd = 'Q';
   static final int fts_redefine_object_cmd = 'R';
@@ -106,9 +108,11 @@ class FtsClientProtocol
   static final int fts_reposition_inlet_cmd = 'X';
   static final int fts_reposition_outlet_cmd = 'Y';
 
-  static final int fts_free_object_cmd = 'f';
-  static final int fts_connect_objects_cmd = 'c';
-  static final int fts_disconnect_objects_cmd = 'd';
+  static final int fts_delete_connection_cmd = 'a';
+  static final int fts_new_connection_cmd   = 'c';
+
+  static final int fts_release_connection_cmd = 'd';
+  static final int fts_release_object_cmd = 'l';
 
   static final int fts_message_cmd = 'm';
   static final int fts_named_message_cmd = 'q';
@@ -178,11 +182,15 @@ class FtsClientProtocol
       case 'Y':
 	return "fts_reposition_outlet";
       case 'f':
-	return "fts_free_object";
+	return "fts_delete_object";
       case 'c':
-	return "fts_connect_objects";
+	return "fts_new_connection";
+      case 'a':
+	return "fts_delete_connection";
       case 'd':
-	return "fts_disconnect_objects";
+	return "fts_release_connection";
+      case 'l':
+	return "fts_release_object";
       case 'm':
 	return "fts_message";
       case 'q':

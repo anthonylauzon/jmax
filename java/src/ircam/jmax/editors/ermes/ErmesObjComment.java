@@ -10,7 +10,9 @@ import ircam.jmax.utils.*;
 //
 // The "comment" graphic object
 //
-class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
+/* $$$$$$$$ */
+
+public class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
   public String itsMaxString = "";
 
   Dimension preferredSize;
@@ -25,6 +27,12 @@ class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
     super(theSketchPad, theFtsObject);
   }
 
+  
+  void cleanAll()
+  {
+    itsParsedTextVector = null;
+    super.cleanAll();
+  }
 
   //--------------------------------------------------------
   // Init

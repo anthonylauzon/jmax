@@ -46,6 +46,12 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData
   {
     Mda.dispose(this);
     super.delete();
+  }
+
+  public void release()
+  {
+    Mda.dispose(this);
+    super.release();
     objects = null;
     connections = null;
   }

@@ -423,19 +423,6 @@ abstract class FtsPort implements Runnable
   }
 
 
-  final void sendMessage(FtsMessage msg)
-  {
-    try
-      {
-	msg.writeTo(this);
-      }
-    catch (java.io.IOException	e)
-      {
-	// Should implement a decent exception system for the client library
-      }
-  }
-
-
   /******************************************************************************/
   /*                                                                            */
   /*                             INPUT PARSER                                   */

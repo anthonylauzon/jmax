@@ -21,7 +21,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
   
 
   public SplashDialog(String filename, String version) {
-    super(MaxWindowManager.getWindowManager().getAFrame(), "jMax",/* true*/false);
+    super(MaxWindowManager.getTopFrame(), "jMax",/* true*/false);
     
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);

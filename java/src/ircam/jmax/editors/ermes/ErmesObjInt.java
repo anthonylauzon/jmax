@@ -9,6 +9,7 @@ import ircam.jmax.*;
 /**
  * The "integer box" graphic object.
  */
+
 class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventClient {
   int state;
   StringBuffer currentText;
@@ -19,8 +20,6 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   int DEFAULT_VISIBLE_DIGIT = 3;
   int itsStartingY, itsFirstY;
   boolean firstClick = true;
-
-  static ErmesObjIntegerDialog itsIntegerDialog = null;
 
   public ErmesObjInt( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -148,20 +147,9 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
       itsSketchPad.ClickOnObject(this, evt, x, y);
   }
 
-  public boolean inspectorAlreadyOpen() 
+  public void inspect() 
   {
-    return (itsIntegerDialog != null && itsIntegerDialog.isVisible());
-  }
-
-  public void openInspector() 
-  {
-    Point aPoint = GetSketchWindow().getLocation();
-
-    if ( itsIntegerDialog == null)
-      itsIntegerDialog = new ErmesObjIntegerDialog( MaxWindowManager.getTopFrame());
-    itsIntegerDialog.setLocation( aPoint.x + getItsX(),aPoint.y + getItsY());
-
-    itsIntegerDialog.ReInit( String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
+    new ErmesObjIntegerDialog(itsSketchPad.GetSketchWindow(), String.valueOf(itsInteger), this);
   }
 
   public boolean MouseUp(MouseEvent evt,int x, int y) 

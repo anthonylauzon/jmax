@@ -63,7 +63,7 @@ public class FtsConnection
     this.id = id;
   }
 
-  /** Undo the connection. */
+  /** Ask FTS to Undo the connection. */
 
   public void delete()
   {
@@ -78,12 +78,12 @@ public class FtsConnection
     to.setDirty();
 	
     Fts.getServer().deleteConnection(this);
-
-    from.getParent().removeConnectionFromContainer(this);
   }
 
 
-  /** Undo the connection, only the client part */
+  /** Undo the connection, only the client part;
+   *  indirectly called by FTS.
+   */
 
   public void release()
   {
@@ -98,6 +98,11 @@ public class FtsConnection
     to.setDirty();
 	
     from.getParent().removeConnectionFromContainer(this);
+    
+    // Clean up
+
+    from = null;
+    to = null;
   }
 
   /** Access the From. The From is the FtsObject origin of the connection. */

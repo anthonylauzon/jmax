@@ -21,4 +21,9 @@ extern void fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int a
 extern void fts_client_upload_object(fts_object_t *obj);
 extern void fts_client_upload_connection(fts_connection_t *c);
 extern void fts_client_upload_patcher_content(fts_patcher_t *patcher);
+
+extern void fts_client_release_connection(fts_connection_t *c);
+extern void fts_client_redefine_connection(fts_connection_t *c);
+extern void fts_client_release_object(fts_object_t *c);
+
 #endif

@@ -7,18 +7,38 @@ import com.sun.java.swing.*;
 import com.sun.java.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 public class MaxWindowMenu extends Menu implements WindowListener, ListDataListener 
 {
-  Frame frame;
+  MaxEditor frame;
   int windowOperationCount = -1;
   boolean windowIsActive = false;
   ListModel windowList;
   ListModel toolFinders;
+  private MaxVector toDispose = new MaxVector();
+
+  abstract class WindowActionListener implements ActionListener
+  {
+    MenuItem item;
+
+    WindowActionListener(MenuItem item)
+    {
+      this.item = item;
+      toDispose.addElement(this);
+    }
+
+    public  abstract void actionPerformed(ActionEvent e);
+
+    public void dispose()
+    {
+      item.removeActionListener(this);
+    }
+  }
 
   /** Build a window menu for frame */
 
-  public MaxWindowMenu(String title, Frame frame)
+  public MaxWindowMenu(String title, MaxEditor frame)
   {
     super(title);
     
@@ -33,11 +53,23 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
     rebuildWindowMenu();
   }
 
-
-  public void dispose()
+  private void disposeActionListeners()
   {
+    for (int i = 0; i < toDispose.size(); i++)
+      ((WindowActionListener) toDispose.elementAt(i)).dispose();
+
+    toDispose.removeAllElements();
+  }
+
+
+  public void removeNotify()
+  {
+    disposeActionListeners();
     windowList.removeListDataListener(this);
+    toolFinders.removeListDataListener(this);
     frame.removeWindowListener(this);
+    frame = null;
+    super.removeNotify();
   }
 
   private void rebuildWindowMenuIfNeeded()
@@ -48,6 +80,10 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 
   private void rebuildWindowMenu()
   {
+    // First, dispose all the action listener (Java VM GC bug !)
+
+    disposeActionListeners();
+
     MenuItem mi;
 
     windowOperationCount = MaxWindowManager.getWindowManager().getWindowOperationCount();
@@ -55,19 +91,19 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 
     mi = new MenuItem("Stack");
     add(mi);
-    mi.addActionListener(new ActionListener()
+    mi.addActionListener(new WindowActionListener(mi)
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().StackWindows();}});
 
     mi = new MenuItem("Tile");
     add(mi);
-    mi.addActionListener(new ActionListener()
+    mi.addActionListener(new WindowActionListener(mi)
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().TileWindows();}});
 
     mi = new MenuItem("Tile Vertical");
     add(mi);
-    mi.addActionListener(new ActionListener()
+    mi.addActionListener(new WindowActionListener(mi)
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().TileVerticalWindows();}});
 
@@ -81,7 +117,7 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 
 	mi = new MenuItem(toolFinder.getToolName());
 	add(mi);
-	mi.addActionListener(new ActionListener()
+	mi.addActionListener(new WindowActionListener(mi)
 			     { public  void actionPerformed(ActionEvent e)
 			       { toolFinder.open();}});
       }
@@ -94,7 +130,7 @@ public class MaxWindowMenu extends Menu implements WindowListener, ListDataListe
 
 	mi = new MenuItem(w.getTitle());
 	add(mi);
-	mi.addActionListener(new ActionListener()
+	mi.addActionListener(new WindowActionListener(mi)
 			     { public  void actionPerformed(ActionEvent e)
 			       { w.toFront();}});
       }

@@ -9,6 +9,7 @@ import ircam.jmax.fts.*;
 //
 // The graphic "float box" object.
 //
+
 class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
   float itsFloat = (float) 0.;
   int DEFAULT_WIDTH = 50;
@@ -28,8 +29,6 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
   boolean firstClick = true;
   Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
   Dimension minimumSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
-
-  static ErmesObjFloatDialog itsFloatDialog = null;
 
   public ErmesObjFloat( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -122,7 +121,6 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     int tempWidth = 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
     resizeBy(tempWidth - getItsWidth(), tempHeight - getItsHeight());
-    // itsSketchPad.repaint(); // @@@ BARBOGIO
   }
 
   //--------------------------------------------------------
@@ -153,18 +151,9 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
       itsSketchPad.ClickOnObject(this, evt, x, y);
   }
 
-  public boolean inspectorAlreadyOpen() 
+  public void inspect() 
   {
-    return (itsFloatDialog != null && itsFloatDialog.isVisible());
-  }
-
-  public void openInspector() 
-  {
-    Point aPoint = GetSketchWindow().getLocation();
-    if (itsFloatDialog == null)
-      itsFloatDialog = new ErmesObjFloatDialog( MaxWindowManager.getTopFrame());
-    itsFloatDialog.setLocation( aPoint.x + getItsX(),aPoint.y + getItsY());
-    itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
+    new ErmesObjFloatDialog(itsSketchPad.GetSketchWindow(), String.valueOf(itsFloat), this);
   }
 
   public boolean MouseUp( MouseEvent evt,int x, int y) 
@@ -336,5 +325,4 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
   {
     return preferredSize;
   }
-
 }

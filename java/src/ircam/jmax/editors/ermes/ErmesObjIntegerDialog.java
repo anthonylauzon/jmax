@@ -6,20 +6,21 @@ import ircam.jmax.utils.*;
 
 //
 // A dialog used to edit the value inside a "float box".
-//
-class ErmesObjIntegerDialog extends Dialog implements ActionListener{
-  Frame itsParent;
+// Not static any more, to solve the gc and the 
+// parent frame problem; the alternative is to store
+// it in the sketchpad, and have one for patcher
+
+class ErmesObjIntegerDialog extends Dialog implements ActionListener
+{
   Button okButton;
   Button cancelButton;
   TextField value;
   ErmesObjInt itsIntObject = null;
-  String itsValue = "";
-  
-  public ErmesObjIntegerDialog(Frame theFrame) 
+
+  public ErmesObjIntegerDialog(Frame theFrame, String theValue, ErmesObjInt theInt)
   {
     super(theFrame, "Integer setting", false);
     
-    itsParent = theFrame;
     setLayout(new BorderLayout()); 
     
     //Create north section.
@@ -48,9 +49,19 @@ class ErmesObjIntegerDialog extends Dialog implements ActionListener{
     p2.add("West", cancelButton);
     
     add("South", p2);
-    //Initialize this dialog to its preferred size.
-    pack();
 
+    //Initialize this dialog 
+
+    Point aPoint = theFrame.getLocation();
+
+    setLocation(aPoint.x + itsIntObject.getItsX(),
+		aPoint.y + itsIntObject.getItsY());
+
+    value.setText( theValue);
+    itsIntObject = theInt;
+    pack();
+    setVisible( true);
+    value.requestFocus();
   }
 
   public void actionPerformed(ActionEvent e)
@@ -63,31 +74,20 @@ class ErmesObjIntegerDialog extends Dialog implements ActionListener{
       }
     else  
       {
-	itsValue = value.getText();
-
 	try
 	  {
-	    aInt = Integer.parseInt(itsValue);
+	    aInt = Integer.parseInt(value.getText());
 	  }
 	catch ( NumberFormatException e1)
 	  {
 	    setVisible(false);
+	    // ??? SHOULD GIVE AN ERROR !!!
 	    return;
 	  }
 
 	itsIntObject.FromDialogValueChanged( aInt);
+	itsIntObject = null; // make the gc happy, later
 	setVisible(false);
       }
   }
-    
-  public void ReInit(String theValue, ErmesObjInt theInt, Frame theParent)
-  {
-    itsValue = theValue;
-    value.setText( theValue);
-    itsIntObject = theInt;
-    itsParent = theParent;
-    setVisible( true);
-    value.requestFocus();
-  }
- 
 }

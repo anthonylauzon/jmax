@@ -17,42 +17,40 @@ import ircam.jmax.fts.*;
 public class ErmesSelection {
   public MaxVector itsObjects = new MaxVector();
   public MaxVector itsConnections = new MaxVector();
-  FtsSelection itsFtsSelection;
 
-  public ErmesSelection( FtsSelection theFtsSelection) 
+  public ErmesSelection() 
   {
-    itsFtsSelection = theFtsSelection;
   }
 
   public void addObject( Object theObject) 
   {
     itsObjects.addElement( theObject);
-    itsFtsSelection.addObject( ((ErmesObject)theObject).itsFtsObject);
+    Fts.getSelection().addObject( ((ErmesObject)theObject).itsFtsObject);
   }
 
   public void addConnection( Object theConnection) 
   {
     itsConnections.addElement( theConnection);
-    itsFtsSelection.addConnection( ((ErmesConnection)theConnection).itsFtsConnection);
+    Fts.getSelection().addConnection( ((ErmesConnection)theConnection).itsFtsConnection);
   }
 
   public void removeObject( Object theObject) 
   {
     itsObjects.removeElement( theObject);
-    itsFtsSelection.removeObject( ((ErmesObject)theObject).itsFtsObject);
+    Fts.getSelection().removeObject( ((ErmesObject)theObject).itsFtsObject);
   }
 
   public void removeConnection( Object theConnection) 
   {
     itsConnections.removeElement( theConnection);
-    itsFtsSelection.removeConnection( ((ErmesConnection)theConnection).itsFtsConnection);
+    Fts.getSelection().removeConnection( ((ErmesConnection)theConnection).itsFtsConnection);
   }
 
   public void removeAllElements() 
   {
     itsObjects.removeAllElements();
     itsConnections.removeAllElements();
-    itsFtsSelection.clean();
+    Fts.getSelection().clean();
   }
 
   public boolean isEmpty() 
@@ -60,3 +58,4 @@ public class ErmesSelection {
     return itsObjects.isEmpty() && itsConnections.isEmpty();
   }
 }
+

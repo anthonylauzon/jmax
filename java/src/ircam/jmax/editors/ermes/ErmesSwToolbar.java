@@ -89,6 +89,11 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     tools.add( itsSwToolbar, BorderLayout.WEST);
   }
 
+  public void removeNotify()
+  {
+    itsSketchPad = null;
+  }
+
   //
   // Add a button to the toolbar, trying not to load already loaded
   // gif files (case of multiple windows with same palette).

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:38 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/03 11:56:02 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -15,12 +15,12 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
+extern void fts_client_release_connection(fts_connection_t *c);
+extern void fts_client_redefine_connection(fts_connection_t *c);
+
 /* #define TRACE_DEBUG */
 
 static fts_heap_t *connection_heap;
-
-static void fts_client_delete_connection(fts_connection_t *c);
-static void fts_client_redefine_connection(fts_connection_t *c);
 
 /******************************************************************************/
 /*                                                                            */
@@ -39,7 +39,7 @@ void fts_connections_init()
 /*                                                                            */
 /******************************************************************************/
 
-fts_connection_t *fts_object_connect(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
@@ -207,6 +207,12 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
 
+  /* First, release the client representation of the connection,
+     if any */
+  
+  if (conn->id != FTS_NO_ID)
+    fts_client_release_connection(conn);
+
   src = conn->src;
   dst  = conn->dst;
 
@@ -240,12 +246,12 @@ static void fts_object_do_disconnect(fts_connection_t *conn, int do_id)
   fts_heap_free((char *) conn, connection_heap);
 }
 
-void fts_object_disconnect(fts_connection_t *conn)
+void fts_connection_delete(fts_connection_t *conn)
 {
   fts_object_do_disconnect(conn, 1);
 }
 
-static void fts_object_disconnect_ignore_id(fts_connection_t *conn)
+static void fts_connection_delete_ignore_id(fts_connection_t *conn)
 {
   fts_object_do_disconnect(conn, 0);
 }
@@ -281,8 +287,8 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	    {
 	      fts_connection_t *new_c;
 
-	      new_c = fts_object_connect(p->id, new, p->woutlet, p->dst, p->winlet);
-	      fts_object_disconnect_ignore_id(p);
+	      new_c = fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet);
+	      fts_connection_delete_ignore_id(p);
 
 	      /* Redefine the connection on the client side */
 
@@ -292,14 +298,8 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	}
       else
 	for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
-	  {
-	    /* Delete the connection also in the client */
+	  fts_connection_delete(p);
 
-	    if (p->id != FTS_NO_ID)
-	      fts_client_delete_connection(p);
-
-	    fts_object_disconnect(p);
-	  }
     }
 
   /* reproduce in new, and delete in old,  
@@ -318,8 +318,8 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	    {
 	      fts_connection_t *new_c;
 
-	      new_c = fts_object_connect(p->id, p->src, p->woutlet, new, p->winlet);
-	      fts_object_disconnect_ignore_id(p);
+	      new_c = fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet);
+	      fts_connection_delete_ignore_id(p);
 
 	      /* Redefine the connection on the client side */
 
@@ -329,14 +329,7 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	}
       else
 	for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
-	  {
-	    /* Delete the connection also in the client */
-
-	    if (p->id != FTS_NO_ID)
-	      fts_client_delete_connection(p);
-	    
-	    fts_object_disconnect(p);
-	  }
+	  fts_connection_delete(p);
     }
 }
 
@@ -366,14 +359,7 @@ void fts_object_trim_connections(fts_object_t *obj, int inlets, int outlets)
 	 */
 
       for (p = obj->out_conn[outlet]; p ;  p = obj->out_conn[outlet])
-	{
-	  /* Delete the connection also in the client */
-
-	  if (p->id != FTS_NO_ID)
-	    fts_client_delete_connection(p);
-
-	  fts_object_disconnect(p);
-	}
+	fts_connection_delete(p);
     }
 
   /* then the incoming connections */
@@ -386,14 +372,7 @@ void fts_object_trim_connections(fts_object_t *obj, int inlets, int outlets)
 	 and methods  can fire correctly */
 
       for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
-	{
-	  /* Delete the connection also in the client */
-
-	  if (p->id != FTS_NO_ID)
-	    fts_client_delete_connection(p);
-
-	  fts_object_disconnect(p);
-	}
+	fts_connection_delete(p);
     }
 }
 
@@ -415,39 +394,4 @@ void fprintf_connection(FILE *f, fts_connection_t *conn)
 }
 
 
-/* Client communication */
 
-/* Note: since the existance of expressions and object redefinition, the
-   object system may, under some circustances, delete or redefine arbitrary
-   connections.
-   This require the object system to call the client communication module.
-   The trouble is, in the current system, the client communication module
-   is part of the runtime layer, that is on top of the message system; so the
-   message system cannot, in theory, call the client module.
-
-   We do it anyway, but we breake the architecture; this will be fixed soon,
-   we hope.
-
-   */
-
-#include "runtime/client/outgoing.h"
-#include "runtime/client/protocol.h"
-
-static void fts_client_delete_connection(fts_connection_t *c)
-{
-  fts_client_mess_start_msg(DISCONNECT_OBJECTS_CODE);
-  fts_client_mess_add_connection(c);
-  fts_client_mess_send_msg();
-}
-
-
-static void fts_client_redefine_connection(fts_connection_t *c)
-{
-  fts_client_mess_start_msg(REDEFINE_CONNECTION_CODE);
-  fts_client_mess_add_connection(c);
-  fts_client_mess_add_object(c->src);
-  fts_client_mess_add_int(c->woutlet);
-  fts_client_mess_add_object(c->dst);
-  fts_client_mess_add_int(c->winlet);
-  fts_client_mess_send_msg();
-}

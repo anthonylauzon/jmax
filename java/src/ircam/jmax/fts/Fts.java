@@ -224,7 +224,7 @@ public class Fts
 
   private static FtsSelection selection = null;
 
-  static public FtsSelection getSelection()
+  static public final FtsSelection getSelection()
   {
     
     if (selection == null)

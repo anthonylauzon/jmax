@@ -32,7 +32,8 @@
    REDEFINE_OBJECT (obj)object [<args>]*
    REPOSITION_INLET (obj)obj <pos>
    REPOSITION_OUTLET (obj)obj <pos>
-   FREE (obj)obj
+   DELETE_OBJECT (obj)obj
+   DELETE_CONNECTION (conn)c
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
    DISCONNECT (obj)cid
 
@@ -666,16 +667,16 @@ fts_mess_client_reposition_outlet(int ac, const fts_atom_t *av)
 }
 
 /* 
-   FREE (obj)obj
+   DELETE_OBJECT (obj)obj
 
    Free (destroy) the object identified by id.
 */
 
 
 static void
-fts_mess_client_free(int ac, const fts_atom_t *av)
+fts_mess_client_delete_object(int ac, const fts_atom_t *av)
 {
-  trace_mess("Received free", ac, av);
+  trace_mess("delete object", ac, av);
 
   if (ac == 1 && fts_is_object(&av[0]))
     {
@@ -685,15 +686,18 @@ fts_mess_client_free(int ac, const fts_atom_t *av)
 
       if (! obj)
 	{
-	  post_mess("System Error in FOS message FREE: freeing a non existing object", ac, av);
+	  post_mess("System Error in FOS message DELETE_OBJECT: deleting a non existing object", ac, av);
 	  return;
 	}
 
       fts_object_delete(obj);
     }
   else
-    post_mess("System Error in FOS message FREE: bad args", ac, av);
+    post_mess("System Error in FOS message DELETE_OBJECT: bad args", ac, av);
 }
+
+
+
 
 
 /* CONNECT (obj)from (int)outlet (obj)to (int)inlet
@@ -703,7 +707,7 @@ fts_mess_client_free(int ac, const fts_atom_t *av)
 
 
 static void
-fts_mess_client_connect(int ac, const fts_atom_t *av)
+fts_mess_client_new_connection(int ac, const fts_atom_t *av)
 {
   trace_mess("Received connect", ac, av);
 
@@ -727,7 +731,7 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 
       if (to && from)
 	{
-	  fts_object_connect(id, from, outlet, to, inlet);
+	  fts_connection_new(id, from, outlet, to, inlet);
 	}
       else
 	post_mess("Error trying to connect non existing objects", ac, av);
@@ -738,7 +742,7 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 
 
 /*
-  DISCONNECT (conn)connection
+  DELETE_CONNECTION (conn)connection
 
   Disconnect the outlet of a from object (identified by the from-id )
   to an inlet of a to object  (identified by the to-id)
@@ -746,9 +750,9 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 
 
 static void
-fts_mess_client_disconnect(int ac, const fts_atom_t *av)
+fts_mess_client_delete_connection(int ac, const fts_atom_t *av)
 {
-  trace_mess("Received disconnect", ac, av);
+  trace_mess("Received delete connection", ac, av);
 
   if ((ac == 1) && fts_is_connection(&av[0]))
     {
@@ -757,12 +761,12 @@ fts_mess_client_disconnect(int ac, const fts_atom_t *av)
       c = fts_get_connection(&av[0]);
 
       if (c)
-	fts_object_disconnect(c);
+	fts_connection_delete(c);
       else
-	post_mess("System Error in FOS message DISCONNECT: disconnecting non existing connection", ac, av);
+	post_mess("System Error in FOS message DELETE CONNECTION: disconnecting non existing connection", ac, av);
     }
   else
-    post_mess("System Error in FOS message DISCONNECT: bad args", ac, av);
+    post_mess("System Error in FOS message DELETE CONNECTION: bad args", ac, av);
 }
 
 
@@ -1026,9 +1030,11 @@ fts_messtile_install_all()
   fts_client_mess_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine_object);
   fts_client_mess_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
   fts_client_mess_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
-  fts_client_mess_install(FREE_OBJECT_CODE,  fts_mess_client_free);
-  fts_client_mess_install(CONNECT_OBJECTS_CODE,  fts_mess_client_connect);
-  fts_client_mess_install(DISCONNECT_OBJECTS_CODE, fts_mess_client_disconnect);
+  fts_client_mess_install(DELETE_OBJECT_CODE,  fts_mess_client_delete_object);
+
+  fts_client_mess_install(NEW_CONNECTION_CODE,  fts_mess_client_new_connection);
+  fts_client_mess_install(DELETE_CONNECTION_CODE, fts_mess_client_delete_connection);
+
   fts_client_mess_install(MESSAGE_CODE, fts_mess_client_mess);
   fts_client_mess_install(NAMED_MESSAGE_CODE, fts_mess_client_nmess);
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);

@@ -11,6 +11,7 @@ import ircam.jmax.utils.*;
 //
 // The "slider" graphic object
 //
+
 class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 
   ErmesObjThrottle itsThrottle;
@@ -144,17 +145,12 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
       }
   }
 
-  public boolean inspectorAlreadyOpen() 
-  {
-    return ( itsSliderDialog != null && itsSliderDialog.isVisible());
-  }
-
-  public void openInspector()
+  public void inspect()
   {
     Point aPoint = GetSketchWindow().getLocation();
 
     if ( itsSliderDialog == null) 
-      itsSliderDialog = new ErmesObjSliderDialog( MaxWindowManager.getTopFrame());
+      itsSliderDialog = new ErmesObjSliderDialog();
 
     itsSliderDialog.setLocation( aPoint.x + getItsX(), aPoint.y + getItsY() - 25);
     itsSliderDialog.ReInit( String.valueOf( itsRangeMax), String.valueOf( itsRangeMin), String.valueOf( itsInteger), this, itsSketchPad.GetSketchWindow());

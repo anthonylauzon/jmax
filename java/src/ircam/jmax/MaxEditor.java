@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
@@ -16,12 +17,94 @@ import com.sun.java.swing.*;
  */
 public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener
 {
+
+  // Subsystem to register things to dispose at editor destroy time
+
+  private MaxVector toDisposeAtDestroy = new MaxVector();
+
+  /** Interface used to handle cleanup */
+
+  public interface Disposable
+  {
+    public void dispose();
+  }
+
+  public void disposeAtDestroy(Disposable d)
+  {
+    toDisposeAtDestroy.addElement(d);
+  }
+
+  private void doDestroyDispose()
+  {
+    for (int i = 0; i < toDisposeAtDestroy.size(); i++)
+      {
+	((Disposable) toDisposeAtDestroy.elementAt(i)).dispose();
+      }
+
+    toDisposeAtDestroy.removeAllElements();
+  }
+
+  /** The MaxActionListener class is used to deal with the
+   *  Menu item GC bug; MaxActionListener are version of ActionListener
+   * that use the disposeAtDestroy mechanism to cleanup at destroy time.
+   * Note that no support for removing
+   * this action listener is implemented (but it could, of course).
+   */
+
+
+  public abstract class MaxActionListener implements  ActionListener, Disposable
+  {
+    MenuItem item;
+
+    public MaxActionListener(MenuItem item)
+    {
+      this.item = item;
+      disposeAtDestroy(this);
+    }
+
+    public abstract void actionPerformed(ActionEvent e);
+
+    public void dispose()
+    {
+      item.removeActionListener(this);
+    }
+  }
+
+
+  /** As MaxActionListener, for item listeners */
+
+  /** The MaxItemListener class is used to deal with the
+   *  Menu item GC bug; MaxItemListener are version of ItembListener
+   * that use the disposeAtDestroy mechanism to cleanup at destroy time.
+   * Note that no support for removing
+   * this action listener is implemented (but it could, of course).
+   */
+
+  public abstract class MaxItemListener implements  ItemListener, Disposable
+  {
+    CheckboxMenuItem item;
+
+    public MaxItemListener(CheckboxMenuItem item)
+    {
+      this.item = item;
+      disposeAtDestroy(this);
+    }
+
+    public abstract void itemStateChanged(ItemEvent e);
+
+    public void dispose()
+    {
+      item.removeItemListener(this);
+    }
+  }
+
   MaxDocumentType editedType;
 
   public Menu itsFileMenu;
   public Menu itsNewFileMenu;
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
+
 
   public MaxEditor(String title, MaxDocumentType type, boolean register)
   {
@@ -57,11 +140,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public final void Init()
   {
     MenuBar mb = new MenuBar();
-    itsFileMenu = CreateFileMenu();
-    itsEditMenu = CreateEditMenu();
 
-    mb.add(itsFileMenu);
-    mb.add(itsEditMenu);
+    itsFileMenu = CreateFileMenu(); 
+    mb.add(itsFileMenu); 
+
+    itsEditMenu = CreateEditMenu(); 
+    mb.add(itsEditMenu); 
 
     setMenuBar(mb);
     
@@ -71,8 +155,17 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     // New Window Manager based Menu
 
-    itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowMenu("Windows", this);
+    itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowMenu("Windows", this); 
     mb.add(itsWindowsMenu);
+  }
+
+  public void Destroy()
+  {
+    removeKeyListener(this);
+    removeWindowListener(this);
+    doDestroyDispose();
+    setVisible(false);
+    dispose();
   }
 
   /** Intercept the setTitle method to tell the window manager,
@@ -88,13 +181,17 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   /** Use an Action object to do this stuff */
 
-  class NewDocumentCreator implements ActionListener
+  class NewDocumentCreator implements ActionListener, Disposable
   {
+    MenuItem item;
     MaxDocumentType type;
 
-    NewDocumentCreator(MaxDocumentType type)
+    NewDocumentCreator(MenuItem item, MaxDocumentType type)
     {
+      this.item = item;
       this.type = type;
+
+      disposeAtDestroy(this);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -115,13 +212,18 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	  new ErrorDialog(MaxEditor.this, ex.toString());
 	}
     }
+
+    public void dispose()
+    {
+      item.removeActionListener(this);
+    }
   }
 
   private MenuItem CreateNewTypeMenu()
   {
     MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName() + " Ctrl+N");
 
-    newMenu.addActionListener(new NewDocumentCreator(editedType));
+    newMenu.addActionListener(new NewDocumentCreator(newMenu, editedType));
 
     return newMenu;
   }
@@ -141,7 +243,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	    aMenuItem = new MenuItem(aDocumentType.getPrettyName());
 	    newFileMenu.add(aMenuItem); 
 
-	    aMenuItem.addActionListener(new NewDocumentCreator(aDocumentType));
+	    aMenuItem.addActionListener(new NewDocumentCreator(aMenuItem, aDocumentType));
 	  }
       }
 
@@ -164,14 +266,14 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     aMenuItem = new MenuItem("Open... Ctrl+O");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Open();}});
 
     aMenuItem = new MenuItem("Close   Ctrl+W");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { 
@@ -181,7 +283,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     aMenuItem = new MenuItem("Save  Ctrl+S");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Save();}});
@@ -189,14 +291,14 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     aMenuItem = new MenuItem("Save As ...");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { SaveAs();}});
 
     aMenuItem = new MenuItem("Save To ...");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { SaveTo();}});
@@ -205,21 +307,21 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     aMenuItem = new MenuItem("Print... Ctrl+P");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Print();}});
 
     aMenuItem = new MenuItem("System statistics...");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    {      new StatisticsDialog(MaxEditor.this);}});
 
     aMenuItem = new MenuItem("Quit    Ctrl+Q");
     fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { MaxApplication.Quit();}});
@@ -235,31 +337,24 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     aMenuItem = new MenuItem("Cut  Ctrl+X");
     editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Cut();}});
 
     aMenuItem = new MenuItem("Copy  Ctrl+C");
     editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Copy();}});
 
     aMenuItem = new MenuItem("Paste  Ctrl+V");
     editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
+    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Paste();}});
-
-    aMenuItem = new MenuItem("Clear"); 
-    editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new ActionListener()
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { Clear();}});
 
     return editMenu;
   }
@@ -293,7 +388,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   protected void Cut(){};
   protected void Copy(){};
   protected void Paste(){};
-  protected void Clear(){};
 
   protected void Find()
   {
@@ -528,10 +622,5 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public MenuItem GetPasteMenu()
   {
     return itsEditMenu.getItem(2);
-  }
-  
-  public MenuItem GetClearMenu()
-  {
-    return itsEditMenu.getItem(3);
   }
 }

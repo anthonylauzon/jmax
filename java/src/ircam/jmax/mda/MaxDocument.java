@@ -51,7 +51,6 @@ abstract public class MaxDocument
   }
 
   /** Removing the editor */
-
   protected void removeEditedData(MaxData data)
   {
     editedData.removeElement(data);
@@ -141,6 +140,13 @@ abstract public class MaxDocument
   public void setRootData(MaxData data)
   {
     rootData = data;
+  }
+
+  /** Check if a data is this document root data */
+
+  public boolean isRootData(MaxData data)
+  {
+    return rootData == data;
   }
 
   /** edit: start an document of the default editor for this document,

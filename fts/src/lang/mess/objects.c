@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.40 $ IRCAM $Date: 1998/09/24 15:36:04 $
+ *      $Revision: 1.41 $ IRCAM $Date: 1998/09/30 17:23:56 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -18,6 +18,8 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+
+extern void fts_client_release_object(fts_object_t *c);
 
 /* forward declarations  */
 
@@ -755,7 +757,7 @@ fts_object_delete(fts_object_t *obj)
 	 and methods  can fire correctly */
 
       while (p = obj->out_conn[outlet])
-	fts_object_disconnect(p);
+	fts_connection_delete(p);
     }
 
   /* Delete all the survived connections ending in the object */
@@ -768,12 +770,18 @@ fts_object_delete(fts_object_t *obj)
 	 and methods  can fire correctly */
 
       while (p = obj->in_conn[inlet])
-	fts_object_disconnect(p);
+	fts_connection_delete(p);
     }
 
+  /* Now Tell the client to release the Java part */
+
+  if (obj->id != FTS_NO_ID)
+    fts_client_release_object(obj);
+
   /* Delete the object from the patcher */
+
   /* Some internal object don't necessarly have a patcher,
-     like through (they should be put in the root patcher ??) */
+     (they should be put in the root patcher ??) */
 
   if (obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);

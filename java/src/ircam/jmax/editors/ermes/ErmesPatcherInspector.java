@@ -8,33 +8,23 @@ import ircam.jmax.fts.*;
 
 class ErmesPatcherInspector extends Frame {
 
-  TextField itsInsField, itsOutsField;
-
-  static FtsContainerObject itsPatcherObject = null;
   private static ErmesPatcherInspector itsInspector = null;
 
   //
   // The only function actually needed: a static call to create (or re-assign) an inspector, given a patcher
   //
+
   public static void inspect( FtsContainerObject thePatcher) 
   {
     if (itsInspector == null) 
       itsInspector = new ErmesPatcherInspector( thePatcher);
-    else if (getInspectedObject() == thePatcher) 
-      itsInspector.setVisible( true);
     else
       itsInspector.reInit( thePatcher);
   }
 
-  public static boolean isOpen() 
-  {
-    return itsInspector != null && itsInspector.isVisible();
-  }
+  TextField itsInsField, itsOutsField;
+  FtsContainerObject itsPatcherObject = null;
 
-  public static FtsContainerObject getInspectedObject() 
-  {
-    return itsPatcherObject;
-  }
 
   public ErmesPatcherInspector(FtsContainerObject thePatcher) 
   {
@@ -52,6 +42,13 @@ class ErmesPatcherInspector extends Frame {
 	    itsPatcherObject.put("outs", Integer.parseInt(itsOutsField.getText()));
 	    itsPatcherObject.ask("ins");
 	    itsPatcherObject.ask("outs");
+
+	    // Put isPatcherObject to null,
+	    // otherwise the GC will not get it if 
+	    // deleted !!!
+
+	    itsPatcherObject = null;
+
 	    Fts.sync();
 	  }
 	catch (NumberFormatException e1)

@@ -14,8 +14,6 @@ import ircam.jmax.*;
 
 public class FtsAbstractionObject  extends FtsContainerObject
 {
-  static boolean  expandAbstractions = true;
-
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */

@@ -8,18 +8,15 @@ import ircam.jmax.utils.*;
 // A dialog used to edit the value inside a "float box".
 //
 class ErmesObjFloatDialog extends Dialog implements ActionListener {
-  Frame itsParent;
   Button okButton;
   Button cancelButton;
   TextField value;
-  ErmesObjFloat itsFloatObject = null;
-  String itsValue = "";
+  ErmesObjFloat itsObject = null;
   
-  public ErmesObjFloatDialog(Frame theFrame) 
+  public ErmesObjFloatDialog(Frame theFrame,  String theValue, ErmesObjFloat theFloat)
   {
     super(theFrame, "Float setting", false);
     
-    itsParent = theFrame;
     setLayout(new BorderLayout());
     
     //Create north section.
@@ -48,24 +45,35 @@ class ErmesObjFloatDialog extends Dialog implements ActionListener {
     p2.add("West", cancelButton);
     
     add("South", p2);
-    //Initialize this dialog to its preferred size.
+
+    //Initialize this dialog 
+
+    Point aPoint = theFrame.getLocation();
+
+    setLocation(aPoint.x + itsObject.getItsX(),
+		aPoint.y + itsObject.getItsY());
+
+
+    value.setText( theValue);
+    itsObject = theFloat;
     pack();
+    setVisible( true);
+    value.requestFocus();
   }
 
   public void actionPerformed(ActionEvent e)
   {
-    float aFloat = 0;
-
     if (e.getSource() == cancelButton) 
       {
 	setVisible(false);
       }
     else  
       {
-	itsValue = value.getText();
+	float aFloat = 0;
+
 	try
 	  {
-	    aFloat = (Float.valueOf(itsValue)).floatValue();
+	    aFloat = (Float.valueOf(value.getText())).floatValue();
 	  }
 	catch (NumberFormatException e1)
 	  {
@@ -73,18 +81,10 @@ class ErmesObjFloatDialog extends Dialog implements ActionListener {
 	    return;
 	  }
 
-	itsFloatObject.FromDialogValueChanged(aFloat);
+	itsObject.FromDialogValueChanged(aFloat);
+	itsObject = null; // make the gc happy, later.
 	setVisible(false);
       }
   }
     
-  public void ReInit( String theValue, ErmesObjFloat theFloat, Frame theParent)
-  {
-    itsValue = theValue;
-    value.setText( theValue);
-    itsFloatObject = theFloat;
-    itsParent = theParent;
-    setVisible( true);
-    value.requestFocus();
-  }
 }

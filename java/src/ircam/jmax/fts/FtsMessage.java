@@ -18,7 +18,8 @@ final public class FtsMessage
   private int command;
 
   /** Message Content */
-
+  
+  private int args_count = 0;
   private int args_fill = 0;
   private Object[] args = new Object[256];
 
@@ -61,9 +62,25 @@ final public class FtsMessage
 
   public final void reset()
   {
+    for (int i = 0; i < args_fill; i++)
+      args[i] = null;
+
     args_fill = 0;
+    args_count = 0;
   }
 
+  /** 
+   * Get the next argument, as an Object
+   */
+
+  public final Object getNextArgument()
+  {
+    if (args_count < args_fill)
+      return args[args_count++];
+    else
+      return null;
+  }
+  
   /**
    * Get a message argument
    */
@@ -96,24 +113,6 @@ final public class FtsMessage
       doubleSize();
 
     args[args_fill++] = obj;
-  }
-
-  /** Write the message to a Connection. */
-
-  final void writeTo(FtsPort outputStream) throws java.io.IOException
-  {
-    // Write first the message properties
-
-    outputStream.sendCmd(command);
-
-    // Write the message body
-
-    if (args != null)
-      outputStream.sendArray(args);
-
-    // Write the end of the message
-
-    outputStream.sendEom();
   }
 
   /** 

@@ -14,7 +14,7 @@
  * Forbidden values : 0x00 (easy message as string in C)
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
- * Lowercase : c d f g h i m n o p q s u x y w z  
+ * Lowercase : a c d f g h i l m n o p q s u x y w z  
  * Uppercase : A B C D E F G H L M N O P Q R S U X Y Z 
  * 
  */
@@ -55,15 +55,21 @@
 #define PATCHER_LOADED_CODE     'L'
 
 #define NEW_OBJECT_CODE         'n'
+#define DELETE_OBJECT_CODE      'f'
+
 #define NEW_ABSTRACTION_CODE    'A'
 #define REDEFINE_PATCHER_CODE   'Q'
 #define REDEFINE_OBJECT_CODE    'R'
 #define REDEFINE_CONNECTION_CODE    'V'
 #define REPOSITION_INLET        'X'
 #define REPOSITION_OUTLET       'Y'
-#define FREE_OBJECT_CODE        'f'
-#define CONNECT_OBJECTS_CODE    'c'
-#define DISCONNECT_OBJECTS_CODE 'd'
+
+
+#define NEW_CONNECTION_CODE     'c'
+#define DELETE_CONNECTION_CODE  'a'
+
+#define CONNECTION_RELEASE_CODE 'd'
+#define OBJECT_RELEASE_CODE     'l'
 #define MESSAGE_CODE            'm'
 #define NAMED_MESSAGE_CODE      'q'
 

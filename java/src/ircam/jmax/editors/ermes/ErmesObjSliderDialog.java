@@ -4,9 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import ircam.jmax.utils.*;
 
+/* Not static any ore */
+
 class ErmesObjSliderDialog extends Frame implements ActionListener {
 
-  Frame itsParent;
   Button okButton;
   Button cancelButton;
   TextField itsMaxValueField, itsMinValueField, itsCurrentValueField;
@@ -15,11 +16,10 @@ class ErmesObjSliderDialog extends Frame implements ActionListener {
   String itsMinValue = "";
   String itsCurrentValue = "";
   
-  public ErmesObjSliderDialog(Frame theFrame) 
+  public ErmesObjSliderDialog() 
   {
     super( "Slider setting");
     
-    itsParent = theFrame;
     setLayout( new BorderLayout());
     
     //Create north section.
@@ -98,6 +98,7 @@ class ErmesObjSliderDialog extends Frame implements ActionListener {
 	    return;
 	  }
 	itsSliderObject.FromDialogValueChanged( aCurrentInt, aMaxInt, aMinInt);
+	itsSliderObject = null; // make the gc happy.
 	setVisible( false);
       }
   }
@@ -111,7 +112,6 @@ class ErmesObjSliderDialog extends Frame implements ActionListener {
     itsMinValueField.setText( theMinValue);
     itsCurrentValueField.setText( theCurrentValue);
     itsSliderObject = theSlider;
-    itsParent = theParent;
 
     setVisible( true);
 

@@ -117,6 +117,11 @@ abstract public class FtsObject
 	  if ((author == null) || (author != owner))
 	    handler.propertyChanged(FtsObject.this, name, value);
       }
+
+      public String toString()
+      {
+	return "PropertyHandlerEntry for " + name + " handler " + handler + " owner " + owner;
+      }
     }
 
     public void removeWatch(Object owner)
@@ -126,7 +131,7 @@ abstract public class FtsObject
 
       MaxVector toRemove = new MaxVector();
 
-      for (int i = 0; i < table.size(); i++)
+       for (int i = 0; i < table.size(); i++)
 	{
 	  PropertyHandlerEntry ph = (PropertyHandlerEntry) table.elementAt(i);
 
@@ -617,17 +622,16 @@ abstract public class FtsObject
   }
 
   /**
-   * Delete the object from fts. 
+   * Ask FTS to Delete the object. 
    * Fts object should be delete explicitely, the finalizer will not delete them.
+   * The actual deleting is done on the FTS delete callback, that call release.
    */
 
   public void delete()
   {
     Fts.getSelection().removeObject(this);
     parent.setDirty();
-    parent.removeObjectConnectionsFromContainer(this);
-    parent.removeObjectFromContainer(this); 
-    Fts.getServer().freeObject(this);
+    Fts.getServer().deleteObject(this);
   }
 
   /**
@@ -639,7 +643,20 @@ abstract public class FtsObject
   {
     Fts.getSelection().removeObject(this);
     parent.setDirty();
+
     parent.removeObjectFromContainer(this); 
+
+    // clean up to help the gc, and make the object
+    // non functioning, so to catch use of the object
+    // after the release/delete.
+
+    propertyHandlerTable = null;
+    properties = null;
+    parent = null;
+    className = null;
+    objectName = null;
+    description = null;
+
     Fts.getServer().unregisterObject(this);
   }
 

@@ -35,7 +35,7 @@ public class MaxWindowManager implements WindowListener
   private DefaultListModel windows = new DefaultListModel();
   private DefaultListModel tools = new DefaultListModel();
 
-  private static Frame topFrame = new Frame();
+  private static Frame topFrame = null;
 
   static public MaxWindowManager getWindowManager()
   {
@@ -45,6 +45,7 @@ public class MaxWindowManager implements WindowListener
   MaxWindowManager()
   {
   }
+
 
   /** Call this method to add a window to 
    * from  the window manager window list
@@ -81,7 +82,9 @@ public class MaxWindowManager implements WindowListener
     // to get an event for the listeners
 
     windowOperationCount++;
-    windows.setElementAt(window, windows.indexOf(window));
+
+    if (windows.size() > 0)
+      windows.setElementAt(window, windows.indexOf(window));
   }
 
 
@@ -112,23 +115,19 @@ public class MaxWindowManager implements WindowListener
     return windowOperationCount;
   }
 
-  /** This method return a frame good for running a 
-    dialog that doesn't care about the window actually activated;
-    of course, at least one window must exists.
-    */
-  
-  public Frame getAFrame()
+  /** 
+   * Return a Frame considered top level, for dialogs that have no 
+   * "natural" parent frame; it is usually set to the console,
+   * for the current console centered interaction.
+   */
+
+  public static void setTopFrame(Frame frame)
   {
-    if (windows.size() > 0)
-      return (Frame) windows.elementAt(0);
-    else
-      return null;
+    topFrame = frame;
   }
 
-  /** This method returns a frame good for showing a dialog without
-   * changing the present hierarchy of windows
-   */
-  public static Frame getTopFrame() {
+  public static Frame getTopFrame()
+  {
     return topFrame;
   }
 

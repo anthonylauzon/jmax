@@ -889,7 +889,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "CONNECT\n");
 #endif
-	    fts_object_connect(FTS_NO_ID, *object_tos, fts_get_int(eval_tos),
+	    fts_connection_new(FTS_NO_ID, *object_tos, fts_get_int(eval_tos),
 			       *(object_tos + 1), fts_get_int((eval_tos + 1)));
 	  }
 	break;

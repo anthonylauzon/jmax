@@ -32,11 +32,6 @@ class FindPanel extends JFrame {
     return findPanel;
   }
 
-  public void setPatcher( FtsContainerObject patcher)
-  {
-    this.patcher = patcher;
-  }
-
   protected FindPanel()
   {
     super( "Find Panel");
@@ -118,7 +113,6 @@ class FindPanel extends JFrame {
     query = textField.getText();
     args = new MaxVector();
     FtsParse.parseAtoms(query, args);
-    // set.find( patcher, args);// tmp commented
     set.find(Fts.getRootObject(), args);
     setCursor(temp);
   }
@@ -128,7 +122,6 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    // set.findErrors( patcher);// tmp commented
     set.findErrors(Fts.getRootObject());
     setCursor(temp);
   }
@@ -145,7 +138,6 @@ class FindPanel extends JFrame {
 
   private static FindPanel findPanel = null;
 
-  private FtsContainerObject patcher;
   private ObjectSetViewer objectSetViewer;
   private JTextField textField;
   private FtsObjectSet set;

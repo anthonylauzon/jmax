@@ -10,6 +10,7 @@ import ircam.jmax.editors.ermes.*;
 //
 // The "bang" graphic object.
 //
+
 class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
 
   boolean itsFlashing = false;
@@ -137,5 +138,4 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   {
     return preferredSize;
   }
-
 }

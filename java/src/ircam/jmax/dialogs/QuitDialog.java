@@ -16,9 +16,9 @@ public class QuitDialog extends Dialog
 
   int answer = CANCEL;
 
-  public QuitDialog()
+  public QuitDialog(Frame dw)
   {
-    super(MaxWindowManager.getWindowManager().getAFrame(), "Quit", true);
+    super(dw, "Quit", true);
 
     Button button;
 

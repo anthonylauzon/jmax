@@ -12,9 +12,7 @@ import ircam.jmax.utils.*;
 // The "patcher" graphic object. It knows the subpatchers it contains.
 //
 
-public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler {
-
-  public ErmesSketchWindow itsSubWindow = null;
+class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler {
 
   // (UNUSED) (fd) Dimension preferredSize = new Dimension(80,24);
  
@@ -49,11 +47,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
     // changed: FTS do not destroy the patcher content, and never will again
 
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( itsArgs);
-    if ( itsSubWindow != null)  
-      {
-      itsSubWindow.itsSketchPad.RedefineInChoice();
-      itsSubWindow.itsSketchPad.RedefineOutChoice();
-    }
   }
   
 	
@@ -154,5 +147,4 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
 
     resizeBy( aMaxWidth - getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
   }
-
 }

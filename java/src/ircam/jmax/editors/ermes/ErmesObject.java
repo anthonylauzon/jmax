@@ -20,7 +20,8 @@ import ircam.jmax.utils.*;
 // - handle the object with data and open the associated editor
 // (example: subpatchers, table, etc.)
 
-abstract public class ErmesObject implements ErmesDrawable {
+
+abstract class ErmesObject implements ErmesDrawable {
   public boolean itsSelected = false;
   public ErmesSketchPad itsSketchPad;
   public FtsObject itsFtsObject = null;
@@ -28,9 +29,6 @@ abstract public class ErmesObject implements ErmesDrawable {
   public MaxVector itsOutletList = new MaxVector();
 
   int itsInitX, itsInitY;
-  FtsContainerObject itsFtsPatcher;
-  boolean absolutePainting = false;
-  boolean updated = false;
   boolean itsDragging = false;
   Font itsFont = null;
   FontMetrics itsFontMetrics = null;
@@ -86,6 +84,7 @@ abstract public class ErmesObject implements ErmesDrawable {
   public ErmesObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super();
+
     itsSketchPad = theSketchPad;
     itsFtsObject = theFtsObject;
   }
@@ -171,18 +170,6 @@ abstract public class ErmesObject implements ErmesDrawable {
   }
 
   public void inspect() 
-  {
-    if ( inspectorAlreadyOpen())
-      return;
-    openInspector();
-  }
-
-  public boolean inspectorAlreadyOpen() 
-  {
-    return false;
-  }
-
-  public void openInspector() 
   {
   }
 
@@ -419,8 +406,6 @@ abstract public class ErmesObject implements ErmesDrawable {
       }
 
     update( itsFtsObject);
-
-    itsFtsPatcher = GetSketchWindow().itsPatcher;
   }
 
   protected void makeCurrentRect( FtsObject theFtsObject) 
@@ -758,6 +743,20 @@ abstract public class ErmesObject implements ErmesDrawable {
   public Dimension Size() 
   {
     return ( new Dimension( currentRect.width, currentRect.height));
+  }
+
+
+  // Called at ErmesObject disposal
+
+  void cleanAll()
+  {
+    itsSketchPad = null;
+    itsFtsObject = null;
+    itsInletList = null;
+    itsOutletList = null;
+    itsFont = null;
+    itsFontMetrics = null;
+    currentRect = null;
   }
 
   // Experimental MDC

@@ -43,10 +43,6 @@ public class TclMaxPackage
 
     interp.createCommand("preloadClass", new MaxPreloadClassCmd());
 
-    /* debug */
-
-    interp.createCommand("oscilloscope", new MaxOscilloscopeCmd());
-
     /* hooks */
 
     interp.createCommand("when", new MaxWhenCmd());

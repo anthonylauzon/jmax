@@ -27,6 +27,13 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
     addFocusListener( this);
   }
 
+  public void removeNotify()
+  {
+    removeKeyListener(this);
+    removeFocusListener(this);
+    super.removeNotify();
+  }
+
   public void AbortEdit()
   {
     setVisible( false);

@@ -14,7 +14,6 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.editors.console.*; 
 import tcl.lang.*;
 
 /**
@@ -102,7 +101,6 @@ public class MaxApplication extends Object
 
   public static void main(String args[])
   {
-
     MaxVector toOpen = new MaxVector();
 
     // main function parse the argument line and create the main class...
@@ -342,7 +340,7 @@ public class MaxApplication extends Object
 
     if (someOneNeedSave)
       {
-	QuitDialog quitDialog = new QuitDialog();
+	QuitDialog quitDialog = new QuitDialog(MaxWindowManager.getWindowManager().getTopFrame());
 
 	switch (quitDialog.getAnswer())
 	  {
@@ -372,7 +370,9 @@ public class MaxApplication extends Object
 	
 	    if (doTheSave && (! document.isSaved()))
 	      {
-		if (YesOrNo.ask("Save " + document.getName(), "Save", "Don't Save"))
+
+		if (YesOrNo.ask(MaxWindowManager.getWindowManager().getTopFrame(),
+				"Save " + document.getName(), "Save", "Don't Save"))
 		  {
 		    if (! document.canSave())
 		      {
@@ -396,7 +396,8 @@ public class MaxApplication extends Object
 		      }
 		    else
 		      {
-			new ErrorDialog(null, "Cannot Save " + document.getName());
+			new ErrorDialog(MaxWindowManager.getWindowManager().getTopFrame(),
+					"Cannot Save " + document.getName());
 		      }
 		  }		    
 
@@ -409,10 +410,10 @@ public class MaxApplication extends Object
 
     runHooks("exit");
 
-    if (ConsoleWindow.getConsoleWindow() != null)
+    if (MaxWindowManager.getTopFrame() != null)
       {
-	ConsoleWindow.getConsoleWindow().setVisible(false);
-	ConsoleWindow.getConsoleWindow().dispose();
+	MaxWindowManager.getTopFrame().setVisible(false);
+	MaxWindowManager.getTopFrame().dispose();
       }
 
     if (Fts.getServer() != null)

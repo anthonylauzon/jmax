@@ -31,6 +31,12 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     TEXT_OFFSET = getWhiteOffset()+TEXT_INSET;
   }
 
+  void cleanAll()
+  {
+    itsParsedTextVector = null;
+    super.cleanAll();
+  }
+
   protected int getWhiteOffset() 
   {
     return 0;
@@ -192,8 +198,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     itsSketchPad.GetEditField().setSize(d1.width-TEXT_OFFSET, d1.height-HEIGHT_DIFF);
 
     itsSketchPad.GetEditField().repaint();
-    // @@@@ BARBOGIO
-    // itsSketchPad.validate();//??
     itsSketchPad.repaint();
   }
 

@@ -17,7 +17,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
   Button okButton;
 
   public ErrorDialog(Frame dw, String theError) {
-    super(((dw != null) ? dw : MaxWindowManager.getWindowManager().getAFrame()), "ermes Error", false);
+    super(dw , "ermes Error", true);
     parent = dw;
     itsError = theError;
 
@@ -45,7 +45,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
   }
 
   public void actionPerformed(ActionEvent e){    
-    setVisible(false);
+    hide();
     dispose();
   }
 }

@@ -231,7 +231,7 @@ void fts_client_upload_connection(fts_connection_t *c)
   if (c->id == FTS_NO_ID)
     fts_connection_table_register(c);
 
-  fts_client_mess_start_msg(CONNECT_OBJECTS_CODE);
+  fts_client_mess_start_msg(NEW_CONNECTION_CODE);
   fts_client_mess_add_long(c->id);
   fts_client_mess_add_object(c->src);
   fts_client_mess_add_long(c->woutlet);
@@ -271,7 +271,33 @@ void fts_client_upload_patcher_content(fts_patcher_t *patcher)
     }
 }
 
+/* Handling of connections and object release and refine */
 
+void fts_client_release_connection(fts_connection_t *c)
+{
+  fts_client_mess_start_msg(CONNECTION_RELEASE_CODE);
+  fts_client_mess_add_connection(c);
+  fts_client_mess_send_msg();
+}
+
+
+void fts_client_redefine_connection(fts_connection_t *c)
+{
+  fts_client_mess_start_msg(REDEFINE_CONNECTION_CODE);
+  fts_client_mess_add_connection(c);
+  fts_client_mess_add_object(c->src);
+  fts_client_mess_add_int(c->woutlet);
+  fts_client_mess_add_object(c->dst);
+  fts_client_mess_add_int(c->winlet);
+  fts_client_mess_send_msg();
+}
+
+void fts_client_release_object(fts_object_t *obj)
+{
+  fts_client_mess_start_msg(OBJECT_RELEASE_CODE);
+  fts_client_mess_add_object(obj);;
+  fts_client_mess_send_msg();
+}
 
 
 

@@ -52,6 +52,8 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
   {
     if (window != null)
       window.Destroy();
+
+    window = null;
   }
 
   /*

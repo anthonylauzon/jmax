@@ -12,7 +12,8 @@ import ircam.jmax.mda.*;
 //
 // The generic "extern" object in ermes. (example: adc1~)
 //
-public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler {
+
+class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler {
 
   public boolean iAmPatcher = false;
   public static final int WHITE_OFFSET = 6;
@@ -81,12 +82,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   }
 
   /* Inspector */
-  public boolean inspectorAlreadyOpen() 
-  {
-    return (ErmesPatcherInspector.isOpen() && ErmesPatcherInspector.getInspectedObject() == itsFtsObject);
-  }
 
-  public void openInspector() 
+  public void inspect() 
   {
     if (iAmPatcher)
       ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);

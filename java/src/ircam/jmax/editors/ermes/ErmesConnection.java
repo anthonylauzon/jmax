@@ -12,7 +12,8 @@ import java.lang.Math;
 // the loading/saving of connections. It has user interface
 // methods (mouseclick, move, doubleclick...).
 //
-public class ErmesConnection implements ErmesDrawable {
+
+class ErmesConnection implements ErmesDrawable {
 
   public ErmesObjInlet itsInlet;
   public ErmesObjOutlet itsOutlet;

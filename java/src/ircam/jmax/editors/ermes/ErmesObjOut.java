@@ -8,6 +8,7 @@ import ircam.jmax.fts.*;
 //
 // The "out" graphic object used in subpatchers.
 //
+
 class ErmesObjOut extends ErmesObject {
 
   int itsId;

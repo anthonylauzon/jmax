@@ -10,6 +10,7 @@ import ircam.jmax.utils.*;
 //
 // The "toggle" graphic object.
 //
+
 class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
 
   boolean itsToggled = false;

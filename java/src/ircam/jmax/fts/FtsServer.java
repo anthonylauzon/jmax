@@ -552,20 +552,19 @@ public class FtsServer
 
   /** Send a "free object" messages to FTS.*/
 
-  final void freeObject(FtsObject obj)
+  final void deleteObject(FtsObject obj)
   {
     if (! connected)
       return;
 
     if (FtsServer.debug)
-      System.err.println("freeObject(" + obj + ")");
+      System.err.println("deleteObject(" + obj + ")");
 
     if (obj.getObjectId() != -1)
       {
 	try
 	  {
-	    unregisterObject(obj);
-	    port.sendCmd(FtsClientProtocol.fts_free_object_cmd);
+	    port.sendCmd(FtsClientProtocol.fts_delete_object_cmd);
 	    port.sendObject(obj);
 	    port.sendEom();
 	  }
@@ -754,7 +753,7 @@ public class FtsServer
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_connect_objects_cmd);
+	port.sendCmd(FtsClientProtocol.fts_new_connection_cmd);
 	port.sendInt(id);
 	port.sendObject(from);
 	port.sendInt(outlet);
@@ -797,12 +796,12 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug)
+    if (FtsServer.debug) 
       System.err.println("deleteConnection(" + connection + ")");
 
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_disconnect_objects_cmd);
+	port.sendCmd(FtsClientProtocol.fts_delete_connection_cmd);
 	port.sendConnection(connection);
 	port.sendEom();
       }
@@ -1114,20 +1113,6 @@ public class FtsServer
   }
 
 
-  /** Send a generic message to FTS. May be this is not used.*/
-
-  final void sendMessage(FtsMessage msg)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("sendMessage(" + msg + ")");
-
-    port.sendMessage(msg);
-  }
-
-
   /** Handle adding an update group listener */
 
   public void addUpdateGroupListener(FtsUpdateGroupListener listener)
@@ -1173,15 +1158,17 @@ public class FtsServer
  	  if (msg.getNumberOfArguments() >= 3)
  	    {
  	      FtsObject obj;
-
- 	      obj = (FtsObject) msg.getArgument(0);
-
+	      String prop;
+	      Object value;
+	      
+ 	      obj = (FtsObject) msg.getNextArgument();
+	      prop = ((String) msg.getNextArgument()).intern();
+	      value =  msg.getNextArgument();
  	      if (obj != null)
- 		obj.localPut(((String) msg.getArgument(1)).intern(), msg.getArgument(2));
+ 		obj.localPut(prop, value);
 
 	      if (FtsServer.debug)
- 		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
- 				   + " " + msg.getArgument(2));
+ 		System.err.println("SetPropertyValue " + obj + " " + prop + " " + value);
  	    }
  	  else
  	    System.err.println("Wrong property value message " + msg);
@@ -1192,7 +1179,7 @@ public class FtsServer
 	{
 	  FtsObject obj;
 
-	  obj = (FtsObject) msg.getArgument(0);
+	  obj = (FtsObject) msg.getNextArgument();
 
 	  if (obj != null)
 	    obj.handleMessage(msg);
@@ -1203,7 +1190,7 @@ public class FtsServer
       break;
 
       case FtsClientProtocol.post_cmd:
-	System.out.print(msg.getArgument(0)); // print the first argument
+	System.out.print(msg.getNextArgument()); // print the first argument
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
@@ -1267,18 +1254,18 @@ public class FtsServer
 	  break;
 	}
 
-      case FtsClientProtocol.fts_connect_objects_cmd:
+      case FtsClientProtocol.fts_new_connection_cmd:
 	{
 	  int id;
 	  FtsObject from, to;
 	  int outlet, inlet;
 	  FtsConnection c;
 
-	  id     = ((Integer)  msg.getArgument(0)).intValue();
-	  from   = (FtsObject) msg.getArgument(1);
-	  outlet = ((Integer)  msg.getArgument(2)).intValue();
-	  to     = (FtsObject) msg.getArgument(3);
-	  inlet  = ((Integer)  msg.getArgument(4)).intValue();
+	  id     = ((Integer)  msg.getNextArgument()).intValue();
+	  from   = (FtsObject) msg.getNextArgument();
+	  outlet = ((Integer)  msg.getNextArgument()).intValue();
+	  to     = (FtsObject) msg.getNextArgument();
+	  inlet  = ((Integer)  msg.getNextArgument()).intValue();
 
 	  c = new FtsConnection(id, from, outlet, to, inlet);
 
@@ -1296,11 +1283,11 @@ public class FtsServer
 	  int outlet, inlet;
 	  FtsConnection c;
 
-	  c      = (FtsConnection)  msg.getArgument(0);
-	  from   = (FtsObject) msg.getArgument(1);
-	  outlet = ((Integer)  msg.getArgument(2)).intValue();
-	  to     = (FtsObject) msg.getArgument(3);
-	  inlet  = ((Integer)  msg.getArgument(4)).intValue();
+	  c      = (FtsConnection)  msg.getNextArgument();
+	  from   = (FtsObject) msg.getNextArgument();
+	  outlet = ((Integer)  msg.getNextArgument()).intValue();
+	  to     = (FtsObject) msg.getNextArgument();
+	  inlet  = ((Integer)  msg.getNextArgument()).intValue();
 
 	  c.redefine(from, outlet, to, inlet);
 
@@ -1309,10 +1296,16 @@ public class FtsServer
 	}
       break;
 
-      case FtsClientProtocol.fts_disconnect_objects_cmd:
+      case FtsClientProtocol.fts_release_connection_cmd:
 	FtsConnection c;
-	c = (FtsConnection)  msg.getArgument(0);
+	c = (FtsConnection)  msg.getNextArgument();
 	c.release();
+	break;
+
+      case FtsClientProtocol.fts_release_object_cmd:
+	FtsObject obj;
+	obj = (FtsObject)  msg.getNextArgument();
+	obj.release();
 	break;
 
       case FtsClientProtocol.remote_call_code:
@@ -1323,11 +1316,11 @@ public class FtsServer
 	      break;
 	    }
 
-	  FtsRemoteData data = (FtsRemoteData) msg.getArgument(0);
+	  FtsRemoteData data = (FtsRemoteData) msg.getNextArgument();
 
 	  if (data != null)
 	    {
-	      int key = ((Integer)  msg.getArgument(1)).intValue();
+	      int key = ((Integer)  msg.getNextArgument()).intValue();
 
 	      // Args can be big (thousands), so in order to keep 
 	      // call as "primitive" as possible, we just pass

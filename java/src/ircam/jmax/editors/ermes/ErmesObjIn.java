@@ -8,6 +8,7 @@ import ircam.jmax.fts.*;
 //
 // The graphic inlet contained in subpatchers
 //
+
 class ErmesObjIn extends ErmesObject {
   Dimension textDimensions = new Dimension();
   int itsId;

@@ -8,6 +8,7 @@ import ircam.jmax.fts.*;
 //
 // The "message box" graphic object.
 //
+
 class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandler {
   boolean itsFlashing = false;
 

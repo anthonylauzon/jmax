@@ -20,6 +20,7 @@ import ircam.jmax.utils.*;
 // It keeps track of the toolbar state, it handles the 
 // offscreen and much, much more...
 // 
+
 class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, FtsUpdateGroupListener {
   // The element list is implemented as a array, whose dimension
   // is doubled on reallocation; two methods are provided to add an element
@@ -28,6 +29,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   // every indirection in its use.
 
   static Toolkit theToolkit = Toolkit.getDefaultToolkit();
+
+  boolean deleted = false; // set to true when the sketch pad is cleaned up.
 
   MaxVector itsElements = new MaxVector();
 
@@ -75,6 +78,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   }
 
   ErmesSketchWindow itsSketchWindow;
+  FtsContainerObject itsPatcher;
 
   private final static int SKETCH_WIDTH = 1200;
   private final static int SKETCH_HEIGHT = 1200;
@@ -130,8 +134,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   MaxVector itsConnections;
   MaxVector itsInletList;
   MaxVector itsOutletList;
-  static ErmesSelection currentSelection;
-  static FtsClipboard ftsClipboard;
+  static ErmesSelection currentSelection =  new ErmesSelection();
   Rectangle currentRect = new Rectangle();
   private Rectangle previousRect = new Rectangle();
   private Point	currentPoint = new Point();
@@ -891,10 +894,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesSketchPad( ErmesSketchWindow theSketchWindow) 
+  ErmesSketchPad( ErmesSketchWindow theSketchWindow, FtsContainerObject thePatcher) 
   {
     super();
 
+    itsPatcher = thePatcher;
     Fts.getServer().addUpdateGroupListener( this);
 
     setLayout( null);
@@ -903,19 +907,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsConnections = new MaxVector();
     itsInletList = new MaxVector();
     itsOutletList = new MaxVector();
-
-    if (currentSelection == null)
-      currentSelection = new ErmesSelection( Fts.getSelection());
-
-    try 
-      {
-	if (ftsClipboard == null)
-	  ftsClipboard = (FtsClipboard) Fts.makeFtsObject( Fts.getServer().getRootObject(), "__clipboard");
-      }
-    catch (FtsException e) 
-      {
-	System.out.println("warning: failed to create an Fts clipboard");
-      }
 
     itsStartMovingPt = new Point( 0,0);    
     itsStartInclusionRect = new Rectangle();  
@@ -937,6 +928,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     addMouseMotionListener( this); 
     addMouseListener( this);
     addKeyListener( itsSketchWindow);
+
+    setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME, 
+		       Font.PLAIN, 
+		       ircam.jmax.utils.Platform.FONT_SIZE));
+
+    InitFromFtsContainer( itsPatcher);
+    PrepareInChoice(); 
+    PrepareOutChoice();
   }
 	
   static void RequestOffScreen( ErmesSketchPad theSketchPad) 
@@ -996,7 +995,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     try
       {
-	fo = Fts.makeFtsObject( itsSketchWindow.itsPatcher, itsAddObjectDescription);
+	fo = Fts.makeFtsObject( itsPatcher, itsAddObjectDescription);
 
 	fo.put( "x", x);
 	fo.put( "y", y);
@@ -1357,15 +1356,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   public void mouseExited( MouseEvent e)
   {
     cleanAnnotations(); // MDC
-
-    if (itsRunMode)
-      return;		
-
-    if ( itsSketchWindow.getCursor().getType() == Cursor.CROSSHAIR_CURSOR)
-      { 
-	itsSketchWindow.setCursor( Cursor.getDefaultCursor());
-	itsCurrentInOutlet.itsAlreadyMoveIn = false;
-      }
   }
 
   //
@@ -1669,8 +1659,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  return;
       }
 
-    if ( itsSketchWindow.getCursor() != Cursor.getDefaultCursor())
-      itsSketchWindow.setCursor( Cursor.getDefaultCursor());
+    itsSketchWindow.setCursor( Cursor.getDefaultCursor());
 
     if (itsCurrentInOutlet != null)
       if (itsCurrentInOutlet.itsAlreadyMoveIn)
@@ -1748,6 +1737,22 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     //    repaint();
   }
 
+  public void showObject( Object obj)
+  {
+    // Should select or highlight obj if it is an FtsObject
+    if (obj instanceof FtsObject) 
+      {
+	ErmesObject aObject = getErmesObjectFor((FtsObject) obj);
+
+	if (aObject != null)
+	  {
+	    deselectAll( true);
+	    currentSelection.addObject( aObject);
+	    aObject.Select( true);
+	    CheckCurrentFont();
+	  }
+      }
+  }
 
   void OutletConnect( ErmesObject theObject, ErmesObjInOutlet theRequester)
   {
@@ -1904,36 +1909,31 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   
   void PrepareInChoice() 
   {
-    if (itsInPop != null) 
-      return;
-
-    int temp = itsSketchWindow.itsPatcher.getNumberOfInlets();
-    itsInPop = new ErmesObjInOutPop( temp);
-
+    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets());
     add( itsInPop);
   }
 
   final void RedefineInChoice()
   {
-    itsInPop.Redefine( itsSketchWindow.itsPatcher.getNumberOfInlets());
+    itsInPop.Redefine( itsPatcher.getNumberOfInlets());
   }
 
   void PrepareOutChoice()
   {
-    if (itsOutPop != null)
-      return; //it's OK, we did it already
-    
-    itsOutPop = new ErmesObjInOutPop( itsSketchWindow.itsPatcher.getNumberOfOutlets());
+    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets());
     add( itsOutPop);
   }
   
   void RedefineOutChoice()
   {
-    itsOutPop.Redefine( itsSketchWindow.itsPatcher.getNumberOfOutlets());
+    itsOutPop.Redefine( itsPatcher.getNumberOfOutlets());
   }
 
   public void paint( Graphics g)
   {
+    if (deleted)
+      return;
+
     if ( itsScrolled)
       {
 	if (offScreenPresent)
@@ -2062,7 +2062,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   public void update( Graphics g)
   {
-    if (itsRunMode) return;
+    if (deleted || itsRunMode)
+      return;
 
     if (editStatus == START_CONNECT) 
       {
@@ -2162,7 +2163,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	return;
       }
     else
-      paint( g);
+      paint (g);
   }
 
   int itsCurrentScrollingX;
@@ -2506,6 +2507,68 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     if (paintNow)
       paintDirtyList();
+  }
+
+  //--------------------------------------------------------
+  //	cleanAll
+  //	Make the cleanup needed before closing the 
+  //    sketchpad
+  //--------------------------------------------------------
+
+  void cleanAll()
+  {
+    Object[] objects = itsElements.getObjectArray();
+    int size       = itsElements.size();
+
+    for ( int i = 0; i < size; i++)
+      {
+	ErmesObject object = (ErmesObject) objects[i];
+
+	if (object instanceof FtsPropertyHandler)
+	  if (object.GetFtsObject()!=null)
+	    object.GetFtsObject().removeWatch( object);
+      }
+
+    Fts.getServer().removeUpdateGroupListener( this);
+    removeMouseMotionListener( this); 
+    removeMouseListener( this);
+    removeKeyListener( itsSketchWindow);
+
+    remove( itsInPop);
+    remove( itsOutPop);
+    remove( itsEditField);
+    remove( itsTextArea);
+    deselectAll( false);
+
+    if (lastSketchWithOffScreen == this)
+      {
+	lastSketchWithOffScreen = null;
+      }
+
+    // Clean up to help the gc, and found the bugs.
+
+    itsSketchWindow = null;// should not be needed, here to get the grabber !!
+    itsToolBar = null;
+
+    itsElements     = null;
+    itsConnections  = null;
+    itsInletList    = null;
+    itsOutletList    = null;
+    itsMovingRectangles  = null;
+    itsConnectingLetList = null;
+    itsPatcher = null;
+    itsInPop = null;
+    itsOutPop = null;
+    itsEditField = null;
+    itsTextArea = null;
+    itsConnectingObj = null;
+    itsConnectingLet = null;
+    dirtyInOutlets = null;
+    dirtyConnections = null;
+    dirtyObjects = null;
+    anOldPastedObject = null;
+
+    deleted = true;
   }
 
   //--------------------------------------------------------

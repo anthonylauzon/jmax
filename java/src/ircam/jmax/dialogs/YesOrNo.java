@@ -19,14 +19,14 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
   Button noButton;
   boolean answer;
 
-  public static boolean ask(String question, String yes, String no)
+  public static boolean ask(Frame frame, String question, String yes, String no)
   {
     boolean answer;
     YesOrNo dialog;
 
-    dialog = new YesOrNo(MaxWindowManager.getWindowManager().getAFrame(), question, yes, no);
+    dialog = new YesOrNo(frame, question, yes, no);
     dialog.setLocation(300, 300);
-    dialog.setVisible(true);
+    dialog.show();
 
     answer = dialog.answer;
 
@@ -77,12 +77,12 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
     if (e.getSource() == yesButton)
       {
 	answer = true;
-	setVisible(false);
+	hide();
       }
     else if(e.getSource() == noButton)
       {
 	answer = false;
-	setVisible(false);
+	hide();
       }
   }
 
@@ -99,7 +99,7 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
     if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
       {
 	answer = true;
-	setVisible(false);
+	hide();
       }
   }
 }
