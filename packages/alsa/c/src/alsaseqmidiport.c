@@ -194,7 +194,7 @@ static void
 alsaseqmidiport_midi_parser_init(alsaseqmidiport_t* this)
 {
     this->buffer_size = DEFAULT_MIDI_BS_SIZE;
-    this->buffer = malloc(this->buffer_size * sizeof(unsigned char));
+    this->buffer = fts_malloc(this->buffer_size * sizeof(unsigned char));
     /* Create midi parser */
     snd_midi_event_new(this->buffer_size * sizeof(unsigned char), &this->midi_event_parser);
     /* Initialize midi parser */
@@ -204,8 +204,11 @@ alsaseqmidiport_midi_parser_init(alsaseqmidiport_t* this)
 static void
 alsaseqmidiport_midi_parser_delete(alsaseqmidiport_t* this)
 {
-    free(this->buffer);
-    this->buffer= 0;
+    if (NULL != this->buffer)
+    {
+	fts_free(this->buffer);
+	this->buffer= NULL;
+    }
     this->buffer_size = 0;
     snd_midi_event_free(this->midi_event_parser);
 }
