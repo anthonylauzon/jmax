@@ -366,12 +366,6 @@ int fts_udpstream_get_output_port(fts_udpstream_t* stream)
 }
 
 
-static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  fts_socketstream_delete(o, winlet, s, ac, at);
-}
-
-
 /* 
    <input>: port (int)
    <output>: host (symbol) port (int)
@@ -385,6 +379,9 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
   fts_udpstream_t* self = (fts_udpstream_t*)o;
   struct sockaddr_in addr;
 
+
+  /* parent constructor */
+  fts_bytestream_init((fts_bytestream_t*)self);
 
   /* socket creation */
   self->socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -474,6 +471,23 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
   }
 
   fts_log( "[udpstream]: created with port %d \n", self->in_port);
+}
+
+static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_udpstream_t* self = (fts_udpstream_t*)o;
+  
+  /* remove from scheduler */
+  fts_sched_remove(o);
+
+  /* close socket */
+  if (self->socket != INVALID_SOCKET) 
+  {
+    CLOSESOCKET(self->socket);
+    self->socket = INVALID_SOCKET;
+  }  
+  
+  fts_bytestream_destroy((fts_bytestream_t*)self);
 }
 
 static void fts_udpstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
