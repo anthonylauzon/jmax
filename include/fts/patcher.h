@@ -36,7 +36,6 @@ struct fts_patcher
   int n_outlets;
 
   fts_object_t *objects; /* list of patcher objects*/
-  fts_object_t *last_object; /* pointer to last object */
 
   int open; /* the open flag */
   int editor_open; /* the open editor flag */

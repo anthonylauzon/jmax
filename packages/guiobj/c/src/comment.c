@@ -40,7 +40,7 @@ static fts_memorystream_t *comment_memory_stream ;
 static fts_memorystream_t *comment_get_memory_stream()
 {
   if(!comment_memory_stream)
-    comment_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+    comment_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_class, 0, 0);
 
   return comment_memory_stream;
 }

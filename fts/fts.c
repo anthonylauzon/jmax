@@ -165,8 +165,8 @@ void fts_load_project( void)
 static void fts_kernel_init( void)
 {
   /*
- *** Attention !!! The order is important, at least for the first lines ***
- */
+   * Attention !!! The order is important (at least for the first lines)
+   */
   _K_DECNCALL( fts_kernel_hashtable_init);
   _K_DECNCALL( fts_kernel_symbol_init);
   _K_DECNCALL( fts_kernel_class_init);
@@ -178,6 +178,7 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_tuple_init);
   _K_DECNCALL( fts_kernel_connection_init);
   _K_DECNCALL( fts_kernel_variable_init);
+  _K_DECNCALL( fts_kernel_bytestream_init); /* Must be before patcher_init */
   _K_DECNCALL( fts_kernel_patcher_init);
   _K_DECNCALL( fts_kernel_parser_init);
   _K_DECNCALL( fts_kernel_expression_init); /* Must be after parser_init */
@@ -205,7 +206,6 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_message_config);
   _K_DECNCALL( fts_audio_config);
   _K_DECNCALL( fts_audioconfig_config);  
-  _K_DECNCALL( fts_bytestream_config);
   _K_DECNCALL( fts_client_config);
   _K_DECNCALL( fts_update_config);
   _K_DECNCALL( fts_clipboard_config);

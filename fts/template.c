@@ -82,6 +82,18 @@ fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int
     {
       fts_template_add_instance( template, (fts_object_t *)instance);
       fts_patcher_set_template( instance, template);
+
+      if(ac > 0)
+	{
+	  fts_atom_t va;
+    
+	  /* define the "args" name */
+	  instance->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+	  fts_object_refer(instance->args);
+
+	  fts_set_object( &va, (fts_object_t *)instance->args);
+	  fts_name_set_value( instance, fts_s_args, &va);
+	}
     }
 
   return (fts_object_t *)instance;

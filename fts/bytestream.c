@@ -93,9 +93,9 @@ typedef int socket_t;
 static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_bytestream = 0;
 
-fts_class_t *fts_socketstream_type = 0;
-fts_class_t *fts_pipestream_type = 0;
-fts_class_t *fts_memorystream_type = 0;
+fts_class_t *fts_socketstream_class = 0;
+fts_class_t *fts_pipestream_class = 0;
+fts_class_t *fts_memorystream_class = 0;
 
 void fts_bytestream_init(fts_bytestream_t *stream)
 {
@@ -540,7 +540,7 @@ static void fts_pipestream_instantiate(fts_class_t *cl)
 /***********************************************************************
  *
  * Memory bytestream
- * (the object that implements a bidirectional byte stream over a TCP/IP socket) 
+ * (the object that implements an output stream writing into an array of bytes)
  *
  */
 
@@ -607,19 +607,20 @@ void fts_memorystream_reset( fts_memorystream_t *stream)
   fts_stack_clear( &stream->output_buffer);
 }
 
+
 /***********************************************************************
  *
  * Initialization
  *
  */
 
-void fts_bytestream_config( void)
+void fts_kernel_bytestream_init( void)
 {
   fts_s_bytestream = fts_new_symbol("bytestream");
   fts_s__superclass = fts_new_symbol("_superclass");
 
-  fts_socketstream_type = fts_class_install(fts_new_symbol("socketstream"), fts_socketstream_instantiate);
-  fts_pipestream_type = fts_class_install(fts_new_symbol("pipestream"), fts_pipestream_instantiate);
-  fts_memorystream_type = fts_class_install(fts_new_symbol("memorystream"), fts_memorystream_instantiate);
+  fts_socketstream_class = fts_class_install( fts_new_symbol("socketstream"), fts_socketstream_instantiate);
+  fts_pipestream_class = fts_class_install( fts_new_symbol("pipestream"), fts_pipestream_instantiate);
+  fts_memorystream_class = fts_class_install( fts_new_symbol("memorystream"), fts_memorystream_instantiate);
 }
 

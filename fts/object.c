@@ -208,6 +208,8 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
 void
 fts_object_destroy(fts_object_t *obj)
 {
+  fts_object_remove_patcher_data(obj);
+
   /* unregister name */
   fts_object_remove_name(obj);
 

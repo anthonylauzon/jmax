@@ -1342,7 +1342,7 @@ static void client_pipe_install( void)
   fts_object_t *client_object;
   fts_object_t *pipe_stream; 
 
-  pipe_stream = fts_object_create(fts_pipestream_type, 0, 0);
+  pipe_stream = fts_object_create( fts_pipestream_class, 0, 0);
   
   fts_set_object( &a, pipe_stream);
   client_object = fts_object_create_in_patcher( client_class, fts_get_root_patcher(), 1, &a);
@@ -1386,7 +1386,7 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
   }
 
   fts_set_int( &a, new_socket);
-  socket_stream = fts_object_create( fts_socketstream_type, 1, &a);
+  socket_stream = fts_object_create( fts_socketstream_class, 1, &a);
 
   fts_set_object( &a, socket_stream);
   client_object = fts_object_create_in_patcher( client_class, fts_get_root_patcher(), 1, &a);

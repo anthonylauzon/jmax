@@ -59,7 +59,6 @@ typedef void (*fts_audioport_io_fun_t)( fts_audioport_t *port);
  */
 typedef void (*fts_audioport_copy_fun_t)( fts_audioport_t *port, float *buff, int buffsize, int channel);
 
-typedef void (*fts_audioport_mute_fun_t)( fts_audioport_t *port, int channel);
 typedef int (*fts_audioport_xrun_fun_t)( fts_audioport_t *port);
 
 #define FTS_AUDIOPORT_MAX_CHANNELS 64
@@ -69,7 +68,6 @@ struct fts_audioport_direction {
   int open;
   fts_audioport_io_fun_t io_fun;
   fts_audioport_copy_fun_t copy_fun;
-  fts_audioport_mute_fun_t mute_fun;
   int channel_used[FTS_AUDIOPORT_MAX_CHANNELS];
   int max_channels;
   int nlabels;
@@ -82,7 +80,8 @@ struct fts_audioport {
   struct fts_audioport *next;
   struct fts_audioport_direction inout[2];
   float *mix_buffers[FTS_AUDIOPORT_MAX_CHANNELS];
-  void (*idle_function)( struct fts_audioport *port);
+
+  /* will probably become a method */
   int (*xrun_function)( struct fts_audioport *port);
 };
 
@@ -120,10 +119,8 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
   ((port)->inout[(direction)].mute_fun)
 
 
-#define fts_audioport_set_idle_fun( port, fun) \
-  ((port)->mute_fun = (fun))
 #define fts_audioport_set_xrun_fun( port, fun) \
-  ((port)->idle_fun = (fun))
+  ((port)->xrun_fun = (fun))
 
 /**
  * 

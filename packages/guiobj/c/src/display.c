@@ -228,7 +228,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 
-  this->stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_type, 0, 0);
+  this->stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_class, 0, 0);
 
   this->period = 50.0;
   this->gate = 1;

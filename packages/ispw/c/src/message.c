@@ -543,7 +543,7 @@ static fts_memorystream_t *message_memory_stream ;
 static fts_memorystream_t * message_get_memory_stream()
 {
   if( !message_memory_stream)
-    message_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+    message_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_class, 0, 0);
   return message_memory_stream;
 }
 

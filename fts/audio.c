@@ -54,8 +54,6 @@ fts_audioport_init( fts_audioport_t *port)
   fts_audioport_t *current;
   int i;
 
-  port->idle_function = AUDIOPORT_DEFAULT_IDLE;
-
   for ( current = audioport_list; current; current = current->next)
     if (current == port)
       return;

@@ -46,6 +46,7 @@ struct _fts_expression_t {
  *  status
  *
  */
+
 fts_status_t
 fts_status_new(fts_symbol_t description)
 {
@@ -126,7 +127,7 @@ static void unique_function(int ac, const fts_atom_t *at)
   static int seed = 1;
   fts_atom_t ret[1];						\
 
-  fts_set_int( ret, seed++);
+								  fts_set_int( ret, seed++);
   
   fts_return( ret);
 }
@@ -145,18 +146,18 @@ static void FUN##_function( int ac, const fts_atom_t *at)	\
 #define FUN DEFINE_FUN
 FUN(sin);
 FUN(cos)
-FUN(tan)
-FUN(asin)
-FUN(acos)
-FUN(atan)
-FUN(sinh)
-FUN(cosh)
-FUN(tanh)
-FUN(asinh)
-FUN(acosh)
-FUN(atanh)
+     FUN(tan)
+     FUN(asin)
+     FUN(acos)
+     FUN(atan)
+     FUN(sinh)
+     FUN(cosh)
+     FUN(tanh)
+     FUN(asinh)
+     FUN(acosh)
+     FUN(atanh)
 
-static void declare_functions( void)
+     static void declare_functions( void)
 {
 #define DECLARE_FUN(FUN)							\
   fts_expression_declare_function( fts_new_symbol( #FUN), FUN##_function);
@@ -374,33 +375,46 @@ static void expression_stack_init( fts_expression_t *exp)
  * Utility functions for creating objects
  */
 static fts_object_t *
-create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, fts_status_t *status)
+create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int offset, fts_status_t *status)
 {
   fts_object_t *obj = NULL;
   fts_template_t *template;
   fts_class_t *cl;
 
   if ((template = fts_package_get_declared_template( package, class_name)) != NULL)
-  {
-    if((obj = fts_template_make_instance( template, patcher, ac, at)) != NULL)
+    {
+      if((obj = fts_template_make_instance( template, patcher, ac-offset, at+offset)) == NULL)
+	{
+	  *status = invalid_template_error;
+	  return NULL;
+	}
+
+      fts_object_set_description(obj, ac, at);
       return obj;
-    else
-       *status = invalid_template_error;
-  }
-  else if ((cl = fts_package_get_class( package, class_name)) != NULL)
-  {
-    if((obj = fts_object_create_in_patcher( cl, patcher, ac, at)) != NULL)
+    }
+
+  if ((cl = fts_package_get_class( package, class_name)) != NULL)
+    {
+      if((obj = fts_object_create_in_patcher( cl, patcher, ac-offset, at+offset)) == NULL)
+	{
+	  *status = fts_status_new(fts_get_error());
+	  return NULL;
+	}
+
       return obj;
-    else
-      *status = fts_status_new(fts_get_error());
-  }
-  else if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
-  {
-    if((obj = fts_template_make_instance( template, patcher, ac, at)) != NULL)
+    }
+
+  if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
+    {
+      if((obj = fts_template_make_instance( template, patcher, ac-offset, at+offset)) == NULL)
+	{
+	  *status = invalid_template_error;
+	  return NULL;
+	}
+
+      fts_object_set_description(obj, ac, at);
       return obj;
-    else
-      *status = invalid_template_error;
-  }
+    }
 
   return NULL;
 }
@@ -416,30 +430,30 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
 
   /* is there a package name in front of the : ? */
   if ( fts_get_symbol( at) != fts_s_colon)
-  {
-    package_name = fts_get_symbol( at);
-    class_name = fts_get_symbol( at + 2);
-
-    pkg = fts_package_get( package_name);
-    if (pkg != NULL)
     {
-      if((obj = create_instance_in_package( pkg, patcher, class_name, ac-3, at+3, status)) != NULL)
-        return obj;
+      package_name = fts_get_symbol( at);
+      class_name = fts_get_symbol( at + 2);
 
-      if(*status == fts_ok)
-        *status = unknown_class_error;
+      pkg = fts_package_get( package_name);
+      if (pkg != NULL)
+	{
+	  if((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 3, status)) != NULL)
+	    return obj;
+
+	  if(*status == fts_ok)
+	    *status = unknown_class_error;
+	}
+      else
+	*status = unknown_package_error;
+
+      return NULL;
     }
-    else
-      *status = unknown_package_error;
-
-    return NULL;
-  }
   
   class_name = fts_get_symbol( at + 1);
 
   /* 1) ask kernel package */
   pkg = fts_get_system_package();
-  if((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
+  if((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
     return obj;
   
   if(*status != fts_ok)
@@ -447,7 +461,7 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
   
   /* 2) ask the current package */
   pkg = fts_get_current_package();
-  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
     return obj;
 
   if(*status != fts_ok)
@@ -466,12 +480,12 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
       if (pkg == NULL)
 	continue;
 
-      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2, status)) != NULL)
+      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2, status)) != NULL)
 	return obj;
 
       if(*status != fts_ok)
         return NULL;      
-  }
+    }
 
   *status = unknown_class_error;      
   return NULL;
@@ -696,15 +710,15 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
   case TK_UPLUS:
     UNOP_EVAL(+)
-    break;
+      break;
 
   case TK_UMINUS:
     UNOP_EVAL(-)
-    break;
+      break;
 
   case TK_LOGICAL_NOT:
     IUNOP_EVAL(!)
-    break;
+      break;
 
   case TK_PLUS:
     ABINOP_EVAL(+);
