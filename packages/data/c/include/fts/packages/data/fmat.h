@@ -26,6 +26,12 @@
 #include <fts/packages/data/data.h>
 
 
+/** Float matrix data class.
+ *
+ *  @file fmat.h
+ *  @ingroup data
+ */
+
 
 /******************************************************************************
  *
@@ -67,14 +73,16 @@ DATA_API fmat_format_t *fmat_format_get_by_name(fts_symbol_t name);
 
 
 
-/******************************************************************************
- * @defgroup fmat 
+/*****************************************************************************/
+/** @defgroup fmat fmat: float matrix
+ *  @ingroup  data
  *  
- * float matrices and vectors
+ *  float matrices and vectors
  *
- * @{
+ *  @{
  */
 
+/** fmat struct */
 typedef struct
 {
   fts_object_t o;
@@ -97,13 +105,13 @@ DATA_API fts_symbol_t fmat_symbol;
 DATA_API fts_class_t *fmat_class;
 #define fmat_type fmat_class
 
-/** Get number of rows of matrix x.
+/** Get number of rows of matrix \p x.
  *
  *  @fn int fmat_get_m(fmat_t *x)
  */
 #define fmat_get_m(x) ((x)->m)
 
-/** Get number of columns of matrix x.
+/** Get number of columns of matrix \p x.
  *
  *  @fn int fmat_get_n(fmat_t *x)
  */
@@ -128,16 +136,19 @@ DATA_API void fmat_set_m(fmat_t *fmat, int m);
 DATA_API void fmat_set_n(fmat_t *fmat, int n);
 
 /** get pointer to raw float data vector.
+ *
  *  @fn float *fmat_get_ptr(fmat_t *x)
  */
 #define fmat_get_ptr(m) ((m)->values)
 
-/**
+/** get the matrix element at row \p i and column \p j.
+ *
  *  @fn float *fmat_get_element(fmat_t *x, int i, int j)
  */
 #define fmat_get_element(m, i, j) ((m)->values[(i) * (m)->n + (j)])
 
-/**
+/** set the matrix element at row \p i and column \p j to \p val.
+ *
  *  @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
  */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
@@ -167,13 +178,12 @@ DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
-/* @} end of group fmat */
+/** @} end of group fmat */
 
 
 
 
-/******************************************************************************
- * @defgroup fvec
+/** @name fvec fvec backwards compatibility
  *
  * A float vector fvec is a mere alias to fmat, with the constraint of having 
  * only one column.
@@ -187,7 +197,7 @@ DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
 #define fvec_type fvec_class
 
-/* @} end of group fvec */
+/** @} end of group fvec */
 
 
 #endif

@@ -18,8 +18,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
+
 #ifndef _DATA_H
 #define _DATA_H
+
+
+/** package with data classes (matrices, vectors, dictionaries, etc.).
+ *  @file     data.h
+ *  @defgroup data	data package
+ */
 
 #include <fts/fts.h>
 
@@ -37,7 +45,9 @@
 
 DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);  
 
-/* expression class */
+/** expression class.
+ *  @class expression
+ */
 typedef struct
 {
   fts_object_t o;

@@ -25,6 +25,14 @@
 
 #include <fts/packages/data/data.h>
 
+
+/** Dictionary associative list.
+ *
+ *  @file dict.h
+ *  @ingroup data
+ */
+
+
 typedef struct dict
 {
   fts_object_t o;

@@ -26,6 +26,14 @@
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 
+
+/** Atom matrix.
+ *
+ *  @file mat.h
+ *  @ingroup data
+ */
+
+
 DATA_API fts_class_t *mat_type;
 DATA_API fts_symbol_t mat_symbol;
 
