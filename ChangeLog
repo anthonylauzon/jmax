@@ -1,5 +1,8 @@
 2003-10-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fts/package.c (__fts_package_save): fixed bug "[ 830993 ] cannot create new project".
+	Package are saved if filename have changed.
+
 	* packages/data/java/ircam/jmax/editors/bpf/FtsBpfObject.java (append): fixed bug "[ 827862 ] bpf persistence buggy".
 
 	* packages/ispw/c/src/delwrite.c (delwrite_init): fixed bug "[ 822061 ] delwrite~ causes jmax crash".
