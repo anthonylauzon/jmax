@@ -43,9 +43,9 @@ io_config(void)
   loopback_config();
   out_config();
 #ifndef WIN32
+  udp_config();
 #if 0
   serial_config();
-  udp_config();
   udpreceive_config();
   udpsend_config();
   wacom_config();
