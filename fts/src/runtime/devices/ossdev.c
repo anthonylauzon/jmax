@@ -165,6 +165,7 @@ oss_audiodev_update_device()
 	  oss_audio_data.fd = fd;
 	  oss_audio_set_parameters();
 	  oss_audio_data.device_opened = 1;
+	  return 0;
 	}
       else
 	{
@@ -185,6 +186,7 @@ oss_audiodev_update_device()
 	      oss_audio_data.fd = open(AUDIO_DEVICE, O_WRONLY, 0);
 	      oss_audio_set_parameters();
 	      oss_audio_data.device_opened = 1;
+	      return 0;
 	    }
 	  else
 	    {
@@ -203,6 +205,7 @@ oss_audiodev_update_device()
 	      oss_audio_data.fd = open(AUDIO_DEVICE, O_RDONLY, 0);
 	      oss_audio_set_parameters();
 	      oss_audio_data.device_opened = 1;
+	      return 0;
 	    }
 	  else
 	    {

@@ -22,31 +22,6 @@ ftl_sigabs(fts_word_t *argv)
   long n = fts_word_get_long(argv + 2);
   int i;
 
-#ifdef HAS_UNROLL_BY8
-  for (i = 0; i < n; i += 8)
-    {
-      float f0, f1, f2, f3, f4, f5, f6, f7;
-
-      f0 = (float) in[i + 0];
-      f1 = (float) in[i + 1];
-      f2 = (float) in[i + 2]; 
-      f3 = (float) in[i + 3];
-      f4 = (float) in[i + 4];
-      f5 = (float) in[i + 5];
-      f6 = (float) in[i + 6];
-      f7 = (float) in[i + 7];
-
-      out[i + 0] = (float) (f0 >= 0 ? f0 : (- f0));
-      out[i + 1] = (float) (f1 >= 0 ? f1 : (- f1));
-      out[i + 2] = (float) (f2 >= 0 ? f2 : (- f2));
-      out[i + 3] = (float) (f3 >= 0 ? f3 : (- f3));
-      out[i + 4] = (float) (f4 >= 0 ? f4 : (- f4));
-      out[i + 5] = (float) (f5 >= 0 ? f5 : (- f5));
-      out[i + 6] = (float) (f6 >= 0 ? f6 : (- f6));
-      out[i + 7] = (float) (f7 >= 0 ? f7 : (- f7));
-    }
-
-#else
   for (i = 0; i < n; i ++)
     {
       float f;
@@ -55,7 +30,6 @@ ftl_sigabs(fts_word_t *argv)
 
       out[i] = (f >= 0 ? f : (- f));
     }
-#endif
 }
 
 

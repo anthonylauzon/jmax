@@ -17,10 +17,8 @@ extern void ftl_2p2z(fts_word_t *argv);
 static void sig2p2z_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 static fts_symbol_t sig2p2z_function = 0;
-#ifdef HI_OPT
 static fts_symbol_t sig2p2z_64_function = 0;
 static fts_symbol_t sig2p2z_64_1ops_function = 0;
-#endif
 
 typedef struct
 {
@@ -72,12 +70,11 @@ ftl_2p2z(fts_word_t *argv)
 }
 
 
-#ifdef HI_OPT
 void
 ftl_64_2p2z(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv + 0);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
   ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 2);
   int i;
   float ym1, ym2, ym0;
@@ -95,27 +92,10 @@ ftl_64_2p2z(fts_word_t *argv)
   ff1 = x->ffcoef1;
   ff2 = x->ffcoef2;
 
-#pragma ivdep
-
-  for (i = 0; i < 64; i += 4)
+  for (i = 0; i < 64; i ++)
     {
-      ym0 = g * in[i + 0] + a * ym1 + b * ym2;
-      out[i + 0] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * in[i + 1] + a * ym1 + b * ym2;
-      out[i + 1] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * in[i + 2] + a * ym1 + b * ym2;
-      out[i + 2] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * in[i + 3] + a * ym1 + b * ym2;
-      out[i + 3] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
+      ym0 = g * in[i] + a * ym1 + b * ym2;
+      out[i] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
       ym2 = ym1;
       ym1 = ym0;
     }
@@ -127,8 +107,8 @@ ftl_64_2p2z(fts_word_t *argv)
 void
 ftl_64_1ops_2p2z(fts_word_t *argv)
 {
-  float *vec = (float *)fts_word_get_ptr(argv + 0);
-  ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 1);
+  float * restrict vec = (float *)fts_word_get_ptr(argv + 0);
+  ctlf2p2z_t * restrict x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 1);
   int i;
   float ym1, ym2, ym0;
   float a, b, g;
@@ -145,27 +125,10 @@ ftl_64_1ops_2p2z(fts_word_t *argv)
   ff1 = x->ffcoef1;
   ff2 = x->ffcoef2;
 
-  /* #pragma ivdep */
-
-  for (i = 0; i < 64; i += 4)
+  for (i = 0; i < 64; i ++)
     {
-      ym0 = g * vec[i + 0] + a * ym1 + b * ym2;
-      vec[i + 0] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * vec[i + 1] + a * ym1 + b * ym2;
-      vec[i + 1] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * vec[i + 2] + a * ym1 + b * ym2;
-      vec[i + 2] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
-      ym2 = ym1;
-      ym1 = ym0;
-
-      ym0 = g * vec[i + 3] + a * ym1 + b * ym2;
-      vec[i + 3] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
+      ym0 = g * vec[i] + a * ym1 + b * ym2;
+      vec[i] = ff0 * ym0 + ff1 * ym1 + ff2 * ym2;
       ym2 = ym1;
       ym1 = ym0;
     }
@@ -173,7 +136,7 @@ ftl_64_1ops_2p2z(fts_word_t *argv)
   x->state1 = ym1;
   x->state2 = ym2;
 }
-#endif
+
 
 static void
 sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -183,7 +146,6 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   sig2p2z_state_clear(o, 0, 0, 0, 0);
 
-#ifdef HI_OPT
   if (fts_dsp_get_input_size(dsp, 0) == 64)
     {
       if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
@@ -209,13 +171,6 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_long(argv+3, fts_dsp_get_input_size(dsp, 0));
       dsp_add_funcall(sig2p2z_function, 4, argv);
     }
-#else
-  fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_ftl_data(argv+2, this->ftl_data);
-  fts_set_long  (argv+3, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(sig2p2z_function, 4, argv);
-#endif
 }
 
 /*************************************
@@ -398,13 +353,11 @@ sig2p2z_config(void)
   sig2p2z_function = fts_new_symbol("2p2z");
   dsp_declare_function(sig2p2z_function, ftl_2p2z);
 
-#ifdef HI_OPT
   sig2p2z_64_function = fts_new_symbol("2p2z_64");
   dsp_declare_function(sig2p2z_64_function, ftl_64_2p2z);
 
   sig2p2z_64_1ops_function = fts_new_symbol("2p2z_64_1ops");
   dsp_declare_function(sig2p2z_64_1ops_function, ftl_64_1ops_2p2z);
-#endif
 }
 
 

@@ -82,47 +82,6 @@ ftl_tabpeek(fts_word_t *argv)
   long tabend = buf->size - 1;
   int i;
 
-#ifdef HAS_UNROLL_BY8
-  if (buf)
-    for (i = 0; i < n; i += 8)
-      {
-	long idx0, idx1, idx2, idx3, idx4, idx5, idx6, idx7;
-
-	idx0 = (long) in[i + 0];
-	idx1 = (long) in[i + 1];
-	idx2 = (long) in[i + 2];
-	idx3 = (long) in[i + 3];
-	idx4 = (long) in[i + 4];
-	idx5 = (long) in[i + 5];
-	idx6 = (long) in[i + 6];
-	idx7 = (long) in[i + 7];
-
-
-	out[i + 0] = tab[idx0 >= 0 ? (idx0 < tabend ? idx0 : tabend) : 0];
-	out[i + 1] = tab[idx1 >= 0 ? (idx1 < tabend ? idx1 : tabend) : 0];
-	out[i + 2] = tab[idx2 >= 0 ? (idx2 < tabend ? idx2 : tabend) : 0];
-	out[i + 3] = tab[idx3 >= 0 ? (idx3 < tabend ? idx3 : tabend) : 0];
-	out[i + 4] = tab[idx4 >= 0 ? (idx4 < tabend ? idx4 : tabend) : 0];
-	out[i + 5] = tab[idx5 >= 0 ? (idx5 < tabend ? idx5 : tabend) : 0];
-	out[i + 6] = tab[idx6 >= 0 ? (idx6 < tabend ? idx6 : tabend) : 0];
-	out[i + 7] = tab[idx7 >= 0 ? (idx7 < tabend ? idx7 : tabend) : 0];
-      }
-  else
-    {   
-      for (i = 0; i < n; i+=8)
-	{
-	  out[i + 0] = 0.0f;
-	  out[i + 1] = 0.0f;
-	  out[i + 2] = 0.0f;
-	  out[i + 3] = 0.0f;
-	  out[i + 4] = 0.0f;
-	  out[i + 5] = 0.0f;
-	  out[i + 6] = 0.0f;
-	  out[i + 7] = 0.0f;
-	}
-    }
-
-#else
   if (buf)
     for (i = 0; i < n; i++)
       {
@@ -137,7 +96,6 @@ ftl_tabpeek(fts_word_t *argv)
       for (i = 0; i < n; i++)
 	out[i] = 0.0f;
     }
-#endif
 }
 
 

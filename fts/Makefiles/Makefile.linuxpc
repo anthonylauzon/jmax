@@ -22,8 +22,7 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 #ARCH_CFLAGS := -DLINUX -DLINUXPC
 
 # Pentium gcc special options; you need the compiler on linotte do use this !!!
-#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
-ARCH_OPT_CFLAGS := -O0
+ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
 #ARCH_OPT_CFLAGS := -O6 -mpentium
 #ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
 

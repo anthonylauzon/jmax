@@ -21,11 +21,8 @@
 #include "lang.h"
 #include "runtime/files.h"
 #include "runtime/devices/devices.h"
-
-
-#ifdef HAS_TIME_OF_THE_DAY
 #include <sys/time.h>
-#endif
+
 
 
 /* forward declarations */
@@ -92,9 +89,7 @@ static struct
   int total_samples;		/* accumulator for number of samples in the profing interval */
   int done_vectors;		/* number of vectors computer */
 
-#ifdef HAS_TIME_OF_THE_DAY
   struct timeval daytime;
-#endif
 
 } prof_dac_data;
 
@@ -192,16 +187,13 @@ prof_dac_put(fts_word_t *argv)
 
 	  if (prof_dac_data.done_vectors == prof_dac_data.profile_interval)
 	    {
-#ifdef HAS_TIME_OF_THE_DAY
 	      struct timeval last_time;
-#endif
 	      fts_atom_t args[2];
 	      int samples_per_seconds = 0;
 	      long dsec, dusec;
 
 	      prof_dac_data.done_vectors = 0;
 
-#ifdef HAS_TIME_OF_THE_DAY
 	      /* Get the current time of the day */
 
 	      gettimeofday(&last_time, 0); /* 0 is for compatibility with BSD */
@@ -226,7 +218,6 @@ prof_dac_put(fts_word_t *argv)
 
 	      samples_per_seconds = (int) ((long) (100L * (long) prof_dac_data.total_samples) /
 					  (long) (100L * dsec + (dusec / 10000)));
-#endif
 	      /* Post the results event */
 
 	      post("Computed %d samples at %d samples per seconds\n", 
@@ -243,12 +234,9 @@ prof_dac_put(fts_word_t *argv)
 
 	  prof_dac_data.one_done = 1;
 
-
-#ifdef HAS_TIME_OF_THE_DAY
 	  /* Set the current time of the day */
 
 	  gettimeofday(&prof_dac_data.daytime, 0); /* 0 is for compatibility with BSD */
-#endif
 
 	  /* reset the total sample counter */
 	  prof_dac_data.total_samples = 0;

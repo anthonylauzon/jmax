@@ -32,10 +32,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-
-#ifdef HAS_DL
 #include <dlfcn.h>
-#endif
 
 
 
@@ -110,8 +107,6 @@ fts_modules_shutdown(void)
   fts_recursive_module_shutdown(fts_installed_modules);
 }
 
-
-#ifdef HAS_DL
 
 static fts_status_description_t  module_loaded = { "Module already loaded."};
 static fts_status_description_t  library_not_found = { "Library Not Found."};
@@ -298,22 +293,5 @@ fts_load_boot_modules(void)
     }
 }
 
-#else
-
-static fts_status_description_t  dynamic_load_not_supported  = { "Dynamic Load Not Supported."};
-
-fts_status_t
-fts_module_load(const char *name, const char *filename)
-{
-  return &dynamic_load_not_supported;
-}
-
-
-void
-fts_load_boot_modules(void)
-{
-}
-
-#endif
 
 

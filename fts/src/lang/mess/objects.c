@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.58 $ IRCAM $Date: 1998/12/03 19:05:33 $
+ *      $Revision: 1.59 $ IRCAM $Date: 1998/12/07 17:09:36 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -169,8 +169,8 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
   fts_symbol_t  var;
   fts_expression_state_t *e = 0;
   fts_atom_t state;
-  int ac;
-  const fts_atom_t *at;
+  int ac = 0;
+  const fts_atom_t *at = 0;
   fts_atom_t new_args[1024]; /* Actually, the evaluated atom vector
 				should be the copy for the object,
 				and the expression parser should be able
