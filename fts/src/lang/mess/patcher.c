@@ -30,8 +30,8 @@ For now, until Input/output typing, all the inlets and outlaets are
 DSP, and the patcher is integrated with the DSP compiler (to be
 rewritten, i am afraid :-< ).
 
-For the moment, no DSP implementation !!!
 */
+
 
 /* The object Structures are defined in mess_sys.h
 */
@@ -386,6 +386,7 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (! fts_object_is_patcher(p))
       fts_message_send(p, winlet, s, ac, at);
+
 }
 
 
@@ -436,7 +437,7 @@ patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_object_t *p;
 
-  this->open = 1;
+  this->open = 0;
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (! fts_object_is_patcher(p))

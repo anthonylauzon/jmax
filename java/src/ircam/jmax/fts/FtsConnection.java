@@ -107,16 +107,10 @@ public class FtsConnection
     if (from.getParent().isOpen())
       {
 	if (inlet >= to.getNumberOfInlets())
-	  {
-	    System.out.println("Cannot connect to inlet " + inlet + " of object " + to);
-	    return false;
-	  }
+	  return false;
 
 	if (outlet >= from.getNumberOfOutlets())
-	  {
-	    System.out.println("Cannot connect to outlet " + outlet + " of object " + from);
-	    return false;
-	  }
+	  return false;
       }
 
     return true;

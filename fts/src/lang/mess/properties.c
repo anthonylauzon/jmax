@@ -859,11 +859,13 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
  */
 
 
+#include <stdio.h>		/* @@@ */
+
 void
 fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
   if (fts_object_patcher_is_open(obj))
-    fts_object_property_changed(obj, property);
+      fts_object_property_changed(obj, property);
 }
 
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/02/20 21:25:11 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/03/09 12:45:46 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -304,8 +304,10 @@ fts_object_replace(fts_object_t *old, fts_object_t *new)
 
       for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
 	{
-	  fts_object_connect(new, p->woutlet, p->dst, p->winlet);
 	  fts_object_disconnect(old, p->woutlet, p->dst, p->winlet);
+
+	  if (outlet < fts_object_get_outlets_number(new))
+	    fts_object_connect(new, p->woutlet, p->dst, p->winlet);
 	}
     }
 
@@ -321,8 +323,10 @@ fts_object_replace(fts_object_t *old, fts_object_t *new)
 
       for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
 	{
-	  fts_object_connect(p->src, p->woutlet, new, p->winlet);
 	  fts_object_disconnect(p->src, p->woutlet, old, p->winlet);
+
+	  if (inlet < fts_object_get_inlets_number(new))
+	    fts_object_connect(p->src, p->woutlet, new, p->winlet);
 	}
     }
 }

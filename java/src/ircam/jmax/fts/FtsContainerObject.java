@@ -172,6 +172,7 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public final void open()
   {
+    System.err.println("Patcher " + this + " opened ");
     open = true;
     FtsServer.getServer().openPatcher(this);
     FtsServer.getServer().syncToFts();
@@ -181,6 +182,7 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public final void close()
   {
+    System.err.println("Patcher " + this + " closed ");
     open = false;
 
     FtsServer.getServer().closePatcher(this);
@@ -214,18 +216,27 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public void watchAll(String property, FtsPropertyHandler handler)
   {
+    watchAll(property, handler, handler);
+  }
+
+  /** Watch a property of all the object in the patcher 
+   *
+   */
+
+  public void watchAll(String property, FtsPropertyHandler handler, Object owner)
+  {
     if (containerPropertyHandlerTable == null)
       containerPropertyHandlerTable = new PropertyHandlerTable();
     
-    containerPropertyHandlerTable.watch(property, handler);
+    containerPropertyHandlerTable.watch(property, handler, owner);
   }
 
   /** Remove a watch all */
 
-  public void removeWatchAll(FtsPropertyHandler handler)
+  public void removeWatchAll(Object owner)
   {
     if (containerPropertyHandlerTable != null)
-      containerPropertyHandlerTable.removeWatch(handler);
+      containerPropertyHandlerTable.removeWatch(owner);
   }
 
   /** execute the watch all */

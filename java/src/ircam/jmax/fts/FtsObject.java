@@ -49,7 +49,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     FtsPropertyDescriptor.setPersistent("fs", true);
     FtsPropertyDescriptor.setPersistent("jsf", true);//justification
     FtsPropertyDescriptor.setPersistent("resized", true);//resized object flag
-    //FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
+    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
   }
 
   /******************************************************************************/
@@ -156,6 +156,9 @@ abstract public class FtsObject implements MaxTclInterpreter
     
     newObject = makeFtsObject(parent, description);
 
+    // replaceInConnections should delete the connections
+    // not existing any more
+
     parent.replaceInConnections(oldObject, newObject);
     FtsServer.getServer().replaceObject(oldObject, newObject);
     oldObject.delete();
@@ -213,11 +216,13 @@ abstract public class FtsObject implements MaxTclInterpreter
     {
       String name;
       FtsPropertyHandler handler;
-	
-      PropertyHandlerEntry(String name, FtsPropertyHandler handler)
+      Object owner;
+
+      PropertyHandlerEntry(String name, FtsPropertyHandler handler, Object owner)
       {
 	this.name    = name;
 	this.handler = handler;
+	this.owner = owner;
 	table.addElement(this);
       }
 
@@ -228,7 +233,7 @@ abstract public class FtsObject implements MaxTclInterpreter
       }
     }
 
-    public void removeWatch(FtsPropertyHandler handler)
+    public void removeWatch(Object owner)
     {
       for (int i = 0; i < table.size(); i++)
 	{
@@ -237,7 +242,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	  // Shitty code; actually, the handler table should 
 	  // not be a vector ... may be a linked list
 
-	  if (ph.handler == handler)
+	  if (ph.owner == owner)
 	    {
 	      table.removeElement(ph);
 	      i--; // to compensate for the shift in the vector
@@ -245,7 +250,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	}
     }
 
-    public void removeWatch(FtsPropertyHandler handler, String name)
+    public void removeWatch(Object owner, String name)
     {
       for (int i = 0; i < table.size(); i++)
 	{
@@ -254,7 +259,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	  // Shitty code; actually, the handler table should 
 	  // not be a vector ... may be a linked list
 
-	  if ((ph.handler == handler) && (ph.name == name))
+	  if ((ph.owner == owner) && (ph.name == name))
 	    {
 	      table.removeElement(ph);
 	      i--; // to compensate for the shift in the vector
@@ -262,9 +267,9 @@ abstract public class FtsObject implements MaxTclInterpreter
 	}
     }
 
-    public void watch(String property, FtsPropertyHandler handler)
+    public void watch(String property, FtsPropertyHandler handler, Object owner)
     {
-      new PropertyHandlerEntry(property, handler);
+      new PropertyHandlerEntry(property, handler, owner);
     }
 
     synchronized void callHandlers(String name, Object value)
@@ -307,13 +312,10 @@ abstract public class FtsObject implements MaxTclInterpreter
     put(name, new Integer(value));
   }
 
-
   public void put(String name, float value)
   {
     put(name, new Float(value));
   }
-
-
 
   public void put(String name, Object value)
   {
@@ -465,7 +467,6 @@ abstract public class FtsObject implements MaxTclInterpreter
     if (propertyHandlerTable != null)
       propertyHandlerTable.callHandlers(name, value);
 
-
     // Call the handlers in the parent
 
     if (parent != null)
@@ -523,22 +524,27 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void watch(String property, FtsPropertyHandler handler)
   {
+    watch(property, handler, handler);
+  }
+
+  public void watch(String property, FtsPropertyHandler handler, Object owner)
+  {
     if (propertyHandlerTable == null)
       propertyHandlerTable = new PropertyHandlerTable();
     
-    propertyHandlerTable.watch(property, handler);
+    propertyHandlerTable.watch(property, handler, owner);
   }
 
-  public void removeWatch(FtsPropertyHandler handler)
+  public void removeWatch(Object owner)
   {
     if (propertyHandlerTable != null)
-      propertyHandlerTable.removeWatch(handler);
+      propertyHandlerTable.removeWatch(owner);
   }
 
-  public void removeWatch(FtsPropertyHandler handler, String name)
+  public void removeWatch(Object owner, String name)
   {
     if (propertyHandlerTable != null)
-      propertyHandlerTable.removeWatch(handler, name);
+      propertyHandlerTable.removeWatch(owner, name);
   }
 
   public void getPropertyNames(Vector names)

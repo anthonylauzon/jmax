@@ -656,6 +656,7 @@ public class FtsServer
 	  obj = (FtsObject) msg.getArguments().elementAt(0);
 	  obj.localPut((String) msg.getArguments().elementAt(1), 
 		       msg.getArguments().elementAt(2));
+
 	}
       break;
 

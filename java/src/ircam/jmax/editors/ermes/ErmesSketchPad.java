@@ -784,11 +784,15 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
       // MDC: this test has been added to allow loading patches with errors
       // in connections, so the debug can be done :->
+      // Actually the error reporting should be redone !!!
 
       if (fc.checkConsistency()){
 	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
 	toObj = (ErmesObject) fc.getTo().getRepresentation();
 	aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+      } else {
+	System.out.println("Cannot connect object " + fc.getFrom() + " outlet " + fc.getFromOutlet() 
+			   + " to object " + fc.getTo() + " inlet " + fc.getToInlet());
       }
     }
   }

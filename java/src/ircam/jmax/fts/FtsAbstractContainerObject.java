@@ -77,8 +77,22 @@ abstract public class FtsAbstractContainerObject extends FtsObject
    */
 
   void replaceInConnections(FtsObject oldObject, FtsObject newObject)
-  {
-    // replace it in all the connections
+  {    
+    // delete the connections that no more consistent
+
+    for (int i = 0; i < connections.size(); i++)
+      {
+	FtsConnection conn = (FtsConnection)connections.elementAt(i);
+
+	if (! (conn.checkConsistency()))
+	  {
+	    conn.delete();
+	    connections.removeElementAt(i);
+	    i--; // to compensate for the shift
+	  }
+      }
+
+    // replace it in all the survived connections
 
     for (int i = 0; i < connections.size(); i++)
       ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);

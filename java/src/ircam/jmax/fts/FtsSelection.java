@@ -49,8 +49,7 @@ public class FtsSelection extends FtsAbstractContainerObject
     removeObjectFromContainer(obj);
   }
 
-  /** Add an connection to this selection.
-   */
+  /** Add a connection to this selection. */
 
   final public void addConnection(FtsConnection obj)
   {
@@ -63,7 +62,6 @@ public class FtsSelection extends FtsAbstractContainerObject
   {
     removeConnectionFromContainer(obj);
   }
-
 
   /** clean: remove everything */
 

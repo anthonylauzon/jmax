@@ -31,3 +31,4 @@ public class ErmesModule
     FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(0));
   }
 }
+
