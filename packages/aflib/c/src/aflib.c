@@ -259,11 +259,24 @@ aflib_loader_write(fts_audiofile_t* audiofile, float** buf, int n_buf, unsigned 
 
 }
 
+/* seek to the wanted offset */
 static int 
 aflib_loader_seek(fts_audiofile_t* audiofile, unsigned int offset)
 {
-  /* not yet implemented */
-  return -1;
+  aflib_handle_t *handle = (aflib_handle_t *)fts_audiofile_get_handle( audiofile);
+  int result = -1;
+  if (fts_audiofile_get_num_frames(audiofile) > offset)
+  {
+    if (handle)
+    {
+      if (handle->af_file)
+      {
+	afSeekFrame(handle->af_file, AF_DEFAULT_TRACK, offset);
+	result = offset;
+      }
+    }
+  }
+  return result;
 }
 
 static int 
