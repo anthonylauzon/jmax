@@ -125,6 +125,8 @@ sequence_cut_only_event(sequence_t *sequence)
   event = sequence->begin;
   event->next = event->prev = 0;
 
+  sequence->begin = 0;
+  sequence->end = 0;
   sequence->size = 0;
 
   return event;
@@ -147,9 +149,9 @@ sequence_cut_begin_event(sequence_t *sequence)
 
 	sequence->begin = event->next;
 	sequence->begin->prev = 0;
-	sequence->size--;
 
 	event->next = 0;
+	sequence->size--;
 
 	return event;
       }
@@ -173,9 +175,9 @@ sequence_cut_end_event(sequence_t *sequence)
 	
 	sequence->end = event->prev;
 	sequence->end->next = 0;
-	sequence->size--;
 	
 	event->prev = 0;
+	sequence->size--;
 
 	return event;
       }
@@ -193,6 +195,7 @@ sequence_cut_event(sequence_t *sequence, sequence_event_t *event)
     {      
       event->prev->next = event->next;
       event->next->prev = event->prev;
+      sequence->size--;
     }
   
   event->next = event->prev = 0;
