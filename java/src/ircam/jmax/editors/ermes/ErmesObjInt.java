@@ -41,9 +41,9 @@ class ErmesObjInt extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     
     DEFAULT_HEIGHT = theSketchPad.getFontMetrics(theSketchPad.sketchFont).getHeight();
-    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*6;
+    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*5+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("..");
     preferredSize.height = DEFAULT_HEIGHT+4;
-    preferredSize.width = DEFAULT_WIDTH+DEFAULT_HEIGHT/2+20;
+    preferredSize.width = DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20;
     if(itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(theSketchPad.GetSketchWindow(), this);
     super.Init(theSketchPad, x, y, theString);
     return true;
@@ -56,7 +56,7 @@ class ErmesObjInt extends ErmesObject {
      //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
-     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*6;
+     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth("..");
      if(currentRect.height<DEFAULT_HEIGHT+4) {
        preferredSize.height = DEFAULT_HEIGHT+4;
        currentRect.height = preferredSize.height;
@@ -125,7 +125,7 @@ class ErmesObjInt extends ErmesObject {
   
   void ResizeToNewFont(Font theFont){
     if(!itsResized){
-      Resize(20+itsFontMetrics.stringWidth("0")*6-currentRect.width,itsFontMetrics.getHeight()+4-currentRect.height);
+      Resize(20+itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth("..")-currentRect.width,itsFontMetrics.getHeight()+4-currentRect.height);
     }
     else ResizeToText(0,0);
   }
@@ -134,15 +134,15 @@ class ErmesObjInt extends ErmesObject {
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
     
-    if(aWidth<currentRect.height/2+20+itsFontMetrics.stringWidth("0")*6)
-      aWidth = currentRect.height/2+20+itsFontMetrics.stringWidth("0")*6;
+    if(aWidth<currentRect.height/2+20+itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth(".."))
+      aWidth = currentRect.height/2+20+itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth("..");
 
     if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
 	
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < currentRect.height/2 +20+itsFontMetrics.stringWidth("0")*6)||(currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 4))
+    if((currentRect.width+theDeltaX < currentRect.height/2 +20+itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth(".."))||(currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 4))
       return false;
     else return true;
   }
@@ -150,7 +150,7 @@ class ErmesObjInt extends ErmesObject {
   public void RestoreDimensions(){
     int aHeight, aWidth;
     aHeight = itsFontMetrics.getHeight()+4;
-    aWidth = 20+itsFontMetrics.stringWidth("0")*6;
+    aWidth = 20+itsFontMetrics.stringWidth("0")*5+itsFontMetrics.stringWidth("..");
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
@@ -321,6 +321,7 @@ class ErmesObjInt extends ErmesObject {
     return preferredSize;
   }
 }
+
 
 
 

@@ -17,13 +17,15 @@ class ErmesObjSlider extends ErmesObject {
   int itsInteger = 0;
   final static int BOTTOM_OFFSET = 10;
   final static int UP_OFFSET = 10;
-  final static int PREFERRED_RANGE = 128;
-  int itsRange = PREFERRED_RANGE;
-  int itsPixelRange = itsRange;
-  static Dimension preferredSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE+UP_OFFSET);
+  final static int PREFERRED_RANGE_MAX = 128;
+  final static int PREFERRED_RANGE_MIN = 0;
+  int itsRangeMax = PREFERRED_RANGE_MAX;
+  int itsRangeMin = PREFERRED_RANGE_MIN;
+  int itsPixelRange = itsRangeMax-itsRangeMin;
+  static Dimension preferredSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE_MAX+UP_OFFSET);
   boolean itsMovingThrottle = false;
   int itsDelta = 0;
-  float itsStep =  itsRange/itsPixelRange;
+  float itsStep =  itsRangeMax/itsPixelRange;
 
   static final int TRUST=100;		//how many transmitted values we trust?
   int transmission_buffer[];
@@ -59,7 +61,7 @@ class ErmesObjSlider extends ErmesObject {
     // Change itsStep
     itsPixelRange += theDeltaV;
 
-    itsStep = (float)itsRange/itsPixelRange;
+    itsStep = (float)itsRangeMax/itsPixelRange;
     itsThrottle.Resize(itsThrottle.getPreferredSize().width+theDeltaH, itsThrottle.getPreferredSize().height);
     itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -itsInteger/itsStep));
   }
@@ -84,7 +86,7 @@ class ErmesObjSlider extends ErmesObject {
   }
 
   public void FromDialogValueChanged(Integer theInt){
-    itsRange = theInt.intValue();
+    itsRangeMax = theInt.intValue();
     Resize(0,0);
     DoublePaint();
   }
@@ -96,7 +98,7 @@ class ErmesObjSlider extends ErmesObject {
 
   protected void FtsValueChanged(Object value) {
     int temp = ((Integer) value).intValue();        
-    int clippedValue = (temp<0)?0:((temp>=itsRange)?itsRange:temp);
+    int clippedValue = (temp<0)?0:((temp>=itsRangeMax)?itsRangeMax:temp);
 
     last_value = temp;
     if ((itsThrottle != null) && (!itsMovingThrottle)) {
@@ -108,18 +110,20 @@ class ErmesObjSlider extends ErmesObject {
 
   
   public boolean MouseDown_specific(MouseEvent evt, int x, int y){
+    if(evt.getClickCount()>1) {
+      Point aPoint = GetSketchWindow().getLocation();
+      itsSliderDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsSliderDialog.ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
+			     String.valueOf(itsInteger), this, GetSketchWindow());
+      itsSliderDialog.setVisible(true);
+      return true;
+    }
     if(itsSketchPad.itsRunMode){
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
 	//itsDelta = y-itsThrottle.itsY;// for now
 	return true;
       }
-    }
-    else if(evt.getClickCount()>1) {
-      Point aPoint = GetSketchWindow().getLocation();
-      itsSliderDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsSliderDialog.ReInit(String.valueOf(itsRange), this, GetSketchWindow());
-      itsSliderDialog.setVisible(true);
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return false;
