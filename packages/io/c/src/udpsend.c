@@ -72,21 +72,26 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       && (fts_get_class(at) == fts_udpstream_class))
   {
     self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
-    fts_object_refer((fts_object_t*)self->udp_stream);
   }
   else
   {
     /* create udp stream */
     self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-    if (self->udp_stream != NULL)
+    if (self->udp_stream == NULL)
     {
-      fts_object_refer((fts_object_t*)self->udp_stream);
-    }
-    else
-    {
-      fts_object_error(o, "Cannot create udp stream component");
+      fts_object_error(o, "Cannot create udp stream component (%s)", fts_get_error());
+      return;
     }
   }
+  
+  /* check if bytestream is an output one */
+  if (!fts_bytestream_is_output(self->udp_stream))
+  {
+    fts_object_error(o, "udpsend need an output udpstream");
+    return;
+  }
+
+  fts_object_refer((fts_object_t*)self->udp_stream);
 }
 
 static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
