@@ -52,7 +52,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener{
 
 
   public SplashDialog(Frame dw, String filename, String version) {
-    super(dw, "ermes",/* true*/false);
+    super(dw, "jMax",/* true*/false);
     
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);
