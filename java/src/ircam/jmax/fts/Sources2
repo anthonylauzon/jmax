@@ -14,7 +14,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsDatagramClientPort.java	\
 	$(INCLUDE_PATH)/FtsDatagramPort.java		\
 	$(INCLUDE_PATH)/FtsDotPatRemoteDocumentHandler.java		\
-	$(INCLUDE_PATH)/FtsError.java			\
 	$(INCLUDE_PATH)/FtsErrorStreamer.java		\
 	$(INCLUDE_PATH)/FtsException.java		\
 	$(INCLUDE_PATH)/FtsHelpPatchTable.java		\

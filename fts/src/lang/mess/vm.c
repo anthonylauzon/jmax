@@ -99,9 +99,9 @@
 #include "lang/mess.h"
 
 
-#define EVAL_STACK_DEPTH   4096
-#define OBJECT_STACK_DEPTH 4096
-#define OBJECT_TABLE_STACK_DEPTH 4096
+#define EVAL_STACK_DEPTH   8192
+#define OBJECT_STACK_DEPTH 8192
+#define OBJECT_TABLE_STACK_DEPTH 8192
 
 static fts_atom_t eval_stack[EVAL_STACK_DEPTH];
 static int        eval_tos = EVAL_STACK_DEPTH;
@@ -200,7 +200,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
      in the stack, so that templates will accept argument by name
      Compute the total number of pushed atoms in lambda.
      */
-
 
   if (e)
     lambda = fts_expression_map_to_assignements(e, fts_object_push_assignement, 0);
@@ -974,16 +973,26 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	case FVM_RETURN:
 	  {
+	    fts_object_t *obj;
+
 	    /* RETURN */
 
 #ifdef VM_DEBUG
 	    fprintf(stderr, "RETURN\n");
 #endif
 
-	    if (object_tos == OBJECT_STACK_DEPTH)
-	      return 0;
-	    else
-	      return object_stack[object_tos++];
+	    /* Rewind the template/patcher argument */
+
+	    eval_tos += lambda;
+
+	    /* This test is usefull only on copy/paste */
+
+	    if (object_tos < OBJECT_STACK_DEPTH - 1)
+	      obj = object_stack[object_tos++];
+
+	    object_tos++;	/* take the parent away from the object stack */
+
+	    return obj;
 	  }
 	}
 

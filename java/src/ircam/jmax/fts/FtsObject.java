@@ -200,30 +200,15 @@ public class FtsObject
 
   public void put(String name, int value)
   {
-    put(name, new Integer(value), null);
+    put(name, new Integer(value));
   }
 
   public void put(String name, float value)
   {
-    put(name, new Float(value), null);
+    put(name, new Float(value));
   }
 
   public void put(String name, Object value)
-  {
-    put(name, value, null);
-  }
-
-  public void put(String name, int value, Object author)
-  {
-    put(name, new Integer(value), author);
-  }
-
-  public void put(String name, float value, Object author)
-  {
-    put(name, new Float(value), author);
-  }
-
-  public void put(String name, Object value, Object author)
   {
     Fts.getServer().putObjectProperty(this, name, value);
   }
@@ -477,8 +462,8 @@ public class FtsObject
   protected int width = -1;
   protected int height = -1;
 
-  /** Direct access to geometric properties; recomended when possible;
-   *  availables only on access.
+  /** Direct access to geometric properties; USE only this for geometric properties;
+   * other properties will "Beanified soon".
    */
 
   public final int getX()
@@ -486,9 +471,21 @@ public class FtsObject
     return x;
   }
 
+  public final void setX(int x)
+  {
+    put("x", new Integer(x));
+    this.x = x;
+  }
+
   public final int getY()
   {
     return y;
+  }
+
+  public final void setY(int y)
+  {
+    put("y", new Integer(y));
+    this.y = y;
   }
 
   public final int getWidth()
@@ -496,9 +493,21 @@ public class FtsObject
     return width;
   }
 
+  public final void setWidth(int w)
+  {
+    put("w", new Integer(w));
+    this.width = w;
+  }
+
   public final int getHeight()
   {
     return height;
+  }
+
+  public final void setHeight(int h)
+  {
+    put("h", new Integer(h));
+    this.height = h;
   }
 
   /*****************************************************************************/

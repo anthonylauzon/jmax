@@ -126,7 +126,7 @@ abstract class ErmesObject implements ErmesDrawable {
   protected void setX( int theX) 
   {
     itsRectangle.x = theX;
-    itsFtsObject.put( "x", itsRectangle.x);
+    itsFtsObject.setX( itsRectangle.x);
   }
 
   protected final int getY() 
@@ -137,7 +137,7 @@ abstract class ErmesObject implements ErmesDrawable {
   protected void setY( int theY) 
   {
     itsRectangle.y = theY;
-    itsFtsObject.put( "y", itsRectangle.y);
+    itsFtsObject.setY( itsRectangle.y);
   }
 
   protected final int getWidth() 
@@ -148,7 +148,7 @@ abstract class ErmesObject implements ErmesDrawable {
   protected void setWidth( int theWidth) 
   {
     itsRectangle.width = theWidth;
-    itsFtsObject.put( "w", theWidth);
+    itsFtsObject.setWidth( theWidth);
   }
 
   protected final int getHeight() 
@@ -159,7 +159,7 @@ abstract class ErmesObject implements ErmesDrawable {
   protected void setHeight( int theHeight) 
   {
     itsRectangle.height = theHeight;
-    itsFtsObject.put( "h", theHeight);
+    itsFtsObject.setHeight( theHeight);
   }
 
   Font getFont() 

@@ -194,7 +194,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 
   private void sendValue( Integer theValue) 
   {
-    itsFtsObject.put( "value", theValue, this);
+    itsFtsObject.put( "value", theValue);
   }
 
   public boolean MouseDrag_specific( MouseEvent evt,int x, int y)

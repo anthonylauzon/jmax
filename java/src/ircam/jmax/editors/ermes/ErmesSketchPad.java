@@ -749,10 +749,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	int newPosX = objectX - minX + itsCurrentScrollingX + pasteDelta.x + numberOfPaste*incrementalPasteOffsetX;
 	int newPosY = objectY - minY + itsCurrentScrollingY + pasteDelta.y + numberOfPaste*incrementalPasteOffsetY;
 
-	fo.put( "x", newPosX);     
-	fo.localPut("x", newPosX);
-	fo.put( "y", newPosY);
-	fo.localPut("y", newPosY);
+	fo.setX( newPosX);     
+	fo.setY( newPosY);
        
 	aObject = AddObject( fo);
 	currentSelection.addObject( aObject);
@@ -973,10 +971,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	fo = Fts.makeFtsObject( itsPatcher, itsAddObjectDescription);
 
-	fo.put( "x", x);
-	fo.put( "y", y);
-	fo.localPut( "x", x);
-	fo.localPut( "y", y);
+	fo.setX( x);
+	fo.setY( y);
 
 	aObject = AddObject( fo);
 
