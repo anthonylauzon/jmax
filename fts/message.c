@@ -229,26 +229,28 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
           fts_method_t method = fts_connection_cache_get_method(conn);
           
           if(fts_connection_cache_get_type(conn) != type)
-          {
-            int varargs = 0;
-            
-            method = fts_class_get_inlet_method(cl, winlet, type, &varargs);
-            
-            if(method != NULL)
-            {
-              fts_connection_cache_set_type(conn, type);
-              fts_connection_cache_set_varargs(conn, 0);
-              fts_connection_cache_set_method(conn, method);
-            }
-            else
-            {
-              fts_object_signal_runtime_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
-              continue;
-            }
-          }
-
-          INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
+	    {
+	      int varargs = 0;
+	      
+	      method = fts_class_get_inlet_method(cl, winlet, type, &varargs);
+	      
+	      if(method != NULL)
+		{
+		  fts_connection_cache_set_type(conn, type);
+		  fts_connection_cache_set_varargs(conn, 0);
+		  fts_connection_cache_set_method(conn, method);
+		}
+	      else
+		{
+		  fts_object_signal_runtime_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
+		  conn = fts_connection_get_next_of_same_source(conn);
+		  continue;
+		}
+	    }
+	  else
+	    INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
         }
+
         conn = fts_connection_get_next_of_same_source(conn);
       }
     }
@@ -300,8 +302,9 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
             }
             else
             {
-              fts_object_signal_runtime_error(dst, "no tuple method at inlet %d", winlet);
-              continue;
+              fts_object_signal_runtime_error(dst, "no tuple method at inlet %d", winlet); 
+	      conn = fts_connection_get_next_of_same_source(conn);
+	      continue;
             }
           }
 
@@ -593,10 +596,7 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
         if(handler != NULL)
           (*handler)(dst, fts_connection_get_inlet(conn), s, ac, at);
         else if(dispatch_message_varargs(dst, s, ac, at, &atup) == NULL)
-        {
-          fts_object_signal_runtime_error(dst, "", woutlet);
-          continue;
-        }
+	  fts_object_signal_runtime_error(dst, "no method for message %s with given argument(s)", s);
         
         conn = fts_connection_get_next_of_same_source(conn);
       }
