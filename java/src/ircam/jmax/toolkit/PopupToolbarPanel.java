@@ -65,7 +65,7 @@ public class PopupToolbarPanel extends JPanel implements PopupProvider{
 	{
 	  if (provider != null)
 	    provider.getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
-	  else getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
+	  else getMenu().show(e.getComponent(), e.getX()-10, e.getY()-10);
 	}
       else 
 	super.processMouseEvent(e);

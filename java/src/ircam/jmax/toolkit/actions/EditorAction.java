@@ -49,17 +49,17 @@ abstract public class EditorAction extends AbstractAction
 
    public EditorAction(String name, String actionCommand, int mnemonic, int keyStroke, boolean enabled)
    {
-	  super(name);
-	  putValue(AbstractAction.NAME, name);
-	  putValue(AbstractAction.ACTION_COMMAND_KEY, actionCommand);
+     super(name);
+     putValue(AbstractAction.NAME, name);
+     putValue(AbstractAction.ACTION_COMMAND_KEY, actionCommand);
 
-	  if(mnemonic != KeyEvent.VK_UNDEFINED)
-		 putValue(AbstractAction.MNEMONIC_KEY, new Integer(mnemonic));
+     if(mnemonic != KeyEvent.VK_UNDEFINED)
+       putValue(AbstractAction.MNEMONIC_KEY, new Integer(mnemonic));
 
-	  if(keyStroke != KeyEvent.VK_UNDEFINED)
-		 putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(keyStroke, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+     if(keyStroke != KeyEvent.VK_UNDEFINED)
+       putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(keyStroke, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-	  setEnabled(enabled);
+     setEnabled(enabled);
    }
 
   public String getName()
