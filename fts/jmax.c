@@ -621,10 +621,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   argv[argc++] = jmax_root;
   argv[argc++] = "-jmaxServerDir";
   argv[argc++] = server_dir;
-  argv[argc++] = "-jmaxConnection";
-  argv[argc++] = "tcp";
-  argv[argc++] = "-jmaxPort";
-  argv[argc++] = "2023";
   argv[argc++] = "-jmaxInterp";
   argv[argc++] = "silk";
 
