@@ -23,3 +23,7 @@ void fts_pause( void)
 {
 }
 
+unsigned int fts_check_fpe(void)
+{
+  return 0;
+}

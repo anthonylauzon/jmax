@@ -378,8 +378,11 @@ sgi_dac_get_nerrors(fts_dev_t *dev)
 
   if (al_frames > (dev_data->fts_frames + dev_data->fifo_size))
     {
+      int ret; 
+
+      ret = al_frames - (dev_data->fts_frames + dev_data->fifo_size);
       dev_data->fts_frames = al_frames;
-      return (int) al_frames - (dev_data->fts_frames + dev_data->fifo_size);
+      return ret;
     }
   else
     return 0;

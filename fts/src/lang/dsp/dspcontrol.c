@@ -105,7 +105,7 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
   if (ac > 0)
     this->poll_interval = fts_get_int(&at[0]);
   else
-    this->poll_interval = 2000;
+    this->poll_interval = 1000;
 
   this->prev_dac_slip = 0;
   this->prev_invalid_fpe = 0;
@@ -118,7 +118,6 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
 
   this->dac_slip_dev = fts_dsp_get_dac_slip_dev();
 
-  fprintf(stderr, "Dac Slip Device %lx\n", this->dac_slip_dev);
   return (fts_data_t *) this;
 }
 

@@ -45,3 +45,8 @@ void fts_pause(void)
   if ( running_high_priority)
     nanosleep( &pause_time, 0);
 }
+
+unsigned int fts_check_fpe(void)
+{
+  return 0;
+}
