@@ -1,5 +1,9 @@
 2003-05-28  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* client/python/ircam/fts/client/FtsServerConnection.py: fixed thread stop if socket is closed.
+
+	* client/python/ircam/fts/client/FtsSocketConnection.py: use select before trying to read on socket (select is available on Windows for socket), removed exception handler for read and write (recv and send doesn't raise any exception).
+	
 	* packages/alsa/c/src/alsaaudiomanager.c (alsaaudiomanager_scan_plugins): avoid opening of dsnoop and dmix ALSA plugins (if you open/close these plugins devices are still opened). Thanks to Paul Brossier for bug report.
 
 2003-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
