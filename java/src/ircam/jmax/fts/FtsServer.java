@@ -1461,11 +1461,12 @@ public class FtsServer implements Runnable
 
       case FtsClientProtocol.fts_server_message_cmd:
 	{
-	  FtsObject obj;
+	  FtsObject obj = stream.getNextObjectArgument();
+	  String selector = stream.getNextStringArgument();
+	  FtsAtom args[] = stream.getArgs();
+	  int nArgs = stream.getNumberOfArgs();
 
-	  obj = stream.getNextObjectArgument();
-
-	  obj.handleMessage(stream);
+	  obj.handleMessage(selector, nArgs, args);
 
 	  if (FtsServer.debug)
 	    System.err.println("< ObjectMessage for " + obj + " in " + stream);

@@ -540,6 +540,7 @@ message_update(fts_object_t *o)
 
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object((fts_object_t *)this);
+  fts_client_mess_add_symbol(fts_s_set);
 
   while (! fts_atom_list_iterator_end(iterator))
     {

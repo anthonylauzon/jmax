@@ -46,6 +46,25 @@ public class FtsObject
   
   private static Hashtable creators = new Hashtable();
   
+  static private Class parameterTypes[] = new Class[2];
+  static Object[] methodArgs = new Object[2];
+  static Object[] methodArgs0 = new Object[2];
+  static Object[] methodArgs1 = new Object[2];
+  static Object[] methodArgs2 = new Object[2];
+  static Object[] methodArgs3 = new Object[2];
+  static Method methodCache = null;
+  static String selectorCache = null;
+
+  static {
+    parameterTypes[0] = java.lang.Integer.TYPE;
+    parameterTypes[1] = FtsAtom[].class;
+
+    methodArgs0[0] = new Integer(0);
+    methodArgs1[0] = new Integer(1);
+    methodArgs2[0] = new Integer(2);    
+    methodArgs3[0] = new Integer(3);    
+  }
+
   static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
   {
     creators.put(nameclass, creator);
@@ -821,61 +840,58 @@ public class FtsObject
    * @exception java.io.InterruptedIOException if the read thread was interrupted
    */
 
-  public void handleMessage( FtsStream stream)
+  public void handleMessage(String selector, int nArgs, FtsAtom args[])
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    if ( stream.nextIsSymbol() )
+    try
       {
-	String selector;
+	if(!selector.equals(selectorCache))
+	  methodCache = getClass().getMethod(selector, parameterTypes);
 
-	selector = stream.getNextSymbolArgument();
-
-	try
+	switch(nArgs)
 	  {
-	    FtsAtom args[] = stream.getArgs();
-	    int nArgs = stream.getNumberOfArgs();
-
-	    if(nArgs > 0)
-	      {
-		Class parameterTypes[] = new Class[2];
-		parameterTypes[0] = java.lang.Integer.TYPE;
-		parameterTypes[1] = FtsAtom[].class;
-
-		Method method = getClass().getMethod( selector, parameterTypes);
-
-		Object[] methodArgs = new Object[2];
-		methodArgs[1] = args;
-		methodArgs[0] = new Integer(nArgs);
-
-		method.invoke( this, methodArgs);
-	      }
-	    else
-	      {
-		Method method = getClass().getMethod(selector, null);
-		
-		method.invoke(this, null);
-	      }
+	  case 0:
+	    methodArgs0[1] = null;
+	    methodCache.invoke(this, methodArgs0);
+	    break;
+	  case 1:
+	    methodArgs0[1] = null;
+	    methodCache.invoke(this, methodArgs1);
+	    break;
+	  case 2:
+	    methodArgs0[1] = null;
+	    methodCache.invoke(this, methodArgs2);
+	    break;
+	  case 3:
+	    methodArgs0[1] = null;
+	    methodCache.invoke(this, methodArgs3);
+	    break;
+	  default:
+	    methodArgs[0] = new Integer(nArgs);
+	    methodArgs[1] = args;
+	    methodCache.invoke(this, methodArgs);
 	  }
-	catch ( IllegalAccessException exc)
-	  {
-	    System.err.println( exc);
-	  }
-	catch ( IllegalArgumentException exc)
-	  {
-	    System.err.println( exc);
-	  }
-	catch ( InvocationTargetException exc)
-	  {
-	    System.err.println( exc);
-	  }
-	catch( NoSuchMethodException exc)
-	  {
-	    System.err.println( exc);
-	  }
-	catch (SecurityException exc)
-	  {
-	    System.err.println( exc);
-	  }
+	
+      }
+    catch ( IllegalAccessException exc)
+      {
+	System.err.println( exc);
+      }
+    catch ( IllegalArgumentException exc)
+      {
+	System.err.println( exc);
+      }
+    catch ( InvocationTargetException exc)
+      {
+	System.err.println( exc);
+      }
+    catch( NoSuchMethodException exc)
+      {
+	System.err.println( exc);
+      }
+    catch (SecurityException exc)
+      {
+	System.err.println( exc);
       }
   }
 

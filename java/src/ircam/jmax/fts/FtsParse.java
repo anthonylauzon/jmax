@@ -666,7 +666,7 @@ public class FtsParse
 			     ">>", ">", "<<", "<=", "<", "?", "::", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value))
+	  if (keywords[i].equals(value.stringValue))
 	    return true;
 
 	return false;
@@ -701,7 +701,7 @@ public class FtsParse
 
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value))
+	  if (keywords[i].equals(value.stringValue))
 	    return true;
 
 	return false;
@@ -739,7 +739,7 @@ public class FtsParse
 			      ";" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value))
+	  if (keywords[i].equals(value.stringValue))
 	    return true;
 
 	return false;
@@ -773,7 +773,7 @@ public class FtsParse
 			      "$", "'", "." };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value))
+	  if (keywords[i].equals(value.stringValue))
 	    return true;
 
 	return false;
@@ -973,7 +973,6 @@ public class FtsParse
 	  descr.append(value1);
 
 	/* decide to put or not a blank between the two */
-
 	if (wantASpaceAfter(value1))
 	  addBlank = true;
 	else if (dontWantASpaceAfter(value1))
@@ -1064,7 +1063,6 @@ public class FtsParse
 	  descr.append(value1);
 
 	/* decide to put or not a blank between the two */
-
 	if (wantASpaceAfter(value1))
 	  addBlank = true;
 	else if (dontWantASpaceAfter(value1))
