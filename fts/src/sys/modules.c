@@ -212,7 +212,7 @@ fts_module_load(const char *name, const char *filename)
 	}
     }
 
-  handle = dlopen(loadpath, RTLD_NOW);	
+  handle = dlopen(loadpath, RTLD_NOW | RTLD_GLOBAL);	
 
   if (! handle)
     {
