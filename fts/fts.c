@@ -162,7 +162,7 @@ void fts_load_project( void)
     }
   else
     {
-      post( "Opened project: %s\n", project_file);
+      fts_log( "[boot]: Opened project: %s\n", project_file);
     }
 
   fts_project_set( project);
