@@ -186,7 +186,7 @@ public class MaxVector
   {
     int max = size() - 1;
     StringBuffer buf = new StringBuffer();
-    buf.append("[");
+    buf.append("MaxVector[" + size() + "]{");
 
     for (int i = 0 ; i < fillPointer ; i++)
       {
@@ -199,7 +199,7 @@ public class MaxVector
 	  buf.append(", ");
       }
 
-    buf.append("]");
+    buf.append("}");
 
     return buf.toString();
   }

@@ -68,6 +68,27 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
     return TEXT_Y_OFFSET;
   }
 
+  // Properties to position correctly the text editor
+
+  public int getTextEditorX()
+  {
+    return getX() + 3;
+  }
+
+  public int getTextEditorY()
+  {
+    return getY() + 2;
+  }
+
+  public int getTextEditorWidth()
+  {
+    return getWidth() - 6;
+  }
+
+  public int getTextEditorHeight()
+  {
+    return getHeight() - 4;
+  }
 
   public void redefine( String text) 
   {

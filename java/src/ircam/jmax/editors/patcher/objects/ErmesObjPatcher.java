@@ -74,7 +74,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   // Text area offset
   // ----------------------------------------
   private static final int TEXT_X_OFFSET = 4;
-  private static final int TEXT_Y_OFFSET = 2;
+  private static final int TEXT_Y_OFFSET = 3; // WAS 2
 
   protected final int getTextXOffset()
   {
@@ -85,6 +85,27 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   {
     return TEXT_Y_OFFSET;
   }
+
+  public int getTextEditorX()
+  {
+    return getX() + 4;
+  }
+
+  public int getTextEditorY()
+  {
+    return getY() + 3;
+  }
+
+  public int getTextEditorWidth()
+  {
+    return getWidth() - 6;
+  }
+
+  public int getTextEditorHeight()
+  {
+    return getHeight() - 7;
+  }
+
 
   // ----------------------------------------
   // Inspector

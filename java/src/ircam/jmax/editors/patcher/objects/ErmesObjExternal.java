@@ -119,6 +119,33 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
     return TEXT_Y_OFFSET;
   }
 
+  public int getTextEditorX()
+  {
+    return getX() + 4;
+  }
+
+  public int getTextEditorY()
+  {
+    return getY() + 2;
+  }
+
+  public int getTextEditorWidth()
+  {
+    return getWidth() - 6;
+  }
+
+  public int getTextEditorHeight()
+  {
+    return getHeight() - 6;
+  }
+
+  final static Insets margin = new Insets(0, 0, 0, 0);
+
+  public Insets getTextEditorMargin()
+  {
+    return margin;
+  }
+
   // ----------------------------------------
   // Paint stuff
   // ----------------------------------------

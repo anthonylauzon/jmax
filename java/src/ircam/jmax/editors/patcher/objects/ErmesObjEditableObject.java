@@ -15,6 +15,8 @@ import ircam.jmax.editors.patcher.*;
 
 abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
 {
+  boolean editing = false;
+
   protected MultiLineText itsText = new MultiLineText();
 
   ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
@@ -49,10 +51,13 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     updateDimensions();
   }
 
-  // redefined from base class
+  // redefined from base class, only when not editing
   // This way, changing the height from outside is forbidden
-  public void setHeight( int theHeight)
+
+  public void setHeight( int v)
   {
+    if (editing)
+      super.setHeight(v);
   }
 
   // redefined from base class
@@ -131,6 +136,24 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     return Color.white;
   }
 
+  // Properties to position correctly the text editor
+
+  abstract public int getTextEditorX();
+  abstract public int getTextEditorY();
+  abstract public int getTextEditorWidth();
+  abstract public int getTextEditorHeight();
+
+  public Insets getTextEditorMargin()
+  {
+    return null;
+  }
+
+
+  public void setEditing(boolean v)
+  {
+    editing = v;
+  }
+
   // ----------------------------------------
   // Property handling
   // ----------------------------------------
@@ -149,6 +172,9 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     
   protected void DrawParsedString( Graphics theGraphics) 
   {
+    if (editing)
+      return;
+
     int x = getX() + getTextXOffset();
     int y = getY() + getTextYOffset() + getFontMetrics().getAscent();
     int height = getFontMetrics().getHeight();
@@ -160,4 +186,5 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
       }
   }
 }
+
 
