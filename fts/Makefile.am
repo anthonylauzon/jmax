@@ -56,7 +56,9 @@ time.c \
 variable.c \
 version.c \
 vm.c \
-list.c 
+list.c \
+package.c \
+project.c 
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
