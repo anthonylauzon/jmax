@@ -856,15 +856,15 @@ _track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   track_t *self = (track_t *)o;
   
-  fts_post("make_trill ac=%d\n", ac);
-  
   if(ac > 1)
   {
     int i;
     event_t *evt;
+    int too_much_pitch = 0;
     double time, start, end, duration;
     double first_pitch = 0.0;
     double second_pitch = 0.0;
+    double pitch = 0.0;
     fts_atom_t a[9];
     
     /* first object */
@@ -882,32 +882,47 @@ _track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     }
     
     /* find start time and duration */
-    for(i = 1; i<ac ; i++)
+    for(i = 1; i<ac; i++)
     {
       evt = (event_t *)fts_get_object(at+i);
       time = event_get_time(evt);
       duration = event_get_duration(evt);
       if(time < start) start = time;
       if(time + duration > end) end = time + duration;
-          
-      track_remove_event(self, evt);
+      
+      pitch =  scoob_get_pitch((scoob_t *)fts_get_object(event_get_value(evt)));
+      if(pitch != first_pitch && pitch != second_pitch)
+      {
+        too_much_pitch = 1;
+        break;
+      }
     }
-    /* remove events at client */
-    fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
+    
+    if(too_much_pitch == 0)
+    {
+      /* remove events */
+      for(i = 1; i<ac ; i++)
+        track_remove_event(self, (event_t *)fts_get_object(at+i));
+    
+      /* remove events at client */
+      fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
         
-    /* create new event and add to track */
-    fts_set_symbol(a, seqsym_scoob);
-    fts_set_symbol(a+1, seqsym_type);
-    fts_set_symbol(a+2, seqsym_trill);
-    fts_set_symbol(a+3, seqsym_pitch);
-    fts_set_int(a+4, first_pitch);
-    fts_set_symbol(a+5, seqsym_interval);
-    fts_set_int(a+6, second_pitch - first_pitch);
-    fts_set_symbol(a+7, seqsym_duration);
-    fts_set_float(a+8, end-start);
-    evt = track_event_create( 9, a);
-    if(evt)
-      track_add_event_and_upload( self, start, evt);    
+      /* create new event and add to track */
+      fts_set_symbol(a, seqsym_scoob);
+      fts_set_symbol(a+1, seqsym_type);
+      fts_set_symbol(a+2, seqsym_trill);
+      fts_set_symbol(a+3, seqsym_pitch);
+      fts_set_int(a+4, first_pitch);
+      fts_set_symbol(a+5, seqsym_interval);
+      fts_set_int(a+6, second_pitch - first_pitch);
+      fts_set_symbol(a+7, seqsym_duration);
+      fts_set_float(a+8, end-start);
+      evt = track_event_create( 9, a);
+      if(evt)
+        track_add_event_and_upload( self, start, evt);    
+    }
+    else
+      fts_post("error: more than two pitches in selection, impossible to make a trill !\n");
   }
 }
 /******************************************************
