@@ -7,6 +7,7 @@ help_DATA=\
  inout.help.jmax \
  io.summary.jmax \
  serial.help.jmax \
+ udpinout.help.jmax \
  udpmessage.help.jmax \
  wacom.help.jmax 
 
