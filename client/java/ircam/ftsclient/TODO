@@ -1,0 +1,9 @@
+
+Cache de symbol:
+
+ajouter les tags:
+SYMBOL (caractères+)
+SYMBOL_TO_CACHE (index,caractères+) : stringCache[index] = string.intern()
+SYMBOL_CACHED (index) args.add( stringCache[index])
+dans le protocole
+

@@ -1,0 +1,7 @@
+# Microsoft Developer Studio Generated Dependency File, included by ftsclient.mak
+
+..\cpp\ftsclient.cpp : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\include\fts\client-version.h"\
+	"..\include\fts\ftsclient.h"\
+	

@@ -1,0 +1,1220 @@
+/*
+ * FTS client library
+ * Copyright (C) 2001 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * See file LICENSE for further informations on licensing terms.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ */
+
+#ifndef WIN32
+#include <string.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#include <unistd.h>
+#include <dlfcn.h>
+#include <signal.h>
+#else
+#define snprintf _snprintf
+#define sleep Sleep
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <time.h>
+#include <fts/ftsclient.h>
+
+
+/***************************************************
+ * ftsclient log
+ *
+ * Should be rewritten and integrated in the existing classes
+ */
+
+static char* log_file = NULL;
+static unsigned int log_start;
+
+char* ftsclient_curdate(char* buf)
+{
+#ifdef WIN32
+  char t[9];
+  char d[9];
+  _strdate(d);
+  _strtime(t);
+  sprintf(buf, "%s %s", d, t);
+#else
+  buf[0] = 0;
+#endif
+  return buf;
+}
+
+unsigned int ftsclient_curtime()
+{
+#ifdef WIN32
+  return GetTickCount();
+#else
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  return now.tv_sec * 1000 + now.tv_usec / 1000;
+#endif
+}
+
+void ftsclient_init_log(void)
+{
+  FILE* log;
+  char date[64];
+
+#ifdef WIN32
+  log_file = "C:\\ftsclient_log.txt";
+#else
+  char* home = getenv("HOME");
+  struct timeval now;
+  if (home) {
+    char buf[1024];
+    snprintf(buf, 1024, "%s/.ftsclient_log", home);
+    log_file = strdup(buf);
+  } else {
+    log_file = "/tmp/ftsclient_log";
+  }
+#endif
+
+  log_start = ftsclient_curtime();
+
+  /* truncate the file */
+  log = fopen(log_file, "w");
+  fprintf(log, "[log]: %s started logging\n", ftsclient_curdate(date));
+  fclose(log);
+}
+
+void ftsclient_log(char* fmt, ...)
+{
+  FILE* log;
+  va_list args; 
+
+  if (log_file == NULL) {
+    ftsclient_init_log();
+  }
+
+  log = fopen(log_file, "a");
+  if (log == NULL) {
+    return;
+  }
+
+  fprintf(log, "[%d]", ftsclient_curtime() - log_start); 
+
+  va_start (args, fmt); 
+  vfprintf(log, fmt, args); 
+  va_end (args); 
+
+  fflush(log);
+  fclose(log);
+}
+
+/***************************************************
+ * FtsHashTable
+ */
+
+static const unsigned int primesSuite[] = {
+  7,
+  17,
+  31,
+  67,
+  127,
+  257,
+  521,
+  1031,
+  2053,
+  4099,
+  8191,
+  16411,
+  32771,
+  65537,
+  131071,
+  262147,
+  524287,
+  1048583,
+  2097169,
+  4194319,
+  8388617,
+  16777259,
+  33554467,
+};
+
+unsigned int getNextPrime( unsigned int n)
+{
+  unsigned int i;
+
+  for ( i = 0; i < sizeof (primesSuite) / sizeof (unsigned int); i++)
+    if (n < primesSuite[i])
+      return primesSuite[i];
+
+  return primesSuite[i-1];
+}
+
+
+/***************************************************
+ * FtsClientException
+ */
+
+ostream &FtsClientException::print( ostream &os) const
+{
+  if (_err != 0)
+    os << "FtsClientException: " << _message << " (err=\"" << strerror( _err) << "\")";
+  else
+    os << "FtsClientException: " << _message;
+
+  return os;
+}
+
+ostream &operator<<( ostream &os, const FtsClientException &e)
+{
+  return e.print( os);
+}
+
+
+/***************************************************
+ * FtsValue
+ */
+
+const int FtsValue::EMPTY = -1;
+const int FtsValue::INT = 1;
+const int FtsValue::FLOAT = 2;
+const int FtsValue::STRING = 3;
+const int FtsValue::OBJECT = 4;
+
+/***************************************************
+ * FtsArgs
+ */
+
+void FtsArgs::clear()
+{
+  for( int i = 0; i < length(); i++)
+    _buffer[i].unset();
+
+  _buffer.clear();
+}
+
+FtsArgs::FtsArgs( const FtsArgs &args)
+{
+  FtsArgs &a = (FtsArgs &)args;
+
+  for ( int i = 0; i < a.length(); i++)
+    {
+      if (a.isInt(i))
+	add( a.getInt(i));
+      else if (a.isFloat(i))
+	add( a.getFloat(i));
+      else if (a.isString(i))
+	add( a.getString(i));
+      else if (a.isObject(i))
+	add( a.getObject(i));
+    }
+}
+
+ostream &FtsArgs::print( ostream &os)
+{
+  os << "[ ";
+  for ( int i = 0; i < length(); i++)
+    {
+      if ( isInt( i))
+	os << getInt( i);
+      else if ( isFloat( i))
+	os << getFloat( i);
+      else if ( isString( i))
+	os << getString( i);
+      else if ( isObject( i))
+	os << getObject( i);
+
+      os << " ";
+    }
+
+  os << " ]";
+
+  return os;
+}
+
+ostream &operator<<( ostream &os, FtsArgs &args)
+{
+  return args.print( os);
+}
+
+/* ********************************************************************** */
+/* FtsServer                                                              */
+/* ********************************************************************** */
+
+int FtsServer::_initialized = 0;
+
+void FtsServer::initialize()
+{
+#if defined(WIN32)
+  if (_initialized) {
+    return;
+  }
+
+  _initialized++;
+
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int result;
+
+  wVersionRequested = MAKEWORD(2, 2);
+  
+  result = WSAStartup( wVersionRequested, &wsaData );
+  if (result != 0) {
+    throw FtsClientException( "Couldn't initialize WinSock", result);
+  }
+  
+  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    WSACleanup();
+    throw FtsClientException( "Bad WinSock version");
+  }
+#endif
+}
+
+FtsServer::FtsServer()
+{
+  initialize();
+
+  _socket = -1;
+  _object = 0;
+  _remote = 0;
+  _root = 0;
+  _args = new FtsArgs();
+  _hostname = "127.0.0.1";
+  _port = FTSSERVER_DEFAULT_PORT;
+  _connectTimeout = FTSSERVER_DEFAULT_CONNECT_TIMEOUT;
+  _threaded = 1;
+  _receiveBufferSize = FTSSERVER_DEFAULT_RECEIVE_BUFFER_SIZE;
+
+  _newObjectId = 16; // Ids 0 to 15 are reserved for pre-defined system objects
+  _receiveBuffer = 0;
+  _receiveThread = (thread_t)NULL;
+  _serverState = NOT_CONNECTED;
+}
+
+FtsServer::~FtsServer()
+{
+  if (_serverState == CONNECTED)
+    disconnect();
+
+  if (_receiveBuffer) 
+    delete _receiveBuffer;
+
+  if (_remote)
+    delete _remote;
+
+  if (_root)
+    delete _root;
+
+  if (_args)
+    delete _args;
+}
+
+void FtsServer::setReceiveBufferSize( int receiveBufferSize)
+{
+  // Cannot change buffer size after initialization because it can be in use
+  // by the receive thread
+  if ( _serverState != NOT_CONNECTED)
+    return;
+
+  _receiveBufferSize = receiveBufferSize;
+}
+
+int FtsServer::connectOnce() throw( FtsClientException )
+{
+  struct sockaddr_in server_addr;
+  struct hostent *hostptr;
+
+  hostptr = gethostbyname( _hostname);
+
+  if ( !hostptr)
+    throw FtsClientException( "Unknown host");
+
+  _socket = socket( PF_INET, SOCK_STREAM, 0);
+
+#ifdef WIN32
+  if (_socket == INVALID_SOCKET)
+    throw FtsClientException( "Can't create socket", WSAGetLastError());
+#else
+  if (_socket < 0)
+    throw FtsClientException( "Can't create socket", errno);
+#endif
+
+  memset( &server_addr, 0, sizeof( server_addr));
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_addr = *((struct in_addr *)hostptr->h_addr_list[0]);
+  server_addr.sin_port = htons( _port);
+
+  if (::connect( _socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == 0)
+    return 0;
+
+#ifdef WIN32
+  closesocket( _socket);
+#else
+  close( _socket);
+#endif
+
+  return -1;
+}
+
+void FtsServer::connect() throw( FtsClientException)
+{
+  int r;
+
+  do
+    {
+      if ((r = connectOnce()) == 0)
+	break;
+
+      sleep( 1);
+      _connectTimeout--;
+    }
+  while (_connectTimeout > 0);
+
+  if ( r < 0)
+    throw FtsClientException( "Cannot connect", errno);
+
+  // Create objects with predefined IDs
+  _root = new FtsObject( this, 0);
+  _remote = new FtsObject( this, 1);
+
+  _state = 0;
+
+  _receiveBuffer = new unsigned char[_receiveBufferSize];
+
+  _serverState = CONNECTED;
+
+  if (!_threaded)
+    return;
+
+#ifdef WIN32
+  unsigned long threadID;
+
+  _receiveThread = CreateThread(NULL, 0, receiveThread, (LPVOID) this, 0, &threadID);
+  
+  if (_receiveThread == NULL) 
+    throw FtsClientException( "Cannot start receive thread");
+  
+  SetThreadPriority(_receiveThread, THREAD_PRIORITY_HIGHEST);
+  
+#else
+  
+  if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
+    throw FtsClientException( "Cannot start receive thread", errno);
+
+  signal( SIGPIPE, SIG_IGN);
+#endif
+}
+
+void FtsServer::disconnect() throw( FtsClientException)
+{
+#ifdef WIN32
+  int r;
+  char buf[1024];
+  if (_socket != INVALID_SOCKET) {
+    /* call WSAAsyncSelect ??? */
+    ::shutdown(_socket, 0x02);
+    while (1) {
+      r = recv(_socket, buf, 1024, 0);
+      if ((r == 0) || (r == SOCKET_ERROR)) {
+	break;
+      }
+    }
+    closesocket(_socket);
+  }
+#else
+  if (_socket >= 0) {
+    close(_socket);
+  }
+#endif
+
+  if (_receiveThread)
+    wait();
+
+  _serverState = DISCONNECTED;
+}
+
+void FtsServer::shutdown() throw( FtsClientException)
+{
+  _remote->send( "shutdown");
+}
+
+#if defined(WIN32)
+DWORD WINAPI FtsServer::receiveThread(LPVOID arg)
+#else
+void *FtsServer::receiveThread( void *arg)
+#endif
+{
+  FtsServer *server = (FtsServer *)arg;
+
+  try
+    {
+      for (;;) 
+	server->receive();
+    }
+  catch( FtsClientException e)
+    {
+      ftsclient_log("[receive]: %s\n", e.getMessage());
+#if defined(WIN32)
+      return 0;
+#else
+      pthread_exit( 0);
+#endif
+    }
+
+  return 0;
+}
+
+void FtsServer::receive() throw( FtsClientException)
+{
+  int n;
+
+#if defined(WIN32)
+  n = recv( _socket, (char*) _receiveBuffer, _receiveBufferSize, 0);
+  if (n == SOCKET_ERROR)
+    {
+      _serverState = DISCONNECTED;
+      throw FtsClientException( "Error in message receiving", WSAGetLastError());
+    }
+  if (n == 0)
+    {
+      _serverState = DISCONNECTED;
+      throw FtsClientException( "Socket closed");
+    }
+#else
+  if( (n = read( _socket, _receiveBuffer, _receiveBufferSize)) < 0)
+    {
+      _serverState = DISCONNECTED;
+      throw FtsClientException( "Error in message receiving", errno);
+    }
+#endif
+
+  decode( _receiveBuffer, n);
+}
+
+void FtsServer::poll() throw( FtsClientException)
+{
+  fd_set readfds;
+  struct timeval tv;
+  int r;
+
+  FD_ZERO( &readfds);
+  FD_SET( _socket, &readfds);
+
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+
+  r = select( _socket+1, &readfds, NULL, NULL, &tv);
+
+  if (r < 0)
+    {
+#if defined(WIN32)
+      throw FtsClientException( "Error in select()", WSAGetLastError());
+#else
+      throw FtsClientException( "Error in select()", errno);
+#endif
+    }
+  else if ( r == 0)
+    return;
+  else
+    receive();
+}
+
+void FtsServer::wait() throw( FtsClientException)
+{
+#ifdef WIN32
+  WaitForSingleObject(_receiveThread, INFINITE);
+#else
+  if (pthread_join( _receiveThread, NULL))
+    throw FtsClientException( "Cannot join receive thread", errno);
+#endif
+}
+
+
+FtsObject *FtsServer::getObject( int id)
+{
+  FtsObject *object = 0;
+
+  _objectTable.get( id, object);
+  return object;
+}
+
+
+void FtsServer::startMessage()
+{
+  _message.clear();
+}
+
+void FtsServer::put( int n)
+{
+  *_message = (char) ((n >> 24) & 0xff);
+  _message++;
+  *_message = (char) ((n >> 16) & 0xff);
+  _message++;
+  *_message = (char) ((n >> 8) & 0xff);
+  _message++;
+  *_message = (char) ((n >> 0) & 0xff);
+  _message++;
+}
+
+void FtsServer::encode( int n)
+{
+  *_message = FTS_PROTOCOL_INT;
+  _message++;
+  put( n);
+}
+
+void FtsServer::encode( float f)
+{
+  *_message = FTS_PROTOCOL_FLOAT;
+  _message++;
+  put( *((int *)&f) );
+}
+
+void FtsServer::encode( const char *s)
+{
+  *_message = FTS_PROTOCOL_STRING;
+  _message++;
+
+  while (*s)
+    {
+      *_message = *s++;
+      _message++;
+    }
+  
+  *_message = FTS_PROTOCOL_STRING_END;
+  _message++;
+}
+
+void FtsServer::encode( const FtsObject *o)
+{
+  *_message = FTS_PROTOCOL_OBJECT;
+  _message++;
+
+  if (o)
+    put( o->getID() );
+  else
+    put( 0);
+}
+
+void FtsServer::encode( FtsArgs &args)
+{
+  for ( int i = 0; i < args.length(); i++)
+    {
+      if ( args.isInt( i))
+	encode( args.getInt( i));
+      else if ( args.isFloat( i))
+	encode( args.getFloat( i));
+      else if ( args.isString( i))
+	encode( args.getString( i));
+      else if ( args.isObject( i))
+	encode( args.getObject( i));
+    }
+}
+
+void FtsServer::endMessage() throw( FtsClientException)
+{
+  *_message = FTS_PROTOCOL_END_OF_MESSAGE;
+  _message++;
+
+  if (_serverState != CONNECTED)
+    throw FtsClientException( "Error in sending message");
+
+#if defined(WIN32)
+  if ( send( _socket, _message, _message.length(), 0) < 0)
+    {
+      _serverState = DISCONNECTED;
+      throw FtsClientException( "Error in sending message", WSAGetLastError());
+    }
+#else
+  if ( write( _socket, _message, _message.length()) < 0)
+    {
+      _serverState = DISCONNECTED;
+      throw FtsClientException( "Error in sending message", errno);
+    }
+#endif
+}
+
+void FtsServer::aEndObject()
+{
+  _ival = _ival << 8 | _incoming;
+
+  _object = 0;
+  _objectTable.get( _ival, _object);
+}
+
+void FtsServer::aEndSelector()
+{
+  *_selector = '\0';
+  _args->clear();
+}
+
+void FtsServer::aEndIntArg()
+{
+  _args->add( _ival << 8 | _incoming);
+} 
+
+void FtsServer::aEndFloatArg()
+{
+  _ival = _ival << 8 | _incoming;
+
+  _args->add( *((float *)&_ival));
+}
+
+void FtsServer::aEndStringArg()
+{
+  *_buff = '\0';
+  _buff++;
+
+  _args->add( _buff);
+}
+
+void FtsServer::aEndObjectArg()
+{
+  _ival = _ival << 8 | _incoming;
+
+  FtsObject *object = 0;
+  if (_objectTable.get( _ival, object))
+    _args->add( object);
+}
+
+void FtsServer::aEndMessage()
+{
+  FtsCallback *callback = 0;
+
+  if (!_object) {
+    throw FtsClientException( "Message to non-existent object");
+  }
+
+  if (!_object->_callbacks) {
+    return;
+  }
+
+  ftsclient_log("[receive]: message \"%s\" for object[id=%d]\n", (const char*)_selector, _object->getID());
+
+  _object->_callbacks->get( _selector, callback);
+
+  if (callback)
+    {
+      callback->invoke( _args);
+    }
+  else
+    {
+      _object->_callbacks->get( "*", callback);
+
+      if (callback)
+	{
+	  callback->invoke( _selector, _args);
+	} 
+      else
+	{
+	  ftsclient_log("[receive]: no callback found\n");
+	}
+    }
+}
+
+void FtsServer::decode( unsigned char *buffer, int size) throw (FtsClientException)
+{
+
+  for ( int i = 0; i < size; i++)
+    {
+      _incoming = buffer[i];
+
+#define MOVE( VALUE, STATE, ACTION) if ( _incoming==(VALUE)) { _state = STATE; ACTION; break; }
+#define UMOVE( STATE, ACTION) _state = STATE; ACTION; break;
+
+      switch( _state) {
+      case 0:
+	MOVE( FTS_PROTOCOL_OBJECT, 1, _ival = 0);
+	UMOVE( 0, throw FtsClientException( "Error in protocol decoding"));
+      case 1:
+	UMOVE( 2, _ival = _ival << 8 | _incoming);
+      case 2:
+	UMOVE( 3, _ival = _ival << 8 | _incoming);
+      case 3:
+	UMOVE( 4, _ival = _ival << 8 | _incoming);
+      case 4:
+	UMOVE( 5, aEndObject() );
+      case 5:
+	MOVE( FTS_PROTOCOL_STRING, 6, _selector.clear());
+	UMOVE( 0, throw FtsClientException( "Error in protocol decoding"));
+      case 6:
+	MOVE( FTS_PROTOCOL_STRING_END, 10, aEndSelector() );
+	UMOVE( 6, (*_selector = _incoming, _selector++) );
+      case 10:
+	MOVE( FTS_PROTOCOL_INT, 20, _ival = 0);
+	MOVE( FTS_PROTOCOL_FLOAT, 30, _ival = 0);
+	MOVE( FTS_PROTOCOL_STRING, 40, _buff.clear());
+	MOVE( FTS_PROTOCOL_OBJECT, 50, _ival = 0);
+	MOVE( FTS_PROTOCOL_END_OF_MESSAGE, 0, aEndMessage() );
+	UMOVE( 0, throw FtsClientException( "Error in protocol decoding"));
+      case 20:
+	UMOVE( 21, _ival = _ival << 8 | _incoming);
+      case 21:
+	UMOVE( 22, _ival = _ival << 8 | _incoming);
+      case 22:
+	UMOVE( 23, _ival = _ival << 8 | _incoming);
+      case 23:
+	UMOVE( 10, aEndIntArg());
+      case 30:
+	UMOVE( 31, _ival = _ival << 8 | _incoming);
+	break;
+      case 31:
+	UMOVE( 32, _ival = _ival << 8 | _incoming);
+	break;
+      case 32:
+	UMOVE( 33, _ival = _ival << 8 | _incoming);
+	break;
+      case 33:
+	UMOVE( 10, aEndFloatArg() );
+	break;
+      case 40:
+	MOVE( FTS_PROTOCOL_STRING_END, 10, aEndStringArg() );
+	UMOVE( 40, (*_buff = _incoming, _buff++) );
+      case 50:
+	UMOVE( 51, _ival = _ival << 8 | _incoming);
+      case 51:
+	UMOVE( 52, _ival = _ival << 8 | _incoming);
+      case 52:
+	UMOVE( 53, _ival = _ival << 8 | _incoming);
+      case 53:
+	UMOVE( 10, aEndObjectArg() );
+      }
+    }
+}
+
+/* ********************************************************************** */
+/* FtsObject                                                              */
+/* ********************************************************************** */
+
+FtsObject::FtsObject( FtsServer *server, FtsObject *parent, const char *ftsClassName) throw( FtsClientException)
+  : _server( server), _callbacks( 0)
+{
+  _id = _server->_newObjectId++;
+  _server->_objectTable.put( _id, this);
+
+  // Send a "new_object" message
+  _server->startMessage();
+  _server->encode( _server->_remote);
+  _server->encode( "new_object");
+  _server->encode( parent);
+  _server->encode( _id);
+  _server->encode( ftsClassName);
+  _server->endMessage();
+}
+
+FtsObject::FtsObject( FtsServer *server, FtsObject *parent, const char *ftsClassName, FtsArgs &args) throw( FtsClientException)
+  : _server( server), _callbacks( 0)
+{
+  _id = _server->_newObjectId++;
+  _server->_objectTable.put( _id, this);
+
+  // Send a "new_object" message
+  _server->startMessage();
+  _server->encode( _server->_remote);
+  _server->encode( "new_object");
+  _server->encode( parent);
+  _server->encode( _id);
+  _server->encode( ftsClassName);
+  _server->encode( args);
+  _server->endMessage();
+}
+
+FtsObject::FtsObject( FtsServer *server, int id)
+  : _server( server), _id( id), _callbacks( 0)
+{
+  _server->_objectTable.put( _id, this);
+}
+
+FtsObject::~FtsObject() throw( FtsClientException)
+{
+  _server->_objectTable.remove( _id);
+
+  if (_callbacks)
+    delete _callbacks;
+}
+
+void FtsObject::destroy() throw( FtsClientException)
+{
+  // Send a "delete_object" message
+  _server->startMessage();
+  _server->encode( _server->_remote);
+  _server->encode( "delete_object");
+  _server->encode( this);
+  _server->endMessage();
+}
+
+void FtsObject::connectTo( int outlet, FtsObject *dst, int dstInlet)
+{
+  _server->startMessage();
+  _server->encode( _server->_remote);
+  _server->encode( "connect_object");
+  _server->encode( this);
+  _server->encode( outlet);
+  _server->encode( dst);
+  _server->encode( dstInlet);
+  _server->endMessage();
+}
+
+void FtsObject::connectFrom( int inlet, FtsObject *src, int srcOutlet)
+{
+  _server->startMessage();
+  _server->encode( _server->_remote);
+  _server->encode( "connect_object");
+  _server->encode( src);
+  _server->encode( srcOutlet);
+  _server->encode( this);
+  _server->encode( inlet);
+  _server->endMessage();
+}
+
+void FtsObject::send( const char *selector, FtsArgs &args) throw( FtsClientException)
+{
+  _server->startMessage();
+  _server->encode( this);
+  _server->encode( selector);
+  _server->encode( args);
+  _server->endMessage();
+}
+
+void FtsObject::send( const char *selector) throw( FtsClientException)
+{
+  _server->startMessage();
+  _server->encode( this);
+  _server->encode( selector);
+  _server->endMessage();
+}
+
+void FtsObject::send( FtsArgs &args) throw( FtsClientException)
+{
+  _server->startMessage();
+  _server->encode( this);
+  _server->encode( "list");
+  _server->encode( args);
+  _server->endMessage();
+}
+
+void FtsObject::send( int n) throw( FtsClientException)
+{
+  _server->startMessage();
+  _server->encode( this);
+  _server->encode( "int");
+  _server->encode( n);
+  _server->endMessage();
+}
+
+void FtsObject::send( float f) throw( FtsClientException)
+{
+  _server->startMessage();
+  _server->encode( this);
+  _server->encode( "float");
+  _server->encode( f);
+  _server->endMessage();
+}
+
+void FtsObject::install( const char *s, FtsCallback *callback)
+{
+  if ( !_callbacks)
+    _callbacks = new FtsHashTable< const char *, FtsCallback *>( 11);
+
+  _callbacks->put( s, callback);
+}
+
+void FtsObject::install( FtsCallback *callback)
+{
+  if ( !_callbacks)
+    _callbacks = new FtsHashTable< const char *, FtsCallback *>( 11);
+
+  _callbacks->put( "*", callback);
+}
+
+/***************************************************
+ * FtsPlugin
+ */
+
+#ifdef WIN32
+#define FTS_LIBRARY      "fts.dll"
+#else
+#define FTS_LIBRARY      "libfts.so"
+#endif
+
+FtsPlugin::FtsPlugin()
+{
+  thread = (thread_t)NULL;
+  library = NULL;
+  init_function = NULL;
+  run_function = NULL;
+  halt_function = NULL;
+  argc = 0;
+  argv = NULL;
+
+  library = openLibrary(FTS_LIBRARY);
+  if (library == NULL) {
+    throw FtsClientException("Can't open library");
+  }
+
+  init_function = (void (*)(int,char **)) getSymbol(library, "fts_init");
+  if (init_function == NULL) {
+    throw FtsClientException("Can't find initialization function");
+  }
+
+  run_function = (void (*)(void)) getSymbol(library, "fts_sched_run");
+  if (run_function == NULL) {
+    throw FtsClientException("Can't find run function");
+  }
+
+  halt_function = (void (*)(void)) getSymbol(library, "fts_sched_halt");
+  if (halt_function == NULL) {
+    throw FtsClientException("Can't find halt function");
+  }
+}
+
+void FtsPlugin::run( int ac, const char **av) throw( FtsClientException)
+{
+#ifdef WIN32
+  unsigned long threadID;
+#endif
+
+  int i;
+
+  argc = ac + 1;
+  argv = (char**) malloc((argc + 1) * sizeof(char*));
+  
+  /* add "fts" as the first argument */
+  argv[0] = "fts";
+  for (i = 0; i < ac; i++) {
+    argv[i + 1] = (char *)av[i];
+  }
+  argv[argc] = NULL;
+  
+#ifdef WIN32
+  thread = CreateThread(NULL, 0, &FtsPlugin::main, (LPVOID) this, 0, &threadID);
+  if (thread == NULL) {
+    throw FtsClientException("Can't create thread");
+  }
+#else
+  if (pthread_create(&thread, NULL, &FtsPlugin::main, (void*) this)) {
+    throw FtsClientException("Can't create thread");
+  }
+#endif
+}
+
+FtsPlugin::~FtsPlugin(void)
+{
+  if (halt_function) {
+    halt_function();
+  }
+  if (argv) {
+    free(argv);
+  }
+  if (thread) {
+#ifdef WIN32
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+#else
+    pthread_join(thread, NULL);
+#endif
+  }
+  if (library) {
+    closeLibrary(library);
+  }
+}
+
+#ifdef WIN32
+DWORD WINAPI FtsPlugin::main(LPVOID data)
+{
+  FtsPlugin* self = (FtsPlugin*) data;
+  self->init_function(self->argc, self->argv);
+  self->run_function();
+  ExitThread(0);
+  return 0;
+}
+#else
+void* FtsPlugin::main(void* data)
+{
+  FtsPlugin* self = (FtsPlugin*) data;
+  self->init_function(self->argc, self->argv);
+  self->run_function();
+
+  pthread_exit(NULL);
+  return NULL;
+}
+#endif
+
+library_t 
+FtsPlugin::openLibrary(char* name)
+{
+#ifdef WIN32
+  return LoadLibrary(name);
+#else
+  return dlopen(name, RTLD_NOW | RTLD_GLOBAL);
+#endif
+}
+
+void 
+FtsPlugin::closeLibrary(library_t lib)
+{
+#ifdef WIN32
+  FreeLibrary(lib);
+#else
+  dlclose(lib);
+#endif
+}
+
+library_symbol_t 
+FtsPlugin::getSymbol(library_t lib, char* name)
+{	
+#ifdef WIN32
+  return GetProcAddress(lib, name);
+#else
+  return dlsym(lib, name);
+#endif
+}
+
+
+/***************************************************
+ * FtsProcess
+ */
+
+FtsProcess::FtsProcess( const char *path) 
+{
+  _path = (path)? strdup(path) : 0;
+}
+
+#if WIN32
+void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
+{
+  BOOL result;
+  char cmdLine[2048];
+  PROCESS_INFORMATION process_info;
+  STARTUPINFO startup_info;
+  int i;
+
+  GetStartupInfo(&startup_info);
+
+  if ( _path == 0) {
+    findDefaultPath();
+  }
+
+  cmdLine[0] = 0;
+  strcat(cmdLine, _path);
+  strcat(cmdLine, " ");
+  for (i = 0; i < args.length(); i++) {
+    if ( args.isString(i))
+      {
+	strcat( cmdLine, args.getString( i));
+	strcat(cmdLine, " ");
+      }
+  }
+
+  result = CreateProcess( _path, cmdLine, NULL, NULL, FALSE, 
+			 DETACHED_PROCESS | REALTIME_PRIORITY_CLASS, 
+			 NULL, NULL, &startup_info, &process_info);
+  if (result == 0) {
+    throw FtsClientException("Failed to start the fts application\n");    
+  }
+}
+#else
+void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
+{
+  if ( (_childPid = fork()) < 0)
+    {
+      throw FtsClientException( "Can't fork FTS", errno);
+    }
+  else if ( !_childPid)
+    {
+      char **argv;
+      int i;
+
+      argv = new char *[args.length()+2];
+
+      argv[0] = (char *)_path;
+      for ( i = 0; i < args.length(); i++)
+	{
+	  if ( args.isString(i))
+	    argv[i+1] = (char *)args.getString( i);
+	}
+
+      argv[i+1] = NULL;
+
+      if ( execvp( _path, argv) < 0)
+	{
+	  fprintf( stderr, "[dtdserver]: execl() failed (%s)\n", strerror( errno));
+	}
+
+      exit( 1);
+    }
+}
+#endif
+
+
+#if WIN32
+void FtsProcess::findDefaultPath() throw( FtsClientException)
+{
+  unsigned char buf[1024];
+  unsigned char version[256];
+  char fullpath[1024];
+  HKEY key, version_key;
+  DWORD type, size;
+  char* jmax_key = "Software\\Ircam\\jMax";
+  char* jmax_version = "CurrentVersion";
+  char* jmax_root = "jmaxRoot";
+
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, jmax_key, 0, KEY_READ, &key) != 0) {
+    throw FtsClientException("Failed to open the jMax registry key\n");
+  }
+
+  if ((RegQueryValueEx(key, jmax_version, 0, &type, 0, &size) != 0)
+      || (type != REG_SZ)
+      || (size >= 256)
+      || (RegQueryValueEx(key, jmax_version, 0, 0, &version[0], &size) != 0)) {
+    RegCloseKey(key);
+    throw FtsClientException("Failed to read the jMax version registry key\n");
+  }
+
+  if (RegOpenKeyEx(key, (const char*) &version[0], 0, KEY_READ, &version_key) != 0) {
+    RegCloseKey(key);
+    throw FtsClientException("Error opening registry key\n");
+  }
+
+  if ((RegQueryValueEx(version_key, jmax_root, 0, &type, 0, &size) != 0)
+      || (type != REG_SZ)
+      || (size >= 1024)
+      || (RegQueryValueEx(version_key, jmax_root, 0, 0, &buf[0], &size) != 0)) {
+    RegCloseKey(key);
+    RegCloseKey(version_key);
+    throw FtsClientException("Failed to read the jmaxRoot registry key\n");
+  }
+
+  RegCloseKey(key);
+  RegCloseKey(version_key);
+  
+  snprintf(fullpath, 1024, "%s\\bin\\%s", buf, "fts.exe");
+  _path = strdup(fullpath);
+}
+#else
+void FtsProcess::findDefaultPath() throw( FtsClientException)
+{
+  // We hope that the executable will be in PATH, as we use execvp
+  _path = "fts";
+}
+#endif
