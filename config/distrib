@@ -2,3 +2,5 @@ all	packages.tcl
 all	audio.tcl
 all	midi.tcl
 all	example.jmaxrc
+all	defaults.tcl
+
