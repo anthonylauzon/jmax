@@ -29,10 +29,19 @@
 #define FTS_OBJECT_BITS_CLIENT 4
 #define FTS_OBJECT_BITS_ID (32 - FTS_OBJECT_BITS_STATUS - FTS_OBJECT_BITS_CLIENT)
 
+typedef void (*fts_object_listener_callback_t)(fts_object_t *o, void *l);
+
 typedef struct
 {
   fts_object_t *container;
 } fts_context_t;
+
+typedef struct fts_object_listener
+{
+  void *listener;
+  fts_object_listener_callback_t callback;
+  struct fts_object_listener *next;
+} fts_object_listener_t;
 
 struct fts_object {
   fts_class_t *cl;
@@ -43,12 +52,11 @@ struct fts_object {
     int id:FTS_OBJECT_BITS_ID;
   } flag; 
   
-  /* reference counter */
-  int refcnt;
+  int refcnt; /* reference counter */
 
   fts_context_t *context; /* (back) pointer to container (or container related data structure) */
+  fts_object_listener_t *listeners;
 };
-
 
 /**
  * Create an instance of a class.
@@ -95,29 +103,26 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 #define fts_object_set_context(o, c) ((o)->context = c)
 #define fts_object_get_container(o) (((o)->context != NULL)? ((o)->context->container): NULL)
 
+/* object listeners */
+FTS_API void fts_object_add_listener(fts_object_t *o, void *listener, fts_object_listener_callback_t callback);
+FTS_API void fts_object_remove_listener(fts_object_t *o, void *listener);
+FTS_API void fts_object_call_listeners(fts_object_t *o);
 
-/** try import handlers from class with the given arguments
-    until one returns true */
-FTS_API void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
-				int ac, const fts_atom_t *at);
+#define fts_object_changed fts_object_call_listeners
 
-/** try export handlers from class with the given arguments
-    until one returns true */
-FTS_API void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, 
-				int ac, const fts_atom_t *at);
+/** try import handlers from class with the given arguments until one returns true */
+FTS_API void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/** try export handlers from class with the given arguments until one returns true */
+FTS_API void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /** open dialog and then call "import" method with the selected filename */
-FTS_API void fts_object_import_dialog (fts_object_t *o, int w, fts_symbol_t s,
-				       int ac, const fts_atom_t *at);
+FTS_API void fts_object_import_dialog (fts_object_t *o, int w, fts_symbol_t s,int ac, const fts_atom_t *at);
 
 /** open dialog and then call "export" method with the selected filename */
-FTS_API void fts_object_export_dialog (fts_object_t *o, int w, fts_symbol_t s, 
-				       int ac, const fts_atom_t *at);
+FTS_API void fts_object_export_dialog (fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /** try list of functions until one returns true (anything but void) */
-FTS_API int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, 
-				     int w, fts_symbol_t s, 
-				     int ac, const fts_atom_t *at);
-
+FTS_API int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif  /* _FTS_OBJECT_H_ */

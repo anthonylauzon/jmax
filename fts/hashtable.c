@@ -335,7 +335,8 @@ void fts_hashtable_stats( fts_hashtable_t *h)
   printf( "minimum %d maximum %d\n", min_keys, max_keys);
 }
 
-void fts_hashtable_log( fts_hashtable_t *h)
+static void 
+fts_hashtable_log( fts_hashtable_t *h)
 {
   unsigned int i;
 

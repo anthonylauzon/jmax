@@ -121,11 +121,10 @@ fts_object_destroy(fts_object_t *obj)
 }
 
 /*****************************************************************************
-*
-*  client
-*
-*/
-
+ *
+ *  client
+ *
+ */
 void
 fts_object_upload(fts_object_t *obj)
 {
@@ -159,11 +158,10 @@ fts_object_reset_client(fts_object_t *obj)
 }
 
 /*****************************************************************************
-*
-*  container
-*
-*/
-
+ *
+ *  container
+ *
+ */
 void
 fts_object_set_name(fts_object_t *obj, fts_symbol_t name)
 {
@@ -249,72 +247,112 @@ fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     fts_object_set_persistence(o, fts_get_number_int(at));
 }
 
+/*****************************************************************************
+ *
+ *  listeneners
+ *
+ */
+void
+fts_object_add_listener(fts_object_t *o, void *listener, fts_object_listener_callback_t callback)
+{
+  fts_object_listener_t *l = (fts_object_listener_t *)fts_malloc(sizeof(fts_object_listener_t));
+  
+  l->listener = listener;
+  l->callback = callback;
+  l->next = o->listeners;
+  o->listeners = l;
+}
+
+void
+fts_object_remove_listener(fts_object_t *o, void *listener)
+{
+  fts_object_listener_t **l = &o->listeners;
+  
+  while(*l != NULL)
+  {
+    fts_object_listener_t *x = *l;
+    
+    if(x->listener == listener)
+    {
+      *l = x->next;
+      fts_free(x);
+    }
+    else
+      l = &(*l)->next;
+  }
+}
+
+void
+fts_object_call_listeners(fts_object_t *o)
+{
+  fts_object_listener_t *l;
+  
+  for(l=o->listeners; l!=NULL; l=l->next)
+    (*l->callback)(o, l->listener);
+}
+
+/*****************************************************************************
+ *
+ *  import/export
+ *
+ */
 
 /* try import handlers from list in class until one returns true */
-void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, 
-			int ac, const fts_atom_t *at)
+void
+fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
-
-    if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-	fts_object_error(o, "import: no handler to import file to %s", 
-			 fts_symbol_name(fts_object_get_class_name(o)));
+  fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
+  
+  if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
+    fts_object_error(o, "import: no handler to import file from %s", fts_symbol_name(fts_object_get_class_name(o)));
 }
-
 
 /* try export handlers from list in class until one returns true */
-void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, 
-			int ac, const fts_atom_t *at)
+void 
+fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
-
-    if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-	fts_object_error(o, "import: no handler to export file from %s", 
-			 fts_symbol_name(fts_object_get_class_name(o)));
+  fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
+  
+  if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
+    fts_object_error(o, "no handler to export file from %s", fts_symbol_name(fts_object_get_class_name(o)));
 }
 
-
 /* try list of functions until one returns true (anything but void) */
-int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, 
-			     fts_symbol_t s, int ac, const fts_atom_t *at)
+int 
+fts_object_try_handlers(fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    int done = 0;
-
-    while (handlers  &&  !done)
-    {
-	fts_method_t func = fts_get_pointer(fts_list_get(handlers));
-
-	/* try handler */
-	func(o, w, s, ac, at);
-
-	/* check if return atom is not void == success */
-	done = !fts_is_void(fts_get_return_value());
-
-	handlers = fts_list_next(handlers);
-    }
+  int done = 0;
+  
+  while (handlers  &&  !done)
+  {
+    fts_method_t func = fts_get_pointer(fts_list_get(handlers));
     
-    return done;
+    /* try handler */
+    func(o, w, s, ac, at);
+    
+    /* check if return atom is not void == success */
+    done = !fts_is_void(fts_get_return_value());
+    
+    handlers = fts_list_next(handlers);
+  }
+  
+  return done;
 }
 
 
 /* open dialog and then call "import" method with the selected filename */
 void
-fts_object_import_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
-			  int ac, const fts_atom_t *at)
+fts_object_import_dialog (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fts_object_open_dialog(o, fts_s_import, 
-			   fts_new_symbol("Open file to import"));
+  fts_object_open_dialog(o, fts_s_import, fts_new_symbol("Open file to import"));
 }
 
 
 /* open dialog and then call "export" method with the selected filename */
 void
-fts_object_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
-			  int ac, const fts_atom_t *at)
+fts_object_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fts_symbol_t default_name = fts_new_symbol("untitled");
-
-    fts_object_save_dialog(o, fts_s_export, 
-			   fts_new_symbol("Select file to export"),
-			   fts_project_get_dir(), default_name);
+  fts_symbol_t default_name = fts_new_symbol("untitled");
+  
+  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("Select file to export"), fts_project_get_dir(), default_name);
 }

@@ -54,114 +54,19 @@ static fts_symbol_t sym_delete_cols = 0;
 
 /********************************************************
  *
- *  fmat format
- *
- */
-static fts_hashtable_t fmat_format_hash;
-static fmat_format_t *fmat_formats[FMAT_FORMATS_MAX + 1];
-static int fmat_n_formats = 0;
-
-fmat_format_t *fmat_format_vec = 0;
-fmat_format_t *fmat_format_rect = 0;
-fmat_format_t *fmat_format_polar = 0;
-fmat_format_t *fmat_format_real = 0;
-
-fmat_format_t *
-fmat_format_register(fts_symbol_t name)
-{
-  fts_atom_t k, a;
-  
-  fts_set_symbol(&k, name);  
-  if(name != sym_real && fts_hashtable_get(&fmat_format_hash, &k, &a) == 0 && fmat_n_formats < FMAT_FORMATS_MAX)
-  {
-    fmat_format_t *format = fts_malloc(sizeof(fmat_format_t));
-    fmat_formats[fmat_n_formats] = format;
-
-    format->name = name;
-    format->index = fmat_n_formats++;
-    format->n_columns = 0;
-        
-    fts_set_pointer(&a, format);
-    fts_hashtable_put(&fmat_format_hash, &k, &a);
-    
-    return format;
-  }
-  
-  return NULL;
-}
-
-void
-fmat_format_add_column(fmat_format_t *format, fts_symbol_t label)
-{
-  format->columns[format->n_columns++] = label;
-}
-
-fmat_format_t *
-fmat_format_get_by_name(fts_symbol_t name)
-{
-  fts_atom_t k, a;
-  
-  fts_set_symbol(&k, name);  
-  if(fts_hashtable_get(&fmat_format_hash, &k, &a) != 0)
-    return (fmat_format_t *)fts_get_pointer(&a);
-
-  return NULL;
-}
-
-/* correct fmat format (if needed) */
-static void
-fmat_adapt_format(fmat_t *self)
-{
-  int n = fmat_get_n(self);
-  
-  if(n == 1)
-    self->format = fmat_format_vec;
-  else 
-  {
-    int format_n = fmat_format_get_n(self->format);
-    
-    switch(fmat_format_get_id(self->format))
-    {
-      case fmat_format_id_vec:
-        if(n > 1)
-          self->format = fmat_format_real;
-        break;        
-        
-      case fmat_format_id_rect:
-      case fmat_format_id_polar:        
-        if(n != 2)
-          self->format = fmat_format_real;
-        break;
-        
-      default:
-        if(n < format_n)
-          self->format = fmat_format_real;
-        break;
-    }    
-  }
-}
-
-/********************************************************
- *
  *  utility functions
  *
  */
 
-#define HEAD_ROWS 8 /* extra points for interpolation at start of vector */
-#define TAIL_ROWS 8 /* extra points for interpolation at end of vector */
-#define HEAD_TAIL_COLS 2 /* interpolation head and tail for 1 or 2 column vectors only */
-#define HEAD_POINTS (HEAD_TAIL_COLS * HEAD_ROWS)
-#define TAIL_POINTS (HEAD_TAIL_COLS * TAIL_ROWS)
-
-
 /* create fmat with m rows and n columns */
-fmat_t *fmat_create(int m, int n)
+fmat_t *
+fmat_create(int m, int n)
 {
-    fts_atom_t size[2];
-
-    fts_set_int(&size[0], m);
-    fts_set_int(&size[1], n);
-    return ((fmat_t *) fts_object_create(fmat_type, 2, size));
+  fts_atom_t size[2];
+  
+  fts_set_int(&size[0], m);
+  fts_set_int(&size[1], n);
+  return ((fmat_t *) fts_object_create(fmat_type, 2, size));
 }
 
 
@@ -169,19 +74,17 @@ fmat_t *fmat_create(int m, int n)
 static void
 fmat_realloc_values(fmat_t *self, size_t size)
 {
-    float *values = self->values;
-    self->values  = NULL;
-
-    if (values == NULL)
-      values = (float *) fts_malloc((size + HEAD_POINTS + TAIL_POINTS) 
-				    * sizeof(float));
-    else
-      values = (float *) fts_realloc(values - HEAD_POINTS, 
-				     (size + HEAD_POINTS + TAIL_POINTS) 
-				     * sizeof(float));
-        
-    self->values = values + HEAD_POINTS;
-    self->alloc  = size;
+  float *values = self->values;
+  
+  self->values  = NULL;
+  
+  if (values == NULL)
+    values = (float *) fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+  else
+    values = (float *) fts_realloc(values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+  
+  self->values = values + HEAD_POINTS;
+  self->alloc  = size;
 }
 
 
@@ -201,8 +104,6 @@ fmat_reshape(fmat_t *self, int m, int n)
   
   self->m = m;
   self->n = n;
-  
-  fmat_adapt_format(self);
 }
 
 void
@@ -276,13 +177,11 @@ fmat_set_n(fmat_t *self, int n)
     }
     
     self->n = n;
-    
-    fmat_adapt_format(self);
   }
 }
 
 
-/* change matrix size, COPYING.LIB data around */
+/* change matrix size, copying data around */
 void
 fmat_set_size(fmat_t *self, int m, int n)
 {
@@ -353,8 +252,6 @@ fmat_set_size(fmat_t *self, int m, int n)
     self->m = m;
     self->n = n;
     self->domain = 0.0;
-    
-    fmat_adapt_format(self);
   }
 }
 
@@ -429,7 +326,6 @@ fmat_copy(fmat_t *org, fmat_t *copy)
   copy->onset = org->onset;
   copy->domain = org->domain;
   copy->sr = org->sr;
-  copy->format = org->format;
 }
 
 
@@ -800,20 +696,13 @@ fmat_error_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
 }
 
 static void
-fmat_error_format_and_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
+fmat_error_complex(fmat_t *fmat, const char *prefix)
 {
-  fmat_format_t *format = fmat_get_format(fmat);
   int m = fmat_get_m(fmat);
   int n = fmat_get_n(fmat);
-  fmat_format_t *op_format = fmat_get_format(op);
-  int op_m = fmat_get_m(op);
-  int op_n = fmat_get_n(op);
   
-  fts_object_error((fts_object_t *)fmat, "%s: %s argument %d x%d doesn't match %s matrix %d x %d", prefix, 
-                   fts_symbol_name(fmat_format_get_name(op_format)), op_m, op_n, 
-                   fts_symbol_name(fmat_format_get_name(format)), m, n);
+  fts_object_error((fts_object_t *)fmat, "%s: matrix %d x %d cannot be handled as complex", prefix, m, n);
 }
-
 
 /********************************************************************
 *
@@ -898,9 +787,7 @@ fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   fmat_copy((fmat_t *)fts_get_object(at), self);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -921,9 +808,7 @@ fmat_set_from_fcol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
     ptr[i] = vec[j];
   
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -944,9 +829,7 @@ fmat_set_from_frow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
     ptr[i] = vec[j];
   
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -988,9 +871,7 @@ fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for(i=0; i<size; i++)
     ptr[i] = (float)iptr[i];
 
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1015,12 +896,9 @@ fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       ac = size - onset;
     
     if(i >= 0 && i < m && j >= 0 && j < n)
-    {
       fmat_set_from_atoms(self, onset, 1, ac, at);
-      
-      if(fmat_editor_is_open(self))
-        fmat_upload_from_index(self, i, j, ac);
-    }
+
+    fts_object_changed(o);
     fts_return_object(o);
   }
 }
@@ -1049,9 +927,6 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
           ac = n;
         
         fmat_set_from_atoms(self, row * n, 1, ac, at);
-        
-        if(fmat_editor_is_open(self))
-          fmat_upload_from_index(self, row, 0, ac);
       }
       else if(fts_is_object(at))
       {
@@ -1069,14 +944,12 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
           
           for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
             ptr[i] = vec[j];
-          
-          if(fmat_editor_is_open(self))
-            fmat_upload_from_index(self, row, 0, vec_size);/*?????*/
         }
       }    
     }
   }
   
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1137,9 +1010,7 @@ fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(ac > 0 && fts_is_number(at))
     fmat_set_const(self, (float)fts_get_number_float(at));
 
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1213,11 +1084,9 @@ fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
       fts_set_void(fts_get_return_value());
     }
-    
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
   }
   
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1243,9 +1112,7 @@ fmat_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for(i=onset; i<range+onset; i++)
     ptr[i] = 0.0;
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1301,12 +1168,10 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {
       fmat_set_size(self, m, n);
       
-      if(fmat_editor_is_open(self))
-        fmat_upload_size(self);
+      fts_object_changed(o);
+      fts_return_object(o);
     }
-  }
-  
-  fts_return_object(o);
+  }  
 }
 
 static void
@@ -1319,10 +1184,9 @@ _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   {    
     fmat_set_m(self, m);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_size(self);
+    fts_object_changed(o);
+    fts_return_object(o);
   }
-  fts_return_object(o);
 }
 
 static void
@@ -1335,10 +1199,9 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   {
     fmat_set_n(self, n);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_size(self);
+    fts_object_changed(o);
+    fts_return_object(o);
   }
-  fts_return_object(o);
 }
 
 /* called by get element message */
@@ -1346,6 +1209,8 @@ static void
 _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
   int i = 0;
   int j = 0;
   
@@ -1354,11 +1219,20 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   if(ac > 1 && fts_is_number(at + 1))
     j = fts_get_number_int(at  + 1);
-
-  if(i >= 0 && i < fmat_get_m(self) && j >= 0 && j < fmat_get_n(self))
-    fts_return_float(fmat_get_element(self, i, j));
-
-  /* todo: index < 0: from end */
+  
+  while(i < 0)
+    i += m;
+  
+  while(j < 0)
+    i += n;
+  
+  if(i >= m)
+    i = m - 1;
+  
+  if(j >= n)
+    i = n - 1;
+  
+  fts_return_float(fmat_get_element(self, i, j));
 }
 
 static void
@@ -1528,7 +1402,6 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
-
 /** append a row of atoms, augment m, clip row to n 
 * 
 * @method append
@@ -1540,7 +1413,6 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
-  int i;
   
   /* clip to row */
   if (ac > n)
@@ -1548,16 +1420,13 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   /* add space, append data */
   fmat_set_size(self, m + 1, n);
-  fmat_set_from_atoms(self, m * n, 1, ac, at);
-
+  
   if(fmat_editor_is_open(self))
-  {
     fts_client_send_message(o, fts_s_append, 0, 0);
-    fmat_upload_from_index(self, m, 0, n);
-  }
-  fts_object_set_state_dirty(o);
+  
+  fts_object_changed(o);
+  fts_return_object(o);
 }
-
 
 /** insert @p num rows of atoms at row @p pos
  *  may insert num rows behind last row m --> append num rows
@@ -1573,7 +1442,7 @@ fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  *		       will be clipped to width of matrix
  */
 static void
-fmat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t	*self = (fmat_t *) o;
   float *newptr;
@@ -1607,10 +1476,8 @@ fmat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   for(i = 0; i < num; i++)
     self->values[n*pos + i] = 0.0;
 
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_object_set_state_dirty(o);
+  fts_object_changed(o);
+  fts_return_object(o);
 }
 
 /** insert @p num rows of atoms at row @p pos
@@ -1662,10 +1529,8 @@ fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     start = start - new_n;
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_object_set_state_dirty(o);
+  fts_object_changed(o);
+  fts_return_object(o);
 }
 
 static void
@@ -1701,10 +1566,8 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   fmat_set_size(self, m, n - numcols);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_object_set_state_dirty(o);
+  fts_object_changed(o);
+  fts_return_object(o);
 }
 
 /** delete @p num rows of atoms 
@@ -1743,14 +1606,9 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   memmove(killptr, killptr + num, tomove * sizeof(float));
   self->m -= numrows; 
 
-  if (fmat_editor_is_open(self))
-    fmat_upload(self);
-
-  fts_object_set_state_dirty(o);
+  fts_object_changed(o);
+  fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -1918,9 +1776,7 @@ fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] += r[i];
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -1939,9 +1795,7 @@ fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] += r;
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -1966,9 +1820,7 @@ fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] -= r[i];
     
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -1987,9 +1839,7 @@ fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] -= r;
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2013,10 +1863,8 @@ fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] *= r[i];
-  
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
     
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2035,9 +1883,7 @@ fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] *= r;
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2061,10 +1907,8 @@ fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] /= r[i];
-  
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2083,9 +1927,7 @@ fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] /= r;
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2110,9 +1952,7 @@ fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] = r[i] - l[i];
 
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2131,9 +1971,7 @@ fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] = r - p[i];
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2158,9 +1996,7 @@ fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] = r[i] / l[i];
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2179,9 +2015,7 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] = r / p[i];
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2212,9 +2046,7 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] == r[i]);
  
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2233,9 +2065,7 @@ fmat_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] == r);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2260,9 +2090,7 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] != r[i]);
     
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2281,9 +2109,7 @@ fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] != r);
 
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2308,9 +2134,7 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] > r[i]);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2329,9 +2153,7 @@ fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] > r);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2356,9 +2178,7 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] >= r[i]);
 
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2377,9 +2197,7 @@ fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] >= r);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2404,9 +2222,7 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] < r[i]);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2425,9 +2241,7 @@ fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] < r);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -2452,9 +2266,7 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] <= r[i]);
   
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
@@ -2473,18 +2285,550 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] <= r);
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
 
 /******************************************************************************
+*
+*  misc math funs
+*
+*/
+static void
+fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = fabsf(ptr[i]);
+
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = logf(fabsf(ptr[i]));
+
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = logf(ptr[i]);
+
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = expf(ptr[i]);
+  
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] *= ptr[i];
+
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+static void
+fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  for(i=0; i<m*n; i++)
+    ptr[i] = sqrtf(ptr[i]);
+
+  fts_object_changed(o);
+  fts_return_object(o);
+}
+
+/******************************************************************************
+*
+*  complex conversion
+*
+*/
+static void
+fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr = fmat_get_ptr(self);
+  int i;
+  
+  if(n == 2)
+  {
+    for(i=0; i<2*m; i+=2)
+    {
+      float mag = ptr[i];
+      float arg = ptr[i + 1];
+      
+      ptr[i] = mag * cosf(arg); /* real part */
+      ptr[i + 1] = mag * sinf(arg); /* imaginary part */
+    }
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat rect:");
+}
+
+static void
+fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr = fmat_get_ptr(self);
+  int i;
+  
+  if(n == 2)
+  {
+    for(i=0; i<2*m; i+=2)
+    {
+      float re = ptr[i];
+      float im = ptr[i + 1];
+      
+      ptr[i] = sqrtf(re * re + im * im);
+      ptr[i + 1] = atan2f(im, re);
+    }
+    
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat polar:");
+}
+
+/******************************************************************************
  *
- *  complex arithmetics
+ *  complex arithmetics and math
  *
  */
+static void
+fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  fmat_t *right = (fmat_t *)fts_get_object(at);
+  int right_m = fmat_get_m(right);
+  int right_n = fmat_get_n(right);
+  float *r = fmat_get_ptr(right);
+  
+  if(m > right_m)
+    m = right_m;
+  
+  if(n == 1)
+  {
+    if(right_n == 1)
+    {
+      /* real * real */
+      float *l = fmat_get_ptr(self);
+      int i;
+      
+      for(i=0; i<m; i++)
+        l[i] *= r[i];
+    }
+    else if(right_n == 2)
+    {
+      /* real * complex */
+      float *l = fmat_get_ptr(self);
+      int i, j;
+
+      fmat_reshape(self, m, 2);
+      l = fmat_get_ptr(self);
+      
+      for(i=m-1, j=(m-1)*2; i>=0; i--, j-=2)
+      {
+        l[j] = l[i] * r[j];
+        l[j + 1] = l[i] * r[j + 1];
+      }
+    }
+    else
+      fmat_error_complex(right, "fmat cmul:");
+  }
+  else if(n == 2)
+  {
+    if(right_n == 1)
+    {
+      /* complex * real */
+      float *l = fmat_get_ptr(self);
+      int i, j;
+
+      for(i=0, j=0; i<m; i++, j+=2)
+      {
+        l[j] *= r[i];
+        l[j + 1] *= r[i];
+      }
+    }
+    else if(right_n == 2)
+    {
+      /* complex * complex */
+      float *l = fmat_get_ptr(self);
+      int i;
+
+      for(i=0; i<m*2; i+=2)
+      {
+        l[i] = l[i] * r[i] - l[i + 1] * r[i + 1];
+        l[i + 1] = l[i] * r[i + 1] + l[i + 1] * r[i];
+      }
+    }
+    else
+      fmat_error_complex(right, "fmat cmul:");
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat cmul:");
+}
+
+static void
+fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float r = fts_get_number_float(at);
+  float *l = fmat_get_ptr(self);
+  int i;
+  
+  if(n <= 2)
+  {
+    for(i=0; i<m*n; i++)
+      l[i] *= r;              
+    
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat cmul:");
+}
+
+
+static void
+fmat_cabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+
+  if(n == 2)
+  {
+    int i, j;
+    
+    for(i=0, j=0; i<m; i++, j+=2)
+    {
+      float re = ptr[j];
+      float im = ptr[j + 1];
+      
+      ptr[i] = sqrtf(re * re + im * im);
+    }
+    
+    fmat_reshape(self, m, 1);
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat cabs:");
+}
+
+static void
+fmat_csqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(n == 2)
+  {
+    int i, j;
+    
+    for(i=0, j=0; i<m; i++, j+=2)
+    {
+      float re = ptr[j];
+      float im = ptr[j + 1];
+      
+      ptr[i] = re * re + im * im;
+    }
+    
+    fmat_reshape(self, m, 1);
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat csqrabs:");
+}
+
+static void
+fmat_clogabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(n == 2)
+  {
+    int i, j;
+  
+    for(i=0, j=0; i<m; i++, j+=2)
+    {
+      float re = ptr[j];
+      float im = ptr[j + 1];
+      
+      ptr[i] = (float)(0.5 * logf(re * re + im * im));
+    }
+    
+    fmat_reshape(self, m, 1);
+  
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+  
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat clogabs:");
+}
+
+static void
+fmat_clog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+
+  if(n == 2)
+  {
+    int i;
+    
+    for(i=0; i<2*m; i+=2)
+    {
+      float re = ptr[i];
+      float im = ptr[i + 1];
+      
+      ptr[i] = (float)(0.5 * log(re * re + im * im));
+      ptr[i + 1] = (float)atan2(im, re);
+    }
+
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat clog:");
+}
+
+static void
+fmat_cexp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(n == 2)
+  {
+    int i;
+  
+    for(i=0; i<2*m; i+=2)
+    {
+      float mag = expf(ptr[i]);
+      float arg = ptr[i + 1];
+      
+      ptr[i] = mag * cosf(arg);
+      ptr[i + 1] = mag * sinf(arg);
+    }
+
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat cexp:");
+}
+
+/******************************************************************************
+*
+*  FFT
+*
+*/
+
+static void
+fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);  
+  
+  if(n == 1)
+  {
+    /* real FFT */
+    int fft_size = fts_get_fft_size(m);
+    float *fft_ptr;
+    int i;
+    
+    fmat_reshape(self, fft_size/2, 2);
+    
+    fft_ptr = fmat_get_ptr(self);
+    
+    /* zero padding */
+    for(i=m; i<fft_size; i++)
+      fft_ptr[i] = 0.0;
+    
+    fts_rfft_inplc(fft_ptr, fft_size);
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else if(n == 2)
+  {
+    /* complex FFT */
+    unsigned int fft_size = fts_get_fft_size(m);
+    complex *fft_ptr;
+    unsigned int i;
+    
+    fmat_reshape(self, fft_size, 2);
+    fft_ptr = (complex *)fmat_get_ptr(self);
+    
+    /* zero padding */      
+    for(i=m; i<fft_size; i++)
+      fft_ptr[i].re = fft_ptr[i].im = 0.0;
+    
+    fts_cfft_inplc(fft_ptr, fft_size);
+    
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat fft:");
+}
+
+static void
+fmat_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(n == 2)
+  {
+    unsigned int fft_size = fts_get_fft_size(m);
+    int i;
+    
+    /* zero padding */      
+    for(i=2*m; i<fft_size; i++)
+      ptr[i] = 0.0;
+    
+    fts_cifft_inplc((complex *)ptr, fft_size);
+    
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat ifft:");
+}
+
+static void
+fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(n == 2)
+  {
+    unsigned int fft_size = fts_get_fft_size(2 * m);
+    int i;
+    
+    /* zero padding */      
+    for(i=2*m; i<fft_size; i++)
+      ptr[i] = 0.0;
+    
+    fts_rifft_inplc(ptr, fft_size);
+    
+    fmat_reshape(self, fft_size, 1);
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
+    
+    fts_return_object(o);
+  }
+  else
+    fmat_error_complex(self, "fmat rifft:");
+}
+
+/******************************************************************************
+*
+*  vector and matrix multiplication
+*
+*/
 
 static void
 fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -2518,7 +2862,7 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         res_row[i_col] = f;
         col++;
       }
-
+      
       /* next row */
       in_row += in_n;
       res_row += n;
@@ -2528,234 +2872,14 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     
     for(i=0; i<in_m*n; i++)
       ptr[i] = res[i]; 
- 
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
     
+    fts_object_changed(o);
     fts_return_object(o);
   }
   else
-  {
-    fmat_format_t *format = fmat_get_format(self);
-    fmat_format_t *in_format = fmat_get_format(in);
-
-    fts_object_error((fts_object_t *)self, "xmul: can't multiply %s matrix %d x %d with %s matrix %d x %d", 
-                     fts_symbol_name(fmat_format_get_name(format)), m, n,
-                     fts_symbol_name(fmat_format_get_name(in_format)), in_m, in_n);
-  }
+    fts_object_error((fts_object_t *)self, "xmul: can't multiply matrix %d x %d with matrix %d x %d", m, n, in_m, in_n);
 }
 
-static void
-fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  fmat_format_t *format = fmat_get_format(self);
-  int id = fmat_format_get_id(format);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  fmat_t *right = (fmat_t *)fts_get_object(at);
-  fmat_format_t *right_format = fmat_get_format(right);
-  int right_id = fmat_format_get_id(right_format);
-  int right_m = fmat_get_m(right);
-  int right_n = fmat_get_n(right);
-  
-  if(m > right_m)
-    m = right_m;
-  
-  if(id <= fmat_format_id_polar && right_id <= fmat_format_id_polar)
-  {
-    float *r = fmat_get_ptr(right);
-    float *l;
-    int i;
-    
-    switch(id)
-    {
-      case fmat_format_id_vec:
-        switch(right_id)
-        {
-          case fmat_format_id_vec:
-            /* vec * vec */
-            l = fmat_get_ptr(self);
-            for(i=0; i<m; i++)
-            {
-              l[i] *= r[i];
-            }
-              break;
-            
-          case fmat_format_id_rect:
-            /* vec * rect */
-            fmat_reshape(self, m, 2);
-            l = fmat_get_ptr(self);
-            for(i=m-1; i>=0; i--)
-            {
-              l[2 * i] = l[i] * r[2 * i];
-              l[2 * i + 1] = l[i] * r[2 * i + 1];
-            }
-              break;
-            
-          case fmat_format_id_polar:
-            /* vec * polar */
-            fmat_reshape(self, m, 2);
-            l = fmat_get_ptr(self);
-            for(i=m-1; i>=0; i--)
-            {
-              l[2 * i] = l[i] * r[2 * i];
-              l[2 * i + 1] = r[2 * i + 1];
-            }
-              break;
-            
-          default:
-            break;
-        }    
-        break;
-        
-      case fmat_format_id_rect:
-        switch(right_id)
-        {
-          case fmat_format_id_vec:
-            /* rect * vec */
-            l = fmat_get_ptr(self);
-            for(i=0; i<m; i++)
-            {
-              l[2 * i] *= r[i];
-              l[2 * i + 1] *= r[i];
-            }
-              break;
-            
-          case fmat_format_id_rect:
-            /* rect * rect */
-            l = fmat_get_ptr(self);
-            for(i=0; i<2*m; i+=2)
-            {
-              l[i] = l[i] * r[i] - l[i + 1] * r[i + 1];
-              l[i + 1] = l[i] * r[i + 1] + l[i + 1] * r[i];
-            }
-              break;
-            
-          case fmat_format_id_polar:
-            /* rect * polar */
-            l = fmat_get_ptr(self);
-            for(i=0; i<2*m; i+=2)
-            {
-              float r_re = r[i] * cosf(r[i + 1]);
-              float r_im = r[i] * sinf(r[i + 1]);
-              l[i] = l[i] * r_re - l[i + 1] * r_im;
-              l[i + 1] = l[i] * r_im+ l[i + 1] * r_re;
-            }
-              break;
-            
-          default:
-            break;
-        }    
-        break;
-        
-      case fmat_format_id_polar:
-        switch(right_id)
-        {
-          case fmat_format_id_vec:
-            /* polar * polar */
-            l = fmat_get_ptr(self);
-            for(i=0; i<m; i++)
-            {
-              l[2 * i] *= r[i];
-            }
-              break;
-            
-          case fmat_format_id_rect:
-            /* polar * rect */
-            l = fmat_get_ptr(self);
-            for(i=0; i<2*m; i+=2)
-            {
-              float r_re = r[i];
-              float r_im = r[i + 1];
-              l[i] *= sqrtf(r_re * r_re + r_im * r_im);
-              l[i + 1] += atan2f(r_im, r_re);
-            }
-              break;
-            
-          case fmat_format_id_polar:
-            /* polar * polar */
-            l = fmat_get_ptr(self);
-            for(i=0; i<2*m; i+=2)
-            {
-              l[i] *= r[i];
-              l[i + 1] += r[i + 1];
-            }
-              break;
-            
-          default:
-            break;
-        }    
-        break;
-        
-      default:
-        break;
-    }
-    
-    if(fmat_editor_is_open(self))
-      fmat_upload(self);
-    
-    fts_return_object(o);
-  }
-  else
-  {
-    fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with %s matrix %d x %d", 
-                     fts_symbol_name(fmat_format_get_name(format)), m, n,
-                     fts_symbol_name(fmat_format_get_name(right_format)), right_m, right_n);
-  }
-}
-
-static void
-fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  fmat_format_t *format = fmat_get_format(self);
-  int id = fmat_format_get_id(format);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  
-  if(id <= fmat_format_id_polar)
-  {
-    float r = fts_get_number_float(at);
-    float *l = fmat_get_ptr(self);
-    int i;
-    
-    switch(id)
-    {
-      case fmat_format_id_vec:
-        for(i=0; i<m; i++)
-          l[i] *= r;              
-        break;
-            
-      case fmat_format_id_rect:
-        for(i=0; i<2*m; i++)
-          l[i] *= r;
-        break;
-        
-      case fmat_format_id_polar:
-        for(i=0; i<2*m; i+=2)
-          l[i] *= r;
-        break;
-        
-      default:
-        break;
-    }
-  
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-    
-    fts_return_object(o);
-  }
-  else
-    fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with number", fts_symbol_name(fmat_format_get_name(format)), m, n);
-}
-
-
-/******************************************************************************
- *
- *  vector and matrix multiplication
- *
- */
 static void
 fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2782,423 +2906,11 @@ fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_object_error(o, "dot: matrices must be column vectors");
 }
 
-
-
-
 /******************************************************************************
- *
- *  mixed real/complex math funs
- *
- */
-static void
-fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<n; i++)
-        ptr[i] = fabsf(ptr[i]);
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0, j=0; i<m; i++, j+=2)
-      {
-        float re = ptr[j];
-        float im = ptr[j + 1];
-        
-        ptr[i] = sqrtf(re * re + im * im);
-      }
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j];
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] = fabsf(ptr[i]);
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<m; i++)
-        ptr[i] = logf(fabsf(ptr[i]));
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0, j=0; i<m; i++, j+=2)
-      {
-        float re = ptr[j];
-        float im = ptr[j + 1];
-        
-        ptr[i] = (float)(0.5 * logf(re * re + im * im));
-      }
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = logf(ptr[j]);
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] = logf(fabsf(ptr[i]));
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<m; i++)
-        ptr[i] = logf(ptr[i]);
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0; i<2*m; i+=2)
-      {
-        float re = ptr[i];
-        float im = ptr[i + 1];
-        
-        ptr[i] = (float)(0.5 * log(re * re + im * im));
-        ptr[i + 1] = (float)atan2(im, re);
-      }
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0; i<2*m; i+=2)
-      {
-        float re = logf(ptr[i]);
-        float im = ptr[i + 1];
-        
-        ptr[i] = sqrtf(re * re + im * im);
-        ptr[i + 1] = (float)atan2(im, re);
-      }
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] = logf(ptr[i]);
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<m; i++)
-        ptr[i] = expf(ptr[i]);
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0; i<2*m; i+=2)
-      {
-        float mag = expf(ptr[i]);
-        float arg = ptr[i + 1];
-        
-        ptr[i] = mag * cosf(arg);
-        ptr[i + 1] = mag * sinf(arg);
-      }
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0; i<2*m; i+=2)
-      {
-        float mag = ptr[i];
-        float arg = ptr[i + 1];
-        
-        ptr[i] = expf(mag * cosf(arg));
-        ptr[i + 1] = mag * sinf(arg);
-      }
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] = expf(ptr[i]);
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<m; i++)
-        ptr[i] *= ptr[i];
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0, j=0; i<m; i++, j+=2)
-      {
-        float re = ptr[j];
-        float im = ptr[j + 1];
-        
-        ptr[i] = re * re + im * im;
-      }
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j] * ptr[j];
-      
-      fmat_reshape(self, m, 1);
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] *= ptr[i];
-      break;
-  }
-
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      for(i=0; i<m; i++)
-        ptr[i] = sqrtf(ptr[i]);
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0; i<m; i+=2)
-      {
-        float re = ptr[i];
-        float im = ptr[i + 1];
-        float mag = sqrtf(re * re + im * im);
-        float arg = atan2f(im, re);
-        
-        mag = sqrtf(mag);
-        arg *= 0.5;
-            
-        ptr[i] = mag * cosf(arg);
-        ptr[i + 1] = mag * sinf(arg);
-      }
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0; i<m; i+=2)
-      {
-        float mag = ptr[i];
-        float arg = ptr[i + 1];
-        
-        ptr[i] = sqrtf(mag * cosf(arg));
-        ptr[i + 1] = 0.5 * mag * sinf(arg);
-      }
-      break;
-      
-    default:
-      for(i=0; i<m*n; i++)
-        ptr[i] = sqrtf(ptr[i]);
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-    {
-      /* real FFT */
-      int size = fmat_get_m(self);
-      int fft_size = fts_get_fft_size(size);
-      float *fft_ptr;
-      int i;
-      
-      fmat_reshape(self, fft_size/2, 2);
-      
-      fft_ptr = fmat_get_ptr(self);
-      
-      /* zero padding */
-      for(i=size; i<fft_size; i++)
-        fft_ptr[i] = 0.0;
-      
-      fts_rfft_inplc(fft_ptr, fft_size);
-      
-      /* cast fmat to complex rect */
-      fmat_set_format(self, fmat_format_rect);
-    } 
-      break;
-      
-    case fmat_format_id_rect:
-    {
-      /* complex FFT */
-      int size = fmat_get_m(self);
-      unsigned int fft_size = fts_get_fft_size(size);
-      complex *fft_ptr;
-      unsigned int i;
-      
-      fmat_reshape(self, fft_size, 2);
-      fft_ptr = (complex *)fmat_get_ptr(self);
-      
-      /* zero padding */      
-      for(i=size; i<fft_size; i++)
-        fft_ptr[i].re = fft_ptr[i].im = 0.0;
-      
-      fts_cfft_inplc(fft_ptr, fft_size);
-    }
-      break;
-      
-    case fmat_format_id_polar:
-    default:
-      /* fmat format error */
-      break;
-  }
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  int m = fmat_get_m(self);
-  int size = 2 * m;
-  unsigned int fft_size = fts_get_fft_size(size);
-  float *ptr;
-  int i;
-  
-  fmat_reshape(self, fft_size, 1);
-  ptr = fmat_get_ptr(self);
-
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      /* fill real part */
-      for(i=m-1; i>=0; i--)
-      {
-        ptr[2 * i + 1] = 0.0;
-        ptr[2 * i] = ptr[i];
-      }
-      
-    case fmat_format_id_rect:
-    {
-      /* zero padding */      
-      for(i=size; i<fft_size; i++)
-        ptr[i] = 0.0;
-      
-      fts_rifft_inplc(ptr, fft_size);
-    }
-      break;
-      
-    case fmat_format_id_polar:
-    default:
-      /* fmat format error */
-      break;
-  }
- 
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
+*
+*  misc
+*
+*/
 
 static void
 fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -3232,14 +2944,9 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
-
-
-
 
 /********************************************************************
  *
@@ -3274,9 +2981,7 @@ fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     ptr += n;
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3363,9 +3068,7 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3424,9 +3127,7 @@ fmat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }    
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3467,9 +3168,7 @@ fmat_tros(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }    
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3512,14 +3211,9 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   }  
     
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-
+  fts_object_changed(o);
   fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -3585,9 +3279,7 @@ fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3629,9 +3321,7 @@ fmat_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     }
   }
   
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3648,9 +3338,7 @@ fmat_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<m*n; i++)
     ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
 
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-
+  fts_object_changed(o);
   fts_return_object(o);
 }
     
@@ -3705,9 +3393,7 @@ fmat_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
   }
 
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3734,9 +3420,7 @@ fmat_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     time += incr;  
   }
 
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-  
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -3781,182 +3465,7 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_set_void(fts_get_return_value());
     
-  if(fmat_editor_is_open(self))
-    fmat_upload_data(self);
-
-  fts_return_object(o);
-}
-
-
-
-
-/******************************************************************************
- *
- *  format conversion
- *
- */
-static void
-fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      break;
-      
-    case fmat_format_id_rect:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j];          
-      fmat_reshape(self, m, 1);
-      break;
-      
-    case fmat_format_id_polar:
-      for(i=0, j=0; i<m; i++, j+=2)
-        ptr[i] = ptr[j] * cosf(ptr[j + 1]);
-      fmat_reshape(self, m, 1);
-      break;
-      
-    default:
-      break;
-  }
-    
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-
-  fts_return_object(o);
-}
-
-static void
-fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  float *ptr;
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      fmat_reshape(self, m, 2);
-      ptr = fmat_get_ptr(self);
-      for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
-      {
-        ptr[i] = ptr[j]; /* real part */
-        ptr[i + 1] = 0.0; /* imaginary part */
-      }
-      break;
-    
-    case fmat_format_id_rect:
-      break;
-    
-    case fmat_format_id_polar:
-      ptr = fmat_get_ptr(self);
-      for(i=0; i<2*m; i+=2)
-      {
-        float mag = ptr[i];
-        float arg = ptr[i + 1];
-      
-        ptr[i] = mag * cosf(arg); /* real part */
-        ptr[i + 1] = mag * sinf(arg); /* imaginary part */
-      }
-      break;
-    
-    default:
-      ptr = fmat_get_ptr(self);
-      for(i=0, j=0; i<2*m; i+=2, j+=n)
-      {
-        ptr[i] = ptr[j]; /* real part */
-        ptr[i + 1] = 0.0; /* imaginary part */
-      }      
-      fmat_reshape(self, m, 2);
-      break;          
-  }
-  
-  fmat_set_format(self, fmat_format_rect);
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  int id = fmat_format_get_id(self->format);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  float *ptr;
-  int i, j;
-  
-  switch(id)
-  {
-    case fmat_format_id_vec:
-      fmat_reshape(self, m, 2);
-      ptr = fmat_get_ptr(self);
-      for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
-      {
-        ptr[i] = ptr[j];
-        ptr[i + 1] = 0.0;
-      }
-      break;
-    
-    case fmat_format_id_rect:
-      ptr = fmat_get_ptr(self);
-      for(i=0; i<2*m; i+=2)
-      {
-        float re = ptr[i];
-        float im = ptr[i + 1];
-      
-        ptr[i] = sqrtf(re * re + im * im);
-        ptr[i + 1] = atan2f(im, re);
-      }
-      break;
-    
-    case fmat_format_id_polar:
-      break;
-    
-    default:
-      ptr = fmat_get_ptr(self);
-      for(i=0, j=0; i<2*m; i+=2, j+=n)
-      {
-        ptr[i] = ptr[j];
-        ptr[i + 1] = 0.0;
-      }
-          
-      fmat_reshape(self, m, 2);
-      break;
-  }
-  
-  fmat_set_format(self, fmat_format_polar);
-  
-  if(fmat_editor_is_open(self))
-    fmat_upload(self);
-  
-  fts_return_object(o);
-}
-
-static void
-fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  if(self->format != fmat_format_vec)
-  {
-    fmat_set_format(self, fmat_format_rect);
-
-    if(fmat_editor_is_open(self))
-      fmat_upload_data(self);
-  }
-
+  fts_object_changed(o);
   fts_return_object(o);
 }
 
@@ -4004,9 +3513,7 @@ fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     
     if(size > 0)
     {
-      if(fmat_editor_is_open(self))
-        fmat_upload(self);
-      
+      fts_object_changed(o);
       fts_return_object(o);
     }
     else
@@ -4048,14 +3555,19 @@ fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
   fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"));
 }
 
-
-
-
 /*********************************************************
  *
  *  editor
  *
  */
+static void *fmat_editor = NULL;
+
+static void
+fmat_editor_callback(fts_object_t *o, void *e)
+{
+  fmat_t *self = (fmat_t *)o;
+  fmat_upload(self); 
+}
 
 static void 
 fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -4064,6 +3576,8 @@ fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   
   fmat_set_editor_open( self);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
+  
+  fts_object_add_listener(o, fmat_editor, fmat_editor_callback);
   
   fmat_upload(self);
 }
@@ -4074,6 +3588,7 @@ fmat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fmat_t *self = (fmat_t *)o;
   
   fmat_set_editor_close( self);
+  fts_object_remove_listener(o, fmat_editor);
 }
 
 static void 
@@ -4085,6 +3600,7 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   {
     fmat_set_editor_close(self);
     fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
+    fts_object_remove_listener(o, fmat_editor);
   }
 }
 
@@ -4100,7 +3616,6 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
-  fmat_format_t *format = fmat_get_format(self);
   int size = m * n;
   fts_bytestream_t* stream = fts_get_default_console_stream();
   int i, j;
@@ -4109,10 +3624,10 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     stream = (fts_bytestream_t *)fts_get_object(at);
   
   if(size == 0)
-    fts_spost(stream, "<empty fmat of %s>\n", fts_symbol_name(fmat_format_get_name(format)));
+    fts_spost(stream, "<empty fmat>\n");
   else
   {
-    fts_spost(stream, "<fmat %d x %d of %s>\n", m, n, fts_symbol_name(fmat_format_get_name(format)));
+    fts_spost(stream, "<fmat %d x %d>\n", m, n);
     fts_spost(stream, "{\n");
 
     for(i=0; i<m; i++)
@@ -4181,7 +3696,6 @@ fmat_initialize(fmat_t *self)
   self->onset = 0.0;
   self->domain = 0.0;
   self->sr = fts_dsp_get_sample_rate();
-  self->format = fmat_format_real;
   self->opened = 0;
 }
 
@@ -4197,26 +3711,8 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 0 && fts_is_number(at))
     m = fts_get_number_int(at);
   
-  if(ac > 1)
-  {
-    if(fts_is_number(at + 1))
-      n = fts_get_number_int(at + 1);
-    else if(fts_is_symbol(at + 1))
-    {
-      fts_symbol_t format_name = fts_get_symbol(at + 1);
-      fmat_format_t *format = fmat_format_get_by_name(format_name);
-      
-      if(format != NULL)
-      {
-        n = format->n_columns;
-        self->format = format;
-      }
-      else
-        fts_object_error(o, "unknown fmat format: %s", fts_symbol_name(format_name));
-    }
-    else
-      fts_object_error(o, "bad column argument");
-  }
+  if(ac > 1 && fts_is_number(at + 1))
+    n = fts_get_number_int(at + 1);
   
   if(ac > 2)
   {
@@ -4369,10 +3865,6 @@ fmat_instantiate(fts_class_t *cl)
   fmat_message(cl, fts_new_symbol("lt"), fmat_lt_fmat, fmat_lt_number);
   fmat_message(cl, fts_new_symbol("le"), fmat_le_fmat, fmat_le_number);
 
-  fts_class_message(cl, fts_new_symbol("xmul"), fmat_class, fmat_xmul_fmat);
-  fmat_message(cl, fts_new_symbol("cmul"), fmat_cmul_fmat, fmat_cmul_number);
-  fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
-  
   fts_class_message_void(cl, fts_new_symbol("abs"), fmat_abs);
   fts_class_message_void(cl, fts_new_symbol("logabs"), fmat_logabs);
   fts_class_message_void(cl, fts_new_symbol("log"), fmat_log);
@@ -4380,13 +3872,26 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fmat_sqrt);
   
+  fts_class_message_void(cl, sym_rect, fmat_convert_rect);
+  fts_class_message_void(cl, sym_polar, fmat_convert_polar);
+
+  fmat_message(cl, fts_new_symbol("cmul"), fmat_cmul_fmat, fmat_cmul_number);
+  fts_class_message_void(cl, fts_new_symbol("cabs"), fmat_cabs);
+  fts_class_message_void(cl, fts_new_symbol("clogabs"), fmat_clogabs);
+  fts_class_message_void(cl, fts_new_symbol("clog"), fmat_clog);
+  fts_class_message_void(cl, fts_new_symbol("cexp"), fmat_cexp);
+  fts_class_message_void(cl, fts_new_symbol("csqrabs"), fmat_csqrabs);
+
   fts_class_message_void(cl, fts_new_symbol("fft"), fmat_fft);
+  fts_class_message_void(cl, fts_new_symbol("ifft"), fmat_ifft);
   fts_class_message_void(cl, fts_new_symbol("rifft"), fmat_rifft);  
+
+  fts_class_message(cl, fts_new_symbol("xmul"), fmat_class, fmat_xmul_fmat);
+  fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
   
   fts_class_message_void(cl, fts_new_symbol("normalize"), fmat_normalize);
-  
-  fts_class_message_void  (cl, fts_s_sort,    fmat_sort);
-  fts_class_message_number(cl, fts_s_sort,    fmat_sort);
+  fts_class_message_void  (cl, fts_s_sort, fmat_sort);
+  fts_class_message_number(cl, fts_s_sort, fmat_sort);
   fts_class_message_void  (cl, fts_s_sortrev, fmat_tros);
   fts_class_message_number(cl, fts_s_sortrev, fmat_tros);
   fts_class_message_void(cl, fts_new_symbol("rotate"), fmat_rotate);
@@ -4405,11 +3910,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("env"), bpf_type, fmat_env_bpf);
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
-
-  fts_class_message_void(cl, sym_vec, fmat_convert_vec);
-  fts_class_message_void(cl, sym_rect, fmat_convert_rect);
-  fts_class_message_void(cl, sym_polar, fmat_convert_polar);
-  fts_class_message_void(cl, sym_real, fmat_convert_real);
   
   fts_class_message_symbol(cl, fts_s_import, fmat_import);
   fts_class_message_void(cl, fts_s_import, fmat_import_dialog);
@@ -4473,19 +3973,26 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("lt"), "<num|fmat: operand>", "replace current values by result of < comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("le"), "<num|fmat: operand>", "replace current values by result of <= comparison (0 or 1) with given scalar or fmat (element by element)");
   
-  fts_class_doc(cl, fts_new_symbol("xmul"), "<fmat: operand>", "calculate matrix multiplication of operand M with current matrix C so that C' = M x C");
-  fts_class_doc(cl, fts_new_symbol("cmul"), "<num|fmat: operand>", "multiply current values of complex vector (rect or polar format) by given scalar or complex vector fmat (element by element)");
-  fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
-
-  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values C' = ");
+  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
-  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector (vec or rect format)");
-  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
-
+  
+  fts_class_doc(cl, fts_new_symbol("cmul"), "<num|fmat: operand>", "multiply current values of complex vector by given scalar or complex vector fmat (element by element)");
+  fts_class_doc(cl, fts_new_symbol("cabs"), NULL, "calulate absolute values of current complex values");
+  fts_class_doc(cl, fts_new_symbol("clogabs"), NULL, "calulate logarithm of absolute values of current complex values");
+  fts_class_doc(cl, fts_new_symbol("clog"), NULL, "calulate lograrithm of current complex values");
+  fts_class_doc(cl, fts_new_symbol("cexp"), NULL, "calulate exponent function of current complex values");
+  fts_class_doc(cl, fts_new_symbol("csqrabs"), NULL, "calulate square of absolute values of current complex values");
+  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector");
+  fts_class_doc(cl, fts_new_symbol("ifft"), NULL, "calulate inplace inverse FFT of complex vector");
+  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real inverse FFT of complex vector");
+  
+  fts_class_doc(cl, fts_new_symbol("xmul"), "<fmat: operand>", "calculate matrix multiplication of operand M with current matrix C so that C' = M x C");
+  fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
+  
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
   fts_class_doc(cl, fts_s_reverse, NULL, "reverse order of rows");
   fts_class_doc(cl, fts_new_symbol("rotate"), "[<num: # of elements (def 1)>]", "rotate by given number of rows");
@@ -4498,10 +4005,8 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
 
-  fts_class_doc(cl, sym_vec, NULL, "convert matrix or complex vector to real vector (vec format)");
-  fts_class_doc(cl, sym_rect, NULL, "convert matrix to rectangular complex vector (rect format)");
-  fts_class_doc(cl, sym_polar, NULL, "convert matrix to polar complex vector (polar format)");
-  fts_class_doc(cl, sym_real, NULL, "convert complex vectors to real matrices (real format)");
+  fts_class_doc(cl, sym_rect, NULL, "convert complex polar vector to complex rectangular vector (matrix of 2 columns)");
+  fts_class_doc(cl, sym_polar, NULL, "convert complex rectangular vector to complex polar vector (matrix of 2 columns)");
 
   fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
@@ -4532,25 +4037,6 @@ fmat_config(void)
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
   fvec_class = fts_class_install(fvec_symbol, fmat_instantiate);
 
-  fts_hashtable_init(&fmat_format_hash, FTS_HASHTABLE_SMALL);
-
-  /* init fmat format table */
-  fmat_format_vec = fmat_format_register(sym_vec);
-  
-  fmat_format_rect = fmat_format_register(sym_rect);
-  fmat_format_add_column(fmat_format_rect, sym_re);
-  fmat_format_add_column(fmat_format_rect, sym_im);
-  
-  fmat_format_polar = fmat_format_register(sym_polar);
-  fmat_format_add_column(fmat_format_polar, sym_mag);
-  fmat_format_add_column(fmat_format_polar, sym_arg);
-  
-  /* fmat default format */
-  fmat_format_real = fts_malloc(sizeof(fmat_format_t));
-  fmat_format_real->name = sym_real;
-  fmat_format_real->index = FMAT_FORMATS_MAX;
-  fmat_format_real->n_columns = 0;
-  
   /*fmat_null = (fmat_t *)fts_object_create(fmat_class, 0, 0);*/
   /*fts_object_refer((fts_object_t *)fmat_null);*/
 }

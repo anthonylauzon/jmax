@@ -33,46 +33,6 @@
  */
 
 
-/******************************************************************************
- *
- *  fmat format
- *
- */
-
-#define FMAT_FORMATS_MAX 256
-
-enum fmat_format_id_enum {
-  fmat_format_id_vec, 
-  fmat_format_id_rect, 
-  fmat_format_id_polar,
-  fmat_format_id_real = FMAT_FORMATS_MAX
-};
-
-typedef struct
-{
-  fts_symbol_t name;
-  enum fmat_format_id_enum index;
-  int n_columns;
-  fts_symbol_t columns[16];
-} fmat_format_t;
-
-DATA_API fmat_format_t *fmat_format_vec;
-DATA_API fmat_format_t *fmat_format_rect;
-DATA_API fmat_format_t *fmat_format_polar;
-DATA_API fmat_format_t *fmat_format_real;
-
-#define fmat_format_get_name(f) ((f)->name)
-#define fmat_format_get_id(f) ((f)->index)
-#define fmat_format_get_n(f) ((f)->n_columns)
-#define fmat_format_get_column_name(f, i) ((f)->column[i])
-
-DATA_API fmat_format_t *fmat_format_register(fts_symbol_t name);
-DATA_API void fmat_format_add_column(fmat_format_t *format, fts_symbol_t label);
-DATA_API fmat_format_t *fmat_format_get_by_name(fts_symbol_t name);
-
-
-
-
 /*****************************************************************************/
 /** @defgroup fmat fmat: float matrix
  *  @ingroup  data
@@ -93,9 +53,16 @@ typedef struct
   double sr; /* sample rate */
   double onset; /* fractional onset */
   double domain; /* fractional size (rows) */
-  fmat_format_t *format;
   int opened;
 } fmat_t;
+
+#define HEAD_ROWS 8 /* extra points for interpolation at start of vector */
+#define TAIL_ROWS 8 /* extra points for interpolation at end of vector */
+#define HEAD_TAIL_COLS 2 /* interpolation head and tail for 1 or 2 column vectors only */
+#define HEAD_POINTS (HEAD_TAIL_COLS * HEAD_ROWS)
+#define TAIL_POINTS (HEAD_TAIL_COLS * TAIL_ROWS)
+
+#define fmat_get_mem(m) ((m)->values - HEAD_POINTS)
 
 /** */
 DATA_API fts_symbol_t fmat_symbol;
@@ -115,9 +82,6 @@ DATA_API fts_class_t *fmat_class;
  *  @fn int fmat_get_n(fmat_t *x)
  */
 #define fmat_get_n(x) ((x)->n)
-
-#define fmat_get_format(x) ((x)->format)
-#define fmat_set_format(x, f) ((x)->format = (f))
 
 #define fmat_editor_is_open(m) ((m)->opened == 1)
 #define fmat_set_editor_open(m) ((m)->opened = 1)

@@ -49,28 +49,28 @@ void fts_objectlist_destroy( fts_objectlist_t *list)
 void fts_objectlist_insert( fts_objectlist_t *list, fts_object_t *object)
 {
   fts_objectlist_cell_t *p;
-
+  
   p = (fts_objectlist_cell_t *) fts_heap_alloc( cell_heap);
-
+  
   p->object = object;
   p->next = list->head;
-
+  
   list->head = p;
 }
 
 void fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object)
 {
   fts_objectlist_cell_t **p, *c;
-
+  
   for (p = &list->head; *p; p = &(*p)->next)
+  {
+    if ((*p)->object == object)
     {
-      if ((*p)->object == object)
-	{
-	  c = *p;
-	  *p = c->next;
-	  fts_heap_free( c, cell_heap);
-
-	  return;
-	}
+      c = *p;
+      *p = c->next;
+      fts_heap_free( c, cell_heap);
+      
+      return;
     }
+  }
 }
