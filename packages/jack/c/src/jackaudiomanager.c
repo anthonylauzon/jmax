@@ -210,7 +210,7 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
 }
 
 static
-void create_jack_manager_client()
+int create_jack_manager_client()
 {
   if (NULL == manager_jack_client)
   {
@@ -219,7 +219,7 @@ void create_jack_manager_client()
     if (NULL == manager_jack_client)
     {
       fts_log("[jackaudiomanager] cannot create jMax manager jack client\n");      
-      return;
+      return -1;
     }
     else
     {
@@ -227,6 +227,7 @@ void create_jack_manager_client()
     }
   }
   ++jack_count;
+  return 0;
 }
 
 static void
@@ -899,7 +900,13 @@ void jackaudiomanager_config( void)
   fts_class_t* jam;
 
   /* create jack manager */
-  create_jack_manager_client();
+  if (-1 == create_jack_manager_client())
+  {
+    fts_log("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
+    post("[jackaudiomanager] cannot connect to jack server, so no jackaudiopoprt available \n");
+    return;
+  }
+
 
   s_default_client_name = fts_new_symbol("jMax_jackaudiomanager");
 
