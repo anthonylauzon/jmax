@@ -27,7 +27,17 @@ public abstract class AbstractSelection implements SelectionHandler {
   public void select(Object obj) 
   {
     selected.addElement(obj);
-    notifyListeners();
+    notifyListeners(OBJECT_SELECTED);
+  }
+
+  /**
+   * select the given enumeration of objects 
+   */
+  public void select(Enumeration e) 
+  {
+    while(e.hasMoreElements())
+      selected.addElement(e.nextElement());
+    notifyListeners(GROUP_SELECTED);
   }
 
   /**
@@ -36,7 +46,17 @@ public abstract class AbstractSelection implements SelectionHandler {
   public void deSelect(Object obj) 
   {
     selected.removeElement(obj);
-    notifyListeners();
+    notifyListeners(OBJECT_DESELECTED);
+  }
+
+  /**
+   * remove the Enumeration of object from the selection
+   */
+  public void deSelect(Enumeration e) 
+  {
+    while (e.hasMoreElements())
+      selected.removeElement(e.nextElement());
+    notifyListeners(GROUP_DESELECTED);
   }
 
 
@@ -69,7 +89,7 @@ public abstract class AbstractSelection implements SelectionHandler {
   public void deselectAll() 
   {
     selected.removeAllElements();
-    notifyListeners();
+    notifyListeners(GROUP_DESELECTED);
   }
 
 
@@ -99,14 +119,28 @@ public abstract class AbstractSelection implements SelectionHandler {
   /**
    * call back the listener, the selection content changed
    */
-  protected void notifyListeners()
+  protected void notifyListeners(int type)
   {
     SelectionListener sl;
 
     for (Enumeration e = listeners.elements(); e.hasMoreElements();)
       {
 	sl = (SelectionListener) e.nextElement();
-	sl.selectionChanged();
+	
+	switch (type) {
+	case OBJECT_SELECTED: 
+	  sl.objectSelected();
+	  break;
+	case GROUP_SELECTED: 
+	  sl.groupSelected();
+	  break;
+	case OBJECT_DESELECTED: 
+	  sl.objectDeselected();
+	  break;
+	case GROUP_DESELECTED: 
+	  sl.groupDeselected();
+	  break;
+	}
       }
   }
 
@@ -115,4 +149,12 @@ public abstract class AbstractSelection implements SelectionHandler {
 
   protected MaxVector selected;
   protected MaxVector listeners;
+
+  public static final int OBJECT_SELECTED = 1;
+  public static final int GROUP_SELECTED = 2;
+  public static final int OBJECT_DESELECTED = 4;
+  public static final int GROUP_DESELECTED = 8;
+  public static final int SELECTION_CHANGED = 16;
+
+  public static final int ALL_EVENTS = OBJECT_SELECTED | GROUP_SELECTED | OBJECT_DESELECTED | GROUP_DESELECTED | SELECTION_CHANGED;
 }

@@ -73,16 +73,36 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
   
   /**
    * selection listener interface */
-  public void selectionChanged()
+  public void objectSelected()
+  {
+    setTarget(identifyTarget());
+  }
+
+  public void objectDeselected()
+  {
+    setTarget(identifyTarget());
+  }
+
+  public void groupSelected()
+  {
+    setTarget(null);
+  }
+
+  public void groupDeselected()
+  {
+    setTarget(identifyTarget());
+  }
+  
+  private ScrEvent identifyTarget()
   {
     if (ExplodeSelection.getSelection().size() == 1) 
       {
 	ScrEvent aEvent = (ScrEvent) ExplodeSelection.getSelection().getSelected().nextElement();
-	setTarget(aEvent);
+	return aEvent;
       }
-    else setTarget(null);
+    else return null;
   }
-
+  
   /**
    * ExplodeDataListener interface */
   public void objectDeleted(Object whichObject)
@@ -98,6 +118,8 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
    * null means no objects */
   public void setTarget(ScrEvent e)
   {
+    if (e == target) return;
+
     target = e;
 
     if (e!= null)
@@ -130,7 +152,7 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
    * all the events in a selection*/
   public void actionPerformed(ActionEvent e)
   {
-    if (target != null || ExplodeSelection.getSelection().size() == 0) return;
+    if (ExplodeSelection.getSelection().size() == 0) return;
     
     int value;
     ScrEvent temp;

@@ -77,12 +77,12 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
     if (e.getSource() == yesButton)
       {
 	answer = true;
-	hide();
+	setVisible(false);
       }
     else if(e.getSource() == noButton)
       {
 	answer = false;
-	hide();
+	setVisible(false);
       }
   }
 
@@ -99,7 +99,7 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
     if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
       {
 	answer = true;
-	hide();
+	setVisible(false);
       }
   }
 }

@@ -5,8 +5,21 @@ package ircam.jmax.toolkit;
  */ 
 
 public interface SelectionListener {
-  /** theContent of the selection changed
+
+  /** a single objects have been selected.
    */
-  public abstract void selectionChanged();
+  public abstract void objectSelected();
+
+  /** a group of object have been selected. 
+   */
+  public abstract void groupSelected();
+
+  /** a single object have been deselected.
+   */
+  public abstract void objectDeselected();
+
+  /** a group of objects have been deselected.
+   */
+  public abstract void groupDeselected();
 }
 

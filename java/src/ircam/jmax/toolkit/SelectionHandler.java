@@ -12,10 +12,21 @@ public interface SelectionHandler {
    */
   public abstract void select(Object obj);
   
+  /** select the given enumeration of objects.
+   * When possible, use this method instead of
+   * selecting single objects. 
+   */
+  public abstract void select(Enumeration e);
 
   /** remove the given object from the selection
    */
   public abstract void deSelect(Object obj);
+
+
+  /** remove the given enumeration of objects from the selection
+   * When possible, use this method instead of
+   * deselecting single objects.    */
+  public abstract void deSelect(Enumeration e);
 
 
   /** returns true if the object is currently selected

@@ -1,8 +1,6 @@
 package ircam.jmax.editors.explode;
 
 import com.sun.java.swing.*;
-import com.sun.java.swing.plaf.*;
-import com.sun.java.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -331,9 +329,23 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * SelectionListener interface
    */
 
-  public void selectionChanged()
+  public void objectSelected()
   {  
+    repaint();
+  }
 
+  public void objectDeselected()
+  {  
+    repaint();
+  }
+
+  public void groupSelected()
+  {  
+    repaint();
+  }
+
+  public void groupDeselected()
+  {  
     repaint();
   }
 
@@ -383,29 +395,6 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public void settings() {
     gc.getAdapter().edit(gc.getFrame());
-  }
-
-
-  /** Undo support */
-  public void undo()
-  {
-    try 
-      {
-	gc.getDataModel().undo();
-      } catch (CannotUndoException e1) {
-	System.out.println("can't undo");
-      }
-  }
-
-  /** undo support */
-  protected void redo()
-  {
-    try 
-      {
-	gc.getDataModel().redo();
-      } catch (CannotRedoException e1) {
-	System.out.println("can't redo");
-      }
   }
 
 

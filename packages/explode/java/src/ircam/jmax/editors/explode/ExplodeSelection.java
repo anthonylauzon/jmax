@@ -6,7 +6,7 @@ import ircam.jmax.toolkit.*;
 
 /**
  * A selection of explode events. Use the static constructor to create the
- * (unique) selection of the system.
+ * (unique) explode selection of the system.
  */ 
 public class ExplodeSelection extends AbstractSelection implements ExplodeDataListener {
 

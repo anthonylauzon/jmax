@@ -45,7 +45,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
   }
 
   public void actionPerformed(ActionEvent e){    
-    hide();
+    setVisible(false);
     dispose();
   }
 }

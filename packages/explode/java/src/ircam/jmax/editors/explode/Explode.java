@@ -12,6 +12,7 @@ import ircam.jmax.toolkit.*;
 
 import com.sun.java.swing.*;
 import com.sun.java.swing.table.*;
+import com.sun.java.swing.undo.*;
 
 
 /**
@@ -34,7 +35,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     setTitle("Explode");
 
     // get the data
-    ExplodeRemoteData explodeData = (ExplodeRemoteData) maxData;
+    explodeData = (ExplodeRemoteData) maxData;
     
     itsPanel = new ScrPanel(explodeData);
     getContentPane().add(itsPanel);
@@ -52,12 +53,12 @@ public class Explode extends MaxEditor implements AAAReadme {
 
 
   /**
-   * personalize the menubar (adds the settings menu)
+   * personalize the menubar (adds the Options menu)
    */
 
   public void SetupMenu()
   {
-    Menu settingsMenu = new Menu("Settings");
+    Menu optionsMenu = new Menu("Options");
     
     MenuItem settings = new MenuItem("Settings...");
     settings.addActionListener(new ActionListener() 
@@ -69,25 +70,56 @@ public class Explode extends MaxEditor implements AAAReadme {
 			     }
 			     );
     
-    settingsMenu.add(settings);
-    getMenuBar().add(settingsMenu);
+    MenuItem pianoRollView = new MenuItem("Piano roll view");
+    settings.addActionListener(new ActionListener() 
+			     {
+			       public void actionPerformed(ActionEvent e) 
+				 {
+				 }
+			     }
+			     );
+
+    MenuItem tableView = new MenuItem("Table view");
+    settings.addActionListener(new ActionListener() 
+			     {
+			       public void actionPerformed(ActionEvent e) 
+				 {
+				 }
+			     }
+			     );
+
+    optionsMenu.add(settings);
+    optionsMenu.add(pianoRollView);
+    optionsMenu.add(tableView);
+    getMenuBar().add(optionsMenu);
   
   }
 
   protected void Undo()
   {
-    itsPanel.undo();
+    try 
+      {
+	explodeData.undo();
+      } catch (CannotUndoException e1) {
+	System.out.println("can't undo");
+      }
   }
 
   protected void Redo()
   {
-    itsPanel.redo();
+    try 
+      {
+	explodeData.redo();
+      } catch (CannotRedoException e1) {
+	System.out.println("can't redo");
+      }
   }
 
 
   //------------------- fields
 
   ScrPanel itsPanel;
+  ExplodeDataModel explodeData;
   static EditorToolbar toolbar;
 }
 
