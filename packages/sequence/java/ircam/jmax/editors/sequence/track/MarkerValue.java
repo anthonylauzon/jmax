@@ -81,6 +81,16 @@ public Object getProperty(String name)
 		return super.getProperty(name);
 }
 
+public void unsetProperty( String name)
+{
+ if(name.equals("tempo"))
+	  tempo = EventValue.UNKNOWN_PROPERTY;
+	else if(name.equals("meter")) 
+		meter = EventValue.UNKNOWN_PROPERTY;
+	else
+		super.unsetProperty(name);
+}
+
 public ValueInfo getValueInfo()
 {
 	return info;
