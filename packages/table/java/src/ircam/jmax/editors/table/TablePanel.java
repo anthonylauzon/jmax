@@ -25,6 +25,11 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     addMouseListener(this);
   }
 
+  public void initValues(int[] vector, int size) {
+    values = vector;
+    N_POINTS = size;
+  }
+
   public void paint(Graphics g) {
     for(int i = 0; i<N_POINTS;i++){
       PaintSingle(i, g);

@@ -57,7 +57,8 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
  
   void fillTable() {
     //fill the internal vector with the data contained in itsData
-    //values = ((FtsIntegerVector)(itsData.getContent())).values();
+    FtsIntegerVector aIntV = ((FtsIntegerVector)(itsData.getContent()));
+    itsTablePanel.initValues(aIntV.getValues(),aIntV.getSize());
   }
 
   public Tabler() {
