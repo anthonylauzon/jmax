@@ -41,14 +41,18 @@ public class PrintAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob(container.getFrame(), "Printing Console", MaxApplication.getProperties());
-    if(aPrintjob != null){
-      Graphics aPrintGraphics = aPrintjob.getGraphics();
-      if(aPrintGraphics != null){
-	container.getFrame().printAll(aPrintGraphics);
-	aPrintGraphics.dispose();
+    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Console", MaxApplication.getProperties());
+
+    if( aPrintjob != null )
+      {
+	Graphics aPrintGraphics = aPrintjob.getGraphics();
+
+	if ( aPrintGraphics != null )
+	  {
+	    container.getFrame().printAll( aPrintGraphics );
+	    aPrintGraphics.dispose();
+	  }
+	aPrintjob.end();
       }
-      aPrintjob.end();
-    }
   }
 }

@@ -39,8 +39,5 @@ import ircam.jmax.toolkit.actions.*;
 
 public class Actions
 {
-  public static EditorAction copyAction      = new CopyAction();
-  public static EditorAction pasteAction     = new PasteAction();
-
   public static EditorAction printAction     = new PrintAction();
 }
