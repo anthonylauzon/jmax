@@ -44,6 +44,8 @@ public class TclMaxPackage
     interp.createCommand("runHooks", new MaxRunHooksCmd());
 
     interp.createCommand("systemProperty", new MaxSystemPropertyCmd());
+    interp.createCommand("installDataType", new MaxInstallDataTypeCmd());
+    interp.createCommand("installDataHandler", new MaxInstallDataHandlerCmd()); 
     interp.createCommand("quit", new MaxQuitCmd());
   }
 }

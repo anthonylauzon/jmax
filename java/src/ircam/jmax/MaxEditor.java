@@ -8,6 +8,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.editors.project.*; // @@@ !!
 import ircam.jmax.editors.ermes.*; // @@@ !!
 import com.sun.java.swing.*;
@@ -59,17 +60,29 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private Menu CreateNewFileMenu(){
-    MaxResourceId aResId;
+    //MaxResourceId aResId;
+    MaxDataType aDataType;
     MenuItem aMenuItem;
     String aString;
     Menu newFileMenu = new Menu("New...  Ctrl+N");
     
-    for(int i=0; i< MaxApplication.resourceVector.size();i++){
+    // the ResId mechanism is substituted by  the MaxDataType getTypes() call.
+    // The installation of MaxDataTypes is dynamic (it's the execution of the 
+    // resources.erm tcl script)
+    for(Enumeration e = MaxDataType.getTypes(); e.hasMoreElements();) {
+      aDataType = (MaxDataType) e.nextElement();
+      aString = aDataType.getName();
+      newFileMenu.add(aMenuItem = new MenuItem(aString));
+      aMenuItem.addActionListener(this);
+    }
+
+    //---OLD CODE
+    /*for(int i=0; i< MaxApplication.resourceVector.size();i++){
       aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
       aString = aResId.GetName();
       newFileMenu.add(aMenuItem = new MenuItem(aString));
       aMenuItem.addActionListener(this);
-    }
+      }*/
     return newFileMenu;
   }
   
@@ -277,13 +290,16 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 	    ||theName.equals("System statistics...")||IsInNewFileMenu(theName));
   }
   
+
   private boolean IsInNewFileMenu(String theName){
-    MaxResourceId aResId;
+    MaxDataType aDataType;
     String aString;
-    
-    for(int i=0; i< MaxApplication.resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
-      aString = aResId.GetName();
+    // to be optimized: this function builds an enumeration for each menu selection 
+    // (even if it is not in the "new" menu). A list of datatype names should be kept
+    // somewhere
+    for(Enumeration e=MaxDataType.getTypes(); e.hasMoreElements();) {
+      aDataType = (MaxDataType) e.nextElement();
+      aString = aDataType.getName();
       if(aString.equals(theName)) return true;
     }
     return false;
@@ -433,11 +449,17 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private MaxEditor NewFile(String theFileType){
-    if(theFileType.equals("patcher")) MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
-    else if (theFileType.equals("abstraction")) MaxApplication.ObeyCommand(MaxApplication.NEW_ABSTRACTION_COMMAND); //yes, I know...
-    else if(theFileType.equals("")) return null;
-    /* @@@@@@ Change new to use resources to find dynamically the editor
-     */
+    
+    // Editor activation starting from the choice of a type.
+    // sorry, using names for now...
+    MaxData ourData = MaxDataType.getTypeByName(theFileType).newInstance();
+    MaxDataEditorFactory ourEditorFactory = ourData.getDataType().getDefaultEditorFactory();
+    MaxDataEditor ourEditor = ourEditorFactory.newEditor(ourData);
+
+    /*if(theFileType.equals("patcher")) MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
+      else if (theFileType.equals("abstraction")) MaxApplication.ObeyCommand(MaxApplication.NEW_ABSTRACTION_COMMAND); //yes, I know...
+      else if(theFileType.equals("")) return null;*/
+
     return null;//WARNING
   }
 

@@ -9,6 +9,7 @@ import java.io.*;
 import tcl.lang.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
@@ -20,7 +21,7 @@ import com.sun.java.swing.*;
  * it is showing, and the fospatcher to which it is associated.
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
-public class ErmesSketchWindow extends MaxEditor {
+public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
 
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
@@ -58,9 +59,6 @@ public class ErmesSketchWindow extends MaxEditor {
   public Vector itsSubWindowList;
   Vector itsWindowMenuList;
 
-  //********************************************************** //
-  //START of the transformation of SketchWindow in a MaxEditor //
-  //********************************************************** //
 
   public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String itemName){
 
@@ -90,9 +88,26 @@ public class ErmesSketchWindow extends MaxEditor {
     return true;
   }
 
-  //**********************************************************//
-  // END of the transormation                                 //
-  //**********************************************************//
+
+  // the MaxDataEditor interface
+  public void editData(MaxData data) throws MaxDataException{}
+  /** This method ask to the stop editing the data.
+   *  This probabily means that the data item or the editor is about to
+   * be disposed (destroyed).
+   *
+   */
+  public void quitEdit() {}
+  /** Tell the editor to syncronize, i.e. to store in the
+   * data all the information possibly cached in the editor
+   * and still not passed to the data instance; this usually
+   * happen before saving an instance.
+   */
+  public void syncData(){}
+  /** Tell the editor the data has changed; it pass a sigle Java
+   * Object that may code what is changed and where; if the argument
+   * is null, means usually that all the data is changed
+   */
+  public void dataChanged(Object reason){}
 
     //--------------------------------------------------------
     //	CONSTRUCTOR

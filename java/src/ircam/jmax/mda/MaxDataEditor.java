@@ -9,7 +9,7 @@ package ircam.jmax.mda;
  * interface defined for this.
  */
 
-interface MaxDataEditor
+public interface MaxDataEditor
 {
   /** This method set the data the editor should edit;
    *  the editor can throw an exception if already set, or can implement

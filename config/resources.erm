@@ -1,49 +1,12 @@
-start_resource_type_list
 
-***new_resource "patcher"
-resource_extension_list
-".pat"
-".tpa"
-end_resource_extension_list
-preferred_resource_handler "Patcher"
-end_resource "patcher"
+## types and editors definitions
 
-***new_resource "espresso"
-resource_extension_list
-".esp"
-end_resource_extension_list
-preferred_resource_handler "Espresso"
-end_resource "espresso"
+# patcher data type and default editor factory:
+set datatype [installDataType ircam.jmax.fts.FtsPatchDataType ircam.jmax.editors.ermes.ErmesPatcherFactory]
+# patcher data type handlers:
+installDataHandler ircam.jmax.mda.MaxTclFileDataHandler
+installDataHandler ircam.jmax.fts.FtsDotPatFileDataHandler
 
-***new_resource "table"
-resource_extension_list
-".tab"
-end_resource_extension_list
-preferred_resource_handler "Tabler"
-end_resource "table"
-
-***new_resource "text"
-resource_extension_list
-".txt"
-end_resource_extension_list
-preferred_resource_handler "TextEditor"
-end_resource "text"
-
-***new_resource "sequence"
-resource_extension_list
-".seq"
-end_resource_extension_list
-preferred_resource_handler "Sequencer"
-end_resource "sequence"
-
-***new_resource "abstraction"
-resource_extension_list
-".gif"
-".jpg"
-end_resource_extension_list
-preferred_resource_handler "GraphicViewer"
-end_resource "abstraction"
-
-end_resource_type_list
+##other types here...
 
 

@@ -369,6 +369,8 @@ public class ErmesObject implements FtsPropertyHandler {
 	return true;
       }
       else 
+	if (itsSelected) itsSketchPad.clickHappenedOnAnAlreadySelected =true;
+	else itsSketchPad.clickHappenedOnAnAlreadySelected =false;
 	if(IsInDragBox(x,y)) {
 	  SetInitDrag(x,y);
 	  return true;

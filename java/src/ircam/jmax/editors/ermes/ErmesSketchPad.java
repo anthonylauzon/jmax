@@ -89,13 +89,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   Rectangle currentResizeRect = null; 
 
   public boolean offScreenValid = true;
-  //Graphics offGraphicsLines = null;
-  // Dimension offDimensionLines;
-  //Image offImageLines;
-
-  //Graphics offGraphicsElements = null;
-  //Dimension offDimensionElements;
-  //Image offImageElements;
   
   ErmesObjMessThread itsMessThread = null;
 
@@ -109,7 +102,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   static Image offImage;
 		
 		
-  /*provasw ErmesToolBar itsToolBar; questa riga e quella dopo (aggiunta)*/
   ErmesSwToolbar itsToolBar;
   ErmesConnSegment itsSelectedSegment;
   Point itsStartMovingPt;
@@ -119,6 +111,13 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   ErmesObject itsStartDragObject = null;
   ErmesObject itsResizingObject = null;
   ErmesConnection itsCurrentConnection = null;
+  // This is an housekeeping structure to implement the re-edit of an
+  // editable object. The logic is:
+  // 1) click on an object selects the object and go in MOVING status
+  // 2) release the mouse (moves if moved), go in START_SELECT
+  // 3) second click select the object, go in MOVING
+  // 4) second release re-edit the object only if the first click was on the same, already selected object.
+  boolean clickHappenedOnAnAlreadySelected = false;
 
   Vector itsConnectingLetList;
 
@@ -982,7 +981,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       else {//se non ha mosso
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
-	    if(itsCurrentObject instanceof ErmesObjEditableObject)
+	    if(itsCurrentObject instanceof ErmesObjEditableObject &&
+	       clickHappenedOnAnAlreadySelected)//this one
 	      ((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
 	  }
 	}

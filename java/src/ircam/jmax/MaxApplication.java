@@ -30,7 +30,7 @@ import tcl.lang.*;
  * - quit of the application
  */
 
-public class MaxApplication extends Object {
+public class MaxApplication extends Object{
 
   // Static global services
 
@@ -51,7 +51,7 @@ public class MaxApplication extends Object {
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
-
+  //  private static HashTable editorFactories; //association between MaxDataTypes and MaxDataEditorFactories
   static ConnectionDialog itsConnDialog;
   private static     FtsServer itsServer = null;
   public static boolean doAutorouting = true; // Should become a static in the Patcher editor
@@ -86,55 +86,24 @@ public class MaxApplication extends Object {
 
 
   static void LoadResources() {
-    byte buffer[] = new byte[1024];
-    String aTempString;
-    
-    FileInputStream fis;
-    int nOfBytes;
-    StringTokenizer aST;
-    MaxResourceId aResId;
+    //New implementation:
+    //reads from the file resources.erm the list of MaxDataTypes
+    //available for the system, and the MaxDataEditorFactory associated.
+    //The resources.erm file is just a TCL script, as usual
     
     String pathForResources = jmaxProperties.getProperty("root")+jmaxProperties.getProperty("file.separator")+"config"+jmaxProperties.getProperty("file.separator")+"resources.erm";
-    try {
-      fis = new FileInputStream(pathForResources);
-    }
-    catch(FileNotFoundException e) {
-      System.err.println("ERROR: can't find resource configuration file in "+pathForResources);
-      return;
-    }
-    try {
-      nOfBytes = fis.read(buffer, 0, MAX_RESOURCE_FILE_LENGHT);
-    }
-    catch(IOException e) {
-      System.out.println("ERROR: can't read resource configuration file");
-      return;
-    }
-    aST = new StringTokenizer(new String(buffer, 0));
-    if (!Start_resource_type_list(aST)) {
-      System.out.println("wrong resources.erm file");
-      return;
-    }
+    try
+      {
+	// Load the "jmaxboot.tcl" file that will do whatever is needed to
+	// create the startup configuration, included reading user files
 
-		
-    while (aST.hasMoreTokens() ) {
-      aTempString = aST.nextToken();
-      if (aTempString.equals("end_resource_type_list"))
-	break;
-      else if (aTempString.equals("***new_resource")){
-	aResId = Resource(aST);
-	if (aResId == null) {
-	  System.out.println("failed to successfull parse resource");
-	  break;
-	}
-	else {
-	resourceVector.addElement(aResId); 
-	//System.out.println(aResId.GetName());
-	}
-      } else {
-	System.out.println("wrong resources.erm file");
-	return;
+	itsInterp.evalFile(pathForResources);
       }
-    }
+    catch (TclException e)
+      {
+	System.out.println("TCL error in resources initialization " + e + " : " + itsInterp.getResult());
+      }
+
   }
   
   static boolean Start_resource_type_list(StringTokenizer aST) {
@@ -185,7 +154,7 @@ public class MaxApplication extends Object {
       itsServer = new FtsSocketClientServer(server);
     else if (mode.equals("local"))
       itsServer = new FtsSubProcessServer();
-
+    else System.out.println("unknown FTS connection type "+mode+": can't cconnect to FTS");
     itsServer.setParameter("ftsdir", theFtsdir);
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
@@ -193,7 +162,7 @@ public class MaxApplication extends Object {
   
   public static void Load(File file)
   {
-
+    
     boolean temp = doAutorouting;
 
     doAutorouting = false;
@@ -232,14 +201,6 @@ public class MaxApplication extends Object {
     itsSketchWindow.inAnApplet = false;
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
-    //CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(8);
-    //aEditMenuItem.setState(doAutorouting);
-
-    /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
-      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-
-    if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
 
     AddThisWindowToMenus(itsSketchWindow);
     itsSketchWindow.setVisible(true);
@@ -275,8 +236,6 @@ public class MaxApplication extends Object {
     if (!found)
       aType = "unknown";
 
-    /*#itsProjectWindow.itsProject.AddToProject(file.getName(), aType, file);
-    UpdateProjectMenu();*/
   }
 	
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
@@ -347,7 +306,7 @@ public class MaxApplication extends Object {
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     }
-    //#itsProjectWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(),theLastItem);
+
     if (itsConsoleWindow != null)
       itsConsoleWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
 
@@ -405,10 +364,6 @@ public class MaxApplication extends Object {
     itsSketchWindow.inAnApplet = false;
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
-    /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
-      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-      if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
     itsSketchWindow.setVisible(true);
     return itsSketchWindow;
   }
@@ -423,8 +378,6 @@ public class MaxApplication extends Object {
     aSketchWindow.Init();
     aSketchWindow.itsSketchPad.doAutorouting = temp;
     theFtsPatcher.open();
-    //aSketchWindow.repaint();
-    //aPatcherDoc.CreateFtsGraphics(aSketchWindow);
     aSketchWindow.InitFromDocument(aPatcherDoc);
     aSketchWindow.inAnApplet = false;
     aSketchWindow.setTitle(aSketchWindow.GetDocument().GetTitle());
@@ -463,12 +416,8 @@ public class MaxApplication extends Object {
       itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
       itsSketchWindow.pack();
       itsSketchWindow.setLocation(40,40);
-      //itsSketchWindow.setRunMode(true);
+
       itsSketchWindow.setRunMode(false);
-      /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
-	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
-	if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
       AddThisWindowToMenus(itsSketchWindow);
       itsSketchWindow.setVisible(true);
       break;	
@@ -486,28 +435,14 @@ public class MaxApplication extends Object {
       itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
       itsSketchWindow.pack();
       itsSketchWindow.setLocation(40,40);
-      //itsSketchWindow.setRunMode(true);
+
       itsSketchWindow.setRunMode(false);
-      /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
-	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
-	if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);*/
       AddThisWindowToMenus(itsSketchWindow);
       itsSketchWindow.setVisible(true);
       break;	
 
     case OPEN_WITH_AUTO_ROUTING:
       doAutorouting = !doAutorouting;
-      //qui controlla lo stato del menu corrispondeente e gli adatta quello
-      //dei menu delle altre finestre.....
-      /*#fallo sulla console
-	CheckboxMenuItem aMenuItem = (CheckboxMenuItem)itsProjectWindow.getMenuBar().getMenu(0).getItem(4);
-	aMenuItem.setState(doAutorouting);
-	for(int i=0; i<itsSketchWindowList.size(); i++){
-	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(i);
-	aMenuItem = (CheckboxMenuItem)aSketchWindow.getMenuBar().getMenu(0).getItem(4);
-	aMenuItem.setState(doAutorouting);
-	}*/
       break;
     case SNAP_TO_GRID:
       for (int k=0; k<itsSketchWindowList.size(); k++) {
@@ -523,21 +458,6 @@ public class MaxApplication extends Object {
       aPrintGraphics.dispose();
       aPrintJob.end();
       break;
-      //case ADD_WINDOW:
-      //#itsProjectWindow.itsProject.AddToProject((ErmesPatcherDoc)itsSketchWindow.GetDocument(), itsSketchWindow);
-      //UpdateProjectMenu();
-      //break;
-      //case REMOVE_FILES:
-      //#itsProjectWindow.itsProject.RemoveFromProject();
-      /*if(itsProjectWindow.itsProject.GetItems().size()==0){
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-	for(int m=0; m<itsSketchWindowList.size(); m++){
-	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-	aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
-	}
-	}
-      */
-      //break;
     }	
   }
   
@@ -731,13 +651,27 @@ public class MaxApplication extends Object {
 
     // The console creation moved in a tcl command !!!
 
-    LoadResources();
-
     //#ahio itsProjectWindow = new ProjectWindow();
 
     itsInterp = new tcl.lang.Interp(); // should go away here !!!
 
     makeTclInterp(); 
+
+    LoadResources();
+
+    try
+      {
+	// Load the "jmaxboot.tcl" file that will do whatever is needed to
+	// create the startup configuration, included reading user files
+
+	itsInterp.evalFile(jmaxProperties.getProperty("root") +
+			   jmaxProperties.getProperty("file.separator") + "tcl" +
+			   jmaxProperties.getProperty("file.separator") +  "jmaxboot.tcl");
+      }
+    catch (TclException e)
+      {
+	System.out.println("TCL error in initialization " + e + " : " + itsInterp.getResult());
+      }
 
     // Splash screen moved to a tcl command
 
@@ -772,33 +706,10 @@ public class MaxApplication extends Object {
 
     ircam.jmax.mda.tcl.TclMdaPackage.installPackage(itsInterp);
 
-    // Define types and data handlers for the application layer
-
-    // The standard patch document
-
+    /* what follows has been moved to the LoadResources method, and instanciated dinamically 
     MaxDataType.installDataType(new FtsPatchDataType());
-
-    // the handler of .tpa files 
-
     MaxDataHandler.installDataHandler(new MaxTclFileDataHandler());
-
-    // the handler of .pat files
-
-    MaxDataHandler.installDataHandler(new FtsDotPatFileDataHandler());
-
-    try
-      {
-	// Load the "jmaxboot.tcl" file that will do whatever is needed to
-	// create the startup configuration, included reading user files
-
-	itsInterp.evalFile(jmaxProperties.getProperty("root") +
-			   jmaxProperties.getProperty("file.separator") + "tcl" +
-			   jmaxProperties.getProperty("file.separator") +  "jmaxboot.tcl");
-      }
-    catch (TclException e)
-      {
-	System.out.println("TCL error in initialization " + e + " : " + itsInterp.getResult());
-      }
+    MaxDataHandler.installDataHandler(new FtsDotPatFileDataHandler());*/
   }
 
   /** This method install the console; a part of it should go
