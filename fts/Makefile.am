@@ -56,7 +56,6 @@ vm.c
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
-#fts_LDADD= -lfts @FTS_SYS_LIBS@ -lm
 fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
 libfts_la_LDFLAGS = -no-undefined
 

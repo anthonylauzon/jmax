@@ -57,7 +57,7 @@ changequote(<<,>>)dnl
 libtool_major_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*\([0-9]\)\.[0-9]*\..*/\1/'`
 libtool_minor_version=`grep "VERSION=" ltmain.sh | sed 's/VERSION=.*[0-9]*\.\([0-9]*\)\..*/\1/'`
 changequote([,])dnl
-if test ("$libtool_major_version" -le 1) -a ("$libtool_minor_version" -lt 4) ; then DOT_LIBS=-L.libs; fi
+if test "$libtool_major_version" -le 1 -a "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs ; fi
 AC_SUBST(DOT_LIBS)
 
 dnl Check for platform
@@ -69,18 +69,18 @@ i*86-pc-linux-gnu)
     PLATFORM_PACKAGES="alsa oss unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile -lpthread" ;
     if test "$electric_fence" = "yes" ; then FTS_SYS_LIBS="-lefence $FTS_SYS_LIBS" ; fi ;
-    ACX_C_RESTRICT ;
+    ACX_C_RESTRICT
     ;;
 mips-sgi-irix6.5)
     PLATFORM=sgi ;
     PLATFORM_PACKAGES="sgi unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile";
-    ACX_C_RESTRICT ;
+    ACX_C_RESTRICT
     ;;
 powerpc-apple-darwin*)
     PLATFORM=macosx ;
     dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code) 
-    AC_DEFINE(restrict,) ;
+    AC_DEFINE(restrict,)
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 

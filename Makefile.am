@@ -66,3 +66,11 @@ final:
 		echo JMAX_VERSION_STATUS=; \
 	) > JMAX-VERSION.out
 	mv JMAX-VERSION.out JMAX-VERSION
+
+
+mrproper: maintainer-clean
+	-rm -f config.guess config.sub configure
+	-rm -f aclocal.m4
+	-rm -f install-sh
+	-rm -f ltconfig ltmain.sh
+	-rm -f missing mkinstalldirs 
