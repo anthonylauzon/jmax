@@ -15,12 +15,12 @@ ErmesSketchWindow.java\
 ErmesToolBar.java\
 ErmesToolButton.java\
 FindPanel.java\
-ErrorPanel.java\
 ErrorTableModel.java\
 ErrorTablePanel.java\
 FontCache.java\
 FpePanel.java\
 IconRenderer.java\
+JMaxToolPanel.java\
 KeyEventClient.java\
 KeyEventsManager.java\
 KeyMap.java\
@@ -34,13 +34,14 @@ PatcherFontManager.java\
 PatcherPrintManager.java\
 PatcherSaveManager.java\
 RuntimeError.java\
-RuntimeErrorsPanel.java\
 RuntimeErrorsTableModel.java\
 RuntimeErrorsTablePanel.java\
 ScaleDialog.java\
 ScaleTransform.java\
 Settings.java\
-TextRenderer.java
+TextRenderer.java\
+ToolsPanel.java\
+ToolTableModel.java
 
 JAVACX=@JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
