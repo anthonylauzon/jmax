@@ -40,7 +40,6 @@ typedef struct _midiconfig
   fts_object_t o;
   midilabel_t *labels;
   int n_labels;
-  int dirty;
 } midiconfig_t;
 
 

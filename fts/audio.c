@@ -882,11 +882,11 @@ fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
   /* save what you want, Patrice */
   /* mais chaque message doit etre sauve' avec selecteur fts_audio_config 
      et avec premier argument le vrai selecteur */
-  while(label)
-  {
+  /*while(label)
+    {
     fts_bmax_code_push_symbol(f, label->name);
-
-  }
+    
+    }*/
 }
 
 /* DUMMY CONSTRUCTOR */

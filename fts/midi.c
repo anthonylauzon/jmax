@@ -32,6 +32,7 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/midi.h>
+#include <ftsprivate/config.h>
 
 /*
  * This file contains everything related to MIDI:
@@ -1366,8 +1367,6 @@ fts_symbol_t fts_midimanager_s_append_output_names;
 fts_symbol_t fts_midimanager_s_get_input;
 fts_symbol_t fts_midimanager_s_get_output;
 
-static void midiconfig_set_dirty(midiconfig_t *this, int is_dirty);
-
 /* handle midimanagers */
 static fts_midiport_t *
 midimanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
@@ -1511,7 +1510,7 @@ midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
     fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
   }
   
-  midiconfig_set_dirty( config, 1);
+  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
 
   return label;
 }
@@ -1545,7 +1544,7 @@ midiconfig_label_remove(midiconfig_t *config, int index)
     fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
   }
 
-  midiconfig_set_dirty( config, 1);
+  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
 }
 
 static void
@@ -1567,7 +1566,7 @@ midiconfig_label_set_input(midiconfig_t *config, midilabel_t *label, int index, 
       fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
     }
 
-    midiconfig_set_dirty( config, 1);
+    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
   }
 }
 
@@ -1590,7 +1589,7 @@ midiconfig_label_set_output(midiconfig_t *config, midilabel_t *label, int index,
       fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
     }
     
-    midiconfig_set_dirty( config, 1);
+    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
   }
 }
 
@@ -1788,7 +1787,7 @@ midiconfig_set_defaults()
       midiconfig_label_set_output(midiconfig, label, 0, port, name);
     }
 
-    midiconfig_set_dirty( midiconfig, 0);
+    fts_config_set_dirty( (config_t *)fts_config_get(), 0);
   }
 }
 
@@ -1818,7 +1817,7 @@ fts_midiconfig_set_defaults(midiconfig_t* midiconfig)
       midiconfig_label_set_output(midiconfig, label, 0, port, name);
     }
 
-    midiconfig_set_dirty( midiconfig, 0);
+    fts_config_set_dirty( (config_t *)fts_config_get(), 0);
   }
 }
 
@@ -1935,7 +1934,7 @@ midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(fts_object_has_id( o)) 
     fts_client_send_message( o, fts_s_clear, 0, 0);
   
-  /*midiconfig_set_dirty( this, 1);*/
+  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
 }
 
 static void
@@ -2072,32 +2071,11 @@ midiconfig_set_to_defaults( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   midiconfig_t *this = (midiconfig_t *)o;
   midiconfig_clear( o, winlet, fts_s_clear, 0, 0);
-/*   this->file_name = NULL; */
+  /* this->file_name = NULL; */
   midiconfig_upload( o, winlet, fts_s_upload, 0, 0); 
   
-  midiconfig_set_dirty( this, 0);
+  fts_config_set_dirty( (config_t *)fts_config_get(), 0);
 }
-
-/* set midiconfig as dirty or as saved.
- * A "setDirty" message is sent to the client after is_dirty flag changed
- */
-static void 
-midiconfig_set_dirty(midiconfig_t *this, int is_dirty)
-{
-  if(this->dirty != is_dirty)
-  {
-    this->dirty = is_dirty;
-
-    if ( fts_object_has_id( (fts_object_t *)this))
-    {
-      fts_atom_t a[1];
-	  
-      fts_set_int(&a[0], is_dirty);
-      fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
-    }
-  }
-}
-
 
 static void
 midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -2124,8 +2102,6 @@ midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       
   this->labels = NULL;
   this->n_labels = 0;
-
-  this->dirty = 0;
 
   /* modify object description */
   fts_set_symbol(&a, midiconfig_s_name);

@@ -52,7 +52,6 @@ config_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
 }
 
-
 static void
 config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -83,7 +82,7 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
     ((config_t*)obj)->file_name = fts_new_symbol(path);
 
-    /* config_set_dirty((config_t*)obj, 0); */
+    fts_config_set_dirty((config_t*)obj, 0);
   }
   else
   {
@@ -117,7 +116,7 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_bmax_code_return( &f);
     fts_bmax_file_close( &f);    
     
-    /*config_set_dirty( this, 0);*/
+    fts_config_set_dirty( this, 0);
   }
   else
     fts_log( "config save: cannot open file %s\n", file_name);
@@ -137,6 +136,25 @@ config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
   config_t* this = (config_t*)o;
   fts_symbol_t selector = fts_get_symbol( at);
   fts_send_message( ((fts_object_t *)this->audio_config), selector, ac - 1, at + 1);
+}
+
+/* set config as dirty or as saved.
+ * A "setDirty" message is sent to the client after is_dirty flag changed
+ */
+void fts_config_set_dirty(config_t *this, int is_dirty)
+{
+  if(( this)&&(this->dirty != is_dirty))
+    {
+      this->dirty = is_dirty;
+      
+      if ( fts_object_has_id( (fts_object_t *)this))
+	{
+	  fts_atom_t a[1];
+	  
+	  fts_set_int(&a[0], is_dirty);
+	  fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
+	}
+    }
 }
 
 static void
@@ -186,6 +204,9 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   audioconfig_t* audio_config;
   midiconfig_t* midi_config;
 
+  self->file_name = NULL;
+  self->dirty = 0;
+
   /* create midi config object */
   midi_config = (midiconfig_t*)fts_object_create(midiconfig_type, NULL, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
@@ -198,11 +219,9 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
   
-  self->file_name = NULL;
-
   /* modify object description */
-  /*fts_set_symbol(&a, config_s_name);
-    fts_object_set_description(o, 1, &a);*/
+  fts_set_symbol(&a, config_s_name);
+  fts_object_set_description(o, 1, &a);
 }
 
 

@@ -40,7 +40,6 @@ typedef struct _audioconfig
     fts_object_t o;
     audiolabel_t* labels;
     int n_labels;    
-    int dirty;
 
     int buffer_size;
     double sample_rate;
@@ -53,3 +52,5 @@ extern void fts_audio_idle( void);
 extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
 
 #endif
+
+

@@ -28,12 +28,14 @@ typedef struct
   fts_symbol_t file_name;
   midiconfig_t* midi_config;
   audioconfig_t* audio_config;
+  int dirty;
 } config_t;
 
 extern fts_class_t* config_type;
 
 extern fts_object_t *fts_config_get( void);
 extern void fts_config_set( config_t* config);
+extern void fts_config_set_dirty( config_t* config, int is_dirty);
 
 
 
