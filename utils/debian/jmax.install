@@ -36,4 +36,3 @@ usr/share/jmax/default_config.jcfg
 usr/lib/pkgconfig/jmax.pc
 usr/bin/jmax
 usr/bin/jmax2xml
-usr/bin/jmax-config

@@ -2,14 +2,14 @@ Source: jmax
 Section: sound
 Priority: optional
 Maintainer: Paul Brossier <piem@altern.org>
-Build-Depends: debhelper (>> 3.0.0), j2sdk, libncurses5, perl-base, perl-modules, doxygen, libjack0.50.0-dev
+Build-Depends: debhelper (>> 4.0.0)
 Standards-Version: 3.5.8
 
 Package: jmax
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: jmax-common, ${shlibs:Depends}
 Description: A visual environment for interactive music and multimedia
- jMax is the latest generation of real-time platform developped at Ircam by the
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -21,8 +21,9 @@ Description: A visual environment for interactive music and multimedia
 
 Package: jmax-common
 Architecture: any
+Depends: libc6, libc6-dev, libasound2, ${shlibs:Depends}
 Description: jMax FTS kernel 
- jMax is the latest generation of real-time platform developped at Ircam by the
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -35,8 +36,9 @@ Description: jMax FTS kernel
 Package: jmax-java
 Section: contrib/sound
 Architecture: any
-Description: Jack Audio Connection Kit support for jMax
- jMax is the latest generation of real-time platform developped at Ircam by the
+Depends: jmax, jmax-common, java-common, java2-common, ${shlibs:Depends}
+Description: Java client for jMax
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -48,10 +50,11 @@ Description: Jack Audio Connection Kit support for jMax
 
 Package: jmax-client
 Architecture: any
+Depends: jmax, jmax-common, python2.2 (>=2.2.2), libwxgtk2.4-python (>=2.4.0.8), ${shlibs:Depends} 
 Description: Clients for jMax
  Contains C++ and Python client for jMax
  .
- jMax is the latest generation of real-time platform developped at Ircam by the
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -63,8 +66,9 @@ Description: Clients for jMax
 
 Package: jmax-jack
 Architecture: any
-Description: Documentation for jmax
- jMax is the latest generation of real-time platform developped at Ircam by the
+Depends: jmax, jmax-common, libjack0.50.0-dev, ${shlibs:Depends}
+Description: Jack Audio Connection Kit support for jMax
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -75,9 +79,10 @@ Description: Documentation for jmax
  fathers of computer music.
 
 Package: jmax-dev
-Architecture: all
+Architecture: any
+Depends: jmax-common, ${shlibs:Depends}
 Description: Headers files for jMax
- jMax is the latest generation of real-time platform developped at Ircam by the
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 
@@ -89,8 +94,9 @@ Description: Headers files for jMax
 
 Package: jmax-doc
 Architecture: all
+Depends: jmax, ${shlibs:Depends}
 Description: Documentation for jMax
- jMax is the latest generation of real-time platform developped at Ircam by the
+ jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.
  .
  jMax is a visual programming environment for building interactive musical and 

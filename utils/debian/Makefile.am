@@ -1,7 +1,6 @@
 EXTRA_DIST= changelog \
 	control \
 	copyright \
-	dirs \
 	docs \
 	jmax-client.install \
 	jmax-common.install \
@@ -11,4 +10,13 @@ EXTRA_DIST= changelog \
 	jmax-jack.install \
 	jmax-java.install \
 	README.Debian \
+	README \
+	TODO \
+	compat \
+	control \
+	docs \
+	fts.1 \
+	jmax.1 \
+	jmax-config.1 \
+	jmax2xml.1 \
 	rules
