@@ -627,6 +627,30 @@ sgi_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
     }
 
 
+  /* Verify if there are samples coming on the adc; in practice, this means
+     to test for the digital input carrier.
+     The technique is simple: we verify if the input fifo is empty, if it is 
+     empty we wait a few millisecond and we check again; if it is still empty,
+     we have no carrier.
+     */
+
+  if (alGetFilled(dev_data->port) == 0)
+    {
+      struct timespec pause_time;
+
+      pause_time.tv_sec = 0;
+      pause_time.tv_nsec = 1000000;
+      nanosleep( &pause_time, 0);
+
+      if (alGetFilled(dev_data->port) == 0)
+	{
+	  post("No Carrier On Audio Input %s\n", dev_data->name);
+
+	  return &fts_dev_open_error;
+	}
+    }
+
+
   /* Allocate the ADC  formatting buffer */
 
   dev_data->adc_fmtbuf = (float *) fts_malloc(MAXVS * dev_data->nch * sizeof(float));
