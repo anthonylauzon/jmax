@@ -121,6 +121,12 @@ create_dest_dir()
 }
 
 # ---------------------------------------------------------------------------
+remove_dest_dir()
+{
+    /bin/rm -rf ${DEST_DIR}
+}
+
+# ---------------------------------------------------------------------------
 # args: ARCH TYPE DIR DEST
 copy_files ()
 {
@@ -208,3 +214,4 @@ copy_files $ARCH $TYPE . ${DEST_DIR}
 
 create_tar
 
+remove_dest_dir

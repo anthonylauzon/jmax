@@ -146,10 +146,10 @@ JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
 
 SWING_DISTRIB_CLASSPATH=
 
-if echo $CLASSPATH | grep -s swing
+if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
 then
-echo "CLASSPATH already contains Swing:"
-echo "Using $CLASSPATH as CLASSPATH"
+    echo "CLASSPATH already contains Swing:"
+    echo "Using $CLASSPATH as CLASSPATH"
 else
     if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
     then
@@ -157,6 +157,7 @@ else
     else
 	echo "Swing classes (swingall.jar) not found."
 	exit 2
+    fi
 fi
 
 if [ $CLASSPATH ]
