@@ -37,6 +37,7 @@ typedef struct
 } udp_t;
 
 fts_symbol_t s_connect = NULL;
+fts_symbol_t s_disconnect = NULL;
 fts_symbol_t s_status = NULL;
 
 static void
@@ -53,6 +54,14 @@ udp_connect(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   connected_port = fts_get_int(at);
   fts_udpstream_connect((fts_udpstream_t*)(self->udp_stream), connected_port);
+}
+
+static void
+udp_disconnect(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  udp_t* self = (udp_t*)o;
+
+  fts_udpstream_disconnect((fts_udpstream_t*)(self->udp_stream));
 }
 
 static void
@@ -160,6 +169,13 @@ udpout_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   udp_t *self = (udp_t *)o;
 
+  /* check number of arguments (need 2, local port and port to connect */
+  if (ac != 2 || !fts_is_int(at) || !fts_is_int(at + 1))
+  {
+    fts_object_error(o, "udpout needs 2 int as arguments (local port and port to connect)");
+    return;
+  }
+
   /* create udp stream */
   self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
   if (self->udp_stream != NULL)
@@ -179,8 +195,9 @@ udpin_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(udp_t), udpin_init, udpin_delete);
 
-  fts_class_message_varargs(cl, s_connect, udp_connect);
   fts_class_message_varargs(cl, s_status, udp_status);
+  fts_class_message_varargs(cl, s_connect, udp_connect);
+  fts_class_message_varargs(cl, s_disconnect, udp_disconnect);
 
   /* name support */
   fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
@@ -193,8 +210,9 @@ udpout_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(udp_t), udpout_init, udpout_delete);
 
-  fts_class_message_varargs(cl, s_connect, udp_connect);
   fts_class_message_varargs(cl, s_status, udp_status);
+  fts_class_message_varargs(cl, s_connect, udp_connect);
+  fts_class_message_varargs(cl, s_disconnect, udp_disconnect);
 
   fts_class_message_varargs(cl, fts_s_send, udpout_send);
 
@@ -212,6 +230,7 @@ void
 udp_config( void)
 {
   s_connect = fts_new_symbol("connect");
+  s_disconnect = fts_new_symbol("disconnect");
   s_status = fts_new_symbol("status");
   fts_class_install( fts_new_symbol("udpin"), udpin_instantiate);
   fts_class_install( fts_new_symbol("udpout"), udpout_instantiate);
