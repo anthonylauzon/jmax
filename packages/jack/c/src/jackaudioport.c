@@ -243,13 +243,6 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   jack_client_t* client = jackaudiomanager_get_jack_client();
 
   fts_audioport_delete(&self->head);
-
-  if (NULL != client)
-  {
-    jack_deactivate(client);
-    fts_log("[jackaudioport] jack client deactivated \n");
-  }
-
   if (0 != self->input_buffer)
   {
     fts_free(self->input_buffer);

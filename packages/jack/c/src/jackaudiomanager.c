@@ -65,6 +65,7 @@ typedef struct _jackaudiomanager_t
 
 
 
+static fts_symbol_t s_register;
 static fts_symbol_t s_unregister;
 
 static int nb_jack_audio_port = 0;
@@ -88,6 +89,11 @@ static fts_object_t* jackaudiomanager_object = NULL;
 
 
 static fts_symbol_t s_running;
+
+
+static fts_hashtable_t jack_port_input_ht;
+static fts_hashtable_t jack_port_output_ht;
+
 
 int get_jack_process_nframes()
 {
@@ -137,6 +143,71 @@ int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
 }
 
 
+static void jackaudiomanager_scan_ports(fts_hashtable_t* ht, int flags);
+
+/* jack port registration callback */
+void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, void* arg)
+{
+  jack_port_t* cur_port = jack_port_by_id(manager_jack_client, port_id);
+  fts_symbol_t port_name = fts_new_symbol(jack_port_name(cur_port));
+  fts_atom_t k, v;
+  fts_log("[jackaudiomanager] port registration callback port name: %s\n", port_name);
+  post("[jackaudiomanager] registration callback, port name: %s\n", port_name);
+
+
+  if (0 == n)
+  {
+    /* check if port is a jMax port */
+    if (1 == jack_port_is_mine(manager_jack_client, cur_port))
+    {
+      /* do nothing */
+      fts_log("[jackaudiomanager] port %s (id:%d) is mine \n", port_name, port_id);
+      return;
+    }
+    
+    /* port unregistered */
+    post("[jackaudiomanager] unregistered port : %s\n", port_name);
+
+    /* look in hashtable to remove port */
+    fts_set_symbol(&k, port_name);
+    if (fts_hashtable_get(&jack_port_input_ht, &k, &v))
+    {
+      fts_object_t* port = fts_get_object(&v);
+      fts_object_release(port);
+      fts_hashtable_remove(&jack_port_input_ht, &k);
+      fts_log("[jackaudiomanager] remove %s from input hashtable \n", port_name);
+      /* remove port */
+      fts_audiomanager_remove_port(port_name);
+    }
+    if (fts_hashtable_get(&jack_port_output_ht, &k, &v))
+    {
+      fts_object_t* port = fts_get_object(&v);
+      fts_object_release(port);
+      fts_hashtable_remove(&jack_port_output_ht, &k);
+      fts_log("[jackaudiomanager] remove %s from output hashtable \n", port_name);
+      /* remove port */
+      fts_audiomanager_remove_port(port_name);
+    }
+  }
+  else
+  {
+    /* update jack port hashtable */
+    /*
+      jack output ports are jMax inputs ports
+      and
+      jack input ports are jMax output ports 
+    */
+    
+    /* port registered */
+    post("[jackaudiomanager] registered port : %s\n", port_name);
+    jackaudiomanager_scan_ports(&jack_port_input_ht, JackPortIsOutput);
+    jackaudiomanager_scan_ports(&jack_port_output_ht, JackPortIsInput);    
+  }
+  
+  /* tell audio config to upload current configuration .... ? */
+/*   fts_send_message(jackaudiomanager_object, fts_s_print, 0, NULL); */
+  
+}
 
 static
 void create_jack_manager_client()
@@ -523,7 +594,7 @@ add_symbol_to_fifo(fts_fifo_t* fifo, fts_symbol_t s)
 }
 
 static void
-jackaudiomanager_scan_ports(fts_array_t* array, int flags)
+jackaudiomanager_scan_ports(fts_hashtable_t* ht, int flags)
 {
   const char** ports;
   int i;
@@ -539,13 +610,20 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
   i = 0;
   while(NULL != ports[i])
   {
+    fts_atom_t k,a;
     cur_sym = fts_new_symbol(ports[i]);
-    fts_array_append_symbol(array, cur_sym);
-    fts_log("[jackaudiomanager] append symbol : %s\n", ports[i]);
-    fts_set_int(at, flags);
-    fts_set_symbol(at + 1, fts_new_symbol(ports[i]));
-    port = (fts_audioport_t*)fts_object_create(jackaudioport_type, 2, at);
-    fts_audiomanager_put_port(cur_sym, port);
+    fts_set_symbol(&k, cur_sym);
+    /* add port to hashtable */
+    if (!fts_hashtable_get(ht, &k, &a))
+    {
+      fts_set_int(at, flags);
+      fts_set_symbol(at + 1, fts_new_symbol(ports[i]));
+      port = (fts_audioport_t*)fts_object_create(jackaudioport_type, 2, at);
+      fts_audiomanager_put_port(cur_sym, port);
+      fts_set_object(&a,(fts_object_t*)port);
+      fts_hashtable_put(ht, &k, &a);
+      fts_log("[jackaudiomanager] append symbol : %s with flags: %d\n", ports[i], flags);      
+    }
     ++i;
   }
 
@@ -661,27 +739,31 @@ jackaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
   jackaudiomanager_t* self;
   fts_bytestream_t* bytestream = fts_post_get_stream(ac, at);
   int i;
+  fts_iterator_t keys, values;
 
-  /* 
-     jack input are jmax output and
-     jack output are jmax input 
-  */
-  fts_array_clear(&jackaudiomanager_inputs_array);
-  jackaudiomanager_scan_ports(&jackaudiomanager_inputs_array, JackPortIsOutput);
-
-  fts_array_clear(&jackaudiomanager_outputs_array);
-  jackaudiomanager_scan_ports(&jackaudiomanager_outputs_array, JackPortIsInput);
 
   fts_spost(bytestream, "[jackaudiomanager] Input Ports\n");
-  for (i = 0; i < fts_array_get_size(&jackaudiomanager_inputs_array); ++i)
+  fts_hashtable_get_keys(&jack_port_input_ht, &keys);
+  fts_hashtable_get_values(&jack_port_input_ht, &values);
+  while (fts_iterator_has_more(&keys))
   {
-    fts_spost(bytestream, "%s\n", fts_get_symbol(fts_array_get_element(&jackaudiomanager_inputs_array, i)));
+    fts_atom_t k,v;
+
+    fts_iterator_next(&keys, &k);
+    fts_iterator_next(&values, &v);
+    fts_spost(bytestream, "%s\n", fts_get_symbol(&k));
   }
 
   fts_spost(bytestream, "[jackaudiomanager] Output Ports\n");
-  for (i = 0; i < fts_array_get_size(&jackaudiomanager_inputs_array); ++i)
+  fts_hashtable_get_keys(&jack_port_output_ht, &keys);
+  fts_hashtable_get_values(&jack_port_output_ht, &values);
+  while (fts_iterator_has_more(&keys))
   {
-    fts_spost(bytestream, "%s\n", fts_get_symbol(fts_array_get_element(&jackaudiomanager_outputs_array, i)));
+    fts_atom_t k,v;
+
+    fts_iterator_next(&keys, &k);
+    fts_iterator_next(&values, &v);
+    fts_spost(bytestream, "%s\n", fts_get_symbol(&k));
   }
 }
 
@@ -735,6 +817,13 @@ static void
 jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
+
+  /* check if a manager already exist ? */
+  if (NULL != jackaudiomanager_object)
+  {
+    o = jackaudiomanager_object;
+    return;
+  }
   jackaudiomanager_set_jack_client(self);
 
 
@@ -749,6 +838,11 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   /* create connections thread */
   create_run_thread(self);
 #endif
+
+  /* port_registration_callback */
+  jack_set_port_registration_callback(manager_jack_client,
+				      jackaudiomanager_port_registration_callback,
+				      NULL);
 }
 
 static void
@@ -808,19 +902,27 @@ void jackaudiomanager_config( void)
   create_jack_manager_client();
 
   s_default_client_name = fts_new_symbol("jMax_jackaudiomanager");
+
+  /* for jack port registration callback */
+  s_register = fts_new_symbol("register");
+  s_unregister = fts_new_symbol("unregister");
+
+  /* for connect/disconnect thread */
   s_running = fts_new_symbol("run");
 
   jackaudiomanager_type = fts_class_install( s, jackaudiomanager_instantiate);
 
-  fts_array_init(&jackaudiomanager_inputs_array, 0, 0);
-  fts_array_init(&jackaudiomanager_outputs_array, 0, 0);
-
-  fts_array_clear(&jackaudiomanager_inputs_array);
-  jackaudiomanager_scan_ports(&jackaudiomanager_inputs_array, JackPortIsOutput);
-
-  fts_array_clear(&jackaudiomanager_outputs_array);
-  jackaudiomanager_scan_ports(&jackaudiomanager_outputs_array, JackPortIsInput);
+  fts_hashtable_init(&jack_port_input_ht, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&jack_port_output_ht, FTS_HASHTABLE_SMALL);
+  /* 
+     jack output ports are input jMax ports 
+     and 
+     jack input ports are output jMax ports 
+  */
+  jackaudiomanager_scan_ports(&jack_port_input_ht, JackPortIsOutput);
+  jackaudiomanager_scan_ports(&jack_port_output_ht, JackPortIsInput);
   
+
   jackaudiomanager_thread_type = fts_class_install(fts_new_symbol("jackaudiomanager_thread"), 
 							   jackaudiomanager_thread_instantiate);
 
