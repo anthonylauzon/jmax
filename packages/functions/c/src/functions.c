@@ -47,7 +47,7 @@ functions_config(void);
 
 /**********************************************************************
 *
-*  C functions
+*  wrappers to C math functions with one argument are automatically generated
 *
 */
 
@@ -68,7 +68,7 @@ static fts_status_t FUN##_function( int ac, const fts_atom_t *at, fts_atom_t *re
 
 /**********************************************************************
 *
-*  misc math functions
+*  misc math functions with name change or multiple arguments
 *
 */
 
@@ -204,6 +204,29 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 
 /**********************************************************************
 *
+*  system functions
+*
+*/
+
+static fts_status_t
+typeof_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+    if (ac > 0)
+    {
+        fts_set_symbol(ret, fts_get_class_name(at));
+	return fts_ok;  
+    }
+    else
+    {
+	fts_set_void(ret);
+	return fts_status_new(fts_new_symbol("missing argument"));
+    }
+}
+
+
+
+/**********************************************************************
+*
 *  functions setup
 *
 */
@@ -220,4 +243,5 @@ functions_config(void)
   fts_function_install( fts_new_symbol("pow"), pow_function);
   fts_function_install( fts_new_symbol("random"), random_function);
   fts_function_install( fts_new_symbol("cat"), cat_function);
+  fts_function_install( fts_new_symbol("typeof"), typeof_function);
 }
