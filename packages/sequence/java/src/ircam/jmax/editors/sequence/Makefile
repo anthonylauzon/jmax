@@ -30,22 +30,22 @@ PACKAGE_DIR = ircam/jmax/editors/sequence
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 all: local_all
-	(cd track ; $(MAKE) all)
 	(cd actions ; $(MAKE) all)
 	(cd menus ; $(MAKE) all)
 	(cd renderers ; $(MAKE) all)
 	(cd tools ; $(MAKE) all)
+	(cd track ; $(MAKE) all)
 .PHONY: all
 
 local_all: $(CLASSES)
 .PHONY: local_all
 
 clean: local_clean
-	(cd track ; $(MAKE) clean)
 	(cd actions ; $(MAKE) clean)
 	(cd menus ; $(MAKE) clean)
 	(cd renderers ; $(MAKE) clean)
 	(cd tools ; $(MAKE) clean)
+	(cd track ; $(MAKE) clean)
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc
 
