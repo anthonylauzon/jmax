@@ -23,12 +23,24 @@ void protodecode_init( protodecode_t *pr)
 
 protodecode_status_t protodecode_run( protodecode_t *pr, unsigned char b)
 {
+  int ivalue;
+
   switch( pr->state) {
   case STATE_IN_TYPE:
     if ( b == INT_CODE)
       {
-	pr->state = STATE_IN_INT_0;
+	pr->state = STATE_IN_INT;
+	pr->counter = 4;
 	pr->int_value = 0;
+	return RUNNING;
+      }
+    else if ( b == FLOAT_CODE)
+      {
+	unsigned int zero = 0;
+
+	pr->state = STATE_IN_FLOAT;
+	pr->counter = 4;
+	pr->float_value = *((float *)&zero);
 	return RUNNING;
       }
     else if ( b == STRING_START_CODE)
@@ -41,25 +53,31 @@ protodecode_status_t protodecode_run( protodecode_t *pr, unsigned char b)
       return EOM_TOKEN;
     break;
 
-  case STATE_IN_INT_0:
-    pr->state = STATE_IN_INT_1;
-    pr->int_value = b;
-    return RUNNING;
-
-  case STATE_IN_INT_1:
-    pr->state = STATE_IN_INT_2;
+  case STATE_IN_INT:
     pr->int_value = (pr->int_value << 8) | b;
-    return RUNNING;
 
-  case STATE_IN_INT_2:
-    pr->state = STATE_IN_INT_3;
-    pr->int_value = (pr->int_value << 8) | b;
-    return RUNNING;
+    pr->counter--;
+    if (pr->counter == 0)
+      {
+	pr->state = STATE_IN_TYPE;
+	return INT_TOKEN;
+      }
+    else
+      return RUNNING;
 
-  case STATE_IN_INT_3:
-    pr->state = STATE_IN_TYPE;
-    pr->int_value = (pr->int_value << 8) | b;
-    return INT_TOKEN;
+  case STATE_IN_FLOAT:
+    ivalue = *((unsigned int *)&(pr->float_value));
+    ivalue = (ivalue << 8) | b;
+    pr->float_value = *((float *)&ivalue);
+
+    pr->counter--;
+    if (pr->counter == 0)
+      {
+	pr->state = STATE_IN_TYPE;
+	return FLOAT_TOKEN;
+      }
+    else
+      return RUNNING;
 
   case STATE_IN_STRING:
     if ( b != STRING_END_CODE)
@@ -88,6 +106,11 @@ protodecode_status_t protodecode_run( protodecode_t *pr, unsigned char b)
 int protodecode_get_int( protodecode_t *pr)
 {
   return pr->int_value;
+}
+
+float protodecode_get_float( protodecode_t *pr)
+{
+  return pr->float_value;
 }
 
 char *protodecode_get_string( protodecode_t *pr)

@@ -90,6 +90,26 @@ void protoencode_put_int( protoencode_t *pr, int value)
   pr->current += 5;
 }
 
+void protoencode_put_float( protoencode_t *pr, float value)
+{
+  unsigned char *p;
+  unsigned int ivalue;
+
+  if (pr->current + (1 + 4) >= pr->buffer_size)
+    protoencode_realloc_buffer( pr);
+
+  p = pr->buffer + pr->current;
+  ivalue = *((unsigned int *)&value);
+
+  *p++ = FLOAT_CODE;
+  *p++ = (unsigned char) ((ivalue >> 24) & 0xff);
+  *p++ = (unsigned char) ((ivalue >> 16) & 0xff);
+  *p++ = (unsigned char) ((ivalue >> 8) & 0xff);
+  *p++ = (unsigned char) ((ivalue >> 0) & 0xff);
+
+  pr->current += 5;
+}
+
 void protoencode_put_string( protoencode_t *pr, const char *s)
 {
   int len = strlen( s);

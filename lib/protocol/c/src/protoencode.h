@@ -102,6 +102,16 @@ extern void protoencode_end( protoencode_t *pr);
 extern void protoencode_put_int( protoencode_t *pr, int value);
 
 /*
+   Function: protoencode_put_float
+   Description:
+     Append a float value to the current message
+   Arguments:
+     pr: a pointer to a protoencode structure
+   Returns:
+*/
+extern void protoencode_put_float( protoencode_t *pr, float value);
+
+/*
    Function: protoencode_put_string
    Description:
      Append a string value to the current message

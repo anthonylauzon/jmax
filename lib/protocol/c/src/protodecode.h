@@ -15,26 +15,27 @@
 #ifndef _PROTODECODE_H
 #define _PROTODECODE_H
 
-#define STRING_MAX 256
-
 enum decode_state { 
   STATE_IN_TYPE,
-  STATE_IN_INT_0,
-  STATE_IN_INT_1,
-  STATE_IN_INT_2,
-  STATE_IN_INT_3,
+  STATE_IN_INT,
+  STATE_IN_FLOAT,
   STATE_IN_STRING
 };
 
+#define STRING_MAX 256
+
 typedef struct _protodecode_t {
   enum decode_state state;
+  int counter;
   int int_value;
+  float float_value;
   int string_len;
   char string_value[STRING_MAX];
 } protodecode_t;
 
 typedef enum {
   INT_TOKEN,
+  FLOAT_TOKEN,
   STRING_TOKEN,
   EOM_TOKEN,
   RUNNING
@@ -62,6 +63,8 @@ void f()
 
       if ( t == INT_TOKEN)
 	printf( "got int %d\n", protodecode_get_int( &pr));
+      else if ( t == FLOATT_TOKEN)
+	printf( "got float %f\n", protodecode_get_float( &pr));
       else if ( t == STRING_TOKEN)
 	printf( "got string %d\n", protodecode_get_string( &pr));
       else if ( t == EOM_TOKEN)
@@ -92,6 +95,8 @@ extern void protodecode_init( protodecode_t *pr);
    Returns:
      INT_TOKEN if decoded token is an int. It can then be retrieved
        by protodecode_get_int
+     FLOAT_TOKEN if decoded token is a float. It can then be retrieved
+       by protodecode_get_float
      STRING_TOKEN if decoded token is a string. It can then be retrieved
        by protodecode_get_string
      EOM_TOKEN if decoded token is end of message.
@@ -108,6 +113,17 @@ extern protodecode_status_t protodecode_run( protodecode_t *pr, unsigned char b)
      the token value
 */
 extern int protodecode_get_int( protodecode_t *pr);
+
+/*
+   Function: protodecode_get_float
+   Description:
+     Returns the current token, assumed it is a float
+   Arguments:
+     pr: a pointer to a protodecode structure
+   Returns:
+     the token value
+*/
+extern float protodecode_get_float( protodecode_t *pr);
 
 /*
    Function: protodecode_get_string
