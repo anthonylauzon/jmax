@@ -159,6 +159,6 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
     itsStringWriter.close();
 
     itsStringWriter = new StringWriter();//we had to do so. flush seems not to work properly on StringWriters(printing again after a flush just appends)
-    itsFtsGroup.setSize(0);
+    itsFtsGroup.removeAllElements();
   }
 }

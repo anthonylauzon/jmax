@@ -1,7 +1,7 @@
 //	LA VERA SKETCH
 package ircam.jmax.editors.ermes;
 
-import java.awt.*;
+import java.awt.*; 
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.util.*;
