@@ -1,8 +1,11 @@
-dnl $Id$
+dnl $Id: configure.in,v 1.87 2002/08/30 16:44:37 schwarz Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
-dnl $Log$
+dnl $Log: configure.in,v $
+dnl Revision 1.87  2002/08/30 16:44:37  schwarz
+dnl Added cvs id and log
+dnl
 dnl Revision 1.86 2002/08/30 16:41:10 schwarz
 dnl Added --with-sdif option and configuration options for package sdif.
 dnl
@@ -208,31 +211,52 @@ ROOTDIR="${datadir}/jmax"
 AC_SUBST(FTSDIR)
 AC_SUBST(ROOTDIR)
 
-dnl Check for jack support
-AC_ARG_ENABLE(jack,
-  [ --enable-jack[=value]	compile jack package [default=no]],
-  with_jack="yes",
+
+
+dnl ###########################################################################
+dnl choice of JACK package
+with_jack="no"
+AC_ARG_ENABLE(jack, dnl newline and indentation:
+[ 
+  --enable-jack[=value]	compile jack package [default=no]],
+  with_jack="$enableval",
   with_jack="no")
-if test "$with_jack" = "yes"
-then
-	dnl Add jack in packages to compile
-	ADDITIONAL_PACKAGES="jack"
-fi
- 
+
+dnl options to find JACK header and JACK library 
 AC_ARG_WITH(jack-cflags,
   [  --with-jack-cflags=JACK_CFLAGS	jack support cflags (optional)],
-  [JACK_CFLAGS="$withval"])
+  [JACK_CFLAGS="$withval";
+  with_jack="yes"])
+
 AC_ARG_WITH(jack-ldflags,
   [  --with-jack-ldflags=JACK_LDFLAGS	jack support ldflags (optional)],
-  [JACK_LDFLAGS="$withval"])
-dnl add a jack test here
+  [JACK_LDFLAGS="$withval";
+  with_jack="yes"])
+
+dnl output JACK feature
+if test "$with_jack" = "yes"
+then
+	dnl AC_MSG_CHECKING(for JACK support)
+	dnl TODO: add a jack test here
+	dnl Use JACK_CFLAGS and JACK_LDFLAGS before testing
+	dnl Display result value of test
+	dnl AC_MSG_RESULT($with_jack)	
+
+	dnl Add jack in packages to compile
+	ADDITIONAL_PACKAGES="$ADDITIONAL_PACKAGES jack"
+	dnl Define macro to enable scheduler special function (fts_sched_run_one_tick)
+	CFLAGS="$CFLAGS -DUSE_JACK"
+fi
+
+
+
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
 
 dnl ###########################################################################
 dnl choice of SDIF package
-
+with_sdif="no"
 AC_ARG_WITH(sdif, dnl newline and indentation:
 [
   --with-sdif[=value]		compile sdif package [default=no]])
@@ -245,11 +269,11 @@ AC_ARG_WITH(sdif-incl,
     [    SDIF_INCLUDE="-I$withval";  with_sdif="yes"; ])
 
 AC_ARG_WITH(sdif-libdir,
-    [    --with-sdif-lib=PATH	directory where SDIF library is installed [optional]],
+    [    --with-sdif-libdir=PATH	directory where SDIF library is installed [optional]],
     [    SDIF_LIBDIR="-L$withval"    with_sdif="yes"; ])
 
 AC_ARG_WITH(sdif-libname,
-    [    --with-sdif-lib=LIBNAME	base name of SDIF library to use [default: sdif]],
+    [    --with-sdif-libname=LIBNAME	base name of SDIF library to use [default: sdif]],
     [    SDIF_LIBNAME="-l$withval";    with_sdif="yes";  ],
     [    if test "$with_debug" = "yes";  then
 	     SDIF_LIBNAME="-lsdif-debug" 
@@ -440,3 +464,8 @@ utils/rpm/Makefile
 utils/rpm/jmax.spec
 utils/xml/Makefile
 )
+
+
+echo
+echo Configuration complete. Type \'make\' to build jMax
+echo
