@@ -48,9 +48,11 @@ namespace client {
     char *_s;
   };
 
+  unsigned int getNextPrime(unsigned int n);
 };
 };
 };
 
 std::ostream &operator<<( std::ostream &os, const ircam::fts::client::FtsSymbol &s);
+
 
