@@ -33,7 +33,7 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 ARCH_OPT_CFLAGS := -O6 -funroll-all-loops
 ARCH_OPT_LDFLAGS := 
 
-FTS_SYS_LIBS = -lm -ldl
+FTS_SYS_LIBS = -lm -ldl -laudiofile -lpthread
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 

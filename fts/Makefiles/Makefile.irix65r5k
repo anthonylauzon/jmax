@@ -50,7 +50,7 @@ ARCH_DEBUG_CFLAGS := -LANG:restrict
 ## FTS specific declarations
 ##
 
-FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
 # (fd) replaced by (great move...)
 # BUT it doesn't work with purify...
 # FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lpthread

@@ -28,6 +28,7 @@ class FtsDatagramStream extends FtsStream
   int sequence = -1;
   final static private int max_packet_size = 2048;
   DatagramSocket socket = null;
+  int receivedPacketSize;
   byte in_data[] = new byte[max_packet_size];
   byte out_data[] = new byte[max_packet_size];
   int in_fill_p = -1;           // point to the next char to read in in_data, -1 if no packet read yet.
@@ -165,12 +166,15 @@ class FtsDatagramStream extends FtsStream
 	      }
 	  }
 
+	receivedPacketSize = ((in_data[1] < 0 ? in_data[1] + 256 : in_data[1]) * 256 +
+			      ((in_data[2] < 0 ? in_data[2] + 256 : in_data[2])));
+
 	in_fill_p = 1;
       }
 
     c = in_data[in_fill_p++];
 
-    if (in_fill_p >= in_packet.getLength())
+    if (in_fill_p >=  receivedPacketSize)
       in_fill_p = -1;
 
     return c;

@@ -58,6 +58,7 @@ public class FtsServer  implements Runnable
   /** The list of listener of update groups */
   
   MaxVector updateGroupListeners;
+  int updateGroupDepth = 0;
 
   /** If true, put a 10 sec timeout on Sync;
    */
@@ -112,7 +113,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("savePatcherBmax(" + patcher + "," + filename + ")");
+      System.err.println("> savePatcherBmax(" + patcher + "," + filename + ")");
 
     try
       {
@@ -134,7 +135,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("loadPatcherBmax(" + parent + ", " + id + ", " + filename + ")");
+      System.err.println("> loadPatcherBmax(" + parent + ", " + id + ", " + filename + ")");
 
     try
       {
@@ -157,7 +158,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("loadPatcherDpat(" + parent + ", " + id + ", " + filename + ")");
+      System.err.println("> loadPatcherDpat(" + parent + ", " + id + ", " + filename + ")");
 
     try
       {
@@ -180,7 +181,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendAbstractionDeclare(" + abstraction + ", " + filename + ")");
+      System.err.println("> sendAbstractionDeclare(" + abstraction + ", " + filename + ")");
 
     try
       {
@@ -203,7 +204,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendAbstractionDeclarePath(" + path + ")");
+      System.err.println("> sendAbstractionDeclarePath(" + path + ")");
 
     try
       {
@@ -225,7 +226,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendTemplateDeclare(" + template + ", " + filename + ")");
+      System.err.println("> sendTemplateDeclare(" + template + ", " + filename + ")");
 
     try
       {
@@ -248,7 +249,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendTemplateDeclarePath(" + path + ")");
+      System.err.println("> sendTemplateDeclarePath(" + path + ")");
 
     try
       {
@@ -273,7 +274,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
+      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
 
     try
       {
@@ -300,7 +301,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("newObject(" + patcher + ", " + id + ", " + description + ")");
+      System.err.println("> newObject(" + patcher + ", " + id + ", " + description + ")");
 
     try
       {
@@ -326,7 +327,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendDownloadObject(" + id + ")");
+      System.err.println("> sendDownloadObject(" + id + ")");
 
     try
       {
@@ -349,7 +350,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("redefinePatcherObject(" + description + ")");
+      System.err.println("> redefinePatcherObject(" + description + ")");
 
     try
       {
@@ -372,7 +373,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("redefineObject(" + description + ")");
+      System.err.println("> redefineObject(" + description + ")");
 
     try
       {
@@ -396,7 +397,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("repositionInletObject(" + obj + ", " + pos + ")");
+      System.err.println("> repositionInletObject(" + obj + ", " + pos + ")");
 
     try
       {
@@ -418,7 +419,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("repositionOutletObject(" + obj + ", " + pos + ")");
+      System.err.println("> repositionOutletObject(" + obj + ", " + pos + ")");
 
     try
       {
@@ -441,7 +442,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("deleteObject(" + obj + ")");
+      System.err.println("> deleteObject(" + obj + ")");
 
     if (obj.getObjectId() != -1)
       {
@@ -465,7 +466,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
+      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
 
     try
       {
@@ -492,7 +493,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
+      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
 
     try
       {
@@ -516,7 +517,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
+      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
 
     try
       {
@@ -543,7 +544,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendSetMessage(" + dst + ", " + values  + ")");
+      System.err.println("> sendSetMessage(" + dst + ", " + values  + ")");
 
     try
       {
@@ -572,7 +573,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendSetMessage(" + obj + ", " + description + ")");
+      System.err.println("> sendSetMessage(" + obj + ", " + description + ")");
 
     try
       {
@@ -598,7 +599,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("newConnection(" + id + "," + from + ", " + outlet + ", " +
+      System.err.println("> newConnection(" + id + "," + from + ", " + outlet + ", " +
 			 to + ", " + inlet + ")");
 
     try
@@ -625,7 +626,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("sendDownloadConnection(" + id + ")");
+      System.err.println("> sendDownloadConnection(" + id + ")");
 
     try
       {
@@ -647,7 +648,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug) 
-      System.err.println("deleteConnection(" + connection + ")");
+      System.err.println("> deleteConnection(" + connection + ")");
 
     try
       {
@@ -669,7 +670,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+      System.err.println("> putObjectProperty(" + object + ", " + name + ", " +
 			 value + ")");
 
     try
@@ -694,7 +695,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+      System.err.println("> putObjectProperty(" + object + ", " + name + ", " +
 			 value + ")");
 
     try
@@ -719,7 +720,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+      System.err.println("> putObjectProperty(" + object + ", " + name + ", " +
 			 value + ")");
 
     try
@@ -744,7 +745,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("askObjectProperty(" + object + ", " + name + ")");
+      System.err.println("> askObjectProperty(" + object + ", " + name + ")");
 
     try
       {
@@ -767,7 +768,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("ucsMessage(" + args + ")");
+      System.err.println("> ucsMessage(" + args + ")");
 
     try
       {
@@ -929,7 +930,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
 
     try
       {
@@ -951,7 +952,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
 
     try
       {
@@ -973,7 +974,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug) 
-      System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + "," + arg + ")");
 
     try
       {
@@ -997,7 +998,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug) 
-      System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + "," + args + ")");
 
     try
       {
@@ -1022,7 +1023,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + "," + args + ")");
 
     try
       {
@@ -1047,7 +1048,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data +
+      System.err.println( "> remoteCall(" + data +
 			  ", " + key + ", " + offset + ", " + size + ", " + values 
 			  + "[" + values.length + "]" + ")");
 
@@ -1073,7 +1074,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + ", " + id + ", " + name + ", " + args + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + ", " + id + ", " + name + ", " + args + ")");
 
     try
       {
@@ -1100,7 +1101,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
 
     try
       {
@@ -1127,7 +1128,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
+      System.err.println( "> remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
 
     try
       {
@@ -1153,7 +1154,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("recomputeErrorObjects()");
+      System.err.println("> recomputeErrorObjects()");
 
     try
       {
@@ -1172,7 +1173,7 @@ public class FtsServer  implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("shutdown");
+      System.err.println("> shutdown");
 
     try
       {
@@ -1201,11 +1202,13 @@ public class FtsServer  implements Runnable
 
   final public synchronized boolean syncToFts()
   {
+    boolean ret;
+
     if (! connected)
       return false;
 
     if (FtsServer.debug)
-      System.err.println("syncToFts()");
+      System.err.println("> syncToFts()");
 
     try
       {
@@ -1218,9 +1221,14 @@ public class FtsServer  implements Runnable
       }
 
     if (timeoutOnSync)
-      return waitForPong(10000);
+      ret = waitForPong(10000);
     else
-      return waitForPong(0);
+      ret = waitForPong(0);
+
+    if (FtsServer.debug)
+      System.err.println("> sync Done");
+
+    return ret;
   }
 
   /* Version with a timeout, to check if FTS is still alive 
@@ -1230,11 +1238,13 @@ public class FtsServer  implements Runnable
 
   final public synchronized boolean syncToFts(int timeOut)
   {
+    boolean ret;
+
     if (! connected)
       return false;
 
     if (FtsServer.debug)
-      System.err.println("syncToFts(" + timeOut + ")");
+      System.err.println("> syncToFts(" + timeOut + ")");
 
     try
       {
@@ -1246,7 +1256,12 @@ public class FtsServer  implements Runnable
       {
       }
 
-    return waitForPong(timeOut);
+    ret = waitForPong(timeOut);
+
+    if (FtsServer.debug)
+      System.err.println("> sync Done");
+
+    return ret;
   }
 
 
@@ -1376,21 +1391,21 @@ public class FtsServer  implements Runnable
 		{
 		  int v = stream.getNextIntArgument();
 
-		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  System.err.println("< SetPropertyValue  " + prop + " to " + v + " for object " + obj);
 		  obj.localPut(prop, v);
 		}
 	      else if (stream.nextIsFloat())
 		{
 		  float v = stream.getNextFloatArgument();
 
-		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  System.err.println("< SetPropertyValue  " + prop + " to " + v + " for object " + obj);
 		  obj.localPut(prop, v);
 		}
 	      else
 		{
 		  Object v = stream.getNextArgument();
 
-		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  System.err.println("< SetPropertyValue  " + prop + " to " + v + " for object " + obj);
 		  obj.localPut(prop, v);
 		}
 	    }
@@ -1416,7 +1431,7 @@ public class FtsServer  implements Runnable
 	  obj.handleMessage(stream);
 
 	  if (FtsServer.debug)
-	    System.err.println("ObjectMessage for " + obj + " in " + stream);
+	    System.err.println("< ObjectMessage for " + obj + " in " + stream);
 	}
       break;
 
@@ -1425,19 +1440,35 @@ public class FtsServer  implements Runnable
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
+
+
+	if (FtsServer.debug)
+	  System.err.println("< Pong Message");
+
 	deliverPong();
 	break;
 	
       case FtsClientProtocol.fts_update_group_start_cmd:
-	if (updateGroupListeners != null)
-	  for (int i = 0; i < updateGroupListeners.size(); i++)
-	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	
+	if (updateGroupDepth == 0)
+	  {
+	    updateGroupDepth++;
+
+	      if (updateGroupListeners != null)
+		for (int i = 0; i < updateGroupListeners.size(); i++)
+		  ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	  }
 	break;
 
       case FtsClientProtocol.fts_update_group_end_cmd:
-	if (updateGroupListeners != null)
-	  for (int i = 0; i < updateGroupListeners.size(); i++)
-	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+	updateGroupDepth--;
+
+	if (updateGroupDepth == 0)
+	  {
+	    if (updateGroupListeners != null)
+	      for (int i = 0; i < updateGroupListeners.size(); i++)
+		((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+	  }
 	break;
 
 	// Messages add to support creation on demand of FtsObject 
@@ -1455,7 +1486,7 @@ public class FtsServer  implements Runnable
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
-		System.err.println("NewObjectMessage " + newObj + " in " + stream);
+		System.err.println("< NewObjectMessage " + newObj + " in " + stream);
 	    }
 	  catch (FtsException e)
 	    {
@@ -1475,7 +1506,7 @@ public class FtsServer  implements Runnable
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
-		System.err.println("NewObjectMessage " + newObj + " in " + stream);
+		System.err.println("< NewObjectMessage " + newObj + " in " + stream);
 	    }
 	  catch (FtsException e)
 	    {
@@ -1505,7 +1536,7 @@ public class FtsServer  implements Runnable
 	  registerConnection(c);
 
 	  if (FtsServer.debug)
-	    System.err.println("New Connection #" + id + " " + from + "." + outlet + " -> " + to + "." + inlet);
+	    System.err.println("< New Connection #" + id + " " + from + "." + outlet + " -> " + to + "." + inlet);
 	}
       break;
 
@@ -1525,7 +1556,7 @@ public class FtsServer  implements Runnable
 	  c.redefine(from, outlet, to, inlet);
 
 	  if (FtsServer.debug)
-	    System.err.println("Connection Redefined " + c);
+	    System.err.println("< Connection Redefined " + c);
 	}
       break;
 
@@ -1536,7 +1567,7 @@ public class FtsServer  implements Runnable
 	  c = stream.getNextConnectionArgument();
 
 	  if (FtsServer.debug) 
-	    System.err.println("Connection Release " + c);
+	    System.err.println("< Connection Release " + c);
 
 	  Fts.getSelection().removeConnection(c);
 	  c.release();
@@ -1550,7 +1581,7 @@ public class FtsServer  implements Runnable
 	  obj = stream.getNextObjectArgument();
 
 	  if (FtsServer.debug) 
-	    System.err.println("Object Release" + obj);
+	    System.err.println("< Object Release" + obj);
 
 	  obj.release();
 	  break;
@@ -1563,7 +1594,7 @@ public class FtsServer  implements Runnable
 	  obj = stream.getNextObjectArgument();
 
 	  if (FtsServer.debug) 
-	    System.err.println("Object Release Data" + obj);
+	    System.err.println("< Object Release Data" + obj);
 
 	  obj.releaseData();
 	  break;
@@ -1575,7 +1606,7 @@ public class FtsServer  implements Runnable
 	  int key = stream.getNextIntArgument();
 
 	  if (FtsServer.debug) 
-	    System.err.println("remote Call stream: " + data + " key " + key + " stream "  + stream);
+	    System.err.println("< remote Call stream: " + data + " key " + key + " stream "  + stream);
 
 	  data.call(key, stream);
 

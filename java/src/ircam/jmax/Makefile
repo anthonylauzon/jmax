@@ -22,6 +22,7 @@ include Sources2
 
 all:  
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
+	(cd editors/patcher ; $(MAKE) all)
 .PHONY: all
 
 

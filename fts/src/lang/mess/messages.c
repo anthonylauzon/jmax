@@ -150,7 +150,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
   fts_class_mess_t *mess;
   fts_class_t *cl = o->cl;
   fts_class_mess_t **messtable;
-  int i;
+  unsigned int i;
 
   if (winlet == fts_SystemInlet)
     in = cl->sysinlet;

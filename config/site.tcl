@@ -40,4 +40,5 @@ defineHost "amati.ircam.fr"      octane
 defineHost "marimba.ircam.fr"    o2r5ki63
 defineHost "libido.ircam.fr"     linuxpc
 defineHost "linotte.ircam.fr"    linuxpc
+defineHost "lindberg.ircam.fr"   linuxpc
 

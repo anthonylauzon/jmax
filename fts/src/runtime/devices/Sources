@@ -15,7 +15,7 @@ AUDIO_SOURCES = sgidev.c
 endif
 
 ifeq ($(AUDIO_LIBRARY),sgial2)
-AUDIO_SOURCES = sgial2dev.c sfdev.c shmdev.c
+AUDIO_SOURCES = sgial2dev.c shmdev.c
 endif
 
 ifeq ($(AUDIO_LIBRARY),oss)
@@ -31,7 +31,8 @@ ifeq ($(OS_TYPE),solaris2)
 	AUDIO_SOURCES = solaris2dev.c
 endif
 
-SOURCES = devconf.c \
+SOURCES = sfdev.c \
+	  devconf.c \
 	  devices.c \
 	  profdev.c \
 	  null.c    \

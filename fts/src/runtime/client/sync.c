@@ -30,8 +30,8 @@ void fts_client_sync_init(void)
 }
 
 
-/* The Sync subsystem; just answer to message to subcommand
-   PING with a message back for subsystem PONG; it is used for syncronization;
+/* The Sync subsystem; just answer to message 
+   SYNC_CODE with a message SYNC_DONE_CODE; it is used for syncronization;
    A client can send a number of requests, and then a PING; at the reception
    of the PONG, it is sure that all the answerback invoked by the previous 
    requests has been processed.

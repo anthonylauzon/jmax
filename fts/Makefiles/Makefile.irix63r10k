@@ -43,7 +43,7 @@ ARCH_OPT_SOFLAGS = $(SYSTEM_OPT_SOFLAGS)
 ## FTS specific declarations
 ##
 
-FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 FTS_USER_LIBS_FLAGS = -all

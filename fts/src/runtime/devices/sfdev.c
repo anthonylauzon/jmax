@@ -13,8 +13,14 @@
  */
 
 #include <pthread.h>
-#include <dmedia/audiofile.h>
+#include <audiofile.h>
+#include <string.h>
 #include "fts.h"
+
+
+#ifdef SGI
+#define HAVE_VIRTUAL_SAMPLE_FORMAT
+#endif
 
 /* Implementation of asynchronius io for sound files,
    based on pthreads */
@@ -44,10 +50,15 @@
    that can be used to destroy other shared resources used for the communication.
    */
 
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+typedef float fifo_sample_t;
+#else
+typedef short fifo_sample_t;
+#endif
 
 typedef struct fts_sample_fifo
 {
-  float *buf;			/* the buffer actually holding the */
+  fifo_sample_t *buf;		/* the buffer actually holding the */
   int    size;			/* its total size */
 
   /* Reading */
@@ -78,21 +89,6 @@ typedef struct fts_sample_fifo
 } fts_sample_fifo_t;
 
 
-static void fts_sample_fifo_describe(const char *msg, fts_sample_fifo_t *fifo)
-{
-  fprintf(stderr, "%s: FIFO %lx\n", msg, (unsigned int) fifo);
-  fprintf(stderr, "\tbuf %lx\n", (unsigned int) fifo->buf);
-  fprintf(stderr, "\tsize %d\n", fifo->size);
-  fprintf(stderr, "\tread_p %d\n", fifo->read_p);
-  fprintf(stderr, "\tread_block %d\n", fifo->read_block);
-  fprintf(stderr, "\tread_pending %d\n", fifo->read_pending);
-  fprintf(stderr, "\treader_eof %d\n", fifo->reader_eof);
-  fprintf(stderr, "\twrite_p %d\n", fifo->write_p);
-  fprintf(stderr, "\twrite_block %d\n", fifo->write_block);
-  fprintf(stderr, "\twrite_pending %d\n", fifo->write_pending);
-  fprintf(stderr, "\twriter_eof %d\n", fifo->writer_eof);
-}
-
 static fts_heap_t *sample_fifo_heap;
 
 /* Create a new empty fifo, of a given size */
@@ -101,7 +97,7 @@ static fts_sample_fifo_t *fts_sample_fifo_new(int size, int read_block, int writ
 {
   fts_sample_fifo_t *sf= (fts_sample_fifo_t *) fts_heap_alloc(sample_fifo_heap);
 
-  sf->buf = (float *) fts_malloc(sizeof(float) * size);
+  sf->buf = (fifo_sample_t *) fts_malloc(sizeof(fifo_sample_t) * size);
   sf->size = size;
 
   sf->read_p       = 0;
@@ -155,13 +151,13 @@ static void fts_sample_fifo_destroy(fts_sample_fifo_t *sf)
 
    the buffer is locked until the call to _got (see below) */
 
-static int fts_sample_fifo_want_to_get(fts_sample_fifo_t *sf, float **p)
+static int fts_sample_fifo_want_to_get(fts_sample_fifo_t *sf, fifo_sample_t **p)
 {
   int ret;
 
   if (sf->writer_eof)
     {
-      *p = (float *)0;
+      *p = (fifo_sample_t *)0;
       return 0;
     }
 
@@ -218,13 +214,13 @@ static void fts_sample_fifo_got(fts_sample_fifo_t *sf)
    be a divisor of the fifo size; it can blocks the thread until
    the buffer is available */
 
-static int fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf, float **p)
+static int fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf, fifo_sample_t **p)
 {
   int ret;
 
   if (sf->reader_eof)
     {
-      *p = (float *)0;
+      *p = (fifo_sample_t *)0;
       return 0;
     }
 
@@ -347,7 +343,7 @@ static int fts_sample_fifo_is_writer_eof(fts_sample_fifo_t *sf)
 }
 
 
-static void fts_sample_fifo_init()
+static void fts_sample_fifo_init(void)
 {
   sample_fifo_heap = fts_heap_new(sizeof(fts_sample_fifo_t));
 }
@@ -393,7 +389,7 @@ static fts_heap_t *cmd_fifo_heap;
 
 /* Create a new empty fifo, of a given size */
 
-static fts_cmd_fifo_t *fts_cmd_fifo_new()
+static fts_cmd_fifo_t *fts_cmd_fifo_new(void)
 {
   fts_cmd_fifo_t *cf= (fts_cmd_fifo_t *) fts_heap_alloc(cmd_fifo_heap);
 
@@ -484,7 +480,7 @@ static void fts_cmd_fifo_add_command(fts_cmd_fifo_t *cf,  void (*fun)(void *), v
   pthread_mutex_unlock(&(cf->mutex));
 }
 
-static void fts_cmd_fifo_init()
+static void fts_cmd_fifo_init(void)
 {
   cmd_fifo_heap = fts_heap_new(sizeof(fts_cmd_fifo_t));
 }
@@ -509,7 +505,7 @@ static void fts_async_call(void (*fun)(void *), void *v)
   fts_cmd_fifo_add_command(async_call_fifo, fun, v);
 }
 
-static void fts_async_init()
+static void fts_async_init(void)
 {
   int rc;
 
@@ -588,17 +584,6 @@ struct readsf_data
   int active; /* Used directly by the readsf object */
 };
 
-
-static void readsf_data_describe(const char *msg, struct readsf_data *data)
-{
-  fprintf(stderr, "%s: DATA %lx\n", msg, (unsigned int) data);
-  fprintf(stderr, "\tfifo %lx\n", (unsigned int) data->fifo);
-  fprintf(stderr, "\tfile_block %d\n", data->file_block);
-  fprintf(stderr, "\tfifo_size_p %d\n", data->fifo_size);
-  fprintf(stderr, "\tfile_name %s\n", fts_symbol_name(data->file_name));
-  fprintf(stderr, "\tnch %d\n", data->nch);
-  fprintf(stderr, "\tactive %d\n", data->active);
-}
 
 /* Destroy callback */
 
@@ -706,7 +691,7 @@ sgi_readsf_get(fts_word_t *argv)
   int ch;
   int i,j;
   int doit = 0;
-  float *in;
+  fifo_sample_t *in;
   int ret;
 
   nchans = fts_word_get_long(argv + 1);
@@ -738,7 +723,13 @@ sgi_readsf_get(fts_word_t *argv)
 	  out = (float *) fts_word_get_ptr(argv + 3 + ch);
 
 	  for (i = ch, j = 0; j < n; i = i + nchans, j++)
-	    out[j] = in[i];
+	    {
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+	      out[j] = in[i];
+#else
+	      out[j] = ((float) in[i] / 32768.0f);
+#endif
+	    }
 	}
     }
   else
@@ -754,7 +745,13 @@ sgi_readsf_get(fts_word_t *argv)
 	  for (i = ch, j = 0; j < n; i = i + nchans, j++)
 	    {
 	      if (i < ret)
-		out[j] = in[i];
+		{
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+		  out[j] = in[i];
+#else
+		  out[j] = ((float) in[i] / 32768.0f);
+#endif	  
+		}
 	      else
 		out[j] = 0.0f;
 	    }
@@ -794,6 +791,9 @@ static void *fts_readsf_worker(void *data)
     }
   else
     {
+      /* Note that on Linux the number of channels must match ! */
+
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
       /* Set the number of virtual channels */
 
       afSetVirtualChannels(file, AF_DEFAULT_TRACK, dev_data->nch);
@@ -801,6 +801,7 @@ static void *fts_readsf_worker(void *data)
       /* Set the virtual format of the file */
 
       afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
+#endif
     }
 
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
@@ -808,7 +809,7 @@ static void *fts_readsf_worker(void *data)
   while (! eof)
     {
       int ret;
-      float *p;
+      fifo_sample_t *p;
 
       ret = fts_sample_fifo_want_to_put(fifo, &p);
 
@@ -926,17 +927,6 @@ struct writesf_data
   int active; /* Used directly by the writesf object */
 };
 
-
-static void writesf_data_describe(const char *msg, struct writesf_data *data)
-{
-  fprintf(stderr, "%s: DATA %lx\n", msg, (unsigned int) data);
-  fprintf(stderr, "\tfifo %lx\n", (unsigned int) data->fifo);
-  fprintf(stderr, "\tfile_block %d\n", data->file_block);
-  fprintf(stderr, "\tfifo_size_p %d\n", data->fifo_size);
-  fprintf(stderr, "\tfile_name %s\n", fts_symbol_name(data->file_name));
-  fprintf(stderr, "\tnch %d\n", data->nch);
-  fprintf(stderr, "\tactive %d\n", data->active);
-}
 
 void writesf_destroy_data(void *dev_data)
 {
@@ -1075,7 +1065,7 @@ sgi_writesf_put(fts_word_t *argv)
 
       if (dev_data->active)
 	{
-	  float *out;
+	  fifo_sample_t *out;
 	  int ret;
 
 	  ret = fts_sample_fifo_want_to_put(dev_data->fifo, &out);
@@ -1095,8 +1085,13 @@ sgi_writesf_put(fts_word_t *argv)
 
 		  in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
 		  for (i = ch, j = 0; j < n; i = i + nchans, j++)
 		    out[i] = in[j];
+#else
+		  for (i = ch, j = 0; j < n; i = i + nchans, j++)
+		    out[i] = (short) (in[j] * 32768.0f);
+#endif
 		}
 
 	      /* Unlock the buffer */
@@ -1146,9 +1141,11 @@ static void *fts_writesf_worker(void *data)
     }
   else
     {
+#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
       /* Set the virtual format of the file */
 
       afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
+#endif
     }
 
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
@@ -1156,13 +1153,9 @@ static void *fts_writesf_worker(void *data)
   while (! eof)
     {
       int ret;
-      float *p;
+      fifo_sample_t *p;
 
       ret = fts_sample_fifo_want_to_get(fifo, &p);
-
-      /* @@@ Test ret; if it is not equal to the block size,
-	 we are in reader_eof; write what you can, and exit the thread
-	 */
 
       afWriteFrames(file, AF_DEFAULT_TRACK, p, ret / dev_data->nch);
 

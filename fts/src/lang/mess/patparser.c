@@ -157,7 +157,7 @@ void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
 static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
 {
   int i;
-
+ 
   fts_patlex_next_token(in);
 
   i = fts_get_int(&(in->val));

@@ -110,8 +110,8 @@ struct fd_dev_data
   /* Out data */
 
   char *put_buf;
-  int put_bufsize;
-  int  put_buf_fill;
+  unsigned int put_bufsize;
+  unsigned int  put_buf_fill;
   int  put_fd;
 
   /* socket server related  */
@@ -233,7 +233,7 @@ fts_status_t fd_dev_put( fts_dev_t *dev, unsigned char c)
 
   if (d->put_buf_fill >= d->put_bufsize)
     {
-      int r;
+      unsigned int r;
 
       r = write(d->put_fd, d->put_buf, d->put_buf_fill);
 
@@ -255,7 +255,7 @@ fts_status_t fd_dev_flush( fts_dev_t *dev)
 
   if (d->put_buf_fill > 0)
     {
-      int r;
+      unsigned int r;
 
       r = write(d->put_fd, d->put_buf, d->put_buf_fill);
 
@@ -1094,7 +1094,7 @@ typedef struct udp_dev_data
   /* Out data */
 
   char put_buf[UDP_PACKET_SIZE];
-  int  put_buf_fill;
+  unsigned int  put_buf_fill;
 
   /* socket related  */
 
@@ -1117,7 +1117,7 @@ static udp_dev_data_t *make_udp_data(void)
   p = fts_malloc(sizeof(udp_dev_data_t));
   p->get_read_p = 0;
   p->get_size = 0;
-  p->put_buf_fill = 1;
+  p->put_buf_fill = 3;
   p->sequence = 0;
   return p;
 }
@@ -1207,14 +1207,19 @@ udp_dev_flush(fts_dev_t *dev)
 {
   udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
 
-  if (dev_data->put_buf_fill > 1)
+  if (dev_data->put_buf_fill > 3)
     {
-      int r;
+      unsigned int r;
 
       /* set the sequence number and send */
 
       dev_data->put_buf[0] = dev_data->sequence;
-      
+
+      /* Set the packet size */
+
+      dev_data->put_buf[1] = dev_data->put_buf_fill / 256;
+      dev_data->put_buf[2] = dev_data->put_buf_fill % 256;
+
       r = sendto(dev_data->socket, dev_data->put_buf, dev_data->put_buf_fill, 0,
 		 &(dev_data->client_addr), sizeof(dev_data->client_addr));
 
@@ -1222,11 +1227,11 @@ udp_dev_flush(fts_dev_t *dev)
 
       if (r != dev_data->put_buf_fill)
 	{
-	  dev_data->put_buf_fill = 1; /* leave place for the sequence number */
+	  dev_data->put_buf_fill = 3; /* leave place for the sequence number and packet size*/
 	  return &fts_dev_io_error; /* error: File IO error */
 	}
       else
-	dev_data->put_buf_fill = 1;/* leave place for the sequence number */
+	dev_data->put_buf_fill = 3;/* leave place for the sequence number and packet size */
     }
   
   return fts_Success;

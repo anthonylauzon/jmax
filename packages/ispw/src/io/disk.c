@@ -261,7 +261,7 @@ readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   dsp_add_funcall(fts_dev_class_get_sig_get_fun_name(fts_dev_class_get_by_name(fts_new_symbol("readsf"))),
 		  3 + this->nchans,
-		  argv);	  
+		  argv);
 
   fts_free(argv);
 }

@@ -29,6 +29,7 @@
 #define FTS_ARCH_NAME "linux"
 #define restrict
 #define HAS_UNIX
+#define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
 #define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL NO

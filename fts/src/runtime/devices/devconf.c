@@ -38,9 +38,7 @@ extern void profdev_init(void);
 extern void ossdev_init(void);
 #endif
 
-#ifdef HAS_PTHREADS
 extern void sfdev_init(void);
-#endif
 
 #ifdef SGI
 extern void shmdev_init( void);
@@ -63,14 +61,7 @@ void fts_dev_configure(void)
 #endif
 
   null_init();
-
-#ifdef HAS_PTHREADS
-
-#ifdef SGI
   sfdev_init();
-#endif
-
-#endif
 
 #ifdef SGI
   shmdev_init();

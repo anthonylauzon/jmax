@@ -23,7 +23,7 @@
  * of the outgoing messages on the standard error
  */
 
-/* #define OUTGOING_DEBUG_TRACE   */
+/* #define OUTGOING_DEBUG_TRACE  */
 
 #include <string.h>
 
@@ -57,10 +57,6 @@ static void fts_client_send_string(const char *msg)
 
   if (client_dev)
     {
-#ifdef OUTGOING_DEBUG_TRACE      
-      fprintf(stderr, "%s", msg); 
-#endif
-
       for (i = 0; msg[i] != '\0' ; i++)
 	fts_char_dev_put(client_dev, msg[i]);
     }

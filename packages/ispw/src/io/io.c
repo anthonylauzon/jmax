@@ -11,6 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+
 #include "fts.h"
 
 extern void dac_config(void);
@@ -18,6 +19,7 @@ extern void adc_config(void);
 extern void dac_doctor_init(void);
 
 #ifdef HAS_DTD
+
 extern void disk_config(void);
 #endif
 

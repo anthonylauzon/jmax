@@ -18,7 +18,7 @@
 #include "lang/mess/objtable.h"
 #include "lang/mess/clipboard.h"
 
-extern void fts_autosave_init();
+extern void fts_autosave_init(void);
 
 static void
 fts_mess_init(void)

@@ -163,7 +163,7 @@ static int filled_table_full = 1;
 
 static int smem_error = 0; /* malloc table full warning given */
 
-static void smem_show_error()
+static void smem_show_error(void)
 {
   if (! smem_error)
     {
@@ -209,6 +209,8 @@ register_check_malloc(char *p, unsigned long size)
 	    /* found and invalid cell, keep it for later
 	       storage */
 	    idx = i;
+	    break;
+	  case malloced:
 	    break;
 	  }
 

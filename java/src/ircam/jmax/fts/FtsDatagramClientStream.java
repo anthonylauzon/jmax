@@ -23,19 +23,13 @@ import java.net.*;
  * so it will work only on unix machines and the like.
  */
 
-/* 
- * Da fare: passare a fts udpsocket come argomento, e l'indirizzo incluso
- * il port locale; poi, aggiungere variabili per tenere l'indirizzo del
- * server fts, e riempirlo al primo pacchetto.
- * Poi, fare il pacchettamento/ripacchettamento lato ricezione/trasmissione
- * dati
- */
 
 class FtsDatagramClientStream extends FtsStream
 {
   int sequence = -1;
-  final static private int max_packet_size = 512;
+  final static private int max_packet_size = 2048;
   DatagramSocket socket = null;
+  int receivedPacketSize;
   byte in_data[]  = new byte[max_packet_size]; 
   byte out_data[] = new byte[max_packet_size];
   int in_fill_p = -1;           // point to the next char to read in in_data, -1 if no packet read yet.
@@ -120,7 +114,7 @@ class FtsDatagramClientStream extends FtsStream
     int c;
 
     if (in_fill_p == -1)
-      {
+      {	
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 
 	socket.receive(in_packet);
@@ -138,12 +132,17 @@ class FtsDatagramClientStream extends FtsStream
 	      }
 	  }
 
-	in_fill_p = 1;
+	receivedPacketSize = ((in_data[1] < 0 ? in_data[1] + 256 : in_data[1]) * 256 +
+			      ((in_data[2] < 0 ? in_data[2] + 256 : in_data[2])));
+
+	System.err.println("Received Packet of length " + receivedPacketSize);
+
+	in_fill_p = 3;
       }
 
     c = in_data[in_fill_p++];
 
-    if (in_fill_p >= in_packet.getLength())
+    if (in_fill_p >= receivedPacketSize)
       in_fill_p = -1;
 
     return c;
