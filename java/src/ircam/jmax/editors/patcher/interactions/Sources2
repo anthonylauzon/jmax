@@ -25,28 +25,28 @@
 
 SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/AddModeInteraction.java \
-	$(INCLUDE_PATH)/EditModeInteraction.java \
-	$(INCLUDE_PATH)/RunModeInteraction.java \
+	$(INCLUDE_PATH)/BackgroundPopUpInteraction.java \
 	$(INCLUDE_PATH)/ConnectionSelectInteraction.java \
 	$(INCLUDE_PATH)/ConnectionToggleSelectInteraction.java \
+	$(INCLUDE_PATH)/CtrlDoubleClickEditInteraction.java \
+	$(INCLUDE_PATH)/DoubleClickEditInteraction.java \
 	$(INCLUDE_PATH)/DragConnectInteraction.java \
 	$(INCLUDE_PATH)/DragReverseConnectInteraction.java \
-	$(INCLUDE_PATH)/MoveConnectInteraction.java \
-	$(INCLUDE_PATH)/MoveReverseConnectInteraction.java \
 	$(INCLUDE_PATH)/DragSelectInteraction.java \
 	$(INCLUDE_PATH)/DragToggleSelectInteraction.java \
 	$(INCLUDE_PATH)/EditCtrlInteraction.java \
+	$(INCLUDE_PATH)/EditModeInteraction.java \
+	$(INCLUDE_PATH)/FollowInteraction.java \
 	$(INCLUDE_PATH)/HResizeInteraction.java \
 	$(INCLUDE_PATH)/HelpInteraction.java \
-	$(INCLUDE_PATH)/PopUpInteraction.java \
-	$(INCLUDE_PATH)/BackgroundPopUpInteraction.java \
 	$(INCLUDE_PATH)/Interaction.java \
 	$(INCLUDE_PATH)/InteractionEngine.java \
+	$(INCLUDE_PATH)/MoveConnectInteraction.java \
 	$(INCLUDE_PATH)/MoveEditInteraction.java \
 	$(INCLUDE_PATH)/MoveInteraction.java \
-	$(INCLUDE_PATH)/FollowInteraction.java \
+	$(INCLUDE_PATH)/MoveReverseConnectInteraction.java \
+	$(INCLUDE_PATH)/PopUpInteraction.java \
 	$(INCLUDE_PATH)/RunCtrlInteraction.java \
+	$(INCLUDE_PATH)/RunModeInteraction.java \
 	$(INCLUDE_PATH)/Squeack.java \
 	$(INCLUDE_PATH)/VResizeInteraction.java \
-	$(INCLUDE_PATH)/CtrlDoubleClickEditInteraction.java \
-	$(INCLUDE_PATH)/DoubleClickEditInteraction.java
