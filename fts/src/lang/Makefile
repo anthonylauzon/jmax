@@ -21,14 +21,30 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
+all:
+	(cd datalib; $(MAKE) $@)
+	(cd dsp; $(MAKE) $@)
+	(cd env; $(MAKE) $@)
+	(cd ftl; $(MAKE) $@)
+	(cd mess; $(MAKE) $@)
+	(cd utils; $(MAKE) $@)
+	(cd veclib; $(MAKE) $@)
+.PHONY: all
 
-## package declaration
-package provide templatedev
+clean:
+	(cd datalib; $(MAKE) $@)
+	(cd dsp; $(MAKE) $@)
+	(cd env; $(MAKE) $@)
+	(cd ftl; $(MAKE) $@)
+	(cd mess; $(MAKE) $@)
+	(cd utils; $(MAKE) $@)
+	(cd veclib; $(MAKE) $@)
+.PHONY: clean
 
-# load dynamic libraries into the server
-global jmaxArch jmaxMode
-ucs load module templatedev $dir/c/lib/$jmaxArch/$jmaxMode/libtemplatedev.so
+install-includes:
+	$(INSTALL_DIR) $(include_install_dir)/fts/lang
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang ; done
+	for d in datalib dsp ftl mess utils veclib; do ( cd $$d ; $(MAKE) $@ ; ) ; done
+.PHONY: install-includes
 
-post "package: TEMPLAGE devices (a starting point for writing devices)"
