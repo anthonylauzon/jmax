@@ -181,6 +181,23 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		  }
 	    }
 	  });
+
+	addKeyListener(new KeyListener(){
+	    public void keyTyped(KeyEvent e){}
+	    public void keyPressed(KeyEvent e)
+	    {
+	      if(isDeleteKey(e))
+		{
+		  BpfEditor.this.model.beginUpdate();
+		  gc.getSelection().deleteAll();
+		}		
+	      else if(isArrowKey(e))
+		{
+		  consumeArrowKeyEvent(e);
+		}
+	    }
+	    public void keyReleased(KeyEvent e){}
+	  });
     }
 
     public void reinit(){}
