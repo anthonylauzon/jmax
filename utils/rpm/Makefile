@@ -25,7 +25,7 @@
 
 ROOTDIR=../..
 
-spec-files: jmax.spec jmax-sgi.spec
+spec-files: jmax.spec
 
 jmax.spec: $(ROOTDIR)/VERSION
 	awk -v version=`cat $(ROOTDIR)/VERSION` '\
