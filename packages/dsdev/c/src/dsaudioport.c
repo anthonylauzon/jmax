@@ -269,7 +269,7 @@ dsaudioport_xrun(fts_audioport_t *port)
 }
 
 
-static BOOL
+BOOL CALLBACK
 dsaudioport_scan_input_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR lpcstrModule, LPVOID lpContext)
 {
   fts_object_t* device;
@@ -294,10 +294,10 @@ dsaudioport_scan_input_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR lp
   {
     fts_log("[dsaudioport] cannot add %s \n", lpcstrDescription);
   }
-  return 1;
+  return TRUE;
 }
 
-static BOOL
+BOOL CALLBACK
 dsaudioport_scan_output_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR lpcstrModule, LPVOID lpContext)
 {
   fts_object_t* device;
@@ -321,7 +321,7 @@ dsaudioport_scan_output_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR l
   {
     fts_log("[dsaudioport] cannot add %s \n", lpcstrDescription);
   }
-  return 1;
+  return TRUE;
 }
 
 static BOOL 
@@ -427,8 +427,18 @@ dsaudioport_input_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID guid
   int err = 0;
   DSCBUFFERDESC dscbd;
 
+  if (NULL != guid)
+    {
+      dev->guid = (LPGUID)malloc(sizeof(GUID));
+      memcpy(dev->guid, guid, sizeof(GUID));
+    }
+  else
+    {
+      dev->guid = NULL;
+    }
+  
   /* Create Sound Capture Object */
-  hr = DirectSoundCaptureCreate(guid, &dev->direct_sound_capture, NULL);
+  hr = DirectSoundCaptureCreate(dev->guid, &dev->direct_sound_capture, NULL);
   if (DS_OK != err)
     {
       fts_object_error(o, "Cannot create the DirectSoundCapture object");
@@ -570,7 +580,15 @@ dsaudioport_output_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID gui
   dev->cur_cbuffer = 1;
   
   /* initialize the audio port object */
-  dev->guid = guid;
+  if (NULL != guid)
+    {
+      dev->guid = (LPGUID)malloc(sizeof(GUID));
+      memcpy(dev->guid, guid, sizeof(GUID));
+    }
+  else
+    {
+      dev->guid = guid;
+    }
   dev->direct_sound = NULL;
   dev->direct_sound_capture = NULL;
   
