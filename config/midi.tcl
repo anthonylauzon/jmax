@@ -9,19 +9,14 @@
 #    origin
 #
 
-###### mips1 irix5.3 irix6.2 origin ######
 
-if {$ftsArch == mips1 || $ftsArch == irix5.3 || origin} {
+if {$ftsArch == "mips1" || $ftsArch == "irix5.3" || $ftsArch == "origin"} {
     post "FTS default MIDI configuration"
-    post "(make sure that you lauched the MIDI deamon)"
-    post "  port: FTSmidi"
-    ucs open device midi 0 as sgi_midi port FTSmidi
-} 
-
-###### o2r5k and o2r10k ######
-
-elseif {$ftsArch == o2r5k || $ftsArch == o2r10k} {
-    post (MIDI not configured)
+    post "(make sure that you lauched the MIDI deamon using the startmidi command)"
+    post "  port: $ftsMidiPort"
+    ucs open device midi 0 as sgi_midi port $ftsMidiPort
+} elseif {$ftsArch == "o2r5k" || $ftsArch == "o2r10k"} {
+    post "(MIDI not configured)"
 }
 
 # shell commands for startmidi

@@ -1,0 +1,31 @@
+start_resource_type_list
+
+***new_resource "patcher"
+resource_extension_list
+".pat"
+end_resource_extension_list
+preferred_resource_handler "Patcher"
+end_resource "patcher"
+
+***new_resource "espresso"
+resource_extension_list
+".esp"
+end_resource_extension_list
+preferred_resource_handler "Espresso"
+end_resource "espresso"
+
+***new_resource "table"
+resource_extension_list
+".tab"
+end_resource_extension_list
+preferred_resource_handler "Tabler"
+end_resource "table"
+
+***new_resource "text"
+resource_extension_list
+".txt"
+end_resource_extension_list
+preferred_resource_handler "TextEditor"
+end_resource "text"
+
+end_resource_type_list
