@@ -1,4 +1,5 @@
 all	all 	README
+all	all	RELEASE_NOTES.html
 all	all	VERSION
 all	all	INSTALL.sh
 all	all	bin
