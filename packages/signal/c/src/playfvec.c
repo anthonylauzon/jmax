@@ -519,15 +519,16 @@ play_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, play_put);
 
   /* transport */
-  fts_class_message_varargs(cl, fts_new_symbol("play"), play_play);
-  fts_class_message_varargs(cl, fts_new_symbol("stop"), play_stop);
-  fts_class_message_varargs(cl, fts_new_symbol("loop"), play_loop);
+  fts_class_message_varargs(cl, fts_new_symbol("play"),  play_play);
+  fts_class_message_varargs(cl, fts_new_symbol("start"), play_play);
+  fts_class_message_varargs(cl, fts_new_symbol("stop"),  play_stop);
+  fts_class_message_varargs(cl, fts_new_symbol("loop"),  play_loop);
   fts_class_message_varargs(cl, fts_new_symbol("pause"), play_pause);
-  fts_class_message_varargs(cl, fts_new_symbol("jump"), play_jump);
+  fts_class_message_varargs(cl, fts_new_symbol("jump"),  play_jump);
   fts_class_message_varargs(cl, fts_new_symbol("duration"), play_set_duration);
 
   fts_class_message_varargs(cl, fts_new_symbol("begin"), play_set_begin);
-  fts_class_message_varargs(cl, fts_new_symbol("end"), play_set_end);
+  fts_class_message_varargs(cl, fts_new_symbol("end"),   play_set_end);
   fts_class_message_varargs(cl, fts_new_symbol("speed"), play_set_speed);
 
   /* parameters */
