@@ -1,7 +1,13 @@
 2001-06-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
+	* added automatic track naming to MIDI file import of the sequence class
+
 	* added fvec abd bpf player to signal package (to be completed)
-	* new splash screen (adapted Java code)
+
+	* new splash screen
+	   - adapted Java code) 
+	   - changed "jMax version" string to "release"
+	
 	* new icon (images/jmax_icon.gif)
 
 2001-06-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
