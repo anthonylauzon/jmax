@@ -53,28 +53,52 @@
  *
  */
 
+#define PREF_DIR ".jmax"
+
 fts_symbol_t fts_get_default_root_directory( void)
 {
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
 fts_symbol_t
-fts_get_user_config( void)
+fts_get_user_project( void)
 {
-  char* home;
+    char* home;
+  char* jmax_user_dir;
   char path[MAXPATHLEN];
-
-  home = getenv("HOME");
-  fts_make_absolute_path(home, ".jmax.jprj", path, MAXPATHLEN);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
+  int size;
+  int cumul = 0;
+  jmax_user_dir = getenv("JMAX_PREF_DIR");
+  if (NULL == jmax_user_dir)
+  {
+      home = getenv("HOME");
+      /* don'"t forget to add '/' and '\0' */
+      size = strlen(home) + strlen(PREF_DIR) + 2;
+      jmax_user_dir = (char*)malloc(size * sizeof(char*)); 
+      strncpy(jmax_user_dir + cumul, home, strlen(home));
+      cumul += strlen(home);
+      strncpy(jmax_user_dir + cumul , "/", 1);
+      cumul += 1;
+      strncpy(jmax_user_dir + cumul, PREF_DIR, strlen(PREF_DIR));
+      cumul += strlen(PREF_DIR);
+      jmax_user_dir[cumul] = '\0';
+      fts_make_absolute_path(jmax_user_dir, fts_s_default_project, path, MAXPATHLEN);      
+      free(jmax_user_dir);
+  }
+  else
+  {      
+      fts_make_absolute_path(jmax_user_dir, fts_s_default_project, path, MAXPATHLEN);      
   }
 
+  if (fts_file_exists(path) && fts_is_file(path)) {
+      return fts_new_symbol(path);
+  }
+  
   return NULL;
 }
 
 fts_symbol_t 
-fts_get_system_config( void)
+fts_get_system_project( void)
 {
   char path[MAXPATHLEN];
 
