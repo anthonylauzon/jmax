@@ -104,3 +104,5 @@ FTS_API void fts_sleep(void);
 
 FTS_API void fts_sched_run_one_tick(void);
 
+FTS_API void fts_sched_set_run_under_callback(void);
+FTS_API void fts_sched_unset_run_under_callback(void);

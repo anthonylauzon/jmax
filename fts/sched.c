@@ -65,6 +65,11 @@ typedef struct fts_sched
 /* the global scheduler */
 static fts_sched_t main_sched;
 
+
+static int sched_run_under_callback = 0;
+
+#define fts_sched_is_running_under_callback() (1 == sched_run_under_callback)
+
 static fts_sched_t *
 fts_sched_get_current(void)
 {
@@ -325,8 +330,12 @@ sleep_init(void)
 void
 fts_sleep(void)
 {
-  double now = fts_get_time();
+  double now;
+  if (fts_sched_is_running_under_callback())
+      return;
 
+  now = fts_get_time();
+  
 
   if (now - last_sleep >= (double)100.0)
     {
@@ -341,6 +350,18 @@ fts_sleep(void)
     }
 }
 #endif
+
+void 
+fts_sched_set_run_under_callback()
+{
+    sched_run_under_callback = 1;
+}
+
+void 
+fts_sched_unset_run_under_callback()
+{
+    sched_run_under_callback = 0;
+}
 
 /*****************************************************************************
  *
