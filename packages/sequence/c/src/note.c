@@ -154,7 +154,6 @@ scoob_declare_property(fts_symbol_t name, fts_symbol_t type)
 {
   fts_atom_t k, a;
 
-  fts_class_instantiate(scoob_class);	
   if(!fts_class_get_method_varargs(scoob_class, name))
   {
     fts_set_symbol(&k, name);
