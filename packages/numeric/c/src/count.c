@@ -300,7 +300,7 @@ count_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(mode == sym_clip)
     count_mode_clip(o, 0, 0, 0, 0);
   else if(mode == sym_wrap)
-    count_mode_clip(o, 0, 0, 0, 0);
+    count_mode_wrap(o, 0, 0, 0, 0);
   else if(mode == sym_reverse)
     this->mode = mode_reverse;
 }
