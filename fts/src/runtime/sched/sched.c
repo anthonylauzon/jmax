@@ -29,7 +29,8 @@
 #include <unistd.h>
 #include <fts/sys.h>
 #include <fts/lang.h>
-#include <fts/runtime.h>
+#include <fts/runtime/time/time.h>
+#include <fts/runtime/time/sched.h>
 
 #define FD_NO_SELECT -1
 

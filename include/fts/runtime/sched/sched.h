@@ -28,7 +28,7 @@
 #define _FTS_SCHED_H_
 
 #include <fts/lang.h>
-#include <fts/runtime/time.h>
+#include <fts/runtime/time/time.h>
 
 /**
  * The FTS scheduler abstraction
