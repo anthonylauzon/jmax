@@ -135,6 +135,26 @@ FtsDotPatTokenizer:
 	javac $(JFLAGS) FtsDotPatTokenizer.java
 .PHONY: FtsDotPatTokenizer
 
+FtsLocator:
+	javac $(JFLAGS) FtsLocator.java
+.PHONY: FtsLocator
+
+FtsDotPatFileDataHandler:
+	javac $(JFLAGS) FtsDotPatFileDataHandler.java 
+.PHONY: FtsDotPatFileDataHandler
+
+FtsTpaFileDataHandler:
+	javac $(JFLAGS) FtsTpaFileDataHandler.java
+.PHONY: FtsTpaFileDataHandler
+
+FtsPatchData:
+	javac $(JFLAGS) FtsPatchData.java
+.PHONY: FtsPatchData
+
+FtsPatchDataType:
+	javac $(JFLAGS) FtsPatchDataType.java
+.PHONY: FtsPatchDataType
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

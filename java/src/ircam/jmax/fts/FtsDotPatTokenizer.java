@@ -62,6 +62,16 @@ class FtsDotPatTokenizer
     this.env = env;
   }
 
+  /** Debug method: store the history 
+    (actually for now just print it)
+    */
+
+  
+  void registerInHistory(char c)
+  {
+    // System.err.println(">" + (char)c + "<");
+  }
+
   void pushBack()
   {
     pushedBack = true;
@@ -151,7 +161,10 @@ class FtsDotPatTokenizer
 	    lookahead_valid = false;
 	  }
 	else
-	  c = in.read();
+	  {
+	    c = in.read();
+	    registerInHistory((char) c);
+	  }
 
 	status = tt_waiting;
 
@@ -400,6 +413,7 @@ class FtsDotPatTokenizer
 	      }
 
 	    c = in.read();
+	    registerInHistory((char) c);
 	  }
       }
   }

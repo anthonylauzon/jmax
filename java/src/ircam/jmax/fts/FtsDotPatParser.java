@@ -12,12 +12,6 @@ import ircam.jmax.fts.*;
 
 public class FtsDotPatParser
 {
-  // no constructor
-
-  private FtsDotPatParser()
-  {
-  }
-
   /**
    * Create a new patcher from a .pat file.
    * The patcher is always a top level patcher.
@@ -31,7 +25,6 @@ public class FtsDotPatParser
   static public FtsObject importPatcher(FtsServer server, File inputFile) throws java.io.IOException, FtsDotPatException
   {
     FtsDotPatTokenizer in = null; 
-    FtsPatcher p;
 
     // Build a new FtsObject, a patcher 0 in 0 out
 
@@ -88,7 +81,12 @@ public class FtsDotPatParser
     if ((in.ttype != FtsDotPatTokenizer.TT_STRING) && ! in.sval.equals("v2"))
       throw new FtsDotPatException("file not in .pat format (header error)");
 
-    in.nextToken(); // Skip the ';'
+    // Skip possible declarations
+
+    while (in.ttype != FtsDotPatTokenizer.TT_EOC)
+      in.nextToken();
+
+    //    in.nextToken(); // Skip the ';'
     in.nextToken(); // Skip the '#N'
 
     // call the parser for a patcher, implemented

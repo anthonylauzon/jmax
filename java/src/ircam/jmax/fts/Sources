@@ -23,5 +23,9 @@ SOURCES = \
           FtsSubProcessPort.java \
           FtsSubProcessServer.java \
           FtsTemplateTable.java \
-          FtsWindowDescription.java
-
+          FtsWindowDescription.java \
+	  FtsLocator.java  \
+	  FtsDotPatFileDataHandler.java  \
+	  FtsTpaFileDataHandler.java \
+	  FtsPatchData.java  \
+	  FtsPatchDataType.java
