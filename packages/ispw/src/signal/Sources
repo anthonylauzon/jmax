@@ -23,15 +23,15 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ifeq ($(VENDOR),sgi)
+ifeq ($(PLATFORM),sgi)
   ARCH_SOURCES = osc_intphase.c phasor_intphase.c
 endif
 
-ifeq ($(VENDOR),gnu)
+ifeq ($(PLATFORM),linux-intel)
   ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
 endif
 
-ifeq ($(VENDOR),apple)
+ifeq ($(PLATFORM),macosx)
   ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
 endif
 
