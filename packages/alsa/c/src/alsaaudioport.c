@@ -32,24 +32,33 @@
 
 #include <fts/fts.h>
 
+/* PCM device */
 static fts_symbol_t s_default;
 static fts_symbol_t s_hw_0_0;
 static fts_symbol_t s_plug_0_0;
+/* sample format */
 static fts_symbol_t s_s16_le, s_s32_le;
+/* access type */
 static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
 
 #define GUESS_CHANNELS -1
-#define DEFAULT_PCM_NAME s_hw_0_0 
+/*
+  We open the default device.
+  This default can be overwritten in .asoundrc
+  with:
+  pcm.!default pcm.foo ....
+  @see ALSA documentation
+*/
+#define DEFAULT_PCM_NAME s_default
 
-/* Defaults for RME 9652 */
-/* 
-   Now this define are no more use, we use alsa lib
-   to check card capabiblities 
+/* Defaults:
+   If these defaults are not available for current card, 
+   we check which parameters are supported by audio card.
 */
 #define DEFAULT_FORMAT s_s32_le
 #define DEFAULT_ACCESS s_mmap_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 4096
+#define DEFAULT_FIFO_SIZE 8192
 #define DEFAULT_INPUT_CHANNELS 26
 #define DEFAULT_OUTPUT_CHANNELS 26
 
@@ -57,7 +66,7 @@ static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleav
 /* Structure used for both capture and playback                           */
 /* ---------------------------------------------------------------------- */
 typedef struct _alsastream_t {
-    snd_pcm_t *handle;
+    snd_pcm_t* handle;
     int period_size;
     size_t bytes_per_sample, bytes_per_frame;
     int channels;
@@ -119,11 +128,109 @@ static snd_output_t *get_post_log( void)
 }
 
 
+static int post_snd_output_buffer(snd_output_t* out)
+{
+    size_t buffer_size;
+    char* output_content;
+    
+    buffer_size = snd_output_buffer_string(out, &output_content);
+    if (buffer_size > 0)
+    {
+	output_content[buffer_size - 1] = '\0';
+    }
+    post("%s\n", output_content);
+    return buffer_size;
+}
+
 /* ********************************************************************** */
 /* alsastream_t functions                                                 */
 /* ********************************************************************** */
 
+/** 
+ * Convert ALSA access type to current use access type 
+ * 
+ * @param access input ALSA access type
+ * 
+ * @return access_index for function array
+ * @return -1 if access type is unknown ....
+ */
+static int 
+convert_alsa_access_to_access_index(snd_pcm_access_t access)
+{
+    int access_index;
 
+    /* convert access to access_index */
+
+    switch(access)
+    {
+    case SND_PCM_ACCESS_MMAP_NONINTERLEAVED:
+	access_index = 0;
+	break;
+    case SND_PCM_ACCESS_MMAP_INTERLEAVED:
+	access_index = 1;
+	break;
+    case SND_PCM_ACCESS_RW_NONINTERLEAVED:
+	access_index = 2;
+	break;
+    case SND_PCM_ACCESS_RW_INTERLEAVED:
+	access_index = 3;
+	break;
+    default:
+	access_index = -1;
+    }
+    return access_index;
+}
+
+/** 
+ * Get name of ALSA access
+ * 
+ * @param access ALSA access
+ * 
+ * @return name of ALSA access
+ */
+static const char* get_alsa_access_type_name(snd_pcm_access_t access)
+{
+    const char* access_type_name;
+
+    switch(access)
+    {
+    case SND_PCM_ACCESS_MMAP_INTERLEAVED:
+	access_type_name =  "mmap access with simple interleaved channels ";
+	break;
+    case SND_PCM_ACCESS_MMAP_NONINTERLEAVED:
+	access_type_name =  "mmap access with simple non interleaved channels ";
+	break;
+    case SND_PCM_ACCESS_MMAP_COMPLEX:
+	access_type_name =  "mmap access with complex placement ";
+	break;
+    case SND_PCM_ACCESS_RW_INTERLEAVED:
+	access_type_name =  "snd_pcm_readi/snd_pcm_writei access ";
+	break;
+
+    case SND_PCM_ACCESS_RW_NONINTERLEAVED:
+	access_type_name =  "snd_pcm_readn/snd_pcm_writen access ";
+	break;
+
+    default:
+	access_type_name =  "Unknown access type ";
+	break;       
+    }
+
+    return access_type_name;
+}
+
+
+
+/** 
+ * Check if access is available for given handle.
+ * If not try to find a better choice 
+ * 
+ * @param handle handle of PCM device
+ * @param params hw_params of PCM device
+ * @param access wanted access type
+ * 
+ * @return new access type
+ */
 static snd_pcm_access_t alsaaudioport_check_better_access_type(snd_pcm_t* handle, 
 							       snd_pcm_hw_params_t* params, 
 							       snd_pcm_access_t access)
@@ -136,7 +243,8 @@ static snd_pcm_access_t alsaaudioport_check_better_access_type(snd_pcm_t* handle
 	return access;
     }
 
-    fts_log("[alsaaudioport] access type not available for handle, try to find a better choice \n");
+    fts_log("[alsaaudioport] access type (%s) not available, try to find a better choice \n",
+	    get_alsa_access_type_name(access));
 
     /* loop initialization */
     access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
@@ -150,12 +258,75 @@ static snd_pcm_access_t alsaaudioport_check_better_access_type(snd_pcm_t* handle
 
     if (test_result >= 0)
     {
-	fts_log("[alsaaudioport] found a better choice \n");
+	fts_log("[alsaaudioport] found a better choice (%s)\n",
+		get_alsa_access_type_name(access));
     }
     return access;
 }
 
 
+/** 
+ * Get name of ALSA PCM Format
+ * 
+ * @param format ALSA PCM Format
+ * 
+ * @return name of ALSA PCM Format
+ */
+static const char* get_alsa_sample_format_name(snd_pcm_format_t format)
+{
+    const char* sample_format_name;
+    switch(format)
+    {
+    case SND_PCM_FORMAT_S8:
+	sample_format_name = "Signed 8 bit ";
+	break;
+    case SND_PCM_FORMAT_U8:
+	sample_format_name = "Unsigned 8 bit ";
+	break;
+    case SND_PCM_FORMAT_S16:	
+	sample_format_name = "Signed 16 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_U16:
+	sample_format_name = "Unsigned 16 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_S24:
+	sample_format_name = "Signed 24 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_U24:
+	sample_format_name = "Unsigned 24 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_S32:	
+	sample_format_name = "Signed 32 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_U32:	
+	sample_format_name = "Unsigned 32 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_FLOAT:	
+	sample_format_name = "Float 32 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_FLOAT64:	
+	sample_format_name = "Float 64 bit CPU endian ";
+	break;
+    case SND_PCM_FORMAT_IEC958_SUBFRAME:	
+	sample_format_name = "IEC-958 CPU Endian ";
+	break;
+    default:
+	sample_format_name = "Unknown Format ";
+	break;
+    }
+    return sample_format_name;
+}
+
+/** 
+ * Check if PCM format is available for given handle
+ * If not try to find a better choice 
+ *
+ * @param handle handle of PCM device
+ * @param params hw_params of PCM device
+ * @param format wanted PCM format
+ * 
+ * @return new PCM format
+ */
 static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
 						    snd_pcm_hw_params_t* params,
 						    int format)
@@ -167,7 +338,8 @@ static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
 	return format;
     }
 
-    fts_log("[alsaaudioport] sample format not available for handle, try to find a better choice \n");
+    fts_log("[alsaaudioport] sample format (%s) not available, try to find a better choice \n",
+	    get_alsa_sample_format_name(format));
 
     /* loop initialization */
     format = SND_PCM_FORMAT_IEC958_SUBFRAME;
@@ -182,7 +354,9 @@ static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
 
     if (test_result >= 0)
     {
-	fts_log("[alsaaudioport] found a better choice \n");
+	fts_log("[alsaaudioport] found a better choice (%s)\n",
+		get_alsa_sample_format_name(format));
+
     }
 
     return format;
@@ -192,14 +366,16 @@ static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
 /* alsatream_open: opens a stream                                         */
 /* ---------------------------------------------------------------------- */
 
-static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, int* format, int channels, int sampling_rate, int fifo_size, snd_pcm_access_t access)
+static int alsastream_open( alsastream_t *stream, char *pcm_name, int which_stream, int* format, int channels, int sampling_rate, int fifo_size, snd_pcm_access_t* access)
 {
-    snd_pcm_access_mask_t *mask;
+/*     snd_pcm_access_mask_t *mask; */
     snd_pcm_hw_params_t *hwparams;
     snd_pcm_sw_params_t *swparams;
+
     int err;
     int open_mode = 0;
     int dir;
+
 
     snd_pcm_hw_params_alloca( &hwparams);
     snd_pcm_sw_params_alloca( &swparams);
@@ -208,17 +384,16 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     /*
      * Open the PCM device
      */
-    if ( (err = snd_pcm_open( &st->handle, (char *)pcm_name, which_stream, open_mode)) < 0)
+    if ( (err = snd_pcm_open( &stream->handle, (char *)pcm_name, which_stream, open_mode)) < 0)
     {
 	fts_log("[alsaaudioport] cannot open ALSA PCM device %s (%s)\n", pcm_name, snd_strerror(err));
-/*	fts_object_set_error(o, "cannot open ALSA PCM device %s (%s)\n", pcm_name, snd_strerror(err)); */
 	return err;
     }
 
-    if ((err = snd_pcm_hw_params_any( st->handle, hwparams)) < 0)
+    if ((err = snd_pcm_hw_params_any( stream->handle, hwparams)) < 0)
     {
-	fts_log("[alsaaudioport] broken configuration for handle: no configuration available (%s)\n", snd_strerror(err));
-/*	fts_object_set_error(o, "broken configuration for handle: no configuration available (%s)\n", snd_strerror(err)); */
+	fts_log("[alsaaudioport] broken configuration for handle: no configuration available (%s)\n", 
+		snd_strerror(err));
 	return err;
     }
 
@@ -229,11 +404,10 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
        Check if acces type is available,
        return a better choice if not 
     */
-    access = alsaaudioport_check_better_access_type(st->handle, hwparams, access);  
-    if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, access)) < 0)
+    *access = alsaaudioport_check_better_access_type(stream->handle, hwparams, *access);  
+    if ((err = snd_pcm_hw_params_set_access( stream->handle, hwparams, *access)) < 0)
     {
 	fts_log("[alsaaudioport] acces type not available for handle: (%s)\n", snd_strerror(err));
-/*	fts_object_set_error(o,  "acces type not available for handle: (%s)\n", snd_strerror(err)); */
 	return err;
     }
 
@@ -244,11 +418,10 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
        Check if sample format is available
        return a better choice if not 
     */
-    *format = alsaaudioport_check_better_sample_format(st->handle, hwparams, *format);
-    if ((err = snd_pcm_hw_params_set_format( st->handle, hwparams, *format)) < 0)
+    *format = alsaaudioport_check_better_sample_format(stream->handle, hwparams, *format);
+    if ((err = snd_pcm_hw_params_set_format( stream->handle, hwparams, *format)) < 0)
     {
 	fts_log("[alsaaudioport] sample format not available: (%s)\n", snd_strerror(err));
-/*	fts_object_set_error(o, "sample format not available: (%s)\n", snd_strerror(err)); */
 	return err;
     }
 
@@ -256,30 +429,31 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
      * Set the number of channels
      */
 #if 0
-    if (st->channels == GUESS_CHANNELS)
-	st->channels = snd_pcm_hw_params_get_channels_max (hwparams);
+    if (stream->channels == GUESS_CHANNELS)
+	stream->channels = snd_pcm_hw_params_get_channels_max (hwparams);
 #endif
   
     if ( (snd_pcm_hw_params_get_channels_max(hwparams) < channels)
 	 || (snd_pcm_hw_params_get_channels_min(hwparams) > channels)
 	)
     {
-	fts_log("[alsaaudioport] channels count (%i) not available, get max\n", channels);
+	fts_log("[alsaaudioport] channels count (%i) not available \n", channels);
 	channels = snd_pcm_hw_params_get_channels_max(hwparams);
+	fts_log("[alsaaudioport] get max number of channels (%i)\n", channels);
     }
       
-    if ((err = snd_pcm_hw_params_set_channels( st->handle, hwparams, channels)) < 0) 
+    if ((err = snd_pcm_hw_params_set_channels( stream->handle, hwparams, channels)) < 0) 
     {
 	fts_log("[alsaaudioport] channels count (%i) not available (%s)\n", channels, snd_strerror(err));
 	return err;
     }
 
-    st->channels = snd_pcm_hw_params_get_channels( hwparams);
+    stream->channels = snd_pcm_hw_params_get_channels( hwparams);
 
     /*
      * Set the sampling rate
      */
-    if ((err = snd_pcm_hw_params_set_rate_near( st->handle, hwparams, sampling_rate, 0)) < 0)
+    if ((err = snd_pcm_hw_params_set_rate_near( stream->handle, hwparams, sampling_rate, 0)) < 0)
     {
 	fts_log("[alsaaudioport] rate %iHz not available for handle: (%s)\n", sampling_rate, snd_strerror(err));
 	return err;
@@ -292,7 +466,7 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     /*
      * Set buffer size
      */
-    if ((err = snd_pcm_hw_params_set_buffer_size_near( st->handle, hwparams, fifo_size)) < 0)
+    if ((err = snd_pcm_hw_params_set_buffer_size_near( stream->handle, hwparams, fifo_size)) < 0)
     {
 	fts_log("[alsaaudioport] buffer size not available (%s)\n", snd_strerror(err));
 	return err;
@@ -307,13 +481,13 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     /*
      * Set period size: the period size is the fifo size divided by the number of periods, here 2
      */
-    if ((err = snd_pcm_hw_params_set_period_size_near( st->handle, hwparams, fifo_size / 2, 0)) < 0) 
+    if ((err = snd_pcm_hw_params_set_period_size_near( stream->handle, hwparams, fifo_size / 2, 0)) < 0) 
     {      
 	fts_log("[alsaaudioport] period size not available (%s)\n", snd_strerror(err));
 	return err;
     }
 
-    st->period_size = snd_pcm_hw_params_get_period_size( hwparams, &dir);
+    stream->period_size = snd_pcm_hw_params_get_period_size( hwparams, &dir);
 
 #ifdef DEBUG
     snd_pcm_hw_params_dump( hwparams, get_post_log());
@@ -323,28 +497,28 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     /*
      * Set hardware parameters
      */
-    if ((err = snd_pcm_hw_params( st->handle, hwparams)) < 0)
+    if ((err = snd_pcm_hw_params( stream->handle, hwparams)) < 0)
     {
 	snd_pcm_hw_params_dump( hwparams, get_post_log());
 	post_log();
 	return err;
     }
 
-    snd_pcm_sw_params_current( st->handle, swparams);
+    snd_pcm_sw_params_current( stream->handle, swparams);
 
     if (SND_PCM_STREAM_PLAYBACK == which_stream)
     {
 	/* start transfer when the buffer is full */
-	if ((err = snd_pcm_sw_params_set_start_threshold( st->handle, swparams, fifo_size)) < 0)
+	if ((err = snd_pcm_sw_params_set_start_threshold( stream->handle, swparams, fifo_size)) < 0)
 	    return err;
     }
 
 
-    if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, st->period_size)) < 0) 
+    if ((err = snd_pcm_sw_params_set_avail_min( stream->handle, swparams, stream->period_size)) < 0) 
 	return err;
 
     /* align all transfers to 1 samples */
-    if ((err = snd_pcm_sw_params_set_xfer_align( st->handle, swparams, 1)) < 0)
+    if ((err = snd_pcm_sw_params_set_xfer_align( stream->handle, swparams, 1)) < 0)
 	return err;
 
 #ifdef DEBUG
@@ -352,15 +526,15 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     post_log();
 #endif
 
-    if ((err = snd_pcm_sw_params( st->handle, swparams)) < 0) 
+    if ((err = snd_pcm_sw_params( stream->handle, swparams)) < 0) 
     {
 	snd_pcm_sw_params_dump(swparams, get_post_log());
 	post_log();
 	return err;
     }
 
-    st->bytes_per_sample = (snd_pcm_format_physical_width(*format) / 8);
-    st->bytes_per_frame = st->bytes_per_sample * st->channels;
+    stream->bytes_per_sample = (snd_pcm_format_physical_width(*format) / 8);
+    stream->bytes_per_frame = stream->bytes_per_sample * stream->channels;
 
     return 0;
 }
@@ -609,6 +783,7 @@ INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f)
     OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f)
     OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f)
 
+
 /* to access this table: functions_table[mode][format][inout] */
     static ftl_wrapper_t functions_table[4][2][2] = {
 	{ { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} }, 
@@ -656,11 +831,31 @@ static int alsaaudioport_xrun_function( fts_audioport_t *port)
     return xrun;
 }
 
-#ifdef DEBUG
-static void pcm_dump_post( snd_pcm_t *handle)
+
+static snd_pcm_access_t convert_jmax_symbol_to_alsa_access(fts_symbol_t s_access)
 {
+    snd_pcm_access_t access;
+
+    if (s_access == s_mmap_noninterleaved)
+    {
+	access = SND_PCM_ACCESS_MMAP_NONINTERLEAVED;
+    }
+    else if (s_access == s_mmap_interleaved)
+    {
+	access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
+    }
+    else if (s_access == s_rw_noninterleaved)
+    {
+	access = SND_PCM_ACCESS_RW_NONINTERLEAVED;
+    }
+    else
+    {
+	access = SND_PCM_ACCESS_RW_INTERLEAVED;
+    }
+
+    return access;
 }
-#endif
+
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -676,10 +871,10 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
     fts_audioport_init( &this->head);
 
 
-  sr = fts_dsp_get_sample_rate();
-  sampling_rate = (int)sr ;
-  fifo_size = DEFAULT_FIFO_SIZE;
-
+    sr = fts_dsp_get_sample_rate();
+    sampling_rate = (int)sr ;
+    fifo_size = DEFAULT_FIFO_SIZE;
+    
     strcpy( pcm_name, fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME) );
 
     capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_INPUT_CHANNELS);
@@ -690,36 +885,27 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
     s_access = fts_get_symbol_arg( ac, at, 4, DEFAULT_ACCESS);
 
-    if (s_access == s_mmap_noninterleaved)
-    {
-	access = SND_PCM_ACCESS_MMAP_NONINTERLEAVED;
-	access_index = 0;
-    }
-    else if (s_access == s_mmap_interleaved)
-    {
-	access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
-	access_index = 1;
-    }
-    else if (s_access == s_rw_noninterleaved)
-    {
-	access = SND_PCM_ACCESS_RW_NONINTERLEAVED;
-	access_index = 2;
-    }
-    else
-    {
-	access = SND_PCM_ACCESS_RW_INTERLEAVED;
-	access_index = 3;
-    }
+    access = convert_jmax_symbol_to_alsa_access(s_access);
 
     if ( capture_channels != 0)
     {
-	if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, &format, capture_channels, sampling_rate, fifo_size, access)) < 0)
+	if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, &format, capture_channels, sampling_rate, fifo_size, &access)) < 0)
 	{
-	    fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
-	    post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
+	    fts_object_set_error(o, "Error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_log("[alsaaudioport] Error opening playback ALSA device (%s)", snd_strerror( err));
+	    post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 	    return;
 	}
 
+
+	/* convert access type to function array index */
+	access_index = convert_alsa_access_to_access_index(access);
+	if (-1 == access_index)
+	{
+	    post("[alsaaudioport] playback access type unknown \n");
+	    fts_object_set_error(o,"playback access type unknown \n");
+	    return;
+	}
 	format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
   
 	fts_audioport_set_input_channels( (fts_audioport_t *)this, this->capture.channels);
@@ -730,12 +916,21 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
     if ( playback_channels != 0)
     {
-	if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, &format, playback_channels, sampling_rate, fifo_size, access)) < 0)
+	if ( (err = alsastream_open(&this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, &format, playback_channels, sampling_rate, fifo_size, &access)) < 0)
 	{
-	    fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
+	    fts_object_set_error(o, "Error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_log("[alsaaudioport] Error opening playback ALSA device (%s)", snd_strerror( err));
+	    post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 
-	    post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
+	    return;
+	}
 
+	/* convert access type to function array index */
+	access_index = convert_alsa_access_to_access_index(access);
+	if (-1 == access_index)
+	{
+	    post("[alsaaudioport] playback access type unknown \n");
+	    fts_object_set_error(o,"playback access type unknown \n");
 	    return;
 	}
 
@@ -780,12 +975,89 @@ static void alsaaudioport_get_state( fts_daemon_action_t action, fts_object_t *o
     fts_set_object( value, o);
 }
 
+static void
+alsaaudioport_print_all_device(alsaaudioport_t* this)
+{
+    snd_output_t *out;
+/*     char* output_content; */
+/*     size_t buffer_size; */
+    int err;
+/*   snd_config_t* conf = snd_config_update(); */
+/*     if (err < 0)  */
+/*     { */
+/* 	fts_log("[alsaaudioport] snd_config_update error : %s", snd_strerror(err)); */
+/* 	return; */
+/*     } */
+
+    err = snd_output_buffer_open(&out);
+    if (err < 0)
+    {
+	fts_log("[alsaaudioport] cannot create config output buffer \n");
+	return;
+    }
+
+    if (NULL != this->capture.handle)
+    {
+
+	if (snd_pcm_dump(this->capture.handle, out) < 0)
+	{
+	    fts_log("[alsaaudioport] error when dumping capture handle (%s)\n", 
+		    snd_strerror(err));
+	}
+	else
+	{
+	    post("Capture Stream \n");
+	    post_snd_output_buffer(out);
+	}
+    }
+    snd_output_flush(out);
+
+    if (NULL != this->playback.handle)
+    {
+	if (snd_pcm_dump(this->playback.handle, out) < 0)
+	{	    
+	    fts_log("[alsaaudioport] error when dumping capture handle (%s)\n", 
+		    snd_strerror(err));
+	}
+	else
+	{
+	    post("Playback Stream \n");
+	    post_snd_output_buffer(out);
+	}
+	snd_output_flush(out);
+    }
+
+    snd_output_close(out);    
+}
+
+
+
+
+static void
+alsaaudioport_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+    alsaaudioport_t* this = (alsaaudioport_t*)o;
+
+    post("[alsaaudioport] All PCM device \n");
+    alsaaudioport_print_all_device(this);
+/*
+  post("Current PCM capture stream:\n");
+  alsaaudioport_print_stream(&this->capture);
+  post("Current PCM playback stream:\n");
+  alsaaudioport_print_stream(&this->playback);
+*/
+}
+
+
 static fts_status_t alsaaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
     fts_class_init( cl, sizeof( alsaaudioport_t), 0, 0, 0);
 
     fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, alsaaudioport_init);
     fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, alsaaudioport_delete);
+
+    /* debug print */
+    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, alsaaudioport_print);
 
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, alsaaudioport_get_state);
 
@@ -805,11 +1077,8 @@ void alsaaudioport_config( void)
 
     fts_audioport_set_default_class( s);
 
-    s_default = fts_new_symbol( "default");
+    s_default = fts_new_symbol( "default"); 
     s_hw_0_0 = fts_new_symbol("hw:0,0");
-/*
-  s_plug_0_0 = fts_new_symbol("plug:0,0");
-*/
     s_plug_0_0 = fts_new_symbol("plughw:0,0");
     s_s32_le = fts_new_symbol( "S32_LE");
     s_s16_le = fts_new_symbol( "S16_LE");
