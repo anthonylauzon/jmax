@@ -1,8 +1,6 @@
-packagedir=$(includedir)/fts/packages/data
+packagedir=$(includedir)/fts/packages/sequence
 package_HEADERS= \
  event.h \
  note.h \
- seqmess.h \
- seqmidi.h \
- seqsym.h \
  sequence.h \
+ track.h
