@@ -209,6 +209,7 @@ bin/Makefile
 bin/jmax
 config/Makefile
 images/Makefile
+help/Makefile
 tutorials/Makefile
 tutorials/basics/Makefile
 java/src/ircam/jmax/JMaxVersion.java

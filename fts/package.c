@@ -124,6 +124,9 @@ fts_init_package_paths(void)
   s = fts_get_root_directory();
   if (s) 
     {
+      /* init system_package dir */
+      fts_system_package->dir = fts_new_symbol_copy(s);
+      
       snprintf(path, MAXPATHLEN, "%s%c%s", s, fts_file_separator, "packages");
       fts_set_symbol(&a, fts_new_symbol_copy(path));
       fts_package_paths = fts_list_append(fts_package_paths, &a);

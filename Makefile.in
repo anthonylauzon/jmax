@@ -96,7 +96,7 @@ VERSION = @VERSION@
 YACC = @YACC@
 uudecode = @uudecode@
 
-SUBDIRS = client fts include java packages bin images tutorials config utils
+SUBDIRS = client fts include java packages bin images tutorials config utils help
 
 #
 # new-patch, new-minor, new-major

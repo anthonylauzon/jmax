@@ -636,11 +636,13 @@ fts_object_recompute(fts_object_t *old)
 	 property on a non error redefined object; actually
 	 the error property daemon should be a global daemon !
       */
-      if (obj->head.id != FTS_NO_ID)
-	fts_object_send_kernel_properties(obj);
 
-      fts_client_upload_object(obj, -1);
-      fts_object_upload_connections(obj);
+      if ( fts_object_has_id( obj))
+	{
+	  fts_object_send_kernel_properties(obj);
+	  fts_client_upload_object(obj, -1);
+	  fts_object_upload_connections(obj);
+	}
     }
 
   return obj;
