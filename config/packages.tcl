@@ -30,14 +30,16 @@
 
 # ISPW classes
 package require ispw
+package require ispwmath
 package require table
 package require qlist
 package require explode
 
 # new classes
+#package require math
+package require data
 package require control
 package require mess
-package require generic
 package require numeric
 package require lists
 
