@@ -32,7 +32,7 @@ tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ac--;
   at++;
 
-  fts_array_init(&this->args, 0, 0);
+  fts_array_init(&this->args, ac, at);
 }
 
 static void
