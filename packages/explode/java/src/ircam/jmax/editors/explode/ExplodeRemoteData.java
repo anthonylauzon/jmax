@@ -5,26 +5,7 @@ import java.lang.*;
 import java.io.*;
 import java.util.*;
 
-public class ExplodeRemoteData extends FtsRemoteData {
-
-  private class ExplodeNote {
-    ExplodeNote( Object args[])
-    {
-      note = new int[5];
-
-      for ( int i = 0; i < 5; i++)
-	{
-	  note[i] = ((Integer)args[i]).intValue();
-	}
-    }
-
-    int getValue( int index)
-    {
-      return note[index];
-    }
-
-    private int note[];
-  }
+public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel{
 
   public ExplodeRemoteData()
     {
@@ -32,32 +13,74 @@ public class ExplodeRemoteData extends FtsRemoteData {
 
       System.err.println( "instanciated " + this.getClass().getName());
 
-      notes = new Vector();
+      itsEvents = new Vector();
+      listeners = new Vector();
     }
 
+  /* the ExplodeDataModel interface... */
   public int length()
   {
-    return notes.size();
+    return itsEvents.size();
   }
 
-  public Object getValue( int index, int which)
-  {
-    return new Integer( ((ExplodeNote)notes.elementAt(index)).getValue( which));
+  public Enumeration getEvents() {
+    return itsEvents.elements();
   }
 
+  public void addEvent(ScrEvent theEvent) {
+    /*should insert in the real (remote) explode
+      itsEvents.addElement(theEvent);
+      notifyListeners();*/
+  }
+
+  public void removeEvent(ScrEvent theEvent) {
+    /* see previous comment
+      itsEvents.removeElement(theEvent);
+      notifyListeners();*/
+  }
+
+ private void notifyListeners() {
+    ExplodeDataListener el;
+    
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
+      el = (ExplodeDataListener) e.nextElement();
+      el.dataChanged(null);
+    }
+  }
+
+  public void addListener(ExplodeDataListener theListener) {
+    listeners.addElement(theListener);
+  }
+
+  public void removeListener(ExplodeDataListener theListener) {
+    listeners.removeElement(theListener);
+  }
+
+  public ScrEvent getEventAt(int index) {
+    return (ScrEvent) itsEvents.elementAt(index);
+  }
+
+
+  /* a method inherited from FtsRemoteData */
   public final void call( int key, Object args[])
     {
       switch( key) {
       case 1:
-	notes.removeAllElements();
+	itsEvents.removeAllElements();
 	break;
       case 2:
-	notes.addElement( new ExplodeNote( args));
+	itsEvents.addElement( new ScrEvent( ((Integer) args[0]).intValue(), 
+					    ((Integer) args[1]).intValue(), 
+					    ((Integer) args[2]).intValue(), 
+					    ((Integer) args[3]).intValue(), 
+					    ((Integer) args[4]).intValue()));
 	break;
       default:
 	break;
       }
     }
 
-  private Vector notes;
+  private Vector itsEvents;
+  private Vector listeners;
 }
+

@@ -10,45 +10,7 @@ import com.sun.java.swing.*;
 import com.sun.java.swing.table.*;
 import com.sun.java.swing.event.*;
 
-class ExplodeTableModel extends AbstractTableModel {
-  public ExplodeTableModel( ExplodeRemoteData explodeRemoteData)
-  {
-    this.explodeRemoteData = explodeRemoteData;
-  }
-
-  public int getColumnCount() 
-  {
-    return names.length; 
-  }
-
-  public int getRowCount() 
-  {
-    return explodeRemoteData.length();
-  }
-
-  public Object getValueAt(int row, int col) 
-  {
-    return explodeRemoteData.getValue( row, col); 
-  }
-
-  public String getColumnName(int column)
-  {
-    return names[column];
-  }
-
-  public boolean isCellEditable( int rowIndex, int columnIndex)
-  {
-    //return columnIndex >= 1;
-    return false;
-  }
-
-  private ExplodeRemoteData explodeRemoteData;
-
-  static String names[] = { "Time", "Pitch", "Velocity", "Duration", "Channel"};
-}
-
-
-public class Explode extends MaxEditor implements MaxDataEditor {
+public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
   public Explode( MaxData maxData)
   {
@@ -56,24 +18,31 @@ public class Explode extends MaxEditor implements MaxDataEditor {
 
     this.maxData = maxData;
 
-    // A method of the super class, that must be called, and is not documented... 
     Init();
 
     setTitle( "Explode");
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) ((FtsRemoteDataObject)maxData).getRemoteData();
 
-    JTable table = new JTable( new ExplodeTableModel( explodeRemoteData ));
+    
+    getContentPane().add(new ScrPanel(explodeRemoteData));
+    
+    /**
+     * just to be able to exit...*/
+    addWindowListener((new WindowAdapter() {
 
-    getContentPane().add( JTable.createScrollPaneForTable( table));
+      public void windowClosing(WindowEvent e) {
+	System.exit(0);
+      }
+    }));
+    
 
-    table.getTableHeader().setReorderingAllowed( false);
-
-    setSize( 300, 300);
+    //----
 
     validate();
+    pack();
+    setVisible(true);
 
-    setVisible( true);
   }
 
 

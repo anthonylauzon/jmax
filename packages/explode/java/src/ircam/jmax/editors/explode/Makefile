@@ -10,7 +10,7 @@ all:
 .PHONY: all
 
 Explode:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Explode.java )
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -depend Explode.java )
 .PHONY: Explode
 
 ExplodeFactory:

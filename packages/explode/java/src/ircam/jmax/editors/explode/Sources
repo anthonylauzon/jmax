@@ -1,6 +1,38 @@
 SOURCES = \
 	Explode.java		\
+	ExplodeDataModel.java	\
+	ExplodeDataListener.java	\
 	ExplodeExtension.java	\
 	ExplodeFactory.java	\
 	ExplodeRemoteData.java	\
+	AAAReadme.java		\
+	Adapter.java		\
+	AdapterProvider.java	\
+	EventRenderer.java	\
+	InteractionModule.java	\
+	Mapper.java		\
+	MouseTracker.java	\
+	PartitionAdapter.java	\
+	PartitionEventRenderer.java	\
+	PitchMapper.java	\
+	PositionListener.java	\
+	Renderer.java		\
+	ScoreRenderer.java	\
+	ScrAddingTool.java	\
+	ScrEvent.java		\
+	ScrPanel.java		\
+	ScrSelectingTool.java	\
+	ScrTool.java		\
+	ScrToolbar.java		\
+	Selecter.java		\
+	SelectionListener.java	\
+	TimeMapper.java		\
+	ToolChangeEvent.java	\
+	ToolListener.java	\
+	ToolbarProvider.java	
+	
+	
+
+
+
 
