@@ -60,6 +60,10 @@ public class ViewMenu extends EditorMenu
     
     add(Actions.backColorAction, "Background Color");
     add(Actions.foreColorAction, "Foreground Color");
+    
+    addSeparator();
+    
+    add(Actions.zoomToWindowAction, "Zoom to Window");
   }
 }
 

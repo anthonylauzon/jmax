@@ -71,6 +71,13 @@ public class TableAdapter {
     setXZoom( (float)1.0);
     setYZoom( (float)1.0);
   }
+  
+  public void zoomToWindow()
+  {
+    int width = gc.getGraphicDestination().getSize().width;
+    setXZoom( findZoomRatioClosestTo( (float)width/dataModel.getSize()));
+  }
+  
   /**
    * Utility routine to find a double number under the form n/1 or 1/n closest
    * to the given double. This kind of ratios are usefull to avoid graphical

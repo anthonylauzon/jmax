@@ -277,7 +277,6 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	  if(hScrollVal == e.getValue()) return;
 	  
 	  int hDelta = hScrollVal-e.getValue();	    
-	  
 	  hScrollVal = e.getValue();
 	  int last = gc.getLastVisibleIndex();
 	  int first = gc.getFirstVisibleIndex();

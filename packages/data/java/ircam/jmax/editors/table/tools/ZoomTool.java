@@ -81,12 +81,14 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
     }
 
     int dddx = 0;
-    int dddy = 0;
+    int dddy = 0;  
     public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
-      TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-      if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
-	{
+      if( !e.isShiftDown())
+      {
+        TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+        if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
+        {
 	  float xZoom = a.getXZoom();
 	  dddx+=deltaX;
 	  if(dddx>35)
@@ -110,16 +112,28 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
 	else
 	  if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 	    a.incrYZoom( -deltaY);
+        }
+    }	
+    public void dragEnd(int x, int y, MouseEvent e)
+    {
+        if( e.isShiftDown())
+        {                        
+            TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+            Dimension size = gc.getGraphicDestination().getSize();
+            int rx = ( x > tempX) ? tempX : x;
+            double width = Math.abs( a.getInvX(x) - a.getInvX(tempX));            
+            a.setXZoom( a.findZoomRatioClosestTo((float)(size.width/width)));
+            ((TableGraphicContext)gc).scrollTo(rx);
+        }
     }
-    public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
 
     public void doubleClick( MouseEvent e)
     {
-      /*if( e.isShiftDown())
-	(((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
-	else*/
-      (((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
+      if( e.isShiftDown())
+	(((TableGraphicContext)gc).getAdapter()).zoomToWindow();
+      else	
+        (((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
     }
   
   /**

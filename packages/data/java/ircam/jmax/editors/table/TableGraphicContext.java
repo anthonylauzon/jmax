@@ -157,6 +157,11 @@ public class TableGraphicContext extends GraphicContext{
     return ((TableDisplay)getGraphicDestination()).panel.itsVerticalControl.isVisible();
   }
 
+  public void scrollTo(int x)
+  {
+    ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.setValue( x);
+  }
+
   public int getVisiblePixelsSize()
   {
     int pixsize;

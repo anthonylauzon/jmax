@@ -101,4 +101,10 @@ public class Actions
 	((TablePanel)container.getEditor()).changeForegroundColor();
       }
     };
+  public static EditorAction zoomToWindowAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((TablePanel)container.getEditor()).getGraphicContext().getAdapter().zoomToWindow();
+      }
+    };
 }
