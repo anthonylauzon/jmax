@@ -60,7 +60,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
   private Menu CreateNewFileMenu(){
-    //MaxResourceId aResId;
     MaxDataType aDataType;
     MenuItem aMenuItem;
     String aString;
@@ -69,20 +68,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     // the ResId mechanism is substituted by  the MaxDataType getTypes() call.
     // The installation of MaxDataTypes is dynamic (it's the execution of the 
     // resources.erm tcl script)
-    for(Enumeration e = MaxDataType.getTypes(); e.hasMoreElements();) {
+
+    for(Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();) {
       aDataType = (MaxDataType) e.nextElement();
       aString = aDataType.getName();
       newFileMenu.add(aMenuItem = new MenuItem(aString));
       aMenuItem.addActionListener(this);
     }
 
-    //---OLD CODE
-    /*for(int i=0; i< MaxApplication.resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
-      aString = aResId.GetName();
-      newFileMenu.add(aMenuItem = new MenuItem(aString));
-      aMenuItem.addActionListener(this);
-      }*/
     return newFileMenu;
   }
   
@@ -297,7 +290,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     // to be optimized: this function builds an enumeration for each menu selection 
     // (even if it is not in the "new" menu). A list of datatype names should be kept
     // somewhere
-    for(Enumeration e=MaxDataType.getTypes(); e.hasMoreElements();) {
+    for(Enumeration e=MaxDataType.getTypes().elements(); e.hasMoreElements();) {
       aDataType = (MaxDataType) e.nextElement();
       aString = aDataType.getName();
       if(aString.equals(theName)) return true;
@@ -412,7 +405,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       aDialog.setVisible(true);
     }
     else{//qui siamo nel caso di New...
-      NewFile(theString);
+      MaxApplication.NewFile(theString);
     }
     return true;
   }
@@ -445,39 +438,13 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     aNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
     aNewDialog.setVisible(true);
     aNewFileType = aNewDialog.GetNewFileType();
-    NewFile(aNewFileType);
-  }
-
-  private MaxEditor NewFile(String theFileType){
-    
-    // Editor activation starting from the choice of a type.
-    // sorry, using names for now...
-    MaxData ourData = MaxDataType.getTypeByName(theFileType).newInstance();
-    MaxDataEditorFactory ourEditorFactory = ourData.getDataType().getDefaultEditorFactory();
-    MaxDataEditor ourEditor = ourEditorFactory.newEditor(ourData);
-
-    /*if(theFileType.equals("patcher")) MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
-      else if (theFileType.equals("abstraction")) MaxApplication.ObeyCommand(MaxApplication.NEW_ABSTRACTION_COMMAND); //yes, I know...
-      else if(theFileType.equals("")) return null;*/
-
-    return null;//WARNING
+    MaxApplication.NewFile(aNewFileType);
   }
 
 
   private boolean EditMenuAction(MenuItem theMenuItem, String theString) {
     return true;
   }
-
-  /*public boolean ProjectMenuAction(MenuItem theMenuItem, String theString) {
-    if (theString.equals("Add Window")) {
-    //MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
-    itsProject.AddToProject(GetDocument(), this);
-    itsProject.UpdateProjectMenu();
-    //qui deve resettare i menu come in ObeyCommand(MaxApplication.ADD_WINDOW)
-    }
-    return true;
-    }*/
-
 
   private boolean WindowsMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Stack")) {
@@ -554,103 +521,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     File file = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
     if (file != null)
-      return OpenFile(file);
-    else
-	return false;
-  }
-
-  /**
-   * Open a file, given its name.
-   * This function choose the type of loading procedure
-   * On the base of the filename (for now)
-   */
-  public static boolean OpenFile(File file){
-    String aExtension = GetExtension(file);
-    MaxResourceId aResId = null;
-    if(aExtension.equals("tpa")){
-	try {
-	  MaxApplication.getTclInterp().evalFile(file.getPath());
-	}
-	catch (Exception e){
-	  System.out.println("error while opening .tpa " + file +" : " + e.toString());
-	  e.printStackTrace();
-	  return false;
-	}
-	MaxApplication.itsSketchWindowList.addElement(MaxApplication.itsSketchWindow);
-	MaxApplication.AddThisWindowToMenus(MaxApplication.itsSketchWindow);
-	MaxApplication.itsSketchWindow.itsDocument.SetFile(file);
-	MaxApplication.itsSketchWindow.setTitle(file.getName());
+      {
+	MaxApplication.OpenFile(file);
 	return true;
-    }
-    else if(aExtension.equals("pat")){
-      MaxApplication.Load(file);
-      return true;
-    }
-    else if ((aResId = ResIdWithExtension("."+aExtension))!=null) {
-      Object placeHolder;
-      MaxDocument aDocument;
-      try {
-	placeHolder = Class.forName("editors." + aResId.resourceName +"." + aResId.preferred_resource_handler).newInstance();
-      }catch(ClassNotFoundException k) {
-	System.out.println("editor not found:" + aResId.preferred_resource_handler); 
-	return false;
       }
-      catch(IllegalAccessException k) {
-	System.out.println("cannot execute " + aResId.preferred_resource_handler + " illegal access - is this \"public\"?");
-	return false;
-      }
-      catch(InstantiationException k) {
-	System.out.println("cannot execute " + aResId.preferred_resource_handler + ": instantiation error");
-	return false;
-      }     
-      if(placeHolder instanceof MaxDocument){
-	if(placeHolder instanceof MaxEditor){
-	  MaxEditor aEditor = (MaxEditor) placeHolder;
-	  //aEditor.Init(/*itsProject*/);
-	}
-	
-	aDocument = (MaxDocument) placeHolder;
-	aDocument.InitDoc(file.getName(), file/*, itsProject*/);
-	MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
-	MaxApplication.SetCurrentWindow(aDocument.GetWindow());
-	MaxApplication.AddThisFrameToMenus(aDocument.GetTitle());
-      }
-      return true;
-    }
-    //tutto il resto viene aperto con il text editor
-    else {
-      // ...
-    }
-    return true;
-  }
-
-  public static String GetExtension(File theFile){
-    String theFileName = theFile.getName();
-    int aLength = theFileName.length();
-    
-
-    if (aLength > 4){
-      String aExtension = theFileName.substring(aLength-3, aLength);
-      if(theFileName.endsWith("."+aExtension)) return aExtension;
-      else return "";
-    }
     else
-      return "";
+      return false;
   }
 
-  static MaxResourceId ResIdWithExtension(String theExtension) {
-    MaxResourceId aResId = null;
-    String aExtension;
-    for(Enumeration e = MaxApplication.resourceVector.elements(); e.hasMoreElements();) {
-      aResId = (MaxResourceId) e.nextElement();
-      for (Enumeration e1=aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
-	aExtension = (String) e1.nextElement();
-	if(aExtension.equals(theExtension))
-	  return aResId;
-      }
-    }
-    return null;//resource extension is unknown in the current system settings...
-  }
 
   public abstract MaxDocument GetDocument();
 

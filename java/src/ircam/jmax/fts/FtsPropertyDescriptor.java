@@ -89,9 +89,17 @@ public class FtsPropertyDescriptor
 
   static String unparse(String property, Object value)
   {
-    if (propertyDescriptors.containsKey(property) &&
-	((FtsPropertyDescriptor) propertyDescriptors.get(property)).parser != null)
-      return ((FtsPropertyDescriptor) propertyDescriptors.get(property)).parser.unparse(value);
+    if (propertyDescriptors.containsKey(property))
+      {
+	FtsTclPropertyParser parser;
+
+	parser = ((FtsPropertyDescriptor) propertyDescriptors.get(property)).parser;
+
+	if (parser != null)
+	  return parser.unparse(value);
+	else
+	  return value.toString();
+      }
     else
       return value.toString();
   }

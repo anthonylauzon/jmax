@@ -109,7 +109,7 @@ post_mess(const char *msg, int ac, const fts_atom_t *av)
 static void
 print_mess(const char *msg, int ac, const fts_atom_t *av)
 {
-  fprintf(stderr, "%s: ", msg);
+  fprintf(stderr, "%s: ", msg); 
   fprintf_atoms(stderr, ac, av);
   fprintf(stderr, "\n");
 }

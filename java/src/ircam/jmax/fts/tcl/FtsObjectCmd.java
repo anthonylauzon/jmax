@@ -45,7 +45,7 @@ class FtsObjectCmd implements Command
 	  {
 	    if (className.equals("messbox"))
 	      {
-		String content = description.substring(description.indexOf('{'),
+		String content = description.substring(description.indexOf('{') + 1,
 						       description.lastIndexOf('}'));
 
 		object = new FtsMessageObject(parent, content);

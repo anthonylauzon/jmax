@@ -1,6 +1,7 @@
 package ircam.jmax.mda;
 
 import java.util.*;
+import com.sun.java.swing.*;
 
 /**
  * Superclass for all the Max Data
@@ -14,7 +15,7 @@ abstract public class MaxData
   private MaxDataHandler handler = null;
   private MaxDataSource  source  = null;
   private MaxDataType    type    = null;
-  private Vector editors = new Vector();
+  private DefaultListModel editors = new DefaultListModel();
   private String name = null; // name of the instance, for UI purposes
   private String info = null; // comment field; store and get back, but don't use for semantic purpose
 
@@ -38,7 +39,7 @@ abstract public class MaxData
    * do not bind the editor on the data, and it is private
    */
 
-  void addEditor(MaxDataEditor editor)
+  public void addEditor(MaxDataEditor editor)
   {
     editors.addElement(editor);
   }
@@ -48,6 +49,14 @@ abstract public class MaxData
   public void removeEditor(MaxDataEditor editor)
   {
     editors.removeElement(editor);
+  }
+
+
+  /** Getting the list of editors, as a ListModel/DefaultListModel */
+
+  public DefaultListModel getEditors()
+  {
+    return editors;
   }
 
   /** Getting the handler */
@@ -124,8 +133,10 @@ abstract public class MaxData
   }
 
   /** edit: start an instance of the default editor for this type and
-   * bind it to this data; it is not the only permitted way to start
+   * register it; it is not the only permitted way to start
    * an editor on a data instance, but it may be convenient.
+   * the other way is to manually start an editor, and register it
+   * with addEditor.
    */
 
   public MaxDataEditor edit() throws MaxDataException
@@ -140,27 +151,6 @@ abstract public class MaxData
       }
     else
       throw new MaxDataException("No default editor for " + this);
-  }
-
-  /** edit: bind a given instance of an editor to this data.
-   * it is the other possible way to start an editor on a data.
-   */
-
-  public MaxDataEditor edit(MaxDataEditor editor) throws MaxDataException
-  {
-    addEditor(editor);
-
-    try
-      {
-	editor.editData(this);
-      }
-    catch (MaxDataException e)
-      {
-	editors.removeElement(editor);
-	return null;
-      }
-
-    return editor;
   }
 
 

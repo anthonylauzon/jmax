@@ -11,13 +11,6 @@ package ircam.jmax.mda;
 
 public interface MaxDataEditor
 {
-  /** This method set the data the editor should edit;
-   *  the editor can throw an exception if already set, or can implement
-   *  a change of the content.
-   */
-
-  abstract public void editData(MaxData data) throws MaxDataException;
-
   /** This method ask to the stop editing the data.
    *  This probabily means that the data item or the editor is about to
    * be disposed (destroyed).

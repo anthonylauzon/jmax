@@ -93,19 +93,13 @@ init_parser(void)
 }
 
 static long
-xtol(char *s)
+dtol(char *s)
 {
   long n = 0;
 
   for (; *s; s++)
-    {
-      if (('0' <= *s) && (*s <= '9'))
-	n = n * 16 + (*s - '0');
-      else if (('a' <= *s) && (*s <= 'f'))
-	n = n * 16 + (*s - 'a') + 10;
-      else if (('A' <= *s) && (*s <= 'F'))
-	n = n * 16 + (*s - 'A') + 10;
-    }
+    if (('0' <= *s) && (*s <= '9'))
+      n = n * 10 + (*s - '0');
 
   return n;
 }
@@ -247,7 +241,7 @@ fts_client_parse_char(char c)
 	  {
 	    *(cp_in.i_pt) = '\0';
 
-	    fts_set_long(cp_in.i_ap, xtol(cp_in.i_buf));
+	    fts_set_long(cp_in.i_ap, dtol(cp_in.i_buf));
 
 	    (cp_in.i_ac)++;
 	    (cp_in.i_ap)++;
@@ -312,7 +306,7 @@ fts_client_parse_char(char c)
 	  {
 	    *(cp_in.i_pt) = '\0';
 
-	    fts_set_long(cp_in.i_ap, (-1) * xtol(cp_in.i_buf));
+	    fts_set_long(cp_in.i_ap, (-1) * dtol(cp_in.i_buf));
 
 	    (cp_in.i_ac)++;
 	    (cp_in.i_ap)++;
@@ -449,7 +443,7 @@ fts_client_parse_char(char c)
 
 	    *(cp_in.i_pt) = '\0';
 
-	    id = xtol(cp_in.i_buf);
+	    id = dtol(cp_in.i_buf);
 	    fts_set_object(cp_in.i_ap, fts_object_table_get(id));
 
 	    (cp_in.i_ac)++;

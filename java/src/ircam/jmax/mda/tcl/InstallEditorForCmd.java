@@ -14,6 +14,9 @@ import ircam.jmax.mda.*;
  * <code>
  *     installEditorFor  <i>typeName function </i>
  * </code>
+ *
+ * 
+ * Change me to work with the new enzo resource scheme !!!
  */
 
 class InstallEditorForCmd implements Command

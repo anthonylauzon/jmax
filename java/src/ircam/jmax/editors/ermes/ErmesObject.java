@@ -267,7 +267,7 @@ public class ErmesObject implements FtsPropertyHandler {
   
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     int i;
-    int width, height;
+    int width = 0, height = 0;
     itsSelected = false;
     itsSketchPad = theSketchPad;
     itsFont = itsSketchPad.sketchFont;
@@ -276,8 +276,19 @@ public class ErmesObject implements FtsPropertyHandler {
     itsX = ((Integer)theFtsObject.get("pos.x")).intValue();
     itsY = ((Integer)theFtsObject.get("pos.y")).intValue();
 
-    width  = ((Integer)theFtsObject.get("size.w")).intValue();
-    height = ((Integer)theFtsObject.get("size.h")).intValue();
+    {
+      Integer widthInt = (Integer) theFtsObject.get("size.w");
+
+      if (widthInt != null)
+	width  = widthInt.intValue();
+    }
+
+    {
+      Integer heightInt = (Integer)theFtsObject.get("size.h");
+
+      if (heightInt != null)
+	height = heightInt.intValue();
+    }
     
     if((width<10)||(height<10)){
        width  = getPreferredSize().width;

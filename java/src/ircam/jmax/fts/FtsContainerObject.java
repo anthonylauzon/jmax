@@ -77,6 +77,7 @@ abstract public class FtsContainerObject extends FtsObject
   final void addObject(FtsObject obj)
   {
     objects.addElement(obj);
+    put("newObject", obj); // the newObject property keep the last object created
   }
 
   /** Remove an object from this container. */
@@ -85,7 +86,6 @@ abstract public class FtsContainerObject extends FtsObject
   {
     objects.removeElement(obj);
   }
-
 
   /** Replace an object with an other one; 
    * Cannot be called for inlets and outlets, only
@@ -111,6 +111,7 @@ abstract public class FtsContainerObject extends FtsObject
   final void addConnection(FtsConnection obj)
   {
     connections.addElement(obj);
+    put("newConnection", obj); // the newObject property keep the last connection created
   }
 
   /** Remove an connection from this container. */
@@ -218,6 +219,39 @@ abstract public class FtsContainerObject extends FtsObject
   public final void loaded()
   {
     MaxApplication.getFtsServer().patcherLoaded(this);
+  }
+
+
+  /** Keep the container handlers */
+
+  FtsObject.PropertyHandlerTable containerPropertyHandlerTable = null;
+
+  /** Watch a property of all the object in the patcher 
+   *
+   */
+
+  public void watchAll(String property, FtsPropertyHandler handler)
+  {
+    if (containerPropertyHandlerTable == null)
+      containerPropertyHandlerTable = new PropertyHandlerTable();
+    
+    containerPropertyHandlerTable.watch(property, handler);
+  }
+
+  /** Remove a watch all */
+
+  public void removeWatchAll(FtsPropertyHandler handler)
+  {
+    if (containerPropertyHandlerTable != null)
+      containerPropertyHandlerTable.removeWatch(handler);
+  }
+
+  /** execute the watch all */
+
+  void callWatchAll(String property, Object value)
+  {
+    if (containerPropertyHandlerTable != null)
+      containerPropertyHandlerTable.callHandlers(property, value);
   }
 
   /*****************************************************************************/

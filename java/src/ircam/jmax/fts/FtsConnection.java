@@ -90,7 +90,7 @@ public class FtsConnection
 
   void saveAsTcl(PrintWriter writer)
   {
-    writer.print("connection $objs(" + from.getObjId() + ") " + outlet + " $objs(" + to.getObjId() + ") " + inlet);
+    writer.print("connection $obj(" + from.getObjId() + ") " + outlet + " $obj(" + to.getObjId() + ") " + inlet);
   }
 
   /**

@@ -13,6 +13,13 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
    */
   public MaxDataEditor newEditor(MaxData theData) {
     ErmesSketchWindow aSketchWindow = MaxApplication.NewPatcherWindow((FtsContainerObject)theData.getContent());
+
+    // This stuff have to move to the constructor
+    MaxApplication.itsSketchWindowList.addElement(aSketchWindow);
+    MaxApplication.AddThisWindowToMenus(aSketchWindow);
+    // aSketchWindow.itsDocument.SetFile(file);
+    aSketchWindow.setTitle(theData.getName());
+
     return aSketchWindow;
   }
 }

@@ -40,6 +40,15 @@ JMaxCmd:
 .PHONY: JMaxCmd
 
 
+MaxInstallDataHandlerCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInstallDataHandlerCmd.java)
+.PHONY: MaxInstallDataHandlerCmd
+
+MaxInstallDataTypeCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInstallDataTypeCmd.java)
+.PHONY: MaxInstallDataTypeCmd
+
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
 

@@ -166,7 +166,6 @@ abstract public class FtsObject implements MaxTclInterpreter
   /******************************************************************************/
 
 
-
   /* The class PropertyTable handle properties and handlers; it is installed
      only by need, and is an inner class of FtsObject
      */
@@ -262,7 +261,7 @@ abstract public class FtsObject implements MaxTclInterpreter
   public void put(String name, Object value)
   {
     if (! FtsPropertyDescriptor.isClientOnly(name))
-      MaxApplication.getFtsServer().putObjectProperty(this, name, value);
+	MaxApplication.getFtsServer().putObjectProperty(this, name, value);
 
     localPut(name, value);
   }
@@ -376,6 +375,12 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     if (propertyHandlerTable != null)
       propertyHandlerTable.callHandlers(name, value);
+
+
+    // Call the handlers in the parent
+
+    if (parent != null)
+      parent.callWatchAll(name, value);
   }
 
 
@@ -763,16 +768,25 @@ abstract public class FtsObject implements MaxTclInterpreter
 
 	    property = (String) names.elementAt(i);
 
+	    // Save all the persistent properties that have a value
+
 	    if (FtsPropertyDescriptor.isPersistent(property))
 	      {
-		if (! firstDone)
-		  firstDone = true;
-		else
-		  writer.print(" ");
+		Object value;
+		
+		value = this.get(property);
 
-		writer.print(property);
-		writer.print(" ");
-		writer.print(FtsPropertyDescriptor.unparse(property, this.get(property)));
+		if (value != null)
+		  {
+		    if (! firstDone)
+		      firstDone = true;
+		    else
+		      writer.print(" ");
+
+		    writer.print(property);
+		    writer.print(" ");
+		    writer.print(FtsPropertyDescriptor.unparse(property, value));
+		  }
 	      }
 	  }
 	
@@ -795,7 +809,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	if ((length % 2) == 1)
 	  throw new FtsException(new FtsError(FtsError.TPA_ERROR, "in property list"));
 
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < length; i += 2)
 	  {
 	    String prop;
 	    TclObject obj;

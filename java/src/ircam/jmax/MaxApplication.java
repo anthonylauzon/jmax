@@ -12,7 +12,6 @@ import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.console.*;
 import ircam.jmax.editors.ermes.*;
-//63import ircam.jmax.editors.project.*;
 import tcl.lang.*;
 
 /**
@@ -59,15 +58,11 @@ public class MaxApplication extends Object{
 
   public static Properties jmaxProperties;
 
-  public static Vector resourceVector = new Vector();
-  static final int MAX_RESOURCE_FILE_LENGHT = 1024;
   public static ErmesSketchWindow itsSketchWindow;
   public static MaxWindow itsWindow;
   //public static ProjectWindow itsProjectWindow;
 
   static MaxWhenHookTable  itsHookTable;
-  public final static int NEW_COMMAND = 0;
-  public final static int NEW_ABSTRACTION_COMMAND = 1;
   public final static int SNAP_TO_GRID = 5;
   public final static int NEW_PROJECT = 6;
   //public final static int CLOSE_WINDOW = 7;
@@ -101,51 +96,12 @@ public class MaxApplication extends Object{
       }
     catch (TclException e)
       {
-	System.out.println("TCL error in resources initialization " + e + " : " + itsInterp.getResult());
+	System.out.println("Error in resources initialization: " + itsInterp.getResult());
       }
 
   }
   
-  static boolean Start_resource_type_list(StringTokenizer aST) {
-    if (aST.hasMoreTokens())
-      return(aST.nextToken().equals("start_resource_type_list"));
-    else return false;
-  }
-
 	
-  static boolean New_resource(StringTokenizer aST) {
-    if (aST.hasMoreTokens())
-      return(aST.nextToken().equals("***new_resource"));
-    else return false;
-  }
-	
-  static MaxResourceId Resource(StringTokenizer aST) {
-    String aTempString;
-    if (!aST.hasMoreTokens()) return null;
-    MaxResourceId aResId = new MaxResourceId(aST.nextToken(" \t\n\r\""));
-    if (!aST.nextToken().equals("resource_extension_list")) return null;
-    if (!aST.hasMoreTokens()) return null;
-    
-    while (aST.hasMoreTokens() ) {
-      aTempString = aST.nextToken();
-      if (aTempString.equals("end_resource_extension_list"))
-	break;
-      else aResId.resourceExtensions.addElement(aTempString);
-    }
-    if (!aST.hasMoreTokens()) return null;
-    if (!aST.nextToken().equals("preferred_resource_handler")) return null;
-    if (!aST.hasMoreTokens()) return null;
-    aResId.preferred_resource_handler = aST.nextToken();
-    // a more clever implementation would now SKIP the tokens until "end_resource", 
-    // that must be present anyway.
-    // This would allow future extensions of the file format
-    if (!aST.hasMoreTokens()) return null;
-    if (!aST.nextToken().equals("end_resource")) return null;
-    if (!aST.hasMoreTokens()) return null;
-    if (!aST.nextToken().equals(aResId.resourceName)) return null;
-    return aResId;	
-  }
-
   public static void ConnectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
   {
     if (mode.equals("socket")) 
@@ -159,10 +115,70 @@ public class MaxApplication extends Object{
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
   }
-  
+
+
+  // Data handling
+
+  /** Method to create a new MaxData of a named type */
+
+  public static MaxData NewFile(String theFileType){
+    
+    // Editor activation starting from the choice of a type.
+    // We use the edit method, that automatically start a new
+    // instance of the default editor for a type, used
+    // the registered default editor factory.
+    // sorry, using names for now...
+
+    MaxData ourData;
+    MaxDataEditor ourEditor;
+
+    try
+      {
+    	ourData = MaxDataType.getTypeByName(theFileType).newInstance();
+	ourEditor = ourData.edit();
+      }
+    catch (MaxDataException e)
+      {
+	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while creating new "+ theFileType);
+	aErr.setLocation(100, 100);
+	aErr.setVisible(true);
+	return null;
+      }
+
+    return ourData;
+  }
+
+
+  /**
+   * Open a file, given its name.
+   * This function choose the type of loading procedure
+   * On the base of the filename (for now)
+   */
+
+  public static MaxData OpenFile(File file)
+  {
+    MaxData ourData;
+    MaxDataEditor ourEditor; 
+
+    try
+      {
+	ourData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(file));
+	ourEditor = ourData.edit();
+
+	return ourData;
+      }
+    catch (MaxDataException e)
+      {
+	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while opening "+ file);
+	aErr.setLocation(100, 100);
+	aErr.setVisible(true);
+	return null;
+      }
+  }
+
+
   public static void Load(File file)
   {
-    
     boolean temp = doAutorouting;
 
     doAutorouting = false;
@@ -210,34 +226,6 @@ public class MaxApplication extends Object{
     doAutorouting = temp;
   }
   
-  public static void AddToProject(File file)
-  {
-    String aType = new String();
-    MaxResourceId aResId;
-    boolean found = false;
-
-    for (Enumeration e= resourceVector.elements(); e.hasMoreElements() && !found;)
-      {
-	aResId = (MaxResourceId) e.nextElement();
-
-	for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();)
-	  {
-	    String aExt = (String) e1.nextElement();
-
-	    if (file.getName().endsWith(aExt))
-	      {
-		aType = aResId.resourceName;
-		found = true;
-		break;
-	      }
-	  }
-      }
-
-    if (!found)
-      aType = "unknown";
-
-  }
-	
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
@@ -403,44 +391,6 @@ public class MaxApplication extends Object{
   public static void ObeyCommand(int command) {
     ErmesSketchWindow aSketchWindow;
     switch (command) {
-    case NEW_COMMAND:
-
-      itsSketchWindow = new ErmesSketchWindow(false, null, false);
-      itsSketchWindow.Init();
-      itsWindow = itsSketchWindow;
-
-      itsSketchWindowList.addElement(itsSketchWindow);
-      itsSketchWindow.inAnApplet = false;
-      itsSketchWindow.itsDocument.itsPatcher.open();	//remember to close
-      
-      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
-      itsSketchWindow.pack();
-      itsSketchWindow.setLocation(40,40);
-
-      itsSketchWindow.setRunMode(false);
-      AddThisWindowToMenus(itsSketchWindow);
-      itsSketchWindow.setVisible(true);
-      break;	
-      
-    case NEW_ABSTRACTION_COMMAND://for test purposes only!!!!!!!
-
-      itsSketchWindow = new ErmesSketchWindow(false, null, true);
-      itsSketchWindow.Init();
-      itsWindow = itsSketchWindow;
-
-      itsSketchWindowList.addElement(itsSketchWindow);
-      itsSketchWindow.inAnApplet = false;
-      itsSketchWindow.itsDocument.itsPatcher.open();	//remember to close
-      
-      itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
-      itsSketchWindow.pack();
-      itsSketchWindow.setLocation(40,40);
-
-      itsSketchWindow.setRunMode(false);
-      AddThisWindowToMenus(itsSketchWindow);
-      itsSketchWindow.setVisible(true);
-      break;	
-
     case OPEN_WITH_AUTO_ROUTING:
       doAutorouting = !doAutorouting;
       break;
@@ -640,7 +590,7 @@ public class MaxApplication extends Object{
     }
 
     //the version number as a system property
-    jmaxProperties.put("version", " version 2.1 beta");
+    jmaxProperties.put("jmaxVersion", " version 2.1 beta");
 
     itsHookTable = new MaxWhenHookTable(); 
 

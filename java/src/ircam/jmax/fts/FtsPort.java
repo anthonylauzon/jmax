@@ -119,10 +119,6 @@ abstract class FtsPort implements Runnable
 
 	    if (msg != null)
 	      server.dispatchMessage(msg);
-
-	    /* server.dispatch(msg) */
-
-	    /* Thread.yield();	*/	// ??? needed ???
 	  }
 	catch (FtsQuittedException e)
 	  {
@@ -185,12 +181,12 @@ abstract class FtsPort implements Runnable
     if (value < 0)
       {
 	out_stream.write(FtsClientProtocol.neg_int_type_code);
-	s = Integer.toHexString(-1 * value);
+	s = Integer.toString(-1 * value);
       }
     else
       {
 	out_stream.write(FtsClientProtocol.pos_int_type_code);
-	s = Integer.toHexString(value);
+	s = Integer.toString(value);
       }
 		
     for (int i = 0; i < s.length(); i++)
@@ -263,7 +259,7 @@ abstract class FtsPort implements Runnable
       value = 0;
 
     out_stream.write(FtsClientProtocol.object_type_code);
-    s = Integer.toHexString(value);
+    s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
       out_stream.write(s.charAt(i));
@@ -413,7 +409,7 @@ abstract class FtsPort implements Runnable
 	    if (FtsClientProtocol.tokenStartingChar(c))
 	      {
 		status = tokenCode(c);
-		args.addElement(new Integer(Integer.parseInt(s.toString(), 16)));
+		args.addElement(new Integer(Integer.parseInt(s.toString())));
 		s.setLength(0);
 	      }
 	    else
@@ -427,7 +423,7 @@ abstract class FtsPort implements Runnable
 	    if (FtsClientProtocol.tokenStartingChar(c))
 	      {
 		status = tokenCode(c);
-		args.addElement(new Integer((-1) * Integer.parseInt(s.toString(), 16)));
+		args.addElement(new Integer((-1) * Integer.parseInt(s.toString())));
 		s.setLength(0);
 	      }
 	    else
@@ -455,7 +451,7 @@ abstract class FtsPort implements Runnable
 	    if (FtsClientProtocol.tokenStartingChar(c))
 	      {
 		status = tokenCode(c);
-		args.addElement(server.getObjectByFtsId(Integer.parseInt(s.toString(), 16)));
+		args.addElement(server.getObjectByFtsId(Integer.parseInt(s.toString())));
 		s.setLength(0);
 	      }
 	    else

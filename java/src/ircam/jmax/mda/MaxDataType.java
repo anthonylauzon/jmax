@@ -1,6 +1,7 @@
 package ircam.jmax.mda; 
 
 import java.util.*;
+import com.sun.java.swing.*;
 
 /** This class represent a type of editable data, with 
  * all its interesting properties.
@@ -24,7 +25,7 @@ abstract public class MaxDataType
   /*                                                                           */
   /*****************************************************************************/
 
-  static Vector typeList = new Vector();
+  static DefaultListModel typeList = new DefaultListModel();
 
   static public MaxDataType getTypeByName(String name)
   {
@@ -41,9 +42,9 @@ abstract public class MaxDataType
     return null;
   }
   
-  static public Enumeration getTypes()
+  static public DefaultListModel getTypes()
   {
-    return typeList.elements();
+    return typeList;
   }
 
   static public void installDataType(MaxDataType type)
@@ -63,7 +64,7 @@ abstract public class MaxDataType
 
   /** The instance list */
 
-  Vector instanceList = new Vector();
+  DefaultListModel instanceList = new DefaultListModel();
 
   /** The defaut editor factory; this object should actually
     build an indirect object that actually build the real 
@@ -133,10 +134,10 @@ abstract public class MaxDataType
     instanceList.removeElement(instance);
   }
 
-  /** Get an enumeration of all the active instances */
+  /** Get the ListModel (a defaultlistmodel, actually) of all the active instances */
 
-  public Enumeration instances()
+  public DefaultListModel instances()
   {
-    return instanceList.elements();
+    return instanceList;
   }
 }

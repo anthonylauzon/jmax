@@ -1,4 +1,5 @@
 SOURCES = \
-	InstallEditorForCmd.java \
+	MaxInstallDataHandlerCmd.java \
+	MaxInstallDataTypeCmd.java \
 	TclMdaPackage.java \
 	JMaxCmd.java

@@ -54,7 +54,7 @@ public abstract class  MaxTclData extends MaxData implements MaxTclInterpreter
 
     interp.eval(list, 0);
 
-    setContent((MaxDataEditor) ReflectObject.get(interp, interp.getResult()));
+    setContent(ReflectObject.get(interp, interp.getResult()));
   }
 
   /** This method provide the subclasses of MaxTclData a way to specify

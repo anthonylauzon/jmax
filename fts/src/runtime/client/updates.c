@@ -61,6 +61,21 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
 }
 
 
+static void 
+update_group_start(void)
+{
+  fts_client_mess_start_msg(UPDATE_GROUP_START_CODE);
+  fts_client_mess_send_msg();
+}
+
+
+static void 
+update_group_end(void)
+{
+  fts_client_mess_start_msg(UPDATE_GROUP_END_CODE);
+  fts_client_mess_send_msg();
+}
+
 static int period_count = 0;
 
 static void
@@ -73,12 +88,17 @@ fts_client_updates_sched(void)
       int update_count;
 
       period_count = 0;
+
+      update_group_start();
+
       for (update_count = 0;
 	   (update_count < fts_updates_per_ticks) && fts_object_get_next_change(&property, &obj);
 	   update_count++)
 	{
 	  fts_client_send_prop(obj, property);
 	}
+
+      update_group_end();
     }
   else
     period_count++;

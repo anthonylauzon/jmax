@@ -188,6 +188,10 @@ FtsTclPropertyParser:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTclPropertyParser.java)
 .PHONY: FtsTclPropertyParser
 
+FtsUpdateGroupListener:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsUpdateGroupListener.java)
+.PHONY: FtsUpdateGroupListener
+
 
 
 

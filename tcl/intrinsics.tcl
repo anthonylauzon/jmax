@@ -65,7 +65,12 @@ proc abstractionDirectory { dir } {
 
 
 
+##
+## Commands for the .tpa format; source from a separate file
+##
 
+
+source $jmaxRootDir/tcl/tpacmds.tcl
 
 
 

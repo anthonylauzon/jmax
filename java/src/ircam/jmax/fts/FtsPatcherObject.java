@@ -183,7 +183,7 @@ public class FtsPatcherObject extends FtsContainerObject
 	
 	if (! (obj instanceof FtsDeclarationObject))
 	  {
-	    writer.print("set objs(" + obj.getObjId() + ")" + " [");
+	    writer.print("set obj(" + obj.getObjId() + ")" + " [");
 
 	    obj.saveAsTcl(writer);
 

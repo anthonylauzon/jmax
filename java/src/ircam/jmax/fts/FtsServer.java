@@ -30,7 +30,7 @@ public class FtsServer
 
   /** The FtsPort used to communicate with FTS */
 
-  FtsPort connection;
+  FtsPort port;
 
   /** The name of this server, used for printouts only */
 
@@ -40,14 +40,18 @@ public class FtsServer
 
   FtsContainerObject root;
 
-  /** Create an FTS Server. With a given connection. */
+  /** The list of listener of update groups */
+  
+  Vector updateGroupListeners;
 
-  FtsServer(String name, FtsPort connection)
+  /** Create an FTS Server. With a given port. */
+
+  FtsServer(String name, FtsPort port)
   {
     this.name = name;
-    this.connection = connection;
+    this.port = port;
 
-    this.connection.setServer(this);
+    this.port.setServer(this);
   }
 
   /** Give a string representation of the server */
@@ -72,7 +76,7 @@ public class FtsServer
 
   public void start()
   {
-    connection.start();
+    port.start();
 
     // Build the root object and the root patcher
 
@@ -83,14 +87,14 @@ public class FtsServer
 
   public void stop()
   {
-    connection.close();
+    port.close();
   }
 
   /** Set a server parameter, <i>before</i> the server start. */
 
   public void setParameter(String name, String value)
   {
-    connection.setParameter(name, value);
+    port.setParameter(name, value);
   }
 
   /** Send a "open patcher" messages to FTS.*/
@@ -99,9 +103,9 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_open_patcher_cmd);
-	connection.sendObject(patcher);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_open_patcher_cmd);
+	port.sendObject(patcher);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -114,9 +118,9 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_close_patcher_cmd);
-	connection.sendObject(patcher);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_close_patcher_cmd);
+	port.sendObject(patcher);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -130,9 +134,9 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_patcher_loaded_cmd);
-	connection.sendObject(patcher);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_patcher_loaded_cmd);
+	port.sendObject(patcher);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -156,15 +160,15 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString(className);
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString(className);
 
 	if (args != null)
-	  connection.sendVector(args);
+	  port.sendVector(args);
 
-	connection.sendEom();
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -188,15 +192,15 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString(className);
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString(className);
 
-	if (args != null)
-	  connection.sendVector(args);
+	if (args != null) 
+	  port.sendVector(args); 
 
-	connection.sendEom();
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -211,14 +215,14 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString("patcher");
-	connection.sendString(name);
-	connection.sendInt(ninlets);
-	connection.sendInt(noutlets);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString("patcher");
+	port.sendString(name);
+	port.sendInt(ninlets);
+	port.sendInt(noutlets);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -233,11 +237,11 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString("inlet");
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString("inlet");
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -251,12 +255,12 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString("inlet");
-	connection.sendInt(pos);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString("inlet");
+	port.sendInt(pos);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -271,11 +275,11 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString("outlet");
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendString("outlet");
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -289,12 +293,12 @@ public class FtsServer
     try
       {
 	registerObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	connection.sendObject(patcher);
-	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString("outlet");
-	connection.sendInt(pos);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	port.sendObject(patcher);
+	port.sendInt(obj.getObjId());
+	port.sendString("outlet");
+	port.sendInt(pos);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -308,10 +312,10 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_replace_object_cmd);
-	connection.sendObject(oldObject);
-	connection.sendObject(newObject);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_replace_object_cmd);
+	port.sendObject(oldObject);
+	port.sendObject(newObject);
+	port.sendEom();
 
 	// In FTS, they exchanged their ID identity; 
 	// we exchange their IDs on the client side to keep
@@ -336,13 +340,13 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	connection.sendObject(obj);
-	connection.sendString("patcher");
-	connection.sendString(name);
-	connection.sendInt(ninlets);
-	connection.sendInt(noutlets);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendObject(obj);
+	port.sendString("patcher");
+	port.sendString(name);
+	port.sendInt(ninlets);
+	port.sendInt(noutlets);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -355,11 +359,11 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	connection.sendObject(obj);
-	connection.sendString("inlet");
-	connection.sendInt(pos);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendObject(obj);
+	port.sendString("inlet");
+	port.sendInt(pos);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -372,11 +376,11 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	connection.sendObject(obj);
-	connection.sendString("outlet");
-	connection.sendInt(pos);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendObject(obj);
+	port.sendString("outlet");
+	port.sendInt(pos);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -396,14 +400,14 @@ public class FtsServer
 
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	connection.sendObject(obj);
-	connection.sendString("messbox");
+	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendObject(obj);
+	port.sendString("messbox");
 
 	if (args != null)
-	  connection.sendVector(args);
+	  port.sendVector(args);
 
-	connection.sendEom();
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -418,9 +422,9 @@ public class FtsServer
     try
       {
 	unregisterObject(obj);
-	connection.sendCmd(FtsClientProtocol.fts_free_object_cmd);
-	connection.sendObject(obj);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_free_object_cmd);
+	port.sendObject(obj);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -434,15 +438,15 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_message_cmd);
-	connection.sendObject(dst);
-	connection.sendInt(inlet);
-	connection.sendString(selector);
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(dst);
+	port.sendInt(inlet);
+	port.sendString(selector);
 
 	if (args != null)
-	  connection.sendVector(args);
+	  port.sendVector(args);
 
-	connection.sendEom();
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -457,16 +461,16 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_named_message_cmd);
+	port.sendCmd(FtsClientProtocol.fts_named_message_cmd);
 
-	connection.sendString(dst);
-	connection.sendInt(inlet);
-	connection.sendString(selector);
+	port.sendString(dst);
+	port.sendInt(inlet);
+	port.sendString(selector);
 
 	if (args != null)
-	  connection.sendVector(args);
+	  port.sendVector(args);
 
-	connection.sendEom();
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -480,12 +484,12 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_connect_objects_cmd);
-	connection.sendObject(from);
-	connection.sendInt(outlet);
-	connection.sendObject(to);
-	connection.sendInt(inlet);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_connect_objects_cmd);
+	port.sendObject(from);
+	port.sendInt(outlet);
+	port.sendObject(to);
+	port.sendInt(inlet);
+	port.sendEom();
 
 	connCount++;
       }
@@ -501,12 +505,12 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_disconnect_objects_cmd);
-	connection.sendObject(from);
-	connection.sendInt(outlet);
-	connection.sendObject(to);
-	connection.sendInt(inlet);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_disconnect_objects_cmd);
+	port.sendObject(from);
+	port.sendInt(outlet);
+	port.sendObject(to);
+	port.sendInt(inlet);
+	port.sendEom();
 
 	connCount--;
       }
@@ -522,11 +526,11 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_put_property_cmd);
-	connection.sendObject(object);
-	connection.sendString(name);
-	connection.sendValue(value);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
+	port.sendObject(object);
+	port.sendString(name);
+	port.sendValue(value);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -540,10 +544,10 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_get_property_cmd);
-	connection.sendObject(object);
-	connection.sendString(name);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.fts_get_property_cmd);
+	port.sendObject(object);
+	port.sendString(name);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -557,9 +561,9 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.ucs_cmd);
-	connection.sendVector(args);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.ucs_cmd);
+	port.sendVector(args);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -579,8 +583,8 @@ public class FtsServer
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.sync_cmd);
-	connection.sendEom();
+	port.sendCmd(FtsClientProtocol.sync_cmd);
+	port.sendEom();
       }
     catch (java.io.IOException e)
       {
@@ -594,9 +598,29 @@ public class FtsServer
 
   final void sendMessage(FtsMessage msg)
   {
-    connection.sendMessage(msg);
+    port.sendMessage(msg);
   }
 
+
+  /** Handle adding an update group listener */
+
+  void addUpdateGroupListener(FtsUpdateGroupListener listener)
+  {
+    if (updateGroupListeners == null)
+      updateGroupListeners = new Vector();
+    
+    updateGroupListeners.addElement(listener);
+  }
+
+  /** Handle removing an update group listener */
+
+  void removeUpdateGroupListener(FtsUpdateGroupListener listener)
+  {
+    if (updateGroupListeners == null)
+      return;
+
+    updateGroupListeners.removeElement(listener);
+  }
 
   /**
    * Dispatch a server message.
@@ -638,6 +662,18 @@ public class FtsServer
 	deliverPong();
 	break;
 	
+      case FtsClientProtocol.fts_update_group_start_cmd:
+	if (updateGroupListeners != null)
+	  for (int i = 0; i < updateGroupListeners.size(); i++)
+	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	break;
+
+      case FtsClientProtocol.fts_update_group_end_cmd:
+	if (updateGroupListeners != null)
+	  for (int i = 0; i < updateGroupListeners.size(); i++)
+	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+	break;
+
       default:
 	break;
       }
@@ -746,3 +782,10 @@ public class FtsServer
       return (FtsObject) objTable.elementAt(id);
   }
 }
+
+
+
+
+
+
+

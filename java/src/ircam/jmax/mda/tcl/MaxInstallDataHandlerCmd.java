@@ -6,18 +6,12 @@
  */
 
 
-package ircam.jmax.tcl;
+package ircam.jmax.mda.tcl;
 
-
-import java.io.*;
-import java.util.*;
 import tcl.lang.*;
-import ircam.jmax.*;
-import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 
 /**
- * The "systemProperty" TCL command.
  */
 
 class MaxInstallDataHandlerCmd implements Command
@@ -31,14 +25,28 @@ class MaxInstallDataHandlerCmd implements Command
     if (argv.length == 2)
       {
 	MaxDataHandler aDataHandler;
-	try {
-	  aDataHandler = (MaxDataHandler) Class.forName(argv[1].toString()).newInstance();
-	} catch (Exception e) {
-	  System.out.println("error installing Data handler " +argv[1].toString());
-	  throw new TclException(1);
-	}
+
+	try
+	  {
+	    aDataHandler = (MaxDataHandler) Class.forName(argv[1].toString()).newInstance();
+	  }
+	catch (ClassNotFoundException e)
+	  {
+	    throw new TclException(interp, "Class not found for Data handler " +argv[1].toString());
+	  }
+	catch (java.lang.InstantiationException e)
+	  {
+	    throw new TclException(interp, "Error instantiating Data handler " +argv[1].toString());
+	  }
+	catch (java.lang.IllegalAccessException e)
+	  {
+	    throw new TclException(interp, "Illegal access Error instantiating Data handler " +argv[1].toString());
+	  }
+
 	MaxDataHandler.installDataHandler(aDataHandler);
+
 	//everything is OK... proceed
+
 	interp.setResult(ReflectObject.newInstance(interp, aDataHandler));
       }
     else

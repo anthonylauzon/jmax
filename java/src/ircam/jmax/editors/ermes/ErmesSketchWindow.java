@@ -90,12 +90,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
 
 
   // the MaxDataEditor interface
-  public void editData(MaxData data) throws MaxDataException{}
-  /** This method ask to the stop editing the data.
-   *  This probabily means that the data item or the editor is about to
-   * be disposed (destroyed).
-   *
-   */
+
   public void quitEdit() {}
   /** Tell the editor to syncronize, i.e. to store in the
    * data all the information possibly cached in the editor
@@ -554,7 +549,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	fileToOpen = FtsHelpPatchTable.getHelpPatch(aObject.itsFtsObject);
 	
 	if (fileToOpen != null)
-	  MaxApplication./*itsProjectWindow.*/GetConsoleWindow().OpenFile(fileToOpen);
+	  MaxApplication.OpenFile(fileToOpen);
       }
     }
   }

@@ -64,7 +64,6 @@ public class FtsDotPatParser
       obj.put("pos.x", x);
       obj.put("pos.y", y);
       obj.put("size.w", width);
-      obj.put("size.h", 0);
       obj.put("fontSize", fontSize);
     }
   }
@@ -307,7 +306,7 @@ public class FtsDotPatParser
 		    Vector args = new Vector();
 
 		    readObjectArguments(args, in);
-		    lastNObject.sendMessage(0, "_set", args);
+		    lastNObject.sendMessage(0, "_set", args); 
 
 		    in.nextToken();//skip ';' ??
 		  }
@@ -415,7 +414,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static FtsConnection parseConnection(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
+  static void parseConnection(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
 
     FtsObject from;
@@ -425,7 +424,7 @@ public class FtsDotPatParser
 
     Vector objects;
 
-    objects = parent.getObjects();
+    objects = parent.getObjects(); 
 
     in.nextToken(); 
     from = (FtsObject) objects.elementAt(objects.size() - (int) in.getNVal() - 1);
@@ -439,7 +438,7 @@ public class FtsDotPatParser
     in.nextToken(); 
     inlet  = (int) in.getNVal();
 
-    return new FtsConnection(from, outlet, to, inlet);
+    new FtsConnection(from, outlet, to, inlet);
   }
 
   /**
@@ -592,12 +591,12 @@ public class FtsDotPatParser
 
 	    if (args.size() > 1)
 	      {
-		((FtsContainerObject)lastNObject).setObjectName((String) args.elementAt(1));
+		((FtsContainerObject)lastNObject).setObjectName((String) args.elementAt(1)); 
 		((FtsContainerObject)lastNObject).assignInOutlets();
 	      }
 	    else
 	      {
-		((FtsContainerObject)lastNObject).setObjectName("unnamed");
+		((FtsContainerObject)lastNObject).setObjectName("unnamed"); 
 		((FtsContainerObject)lastNObject).assignInOutlets();
 	      }
 

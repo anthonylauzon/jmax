@@ -25,10 +25,7 @@ import ircam.jmax.editors.console.*;
 
 class MaxOpenCmd implements Command {
 
-  
-  
   /**
-    
    * This procedure is invoked to execute a "Open" operation in Ermes
    * It calls the generic OpenFile procedure of the project manager
    * It is able to load everything that can be opened by the "open" menu
@@ -42,7 +39,7 @@ class MaxOpenCmd implements Command {
 
 	// Should call MaxApplication.Open, not the project !!!
 
-	MaxApplication.GetConsoleWindow().OpenFile(new File(new String(argv[1].toString())));
+	MaxApplication.OpenFile(new File(argv[1].toString()));
 	// Should return the document produced !!!
       }
     else

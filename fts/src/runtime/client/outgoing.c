@@ -58,9 +58,9 @@ void
 fts_client_mess_add_long(long value)
 {
   if (value >= 0)
-    sprintf(outbuf_fill, "%c%lx", LONG_POS_CODE, value);
+    sprintf(outbuf_fill, "%c%ld", LONG_POS_CODE, value);
   else 
-    sprintf(outbuf_fill, "%c%lx", LONG_NEG_CODE, (-1) * value);
+    sprintf(outbuf_fill, "%c%ld", LONG_NEG_CODE, (-1) * value);
 
   outbuf_fill = outbuf_fill + strlen(outbuf_fill);
 }
@@ -68,7 +68,7 @@ fts_client_mess_add_long(long value)
 void
 fts_client_mess_add_object(fts_object_t *obj)
 {
-  sprintf(outbuf_fill, "%c%lx", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
+  sprintf(outbuf_fill, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
 
   outbuf_fill = outbuf_fill + strlen(outbuf_fill);
 }

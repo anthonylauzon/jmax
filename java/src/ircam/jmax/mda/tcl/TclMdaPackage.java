@@ -17,7 +17,11 @@ public class TclMdaPackage
 
   static public void installPackage(Interp interp)
   {
-    interp.createCommand("installEditorFor",  new InstallEditorForCmd());
+    interp.createCommand("installDataType", new MaxInstallDataTypeCmd());
+    interp.createCommand("installDataHandler", new MaxInstallDataHandlerCmd()); 
+
+    // Don't use this, old stuff; a try to add a TCL defined editor.
+    // interp.createCommand("installEditorFor",  new InstallEditorForCmd()); 
     interp.createCommand("jmax",  new JMaxCmd());
   }
 }

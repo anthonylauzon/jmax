@@ -34,6 +34,13 @@ public class FtsPatchDataType extends MaxDataType
 
     patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
 
+    // Put some geometrical property for the window, so we can see it.
+
+    patcher.put("win.pos.x", 100);
+    patcher.put("win.pos.y", 100);
+    patcher.put("win.size.w", 300);
+    patcher.put("win.size.h", 300);
+
     FtsPatchData obj = new FtsPatchData();
 
     obj.setPatcher(patcher);

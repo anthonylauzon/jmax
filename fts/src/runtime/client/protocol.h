@@ -52,6 +52,9 @@ are the same, so the users can add as many message type as they want.
 #define CLIENTPROP_CODE         'P'
 #define CLIENTMESS_CODE         'M'
 
+#define UPDATE_GROUP_START_CODE  '{'
+#define UPDATE_GROUP_END_CODE    '}'
+
 /* Sincronization code */
 
 #define SYNC_CODE     '>'

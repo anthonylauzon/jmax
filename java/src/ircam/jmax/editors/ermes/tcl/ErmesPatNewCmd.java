@@ -30,7 +30,9 @@ class ErmesPatNewCmd implements Command {
     if (argv.length > 1)
       throw new TclNumArgsException(interp, 1, argv, "");
 
-    MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
+    // Obsolete, use the generic new with patch as argument
+    // ehm, write the generic new, before :->
+
 
     // It should get back the new patcher, and return it for future commands !!!
   }

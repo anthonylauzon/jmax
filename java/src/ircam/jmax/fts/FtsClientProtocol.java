@@ -93,6 +93,9 @@ class FtsClientProtocol
 
   static final int fts_property_value_cmd = 'P';
   static final int fts_server_message_cmd = 'M';
+
+  static final int fts_update_group_start_cmd = '{';
+  static final int fts_update_group_end_cmd = '}';
 }
 
 
