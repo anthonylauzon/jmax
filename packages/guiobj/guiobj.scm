@@ -21,8 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-(println "HERE")
-
 ;; package declaration
 (provide-package "guiobj" "0.0.0")
 
