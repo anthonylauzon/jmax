@@ -4,8 +4,13 @@
 ## generate libtool files
 ## libtoolize --automake -c
 ## automake --add-missing --copy --foreign
-SUBDIRS=client fts include java packages bin images tutorials config utils help doc
+if COND_COMPILE_JAVA
+JAVA_SRC_DIR= java
+else
+JAVA_SRC_DIR= 
+endif
 
+SUBDIRS=client fts include $(JAVA_SRC_DIR) packages bin images tutorials config utils help doc
 EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
 
 #
