@@ -256,6 +256,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	    else
 	      {
 		nodeText = ftsObj.getDescription();
+		nodeText.trim();
 		if(nodeText.equals("")) nodeText = ftsObj.getComment();
 		node = new FtsMutableTreeNode(ftsObj, nodeText);
 		top.add(node);

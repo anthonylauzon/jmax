@@ -98,6 +98,8 @@ struct fts_package {
 
   fts_hashtable_t* help;
   fts_list_t* data_paths;
+
+  int dirty; /* set to one if package's content is not saved */
 };
 
 /** Allocates a new package. 
@@ -319,6 +321,8 @@ void fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path);
  * @ingroup package */
 int fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len);
 
+
+extern void fts_package_set_dirty(fts_package_t *this, int is_dirty);
 
 /********************************************************************
  *

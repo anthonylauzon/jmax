@@ -904,6 +904,8 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   
   if( fts_object_has_id( o) && pkg->packages)
     fts_package_upload_requires( pkg);
+
+  fts_package_set_dirty( pkg, 1);
 }
 
 static void 
@@ -934,6 +936,8 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   if( fts_object_has_id( o) && pkg->template_paths)
     fts_package_upload_template_paths( pkg);
+
+  fts_package_set_dirty( pkg, 1);
 }
 
 static void 
@@ -977,6 +981,8 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   if( fts_object_has_id( o) && pkg->data_paths)
     fts_package_upload_data_paths( pkg);
+
+  fts_package_set_dirty( pkg, 1);
 }
 
 static void 
@@ -1037,6 +1043,8 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_bmax_code_return( &f);
 
   fts_bmax_file_close( &f);
+
+  fts_package_set_dirty( this, 0);
 }
 
 static void 
@@ -1068,6 +1076,27 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if ( this->help) {
     fts_package_print_hashtable( this->help, fts_s_help, NULL);
   }
+}
+
+/* set a patch as dirty or as saved: if this patcher is a sub-patcher propagate the set_dirty to his father
+ * until a firts level patche is reached.
+ * A "setDirty" message is sent to the client after is_dirty flag changed
+ */
+void 
+fts_package_set_dirty(fts_package_t *this, int is_dirty)
+{
+  if(this->dirty != is_dirty)
+    {
+      this->dirty = is_dirty;
+
+      if ( fts_object_has_id( (fts_object_t *)this))
+	{
+	  fts_atom_t a[1];
+	  
+	  fts_set_int(&a[0], is_dirty);
+	  fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
+	}
+    }
 }
 
 /***********************************************
@@ -1240,6 +1269,8 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_client_send_message( o, s_hasSummary, 1, a);  
 
   fts_client_send_message( o, s_uploadDone, 0, 0);  
+
+  fts_package_set_dirty( this, 0);
 }
 
 static void 

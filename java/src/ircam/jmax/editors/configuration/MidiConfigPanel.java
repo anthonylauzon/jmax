@@ -367,6 +367,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 	{
 	  if( col==0)
 	    {
+	      ((String)value).trim();
               if( ((String)value).equals("")) value = "unnamed";
             
 	      if( oldValue == null)

@@ -116,6 +116,7 @@ public class TextRenderer implements ObjectRenderer
 	int ww;
 	int w = 0;
 
+	text.trim();
 	if(!text.equals(""))
 	    {
 		area.setText(text);
@@ -139,6 +140,7 @@ public class TextRenderer implements ObjectRenderer
 
   public int getTextHeight(String text, SequenceGraphicContext gc){
     int h = 0;
+    text.trim();
     if(!text.equals(""))
 	{
 	    area.setText(text);

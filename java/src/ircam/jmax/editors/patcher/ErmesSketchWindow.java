@@ -160,12 +160,21 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle( itsSketchPad.getTitle()));
   }
 
-  public void setTitle(String title)
+  public void setTitle(String fileName)
   {
-    if(!getTitle().equals(title))
+    String title;
+    
+    int id = fileName.lastIndexOf('/');
+    
+    if( id != -1)
+      title = fileName.substring( id + 1);
+    else
+      title = fileName;
+
+    if(!getTitle().equals( title))
       {
-	super.setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));
-	MaxWindowManager.getWindowManager().windowChanged(this);
+	super.setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle( title));
+	MaxWindowManager.getWindowManager().windowChanged( this);
       }
   }
 

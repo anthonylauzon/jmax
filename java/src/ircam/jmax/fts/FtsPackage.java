@@ -85,6 +85,12 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).uploadDone();
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("setDirty"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).setDirty( args.getInt( 0) == 1);
+	}
+      });
   }
     
   public FtsPackage() throws IOException
@@ -245,8 +251,7 @@ public class FtsPackage extends FtsObjectWithEditor
 
   public void setName( String name)
   {
-    this.name = name;
-    
+    this.name = name;    
   }
 
   public String getName()
@@ -268,7 +273,6 @@ public class FtsPackage extends FtsObjectWithEditor
   public void setDir( String dir)
   {
     this.dir = dir;
-    
   }
 
   public String getDir()
@@ -287,6 +291,15 @@ public class FtsPackage extends FtsObjectWithEditor
     ProjectEditor.editPackage( this);
   }
   public void destroyEditor(){}
+
+  public void setDirty( boolean d)
+  {
+    isDirty = d;
+  }
+  public boolean isDirty()
+  {
+    return isDirty;
+  }
   /*************************************/
 
   public Enumeration getRequires()
@@ -319,5 +332,6 @@ public class FtsPackage extends FtsObjectWithEditor
   //private FtsActionListener listener;
   private ircam.jmax.editors.project.ConfigPackagePanel listener;
   private boolean hasSummaryHelp = true;
+  private boolean isDirty = false;
 }
 

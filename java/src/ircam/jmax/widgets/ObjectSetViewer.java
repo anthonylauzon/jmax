@@ -52,6 +52,7 @@ public class ObjectSetViewer extends JPanel {
       if (obj != null)
 	{
 	  String text = ((FtsGraphicObject)obj).getDescription();	   
+	  text.trim();
 	  if(text.equals(""))
 	      text = ((FtsGraphicObject)obj).getComment();
 	  setText( text);

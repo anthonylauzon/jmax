@@ -115,6 +115,7 @@ public class MessageTrackEditor extends MonoTrackEditor
     
     int evtLenght, evtHeight;
     
+    text.trim();
     if(!text.equals(""))
       {
 	evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);

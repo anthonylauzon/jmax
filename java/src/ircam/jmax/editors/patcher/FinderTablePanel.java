@@ -184,6 +184,7 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    if( query != null) query.trim();
 
     if(query!=null && !query.equals(""))
       ftsFinder.find(set, query);

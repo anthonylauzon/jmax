@@ -29,6 +29,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 
 import ircam.fts.client.*;
@@ -95,6 +96,14 @@ public class ProjectEditor extends JFrame implements EditorContainer
     
     validate();
     pack();
+
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter(){
+	public void windowClosing(WindowEvent e)
+	{
+	  packagePanel.close(false);    
+	}
+      });
   }
 
   private void makeMenuBar()

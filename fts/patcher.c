@@ -73,7 +73,6 @@ fts_class_t *outlet_class = 0;
 
 fts_symbol_t sym_showObject = 0;
 fts_symbol_t sym_stopWaiting = 0;
-fts_symbol_t sym_setDirty = 0;
 
 fts_symbol_t sym_redefineStart = 0;
 fts_symbol_t sym_setWX = 0;
@@ -2361,7 +2360,7 @@ fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
 	      fts_atom_t a[1];
   
 	      fts_set_int(&a[0], is_dirty);
-	      fts_client_send_message((fts_object_t *)this, sym_setDirty, 1, a);
+	      fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
 	    }
 	}
     }
@@ -2443,7 +2442,6 @@ void fts_kernel_patcher_init(void)
 
   sym_showObject = fts_new_symbol("showObject");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
-  sym_setDirty = fts_new_symbol("setDirty");
 
   sym_redefineStart = fts_new_symbol("redefineStart");
   sym_setWX = fts_new_symbol("setWX");

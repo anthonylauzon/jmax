@@ -169,6 +169,7 @@ PREDEF_SYMBOL( fts_s_summary, "summary")
 PREDEF_SYMBOL( fts_s_patcher_type, "type")
 PREDEF_SYMBOL( fts_s_named_defaults, "named_defaults")
 PREDEF_SYMBOL( fts_s_spost_description, "spost_description")
+PREDEF_SYMBOL( fts_s_set_dirty, "setDirty")
 
 /* Symbols related to builtin classes */
 PREDEF_SYMBOL( fts_s_old_patcher, "patcher")

@@ -82,6 +82,7 @@ class FinderTableModel extends AbstractTableModel implements ToolTableModel
       if(obj==null) return " ";
 
       String val = obj.getDescription();
+      val.trim();
       if(val.equals("")) val = obj.getComment();
 
       return val;

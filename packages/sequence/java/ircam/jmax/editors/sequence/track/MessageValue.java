@@ -86,6 +86,7 @@ public class MessageValue extends AbstractEventValue
 	
 	String text = ((MessageAdapter)gc.getAdapter()).getLabel(evt);
 	
+	text.trim();
 	if(!text.equals(""))
 	  height = TextRenderer.getRenderer().getTextHeight(text, gc);
 	else
@@ -121,6 +122,7 @@ public class MessageValue extends AbstractEventValue
     
     if(gc!=null)
       {
+	text.trim();
 	if(!text.equals(""))
 	  {
 	    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
@@ -165,6 +167,7 @@ public class MessageValue extends AbstractEventValue
     int height;
     String text = (String) message;
     
+    text.trim();
     if(!text.equals(""))
       height = TextRenderer.getRenderer().getTextHeight(text, gc);
     else
@@ -181,6 +184,7 @@ public class MessageValue extends AbstractEventValue
     boolean open = ((Boolean)getProperty("open")).booleanValue();
     if(open)
       {
+	text.trim();
 	if(!text.equals(""))
 	  evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
 	else

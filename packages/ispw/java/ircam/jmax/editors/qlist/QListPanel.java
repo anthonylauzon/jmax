@@ -164,6 +164,7 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
   public boolean isSelectedText(){
     String text = itsTextArea.getSelectedText();
     if(text==null) return false;
+    text.trim();
     if(text.equals("")) return false;
     else return true;
   }

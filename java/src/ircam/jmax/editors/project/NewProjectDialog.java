@@ -160,6 +160,9 @@ public class NewProjectDialog extends JDialog
   {
     String name = nameField.getText();
     String path = pathField.getText();
+    if( name != null) name.trim();
+    if( path != null) path.trim();
+
     createButton.setEnabled( (name!=null)&&(path!=null)&&(!name.equals("")&&(!path.equals(""))));
   }
 
