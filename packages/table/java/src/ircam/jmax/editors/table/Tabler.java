@@ -27,7 +27,6 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   ScrollPane itsScrollPane;
 
   public FtsIntegerVector itsData;
-  static int untitledCounter = 1;
   
   public Tabler(MaxData theData) {
     super(Mda.getDocumentTypeByName("Table"));
@@ -35,7 +34,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     itsData = (FtsIntegerVector) theData;
 
     if (itsData.getDocument().getName()==null)
-      setTitle(GetNewUntitledName());
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("table"));
     else {
       setTitle(itsData.getDocument().getName());
     }
@@ -120,6 +119,16 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     Close();
   }
 
+  public void reEdit()
+  {
+    itsData.forceUpdate();
+    //scure itsTablePanel.recreateOffScreen();
+    itsTablePanel.paint(itsTablePanel.getGraphics());
+    itsTablePanel.UpdateOldValues();
+
+    toFront();
+  }
+
   /** Tell the editor to syncronize, i.e. to store in the
    * data all the information possibly cached in the editor
    * and still not passed to the data instance; this usually
@@ -134,10 +143,6 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
   //end of the MaxDataEditor interface
 
-
-  public static String GetNewUntitledName() {
-    return "tab_untitled"+(untitledCounter++);
-  }
 
   public void SetupMenu(){
     GetEditMenu().add(new MenuItem("-"));

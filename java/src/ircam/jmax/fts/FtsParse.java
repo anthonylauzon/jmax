@@ -17,36 +17,6 @@ import java.util.*;
 
 public class FtsParse
 {
-  static public class FloatString 
-  {
-    String str;
-
-    FloatString(String str)
-    {
-      this.str = str;
-    }
-
-    public String toString()
-    {
-      return str;
-    }
-  }
-
-  static public class IntegerString 
-  {
-    String str;
-
-    IntegerString(String str)
-    {
-      this.str = str;
-    }
-
-    public String toString()
-    {
-      return str;
-    }
-  }
-  
   final static int lex_long_start = 0;
   final static int lex_long_in_value = 1;
   final static int lex_long_in_sign = 2;
@@ -196,12 +166,12 @@ public class FtsParse
 
   final private void ParseLong()
   {
-    parsedToken = new IntegerString(token.toString());
+    parsedToken = new Integer(token.toString());
   }
 
   final private void ParseFloat()
   {
-    parsedToken = new FloatString(token.toString());
+    parsedToken = new Float(token.toString());
   }
 
   final private void ParseString()
@@ -472,67 +442,9 @@ public class FtsParse
   }
 
 
-  /** Parse the argument of a .abs abstraction;
-   * .abs abstraction arguments are anyway used as strings,
-   * because the abstraction argument substitution is a lexical
-   * mechanism in Max 0.26, so we just parse strings.
-   */
+  /** Parse an list of atoms in a Vector */
 
-  public static String parseObject(String str, Vector values)
-  {
-    FtsParse parser = new FtsParse(str);
-    String className;
-
-    // First, get a string that is the className, and just skip it
-
-    if (! parser.tryKeywords())
-      if (! parser.tryQString())
-	if (! parser.tryString())
-	  return "";		// error in parsing, should raise an exception
-
-    className = (String) parser.parsedToken;
-
-    while (! parser.isEndOfString())
-      {
-	/* First, a multiple separator skip loop,
-	   just to allow ignoring separators in the
-	   single automata.
-
-	   Should be cleaner and nicer :-< ...
-	   */
-
-	while ((! parser.isEndOfString()) && parser.isSeparator())
-	  parser.nextChar();
-
-	if (parser.isEndOfString())
-	  break;
-
-	/* The order is important, beacause the 
-	   last parser get accept everything as a symbol,
-	   for easiness of implementation; also, the float parser
-	   accept also ints, so the int parser must be called
-	   before the float parser.
-	   
-	   Every parser return 1 and advance the pointer to the
-	   char after the end of the reconized token only
-	   if the parsing has been succesfull.
-	 */
-
-	if (! parser.tryKeywords())
-	  if (! parser.tryLong())
-	    if (! parser.tryFloat())
-	      if (! parser.tryQString())
-		parser.tryString();
-
-	values.addElement(parser.parsedToken);
-      }
-
-    return className;
-  }
-
-  /** Parse an object argument description (without the class Name) */
-
-  public static void parseObjectArguments(String str, Vector values)
+  public static void parseAtoms(String str, Vector values)
   {
     FtsParse parser = new FtsParse(str);
 
@@ -570,20 +482,6 @@ public class FtsParse
 
 	values.addElement(parser.parsedToken);
       }
-  }
-
-  // Extract the class name from a description (assume a blank as separator)
-
-  static public String parseClassName(String description)
-  {
-    int idx;
-
-    idx = description.indexOf(' ');
-
-    if (idx == -1)
-      return description; // the description is made of a sigle word
-    else
-      return description.substring(0, description.indexOf(' '));
   }
 }
 

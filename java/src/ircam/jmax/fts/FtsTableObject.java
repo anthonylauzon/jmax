@@ -50,7 +50,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
 
     args = new Vector();
     
-    FtsParse.parseObjectArguments(description, args);
+    FtsParse.parseAtoms(description, args);
 
     if (args.size() >= 3)
       vectorSize = Integer.parseInt(args.elementAt(2).toString());
@@ -85,6 +85,13 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
     vector.setObject(this);
     vector.setSize(vectorSize);
     this.vector.changed();
+  }
+
+
+  public void delete()
+  {
+    Mda.dispose(vector);
+    super.delete();
   }
 
   // Save the object 

@@ -12,6 +12,14 @@ package ircam.jmax.mda;
 public interface MaxDataEditor
 {
   /**
+   * This method is called when an edit is asked
+   * for the data the editor is already editing; the semantic
+   * is editor dependent.
+   */
+
+  abstract public void reEdit();
+
+  /**
    * This method return the data instance the editor is editing
    */
 
@@ -40,3 +48,8 @@ public interface MaxDataEditor
 
   abstract public void dataChanged(Object reason);
 }
+
+
+
+
+

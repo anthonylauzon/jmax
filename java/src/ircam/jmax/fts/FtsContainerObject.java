@@ -47,6 +47,11 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     this.document = (FtsPatcherDocument) document;
   }
 
+  public String getName()
+  {
+    return getObjectName();
+  }
+
   // FtsObjectWithData implementation
 
   public MaxData getData()

@@ -4,9 +4,11 @@ import tcl.lang.*;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+
 
 /**
  * Class implementing the proxy of an FTS object.
@@ -17,6 +19,8 @@ import ircam.jmax.mda.*;
 
 abstract public class FtsObject implements MaxTclInterpreter
 {
+  static private NumberFormat numberFormat;
+
   /* code to set generic properties meta-properties */
 
   static
@@ -48,6 +52,12 @@ abstract public class FtsObject implements MaxTclInterpreter
     FtsPropertyDescriptor.setPersistent("font", true);
     FtsPropertyDescriptor.setPersistent("fs", true);
     FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
+
+    // Number format for messages coming from FTS (to be cleaned up:
+    // the text should be sent by FTS as text alread).
+    
+    numberFormat = NumberFormat.getInstance(Locale.US);
+    numberFormat.setMaximumFractionDigits(6);
   }
 
   /******************************************************************************/
@@ -85,7 +95,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     if (obj != null)
       return obj;
     else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, className));
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
   }
   
 
@@ -113,7 +123,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     if (obj != null)
       return obj;
     else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, FtsParse.parseClassName(description)));
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
   }
   
 
@@ -137,12 +147,17 @@ abstract public class FtsObject implements MaxTclInterpreter
 
 	value = msg.getArgument(i);
 
-	descr.append(value);
-
-	if (value.equals(";"))
+	if (value instanceof Float)
+	  descr.append(numberFormat.format(value));
+	else
 	  {
-	    descr.append("\n");
-	    addBlank = false;
+	    descr.append(value);
+
+	    if (value.equals(";"))
+	      {
+		descr.append("\n");
+		addBlank = false;
+	      }
 	  }
       }
 

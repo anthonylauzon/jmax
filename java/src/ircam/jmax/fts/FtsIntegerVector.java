@@ -13,8 +13,9 @@ public class FtsIntegerVector implements FtsDataObject
   FtsObject object = null; 
   int[] values = null;
 
-  public FtsIntegerVector()
+  public FtsIntegerVector(int size)
   {
+    this.values = new int[size];
   }
 
   public FtsIntegerVector(FtsObject object, int size)
@@ -31,6 +32,11 @@ public class FtsIntegerVector implements FtsDataObject
       return object.getParent().getDocument();
     else
       return null;
+  }
+
+  public String getName()
+  {
+    return object.getObjectName();
   }
 
   /** Get the vector size */

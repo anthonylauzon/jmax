@@ -50,7 +50,18 @@ class FtsObjectCmd implements Command
 	description = argv[1].toString();
 	properties = argv[2];
 
-	className = FtsParse.parseClassName(description);
+	/* Extract the className */
+
+	{
+	  int idx;
+
+	  idx = description.indexOf(' ');
+
+	  if (idx == -1)
+	    className = description; 
+	  else
+	    className = description.substring(0, description.indexOf(' '));
+	}
 
 	try
 	  {

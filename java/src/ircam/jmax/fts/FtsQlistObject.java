@@ -70,6 +70,13 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
     this.list.changed();
   }
 
+  public void delete()
+  {
+    Mda.dispose(list);
+    super.delete();
+  }
+
+
   // Save the object 
   // Data is saved by the surrounding saved, patcher or selection
   // because need more context

@@ -45,9 +45,7 @@ public class FtsIntegerVectorCmd implements Command
 	args = argv[2];
 
 
-	vector = new FtsIntegerVector();
-	vector.setSize(size);
-	
+	vector = new FtsIntegerVector(size);
 	values = vector.getValues();
 
 	int availables = TclList.getLength(interp, args);

@@ -118,7 +118,6 @@ public class MaxWindowManager implements WindowListener
   }
 
 
-
   /** Produce a unique window title for the Name 
    *  the technique is the following (naive, but usefull)
    *  it look all the window titles, and count those

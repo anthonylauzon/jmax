@@ -49,7 +49,7 @@ public class FtsPatcherObject extends FtsContainerObject
 
     args = new Vector();
     
-    FtsParse.parseObjectArguments(description, args);
+    FtsParse.parseAtoms(description, args);
 
     if (args.size() >= 1)
       setObjectName((String) args.elementAt(0));

@@ -21,6 +21,14 @@ public class Mda
      
   private static Vector editorFactoryTable = new Vector();
 
+  /**
+   * Store all the pair data/editor; used for house keeping:
+   * avoiding double editors, closing editors when the data
+   * is destroyed and so on.
+   */
+
+  private static Hashtable dataEditorTable = new Hashtable();
+  
   /** Register an editor factory for a given class */
  
   public static void installEditorFactory(MaxDataEditorFactory factory)
@@ -39,6 +47,22 @@ public class Mda
 
   public static MaxDataEditor edit(MaxData data) throws MaxDocumentException
   {
+    MaxDataEditor editor;
+
+    /* First, check if there is already an editor for the data */
+
+    editor = (MaxDataEditor) dataEditorTable.get(data);
+
+    if (editor != null)
+      {
+	editor.reEdit();
+
+	return editor;
+      }
+    
+
+    /* Not found, create a new one */
+
     for (int i = 0; i < editorFactoryTable.size() ; i++)
       {
 	MaxDataEditorFactory factory;
@@ -47,11 +71,10 @@ public class Mda
 	
 	if (factory.canEdit(data))
 	  {
-	    MaxDataEditor editor;
-	    
 	    editor = factory.newEditor(data);
 
 	    data.getDocument().addEditor(editor);
+	    dataEditorTable.put(data, editor);
 
 	    return editor;
 	  }
@@ -60,6 +83,25 @@ public class Mda
     throw new MaxDocumentException("No editor for " + data);
   }
 
+  /* dispose a data: signal Mda that the data should not be used
+     anymore; for the moment, just close the associated editor.
+     */
+
+  public static void dispose(MaxData data)
+  {
+    MaxDataEditor editor;
+
+    /* First, check if there is already an editor for the data */
+
+    editor = (MaxDataEditor) dataEditorTable.get(data);
+
+    if (editor != null)
+      {
+	editor.quitEdit();
+
+	dataEditorTable.remove(data);
+      }
+  }
 
   /*
    * Document handlers registration service 

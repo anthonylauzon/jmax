@@ -97,7 +97,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public MaxDocument itsDocument;
   static int untitledCounter = 1;
 
-  // the MaxDataEditor interface
+  // the MaxDataEditor interface: Please implement me :->
+
+
+  public void reEdit() {
+    toFront();
+  }
 
   public void quitEdit() {
     /*

@@ -15,16 +15,6 @@ public class FtsAtomList implements FtsDataObject
   FtsObject object = null; 
   Vector values = new Vector();
 
-  // Max Data implementation
-
-  public MaxDocument getDocument()
-  {
-    if (object != null)
-      return object.getParent().getDocument();
-    else
-      return null;
-  }
-
   public FtsAtomList()
   {
   }
@@ -32,6 +22,18 @@ public class FtsAtomList implements FtsDataObject
   public FtsAtomList(FtsObject object)
   {
     this.object = object;
+  }
+
+  // Max Data implementation
+
+  public MaxDocument getDocument()
+  {
+    return object.getParent().getDocument();
+  }
+
+  public String getName()
+  {
+    return object.getObjectName();
   }
 
   public int getSize()
@@ -85,7 +87,7 @@ public class FtsAtomList implements FtsDataObject
   public void setValuesAsText(String value)
   {
     values.removeAllElements();
-    FtsParse.parseObjectArguments(value, values);
+    FtsParse.parseAtoms(value, values);
     changed();
   }
 

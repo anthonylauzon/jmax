@@ -85,7 +85,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
     }
     catch (FtsException e){
-      System.err.println("Cannot create object: " + itsArgs);
+      System.out.println("Cannot create object: " + itsArgs);
       // Enzo !!! Aiuto :-> (MDC)
     }
     if (itsFtsObject instanceof FtsContainerObject)
