@@ -24,21 +24,19 @@
 #
 
 JMAXROOTDIR= ../../../..
-ROOTDIR = ../../../..
+PACKAGE_ROOT = ../..
 PACKAGE_DIR =  
-
-MAX_PACKAGE_NAME = explode
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 DOC_PACKAGES =  ircam.jmax.editors.explode
 
 all: $(JAVA_CLASSES_ROOT)
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) all)
+	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) clean)
+	(cd ircam ; $(MAKE) clean)
 .PHONY: clean
 
 doc:  
@@ -50,7 +48,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/explode/java/classes ; /bin/rm -f explode.jar ; jar -cvf explode.jar ircam )
+	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f explode.jar ; jar -cvf explode.jar ircam )
 .PHONY: jar
 
 

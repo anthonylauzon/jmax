@@ -24,7 +24,7 @@
 #
 
 JMAXROOTDIR = ../../../..
-ROOTDIR = ../../../..
+PACKAGE_ROOT = ../..
 PACKAGE_DIR = 
 
 MAX_PACKAGE_NAME = table
@@ -34,11 +34,11 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 DOC_PACKAGES =  ircam.jmax.editors.table
 
 all: $(JAVA_CLASSES_ROOT)
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) all)
+	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) clean)
+	(cd ircam ; $(MAKE) clean)
 .PHONY: clean
 
 doc:  
@@ -50,7 +50,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/table/java/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam	)
+	(cd $(PACKAGE_ROOT)/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam	)
 .PHONY: jar
 
 

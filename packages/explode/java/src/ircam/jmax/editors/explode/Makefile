@@ -24,10 +24,8 @@
 #
 
 JMAXROOTDIR = ../../../../../../../..
-ROOTDIR = ../../../../../../../..
+PACKAGE_ROOT = ../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/explode
-
-include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.common
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 

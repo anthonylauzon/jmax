@@ -24,7 +24,7 @@
 
 
 JMAXROOTDIR = ../../../../../../../..
-ROOTDIR = ../../../../../../../..
+PACKAGE_ROOT = ../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/table
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package

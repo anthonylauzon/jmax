@@ -24,7 +24,7 @@
 #
 
 JMAXROOTDIR = ../../../..
-ROOTDIR = ../../../..
+PACKAGE_ROOT = ../..
 PACKAGE_DIR = 
 
 MAX_PACKAGE_NAME = qlist
@@ -34,11 +34,11 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 DOC_PACKAGES =  ircam.jmax.editors.qlist
 
 all: $(JAVA_CLASSES_ROOT)
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) all)
+	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
 clean:
-	(cd ircam ; $(MAKE) MAX_PACKAGE_NAME=$(MAX_PACKAGE_NAME) clean)
+	(cd ircam ; $(MAKE) clean)
 .PHONY: clean
 
 doc:  
@@ -50,7 +50,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/qlist/java/classes ; /bin/rm -f qlist.jar ; jar -cvf qlist.jar ircam	)
+	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f qlist.jar ; jar -cvf qlist.jar ircam	)
 .PHONY: jar
 
 

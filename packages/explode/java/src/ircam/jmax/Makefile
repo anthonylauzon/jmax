@@ -24,7 +24,7 @@
 #
 
 JMAXROOTDIR = ../../../../../..
-ROOTDIR = ../../../../../..
+PACKAGE_ROOT = ../../../..
 PACKAGE_DIR = ircam/jmax
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
