@@ -51,26 +51,14 @@ fts_patlex_t *
 fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
 {
   fts_patlex_t *this;
-  FILE *fd;
+  FILE *file;
 
-  fd  = fopen(filename, "r");
+  file  = fopen(filename, "r");
 
-  if (fd == 0)
+  if (file == 0)
     return 0;
 
-  this = (fts_patlex_t *) fts_malloc(sizeof(fts_patlex_t));
-  this->fd = fd;
-  this->env_argc = env_argc;
-  this->env_argv = env_argv;
-  this->unique_var = unique_count++; /* the unique number used in variable  0 substitution */
-  this->pushedBack = 0;
-  this->lookahead_valid = 0;
-  this->env_argc = env_argc;
-  this->env_argv = env_argv;
-  this->buf_fill = 0;
-  this->messbox_mode = 0;
-
-  return this;
+  return fts_patlex_open_file( file, env_argc, env_argv);
 }
 
 /* Version of the above that already get a FILE * instead of the file name.

@@ -96,6 +96,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_patlex_t *in, fts_graphic_description_t *g);
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in);
 static void pat_error(const char *description);
+static void pat_warning(const char *description);
 
 void fts_patparser_init()
 {
@@ -525,8 +526,10 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 	    }
 	  else
 	    {
-	      pat_error("Syntax error: #X in a .pat file, after something different from qlist or table");
-	      return;
+	      pat_warning("Syntax error: #X in a .pat file, after something different from qlist or table");
+
+	      while ((in->ttype != FTS_LEX_EOC) && (in->ttype != FTS_LEX_EOF))
+		fts_patlex_next_token(in);/* skip ';' */
 	    }
 	}
       else
@@ -993,4 +996,9 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
 static void pat_error(const char *description) 
 {
   post("Error loading .pat file: %s\n", description);
+}
+
+static void pat_warning(const char *description) 
+{
+  post("Warning loading .pat file: %s\n", description);
 }
