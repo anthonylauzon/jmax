@@ -54,6 +54,16 @@
  */
 
 typedef struct fts_timebase fts_timebase_t;
+typedef struct fts_timebase_entry fts_timebase_entry_t;
+
+struct fts_timebase_entry
+{
+  double time; /* when to trigger this entry */
+  fts_object_t *object;
+  fts_method_t method; /* entry callback method */
+  fts_atom_t atom; /* entry callback argument */
+  fts_timebase_entry_t *next; /* next entry in timebase */
+};
 
 struct fts_timebase
 { 
@@ -64,7 +74,7 @@ struct fts_timebase
   double time; /* logical time */
   double step; /* tick step */
 
-  struct _timebase_entry_ *entries; /* list of schedule entries */
+  fts_timebase_entry_t *entries; /* list of schedule entries */
 
   /* master timebase */
   fts_timebase_t *slaves; /* list of slaves */
@@ -143,7 +153,6 @@ FTS_API void fts_timebase_locate(fts_timebase_t *timebase);
 FTS_API double fts_get_time(void);
 FTS_API fts_timebase_t *fts_get_timebase(void);
 
-
 /** 
  * @name system time
  */
@@ -160,4 +169,13 @@ FTS_API fts_timebase_t *fts_get_timebase(void);
 FTS_API double fts_systime(void);
 
 /*@}*/ /* logical time */
+
+typedef struct fts_timefifo
+{
+  fts_fifo_t fifo;
+  fts_timebase_t *base;
+  int size;
+  double delta;
+} fts_timefifo_t;
+
 

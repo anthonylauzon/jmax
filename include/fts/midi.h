@@ -545,7 +545,7 @@ FTS_API int fts_midiport_is_output(fts_midiport_t *port);
 /*@}*/ /* Refering to a MIDI port.*/
 
 /* define functions by macros */
-#define fts_midiport_is_input(p) ((p)->listeners != 0)
+#define fts_midiport_is_input(p) ((p)->listeners[0] != 0)
 #define fts_midiport_is_output(p) ((p)->output != 0)
 
 /** 
@@ -680,6 +680,8 @@ typedef struct fts_midilabel
   fts_symbol_t name;
   fts_midiport_t *input;
   fts_midiport_t *output;
+  fts_symbol_t input_name;
+  fts_symbol_t output_name;
   struct fts_midilabel *next;
 } fts_midilabel_t;
 
@@ -687,6 +689,9 @@ typedef struct fts_midilabel
 #define fts_midilabel_get_input(l) ((l)->input)
 #define fts_midilabel_get_output(l) ((l)->output)
 #define fts_midilabel_get_next(l) ((l)->next)
+
+FTS_API void fts_midilabel_set_input(fts_midilabel_t *label, fts_midiport_t *port, fts_symbol_t name);
+FTS_API void fts_midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port, fts_symbol_t name);
 
 typedef struct fts_midimanager
 {
@@ -707,9 +712,14 @@ FTS_API void fts_midimanager_remove_label_at_index(fts_midimanager_t *mm, int in
 FTS_API fts_midilabel_t *fts_midimanager_get_label_by_index(fts_midimanager_t *mm, int index);
 FTS_API fts_midilabel_t *fts_midimanager_get_label_by_name(fts_midimanager_t *mm, fts_symbol_t name);
 
-FTS_API void fts_midilabel_set_input(fts_midilabel_t *label, fts_midiport_t *port);
-FTS_API void fts_midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port);
-FTS_API void fts_midilabel_set_internal(fts_midilabel_t *label);
+FTS_API void fts_midimanager_set_input(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);
+FTS_API void fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);
+FTS_API void fts_midimanager_set_internal(fts_midimanager_t *mm, int index);
+
+#define fts_midimanager_reset_input(m, i) fts_midimanager_set_input((m), (i), NULL, fts_s_none)
+#define fts_midimanager_reset_output(m, i) fts_midimanager_set_output((m), (i), NULL, fts_s_none)
+
+FTS_API fts_symbol_t fts_midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name);
 
 /* midi objects API */
 FTS_API fts_midiport_t *fts_midimanager_get_input(fts_midimanager_t *mm, fts_symbol_t name);

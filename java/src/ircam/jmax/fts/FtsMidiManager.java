@@ -50,6 +50,12 @@ public class FtsMidiManager extends FtsObject
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsMidiManager)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString());
+
+          if(args.getLength() > 2)
+            ((FtsMidiManager)obj).setInput( args.getInt( 0), args.getSymbol( 2).toString());
+            
+          if(args.getLength() > 3)
+            ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 3).toString());            
 	}
       });
      FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("remove"), new FtsMessageHandler(){

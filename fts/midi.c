@@ -1196,6 +1196,8 @@ fts_midilabel_new(fts_symbol_t name)
   label->name = name;
   label->input = NULL;
   label->output = NULL;
+  label->input_name = NULL;
+  label->output_name = NULL;
   label->next = NULL;
 
   return label;
@@ -1204,8 +1206,11 @@ fts_midilabel_new(fts_symbol_t name)
 static void
 fts_midilabel_delete(fts_midilabel_t *label)
 {
-  fts_object_release(label->input);
-  fts_object_release(label->output);
+  if(label->input != NULL)
+    fts_object_release(label->input);
+
+  if(label->output != NULL)
+    fts_object_release(label->output);
 
   fts_free(label);
 }
@@ -1214,7 +1219,7 @@ void
 fts_midimanager_insert_label_at_index(fts_midimanager_t *mm, int index, fts_symbol_t name)
 {
   fts_midilabel_t **p = &mm->labels;
-  fts_midilabel_t *label =  fts_midilabel_new(name);
+  fts_midilabel_t *label = fts_midilabel_new(name);
 
   while((*p) && index--)
     p = &(*p)->next;
@@ -1268,39 +1273,76 @@ fts_midimanager_get_label_by_name(fts_midimanager_t *mm, fts_symbol_t name)
 }
 
 void
-fts_midilabel_set_input(fts_midilabel_t *label, fts_midiport_t *port)
+fts_midilabel_set_input(fts_midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
   if(label->input != NULL)
     fts_object_release(label->input);
 
   label->input = port;
+  label->input_name = name;
 
   if(port != NULL)
     fts_object_refer(port);
 }
 
 void
-fts_midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port)
+fts_midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
   if(label->output != NULL)
     fts_object_release(label->output);
 
   label->output = port;
+  label->output_name = name;
 
   if(port != NULL)
     fts_object_refer(port);
 }
 
 void
-fts_midilabel_set_internal(fts_midilabel_t *label)
+fts_midimanager_set_input(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
-  fts_midiport_t *midiport = (fts_midiport_t *)fts_object_create(fts_midiport_type, 0, 0); /* create internal MIDI port */
+  fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
+  fts_atom_t args[2];
 
-  /* set input and output to internal MIDI port */
-  fts_midilabel_set_input(label, midiport);
-  fts_midilabel_set_output(label, midiport);
+  fts_midilabel_set_input(label, midiport, name);
+
+  fts_set_int(args + 0, index);
+  fts_set_symbol(args + 1, name);
+  fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
 }
 
+void
+fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name)
+{
+  fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
+  fts_atom_t args[2];
+
+  fts_midilabel_set_output(label, midiport, name);
+
+  fts_set_int(args + 0, index);
+  fts_set_symbol(args + 1, name);
+  fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+}
+
+void
+fts_midimanager_set_internal(fts_midimanager_t *mm, int index)
+{
+  fts_midilabel_t *label = fts_midimanager_get_label_by_index(mm, index);
+  fts_midiport_t *midiport = (fts_midiport_t *)fts_object_create(fts_midiport_type, 0, 0); /* create internal MIDI port */
+  fts_atom_t args[2];
+  
+  /* set input and output to internal MIDI port */
+  fts_midilabel_set_input(label, midiport, fts_s_internal);
+  fts_midilabel_set_output(label, midiport, fts_s_internal);
+
+  fts_set_int(args + 0, index);
+  fts_set_symbol(args + 1, fts_s_internal);
+  fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+
+  fts_set_int(args + 0, index);
+  fts_set_symbol(args + 1, fts_s_internal);
+  fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
+}
 
 /* midi objects API */
 fts_midiport_t *
@@ -1323,6 +1365,38 @@ fts_midimanager_get_output(fts_midimanager_t *mm, fts_symbol_t name)
     return label->input;
   else
     return NULL;
+}
+
+/* name utility */
+fts_symbol_t
+fts_midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name)
+{
+  const char *str = name;
+  int len = strlen(str);
+  char *new_str = alloca((len + 2) * sizeof(char));
+  int num = 0;
+  int dec = 1;
+  int i;
+
+  /* separate base name and index */
+  for(i=len-1; i>=0; i--)
+    {
+      if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+        num += (str[len = i] - '0') * dec;
+      else
+        new_str[i] = str[i];
+  
+      dec *= 10;
+    }
+
+  /* generate new label name */
+  while(fts_midimanager_get_label_by_name(mm, name) != NULL)
+    {
+      sprintf(new_str + len, "%d", ++num);
+      name = fts_new_symbol_copy(new_str);
+    }
+
+  return name;
 }
 
 /* midi manager API */

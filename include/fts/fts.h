@@ -75,6 +75,7 @@ extern "C" {
 #include <fts/malloc.h>
 #include <fts/symbol.h>
 #include <fts/stack.h>
+#include <fts/fifo.h>
 #include <fts/property.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>

@@ -25,6 +25,8 @@
 #ifndef _MACOCXMIDI_H_
 #define _MACOCXMIDI_H_
 
+#define MACOSXMIDI_OBJECT_TYPE_ANY kMIDIObjectType_Other
+
 typedef struct _macosxmidi_
 {
   fts_midimanager_t manager;
@@ -38,14 +40,18 @@ typedef struct _macosxmidiport_
   fts_midiport_t head;
   macosxmidi_t *manager;
   fts_symbol_t name;
-  MIDIPortRef port;
+  int id;  
   MIDIEndpointRef ref;
+  MIDIPortRef port;
   fts_midiparser_t parser;
 } macosxmidiport_t;
 
 #define macosxmidiport_get_name(p) ((p)->name)
+#define macosxmidiport_get_id(p) ((p)->id)
 
 extern fts_metaclass_t *macosxmidi_input_type;
 extern fts_metaclass_t *macosxmidi_output_type;
+
+extern MIDIObjectRef *macosxmidi_get_by_unique_id(int id, MIDIObjectType exspect);
 
 #endif

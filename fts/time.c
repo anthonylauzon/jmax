@@ -40,21 +40,9 @@ static fts_heap_t *timebase_entry_heap = 0;
  *
  */
 
-typedef struct _timebase_entry_
+static void
+fts_timebase_entry_init(fts_timebase_entry_t *entry, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
 {
-  double time; /* when to trigger this entry */
-  fts_object_t *object;
-  fts_method_t method; /* entry callback method */
-  fts_atom_t atom; /* entry callback argument */
-  struct _timebase_entry_ *next; /* next entry in timebase */
-} timebase_entry_t;
-
-
-static timebase_entry_t *
-timebase_entry_new(fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
-{
-  timebase_entry_t *entry = fts_heap_alloc(timebase_entry_heap);
-
   entry->time = time;
   entry->object = object;
   entry->method = method;
@@ -66,15 +54,13 @@ timebase_entry_new(fts_object_t *object, fts_method_t method, const fts_atom_t *
   /* claim atom if object */
   if(atom)
     fts_atom_assign(&entry->atom, atom);
-
-  return entry;
 }
 
 static void
-timebase_entry_free(timebase_entry_t *entry)
+fts_timebase_entry_free(fts_timebase_entry_t *entry)
 {
   fts_object_release(entry->object);
-  fts_atom_assign( &entry->atom, fts_null);
+  fts_atom_void(&entry->atom);
   fts_heap_free(entry, timebase_entry_heap);
 }
 
@@ -86,9 +72,9 @@ timebase_entry_free(timebase_entry_t *entry)
  */
 
 static void
-timebase_insert_entry(fts_timebase_t *timebase, timebase_entry_t *entry)
+timebase_insert_entry(fts_timebase_t *timebase, fts_timebase_entry_t *entry)
 {
-  timebase_entry_t **p = &timebase->entries;
+  fts_timebase_entry_t **p = &timebase->entries;
   
   /* place in ordered list */
   while(*p && (entry->time >= (*p)->time))
@@ -105,13 +91,13 @@ timebase_remove_entries(fts_timebase_t *timebase)
   /* remove all entries */
   while(timebase->entries)
     {
-      timebase_entry_t *freeme = timebase->entries;
+      fts_timebase_entry_t *freeme = timebase->entries;
       
       /* remove the entry from the list */
       timebase->entries = timebase->entries->next;
       
       /* free entry */
-      timebase_entry_free(freeme);
+      fts_timebase_entry_free(freeme);
     }
 }
 
@@ -247,7 +233,7 @@ fts_timebase_advance_slaves(fts_timebase_t *timebase)
       /* reschedule all current entries to origin */
       while(slave->entries && slave->entries->time < slave->time + slave->step)
 	{
-	  timebase_entry_t *entry = slave->entries;
+	  fts_timebase_entry_t *entry = slave->entries;
 	  double retime = slave->origin->time + (entry->time - slave->time) * slave->origin->step / slave->step;
 	  
 	  /* remove the entry from the list */
@@ -275,7 +261,7 @@ fts_timebase_advance(fts_timebase_t *timebase)
   /* fire all current entries */	  
   while(timebase->entries && timebase->entries->time < time)
     {
-      timebase_entry_t *entry = timebase->entries;
+      fts_timebase_entry_t *entry = timebase->entries;
       
       /* remove the entry from the list */
       timebase->entries = timebase->entries->next;
@@ -287,7 +273,7 @@ fts_timebase_advance(fts_timebase_t *timebase)
       entry->method(entry->object, 0, 0, 1, &entry->atom);
       
       /* free entry */
-      timebase_entry_free(entry);
+      fts_timebase_entry_free(entry);
     }
 
   timebase->time = time;
@@ -327,12 +313,12 @@ fts_timebase_locate(fts_timebase_t *timebase)
 void 
 fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double delay)
 {
-  timebase_entry_t *entry;
+  fts_timebase_entry_t *entry = fts_heap_alloc(timebase_entry_heap);
 
   if(delay > 0.0)
-    entry = timebase_entry_new(object, method, atom, timebase->time + delay);
+    fts_timebase_entry_init(entry, object, method, atom, timebase->time + delay);
   else
-    entry = timebase_entry_new(object, method, atom, timebase->time);
+    fts_timebase_entry_init(entry, object, method, atom, timebase->time);
     
   timebase_insert_entry(timebase, entry);
 }
@@ -340,19 +326,19 @@ fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method
 void
 fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object)
 {
-  timebase_entry_t **p = &timebase->entries;
+  fts_timebase_entry_t **p = &timebase->entries;
   
   while(*p)
     {
       if ((*p)->object == object)
 	{
-	  timebase_entry_t *freeme = *p;
+	  fts_timebase_entry_t *freeme = *p;
 	  
 	  /* remove from list */
 	  *p = (*p)->next;
 	  
 	  /* free entry */
-	  timebase_entry_free(freeme);
+	  fts_timebase_entry_free(freeme);
 	}
       else
 	p = &((*p)->next);
@@ -362,13 +348,13 @@ fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object)
 void
 fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object)
 {
-  timebase_entry_t **p = &timebase->entries;
+  fts_timebase_entry_t **p = &timebase->entries;
   
   while(*p)
     {
       if ((*p)->object == object)
 	{
-	  timebase_entry_t *freeme = *p;
+	  fts_timebase_entry_t *freeme = *p;
 	  
 	  /* remove from list */
 	  *p = (*p)->next;
@@ -377,11 +363,96 @@ fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object)
 	  freeme->method(freeme->object, 0, 0, 1, &freeme->atom);
 
 	  /* free entry */
-	  timebase_entry_free(freeme);
+	  fts_timebase_entry_free(freeme);
 	}
       else
 	p = &((*p)->next);
     }
+}
+
+/***************************************************
+*
+*  call fifo
+*
+*/
+
+void
+fts_timefifo_init(fts_timefifo_t *timefifo, fts_timebase_t *base, int size)
+{
+  int bytes = sizeof(fts_timebase_entry_t *) * size;
+  fts_timebase_entry_t **entries = (fts_timebase_entry_t **)fts_malloc(bytes);
+  int i;
+
+  fts_fifo_init(&timefifo->fifo, (void *)entries, bytes);
+
+  /* allocate entries to timebase fifo */
+  for(i=0; i<size; i++)
+    entries[i] = fts_heap_alloc(timebase_entry_heap);
+  
+  timefifo->size = size;
+  timefifo->delta = 0.0;
+  timefifo->base = base;
+}
+
+void
+fts_timefifo_destroy(fts_timefifo_t *timefifo, int size)
+{
+  fts_timebase_entry_t **entries = (fts_timebase_entry_t **)timefifo->fifo.buffer;
+  int i;
+
+  /* free entries in timebase fifo */
+  for(i=0; i<size; i++)
+    fts_heap_free(entries[i], timebase_entry_heap);
+}
+
+void
+fts_timefifo_read_to_timebase(fts_timefifo_t *timefifo, fts_timebase_t *tb)
+{
+  while(fts_fifo_read_level(&timefifo->fifo) >= sizeof(fts_timebase_entry_t *)) {
+    fts_timebase_entry_t **ptr = (fts_timebase_entry_t **)fts_fifo_read_pointer(&timefifo->fifo);
+    fts_timebase_entry_t *entry = *ptr;
+    double time = entry->time - timefifo->delta;
+
+    /* adjust time difference */
+    if(time < timefifo->base->time)
+      timefifo->delta = entry->time - timefifo->base->time;
+
+    /* move entry to timebase (entry with NULL object can be used to sync) */
+    if(entry->object != NULL) {
+      
+      /* set entry to adjusted time */
+      entry->time = time;
+
+      /* insert entry to timebase */
+      timebase_insert_entry(timefifo->base, entry);
+
+      /* allocate new entry to fifo */
+      *ptr = fts_heap_alloc(timebase_entry_heap);
+
+      /* increment read pointer */
+      fts_fifo_incr_write(&timefifo->fifo, sizeof(fts_timebase_entry_t *));
+    }
+  }
+}
+
+int
+fts_timefifo_write(fts_timefifo_t *timefifo, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
+{
+  if(fts_fifo_write_level(&timefifo->fifo) >= sizeof(fts_timebase_entry_t *)) {
+    fts_timebase_entry_t **ptr = (fts_timebase_entry_t **)fts_fifo_write_pointer(&timefifo->fifo);
+    fts_timebase_entry_t *entry = *ptr;
+
+    /* init timebase entry in fifo */
+    fts_timebase_entry_init(entry, object, method, atom, time);
+
+    /* increment write pointer */
+    fts_fifo_incr_read(&timefifo->fifo, sizeof(fts_timebase_entry_t *));
+
+    return 1;
+  
+  }
+
+  return 0;
 }
 
 /***************************************************
@@ -411,5 +482,6 @@ fts_get_time(void)
 void 
 fts_kernel_time_init(void)
 {
-  timebase_entry_heap = fts_heap_new(sizeof(timebase_entry_t));
+  timebase_entry_heap = fts_heap_new(sizeof(fts_timebase_entry_t));
 }
+
