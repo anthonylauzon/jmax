@@ -33,10 +33,6 @@
 #include "naming.h"
 
 fts_symbol_t sym_setAtomList = 0;
-fts_symbol_t sym_qlist_openEditor = 0;
-fts_symbol_t sym_qlist_closeEditor = 0;
-fts_symbol_t sym_destroyEditor = 0;
-fts_symbol_t sym_hide = 0;
 
 typedef struct _qlist_
 {
@@ -298,7 +294,7 @@ qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
   fts_atom_list_iterator_free(this->iterator);
 
-  fts_client_send_message(o, sym_destroyEditor, 0, 0);
+  fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
 
 static void
@@ -394,12 +390,12 @@ qlist_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   qlist_t *this = (qlist_t *)o;
 
   qlist_set_editor_open(this);
-  fts_client_send_message(o, sym_qlist_openEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
   /*qlist_upload(o, 0, 0, 0, 0);*/
 }
 
 static void
-qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -407,14 +403,14 @@ qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-qlist_hide(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *) o;
 
   if(qlist_editor_is_open(this))
     {
       qlist_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, sym_qlist_closeEditor, 0, 0);  
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
     }
 }
 
@@ -435,9 +431,9 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, qlist_append);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, qlist_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, qlist_close_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_hide, qlist_hide); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, qlist_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, qlist_destroy_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, qlist_close_editor); 
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), qlist_rewind);
   fts_method_define_varargs(cl, 0, fts_new_symbol("flush"), qlist_flush);
@@ -458,10 +454,6 @@ void
 qlist_config(void)
 {
   sym_setAtomList = fts_new_symbol("setAtomList");
-  sym_qlist_openEditor = fts_new_symbol("openEditor");
-  sym_qlist_closeEditor = fts_new_symbol("closeEditor");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
-  sym_hide = fts_new_symbol("hide");
   
   fts_class_install(fts_new_symbol("qlist"), qlist_instantiate);
 }

@@ -347,7 +347,7 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   table_t *this = (table_t *)o;
 
-  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_open_editor, 0, 0);
+  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_openEditor, 0, 0);
 }
 
 static fts_status_t
@@ -359,7 +359,7 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, table_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, table_open_editor);
   
   /* save/load bmax file if not instantiated with reference */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_with_onset_from_atoms);

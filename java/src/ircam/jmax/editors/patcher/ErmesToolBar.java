@@ -125,7 +125,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 	  public void actionPerformed( ActionEvent e)
 	    {
 		sketch.waiting();
-		sketch.getFtsPatcher().getParent().sendMessage(FtsObject.systemInlet, "open_editor");
+		sketch.getFtsPatcher().getParent().sendMessage(FtsObject.systemInlet, "openEditor");
 		sketch.getFtsPatcher().requestStopWaiting(null);
 	    }});
 

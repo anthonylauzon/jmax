@@ -50,9 +50,6 @@ extern fts_symbol_t seqsym_add_event;
 extern fts_symbol_t seqsym_active;
 
 /* messages from/to client */
-extern fts_symbol_t seqsym_createEditor;
-extern fts_symbol_t seqsym_closeEditor;
-extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_removeTracks;
 extern fts_symbol_t seqsym_moveTrack;

@@ -70,7 +70,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    * Fts callback: open the editor associated with this FtsSequenceObject.
    * If not exist create them else show them.
    */
-  public void createEditor(int nArgs, FtsAtom args[])
+  public void openEditor(int nArgs, FtsAtom args[])
   {
     if(sequence == null)
 	{
@@ -304,7 +304,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
     public void closeEditor()
     {
-	sendMessage(FtsObject.systemInlet, "closeEditor", 0, null);
+	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
   /**

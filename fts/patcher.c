@@ -71,11 +71,7 @@ static fts_class_t *patcher_class = 0;
 fts_class_t *inlet_class = 0;
 fts_class_t *outlet_class = 0;
 
-fts_symbol_t sym_openEditor = 0;
-fts_symbol_t sym_closeEditor = 0;
-fts_symbol_t sym_hide = 0;
 fts_symbol_t sym_showObject = 0;
-fts_symbol_t sym_destroyEditor = 0;
 fts_symbol_t sym_stopWaiting = 0;
 
 fts_symbol_t sym_redefineStart = 0;
@@ -592,18 +588,38 @@ patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   set_editor_open(this);
-  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
 }
 
 static void
-close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   set_editor_close(this);
+}
+
+static void 
+patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_object_t *p;
+  
+  if(editor_is_open(this))
+    {
+      set_editor_close(this);
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
+    }
+  
+  p = this->objects;
+  while (p)
+    {
+      fts_send_message(p, fts_SystemInlet, fts_s_closeEditor, 0, 0);      
+      p = p->next_in_patcher;
+    }
 }
 
 static void
@@ -617,7 +633,7 @@ show_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  if(!editor_is_open(this))
 	      set_editor_open(this);
 
-	  fts_client_send_message(o, sym_openEditor, 0, 0);	  
+	  fts_client_send_message(o, fts_s_openEditor, 0, 0);	  
 	  fts_client_send_message(o, sym_showObject, 1, at);
       }
 }
@@ -842,7 +858,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(editor_is_open(this))
     {
       set_editor_close(this);
-      fts_client_send_message(o, sym_destroyEditor, 0, 0);
+      fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
     }
 
   /* If it is a template, remove it from the template instance list */
@@ -874,26 +890,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (this->outlets)
     fts_free( this->outlets);
-}
-
-static void 
-patcher_hide(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_object_t *p;
-
-  if(editor_is_open(this))
-    {
-      set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
-    }
-
-  p = this->objects;
-  while (p)
-    {
-	fts_send_message(p, fts_SystemInlet, sym_hide, 0, 0);      
-	p = p->next_in_patcher;
-    }
 }
 
 static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1330,11 +1326,11 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl,fts_SystemInlet, fts_s_open, patcher_open); 
   fts_method_define_varargs(cl,fts_SystemInlet, fts_s_close, patcher_close); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, patcher_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, patcher_destroy_editor);
+  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_closeEditor, patcher_close_editor); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("show_object"), show_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("stop_waiting"), stop_waiting);
-  fts_method_define_varargs(cl,fts_SystemInlet, sym_hide, patcher_hide); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("start_updates"), fts_patcher_start_updates);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
@@ -2008,11 +2004,7 @@ patcher_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
 void fts_kernel_patcher_init(void)
 {
-  sym_openEditor = fts_new_symbol("openEditor");
-  sym_closeEditor = fts_new_symbol("closeEditor");
-  sym_hide = fts_new_symbol("hide");
   sym_showObject = fts_new_symbol("showObject");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
 
   sym_redefineStart = fts_new_symbol("redefineStart");

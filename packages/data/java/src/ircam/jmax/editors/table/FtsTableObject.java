@@ -353,7 +353,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 
     public void closeEditor()
     {
-	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     private int[] values;

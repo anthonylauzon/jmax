@@ -77,7 +77,7 @@ public class Patcher extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
-    ftsObject.sendMessage(FtsObject.systemInlet, "open_editor");
+    ftsObject.sendMessage(FtsObject.systemInlet, "openEditor");
     ftsObject.getParent().requestStopWaiting(null);
   }
 

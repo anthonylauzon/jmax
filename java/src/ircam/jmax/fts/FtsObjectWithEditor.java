@@ -96,7 +96,7 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
 
   void releaseData()
     {
-	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
 	super.releaseData();
     }
 

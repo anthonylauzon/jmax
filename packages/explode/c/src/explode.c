@@ -36,9 +36,6 @@ static fts_heap_t *explode_hang_heap;
 static fts_heap_t *explode_skip_heap;
 
 static fts_symbol_t explode_symbol    = 0;
-static fts_symbol_t sym_openEditor    = 0;
-static fts_symbol_t sym_closeEditor    = 0;
-static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_loadStart     = 0;
 static fts_symbol_t sym_loadAppend    = 0;
 static fts_symbol_t sym_loadEnd       = 0;
@@ -1033,7 +1030,7 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   forget_explode(this, this->data.name);
 
   if(fts_object_has_id(o))
-    fts_client_send_message(o, sym_destroyEditor, 0, 0);
+    fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
 
 static void 
@@ -1181,24 +1178,24 @@ explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   explode_t *this = (explode_t *)o;
 
   explode_set_editor_open(this);
-  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
   fts_send_message((fts_object_t *)this, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 static void
-explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   explode_set_editor_close(this);
 }
 static void
-explode_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   if(explode_editor_is_open(this))
     {
       explode_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
     }
 }
 /*
@@ -1442,9 +1439,9 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("params"), explode_params_mth);
 
   /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, explode_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, explode_close_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), explode_hide_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, explode_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, explode_destroy_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, explode_close_editor);
   
   fts_method_define_varargs(cl, fts_SystemInlet, sym_add_event, explode_add);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_remove_event, explode_remove);
@@ -1477,9 +1474,6 @@ explode_config(void)
   explode_hang_heap = fts_heap_new(sizeof(hang_t));
 
   explode_symbol = fts_new_symbol("explode");
-  sym_openEditor = fts_new_symbol("openEditor");
-  sym_closeEditor = fts_new_symbol("closeEditor");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_loadStart = fts_new_symbol("loadStart");
   sym_loadAppend = fts_new_symbol("loadAppend");
   sym_loadEnd = fts_new_symbol("loadEnd");

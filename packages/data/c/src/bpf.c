@@ -31,9 +31,6 @@ fts_symbol_t bpf_symbol = 0;
 fts_type_t bpf_type = 0;
 fts_class_t *bpf_class = 0;
 
-static fts_symbol_t sym_openEditor = 0;
-static fts_symbol_t sym_closeEditor = 0;
-static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;
 static fts_symbol_t sym_setPoints = 0;
@@ -426,29 +423,29 @@ bpf_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   bpf_t *this = (bpf_t *)o;
 
   bpf_set_editor_open(this);
-  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
 
   bpf_set_client(this);
 }
 
-static void
-bpf_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  bpf_t *this = (bpf_t *)o;
-
-  bpf_set_editor_close(this);
-}
-
 static void 
-bpf_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *) o;
 
   if(bpf_editor_is_open(this))
     {
       bpf_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
     }
+}
+
+static void
+bpf_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+
+  bpf_set_editor_close(this);
 }
 
 /************************************************************
@@ -577,7 +574,7 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   bpf_t *this = (bpf_t *)o;
 
   if(fts_object_has_id(o))
-    fts_client_send_message(o, sym_destroyEditor, 0, 0);
+    fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 
   if(this->points)
     fts_free(this->points);
@@ -625,9 +622,9 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append);
 
       /* graphical editor */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, bpf_open_editor);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, bpf_close_editor);
-      fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("hide"), bpf_hide_editor); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, bpf_open_editor);
+      fts_method_define_varargs(cl,fts_SystemInlet, fts_s_closeEditor, bpf_close_editor); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, bpf_destroy_editor);
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
@@ -636,8 +633,6 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);
 
       fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
-
-      fts_method_define_varargs(cl, 0, fts_s_open_editor, bpf_open_editor);
 
       return fts_Success;
     }
@@ -657,9 +652,6 @@ bpf_config(void)
   bpf_symbol = fts_new_symbol("bpf");
   bpf_type = bpf_symbol;
 
-  sym_openEditor = fts_new_symbol("openEditor");
-  sym_closeEditor = fts_new_symbol("closeEditor");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_addPoint = fts_new_symbol("addPoint");
   sym_removePoints = fts_new_symbol("removePoints");
   sym_setPoints = fts_new_symbol("setPoints");

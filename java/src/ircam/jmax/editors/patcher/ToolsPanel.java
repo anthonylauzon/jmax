@@ -192,7 +192,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
 			if(obj instanceof FtsPatcherObject)
 			    {
-				obj.sendMessage(FtsObject.systemInlet, "open_editor");
+				obj.sendMessage(FtsObject.systemInlet, "openEditor");
 				((FtsPatcherObject)obj).requestStopWaiting(ToolsPanel.toolsPanel);
 			    }
 			else

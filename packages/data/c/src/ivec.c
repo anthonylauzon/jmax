@@ -33,10 +33,6 @@ fts_class_t *ivec_class = 0;
 
 static fts_symbol_t sym_local = 0;
 
-static fts_symbol_t sym_openEditor = 0;
-static fts_symbol_t sym_closeEditor = 0;
-static fts_symbol_t sym_destroyEditor = 0;
-
 static fts_symbol_t sym_set_visibles = 0;
 static fts_symbol_t sym_append_visibles = 0;
 static fts_symbol_t sym_set_pixels = 0;
@@ -711,11 +707,11 @@ ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_client_upload(o, ivec_symbol, 0, 0);
 
   ivec_set_editor_open(this);
-  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
 }
 
 static void
-ivec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
 
@@ -723,14 +719,14 @@ ivec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-ivec_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *) o;
 
   if(ivec_editor_is_open(this))
     {
       ivec_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, sym_closeEditor, 0, 0);  
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
     }
 }
 
@@ -1115,7 +1111,7 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ivec_t *this = (ivec_t *)o;
   
   if(fts_object_has_id(o))
-    fts_client_send_message(o, sym_destroyEditor, 0, 0);
+    fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 
   if(this->copy)
     fts_object_destroy((fts_object_t *)this->copy);
@@ -1167,9 +1163,9 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
 
       /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, ivec_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), ivec_hide_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, ivec_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, ivec_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, ivec_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, ivec_destroy_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set_elements);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
@@ -1201,9 +1197,6 @@ ivec_config(void)
 
   sym_local = fts_new_symbol("local");
 
-  sym_openEditor = fts_new_symbol("openEditor");
-  sym_closeEditor = fts_new_symbol("closeEditor");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_copy_client = fts_new_symbol("copy");
   sym_paste_client = fts_new_symbol("paste");
   sym_cut_client = fts_new_symbol("cut");

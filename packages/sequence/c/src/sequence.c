@@ -240,12 +240,12 @@ sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   sequence_t *this = (sequence_t *)o;
 
   sequence_set_editor_open(this);
-  fts_client_send_message(o, seqsym_createEditor, 0, 0);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
   sequence_upload(o, 0, 0, 0, 0);
 }
 
 static void
-sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sequence_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
 
@@ -253,14 +253,14 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-sequence_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
 
   if(sequence_editor_is_open(this))
     {
       sequence_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, seqsym_closeEditor, 0, 0);
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);
     }
 }
 
@@ -424,7 +424,7 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	      const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
 
 	      post("  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
-		   fts_symbol_name(track_type), (track_size == 1)? "s": "");
+		   fts_symbol_name(track_type), (track_size == 1)? "": "s");
 
 	      track = track_get_next(track);
   	    }
@@ -647,7 +647,7 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       track = sequence_get_first_track(this);
     }    
   
-  fts_client_send_message(o, seqsym_destroyEditor, 0, 0);
+  fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
 
 static fts_status_t
@@ -672,9 +672,9 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("getName"), sequence_send_name_to_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, sequence_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, sequence_close_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), sequence_hide_editor); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, sequence_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, sequence_destroy_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, sequence_close_editor); 
   
   fts_method_define_varargs(cl, 0, fts_s_clear, sequence_clear);
   fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);

@@ -61,7 +61,7 @@ public class FtsPatcherDocument extends MaxDocument
   public void edit() throws MaxDocumentException
   {
     if (rootData != null)
-	((FtsPatcherObject) getRootData()).sendMessage(FtsObject.systemInlet, "open_editor");
+	((FtsPatcherObject) getRootData()).sendMessage(FtsObject.systemInlet, "openEditor");
     else
 	super.edit();
   }

@@ -781,14 +781,14 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 	      if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
 		  {
 		      itsPatcher.stopUpdates();		      
-		      itsPatcher.sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+		      itsPatcher.sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
 		      if(itsPatcher.isARootPatcher()) fts.fireAtomicAction(true); 
 		      itsPatcher.delete();
 		      ((ErmesSketchWindow)itsEditorContainer).Destroy();
 		  }
 	  }
       else 
-	  itsPatcher.sendMessage(FtsObject.systemInlet, "hide", 0, null);
+	  itsPatcher.sendMessage(FtsObject.systemInlet, "closeEditor", 0, null);
 
       KeyEventsManager.removeProducer(this);
   }

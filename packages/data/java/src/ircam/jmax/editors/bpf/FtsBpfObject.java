@@ -243,7 +243,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 
     public void closeEditor()
     {
-	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     public void addPoint(int index, BpfPoint pt)

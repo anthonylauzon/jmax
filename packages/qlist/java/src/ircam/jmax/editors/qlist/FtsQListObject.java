@@ -80,7 +80,7 @@ public class FtsQListObject extends FtsObjectWithEditor {
 
     public void closeEditor()
     {
-	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     FtsAtomList list;
