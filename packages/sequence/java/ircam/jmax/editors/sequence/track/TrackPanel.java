@@ -443,12 +443,9 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     }
     
     if(JMaxApplication.getProperty("no_menus") == null)
-    {
-      EditMenu menu = ((TrackWindow)itsContainer).getEditMenu();
-      menu.copyAction.setEnabled(numSelected > 0);
-      menu.cutAction.setEnabled(numSelected > 0);
-      menu.duplicateAction.setEnabled(numSelected > 0);
-    }
+      ((TrackWindow)itsContainer).getEditMenu().updateMenu(); 
+    else
+      ((TrackWindow)itsContainer).getSimpleMenu().updateMenu();   
   }
 	
   public boolean eventIsVisible(Event evt)
