@@ -42,7 +42,7 @@ fts_package_t *
 fts_project_open(const char* filename)
 {
   char *fnm;
-  fts_package_t *package;
+  fts_package_t *project;
 
   if (fts_project != NULL)
     fts_project_close();
@@ -52,11 +52,13 @@ fts_project_open(const char* filename)
   fnm = strcpy( fts_malloc( strlen( filename) + 1), filename);
   loading_project_dir = fts_dirname( fnm);
 
-  package = fts_package_load_from_file( fts_s_project, filename);
+  project = fts_package_load_from_file( fts_s_project, filename);
 
   loading_project_dir = NULL;
+  
+  fts_free(fnm);
 
-  return package;
+  return project;
 }
 
 int 
