@@ -100,8 +100,13 @@ fts_new_template(fts_symbol_t name, fts_symbol_t filename)
 
   /* resolve the links in the path, so that we have a unique name 
      for the file */
+  
+  fprintf(stderr, "before realpath: file=%s\n", fts_symbol_name(filename));
+
   realpath(fts_symbol_name(filename), buf);
   filename = fts_new_symbol_copy(buf);
+
+  fprintf(stderr, "after realpath: file=%s\n", fts_symbol_name(filename));
 
   /* Make the template */
   template = (fts_template_t *) fts_heap_alloc(template_heap);

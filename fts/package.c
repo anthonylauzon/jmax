@@ -434,7 +434,11 @@ fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fil
     
   } else {
 
+    fprintf(stderr, "before: dir=%s, file=%s\n", fts_symbol_name(pkg->dir), fts_symbol_name(file));
+
     fts_make_absolute_path(fts_symbol_name(pkg->dir), fts_symbol_name(file), buf, MAXPATHLEN);
+
+    fprintf(stderr, "after: file=%s\n", buf);
 
     /* Register the template */
     template = fts_new_template(name, fts_new_symbol_copy(buf));

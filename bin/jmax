@@ -30,7 +30,7 @@
 # JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
 JAVA_DEFAULT_OPTIONS="-noclassgc -mx64m -ms2m"
 
-prefix=/u/worksta/hanappe/tmp/jmax
+prefix=/u/worksta/hanappe/jmax
 exec_prefix=${prefix}
 rootdir=${prefix}/share/jmax
 ftsdir=${exec_prefix}/bin

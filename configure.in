@@ -192,6 +192,7 @@ packages/lists/Makefile
 packages/lists/c/Makefile
 packages/lists/c/src/Makefile
 packages/lists/help/Makefile
+packages/lists/templates/Makefile
 packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile

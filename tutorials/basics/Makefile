@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-prefix = /u/worksta/hanappe/tmp/jmax
+prefix = /u/worksta/hanappe/jmax
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
