@@ -111,6 +111,5 @@ void
 vecsqrt_config(void)
 {
   fts_metaclass_create(fts_new_symbol("sqrt~"), sqrt_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("rsqr~"), rsqrt_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("rsqrt~"), fts_new_symbol("rsqr~"));
+  fts_metaclass_create(fts_new_symbol("rsqrt~"), rsqrt_instantiate, fts_always_equiv);
 }
