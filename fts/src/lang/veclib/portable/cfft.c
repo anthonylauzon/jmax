@@ -52,7 +52,7 @@ void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, lon
  *    bitreversal buffer 
  *
  */
-void bitreversal_inplc(complex *buf, long *bitrev, long nstep, long npoints)
+void bitreversal_inplc(complex * restrict buf, long * restrict bitrev, long nstep, long npoints)
 {
   long idx, xdi;
   complex z;
@@ -62,16 +62,19 @@ void bitreversal_inplc(complex *buf, long *bitrev, long nstep, long npoints)
   for(nshift=-1; nstep; nstep>>=1, nshift++)
     ;
 
-  for(idx=0; idx<npoints; idx++){
-    if((xdi = (bitrev[idx]>>nshift)) > idx){
-      z = buf[idx];    
-      buf[idx] = buf[xdi];
-      buf[xdi] = z;    
+  for(idx=0; idx<npoints; idx++)
+    {
+      int xdi = bitrev[idx] >> nshift;
+      if(xdi > idx)
+	{
+	  z = buf[idx];    
+	  buf[idx] = buf[xdi];
+	  buf[xdi] = z;    
+	}
     }
-  }
 }
 
-void bitreversal(complex *in, complex *out, long *bitrev, long nstep, long npoints)
+void bitreversal_outplc(complex * restrict in, complex * restrict out, long * restrict bitrev, long nstep, long npoints)
 {
   long idx, xdi;
   long nshift;
@@ -80,11 +83,11 @@ void bitreversal(complex *in, complex *out, long *bitrev, long nstep, long npoin
   for(nshift=-1; nstep; nstep>>=1, nshift++)
     ;
 
-  for(idx=0; idx<npoints; idx++){
-    xdi = bitrev[idx]>>nshift;
-    out[xdi] = in[idx];    
-    out[idx] = in[xdi];
-  }
+  for(idx=0; idx<npoints; idx++)
+    {
+      xdi = bitrev[idx]>>nshift;
+      out[idx] = in[xdi];
+    }
 }
 
 /***************************************************************************
@@ -92,7 +95,7 @@ void bitreversal(complex *in, complex *out, long *bitrev, long nstep, long npoin
  *    compute weights for the fft
  *
  */
-void generate_fft_coefficients(complex *coef, complex *icoef, long npoints)
+void generate_fft_coefficients(complex * restrict coef, complex * restrict icoef, long npoints)
 {
   long i;
   double phase = 0;
@@ -110,7 +113,7 @@ void generate_fft_coefficients(complex *coef, complex *icoef, long npoints)
  *    compute table of bitreversed indices
  *
  */
-void generate_bitreversed_indices(long *bitrev, long npoints)
+void generate_bitreversed_indices(long * restrict bitrev, long npoints)
 {
   long idx, xdi;
   long i, j;

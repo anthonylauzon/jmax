@@ -2,7 +2,7 @@
 
 #include "lang/veclib/portable/rfft_shuffle.h"
 
-void shuffle_after_rfft_inplc(complex *buf, complex *coef, long n_over, long n_points)
+void shuffle_after_rfft_inplc(complex * restrict buf, complex * restrict coef, long n_over, long n_points)
 {
   long idx, xdi, i;
   int n_step = n_over>>1;
@@ -26,7 +26,7 @@ void shuffle_after_rfft_inplc(complex *buf, complex *coef, long n_over, long n_p
   buf[n_half].im = -buf[n_half].im;
 }
 
-void shuffle_after_rfft(complex *in, complex *out, complex *coef, long n_over, long n_points)
+void shuffle_after_rfft_outplc(complex * restrict in, complex * restrict out, complex * restrict coef, long n_over, long n_points)
 {
   long idx, xdi, i;
   int n_step = n_over>>1;
@@ -50,7 +50,7 @@ void shuffle_after_rfft(complex *in, complex *out, complex *coef, long n_over, l
   out[n_half].im = -in[n_half].im;
 }
 
-void shuffle_before_rifft_inplc(complex *buf, complex *coef, long n_over, long n_points)
+void shuffle_before_rifft_inplc(complex * restrict buf, complex * restrict coef, long n_over, long n_points)
 {
   long idx, xdi, i;
   int n_step = n_over>>1;
@@ -73,7 +73,7 @@ void shuffle_before_rifft_inplc(complex *buf, complex *coef, long n_over, long n
   buf[n_half].im *= -2;
 }
 
-void shuffle_before_rifft(complex *in, complex *out, complex *coef, long n_over, long n_points)
+void shuffle_before_rifft_outplc(complex * restrict in, complex * restrict out, complex * restrict coef, long n_over, long n_points)
 {
   long idx, xdi, i;
   int n_step = n_over>>1;
