@@ -35,14 +35,12 @@
 #include "fts.h"
 #include "dtdserver.h"
 
-extern void readsf_config(void);
-extern void writesf_config(void);
+extern void dtdobjs_init(void);
 
 static void unixdtd_init(void)
 {
   dtdserver_init();
-  readsf_config();
-/*    writesf_config(); */
+  dtdobjs_init();
 }
 
 static void unixdtd_shutdown(void)

@@ -302,7 +302,7 @@ static AFfilehandle dtd_open_file_write( const char *filename, const char *path,
   AFfilesetup setup;
   int file_channels, sampfmt, sampwidth;
 
-  // which path ??
+  /* which path ?? */
 
   setup = afNewFileSetup();
 
