@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 #include "lang/utils.h"
 #include "lang/ftl.h"
 #include "lang/veclib/include/veclib.h"
+#include "runtime/files/post.h"
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -19,11 +21,13 @@ typedef enum {
 
 typedef struct {
   fts_object_t *object;
-} ftl_instr_debug_info_t;
+  int profile_count;
+} ftl_instruction_debug_info_t;
 
 typedef struct {
   int size;
-  ftl_instr_debug_info_t *info;
+  int last;
+  ftl_instruction_debug_info_t *info;
 } ftl_debug_info_table_t;
 
 #define DEFAULT_DEBUG_INFO_SIZE 128
@@ -33,13 +37,12 @@ struct _ftl_subroutine_t {
   fts_symbol_t name;
   fts_atom_list_t instructions;
   struct _ftl_subroutine_t *next;
+  struct _ftl_subroutine_t *next_in_stack;
 
   fts_word_t *bytecode;
 
   int instruction_count;
   ftl_debug_info_table_t debug_info_table;
-
-  ftl_program_t *program;
 };
 
 
@@ -49,26 +52,26 @@ struct _ftl_program_t {
   ftl_subroutine_t *current_subroutine, *main;
   fts_hash_table_t symbol_table;
 
-  /* Information for pc sampling profiling */
+  /* Stack of subroutines calls */
+  ftl_subroutine_t *subroutine_tos;
+
+  /* Program counter for PC sampling */
   int pc;
-  ftl_subroutine_t *subr;
+
+  /* Profiling thread */
+  pthread_t profile_thread;
 };
 
 static fts_hash_table_t *ftl_functions_table = 0;
 
-fts_status_description_t ftl_error =
+fts_status_description_t ftl_error_uninitialized_program =
 {
-  "FTL unspecified error : appeler le service apres-vente"
+  "uninitialized FTL program"
 };
 
 fts_status_description_t ftl_error_invalid_program =
 {
   "invalid FTL program"
-};
-
-fts_status_description_t ftl_error_uninitialized_program =
-{
-  "uninitialized FTL program"
 };
 
 /* --------------------------------------------------------------------------- */
@@ -80,7 +83,8 @@ fts_status_description_t ftl_error_uninitialized_program =
 static void ftl_debug_info_table_init( ftl_debug_info_table_t *table)
 {
   table->size = DEFAULT_DEBUG_INFO_SIZE;
-  table->info = (ftl_instr_debug_info_t *)fts_malloc( table->size * sizeof(ftl_instr_debug_info_t));
+  table->info = (ftl_instruction_debug_info_t *)fts_malloc( table->size * sizeof(ftl_instruction_debug_info_t));
+  table->last = 0;
 }
 
 static void ftl_debug_info_table_set( ftl_debug_info_table_t *table, int index, fts_object_t *object)
@@ -93,7 +97,7 @@ static void ftl_debug_info_table_set( ftl_debug_info_table_t *table, int index, 
       while (new_size <= index)
 	new_size *= 2;
 
-      table->info = (ftl_instr_debug_info_t *)fts_realloc( table->info, new_size * sizeof(ftl_instr_debug_info_t));
+      table->info = (ftl_instruction_debug_info_t *)fts_realloc( table->info, new_size * sizeof(ftl_instruction_debug_info_t));
 
      for ( i = table->size; i < new_size; i++)
        table->info[i].object = 0;
@@ -103,7 +107,11 @@ static void ftl_debug_info_table_set( ftl_debug_info_table_t *table, int index, 
 
   ASSERT( index >= 0 && index < table->size);
 
-  table->info[ index ].object = object;
+  table->info[index].object = object;
+  table->info[index].profile_count = 0;
+
+  if ( index > table->last)
+    table->last = index;
 }
 
 static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
@@ -111,6 +119,7 @@ static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
   fts_free( table->info);
   table->info = 0;
   table->size = 0;
+  table->last = 0;
 }
 
 /* ********************************************************************** */
@@ -118,7 +127,7 @@ static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
 /* ********************************************************************** */
 
 static ftl_subroutine_t *
-ftl_subroutine_new( ftl_program_t *prog, fts_symbol_t name)
+ftl_subroutine_new( fts_symbol_t name)
 {
   ftl_subroutine_t *newsubr;
 
@@ -130,12 +139,11 @@ ftl_subroutine_new( ftl_program_t *prog, fts_symbol_t name)
   fts_atom_list_init( &(newsubr->instructions) );
 
   newsubr->next = 0;
+  newsubr->next_in_stack = 0;
   newsubr->bytecode = 0;
   newsubr->instruction_count = 0;
 
   ftl_debug_info_table_init( &newsubr->debug_info_table);
-
-  newsubr->program = prog;
 
   return newsubr;
 }
@@ -209,7 +217,7 @@ ftl_program_add_subroutine( ftl_program_t *prog, fts_symbol_t name)
 	return 0;
     }
 
-  newsubr = ftl_subroutine_new( prog, name);
+  newsubr = ftl_subroutine_new( name);
   *subr = newsubr;
 
   return newsubr;
@@ -296,7 +304,8 @@ ftl_program_init( ftl_program_t *prog)
   prog->subroutines = 0;
   prog->current_subroutine = 0;
   prog->main = 0;
-  prog->subr = 0;
+  prog->subroutine_tos = 0;
+  prog->pc = -1;
 
   fts_hash_table_init( &(prog->symbol_table) );
 }
@@ -594,6 +603,13 @@ ftl_program_compile_portable( ftl_program_t *prog)
       ret = ftl_state_machine( &subr->instructions, compile_portable_state_fun, &info);
       if ( ret != fts_Success)
 	return 0;
+
+#if 0
+      fprintf( stderr, "subr %s last %d instruction_count %d\n", 
+	       fts_symbol_name(subr->name), 
+	       subr->debug_info_table.last,
+	       subr->instruction_count);
+#endif
     }
 
   return 1;
@@ -672,7 +688,7 @@ void ftl_program_print_signals_count( const ftl_program_t *prog)
 struct print_info {
   int pc;
   char line[256];
-  ftl_instr_debug_info_t *debug_info;
+  ftl_instruction_debug_info_t *debug_info;
 };
 
 static fts_status_t print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
@@ -772,14 +788,13 @@ void ftl_program_print_bytecode( const ftl_program_t *prog)
 /* Run functions                                                          */
 /* ********************************************************************** */
 
-void ftl_program_call_subr( ftl_subroutine_t *subr)
+void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
 {
   fts_word_t *bytecode;
-  int *ppc;
 
-  subr->program->subr = subr;
-  ppc = &(subr->program->pc);
-  *ppc = 0;
+  prog->pc = -1;
+  subr->next_in_stack = prog->subroutine_tos;
+  prog->subroutine_tos = subr;
 
   bytecode = subr->bytecode;
   while (fts_word_get_long(bytecode))
@@ -787,35 +802,283 @@ void ftl_program_call_subr( ftl_subroutine_t *subr)
       ftl_wrapper_t w;
       int argc;
       
+      prog->pc++;
       w = (ftl_wrapper_t) fts_word_get_ptr( bytecode);
       argc = fts_word_get_long( bytecode+1);
       (*w)(bytecode+2);
       bytecode += (argc + 2);
-      (*ppc)++;
     }
+
+  prog->pc = -1;
+  prog->subroutine_tos = subr->next_in_stack;
+  subr->next_in_stack = 0;
 }
 
 void ftl_program_run( ftl_program_t *prog )
 {
-  ftl_program_call_subr( prog->main);
-  prog->subr = 0;
+  ftl_program_call_subr( prog, prog->main);
 }
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
-/* Auxiliary function for profiling                                            */
+/* Profile thread management                                                   */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-fts_object_t *ftl_program_pc_sample( ftl_program_t *prog)
+#ifdef SLOW
+#define DEFAULT_PROFILE_PERIOD_NS 130000000
+#else
+#define DEFAULT_PROFILE_PERIOD_NS 23000000
+#endif
+
+static struct timespec profile_period = { 0, DEFAULT_PROFILE_PERIOD_NS };
+
+static pthread_t profile_thread;
+
+static void profile_thread_cleanup( void *arg)
+{
+#ifdef DEBUG
+  fprintf( stderr, "Profile thread has exited\n");
+#endif
+}
+
+static void ftl_program_pc_sample( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr;
   int pc;
 
-  subr = prog->subr;
+  subr = prog->subroutine_tos;
   pc = prog->pc;
-  if (subr)
-    return subr->debug_info_table.info[pc].object;
-  else
-    return 0;
+
+  if (subr != 0 && pc >= 0)
+    {
+#if 0
+      fprintf( stderr, "subr %s pc %d\n", fts_symbol_name( subr->name), pc);
+#endif
+
+      ASSERT( pc <= subr->debug_info_table.last);
+
+      subr->debug_info_table.info[pc].profile_count += 1;
+    }
 }
+
+static void *profile_thread_fun( void *arg)
+{
+  ftl_program_t *prog;
+
+  prog = (ftl_program_t *)arg;
+
+#ifdef DEBUG
+  fprintf( stderr, "Profile thread has started\n");
+#endif
+
+  pthread_cleanup_push( profile_thread_cleanup, 0);
+
+  while (1)
+    {
+      ftl_program_pc_sample( prog);
+
+      nanosleep( &profile_period, NULL);
+    }
+
+  pthread_cleanup_pop( 0);
+}
+
+static void profile_thread_start( ftl_program_t *prog)
+{
+  pthread_create( &prog->profile_thread, 0, profile_thread_fun, prog);
+}
+
+static void profile_thread_stop( ftl_program_t *prog)
+{
+  pthread_cancel( prog->profile_thread);
+}
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Report by metaclass related functions                                       */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+typedef struct {
+  void *object;
+  int profile_count;
+} report_entry_t;
+
+typedef struct _report_node_t report_node_t;
+
+struct _report_node_t {
+  report_entry_t entry;
+  report_node_t *left, *right;
+};
+
+static void report_tree_add_node( report_node_t **root, void *object, int profile_count)
+{
+  if ( ! *root)
+    {
+      *root = (report_node_t *)fts_malloc( sizeof( report_node_t));
+      (*root)->entry.object = object;
+      (*root)->entry.profile_count = profile_count;
+      (*root)->left = 0;
+      (*root)->right = 0;
+    }
+  else if (object < (*root)->entry.object)
+    report_tree_add_node( &((*root)->left), object, profile_count);
+  else if (object > (*root)->entry.object)
+    report_tree_add_node( &((*root)->right), object, profile_count);
+  else
+    (*root)->entry.profile_count += profile_count;
+}
+
+static void report_tree_build( ftl_program_t *prog, report_node_t **tree)
+{
+  ftl_subroutine_t *subr;
+
+  for( subr = prog->subroutines; subr; subr = subr->next)
+    {
+      ftl_instruction_debug_info_t *debug_info;
+      int i, last;
+
+      debug_info = subr->debug_info_table.info;
+      last = subr->debug_info_table.last;
+
+      for ( i = 0; i < last; i++)
+	{
+	  if (debug_info->profile_count && debug_info->object)
+	    report_tree_add_node( tree, debug_info->object->cl->mcl, debug_info->profile_count);
+
+	  debug_info++;
+	}
+    }
+}
+
+static void report_tree_count( report_node_t *tree, int *nobjects, int *nevents)
+{
+  if (tree)
+    {
+      *nobjects += 1;
+      *nevents += tree->entry.profile_count;
+      report_tree_count( tree->left, nobjects, nevents);
+      report_tree_count( tree->right, nobjects, nevents);
+    }
+}
+
+static void report_tree_copy_aux( report_node_t *tree, report_entry_t **p)
+{
+  if (tree)
+    {
+      memcpy( *p, &tree->entry, sizeof( tree->entry));
+      (*p)++;
+      report_tree_copy_aux( tree->left, p);
+      report_tree_copy_aux( tree->right, p);
+    }
+}
+
+static void report_tree_copy( report_node_t *tree, report_entry_t *tab)
+{
+  report_tree_copy_aux( tree, &tab);
+}
+
+static void report_tree_free( report_node_t *tree)
+{
+  if (tree)
+    {
+      report_tree_free( tree->left);
+      report_tree_free( tree->right);
+      fts_free( tree);
+    }
+}
+
+static const char *metaclass_name_function(void *object)
+{
+  return fts_symbol_name( ((fts_metaclass_t *)object)->name);
+}
+
+static const char *object_name_function(void *object)
+{
+  return fts_symbol_name( fts_object_get_class_name((fts_object_t *)object));
+}
+
+static void report_tree_print( report_node_t *tree, const char *(*name_function)(void *))
+{
+  if (tree)
+    {
+      fprintf( stderr, "%s %d\n", (*name_function)(tree->entry.object), tree->entry.profile_count);
+      report_tree_print( tree->left, name_function);
+      report_tree_print( tree->right, name_function);
+    }
+}
+
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* FTL profiling API                                                           */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+void ftl_program_start_profiler( ftl_program_t *prog)
+{
+  profile_thread_start( prog);
+}
+
+void ftl_program_stop_profiler( ftl_program_t *prog)
+{
+  profile_thread_stop( prog);
+}
+
+void ftl_program_clear_profile_data( ftl_program_t *prog)
+{
+  ftl_subroutine_t *subr;
+
+  for( subr = prog->subroutines; subr; subr = subr->next)
+    {
+      ftl_instruction_debug_info_t *debug_info;
+      int i, last;
+
+      debug_info = subr->debug_info_table.info;
+      last = subr->debug_info_table.last;
+
+      for ( i = 0; i < last; i++)
+	{
+	  debug_info->profile_count = 0;
+	  debug_info++;
+	}
+    }
+}
+
+static int report_compare( const void *r1, const void *r2)
+{
+  return ((const report_entry_t *)r2)->profile_count - ((const report_entry_t *)r1)->profile_count;
+}
+
+void ftl_program_show_profile_by_class( ftl_program_t *prog)
+{
+  report_node_t *tree = 0;
+  int nobjects = 0, nevents = 0, i;
+  report_entry_t *tab;
+
+  report_tree_build( prog, &tree);
+
+  report_tree_count( tree, &nobjects, &nevents);
+
+  tab = (report_entry_t *)fts_malloc( sizeof(report_entry_t) * nobjects);
+
+  report_tree_copy( tree, tab);
+
+  qsort( tab, nobjects, sizeof( report_entry_t), report_compare);
+
+  post( "Reporting profile (%d events)\n", nevents);
+  for ( i = 0; i < nobjects; i++)
+    {
+      float p;
+
+      p = 100.0*((float)tab[i].profile_count/nevents);
+      post( "%3.2f%% %s\n", p, metaclass_name_function( tab[i].object));
+    }
+
+  fts_free( tab);
+
+  report_tree_free( tree);
+}
+
+
