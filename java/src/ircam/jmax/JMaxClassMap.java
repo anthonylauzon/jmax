@@ -84,11 +84,13 @@ public class JMaxClassMap {
   public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String cursorName, JMaxPackage jmaxPackage)
   {
     instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconName, cursorName, jmaxPackage));
+    instance.names.add( ftsClassName);
   }
 
   public static void put( String ftsClassName, JMaxObjectCreator creator, String iconPath, String cursorPath)
   {
     instance.map.put( ftsClassName, new ClassMapEntry( ftsClassName, creator, iconPath, cursorPath));
+    instance.names.add( ftsClassName);
   }
 
   public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, JMaxPackage jmaxPackage)
@@ -118,15 +120,17 @@ public class JMaxClassMap {
 
   public static Iterator getClassNames()
   {
-    return instance.map.keySet().iterator();
+    return instance.names.iterator();
   }
 
   private JMaxClassMap()
   {
     map = new HashMap();
+    names = new ArrayList();
   }
 
   private static JMaxClassMap instance = new JMaxClassMap();
   private HashMap map;
+  private ArrayList names;
 }
 
