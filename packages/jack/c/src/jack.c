@@ -36,6 +36,13 @@ extern void jackaudiomanager_config(void);
 
 void jack_config(void)
 {
-  jackaudiomanager_config();
   jackaudioport_config();
+  jackaudiomanager_config();
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
