@@ -28,6 +28,9 @@
  *
  */
 
+#include <fts/fts.h>
+#include <ftsprivate/client.h>
+#include <ftsprivate/patcher.h>
 #include "qlist.h"
 #include "atomlist.h"
 #include "naming.h"
@@ -215,6 +218,8 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "set" [<arg>*] inlet 0 */
@@ -228,6 +233,8 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "clear" inlet 0 */
@@ -241,6 +248,8 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
 
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "flush" inlet 0 */
@@ -279,8 +288,6 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     }
   else
     this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
-  
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_upload, 0, 0);
 
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }
@@ -303,8 +310,16 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   qlist_t *this = (qlist_t *)o;
   fts_atom_t a[1];
 
-  fts_set_object(a, (fts_object_t *)this->atom_list);
+  if(!fts_object_has_id((fts_object_t *)this->atom_list))
+  {
+    ((fts_object_t *)this->atom_list)->patcher = o->patcher;
+    fts_client_register_object((fts_object_t *)this->atom_list, -1);     
+  }
+  
+  fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));
   fts_client_send_message((fts_object_t *)this, sym_setAtomList, 1, a);
+
+  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 static void
@@ -391,7 +406,7 @@ qlist_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   qlist_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  /*qlist_upload(o, 0, 0, 0, 0);*/
+  qlist_upload(o, 0, 0, 0, 0);
 }
 
 static void

@@ -365,7 +365,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 $(JAR): $(JAR_DEP)	
 	-test -f $(JAR) || rm -f $(JAR)
-	jar -cvf $(JAR) *.class ircam/jmax/editors/qlist/*.class
+	jar -cvf $(JAR) *.class ircam/jmax/editors/qlist/*.class ircam/jmax/editors/qlist/actions/*.class ircam/jmax/editors/qlist/menus/*.class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

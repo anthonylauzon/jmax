@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.qlist;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
@@ -40,7 +41,8 @@ public class FtsQListObject extends FtsObjectWithEditor {
     FtsObject.registerMessageHandler( FtsQListObject.class, FtsSymbol.get("setAtomList"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsQListObject)obj).setAtomList( (FtsAtomList)args.getObject( 0));
+	  FtsAtomList atomList = new FtsAtomList( JMaxApplication.getFtsServer(), null, args.getInt( 0));
+	  ((FtsQListObject)obj).setAtomList( atomList);
 	}
       });
   }
