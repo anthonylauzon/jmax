@@ -985,7 +985,10 @@ __fts_package_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       fts_send_message((fts_object_t *)fts_config_get(), fts_s_load, 1, a);
     }
   else
-    fts_send_message((fts_object_t *)fts_config_get(), fts_s_default, 0, 0);
+  {
+    if (fts_config_get() != NULL)
+      fts_send_message((fts_object_t *)fts_config_get(), fts_s_default, 0, 0);
+  }
 }
 
 static void 
@@ -1593,3 +1596,9 @@ fts_kernel_package_init(void)
   fts_class_install( fts_new_symbol( "loader"), loader_instantiate);
 }
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */

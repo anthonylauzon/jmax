@@ -168,7 +168,7 @@ void fts_load_config( void)
 {
   fts_symbol_t config_symbol;
   fts_symbol_t config_file;
-  fts_package_t* config = NULL;
+  fts_config_t* config = NULL;
 
   config_symbol = fts_new_symbol( "config");
   
@@ -186,17 +186,20 @@ void fts_load_config( void)
   }
   
   /* @@@@@@ TODO @@@@@@@@ */
-#if 0
   /* create an empty config */
   if (config_file == NULL)
   {
-    fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
-    config = fts_package_new(config_symbol);
+    fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
+    config = (fts_config_t*)fts_object_create(config_type, 0, 0);
+    fts_midiconfig_set_defaults(config->midi_config);
+    fts_audioconfig_set_defaults(config->audio_config);
+
     fts_config_set(config);
   }
   else
-#endif /* TODO create an empty config */
+  {
     fts_config_open(config_file);
+  }
 }
 
 /***********************************************************************
