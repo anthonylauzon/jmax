@@ -82,17 +82,12 @@ typedef struct {
 /* alsastream_t functions                                                 */
 /* ********************************************************************** */
 
-#define ERROR(FUN,ERR) do {fprintf( stderr, "Error: %s() failed: %s\n", FUN, snd_strerror( ERR )); return ERR;} while (0)
-
 /* ---------------------------------------------------------------------- */
 /* alsatream_open: opens a stream                                         */
 /* ---------------------------------------------------------------------- */
 
 static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, int format, int channels, int sampling_rate, int fifo_size, enum transfer_mode_t transfer_mode)
 {
-  int COUNT = 0;
-#define HERE fprintf( stderr, "-> %d\n", COUNT++);
-
   snd_pcm_access_mask_t *mask;
   snd_output_t *log;
   snd_pcm_hw_params_t *hwparams;
@@ -111,10 +106,10 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Open the PCM device
    */
   if ( (err = snd_pcm_open( &st->handle, (char *)pcm_name, which_stream, open_mode)) < 0)
-    ERROR( "snd_pcm_open", err);
+    return err;
 
   if ((err = snd_pcm_hw_params_any( st->handle, hwparams)) < 0)
-    ERROR( "snd_pcm_hw_params_any", err);
+    return err;
 
   /*
    * Set the access mode:
@@ -122,23 +117,23 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
   switch ( transfer_mode) {
   case MMAP_ARDOUR:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0)
-      ERROR( "snd_pcm_hw_params_set_access", err);
+      return err;
     break;
   case MMAP_NONINTERLEAVED:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0)
-      ERROR( "snd_pcm_hw_params_set_access", err);
+      return err;
     break;
   case MMAP_INTERLEAVED:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0)
-      ERROR( "snd_pcm_hw_params_set_access", err);
+      return err;
     break;
   case RW_NONINTERLEAVED:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_RW_NONINTERLEAVED)) < 0)
-      ERROR( "snd_pcm_hw_params_set_access", err);
+      return err;
     break;
   case RW_INTERLEAVED:
     if ((err = snd_pcm_hw_params_set_access( st->handle, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
-      ERROR( "snd_pcm_hw_params_set_access", err);
+      return err;
     break;
   }
 
@@ -146,7 +141,7 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Set the sample format
    */
   if ((err = snd_pcm_hw_params_set_format( st->handle, hwparams, format)) < 0)
-    ERROR( "snd_pcm_hw_params_set_format", err);
+    return err;
 
   /*
    * Set the number of channels
@@ -156,7 +151,7 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     st->channels = snd_pcm_hw_params_get_channels_max (hwparams);
 #endif
   if ((err = snd_pcm_hw_params_set_channels( st->handle, hwparams, channels)) < 0) 
-    ERROR( "snd_pcm_hw_params_set_channels", err);
+    return err;
 
   st->channels = snd_pcm_hw_params_get_channels( hwparams);
 
@@ -164,14 +159,14 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Set the sampling rate
    */
   if ((err = snd_pcm_hw_params_set_rate_near( st->handle, hwparams, sampling_rate, 0)) < 0)
-    ERROR( "snd_pcm_hw_params_set_rate_near", err);
+    return err;
 
   /*
    * Set periods: we ask for 2 periods
    */
   periods = 2;
   if ((err = snd_pcm_hw_params_set_periods( st->handle, hwparams, periods, 0) < 0))
-    ERROR( "snd_pcm_hw_params_set_periods", err);
+    return err;
 
   st->periods = snd_pcm_hw_params_get_periods( hwparams, 0);
 
@@ -179,7 +174,7 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Set period size: the period size is the fifo size divided by the number of periods
    */
   if ((err = snd_pcm_hw_params_set_period_size( st->handle, hwparams, fifo_size / periods, 0)) < 0) 
-    ERROR( "snd_pcm_hw_params_set_period_size", err);
+    return err;
 
   st->period_size = snd_pcm_hw_params_get_period_size( hwparams, &dir);
 
@@ -187,38 +182,38 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    * Set buffer size
    */
   if ((err = snd_pcm_hw_params_set_buffer_size( st->handle, hwparams, fifo_size)) < 0)
-    ERROR( "snd_pcm_hw_params_buffer_size", err);
+    return err;
 
   /*
    * Set hardware parameters
    */
   if ((err = snd_pcm_hw_params( st->handle, hwparams)) < 0)
     {
-      snd_pcm_hw_params_dump( hwparams, log);
-      ERROR( "snd_pcm_hw_params", err);
+/*        snd_pcm_hw_params_dump( hwparams, log); */
+      return err;
     }
 
   snd_pcm_sw_params_current( st->handle, swparams);
 
   if ((err = snd_pcm_sw_params_set_period_step( st->handle, swparams, 1)) < 0)
-    ERROR( "snd_pcm_sw_params_set_period_step", err);
+    return err;
 
   if ( transfer_mode == MMAP_ARDOUR)
     {
       if ((err = snd_pcm_sw_params_set_xrun_mode( st->handle, swparams, SND_PCM_XRUN_NONE)) < 0) 
-	ERROR( "snd_pcm_sw_params_set_xrun_mode", err);
+	return err;
 
       if ((err = snd_pcm_sw_params_set_start_mode( st->handle, swparams, SND_PCM_START_EXPLICIT)) < 0)
-	ERROR( "snd_pcm_sw_params_set_start_mode", err);
+	return err;
     }
 
   if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, fifo_size / periods)) < 0) 
-    ERROR( "snd_pcm_sw_params_set_avail_min", err);
+    return err;
 
   if ((err = snd_pcm_sw_params( st->handle, swparams)) < 0) 
     {
-      snd_pcm_sw_params_dump(swparams, log);
-      ERROR( "snd_pcm_sw_params", err);
+/*        snd_pcm_sw_params_dump(swparams, log); */
+      return err;
     }
 
   st->bytes_per_sample = (snd_pcm_format_physical_width(format) / 8);
@@ -226,7 +221,7 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
 
   st->link = 0;
 
-  return 1;
+  return 0;
 }
 
 
@@ -312,8 +307,8 @@ static int alsastream_xrun_recovery_ardour( alsastream_t *capture)
   snd_pcm_sframes_t capture_delay;
   int err;
 
-  if ((err = snd_pcm_delay( capture->handle, &capture_delay)))
-    ERROR( "snd_pcm_delay", err);
+  if ((err = snd_pcm_delay( capture->handle, &capture_delay)) < 0)
+    return err;
 
   post( "xrun of %d frames\n", capture_delay);
 	
@@ -345,8 +340,7 @@ static int alsastream_poll( alsastream_t *st)
 	  /* under gdb, or when exiting due to a signal */
 	}
 
-      ERROR( "poll", r);
-      return -1;
+      return r;
     }
   else if (r == 0)
     return 0;
@@ -361,8 +355,7 @@ static int alsastream_poll( alsastream_t *st)
 	xrun = 1;
       else 
 	{
-	  ERROR( "snd_pcm_avail_update", frames_avail);
-	  return -1;
+	  return frames_avail;
 	}
     }
 
@@ -374,8 +367,7 @@ static int alsastream_poll( alsastream_t *st)
 	    xrun = 1;
 	  else 
 	    {
-	      ERROR( "snd_pcm_avail_update", frames_avail);
-	      return -1;
+	      return frames_avail;
 	    }
 	}
     }
@@ -466,7 +458,7 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
 	
   snd_pcm_status_alloca(&status);
   if ( (err = snd_pcm_status( handle, status)) < 0)
-    ERROR( "snd_pcm_status", err);
+    return err;
 
   if ( snd_pcm_status_get_state( status) == SND_PCM_STATE_XRUN)
     {
@@ -474,7 +466,7 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
     }
 
   if (( err = snd_pcm_prepare( handle)) < 0)
-    ERROR( "snd_pcm_prepare", err);
+    return err;
 
   return 0;
 }
@@ -772,7 +764,7 @@ static void pcm_dump_post( snd_pcm_t *handle)
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, transfer_mode;
+  int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, transfer_mode, err;
   float sr;
   char pcm_name[256];
   const char *format_name;
@@ -811,9 +803,9 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( capture_channels != 0)
     {
-      if ( alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, transfer_mode) < 0)
+      if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
-	  fts_object_set_error(o, "Error opening ALSA device");
+	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
 	  return;
 	}
 
@@ -825,9 +817,9 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( playback_channels != 0)
     {
-      if ( alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, transfer_mode) < 0)
+      if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
-	  fts_object_set_error(o, "Error opening ALSA device");
+	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
 	  return;
 	}
 
