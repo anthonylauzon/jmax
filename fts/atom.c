@@ -28,7 +28,8 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 
-const fts_atom_t fts_null[] = {FTS_NULL};
+static fts_atom_t __fts_null;
+const fts_atom_t *fts_null = &__fts_null;
 
 int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 {
@@ -117,5 +118,7 @@ void fts_kernel_atom_init( void)
   fts_metaclass_set_selector( &pointer_metaclass, fts_s_pointer);
   fts_metaclass_set_selector( &string_metaclass, fts_s_string);
   fts_metaclass_set_selector( &connection_metaclass, fts_s_connection);
+
+  fts_set_void( &__fts_null);
 }
 

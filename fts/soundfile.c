@@ -44,6 +44,9 @@ fts_symbol_t fts_s_signed16 = 0;
 fts_symbol_t fts_s_signed24 = 0;
 fts_symbol_t fts_s_signed32 = 0;
 
+/* An initializer for empty atoms */
+#define FTS_NULL { 0, {0}}
+
 static fts_soundfile_format_t format_aiffc = {"extended Audio Interchange File Format (AIFFC)", FTS_NULL};
 static fts_soundfile_format_t format_aiff = {"Audio Interchange File Format (AIFF)", FTS_NULL};
 static fts_soundfile_format_t format_next = {"NeXT .snd and Sun .au", FTS_NULL};

@@ -102,7 +102,7 @@ FTS_API fts_metaclass_t *fts_t_connection;
  * @param p pointer to the atom
  * @ingroup atom
  */
-#define fts_set_void(p) ((p)->typeid = fts_t_void)
+#define fts_set_void(p) ((p)->typeid = fts_t_void, fts_word_set_int( &(p)->value, 0))
 
 /**
  * Set the integer value
@@ -396,8 +396,5 @@ FTS_API fts_metaclass_t *fts_t_connection;
  */
 FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 
-/* An initializer for empty atoms */
-#define FTS_NULL { 0, {0}}
-
-extern const fts_atom_t fts_null[];
+extern const fts_atom_t *fts_null;
 
