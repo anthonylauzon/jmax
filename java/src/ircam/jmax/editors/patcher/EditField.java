@@ -213,17 +213,17 @@ public class EditField extends JTextArea implements FocusListener
 	  {
 
 	    SwingUtilities.invokeLater(new Runnable()
-				       {
-					 public void run()
-					   {
-					     int pos = viewToModel(location);
-					     
-					     if (pos >= 0)
-					       setCaretPosition(pos);
-					     else
-					       setCaretPosition(owner.getArgs().length());
-					   }
-				       });
+	      {
+		public void run()
+		{
+		  int pos = viewToModel(location);
+		  
+		  if (pos >= 0)
+		    setCaretPosition(pos);
+		  else
+		    setCaretPosition(owner.getArgs().length());
+		}
+	      });
 	    doneOnce = true;
 	  }
       }
@@ -263,37 +263,37 @@ public class EditField extends JTextArea implements FocusListener
   void resizeIfNeeded()
   {
     SwingUtilities.invokeLater(new Runnable()
-			       {
-				 public void run()
-				   {
-				     if (getText() != null)
-				       {
-					 Dimension d;
-					 
-					 owner.redraw();
-					 owner.redrawConnections();
-					 
-					  if(owner.isMultiline())
-					     {
-						 d = getPreferredSize();
-						 owner.setHeight(d.height + owner.getTextHeightOffset());
-					     }					 
-					 else
-					     {
-						 owner.setWidthToText(getText());
-						 
-						 d = getSize();
-						 d.width = owner.getWidth() - owner.getTextWidthOffset();
-					     }
-
-					 owner.redraw();
-					 owner.redrawConnections();
-
-					 setSize(d);
-					 sketch.fixSize();
-				       }
-				   }
-			       });
+      {
+	public void run()
+	{
+	  if (getText() != null)
+	    {
+	      Dimension d;
+	      
+	      owner.redraw();
+	      owner.redrawConnections();
+	      
+	      if(owner.isMultiline())
+		{
+		  d = getPreferredSize();
+		  owner.setHeight(d.height + owner.getTextHeightOffset());
+		}					 
+	      else
+		{
+		  owner.setWidthToText(getText());
+		  
+		  d = getSize();
+		  d.width = owner.getWidth() - owner.getTextWidthOffset();
+		}
+	      
+	      owner.redraw();
+	      owner.redrawConnections();
+	      
+	      setSize(d);
+	      sketch.fixSize();
+	    }
+	}
+      });
   }
 				 
        
@@ -302,7 +302,6 @@ public class EditField extends JTextArea implements FocusListener
   void deleteSelectedText()
   {
     String s = getText();
-
     setText(s.substring(0, getSelectionStart()) +  s.substring(getSelectionEnd(), s.length()));
   }
 

@@ -205,7 +205,6 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
       return null;
   }
 
-    
   final transient static float unity = 2.0f;
   final transient static float dash1[] = {unity, 3*unity};
   final transient static float dash2[] = {unity, unity};
@@ -229,80 +228,80 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
   public void paint( Graphics g) 
   {
     if(type == FtsConnection.fts_connection_signal)	
-	{
-	    g.setColor(Color.black);
+      {
+	g.setColor(Color.black);
 
-	    double angle = Math.abs(Math.atan2((float)(start.y - end.y), (float)(end.x - start.x)));
-	    if((angle>Math.PI/4)&&(angle<Math.PI*3/4))
-		{		 
-		    if(selected)
-			{
-			    ((Graphics2D)g).setStroke(dashed1);
-			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
-			    g.drawLine(start.x+2, start.y, end.x+2, end.y);
-			    ((Graphics2D)g).setStroke(dashed2);
-			    g.drawLine(start.x, start.y, end.x, end.y);
-			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
-			    ((Graphics2D)g).setStroke(dashed3);
-			    g.drawLine(start.x-1, start.y, end.x-1, end.y);
-			    g.drawLine(start.x, start.y, end.x, end.y); 
-			}
-		    else
-			{
-			    ((Graphics2D)g).setStroke(dashed1);
-			    g.drawLine(start.x+1, start.y, end.x+1, end.y);
-			    ((Graphics2D)g).setStroke(dashed2);
-			    g.drawLine(start.x, start.y, end.x, end.y);
-			    ((Graphics2D)g).setStroke(dashed3);
-			    g.drawLine(start.x-1, start.y, end.x-1, end.y);
-			}
-		}
+	double angle = Math.abs(Math.atan2((float)(start.y - end.y), (float)(end.x - start.x)));
+	if((angle>Math.PI/4)&&(angle<Math.PI*3/4))
+	  {		 
+	    if(selected)
+	      {
+		((Graphics2D)g).setStroke(dashed1);
+		g.drawLine(start.x+1, start.y, end.x+1, end.y);
+		g.drawLine(start.x+2, start.y, end.x+2, end.y);
+		((Graphics2D)g).setStroke(dashed2);
+		g.drawLine(start.x, start.y, end.x, end.y);
+		g.drawLine(start.x+1, start.y, end.x+1, end.y);
+		((Graphics2D)g).setStroke(dashed3);
+		g.drawLine(start.x-1, start.y, end.x-1, end.y);
+		g.drawLine(start.x, start.y, end.x, end.y); 
+	      }
 	    else
-		{
-		    if(selected)
-			{
-			    ((Graphics2D)g).setStroke(dashed1);
-			    g.drawLine(start.x, start.y-1, end.x, end.y-1);
-			    g.drawLine(start.x, start.y, end.x, end.y);
-			    ((Graphics2D)g).setStroke(dashed2);
-			    g.drawLine(start.x, start.y, end.x, end.y);
-			    g.drawLine(start.x, start.y+1, end.x, end.y+1);
-			    ((Graphics2D)g).setStroke(dashed3);
-			    g.drawLine(start.x, start.y+1, end.x, end.y+1); 
-			    g.drawLine(start.x, start.y+2, end.x, end.y+2); 
-			}
-		    else
-			{
-			    ((Graphics2D)g).setStroke(dashed1);
-			    g.drawLine(start.x, start.y-1, end.x, end.y-1);
-			    ((Graphics2D)g).setStroke(dashed2);
-			    g.drawLine(start.x, start.y, end.x, end.y);
-			    ((Graphics2D)g).setStroke(dashed3);
-			    g.drawLine(start.x, start.y+1, end.x, end.y+1); 
-			}
-		}
+	      {
+		((Graphics2D)g).setStroke(dashed1);
+		g.drawLine(start.x+1, start.y, end.x+1, end.y);
+		((Graphics2D)g).setStroke(dashed2);
+		g.drawLine(start.x, start.y, end.x, end.y);
+		((Graphics2D)g).setStroke(dashed3);
+		g.drawLine(start.x-1, start.y, end.x-1, end.y);
+	      }
+	  }
+	else
+	  {
+	    if(selected)
+	      {
+		((Graphics2D)g).setStroke(dashed1);
+		g.drawLine(start.x, start.y-1, end.x, end.y-1);
+		g.drawLine(start.x, start.y, end.x, end.y);
+		((Graphics2D)g).setStroke(dashed2);
+		g.drawLine(start.x, start.y, end.x, end.y);
+		g.drawLine(start.x, start.y+1, end.x, end.y+1);
+		((Graphics2D)g).setStroke(dashed3);
+		g.drawLine(start.x, start.y+1, end.x, end.y+1); 
+		g.drawLine(start.x, start.y+2, end.x, end.y+2); 
+	      }
+	    else
+	      {
+		((Graphics2D)g).setStroke(dashed1);
+		g.drawLine(start.x, start.y-1, end.x, end.y-1);
+		((Graphics2D)g).setStroke(dashed2);
+		g.drawLine(start.x, start.y, end.x, end.y);
+		((Graphics2D)g).setStroke(dashed3);
+		g.drawLine(start.x, start.y+1, end.x, end.y+1); 
+	      }
+	  }
 
-	    ((Graphics2D)g).setStroke(normal);
-	}
+	((Graphics2D)g).setStroke(normal);
+      }
     else
-	{
-	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+      {
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	    
-	    if(type == FtsConnection.fts_connection_invalid)
-		g.setColor( Color.gray);
-	    else
-		g.setColor( Color.black);
+	if(type == FtsConnection.fts_connection_invalid)
+	  g.setColor( Color.gray);
+	else
+	  g.setColor( Color.black);
 		
-	    ((Graphics2D)g).drawLine(start.x, start.y, end.x, end.y);
-	    if (selected)  
-		{
-		    if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
-			g.drawLine(start.x, start.y+1, end.x, end.y+1);
-		    else 
-			g.drawLine(start.x+1, start.y, end.x+1, end.y);
-		} 	    
-	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	}
+	((Graphics2D)g).drawLine(start.x, start.y, end.x, end.y);
+	if (selected)  
+	  {
+	    if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
+	      g.drawLine(start.x, start.y+1, end.x, end.y+1);
+	    else 
+	      g.drawLine(start.x+1, start.y, end.x+1, end.y);
+	  } 	    
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      }
   }
 
   public void updatePaint(Graphics g){}
@@ -338,7 +337,6 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 
     sketch.repaint(x, y, width, height);
   }
-
 
   public final boolean intersects(Rectangle r)
   {
@@ -377,3 +375,4 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
   }
   
 }
+

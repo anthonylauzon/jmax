@@ -31,6 +31,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -52,10 +53,17 @@ public class AddPopUp extends JPopupMenu
     boolean edit;
     String descr;
     String message;
+    Cursor cursor;
 
     AddPopUpListener(String descr, String message, boolean edit)
     {
-      this.descr = descr;
+      this.cursor = JMaxClassMap.getCursor( descr);
+      
+      if(!descr.equals("standard"))
+	this.descr = descr;
+      else
+	this.descr = "";
+
       this.message = message;
       this.edit = edit;
     }
@@ -65,6 +73,7 @@ public class AddPopUp extends JPopupMenu
       Component invoker;
       
       invoker = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
+      ((ErmesSketchPad) invoker).setCursor( cursor);
       ((ErmesSketchPad) invoker).setAddModeInteraction(descr, message, edit);
     }
   };
@@ -74,10 +83,17 @@ public class AddPopUp extends JPopupMenu
     boolean edit;
     String descr;
     String message;
+    Cursor cursor;
 
     AddPopUpSubMenuListener(String descr, String message, boolean edit)
     {
-      this.descr = descr;
+      this.cursor = JMaxClassMap.getCursor( descr);
+      
+      if(!descr.equals("standard"))
+	this.descr = descr;
+      else
+	this.descr = "";
+
       this.message = message;
       this.edit  = edit;
     }
@@ -86,11 +102,11 @@ public class AddPopUp extends JPopupMenu
     {
       Component menu;
       Component invoker;
-      ErmesSketchPad editor;
 
       menu    = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
       invoker = ((JPopupMenu) menu.getParent()).getInvoker();
 
+      ((ErmesSketchPad) invoker).setCursor( cursor);
       ((ErmesSketchPad) invoker).setAddModeInteraction(descr, message, edit);
     }
   };
@@ -107,18 +123,13 @@ public class AddPopUp extends JPopupMenu
   {
     popup.x = x;
     popup.y = y;
-    popup.setPopupSize(100, 200);
+    popup.pack();
     popup.show(invoker, x - 2, y - 2);
   }
 
   static public void addAbbreviation(String cmd, String descr, String message, boolean edit)
   {
-    JMenuItem item;
-
-//      if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-//        item = new JMenuItem(SystemIcons.get(cmd));
-//      else
-      item = new JMenuItem(cmd);
+    JMenuItem item  = new JMenuItem(cmd);
 
     item.addActionListener(new AddPopUpListener(descr, message, edit));
     popup.add(item);
@@ -136,15 +147,7 @@ public class AddPopUp extends JPopupMenu
 
   static JMenu addAbbreviationMenu(String name)
   {
-    JMenu menu;
-
-//      if (name.charAt(0) == '%')
-//        {
-//  	menu = new JMenu();
-//  	menu.setIcon(SystemIcons.get(name));
-//        }
-//      else
-      menu = new JMenu(name);
+    JMenu menu = new JMenu(name);
 
     popup.add(menu);
     popup.pack();
@@ -163,10 +166,7 @@ public class AddPopUp extends JPopupMenu
     if (menu == null)
       menu = addAbbreviationMenu(menuName);
     
-//      if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-//        item = new JMenuItem(SystemIcons.get(cmd));
-//      else
-      item = new JMenuItem(cmd);
+    item = new JMenuItem(cmd);
 
     item.addActionListener(new AddPopUpSubMenuListener(descr, message, edit));
     menu.add(item);
