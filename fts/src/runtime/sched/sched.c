@@ -34,7 +34,8 @@
 double fts_sched_msecs = 0.0;
 double fts_sched_ticks = 0.0;
 int fts_sched_tick_size = FTS_DEF_TICK_SIZE;
-double fts_sched_tick_duration = ((double)(FTS_DEF_TICK_SIZE * 1000) / 44100.0);
+double fts_sched_sample_rate = (double)44100.0;
+double fts_sched_tick_duration = (double)(FTS_DEF_TICK_SIZE * 1000) / 44100.0;
 
 #define FD_NO_SELECT -1
 
@@ -275,6 +276,7 @@ static void fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const
     {
       float sr = fts_get_number_float(value);
       fts_sched_tick_duration = fts_sched_tick_size * 1000. / sr;
+      fts_sched_sample_rate = sr;
     }
 }
 
