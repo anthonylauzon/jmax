@@ -170,27 +170,12 @@ class ErmesObjFloat extends ErmesObject {
   //  mouseUp
   //--------------------------------------------------------
   public boolean MouseUp(MouseEvent evt,int x, int y) {
-    /*if (itsSketchPad.itsRunMode) {
-      itsStartingValue = itsFloat;
-      firstClick = true;
-      
-      String aString; 
-      if (itsFloat != 0) aString = String.valueOf(itsFloat);
-      else aString = "0.0";
-      int lenght = itsFontMetrics.stringWidth(aString);
-      if(!itsResized){
-      if(lenght<currentRect.width*2/3-2-20){
-      itsSketchPad.RemoveElementRgn(this);
-      while(lenght<currentRect.width*2/3-2-20){
-      Resize1(currentRect.width-10, currentRect.height);
-      }
-      itsSketchPad.SaveOneElementRgn(this);
-      itsSketchPad.repaint();//???????
-      }
-      }
+    if(itsSketchPad.itsRunMode){
+      FtsServer.getServer().syncToFts();
+      DoublePaint();
       return true;
-      }*/
-      return super.MouseUp(evt,x,y);
+    }
+    else return super.MouseUp(evt, x, y);
   }
   
   //--------------------------------------------------------
