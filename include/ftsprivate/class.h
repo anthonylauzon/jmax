@@ -24,7 +24,7 @@
 #define _FTS_PRIVATE_CLASS_H_
 
 /* the class of 'class' objects */
-fts_class_t *fts_class_class;
+extern fts_class_t *fts_class_class;
 
 struct fts_class_outlet
 {
