@@ -364,7 +364,8 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	  }
       }
   }
-  
+    public void trackNameChanged(String oldName, String newName){}
+
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {

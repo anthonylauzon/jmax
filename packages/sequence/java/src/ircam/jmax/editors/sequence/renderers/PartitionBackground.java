@@ -53,7 +53,8 @@ public class PartitionBackground implements Layer, ImageObserver{
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
 	    {		
-		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch"))
+		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
+		    e.getPropertyName().equals("repaint"))
 		    {
 			toRepaintBack = true;
 			gc.getGraphicDestination().repaint();

@@ -13,7 +13,6 @@ public class TrackBase implements Track{
     public TrackBase(TrackDataModel model)
     {
 	this.model = model;
-	name = model.getName();
     }
 
     /**
@@ -72,24 +71,13 @@ public class TrackBase implements Track{
 	return (int)model.getMaximumTime();
     }
 
-    /*public void setId(int id)
-      {
-      this.id = id;
-      if(name.equals(""))
-      name = "track"+id;
-      }
-      public int getId()
-      {
-      return id;
-      }*/
-
     public String getName()
     {
-	return name;
+	return model.getName();
     }
     public void setName(String name)
     {
-	this.name = name;
+	//this.name = name;
     }
 
     public boolean canEditType(ValueInfo info){

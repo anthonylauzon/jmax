@@ -164,7 +164,24 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       double time = (double)(args[1].getFloat());
 
       evt.moveTo(time);
+      
+      setDirty();
   }  
+
+  public void setName(int nArgs , FtsAtom args[])
+  {
+    String name = args[0].getString();
+    
+    if((trackName == name)||(name == null))
+      return;
+
+    String old = trackName;
+    trackName = name;
+
+    notifyTrackNameChanged(old, trackName);
+    setDirty();
+  }  
+
 
   public void lock(int nArgs , FtsAtom args[])
   {
@@ -222,17 +239,22 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendMessage(FtsObject.systemInlet, "make_event", 2+nArgs, sendArgs);
   }
     
-    public void requestEventMove(TrackEvent evt, double newTime)
-    {
-	sendArgs[0].setObject(evt); 
-	sendArgs[1].setDouble(newTime);
-	sendMessage(FtsObject.systemInlet, "move_event", 2, sendArgs);
-    }
+  public void requestEventMove(TrackEvent evt, double newTime)
+  {
+    sendArgs[0].setObject(evt); 
+    sendArgs[1].setDouble(newTime);
+    sendMessage(FtsObject.systemInlet, "move_event", 2, sendArgs);
+  }
+  public void requestSetName(String newName)
+  {
+    sendArgs[0].setString(newName); 
+    sendMessage(FtsObject.systemInlet, "set_name", 1, sendArgs);
+  }    
 
-    public void export()
-    {
-	sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
-    }
+  public void export()
+  {
+      sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
+  }
 
     /**
      * how many events in the database?
@@ -584,7 +606,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
 	    ((TrackDataListener) e.nextElement()).objectChanged(spec, propName, propValue);
     }
-    
+    private void notifyTrackNameChanged(String oldName, String newName)
+    {
+	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+	    ((TrackDataListener) e.nextElement()).trackNameChanged(oldName, newName);
+    }
     private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 

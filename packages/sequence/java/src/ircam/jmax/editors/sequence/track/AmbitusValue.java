@@ -98,11 +98,11 @@ public class AmbitusValue extends AbstractEventValue
 
     /**
      * Create a new Widget for the associated Value */ 
-    public Component newWidget(SequenceGraphicContext gc)
-    {
-      ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
-      return widget;
-    }
+      /*public Component newWidget(SequenceGraphicContext gc)
+	{
+	ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
+	return widget;
+	}*/
    
     public Enumeration getPropertyNames()
       {

@@ -215,6 +215,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	repaint();
     }
     
+    public void trackNameChanged(String oldName, String newName) 
+    {
+	track.setProperty("trackName", newName);
+    }
+
     /**
      * ListSelectionListener interface
      */

@@ -52,7 +52,8 @@ public class ScoreBackground implements Layer{
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
 	    {		
-		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch"))
+		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") ||
+		    e.getPropertyName().equals("trackName"))
 		{
 		    toRepaintBack = true;
 		    gc.getGraphicDestination().repaint();

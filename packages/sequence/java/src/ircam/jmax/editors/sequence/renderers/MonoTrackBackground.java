@@ -52,7 +52,8 @@ public class MonoTrackBackground implements Layer, ImageObserver{
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
 	    {		
-		if (e.getPropertyName().equals("maximumValue") || e.getPropertyName().equals("minimumValue"))
+		if (e.getPropertyName().equals("maximumValue") || e.getPropertyName().equals("minimumValue") ||
+		    e.getPropertyName().equals("trackName"))
 		    {
 			toRepaintBack = true;
 			gc.getGraphicDestination().repaint();

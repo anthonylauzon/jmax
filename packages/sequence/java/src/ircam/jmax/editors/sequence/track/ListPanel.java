@@ -146,6 +146,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	select((TrackEvent)whichObject, newIndex, 0);
 	repaint();
     }
+    public void trackNameChanged(String oldName, String newName){}
     
     public Dimension getPreferredSize()
     {

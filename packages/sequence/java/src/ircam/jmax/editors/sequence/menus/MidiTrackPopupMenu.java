@@ -139,6 +139,16 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     add(rangeMenu);
 
+    item = new JMenuItem("Change Name");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
+					     MidiTrackPopupMenu.getPopupTarget().getGc().getFrame());
+	}
+    });
+
+    add(item);
     ////////////////////// View Menu //////////////////////////////
     JMenu viewMenu = new JMenu("Change View");
     item = new JMenuItem("Pianoroll view");

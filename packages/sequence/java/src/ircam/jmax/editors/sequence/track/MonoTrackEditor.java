@@ -71,6 +71,9 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {
 		MonoTrackEditor.this.repaint();
 	    }
+	    public void trackNameChanged(String oldName, String newName) {
+		MonoTrackEditor.this.repaint();
+	    }
 	});
 
 	track.getTrackDataModel().addHighlightListener(new HighlightListener(){

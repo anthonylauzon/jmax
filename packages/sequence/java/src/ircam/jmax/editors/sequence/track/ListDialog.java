@@ -117,7 +117,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     {
 	scroll.validate();
     }
-
+    public void trackNameChanged(String oldName, String newName){}
     /**
      * TrackListListener  interface
      */
