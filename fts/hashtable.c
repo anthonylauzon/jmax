@@ -456,6 +456,49 @@ void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
   hashtable_iterator_get( h, i, 0);
 }
 
+fts_symbol_t
+fts_hashtable_get_unused_symbol(fts_hashtable_t *hash, fts_symbol_t name)
+{
+  fts_atom_t a, k;
+
+  fts_set_symbol(&k, name);
+
+  if(fts_hashtable_get(hash, &k, &a))
+    {
+      const char *str = name;
+      int len = strlen(str);
+      char *new_str = alloca((len + 10) * sizeof(char));
+      int num = 0;
+      int dec = 1;
+      int i;
+      
+      /* separate base name and index */
+      for(i=len-1; i>=0; i--) 
+	{
+	  if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+	    num += (str[len = i] - '0') * dec;
+	  else
+	    new_str[i] = str[i];
+	  
+	  dec *= 10;
+	}
+
+      /* generate new name */
+      sprintf(new_str + len, "%d", ++num);
+      name = fts_new_symbol(new_str);
+      fts_set_symbol(&k, name);
+
+      while(fts_hashtable_get(hash, &k, &a)) 
+	{
+	  sprintf(new_str + len, "%d", ++num);
+	  name = fts_new_symbol(new_str);
+	  fts_set_symbol(&k, name);
+	}
+    }
+
+  return name;
+}
+
 
 /***********************************************************************
  *

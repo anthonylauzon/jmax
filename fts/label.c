@@ -117,7 +117,7 @@ fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
   
   fts_set_symbol(&key, name);
 
-  if(value && fts_is_object(value))
+  if(fts_is_object(value))
     {
       fts_object_t *obj = fts_get_object(value);
       

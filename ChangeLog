@@ -1,3 +1,8 @@
+2002-10-06  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* reimplemented error objects as seperated class
+	* reimplemented names and definitions (former variables) with hashtables in top level and template patcher 
+
 2002-10-02  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* removed definitively metaclasses.

@@ -1189,6 +1189,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	      fts_atom_t new_args[512];
 	      int i;
 
+	      fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *)lastNObject);
+
 	      fts_set_symbol(&new_args[0], fts_s_patcher);
 
 	      for (i = 1; (i < argc) && (i < 512); i++)
@@ -1196,6 +1198,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	      fts_patcher_redefine((fts_patcher_t *)lastNObject, argc, new_args);
 	    }
+	  else
+	    fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *)lastNObject);
 	}
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == patlex_sym_qlist) &&
 	       (lastNObjectType == patlex_sym_qlist))
@@ -1238,7 +1242,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 
       fts_set_symbol(&description[0], fts_s_inlet);
-      fts_set_int(&description[1], -2); 
+      fts_set_int(&description[1], 0); 
       obj = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
@@ -1257,7 +1261,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       /* Create a non assigned outlet */
 
       fts_set_symbol(&description[0], fts_s_outlet);
-      fts_set_int(&description[1], -2); 
+      fts_set_int(&description[1], 0); 
       obj = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
@@ -1478,6 +1482,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 
       fts_patparse_parse_patlex(patcher, in);
       fts_patlex_close(in);
+      fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *) patcher);
 
       return patcher;
     }

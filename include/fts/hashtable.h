@@ -194,3 +194,4 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
  */
 FTS_API void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
 
+FTS_API fts_symbol_t fts_hashtable_get_unused_symbol(fts_hashtable_t *hash, fts_symbol_t name);

@@ -47,6 +47,7 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <limits.h>
@@ -116,7 +117,6 @@ struct patcher_inout
   fts_channel_t channel;
   fts_patcher_t *patcher;
   int index;
-  int position;
 };
 
 static int 
@@ -145,29 +145,6 @@ patcher_inouts_shift_right(patcher_inout_t **inouts, int n, int index)
 
   /* make hole */
   inouts[index] = NULL;
-}
-
-static int
-patcher_inouts_get_index_by_position(patcher_inout_t **inouts, int n, int position)
-{
-  int left_x = INT_MIN;
-  int index = 0;
-  int i;
-  
-  /* look for the right index regarding the x position */
-  while(index < n && inouts[index] != NULL)
-    {
-      int right_x = inouts[index]->position;
-      
-      if(position >= left_x && position < right_x)
-	break;
-      
-      /* pass on to next inout */
-      left_x = right_x;
-      index++;
-    }
-  
-  return index;
 }
 
 static void 
@@ -285,7 +262,6 @@ patcher_inout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_channel_init(&this->channel);
   this->patcher = NULL;
   this->index = 0;
-  this->position = 0;
 }
 
 static void 
@@ -444,34 +420,10 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(ac == 0 || fts_is_number(at))
     {
       /* patcher inlet */
-      int index = -1;
-      int position = 0;
-      patcher_inout_t *inlet;
-
       if(ac > 0)
-	index = fts_get_number_int(at);
-      
-      if(index == -2)
-	{
-	  /* .pat support */
-	  fts_atom_t ax;
-	  int x;
-
-	  /* get x position */
-	  fts_object_get_prop(o, fts_s_x, &ax);
-	  x = fts_get_int(&ax);
-
-	  /* look for index regarding the x position */
-	  index = patcher_inouts_get_index_by_position(patcher->inlets, patcher->n_inlets, x);
-
-	  /* insert hole at index */
-	  patcher_insert_inlet_hole(patcher, index);
-	}
-
-      inlet = patcher_get_inlet(patcher, index);
-      inlet->position = position;
-
-      obj = (fts_object_t *)inlet;
+	obj = (fts_object_t *)patcher_get_inlet(patcher, fts_get_number_int(at));
+      else
+	obj = (fts_object_t *)patcher_get_inlet(patcher, -1);	
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
@@ -595,34 +547,10 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac == 0 || fts_is_number(at))
     {
       /* patcher outlet */
-      int index = -1;
-      int position = 0;
-      patcher_inout_t *outlet;
-
       if(ac > 0)
-	index = fts_get_number_int(at);
-      
-      if(index == -2)
-	{
-	  /* .pat support */
-	  fts_atom_t ax;
-	  int x;
-
-	  /* get x position */
-	  fts_object_get_prop(o, fts_s_x, &ax);
-	  x = fts_get_int(&ax);
-
-	  /* look for index regarding the x position */
-	  index = patcher_inouts_get_index_by_position(patcher->outlets, patcher->n_outlets, x);
-
-	  /* insert hole at index */
-	  patcher_insert_outlet_hole(patcher, index);
-	}
-
-      outlet = patcher_get_outlet(patcher, index);
-      outlet->position = position;
-
-      obj = (fts_object_t *)outlet;
+	obj = (fts_object_t *)patcher_get_outlet(patcher, fts_get_number_int(at));
+      else
+	obj = (fts_object_t *)patcher_get_outlet(patcher, -1);
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
@@ -1078,7 +1006,7 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
 
 /***********************************************************************
  *
- *  .pat file format saving
+ *  .pat file format saving and loading
  *
  */
 static void patcher_save_dotpat_internal( FILE *file, fts_patcher_t *patcher);
@@ -1271,6 +1199,88 @@ fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
     {
       /* this should be a dialog opened in the user interface */
       post( "Error: cannot open %s for saving\n", filename );
+    }
+}
+
+/* .pat loading: reorder inlets and outlets regarding their x position in the patcher */
+static int 
+patcher_objects_compare_x(const void *left, const void *right)
+{
+  fts_object_t *obj_left = *((fts_object_t **)left);
+  fts_object_t *obj_right = *((fts_object_t **)right);
+  int x_left, x_right;
+  fts_atom_t a;
+  
+  fts_object_get_prop(obj_left, fts_s_x, &a);
+  x_left = fts_get_int(&a);
+
+  fts_object_get_prop(obj_right, fts_s_x, &a);
+  x_right = fts_get_int(&a);
+
+  return x_left - x_right;
+}
+
+#define MAX_INOUTS 256
+
+void
+fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this)
+{
+  fts_receive_t *receives[MAX_INOUTS];
+  fts_send_t *sends[MAX_INOUTS];
+  fts_object_t *p;
+  int n_ins = 0;
+  int n_outs = 0;
+  int i;
+
+  /* put all inlet receives in an array */
+  for (p=this->objects; p; p=p->next_in_patcher)
+    {
+      if(fts_object_get_class(p) == receive_class)
+	{
+	  fts_receive_t *receive = (fts_receive_t *)p;
+
+	  if(fts_object_get_class(receive->obj) == patcher_inout_class && n_ins < MAX_INOUTS)
+	    {
+	      receives[n_ins] = receive;
+	      n_ins++;
+	    }
+	}
+      else if(fts_object_get_class(p) == send_class)
+	{
+	  fts_send_t *send = (fts_send_t *)p;
+
+	  if(fts_object_get_class(send->obj) == patcher_inout_class && n_outs < MAX_INOUTS)
+	    {
+	      sends[n_outs] = send;
+	      n_outs++;
+	    }
+	}
+    }
+  
+  /* sort receives and assign inlets */
+  if(n_ins > 1)
+    {
+      patcher_redefine_number_of_inlets(this, n_ins);
+
+      /* sort receives */
+      qsort((void *)receives, n_ins, sizeof(fts_object_t *), patcher_objects_compare_x);
+      
+      /* assign new inlet to receive */
+      for(i=1; i<n_ins; i++)
+	receives[i]->obj = (fts_object_t *)patcher_get_inlet(this, i);
+    }
+
+  /* sort sends and assign outlets */
+  if(n_outs > 1)
+    {
+      patcher_redefine_number_of_outlets(this, n_outs);
+
+      /* sort sends */
+      qsort((void *)sends, n_outs, sizeof(fts_object_t *), patcher_objects_compare_x);
+      
+      /* assign new outlet to receive */
+      for(i=1; i<n_outs; i++)
+	sends[i]->obj = (fts_object_t *)patcher_get_outlet(this, i);
     }
 }
 
@@ -1966,13 +1976,6 @@ fts_patcher_get_objects_count(fts_patcher_t *this)
   return i;
 }
 
-/*************************************************************
- *
- *  patcher .pat format support
- *
- */
-
-
 /* set a patch as dirty or as saved: if this patcher is a sub-patcher propagate the set_dirty to his father
  * until a firts level patche is reached.
  * A "setDirty" message is sent to the client after is_dirty flag changed
@@ -2044,15 +2047,17 @@ fts_get_root_patcher(void)
 fts_patcher_t *
 fts_patcher_get_top_level(fts_patcher_t *patcher)
 {
-  while(patcher != NULL)
+  if(patcher != NULL)
     {
-      if(fts_patcher_get_template(patcher) != NULL || fts_patcher_get_file_name(patcher) != NULL)
-	break;
-
-      patcher = fts_object_get_patcher((fts_object_t *)patcher);
+      fts_patcher_t *parent = fts_object_get_patcher((fts_object_t *)patcher);
+      
+      while(parent != NULL && parent != fts_root_patcher && fts_patcher_get_template(patcher) == NULL)
+	patcher = fts_object_get_patcher((fts_object_t *)patcher);
+      
+      return patcher;
     }
 
-  return patcher;
+  return fts_root_patcher;
 }
 
 /***********************************************************************

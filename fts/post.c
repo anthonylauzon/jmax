@@ -427,7 +427,8 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
     }
 }
 
-void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
+void 
+fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
 {
   int ac;
   fts_atom_t *at;
@@ -445,7 +446,8 @@ void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
   fts_spost_object_description_args( stream, ac, at);
 }
 
-void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at)
+void 
+fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at)
 {
   int do_new_line = 0;
   int add_blank = 0;

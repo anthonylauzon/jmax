@@ -335,8 +335,15 @@ fts_object_set_outlets_number(fts_object_t *o, int n)
 static void 
 fts_object_unbind(fts_object_t *obj)
 {
-  if(obj->patcher != NULL)
+  fts_list_t *list = obj->name_refs;
+
+  while(list != NULL) 
     {
+      fts_definition_t *def = (fts_definition_t *)fts_get_pointer(fts_list_get(list));
+      
+      fts_definition_remove_listener(def, obj);
+      
+      list = fts_list_next(list);
     }
 }
 
@@ -468,21 +475,20 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
     {
       fts_object_t  *new;
       
-      /* unbind variables */
+      /* unbind variables from old object */
       fts_object_unbind(old);
 
-      /* call deconstructor */
+      /* call deconstructor of old object */
       if(old->refcnt == 1 && fts_class_get_deconstructor(old->head.cl))
 	fts_class_get_deconstructor(old->head.cl)(old, fts_system_inlet, fts_s_delete, 0, 0);
       
       /* make the new object  */
       new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
       
-      /* Update the loading vm */
+      /* update the loading vm */
       fts_vm_substitute_object(old, new);
       
-      /* If new is an error object, assure that there are enough inlets
-	 and outlets for the connections */
+      /* if new is an error object, assure that there are enough inlets and outlets for the connections */
       if (fts_object_is_error(new))
 	{
 	  fts_error_object_fit_inlet(new, old->n_inlets - 1);
@@ -495,11 +501,12 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
        */
       fts_object_move_properties(old, new);
       
-      /* move the connections from the old to the new object, tell the client if needed */
+      /* move the connections from the old to the new object */
       fts_object_move_connections(old, new);
       
-      /* remove old from client */
+      /* remove old from client and update list */
       fts_object_unclient(old);
+      fts_update_reset(old);
       
       /* assure that object won't be destroyed when removed from patcher */
       old->refcnt++;
@@ -508,7 +515,6 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       if(old->patcher)
 	fts_patcher_remove_object(old->patcher, old);
       
-      fts_update_reset(old);
       
       if(old->refcnt == 1)
 	fts_object_free(old);

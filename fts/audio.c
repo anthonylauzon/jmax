@@ -663,17 +663,9 @@ void fts_audioport_set_default_class( fts_symbol_t name)
 
 static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 {
-  fts_object_t *obj;
-  fts_atom_t a[1];
+  fts_object_t *obj = fts_eval_object_description( fts_get_root_patcher(), argc, argv);
 
-  obj = fts_eval_object_description( fts_get_root_patcher(), argc, argv);
-
-  if (!obj)
-    return;
-
-  fts_object_get_prop( obj, fts_s_state, a);
-
-  if ( !fts_is_object( a) || !fts_object_is_audioport( fts_get_object( a)) )
+  if (!obj || !fts_object_is_audioport(obj) )
     {
       fts_object_delete_from_patcher( obj);
       return;
@@ -684,7 +676,7 @@ static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
       fts_object_delete_from_patcher( (fts_object_t *)default_audioport);
     }
 
-  default_audioport = (fts_audioport_t *)fts_get_object( a);
+  default_audioport = (fts_audioport_t *)obj;
 }
 
 fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)

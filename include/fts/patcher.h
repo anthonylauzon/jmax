@@ -46,9 +46,7 @@ struct fts_patcher
 
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
-
-  fts_hashtable_t variables;
-
+  fts_hashtable_t *definitions;
   fts_symbol_t file_name;
   
   int save_id;
@@ -56,7 +54,6 @@ struct fts_patcher
 
 #define fts_patcher_get_args(p)    ((p)->args)
 #define fts_patcher_is_open(p)     ((p)->open)
-
 FTS_API void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);

@@ -450,7 +450,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
 	value = fts_name_get_value(scope, fts_get_symbol( &tree->value));
 
-	if (value == NULL)
+	if (fts_is_void(value))
 	  return undefined_variable_error;
 	else
 	  expression_stack_push( exp, value);

@@ -27,6 +27,9 @@ extern fts_class_t *patcher_class;
 
 #define fts_object_is_patcher(o) ((o)->head.cl == patcher_class)
 
+#define fts_patcher_get_definitions(p) ((p)->definitions)
+#define fts_patcher_set_definitions(p, d) ((p)->definitions = (d))
+
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
 extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
@@ -66,5 +69,7 @@ extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 extern void fts_patcher_redefine_connection(fts_object_t *this, fts_connection_t *c);
 
 extern fts_patcher_t *fts_patcher_get_top_level(fts_patcher_t *patcher);
+
+extern void fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this);
 
 #endif
