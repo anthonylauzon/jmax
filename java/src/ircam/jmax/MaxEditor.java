@@ -276,14 +276,16 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       GetDocument().Save();
     }
     else if (theString.equals("Save As...")) {
-      GetDocument().SetFile(null);
+      GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this,
+							    "Save As ",
+							    GetDocument().GetFile()));;
       GetDocument().Save();
     }
     else if (theString.equals("Close Ctrl+W")) {
       itsProject.CloseThisWindow();
     }
     else if (theString.equals("Print... Ctrl+P")) {
-      //MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
+      //MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);
     }
     return true;
   }
@@ -322,7 +324,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
 
   public boolean ProjectMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Add Window")) {
-      //MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
+      //MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
       itsProject.AddToProject(GetDocument(), this);
       itsProject.UpdateProjectMenu();
       //qui deve resettare i menu come in ObeyCommand(MaxApplication.ADD_WINDOW)
@@ -336,7 +338,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
       itsProject.itsProjectWindow.toFront();
     }
     if (theString.equals("jMax Console")) {
-      MaxApplication.getApplication().GetConsoleWindow().ToFront();
+      MaxApplication.GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
     return true;
@@ -390,7 +392,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void InitFromDocument(MaxDocument theDocument){}  
   
   public boolean Open(){
-    File file = MaxApplication.getOpenFileName(this, "Open File");
+    File file = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
     if (file != null)
       return OpenFile(file);
@@ -417,9 +419,9 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
     if (e.isControlDown()){
-      if(aInt == 77) MaxApplication.getApplication().GetProjectWindow().toFront();//m
-      else if(aInt == 79) MaxApplication.getApplication().itsProjectWindow.Open();//o
-      else if(aInt == 80)MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
+      else if(aInt == 79) MaxApplication.itsProjectWindow.Open();//o
+      else if(aInt == 80)MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 83) GetDocument().Save();//s
       else if(aInt == 87) itsProject.CloseThisWindow();//w
     }

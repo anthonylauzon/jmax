@@ -24,8 +24,6 @@ import  ircam.jmax.editors.project.*;
    */ 
   abstract boolean Save();	
 
-  abstract boolean SaveAs(File file);
-
   abstract public void InitDoc(String theTitle, File file, Project theProject);
 
   abstract public String GetType();

@@ -140,7 +140,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
       if(itsDocument!=null){
 	if(itsDocument.GetWindow()!=null){
 	  itsDocument.GetWindow().ToFront();
-	  MaxApplication.getApplication().SetCurrentWindow(itsDocument.GetWindow());
+	  MaxApplication.SetCurrentWindow(itsDocument.GetWindow());
 	}
       }
       else
@@ -154,7 +154,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
 
   boolean OpenEntryDocument(){
     if(itsProject.itsProjectWindow.OpenFile(itsFile)){
-      itsDocument = MaxApplication.getApplication().itsWindow.GetDocument();
+      itsDocument = MaxApplication.itsWindow.GetDocument();
       if(itsDocument instanceof ErmesPatcherDoc){
 	((ErmesSketchWindow)(itsDocument.GetWindow())).SetEntry(this);//?????
       }

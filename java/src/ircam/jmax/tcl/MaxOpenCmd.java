@@ -38,7 +38,7 @@ class MaxOpenCmd implements Command {
   {
     if (argv.length == 2)
       {
-	ProjectWindow aProjectWindow = MaxApplication.getApplication().itsProjectWindow;
+	ProjectWindow aProjectWindow = MaxApplication.itsProjectWindow;
 
 	// Should call MaxApplication.Open, not the project !!!
 

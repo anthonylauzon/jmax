@@ -30,7 +30,7 @@ class MaxSystemPropertyCmd implements Command
   {
     if (argv.length == 2)
       {
-	String property = MaxApplication.ermesProperties.getProperty(new String(argv[1].toString()));
+	String property = MaxApplication.jmaxProperties.getProperty(new String(argv[1].toString()));
 
 	/* If the property is not defined, don't raise an error, return the empty string, 
 	   so a TCL script can test the existence of a systemProperty.

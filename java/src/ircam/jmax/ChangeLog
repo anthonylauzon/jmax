@@ -1,3 +1,19 @@
+Mon Feb  2 14:59:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Completed the transition to everything static in MaxApplication; half
+	  of the methods and variables where static, half where not, but at the end
+	  one unique of MaxApplication existed, so the confusion had no reason to exists.
+	  Now, everything is static, and no instance of MaxApplication are ever created.
+	  
+	* editors/ermes/ErmesPatcherDoc.java: Now when importing a .pat file, the
+	  old file name is forgot, so the next Save a new filename will be asked;
+	  this avoid rewriting on top of the .pat files.
+
+	* Moved the getOpenFileName function to a separate class, in dialogs,
+	  called MaxFileChooser, and renamed to chooseFileToOpen; added the corresponding
+	  chooseFileToSave, with an optional file argument to give old name
+	  and directory.
+
 Fri Jan 30 12:50:41 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Changed *all* the methods previously using directory/name string

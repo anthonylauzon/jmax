@@ -431,7 +431,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	itsSubWindowsMenu.add(aMenuItem = new MenuItem(theSketchWindow.getTitle()));
 	aMenuItem.addActionListener(this);
       }
-      MaxApplication.getApplication().AddToSubWindowsList(this, theSketchWindow, aFirstItem);
+      MaxApplication.AddToSubWindowsList(this, theSketchWindow, aFirstItem);
       itsSubWindowList.addElement(theSketchWindow);
     }
   }
@@ -490,7 +490,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	}
 	aLastItem = false;
       }
-      MaxApplication.getApplication().RemoveFromSubWindowsList(this, theSubWindow, aLastItem);
+      MaxApplication.RemoveFromSubWindowsList(this, theSubWindow, aLastItem);
     }
   }
 
@@ -566,11 +566,11 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
     if(e.isControlDown()){
-      if(aInt == 77) MaxApplication.getApplication().GetProjectWindow().toFront();//m
-      else if(aInt == 78) MaxApplication.getApplication().itsProjectWindow.New();//n
-      else if(aInt == 79) MaxApplication.getApplication().itsProjectWindow.Open();//o
-      else if(aInt == 80) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
-      else if(aInt == 81) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);//q
+      if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
+      else if(aInt == 78) MaxApplication.itsProjectWindow.New();//n
+      else if(aInt == 79) MaxApplication.itsProjectWindow.Open();//o
+      else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83)itsDocument.Save();//s
       else if(aInt == 87) {//w
 	if (isSubPatcher){
@@ -578,7 +578,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	  itsTopWindow.RemoveFromSubWindowList(this);
 	}
 	else {
-	  MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	  MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
 	  dispose();
 	}
       }       
@@ -657,7 +657,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	fileToOpen = aObject.itsFtsObject.getHelpPatch();
 	
 	if (fileToOpen != null)
-	  MaxApplication.Load(fileToOpen);
+	  MaxApplication.itsProjectWindow.OpenFile(fileToOpen);
       }
     }
   }
@@ -703,8 +703,15 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       itsDocument.Save();
     }
     if (theString.equals("Save As...")) {
-      itsDocument.SetFile(null);
-      itsDocument.Save();
+      File file;
+
+      file = MaxFileChooser.chooseFileToSave(this, "Save As ", itsDocument.GetFile());
+      
+      if (file != null)
+	{
+	  itsDocument.SetFile(file);
+	  itsDocument.Save();
+	}
     }
     else if (theString.equals("Close   Ctrl+W")) {
       if (isSubPatcher){
@@ -712,13 +719,13 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	itsTopWindow.RemoveFromSubWindowList(this);
       }
       else {
-	MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
 	dispose();
       }
     }
     //try to print...
     else if (theString.equals("Print... Ctrl+P")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
+      MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);
     }
   }
 	
@@ -746,7 +753,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
     CloseAllSubWindows();//?????
 
-    MaxApplication.getApplication().RemoveThisWindowFromMenus(this);
+    MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsSketchWindowList.removeElement(this);
     itsDocument.itsPatcher.delete();
     itsDocument.DelWindow();
@@ -789,7 +796,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     ProjectEntry aEntry;
     for (Enumeration e = itsSketchPad.itsPatcherElements.elements(); e.hasMoreElements();){
       aPatcher = (ErmesObjPatcher)e.nextElement();
-      aEntry = MaxApplication.getApplication().GetProjectWindow().GetProject().GetTheEntry(aPatcher.GetName());
+      aEntry = MaxApplication.GetProjectWindow().GetProject().GetTheEntry(aPatcher.GetName());
       aEntry.DecAbstractionNumber();
       if(aEntry.GetAbstractionNumber()==0) itsProjectEntry.itsProject.RemoveFromProject(aEntry);
     }
@@ -798,16 +805,26 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   private void EditMenuAction(MenuItem theMenuItem, String theString) {
     CheckboxMenuItem aCheckItem;
     if (theString.equals("Select All")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.SELECT_ALL);
+      // Should move to a SketchPad method
+      ErmesObject aObject;
+      Vector aElementsList = GetSketchPad().GetElements();
+      Vector aSelectedList = GetSketchPad().GetSelectedList();
+      for (Enumeration e = aElementsList.elements() ; e.hasMoreElements() ;) {
+	aObject = (ErmesObject) e.nextElement();
+	aSelectedList.addElement(aObject);
+	aObject.Select();
+      }
+      GetSketchPad().repaint();
     }
     if (theString.equals("Snap to Grid")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.SNAP_TO_GRID);
+      MaxApplication.ObeyCommand(MaxApplication.SNAP_TO_GRID);
+
       aCheckItem = (CheckboxMenuItem)theMenuItem;
       if(aCheckItem.getState()) aCheckItem.setState(false);
       else aCheckItem.setState(true);
     }
     else if (theString.equals("Autorouting")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.AUTO_ROUTING);
+      SetAutorouting();
       aCheckItem = (CheckboxMenuItem)theMenuItem;
       if(aCheckItem.getState())aCheckItem.setState(false);
       else aCheckItem.setState(true);
@@ -824,10 +841,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   private void ProjectMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Add Window")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
+      MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
     }
     else if (theString.equals("Add files...")) {
-      File file = MaxApplication.getOpenFileName(this, "Add To Project");
+      File file = MaxFileChooser.chooseFileToOpen(this, "Add To Project");
 
       if (file != null)
 	MaxApplication.AddToProject(file);
@@ -835,7 +852,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 	return;
     }
     else if (theString.equals("Remove files")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.REMOVE_FILES);
+      MaxApplication.ObeyCommand(MaxApplication.REMOVE_FILES);
     }
   }
 
@@ -862,10 +879,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       itsToolBar.RunModeSetted(false);
     }
     else if (theString.equals("Project Manager Ctrl+M")) {
-      MaxApplication.getApplication().GetProjectWindow().toFront();
+      MaxApplication.GetProjectWindow().toFront();
     }
     else if (theString.equals("jMax Console")) {
-      MaxApplication.getApplication().GetConsoleWindow().ToFront();
+      MaxApplication.GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
   }
@@ -911,7 +928,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){
     if(!itsClosing){
-      MaxApplication.getApplication().SetCurrentWindow(this);
+      MaxApplication.SetCurrentWindow(this);
       ErmesSketchPad.RequestOffScreen(itsSketchPad);
       if(itsSketchPad.getGraphics()!= null)
 	itsSketchPad.update(itsSketchPad.getGraphics());
@@ -935,7 +952,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if (isSubPatcher) {
 	setVisible(false);
       }
-      else {MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+      else {MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
       dispose();
       }
     }
@@ -974,7 +991,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     //--------------------------------------------------------
     public void SetEntry(ProjectEntry theProjectEntry){
     	itsProjectEntry = theProjectEntry;
-    	/*MenuBar aMenuBar = MaxApplication.getApplication().GetProjectWindow().getMenuBar();
+    	/*MenuBar aMenuBar = MaxApplication.GetProjectWindow().getMenuBar();
     	aMenuBar.getMenu(2).getItem(3).enable();*/
     }
     

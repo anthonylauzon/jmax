@@ -24,7 +24,7 @@ class MaxOpenConsoleCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    MaxApplication.getApplication().makeMaxConsole();
+    MaxApplication.makeMaxConsole();
   }
 }
 

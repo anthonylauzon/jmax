@@ -4,7 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * A generic error dialog for extreme situations
+ * Provide an error message shown in a dialog; use by the static
+ * function "show"
  */
 
 public class ErrorDialog extends Dialog implements ActionListener{

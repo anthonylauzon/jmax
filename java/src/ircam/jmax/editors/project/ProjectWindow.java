@@ -101,6 +101,13 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     addKeyListener(this);
     addWindowListener(this);
     addMouseListener(this);
+
+    // Set its title
+
+    setTitle("Project manager");
+    setLocation(0, 0);//start in the upper left position
+    pack();
+    setVisible(true);
   }
     
   private Menu CreateNewFileMenu(){
@@ -109,8 +116,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     String aString;
     Menu newFileMenu = new Menu("New...  Ctrl+N");
 
-    for(int i=0; i< MaxApplication.getApplication().resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.getApplication().resourceVector.elementAt(i);
+    for(int i=0; i< MaxApplication.resourceVector.size();i++){
+      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
       aString = aResId.GetName();
       newFileMenu.add(aMenuItem = new MenuItem(aString));
       aMenuItem.addActionListener(this);
@@ -162,8 +169,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     MaxResourceId aResId;
     String aString;
 
-    for(int i=0; i< MaxApplication.getApplication().resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.getApplication().resourceVector.elementAt(i);
+    for(int i=0; i< MaxApplication.resourceVector.size();i++){
+      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
       aString = aResId.GetName();
       if(aString.equals(theName)) return true;
     }
@@ -398,9 +405,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
      NewFile(aNewFileType);
   }
 
-  /*private*/public MaxEditor NewFile(String theFileType){//OK OK, this SHOULD be private, but it's called
-    //also in ErmesObjExternal when he realizes to be a table
-    if(theFileType.equals("patcher"))MaxApplication.getApplication().ObeyCommand(MaxApplication.NEW_COMMAND);
+  private MaxEditor NewFile(String theFileType){
+    if(theFileType.equals("patcher"))MaxApplication.ObeyCommand(MaxApplication.NEW_COMMAND);
     else if(theFileType.equals("")) return null;
     /* @@@@@@ Change new to use resources to find dynamically the editor
     */
@@ -408,7 +414,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   }
   
   public boolean Open(){
-    File file = MaxApplication.getOpenFileName(this, "Open File");
+    File file = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
     if (file != null)
       {
@@ -450,8 +456,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	    // e.printStackTrace();
 	    return false;
 	  }
-	MaxApplication.itsSketchWindowList.addElement(MaxApplication.getApplication().itsSketchWindow);
-	MaxApplication.getApplication().AddThisWindowToMenus(MaxApplication.getApplication().itsSketchWindow);
+	MaxApplication.itsSketchWindowList.addElement(MaxApplication.itsSketchWindow);
+	MaxApplication.AddThisWindowToMenus(MaxApplication.itsSketchWindow);
 	return true;
       }
     else if(aExtension.equals("pat"))
@@ -485,8 +491,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	aDocument = (MaxDocument) placeHolder;
 	aDocument.InitDoc(file.getName(), file, itsProject);
 	MaxApplication.itsEditorsFrameList.addElement(aDocument.GetWindow());
-	MaxApplication.getApplication().SetCurrentWindow(aDocument.GetWindow());
-	MaxApplication.getApplication().AddThisFrameToMenus(aDocument.GetTitle());
+	MaxApplication.SetCurrentWindow(aDocument.GetWindow());
+	MaxApplication.AddThisFrameToMenus(aDocument.GetTitle());
       }
       return true;
     }
@@ -500,7 +506,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   MaxResourceId ResIdWithExtension(String theExtension) {
     MaxResourceId aResId = null;
     String aExtension;
-    for(Enumeration e = MaxApplication.getApplication().resourceVector.elements(); e.hasMoreElements();) {
+    for(Enumeration e = MaxApplication.resourceVector.elements(); e.hasMoreElements();) {
       aResId = (MaxResourceId) e.nextElement();
       for (Enumeration e1=aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
 	aExtension = (String) e1.nextElement();
@@ -516,7 +522,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
       return Open();
     }
     else if (theString.equals("Import...")) {
-      File file = MaxApplication.getOpenFileName(this, "Import File", itsPatFilter);
+      File file = MaxFileChooser.chooseFileToOpen(this, "Import File", itsPatFilter);
 
       if (file != null)
 	MaxApplication.Load(file);
@@ -524,23 +530,29 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	return false;
     }
     if (theString.equals("Save  Ctrl+S")) {
-      if(MaxApplication.getApplication().itsWindow != null) MaxApplication.getApplication().itsSketchWindow.GetDocument().Save();
+      if(MaxApplication.itsWindow != null)
+	MaxApplication.itsSketchWindow.GetDocument().Save();
     }
     if (theString.equals("Save As...")) {
-      if(MaxApplication.getApplication().itsWindow != null){
-	MaxApplication.getApplication().itsWindow.GetDocument().SetFile(null);
-	MaxApplication.getApplication().itsWindow.GetDocument().Save();
-      }
+      MaxWindow w = MaxApplication.itsWindow;
+
+      if(w != null)
+	{
+	  w.GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this,
+								  "Save As ",
+								  w.GetDocument().GetFile()));
+	  w.GetDocument().Save();
+	}
     }
     else if (theString.equals("Close   Ctrl+W")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+      MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
     }
     //try to print...
     else if (theString.equals("Print... Ctrl+P")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
+      MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);
     }
     else if (theString.equals("Quit    Ctrl+Q")) { 
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
+      MaxApplication.Quit();
     }
     else if (theString.equals("Open with Autorouting")) {
       MaxApplication.doAutorouting = !MaxApplication.doAutorouting;
@@ -562,11 +574,11 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 
   private boolean ProjectMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Add Window")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
+      MaxApplication.ObeyCommand(MaxApplication.ADD_WINDOW);
     }
     else if (theString.equals("Add files...")) {
 
-      File file = MaxApplication.getOpenFileName(this, "Add To Project");
+      File file = MaxFileChooser.chooseFileToOpen(this, "Add To Project");
 
       if (file != null)
 	MaxApplication.AddToProject(file);
@@ -574,7 +586,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	return false;
     }
     else if (theString.equals("Remove files")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.REMOVE_FILES);
+      MaxApplication.ObeyCommand(MaxApplication.REMOVE_FILES);
     }
     return true;
   }
@@ -582,16 +594,16 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   private boolean WindowsMenuAction(MenuItem theMenuItem, String theString) {
     ErmesObject aObject;
     if (theString.equals("Stack")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.STACK_WINDOWS);
+      MaxApplication.StackWindows();
     }
     else if (theString.equals("Tile")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.TILE_WINDOWS);
+      MaxApplication.TileWindows();
     }
     else if (theString.equals("Tile Vertical")) {
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.TILEVERTICAL_WINDOWS);
+      MaxApplication.TileVerticalWindows();
     }
     else if (theString.equals("jMax Console")) {
-      MaxApplication.getApplication().GetConsoleWindow().ToFront();
+      MaxApplication.GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
     return true;
@@ -601,8 +613,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     String aString;
-    for (int i=0; i< MaxApplication.getApplication().itsSketchWindowList.size(); i++) {
-      aSketchWindow = (ErmesSketchWindow) MaxApplication.getApplication().itsSketchWindowList.elementAt(i);
+    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
+      aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
       aString = aSketchWindow.getTitle();
       if(aString.equals(theName)) {
 	aSketchWindow.toFront();
@@ -636,13 +648,13 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     if (e.isControlDown()){
       if(aInt == 78) New();//n
       else if(aInt == 79) Open();//o
-      else if(aInt == 80) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);//p
-      else if(aInt == 81) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);//q
+      else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83){//s
-	if(MaxApplication.getApplication().itsWindow != null) 
-	  MaxApplication.getApplication().itsSketchWindow.GetDocument().Save();
+	if(MaxApplication.itsWindow != null) 
+	  MaxApplication.itsSketchWindow.GetDocument().Save();
       }
-      else if(aInt == 87) MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
+      else if(aInt == 87) MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
     }
     else{
       if(aInt == ircam.jmax.utils.Platform.RETURN_KEY) {

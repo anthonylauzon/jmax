@@ -27,8 +27,8 @@ class ErmesSelectedCmd implements Command
       {
 	Enumeration e;
     
-	if (MaxApplication.getApplication().itsSketchWindow != null)
-	  e =  MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsSelectedList.elements();
+	if (MaxApplication.itsSketchWindow != null)
+	  e =  MaxApplication.itsSketchWindow.itsSketchPad.itsSelectedList.elements();
 	else
 	  throw new TclException(interp, "no windows!"); 
 

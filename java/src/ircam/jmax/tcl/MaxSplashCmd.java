@@ -35,7 +35,7 @@ class MaxSplashCmd implements Command
       {
 	String fileName = new String(argv[1].toString());
 
-	new SplashDialog(MaxApplication.getApplication().itsProjectWindow, fileName);    
+	new SplashDialog(MaxApplication.itsProjectWindow, fileName);    
       }
     else
       {	

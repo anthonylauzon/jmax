@@ -28,24 +28,16 @@ import tcl.lang.*;
  * - creation of new windows (new, double-click on a subpatcher, etc.)
  * - quit of the application
  */
+
 public class MaxApplication extends Object {
 
   // Static global services
-
-  static MaxApplication theApplication;
-
-  /** Get the unique instance of getApplication */
-
-  public static MaxApplication getApplication()
-  {
-    return theApplication;
-  }
 
   /** Get the unique active FTS Server, if any */
 
   public static FtsServer getFtsServer()
   {
-    return theApplication.itsServer;
+    return itsServer;
   }
 
   /** Get the unique active TCL interpreter */
@@ -55,38 +47,6 @@ public class MaxApplication extends Object {
     return itsInterp;
   }
 
-  /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
-
-  static private String openFileDirectory = null; // temp !!
-
-  public static File getOpenFileName(Frame frame, String title)
-  {
-    return getOpenFileName(frame, title, null);
-  }
-
-  public static File getOpenFileName(Frame frame, String title, FilenameFilter filter)
-  {
-    FileDialog fd = new FileDialog(frame, title);
-    String file;
-
-    fd.setFile("");
-
-    if (openFileDirectory != null)
-      fd.setDirectory(openFileDirectory);
-
-    if (filter != null)
-      fd.setFilenameFilter(filter);
-    
-    fd.show();
-
-    openFileDirectory = fd.getDirectory();
-    file = fd.getFile();
-
-    if ((file == null) || file.equals(""))
-      return null;
-
-    return new File(openFileDirectory, file);
-  }
 
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
@@ -97,69 +57,34 @@ public class MaxApplication extends Object {
   public static boolean doAutorouting = true; // Should become a static in the Patcher editor
   //e.m.public static ConsShell itsShell;
 
-  public static Properties ermesProperties;
+  public static Properties jmaxProperties;
 
   public static Vector resourceVector = new Vector();
-  int MAX_RESOURCE_FILE_LENGHT = 1024;
+  static final int MAX_RESOURCE_FILE_LENGHT = 1024;
   public static ErmesSketchWindow itsSketchWindow;
   public static MaxWindow itsWindow;
   public static ProjectWindow itsProjectWindow;
 
   static MaxWhenHookTable  itsHookTable;
   public final static int NEW_COMMAND = 0;
-  public final static int REQUIRE_CONNECTION = 1;
-  public final static int STACK_WINDOWS = 2;
-  public final static int TILE_WINDOWS = 3;
-  public final static int TILEVERTICAL_WINDOWS = 4;
   public final static int SNAP_TO_GRID = 5;
   public final static int NEW_PROJECT = 6;
   public final static int CLOSE_WINDOW = 7;
-  public final static int QUIT_APPLICATION = 8;
   public final static int OPEN_COMMAND = 9;
   public final static int SAVE_COMMAND = 10;
   public final static int SAVEAS_COMMAND = 11;
-  public final static int CONNECTION_CHOOSEN = 12;
   public final static int ADD_WINDOW = 13;
-  public final static int ADD_FILES = 14;
   public final static int REMOVE_FILES = 15;
-  public final static int AUTO_ROUTING = 16;
   public final static int OPEN_WITH_AUTO_ROUTING = 17;
-  public final static int SELECT_ALL = 18;
   public final static int PRINT_WINDOW = 19;
 
   static ConsoleWindow itsConsoleWindow = null;
-  Dimension d = new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
-  final int SCREENVERT = d.height;
-  final int SCREENHOR = d.width;
 
-  public MaxApplication() {
+  static final int SCREENVERT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
+  static final int SCREENHOR = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
 
-    theApplication = this;
 
-    itsHookTable = new MaxWhenHookTable(); 
-
-    ircam.jmax.utils.Platform.setValues();
-    itsSketchWindowList = new Vector();
-    itsEditorsFrameList = new Vector();
-
-    // The console creation moved in a tcl command !!!
-
-    LoadResources();
-
-    ObeyCommand(NEW_PROJECT);
-
-    itsInterp = new tcl.lang.Interp(); // should go away here !!!
-
-    makeTclInterp(); 
-
-    // Splash screen moved to a tcl command
-
-    //if there were no connection statements in startup.tcl, ask the user
-    if (itsServer == null) ObeyCommand(REQUIRE_CONNECTION);	// maybe to be moved in ConnectionDialog
-  }
-	
-
-  void LoadResources() {
+  static void LoadResources() {
     byte buffer[] = new byte[1024];
     String aTempString;
     
@@ -168,7 +93,7 @@ public class MaxApplication extends Object {
     StringTokenizer aST;
     MaxResourceId aResId;
     
-    String pathForResources = ermesProperties.getProperty("root")+ermesProperties.getProperty("file.separator")+"config"+ermesProperties.getProperty("file.separator")+"resources.erm";
+    String pathForResources = jmaxProperties.getProperty("root")+jmaxProperties.getProperty("file.separator")+"config"+jmaxProperties.getProperty("file.separator")+"resources.erm";
     try {
       fis = new FileInputStream(pathForResources);
     }
@@ -220,20 +145,20 @@ public class MaxApplication extends Object {
       }*/
   }
   
-  boolean Start_resource_type_list(StringTokenizer aST) {
+  static boolean Start_resource_type_list(StringTokenizer aST) {
     if (aST.hasMoreTokens())
       return(aST.nextToken().equals("start_resource_type_list"));
     else return false;
   }
 
 	
-  boolean New_resource(StringTokenizer aST) {
+  static boolean New_resource(StringTokenizer aST) {
     if (aST.hasMoreTokens())
       return(aST.nextToken().equals("***new_resource"));
     else return false;
   }
 	
-  MaxResourceId Resource(StringTokenizer aST) {
+  static MaxResourceId Resource(StringTokenizer aST) {
     String aTempString;
     if (!aST.hasMoreTokens()) return null;
     MaxResourceId aResId = new MaxResourceId(aST.nextToken(" \t\n\r\""));
@@ -260,7 +185,7 @@ public class MaxApplication extends Object {
     return aResId;	
   }
 
-  public boolean FTSConnect(String theFtsdir, String theFtsname, String mode, String server, String port)
+  public static void ConnectToFts(String theFtsdir, String theFtsname, String mode, String server, String port)
   {
     if (mode.equals("socket")) 
       itsServer = new FtsSocketServer(server, Integer.parseInt(port));
@@ -272,11 +197,6 @@ public class MaxApplication extends Object {
     itsServer.setParameter("ftsdir", theFtsdir);
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
-
-    // don't run the "start" hooks here, we do it from TCL
-    // to make sure all the config and lib loading is done.
-
-    return itsServer != null;
   }
   
   public static void Load(File file)
@@ -389,7 +309,7 @@ public class MaxApplication extends Object {
     }
   }
 
-  public void AddThisFrameToMenus(String theName){
+  static public void AddThisFrameToMenus(String theName){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
@@ -407,7 +327,7 @@ public class MaxApplication extends Object {
       itsConsoleWindow.AddWindowToMenu(theName);
   }
 
-  public void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
+  public static void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
@@ -425,7 +345,7 @@ public class MaxApplication extends Object {
       itsConsoleWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
   }
 
-   public void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
+   public static void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
@@ -445,7 +365,7 @@ public class MaxApplication extends Object {
   }
 
 
-  public void RemoveThisWindowFromMenus(MaxWindow theWindow){
+  public static void RemoveThisWindowFromMenus(MaxWindow theWindow){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
@@ -464,7 +384,7 @@ public class MaxApplication extends Object {
       itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
   }
   
-  public void ChangeWinNameMenus(String theOldName, String theNewName){
+  public static void ChangeWinNameMenus(String theOldName, String theNewName){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
@@ -482,7 +402,7 @@ public class MaxApplication extends Object {
   }
   
 
-  public ErmesSketchWindow NewPatcherWindow(FtsObject theFtsPatcher) {
+  public static ErmesSketchWindow NewPatcherWindow(FtsObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow);
@@ -503,7 +423,7 @@ public class MaxApplication extends Object {
   }
 
 
-  public ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
+  public static ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
@@ -528,14 +448,14 @@ public class MaxApplication extends Object {
     return itsSketchWindow;
   }
   
-  public ErmesSketchWindow NewDefaultSubPatcher( FtsObject theFtsPatcher) {//to use just for 'patcher' externals
+  public static ErmesSketchWindow NewDefaultSubPatcher( FtsObject theFtsPatcher) {//to use just for 'patcher' externals
     theFtsPatcher.setWindowDescription(new FtsWindowDescription(100, 100, 300, 300));
     ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
     aSketchWindow.isSubPatcher = true;
     return aSketchWindow;
   }
   
-  public boolean ObeyCommand(int command) {
+  public static void ObeyCommand(int command) {
     ErmesSketchWindow aSketchWindow;
     switch (command) {
     case NEW_COMMAND:
@@ -558,44 +478,6 @@ public class MaxApplication extends Object {
       itsSketchWindow.setVisible(true);
       break;	
       
-    case NEW_PROJECT:
-      itsProjectWindow = new ProjectWindow();
-      itsProjectWindow.setTitle("Project manager");
-      itsProjectWindow.setLocation(0, 0);//start in the upper left position
-      itsProjectWindow.pack();
-      itsProjectWindow.setVisible(true);
-      break;
-      
-    case REQUIRE_CONNECTION:
-      itsConnDialog = new ConnectionDialog(itsProjectWindow);
-      itsConnDialog.setLocation(200,200);
-      itsConnDialog.setVisible(true);
-      
-      // hard-coded for now....
-      
-      break;
-      
-    case CONNECTION_CHOOSEN:
-      if (itsConnDialog.connectionLine == itsConnDialog.REMOTE_CONNECTION) {
-	int port = Integer.parseInt(itsConnDialog.portNo);
-	itsServer = new FtsSocketServer(itsConnDialog.hostName, port);
-
-	itsServer.setParameter("ftsdir", "/u/worksta/dececco/projects/imax/fts/bin/origin/debug");
-
-	itsServer.setParameter("ftsname", "fts");
-	itsServer.start();				
-	runHooks("start");
-      }
-      else if (itsConnDialog.connectionLine == itsConnDialog.LOCAL_CONNECTION) {
-	itsServer = new FtsSubProcessServer();
-	itsServer.setParameter("ftsdir", "/u/worksta/maggi/projects/fts");
-	itsServer.setParameter("ftsname", "fts");
-	itsServer.start();	//?
-	runHooks("start");
-      }
-      else
-	itsServer = null; //no server, for now
-      break;
     case OPEN_WITH_AUTO_ROUTING:
       doAutorouting = !doAutorouting;
       //qui controlla lo stato del menu corrispondeente e gli adatta quello
@@ -608,36 +490,13 @@ public class MaxApplication extends Object {
 	aMenuItem.setState(doAutorouting);
       }
       break;
-    case STACK_WINDOWS:
-      if ((itsSketchWindowList.size()==0)&&(itsEditorsFrameList.size()==0)) break;
-      StackWindows();
-      break;
-    case TILE_WINDOWS:
-      TileWindows();
-      break;
-    case TILEVERTICAL_WINDOWS:
-      TileVerticalWindows();
-      break;
-    case SELECT_ALL:
-      ErmesObject aObject;
-      Vector aElementsList = itsSketchWindow.GetSketchPad().GetElements();
-      Vector aSelectedList = itsSketchWindow.GetSketchPad().GetSelectedList();
-      for (Enumeration e = aElementsList.elements() ; e.hasMoreElements() ;) {
-	aObject = (ErmesObject) e.nextElement();
-	aSelectedList.addElement(aObject);
-	aObject.Select();
-      }
-      itsSketchWindow.GetSketchPad().repaint();
-      break;
     case SNAP_TO_GRID:
       for (int k=0; k<itsSketchWindowList.size(); k++) {
 	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(k);
 	aSketchWindow.SetSnapToGrid();
       }
       break;
-    case AUTO_ROUTING:
-      itsSketchWindow.SetAutorouting();
-      break;
+
     case CLOSE_WINDOW:
       if(itsWindow!=null) {
 	itsWindow.Close();
@@ -650,31 +509,6 @@ public class MaxApplication extends Object {
 	  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
 	}
       } 
-      break;
-    case QUIT_APPLICATION:
-      MaxWindow aWindow;
-
-      runHooks("exit");// run the exit hooks
-
-      for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
-	aSketchWindow = (ErmesSketchWindow)e.nextElement();
-	if(!aSketchWindow.Close()) return true;
-      }
-      for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
-	aWindow = (MaxWindow)e.nextElement();
-	if(!aWindow.Close()) return true;
-      }
-
-      if (itsConsoleWindow != null)
-	{
-	  itsConsoleWindow.setVisible(false);
-	  itsProjectWindow.setVisible(false);
-	  itsConsoleWindow.dispose();
-	  itsProjectWindow.dispose();
-	}
-
-      if (itsServer != null) itsServer.stop();
-      Runtime.getRuntime().exit(0);
       break;
     case PRINT_WINDOW: 
       PrintJob aPrintJob = Toolkit.getDefaultToolkit().getPrintJob(itsSketchWindow, "print1", null);
@@ -699,10 +533,9 @@ public class MaxApplication extends Object {
       }
       break;
     }	
-    return true;
   }
   
-  public void TileVerticalWindows(){
+  public static void TileVerticalWindows(){
     Rectangle aRect = new Rectangle();
     Frame aWindow;
     int num = itsSketchWindowList.size()+itsEditorsFrameList.size();
@@ -724,7 +557,7 @@ public class MaxApplication extends Object {
   }
 
 
-  public void TileWindows(){
+  public static void TileWindows(){
     Rectangle aRect2 = new Rectangle();
     Rectangle aStartRect = new Rectangle();
     Dimension d2 = new Dimension();
@@ -778,11 +611,15 @@ public class MaxApplication extends Object {
   }
 
 
-  public void StackWindows(){
+  public static void StackWindows(){
     Dimension d;
     ErmesSketchWindow aSketchWindow;
     Frame aWindow;
     Rectangle aRect = new Rectangle();
+
+    if ((itsSketchWindowList.size() == 0) &&(itsEditorsFrameList.size() == 0))
+      return;
+
     if(itsSketchWindow!=null) d = itsSketchWindow.getPreferredSize();
     else d = ((Frame)itsWindow).getPreferredSize();
     aRect.x = 50; aRect.y = 50;
@@ -808,25 +645,25 @@ public class MaxApplication extends Object {
 
 
 
-  public void SetCurrentWindow(MaxWindow theWindow){
+  public static void SetCurrentWindow(MaxWindow theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
     GetCurrentProject().SetCurrentEntry(itsWindow.GetDocument().GetTitle());
   }
   
-  public ErmesSketchWindow GetCurrentWindow() {
+  public static ErmesSketchWindow GetCurrentWindow() {
     return itsSketchWindow;
   }
 	
-  public ProjectWindow GetProjectWindow() {
+  public static ProjectWindow GetProjectWindow() {
     return itsProjectWindow;
   }
 	
-  public ConsoleWindow GetConsoleWindow() {
+  public static ConsoleWindow GetConsoleWindow() {
     return itsConsoleWindow;
   }
 
-  public Project GetCurrentProject() {
+  public static Project GetCurrentProject() {
     return itsProjectWindow.itsProject;
   }
 	
@@ -843,14 +680,14 @@ public class MaxApplication extends Object {
 
   /** Functions to add application hooks */
 
-  public void addHook(String name, String code)
+  public static void addHook(String name, String code)
   {
     itsHookTable.addHook(name, code);
   }
 
   /** Functions to run application hooks */
 
-  public void runHooks(String name)
+  public static void runHooks(String name)
   {
     itsHookTable.runHooks(name);
   }
@@ -860,7 +697,7 @@ public class MaxApplication extends Object {
   public static void main(String args[]) {
     // main function parse the argument line and create the main class...
     //create a new default Properties object
-    ermesProperties = new Properties(System.getProperties());
+    jmaxProperties = new Properties(System.getProperties());
 
     //start parsing arguments
     // don't check for valid options, so the user can set
@@ -868,15 +705,41 @@ public class MaxApplication extends Object {
     // and we don't know yet
 
     for (int i=0; i<args.length &&args[i].startsWith("-"); i++) 
-      ermesProperties.put(args[i].substring(1), args[++i]);
+      jmaxProperties.put(args[i].substring(1), args[++i]);
 
     // Default values
-    if (ermesProperties.get("root") == null) {
+    if (jmaxProperties.get("root") == null) {
       //user didn't specify the root. Take the /usr/local/max default directory.
-      ermesProperties.put("root", "/usr/local/max");
+      jmaxProperties.put("root", "/usr/local/max");
     }
 
-    new MaxApplication();
+    itsHookTable = new MaxWhenHookTable(); 
+
+    ircam.jmax.utils.Platform.setValues();
+
+    itsSketchWindowList = new Vector();
+    itsEditorsFrameList = new Vector();
+
+    // The console creation moved in a tcl command !!!
+
+    LoadResources();
+
+    itsProjectWindow = new ProjectWindow();
+
+    itsInterp = new tcl.lang.Interp(); // should go away here !!!
+
+    makeTclInterp(); 
+
+    // Splash screen moved to a tcl command
+
+    //if there were no connection statements in startup.tcl, ask the user
+
+    if (itsServer == null)
+      {
+	new ConnectionDialog(itsProjectWindow);
+	MaxApplication.runHooks("start");
+      }
+
   }
 
   /** This private method build the tcl interpreter, 
@@ -902,9 +765,9 @@ public class MaxApplication extends Object {
 	// Load the "jmaxboot.tcl" file that will do whatever is needed to
 	// create the startup configuration, included reading user files
 
-	itsInterp.evalFile(ermesProperties.getProperty("root") +
-			   ermesProperties.getProperty("file.separator") + "tcl" +
-			   ermesProperties.getProperty("file.separator") +  "jmaxboot.tcl");
+	itsInterp.evalFile(jmaxProperties.getProperty("root") +
+			   jmaxProperties.getProperty("file.separator") + "tcl" +
+			   jmaxProperties.getProperty("file.separator") +  "jmaxboot.tcl");
       }
     catch (TclException e)
       {
@@ -916,7 +779,7 @@ public class MaxApplication extends Object {
     in the UI classes (why to call awt things like pack here ??),
     and another part should just become tcl ??? */
 
-  public void makeMaxConsole()
+  public static void makeMaxConsole()
   {
     Console itsConsole;
 
@@ -931,6 +794,38 @@ public class MaxApplication extends Object {
     itsConsoleWindow.pack();
     itsConsoleWindow.setVisible(true);
 
+  }
+
+  public static void Quit()
+  {
+    MaxWindow aWindow;
+    ErmesSketchWindow aSketchWindow;
+
+    runHooks("exit");// run the exit hooks
+
+    for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
+      aSketchWindow = (ErmesSketchWindow)e.nextElement();
+      if (! aSketchWindow.Close())
+	return;
+    }
+
+    for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
+      aWindow = (MaxWindow)e.nextElement();
+      if(!aWindow.Close()) return;
+    }
+
+    if (itsConsoleWindow != null)
+      {
+	itsConsoleWindow.setVisible(false);
+	itsProjectWindow.setVisible(false);
+	itsConsoleWindow.dispose();
+	itsProjectWindow.dispose();
+      }
+
+    if (itsServer != null)
+      itsServer.stop();
+
+    Runtime.getRuntime().exit(0);
   }
 }
 

@@ -229,7 +229,7 @@ prof_dac_put(fts_word_t *argv)
 #endif
 	      /* Post the results event */
 
-	      post("Computed %d samples at %d samples per seconds", 
+	      post("Computed %d samples at %d samples per seconds\n", 
 		   prof_dac_data.total_samples,
 		   samples_per_seconds);
 

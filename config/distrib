@@ -2,4 +2,4 @@ all	jmax.cfg
 all	audio.tcl
 all	midi.tcl
 all	resources.erm
-all	example.ermesrc
+all	example.jmax.cfg

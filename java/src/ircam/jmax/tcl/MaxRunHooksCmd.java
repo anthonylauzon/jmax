@@ -30,7 +30,7 @@ class MaxRunHooksCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 2)
-      MaxApplication.getApplication().runHooks(new String(argv[1].toString()));
+      MaxApplication.runHooks(new String(argv[1].toString()));
     else
       throw new TclNumArgsException(interp, 1, argv, "name");
   }

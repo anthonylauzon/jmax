@@ -248,7 +248,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
       aErr.setLocation(100, 100);
       aErr.show();  
-      e.printStackTrace(); // temporary, MDC
       return;
     }
 
@@ -755,7 +754,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     nameTable.put("slider", "ircam.jmax.editors.ermes.ErmesObjSlider");
     nameTable.put("inlet", "ircam.jmax.editors.ermes.ErmesObjIn");
     nameTable.put("outlet", "ircam.jmax.editors.ermes.ErmesObjOut");
-    nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjPatcher");
+    // At the moment, if we put patchers in the green box, we cannot edit them ??
+    nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjExternal");
+    // nameTable.put("patcher", "ircam.jmax.editors.ermes.ErmesObjPatcher");
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {
@@ -853,29 +854,43 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	editStatus = DOING_NOTHING;
 	return;
       }
-      try {
-	//there was an error "aObject may not have been initialized"
-	aObject = (ErmesObject) Class.forName(objectNames[itsAddObject]).newInstance();
-      } catch(ClassNotFoundException e1) {i = 0;}
-      catch(IllegalAccessException e2) {i = 1;}
-      catch(InstantiationException e3) {i = 2;}
-      finally {
-	aObject.Init(this, x, y, "");
-	itsElements.addElement(aObject);
-	aObject.Paint(offGraphics);
-	CopyTheOffScreen(getGraphics());
-	if(objectNames[itsAddObject] == "ircam.jmax.editors.ermes.ErmesObjPatcher")
-	  itsPatcherElements.addElement(aObject);
-	if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-	aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
-	aRect.grow(3,6);
-	itsElementRgn.Add(aRect);
-	for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
-	  aOutlet = (ErmesObjOutlet)en.nextElement();
-	  itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
+
+      try
+	{
+	  //there was an error "aObject may not have been initialized"
+	  aObject = (ErmesObject) Class.forName(objectNames[itsAddObject]).newInstance();
 	}
-	ToSave();
+      catch (ClassNotFoundException e1)
+	{
+	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Class not found: " + e1);
+	  return;
+	}
+      catch (IllegalAccessException e2)
+	{
+	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Illegal Access: " + e2);
+	  return;
+	}
+      catch (InstantiationException e3)
+	{
+	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Instantiation Error: " + e3);
+	  return;
+	}
+
+      aObject.Init(this, x, y, "");
+      itsElements.addElement(aObject);
+      aObject.Paint(offGraphics);
+      CopyTheOffScreen(getGraphics());
+      if(objectNames[itsAddObject] == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+	itsPatcherElements.addElement(aObject);
+      if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
+      aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
+      aRect.grow(3,6);
+      itsElementRgn.Add(aRect);
+      for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
+	aOutlet = (ErmesObjOutlet)en.nextElement();
+	itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
       }
+      ToSave();
     }
     else{
       if (!e.isShiftDown()) itsHelper.DeselectAll();

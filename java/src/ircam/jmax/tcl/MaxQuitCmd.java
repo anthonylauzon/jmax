@@ -26,7 +26,7 @@ class MaxQuitCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 1)
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
+      MaxApplication.Quit();
     else
       throw new TclNumArgsException(interp, 1, argv, "");
   }

@@ -46,6 +46,10 @@ StatisticsDialog:
 	javac $(JFLAGS) StatisticsDialog.java
 .PHONY: StatisticsDialog.java
 
+MaxFileChooser:
+	javac $(JFLAGS) MaxFileChooser.java
+.PHONY: MaxFileChooser.java
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
 

@@ -32,8 +32,8 @@ class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, K
     itsList = new List(5, false);
     MaxResourceId aResId;
     String aString;
-    for(int i=0; i< MaxApplication.getApplication().resourceVector.size();i++){
-      aResId = (MaxResourceId)MaxApplication.getApplication().resourceVector.elementAt(i);
+    for(int i=0; i< MaxApplication.resourceVector.size();i++){
+      aResId = (MaxResourceId)MaxApplication.resourceVector.elementAt(i);
       aString = aResId.GetName();
       itsList.add(aString);
     }

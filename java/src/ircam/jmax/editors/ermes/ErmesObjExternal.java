@@ -68,7 +68,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     // that opens up their favourite editor (the name should be searched in the resources.erm file)
     super.update(theFtsObject);
     if (iAmPatcher){
-      itsSubWindow = MaxApplication.getApplication().NewDefaultSubPatcher( itsFtsObject);
+      itsSubWindow = MaxApplication.NewDefaultSubPatcher( itsFtsObject);
       itsSketchPad.itsFirstClick = true;//??????
     }
 
@@ -145,7 +145,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	    itsSketchPad.itsFirstClick = true;
 	  }
 	  else{	//this 'else' shouldn't be reached...
-	    itsSubWindow = MaxApplication.getApplication().NewSubPatcherWindow( itsFtsObject);
+	    itsSubWindow = MaxApplication.NewSubPatcherWindow( itsFtsObject);
 	    ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
 	  }
 	  return true;

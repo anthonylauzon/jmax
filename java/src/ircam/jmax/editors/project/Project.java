@@ -147,11 +147,11 @@ public class Project extends Panel implements AdjustmentListener{
 
   /*only for the communication between Tabler/TextEditor and MaxApplication*/
   public void CloseThisWindow(){
-    MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+    MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
   }
 
   public void SetThisWindow(MaxWindow theWindow){
-    MaxApplication.getApplication().SetCurrentWindow(theWindow);
+    MaxApplication.SetCurrentWindow(theWindow);
   }
 
   //--------------------------------------------------------
@@ -247,7 +247,7 @@ public class Project extends Panel implements AdjustmentListener{
   }	
 
   public void ResetMenus(MaxWindow theWindow){
-    MaxApplication.getApplication().RemoveThisWindowFromMenus(theWindow);
+    MaxApplication.RemoveThisWindowFromMenus(theWindow);
   }
 	
   //--------------------------------------------------------
@@ -306,7 +306,7 @@ public class Project extends Panel implements AdjustmentListener{
   }
   
   public void UpdateProjectMenu(){
-    MaxApplication.getApplication().UpdateProjectMenu();
+    MaxApplication.UpdateProjectMenu();
   }
 
   //--------------------------------------------------------

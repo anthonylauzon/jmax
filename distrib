@@ -1,7 +1,6 @@
 all	README
 all	config
 all	doc
-all	ermes
 all	examples
 all	fts
 all	packages
@@ -9,4 +8,5 @@ all	utilities
 all	images
 all	java
 all	tcl
+all	bin
 

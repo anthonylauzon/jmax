@@ -8,6 +8,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.project.*;// @@@@@@
 import ircam.jmax.editors.ermes.*;
 
@@ -24,7 +25,7 @@ public class ErmesPatcherDoc implements MaxDocument {
 
   protected String itsTitle = ""; // !!! should be handled in the editor
 
-  protected File itsFile;
+  protected File itsFile = null;
   protected String itsDocumentType = "";
   public boolean alreadySaved =/*false*/true;
   protected boolean neverSaved =true;
@@ -44,7 +45,11 @@ public class ErmesPatcherDoc implements MaxDocument {
   public ErmesPatcherDoc(FtsObject theFtsPatcher) {
     // create a ErmesPatcherDoc starting from an existing FtsPatcher.
 
-    if (theFtsPatcher.getClassName().equals("patcher"))
+    if (itsFile != null)
+      {
+	itsTitle = itsFile.getName();
+      }
+    else if (theFtsPatcher.getClassName().equals("patcher"))
       {
 	itsTitle = (String) theFtsPatcher.getArguments().elementAt(0);
       }
@@ -129,10 +134,8 @@ public class ErmesPatcherDoc implements MaxDocument {
 
 
   public boolean Import(File file) {
-    itsFile = file;
     itsTitle = file.getName();
     itsDocumentType = "patcher";
-    alreadySaved = true;
 
     try {
       itsPatcher = FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), file);
@@ -142,24 +145,19 @@ public class ErmesPatcherDoc implements MaxDocument {
       // e.printStackTrace(); // temporary, MDC
       return false;
     }
-		
+
+    // Reset the file, to avoid writing on top of .pat or other .tpa files
+
+    itsFile = null;
+
+    // This file is not already saved, beacause it do not correspond to a .tpa file !!
+
+    ToSave();
+
     return false;
   }
   
 
-
-  boolean ActualSave(OutputStream o) {
-    boolean temp = true;
-    try {
-      temp = itsSketchWindow.itsSketchPad.SaveTo(o);
-    }
-    catch (IOException e) {
-      System.out.println("ERROR while writing " + GetFile());
-      e.printStackTrace(); // temporary, MDC
-      return false;
-    }
-    return true;
-  }
 
   public void ToSave(){
     alreadySaved = false;
@@ -173,30 +171,29 @@ public class ErmesPatcherDoc implements MaxDocument {
     String oldTitle = itsTitle;
 		
     if (itsFile == null)
-      {
-	// Should go in global getSaveFileName function
+      itsFile = MaxFileChooser.chooseFileToSave(itsSketchWindow, "Save Patcher");
 
-	FileDialog fd = new FileDialog(itsSketchWindow, "FileDialog", FileDialog.SAVE);
-	fd.setFilenameFilter(itsTpaFilter);
-	fd.show();
-
-	if((fd.getFile()==null)||(fd.getDirectory()==null)) return false;
-      
-	itsTitle = fd.getFile();
-	itsFile = new File(fd.getDirectory(),fd.getFile());
-      }
+    if (itsFile == null)
+      return false;
     
+    // update its title  (but who tell the window ??)
+
+    itsTitle = itsFile.getName();
+
     try {
       System.out.println(itsFile);
       fs = new FileOutputStream(itsFile);
     }
-    catch(Exception e) {
-      System.out.println("ERROR while opening " + itsFile);
-      e.printStackTrace(); // temporary, MDC
+
+    catch(IOException e) {
+      System.out.println("ERROR " + e + " while saving " + itsFile);
+      // e.printStackTrace(); // temporary, MDC
       return false;
     }
 
     CreateFtsGraphics(itsSketchWindow);
+
+
     PrintStream ps = new PrintStream(fs);
     itsPatcher.saveTo(fs);
 
@@ -211,7 +208,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     neverSaved = false;
     
     if(!oldTitle.equals(itsTitle)){
-      MaxApplication.getApplication().ChangeWinNameMenus(oldTitle, itsTitle);
+      MaxApplication.ChangeWinNameMenus(oldTitle, itsTitle);
       itsSketchWindow.setTitle(itsTitle);
       if (itsSketchWindow.itsProjectEntry != null)
 	itsSketchWindow.itsProjectEntry.SetFile(itsFile);
@@ -252,12 +249,6 @@ public class ErmesPatcherDoc implements MaxDocument {
 	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)
 	CreateFtsGraphics(((ErmesObjExternal)aErmesObject).itsSubWindow); //recursive call
     }
-  }
-
-  public boolean SaveAs(File file)
-  {
-    SetFile(null);
-    return Save();
   }
 }
 

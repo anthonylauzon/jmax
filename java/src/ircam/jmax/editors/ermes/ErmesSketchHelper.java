@@ -197,13 +197,13 @@ class ErmesSketchHelper extends Object{
       itsSketchPad.itsPatcherElements.removeElement(theObject);
       ErmesObjPatcher aPatcher = (ErmesObjPatcher)theObject;
       if(((ErmesSketchWindow)itsSketchPad.itsSketchWindow).GetProjectEntry()!=null){
-	if (MaxApplication.getApplication().GetProjectWindow().GetProject().HaveAEntry(aPatcher.GetName()))
+	if (MaxApplication.GetProjectWindow().GetProject().HaveAEntry(aPatcher.GetName()))
 	  {
-	    ProjectEntry aEntry = MaxApplication.getApplication().GetProjectWindow().
+	    ProjectEntry aEntry = MaxApplication.GetProjectWindow().
 	      GetProject().GetTheEntry(aPatcher.GetName());
 	    aEntry.DecAbstractionNumber();
 	    if(aEntry.GetAbstractionNumber()==0) 
-	      MaxApplication.getApplication().GetProjectWindow().GetProject().RemoveFromProject(aEntry);
+	      MaxApplication.GetProjectWindow().GetProject().RemoveFromProject(aEntry);
 	  }
       }
     }

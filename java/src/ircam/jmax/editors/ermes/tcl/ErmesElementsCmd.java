@@ -27,7 +27,7 @@ class ErmesElementsCmd implements Command
 {
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    Enumeration e = MaxApplication.getApplication().itsSketchWindow.itsSketchPad.itsElements.elements();
+    Enumeration e = MaxApplication.itsSketchWindow.itsSketchPad.itsElements.elements();
     ErmesObject aObject = null;
 	
     if (argv.length == 1)

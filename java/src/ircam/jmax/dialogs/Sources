@@ -3,5 +3,6 @@ SOURCES = \
            ErrorDialog.java \
            FileNotSavedDialog.java \
            SplashDialog.java \
+	   MaxFileChooser.java \
            StatisticsDialog.java
 

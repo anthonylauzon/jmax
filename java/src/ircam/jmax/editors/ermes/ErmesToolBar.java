@@ -133,8 +133,8 @@ public class ErmesToolBar extends Panel {
   //--------------------------------------------------------
   private void InsertButton() {
     //charge images if not already charged
-    String fs = MaxApplication.ermesProperties.getProperty("file.separator");
-    String path = MaxApplication.ermesProperties.getProperty("root")+fs+"images"+fs;
+    String fs = MaxApplication.jmaxProperties.getProperty("file.separator");
+    String path = MaxApplication.jmaxProperties.getProperty("root")+fs+"images"+fs;
 
     if (aImage1 == null) {
       Toolkit toolkit = Toolkit.getDefaultToolkit();

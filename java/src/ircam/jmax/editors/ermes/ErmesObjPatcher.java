@@ -165,7 +165,7 @@ public class ErmesObjPatcher extends ErmesObject {
       //ask MaxApplication to create a new Patcher with this FtsPatcher
       //
       else {
-	itsSubWindow = MaxApplication.getApplication().NewSubPatcherWindow( itsFtsObject);
+	itsSubWindow = MaxApplication.NewSubPatcherWindow( itsFtsObject);
 	((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
       }
     }

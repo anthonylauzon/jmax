@@ -37,7 +37,9 @@ import ircam.jmax.utils.*;
 
 /**
  * The dialog popped up at startup to establish the connection with FTS.
+ * Use it thru the static function "PopUpConnectionDialog".
  */
+
 public class ConnectionDialog extends Dialog implements KeyListener, ActionListener, ItemListener{
   Frame parent;
   Button okButton;
@@ -52,7 +54,6 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
   public String hostName = "";
   public String portNo = "";
     
-
   public ConnectionDialog(Frame dw) {
     super(dw, "FTS connection", false);
 
@@ -122,7 +123,30 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     addKeyListener(this);
 
     //Initialize this dialog to its preferred size.
+
     pack();
+
+    // set to a hardcoded location
+
+    setLocation(200,200);
+    setVisible(true);
+  }
+
+  private void  connectionChoosen()
+  {
+    String connType;
+
+    if (connectionLine == REMOTE_CONNECTION) 
+      connType = "socket";
+    else if (connectionLine == LOCAL_CONNECTION)
+      connType = "local";
+    else return;
+
+    // Work only in astor and mimi, the directory is fake !!
+    // also the whole tcl init structure would not work; it must
+    // be called from the TCL script, and not here !!!
+
+    MaxApplication.ConnectToFts("/usr/local/max/fts/bin/origin/opt" , "fts", connType, hostName, portNo);
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -132,8 +156,9 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     if (e.getSource() == okButton){
       hostName = host.getText();
       portNo = port.getText();
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
+      connectionChoosen();
       setVisible(false);
+      dispose();
     }
     else if (e.getSource() == cancelButton) setVisible(false);
     //else if(e.getSource() == connectionType) connectionLine = connectionType.getSelectedIndex();
@@ -157,8 +182,9 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
     if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
       hostName = host.getText();
       portNo = port.getText();
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
+      connectionChoosen();
       setVisible(false);
+      dispose();
     }
   }
   ///////////////////////////////////////////////////////////////////////
