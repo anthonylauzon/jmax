@@ -52,17 +52,19 @@ struct _track_
 };
 
 #define track_set_sequence(t, s) ((t)->sequence = (s))
-
 #define track_get_sequence(t) ((t)->sequence)
+
 #define track_get_next(t) ((t)->next)
 #define track_get_name(t) ((t)->name)
 #define track_set_name(t, n) ((t)->name = (n))
 
-#define track_get_type(track) ((track)->type)
-#define track_get_first(track) ((track)->first)
-#define track_get_last(track) ((track)->last)
-#define track_get_size(track) ((track)->size)
-#define track_get_duration(track) ((track)->last->time - (track)->first->time)
+#define track_get_type(t) ((t)->type)
+#define track_get_first(t) ((t)->first)
+#define track_get_last(t) ((t)->last)
+#define track_get_size(t) ((t)->size)
+#define track_get_duration(t) ((t)->last->time - (t)->first->time)
+
+#define track_editor_is_open(t) ((t)->sequence && sequence_editor_is_open((t)->sequence))
 
 extern void track_add_event(track_t *track, double time, event_t *event);
 extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *here);

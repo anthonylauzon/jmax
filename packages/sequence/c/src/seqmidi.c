@@ -252,7 +252,7 @@ sequence_read_track_end(fts_midifile_t *file)
  *
  */
 int
-track_import_midifile(track_t *track, fts_midifile_t *file)
+track_import_from_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;
@@ -294,7 +294,7 @@ track_import_midifile(track_t *track, fts_midifile_t *file)
 }
 
 int
-sequence_import_midifile(sequence_t *sequence, fts_midifile_t *file)
+sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
 {
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;
@@ -406,7 +406,7 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
 }
 
 int
-track_export_midifile(track_t *track, fts_midifile_t *file)
+track_export_to_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_symbol_t track_name = track_get_name(track);
   seqmidi_write_data_t data;

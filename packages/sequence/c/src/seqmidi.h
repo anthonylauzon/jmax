@@ -30,9 +30,9 @@
 #include "sequence.h"
 #include "track.h"
 
-extern int track_import_midifile(track_t *track, fts_midifile_t *file);
-extern int track_export_midifile(track_t *track, fts_midifile_t *file);
+extern int track_import_from_midifile(track_t *track, fts_midifile_t *file);
+extern int track_export_to_midifile(track_t *track, fts_midifile_t *file);
 
-extern int sequence_import_midifile(sequence_t *sequence, fts_midifile_t *file);
+extern int sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file);
 
 #endif

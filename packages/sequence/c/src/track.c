@@ -542,7 +542,7 @@ void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_symbol_t type = track_get_type(track);
+  fts_symbol_t type = track_get_type(this);
   event_t *event = track_get_first(this);
   fts_atom_t a[TRACK_BLOCK_SIZE];
   fts_array_t array;
@@ -708,13 +708,19 @@ static void
 track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
+  fts_symbol_t type = track_get_type(this);
 
-  if(ac == 0)
-    track_import_midifile_dialog(o, 0, 0, 0, 0);
-  else if(ac == 1 && fts_is_symbol(at))
-    track_import_midifile(o, 0, 0, 1, at);
+  if(type == fts_s_midievent && type == fts_s_void)
+    {
+      if(ac == 0)
+	track_import_midifile_dialog(o, 0, 0, 0, 0);
+      else if(ac == 1 && fts_is_symbol(at))
+	track_import_midifile(o, 0, 0, 1, at);
+      else
+	fts_object_signal_runtime_error(o, "import: wrong arguments");  
+    }
   else
-    fts_object_signal_runtime_error(o, "import: wrong arguments");  
+    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", type);    
 }
 
 static void 
