@@ -13,3 +13,11 @@ libftsclient_la_LDFLAGS = -no-undefined
 libftsclient_la_LIBADD= -lstdc++
 
 INCLUDES=-I$(top_srcdir)/cpp/include
+
+noinst_HEADERS = \
+BinaryProtocolDecoder.h \
+BinaryProtocolEncoder.h \
+BinaryProtocol.h \
+Buffer.h \
+Hashtable.h \
+SymbolCache.h 
