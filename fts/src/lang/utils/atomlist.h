@@ -50,4 +50,8 @@ extern fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_
 
 extern void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_object_t *target);
 
+/* Generic find support */
+
+extern int fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *at);
+
 #endif

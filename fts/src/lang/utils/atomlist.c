@@ -124,7 +124,6 @@ fts_atom_list_append( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
     fts_atom_list_append_one(list, atom + i);
 }
 
-
 void 
 fts_atom_list_set( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
 {
@@ -258,3 +257,62 @@ void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_obje
       fts_bmax_code_pop_args(f, ac);
     }
 }
+
+
+
+/* Check for subsequences */
+
+int
+fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_iterator_t iterator;
+
+  /* Look for the first key atom in the atom list;
+     if found, try to see the rest of the sequence is there
+     */
+
+  fts_atom_list_iterator_init(&iterator, list);
+
+  while (! fts_atom_list_iterator_end(&iterator))
+    {
+      if (fts_atom_equal(&at[0], fts_atom_list_iterator_current(&iterator)))
+	{
+	  fts_atom_list_iterator_t ii;
+	  int i;
+
+	  i = 1;
+	  ii = iterator;
+	  fts_atom_list_iterator_next(&ii);
+
+	  while ((i < ac) && (! fts_atom_list_iterator_end(&ii)) &&
+		 fts_atom_equal(&at[i], fts_atom_list_iterator_current(&ii)))
+	    {
+	      i++;
+	      fts_atom_list_iterator_next(&ii);
+	    }
+
+	  if (i == ac)
+	    {
+	      /* Found, return 1 */
+	      return 1;
+	    }
+
+	  if (fts_atom_list_iterator_end(&ii))
+	    {
+	      /* Not found because the atom list is finished,
+		 uless to continue, return 0 */
+	      return 0;
+	    }
+
+	  /* Not found, continue */
+	}
+
+      fts_atom_list_iterator_next(&iterator);
+    }
+
+  return 0;
+}
+
+
+
+

@@ -74,6 +74,7 @@ class FindPanel extends JFrame {
     validate();
 
     set = (FtsObjectSet) Fts.newRemoteData( "objectset_data", null);
+    objectSetViewer.setModel( set.getListModel());
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
@@ -107,11 +108,7 @@ class FindPanel extends JFrame {
     query = textField.getText();
     args = new Vector();
     FtsParse.parseAtoms(query, args);
-
-    objectSetViewer.setModel( null);
     set.find( patcher, args);
-    objectSetViewer.setModel( set.getListModel());
-
     setCursor(temp);
   }
 
@@ -120,10 +117,7 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    objectSetViewer.setModel( null);
     set.findErrors( patcher);
-    objectSetViewer.setModel( set.getListModel());
-
     setCursor(temp);
   }
 
@@ -132,10 +126,7 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    objectSetViewer.setModel( null);
     set.findFriends( object);
-    objectSetViewer.setModel( set.getListModel());
-
     setCursor(temp);
   }
 

@@ -23,7 +23,9 @@ public class FtsMessageObject extends FtsObject
   {
     public void handleMessage(FtsMessage msg)
     {
-      FtsMessageObject.this.localPut("value", FtsParse.unparseObjectDescription(2, msg));
+      description = FtsParse.unparseObjectDescription(2, msg);
+
+      FtsMessageObject.this.localPut("value", description);
     }
   }
 

@@ -6,6 +6,8 @@
 #include "lang/mess.h"
 #include "lang/utils.h"
 
+/* #define LOAD_DEBUG */
+
 /* Private structure */
 typedef struct fts_binary_file_desc_t {
   int fd;
@@ -90,6 +92,10 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
   /* allocate code */
 
+#ifdef LOAD_DEBUG
+  fprintf(stderr, "Reading %d bytecodes\n", header.code_size);
+#endif
+
   desc->code = (unsigned char *)fts_malloc( header.code_size);
   if (!desc->code)
     {
@@ -105,6 +111,10 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     }
 
   /* allocate code and read symbols */
+
+#ifdef LOAD_DEBUG
+  fprintf(stderr, "Reading %d symbols\n", header.n_symbols);
+#endif
 
   if (header.n_symbols > 0)
     {
@@ -143,11 +153,21 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 	    fts_symbol_t symbol;
 
 	    symbol = fts_new_symbol_copy( p);
+
 	    if ( !symbol)
 	      {
-		return -1;
+#ifdef LOAD_DEBUG
+		fprintf(stderr, "Reading NULL symbol\n");
+#endif
+		desc->symbols[i] = 0;
 	      }
-	    desc->symbols[i] = symbol;
+	    else
+	      {
+#ifdef LOAD_DEBUG
+		fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(symbol));
+#endif
+		desc->symbols[i] = symbol;
+	      }
 	    i++;
 	    
 	    /* advance to next symbol */

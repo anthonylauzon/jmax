@@ -25,11 +25,33 @@ public class FtsObjectSet extends FtsRemoteData
   static final int REMOTE_FIND_ERRORS   = 5;
   static final int REMOTE_FIND_FRIENDS  = 6;
 
-  DefaultListModel list = new DefaultListModel();
+  Vector list;
+  ObjectSetListModel model;
+
+  class ObjectSetListModel extends AbstractListModel
+  {
+    public java.lang.Object getElementAt(int index)
+    {
+      return list.elementAt(index);
+    }
+
+    public int getSize()
+    {
+      return list.size();
+    }
+
+    void listChanged()
+    {
+      fireContentsChanged(this, 0, list.size());
+    }
+  }
 
   public FtsObjectSet()
   {
     super();
+
+    list = new Vector();
+    model = new ObjectSetListModel();
   }
 
   /** SHould go away !!! */
@@ -43,7 +65,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   public ListModel getListModel()
   {
-    return list;
+    return model;
   }
 
   /* a method inherited from FtsRemoteData */
@@ -84,6 +106,7 @@ public class FtsObjectSet extends FtsRemoteData
 
     remoteCall(REMOTE_FIND, args);
     Fts.sync();
+    model.listChanged();
   }
 
 
@@ -91,6 +114,7 @@ public class FtsObjectSet extends FtsRemoteData
   {
     remoteCall(REMOTE_FIND, values);
     Fts.sync();
+    model.listChanged();
   }
 
 
@@ -98,6 +122,7 @@ public class FtsObjectSet extends FtsRemoteData
   {
     remoteCall(REMOTE_FIND, context, values);
     Fts.sync();
+    model.listChanged();
   }
 
 
@@ -105,6 +130,7 @@ public class FtsObjectSet extends FtsRemoteData
   {
     remoteCall(REMOTE_FIND_ERRORS, context, (Vector) null);
     Fts.sync();
+    model.listChanged();
   }
 
 
@@ -112,6 +138,7 @@ public class FtsObjectSet extends FtsRemoteData
   {
     remoteCall(REMOTE_FIND_FRIENDS, target, (Vector) null);
     Fts.sync();
+    model.listChanged();
   }
 }
 
