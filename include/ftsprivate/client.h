@@ -42,6 +42,26 @@ typedef struct _client_t client_t;
 extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
 extern client_t *object_get_client( fts_object_t *obj);
 
+/** 
+ * Start a pipe connection client 
+ *
+ * @fn int fts_client_pipe_start(void)
+ * 
+ * @return 0 if success, -1 if client object cannot be created
+ * @ingroup client
+ */
+extern int fts_client_pipe_start(void);
+
+/** 
+ * Start a tcp connection client 
+ *
+ * @fn int fts_client_tcp_start(void)
+ * 
+ * @return 0 if success, -1 if client object cannot be created
+ * @ingroup client
+ */
+extern int fts_client_tcp_start(void);
+
 #endif
 
 
