@@ -1,0 +1,4 @@
+2000-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Makefile (jar): fixed missing silk in jar building
+
