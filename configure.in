@@ -61,8 +61,11 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 dnl Check for Java compiler
-dnl AC_PROG_JAVAC
-JAVACX=javac
+AC_TRY_RUN_JAVA
+dnl Check for swing
+AC_CHECK_CLASS(javax.swing.JButton)
+
+JAVACX=$JAVAC
 AC_SUBST(JAVACX)
 JAVACFLAGSX=
 if test "$with_debug" = "yes"
@@ -105,34 +108,7 @@ dnl Set platform specifics
 case "$host" in
 
 dnl GNU/Linux on an Intel or compatible
-i*86-*-linux*)
-PLATFORM=linux
-CFLAGS="$CFLAGS -Wall -Wno-unused -mpentiumpro"
-if test "$with_debug" != "yes"
-then
-  CFLAGS="$CFLAGS -O3 -funroll-loops -fmove-all-movables -fstrict-aliasing"
-fi
-if test "$check_memory" = "yes"
-then
-  CFLAGS="$CFLAGS -fcheck-memory-usage"
-fi
-
-AC_CHECK_HEADER( "alsa/asoundlib.h", alsa_found="yes")
-
-PLATFORM_PACKAGES="oss unixdtd aflib"
-
-if test "x$alsa_found" = "xyes" ; then
-CONFIG_FILE=config_linux_alsa.jmax
-PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
-else
-CONFIG_FILE=config_linux_oss.jmax
-fi
-FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
-ACX_C_RESTRICT
-;;
-
-dnl GNU/Linux on a PowerPC
-powerpc-*-linux-gnu)
+i*86-*-linux*|powerpc-*-linux-gnu)
 PLATFORM=linux
 CFLAGS="$CFLAGS -Wall -Wno-unused"
 if test "$with_debug" != "yes"
@@ -143,10 +119,21 @@ if test "$check_memory" = "yes"
 then
   CFLAGS="$CFLAGS -fcheck-memory-usage"
 fi
+dnl Platform specific CFLAGS
+case "$host" in
+i*86-*-linux*) CFLAGS="$CFLAGS -mpentiumpro" ;;
+esac
 
-PLATFORM_PACKAGES="oss unixdtd aflib"
+PLATFORM_PACKAGES="oss"
 
-CONFIG_FILE=config_linux_oss.jmax
+AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[echo packages unixdtd and aflib will not be build])
+AM_PATH_ALSA(0.9.0,[
+	CONFIG_FILE=config_linux_alsa.jmax
+	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
+],[
+	CONFIG_FILE=config_linux_oss.jmax
+])
+
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
 ACX_C_RESTRICT
 ;;
@@ -216,8 +203,6 @@ tutorials/Makefile
 tutorials/basics/Makefile
 java/src/ircam/jmax/JMaxVersion.java
 java/Makefile
-java/lib/Makefile
-java/lib/jacl/Makefile
 java/src/Makefile
 java/src/ircam/Makefile
 java/src/ircam/jmax/Makefile
