@@ -65,7 +65,10 @@ static void graph_iterator_push( graph_iterator_t *iter, fts_object_t *object, i
   new_elem = (stack_element_t *)fts_heap_zalloc(stack_element_heap);
 
   new_elem->object = object;
-  new_elem->connection = object->out_conn[outlet];
+  if (object->out_conn)
+    new_elem->connection = object->out_conn[outlet];
+  else
+    new_elem->connection = 0;
   new_elem->next = iter->top;
 
   iter->top = new_elem;
