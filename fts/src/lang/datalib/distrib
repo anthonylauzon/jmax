@@ -1,5 +1,7 @@
 src	all	Makefile
 src	all	Sources
+src	all	atomarray.c
+src	all	atomarray.h
 src	all	atomlist.c
 src	all	atomlist.h
 src	all	datalib.c

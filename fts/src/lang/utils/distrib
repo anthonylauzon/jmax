@@ -5,10 +5,14 @@ src	all	floatfuns.h
 src	all	hashtab.c
 src	all	hashtab.h
 src	all	ieeewrap.h
+src	all	intphase.h
 src	all	ramps.c
 src	all	ramps.h
+src	all	ramp_vectors.c
+src	all	ramp_vectors.h
+src	all	srconv.c
+src	all	srconv.h
 src	all	units.c
 src	all	units.h
-src	all	utils.c
 src	all	wto.c
 src	all	wto.h

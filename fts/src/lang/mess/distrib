@@ -1,7 +1,5 @@
 src	all	Makefile
 src	all	Sources
-src	all	array.c
-src	all	array.h
 src	all	atoms.c
 src	all	atoms.h
 src	all	classes.c
