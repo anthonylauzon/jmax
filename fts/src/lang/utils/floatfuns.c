@@ -1,19 +1,7 @@
-/*
- * jMax
- * 
- * Copyright (C) 1999 by IRCAM
- * All rights reserved.
- * 
- * This program may be used and distributed under the terms of the 
- * accompanying LICENSE.
- *
- * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
- * for DISCLAIMER OF WARRANTY.
- * 
- */
 #include "fts.h"
 #include "floatfuns.h"
 #include <math.h>
+#include <assert.h>
 
 static fts_hash_table_t the_fts_ffun_hashtable;
 
@@ -41,40 +29,37 @@ typedef struct _fts_ffun
 } fts_ffun_t;
 
 /* local */
-static fts_ffun_t *
-ffun_get_by_name(fts_symbol_t name)
+static fts_ffun_t *ffun_get_by_name( fts_symbol_t name)
 {
   fts_atom_t a;
 
-  if(fts_hash_table_lookup(&the_fts_ffun_hashtable, name, &a))
-    return fts_get_ptr(&a);
+  if ( fts_hash_table_lookup( &the_fts_ffun_hashtable, name, &a))
+    return fts_get_ptr( &a);
   else
     return 0;
 }
 
-/* insert to table list (append to end) */
-static void
-ffun_insert_tab(fts_ffun_t *ffun, fts_fftab_t *fftab) 
+/* insert to table list ( append to end) */
+static void ffun_insert_tab( fts_ffun_t *ffun, fts_fftab_t *fftab) 
 {
-  if(ffun->tables)
+  if (ffun->tables)
     fftab->next_in_list = ffun->tables;
 
   ffun->tables = fftab;
 }
 
 /* remove from table list */
-static void
-ffun_remove_tab(fts_ffun_t *ffun, fts_fftab_t *fftab)
+static void ffun_remove_tab( fts_ffun_t *ffun, fts_fftab_t *fftab)
 {
-  if(ffun->tables == fftab)
+  if (ffun->tables == fftab)
     ffun->tables = fftab->next_in_list;
   else
     {
       fts_fftab_t *ptr = ffun->tables;
       
-      while(ptr->next_in_list)
+      while ( ptr->next_in_list)
 	{
-	  if(ptr->next_in_list == fftab)
+	  if ( ptr->next_in_list == fftab)
 	    {
 	      ptr->next_in_list = fftab->next_in_list;
 	      break;
@@ -84,93 +69,111 @@ ffun_remove_tab(fts_ffun_t *ffun, fts_fftab_t *fftab)
     }
 }
 
-int
-fts_ffun_exists(fts_symbol_t name)
+int fts_ffun_exists( fts_symbol_t name)
 {
   fts_atom_t a;
 
-  return (fts_hash_table_lookup(&the_fts_ffun_hashtable, name, &a));
+  return (fts_hash_table_lookup( &the_fts_ffun_hashtable, name, &a));
 }
 
-int
-fts_ffun_new(fts_symbol_t name, float (*function)(float))
+int fts_ffun_new( fts_symbol_t name, float (*function)(float))
 {
   fts_atom_t a;
-  fts_ffun_t *ffun = ffun_get_by_name(name);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
   
-  if(ffun)
+  if ( ffun)
     return (ffun->function == function);
   else
     {
-      ffun = fts_malloc(sizeof(fts_ffun_t));
+      ffun = fts_malloc( sizeof( fts_ffun_t));
       ffun->function = function;
       ffun->tables = 0;
       
-      fts_set_ptr(&a, ffun);
-      return fts_hash_table_insert(&the_fts_ffun_hashtable, name, &a);
+      fts_set_ptr( &a, ffun);
+      return fts_hash_table_insert( &the_fts_ffun_hashtable, name, &a);
     }
 }
 
-float
-fts_ffun_eval(fts_symbol_t name, float f)
+float fts_ffun_eval( fts_symbol_t name, float f)
 {
-  fts_ffun_t *ffun = ffun_get_by_name(name);
-  
-  return ffun->function(f);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
+
+  assert( ffun != 0);
+
+  return ffun->function( f);
 }
 
-void
-fts_ffun_fill(fts_symbol_t name, float *out, int size, float min, float max)
+void fts_ffun_fill( fts_symbol_t name, float *out, int size, float min, float max)
 {
   int i;
-  fts_ffun_t *ffun = ffun_get_by_name(name);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
   float step = (max - min) / size;
 
-  if(ffun)
+  assert( ffun != 0);
+
+  if ( ffun)
     {
-      for(i=0; i<=size; i++)
-	out[i] = ffun->function(min + (float)i * step);
+      for( i=0; i<=size; i++)
+	out[i] = ffun->function( min + (float)i * step);
     }
 }
 
-void
-fts_ffun_apply(fts_symbol_t name, float* in, float* out, int size)
+void fts_ffun_apply( fts_symbol_t name, float* in, float* out, int size)
 {
   int i;
-  fts_ffun_t *ffun = ffun_get_by_name(name);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
 
-  if(ffun)
+  assert( ffun != 0);
+
+  if ( ffun)
     {
-      for(i=0; i<size; i++)
-	out[i] = ffun->function(in[i]);
+      for( i=0; i<size; i++)
+	out[i] = ffun->function( in[i]);
     }
 }
 
-fts_float_function_t
-fts_ffun_get_ptr(fts_symbol_t name)
+fts_float_function_t fts_ffun_get_ptr( fts_symbol_t name)
 {
-  fts_ffun_t *ffun = ffun_get_by_name(name);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
 
-  if(ffun)
+  if ( ffun)
     return ffun->function;
   else
     return 0;
 }
 
-void fts_ffuns_init(void)
+#ifdef LINUXPC
+static float sinf( float f)
 {
-  fts_hash_table_init(&the_fts_ffun_hashtable);
+  return (float)sin(f);
+}
+
+static float cosf( float f)
+{
+  return (float)cos(f);
+}
+#endif
+
+void
+fts_ffuns_init( void)
+{
+  fts_hash_table_init( &the_fts_ffun_hashtable);
 
 #ifdef SGI
-  fts_ffun_new(fts_new_symbol("sin"), sinf);
-  fts_ffun_new(fts_new_symbol("cos"), cosf);
-  fts_ffun_new(fts_new_symbol("tan"), tanf);
-  fts_ffun_new(fts_new_symbol("asin"), asinf);
-  fts_ffun_new(fts_new_symbol("acos"), acosf);
-  fts_ffun_new(fts_new_symbol("atan"), atanf);
-  fts_ffun_new(fts_new_symbol("exp"), expf);
-  fts_ffun_new(fts_new_symbol("log"), logf);
-  fts_ffun_new(fts_new_symbol("log10"), log10f);
+  fts_ffun_new( fts_new_symbol( "sin"), sinf);
+  fts_ffun_new( fts_new_symbol( "cos"), cosf);
+  fts_ffun_new( fts_new_symbol( "tan"), tanf);
+  fts_ffun_new( fts_new_symbol( "asin"), asinf);
+  fts_ffun_new( fts_new_symbol( "acos"), acosf);
+  fts_ffun_new( fts_new_symbol( "atan"), atanf);
+  fts_ffun_new( fts_new_symbol( "exp"), expf);
+  fts_ffun_new( fts_new_symbol( "log"), logf);
+  fts_ffun_new( fts_new_symbol( "log10"), log10f);
+#elif defined( LINUXPC)
+  fts_ffun_new( fts_new_symbol( "sin"), sinf);
+  fts_ffun_new( fts_new_symbol( "cos"), cosf);
+#else
+#error No floatfuns.
 #endif
 }
 
@@ -183,18 +186,18 @@ void fts_ffuns_init(void)
 
 /* match by size, min and max in table list */
 static float *
-fftab_match(fts_fftab_t *list, int size, float min, float max, float tolerance) 
+fftab_match( fts_fftab_t *list, int size, float min, float max, float tolerance) 
 {
   fts_fftab_t *fftab = list;
   float step = (max - min) / size;
   float margin = tolerance * step; /* one percent of the step */
 
-  while(fftab)
+  while (fftab)
     {
       float fftab_step = (fftab->max - fftab->min) / fftab->size;
 
-      if(size <= fftab->size && 
-         fabs(size * step - size * fftab_step) < margin &&
+      if (size <= fftab->size && 
+         fabs( size * step - size * fftab_step) < margin &&
          min + 0.5 * margin >= fftab->min &&
          max - 0.5 * margin <= fftab->max)
 	return fftab->values + (int)(fftab->min - min + 0.5 * margin);
@@ -206,32 +209,32 @@ fftab_match(fts_fftab_t *list, int size, float min, float max, float tolerance)
 }
 
 static void
-fftab_fill(fts_fftab_t *fftab, fts_ffun_t *ffun, int size, float min, float max)
+fftab_fill( fts_fftab_t *fftab, fts_ffun_t *ffun, int size, float min, float max)
 {
   float step = (max - min) / size;
   int i;
   
-  for(i=0; i<=size; i++)
-    fftab->values[i] = ffun->function(min + (float)i * step);      
+  for( i=0; i<=size; i++)
+    fftab->values[i] = ffun->function( min + (float)i * step);      
 }
 
 /* new / delete */
 
 static fts_fftab_t *
-fftab_new(fts_ffun_t *ffun, int size, float min, float max)
+fftab_new( fts_ffun_t *ffun, int size, float min, float max)
 {
   fts_fftab_t *fftab;
   
-  fftab = (fts_fftab_t *)fts_malloc(sizeof(fts_fftab_t));
-  fftab->values = (float *)fts_malloc(sizeof(float) * (size + 1));
+  fftab = (fts_fftab_t *)fts_malloc( sizeof(fts_fftab_t));
+  fftab->values = (float *)fts_malloc( sizeof( float) * (size + 1));
 
-  if(min < max)
+  if (min < max)
     {
       fftab->min = min;
       fftab->max = max;
       fftab->scale = size / (max - min);
     }
-  else if(max > min)
+  else if (max > min)
     {
       fftab->min = max;
       fftab->max = min;
@@ -249,29 +252,32 @@ fftab_new(fts_ffun_t *ffun, int size, float min, float max)
   return fftab;
 }
 
-static void fftab_delete(fts_fftab_t *fftab)
+void
+fftab_delete( fts_fftab_t *fftab)
 {
-  fts_free(fftab->values);
-  fts_free(fftab);
+  fts_free( fftab->values);
+  fts_free( fftab);
 }
 
 /* get (or create) table for existing function */
 float *
-fts_fftab_get(fts_symbol_t name, int size, float min, float max)
+fts_fftab_get( fts_symbol_t name, int size, float min, float max)
 {
-  fts_ffun_t *ffun = ffun_get_by_name(name);
+  fts_ffun_t *ffun = ffun_get_by_name( name);
     
-  if(ffun)
-    {
-      float *tab = fftab_match(ffun->tables, size, min, max, 0.01f);
+  assert( ffun != 0);
 
-      if(!tab)
+  if (ffun)
+    {
+      float *tab = fftab_match( ffun->tables, size, min, max, 0.01f);
+
+      if (!tab)
 	{
 	  float step = (max - min) / size;
-	  fts_fftab_t *fftab = fftab_new(ffun, size, min, max);
+	  fts_fftab_t *fftab = fftab_new( ffun, size, min, max);
 
-	  fftab_fill(fftab, ffun, size, min, max);
-	  ffun_insert_tab(ffun, fftab);
+	  fftab_fill( fftab, ffun, size, min, max);
+	  ffun_insert_tab( ffun, fftab);
 	  tab = fftab->values;
 	}
 
@@ -282,90 +288,90 @@ fts_fftab_get(fts_symbol_t name, int size, float min, float max)
 }
 
 float *
-fts_fftab_get_sine(int size)
+fts_fftab_get_sine( int size)
 {
-  return fts_fftab_get(fts_new_symbol("sin"), (5 * size / 4), (0.0f), (5 * 6.2831853f / 4));
+  return fts_fftab_get( fts_new_symbol( "sin"), (5 * size / 4), (0.0f), (5 * 6.2831853f / 4));
 }
 
 float *
-fts_fftab_get_sine_first_half(int size)
+fts_fftab_get_sine_first_half( int size)
 {
-  return fts_fftab_get_sine(2 * size);
+  return fts_fftab_get_sine( 2 * size);
 }
 
 float *
-fts_fftab_get_sine_second_half(int size)
+fts_fftab_get_sine_second_half( int size)
 {
-  float *tab = fts_fftab_get_sine(2 * size);
+  float *tab = fts_fftab_get_sine( 2 * size);
 
-  if(tab)
+  if (tab)
     return tab + size;
   else
     return 0;
 }
 
 float *
-fts_fftab_get_sine_first_quarter(int size)
+fts_fftab_get_sine_first_quarter( int size)
 {
-  return fts_fftab_get_sine(4 * size);
+  return fts_fftab_get_sine( 4 * size);
 }
 
 float *
-fts_fftab_get_sine_second_quarter(int size)
+fts_fftab_get_sine_second_quarter( int size)
 {
-  float *tab = fts_fftab_get_sine(4 * size);
+  float *tab = fts_fftab_get_sine( 4 * size);
 
-  if(tab)
+  if (tab)
     return tab + size;
   else
     return 0;
 }
 
 float *
-fts_fftab_get_sine_third_quarter(int size)
+fts_fftab_get_sine_third_quarter( int size)
 {
-  float *tab = fts_fftab_get_sine(4 * size);
+  float *tab = fts_fftab_get_sine( 4 * size);
 
-  if(tab)
+  if (tab)
     return tab + 2 * size;
   else
     return 0;
 }
 
 float *
-fts_fftab_get_sine_fourth_quarter(int size)
+fts_fftab_get_sine_fourth_quarter( int size)
 {
-  float *tab = fts_fftab_get_sine(4 * size);
+  float *tab = fts_fftab_get_sine( 4 * size);
 
-  if(tab)
+  if (tab)
     return tab + 3 * size;
   else
     return 0;
 }
 
 float *
-fts_fftab_get_cosine(int size)
+fts_fftab_get_cosine( int size)
 {
-  float *tab = fts_fftab_get_sine(size);
+  float *tab = fts_fftab_get_sine( size);
 
-  if(tab)
+  if ( tab)
     return tab + (size / 4); /* return phase shifted sine as cosine */
   else
     return 0;
 }
 
 float *
-fts_fftab_get_cosine_first_half(int size)
+fts_fftab_get_cosine_first_half( int size)
 {
-  return fts_fftab_get_cosine(2 * size);
+  return fts_fftab_get_cosine( 2 * size);
 }
 
 float *
-fts_fftab_get_cosine_second_half(int size)
+fts_fftab_get_cosine_second_half( int size)
 {
-  float *tab = fts_fftab_get_cosine(2 * size);
+  float *tab = fts_fftab_get_cosine( 2 * size);
 
-  if(tab)
+  if (tab)
     return tab + size;
   else
     return 0;
