@@ -338,7 +338,9 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 	      l = ( l > 0 ) ? l - 1 : 0;
 	      currentText.setLength( l);
 	    }
-	  break;
+            break;
+          case KeyEvent.VK_SHIFT:
+            break;
 	  case KeyEvent.VK_NUMPAD0:
 	    currentText.append("0");
 	    break;
