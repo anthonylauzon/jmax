@@ -9,9 +9,11 @@ BuildRoot: /var/tmp/jmax-%{version}-root
 Provides: %{name}-common = %{version}, %{name}-java = %{version}
 
 # gnome and kde menu
-%define _gnome_menu_dir /usr/share/gnome/apps/Multimedia
-%define _kde_menu_dir /usr/share/applnk/Multimedia
 %define _pixmaps_dir /usr/share/pixmaps
+
+%define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
+
+%define vendor_name ircam
 
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
@@ -73,17 +75,23 @@ find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" 
 # for global rpm (without jack support)
 cat /var/tmp/rpm.jmax.java.list /var/tmp/rpm.jmax.common.list >> /var/tmp/rpm.jmax.global.list
 
-# gnome menu
-mkdir -p $RPM_BUILD_ROOT%{_gnome_menu_dir}
-install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_gnome_menu_dir}
-
-#kde menu
-mkdir -p $RPM_BUILD_ROOT%{_kde_menu_dir}
-install -c -m 644 ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_kde_menu_dir}
 
 # jMax icons
 mkdir -p $RPM_BUILD_ROOT%{_pixmaps_dir}
 install -c -m 644 ./images/jmax_icon_48x48.png $RPM_BUILD_ROOT%{_pixmaps_dir}/jmax_icon.png
+
+%if "%{desktop_utils}" == "yes"
+  mkdir -p %{buildroot}%{_datadir}/applications
+  desktop-file-install --vendor %{vendor_name}  \
+    --dir %{buildroot}%{_datadir}/applications    \
+    --add-category X-Red-Hat-Base                 \
+    --add-category Application                    \
+    --add-category AudioVideo                     \
+    ./utils/linux_desktop/%{name}.desktop
+%else
+  install -d $RPM_BUILD_ROOT%{_sysconfdir}/X11/applnk/Multimedia
+  install ./utils/linux_desktop/%{name}.desktop $RPM_BUILD_ROOT%{_sysconfdir}/X11/applnk/Multimedia/
+%endif
 
 
 %clean
@@ -98,8 +106,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
-%{_kde_menu_dir}/*
-%{_gnome_menu_dir}/*
+%if "%{desktop_utils}" == "yes"
+%{_datadir}/applications/%{vendor_name}-%{name}.desktop
+%else
+%attr(644,root,root) %{_sysconfdir}/X11/applnk/Multimedia/%{name}.desktop
+%endif
 %{_pixmaps_dir}/*
 
 
@@ -133,6 +144,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/jmax/packages/jack
 
 %changelog
+* Wed Mar  5 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- add jMax in RedHat 8.0 menu
 * Mon Mar  3 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - add icon for jMax in KDE and GNOME menus
 - add suid flag for %{_bindir}/fts
