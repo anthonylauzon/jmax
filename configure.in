@@ -329,6 +329,81 @@ AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
+
+dnl ###########################################################################
+dnl choice of MidiShare package
+with_midishare="no"
+AC_ARG_ENABLE(midishare, dnl newline and indentation:
+[ 
+  --enable-midishare[=value]	compile midishare package [default=no]],
+  with_midishare="$enableval",
+  with_midishare="no")
+
+
+dnl options to find JACK header and JACK library 
+AC_ARG_WITH(midishare-cflags,
+  [  --with-midishare-cflags=MIDISHARE_CFLAGS	MidiShare support cflags (optional)],
+  [MIDISHARE_CFLAGS="$withval";
+  with_midishare="yes";]
+  )
+
+AC_ARG_WITH(midishare-ldflags,
+  [  --with-midishare-ldflags=MIDISHARE_LDFLAGS	Midishare support ldflags (optional)],
+  [MIDISHARE_LDFLAGS="$withval";
+  with_midishare="yes";],
+  MIDISHARE_LDFLAGS="-lMidiShare"
+  )
+
+HAVE_LIB_JACK="false"
+dnl output MidiShare feature
+if test "$with_midishare" = "yes"
+then
+	dnl Store current value of CPPFLAGS, CFLAGS, CXXFLAGS and LDFLAGS
+	tmp_CPPFKLAGS="$CPPFLAGS"
+	tmp_CFLAGS="$CFLAGS"
+	tmp_CXXFLAGS="$CXXFLAGS"
+	tmp_LDFLAGS="$LDFLAGS"
+	tmp_LIBS="$LIBS"
+
+	dnl Set new value of CPPFLAGS, CFLAGS, CXXFLAGS and LDFLAGS
+	CPPFLAGS="$MIDISHARE_CFLAGS"
+	LDFLAGS="$MIDISHARE_LDFLAGS"
+	LIBS="$MIDISHARE_LDFLAGS"
+
+	dnl check if jack headeris installed
+	AC_CHECK_HEADER(MidiShare.h, dnl header to check
+	[HAVE_MIDISHARE_H="true"],         dnl action-if-found
+	[HAVE_MIDISHARE_H="false"])        dnl action-if-not-found
+	dnl Check result value of test
+	if test "$HAVE_MIDISHARE_H" != "true"; then
+	   AC_MSG_ERROR([*** Midishare.h not found ***])
+	fi
+
+	dnl check if MidiShare library is installed
+	AC_CHECK_LIB(MidiShare,MidiCountEvs,
+	[ HAVE_LIB_MIDISHARE="true"],
+	[ HAVE_LIB_MIDISHARE="false"])
+	dnl Check result value of test
+	if test "$HAVE_LIB_MIDISHARE" != "true"; then
+	   AC_MSG_ERROR([*** MidiShare library not found ***])
+	fi
+
+	dnl Reset value of CPPFLAGS, CFLAGS, CXXFLAGS and LDFLAGS
+	CPPFLAGS="$tmp_CPPFKLAGS"
+	CFLAGS="$tmp_CFLAGS"
+	CXXFLAGS="$tmp_CXXFLAGS"
+	LDFLAGS="$tmp_LDFLAGS"
+	LIBS="$tmp_LIBS"
+fi
+		
+dnl Add jack in packages to compile	
+AM_CONDITIONAL(COND_COMPILE_MIDISHARE, test "$HAVE_LIB_MIDISHARE" = "true")	
+
+AC_SUBST(MIDISHARE_CFLAGS)
+AC_SUBST(MIDISHARE_LDFLAGS)
+
+
+
 AC_SUBST(DEFAULT_CONFIG_FILE)
 
 dnl Check for doxygen
@@ -466,6 +541,9 @@ packages/midi/c/Makefile
 packages/midi/c/src/Makefile
 packages/midi/help/Makefile
 packages/midi/winbuild/Makefile
+packages/midishare/Makefile
+packages/midishare/c/Makefile
+packages/midishare/c/src/Makefile
 packages/mmio/Makefile
 packages/mmio/c/Makefile
 packages/mmio/c/src/Makefile
