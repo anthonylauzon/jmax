@@ -728,18 +728,30 @@ public class ErmesSketchPad extends JPanel
   public void setRunModeInteraction()
   {
     stopTextEditing();
+    toolBar.reset();
     engine.setTopInteraction(Interactions.runModeInteraction);
   }
 
   public void setEditModeInteraction()
   {
+    toolBar.reset();
     engine.setTopInteraction(Interactions.editModeInteraction);
   }
 
-  public void setAddModeInteraction()
+  String newObjectDescription = null;
+
+  public void setAddModeInteraction(String description)
   {
+    newObjectDescription = description;
+
     stopTextEditing();
+    setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
     engine.setTopInteraction(Interactions.addModeInteraction);
+  }
+
+  public void makeAddModeObject(int x, int y)
+  {
+    makeObject(newObjectDescription, x, y);
   }
 
   public  InteractionEngine getEngine()

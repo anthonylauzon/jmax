@@ -61,7 +61,8 @@ public class AddPopUp extends JPopupMenu
       menu    = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
       invoker = ((JPopupMenu) menu.getParent()).getInvoker();
 
-      ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
+      ((ErmesSketchPad) invoker).setAddModeInteraction(descr);
+      // ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
     }
   };
 
@@ -71,32 +72,6 @@ public class AddPopUp extends JPopupMenu
 
   public AddPopUp()
   {
-    insertButtons();
-  }
-
-  private void addButton(String descr, String iconName)
-  {
-    JMenuItem item;
-
-    item = new JMenuItem(Icons.get(iconName));
-    item.addActionListener(new AddPopUpListener(descr, this));
-    add(item);
-  }
-
-
-  private void insertButtons()
-  {
-    addButton("", "_object_");
-    addButton("messbox", "_message_box_");
-    addButton("jpatcher", "_patcher_");
-    addButton("inlet -1", "_inlet_");
-    addButton("outlet -1","_outlet_");
-    addButton("comment", "_comment_");
-    addButton("button",  "_button_");
-    addButton("toggle",  "_toggle_");
-    addButton("slider",  "_slider_");
-    addButton("intbox",   "_intbox_");
-    addButton("floatbox", "_floatbox_");
   }
 
   static public void popup(Component invoker, int x, int y)

@@ -104,7 +104,7 @@ public class ErmesToolBar extends JPanel  {
 	  selectedButton.setSelected(false);
 
 	selectedButton = button;
-	sketch.setAddModeInteraction();
+	sketch.setAddModeInteraction(selectedButton.getDescription());
       }
     else
       {
@@ -113,15 +113,10 @@ public class ErmesToolBar extends JPanel  {
       }
   }
 
-  boolean isActive()
-  {
-    return selectedButton != null;
-  }
-
-  public void makeObject(int x, int y)
+  public void reset()
   {
     if (selectedButton != null)
-      selectedButton.makeObject(sketch, x, y);
+      selectedButton.setSelected(false);
   }
 
   protected void setLocked( boolean locked)

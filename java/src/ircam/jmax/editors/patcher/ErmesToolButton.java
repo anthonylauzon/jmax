@@ -29,10 +29,9 @@ class ErmesToolButton extends JToggleButton
 		      });
   }
 
-  void makeObject(ErmesSketchPad sketch, int x, int y)
+  String getDescription()
   {
-    sketch.makeObject(description, x, y);
-    setSelected(false);
+    return description;
   }
 }
 
