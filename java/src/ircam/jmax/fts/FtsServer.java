@@ -937,9 +937,10 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug)
+    if (FtsServer.debug) 
       System.err.println( "remoteCall(" + data +
-			  ", " + key + ", " + offset + ", " + size + ", " + values + ")");
+			  ", " + key + ", " + offset + ", " + size + ", " + values 
+			  + "[" + values.length + "]" + ")");
 
     try
       {
@@ -948,7 +949,7 @@ public class FtsServer
 	port.sendInt(key);
 	port.sendInt(offset);
 	port.sendInt(size);
-	port.sendArray(values, offset, offset + size);
+	port.sendArray(values, offset, size);
 	port.sendEom();
       }
     catch (java.io.IOException e)

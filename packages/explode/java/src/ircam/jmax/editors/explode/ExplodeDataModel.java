@@ -73,6 +73,9 @@ public interface ExplodeDataModel {
   public abstract void removeEvent(ScrEvent theEvent);
 
 
+  /*
+   */
+
   /**
    * requires to be notified when the database changes
    */

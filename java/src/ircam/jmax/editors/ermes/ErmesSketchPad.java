@@ -921,7 +921,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     itsTextArea.setLocation(-200,-200);
 
     setBackground(sketchColor);
-    addMouseMotionListener(this);
+    addMouseMotionListener(this); 
     addMouseListener(this);
     addKeyListener(itsSketchWindow);
 

@@ -106,6 +106,7 @@ public class ScrEvent {
   }
 
   //------------ Fields
+
   int itsTime;
   int itsPitch;
   int itsVelocity;

@@ -144,7 +144,9 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 
   public void mouseReleased(MouseEvent e){
     itsTabler.itsData.changed();
-    itsTabler.itsData.forceUpdate();
+
+    // You don't need a forceUpdate here
+    // itsTabler.itsData.forceUpdate();
   }
 
   public void mouseEntered(MouseEvent e){}

@@ -73,7 +73,8 @@ get_or_create_receive_list(fts_symbol_t name)
   receive_list_t *t;
 
   if (name == 0)
-    return;
+    return 0;
+
 
   if (fts_hash_table_lookup(&receive_list_table, name, &d))
     {

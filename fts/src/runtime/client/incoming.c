@@ -115,6 +115,10 @@ double_av(void)
 
   for (i = 0; i < parser.av_size; i++)
     new_av[i] = parser.av[i];
+
+  fts_free(parser.av);
+  parser.av = new_av;
+  parser.av_size = new_size;
 }
 
 static void
@@ -129,6 +133,10 @@ double_buf(void)
 
   for (i = 0; i < parser.buf_size; i++)
     new_buf[i] = parser.buf[i];
+
+  fts_free(parser.buf);
+  parser.buf = new_buf;
+  parser.buf_size = new_size;
 }
      
 

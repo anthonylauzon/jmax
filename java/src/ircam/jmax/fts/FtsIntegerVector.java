@@ -92,9 +92,9 @@ public class FtsIntegerVector extends FtsRemoteData
    * and this range need to be sent to FTS
    */
 
-  public void changed(int from, int to)
+  public void changed(int from, int howMany)
   {
-    remoteCall(REMOTE_SET, from, to - from + 1, values);
+    remoteCall(REMOTE_SET, from, howMany, values);
   }
 
   /** Declare that a value in the vector has been changed
@@ -103,7 +103,7 @@ public class FtsIntegerVector extends FtsRemoteData
 
   public void changed(int idx)
   {
-    changed(idx, idx);
+    changed(idx, 1);
   }
 
   /** Declare that all the  values in the vector has been changed
@@ -113,7 +113,7 @@ public class FtsIntegerVector extends FtsRemoteData
 
   public void changed()
   {
-    changed(0, values.length - 1);
+    changed(0, values.length);
   }
 
   /* a method inherited from FtsRemoteData */

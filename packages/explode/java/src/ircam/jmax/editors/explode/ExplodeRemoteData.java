@@ -194,14 +194,60 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	    args[0] = new Integer(removeIndex);
 	    remoteCall(REMOTE_REMOVE, args);
 
+
 	    notifyListeners(OBJECT_DELETED, event);
 	  }
       }
   }
 
   /**
+   *  Signal FTS that an object is changed 
+   */
+
+  public void changeEvent(ScrEvent event)
+  {
+    int index;
+
+    // Linear search: a binary search would not
+    // work because we can have multiple events
+    // with the same key (time).
+
+    for (index = 0 ; index < events_fill_p; index++)
+      {
+	if (events[removeIndex] == event)
+	  {
+	    // Send the change command to fts
+
+	    Object args[] = new Object[6];
+
+	    args[0] = new Integer(index);
+	    args[1] = new Integer(event.getTime());
+	    args[2] = new Integer(event.getPitch());
+	    args[3] = new Integer(event.getVelocity());
+	    args[4] = new Integer(event.getDuration());
+	    args[5] = new Integer(event.getSomething());
+
+	    remoteCall(REMOTE_CHANGE, args);
+
+	    notifyListeners(OBJECT_DELETED, event);
+	  }
+      }
+
+  /**
+   *  Signal FTS that an object is moved, and move it
+   * in the data base; moving means changing the "index"
+   * value, i.e. its time.
+   */
+
+  public void moveEvent(ScrEvent event)
+  {
+  }
+
+
+  /**
    * utility to notify the data base change to all the listeners
    */
+
  private void notifyListeners(int cause, Object spec)
   {
     ExplodeDataListener el;

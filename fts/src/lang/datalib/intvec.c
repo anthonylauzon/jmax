@@ -337,7 +337,7 @@ static void fts_intvec_export_fun(fts_data_t *d)
  * No checks here, correctness by design.
  */
 
-static void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
+/*static */ void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_intvec_t *this = (fts_intvec_t *)d;
   int offset;
@@ -358,7 +358,7 @@ static void fts_intvec_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
 }
 
 
-static void fts_intvec_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
+/*static */ void fts_intvec_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_intvec_t *this = (fts_intvec_t *)d;
   int i;
