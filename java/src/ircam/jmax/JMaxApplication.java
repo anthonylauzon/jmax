@@ -246,8 +246,8 @@ public class JMaxApplication {
     closeAllWindows( doTheSave);
 
     //Look if current project needs to be saved
-    //if( getProject().isDirty())
-    getProject().save( null);	
+    if( getProject().isDirty())
+      getProject().save( null);	
 
     //Look if current midi configuration needs to be saved
     if( getMidiManager().isDirty() && ( getMidiManager().getFileName() != null))

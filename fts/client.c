@@ -869,9 +869,6 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   dir_name = (char *)alloca( strlen( file_name) + 1);
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
-  fts_package_add_template_path( fts_project_get(), fts_new_symbol( dir_name));
-  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol( dir_name));
-  fts_package_add_data_path( fts_project_get(), fts_new_symbol( dir_name));
 
   /*
     We change the working directory so that it is the directory of the
@@ -940,7 +937,6 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
       fts_client_send_message(o, fts_s_project, 1, a);
       
       fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0);
-      fts_send_message( (fts_object_t *)project, fts_s_openEditor, 0, 0);
     }
 }
 

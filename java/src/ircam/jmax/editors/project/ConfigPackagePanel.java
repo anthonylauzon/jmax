@@ -993,6 +993,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
   public void save()
   {
+    ProjectEditor.saveWindows();
     ftsPkg.save( null);
   }
 

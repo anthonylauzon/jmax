@@ -93,7 +93,8 @@ public class FtsPackage extends FtsObjectWithEditor
       });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
-	{
+	
+{
 	  ((FtsPackage)obj).uploadDone();
 	}
       });

@@ -261,6 +261,27 @@ public class ProjectEditor extends JFrame implements EditorContainer
     JMaxApplication.getProject().save( null);
   }
 
+  public static void saveWindows()
+  {
+    ListModel windows = MaxWindowManager.getWindowManager().getWindowList();
+    Vector fileNames = new Vector();
+    Frame win;
+    FtsPatcherObject patcher;
+    
+  search: for (int i = 0; i < windows.getSize(); i++)
+    {
+      win = (Frame) windows.getElementAt(i);
+      if( win instanceof ErmesSketchWindow)
+	{
+	  patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+	  if( patcher.getName() != null)
+	    fileNames.add( patcher.getName());
+	}
+    }
+    if( fileNames.size() > 0)
+      JMaxApplication.getProject().saveWindows( fileNames.elements());
+  }
+
   /****************** Packages ***********************************/
   public static void newPackage( Frame frame)
   {

@@ -508,10 +508,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     if (windowWidth != value)
       {
 	windowWidth = value;
-
+	
 	args.clear();
 	args.addInt(windowWidth);
-      
+	
 	try{
 	  send( FtsSymbol.get("set_ww"), args);
 	}
