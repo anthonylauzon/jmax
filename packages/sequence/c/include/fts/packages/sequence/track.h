@@ -32,9 +32,6 @@ struct _track_
 { 
   fts_object_t o;
 
-  struct _sequence_ *sequence; /* sequence of track */
-  track_t *next; /* list of tracks in sequence */
-
   int active; /* active flag */
   int open; /* flag: is 1 if track editor is open */
 
@@ -53,14 +50,8 @@ struct _track_
   track_t *markers;
 };
 
-/* for sequence */
-#define track_get_next(t) ((t)->next)
-
 #define track_get_name(t) (NULL)
 #define track_set_name(t, n)
-
-#define track_set_sequence(t, s) ((t)->sequence = (s))
-#define track_get_sequence(t) ((t)->sequence)
 
 #define track_get_type(t) ((t)->type)
 #define track_get_first(t) ((t)->first)
@@ -76,7 +67,7 @@ struct _track_
 
 #define track_set_editor_open(t) ((t)->open = 1)
 #define track_set_editor_close(t) ((t)->open = 0)
-#define track_editor_is_open(t) (((t)->sequence && sequence_editor_is_open((t)->sequence)) || ((!(t)->sequence) && ((t)->open != 0)))
+#define track_editor_is_open(t) ((t)->open != 0)
 
 #define track_set_markers(t, m) ((t)->markers = (m))
 #define track_get_markers(t) ((t)->markers)

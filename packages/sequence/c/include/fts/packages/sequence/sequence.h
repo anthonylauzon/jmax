@@ -60,9 +60,21 @@ typedef struct _sequence_
 #define sequence_get_keep(s) ((s)->keep)
 #define sequence_is_keeping(s) ((s)->keep == fts_s_yes)
 
-#define sequence_set_editor_open(s) ((s)->open = 1)
-#define sequence_set_editor_close(s) ((s)->open = 0)
+SEQUENCE_API void sequence_set_editor_open(sequence_t *sequence);
+SEQUENCE_API void sequence_set_editor_close(sequence_t *sequence);
 #define sequence_editor_is_open(s) ((s)->open != 0)
+
+typedef struct
+{
+	sequence_t *container;
+  track_t *next; /* list of tracks in sequence */
+} sequence_context_t;
+
+#define sequence_track_get_container(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container)
+#define sequence_track_set_container(t, s) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container = (s))
+
+#define sequence_track_get_next(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->next)
+#define sequence_track_set_next(t, n) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->next = (n))
 
 SEQUENCE_API void sequence_add_track(sequence_t *sequence, track_t *track);
 SEQUENCE_API void sequence_remove_track(sequence_t *sequence, track_t *track);
@@ -72,5 +84,7 @@ SEQUENCE_API track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbo
 SEQUENCE_API track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 
 SEQUENCE_API void sequence_config(void);
+
+
 
 #endif

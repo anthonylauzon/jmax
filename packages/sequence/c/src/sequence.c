@@ -39,7 +39,7 @@ sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
   track_t *track = sequence->tracks;
 
   while(track && track_get_name(track) != name)
-    track = track_get_next(track);
+    track = sequence_track_get_next(track);
 
   return track;
 }
@@ -54,7 +54,7 @@ sequence_get_track_by_index(sequence_t *sequence, int index)
     track = sequence->tracks;
 
     while(track && index--)
-      track = track_get_next(track);
+      track = sequence_track_get_next(track);
   }
 
   return track;
@@ -63,24 +63,26 @@ sequence_get_track_by_index(sequence_t *sequence, int index)
 static void
 sequence_insert_track(sequence_t *sequence, track_t *here, track_t *track)
 {
-  if(!here)
+	sequence_context_t *context = (sequence_context_t *)fts_object_get_context((fts_object_t *)track);
+		
+  if(here == NULL)
   {
     /* first track */
-    track_get_next(track) = sequence->tracks;
+		context->next = sequence->tracks;
     sequence->tracks = track;
-    sequence->size = 1;
+    sequence->size++;
   }
   else
   {
     /* insert after track here */
-    track_get_next(track) = here->next;
-    here->next = track;
+		context->next = sequence_track_get_next(here);
+    sequence_track_set_next(here, track);
     sequence->size++;
   }
 
   fts_object_refer((fts_object_t *)track);
 
-  track_set_sequence(track, sequence);
+  sequence_track_set_container(track, sequence);
 }
 
 void
@@ -88,8 +90,8 @@ sequence_add_track(sequence_t *sequence, track_t *track)
 {
   track_t *last = sequence->tracks;
 
-  while(last && last->next)
-    last = last->next;
+  while(last && sequence_track_get_next(last))
+    last = sequence_track_get_next(last);
 
   sequence_insert_track(sequence, last, track);
 }
@@ -100,7 +102,7 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
   if(track == sequence->tracks)
   {
     /* first track */
-    sequence->tracks = track_get_next(track);
+    sequence->tracks = sequence_track_get_next(track);
     sequence->size--;
 
     fts_object_release((fts_object_t *)track);
@@ -108,17 +110,17 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
   else
   {
     track_t *prev = sequence->tracks;
-    track_t *this = track_get_next(prev);
+    track_t *this = sequence_track_get_next(prev);
 
     while(this && this != track)
     {
       prev = this;
-      this = this->next;
+      this = sequence_track_get_next(this);
     }
 
     if(this)
     {
-      prev->next = this->next;
+      sequence_track_set_next(prev, sequence_track_get_next(this));
       sequence->size--;
 
       fts_object_release((fts_object_t *)track);
@@ -190,7 +192,7 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);/* to create trackeditor */
 
     /* next track */
-    track = track_get_next(track);
+    track = sequence_track_get_next(track);
   }
 }
 
@@ -198,7 +200,6 @@ static void
 sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-	track_t *track;
 	
   sequence_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
@@ -222,6 +223,34 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   {
     sequence_set_editor_close(this);
     fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);
+  }
+}
+
+void 
+sequence_set_editor_open(sequence_t *sequence)
+{
+  track_t *track = sequence_get_first_track(sequence);
+
+  sequence->open = 1;
+  
+  while(track != NULL)
+  {
+    track_set_editor_open(track);
+    track = sequence_track_get_next(track);
+  }
+}
+
+void 
+sequence_set_editor_close(sequence_t *sequence)
+{
+  track_t *track = sequence_get_first_track(sequence);
+  
+  sequence->open = 0;
+  
+  while(track != NULL)
+  {
+    track_set_editor_close(track);
+    track = sequence_track_get_next(track);
   }
 }
 
@@ -351,7 +380,7 @@ sequence_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       else
         fts_spost(stream, " -");
 
-      track = track_get_next(track);
+      track = sequence_track_get_next(track);
     }
 
     fts_spost(stream, ">");
@@ -393,7 +422,7 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       else
         fts_spost(stream, "  track %d: \"%s\" %d event(s)\n", i, name_str, track_size);
 
-      track = track_get_next(track);
+      track = sequence_track_get_next(track);
     }
 
     fts_spost(stream, "}\n");
@@ -424,6 +453,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   if(sequence_editor_is_open(this))
   {
+    track_set_editor_open(track);
     sequence_add_track_at_client(this, track);
     fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
 		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
@@ -504,7 +534,7 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     
     /* write track events */
     track_dump_state((fts_object_t *)track, 0, 0, 1, at);
-    track = track_get_next(track);
+    track = sequence_track_get_next(track);
   }
 }
 
