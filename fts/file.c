@@ -204,15 +204,15 @@ fts_find_file_aux(const char* root, const char* path, const char* filename, char
       fts_make_absolute_path(root, path, newroot, MAXPATHLEN);
       fts_make_absolute_path(newroot, filename, buf, len);
     } else {
-      snprintf(newroot, "%s", root);
+      snprintf(newroot, MAXPATHLEN, "%s", root);
       fts_make_absolute_path(newroot, filename, buf, len);
     }
   } else {
     if (path != NULL) {
-      snprintf(newroot, "%s", path);
+      snprintf(newroot, MAXPATHLEN, "%s", path);
       fts_make_absolute_path(newroot, filename, buf, len);
     } else {
-      snprintf(buf, "%s", filename);      
+      snprintf(buf, len, "%s", filename);      
     }
   }
 
