@@ -25,4 +25,6 @@
 
 FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
 
+FTS_API void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at);
+
 #endif

@@ -28,6 +28,7 @@
 ;;
 
 ; new classes
+(require-package "utils" "0.0.0")
 (require-package "data" "0.0.0")
 (require-package "control" "0.0.0")
 (require-package "mess" "0.0.0")

@@ -29,6 +29,7 @@
 ##
 
 # new classes
+package require utils
 package require data
 package require control
 package require mess
