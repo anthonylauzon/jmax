@@ -234,6 +234,7 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), seqobj_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_add"), seqobj_track_add);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_remove"), seqobj_track_remove);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), seqobj_event_new);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_remove"), seqobj_event_remove);
 

@@ -56,7 +56,7 @@ void
 sequence_event_init(sequence_event_t *event, float time, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
   sequence_event_set_time(event, time);
-  sequence_event_set_value(event, selector, ac - 3, at + 3);
+  sequence_event_set_value(event, selector, ac, at);
 }
 
 void
