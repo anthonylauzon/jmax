@@ -89,7 +89,7 @@ proc openDefaultMidi  { device } {
     global jmaxDeviceDoc
 
     puts "Opening default midi port: $jmaxDeviceDoc($device)"
-    eval [concat " ucs open device midi 0 as " jmaxDeviceTable($device) ]
+    eval [concat " ucs open device midi 0 as " $jmaxDeviceTable($device) ]
 }
 
 ##
