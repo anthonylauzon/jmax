@@ -55,15 +55,6 @@ fts_definition_new(fts_symbol_t name)
   return def;
 }
 
-static void
-define_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  int descr_ac = fts_object_get_description_size(o);
-  fts_atom_t *descr_at = fts_object_get_description_atoms(o);
-  
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), descr_ac - 2, descr_at + 2);
-}
-
 fts_definition_t *
 fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -316,31 +307,20 @@ typedef struct
   fts_expression_t *expression;
 } define_t;
 
-static fts_symbol_t sym_type = 0;
+static fts_symbol_t sym_valid = 0;
+static fts_symbol_t sym_expression = 0;
 static fts_symbol_t sym_const = 0;
 static fts_symbol_t sym_arg = 0;
 static fts_symbol_t sym_args = 0;
 
-static void
-define_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_memorystream_t *define_memory_stream ;
+
+static fts_memorystream_t * define_get_memory_stream()
 {
-  define_t *this = (define_t *) o;
-  fts_atom_t a;
-
-  fts_set_int(&a, this->valid);
-  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
-}
-
-static void
-define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  define_t *this = (define_t *) o;
-  fts_atom_t a;
-
-  fts_set_symbol(&a, this->type);
-  fts_client_send_message(o, sym_type, 1, &a);
-
-  fts_name_gui_method(o, 0, 0, 0, 0);
+  if(!define_memory_stream)
+    define_memory_stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_class, 0, 0);
+  
+  return define_memory_stream;
 }
 
 static fts_status_t
@@ -404,7 +384,7 @@ define_expression_callback(int ac, const fts_atom_t *at, void *data)
 
         if(ac > size)
           fts_tuple_append(tuple, ac - size, at + size);
-        
+
         fts_set_object(&a, (fts_object_t *)tuple);
         fts_atom_assign(&this->value, &a);
       }
@@ -429,7 +409,7 @@ define_evaluate(define_t *this)
   int valid = 0;
 
   fts_set_void(&this->value);
-  
+
   /* evaluate expression */
   if(status == fts_ok)
   {
@@ -445,32 +425,66 @@ define_evaluate(define_t *this)
         fts_name_set_value(this->patcher, this->name, fts_null);
     }
   }
-  
+
   /* update gui */
   if(valid != this->valid)
   {
+    fts_atom_t a;
     this->valid = valid;
-    fts_update_request((fts_object_t *)this);
+
+    fts_set_int(&a, this->valid);
+    fts_client_send_message((fts_object_t *)this, sym_valid, 1, &a);
   }
 }
 
 static void
-define_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_set_type(define_t *this, fts_symbol_t type)
+{
+  fts_atom_t a;
+
+  this->type = type;
+
+  /* set type at client */
+  fts_set_symbol(&a, this->type);
+  fts_client_send_message((fts_object_t *)this, fts_s_type, 1, &a);
+}
+
+static void
+define_set_expression(define_t *this, int ac, const fts_atom_t *at)
+{
+  fts_memorystream_t *stream = define_get_memory_stream();
+  fts_atom_t a;
+
+  fts_array_set(&this->descr, ac, at);
+
+  /* set name of object */
+  fts_memorystream_reset(stream);
+  fts_spost_object_description_args((fts_bytestream_t *)stream, fts_array_get_size(&this->descr), fts_array_get_atoms(&this->descr));
+  fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+
+  /* set expression at client */
+  fts_set_string(&a, fts_memorystream_get_bytes(stream));
+  fts_client_send_message((fts_object_t *)this, sym_expression, 1, &a);
+}
+
+static void
+define_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   define_t *this = (define_t *) o;
 
   if(fts_is_symbol(at))
-    this->type = fts_get_symbol(at);
+    define_set_type(this, fts_get_symbol(at));
 
   define_evaluate(this);
 }
 
 static void
-define_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   define_t *this = (define_t *)o;
 
   fts_array_set(&this->descr, ac, at);
+  
   define_evaluate(this);
 }
 
@@ -480,17 +494,18 @@ define_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   define_t *this = (define_t *)o;
 
   if(fts_is_symbol(at))
-    this->type = fts_get_symbol(at);
+    define_set_type(this, fts_get_symbol(at));
 
-  fts_array_set(&this->descr, ac - 1, at + 1);
-
+  define_set_expression(this, ac - 1, at + 1);
+  
   define_evaluate(this);
 }
 
 static void
-define_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   define_t *this = (define_t *)o;
+  fts_atom_t a;
   
   /* reset definition */
   if(this->name != NULL && !fts_is_void(&this->value))
@@ -509,14 +524,9 @@ define_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(!fts_is_void(&this->value))
         fts_name_set_value(this->patcher, this->name, &this->value);
 
-      /* set name of object */
-      if(fts_object_has_id(o))
-      {
-        fts_atom_t a;
-        
-        fts_set_symbol(&a, name);
-        fts_client_send_message(o, fts_s_name, 1, &a);
-      }
+      /* set name at client */
+      fts_set_symbol(&a, name);
+      fts_client_send_message(o, fts_s_name, 1, &a);
     }
   }
 }
@@ -531,6 +541,18 @@ define_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_message_append_symbol(mess, this->type);
   fts_message_append(mess, fts_array_get_size( &this->descr), fts_array_get_atoms(&this->descr));
   fts_dumper_message_send(dumper, mess);
+}
+
+static void
+define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  define_t *this = (define_t *) o;
+  fts_atom_t a;
+
+  fts_set_symbol(&a, this->type);
+  fts_client_send_message(o, fts_s_type, 1, &a);
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 static void 
@@ -576,16 +598,14 @@ define_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
   
   fts_class_message_varargs(cl, fts_s_dump, define_dump);
-  fts_class_message_varargs(cl, fts_s_name, define_set_name);
+  fts_class_message_varargs(cl, fts_s_name, define_name);
   
-  fts_class_message_varargs(cl, fts_s_type, define_set_type);
-  fts_class_message_varargs(cl, fts_new_symbol("expression"), define_set_expression);
+  fts_class_message_varargs(cl, fts_s_type, define_type);
+  fts_class_message_varargs(cl, fts_new_symbol("expression"), define_expression);
 
   fts_class_message_varargs(cl, fts_s_set, define_set);
 
-  fts_class_message_varargs(cl, fts_s_update_real_time, define_update_real_time);
   fts_class_message_varargs(cl, fts_s_update_gui, define_update_gui); 
-  fts_class_message_varargs(cl, fts_s_spost_description, define_spost_description);
 }
 
 void 
@@ -593,7 +613,8 @@ fts_kernel_variable_init(void)
 {
   fts_class_install( fts_s_define, define_instantiate);
 
-  sym_type = fts_new_symbol("type");
+  sym_valid = fts_new_symbol("valid ");
+  sym_expression = fts_new_symbol("expression");
   sym_const = fts_new_symbol("const");
   sym_arg = fts_new_symbol("arg");
   sym_args = fts_new_symbol("args");
