@@ -48,7 +48,7 @@ class VResizeInteraction extends Interaction
     filter.setAutoScrolling(true);
   }
 
-
+  int dy;
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && Squeack.onVResizeHandle(squeack))
@@ -63,6 +63,23 @@ class VResizeInteraction extends Interaction
 	object.setHeight(mouse.y - object.getY());
 	object.redraw();
 	object.redrawConnections();
+
+	if (ErmesSelection.patcherSelection.ownedBy(editor))
+	  {
+	    dy = mouse.y - oldMouse.y;
+	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
+	      public void processObject(GraphicObject obj)
+		{
+		  if(obj!=object){
+		    obj.redraw();
+		    obj.redrawConnections();
+		    obj.setHeight(object.getHeight() + dy);
+		    obj.redraw();
+		    obj.redrawConnections();
+		  }
+		}});
+	  }
+
 	editor.fixSize(); 
       }
     else if (Squeack.isUp(squeack))

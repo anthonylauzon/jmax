@@ -47,7 +47,7 @@ class HResizeInteraction extends Interaction
     filter.setFollowingMoves(true);
     filter.setAutoScrolling(true);
   }
-
+  int dx;
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && Squeack.onHResizeHandle(squeack))
@@ -57,11 +57,28 @@ class HResizeInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
+	//resize only the targert object (we do resize also all selected objects?)
 	object.redraw();
 	object.redrawConnections();
 	object.setWidth(mouse.x - object.getX());
 	object.redraw();
 	object.redrawConnections();
+
+	if (ErmesSelection.patcherSelection.ownedBy(editor))
+	  {
+	    dx = mouse.x - oldMouse.x;
+	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
+	      public void processObject(GraphicObject obj)
+		{
+		  if(obj!=object){
+		    obj.redraw();
+		    obj.redrawConnections();
+		    obj.setWidth(object.getWidth() + dx);
+		    obj.redraw();
+		    obj.redrawConnections();
+		  }
+		}});
+	  }
 	editor.fixSize();
       }
     else if (Squeack.isUp(squeack))
