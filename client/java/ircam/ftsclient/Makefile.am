@@ -1,6 +1,5 @@
 noinst_PROGRAMS = package
 package_SOURCES = \
-Fts.java \
 FtsArgs.java \
 FtsAtom.java \
 FtsCallback.java \
