@@ -530,15 +530,22 @@ void fts_platform_init( void)
   /* load aflib package */
   fts_package_load(fts_new_symbol("aflib"));
 
-  /* load alsa package */
-  fts_package_load(fts_new_symbol("alsa"));
 
+  /*  if we don't want to have audio,
+   we don't load audio packages */
+  if (fts_s_noaudio != fts_cmd_args_get(fts_s_config))
+  {    
+    /* load alsa package */
+    fts_package_load(fts_new_symbol("alsa"));
+    
 /* USE_JACK is defined in configure if jack support is enabled */
 #ifdef USE_JACK
-  /* load jack package */
-  fts_package_load(fts_new_symbol("jack"));
+    /* load jack package */
+    fts_package_load(fts_new_symbol("jack"));
 #endif /* USE_JACK */
+  }
 }
+
 
 /* *************************************************************************** */
 /*                                                                             */

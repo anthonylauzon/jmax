@@ -280,8 +280,14 @@ int fts_unlock_memory( void)
 void fts_platform_init( void)
 {
   post( "Mac OS X BETA version\n");
-  /* load macosx package */
-  fts_package_load(fts_new_symbol("macosx"));
+
+  /*  if we don't want to have audio,
+   we don't load audio packages */
+  if (fts_s_noaudio != fts_cmd_args_get(fts_s_config))
+  {        
+    /* load macosx package */
+    fts_package_load(fts_new_symbol("macosx"));
+  }
 }
 
 
