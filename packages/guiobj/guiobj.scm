@@ -30,8 +30,12 @@
 ; load dynamic libraries into the server
 (ucs "load" "module" "guiobj" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "guiobj")))
 
+(append-local-path this-package (file-cat "java" "classes"))
+(load-class this-package "ircam.jmax.guiobj.GuiObjExtension")
+
 ;; load help patch table
 (sshh-load (file-cat dir "help" "guiobj.help.index.scm"))
+(help-summary "GUI summary" (file-cat dir "help" "guiobj.summary.jmax"))
 
-(println "package: guiobj")
+(println "package: guiobj (user interface objects)")
 

@@ -92,6 +92,12 @@ public class SilkJavaMethod extends Procedure {
 		r = truth(((Boolean) r).booleanValue());
 	    }
 	    return r;
+	} catch (InvocationTargetException te) { 
+	    Throwable tmp = te.getTargetException();
+	    String m = (tmp.getMessage() == null) ? tmp.getClass().getName() : tmp.getMessage();
+	    System.out.println("Can't invoke Java method " + className + "." + methodName + ": " + m); 
+	    tmp.printStackTrace();
+	    return truth(false);
 	} catch (Exception e) { 
 	    String m = (e.getMessage() == null) ? e.getClass().getName() : e.getMessage();
 	    System.out.println("Can't invoke Java method " + className + "." + methodName + ": " + m); 

@@ -44,7 +44,7 @@ class FtsSubProcessStream extends FtsStream
   {
     try
       {
-	proc = Runtime.getRuntime().exec( ftsDir + "/" + ftsName + " " + ftsOptions);
+	proc = Runtime.getRuntime().exec( ftsDir + File.separator + ftsName + " " + ftsOptions);
 	out_stream = proc.getOutputStream();
 	in_stream  = proc.getInputStream();
 

@@ -27,6 +27,9 @@
 ; load the dynamic libraries in FTS
 (ucs "load" "module" "ispw" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "ispw")))
 
+(append-local-path this-package (file-cat "java" "classes"))
+(load-class this-package "ircam.jmax.ispw.ISPWExtension")
+
 ;; set path for abstractions
 (abstraction-directory (file-cat dir "abs" "compatibility"))
 (template-directory (file-cat dir "templates" "compatibility"))

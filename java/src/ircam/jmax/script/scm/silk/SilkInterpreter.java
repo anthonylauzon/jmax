@@ -125,7 +125,7 @@ public class SilkInterpreter extends SchemeInterpreter
 		define("jmax-root", root);
 		define("slash", File.separator);
 
-		if (Platform.SYSTEM.equals("windows")) {
+		if (Platform.SYSTEM.toLowerCase().startsWith("windows")) {
 		    define("lib-prefix", "");
 		    define("lib-suffix", ".dll");
 		} else {
