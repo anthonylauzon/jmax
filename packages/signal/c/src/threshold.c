@@ -25,6 +25,9 @@
 
 static fts_symbol_t sym_threshold = 0;
 
+#define DEFAULT_HI_THRESH 0.0f
+#define DEFAULT_LO_THRESH 0.0f
+
 typedef struct
 {
   fts_object_t *object;
@@ -156,6 +159,10 @@ threshold_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     case 1:
       if(fts_is_number(at))
 	data->hi_thresh = fts_get_number_float(at);
+    case 0:
+	data->lo_thresh = DEFAULT_LO_THRESH;
+	data->hi_thresh = DEFAULT_HI_THRESH;
+	
     }
   
   if (data->lo_thresh > data->hi_thresh)
