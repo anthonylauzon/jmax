@@ -60,6 +60,6 @@ extern char *fts_soundfile_format_get_explain(fts_symbol_t name);
 extern fts_atom_t *fts_soundfile_format_get_descriptor(fts_symbol_t name);
 
 extern void fts_soundfile_format_set_default(fts_symbol_t name);
-extern fts_symbol_t fts_soundfile_format_get_default();
+extern fts_symbol_t fts_soundfile_format_get_default( void);
 
 #endif
