@@ -43,6 +43,7 @@ struct _track_editor
   int transp;          /* editor x_transposition */
   int view;            /* editor view mode */
   int range_mode;      /* editor displayed range mode */
+  int grid_mode;       /* editor grid mode (time or markers...) */
   int tab_w;           /* table editor width */
   int tab_h;           /* table editor height */
   fts_array_t columns; /* list of table column names */

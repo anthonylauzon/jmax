@@ -50,6 +50,12 @@ public class FtsTrackEditorObject extends FtsObject
 				((FtsTrackEditorObject)obj).restoreTableColumns(args.getLength(), args.getAtoms());		  
 		  }
 		});
+    FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("grid_mode"), new FtsMessageHandler(){
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				((FtsTrackEditorObject)obj).restoreGridMode(args.getLength(), args.getAtoms());		  
+		  }
+		});
 		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("tableSize"), new FtsMessageHandler(){
 			public void invoke( FtsObject obj, FtsArgs args)
 		  {
@@ -73,6 +79,7 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		transp = 0;
 		view = 0;
 		rangeMode = 0;
+    gridMode = 0;
 		trackObj = (FtsTrackObject)parent;		
 		columnNames = new Vector();
 }
@@ -115,6 +122,13 @@ public void restoreTableSize( int nArgs, FtsAtom args[])
 		this.tab_h = args[1].intValue;	
 	}
 }
+
+public void restoreGridMode( int nArgs, FtsAtom args[])
+{	
+	if(nArgs==1)
+		this.gridMode = args[0].intValue;
+}
+
 
 public Enumeration getTableColumns()
 {
@@ -259,6 +273,26 @@ public void setRangeMode(int rangeMode)
 		}
 }
 
+public void setGridMode(int gridMode)
+{	
+		if(this.gridMode != gridMode)
+		{     
+			this.gridMode = gridMode;
+			args.clear();
+			args.addInt( gridMode);
+			
+			try{
+				send( FtsSymbol.get("grid_mode"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsTrackEditorObject: I/O Error sending grid_mode Message!");
+				e.printStackTrace(); 
+			}
+		}
+}
+
+
 public void setTableSize(int tw, int th)
 {	
 	if(tw == -1 || th == -1)
@@ -351,7 +385,7 @@ public boolean haveContent()
 
 //////////////////////////////////////////////////////////////////////////////////	
 
-public int wx, wy, ww, wh, transp, view, rangeMode, tab_w, tab_h;
+public int wx, wy, ww, wh, transp, view, rangeMode, gridMode, tab_w, tab_h;
 public String label;
 public float zoom;
 public Vector columnNames;

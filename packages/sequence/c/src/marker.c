@@ -168,20 +168,19 @@ scomark_meter_quotient_get_symbol(int meter_num, int meter_den)
 void
 scomark_set_tempo(scomark_t *self, double tempo)
 {
-  fts_atom_t a;
-  double old_tempo = 0.0;
-  track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
-  scomark_get_tempo(self, &old_tempo);
+  if(tempo > 0.0)
+  {
+    fts_atom_t a;
+    double old_tempo = 0.0;
+    track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
+    scomark_get_tempo(self, &old_tempo);
     
-  if(tempo < 0.0)
-    tempo = 0.0;
+    fts_set_float(&a, tempo);
+    propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);  
   
-  fts_set_float(&a, tempo);
-  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);  
-  
-  marker_track_tempo_changed(marker_track, self, old_tempo, tempo);
+    marker_track_tempo_changed(marker_track, self, old_tempo, tempo);
+  }
 }
-
 void
 scomark_get_tempo(scomark_t *self, double *tempo)
 {

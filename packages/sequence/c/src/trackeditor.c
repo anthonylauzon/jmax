@@ -35,10 +35,10 @@ track_editor_upload(track_editor_t *this)
   {
 		fts_atom_t *atoms = fts_array_get_atoms(&this->columns);
 		int size = fts_array_get_size(&this->columns);
-
+    fts_atom_t a[9];
+    
 		if(this->win_x!=-1 && this->win_y!=-1 && this->win_w!=-1 && this->win_h!=-1)
 		{
-			fts_atom_t a[9];
 			fts_set_int(a, this->win_x);
 			fts_set_int(a+1, this->win_y);
 			fts_set_int(a+2, this->win_w);
@@ -52,6 +52,9 @@ track_editor_upload(track_editor_t *this)
 			fts_client_send_message((fts_object_t *)this, seqsym_editor, 9, a);
 		}
 		
+    fts_set_int(a, this->grid_mode);
+    fts_client_send_message((fts_object_t *)this, seqsym_grid_mode, 1, a);
+    
 		if(this->tab_w!=-1 && this->tab_h!=-1)
 		{
 			fts_atom_t b[2];
@@ -96,7 +99,11 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
   fts_set_symbol(a, seqsym_range_mode);
 	fts_set_int(a + 1, this->range_mode);
   fts_dumper_send(dumper, seqsym_editor, 2, a);
-		
+	
+  fts_set_symbol(a, seqsym_grid_mode);
+  fts_set_int(a + 1, this->grid_mode);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);   
+  
 	if(this->tab_w != -1 && this->tab_h != -1)
 	{
     fts_set_symbol(a, seqsym_table_size);
@@ -119,7 +126,7 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
       
 		fts_dumper_send(dumper, seqsym_editor, n_cols + 1, b);
   }
-}
+ }
 
 
 static void
@@ -222,6 +229,21 @@ track_editor_range_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }	
 }	
 static void
+track_editor_grid_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_editor_t *this = (track_editor_t *)o;
+  if(ac == 1 && fts_is_int(at))
+  {
+    int grid_mode = fts_get_int(at);
+    if(this->grid_mode != grid_mode)
+    {
+      this->grid_mode = grid_mode;
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }	
+}	
+static void
 track_editor_set_table_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_editor_t *this = (track_editor_t *)o;
@@ -306,6 +328,8 @@ track_editor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	this->transp = 0;
 	this->view = 0;
 	this->range_mode = 0;
+  
+  this->grid_mode = 0;
 	
 	this->tab_w = -1;
 	this->tab_h = -1;
@@ -341,6 +365,7 @@ track_editor_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_zoom, track_editor_zoom);
   fts_class_message_varargs(cl, seqsym_transp, track_editor_transp);
 	fts_class_message_varargs(cl, seqsym_view, track_editor_view);
+  fts_class_message_varargs(cl, seqsym_grid_mode, track_editor_grid_mode);
 	fts_class_message_varargs(cl, seqsym_range_mode, track_editor_range_mode);
 	fts_class_message_varargs(cl, seqsym_columns, track_editor_set_table_columns);
 	fts_class_message_varargs(cl, seqsym_table_size, track_editor_set_table_size);

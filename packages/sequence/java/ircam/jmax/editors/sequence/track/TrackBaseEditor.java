@@ -55,7 +55,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
     gc = createGraphicContext(geometry, track);
 		
 		setDisplayer();
-		setGridMode();
+		initGridMode();
 		
     track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
@@ -109,6 +109,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					setLabelType(editorState.label);
 				setViewMode(editorState.view);				
 				setRangeMode(editorState.rangeMode, true);
+        setGridMode(editorState.gridMode);
 			};
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
@@ -253,12 +254,13 @@ void displayMousePosition(int x, int y)
   gc.getDisplayer().display(Displayer.numberFormat.format(time)+" , "+Displayer.numberFormat.format(val));	  
 }
 
-void setGridMode()
+void initGridMode()
 {
 	Object prop = geometry.getProperty("gridMode");
 	if(prop != null)
 		gc.setGridMode( ((Integer)prop).intValue());
 }
+public void setGridMode(int gridMode){}
 
 void listenToMarkers( FtsTrackObject markers, SequenceSelection markSel)
 {

@@ -138,6 +138,8 @@ public class MidiTrackEditor extends TrackBaseEditor
   {
 		this.gridMode = gridMode;
 		geometry.setProperty("gridMode", new Integer(gridMode));
+    if(!gc.isInSequence())
+      ((FtsTrackObject)gc.getDataModel()).editorObject.setGridMode(gridMode);
 	}
 	
 	public void setRangeMode(int rangeMode, boolean changed)

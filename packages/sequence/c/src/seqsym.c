@@ -90,6 +90,7 @@ fts_symbol_t seqsym_table_size = 0;
 fts_symbol_t seqsym_save_editor = 0;
 fts_symbol_t seqsym_editor_state = 0;
 fts_symbol_t seqsym_set_editor = 0;
+fts_symbol_t seqsym_grid_mode = 0;
 fts_symbol_t seqsym_markers = 0;
 fts_symbol_t seqsym_shift = 0;
 fts_symbol_t seqsym_stretch = 0;
@@ -182,6 +183,7 @@ seqsym_config(void)
   seqsym_save_editor = fts_new_symbol("save_editor");
 	seqsym_editor_state = fts_new_symbol("editor_state");
 	seqsym_set_editor = fts_new_symbol("set_editor");
+  seqsym_grid_mode = fts_new_symbol("grid_mode");
 	seqsym_markers = fts_new_symbol("markers");
   seqsym_shift = fts_new_symbol("shift");
   seqsym_stretch = fts_new_symbol("stretch");
