@@ -14,15 +14,6 @@ noinst_HEADERS=  \
 sigbus.h \
 system.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-libsystem_la_LDFLAGS=$(XLDFLAGS)
-libsystem_la_LIBADD=$(XLIBADD)
+libsystem_la_LDFLAGS= -module
 
 

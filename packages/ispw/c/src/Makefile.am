@@ -152,24 +152,5 @@ vexp.h \
 vexp_util.h \
 wavetab.h
 
-
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-# This causes libtool to issue a warning and not to produce the .so 
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/packages/data/c/src/.libs -ldata -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
-
-# So we add this explicitely !!!
-all-local: .libs/libispw.so
-
-.libs/libispw.so: $(libispw_la_OBJECTS) $(libispw_la_DEPENDENCIES)
-	cc -bundle -undefined error -o $@ $(libispw_la_OBJECTS) $(XLIBADD) -lm -lc 
-
-install-data-local: .libs/libispw.so
-	$(INSTALL_DATA) .libs/libispw.so $(DESTDIR)$(packagedir)/libispw.so
-endif
-
-libispw_la_LDFLAGS=$(XLDFLAGS)
-libispw_la_LIBADD=$(XLIBADD)
+libispw_la_LDFLAGS= -module
 

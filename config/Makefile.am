@@ -1,5 +1,5 @@
 
-configdir=$(pkgdatadir)
-config_DATA=config.jmax
+EXTRA_DIST=@CONFIG_FILE@
 
-EXTRA_DIST=$(config_DATA)
+install-data-local:
+	$(INSTALL_DATA) @CONFIG_FILE@ $(pkgdatadir)/config.jmax

@@ -17,14 +17,5 @@ listcomp.c
 noinst_HEADERS= \
 lists.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-liblists_la_LDFLAGS=$(XLDFLAGS)
-liblists_la_LIBADD=$(XLIBADD)
+liblists_la_LDFLAGS= -module
 

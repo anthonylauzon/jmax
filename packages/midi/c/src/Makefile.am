@@ -11,14 +11,5 @@ sysex.c
 noinst_HEADERS= \
 midi.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-libmidi_la_LDFLAGS=$(XLDFLAGS)
-libmidi_la_LIBADD=$(XLIBADD)
+libmidi_la_LDFLAGS= -module
 

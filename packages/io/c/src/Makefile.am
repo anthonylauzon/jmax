@@ -18,14 +18,5 @@ out.c
 noinst_HEADERS= \
 iomodule.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-libio_la_LDFLAGS=$(XLDFLAGS)
-libio_la_LIBADD=$(XLIBADD)
+libio_la_LDFLAGS= -module
 

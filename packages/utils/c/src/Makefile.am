@@ -17,14 +17,5 @@ cfft.h \
 rfft_shuffle.h \
 utils.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-libutils_la_LDFLAGS=$(XLDFLAGS)
-libutils_la_LIBADD=$(XLIBADD)
+libutils_la_LDFLAGS= -module
 

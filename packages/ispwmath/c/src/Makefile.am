@@ -7,14 +7,5 @@ ispwmath.c
 noinst_HEADERS= \
 ispwmath.h
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-if MACOSX
-
-XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts 
-
-endif
-
-libispwmath_la_LDFLAGS=$(XLDFLAGS)
-libispwmath_la_LIBADD=$(XLIBADD)
+libispwmath_la_LDFLAGS= -module
 
