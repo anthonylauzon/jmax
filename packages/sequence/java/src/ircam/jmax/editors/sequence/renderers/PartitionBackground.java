@@ -30,6 +30,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.MaxApplication;
 
+import java.beans.*;
 import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.*;
@@ -48,18 +49,37 @@ public class PartitionBackground implements Layer, ImageObserver{
     super();
     
     gc = theGc;
+
+    gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	public void propertyChange(PropertyChangeEvent e)
+	    {		
+		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch"))
+		    {
+			toRepaintBack = true;
+			gc.getGraphicDestination().repaint();
+		    }
+	    }
+    });
   }
   /** builds an horizontal grid in the given graphic port
    * using the destination size*/
   private void drawHorizontalGrid(Graphics g)
   {
+    PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
+    int maxPitch = pa.getY(((Integer)gc.getTrack().getProperty("maximumPitch")).intValue());
+    int minPitch = pa.getY(((Integer)gc.getTrack().getProperty("minimumPitch")).intValue());
 
-    g.setFont(gridSubdivisionFont);
     Dimension d = gc.getGraphicDestination().getSize();
 
     g.setColor(Color.white);
     g.fillRect(0, 0, d.width, d.height);
+
+    g.setColor(ScoreBackground.OUT_RANGE_COLOR);
+    g.fillRect(0, 0, d.width, maxPitch);
+    g.fillRect(0, minPitch, d.width, d.height-maxPitch);
+    
     int positionY = SC_BOTTOM;
+    g.setFont(gridSubdivisionFont);
 
     // the minor subdivision
     for(int k=0;k<2;k++)
@@ -150,7 +170,7 @@ public class PartitionBackground implements Layer, ImageObserver{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalGrid(itsImage.getGraphics());
       }
-    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width)
+    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
       {
 	itsImage.flush();
 	itsImage = null;
@@ -160,6 +180,7 @@ public class PartitionBackground implements Layer, ImageObserver{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalGrid(itsImage.getGraphics());
 	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+	toRepaintBack = false;
       } 
     
     if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
@@ -240,7 +261,8 @@ public class PartitionBackground implements Layer, ImageObserver{
 
   //--- Fields
   SequenceGraphicContext gc;
-  static Image itsImage;
+  Image itsImage;
+  boolean toRepaintBack = false;
   public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
   public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
   public static final int KEYX = 27;

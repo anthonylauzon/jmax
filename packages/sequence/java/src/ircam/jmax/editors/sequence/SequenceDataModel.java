@@ -51,7 +51,7 @@ public interface SequenceDataModel {
   /**
    * adds a Track to this sequencer
    */
-  public abstract void addTrack(Track track);
+    //public abstract void addTrack(Track track);
 
   /**
    * deletes an event from the database

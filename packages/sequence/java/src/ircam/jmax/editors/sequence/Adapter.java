@@ -111,18 +111,18 @@ abstract public class Adapter implements MappingListener{
    * set the parameter of the event associated with the graphic X
    */
     public void setX(Event e, int x) 
-  {
-      XMapper.set(e, getInvX(x));
-  }
+    {
+	XMapper.set(e, getInvX(x));
+    }
 
 
   /**
    * set the parameter of the event associated with the Y
    */
     public void setY(Event e, int y) 
-  {
-    YMapper.set(e, y);
-  }
+    {
+	YMapper.set(e, y);
+    }
   
 
   /**

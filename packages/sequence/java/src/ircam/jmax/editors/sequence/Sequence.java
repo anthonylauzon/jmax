@@ -62,30 +62,30 @@ public class Sequence extends JFrame implements EditorContainer{
    */
     public Sequence(FtsSequenceObject data)
     {
-    super();
+	super();
 
-    MaxWindowManager.getWindowManager().addWindow(this);
+	MaxWindowManager.getWindowManager().addWindow(this);
 
-    sequenceData = data;
+	sequenceData = data;
 
-    initTrackEditorFactoryTable();
+	initTrackEditorFactoryTable();
 
-    //initValueInfoTable();
-    
-    makeTitle(data);
+	//initValueInfoTable();
+	
+	makeTitle(data);
+	
+	// Build The Menus and Menu Bar
+	makeMenuBar();
 
-    // Build The Menus and Menu Bar
-    makeMenuBar();
-
-    //... then the SequencePanel
-    itsSequencePanel = new SequencePanel(this, data);
-
-    getContentPane().add(itsSequencePanel);
-    setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-
-    validate();
-    setVisible(true);
-  }
+	//... then the SequencePanel
+	itsSequencePanel = new SequencePanel(this, data);
+	
+	getContentPane().add(itsSequencePanel);
+	setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+	
+	validate();
+	setVisible(true);
+    }
 
     /* Code to interact with the "appmatch" score recognition module. PLEASE, don't delete !
        void translateToAgrep(Writer w)

@@ -57,6 +57,8 @@ public class MutexPropertyHandler {
 		Track temp;
 		PropertyChangeListener pcl;
 
+		if (!e.getPropertyName().equals("active")) return;
+		
 		/** HACK! the ignore_callback flag is here just to avoid endless loops */
 		if (ignore_callbacks) return;
 
@@ -66,14 +68,14 @@ public class MutexPropertyHandler {
 		Boolean opposite = ((e.getNewValue()).equals(Boolean.TRUE))?Boolean.FALSE:Boolean.TRUE;
 		
 		ignore_callbacks = true;
-
+		
 		for (Enumeration enum = clients.keys(); enum.hasMoreElements();)
 		{
 		    temp = (Track) enum.nextElement();
 		    pcl = (PropertyChangeListener) clients.get(temp);
-
-		    if (pcl != this) 
-			temp.setProperty(name, opposite);
+		    
+		    if(pcl != this) 
+		       temp.setProperty(name, opposite);
 		    else current = temp;
 		    
 		}

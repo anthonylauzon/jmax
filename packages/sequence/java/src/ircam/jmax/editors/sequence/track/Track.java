@@ -46,6 +46,9 @@ public interface Track {
     public abstract TrackDataModel getTrackDataModel();
 
     /**
+     * Get the FtsObject associated to this Track object. */
+    public abstract FtsTrackObject getFtsTrack();
+    /**
      * Sets a property for this track (ex. muted, active, other). This interface
      * does not define which properties are allowed for a track, since they can
      * be different from track to track, or can be associated to its use: for
@@ -70,16 +73,19 @@ public interface Track {
 
     /**
      * Set the unique identifier of this track.*/
-    public void setId(int id);
+    //public void setId(int id);
     /**
      * Returns the unique identifier of this track.*/
-    public int getId();
+    //public int getId();
      /**
      * Set the unique name of this track.*/
     public void setName(String name);
     /**
      * Returns the unique name of this track.*/
     public String getName();
+    /**
+     * Returns true if the track can edit this type.*/
+    public boolean canEditType(ValueInfo info);
 }
 
 

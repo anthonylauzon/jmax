@@ -255,7 +255,7 @@ seqmidi_read_track_start(fts_midifile_t *file)
   sequence_track_t *track;
   fts_atom_t a[3];
   
-  sprintf(s, "track%d", sequence->n_tracks);
+  sprintf(s, "track%d", sequence_get_n_tracks(sequence));
   name = fts_new_symbol_copy(s);
 
   fts_set_symbol(a + 0, seqtrack_symbol);

@@ -120,37 +120,32 @@ public class AdderTool extends Tool implements PositionListener {
 	  // ends the undoable transition
 	  ((UndoableData) egc.getDataModel()).endUpdate();*/
 
-	requestEventCreation(egc.getTrack().getName(),
-			     (float)aEvent.getTime(), 
-			     value.getValueInfo().getName(), 
-			     value.getPropertyCount(), 
-			     value.getPropertyValues());
+	/*requestEventCreation(egc.getTrack().getName(),
+	  (float)aEvent.getTime(), 
+	  value.getValueInfo().getName(), 
+	  value.getPropertyCount(), 
+	  value.getPropertyValues());*/
+
+	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
+							  value.getValueInfo().getName(), 
+							  value.getPropertyCount(), 
+							  value.getPropertyValues());
     }
 
-    private void requestEventCreation(String trackName, float time, String type, int nArgs, Object args[])
+  /*private void requestEventCreation(String trackName, float time, String type, int nArgs, Object args[])
     {
-      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
       
-      //////////////////////////////////////
-      /*sendArgs[0].setObject(egc.getFtsSequenceObject()); 
-	sendArgs[1].setString(trackName); 
-	sendArgs[2].setFloat(time); 
-	sendArgs[3].setString(type);
+    //////////////////////////////////////
+    sendArgs[0].setString(trackName); 
+    sendArgs[1].setFloat(time); 
+    sendArgs[2].setString(type);
       
-	for(int i=0; i<nArgs; i++)
-	sendArgs[4+i].setValue(args[i]);
-      
-	MaxApplication.getFts().makeFtsObjectAsync("seqevent", 4+nArgs, sendArgs);*/
+    for(int i=0; i<nArgs; i++)
+    sendArgs[3+i].setValue(args[i]);
 
-      sendArgs[0].setString(trackName); 
-      sendArgs[1].setFloat(time); 
-      sendArgs[2].setString(type);
-      
-      for(int i=0; i<nArgs; i++)
-	  sendArgs[3+i].setValue(args[i]);
-	
-      egc.getFtsSequenceObject().sendMessage(FtsObject.systemInlet, "event_new", 3+nArgs, sendArgs);
-    }
+    egc.getFtsSequenceObject().sendMessage(FtsObject.systemInlet, "event_new", 3+nArgs, sendArgs);
+    }*/
 
     void popupChoose(int x, int y, Track track)
     {

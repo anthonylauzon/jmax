@@ -9,4 +9,5 @@ public interface TrackListener
 {
     public abstract void trackAdded(Track track);   
     public abstract void trackRemoved(Track track);   
+    public abstract void trackChanged(Track track);   
 }

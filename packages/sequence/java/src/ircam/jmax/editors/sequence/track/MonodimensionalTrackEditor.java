@@ -80,7 +80,6 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 		}
 	});
 
-
 	
 	selection.addListSelectionListener(this);
 
@@ -132,7 +131,7 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
 
-	gc.setAdapter(new MonoDimensionalAdapter(geometry, MONODIMENSIONAL_TRACK_OFFSET));
+	gc.setAdapter(new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
 
 	renderer = new MonodimensionalTrackRenderer(gc);
 	gc.setRenderManager(renderer);

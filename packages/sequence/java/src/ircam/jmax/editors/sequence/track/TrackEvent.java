@@ -40,17 +40,6 @@ import ircam.jmax.toolkit.*;
 
 public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
-    /*public TrackEvent(Fts fts, FtsSequenceObject sequence, String trackName, double time, EventValue value)
-      {
-      super(fts, null, null, "seqevent", "seqevent");
-	
-      this.time = time;
-	
-      setValue(value);
-	
-      sequence.getTrackByName(trackName).getTrackDataModel().addEvent(this);
-      }*/
-    
     public TrackEvent(Fts fts, double time, EventValue value)
     {
 	super(fts, null, null, "seqevent", "seqevent");

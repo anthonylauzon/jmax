@@ -138,6 +138,7 @@ public interface TrackDataModel {
     public abstract void removeListener(TrackDataListener theListener);
     
 
+    public abstract String getName();
     /**
      * Returns an Enumeration of all the types (ValueInfo) contained in this
      * model */
@@ -159,7 +160,7 @@ public interface TrackDataModel {
      * remove them from the original one. After this operation, the old
      * model is empty, but its content can be get back using the unmergeModel() call.
      */
-    public abstract void mergeModel(TrackDataModel model);
+    //public abstract void mergeModel(TrackDataModel model);
 
     /**
      * Fill the given TrackDataModel with all the event of type info
@@ -168,7 +169,7 @@ public interface TrackDataModel {
      * The resulting model can have a different content if the merged model
      * have been edited in the meanwhile.
      */
-    public abstract void unmergeModel(TrackDataModel model, ValueInfo info);
+    //public abstract void unmergeModel(TrackDataModel model, ValueInfo info);
 
     /**
      * Error code

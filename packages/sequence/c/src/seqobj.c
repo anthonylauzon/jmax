@@ -166,11 +166,14 @@ seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t type = fts_get_symbol(at + 0);
-  fts_symbol_t name = fts_get_symbol(at + 1);
+  char str[] = "track9999";
+  fts_symbol_t name;
   fts_object_t *track;
   fts_atom_t a[3];
+
+  sprintf(str, "track%d", sequence_get_n_tracks(this));
+  name = fts_new_symbol_copy(str);
   
-  /* make new event object */
   fts_set_symbol(a + 0, seqtrack_symbol);
   fts_set_symbol(a + 1, type);
   fts_set_symbol(a + 2, name);
@@ -178,6 +181,9 @@ seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* add it to the track */
   sequence_add_track(this, (sequence_track_t *)track);
+
+  /* create track at client */
+  fts_client_upload(track, seqtrack_symbol, 2, a + 1);
 
   /* add track to sequence at client */
   fts_set_object(a + 0, (fts_object_t *)track);	    

@@ -56,7 +56,8 @@ class TrackContainer extends JPanel {
 
 
   /**
-   * Returns the button used to activate this track.*/
+   * Returns the button used to activate this track.
+   */
   public AbstractButton getActivationButton()
   {
     return activationButton;
@@ -65,7 +66,8 @@ class TrackContainer extends JPanel {
   /**
    * A listener of the "active" property of a track. Its role
    * is to switch the state of the activation button when
-   * the active state changes */
+   * the active state changes 
+   */
   class ActiveListener implements PropertyChangeListener {
     
     public ActiveListener(AbstractButton b)
@@ -76,12 +78,20 @@ class TrackContainer extends JPanel {
     public void propertyChange(PropertyChangeEvent evt)
     {
       boolean active = false;	    
-      
+
       if (evt.getPropertyName().equals("active"))
-	active = ((Boolean) evt.getNewValue()).booleanValue();
-      else System.err.println("CHEE? "+evt.getPropertyName());
-      
-      b.setSelected(active);
+	  {
+	      active = ((Boolean) evt.getNewValue()).booleanValue();
+	      b.setSelected(active);
+	  }
+      else 
+	  if(evt.getPropertyName().equals("maximumPitch") || evt.getPropertyName().equals("minimumPitch"))
+	      {
+		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight(track);
+		  setSize(getSize().width, height);
+		  setPreferredSize(new Dimension(getPreferredSize().width, height));
+		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+	      }
     }
     
     AbstractButton b;
@@ -98,3 +108,10 @@ class TrackContainer extends JPanel {
   JToggleButton activationButton;
   public static final int BUTTON_WIDTH = 30;
 }
+
+
+
+
+
+
+

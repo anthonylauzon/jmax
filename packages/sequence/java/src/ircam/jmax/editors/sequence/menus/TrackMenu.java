@@ -62,9 +62,9 @@ public class TrackMenu extends EditorMenu
     
     removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
 
-    addSeparator();
+    //addSeparator();
 
-    add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
+    //add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
   }
     
   private void FillAddTrackMenu( JMenu menu)
@@ -90,7 +90,8 @@ public class TrackMenu extends EditorMenu
     
     public void actionPerformed(ActionEvent e)
     {
-      sequenceModel.addTrack(new TrackBase(new AbstractSequence(sequenceModel, info)));
+	//sequenceModel.addTrack(new TrackBase(new AbstractSequence(sequenceModel, info)));
+	((FtsSequenceObject)sequenceModel).requestTrackCreation(info.getName());
     }
 	
     ValueInfo info;    

@@ -91,11 +91,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     ftsSequenceObject = (FtsSequenceObject)data;
     ftsSequenceObject.addTrackListener(this);
 
-
     //Create a Geometry object for this sequencer
     geometry = new Geometry();
 
-    utilityPartitionAdapter = new PartitionAdapter(geometry);
+    utilityPartitionAdapter = new PartitionAdapter(geometry, null);
 
     //Create the backgrounds images????
     try{
@@ -145,17 +144,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     /**********  DEBUG CODE: for now, sequenceRemoteData is Empty (the FTS counterpart does not exist yet)
      ********** so we insert some false track to test the track editors */
 
-
-    ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(ftsSequenceObject, AmbitusValue.info)));
-    //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(FricativeValue.info)));
-    //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(CueValue.info)));
+    //ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(ftsSequenceObject, AmbitusValue.info)));    
+    ftsSequenceObject.requestTrackCreation(/*AmbitusValue.info.getName()*/"ambitus");
 
     setLayout(new BorderLayout());
 
     JPanel separate_tracks = new JPanel();
     separate_tracks.setLayout(new BorderLayout());
 
-    ftsSequenceObject.getTrackAt(0).setProperty("active", Boolean.TRUE);
+    //ftsSequenceObject.getTrackAt(0).setProperty("active", Boolean.TRUE);
 
     trackPanel.setSize(500, 50);
 
@@ -307,6 +304,16 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     }
 
+    /**
+     * Callback from the model. It can be called when a track changed */
+    public void trackChanged(Track track)
+    {
+	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
+	trackContainer.validate();
+	trackPanel.validate();
+	scrollTracks.validate();
+    }
+
   public void moveTrackTo(TrackEditor editor, int pos)
   {
       TrackContainer trackContainer = (TrackContainer) trackContainers.get(editor.getTrack());
@@ -395,9 +402,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//itsScrPanel.settings();
     }
 
-    public void Merge(){
-	new MergeDialog(sequenceData, geometry);
-    }
+    /*public void Merge(){
+      new MergeDialog(sequenceData, geometry);
+      }*/
     
     public void removeActiveTrack()
     {

@@ -45,6 +45,10 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 {
     public MidiTrackEditor(Geometry geometry, Track track)
     {
+	if(track.getProperty("maximumPitch")==null)
+	    track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
+	if(track.getProperty("minimumPitch")==null)
+	    track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));
 
 	setLayout(new BorderLayout());
 	setBackground(Color.white);
@@ -73,8 +77,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		    itsScore.repaint();
 		}
 	});
-
-
 
 	// make this panel repaint when the selection status change
 	// either in content or in ownership.
@@ -107,7 +109,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public int trackCount()
     {
-	//return gc.getSequenceRemoteData().trackCount();
 	return gc.getFtsSequenceObject().trackCount();
     }
 
@@ -116,19 +117,12 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	selection = new SequenceSelection(track.getTrackDataModel());
 
 	//--- make this selection the current one when the track is activated
-	track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
-	    public void propertyChange(PropertyChangeEvent e)
-		{
-
-		    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
-			SequenceSelection.setCurrent(selection);
-		}
-	});
+	track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
 
 	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, track); //loopback?
 	gc.setGraphicSource(itsScore);
 	gc.setGraphicDestination(itsScore);
-	gc.setAdapter(new PartitionAdapter(geometry));
+	gc.setAdapter(new PartitionAdapter(geometry, gc));
 	
 	renderer = new ScoreRenderer(gc);
 	
@@ -245,14 +239,12 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(800, /*450*/430);
-	//return new Dimension(800, 300);//for split
+	return new Dimension(800, 430);
     }
 
     public Dimension getMinimumSize()
     {
 	return new Dimension(800, 250);
-	//return new Dimension(800, 100);//for split
     }
 
     public Track getTrack()
@@ -338,6 +330,24 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	  renderer.render(g, r); //et c'est tout	
 	}
     }
+
+    class MidiTrackPropertyChangeListener implements PropertyChangeListener 
+    {
+	public void propertyChange(PropertyChangeEvent e)
+	{
+	    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
+		SequenceSelection.setCurrent(selection);
+	    /*else 
+	      if(e.getPropertyName().equals("maximumPitch")||e.getPropertyName().equals("minimumPitch"))
+	      {
+	      int height = ((PartitionAdapter)gc.getAdapter()).getRangeHeight(track);
+	      //setSize(getSize().width, height);
+	      //setPreferredSize(new Dimension(getPreferredSize().width, height));
+	      //gc.getFtsSequenceObject().changeTrack(track);
+	      }*/
+	}
+    }
+
 
    
     //--- MidiTrack fields

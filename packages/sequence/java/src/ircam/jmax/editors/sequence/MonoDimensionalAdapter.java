@@ -32,9 +32,9 @@ import ircam.jmax.editors.sequence.track.*;
  * An adapter that treats the y parameter as a constant*/
 public class MonoDimensionalAdapter extends PartitionAdapter {
 
-    public MonoDimensionalAdapter(Geometry geometry, int constant)
+    public MonoDimensionalAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
     {
-	super(geometry);
+	super(geometry, gc);
 	this.constant = constant;
     }
 

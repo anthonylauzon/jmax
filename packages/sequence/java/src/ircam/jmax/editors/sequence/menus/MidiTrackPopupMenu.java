@@ -55,6 +55,10 @@ public class MidiTrackPopupMenu extends JPopupMenu
   JMenu moveMenu;
   int trackCount = 1;
 
+  JLabel maxLabel, minLabel;
+  JSlider maxSlider, minSlider;
+  Box maxBox, minBox;
+
   public MidiTrackPopupMenu()
   {
     super();
@@ -67,6 +71,74 @@ public class MidiTrackPopupMenu extends JPopupMenu
     moveMenu.add(item);
     
     add(moveMenu);
+
+    addSeparator();
+
+    JMenu rangeMenu = new JMenu("Change Range");
+    JMenu maxRangeMenu = new JMenu("Maximum");
+    JMenu minRangeMenu = new JMenu("Minimum");
+
+    maxLabel = new JLabel(" 127 ", JLabel.CENTER);
+    maxLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    maxSlider = new JSlider(JSlider.VERTICAL, 0, 127, 127);
+    maxSlider.setMajorTickSpacing(12);
+    maxSlider.setMinorTickSpacing(6);
+    maxSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
+    maxSlider.setPaintTicks(true);
+    //maxSlider.setPaintLabels(true);
+    maxSlider.addChangeListener(new ChangeListener(){
+	public void stateChanged(ChangeEvent e) {
+	    JSlider source = (JSlider)e.getSource();
+	    int max = (int)source.getValue();
+	    int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
+	    if(max<min) max = min+1;
+	    
+	    if(!source.getValueIsAdjusting())
+		target.getTrack().setProperty("maximumPitch", new Integer(max));
+	    
+	    maxLabel.setText(""+max);
+	}
+    });
+    maxBox = new Box(BoxLayout.Y_AXIS);
+    maxBox.add(maxSlider);
+    maxBox.add(maxLabel);
+    maxBox.validate();
+
+    minLabel = new JLabel("  0  ", JLabel.CENTER);
+    minLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    minSlider = new JSlider(JSlider.VERTICAL, 0, 127, 0);
+    minSlider.setMajorTickSpacing(12);
+    minSlider.setMinorTickSpacing(6);
+    minSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
+    minSlider.setPaintTicks(true);
+    //minSlider.setPaintLabels(true);
+    minSlider.addChangeListener(new ChangeListener(){
+	public void stateChanged(ChangeEvent e) {
+	    JSlider source = (JSlider)e.getSource();
+	    int min = (int)source.getValue();
+	    int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
+	    if(min>max) min = max-1;
+
+	    if (!source.getValueIsAdjusting())
+		target.getTrack().setProperty("minimumPitch", new Integer(min));
+	    
+	    minLabel.setText(""+min);
+	}
+    });
+    minBox = new Box(BoxLayout.Y_AXIS);
+    minBox.add(minSlider);
+    minBox.add(minLabel);
+    minBox.validate();
+
+    maxRangeMenu.add(maxBox);
+    minRangeMenu.add(minBox);
+
+    rangeMenu.add(maxRangeMenu);
+    rangeMenu.add(minRangeMenu);
+
+    add(rangeMenu);
 
     JMenu viewMenu = new JMenu("Change View");
     item = new JMenuItem("Pianoroll view");
@@ -128,6 +200,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	  popup.pack();
 	}
     popup.updateMoveToMenu();
+    popup.updateChangeRangeMenu();
 
     if(!popup.target.isDisplayLabels())
 	popup.displayLabelItem.setText("Display Labels");
@@ -157,6 +230,15 @@ public class MidiTrackPopupMenu extends JPopupMenu
 			moveMenu.remove(moveMenu.getItemCount()-1);
 		trackCount = count;
 	    }
+    }
+    
+    void updateChangeRangeMenu()
+    {
+	int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
+	int min =  ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();
+	
+	if(maxSlider.getValue()!=max) maxSlider.setValue(max);
+	if(minSlider.getValue()!=min) minSlider.setValue(min);
     }
 
   class SetViewAction extends AbstractAction {

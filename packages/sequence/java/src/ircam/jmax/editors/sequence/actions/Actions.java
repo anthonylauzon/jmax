@@ -50,7 +50,7 @@ public class Actions
   public static EditorAction removeTrackAction      = new RemoveTrackAction();
 
   public static EditorAction settingsAction  = new SettingsAction();
-  public static EditorAction mergeAction     = new MergeAction();
+    //public static EditorAction mergeAction     = new MergeAction();
 
   public static EditorAction moveMidiTrackToAction = new MoveMidiTrackToAction();
   public static EditorAction moveMonodimensionalTrackToAction = new MoveMonodimensionalTrackToAction();

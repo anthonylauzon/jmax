@@ -42,18 +42,21 @@ import java.io.*;
  * array.
  * @see ircam.jmax.editors.sequence.track.TrackDataModel*/
 
-public class AbstractSequence extends FtsRemoteUndoableData implements TrackDataModel, ClipableData, ClipboardOwner
+public class FtsTrackObject extends FtsObject implements TrackDataModel, ClipableData, ClipboardOwner
 {
 
     /**
      * Create an AbstractSequence and initialize the type vector
      * with the given type.
      */
-    public AbstractSequence(SequenceDataModel sequence, ValueInfo info)
+    public FtsTrackObject(Fts fts, String name, ValueInfo info)
     {
-	super();
+	super(fts, null, null, "seqtrack", "seqtrack");
+	
 	listeners = new MaxVector();
-	sequenceData = sequence;
+
+	this.name = name;
+	//sequenceData = sequence;
 	
 	/* prepare the flavors for the clipboard */
 	if (flavors == null)
@@ -62,21 +65,58 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 
 	infos.addElement(info);
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    //// MESSAGES called from fts.
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Fts callback: add a TrackEvent(first arg) in a track (second arg). 
+     * 
+     */
+    public void addEvent(int nArgs , FtsAtom args[])
+    {
+	//String trackName = args[0].getString();
+	TrackEvent evt = (TrackEvent)(args[0].getObject());
+	//TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
+
+	// starts an undoable transition
+	//((UndoableData)model).beginUpdate();
+    
+	//model.addEvent(evt);
+	addEvent(evt);
+    
+	// ends the undoable transition
+	//((UndoableData)model).endUpdate();
+  }
+
+
+  public void requestEventCreation(float time, String type, int nArgs, Object args[])
+  {
+    sendArgs[0].setFloat(time); 
+    sendArgs[1].setString(type);
+      
+    for(int i=0; i<nArgs; i++)
+      sendArgs[2+i].setValue(args[i]);
+
+    sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
+  }
+  
     
     /**
      * Create an AbstractSequence with an empty type vector 
      */
-    public AbstractSequence( )
-    {
-	super();
-	listeners = new MaxVector();
-	
-	/* prepare the flavors for the clipboard */
-	if (flavors == null)
-	    flavors = new DataFlavor[1];
-	flavors[0] = sequenceFlavor;
-
-    }
+    /*public FtsTrackObject(Fts fts)
+      {
+      super(fts, null, null, "seqtrack", "seqtrack");
+      listeners = new MaxVector();
+      
+      // prepare the flavors for the clipboard 
+      if (flavors == null)
+      flavors = new DataFlavor[1];
+      flavors[0] = sequenceFlavor;
+      
+      }*/
 
   
     
@@ -84,26 +124,25 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * Create an AbstractSequence and initialize the type vector
      * with the given enumeration of types.
      */
-    public AbstractSequence( Enumeration types)
-    {
-	super();
-	listeners = new MaxVector();
+    /*public AbstractSequence( Enumeration types)
+      {
+      super();
+      listeners = new MaxVector();
 	
-	/* prepare the flavors for the clipboard */
-	if (flavors == null)
-	    flavors = new DataFlavor[1];
-	flavors[0] = sequenceFlavor;
+      // prepare the flavors for the clipboard 
+      if (flavors == null)
+      flavors = new DataFlavor[1];
+      flavors[0] = sequenceFlavor;
+      
+      if (types == null)
+      return;
 
-	if (types == null)
-	    return;
-
-	while(types.hasMoreElements())
-	    {
-		infos.addElement(types.nextElement());
-	    }
-
-
-    }
+      while(types.hasMoreElements())
+      {
+      infos.addElement(types.nextElement());
+      }
+      
+      }*/
 
     /**
      * how many events in the database?
@@ -208,10 +247,10 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 		
 	notifyObjectAdded(event, index);
 	
-	if (isInGroup())     
-	    {
-		postEdit(new UndoableAdd(event));
-	    }
+	/*if (isInGroup())     
+	  {
+	  postEdit(new UndoableAdd(event));
+	  }*/
     }
 
     /**
@@ -290,7 +329,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	removeEventAt(removeIndex);
 
 	sendArgs[0].setObject(event);
-	((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
+	//((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
+	sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
     }
     
 
@@ -310,8 +350,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)
 	    return;
 	
-	if (isInGroup())
-	    postEdit(new UndoableDelete(event));
+	/*if (isInGroup())
+	  postEdit(new UndoableDelete(event));*/
 	
 	deleteRoomAt(removeIndex);
 	
@@ -377,14 +417,14 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	// ... and remove 
 	
-	beginUpdate(); //cut is undoable
+	//beginUpdate(); //cut is undoable
 	
 	for (Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
 	    {
 		removeEvent((TrackEvent) e.nextElement());
 	    }
 	
-	endUpdate();
+	//endUpdate();
     }
     
     public void copy()
@@ -425,7 +465,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 		TrackEvent event;
 		TrackEvent event1;
 		
-		beginUpdate();  //the paste is undoable
+		//beginUpdate();  //the paste is undoable
 		SequenceSelection.getCurrent().deselectAll();
 		
 		try {
@@ -440,7 +480,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 		}
 		catch (Exception e) {}
 		
-		endUpdate();
+		//endUpdate();
 		
 	    }
     }
@@ -665,19 +705,19 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * remove them from the original one. After this operation, the old
      * model is empty, but its content can be get back using the unmergeModel() call.
      */
-    public void mergeModel(TrackDataModel model)
-    {
-	for (Enumeration e = model.getEvents(); e.hasMoreElements();)
-	    {
-
-		addEvent((TrackEvent) e.nextElement());
-	    }
-
-	for (Enumeration e = model.getTypes(); e.hasMoreElements();)
-	    infos.addElement(e.nextElement());
-
-	model.removeAllEvents();
-    }
+    /*public void mergeModel(TrackDataModel model)
+      {
+      for (Enumeration e = model.getEvents(); e.hasMoreElements();)
+      {
+      
+      addEvent((TrackEvent) e.nextElement());
+      }
+      
+      for (Enumeration e = model.getTypes(); e.hasMoreElements();)
+      infos.addElement(e.nextElement());
+      
+      model.removeAllEvents();
+      }*/
 
 
     /**
@@ -687,25 +727,25 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * The resulting models can have a different content if the MultiSequence
      * object have been edited in the meanwhile.
      */
-    public void unmergeModel(TrackDataModel model, ValueInfo info)
-    {
-	if (!infos.contains(info))
-	    return; 
-	// no elements of type info are present.
+    /*public void unmergeModel(TrackDataModel model, ValueInfo info)
+      {
+      if (!infos.contains(info))
+      return; 
+      // no elements of type info are present.
+      
+      infos.removeElement(info);
+      
+      TrackEvent temp;
+      for (Enumeration e = getEvents(); e.hasMoreElements();)
+      {
+      temp = (TrackEvent) e.nextElement();
+      if (temp.getValue().getValueInfo().equals(info))
+      {
+      model.addEvent(temp);
+      }
+      }
 
-	infos.removeElement(info);
-
-	TrackEvent temp;
-	for (Enumeration e = getEvents(); e.hasMoreElements();)
-	    {
-		temp = (TrackEvent) e.nextElement();
-		if (temp.getValue().getValueInfo().equals(info))
-		    {
-			model.addEvent(temp);
-		    }
-	    }
-
-    }
+      }*/
 
     /**
      * Returns an enumeration of all the ValueInfo merged in this model
@@ -735,7 +775,10 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	return infos.size();
     }
 
-
+    public String getName()
+    {
+	return name;
+    }
 
     //---  AbstractSequence fields
     
@@ -745,8 +788,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     private MaxVector listeners;
     private MaxVector tempVector = new MaxVector();
     MaxVector infos = new MaxVector();
-    SequenceDataModel sequenceData;
-
+    //SequenceDataModel sequenceData;
+    private String name;
     public static DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
@@ -757,6 +800,8 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	    sendArgs[i]= new FtsAtom();
     }
 }
+
+
 
 
 

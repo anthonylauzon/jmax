@@ -1,6 +1,7 @@
 
 package ircam.jmax.editors.sequence.track;
 
+import ircam.jmax.editors.sequence.*;
 import java.util.*;
 import java.beans.*;
 
@@ -12,6 +13,7 @@ public class TrackBase implements Track{
     public TrackBase(TrackDataModel model)
     {
 	this.model = model;
+	name = model.getName();
     }
 
     /**
@@ -51,7 +53,6 @@ public class TrackBase implements Track{
 	return propertySupport;
     }
 
-
     /**
      * Returns the data model (the track data) this Track is working on */
     public TrackDataModel getTrackDataModel()
@@ -59,16 +60,24 @@ public class TrackBase implements Track{
 	return model;
     }
 
-    public void setId(int id)
+    /**
+     * Returns the ftsTrackObject this Track is working on */
+    public FtsTrackObject getFtsTrack()
     {
-	this.id = id;
-	if(name.equals(""))
-	    name = "track"+id;
+	return (FtsTrackObject)model;
     }
-    public int getId()
-    {
-	return id;
-    }
+
+    /*public void setId(int id)
+      {
+      this.id = id;
+      if(name.equals(""))
+      name = "track"+id;
+      }
+      public int getId()
+      {
+      return id;
+      }*/
+
     public String getName()
     {
 	return name;
@@ -78,11 +87,15 @@ public class TrackBase implements Track{
 	this.name = name;
     }
 
+    public boolean canEditType(ValueInfo info){
+	return model.containsType(info);
+    }
+
     //--- Fields
     Hashtable properties = new Hashtable();
     PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
     TrackDataModel model;
-    private int id;
+    //private int id;
     private String name = "";
 }
 

@@ -71,11 +71,22 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	
 	public void actionPerformed(ActionEvent ae)
 	{
+	    /*int time = (int)event.getTime();
+	      if(sequencePanel.scrollBy(time))
+	      
+	      event.setTime(time+delta);
+	      else
+	      event.setTime(time-delta);*/
+	    
 	    int time = (int)event.getTime();
 	    if(sequencePanel.scrollBy(time))
 		event.setTime(time+delta);
 	    else
 		event.setTime(time-delta);
+
+	    PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
+
+	    moveTo(a.getX(time+delta), a.getY(event));
 	}
 	void setEditor(SequencePanel editor)
 	{
@@ -268,12 +279,31 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     g.dispose();
   }
 
+    SequenceGraphicContext getGc()
+    {
+	return (SequenceGraphicContext)gc;
+    }
   //--- Fields
-  Rectangle enclosingRect = new Rectangle();
-  UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
+    Rectangle enclosingRect = new Rectangle();
+    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

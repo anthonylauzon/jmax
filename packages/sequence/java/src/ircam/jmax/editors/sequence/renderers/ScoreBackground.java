@@ -33,6 +33,7 @@ import ircam.jmax.MaxApplication;
 import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.beans.*;
 
 import javax.swing.*;
 
@@ -46,68 +47,93 @@ public class ScoreBackground implements Layer{
   {
     super();
     
-    gc = theGc;
-    
-  }
+    gc = theGc; 
 
+    gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	public void propertyChange(PropertyChangeEvent e)
+	    {		
+		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch"))
+		{
+		    toRepaintBack = true;
+		    gc.getGraphicDestination().repaint();
+		}
+	    }
+    });
+  }
+    
   /** builds an horizontal grid in the given graphic port
    * using the destination size*/
   private void drawHorizontalGrid(Graphics g)
   {
+      PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
+      Track track = gc.getTrack();
 
-    g.setFont(gridSubdivisionFont);
-    Dimension d = gc.getGraphicDestination().getSize();
+      int max = ((Integer)track.getProperty("maximumPitch")).intValue();
+      int maxPitch = pa.getY(max);
+      int minPitch = pa.getY(((Integer)track.getProperty("minimumPitch")).intValue());
 
-    g.setColor(Color.white);
-    g.fillRect(0, 0, d.width, d.height);
-    int positionY;
+      int delta;
+      if(max<127) delta = maxPitch-SC_TOP;
+      else delta = 0;
 
-    // the minor subdivision
-    g.setColor(horizontalGridLinesColor);
-    for (int i = 0; i < 381; i+=9)
-      {
-	positionY = SC_BOTTOM-i;
-	g.drawLine(KEYX, positionY, d.width, positionY);
-      }
+      Dimension d = gc.getGraphicDestination().getSize();
 
-    // the major subdivision lines and numbers
-    g.setColor(Color.black);
-    for (int j = 0; j < 381; j+=36)
-      {
-	positionY = SC_BOTTOM-j;
-	g.drawLine(KEYEND+1, positionY, d.width, positionY);
-      }
-    // the last (127) line
-    g.drawLine(KEYEND+1, SC_TOP, d.width, SC_TOP);
+      g.setColor(Color.white);
+      g.fillRect(0, 0, d.width, d.height);
+
+      g.setColor(OUT_RANGE_COLOR);
+      g.fillRect(0 , 0 -delta, d.width, maxPitch);
+      g.fillRect(0, minPitch -delta, d.width, d.height-maxPitch);
+
+      int positionY;
+      g.setFont(gridSubdivisionFont);
+      // the minor subdivision
     
-    g.setColor(Color.gray);
-    for (int j = 0; j < 381; j+=36)
-      {
-	positionY = SC_BOTTOM-j;
-	g.drawString(""+j/3, 10, positionY+3);
-      }
-    // the last (127) number
-    g.drawString(""+127, 10, SC_TOP+3);
-
-    // the piano keys...
-    for (int i = 0; i <= 127; i++)
-      {
-	positionY = SC_BOTTOM-(i*3)-1;
-	if (isAlteration(i)) 
+      g.setColor(horizontalGridLinesColor);
+      for (int i = 0; i < 381; i+=9)
 	  {
-	    g.setColor(Color.darkGray);
-	    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
+	      positionY = SC_BOTTOM-i;
+	      g.drawLine(KEYX, positionY -delta, d.width, positionY -delta);
 	  }
-	else 
-	  {
-	    g.setColor(Color.lightGray);
-	    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
-	  }
-      }
 
-    // the vertical line at the end of keyboard
-    g.setColor(Color.black);
-    g.drawLine(KEYEND, SC_TOP, KEYEND, SC_BOTTOM);
+      // the major subdivision lines and numbers
+      g.setColor(Color.black);
+      for (int j = 0; j < 381; j+=36)
+	  {
+	      positionY = SC_BOTTOM-j;
+	      g.drawLine(KEYEND+1, positionY -delta, d.width, positionY-delta);
+	  }
+      // the last (127) line
+      g.drawLine(KEYEND+1, SC_TOP -delta, d.width, SC_TOP -delta);
+    
+      g.setColor(Color.gray);
+      for (int j = 0; j < 381; j+=36)
+	  {
+	      positionY = SC_BOTTOM-j;
+	      g.drawString(""+j/3, 10 , positionY+3-delta);
+	  }
+      // the last (127) number
+      g.drawString(""+127, 10, SC_TOP+3-delta);
+      
+      // the piano keys...
+      for (int i = 0; i <= 127; i++)
+	  {
+	      positionY = SC_BOTTOM-(i*3)-1;
+	      if (isAlteration(i)) 
+		  {
+		      g.setColor(Color.darkGray);
+		      g.fillRect(KEYX, positionY-delta, KEYWIDTH, KEYHEIGHT);
+		  }
+	      else 
+		  {
+		      g.setColor(Color.lightGray);
+		      g.fillRect(KEYX, positionY -delta, KEYWIDTH, KEYHEIGHT);
+		  }
+	  }
+
+      // the vertical line at the end of keyboard
+      g.setColor(Color.black);
+      g.drawLine(KEYEND, SC_TOP-delta, KEYEND, SC_BOTTOM-delta);
   }
 
   public static boolean isAlteration(int note)
@@ -146,7 +172,6 @@ public class ScoreBackground implements Layer{
    * Layer interface. Draw the background */
   public void render( Graphics g, int order)
   {
-
     Dimension d = gc.getGraphicDestination().getSize();
     
     if (itsImage == null) 
@@ -154,7 +179,7 @@ public class ScoreBackground implements Layer{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalGrid(itsImage.getGraphics());
       }
-    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width)
+    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
       {
 	itsImage.flush();
 	itsImage = null;
@@ -164,13 +189,13 @@ public class ScoreBackground implements Layer{
 	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
 	drawHorizontalGrid(itsImage.getGraphics());
 	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+	toRepaintBack = false;
       } 
     
     if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
       System.err.println("something wrong: incomplete Image  ");
     
     drawVerticalGrid(g);
-
   }
 
       
@@ -239,20 +264,25 @@ public class ScoreBackground implements Layer{
   }
 
 
-  //--- Fields
-  SequenceGraphicContext gc;
-  static Image itsImage;
-  static boolean imageReady = true/*false*/;
-  public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
+    //--- Fields
+    SequenceGraphicContext gc;
+    //static Image itsImage;
+    private Image itsImage;
+    boolean toRepaintBack = false;
+    //static boolean imageReady = true;
+    boolean imageReady = true;
+    public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
     //  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
-  public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
-  public static final int KEYX = 31;
-  public static final int KEYWIDTH = 24;
-  public static final int KEYHEIGHT = 3;
-  public static final int KEYEND = KEYX + KEYWIDTH;
+    public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
+    public static final int KEYX = 31;
+    public static final int KEYWIDTH = 24;
+    public static final int KEYHEIGHT = 3;
+    public static final int KEYEND = KEYX + KEYWIDTH;
 
-  public static final int SC_BOTTOM = 409;
-  public static final int SC_TOP = 28;
+    public static final int SC_BOTTOM = 409;
+    public static final int SC_TOP = 28;
+
+    public static final Color OUT_RANGE_COLOR = new Color(230, 230, 230);
 }
 
 

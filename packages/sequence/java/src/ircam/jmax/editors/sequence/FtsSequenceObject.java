@@ -78,6 +78,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   {
     if(sequence == null)
       sequence = new Sequence(this);
+
     if (! sequence.isVisible())
       sequence.setVisible(true);
     sequence.toFront();
@@ -99,21 +100,34 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    * Fts callback: add a TrackEvent(first arg) in a track (second arg). 
    * 
    */
-  public void addEvent(int nArgs , FtsAtom args[])
+    /*public void addEvent(int nArgs , FtsAtom args[])
+      {
+      String trackName = args[0].getString();
+      TrackEvent evt = (TrackEvent)(args[1].getObject());
+      TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
+
+      // starts an undoable transition
+      ((UndoableData)model).beginUpdate();
+      
+      model.addEvent(evt);
+    
+      // ends the undoable transition
+      ((UndoableData)model).endUpdate();
+      }*/
+
+  /**
+   * Fts callback: add a new Track(first arg) . 
+   * 
+   */
+  public void addTrack(int nArgs , FtsAtom args[])
   {
-    String trackName = args[0].getString();
-    TrackEvent evt = (TrackEvent)(args[1].getObject());
-    TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
-
-    // starts an undoable transition
-    ((UndoableData)model).beginUpdate();
+    FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
+    Track track = new TrackBase(trackObj);
+    tracks.addElement(track);
     
-    model.addEvent(evt);
-    
-    // ends the undoable transition
-    ((UndoableData)model).endUpdate();
+    notifyTrackAdded(track);
   }
-
+    
   /**
    * return how many tracks in the sequence
    */
@@ -139,20 +153,6 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   /**
-   * Returns the track with this id 
-   */
-  public Track getTrackById(int id)
-  {
-    Track track;
-    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-      {
-	track = (Track)e.nextElement();
-	if(track.getId()==id) return track;
-      }
-    return null;
-  }
-
-  /**
    * Returns the track with this name 
    */
   public Track getTrackByName(String name)
@@ -169,19 +169,19 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   /**
    * Adds a track
    */
-  public void addTrack(Track track)
-  {
-    track.setId(trackId++);
-    tracks.addElement(track);
-  
-    messVect.removeAllElements();
-    messVect.addElement(track.getName());
-    messVect.addElement("anything");
+    /*public void addTrack(Track track)
+      {
+      track.setId(trackId++);
+      tracks.addElement(track);
       
-    sendMessage(FtsObject.systemInlet, "track_add", messVect);
-
-    notifyTrackAdded(track);
-  }
+      messVect.removeAllElements();
+      messVect.addElement(track.getName());
+      messVect.addElement("anything");
+      
+      sendMessage(FtsObject.systemInlet, "track_add", messVect);
+      
+      notifyTrackAdded(track);
+      }*/
 
   /**
    * Remove a Track from this sequencer 
@@ -191,13 +191,22 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     if(track==null) return;
     tracks.removeElement(track);
 
-    messVect.removeAllElements();
-    messVect.addElement(track.getName());
-      
-    sendMessage(FtsObject.systemInlet, "track_remove", messVect);
+    sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
+    sendMessage(FtsObject.systemInlet, "track_remove", 1, sendArgs);
 
     notifyTrackRemoved(track);
   }
+
+  public void changeTrack(Track track)
+  {
+    notifyTrackChanged(track);
+  }
+
+    public void requestTrackCreation(String type)
+    {
+	sendArgs[0].setString(type); 
+	sendMessage(FtsObject.systemInlet, "track_add", 1, sendArgs);
+    }
 
   /**
    * Require to be notified when database change
@@ -227,12 +236,24 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       ((TrackListener)(e.nextElement())).trackRemoved(track);
   }
 
+  private void notifyTrackChanged(Track track)
+  {
+    for (Enumeration e=listeners.elements(); e.hasMoreElements();)
+      ((TrackListener)(e.nextElement())).trackChanged(track);
+  }
+
   //----- Fields
+  static FtsAtom[] sendArgs = new FtsAtom[128];
+  static
+  {
+      for(int i=0; i<128; i++)
+	  sendArgs[i]= new FtsAtom();
+  }
   Sequence sequence = null;  
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();
-  MaxVector messVect = new MaxVector();
+    //MaxVector messVect = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
 
   //unic id for a track, starting from zero;

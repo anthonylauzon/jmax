@@ -42,7 +42,7 @@ public class PartitionAdapter extends Adapter {
    * It creates and assigns its mappers (X, Y, Lenght, Heigth, Label), 
    * and set the initial values for the zoom, transpose and invertion fields.
    */
-  public PartitionAdapter(Geometry g) 
+  public PartitionAdapter(Geometry g, SequenceGraphicContext gc) 
   {
       super(g);
       XMapper = TimeMapper.getMapper();
@@ -52,6 +52,7 @@ public class PartitionAdapter extends Adapter {
       LabelMapper = PitchMapper.getMapper();
       
       itsName = "Standard Adapter";
+      this.gc = gc;
   }
 
 
@@ -73,7 +74,7 @@ public class PartitionAdapter extends Adapter {
    * it returns the X graphic value corresponding to the x
    * logical value.
    */
-  public int getX(int x) 
+  public int getX(double x) 
   {
     if (geometry.getXInvertion()) x = -x;
 
@@ -109,23 +110,45 @@ public class PartitionAdapter extends Adapter {
    * making the needed cordinate conversions.
    */
     public int getY(Event e) 
-  {  
-    int q, r;
-    int temp = super.getY(e);
+    {  
+	int q, r;
+	int temp = super.getY(e);
     
-    if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
-    {
-      if (geometry.getYInvertion()) temp = -temp;
-      return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+	if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+	    {
+		if (geometry.getYInvertion()) temp = -temp;
+		return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+	    }
+	else//NMS_VIEW
+	    {
+		q = temp/12;
+		r = getRestFromIntervall(temp - q*12);
+		temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
+		return temp;
+	    }
     }
-    else//NMS_VIEW
-    {
-      q = temp/12;
-      r = getRestFromIntervall(temp - q*12);
-      temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
-      return temp;
+    /**
+     * it returns the Y graphic value of the event from the y logic value,
+     * making the needed cordinate conversions.
+     */
+    public int getY(int y) 
+    {  
+	int q, r;
+	int temp = y;
+    
+	if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+	    {
+		if (geometry.getYInvertion()) temp = -temp;
+		return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+	    }
+	else//NMS_VIEW
+	    {
+		q = temp/12;
+		r = getRestFromIntervall(temp - q*12);
+		temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
+		return temp;
+	    }
     }
-  }
 
 
   /**
@@ -150,8 +173,26 @@ public class PartitionAdapter extends Adapter {
 	r = temp - q*7;
 	temp = q*12 + getIntervallFromRest(r, rest);
     }
-    if(temp<0) temp = 0;
-    else if(temp>127) temp = 127;
+    
+    int maxRange, minRange;
+
+    if(gc !=null)
+	{
+	    maxRange = ((Integer)gc.getTrack().getProperty("maximumPitch")).intValue();
+	    minRange = ((Integer)gc.getTrack().getProperty("minimumPitch")).intValue();
+	}
+    else 
+	{
+	    maxRange = 127;
+	    minRange = 0;
+	}
+
+    if(temp<minRange) temp = minRange;
+    else if(temp>maxRange) temp = maxRange;
+
+    /*if(temp<0) temp = 0;
+      else if(temp>127) temp = 127;*/
+
     return temp;
   }
 
@@ -189,47 +230,47 @@ public class PartitionAdapter extends Adapter {
 	    }
     }
 
-  int getRestFromIntervall(int i)
-  {
-    switch(i)
-	{
-	case 2: return 1;
-	case 3:
-	case 4: return 2;
-	case 5: 
-	case 6: return 3;
-	case 7: 
-	case 8: return 4;
-	case 9: return 5;
-	case 10:
-	case 11: return 6;
-	default: return 0;
-	}
-  }
+    int getRestFromIntervall(int i)
+    {
+	switch(i)
+	    {
+	    case 2: return 1;
+	    case 3:
+	    case 4: return 2;
+	    case 5: 
+	    case 6: return 3;
+	    case 7: 
+	    case 8: return 4;
+	    case 9: return 5;
+	    case 10:
+	    case 11: return 6;
+	    default: return 0;
+	    }
+    }
 
     public int getAlteration(Event e)
-  {
-    int q, r;
-    int temp = super.getY(e);
-    q = temp/12;
-    r = temp-q*12;
-    switch(r)
-      {
-      case 1:
-      case 6:
-      case 8: return ALTERATION_DIESIS;
-      case 3:
-      case 10: return ALTERATION_BEMOLLE;
-      default: return ALTERATION_NOTHING;
-      }
-  }
+    {
+	int q, r;
+	int temp = super.getY(e);
+	q = temp/12;
+	r = temp-q*12;
+	switch(r)
+	    {
+	    case 1:
+	    case 6:
+	    case 8: return ALTERATION_DIESIS;
+	    case 3:
+	    case 10: return ALTERATION_BEMOLLE;
+	    default: return ALTERATION_NOTHING;
+	    }
+    }
   /**
    * set the parameter of the event associated with the graphic y
    */
     public void setY(Event e, int y) 
-  {
-    super.setY(e, getInvY(y));
-  }
+    {
+	super.setY(e, getInvY(y));
+    }
 
 
   /**
@@ -316,7 +357,6 @@ public class PartitionAdapter extends Adapter {
 	displayLabels = display;
     }
 
-  //------------- Fields
     public void setViewMode(int mode)
     {
 	viewMode = mode;
@@ -325,6 +365,16 @@ public class PartitionAdapter extends Adapter {
     {
 	return viewMode;
     }
+
+    public int getRangeHeight(Track track)
+    {
+	int max = getY(((Integer)track.getProperty("maximumPitch")).intValue());
+	int min = getY(((Integer)track.getProperty("minimumPitch")).intValue());
+	
+	return (min-max + 2*ScoreBackground.SC_TOP);
+    }
+
+    //------------- Fields
     public static final int NOTE_DEFAULT_HEIGTH = 3;
     int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
     boolean displayLabels = true;
@@ -332,7 +382,7 @@ public class PartitionAdapter extends Adapter {
     public static final int ALTERATION_DIESIS = 1;
     public static final int ALTERATION_BEMOLLE = -1;
     public static final int ALTERATION_NOTHING = 0;
-    
+    SequenceGraphicContext gc;
 }
 
 
