@@ -18,8 +18,8 @@ rm $$
 DISTFILE=$ROOT_DIR/../jmax-$JMAX_VERSION-src.tar.gz
 SRCROOTDIR=jmax-$JMAX_VERSION
 TMP_IDB_SORTED=/tmp/$$.idb.sorted
-TMP_SPEC=/tmp/$$.spec
-SPEC_FILE=jmax.spec
+TMP_SPEC=/tmp/$$.pkgdef
+SPEC_FILE=jmax.pkgdef
 
 # ---------------------------------------------------------------------------
 help ()
