@@ -22,6 +22,11 @@
 
 
 #include <stdio.h>
+/* 
+   explode.c use snprintf which is not ANSI C, so we need to include
+   ftsconfig.h for Visual C++ compilation
+*/
+#include <ftsconfig.h>
 #include "explode.h"
 
 static long explode_nextserial;
