@@ -24,7 +24,7 @@
 
 typedef struct
 {
-  fts_object_t* o;
+  fts_object_t o;
   fts_symbol_t file_name;
   midiconfig_t* midi_config;
   audioconfig_t* audio_config;
