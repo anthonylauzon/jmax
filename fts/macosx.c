@@ -266,6 +266,8 @@ int fts_unlock_memory( void)
 void fts_platform_init( void)
 {
   post( "Mac OS X BETA version\n");
+  /* load macosx package */
+  fts_package_load(fts_new_sybmol("macosx"));
 }
 
 

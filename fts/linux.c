@@ -45,6 +45,7 @@
 
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
+#include <ftsprivate/package.h>
 #include <fts/thread.h>
 
 /***********************************************************************
@@ -545,6 +546,15 @@ void fts_platform_init( void)
   abandon_root();
 
   fts_disable_fpe_traps();
+
+  /* load alsa package */
+  fts_package_load(fts_new_symbol("alsa"));
+
+/* USE_JACK is defined in configure if jack support is enabled */
+#ifdef USE_JACK
+  /* load jack package */
+  fts_package_load(fts_new_symbol("jack"));
+#endif /* USE_JACK */
 }
 
 /* *************************************************************************** */
