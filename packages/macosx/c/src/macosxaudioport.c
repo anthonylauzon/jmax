@@ -492,12 +492,11 @@ macosxaudiomanager_scan_devices( void)
       fts_object_refer((fts_object_t*)port);
       fts_audiomanager_put_port( name, port);
 
-      if (device_list[i] == default_input_device && device_list[i] == default_output_device)
-	{
-           post( "Default: %s\n", name);
-           fts_object_refer((fts_object_t*)port);
-           fts_audiomanager_put_port( fts_s_default, port);
-	}
+      if(device_list[i] == default_output_device)
+      {
+        fts_object_refer((fts_object_t*)port);
+        fts_audiomanager_put_port( fts_s_default, port);
+      }
     }
 
   fts_free( buff);

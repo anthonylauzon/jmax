@@ -152,6 +152,8 @@ audioconfig_update_devices(fts_audioconfig_t* config)
   fts_atom_t* at;
   fts_symbol_t *names;
   fts_audioport_t* port;
+  int channels;
+  
   fts_array_clear(&audioconfig_sample_rates_array);
   fts_array_clear(&audioconfig_buffer_sizes_array);
 
@@ -159,23 +161,33 @@ audioconfig_update_devices(fts_audioconfig_t* config)
   names = fts_audiomanager_get_input_names();
   fts_client_start_message( (fts_object_t *)config, audioconfig_s_inputs);
   while (*names)
+  {
+    port = fts_audiomanager_get_port(*names);
+    channels = fts_audioport_get_channels(port, FTS_AUDIO_INPUT);
+
+    if(channels > 0)
     {
       fts_client_add_symbol( (fts_object_t *)config, *names);
-      port = fts_audiomanager_get_port(*names);
-      fts_client_add_int((fts_object_t*)config, fts_audioport_get_channels(port, FTS_AUDIO_INPUT));
-      names++;
+      fts_client_add_int((fts_object_t*)config, channels);
     }
+    names++;
+  }
   fts_client_done_message( (fts_object_t *)config);
 
   names = fts_audiomanager_get_output_names();
   fts_client_start_message( (fts_object_t *)config, audioconfig_s_outputs);
   while (*names)
+  {
+    port = fts_audiomanager_get_port(*names);
+    channels = fts_audioport_get_channels(port, FTS_AUDIO_OUTPUT);
+
+    if(channels > 0)
     {
       fts_client_add_symbol( (fts_object_t *)config, *names);
-      port = fts_audiomanager_get_port(*names);
       fts_client_add_int((fts_object_t*)config, fts_audioport_get_channels(port, FTS_AUDIO_OUTPUT));
-      names++;
     }
+    names++;
+  }
   fts_client_done_message( (fts_object_t *)config);
 }
 
