@@ -45,7 +45,7 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
   //
 
   public MaxDataEditor newEditor(MaxData theData) 
-  {
+  { 
     return new ErmesDataEditor( (FtsPatcherData)theData);
   }
 }

@@ -740,25 +740,21 @@ public class FtsObject
   {
     // If we have data, dispose it, so that all
     // the editors will be closed.
-
     deleted = true;
-
+    
     releaseData();
 
     if(parent != null)
       {
 	parent.setDirty();
-	
+
 	if((isError())||(hasErrorsInside()))
 	  parent.removeErrorObject(this);
-
-	parent = null;
       }
-
     // Take away the object from the container, if any
 
     if (getPatcherData() != null)
-      getPatcherData().removeObject(this);
+	getPatcherData().removeObject(this);
 
     // Fire also the global edit listeners
 
@@ -767,7 +763,8 @@ public class FtsObject
     // clean up to help the gc, and make the object
     // non functioning, so to catch use of the object
     // after the release/delete.
-
+    
+    parent = null;
     className = null;
     description = null;
 

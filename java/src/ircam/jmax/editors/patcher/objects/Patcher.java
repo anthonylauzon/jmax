@@ -39,7 +39,7 @@ import ircam.jmax.editors.patcher.*;
 // The "patcher" graphic object.
 //
 
-class Patcher extends Editable implements FtsObjectErrorListener
+public class Patcher extends Editable implements FtsObjectErrorListener
 {
   // ----------------------------------------
   // Constructor

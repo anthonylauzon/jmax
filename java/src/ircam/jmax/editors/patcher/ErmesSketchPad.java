@@ -255,7 +255,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // --------------------------------------------------------------
 
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
-  {    FtsPatcherData aFtsPatcherData = theContainerObject;
+  {    
+    FtsPatcherData aFtsPatcherData = theContainerObject;
     Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
     int osize = aFtsPatcherData.getObjects().size();
     boolean doLayers = false;
@@ -551,6 +552,16 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     return object;
   }
+
+    //debug utility 
+    private void printObjectsDescription()
+    {
+	Object[] objects = itsPatcherData.getObjects().getObjectArray();
+	int osize = itsPatcherData.getObjects().size();
+
+	for ( int i = 0; i < osize; i++)
+	    System.err.println("obj "+(FtsObject)objects[i]+" "+((FtsObject)objects[i]).getDescription());
+    }
 
   // -----------------------------------------------------------------------
   // Handling of the object text editing
