@@ -42,7 +42,6 @@ import java.util.*;
 /**
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
- * SequenceRemoteData offers support for undo and clipboard operations.
  */
 public class FtsSequenceObject extends FtsObject implements SequenceDataModel
 {
@@ -57,11 +56,14 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
 	listeners = new MaxVector();
     }
 
-   /**
-   * MESSAGES called from fts.
-   */
-  Sequence sequence = null;
+    //////////////////////////////////////////////////////////////////////////////////////
+    //// MESSAGES called from fts.
+    //////////////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Fts callback: open the editor associated with this FtsSequenceObject.
+   * If not exist create them else show them.
+   */
   public void openEditor(int nArgs, FtsAtom args[])
   {
     if(sequence == null)
@@ -71,6 +73,9 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     sequence.toFront();
   }
 
+  /**
+   * Fts callback: destroy the editor associated with this FtsSequenceObject.
+   */
   public void destroyEditor(int nArgs, FtsAtom args[])
   {
     if(sequence != null)
@@ -79,7 +84,11 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       sequence = null;
     }
   }
-    
+
+  /**
+   * Fts callback: add a TrackEvent(first arg) in a track (second arg). 
+   * 
+   */
   public void addEvent(int nArgs , FtsAtom args[])
   {
     String trackName = args[0].getString();
@@ -96,29 +105,32 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   /**
-   * how many events in the data base?
+   * return how many tracks in the sequence
    */
-
   public int trackCount()
   {
     return tracks.size();
   }
 
-
+  /**
+   * return the name of the sequence
+   */
   public String getName()
   {
     return name;
   }
 
   /**
-   * Returns the i-th track in the vector */
+   * Returns the i-th track in the vector 
+   */
   public Track getTrackAt(int i)
   {
     return (Track) tracks.elementAt(i);
   }
 
   /**
-   * Returns the track with this id */
+   * Returns the track with this id 
+   */
   public Track getTrackById(int id)
   {
     Track track;
@@ -131,7 +143,8 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   /**
-   * Returns the track with this name */
+   * Returns the track with this name 
+   */
   public Track getTrackByName(String name)
   {
     Track track;
@@ -205,7 +218,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   //----- Fields
-  /** Key for remote call add */
+  Sequence sequence = null;  
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();

@@ -79,6 +79,7 @@ public class DeleteTool extends Tool implements PositionListener {
       {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	// starts an undoable transition
+	
 	((UndoableData) egc.getDataModel()).beginUpdate();
 
 	if (egc.getSelection().isInSelection(aEvent))
@@ -96,14 +97,14 @@ public class DeleteTool extends Tool implements PositionListener {
 	    
 	    // remove them
 	    for (int i = 0; i< v.size(); i++)
-	      egc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
-
+		egc.getDataModel().removeEvent((TrackEvent)(v.elementAt(i)));
 	    v = null;
 	  }
 	else
 	  {
-	    egc.getDataModel().removeEvent(aEvent);
-	    egc.getSelection().deselectAll();
+	      egc.getDataModel().removeEvent(aEvent);
+	      
+	      egc.getSelection().deselectAll();
 	  }
 
 	((UndoableData) egc.getDataModel()).endUpdate();
@@ -112,8 +113,7 @@ public class DeleteTool extends Tool implements PositionListener {
   
 
 
-  //---- Fields
+    //---- Fields
 
-  MouseTracker itsMouseTracker;
-
+    MouseTracker itsMouseTracker;
 }

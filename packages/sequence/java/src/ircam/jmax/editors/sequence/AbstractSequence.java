@@ -288,6 +288,9 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	removeIndex = indexOf(event);
 	removeEventAt(removeIndex);
+
+	sendArgs[0].setObject(event);
+	((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
     }
     
 
@@ -746,6 +749,13 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 
     public static DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
+
+    static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
 }
 
 
