@@ -225,14 +225,14 @@ public class Fts implements MaxContext
    * there is not a Sync point. Will receive the created object in asynchronous way with a message.
    * (used in Sequence editor)
    */
-  public void makeFtsObjectAsync(String className, int nArgs, FtsAtom args[])
-  {
-    int id;
+    /*public void makeFtsObjectAsync(String className, int nArgs, FtsAtom args[])
+      {
+      int id;
 
-    id = server.getNewObjectId();
+      id = server.getNewObjectId();
 
-    server.newObject( id, className, nArgs, args);
-  }
+      server.newObject( id, className, nArgs, args);
+      }*/
     
 
   /** Make a Connection.
