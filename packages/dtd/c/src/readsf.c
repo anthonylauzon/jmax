@@ -48,7 +48,7 @@ typedef struct
     int read_index;
     int is_open;
     int is_started;
-
+    int is_eof;
 
     fts_thread_worker_t* thread_worker;
 } readsf_t;
@@ -58,6 +58,13 @@ static fts_symbol_t readsf_symbol;
 static fts_symbol_t s_play;
 static fts_symbol_t s_pause;
 
+
+/* static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)*/
+static void readsf_eof_alarm(fts_object_t* o)
+{
+    /* set bang to last outlet */
+    fts_outlet_bang(o, fts_object_get_outlets_number(o) - 1);
+}
 
 static void readsf_dsp( fts_word_t *argv)
 {
@@ -73,19 +80,41 @@ static void readsf_dsp( fts_word_t *argv)
 
   buffer_index = self->buffer_index;
 
+
   if (0 == self->is_started)
   {
       return;
   }
 
-  /* check if there is enough data available in com_buffer */
-  if (!(self->com_buffer[buffer_index].end_index >= (self->read_index + n_tick)))
+
+  /* check if it is eof and buffers are empty */
+  if ((1 == self->is_eof)
+      && (self->com_buffer[0].full == 0)
+      && (self->com_buffer[1].full == 0)
+      )
   {
-      /* swap buffer */
+      post ("[readsf~] end of file\n");
+      self->is_started = 0;
+      /* call eof file method */
+      readsf_eof_alarm((fts_object_t*)self);
+      return;
+  }
+
+
+
+  /* check if there is enough data available in com_buffer */
+ if (!(self->com_buffer[buffer_index].end_index >= (self->read_index + n_tick)))
+  {
+      /* set buffer to empty */
+      self->com_buffer[buffer_index].full = 0;
+      /* swap buffer */      
       buffer_index = (buffer_index + 1) % 2;
       /* check again */
-      if (!(self->com_buffer[buffer_index].end_index > (self->read_index + n_tick)))
+      if (!(self->com_buffer[buffer_index].end_index >= (self->read_index + n_tick)))
       {
+	  /* set buffer to empty */
+	  self->com_buffer[buffer_index].full = 0;
+	  /* now fill output with zero */
 	  for (channels = 0; channels < n_channels; ++channels)
 	  {
 	      out = (float*)fts_word_get_pointer(argv + 2 + channels);
@@ -128,6 +157,8 @@ static void readsf_dsp( fts_word_t *argv)
       /* reset read_index */
       self->read_index = 0;
   }
+  
+
 }
 
 static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -176,6 +207,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    reader->sf = sf;
 	    reader->com_buffer = self->com_buffer;
 	    reader->buffer_index = &self->buffer_index;
+	    reader->is_eof = &self->is_eof;
 	    thread_job->object = (fts_object_t*)reader;
 	    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
 						      fts_s_read);
@@ -247,8 +279,7 @@ static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
     readsf_t* self = (readsf_t*)o;
 
-    /* not yet implemented */
-    post("[readsf~] want to start \n");
+    post("[readsf~] start \n");
     self->is_started = 1;
 }
 
@@ -257,10 +288,9 @@ static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
     readsf_t* self = (readsf_t*)o;
 
-    /* not yet implemented */
-    post("[readsf~] want to stop \n");
+    post("[readsf~] stop \n");
     self->is_started = 0;
-    /* need to reset file pointer here */
+    self->read_index = 0;
 
 }
 
@@ -268,7 +298,7 @@ static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
     readsf_t* self = (readsf_t*)o;
 
-    /* not yet implemented */
+    post("[readsf~] pause \n");
     self->is_started += 1;
     self->is_started = self->is_started % 2;
 
@@ -311,11 +341,14 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   self->buffer_index = 0;
   self->is_open = 0;
   self->is_started = 0;
+  self->is_eof = 0;
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
-  fts_object_set_outlets_number(o, n_channels);
+  /* add an outlet for end of file alarm bang */
+  fts_object_set_outlets_number(o, n_channels + 1);
+  fts_class_outlet_bang(fts_object_get_class(o), n_channels);
 }
 
 static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -352,7 +385,6 @@ readsf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
   fts_class_message_varargs(cl, fts_s_open, readsf_open);
   fts_class_message_varargs(cl, fts_s_close, readsf_close);
   
-  /* not yet implemented */
   fts_class_message_varargs(cl, fts_s_start, readsf_start);
   fts_class_message_varargs(cl, fts_s_stop, readsf_stop);
   fts_class_message_varargs(cl, s_pause, readsf_pause);
