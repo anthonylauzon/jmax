@@ -253,6 +253,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     return "col "+col_id;
   }
   
+  public String getType()
+  {
+    return "FMat";
+  }  
+  
   public void setRows(int m)
   {
     setSize(m, n_cols);

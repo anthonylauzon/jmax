@@ -267,6 +267,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     }
   }
   
+  public String getType()
+  {
+    return "Dict";
+  }
+  
   public void setRows(int m)
   {
     setSize(m, n_cols);
