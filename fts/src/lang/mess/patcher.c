@@ -704,6 +704,7 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   /* Define the "args" variable */
 
   this->args = (fts_data_t *)fts_atom_array_new_from_atom_list(ac - 1, at + 1);
+  fts_data_set_const(this->args);
   fts_data_refer(this->args);
 
   fts_variable_define(this, fts_s_args, o);
@@ -1110,6 +1111,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
       fts_atom_array_delete((fts_atom_array_t *)this->args);
 
       this->args = (fts_data_t *)fts_atom_array_new_from_atom_list(ac - 1, at + 1);
+      fts_data_set_const(this->args);
       fts_data_refer(this->args);
 
       /* set the new variables */
