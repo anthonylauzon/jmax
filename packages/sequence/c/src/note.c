@@ -363,7 +363,12 @@ scoob_instantiate(fts_class_t *cl)
   propobj_class_add_int_property(cl, seqsym_channel, NULL); /* scoob_propidx_channel = 1 */
   propobj_class_add_int_property(cl, seqsym_cue, NULL);
   propobj_class_add_float_property(cl, seqsym_offset, NULL);
-  
+
+  /* preliminary (1), until suivi can be initialised before track loading,
+     preliminary (2), until section and cue are markers */
+  propobj_class_add_int_property(cl, seqsym_section, NULL);
+  propobj_class_add_symbol_property(cl, fts_new_symbol("text"), NULL);
+
   fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
   
   fts_class_set_copy_function(cl, scoob_copy_function);

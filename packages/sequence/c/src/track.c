@@ -1337,6 +1337,7 @@ _track_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   }
 }
 
+
 static void
 _track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1360,6 +1361,7 @@ _track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   else
     fts_object_error(o, "insert: bad time value");
 }
+
 
 static void
 _track_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

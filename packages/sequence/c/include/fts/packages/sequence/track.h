@@ -24,6 +24,7 @@
 #define _SEQUENCE_TRACK_H_
 
 #include <fts/fts.h>
+#include <fts/packages/sequence/marker.h>
 #include <fts/packages/sequence/sequence.h>
 
 
