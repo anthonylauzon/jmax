@@ -401,6 +401,7 @@ static void hashtable_iterator_get( const fts_hashtable_t *h, fts_iterator_t *i,
 
   hiter->table = h->table;
   hiter->keys = keys;
+  hiter->cell = 0;
   hiter->index = h->length;
 
   i->has_more = hashtable_iterator_has_more;
