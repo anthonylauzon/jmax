@@ -113,6 +113,9 @@ audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
   fts_array_append_int(buffer_sizes_array, 256);
   fts_array_append_int(buffer_sizes_array, 512);
   fts_array_append_int(buffer_sizes_array, 1024);
+  fts_array_append_int(buffer_sizes_array, 2048);
+  fts_array_append_int(buffer_sizes_array, 4096);
+  fts_array_append_int(buffer_sizes_array, 8192);
 }
 
 
@@ -497,28 +500,34 @@ int audioconfig_check_buffer_size(fts_audioconfig_t* config, int buffer_size)
 
 
 int 
-fts_audioconfig_get_buffer_size(fts_audioconfig_t* self)
+fts_audioconfig_get_buffer_size(fts_audioconfig_t* config)
 {
 /* #warning TODO: Convert this function into a macro */
-  return self->buffer_size;
+  return config->buffer_size;
 }
 
 int 
 fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
 /* #warning NOT YET IMPLEMENTED (fts_audioconfig_set_buffer_size) */
+  int set_buffer_size;
+  fts_atom_t arg;
   /* check if buffer size is available with current use audioport */
   if (audioconfig_check_buffer_size(config, buffer_size))
   {
     config->buffer_size = buffer_size;
     /* change buffer size for used audioport */
-    return buffer_size;
+    fts_dsp_set_buffer_size(buffer_size);
+    set_buffer_size = buffer_size;
   }
   else
   {
     /* error */
-    return buffer_size;
+    set_buffer_size = buffer_size;
   }
+  
+  config->buffer_size = buffer_size;
+  return buffer_size;
 }
 
 int
@@ -538,7 +547,7 @@ fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate)
   if (audioconfig_check_sample_rate(config, sample_rate))
   {
     config->sample_rate = sample_rate;
-/*     /\* change dsp sample rate *\/ */
+    /* change dsp sample rate */
      fts_dsp_set_sample_rate((double)sample_rate);
     /* change sample rate for used audioport */
     set_sample_rate = sample_rate;
@@ -602,6 +611,9 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int buffer_size = fts_get_int(at);
   fts_atom_t arg;
+
+  /* check if sample rate is available */
+  fts_audioconfig_set_buffer_size(self, buffer_size);
       
   fts_set_int(&arg, self->buffer_size);
   fts_client_send_message( o, audioconfig_s_buffer_size, 1, &arg);
