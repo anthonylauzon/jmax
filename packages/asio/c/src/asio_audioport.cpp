@@ -24,6 +24,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <windows.h>
+#include <io.h>
+#include <fcntl.h>
 #include "jmax_asio_port.h"
 
 /* 
@@ -43,6 +46,7 @@ fts_class_t* asio_audioport_type;
    so we need this global variable to know which driver we use 
 */
 static asio_audioport_t* current_port = 0;
+static int nb_port_opened = 0;
 
 /*
   Needed ?
@@ -52,8 +56,8 @@ unsigned long get_sys_reference_time();
 /*
   Used to stop FTS scheduler
 */
-HANDLE in;
-HANDLE out;
+#define PIPE_DEFAULT_SIZE 256
+int pipe_handles[2];
 
 // Utilities for buffer size alignment computation
 int PGCD(int a, int b)
@@ -171,6 +175,7 @@ ASIOTime *bufferSwitchTimeInfo(ASIOTime *timeInfo, long index, ASIOBool processN
   // reinit asio input buffer offset  
   current_port->asio_input_buffer_offset = 0;
 
+  // post("ASIO CALLBACK \n");
   // fill asio output with remaining frames in port output 
   frames_output_asio_buffer = frames_per_buffer - current_port->asio_output_buffer_offset;
 
@@ -562,24 +567,99 @@ asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
   }
 }
 
+static void asio_restart_fts_scheduler()
+{
+  // write in named pipe
+  int val = 0;
+  post("[asio] Restart FTS scheduler \n");
+  fts_log("[asio] Restart FTS scheduler \n");
+  write(pipe_handles[1], &val, sizeof(int));
+}
+
+static void asio_stop_fts_scheduler()
+{
+  // Create pipe
+  if (0 != _pipe(pipe_handles, PIPE_DEFAULT_SIZE, O_BINARY))
+    {
+      fts_log("[asio] Cannot create a pipe for stopping FTS scheduler\n");
+      post("[asio] Cannot create pipe\n");
+    }
+  else
+    {
+      int val;
+      post("[asio] FTS scheduler stopped \n");
+      fts_log("[asio] FTS scheduler stopped \n");
+      read(pipe_handles[0], &val, sizeof(int));
+      post("[asio] FTS scheduler restarted \n");
+      fts_log("[asio] FTS scheduler restarted \n");
+    }
+  
+}
+
+static int
+asio_audioport_open(asio_audioport_t* port, int input_or_output)
+{
+  int result = 0;
+
+  if (nb_port_opened == 0)
+    {
+      // set current port
+      current_port = port;
+      nb_port_opened++;
+      // set port open
+      fts_audioport_set_open((fts_audioport_t*)port, input_or_output);
+      // start ASIO callback
+      if (!current_port->driver->isStarted)
+	{
+	  post("Start ASIO callback \n");
+	  current_port->driver->driver_interface->start();
+	  result = 1;
+	}
+
+      // stop fts scheduler 
+      asio_stop_fts_scheduler();
+    }
+  else
+    {
+      post("ASIO allows only to use one driver (%s)\n", current_port->driver->name);
+      // set port open
+      fts_audioport_set_open((fts_audioport_t*)port, input_or_output);
+      nb_port_opened++;
+    }
+
+  post("[asio] open (%d)\n", nb_port_opened);
+  return result;
+}
+
+static void
+asio_audioport_close()
+{
+  int result = 0;
+  if (nb_port_opened == 1)
+    {
+      // stop ASIO callback
+      current_port->driver->driver_interface->stop();
+      post("ASIO Callback stop\n");
+      // restart fts scheduler
+      asio_restart_fts_scheduler();
+      post("FTS scheduler restarted\n");      
+      nb_port_opened = 0;
+    }
+  else
+    {
+      nb_port_opened--;
+    }
+  post("[asio] close (%d)\n", nb_port_opened);
+}
+
 static void 
 asio_audioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   /* ASIO support only one callback, so we don't want to open other ports */
   /* set current_port to opened port */
-  current_port = (asio_audioport_t*)o;
-
-  fts_audioport_set_open((fts_audioport_t*)o, FTS_AUDIO_INPUT);
-  /* before starting ASIO processing we need to stop FTS scheduler .... */
-
-  /* start ASIO processing */
-  if (!current_port->driver->isStarted)
-  {
-    current_port->driver->driver_interface->start();
-  }
-
-  /* HACK to simulate FTS scheduler stop */
-  Sleep(10000);
+  asio_audioport_t* port = (asio_audioport_t*)o;
+  post("[asio] open input \n");
+  asio_audioport_open(port, FTS_AUDIO_INPUT);
 }
 
 static void 
@@ -587,33 +667,27 @@ asio_audioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 {
   /* ASIO support only one callback, so we don't want to open other ports */
   /* set current_port to opened port */
-  current_port = (asio_audioport_t*)o;
-
-  fts_audioport_set_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
-
-  /* before starting ASIO processing, we need to  FTS scheduler */
-  /* call a function for this ..... */
-
-  /* start ASIO processing */
-  current_port->driver->driver_interface->start();
-  /* simulate FTS scheduler stop */
-  Sleep(1000000);
+  asio_audioport_t* port = (asio_audioport_t*)o;
+  post("[asio] open output \n");
+  asio_audioport_open(port, FTS_AUDIO_OUTPUT);
 }
 
 static void
 asio_audioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
+  post("[asio] asio close input\n");
   fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_INPUT);
   // dont forget to restart FTS scheduler 
-  current_port->driver->driver_interface->stop();
+  asio_audioport_close();
 }
 
 static void
 asio_audioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
+  post("[asio] asio close output\n");
   fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
   // dont forget to restart FTS scheduler  
-  current_port->driver->driver_interface->stop();
+  asio_audioport_close();
 }
 
 static void
