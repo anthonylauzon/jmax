@@ -56,6 +56,15 @@
  */
 #define fts_get_class_name(p) fts_class_get_name( fts_get_class(p))
 
+/** 
+ * Check type of an atom
+ *
+ * @fn int fts_is_a(fts_atom_t* p, fts_class_t* cl)
+ * @param p pointer to the the atom
+ * @param c the type of the atom as a fts_class_t*
+ * @return 1 if atom is of the given type
+ * @ingroup atom
+ */
 #define fts_is_a(p,c) ((p)->type == (c))
 
 /**
@@ -434,5 +443,9 @@ FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
  */
 FTS_API int fts_atom_compare(const fts_atom_t *p1, const fts_atom_t *p2);
 
+/**
+ * Constant representing a 'void' atom
+ * @ingroup atom
+ */
 extern const fts_atom_t *fts_null;
 
