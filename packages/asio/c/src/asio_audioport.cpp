@@ -943,6 +943,9 @@ extern "C"
     fts_symbol_t s = fts_new_symbol("asio_audioport");
     asio_audioport_type = fts_class_install(s, asio_audioport_instantiate);
 
+    /* initialize the COM library */
+    CoInitialize(0);
+
     /* Let the asioCallbacks structure point to our static methods */
     asioCallbacks.bufferSwitch         = &bufferSwitch;
     asioCallbacks.sampleRateDidChange  = &sampleRateChanged;

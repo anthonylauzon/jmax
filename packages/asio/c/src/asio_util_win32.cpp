@@ -213,9 +213,6 @@ unsigned int asio_util_scan_drivers()
   asio_driver_t* driver = 0;
   fts_atom_t at;
 
-  /* initialize the COM library */
-  CoInitialize(0);
-
   /* open registry key for ASIO driver */
   err = RegOpenKey(HKEY_LOCAL_MACHINE, ASIO_PATH,&regKeyEnum);
   while(err == ERROR_SUCCESS)
