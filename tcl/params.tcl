@@ -31,9 +31,8 @@ if {[systemProperty "jmaxHostType"] != ""} then {
 } else {
     if [catch {set foo $jmaxHostType}] then {
 	if [info exists jmaxHostTypeTable($jmaxHost)] then {
-	    set jmaxHostType jmaxHostTypeTable("$jmaxHost)
-	}
-	else {
+	    set jmaxHostType jmaxHostTypeTable("$jmaxHost")
+	} else {
 	    set jmaxHostType "octane"
 	}
     }
