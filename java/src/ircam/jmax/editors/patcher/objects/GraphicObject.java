@@ -51,18 +51,18 @@ abstract public class GraphicObject implements DisplayObject
     static final int INOUTLET_WIDTH = 5;
     static final int INOUTLET_HEIGHT = 3;
 
-    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 5;
-    static final int HIGHLIGHTED_INOUTLET_WIDTH = 6;
+    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 6;
+    static final int HIGHLIGHTED_INOUTLET_WIDTH = 7;
 
     // The part of the highlight that go inside the 
     // Rectangle 
 
-    static final int HIGHLIGHTED_INLET_OVERLAP = 4;
+    static final int HIGHLIGHTED_INLET_OVERLAP = 5;
 
     // The part of the highlight that go inside the 
     // Rectangle 
 
-    static final int HIGHLIGHTED_OUTLET_OVERLAP = 4;
+    static final int HIGHLIGHTED_OUTLET_OVERLAP = 5;
 
     // PAD is the distance between the object border and the 
     // center of the inlet/outlet; CHANGE the Connection geometry
@@ -342,23 +342,27 @@ abstract public class GraphicObject implements DisplayObject
 
     for ( int i = 0; i < n; i++)
       {
-	int x, y, w, h;
+	int x, y;
 
 	x = getInletAnchorX(i);
 	y = getInletAnchorY(i);
 
 	if (itsSketchPad.isHighlightedInlet(this, i))
 	  {
-	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
-	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+	    int w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+	    int h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+	    int xHL = x - w / 2;
+	    int yHL = y + ObjectGeometry.HIGHLIGHTED_INLET_OVERLAP + ObjectGeometry.INLET_OFFSET;
 
-	    g.fillRect( x - w / 2,
-			y - h + ObjectGeometry.HIGHLIGHTED_INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
+	    g.fillRect( xHL, yHL - h, w, h - 3);
+	    g.drawLine( x - 2, yHL - 3, x + 2, yHL - 3);
+	    g.drawLine( x - 1, yHL - 2, x + 1, yHL - 2);
+	    g.drawLine( x - 0, yHL - 1, x + 0, yHL - 1);
 	  }
 	else
 	  {
-	    w = ObjectGeometry.INOUTLET_WIDTH;
-	    h = ObjectGeometry.INOUTLET_HEIGHT;
+	    int w = ObjectGeometry.INOUTLET_WIDTH;
+	    int h = ObjectGeometry.INOUTLET_HEIGHT;
 
 	    g.fillRect( x - w / 2, y - h + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
 	  }
@@ -373,23 +377,27 @@ abstract public class GraphicObject implements DisplayObject
 
     for ( int i = 0; i < n; i++)
       {
-	int x, y, w, h;
+	int x, y;
 
 	x = getOutletAnchorX(i);
 	y = getOutletAnchorY(i);
 
 	if (itsSketchPad.isHighlightedOutlet(this, i))
 	  {
-	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
-	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+	    int w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+	    int h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
+	    int xHL = x - w / 2;
+	    int yHL = y - ObjectGeometry.HIGHLIGHTED_OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET;
 
-	    g.fillRect( x - w / 2,
-			y - ObjectGeometry.HIGHLIGHTED_OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
+	    g.drawLine( x - 0, yHL + 0, x + 0, yHL + 0);
+	    g.drawLine( x - 1, yHL + 1, x + 1, yHL + 1);
+	    g.drawLine( x - 2, yHL + 2, x + 2, yHL + 2);
+	    g.fillRect( xHL, yHL + 3, w, h - 3);
 	  }
 	else
 	  {
-	    w = ObjectGeometry.INOUTLET_WIDTH;
-	    h = ObjectGeometry.INOUTLET_HEIGHT;
+	    int w = ObjectGeometry.INOUTLET_WIDTH;
+	    int h = ObjectGeometry.INOUTLET_HEIGHT;
 
 	    g.fillRect( x - w / 2, y - ObjectGeometry.OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
 	  }

@@ -34,7 +34,7 @@ public class IntBox extends NumberBox implements FtsIntValueListener
 {
   private int itsInteger = 0;
 
-  private int itsStartingY, itsFirstY;
+  private int itsStartingValue, itsFirstY;
 
   public IntBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -86,12 +86,12 @@ public class IntBox extends NumberBox implements FtsIntValueListener
     if (Squeack.isDown(squeack))
       {
 	itsFirstY = mouse.y;
-	itsStartingY = itsInteger;
+	itsStartingValue = itsInteger;
 	dragged = false;
       }
     else if (Squeack.isDrag(squeack))
       {
-	((FtsIntValueObject)ftsObject).setValue(itsStartingY + (itsFirstY - mouse.y));
+	((FtsIntValueObject)ftsObject).setValue(itsStartingValue + (itsFirstY - mouse.y));
 	dragged = true;
       }
     else if (Squeack.isUp(squeack))
@@ -105,4 +105,3 @@ public class IntBox extends NumberBox implements FtsIntValueListener
       }
   }
 }
-

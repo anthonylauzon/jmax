@@ -31,6 +31,7 @@ import ircam.jmax.editors.patcher.*;
 abstract class NumberBox extends GraphicObject implements KeyEventClient {
   boolean valueValid = true;
   private StringBuffer currentText;
+  private int nDecimals = 0;
   private String filter;
   private static final int DEFAULT_WIDTH = 40;
   private static final int DEFAULT_HEIGHT = 15;
@@ -144,8 +145,8 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
     // Draw the value
     String aString;
 
-    if (valueValid)
-      aString = getVisibleString( getValueAsText());
+    if(valueValid)
+      aString = getVisibleString(getValueAsText());
     else 
       aString = getVisibleString(currentText.toString());
     
@@ -165,13 +166,13 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
 
     int aStringLength = theString.length();
 
-    int aCurrentSpace = getWidth() - (getHeight()/2+5) - 5;
-    int aStringWidth = getFontMetrics().stringWidth( aString);
+    int aCurrentSpace = getWidth() - (getHeight() / 2 + 5) - 5;
+    int aStringWidth = getFontMetrics().stringWidth(aString);
 
-    if ( aStringWidth < aCurrentSpace)
+    if (aStringWidth < aCurrentSpace)
       return aString;
 
-    while ( ( aCurrentSpace <= aStringWidth) && (aString.length() > 0) )
+    while(( aCurrentSpace <= aStringWidth) && (aString.length() > 0) )
       {
 	aString = aString.substring( 0, aString.length()-1);
 	aStringWidth = getFontMetrics().stringWidth( aString);

@@ -32,26 +32,23 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class FloatBox extends NumberBox implements FtsFloatValueListener
 {
-  private float value = (float) 0.0;
-
-  private float itsStartingValue;
+  private double value = 0.0;
 
   // values relative to mouse dragging motion
-  private float acceleration;
-  private float velocity;
-  private float previousVelocity;
-  private int previousY;
+  private double increment;
+  private double valInc;  
+  private int itsLastY;
 
   FloatBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 
-    value = ((FtsFloatValueObject)ftsObject).getValue();
+    value = (double)((FtsFloatValueObject)ftsObject).getValue();
   }
 
   public void valueChanged(float v) 
   {
-    this.value = v;
+    this.value = (double)v;
     updateRedraw();
   }
 
@@ -64,7 +61,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     // Number format for controlling the float printed by the float box.
     // essentially used to avoid scientific notation in float.
     
-    formatter  = new DecimalFormat("0.######;-0.######");
+    formatter = new DecimalFormat("0.####;-0.####");
     formatter.setGroupingUsed(false);
     formatter.setDecimalSeparatorAlwaysShown(true);
   }
@@ -73,20 +70,20 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     try
       {
-	value = ((Double) formatter.parse(v)).floatValue();
+	value = (double)((Double)formatter.parse(v)).floatValue();
       }
     catch (java.text.ParseException  e1)
       {
 	return;
       }
 
-    ((FtsFloatValueObject)ftsObject).setValue(value);
+    ((FtsFloatValueObject)ftsObject).setValue((float)value);
   }
 
 
   String getValueAsText()
   {
-    return formatter.format( value);
+    return formatter.format(value);
   }
 
   //--------------------------------------------------------
@@ -97,47 +94,74 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (Squeack.isDown(squeack))
+    if(Squeack.isDown(squeack))
       {
 	dragged = false;
-	velocity = 0;
-	previousVelocity = 0;
-	acceleration = 0;
-	previousY = mouse.y;
-	itsStartingValue = value;
+	itsLastY = mouse.y;
       }
-    else if (Squeack.isDrag(squeack))
+    else if(Squeack.isDrag(squeack))
       {
-	dragged = true;
-	previousVelocity = velocity;
-	velocity = (previousY- mouse.y);
-	acceleration = Math.abs(velocity-previousVelocity);
-	previousY= mouse.y;
-
-	float increment;
-
-	if (velocity*previousVelocity > 0)
-	  increment = (velocity/1000) + ((velocity>0)?acceleration:-acceleration)/10;
-	else
-	  increment = velocity/1000;
-
-	if (Squeack.isShift(squeack))
-	  increment*=10;
-
-	value += increment;
-
-	((FtsFloatValueObject)ftsObject).setValue(value);
-      }
-    else if (Squeack.isUp(squeack))
-      {
-	if (! dragged)
+	if(!dragged)
 	  {
-	    itsSketchPad.setKeyEventClient( this);
+	    double valueAbs = Math.abs(value);
+
+	    if(valueAbs > 750.)
+	      {
+		increment = 1.;
+	      }
+	    else if(valueAbs > 0.1)
+	      {
+		double decade = Math.floor(Math.log(valueAbs) / Math.log(10.));
+		double decadeFactor = Math.exp(decade * Math.log(10.));
+		double factor = valueAbs / decadeFactor;
+
+		if(factor > 7.5)
+		  factor = 10.;
+		else if(factor > 3.5)
+		  factor = 5.;
+		else if(factor > 1.5)
+		  factor = 2.;
+		else
+		  factor = 1.;
+		
+		increment = 0.001 * factor * decadeFactor;
+	      }
+	    else
+	      increment = 0.0001;
+	    
+	    if(mouse.y > itsLastY)
+	      valInc = Math.floor(value / increment); // move down
+	    else
+	      valInc = Math.ceil(value / increment); // move up
+
+	    value = valInc * increment;
+	    ((FtsFloatValueObject)ftsObject).setValue((float)value);
+
+	    itsLastY = mouse.y;
+	    dragged = true;
+	  }
+       else
+	 {
+	   if(Squeack.isShift(squeack))
+	     valInc += (double)(itsLastY - mouse.y) * 10.;
+	   else
+	     valInc += (double)(itsLastY - mouse.y);
+	   
+	    value = valInc * increment;
+	   ((FtsFloatValueObject)ftsObject).setValue((float)value);
+
+	    itsLastY = mouse.y;
+	 }
+      }
+    else if(Squeack.isUp(squeack))
+      {
+	if(!dragged)
+	  {
+	    itsSketchPad.setKeyEventClient(this);
 	    valueValid = false;
 	    return;
 	  }
       }
-
   }
 }
 
