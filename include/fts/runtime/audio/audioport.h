@@ -91,8 +91,11 @@ extern void __fts_audioport_set_output_function( fts_audioport_t *port, fts_symb
 /*  3)   */
 #define fts_audioport_set_idle_function(P,F) (((fts_audioport_t *)(P))->idle_function = (F))
 
-extern fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *target, int outlet);
+extern fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *owner, int outlet);
+extern void fts_audioport_remove_in_object( fts_object_t *in_object);
+
 extern fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet);
+extern void fts_audioport_remove_out_object( fts_object_t *out_object);
 
 /* dac slip report:
  the audioport xrun function returns an int saying that there has been an xrun since last call

@@ -31,8 +31,14 @@
 
 #include <fts/fts.h>
 
+typedef struct {
+  fts_object_t head;
+  fts_object_t **dispatchers;
+} adc_tilda_t;
+
 static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  adc_tilda_t *this = (adc_tilda_t *)o;
   fts_audioport_t *port;
   int i, outlets;
 
@@ -48,16 +54,46 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   outlets = fts_object_get_outlets_number( o);
 
+  this->dispatchers = (fts_object_t **)fts_malloc( outlets * sizeof( fts_object_t *));
+
   if ( ac != 0)
     {
       for ( i = 0; i < outlets; i++)
-	fts_audioport_get_in_object( port, o, fts_get_long(at + i) - 1);
+	{
+	  this->dispatchers[i] = fts_audioport_get_in_object( port, o, fts_get_long(at + i) - 1);
+	  fts_object_refer( this->dispatchers[i]);
+	}
     }
   else
     {
-      fts_audioport_get_in_object( port, o, 0);
-      fts_audioport_get_in_object( port, o, 1);
+      for ( i = 0; i < 2; i++)
+	{
+	  this->dispatchers[i] = fts_audioport_get_in_object( port, o, i);
+	  fts_object_refer( this->dispatchers[i]);
+	}
     }
+}
+
+static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  adc_tilda_t *this = (adc_tilda_t *)o;
+  int i;
+
+  for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+    {
+      fts_audioport_remove_in_object( this->dispatchers[ i]);
+      fts_object_release( this->dispatchers[ i]);
+    }
+}
+
+static void adc_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_set_int(fts_s_dsp_on, 1);
+}
+
+static void adc_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -72,9 +108,13 @@ static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   else
     outlets = ac;
 
-  fts_class_init( cl, sizeof( fts_object_t), 0, outlets, 0);
+  fts_class_init( cl, sizeof( adc_tilda_t), 1, outlets, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, adc_tilda_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, adc_tilda_delete);
+
+  fts_method_define( cl, 0, fts_new_symbol("start"), adc_tilda_start, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("stop"), adc_tilda_stop, 0, 0);
 
   for ( i = 0; i < outlets; i++)
     fts_dsp_declare_outlet( cl, i);

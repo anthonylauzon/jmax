@@ -486,8 +486,8 @@ static void FUN_NAME( fts_word_t *argv)					\
   int n, channels, ch, i, j;						\
   ssize_t r;								\
   size_t count;								\
-  TYPE *buffer;								\
   u_char *data;								\
+  TYPE *buffer;								\
 									\
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
   n = fts_word_get_long(argv + 1);					\
@@ -577,60 +577,98 @@ static void FUN_NAME( fts_word_t *argv)					\
 }
 
 
-#define INPUT_FUN_NONINTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)	\
-static void FUN_NAME( fts_word_t *argv)					\
-{									\
-  alsaaudioport_t *port;						\
-  int n, channels, ch, i, r;						\
-  TYPE *buffer;								\
-  void **buffers;							\
-									\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
-  n = fts_word_get_long(argv + 1);					\
-  channels = fts_audioport_get_input_channels( port);			\
-  buffers = (void **)port->input_buffer;				\
-									\
-  if ( (r = SND_PCM_FUN( port->capture.handle, buffers, n)) == -EPIPE)	\
-    xrun( port, port->capture.handle);					\
-  else if (r < 0)							\
-    post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));	\
-									\
-  for ( ch = 0; ch < channels; ch++)					\
-    {									\
-      long *buffer = (long *)buffers[ch];				\
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);		\
-									\
-      for ( i = 0; i < n; i++)						\
-        out[i] = (buffer[i] >> SHIFT) / CONV;				\
-    }									\
+#define INPUT_FUN_NONINTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)					\
+static void FUN_NAME( fts_word_t *argv)									\
+{													\
+  alsaaudioport_t *port;										\
+  int n, channels, ch, i;										\
+  ssize_t r;												\
+  size_t count, result;											\
+  u_char **buffers;											\
+													\
+  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
+  n = fts_word_get_long(argv + 1);									\
+  channels = fts_audioport_get_input_channels( port);							\
+													\
+  buffers = (u_char **)alloca( channels * sizeof( u_char *));						\
+  count = n;												\
+  result = 0;												\
+  while ( count > 0)											\
+    {													\
+      for ( ch = 0; ch < channels; ch++)								\
+	buffers[ch] = ((u_char **)port->input_buffer)[ch] + result*port->capture.bytes_per_sample;	\
+													\
+      r = SND_PCM_FUN( port->capture.handle, (void **)buffers, count);					\
+													\
+      if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count))						\
+	snd_pcm_wait( port->capture.handle, 1000);							\
+      else if ( r == -EPIPE )										\
+	xrun( port, port->capture.handle);								\
+      else if (r < 0)											\
+	post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));					\
+													\
+      if ( r > 0)											\
+	{												\
+	  result += r;											\
+	  count -= r;											\
+	}												\
+    }													\
+													\
+  for ( ch = 0; ch < channels; ch++)									\
+    {													\
+      TYPE *buffer = ((TYPE **)port->input_buffer)[ch];							\
+      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);						\
+													\
+      for ( i = 0; i < n; i++)										\
+        out[i] = (buffer[i] >> SHIFT) / CONV;								\
+    }													\
 }
 
-#define OUTPUT_FUN_NONINTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)	\
-static void FUN_NAME( fts_word_t *argv)					\
-{									\
-  alsaaudioport_t *port;						\
-  int n, channels, ch, i, r;						\
-  TYPE *buffer;								\
-  void **buffers;							\
-									\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
-  n = fts_word_get_long(argv + 1);					\
-  channels = fts_audioport_get_output_channels( port);			\
-  buffers = (void **)port->output_buffer;				\
-									\
-  for ( ch = 0; ch < channels; ch++)					\
-    {									\
-      long *buffer = (long *)buffers[ch];				\
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);		\
-									\
-      for ( i = 0; i < n; i++)						\
-	buffer[i] = ((TYPE) (CONV * in[i])) << SHIFT;			\
-    }									\
-									\
-  if ( (r = SND_PCM_FUN( port->playback.handle, buffers, n)) == -EPIPE)	\
-    xrun( port, port->playback.handle);					\
-  else if (r < 0)							\
-    post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));	\
+#define OUTPUT_FUN_NONINTERLEAVED(FUN_NAME,TYPE,SND_PCM_FUN,SHIFT,CONV)					\
+static void FUN_NAME( fts_word_t *argv)									\
+{													\
+  alsaaudioport_t *port;										\
+  int n, channels, ch, i;										\
+  ssize_t r;												\
+  size_t count, result;											\
+  u_char **buffers;											\
+													\
+  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
+  n = fts_word_get_long(argv + 1);									\
+  channels = fts_audioport_get_output_channels( port);							\
+													\
+  for ( ch = 0; ch < channels; ch++)									\
+    {													\
+      TYPE *buffer = ((TYPE **)port->output_buffer)[ch];						\
+      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);						\
+													\
+      for ( i = 0; i < n; i++)										\
+	buffer[i] = ((TYPE) (CONV * in[i])) << SHIFT;							\
+    }													\
+													\
+  buffers = (u_char **)alloca( channels * sizeof( u_char *));						\
+  count = n;												\
+  result = 0;												\
+  while ( count > 0)											\
+    {													\
+      for ( ch = 0; ch < channels; ch++)								\
+	buffers[ch] = ((u_char **)port->output_buffer)[ch] + result*port->playback.bytes_per_sample;	\
+													\
+      r = SND_PCM_FUN( port->playback.handle, (void **)buffers, count);					\
+													\
+      if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count))						\
+	snd_pcm_wait( port->playback.handle, 1000);							\
+      else if ( r == -EPIPE )										\
+	xrun( port, port->playback.handle);								\
+      else if (r < 0)											\
+	post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));					\
+													\
+      if ( r > 0)											\
+	{												\
+	  result += r;											\
+	  count -= r;											\
+	}												\
+    }													\
 }
 
 /*
@@ -703,6 +741,34 @@ static int alsaaudioport_xrun_function( fts_audioport_t *port)
 
   return xrun;
 }
+
+#ifdef DEBUG
+static void pcm_dump_post( snd_pcm_t *handle)
+{
+  snd_output_t *log;
+  char *p, *q;
+
+  snd_output_buffer_open( &log);
+
+  snd_pcm_dump( handle, log);
+
+  snd_output_buffer_string( log, &p);
+
+  do
+    {
+      q = index( p, '\n');
+      if (q)
+	{
+	  *q = '\0';
+	  post( "%s\n", p);
+	  p = q+1;
+	}
+    }
+  while ( *p);
+
+  snd_output_close( log);
+}
+#endif
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -787,37 +853,13 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 	  return;
 	}
     }
-
   fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function);
 
 #ifdef DEBUG
-  {
-    snd_output_t *log;
-    char *p, *q;
-
-    snd_output_buffer_open( &log);
-
-    if (this->capture.handle)
-      snd_pcm_dump( this->capture.handle, log);
-    if (this->playback.handle)
-      snd_pcm_dump( this->playback.handle, log);
-
-    snd_output_buffer_string( log, &p);
-
-    do
-      {
-	q = index( p, '\n');
-	if (q)
-	  {
-	    *q = '\0';
-	    post( "%s\n", p);
-	    p = q+1;
-	  }
-      }
-    while ( *p);
-
-    snd_output_close( log);
-  }
+  if (this->capture.handle)
+    pcm_dump_post( this->capture.handle);
+  if (this->playback.handle)
+    pcm_dump_post( this->playback.handle);
 #endif
 }
 

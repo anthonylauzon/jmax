@@ -28,6 +28,7 @@
  * This file's author: François Déchelle
  */
 
+#include <alloca.h>
 #include <stdlib.h>
 #include <fts/sys.h>
 #include <fts/lang.h>
@@ -350,7 +351,7 @@ static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_
 
 typedef struct {
   fts_object_t head;
-  fts_object_t *target;
+  fts_object_t *owner;
   int outlet;
 } indispatch_t;
 
@@ -361,7 +362,7 @@ static void indispatch_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   ac--;
   at++;
 
-  this->target = fts_get_object( at);
+  this->owner = fts_get_object( at);
   this->outlet = fts_get_int( at+1);
 }
 
@@ -371,7 +372,7 @@ static void indispatch_propagate_input(fts_object_t *o, int winlet, fts_symbol_t
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
   void *propagate_context = fts_get_ptr(at + 1);
 
-  (*propagate_fun)( propagate_context, this->target, this->outlet);
+  (*propagate_fun)( propagate_context, this->owner, this->outlet);
 }
 
 static fts_status_t indispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -387,7 +388,7 @@ static fts_status_t indispatch_instantiate(fts_class_t *cl, int ac, const fts_at
   return fts_Success;
 }
 
-fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *target, int outlet)
+fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *owner, int outlet)
 {
   fts_object_t *in;
   fts_atom_t a[3];
@@ -400,13 +401,21 @@ fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *
     }
 
   fts_set_symbol( a+0, s_indispatch);
-  fts_set_object( a+1, target);
+  fts_set_object( a+1, owner);
   fts_set_int( a+2, outlet);
   fts_object_new_to_patcher( fts_get_root_patcher(), 3, a, &in);
 
   fts_connection_new( FTS_NO_ID, port->audioportin, outlet, in, 0);
 
   return in;
+}
+
+void fts_audioport_remove_in_object( fts_object_t *in_object)
+{
+  fts_connection_t *p;
+
+  while ((p = in_object->in_conn[0]))
+    fts_connection_delete(p);
 }
 
 
@@ -440,6 +449,13 @@ fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet)
   return out;
 }
 
+void fts_audioport_remove_out_object( fts_object_t *out_object)
+{
+  fts_connection_t *p;
+
+  while ((p = out_object->out_conn[0]))
+    fts_connection_delete(p);
+}
 
 int fts_audioport_report_xrun( void)
 {
@@ -501,8 +517,8 @@ void audioport_config( void)
   s_indispatch = fts_new_symbol( "indispatch");
   s_outdispatch = fts_new_symbol( "outdispatch");
 
-  fts_metaclass_install( s_indispatch, indispatch_instantiate, fts_never_equiv);
-  fts_metaclass_install( s_outdispatch, outdispatch_instantiate, fts_never_equiv);
+  fts_class_install( s_indispatch, indispatch_instantiate);
+  fts_class_install( s_outdispatch, outdispatch_instantiate);
 
   fts_metaclass_install( s_audioportin, audioportin_instantiate, fts_never_equiv);
   fts_metaclass_install( s_audioportout, audioportout_instantiate, fts_never_equiv);

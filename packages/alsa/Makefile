@@ -37,9 +37,10 @@ clean:
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa
 	$(INSTALL_DATA) alsa.jpk $(lib_install_dir)/packages/alsa/alsa.jpk
-	$(INSTALL_DATA) alsa.scm $(lib_install_dir)/packages/alsa/alsa.scm
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsa.so $(lib_install_dir)/packages/alsa/lib/$(ARCH)/opt/libalsa.so )
+	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa/help
+	( cd help; for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/alsa/help/$$f ; done )
 .PHONY: install
 
 # The following line is a hack that installs the <package>.jpk file on all platforms
@@ -48,5 +49,4 @@ install:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa
 	$(INSTALL_DATA) alsa.jpk $(lib_install_dir)/packages/alsa/alsa.jpk
-	$(INSTALL_DATA) alsa.scm $(lib_install_dir)/packages/alsa/alsa.scm
 .PHONY: install-noarch

@@ -33,7 +33,7 @@
 
 typedef struct {
   fts_object_t head;
-  fts_object_t **targets;
+  fts_object_t **dispatchers;
 } dac_tilda_t;
 
 static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -45,10 +45,6 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   ac--;
   at++;
 
-  inlets = fts_object_get_inlets_number( o);
-
-  this->targets = (fts_object_t **)fts_malloc( inlets * sizeof( fts_object_t *));
-
   port = fts_audioport_get_default();
   if ( !port)
     {
@@ -56,15 +52,25 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;    
     }
 
+  inlets = fts_object_get_inlets_number( o);
+
+  this->dispatchers = (fts_object_t **)fts_malloc( inlets * sizeof( fts_object_t *));
+
   if ( ac != 0)
     {
       for ( i = 0; i < inlets; i++)
-	this->targets[i] = fts_audioport_get_out_object( port, fts_get_long(at + i) - 1);
+	{
+	  this->dispatchers[i] = fts_audioport_get_out_object( port, fts_get_long(at + i) - 1);
+	  fts_object_refer( this->dispatchers[i]);
+	}
     }
   else
     {
-      this->targets[0] = fts_audioport_get_out_object( port, 0);
-      this->targets[1] = fts_audioport_get_out_object( port, 1);
+      for ( i = 0; i < inlets; i++)
+	{
+	  this->dispatchers[0] = fts_audioport_get_out_object( port, i);
+	  fts_object_refer( this->dispatchers[i]);
+	}
     }
 }
 
@@ -73,16 +79,21 @@ static void dac_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
   dac_tilda_t *this = (dac_tilda_t *)o;
   int i;
 
-  /* For now, we leave the objects that were created
-     Otherwise, it crashes when you quit because it tries to delete
-     objects that were already deleted
-     Anyway, if you delete the dac~ object, the dispatch objects
-     will no longer be visited when you create the dsp chain
-     because of the propagation mechanism
-  */
+  for ( i = 0; i < fts_object_get_inlets_number( o); i++)
+    {
+      fts_audioport_remove_out_object( this->dispatchers[ i]);
+      fts_object_release( this->dispatchers[ i]);
+    }
+}
 
-/*    for ( i = 0; i < fts_object_get_inlets_number( o); i++) */
-/*      fts_object_delete_from_patcher( this->targets[ i]); */
+static void dac_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_set_int(fts_s_dsp_on, 1);
+}
+
+static void dac_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -92,8 +103,8 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   void *propagate_context = fts_get_ptr(at + 1);
   int n = fts_get_int(at + 2);
 
-  if ( this->targets)
-    (*propagate_fun)( propagate_context, this->targets[n], 0);
+  if ( this->dispatchers[n])
+    (*propagate_fun)( propagate_context, this->dispatchers[n], 0);
 }
 
 static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -113,6 +124,9 @@ static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dac_tilda_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dac_tilda_delete);
+
+  fts_method_define( cl, 0, fts_new_symbol("start"), dac_tilda_start, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("stop"), dac_tilda_stop, 0, 0);
 
   for ( i = 0; i < inlets; i++)
     fts_dsp_declare_inlet( cl, i);
