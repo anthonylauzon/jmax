@@ -26,6 +26,7 @@
 package ircam.jmax.script.tcl;
 
 import tcl.lang.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.console.*;
@@ -42,7 +43,13 @@ class ConsoleOpenCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-      new ConsoleWindow();
+      //new ConsoleWindow();
+
+      SwingUtilities.invokeLater(new Runnable() {
+	      public void run()
+	      { 
+		  new ConsoleWindow();
+	      }});
   }
 }
 
