@@ -116,6 +116,7 @@ extern "C" {
 #include <fts/audio.h>
 #include <fts/bytestream.h>
 
+#include <fts/client.h>
 
 /*
  * FTS global initialization 
