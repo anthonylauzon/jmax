@@ -1,3 +1,7 @@
+2003-12-11  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/alsa/c/src/alsaaudio.h, packages/alsa/c/src/alsaaudiomanager.c, packages/alsa/c/src/alsaaudioport.c, packages/alsa/c/src/alsamidi.h, packages/alsa/c/src/alsaseqmidi.h: added defines for ALSA API change between 0.9 and 1.0 version.	
+
 2003-12-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/object.c (fts_object_set_name): fixed bug "[ 840782 ] can't remove object name".

@@ -19,6 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
+
+/* These 2 defines are needed */
+/* Alsa API changed between 0.9 and 1.0 */
+#define ALSA_PCM_OLD_HW_PARAMS_API
+#define ALSA_PCM_OLD_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 #include <fts/fts.h>
 
