@@ -164,7 +164,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     
     nValues = nArgs;
 
-    ((FtsDisplayListener) listener).display();
+    ((VectorDisplay) listener).display();
   }
 
   public void scroll(int nArgs, FtsAtom args[])
@@ -193,7 +193,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     if(nValues > size)
       nValues = size;
     
-    ((FtsDisplayListener) listener).display();
+    ((VectorDisplay) listener).display();
   }
 
   public void setCurrentBounds(float min, float max)
@@ -207,7 +207,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     computeZero();
 
     if(listener != null)
-      ((FtsDisplayListener) listener).display();
+      ((VectorDisplay) listener).display();
   }
 
   public void setBounds(float min, float max)

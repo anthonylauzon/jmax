@@ -133,7 +133,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
 	  }
       }
 
-    ((FtsDisplayListener) listener).display();
+    ((MatDisplay) listener).display();
   }
   
   public void scroll(int nArgs, FtsAtom args[])
@@ -207,7 +207,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     
     if(listener != null)
       {
-	((FtsDisplayListener) listener).display();
+	((MatDisplay) listener).display();
       }
   }
  
@@ -244,7 +244,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
 
     if(listener != null)
       {
-	((FtsDisplayListener) listener).display();
+	((MatDisplay) listener).display();
       }
   }
   
@@ -281,7 +281,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     if(listener != null)
       {
 	((MatDisplay) listener).setColor( new Color(min), new Color(max));
-	((FtsDisplayListener) listener).display();
+	((MatDisplay) listener).display();
       }
   }
   

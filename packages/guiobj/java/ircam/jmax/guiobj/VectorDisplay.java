@@ -37,7 +37,7 @@ import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-public class VectorDisplay extends GraphicObject implements FtsDisplayListener
+public class VectorDisplay extends GraphicObject 
 {
   private static final int minWidth = 18;
   private static final int minHeight = 18;

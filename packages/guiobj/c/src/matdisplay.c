@@ -60,6 +60,9 @@ static fts_symbol_t sym_window = 0;
 static fts_symbol_t sym_color = 0;
 static fts_symbol_t sym_size = 0;
 
+static void 
+matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /************************************************************
  *
  *  send to client with time gate
@@ -93,7 +96,7 @@ matdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    fts_client_send_message(o, sym_display, fts_array_get_size(&this->a), fts_array_get_atoms(&this->a));
 	 
 	  fts_array_set_size(&this->a, 0);
-	  fts_timebase_add_call(fts_get_timebase(), o, matdisplay_send, 0, this->period);
+	  fts_timebase_add_call(fts_get_timebase(), o, /*matdisplay_send*/matdisplay_called, 0, this->period);
 	}
     }
   else
@@ -107,7 +110,14 @@ matdisplay_deliver(matdisplay_t *this)
   
   /* if gate is open send right away */
   if(this->gate)
-    matdisplay_send((fts_object_t *)this, 0, 0, 0, 0);
+    /*matdisplay_send((fts_object_t *)this, 0, 0, 0, 0);*/
+    fts_update_request( (fts_object_t *)this);
+}
+
+static void 
+matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_update_request(o);
 }
 
 /************************************************************
@@ -487,6 +497,12 @@ matdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_dumper_send(dumper, sym_zoom, 2, a);
 }
 
+static void 
+matdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matdisplay_send( o, 0, 0, 0, 0);
+}
+
 /************************************************************
  *
  *  class
@@ -535,6 +551,7 @@ matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, matdisplay_update_gui); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, matdisplay_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, matdisplay_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, sym_window, matdisplay_set_window_size_by_client);
   fts_method_define_varargs(cl, fts_system_inlet, sym_zoom, matdisplay_set_zoom_by_client);

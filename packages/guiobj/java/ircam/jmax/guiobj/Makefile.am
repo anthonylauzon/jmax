@@ -10,7 +10,6 @@ FloatBoxControlPanel.java \
 Fork.java \
 FtsBangObject.java \
 FtsCommentObject.java \
-FtsDisplayListener.java \
 FtsDisplayObject.java \
 FtsFloatValueListener.java \
 FtsFloatValueObject.java \

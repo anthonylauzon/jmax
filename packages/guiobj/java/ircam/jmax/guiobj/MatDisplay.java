@@ -37,7 +37,7 @@ import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-public class MatDisplay extends GraphicObject implements FtsDisplayListener
+public class MatDisplay extends GraphicObject 
 {
   private static final int minWidth = 18;
   private static final int minHeight = 18;
@@ -60,6 +60,8 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
 
   public static MatDispControlPanel controlPanel = new MatDispControlPanel();
 
+  ImageObserver observer;
+
   public MatDisplay(FtsGraphicObject theFtsObject)
   {
     super(theFtsObject);
@@ -71,6 +73,13 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
     icm = generateColorModel(Color.white, Color.black);
     source = new MemoryImageSource(width, height, icm, pixels, 0, width);
     image = Toolkit.getDefaultToolkit().createImage(source);
+
+    observer = new ImageObserver() {
+	public boolean imageUpdate( Image img, int infoflags, int x, int y, int width, int height)
+	{
+	  return true;
+	}
+      };
   }
 
   public void setDefaults()
@@ -88,8 +97,9 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
     if((width * height) > 0)
       {
 	byte pixels[] = ((FtsMatDisplayObject)ftsObject).pixels;
-	image = itsSketchPad.getToolkit().createImage(new MemoryImageSource(width, height, icm, pixels, 0, width));
-	redraw();
+	image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(width, height, icm, pixels, 0, width));
+	/*redraw();*/
+	updateRedraw();
       }
   }
 
@@ -203,11 +213,14 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
     int scroll = ((FtsMatDisplayObject)ftsObject).getScaledScroll();
 
     if(scroll == 0)
-      g.drawImage(image, x+1, y+1, itsSketchPad);
+      //g.drawImage(image, x+1, y+1, itsSketchPad);
+      g.drawImage(image, x+1, y+1, observer);
     else
       {
-	g.drawImage(image, x+1 - scroll, y+1, itsSketchPad);
-	g.drawImage(image, x+1 - scroll + imageWidth, y+1, itsSketchPad);
+	/*g.drawImage(image, x+1 - scroll, y+1, itsSketchPad);
+	  g.drawImage(image, x+1 - scroll + imageWidth, y+1, itsSketchPad);*/
+	g.drawImage(image, x+1 - scroll, y+1, observer);
+	g.drawImage(image, x+1 - scroll + imageWidth, y+1, observer);
       }
   }
 

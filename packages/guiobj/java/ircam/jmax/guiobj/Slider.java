@@ -279,6 +279,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 	pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
 	g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
       }
+
     super.paint(g);
   }
   
