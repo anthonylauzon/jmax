@@ -823,15 +823,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	  {
 	    itsPatcher.stopUpdates();		      
 	    itsPatcher.requestDestroyEditor();
-	    //FtsPatcherObject.fireAtomicAction(true); 
-	    try
-	      {
-		itsPatcher.delete();
-	      }
-	    catch(IOException e){
-	      System.err.println("[ErmesSketchPad]: IO error deleting patcher");
-	    }
-
+	    ((FtsPatcherObject)itsPatcher.getParent()).requestDeleteObject( itsPatcher);
 	    ((ErmesSketchWindow)itsEditorContainer).Destroy();
 	  }
       }

@@ -1282,9 +1282,9 @@ static fts_patcher_t * get_patcher_by_file_name( fts_symbol_t file_name)
       if (fts_object_is_patcher(p))
 	{
 	  fts_patcher_t *patcher = (fts_patcher_t *)p;
-	  fts_symbol_t fime_name = fts_patcher_get_file_name(patcher);
+	  fts_symbol_t patch_name = fts_patcher_get_file_name(patcher);
 	  
-	  if(file_name == fts_patcher_get_file_name(patcher))
+	  if(file_name == patch_name)
 	    return patcher;
 	}
     }
@@ -2347,6 +2347,8 @@ fts_patcher_blip(fts_patcher_t *this, const char *msg)
 void 
 fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
 {
+  if(this == fts_get_root_patcher()) return;
+
   if( ((fts_object_t *)this)->patcher != fts_get_root_patcher())
     fts_patcher_set_dirty( ((fts_object_t *)this)->patcher, is_dirty);
   else

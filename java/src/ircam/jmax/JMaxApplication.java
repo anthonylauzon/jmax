@@ -273,14 +273,7 @@ public class JMaxApplication {
 		  }
 		patcher.stopUpdates();		      
 		patcher.requestDestroyEditor();
-		try
-		  {
-		    patcher.delete();
-		  }
-		catch(IOException e){
-		  System.err.println("[ErmesSketchPad]: IO error deleting patcher");
-		}
-		
+		getRootPatcher().requestDeleteObject( patcher);
 		((ErmesSketchWindow)win).Destroy();
 	      }
 	  }

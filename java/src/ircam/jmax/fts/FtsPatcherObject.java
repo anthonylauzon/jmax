@@ -855,7 +855,22 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	e.printStackTrace(); 
       }
   }
-  
+
+ 
+  public void requestDeleteObject(FtsObject obj)
+  {
+    args.clear();
+    args.addObject( obj);      
+      
+    try{
+      send( FtsSymbol.get("delete_objects"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending delete_objects Message!");
+	e.printStackTrace(); 
+      }
+  }
 
   //used in addObject method to start editing in added object if needed 
   public void addObject(int nArgs , FtsAtom args[]) 
