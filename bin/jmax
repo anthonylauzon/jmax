@@ -179,6 +179,7 @@ else
 	SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
     else
 	echo "Using Swing from JDK ($JDK_HOME)."
+    fi
 fi
 
 if [ $CLASSPATH ]
