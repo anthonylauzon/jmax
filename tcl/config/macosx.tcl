@@ -25,6 +25,7 @@
 
 set jmaxArch ppc-macosx
 
-when defaultStart {
+when platformStart {
+    package require macosx
 }
 

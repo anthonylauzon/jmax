@@ -427,15 +427,14 @@ static fts_status_t fts_ucs_default_audio(int argc, const fts_atom_t *argv)
 {
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     {
-      post( "Setting default audio port to \"");
-      post_atoms( 1, argv);
-      post( "\"");
+      post( "Setting default audio port to \"%s\"", fts_symbol_name( fts_get_symbol( argv)));
       if (argc >= 2)
 	{
 	  post( "arguments: ");
 	  post_atoms( argc-1, argv+1);
-	  post( ")\n");
+	  post( ")");
 	}
+      post( "\n");
 
       fts_audioport_set_default( argc, argv);
     }
@@ -447,15 +446,14 @@ static fts_status_t fts_ucs_default_midi(int argc, const fts_atom_t *argv)
 {
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     { 
-      post( "Setting default MIDI port to \"");
-      post_atoms( 1, argv);
-      post( "\"");
+      post( "Setting default MIDI port to \"%s\"", fts_symbol_name( fts_get_symbol( argv)));
       if (argc >= 2)
 	{
 	  post( "arguments: ");
 	  post_atoms( argc-1, argv+1);
-	  post( ")\n");
+	  post( ")");
 	}
+      post( "\n");
 
       fts_midiport_set_default( argc, argv);
     }
