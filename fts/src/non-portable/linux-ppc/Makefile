@@ -22,20 +22,5 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
-ROOTDIR = ../../../../../../..
-PACKAGE_DIR = ircam/jmax/editors/patcher/tcl
-
-include $(ROOTDIR)/java/Makefiles/Makefile.common
-
-all: $(CLASSES)
-.PHONY: all
-
-clean: local_clean
-.PHONY: clean
-
-include $(ROOTDIR)/java/Makefiles/Makefile.misc
-
-
-
-
+JMAXDISTDIR = ../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts

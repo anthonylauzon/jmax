@@ -134,8 +134,9 @@ cvs-tag: spec-files
 		exit 1 ; \
 	fi
 	( \
-		echo "Tagging with tag $(JMAX_VERSION_TAG)" ; \
-		cvs tag -F $(JMAX_VERSION_TAG) ; \
+#		echo "Tagging with tag $(JMAX_VERSION_TAG)" ; \
+#		cvs tag -F $(JMAX_VERSION_TAG) ; \
+		echo "You must do a ***BRANCH*** TAG !!!" ; \
 	)
 .PHONY: cvs-tag
 
@@ -216,7 +217,7 @@ install-includes:
 # new-patch, new-minor, new-major
 # version number manipulation (new-patch is the most frequent, new-major the least...)
 #
-SNAPSHOT_STATUS=-latest-cvs
+SNAPSHOT_STATUS=_latest_cvs
 
 new-patch:
 	awk -F= -v x="PATCH" -v y="$(SNAPSHOT_STATUS)" '\

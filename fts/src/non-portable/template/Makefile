@@ -21,21 +21,6 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-SOURCES = \
-	AbstractMaxDataEditor.java \
-	MaxContext.java \
-	MaxData.java \
-	MaxDataEditor.java \
-	MaxDataEditorFactory.java \
-	MaxDataEditorReadyListener.java \
-	MaxDocument.java \
-	MaxDocumentException.java \
-	MaxDocumentHandler.java \
-	MaxDocumentType.java \
-	MaxEnv.java \
-	MaxScriptDocument.java \
-	MaxExecutedScriptDocument.java \
-	Mda.java \
-	MdaModule.java 
+JMAXDISTDIR = ../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts
