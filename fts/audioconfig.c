@@ -549,9 +549,7 @@ fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate)
     set_sample_rate =  sample_rate;
   }
   
-  fts_set_int(&arg, 48000);
-  fts_client_send_message((fts_object_t*)config, audioconfig_s_sampling_rate, 1, &arg);
-
+  config->sample_rate = sample_rate;
   return set_sample_rate;
 }
 
@@ -618,6 +616,9 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int sample_rate = fts_get_int(at);
   fts_atom_t arg;
+
+  /* check if sample rate is available */
+  fts_audioconfig_set_sample_rate(self, sample_rate);
 
   fts_set_int(&arg, self->sample_rate);
   fts_client_send_message( o, audioconfig_s_sampling_rate, 1, &arg); 
