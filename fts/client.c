@@ -311,7 +311,6 @@ struct _client_t {
   /* Automata state */
   int state;
   /* Input decoding */
-  int input_value;
   fts_stack_t input_args;
   fts_stack_t input_buffer;
   /* Symbol caches */
@@ -401,18 +400,42 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
 
 /* Actions */
 
+static void swap_bytes( unsigned char *p, int n)
+{
+  int i, tmp;
+
+  for ( i = 0; i < n/2; i++)
+    {
+      tmp = p[i];
+      p[i] = p[n-i-1];
+      p[n-i-1] = tmp;
+    }
+}
+
+static int get_int_from_bytes( unsigned char *p)
+{
+#ifndef WORDS_BIGENDIAN
+  swap_bytes( p, sizeof( int));
+#endif
+
+  return *(int *)p;
+}
+
+static double get_double_from_bytes( unsigned char *p)
+{
+#ifndef WORDS_BIGENDIAN
+  swap_bytes( p, sizeof( double));
+#endif
+
+  return *(double *)p;
+}
+
 static void clear_action( unsigned char input, client_t *client)
 {
-  client->input_value = 0;
   fts_stack_clear( &client->input_buffer);
 }
 
 static void shift_action( unsigned char input, client_t *client)
-{
-  client->input_value = client->input_value << 8 | input;
-}
-
-static void buffer_shift_action( unsigned char input, client_t *client)
 {
   fts_stack_push( &client->input_buffer, unsigned char, input);
 }
@@ -421,8 +444,8 @@ static void end_int_action( unsigned char input, client_t *client)
 {
   fts_atom_t a;
 
-  client->input_value = (client->input_value << 8) | input;
-  fts_set_int( &a, client->input_value);
+  fts_stack_push( &client->input_buffer, unsigned char, input);
+  fts_set_int( &a, get_int_from_bytes( fts_stack_base( &client->input_buffer)));
   fts_stack_push( &client->input_args, fts_atom_t, a);
 } 
 
@@ -430,28 +453,35 @@ static void end_float_action( unsigned char input, client_t *client)
 {
   fts_atom_t a;
 
-  client->input_value = (client->input_value << 8) | input;
-  fts_set_float( &a, *((float *)&client->input_value));
+  fts_stack_push( &client->input_buffer, unsigned char, input);
+  fts_set_float( &a, get_double_from_bytes( fts_stack_base( &client->input_buffer)));
   fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
 static void end_symbol_index_action( unsigned char input, client_t *client)
 {
   fts_atom_t a;
+  int index;
 
-  client->input_value = (client->input_value << 8) | input;
-  fts_set_symbol( &a, client->input_cache.symbols[ client->input_value]);
+  fts_stack_push( &client->input_buffer, unsigned char, input);
+  index = get_int_from_bytes( fts_stack_base( &client->input_buffer));
+  fts_set_symbol( &a, client->input_cache.symbols[ index]);
   fts_stack_push( &client->input_args, fts_atom_t, a);
 }
 
 static void end_symbol_cache_action( unsigned char input, client_t *client)
 {
+  int index;
   fts_symbol_t s;
   fts_atom_t a;
 
+  index = get_int_from_bytes( fts_stack_base( &client->input_buffer));
+
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
-  s = fts_new_symbol_copy( fts_stack_base( &client->input_buffer));
-  symbol_cache_put( &client->input_cache, s, client->input_value);
+  s = fts_new_symbol_copy( fts_stack_base( &client->input_buffer) + sizeof( int));
+
+  symbol_cache_put( &client->input_cache, s, index);
+
   fts_set_symbol( &a, s);
   fts_stack_push( &client->input_args, fts_atom_t, a);
 }
@@ -489,13 +519,16 @@ static void end_object_action( unsigned char input, client_t *client)
 {
   fts_object_t *obj = 0;
   fts_atom_t v;
+  int id;
 
-  client->input_value = (client->input_value << 8) | input;
-  obj = client_get_object( client, client->input_value);
+  fts_stack_push( &client->input_buffer, unsigned char, input);
+  id = get_int_from_bytes( fts_stack_base( &client->input_buffer));
+
+  obj = client_get_object( client, id);
 
   if (obj == NULL)
     {
-      fts_log( "[client] invalid object id: %d\n", client->input_value);
+      fts_log( "[client] invalid object id: %d\n", id);
       fts_set_void( &v);
     }
   else
@@ -543,29 +576,40 @@ static void end_message_action( unsigned char input, client_t *client)
 static void state_next( client_t *client, unsigned char input)
 {
 #define q_initial            1
-#define q_int0               2
-#define q_int1               3
-#define q_int2               4
-#define q_int3               5
-#define q_float0             6
-#define q_float1             7
-#define q_float2             8
-#define q_float3   	     9
-#define q_string             10
-#define q_object0            11
-#define q_object1            12
-#define q_object2            13
-#define q_object3            14
-#define q_symbol_index0      15
-#define q_symbol_index1      16
-#define q_symbol_index2      17
-#define q_symbol_index3      18
-#define q_symbol_cache0      19
-#define q_symbol_cache1      20
-#define q_symbol_cache2      21
-#define q_symbol_cache3      22
-#define q_symbol_cache4      23
-#define q_raw_string         24
+
+#define q_int0               10
+#define q_int1               11
+#define q_int2               12
+#define q_int3               13
+
+#define q_float0             20
+#define q_float1             21
+#define q_float2             22
+#define q_float3   	     23
+#define q_float4             24
+#define q_float5             25
+#define q_float6             26
+#define q_float7   	     27
+
+#define q_string             30
+
+#define q_object0            40
+#define q_object1            41
+#define q_object2            42
+#define q_object3            43
+
+#define q_symbol_index0      50
+#define q_symbol_index1      51
+#define q_symbol_index2      52
+#define q_symbol_index3      53
+
+#define q_symbol_cache0      60
+#define q_symbol_cache1      61
+#define q_symbol_cache2      62
+#define q_symbol_cache3      63
+#define q_symbol_cache4      64
+
+#define q_raw_string         70
 
 #define moveto( NEWSTATE, ACTION) (client->state = NEWSTATE, ACTION( input, client))
 
@@ -595,6 +639,7 @@ static void state_next( client_t *client, unsigned char input)
     else
       client->state = 0;
     break;
+
   case q_int0:
     moveto( q_int1, shift_action);
     break;
@@ -607,6 +652,7 @@ static void state_next( client_t *client, unsigned char input)
   case q_int3:
     moveto( q_initial, end_int_action);
     break;
+
   case q_float0:
     moveto( q_float1, shift_action);
     break;
@@ -617,8 +663,21 @@ static void state_next( client_t *client, unsigned char input)
     moveto( q_float3, shift_action);
     break;
   case q_float3:
+    moveto( q_float4, end_float_action);
+    break;
+  case q_float4:
+    moveto( q_float5, shift_action);
+    break;
+  case q_float5:
+    moveto( q_float6, shift_action);
+    break;
+  case q_float6:
+    moveto( q_float7, shift_action);
+    break;
+  case q_float7:
     moveto( q_initial, end_float_action);
     break;
+
   case q_symbol_index0:
     moveto( q_symbol_index1, shift_action);
     break;
@@ -631,6 +690,7 @@ static void state_next( client_t *client, unsigned char input)
   case q_symbol_index3:
     moveto( q_initial, end_symbol_index_action);
     break;
+
   case q_symbol_cache0:
     moveto( q_symbol_cache1, shift_action);
     break;
@@ -647,20 +707,23 @@ static void state_next( client_t *client, unsigned char input)
     if ( input == 0)
       moveto( q_initial, end_symbol_cache_action);
     else
-      moveto( q_symbol_cache4, buffer_shift_action);
+      moveto( q_symbol_cache4, shift_action);
     break;
+
   case q_string:
     if ( input == 0)
       moveto( q_initial, end_string_action);
     else
-      moveto( q_string, buffer_shift_action);
+      moveto( q_string, shift_action);
     break;
+
   case q_raw_string:
     if ( input == 0)
       moveto( q_initial, end_raw_string_action);
     else
-      moveto( q_raw_string, buffer_shift_action);
+      moveto( q_raw_string, shift_action);
     break;
+
   case q_object0:
     moveto( q_object1, shift_action);
     break;
@@ -969,7 +1032,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   /* input protocol decoder */
   this->state = q_initial;
-  this->input_value = 0;
   fts_stack_init( &this->input_args, fts_atom_t);
   fts_stack_init( &this->input_buffer, unsigned char);
   symbol_cache_init( &this->input_cache);
@@ -1226,25 +1288,38 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
  *
  */
 
-#define write_char(C,N) fts_stack_push( &(C)->output_buffer, unsigned char, (N))
-#define write_int(C,N) \
-	write_char(C, (unsigned char) (((N) >> 24) & 0xff)), \
-	write_char(C, (unsigned char) (((N) >> 16) & 0xff)), \
-	write_char(C, (unsigned char) (((N) >> 8) & 0xff)), \
-	write_char(C, (unsigned char) (((N) >> 0) & 0xff))
+#define put_byte(C,N) fts_stack_push( &(C)->output_buffer, unsigned char, (N))
+
+#define put_int(C,N) \
+	put_byte(C, (unsigned char) (((N) >> 24) & 0xff)), \
+	put_byte(C, (unsigned char) (((N) >> 16) & 0xff)), \
+	put_byte(C, (unsigned char) (((N) >> 8) & 0xff)), \
+	put_byte(C, (unsigned char) (((N) >> 0) & 0xff))
 
 static void client_write_int( client_t *client, int v)
 {
-  write_char( client, FTS_PROTOCOL_INT);
-  write_int( client, v);
+  put_byte( client, FTS_PROTOCOL_INT);
+  put_int( client, v);
 }
 
-static void client_write_float( client_t *client, float v)
+static void client_write_float( client_t *client, double v)
 {
-  float f = v;
+  unsigned char *p;
+  int i;
 
-  write_char( client, FTS_PROTOCOL_FLOAT);
-  write_int( client, *((unsigned int *)&f));
+  put_byte( client, FTS_PROTOCOL_FLOAT);
+
+  p = (unsigned char *)&v;
+
+#ifndef WORDS_BIGENDIAN
+  swap_bytes( p, sizeof( double));
+#endif
+
+  for ( i = 0; i < sizeof( double); i++)
+    {
+      put_byte( client, p[i]);
+      p++;
+    }
 }
 
 static void client_write_symbol( client_t *client, fts_symbol_t s)
@@ -1265,8 +1340,8 @@ static void client_write_symbol( client_t *client, fts_symbol_t s)
 #endif
 
       /* just send the index */
-      write_char( client, FTS_PROTOCOL_SYMBOL_INDEX);
-      write_int( client, index);
+      put_byte( client, FTS_PROTOCOL_SYMBOL_INDEX);
+      put_int( client, index);
     }
   else 
     {
@@ -1275,13 +1350,13 @@ static void client_write_symbol( client_t *client, fts_symbol_t s)
       cache->symbols[index] = s;
 
       /* send both the cache index and the symbol */
-      write_char( client, FTS_PROTOCOL_SYMBOL_CACHE);
-      write_int( client, index);
+      put_byte( client, FTS_PROTOCOL_SYMBOL_CACHE);
+      put_int( client, index);
 
       while (*p)
-	write_char( client, (unsigned char)*p++);
+	put_byte( client, (unsigned char)*p++);
 
-      write_char( client, 0);
+      put_byte( client, 0);
     }
 
 #ifdef CACHE_REPORT
@@ -1294,18 +1369,18 @@ static void client_write_symbol( client_t *client, fts_symbol_t s)
 
 static void client_write_string( client_t *client, const char *s)
 {
-  write_char( client, FTS_PROTOCOL_STRING);
+  put_byte( client, FTS_PROTOCOL_STRING);
 
   while (*s)
-    write_char( client, (unsigned char)*s++);
+    put_byte( client, (unsigned char)*s++);
 
-  write_char( client, 0);
+  put_byte( client, 0);
 }
 
 static void client_write_object( client_t *client, fts_object_t *obj)
 {
-  write_char( client, FTS_PROTOCOL_OBJECT);
-  write_int( client, OBJECT_ID_OBJ( fts_object_get_id( obj)));
+  put_byte( client, FTS_PROTOCOL_OBJECT);
+  put_int( client, OBJECT_ID_OBJ( fts_object_get_id( obj)));
 }
 
 void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
@@ -1400,7 +1475,7 @@ void fts_client_done_message( fts_object_t *obj)
   if ( !client)
     return;
 
-  write_char( client, FTS_PROTOCOL_END_OF_MESSAGE);
+  put_byte( client, FTS_PROTOCOL_END_OF_MESSAGE);
   
   fts_bytestream_output( client->stream, fts_stack_size( &client->output_buffer), fts_stack_base( &client->output_buffer));
 

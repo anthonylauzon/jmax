@@ -146,8 +146,8 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     
     for(int i=0; i<n; i++)
       {
-	float time = args[i * 2 + 1].floatValue;
-	float value = args[i * 2 + 2].floatValue;
+	float time = (float)args[i * 2 + 1].doubleValue;
+	float value = (float)args[i * 2 + 2].doubleValue;
 	point = getPointAt(firstIndex + i);
 	point.setValue(value);
 	point.setTime(time);	      
@@ -169,7 +169,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
       {
 	int j=0;
 	for(int i = 0; i<nArgs; i+=2)
-	  addPoint(j++, new BpfPoint(args[i].floatValue, args[i+1].floatValue));
+	  addPoint(j++, new BpfPoint( (float)args[i].doubleValue, (float)args[i+1].doubleValue));
 
 	notifyPointAdded(j-1);
       }
@@ -179,7 +179,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   {
     int j=0;
     for(int i = length(); i<length()+nArgs; i+=2)
-      addPoint(j++, new BpfPoint(args[i].floatValue, args[i+1].floatValue));
+      addPoint(j++, new BpfPoint( (float)args[i].doubleValue, (float)args[i+1].doubleValue));
 	
     notifyPointAdded(j);
   }

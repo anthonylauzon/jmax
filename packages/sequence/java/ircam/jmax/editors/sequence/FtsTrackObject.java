@@ -215,7 +215,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	evt  = (TrackEvent)(args[i].objectValue);
 	oldIndex = indexOf(evt);
 	deleteRoomAt(oldIndex);
-	time = (double)(args[i+1].floatValue);
+	time = args[i+1].doubleValue;
 
 	if (isInGroup())
 	  postEdit(new UndoableMove(evt, time));

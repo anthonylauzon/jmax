@@ -116,7 +116,7 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  post("<%s> ", s);
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
-	    post("<???>\n");
+	    post("<\?\?\?>\n");
 	}
     }
   else if(ac == 1 && s == fts_get_selector(at))

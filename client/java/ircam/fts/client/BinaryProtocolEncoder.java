@@ -85,6 +85,18 @@ class BinaryProtocolEncoder {
     outputBuffer.append( (byte) ((v >> 0) & 0xff));
   }
 
+  private final void write( long v)
+  {
+    outputBuffer.append( (byte) ((v >> 56) & 0xff));
+    outputBuffer.append( (byte) ((v >> 48) & 0xff));
+    outputBuffer.append( (byte) ((v >> 40) & 0xff));
+    outputBuffer.append( (byte) ((v >> 32) & 0xff));
+    outputBuffer.append( (byte) ((v >> 24) & 0xff));
+    outputBuffer.append( (byte) ((v >> 16) & 0xff));
+    outputBuffer.append( (byte) ((v >> 8) & 0xff));
+    outputBuffer.append( (byte) ((v >> 0) & 0xff));
+  }
+
   private final void write( String v)
   {
     for ( int i = 0; i < v.length(); i++)
@@ -99,10 +111,10 @@ class BinaryProtocolEncoder {
     write( v);
   }
 
-  void writeFloat( float v) throws IOException
+  void writeDouble( double v) throws IOException
   {
     outputBuffer.append( BinaryProtocol.FLOAT);
-    write( Float.floatToRawIntBits(v));
+    write( Double.doubleToRawLongBits( v));
   }
 
   void writeSymbol( FtsSymbol v) throws IOException
@@ -159,8 +171,8 @@ class BinaryProtocolEncoder {
       {
 	if ( atoms[i].isInt())
 	  writeInt( atoms[i].intValue);
-	else if ( atoms[i].isFloat())
-	  writeFloat( atoms[i].floatValue);
+	else if ( atoms[i].isDouble())
+	  writeDouble( atoms[i].doubleValue);
 	else if ( atoms[i].isSymbol())
 	  writeSymbol( atoms[i].symbolValue);
 	else if ( atoms[i].isString())

@@ -130,11 +130,11 @@ public class FtsObject implements Serializable
     encoder.flush();
   }
 
-  public void send( float f) throws IOException
+  public void send( double d) throws IOException
   {
     encoder.writeObject( this);
     encoder.writeSymbol( sFloat);
-    encoder.writeFloat( f);
+    encoder.writeDouble( d);
     encoder.flush();
   }
 

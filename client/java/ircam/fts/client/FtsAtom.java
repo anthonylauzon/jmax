@@ -31,9 +31,9 @@ public class FtsAtom {
    */
   public int intValue;
   /**
-   * If the atom is a float, holds the float value
+   * If the atom is a double, holds the double value
    */
-  public float floatValue;
+  public double doubleValue;
   /**
    * If the atom is a Symbol, holds the Symbol value
    */
@@ -68,13 +68,13 @@ public class FtsAtom {
   }
 
   /**
-   * Tests if atom contains a float
+   * Tests if atom contains a double
    * 
-   * @return true if atom type is float
+   * @return true if atom type is double
    */
-  public final boolean isFloat()
+  public final boolean isDouble()
   {
-    return type == Float.TYPE;
+    return type == Double.TYPE;
   }
 
   /**
@@ -130,14 +130,14 @@ public class FtsAtom {
   }
 
   /**
-   * Set the float value
+   * Set the double value
    * 
    * @param f the value
    */
-  public final void setFloat( float f)
+  public final void setDouble( double f)
   {
-    type = Float.TYPE;
-    floatValue = f;
+    type = Double.TYPE;
+    doubleValue = f;
   }
 
   /**
@@ -190,8 +190,8 @@ public class FtsAtom {
       return null;
     else if ( isInt())
       return new Integer( intValue);
-    else if ( isFloat())
-      return new Float( floatValue);
+    else if ( isDouble())
+      return new Double( doubleValue);
     else if ( isString())
       return stringValue;
     else if ( isRawString())
@@ -208,8 +208,8 @@ public class FtsAtom {
   {
     if ( value instanceof Integer)
       setInt( ((Integer)value).intValue());
-    else if ( value instanceof Float)
-      setFloat( ((Float)value).floatValue());
+    else if ( value instanceof Double)
+      setDouble( ((Double)value).doubleValue());
     else if ( value instanceof FtsSymbol)
       setSymbol((FtsSymbol)value);
     else if ( value instanceof String)

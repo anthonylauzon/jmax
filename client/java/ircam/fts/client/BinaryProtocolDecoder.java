@@ -24,78 +24,93 @@ package ircam.fts.client;
 class BinaryProtocolDecoder {
 
   private static final int qInitial = 1;
-  private static final int qInt0 = 2;
-  private static final int qInt1 = 3;
-  private static final int qInt2 = 4;
-  private static final int qInt3 = 5;
-  private static final int qFloat0 = 6;
-  private static final int qFloat1 = 7;
-  private static final int qFloat2 = 8;
-  private static final int qFloat3 = 9;
-  private static final int qString = 10;
-  private static final int qObject0 = 11;
-  private static final int qObject1 = 12;
-  private static final int qObject2 = 13;
-  private static final int qObject3 = 14;
-  private static final int qSymbolIndex0 = 15;
-  private static final int qSymbolIndex1 = 16;
-  private static final int qSymbolIndex2 = 17;
-  private static final int qSymbolIndex3 = 18;
-  private static final int qSymbolCache0 = 19;
-  private static final int qSymbolCache1 = 20;
-  private static final int qSymbolCache2 = 21;
-  private static final int qSymbolCache3 = 22;
-  private static final int qSymbolCache4 = 23;
 
-  private void clearAction( int input)
+  private static final int qInt0 = 10;
+  private static final int qInt1 = 11;
+  private static final int qInt2 = 12;
+  private static final int qInt3 = 13;
+
+  private static final int qFloat0 = 20;
+  private static final int qFloat1 = 21;
+  private static final int qFloat2 = 22;
+  private static final int qFloat3 = 23;
+  private static final int qFloat4 = 24;
+  private static final int qFloat5 = 25;
+  private static final int qFloat6 = 26;
+  private static final int qFloat7 = 27;
+
+  private static final int qString = 30;
+
+  private static final int qObject0 = 40;
+  private static final int qObject1 = 41;
+  private static final int qObject2 = 42;
+  private static final int qObject3 = 43;
+
+  private static final int qSymbolIndex0 = 50;
+  private static final int qSymbolIndex1 = 51;
+  private static final int qSymbolIndex2 = 52;
+  private static final int qSymbolIndex3 = 53;
+
+  private static final int qSymbolCache0 = 60;
+  private static final int qSymbolCache1 = 61;
+  private static final int qSymbolCache2 = 62;
+  private static final int qSymbolCache3 = 63;
+  private static final int qSymbolCache4 = 64;
+
+  private final void clearAction( int input)
   {
-    ival = 0;
+    lval = 0;
   }
 
-  private void shiftAction( int input)
+  private final void shiftAction( int input)
   {
-    ival = ival << 8 | input;
+    lval = lval << 8 | input;
   }
 
-  private void bufferClearAction( int input)
+  private final void shiftLongAction( int input)
+  {
+    lval = lval << 8 | input;
+  }
+
+  private final void bufferClearAction( int input)
   {
     buffer.setLength( 0);
   }
 
-  private void clearAllAction( int input)
+  private final void clearAllAction( int input)
   {
-    ival = 0;
+    lval = 0;
     buffer.setLength( 0);
   }
 
-  private void bufferShiftAction( int input)
+  private final void bufferShiftAction( int input)
   {
     buffer.append( (char)input);
   }
 
-  private void endIntAction( int input)
+  private final void endIntAction( int input)
   {
-    ival = ival << 8 | input;
+    lval = lval << 8 | input;
 
     if (argsCount >= 2)
-      args.addInt( ival);
+      args.addInt( (int)lval);
     argsCount++;
   }
 
-  private void endFloatAction( int input)
+  private final void endFloatAction( int input)
   {
-    ival = ival << 8 | input;
+    lval = lval << 8 | input;
 
     if (argsCount >= 2)
-      args.addFloat( Float.intBitsToFloat(ival) );
+      args.addDouble( Double.longBitsToDouble( lval) );
     argsCount++;
   }
 
-  private void endSymbolIndexAction( int input)
+  private final void endSymbolIndexAction( int input)
   {
-    ival = ival << 8 | input;
+    lval = lval << 8 | input;
 
-    FtsSymbol s = symbolCache.get( ival);
+    FtsSymbol s = symbolCache.get( (int)lval);
 
     if (argsCount == 1)
       selector = s;
@@ -105,11 +120,11 @@ class BinaryProtocolDecoder {
     argsCount++;
   }
 
-  private void endSymbolCacheAction( int input)
+  private final void endSymbolCacheAction( int input)
   {
     FtsSymbol s = FtsSymbol.get( buffer.toString());
 
-    symbolCache.put( ival, s);
+    symbolCache.put( (int)lval, s);
 
     if (argsCount == 1)
       selector = s;
@@ -119,18 +134,18 @@ class BinaryProtocolDecoder {
     argsCount++;
   }
 
-  private void endStringAction( int input)
+  private final void endStringAction( int input)
   {
     if (argsCount >= 2)
       args.addString( buffer.toString());
     argsCount++;
   }
 
-  private void endObjectAction( int input)
+  private final void endObjectAction( int input)
   {
-    ival = ival << 8 | input;
+    lval = lval << 8 | input;
 
-    FtsObject obj = server.getObject( ival);
+    FtsObject obj = server.getObject( (int)lval);
 
     if (argsCount == 0)
       target = obj;
@@ -140,14 +155,14 @@ class BinaryProtocolDecoder {
     argsCount++;
   }
 
-  private void endMessageAction( int input)
+  private final void endMessageAction( int input)
   {
     FtsObject.invokeMessageHandler( target, selector, args);
     args.clear();
     argsCount = 0;
   }
 
-  private void nextState( int input)
+  private final void nextState( int input)
   {
     switch( currentState) {
     case 0:
@@ -220,6 +235,22 @@ class BinaryProtocolDecoder {
       shiftAction( input);
       break;
     case qFloat3:
+      currentState = qFloat4;
+      endFloatAction( input);
+      break;
+    case qFloat4:
+      currentState = qFloat5;
+      shiftAction( input);
+      break;
+    case qFloat5:
+      currentState = qFloat6;
+      shiftAction( input);
+      break;
+    case qFloat6:
+      currentState = qFloat7;
+      shiftAction( input);
+      break;
+    case qFloat7:
       currentState = qInitial;
       endFloatAction( input);
       break;
@@ -325,7 +356,7 @@ class BinaryProtocolDecoder {
   private FtsServer server;
   private FtsServerConnection connection;
 
-  private int ival;
+  private long lval;
   private StringBuffer buffer;
 
   private FtsObject target;

@@ -143,7 +143,7 @@ public class FtsScopeObject extends FtsVectorDisplayObject
 	  this.threshold = THRESHOLD_OFF;
       }
     else
-      this.threshold = arg.floatValue;    
+      this.threshold = (float)arg.doubleValue;
   }
   
   public float getThreshold()

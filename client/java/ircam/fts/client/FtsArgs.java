@@ -22,7 +22,7 @@
 package ircam.fts.client;
 
 /**
- * A buffer of FtsAtom, i.e. int, float, strings and FtsObject
+ * A buffer of FtsAtom, i.e. int, double, strings and FtsObject
  *
  * This class does not use standard Collection implementations in order
  * to avoid allocations during message reception.
@@ -69,10 +69,10 @@ public class FtsArgs {
     addInt( value.booleanValue() ? 1 : 0);
   }
 
-  public final void addInt( int i)
+  public final void addInt( int value)
   {
     ensureCapacity(1);
-    array[current++].setInt( i);
+    array[current++].setInt( value);
   }
 
   public final void addInt( Integer value)
@@ -80,47 +80,64 @@ public class FtsArgs {
     addInt( value.intValue());
   }
 
-  public final void addFloat( float f)
+  public final void addDouble( double value)
   {
     ensureCapacity(1);
-    array[current++].setFloat( f);
+    array[current++].setDouble( value);
   }
 
+  public final void addDouble( Double value)
+  {
+    addDouble( value.doubleValue());
+  }
+
+  /**
+   * @deprecated replaced by addDouble( double value)
+   */
+  public final void addFloat( float value)
+  {
+    addDouble( (double)value);
+  }
+
+  /**
+   * @deprecated replaced by addDouble( Double value)
+   */
   public final void addFloat( Float value)
   {
-    addFloat( value.floatValue());
+    addDouble( (double)value.floatValue());
   }
 
-  public final void addSymbol( FtsSymbol s)
+
+  public final void addSymbol( FtsSymbol value)
   {
     ensureCapacity(1);
-    array[current++].setSymbol( s);
+    array[current++].setSymbol( value);
   }
 
-  public final void addString( String s)
+  public final void addString( String value)
   {
     ensureCapacity(1);
-    array[current++].setString( s);
+    array[current++].setString( value);
   }
 
-  public final void addRawString( String s)
+  public final void addRawString( String value)
   {
     ensureCapacity(1);
-    array[current++].setRawString( s);
+    array[current++].setRawString( value);
   }
 
-  public final void addObject( FtsObject o)
+  public final void addObject( FtsObject value)
   {
     ensureCapacity(1);
-    array[current++].setObject( o);
+    array[current++].setObject( value);
   }
 
   public final void add( Object value)
   {
     if ( value instanceof Integer)
       addInt( ((Integer)value).intValue());
-    else if ( value instanceof Float)
-      addFloat( ((Float)value).floatValue());
+    else if ( value instanceof Double)
+      addDouble( ((Double)value).doubleValue());
     else if ( value instanceof FtsSymbol)
       addSymbol((FtsSymbol)value);
     else if ( value instanceof String)
@@ -136,9 +153,17 @@ public class FtsArgs {
     return array[index].isInt();
   }
 
+  public final boolean isDouble( int index)
+  {
+    return array[index].isDouble();
+  }
+
+  /**
+   * @deprecated replaced by isDouble( int index)
+   */
   public final boolean isFloat( int index)
   {
-    return array[index].isFloat();
+    return isDouble( index);
   }
 
   public final boolean isSymbol( int index)
@@ -168,9 +193,17 @@ public class FtsArgs {
     return array[index].intValue;
   }
 
+  public final double getDouble( int index)
+  {
+    return array[index].doubleValue;
+  }
+
+  /**
+   * @deprecated replaced by getDouble( int index)
+   */
   public final float getFloat( int index)
   {
-    return array[index].floatValue;
+    return (float)array[index].doubleValue;
   }
 
   public final FtsSymbol getSymbol( int index)

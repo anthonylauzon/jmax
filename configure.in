@@ -1,8 +1,20 @@
-dnl $Id: configure.in,v 1.88 2002/09/03 09:12:53 tisseran Exp $
+dnl $Id: configure.in,v 1.89 2002/09/05 16:13:49 tisseran Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.89  2002/09/05 16:13:49  tisseran
+dnl Add jmax-config and jmax.pc tools for given flags needed for compilation of external packages.
+dnl To get FTS cflags:
+dnl $ jmax-config --cflags
+dnl $ pkg-config --cflags jmax
+dnl To get FTS ldflags:
+dnl $ jmax-config --libs
+dnl $ pkg-config --libs jmax
+dnl To get directory where jMax standard packages are installed:
+dnl $ jmax-config --package-dir
+dnl $ pkg-config --variable=pkgdatadir jmax
+dnl
 dnl Revision 1.88  2002/09/03 09:12:53  tisseran
 dnl Fix help display of SDIF package setup
 dnl Fix setup of JACK package
@@ -140,7 +152,7 @@ case "$host" in
 dnl GNU/Linux on an Intel or compatible
 i*86-*-linux*|powerpc-*-linux-gnu)
 PLATFORM=linux
-CFLAGS="$CFLAGS -Wall"
+CFLAGS="$CFLAGS -Wall -Wno-unused"
 if test "$with_debug" != "yes"
 then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fmove-all-movables -fstrict-aliasing"
