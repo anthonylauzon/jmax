@@ -277,7 +277,6 @@ public class MaxApplication extends Object
     // then the builtin editors 
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
-    ircam.jmax.editors.control.ControlModule.initModule();    
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer

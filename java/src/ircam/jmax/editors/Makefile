@@ -32,13 +32,11 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 all: 
 	(cd console ; $(MAKE) all)
 	(cd patcher ; $(MAKE) all)
-	(cd control ; $(MAKE) all)
 .PHONY: all
 
 clean:
 	(cd console ; $(MAKE) clean)
 	(cd patcher ; $(MAKE) clean)
-	(cd control ; $(MAKE) clean)
 .PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

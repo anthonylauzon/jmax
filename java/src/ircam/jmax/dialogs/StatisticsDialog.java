@@ -39,10 +39,13 @@ import ircam.jmax.fts.*;
 public class StatisticsDialog extends Dialog implements ActionListener, KeyListener{
   Frame parent;
   Button okButton;
-  
+  private FtsDspControl control;
+
   public StatisticsDialog( Frame dw) {
     super(dw, "System statistics", false);
     parent = (Frame)dw;
+  
+    control = MaxApplication.getFts().getDspController();
     
     // Do a gc before giving statistics (added by mdc).
     
@@ -65,6 +68,10 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     p1.add(label8);
     Label label9 = new Label("Used memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
     p1.add(label9);
+    Label label10 = new Label("Sampling Rate " + control.getSamplingRate().toString());
+    p1.add(label10);
+    Label label11 = new Label("Audio Buffer " + control.getFifoSize().toString());
+    p1.add(label11);
 
     add("Center", p1);
     
