@@ -40,27 +40,27 @@ typedef struct {
 static fts_heap_t *cell_heap = 0;
 static fts_heap_t *iterator_heap = 0;
 
-static unsigned int hash_int( fts_atom_t *a)
+static unsigned int hash_int( const fts_atom_t *a)
 {
   return (unsigned int)fts_get_int( a);
 }
 
-static int equals_int( fts_atom_t *a, fts_atom_t *b)
+static int equals_int( const fts_atom_t *a, const fts_atom_t *b)
 {
   return fts_get_int( a) == fts_get_int( b);
 }
 
-static unsigned int hash_ptr( fts_atom_t *a)
+static unsigned int hash_ptr( const fts_atom_t *a)
 {
   return (unsigned int)fts_get_ptr( a) >> 3;
 }
 
-static int equals_ptr( fts_atom_t *a, fts_atom_t *b)
+static int equals_ptr( const fts_atom_t *a, const fts_atom_t *b)
 {
   return fts_get_ptr( a) == fts_get_ptr( b);
 }
 
-static unsigned int hash_string( fts_atom_t *a)
+static unsigned int hash_string( const fts_atom_t *a)
 {
   char *s = fts_get_string( a);
   unsigned int h = *s, i = 0;
@@ -71,17 +71,17 @@ static unsigned int hash_string( fts_atom_t *a)
   return h;
 }
 
-static int equals_string( fts_atom_t *a, fts_atom_t *b)
+static int equals_string( const fts_atom_t *a, const fts_atom_t *b)
 {
   return strcmp( fts_get_string( a), fts_get_string( b)) == 0;
 }
 
-static unsigned int hash_symbol( fts_atom_t *a)
+static unsigned int hash_symbol( const fts_atom_t *a)
 {
   return (unsigned int)fts_get_symbol( a) >> 3;
 }
 
-static int equals_symbol( fts_atom_t *a, fts_atom_t *b)
+static int equals_symbol( const fts_atom_t *a, const fts_atom_t *b)
 {
   return fts_get_symbol( a) == fts_get_symbol( b);
 }
@@ -177,7 +177,7 @@ void fts_hashtable_destroy( fts_hashtable_t *h)
   fts_free( h->table);
 }
 
-static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, fts_atom_t *key)
+static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, const fts_atom_t *key)
 {
   fts_hashtable_cell_t **c;
 
@@ -199,7 +199,7 @@ static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, fts_atom_t 
   return c;
 }
 
-int fts_hashtable_get( const fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
+int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
 
@@ -278,7 +278,7 @@ static void rehash( fts_hashtable_t *h)
   fts_free( old_table);
 }
 
-int fts_hashtable_put( fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
+int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
 
@@ -300,7 +300,7 @@ int fts_hashtable_put( fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
   return 0;
 }
 
-int fts_hashtable_remove( fts_hashtable_t *h, fts_atom_t *key)
+int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
 

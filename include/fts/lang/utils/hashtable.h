@@ -63,8 +63,8 @@ typedef struct _fts_hashtable_cell_t {
  *
  * @ingroup hashtable
  */
-typedef unsigned int (*hash_function_t)( fts_atom_t *);
-typedef int (*equals_function_t)( fts_atom_t *, fts_atom_t *);
+typedef unsigned int (*hash_function_t)( const fts_atom_t *);
+typedef int (*equals_function_t)( const fts_atom_t *, const fts_atom_t *);
 
 typedef struct {
   unsigned int length;
@@ -117,34 +117,34 @@ extern void fts_hashtable_destroy( fts_hashtable_t *h);
 /**
  * Retrieve value mapped to specified key.
  *
- * @fn int fts_hashtable_get( const fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
+ * @fn int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
  * @param h the hashtable
  * @param key a pointer to the key to be inserted
  * @param value a pointer for returning the retrieved value
  * @return 1 if key is mapped, 0 if not
  */
-extern int fts_hashtable_get( const fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value);
+extern int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
 
 /**
  * Insert specified key mapped to specified value.
  *
- * @fn int fts_hashtable_put( fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
+ * @fn int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
  * @param h the hashtable
  * @param key a pointer to the key to be inserted
  * @param value a pointer to the value to be inserted
  * @return 1 if entry was already mapped, 0 if not
  */
-extern int fts_hashtable_put( fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value);
+extern int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
 
 /**
  * Removes specified key 
  *
- * @fn int fts_hashtable_remove( fts_hashtable_t *h, fts_atom_t *key)
+ * @fn int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
  * @param h the hashtable
  * @param key a pointer to the key to be removed
  * @return 1 if entry was mapped, 0 if not
  */
-extern int fts_hashtable_remove( fts_hashtable_t *h, fts_atom_t *key);
+extern int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key);
 
 extern void fts_hashtable_stats( fts_hashtable_t *h);
 

@@ -30,7 +30,7 @@ spec-files: jmax.spec
 
 jmax.spec: $(ROOTDIR)/VERSION
 	awk -v version=$(JMAX_VERSION) '\
-$$1 == "Version:" { printf( "Version: %s\n", version ); } \
+$$1 == "Version:" { printf( "Version: %s\n", version); } \
 $$1 != "Version:" { print} \
 ' jmax.spec > jmax.spec.out
 	mv jmax.spec.out jmax.spec
