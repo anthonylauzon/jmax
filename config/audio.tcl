@@ -62,17 +62,16 @@ if {$jmaxArch == "mips1"} {
     ucs default out~ multiA
 
 } elseif {$jmaxArch == "linuxpc"} {
-    puts "Profile DACs"
-    ucs open device out~ prof_out as prof_dac channels 2 
-    ucs default out~ prof_out
-#    puts "NO DACS"
+#    puts "Profile DACs"
+#    ucs open device out~ prof_out as prof_dac channels 2 
+#    ucs default out~ prof_out
 
-#    puts "    default: 2/2"
-#    ucs open device out~ default as oss_dac
-##    ucs open device in~ default as 
-#   
-#    ucs default out~ default 
-##    ucs default in~ default
+    puts "    default: 2/2"
+    ucs open device out~ default as oss_dac
+#    ucs open device in~ default as 
+   
+    ucs default out~ default 
+#    ucs default in~ default
 } else {
 
     puts "Unknow architecture, profile DACs installed"
