@@ -73,7 +73,7 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_audioport_t *port = fts_audioport_get_default();
+  fts_audioport_t *port = fts_audioport_get_default(o);
 
   fts_send_message((fts_object_t *)port, fts_SystemInlet, fts_s_print, 0, 0);
 }
