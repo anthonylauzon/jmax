@@ -17,7 +17,6 @@
 #define GUARDPTS 4 /* four points more for interpolation */
 
 typedef struct{
-  fts_symbol_t name;
   float *samples; /* a floating-point vector of samples */
   long size; /* # of samples (excluding GUARDPTS) */
   long alloc_size; /* allocated size (# of samples excluding GUARDPTS) */
