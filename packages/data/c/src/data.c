@@ -392,7 +392,7 @@ propobj_set_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_
     propobj_set_property_by_index(self, prop->index, value);
 }
 
-static void
+void
 propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   propobj_t *self = (propobj_t *)o;
@@ -534,8 +534,6 @@ propobj_class_init(fts_class_t *cl)
   descr->n_properties = 0;
   
   fts_object_set_context((fts_object_t *)cl, (fts_context_t *)descr);  
-  
-  fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
 }
 
 propobj_class_description_t *

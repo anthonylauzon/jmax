@@ -257,7 +257,7 @@ scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
   double time = fts_midifile_get_time(file);
   scomark_t *scomark = data->last_marker;
   
-  if(data->last_marker == NULL || time > data->last_marker_time)
+  if(scomark == NULL || time > data->last_marker_time)
     scomark = scoobtrack_append_scomark_event(data->merge, time, seqsym_tempo);
   
   scomark_set_tempo(scomark, 60000000.0 / (double)tempo);
@@ -274,7 +274,7 @@ scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denomina
   double time = fts_midifile_get_time(file);
   scomark_t *scomark = data->last_marker;
   
-  if(data->last_marker == NULL || data->last_marker_time > time)
+  if(scomark == NULL || time > data->last_marker_time)
     scomark = scoobtrack_append_scomark_event(data->merge, time, seqsym_bar);
   else
     scomark_set_type(scomark, seqsym_bar);

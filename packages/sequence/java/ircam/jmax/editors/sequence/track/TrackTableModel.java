@@ -83,7 +83,7 @@ public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex)
 	if(columnIndex == 1)
 		event.move(((Double) aValue).doubleValue());
 	else
-		if( aValue == null)
+		if( aValue == null || (aValue instanceof String && ((String)aValue).equals("")))
 			event.unsetProperty( getColumnName(columnIndex));
 	else 
 		event.setProperty( getColumnName(columnIndex), aValue);

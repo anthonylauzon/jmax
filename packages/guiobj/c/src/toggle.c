@@ -147,7 +147,7 @@ toggle_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, toggle_update_gui);
   fts_class_message_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
   
-  fts_class_message_varargs(cl, fts_s_set, toggle_toggle);
+  fts_class_message_varargs(cl, fts_s_set, toggle_set);
   fts_class_message_varargs(cl, fts_s_value, toggle_set);
 
   fts_class_message_varargs(cl, fts_new_symbol("click"), toggle_toggle);

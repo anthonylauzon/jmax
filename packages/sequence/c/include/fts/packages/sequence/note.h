@@ -108,10 +108,10 @@ enum scomark_type_enum
 extern fts_class_t *scomark_class;
 extern enumeration_t *scomark_type_enumeration;
 
-#define scomark_set_type(s, b) ((s)->type = (b))
+#define scomark_set_type(s, t) ((s)->type = (t))
 #define scomark_get_type(s) ((s)->type)
 
-#define scomark_set_tempo(s, b) ((s)->tempo = (b))
+#define scomark_set_tempo(s, t) ((s)->tempo = (t))
 #define scomark_get_tempo(s) ((s)->tempo)
 
 #define scomark_set_beat(s, b) ((s)->beat = (b))

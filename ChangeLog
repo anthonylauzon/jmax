@@ -1,3 +1,8 @@
+2004-06-04  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* (package data) data.c: minor fixes for propobj
+	* (package sequence): minor fixes for track markers
+
 2004-06-01  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* (package sequence) track.c: added markers track (for bars, tempo, signatures, etc.) to track

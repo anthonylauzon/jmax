@@ -362,6 +362,12 @@ track_clear(track_t *track)
   track->first = 0;
   track->last = 0;
   track->size = 0;
+  
+  if(track->markers != NULL)
+  {
+    fts_object_release((fts_object_t *)track->markers);
+    track->markers = NULL;
+  }
 }
 
 void
@@ -766,11 +772,11 @@ track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   track_t *this = (track_t *)o;
 
-  if(track_editor_is_open(this))
+  if(fts_object_has_id(o))
     fts_client_send_message(o, fts_s_clear, 0, 0);
 
   track_clear(this);
-
+  
   fts_object_set_state_dirty(o);
 }
 
@@ -1147,8 +1153,8 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     int size;
     char *error;
 
-    track_clear(this);
-
+    track_clear_method(o, 0, NULL, 0, NULL);
+	
     size = track_import_from_midifile(this, file);
     error = fts_midifile_get_error(file);
 
@@ -1160,7 +1166,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     fts_midifile_close(file);
 
     if(track_editor_is_open(this))
-      track_upload(o, 0, 0, 0, 0);
+      track_upload(o, 0, NULL, 0, NULL);
   }
   else
     fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
@@ -1578,9 +1584,6 @@ track_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   track_clear(this);
   
-  if(this->markers != NULL)
-    fts_object_release((fts_object_t *)this->markers);
-
   if(this->editor != NULL)
     fts_object_release((fts_object_t *)this->editor);
 }
