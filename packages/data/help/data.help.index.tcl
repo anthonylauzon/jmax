@@ -1,5 +1,6 @@
-helpPatch ref $dir/ref.help.jmax
-helpPatch val $dir/val.help.jmax
+helpPatch value $dir/value.help.jmax
+helpPatch getval $dir/value.help.jmax
+helpPatch setval $dir/value.help.jmax
 helpPatch ivec $dir/ivec.help.jmax
 helpPatch fvec $dir/fvec.help.jmax
 helpPatch vec $dir/vec.help.jmax
