@@ -131,8 +131,6 @@ static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (this->countdown > 0)
     return;
 
-  fprintf( stderr, "hal_halt\n");
-
   err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
   if (err != noErr)
     {
@@ -154,8 +152,6 @@ static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   /* halt scheduler main loop */
   FD_ZERO( &rfds);
   FD_SET( 0, &rfds);
-
-  fprintf( stderr, "About to select()\n");
 
   if (select( 1, &rfds, NULL, NULL, NULL) < 0)
     fprintf( stderr, "select() failed\n");
@@ -198,8 +194,6 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
 
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
-
-  post( "*** Buffer size %d\n", bufferSizeProperty);
 
   this->buffer = 0;
   this->countdown = COUNTDOWN;
