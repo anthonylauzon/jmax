@@ -382,7 +382,7 @@ scoob_instantiate(fts_class_t *cl)
   
   fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
   
-  fts_class_set_copy_function(cl, propobj_copy_function);
+  fts_class_set_copy_function(cl, scoob_copy_function);
   fts_class_set_equals_function(cl, scoob_equals_function);
   fts_class_set_post_function(cl, scoob_post_function);
   fts_class_set_array_function(cl, scoob_array_function);
