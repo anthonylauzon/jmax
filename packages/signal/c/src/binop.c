@@ -129,19 +129,6 @@ ftl_add(fts_word_t *argv)
 }
 
 static void 
-ftl_mul(fts_word_t *argv)
-{
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
-  int n = fts_word_get_int(argv + 3);
-  int i;
-
-  for (i=0; i<n; i++)
-    out[i] = in1[i] * in2[i];
-}
-
-static void 
 ftl_sub(fts_word_t *argv)
 {
   float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
@@ -152,6 +139,19 @@ ftl_sub(fts_word_t *argv)
 
   for (i=0; i<n; i++)
     out[i] = in1[i] - in2[i];
+}
+
+static void 
+ftl_mul(fts_word_t *argv)
+{
+  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_int(argv + 3);
+  int i;
+
+  for (i=0; i<n; i++)
+    out[i] = in1[i] * in2[i];
 }
 
 static void 
@@ -1418,13 +1418,13 @@ signal_binop_config(void)
   /* signal x const */
 
   sym_add_const = fts_new_symbol("add_const");
-  dsp_declare_function(sym_add, ftl_add_const);
-
-  sym_mul_const = fts_new_symbol("mul_const");
-  dsp_declare_function(sym_mul_const, ftl_mul_const);
+  dsp_declare_function(sym_add_const, ftl_add_const);
 
   sym_sub_const = fts_new_symbol("sub_const");
   dsp_declare_function(sym_sub_const, ftl_sub_const);
+
+  sym_mul_const = fts_new_symbol("mul_const");
+  dsp_declare_function(sym_mul_const, ftl_mul_const);
 
   sym_div_const = fts_new_symbol("div_const");
   dsp_declare_function(sym_div_const, ftl_div_const);
@@ -1461,7 +1461,7 @@ signal_binop_config(void)
   dsp_declare_function(sym_add_ramp, ftl_add_ramp);
 
   sym_sub_ramp = fts_new_symbol("sub_ramp");
-  dsp_declare_function(sym_sub, ftl_sub_ramp);
+  dsp_declare_function(sym_sub_ramp, ftl_sub_ramp);
 
   sym_mul_ramp = fts_new_symbol("mul_ramp");
   dsp_declare_function(sym_mul_ramp, ftl_mul_ramp);
