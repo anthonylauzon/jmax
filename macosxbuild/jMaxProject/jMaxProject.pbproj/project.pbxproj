@@ -338,7 +338,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../packages/ispw/java\njar -uvf ../../../macosxbuild/jMaxProject/build/ispw.jar icons/*.gif";
+			shellScript = "cd ../../packages/ispw/java\njar -uf ../../../macosxbuild/jMaxProject/build/ispw.jar icons/*.gif";
 		};
 		F820CB990291112501664092 = {
 			buildActionMask = 2147483647;
@@ -351,7 +351,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../packages/guiobj/java\njar -uvf ../../../macosxbuild/jMaxProject/build/guiobj.jar icons/*.gif";
+			shellScript = "cd ../../packages/guiobj/java\njar -uf ../../../macosxbuild/jMaxProject/build/guiobj.jar icons/*.gif";
 		};
 		F820CB9A0291129D01664092 = {
 			buildActionMask = 2147483647;
@@ -364,7 +364,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"root\" > jmax.jar.root\njar -uvf build/jmax.jar jmax.jar.root";
+			shellScript = "echo \"root\" > jmax.jar.root\njar -uf build/jmax.jar jmax.jar.root";
 		};
 		F822188D02BE2B1801664092 = {
 			isa = PBXFileReference;
