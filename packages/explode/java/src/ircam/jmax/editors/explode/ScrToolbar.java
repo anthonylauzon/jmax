@@ -20,14 +20,21 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
     super();
     setDoubleBuffered(false);
     
+    /** prepare the popup */
+    itsPopupMenu = new JPopupMenu();
+    JMenuItem item;
+
     //install the Tools
     ScrTool aTool;
     for (Enumeration e = theProvider.getTools(); e.hasMoreElements();) 
       {
 	aTool = (ScrTool) e.nextElement();
 	if (aTool == null) System.err.println("warning: trying to add a null tool in the toolbar");
-	else addTool(aTool);
+	else {
+	  addTool(aTool);
+	}
       }
+
 
     currentContext = theProvider.getGraphicContext();
     setTool(theProvider.getDefaultTool());
@@ -80,20 +87,26 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
  
 
   /**
-   * add a new tool in the toolbar
+   * add a new tool in the toolbar (and in the popupMenu)
    */ 
   public void addTool(ScrTool theTool) 
   {
     JButton aButton = new JButton(theTool.getIcon());
-    
+    JMenuItem aMenuItem;
+
     aButton.setToolTipText(theTool.getName());
 
     add(aButton);
+
+    itsPopupMenu.add (aMenuItem = new JMenuItem (theTool.getIcon()));
+    
     validate();
     
     itsTools.put(aButton, theTool);
+    itsTools.put(aMenuItem, theTool);
 
-    aButton.addActionListener(this);  
+    aButton.addActionListener(this);
+    aMenuItem.addActionListener(this);
   }  
 
 
@@ -104,8 +117,8 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
    */
   public void actionPerformed(ActionEvent e) 
   {    
-    JButton aButton = (JButton) e.getSource();
-    ScrTool aTool = (ScrTool) itsTools.get(aButton);
+    Object aSource =  e.getSource();
+    ScrTool aTool = (ScrTool) itsTools.get(aSource);
     
     currentTool.deactivate();
     aTool.reActivate(currentContext);
@@ -115,6 +128,8 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
     toolNotification(aTool);
   }
 
+
+  
   /**
    * creates a toolbar, if it doesnt exist already.
    * Makes the (newly) created toolbar a listener for the
@@ -187,6 +202,8 @@ public class ScrToolbar extends JToolBar implements ActionListener, WindowListen
 
   //---- Fields 
   static ScrToolbar itsToolbar; 
+  public static JPopupMenu itsPopupMenu;
+
   Hashtable itsTools = new Hashtable();
   static ScrTool currentTool = null;
   static GraphicContext currentContext;
