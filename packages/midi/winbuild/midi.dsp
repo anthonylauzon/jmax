@@ -104,11 +104,19 @@ SOURCE=..\c\src\midiout.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\midiport.c
+SOURCE=..\c\src\midiparse.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\rawmidiport.c
+SOURCE=..\c\src\midiroute.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\mtof.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\noteoff.c
 # End Source File
 # Begin Source File
 

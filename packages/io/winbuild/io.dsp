@@ -88,10 +88,6 @@ LINK32=link.exe
 # Name "io - Win32 Debug"
 # Begin Source File
 
-SOURCE=..\c\src\fakestream.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\filestream.c
 # End Source File
 # Begin Source File
@@ -120,7 +116,15 @@ SOURCE=..\c\src\out.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\profileaudioport.c
+SOURCE=..\c\src\udp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\udpreceive.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\udpsend.c
 # End Source File
 # End Target
 # End Project
