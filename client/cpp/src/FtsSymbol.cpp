@@ -33,11 +33,11 @@ const FtsSymbol *FtsSymbol::sList = FtsSymbol::get( "list");
 
 const FtsSymbol *FtsSymbol::get( const char *s)
 {
-  FtsSymbol *symbol;
+  FtsSymbol *symbol = 0;
 
   symbolTable.get( s, symbol);
 
-  if (symbol != NULL)
+  if (symbol != 0)
     return symbol;
 
   symbol = new FtsSymbol( s);
