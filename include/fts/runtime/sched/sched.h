@@ -127,6 +127,7 @@ extern void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t
 extern void fts_sched_remove( fts_sched_t *sched, fts_object_t *object);
 
 /* run time */
+extern void fts_sched_run_one_tick( void);
 extern void fts_sched_run(void);
 extern void fts_halt(void);
 

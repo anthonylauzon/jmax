@@ -236,7 +236,19 @@ void fts_halt(void)
   fts_running_status = halted;
 }
 
-void fts_sched_run()
+void fts_sched_run_one_tick( void)
+{
+  fts_alarm_poll();
+  /* You are the next on the list. Keep cool!!! */
+  fts_client_poll();
+  fts_sched_do_select( fts_sched_get_current());
+  fts_dsp_chain_poll();
+
+  fts_sched_ticks += 1.0;
+  fts_sched_msecs = fts_sched_ticks * fts_sched_tick_duration;
+}
+
+void fts_sched_run( void)
 {
   int tick_counter = 0;
 
@@ -244,17 +256,10 @@ void fts_sched_run()
 
   while(fts_running_status == running)
     {
-      fts_alarm_poll();
-      /* You are the next on the list. Keep cool!!! */
-      fts_client_poll();
-      fts_sched_do_select( fts_sched_get_current());
-      fts_dsp_chain_poll();
-
-      fts_sched_ticks += 1.0;
-      fts_sched_msecs = fts_sched_ticks * fts_sched_tick_duration;
+      fts_sched_run_one_tick();
 
       tick_counter++;
-
+  
       if (tick_counter > fts_pause_period)
 	{
 	  fts_pause(); /* call the OS dependent pause function */

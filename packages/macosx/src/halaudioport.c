@@ -42,7 +42,6 @@
 typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
-  int pipe[2];
   float *buffer;
   int count;
   int buffer_size;
@@ -76,12 +75,7 @@ static void halaudioport_output( fts_word_t *argv)
   this->count += n * channels;
 
   if (this->count >= this->buffer_size)
-    {
-      char c;
-
-      read( this->pipe[0], &c, 1);
-      this->count = 0;
-    }
+    this->count = 0;
 }
 
 OSStatus halaudioport_ioproc( AudioDeviceID inDevice, 
@@ -93,11 +87,8 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
-  char c;
 
   memcpy( outOutputData->mBuffers[0].mData, this->buffer, this->buffer_size);
-
-  write( this->pipe[1], &c, 1);
 
   return noErr;
 }
@@ -154,7 +145,6 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
     
-
   err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
   if (err != noErr)
     {
