@@ -102,16 +102,21 @@ import ircam.jmax.fts.*;
   // mouseDown
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if(evt.getClickCount()>1) {
-      if (itsSketchPad.GetEditField() != null) {
-	itsSketchPad.GetEditField().setEditable(true);
-	itsInEdit = true;
+    /*if(evt.getClickCount()>1) {
+      RestartEditing();
       }
-    }
-    else itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
+      else*/ 
+      itsSketchPad.ClickOnObject(this, evt, x, y);
+      return true;
   }
 	
+  public void RestartEditing(){
+    if (itsSketchPad.GetEditField() != null) {
+      itsSketchPad.GetEditField().setEditable(true);
+      itsInEdit = true;
+    }
+  }
+
   public boolean MouseUp(MouseEvent evt,int x,int y){
     if(itsInEdit) return true;
     else return super.MouseUp(evt, x, y);

@@ -123,6 +123,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   Vector itsConnectingLetList;
 
   int editStatus = DOING_NOTHING;
+  int oldEditStatus = DOING_NOTHING;
 
   static String objectNames[] ={ "ircam.jmax.editors.ermes.ErmesObjExternal",
 				 "ircam.jmax.editors.ermes.ErmesObjMessage",
@@ -975,8 +976,17 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	itsHelper.MoveElements(aDeltaH, aDeltaV);
 	itsHelper.SaveElementRgn();
 	itsHelper.MoveElemConnections(aDeltaH,aDeltaV);
+	repaint();
       }
-      repaint();
+      //repaint();
+      else {//se non ha mosso
+	if(e.getClickCount() == 1){
+	  if(oldEditStatus == START_SELECT){
+	    if(itsCurrentObject instanceof ErmesObjEditableObject)
+	      ((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
+	  }
+	}
+      }
     }
     else if (editStatus == MOVINGSEGMENT){
       if(itsHelper.IsMovable(itsSelectedSegment)) {
@@ -1163,6 +1173,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void MoveSelected(int theX, int theY) {
     // only sets the status and the initial coordinates
     // all the work is done by the mouseDrag() method invocations
+    oldEditStatus = editStatus;
     editStatus = MOVING;
     currentMouseX = theX;
     currentMouseY = theY;

@@ -70,7 +70,7 @@ public class ErmesObjPatcher extends ErmesObject {
       //currentRect = new Rectangle(theFtsGraphic.x,theFtsGraphic.y, preferredSize.width, preferredSize.height);
     }
     else  preferredSize = new Dimension(80, 20);	//vergogna
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+    //super.Init(theSketchPad, theFtsGraphic, theFtsObject);
     return true;
   }
 

@@ -133,49 +133,54 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
    public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
      if (!itsSketchPad.itsRunMode) {
        if(evt.getClickCount()>1) {
-	 if (evt.isControlDown()) {
-	   if (iAmPatcher) {	
-	     if (itsSubWindow != null) {//show the subpatcher, it's there
-	       itsSubWindow.setVisible(true);
-	       itsSketchPad.itsFirstClick = true;
-	     }
-	     else{	//this 'else' shouldn't be reached...
-	       itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
-	       ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
-	     }
-	     return true;
+	 //if (!evt.isControlDown()) {
+	 if (iAmPatcher) {	
+	   if (itsSubWindow != null) {//show the subpatcher, it's there
+	     itsSubWindow.setVisible(true);
+	     itsSketchPad.itsFirstClick = true;
 	   }
-	 }
-	 else{//edit the text field
-	   if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
-	   ////////////////////////????????????????????????????????????
-	   if((iAmPatcher)&&(itsSubWindow != null)){
-	     ((ErmesPatcherDoc)itsSubWindow.GetDocument()).CreateFtsGraphics(itsSubWindow);
-	     itsSubWindow.dispose();
-	     itsSubWindow = null;
+	   else{	//this 'else' shouldn't be reached...
+	     itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
+	     ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
 	   }
-	   
-	   itsSketchPad.GetEditField().setFont(itsFont);
-	   itsSketchPad.GetEditField().setText(itsArgs);
-	   itsSketchPad.GetEditField().itsOwner = this; 
-	   itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-	   
-	   itsParsedTextVector.removeAllElements();
-	   
-	   itsSketchPad.GetEditField().setVisible(true);
-	   itsSketchPad.GetEditField().requestFocus();
-	   itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
 	   return true;
 	 }
+	 //}
+	 //else{//edit the text field
+	 //RestartEditing();
+	 //return true;
+	 //}
+	 //double click, but there's no CTRL key pressed and this is not a subpatcher, so
        }
-       //double click, but there's no CTRL key pressed and this is not a subpatcher, so
        itsSketchPad.ClickOnObject(this, evt, x, y);
        return true;
      }
      else return true;	//run mode, no editing, no subpatcher opening (?)
    }
 
+  public void RestartEditing(){
+    if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
+    ////////////////////////????????????????????????????????????
+    if((iAmPatcher)&&(itsSubWindow != null)){
+      ((ErmesPatcherDoc)itsSubWindow.GetDocument()).CreateFtsGraphics(itsSubWindow);
+      itsSubWindow.dispose();
+      itsSubWindow = null;
+    }
+	   
+    itsSketchPad.GetEditField().setFont(itsFont);
+    itsSketchPad.GetEditField().setText(itsArgs);
+    itsSketchPad.GetEditField().itsOwner = this; 
+    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+    
+    itsParsedTextVector.removeAllElements();
+    
+    itsSketchPad.GetEditField().setVisible(true);
+    itsSketchPad.GetEditField().requestFocus();
+    itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
+  }
   
+
+
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
