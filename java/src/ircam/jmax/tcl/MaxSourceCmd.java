@@ -29,7 +29,12 @@ class MaxSourceCmd implements Command
 	String fileName;
 	String dirName;
 
-	fileName = argv[1].toString();
+	String inputPath = argv[1].toString();
+	
+	if (inputPath.charAt(0) == '~') {
+	  fileName = ((String) MaxApplication.getProperty("user.home"))+ inputPath.substring(1);
+	}
+	else fileName = inputPath;
 
 	file = new File(fileName);
 
