@@ -9,7 +9,6 @@ FindAgainAction.java \
 GetAction.java \
 ImportAction.java \
 PasteAction.java \
-PrintAction.java \
 SetAction.java 
 
 JAVAC = @JAVACX@

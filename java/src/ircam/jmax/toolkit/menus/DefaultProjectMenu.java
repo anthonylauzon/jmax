@@ -53,18 +53,6 @@ public class DefaultProjectMenu extends EditorMenu
     add(DefaultActions.newProjectAction, "New Project", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_N);
 
     add(DefaultActions.editProjectAction, "Edit Project");
-
-    addSeparator();
-
-    saveItem = add(DefaultActions.saveProjectAction, "Save Project", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_S);
-    saveAsItem = add(DefaultActions.saveAsProjectAction, "Save Project As ...");
-  }
-
-  public void updateMenu()
-  {
-    boolean enable = ((ProjectEditor.getInstance() != null) && ProjectEditor.getInstance().isVisible());
-    saveItem.setEnabled( enable);
-    saveAsItem.setEnabled( enable);
   }
 }
 

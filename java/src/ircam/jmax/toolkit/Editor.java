@@ -32,6 +32,9 @@ import ircam.jmax.fts.*;
 public interface Editor
 {
   public EditorContainer getEditorContainer();
-  public void Close(boolean doCancel);//?????? why this parameter here ?????
+  public void close(boolean doCancel);//?????? why this parameter here ?????
+  public void print();
+  public void save();
+  public void saveAs();
 }
 

@@ -545,23 +545,47 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
-  public void Close(boolean doCancel){
+  public void close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
     ftsSequenceObject.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
-    
-    /**
-     * ListSelectionListener interface
-     */    
-    public void valueChanged(ListSelectionEvent e)
-    {
-	if (SequenceSelection.getCurrent().size()==1)
-	    {
-		TrackEvent evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
-		makeVisible(evt);
-	    }
-    }
+  public void save(){}
+  public void saveAs(){}
+  public void print()
+  {
+    SequenceWindow win = (SequenceWindow)itsContainer;
+
+    RepaintManager.currentManager(win).setDoubleBufferingEnabled(false);
+
+    PrintJob aPrintjob = win.getToolkit().getPrintJob( win, "Printing Sequence", null, null);
+
+    if (aPrintjob != null)
+      {
+	Graphics aPrintGraphics = aPrintjob.getGraphics();
+
+	if (aPrintGraphics != null)
+	  {
+	    win.print( aPrintGraphics);
+	    aPrintGraphics.dispose();
+	  }
+	aPrintjob.end();
+      }
+
+    RepaintManager.currentManager(win).setDoubleBufferingEnabled(true);
+  }
+
+  /**
+   * ListSelectionListener interface
+   */    
+  public void valueChanged(ListSelectionEvent e)
+  {
+    if (SequenceSelection.getCurrent().size()==1)
+      {
+	TrackEvent evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
+	makeVisible(evt);
+      }
+  }
     
     public boolean eventIsVisible(Event evt)
     {

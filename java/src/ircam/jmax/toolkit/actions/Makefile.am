@@ -1,14 +1,10 @@
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit/actions
 package_JAVA = \
-CloseAction.java\
-DSPAction.java\
 DefaultActions.java\
 EditorAction.java\
 NewAction.java\
 OpenAction.java\
-OpenHelpSummaryAction.java\
-QuitAction.java\
-StatisticsAction.java
+OpenHelpSummaryAction.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

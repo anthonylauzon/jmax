@@ -166,10 +166,13 @@ public class ExplodePanel extends JPanel implements Editor{
     return itsContainer;
   }
 
-  public void Close(boolean doCancel){
+  public void close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
+  public void save(){}
+  public void saveAs(){}
+  public void print(){}
 }
 
 

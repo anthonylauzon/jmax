@@ -92,7 +92,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   {
     JMenuBar mb = new JMenuBar();
 
-    mb.add( new FileMenu()); 
+    EditorMenu fileMenu = new DefaultFileMenu();
+    fileMenu.setEnabled( false, 3);
+    fileMenu.setEnabled( false, 4);
+    fileMenu.setEnabled( false, 5);
+    mb.add( fileMenu); 
     mb.add( new DefaultProjectMenu()); 
     mb.add( new MaxWindowJMenu( "Windows", this));
     mb.add(Box.createHorizontalGlue());
@@ -130,8 +134,28 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     return this;
   }
 
-  public void Close(boolean doCancel)
+  public void close(boolean doCancel)
   {
+  }
+  public void save()
+  {
+  }
+  public void saveAs()
+  {
+  }
+  public void print()
+  {
+     PrinterJob printJob = PrinterJob.getPrinterJob();
+     PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+     printJob.setPrintable( this, format);	    
+     
+     if (printJob.printDialog()) {
+       try {
+	 printJob.print();
+       } catch (Exception ex) {
+	 ex.printStackTrace();
+       }
+     }
   }
 
   // Methods from interface EditorContainer

@@ -33,13 +33,10 @@ LockAction.java\
 MoveAction.java\
 OpenHelpPatchAction.java\
 PasteAction.java\
-PrintAction.java\
 RemoveInOutletConnection.java\
 ResizeAction.java\
 ResizeToMaxHeightAction.java\
 ResizeToMaxWidthAction.java\
-SaveAction.java\
-SaveAsAction.java\
 SaveToAction.java\
 ScalePatcherAction.java\
 SelectAllAction.java\

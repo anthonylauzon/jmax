@@ -95,15 +95,10 @@ public class Actions
   public static EditorAction inspectAction   = new InspectAction();
   public static EditorAction lockAction      = new LockAction();
 
-  public static EditorAction saveAction     = new SaveAction();
-  public static EditorAction saveAsAction   = new SaveAsAction();
   public static EditorAction saveToAction   = new SaveToAction();
   public static EditorAction saveTemplateAction = new SaveToAction();
 
   public static EditorAction scalePatcherAction = new ScalePatcherAction();
-
-  public static EditorAction printAction    = new PrintAction();
-
 
   public static EditorAction openHelpPatchAction = new OpenHelpPatchAction();
   public static EditorAction showHtmlAction = new ShowHTMLAction();

@@ -80,7 +80,9 @@ public class ProjectEditor extends JFrame implements EditorContainer
   {
     JMenuBar mb = new JMenuBar();
 
-    mb.add( new DefaultFileMenu()); 
+    EditorMenu fileMenu = new DefaultFileMenu();
+    fileMenu.setEnabled( false, 7);
+    mb.add( fileMenu); 
     mb.add( new DefaultProjectMenu()); 
     mb.add( new MaxWindowJMenu( "Windows", this));
     mb.add(Box.createHorizontalGlue());
@@ -94,14 +96,13 @@ public class ProjectEditor extends JFrame implements EditorContainer
     packagePanel.update();
   } 
 
-  public void save()
+  public static void newProject()
   {
-    packagePanel.Save();
-  } 
-  public void saveAs()
-  {
-    packagePanel.SaveAs();
-  } 
+    //apre un dialogo che mi chiede nome e path
+    //poi crea la directory e il file nome.jmax
+    //il progetto e' vuoto!!!
+  }
+
   /************* interface EditorContainer ************************/
   public Editor getEditor()
   {

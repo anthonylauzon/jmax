@@ -48,17 +48,22 @@ public class DefaultFileMenu extends EditorMenu
     super("File");
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-    setDefaultNumEntries(7);
+    setDefaultNumEntries(10);
 
-    add(DefaultActions.newAction, "New", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
-    add(DefaultActions.openAction, "Open", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
+    add(DefaultActions.newAction, "New Patcher", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
+    add(DefaultActions.openAction, "Open ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
 
     addSeparator();
+
+    add(DefaultActions.saveAction,   "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S);
+    add(DefaultActions.saveAsAction, "Save As ...");
 
     add(DefaultActions.closeAction, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
 
     addSeparator();
-    
+
+    add(DefaultActions.printAction, "Print ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P);
+
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
   

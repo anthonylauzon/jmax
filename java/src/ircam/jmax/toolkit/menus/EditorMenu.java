@@ -111,6 +111,18 @@ public abstract class EditorMenu extends JMenu
 
     return item;
   }
+
+  public JMenuItem replace(EditorAction action, String name, int position)
+  {
+    JMenuItem item;
+    
+    item = new JMenuItem(name); 
+    item.addActionListener(action);
+    remove( position);
+    insert( item, position); 
+    
+    return item;
+  }
   
   public JCheckBoxMenuItem addCheck(EditorAction action, String name)
   {
@@ -134,6 +146,11 @@ public abstract class EditorMenu extends JMenu
     return item;
   } 
     
+  public void setEnabled(boolean enabled, int position)
+  {
+    getItem( position).setEnabled( enabled);
+  }
+
   public void updateMenu(){};
 }
 

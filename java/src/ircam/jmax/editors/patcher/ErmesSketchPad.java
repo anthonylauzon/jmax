@@ -797,7 +797,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   //	Close 
   //--------------------------------------------------------
 
-  public void Close(boolean doCancel)
+  public void close(boolean doCancel)
   {
     if ( itsPatcher.isARootPatcher())
       {
@@ -828,6 +828,20 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     KeyEventsManager.removeProducer(this);
   }
 
+  public void save()
+  {
+    PatcherSaveManager.save( itsEditorContainer);
+  }
+
+  public void saveAs()
+  {
+    PatcherSaveManager.saveAs( itsEditorContainer);
+  }
+
+  public void print()
+  {
+    PatcherPrintManager.Print( itsEditorContainer);
+  }
   
   // -----------------------------------------------------------------------
   // The waiting/stopWaiting service

@@ -221,12 +221,14 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
-  public void Close(boolean doCancel){
+  public void close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
     bpfData.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
-    
+  public void save(){}
+  public void saveAs(){}
+  public void print(){}
   /**
    * ListSelectionListener interface
    */    

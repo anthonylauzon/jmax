@@ -47,9 +47,11 @@ public class Actions
   
   public static EditorAction importAction    = new ImportAction();
   public static EditorAction exportAction    = new ExportAction();
-  public static EditorAction printAction     = new PrintAction();
 
   public static EditorAction getAction       = new GetAction();
   public static EditorAction setAction       = new SetAction();
 }
+
+
+
 

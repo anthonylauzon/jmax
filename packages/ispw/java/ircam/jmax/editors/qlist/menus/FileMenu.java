@@ -42,9 +42,13 @@ import ircam.jmax.toolkit.menus.*;
 public class FileMenu extends DefaultFileMenu
 {
   public FileMenu(){
-    insert(Actions.importAction, "Import", Event.CTRL_MASK, KeyEvent.VK_I, 3);
-    insert(Actions.exportAction, "Export", Event.CTRL_MASK, KeyEvent.VK_E, 4);
-    insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 7);
+    
+    setDefaultNumEntries(12);
+    
+    setEnabled( false, 3);
+    setEnabled( false, 4);
+    insert(Actions.importAction, "Import", Event.CTRL_MASK, KeyEvent.VK_I, 5);
+    insert(Actions.exportAction, "Export", Event.CTRL_MASK, KeyEvent.VK_E, 6);
   }
 }
 

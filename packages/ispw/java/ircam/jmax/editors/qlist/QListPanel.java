@@ -304,10 +304,26 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
     return itsEditorContainer;
   }
 
-  public void Close(boolean doCancel){
+  public void close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
     itsData.requestDestroyEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
+  }
+  public void save(){}
+  public void saveAs(){}
+  public void print()
+  {
+    PrintJob aPrintjob = itsEditorContainer.getFrame().getToolkit().
+      getPrintJob(itsEditorContainer.getFrame(), "Printing QList", null, null);
+    
+    if(aPrintjob != null){
+      Graphics aPrintGraphics = aPrintjob.getGraphics();
+      if(aPrintGraphics != null){
+	getTextArea().printAll(aPrintGraphics);
+	aPrintGraphics.dispose();
+      }
+      aPrintjob.end();
+    }
   }
   // ----------ClipboardOwner interface methods
   public void lostOwnership(Clipboard clipboard, Transferable contents) {}

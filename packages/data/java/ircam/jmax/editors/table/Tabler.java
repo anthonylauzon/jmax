@@ -27,6 +27,7 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -42,10 +43,10 @@ public class Tabler extends JFrame implements EditorContainer {
   //--- Fields 
   TablePanel itsPanel;
 
-  private JMenu itsFileMenu;
-  private EditMenu itsEditMenu;	
-  private ViewMenu itsViewMenu;
-  private JMenu itsWindowsMenu;
+  private EditorMenu itsFileMenu;
+  private EditMenu   itsEditMenu;	
+  private ViewMenu   itsViewMenu;
+  private JMenu   itsWindowsMenu;
 
   /** Constructor */
   public Tabler(FtsTableObject theData) {
@@ -95,6 +96,8 @@ public class Tabler extends JFrame implements EditorContainer {
 
     // Build the file menu
     itsFileMenu = new ircam.jmax.toolkit.menus.DefaultFileMenu();
+    itsFileMenu.setEnabled( false, 3);
+    itsFileMenu.setEnabled( false, 4);
     mb.add( itsFileMenu); 
     
     // Build the edit menu

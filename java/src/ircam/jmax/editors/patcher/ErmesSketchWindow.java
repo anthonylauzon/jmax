@@ -310,7 +310,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   // Window Listener Interface 
   public void windowClosing(WindowEvent e)
   {
-    itsSketchPad.Close(false);    
+    itsSketchPad.close(false);    
   }
 
   public void windowOpened(WindowEvent e){}

@@ -229,16 +229,6 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	}
   }
 
-  void Save()
-  {
-    ftsPkg.save();
-  }
-
-  void SaveAs()
-  {
-    ftsPkg.save();
-  }
-
   /*********************************************************
    ***   Table model for the Requires JTable             ***
    *********************************************************/
@@ -300,8 +290,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 		temp[i][1] = data[i][1];
 	      }
 
-	      temp[index+1][0] = null;
-	      temp[index+1][1] = null;
+	      /*temp[index+1][0] = null;
+		temp[index+1][1] = null;*/
+	      temp[index+1][0] = "%^$#&^$!@#&^$%@!*&!@$*&%*&%!@$*&%!@$";
+	      temp[index+1][1] = Boolean.FALSE;
 	      
 	      for(int j = index+2; j < size-1; j++)
 	      {
@@ -386,10 +378,21 @@ public class ConfigPackagePanel extends JPanel implements Editor
     return (EditorContainer)window;
   }
 
-  public void Close(boolean doCancel)
+  public void close(boolean doCancel)
   {
     window.setVisible(false);
   }
+  public void save()
+  {
+    ftsPkg.save();
+  }
+  public void saveAs()
+  {
+    ftsPkg.save();
+  }
+  public void print()
+  {
+  } 
   /********************************/
   private JTabbedPane tabbedPane;
   private JTable requiresTable;

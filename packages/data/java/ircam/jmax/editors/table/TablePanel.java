@@ -549,11 +549,14 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     return itsEditorContainer;
   }
 
-  public void Close(boolean doCancel){
+  public void close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
     getData().requestDestroyEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
+  public void save(){}
+  public void saveAs(){}
+  public void print(){}
 }
 
 

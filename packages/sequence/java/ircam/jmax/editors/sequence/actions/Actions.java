@@ -39,7 +39,6 @@ import ircam.jmax.toolkit.actions.*;
 
 public class Actions
 {
-  public static EditorAction printAction     = new PrintAction();
   public static EditorAction exportAction    = new ExportAction();
   public static EditorAction importAction    = new ImportAction();
 

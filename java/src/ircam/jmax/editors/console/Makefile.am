@@ -2,8 +2,7 @@ packagedir=$(pkgdatadir)/java/classes/ircam/jmax/editors/console/
 package_JAVA = \
 ConsoleOutputStream.java\
 ConsoleWindow.java\
-ControlPanel.java\
-FileMenu.java
+ControlPanel.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

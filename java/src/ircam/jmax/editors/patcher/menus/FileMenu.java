@@ -43,27 +43,36 @@ public class FileMenu extends DefaultFileMenu
 {
   public FileMenu(ErmesSketchPad sketch)
   {
-    setDefaultNumEntries(10);
+    /*setDefaultNumEntries(10);
 
-    if(sketch.isARootPatcher())
+      if(sketch.isARootPatcher())
       {
-	insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
-	insert(Actions.saveAsAction, "SaveAs", 4);
+      insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
+      insert(Actions.saveAsAction, "SaveAs", 4);
       }
-    else
+      else
       if(sketch.isASubPatcher())
-	{
-	    insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
-	  insert(Actions.saveToAction, "Save As Template", 4);
-	}
+      {
+      insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);
+      insert(Actions.saveToAction, "Save As Template", 4);
+      }
       else //is a template
-	{
-	  insert(Actions.saveTemplateAction, "Save Template", 3);
-	  insert(Actions.saveToAction, "SaveAs", 4);
-	}
-    //insertSeparator(6);
-
-     insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 7);
+      {
+      insert(Actions.saveTemplateAction, "Save Template", 3);
+      insert(Actions.saveToAction, "SaveAs", 4);
+      }*/
+    if(!sketch.isARootPatcher())
+      {
+	if(sketch.isASubPatcher())
+	  {
+	    replace(Actions.saveToAction, "Save As Template", 4);
+	  }
+	 else //is a template
+	   {
+	     replace(Actions.saveTemplateAction, "Save Template", 3);
+	   }
+      }
+    //insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 7);
   }
 }
 

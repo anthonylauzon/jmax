@@ -47,7 +47,7 @@ public class ExplodeWindow extends JFrame implements EditorContainer, AAAReadme 
   //------------------- fields
   FtsExplodeObject explodeObject;
   ExplodePanel itsExplodePanel;
-  JMenu itsFileMenu;
+  EditorMenu itsFileMenu;
   EditMenu itsEditMenu;
   OptionsMenu itsOptionsMenu;
     //JMenu itsToolsMenu;
@@ -118,6 +118,9 @@ public class ExplodeWindow extends JFrame implements EditorContainer, AAAReadme 
 
     // Build the file menu
     itsFileMenu = new DefaultFileMenu();
+    itsFileMenu.setEnabled( false, 3);
+    itsFileMenu.setEnabled( false, 4);
+    itsFileMenu.setEnabled( false, 7);
     mb.add(itsFileMenu); 
     
     // Build the edit menu

@@ -27,6 +27,9 @@ package ircam.jmax.toolkit.actions;
 
 import java.awt.event.*;
 import javax.swing.*;
+import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.project.*;
 
@@ -38,36 +41,64 @@ import ircam.jmax.editors.project.*;
 
 public class DefaultActions
 {
-  public static EditorAction newAction      = new NewAction();
-  public static EditorAction openAction     = new OpenAction();
-  public static EditorAction closeAction    = new CloseAction();
-  public static EditorAction statisticsAction = new StatisticsAction();
-  public static EditorAction dspAction     = new DSPAction();
-  public static EditorAction quitAction     = new QuitAction();
+  public static EditorAction newAction        = new NewAction();
+  public static EditorAction openAction       = new OpenAction();
+  public static EditorAction saveAction       = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	container.getEditor().save();
+      }
+    };
+  public static EditorAction saveAsAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	container.getEditor().saveAs();
+      }
+    };
+  public static EditorAction closeAction      = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	container.getEditor().close(true);
+	System.gc();
+      }
+    };
+  public static EditorAction printAction      = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	container.getEditor().print();
+      }
+    };
+  public static EditorAction statisticsAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	new StatisticsDialog(container.getFrame());
+      }
+    };
+  public static EditorAction dspAction        = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	 FtsDspControl control = JMaxApplication.getDspControl();
+	 control.requestSetDspOn(!control.getDspOn());
+      }
+    };
+  public static EditorAction quitAction       = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	JMaxApplication.Quit();
+      }
+    };
 
   /*********** project ***********************************/
   public static EditorAction newProjectAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	//ProjectEditor.new();
+	ProjectEditor.newProject();
       }
     };
   public static EditorAction editProjectAction    = new EditorAction(){
       public void doAction(EditorContainer container)
       {
 	ProjectEditor.open();
-      }
-    };
-  public static EditorAction saveProjectAction    = new EditorAction(){
-      public void doAction(EditorContainer container)
-      {
-	ProjectEditor.getInstance().save();
-      }
-    };
-  public static EditorAction saveAsProjectAction  = new EditorAction(){
-      public void doAction(EditorContainer container)
-      {
-	ProjectEditor.getInstance().saveAs();
       }
     };
 }
