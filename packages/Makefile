@@ -45,7 +45,7 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 	sources \
 	system
 
-JAVA_PACKAGES=table
+JAVA_PACKAGES=
 
 MIXED_PACKAGES=data explode qlist sequence
 

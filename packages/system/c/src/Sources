@@ -27,6 +27,7 @@ SOURCES = \
 arch.c \
 argument.c \
 blip.c \
+bus_tilda.c \
 const.c \
 dsp1.c \
 print.c \

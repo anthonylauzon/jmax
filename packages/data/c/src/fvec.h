@@ -37,7 +37,7 @@ typedef struct _fvec_
   int alloc;
 } fvec_t;
 
-extern fts_data_class_t *fvec_data_class;
+extern fts_class_t *fvec_class;
 extern fts_symbol_t fvec_symbol;
 extern fts_type_t fvec_type;
 
