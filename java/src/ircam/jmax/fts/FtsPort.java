@@ -17,7 +17,7 @@ import java.io.*;
 
 abstract class FtsPort implements Runnable
 {
-  boolean flushing;
+  boolean flushing = true;
 
   /** Local Exception represeting a crash in the FTS server. */
 

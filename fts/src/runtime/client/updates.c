@@ -115,10 +115,14 @@ fts_client_updates_sync(void)
   fts_symbol_t property;
   fts_object_t *obj;
 
+  update_group_start();
+
   while (fts_object_get_next_change(&property, &obj))
     {
       fts_client_send_prop(obj, property);
     }
+
+  update_group_end();
 }
 
 
