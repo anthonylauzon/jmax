@@ -63,17 +63,6 @@ public class Package {
      *  package. Every package has its class loader. */
     protected PackageClassLoader classLoader;
 
-    /** The settings of the package */
-    SettingsTable settings;
-
-    public void setSettings(SettingsTable settings) {
-	this.settings = settings;
-    }
-
-    public SettingsTable setSettings() {
-	return settings;
-    }
-
     /** Creates a new package with the given name and version. */
     public Package(PackageHandler handler, String name, String version) 
     {
