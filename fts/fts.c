@@ -95,11 +95,32 @@ fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
   return fts_get_symbol( value);
 }
 
+static void fts_cmd_args_init( void)
+{
+  fts_atom_t a[2];
+
+  s___v = fts_new_symbol( "__v");
+  fts_class_install( s___v, v_instantiate);
+
+  s_yes = fts_new_symbol( "yes");
+
+  fts_set_symbol( a+0, fts_s_patcher);
+  fts_set_symbol( a+1, fts_new_symbol("environnment"));
+  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&cmd_args_patcher);
+  if ( !cmd_args_patcher)
+    {
+      fprintf( stderr, "cannot create environnment patcher\n");
+      return;
+    }
+}
+
 static void fts_cmd_args_parse( int argc, char **argv)
 {
   int filecount = 1, r;
   char filevar[32];
   fts_symbol_t name, value;
+
+  fts_cmd_args_init();
 
   argc--;
   argv++;
@@ -133,25 +154,6 @@ static void fts_cmd_args_parse( int argc, char **argv)
 
       argc--;
       argv++;
-    }
-}
-
-static void fts_kernel_cmd_args_init( void)
-{
-  fts_atom_t a[2];
-
-  s___v = fts_new_symbol( "__v");
-  fts_class_install( s___v, v_instantiate);
-
-  s_yes = fts_new_symbol( "yes");
-
-  fts_set_symbol( a+0, fts_s_patcher);
-  fts_set_symbol( a+1, fts_new_symbol("environnment"));
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&cmd_args_patcher);
-  if ( !cmd_args_patcher)
-    {
-      fprintf( stderr, "cannot create environnment patcher\n");
-      return;
     }
 }
 
@@ -236,8 +238,6 @@ void fts_init( int argc, char **argv)
   fts_kernel_soundfile_init();
   fts_kernel_oldclient_init();
   fts_kernel_olducs_init();
-
-  fts_kernel_cmd_args_init();
 
   fts_cmd_args_parse( argc, argv);
 

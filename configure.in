@@ -59,6 +59,12 @@ dnl Check for platform-specific code
 PLATFORM=linux
 AC_SUBST(PLATFORM)
 
+if test "x${prefix}" = "xNONE"; then
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "/usr/lib/jmax")
+else
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}")
+fi
+
 dnl Absolute pathname of top-level directory
 ABS_TOP_SRCDIR=`pwd`
 AC_SUBST(ABS_TOP_SRCDIR)

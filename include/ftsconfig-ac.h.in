@@ -108,3 +108,5 @@
 
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
+
+#undef DEFAULT_ROOT

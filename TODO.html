@@ -56,9 +56,6 @@ instead of specific code
 After this done, do a typedef const char *fts_symbol_t and remove fts_symbol_name()
 
 <p>
-Remove also devices.c (all logical devices bazar)
-
-<p>
 Replace udpsend/udpreceive by the object used in protocol
 
 
@@ -140,10 +137,7 @@ by a patch, and create classes, templates, abstractions in packages.
 <h2>Compilation issues</h2>
 
 <p>
-Move Makefiles to automake and autoconf
-
-<p>
-Compile to libfts.so and then link the executable against it
+Move Makefiles to automake and autoconf (only packages now)
 
 <p>
 Create the fts binary in jmax/fts/bin/fts instead of $(ARCH)/$(MODE).
@@ -152,6 +146,9 @@ executable to start.<br>
 Note: this is related to packages because it is still usefull to have
 ARCH in package's library path (to be able to share installations).
 The ARCH can be known from inside fts (defined at compile time).
+
+<P>
+Reintegrate compilation stuff for compilation date.
 
 
 <h2>Objects development API</h2>

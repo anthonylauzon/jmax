@@ -28,6 +28,8 @@
  * 
  */
 
+#include "ftsconfig.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -42,6 +44,24 @@
 #include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
+
+
+/***********************************************************************
+ *
+ * Root directory
+ *
+ */
+
+fts_symbol_t fts_get_root_directory( void)
+{
+  fts_symbol_t r;
+
+  r = fts_cmd_args_get( fts_new_symbol( "root"));
+  if ( r)
+    return r;
+
+  return fts_new_symbol( DEFAULT_ROOT);
+}
 
 /***********************************************************************
  *
