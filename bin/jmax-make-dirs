@@ -123,10 +123,10 @@ do_it ()
     do
 	for d in "lib" "obj"
 	do
-	    echo mkdir -p lib/protocol/$d/$a/debug lib/protocol/$d/$a/opt 
+	    echo mkdir -p lib/protocol/c/$d/$a
 	    if [ _${NOEXEC}_ = __ ]
 	    then
-		mkdir -p lib/protocol/$d/$a/debug lib/protocol/$d/$a/opt
+		mkdir -p lib/protocol/c/$d/$a
 	    fi
 	done
     done
