@@ -17,7 +17,7 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener,
   
   
   public ErmesObjFloatDialog(Frame theFrame) {
-    super(theFrame, "Float setting", true);
+    super(theFrame, "Float setting", false);
     
     itsParent = theFrame;
     setLayout(new BorderLayout());
