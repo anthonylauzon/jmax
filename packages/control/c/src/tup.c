@@ -495,21 +495,25 @@ getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   {
     fts_object_t *obj = fts_get_object(at);
     fts_class_t *cl = fts_object_get_class(obj);
-    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
-    fts_array_t *array = fts_tuple_get_array(tuple);
     fts_array_function_t fun = fts_class_get_array_function(cl);
 
-    fts_object_refer((fts_object_t *)tuple);
-    
-    (*fun)(obj, array);
+    if(fun != NULL)
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+      fts_array_t *array = fts_tuple_get_array(tuple);
 
-    /* output array */
-    if(fts_array_get_size(array) > 0)
-      fts_outlet_object(o, 0, (fts_object_t *)tuple);
-    else
-      fts_object_error(o, "cannot get tuple from %s object", fts_object_get_class_name(obj));
+      fts_object_refer((fts_object_t *)tuple);
+      
+      (*fun)(obj, array);
+      
+      /* output array */
+      if(fts_array_get_size(array) > 0)
+        fts_outlet_object(o, 0, (fts_object_t *)tuple);
     
-    fts_object_release((fts_object_t *)tuple);
+      fts_object_release((fts_object_t *)tuple);
+    }
+    else
+      fts_object_error(o, "cannot get tuple from %s object", fts_class_get_name(cl));
   }
   else
     fts_outlet_atom(o, 0, at);
