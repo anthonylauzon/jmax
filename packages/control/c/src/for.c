@@ -160,19 +160,19 @@ static void
 for_float_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   for_float_t *this = (for_float_t *)o;
-  int init = this->init;
-  int limit = this->limit;
-  int incr = this->incr;
+  float init = this->init;
+  float limit = this->limit;
+  float incr = this->incr;
   float f;
 
-  if(this->incr > 0.0 && this->init < this->limit)
+  if(incr > 0.0 && init < limit)
     {
-      for(f=this->init; f<this->limit; f+=this->incr)
+      for(f=init; f<limit; f+=incr)
 	fts_outlet_float(o, 0, f);
     }
-  else if(this->incr < 0.0 && this->init > this->limit)
+  else if(incr < 0.0 && init > limit)
     {
-      for(f=this->init; f>this->limit; f+=this->incr)
+      for(f=init; f>limit; f+=incr)
 	fts_outlet_float(o, 0, f);
     }
 }
