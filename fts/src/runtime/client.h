@@ -32,5 +32,6 @@
 #include "client/incoming.h"
 #include "client/outgoing.h"
 #include "client/updates.h"
+#include "client/protcodec.h"
 
 #endif

@@ -40,10 +40,12 @@ SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o
 PACKAGELIB=$(LIBDIR)/libunixdtd.so
 DTD_BIN = $(BINDIR)/dtd
 
+FTS_LIB=$(JMAXROOTDIR)/fts/lib/$(ARCH)/$(MODE)/libfts.a
+
 all: $(LIBDIR) $(OBJDIR) $(BINDIR) $(PACKAGELIB) $(DTD_BIN)
 
 $(DTD_BIN): $(SERVER_OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ -laudiofile
+	$(CC) $(CFLAGS) -o $@ $^ $(FTS_LIB) -laudiofile
 
 $(BINDIR):
 	mkdir -p $(BINDIR)

@@ -36,7 +36,6 @@
 #include <stdio.h>
 
 #include "fts.h"
-#include "protocol.h"
 
 typedef struct {
   fts_object_t o;

@@ -38,6 +38,10 @@
  */
 #undef INCOMING_DEBUG_TRACE
 
+#ifdef INCOMING_DEBUG_TRACE
+extern const char *protocol_printable_cmd( int cmd);
+#endif
+
 static void (* mess_dispatch_table[256])(int, const fts_atom_t *);
 
 #define S_CMD                      (256+1)

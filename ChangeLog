@@ -1,4 +1,14 @@
+2000-12-11  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	*  lib/protocol: removed this directory and moved the files in 
+	fts/src/runtime/client/protcodec.[ch] for the C part and to /dev/null
+	for the Java part
+
 2000-12-05  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed the makefiles for FTS: now only one library (libfts.a) is build
+	instead of one library per directory. The Makefiles in fts/src/*/* are
+	also much simpler.
 
 	* added packages/audpdev
 

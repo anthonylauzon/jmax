@@ -45,7 +45,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sched.h>
-#include <sys/stat.h>
 #include <signal.h>
 #include <audiofile.h>
 #ifdef USE_UDP
@@ -53,6 +52,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
+
+#include "fts.h"
 
 #include "dtddefs.h"
 #include "dtdfifo.h"
@@ -209,64 +210,13 @@ static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, i
   return n_write;
 }
 
-static const char *splitpath( const char *path, char *result, char sep)
-{
-  if ( *path == '\0')
-    return 0;
-
-  while ( *path != sep && *path != '\0')
-    {
-      *result++ = *path++;
-    }
-
-  *result = '\0';
-
-  if ( *path)
-    return path+1;
-
-  return path;
-}
-
-static int file_exists( const char *filename)
-{
-  struct stat statbuf;
-
-  return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
-}
-
-static int search_file_in_path( const char *filename, const char *path, char *full_path)
-{
-  char pathelem[N];
-
-  if (*filename == '/')
-    {
-      strcpy( full_path, filename);
-
-      return file_exists( full_path);
-    }
-
-  while ( (path = splitpath( path, pathelem, ':')) )
-    {
-      strcpy( full_path, pathelem);
-      strcat( full_path, "/");
-      strcat( full_path, filename);
-
-      DTD_DEBUG( __debug( "searching `%s'", full_path) );
-
-      if (file_exists( full_path))
-	  return 1;
-    }
-
-  return 0;
-}
-
 static AFfilehandle dtd_open_file_read( const char *filename, const char *path, int n_channels)
 {
   char full_path[N+N];
   AFfilehandle file;
   int file_channels, sampfmt, sampwidth;
 
-  if ( !search_file_in_path( filename, path, full_path) )
+  if ( !fts_file_search_in_path( filename, path, full_path) )
     {
       fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
       return AF_NULL_FILEHANDLE;

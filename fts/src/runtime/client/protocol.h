@@ -109,7 +109,5 @@
 #define DATA_CODE           0x0a
 #define EOM_CODE            0x0b
 
-extern const char *protocol_printable_cmd( int cmd);
-
 #endif
 
