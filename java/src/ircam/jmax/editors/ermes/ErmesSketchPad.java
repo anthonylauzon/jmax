@@ -1917,7 +1917,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	aObject = (ErmesObject)e.nextElement();
 	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
 	RemoveElementRgn(aObject);
-	aObject.MoveBy(0, aValue-aObject.GetY());
+	aObject.MoveBy(0, aValue-(aObject.GetY()+aObject.currentRect.height));
 	SaveOneElementRgn(aObject);
       }
     }
@@ -1927,7 +1927,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	aObject = (ErmesObject)e.nextElement();
 	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
 	RemoveElementRgn(aObject);
-	aObject.MoveBy(aValue-aObject.GetX(), 0);
+	aObject.MoveBy(aValue-(aObject.GetX()+aObject.currentRect.width), 0);
 	SaveOneElementRgn(aObject);
       }
     }
@@ -1960,7 +1960,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int aMaxY = -10000;
     for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMaxY<aObject.GetY()) aMaxY = aObject.GetY();
+      if(aMaxY<aObject.GetY()+aObject.currentRect.height) 
+	aMaxY = aObject.GetY()+aObject.currentRect.height;
     }
     return aMaxY;
   }
@@ -1970,7 +1971,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int aMaxX = -10000;
     for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMaxX < aObject.GetX()) aMaxX = aObject.GetX();
+      if(aMaxX < aObject.GetX()+aObject.currentRect.width) 
+	aMaxX = aObject.GetX()+aObject.currentRect.width;
     }
     return aMaxX;
   }

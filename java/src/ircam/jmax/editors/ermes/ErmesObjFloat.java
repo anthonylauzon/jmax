@@ -14,7 +14,8 @@ class ErmesObjFloat extends ErmesObject {
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
   int DEFAULT_WIDTH = 50;
-  int DEFAULT_HEIGHT = /*20*/15;
+  int DEFAULT_HEIGHT = 15;
+  int DEFAULT_VISIBLE_DIGIT = 3;
   float itsStartingValue;
   int itsFirstY;
   boolean firstClick = true;
@@ -34,9 +35,9 @@ class ErmesObjFloat extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     
     DEFAULT_HEIGHT = theSketchPad.getFontMetrics(theSketchPad.sketchFont).getHeight();
-    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*6+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("...");
+    DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*DEFAULT_VISIBLE_DIGIT+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("...");
     preferredSize.height = DEFAULT_HEIGHT+4;
-    preferredSize.width = DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20;
+    preferredSize.width = DEFAULT_WIDTH+17;
     super.Init(theSketchPad, x, y, theString);
     return true;
   }
@@ -46,13 +47,13 @@ class ErmesObjFloat extends ErmesObject {
     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
-    DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("...");
+    DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     if(currentRect.height<DEFAULT_HEIGHT+4) {
       preferredSize.height = DEFAULT_HEIGHT+4;
       currentRect.height = preferredSize.height;
     }
-    if(currentRect.width<DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20){
-      preferredSize.width = DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20;
+    if(currentRect.width<DEFAULT_WIDTH+17){
+      preferredSize.width = DEFAULT_WIDTH+17;
       currentRect.width = preferredSize.width;
     }
     return true;
@@ -103,7 +104,7 @@ class ErmesObjFloat extends ErmesObject {
 	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      int tempWidth = itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("...")+20;
+      int tempWidth = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...")+17;
       int tempHeight = itsFontMetrics.getHeight()+4;
       Resize(tempWidth - currentRect.width, tempHeight - currentRect.height);
     }
@@ -114,14 +115,19 @@ class ErmesObjFloat extends ErmesObject {
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
     
-    if(aWidth<currentRect.height/2 +20+itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("..."))
-      aWidth=currentRect.height/2 +20+itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("...");
-    if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
+    if((aWidth<aHeight/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..."))&&(aHeight<itsFontMetrics.getHeight()+4)){
+      aWidth = getMinimumSize().width;
+      aHeight = getMinimumSize().height;
+    }else{
+      if(aWidth<aHeight/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..."))
+	aWidth=aHeight/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
+      if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
+    }
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
 	
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < currentRect.height/2+20+itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("..."))||(currentRect.height+theDeltaY<itsFontMetrics.getHeight()+4))
+    if((currentRect.width+theDeltaX < currentRect.height/2+17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..."))||(currentRect.height+theDeltaY<itsFontMetrics.getHeight()+4))
       return false;
     else return true;
   }
@@ -130,7 +136,7 @@ class ErmesObjFloat extends ErmesObject {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    int tempWidth = 20+itsFontMetrics.stringWidth("0")*6+itsFontMetrics.stringWidth("...");
+    int tempWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
     Resize(tempWidth - currentRect.width, tempHeight - currentRect.height);		
     itsSketchPad.SaveOneElementRgn(this);
@@ -252,29 +258,40 @@ class ErmesObjFloat extends ErmesObject {
     
     //draw the value
     String aString;
-    String aString2 = ".."; 
-    if (itsFloat != 0) {
-      aString = String.valueOf(itsFloat);
-      if(aString.length()>6){
-	aString = aString.substring(0,6);
-	aString = aString + aString2;
-      }
-    }
+    //String aString2 = ".."; 
+    if (itsFloat != 0) aString = GetVisibleString(String.valueOf(itsFloat));
     else aString = "0.0";
     g.setFont(itsFont);
     g.setColor(Color.black);
-    g.drawString(aString, itsX+currentRect.height/2+8,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2+1);
+    g.drawString(aString, itsX+currentRect.height/2+5,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2+1);
     
     //draw the drag box
     if(!itsSketchPad.itsRunMode)
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
+  String GetVisibleString(String theString){
+    String aString = theString;
+    String aString2 = "..";
+    int aStringLength = theString.length();
+    int aCurrentSpace = currentRect.width-(currentRect.height/2+8)-3;
+    int aStringWidth = itsFontMetrics.stringWidth(aString);
+    if(aStringWidth<aCurrentSpace) return aString;
+    while((aCurrentSpace<=aStringWidth)&&(aString.length()>0)){
+      aString = aString.substring(0,aString.length()-1);
+      aStringWidth = itsFontMetrics.stringWidth(aString);
+    }
+    if((aStringWidth+itsFontMetrics.stringWidth("..") >= aCurrentSpace)&&(aString.length()>0))
+      aString = aString.substring(0,aString.length()-1);
+    aString =  aString + aString2;
+    return aString;
+  }
+
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return getPreferredSize();
+    return new Dimension(itsFontMetrics.stringWidth("0.0")+itsFontMetrics.getHeight()/2+15,itsFontMetrics.getHeight()+4);
   }
   
   //--------------------------------------------------------
