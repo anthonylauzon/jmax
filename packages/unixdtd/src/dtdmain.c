@@ -201,14 +201,15 @@ static int file_exists( const char *filename)
   return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
-static char *search_file_in_path( const char *filename, const char *path, char *full_path)
+static int search_file_in_path( const char *filename, const char *path, char *full_path)
 {
   char pathelem[N];
 
   if (*filename == '/')
     {
       strcpy( full_path, filename);
-      return full_path;
+
+      return file_exists( full_path);
     }
 
   while ( (path = splitpath( path, pathelem, ':')) )
@@ -218,7 +219,7 @@ static char *search_file_in_path( const char *filename, const char *path, char *
       strcat( full_path, filename);
 
       if (file_exists( full_path))
-	  return full_path;
+	  return 1;
     }
 
   return 0;
