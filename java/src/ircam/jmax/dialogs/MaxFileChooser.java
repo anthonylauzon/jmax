@@ -202,22 +202,8 @@ public class MaxFileChooser
   /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
   private static void configure()
   {
-    if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
-      {
-	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
-
-	Enumeration e = Mda.getDocumentFileFilters();
-	while (e.hasMoreElements())
-	  fd.addChoosableFileFilter((javax.swing.filechooser.FileFilter) e.nextElement());
-
-	fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
-
-	fd.setFileView(Mda.getFileView());
-      }
-
-    nickNackFileDialog();
-    
-    configured = true;
+      nickNackFileDialog();
+      configured = true;
   }
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
