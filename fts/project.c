@@ -135,6 +135,12 @@ fts_project_open(const char* filename)
   fts_object_t* obj;
   fts_project_t* project = NULL;
 
+  if (filename == NULL) {
+    return NULL;
+  }
+
+  fts_log("[project]: Loading project file \"%s\"\n", filename);
+
   /* this is a hack but not a big one: load the project in the context
      of the system package. */
   fts_package_push(fts_system_package);
@@ -185,6 +191,8 @@ fts_project_open(const char* filename)
   project->package.filename = fts_new_symbol_copy(path);
 
   fts_package_pop(fts_system_package);
+
+  fts_log("[project]: Done\n");
 
   return project;
 }
@@ -335,7 +343,7 @@ fts_project_midi(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   if (project->midi != NULL) {
     fts_array_clear(project->midi);
     fts_array_set(project->midi, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->midi = fts_array_new(ac, at);
   }
 
@@ -350,7 +358,7 @@ fts_project_midi_in(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   if (project->midi_in != NULL) {
     fts_array_clear(project->midi_in);
     fts_array_set(project->midi_in, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->midi_in = fts_array_new(ac, at);
   }
 
@@ -365,7 +373,7 @@ fts_project_midi_out(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
   if (project->midi_out != NULL) {
     fts_array_clear(project->midi_out);
     fts_array_set(project->midi_out, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->midi_out = fts_array_new(ac, at);
   }
 
@@ -380,7 +388,7 @@ fts_project_audio(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   if (project->audio != NULL) {
     fts_array_clear(project->audio);
     fts_array_set(project->audio, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->audio = fts_array_new(ac, at);
   }
 
@@ -395,7 +403,7 @@ fts_project_audio_in(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
   if (project->audio_in != NULL) {
     fts_array_clear(project->audio_in);
     fts_array_set(project->audio_in, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->audio_in = fts_array_new(ac, at);
   }
 
@@ -410,7 +418,7 @@ fts_project_audio_out(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   if (project->audio_out != NULL) {
     fts_array_clear(project->audio_out);
     fts_array_set(project->audio_out, ac, at);
-  } else {
+  } else if (ac > 0) {
     project->audio_out = fts_array_new(ac, at);
   }
 

@@ -1417,7 +1417,11 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	{
 	  fts_object_t *patcher;
 
+	  fts_log("[OLDclient]: Load file %s\n", fts_symbol_name(filename));
+
 	  patcher = fts_binary_file_load(fts_symbol_name(filename), parent, 0, 0, 0);
+
+	  fts_log("[OLDclient]: Done\n");
 
 	  if (patcher == 0)
 	    {

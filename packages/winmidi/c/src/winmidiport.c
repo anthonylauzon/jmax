@@ -569,38 +569,38 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	    }
 	  }
 	}
+      }
     
-	/* if the hardware midi devices failed, try opening a software synth */
-	if (this->hmidiout == NULL) {
-	  for (i = 0; i < num; i++) {
-	    res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
-	    if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
-	      err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
-	      if (err == MMSYSERR_NOERROR) {
-		post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-		fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-		break;
-	      } else {
-		this->hmidiout = NULL;
-	      } 
-	    }
+      /* if the hardware midi devices failed, try opening a software synth */
+      if (this->hmidiout == NULL) {
+	for (i = 0; i < num; i++) {
+	  res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
+	  if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
+	    err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
+	    if (err == MMSYSERR_NOERROR) {
+	      post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+	      fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+	      break;
+	    } else {
+	      this->hmidiout = NULL;
+	    } 
 	  }
 	}
+      }
 
-	if (this->hmidiout == NULL) {
-	  post("Warning: winmidiport: failed to opened a midi out device; midi out not available\n");
-	  fts_log("[winmidiport]: Failed to opened a midi out device; midi out not available\n");
-	  
-	} else {
-	  
-	  /* setup the buffers for outgoing sysex messages */
-	  for (i = 0; i < 2; i++) {
-	    this->outhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
-	    this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
-	    this->outhdr[i].dwBytesRecorded = 0;
-	    this->outhdr[i].dwUser = i;
-	    this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
-	  }
+      if (this->hmidiout == NULL) {
+	post("Warning: winmidiport: failed to opened a midi out device; midi out not available\n");
+	fts_log("[winmidiport]: Failed to opened a midi out device; midi out not available\n");
+	
+      } else {
+	
+	/* setup the buffers for outgoing sysex messages */
+	for (i = 0; i < 2; i++) {
+	  this->outhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
+	  this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
+	  this->outhdr[i].dwBytesRecorded = 0;
+	  this->outhdr[i].dwUser = i;
+	  this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
 	}
       }
     }
@@ -720,7 +720,7 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   HMIDIOUT hmidiout;
   HMIDIIN hmidiin;
 
-  fts_log("[winmidiport]: Closing MIDI ports\n");
+  fts_log("[winmidiport]: Closing MIDI port\n");
 
   EnterCriticalSection(&this->critical_section);
 
