@@ -4,4 +4,6 @@ help_DATA=\
  explay.help.jmax \
  explode.help.index.tcl \
  explode.help.jmax \
- explode.summary.jmax \
+ explode.summary.jmax 
+
+EXTRA_DIST= $(help_DATA)

@@ -131,6 +131,8 @@ tutorials/Makefile
 tutorials/basics/Makefile
 java/src/ircam/jmax/MaxVersion.java
 java/Makefile
+java/lib/Makefile
+java/lib/jacl/Makefile
 java/src/Makefile
 java/src/ircam/Makefile
 java/src/ircam/jmax/Makefile
@@ -246,6 +248,7 @@ packages/numeric/help/Makefile
 packages/oss/Makefile
 packages/oss/c/Makefile
 packages/oss/c/src/Makefile
+packages/oss/help/Makefile
 packages/qlist/Makefile
 packages/qlist/c/Makefile
 packages/qlist/c/src/Makefile
@@ -287,5 +290,7 @@ packages/unixdtd/Makefile
 packages/utils/Makefile
 packages/utils/c/Makefile
 packages/utils/c/src/Makefile
+utils/Makefile
+utils/rpm/Makefile
 utils/rpm/jmax.spec
 )

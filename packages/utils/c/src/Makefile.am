@@ -11,3 +11,8 @@ random.c \
 rfft_shuffle.c \
 utils.c \
 vec_fft.c 
+
+noinst_HEADERS= \
+cfft.h \
+rfft_shuffle.h \
+utils.h

@@ -42,3 +42,5 @@ help_DATA=\
  trigon~.help.jmax \
  wahwah~.help.jmax \
  zerocross~.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

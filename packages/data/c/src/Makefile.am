@@ -23,3 +23,18 @@ vec.c \
 dumpfile.c
 
 INCLUDES=-I@top_srcdir@/packages/utils/c/src
+
+noinst_HEADERS= \
+bpf.h \
+col.h \
+data.h \
+fmat.h \
+fvec.h \
+ivec.h \
+mat.h \
+message.h \
+messtab.h \
+preset.h \
+row.h \
+value.h \
+vec.h

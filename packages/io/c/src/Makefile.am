@@ -12,3 +12,6 @@ profileaudioport.c \
 serial.c \
 udp.c \
 wacom.c 
+
+noinst_HEADERS= \
+iomodule.h

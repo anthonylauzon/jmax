@@ -11,4 +11,6 @@ help_DATA=\
  mat.help.jmax \
  setelem.help.jmax \
  value.help.jmax \
- vec.help.jmax \
+ vec.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

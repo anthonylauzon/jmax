@@ -9,3 +9,5 @@ help_DATA=\
  serial.help.jmax \
  udpmessage.help.jmax \
  wacom.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

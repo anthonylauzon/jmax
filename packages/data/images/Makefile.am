@@ -7,3 +7,5 @@ img_DATA=\
  liner.gif \
  scroller.gif \
  zoomer.gif 
+
+EXTRA_DIST= $(img_DATA)

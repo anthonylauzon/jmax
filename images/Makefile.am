@@ -46,3 +46,5 @@ tool_text.gif \
 tool_up.gif \
 tux.gif \
 warning.gif 
+
+EXTRA_DIST= $(pkgimg_DATA)

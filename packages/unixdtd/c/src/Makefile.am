@@ -7,3 +7,9 @@ dtdmodule.c \
 dtdobjs.c \
 dtdserver.c \
 libtime.c 
+
+noinst_HEADERS=  \
+dtddefs.h \
+dtdfifo.h \
+dtdserver.h \
+libtime.h

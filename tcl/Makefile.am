@@ -22,3 +22,4 @@ params.tcl\
 startup.tcl\
 require.tcl
 
+EXTRA_DIST= $(pkgtcl_DATA)

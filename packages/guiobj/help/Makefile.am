@@ -13,3 +13,5 @@ help_DATA=\
  slider.help.jmax \
  toggle.help.jmax \
  vecdisplay.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

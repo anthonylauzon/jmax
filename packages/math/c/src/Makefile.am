@@ -8,3 +8,7 @@ binop_number.c \
 math.c 
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src
+
+noinst_HEADERS= \
+binop.h \
+math.h

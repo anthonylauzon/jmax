@@ -10,3 +10,5 @@ img_DATA=\
  selecter.gif \
  vmover.gif \
  zoomer.gif 
+
+EXTRA_DIST= $(img_DATA)

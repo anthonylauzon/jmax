@@ -8,3 +8,5 @@ help_DATA=\
  sequence.help.index.tcl \
  sequence.help.jmax \
  sequence.summary.jmax 
+
+EXTRA_DIST= $(help_DATA)

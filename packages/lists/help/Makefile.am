@@ -17,3 +17,5 @@ help_DATA=\
  listsublist.help.jmax \
  listsum.help.jmax \
  listtail.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

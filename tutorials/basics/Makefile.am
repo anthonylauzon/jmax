@@ -20,3 +20,4 @@ tutorial_DATA=\
  system.summary.jmax \
  variables.tutorial.jmax 
 
+EXTRA_DIST= $(tutorial_DATA)

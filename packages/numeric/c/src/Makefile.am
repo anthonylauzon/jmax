@@ -4,3 +4,6 @@ libnumeric_la_SOURCES= \
 numeric.c \
 rewrap.c \
 wrap.c 
+
+noinst_HEADERS= \
+numeric.h

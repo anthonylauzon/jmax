@@ -7,3 +7,6 @@ midiout.c \
 midiport.c \
 rawmidiport.c \
 sysex.c 
+
+noinst_HEADERS= \
+midi.h

@@ -7,3 +7,5 @@ help_DATA=\
  signal.summary.jmax \
  tilda.help.jmax \
  wave.aiff 
+
+EXTRA_DIST= $(help_DATA)

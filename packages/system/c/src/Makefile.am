@@ -12,3 +12,6 @@ sigbus.c \
 system.c \
 ucsobj.c 
 
+noinst_HEADERS=  \
+sigbus.h \
+system.h

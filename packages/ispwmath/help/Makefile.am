@@ -7,3 +7,5 @@ help_DATA=\
  ispwmath.summary.jmax \
  logic.help.jmax \
  shift.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

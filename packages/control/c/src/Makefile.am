@@ -10,3 +10,6 @@ oneshot.c \
 range.c \
 switch.c \
 sync.c 
+
+noinst_HEADERS=\
+control.h

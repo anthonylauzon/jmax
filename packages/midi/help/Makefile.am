@@ -13,3 +13,5 @@ help_DATA=\
  project.env \
  sysex.help.jmax \
  touch.help.jmax 
+
+EXTRA_DIST= $(help_DATA)

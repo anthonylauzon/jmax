@@ -8,3 +8,5 @@ help_DATA=\
  print.help.jmax \
  system.help.index.tcl \
  system.summary.jmax 
+
+EXTRA_DIST= $(help_DATA)

@@ -124,3 +124,30 @@ wavetab.c \
 zerocross.c 
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
+
+noinst_HEADERS= \
+Rsend.h \
+atomlist.h \
+biquad.h \
+delbuf.h \
+deltable.h \
+fft_ftl.h \
+filters.h \
+fir.h \
+fourpoint.h \
+iir.h \
+ispw.h \
+naming.h \
+osc.h \
+phasor.h \
+pt_meth.h \
+pt_obj.h \
+pt_tools.h \
+sampbuf.h \
+sampread.h \
+sampunit.h \
+sampwrite.h \
+vd.h \
+vexp.h \
+vexp_util.h \
+wavetab.h

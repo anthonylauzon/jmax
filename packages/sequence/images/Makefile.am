@@ -25,3 +25,5 @@ img_DATA=\
  message.gif \
  anything.gif \
  midi.gif 
+
+EXTRA_DIST= $(img_DATA)

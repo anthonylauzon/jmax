@@ -13,3 +13,6 @@ listsublist.c \
 listsum.c \
 listtail.c \
 listcomp.c 
+
+noinst_HEADERS= \
+lists.h

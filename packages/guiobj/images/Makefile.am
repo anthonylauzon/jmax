@@ -23,3 +23,5 @@ img_DATA=\
  toggle_cursor.gif \
  vecdisplay.gif \
  vecdisplay_cursor.gif 
+
+EXTRA_DIST= $(img_DATA)

@@ -10,3 +10,4 @@ help_DATA=\
  range.help.jmax \
  switch.help.jmax 
 
+EXTRA_DIST=$(help_DATA)

@@ -47,3 +47,5 @@ help_DATA=\
  unpack.help.jmax \
  value.help.jmax \
  voxalloc.help.jmax 
+
+EXTRA_DIST= $(help_DATA)
