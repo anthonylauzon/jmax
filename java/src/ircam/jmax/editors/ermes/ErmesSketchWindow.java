@@ -661,51 +661,26 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if(e.isControlDown()){
       if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
       else if(aInt == 65) itsSketchPad.SelectAll();//a
-      //#else if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
+      else if(aInt == 67) Copy();//c
       else if(aInt == 78) MaxApplication.GetConsoleWindow().New();//n
-      else if(aInt == 79) MaxApplication.GetConsoleWindow()/*itsProjectWindow*/.Open();//o
+      else if(aInt == 79) MaxApplication.GetConsoleWindow().Open();//o
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83)Save();//s
+      else if(aInt == 86) Paste();//v
       else if(aInt == 87) {//w
 	if (isSubPatcher){
 	  setVisible(false);
 	  itsTopWindow.RemoveFromSubWindowList(this);
 	}
 	else {
-	  //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
 	  Close();
-	  //dispose();
 	}
       }       
       else if(aInt == 69){//e
 	if (itsSketchPad.GetRunMode()) setRunMode(false);
 	else setRunMode(true);
 	return;
-	/*ErmesObject aObject;
-	  itsChangingRunEditMode = true;
-	  MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
-	  MenuItem aSelectAllItem = itsEditMenu.getItem(5);
-	  if(!itsSketchPad.GetRunMode()){  
-	  setBackground(Color.white);
-	  itsSketchPad.SetRunMode(true);
-	  for(Enumeration en1 = itsSketchPad.itsElements.elements(); en1.hasMoreElements();) {
-	  aObject = (ErmesObject)en1.nextElement();
-	  aObject.RunModeSetted();
-	  }
-	  itsToolBar.setRunMode(true);
-	  aRunEditItem.setLabel("Edit mode Ctrl+E");
-	  aSelectAllItem.setEnabled(false);
-	  }
-	  else {
-	  itsChangingRunEditMode = true;
-	  setBackground(ErmesSketchPad.sketchColor);
-	  itsSketchPad.SetRunMode(false);
-	  itsToolBar.setRunMode(false);
-	  aRunEditItem.setLabel("Run mode Ctrl+E");
-	  aSelectAllItem.setEnabled(true);
-	  }
-	  requestFocus();*/
       }
       else if (aInt == 47){//?
 	//ask help for the reference Manual for the selected element...

@@ -12,10 +12,11 @@ import ircam.jmax.fts.*;
 /*abstract*/ class ErmesObjEditableObject extends ErmesObject {
 	
 	
-  final int WIDTH_DIFF = 14;
+  int WIDTH_DIFF = 14;
   int HEIGHT_DIFF = 2;
 	
   protected int FIELD_HEIGHT;
+  protected int FIELD_WIDTH;
   Dimension preferredSize = null;
   String 	  itsArgs;
   public Vector itsParsedTextVector = new Vector();
@@ -46,7 +47,8 @@ import ircam.jmax.fts.*;
 
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     FIELD_HEIGHT = itsFontMetrics.getHeight();
-    preferredSize = new Dimension(70,FIELD_HEIGHT+2*HEIGHT_DIFF);
+    FIELD_WIDTH = itsFontMetrics.stringWidth("0");
+    preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF+10*/,FIELD_HEIGHT+2*HEIGHT_DIFF);
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText("");
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
@@ -73,7 +75,8 @@ import ircam.jmax.fts.*;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); //bugsgi*/
     itsJustification = itsSketchPad.itsJustificationMode;
     FIELD_HEIGHT = itsFontMetrics.getHeight();
-    preferredSize = new Dimension(70,FIELD_HEIGHT+2*HEIGHT_DIFF);
+    FIELD_WIDTH = itsFontMetrics.stringWidth("0");
+    preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF+10*/, FIELD_HEIGHT+2*HEIGHT_DIFF);
     super.Init(theSketchPad, x, y, args);
     
     ResizeToText(0, 0);	//will it work?
@@ -148,7 +151,7 @@ import ircam.jmax.fts.*;
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF+10,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
-    int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF-currentRect.height;
+    int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height;
 
     Resize(aMaxWidth-currentRect.width, aHeight);
     itsSketchPad.SaveOneElementRgn(this);

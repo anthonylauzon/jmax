@@ -24,7 +24,7 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
     setDoubleBuffered(true);
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
-    itsSwToolbar = new JToolBar();    
+    itsSwToolbar = new JToolBar();
     ToolBarUI ui = itsSwToolbar.getUI();
     if (ui instanceof BasicToolBarUI)
       ((BasicToolBarUI)ui).setFloatable (false);    
@@ -48,14 +48,14 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
     //    System.err.println("got a paint");
     super.paint(g);
     //CreateaDump();
-    }
+    }*/
     
     public void update(Graphics g) {
-    super.update(g);
-    //System.err.println("got an update()");
+      super.update(g);
+      //System.err.println("got an update()");
     }
     
-    public void repaint() {
+  /*public void repaint() {
     super.repaint(); //fosse la madonna
     // super.repaint();
     //System.err.println("got a repaint()");
@@ -119,10 +119,12 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
   }
 
   public void setRunMode(boolean theRunMode) {
-    JComponent aComponent;
+    //JComponent aComponent;
     if(theRunMode) setBackground(Color.white);
     else setBackground(itsSwToolbar.getBackground());
-    //setVisible(!theRunMode);
+    //for(int i=0;i< getComponentCount(); i++) {
+    //getComponent(i).setVisible(!theRunMode);
+    //}
     itsSwToolbar.setVisible(!theRunMode);
   }
  

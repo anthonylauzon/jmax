@@ -762,9 +762,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     FtsObject	fo;
     FtsConnection fc;
     ErmesObject aObject;
+    ErmesConnection aConnection;
 
     int objectX;    
     int objectY;
+    
+    itsHelper.DeselectAll();
 
     if (objectVector == null) return;
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
@@ -783,7 +786,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       fo.put("pos.y", objectY+10);//offset by 10
       
       aObject = itsHelper.AddObject(objectClass, fo);
-      
+      itsSelectedList.addElement(aObject);
+      aObject.Select();
+       
       if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
       
@@ -799,9 +804,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
       fromObj = (ErmesObject) fc.getFrom().getRepresentation();
       toObj = (ErmesObject) fc.getTo().getRepresentation();
-      itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+      aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+      itsSelectedConnections.addElement(aConnection);
+      aConnection.Select();
     }
-
+    editStatus = START_SELECT;
   }
   
   

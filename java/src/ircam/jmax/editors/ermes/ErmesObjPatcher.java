@@ -27,7 +27,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   //--------------------------------------------------------
   public ErmesObjPatcher(){
     super();
-    HEIGHT_DIFF = 4;
+    HEIGHT_DIFF = 5;
+    WIDTH_DIFF = 11;
   }
 	
   //--------------------------------------------------------
@@ -57,7 +58,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
     
     ParseText(itsArgs);
-    ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
+    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
     RestoreDimensions();
 
     return true;		// Why this method return a value ????
@@ -194,9 +195,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     g.setColor(Color.black);
     g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
     g.drawRect(itsX+4, itsY+4, currentRect.width-8, currentRect.height-8);
-    g.drawLine(itsX+7,itsY+6,itsX+7,itsY+/*18*/currentRect.height-6);
-    g.drawLine(itsX+7,itsY+6,itsX/*+13*/+currentRect.width/6,itsY/*+12*/+currentRect.height/2);
-    g.drawLine(itsX+/*13*/currentRect.width/6,itsY/*+12*/+currentRect.height/2,itsX+7,itsY/*+18*/+currentRect.height-6);
+    
+    //the triangle
+    g.drawLine(itsX+7,itsY+6,itsX+7,itsY+currentRect.height-6);
+    g.drawLine(itsX+7, itsY+6, itsX+currentRect.height/2+2, itsY+currentRect.height/2);
+    g.drawLine(itsX+currentRect.height/2+2,itsY+currentRect.height/2, itsX+7, itsY+currentRect.height-6);
+
+
     g.setFont(itsFont);
     g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2/*currentRect.width/6+3*/,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);		
     
@@ -207,7 +212,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsArgs) + 32 - currentRect.width,
+      Resize(itsFontMetrics.stringWidth(itsMaxString) + 32 - currentRect.width,
 	     itsFontMetrics.getHeight() + 10 - currentRect.height);
     }
     else ResizeToText(0,0);
@@ -216,15 +221,15 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsArgs) + 32) 
-      aWidth = itsFontMetrics.stringWidth(itsArgs) + 32;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + 32) 
+      aWidth = itsFontMetrics.stringWidth(itsMaxString) + 32;
     if(aHeight<itsFontMetrics.getHeight() + 10) 
       aHeight = itsFontMetrics.getHeight() + 10;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(itsArgs)+32)||
+    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(itsMaxString)+32)||
        (currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 10))
       return false;
     else return true;
@@ -233,13 +238,29 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsArgs)+32,
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF+10,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
     Resize(aMaxWidth-currentRect.width, itsFontMetrics.getHeight() + 10 - currentRect.height);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
 
+    //--------------------------------------------------------
+  // resize
+  //--------------------------------------------------------
+  public void setSize(int theH, int theV) {
+    Dimension d = new Dimension(theH, theV);
+    if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);
+    super.Resize1(d.width, d.height);
+    if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
+    currentRect.setSize(d.width, d.height);
+    if (itsSketchPad != null) itsSketchPad.repaint();
+  }
+  
+  public void setSize(Dimension d) {
+    setSize(d.width, d.height);
+  }
+ 
 }
 
 

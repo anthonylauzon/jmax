@@ -100,14 +100,16 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     //dovrebbe farlo anche per l'altezza...
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
-  
-    if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
+    System.out.println("lenght = "+lenght);
+    // if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
+    if(!itsOwner.itsResized){//??????????????
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
       itsOwner.setSize(d1.width, d1.height);
     }
     int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
-    if((height< getSize().height-10)&&(!itsOwner.itsResized)){
+    //if((height< getSize().height-10)&&(!itsOwner.itsResized)){
+    if(!itsOwner.itsResized){//?????
       Dimension d1 = itsOwner.Size();
       d1.height = height+2*itsOwner.HEIGHT_DIFF;
       itsOwner.setSize(d1.width, d1.height);
