@@ -700,12 +700,10 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
   fts_atom_t *value;
   fts_audioport_t *default_audioport = 0;
 
-  value = fts_variable_get_value( fts_object_get_patcher( obj), s_default_audio_port);
+  value = fts_variable_get_value_or_void( fts_object_get_patcher( obj), s_default_audio_port);
 
   if (value && fts_is_object(value))
-    {
-      default_audioport = (fts_audioport_t *)fts_get_object( value);
-    }
+    default_audioport = (fts_audioport_t *)fts_get_object( value);
   
   if (obj)
     fts_variable_add_user( fts_object_get_patcher(obj), s_default_audio_port, obj);

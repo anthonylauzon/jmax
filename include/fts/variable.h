@@ -68,6 +68,8 @@ struct fts_env
 
 /* Access the value of a variable in the scope represented by an object */
 FTS_API fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
+/* Access the value of a variable in the given scope or create void place holder in root patcher */
+FTS_API fts_atom_t *fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Add a user to a variable in a given scope.
  * A user is an object that referentiate the variable and so need to 
