@@ -1010,6 +1010,11 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   char path[MAXPATHLEN];
   char *dir;
 
+  if (this->dirty == 0)
+  {
+    /* no need to save package */
+    return;
+  }
   if (ac == 0)
     {
       post( "No filename specified\n");    
