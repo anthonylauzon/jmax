@@ -48,7 +48,7 @@ import ircam.jmax.utils.*;
  */
 
 
-public class FtsServer  implements Runnable
+public class FtsServer implements Runnable
 {
   Fts fts;			// back pointer to the FTS object using this server
 

@@ -161,6 +161,7 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->ftl_data = ftl_data_new(line_control_t);
 
   df = 0.0f;
+  f = 0.0f;
   ftl_data_set(line_control_t, this->ftl_data, value, &df);
   ftl_data_set(line_control_t, this->ftl_data, target, &f);
   ftl_data_set(line_control_t, this->ftl_data, incr, &df);

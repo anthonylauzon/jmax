@@ -16,6 +16,8 @@
 #include "fts.h"
 #include "sequence.h"
 
+static fts_symbol_t sym_open_editor = 0;
+
 typedef struct seqevt_ 
 {
   fts_object_t o;
@@ -77,6 +79,14 @@ seqobj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 void
+seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqobj_t *this = (seqobj_t *)o;
+
+  fts_client_object_send_mess(o, sym_open_editor, 0, 0);
+}
+
+void
 seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqobj_t *this = (seqobj_t *)o;
@@ -119,13 +129,16 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(ac == 1)
     {
+      sym_open_editor = fts_new_symbol("open_editor");
+
       fts_class_init(cl, sizeof(seqobj_t), 1, 0, 0); 
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqobj_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqobj_delete);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("trkadd"), seqobj_track_add);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), seqobj_print);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), seqobj_open_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_add"), seqobj_track_add);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("print"), seqobj_print);
       
       return fts_Success;
     }

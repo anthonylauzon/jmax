@@ -430,7 +430,8 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
 }
 
 
-/*    NEW  (obj)pid (int)new-id [<args>]*
+/*    NEW  (obj)pid (int)new-id [<args>]* or
+      NEW  (int)new-id [<args>]*
 
       Create a new object, in the parent patcher, with 
       local id new-lid, and description args.
@@ -446,6 +447,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
   if (ac >= 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
     {
+      /* new object in patcher */
       fts_object_t *obj;
       int id;
       fts_patcher_t *parent;
@@ -462,6 +464,15 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       obj = fts_eval_object_description(parent, ac - 2, av + 2);
       fts_object_set_id(obj, id);
+    }
+  else if (ac >= 1 && fts_is_int(&av[0]))
+    {
+      /* new object without context */
+      int id  = fts_get_int(&av[0]);
+      fts_object_t *obj;
+      
+      fts_object_new(0, ac - 1, av + 1, &obj);
+      fts_object_set_id(obj, id);      
     }
   else
     printf_mess("System Error in FOS message NEW: bad args", ac, av);

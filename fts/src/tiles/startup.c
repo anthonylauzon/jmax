@@ -127,8 +127,8 @@ static void fts_kernel_config(void)
   fts_install_module( &fts_dev_module);      /* the device support  system */
   fts_install_module( &fts_midi_module);     /* the fts MIDI system */
   fts_install_module( &fts_time_module);     /* the time handling module */
-  fts_install_module( &fts_audio_module);    /* the fts AUDIO I/O  system */
   fts_install_module( &fts_client_module);   /* the fts <--> client communication system */
+  fts_install_module( &fts_audio_module);    /* the fts AUDIO I/O  system */
   fts_install_module( &fts_files_module);   /* the fts file handling module */
 
   /* Thread module

@@ -27,4 +27,3 @@ SOURCES = \
 module.c \
 sequence.c \
 seqobj.c \
-#seq_play.c \

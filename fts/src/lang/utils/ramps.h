@@ -133,7 +133,29 @@ extern void fts_ramp_incr(fts_ramp_t *ramp);
 
 void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size);
 void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size);
-void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size);
+/* void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size); */
+
+#define fts_ramp_vec_mul_add(r, x, y, n) \
+  if((r)->n_steps <= 0) \
+    { \
+      float target = (r)->value.target; \
+      int i; \
+ \
+      for(i=0; i<(n); i++) \
+	(y)[i] += (x)[i] * target; \
+    } \
+  else \
+    { \
+      float incr = (r)->value.incr / (n); \
+      float base = (r)->value.current; \
+      int i; \
+ \
+      for(i=0; i<(n); i++) \
+	(y)[i] += (x)[i] * (base + i * incr); \
+ \
+      fts_ramp_value_incr(&(r)->value); \
+      (r)->n_steps--; \
+    }
 
 #endif
 

@@ -60,7 +60,7 @@ oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(this->open == 1)
     {
       this->open = 0;
-      fts_outlet_send(o, 0, s, 1, at);
+      fts_outlet_send(o, 0, s, ac, at);
     }
 }
 

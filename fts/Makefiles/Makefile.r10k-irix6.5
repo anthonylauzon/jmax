@@ -44,7 +44,8 @@ SYSTEM_LDFLAGS :=  -mips4 -n32
 #SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc -lfpe -lfpe_ss
 #SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc
 
-SYSTEM_SOFLAGS := -mips4 -n32
+SYSTEM_SOFLAGS := -mips4 -n32 -update_registry /dev/null
+#SYSTEM_SOFLAGS := -mips4 -n32
 
 # 7.2 compiler, no -IPA for the moment (but get 10% better anyway)
 
