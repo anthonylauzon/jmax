@@ -290,8 +290,11 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   //controll if the object is in the actual scrollable area. if not extend the area
   private void resizePanelToEventTime(TrackEvent evt)
   {
-    int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
-    resizePanelToTime(evtTime);
+    if( evt != null)
+      {
+	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
+	resizePanelToTime(evtTime);
+      }
   }
 
   private void resizePanelToTime(int time)
