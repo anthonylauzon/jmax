@@ -73,6 +73,10 @@ all-local: time.stamp
 		for i in $(noinst_DATA); do cp $(GIF_SRC_DIR)/$$i $(GIF_TARGET_DIR); done; \
 	fi
 
+clean-local:
+	if test "$(GIF_SRC_DIR)" != "$(GIF_TARGET_DIR)"; then \
+		for i in $(noinst_DATA); do rm -f $(GIF_TARGET_DIR)/$$i; done; \
+	fi
 
 time.stamp: $(noinst_DATA)
 	echo timestamp > time.stamp
