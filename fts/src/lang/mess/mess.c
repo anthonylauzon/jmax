@@ -66,9 +66,6 @@ static void fts_mess_init( void )
   /* Initialize the property system */
   fts_properties_init();
 
-  /* Initialize object naming services */
-  fts_mess_naming_init();
-
   /* Create the patcher data */
   fts_patcher_data_config();
 
