@@ -759,16 +759,29 @@ public class FtsObject
 	  return args.elementAt(0).toString();
 	else
 	  {
+	    Object element;
 	    StringBuffer b;
 
 	    b = new StringBuffer();
 
-	    b.append(args.elementAt(0));
-
+	    element = args.elementAt(0);
+	    b.append(element.toString());
+	  
 	    for (int i = 1; i < args.size(); i++)
 	      {
-		b.append(" ");
-		b.append(args.elementAt(i).toString());
+		// If we are generating the description of a message
+		// box, follow the convention of Max 0.26 about new lines.
+		// otherwise, add a blank between values
+
+		if ((className == "message") &&
+		    (element instanceof String) &&
+		    (((String) element).equals(";")))
+		  b.append("\n");
+		else
+		  b.append(" ");
+
+		element = args.elementAt(i);
+		b.append(element.toString());
 	      }
 
 	    return b.toString();
