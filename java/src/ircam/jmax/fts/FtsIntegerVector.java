@@ -24,13 +24,6 @@ public class FtsIntegerVector extends FtsRemoteData
     super();
   }
 
-  /** SHould go away !!! */
-
-  public String getName()
-  {
-    return "table";
-  }
-
   /** Get the vector size */
 
   public int getSize()

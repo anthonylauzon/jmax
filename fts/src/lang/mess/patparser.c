@@ -5,7 +5,11 @@
 #include "lang/mess/messP.h"
 #include "lang/mess/patlex.h"
 
-/* TODO: assigninletoutlets, setObjectName, better integration, of course */
+/* Auto scretch  */
+
+#define SCALE_MULT 23
+#define SCALE_DEN  18
+
 
 /* Local symbols */
 
@@ -882,7 +886,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    g->x = in->val;
+    fts_set_int(&(g->x), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
   else
     {
       fts_patlex_push_back(in);
@@ -892,7 +896,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    g->y = in->val;
+    fts_set_int(&(g->y), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
   else
     {
       fts_patlex_push_back(in);
@@ -902,7 +906,7 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
   fts_patlex_next_token(in);
 
   if (in->ttype == FTS_LEX_NUMBER)
-    g->width = in->val;
+    fts_set_int(&(g->width), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
   else
     {
       fts_patlex_push_back(in);
@@ -927,16 +931,16 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
   /* We don't try to do many checks, for the moment */
 
   fts_patlex_next_token(in);
-  x = in->val;
+  fts_set_int(&(x), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
     
   fts_patlex_next_token(in);
-  y = in->val;
+  fts_set_int(&(y), (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN);
 
   fts_patlex_next_token(in);
-  x2 = fts_get_int(&(in->val));
+  x2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
 
   fts_patlex_next_token(in);
-  y2 = fts_get_int(&(in->val));
+  y2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
 
   fts_set_int(&width,  x2 - fts_get_int(&x));
   fts_set_int(&height, y2 - fts_get_int(&y));

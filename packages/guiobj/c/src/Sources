@@ -5,7 +5,7 @@ comment.c \
 comment_doctor.c \
 gfloat.c \
 gint.c \
-gobj.c \
+slider.c \
 panel.c \
 message.c \
 message_doctor.c \

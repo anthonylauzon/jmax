@@ -10,8 +10,8 @@ static fts_heap_t *atom_list_iterator_heap;
 
 /* Remote call codes */
 
-#define ATOM_LIST_SET    1
-#define ATOM_LIST_UPDATE 2
+#define ATOM_LIST_UPDATE 1
+#define ATOM_LIST_SET    2
 
 /********************************************************************************/
 /*                                                                              */
@@ -380,10 +380,10 @@ static void fts_atom_list_export_fun(fts_data_t *d)
 {
   fts_atom_list_iterator_t *iterator;
   fts_atom_list_t *this = (fts_atom_list_t *)d;
-  int i;
 
   iterator = fts_atom_list_iterator_new(this);
-  fts_data_start_remote_call(d, ATOM_LIST_SET, 0, 0);
+
+  fts_data_start_remote_call(d, ATOM_LIST_SET);
 
   while (! fts_atom_list_iterator_end(iterator))
     {
@@ -392,9 +392,9 @@ static void fts_atom_list_export_fun(fts_data_t *d)
     }
 
   fts_data_end_remote_call();
+
   fts_atom_list_iterator_free(iterator);
 }
-
 
 /*
  * The remote set function.
@@ -412,11 +412,10 @@ static void fts_atom_list_remote_update( fts_data_t *d, int ac, const fts_atom_t
 {
   fts_atom_list_iterator_t *iterator;
   fts_atom_list_t *this = (fts_atom_list_t *)d;
-  int i;
 
   iterator = fts_atom_list_iterator_new(this);
 
-  fts_data_start_remote_call(d, ATOM_LIST_SET, 0, 0);
+  fts_data_start_remote_call(d, ATOM_LIST_SET);
 
   while (! fts_atom_list_iterator_end(iterator))
     {
@@ -425,6 +424,7 @@ static void fts_atom_list_remote_update( fts_data_t *d, int ac, const fts_atom_t
     }
 
   fts_data_end_remote_call();
+
   fts_atom_list_iterator_free(iterator);
 }
 

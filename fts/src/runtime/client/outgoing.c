@@ -40,8 +40,7 @@
 
 static char outbuf[1024];
 
-static void
-fts_client_send_string(char *msg)
+static void fts_client_send_string(char *msg)
 {
   int i;
 
@@ -56,14 +55,12 @@ fts_client_send_string(char *msg)
     }
 }
 
-void
-fts_client_mess_start_msg(int type)
+void fts_client_mess_start_msg(int type)
 {
   fts_char_dev_put(client_dev, (char) type);
 }
 
-void
-fts_client_mess_add_int(int value)
+void fts_client_mess_add_int(int value)
 {
   sprintf(outbuf, "%c%ld", LONG_POS_CODE, value);
 
@@ -71,8 +68,7 @@ fts_client_mess_add_int(int value)
 }
 
 
-void
-fts_client_mess_add_data( fts_data_t *data)
+void fts_client_mess_add_data( fts_data_t *data)
 {
   sprintf(outbuf, "%c%ld", DATA_CODE, (data ? fts_data_get_id(data) : 0));
 
@@ -80,8 +76,7 @@ fts_client_mess_add_data( fts_data_t *data)
 }
 
 
-void
-fts_client_mess_add_object(fts_object_t *obj)
+void fts_client_mess_add_object(fts_object_t *obj)
 {
   sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
 
@@ -89,8 +84,7 @@ fts_client_mess_add_object(fts_object_t *obj)
 }
 
 
-void
-fts_client_mess_add_connection(fts_connection_t *c)
+void fts_client_mess_add_connection(fts_connection_t *c)
 {
   sprintf(outbuf, "%c%ld", CONNECTION_CODE, (c ? fts_connection_get_id(c) : 0));
 
@@ -98,16 +92,14 @@ fts_client_mess_add_connection(fts_connection_t *c)
 }
 
 
-void
-fts_client_mess_add_float(float value)
+void fts_client_mess_add_float(float value)
 {
   sprintf(outbuf, "%c%f", FLOAT_CODE, value);
 
   fts_client_send_string(outbuf);
 }
 
-void
-fts_client_mess_add_sym(fts_symbol_t s)
+void fts_client_mess_add_sym(fts_symbol_t s)
 {
   if (s)
     fts_client_mess_add_string(fts_symbol_name(s));
@@ -115,9 +107,12 @@ fts_client_mess_add_sym(fts_symbol_t s)
     fts_client_mess_add_string("(null)");
 }
 
+void fts_client_mess_add_void()
+{
+  fts_client_send_string("v");
+}
 
-void
-fts_client_mess_add_string(const char *sp)
+void fts_client_mess_add_string(const char *sp)
 {
   sprintf(outbuf, "%c%s%c", STRING_START_CODE, sp, STRING_END_CODE);
 
@@ -125,8 +120,7 @@ fts_client_mess_add_string(const char *sp)
 }
 
 
-void
-fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
+void fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 {
   int i;
 
@@ -146,6 +140,8 @@ fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 	fts_client_mess_add_object(fts_get_object(&args[i]));
       else  if (fts_is_data(&args[i]))
 	fts_client_mess_add_data( fts_get_data( &args[i]) );
+      else  if (fts_is_void(&args[i]))
+	fts_client_mess_add_void();
       else
 	fprintf(stderr, "Wrong atom type in fts_client_mess_add_atoms: %lx\n",
 		(unsigned long) fts_get_type(&args[i]));
@@ -153,8 +149,7 @@ fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 }
 
 
-void
-fts_client_mess_send_msg(void)
+void fts_client_mess_send_msg(void)
 {
   /*  Add the eom code  */
 
@@ -169,8 +164,7 @@ fts_client_mess_send_msg(void)
 
    */
 
-void
-fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
+void fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
 {
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object(obj);
@@ -180,8 +174,7 @@ fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, const f
 }
 
 
-void
-fts_client_upload_object(fts_object_t *obj)
+void fts_client_upload_object(fts_object_t *obj)
 {
   if (obj->id == FTS_NO_ID)
     fts_object_table_register(obj);
@@ -230,8 +223,8 @@ fts_client_upload_object(fts_object_t *obj)
   fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
-void
-fts_client_upload_connection(fts_connection_t *c)
+
+void fts_client_upload_connection(fts_connection_t *c)
 {
   /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
 
@@ -247,8 +240,8 @@ fts_client_upload_connection(fts_connection_t *c)
   fts_client_mess_send_msg();
 }
 
-void
-fts_client_upload_patcher_content(fts_patcher_t *patcher)
+
+void fts_client_upload_patcher_content(fts_patcher_t *patcher)
 {
   fts_object_t *p;
 

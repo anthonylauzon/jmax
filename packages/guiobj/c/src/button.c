@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.8 $ IRCAM $Date: 1998/09/16 11:39:53 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 12:12:24 $
  *
  * Use a timer for blinking because Java timing is not reilable.
  * 
@@ -30,6 +30,18 @@ typedef struct
  *    object
  *
  */
+
+static void
+button_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_property_changed_urgent(o, fts_s_value);
+}
+
+static void
+button_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_ui_property_changed(o, fts_s_value);
+}
  
 static void
 button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -157,6 +169,9 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_symbol;
   fts_method_define(cl, fts_SystemInlet, fts_s_init, button_init, 1, a);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, button_delete, 0, 0);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties, 0, 0); 
 
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_anything, button_bang);

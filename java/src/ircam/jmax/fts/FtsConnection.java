@@ -11,10 +11,6 @@ import java.util.*;
 
 public class FtsConnection 
 {
-  /** on screen representation of the Fts Connection */
-
-  Object representation = null;
-
   /** to protect against double deletion.
     temporary, waiting for a more event/based editor
     */
@@ -135,20 +131,6 @@ public class FtsConnection
   public String  toString()
   {
     return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ")";
-  }
-
-  /** Get the representation of this connection in the editor. */
-
-  public final Object getRepresentation()
-  {
-    return representation;
-  }
-
-  /** Set the representation of this connection in the editor. */
-
-  public final void setRepresentation(Object r)
-  {
-    representation = r;
   }
 }
 

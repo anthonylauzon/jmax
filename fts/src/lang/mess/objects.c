@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.39 $ IRCAM $Date: 1998/09/03 11:56:10 $
+ *      $Revision: 1.40 $ IRCAM $Date: 1998/09/24 15:36:04 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -883,35 +883,30 @@ fts_object_send_properties(fts_object_t *obj)
 
       fts_object_property_changed_urgent(obj, fts_s_ninlets);
       fts_object_property_changed_urgent(obj, fts_s_noutlets);
-
-      fts_object_property_changed_urgent(obj, fts_s_min_value);
-      fts_object_property_changed_urgent(obj, fts_s_max_value);
-
-      /* The following properties are here only temporarly; they should
-	 be in the relative objects */
-
-      fts_object_property_changed_urgent(obj, fts_s_value); 
-      fts_object_property_changed_urgent(obj, fts_s_name) ;
       fts_object_property_changed_urgent(obj, fts_s_error);
 
-      /* Declarations are not yet really supported */
+      /* Ask the object to send to the client object specific properties */
 
-      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
     }
 }
 
 
-/* Properties used by the ui (value for the moment) */
+/* Properties used by the ui (value for the moment) at run time; update related */
 
 void
 fts_object_send_ui_properties(fts_object_t *obj)
 {
-  if (obj->id != FTS_NO_ID) 
-    fts_object_property_changed_urgent(obj, fts_s_value); 
+  if (obj->id != FTS_NO_ID)
+    {
+      /* Ask the object to send to the client object specific UI properties */
+
+      fts_send_message(obj, fts_SystemInlet, fts_s_send_ui_properties, 0, 0);
+    }
 }
 
 
-/* Properties to be sent after a recomputing */
+/* Properties to be sent after a recomputing; i.e. all the non geometrical properties */
 
 static void
 fts_object_send_kernel_properties(fts_object_t *obj)
@@ -925,20 +920,11 @@ fts_object_send_kernel_properties(fts_object_t *obj)
     { 
       fts_object_property_changed_urgent(obj, fts_s_ninlets);
       fts_object_property_changed_urgent(obj, fts_s_noutlets);
-
-      fts_object_property_changed_urgent(obj, fts_s_min_value);
-      fts_object_property_changed_urgent(obj, fts_s_max_value);
-
-      /* The following properties are here only temporarly; they should
-	 be in the relative objects */
-
-      fts_object_property_changed_urgent(obj, fts_s_value); 
       fts_object_property_changed_urgent(obj, fts_s_error);
-      fts_object_property_changed_urgent(obj, fts_s_name) ;
 
-      /* Declarations are not yet really supported */
+      /* Ask the object to send to the client object specific properties */
 
-      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
     }
 }
 

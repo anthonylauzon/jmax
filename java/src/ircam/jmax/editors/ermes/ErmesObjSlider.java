@@ -40,23 +40,31 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 
   public void Init()
   {
+    Object value;
+
     super.Init();
 
-    itsFtsObject.watch( "value", this);
-    makeCurrentRect( itsFtsObject);
-    itsThrottle = new ErmesObjThrottle( this, getItsX(), getItsY());   
+    itsFtsObject.watch("value", this);
+    makeCurrentRect(itsFtsObject);
+    itsThrottle = new ErmesObjThrottle(this, getItsX(), getItsY());   
 
-    Integer aInteger = ( Integer)itsFtsObject.get( "minValue");
-    itsRangeMin = aInteger.intValue();
+    value = itsFtsObject.get("minValue");
 
-    aInteger = ( Integer)itsFtsObject.get( "maxValue");
-    itsRangeMax = aInteger.intValue();
+    if (value instanceof Integer)
+      itsRangeMin = ((Integer) value).intValue();
 
-    itsRange = itsRangeMax-itsRangeMin;
-    itsStep = ( float)itsRange/itsPixelRange;
+    value = itsFtsObject.get("maxValue");
 
-    aInteger = (Integer)itsFtsObject.get( "value");
-    itsInteger = aInteger.intValue();
+    if (value instanceof Integer)
+      itsRangeMax = ((Integer) value).intValue();
+
+    itsRange = itsRangeMax - itsRangeMin;
+    itsStep = ( float)itsRange / itsPixelRange;
+
+    value = itsFtsObject.get("value");
+
+    if (value instanceof Integer)
+      itsInteger = ((Integer) value).intValue();
 
     resizeBy( 0,0);
   }

@@ -499,16 +499,6 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /* The MaxData interface */
 
 
-  /** 
-   * Get the a name for this data, for UI purposes only 
-   */
-
-  public String getName()
-  {
-    return "explode";
-  }
-
-
   //----- Fields
   /** Key for remote call add */
 

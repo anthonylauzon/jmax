@@ -14,19 +14,14 @@ public class FtsAtomList extends FtsRemoteData
 {
   /** Key for remote calls */
 
-  static final int REMOTE_SET     = 1;
-  static final int REMOTE_UPDATE  = 2;
+  static final int REMOTE_UPDATE = 1;
+  static final int REMOTE_SET    = 2;
 
   MaxVector values = new MaxVector();
 
   public FtsAtomList()
   {
     super();
-  }
-
-  public String getName()
-  {
-    return "atomList";
   }
 
   public int getSize()
@@ -102,8 +97,11 @@ public class FtsAtomList extends FtsRemoteData
     switch( key)
       {
       case REMOTE_SET:
+
+	values.setSize(msg.getNumberOfArguments() - 2);
+
 	for (int i = 2 ; i < msg.getNumberOfArguments(); i++)
-	  values.addElement(msg.getArgument(i));
+	  values.setElementAt(msg.getArgument(i), i - 2);
 	break;
       default:
 	break;

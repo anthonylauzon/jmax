@@ -14,6 +14,14 @@ import ircam.jmax.widgets.*;
 
 class FindPanel extends JFrame {
 
+  static void registerFindPanel()
+  {
+    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
+      public String getToolName() { return "Find Panel";}
+      public void open() { FindPanel.open();}
+    });
+  }
+
   public static FindPanel open()
   {
     if (findPanel == null)
@@ -63,13 +71,13 @@ class FindPanel extends JFrame {
     objectSetViewer = new ObjectSetViewer();
 
     JPanel findPanel = new JPanel();
-    findPanel.setLayout( new BoxLayout( findPanel, BoxLayout.Y_AXIS));
+    findPanel.setLayout( new BorderLayout());
     findPanel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
     findPanel.setAlignmentX( LEFT_ALIGNMENT);
     //findPanel.setOpaque( false);
 
-    findPanel.add( labelPanel);
-    findPanel.add( objectSetViewer);
+    findPanel.add( "North", labelPanel);
+    findPanel.add( "Center", objectSetViewer);
 
     //setSize( 300, 300);
     getContentPane().add( findPanel);
@@ -83,31 +91,20 @@ class FindPanel extends JFrame {
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
 	{
-	  Cursor temp = FindPanel.this.getCursor();
+	  final Cursor temp = FindPanel.this.getCursor();
 
 	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-	  try
-	    {
-	      Mda.edit(object.getParent().getData(), object);
-	    } 
-	  catch (MaxDocumentException e)
-	    {
-	    }
 
-	  FindPanel.this.setCursor(temp);
+	  Fts.editPropertyValue(object.getParent(), object,  "data",
+				new MaxDataEditorReadyListener() {
+	    public void editorReady(MaxDataEditor editor)
+	      {	  FindPanel.this.setCursor(temp);}
+	  });
 	}
     });
     
     //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
 
-    // Finally, add the a tool finder to the window manager.
-    // As an alternative, the find panel can be added as a window.
-    // With   MaxWindowManager.getWindowManager().addWindow(this);
-
-    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-      public String getToolName() { return "Find Panel";}
-      public void open() { FindPanel.open();}
-    });
   }
 
   public void find()

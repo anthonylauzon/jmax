@@ -19,8 +19,8 @@ abstract public class MaxDocument
   protected MaxDocumentHandler handler = null;
   protected File file                  = null;
   protected MaxDocumentType    type    = null;
-  private   DefaultListModel editors = new DefaultListModel();
-  protected String name = null; // name of the document, for UI purposes
+  private   Vector editedData          = new Vector();
+  protected String name   = null; // name of the document, for UI purposes
   protected boolean saved = false;   // saved flag
 
   /** A constructor that get only the type */
@@ -45,24 +45,16 @@ abstract public class MaxDocument
    * do not bind the editor on the document, and it is private
    */
 
-  protected void addEditor(MaxDataEditor editor)
+  protected void addEditedData(MaxData data)
   {
-    editors.addElement(editor);
+    editedData.addElement(data);
   }
 
   /** Removing the editor */
 
-  protected void removeEditor(MaxDataEditor editor)
+  protected void removeEditedData(MaxData data)
   {
-    editors.removeElement(editor);
-  }
-
-
-  /** Getting the list of editors, as a ListModel/DefaultListModel */
-
-  public DefaultListModel getEditors()
-  {
-    return editors;
+    editedData.removeElement(data);
   }
 
   /** Getting the handler */
@@ -259,6 +251,13 @@ abstract public class MaxDocument
 
   public void dispose()
   {
+    Vector toDispose;
+
+    toDispose = (Vector) editedData.clone();
+
+    for (int i = 0; i < toDispose.size(); i++)
+      Mda.dispose((MaxData) toDispose.elementAt(i));
+
     type.disposeDocument(this);
     handler = null;
     type = null;

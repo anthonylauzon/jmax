@@ -904,43 +904,27 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
       obj  = fts_get_object(&av[0]);
       name = fts_get_symbol(&av[1]);
 
+      /* Temporary "hack"; if the object is a patcher,  cause
+	 the patcher itself and its content to be uploaded; this
+	 hack will be thrown away when the patcher will become an 
+	 ftsdata */
+
+      if ((name == fts_s_data) &&
+	  fts_object_is_patcher(obj) &&
+	  (! fts_object_is_error(obj)))
+	{
+	  if (obj->id == FTS_NO_ID)
+	    fts_client_upload_object(obj);
+
+	  fts_client_upload_patcher_content((fts_patcher_t *) obj);
+	}
+
       fts_object_property_changed(obj, name);
     }
   else
     post_mess("System Error in FOS message GETPROP: bad args", ac, av);
 }
 
-
-/*
-   GETDONE (obj)o 
-
-   Temporary solution to the problem of the soft-synvc
-   (callback based sync).
-   Put the "done" property in an object to 1, and send it back
-   to the client; on the client side, can be used to call a callback
-   after all the other requests have been completed (open, download).
-   */
-
-static void 
-fts_mess_client_get_done(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received get done", ac, av);
-
-  if ((ac == 1)
-      && fts_is_object(&av[0]))
-    {
-      fts_object_t *obj;
-      fts_atom_t a;
-
-      obj  = fts_get_object(&av[0]);
-      fts_set_int( &a, 1);
-
-      fts_object_put_prop(obj, fts_s_done, &a);
-      fts_object_property_changed( obj, fts_s_done);
-    }
-  else
-    post_mess("System Error in FOS message GETDONE: bad args", ac, av);
-}
 
 /*
    GETALLPROP (obj)o (symbol)name
@@ -1049,7 +1033,6 @@ fts_messtile_install_all()
   fts_client_mess_install(NAMED_MESSAGE_CODE, fts_mess_client_nmess);
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
-  fts_client_mess_install(GETDONE_CODE,  fts_mess_client_get_done);
   fts_client_mess_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
   fts_client_mess_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
   fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);

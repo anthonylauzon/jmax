@@ -55,13 +55,6 @@ public class FtsObjectSet extends FtsRemoteData
     model = new ObjectSetListModel();
   }
 
-  /** SHould go away !!! */
-
-  public String getName()
-  {
-    return "objectset";
-  }
-
   /** Get the vector size */
 
   public ListModel getListModel()

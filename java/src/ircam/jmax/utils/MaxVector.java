@@ -15,11 +15,16 @@ public class MaxVector
 
   public final void ensureCapacity(int requestedSize)
   {
-    if (requestedSize >= fillPointer)
+    if (requestedSize >= objects.length)
       {
+	int newSize = objects.length;
+
+	while (newSize < requestedSize)
+	  newSize *= 2;
+
 	Object oldObjects[] = objects;
 
-	objects = new Object[requestedSize];
+	objects = new Object[newSize];
 	System.arraycopy(oldObjects, 0, objects, 0, fillPointer);
       }
   }
@@ -27,7 +32,7 @@ public class MaxVector
 
   public final void setSize(int newSize)
   {
-    if (newSize > fillPointer) 
+    if (newSize > objects.length) 
       ensureCapacity(newSize);
     else
       {

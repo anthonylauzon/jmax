@@ -57,6 +57,8 @@ fts_symbol_t fts_s_find;
 fts_symbol_t fts_s_find_errors;
 fts_symbol_t fts_s_find_friends;
 fts_symbol_t fts_s_anything;
+fts_symbol_t fts_s_send_properties;
+fts_symbol_t fts_s_send_ui_properties;
 
 /* Predefined symbol for properties */
 
@@ -79,7 +81,7 @@ fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
 fts_symbol_t fts_s_error_description;
 fts_symbol_t fts_s_state;
-fts_symbol_t fts_s_done;
+
 
 /* Symbols related to builtin classes */
 
@@ -168,6 +170,8 @@ fts_predefine_symbols(void)
   fts_s_find_errors = fts_new_symbol("find_errors");
   fts_s_find_friends = fts_new_symbol("find_friends");
   fts_s_anything   = fts_new_symbol("anything");
+  fts_s_send_properties = fts_new_symbol("send_properties");
+  fts_s_send_ui_properties = fts_new_symbol("send_ui_properties");
   fts_s_comma      = fts_new_symbol(",");
   fts_s_quote      = fts_new_symbol("'");
   fts_s_dollar     = fts_new_symbol("$");
@@ -191,7 +195,6 @@ fts_predefine_symbols(void)
   fts_s_error_description  = fts_new_symbol("errdesc");
   fts_s_size       = fts_new_symbol("size");
   fts_s_state      = fts_new_symbol("state");
-  fts_s_done       = fts_new_symbol("done");
 
   /* Symbols related to builtin classes */
 

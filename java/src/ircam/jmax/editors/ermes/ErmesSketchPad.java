@@ -108,7 +108,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   private final static int MAX_NUM_SELECTED = 10;
 
-  int itsJustificationMode = LEFT_JUSTIFICATION;
   int itsResizeMode = BOTH_RESIZING;
 
   ErmesObjInOutPop itsInPop = null;
@@ -446,37 +445,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
   }
 
-  void ChangeJustification( String theJustification)
-  {
-    int aJustificationMode = 0;
-
-    if ( theJustification.equals( "Center"))
-      aJustificationMode = CENTER_JUSTIFICATION;
-    else if (theJustification.equals( "Left"))
-      aJustificationMode = LEFT_JUSTIFICATION;
-    else if (theJustification.equals( "Right"))
-      aJustificationMode = RIGHT_JUSTIFICATION;
-
-    if ( currentSelection.itsObjects.size() == 0)
-      itsJustificationMode = aJustificationMode;
-    else
-      {
-	Object[] objects = currentSelection.itsObjects.getObjectArray();
-	int size = currentSelection.itsObjects.size();
-
-	for ( int i = 0; i < size; i++) 
-	  {
-	    ErmesObject aObject = (ErmesObject) objects[i];
-
-	    if ( (aObject instanceof ErmesObjEditableObject)
-		 || (aObject instanceof ErmesObjComment))
-	      aObject.setJustification( aJustificationMode);
-	  }
-      }
-
-    repaint();
-  }
-
   void ChangeResizeMode( int theResizeMode)
   {
     itsResizeMode = theResizeMode;
@@ -812,9 +780,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	aObject = AddObject( fo);
 	currentSelection.addObject( aObject);
 	aObject.Select( false);
-       
-	if (aObject != null) 
-	  fo.setRepresentation( aObject);
       }
 
     // chiama tanti AddConnection...
@@ -824,8 +789,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	fc = (FtsConnection)e2.nextElement();
 
-	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
-	toObj = (ErmesObject) fc.getTo().getRepresentation();
+	fromObj = getErmesObjectFor(fc.getFrom());
+	toObj   = getErmesObjectFor(fc.getTo());
 	aConnection = AddConnection( fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
 	currentSelection.addConnection( aConnection);
 	aConnection.Select( false);
@@ -854,8 +819,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	fc = (FtsConnection)e2.nextElement();
 
-	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
-	toObj = (ErmesObject) fc.getTo().getRepresentation();
+	fromObj = getErmesObjectFor(fc.getFrom());
+	toObj   = getErmesObjectFor(fc.getTo());
 	aConnection = AddConnection( fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
       }
 
@@ -991,59 +956,29 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     theSketchPad.paintForTheFirstTime = true;
   }
   
+
+  /* Simplified: size and font are preselected iff there is only
+     one object in the selection; the idea was nice, but creating
+     two vector, an enumeration and a quadratic algorithm for
+     every selection operation was a little bit too much (mdc) */
+
   void CheckCurrentFont()
   {
     ErmesObject aObject;
     String aFontName;
     Integer aSize;
-    Integer aJustification;
 
-    MaxVector aUsedFontVector = new MaxVector();
-    MaxVector aUsedSizeVector = new MaxVector();
-    MaxVector aUsedJustificationVector = new MaxVector();
-
-    for ( Enumeration en = currentSelection.itsObjects.elements(); en.hasMoreElements(); ) 
+    if (currentSelection.itsObjects.size() == 1)
       {
-	aObject = (ErmesObject)en.nextElement();
-	if ( (aObject instanceof ErmesObjEditableObject)
-	     || (aObject instanceof ErmesObjComment)
-	     || (aObject instanceof ErmesObjInt)
-	     || (aObject instanceof ErmesObjFloat))
-	  {
-	    aFontName = aObject.getFont().getName().toLowerCase();
-	    aSize = new Integer( aObject.getFont().getSize());
-	    aJustification = new Integer( aObject.getJustification());
+	aObject = (ErmesObject) currentSelection.itsObjects.elementAt(0);
+	
+	aFontName = aObject.getFont().getName().toLowerCase();
+	aSize = new Integer( aObject.getFont().getSize());
 
-	    if ( !aUsedFontVector.contains( aFontName)) 
-	      aUsedFontVector.addElement( aFontName);
-
-	    if ( !aUsedSizeVector.contains( aSize)) 
-	      aUsedSizeVector.addElement( aSize);
-
-	    if ( !aUsedJustificationVector.contains( aJustification)) 
-	      aUsedJustificationVector.addElement( aJustification);
-	  }
+	itsSketchWindow.SelectionUpdateMenu( aFontName, aSize);
       }
-
-    if ( aUsedFontVector.size() != 0)
-      {
-	if (aUsedFontVector.size() == 1)
-	  aFontName = (String) aUsedFontVector.elementAt( 0);
-	else 
-	  aFontName = null;
-      
-	if (aUsedSizeVector.size() == 1)
-	  aSize=(Integer)aUsedSizeVector.elementAt( 0);
-	else 
-	  aSize = null;
-      
-	if ( aUsedJustificationVector.size()==1)
-	  aJustification = (Integer)aUsedJustificationVector.elementAt( 0);
-	else 
-	  aJustification = null;
-      
-	itsSketchWindow.SelectionUpdateMenu( aFontName, aSize, aJustification);
-      }
+    else
+      itsSketchWindow.SelectionUpdateMenu( null, null);
   }
 
 
@@ -1080,6 +1015,39 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	System.err.println( "ErmesSketchPad:mousePressed: INTERNAL ERROR: FTS Instantiation Error: " + ftse);
       }
   }
+
+  ErmesObject getErmesObjectFor(FtsObject obj)
+  {
+    Object[] objects = itsElements.getObjectArray();
+    int size = itsElements.size();
+
+    for ( int i = 0; i < size; i++)
+      {
+	ErmesObject aObject = (ErmesObject) objects[i];
+
+	if (aObject.itsFtsObject == obj)
+	  return aObject;
+      }
+
+    return null;
+  }
+
+  ErmesConnection getErmesConnectionFor(FtsConnection c)
+  {
+    Object[] objects = itsConnections.getObjectArray();
+    int size = itsConnections.size();
+
+    for ( int i = 0; i < size; i++)
+      {
+	ErmesConnection aConnection = (ErmesConnection) objects[i];
+
+	if (aConnection.itsFtsConnection == c)
+	  return aConnection;
+      }
+
+    return null;
+  }
+
 
   public void mousePressed( MouseEvent e)
   {
@@ -2339,9 +2307,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     aObject = ErmesObject.makeErmesObject( this, theFtsObject);
     itsElements.addElement( aObject);
-
-    theFtsObject.setRepresentation( aObject);
-
     return aObject;
 
   }

@@ -51,12 +51,11 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
     {
       fts_object_get_prop(obj, name, &a);
 
-      /* If the property if an fts_data, we
-	 export to the client it if needed 
-	 before sending back the property */
-
       if (fts_is_data(&a))
 	{
+	  /* If the property value is an fts_data, we
+	     export the data needed  */
+
 	  fts_data_t *d;
 	  
 	  d = fts_get_data(&a);
@@ -64,15 +63,25 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
 	  if (! fts_data_is_exported(d))
 	    fts_data_export(d);
 	}
-	  
-      if (! fts_is_void(&a))
+      else if (fts_is_object(&a))
 	{
-	  fts_client_mess_start_msg(CLIENTPROP_CODE);
-	  fts_client_mess_add_object(obj);
-	  fts_client_mess_add_sym(name);
-	  fts_client_mess_add_atoms(1, &a);
-	  fts_client_mess_send_msg();
+	  /* If the property is an fts_object and is not 
+	     uploaded, upload it; note that this will shortly
+	     be unified with fts_data model */
+
+	  fts_object_t *obj;
+
+	  obj = fts_get_object(&a);
+
+	  if (obj->id == FTS_NO_ID)
+	    fts_client_upload_object(obj);
 	}
+
+      fts_client_mess_start_msg(CLIENTPROP_CODE);
+      fts_client_mess_add_object(obj);
+      fts_client_mess_add_sym(name);
+      fts_client_mess_add_atoms(1, &a);
+      fts_client_mess_send_msg();
     }
 }
 

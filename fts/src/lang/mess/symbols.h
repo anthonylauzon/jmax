@@ -73,6 +73,8 @@ extern fts_symbol_t fts_s_find;
 extern fts_symbol_t fts_s_find_errors;
 extern fts_symbol_t fts_s_find_friends;
 extern fts_symbol_t fts_s_anything;
+extern fts_symbol_t fts_s_send_properties;
+extern fts_symbol_t fts_s_send_ui_properties;
 
 /* Symbols related to object properties */
 
@@ -95,7 +97,6 @@ extern fts_symbol_t fts_s_size;
 extern fts_symbol_t fts_s_error;
 extern fts_symbol_t fts_s_error_description;
 extern fts_symbol_t fts_s_state;
-extern fts_symbol_t fts_s_done;
 
 /* Symbols related to builtin classes */
 

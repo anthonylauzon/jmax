@@ -47,13 +47,11 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       ftsConnectionsPasted.addElement( value);
     else if (name == "deletedObject") 
       {
-	// just an hack: remove the watch temporarly, add it just after
-	// to avoid recursion
-	itsSketchPad.DeleteGraphicObject( (ErmesObject)(((FtsObject)value).getRepresentation()), false);
+	itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor((FtsObject)value), false);
       }
     else if (name == "deletedConnection") 
       {
-	itsSketchPad.DeleteGraphicConnection( (ErmesConnection)((FtsConnection)value).getRepresentation(), false);
+	itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor((FtsConnection)value), false);
       }
 
     if (!pasting)
@@ -72,8 +70,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   public void componentMoved( ComponentEvent e) 
   {
     if (itsPatcher == null)
-      System.err.println( "internal warning: patcher moved while FtsPatcher is null");    
-    else 
       {
 	itsPatcher.put( "wx", getLocation().x);
 	itsPatcher.put( "wy", getLocation().y);
@@ -102,7 +98,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   ErmesSwToolbar itsToolBar;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
   public FtsContainerObject itsPatcher;
-  private Menu itsJustificationMenu;
 
   private Menu itsAlignObjectMenu;
   private Menu itsSizesMenu;	
@@ -113,8 +108,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
   CheckboxMenuItem itsSketchFontMenu;     //the SketchPad font MenuItem
   CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
-  CheckboxMenuItem itsSelectedJustificationMenu;
-  CheckboxMenuItem itsSketchJustificationMenu;
   CheckboxMenuItem itsCurrentResizeMenu;
   CheckboxMenuItem itsAutoroutingMenu;
   MenuItem itsRunModeMenuItem;
@@ -128,7 +121,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // Should select or highlight obj if it is an FtsObject
     if (obj instanceof FtsObject) 
       {
-	ErmesObject aObject = (ErmesObject) (((FtsObject) obj).getRepresentation());
+	ErmesObject aObject = itsSketchPad.getErmesObjectFor((FtsObject) obj);
 	itsSketchPad.deselectAll( true);
 	itsSketchPad.currentSelection.addObject( aObject);
 	aObject.Select( true);
@@ -142,8 +135,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   public ErmesSketchWindow( FtsContainerObject patcher) 
   {
     super( Mda.getDocumentTypeByName( "patcher"));
-
-    System.err.println( this.getClass().getName());
 
     // (fd)
     keyEventClient = null;
@@ -160,7 +151,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (itsDocument.getRootData() == itsPatcher)
       setTitle( itsDocument.getName());
     else
-      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle( chooseWindowName( patcher)));
+      setTitle(chooseWindowName( patcher));
 
     itsSketchPad = new ErmesSketchPad( this);
     itsToolBar = new ErmesSwToolbar( itsSketchPad);
@@ -211,20 +202,20 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // to something different than "run" (usually, "edit" :)
 
     FtsContainerObject p = itsPatcher;
-    String mode;
+    Object mode;
 
-    mode = (String) p.get( "initialMode");
+    mode = p.get("initialMode");
 
     p = p.getParent();
 
-    while ((mode == null) && (p != null))
+    while ((mode instanceof FtsVoid) && (p != null))
       {
-	mode = (String) p.get( "editMode");
+	mode = p.get("editMode");
 	p = p.getParent();
       }
 
-    if ((mode == null) || mode.equals( "run"))
-      setRunMode( true);
+    if ((mode instanceof FtsVoid) || mode.equals("run"))
+      setRunMode(true);
   }
 
   static String chooseWindowName( FtsContainerObject theFtsPatcher)
@@ -252,33 +243,39 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     int y = 0;
     int width = 500;
     int height = 480;
-    Integer x1, y1, width1, height1;
-    
+    Object value;
 
-    // Double check the existence of the window properties. If there aren't, use defaults
-    x1 = (Integer) patcher.get( "wx");
-    if (x1 == null) 
-      patcher.put( "wx", new Integer( x));
-    else
-      x = x1.intValue();
+    //Double check the existence of the window properties. If there aren't, use defaults
+      
+    value = patcher.get( "wx");
 
-    y1 = (Integer) patcher.get( "wy");
-    if (y1 == null) 
-      patcher.put( "wy", new Integer( y));
+    if (value instanceof FtsVoid) 
+      patcher.put( "wx", new Integer(x));
     else  
-      y = y1.intValue();
+      x = ((Integer) value).intValue();
 
-    width1  = (Integer) patcher.get( "ww");
-    if (width1 == null)
-      patcher.put( "ww", new Integer ( width));
+    value = patcher.get( "wy");
+
+    if (value instanceof FtsVoid) 
+      patcher.put( "wy", new Integer(y));
+    else  
+      y = ((Integer) value).intValue();
+
+
+    value = patcher.get( "ww");
+
+    if (value instanceof FtsVoid) 
+      patcher.put( "ww", new Integer (width));
     else 
-      width = width1.intValue();
+      width = ((Integer) value).intValue();
 
-    height1 = (Integer) patcher.get( "wh");
-    if (height1 == null)
-      patcher.put( "wh", new Integer( height));
+
+    value = patcher.get( "wh");
+
+    if (value instanceof FtsVoid) 
+      patcher.put( "wh", new Integer(height));
     else
-      height = height1.intValue();
+      height = ((Integer) value).intValue();
       
     setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
 
@@ -541,13 +538,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     itsSizesMenu = new Menu( "Sizes");
     FillSizesMenu( itsSizesMenu);
     theTextMenu.add( itsSizesMenu);
-
-    theTextMenu.add( new MenuItem( "-"));
-
-    //-- justification
-    itsJustificationMenu = new Menu( "Justification");
-    FillJustificationMenu( itsJustificationMenu);
-    theTextMenu.add( itsJustificationMenu);
   }
 
   class SizesMenuAdapter implements ItemListener
@@ -621,42 +611,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
   }
 
-  class JustificationMenuAdapter implements ItemListener
-  {
-    CheckboxMenuItem item;
-    String justification;
-
-    JustificationMenuAdapter( CheckboxMenuItem item,  String justification)
-    {
-      this.item = item;
-      this.justification = justification;
-    }
-
-    public  void itemStateChanged( ItemEvent e)
-    {
-      JustificationMenuAction( item, justification);
-    }
-  }
-
-  private void FillJustificationMenu( Menu theJustificationMenu)
-  {
-    CheckboxMenuItem aCheckItem;
-
-    aCheckItem = new CheckboxMenuItem( "Left");
-    theJustificationMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Left"));
-
-    aCheckItem = new CheckboxMenuItem( "Center");
-    theJustificationMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Center"));
-    aCheckItem.setState( true);
-    itsSelectedJustificationMenu = aCheckItem;
-    itsSketchJustificationMenu = itsSelectedJustificationMenu;
-
-    aCheckItem = new CheckboxMenuItem( "Right");
-    theJustificationMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new JustificationMenuAdapter( aCheckItem, "Right"));
-  }
 
   private void CheckDefaultSizeFontMenuItem()
   {
@@ -867,8 +821,11 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   }
 
   // Method to close the editor (do not touch the patcher)
+
   void Destroy()
   {
+    itsPatcher.removeWatch(this);
+    itsPatcher = null;
     setVisible( false);
     dispose();
   }
@@ -1016,14 +973,10 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     itsSelectedSizeMenu = itsSketchSizeMenu;
 
     itsSelectedSizeMenu.setState( true);
-    if (itsSelectedJustificationMenu != null)
-      itsSelectedJustificationMenu.setState( false);
-    itsSelectedJustificationMenu = itsSketchJustificationMenu;
-
-    itsSelectedJustificationMenu.setState( true);
   }
 
-  public void SelectionUpdateMenu( String theFont, Integer theSize, Integer theJustification)
+
+  public void SelectionUpdateMenu( String theFont, Integer theSize)
   {
     CheckboxMenuItem aCheckItem = null;
 
@@ -1064,54 +1017,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
     else
       itsSelectedSizeMenu = null;
-
-    if (itsSelectedJustificationMenu != null)
-      itsSelectedJustificationMenu.setState( false);
-
-    if (theJustification != null)
-      {
-	int aJust = theJustification.intValue();
-	if (aJust == ErmesSketchPad.CENTER_JUSTIFICATION)
-	  {
-	    for ( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
-	      {
-		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
-		if (aCheckItem.getLabel().equals( "Center"))
-		  {
-		    itsSelectedJustificationMenu = aCheckItem;
-		    itsSelectedJustificationMenu.setState( true);
-		    break;
-		  }
-	      }
-	  }
-	else if (aJust == ErmesSketchPad.LEFT_JUSTIFICATION)
-	  {
-	    for( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
-	      {
-		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
-		if (aCheckItem.getLabel().equals( "Left"))
-		  {
-		    itsSelectedJustificationMenu = aCheckItem;
-		    itsSelectedJustificationMenu.setState( true);
-		    break;
-		  }
-	      }
-	  }
-	else if (aJust == ErmesSketchPad.RIGHT_JUSTIFICATION)
-	  {
-	    for( int i = 0; i < itsJustificationMenu.getItemCount(); i++)
-	      {
-		aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem( i);
-		if (aCheckItem.getLabel().equals( "Right")){
-		  itsSelectedJustificationMenu = aCheckItem;
-		  itsSelectedJustificationMenu.setState( true);
-		  break;
-		}
-	      }
-	  }
-      }
-    else
-      itsSelectedJustificationMenu = null;
   }
 
 
@@ -1146,20 +1051,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     else
       itsSketchPad.ChangeSizeFont( theFontSize);
 
-    return true;
-  }
-
-  private boolean JustificationMenuAction( MenuItem theMenuItem, String theString) 
-  {
-    if (itsSelectedJustificationMenu != null)
-      itsSelectedJustificationMenu.setState( false);
-
-    itsSketchPad.ChangeJustification( theString);
-    itsSelectedJustificationMenu = (CheckboxMenuItem)theMenuItem;
-    itsSelectedJustificationMenu.setState( true);
-
-    if (ErmesSketchPad.currentSelection.itsObjects.size() == 0)
-      itsSketchJustificationMenu = itsSelectedJustificationMenu;
     return true;
   }
 

@@ -4,6 +4,7 @@ import java.util.*;
 
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
+import com.sun.java.swing.*;
 
 /**
  * This class export a number of global functionalities
@@ -67,7 +68,7 @@ public class Fts
     
     // Wait for FTS to do his work
 
-    server.syncToFts();
+    sync();
 
     obj = server.getObjectByFtsId(id);
     
@@ -98,7 +99,7 @@ public class Fts
     
     // Wait for FTS to do his work
 
-    server.syncToFts();
+    sync();
     obj = server.getObjectByFtsId(id);
     
     if (obj != null)
@@ -126,7 +127,7 @@ public class Fts
 
     // Wait for FTS to do his work
 
-    server.syncToFts();
+    sync();
 
     conn = server.getConnectionByFtsId(id);
     
@@ -165,24 +166,14 @@ public class Fts
     FtsObject newObject;
     FtsContainerObject parent;
     int oldInlets, oldOutlets;
-    MaxData data;
+    Object data;
 
     // Get the data, and quit the editors connected to the data
 
-    data = (MaxData) oldObject.get("data");	
+    data = oldObject.get("data");	
 
-    if ((data == null) && (oldObject instanceof FtsObjectWithData))
-      {
-	// Fall back the old obsolete behaviour
-	// Should be substituted by the previous one
-	// need changes to table, qlist and patcher (?)
-	// for this
-
-	data = ((FtsObjectWithData) oldObject).getData();	   
-      }
-
-    if (data != null)
-      Mda.dispose(data);
+    if (data instanceof MaxData)
+      Mda.dispose((MaxData) data);
 
     // Get parent and ins/outs
 
@@ -206,7 +197,7 @@ public class Fts
     
     // Wait for FTS to do his work
 
-    server.syncToFts();
+    sync();
     newObject = server.getObjectByFtsId(id);
     
     if (newObject != null)
@@ -318,5 +309,85 @@ public class Fts
   public static FtsObject getRootObject()
   {
     return server.getRootObject();
+  }
+
+  /* Utility function: get a Data that is a value of an object property,
+     and call and editor on it; but do it asynchroniously;
+     the asynchronicity is actually in two places:
+     1- to avoid calling Fts.sync, put a property handler on the wished property.
+
+     2- Once the property handler will be called by the input thread, a Runnable
+	starting the editor will be posted using invokeLater, so it will be
+	executed in the AWT thread.
+    */
+
+  static class DelayedEditPropertyHandler implements FtsPropertyHandler
+  {
+    MaxDataEditorReadyListener listener;
+    Object where;
+
+    DelayedEditPropertyHandler(MaxDataEditorReadyListener listener, Object where)
+    {
+      this.listener = listener;
+      this.where    = where;
+    }
+
+    DelayedEditPropertyHandler(MaxDataEditorReadyListener listener)
+    {
+      this(listener, null);
+    }
+
+    public void propertyChanged(FtsObject object, String name, Object value)
+    {
+      if (value instanceof MaxData)
+	{
+	  final MaxData data = (MaxData) value;
+
+	  // Set the document; when documents will be remote data,
+	  // it will be handled in FTS.
+
+	  if (data instanceof FtsRemoteData)
+	    ((FtsRemoteData) data).setDocument(object.getDocument());
+
+	  SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      MaxDataEditor editor;
+
+	      try
+		{
+		  editor = Mda.edit(data, where);
+		  editor.addEditorReadyListener(listener);
+		}
+	      catch (MaxDocumentException e)
+		{
+		  // Error; we should do an
+		  listener.editorReady(null); 
+		}
+
+	    }});
+	}
+      else
+	{
+	  // If there is nothing to edit, we anyway call the listener
+	  // with a null editor, to tell him about the failure
+
+	  listener.editorReady(null); 
+	}
+
+      object.removeWatch(this);
+    }
+  }
+
+  public static void editPropertyValue(FtsObject obj, String property, MaxDataEditorReadyListener listener)
+  {
+    obj.watch(property, new DelayedEditPropertyHandler(listener));
+    obj.ask(property);
+  }
+
+  public static void editPropertyValue(FtsObject obj, Object where, String property,
+				       MaxDataEditorReadyListener listener)
+  {
+    obj.watch(property, new DelayedEditPropertyHandler(listener, where));
+    obj.ask(property);
   }
 }

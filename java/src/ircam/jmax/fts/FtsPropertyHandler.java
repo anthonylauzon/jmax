@@ -24,3 +24,6 @@ public interface FtsPropertyHandler
 
   void propertyChanged(FtsObject object, String name, Object value);
 }
+
+
+

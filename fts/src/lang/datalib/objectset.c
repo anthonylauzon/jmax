@@ -305,7 +305,7 @@ static void fts_object_set_export_fun(fts_data_t *d)
 
   fts_data_remote_call(d, REMOTE_CLEAN, 0, 0);
 
-  fts_data_start_remote_call(d, REMOTE_APPEND, 0, 0);
+  fts_data_start_remote_call(d, REMOTE_APPEND);
 
   for (p = this->head; p; p = p->next)
     fts_client_mess_add_object(p->object);
@@ -351,14 +351,11 @@ static void fts_object_set_find_friends( fts_data_t *d, int ac, const fts_atom_t
 
   if (fts_object_get_variable(target))
     {
-      fprintf(stderr, "Looking for friends of variable %s\n", fts_symbol_name(fts_object_get_variable(target)));
       fts_variable_find_users(target->patcher, fts_object_get_variable(target), this);
     }
   else
     {
       fts_atom_t a[1];
-
-      fprintf(stderr, "Looking for standard friends\n");
 
       fts_set_data(&a[0], (fts_data_t *) this);
       fts_send_message(target, fts_SystemInlet, fts_s_find_friends, 1, a);

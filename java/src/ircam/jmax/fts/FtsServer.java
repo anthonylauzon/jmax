@@ -321,6 +321,7 @@ public class FtsServer
     if (! connected)
       return;
 
+
     if (FtsServer.debug)
       System.err.println("openPatcher(" + patcher + ")");
 
@@ -342,7 +343,7 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug)
+    if (FtsServer.debug) 
       System.err.println("closePatcher(" + patcher + ")");
 
     try
@@ -356,28 +357,6 @@ public class FtsServer
       }
   }
 
-  /** Send a "getDone" messages to FTS.*/
-
-  final void getDone(FtsObject patcher)
-  {
-    if (! connected)
-      return;
-
-    System.err.println( "in getDone");
-
-    if (FtsServer.debug)
-      System.err.println("getDone(" + patcher + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_get_done_cmd);
-	port.sendObject(patcher);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
 
   /** Send a "patcher loaded" messages to FTS.*/
 
@@ -1200,7 +1179,7 @@ public class FtsServer
  	      if (obj != null)
  		obj.localPut(((String) msg.getArgument(1)).intern(), msg.getArgument(2));
 
- 	      if (FtsServer.debug)
+	      if (FtsServer.debug)
  		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
  				   + " " + msg.getArgument(2));
  	    }

@@ -33,11 +33,7 @@ public class Tabler extends MaxEditor {
 
     itsData = theData;
 
-    if (itsData.getDocument().getName()==null)
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("table"));
-    else {
-      setTitle(itsData.getDocument().getName());
-    }
+    setTitle("Table");
 
     JPanel aContent = new JPanel();
     aContent.setLayout(new BorderLayout());

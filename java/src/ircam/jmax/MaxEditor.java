@@ -23,37 +23,35 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
 
-  public MaxEditor(String title, MaxDocumentType type)
+  public MaxEditor(String title, MaxDocumentType type, boolean register)
   {
     super(title);
     
     editedType = type;
-    MaxWindowManager.getWindowManager().addWindow(this);
+
+    if (register) 
+      MaxWindowManager.getWindowManager().addWindow(this);
+  }
+
+  public MaxEditor(String title, MaxDocumentType type)
+  {
+    this(title, type, true);
   }
 
   public MaxEditor(String title)
   {
-    super(title);
-    
-    editedType = null;
-    MaxWindowManager.getWindowManager().addWindow(this);
+    this(title, null, true);
   }
 
   
   public MaxEditor(MaxDocumentType type)
   {
-    super("");
-
-    editedType = type;
-    MaxWindowManager.getWindowManager().addWindow(this);
+    this("", type, true);
   }
 
   public MaxEditor()
   {
-    super("");
-
-    editedType = null;
-    MaxWindowManager.getWindowManager().addWindow(this);
+    this("", null, true);
   }
 
   public final void Init()
@@ -77,11 +75,13 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     mb.add(itsWindowsMenu);
   }
 
-  /** Intercept the setTitle method to tell the window manager */
+  /** Intercept the setTitle method to tell the window manager,
+   *  and to automatically generate a unique title.
+   */
 
   public synchronized void setTitle(String title)
   {
-    super.setTitle(title);
+    super.setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));
 
     MaxWindowManager.getWindowManager().windowChanged(this);
   }

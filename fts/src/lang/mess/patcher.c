@@ -540,6 +540,14 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_block_free((char *) this->outlets, sizeof(fts_outlet_t *)*fts_object_get_outlets_number((fts_object_t *) this));
 }
 
+
+static void
+patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_property_changed(o, fts_s_name);
+}
+
+
 /* Daemons to set nins and nouts */
 
 static void
@@ -568,6 +576,17 @@ patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
   fts_patcher_redefine(this, ninlets, noutlets);
 }
 
+
+/* Daemon to get the data property; the data property of a patcher
+   is itself */
+
+
+static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
+			     int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_set_object(value, (fts_object_t *) obj);
+}
+
 /* Class instantiation */
 
 static fts_status_t
@@ -592,6 +611,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, patcher_find);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_errors, patcher_find_errors);
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, patcher_send_properties, 0, 0); 
 
   for (i = 0; i < ninlets; i ++)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);
@@ -604,6 +624,10 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_put_ninlets);
   fts_class_add_daemon(cl, obj_property_put, fts_s_noutlets, patcher_put_noutlets);
+
+  /* daemon for data property */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_data, patcher_get_data);
 
   return fts_Success;
 }

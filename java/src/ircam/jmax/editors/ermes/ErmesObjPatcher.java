@@ -78,30 +78,12 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
   {
     if ( evt.getClickCount() > 1)
       {
-	try
-	  {
-	    MaxDataEditor editor;
-	    MaxData data;
-
-	    itsSketchPad.waiting();
-
-	    data = ( (FtsObjectWithData) itsFtsObject).getData();
-
-	    editor = Mda.edit( data);
-
-	    // Add ready listener
-	    editor.addEditorReadyListener( new MaxDataEditorReadyListener() {
-	      public void editorReady( MaxDataEditor editor) 
-		{
-		  itsSketchPad.stopWaiting();
-		}
-	    });
-	  }
-	catch ( MaxDocumentException e)
-	  {
-	    // Really a system error here
-	    System.err.println( e);
-	  }
+	itsSketchPad.waiting();
+	Fts.editPropertyValue(itsFtsObject, "data",
+			      new MaxDataEditorReadyListener() {
+				public void editorReady(MaxDataEditor editor)
+				  {itsSketchPad.stopWaiting();}
+			      });
       }
     else
       itsSketchPad.ClickOnObject( this, evt, x, y);

@@ -69,7 +69,6 @@
 
 #define PUTPROP_CODE            'p'
 #define GETPROP_CODE            'g'
-#define GETDONE_CODE            'I'
 #define GETALLPROP_CODE         'B'
 
 #define CLIENTPROP_CODE         'P'
@@ -91,7 +90,6 @@
 
 #define REMOTE_CALL_CODE    '!'
 
-
 /* Value coding */
 
 /*
@@ -105,9 +103,9 @@
 #define FLOAT_CODE 'z'
 #define STRING_START_CODE 0x01
 #define STRING_END_CODE   0x02
-#define STRING_QUOTE_CODE '\\'
 #define OBJECT_CODE 'o'
 #define CONNECTION_CODE 'x'
+#define VOID_CODE 'v'
 #define DATA_CODE 0x05
 
 /*

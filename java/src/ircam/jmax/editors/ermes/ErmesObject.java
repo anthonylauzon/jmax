@@ -34,7 +34,6 @@ abstract public class ErmesObject implements ErmesDrawable {
   boolean itsDragging = false;
   Font itsFont = null;
   FontMetrics itsFontMetrics = null;
-  private int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
 
   static Color itsUINormalColor = new Color( 153, 204, 255);
   static Color itsUISelectedColor = new Color( 51, 153, 204);
@@ -187,16 +186,6 @@ abstract public class ErmesObject implements ErmesDrawable {
   {
   }
 
-  public void setJustification( int theJustification) 
-  {
-    itsJustification = theJustification;
-  }
-
-  public int getJustification() 
-  {
-    return itsJustification;
-  }
-
   void ResizeToNewFont( Font itsFont) 
   {
   }
@@ -263,8 +252,6 @@ abstract public class ErmesObject implements ErmesDrawable {
     Rectangle aRect = currentRect;
 
     int maxPads = (n_outlts > n_inlts) ? n_outlts : n_inlts;
-
-    itsFtsObject.setRepresentation( this);
 
     if ( maxPads * PADS_DISTANCE > aRect.width) 
       { //the pads are longer then the element
@@ -391,8 +378,18 @@ abstract public class ErmesObject implements ErmesDrawable {
 
   public void Init() 
   {
-    String aFont = (String)itsFtsObject.get( "font");
-    Integer aSize = (Integer)itsFtsObject.get( "fs");
+    String aFont = null;
+    Integer  aSize = null;
+    Object value;
+
+    value = itsFtsObject.get( "font");
+
+    if (value instanceof String)
+      aFont = (String)itsFtsObject.get( "font");
+
+    value = itsFtsObject.get( "fs");
+    if (value instanceof Integer)
+      aSize = (Integer)itsFtsObject.get( "fs");
 
     itsSelected = false;
     makeCurrentRect( itsFtsObject);

@@ -38,7 +38,7 @@ class ErmesPatcherInspector extends Frame {
 
   public ErmesPatcherInspector(FtsContainerObject thePatcher) 
   {
-    super("inspector for: " + thePatcher.getName());
+    super("Inspector for patcher " + thePatcher.getObjectName());
     
     setLayout(new BorderLayout());
     
@@ -124,7 +124,7 @@ class ErmesPatcherInspector extends Frame {
 
     itsPatcherObject = thePatcher;
 
-    setTitle("inspector for: "+thePatcher.getName());
+    setTitle("Inspector for patcher " + thePatcher.getObjectName());
     setVisible(true);
 
     itsInsField.requestFocus();

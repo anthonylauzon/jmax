@@ -23,10 +23,9 @@ import com.sun.java.swing.*;
  * Removed the inlets/outlets housekeeping: since the .pat parsing is done in FTS
  * we don't need to make them different from the other objects.
  * 
- * A container is both a MaxData and a FtsObjectWithData; of course, its data is itself.
  */
 
-abstract public class FtsContainerObject extends FtsObject implements MaxData, FtsObjectWithData
+abstract public class FtsContainerObject extends FtsObject implements MaxData
 {
   /** The objects contained in the patcher */
 
@@ -35,16 +34,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   /** All the connections between these objects */
 
   private MaxVector connections = new MaxVector();
-
-  /** True if the patcher have been already downloaded from FTS */
-
-  protected boolean downloaded = false;
-
-  /** True if the patcher content have been downloaded from FTS
-   *  or anyway consistent because built in the editor
-   */
-
-  protected boolean downLoaded = false;
 
   protected  FtsContainerObject(FtsContainerObject parent, String className, String description, int objId)
   {
@@ -57,6 +46,8 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   {
     Mda.dispose(this);
     super.delete();
+    objects = null;
+    connections = null;
   }
 
   /*
@@ -148,43 +139,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   public final MaxVector getConnections()
   {
     return connections;
-  }
-
-  /** Open tell FTS that this patcher is "alive";
-   * open need to download the patcher if not downloaded.
-   */
-
-  public final void download()
-  {
-    Fts.getServer().sendDownloadPatcher(this);
-    Fts.sync();
-    downloaded = true;
-  }
-
-  /* The callback is called by the message handler */
-
-  Runnable downloadCallback = null;
-
-  public final void download(Runnable c)
-  {
-    downloadCallback = c;
-    Fts.getServer().sendDownloadPatcher(this);
-    Fts.getServer().getDone(this);
-    downloaded = true;
-  }
-
-  private final void callDownloadCallback()
-  {
-    if (downloadCallback != null)
-      SwingUtilities.invokeLater(downloadCallback);
-
-    downloadCallback = null;
-  }
-
-
-  public boolean isDownloaded()
-  {
-    return downloaded;
   }
 
   /** Close tell FTS that this patcher is  "alive". */
@@ -297,37 +251,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   public void setDocument(MaxDocument document)
   {
     this.document = (FtsPatcherDocument) document;
-  }
-
-  public String getName()
-  {
-    return getObjectName();
-  }
-
-  // FtsObjectWithData implementation
-
-  public MaxData getData()
-  {
-    return this;
-  }
-
-  public void setData(MaxData data) throws FtsException
-  {
-    throw new FtsException(new FtsError(FtsError.ILLEGAL_OPERATION, "Cannot set the content of a  patcher"));
-  }
-
-  /** Handle a direct message from an FTS object. 
-   * Containers for the moment only get "open call back messages"
-   */
-
-  void localPut(String name, Object value, Object author)
-  {
-    // check first hardcoded properties
-
-    if (name == "done") 
-      callDownloadCallback();
-    else
-      super.localPut(name, value, author);
   }
 }
 

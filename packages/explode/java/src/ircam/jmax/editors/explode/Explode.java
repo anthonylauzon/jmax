@@ -29,7 +29,7 @@ public class Explode extends MaxEditor implements AAAReadme {
 
     Init();
 
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode"));
+    setTitle("Explode");
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 

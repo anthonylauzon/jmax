@@ -12,6 +12,7 @@ import tcl.lang.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.toolkit.*;
 
 /**
   Window containing a tcl console
@@ -26,13 +27,20 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
   static private ConsoleWindow theConsoleWindow = null;
 
+  static {
+    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
+      public String getToolName() { return "Console";}
+      public void open() { theConsoleWindow.toFront();}
+    });
+  }
+
   static public ConsoleWindow getConsoleWindow()
   {
     return theConsoleWindow;
   }
 
   public ConsoleWindow() {
-    super("jMax Console", Mda.getDocumentTypeByName("patcher"));
+    super("jMax Console", Mda.getDocumentTypeByName("patcher"), false);
 
     itsConsole = new Console(MaxApplication.getTclInterp());
     itsConsole.Start();

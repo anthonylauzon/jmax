@@ -15,20 +15,8 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
   {
     super(p);
 
-    final FtsContainerObject patcher = p;
-
-    if (patcher.isDownloaded())
-      {
-	setSketchWindow(new ErmesSketchWindow(patcher));
-	fireEditorReadyListeners();
-      }
-    else
-      patcher.download( new Runnable() {
-	public void run() {
-	  ErmesDataEditor.this.setSketchWindow(new ErmesSketchWindow(patcher));
-	  ErmesDataEditor.this.fireEditorReadyListeners();
-	}
-      });
+    setSketchWindow(new ErmesSketchWindow(p));
+    fireEditorReadyListeners();
   }
 
   public void setSketchWindow(ErmesSketchWindow window)
@@ -63,10 +51,7 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
   public void quitEdit()
   {
     if (window != null)
-      {
-	window.itsPatcher = null; // (fd) ???
-	window.Destroy();
-      }
+      window.Destroy();
   }
 
   /*

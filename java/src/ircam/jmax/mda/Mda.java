@@ -98,7 +98,11 @@ public class Mda
 	    if (where != null)
 	      editor.showObject(where);
 
-	    data.getDocument().addEditor(editor);
+	    // In case of document less data 
+
+	    if (data.getDocument() != null)
+	      data.getDocument().addEditedData(data);
+
 	    dataEditorTable.put(data, editor);
 
 	    return editor;
@@ -122,7 +126,7 @@ public class Mda
 
     if (editor != null)
       {
-        data.getDocument().removeEditor(editor);
+        data.getDocument().removeEditedData(data);
 	editor.quitEdit();
 	dataEditorTable.remove(data);
       }
@@ -370,37 +374,47 @@ public class Mda
 
   // Generate a FileView based on Mda suitable for a JFileChooser dialog
 
-  static class MaxDocumentFileView extends FileView {
-    public String getName(File f) {
-	return null; // let the L&F FileView figure this out
+  static class MaxDocumentFileView extends FileView
+  {
+    public String getName(File f)
+    {
+      return null; // let the L&F FileView figure this out
     }
     
-    public String getDescription(File f) {
-	return null; // let the L&F FileView figure this out
+    public String getDescription(File f)
+    {
+      return null; // let the L&F FileView figure this out
     }
     
-    public String getTypeDescription(File f) {
+    public String getTypeDescription(File f)
+    {
       return Mda.getFileDescription(f);
     }
     
-    public Icon getIcon(File f) {
+    public Icon getIcon(File f)
+    {
       return Mda.getFileIcon(f);
     }
     
-    public Boolean isTraversable(File f) {
-	return null; // let the L&F FileView figure this out
+    public Boolean isTraversable(File f)
+    {
+      return null; // let the L&F FileView figure this out
     }
     
     // Get the extension of this file. Code is factored out
     // because we use this in both getIcon and getTypeDescription
-    private String getExtension(File f) {
-	String ext = null;
-	String s = f.getName();
-	int i = s.lastIndexOf('.');
-	if(i > 0 &&  i < s.length() - 1) {
-	    ext = s.substring(i+1).toLowerCase();
-	}
-	return ext;
+
+    private String getExtension(File f)
+    {
+      String ext = null;
+      String s = f.getName();
+
+      int i = s.lastIndexOf('.');
+
+      if (i > 0 &&  i < s.length() - 1) 
+	ext = s.substring(i+1).toLowerCase();
+
+      return ext;
     }
   }
 

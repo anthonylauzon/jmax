@@ -117,60 +117,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   {
     if ( evt.getClickCount() > 1 ) 
       {
-	MaxData data = null;
-
-	// New implementation: try to get the "data" property, and if not null edit it.
-
-	itsFtsObject.ask("data");
-	Fts.sync();
-	data = (MaxData) itsFtsObject.get("data");
-
-	/* HACK !! */
-
-	if ((data != null) && (data instanceof FtsRemoteData)) 
-	  {
-	    ((FtsRemoteData) data).setDocument(
-					       GetSketchWindow().itsDocument);
-	  }
-
-	/* HACK END !! */
-
-	if ((data == null) &&  (itsFtsObject instanceof FtsObjectWithData)) 
-	  {
-	    // Fall back the old obsolete behaviour
-	    // Should be substituted by the previous one
-	    // need changes tqlist and patcher (?)
-	    // for this
-
-	    data = ((FtsObjectWithData) itsFtsObject).getData();
-	  }
-
-	if (data != null) 
-	  {
-	    itsSketchPad.waiting();
-
-	    try 
-	      {
-		MaxDataEditor editor;
-
-		editor = Mda.edit(data);
-
-		// Add ready listener
-
-		editor.addEditorReadyListener( new MaxDataEditorReadyListener() {
-		  public void editorReady( MaxDataEditor editor) 
-		    {
-		      itsSketchPad.stopWaiting();
-		    }
-		});
-	      } catch ( MaxDocumentException e) 
-		{
-		  // SHould do something better
-		  System.err.println( e);
-                }
-	  }
-      } 
-    else if ( !itsSketchPad.itsRunMode)
+	itsSketchPad.waiting();
+	Fts.editPropertyValue(itsFtsObject, "data",
+			      new MaxDataEditorReadyListener() {
+	  public void editorReady(MaxDataEditor editor)
+	    {itsSketchPad.stopWaiting();}
+	});
+      }
+    else if ( !itsSketchPad.itsRunMode) 
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 

@@ -296,7 +296,7 @@ void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
    needed (see intvec.c for example).
    */
 
-void fts_data_start_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
+void fts_data_start_remote_call( fts_data_t *d, int key)
 {
   if (! fts_data_is_exported(d))
     fts_data_export(d);

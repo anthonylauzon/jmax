@@ -3,7 +3,6 @@
 extern void toggle_config(void);
 extern void message_config(void);
 extern void panel_config(void);
-extern void gobj_config(void);
 extern void gint_config(void);
 extern void gfloat_config(void);
 extern void comment_config(void);
@@ -18,7 +17,6 @@ fts_guiobj_init(void)
   message_config();
   message_doctor_init();
   panel_config();
-  gobj_config();
   gint_config();
   gfloat_config();
   comment_config();

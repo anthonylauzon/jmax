@@ -14,10 +14,6 @@ public interface MaxData
   /** Get the document this data belong to */
 
   abstract public MaxDocument getDocument();
-
-  /** Get the a name for this data, for UI purposes only */
-
-  abstract public String getName();
 }
 
 

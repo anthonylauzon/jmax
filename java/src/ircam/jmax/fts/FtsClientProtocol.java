@@ -16,9 +16,10 @@ class FtsClientProtocol
   static final int float_type_code    = 'z';
   static final int object_type_code   = 'o';
   static final int connection_type_code   = 'x';
-  static final int data_type_code       = 0x05;
-  static final int string_start_code = 0x01;
-  static final int string_end_code   = 0x02;
+  static final int void_type_code     = 'v';
+  static final int data_type_code     = 0x05;
+  static final int string_start_code  = 0x01;
+  static final int string_end_code    = 0x02;
   static final int end_of_message_code = 0x03;
   
   // predicated coding protocol character sets
@@ -29,7 +30,8 @@ class FtsClientProtocol
 	    (c == int_type_code) ||
 	    (c == float_type_code)   ||
 	    (c == object_type_code)   ||
-	    (c == connection_type_code) || // (fd) was missing... Is it intentionnal ? NO !! :-< ..
+	    (c == connection_type_code) || 
+	    (c == void_type_code) || 
 	    (c == data_type_code)   ||
 	    (c == string_start_code) ||
 	    (c == end_of_message_code) ||
@@ -113,7 +115,6 @@ class FtsClientProtocol
 
   static final int fts_put_property_cmd = 'p';
   static final int fts_get_property_cmd = 'g';
-  static final int fts_get_done_cmd     = 'I';
   static final int fts_get_all_property_cmd = 'B';
 
   static final int fts_property_value_cmd = 'P';

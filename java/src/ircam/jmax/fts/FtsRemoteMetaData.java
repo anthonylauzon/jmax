@@ -123,13 +123,6 @@ class FtsRemoteMetaData extends FtsRemoteData
   {
     return null;
   }
-
-  /** Get the a name for this data, for UI purposes only */
-
-  public String getName()
-  {
-    return "metaData";
-  }
 }
 
 

@@ -17,7 +17,7 @@ public class ErmesModule
 
     //List of persistent properties
 
-    FtsPropertyDescriptor.setDefaultValue("autorouting", "off");
+    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
     FtsPropertyDescriptor.setDefaultValue("maxValue", new Integer(128));
     FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(0));
     FtsPropertyDescriptor.setDefaultValue("resized", "off");
@@ -25,6 +25,10 @@ public class ErmesModule
     // Load the toolbar images
 
     ErmesSwToolbar.loadToolBarImages();
+
+    // Register the find panel
+
+    FindPanel.registerFindPanel();
   }
 }
 

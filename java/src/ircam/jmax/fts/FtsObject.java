@@ -19,13 +19,6 @@ abstract public class FtsObject
 {
   /* code to set generic properties meta-properties */
 
-  static
-  {
-    // Ins and outs
-
-    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
-  }
-
   /******************************************************************************/
   /*                                                                            */
   /*              STATIC FUNCTION                                               */
@@ -237,75 +230,13 @@ abstract public class FtsObject
   }
 
 
-  /* ask fts to send back the value property (and so call the handlers) */
+  /* ask fts to send back the value property (and so indirectly call the handlers) */
      
   public void ask(String name)
   {
     Fts.getServer().askObjectProperty(this, name);
   }
-
   
-  /** Check if a property correspond to a Java builtin property
-   * (Java bean like) and set it; return true in this case.
-   * in a far (?) future, this can use BeanInfos instead of handcoded 
-   * checks.
-   * Subclasses should specialize this method, and finish the else chain by 
-   * "return super.builtinPut(name, value)".
-   * Handlers are called also for builtin properties.
-   *
-   * @return true if the property has been set, and should not be stored
-   *         in the property list.
-   */
-
-
-  /** Check if a property correspond to a Java builtin property
-   * (Java bean like) and get it.
-   * in a far (?) future, this can use BeanInfos instead of handcoded 
-   * checks.
-   * Subclasses should specialize this method, and finish the else chain by 
-   * "return super.builtinGet(name)".
-   *
-   * @return the value, or null if the property is not builtin
-   *
-   */
-
-  protected Object builtinGet(String name)
-  {
-    if (name == "ins")
-      return new Integer(getNumberOfInlets());
-    else if (name == "outs")
-      return new Integer(getNumberOfOutlets());
-    else if (name == "x")
-      return new Integer(x);
-    else if (name == "y")
-      return new Integer(y);
-    else if (name == "w")
-      return new Integer(width);
-    else if (name == "h")
-      return new Integer(height);
-    else if (name == "name")
-      return getObjectName();
-    else
-      return null;
-  }
-
-
-  /** Get the names of the "builtin" properties.
-   *  Subclasses should add names to the names vector, and 
-   *  then call super.builtinPropertyNames(names).
-   */
-
-  protected void builtinPropertyNames(MaxVector names)
-  {
-    names.addElement("ins");
-    names.addElement("outs");
-    names.addElement("name");
-    names.addElement("x");
-    names.addElement("y");
-    names.addElement("w");
-    names.addElement("h");
-  }
-
   /** Local put is a version of put that do not send
     values to FTS.
     */
@@ -341,19 +272,40 @@ abstract public class FtsObject
     // check first hardcoded properties
 
     if (name == "ins")
-      this.ninlets = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  this.ninlets = ((Integer)value).intValue();
+      }
     else if (name == "outs")
-      this.noutlets = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  this.noutlets = ((Integer)value).intValue();
+      }
     else if (name == "x")
-      x = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  x = ((Integer)value).intValue();
+      }
     else if (name == "y")
-      y = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  y = ((Integer)value).intValue();
+      }
     else if (name == "w")
-      width = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  width = ((Integer)value).intValue();
+      }
     else if (name == "h")
-      height = ((Integer)value).intValue();
+      {
+	if (! (value instanceof FtsVoid))
+	  height = ((Integer)value).intValue();
+      }
     else if (name == "name")
-      setObjectName(value.toString());
+      {
+	if (! (value instanceof FtsVoid))
+	  setObjectName(value.toString());
+      }
     else
       {
 	// local properties
@@ -394,32 +346,47 @@ abstract public class FtsObject
       parent.callWatchAll(name, value, author);
   }
 
-
-  /** Get a propery value */
+  /** Get a propery value; subclasses may specialize it */
 
   public Object get(String name)
   {
-    Object v;
+    Object v = null;
 
-    v = builtinGet(name);
+    if (name == "ins")
+      return new Integer(getNumberOfInlets());
+    else if (name == "outs")
+      return new Integer(getNumberOfOutlets());
+    else if (name == "x")
+      return new Integer(x);
+    else if (name == "y")
+      return new Integer(y);
+    else if (name == "w")
+      return new Integer(width);
+    else if (name == "h")
+      return new Integer(height);
+    else if (name == "name")
+      return getObjectName();
 
-    if (v != null)
-      return v;
-    else
+    if (properties != null)
       {
-	if (properties != null)
-	  {
-	    for (int i = 0; i < properties.size(); i++)
-	      {
-		Property p = (Property)(properties.elementAt(i));
-
-		if (p.name == name)
-		  return p.value;
-	      }
-	  }
-
-	return FtsPropertyDescriptor.getDefaultValue(name);
+      search: for (int i = 0; i < properties.size(); i++)
+	{
+	  Property p = (Property)(properties.elementAt(i));
+	    
+	  if (p.name == name)
+	    {
+	      v = p.value;
+	      break search;
+	    }
+	}
       }
+    else
+      v = FtsPropertyDescriptor.getDefaultValue(name);
+
+    if (v == null)
+      return FtsVoid.voidValue;
+    else
+      return v;
   }
 
   public void watch(String property, FtsPropertyHandler handler)
@@ -446,24 +413,6 @@ abstract public class FtsObject
     if (propertyHandlerTable != null)
       propertyHandlerTable.removeWatch(name, owner);
   }
-
-  public void getPropertyNames(MaxVector names)
-  {
-    builtinPropertyNames(names);
-
-    // special properties missing here
-
-    if (properties != null)
-      {
-	for (int i = 0; i < properties.size(); i++)
-	  {
-	    Property p = (Property)(properties.elementAt(i));
-
-	    names.addElement(p.name);
-	  }
-      }
-  }
-
 
   /******************************************************************************/
   /*                                                                            */
@@ -507,11 +456,6 @@ abstract public class FtsObject
 
   /** The property Handler Table for this object */
 
-
-
-  /** on screen representation of the Fts Object */
-
-  Object representation;
 
   /** x, y, width and height cache locally the geometrical properties, to speed
     up access; also, to prepare transition to beans model */
@@ -706,20 +650,6 @@ abstract public class FtsObject
   public final void sendMessage(int inlet, String selector, MaxVector args)
   {
     Fts.getServer().sendObjectMessage(this, inlet, selector, args);
-  }
-
-  /** Get the representation of this object in the editor. */
-
-  public final Object getRepresentation()
-  {
-    return representation;
-  }
-
-  /** Set the representation of this object in the editor. */
-
-  public final void setRepresentation(Object r)
-  {
-    representation = r;
   }
 
   /*****************************************************************************/

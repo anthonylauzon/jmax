@@ -19,10 +19,15 @@ typedef struct {
 
 
 static void
-gint_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  gint_t *this = (gint_t *)o;
+  fts_object_property_changed_urgent(o, fts_s_value);
+}
 
+
+static void
+gint_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   fts_object_ui_property_changed(o, fts_s_value);
 }
 
@@ -120,7 +125,8 @@ gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(gint_t), 1, 1, 0);
 
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("open"), gint_open, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, gint_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, gint_send_ui_properties, 0, 0); 
 
   fts_method_define(cl, 0, fts_s_bang, gint_bang, 0, 0);
 
@@ -150,6 +156,5 @@ void
 gint_config(void)
 {
   fts_metaclass_create(fts_new_symbol("intbox"),gint_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("slider"), fts_new_symbol("intbox"));
 }
 

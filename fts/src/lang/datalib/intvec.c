@@ -323,7 +323,7 @@ static void fts_integer_vector_export_fun(fts_data_t *d)
   fts_integer_vector_t *this = (fts_integer_vector_t *)d;
   int i;
 
-  fts_data_start_remote_call(d, INTEGER_VECTOR_SET, 0, 0);
+  fts_data_start_remote_call(d, INTEGER_VECTOR_SET);
   fts_client_mess_add_int(this->size);
 
   for (i = 0; i < this->size; i++)
@@ -363,7 +363,7 @@ static  void fts_integer_vector_remote_update( fts_data_t *d, int ac, const fts_
   fts_integer_vector_t *this = (fts_integer_vector_t *)d;
   int i;
 
-  fts_data_start_remote_call(d, INTEGER_VECTOR_SET, 0, 0);
+  fts_data_start_remote_call(d, INTEGER_VECTOR_SET);
   fts_client_mess_add_int(this->size);
 
   for (i = 0; i < this->size; i++)

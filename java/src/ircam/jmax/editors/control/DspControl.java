@@ -103,13 +103,6 @@ public class DspControl extends FtsRemoteData
 
     listeners.firePropertyChange(prop, oldValue, newValue);
   }
-
-  /** Max Data support ?? */
-
-  public String getName()
-  {
-    return "DspControl";
-  }
 }
 
 

@@ -59,12 +59,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
     super.Init();
 
-    Integer aJustification = (Integer)itsFtsObject.get("jsf");
-    if (aJustification == null)
-      setJustification(itsSketchPad.itsJustificationMode);
-    else
-      setJustification(aJustification.intValue());
-  
     itsInEdit = false;
 
     itsFtsObject.watch("ins", this);

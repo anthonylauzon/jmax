@@ -19,6 +19,8 @@ extern void fts_data_delete( fts_data_t *d);
 
 extern void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at);
 extern void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at);
+extern void fts_data_start_remote_call( fts_data_t *d, int key);
+extern void fts_data_end_remote_call(void);
 
 /* Really necessary ? */
 extern int fts_data_is_exported( fts_data_t *d);

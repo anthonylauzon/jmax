@@ -48,13 +48,6 @@ class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
 
     super.Init();
 
-    Integer aJustification = (Integer)itsFtsObject.get("jsf");
-
-    if (aJustification == null)
-      setJustification( itsSketchPad.itsJustificationMode);
-    else
-      setJustification( aJustification.intValue());
-
     itsSketchPad.GetTextArea().setBackground( Color.white);
 
     ParseText(itsArgs);

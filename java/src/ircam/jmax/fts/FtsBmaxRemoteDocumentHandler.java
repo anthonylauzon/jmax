@@ -86,6 +86,12 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
       {
 	FtsPatcherDocument obj = new FtsPatcherDocument();
 
+	// Temporary hack to force the patcher uploading; really, MDA should allow for 
+	// async edit of documents ...
+
+	patcher.ask("data");
+	server.syncToFts();
+
 	obj.setRootData((MaxData) patcher);
 	obj.setDocumentFile(file);
 	obj.setDocumentHandler(this);

@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/03/18 19:05:47 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 12:12:25 $
  *
  */
 
@@ -20,11 +20,17 @@ typedef struct {
   float f;
 } gfloat_t;
 
-static void
-gfloat_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  gfloat_t *this = (gfloat_t *)o;
 
+static void
+gfloat_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_property_changed_urgent(o, fts_s_value);
+}
+
+
+static void
+gfloat_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   fts_object_ui_property_changed(o, fts_s_value);
 }
 
@@ -113,7 +119,8 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(gfloat_t), 1, 1, 0);
 
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("open"), gfloat_open, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, gfloat_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, gfloat_send_ui_properties, 0, 0); 
 
   fts_method_define(cl, 0, fts_s_bang, gfloat_bang, 0, 0);
 

@@ -8,6 +8,19 @@ typedef struct
 
 
 static void
+toggle_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_property_changed_urgent(o, fts_s_value);
+}
+
+
+static void
+toggle_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_ui_property_changed(o, fts_s_value);
+}
+
+static void
 toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   toggle_t *this = (toggle_t *) o;
@@ -100,6 +113,9 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[1];
 
   fts_class_init(cl, sizeof(toggle_t), 1, 1, 0);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, toggle_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, toggle_send_properties, 0, 0); 
 
   fts_method_define(cl, 0, fts_s_bang, toggle_bang, 0, a);
 

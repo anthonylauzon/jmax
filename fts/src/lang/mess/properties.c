@@ -897,6 +897,7 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
     changes_queue_head = p;
 }
 
+
 void
 fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 {
