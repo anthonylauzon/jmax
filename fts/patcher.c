@@ -1778,6 +1778,7 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int dy = fts_get_int(at+2);
   fts_atom_t a[2];
   fts_object_t *p;
+  int uploaded = 0;
 
   fts_set_object(a, o);
   fts_send_message(clipboard, fts_s_paste, 1, a);   
@@ -1799,6 +1800,7 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	fts_object_put_prop(p, fts_s_y, a+1);
 
 	fts_client_upload_object( p, -1);
+	uploaded = 1;
       }
 
   /* For each object, for each outlet, upload all the not uploaded connections */
@@ -1816,12 +1818,16 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 		{
 		  ((fts_object_t *)c)->patcher = this;
 		  fts_client_upload_object((fts_object_t *)c, -1);
+		  uploaded = 1;
 		}
 	    }
 	}
     }
   
   fts_client_send_message((fts_object_t *)this, sym_endPaste, 0, 0);
+  
+  if( uploaded)
+    fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void
