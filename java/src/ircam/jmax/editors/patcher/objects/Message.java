@@ -75,8 +75,10 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
+    // Send a bang message to the system inlet
+ 
     if (Squeack.isDown(squeack))
-      ((FtsIntValueObject)ftsObject).setValue(1);
+      ftsObject.sendMessage( -1, "bang", null);
   }
 
   public void valueChanged(int value) 

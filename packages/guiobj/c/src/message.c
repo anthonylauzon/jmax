@@ -78,6 +78,32 @@ message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
    evalution of the box content.
 */
 
+
+static void 
+message_tick(fts_alarm_t *alarm, void *calldata)
+{
+  message_t *this = (message_t *)calldata;
+
+  this->value = 0;
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+}
+
+
+static void
+message_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{  
+  message_t *this = (message_t *) o;
+
+  this->value = 1;
+  fts_object_ui_property_changed(o, fts_s_value);
+
+  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
+  fts_alarm_arm(&(this->alarm));
+
+  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
+}
+
+
 static void
 message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
@@ -85,6 +111,7 @@ message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
+
 
 static void
 message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -194,33 +221,6 @@ message_get_value(fts_daemon_action_t action, fts_object_t *obj,
 }
 
 
-static void
-message_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
-{
-  message_t *this = (message_t *)obj;
-
-  fts_outlet_bang(obj, 0);
-
-  this->value = 1;
-  fts_object_ui_property_changed(obj, fts_s_value);
-
-  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
-  fts_alarm_arm(&(this->alarm));
-}
-
-
-static void 
-message_tick(fts_alarm_t *alarm, void *calldata)
-{
-  message_t *this = (message_t *)calldata;
-
-  this->value = 0;
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
-}
-
-
-
 static fts_status_t
 message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -235,6 +235,7 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, message_set);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, message_find);
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, message_eval_and_update, 0, 0);
 
   /* Atom list saving/loading/update support */
 
@@ -258,7 +259,6 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_s_symbol, message_eval, 1, a);
 
-
   fts_method_define_varargs(cl, 0, fts_s_list, message_eval);
 
   fts_method_define_varargs(cl, 0, fts_s_set, message_set);
@@ -268,7 +268,6 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* value daemons */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, message_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, message_put_value);
 
   return fts_Success;
 }
