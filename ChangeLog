@@ -1,3 +1,8 @@
+2003-07-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* */java/*/Makefile.am: closed bug "[ 761311 ] make dist RedHat 8.0". 
+	set EXTRA_DIST to package_JAVA.
+
 2003-06-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in, packages/Makefile.am, packages/midishare: updated midishare package to jMax 4.x
