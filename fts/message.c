@@ -421,13 +421,13 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_
       
       if(s == 0)
 	{
-	  if(ac == 1)
-	    output_value(o, woutlet, at);
+	  if(n == 1)
+	    output_value(o, woutlet, a);
 	  else
-	    output_varargs(o, woutlet, ac, at);
+	    output_varargs(o, woutlet, n, a);
 	}
       else
-	output_message(o, woutlet, s, ac, at);
+	output_message(o, woutlet, s, n, a);
     }
 }
 

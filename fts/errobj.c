@@ -45,6 +45,9 @@ error_object_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_error_object_t *this = (fts_error_object_t *)o;
 
   this->description = fts_get_symbol(at);
+
+  fts_object_set_inlets_number(o, 0);
+  fts_object_set_outlets_number(o, 0);
 }
 
 static void
@@ -53,6 +56,12 @@ error_object_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_error_object_t), error_object_init, NULL);
 
   fts_class_set_default_handler(cl, error_object_default_handler);
+
+  fts_class_inlet_anything(cl, 0);
+  fts_class_outlet_anything(cl, 0);
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);  
 }
 
 fts_class_t *

@@ -171,22 +171,10 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (! drop)
 	{
-	  if (fts_is_int(ap))
-	    {
-	      if (ac > 1)
-		fts_send_message(target, fts_s_send, ac, ap);
-	      else 
-		fts_send_message(target, fts_s_send, ac, ap);
-	    }
-	  else if (fts_is_float(ap))
-	    {
-	      if (ac > 1) 
-		fts_send_message(target, fts_s_send, ac, ap);
-	      else 
-		fts_send_message(target, fts_s_send, ac, ap);
-	    }
+	  if (fts_is_number(ap))
+	    ispw_target_send(target, NULL, ac, ap);
 	  else if (fts_is_symbol(ap) && (fts_get_symbol(ap) != fts_s_semi) && (fts_get_symbol(ap) != fts_s_comma))
-	    fts_send_message(target, fts_get_symbol(ap), ac - 1, ap + 1);
+	    ispw_target_send(target, fts_get_symbol(ap), ac - 1, ap + 1);
 	}
 
       if (!is_comma)

@@ -344,7 +344,9 @@ static void
 dsp_edge_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_dsp_edge_t), dsp_edge_init, dsp_edge_delete);
+
   fts_class_message_varargs(cl, fts_s_put, dsp_edge_put);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -556,7 +558,7 @@ void fts_kernel_dsp_init(void)
   dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_class, NULL, 0, 0);
 
   /* DSP edge class */
-  fts_dsp_edge_class = fts_class_install(NULL, dsp_edge_instantiate);
+  fts_dsp_edge_class = fts_class_install(fts_new_symbol("edge~"), dsp_edge_instantiate);
 
   /* DSP signal dummy class */
   fts_dsp_signal_class = fts_class_install(NULL, dsp_signal_instantiate);

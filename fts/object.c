@@ -405,6 +405,7 @@ fts_object_get_name(fts_object_t *obj)
  *  delete object
  *
  *    fts_object_unbind()
+ *    fts_object_unname()
  *    fts_object_unconnect()
  *    fts_object_unclient()
  *    fts_object_free()
@@ -429,7 +430,11 @@ fts_object_unbind(fts_object_t *obj)
       
       list = fts_list_next(list);
     }
+}
 
+static void 
+fts_object_unname(fts_object_t *obj)
+{
   /* remove definition of named object */
   if(obj->definition != NULL)
     {
@@ -480,6 +485,8 @@ fts_object_destroy(fts_object_t *obj)
   if(fts_class_get_deconstructor(fts_object_get_class(obj)))
     fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
 
+  fts_object_unname(obj);
+
   /* release all client components */
   fts_object_unclient(obj);
 
@@ -494,6 +501,7 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   fts_object_unconnect(obj);
 
   /* unbind the objects from defined and used variables */
+  fts_object_unname(obj);
   fts_object_unbind(obj);
 
   if(obj->patcher)
@@ -536,6 +544,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       fts_object_t *new;
       
       /* unbind variables from old object */
+      fts_object_unname(old);
       fts_object_unbind(old);
 
       /* call deconstructor of old object */
@@ -602,6 +611,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   else
     {
       /* unbind variables */
+      fts_object_unname(old);
       fts_object_unbind(old);
     }      
 

@@ -389,9 +389,10 @@ patcher_inout_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_propagate_input, patcher_inout_propagate_input);
 
-  fts_class_message_varargs(cl, fts_s_input, patcher_inout_input);
   fts_class_message_varargs(cl, fts_s_add_listener, patcher_inout_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, patcher_inout_remove_listener);
+
+  fts_class_set_default_handler(cl, patcher_inout_input);
 }
 
 static void
@@ -547,14 +548,22 @@ receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac,
 {
   fts_receive_t *this  = (fts_receive_t *)o;
   fts_class_t *cl = fts_object_get_class(this->obj);
+      fts_atom_t a;
 
   if(cl == patcher_inout_class)
     {
       /* send inlet index as object description */
       patcher_inout_t *inout = (patcher_inout_t *)this->obj;
-      fts_atom_t a;
       
       fts_set_int(&a, inout->index);
+      fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), 1, &a);
+    }
+  else if(cl == fts_label_class)
+    {
+      /* send inlet index as object description */
+      fts_label_t *label = (fts_label_t *)this->obj;
+      
+      fts_set_symbol(&a, fts_object_get_name((fts_object_t *)label));
       fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), 1, &a);
     }
   else
@@ -642,7 +651,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(obj)
     {
-      meth = fts_class_get_method(fts_object_get_class(obj), fts_s_input);
+      meth = fts_class_get_default_handler(fts_object_get_class(obj));
       
       if(!meth)
 	{

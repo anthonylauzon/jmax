@@ -34,5 +34,6 @@ ISPW_API void ispw_register_named_object(fts_object_t *obj, fts_symbol_t name);
 ISPW_API void ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name);
 
 ISPW_API fts_object_t *ispw_get_target(fts_patcher_t *scope, fts_symbol_t name);
+ISPW_API void ispw_target_send(fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif

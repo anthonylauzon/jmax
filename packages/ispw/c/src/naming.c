@@ -77,6 +77,24 @@ ispw_get_target(fts_patcher_t *scope, fts_symbol_t name)
     return ispw_get_object_by_name(name);
 }
 
+void
+ispw_target_send(fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_class_t *cl = fts_object_get_class(target);
+
+  if(cl == fts_label_class)
+    fts_label_send((fts_label_t *)target, s, ac, at);
+  else if(s != NULL)
+    {
+      fts_method_t meth = fts_class_get_method(cl, s);
+      
+      if(meth != NULL)
+	(*meth)(target, fts_system_inlet, s, ac, at);
+      else
+	fts_object_signal_runtime_error(target, "don't understand message %s (from ispw message box)", s);
+    }
+}
+
 void 
 ispw_naming_init(void)
 {

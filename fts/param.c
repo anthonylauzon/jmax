@@ -137,7 +137,7 @@ param_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
   
 static void
-param_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
   
@@ -154,12 +154,23 @@ param_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-param_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
 
-  param_set_atoms(o, 0, 0, ac, at);
+  param_set_varargs(o, 0, 0, ac, at);
   param_call_listeners(this);
+}
+
+static void
+param_default_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  if(s == NULL)
+    param_input_varargs(o, 0, 0, ac, at);
+  else
+    fts_class_default_error_handler(o, 0, s, ac, at);
 }
 
 static void
@@ -298,7 +309,7 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 0)
     {
-      param_set_atoms(o, 0, 0, ac, at);
+      param_set_varargs(o, 0, 0, ac, at);
       this->persistence = -1;    
     }
 }
@@ -323,22 +334,24 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, param_post);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_set, param_set_atoms);
+  fts_class_message_varargs(cl, fts_s_set, param_set_varargs);
   fts_class_message_varargs(cl, fts_s_dump, param_dump);
 
   fts_class_message_varargs(cl, fts_s_get_array, param_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_atoms);
+  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_varargs);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
 
-  fts_class_message_varargs(cl, fts_s_input, param_input_atoms);
   fts_class_message_varargs(cl, fts_s_add_listener, param_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, param_remove_listener);
 
   fts_class_message_varargs(cl, fts_s_bang, param_update);
   fts_class_message_varargs(cl, fts_s_clear, param_clear);
+  fts_class_message_varargs(cl, fts_s_send, param_input_varargs);
+
+  fts_class_set_default_handler(cl, param_default_handler);
   
-  fts_class_inlet_varargs(cl, 0, param_input_atoms);
+  fts_class_inlet_varargs(cl, 0, param_input_varargs);
   fts_class_outlet_varargs(cl, 0);
 }
 

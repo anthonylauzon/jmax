@@ -61,12 +61,15 @@ bus_reset(bus_t *this, int n_tick, double sr)
       this->buf[0] = fts_realloc(this->buf[0], n * sizeof(float));
       this->buf[1] = fts_realloc(this->buf[1], n * sizeof(float));
 
-      this->toggle = 0;
+      this->n_tick = n_tick;
     }
 
   /* zero buffers */
   for(i=0; i<n; i++)
     (this->buf[0])[i] = (this->buf[1])[i] = 0.0;
+
+  /* reset toggle */
+  this->toggle = 0;
 }
 
 static void
@@ -368,9 +371,9 @@ static void
 throw_ftl(fts_word_t *a)
 {
   bus_t *bus = *((bus_t **)fts_word_get_pointer(a + 0));
-  int index = fts_word_get_int(a + 2);
-  float *input = (float *)fts_word_get_pointer(a + 3);
-  int n_tick = fts_word_get_int(a + 4);
+  int index = *((int *)fts_word_get_pointer(a + 1));
+  float *input = (float *)fts_word_get_pointer(a + 2);
+  int n_tick = fts_word_get_int(a + 3);
   float *buffer = bus->buf[bus->toggle];
   float *write = buffer + index * n_tick;
   int i;
@@ -433,7 +436,7 @@ static void
 catch_ftl(fts_word_t *a)
 {
   bus_t *bus = *((bus_t **)fts_word_get_pointer(a + 0));
-  int index = fts_word_get_int(a + 1);
+  int index = *((int *)fts_word_get_int(a + 1));
   float *output = (float *)fts_word_get_pointer(a + 2);
   int n_tick = fts_word_get_int(a + 3);
   float *buffer = bus->buf[bus->toggle];

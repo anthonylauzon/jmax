@@ -102,10 +102,13 @@ static void
 messbox_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl = fts_object_get_class(o);
-  fts_method_t meth = fts_class_get_method(cl, fts_s_input);
+  fts_method_t meth = fts_class_get_method(cl, s);
 
-  if(meth)
-    meth(o, fts_system_inlet, s, ac, at);
+  if(meth == NULL)
+    meth = fts_class_get_default_handler(cl);
+
+  if(meth != NULL)
+    (*meth)(o, fts_system_inlet, s, ac, at);
 }
 
 /*
@@ -153,7 +156,7 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
 /* LOCAL MACRO for the evaluation engine */
 #define SEND_MESSAGE \
   if (ev_dest_is_object) \
-    { if(target) messbox_send((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
+    { if(target) ispw_target_send((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
   else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 

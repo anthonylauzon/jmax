@@ -61,8 +61,6 @@ bus_get_channel(bus_t *bus, int index)
 static void
 access_set_channel(access_t *this, bus_t *bus, int index)
 {
-  fts_channel_t *channel = bus_get_channel(bus, index);
-
   if(this->bus != NULL)
     fts_object_release((fts_object_t *)this->bus);
   
@@ -105,13 +103,15 @@ static void
 throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
-  int index = 0;
+  int index = this->index;
 
   if(ac > 1 && fts_is_number(at + 1))
-    index = fts_get_number_int(at + 1);
-
-  if(index < 0)
-    index = 0;
+    {
+      index = fts_get_number_int(at + 1);
+      
+      if(index < 0)
+	index = 0;
+    }
 
   if(ac > 0 && fts_is_a(at, bus_type))
     {
@@ -119,7 +119,7 @@ throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
       /*fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);*/
       access_set_channel(this, bus, index);
-      /*fts_channel_add_origin(bus_get_channel(bus, index), o);*/
+      /*fts_channel_add_origin(bus_get_channel(this->bus, this->index), o);*/
     }
   else if(winlet > 0)
     fts_object_signal_runtime_error(o, "bad value at inlet %d (bus required)", winlet);
@@ -172,13 +172,15 @@ static void
 catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
-  int index = 0;
+  int index = this->index;
 
   if(ac > 1 && fts_is_number(at + 1))
-    index = fts_get_number_int(at + 1);
-
-  if(index < 0)
-    index = 0;
+    {
+      index = fts_get_number_int(at + 1);
+      
+      if(index < 0)
+	index = 0;
+    }
 
   if(ac > 0 && fts_is_a(at, bus_type))
     {
@@ -188,12 +190,30 @@ catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	fts_channel_remove_target(bus_get_channel(this->bus, this->index), o);
 
       access_set_channel(this, bus, index);
-      fts_channel_add_target(bus_get_channel(bus, index), o);
+      fts_channel_add_target(bus_get_channel(this->bus, this->index), o);
     }
   else if(winlet > 0)
     fts_object_signal_runtime_error(o, "bad value at inlet %d (bus required)", winlet);
   else
     fts_object_set_error(o, "bus required");
+}
+
+static void
+catch_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  access_t *this = (access_t *)o;
+
+  if(this->bus)
+    {
+      int index = fts_get_number_int(at);
+
+      if(index < 0)
+	index = 0;
+  
+      fts_channel_remove_target(bus_get_channel(this->bus, this->index), o);
+      this->index = index;
+      fts_channel_add_target(bus_get_channel(this->bus, this->index), o);
+    }
 }
 
 static void
@@ -211,7 +231,7 @@ catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 
   if(this->bus != NULL)
     {
-      fts_channel_remove_origin(bus_get_channel(this->bus, this->index), o);
+      fts_channel_remove_target(bus_get_channel(this->bus, this->index), o);
       fts_object_release((fts_object_t *)this->bus);
     }
 }
@@ -223,7 +243,7 @@ catch_instantiate(fts_class_t *cl)
   
   fts_class_inlet_varargs(cl, 0, catch_set_channel);
   fts_class_inlet(cl, 0, bus_type, catch_set_channel);
-  fts_class_inlet_number(cl, 0, access_set_index);
+  fts_class_inlet_number(cl, 0, catch_set_index);
 
   fts_class_outlet_anything(cl, 0);
 }

@@ -23,6 +23,8 @@
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/label.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/variable.h>
 
 /***********************************************************************
  *
@@ -156,7 +158,18 @@ label_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fts_label_t *this = (fts_label_t *) o;
 
-  fts_label_send(this, s, ac, at);
+  fts_label_send(this, NULL, ac, at);
+}
+
+static void
+label_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_label_t *this = (fts_label_t *) o;
+
+  if(ac > 0 && fts_is_symbol(at))
+    fts_label_send(this, fts_get_symbol(at), ac - 1, at + 1);
+  else
+    fts_object_signal_runtime_error(o, "invalid message selector");
 }
 
 static void
@@ -183,23 +196,23 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_label_t *this = (fts_label_t *) o;
   fts_patcher_t *scope = (fts_patcher_t *)fts_get_object(at);
   fts_symbol_t name = fts_name_get_unused(scope, fts_get_symbol(at + 1));
+  fts_definition_t *def = fts_definition_get(scope, name);
   fts_atom_t a;
 
   fts_channel_init(&this->channel);
 
+  /* set definition to this label object */
   fts_set_object(&a, o);
-  fts_name_set_value(scope, name, &a);
+  fts_definition_set_value(def, &a);
 
-  this->scope = scope;
-  this->name = name;
+  /* store definition in object */
+  fts_object_set_definition(o, def);
 }
 
 static void
 label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *) o;
-
-  fts_name_reset(this->scope, this->name);
 }
 
 static void
@@ -220,9 +233,12 @@ label_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_propagate_input, label_propagate_input);
   fts_class_message_varargs(cl, fts_s_find_friends, label_find_friends);
 
-  fts_class_message_varargs(cl, fts_s_input, label_send);
+  fts_class_message_varargs(cl, fts_s_send, label_send);
+  fts_class_message_varargs(cl, fts_new_symbol("mess"), label_mess);
   fts_class_message_varargs(cl, fts_s_add_listener, label_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, label_remove_listener);
+
+  fts_class_set_default_handler(cl, label_send);
 }
 
 void 
