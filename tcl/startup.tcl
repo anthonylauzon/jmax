@@ -38,7 +38,6 @@ if {[systemProperty "jmaxMode"] != ""} then { set jmaxMode [systemProperty "jmax
 if {[systemProperty "jmaxServerName"] != ""} then { set jmaxServerName [systemProperty "jmaxServerName"]}
 
 # set audio and MIDI configuration to commandline argument
-if {[systemProperty "jmaxProfiling"] != ""} then { set jmaxProfiling [systemProperty "jmaxProfiling"]}
 if {[systemProperty "jmaxAudioBuffer"] != ""} then { set jmaxAudioBuffer [systemProperty "jmaxAudioBuffer"]}
 if {[systemProperty "jmaxSampleRate"] != ""} then { set jmaxSampleRate [systemProperty "jmaxSampleRate"]}
 if {[systemProperty "jmaxMidiPort"] != ""} then { set jmaxMidiPort [systemProperty "jmaxMidiPort"]}
@@ -79,7 +78,6 @@ if [catch {set foo $jmaxMidiPort}] then { set jmaxMidiPort $jmaxDefaultMidiPort}
 if [catch {set foo $jmaxPkgPath}] then { set jmaxPkgPath $jmaxDefaultPkgPath}
 
 # hard coded defaults
-if [catch {set foo $jmaxProfiling}] then { set jmaxProfiling "off"}
 if [catch {set foo $jmaxSplashScreen}] then { set jmaxSplashScreen "show"}
 
 
@@ -111,7 +109,7 @@ sourceFile $jmaxRootDir/config/packages.tcl
 
 # loading installation default audio configuration
 # if profiling is off
-if {$jmaxProfiling == "on"} {
+if {[systemProperty "profile"] == "true"} {
   puts "running with pseudo audio device for profiling"
   ucs open device out~ prof_out as prof_dac channels 2 
   ucs default out~ prof_out
