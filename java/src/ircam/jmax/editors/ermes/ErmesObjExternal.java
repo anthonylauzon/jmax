@@ -171,9 +171,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 
-  public void RestartEditing() {
+  public void restartEditing() {
     isError = 0; // to get the edited object green
-    super.RestartEditing();
+    super.restartEditing();
   }
   
 

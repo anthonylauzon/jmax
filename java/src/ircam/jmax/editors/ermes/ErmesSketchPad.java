@@ -968,7 +968,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 	repaint(); // ??
 
 	if (aObject instanceof ErmesObjEditable)
-	  ((ErmesObjEditable)aObject).RestartEditing();
+	  ((ErmesObjEditable)aObject).startEditing();
       }
     catch (FtsException ftse)
       {
@@ -1204,22 +1204,22 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       else {//se non ha mosso
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
-	    /*for problems during Inits, ErmesObjComment is not, for now,
-	      a subclass of ErmesObjEditableObject as it should, but a direct
-	      child of ErmesObject.
-	      The situation is going to change soon (today is 03/05/98)*/
+
 	    if(itsCurrentObject instanceof ErmesObjEditableObject ||
-	       itsCurrentObject instanceof ErmesObjComment){
-	      if(clickHappenedOnAnAlreadySelected) {
-		deselectAll(true);
-		currentSelection.addObject(itsCurrentObject);
-		if (itsCurrentObject instanceof ErmesObjEditableObject) {
-		  ((ErmesObjEditableObject)itsCurrentObject).backupText();
-		  ((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
-		}
-		else ((ErmesObjComment)itsCurrentObject).RestartEditing();
+	       itsCurrentObject instanceof ErmesObjComment)
+	      {
+		if(clickHappenedOnAnAlreadySelected) 
+		  {
+		    deselectAll(true);
+		    currentSelection.addObject(itsCurrentObject);
+		    if (itsCurrentObject instanceof ErmesObjEditableObject) 
+		      {
+			((ErmesObjEditableObject)itsCurrentObject).backupText();
+			((ErmesObjEditableObject)itsCurrentObject).restartEditing();
+		      }
+		    else ((ErmesObjComment)itsCurrentObject).restartEditing();
+		  }
 	      }
-	    }
 	  }
 	}
       }

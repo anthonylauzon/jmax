@@ -98,7 +98,12 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     itsArgs = itsBackupText.toString();
   }
 
-  public void RestartEditing(){
+  /**
+   * actually starts the edit operation.
+   * The inset parameter specify the relative position of the editfield
+   */
+  private void doEdit(int editFieldInset)
+  {
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
     
     itsSketchPad.GetEditField().setFont(getFont());
@@ -107,9 +112,9 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight()+20);
+      itsSketchPad.GetEditField().setBounds(getItsX()+editFieldInset/2, getItsY()+1, getItsWidth()-editFieldInset, itsFontMetrics.getHeight()+20);
     else
-      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-8, itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds(getItsX()+editFieldInset/2, getItsY()+1, getItsWidth()-editFieldInset, itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
 
     itsMaxString = "";
@@ -118,6 +123,16 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     itsSketchPad.GetEditField().setVisible(true);
     itsSketchPad.GetEditField().requestFocus();
     itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
+  }
+
+  public void restartEditing()
+  {
+    doEdit(0);
+  }
+
+  public void startEditing()
+  {
+    doEdit(6);
   }
 
   public boolean MouseUp(MouseEvent evt,int x,int y){

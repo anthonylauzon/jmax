@@ -76,7 +76,12 @@ class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
     itsSketchPad.ClickOnObject(this, evt, x, y);
   }
   
-  public void RestartEditing(){
+  public void startEditing()
+  {
+    restartEditing();
+  }
+
+  public void restartEditing(){
     if (itsSketchPad.GetTextArea() != null) itsSketchPad.GetTextArea().setEditable(true);
     itsSketchPad.GetTextArea().setFont(getFont());
 
@@ -88,7 +93,7 @@ class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
     itsSketchPad.GetTextArea().itsOwner = this;
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetTextArea().setBounds(getItsX(), getItsY(), getItsWidth()+10, itsFontMetrics.getHeight()*5);
+      itsSketchPad.GetTextArea().setBounds(getItsX(), getItsY(), getItsWidth()+20, itsFontMetrics.getHeight()*5);
     else
       itsSketchPad.GetTextArea().setBounds(getItsX(), getItsY(), getItsWidth()+10,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
 
