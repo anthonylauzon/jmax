@@ -111,7 +111,24 @@ struct fts_timebase
 
 #define fts_timebase_get_master(t) ((t)->master)
 
+/**
+ * Initialize a timebase
+ *
+ * @fn void fts_timebase_init(fts_timebase_t *timebase)
+ * @param timebase the timebase to initialize
+ *
+ * @ingroup time
+ */
 FTS_API void fts_timebase_init(fts_timebase_t *timebase);
+
+/**
+ * Reset a timebase
+ *
+ * @fn void fts_timebase_reset(fts_timebase_t *timebase)
+ * @param timebases the timebase to reset
+ *
+ *@ingroup time 
+ */
 FTS_API void fts_timebase_reset(fts_timebase_t *timebase);
 
 /***************************************************
@@ -120,7 +137,34 @@ FTS_API void fts_timebase_reset(fts_timebase_t *timebase);
  *
  */
 
-FTS_API void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, const fts_atom_t *a, double delay);
+/**
+ * Add a callback in a given timebase
+ *
+ * The call will be:
+ * @code
+ method(object, 0, 0, 1, a)
+ * @endcode
+ * 
+ * @fn void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, const fts_atom_t *a, double delay)
+ * @param timebase the timebase to use
+ * @param object the object
+ * @param method the method to call 
+ * @param a the argument of the method (only 1 argument)
+ * @param delay delay in milliseconds
+ *
+ * @ingroup time
+ */
+FTS_API void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, const fts_atom_t *a, double delay);
+
+/**
+ * Remove an object from a timebase
+ *
+ * @fn void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object)
+ * @param timebase the timebase
+ * @param the object
+ *
+ * @ingroup time
+ */
 FTS_API void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object);
 FTS_API void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
 
@@ -142,6 +186,14 @@ FTS_API void fts_timebase_advance_slaves(fts_timebase_t *timebase);
  *
  */
 
+/**
+ * Advance the given timebase
+ *
+ * @fn void fts_timebase_advance(fts_timebase_t *timebase)
+ * @param timebase
+ *
+ * @ingroup time
+ */
 FTS_API void fts_timebase_advance(fts_timebase_t *timebase);
 FTS_API void fts_timebase_locate(fts_timebase_t *timebase);
 
@@ -158,7 +210,16 @@ FTS_API void fts_timebase_locate(fts_timebase_t *timebase);
  *
  * @ingroup time
  */
+
 FTS_API double fts_get_time(void);
+/**
+ * Get main timebase 
+ *
+ * @fn fts_timebase_t *fts_get_timebase(void)
+ * @return main timebase
+ *
+ * @ingroup time
+ */
 FTS_API fts_timebase_t *fts_get_timebase(void);
 
 /** 
@@ -169,7 +230,7 @@ FTS_API fts_timebase_t *fts_get_timebase(void);
 /**
  * Get system time in milliseconds
  *
- * @fn unsigned int fts_systime(void)
+ * @fn double fts_systime(void)
  * @return system time in msecs
  *
  * @ingroup time
