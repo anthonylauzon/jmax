@@ -40,7 +40,7 @@ public:
 
 
 
-main( int ac, char **av)
+int main( int ac, char **av)
 {
   FtsSocketConnection *connection;
 
@@ -50,11 +50,16 @@ main( int ac, char **av)
     }
   catch( FtsClientException e)
     {
-      cerr << e << endl;
+	std::cerr << e << std::endl;
     }
 
   FtsObject* rootPatcher = new FtsObject(connection, NULL, 0);
+  connection->putObject(0, rootPatcher);
+  
+//   FtsObject* clientPatcher = new FtsObject(connection, rootPatcher, 1);
+//   connection->putObject(1, clientPatcher);
 
+//   FtsObject* console_stream = new FtsObject(connection, clientPatcher, "console_stream");
   FtsObject* console_stream = new FtsObject(connection, rootPatcher, "console_stream");
 
   ConsoleStreamHandler* handler = new ConsoleStreamHandler();
@@ -63,7 +68,7 @@ main( int ac, char **av)
   
   console_stream->send("set_default");
   int c;
-  cin >> c;
+  std::cin >> c;
 
   delete handler;
   delete console_stream;
@@ -72,4 +77,6 @@ main( int ac, char **av)
 
 
   std::exit( 0);
+
+  return 0;
 }
