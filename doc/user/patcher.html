@@ -40,12 +40,7 @@
 
 <!--Missing:-->
 
-<!--  The popmenu menu on the background to add a new object, -->
-<!--  and the tcl commands to customize it. -->
-
 <!--  Object ordering (needed ?): selecting an object put in the foreground. -->
-
-<!--  Ctrl-Z to see the object error message (should be change this ?). -->
 
 <!--  Selectin and Shift-Selecting connections. -->
 
@@ -73,13 +68,17 @@
   <LI><A HREF="#toolbar">Toolbar</A>
   <LI><A HREF="#adding">Adding an Object</A>
   <LI><A HREF="#connecting">Connecting Objects</A>
-  <LI><A HREF="#selecting">Selecting an Object</A>
+  <LI><A HREF="#selecting">Selecting Objects</A>
+  <LI><A HREF="#selectingConnections">Selecting Connections</A>
   <LI><A HREF="#moving">Moving an Object</A>
   <LI><A HREF="#resizing">Resizing an Object</A>
   <LI><A HREF="#copy_cut_paste">Copy, Cut & Paste</A>
   <LI><A HREF="#editing">Editing an Object</A>
   <LI><A HREF="#obtaining help">Obtaining help</A>
+  <LI><A HREF="#errors">Error objects</A>
   <LI><A HREF="#patcher">The Patcher Object</A>
+  <LI><A HREF="#comments">Comments</A>
+  <LI><A HREF="#buttons">Buttons</A>
   <LI><A HREF="#editor">Opening an Editor</A>
   <LI><A HREF="#key_bindings">Key Bindings</A>
   <LI><A HREF="#changes">Specific Differences to ISPW Max</A>
@@ -213,12 +212,17 @@ interpreted the following way:
 <li> CLICK adds the object at the chosen location and returns the patch editor to normal mode
 <li> SHIFT-CLICK adds the object and leaves the patch editor in "Adding ..." mode, allowing
 to add a new instance of the same object without reselecting the toolbar. 
+<li> RIGHT-CLICK will exit the "Adding ..." mode without adding any object.
 </ul>
 
 <p>
-When the patch editor is in "Adding ..." mode, right clicking will terminate this mode
-and return the patch editor to normal mode without adding an object.
-
+An other way to start to add objects is to use the add pop-up menu,
+that you can get by right-clicking on the editor background; the
+pop-up menu by default include a sub-menu correspoding to the toolbar,
+but other sub-menus can be added by <code>tcl</code> commands, either
+in your <code>.jmaxrc</code> file or in yours project files.  See the
+documentation of <A HREF="projects.html#commands"> the <code>tcl</code>
+commands</A>.
 
 <P>
 <A NAME="connecting">
@@ -261,7 +265,14 @@ in text.
 Text editing can be terminated either by clicking outside the object, or by
 typing the "End" key.
 
-
+<p>
+Note that an object or template can be shown with an graphic icon
+instead of text; in this case, clicking on the icon will show the text
+to be edited; icons can be associated to objects by means of the
+<code>declareIcon</code> <code>tcl</code> command, either in your
+<code>.jmaxrc</code> file or in yours project files.  See the
+documentation of <A HREF="projects.html#commands"> the
+<code>tcl</code> commands</A>.
 <P>
 <A NAME="moving">
 <HR>
@@ -281,13 +292,26 @@ Area selection is obtained by mouse drag outside objects.
 
 <P>
 An object can be selected either by area selection or by clicking in its frame (outside
-text area and in/outlets sensibility area).
+text area and in/outlets sensibility area); clicking on the object frame will also
+bring the object in the foreground.
 
 <p>
 Selection can be extended or reduced by SHIFT modifier: SHIFT-selecting (either by click or
 area select) an already selected object deselects
 it, SHIFT-selecting a not selected object selects it.
+  <LI><A HREF="#selectingConnections">Selecting a Connection</A>
 
+<P>
+<A NAME="selectingConnections">
+<HR>
+<h2>Selecting Connections</h2>
+
+<P>
+Normally, if the source and destination of a connection are selected, the
+connection is automatically selected.
+<P>
+You can select a single connecting by clicking on it, and you can add or remove a single
+connection to the selection by SHIFT-clicking on it.
 
 <P>
 <A NAME="resizing">
@@ -330,6 +354,18 @@ CTRL-H (the "Help ... on object" menu shortcut).
 The help menu gives also access to summary patches, that present an overview
 of the objects offered by a package.
 
+<p>
+<a name="errors">
+<hr>
+<h2>Error objects</h2></a>
+
+<p> 
+The patcher error signal errors in objects by painting them in
+a different color (currently, red); typing <code>Ctrl-Z</code> will
+give, for each error object, a short explanation message; if the
+selection is active, the message will be shown only for the selected error
+objects.
+<p>
 <P>
 <A NAME="patcher">
 <HR>
@@ -375,9 +411,76 @@ ISPW Max)
 <P>
 Please refer to the <A HREF="language.html">language</A> section of this 
 documentation for further information about patchers, variables and templates.
+<P>
 
+<A NAME="comments">
+<HR>
+<h2>Comments</h2>
 
 <P>
+Comment usually show simple unformatted text.  Comments can also show
+an icon (without any size limits); to do that, the content of the
+comment must be a single word, starting with the <code>%</code>
+character, naming an icon.
+<P>
+<i>j</i>Max predefine a number of usefull icons:
+
+<P>
+<CENTER>
+<TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0></TD> 
+    <TD><b>%jmax</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/new.gif" BORDER=0></TD>
+    <TD><b>%new</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/hot.gif" BORDER=0></TD>
+    <TD><b>%hot</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/stop.gif" BORDER=0></TD>
+    <TD><b>%stop</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/at_work.gif" BORDER=0></TD>
+    <TD><b>%at_work</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/question.gif" BORDER=0> </TD>
+    <TD><b>%question</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/warning.gif" BORDER=0> </TD>
+    <TD><b>%warning</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/info.gif" BORDER=0></TD>
+    <TD><b>%info</b></TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP><IMG SRC="../../images/linux.gif" BORDER=0></TD> 
+    <TD><b>%linux</b></TD>
+  </TR>
+</TABLE>
+</CENTER>
+<p>
+You can define named icons using the <code>declareIcon</code> 
+<code>tcl</code> command, either in your <code>.jmaxrc</code> file or
+in yours project files.  See the documentation of <A
+HREF="projects.html#commands"> the <code>tcl</code> commands</A>.
+<P>
+<A NAME="buttons">
+<HR>
+<h2>Buttons</h2>
+
+<P>
+You can change the color used to flash a button, using a pop-up menu
+that you can get by right clicking on the button.
+<P>
+
 <A NAME="editor">
 <HR>
 <h2>Opening an editor</h2>
@@ -468,6 +571,10 @@ The following key bindings are currently available:
 <TR>
   <TD> CTRL-p </TD>
   <TD> print current patcher </TD>
+</TR>
+<TR>
+  <TD> CTRL-z </TD>
+  <TD> show error messages </TD>
 </TR>
 <TR>
   <TD> CTRL-q </TD>
