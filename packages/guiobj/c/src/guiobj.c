@@ -48,6 +48,7 @@ extern void slider_config(void);
 extern void toggle_config(void);
 extern void vecdisplay_config(void);
 extern void matdisplay_config(void);
+extern void xypad_config(void);
 
 void
 guiobj_config(void)
@@ -74,5 +75,6 @@ guiobj_config(void)
   toggle_config();
   vecdisplay_config(); 
   matdisplay_config(); 
+  xypad_config(); 
 }
 

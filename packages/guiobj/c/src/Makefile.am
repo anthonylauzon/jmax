@@ -22,9 +22,9 @@ runtimeerrors.c \
 scope.c \
 slider.c \
 toggle.c \
-vecdisplay.c\
-matdisplay.c
-
+vecdisplay.c \
+matdisplay.c \
+xypad.c
 
 INCLUDES=-I$(top_srcdir)/packages/data/c/src
 

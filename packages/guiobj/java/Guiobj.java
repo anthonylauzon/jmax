@@ -138,6 +138,12 @@ public class Guiobj implements JMaxPackage {
 	  return new Monitor( new FtsMonitorObject( server, parent, objId, className, args, offset, length));
 	}
       };
+    JMaxObjectCreator xyPadCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new XYPad( new FtsXYPadObject( server, parent, objId, className, args, offset, length));
+	}
+      };
 
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", this);
@@ -149,6 +155,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "button", buttonCreator, "/icons/button.gif", "/icons/button_cursor.gif", this);
     JMaxClassMap.put( "toggle", toggleCreator, "/icons/toggle.gif", "/icons/toggle_cursor.gif", this);
     JMaxClassMap.put( "slider", sliderCreator, "/icons/slider.gif", "/icons/slider_cursor.gif", this);
+    JMaxClassMap.put( "xypad", xyPadCreator, "/icons/xypad.gif", "/icons/xypad_cursor.gif", this);
     JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", this);
     JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", this);
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
