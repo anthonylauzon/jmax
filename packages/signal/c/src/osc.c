@@ -61,11 +61,18 @@ osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   osc_t *this = (osc_t *)o;
   fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  int size = fvec_get_size(fvec);
+  
+  if(size < OSC_TABLE_SIZE + 1)
+  {
+    int i;
 
-  /* check float vector size */
-  if(fvec_get_size(fvec) < OSC_TABLE_SIZE + 1)
     fvec_set_size(fvec, OSC_TABLE_SIZE + 1);
 
+    for(i=size; i<OSC_TABLE_SIZE + 1; i++)
+      fvec_set_element(fvec, i, 0.0);
+  }
+  
   osc_data_set_fvec(this->data, fvec);
 }
 
@@ -313,8 +320,7 @@ phi_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("phase"), phi_set_phase);
   fts_class_message_varargs(cl, fts_new_symbol("freq"), phi_set_freq);
   
-  fts_class_inlet_int(cl, 0, phi_set_freq);
-  fts_class_inlet_float(cl, 0, phi_set_freq);
+  fts_class_inlet_number(cl, 0, phi_set_freq);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
