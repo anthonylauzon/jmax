@@ -252,7 +252,9 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     removeComponentListener( this);
     removeWindowListener(this);
 
-    ((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(null);
+    if(itsSketchPad.getFtsPatcher() instanceof FtsPatcherObject)
+	((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(null);
+
     itsSketchPad.cleanAll();
 
     itsSketchPad = null;
