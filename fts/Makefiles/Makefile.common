@@ -6,7 +6,7 @@
 #                              manager@ircam.fr
 #
 #
-# $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:49:55 $
+# $Revision: 1.2 $ IRCAM $Date: 1997/12/11 16:43:18 $
 #
 # Eric Viara for Ircam March 1995
 #
@@ -146,7 +146,6 @@ FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libDsp.a    \
 	   $(LIBDIR)/libFtl.a    \
 	   $(LIBDIR)/libVecLib.a \
-	   $(LIBDIR)/libPortableVecLib.a \
 	   $(LIBDIR)/libUtils.a  \
 	   $(LIBDIR)/libMess.a   \
 	   $(LIBDIR)/libSys.a

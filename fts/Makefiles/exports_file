@@ -41,6 +41,7 @@ fts_s_disconnect_inlet
 fts_s_disconnect_outlet
 fts_s_send_update
 fts_s_value
+fts_s_name
 fts_s_ninlets
 fts_s_noutlets
 fts_s_bang

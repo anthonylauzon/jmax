@@ -48,9 +48,15 @@ $(LIBDIR)/%.so : $(LIBDIR)/%.a
 endif
 
 ifeq ($(VENDOR),gnu)
+ifneq ($(ARCH),rhapsody)
 
 $(LIBDIR)/%.so : $(LIBDIR)/%.a
 	ld $(FTS_SOFLAGS) -export-dynamic -shared -o $@ $(LD_ALL_FLAG) $<  $(LD_NONE_FLAG) $(SOLIBS) -lc  $(MORESOLIBS)
+else
+$(LIBDIR)/%.so : $(LIBDIR)/%.a
+	echo "Rhapsody does not support dynamic linking..."
+	touch $@
+endif
 endif
 
 

@@ -9,7 +9,7 @@ CC := gcc
 
 ARCH_CFLAGS := -Wall -DGNU 
 ARCH_LDFLAGS :=
-
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 ARCH_OPT_CFLAGS := -O3
 ARCH_OPT_LDFLAGS := 
