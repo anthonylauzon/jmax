@@ -37,7 +37,7 @@ import ircam.jmax.editors.console.actions.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
-/** Implement the patcher editor File Menu */
+/** Implement the console editor File Menu */
 
 public class FileMenu extends DefaultFileMenu
 {
