@@ -26,11 +26,6 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 
 	getContentPane().add(tabPanel);
 	
-	getContentPane().validate();
-	
-	validate();
-	pack();
-
 	track.getTrackDataModel().addListener(this);
 
 	setLocation(200, 200);
@@ -39,6 +34,10 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	if(dim.height+30>700) dim.height = 700;
 	else dim.height += 30;
 	setSize(dim);
+
+	getContentPane().validate();
+	validate();
+	pack();
     }
 
     /**
@@ -51,7 +50,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
+	//pack();
     }
       
     public void objectsAdded(int maxTime) 
@@ -59,7 +58,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
+	//pack();
     }
     
     public void objectDeleted(Object whichObject, int index) 
@@ -67,7 +66,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
+	//pack();
     }
 
     public void trackCleared() 
@@ -75,7 +74,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	pack();
+	//pack();
     }
     
     public void objectMoved(Object whichObject, int oldIndex, int newIndex){}

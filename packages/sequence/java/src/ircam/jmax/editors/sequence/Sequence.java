@@ -20,7 +20,7 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Maurizio De Cecco, Francois Dechelle, Riccardo Borghesi, Enzo Maggi, Norbert Schnell.
 // 
 
 package ircam.jmax.editors.sequence;
