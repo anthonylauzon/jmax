@@ -66,8 +66,9 @@ public class PartitionBackground implements Layer, ImageObserver{
   private void drawHorizontalGrid(Graphics g)
   {
     PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-    int maxPitch = pa.getY(((Integer)gc.getTrack().getProperty("maximumPitch")).intValue());
-    int minPitch = pa.getY(((Integer)gc.getTrack().getProperty("minimumPitch")).intValue());
+    int maxPitch = pa.getY(pa.getMaxPitch());
+    int minPitch = pa.getY(pa.getMinPitch());
+    int delta = pa.getVerticalTransp();
 
     Dimension d = gc.getGraphicDestination().getSize();
 
@@ -75,8 +76,8 @@ public class PartitionBackground implements Layer, ImageObserver{
     g.fillRect(0, 0, d.width, d.height);
 
     g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-    g.fillRect(0, 0, d.width, maxPitch);
-    g.fillRect(0, minPitch, d.width, d.height-maxPitch);
+    g.fillRect(0, 0 -delta, d.width, maxPitch);
+    g.fillRect(0, minPitch -delta, d.width, d.height-maxPitch);
     
     int positionY = SC_BOTTOM;
     g.setFont(gridSubdivisionFont);
@@ -87,33 +88,33 @@ public class PartitionBackground implements Layer, ImageObserver{
 	g.setColor(Color.black);
 	for (int i = 0; i < 5; i++)
 	  {
-	    positionY = SC_BOTTOM-(i+k*7)*step;
+	    positionY = SC_BOTTOM-(i+k*7)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-	g.drawImage(SequencePanel.faClefImage, KEYX+4, positionY-1, this);
+	g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);
 
 	g.setColor(horizontalGridLinesColor);
      
 	for (int j = 5; j < 7; j++)
 	  {
-	    positionY = SC_BOTTOM-(j+k*7)*step;
+	    positionY = SC_BOTTOM-(j+k*7)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
       }
     g.setColor(Color.black);
-    g.drawString("15", KEYEND-15, SC_BOTTOM-3);
-    g.drawString("8", KEYEND-14, SC_BOTTOM-step*7-3);    
+    g.drawString("15", KEYEND-15, SC_BOTTOM-3 -delta);
+    g.drawString("8", KEYEND-14, SC_BOTTOM-step*7-3 -delta);    
 
     for (int i = 14; i < 19; i++)
       {
-	positionY = SC_BOTTOM-(i*step);
+	positionY = SC_BOTTOM-(i*step) -delta;
 	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 	
-    g.drawImage(SequencePanel.faClefImage, KEYX+4, positionY-1, this);
+    g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);
 
     g.setColor(horizontalGridLinesColor);
-    positionY = SC_BOTTOM-(19*step);
+    positionY = SC_BOTTOM-(19*step) -delta;
     g.drawLine(KEYX, positionY, d.width, positionY);
     
     for(int k=0;k<2;k++)
@@ -121,17 +122,17 @@ public class PartitionBackground implements Layer, ImageObserver{
 	g.setColor(Color.black);
 	for (int i = 0; i < 5; i++)
 	  {
-	    positionY = SC_BOTTOM-(i+k*7+20)*step;
+	    positionY = SC_BOTTOM-(i+k*7+20)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
 	
-	g.drawImage(SequencePanel.violinClefImage, KEYX+4, positionY-7, this);
+	g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, positionY-7, this);
 
 	g.setColor(horizontalGridLinesColor);
      
 	for (int j = 5; j < 7; j++)
 	  {
-	    positionY = SC_BOTTOM-(j+k*7+20)*step;
+	    positionY = SC_BOTTOM-(j+k*7+20)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
       }
@@ -139,17 +140,17 @@ public class PartitionBackground implements Layer, ImageObserver{
     g.setColor(Color.black);
     for (int i = 0; i < 5; i++)
       {
-	positionY = SC_BOTTOM-(i+34)*step;
+	positionY = SC_BOTTOM-(i+34)*step -delta;
 	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 
-    g.drawImage(SequencePanel.violinClefImage, KEYX+4, SC_TOP-7, this);
+    g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, SC_TOP-7 -delta, this);
 
-    g.drawString("15", KEYEND-9, SC_TOP+2);
-    g.drawString("8", KEYEND-6, SC_TOP+step*7+2);    
+    g.drawString("15", KEYEND-9, SC_TOP+2 -delta);
+    g.drawString("8", KEYEND-6, SC_TOP+step*7+2 -delta);    
 
     // the vertical line at the end of keyboard
-    g.drawLine(KEYX, SC_TOP, KEYX, SC_BOTTOM);
+    g.drawLine(KEYX, SC_TOP-delta, KEYX, SC_BOTTOM-delta);
     g.setColor(Color.gray);
     g.drawLine(KEYEND, 0, KEYEND, d.height);
   }

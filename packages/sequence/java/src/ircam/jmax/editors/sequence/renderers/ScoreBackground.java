@@ -66,15 +66,17 @@ public class ScoreBackground implements Layer{
   private void drawHorizontalGrid(Graphics g)
   {
       PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-      Track track = gc.getTrack();
-
-      int max = ((Integer)track.getProperty("maximumPitch")).intValue();
-      int maxPitch = pa.getY(max);
-      int minPitch = pa.getY(((Integer)track.getProperty("minimumPitch")).intValue());
-
-      int delta;
-      if(max<127) delta = maxPitch-SC_TOP;
-      else delta = 0;
+      /*Track track = gc.getTrack();
+	int max = ((Integer)track.getProperty("maximumPitch")).intValue();
+	int maxPitch = pa.getY(max);
+	int minPitch = pa.getY(((Integer)track.getProperty("minimumPitch")).intValue());
+      
+	int delta;
+	if(max<127) delta = maxPitch-SC_TOP;
+	else delta = 0;*/
+      int maxPitch = pa.getY(pa.getMaxPitch());
+      int minPitch = pa.getY(pa.getMinPitch());
+      int delta = pa.getVerticalTransp();
 
       Dimension d = gc.getGraphicDestination().getSize();
 
@@ -143,11 +145,13 @@ public class ScoreBackground implements Layer{
   }
 
   static int currentPressedKey = -1;
-  static public void pressKey(int key, GraphicContext sgc)
+  static public void pressKey(int key, SequenceGraphicContext sgc)
   {
     if (key < 0 || key > 127) return;
     if (currentPressedKey != -1 && currentPressedKey != key) releaseKey(sgc);
-    int positionY = SC_BOTTOM-(key*KEYHEIGHT)-1;
+    PartitionAdapter pa = (PartitionAdapter)(sgc.getAdapter());
+    int positionY = SC_BOTTOM-(key*KEYHEIGHT)-1-pa.getVerticalTransp();//@@@@@@@@@@@@@@@@@@@@@@
+
     Graphics g = sgc.getGraphicDestination().getGraphics();
     g.setColor(Color.white);
     g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
@@ -155,10 +159,12 @@ public class ScoreBackground implements Layer{
     currentPressedKey = key;
   }
 
-  static public void releaseKey(GraphicContext sgc)
+  static public void releaseKey(SequenceGraphicContext sgc)
   {
     if (currentPressedKey == -1) return;
-    int positionY = SC_BOTTOM-(currentPressedKey*KEYHEIGHT)-1;
+    PartitionAdapter pa = (PartitionAdapter)(sgc.getAdapter());
+    int positionY = SC_BOTTOM-(currentPressedKey*KEYHEIGHT)-1-pa.getVerticalTransp();
+
     Graphics g = sgc.getGraphicDestination().getGraphics();
     if (isAlteration(currentPressedKey))
       g.setColor(Color.darkGray);

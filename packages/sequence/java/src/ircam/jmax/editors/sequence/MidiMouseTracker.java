@@ -45,14 +45,25 @@ public class MidiMouseTracker extends MouseTracker {
   {  
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
-    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-			    ListPanel.numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
-			    ", "+
-			    (egc.getAdapter().getInvY(e.getY())));
+    if(!(egc.getAdapter() instanceof MonoDimensionalAdapter))//only for midi editor
+	{
+	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
+				    ListPanel.numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
+				    ", "+
+				    (egc.getAdapter().getInvY(e.getY())));
     
-    //press keys in the pianoroll representation
-    if(((PartitionAdapter)egc.getAdapter()).getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)
-	if (egc.getTrack().getTrackDataModel().containsType(AmbitusValue.info))
-	    ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
+	    //press keys in the pianoroll representation
+	    
+	    if(((PartitionAdapter)egc.getAdapter()).getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)
+		if (egc.getTrack().getTrackDataModel().containsType(AmbitusValue.info))
+		    ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
+	}
+    else
+	egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
+				    ListPanel.numberFormat.format(egc.getAdapter().getInvX(e.getX())));
   }
 }
+
+
+
+

@@ -267,7 +267,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    // and make the keyboard in the MidiTrack a listener of such movements.
 	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).
 	    if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
-	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), gc);
+	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
 	  }
       }
     

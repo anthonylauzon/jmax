@@ -27,15 +27,16 @@ package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
-
 import ircam.jmax.toolkit.*;
+
+import java.beans.*;
 
 /**
  * the standard, partition-like adapter for a TrackEvent
  * in the Sequence database.
  * The x-coordinates corresponds to time, y and label to pitch, lenght to duration.
  */
-public class PartitionAdapter extends Adapter {
+public class PartitionAdapter extends Adapter implements PropertyChangeListener{
   
   /**
    * constructor.
@@ -117,15 +118,15 @@ public class PartitionAdapter extends Adapter {
 	if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
 	    {
 		if (geometry.getYInvertion()) temp = -temp;
-		return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+		temp = (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
 	    }
 	else//NMS_VIEW
 	    {
 		q = temp/12;
 		r = getRestFromIntervall(temp - q*12);
 		temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
-		return temp;
 	    }
+	return temp-getVerticalTransp();//@@@@@@@@@@@@@@@@@@@@@@@@@
     }
     /**
      * it returns the Y graphic value of the event from the y logic value,
@@ -139,15 +140,15 @@ public class PartitionAdapter extends Adapter {
 	if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
 	    {
 		if (geometry.getYInvertion()) temp = -temp;
-		return (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
+		temp = (int) ((temp+geometry.getYTransposition())*geometry.getYZoom());  
 	    }
 	else//NMS_VIEW
 	    {
 		q = temp/12;
 		r = getRestFromIntervall(temp - q*12);
 		temp = PartitionBackground.SC_BOTTOM-9-(q*7+r)*4 - 3;
-		return temp;
 	    }
+	return temp/*-getVerticalTransp()*/;//@@@@@@@@@@@@@@@@@@@@@@@@@
     }
 
 
@@ -158,6 +159,8 @@ public class PartitionAdapter extends Adapter {
   public int getInvY(int y) 
   {
     int temp , rest, q, r;
+
+    y = y+getVerticalTransp();//@@@@@@@@@@@@@@
 
     if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
     {
@@ -174,24 +177,8 @@ public class PartitionAdapter extends Adapter {
 	temp = q*12 + getIntervallFromRest(r, rest);
     }
     
-    int maxRange, minRange;
-
-    if(gc !=null)
-	{
-	    maxRange = ((Integer)gc.getTrack().getProperty("maximumPitch")).intValue();
-	    minRange = ((Integer)gc.getTrack().getProperty("minimumPitch")).intValue();
-	}
-    else 
-	{
-	    maxRange = 127;
-	    minRange = 0;
-	}
-
-    if(temp<minRange) temp = minRange;
-    else if(temp>maxRange) temp = maxRange;
-
-    /*if(temp<0) temp = 0;
-      else if(temp>127) temp = 127;*/
+    if(temp<minPitch) temp = minPitch;
+    else if(temp>maxPitch) temp = maxPitch;
 
     return temp;
   }
@@ -366,17 +353,47 @@ public class PartitionAdapter extends Adapter {
 	return viewMode;
     }
 
-    public int getRangeHeight(Track track)
+    public int getRangeHeight()
     {
-	int max = getY(((Integer)track.getProperty("maximumPitch")).intValue());
-	int min = getY(((Integer)track.getProperty("minimumPitch")).intValue());
-	
-	return (min-max + 2*ScoreBackground.SC_TOP);
+	return (getY(minPitch)-getY(maxPitch) + 2*ScoreBackground.SC_TOP);
+    }
+
+    public int getVerticalTransp()
+    {
+	int delta;
+	int max = getY(maxPitch);
+	if(maxPitch<127) delta = max-ScoreBackground.SC_TOP;
+	else delta = 0;
+
+	return delta;
+    }
+
+    public int getMaxPitch()
+    {
+	return maxPitch;
+    }
+    public int getMinPitch()
+    {
+	return minPitch;
+    }
+
+    ////////////////// PropertyChangeListener interface
+    public void propertyChange(PropertyChangeEvent e)
+    {
+	if(e.getPropertyName().equals("maximumPitch"))
+	    maxPitch = ((Integer)e.getNewValue()).intValue();
+	else if(e.getPropertyName().equals("minimumPitch"))
+	    minPitch = ((Integer)e.getNewValue()).intValue();
+	else 
+	    if(e.getPropertyName().equals("viewMode"))
+		setViewMode(((Integer)e.getNewValue()).intValue());
     }
 
     //------------- Fields
     public static final int NOTE_DEFAULT_HEIGTH = 3;
     int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+    int maxPitch = 127;
+    int minPitch = 0;
     boolean displayLabels = true;
 
     public static final int ALTERATION_DIESIS = 1;

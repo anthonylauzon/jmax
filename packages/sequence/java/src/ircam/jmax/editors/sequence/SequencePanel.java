@@ -75,9 +75,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     static public Color violetColor = new Color(102,102,153);
     static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
-    static public Image violinClefImage;
-    static public Image faClefImage;
-    static String path;
 
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
@@ -96,19 +93,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     utilityPartitionAdapter = new PartitionAdapter(geometry, null);
 
-    //Create the backgrounds images????
-    try{
-      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+File.separator+"images"+File.separator;
-    }
-    catch(FileNotFoundException e){
-	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-    }
-
-    violinClefImage = Toolkit.getDefaultToolkit().getImage(path+"violinClef.gif");
-    faClefImage = Toolkit.getDefaultToolkit().getImage(path+"faClef.gif");
-    Toolkit.getDefaultToolkit().prepareImage(violinClefImage, /*25, 54*/20, 51, this);
-    Toolkit.getDefaultToolkit().prepareImage(faClefImage, 23, 30, this);
-   
     //------------------------------------------------
     // Create the ruler
     ruler = new Ruler();
@@ -477,14 +461,12 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	if(eventTime<startTime)
 	    {
-		System.err.println("troppo piccino ");
 		itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
 		return false;//going to left
 	    }
 	else
 	    {
 		if(eventTime>endTime){
-		    System.err.println("troppo grande ");
 		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()+scrollingDelta);
 		}
 		return true;//going to rigth

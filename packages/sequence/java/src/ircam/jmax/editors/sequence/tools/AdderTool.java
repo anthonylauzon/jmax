@@ -110,6 +110,7 @@ public class AdderTool extends Tool implements PositionListener {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	
 	egc.getAdapter().setX(aEvent, x);
+
 	egc.getAdapter().setY(aEvent, y);
 
 	// starts an undoable transition

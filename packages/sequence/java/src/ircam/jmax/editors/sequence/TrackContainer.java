@@ -78,19 +78,20 @@ class TrackContainer extends JPanel {
     public void propertyChange(PropertyChangeEvent evt)
     {
       boolean active = false;	    
+      String name = evt.getPropertyName();
 
-      if (evt.getPropertyName().equals("active"))
+      if (name.equals("active"))
 	  {
 	      active = ((Boolean) evt.getNewValue()).booleanValue();
 	      b.setSelected(active);
 	  }
       else 
-	  if(evt.getPropertyName().equals("maximumPitch") || evt.getPropertyName().equals("minimumPitch"))
+	  if(name.equals("maximumPitch") || name.equals("minimumPitch")|| name.equals("viewMode"))
 	      {
-		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight(track);
+		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
 		  setSize(getSize().width, height);
 		  setPreferredSize(new Dimension(getPreferredSize().width, height));
-		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
 	      }
     }
     

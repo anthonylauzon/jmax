@@ -122,7 +122,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, track); //loopback?
 	gc.setGraphicSource(itsScore);
 	gc.setGraphicDestination(itsScore);
-	gc.setAdapter(new PartitionAdapter(geometry, gc));
+	PartitionAdapter ad = new PartitionAdapter(geometry, gc);
+	track.getPropertySupport().addPropertyChangeListener(ad);
+	gc.setAdapter(ad);
 	
 	renderer = new ScoreRenderer(gc);
 	
@@ -263,7 +265,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    viewMode=viewType;
 	    renderer.setViewMode(viewMode);
-	    ((PartitionAdapter)gc.getAdapter()).setViewMode(viewMode);
+	    //((PartitionAdapter)gc.getAdapter()).setViewMode(viewMode);
+	    track.setProperty("viewMode", new Integer(viewType));
 	    repaint();
 	}    
     }
@@ -342,14 +345,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
 		SequenceSelection.setCurrent(selection);
-	    /*else 
-	      if(e.getPropertyName().equals("maximumPitch")||e.getPropertyName().equals("minimumPitch"))
-	      {
-	      int height = ((PartitionAdapter)gc.getAdapter()).getRangeHeight(track);
-	      //setSize(getSize().width, height);
-	      //setPreferredSize(new Dimension(getPreferredSize().width, height));
-	      //gc.getFtsSequenceObject().changeTrack(track);
-	      }*/
 	}
     }
 

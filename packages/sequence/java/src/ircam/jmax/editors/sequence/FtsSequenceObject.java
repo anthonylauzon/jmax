@@ -26,6 +26,7 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.renderers.*;
 
 /* FIXME: check how many imports are really needed */
 import ircam.jmax.MaxApplication;
@@ -55,6 +56,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
 	
       listeners = new MaxVector();
       initValueInfoTable();
+      SequenceImages.init();
     }
 
     private final void initValueInfoTable()

@@ -30,6 +30,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.renderers.*;
 /**
  * The sequence extension; install the sequence data type,
  * register the remote data class, installs
