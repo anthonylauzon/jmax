@@ -528,6 +528,18 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       }  
   }
 
+  public void importMidiFile()
+  {
+    try{
+      send( FtsSymbol.get("import_midifile_dialog"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsTrackObject: I/O Error sending import_midifile_dialog Message!");
+	e.printStackTrace(); 		
+      }
+  }
+
   public void requestSetActive(boolean active)
   {
     args.clear();

@@ -38,6 +38,9 @@ public class ImportAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
+    if( container instanceof SequenceWindow)
       ((SequencePanel)container.getEditor()).getFtsSequenceObject().importMidiFile();
+    else 
+      ((FtsTrackObject)((TrackPanel)container.getEditor()).getFtsObject()).importMidiFile();
   }
 }
