@@ -163,7 +163,10 @@ fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
 
       patcher = (fts_object_t *) fts_get_object(&av[0]);
 
-      fts_message_send(patcher, fts_SystemInlet, fts_s_close, 0, 0);
+      if (patcher)
+	fts_message_send(patcher, fts_SystemInlet, fts_s_close, 0, 0);
+      else
+	post_mess("Error in FOS message CLOSE PATCHER: patcher already deleted", ac, av);
     }
   else
     post_mess("Error in FOS message CLOSE PATCHER: bad args", ac, av);

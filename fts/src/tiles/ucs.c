@@ -323,6 +323,17 @@ fts_ucs_set_updates_per_ticks(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
+static fts_status_t
+fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
+{
+  if ((argc == 1) && fts_is_int(&argv[0]))
+    {
+      fts_updates_set_update_period(fts_get_int(&argv[0]));
+    }
+
+  return fts_Success;
+}
+
 
 static fts_status_t
 fts_ucs_load_module(int argc, const fts_atom_t *argv)
@@ -561,6 +572,11 @@ fts_ucs_install_commands()
 			 fts_ucs_set_updates_per_ticks,
 			 "set update_per_ticks <int>",
 			 "Set how many value updates are sent by FTS in a sigle scheduling tick");
+
+  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("updates_period"),
+			 fts_ucs_set_updates_period,
+			 "set update_period <int>",
+			 "Set every how much FTS perform an  update");
 
   fts_ucs_define_command(fts_new_symbol("load"), fts_new_symbol("module"), fts_ucs_load_module,
 			 "load module <name> <filename>",

@@ -174,9 +174,6 @@ oss_dac_init(void)
 {
   fts_dev_class_t *oss_dac_class;
 
-
-
-
     
   /* OSS DAC class  */
 
