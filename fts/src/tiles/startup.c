@@ -165,12 +165,13 @@ static void fts_kernel_config(void)
   fts_install_module( &fts_datalib_module);   /* Install the FTS data lib */
   fts_install_module( &fts_veclib_module);    /* Install the FTS vector function*/
   fts_install_module( &fts_ftl_module);       /* Install the FTL engine ***MUST BE BEFORE DSP*** */
-  fts_install_module( &fts_dsp_module);       /* Install the DSP engine */
 
   /* RUNTIME modules */
 
   fts_install_module( &fts_time_module);     /* the fts time module */
+  fts_install_module( &fts_dsp_module);       /* Install the DSP engine */
   fts_install_module( &fts_sched_module);    /* the fts scheduler module */
+
   fts_install_module( &fts_dev_module);      /* the device support  system */
   fts_install_module( &fts_midi_module);     /* the fts MIDI system */
   fts_install_module( &fts_client_module);   /* the fts <--> client communication system */

@@ -241,6 +241,8 @@ fts_sched_init(fts_sched_t *sched)
   sched->status = sched_ready;
 }
 
+extern void fts_client_poll(void);
+
 /* run the scheduler in a loop (note that the clock time is set inside fts_dsp_run_tick() */
 void 
 fts_sched_run(fts_sched_t *sched)
