@@ -44,7 +44,6 @@ public class TableGraphicContext extends GraphicContext{
   {
     itsModel = dm;
     itsFtsObject = (FtsTableObject)dm;
-    /*itsWriter = new CoordinateWriter(this);*/
   }
 
 
@@ -70,8 +69,6 @@ public class TableGraphicContext extends GraphicContext{
   TableDataModel itsModel;
   FtsTableObject itsFtsObject;
   TableAdapter itsAdapter;
-  CoordinateWriter itsWriter;
-  //EditorToolbar toolbar;
   TableSelection itsSelection;
   TableToolManager toolManager;
 
@@ -102,26 +99,6 @@ public class TableGraphicContext extends GraphicContext{
   {
     itsAdapter = theAdapter;
   }
-
-  public CoordinateWriter getCoordWriter()
-  {
-    return itsWriter;
-  }
-  
-  public void setCoordWriter(CoordinateWriter cw)
-  {
-    itsWriter = cw;
-  }
-
-  /*public void setToolbar(EditorToolbar t)
-    {
-    toolbar = t;
-    }
-
-    public EditorToolbar getToolbar()
-    {
-    return toolbar;
-    }*/
 
   public void setToolManager( TableToolManager tm)
   {
@@ -192,7 +169,9 @@ public class TableGraphicContext extends GraphicContext{
   }
 
   int itsVerticalMaximum = DEFAULT_V_MAXIMUM;
+  int itsVerticalMinimum = DEFAULT_V_MINIMUM;
   final public static int DEFAULT_V_MAXIMUM = 135;
+  final public static int DEFAULT_V_MINIMUM = -135;
 
   public int getVerticalMaximum()
   {
@@ -202,17 +181,31 @@ public class TableGraphicContext extends GraphicContext{
   {
     itsVerticalMaximum = max;
   }
+  public int getVerticalMinimum()
+  {
+    return itsVerticalMinimum;
+  }
+  public void setVerticalMinimum(int min)
+  {
+    itsVerticalMinimum = min;
+  }
 
+  public int getVerticalRange()
+  {
+    return (itsVerticalMaximum - itsVerticalMinimum);
+  }
   /* display informations */
 
   public void display(String text)
   {
-    display.setText(text);
+    if( display != null)
+      display.setText(text);
   }
 
   public void displayInfo(String text)
   {
-    info.setText(text);
+    if( info != null)
+      info.setText(text);
   }
   public void setDisplay(JLabel label, JLabel infoLabel)
   {

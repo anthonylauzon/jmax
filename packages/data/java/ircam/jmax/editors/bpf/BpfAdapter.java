@@ -81,15 +81,15 @@ public class BpfAdapter {
    * Returns the time associated with the value of an X coordinate after
    * the coordinate conversion.
    */
-    public float getInvX(int x) 
-    {
-	x = x - DX;
-	return (float) (x/geometry.getXZoom() - geometry.getXTransposition());    
-    }
+  public float getInvX(int x) 
+  {
+    x = x - DX;
+    return (float) (x/geometry.getXZoom() - geometry.getXTransposition());    
+  }
 
   public int getInvWidth(int w)
   {
-      return (int)(getInvX(w)-getInvX(0));
+    return (int)(getInvX(w)-getInvX(0));
   }
 
   /**
@@ -107,26 +107,26 @@ public class BpfAdapter {
    * it returns the Y value of the event,
    * making the needed cordinate conversions.
    */
-    public int getY(BpfPoint p) 
-    {  
-	return getY(p.getValue());
-    }
+  public int getY(BpfPoint p) 
+  {  
+    return getY(p.getValue());
+  }
     /**
      * it returns the Y graphic value of the event from the y logic value,
      * making the needed cordinate conversions.
      */
-    public int getY(float y) 
-    {  
-	float value = y - gc.getDataModel().getMinimumValue();
-	int height = gc.getGraphicDestination().getSize().height -2*DY;
-	float range = gc.getDataModel().getRange();
-	float step = (float)((float)height/range);
-	return height - (int)(value*step) + DY;
-    }
+  public int getY(float y) 
+  {  
+    float value = y - gc.getDataModel().getMinimumValue();
+    int height = gc.getGraphicDestination().getSize().height -2*DY;
+    float range = gc.getDataModel().getRange();
+    float step = (float)((float)height/range);
+    return height - (int)(value*step) + DY;
+  }
 
   public void setInvY(BpfPoint p, int y)
   {
-      //super.setY(e, y);
+    //super.setY(e, y);
   }
 
   /**

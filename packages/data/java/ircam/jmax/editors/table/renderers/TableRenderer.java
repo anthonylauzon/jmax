@@ -86,11 +86,17 @@ public class TableRenderer extends AbstractRenderer implements Layer{
    * Layer interface */
   public void render(Graphics g, Rectangle r, int order)
   {    
-    g.setColor( backColor);
+    int yMax = gc.getAdapter().getY( gc.getVerticalMaximum());
+    int yMin = gc.getAdapter().getY( gc.getVerticalMinimum());
+
+    g.setColor( outRangeColor);
     g.fillRect(r.x, r.y, r.width, r.height);
-
-    if(r.height == 15) return;
-
+    g.setColor( backColor);
+    g.fillRect(r.x, yMax, r.width, (yMin-yMax));
+    g.setColor( borderRangeColor);
+    g.drawLine( r.x, yMax, r.x+r.width, yMax);
+    g.drawLine( r.x, yMin, r.x+r.width, yMin);
+    
     g.setColor( foreColor);
     
     int zero = gc.getAdapter().getY(0);
@@ -151,7 +157,10 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   public final static int SOLID = 1;
   
   Color backColor = new Color(247, 247, 247);
+  Color borderRangeColor = new Color(229, 229, 229);
+  Color outRangeColor = new Color(237, 237, 237);
   Color foreColor = Color.lightGray;
 }
+
 
 

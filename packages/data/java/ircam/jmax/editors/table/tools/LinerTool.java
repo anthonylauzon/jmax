@@ -83,6 +83,7 @@ public class LinerTool extends TableTool implements LineListener{
   {
     drawLine(startingPoint.x, startingPoint.y, x, y);
     getGc().getFtsObject().requestEndEdit();
+    getGc().displayInfo("");
   }
 
   /**

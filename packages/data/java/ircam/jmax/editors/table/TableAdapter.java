@@ -74,7 +74,7 @@ public class TableAdapter {
     
     setYZoom((float)1.0);
   
-    setYTransposition( maxY);
+    setYTransposition( 0);
   } 
 
   /**
@@ -136,11 +136,12 @@ public class TableAdapter {
    * The y coordinates are implicitily inverted. */
   public int getY(int value)
   {
+    float V = value - gc.getVerticalMinimum();
     int h = gc.getGraphicDestination().getSize().height;
     if( gc.isVerticalScrollbarVisible())
-      return (int) (yTransposition + h/2 - value * itsYZoom);
-    else	
-      return (int) ( h/2 - value * itsYZoom);
+      return h - (int)((V - yTransposition) * itsYZoom);
+    else
+      return h - (int)(V * itsYZoom);
   }
 
   /**
@@ -149,9 +150,9 @@ public class TableAdapter {
   {
     int h = gc.getGraphicDestination().getSize().height;
     if( gc.isVerticalScrollbarVisible())
-      return (int) ((yTransposition + h/2 - y)/itsYZoom);
+      return (int)(( h - y)/itsYZoom) + yTransposition + gc.getVerticalMinimum();
     else
-      return (int) (( h/2 - y)/itsYZoom);  
+      return (int) ((h - y)/itsYZoom) + gc.getVerticalMinimum();
   }
 
   /**

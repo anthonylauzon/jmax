@@ -48,7 +48,6 @@ public class TablePopupMenu extends JPopupMenu
   int x;
   int y;
   TableDisplay target = null;     
-  JTextField maxValueField;
   JMenuItem solidItem, hollowItem;
 
   public TablePopupMenu(TableDisplay editor)
@@ -87,74 +86,6 @@ public class TablePopupMenu extends JPopupMenu
     hollowItem.addActionListener( Actions.hollowAction);
     viewGroup.add( hollowItem);
     add( hollowItem);    
-    
-    addSeparator();
-
-    ////////////////////// Range Menu //////////////////////////////
-    JPanel rangePanel = new JPanel();
-    rangePanel.setLayout(new BoxLayout(rangePanel, BoxLayout.Y_AXIS));
-    
-    JLabel rangeLabel = new JLabel("Vertical Range", JLabel.CENTER);
-    rangeLabel.setForeground(Color.black);
-
-    Box labelRangeBox = new Box(BoxLayout.X_AXIS);
-    labelRangeBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-    labelRangeBox.add(rangeLabel);    
-    labelRangeBox.add(Box.createHorizontalGlue());    
-
-    rangePanel.add(labelRangeBox);    
-
-    ActionListener rangeListener = new ActionListener(){
-	public void actionPerformed( ActionEvent e)
-	{
-	  setRange();
-	}
-      };
-
-    JLabel maxLabel = new JLabel("max", JLabel.CENTER);
-    maxValueField = new JTextField();
-    maxValueField.setPreferredSize(new Dimension(100, 20));
-    maxValueField.setMaximumSize(new Dimension(100, 20));
-    maxValueField.addActionListener(rangeListener);
-    
-    JPanel maxPanel = new JPanel();
-    maxPanel.setPreferredSize(new Dimension(150, 20));
-    maxPanel.setLayout(new BoxLayout(maxPanel, BoxLayout.X_AXIS));    
-    maxPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
-    maxPanel.add(maxLabel);
-    maxPanel.add(Box.createHorizontalGlue());    
-    maxPanel.add( maxValueField);
-
-    rangePanel.add(maxPanel);
-
-    /*JLabel minLabel = new JLabel("min", JLabel.CENTER);
-      minValueField = new JTextField();
-      minValueField.setPreferredSize(new Dimension(100, 20));
-      minValueField.setMaximumSize(new Dimension(100, 20));
-      minValueField.addActionListener(rangeListener);
-      
-      JPanel minPanel = new JPanel();
-      minPanel.setPreferredSize(new Dimension(150, 20));
-      minPanel.setLayout(new BoxLayout(minPanel, BoxLayout.X_AXIS));
-      minPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
-      minPanel.add(minLabel);
-      minPanel.add(Box.createHorizontalGlue());    
-      minPanel.add( minValueField);
-
-      rangePanel.add(minPanel);*/
-    rangePanel.validate();
-
-    add(rangePanel);
-
-    ///////////////////////////////////
-    addPopupMenuListener(new PopupMenuListener(){
-	public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
-	public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
-	{
-	  setRange();
-	}
-	public void popupMenuCanceled(PopupMenuEvent e){}
-      });
 
     validate();
     pack();
@@ -169,29 +100,11 @@ public class TablePopupMenu extends JPopupMenu
     super.show(invoker, x, y);
   }
 
-  public void setRange()
-  {
-    try
-      {
-	int max = Integer.valueOf( maxValueField.getText()).intValue();
-	if( target.getGraphicContext().getVerticalMaximum() != max)
-	  target.panel.setMaximumValue(max);
-      }
-    catch (NumberFormatException e1)
-      {
-	System.err.println("Error:  invalid number format!");
-	return;
-      }
-  }
-
   public void update()
   {
     int dm = target.getDisplayMode();
     if( dm == TableRenderer.SOLID) solidItem.setSelected( true);
-    else hollowItem.setSelected( true);
-    
-    int max = target.getGraphicContext().getVerticalMaximum();
-    maxValueField.setText(""+max);    
+    else hollowItem.setSelected( true);    
     revalidate();
   }
 }

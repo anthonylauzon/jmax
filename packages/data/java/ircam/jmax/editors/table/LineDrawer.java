@@ -64,10 +64,7 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
   /**
    * overrides InteractionModule mouseMoved()
    * to show the position in the status bar*/
-  public void mouseMoved(MouseEvent e)
-  {
-    //getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
-  }
+  public void mouseMoved(MouseEvent e){}
 
 
   /**
@@ -89,7 +86,6 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
   {
     if (!active) return;//!!
     itsXORHandler.moveTo(e.getX(), e.getY());
-    getGc().getCoordWriter().postXRange( startSelection.x , e.getX());
   }
 
   /**
@@ -150,8 +146,6 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
   Point startSelection = new Point();
   Point movingPoint = new Point();
   XORHandler itsXORHandler;
-  CoordinateWriter itsWriter;
-
   boolean active = false;
 
 }

@@ -46,15 +46,6 @@ public class StripeSelecter extends Selecter {
    super(l); 
   }
 
-  public void mouseDragged(MouseEvent e)
-  {
-      if(startSelection.x <=  e.getX())
-	  ((TableGraphicContext) gc).getCoordWriter().postXRange(startSelection.x, e.getX());
-      else
-	  ((TableGraphicContext) gc).getCoordWriter().postXRange(e.getX(), startSelection.x);
-      super.mouseDragged(e);
-  }
-
   /**
    * overrides Selecter.XORDraw. The actual drawing routine
    */
@@ -67,7 +58,7 @@ public class StripeSelecter extends Selecter {
 
     if (x1 <0) x1=0; 
 
-    tempRect.setBounds(x1, 2/*0*/, x2-x1,gc.getGraphicDestination().getSize().height-4/**/);
+    tempRect.setBounds(x1, 2, x2-x1,gc.getGraphicDestination().getSize().height-4);
     normalizeRectangle(tempRect);
 
     Graphics g = gc.getGraphicDestination().getGraphics();

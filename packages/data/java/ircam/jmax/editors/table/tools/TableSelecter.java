@@ -68,7 +68,6 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
 	getGc().getSelection().deselectAll();
 	getGc().getSelection().setCaretPosition(getGc().getAdapter().getInvX(x));
       }
-    getGc().getCoordWriter().postXRange(x, x);
   }
 
   /**
