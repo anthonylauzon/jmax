@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.99 2002/11/15 17:40:59 nschnell Exp $
+dnl $Id: configure.in,v 1.100 2002/11/21 11:38:19 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.100  2002/11/21 11:38:19  p_tisserand
+dnl add a configure flag to disable jMax java compilation (--disable-java-part or --enable-java-part=no)
+dnl
 dnl Revision 1.99  2002/11/15 17:40:59  nschnell
 dnl *** empty log message ***
 dnl
@@ -123,6 +126,14 @@ AC_CHECK_FUNCS(socket)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_BIGENDIAN
+
+if test $ac_cv_c_bigendian = yes; then
+FTS_CONFIG_BYTE_ORDER=FTS_CONFIG_BIGENDIAN
+else
+FTS_CONFIG_BYTE_ORDER=FTS_CONFIG_LITTLEENDIAN
+fi
+ 
+AC_SUBST(FTS_CONFIG_BYTE_ORDER)
 
 dnl Check for lex/flex and yacc/bison
 AM_PROG_LEX
@@ -387,6 +398,7 @@ fts/Makefile
 fts/version.c
 include/Makefile
 include/fts/Makefile
+include/fts/config-ac.h
 include/ftsprivate/Makefile
 bin/Makefile
 bin/jmax
