@@ -235,6 +235,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 
       fts_set_symbol(&a, fts_status_get_description( status));
       obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
+      fts_object_set_description(obj, ac, at);
+
       fts_patcher_add_object( patcher, obj);
     }
 
