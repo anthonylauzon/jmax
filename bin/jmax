@@ -68,7 +68,7 @@ Options and arguments:
     Defaults to $rootdir
 
   <other-jmax-options>       (optional)
-    Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
+    Defines jMax options that are passed directly to ircam.jmax.JMaxApplication as 
     command line options (for instance, jmaxArch, jmaxMode, ...)
 
   -verbose                   (optional)
@@ -171,7 +171,7 @@ start_it ()
 	echo "CLASSPATH=${CLASSPATH}"
     fi
 
-    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -jmaxServerDir ${ftsdir} -jmaxRoot $ROOTDIR $JMAXOPT "
+    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.JMaxApplication -jmaxServerDir ${ftsdir} -jmaxRoot $ROOTDIR $JMAXOPT "
 
     ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
 
