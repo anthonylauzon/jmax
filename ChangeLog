@@ -1,3 +1,7 @@
+2003-07-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/guiobj/c/src/slider.c (slider_incr): added "incr" message support for slider.
+
 2003-07-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/ispw/c/src/pack.c (pack_error_inlet): closed bug "[ 766895 ] [pack] weirdness bis" : added a console message if inlet > 0 receive doesn't receive a numer or a symbol.
