@@ -51,9 +51,11 @@ class MoveInteraction extends Interaction
     if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
       {
 	object = (GraphicObject) area.getTarget();
-	editor.getDisplayList().objectToFront(object);
-	object.redraw();
-	object.redrawConnections();
+	//to made faster the mouseclick objects selection we lost "to front" feature 
+
+	//editor.getDisplayList().objectToFront(object);
+	//object.redraw();
+	//object.redrawConnections();
 
 	if (! object.isSelected())
 	  {
@@ -64,6 +66,7 @@ class MoveInteraction extends Interaction
 	      }
 
 	    ErmesSelection.patcherSelection.select(object);
+	    object.redraw();
 	  }
 
 	editor.setCursor(Cursor.getDefaultCursor());

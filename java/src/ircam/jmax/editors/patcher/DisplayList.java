@@ -154,6 +154,38 @@ public class DisplayList
     sortDisplayList();
   }
 
+  public void objectsToFront(Object[] objects, int size)
+  {
+    GraphicObject object; 
+
+    sortVector(objects, size);
+    for (int i=0; i<size; i++)
+      {
+	object = (GraphicObject) objects[i];
+	remove(object);
+	add(object);
+      }
+    reassignLayers();
+    sortDisplayList();
+    sketch.repaint();
+  }
+
+  public void objectsToBack(Object[] objects, int size)
+  {
+    GraphicObject object;
+
+    sortVector(objects, size);
+    for (int i=size-1; i>=0; i--)
+      {
+	object = (GraphicObject) objects[i];
+	remove(object);
+	addToBeginning(object);
+      }
+    reassignLayers();
+    sortDisplayList();
+    sketch.repaint();
+  }
+
   /* Connections */
 
   final public void add(GraphicConnection connection)
@@ -310,23 +342,22 @@ public class DisplayList
 	((GraphicObject) values[i]).setLayer(layer++);
   }
 
-  public void sortDisplayList()
-  {
-    Object[] values = displayObjects.getObjectArray();
-    int size = displayObjects.size();
-
-    // Then, sort 
-
+  void sortVector(Object[] values, int size){
     for (int i = 0; i < size; i++)
       for (int j = 0; j < i; j++)
 	if (isAfter(values[j], values[i]))
 	  {
 	    Object v;
-
+	    
 	    v = values[j];
 	    values[j] = values[i];
 	    values[i] = v;
 	  }
+  }
+
+  public void sortDisplayList()
+  {
+    sortVector(displayObjects.getObjectArray(), displayObjects.size());
   }
 
   private final boolean isAfter(Object do1, Object do2)

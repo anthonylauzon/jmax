@@ -73,7 +73,10 @@ public class EditMenu extends EditorMenu
   JMenuItem selectAllItem;
   JMenuItem inspectItem;
   JMenuItem lockItem;
-  
+  AlignMenu alignMenu;
+  JMenuItem toFrontMenuItem;
+  JMenuItem toBackMenuItem;
+
   public EditMenu(ErmesSketchPad sketch)
   {
     super("Edit");
@@ -102,7 +105,14 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
-    add( new AlignMenu());
+
+    alignMenu = new AlignMenu();
+    add(alignMenu);
+
+    addSeparator();
+
+    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Event.CTRL_MASK, KeyEvent.VK_K);
+    toBackMenuItem  = add(Actions.sendToBackAction, "Send To Back", Event.CTRL_MASK, KeyEvent.VK_B);
 
     addSeparator();
 
@@ -124,7 +134,7 @@ public class EditMenu extends EditorMenu
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
 	inspectItem.setEnabled(false);
-
+	
 	pasteItem.setEnabled((flavors != null) &&
 			     clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
       }
@@ -161,6 +171,9 @@ public class EditMenu extends EditorMenu
 		cutItem.setEnabled(false);
 		copyItem.setEnabled(false);
 		duplicateItem.setEnabled(false);
+		alignMenu.setEnabled(false);
+		toFrontMenuItem.setEnabled(false);
+		toBackMenuItem.setEnabled(false);
 	      }
 	    else if (ErmesSelection.patcherSelection.getOwner() == sketch)
 	      {
@@ -169,6 +182,9 @@ public class EditMenu extends EditorMenu
 		cutItem.setEnabled(true);
 		copyItem.setEnabled(true);
 		duplicateItem.setEnabled(true);
+		alignMenu.setEnabled(true);
+		toFrontMenuItem.setEnabled(true);
+		toBackMenuItem.setEnabled(true);
 	      }
 
 	    pasteItem.setEnabled((flavors != null) &&

@@ -72,6 +72,9 @@ public class Actions
   public static EditorAction alignBottomAction = new AlignBottomAction();
   public static EditorAction alignRightAction  = new AlignRightAction();
 
+  public static EditorAction bringToFrontAction = new BringToFrontAction();
+  public static EditorAction sendToBackAction  = new SendToBackAction();
+
   public static EditorAction cutAction       = new CutAction();
   public static EditorAction copyAction      = new CopyAction();
   public static EditorAction pasteAction     = new PasteAction();

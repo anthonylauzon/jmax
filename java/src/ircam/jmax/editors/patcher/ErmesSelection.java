@@ -385,7 +385,17 @@ public class ErmesSelection implements Transferable
 	object.redrawConnections();
       }
   }
+ public void bringToFront()
+  {
+    if(hasObjects())
+      owner.getDisplayList().objectsToFront(objects.getObjectArray(), objects.size());
+  }
 
+  public void sendToBack()
+  {
+    if(hasObjects())
+      owner.getDisplayList().objectsToBack(objects.getObjectArray(), objects.size());
+  }
   // Add the proper throw
 
   public void setFontName( String theFontName)

@@ -68,7 +68,9 @@ class DragToggleSelectInteraction extends Interaction
 	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y, 1, 1);
 	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
 	object = (GraphicObject) area.getTarget();
-	bringToBack = true;
+	//to made faster the shift+click objects selection we lost "to back" feature 
+	//bringToBack = true;
+	bringToBack = false;
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack) && Squeack.onBackground(squeack))
       {
