@@ -56,6 +56,10 @@ version.c \
 parser.y \
 tokenizer.l
 
+# TODO add thread.c when platform specific source code is remove from thread.c
+
+noinst_HEADERS= parser.h
+
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
