@@ -364,8 +364,8 @@ public int getViewMode()
 public void setRangeMode(int rangeMode)
 {
 	this.rangeMode = rangeMode;
-	setMaxScoreY();
-	setMinScoreY();
+  setMinScoreY();
+  setMaxScoreY();
 }
 
 public int getRangeMode()

@@ -143,7 +143,7 @@ private boolean staffIsDrawable(int numGroup, int maxPitch, int minPitch)
 
 public static boolean isPitchInGrayStaff(int p)
 {		
-	return (p >=10 && p<=17) || (p >=34 && p<=43) || (p >=58 && p<=62) || 
+	return (p >=10 && p<=18) || (p >=34 && p<=42) || (p >=58 && p<=62) || 
 				 (p >=79 && p<=86) || (p >=103 && p<=110);
 }
 
