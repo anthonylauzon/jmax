@@ -368,7 +368,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   int windowTimeWidth() 
   {
-    return (int)(itsScore.getSize().width/(gc.getAdapter().getXZoom()));
+    return gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND) - 1;
+
   }
 
 

@@ -44,7 +44,7 @@ public class PartitionAdapter extends Adapter {
     
     if (xInvertion) temp = -temp;
 
-    return (int) ((temp+xTranspose)*xZoomFactor);
+    return (int) ((temp+xTranspose)*xZoomFactor) + ScoreBackground.KEYEND;
   }
 
 
@@ -56,9 +56,9 @@ public class PartitionAdapter extends Adapter {
   public int getInvX(int x) 
   {
 
-    if (xInvertion) return (int) (xTranspose -x/xZoomFactor);
+    if (xInvertion) return (int) (xTranspose -(x-ScoreBackground.KEYEND)/xZoomFactor);
 
-    else return (int) (x/xZoomFactor - xTranspose);
+    else return (int) ((x-ScoreBackground.KEYEND)/xZoomFactor - xTranspose);
     
   }
 

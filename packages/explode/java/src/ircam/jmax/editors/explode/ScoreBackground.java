@@ -24,7 +24,7 @@ public class ScoreBackground implements Layer{
     
   }
 
-  /** builds a grid representation in the given graphic port
+  /** builds an horizontal grid in the given graphic port
    * using the destination size*/
   private void drawTheGrid(Graphics g)
   {
@@ -41,7 +41,7 @@ public class ScoreBackground implements Layer{
     for (int i = 0; i < 381; i+=9)
       {
 	positionY = 409-i;
-	g.drawLine(31, positionY, d.width, positionY);
+	g.drawLine(KEYX, positionY, d.width, positionY);
       }
 
     // the major subdivision lines and numbers
@@ -57,21 +57,24 @@ public class ScoreBackground implements Layer{
     g.drawLine(56, 28, d.width, 28);
     g.drawString(""+127, 10, 31);
 
-    // and the piano keys...
+    // the piano keys...
     for (int i = 0; i < 127; i++)
       {
 	positionY = 409-(i*3)-1;
 	if (isAlteration(i)) 
 	  {
 	    g.setColor(Color.darkGray);
-	    g.fillRect(31, positionY, 24, 3);
+	    g.fillRect(KEYX, positionY, KEYWIDTH, 3);
 	  }
 	else 
 	  {
 	    g.setColor(Color.lightGray);
-	    g.fillRect(31, positionY, 24, 3);
+	    g.fillRect(KEYX, positionY, KEYWIDTH, 3);
 	  }
       }
+
+    // the vertical line at the end of keyboard
+    g.drawLine(KEYEND, 28, KEYEND, 409);
   }
 
   public static boolean isAlteration(int note)
@@ -88,7 +91,7 @@ public class ScoreBackground implements Layer{
     int positionY = 409-(key*3)-1;
     Graphics g = sgc.getGraphicDestination().getGraphics();
     g.setColor(Color.white);
-    g.fillRect(31, positionY, 25, 3);
+    g.fillRect(KEYX, positionY, 25, 3);
     g.dispose();
     currentPressedKey = key;
   }
@@ -101,7 +104,7 @@ public class ScoreBackground implements Layer{
     if (isAlteration(currentPressedKey))
       g.setColor(Color.darkGray);
     else g.setColor(Color.lightGray);
-    g.fillRect(31, positionY, 25, 3);
+    g.fillRect(KEYX, positionY, 25, 3);
     g.dispose();
     currentPressedKey = -1;
   }
@@ -136,8 +139,9 @@ public class ScoreBackground implements Layer{
     // paint the vertical grid
     int MIN_GRID = 6;
     int MAX_GRID = 50;
+    ScrEvent tempEvent = new ScrEvent(null);
     
-    int windowTime = (int) (gc.getGraphicDestination().getSize().width / gc.getAdapter().getXZoom());
+    int windowTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width) - gc.getAdapter().getInvX(KEYEND)-1 ;
     int timeStep;
     
     
@@ -151,16 +155,16 @@ public class ScoreBackground implements Layer{
     for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
       {
 	snappedTime = (i/timeStep)*timeStep;
-	xPosition = (int) ((snappedTime-gc.getLogicalTime()) * gc.getAdapter().getXZoom());
+	tempEvent.setTime(snappedTime);
+	xPosition = gc.getAdapter().getX(tempEvent);
 	
-	g.drawLine(xPosition, 20, xPosition, 400);
+	g.drawLine(xPosition, 24, xPosition, 409);
 	g.drawString(""+snappedTime, xPosition-20, 15);
       }
       
-    //debugImage();
   }
   
-  public void debugImage()
+  private void debugImage()
   {
     Graphics g = gc.getGraphicDestination().getGraphics();
     Dimension d = gc.getGraphicDestination().getSize();
@@ -213,6 +217,10 @@ public class ScoreBackground implements Layer{
   static boolean imageReady = true/*false*/;
   public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
   public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
+
+  public static final int KEYX = 31;
+  public static final int KEYWIDTH = 24;
+  public static final int KEYEND = KEYX + KEYWIDTH;
 }
 
 
