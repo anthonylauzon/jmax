@@ -12,12 +12,15 @@
  * 
  */
 #include "fts.h"
-#include "matrix.h"
+#include "mat.h"
 
 typedef struct 
 {
   fts_object_t o;
-  matrix_t *mx; /* referenced matrix */
+  union {
+    mat_t *mat;
+    fts_object_t *obj;
+  } ref;
   fts_atom_t *list; /* ouput buffer */
   int alloc;
 } getlist_t;
@@ -32,10 +35,10 @@ static void
 getlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
-  matrix_t *mx = matrix_atom_get(at + 1);
-  int n = matrix_get_n(mx); /* # of cols */
+  mat_t *mat = mat_atom_get(at + 1);
+  int n = mat_get_n(mat); /* # of cols */
 
-  this->mx = mx;
+  this->ref.mat = mat;
   
   /* init output list to # of cols */
   if(n > 0)
@@ -79,12 +82,12 @@ getlist_resize_buffer(getlist_t *this, int size)
  */
 
 static void
-getlist_matrix_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getlist_mat_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
-  matrix_t *mx = this->mx;
-  int m = matrix_get_m(mx);
-  int n = matrix_get_n(mx);
+  mat_t *mat = this->ref.mat;
+  int m = mat_get_m(mat);
+  int n = mat_get_n(mat);
   int i = fts_get_int(at);
   int j;
   
@@ -93,19 +96,19 @@ getlist_matrix_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       getlist_resize_buffer(this, n);
 
       for(j=0; j<n; j++)
-	this->list[j] = matrix_get_element(mx, i, j);
+	this->list[j] = mat_get_element(mat, i, j);
       
       fts_outlet_send(o, 0, fts_s_list, n, this->list);
     }
 }
 
 static void
-getlist_matrix_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getlist_mat_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
-  matrix_t *mx = this->mx;
-  int m = matrix_get_m(mx);
-  int n = matrix_get_n(mx);
+  mat_t *mat = this->ref.mat;
+  int m = mat_get_m(mat);
+  int n = mat_get_n(mat);
   int i;
   int j = fts_get_int(at);
   
@@ -114,21 +117,21 @@ getlist_matrix_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       getlist_resize_buffer(this, n);
 
       for(i=0; i<m; i++)
-	this->list[i] = matrix_get_element(mx, i, j);
+	this->list[i] = mat_get_element(mat, i, j);
       
       fts_outlet_send(o, 0, fts_s_list, m, this->list);
     }
 }
 
 static void
-getlist_matrix_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getlist_mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
-  matrix_t *mx = matrix_atom_get(at);
+  mat_t *mat = mat_atom_get(at);
 
-  matrix_release(this->mx);  
-  this->mx = mx;
-  matrix_refer(mx);
+  fts_object_release(this->ref.obj);
+  this->ref.mat = mat;
+  fts_object_refer(this->ref.obj);
 }
 
 /************************************************
@@ -146,7 +149,7 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(getlist_t), 2, 1, 0); 
 
-  if(ac == 2 && matrix_atom_is(at + 1))
+  if(ac == 2 && mat_atom_is(at + 1))
     {
       /* define the system methods */
       a[0] = fts_s_symbol;
@@ -155,11 +158,11 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       /* user methods */
       a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_s_int, getlist_matrix_row, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("row"), getlist_matrix_row, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("col"), getlist_matrix_col, 1, a);
+      fts_method_define(cl, 0, fts_s_int, getlist_mat_row, 1, a);
+      fts_method_define(cl, 0, fts_new_symbol("row"), getlist_mat_row, 1, a);
+      fts_method_define(cl, 0, fts_new_symbol("col"), getlist_mat_col, 1, a);
 
-      fts_method_define_varargs(cl, 1, matrix_type, getlist_matrix_set);
+      fts_method_define_varargs(cl, 1, mat_type, getlist_mat_set);
 
       /* type the outlet */
       fts_outlet_type_define_varargs(cl, 0, fts_s_list);

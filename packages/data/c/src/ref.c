@@ -25,7 +25,6 @@
  */
 
 #include "fts.h"
-#include "refdata.h"
 
 static fts_symbol_t sym_ref = 0;
 
@@ -48,7 +47,7 @@ ref_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->a = at[1];
   
-  refdata_atom_refer(&this->a);
+  fts_refer(&this->a);
 }
 
 static void
@@ -56,7 +55,7 @@ ref_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ref_t *this = (ref_t *) o;
 
-  refdata_atom_release(&this->a);
+  fts_release(&this->a);
 }
 
 static void
@@ -90,9 +89,9 @@ ref_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ref_t *this = (ref_t *) o;
   
-  refdata_atom_release(&this->a);
+  fts_release(&this->a);
   this->a = at[0];
-  refdata_atom_refer(at);
+  fts_refer(at);
 }
 
 static void
@@ -100,9 +99,9 @@ ref_store_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   ref_t *this = (ref_t *) o;
   
-  refdata_atom_release(&this->a);
+  fts_release(&this->a);
   this->a = at[0];
-  refdata_atom_refer(at);
+  fts_refer(at);
 
   fts_outlet_send(o, 0, fts_get_selector(&this->a), 1, &this->a);
 }
@@ -116,7 +115,9 @@ ref_store_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static fts_status_t
 ref_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && refdata_atom_is(at + 1))
+  fts_type_t t;
+
+  if(ac == 2 && fts_is_object(at + 1))
     {
       fts_symbol_t selector = fts_get_selector(at + 1);
 
@@ -130,7 +131,8 @@ ref_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, selector, ref_store_and_output);
       fts_method_define_varargs(cl, 1, selector, ref_store);
 
-      fts_outlet_type_define(cl, 0, selector, 1, &fts_get_type(at + 1));
+      t = fts_get_type(at + 1);
+      fts_outlet_type_define(cl, 0, selector, 1, &t);
       
       return fts_Success;
     }

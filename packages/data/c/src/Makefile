@@ -26,7 +26,6 @@
 JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libdata.so
-MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package
 

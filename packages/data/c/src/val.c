@@ -90,6 +90,8 @@ val_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 static fts_status_t
 val_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_type_t t;
+
   if(ac == 2)
     {
       fts_symbol_t selector = fts_get_selector(at + 1);
@@ -116,7 +118,8 @@ val_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       else
 	return &fts_CannotInstantiate;
 
-      fts_outlet_type_define(cl, 0, selector, 1, &fts_get_type(at + 1));
+      t = fts_get_type(at + 1);
+      fts_outlet_type_define(cl, 0, selector, 1, &t);
       
       /* fts_class_add_daemon(cl, obj_property_get, fts_s_state, val_get_state); */
       

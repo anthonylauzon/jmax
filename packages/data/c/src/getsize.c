@@ -14,10 +14,10 @@
  * 
  */
 #include "fts.h"
-#include "vector.h"
-#include "intvec.h"
-#include "floatvec.h"
-#include "matrix.h"
+#include "vec.h"
+#include "ivec.h"
+#include "fvec.h"
+#include "mat.h"
 
 /******************************************************
  *
@@ -26,37 +26,37 @@
  */
 
 static void
-getsize_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getsize_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vector_t *vector = vector_atom_get(at);
+  vec_t *vec = vec_atom_get(at);
 
-  fts_outlet_int(o, 0, vector_get_size(vector));
+  fts_outlet_int(o, 0, vec_get_size(vec));
 }
 
 static void
-getsize_int_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getsize_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int_vector_t *vector = int_vector_atom_get(at);
+  ivec_t *vec = ivec_atom_get(at);
 
-  fts_outlet_int(o, 0, int_vector_get_size(vector));
+  fts_outlet_int(o, 0, ivec_get_size(vec));
 }
 
 static void
-getsize_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getsize_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  float_vector_t *vector = float_vector_atom_get(at);
+  fvec_t *vec = fvec_atom_get(at);
 
-  fts_outlet_int(o, 0, float_vector_get_size(vector));
+  fts_outlet_int(o, 0, fvec_get_size(vec));
 }
 
 static void
-getsize_matrix(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getsize_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  matrix_t *matrix = matrix_atom_get(at);
+  mat_t *mat = mat_atom_get(at);
   fts_atom_t list[2];
 
-  fts_set_int(list, matrix_get_m(matrix));
-  fts_set_int(list + 1, matrix_get_n(matrix));
+  fts_set_int(list, mat_get_m(mat));
+  fts_set_int(list + 1, mat_get_n(mat));
 
   fts_outlet_send(o, 0, fts_s_list, 2, list);
 }
@@ -77,10 +77,10 @@ getsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       /* initialize the class */
       fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
       
-      fts_method_define_varargs(cl, 0, vector_symbol, getsize_vector);
-      fts_method_define_varargs(cl, 0, int_vector_symbol, getsize_int_vector);
-      fts_method_define_varargs(cl, 0, float_vector_symbol, getsize_float_vector);
-      fts_method_define_varargs(cl, 0, matrix_symbol, getsize_matrix);
+      fts_method_define_varargs(cl, 0, vec_symbol, getsize_vec);
+      fts_method_define_varargs(cl, 0, ivec_symbol, getsize_ivec);
+      fts_method_define_varargs(cl, 0, fvec_symbol, getsize_fvec);
+      fts_method_define_varargs(cl, 0, mat_symbol, getsize_mat);
       
       return fts_Success;
     }

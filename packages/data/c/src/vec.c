@@ -25,40 +25,18 @@
  */
 
 #include "fts.h"
-#include "vector.h"
+#include "mat.h"
+#include "vec.h"
+
+fts_type_t vec_type = 0;
+fts_symbol_t vec_symbol = 0;
+fts_class_t *vec_class = 0;
 
 static fts_symbol_t sym_text = 0;
 
-/******************************************************************
- *
- *  object vec
- *
- *  vector of atoms
- *
- */
+extern void mat_alloc(mat_t *mat, int m, int n);
+extern void mat_free(mat_t *mat);
 
-typedef struct 
-{
-  fts_object_t ob;
-  vector_t *vec; /* atom vector */
-} vec_t;
-
-static void
-vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-
-  this->vec = vector_create(ac - 1, at + 1);
-  vector_refer(this->vec);
-}
-
-static void
-vec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-
-  vector_release(this->vec);
-}
 /********************************************************************
  *
  *   user methods
@@ -66,64 +44,54 @@ vec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-vec_send(fts_object_t *o, vector_t *vec)
-{
-  fts_atom_t a;
-  
-  vector_atom_set(&a, vec);
-  fts_outlet_send(o, 0, vector_symbol, 1, &a);  
-}
-
-static void
 vec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
+  fts_atom_t a[1];
 
-  vec_send(o, this->vec);
+  vec_atom_set(a, this);
+  fts_outlet_send(o, 0, vec_symbol, 1, a);
 }
 
 static void
 vec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  vector_t *vec = (vector_t *)this->vec;
-  int size = vector_get_size(vec);
+  int size = vec_get_size(this);
   
   if(ac > 0 && fts_is_number(at))
     {
       int i = fts_get_number_int(at);
 
       if(i >= 0 && i < size)
-	vector_void_element(vec, i);
+	vec_void_element(this, i);
     }
   else
-    vector_void(vec);
+    vec_void(this);
 }
 
 static void
 vec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  vector_t *vec = (vector_t *)this->vec;
 
   if(ac > 0)
-    vector_fill(vec, at[0]);
+    vec_set_const(this, at[0]);
 }
 
 static void
 vec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  vector_t *vec = (vector_t *)this->vec;
 
   if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
     {
-      int size = vector_get_size(vec);
+      int size = vec_get_size(this);
       int i = fts_get_number_int(at);
 
       if(i >= 0 && i < size)
 	{
-	  vector_set_from_atom_list(vec, i, ac - 2, at + 2);
+	  vec_set_from_atom_list(this, i, ac - 2, at + 2);
 	}
     }
 }
@@ -131,7 +99,7 @@ vec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 static void
 vec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vector_t *vec = ((vec_t *)o)->vec;
+  vec_t *this = (vec_t *)o;
   int size = 0;
 
   if(ac > 0 && fts_is_number(at))
@@ -139,11 +107,8 @@ vec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       size = fts_get_number_int(at);
       
       if(size >= 0)
-	vector_set_size(vec, size);
+	vec_set_size(this, size);
     }  
-  
-  if(size >= 0)
-    vec_send(o, vec);
 }
 
 static void
@@ -152,7 +117,6 @@ vec_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   vec_t *this = (vec_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-  vector_t *vec = this->vec;
 
   if(!file_name)
     return;
@@ -161,11 +125,9 @@ vec_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       int size = 0;
 
-      size = vector_read_atom_file(vec, file_name);
+      size = vec_read_atom_file(this, file_name);
 
-      if(size >= 0)
-	vec_send(o, vec);
-      else
+      if(size <= 0)
 	post("vec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
@@ -178,7 +140,6 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   vec_t *this = (vec_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-  vector_t *vec = this->vec;
 
   if(!file_name)
     return;
@@ -187,7 +148,7 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       int size = 0;
 
-      size = vector_write_atom_file(vec, file_name);
+      size = vec_write_atom_file(this, file_name);
 
       if(size < 0)
 	post("vec: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
@@ -202,7 +163,7 @@ vec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
 
   if (cmd == fts_s_object)
-    fts_object_blip(o, "vector of values");
+    fts_object_blip(o, "vec of values");
   else if (cmd == fts_s_inlet)
     {
       int n = fts_get_int_arg(ac, at, 1, 0);
@@ -210,63 +171,174 @@ vec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       switch(n)
 	{
 	case 0:
-	  fts_object_blip(o, "vector commands");
-	  break;
-	}
-    }
-  else if (cmd == fts_s_outlet)
-    {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
-	{
-	case 0:
-	  fts_object_blip(o, "<vec>: the vector", n);
+	  fts_object_blip(o, "vec commands");
 	  break;
 	}
     }
 }
 
+/********************************************************
+ *
+ *  files
+ *
+ */
+
+#define VEC_BLOCK_SIZE 64
+
+static void
+vec_grow(vec_t *vec, int size)
+{
+  int alloc = vec->alloc;
+
+  while(size > alloc)
+    alloc += VEC_BLOCK_SIZE;
+
+  vec_set_size(vec, alloc);
+}
+
+int 
+vec_read_atom_file(vec_t *vec, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  int n = 0;
+  fts_atom_t a;
+  char c;
+
+  if(!file)
+    return -1;
+
+  vec_void(vec);
+
+  while(fts_atom_file_read(file, &a, &c))
+    {
+      if(n >= vec->alloc)
+	vec_grow(vec, n);
+
+      vec->data[n] = a;
+      n++;
+    }
+
+  vec_set_size(vec, n);
+  
+  fts_atom_file_close(file);
+
+  return (n);
+}
+
+int
+vec_write_atom_file(vec_t *vec, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file;
+  int size = vec_get_size(vec);
+  int i;
+
+  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+
+  if(!file)
+    return -1;
+
+  /* write the content of the vec */
+  for(i=0; i<size; i++)     
+    {
+      fts_atom_t *data = vec->data;
+
+      fts_atom_file_write(file, data + i, '\n');
+    }
+
+  fts_atom_file_close(file);
+
+  return (i);
+}
+
 /********************************************************************
  *
- *   class
+ *  system functions
  *
  */
 
 static void
-vec_get_vector(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+
+  post("{");
+  post_atoms(vec_get_size(this), vec_get_ptr(this));
+  post("}");
+}
+
+static void
+vec_get_vec(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   vec_t *this = (vec_t *)obj;
 
-  vector_atom_set(value, this->vec);
+  vec_atom_set(value, this);
+}
+
+/********************************************************************
+ *
+ *  class
+ *
+ */
+
+static void
+vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+
+  ac--;
+  at++;
+
+  if(ac == 0)
+    mat_alloc((mat_t *)this, 0, 0);
+  else if(ac == 1 && fts_is_int(at))
+    mat_alloc((mat_t *)this, fts_get_int(at), 1);
+  else if(ac == 1 && fts_is_list(at))
+    {
+      fts_list_t *aa = fts_get_list(at);
+      int size = fts_list_get_size(aa);
+      
+      mat_alloc((mat_t *)this, size, 1);
+      vec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
+    }
+  else if(ac > 1)
+    {
+      mat_alloc((mat_t *)this, ac, 1);
+      vec_set_from_atom_list(this, 0, ac, at);
+    }
+}
+
+static void
+vec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+
+  mat_free((mat_t *)this);
+}
+
+static int
+vec_check(int ac, const fts_atom_t *at)
+{
+  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || ac > 1);
 }
 
 static fts_status_t
 vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  if(vector_get_constructor(ac - 1, at + 1))
+  if(vec_check(ac - 1, at + 1))
     {
       fts_class_init(cl, sizeof(vec_t), 1, 1, 0);
   
-      /* init/delete */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vec_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vec_delete);
 
-      /* define variable */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vector);
-
-      /* .bmax load and save */
-      /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, vec_set_from_atom_list);*/
-      /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, vec_save_bmax);*/
-
-      /* help */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, vec_print); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), vec_assist); 
       
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vec);
+
       /* user methods */
-      fts_method_define_varargs(cl, 0, fts_s_bang, vec_output); 
-      
+      fts_method_define_varargs(cl, 0, fts_s_bang, vec_output);
+
       fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), vec_clear);
       fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), vec_fill);      
       fts_method_define_varargs(cl, 0, fts_new_symbol("set"), vec_set);
@@ -277,8 +349,8 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), vec_export); 
 
       /* type outlet */
-      fts_outlet_type_define(cl, 0, vector_symbol, 1, &vector_type);
-      
+      fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_type);
+
       return fts_Success;
     }
   else
@@ -289,13 +361,18 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 vec_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return (vector_get_constructor(ac0 - 1, at0 + 1) == vector_get_constructor(ac1 - 1, at1 + 1));
+  return vec_check(ac1 - 1, at1 + 1);
 }
 
 void
 vec_config(void)
 {
   sym_text = fts_new_symbol("text");
+  vec_symbol = fts_new_symbol("vec");
+  vec_type = vec_symbol;
 
-  fts_metaclass_install(fts_new_symbol("vec"), vec_instantiate, vec_equiv);
+  fts_metaclass_install(vec_symbol, vec_instantiate, vec_equiv);
+  vec_class = fts_class_get_by_name(vec_symbol);
+
+  fts_atom_type_register(vec_symbol, vec_class);
 }
