@@ -1,5 +1,7 @@
 2001-03-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* added: package sgi, containing SGI audio port
+
 	* added: package oss, containing OSS audio port
 
 2001-03-19  Francois Dechelle  <dechelle@lipari.ircam.fr>

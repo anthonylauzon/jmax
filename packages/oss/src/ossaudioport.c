@@ -24,6 +24,11 @@
  *
  */
 
+/*
+ * This file's authors:
+ * François Déchelle (dechelle@ircam.fr)
+ */
+
 /* 
  * This file include the jMax OSS audio port.
  */
@@ -58,7 +63,7 @@ static fts_symbol_t s_slash_dev_slash_audio;
 static fts_symbol_t s_input_only;
 static fts_symbol_t s_output_only;
 
-static void oss_input( fts_word_t *argv)
+static void ossaudioport_input( fts_word_t *argv)
 {
   ossaudioport_t *port;
   int n, channels, ch, i, j;
@@ -88,7 +93,7 @@ static void oss_input( fts_word_t *argv)
     }
 }
 
-static void oss_output( fts_word_t *argv)
+static void ossaudioport_output( fts_word_t *argv)
 {
   ossaudioport_t *port;
   int n, channels, ch, i, j;
@@ -121,7 +126,7 @@ static void oss_output( fts_word_t *argv)
 }
 
 
-static int ossaudioport_xrun_function( fts_audioport_t *port)
+static int ossaudioport_xrun( fts_audioport_t *port)
 {
   ossaudioport_t *ossport = (ossaudioport_t *)port;
   count_info count;
@@ -151,7 +156,7 @@ static int ossaudioport_xrun_function( fts_audioport_t *port)
 }
 
 #ifdef DEBUG
-static void oss_debug( int fd)
+static void ossaudioport_debug( int fd)
 {
   audio_buf_info info;
 
@@ -212,7 +217,7 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
     }
 
 #ifdef DEBUG
-  oss_debug( this->fd);
+  ossaudioport_debug( this->fd);
 #endif
 
   /* Set 16 bit format */
@@ -242,18 +247,18 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if (flags != O_WRONLY)
     {
       fts_audioport_set_input_channels( (fts_audioport_t *)this, channels);
-      fts_audioport_set_input_function( (fts_audioport_t *)this, oss_input);
+      fts_audioport_set_input_function( (fts_audioport_t *)this, ossaudioport_input);
     }
   if (flags != O_RDONLY)
     {
       fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
-      fts_audioport_set_output_function( (fts_audioport_t *)this, oss_output);
+      fts_audioport_set_output_function( (fts_audioport_t *)this, ossaudioport_output);
     }
 
-  fts_audioport_set_xrun_function( (fts_audioport_t *)this, ossaudioport_xrun_function);
+  fts_audioport_set_xrun_function( (fts_audioport_t *)this, ossaudioport_xrun);
 
-  this->adc_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * channels * sizeof(short));
-  this->dac_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * channels * sizeof(short));
+  this->adc_fmtbuf = (short *)fts_malloc( fts_get_tick_size() * channels * sizeof(short));
+  this->dac_fmtbuf = (short *)fts_malloc( fts_get_tick_size() * channels * sizeof(short));
 
   this->no_xrun_message_already_posted = 0;
 }

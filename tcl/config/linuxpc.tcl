@@ -46,7 +46,7 @@ set jmaxArch i686-linux
 #defineDevice midi { oss_midi } "OSS MIDI"
 
 when platformStart {
-    package require ossdev
+    package require oss
     package require unixdtd
 }
 
