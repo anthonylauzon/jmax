@@ -42,6 +42,7 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   int x, y, w, font_index;
   fts_symbol_t text;
   fts_atom_t a;
+  char *p;
 
   file = (FILE *)fts_get_ptr( at);
 
@@ -56,7 +57,16 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, "#P comment %d %d %d %d ", x, y, w, font_index);
 
   fts_object_get_prop( o, fts_s_comment, &a);
-  fprintf( file, "%s;\n", fts_symbol_name( fts_get_symbol( &a)) );
+
+  for ( p = fts_symbol_name( fts_get_symbol( &a)); *p; p++)
+    {
+      if ( *p == ',' || *p == ';')
+	fprintf( file, "\\%c", *p);
+      else
+	fprintf( file, "%c", *p);
+    }
+
+  fprintf( file, ";\n");
 }
 
 static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

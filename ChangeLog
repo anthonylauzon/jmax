@@ -1,3 +1,7 @@
+2000-05-03  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fts: fixing 'save as .pat' methods (messages were not saved correctly)
+
 2000-05-02  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	*  fts: added stuff for running fts under purify (ENABLE_PURIFY=yes on make command 

@@ -611,6 +611,7 @@ static void message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
+
 static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
@@ -620,6 +621,7 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_symbol_t text;
   fts_atom_t a;
   fts_atom_list_iterator_t *iterator;
+  int state;
 
   file = (FILE *)fts_get_ptr( at);
 
@@ -635,26 +637,57 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   iterator = fts_atom_list_iterator_new( this->atom_list);
 
+  state = 0;
+
   while (! fts_atom_list_iterator_end( iterator))
     {
       fts_atom_t *a = fts_atom_list_iterator_current( iterator);
 
-      if ( fts_is_int( a))
-	fprintf( file, " %d", fts_get_int( a));
-      else if ( fts_is_float( a) )
-	fprintf( file, " %f", fts_get_float( a));
-      else if ( fts_is_symbol( a) )
-	{
-	  fts_symbol_t s = fts_get_symbol( a);
+      switch ( state ) {
 
-	  if (s == fts_s_semi)
-	    fprintf( file, " \\;");
-	  else
-	    fprintf( file, " %s", fts_symbol_name( fts_get_symbol( a)) );
-	}
+      case 0:
+	if ( fts_is_int( a))
+	  fprintf( file, " %d", fts_get_int( a));
+	else if ( fts_is_float( a) )
+	  fprintf( file, " %f", fts_get_float( a));
+	else if ( fts_is_symbol( a) )
+	  {
+	    fts_symbol_t s = fts_get_symbol( a);
+
+	    if (s == fts_s_semi || s == fts_s_comma)
+	      fprintf( file, " \\%s", fts_symbol_name( s));
+	    else if (s == fts_s_dollar)
+	      state = 1;
+	    else
+	      fprintf( file, " %s", fts_symbol_name( s));
+	  }
+
+	break;
+
+      case 1:
+	state = 0;
+
+	if (fts_is_int( a))
+	  fprintf( file, " \\$%d", fts_get_int( a));
+	else if ( fts_is_float( a) )
+	  fprintf( file, " $ %f", fts_get_float( a));
+	else if ( fts_is_symbol( a) )
+	  {
+	    fts_symbol_t s = fts_get_symbol( a);
+
+	    if (s == fts_s_semi || s == fts_s_comma)
+	      fprintf( file, " $ \\%s", fts_symbol_name( s));
+	    else
+	      fprintf( file, " $ %s", fts_symbol_name( s));
+	    }
+
+	break;
+      }
 
       fts_atom_list_iterator_next( iterator);
     }
+
+  fts_atom_list_iterator_free( iterator);
 
   fprintf( file, ";\n");
 }

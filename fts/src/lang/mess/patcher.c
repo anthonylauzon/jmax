@@ -793,16 +793,15 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_block_free((char *) this->outlets, sizeof(fts_outlet_t *)*fts_object_get_outlets_number((fts_object_t *) this));
 }
 
-/*
-  Function: patcher_open_and_save_dotpat
-  Description:
-    Saves a patcher in .pat format
-  Arguments:
-    at[0]  filename         the name of the destination file
-  Note:
-    This method does not check for nor add a .pat suffix to the file name.
-    This is left to the user interface.
-*/
+/* **********************************************************************
+ * .pat file format saving
+ * **********************************************************************
+ */
+
+/* Forward declarations */
+static void patcher_save_dotpat_internal( FILE *file, fts_patcher_t *patcher);
+static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher);
+
 static int get_int_property( fts_object_t *object, fts_symbol_t property_name)
 {
   fts_atom_t a;
@@ -834,13 +833,13 @@ static void patcher_save_dotpat_atoms( FILE *file, int ac, const fts_atom_t *at)
     }
 }
 
-static void patcher_save_dotpat_internal( FILE *file, fts_patcher_t *patcher);
-
-static int patcher_find_object_index( fts_patcher_t *patcher, fts_object_t *object)
+static int find_object_index_in_patcher( fts_object_t *object)
 {
   int index = 0;
   fts_object_t *o;
+  fts_patcher_t *patcher;
 
+  patcher = fts_object_get_patcher( object);
   for ( o = patcher->objects; o ; o = o->next_in_patcher)
     {
       if ( object == o)
@@ -852,21 +851,9 @@ static int patcher_find_object_index( fts_patcher_t *patcher, fts_object_t *obje
   return -1;
 }
 
-static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
+static void patcher_save_objects( FILE *file, fts_object_t *object)
 {
-  int x_left, y_top, x_right, y_bottom, count;
-  fts_object_t *object;
-
-  x_left = get_int_property( (fts_object_t *)patcher, fts_s_wx);
-  y_top = get_int_property( (fts_object_t *)patcher, fts_s_wy);
-  x_right = x_left + get_int_property( (fts_object_t *)patcher, fts_s_ww);
-  y_bottom = y_top + get_int_property( (fts_object_t *)patcher, fts_s_wh);;
-
-  /* Save window properties */
-  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_left, y_top, x_right, y_bottom);
-
-  /* Save objects */
-  for ( object = patcher->objects; object ; object = object->next_in_patcher)
+  while ( object)
     {
       if ( fts_object_is_standard_patcher( object) )
 	{
@@ -893,12 +880,51 @@ static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
 	  patcher_save_dotpat_atoms( file, object->argc, object->argv);
 	  fprintf( file, ";\n");
 	}
+
+      object = object->next_in_patcher;
     }
+}
 
-  /* Save connections */
-  count = fts_patcher_get_objects_count( patcher) - 1;
+/*
+ * This auxiliary function is used to save the connections in reverse order.
+ * There is no requested order for connections saving, but MAX/Opcode
+ * saves in reverse order, so in order to ease text comparison of files,
+ * we can save in reverse order.
+ */
+/*
+ * Apparently, the connection saving order depends from the MAX version...
+ */
+#if 0
+static void patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_count)
+{
+  int outlet;
 
-  for ( object = patcher->objects; object ; object = object->next_in_patcher)
+  if ( !object)
+    return;
+
+  patcher_save_connections( file, object->next_in_patcher, patcher_object_count);
+
+  for ( outlet = 0; outlet < fts_object_get_outlets_number( object); outlet++)
+    {
+      fts_connection_t *c;
+
+      for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
+	{
+	  fprintf( file, "#P connect %d %d %d %d;\n", 
+		   patcher_object_count - 1 - find_object_index_in_patcher( object),
+		   outlet, 
+		   patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
+		   c->winlet);
+	}
+    }
+}
+#endif
+
+static void patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_count)
+{
+  int object_index = 0;
+
+  while ( object)
     {
       int outlet;
 
@@ -909,17 +935,48 @@ static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
 	  for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
 	    {
 	      fprintf( file, "#P connect %d %d %d %d;\n", 
-		       count - patcher_find_object_index( patcher, object),
+		       patcher_object_count - 1 - object_index,
 		       outlet, 
-		       count - patcher_find_object_index( patcher, c->dst),
+		       patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
 		       c->winlet);
 	    }
 	}
+
+      object_index++;
+
+      object = object->next_in_patcher;
     }
+}
+
+static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
+{
+  int x_left, y_top, x_right, y_bottom;
+
+  /* Save window properties */
+  x_left = get_int_property( (fts_object_t *)patcher, fts_s_wx);
+  y_top = get_int_property( (fts_object_t *)patcher, fts_s_wy);
+  x_right = x_left + get_int_property( (fts_object_t *)patcher, fts_s_ww);
+  y_bottom = y_top + get_int_property( (fts_object_t *)patcher, fts_s_wh);;
+
+  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_left, y_top, x_right, y_bottom);
+
+  /* Save objects */
+  patcher_save_objects( file, patcher->objects);
+
+  /* Save connections */
+  patcher_save_connections( file, patcher->objects, fts_patcher_get_objects_count( patcher));
 
   fprintf( file, "#P pop;\n");
 }
 
+/*
+    Saves a patcher in .pat format
+  Arguments:
+    at[0]  filename         the name of the destination file
+  Note:
+    This method does not check for nor add a .pat suffix to the file name.
+    This is left to the user interface.
+*/
 static void patcher_save_dotpat_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   FILE *file;
