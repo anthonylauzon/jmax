@@ -6,6 +6,7 @@ MatDataListener.java \
 MatDataModel.java \
 MatPanel.java \
 MatRowIndex.java \
+MatSimpleMenu.java \
 MatTableModel.java \
 MatWindow.java \
 RowIndexPopupMenu.java
