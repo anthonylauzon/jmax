@@ -66,6 +66,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public boolean itsRunMode = false;
   boolean doSnapToGrid = false;
   public boolean doAutorouting = true;
+  public boolean itsSelectionRouting = true;
   public boolean itsGraphicsOn = true;
   
   ErmesObjEditField itsEditField = null;
@@ -387,6 +388,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	itsSelectedConnections.addElement(itsCurrentConnection); 
 	itsCurrentConnection.Select();
 	editStatus = START_SELECT;///////
+	((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
 	if (offScreenPresent) {
 	  itsCurrentConnection.Paint(offGraphics);
 	  CopyTheOffScreen(getGraphics());
@@ -423,6 +425,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	  }
 	  itsCurrentConnection.Select();
 	  itsCurrentConnection.Repaint();
+	  ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
 	}
       }
       else{//se c'e' lo shift premuto
@@ -438,10 +441,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	  else {
 	    itsSelectedConnections.removeElement(itsCurrentConnection);
 	    itsCurrentConnection.Deselect();
-	    
+
 	    if((itsSelectedConnections.size()) == 0)
 	      editStatus = DOING_NOTHING;
 	  }
+	  ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
 	}
 	repaint();
       }	
@@ -1138,6 +1142,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	    aConnection.Select();
 	    aConnection.Paint(offGraphics);
 	    itsSelectedConnections.addElement(aConnection);
+	    ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
 	  }
 	}	
 
@@ -1396,6 +1401,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsSelectedConnections.addElement(aConnection);
       aConnection.Select();
     }
+    ((ErmesSketchWindow)itsSketchWindow).UpdateRoutingMenuWithSelection();
     repaint();
   }
 
@@ -1669,11 +1675,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //??	void SaveSegmRgn(ErmesConnSegment theSegment){}
   public void SetAutorouting(){
     ErmesConnection aConnection;
-    doAutorouting = !doAutorouting;
+    itsSelectionRouting = !itsSelectionRouting;
+    if(itsSelectedConnections.size()==0) doAutorouting = !doAutorouting;
     //qui sulla lista delle connessioni selezionate adatta l'autorouting
     for (Enumeration e = itsSelectedConnections.elements(); e.hasMoreElements();) {
       aConnection = (ErmesConnection)e.nextElement();
-      if(aConnection.GetAutorouted() != doAutorouting) aConnection.ChangeRoutingMode();
+      if(aConnection.GetAutorouted() != itsSelectionRouting) aConnection.ChangeRoutingMode();
     }
     ToSave();
     repaint();

@@ -63,7 +63,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   CheckboxMenuItem itsSelectedJustificationMenu;
   CheckboxMenuItem itsSketchJustificationMenu;
   CheckboxMenuItem itsCurrentResizeMenu;
-  CheckboxMenuItem itsAutoroutingCheckbox;
+  CheckboxMenuItem itsAutoroutingMenu;
   MenuItem itsRunModeMenuItem;
   MenuItem itsSelectAllMenuItem;
   boolean itsClosing = false;
@@ -373,8 +373,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
   
   private void FillGraphicsMenu(Menu theGraphicsMenu){
-    theGraphicsMenu.add(itsAutoroutingCheckbox = new CheckboxMenuItem("Autorouting", true));
-    itsAutoroutingCheckbox.addItemListener(this); 
+    theGraphicsMenu.add(itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true));
+    itsAutoroutingMenu.addItemListener(this); 
   }
 
 
@@ -905,6 +905,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
     itsSelectedJustificationMenu = itsSketchJustificationMenu;
     itsSelectedJustificationMenu.setState(true);
+    itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
+    itsSketchPad.itsSelectionRouting = itsSketchPad.doAutorouting;
   }
 
   public void SelectionUpdateMenu(String theFont, Integer theSize, Integer theJustification){
@@ -971,6 +973,23 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       }
     }
     else itsSelectedJustificationMenu = null;
+    
+    UpdateRoutingMenuWithSelection();
+  }
+
+  public void UpdateRoutingMenuWithSelection(){
+    if(itsSketchPad.itsSelectedConnections.size()!=0){
+      boolean aAutorouting = ((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(0)).GetAutorouted();
+      boolean aBothRoutingMode = false;
+      for(int i=1; i<itsSketchPad.itsSelectedConnections.size(); i++){
+	if(aAutorouting!=((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(i)).GetAutorouted()){
+	  aBothRoutingMode = true;
+	  break;
+	}
+      }
+      if(aBothRoutingMode) itsAutoroutingMenu.setState(false);
+      else itsAutoroutingMenu.setState(aAutorouting);
+    }
   }
 
   private void ExecutionMenuAction(MenuItem theMenuItem, String theString) {

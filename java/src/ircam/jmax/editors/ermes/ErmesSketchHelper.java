@@ -254,6 +254,7 @@ class ErmesSketchHelper extends Object{
 	DeleteConnection(aConnection);
       }
     }
+    ((ErmesSketchWindow)itsSketchPad.itsSketchWindow).DeselectionUpdateMenu();
     itsSketchPad.ToSave();
     itsSketchPad.repaint();
   }
