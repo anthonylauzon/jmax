@@ -32,7 +32,7 @@ import ircam.jmax.editors.table.*;
  * It uses just one user-interaction module:
  * a mouse tracker to choose the position.
  */ 
-public class ZoomTool extends TableTool implements  DirectionListener, TableDynamicDragListener {
+public class ZoomTool extends TableTool implements  DirectionListener, TableDynamicDragListener, GraphicSelectionListener{
 
   /** constructor */
   public ZoomTool(ImageIcon theImageIcon) 
@@ -42,6 +42,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
     setCursor( theImageIcon);
     itsDirectionChooser = new DirectionChooser(this);
     itsMouseTracker = new TableMouseDragTracker(this);
+    itsSelecter = new StripeSelecter(this);
   }
 
   /**
@@ -70,69 +71,73 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y, MouseEvent e)
-    {
+  public void dragStart(int x, int y, MouseEvent e)
+  {
+    if( e.isShiftDown())
+      mountIModule(itsSelecter, x, y);
+    else
       mountIModule(itsDirectionChooser, x, y);
-      tempX = x;
-      tempY = y;
-      
-      dddx = 0;
-      dddy = 0;
-    }
 
-    int dddx = 0;
-    int dddy = 0;  
-    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
-    {
-      if( !e.isShiftDown())
+    tempX = x;
+    tempY = y;
+    
+    dddx = 0;
+    dddy = 0;
+  }
+  
+  int dddx = 0;
+  int dddy = 0;  
+  public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
+  {
+    //if( !e.isShiftDown())
+    //{
+    TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+    if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
       {
-        TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-        if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
-        {
-	  float xZoom = a.getXZoom();
-	  dddx+=deltaX;
-	  if(dddx>35)
-	    {
-	      if (xZoom>=0.9)
-		a.setXZoom(Math.round(xZoom)+1);
-	      else
-		a.setXZoom(xZoom*(1/(1-xZoom)));
-	      
-	      dddx=0;
-	    }
-	  else if(dddx<-35)
-	    {
-	      if (xZoom>1.9) 
-		a.setXZoom(Math.round(xZoom)-1);
-	      else
-		a.setXZoom(xZoom*(1/(1+xZoom)));
-	      dddx=0;
-	    }		    
-	}
-	else
-	  if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
-	    a.incrYZoom( -deltaY);
-        }
-    }	
-    public void dragEnd(int x, int y, MouseEvent e)
-    {
-        if( e.isShiftDown())
-        {                        
-            TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-            Dimension size = gc.getGraphicDestination().getSize();
-            int rx = ( x > tempX) ? tempX : x;
-            double width = Math.abs( a.getInvX(x) - a.getInvX(tempX));            
-            a.setXZoom( a.findZoomRatioClosestTo((float)(size.width/width)));
-            ((TableGraphicContext)gc).scrollTo(rx);
-        }
-    }
+	float xZoom = a.getXZoom();
+	dddx+=deltaX;
+	if(dddx>35)
+	  {
+	    if (xZoom>=0.9)
+	      a.setXZoom(Math.round(xZoom)+1);
+	    else
+	      a.setXZoom(xZoom*(1/(1-xZoom)));
+	    
+	    dddx=0;
+	  }
+	else if(dddx<-35)
+	  {
+	    if (xZoom>1.9) 
+	      a.setXZoom(Math.round(xZoom)-1);
+	    else
+	      a.setXZoom(xZoom*(1/(1+xZoom)));
+	    dddx=0;
+	  }		    
+      }
+    else
+      if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
+	a.incrYZoom( -deltaY);
+    //}
+  }	
+  public void dragEnd(int x, int y, MouseEvent e)
+  {
+    /*if( e.isShiftDown())
+      {                        
+      TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+      Dimension size = gc.getGraphicDestination().getSize();
+      int rx = ( x > tempX) ? tempX : x;
+      double width = Math.abs( a.getInvX(x) - a.getInvX(tempX));            
+      a.setXZoom( a.findZoomRatioClosestTo((float)(size.width/width)));
+      ((TableGraphicContext)gc).scrollTo(rx);
+      }*/
+  }
     public void updateStartingPoint(int deltaX, int deltaY){}
 
     public void doubleClick( MouseEvent e)
     {
-      if( e.isShiftDown())
+      /*if( e.isShiftDown())
 	(((TableGraphicContext)gc).getAdapter()).zoomToWindow();
-      else	
+	else*/	
         (((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
     }
   
@@ -149,9 +154,32 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
     mountIModule(itsMouseTracker, tempX , tempY);
   }
 
+  /**
+   * GraphicSelectionListener interface
+   */
+  public void selectionPointChoosen(int x, int y, int modifiers){}
+  public void selectionChoosen(int x, int y, int w, int h) 
+  {
+    TableAdapter a = ((TableGraphicContext)gc).getAdapter();
+    Dimension size = gc.getGraphicDestination().getSize();
+
+    double width = Math.abs( a.getInvX(x) - a.getInvX(x+w));            
+    a.setXZoom( a.findZoomRatioClosestTo((float)(size.width/width)));
+    ((TableGraphicContext)gc).scrollTo(x);
+
+    mountIModule(itsMouseTracker, tempX , tempY);
+  }
+  public void selectionPointDoubleClicked(int x, int y, int modifiers)
+  {
+    (((TableGraphicContext)gc).getAdapter()).zoomToWindow();
+    
+    //mountIModule(itsMouseTracker, tempX , tempY);
+  }
   //-------------- Fields
   TableMouseDragTracker itsMouseTracker;
   DirectionChooser itsDirectionChooser;
+  StripeSelecter itsSelecter;
+
   int tempX = 0;
   int tempY = 0;
   int direction;
