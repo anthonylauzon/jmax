@@ -1,6 +1,7 @@
 # Microsoft Developer Studio Generated Dependency File, included by fts.mak
 
 ..\fts\main.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -21,7 +22,6 @@
 	"..\include\fts\hashtable.h"\
 	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
-	"..\include\fts\list.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -29,7 +29,7 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\OLDclient.h"\
+	"..\include\fts\oldclient.h"\
 	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
@@ -43,8 +43,6 @@
 	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
-	"..\include\fts\time.h"\
-	"..\include\fts\types.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	

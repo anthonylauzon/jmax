@@ -50,7 +50,6 @@ CLEAN :
 	-@erase "$(INTDIR)\dspgraph.obj"
 	-@erase "$(INTDIR)\errobj.obj"
 	-@erase "$(INTDIR)\expression.obj"
-	-@erase "$(INTDIR)\fifo.obj"
 	-@erase "$(INTDIR)\file.obj"
 	-@erase "$(INTDIR)\fpe.obj"
 	-@erase "$(INTDIR)\ftl.obj"
@@ -163,7 +162,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\dspgraph.obj" \
 	"$(INTDIR)\errobj.obj" \
 	"$(INTDIR)\expression.obj" \
-	"$(INTDIR)\fifo.obj" \
 	"$(INTDIR)\file.obj" \
 	"$(INTDIR)\fpe.obj" \
 	"$(INTDIR)\ftl.obj" \
@@ -237,7 +235,6 @@ CLEAN :
 	-@erase "$(INTDIR)\dspgraph.obj"
 	-@erase "$(INTDIR)\errobj.obj"
 	-@erase "$(INTDIR)\expression.obj"
-	-@erase "$(INTDIR)\fifo.obj"
 	-@erase "$(INTDIR)\file.obj"
 	-@erase "$(INTDIR)\fpe.obj"
 	-@erase "$(INTDIR)\ftl.obj"
@@ -353,7 +350,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\dspgraph.obj" \
 	"$(INTDIR)\errobj.obj" \
 	"$(INTDIR)\expression.obj" \
-	"$(INTDIR)\fifo.obj" \
 	"$(INTDIR)\file.obj" \
 	"$(INTDIR)\fpe.obj" \
 	"$(INTDIR)\ftl.obj" \
@@ -508,12 +504,6 @@ SOURCE=..\fts\errobj.c
 SOURCE=..\fts\expression.c
 
 "$(INTDIR)\expression.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\fifo.c
-
-"$(INTDIR)\fifo.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
