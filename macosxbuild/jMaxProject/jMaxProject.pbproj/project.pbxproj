@@ -30,6 +30,7 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
+				F85C8797029023E401664092,
 				F80A5F43028FD44C01664092,
 				F80A5F44028FD44C01664092,
 				F80A5F45028FD44C01664092,
@@ -11240,6 +11241,80 @@
 			settings = {
 			};
 		};
+		F85C878F0290238D01664092 = {
+			isa = PBXBundleReference;
+			path = "file-generation.bundle";
+			refType = 3;
+		};
+		F85C87900290238D01664092 = {
+			buildPhases = (
+				F85C87960290238D01664092,
+			);
+			buildSettings = {
+				OPTIMIZATION_CFLAGS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = "file-generation";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = "file-generation";
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = "file-generation";
+			productReference = F85C878F0290238D01664092;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
+<plist version=\"0.9\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F85C87960290238D01664092 = {
+			buildActionMask = 12;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			name = "Shell Script";
+			neededFileNames = (
+			);
+			shellPath = /bin/sh;
+			shellScript = ". ../../JMAX-VERSION \nJMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${JMAX_VERSION_STATUS}\nsed -e 's/@VERSION@/'${JMAX_VERSION}/ < ../../fts/version.c.in > ../../fts/version.c\nsed -e 's/@VERSION@/'${JMAX_VERSION}/ < ../../java/src/ircam/jmax/jMaxVersion.java.in > ../../java/src/ircam/jmax/JMaxVersion.java";
+		};
+		F85C8797029023E401664092 = {
+			isa = PBXTargetDependency;
+			target = F85C87900290238D01664092;
+		};
 		F8605DF8028C50E601664092 = {
 			buildActionMask = 2147483647;
 			files = (
@@ -12310,6 +12385,7 @@
 			projectDirPath = "";
 			targets = (
 				F80A5F42028FD44C01664092,
+				F85C87900290238D01664092,
 				F880FD830282FA3901664092,
 				F880FFEE028301DA01664092,
 				F880FD0F0282F90B01664092,
@@ -12434,6 +12510,7 @@
 				F8512351028BE5ED01664092,
 				F8512383028BE77C01664092,
 				F8512384028BE77C01664092,
+				F85C878F0290238D01664092,
 			);
 			isa = PBXGroup;
 			name = Products;
