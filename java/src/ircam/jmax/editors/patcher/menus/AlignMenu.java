@@ -39,9 +39,12 @@ import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
 
-/** Implement the patcher editor File Menu */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
-public class AlignMenu extends PatcherMenu
+/** Implement the editor File Menu */
+
+public class AlignMenu extends EditorMenu
 {
   public AlignMenu()
   {

@@ -43,25 +43,25 @@ import ircam.jmax.editors.patcher.*;
 
 public class HelpMenu extends JMenu
 {
-  ErmesSketchWindow editor;
+  ErmesSketchPad sketchpad;
 
-  public HelpMenu(ErmesSketchWindow window)
+  public HelpMenu(ErmesSketchPad sketch)
   {
     super("Help");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
     JMenuItem item;
-    editor = window;
+    sketchpad = sketch;
 
     item = new JMenuItem( "Help Patch", KeyEvent.VK_H);
     add( item);
     item.addActionListener( new ActionListener() {
       public  void actionPerformed( ActionEvent e)
 	{
-	  if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
+	  if (ErmesSelection.patcherSelection.ownedBy(sketchpad))
 	    {
 	      if (! ErmesSelection.patcherSelection.openHelpPatches())
-		new ErrorDialog( editor, "Sorry, no help for object ");
+		new ErrorDialog( sketchpad.getEditorContainer().getFrame(), "Sorry, no help for object ");
 	    }
 	}
     });
@@ -79,10 +79,10 @@ public class HelpMenu extends JMenu
 	item.addActionListener( new ActionListener() {
 	  public  void actionPerformed( ActionEvent e)
 	    {
-	      FtsHelpPatchTable.openHelpSummary(editor.getFts(), str);
+	      FtsHelpPatchTable.openHelpSummary(sketchpad.getFts(), str);
 	    }
 	});
        }
-  
-}
+    
+  }
 }

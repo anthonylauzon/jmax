@@ -40,11 +40,11 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class ErmesPatcherListener implements FtsPatcherListener
 {
-  ErmesSketchWindow window;
+  ErmesSketchPad sketch;
 
-  ErmesPatcherListener(ErmesSketchWindow window)
+  ErmesPatcherListener(ErmesSketchPad sketch)
   {
-    this.window = window;
+    this.sketch = sketch;
   }
 
   public void objectAdded(FtsPatcherData data, FtsObject object)
@@ -53,9 +53,8 @@ class ErmesPatcherListener implements FtsPatcherListener
     // pasting;
     // in reality, this should be the only way to add objects
     // to the sketch.
-    if(PatcherClipboardManager.getManager().isPasting()){
-      PatcherClipboardManager.getManager().addPastedObject(object);
-    }
+    if(PatcherClipboardManager.clipboardManager.isPasting())
+      PatcherClipboardManager.clipboardManager.addPastedObject(object);
   }
 
   public void objectRemoved(FtsPatcherData data, FtsObject object)
@@ -76,8 +75,8 @@ class ErmesPatcherListener implements FtsPatcherListener
     // in reality, this should be the only way to add connections 
     // to the sketch.
 
-    if(PatcherClipboardManager.getManager().isPasting())
-      PatcherClipboardManager.getManager().addPastedConnection(connection);
+    if(PatcherClipboardManager.clipboardManager.isPasting())
+      PatcherClipboardManager.clipboardManager.addPastedConnection(connection);
   }
 
   public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
@@ -95,7 +94,7 @@ class ErmesPatcherListener implements FtsPatcherListener
 	{
 	  GraphicConnection conn;
 
-	  conn = window.itsSketchPad.getDisplayList().getGraphicConnectionFor(c);
+	  conn = sketch.getDisplayList().getGraphicConnectionFor(c);
 
 	  // conn may be null if the connection has been delete by Ermes
 	  // first; a little hack, the whole deleting business should be cleaned up.
@@ -115,12 +114,12 @@ class ErmesPatcherListener implements FtsPatcherListener
 
   public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)
   {
-    window.itsSketchPad.redraw(); // ??? Why
+    sketch.redraw(); // ??? Why
   }
 
   public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts)
   {
-    window.itsSketchPad.redraw(); // ??? Why
+    sketch.redraw(); // ??? Why
   }
 
   public void patcherChanged(FtsPatcherData data)
@@ -130,7 +129,7 @@ class ErmesPatcherListener implements FtsPatcherListener
 
   public void patcherHaveMessage(String msg)
   {
-    window.showMessage(msg);
+    sketch.showMessage(msg);
   }
 }
 

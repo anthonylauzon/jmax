@@ -134,14 +134,25 @@ class Bang extends GraphicObject implements FtsIntValueListener
 
     super.paint( g);
   }
+  public void updatePaint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
+    g.setColor( itsFlashColor);
+    g.fillOval( x + CIRCLE_ORIGIN + 1,
+		y + CIRCLE_ORIGIN + 1,
+		w - 2*(CIRCLE_ORIGIN+1) - 1,
+		h - 2*(CIRCLE_ORIGIN+1) - 1);
+  }
 
   public void popUpEdit(Point p)
   {
     ChooseColorIdPopUp.choose(itsSketchPad,
-			      (new NumberChoosenListener()
-			       {
+			      (new NumberChoosenListener(){
 				 public void numberChoosen(int number) { ftsObject.setColor(number + 1);}
-			       }),
-			      p);
+			       }), p);
   }
 }

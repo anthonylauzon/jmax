@@ -35,7 +35,10 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ResizeAction extends AbstractAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class ResizeAction extends EditorAction
 {
   int dx;
   int dy;
@@ -48,9 +51,9 @@ public class ResizeAction extends AbstractAction
     this.dy = dy;
   }
 
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(EditorContainer container)
   {
-    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
 
     if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {

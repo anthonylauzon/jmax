@@ -34,10 +34,13 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class FindErrorsAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class FindErrorsAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    FindPanel.open(editor.getFts()).findErrors();
+    FindPanel.open(container.getEditor().getFts()).findErrors();
   }
 }

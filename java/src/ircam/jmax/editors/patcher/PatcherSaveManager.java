@@ -23,6 +23,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 
+import ircam.jmax.toolkit.*;
 
 public class PatcherSaveManager
 {
@@ -34,7 +35,7 @@ public class PatcherSaveManager
   /*                                                                          */
   /****************************************************************************/
   
-  static public boolean Save(ErmesSketchWindow sketchWindow)
+  static public boolean Save(EditorContainer container)
   {
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
@@ -45,13 +46,15 @@ public class PatcherSaveManager
 
     // Change in semantic: now Save() is active *only* on root level patchers 
     // SHOULD BECOME Gray in the others
-    MaxDocument document = sketchWindow.getDocument();
-    FtsPatcherData patcherData = sketchWindow.getPatcherData();
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
 
     if (! document.isRootData(patcherData))
       {
-	new ErrorDialog( sketchWindow, "Only root patchers can be saved");
+	new ErrorDialog( container.getFrame(), "Only root patchers can be saved");
 	return false;
       }
 
@@ -64,35 +67,38 @@ public class PatcherSaveManager
 	  }
 	catch ( MaxDocumentException e)
 	  {
-	    new ErrorDialog( sketchWindow, e.getMessage());
+	    new ErrorDialog( container.getFrame(), e.getMessage());
 	  }
       }
     else
-      saved = SaveAs(sketchWindow);
+      saved = SaveAs(container);
     return saved;
   }
 
-  static public boolean SaveAs(ErmesSketchWindow sketchWindow)
+  static public boolean SaveAs(EditorContainer container)
   {
     File file;
-    MaxDocument document = sketchWindow.getDocument();
-    FtsPatcherData patcherData = sketchWindow.getPatcherData();
+
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
 
     if (! document.isRootData(patcherData))
       {
-	new ErrorDialog( sketchWindow, "Only root patchers can be saved");
+	new ErrorDialog( container.getFrame(), "Only root patchers can be saved");
 	return false;
       }
 
-    file = MaxFileChooser.chooseFileToSave( sketchWindow, document.getDocumentFile(), "Save As");
+    file = MaxFileChooser.chooseFileToSave( container.getFrame(), document.getDocumentFile(), "Save As");
 
     if (file == null)
       return false;
     else
       document.bindToDocumentFile( file);
 
-    sketchWindow.setTitle( file.toString()); 
+    container.getFrame().setTitle( file.toString()); 
 
     try
       {
@@ -101,18 +107,21 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	new ErrorDialog( sketchWindow, e.getMessage());
+	new ErrorDialog( container.getFrame(), e.getMessage());
       }
     return saved;
   }
 
-  static public void SaveTo(ErmesSketchWindow sketchWindow)
+  static public void SaveTo(EditorContainer container)
   {
     File file;
-    MaxDocument document = sketchWindow.getDocument();
-    FtsPatcherData patcherData = sketchWindow.getPatcherData();
 
-    file = MaxFileChooser.chooseFileToSave( sketchWindow, document.getDocumentFile(), "Save To");
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+
+    file = MaxFileChooser.chooseFileToSave(container.getFrame(), document.getDocumentFile(), "Save To");
 
     if (file == null)
       return;
@@ -132,19 +141,21 @@ public class PatcherSaveManager
       }
     catch ( MaxDocumentException e)
       {
-	new ErrorDialog( sketchWindow, e.getMessage());
+	new ErrorDialog(container.getFrame(), e.getMessage());
       }
   }
   
-  static public boolean SaveClosing(ErmesSketchWindow sketchWindow, boolean doCancel)
+  static public boolean SaveClosing(EditorContainer container, boolean doCancel)
   {
-    MaxDocument document = sketchWindow.getDocument();
-    FtsPatcherData patcherData = sketchWindow.getPatcherData();
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean toClose=true;
 
     if(document.isRootData(patcherData) && (!document.isSaved()))
       {
-	FileNotSavedDialog aDialog = new FileNotSavedDialog( sketchWindow, document, doCancel);
+	FileNotSavedDialog aDialog = new FileNotSavedDialog(container.getFrame(), document, doCancel);
 	
 	aDialog.setLocation( 300, 300);
 	aDialog.setVisible( true);
@@ -153,7 +164,7 @@ public class PatcherSaveManager
 	  toClose = false;
 	
 	if (aDialog.getToSaveFlag())
-	  toClose = Save(sketchWindow);
+	  toClose = Save(container);
 
 	aDialog.dispose();
       }

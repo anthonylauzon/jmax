@@ -35,16 +35,20 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class DeleteSelectionAction extends AbstractAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class DeleteSelectionAction extends EditorAction
 {
   public DeleteSelectionAction()
   {
     super("Delete Selection");
   }
 
-  public  void actionPerformed(ActionEvent e)
-  {
-    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+  /*public  void actionPerformed(ActionEvent e)
+  {*/
+  public void doAction(EditorContainer container){
+    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
 
     if (! sketch.isLocked())
       {
@@ -78,3 +82,9 @@ public class DeleteSelectionAction extends AbstractAction
       }
   }
 }
+
+
+
+
+
+

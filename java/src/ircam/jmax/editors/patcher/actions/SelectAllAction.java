@@ -34,16 +34,28 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class SelectAllAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class SelectAllAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public SelectAllAction()
   {
-    if (! editor.isLocked())
+    super("Select All");
+  }
+
+  public void doAction(EditorContainer container)
+  {
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    if (!sketch.isLocked())
       {
-	ErmesSelection.patcherSelection.setOwner(editor.itsSketchPad); 
+	ErmesSelection.patcherSelection.setOwner(sketch); 
 	ErmesSelection.patcherSelection.deselectAll();
-	editor.itsSketchPad.getDisplayList().selectAll();
-	editor.itsSketchPad.redraw();
+	sketch.getDisplayList().selectAll();
+	sketch.redraw();
       }
   }
 }
+
+

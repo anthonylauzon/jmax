@@ -62,7 +62,7 @@ class HelpInteraction extends Interaction
 
 	if (object != null)
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	    new ErrorDialog( editor.getSketchWindow(),
+	    new ErrorDialog( editor.getEditorContainer().getFrame(),
 			     "Sorry, no help for object " + object.getFtsObject().getClassName());
 
 	locked = false;

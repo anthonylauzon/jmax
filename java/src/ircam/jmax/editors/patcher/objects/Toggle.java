@@ -108,7 +108,33 @@ class Toggle extends GraphicObject implements FtsIntValueListener
 	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
 	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
       }
-
+    
     super.paint( g);
   }
+
+  public void updatePaint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
+    //g.setClip(x+2, y+2, w-4, h-4);
+    
+    g.setColor( Settings.sharedInstance().getUIColor());
+
+    g.fillRect( x + 3, y + 3, w - 6, h - 6);
+
+    if (isToggled) 
+      {
+	g.setColor( itsCrossColor);
+	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
+	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
+      }
+  }  
 }
+
+
+
+
+

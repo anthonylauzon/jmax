@@ -1,4 +1,4 @@
- # 
+# 
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 # 
@@ -22,11 +22,9 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-#
-
 
 ROOTDIR = ../../../../../../..
-PACKAGE_DIR = ircam/jmax/editors/patcher/actions
+PACKAGE_DIR = ircam/jmax/editors/patcher/tcl
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
@@ -37,4 +35,7 @@ clean: local_clean
 .PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
- 
+
+
+
+

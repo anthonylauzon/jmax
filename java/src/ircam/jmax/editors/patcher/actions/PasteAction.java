@@ -34,10 +34,15 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class PasteAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class PasteAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Paste(editor);    
+    PatcherClipboardManager.clipboardManager.Paste(container);    
   }
 }
+
+

@@ -55,14 +55,13 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
    * is editor dependent.
    */
 
-
   public void reEdit()
   {
     if (window != null)
       {
 	window.setVisible(true);
 	window.toFront();
-	window.itsPatcherData.startUpdates();
+	window.itsSketchPad.getFtsPatcherData().startUpdates();
       }
   }
 
@@ -88,13 +87,15 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
 
   public void showObject(Object object)
   {
-    if (window.isLocked())
-      window.setLocked(false);
+    if (window.itsSketchPad.isLocked())
+      window.itsSketchPad.setLocked(false);
 
     if (window != null)
-      window.showObject(object);
+      window.itsSketchPad.showObject(object);
   }
 }
+
+
 
 
 

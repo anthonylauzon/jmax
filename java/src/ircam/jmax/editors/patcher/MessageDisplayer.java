@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,21 +23,15 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.actions;
+package ircam.jmax.editors.patcher;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.*; 
 
-import javax.swing.*;
-import javax.swing.event.*;
-
-import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
-
-public class QuitAction extends MenuAction
+/** An interface for a message displayer of an editor 
+  */
+public interface MessageDisplayer
 {
-  public void doAction(ErmesSketchWindow editor)
-  {
-    MaxApplication.Quit();
-  }
+  public void showMessage(String text);
+  public void resetMessage();
+  public boolean isMessageReset();
 }

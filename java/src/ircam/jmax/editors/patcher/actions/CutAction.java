@@ -34,11 +34,14 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class CutAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class CutAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Cut(editor);
+    PatcherClipboardManager.clipboardManager.Cut(container);
   }
 }
 

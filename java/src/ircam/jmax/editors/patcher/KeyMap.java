@@ -48,15 +48,12 @@ import ircam.jmax.editors.patcher.actions.*;
 class KeyMap
 {
   JComponent  component;
-  ErmesSketchWindow editor;
-
-  KeyMap(JComponent component, ErmesSketchWindow editor)
+  
+  KeyMap(JComponent component)
   {
     // Set local variables
 
     this.component = component;
-    this.editor = editor;
-
     // Install the keyboard actions
 
     // Move actions
@@ -113,5 +110,13 @@ class KeyMap
 				     condition);
   }
 }
+
+
+
+
+
+
+
+
 
 

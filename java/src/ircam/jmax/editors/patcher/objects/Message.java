@@ -156,4 +156,13 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
 
     super.paint( g);
   }
+
+  public void updatePaint(Graphics g) 
+  {
+    g.setColor(getTextBackground());
+    g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
+    
+    drawContent( g);
+  }
+
 }

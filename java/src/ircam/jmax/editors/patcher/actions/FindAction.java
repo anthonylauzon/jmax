@@ -35,23 +35,26 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class FindAction extends MenuAction
-{
-  ErmesSketchWindow editor;
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-  public void doAction(ErmesSketchWindow e)
+public class FindAction extends EditorAction
+{
+  EditorContainer container;
+
+  public void doAction(EditorContainer c)
   {
-    editor = e;
+    container = c;
 
     if (ErmesSelection.patcherSelection.isSingleton())
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    { 
-	      FindPanel.open(editor.getFts()).findFriends(object.getFtsObject());
+	      FindPanel.open(container.getEditor().getFts()).findFriends(object.getFtsObject());
 	    }});
       }
     else
-      FindPanel.open(editor.getFts());
+      FindPanel.open(container.getEditor().getFts());
   }
 }

@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -34,32 +34,21 @@ import javax.swing.event.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
 
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
 /** Implement the patcher editor File Menu */
 
-public class FileMenu extends PatcherMenu
+public class FileMenu extends DefaultFileMenu
 {
   public FileMenu()
   {
-    super("File");
+    insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
+    insert(Actions.saveAsAction, "SaveAs", 4);
+    insert(Actions.saveToAction, "SaveTo", 5);
 
-    setHorizontalTextPosition(AbstractButton.LEFT);
-
-    add(Actions.newAction, "New", Event.CTRL_MASK, KeyEvent.VK_N);
-    add(Actions.openAction, "Open", Event.CTRL_MASK, KeyEvent.VK_O);
-
-    addSeparator();
-
-    add(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S);
-    add(Actions.saveAsAction, "SaveAs");
-    add(Actions.saveToAction, "SaveTo");
-    add(Actions.closeAction, "Close", Event.CTRL_MASK, KeyEvent.VK_W);
-
-    addSeparator();
-
-    add(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P);
-    add(Actions.statisticsAction, "Statistics");
-    add(Actions.quitAction, "Quit", Event.CTRL_MASK, KeyEvent.VK_Q);
+    insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 8);
+    insertSeparator(9);    
   }
 }
 

@@ -39,6 +39,7 @@ public interface DisplayObject
 {
   public SensibilityArea getSensibilityAreaAt( int mouseX, int mouseY);
   abstract public void paint(Graphics g);
+  abstract public void updatePaint(Graphics g);
   //  abstract public void redraw();
   abstract public boolean intersects(Rectangle r);
 }

@@ -34,10 +34,14 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class LockAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class LockAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    editor.setLocked(! editor.isLocked());
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+    sketch.setLocked(!sketch.isLocked());
   }
 }

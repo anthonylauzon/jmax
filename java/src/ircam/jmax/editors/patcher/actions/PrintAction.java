@@ -34,10 +34,13 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class PrintAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class PrintAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    PatcherPrintManager.Print(editor);
+    PatcherPrintManager.Print(container);
   }
 }

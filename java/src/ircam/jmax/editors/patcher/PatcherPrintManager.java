@@ -19,6 +19,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import ircam.jmax.*;
+import ircam.jmax.toolkit.*;
 
 public class PatcherPrintManager
 {
@@ -30,13 +31,13 @@ public class PatcherPrintManager
   /*                                                                          */
   /****************************************************************************/
   
-  static public void Print(ErmesSketchWindow sketchWindow)
+  static public void Print(EditorContainer container)
   {
-    ErmesSketchPad sketch = sketchWindow.getSketchPad();
-    
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
     RepaintManager.currentManager(sketch).setDoubleBufferingEnabled(false);
 
-    PrintJob aPrintjob = sketchWindow.getToolkit().getPrintJob( sketchWindow, "Printing Patcher", MaxApplication.getProperties());
+    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Patcher", MaxApplication.getProperties());
 
     if (aPrintjob != null)
       {

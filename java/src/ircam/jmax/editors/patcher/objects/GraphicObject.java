@@ -419,9 +419,11 @@ abstract public class GraphicObject implements DisplayObject
 
     paintInlets(g);
     paintOutlets(g);
-
+    
     g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
   }
+
+  public void updatePaint( Graphics g){}  
 
   public void inspect() 
   {
@@ -432,7 +434,7 @@ abstract public class GraphicObject implements DisplayObject
   public void redraw()
   {
     itsSketchPad.repaint(ftsObject.getX(),
-			 ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+			    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
 			 ftsObject.getWidth(),
 			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
@@ -442,13 +444,13 @@ abstract public class GraphicObject implements DisplayObject
 
   public void updateRedraw()
   {
-    itsSketchPad.paintAtUpdateEnd(ftsObject.getX(),
-				  ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				  ftsObject.getWidth(),
-				  ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+      itsSketchPad.paintAtUpdateEnd(this, ftsObject.getX(),
+				    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				    ftsObject.getWidth(),
+				    ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()

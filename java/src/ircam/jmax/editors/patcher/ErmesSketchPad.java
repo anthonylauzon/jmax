@@ -37,10 +37,12 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
+import ircam.jmax.toolkit.*;
 
 /** The graphic workbench for the patcher editor.
  * It handles the interaction of the user with the objects,
@@ -50,44 +52,58 @@ import ircam.jmax.editors.patcher.interactions.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
+public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGroupListener
 {
+  boolean somethingToUpdate = false;
+  Rectangle invalid = new Rectangle();
+  public void paintAtUpdateEnd(GraphicObject object, int x, int y, int w, int h)
+  {
+    displayList.addToUpdate(object);
+    if(!somethingToUpdate){
+      somethingToUpdate = true;
+      invalid.setBounds(x, y, w, h);
+    }
+    else
+      SwingUtilities.computeUnion(x, y, w, h, invalid);
+  }
+  public void resetUpdate(){
+    displayList.resetUpdateObjects();
+    somethingToUpdate = false;
+  }
+  public Rectangle getUpdateRect(){
+    return invalid;
+  }
+  // --------------------------------------
+  // FtsUpdateGroupListener interface
+  // --------------------------------------  
   static boolean syncPaint = false;
-
+    
   static void setSyncPaint(boolean v)
   {
     syncPaint = v;
   }
 
-  Rectangle invalid = new Rectangle();
-  boolean somethingToDraw = false;
-
   public void updateGroupStart()
   {
-    somethingToDraw = false;
+    resetUpdate();
   }
 
   public void updateGroupEnd()
   {
-    if (somethingToDraw);
-      {
-	if (isLocked() && syncPaint)
-	  paintImmediately(invalid);
-	else
-	  repaint(invalid);
-      }
+    Rectangle rect = getEditorContainer().getViewRectangle();
+    Graphics gr;
+    
+    if (isLocked()/* && syncPaint*/){
+      gr = getGraphics();
+      SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
+      gr.setClip(invalid);
+      displayList.updatePaint(gr);
+    }    
+    else
+      repaint(invalid); 
   }
 
-  public void paintAtUpdateEnd(int x, int y, int w, int h)
-  {
-    if (somethingToDraw)
-      SwingUtilities.computeUnion(x, y, w, h, invalid);
-    else
-      {
-	somethingToDraw = true;
-	invalid.setBounds(x, y, w, h);
-      }
-  }
+  // ------------------------------------------------
 
   private DisplayList displayList;
 
@@ -103,16 +119,15 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return keyMap;
   }
 
-  ErmesSketchWindow itsSketchWindow;
+  EditorContainer itsEditorContainer;
 
-  final public ErmesSketchWindow getSketchWindow()
-  {
-    return itsSketchWindow;
+  public EditorContainer getEditorContainer(){
+    return itsEditorContainer;
   }
 
   private Fts fts;
 
-  public Fts getFts()
+  final public Fts getFts()
   {
     return fts;
   }
@@ -129,6 +144,13 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   public FtsPatcherData getFtsPatcherData()
   {
     return itsPatcherData;
+  }
+
+  MaxDocument itsDocument;
+  
+  public MaxDocument getDocument()
+  {
+    return itsDocument;
   }
 
   // ---------------------------------------------------------------------
@@ -159,7 +181,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
   // ---------------------------------------------------------
-  // paste/copy/past  related variables and methods
+  // cut/copy/paste variables and methods
   // ---------------------------------------------------------
   private int incrementalPasteOffsetX;
   private int incrementalPasteOffsetY;
@@ -249,24 +271,25 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-
-  ErmesSketchPad(Fts fts, ErmesSketchWindow theSketchWindow, FtsPatcherData thePatcherData) 
+  ErmesSketchPad(EditorContainer container, FtsPatcherData thePatcherData) 
   {
     super();
 
     String s;
 
     // Setting the local variables
+    itsEditorContainer = container;
 
-    this.fts  = fts;
-    itsSketchWindow = theSketchWindow;
     itsPatcherData  = thePatcherData;
+    fts = itsPatcherData.getFts();
     itsPatcher      = thePatcherData.getContainerObject(); // ???
+    itsDocument     = itsPatcher.getDocument();
+
+    // Initialize state
+    itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
 
     fts.addUpdateGroupListener( this);
-
     // Get the defaultFontName and Size
-
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
 
     if (defaultFontName == null)
@@ -283,7 +306,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     displayList = new DisplayList(this);
     engine      = new InteractionEngine(this);
-    keyMap      = new KeyMap(this, this.getSketchWindow());
+    keyMap      = new KeyMap(this/*, this.getSketchWindow()*/);
 
     // Next two temporary (mdc)
 
@@ -375,12 +398,30 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
   // ----------------------------------------------------------------
+  // make the title for the container (window)
+  // ----------------------------------------------------------------
+
+  String getTitle(){
+    String name;
+
+    if (itsDocument.isRootData(itsPatcherData))
+      name = itsDocument.getName();
+    else if (itsPatcher instanceof FtsPatcherObject)
+      {
+	name = "patcher " + itsPatcher.getDescription();
+      }
+    else
+      name = "template " + itsPatcher.getClassName();
+    return name;
+  }
+
+  // ----------------------------------------------------------------
   // scrolling support
   // ----------------------------------------------------------------
 
   public boolean pointIsVisible(Point point, int margin)
   {
-    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+    Rectangle r = itsEditorContainer.getViewRectangle();
 
     return ((point.x > r.x + margin) && (point.x < r.x + r.width - margin) &&
 	    (point.y > r.y + margin) && (point.y < r.y + r.height - margin));
@@ -389,20 +430,20 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   public void scrollBy(int dx, int dy)
   {
-    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+    Rectangle r = itsEditorContainer.getViewRectangle();
 
     r.x = r.x + dx;
     r.y = r.y + dy;
 
     scrollRectToVisible(r);
 
-    revalidate(); // ???
+    revalidate();
     redraw();
   }
 
   public Point whereItIs(Point point, Point direction, int margin)
   {
-    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+    Rectangle r = itsEditorContainer.getViewRectangle();
 
     direction.x = 0;
     direction.y = 0;
@@ -427,7 +468,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   void showSelection()
   {
     Rectangle selectionBounds = ErmesSelection.patcherSelection.getBounds();
-    Rectangle visibleRectangle = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+    Rectangle visibleRectangle = itsEditorContainer.getViewRectangle();
 
     if (selectionBounds != null)
       {
@@ -551,16 +592,15 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
       }
   }
 
-  public void paintComponent( Graphics g)
+  public void paintComponent(Graphics g)
   {
     displayList.paint(g);
-  }		
+  }	
 
-  final public void redraw()
+   final public void redraw()
   {
     repaint();
   }
-
 
   // ------------------------------------------------------------------------
   // toolbar support
@@ -585,6 +625,8 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   void cleanAll()
   {
+    itsPatcherData.resetPatcherListener();
+    
     fts.removeUpdateGroupListener( this);
 
     engine.dispose();
@@ -597,13 +639,36 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     remove( itsEditField);
 
     // Clean up to help the gc, and found the bugs.
-
-    itsSketchWindow = null;// should not be needed, here to get the grabber !!
+    itsEditorContainer = null;// should not be needed, here to get the grabber !!
 
     itsPatcher = null;
+    itsPatcherData = null;
     itsEditField = null;
     anOldPastedObject = null;
+    itsDocument = null;
   }
+
+
+  //--------------------------------------------------------
+  //	Close 
+  //--------------------------------------------------------
+
+  public void Close(boolean doCancel)
+  {
+    if (! itsDocument.isRootData(itsPatcherData))
+      {
+	itsPatcherData.stopUpdates();
+	Mda.dispose(itsPatcherData); 
+      }
+    else 
+      {
+	if(PatcherSaveManager.SaveClosing(getEditorContainer(), doCancel))
+	  itsDocument.dispose();
+	// Just call dispose on the document
+	// Mda will indirectly call Destroy, and will close all the other editors
+      }
+  }
+
   
   // -----------------------------------------------------------------------
   // The waiting/stopWaiting service
@@ -630,19 +695,35 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   // ------------------------------------------------------------------------
   // Mode handling
   // ------------------------------------------------------------------------
-
   private boolean locked = false;
 
-  void setLocked( boolean locked)
-  {
-    this.locked = locked;
+  // To set the initial state: set to edit mode only if the
+  // initialMode property of a patcher is set and it is set
+  // to something different than "run" (usually, "edit" :)
+  void InitLock(){
+    if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
+      setLocked( false);
+    else
+      setLocked( true);
+  }
 
+  public void setLocked( boolean locked)
+  {
+    toolBar.setLocked(locked);
+
+    this.locked = locked;
+    // Store the mode in a non persistent, property of 
+    // the patch, so that subpatcher can use it as their initial mode
+    if (locked)
+      itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
+    else
+      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
     if (isLocked())
       setRunModeInteraction();
     else
       setEditModeInteraction();
 
-    if (isLocked())
+    if (locked)
       {
 	if (isTextEditingObject())
 	  stopTextEditing();
@@ -650,8 +731,10 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 	if (ErmesSelection.patcherSelection.ownedBy(this))
 	  ErmesSelection.patcherSelection.deselectAll();
       }
-
     redraw();
+    
+    setKeyEventClient( null); //when changing mode, always remove key listeners
+    requestFocus();
   }
 
   final public boolean isLocked()
@@ -949,21 +1032,58 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   // -----------------------------------------------------------------
   // Messages 
   // -----------------------------------------------------------------
+  MessageDisplayer itsMessageDisplayer;
+  public void setMessageDisplayer(MessageDisplayer displayer){
+    itsMessageDisplayer = displayer;
+  }
+  public MessageDisplayer getMessageDisplayer(){
+    return itsMessageDisplayer;
+  }
 
   public void showMessage(String text)
   {
-    itsSketchWindow.showMessage(text);
+    itsMessageDisplayer.showMessage(text);
   }
 
   public void resetMessage()
   {
-    itsSketchWindow.resetMessage();
+    itsMessageDisplayer.resetMessage();
   }
 
   public boolean isMessageReset()
   {
-    return itsSketchWindow.isMessageReset();
+    return itsMessageDisplayer.isMessageReset();
   }
+
+  ////////////////////////////////////
+  // called at window resize and move
+  ///////////////////////////////////
+
+  public void resizeToWindow(int width, int height){
+    if (itsPatcher != null) {
+      itsPatcherData.setWindowWidth(width);
+      itsPatcherData.setWindowHeight(height);
+      fixSize();
+    }
+  }
+  public void relocateToWindow(int x, int y){
+    if (itsPatcher != null) {
+      itsPatcherData.setWindowX(x);
+      itsPatcherData.setWindowY(y);
+    }
+  }
+
+  void stopUpdates(){
+    // Do the test because the awt can call this before itsPatcher is ready
+    if (itsPatcherData != null)
+      itsPatcherData.stopUpdates();
+  }
+  void startUpdates(){
+    // Do the test because the awt can call this before itsPatcher is ready
+    if (itsPatcherData != null)
+      itsPatcherData.startUpdates();
+  }
+
 }
 
 

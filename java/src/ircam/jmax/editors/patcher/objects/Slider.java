@@ -139,7 +139,8 @@ class Slider extends GraphicObject implements FtsIntValueListener
 
   public void inspect()
   {
-    Point aPoint = itsSketchPad.getSketchWindow().getLocation();
+    //Point aPoint = itsSketchPad.getSketchWindow().getLocation();
+    Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
 
     if ( inspector == null) 
       inspector = new SliderDialog();
@@ -150,7 +151,8 @@ class Slider extends GraphicObject implements FtsIntValueListener
 		      String.valueOf( rangeMin),
 		      String.valueOf( value),
 		      this,
-		      itsSketchPad.getSketchWindow());
+		      //itsSketchPad.getSketchWindow()
+		      itsSketchPad.getEditorContainer().getFrame());
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
@@ -171,6 +173,11 @@ class Slider extends GraphicObject implements FtsIntValueListener
 
   public void paint( Graphics g) 
   {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    
     /* Paint the box */
 
     if( !isSelected()) 
@@ -178,24 +185,49 @@ class Slider extends GraphicObject implements FtsIntValueListener
     else
       g.setColor( Settings.sharedInstance().getSelectedColor());
 
-    g.fill3DRect( getX()+1, getY()+1, getWidth()-2,  getHeight()-2, true);
+    g.fill3DRect( x+1, y+1, w-2,  h-2, true);
 
     /* Paint the throttle */
 
-    int pixels = getHeight() - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-    int pos = getY() + BOTTOM_OFFSET + pixels - (pixels * value) / (rangeMax - rangeMin);
+    int pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+    int pos = y + BOTTOM_OFFSET + pixels - (pixels * value) / (rangeMax - rangeMin);
 
     g.setColor( Settings.sharedInstance().getSelectedColor());
 
     if (! isSelected()) 
-      g.fillRect( getX() + THROTTLE_LATERAL_OFFSET + 1, pos + 1,
-		  getWidth() - 2*THROTTLE_LATERAL_OFFSET - 2, THROTTLE_HEIGHT - 2);
+      g.fillRect( x + THROTTLE_LATERAL_OFFSET + 1, pos + 1,
+		  w - 2*THROTTLE_LATERAL_OFFSET - 2, THROTTLE_HEIGHT - 2);
 
     g.setColor( Color.black);
 
-    g.drawRect(getX() + THROTTLE_LATERAL_OFFSET, pos, getWidth() - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+    g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
 
     super.paint(g);
+  }
+
+  public void updatePaint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
+    //g.setClip(x+2, y+2, w-4, h-4);
+
+    /* Paint the box */
+    g.setColor( Settings.sharedInstance().getUIColor());
+    g.fillRect( x+2, y+2, w-4,  h-4);
+
+    /* Paint the throttle */
+    int pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+    int pos = y + BOTTOM_OFFSET + pixels - (pixels * value) / (rangeMax - rangeMin);
+
+    /*g.setColor( Settings.sharedInstance().getSelectedColor());
+      g.fillRect( x + THROTTLE_LATERAL_OFFSET + 1, pos + 1,
+      w - 2*THROTTLE_LATERAL_OFFSET - 2, THROTTLE_HEIGHT - 2);*/
+
+    g.setColor( Color.black);
+    g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)

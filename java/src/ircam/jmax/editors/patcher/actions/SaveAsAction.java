@@ -33,10 +33,13 @@ import javax.swing.event.*;
 
 import ircam.jmax.editors.patcher.*;
 
-public class SaveAsAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class SaveAsAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    PatcherSaveManager.SaveAs(editor);
+    PatcherSaveManager.SaveAs(container);
   }
 }

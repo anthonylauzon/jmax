@@ -168,6 +168,36 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
     super.paint( g);
   }
 
+  public void updatePaint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    int hd2 = h / 2;
+
+    //g.setClip(x+hd2+2, y+2, w-(hd2+2)-2, h-4);
+
+    // Fill the background
+    g.setColor( Color.white);
+    g.fillRect( x+hd2+2, y+1, w-(hd2+2)-2, h-2);
+
+    // Draw the value
+    String aString;
+
+    if(valueValid)
+      aString = getVisibleString(getValueAsText());
+    else 
+      aString = getVisibleString(currentText.toString());
+    
+    g.setColor( Color.black);
+    g.setFont( getFont());
+    g.drawString( aString, 
+		  x + hd2 + 5, 
+		  y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2 + 1);
+  }
+
+
   String getVisibleString(String theString) 
   {
     String aString = theString;
@@ -199,6 +229,7 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
   {
     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
       {
+	if(e.getKeyCode()==109) return;//??????
 	// This stuff should be thrown away, and we should use
 	// a real text area for the number boxes !!!
 
@@ -263,11 +294,17 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
 
   public void keyReleased( KeyEvent e) 
   {
+     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
+      {
+	if(e.getKeyChar()== '-') 
+	  currentText.append('-');
+
+	e.consume();
+	redraw();
+      }
   }
 
-  public void keyTyped( KeyEvent e) 
-  {
-  }
+  public void keyTyped( KeyEvent e){}
 
   public void keyInputGained() 
   {

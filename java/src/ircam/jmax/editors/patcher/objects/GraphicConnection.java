@@ -211,6 +211,8 @@ public class GraphicConnection implements DisplayObject
       g.drawLine(start.x, start.y, end.x, end.y);
   }
 
+  public void updatePaint(Graphics g){}
+
   // Connections should store their bounds !!!
 
   public void redraw()

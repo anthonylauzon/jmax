@@ -54,7 +54,7 @@ public class TextMenu extends JMenu
   private ButtonGroup itsFontMenuGroup;
   JRadioButtonMenuItem fakeFontButton;
 
-  ErmesSketchWindow editor;
+  ErmesSketchPad sketch;
 
   class TextMenuListener implements MenuListener
   {
@@ -72,13 +72,13 @@ public class TextMenu extends JMenu
     }
   }
 
-  public TextMenu(ErmesSketchWindow window)
+  public TextMenu(ErmesSketchPad sketch)
   {
     super("Text");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
     JMenuItem item;
-    editor = window;
+    this.sketch = sketch;
 
     biggerItem = new JMenuItem("Bigger");
     biggerItem.addActionListener(new ActionListener()
@@ -127,7 +127,7 @@ public class TextMenu extends JMenu
     {
       //if we are here, a font size have been choosen from the FONT menu
 
-      if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad) && 
+      if (ErmesSelection.patcherSelection.ownedBy(sketch) && 
 	  ErmesSelection.patcherSelection.hasObjects())
 	{
 	  try
@@ -136,13 +136,13 @@ public class TextMenu extends JMenu
 	    }
 	  catch (Exception e)
 	    {
-	      ErrorDialog aErr = new ErrorDialog(editor, "This font does not exist on this platform");
+	      ErrorDialog aErr = new ErrorDialog(sketch.getEditorContainer().getFrame(), "This font does not exist on this platform");
 	      aErr.setLocation( 100, 100);
 	      aErr.show();  
 	    }
 	}
       else
-	editor.itsSketchPad.setDefaultFontSize(size);
+	sketch.setDefaultFontSize(size);
     }
   }
 
@@ -178,7 +178,7 @@ public class TextMenu extends JMenu
 
     public void actionPerformed(ActionEvent ev) 
     {
-      if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad) && 
+      if (ErmesSelection.patcherSelection.ownedBy(sketch) && 
 	  ErmesSelection.patcherSelection.hasObjects())
 	{
 	  try
@@ -187,13 +187,13 @@ public class TextMenu extends JMenu
 	    }
 	  catch (Exception e) 
 	    {
-	      ErrorDialog aErr = new ErrorDialog(editor, "This font does not exist on this platform");
+	      ErrorDialog aErr = new ErrorDialog(sketch.getEditorContainer().getFrame(), "This font does not exist on this platform");
 	      aErr.setLocation( 100, 100);
 	      aErr.show();  
 	    }
 	}
       else
-	editor.itsSketchPad.setDefaultFontName(font);
+	sketch.setDefaultFontName(font);
     }
   }
 
@@ -234,8 +234,8 @@ public class TextMenu extends JMenu
 	biggerItem.setEnabled(false);
 	smallerItem.setEnabled(false);
 
-	fontName = editor.itsSketchPad.getDefaultFontName();
-	fontSize = editor.itsSketchPad.getDefaultFontSize();
+	fontName = sketch.getDefaultFontName();
+	fontSize = sketch.getDefaultFontSize();
       }
     else if (ErmesSelection.patcherSelection.isSingleton())
       {

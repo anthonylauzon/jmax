@@ -34,10 +34,13 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class DuplicateAction extends MenuAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class DuplicateAction extends EditorAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Duplicate(editor);   
+    PatcherClipboardManager.clipboardManager.Duplicate(container);   
   }
 }

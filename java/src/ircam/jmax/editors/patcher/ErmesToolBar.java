@@ -72,9 +72,9 @@ public class ErmesToolBar extends JPanel  {
       public void itemStateChanged(ItemEvent e)
 	{
 	  if (e.getStateChange() == ItemEvent.SELECTED)
-	    sketch.itsSketchWindow.setLocked( false);
+	    sketch.setLocked( false);
 	  else
-	    sketch.itsSketchWindow.setLocked( true);
+	    sketch.setLocked( true);
 	}
     });
 
@@ -183,4 +183,6 @@ public class ErmesToolBar extends JPanel  {
     AddPopUp.initDone();//????
   }
 }
+
+
 

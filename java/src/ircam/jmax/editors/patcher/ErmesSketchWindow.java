@@ -26,7 +26,7 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.*;  
 import javax.swing.*;
 
 import ircam.jmax.*;
@@ -34,18 +34,18 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.menus.*;
 
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 //
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
-public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener
+public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener, EditorContainer, MessageDisplayer
 {
   public ErmesSketchPad itsSketchPad;
   JScrollPane  itsScrollerView;
   ErmesToolBar itsToolBar;
   JLabel       itsMessageLabel;
-  public FtsObject itsPatcher;
-  public FtsPatcherData itsPatcherData;
 
   private FileMenu itsFileMenu;
   private EditMenu itsEditMenu;	
@@ -54,14 +54,42 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
 
-  private Fts fts;
+  // ------ editorContainer interface ---------------
 
-  public MaxDocument itsDocument;
-
-  public void showObject( Object obj)
-  {
-    itsSketchPad.showObject( obj);
+  public Editor getEditor(){
+    return itsSketchPad;
   }
+  public Frame getFrame(){
+    return this;
+  }
+  public Point getContainerLocation(){
+    return getLocation();
+  }
+  public Rectangle getViewRectangle(){
+    return itsScrollerView.getViewport().getViewRect();
+  }
+
+  // ------- messageDisplayer interface -------------\
+
+  boolean gotMessage = false;
+  public void showMessage(String text)
+  {
+    itsMessageLabel.setText(text);
+    gotMessage = true;
+  }
+  public void resetMessage()
+  {
+    if (gotMessage)
+      {
+	itsMessageLabel.setText("    ");
+	gotMessage = false;
+      }
+  }
+  public boolean isMessageReset()
+  {
+    return (! gotMessage);
+  }
+  // -----------------------------------------------
 
   /****************************************************************************/
   /*                                                                          */
@@ -73,26 +101,18 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     super("");
 
-    fts = patcherData.getFts();
-
     MaxWindowManager.getWindowManager().addWindow(this);
 
     // Create the ClipboardManager
     PatcherClipboardManager.createManager();
     
-    // Initialize state
-    itsDocument = patcherData.getDocument();
-    itsPatcher = patcherData.getContainerObject();
-    itsPatcherData = patcherData;
+    // Make the content
+    itsSketchPad = new ErmesSketchPad(this, patcherData);
 
-    itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
+    itsToolBar = new ErmesToolBar( itsSketchPad);
 
     // Make the title
     makeTitle();
-
-    // Make the content
-    itsSketchPad = new ErmesSketchPad(fts, this, itsPatcherData);
-    itsToolBar = new ErmesToolBar( itsSketchPad);
 
     itsScrollerView = new JScrollPane();
     itsScrollerView.setViewportView( itsSketchPad); 
@@ -102,37 +122,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsScrollerView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
     // Build The Menus and Menu Bar
-    JMenuBar mb = new JMenuBar();
+    makeMenuBar();
 
-    // Build the file menu
-    itsFileMenu = new FileMenu();
-    mb.add(itsFileMenu); 
-
-    // Build the edit menu
-    itsEditMenu = new EditMenu(this); 
-    mb.add(itsEditMenu); 
-
-    // Build the text menu
-    itsTextMenu = new TextMenu(this);
-    mb.add( itsTextMenu);
-
-    // New Tool menu 
-    itsToolsMenu = new ircam.jmax.toolkit.MaxToolsJMenu("Tools"); 
-    mb.add(itsToolsMenu);
-
-    // New Window Manager based Menu
-    itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowJMenu("Windows", this); 
-    mb.add(itsWindowsMenu);
-
-    // Add some separation between help and the others.
-    mb.add(Box.createHorizontalGlue());
-
-    // Build up the help Menu 
-    itsHelpMenu = new HelpMenu(this);
-    mb.add( itsHelpMenu);
-
-    setJMenuBar(mb);
-    
     // inform the Sketch of the ToolBar to 
     itsSketchPad.setToolBar( itsToolBar);
 
@@ -143,26 +134,18 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     getContentPane().add( itsMessageLabel, BorderLayout.SOUTH);
 
     // Compute its Initial Size
-    InitFromContainer( itsPatcher); 
+    InitFromContainer( patcherData); 
 
     validate();
 
     addComponentListener( this); 
     addWindowListener(this); 
     
-    // To set the initial state: set to edit mode only if the
-    // initialMode property of a patcher is set and it is set
-    // to something different than "run" (usually, "edit" :)
-    if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
-      setLocked( false);
-    else
-      setLocked( true);
-
-    // Fix the sketch size if needed ????
-    itsSketchPad.fixSize();
+    itsSketchPad.InitLock();
+    itsSketchPad.setMessageDisplayer(this);
 
     // Finally, activate the updates
-    itsPatcherData.startUpdates();
+    patcherData.startUpdates();
 
     // Make it visible, at the end
     setVisible( true);
@@ -170,21 +153,44 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private final void makeTitle()
   {
-    String name;
-
-    if (itsDocument.isRootData(itsPatcherData))
-      name = itsDocument.getName();
-    else if (itsPatcher instanceof FtsPatcherObject)
-      {
-	name = "patcher " + itsPatcher.getDescription();
-      }
-    else
-      name = "template " + itsPatcher.getClassName();
-
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(name));
-
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(itsSketchPad.getTitle()));
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
+
+  private final void makeMenuBar(){
+    
+    JMenuBar mb = new JMenuBar();
+
+    // Build the file menu
+    itsFileMenu = new FileMenu(); 
+    mb.add(itsFileMenu); 
+
+    // Build the edit menu
+    itsEditMenu = new EditMenu(itsSketchPad); 
+    mb.add(itsEditMenu); 
+
+    // Build the text menu
+    itsTextMenu = new TextMenu(itsSketchPad);
+    mb.add( itsTextMenu);
+
+    // New Tool menu 
+    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
+    mb.add(itsToolsMenu);
+
+    // New Window Manager based Menu
+    itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
+    mb.add(itsWindowsMenu);
+
+    // Add some separation between help and the others.
+    mb.add(Box.createHorizontalGlue());
+
+    // Build up the help Menu 
+    itsHelpMenu = new HelpMenu(itsSketchPad);
+    mb.add( itsHelpMenu);
+
+    setJMenuBar(mb);
+  }
+
 
   int horizontalOffset()
   {
@@ -196,7 +202,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return 130;
   }
   
-  private void InitFromContainer( FtsObject patcher)
+  private void InitFromContainer( FtsPatcherData patcherData)
   {
     int x;
     int y;
@@ -205,10 +211,10 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     //Double check the existence of the window properties. If there aren't, use defaults
       
-    x = itsPatcherData.getWindowX();
-    y = itsPatcherData.getWindowY();
-    width = itsPatcherData.getWindowWidth();
-    height = itsPatcherData.getWindowHeight();
+    x = patcherData.getWindowX();
+    y = patcherData.getWindowY();
+    width = patcherData.getWindowWidth();
+    height = patcherData.getWindowHeight();
 
     if (width <= 0)
       width = 480;
@@ -219,92 +225,20 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
   }
 
-  public Fts getFts()
-  {
-    return fts;
-  }
-
-  public ErmesSketchPad getSketchPad(){
-    return itsSketchPad;
-  }
-  public MaxDocument getDocument(){
-    return itsDocument;
-  }
-  public FtsPatcherData getPatcherData(){
-    return itsPatcherData;
-  }
-  /****************************************************************************/
-  /*                                                                          */
-  /*           MENU ACTIONS                                                   */
-  /*                                                                          */
-  /****************************************************************************/
-
-  public void Close(boolean doCancel)
-  {
-    if (! itsDocument.isRootData(itsPatcherData))
-      {
-	itsPatcherData.stopUpdates();
-	Mda.dispose(itsPatcherData); // experimental
-      }
-    else 
-      {
-	if(PatcherSaveManager.SaveClosing(this, doCancel))
-	  itsDocument.dispose();
-	// Just call dispose on the document
-	// Mda will indirectly call Destroy, and will close all the other editors
-      }
-  }
-
-  // Method to close the editor (do not touch the patcher)
   public void Destroy()
   {
+    
     setVisible(false);
 
-    itsPatcherData.resetPatcherListener();
     removeComponentListener( this);
     removeWindowListener(this);
     itsSketchPad.cleanAll();
 
     itsSketchPad = null;
-    itsPatcher = null;
-    itsPatcherData = null;
-    itsDocument = null;
-
     itsScrollerView = null;
 
     dispose();
   }
-
-  /****************************************************************************/
-  /*                                                                          */
-  /*           LOCK MODE HANDLING                                             */
-  /*                                                                          */
-  /****************************************************************************/
-
-  public void setLocked( boolean locked)
-  {
-    // Store the mode in a non persistent, property of 
-    // the patch, so that subpatcher can use it as their initial mode
-
-    if (locked)
-      itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
-    else
-      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
-
-    itsSketchPad.setLocked( locked); 
-
-    itsToolBar.setLocked( locked);
-
-    itsSketchPad.setKeyEventClient( null); //when changing mode, always remove key listeners
-
-    itsSketchPad.requestFocus();
-  }
-
-  final public boolean isLocked()
-  {
-    return itsSketchPad.isLocked();
-  }
-
   /****************************************************************************/
   /*                                                                          */
   /*           LISTENERS                                                      */
@@ -313,7 +247,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   // Window Listener Interface 
   public void windowClosing(WindowEvent e)
   {
-    Close(false);
+    itsSketchPad.Close(false);    
   }
 
   public void windowOpened(WindowEvent e)
@@ -326,16 +260,12 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void windowIconified( WindowEvent e)
   {
-    // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcherData != null)
-      itsPatcherData.stopUpdates();
+    itsSketchPad.stopUpdates();
   }       
 
   public void windowDeiconified( WindowEvent e)
   {
-    // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcherData != null)
-      itsPatcherData.startUpdates();
+    itsSketchPad.startUpdates();
   }       
 
   public void windowActivated(WindowEvent e)
@@ -350,21 +280,12 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   // Component Listener Interface
   public void componentResized( ComponentEvent e) 
   {
-    if (itsPatcher != null) 
-      {
-	itsPatcherData.setWindowWidth(getSize().width - horizontalOffset());
-	itsPatcherData.setWindowHeight(getSize().height - verticalOffset());
-	itsSketchPad.fixSize();
-      }
+    itsSketchPad.resizeToWindow(getSize().width - horizontalOffset(), getSize().height - verticalOffset());
   }
 
   public void componentMoved( ComponentEvent e) 
   {
-    if (itsPatcher != null)
-      {
-	itsPatcherData.setWindowX(getLocation().x);
-	itsPatcherData.setWindowY(getLocation().y);
-      }
+    itsSketchPad.relocateToWindow(getLocation().x, getLocation().y);
   }
 
   public void componentShown( ComponentEvent e) 
@@ -373,28 +294,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void componentHidden( ComponentEvent e)
   {
-  }
-
-  boolean gotMessage = false;
-
-  public void showMessage(String text)
-  {
-    itsMessageLabel.setText(text);
-    gotMessage = true;
-  }
-
-  public void resetMessage()
-  {
-    if (gotMessage)
-      {
-	itsMessageLabel.setText("    ");
-	gotMessage = false;
-      }
-  }
-
-  public boolean isMessageReset()
-  {
-    return (! gotMessage);
   }
 }
 

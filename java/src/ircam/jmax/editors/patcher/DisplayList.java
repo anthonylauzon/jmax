@@ -426,6 +426,31 @@ public class DisplayList
     return candidateArea;
   }
 
+  ////////////////////////////////////////////////////////////
+  //
+  //                  UPDATING 
+  //
+  ///////////////////////////////////////////////////////////
+  MaxVector updateObjects = new MaxVector();
+
+  public void addToUpdate(GraphicObject object){
+    updateObjects.addElement(object);
+  }
+    
+  public void resetUpdateObjects(){
+    updateObjects.removeAllElements();
+  }
+    
+  public Enumeration getUpdateObjects(){
+    return updateObjects.elements();
+  }
+
+  void updatePaint(Graphics g){
+    Object[] values = updateObjects.getObjectArray();
+    int size = updateObjects.size();
+    for ( int i = 0; i < size; i++)
+      ((DisplayObject) values[i]).updatePaint(g);
+  }
 
   ////////////////////////////////////////////////////////////////////////////////
   //                                                                            //
@@ -474,9 +499,7 @@ public class DisplayList
 
     // First, paint the background
 
-    Rectangle clip;
-    
-    clip = g.getClipBounds();
+    Rectangle clip  = g.getClipBounds();
 
     g.setColor(sketch.isLocked() ?
 	       Settings.sharedInstance().getLockBackgroundColor() : 
@@ -828,6 +851,11 @@ public class DisplayList
     sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
   }
 }
+
+
+
+
+
 
 
 

@@ -43,14 +43,15 @@ public class ErmesModule
   {
     if (active)
       {
+	MaxRepaintManager manager = new MaxRepaintManager();
+	// Install the customized Repaint Manager
+	RepaintManager.setCurrentManager(manager);
 	// Optionally set the syncPaint flag
-
 	if (MaxApplication.getProperty("syncPaint") != null)
 	  ErmesSketchPad.setSyncPaint(true);
-
-	// Install the customized Repaint Manager
-
-	RepaintManager.setCurrentManager(new MaxRepaintManager());
+	  //manager.setSyncPaint(true);
+	
+	//MaxApplication.getFts().addUpdateGroupListener(manager);
 
 	// Install the local mda entities
 

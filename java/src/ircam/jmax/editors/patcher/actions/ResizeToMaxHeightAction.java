@@ -35,17 +35,20 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ResizeToMaxHeightAction extends AbstractAction
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class ResizeToMaxHeightAction extends EditorAction
 {
   public ResizeToMaxHeightAction()
   {
     super("Max Height");
   }
 
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(EditorContainer container)
   {
-    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
-
+    ErmesSketchPad sketch = (ErmesSketchPad) container.getEditor();
+  
     if (ErmesSelection.patcherSelection.ownedBy(sketch))
       ErmesSelection.patcherSelection.resizeToMaxHeight();
   }

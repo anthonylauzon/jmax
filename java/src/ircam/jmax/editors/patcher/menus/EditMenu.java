@@ -41,9 +41,12 @@ import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
 
-/** Implement the patcher editor File Menu */
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
-public class EditMenu extends PatcherMenu
+/** Implement the editor File Menu */
+
+public class EditMenu extends EditorMenu
 {
   class EditMenuListener implements MenuListener
   {
@@ -61,7 +64,7 @@ public class EditMenu extends PatcherMenu
     }
   }
 
-  ErmesSketchWindow window;
+  ErmesSketchPad sketch;
 
   JMenuItem cutItem;
   JMenuItem copyItem;
@@ -71,11 +74,11 @@ public class EditMenu extends PatcherMenu
   JMenuItem inspectItem;
   JMenuItem lockItem;
   
-  public EditMenu(ErmesSketchWindow window)
+  public EditMenu(ErmesSketchPad sketch)
   {
     super("Edit");
 
-    this.window = window;
+    this.sketch = sketch;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
@@ -113,7 +116,7 @@ public class EditMenu extends PatcherMenu
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
 
-    if (window.isLocked())
+    if (sketch.isLocked())
       {
 	lockItem.setText("Unlock");
 	selectAllItem.setEnabled(false);
@@ -129,11 +132,11 @@ public class EditMenu extends PatcherMenu
       {
 	lockItem.setText("Lock");
 
-	if (window.itsSketchPad.isTextEditingObject())
+	if (sketch.isTextEditingObject())
 	  {
 	    // Text editing, look at text selection
 
-	    if (window.itsSketchPad.getSelectedText() != null)
+	    if (sketch.getSelectedText() != null)
 	      {
 		cutItem.setEnabled(true);
 		copyItem.setEnabled(true);
@@ -159,7 +162,7 @@ public class EditMenu extends PatcherMenu
 		copyItem.setEnabled(false);
 		duplicateItem.setEnabled(false);
 	      }
-	    else if (ErmesSelection.patcherSelection.getOwner() == window.itsSketchPad)
+	    else if (ErmesSelection.patcherSelection.getOwner() == sketch)
 	      {
 		// Object selection
 
