@@ -28,7 +28,7 @@ typedef struct fts_status_description {
 #define fts_ok ((fts_status_t) 0)
 #define fts_status_get_description(s) ((s)->description)
 
-extern fts_status_t fts_ignore;
+FTS_API fts_status_t fts_ignore;
 
 FTS_API fts_status_t fts_status_new(fts_symbol_t description);
 FTS_API fts_status_t fts_status_format(const char *format, ...);
