@@ -9,7 +9,7 @@ help_DATA=\
  key.help.jmax \
  keystat.help.jmax \
  messbox.help.jmax \
- scope.help.jmax \
+ scope~.help.jmax \
  slider.help.jmax \
  toggle.help.jmax \
  vecdisplay.help.jmax \
