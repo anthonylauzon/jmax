@@ -52,7 +52,7 @@ getlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   getlist_t *this = (getlist_t *)o;
 
-  fts_array_reset(&this->list);
+  fts_array_destroy(&this->list);
 }
 
 /************************************************

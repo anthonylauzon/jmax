@@ -59,21 +59,21 @@ preset_remove(preset_t *this, const fts_atom_t *key)
 
   if(fts_hashtable_get(&this->hash, key, &value))
     {
-      fts_list_t *states = (fts_list_t *)fts_get_ptr(&value);
+      fts_array_t *states = (fts_array_t *)fts_get_ptr(&value);
       int i;
 
       for(i=0; i<this->n_objects; i++)
-	fts_list_reset(states + i);
+	fts_array_destroy(states + i);
 
       fts_free(states);
       fts_hashtable_remove(&this->hash, key);      
     }
 }
 
-static fts_list_t *
+static fts_array_t *
 preset_get_or_add(preset_t *this, const fts_atom_t *key)
 {
-  fts_list_t *states;
+  fts_array_t *states;
   fts_atom_t value;
   
   if(fts_hashtable_get(&this->hash, key, &value))
@@ -82,10 +82,10 @@ preset_get_or_add(preset_t *this, const fts_atom_t *key)
     {
       int i;
       
-      states = (fts_list_t *)fts_malloc(sizeof(fts_list_t) * this->n_objects);
+      states = (fts_array_t *)fts_malloc(sizeof(fts_array_t) * this->n_objects);
       
       for(i=0; i<this->n_objects; i++)
-	fts_list_init(states + i, 0, 0);
+	fts_array_init(states + i, 0, 0);
 
       fts_set_ptr(&value, (void *)states);
       fts_hashtable_put(&this->hash, key, &value);
@@ -120,7 +120,7 @@ preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       while(fts_iterator_has_more( &iterator))
 	{
 	  fts_atom_t key;
-	  fts_list_t *states;
+	  fts_array_t *states;
 	  int i;
 	  
 	  fts_iterator_next( &iterator, &key);
@@ -140,15 +140,15 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(fts_is_int(at))
     {
       fts_atom_t value;
-      fts_list_t *states;
+      fts_array_t *states;
 
       if(fts_hashtable_get(&this->hash, at, &value))
 	{
-	  states = (fts_list_t *)fts_get_ptr(&value);
+	  states = (fts_array_t *)fts_get_ptr(&value);
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_list_set_size(states + i, 0);
+	      fts_array_set_size(states + i, 0);
 
 	      /* get object state as array */
 	      fts_set_list(&value, states + i);
@@ -157,11 +157,11 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
       else
 	{
-	  states = (fts_list_t *)fts_malloc(sizeof(fts_list_t) * this->n_objects);
+	  states = (fts_array_t *)fts_malloc(sizeof(fts_array_t) * this->n_objects);
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_list_init(states + i, 0, 0);
+	      fts_array_init(states + i, 0, 0);
 
 	      /* get object state as array */
 	      fts_set_list(&value, states + i);
@@ -185,13 +185,13 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(fts_hashtable_get(&this->hash, at, &value))
 	{
-	  fts_list_t *states = fts_get_list(&value);
+	  fts_array_t *states = fts_get_list(&value);
 	  int i;
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_atom_t *atoms = fts_list_get_ptr(states + i);
-	      int size = fts_list_get_size(states + i);
+	      fts_atom_t *atoms = fts_array_get_atoms(states + i);
+	      int size = fts_array_get_size(states + i);
 
 	      fts_message_send(this->objects[i], fts_SystemInlet, sym_restore_state_from_array, size, atoms);
 	    }
@@ -211,10 +211,10 @@ static void
 preset_add_state_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
-  fts_list_t *states = preset_get_or_add(this, at + 0);
+  fts_array_t *states = preset_get_or_add(this, at + 0);
   int i_object = fts_get_int(at + 1);
 
-  fts_list_set(states + i_object, ac - 2, at + 2);
+  fts_array_set(states + i_object, ac - 2, at + 2);
 }
 
 /* add array to preset at given index of state of given object */
@@ -222,15 +222,16 @@ static void
 preset_add_array_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
-  fts_list_t *states = preset_get_or_add(this, at + 0);
+  fts_array_t *states = preset_get_or_add(this, at + 0);
   int i_object = fts_get_int(at + 1);
   int i_array = fts_get_int(at + 2);
 
   if(i_object < this->n_objects)
     {
-      fts_list_t *atoms = fts_list_new(ac - 3, at + 3);
-      fts_atom_t *a = &fts_list_get_element(states + i_object, i_array);
+      fts_array_t *atoms = fts_malloc(sizeof(fts_array_t));
+      fts_atom_t *a = fts_array_get_element(states + i_object, i_array);
 
+      fts_array_init(atoms, ac - 3, at + 3);
       fts_set_list(a, atoms);
     }
 }
@@ -251,19 +252,19 @@ preset_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	{
 	  fts_atom_t key;
 	  fts_atom_t value;
-	  fts_list_t *states;
+	  fts_array_t *states;
 	  int i;
 	  
 	  fts_iterator_next( &iterator, &key);
 	  fts_hashtable_get(&this->hash, &key, &value);
 	  
-	  states = (fts_list_t *)fts_get_ptr(&value);
+	  states = (fts_array_t *)fts_get_ptr(&value);
 	      
 	  /* save states */
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_atom_t *atoms = fts_list_get_ptr(states + i);
-	      int size = fts_list_get_size(states + i);
+	      fts_atom_t *atoms = fts_array_get_atoms(states + i);
+	      int size = fts_array_get_size(states + i);
 	      int j;
 
 	      /* save state as array */
@@ -290,11 +291,11 @@ preset_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 		{
 		  if(fts_is_list(atoms + j))
 		    {
-		      fts_list_t *array = fts_get_list(atoms + j);
-		      int n = fts_list_get_size(array);
+		      fts_array_t *array = fts_get_list(atoms + j);
+		      int n = fts_array_get_size(array);
 
 		      /* write array */
-		      fts_bmax_code_push_atoms(f, n, fts_list_get_ptr(array));
+		      fts_bmax_code_push_atoms(f, n, fts_array_get_atoms(array));
 
 		      /* write array index */
 		      fts_bmax_code_push_int(f, j);
@@ -361,7 +362,8 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	}
     }
 
-  fts_hashtable_init(&this->hash, fts_t_int, 16);
+  /* init hash table */
+  fts_hashtable_init(&this->hash, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
 
   this->objects = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * ac);
 
