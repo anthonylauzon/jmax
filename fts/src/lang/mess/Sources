@@ -21,7 +21,6 @@ events.c	\
 expressions.c	\
 templates.c     \
 ftsdata.c	\
-array.c         \
 ftsdataid.c	\
 loader.c	\
 mess.c		\

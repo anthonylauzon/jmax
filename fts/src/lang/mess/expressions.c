@@ -181,8 +181,7 @@ struct fts_expression_state
 
 /* Error utility */
 
-static int expression_error(fts_expression_state_t *e, int err, const char *msg,
-			    const char *arg)
+static int expression_error(fts_expression_state_t *e, int err, const char *msg, const char *arg)
 {
   e->msg = msg;
   e->err_arg = arg;
@@ -485,13 +484,10 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  args++;
 		}
 
-
 	      /* Make the array */
-
-	      fts_set_atom_array(&result, fts_atom_array_new_fill(args, tos));
+	      fts_set_data(&result, fts_data_new_const(fts_s_atom_array, args, tos));
 
 	      /* Pop the stack, and push the result */
-
 	      value_stack_pop(e, args);
 	      value_stack_push(e, &result);
 
@@ -756,8 +752,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		  next_in(e);
 
 		  if (! more_in(e))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector constant", 0);
+		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array constant", 0);
 
 		  if (fts_is_closed_cpar(current_in(e)))
 		    break;	
@@ -767,19 +762,15 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		  TRY(fts_expression_eval_one(e));
 
 		  if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_cpar(current_in(e))))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector constant", 0);
+		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array constant", 0);
 
 		  args++;
 		}
 
-
 	      /* Make the array */
-
-	      fts_set_atom_array(&result, fts_atom_array_new_fill(args, tos + 1));
+	      fts_set_data(&result, fts_data_new_const(fts_s_atom_array, args, tos + 1));
 
 	      /* Pop the stack, and push the result */
-
 	      value_stack_pop(e, args);
 	      value_stack_push(e, &result);
 
@@ -1348,36 +1339,44 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_ARRAY_REF:
-	  if (fts_is_int(tos) && fts_is_atom_array(ptos))
+	  if (fts_is_int(tos) && fts_is_data(ptos) && fts_data_is(fts_get_data(ptos), fts_s_atom_array))
 	    {
-	      fts_atom_array_t *aa;
-	      int idx;
+	      fts_data_t *data = fts_get_data(ptos);
+	      fts_atom_array_t *aa = (fts_atom_array_t *)data;
+	      int idx = fts_get_int(tos);
 	      
-	      aa = fts_get_atom_array(ptos);
-	      idx = fts_get_int(tos);
-
 #ifdef EXPRESSION_TRACE_DEBUG
 	      fprintf(stderr, "Accessing array ");
 	      fprintf_atom_array(stderr, aa);
-	      fprintf(stderr, " Position %d ", idx);
-
-	      if (fts_atom_array_check(aa, idx))
+	      fprintf(stderr, " Position %d ", idx);	      
+	      
+	      if(fts_data_is_const(data))
 		{
-		  fts_atom_t a;
-
-		  fprintf(stderr, " value ");
-		  a = fts_atom_array_get(aa, idx);
-		  fprintf_atoms(stderr, 1, &a);
-		  fprintf(stderr, "\n");
+		  if (fts_atom_array_check_index(aa, idx))
+		    {
+		      fts_atom_t a;
+		      
+		      fprintf(stderr, " value ");
+		      a = fts_atom_array_get_element(aa, idx);
+		      fprintf_atoms(stderr, 1, &a);
+		      fprintf(stderr, "\n");
+		    }
+		  else
+		    fprintf(stderr, "(Array index out of bound)\n");
 		}
 	      else
-		fprintf(stderr, "(Array index out of bound)\n");
-#endif
+		fprintf(stderr, "(Array not constant)\n");
 
-	      if (fts_atom_array_check(aa, idx))
-		*value_stack_top(e) = fts_atom_array_get(aa, idx);
+#endif
+	      if(fts_data_is_const(data))
+		{
+		  if (fts_atom_array_check_index(aa, idx))
+		    *value_stack_top(e) = fts_atom_array_get_element(aa, idx);
+		  else
+		    return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
+		}
 	      else
-		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
+		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array not constant in constant expression", 0);
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for array access", 0);
@@ -1576,13 +1575,14 @@ static int unique(int ac, const fts_atom_t *at, fts_atom_t *result)
 
 static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
-  if ((ac == 4) && fts_is_atom_array(&at[1]) && fts_is_int(&at[2]))
+  if ((ac == 4) && fts_is_int(&at[2]) && fts_is_data(&at[1]) && fts_data_is(fts_get_data(&at[1]), fts_s_atom_array))
     {
-      fts_atom_array_t *array = fts_get_atom_array(&at[1]);
+      fts_data_t *data = fts_get_data(&at[1]);
+      fts_atom_array_t *array = (fts_atom_array_t *)data;
       int idx = fts_get_int(&at[2]);
 
-      if (fts_atom_array_check(array, idx))
-	*result = fts_atom_array_get(array, idx);
+      if (fts_data_is_const(data) && fts_atom_array_check_index(array, idx))
+	*result = fts_atom_array_get_element(array, idx);
       else
 	*result = at[3];
   
@@ -1592,8 +1592,23 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
     return FTS_EXPRESSION_SYNTAX_ERROR;
 }
   
-/* Init function  */
+/* FTS data consructor function in expressions */
+static int
+fts_expressions_data_new(int ac, const fts_atom_t *at, fts_atom_t *result)
+{
+  fts_symbol_t class_name = fts_get_symbol(at);
+  fts_data_t *data = fts_data_new(class_name, ac, at);
 
+  if(data)
+    {
+      fts_set_data(result, data);
+      return FTS_EXPRESSION_OK;
+    }
+  else
+    return FTS_EXPRESSION_SYNTAX_ERROR;
+}
+
+/* Init function  */
 void
 fts_expressions_init(void)
 {
@@ -1604,12 +1619,11 @@ fts_expressions_init(void)
   fts_hash_table_init(&fts_expression_fun_table);
 
   /* function installation */
-
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);
   fts_expression_declare_fun(fts_new_symbol("_getElement"), get_array_element);
+  fts_expression_declare_fun(fts_new_symbol("new"), fts_expressions_data_new);
 
   /* operator declarations  */
-
   fts_symbol_set_operator(fts_s_plus,  FTS_OP_PLUS);
   fts_symbol_set_operator(fts_s_minus, FTS_OP_MINUS);
   fts_symbol_set_operator(fts_s_times, FTS_OP_TIMES);
@@ -1718,10 +1732,3 @@ fts_expressions_init(void)
   op_binary[FTS_OP_ASSIGN] = 1;
   op_binary[FTS_OP_ARRAY_REF] = 1;
 }
-
-
-
-
-
-
-

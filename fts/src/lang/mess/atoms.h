@@ -43,9 +43,8 @@
    branch of an if ...
  */
 
-#define FTS_NULL {(fts_symbol_t)0, 0}
-
-extern fts_atom_t fts_null;
+#define FTS_NULL {(fts_symbol_t)0, {0}}
+extern const fts_atom_t fts_null;
 
 /* Macros to deal with any type */
 
@@ -129,34 +128,32 @@ extern fts_atom_t fts_null;
 #define fts_is_connection(ap)      fts_is_a(ap, fts_s_connection)
 #define fts_is_true(ap)            fts_is_a(ap, fts_s_true)
 #define fts_is_false(ap)           fts_is_a(ap, fts_s_false)
-#define fts_is_data(ap)            fts_is_a(ap, fts_s_data)
-#define fts_is_atom_array(ap)      fts_is_a(ap, fts_s_atom_array)
+#define fts_is_data(ap) (fts_is_a(ap, fts_s_data))
+
+#define fts_is_primitive(ap) (fts_is_number(ap) || fts_is_symbol(ap))
 
 /* Convenience macros to deal with type and atom algebra */
-
 #define fts_same_types(ap1, ap2)    (((ap1)->type) == (ap2)->type)
 
 /* equality test between two atoms */
-
 extern int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
 
 /* null test: a null content can be a null pointer or a zero value */
-
 extern int fts_atom_is_null(const fts_atom_t *a);
 
 /* Subsequence  testing */
-
 extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
 
-
 /* Convenience macro for symbols */
-
 #define fts_is_operator(a)        (fts_is_symbol((a)) && fts_symbol_is_operator(fts_get_symbol(a)))
 #define fts_get_operator(a)        (fts_symbol_get_operator(fts_get_symbol(a)))
 
 /* Atom printing function, usually for debug */
-
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
+
+extern void fts_xassign(fts_atom_t *atom, fts_atom_t *assign);
+extern void fts_reassign(fts_atom_t *atom, fts_atom_t *assign);
+extern void fts_void(fts_atom_t *atom);
 
 #endif
 

@@ -199,8 +199,8 @@ fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class
   cl->ac = ac;
   cl->at = fts_malloc(ac * sizeof(fts_atom_t));
 
-  for (i = 0; i < ac; i++)
-    (((fts_atom_t *) cl->at)[i]) = at[i];
+  for(i=0; i<ac; i++)
+    fts_assign((fts_atom_t *)cl->at + i, at + i);
 
   cl->next = mcl->inst_list;
   mcl->inst_list = cl;
@@ -228,7 +228,6 @@ fts_class_get(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
    an error if the arguments are not ok.
    *We cannot use init arguments because the classes do not exists yet*.
  */
-
 
 fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at)
 {
@@ -335,8 +334,7 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
     }
   else
     {
-      fts_array_alloc((void **)&in->messlist, sizeof(fts_class_mess_t *),
-		      &in->nalloc, in->nmess+1);
+      fts_array_alloc((void **)&in->messlist, sizeof(fts_class_mess_t *), &in->nalloc, in->nmess+1);
       in->messlist[in->nmess++] = msg;
     }
 

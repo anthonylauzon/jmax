@@ -16,11 +16,10 @@
   Generic, may be debug, function to deal with atoms
  */
 
-
 #include "sys.h"
 #include "lang/mess.h"
 
-fts_atom_t fts_null = FTS_NULL;
+const fts_atom_t fts_null = FTS_NULL;
 
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 {
@@ -74,8 +73,6 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	fprintf(f,"<void>%s", ps);
       else if (fts_is_error(&at[i]))
 	fprintf(f,"<error>%s", ps);
-      else if (fts_is_atom_array(&at[i]))
-	fprintf_atom_array(f, fts_get_atom_array(&at[i]));
       else if (fts_get_type(&at[i]))
 	fprintf(f,"<%s>%lx%s", fts_symbol_name(fts_get_type(&at[i])), 
 		(unsigned long) fts_get_ptr( &at[i]), ps);
@@ -98,8 +95,6 @@ int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 	return fts_get_symbol(a1) == fts_get_symbol(a2);
       else if (fts_is_string(a1))
 	return ! strcmp(fts_get_string(a1), fts_get_string(a2));
-      else if (fts_is_atom_array(a1))
-	return fts_get_atom_array(a1) == fts_get_atom_array(a2);
       else if (fts_is_ptr(a1))
 	return fts_get_ptr(a1) == fts_get_ptr(a2);
       else if (fts_is_int(a1))
@@ -150,8 +145,6 @@ int fts_atom_is_null(const fts_atom_t *a)
 }
 
 /* Functions to compare list of atoms */
-
-
 int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av)
 {
   int i,j;
@@ -170,3 +163,58 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
 
   return 0;
 }
+
+void 
+fts_assign(fts_atom_t *atom, fts_atom_t *assign)
+{
+  if(fts_is_data(assign))
+    {
+      fts_data_t *data = fts_get_data(assign);
+
+      /* assign atom to new content */
+      *atom = *assign;
+
+      /* refer to new content */
+      fts_data_refer(data);
+    }
+  else
+    *atom = *assign;
+}
+
+/* reassign atom to a new value taking in account the fts_data referencies */
+void 
+fts_reassign(fts_atom_t *atom, fts_atom_t *assign)
+{
+  if(fts_is_data(atom))
+    {
+      fts_data_t *data = fts_get_data(atom);
+
+      /* release old content (if reference type) */
+      fts_data_release(data);
+
+      /* assign atom to new content */
+      *atom = *assign;
+
+      /* refer to new content */
+      fts_data_refer(data);
+    }
+  else
+    *atom = *assign;
+}
+
+/* reassign atom to a new value taking in account the fts_data referencies */
+void 
+fts_void(fts_atom_t *atom)
+{
+  /* if existing release reference */
+  if(fts_is_data(atom))
+    {
+      fts_data_t *data = fts_get_data(atom);
+      fts_data_release(data);
+    }
+
+  /* set atom to void */
+  fts_set_void(atom);
+}
+
+

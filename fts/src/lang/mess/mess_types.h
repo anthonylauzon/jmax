@@ -28,7 +28,6 @@
 typedef const struct fts_symbol_descr *fts_symbol_t;
 typedef union  fts_word          fts_word_t;
 typedef struct fts_atom          fts_atom_t;
-typedef struct fts_atom_array    fts_atom_array_t;
 typedef struct fts_plist                 fts_plist_t;
 
 typedef enum fts_daemon_action {
@@ -96,7 +95,6 @@ union fts_word
   char                *fts_str;
   fts_object_t        *fts_obj;
   fts_connection_t    *fts_connection;
-  fts_atom_array_t    *fts_atom_array;
   fts_data_t          *fts_data;
   void                *fts_ptr;		/*  just a pointer somewhere */
   void                (*fts_fun)(void);     /*  just a pointer to some function */
@@ -110,7 +108,10 @@ union fts_word
 
 struct fts_data {
   fts_data_class_t *class;
+  fts_symbol_t name;
   int id;
+  int cnst; /* flag: non zero if data is constant */
+  int refcnt; /* reference counter */
 };
 
 
@@ -140,12 +141,6 @@ struct fts_atom
    For now, used as value in expression, may become more
    widely used later.
    */
-
-struct fts_atom_array
-{
-  int ac;
-  fts_atom_t *at;
-};
 
 /*
  *  PROPERTY LISTS
@@ -379,7 +374,7 @@ struct fts_patcher
   int load_init_fired;		/* the multiple load init protection flag*/
   int deleted;			/* set to one during content deleting */
 
-  fts_atom_array_t *args;	/* the arguments used for the "args" variable */
+  fts_data_t *args;	/* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 
