@@ -1,3 +1,11 @@
+2003-10-30  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in, Makefile.am: added macosxbuild directory in make dist tarball
+	The following files have been added:
+	  macosxbuild/Makefile.am
+	  macosxbuild/jMaxProject/Makefile.am
+	  macosxbuild/jMaxProject/jMaxProject.pbproj/Makefile.am
+
 2003-10-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/tuple.c (tuple_init): fixed bugs "[ 766924 ] [tuple] crash" and "[ 822060 ] crash when trying to create [tuple]".

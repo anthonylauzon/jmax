@@ -10,7 +10,7 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS=client fts include $(JAVA_SRC_DIR) packages bin images tutorials config utils help doc winbuild
+SUBDIRS=client fts include $(JAVA_SRC_DIR) packages bin images tutorials config utils help doc winbuild macosxbuild
 EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION COPYING README LISEZMOI INSTALL.linux
 
 #

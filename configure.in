@@ -531,6 +531,9 @@ java/src/ircam/jmax/toolkit/Makefile
 java/src/ircam/jmax/toolkit/actions/Makefile
 java/src/ircam/jmax/toolkit/menus/Makefile
 java/src/ircam/jmax/widgets/Makefile
+macosxbuild/Makefile
+macosxbuild/jMaxProject/Makefile
+macosxbuild/jMaxProject/jMaxProject.pbproj/Makefile
 packages/Makefile
 packages/alsa/Makefile
 packages/alsa/c/Makefile
