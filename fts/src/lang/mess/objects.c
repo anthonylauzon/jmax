@@ -402,7 +402,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
       /* Object not found */
 
       obj = fts_error_object_new(patcher, aoc, aot,
-				 "Object or template %s not found", fts_symbol_name(fts_get_symbol(aot)));
+				 "Object or template %s not found", fts_symbol_name(fts_get_symbol(at)));
     }
 
   /* 10 - check if we are defining a variable *and* we have a state;
