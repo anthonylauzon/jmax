@@ -17,6 +17,9 @@ ROOTDIR = ../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
+DATE:= $(shell date)
+MODULE_CFLAGS:= -DCOMPILATION_DATE_STRING='"Compiled on $(DATE)\n"'
+
 FTS_BIN = $(BINDIR)/fts
 
 ifeq ($(ARCH),rhapsody)

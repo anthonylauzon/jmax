@@ -28,9 +28,8 @@ static void fts_assign_boot_devices();
 /* fts_welcome_t: hw or module dependent welcome should be moved in the proper
    module init function */
 
-static fts_welcome_t version_welcome = {FTS_RELEASE_STRING};
-static fts_welcome_t version_date_welcome = {FTS_COMPILATION_DATE};
-static fts_welcome_t version_time_welcome = {FTS_COMPILATION_TIME};
+static fts_welcome_t version_welcome = {FTS_VERSION_STRING};
+static fts_welcome_t compilation_date_welcome = {COMPILATION_DATE_STRING};
 static fts_welcome_t author_welcome = {"by Francois Dechelle, Maurizio De Cecco and Norbert Schnell\n"};
 static fts_welcome_t author_email_welcome = {"  dechelle@ircam.fr   dececco@ircam.fr  schnell@ircam.fr\n"};
 static fts_welcome_t miller_welcome = {"A new implementation of Miller Puckette's FTS\n"};
@@ -67,8 +66,6 @@ main(int argc, char **argv)
   /* Install the basic welcome messages */
 
   fts_add_welcome(&version_welcome);
-  fts_add_welcome(&version_date_welcome);
-  fts_add_welcome(&version_time_welcome);
   fts_add_welcome(&author_welcome);
   fts_add_welcome(&author_email_welcome);
   fts_add_welcome(&miller_welcome);
