@@ -13,7 +13,7 @@ import ircam.jmax.utils.*;
  * The "patcher" graphic object. It knows the subpatchers it contains.
  */
 
-public class ErmesObjPatcher extends ErmesObjEditableObject {
+public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler{
 
   String itsNameString = new String();
 
@@ -21,6 +21,12 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
  
+  public void propertyChanged(FtsObject obj, String name, Object value) {
+    if (name.equals("ins") || name.equals("outs"))
+      update(itsFtsObject);
+    //maybe some graphic refresh after this?
+  }
+  
   //--------------------------------------------------------
   // Constructor
   //--------------------------------------------------------
@@ -34,13 +40,23 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     return 10;
   }
 
+  public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    super.Init(theSketchPad, x, y, theString);
+    itsFtsObject.watch("ins", this);
+    itsFtsObject.watch("outs", this);
+
+    return true;
+  }
+
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     // Added by MDC; get the correct String from the object, and then call super
 
     itsArgs = theFtsObject.getDescription().trim();
 
     super.Init(theSketchPad, theFtsObject);
-
+    itsFtsObject.watch("ins", this);
+    itsFtsObject.watch("outs", this);
+    
     resizeBy(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     

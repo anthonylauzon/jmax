@@ -16,8 +16,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   StringBuffer currentText;
   // } (fd)
 
-  ErmesObjInlet itsInlet;
-  ErmesObjOutlet itsOutlet;
+
   int itsInteger = 0;
   
   static ErmesObjIntegerDialog itsIntegerDialog = null;
