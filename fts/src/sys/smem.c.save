@@ -1,3 +1,16 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
 /* Safe memory library.
 
    To link only during debugging of bugs difficult to trace.
@@ -15,13 +28,94 @@
    housekeeping; the result is that there is a compile time defined limit
    to the number of malloc/free for any session (the OPS_LIMIT below).
 
+   Added begin and end marker, to check for block consistency.
+
+
+   MOST OF THE CHECKS are being disabled, because purify made them
+   useless; anyway, we still keep the structure to perform memory
+   statistics.
 */
+
+#include <stdio.h>
+#include <malloc.h>
 
 #define OPS_LIMIT 256*1024
 #define BLOCK_CACHE_SIZE 16
 
-#include <stdio.h>		/* HW specific file, can include stdio.h */
-#include <malloc.h>
+#include "smem.h"
+
+#define SMEM_START_MARKER 0xaa55aa55
+#define SMEM_END_MARKER   0xaa5555aaL
+
+
+struct mem_header
+{
+  unsigned int marker;
+  const char *filename;
+  int   line;
+  unsigned long size;
+  struct mem_header *next;
+  unsigned int  marker2;
+};
+
+static struct mem_header *first_block = 0;
+
+struct mem_trailer
+{
+  unsigned long marker;
+};
+
+
+static void
+add_block(char *block)
+{
+  struct mem_header *p = (struct mem_header *)block;
+
+  p->next = first_block;
+  first_block = p;
+}
+
+static void
+remove_block(char *block)
+{
+  struct mem_header **pp;	/* indirect precursor */
+  struct mem_header  *p = (struct mem_header *)block;
+
+  for (pp = &first_block; *pp; pp = &((*pp)->next))
+    if (*pp == p)
+      {
+	*pp = (*pp)->next;
+	return;
+      }
+  
+}
+
+
+void check_integrity(char *p, const char *msg)
+{
+  const char *err;
+
+  if ((((struct mem_header *)p)->marker != SMEM_START_MARKER) &&
+      (((struct mem_header *)p)->marker2 != SMEM_START_MARKER))
+    err = "Block integrity error: data structure corrupted before the block";
+  else if (((struct mem_trailer *)(p + sizeof(struct mem_header) + ((struct mem_header *)p)->size))->marker
+	   != SMEM_END_MARKER)
+    err = "Block integrity error: data structure corrupted after the block";
+  else
+    return;
+
+  fprintf(stderr, "%s %s\nOriginally allocated file %s line %d\n", err, msg, 
+	  ((struct mem_header *)p)->filename,  ((struct mem_header *)p)->line);
+
+  fprintf(stderr, " - Trapping !!!!\n");
+  fflush(stderr);
+
+  {
+    volatile char c;
+    c = *((volatile char *) 0);
+  }
+}
+
 
 typedef enum { malloced, freed, invalid} mem_status_t;
 
@@ -231,8 +325,7 @@ register_check_free(char *p)
   block_cache_insert = 0;
 }
 
-void
-fts_check_block(char *p, unsigned long size, const char *msg)
+void fts_check_block(char *p, unsigned long size, const char *msg)
 {
   unsigned int i;
   int found = 0;		/* 1 when we found an including malloced block */
@@ -320,72 +413,84 @@ fts_check_block(char *p, unsigned long size, const char *msg)
 }
 
 
-void
-fts_check_pointer(void *p, char *msg)
+void fts_check_pointer(void *p, char *msg)
 {
-  fts_check_block(p, 1, msg);
+  fts_check_block(((char *)p) , 1, msg);
 }
 
 
-char *
-fts_safe_malloc(unsigned long size)
+/* Call this on a malloced block only !! */
+
+void fts_check_malloc(void *p, char *msg)
 {
-  if (size == 0)
+  if (p)
     {
-      /* TWICE MALLOC'ed ERROR !!!! */
-      fprintf(stderr, "Malloc with size 0\n");
-      fprintf(stderr, "Trapping !!!!\n");
-      fflush(stderr);
-
-      {
-	volatile char c;
-	c = *((volatile char *) 0);
-      }
-
-      return 0;			/* for the compiler :-> */
-    }
-  else
-    {
-      char *p;
-
-      p = (char *)malloc(size);
-
-      register_check_malloc(p, size);
-
-      return p;
-    }
-}
-
-void
-fts_safe_free(char *p)
-{
-  if (! p)
-    {
-      /* TWICE MALLOC'ed ERROR !!!! */
-      fprintf(stderr, "Freeing null pointer\n");
-      fprintf(stderr, "Trapping !!!!\n");
-      fflush(stderr);
-
-      {
-	volatile char c;
-	c = *((volatile char *) 0);
-      }
-    }
-  else
-    {
-      register_check_free(p);
-      free(p);
+      check_integrity((char *)p  - sizeof(struct mem_header), msg);
+      fts_check_block(((char *)p) - sizeof(struct mem_header), 1, msg);
     }
 }
 
 
-
-char *
-fts_safe_realloc(void *p, int size)
+char *fts_safe_malloc(unsigned long size, const char *filename, int line)
 {
-  register_check_free(p);
-  p = (char *)realloc(p, size);
-  register_check_malloc(p, size);
-  return p;
+  char *p;
+
+  /* align the size */
+
+  if (size % sizeof(unsigned long))
+    size = ((size / sizeof(unsigned long)) + 1) * sizeof(unsigned long);
+
+  p = (char *)malloc(size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
+
+  ((struct mem_header *)p)->marker   = SMEM_START_MARKER;
+  ((struct mem_header *)p)->marker2  = SMEM_START_MARKER;
+  ((struct mem_header *)p)->size     = size;
+  ((struct mem_header *)p)->filename = filename;
+  ((struct mem_header *)p)->line     = line;
+  ((struct mem_trailer *)(p + sizeof(struct mem_header) + size))->marker = SMEM_END_MARKER;
+  add_block(p);
+
+  register_check_malloc(p, size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
+
+  return p + sizeof(struct mem_header);
 }
+
+void fts_safe_free(char *p)
+{
+  remove_block(p - sizeof(struct mem_header));
+  register_check_free(p - sizeof(struct mem_header));
+  free(p - sizeof(struct mem_header));
+}
+
+
+
+char *fts_safe_realloc(void *pv, int size, const char *filename, int line)
+{
+  char *p = (char *)pv;
+
+  /* align the size */
+
+  if (size % sizeof(unsigned long))
+    size = ((size / sizeof(unsigned long)) + 1) * sizeof(unsigned long);
+
+  register_check_free(p - sizeof(struct mem_header)); 
+  remove_block(p - sizeof(struct mem_header));
+
+  p = (char *)realloc(p - sizeof(struct mem_header),
+		      size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
+
+  ((struct mem_header *)p)->marker = SMEM_START_MARKER;
+  ((struct mem_header *)p)->marker2 = SMEM_START_MARKER;
+  ((struct mem_header *)p)->size   = size;
+  ((struct mem_header *)p)->filename = filename;
+  ((struct mem_header *)p)->line     = line;
+  ((struct mem_trailer *)(p + sizeof(struct mem_header) + size))->marker = SMEM_END_MARKER;
+
+  add_block(p);
+
+  register_check_malloc(p, size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
+
+  return p + sizeof(struct mem_header);
+}
+
 

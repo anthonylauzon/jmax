@@ -117,7 +117,10 @@ void
 fts_atom_array_delete(fts_atom_array_t *array)
 {
   fts_atom_array_void(array);
-  fts_free((void *)array->atoms);
+
+  if (array->atoms)
+    fts_free((void *)array->atoms);
+
   fts_data_delete((fts_data_t *)array);
   fts_free((void *)array);
 }

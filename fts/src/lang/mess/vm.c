@@ -983,7 +983,9 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "POP_OBJ_TABLE\n");
 #endif
 
-	    fts_free(object_table);
+	    if (object_table)
+	      fts_free(object_table);
+
 	    object_table_tos++;
 	    object_table = object_table_stack[object_table_tos];
 	  }

@@ -39,6 +39,7 @@ line_int_tick(fts_alarm_t *alarm, void *o)
     {
       this->cur += this->inc;
       fts_alarm_set_delay(alarm, this->grain);
+      fts_alarm_arm(alarm);
       fts_outlet_int((fts_object_t *)o, 0, this->cur);	
     }
   else
@@ -60,6 +61,7 @@ line_float_tick(fts_alarm_t *alarm, void *o)
     {
       this->cur += this->inc;
       fts_alarm_set_delay(alarm, this->grain);
+      fts_alarm_arm(alarm);
       fts_outlet_float((fts_object_t *)o, 0, this->cur);	
     }
   else

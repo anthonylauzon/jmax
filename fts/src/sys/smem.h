@@ -36,11 +36,6 @@ extern char *fts_safe_malloc(unsigned long size, const char *filename, int line)
 extern void fts_safe_free(char *p);
 extern char *fts_safe_realloc(void *pv, int size, const char *filename, int line);
 
-extern void check_integrity(char *p, const char *msg);
-extern void fts_check_pointer(void *p, char *msg);
-extern void fts_check_malloc(void *p, char *msg);
-extern void fts_check_block(char *p, unsigned long size, const char *msg);
-
 #define real_malloc(size)   fts_safe_malloc(size, __FILE__, __LINE__)
 #define real_free    fts_safe_free
 #define real_realloc(pnt, size)  fts_safe_realloc(pnt, size, __FILE__, __LINE__)

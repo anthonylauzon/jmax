@@ -115,10 +115,8 @@ button_tick(fts_alarm_t *alarm, void *calldata)
 {
   button_t *this = (button_t *)calldata;
 
-  fts_alarm_unarm(alarm);	/* unarm the alarm, one shot only here */
 
   this->value = 0;
-
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
 }
 
