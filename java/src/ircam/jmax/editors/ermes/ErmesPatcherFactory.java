@@ -21,8 +21,6 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
 
   public MaxDataEditor newEditor(MaxData theData) {
 
-    GlobalProbe.enterMethod( this, "newEditor"); // (fd)
-
     ErmesSketchWindow aSketchWindow = new ErmesSketchWindow((FtsContainerObject) theData);
     String mode;
     FtsContainerObject p;
@@ -45,9 +43,6 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
 
     if ((mode == null) || mode.equals("run"))
       aSketchWindow.setRunMode(true);
-
-    GlobalProbe.exitMethod(); // (fd)
-    GlobalProbe.report(); // (fd)
 
     return aSketchWindow;
   }

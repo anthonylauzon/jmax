@@ -206,57 +206,51 @@ abstract class ErmesObjEditableObject extends ErmesObject {
 	
   public void ParseText(String theString)
   {
+    int aIndex = theString.indexOf( "\n");
+    int aOldIndex = -1;
+    int aLastIndex = theString.lastIndexOf( "\n");
+    String aString;
+    int width = 0;
+    int i = 0;
+
+    while ( aIndex != -1)
+      {
+
+	aString = theString.substring( aOldIndex + 1, aIndex);
+	width = itsFontMetrics.stringWidth( aString);
+
+	// (fd) {
+	// The following ...
+	//if ( width > itsFontMetrics.stringWidth( itsMaxString)) 
+	//itsMaxString = aString;
+	// can be replaced by:
+	if ( width > itsMaxStringWidth)
+	  {
+	    itsMaxString = aString;
+	    itsMaxStringWidth = width;
+	  }
+	// saving one call to FontMetrics::stringWidth()...
+	// } (fd)
+
+	itsParsedTextVector.addElement( aString);
+	aOldIndex = aIndex;
+	aIndex = theString.indexOf( "\n", aOldIndex + 1);
+	i++;
+      }
+
+    aString = theString.substring( aOldIndex + 1);
+    width = itsFontMetrics.stringWidth( aString);
+
     // (fd) {
-    // the whole text and font management is to be redone ...
-
-//     int aIndex = theString.indexOf( "\n");
-//     int aOldIndex = -1;
-//     int aLastIndex = theString.lastIndexOf( "\n");
-//     String aString;
-//     int width = 0;
-//     int i = 0;
-
-//     while ( aIndex != -1)
-//       {
-
-// 	aString = theString.substring( aOldIndex + 1, aIndex);
-// 	width = itsFontMetrics.stringWidth( aString);
-
-// 	// (fd) {
-// 	// The following ...
-// 	//if ( width > itsFontMetrics.stringWidth( itsMaxString)) 
-// 	//itsMaxString = aString;
-// 	// can be replaced by ...
-// 	if ( width > itsMaxStringWidth)
-// 	  {
-// 	    itsMaxString = aString;
-// 	    itsMaxStringWidth = width;
-// 	  }
-// 	// } (fd)
-
-// 	itsParsedTextVector.addElement( aString);
-// 	aOldIndex = aIndex;
-// 	aIndex = theString.indexOf( "\n", aOldIndex + 1);
-// 	i++;
-//       }
-
-//     aString = theString.substring( aOldIndex + 1);
-//     width = itsFontMetrics.stringWidth( aString);
-
-//     // (fd) {
-//     if ( width > itsMaxStringWidth)
-//       {
-// 	itsMaxString = aString;
-// 	itsMaxStringWidth = width;
-//       }
-//     // } (fd)
-
-//     itsParsedTextVector.addElement( aString);
-
-    itsParsedTextVector.removeAllElements();
-    itsParsedTextVector.addElement( theString);
-    itsMaxString = theString;
+    // idem
+    if ( width > itsMaxStringWidth)
+      {
+	itsMaxString = aString;
+	itsMaxStringWidth = width;
+      }
     // } (fd)
+
+    itsParsedTextVector.addElement( aString);
   }
 
   //--------------------------------------------------------

@@ -23,6 +23,8 @@ import com.sun.java.swing.*;
  */
 
 public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler, ComponentListener{
+  // (fd)
+  protected KeyEventClient keyEventClient;
 
   public void propertyChanged(FtsObject object, String name, Object value)
   {
@@ -166,7 +168,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     
     super(Mda.getDocumentTypeByName("patcher"));
 
-    GlobalProbe.enterMethod( this, "ErmesSketchWindow"); // (fd)
+    // (fd)
+    keyEventClient = null;
 
     itsDocument = patcher.getDocument();
     itsPatcher = patcher;
@@ -198,7 +201,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsPatcher.watch("outs", this);
     addComponentListener(this);
 
-    GlobalProbe.exitMethod(); // (fd)
   }
 
   // For the MaxDataEditor interface
@@ -247,8 +249,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   
   public void InitFromContainer(FtsContainerObject patcher) {
     
-    GlobalProbe.enterMethod( this, "InitFromContainer"); // (fd)
-
     Object aObject;
     int x=0;
     int y=0;
@@ -291,7 +291,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       
     validate();
 
-    GlobalProbe.exitMethod(); // (fd)
   }
 
   //--------------------------------------------------------
@@ -699,115 +698,123 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   // Modified to use inheritance and call the MaxEditor method
   // for all the standard key bindings
-  public void keyPressed(KeyEvent e){
+  public void keyPressed( KeyEvent e)
+  {
     int aInt = e.getKeyCode();
 
-      //arrows first:
-      if (isAnArrow(aInt)) {
-
-	//***
-	if (e.isShiftDown()) {
-	  if (e.isControlDown()) {
-	    itsSketchPad.resizeSelection(10, aInt);
+    //arrows first:
+    if ( isAnArrow(aInt)) 
+      {
+	if (e.isShiftDown()) 
+	  {
+	    if (e.isControlDown()) 
+	      itsSketchPad.resizeSelection( 10, aInt);
+	    else 
+	      itsSketchPad.moveSelection( 10, aInt);
 	  }
-	  else {
-	    itsSketchPad.moveSelection(10, aInt);
-	  }
-	}
-	else {
-	  if (e.isControlDown()) {
-	    if (e.isMetaDown()) {
+	else if (e.isControlDown()) 
+	  {
+	    if (e.isMetaDown()) 
 	      itsSketchPad.alignSizeSelection(aInt);
-	    }
-	    else {
+	    else 
 	      itsSketchPad.resizeSelection(1, aInt);
-	    }
+	      }
+	else if (e.isMetaDown()) 
+	  {
+	    //align
+	    String where;
+
+	    if (aInt == Platform.LEFT_KEY) 
+	      where = "Left";
+	    else if (aInt == Platform.RIGHT_KEY) 
+	      where = "Right";
+	    else if (aInt == Platform.UP_KEY) 
+	      where = "Top";
+	    else 
+	      where = "Bottom";
+
+	    itsSketchPad.AlignSelectedObjects(where);
 	  }
-	  else {
-	    if (e.isMetaDown()) {
-	      //align
-	       String where;
-	       if (aInt == Platform.LEFT_KEY) where = "Left";
-	       else if (aInt == Platform.RIGHT_KEY) where = "Right";
-	       else if (aInt == Platform.UP_KEY) where = "Top";
-	       else where = "Bottom";
-	       itsSketchPad.AlignSelectedObjects(where);
-	    }
-	    else {
-	      itsSketchPad.moveSelection(1, aInt);
-	    }
-	  }
-	}
+	else 
+	  itsSketchPad.moveSelection(1, aInt);
       }
-
-      /////// end of arrows
-
-      else if(e.isControlDown()){
-	
-	if(aInt == 65) itsSketchPad.SelectAll();//a
-	else if(aInt == 69){//e
-	  if (itsSketchPad.GetRunMode()) setRunMode(false);
-	  else setRunMode(true);
-	  return;
-	}
-	else if (aInt == 73) { //i
-	  itsSketchPad.inspectSelection();
-	}
-	else if (aInt == 47){//?
-	  //ask help for the reference Manual for the selected element...
-	  // open one url *only*, because we open only one browser.
+    else if(e.isControlDown()) 
+      {
+	if(aInt == 65)
+	  itsSketchPad.SelectAll();//a
+	else if(aInt == 69)
+	  {//e
+	    if (itsSketchPad.GetRunMode()) 
+	      setRunMode(false);
+	    else 
+	      setRunMode(true);
+	  }
+	else if (aInt == 73) 
+	  itsSketchPad.inspectSelection(); // i
+	else if (aInt == 47)
+	  {
+	    //ask help for the reference Manual for the selected element...
+	    // open one url *only*, because we open only one browser.
+	    ErmesObject aObject;
+	    String urlToOpen;
+	    Interp interp  = MaxApplication.getTclInterp();
 	  
-	  ErmesObject aObject;
-	  String urlToOpen;
-	  Interp interp  = MaxApplication.getTclInterp();
-	  
-	  if (ErmesSketchPad.currentSelection.itsObjects.size() > 0){
-	    aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(0);
+	    if (ErmesSketchPad.currentSelection.itsObjects.size() > 0)
+	      {
+		aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(0);
+		urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
 	    
-	    urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
-	    
-	    if (urlToOpen != null){
-	      try
-		{
-		  // Call the tcl browse function, with the URL as argument
-		  // By default, the tcl browse function do nothing.
-		  // if a user installed a browser package, this will
-		// show the documentation.
-		  
-		  
-		  
-		  interp.eval("browse " + urlToOpen);
-		}
-	      catch (tcl.lang.TclException et)
-		{
-		  System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
-		}
-	    }
-	  }   
-	}
-	else super.keyPressed(e);
+		if (urlToOpen != null)
+		  {
+		    try
+		      {
+			// Call the tcl browse function, with the URL as argument
+			// By default, the tcl browse function do nothing.
+			// if a user installed a browser package, this will show the documentation.
+			interp.eval("browse " + urlToOpen);
+		      }
+		    catch (tcl.lang.TclException et)
+		      {
+			System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
+		      }
+		  }
+	      }   
+	  }
+	else
+	  super.keyPressed(e);
       } 
-      else if((aInt==ircam.jmax.utils.Platform.DELETE_KEY)||(aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
-      if(itsSketchPad.GetEditField()!=null){
-	if(!itsSketchPad.GetEditField().HasFocus())
-	  itsSketchPad.itsHelper.DeleteSelected();
-      }
-    }
-      else if(aInt == 47){//this is a patch to trap the '?'
-      //ask help for the selected element...
-      ErmesObject aObject = null;
+    else if(aInt == 47)
+      {//this is a patch to trap the '?'
+	//ask help for the selected element...
+	ErmesObject aObject = null;
       
-      for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements();) {
-	aObject = (ErmesObject) en.nextElement();
+	for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements();) 
+	  {
+	    aObject = (ErmesObject) en.nextElement();
 	
-	FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
+	    FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
+	  }
+      } 
+    // (fd) {
+    else if ( keyEventClient != null)
+      {
+	keyEventClient.keyPressed( e);
       }
-    } 
-      else {
-      // Finally, if we don't redefine the key, call the superclass method
-      // that define the standard things.
-      super.keyPressed(e);
-    }
+    else if ( ( aInt == ircam.jmax.utils.Platform.DELETE_KEY)
+	     || ( aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY) )
+      {
+	if(itsSketchPad.GetEditField()!=null)
+	  {
+	    if(!itsSketchPad.GetEditField().HasFocus())
+	      itsSketchPad.itsHelper.DeleteSelected();
+	  }
+      }
+    // } (fd)
+    else
+      {
+	// Finally, if we don't redefine the key, call the superclass method that define the standard things.
+	super.keyPressed(e);
+      }
   }
 
   public static boolean isAnArrow(int code) {
@@ -1159,16 +1166,17 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public Dimension getPreferredSize() {
       return preferredsize;
   }
+
+  // (fd) {
+  public void setKeyEventClient( KeyEventClient keyEventClient)
+  {
+    if ( this.keyEventClient != null && this.keyEventClient != keyEventClient)
+      this.keyEventClient.keyInputLost();
+
+    this.keyEventClient = keyEventClient;
+
+    if (this.keyEventClient != null)
+      this.keyEventClient.keyInputGained();
+  }
+  // } (fd)
 }
-
-
-
-
-
-
-
-
-
-
-
-

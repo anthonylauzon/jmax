@@ -9,8 +9,13 @@ import ircam.jmax.*;
 /**
  * The "integer box" graphic object.
  */
-class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
-  
+class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventClient {
+
+  // (fd) {
+  int state;
+  StringBuffer currentText;
+  // } (fd)
+
   ErmesObjInlet itsInlet;
   ErmesObjOutlet itsOutlet;
   int itsInteger = 0;
@@ -34,6 +39,12 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   public ErmesObjInt(){
     super();
+
+    // (fd) {
+    state = 0;
+    currentText = new StringBuffer();
+    // } (fd)
+
     transmission_buffer = new int[TRUST];
   }
 	
@@ -165,25 +176,32 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   //  mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    
-    /*if(evt.getClickCount()>1) {
-      inspect();
-      return true;
-    }*/
-    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
-      itsFirstY = y;
-      if (firstClick) {
-	itsStartingY = itsInteger;
-	firstClick = false;
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
+  {
+    if ( itsSketchPad.itsRunMode || evt.isControlDown())
+      {
+	// (fd) {
+	state = 1;
+	itsSketchPad.itsSketchWindow.setKeyEventClient( this);
+	// } (fd)
+
+	itsFirstY = y;
+
+	if (firstClick) 
+	  {
+	    itsStartingY = itsInteger;
+	    firstClick = false;
+	  }
+	else 
+	  itsStartingY = itsInteger;
+
+	itsFtsObject.put("value", new Integer(itsInteger));
+	Trust(itsInteger);
       }
-      else itsStartingY = itsInteger;
-      itsFtsObject.put("value", new Integer(itsInteger));
-      Trust(itsInteger);
-    }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
+
+    return true; // (fd) Is returned value used ????? Seems not ...
   }
   
   public boolean inspectorAlreadyOpen() {
@@ -229,16 +247,21 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   // mouseDrag
   //--------------------------------------------------------
-  public boolean MouseDrag_specific(MouseEvent evt,int x, int y) {
+  public boolean MouseDrag_specific(MouseEvent evt,int x, int y) 
+  {
+    if ( itsSketchPad.itsRunMode || evt.isControlDown() )
+      {
+	// (fd)
+	state = 2;
 
-    if(itsSketchPad.itsRunMode || evt.isControlDown()){
-      itsInteger = itsStartingY+(itsFirstY-y);
-      itsFtsObject.put("value", new Integer(itsInteger));
-      DoublePaint();
-      Trust(itsInteger);
-      return true;
-    }
-    else return false;
+	itsInteger = itsStartingY + (itsFirstY - y);
+	itsFtsObject.put( "value", new Integer(itsInteger));
+	DoublePaint();
+	Trust( itsInteger);
+	return true;
+      }
+    else
+      return false;
   }
 
   public boolean NeedPropertyHandler(){
@@ -252,45 +275,67 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
-  public void Paint_specific(Graphics g) {
+  public void Paint_specific( Graphics g) 
+    {
+      int x = getItsX();
+      int xp1 = x + 1;
+      int y = getItsY();
+      int h = getItsHeight();
+      int hd2 = h / 2;
+      int hm1 = h - 1;
+      int w = getItsWidth();
+      int wm1 = w - 1;
 
-    if (g == null) return;
-    //draw the white area
-    int xWhitePoints[] = {getItsX()+3, getItsX()+getItsWidth()-3, getItsX()+getItsWidth()-3, getItsX()+3, getItsX()+getItsHeight()/2+3};
-    int yWhitePoints[] = {getItsY()+1, getItsY()+1, getItsY()+getItsHeight()-1,getItsY()+getItsHeight()-1, getItsY()+getItsHeight()/2};
-    if(!itsSelected) g.setColor(Color.white);
-    else g.setColor(itsUINormalColor);
-    g.fillPolygon(xWhitePoints, yWhitePoints, 5);
+      if (g == null) 
+	return;
 
-    //fill the triangle and blue rectangle 
-    if(!itsSelected) g.setColor(itsUINormalColor);
-    else g.setColor(itsUISelectedColor);
-    
-    g.fill3DRect(getItsX()+getItsWidth()-4,getItsY()+1, 3, getItsHeight()-2, true);
-    
-    int xPoints[]={getItsX()+1, getItsX()+getItsHeight()/2+1, getItsX()+1};
-    int yPoints[]={getItsY(), getItsY()+getItsHeight()/2, getItsY()+getItsHeight()-1};
-    g.fillPolygon(xPoints, yPoints, 3);
+    // (fd) Nice ! Simple ! Fast ! ...
+    // draw the white area
+    //int xWhitePoints[] = {getItsX()+3, getItsX()+getItsWidth()-3, getItsX()+getItsWidth()-3, getItsX()+3, getItsX()+getItsHeight()/2+3};
+    //int yWhitePoints[] = {getItsY()+1, getItsY()+1, getItsY()+getItsHeight()-1,getItsY()+getItsHeight()-1, getItsY()+getItsHeight()/2};
+    //g.fillPolygon(xWhitePoints, yWhitePoints, 5);
 
-    //draw the outline
-    g.setColor(Color.black);
-    g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
+      // (1) Fill the background
+      if ( !itsSelected) 
+	g.setColor( Color.white);
+      else
+	g.setColor( itsUISelectedColor);
+      g.fillRect( x, y, wm1 , hm1);
     
-    //draw the triangle
-    if(!itsSelected) g.setColor(itsUISelectedColor);
-    else g.setColor(Color.black);
-    g.drawLine(getItsX()+1,getItsY(),getItsX()+getItsHeight()/2+1,getItsY()+getItsHeight()/2);
-    g.drawLine(getItsX()+getItsHeight()/2+1,getItsY()+getItsHeight()/2,getItsX()+1, getItsY()+getItsHeight()-1);
+      // (2) Draw the outline
+      g.setColor( Color.black);
+      g.drawRect( x, y, wm1, hm1);
+
+      // (3) Draw or fill the triangle
+      if ( state != 0 )
+	{
+	  int xPoints[] = { xp1, xp1 + hd2, xp1};
+	  int yPoints[] = { y, y + hd2, y + hm1};
+	  g.fillPolygon( xPoints, yPoints, 3);
+	}
+      else
+	{
+	  g.drawLine( xp1, y, xp1 + hd2, y + hd2);
+	  g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
+	}
     
-    //draw the value
-    g.setColor(Color.black);
-    String aString = GetVisibleString(String.valueOf(itsInteger));
-    g.setFont(getFont());
-    g.drawString(aString, getItsX()+getItsHeight()/2+5,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2 +1);
+      // (4) Draw the value
+      String aString;
+
+      if (state != 3)
+	aString = GetVisibleString(String.valueOf(itsInteger));
+      else
+	{
+	  aString = currentText.toString();
+	  g.setColor( Color.red);
+	}
+
+      g.setFont( getFont());
+      g.drawString( aString, x + hd2 + 5, y + itsFontMetrics.getAscent() + (h - itsFontMetrics.getHeight())/2 + 1);
     
-    //draw the dragbox
-    if(!itsSketchPad.itsRunMode)
-      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      // (5) Draw the dragbox (?)
+      if ( !itsSketchPad.itsRunMode)
+	g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   String GetVisibleString(String theString){
@@ -324,8 +369,68 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   public Dimension getPreferredSize() {
     return preferredSize;
   }
+
+  // (fd) {
+  public void keyPressed( KeyEvent e) 
+  {
+    // DEBUG
+    //System.err.println( this.getClass().getName() + "( " + e.getKeyCode() + " )");
+
+    state = 3;
+
+    if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown())
+      {
+	int c = e.getKeyCode();
+
+	if ( c >= '0' && c <= '9')
+	  currentText.append( (char)c);
+	else if ( c == ircam.jmax.utils.Platform.ENTER_KEY
+		  || c == ircam.jmax.utils.Platform.RETURN_KEY )
+	  {
+	    try
+	      {
+		int value = Integer.parseInt( currentText.toString());
+
+		itsFtsObject.put( "value", new Integer( value));
+	      }
+	    catch ( NumberFormatException exception)
+	      {
+	      }
+	    currentText.setLength(0);
+	    state = 1;
+	  }
+	else if ( ( c == ircam.jmax.utils.Platform.DELETE_KEY)
+	     || ( c == ircam.jmax.utils.Platform.BACKSPACE_KEY) )
+	  {
+	    int l = currentText.length();
+
+	    l = ( l > 0 ) ? l - 1 : 0;
+
+	    currentText.setLength( l);
+	  }
+
+	DoublePaint();
+	Trust( itsInteger);
+      }
+  }
+
+  public void keyReleased( KeyEvent e) 
+  {
+  }
+
+  public void keyTyped( KeyEvent e)
+  {
+  }
+
+  public void keyInputGained()
+    {
+      DoublePaint();
+    }
+
+  public void keyInputLost()
+    {
+      state = 0;
+      DoublePaint();
+    }
+  // } (fd)
 }
-
-
-
-

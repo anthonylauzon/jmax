@@ -24,7 +24,7 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, ErmesDrawable, FtsUpdateGroupListener{
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, ErmesDrawable, FtsUpdateGroupListener {
   
   //2703...
   public boolean isInGroup = false;
@@ -767,8 +767,6 @@ Rectangle previousResizeRect = new Rectangle();
   
   public void InitFromFtsContainer(FtsContainerObject theContainerObject){
 
-    GlobalProbe.enterMethod( this, "InitFromFtsContainer");
-
     FtsContainerObject aFtsPatcher = theContainerObject;
     // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getObjects();	//usefull?
@@ -811,7 +809,6 @@ Rectangle previousResizeRect = new Rectangle();
 
     repaint();
     
-    GlobalProbe.exitMethod();
   }
 
   //--------------------------------------------------------
@@ -1021,8 +1018,8 @@ Rectangle previousResizeRect = new Rectangle();
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
 
-  public void mousePressed(MouseEvent e){
-
+  public void mousePressed(MouseEvent e)
+  {
     MaxApplication.setCurrentWindow(itsSketchWindow);
     itsSketchWindow.requestFocus();//???
     
@@ -1030,80 +1027,108 @@ Rectangle previousResizeRect = new Rectangle();
     int y = e.getY();
     int i;
     
-    if(!offScreenPresent){
-      RequestOffScreen(this);
-      DrawOffScreen(getGraphics());
-    }
-    
-    if (itsRunMode || e.isControlDown()) {
-      if(itsHelper.IsInObject(x,y)) {
-	itsCurrentObject.MouseDown(e,x,y);
-	itsStartDragObject = itsCurrentObject;	//object FROM WHICH we started drag
+    if ( !offScreenPresent)
+      {
+	RequestOffScreen(this);
+	DrawOffScreen(getGraphics());
       }
-      return;
-    }
     
-    if(editStatus == EDITING_OBJECT){
-      itsEditField.LostFocus();
-      requestFocus();
-    }
-    if(editStatus == EDITING_COMMENT){
-      itsTextArea.LostFocus();
-      requestFocus();
-    }
-    ///if we are in a InOutLet
-    if(itsHelper.IsInInOutLet(x,y)){
-      if(itsToolBar.pressed) itsToolBar.Unlock();
-      itsHelper.deselectObjects(currentSelection.itsObjects, false);
-      itsHelper.deselectConnections(currentSelection.itsConnections, false);
-      if (e.isShiftDown()){
-	MultiConnect(itsCurrentInOutlet);
-      }
-      else{
-	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
-	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
-	  if (itsConnectingLet != null) { //we are going to START a connection
-	    //(not to terminate one!!)
-	    editStatus = START_CONNECT;
-	    prepareForDynamicConnect(itsCurrentInOutlet);
+    if ( itsRunMode || e.isControlDown()) 
+      {
+	// (fd) {
+	itsSketchWindow.setKeyEventClient( null);
+	// } (fd)
+
+	if ( itsHelper.IsInObject(x,y))
+	  {
+	    itsCurrentObject.MouseDown(e,x,y);
+	    itsStartDragObject = itsCurrentObject;	//object FROM WHICH we started drag
 	  }
-	}
-	else {
-	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
-	}
+
+	return;
       }
-      paintDirtyList();
-      return;
-    }
+    
+    if (  editStatus == EDITING_OBJECT)
+      {
+	itsEditField.LostFocus();
+	requestFocus();
+      }
+
+    if ( editStatus == EDITING_COMMENT)
+      {
+	itsTextArea.LostFocus();
+	requestFocus();
+      }
+
+    ///if we are in a InOutLet
+    if ( itsHelper.IsInInOutLet(x,y))
+      {
+	if(itsToolBar.pressed)
+	  itsToolBar.Unlock();
+
+	itsHelper.deselectObjects( currentSelection.itsObjects, false);
+	itsHelper.deselectConnections( currentSelection.itsConnections, false);
+	if ( e.isShiftDown())
+	  {
+	    MultiConnect(itsCurrentInOutlet);
+	  }
+	else
+	  {
+	    if ( !itsCurrentInOutlet.GetSelected() )
+	      {// no previously selected
+		itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+		if ( itsConnectingLet != null) 
+		  { 
+		    // we are going to START a connection, not to terminate one !!
+		    editStatus = START_CONNECT;
+		    prepareForDynamicConnect( itsCurrentInOutlet);
+		  }
+	      }
+	    else 
+	      {
+		itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
+	      }
+	  }
+	paintDirtyList();
+	return;
+      }
+
     ///if we are in a Object
-    if(itsHelper.IsInObject(x,y)){
-      if(itsToolBar.pressed) itsToolBar.Unlock();
-      itsCurrentObject.MouseDown(e,x,y);
-      return;
-    }
+    if(itsHelper.IsInObject(x,y))
+      {
+	if(itsToolBar.pressed)
+	  itsToolBar.Unlock();
+	itsCurrentObject.MouseDown(e,x,y);
+	return;
+      }
     
     ///if we are in a Connection
-    if(itsHelper.IsInConnection(x,y)) {
-      if(itsToolBar.pressed) itsToolBar.Unlock();
-      itsCurrentConnection.MouseDown(e,x,y);
-      return;
-    }
-    
-    if (!itsToolBar.locked) itsToolBar.Deselect();
-    
-    if(editStatus == START_ADD){
-      AddingObject(x,y);
-    }
-    else{ //DOING_NOTHING, START_SELECT
-      if (!e.isShiftDown()) {
-	itsHelper.deselectAll(true);
+    if(itsHelper.IsInConnection(x,y)) 
+      {
+	if(itsToolBar.pressed)
+	  itsToolBar.Unlock();
+	itsCurrentConnection.MouseDown(e,x,y);
+	return;
       }
-      editStatus = AREA_SELECT;
-      currentRect.setBounds(x,y,0,0);
-      previousRect.setBounds(x,y,0,0);
-      currentPoint.setLocation(x,y);
-    }
-
+    
+    if (!itsToolBar.locked)
+      itsToolBar.Deselect();
+    
+    if(editStatus == START_ADD)
+      {
+	AddingObject(x,y);
+      }
+    else
+      { //DOING_NOTHING, START_SELECT
+	if (!e.isShiftDown()) 
+	  {
+	    itsHelper.deselectAll(true);
+	  }
+	editStatus = AREA_SELECT;
+	currentRect.setBounds(x,y,0,0);
+	previousRect.setBounds(x,y,0,0);
+	currentPoint.setLocation(x,y);
+      }
   }
        
   private void prepareForDynamicConnect(ErmesObjInOutlet io) {

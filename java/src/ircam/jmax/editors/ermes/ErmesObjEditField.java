@@ -179,6 +179,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	else//inserisce testo in coda
 
 	  s = s+k;
+
 	if (k==Platform.DELETE_KEY || 
 	    k==Platform.BACKSPACE_KEY ||
 	    ErmesSketchWindow.isAnArrow(e.getKeyCode())) return;
