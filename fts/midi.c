@@ -2055,13 +2055,21 @@ fts_midiconfig_dump( midiconfig_t *this, fts_bmax_file_t *f)
   while(label) 
   {
     /*code insert message for each label */
+    /*
+      here symbol order must be inverse of restore method symbol order 
+      so in restore_method (selector fts_s_label):
+      label->name = fts_get_symbol(at);
+      label->input_name = fts_get_symbol(at+1);
+      label->output_name = fts_get_symbol(at+2);
+    */
     fts_bmax_code_push_symbol(f, label->output_name);
     fts_bmax_code_push_symbol(f, label->input_name);
     fts_bmax_code_push_symbol(f, label->name);
     fts_bmax_code_push_symbol(f, fts_s_label);
     fts_bmax_code_obj_mess(f, fts_s_midi_config, 4);
     fts_bmax_code_pop_args(f, 4);
-    
+
+      
     label = label->next;	  
   }
 }
@@ -2125,7 +2133,6 @@ midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->n_labels = 0;
 
   this->dirty = 0;
-/*   this->file_name = NULL; */
 
   /* modify object description */
   fts_set_symbol(&a, midiconfig_s_name);
