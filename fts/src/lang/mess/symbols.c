@@ -68,6 +68,7 @@ fts_symbol_t fts_s_wh;
 fts_symbol_t fts_s_range;
 fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
+fts_symbol_t fts_s_error;
 
 /* Symbols related to builtin classes */
 
@@ -142,6 +143,7 @@ fts_predefine_symbols(void)
   fts_s_range             = fts_new_builtin_symbol("range",    47);
   fts_s_font              = fts_new_builtin_symbol("font",     48);
   fts_s_fontSize          = fts_new_builtin_symbol("fs",       49);
+  fts_s_error             = fts_new_builtin_symbol("error",    56);
 
   /* Symbols related to builtin classes */
 
@@ -151,6 +153,8 @@ fts_predefine_symbols(void)
   fts_s_qlist             = fts_new_builtin_symbol("qlist",   53);
   fts_s_table             = fts_new_builtin_symbol("table",   54);
   fts_s_explode           = fts_new_builtin_symbol("explode", 55);
+
+  /* Last number user: 56 (max, 255 predefined symbols !! ) */
 }
 
 

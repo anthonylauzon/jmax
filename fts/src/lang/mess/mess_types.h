@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.8 $ IRCAM $Date: 1998/05/12 16:46:25 $
+ *      $Revision: 1.9 $ IRCAM $Date: 1998/05/13 16:04:33 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -291,7 +291,8 @@ struct fts_patcher
 
   int open;			/* the open flag */
   int load_init_fired;		/* the multiple load init protection flag*/
-  int is_abstraction;
+
+  enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 };    
 
 

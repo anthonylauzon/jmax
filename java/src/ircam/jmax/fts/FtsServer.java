@@ -1,6 +1,7 @@
 package ircam.jmax.fts;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import java.util.*;
 import java.io.*;
 
@@ -21,6 +22,7 @@ import java.io.*;
 
 public class FtsServer 
 {
+  // Probe probe;
   static final boolean debug = false;
 
   /** The FtsPort used to communicate with FTS */
@@ -76,6 +78,9 @@ public class FtsServer
 
   public void start()
   {
+    //    probe = new Probe("FTS", 10000, 100); //@@@
+    // probe.start();//@@@
+
     port.start();
 
     // Build the root patcher, by mapping directly to object id 1 on FTS
@@ -747,6 +752,7 @@ public class FtsServer
     if (FtsServer.debug)
       System.err.println("syncToFts()");
 
+    // probe.mark("Sync ping");
     try
       {
 	port.sendCmd(FtsClientProtocol.sync_cmd);
@@ -811,10 +817,14 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
+	  // probe.mark("Property value in");
 
  	  if (msg.getNumberOfArguments() >= 3)
  	    {
  	      FtsObject obj;
+
+	      // if (msg.getArgument(1).equals("value"))
+	      // return;
 
  	      obj = (FtsObject) msg.getArgument(0);
 
@@ -849,6 +859,7 @@ public class FtsServer
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
+	// probe.mark("Pong in");
 	deliverPong();
 	break;
 	
@@ -955,6 +966,7 @@ public class FtsServer
       {
 	// ignore iand continue
       }
+    // probe.mark("Sync pong");
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */

@@ -14,35 +14,72 @@ import java.util.*;
  * reportToFile() calls.
  */
 
-public class Probe {
-  final static int MAX_EVENTS = 10000; 
-  long times[] = new long[MAX_EVENTS];
-  String labels[] = new String[MAX_EVENTS]; 
+public class Probe
+{
+  int MAX_EVENTS = 10000; 
+  long times[];
+  String labels[];
   long startTime;
   String itsName;
   int eventCounter = 0;
+  int autoReport   = 0;
   boolean running=false;
-
-  public Probe(String theName) {
+  
+  public Probe(String theName, int max)
+  {
     itsName = theName;
+    MAX_EVENTS = max;
+    times = new long[MAX_EVENTS];
+    labels = new String[MAX_EVENTS]; 
   }
 
-  public void start() {
+  public Probe(String theName)
+  {
+    itsName = theName;
+    times = new long[MAX_EVENTS];
+    labels = new String[MAX_EVENTS]; 
+  }
+
+  public Probe(String theName, int max, int autoReport)
+  {
+    itsName = theName;
+    MAX_EVENTS = max;
+    this.autoReport = autoReport;
+    times = new long[MAX_EVENTS];
+    labels = new String[MAX_EVENTS]; 
+  }
+
+  public void setAutoReport(int v)
+  {
+    autoReport = v;
+  }
+
+  public void start()
+  {
     running = true;
-    mark("probe "+itsName+" start");
+    startTime = System.currentTimeMillis();
   }
 
   public void mark(String markName) {
-    if (running && eventCounter < MAX_EVENTS) {
-      times[eventCounter] = System.currentTimeMillis();
-      labels[eventCounter++] = markName;
-    }  
+
+    if (running)
+      {
+	if (eventCounter < MAX_EVENTS)
+	  {
+	    times[eventCounter] = System.currentTimeMillis();
+	    labels[eventCounter++] = markName;
+	  }
+
+	if (autoReport != 0)
+	  if ((eventCounter % autoReport) == 0)
+	    report(eventCounter - autoReport, eventCounter);
+      }
   }
 
   public void silentMark() {
     if (eventCounter < MAX_EVENTS) {
     times[eventCounter] = System.currentTimeMillis();
-    labels[eventCounter++] = "";
+    labels[eventCounter++] = null;
     }
   }
   
@@ -50,12 +87,41 @@ public class Probe {
     mark("probe "+itsName+" stop");
     running = false;
   }
-  public void report() {
-   for (int i=1; i<eventCounter; i++) {
-     if (labels[i].equals("")) continue;
-     System.err.println("Probe "+itsName+" ****   after ms:"+(times[i]-times[i-1])+"   \t["+(times[i]-startTime)+"]\t"+labels[i]);
-   }
+
+  public void report()
+  {
+    report(0, eventCounter - 1);
   }
+
+  public void report(int end)
+  {
+    report(0, end);
+  }
+
+  public void report(int begin, int end)
+  {
+    if (begin < 0)
+      begin = 0;
+
+    if (end >=  eventCounter)
+      end = eventCounter - 1;
+      
+    System.err.println("Probe " + itsName +" Report");
+
+    for (int i = begin; i < end; i++)
+      {
+	if (labels[i] != null)
+	  {
+	    if (i == 0)
+	      System.err.println(labels[i] + " @ ms:" + (times[i]-startTime));
+	    else
+	      System.err.println(labels[i] +" @ ms:"+ (times[i]-startTime) 
+				 + " \tdelta: " + (times[i]-times[i-1]));
+	  }
+      }
+  }
+
+
 
   public void reportToFile(String path) {
    PrintWriter out;
@@ -70,8 +136,8 @@ public class Probe {
    }
 
    for (int i=1; i<eventCounter; i++) {
-     if (labels[i].equals("")) continue;
-     out.println("Probe "+itsName+" ****   after ms:"+(times[i]-times[i-1])+"   \t["+(times[i]-startTime)+"]\t"+labels[i]);
+     if (labels[i] != null)
+       out.println("Probe "+itsName+" ****   after ms:"+(times[i]-times[i-1])+"   \t["+(times[i]-startTime)+"]\t"+labels[i]);
    }
    try {
      aFileWriter.flush();
@@ -82,3 +148,8 @@ public class Probe {
    }
   }
 }
+
+
+
+
+

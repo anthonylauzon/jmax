@@ -13,7 +13,7 @@ naming.c        \
 properties.c	\
 symbols.c	\
 send.c          \
-voidobj.c       \
+errobj.c       \
 patlex.c        \
 patabs.c        \
 patparser.c     \

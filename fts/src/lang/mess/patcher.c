@@ -390,7 +390,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->objects = (fts_object_t *) 0;
   this->open    = 0;		/* start as closed */
-  this->is_abstraction = 0;
+  fts_patcher_set_standard(this);
 }
 
 
@@ -554,9 +554,9 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
     }
 
-  /* If it is not an abstraction, change the description for ninlets */
+  /* If it is a standard patcher, change the description for ninlets */
 
-  if (! fts_patcher_is_abstraction(this))
+  if (fts_patcher_is_standard(this))
     fts_set_int(&(obj_this->argv[2]), new_ninlets);
 
   /* Reallocate and copy the patcher outlets, incoming connections and outlets properties if needed */
@@ -634,9 +634,9 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
     }
 
-  /* If it is not an abstraction, change the description for noutlets */
+  /* If it is a standard patcher abstraction, change the description for noutlets */
 
-  if (! fts_patcher_is_abstraction(this))
+  if (fts_patcher_is_standard(this))
     fts_set_int(&(obj_this->argv[3]), new_noutlets);
 
   /* Set the new name if not null */
@@ -645,7 +645,7 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
     {
       this->name = name;
 
-      if (! fts_patcher_is_abstraction(this))
+      if (fts_patcher_is_standard(this))
 	fts_set_symbol(&(obj_this->argv[1]), name);
     }
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.19 $ IRCAM $Date: 1998/05/11 19:36:34 $
+ *      $Revision: 1.20 $ IRCAM $Date: 1998/05/12 16:46:25 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -224,6 +224,9 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed_urgent(obj, fts_s_height);
       fts_object_property_changed_urgent(obj, fts_s_width);
 
+      fts_object_property_changed_urgent(obj, fts_s_font);
+      fts_object_property_changed_urgent(obj, fts_s_fontSize);
+
       if (fts_object_is_patcher(obj))
 	{
 	  fts_object_property_changed_urgent(obj, fts_s_wx);
@@ -239,6 +242,14 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed_urgent(obj, fts_s_min_value);
       fts_object_property_changed_urgent(obj, fts_s_max_value);
       fts_object_property_changed_urgent(obj, fts_s_value); /* should this be here or elsewhere ?? */
+
+      if (fts_object_is_error(obj))
+	{
+	  fts_atom_t a;
+
+	  fts_set_int(&a, 1);
+	  fts_object_property_changed_urgent(obj, fts_s_error);
+	}
 
       /* Declarations are not yet really supported */
 
@@ -337,6 +348,15 @@ fts_connection_t *fts_object_connect(int id, fts_object_t *out, int woutlet, fts
   fts_class_mess_t *mess = 0;
   fts_connection_t *outconn;
   int anything;
+
+  /* first of all, if one of the two object is an error object,
+     add the required inlets/outlets to it */
+
+  if (fts_object_is_error(out))
+    fts_error_object_fit_outlet(out, woutlet);
+
+  if (fts_object_is_error(in))
+    fts_error_object_fit_inlet(in, winlet);
 
   /* check the range */
 

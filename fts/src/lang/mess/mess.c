@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.8 $ IRCAM $Date: 1998/05/13 16:04:32 $
+ *      $Revision: 1.9 $ IRCAM $Date: 1998/05/14 10:44:30 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -65,10 +65,6 @@ fts_mess_init(void)
   /* Initialize the .pat parser */
 
   fts_patparser_init();
-
-  /* Create the voidobj class */
-
-  fts_voidobj_config();
 
   /* Create the selection class */
 

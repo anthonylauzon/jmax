@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -26,10 +27,17 @@ struct fts_bmax_file
 
 
 static fts_bmax_file_t *
-fts_open_bmax_file_for_writing(const char *name)
+fts_open_bmax_file_for_writing(fts_symbol_t file)
 {
   fts_bmax_file_t *f;
-  
+  const char *name;
+  char backup[PATH_MAX];
+
+  /* Get the file and backup file name */
+
+  name = fts_symbol_name(file);
+  sprintf(backup, "%s.backup", name);
+
   /* allocate a bmax descriptor, and initialize it */
 
   f = (fts_bmax_file_t *) fts_malloc(sizeof(fts_bmax_file_t));
@@ -41,6 +49,13 @@ fts_open_bmax_file_for_writing(const char *name)
   f->header.magic_number = FTS_BINARY_FILE_MAGIC;
   f->header.code_size = 0;
   f->header.n_symbols = 0;
+
+  /* if the file exists, rename the old file, to keep a backup; ignore the error,
+     if we cannot autosave, we need anyway to try saving ! also, ignoring
+     the error catch the case where "name" do not exists.
+   */
+
+  rename(name, backup);
 
   /* Open the file */
 
@@ -721,8 +736,8 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fprintf(stderr, "\n");
 #endif
 
-
   fts_bmax_code_push_atoms(f, obj->argc, obj->argv);
+
   fts_bmax_code_make_obj(f, obj->argc);
 
   if (objidx >= 0)
@@ -738,6 +753,9 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_y);
   fts_bmax_code_new_property(f, obj, fts_s_height);
   fts_bmax_code_new_property(f, obj, fts_s_width);
+
+  fts_bmax_code_new_property(f, obj, fts_s_font);
+  fts_bmax_code_new_property(f, obj, fts_s_fontSize);
 
   fts_bmax_code_new_property(f, obj, fts_s_min_value);
   fts_bmax_code_new_property(f, obj, fts_s_max_value);
@@ -899,7 +917,7 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(fts_symbol_name(file));
+  f = fts_open_bmax_file_for_writing(file);
 
   if (f)
     {
@@ -938,7 +956,7 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 
 	  p = selection->objects[i];
 
-	  if (fts_object_is_patcher(p) && (! fts_object_is_abstraction(p)))
+	  if (fts_object_is_patcher(p) && fts_patcher_is_standard((fts_patcher_t *) p))
 	    {
 	      /* Save the object recursively as a patcher, and then pop it from the stack */
 	      
@@ -980,7 +998,7 @@ void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(fts_symbol_name(file));
+  f = fts_open_bmax_file_for_writing(file);
 
   if (f)
     {

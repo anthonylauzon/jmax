@@ -1645,7 +1645,6 @@ Rectangle previousResizeRect = new Rectangle();
   //	paint
   //--------------------------------------------------------
   public void paint(Graphics g) {
-    
     if(itsScrolled){
       if (offScreenPresent) {
 	if (paintForTheFirstTime) {
@@ -1662,10 +1661,10 @@ Rectangle previousResizeRect = new Rectangle();
 	DrawOffScreen(getGraphics());
       }
     }
-     else {
-       DrawOffScreen(g);
-     }
-  }			
+    else {
+      DrawOffScreen(g);
+    }
+  }		
   
   //--------------------------------------------------------
   //	ResetConnect
