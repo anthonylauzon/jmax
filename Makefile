@@ -140,8 +140,8 @@ cvs-tag: spec-files
 		echo "Not sync with cvs (do an update or commit)" ; \
 		exit 1 ; \
 	fi
-	echo "Tagging with tag" `sed -e 's/\./_/g' -e 's/^/V/' VERSION`
-	cvs tag -F `sed -e 's/\./_/g' -e 's/^/V/' VERSION`
+	echo "Tagging with tag" V`sed 's/\./_/g' VERSION`
+	cvs tag -F V`sed 's/\./_/g' VERSION`
 .PHONY: cvs-tag
 
 #
@@ -161,8 +161,8 @@ dist:
 		umask 22 ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
-		TAG=`echo $(VERSION) | sed -e 's/\./_/g' -e 's/^/V/'` ; \
-		cvs export -r $$TAG jmax ; \
+		TAG=V`echo $(VERSION) | sed 's/\./_/g'` ; \
+		cvs export -r$$TAG jmax ; \
 		mv jmax jmax-$(VERSION) ; \
 		tar cvf - jmax-$(VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
 		chmod 644 ../../jmax-$(VERSION)-src.tar.gz ; \
