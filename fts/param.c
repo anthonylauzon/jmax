@@ -275,7 +275,7 @@ param_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
-  fts_class_message_varargs(cl, fts_s_get_tuple, param_get_value);
+  fts_class_message_varargs(cl, fts_s_get_element, param_get_value);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
 

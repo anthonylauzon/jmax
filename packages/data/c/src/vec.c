@@ -28,8 +28,32 @@ fts_class_t *vec_type = 0;
 
 static fts_symbol_t sym_text = 0;
 
+static int
+vec_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+{
+  vec_t *o = (vec_t *)fts_get_object(a);
+  vec_t *p = (vec_t *)fts_get_object(b);
+  int o_n = vec_get_size(o);
+  int p_n = vec_get_size(p);
+  
+  if(o_n == p_n)
+  {
+    fts_atom_t *o_ptr = vec_get_ptr(o);
+    fts_atom_t *p_ptr = vec_get_ptr(p);
+    int i;
+    
+    for(i=0; i<o_n; i++)
+      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
+        return 0;
+    
+    return 1;
+  }
+  
+  return 0;
+}
+
 static void
-vec_post(fts_object_t *o, fts_bytestream_t *stream)
+vec_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   vec_t *this = (vec_t *)o;
   int size = vec_get_size(this);
@@ -46,6 +70,23 @@ vec_post(fts_object_t *o, fts_bytestream_t *stream)
   }
   else
     fts_spost(stream, "<vec %d>", size);
+}
+
+static void
+vec_array_function(fts_object_t *o, fts_array_t *array)
+{
+  vec_t *this = (vec_t *)o;
+  fts_atom_t *values = vec_get_ptr(this);
+  int size = vec_get_size(this);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i;
+  
+  fts_array_set_size(array, onset + size);
+  atoms = fts_array_get_atoms(array) + onset;
+  
+  for(i=0; i<size; i++)
+    fts_atom_assign(atoms + i, values + i);
 }
 
 /********************************************************************
@@ -157,25 +198,6 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     }
   else
     fts_post("vec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
-}
-
-static void
-vec_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-  fts_atom_t *values = vec_get_ptr(this);
-  int size = vec_get_size(this);
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
-  fts_atom_t *atoms;
-  int i;
-
-  fts_tuple_set_size(tuple, size);
-  atoms = fts_tuple_get_atoms(tuple);
-
-  for(i=0; i<size; i++)
-    fts_atom_assign(atoms + i, values + i);
-
-  fts_return_object((fts_object_t *)tuple);
 }
 
 static void
@@ -353,30 +375,6 @@ vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 
-static int
-vec_equals(const fts_atom_t *a, const fts_atom_t *b)
-{
-  vec_t *o = (vec_t *)fts_get_object(a);
-  vec_t *p = (vec_t *)fts_get_object(b);
-  int o_n = vec_get_size(o);
-  int p_n = vec_get_size(p);
-
-  if(o_n == p_n)
-  {
-    fts_atom_t *o_ptr = vec_get_ptr(o);
-    fts_atom_t *p_ptr = vec_get_ptr(p);
-    int i;
-
-    for(i=0; i<o_n; i++)
-      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
-        return 0;
-
-    return 1;
-  }
-
-  return 0;
-}
-
 /********************************************************************
  *
  *  class
@@ -426,11 +424,11 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
 
-  fts_class_set_equals_function(cl, vec_equals);
-  fts_class_set_post_function(cl, vec_post);
+  fts_class_set_equals_function(cl, vec_equals_function);
+  fts_class_set_post_function(cl, vec_post_function);
+  fts_class_set_array_function(cl, vec_array_function);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_get_tuple, vec_get_tuple);  
   fts_class_message_varargs(cl, fts_s_print, vec_print); 
     
   fts_class_message_varargs(cl, fts_s_fill, vec_fill);      

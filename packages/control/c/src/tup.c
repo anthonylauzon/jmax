@@ -485,20 +485,22 @@ getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(fts_is_object(at))
   {
     fts_object_t *obj = fts_get_object(at);
+    fts_class_t *cl = fts_object_get_class(obj);
+    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
+    fts_array_t *array = fts_tuple_get_array(tuple);
+    fts_array_function_t fun = fts_class_get_array_function(cl);
 
-    fts_set_void(fts_get_return_value());
-
-    fts_send_message_varargs(obj, fts_s_get_tuple, 0, NULL);
+    fts_object_refer((fts_object_t *)tuple);
+    
+    (*fun)(obj, array);
 
     /* output array */
-    if(!fts_is_void(fts_get_return_value()))
-    {
-      fts_atom_refer(fts_get_return_value());
-      fts_outlet_atom(o, 0, fts_get_return_value());
-      fts_atom_release(fts_get_return_value());
-    }
+    if(fts_array_get_size(array) > 0)
+      fts_outlet_object(o, 0, (fts_object_t *)tuple);
     else
       fts_object_error(o, "cannot get tuple from %s object", fts_object_get_class_name(obj));
+    
+    fts_object_release((fts_object_t *)tuple);
   }
   else
     fts_outlet_atom(o, 0, at);

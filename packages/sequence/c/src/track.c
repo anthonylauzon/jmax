@@ -1156,15 +1156,24 @@ _track_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 #define MARKERS_BAR_TOLERANCE 20.0 /* tolerance for bars */
 #define MARKERS_BAR_EPSILON 0.1
 
-static void
-_track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static int 
+number_bar(scomark_t *bar, int num)
 {
-  static int bar_num_idx = -1;
+  int bar_num = scomark_get_bar_num(bar);
+  
+  if(bar_num >= 0)
+    num = bar_num;
+  else
+    scomark_set_bar_num(bar, num);
+
+  return num + 1;
+}
+
+static void
+track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   track_t *this = (track_t *)o;
   track_t *markers = this->markers;
-
-  if(bar_num_idx < 0)
-    bar_num_idx = propobj_property_get_index(propobj_class_get_property_by_name(scomark_class, seqsym_bar));
 
   if(markers != NULL)
   {
@@ -1177,7 +1186,6 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     double bar_duration = 0.0;
     double next_bar_time = 0.0;
     int bar_num = 1;
-    fts_atom_t a;
     
     /* get beginning of meter */
     while(marker_event != NULL && next_bar_time == 0.0)
@@ -1198,17 +1206,7 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
           next_bar_time = time + bar_duration;
         }
         
-        propobj_get_property_by_index((propobj_t *)scomark, bar_num_idx, &a);
-        
-        if(fts_is_int(&a))
-          bar_num = fts_get_int(&a);
-        else
-        {
-          fts_set_int(&a, bar_num);
-          propobj_set_property_by_index((propobj_t *)scomark, bar_num_idx, &a);
-        }
-        
-        bar_num++;
+        bar_num = number_bar(scomark, bar_num);
       } 
       
       marker_event = event_get_next(marker_event);
@@ -1237,13 +1235,8 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
         /* fill with bars until given bar */
         while(time - next_bar_time > MARKERS_BAR_TOLERANCE)
         {
-          scomark_t *sm = track_insert_marker(this, next_bar_time, seqsym_bar);
-          
-          /* set bar number */
-          fts_set_int(&a, bar_num);
-          propobj_set_property_by_index((propobj_t *)sm, bar_num_idx, &a);
-          
-          bar_num++;
+          scomark_t *bar = track_insert_marker(this, next_bar_time, seqsym_bar);
+          bar_num = number_bar(bar, bar_num);
           next_bar_time += bar_duration;
         }
         
@@ -1251,27 +1244,17 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
           fts_post("track make-bars: bar @ %g is short by %g msec\n", time, next_bar_time - time);
         
         /* next given bar */
+        bar_num = number_bar(scomark, bar_num);
         bar_duration = ((double)numerator * 240000.0) / (tempo * (double)denominator);
-        next_bar_time = time + bar_duration;
-        
-        /* set bar number */
-        fts_set_int(&a, bar_num);
-        propobj_set_property_by_index((propobj_t *)scomark, bar_num_idx, &a);
-        
-        bar_num++;        
+        next_bar_time = time + bar_duration;        
       }
       else
       {
         /* current is marker inside bar (tempo & co) */
         while(time - next_bar_time > MARKERS_BAR_EPSILON)
         {
-          scomark_t *sm = track_insert_marker(this, next_bar_time, seqsym_bar);
-          
-          /* set bar number */
-          fts_set_int(&a, bar_num);
-          propobj_set_property_by_index((propobj_t *)sm, bar_num_idx, &a);
-          
-          bar_num++;
+          scomark_t *bar = track_insert_marker(this, next_bar_time, seqsym_bar);
+          bar_num = number_bar(bar, bar_num);
           next_bar_time += bar_duration;
         }
         
@@ -1286,12 +1269,7 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
         if(next_bar_time <= time + MARKERS_BAR_EPSILON)
         {
           scomark_set_type(scomark, seqsym_bar);
-          
-          /* set bar number */
-          fts_set_int(&a, bar_num);
-          propobj_set_property_by_index((propobj_t *)scomark, bar_num_idx, &a);
-          
-          bar_num++;        
+          bar_num = number_bar(scomark, bar_num);
           next_bar_time += bar_duration;          
         }
       }
@@ -1303,13 +1281,8 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     /* fill until end of track */
     while(next_bar_time <= track_get_duration(this) && next_bar_time > 0.0)
     {
-      scomark_t *sm = track_insert_marker(this, next_bar_time, seqsym_bar);
-      
-      /* set bar number */
-      fts_set_int(&a, bar_num);
-      propobj_set_property_by_index((propobj_t *)sm, bar_num_idx, &a);
-      
-      bar_num++;
+      scomark_t *bar = track_insert_marker(this, next_bar_time, seqsym_bar);
+      bar_num = number_bar(bar, bar_num);
       next_bar_time += ((double)numerator * 240000.0) / (tempo * (double)denominator);
     }      
     
@@ -1862,7 +1835,7 @@ track_instantiate(fts_class_t *cl)
   
   /* DON'T EVER TELL ANYBODY!! */
   fts_class_message_void(cl, seqsym_markers, _track_get_markers);
-  fts_class_message_void(cl, fts_new_symbol("make-bars"), _track_make_bars);
+  fts_class_message_void(cl, fts_new_symbol("make-bars"), track_make_bars);
   
   fts_class_inlet_thru(cl, 0);
   

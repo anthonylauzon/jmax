@@ -644,7 +644,7 @@ propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name)
 }
 
 propobj_property_t * 
-propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e)
+propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name)
 {
   propobj_property_t *prop;
   

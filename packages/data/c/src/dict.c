@@ -164,9 +164,31 @@ dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
 }
 
 static void
-dict_post(fts_object_t *o, fts_bytestream_t *stream)
+dict_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   fts_spost(stream, "<dict>");
+}
+
+static void
+dict_array_function(fts_object_t *o, fts_array_t *array)
+{
+  dict_t *self = (dict_t *)o;
+  fts_iterator_t keys_iterator;
+  fts_iterator_t values_iterator;
+  
+  fts_hashtable_get_keys(&self->hash, &keys_iterator);
+  fts_hashtable_get_values(&self->hash, &values_iterator);
+  
+  while(fts_iterator_has_more(&keys_iterator))
+  {
+    fts_atom_t key, value;
+    
+    fts_iterator_next(&keys_iterator, &key);
+    fts_iterator_next(&values_iterator, &value);
+    
+    fts_array_append(array, 1, &key);
+    fts_array_append(array, 1, &value);
+  }
 }
 
 /**********************************************************
@@ -647,12 +669,16 @@ dict_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
+  fts_class_set_copy_function(cl, dict_copy_function);
+  fts_class_set_post_function(cl, dict_post_function);
+  fts_class_set_post_function(cl, dict_array_function);
+  
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, dict_dump_state);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_dict);
-  fts_class_message_varargs(cl, fts_s_get_tuple, dict_get_keys);
+  fts_class_message_varargs(cl, fts_new_symbol("keys"), dict_get_keys);
 
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
@@ -675,9 +701,6 @@ dict_instantiate(fts_class_t *cl)
 
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
-
-  fts_class_set_copy_function(cl, dict_copy_function);
-  fts_class_set_post_function(cl, dict_post);
 
   fts_class_doc(cl, dict_symbol, "[<sym|int: key> <any: value> ...]", "dictionary");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");

@@ -95,6 +95,8 @@ typedef struct
 {
   propobj_t propobj;
   fts_symbol_t type;
+  int bar_num;
+  int cue;
   double tempo;
   int meter_num;
   int meter_den;
@@ -103,6 +105,7 @@ typedef struct
 enum scomark_type_enum
 {
   scomark_tempo = 0,
+  scomark_cue,
   scomark_bar,
   scomark_end,
   scomark_double
@@ -111,7 +114,13 @@ enum scomark_type_enum
 extern fts_class_t *scomark_class;
 extern enumeration_t *scomark_type_enumeration;
 
-#define scomark_is_bar(s) ((s)->type != seqsym_tempo)
+#define scomark_is_bar(s) ((s)->type == seqsym_bar || (s)->type == seqsym_double || (s)->type == seqsym_end)
+
+#define scomark_set_bar_num(s, n) ((s)->bar_num = (n))
+#define scomark_get_bar_num(s) ((s)->bar_num)
+
+#define scomark_set_cue(s, c) ((s)->cue = (c))
+#define scomark_get_cue(s) ((s)->cue)
 
 #define scomark_set_type(s, t) ((s)->type = (t))
 #define scomark_get_type(s) ((s)->type)

@@ -299,7 +299,7 @@ midievent_copy_function(const fts_atom_t *from, fts_atom_t *to)
 }
 
 static void
-midievent_post(fts_object_t *o, fts_bytestream_t *stream)
+midievent_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
   int type = fts_midievent_get_type(this);
@@ -354,6 +354,52 @@ midievent_post(fts_object_t *o, fts_bytestream_t *stream)
   }
   
   fts_spost(stream, ">");  
+}
+
+static void
+midievent_array_function(fts_object_t *o, fts_array_t *array)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  int type = fts_midievent_get_type(this);
+  
+  fts_array_append_symbol(array, fts_midi_types[type]);
+  
+  /* append event data */
+  if(fts_midievent_is_channel_message(this))
+  {
+    fts_array_append_int(array, fts_midievent_channel_message_get_first(this));
+	  
+    if(fts_midievent_channel_message_has_second_byte(this))
+      fts_array_append_int(array, fts_midievent_channel_message_get_second(this));
+    
+    fts_array_append_int(array, fts_midievent_channel_message_get_channel(this));
+  }
+  else if(fts_midievent_is_system_exclusive(this))
+  {
+    int size = fts_midievent_system_exclusive_get_size(this);
+    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
+	  
+    fts_array_append(array, size, atoms);
+  }
+  else if(fts_midievent_is_time_code(this))
+  {
+    fts_array_append_int(array, fts_midievent_time_code_get_type(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_hour(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_minute(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_second(this));
+    fts_array_append_int(array, fts_midievent_time_code_get_frame(this));
+  }
+  else if(fts_midievent_is_song_position_pointer(this))
+  {
+    fts_array_append_int(array,fts_midievent_song_position_pointer_get_first(this));
+    fts_array_append_int(array,fts_midievent_song_position_pointer_get_second(this));
+  }
+  else if(fts_midievent_is_song_select(this))
+    fts_array_append_int(array, fts_midievent_song_select_get(this));
+  else if(fts_midievent_is_real_time(this))
+    fts_array_append_int(array, fts_midievent_real_time_get(this));
+  
+  fts_return_object((fts_object_t *)array);
 }
 
 static void
@@ -476,53 +522,6 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 }
   
-static void
-midievent_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midievent_t *this = (fts_midievent_t *)o;
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
-  int type = fts_midievent_get_type(this);
-
-  fts_tuple_append_symbol(tuple, fts_midi_types[type]);
-
-  /* append event data */
-  if(fts_midievent_is_channel_message(this))
-  {
-    fts_tuple_append_int(tuple, fts_midievent_channel_message_get_first(this));
-	  
-    if(fts_midievent_channel_message_has_second_byte(this))
-      fts_tuple_append_int(tuple, fts_midievent_channel_message_get_second(this));
-
-    fts_tuple_append_int(tuple, fts_midievent_channel_message_get_channel(this));
-  }
-  else if(fts_midievent_is_system_exclusive(this))
-  {
-    int size = fts_midievent_system_exclusive_get_size(this);
-    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
-	  
-    fts_tuple_append(tuple, size, atoms);
-  }
-  else if(fts_midievent_is_time_code(this))
-  {
-    fts_tuple_append_int(tuple, fts_midievent_time_code_get_type(this));
-    fts_tuple_append_int(tuple, fts_midievent_time_code_get_hour(this));
-    fts_tuple_append_int(tuple, fts_midievent_time_code_get_minute(this));
-    fts_tuple_append_int(tuple, fts_midievent_time_code_get_second(this));
-    fts_tuple_append_int(tuple, fts_midievent_time_code_get_frame(this));
-  }
-  else if(fts_midievent_is_song_position_pointer(this))
-  {
-    fts_tuple_append_int(tuple,fts_midievent_song_position_pointer_get_first(this));
-    fts_tuple_append_int(tuple,fts_midievent_song_position_pointer_get_second(this));
-  }
-  else if(fts_midievent_is_song_select(this))
-    fts_tuple_append_int(tuple, fts_midievent_song_select_get(this));
-  else if(fts_midievent_is_real_time(this))
-    fts_tuple_append_int(tuple, fts_midievent_real_time_get(this));
-
-  fts_return_object((fts_object_t *)tuple);
-}
-
 static void
 _midievent_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -746,7 +745,7 @@ midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if(ac > 0 && fts_is_object(at))
     stream = (fts_bytestream_t *)fts_get_object(at);
 
-  midievent_post(o, stream);
+  midievent_post_function(o, stream);
   fts_post("\n");
 }  
 
@@ -764,9 +763,12 @@ midievent_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_midievent_t), midievent_init, midievent_delete);
 
+  fts_class_set_copy_function(cl, midievent_copy_function);
+  fts_class_set_post_function(cl, midievent_post_function);
+  fts_class_set_array_function(cl, midievent_array_function);
+  
   fts_class_message_varargs(cl, fts_s_print, midievent_print);
 
-  fts_class_message_varargs(cl, fts_s_get_tuple, midievent_get_tuple);
   fts_class_message_varargs(cl, fts_s_set, midievent_set);
   fts_class_message(cl, fts_s_set, cl, midievent_set_from_midievent);
 
@@ -785,9 +787,6 @@ midievent_instantiate(fts_class_t *cl)
 
   fts_class_message_void(cl, fts_new_symbol("status"), _midievent_get_status);
   
-  fts_class_set_copy_function(cl, midievent_copy_function);
-  fts_class_set_post_function(cl, midievent_post);
-
   /* class doc */
   fts_class_doc(cl, fts_s_midievent, "<'note'|'poly'|'ctl'|'prg'|'touch'|'bend'|'sysex'|'mtc'|'spos'|'ssel'|'rt': type> [<num: MIDI bytes (see message 'set')> ...]", "MIDI message");
   fts_class_doc(cl, fts_s_set, "<'note'> <num: note #> <num: velocity> [<num: channel>]", "set to note on/off message (velocity is 0 for note off)");

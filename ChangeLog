@@ -1,3 +1,9 @@
+2004-06-24  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* (package sequence): created sequence context in order to move sequence dependent stuff outof track
+	* (package sequence): modified score markers and their properties (i.e. introduced bar numbering and cues)
+	* (kernel): removed fts_s_post and fts_s_get_tuple methods and created system methods (pointers in class structure) instead
+
 2004-06-15  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* (package sequence): fixed (hidden) bug in MIDI file import (time of tempo changes was wrong)

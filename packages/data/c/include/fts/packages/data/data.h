@@ -125,7 +125,7 @@ propobj_class_description_t *propobj_get_descritption(propobj_t *self);
 
 propobj_property_t *propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name);
 propobj_property_t *propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name);
-propobj_property_t *propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, enumeration_t *e);
+propobj_property_t *propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name);
 propobj_property_t *propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name);
 propobj_property_t *propobj_class_get_property_by_index(fts_class_t *cl, int index);
 

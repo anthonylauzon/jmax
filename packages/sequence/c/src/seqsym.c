@@ -42,6 +42,7 @@ fts_symbol_t seqsym_trill = 0;
 fts_symbol_t seqsym_midi = 0;
 fts_symbol_t seqsym_seqmess = 0;
 fts_symbol_t seqsym_bar = 0;
+fts_symbol_t seqsym_bar_num = 0;
 fts_symbol_t seqsym_end = 0;
 fts_symbol_t seqsym_double = 0;
 fts_symbol_t seqsym_type = 0;
@@ -125,6 +126,7 @@ seqsym_config(void)
   seqsym_midi = fts_new_symbol("midi");
   seqsym_seqmess = fts_new_symbol("seqmess");
   seqsym_bar = fts_new_symbol("bar");
+  seqsym_bar_num = fts_new_symbol("bar #");
   seqsym_end = fts_new_symbol("end");
   seqsym_double = fts_new_symbol("double");
   seqsym_type = fts_new_symbol("type");

@@ -205,7 +205,35 @@ ivec_copy(ivec_t *org, ivec_t *copy)
 }
 
 static void
-ivec_post(fts_object_t *o, fts_bytestream_t *stream)
+ivec_copy_function(const fts_atom_t *from, fts_atom_t *to)
+{
+  ivec_copy((ivec_t *)fts_get_object(from), (ivec_t *)fts_get_object(to));
+}
+
+static int
+ivec_equals_function(const fts_atom_t *a, const fts_atom_t *b)
+{
+  ivec_t *o = (ivec_t *)fts_get_object(a);
+  ivec_t *p = (ivec_t *)fts_get_object(b);
+  int o_n = ivec_get_size(o);
+  int p_n = ivec_get_size(p);
+  
+  if(o_n == p_n)
+  {
+    int i;
+    
+    for(i=0; i<o_n; i++)
+      if(ivec_get_element(o, i) != ivec_get_element(p, i))
+        return 0;
+    
+    return 1;
+  }
+  
+  return 0;
+}
+
+static void
+ivec_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   ivec_t *this = (ivec_t *)o;
   int size = ivec_get_size(this);
@@ -223,6 +251,23 @@ ivec_post(fts_object_t *o, fts_bytestream_t *stream)
   }
   else
     fts_spost(stream, "<ivec %d>", size);
+}
+
+static void
+ivec_array_function(fts_object_t *o, fts_array_t *array)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *values = ivec_get_ptr(this);
+  int size = ivec_get_size(this);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i;
+  
+  fts_array_set_size(array, onset + size);
+  atoms = fts_array_get_atoms(array) + onset;
+  
+  for(i=0; i<size; i++)
+    fts_set_int(atoms + i, values[i]);
 }
 
 /********************************************************
@@ -763,47 +808,6 @@ ivec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_dumper_message_send(dumper, mess);
 }
 
-static void
-ivec_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ivec_t *this = (ivec_t *)o;
-  int *values = ivec_get_ptr(this);
-  int size = ivec_get_size(this);
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
-  fts_atom_t *atoms;
-  int i;
-
-  fts_tuple_set_size(tuple, size);
-  atoms = fts_tuple_get_atoms(tuple);
-  
-  for(i=0; i<size; i++)
-    fts_set_int(atoms + i, values[i]);
-
-  fts_return_object((fts_object_t *)tuple);
-}
-
-static int
-ivec_equals(const fts_atom_t *a, const fts_atom_t *b)
-{
-  ivec_t *o = (ivec_t *)fts_get_object(a);
-  ivec_t *p = (ivec_t *)fts_get_object(b);
-  int o_n = ivec_get_size(o);
-  int p_n = ivec_get_size(p);
-
-  if(o_n == p_n)
-  {
-    int i;
-
-    for(i=0; i<o_n; i++)
-      if(ivec_get_element(o, i) != ivec_get_element(p, i))
-        return 0;
-
-    return 1;
-  }
-
-  return 0;
-}
-
 /*********************************************************
  *
  *  class
@@ -866,6 +870,11 @@ ivec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
+  fts_class_set_equals_function(cl, ivec_equals_function);
+  fts_class_set_equals_function(cl, ivec_copy_function);
+  fts_class_set_post_function(cl, ivec_post_function);
+  fts_class_set_array_function(cl, ivec_array_function);
+  
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, ivec_dump_state);
@@ -877,12 +886,7 @@ ivec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_print, ivec_print); 
 
-  fts_class_set_equals_function(cl, ivec_equals);
-  fts_class_set_post_function(cl, ivec_post);
-  
   fts_class_message_varargs(cl, fts_s_set_from_instance, ivec_set_from_instance);
-
-  fts_class_message_varargs(cl, fts_s_get_tuple, ivec_get_tuple);
 
   fts_class_message_varargs(cl, fts_new_symbol("reverse"), ivec_reverse);
   fts_class_message_varargs(cl, fts_new_symbol("rotate"), ivec_rotate);
