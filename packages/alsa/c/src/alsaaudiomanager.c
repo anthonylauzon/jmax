@@ -28,81 +28,154 @@
 #include <alsa/asoundlib.h>
 
 #include <fts/fts.h>
+#include "alsaaudio.h"
 
-typedef struct _alsaaudiomanager
+
+
+
+void
+alsaaudiomanager_scan_devices()
 {
-    fts_object_t o;
-  /* Need to store array of device name and corresponding alsa audioport */
-} alsaaudiomanager_t;
+  int card;
+  int err;
+  int dev;
+  char device_name[32];
+  snd_ctl_t* ctl_handle;
+  snd_ctl_card_info_t* card_info;
+  snd_pcm_info_t* pcminfo;
 
-static void alsaaudiomanager_device_list(snd_pcm_stream_t stream, fts_bytestream_t* bytestream)
-{
-
-}
-
-
-
-
-static void
-alsaaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-/*   alsaaudiomanager_t* this = (alsaaudiomanager_t*)o; */
-
-  fts_bytestream_t* bytestream = fts_post_get_stream(ac, at);  
-  fts_spost(bytestream, "[alsaaudiomanager] All PCM PLAYBACK device \n");
-
-  alsaaudiomanager_device_list(SND_PCM_STREAM_PLAYBACK, bytestream);
-
-  fts_spost(bytestream, "[alsaaudiomanager] All PCM CAPTURE device \n");
-
-  alsaaudiomanager_device_list(SND_PCM_STREAM_CAPTURE, bytestream);
-
-/*
-  post("Current PCM capture stream:\n");
-  alsaaudiomanager_print_stream(&this->capture);
-  post("Current PCM playback stream:\n");
-  alsaaudiomanager_print_stream(&this->playback);
-*/
-}
-
-static void
-alsaaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  /* For debug call print method .... */
+  fts_audioport_t* port;
+  fts_atom_t at;
+  fts_symbol_t s_devicename = 0;
   
-
+  snd_ctl_card_info_alloca(&card_info);
+  snd_pcm_info_alloca(&pcminfo);
+  card = -1; 
+  
+  /* if card = -&, snd_card_next return the first available card */
+  if (snd_card_next(&card) < 0 || card < 0)
+  {
+    fts_log("[alsaaudiomanager] No soundcards found \n");    
+    return;
+  }
+  
+  while (card >= 0)
+  {
+    sprintf(device_name, "hw:%d", card);
+    err = snd_ctl_open(&ctl_handle, device_name, 0);
+    if (err < 0)
+    {
+      fts_log("[alsaudiomanager] Cannot open a ctl: %s\n", snd_strerror(err));
+      return;
+    }
+    err = snd_ctl_card_info(ctl_handle, card_info);
+    if (err < 0)
+    {
+      fts_log("[alsaaudiomanager] Cannot get card info : %s\n", snd_strerror(err));
+      snd_ctl_close(ctl_handle);
+      return;
+    }
+    /* Here same output as snd_card_get_name(card_id, name) */
+    fts_log("[alsaaudiomanager] ctl info card name :%s\n", snd_ctl_card_info_get_name(card_info));
+    
+    /* check for devices */
+    dev = -1;
+    while(1)
+    {
+      unsigned int count;
+      if (snd_ctl_pcm_next_device(ctl_handle, &dev)< 0)
+      {
+	fts_log("[alsaaudiomanager] snd_ctl_pcm_get_next_device error \n");
+      }
+      if (dev < 0)
+      {
+	break;
+      }
+      snd_pcm_info_set_device(pcminfo, dev);
+      snd_pcm_info_set_subdevice(pcminfo, 0);
+/*       snd_pcm_info_set_stream(pcminfo, SND_PCM_STREAM_PLAYBACK); */
+      err = snd_ctl_pcm_info(ctl_handle, pcminfo);
+      if (err < 0)
+      {
+	if (err != -ENOENT)
+	{
+	  fts_log("[alsaaudiomanager] control digital audio info (%i): %s\n", card, snd_strerror(err));		    
+	}
+	continue;
+      }
+      fts_log("[alsaaudiomanager] Device Name : %s (hw:%d,%d)\n", snd_pcm_info_get_name(pcminfo), card, dev);
+      
+      snprintf(device_name, 32, "hw:%d,%d", card, dev);
+      s_devicename = fts_new_symbol(device_name);
+      fts_set_symbol(&at, s_devicename);
+      port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
+      fts_audiomanager_put_port(fts_new_symbol(snd_pcm_info_get_name(pcminfo)), port);
+      fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", snd_pcm_info_get_name(pcminfo));
+    }
+    snd_card_next(&card);   
+    snd_ctl_close(ctl_handle);
+  }
 }
 
 
-static void
-alsaaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+
+snd_pcm_access_t 
+alsaaudiomanager_convert_jmax_symbol_to_alsa_access(fts_symbol_t s_access)
 {
+  snd_pcm_access_t access;
 
+  if (s_access == s_mmap_noninterleaved)
+  {
+    access = SND_PCM_ACCESS_MMAP_NONINTERLEAVED;
+  }
+  else if (s_access == s_mmap_interleaved)
+  {
+    access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
+  }
+  else if (s_access == s_rw_noninterleaved)
+  {
+    access = SND_PCM_ACCESS_RW_NONINTERLEAVED;
+  }
+  else
+  {
+    access = SND_PCM_ACCESS_RW_INTERLEAVED;
+  }
 
+  return access;
 }
 
-static void alsaaudiomanager_instantiate(fts_class_t *cl)
+
+
+int
+alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode)
 {
-  fts_class_init(cl, sizeof( alsaaudiomanager_t), alsaaudiomanager_init, alsaaudiomanager_delete);
+  snd_pcm_t* handle;
+  snd_pcm_hw_params_t* hwparams;
+  int err;
+  int max_channels;
 
-  /* debug print */
-  fts_class_message_varargs(cl, fts_s_print, alsaaudiomanager_print);
+  snd_pcm_hw_params_alloca(&hwparams);
+  
+  err = snd_pcm_open(&handle, device_name, stream_mode, SND_PCM_NONBLOCK);
+  if (err < 0)
+  {
+    fts_log("[alsaaudiomanger] cannot open ALSA PCM device %s (%s)\n", device_name, snd_strerror(err));
+    return err;
+  }
+  
+  err = snd_pcm_hw_params_any(handle, hwparams);
+  if (err < 0)
+  {
+    fts_log("[alsaaudiomanager] cannot get hardware configuration for device %s (%s)\n", device_name, snd_strerror(err));
+    return err;
+  }
+
+  max_channels = snd_pcm_hw_params_get_channels_max(hwparams);
+
+  snd_pcm_close(handle);
+  
+  return max_channels;
 }
-
-
-
-/***********************************************************************
- *
- * Config
- *
- */
-void alsaaudiomanager_config( void)
-{
-  fts_symbol_t s = fts_new_symbol("alsaaudiomanager");
-
-  fts_class_install( s, alsaaudiomanager_instantiate);
-}
-
 
 /** EMACS **
  * Local variables:

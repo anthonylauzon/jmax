@@ -18,33 +18,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Author: François Déchelle, Norbert Schnell, Patrice Tisserand
- *
  */
-
+#include <alsa/asoundlib.h>
 #include <fts/fts.h>
 
-extern void alsaaudioport_config( void);
 
-extern void alsarawmidiport_config( void);
-extern void alsaseqmidiport_config(void);
 
-extern void alsamidi_config( void);
-extern void alsaseqmidi_config(void);
+/* sample format */
+fts_symbol_t s_s16_le;
+fts_symbol_t s_s32_le;
 
-/* extern void alsaaudiomanager_config(void); */
+/* access type */
+fts_symbol_t s_mmap_noninterleaved;
+fts_symbol_t s_mmap_interleaved;
+fts_symbol_t s_rw_noninterleaved;
+fts_symbol_t s_rw_interleaved;
 
-void alsa_config(void)
-{
-  alsaaudioport_config();
+fts_class_t* alsaaudioport_type;
 
-  alsarawmidiport_config();
-  alsaseqmidiport_config();
+void alsaaudiomanager_scan_devices(void);
 
-  alsamidi_config();
-  alsaseqmidi_config();
-
-/*   alsaaudiomanager_config(); */
-}
+snd_pcm_access_t alsaaudiomanager_convert_jmax_symbol_to_alsa_access(fts_symbol_t s_access);
+int alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode);
