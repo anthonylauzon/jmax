@@ -40,19 +40,18 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 	}
       }
 
-    itsFrame = new JFrame("tools");    
-    itsFrame.getContentPane().add(this);
-    
-    itsFrame.pack();
-    itsFrame.setVisible(true);
+    /*itsFrame = new JFrame("tools");    
+      itsFrame.getContentPane().add(this);
+      
+      itsFrame.pack();
+      itsFrame.setVisible(true);*/
     
     setTool(theProvider.getDefaultTool());
 
-    addClient(currentContext);
   }
 
   /**
-   * another window wants to be a client of this toolbar */
+   * another graphic context  wants to be a client of this toolbar */
   public void addClient(GraphicContext gc)
   {
     itsClients.put(gc.getFrame(), gc);
@@ -154,37 +153,6 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   }
 
 
-  
-  /**
-   * Creates a toolbar, if it doesnt exist already, and shows it in a window.
-   * Makes the (newly) created toolbar a listener for the given
-   * Graphic context's window. 
-   */
-  // note: the implementation should change to allow different Editors to create
-  // different toolbars!!
-  // Most of the static methods should disappear.
-  /*static public void createToolbar(ToolbarProvider theProvider, GraphicContext gc) {
-    
-    currentContext = theProvider.getGraphicContext();
-    
-    if (itsToolbar == null) 
-    {
-    itsToolbar = new EditorToolbar(theProvider);
-    itsFrame = new JFrame("tools");    
-    itsFrame.getContentPane().add(itsToolbar);
-    
-    itsFrame.pack();
-    itsFrame.setVisible(true);
-    
-    setTool(theProvider.getDefaultTool());
-    }
-    
-    // maps a given window with its graphic context
-    itsClients.put(gc.getFrame(), gc);
-    gc.getFrame().addWindowListener(itsToolbar);  
-    
-    }*/
-  
   // WindowListener interface
 
   public void windowClosing(WindowEvent e)
@@ -215,7 +183,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
     GraphicContext gc = (GraphicContext) itsClients.get(e.getWindow());
     currentContext = gc;
     currentTool.reActivate(gc);
-    itsFrame.toFront();
+    //itsFrame.toFront();
   }
 
   public void windowDeactivated(WindowEvent e)

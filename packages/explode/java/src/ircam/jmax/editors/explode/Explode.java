@@ -39,9 +39,8 @@ public class Explode extends MaxEditor implements AAAReadme {
     itsPanel = new ScrPanel(explodeData);
     getContentPane().add(itsPanel);
     
-    if (toolbar == null)
-      toolbar = itsPanel.prepareToolbar();
-    else itsPanel.linkToToolbar();
+    toolbar = itsPanel.prepareToolbar();
+    
     
     //----
 

@@ -77,7 +77,7 @@ public class GraphicContext {
   }
 
   /**
-   * returns the current logical time
+   * get the status bar
    */
   public StatusBar getStatusBar() 
   {

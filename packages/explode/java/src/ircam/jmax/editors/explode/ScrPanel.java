@@ -171,30 +171,43 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public EditorToolbar prepareToolbar() 
   {
+    EditorToolbar tb;
 
     gc.setFrame(GraphicContext.getFrame(this));
 
-    EditorToolbar tb = new EditorToolbar(this);
+    if (Explode.toolbar == null) {
+       tb = new EditorToolbar(this);
+    }
+    else tb = Explode.toolbar;
+    
+    linkToToolbar(tb);
+    JPanel c = new JPanel() {
+      public void remove(Component c)
+	{
+	  super.remove(c);
+	  repaint();
 
-    tb.addToolListener(this);
-    itsStatusBar.post(tb.getTool(), "");
-    return tb;
-    /*JPanel c = new JPanel();
+	}
+
+    };
     c.setLayout(new BorderLayout());
-    Component tb = EditorToolbar.getToolbar();
+    // Component tbc = EditorToolbar.getToolbar();
     tb.setSize(200, 30);
     c.add(tb, BorderLayout.CENTER);
     c.setSize(200, 30);
-    itsStatusBar.addWidgetAt(c, 2);*/
+ 
+    itsStatusBar.addWidgetAt(c, 2);
+
+    return tb;
   }
 
   /**
    * link this panel to a pre-existing toolbar */
-  void linkToToolbar()
+  void linkToToolbar(EditorToolbar t)
   {
-    Explode.toolbar.addClient(gc);
-    Explode.toolbar.addToolListener(this);
-    itsStatusBar.post(Explode.toolbar.getTool(), "");
+    t.addClient(gc);
+    t.addToolListener(this);
+    itsStatusBar.post(t.getTool(), "");
   } 
 
   /**
