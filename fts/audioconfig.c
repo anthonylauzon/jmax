@@ -132,7 +132,7 @@ audiomanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
 static void
 audiomanagers_get_input_device_names(fts_array_t* inputs_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_input_device_names)
+#warning NOT YET IMPLEMENTED (audiomanagers_get_input_device_names), dummy implementation to test server<->client communication
   fts_array_append_symbol(inputs_array, fts_new_symbol("hw:1"));
   fts_array_append_int(inputs_array, 10);
   fts_array_append_symbol(inputs_array, fts_new_symbol("hw:2"));
@@ -144,7 +144,7 @@ audiomanagers_get_input_device_names(fts_array_t* inputs_array)
 static void
 audiomanagers_get_output_device_names(fts_array_t* outputs_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_output_device_names)
+#warning NOT YET IMPLEMENTED (audiomanagers_get_output_device_names), dummy implementation to test server<->client communication
   fts_array_append_symbol(outputs_array, fts_new_symbol("hw:0"));
   fts_array_append_int(outputs_array, 5);
   fts_array_append_symbol(outputs_array, fts_new_symbol("hw:1"));
@@ -156,7 +156,7 @@ audiomanagers_get_output_device_names(fts_array_t* outputs_array)
 static void
 audiomanagers_get_device_names(fts_array_t* inputs_array, fts_array_t* outputs_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_device_names)
+#warning NOT YET IMPLEMENTED (audiomanagers_get_device_names), dummy implementation to test communication between fts server and client
   audiomanagers_get_input_device_names(inputs_array);
   audiomanagers_get_output_device_names(outputs_array);
 }
@@ -164,17 +164,18 @@ audiomanagers_get_device_names(fts_array_t* inputs_array, fts_array_t* outputs_a
 static void
 audiomanagers_get_sample_rates(fts_array_t* sample_rates_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_sample_rates)
+#warning NOT YET IMPLEMENTED (audiomanagers_get_sample_rates), dummy implementation to test communication between fts server and client
 
   fts_array_append_int(sample_rates_array,22050);
   fts_array_append_int(sample_rates_array,44100);
   fts_array_append_int(sample_rates_array,48000);
+  fts_array_append_int(sample_rates_array,96000);
 }
 
 static void
 audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_buffer_sizes)
+#warning NOT YET IMPLEMENTED (audiomanagers_get_buffer_sizes), dummy implementation to test communication between fts server and client
   fts_array_append_int(buffer_sizes_array, 128);
   fts_array_append_int(buffer_sizes_array, 256);
   fts_array_append_int(buffer_sizes_array, 512);
@@ -276,7 +277,7 @@ audioconfig_update_labels(audioconfig_t* config)
   audiolabel_t* label = config->labels;
   int n = config->n_labels;
   int i;
-
+  /* Make a query on audiomanagers to know which input and output audioport are available */
   /* check input and output audioports */
 /*   for ( i = 0; i < n; ++i) */
 /*   { */
@@ -758,7 +759,6 @@ audioconfig_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-#warning NOT YET IMPLEMENTED (audioconfig_upload)
   audioconfig_t *self = (audioconfig_t *)o;
   audiolabel_t* label = self->labels;
   int index;
@@ -796,22 +796,8 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_log("[audioconfig] upload done \n");
 #endif /* AUDIO_CONFIG_DEBUG */
   
-  /* send sampling rates */
-  {
-    fts_atom_t args[3];
-    fts_set_int(args, 22050);
-    fts_set_int(args + 1, 44100);
-    fts_set_int(args + 2, 48000);
-    fts_client_send_message((fts_object_t*)self, audioconfig_s_sampling_rates, 3, args);
-  }
-  /* send buffer sizes */
-  {
-    fts_atom_t args[3];
-    fts_set_int(args, 128);
-    fts_set_int(args + 1, 256);
-    fts_set_int(args + 2, 512);
-    fts_client_send_message((fts_object_t*)self, audioconfig_s_buffer_sizes, 3, args);
-  }
+  audioconfig_update_sample_rates(self);
+  audioconfig_update_buffer_sizes(self);
 }
 
 
