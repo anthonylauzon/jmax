@@ -1218,25 +1218,30 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int i = 0;
   int j = 0;
   
-  if(ac > 0 && fts_is_number(at))
-    i = fts_get_number_int(at);
+  if (m == 0  ||  n == 0)
+    fts_return_float(0);	/* empty matrix: no error, just return 0 */
+  else
+  {
+    if (ac > 0  &&  fts_is_number(at))
+      i = fts_get_number_int(at);
 
-  if(ac > 1 && fts_is_number(at + 1))
-    j = fts_get_number_int(at  + 1);
+    if (ac > 1  &&  fts_is_number(at + 1))
+      j = fts_get_number_int(at  + 1);
   
-  while(i < 0)
-    i += m;
+    while (i < 0)
+      i += m;
   
-  while(j < 0)
-    i += n;
+    while (j < 0)
+      j += n;
   
-  if(i >= m)
-    i = m - 1;
+    if (i >= m)
+      i = m - 1;
   
-  if(j >= n)
-    i = n - 1;
+    if (j >= n)
+      i = n - 1;
   
-  fts_return_float(fmat_get_element(self, i, j));
+    fts_return_float(fmat_get_element(self, i, j));
+  }
 }
 
 static void
