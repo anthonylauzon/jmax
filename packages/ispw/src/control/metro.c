@@ -55,9 +55,9 @@ static void metro_clock_reset(void *o)
     {
       fts_alarm_set_delay(x->alarm, x->cycle);
       fts_alarm_arm(x->alarm);
-    }
 
-  fts_outlet_bang((fts_object_t *)o, 0);
+      fts_outlet_bang((fts_object_t *)o, 0);
+    }
 }
 
 

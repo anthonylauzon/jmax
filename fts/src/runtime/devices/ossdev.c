@@ -763,4 +763,3 @@ void ossdev_init(void)
 
   oss_midi_init();
 }
-

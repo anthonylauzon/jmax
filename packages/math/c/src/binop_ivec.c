@@ -68,7 +68,7 @@ static void
 binop_ivec_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_ivec_t *this = (binop_ivec_t *)o;
-  int_vector_t *right = int_vector_atom_get(at + 1);
+  int_vector_t *right = int_vector_atom_get(at);
 
   int_vector_release(this->right);
   this->right = right;

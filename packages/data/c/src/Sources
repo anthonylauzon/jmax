@@ -25,6 +25,8 @@
 
 SOURCES = \
 data.c \
+val.c \
+ref.c \
 ivec.c \
 fvec.c \
 mat.c \
@@ -32,3 +34,4 @@ getelem.c \
 getsize.c \
 getlist.c \
 fill.c \
+copy.c \

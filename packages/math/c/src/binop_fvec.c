@@ -68,7 +68,7 @@ static void
 binop_fvec_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
-  float_vector_t *right = float_vector_atom_get(at + 1);
+  float_vector_t *right = float_vector_atom_get(at);
 
   float_vector_release(this->right);
   this->right = right;

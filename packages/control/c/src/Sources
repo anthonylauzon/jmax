@@ -29,4 +29,5 @@ bus.c \
 throw.c \
 catch.c \
 switch.c \
+oneshot.c \
 demux.c \

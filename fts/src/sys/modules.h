@@ -73,8 +73,6 @@ typedef struct _fts_module
   struct _fts_module *next;	/* pointer for list handling */
 } fts_module_t;
 
-
-
 extern void fts_install_module(fts_module_t *s);
 extern void fts_modules_init(void);
 extern void fts_modules_restart(void);

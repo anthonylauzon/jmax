@@ -45,9 +45,9 @@ extern vector_t *vector_new(int size);
 
 #define vector_get_ptr(vec) (((matrix_t *)(vec))->data)
 
-#define vector_set_element(vec, i, v) (matrix_set_element(vec, i, 0, v))
-#define vector_get_element(vec, i) (matrix_get_element(vec, i, 0))
-#define vector_void_element(vec, i) (matrix_void_element(vec, i, 0))
+#define vector_set_element(vec, i, v) (matrix_set_element((matrix_t *)(vec), (i), 0, (v)))
+#define vector_get_element(vec, i) (matrix_get_element((matrix_t *)(vec), (i), 0))
+#define vector_void_element(vec, i) (matrix_void_element((matrix_t *)(vec), (i), 0))
 
 #define vector_void(vec) (matrix_void((matrix_t *)(vec)))
 #define vector_fill(vec, a) (matrix_fill((matrix_t *)(vec), (a)))

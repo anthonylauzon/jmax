@@ -35,15 +35,15 @@
 typedef struct 
 {
   fts_object_t o;
-  int on;
-} switch_t;
+  int open;
+} oneshot_t;
 
 static void
-switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  switch_t *this = (switch_t *)o;
+  oneshot_t *this = (oneshot_t *)o;
   
-  this->on = fts_get_int_arg(ac, at, 1, 0);
+  this->open = 1;
 }
 
 /************************************************************
@@ -53,20 +53,23 @@ switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  switch_t *this = (switch_t *)o;
+  oneshot_t *this = (oneshot_t *)o;
 
-  if(this->on != 0)
-    fts_outlet_send(o, 0, s, 1, at);
+  if(this->open == 1)
+    {
+      this->open = 0;
+      fts_outlet_send(o, 0, s, 1, at);
+    }
 }
 
 static void
-switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  switch_t *this = (switch_t *)o;
+  oneshot_t *this = (oneshot_t *)o;
 
-  this->on = fts_get_number_int(at);
+  this->open = 1;
 }
 
 /************************************************************
@@ -75,25 +78,22 @@ switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *
  */
 static fts_status_t
-switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+oneshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  fts_class_init(cl, sizeof(switch_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(oneshot_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, switch_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, oneshot_init);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, switch_input);
-
-  a[0] = fts_s_number;
-  fts_method_define(cl, 1, fts_s_int, switch_set, 1, a);
-  fts_method_define(cl, 1, fts_s_float, switch_set, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_anything, oneshot_input);
+  fts_method_define_varargs(cl, 1, fts_s_bang, oneshot_open);
 
   return fts_Success;
 }
 
 void
-switch_config(void)
+oneshot_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("switch"), switch_instantiate, fts_always_equiv);
+  fts_metaclass_install(fts_new_symbol("oneshot"), oneshot_instantiate, fts_always_equiv);
 }

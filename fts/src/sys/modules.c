@@ -132,10 +132,10 @@ fts_modules_shutdown(void)
 }
 
 
-static fts_status_description_t  module_loaded = { "Module already loaded."};
-static fts_status_description_t  library_not_found = { "Library Not Found."};
-static fts_status_description_t  error_loading = { "Error loading module."};
-static fts_status_description_t  module_not_found = { "Module Not Found."};
+static fts_status_description_t  module_loaded = { "module already loaded"};
+static fts_status_description_t  library_not_found = { "library not found"};
+static fts_status_description_t  error_loading = { "error loading module"};
+static fts_status_description_t  module_not_found = { "module not found"};
 
 /* for architecuture with dynamic loading, load the module;
    the module variable name *must* be called <name>_module;

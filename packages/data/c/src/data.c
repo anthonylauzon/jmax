@@ -25,6 +25,13 @@
  */
 
 #include "fts.h"
+#include "intvec.h"
+#include "floatvec.h"
+#include "vector.h"
+#include "matrix.h"
+
+extern void val_config(void);
+extern void ref_config(void);
 
 extern void ivec_config(void);
 extern void fvec_config(void);
@@ -35,10 +42,14 @@ extern void getsize_config(void);
 extern void getlist_config(void);
 
 extern void fill_config(void);
+extern void copy_config(void);
 
 static void
 data_init(void)
 {
+  val_config();
+  ref_config();
+
   ivec_config();
   fvec_config();
   mat_config();
@@ -48,6 +59,7 @@ data_init(void)
   getlist_config();  
 
   fill_config();
+  copy_config();
 }
 
 fts_module_t data_module = {"data", "data structures", data_init};

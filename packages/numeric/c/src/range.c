@@ -144,7 +144,7 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   for(i=1; i<n; i++)
     {
-      if(v < points[i])
+      if(v < points[i] || v == points[i - 1])
 	{
 	  fts_outlet_send(o, i, fts_s_float, 1, at);
 	  return;

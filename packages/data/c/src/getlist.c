@@ -55,7 +55,8 @@ getlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   getlist_t *this = (getlist_t *)o;
 
-  fts_block_free(this->list, this->alloc);
+  if(this->alloc)
+    fts_block_free(this->list, this->alloc);
 }
 
 static void

@@ -382,12 +382,13 @@ fts_ucs_load_module(int argc, const fts_atom_t *argv)
   if ((argc == 2) && fts_is_symbol(&argv[0]) && fts_is_symbol(&argv[1]))
     {
       fts_status_t ret;
+      fts_symbol_t name = fts_get_symbol(argv + 0);
+      fts_symbol_t file = fts_get_symbol(argv + 1);
 
-      ret = fts_module_load(fts_symbol_name(fts_get_symbol(&argv[0])),
-			    fts_symbol_name(fts_get_symbol(&argv[1])));
+      ret = fts_module_load(fts_symbol_name(name), fts_symbol_name(file));
 
       if (ret != fts_Success)
-	post("Error: %s\n", ret->description);
+	post("Error loading module %s: %s (%s)\n", fts_symbol_name(name), ret->description, fts_symbol_name(file));
     }
 
   return fts_Success;

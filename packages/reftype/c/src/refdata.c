@@ -46,4 +46,3 @@ refdata_create(reftype_t *type, int ac, const fts_atom_t* at)
   else
     return 0;
 }
-
