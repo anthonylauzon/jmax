@@ -1489,6 +1489,16 @@ void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, 
 
 void fts_client_upload_object(fts_object_t *obj, int id)
 {
+  fts_atom_t a[1];
+
+  fts_client_register_object(obj, id);
+
+  fts_set_object( a, obj);
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);  
+}
+
+void fts_client_register_object(fts_object_t *obj, int id)
+{
   int client_id;
   client_t *client;
   fts_atom_t a[1];
@@ -1507,9 +1517,6 @@ void fts_client_upload_object(fts_object_t *obj, int id)
     }
 
   client_register_object( client, obj);
-
-  fts_set_object( a, obj);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);  
 }
 
 /* compatibility */
