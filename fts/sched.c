@@ -28,8 +28,6 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include <stdio.h>
-
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
@@ -71,32 +69,6 @@ static fts_sched_t *
 fts_sched_get_current(void)
 {
   return &main_sched;
-}
-
-static void
-sched_debug_aux( fts_sched_t *sched)
-{
-  sched_callback_t *callback;
-
-  fprintf( stderr, "Scheduler\n");
-  for ( callback = sched->callback_head; callback; callback = callback->next)
-    {
-      fprintf( stderr, " %p: object %p (%s) flag %s fd %d ready %p error %p next %p\n",
-	       callback,
-	       callback->object,
-	       fts_object_get_class_name( callback->object),
-	       (callback->flags == FTS_SCHED_ALWAYS) ? "ALWAYS" : "READY",
-	       callback->fd,
-	       callback->ready_mth,
-	       callback->error_mth,
-	       callback->next);
-    }
-}
-
-void
-sched_debug(void)
-{
-  sched_debug_aux( &main_sched);
 }
 
 /*****************************************************************************
@@ -240,6 +212,10 @@ static void run_always( fts_sched_t *sched)
 {
   sched_callback_t *callback, *next;
 
+  /* Attention (idem run_select):
+     the callback method ***can*** call fts_sched_remove, thus removing
+     the entry in the scheduler callback list.
+  */
   for ( callback = sched->callback_head; callback; callback = next)
     {
       next = callback->next;
