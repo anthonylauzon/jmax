@@ -4,7 +4,7 @@ else
 JAVA_SRC_DIR=
 endif
 
-SUBDIRS=c $(JAVA_SRC_DIR) help images
+SUBDIRS=c $(JAVA_SRC_DIR) help images winbuild
 
 packagedir=$(pkgdatadir)/packages/data
 package_DATA=data.jpkg

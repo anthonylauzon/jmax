@@ -1,3 +1,9 @@
+2003-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* added dsdev, mmio and winmidi packages in distribution.
+
+	* added Visual C++ project/workspace files in distribution.
+
 2003-05-22  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* utils/m4/jmax.m4: added a m4 file which contains AM_JMAX_CONFIG m4 macro.

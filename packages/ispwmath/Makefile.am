@@ -1,4 +1,4 @@
-SUBDIRS=c help
+SUBDIRS=c help winbuild
 
 packagedir=$(pkgdatadir)/packages/ispwmath
 package_DATA=ispwmath.jpkg

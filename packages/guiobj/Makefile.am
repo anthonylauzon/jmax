@@ -4,7 +4,7 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS=c $(JAVA_SRC_DIR) help
+SUBDIRS=c $(JAVA_SRC_DIR) help winbuild
 
 packagedir=$(pkgdatadir)/packages/guiobj
 package_DATA=guiobj.jpkg

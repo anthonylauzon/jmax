@@ -8,6 +8,8 @@ else
 JACK_PKG_DIR=
 endif
 
-SUBDIRS=utils control data guiobj io ispw ispwmath midi numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR)
+SUBDIRS=utils control data guiobj io ispw ispwmath midi numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi
+
+
 
 

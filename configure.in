@@ -387,6 +387,7 @@ packages/control/Makefile
 packages/control/c/Makefile
 packages/control/c/src/Makefile
 packages/control/help/Makefile
+packages/control/winbuild/Makefile
 packages/data/Makefile
 packages/data/c/Makefile
 packages/data/c/include/Makefile
@@ -407,6 +408,11 @@ packages/data/java/ircam/jmax/editors/table/renderers/Makefile
 packages/data/java/ircam/jmax/editors/table/tools/Makefile
 packages/data/help/Makefile
 packages/data/images/Makefile
+packages/data/winbuild/Makefile
+packages/dsdev/Makefile
+packages/dsdev/c/Makefile
+packages/dsdev/c/src/Makefile
+packages/dsdev/winbuild/Makefile
 packages/dtd/Makefile
 packages/dtd/c/Makefile
 packages/dtd/c/src/Makefile
@@ -419,10 +425,12 @@ packages/guiobj/java/ircam/Makefile
 packages/guiobj/java/ircam/jmax/Makefile
 packages/guiobj/java/ircam/jmax/guiobj/Makefile
 packages/guiobj/help/Makefile
+packages/guiobj/winbuild/Makefile
 packages/io/Makefile
 packages/io/c/Makefile
 packages/io/c/src/Makefile
 packages/io/help/Makefile
+packages/io/winbuild/Makefile
 packages/ispw/Makefile
 packages/ispw/c/Makefile
 packages/ispw/c/src/Makefile
@@ -441,10 +449,12 @@ packages/ispw/java/ircam/jmax/editors/explode/menus/Makefile
 packages/ispw/help/Makefile
 packages/ispw/images/Makefile
 packages/ispw/sounds/Makefile
+packages/ispw/winbuild/Makefile
 packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
 packages/ispwmath/help/Makefile
+packages/ispwmath/winbuild/Makefile
 packages/jack/Makefile
 packages/jack/c/Makefile
 packages/jack/c/src/Makefile
@@ -455,10 +465,16 @@ packages/midi/Makefile
 packages/midi/c/Makefile
 packages/midi/c/src/Makefile
 packages/midi/help/Makefile
+packages/midi/winbuild/Makefile
+packages/mmio/Makefile
+packages/mmio/c/Makefile
+packages/mmio/c/src/Makefile
+packages/mmio/winbuild/Makefile
 packages/numeric/Makefile
 packages/numeric/c/Makefile
 packages/numeric/c/src/Makefile
 packages/numeric/help/Makefile
+packages/numeric/winbuild/Makefile
 packages/oss/Makefile
 packages/oss/c/Makefile
 packages/oss/c/src/Makefile
@@ -481,14 +497,17 @@ packages/sequence/java/ircam/jmax/editors/sequence/tools/Makefile
 packages/sequence/java/ircam/jmax/editors/sequence/track/Makefile
 packages/sequence/help/Makefile
 packages/sequence/images/Makefile
+packages/sequence/winbuild/Makefile
 packages/signal/Makefile
 packages/signal/c/Makefile
 packages/signal/c/src/Makefile
 packages/signal/help/Makefile
+packages/signal/winbuild/Makefile
 packages/system/Makefile
 packages/system/c/Makefile
 packages/system/c/src/Makefile
 packages/system/help/Makefile
+packages/system/winbuild/Makefile
 packages/unixdtd/Makefile
 packages/unixdtd/c/Makefile
 packages/unixdtd/c/src/Makefile
@@ -499,6 +518,12 @@ packages/utils/c/include/fts/Makefile
 packages/utils/c/include/fts/packages/Makefile
 packages/utils/c/include/fts/packages/utils/Makefile
 packages/utils/c/src/Makefile
+packages/utils/winbuild/Makefile
+packages/winbuild/Makefile
+packages/winmidi/Makefile
+packages/winmidi/c/Makefile
+packages/winmidi/c/src/Makefile
+packages/winmidi/winbuild/Makefile
 utils/Makefile
 utils/debian/Makefile
 utils/jmax-config/Makefile
@@ -511,6 +536,7 @@ utils/rpm/Makefile
 utils/rpm/jmax.spec
 utils/update/Makefile
 utils/xml/Makefile
+winbuild/Makefile
 )
 
 

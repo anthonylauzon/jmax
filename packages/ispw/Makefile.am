@@ -4,7 +4,7 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS=c $(JAVA_SRC_DIR) help images sounds
+SUBDIRS=c $(JAVA_SRC_DIR) help images sounds winbuild
 
 packagedir=$(pkgdatadir)/packages/ispw
 package_DATA=ispw.jpkg
