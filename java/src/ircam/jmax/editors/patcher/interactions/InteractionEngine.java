@@ -188,7 +188,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   private void initAutoScroll()
   {
     scroller    = new ScrollDragAction();
-    scrollTimer = new Timer(10, scroller);
+    scrollTimer = new Timer(8, scroller);
     scrollTimer.setCoalesce(true);
     scrollTimer.setRepeats(true);
   }

@@ -34,7 +34,13 @@ class RunModeInteraction extends Interaction
       case (Squeack.DOWN | Squeack.OBJECT):
 	// Normal controller operations
 	return Interactions.runCtrlInteraction;
+      case (Squeack.DOWN | Squeack.TEXT):
+	// Normal controller operations
+	return Interactions.runCtrlInteraction;
       case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+	// Edit Content
+	return Interactions.doubleClickEditInteraction;
+      case (Squeack.DOUBLE_CLICK | Squeack.TEXT):
 	// Edit Content
 	return Interactions.doubleClickEditInteraction;
       default :

@@ -24,15 +24,21 @@ class RunCtrlInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
+    if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
+      object = (ErmesObject) dobject;
+    else if (Squeack.isDown(squeack) && Squeack.onText(squeack))
+      object = ((TextSensibilityArea) dobject).getObject();
+
     // Take away the control modifier (always there)
 
     squeack &= (~ Squeack.LOCATION_MASK);
-    
+
+
     switch (squeack)
       {
+      case Squeack.DRAG:
       case Squeack.DOWN:
-	this.object = (ErmesObject) dobject;
-	object.gotSqueack(squeack, mouse, oldMouse);
+	object.gotSqueack(squeack, mouse, oldMouse);    
 	break;
 
       case Squeack.UP:

@@ -22,18 +22,14 @@ class CtrlDoubleClickEditInteraction extends Interaction
 	  ErmesObject object = (ErmesObject) dobject;
 	  
 	  object.editContent();
-
 	  editor.endInteraction();
 	}
     else if (Squeack.onText(squeack))
       {
-	{
-	  TextSensibilityArea area = (TextSensibilityArea) dobject;
+	TextSensibilityArea area = (TextSensibilityArea) dobject;
 	  
-	  area.getObject().editContent();
-
-	  editor.endInteraction();
-	}
+	area.getObject().editContent();
+	editor.endInteraction();
       }
   }
 }
