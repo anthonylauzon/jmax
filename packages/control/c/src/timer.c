@@ -35,7 +35,7 @@ typedef struct
 } timer_t;
 
 static void
-timer_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   timer_t *this = (timer_t *)o;
 
@@ -108,14 +108,15 @@ timer_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(timer_t), timer_init, 0);
 
-  fts_class_message_varargs(cl, fts_new_symbol("zero"), timer_zero);
+  fts_class_message_varargs(cl, fts_new_symbol("reset"), timer_reset);
   fts_class_message_varargs(cl, fts_s_start, timer_start);
   fts_class_message_varargs(cl, fts_s_stop, timer_stop);
   fts_class_message_varargs(cl, fts_new_symbol("continue"), timer_continue);
   fts_class_message_varargs(cl, fts_new_symbol("time"), timer_send_time);
   fts_class_message_varargs(cl, fts_s_bang, timer_send_time);
 
-  fts_class_outlet_float(cl, 0);
+  fts_class_inlet_anything(cl, 0);
+  fts_class_outlet_anything(cl, 0);
 }
 
 void

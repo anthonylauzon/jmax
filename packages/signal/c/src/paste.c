@@ -27,7 +27,7 @@ fts_symbol_t paste_symbol = 0;
 
 typedef struct _paste_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   float *buf;
   int size;
   int ring_size; /* size + tick_size */
@@ -175,14 +175,14 @@ paste_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	}
       else
 	{
-	  fts_object_set_error(o, "Wrong argument");
+	  fts_object_set_error(o, "bad argument");
 	  return;
 	}
     }
       
   this->size = size;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -193,7 +193,7 @@ paste_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(this->buf != NULL)
     fts_free(this->buf);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

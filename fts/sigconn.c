@@ -57,9 +57,8 @@ fts_signal_connection_table_init(fts_signal_connection_table_t *table)
 void
 fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection)
 {  
-  if(fts_connection_get_type(connection) != fts_c_signal_active && fts_connection_get_type(connection) > fts_c_hidden)
+  if(fts_connection_get_type(connection) != fts_c_audio_active && fts_connection_get_type(connection) > fts_c_hidden)
     {
-      fts_object_t *source = fts_connection_get_source(connection);
       int n = table->size;
       
       if(n >= table->alloc)
@@ -68,7 +67,7 @@ fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t
       table->connections[n] = connection;
       table->size++;
 
-      fts_connection_set_type(connection, fts_c_signal_active);
+      fts_connection_set_type(connection, fts_c_audio_active);
     }
 }
 
@@ -79,11 +78,7 @@ fts_signal_connection_remove_all(fts_signal_connection_table_t *table)
   int i;
 
   for(i=0; i<table->size; i++)
-    {
-      fts_object_t *source = fts_connection_get_source(ptr[i]);
-
-      fts_connection_set_type(ptr[i], fts_c_signal);
-    }
+    fts_connection_set_type(ptr[i], fts_c_audio);
 
   table->size = 0;
 }

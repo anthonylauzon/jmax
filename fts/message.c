@@ -86,7 +86,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_message_set(this, selector, ac - 1, at + 1);
 	}
       else
-	fts_object_set_error(o, "First argument must be symbol");
+	fts_object_set_error(o, "first argument must be symbol");
     }
 }
 
@@ -252,7 +252,7 @@ output_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_a
 	}
     }
   else
-    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
+    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 /* output single value */
@@ -305,7 +305,7 @@ output_value(fts_object_t *o, int woutlet, const fts_atom_t *at)
 	}
     }
   else
-    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
+    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 static void
@@ -352,7 +352,7 @@ output_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 	}
     }
   else
-    fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
+    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 void 

@@ -46,7 +46,7 @@ typedef struct
 
 typedef struct
 {
-  fts_object_t obj; 
+  fts_dsp_object_t obj; 
   ftl_data_t tabcycle_data;
   fts_symbol_t tab_name; /* symbol bound to table we'll use */
   float value; /* value to write ot samptab */
@@ -72,10 +72,10 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       
       this->tabcycle_data = ftl_data_alloc(sizeof(tabcycle_ctl_t));
       
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
-    fts_object_set_error(o, "Wrong arguments");
+    fts_object_set_error(o, "bad arguments");
 }
 
 
@@ -85,7 +85,7 @@ tabcycle_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   tabcycle_t *this = (tabcycle_t *)o;
 
   ftl_data_free(this->tabcycle_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /******************************************************************

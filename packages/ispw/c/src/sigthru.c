@@ -30,7 +30,7 @@
 
 typedef struct sigthrough
 {
-  fts_object_t  o;
+  fts_dsp_object_t o;
 } sigthru_t;
 
 static void
@@ -42,13 +42,13 @@ sigthru_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_at
 static void
 sigthru_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
 {
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
 sigthru_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -68,8 +68,9 @@ sigthru_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, sigthru_put);
 
-  fts_class_inlet_varargs(cl, 0, sigthru_input);
   fts_class_set_default_handler(cl, sigthru_input);
+  fts_class_inlet_anything(cl, 0);
+  fts_class_outlet_anything(cl, 1);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

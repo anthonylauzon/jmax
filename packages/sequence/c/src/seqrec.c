@@ -196,7 +196,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->recording = (track_t *)fts_object_create(track_type, 0, 0);
     }
   else
-    fts_object_set_error(o, "Argument of track required");
+    fts_object_set_error(o, "argument of track required");
 }
 
 static void 

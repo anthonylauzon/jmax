@@ -300,7 +300,7 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 
   if (ac == 0)
     {
-      obj = fts_error_object_new( patcher, 0, 0, "Empty object");
+      obj = fts_error_object_new( patcher, 0, 0, "empty object");
       fts_object_set_description(obj, ac, at);
       CHECK_ERROR_PROPERTY(obj);
       return obj;
@@ -421,9 +421,6 @@ fts_object_destroy(fts_object_t *obj)
   if(fts_class_get_deconstructor(fts_object_get_class(obj)))
     fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
 
-  /* take the object away from the update queue (if there) and free it */
-  fts_update_reset(obj);
-
   /* release all client components */
   fts_object_unclient(obj);
 
@@ -439,9 +436,6 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   
   /* remove connections */
   fts_object_unconnect(obj);
-
-  /* take the object away from the update queue (if there) and free it */
-  fts_update_reset(obj);
 
   /* unreference by hand */
   obj->refcnt--;

@@ -742,10 +742,10 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		  sequence_tuple_append(this, track);
 		}
 	      else
-		fts_object_set_error(o, "Cannot create track of type %s", type);
+		fts_object_set_error(o, "cannot create track of type %s", type);
 	    }
 	  else
-	    fts_object_set_error(o, "Wrong arguments");
+	    fts_object_set_error(o, "bad arguments");
 	}
       
       this->keep = fts_s_args;

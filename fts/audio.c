@@ -267,7 +267,7 @@ void fts_audio_idle( void)
 /* ********************************************************************** */
 
 typedef struct _audioport_guard_t {
-  fts_object_t head;
+  fts_dsp_object_t o;
   int at_least_one_io_fun_called;
 } audioport_guard_t;
 
@@ -296,12 +296,12 @@ static int audioport_guard_is_armed( void)
 
 static void audioport_guard_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void audioport_guard_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void audioport_guard_put_prologue( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -338,7 +338,7 @@ static void audioport_guard_instantiate(fts_class_t *cl)
 
 typedef struct 
 {
-  fts_object_t head;
+  fts_dsp_object_t o;
   fts_audioport_t *port;
 } fts_audioportin_t;
 
@@ -354,7 +354,7 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
       this->port = port;
       fts_object_set_outlets_number(o, outlets);
 
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
     fts_object_set_error(o, "audioport required");
@@ -362,7 +362,7 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void audioportin_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -489,7 +489,7 @@ void fts_audioport_set_input_channels( fts_audioport_t *port, int channels)
 
 typedef struct 
 {
-  fts_object_t head;
+  fts_dsp_object_t o;
   fts_audioport_t *port;
 } fts_audioportout_t;
 
@@ -505,13 +505,13 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       this->port = port;
       fts_object_set_inlets_number(o, inlets);
 
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
     }
 }
 
 static void audioportout_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void audioportout_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

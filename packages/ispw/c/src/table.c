@@ -308,7 +308,7 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	      this->vec = (ivec_t *)obj;
 	    }
 	  else
-	    fts_object_set_error(o, "Object %s is not a table", name);
+	    fts_object_set_error(o, "object %s is not a table", name);
 
 	  return;
 	}

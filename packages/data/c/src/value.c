@@ -168,16 +168,18 @@ value_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_array, value_get_array);
   fts_class_message_varargs(cl, fts_s_set_from_array, value_set_from_array);
   
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, value_get_state);
+
   fts_class_message_varargs(cl, fts_s_bang, value_output);
   fts_class_message_varargs(cl, fts_s_set, value_set_atom);
 
   fts_class_inlet_varargs(cl, 0, value_set_and_output);
   fts_class_inlet_varargs(cl, 1, value_set_atoms);
-  
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, value_get_state);
-  }
+
+  fts_class_outlet_varargs(cl, 0);
+}
 
 void
 value_config(void)

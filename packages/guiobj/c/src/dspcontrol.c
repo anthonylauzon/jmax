@@ -235,7 +235,7 @@ dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symbol_t s, int ac, 
 static void 
 dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_restart();
+  /*fts_dsp_restart();*/
 }
 
 static void

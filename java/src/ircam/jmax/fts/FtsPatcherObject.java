@@ -136,7 +136,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  if(obj != JMaxApplication.getRootPatcher())
-	    ((FtsPatcherObject)obj).releaseObject( ( FtsGraphicObject)args.getObject( 0));	  
+	    ((FtsPatcherObject)obj).releaseObject( ( FtsObject)args.getObject( 0));	  
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){
@@ -149,12 +149,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsPatcherObject)obj).redefineConnection( args.getLength(), args.getAtoms());
-	}
-      });
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("releaseConnection"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ( ( FtsPatcherObject)obj).releaseConnection( ( FtsConnection)args.getObject( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("objectRedefined"), new FtsMessageHandler(){
@@ -966,7 +960,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void releaseConnection(FtsConnection c)
   {
-    removeConnection( c);
     if( getEditorFrame() != null)
       ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( c);
   }
@@ -976,11 +969,22 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.objectRedefined( obj);
   }
 
-  public void releaseObject( FtsGraphicObject obj)
+  public void releaseObject( FtsObject obj)
   {
-    removeObject( obj);
-    if( getEditorFrame() != null)
-      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( obj);
+    if(obj instanceof FtsConnection)
+      {
+	removeConnection((FtsConnection)obj);
+
+	if( getEditorFrame() != null)
+	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove((FtsConnection)obj);
+      }
+    else
+      {
+	removeObject((FtsGraphicObject)obj);
+
+	if( getEditorFrame() != null)
+	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove((FtsGraphicObject)obj);
+      }
   }
 
   /**************************************************************/

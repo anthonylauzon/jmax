@@ -29,7 +29,7 @@
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
 } white_t;
 
 static fts_symbol_t white_ftl_sym = 0;
@@ -66,13 +66,13 @@ white_ftl(fts_word_t *argv)
 static void
 white_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
 white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

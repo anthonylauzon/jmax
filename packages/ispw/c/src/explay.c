@@ -273,11 +273,11 @@ explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(ac > 0 && fts_is_symbol(at))
     {
-      this->explode_name = fts_get_symbol_arg(ac, at, 0, 0);
+      this->explode_name = fts_get_symbol(at);
       this->current = 0;
     }
-
-  fts_object_set_error(o, "Argument of explode name required");
+  else
+    fts_object_set_error(o, "argument of explode name required");
 }
 
 

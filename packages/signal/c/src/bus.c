@@ -36,7 +36,7 @@ static fts_metaclass_t *bus_type = 0;
 
 typedef struct
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   fts_dsp_edge_t *edge; /* DSP edge */
   int n_channels;
   float *buf[2]; /* two buffers */
@@ -131,7 +131,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
   this->toggle = 0;
   this->n_channels = n_channels;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -142,7 +142,7 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
   fts_free(this->buf[0]);
   fts_free(this->buf[1]);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -206,7 +206,7 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 
 typedef struct access_tilda
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t bus;
   ftl_data_t index;
 } access_t;
@@ -314,7 +314,7 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   else
     fts_object_set_error(o, "bus~ required");
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }	
 
 static void
@@ -322,7 +322,7 @@ access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   access_t *this = (access_t *)o;
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 
   if(this->bus)
     {

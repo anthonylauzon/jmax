@@ -77,7 +77,7 @@ symbol_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if(ac > 0 && fts_is_symbol(at))
     this->s = fts_get_symbol(at);
   else
-    fts_object_set_error(o, "Argument required");
+    fts_object_set_error(o, "argument required");
 }
 
 static void

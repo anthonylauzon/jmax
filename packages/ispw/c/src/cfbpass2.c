@@ -64,7 +64,7 @@
 
 typedef struct 
 {
-  fts_object_t obj;
+  fts_dsp_object_t obj;
 
   float srate;
   float gain0;
@@ -256,14 +256,14 @@ sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   sigcoef_bpass2_verify_freq(this);
   sigcoef_bpass2_verify_bw(this);
 
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 
 static void
 sigcoef_bpass2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 

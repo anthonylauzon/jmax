@@ -156,7 +156,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   osc_t *this = (osc_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   /* init osc */
   this->freq = 0.0;
@@ -190,7 +190,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       this->fvec = 1;
     }
   else
-    fts_object_set_error(o, "Bad arguments");
+    fts_object_set_error(o, "bad arguments");
 }
 
 static void
@@ -203,7 +203,7 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     osc_data_set_fvec(this->data, 0);
 
   ftl_data_free(this->data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -334,7 +334,7 @@ phi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   osc_t *this = (osc_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   /* init osc */
   this->freq = 0.0;
@@ -353,7 +353,7 @@ phi_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   osc_t *this = (osc_t *)o;
 
   ftl_data_free(this->data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

@@ -67,14 +67,14 @@ argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	}
       else
 	{
-	  fts_object_set_error(o, "Argument %d is not defined for this patcher", index);
+	  fts_object_set_error(o, "argument %d is not defined for this patcher", index);
 	  return;
 	}
 
       fts_variable_add_user(fts_object_get_patcher(o), fts_s_args, o);
     }
   else
-    fts_object_set_error(o, "Wrong arguments");
+    fts_object_set_error(o, "bad arguments");
 }
 
 static void

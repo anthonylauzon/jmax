@@ -29,6 +29,7 @@ typedef struct
 {
   fts_object_t o;
   fts_object_t *obj;
+  fts_method_t meth;
   int index;
 } getinter_t;
 
@@ -169,7 +170,21 @@ getinter_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   getinter_t *this = (getinter_t *)o;
   fts_object_t *obj = fts_get_object(at);
 
-  fts_object_release(this->obj);
+  if(fts_is_a(at, ivec_type))
+    this->meth = getinter_ivec;
+  else if(fts_is_a(at, fvec_type))
+    this->meth = getinter_fvec;
+  else if(fts_is_a(at, bpf_type))
+    this->meth = getinter_bpf;
+  else
+    {
+      fts_object_signal_runtime_error(o, "not implemented for %s", fts_get_class_name(at));
+      return;
+    }
+
+  if(this->obj != NULL)
+    fts_object_release(this->obj);
+
   this->obj = obj;
   fts_object_refer(obj);
 }
@@ -179,6 +194,7 @@ getinter_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   getinter_t *this = (getinter_t *)o;
 
+  this->meth(o, 0, 0, ac, at);
 }
   
 /******************************************************
@@ -192,8 +208,14 @@ getinter_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   getinter_t *this = (getinter_t *)o;
 
-  this->obj = fts_get_object(at);
-  fts_object_refer(this->obj);
+  this->obj = NULL;
+  this->meth = NULL;
+
+  if(fts_is_object(at))
+    getinter_set_reference(o, 0, 0, 1, at);
+
+  if(this->obj == NULL)
+    fts_object_set_error(o, "not implemented for %s", fts_get_class_name(at));
 }
 
 static void
@@ -213,6 +235,8 @@ getinter_instantiate(fts_class_t *cl)
   fts_class_inlet_float(cl, 0, getinter_input);
   
   fts_class_inlet(cl, 1, ivec_type, getinter_set_reference);
+  fts_class_inlet(cl, 1, fvec_type, getinter_set_reference);
+  fts_class_inlet(cl, 1, bpf_type, getinter_set_reference);
 
   fts_class_outlet_float(cl, 0);
 }

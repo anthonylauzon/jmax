@@ -154,13 +154,13 @@ col_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	  if(col_index >= 0)
 	    this->j = col_index;
 	  else
-	    fts_object_set_error(o, "Index must be positive");
+	    fts_object_set_error(o, "index must be positive");
 	}
       else
 	this->j = 0;
     }
   else
-    fts_object_set_error(o, "First argument of mat required");
+    fts_object_set_error(o, "first argument of mat required");
 }
 
 static void

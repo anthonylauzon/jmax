@@ -112,7 +112,7 @@ invoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_array_init(&this->args, ac - 1, at + 1);
     }
   else
-    fts_object_set_error(o, "First argument of symbol required");
+    fts_object_set_error(o, "first argument of symbol required");
 }
 
 static void

@@ -42,7 +42,7 @@ static fts_symbol_t sym_wahwah = 0;
 
 typedef struct wahwah
 {
-  fts_object_t obj;
+  fts_dsp_object_t obj;
   ftl_data_t state;
 } wahwah_t;
 
@@ -53,7 +53,7 @@ wahwah_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->state = ftl_data_alloc(sizeof(float) * 2);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -63,7 +63,7 @@ wahwah_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   ftl_data_free(this->state);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

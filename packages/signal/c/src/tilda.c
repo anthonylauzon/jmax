@@ -29,7 +29,7 @@
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t data;
   float time;
   float cr;
@@ -165,7 +165,7 @@ tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   tilda_t *this = (tilda_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->time = 0.0;
   this->cr = 1.0;
@@ -198,7 +198,7 @@ tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       tilda_set_time(o, 0, 0, 1, at + 1);
     }
   else
-    fts_object_set_error(o, "Bad arguments");
+    fts_object_set_error(o, "bad arguments");
 }
 
 static void
@@ -206,7 +206,7 @@ tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   tilda_t *this = (tilda_t *)o;
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 
   ftl_data_free(this->data);
 }

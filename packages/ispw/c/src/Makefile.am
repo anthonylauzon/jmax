@@ -33,6 +33,7 @@ gate.c \
 integer.c \
 ispw.c \
 ispwcomp.c \
+line.c \
 loadbang.c \
 makenote.c \
 message.c \
@@ -64,19 +65,16 @@ sigapass3.c \
 sigarctan2.c \
 sigline.c \
 sigparam.c \
-sigprint.c \
 sigswitch.c \
 sigtable.c \
 sigthru.c \
 split.c \
 stripnote.c \
 sustain.c \
-symbol.c \
 tabcycle.c \
 table.c \
 tabpeek.c \
 tabpoke.c \
-timer.c \
 trigger.c \
 unpack.c \
 value.c \

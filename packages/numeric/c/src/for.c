@@ -26,14 +26,6 @@
 
 #include <fts/fts.h>
 
-/************************************************************
- *
- *  object
- *
- */
-
-static void for_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
 typedef struct 
 {
   fts_object_t o;
@@ -42,30 +34,6 @@ typedef struct
   double incr;
   int is_int;
 } for_t;
-
-static void
-for_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  for_t *this = (for_t *)o;
-  int is_int = 1;
-  int i;
-  
-  for(i=0; i<ac; i++)
-    if(!fts_is_int(at + i))
-      is_int = 0;
-
-  this->init = 0.0;
-  this->limit = 0.0;
-  this->incr = 1.0;
-
-  for_set(o, 0, 0, ac, at);
-}
-
-/************************************************************
- *
- *  user methods
- *
- */
 
 static void
 for_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -165,6 +133,24 @@ for_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *  class
  *
  */
+
+static void
+for_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  for_t *this = (for_t *)o;
+  int is_int = 1;
+  int i;
+  
+  for(i=0; i<ac; i++)
+    if(!fts_is_int(at + i))
+      is_int = 0;
+
+  this->init = 0.0;
+  this->limit = 0.0;
+  this->incr = 1.0;
+
+  for_set(o, 0, 0, ac, at);
+}
 
 static void
 for_instantiate(fts_class_t *cl)

@@ -35,19 +35,6 @@ typedef struct
 } print_t;
 
 static void
-print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  if(ac > 0 && fts_is_symbol(at))
-    this->prompt = fts_get_symbol(at);
-  else
-    this->prompt = fts_s_print;
-
-  this->stream = fts_get_default_console_stream();
-}
-
-static void
 print_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
@@ -60,7 +47,8 @@ print_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   print_t *this = (print_t *)o;
 
-  fts_spost(this->stream, "%s: ", this->prompt);
+  if(this->prompt)
+    fts_spost(this->stream, "%s: ", this->prompt);
 
   /* ordinary message */
   fts_spost_symbol(this->stream, s);
@@ -74,7 +62,8 @@ print_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   print_t *this = (print_t *)o;
 
-  fts_spost(this->stream, "%s: ", this->prompt);
+  if(this->prompt)
+    fts_spost(this->stream, "%s: ", this->prompt);
   
   if(ac == 1)
     {
@@ -120,6 +109,18 @@ print_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *  class
  *
  */
+
+static void
+print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  print_t *this = (print_t *)o;
+
+  this->stream = fts_get_default_console_stream();
+  this->prompt = NULL;
+
+  if(ac > 0 && fts_is_symbol(at))
+    this->prompt = fts_get_symbol(at);
+}
 
 static void
 print_instantiate(fts_class_t *cl)

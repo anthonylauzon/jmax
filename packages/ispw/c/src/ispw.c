@@ -25,6 +25,7 @@
 extern void ispw_naming_init(void);
 extern void bangbang_config(void);
 extern void ispwcomp_config(void);
+extern void line_config(void);
 extern void loadbang_config(void);
 extern void atom_list_config(void);
 extern void messbox_config(void);
@@ -36,7 +37,6 @@ extern void prepend_config(void);
 extern void gate_config(void);
 extern void route_config(void);
 extern void split_config(void);
-extern void timer_config(void);
 extern void trigger_config(void);
 extern void unpack_config(void);
 extern void voxalloc_config(void);
@@ -49,7 +49,6 @@ extern void int_config(void);
 extern void explay_config(void);
 extern void explode_config(void);
 extern void float_config(void);
-extern void symbol_obj_config(void);
 extern void funbuff_config(void);
 extern void pbank_config(void);
 extern void qlist_config(void);
@@ -62,6 +61,7 @@ extern void expr_config(void);
 /* filters */
 extern void sigcoef_bpass2_config(void);
 extern void sigcoef_hlshelf1_config(void);
+extern void sig2p2z_config(void);
 extern void sigapass3_config(void);
 
 /* io */
@@ -104,7 +104,6 @@ extern void sigup_config(void);
 extern void osc_config(void);
 extern void noise_config(void);
 extern void sigparam_config(void);
-extern void sigprint_config(void);
 extern void vectrigon_config(void);
 extern void vecsqrt_config(void);
 extern void veclog_config(void);
@@ -120,6 +119,7 @@ ispw_config(void)
   ispw_naming_init();
   bangbang_config();
   ispwcomp_config();
+  line_config();
   loadbang_config();
   atom_list_config();
   messbox_config();
@@ -131,7 +131,6 @@ ispw_config(void)
   gate_config();
   route_config();
   split_config();
-  timer_config();
   trigger_config();
   unpack_config();
   voxalloc_config();
@@ -144,7 +143,6 @@ ispw_config(void)
   explay_config();
   explode_config();
   float_config();
-  symbol_obj_config();
   funbuff_config();
   pbank_config();
   qlist_config();
@@ -157,6 +155,7 @@ ispw_config(void)
   /* filters */
   sigcoef_bpass2_config();
   sigcoef_hlshelf1_config();
+  sig2p2z_config();
   sigapass3_config();
 
   /* io */
@@ -199,7 +198,6 @@ ispw_config(void)
   osc_config();
   noise_config();
   sigparam_config();
-  sigprint_config();
   vectrigon_config();
   vecsqrt_config();
   veclog_config();

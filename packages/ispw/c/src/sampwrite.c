@@ -37,7 +37,7 @@
  
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   fts_symbol_t tab_name;
   ftl_data_t sampwrite_data;
 } sampwrite_t;
@@ -61,10 +61,10 @@ sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       l = 0x7fffffff;
       ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
       
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
-    fts_object_set_error(o, "Name argument required");
+    fts_object_set_error(o, "name argument required");
 }
 
 static void
@@ -73,7 +73,7 @@ sampwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sampwrite_t *this = (sampwrite_t *)o;
 
   ftl_data_free(this->sampwrite_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /******************************************************************

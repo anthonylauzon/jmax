@@ -47,9 +47,9 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_object(&this->a, tuple);
     }
   if(ac > 0)
-    fts_atom_assign(&this->a, at);
+    this->a = at[0];
   else
-    fts_object_set_error(o, "No value given");
+    fts_object_set_error(o, "no value given");
 }
 
 static void

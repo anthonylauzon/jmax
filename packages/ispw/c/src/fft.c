@@ -36,7 +36,7 @@ fts_symbol_t sym_fft = 0;
 fts_symbol_t sym_ifft = 0;
 
 typedef struct{
-  fts_object_t head;
+  fts_dsp_object_t head;
   fts_symbol_t name;
   fft_ctl_t ctl; /* pointer to control block */
   long hop; /* hop in samples of FFT (at least size) */
@@ -145,19 +145,14 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(!check_args(ac, at, &type, &real_spec))
     {
-      fts_object_set_error(o, "Wrong  arguments\n");
+      fts_object_set_error(o, "bad arguments\n");
       return;
     }
 
   buffers_init(x, type, real_spec, ac, at);
 
   if(real_spec == sym_half)
-    {
-      fts_atom_t av;
-      
-      fts_set_int(&av, 1);
-      fts_object_put_prop(o, fts_s_dsp_downsampling, &av);
-    }
+    fts_dsp_object_set_resampling((fts_dsp_object_t *)o, -1);
   
   if(type == sym_real)
     {
@@ -180,7 +175,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       x->bang_out = 2;
     }
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -192,19 +187,14 @@ ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(!check_args(ac, at, &type, &real_spec))
     {
-      fts_object_set_error(o, "Wrong arguments\n", x->name);
+      fts_object_set_error(o, "bad arguments\n", x->name);
       return;
     }
 
   buffers_init(x, type, real_spec, ac, at);
 
   if(real_spec == sym_half)
-    {
-      fts_atom_t av;
-      
-      fts_set_int(&av, 1);
-      fts_object_put_prop(o, fts_s_dsp_upsampling, &av);
-    }
+    fts_dsp_object_set_resampling((fts_dsp_object_t *)o, 1);
   
   if(type == sym_real)
     {
@@ -228,7 +218,7 @@ ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       x->bang_out = 2;
     }
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -242,7 +232,7 @@ fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(x->ctl.spec) 
     fts_free((void *)x->ctl.spec);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /************************************************

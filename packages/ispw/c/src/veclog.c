@@ -33,7 +33,7 @@ static fts_symbol_t log10_symbol;
 
 typedef struct
 {
-  fts_object_t head;
+  fts_dsp_object_t head;
   float scl;
 } veclog_t;
 
@@ -169,7 +169,7 @@ veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   else
     obj->scl = 1.0;
   
-  fts_dsp_add_object(o);  
+  fts_dsp_object_init((fts_dsp_object_t *)o);  
 }
 
 static void
@@ -186,7 +186,7 @@ siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 veclog_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

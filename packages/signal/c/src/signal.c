@@ -27,7 +27,7 @@
 #include "signal.h"
 #include <utils/c/include/utils.h>
 
-extern void signal_bus_tilda(void);
+extern void signal_bus_config(void);
 
 extern void signal_binop_config(void);
 extern void signal_abs_config(void);

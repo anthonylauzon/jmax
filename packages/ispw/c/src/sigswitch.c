@@ -40,7 +40,7 @@ static fts_symbol_t switch_function = 0;
 static int switch_count = 1;
 
 typedef struct {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   ftl_subroutine_t *current, *previous;
   ftl_data_t switch_ftl_data;
 } sigswitch_t;
@@ -109,7 +109,7 @@ sigswitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->switch_ftl_data = ftl_data_new( int);
   ftl_data_copy( int, this->switch_ftl_data, &state);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -118,7 +118,7 @@ sigswitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sigswitch_t *this = (sigswitch_t *)o;
 
   ftl_data_free( this->switch_ftl_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

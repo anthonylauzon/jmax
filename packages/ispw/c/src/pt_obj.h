@@ -75,7 +75,7 @@ typedef struct{
 } pt_common_stat_t;
 
 typedef struct{
-  fts_object_t header;
+  fts_dsp_object_t header;
   int n_points;
   int n_overlap;
   int n_channels;

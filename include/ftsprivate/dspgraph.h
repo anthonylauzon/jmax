@@ -23,25 +23,26 @@
 #ifndef _FTS_PRIVATE_DSPGRAPH_H_
 #define _FTS_PRIVATE_DSPGRAPH_H_
 
-FTS_API fts_symbol_t fts_s_dsp_outputsize;
-FTS_API fts_symbol_t fts_s_dsp_descr;
-
 FTS_API fts_dsp_signal_t *sig_zero;
 
-typedef struct _fts_dsp_node_ 
-{
-  fts_object_t *o;
-  int pred_cnt;
-  fts_dsp_descr_t descr;
-  struct _fts_dsp_node_ *next;
-} fts_dsp_node_t;
+/*************************************************
+ *
+ *  DSP graph node
+ *
+ */
+
+/*************************************************
+ *
+ *  DSP graph
+ *
+ */
 
 typedef struct _fts_dsp_graph_
 {
   enum {status_reset, status_compiled} status;
 
   /* the objects */
-  fts_dsp_node_t *nodes;
+  fts_dsp_object_t *objects;
 
   /* the dsp chain */
   ftl_program_t *chain;
@@ -70,7 +71,7 @@ extern void fts_dsp_graph_compile(fts_dsp_graph_t *graph);
 extern void fts_dsp_graph_reset(fts_dsp_graph_t *graph);
 extern void fts_dsp_graph_run(fts_dsp_graph_t *graph);
 
-extern void fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_object_t *o);
-extern void fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o);
+extern void fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_dsp_object_t *obj);
+extern void fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_dsp_object_t *obj);
 
 #endif

@@ -41,7 +41,7 @@ extern void ftl_delwrite(fts_word_t *a);
 
 typedef struct _delwrite_t
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   fts_symbol_t name;
   fts_symbol_t unit;
   del_buf_t *buf;
@@ -79,7 +79,7 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->rec_prot = 0;
 
   delay_table_add_delwrite(o, this->name, this->buf);
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 static void
@@ -91,7 +91,7 @@ delwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       delbuf_delete_delayline(this->buf);
       delay_table_remove_delwrite(o, this->name);
-      fts_dsp_remove_object(o);
+      fts_dsp_object_delete((fts_dsp_object_t *)o);
     }
 }
 

@@ -21,7 +21,6 @@
 
 #include "iomodule.h"
 
-extern void fakestream_config(void);
 extern void filestream_config(void);
 extern void in_config(void);
 extern void in_out_tilda_config( void);
@@ -37,7 +36,6 @@ extern void wacom_config(void);
 void
 io_config(void)
 {
-  fakestream_config();
   filestream_config();
   in_config();
   in_out_tilda_config();

@@ -1077,7 +1077,7 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
-    fts_object_set_error(o, "Wrong arguments for ivec constructor");
+    fts_object_set_error(o, "bad arguments for ivec constructor");
 }
 
 static void

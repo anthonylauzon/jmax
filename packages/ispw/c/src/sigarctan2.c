@@ -39,8 +39,7 @@
 
 typedef struct sigarctan2
 {
-  fts_object_t obj;
-
+  fts_dsp_object_t obj;
   float *table;   	
 } sigarctan2_t;
 
@@ -133,14 +132,14 @@ sigarctan2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       atan_table[TABLE_SIZE+1] = atan(1.0f);	/* extra point for interp. */
     }
 
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 
 static void
 sigarctan2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 

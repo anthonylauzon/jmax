@@ -37,7 +37,7 @@ static fts_symbol_t sym_iir[5] = {0, 0, 0, 0, 0};
 
 typedef struct
 {
-  fts_object_t head;
+  fts_dsp_object_t head;
   ftl_data_t state;
   ftl_data_t coefs;  
   long n_order;
@@ -356,11 +356,11 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    coefs[i] = 0.0;
 	}
   
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
       fts_object_set_inlets_number(o, n_order + 1);
     }
   else
-    fts_object_set_error(o, "Wrong arguments");
+    fts_object_set_error(o, "bad arguments");
 }
 
 
@@ -375,7 +375,7 @@ iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       ftl_data_free(this->state);
     }
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

@@ -28,6 +28,7 @@ extern void const_config(void);
 extern void argument_config(void);
 
 extern void print_config(void);
+extern void print_tilda_config(void);
 
 void
 system_config(void)
@@ -39,4 +40,5 @@ system_config(void)
   argument_config();
 
   print_config();
+  print_tilda_config();
 }

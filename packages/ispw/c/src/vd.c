@@ -50,7 +50,7 @@ static fts_symbol_t vd_miller_dsp_symbol = 0;
 
 typedef struct
 {
-  fts_object_t  obj;
+  fts_dsp_object_t  obj;
   fts_symbol_t name;
   fts_object_t *next; /* pointer to the other delreader for the same delay line */ 
   fts_symbol_t unit;
@@ -122,7 +122,7 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
 
   delay_table_add_delreader(o, this->name);
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 
@@ -138,7 +138,7 @@ vd_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       ftl_data_free(this->vd_data);
       
-      fts_dsp_remove_object(o);
+      fts_dsp_object_delete((fts_dsp_object_t *)o);
     }
 }
 

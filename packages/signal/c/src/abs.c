@@ -60,20 +60,20 @@ ftl_abs(fts_word_t *argv)
 static void
 abs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_add_object(o); 
+  fts_dsp_object_init((fts_dsp_object_t *)o); 
 }
 
 
 static void
 abs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
 abs_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), abs_init, abs_delete);
+  fts_class_init(cl, sizeof(fts_dsp_object_t), abs_init, abs_delete);
 
   fts_class_message_varargs(cl, fts_s_put, abs_put);
 

@@ -891,8 +891,8 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
     {
 	if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, &format, capture_channels, sampling_rate, fifo_size, &access)) < 0)
 	{
-	    fts_object_set_error(o, "Error opening playback ALSA device (%s)", snd_strerror( err));
-	    fts_log("[alsaaudioport] Error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_object_set_error(o, "error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_log("[alsaaudioport] error opening playback ALSA device (%s)", snd_strerror( err));
 	    post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 	    return;
 	}
@@ -918,8 +918,8 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
     {
 	if ( (err = alsastream_open(&this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, &format, playback_channels, sampling_rate, fifo_size, &access)) < 0)
 	{
-	    fts_object_set_error(o, "Error opening playback ALSA device (%s)", snd_strerror( err));
-	    fts_log("[alsaaudioport] Error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_object_set_error(o, "error opening playback ALSA device (%s)", snd_strerror( err));
+	    fts_log("[alsaaudioport] error opening playback ALSA device (%s)", snd_strerror( err));
 	    post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
 
 	    return;

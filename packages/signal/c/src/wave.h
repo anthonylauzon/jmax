@@ -54,7 +54,7 @@ typedef struct wave_data
 
 typedef struct _wave_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t data;
   int fvec;
 } wave_t;

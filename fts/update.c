@@ -127,24 +127,24 @@ static void update_group_instantiate(fts_class_t *cl)
  *
  */
 
-static update_group_t *object_get_update_group( fts_object_t *obj)
+static update_group_t *
+object_get_update_group( fts_object_t *obj)
 {
-  int id, index;
+  int id = fts_object_get_id( obj);
 
-  id = fts_object_get_id( obj);
+  if (id > FTS_NO_ID)
+    {
+      int index = OBJECT_ID_CLIENT( id );
+      
+      if (index >= 0 && index < update_group_table_length)
+	return update_group_table[ index];
+    }
 
-  if (id <= FTS_NO_ID)
-    return NULL;
-
-  index = OBJECT_ID_CLIENT( id );
-
-  if (index < 0 || index >= update_group_table_length)
-    return NULL;
-
-  return update_group_table[ index];
+  return NULL;
 }
 
-static void update_group_add_object( update_group_t *this, fts_object_t *obj)
+static void 
+update_group_add_object( update_group_t *this, fts_object_t *obj)
 {
   update_entry_t **pp;
 
@@ -166,7 +166,8 @@ static void update_group_add_object( update_group_t *this, fts_object_t *obj)
   this->object_count++;
 }
 
-static void update_group_remove_object( update_group_t *this, fts_object_t *obj)
+static void 
+update_group_remove_object( update_group_t *this, fts_object_t *obj)
 {
   update_entry_t **pp;
 
@@ -192,37 +193,28 @@ static void update_group_remove_object( update_group_t *this, fts_object_t *obj)
     }
 }
 
-void fts_update_request( fts_object_t *obj)
+void 
+fts_update_request( fts_object_t *obj)
 {
-  update_group_t *update_group;
-  fts_patcher_t *patcher;
+  update_group_t *update_group = object_get_update_group( obj);
 
-  update_group = object_get_update_group( obj);
-
-  if ( !update_group)
-    return;
-
-  patcher = fts_object_get_patcher( obj);
-
-  if ( !patcher || !fts_patcher_is_open(patcher))
-    return;
-
-  update_group_add_object( update_group, obj);
+  if (update_group)
+    {
+      fts_patcher_t *patcher = fts_object_get_patcher( obj);
+      
+      if (patcher && fts_patcher_is_open(patcher))
+	update_group_add_object( update_group, obj);
+    }
 }
 
-void fts_update_reset( fts_object_t *obj)
+void 
+fts_update_reset( fts_object_t *obj)
 {
-  update_group_t *update_group;
+  update_group_t *update_group = object_get_update_group( obj);
 
-  update_group = object_get_update_group( obj);
-
-  if ( !update_group)
-    return;
-
-  update_group_remove_object( update_group, obj);
+  if (update_group)
+    update_group_remove_object( update_group, obj);
 }
-
-
 
 /***********************************************************************
  *

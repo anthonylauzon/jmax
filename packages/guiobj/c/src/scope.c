@@ -57,7 +57,7 @@ typedef struct _scope_ftl_
 
 typedef struct _scope_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t data;
   fts_atom_t a[SCOPE_BUFFER_SIZE];
   int range;
@@ -211,7 +211,8 @@ scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void 
 scope_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_update_request(o);
+  if(fts_object_get_patcher(o) != NULL)
+    fts_update_request(o);
 }
 static void 
 scope_send_to_client(scope_t *this)
@@ -532,7 +533,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   scope_reset(data);
   
-  fts_dsp_add_object((fts_object_t *)this);
+  fts_dsp_object_init((fts_dsp_object_t *)(fts_object_t *)this);
 }
 
 static void
@@ -543,7 +544,7 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(this->data)
     {
       ftl_data_free(this->data);      
-      fts_dsp_remove_object(o);
+      fts_dsp_object_delete((fts_dsp_object_t *)o);
     }
 }
 

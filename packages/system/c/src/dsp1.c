@@ -44,7 +44,7 @@ dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 dsp_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_dsp_get_active() != 0)
+  if(fts_dsp_is_active())
     fts_dsp_desactivate();
 
   fts_dsp_activate();

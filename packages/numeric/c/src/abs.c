@@ -38,7 +38,7 @@ abs_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-abs_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));
   int i;
@@ -63,7 +63,11 @@ abs_instantiate(fts_class_t *cl)
 
   fts_class_inlet_int(cl, 0, abs_int);
   fts_class_inlet_float(cl, 0, abs_float);
-  fts_class_inlet_varargs(cl, 0, abs_atoms);
+  fts_class_inlet_varargs(cl, 0, abs_varargs);
+
+  fts_class_outlet_int(cl, 0);
+  fts_class_outlet_float(cl, 0);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

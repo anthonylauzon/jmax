@@ -67,7 +67,7 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
       if (0 > n)
       {
-	  fts_object_set_error(o, "[alsaseqmidiport] Cannot decode event");
+	  fts_object_set_error(o, "[alsaseqmidiport] cannot decode event");
       }
       else
       {
@@ -287,7 +287,7 @@ alsaseqmidiport_io_init(alsaseqmidiport_t* this,
     }
     if (err < 0)
     {
-	fts_object_set_error((fts_object_t*)this, "Error opening ALSA sequencer MIDI port (%s)", snd_strerror(err));
+	fts_object_set_error((fts_object_t*)this, "error opening ALSA sequencer MIDI port (%s)", snd_strerror(err));
 	fts_log("alsaseqmidiport: cannot open ALSA sequencer MIDI port %s (%s)",port_name, snd_strerror(err)); 
     }
     else
@@ -368,7 +368,7 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 
     if (0 == snd_seq_poll_descriptors(this->seq, &fds, 1, POLLIN))
     {
-	fts_object_set_error(o, "Cannot get file descriptor");
+	fts_object_set_error(o, "cannot get file descriptor");
 	return;
     }
 

@@ -404,13 +404,13 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  if(!preset_check_object(this, obj))
 	    {
 	      fts_symbol_t name = fts_object_get_class_name(obj);
-	      fts_object_set_error(o, "Cannot handle object of class %s", name);
+	      fts_object_set_error(o, "cannot handle object of class %s", name);
 	      return;
 	    }
 	}
       else
 	{
-	  fts_object_set_error(o, "Arguments of object required", i);
+	  fts_object_set_error(o, "arguments of object required", i);
 	  return;
 	}
     }

@@ -27,7 +27,7 @@ fts_symbol_t cut_symbol = 0;
 
 typedef struct _cut_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   float *buf;
   int size;
   int index;
@@ -187,7 +187,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
       else
 	{
-	  fts_object_set_error(o, "Wrong argument");
+	  fts_object_set_error(o, "bad argument");
 	  return;
 	}
     }
@@ -204,7 +204,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->fvec = fvec;
   fts_object_refer((fts_object_t *)fvec);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -218,7 +218,7 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(this->fvec != NULL)
     fts_object_release((fts_object_t *)this->fvec);    
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

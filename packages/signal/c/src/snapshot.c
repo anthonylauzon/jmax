@@ -30,7 +30,7 @@ static fts_symbol_t sym_snapshot_tilda = 0;
 
 typedef struct
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t val;
 } snapshot_t;
 
@@ -69,7 +69,7 @@ snapshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   *val = 0.0;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -93,7 +93,7 @@ snapshot_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 snapshot_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

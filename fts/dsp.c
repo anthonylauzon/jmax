@@ -53,6 +53,11 @@ static fts_param_t *dsp_active_param = 0;
 fts_metaclass_t *fts_dsp_edge_metaclass = 0;
 fts_metaclass_t *fts_dsp_signal_metaclass = 0;
 
+void 
+fts_dsp_default_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+}
+
 /*********************************************************
  *
  *  DSP timebase
@@ -149,15 +154,10 @@ fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
   ftl_declare_function( name, w);
 }
 
-static void 
-sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-}
-
 void 
 fts_dsp_declare_inlet(fts_class_t *cl, int num)
 {
-  fts_class_inlet(cl, num, fts_dsp_signal_metaclass, sig_dummy);
+  fts_class_inlet(cl, num, fts_dsp_signal_metaclass, fts_dsp_default_method);
 }
 
 void 
@@ -166,16 +166,74 @@ fts_dsp_declare_outlet(fts_class_t *cl, int num)
   fts_class_outlet(cl, num, fts_dsp_signal_metaclass);
 }
 
-void 
-fts_dsp_add_object(fts_object_t *o)
+static int
+dsp_object_get_n_inlets(fts_dsp_object_t *obj)
 {
-  fts_dsp_graph_add_object(&main_dsp_graph, o);
+  fts_object_t *o = (fts_object_t *)obj;
+  fts_class_t *cl = fts_object_get_class(o);
+  int i;
+
+  for(i=0; i<fts_object_get_inlets_number(o); i++)
+    {
+      if(fts_class_inlet_get_method(cl, i, fts_dsp_signal_metaclass) == NULL)
+	break;
+    }
+
+  return i;
+}
+
+static int
+dsp_object_get_n_outlets(fts_dsp_object_t *obj)
+{
+  fts_object_t *o = (fts_object_t *)obj;
+  fts_class_t *cl = fts_object_get_class(o);
+  int i;
+
+  for(i=0; i<fts_object_get_outlets_number(o); i++)
+    {
+      if(!fts_class_outlet_has_type(cl, i, fts_dsp_signal_metaclass))
+	break;
+    }
+
+  return i;
+}
+
+void
+fts_dsp_object_init(fts_dsp_object_t *obj)
+{
+  fts_class_t *cl = fts_object_get_class((fts_object_t *)obj);
+  int ninputs = dsp_object_get_n_inlets(obj);
+  int noutputs = dsp_object_get_n_outlets(obj);
+
+  /* make sure that class has a put method */
+  if(fts_class_get_method(cl, fts_s_put) == NULL)
+    fts_class_message_varargs(cl, fts_s_put, fts_dsp_default_method);
+
+  obj->descr.ninputs = ninputs;
+  obj->descr.noutputs = noutputs;
+  
+  if(obj->descr.ninputs > 0)
+    obj->descr.in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * ninputs);
+  
+  if(obj->descr.noutputs > 0)
+    obj->descr.out = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * noutputs);
+
+  fts_dsp_graph_add_object(&main_dsp_graph, obj);
 }
 
 void 
-fts_dsp_remove_object(fts_object_t *o)
+fts_dsp_object_delete(fts_dsp_object_t *obj)
 {
-  fts_dsp_graph_remove_object(&main_dsp_graph, o);
+  fts_dsp_graph_remove_object(&main_dsp_graph, obj);
+
+  fts_free(obj->descr.in);
+  fts_free(obj->descr.out);  
+}
+
+int
+fts_is_dsp_object(fts_object_t *o)
+{
+  return (fts_class_get_method(fts_object_get_class(o), fts_s_put) != NULL);
 }
 
 void 
@@ -279,13 +337,13 @@ dsp_edge_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->n_tick = fts_dsp_get_tick_size();
   this->sr = fts_dsp_get_sample_rate();
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
 dsp_edge_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -298,7 +356,7 @@ dsp_edge_instantiate(fts_class_t *cl)
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  }
+}
 
 void
 fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge)
@@ -393,20 +451,8 @@ fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size)
   fts_dsp_add_function(dsp_copy_fun_symbol, 3, a);
 }
 
-void
-fts_dsp_activate(void)
-{
-  fts_param_set_int(dsp_active_param, 1);
-}
-
-void
-fts_dsp_desactivate(void)
-{
-  fts_param_set_int(dsp_active_param, 0);
-}
-
 int
-fts_dsp_get_active(void)
+fts_dsp_is_active(void)
 {
   if(dsp_active_param != NULL)
     {
@@ -417,6 +463,18 @@ fts_dsp_get_active(void)
     }
   
   return 0;
+}
+
+void
+fts_dsp_activate(void)
+{
+  fts_param_set_int(dsp_active_param, 1);
+}
+
+void
+fts_dsp_desactivate(void)
+{
+  fts_param_set_int(dsp_active_param, 0);
 }
 
 void

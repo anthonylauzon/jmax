@@ -38,6 +38,7 @@
 
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
+#include <sys/time.h>
 #include <utils/c/include/utils.h>
 
 
@@ -46,20 +47,20 @@
 #define RQ 127773L /* m div a */
 #define RR 2836 /* m mod a */
 
-static unsigned long seed = 1;
+static unsigned int seed = 1;
 
 void
-fts_random_set_seed(unsigned long ul)
+fts_random_set_seed(unsigned int ui)
 {
-  seed = ul;
+  seed = ui;
 }
 
-unsigned long
+unsigned int
 fts_random(void)
 {
-  unsigned long lo, hi;
+  unsigned int lo, hi;
 
-  hi = RA * (long)((unsigned long)seed >> 16);
+  hi = RA * (long)((unsigned int)seed >> 16);
   seed = RA * (long)(seed & 0xFFFF);
   
   seed += (hi & 0x7FFF) << 16;
@@ -98,10 +99,10 @@ typedef union
 float
 fts_random_float(void)
 {
-  unsigned long lo, hi;
+  unsigned int lo, hi;
   intfloat_t x;
 
-  hi = RA * (long)((unsigned long)seed >> 16);
+  hi = RA * (long)((unsigned int)seed >> 16);
   seed = RA * (long)(seed & 0xFFFF);
   
   seed += (hi & 0x7FFF) << 16;
@@ -130,9 +131,9 @@ fts_random_float(void)
 float
 fts_random_float(void)
 {
-  unsigned long lo, hi;
+  unsigned int lo, hi;
 
-  hi = RA * (long)((unsigned long)seed >> 16);
+  hi = RA * (long)((unsigned int)seed >> 16);
   seed = RA * (long)(seed & 0xFFFF);
   
   seed += (hi & 0x7FFF) << 16;
@@ -156,5 +157,12 @@ fts_random_float(void)
 
 #endif
 
+void
+fts_random_init(void)
+{
+  struct timeval tv;
 
+  gettimeofday(&tv, NULL);
 
+  seed = tv.tv_usec;
+}

@@ -223,23 +223,16 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   /* void state */
   for(i=0; i<SYNC_MAX_SIZE; i++)
     fts_set_int(this->a + i, 0);
-
-  if(ac == 1)
+  
+  if(ac == 0 || (ac == 1 && fts_is_number(at)))
     {
-      if(fts_is_number(at))
-	{
-	  n = fts_get_number_int(at);
-	  
-	  if(n < 2) 
-	    n = 2;
-	  else if(n > SYNC_MAX_SIZE)
-	    n = SYNC_MAX_SIZE;
-	}
-      else
-	{
-	  fts_object_set_error(o, "Bad argument");
-	  return;
-	}
+      if(ac == 1)
+	n = fts_get_number_int(at);
+      
+      if(n < 2) 
+	n = 2;
+      else if(n > SYNC_MAX_SIZE)
+	n = SYNC_MAX_SIZE;
     }
   else if(ac > 1)
     {
@@ -251,7 +244,12 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       for(i=0; i<n; i++)
 	fts_atom_assign(this->a + i, at + i);
     }
-
+  else
+    {
+      fts_object_set_error(o, "bad arguments");
+      return;
+    }
+  
   this->n = n;
   this->trigger = this->require = this->reset = this->wait = (1 << n) - 1;
 

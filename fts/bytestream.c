@@ -266,7 +266,7 @@ static void fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   if (this->socket == INVALID_SOCKET) 
     {
-      fts_object_set_error( (fts_object_t *)this, "Invalid arguments");
+      fts_object_set_error( (fts_object_t *)this, "bad arguments");
       return;
     }
 
@@ -414,7 +414,7 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
   if ((this->out == INVALID_HANDLE_VALUE) || (_stdin == INVALID_HANDLE_VALUE))
     {
       fts_log("Invalid pipes.\n");    
-      fts_object_set_error( (fts_object_t *)this, "Invalid pipes");
+      fts_object_set_error( (fts_object_t *)this, "invalid pipes");
       return -1;
     }
 
@@ -423,7 +423,7 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
 		       GetCurrentProcess(), &this->in, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
       fts_log("Failed to duplicate stdin.\n");    
-      fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin");
+      fts_object_set_error( (fts_object_t *)this, "failed to duplicate stdin");
       return -1;
     }
 
@@ -448,7 +448,7 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
 
   if ( (this->in = dup( 0)) < 0 || (this->out = dup( 1)) < 0)
     {
-      fts_object_set_error( (fts_object_t *)this, "Failed to duplicate standard input or output");
+      fts_object_set_error( (fts_object_t *)this, "failed to duplicate standard input or output");
       return -1;
     }
 

@@ -438,7 +438,7 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
     }
   else
-    fts_object_set_error(o, "First argument of serial device name required");
+    fts_object_set_error(o, "first argument of serial device name required");
 }
 
 static void 

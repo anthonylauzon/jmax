@@ -36,15 +36,25 @@ static int
 connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 {
   fts_iterator_t iter;
+  int n_types = fts_class_outlet_get_declarations(fts_object_get_class(src), woutlet, &iter);
 
-  /* connection to object with its own default handler is always ok */
-  if(fts_class_get_default_handler(fts_object_get_class(dst)) != fts_class_default_error_handler)
-    return 1;
-
-  /* connection to outlet without declarations is always ok */
-  if(fts_class_outlet_get_declarations(fts_object_get_class(src), woutlet, &iter))
+  if(n_types == 0)
     {
-      while ( fts_iterator_has_more( &iter)) 
+      /* no declaration is always good */
+      return 1;
+    }
+  else if(n_types == 1 && fts_class_outlet_has_type(fts_object_get_class(src), woutlet, fts_dsp_signal_metaclass))
+    {
+      /* pur signal outlet connects to signal inlet only */
+      return (fts_class_inlet_get_method(fts_object_get_class(dst), winlet, fts_dsp_signal_metaclass) != NULL);
+    }
+  else 
+    {
+      /* connection to class with declared default handler is always good */
+      if(fts_class_get_default_handler(fts_object_get_class(dst)) != fts_class_default_error_handler)
+	return 1;
+
+      while( fts_iterator_has_more( &iter)) 
 	{
 	  fts_atom_t a;
 
@@ -54,8 +64,15 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 	    {
 	      fts_metaclass_t *class = (fts_metaclass_t *)fts_get_pointer(&a);
 
+	      /* varargs connects to everything (we could be more severe here) */
+	      if(class == NULL)
+		return 1; 
+	      
+	      /* found inlet type match or varargs method */
 	      if(fts_class_inlet_get_method(fts_object_get_class(dst), winlet, class) != NULL)
-		return 1; /* found inlet type match */
+		return 1;
+	      else if(fts_class_inlet_get_method(fts_object_get_class(dst), winlet, NULL) != NULL)
+		return 1;
 	    }	
 	  else if(fts_is_symbol(&a))
 	    {
@@ -65,11 +82,9 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 		return 1; /* found message match */
 	    }
 	}
-
-      return 0; /* no match found */
     }
-  else
-    return 1;
+      
+  return 0; /* no match found */
 }
 
 fts_connection_t *
@@ -104,7 +119,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {
-      fts_object_signal_runtime_error(src, "Outlet out of range");
+      fts_object_signal_runtime_error(src, "outlet out of range");
       return NULL;
     }
 
@@ -113,7 +128,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     {
       if ((p->dst == dst) && (p->winlet == winlet))
 	{
-	  fts_object_signal_runtime_error(dst, "Double connection ignored");
+	  fts_object_signal_runtime_error(dst, "double connection ignored");
 	  return NULL;
 	}
     }
@@ -125,7 +140,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   /* check connection */
   if(connection_check(src, woutlet, dst, winlet) == 0)
     {
-      fts_object_signal_runtime_error(dst, "Cannot connect");
+      fts_object_signal_runtime_error(dst, "type mismatch (cannot connect)");
       return NULL;
     }
 
@@ -179,11 +194,11 @@ fts_connection_delete(fts_connection_t *conn)
   fts_connection_t **p; /* indirect precursor */
 
   /* release the client representation of the connection */
-  if ( fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
-    fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
+  if (fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
+    fts_client_release_object((fts_object_t *)conn);
 
   src = conn->src;
-  dst  = conn->dst;
+  dst = conn->dst;
 
   /* look for the connection in the output list of src, and remove it */
   for (p = &src->out_conn[conn->woutlet]; *p ; p = &((*p)->next_same_src))

@@ -98,7 +98,8 @@ split_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(split_t), split_init, 0);
 
   fts_class_inlet_varargs(cl, 0, split_varargs);
-  fts_class_inlet_number(cl, 0, split_int);
+  fts_class_inlet_int(cl, 0, split_int);
+  fts_class_inlet_float(cl, 0, split_float);
   fts_class_inlet_number(cl, 1, split_bound);
   fts_class_inlet_number(cl, 2, split_bound);
 

@@ -34,7 +34,7 @@
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   fts_memorystream_t *stream;
   double period;
   int gate;
@@ -128,7 +128,8 @@ display_deliver(display_t *this)
 static void 
 display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_update_request(o);
+  if(fts_object_get_patcher(o) != NULL)  
+    fts_update_request(o);
 }
 
 static void 
@@ -227,7 +228,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   display_t * this = (display_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_type, 0, 0);
 
@@ -244,7 +245,7 @@ display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
   
   fts_object_destroy((fts_object_t *)this->stream);
 }

@@ -27,7 +27,7 @@ fts_symbol_t pick_symbol = 0;
 
 typedef struct _pick_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   fvec_t *fvec;
   int index;
   double conv;
@@ -173,7 +173,7 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	pick_set_fvec(o, 0, 0, 1, at);
       else
 	{
-	  fts_object_set_error(o, "Wrong argument");
+	  fts_object_set_error(o, "bad argument");
 	  return;
 	}
     }
@@ -187,7 +187,7 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   this->index = fvec_get_size(this->fvec);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -198,7 +198,7 @@ pick_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(this->fvec)
     fts_object_release((fts_object_t *)this->fvec);    
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

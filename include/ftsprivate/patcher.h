@@ -69,6 +69,5 @@ extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const f
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 
 extern void fts_patcher_redefine_connection(fts_object_t *this, fts_connection_t *c);
-extern void fts_patcher_release_connection(fts_object_t *this, fts_connection_t *c);
 
 #endif

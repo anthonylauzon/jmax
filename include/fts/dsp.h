@@ -37,7 +37,7 @@
  * of an objects inputs or outputs can be differ from the global parameters due to up or 
  * downsampling instructions of the DSP compiler (not part of the general API).
  *
- * An object can be declared as DSP object in its init method using the function fts_dsp_add_object().
+ * An object can be declared as DSP object in its init method using the function fts_dsp_object_init().
  * By convention a DSP object has a name ending with '~'.
  *
  * A DSP object will be send a message \e put when it is scheduled by the compiler of the DSP subsystem 
@@ -97,34 +97,41 @@
 /* Symbols used by the DSP compiler */
 /* Signal 0: always 0 */
 FTS_API fts_symbol_t fts_s_sig_zero;
-/* Up/downsampling properties */
-FTS_API fts_symbol_t fts_s_dsp_upsampling;
-FTS_API fts_symbol_t fts_s_dsp_downsampling;
-
-
 
 /** 
  * @name DSP compiler structures
  */
 /*@{*/
 
-typedef struct _fts_dsp_signal_t {
+typedef struct 
+{
   fts_symbol_t name;
   int refcnt;
   int length;
   float srate;
 } fts_dsp_signal_t;
 
-typedef struct _fts_dsp_descr_t {
+typedef struct
+{
   int ninputs;
   int noutputs;
   fts_dsp_signal_t **in;
   fts_dsp_signal_t **out;
 } fts_dsp_descr_t;
 
+typedef struct fts_dsp_object
+{
+  fts_object_t o;
+  int pred_cnt;
+  int resamp; /* log2 of resampling factor */
+  fts_dsp_descr_t descr; /* dsp descriptor */
+  struct fts_dsp_object *next_in_dspgraph;
+} fts_dsp_object_t;
 
 /*@}*/ /* DSP compiler structures */
 
+#define fts_dsp_object_get_resampling(o) ((o)->resamp)
+#define fts_dsp_object_set_resampling(o, r) ((o)->resamp = (r))
 
 FTS_API void fts_dsp_run_tick(void);
 FTS_API int fts_dsp_is_running(void);
@@ -229,29 +236,32 @@ FTS_API void fts_dsp_declare_outlet(fts_class_t *class, int number);
  * This function declares an object as DSP object and add it to the DSP graph.
  * Typically it is called in the objects init method.
  *
- * @fn void fts_dsp_add_object(fts_object_t *o)
+ * @fn void fts_dsp_object_init(fts_dsp_object_t *o)
  * @param object
  *
- * @see fts_dsp_remove_object()
+ * @see fts_dsp_object_delete()
  *
  * @ingroup dsp
  */
-FTS_API void fts_dsp_add_object(fts_object_t *object);
+FTS_API void fts_dsp_object_init(fts_dsp_object_t *object);
 
 /** 
  * Remove object from the DSP graph.
  *
- * This function removes the object from the DSP graph which is added with fts_dsp_add_object().
+ * This function removes the object from the DSP graph which is added with fts_dsp_object_init().
  * Typically it is called in the objects delete method.
  *
- * @fn void fts_dsp_remove_object(fts_object_t *o)
+ * @fn void fts_dsp_object_delete(fts_dsp_object_t *o)
  * @param object
  *
- * @see fts_dsp_add_object()
+ * @see fts_dsp_object_init()
  *
  * @ingroup dsp
  */
-FTS_API void fts_dsp_remove_object(fts_object_t *object);
+FTS_API void fts_dsp_object_delete(fts_dsp_object_t *obj);
+
+FTS_API int fts_is_dsp_object(fts_object_t *o);
+FTS_API void fts_dsp_default_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /* test inputs */
 FTS_API int fts_dsp_is_sig_inlet(fts_object_t *object, int number);
@@ -260,14 +270,14 @@ FTS_API int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
 /* DSP active state (former dsp_on param) */
 FTS_API void fts_dsp_activate(void);
 FTS_API void fts_dsp_desactivate(void);
-FTS_API int fts_dsp_get_active(void);
+FTS_API int fts_dsp_is_active(void);
 FTS_API void fts_dsp_active_add_listener(fts_object_t *object, fts_method_t method);
 FTS_API void fts_dsp_active_remove_listener(fts_object_t *object);
 
 /* DSP edge */
 typedef struct fts_dsp_edge
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   int n_tick;
   double sr;
 } fts_dsp_edge_t;
@@ -408,7 +418,7 @@ FTS_API int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
  * @param array of arguments of the DSP function
  *
  * @see fts_dsp_declare_function()
- * @see fts_dsp_add_object()
+ * @see fts_dsp_object_init()
  *
  * @ingroup dsp
  */
@@ -439,12 +449,3 @@ FTS_API ftl_program_t *dsp_get_current_dsp_chain( void);
 FTS_API void fts_dsp_add_function_zero(fts_symbol_t out, int size);
 FTS_API void fts_dsp_add_function_fill(ftl_data_t value, fts_symbol_t out, int size);
 FTS_API void fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size);
-
-/* old names of user API */
-#define dsp_list_insert(o) fts_dsp_add_object(o)
-#define dsp_list_remove(o) fts_dsp_remove_object(o)
-#define dsp_sig_inlet(c, i) fts_dsp_declare_inlet((c), (i))
-#define dsp_sig_outlet(c, i) fts_dsp_declare_outlet((c), (i))
-#define dsp_declare_function(n, f) fts_dsp_declare_function((n), (f))
-#define dsp_add_funcall(s, n, a) fts_dsp_add_function((s), (n), (a))
-

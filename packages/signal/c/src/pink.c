@@ -45,7 +45,7 @@ typedef struct
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t data;
 } pink_t;
 
@@ -164,7 +164,7 @@ pink_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   pink_t *this = (pink_t *)o;
   pink_data_t *data;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->data = ftl_data_new(pink_data_t);
   data = (pink_data_t *)ftl_data_get_ptr(this->data);
@@ -184,7 +184,7 @@ pink_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pink_t *this = (pink_t *)o;
 
   ftl_data_free(this->data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

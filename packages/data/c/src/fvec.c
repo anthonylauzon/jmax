@@ -1475,7 +1475,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	size = fvec_load_audiofile(this, file_name, 0, 0);
 
       if(size == 0)
-	fts_object_set_error(o, "Cannot load fvec from file \"%s\"", file_name);
+	fts_object_set_error(o, "cannot load fvec from file \"%s\"", file_name);
 
       data_object_set_keep((data_object_t *)o, fts_s_args);
     }
@@ -1487,7 +1487,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_set_keep((data_object_t *)o, fts_s_args);
     }
   else
-    fts_object_set_error(o, "Wrong arguments for fvec constructor");
+    fts_object_set_error(o, "bad arguments for fvec constructor");
 }
 
 static void

@@ -57,8 +57,9 @@ typedef struct{
  *
  */
 
-typedef struct{
-  fts_object_t  _o;
+typedef struct
+{
+  fts_dsp_object_t  _o;
   fts_symbol_t name; /* its name */
   sampbuf_t buf; /* pointer to the sampbuf */
   float check_size; /* store size here to check it @ dsp start */
@@ -103,11 +104,11 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       this->unit = unit;
       
       ispw_register_named_object(o, this->name);
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
     {
-      fts_object_set_error(o, "Name required\n");
+      fts_object_set_error(o, "name required\n");
       return;
     }
 }
@@ -123,7 +124,7 @@ sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
       sampbuf_remove(this->name);
       sampbuf_erase(&this->buf);
       
-      fts_dsp_remove_object(o);
+      fts_dsp_object_delete((fts_dsp_object_t *)o);
     }
 }
  

@@ -49,7 +49,7 @@ binop_number_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   if(fts_is_number(at))
     this->right = at[0];
   else
-    fts_object_signal_runtime_error(o, "Bad value for right operand");
+    fts_object_signal_runtime_error(o, "bad value for right operand");
 }
 
 static void
@@ -64,12 +64,12 @@ binop_number_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       if(fts_is_number(at + 1))
 	this->right = at[1];
       else
-	fts_object_signal_runtime_error(o, "Bad value for left operand");
+	fts_object_signal_runtime_error(o, "bad value for left operand");
     case 1:
       if(fts_is_number(at))
 	this->left = at[0];
       else
-	fts_object_signal_runtime_error(o, "Bad value for left operand");
+	fts_object_signal_runtime_error(o, "bad value for left operand");
     case 0:
       break;
     }
@@ -103,7 +103,7 @@ binop_number_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const ft
   else if(ac > 0 && fts_is_float(at))
     this->type = binop_float;
   else
-    fts_object_set_error(o, "Bad argument");
+    fts_object_set_error(o, "bad argument");
 
   if(ac > 0)
     this->right = at[0];
@@ -133,7 +133,7 @@ binop_equal_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
      (this->type == binop_symbol && fts_is_symbol(at)))
     this->right = at[0];
   else
-    fts_object_signal_runtime_error(o, "Bad value for right operand");
+    fts_object_signal_runtime_error(o, "bad value for right operand");
 }
 
 static void
@@ -151,12 +151,12 @@ binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  if(fts_is_number(at + 1))
 	    this->right = at[1];
 	  else
-	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	    fts_object_signal_runtime_error(o, "bad value for left operand");
 	case 1:
 	  if(fts_is_number(at))
 	    this->left = at[0];
 	  else
-	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	    fts_object_signal_runtime_error(o, "bad value for left operand");
 	case 0:
 	  break;
 	}
@@ -171,12 +171,12 @@ binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  if(fts_is_symbol(at + 1))
 	    this->right = at[1];
 	  else
-	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	    fts_object_signal_runtime_error(o, "bad value for left operand");
 	case 1:
 	  if(fts_is_symbol(at))
 	    this->left = at[0];
 	  else
-	    fts_object_signal_runtime_error(o, "Bad value for left operand");
+	    fts_object_signal_runtime_error(o, "bad value for left operand");
 	case 0:
 	  break;
 	}
@@ -212,7 +212,7 @@ binop_equal_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts
   else if(ac > 0 && fts_is_symbol(at))
     this->type = binop_symbol;
   else
-    fts_object_set_error(o, "Bad argument");
+    fts_object_set_error(o, "bad argument");
 
   if(ac > 0)
     this->right = at[0];

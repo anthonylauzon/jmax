@@ -861,27 +861,6 @@ funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 
-/* method dump, inlet 0 */
-static void
-funbuff_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  funbuff_t *this = (funbuff_t *)o;
-  struct zll *list;
-  
-  if (! funbuff_first(this))
-    {
-      post("funbuff_dump: nothing to dump\n");
-      return;
-    }
-  
-  for(list = funbuff_first(this); list; list = list->next)
-    {
-      fts_outlet_int((fts_object_t *)this, 1, list->y);
-      fts_outlet_int((fts_object_t *)this, 0, list->x);
-    }
-}
-
-
 /*  returns *copy of selected region of list or 0  */
 /* method copy, inlet 0 */
 static void
@@ -1087,7 +1066,6 @@ funbuff_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("cut"), funbuff_cut);
   fts_class_message_varargs(cl, fts_new_symbol("copy"), funbuff_copy);
   fts_class_message_varargs(cl, fts_new_symbol("paste"), funbuff_paste);
-  fts_class_message_varargs(cl, fts_new_symbol("dump"), funbuff_dump);
   fts_class_message_varargs(cl, fts_new_symbol("find"), funbuff_find);
   fts_class_message_varargs(cl, fts_new_symbol("undo"), funbuff_undo);
 

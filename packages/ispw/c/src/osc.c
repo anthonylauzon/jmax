@@ -38,7 +38,8 @@
 
 static fts_hashtable_t *sigtab1_ht;
 
-typedef struct {
+typedef struct 
+{
   fts_object_t _o;
   wavetab_t *wavetab;
 } sigtab1_t;
@@ -76,7 +77,7 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 	}
     }
   else
-    fts_object_set_error(o, "Name argument required");
+    fts_object_set_error(o, "name argument required");
 }
 
 static void
@@ -112,7 +113,7 @@ sigtab1_instantiate(fts_class_t *cl)
 
 typedef struct 
 {
-  fts_object_t obj;
+  fts_dsp_object_t obj;
   fts_symbol_t sym;
   ftl_data_t ftl_data;
 } osc_t;
@@ -197,7 +198,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->ftl_data = osc_ftl_data_new();
   this->sym = sym;
 
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 static void
@@ -207,7 +208,7 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   ftl_data_free(this->ftl_data);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -235,7 +236,7 @@ osc_instantiate(fts_class_t *cl)
 
 typedef struct 
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   ftl_data_t state;
 } phasor_t;
 
@@ -292,7 +293,7 @@ phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->state = phasor_ftl_data_new();
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -301,7 +302,7 @@ phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   phasor_t *this = (phasor_t *)o;
 
   ftl_data_free(this->state);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

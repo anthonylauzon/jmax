@@ -74,6 +74,6 @@ typedef enum fts_connection_type
   fts_c_anything = 0, /* message, value or signal */
   fts_c_message = 1, /* message, value or signal */
   fts_c_value = 2, /* varargs (unpacked tuple) or single value */
-  fts_c_signal = 3, /* signal connection */
-  fts_c_signal_active = 4 /* active signal connection */
+  fts_c_audio = 3, /* signal connection */
+  fts_c_audio_active = 4 /* active signal connection */
 } fts_connection_type_t;

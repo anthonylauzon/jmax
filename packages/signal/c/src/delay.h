@@ -32,7 +32,7 @@
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   fts_dsp_edge_t *edge; /* DSP edge */
   float *buffer; /* pointer to delay line */
   int delay_size; /* size of delay buffer (max delay in samples) */

@@ -144,7 +144,7 @@ route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	fts_outlet_send(o, ns, s, ac, at);
     }
   else
-    fts_object_signal_runtime_error(o, "Don't understand %s", s);
+    fts_object_signal_runtime_error(o, "don't understand %s", s);
 }
 
 static void
@@ -160,10 +160,10 @@ route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       
       for(i=0; i<ac; i++)
 	{
-	  if(!fts_is_int(at + 1))
+	  if(!fts_is_int(at + i))
 	    all_int = 0;
 	  
-	  if(!fts_is_symbol(at + 1))
+	  if(!fts_is_symbol(at + i))
 	    all_symbol = 0;
 	}
       
@@ -190,10 +190,10 @@ route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  fts_object_set_outlets_number(o, ac + 1);
 	}
       else
-	fts_object_set_error(o, "Bad arguments");
+	fts_object_set_error(o, "bad arguments");
     }
   else
-    fts_object_set_error(o, "Arguments missing");
+    fts_object_set_error(o, "arguments missing");
 }
 
 static void

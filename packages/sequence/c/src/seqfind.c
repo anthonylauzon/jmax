@@ -142,7 +142,7 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_refer(this->track);
     }
   else
-    fts_object_set_error(o, "Argument of event track required");
+    fts_object_set_error(o, "argument of event track required");
 }
 
 static void 

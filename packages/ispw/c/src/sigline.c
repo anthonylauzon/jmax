@@ -33,10 +33,9 @@ typedef struct
   int steps;
 } line_control_t;
 
-
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   float time;
   int set;
   int vecsize;
@@ -162,15 +161,9 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ftl_data_set(line_control_t, this->ftl_data, steps, &i);
 
   if (down > 0)
-    {
-      fts_atom_t a;
+    fts_dsp_object_set_resampling((fts_dsp_object_t *)o, -down);
 
-      fts_set_int(&a, down);
-
-      fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
-    }
-
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -232,7 +225,7 @@ sigline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sigline_t *this = (sigline_t *)o;
 
   ftl_data_free(this->ftl_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 

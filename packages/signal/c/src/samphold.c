@@ -38,7 +38,7 @@ typedef struct
 
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   float val;
   float last;
   ftl_data_t data;
@@ -121,7 +121,7 @@ samphold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   data->last = INITVAL;
   data->val = 0.0;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -130,7 +130,7 @@ samphold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   samphold_t *this = (samphold_t *)o;
 
   ftl_data_free(this->data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

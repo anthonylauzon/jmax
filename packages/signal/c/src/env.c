@@ -34,7 +34,7 @@ static fts_symbol_t sym_continue = 0;
 
 typedef struct _env_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
 
   enum env_mode {mode_continue, mode_sustain} mode;
   enum env_status {status_hold, status_running} status;
@@ -597,7 +597,7 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   else
     env_set_current(this, this->local);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -609,7 +609,7 @@ env_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_object_release(this->current);
 
   fts_object_destroy((fts_object_t *)this->local);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

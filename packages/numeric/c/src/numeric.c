@@ -24,6 +24,7 @@
 
 #include "numeric.h"
 
+extern void abs_config(void);
 extern void clip_config(void);
 extern void fit_config(void);
 extern void wrap_config(void);
@@ -34,6 +35,10 @@ extern void logscale_config(void);
 
 extern void range_config(void);
 
+extern void for_config(void);
+extern void count_config(void);
+extern void ramp_config(void);
+
 extern void random_config(void);
 extern void drunk_config(void);
 
@@ -41,6 +46,7 @@ extern void drunk_config(void);
 void
 numeric_config(void)
 {
+  abs_config();
   clip_config();
   fit_config();
   wrap_config();
@@ -50,6 +56,10 @@ numeric_config(void)
   logscale_config();
 
   range_config();
+
+  for_config();
+  count_config();
+  ramp_config();
 
   random_config();
   drunk_config();

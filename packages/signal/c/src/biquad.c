@@ -38,7 +38,7 @@ static fts_symbol_t sym_biquad_inplace = 0;
 
 typedef struct
 {
-  fts_object_t head;
+  fts_dsp_object_t head;
   ftl_data_t biquad_state;
   ftl_data_t biquad_coefs;
 } biquad_t;
@@ -262,7 +262,7 @@ biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   biquad_state_clear(o, 0, 0, 0, 0);
   biquad_set_coefs(o, 0, 0, ac, at);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -273,7 +273,7 @@ biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   ftl_data_free(this->biquad_coefs);
   ftl_data_free(this->biquad_state);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 

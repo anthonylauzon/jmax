@@ -27,7 +27,7 @@ static fts_symbol_t matrix_copy_out_ftl_symbol = 0;
 
 typedef struct _matrix
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   fts_atom_t *ftl_args;
   int n_ins;
   int n_outs;
@@ -97,12 +97,12 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->cr = 1.0f; /* will be properly set in the put routine */
       this->n_tick = 0;
       
-      fts_dsp_add_object(o);
+      fts_dsp_object_init((fts_dsp_object_t *)o);
       fts_object_set_inlets_number(o, n_ins);
       fts_object_set_outlets_number(o, n_outs);      
     }
   else
-    fts_object_set_error(o, "Matrix dimension arguments required");
+    fts_object_set_error(o, "matrix dimension arguments required");
 }
 
 static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -111,7 +111,7 @@ static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   
   ftl_data_free((void *)this->ramps);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /**************************************************************

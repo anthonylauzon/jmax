@@ -164,7 +164,7 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   delayline_t *this = (delayline_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   delayline_initialize(this);
 
@@ -194,7 +194,7 @@ delayline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   delayline_t *this = (delayline_t *)o;
 
   delayline_destroy(this);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -221,7 +221,7 @@ delayline_instantiate(fts_class_t *cl)
 
 typedef struct 
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t samples;
   delayline_t *line;
   enum interpolation_mode {mode_none, mode_cubic} mode;
@@ -350,7 +350,7 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   delay_t *this = (delay_t *)o;
   ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = (delayline_t *)fts_malloc(sizeof(delayline_t));
   this->samples = samples;
@@ -376,7 +376,7 @@ delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   delayline_destroy(this->line);
   fts_free(this->line);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -508,7 +508,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   delay_t *this = (delay_t *)o;
   ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = NULL;
   this->samples = samples;
@@ -518,7 +518,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "First argument must be a delay line");
+      fts_object_set_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -534,7 +534,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   delay_t *this = (delay_t *)o;
   ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = NULL;
   this->samples = samples;
@@ -544,7 +544,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "First argument must be a delay line");
+      fts_object_set_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -563,7 +563,7 @@ tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_object_release((fts_object_t *)this->line);
 
   ftl_data_free(this->samples);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -686,7 +686,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   delay_t *this = (delay_t *)o;
   ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = NULL;
   this->samples = samples;
@@ -696,7 +696,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "First argument must be a delay line");
+      fts_object_set_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -816,7 +816,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 { 
   delay_t *this = (delay_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->line = NULL;
   this->samples = 0;
@@ -826,7 +826,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "First argument must be a delay line");
+      fts_object_set_error(o, "first argument must be a delay line");
       return;
     }
 

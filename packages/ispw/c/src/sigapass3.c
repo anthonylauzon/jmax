@@ -35,7 +35,7 @@ static fts_symbol_t sigapass3_function = 0;
 
 typedef struct 
 {
-  fts_object_t obj;
+  fts_dsp_object_t obj;
   ftl_data_t biquad_state;
   ftl_data_t biquad_coefs;
 } sigapass3_t;
@@ -137,7 +137,7 @@ sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   data->b1 = 0.0;
   data->b2 = 0.0;
 
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 static void
@@ -148,7 +148,7 @@ sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ftl_data_free(this->biquad_coefs);
   ftl_data_free(this->biquad_state);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

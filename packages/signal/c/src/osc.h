@@ -50,7 +50,7 @@ extern struct osc_ftl_symbols osc_ftl_symbols_fvec;
 
 typedef struct _osc_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
   ftl_data_t data;
   int fvec;
   double freq;

@@ -58,7 +58,7 @@ typedef enum {
 } readsf_state_t;
 
 typedef struct {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   int n_channels;
   readsf_state_t state;
   dtdserver_t *server;
@@ -248,7 +248,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   if(!this->server)
     {
-      fts_object_set_error( o, "Error starting direct-to-disk server");
+      fts_object_set_error( o, "error starting direct-to-disk server");
       return;
     }
 
@@ -257,7 +257,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   this->state = readsf_closed;
   this->can_post_data_late = 1;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->timebase = fts_get_timebase();
   fts_object_set_outlets_number(o, n_channels);
@@ -271,7 +271,7 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
   fts_timebase_remove_object( this->timebase, (fts_object_t *)this);	
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void clear_outputs( int n, int n_channels, fts_word_t *outputs)
@@ -468,7 +468,7 @@ typedef enum {
 } writesf_state_t;
 
 typedef struct {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   int n_channels;
   writesf_state_t state;
   dtdserver_t *server;
@@ -603,7 +603,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if (!this->server)
     {
-      fts_object_set_error( o, "Error starting direct-to-disk server");
+      fts_object_set_error( o, "error starting direct-to-disk server");
       return;
     }
 
@@ -612,7 +612,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->state = writesf_closed;
   this->can_post_fifo_overflow = 1;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->timebase = fts_get_timebase();
   fts_object_set_inlets_number(o, n_channels);
@@ -626,7 +626,7 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   fts_timebase_remove_object( this->timebase, (fts_object_t *)this);	
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *inputs)

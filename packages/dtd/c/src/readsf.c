@@ -36,7 +36,7 @@
  */
 typedef struct
 {
-    fts_object_t head;
+    fts_dsp_object_t head;
     int n_channels;
     fts_symbol_t filename;
 
@@ -315,7 +315,7 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
   fts_object_set_outlets_number(o, n_channels);
 }
 
@@ -340,7 +340,7 @@ static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   }
   fts_free(self->com_buffer);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 

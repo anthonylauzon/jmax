@@ -198,3 +198,17 @@ fts_list_get_values( const fts_list_t *list, fts_iterator_t *i)
   i->data = (void *)list;
 }
 
+int
+fts_list_get_size( const fts_list_t *list)
+{
+  int n = 0;
+
+  while(list) 
+    {
+      n++;
+      list = list->next;
+    }
+  
+  return n;
+}
+

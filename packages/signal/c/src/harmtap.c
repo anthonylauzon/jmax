@@ -183,7 +183,7 @@ harmtap_params_reset(harmtap_params_t *params, double sr, int n_tick)
 
 typedef struct _harmtap_
 {
-  fts_object_t obj;
+  fts_dsp_object_t obj;
   fts_symbol_t name;
   fts_object_t *next; /* pointer to the other delreader for the same delay line */ 
   ftl_data_t params;
@@ -210,7 +210,7 @@ harmtap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_symbol(argv + 0, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(argv + 1, this->params);
   fts_set_int(argv + 2, n_tick);
-  dsp_add_funcall(harmtap_dsp_symbol, 3, argv);
+  fts_dsp_add_function(harmtap_dsp_symbol, 3, argv);
 }
 
 static void
@@ -418,7 +418,7 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->params = ftl_data_new(harmtap_params_t);
   params = ftl_data_get_ptr(this->params);
@@ -427,7 +427,7 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   harmtap_set(o, 0, 0, ac, at);
 
   if(params->delayline == NULL)
-    fts_object_set_error(o, "First argument of delay~ required");
+    fts_object_set_error(o, "first argument of delay~ required");
 }
 
 
@@ -437,7 +437,7 @@ harmtap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   harmtap_t *this = (harmtap_t *)o;
 
   ftl_data_free(this->params);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -458,11 +458,11 @@ harmtap_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 1, harmtap_set_delay);
   fts_class_inlet_float(cl, 1, harmtap_set_delay);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);        
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);        
   
   harmtap_dsp_symbol = fts_new_symbol("ftl_harmtap");
-  dsp_declare_function(harmtap_dsp_symbol, ftl_harmtap);
+  fts_dsp_declare_function(harmtap_dsp_symbol, ftl_harmtap);
   
   if(!harmtap_window)
     harmtap_window = fts_fftab_get_sine_first_half(WINDOW_SIZE);

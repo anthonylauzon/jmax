@@ -56,7 +56,7 @@ tabpoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       this->state = 0;
     }
   else
-    fts_object_set_error(o, "Name argument required");
+    fts_object_set_error(o, "name argument required");
 }
 
 

@@ -4,9 +4,11 @@ libnumeric_la_SOURCES= \
 numeric.c \
 abs.c \
 clip.c \
+count.c \
 drunk.c \
 exscale.c \
 fit.c \
+for.c \
 logscale.c \
 random.c \
 range.c \

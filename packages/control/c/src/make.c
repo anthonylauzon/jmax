@@ -56,7 +56,7 @@ make_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(error)
     {
       fts_object_destroy((fts_object_t *)obj);
-      fts_object_signal_runtime_error(o, "Error in object creation: %s", error);
+      fts_object_signal_runtime_error(o, "error in object creation: %s", error);
       return;
     }
 
@@ -99,7 +99,7 @@ make_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     make_set_classname(o, 0, 0, 1, at);
   
   if(this->class == 0)
-    fts_object_set_error(o, "Invalid class name");
+    fts_object_set_error(o, "invalid class name");
 }
 
 static void

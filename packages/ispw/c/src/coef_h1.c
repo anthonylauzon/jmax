@@ -63,7 +63,7 @@ sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   float s_rate;
   float s_gain0;
   float s_gain1;
@@ -138,7 +138,7 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_set_float(&a, f2);
   sigcoef_hlshelf1_in4(o, 4, s, 1, &a);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -269,7 +269,7 @@ sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 sigcoef_hlshelf1_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

@@ -120,7 +120,7 @@ FTS_API void fts_class_default_error_handler(fts_object_t *o, int winlet, fts_sy
 /* method definition */
 FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
 FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_metaclass_t *type, fts_method_t mth);
-FTS_API void fts_class_inlet_anything(fts_class_t *cl, int woutlet);
+FTS_API void fts_class_inlet_anything(fts_class_t *cl, int winlet);
 
 /* outlet definition */
 FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_metaclass_t *type);

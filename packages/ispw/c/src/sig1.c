@@ -27,8 +27,7 @@ static fts_symbol_t sig_64_dsp_function = 0;
 
 typedef struct 
 {
-  fts_object_t _o;
-
+  fts_dsp_object_t _o;
   ftl_data_t sig_ftl_data;
 } sigobj_t;
 
@@ -44,14 +43,9 @@ sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   ftl_data_copy(float, this->sig_ftl_data, &value);
 
   if (down > 0)
-    {
-      fts_atom_t a;
+    fts_dsp_object_set_resampling((fts_dsp_object_t *)o, -down);
 
-      fts_set_int(&a, down);
-      fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
-    }
-
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 
@@ -61,7 +55,7 @@ sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   sigobj_t *this = (sigobj_t *)o;
 
   ftl_data_free(this->sig_ftl_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /**********************************************************

@@ -19,16 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
-/* resample.c */
-
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
 #include <string.h>
 
-
-/* ------------------------------ sigup~ ------------------------------- */
 static fts_symbol_t sigup_function = 0;
 
 typedef struct
@@ -38,8 +33,7 @@ typedef struct
 
 typedef struct up
 {
-  fts_object_t _o;
-
+  fts_dsp_object_t _o;
   ftl_data_t up_ftl_data;
 } sigup_t;
 
@@ -99,8 +93,10 @@ sigup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   sigup_t *this = (sigup_t *)o;
 
+  fts_dsp_object_init((fts_dsp_object_t *)o);
+  fts_dsp_object_set_resampling((fts_dsp_object_t *)o, 1);
+
   this->up_ftl_data = ftl_data_new(up_state_t);
-  fts_dsp_add_object(o);
 }
 
 static void
@@ -109,27 +105,22 @@ sigup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sigup_t *this = (sigup_t *)o;
 
   ftl_data_free(this->up_ftl_data);
-  fts_dsp_remove_object(o);
+
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
 sigup_instantiate(fts_class_t *cl)
 {
-  fts_atom_t a;
-
   fts_class_init(cl, sizeof(sigup_t), sigup_init, sigup_delete);
-
-  fts_class_message_varargs(cl, fts_s_put, sigup_put);
-
-  fts_set_int(&a, 1);
-  fts_class_put_prop(cl, fts_s_dsp_upsampling, &a);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
+  fts_class_message_varargs(cl, fts_s_put, sigup_put);
   
   sigup_function = fts_new_symbol("up");
   fts_dsp_declare_function(sigup_function, ftl_up);
-  }
+}
 
 void
 sigup_config(void)
@@ -137,12 +128,11 @@ sigup_config(void)
   fts_class_install(fts_new_symbol("up~"),sigup_instantiate);
 }
 
-/* ------------------------------ sigdown~ ------------------------------- */
 static fts_symbol_t sigdown_function = 0;
 
 typedef struct down
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
 } sigdown_t;
 
 
@@ -175,26 +165,22 @@ sigdown_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 sigdown_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
+  fts_dsp_object_set_resampling((fts_dsp_object_t *)o, -1);
 }
 
 static void
 sigdown_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
 sigdown_instantiate(fts_class_t *cl)
 {
-  fts_atom_t a;
-
   fts_class_init(cl, sizeof(sigdown_t), sigdown_init, sigdown_delete);
 
   fts_class_message_varargs(cl, fts_s_put, sigdown_put);
-
-  fts_set_int(&a, 1);
-  fts_class_put_prop(cl, fts_s_dsp_downsampling, &a);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -40,18 +40,14 @@ extern void demux_config(void);
 extern void select_config(void);
 extern void change_config(void);
 
-extern void for_config(void);
-extern void count_config(void);
-
 extern void make_config(void);
-extern void mess_config(void);
 extern void invoke_config(void);
 
 extern void metro_config(void);
 extern void delay_config(void);
-extern void line_config(void);
 extern void retard_config(void);
 extern void speedlim_config(void);
+extern void timer_config(void);
 
 void
 control_config(void)
@@ -70,16 +66,12 @@ control_config(void)
   select_config();
   change_config();
 
-  for_config();
-  count_config();
-
   make_config();
-  mess_config();
   invoke_config();
 
   metro_config();
   delay_config();
-  line_config();
   retard_config();
   speedlim_config();
+  timer_config();
 }

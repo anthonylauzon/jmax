@@ -22,8 +22,9 @@
 #include <fts/fts.h>
 #include <utils/c/include/utils.h>
 
-typedef struct noise_t {
-  fts_object_t _o;
+typedef struct
+{
+  fts_dsp_object_t _o;
 } noise_t;
 
 static fts_symbol_t noise_dsp_symbol = 0;
@@ -56,7 +57,7 @@ noise_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   noise_t *this = (noise_t *) o;
 
-  fts_dsp_add_object(o); /* just put object in list */
+  fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 static void
@@ -64,7 +65,7 @@ noise_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   noise_t *this = (noise_t *) o;
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

@@ -217,7 +217,7 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
 
   if ( ++objects_count > 1)
     {
-      fts_object_set_error( o, "Object client_manager already exists");
+      fts_object_set_error( o, "object client_manager already exists");
       return;
     }
 
@@ -990,7 +990,7 @@ static void client_predefine_objects( client_t *this)
 
   if ( !this->root_patcher)
     {
-      fts_object_set_error( (fts_object_t *)this, "Cannot create client root patcher");
+      fts_object_set_error( (fts_object_t *)this, "cannot create client root patcher");
       return;
     }
 
@@ -1013,7 +1013,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
        || !fts_bytestream_is_input( this->stream) 
        || !fts_bytestream_is_output( this->stream))
     {
-      fts_object_set_error( (fts_object_t *)this, "Invalid stream");
+      fts_object_set_error( (fts_object_t *)this, "invalid stream");
       return;
     }
 
@@ -1141,7 +1141,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_symbol_t s_label = fts_new_symbol( "label");
 
 #ifdef REIMPLEMENTING_VARIABLES
-  fts_object_set_error( (fts_object_t *)this, "First argument does not refer to an object");
+  fts_object_set_error( (fts_object_t *)this, "object required");
 #else
   this->gate = 0;
 
@@ -1150,13 +1150,13 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   if ( !((ac == 1 || ac == 2) && fts_is_symbol( at) && ( (ac==2) ? fts_is_int( at+1) : 1)) )
     {
-      fts_object_set_error( (fts_object_t *)this, "Invalid arguments (symbol [int])");
+      fts_object_set_error( (fts_object_t *)this, "invalid arguments (symbol [int])");
       return;
     }
 
   if ( !fts_is_symbol( at))
     {
-      fts_object_set_error( (fts_object_t *)this, "First argument must be a symbol");
+      fts_object_set_error( (fts_object_t *)this, "first argument must be a symbol");
       return;
     }
 
@@ -1165,7 +1165,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   v = fts_variable_get_value( fts_object_get_patcher(o), name);
   if (!v || !fts_is_object(v))
     {
-      fts_object_set_error( (fts_object_t *)this, "First argument does not refer to an object");
+      fts_object_set_error( (fts_object_t *)this, "first argument does not refer to an object");
       return;
     }
 
@@ -1174,7 +1174,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
  
   if (target_class_name != s_bus && target_class_name != s_label)
     {
-      fts_object_set_error( (fts_object_t *)this, "First argument must be a \"bus\" or a \"label\"");
+      fts_object_set_error( (fts_object_t *)this, "first argument must be a \"bus\" or a \"label\"");
       return;
     }
 
@@ -1208,7 +1208,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   if( !from || !to)
     {
-      fts_object_set_error( (fts_object_t *)this, "Cannot create connection objects");
+      fts_object_set_error( (fts_object_t *)this, "cannot create connection objects");
       return;
     }
 

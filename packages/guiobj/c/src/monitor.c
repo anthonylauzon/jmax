@@ -44,7 +44,7 @@ static void
 monitor_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   monitor_t *this = (monitor_t *) o;
-  int active = fts_dsp_get_active();
+  int active = fts_dsp_is_active();
   fts_atom_t a;
 
   fts_set_int( &a, active);
@@ -61,9 +61,9 @@ static void
 monitor_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   monitor_t *this = (monitor_t *) o;
-  int active = fts_dsp_get_active();
+  int active = fts_dsp_is_active();
 
-  if(active)
+  if(fts_dsp_is_active())
     fts_dsp_desactivate();
   else
     fts_dsp_activate();
@@ -75,7 +75,7 @@ static void
 monitor_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   monitor_t *this = (monitor_t *)obj;
-  int active = fts_dsp_get_active();
+  int active = fts_dsp_is_active();
 
   fts_set_int(value, active);
 }
@@ -107,7 +107,7 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->port = fts_audioport_get_default(o);
   if (!this->port)
     {
-      fts_object_set_error( o, "Default audio port is not defined");
+      fts_object_set_error( o, "default audio port is not defined");
       return;    
     }
 

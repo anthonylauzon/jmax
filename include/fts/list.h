@@ -162,5 +162,6 @@ FTS_API void fts_list_delete( fts_list_t *list);
  * @param i the iterator
  * @ingroup list */
 FTS_API void fts_list_get_values( const fts_list_t *list, fts_iterator_t *i );
+FTS_API int fts_list_get_size( const fts_list_t *list);
 
 

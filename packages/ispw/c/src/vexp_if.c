@@ -168,7 +168,7 @@ expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
     }
 
-  fts_object_set_error(o, "Wrong arguments");
+  fts_object_set_error(o, "bad arguments");
 }
 
 static void

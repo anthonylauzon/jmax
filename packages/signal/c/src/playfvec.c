@@ -33,7 +33,7 @@ static fts_symbol_t play_fvec_symbol = 0;
 
 typedef struct _play_fvec_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
 
   fvec_t *fvec;
 
@@ -437,17 +437,17 @@ play_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(ac > 0 && fts_is_object(at))
     play_fvec_set((fts_object_t *)this, 0, 0, ac, at);
   else
-    fts_object_set_error((fts_object_t *)this, "Something to play required as first argument");
+    fts_object_set_error((fts_object_t *)this, "fvec required as first argument");
 
   play_fvec_set_conv_position(this, 0.001 * fts_dsp_get_sample_rate());
 
-  fts_dsp_add_object((fts_object_t *)this);
+  fts_dsp_object_init((fts_dsp_object_t *)(fts_object_t *)this);
 }
 
 static void
 play_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

@@ -1039,7 +1039,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       if(fts_is_symbol(at))
 	this->type = fts_get_symbol(at);
       else
-	fts_object_set_error(o, "Wrong argument");
+	fts_object_set_error(o, "bad argument");
     }
 }
 

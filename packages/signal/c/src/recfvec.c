@@ -37,7 +37,7 @@
 
 typedef struct _rec_fvec_
 {
-  fts_object_t o;
+  fts_dsp_object_t o;
 
   fvec_t *fvec;
 
@@ -284,7 +284,7 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 { 
   rec_fvec_t *this = (rec_fvec_t *)o;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 
   this->index = 0.0;
 
@@ -300,13 +300,13 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac > 0 && fts_is_a(at, fvec_type))
     rec_fvec_set(o, 0, 0, ac, at);
   else
-    fts_object_set_error(o, "First argument of fvec required");
+    fts_object_set_error(o, "first argument of fvec required");
 }
 
 static void
 rec_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

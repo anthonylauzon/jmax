@@ -80,7 +80,6 @@ fts_symbol_t sym_setPatcherBounds = 0;
 fts_symbol_t sym_addObject = 0;
 fts_symbol_t sym_addConnection = 0;
 fts_symbol_t sym_redefineConnection = 0;
-fts_symbol_t sym_releaseConnection = 0;
 fts_symbol_t sym_redefineObject = 0;
 fts_symbol_t sym_objectRedefined = 0;
 fts_symbol_t sym_setRedefined = 0;
@@ -498,7 +497,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_refer(obj);
     }
   else
-    fts_object_set_error(o, "Bad argument");
+    fts_object_set_error(o, "bad argument");
 }
 
 static void
@@ -642,7 +641,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       if(!meth)
 	{
-	  fts_object_set_error(o, "Cannot connect to object");
+	  fts_object_set_error(o, "cannot connect to object");
 	  return;
 	}
       
@@ -654,7 +653,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_object_refer(obj);
     }
   else
-    fts_object_set_error(o, "Bad argument");
+    fts_object_set_error(o, "bad argument");
 }
 
 static void
@@ -1038,6 +1037,9 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       p = this->objects;
       while (p->next_in_patcher)
 	p = p->next_in_patcher;
+      
+      if(fts_dsp_is_active() && fts_is_dsp_object(p))
+	fts_dsp_desactivate();
 
       fts_object_delete_from_patcher(p);
     }
@@ -1607,15 +1609,6 @@ fts_patcher_redefine_connection(fts_object_t *patcher, fts_connection_t *c)
   fts_client_done_message( patcher);
 }
 
-void 
-fts_patcher_release_connection(fts_object_t *patcher, fts_connection_t *c)
-{
-  fts_atom_t a[1];
-
-  fts_set_object(a, (fts_object_t *)c);
-  fts_client_send_message( patcher, sym_releaseConnection, 1, a);
-}
-
 static void 
 fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1718,7 +1711,12 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 	  obj = fts_get_object(at + i);
 
 	  if (obj)
-	    fts_object_delete_from_patcher(obj);
+	    {
+	      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
+		fts_dsp_desactivate();
+
+	      fts_object_delete_from_patcher(obj);
+	    }
 	}
       
         fts_patcher_set_dirty((fts_patcher_t *)o, 1);
@@ -1768,11 +1766,14 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
 static void 
 fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_connection_t *c = (fts_connection_t *)fts_get_object( at);
+  fts_connection_t *connection = (fts_connection_t *)fts_get_object( at);
 
-  if (c)
+  if (connection)
     {
-      fts_connection_delete(c);
+      if(fts_connection_get_type(connection) == fts_c_audio_active)
+	fts_dsp_desactivate();
+
+      fts_connection_delete(connection);
       fts_patcher_set_dirty((fts_patcher_t *)o, 1);
     }
 }
@@ -2125,7 +2126,6 @@ void fts_kernel_patcher_init(void)
   sym_addObject = fts_new_symbol("addObject");
   sym_addConnection = fts_new_symbol("addConnection");
   sym_redefineConnection = fts_new_symbol("redefineConnection");
-  sym_releaseConnection = fts_new_symbol("releaseConnection");
   sym_redefineObject = fts_new_symbol("redefineObject");
   sym_objectRedefined = fts_new_symbol("objectRedefined");
   sym_setRedefined = fts_new_symbol("setRedefined");

@@ -4,16 +4,12 @@ libcontrol_la_SOURCES= \
 bus.c \
 change.c \
 control.c \
-count.c \
 delay.c \
 demux.c \
 dispatch.c \
 fifo.c \
-for.c \
 invoke.c \
-line.c \
 make.c \
-mess.c \
 metro.c \
 oneshot.c \
 retard.c \
@@ -22,6 +18,7 @@ speedlim.c \
 stack.c \
 switch.c \
 sync.c \
+timer.c \
 tup.c
 
 noinst_HEADERS=\

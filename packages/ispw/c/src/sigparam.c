@@ -32,7 +32,7 @@
 
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   float c_rate;
   int c_vecsize;
   int c_isvecsize;
@@ -69,7 +69,7 @@ sigsamplerate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   x->c_vecsize   = -1;
   x->c_isvecsize = 0;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -80,13 +80,13 @@ sigvectorsize_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   x->c_vecsize   = -1;
   x->c_isvecsize = 1;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
 sigparam_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void

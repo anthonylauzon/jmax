@@ -648,7 +648,7 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       else
 	{
 	  dict_clear(o, 0, 0, 0, 0);
-	  fts_object_set_error(o, "Wrong key type in initialization");
+	  fts_object_set_error(o, "wrong key type in initialization");
 	}
 
       data_object_set_keep((data_object_t *)o, fts_s_args);

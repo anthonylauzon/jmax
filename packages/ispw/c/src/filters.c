@@ -70,9 +70,9 @@ compute_biquad(float *x, float *y, biquad_state_t *state, biquad_coefs_t *coefs,
 
 static void sig2p2z_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-static fts_symbol_t sig2p2z_function = 0;
-static fts_symbol_t sig2p2z_64_function = 0;
-static fts_symbol_t sig2p2z_64_1ops_function = 0;
+static fts_symbol_t sym_sig2p2z = 0;
+static fts_symbol_t sym_sig2p2z_64 = 0;
+static fts_symbol_t sym_sig2p2z_64_1ops = 0;
 
 typedef struct ctlf2p2z		/* control structure for 2p2z~ */
 {
@@ -89,7 +89,7 @@ typedef struct ctlf2p2z		/* control structure for 2p2z~ */
 
 typedef struct
 {
-  fts_object_t _o;
+  fts_dsp_object_t _o;
   ftl_data_t ftl_data;
 } sig2p2z_t;
 
@@ -221,14 +221,14 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	{
 	  fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));
 	  fts_set_ftl_data(argv + 1, this->ftl_data);
-	  fts_dsp_add_function(sig2p2z_64_1ops_function, 2, argv);
+	  fts_dsp_add_function(sym_sig2p2z_64_1ops, 2, argv);
 	}
       else
 	{
 	  fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_ftl_data(argv+2, this->ftl_data);
-	  fts_dsp_add_function(sig2p2z_64_function, 3, argv);
+	  fts_dsp_add_function(sym_sig2p2z_64, 3, argv);
 	}
     }
   else
@@ -238,7 +238,7 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_ftl_data(argv+2, this->ftl_data);
 
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
-      fts_dsp_add_function(sig2p2z_function, 4, argv);
+      fts_dsp_add_function(sym_sig2p2z, 4, argv);
     }
 }
 
@@ -330,7 +330,7 @@ sig2p2z_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   sig2p2z_set(o, winlet, s, ac, at);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -339,7 +339,7 @@ sig2p2z_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sig2p2z_t *this = (sig2p2z_t *)o;
 
   ftl_data_free(this->ftl_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
@@ -369,17 +369,19 @@ sig2p2z_instantiate(fts_class_t *cl)
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  }
+}
 
 static void 
 sig2p2z_config(void)
 {
-  sig2p2z_function = fts_new_symbol("2p2z");
-  fts_dsp_declare_function(sig2p2z_function, ftl_2p2z);
+  sym_sig2p2z = fts_new_symbol("2p2z~");
+  fts_dsp_declare_function(sym_sig2p2z, ftl_2p2z);
 
-  sig2p2z_64_function = fts_new_symbol("2p2z_64");
-  fts_dsp_declare_function(sig2p2z_64_function, ftl_64_2p2z);
+  sym_sig2p2z_64 = fts_new_symbol("2p2z~ (64)");
+  fts_dsp_declare_function(sym_sig2p2z_64, ftl_64_2p2z);
 
-  sig2p2z_64_1ops_function = fts_new_symbol("2p2z_64_1ops");
-  fts_dsp_declare_function(sig2p2z_64_1ops_function, ftl_64_1ops_2p2z);
+  sym_sig2p2z_64_1ops = fts_new_symbol("2p2z~ (64, 1ops)");
+  fts_dsp_declare_function(sym_sig2p2z_64_1ops, ftl_64_1ops_2p2z);
+
+  fts_class_install(sym_sig2p2z, sig2p2z_instantiate);
 }

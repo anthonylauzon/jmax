@@ -42,8 +42,8 @@ public class FtsConnection extends FtsObject
   public static final int fts_connection_anything = 0; /* message which is not one of the following */
   public static final int fts_connection_message = 1; /* message */
   public static final int fts_connection_value = 2; /* varargs (unpacked tuple) or single value */
-  public static final int fts_connection_signal = 3; /* signal connection */
-  public static final int fts_connection_signal_active = 4; /* active signal connection */
+  public static final int fts_connection_audio = 3; /* signal connection */
+  public static final int fts_connection_audio_active = 4; /* active signal connection */
 
   private transient int id;
 

@@ -41,8 +41,7 @@ static fts_symbol_t fts_s_jump;
 
 typedef struct
 {
-  fts_object_t _o;
-
+  fts_dsp_object_t _o;
   fts_symbol_t tab_name; /* name of table */
   float          max_speed; /* maximum up-shift of pitch */
   fts_symbol_t   unit;
@@ -75,7 +74,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   ftl_data_set(sampread_ctl_t, this->sampread_data, last_in, &zero);
   ftl_data_set(sampread_ctl_t, this->sampread_data, conv,    &zero);
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -84,7 +83,7 @@ sampread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   sampread_t *this = (sampread_t *)o;
 
   ftl_data_free(this->sampread_data);
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /******************************************************************

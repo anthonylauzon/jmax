@@ -244,13 +244,12 @@ class_outlet_add_declaration(fts_class_outlet_t *out, const fts_atom_t *a)
 int 
 class_outlet_get_declarations(fts_class_outlet_t *out, fts_iterator_t *iter)
 {
-  fts_list_get_values(out->declarations, iter);
+  int n = fts_list_get_size(out->declarations);
+
+  if(n > 0)
+    fts_list_get_values(out->declarations, iter);
   
-  if(fts_iterator_has_more(iter))
-    return 1;
-
-  return 0;
-
+  return n;
 }
 
 int
@@ -258,7 +257,7 @@ class_outlet_has_declaration(fts_class_outlet_t *out, const fts_atom_t *p)
 {
   fts_iterator_t iter;
 
-  if(class_outlet_get_declarations(out, &iter))
+  if(class_outlet_get_declarations(out, &iter) > 0)
     {
       while(fts_iterator_has_more(&iter)) 
 	{
@@ -280,12 +279,12 @@ fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int
   if(s == 0)
     {
       if(ac > 0)
-	fts_object_signal_runtime_error(o, "No tuple method at inlet %d", s, winlet);
+	fts_object_signal_runtime_error(o, "no tuple method at inlet %d", s, winlet);
       else
-	fts_object_signal_runtime_error(o, "No method for %s at inlet %d", fts_get_class_name(at), winlet);
+	fts_object_signal_runtime_error(o, "no method for %s at inlet %d", fts_get_class_name(at), winlet);
     }
   else
-    fts_object_signal_runtime_error(o, "Don't understand %s", s);    
+    fts_object_signal_runtime_error(o, "don't understand %s", s);    
 }
 
 /********************************************

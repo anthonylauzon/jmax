@@ -28,8 +28,7 @@
 
 typedef struct
 {
-  fts_object_t _o;
-
+  fts_dsp_object_t _o;
   ftl_data_t ftl_data_min;
   ftl_data_t ftl_data_max;
 } clip_t;
@@ -140,7 +139,7 @@ clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else
     *max = 1.0;
 
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 
@@ -152,11 +151,11 @@ clip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ftl_data_free(this->ftl_data_min);
   ftl_data_free(this->ftl_data_max);
 
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
-class_instantiate(fts_class_t *cl)
+clip_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(clip_t), clip_init, clip_delete);
 
@@ -178,5 +177,5 @@ signal_clip_config(void)
   sym_clip = fts_new_symbol("clip~");
   fts_dsp_declare_function(sym_clip, ftl_clip);
 
-  fts_class_install(sym_clip, class_instantiate);
+  fts_class_install(sym_clip, clip_instantiate);
 }

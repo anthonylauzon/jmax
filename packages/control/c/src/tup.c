@@ -278,7 +278,7 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
       else
 	{
-	  fts_object_set_error(o, "Bad argument");
+	  fts_object_set_error(o, "bad argument");
 	  return;
 	}
 
@@ -576,55 +576,56 @@ getup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-getup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getup_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cotup_t *this = (cotup_t *)o;
 
-  if(s == 0)
+  fts_array_clear(&this->array);
+  fts_array_append_symbol(&this->array, s);
+  fts_array_append(&this->array, ac, at);
+  
+  cotup_output(o, 0, 0, 0, 0);
+}
+
+static void
+getup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cotup_t *this = (cotup_t *)o;
+  
+  if(ac == 1)
     {
-      if(ac == 1)
+      if(fts_is_object(at))
 	{
-	  if(fts_is_object(at))
+	  cotup_t *this = (cotup_t *)o;
+	  fts_object_t *input = fts_get_object(at);
+	  fts_class_t *class = fts_object_get_class(input);
+	  fts_method_t method = fts_class_get_method(class, fts_s_get_array);
+	  
+	  if(method)
 	    {
-	      cotup_t *this = (cotup_t *)o;
-	      fts_object_t *input = fts_get_object(at);
-	      fts_class_t *class = fts_object_get_class(input);
-	      fts_method_t method = fts_class_get_method(class, fts_s_get_array);
+	      fts_atom_t a;
+	      int size;
+	      fts_atom_t *atoms;
+	      fts_atom_t *output;
+	      int i;
 	      
-	      if(method)
-		{
-		  fts_atom_t a;
-		  int size;
-		  fts_atom_t *atoms;
-		  fts_atom_t *output;
-		  int i;
-		  
-		  fts_array_clear(&this->array);
-		  
-		  /* get object state as array */
-		  fts_set_pointer(&a, &this->array);
-		  method(input, 0, fts_s_get_array, 1, &a);
-		  
-		  /* output array */
-		  cotup_output(o, 0, 0, 0, 0);
-		}
-	      else
-		fts_object_signal_runtime_error(o, "Cannot get tuple from %s object", fts_object_get_class_name(input));
+	      fts_array_clear(&this->array);
+	      
+	      /* get object state as array */
+	      fts_set_pointer(&a, &this->array);
+	      method(input, 0, fts_s_get_array, 1, &a);
+	      
+	      /* output array */
+	      cotup_output(o, 0, 0, 0, 0);
 	    }
 	  else
-	    fts_outlet_varargs(o, 0, 1, at);
+	    fts_object_signal_runtime_error(o, "cannot get tuple from %s object", fts_object_get_class_name(input));
 	}
       else
-	fts_outlet_varargs(o, 0, ac, at);
+	fts_outlet_varargs(o, 0, 1, at);
     }
   else
-    {
-      fts_array_clear(&this->array);
-      fts_array_append_symbol(&this->array, s);
-      fts_array_append(&this->array, ac, at);
-
-      cotup_output(o, 0, 0, 0, 0);
-    }
+    fts_outlet_varargs(o, 0, ac, at);
 }
 
 static void
@@ -632,8 +633,64 @@ getup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cotup_t), getup_init, getup_delete);
 
-  fts_class_set_default_handler(cl, getup_input);
+  fts_class_set_default_handler(cl, getup_message);
+  fts_class_inlet_varargs(cl, 0, getup_varargs);
   fts_class_outlet_varargs(cl, 0);
+}
+
+typedef struct 
+{
+  fts_object_t o;
+  fts_symbol_t selector;
+} messtup_t;
+
+static void
+messtup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtup_t *this = (messtup_t *)o;
+
+  if(this->selector != NULL)
+    fts_outlet_send(o, 0, this->selector, ac, at);
+  else 
+    {
+      if(fts_is_symbol(at))
+	fts_outlet_send(o, 0, fts_get_symbol(at), ac - 1, at + 1);
+      else
+	fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
+    }
+}
+
+static void
+messtup_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtup_t *this = (messtup_t *)o;
+  fts_symbol_t selector = fts_get_symbol(at);
+  
+  this->selector = selector;
+}
+
+static void
+messtup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  messtup_t *this = (messtup_t *)o;
+  
+  this->selector = NULL;
+
+  if(ac > 0 && fts_is_symbol(at))
+    messtup_set_selector(o, 0, 0, 1, at);
+}
+
+static void
+messtup_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(messtup_t), messtup_init, NULL);
+  
+  fts_class_message_varargs(cl, fts_s_bang, messtup_varargs);
+
+  fts_class_inlet_varargs(cl, 0, messtup_varargs);  
+  fts_class_inlet_symbol(cl, 1, messtup_set_selector);
+
+  fts_class_outlet_anything(cl, 0);
 }
 
 /************************************************
@@ -656,4 +713,5 @@ tup_config(void)
   fts_class_install(fts_new_symbol("cotup"), cotup_instantiate);
   fts_class_install(fts_new_symbol("detup"), detup_instantiate);
   fts_class_install(fts_new_symbol("getup"), getup_instantiate);
+  fts_class_install(fts_new_symbol("messtup"), messtup_instantiate);
 }

@@ -36,7 +36,7 @@ static fts_symbol_t tanh_symbol;
 
 typedef struct
 {
-  fts_object_t head;
+  fts_dsp_object_t head;
 } vectrigon_t;
 
 /************************************************
@@ -227,13 +227,13 @@ tanh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 vectrigon_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_add_object(o);
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
 vectrigon_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_remove_object(o);
+  fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
