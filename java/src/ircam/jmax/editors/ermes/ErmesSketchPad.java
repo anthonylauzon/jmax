@@ -766,16 +766,19 @@ Rectangle previousResizeRect = new Rectangle();
   
   
   public void InitFromFtsContainer(FtsContainerObject theContainerObject){
-	
+
+    GlobalProbe.enterMethod( this, "InitFromFtsContainer");
+
     FtsContainerObject aFtsPatcher = theContainerObject;
     // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getObjects();	//usefull?
 
-
     FtsObject	fo;
     FtsConnection fc;
     ErmesObject aObject;
+
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
+
       fo = (FtsObject)e.nextElement();
       // Note that the representation is now found from the fts className,
       // made unique; the new file format will allow for specifing
@@ -784,6 +787,7 @@ Rectangle previousResizeRect = new Rectangle();
 
       Class objectClass = itsHelper.SearchFtsName(fo);
       if (objectClass==null) continue;
+
       aObject = itsHelper.AddObject(objectClass, fo);
     
       if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
@@ -804,8 +808,10 @@ Rectangle previousResizeRect = new Rectangle();
       toObj = (ErmesObject) fc.getTo().getRepresentation();
       aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
     }
+
     repaint();
     
+    GlobalProbe.exitMethod();
   }
 
   //--------------------------------------------------------

@@ -37,14 +37,15 @@ class ErmesObjOut extends ErmesObject {
   	
     itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
 
-    // >>> (fd) See ErmesObjIn.java for comments.
+    // (fd) {
+    // See ErmesObjIn.java for comments.
     int temp = theSketchPad.GetSketchWindow().itsPatcher.getNumberOfInlets();
     
     if (theSketchPad.outCount < temp)
       itsId = theSketchPad.outCount++;   //for now no deleting handled
     else
       itsId = temp - 1;
-    // <<< (fd)
+    // } (fd)
 
     super.Init(theSketchPad, x, y, theString);	//it was not here...
 

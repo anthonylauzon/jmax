@@ -33,19 +33,22 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     return WHITE_OFFSET;
   }
 
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+  public boolean Init( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
     // Added by MDC; get the correct String from the object, and then call super
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
     // to get the string from the object.
 
     itsArgs = theFtsObject.getDescription().trim();
 
-    super.Init(theSketchPad, theFtsObject);
+    super.Init( theSketchPad, theFtsObject);
 
-    if (theFtsObject instanceof FtsContainerObject)
-      this.YouArePatcher(true);
-    ParseText(itsArgs);
-    if(!canResizeBy(0,0)) RestoreDimensions(false);
+    if ( theFtsObject instanceof FtsContainerObject)
+      this.YouArePatcher( true);
+
+    ParseText( itsArgs);
+    if ( !canResizeBy( 0, 0))
+      RestoreDimensions( false);
 
     return true;
   }

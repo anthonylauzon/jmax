@@ -213,14 +213,17 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler{
   //--------------------------------------------------------
   //  mouseUp
   //--------------------------------------------------------
-  public boolean MouseUp(MouseEvent evt,int x, int y) {
-    if(itsSketchPad.itsRunMode || evt.isControlDown()){
-      Fts.getServer().syncToFts();
+  public boolean MouseUp(MouseEvent evt,int x, int y) 
+  {
+    if(itsSketchPad.itsRunMode || evt.isControlDown())
+      {
+	Fts.getServer().syncToFts();
 
-      DoublePaint();
-      return true;
-    }
-    else return super.MouseUp(evt, x, y);
+	DoublePaint();
+	return true;
+      }
+    else
+      return super.MouseUp(evt, x, y);
   }
 	
   //--------------------------------------------------------

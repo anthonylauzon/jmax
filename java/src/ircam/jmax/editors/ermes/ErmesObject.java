@@ -9,19 +9,18 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.GlobalProbe;
 
-/**
- * The base class of all the graphic objects on the sketch.
- * This class has a knowledge of its corrisponding fos object. It contains
- * methods for:
- * - painting, selecting, moving, dragging (services to the sketch)
- * - create fos objects, change the value when the FTS value
- *   has changed (services to FTS), redefine itself.
- * - sending values when the user interact with the object
- * - handle the object with data and open the associated editor 
- *   (example: subpatchers, table, etc.)
- */
-abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
+// The base class of all the graphic objects on the sketch.
+// This class has a knowledge of its corrisponding fos object. It contains
+// methods for:
+// - painting, selecting, moving, dragging (services to the sketch)
+// - create fos objects, change the value when the FTS value
+//   has changed (services to FTS), redefine itself.
+// - sending values when the user interact with the object
+// - handle the object with data and open the associated editor 
+//   (example: subpatchers, table, etc.)
+
+abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   private int itsX, itsY;
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
@@ -37,7 +36,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   boolean	absolutePainting = false;
   boolean updated = false;
   boolean itsDragging = false;
-  private Font itsFont = null;
+  // private Font itsFont = null;
+  Font itsFont = null;
   FontMetrics itsFontMetrics = null;
   private int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
 
@@ -63,7 +63,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setItsX(int theX) {
     itsX = theX;
-    itsFtsObject.put("x", itsX);
+    // (fd)   itsFtsObject.put("x", itsX);
   }
 
   public int getItsY() {
@@ -72,7 +72,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setItsY(int theY) {
     itsY = theY;
-    itsFtsObject.put("y", itsY);
+    // (fd) itsFtsObject.put("y", itsY);
   }
 
   public int getItsWidth() {
@@ -83,7 +83,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   public void setItsWidth(int theWidth) {
     
     currentRect.width = theWidth;
-    itsFtsObject.put("w", theWidth);
+    // (fd)    itsFtsObject.put("w", theWidth);
   }
 
   public int getItsHeight() {
@@ -95,20 +95,30 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   public void setItsHeight(int theHeight) {
     
     currentRect.height = theHeight;
-    itsFtsObject.put("h", theHeight);
+    // (fd) itsFtsObject.put("h", theHeight);
   }
 
   public Font getFont() {
     return itsFont;
   }
 
-  public void setFont(Font theFont) {
+  public void setFont( Font theFont) 
+  {
+    // (fd) {
+//     {
+//       System.err.println( "Ouarghl ! setFont(" + theFont + ")");
+
+//       (new Throwable()).printStackTrace();
+//     }
+    // } (fd)
 
     itsFont = theFont;
-    itsFontMetrics =itsSketchPad.getFontMetrics(theFont);
-    ResizeToNewFont(itsFont);
-    itsFtsObject.put("font", itsFont.getName());
-    itsFtsObject.put("fs", itsFont.getSize());
+    itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
+
+    ResizeToNewFont( itsFont);
+
+    itsFtsObject.put( "font", itsFont.getName());
+    itsFtsObject.put( "fs", itsFont.getSize());
   }
   
   public void setDirty(boolean b) {
@@ -165,7 +175,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setJustification(int theJustification) {
     itsJustification = theJustification;
-    itsFtsObject.put("jsf", theJustification);
+    // (fd) useless (always left when loading...)
+    //itsFtsObject.put("jsf", theJustification);
   }
 
   public int getJustification(){
@@ -325,7 +336,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     itsSelected = false;
     itsSketchPad = theSketchPad;
     setFont(itsSketchPad.sketchFont);
-    itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
+
+    // itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); // (fd) already done in setFont() !!!
     
     //setItsX(x);
     //setItsY(y);
@@ -344,66 +356,97 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   abstract public void makeFtsObject();
   public void redefineFtsObject() {  }
   
-  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    int i;
-    int width = 0, height = 0;
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  {
+    String aFont = (String)theFtsObject.get( "font");
+    Integer  aSize = (Integer)theFtsObject.get( "fs");
+    
     itsSelected = false;
     itsSketchPad = theSketchPad;
-    String aFont = (String)theFtsObject.get("font");
-    Integer  aSize = (Integer)theFtsObject.get("fs");
-    int aIntSize;
-    
     itsFtsObject = theFtsObject;
+
     makeCurrentRect(theFtsObject);
-    if((aFont == null)&&(aSize == null)) setFont(itsSketchPad.sketchFont);
-    else{
-      if(aFont == null) aFont = itsSketchPad.sketchFont.getName();
-      if(aSize == null) aIntSize = itsSketchPad.sketchFont.getSize();
-      else aIntSize = aSize.intValue();
-      setFont(new Font(aFont,itsSketchPad.sketchFont.getStyle(), aIntSize));
-    }
-    itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
+
+    // (fd) font mess !!! needs to be redone entirely.
+    if ( (aFont == null) && (aSize != null))
+      {
+	int fontSize = aSize.intValue();
+
+	itsFont = FontCache.lookupFont( fontSize );
+	itsFontMetrics = FontCache.lookupFontMetrics( fontSize);
+
+	// (fd) et allez, on vire tout !!!
+	//ResizeToNewFont( itsFont);
+
+	// (fd) this case is the default, which should not be resent to FTS
+	//itsFtsObject.put( "font", itsFont.getName());
+	//itsFtsObject.put( "fs", itsFont.getSize());
+      }
+    else if( (aFont == null) && (aSize == null))
+      {
+	setFont( itsSketchPad.sketchFont);
+      }
+    else
+      {
+	int aIntSize;
+
+	if (aSize == null)
+	  aIntSize = itsSketchPad.sketchFont.getSize();
+	else
+	  aIntSize = aSize.intValue();
+
+	setFont( new Font( aFont, itsSketchPad.sketchFont.getStyle(), aIntSize));
+      }
+
+    // itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); // (fd) already done in setFont() !!!
     
     update(itsFtsObject);
+
     itsFtsPatcher = GetSketchWindow().itsPatcher;
+
     return true;
   }
   
-  protected void makeCurrentRect(int x, int y) {
+  protected void makeCurrentRect( int x, int y) 
+  {
     Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
-    setItsX(x); setItsY(y); setItsWidth(d.width); setItsHeight(d.height);
+    setItsX(x);
+    setItsY(y);
+    setItsWidth(d.width);
+    setItsHeight(d.height);
   }
 
-  protected void makeCurrentRect(FtsObject theFtsObject) {
-    
-    int width=0;
-    int  height=0;
+  protected void makeCurrentRect(FtsObject theFtsObject) 
+  {
+    int width = 0;
+    int height = 0;
 
-    setItsX(((Integer)theFtsObject.get("x")).intValue());
-    setItsY(((Integer)theFtsObject.get("y")).intValue());
-    {
-      Integer widthInt = (Integer) theFtsObject.get("w");
+    setItsX( ((Integer)theFtsObject.get("x")).intValue() );
+    setItsY( ((Integer)theFtsObject.get("y")).intValue() );
+
+    Integer widthInt = (Integer) theFtsObject.get("w");
+    if (widthInt != null)
+      width  = widthInt.intValue();
+
+    Integer heightInt = (Integer)theFtsObject.get("h");
+    if (heightInt != null)
+      height = heightInt.intValue();
     
-      if (widthInt != null)
-	width  = widthInt.intValue();
-    }
-    
-    {
-      Integer heightInt = (Integer)theFtsObject.get("h");
-      
-      if (heightInt != null)
-	height = heightInt.intValue();
-    }
-    
-    if(width<10){
-      width  = getMinimumSize().width;
-    }
-    if(height<10){
-      height  = getMinimumSize().height;
-    }
+    if ( width < 10)
+      {
+	width  = getMinimumSize().width;
+      }
+
+    if ( height < 10)
+      {
+	height  = getMinimumSize().height;
+      }
+
     currentRect = new Rectangle(itsX, itsY, width, height);
-    setItsWidth(width);setItsHeight(height);
+
+    setItsWidth(width);
+    setItsHeight(height);
   }
 
   public boolean Select(boolean paintNow)
@@ -656,14 +699,3 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-

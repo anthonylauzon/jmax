@@ -36,7 +36,8 @@ class ErmesObjIn extends ErmesObject {
 
     itsSketchPad = theSketchPad;  // (fd) itsSketchPad is set in ErmesObject::Init
 
-    // >>> (fd) this piece of code which was after calling super.Init(),
+    // (fd) {
+    // this piece of code which was after calling super.Init(),
     // must be BEFORE it, because super.Init() calls makeFtsObject that uses member 
     // variable itsId which was not initialized.
     // i.e. 1) the constructor calls super()
@@ -54,7 +55,7 @@ class ErmesObjIn extends ErmesObject {
       itsId = theSketchPad.inCount++;   //for now no deleting handled
     else
       itsId = temp - 1;
-    // <<< (fd)
+    // } (fd)
 
     super.Init(theSketchPad, x, y, theString);	//this was not here...
     makeCurrentRect(x, y);

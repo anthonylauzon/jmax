@@ -6,6 +6,7 @@ import java.lang.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.project.*;
  
@@ -45,6 +46,8 @@ class ErmesSketchHelper extends Object{
     Rectangle aRect;
     ErmesObjOutlet aOutlet;
     
+    //GlobalProbe.enterMethod( this, "AddObject");
+
     if(itsSketchPad.doSnapToGrid){
       int x, y;
 
@@ -57,8 +60,9 @@ class ErmesSketchHelper extends Object{
 
     try
       {
-      aObject = (ErmesObject) theClass.newInstance();
-      aObject.Init(itsSketchPad, theFtsObject);
+	aObject = (ErmesObject) theClass.newInstance();
+
+ 	aObject.Init(itsSketchPad, theFtsObject);
       }
     catch(IllegalAccessException e)
       {
@@ -76,7 +80,11 @@ class ErmesSketchHelper extends Object{
       }
 
     itsSketchPad.itsElements.addElement(aObject);
+
     if (!itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;	
+
+    //GlobalProbe.exitMethod();
+
     return aObject;
   }
   

@@ -141,28 +141,45 @@ class ErmesObjComment extends ErmesObject {
     else return true;
   }
 
-  public void ParseText(String theString){
-    int aIndex = theString.indexOf("\n");
-    int aOldIndex = -1;
-    int aLastIndex = theString.lastIndexOf("\n");
-    String aString;
-    int length = 0;
-    int i = 0;
-    while(aIndex!=-1){
-      aString = theString.substring(aOldIndex+1, aIndex);
-      length = itsFontMetrics.stringWidth(aString);
-      if(length> itsFontMetrics.stringWidth(itsMaxString)) 
-	itsMaxString = aString;
-      itsParsedTextVector.addElement(aString);
-      aOldIndex = aIndex;
-      aIndex = theString.indexOf("\n", aOldIndex+1);
-      i++;
-    }
-    aString = theString.substring(aOldIndex+1);
-    length = itsFontMetrics.stringWidth(aString);
-    if(length> itsFontMetrics.stringWidth(itsMaxString)) 
-      itsMaxString = aString;
-    itsParsedTextVector.addElement(aString);
+  public void ParseText(String theString)
+  {
+    // (fd) {
+    // See ErmesObjEditableObject for comments on fonts
+    // PLUS: a nice example of copy/paste programming..
+
+//     int aIndex = theString.indexOf( "\n");
+//     int aOldIndex = -1;
+//     int aLastIndex = theString.lastIndexOf( "\n");
+//     String aString;
+//     int length = 0;
+//     int i = 0;
+
+//     while ( aIndex != -1)
+//       {
+// 	aString = theString.substring( aOldIndex + 1, aIndex);
+// 	length = itsFontMetrics.stringWidth( aString);
+
+// 	if ( length > itsFontMetrics.stringWidth(itsMaxString)) 
+// 	  itsMaxString = aString;
+
+// 	itsParsedTextVector.addElement( aString);
+// 	aOldIndex = aIndex;
+// 	aIndex = theString.indexOf( "\n", aOldIndex+1);
+// 	i++;
+//       }
+
+//     aString = theString.substring( aOldIndex+1);
+//     length = itsFontMetrics.stringWidth( aString);
+
+//     if ( length > itsFontMetrics.stringWidth( itsMaxString))
+//       itsMaxString = aString;
+
+//     itsParsedTextVector.addElement( aString);
+
+    itsParsedTextVector.removeAllElements();
+    itsParsedTextVector.addElement( theString);
+    itsMaxString = theString;
+    // } (fd)
   }
 
   public void Paint_specific(Graphics g) {

@@ -163,7 +163,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
    * This is the only constructor actually called
    */
   public ErmesSketchWindow(FtsContainerObject patcher) {
+    
     super(Mda.getDocumentTypeByName("patcher"));
+
+    GlobalProbe.enterMethod( this, "ErmesSketchWindow"); // (fd)
 
     itsDocument = patcher.getDocument();
     itsPatcher = patcher;
@@ -181,7 +184,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     InitSketchWin();
     validate();
     itsPatcher.open();
+
+    // (fd) is it faster like that ? YES ? but it's quite hard to see...
+    //if ( MaxEditor.IN_FILE)
     InitFromContainer(itsPatcher);
+
     setVisible(true);
 
     itsSketchPad.PrepareInChoice();//???????
@@ -190,6 +197,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsPatcher.watch("ins", this);
     itsPatcher.watch("outs", this);
     addComponentListener(this);
+
+    GlobalProbe.exitMethod(); // (fd)
   }
 
   // For the MaxDataEditor interface
@@ -238,6 +247,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   
   public void InitFromContainer(FtsContainerObject patcher) {
     
+    GlobalProbe.enterMethod( this, "InitFromContainer"); // (fd)
+
     Object aObject;
     int x=0;
     int y=0;
@@ -245,27 +256,43 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     int height=480;
     Integer x1, y1, width1, height1;
     
+
     //double check the existence of the window properties. If there aren't, use defaults
       
-      x1 = (Integer) patcher.get("wx");
-      if (x1 == null) patcher.put("wx", new Integer(x));
-      else  x = x1.intValue();
-      y1 = (Integer) patcher.get("wy");
-      if (y1 == null) patcher.put("wy", new Integer(y));
-      else  y = y1.intValue();
-      width1  = (Integer) patcher.get("ww");
-      if (width1 == null) patcher.put("ww", new Integer (width));
-      else  width = width1.intValue();
-      height1 = (Integer) patcher.get("wh");
-      if (height1 == null) patcher.put("wh", new Integer(height));
-      else  height = height1.intValue();
+    x1 = (Integer) patcher.get("wx");
+    if (x1 == null) 
+      patcher.put("wx", new Integer(x));
+    else  
+      x = x1.intValue();
+
+    y1 = (Integer) patcher.get("wy");
+    if (y1 == null) 
+      patcher.put("wy", new Integer(y));
+    else  
+      y = y1.intValue();
+
+    width1  = (Integer) patcher.get("ww");
+    if (width1 == null)
+      patcher.put("ww", new Integer (width));
+    else 
+      width = width1.intValue();
+
+    height1 = (Integer) patcher.get("wh");
+    if (height1 == null)
+      patcher.put("wh", new Integer(height));
+    else
+      height = height1.intValue();
       
-      setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
-      validate();
-      itsSketchPad.InitFromFtsContainer(patcher);
+    setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
+
+    validate();
+
+    itsSketchPad.InitFromFtsContainer(patcher);
       
-      validate();
-    }
+    validate();
+
+    GlobalProbe.exitMethod(); // (fd)
+  }
 
   //--------------------------------------------------------
   // InitSketchWin
@@ -662,12 +689,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     return itsSketchPad;
   }
   
-  /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio  
-  public void keyTyped(KeyEvent e){}
+  public void keyTyped(KeyEvent e)
+  {
+  }
 
-  public void keyReleased(KeyEvent e){
-    
+  public void keyReleased(KeyEvent e)
+  {
   }
 
   // Modified to use inheritance and call the MaxEditor method
@@ -782,8 +809,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       super.keyPressed(e);
     }
   }
-  ////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////// keyListener --fine
 
   public static boolean isAnArrow(int code) {
     return (code == Platform.LEFT_KEY ||

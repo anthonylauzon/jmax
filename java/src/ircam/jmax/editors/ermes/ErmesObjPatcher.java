@@ -7,6 +7,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.editors.ermes.*;
+import ircam.jmax.utils.*;
 
 /**
  * The "patcher" graphic object. It knows the subpatchers it contains.
@@ -128,6 +129,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	    MaxData data;
 	    Cursor temp = itsSketchPad.getCursor();
 	    itsSketchPad.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
 	    data = ((FtsObjectWithData) itsFtsObject).getData();
 
 	    Mda.edit(data);

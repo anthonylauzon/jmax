@@ -212,4 +212,8 @@ ErmesPatcherFactory:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherFactory.java)
 .PHONY: ErmesPatcherFactory
 
+FontCache:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FontCache.java)
+.PHONY: FontCache
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
