@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.107 2003/01/31 12:16:26 p_tisserand Exp $
+dnl $Id: configure.in,v 1.108 2003/02/05 10:39:51 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.108  2003/02/05 10:39:51  p_tisserand
+dnl Add define of USE_JACK for preprocessor conditionnal in fts_platform_init (linux.c)
+dnl
 dnl Revision 1.107  2003/01/31 12:16:26  p_tisserand
 dnl Fix AM_CONDITIONAL error with Jack Audio Connection Kit (thanks to Andre Almeida)
 dnl
@@ -271,11 +274,9 @@ PLATFORM_PACKAGES="oss"
 
 AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[echo packages unixdtd and aflib will not be build])
 AM_PATH_ALSA(0.9.0,[
-	DEFAULT_PROJECT_FILE=default_project_linux_alsa.jprj
 	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 ],[
-	DEFAULT_PROJECT_FILE=default_project_linux_oss.jprj
 	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
 ])
 
@@ -292,7 +293,6 @@ then
 fi
 PLATFORM_PACKAGES="sgi unixdtd"
 FTS_SYS_LIBS="-ldl"
-DEFAULT_PROJECT_FILE=config_sgi.jprj
 ACX_C_RESTRICT
 ;;
 
@@ -305,7 +305,6 @@ then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fno-inline"
 fi
 PLATFORM_PACKAGES="macosx"
-DEFAULT_PROJECT_FILE=config_macosx.jprj
 dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code) 
 AC_DEFINE(restrict,)
 ;;
@@ -418,7 +417,6 @@ then
 	LDFLAGS="$tmp_LDFLAGS"
 	LIBS="$tmp_LIBS"
 	dnl Set default project and AUDIO/MIDI configuration file
-	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
 	DEFAULT_CONFIG_FILE=default_config_linux_jack.jcfg
 	dnl define USE_JACK for preprocessor conditionnal in linux.c fts_platform_init
 	CFLAGS="$CFLAGS -DUSE_JACK"
@@ -430,7 +428,6 @@ AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
-AC_SUBST(DEFAULT_PROJECT_FILE)
 AC_SUBST(DEFAULT_CONFIG_FILE)
 
 dnl Run configure in subdirectories
