@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.31 $ IRCAM $Date: 1998/06/26 15:43:03 $
+ *      $Revision: 1.32 $ IRCAM $Date: 1998/06/30 14:27:09 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -1061,8 +1061,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 /* All the call to this  Function are overwritten to macro in case of optimization.
    The function is left here so that a user can compile an object with -g to test it
 */
-
-#ifdef DEBUG
+#undef fts_outlet_send
 
 fts_status_t
 fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
@@ -1135,7 +1134,7 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
    always compiled, also to allow user object to be compiled with
    -g also with -O compiled libraries.
 */
-
+#undef fts_outlet_int
 void
 fts_outlet_int(fts_object_t *o, int woutlet, int n)
 {
@@ -1154,6 +1153,7 @@ fts_outlet_int(fts_object_t *o, int woutlet, int n)
     }
 }
 
+#undef fts_outlet_float
 void
 fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
@@ -1172,6 +1172,7 @@ fts_outlet_float(fts_object_t *o, int woutlet, float f)
     }
 }
 
+#undef fts_outlet_symbol
 void
 fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 {
@@ -1190,6 +1191,7 @@ fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
     }
 }
 
+#undef fts_outlet_list
 void
 fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 {
@@ -1205,7 +1207,7 @@ fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
     }
 }
 
-
+#undef fts_outlet_bang
 void
 fts_outlet_bang(fts_object_t *o, int woutlet)
 {
@@ -1218,8 +1220,6 @@ fts_outlet_bang(fts_object_t *o, int woutlet)
       conn = conn->next_same_src;
     }
 }
-
-#endif
 
 /* 
    function to get values by name;  later, argument by name will be supported in

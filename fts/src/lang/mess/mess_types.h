@@ -6,8 +6,6 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.13 $ IRCAM $Date: 1998/06/17 15:42:47 $
- *
  *  Eric Viara for Ircam, January 1995
  *
  */
@@ -83,7 +81,6 @@ struct fts_symbol_descr
 union fts_word
 {
   long                fts_long;
-  unsigned long       fts_ulong;
   float               fts_float;
   fts_symbol_t        fts_symbol;
   void                *fts_ptr;		/*  just a pointer somewhere */

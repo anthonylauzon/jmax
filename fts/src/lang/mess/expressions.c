@@ -240,7 +240,7 @@ fts_expressions_init(void)
  * Stacks grow up.
  */
 
-struct fts_epression_state
+struct fts_expression_state
 {
   fts_atom_t value_stack[FTS_EXPR_MAX_DEPTH];
   int value_stack_p;	/* point to the last actually used cell */

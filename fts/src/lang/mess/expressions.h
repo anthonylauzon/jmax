@@ -3,8 +3,8 @@
 
 extern void fts_expressions_init(void);
 
-typedef struct fts_epression_state fts_expression_state_t;
-struct fts_epression_state;
+typedef struct fts_expression_state fts_expression_state_t;
+struct fts_expression_state;
 
 extern fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 						   int expr_size, const fts_atom_t *expr,
