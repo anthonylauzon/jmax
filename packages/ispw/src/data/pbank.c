@@ -16,9 +16,6 @@
 
 #include "fts.h"
 
-
-
-
 typedef struct
 {
   fts_atom_t **matrix;		/* matrix  pointer */
@@ -126,7 +123,7 @@ static int pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
     }
 
   fts_atom_file_close(f);
-  return(1);
+  return current_row;
 }
 
 static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
@@ -178,6 +175,38 @@ static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
   return(1);
 }
 
+static int pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
+{
+  fts_atom_t  a, *av;
+  fts_atom_file_t *f;
+  int i, j;
+
+
+  f = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  if(!f){
+    post("pbank: can't open file to write: %s\n", fts_symbol_name(file_name));
+    return(0);
+  }
+
+  /* write the content of the matrix */
+
+  for (i = 0; i < data->rows; i++)     
+    {
+      av = data->matrix[i];
+
+      for (j = 0; j < data->columns; j++, av++)	
+	fts_atom_file_write(f, av, ' ');
+
+      fts_set_symbol(&a, fts_new_symbol(""));
+      fts_atom_file_write(f, &a, '\n');
+    }
+
+  fts_atom_file_close(f);
+
+  data->dirty = 0;
+  return(1);
+}
+
 static pbank_data_t *
 pbank_data_new(fts_symbol_t name, long columns, long rows)
 {
@@ -197,8 +226,7 @@ pbank_data_new(fts_symbol_t name, long columns, long rows)
 
       if (p->columns != columns || p->rows != rows)
 	{
-	  post("pbank: pbank %s's dimensions must be (%d x %d)\n", fts_symbol_name(name),
-		p->columns, p->rows);
+	  post("pbank: %s %d %d: dimensions don't match\n", fts_symbol_name(name), p->columns, p->rows);
 	  return 0;
 	}
       else
@@ -247,7 +275,7 @@ pbank_data_new(fts_symbol_t name, long columns, long rows)
 
       /* if named, record it in the table */
 
-      if (name)
+       if (name)
 	{
 	  fts_set_ptr(&data, p);
 	  fts_hash_table_insert(&pbank_data_table, name, &data);
@@ -647,8 +675,11 @@ static void
 pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
+  int read_rows;
 
-  pbank_read_file(this->data, fts_get_symbol(at));
+  read_rows = pbank_read_file(this->data, fts_get_symbol(at));
+  
+  fts_outlet_int(o, 1, read_rows);
 }
 
 
@@ -660,6 +691,28 @@ pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pbank_t *this = (pbank_t *)o;
 
   pbank_write_file(this->data, fts_get_symbol(at));
+}
+
+
+static void
+pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  pbank_t *this = (pbank_t *)o;
+  
+  if(ac > 1 && fts_is_symbol(at) && fts_is_symbol(at + 1))
+    {
+      fts_symbol_t format = fts_get_symbol(at);
+
+      if(format = fts_new_symbol("ascii"))
+	{
+	  pbank_export_file_ascii(this->data, fts_get_symbol(at + 1));
+	}
+      else
+	post("pbank: unknown export format: %s\n", fts_symbol_name(format));
+    }
+  else
+    post("pbank: usage: export <format> <file name>\n");
+    
 }
 
 
@@ -726,10 +779,12 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->out_list = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * columns);
   
   this->data = pbank_data_new(this->name, columns, rows);
-  if(this->name)
-    pbank_read_file(this->data, this->name); /* read in data from file (at least try it) */
 
-  this->data->dirty = 0;
+  if(this->data)
+    {
+      pbank_read_file(this->data, this->name); /* read in data from file (at least try it) */
+      this->data->dirty = 0;
+    }
 }
 
 /* method delete, system inlet */
@@ -738,6 +793,9 @@ static void
 pbank_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
+
+  if(!this->data)
+    return;
 
   if (this->data->dirty) 
     {
@@ -768,7 +826,7 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(pbank_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(pbank_t), 1, 2, 0); 
 
   /* define the system methods */
 
@@ -805,6 +863,10 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_new_symbol("write"), pbank_write, 1, a);
+
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("export"), pbank_export, 2, a);
 
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_new_symbol("read"), pbank_read, 1, a);

@@ -143,7 +143,7 @@ fts_float_function_t fts_ffun_get_ptr( fts_symbol_t name)
 }
 
 #ifdef LINUXPC
-static float sinf( float f)
+static float fts_ffun_sin(float f)
 {
   return (float)sin(f);
 }
@@ -153,6 +153,11 @@ static float cosf( float f)
   return (float)cos(f);
 }
 #endif
+
+static float hanning( float f)
+{
+  return (0.5 - 0.5 * cos(f));
+}
 
 void
 fts_ffuns_init( void)
@@ -175,6 +180,8 @@ fts_ffuns_init( void)
 #else
 #error No floatfuns.
 #endif
+
+  fts_ffun_new( fts_new_symbol( "hanning"), hanning);
 }
 
 
@@ -376,3 +383,10 @@ fts_fftab_get_cosine_second_half( int size)
   else
     return 0;
 }
+
+float *
+fts_fftab_get_hanning(int size)
+{
+  return fts_fftab_get(fts_new_symbol("hanning"), size, 0.0f, 6.2831853f);
+}
+

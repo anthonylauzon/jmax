@@ -58,4 +58,6 @@ extern float *fts_fftab_get_cosine(int size); /* size must be a multiple of 4 */
 extern float *fts_fftab_get_cosine_first_half(int size); /* size must be a multiple of 2 */
 extern float *fts_fftab_get_cosine_second_half(int size); /* size must be a multiple of 2 */
 
+/* get hanning window */
+extern float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) window */
 #endif

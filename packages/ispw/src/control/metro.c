@@ -38,8 +38,13 @@ static void metro_clock_reset(void *o)
 {
   metro_t *x = (metro_t *)o;
 
-  fts_alarm_set_delay(x->alarm, x->cycle);
-  fts_alarm_arm(x->alarm);
+  if(x->run)
+    {
+      fts_alarm_set_delay(x->alarm, x->cycle);
+      fts_alarm_arm(x->alarm);
+    }
+
+  fts_outlet_bang((fts_object_t *)o, 0);
 }
 
 
@@ -189,4 +194,3 @@ metro_config(void)
 {
   fts_class_install(fts_new_symbol("metro"),metro_instantiate);
 }
-

@@ -437,7 +437,7 @@ static op_t *
 binop_add_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -455,7 +455,7 @@ static op_t *
 binop_sub_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
@@ -473,7 +473,7 @@ static op_t *
 binop_mul_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
@@ -491,7 +491,7 @@ static op_t *
 binop_div_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -509,7 +509,7 @@ static op_t *
 binop_bus_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -527,7 +527,7 @@ static op_t *
 binop_vid_inplace_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		

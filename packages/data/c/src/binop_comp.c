@@ -177,8 +177,8 @@ binop_le_f_f(op_t *op)
 static op_t *
 binop_ee_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l == r);
 
@@ -188,8 +188,8 @@ binop_ee_n_n(op_t *op)
 static op_t *
 binop_ne_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l != r);
 
@@ -199,8 +199,8 @@ binop_ne_n_n(op_t *op)
 static op_t *
 binop_gt_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l > r);
 
@@ -210,8 +210,8 @@ binop_gt_n_n(op_t *op)
 static op_t *
 binop_lt_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l < r);
 
@@ -221,8 +221,8 @@ binop_lt_n_n(op_t *op)
 static op_t *
 binop_ge_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l >= r);
 
@@ -232,8 +232,8 @@ binop_ge_n_n(op_t *op)
 static op_t *
 binop_le_n_n(op_t *op)
 {
-  float l = op_get_number(op[0]);
-  float r = op_get_number(op[1]);
+  float l = op_get_number_float(op[0]);
+  float r = op_get_number_float(op[1]);
 
   op_set_int(&op[2], l <= r);
 
@@ -843,7 +843,7 @@ static op_t *
 binop_ee_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
@@ -864,7 +864,7 @@ static op_t *
 binop_ne_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
@@ -885,7 +885,7 @@ static op_t *
 binop_gt_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
@@ -906,7 +906,7 @@ static op_t *
 binop_lt_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
@@ -927,7 +927,7 @@ static op_t *
 binop_ge_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;
@@ -948,7 +948,7 @@ static op_t *
 binop_le_fv_n(op_t *op)
 {
   fts_float_vector_t *left_vector = op_get_float_vector(op[0]);
-  float r = op_get_number(op[1]);
+  float r = op_get_number_float(op[1]);
   fts_integer_vector_t *result_vector;
   int size = fts_float_vector_get_size(left_vector);
   int i;

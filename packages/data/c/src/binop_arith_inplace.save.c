@@ -511,7 +511,7 @@ static fts_atom_t *
 binop_add_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -529,7 +529,7 @@ static fts_atom_t *
 binop_sub_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
@@ -547,7 +547,7 @@ static fts_atom_t *
 binop_mul_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 
@@ -565,7 +565,7 @@ static fts_atom_t *
 binop_div_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -583,7 +583,7 @@ static fts_atom_t *
 binop_bus_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		
@@ -601,7 +601,7 @@ static fts_atom_t *
 binop_vid_inplace_fv_n(fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   fts_float_vector_t *left_vector = (fts_float_vector_t *)fts_get_data(left);
-  float r = fts_get_number(right);
+  float r = fts_get_number_float(right);
   int size = fts_float_vector_get_size(left_vector);
   int i;
 		

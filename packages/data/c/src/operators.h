@@ -75,7 +75,8 @@ typedef struct _op_
 #define op_get_integer_vector(op) ((fts_integer_vector_t *)fts_get_data(op_get_ap(op)))
 #define op_get_float_vector(op) ((fts_float_vector_t *)fts_get_data(op_get_ap(op)))
 
-#define op_get_number(op) (fts_get_number(op_get_ap(op)))
+#define op_get_number_int(op) (fts_get_number_int(op_get_ap(op)))
+#define op_get_number_float(op) (fts_get_number_float(op_get_ap(op)))
 
 #define _op_get_data(op) (fts_get_data(op_get_ap(op)))
 
