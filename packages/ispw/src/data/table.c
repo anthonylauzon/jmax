@@ -257,18 +257,18 @@ static void
 table_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  int onset;
+  int offset;
 
   if (! fts_is_int(at)) 
     {
-      post("table: set: bad onset\n");
+      post("table: set: bad offset\n");
       return;
     }
 
-  onset = fts_get_int_arg(ac, at, 0, 0);
+  offset = fts_get_int_arg(ac, at, 0, 0);
 
   if (ac > 1)
-    fts_integer_vector_set_from_atom_list(this->vector, onset, ac - 1, at + 1);
+    fts_integer_vector_set_from_atom_list(this->vector, offset, ac - 1, at + 1);
 }
 
 

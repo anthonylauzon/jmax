@@ -88,13 +88,15 @@ fts_integer_vector_set_size(fts_integer_vector_t *vector, int size)
 }
 
 void
-fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int onset, int ac, const fts_atom_t *at)
+fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int offset, int ac, const fts_atom_t *at)
 {
   int i;
 
-  for (i=onset; i<ac && i<vector->size; i++)
+  fprintf(stderr, "fts_integer_vector_set_from_atom_list, called with %d values, offset %d\n", ac, offset);
+
+  for (i = 0; i < ac && (i + offset) < vector->size; i++)
     if (fts_is_int(&at[i]))
-      vector->values[i] = fts_get_int(&at[i]);
+      vector->values[i + offset] = fts_get_int(&at[i]);
 }
 
 

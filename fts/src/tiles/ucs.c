@@ -603,7 +603,7 @@ fts_ucs_install_commands()
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("updates_per_ticks"),
 			 fts_ucs_set_updates_per_ticks,
 			 "set update_per_ticks <int>",
-			 "Set how many value updates are sent by FTS in a sigle scheduling tick");
+			 "Set how many value updates are sent by FTS in a single scheduling tick");
 
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("update_period"),
 			 fts_ucs_set_updates_period,

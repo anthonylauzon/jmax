@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/30 17:24:46 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/10/30 17:49:30 $
  *
  * Use a timer for blinking because Java timing is not reilable.
  * 
@@ -77,7 +77,7 @@ button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->value = this->color;
 
-  fts_object_ui_property_changed_urgent(o, fts_s_value);
+  fts_object_ui_property_changed(o, fts_s_value);
 
   fts_alarm_set_delay(&this->alarm, this->duration);
   fts_alarm_arm(&this->alarm);
@@ -117,7 +117,7 @@ button_tick(fts_alarm_t *alarm, void *calldata)
 
   this->value = 0;
 
-  fts_object_ui_property_changed_urgent((fts_object_t *)this, fts_s_value);
+  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
 }
 
 /************************************************
@@ -147,7 +147,7 @@ button_put_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_outlet_bang(obj, 0);
 
   this->value = this->color;
-  fts_object_ui_property_changed_urgent(obj, fts_s_value);
+  fts_object_ui_property_changed(obj, fts_s_value);
 
   fts_alarm_set_delay(&(this->alarm), this->duration);
   fts_alarm_arm(&(this->alarm));

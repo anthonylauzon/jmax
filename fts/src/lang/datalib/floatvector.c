@@ -78,11 +78,11 @@ fts_float_vector_set_size(fts_float_vector_t *vector, long size)
 }
 
 void
-fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int onset, int ac, const fts_atom_t *at)
+fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int offset, int ac, const fts_atom_t *at)
 {
   int i;
 
-  for (i=onset; i<ac && i<vector->size; i++)
+  for (i=offset; i<ac && i<vector->size; i++)
     if (fts_is_float(&at[i]))
       vector->values[i] = fts_get_float(&at[i]);
 }

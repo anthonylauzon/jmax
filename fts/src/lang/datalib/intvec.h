@@ -32,7 +32,7 @@ extern int fts_integer_vector_get_sub_sum(fts_integer_vector_t *vector, int from
 extern int fts_integer_vector_get_min_value(fts_integer_vector_t *vector);
 extern int fts_integer_vector_get_max_value(fts_integer_vector_t *vector);
 
-extern void fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int onset, int ac, const fts_atom_t *at);
+extern void fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int offset, int ac, const fts_atom_t *at);
 extern void fts_integer_vector_save_bmax(fts_integer_vector_t *this, fts_bmax_file_t *f);
 
 #endif

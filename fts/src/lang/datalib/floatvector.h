@@ -31,7 +31,7 @@ extern float fts_float_vector_get_sub_sum(fts_float_vector_t *vector, int from, 
 extern float fts_float_vector_get_min_value(fts_float_vector_t *vector);
 extern float fts_float_vector_get_max_value(fts_float_vector_t *vector);
 
-extern void fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int onset, int ac, const fts_atom_t *at);
+extern void fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int offset, int ac, const fts_atom_t *at);
 
 #endif
 

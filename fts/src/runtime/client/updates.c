@@ -120,24 +120,6 @@ fts_client_updates_sched(void)
   int one_done = 0;
   fts_symbol_t property;
 
-  /* First, do all the update in the urgent list;
-     do not count, do not limit in any way (should we ?)
-     */
-
-
-  while (fts_object_get_next_change_urgent(&property, &obj))
-    {
-      if (one_done == 0)
-	{
-	  update_group_start();
-	  one_done = 1;
-	}
-
-      fts_client_send_property(obj, property);
-    }
-
-  /* Then do the normal updates, with the limited algorithm */
-
   if (period_count >=  fts_update_period)
     {
       int update_count;
@@ -177,22 +159,6 @@ fts_client_updates_sync(void)
   fts_symbol_t property;
   fts_object_t *obj;
   int one_done = 0;
-
-  /* First, do all the update in the urgent list, then the
-     standards.
-     */
-
-  while (fts_object_get_next_change_urgent(&property, &obj))
-    {
-      if (one_done == 0)
-	{
-	  update_group_start();
-	  one_done = 1;
-	}
-
-      fts_client_send_property(obj, property);
-    }
-
 
   while (fts_object_get_next_change(&property, &obj))
     {
