@@ -46,6 +46,9 @@
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)(fts_audioport_t *port))-1)
 
+#define AUDIO_CONFIG_DEFAULT_SAMPLE_RATE 44100.
+#define AUDIO_CONFIG_DEFAULT_BUFFER_SIZE 1024
+
 static fts_audioport_t *audioport_list = 0;
 
 static fts_symbol_t s_default_audio_port;
@@ -703,6 +706,81 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
   return default_audioport;  
 }
 
+
+/****************************************************
+ *
+ *  AUDIO label 
+ *
+ */
+
+static audiolabel_t*
+audiolabel_new(fts_symbol_t name)
+{
+  audiolabel_t* label = (audiolabel_t*)fts_malloc(sizeof(audiolabel_t));
+  
+  if (NULL != label)
+  {
+    label->name = name;
+    label->stereo_flag = 1;
+    label->input = NULL;
+    label->input_channel = -1;
+    label->output = NULL;
+    label->output_channel = -1;
+  }
+  return label;
+}
+
+static void
+audiolabel_delete(audiolabel_t* label)
+{
+  if (NULL != label->input)
+  {
+    fts_object_release(label->input);
+  }
+  
+  if (NULL != label->output)
+  {
+    fts_object_release(label->output);
+  }
+  fts_free(label);
+}
+
+static void
+audiolabel_set_stereo(audiolabel_t* label, int stereo_flag)
+{
+#warning NOT YET IMPLEMENTED
+  /* check if stereo ccan be done with current channel, and current input/output audioport */
+}
+
+static void
+audiolabel_set_input_channel(audiolabel_t* label, int channel)
+{
+#warning NOT YET IMPLEMENTED
+  /* check if input channel is available on input audioport, and if stereo can be done */
+  if (1 == label->stereo_flag)
+  {
+
+  }
+}
+
+static void
+audiolabel_set_input_port(audiolabel_t* label, fts_audioport_t* port)
+{
+#warning NOT YET IMPLEMENTED
+}
+
+static void
+audiolabel_set_output_channel(audiolabel_t* label, int channel)
+{
+#warning NOT YET IMPLEMENTED
+}
+
+static void
+audiolabel_set_output_port(audiolabel_t* label, fts_audioport_t* port)
+{
+#warning NOT YET IMPLEMENTED
+}
+
 /****************************************************
  *
  *  AUDIO configuration class
@@ -711,19 +789,114 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 fts_class_t* audioconfig_type = NULL;
 static fts_symbol_t audioconfig_s_name;
 
+
+
+int audioconfig_check_sample_rate(audioconfig_t* config, double sample_rate)
+{
+#warning NOT YET IMPLEMENTED
+  int success = 1;
+  /* foreach used audioport:
+       check if sample rate is available for selected channels
+       if not:
+          try to find another sample rate OR return error ?
+       end if 
+     end foreach
+  */
+  return success;
+}
+
+int audioconfig_check_buffer_size(audioconfig_t* config, int buffer_size)
+{
+#warning NOT YET IMPLEMENTED
+  int success = 1;
+  /* foreach used audioport:
+       check if buffer size is available for selected channels
+       if not:
+          try to find another buffer size OR return error ?
+       end if 
+     end foreach
+  */
+  return success;
+
+}
+
+
+int 
+fts_audioconfig_get_buffer_size(audioconfig_t* self)
+{
+#warning TODO: Convert this function into a macro
+  return self->buffer_size;
+}
+
+int 
+fts_audioconfig_set_buffer_size(audioconfig_t* config, int buffer_size)
+{
+#warning NOT YET IMPLEMENTED
+  /* check if buffer size is available with current use audioport */
+  if (audioconfig_check_buffer_size(config, buffer_size))
+  {
+    config->buffer_size = buffer_size;
+    /* change buffer size for used audioport */
+    return buffer_size;
+  }
+  else
+  {
+    /* error */
+    return buffer_size;
+  }
+}
+
+double
+fts_audioconfig_get_sample_rate(audioconfig_t* config)
+{
+#warning TODO: Convert this function into a macro
+  return config->sample_rate;
+}
+
+double 
+fts_audioconfig_set_samplerate(audioconfig_t* config, double sample_rate)
+{
+#warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate
+  /* check if sample rate is available with current use audioport */
+  if (audioconfig_check_sample_rate(config, sample_rate))
+  {
+    config->sample_rate = sample_rate;
+    /* change dsp sample rate */
+    /* change smaple rate for used audioport */
+    return sample_rate;
+  }
+  else
+  {
+    /* error */
+    return sample_rate;
+  }
+}
+
+
+void
+fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
+{
+#warning NOT YET IMPLEMENTED
+  audiolabel_t* label = this->labels;
+  
+  /* save what you want, Patrice */
+  /* mais chaque message doit etre sauve' avec selecteur fts_audio_config 
+     et avec premier argument le vrai selecteur */
+  while(label)
+  {
+    fts_bmax_code_push_symbol(f, label->name);
+
+  }
+}
+
 /* DUMMY CONSTRUCTOR */
 static void
 audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   audioconfig_t* self = (audioconfig_t*)o;
-}
 
-void
-fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
-{
-  /* save what you want, Patrice */
-  /* mais chaque message doit etre sauve' avec selecteur fts_audio_config 
-     et avec premier argument le vrai selecteur */
+  self->sample_rate = AUDIO_CONFIG_DEFAULT_SAMPLE_RATE;
+  self->buffer_size = AUDIO_CONFIG_DEFAULT_BUFFER_SIZE;
 }
 
 /* DUMMY DESTRUCTOR */
@@ -737,8 +910,9 @@ audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 audioconfig_instantiate(fts_class_t* cl)
 {
-  fts_class_init(cl, sizeof(audioconfig_t), audioconfig_init, audioconfig_delete);
+  fts_class_init(cl, sizeof(audioconfig_t), audioconfig_init, audioconfig_delete);  
 }
+
 /***********************************************************************
  *
  * Initialization
