@@ -99,10 +99,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer {
     getContentPane().add( BorderLayout.CENTER, jsp);
 
     setLocation(0,0);
-    setSize( 600, 400);
-
-    pack();
-    validate();
+    setSize( 500, 600);
 
     setVisible( true);
   }
