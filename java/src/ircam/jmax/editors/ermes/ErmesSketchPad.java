@@ -1006,7 +1006,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){
-      if(itsToolBar.locked) itsToolBar.Unlock();
+      if(itsToolBar.pressed) itsToolBar.Unlock();
       itsHelper.DeselectObjAndConn();
       if (e.isShiftDown()){
 	MultiConnect(itsCurrentInOutlet);
@@ -1023,14 +1023,14 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
     ///if we are in a Object
     if(itsHelper.IsInObject(x,y)){
-      if(itsToolBar.locked) itsToolBar.Unlock();
+      if(itsToolBar.pressed) itsToolBar.Unlock();
       itsCurrentObject.MouseDown(e,x,y);
       return;
     }
     
     ///if we are in a Connection
     if(itsHelper.IsInConnection(x,y)) {
-      if(itsToolBar.locked) itsToolBar.Unlock();
+      if(itsToolBar.pressed) itsToolBar.Unlock();
       itsCurrentConnection.MouseDown(e,x,y);
       return;
     }
@@ -1849,7 +1849,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       aRect.y+=(currentMouseY-itsStartMovingPt.y);
       aInclusionRect.x+=(currentMouseX-itsStartMovingPt.x);
       aInclusionRect.y+=(currentMouseY-itsStartMovingPt.y);
-      g.drawRect(aRect.x, aRect.y, aRect.width-1, aRect.height-1);
+      g.drawRect(aRect.x, aRect.y, aRect.width, aRect.height);
       g.drawRect(aInclusionRect.x, aInclusionRect.y, aInclusionRect.width, aInclusionRect.height);
       return;
     }

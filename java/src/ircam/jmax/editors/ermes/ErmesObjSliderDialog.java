@@ -27,22 +27,22 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     
     Panel p11 = new Panel();
     p11.setLayout(new GridLayout(3,1));
-    p11.add(new Label("Slider Current Value"));
     p11.add(new Label("Slider Maximum Value"));
     p11.add(new Label("Slider Minimum Value"));
+    p11.add(new Label("Slider Current Value"));
     p1.add(p11);
     
     Panel p12 = new Panel();
     p12.setLayout(new GridLayout(3,1));
-    itsCurrentValueField = new TextField("", 20);
-    itsCurrentValueField.addActionListener(this);
-    p12.add(itsCurrentValueField);
     itsMaxValueField = new TextField("", 20);
     itsMaxValueField.addActionListener(this);
     p12.add(itsMaxValueField);
     itsMinValueField = new TextField("", 20);
     itsMinValueField.addActionListener(this);
-    p12.add(itsMinValueField);    
+    p12.add(itsMinValueField);   
+    itsCurrentValueField = new TextField("", 20);
+    itsCurrentValueField.addActionListener(this);
+    p12.add(itsCurrentValueField);
     p1.add(p12);
 
     add("North", p1);

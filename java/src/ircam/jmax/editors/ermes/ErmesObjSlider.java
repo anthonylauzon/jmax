@@ -88,7 +88,7 @@ class ErmesObjSlider extends ErmesObject {
     itsStep = (float)itsRange/itsPixelRange;
 
     int temp = theCurrentInt.intValue();        
-    int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax-1:temp);
+    int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
     itsInteger = clippedValue;
     itsFtsObject.put("value", new Integer(itsInteger));
   }
@@ -164,8 +164,8 @@ class ErmesObjSlider extends ErmesObject {
 	DoublePaint();
       }
       else if(itsY+UP_OFFSET>=y){
-	itsFtsObject.put("value", new Integer(itsRangeMax-1));
-	itsInteger = itsRangeMax-1;
+	itsFtsObject.put("value", new Integer(itsRangeMax));
+	itsInteger = itsRangeMax;
 	itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET);
 	DoublePaint();
       }
@@ -264,4 +264,13 @@ class ErmesObjSlider extends ErmesObject {
     return preferredSize;
   }
 }
+
+
+
+
+
+
+
+
+
 
