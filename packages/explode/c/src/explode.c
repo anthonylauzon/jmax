@@ -969,16 +969,24 @@ explode_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
   if(!file_name)
     {
-      char s[1024];
-      snprintf(s, 1024, "%s.mid", fts_symbol_name(this->data.name));
-      file_name = fts_new_symbol_copy(s);
+      if(this->data.name)
+	{
+	  char s[1024];
+	  snprintf(s, 1024, "%s.mid", fts_symbol_name(this->data.name));
+	  file_name = fts_new_symbol_copy(s);
+	}
+      else
+	{
+	  char s[] = "explode.mid";
+	}
+
     }
   
   explode_export_midifile(this, file_name);

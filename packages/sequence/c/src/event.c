@@ -26,8 +26,6 @@
 #include "fts.h"
 #include "event.h"
 
-fts_symbol_t event_symbol = 0;
-
 /*********************************************************
  *
  *  sequence event
@@ -41,10 +39,4 @@ event_init(event_t *event)
   event->next = 0;
   event->track = 0;
   event->time = 0.0;
-}
-
-void
-event_setup(void)
-{
-  event_symbol = fts_new_symbol("event");
 }

@@ -24,13 +24,20 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "messevt.h"
-
-fts_symbol_t messevt_symbol = 0;
 
 static void messevt_set_message(fts_object_t *this, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+typedef struct _messevt_
+{
+  event_t head;
+  fts_symbol_t s;
+  int ac;
+  fts_atom_t *at;
+  int pos;
+} messevt_t;
 
 static void
 messevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -60,11 +67,11 @@ messevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_atom_t a[3];
 
   fts_set_float(this->at + 0, event_get_time(&this->head));
-  fts_set_symbol(this->at + 1, messevt_symbol);
+  fts_set_symbol(this->at + 1, seqsym_messevt);
   fts_set_int(this->at + 2, this->pos);
   fts_set_symbol(this->at + 3, this->s);
   
-  fts_client_upload(o, event_symbol, this->ac + 4, this->at);
+  fts_client_upload(o, seqsym_event, this->ac + 4, this->at);
 }
 
 static void
@@ -185,9 +192,7 @@ messevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 messevt_config(void)
 {
-  messevt_symbol = fts_new_symbol("messevt");
-
-  fts_class_install(messevt_symbol, messevt_instantiate);
+  fts_class_install(seqsym_messevt, messevt_instantiate);
 }
 
 

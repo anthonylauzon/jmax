@@ -24,6 +24,7 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "sequence.h"
 #include "seqmidi.h"
 #include "eventtrk.h"
@@ -33,10 +34,6 @@
 #define NOTEEVT_DEF_DURATION 400
 #define NOTEEVT_DEF_MIDI_CHANNEL 1
 #define NOTEEVT_DEF_MIDI_VELOCITY 64
-
-fts_symbol_t noteevt_symbol = 0;
-static fts_symbol_t sym_midi_channel = 0;
-static fts_symbol_t sym_midi_velocity = 0;
 
 static void
 noteevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -64,11 +61,11 @@ noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_atom_t a[4];
 
   fts_set_float(a + 0, event_get_time(&this->head));
-  fts_set_symbol(a + 1, noteevt_symbol);
+  fts_set_symbol(a + 1, seqsym_noteevt);
   fts_set_int(a + 2, this->pitch);
   fts_set_float(a + 3, this->duration);
 
-  fts_client_upload(o, event_symbol, 4, a);
+  fts_client_upload(o, seqsym_event, 4, a);
 }
 
 static void
@@ -200,11 +197,11 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, noteevt_init);
 
-  fts_class_add_daemon(cl, obj_property_get, sym_midi_channel, noteevt_get_midi_channel_property);
-  fts_class_add_daemon(cl, obj_property_put, sym_midi_channel, noteevt_set_midi_channel_property);
+  fts_class_add_daemon(cl, obj_property_get, seqsym_midi_channel, noteevt_get_midi_channel_property);
+  fts_class_add_daemon(cl, obj_property_put, seqsym_midi_channel, noteevt_set_midi_channel_property);
 
-  fts_class_add_daemon(cl, obj_property_get, sym_midi_velocity, noteevt_get_midi_velocity_property);
-  fts_class_add_daemon(cl, obj_property_put, sym_midi_velocity, noteevt_set_midi_velocity_property);
+  fts_class_add_daemon(cl, obj_property_get, seqsym_midi_velocity, noteevt_get_midi_velocity_property);
+  fts_class_add_daemon(cl, obj_property_put, seqsym_midi_velocity, noteevt_set_midi_velocity_property);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), noteevt_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), noteevt_move);
@@ -220,9 +217,5 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 noteevt_config(void)
 {
-  noteevt_symbol = fts_new_symbol("noteevt");
-  sym_midi_channel = fts_new_symbol("midi_channel");
-  sym_midi_velocity = fts_new_symbol("midi_velocity");
-
-  fts_class_install(noteevt_symbol, noteevt_instantiate);
+  fts_class_install(seqsym_noteevt, noteevt_instantiate);
 }

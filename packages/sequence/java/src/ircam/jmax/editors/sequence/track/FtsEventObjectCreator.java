@@ -11,7 +11,7 @@ import java.util.*;
 public class FtsEventObjectCreator implements FtsObjectCreator
 { 
     static Object[] evtArgs = new Object[128];
-    public FtsObject createInstance(Fts fts, FtsObject parent, String className, int nArgs, FtsAtom args[])
+    public FtsObject createInstance(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
     {
 	double time = (double)args[0].getFloat();
 	String valueType = args[1].getString();

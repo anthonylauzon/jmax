@@ -26,6 +26,7 @@
 SOURCES = \
 module.c \
 sequence.c \
+seqsym.c \
 track.c \
 event.c \
 seqmidi.c \

@@ -95,7 +95,7 @@ public class FtsObject
   //int objId, String variable, String className, int nArgs, FtsAtom args[])
 
   static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
-					    int objId, String variable, String className, int nArgs, FtsAtom args[])
+					    int objId, String variableName, String className, int nArgs, FtsAtom args[])
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     Object creator;
@@ -114,7 +114,7 @@ public class FtsObject
 	Object ctr = creators.get(className);
 	
 	if(ctr != null)
-	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, nArgs, args);
+	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
 	else if (className == "jpatcher")
 	  obj =  new FtsPatcherObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
@@ -141,10 +141,8 @@ public class FtsObject
 	  obj =  new FtsSelection(fts, parent);
 	else if (className == "__clipboard")
 	  obj =  new FtsClipboard(fts, parent);
-	else if (variable != null)
-	  obj = new FtsObject(fts, parent, variable, className, variable + " : " + className + " " + FtsParse.unparseArguments(nArgs, args));
 	else
-	  obj = new FtsObject(fts, parent, null, className, className + " " + FtsParse.unparseArguments(nArgs, args));
+	  obj = new FtsObject(fts, parent, variableName, className, className + " " + FtsParse.unparseArguments(nArgs, args));
       }
     else
       obj = new FtsObject(fts, parent, null, null, "");
@@ -672,7 +670,10 @@ public class FtsObject
 
   public String getDescription()
   {
-    return description;
+    if(variableName == null)
+      return description;
+    else
+      return variableName + " : " + description;
   }
 
   /** Get the number of inlets of the object */

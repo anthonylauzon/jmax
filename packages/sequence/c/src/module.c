@@ -26,8 +26,8 @@
 
 #include "fts.h"
 
-extern void track_setup(void);
-extern void event_setup(void);
+extern void seqsym_config(void);
+
 extern void seqobj_config(void);
 extern void eventtrk_config(void);
 extern void intevt_config(void);
@@ -38,8 +38,8 @@ extern void floatevt_config(void);
 static void
 sequence_module_init(void)
 {
-  track_setup();
-  event_setup();
+  seqsym_config();
+
   seqobj_config();
   eventtrk_config();
   intevt_config();

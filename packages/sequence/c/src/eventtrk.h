@@ -36,8 +36,6 @@
  *
  */
 
-extern fts_symbol_t eventtrk_symbol;
-
 typedef struct _eventtrk_ eventtrk_t;
 
 struct _eventtrk_

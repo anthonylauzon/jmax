@@ -24,11 +24,15 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "floatevt.h"
 
-fts_symbol_t floatevt_symbol = 0;
+typedef struct _floatevt_
+{
+  event_t head;
+  fts_atom_t value;
+} floatevt_t;
 
 static void
 floatevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -54,10 +58,10 @@ floatevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   /*fts_set_float(a + 0, 1000.0 * event_get_time(&this->head));*/
   fts_set_float(a + 0, event_get_time(&this->head));
-  fts_set_symbol(a + 1, floatevt_symbol);
+  fts_set_symbol(a + 1, seqsym_floatevt);
   a[2] = this->value;
 
-  fts_client_upload(o, event_symbol, 3, a);
+  fts_client_upload(o, seqsym_event, 3, a);
 }
 
 static void
@@ -117,7 +121,5 @@ floatevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 floatevt_config(void)
 {
-  floatevt_symbol = fts_new_symbol("floatevt");
-
-  fts_class_install(floatevt_symbol, floatevt_instantiate);
+  fts_class_install(seqsym_floatevt, floatevt_instantiate);
 }

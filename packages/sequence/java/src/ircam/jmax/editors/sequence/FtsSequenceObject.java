@@ -50,9 +50,9 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   /**
    * constructor.
    */
-    public FtsSequenceObject(Fts fts, FtsObject parent, String classname)
+    public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname)
     {
-      super(fts, parent, null, "sequence", "sequence");
+      super(fts, parent, variableName, "sequence", "sequence");
 	
       listeners = new MaxVector();
       initValueInfoTable();

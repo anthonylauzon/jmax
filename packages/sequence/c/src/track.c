@@ -26,8 +26,6 @@
 #include "fts.h"
 #include "track.h"
 
-fts_symbol_t track_symbol = 0;
-
 void
 track_init(track_t *track, fts_symbol_t name)
 {
@@ -36,10 +34,4 @@ track_init(track_t *track, fts_symbol_t name)
 
   track->name = name;
   track->active = 1;
-}
-
-void
-track_setup(void)
-{
-  track_symbol = fts_new_symbol("track");
 }

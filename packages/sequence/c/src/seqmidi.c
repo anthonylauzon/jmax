@@ -26,17 +26,15 @@
 #include <ctype.h>
 
 #include "fts.h"
+#include "seqsym.h"
 #include "sequence.h"
 #include "track.h"
 #include "eventtrk.h"
 #include "noteevt.h"
-#include "intevt.h"
 
 #define N_MIDI_CHANNELS 16
 #define N_MIDI_PITCHES 128
 #define N_MIDI_CONTROLLERS 128
-
-static fts_symbol_t sym_note = 0;
 
 /**************************************************************************
  *
@@ -97,9 +95,9 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       name = fts_new_symbol_copy(s);
 
       /* create new track */
-      fts_set_symbol(a + 0, eventtrk_symbol);
+      fts_set_symbol(a + 0, seqsym_eventtrk);
       fts_set_symbol(a + 1, name);
-      fts_set_symbol(a + 2, noteevt_symbol);
+      fts_set_symbol(a + 2, seqsym_noteevt);
       fts_object_new(0, 3, a, (fts_object_t **)&track);
 
       /* add track to sequence */
@@ -119,7 +117,7 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       fts_object_t *note;
       fts_atom_t a[3];
 
-      fts_set_symbol(a + 0, noteevt_symbol);
+      fts_set_symbol(a + 0, seqsym_noteevt);
       fts_set_int(a + 1, pitch);
       fts_set_float(a + 2, 0.0);
       fts_object_new(0, 3, a, &note);
@@ -170,9 +168,9 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
       name = fts_new_symbol_copy(s);
 
       /* create new track */
-      fts_set_symbol(a + 0, eventtrk_symbol);
+      fts_set_symbol(a + 0, seqsym_eventtrk);
       fts_set_symbol(a + 1, name);
-      fts_set_symbol(a + 2, intevt_symbol);
+      fts_set_symbol(a + 2, seqsym_intevt);
       fts_object_new(0, 3, a, (fts_object_t **)&track);
 
       /* add track to sequence */
@@ -182,7 +180,7 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
       data->controller_tracks[ctrl_num] = track;
     }
   
-  fts_set_symbol(a + 0, intevt_symbol);
+  fts_set_symbol(a + 0, seqsym_intevt);
   fts_set_int(a + 1, value);
   fts_object_new(0, 2, a, &intevt);
 
@@ -340,7 +338,6 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
  
   if(file)
     {
-      fts_symbol_t sym_export_midi = fts_new_symbol("export_midi");
       seqmidi_write_data_t data;
       fts_atom_t a[3];
       event_t *event;
@@ -354,9 +351,9 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
       data.track = track;
 	  
       /* make note off track */
-      fts_set_symbol(a + 0, eventtrk_symbol); /* event track */
-      fts_set_symbol(a + 1, sym_export_midi); /* track name */
-      fts_set_symbol(a + 2, sym_export_midi); /* event type */
+      fts_set_symbol(a + 0, seqsym_eventtrk); /* event track */
+      fts_set_symbol(a + 1, seqsym_export_midi); /* track name */
+      fts_set_symbol(a + 2, seqsym_export_midi); /* event type */
       fts_object_new(0, 3, a, (fts_object_t **)&(data.note_off_track));
       
       /* init array of note status events */
@@ -404,7 +401,7 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
 	    }
 
 	  /* send export message to event */
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, sym_export_midi, 1, a);
+	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_export_midi, 1, a);
 	  
 	  /* go to next event */
 	  event = event_get_next(event);

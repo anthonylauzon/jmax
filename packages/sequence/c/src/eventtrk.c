@@ -24,15 +24,12 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "event.h"
 #include "eventtrk.h"
 #include "seqmidi.h"
 
 #define EVENTTRK_ADD_BLOCK_SIZE 256
-
-fts_symbol_t eventtrk_symbol = 0;
-
-static fts_symbol_t sym_addEvents = 0;
 
 /*********************************************************
  *
@@ -280,11 +277,11 @@ eventtrk_event_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   eventtrk_add_event(this, time, (event_t *)event);
 
   /* create event at client (short cut: could also send upload message to event object) */
-  fts_client_upload(event, event_symbol, ac, at);
+  fts_client_upload(event, seqsym_event, ac, at);
 
   /* add event to track at client */
   fts_set_object(a, event);    
-  fts_client_send_message((fts_object_t *)this, sym_addEvents, 1, a);
+  fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
 }
 
 /* create new event by client request without uploading */
@@ -301,9 +298,6 @@ eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 
   /* add event to track */
   eventtrk_add_event(this, time, (event_t *)event);
-
-  /* create event at client (short cut: could also send upload message to event object) */
-  /*fts_client_upload(event, event_symbol, ac, at);*/  
 }
 
 /* delete event by client request */
@@ -334,7 +328,7 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       /* create track at client */
       fts_set_symbol(a + 0, track_get_name(&this->head));
       fts_set_symbol(a + 1, eventtrk_get_type(this));
-      fts_client_upload((fts_object_t *)this, track_symbol, 2, a);
+      fts_client_upload((fts_object_t *)this, seqsym_track, 2, a);
     }
 
   while(event)
@@ -350,7 +344,7 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 	  if(n == EVENTTRK_ADD_BLOCK_SIZE)
 	    {
-	      fts_client_send_message((fts_object_t *)this, sym_addEvents, n, a);
+	      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);
 	      n = 0;
 	    }
 	}
@@ -359,7 +353,7 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
  
   if(n > 0)
-    fts_client_send_message((fts_object_t *)this, sym_addEvents, n, a);    
+    fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
 }
 
 static void 
@@ -385,19 +379,28 @@ static void
 eventtrk_export_to_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_name = fts_get_symbol(at);
 
-  if(!file_name)
-    {
-      char s[1024];
-      fts_symbol_t track_name = track_get_name(&this->head);
-
-      snprintf(s, 1024, "%s.mid", fts_symbol_name(track_name));
-      
-      file_name = fts_new_symbol_copy(s);
-    }
-  
   seqmidi_write_midifile_from_event_track(this, file_name);
+}
+
+static void 
+eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  fts_symbol_t track_name = track_get_name(&this->head);
+  fts_symbol_t default_name;
+  char str[1024];
+  fts_atom_t a[4];
+
+  snprintf(str, 1024, "%s.mid", fts_symbol_name(track_name));
+  default_name = fts_new_symbol_copy(str);
+      
+  fts_set_symbol(a, seqsym_dialogFileSave);
+  fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
+  fts_set_symbol(a + 2, fts_get_project_dir());
+  fts_set_symbol(a + 3, default_name);
+  fts_client_send_message(o, seqsym_dialogFileSave, 4, a);
 }
 
 static fts_status_t
@@ -411,7 +414,8 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, eventtrk_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), eventtrk_export_to_midifile);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi_dialog, eventtrk_export_to_midifile_with_dialog);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi, eventtrk_export_to_midifile);
     
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), eventtrk_event_new_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_add"), eventtrk_event_add_by_client_request);
@@ -423,8 +427,5 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 eventtrk_config(void)
 {
-  eventtrk_symbol = fts_new_symbol("eventtrk");
-  sym_addEvents = fts_new_symbol("addEvents");
-
-  fts_class_install(fts_new_symbol("eventtrk"), eventtrk_instantiate);
+  fts_class_install(seqsym_eventtrk, eventtrk_instantiate);
 }

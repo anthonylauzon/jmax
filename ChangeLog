@@ -1,7 +1,11 @@
+2000-08-01  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* packages/explode/c/src/explode.c: added MIDI file export to explode object
+	* packages/sequence/c/src/seqmidi.c: added MIDI file import/export to sequence object
+
 2000-07-12  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* packages/midisgi/c/src/sgimidiport.c: fts_midiport_t implementation for SGI
-
 	* packages/midi/*: added package midi (ISPW like midi objects based on fts_midiport_t)
 
 2000-06-23  Francois Dechelle  <dechelle@lipari.ircam.fr>

@@ -29,8 +29,6 @@
 #include "fts.h"
 #include "event.h"
 
-extern fts_symbol_t noteevt_symbol;
-
 typedef struct _noteevt_
 {
   event_t head;

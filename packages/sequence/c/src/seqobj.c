@@ -26,6 +26,8 @@
 
 #include "fts.h"
 
+#include "seqsym.h"
+
 #include "sequence.h"
 #include "track.h"
 
@@ -33,12 +35,6 @@
 #include "noteevt.h"
 
 #include "seqmidi.h"
-
-static fts_symbol_t sym_openEditor = 0;
-static fts_symbol_t sym_destroyEditor = 0;
-static fts_symbol_t sym_addTracks = 0;
-
-static fts_symbol_t sym_export_midi = 0;
 
 #define SEQOBJ_ADD_BLOCK_SIZE 64
 
@@ -70,7 +66,7 @@ seqobj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       track = sequence_get_first_track(this);
     }    
   
-  fts_client_send_message(o, sym_destroyEditor, 0, 0);
+  fts_client_send_message(o, seqsym_destroyEditor, 0, 0);
 }
 
 /******************************************************
@@ -87,8 +83,8 @@ seqobj_track_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_symbol_t type = fts_get_symbol(at + 0);
   fts_symbol_t track_class;
 
-  /*if(type == noteevt_symbol)*/
-  track_class = eventtrk_symbol;
+  /*if(type == seqsym_noteevt)*/
+  track_class = seqsym_eventtrk;
   /*else
     track_class = 0;*/
 
@@ -111,11 +107,11 @@ seqobj_track_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
       sequence_add_track(this, (track_t *)track);
       
       /* create track at client */
-      fts_client_upload(track, track_symbol, 2, a + 1);
+      fts_client_upload(track, seqsym_track, 2, a + 1);
       
       /* add track to sequence at client */
       fts_set_object(a + 0, (fts_object_t *)track);	    
-      fts_client_send_message(o, sym_addTracks, 1, a);
+      fts_client_send_message(o, seqsym_addTracks, 1, a);
     }
 }
 
@@ -155,7 +151,7 @@ seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	  if(n == SEQOBJ_ADD_BLOCK_SIZE)
 	    {
-	      fts_client_send_message(o, sym_addTracks, n, a);
+	      fts_client_send_message(o, seqsym_addTracks, n, a);
 	      n = 0;
 	    }
 	}
@@ -164,7 +160,7 @@ seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 
   if(n > 0)
-    fts_client_send_message(o, sym_addTracks, n, a);
+    fts_client_send_message(o, seqsym_addTracks, n, a);
 }
 
 void
@@ -173,7 +169,7 @@ seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   sequence_t *this = (sequence_t *)o;
 
   sequence_set_editor_open(this);
-  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_client_send_message(o, seqsym_openEditor, 0, 0);
   seqobj_update(o, 0, 0, 0, 0);
 }
 
@@ -191,15 +187,19 @@ seqobj_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 void
-seqobj_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqobj_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t track_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 1, 0);
   track_t *track = sequence_get_track_by_name(this, track_name);
 
   if(track)
-    fts_send_message((fts_object_t *)track, fts_SystemInlet, sym_export_midi, 1, at + 1);  
+    {
+      if(ac > 1 && fts_is_symbol(at + 1))
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi, 1, at + 1);
+      else
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi_dialog, 0, 0);
+    }
 }
 
 void
@@ -230,6 +230,12 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
+static void
+seqobj_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_set_object(value, o);
+}
+
 /******************************************************
  *
  *  class
@@ -243,6 +249,9 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_class_init(cl, sizeof(sequence_t), 1, 0, 0); 
 
+      /* define variable */
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, seqobj_get_state);
+
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqobj_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqobj_delete);
 
@@ -252,7 +261,7 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_s_print, seqobj_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), seqobj_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), seqobj_export);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), seqobj_export_track_by_name);
       
       return fts_Success;
     }
@@ -263,10 +272,5 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 seqobj_config(void)
 {
-  sym_openEditor = fts_new_symbol("openEditor");
-  sym_destroyEditor = fts_new_symbol("destroyEditor");
-  sym_addTracks = fts_new_symbol("addTracks");
-  sym_export_midi = fts_new_symbol("export_midi");
-
-  fts_class_install(fts_new_symbol("sequence"), seqobj_instantiate);
+  fts_class_install(seqsym_sequence, seqobj_instantiate);
 }

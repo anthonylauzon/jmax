@@ -28,8 +28,6 @@
 
 #include "fts.h"
 
-extern fts_symbol_t track_symbol;
-
 typedef struct _track_ track_t;
 
 struct _track_

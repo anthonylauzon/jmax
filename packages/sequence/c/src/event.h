@@ -34,8 +34,6 @@
  *
  */
 
-extern fts_symbol_t event_symbol;
-
 typedef struct _event_ event_t;
 
 struct _event_

@@ -23,24 +23,36 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _FLOATEVT_H_
-#define _FLOATEVT_H_
+#ifndef _SEQSYM_H_
+#define _SEQSYM_H_
 
 #include "fts.h"
-#include "event.h"
 
-extern fts_symbol_t floatevt_symbol;
+/* sequence components */
+extern fts_symbol_t seqsym_sequence;
+extern fts_symbol_t seqsym_track;
+extern fts_symbol_t seqsym_eventtrk;
+extern fts_symbol_t seqsym_event;
 
-typedef struct _floatevt_
-{
-  event_t head;
-  fts_atom_t value;
-} floatevt_t;
+/* events */
+extern fts_symbol_t seqsym_noteevt;
+extern fts_symbol_t seqsym_floatevt;
+extern fts_symbol_t seqsym_intevt;
+extern fts_symbol_t seqsym_messevt;
 
-#define floatevt_set_value(e, v) ((e)->value = (v))
-#define floatevt_get_value(e) ((e)->value)
+/* properties */
+extern fts_symbol_t seqsym_midi_channel;
+extern fts_symbol_t seqsym_midi_velocity;
+
+/* messages */
+extern fts_symbol_t seqsym_export_midi;
+extern fts_symbol_t seqsym_export_midi_dialog;
+
+/* messages to client */
+extern fts_symbol_t seqsym_openEditor;
+extern fts_symbol_t seqsym_destroyEditor;
+extern fts_symbol_t seqsym_addTracks;
+extern fts_symbol_t seqsym_addEvents;
+extern fts_symbol_t seqsym_dialogFileSave;
 
 #endif
-
-
-

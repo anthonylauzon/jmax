@@ -24,11 +24,15 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "intevt.h"
 
-fts_symbol_t intevt_symbol = 0;
+typedef struct _intevt_
+{
+  event_t head;
+  fts_atom_t value;
+} intevt_t;
 
 static void
 intevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -54,10 +58,10 @@ intevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   /*fts_set_float(a + 0, 1000.0 * event_get_time(&this->head));*/
   fts_set_float(a + 0, event_get_time(&this->head));
-  fts_set_symbol(a + 1, intevt_symbol);
+  fts_set_symbol(a + 1, seqsym_intevt);
   a[2] = this->value;
 
-  fts_client_upload(o, event_symbol, 3, a);
+  fts_client_upload(o, seqsym_event, 3, a);
 }
 
 static void
@@ -117,7 +121,5 @@ intevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 intevt_config(void)
 {
-  intevt_symbol = fts_new_symbol("intevt");
-
-  fts_class_install(intevt_symbol, intevt_instantiate);
+  fts_class_install(seqsym_intevt, intevt_instantiate);
 }
