@@ -36,9 +36,15 @@ extern void alsaaudioport_config( void);
 extern void alsamidi_config( void);
 extern void alsarawmidiport_config( void);
 
+extern void alsaseqmidiport_config(void);
+extern void alsaseqmidi_config(void);
+
 void alsa_config(void)
 {
   alsaaudioport_config();
   alsarawmidiport_config();
   alsamidi_config();
+  alsaseqmidiport_config();
+  alsaseqmidi_config();
+
 }
