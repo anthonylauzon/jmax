@@ -28,5 +28,9 @@ public class FtsModule
     // Install the meta data object
 
     FtsRemoteMetaData.install();
+
+    // Install the Integer vector class
+
+    Fts.registerRemoteDataClass("intvec_data", ircam.jmax.fts.FtsIntegerVector.class);
   }
 }

@@ -25,7 +25,6 @@ static fts_symbol_t fts_s_newobj;
 static fts_symbol_t fts_s_vpatcher;
 static fts_symbol_t fts_s_vtable;
 static fts_symbol_t fts_s_slider;
-static fts_symbol_t fts_s__set;
 static fts_symbol_t fts_s_number;
 static fts_symbol_t fts_s_flonum;
 static fts_symbol_t fts_s_intbox;
@@ -84,7 +83,6 @@ void fts_patparser_init()
   fts_s_vpatcher = fts_new_symbol("vpatcher");
   fts_s_vtable = fts_new_symbol("vtable");
   fts_s_slider = fts_new_symbol("slider");
-  fts_s__set = fts_new_symbol("_set");
   fts_s_number = fts_new_symbol("number");
   fts_s_flonum = fts_new_symbol("flonum");
   fts_s_intbox = fts_new_symbol("intbox");
@@ -447,7 +445,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
 	      argc = fts_patparse_read_object_arguments(args, in);
 
-	      fts_send_message(lastNObject, 0, fts_s__set, argc, args);
+	      fts_send_message(lastNObject, 0, fts_s_set, argc, args);
 
 	      fts_patlex_next_token(in);/* skip ';' ?? */
 	    }

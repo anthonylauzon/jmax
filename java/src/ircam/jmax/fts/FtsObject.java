@@ -54,9 +54,7 @@ abstract public class FtsObject
 
     className = (String) msg.getArgument(2);
 
-    if (className.equals("table"))
-      return new FtsTableObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("qlist"))
+    if (className.equals("qlist"))
       return new FtsQlistObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("jpatcher"))
       return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
@@ -68,16 +66,6 @@ abstract public class FtsObject
       return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className.equals("comment"))
       return new FtsCommentObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
-    else if (className.equals("slider"))
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("intbox"))
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("floatbox"))
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("toggle"))
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("param"))
-      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("__selection"))
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))

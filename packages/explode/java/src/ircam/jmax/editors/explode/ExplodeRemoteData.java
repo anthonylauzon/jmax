@@ -8,9 +8,11 @@ import java.util.*;
 
 public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 {
-  /** Key for remote call add */
+  /** Key for remote calls */
 
-  static final int REMOTE_ADD   = 1;
+  static final int REMOTE_CLEAN  = 1;
+  static final int REMOTE_APPEND = 2;
+  static final int REMOTE_ADD    = 1;
   static final int REMOTE_REMOVE = 2;
 
   /* Events are stored in an array; the array is larger than
@@ -243,10 +245,10 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   /* a method inherited from FtsRemoteData */
 
-  public final void call( int key, Object args[])
+  public final void call( int key, FtsMessage msg)
     {
       switch( key) {
-      case 1:
+      case REMOTE_CLEAN:
 	// Make the gc happy
 
 	for (int i = 0; i < events_fill_p; i++)
@@ -254,17 +256,16 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
 	events_fill_p = 0;
 	break;
-      case 2:
+      case REMOTE_APPEND:
 	// FTS always send the events in order (???)
 
 	if (events_fill_p >= events_size)
 	  reallocateEvents();
-	events[events_fill_p++] = new ScrEvent( ((Integer) args[0]).intValue(), 
-						((Integer) args[1]).intValue(), 
-						((Integer) args[2]).intValue(), 
-						((Integer) args[3]).intValue(), 
-						((Integer) args[4]).intValue());
-	
+	events[events_fill_p++] = new ScrEvent( ((Integer) msg.getArgument(2)).intValue(), 
+						((Integer) msg.getArgument(3)).intValue(), 
+						((Integer) msg.getArgument(4)).intValue(), 
+						((Integer) msg.getArgument(5)).intValue(), 
+						((Integer) msg.getArgument(6)).intValue());
 	break;
       default:
 	break;

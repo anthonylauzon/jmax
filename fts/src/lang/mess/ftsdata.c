@@ -132,7 +132,7 @@ int fts_data_get_id( fts_data_t *d)
   return d->id;
 }
 
-void fts_data_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
+void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 {
   fts_data_fun_t function;
 
@@ -147,7 +147,7 @@ void fts_data_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
   (*function)( d, ac, at);
 }
 
-void fts_data_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
+void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 {
   if (! fts_data_is_exported(d))
     fts_data_export(d);
@@ -156,6 +156,30 @@ void fts_data_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
   fts_client_mess_add_int( d->id);
   fts_client_mess_add_int( key);
   fts_client_mess_add_atoms( ac, at);
+  fts_client_mess_send_msg();
+}
+
+
+/* A version where the arguments are sent directly by the caller;
+   usefull to avoid allocation of big atom arrays.
+   Of course, if somebody call fts_data_start_remote_call
+   without calling fts_data_end_remote_call, the message
+   and the next one are lost, but these functions are absolutely
+   needed (see intvec.c for example).
+   */
+
+void fts_data_start_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
+{
+  if (! fts_data_is_exported(d))
+    fts_data_export(d);
+
+  fts_client_mess_start_msg( REMOTE_CALL_CODE);
+  fts_client_mess_add_int( d->id);
+  fts_client_mess_add_int( key);
+}
+
+void fts_data_end_remote_call()
+{
   fts_client_mess_send_msg();
 }
 

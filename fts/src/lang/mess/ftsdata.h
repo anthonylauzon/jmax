@@ -8,8 +8,8 @@ extern void fts_data_class_define_function( fts_data_class_t *class, int key, ft
 extern void fts_data_init( fts_data_t *d, fts_data_class_t *class);
 extern void fts_data_export( fts_data_t *d);
 
-extern void fts_data_call( fts_data_t *d, int key, int ac, fts_atom_t *at);
-extern void fts_data_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at);
+extern void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at);
+extern void fts_data_remote_call( fts_data_t *d, int key, int ac, const fts_atom_t *at);
 
 /* Really necessary ? */
 

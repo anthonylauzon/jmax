@@ -3,6 +3,7 @@
 
 #include "lang/mess.h"
 #include "lang/utils.h"
+#include "lang/datalib.h"
 #include "lang/ftl.h"
 #include "lang/dsp.h"
 #include "lang/veclib.h"

@@ -161,7 +161,7 @@ struct fts_plist
  * Data functions
  */
 
-typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, fts_atom_t *at);
+typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, const fts_atom_t *at);
 typedef void (*fts_data_export_fun_t)( fts_data_t *d);
 
 

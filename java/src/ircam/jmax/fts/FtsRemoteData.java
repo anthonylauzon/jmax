@@ -20,11 +20,27 @@ public abstract class FtsRemoteData implements MaxData {
       return this.getClass().getName() + "." + id;
     }
 
-  abstract public void call( int key, Object args[]);
+  abstract public void call( int key, FtsMessage msg);
 
+
+  /* We implement a family of remoteCall methods.
+     The first one accept the argument as an object array;
+     others accept various form of arguments, to avoid
+     allocating new objects when sending the message;
+     some of the special version are quite general,
+     and some are quite specific, of course, but the problem
+     cannot be solved in general; we support first messages
+     that can have vector related arguments.
+     */
+     
   public void remoteCall( int key, Object args[])
   {
     Fts.getServer().remoteCall( this, key, args);
+  }
+
+  public void remoteCall( int key, int offset, int size, int values[])
+  {
+    Fts.getServer().remoteCall( this, key, offset, size, values);
   }
 
   protected int id;

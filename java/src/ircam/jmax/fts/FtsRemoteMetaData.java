@@ -16,10 +16,10 @@ class FtsRemoteMetaData extends FtsRemoteData
     super();
   }
 
-  private void newFtsRemoteData( Object args[])
+  private void newFtsRemoteData( FtsMessage msg)
   {
-    int newId = ((Integer)args[0]).intValue();
-    String className = (String)args[1];
+    int newId = ((Integer)msg.getArgument(2)).intValue();
+    String className = (String)msg.getArgument(3);
     Class dataJavaClass;
     FtsRemoteData newRemoteData;
 
@@ -50,11 +50,11 @@ class FtsRemoteMetaData extends FtsRemoteData
     FtsRemoteDataID.put( newId, newRemoteData);
   }
 
-  public final void call( int key, Object args[])
+  public final void call( int key, FtsMessage msg)
   {
     switch( key) {
     case 1:
-      newFtsRemoteData( args);
+      newFtsRemoteData(msg);
       break;
     default:
       break;

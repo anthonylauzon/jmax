@@ -56,6 +56,8 @@
    CLIENTPROP (obj)o (symbol)name (atom) value
    CLIENTMESS (obj)obj (symbol)selector [(atom)<args>]*
 
+   REMOTE_CALL <key> <args> * 
+
    FTS_SHUTDOWN_CODE  quit fts.
 
    Other messages will be added ...
@@ -942,6 +944,33 @@ fts_mess_client_get_all_prop(int ac, const fts_atom_t *av)
     post_mess("System Error in FOS message GETPROP: bad args", ac, av);
 }
 
+/*
+  REMOTE_CALL <key> <args> * 
+
+   Get a fts data function call .
+   */
+
+
+static void 
+fts_mess_client_remote_call(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received remote call", ac, av);
+
+  if ((ac >= 2) &&
+      fts_is_data(&av[0]) &&
+      fts_is_int(&av[1]))
+    {
+      fts_data_t *data;
+      int key;
+
+      data = fts_get_data(&av[0]);
+      key  = fts_get_int(&av[1]);
+
+      fts_data_call(data, key, ac - 2, av + 2);
+    }
+  else
+    post_mess("System Error in FOS message REMOTE_CALL: bad args", ac, av);
+}
 
 /*
    SHUTDOWN
@@ -993,6 +1022,7 @@ fts_messtile_install_all()
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
   fts_client_mess_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
+  fts_client_mess_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
   fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }
 

@@ -10,35 +10,25 @@ import ircam.jmax.utils.*;
  *  FTS
  */
 
-public class FtsIntegerVector implements FtsDataObject
+public class FtsIntegerVector extends FtsRemoteData
 {
-  FtsObject object = null; 
+  /** Key for remote calls */
+
+  static final int REMOTE_SET     = 1;
+  static final int REMOTE_UPDATE  = 2;
+
   int[] values = null;
 
-  public FtsIntegerVector(int size)
+  public FtsIntegerVector()
   {
-    this.values = new int[size];
+    super();
   }
 
-  public FtsIntegerVector(FtsObject object, int size)
-  {
-    this.object = object;
-    this.values = new int[size];
-  }
-
-  // Max Data implementation
-
-  public MaxDocument getDocument()
-  {
-    if (object != null)
-      return object.getParent().getDocument();
-    else
-      return null;
-  }
+  /** SHould go away !!! */
 
   public String getName()
   {
-    return object.getObjectName();
+    return "table";
   }
 
   /** Get the vector size */
@@ -51,8 +41,6 @@ public class FtsIntegerVector implements FtsDataObject
       return 0;
   }
 
-  /** set the vector size 
-   */
 
   public void setSize(int size)
   {
@@ -85,13 +73,6 @@ public class FtsIntegerVector implements FtsDataObject
   }
 
 
-  /** Set the corresponding FTS objetc */
-
-  void setObject(FtsObject object)
-  {
-    this.object = object;
-  }
-
   /** Get the values  */
 
   public int[] getValues()
@@ -103,21 +84,8 @@ public class FtsIntegerVector implements FtsDataObject
 
   public void forceUpdate()
   {
-    if (object != null)
-      {
-	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
-	Fts.sync();
-      }
-  }
-
-  void updateFromMessage(FtsMessage msg)
-  {
-    int updateSize;
-
-    updateSize = ((Integer) msg.getArgument(2)).intValue();
-
-    for (int i = 0 ; i < updateSize; i++)
-      values[i] = ((Integer) msg.getArgument(i + 3)).intValue();
+    remoteCall(REMOTE_UPDATE, null);
+    Fts.sync();
   }
 
   /** Declare that a range in the vector has been changed
@@ -126,15 +94,7 @@ public class FtsIntegerVector implements FtsDataObject
 
   public void changed(int from, int to)
   {
-    // Mandare un messaggio _set all'oggetto
-    // primo argomento l'offset, e poi i valori.
-
-    
-    if (object != null)
-      {
-	Fts.getServer().sendSetMessage(object, from, values, from, to);
-	object.setDirty();
-      }
+    remoteCall(REMOTE_SET, from, to - from + 1, values);
   }
 
   /** Declare that a value in the vector has been changed
@@ -150,9 +110,32 @@ public class FtsIntegerVector implements FtsDataObject
       and should be sent to FTS
       */
 
+
   public void changed()
   {
     changed(0, values.length - 1);
+  }
+
+  /* a method inherited from FtsRemoteData */
+
+  public final void call( int key, FtsMessage msg)
+  {
+    switch( key)
+      {
+      case REMOTE_SET:
+	int size;
+	
+	size = ((Integer) msg.getArgument(2)).intValue();
+
+	if ((values == null) || size != values.length)
+	  values = new int[size];
+	
+	for (int i = 3 ; i < size + 2; i++)
+	  values[i - 3] = ((Integer) msg.getArgument(i)).intValue();
+	break;
+      default:
+	break;
+      }
   }
 }
 

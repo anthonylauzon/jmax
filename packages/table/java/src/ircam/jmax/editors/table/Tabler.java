@@ -3,6 +3,7 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;

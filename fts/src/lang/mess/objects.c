@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.35 $ IRCAM $Date: 1998/08/19 15:15:49 $
+ *      $Revision: 1.36 $ IRCAM $Date: 1998/08/25 12:52:21 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -893,7 +893,6 @@ fts_object_send_properties(fts_object_t *obj)
 	 be in the relative objects */
 
       fts_object_property_changed_urgent(obj, fts_s_value); 
-      fts_object_property_changed_urgent(obj, fts_s_size); 
       fts_object_property_changed_urgent(obj, fts_s_name) ;
       fts_object_property_changed_urgent(obj, fts_s_error);
 
@@ -926,7 +925,6 @@ fts_object_send_kernel_properties(fts_object_t *obj)
 	 be in the relative objects */
 
       fts_object_property_changed_urgent(obj, fts_s_value); 
-      fts_object_property_changed_urgent(obj, fts_s_size); 
       fts_object_property_changed_urgent(obj, fts_s_error);
       fts_object_property_changed_urgent(obj, fts_s_name) ;
 

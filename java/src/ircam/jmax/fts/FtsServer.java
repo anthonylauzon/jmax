@@ -578,34 +578,6 @@ public class FtsServer
   }
 
 
-  /** Send set" messages to the system inlet 0 of an FTS object with as arguments elements
-    from an int arrays
-    */
-
-  final void sendSetMessage(FtsObject dst, int offset, int[] values, int from, int to)
-  {
-    if (FtsServer.debug)
-      System.err.println("sendSetMessage(" + dst + ", " + offset + ", " + values  + ", " +
-			 from + ", " + to + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_message_cmd);
-	port.sendObject(dst);
-	port.sendInt(-1);
-	port.sendString("set");
-	port.sendInt(offset);
-
-	if (values != null)
-	  port.sendArray(values, from, to);
-
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
   /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a Vector; the vector should only contains String, Floats and Integers, of course.
     */
@@ -834,23 +806,46 @@ public class FtsServer
   final void remoteCall( FtsRemoteData data, int key, Object args[])
   {
     if (FtsServer.debug)
-      System.err.println( "remoteCall(" + data + ", " + key + ", ...)");
+      System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
 
     try
       {
-	port.sendCmd( FtsClientProtocol.remote_call_code);
-	port.sendRemoteData( data);
-	port.sendInt( key);
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
 
-	port.sendArray( args);
+	if (args != null)
+	  port.sendArray( args); // we may have zero args call
 
 	port.sendEom();
       }
     catch (java.io.IOException e)
       {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
       }
   }
 
+  final void remoteCall( FtsRemoteData data, int key, int offset, int size, int values[])
+  {
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data +
+			  ", " + key + ", " + offset + ", " + size + ", " + values + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendInt(offset);
+	port.sendInt(size);
+	port.sendArray(values, offset, offset + size);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, offset, size , values)");
+      }
+  }
 
   /**
    * Sync point with FTS.
@@ -1098,12 +1093,12 @@ public class FtsServer
 
 	  int key = ((Integer)  msg.getArgument(1)).intValue();
 
-	  Object args[] = new Object[ msg.getNumberOfArguments() - 2];
+	  // Args can be big (thousands), so in order to keep 
+	  // call as "primitive" as possible, we just pass
+	  // the msg; it is up to the called object to interpret
+	  // it
 
-	  for ( int i = 2; i < msg.getNumberOfArguments(); i++)
-	    args[i-2] = msg.getArgument(i);
-
-	  data.call( key, args);
+	  data.call(key, msg);
 
 	  break;
 	}

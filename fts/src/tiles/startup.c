@@ -119,6 +119,8 @@ fts_kernel_config(void)
 
   fts_install_module(&fts_utils_module);      /* Install the FTS utils */
 
+  fts_install_module(&fts_datalib_module);      /* Install the FTS data lib */
+
   fts_install_module(&fts_veclib_module);  /* Install the FTS vector function*/
 
   fts_install_module(&fts_dsp_module);       /* Install the DSP engine */
