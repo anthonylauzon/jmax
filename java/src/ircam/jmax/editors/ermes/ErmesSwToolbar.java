@@ -95,29 +95,8 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
    * The action taken when a toolBar button is pressed...
    */
   public void mousePressed(MouseEvent e){ 
-    /*ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
-      if (e.getClickCount() > 1) {
-      SelectAButton(aTButton);
-      itsSketchPad.startAdd(aTButton.getName());
-      locked = true;
-      return;
-      }
-      if (aTButton == itsLastPressed){
-       itsLastPressed= null;
-       itsSketchPad.DoNothing();
-       locked = false;
-       }
-       else { //deselect the last
-       Deselect();
-       locked = false;
-       itsLastPressed = aTButton;
-       itsSketchPad.startAdd(aTButton.getName()); //and tell to the sketch
-       }*/
-  }
-
-  public void mouseClicked(MouseEvent e){
     ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
-
+    
     if (e.getClickCount() > 1) {
       pressed = true;
       aTButton.setSelected(true);
@@ -130,7 +109,6 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
       return;
     }
     if (aTButton == itsLastPressed){
-      // itsLastPressed= null;//?????????????????????
       itsSketchPad.DoNothing();
       locked = false;
       pressed = false;
@@ -143,8 +121,12 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
       itsSketchPad.startAdd(aTButton.getName()); //and tell to the sketch
     }
   }
+
+  public void mouseClicked(MouseEvent e){}
   
-  public void mouseReleased(MouseEvent e){}
+  public void mouseReleased(MouseEvent e){
+    if(!itsLastPressed.contains(e.getX(), e.getY())) itsSketchPad.DoNothing();
+  }
   public void mouseEntered(MouseEvent e){}
   public void mouseExited(MouseEvent e){}
 

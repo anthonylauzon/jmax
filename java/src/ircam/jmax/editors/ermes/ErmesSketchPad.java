@@ -952,10 +952,71 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
-    public Dimension getMinimumSize() {
-        return new Dimension(30, 20);
-    }
+  public Dimension getMinimumSize() {
+    return new Dimension(30, 20);
+  }
 	
+  void AddingObject(int x, int y){
+    Rectangle aRect = null;
+    ErmesObject aObject = null;
+    ErmesObjOutlet aOutlet;
+
+    if(doSnapToGrid){
+      Point aPoint = itsHelper.SnapToGrid(x, y);
+      x = aPoint.x;
+      y = aPoint.y;
+    }
+      
+    //bug 1003.8: waiting for lock on Maurizio's modifs
+    boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
+    if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
+      //forbidden to add such objects in a top level patch
+      ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
+      aErr.setLocation(100, 100);
+      aErr.show();
+      editStatus = DOING_NOTHING;
+      return;
+    }
+    try
+      {
+	aObject = (ErmesObject) Class.forName(itsAddObjectName).newInstance();
+      }
+    catch (ClassNotFoundException e1)
+      {
+	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Class not found: " + e1);
+	return;
+      }
+    catch (IllegalAccessException e2)
+      {
+	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Illegal Access: " + e2);
+	return;
+      }
+    catch (InstantiationException e3)
+      {
+	System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Instantiation Error: " + e3);
+	return;
+      }
+    
+    aObject.Init(this, x, y, "");
+    itsElements.addElement(aObject);
+    aObject.Paint(offGraphics);
+    CopyTheOffScreen(getGraphics());
+    if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+      itsPatcherElements.addElement(aObject);
+    if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
+    aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
+    aRect.grow(3,6);
+    itsElementRgn.Add(aRect);
+    for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet)en.nextElement();
+      itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
+    }
+    ToSave();
+  }
+
+
+
+
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}
@@ -968,11 +1029,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int x = e.getX();
     int y = e.getY();
     int i;
-    Rectangle aRect = null;
-    ErmesObject aObject = null;
-    ErmesObjOutlet aOutlet;
-    ErmesConnection aConnection;
-		
     
     if(!offScreenPresent){
       RequestOffScreen(this);
@@ -1028,57 +1084,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     if (!itsToolBar.locked) itsToolBar.Deselect();
     
     if(editStatus == START_ADD){
-      if(doSnapToGrid){
-	Point aPoint = itsHelper.SnapToGrid(x, y);
-	x = aPoint.x;
-	y = aPoint.y;
-      }
-      
-      //bug 1003.8: waiting for lock on Maurizio's modifs
-      boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
-      if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
-	//forbidden to add such objects in a top level patch
-	ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
-	aErr.setLocation(100, 100);
-	aErr.show();
-	editStatus = DOING_NOTHING;
-	return;
-      }
-      try
-	{
-	  aObject = (ErmesObject) Class.forName(itsAddObjectName).newInstance();
-	}
-      catch (ClassNotFoundException e1)
-	{
-	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Class not found: " + e1);
-	  return;
-	}
-      catch (IllegalAccessException e2)
-	{
-	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Illegal Access: " + e2);
-	  return;
-	}
-      catch (InstantiationException e3)
-	{
-	  System.err.println("ErmesSketchPad:mousePressed: INTERNAL ERROR: Instantiation Error: " + e3);
-	  return;
-	}
-
-      aObject.Init(this, x, y, "");
-      itsElements.addElement(aObject);
-      aObject.Paint(offGraphics);
-      CopyTheOffScreen(getGraphics());
-      if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
-	itsPatcherElements.addElement(aObject);
-      if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-      aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
-      aRect.grow(3,6);
-      itsElementRgn.Add(aRect);
-      for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
-	aOutlet = (ErmesObjOutlet)en.nextElement();
-	itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
-      }
-      ToSave();
+      AddingObject(x,y);
     }
     else{
       if (!e.isShiftDown()) itsHelper.DeselectAll();
@@ -1093,7 +1099,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int x = e.getX();
     int y = e.getY();
     
-
     //(opt.) resetting the "firstclick" flag if safer but heavy 
     //(a repaint foreach mouseup...)
     //itsFirstClick = true;
@@ -1197,6 +1202,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsCurrentObject.MouseUp(e,x,y);
       editStatus = START_SELECT;
       repaint();
+    }
+    else if(editStatus == START_ADD){//?????????????????????
+      AddingObject(x,y);
     }
     else if(editStatus == DOING_NOTHING) return;
   }
