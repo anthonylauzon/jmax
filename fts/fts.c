@@ -129,6 +129,12 @@ fts_symbol_t fts_get_root_directory( void)
   return fts_get_default_root_directory();
 }
 
+fts_symbol_t get_user_directory(void);
+fts_symbol_t fts_get_user_directory(void)
+{
+  return get_user_directory();
+}
+
 
 /***********************************************************************
  *

@@ -60,7 +60,7 @@ fts_symbol_t fts_get_default_root_directory( void)
 
 #define PREF_DIR ".jmax"
 
-static fts_symbol_t get_user_directory(void)
+fts_symbol_t get_user_directory(void)
 {
   char dir[MAXPATHLEN];
 
