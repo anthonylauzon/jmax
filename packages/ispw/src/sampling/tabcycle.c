@@ -1,4 +1,4 @@
-#include "fts.h"
+>#include "fts.h"
 
 #include "sampbuf.h"
 
@@ -15,7 +15,6 @@ typedef struct
 {
   long size;			/* cycle size */
   long offset;			/* sample offset (grows by the vectorSize) */
-  long wrap;			/* used for index wrap */
   sampbuf_t *buf;		/* samp tab buffer */
 } tabcycle_ctl_t;
 
@@ -43,8 +42,6 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->size = size;
 
   this->tabcycle_data = ftl_data_new(tabcycle_ctl_t);
-
-  ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, size, &size);
 
   dsp_list_insert(o); /* just put object in list */
 }
@@ -75,7 +72,7 @@ tabcycle_dsp_function(fts_word_t *argv)
 
   offset = ctl->offset;
   fts_vecx_fcpy(ctl->buf->samples + offset, out, n_tick);
-  ctl->offset = (ctl->offset + n_tick) & ctl->wrap;
+  ctl->offset = (ctl->offset + n_tick) % ctl->size;
 }
 
 static void
@@ -94,21 +91,20 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       n_tick = fts_dsp_get_input_size(dsp, 0);
 
-      if (buf->size < this->size)
-	{
-	  post("tabcycle~: %s: table to short\n", fts_symbol_name(this->tab_name));
-	  return;
-	}
-
-      if(this->size % n_tick)
+      if(this->size % n_tick || this->size <= 0)
 	{
 	  post("tabcycle~: %s: size must be a multiple of %d\n", fts_symbol_name(this->tab_name), n_tick);
 	  return;
 	}
 
+      if (buf->size < this->size)
+	{
+	  post("tabcycle~: %s: table to short\n", fts_symbol_name(this->tab_name));
+	  return;
+	}
       
-      l = this->size - 1;
-      ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, wrap, &l);
+      l = this->size;
+      ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, size, &l);
 
       ftl_data_set(tabcycle_ctl_t, this->tabcycle_data, buf, &buf);
 
