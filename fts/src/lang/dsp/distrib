@@ -1,7 +1,7 @@
+all	all	dsp.h
 src	all	Makefile
 src	all	Sources
 src	all	dsp.c
-src	all	dsp.h
 src	all	dspcontrol.c
 src	all	dspgraph.c
 src	all	gphiter.c
