@@ -8803,7 +8803,7 @@
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;
-				HEADER_SEARCH_PATHS = "../../packages ../../include";
+				HEADER_SEARCH_PATHS = "../../packages ../../packages/sequence/c/include ../../include";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
