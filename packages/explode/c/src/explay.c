@@ -25,6 +25,30 @@ typedef struct
 
 
 static void
+gen_explode_name(char *buf, const char *base, long int n)
+{
+  char b2[30];
+  char *s = b2+29;
+  *s = 0;
+
+  if (n < 0)
+    n = 0;
+
+  while ((*buf = *base++))
+    buf++;
+
+  if (!n)
+    *(--s) = '0';
+  else while (n)
+    {
+      *(--s) = '0' + (n%10);
+      n /= 10;
+    }
+  while ((*buf++ = *s++))
+    ;
+}
+
+static void
 explay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
@@ -200,7 +224,7 @@ explay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   explay_t *this = (explay_t *)o;
   char buf[30];
 
-  gensampname(buf, "explode", fts_get_number(at));
+  gen_explode_name(buf, "explode", fts_get_number(at));
   this->explode_name = fts_new_symbol_copy(buf);
   this->current = 0;
 }

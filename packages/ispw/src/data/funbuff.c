@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:22 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:39 $
  *
  * Ported to FTS 1.3.x by MDC From the original sources of Zack Settel & Miller Puckette
  */
@@ -830,7 +830,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   x2 = z->next->x;
 
   tab_x = tab_domain * ((xn - x1) / (float)(x2 - x1));
-  tab_y = fts_integer_vector_get_value(tab, tab_x) - low;
+  tab_y = fts_integer_vector_get_element(tab, tab_x) - low;
   xn = z->y + (z->next->y - z->y) * (float)tab_y / tab_range;
 
   fts_outlet_int((fts_object_t *)this, 0, xn);			

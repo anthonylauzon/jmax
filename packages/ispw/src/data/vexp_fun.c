@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:25 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:41 $
  *
  * vexp_func.c -- this file include all the functions for vexp.
  *		  the first two arguments to the function are the number
@@ -570,7 +570,7 @@ ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   if (tw)
     {
       optr->ex_type = ET_INT;
-      optr->ex_int = fts_integer_vector_get_sum(tw, (long)0, (long)-1);
+      optr->ex_int = fts_integer_vector_get_sum(tw);
     }
   else
     {
@@ -620,7 +620,7 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     }
   
   optr->ex_type = ET_INT;
-  optr->ex_int = fts_integer_vector_get_sum(tw, argv->ex_int, argv[1].ex_int);
+  optr->ex_int = fts_integer_vector_get_sub_sum(tw, argv->ex_int, argv[1].ex_int);
 }
 
 /*
@@ -651,7 +651,7 @@ ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
       if (! fts_integer_vector_get_size(tw))
 	optr->ex_int = 0;
       else
-	optr->ex_int = fts_integer_vector_get_sum(tw, (long)0, (long)-1) / fts_integer_vector_get_size(tw);
+	optr->ex_int = fts_integer_vector_get_sum(tw) / fts_integer_vector_get_size(tw);
     }
   else
     {
@@ -704,7 +704,7 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   if (argv[1].ex_int - argv->ex_int <= 0)
     optr->ex_int = 0;
   else
-    optr->ex_int = (fts_integer_vector_get_sum(tw, argv->ex_int, argv[1].ex_int) /
+    optr->ex_int = (fts_integer_vector_get_sub_sum(tw, argv->ex_int, argv[1].ex_int) /
 		    (argv[1].ex_int - argv->ex_int));
 }
 
@@ -744,7 +744,7 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
       optr->ex_int = 0;
     }
 
-  fts_integer_vector_set_value(tw, argv->ex_int < 0 ? 0 : argv->ex_int % fts_integer_vector_get_size(tw), argv[1].ex_int);
+  fts_integer_vector_set_element(tw, argv->ex_int < 0 ? 0 : argv->ex_int % fts_integer_vector_get_size(tw), argv[1].ex_int);
   *optr = argv[1]; 
 }
 

@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/08/25 12:52:53 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:22 $
  *
  * Maintain a symbol table and define a message-passing system
  */
@@ -163,6 +163,7 @@ integer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* defined outlet selector */
 
+  a[0] = fts_s_int;
   fts_outlet_type_define(cl,
 			 0,	    /* the outlet #0 */
 			 fts_s_int, /* the symbol "int" (from fts.h) */

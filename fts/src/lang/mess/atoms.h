@@ -30,6 +30,7 @@
    branch of an if ...
  */
 
+#define fts_null {(fts_symbol_t)0, 0}
 
 /* Macros to deal with any type */
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:26 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:41 $
  *
  */
 #include <stdio.h>		/* for sprintf */
@@ -57,14 +57,14 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
   switch (arg->ex_type) {
   case ET_INT:
 
-    optr->ex_int =  fts_integer_vector_get_value(tw, arg->ex_int % fts_integer_vector_get_size(tw)); 
+    optr->ex_int =  fts_integer_vector_get_element(tw, arg->ex_int % fts_integer_vector_get_size(tw)); 
     break;
   case ET_FLT:
     /* CHANGE are we zero based or one based? */
 
     i = (int)arg->ex_flt % fts_integer_vector_get_size(tw); 
 
-    optr->ex_int =  fts_integer_vector_get_value(tw,i);
+    optr->ex_int =  fts_integer_vector_get_element(tw,i);
     if (i  == fts_integer_vector_get_size(tw) - 1)
       break;
 
@@ -73,7 +73,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
      * the table do a interpolation with the fraction 
      */
     rest = arg->ex_flt - (int)arg->ex_flt;
-    optr->ex_int+=(int) ((float)(fts_integer_vector_get_value(tw,i)- fts_integer_vector_get_value(tw,i+1))*rest);
+    optr->ex_int+=(int) ((float)(fts_integer_vector_get_element(tw,i)- fts_integer_vector_get_element(tw,i+1))*rest);
     break;
 
   default:	/* do something with strings */

@@ -253,7 +253,7 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   pt_reattack(o, 0, 0, 2, a);
 	
   fts_set_ptr(a, (void *)o);
-  fts_set_fun(a+1, (void *)analysis);
+  fts_set_fun(a+1, analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_long(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);

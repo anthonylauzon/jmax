@@ -11,255 +11,239 @@
  */
 
 
+fts_symbol_t fts_s_integer_vector = 0;
 static fts_data_class_t *fts_integer_vector_data_class = 0;
 
-struct fts_integer_vector
-{
-  fts_data_t dataobj;
-  int *vec;
-  int size;	
-};
-
-/* Remote call codes */
+/* remote call codes */
 
 #define INTEGER_VECTOR_SET    1
 #define INTEGER_VECTOR_UPDATE 2
 
-/********************************************************************/
-/*                                                                  */
-/*            SET functions on integer vectors                      */
-/*                                                                  */
-/********************************************************************/
+/* new/delete */
 
-void
-fts_integer_vector_set_value(fts_integer_vector_t *this, int n1, int n2)
+fts_integer_vector_t *
+fts_integer_vector_new(int size)
 {
-  if (n1 < 0)
-    n1 = 0;
-  else if (n1 >= this->size)
-    n1 = this->size-1;
-
-  (this->vec)[n1] = n2;
-}
-
-
-void
-fts_integer_vector_set_const(fts_integer_vector_t *this, int n)
-{
+  fts_integer_vector_t *vector;
   int i;
 
-  for (i = 0; i < this->size; i++)
-    this->vec[i] = n;
-}
+  vector = (fts_integer_vector_t *)fts_malloc(sizeof(fts_integer_vector_t));
 
+  if(size > 0)
+    {
+      vector->values = (int *) fts_malloc(size * sizeof(int));
+      vector->size = size;
+      fts_integer_vector_zero(vector);
+    }
+  else
+    {
+      vector->values = 0;
+      vector->size = 0;
+    }
+
+  fts_data_init((fts_data_t *) vector, fts_integer_vector_data_class);
+
+  return vector;
+}
 
 void
-fts_integer_vector_set(fts_integer_vector_t *this, int onset, int ac, const fts_atom_t *at)
+fts_integer_vector_delete(fts_integer_vector_t *vector)
 {
-  int i;
-
-  for (i = onset; i < ac && i < this->size; i++)
-    if (fts_is_int(&at[i]))
-      this->vec[i] = fts_get_int(&at[i]);
+  fts_data_delete((fts_data_t *) vector);
+  fts_free((void *)vector->values);
+  fts_free((void *)vector);
 }
 
+/* copy & zero */
+
+void
+fts_integer_vector_copy(fts_integer_vector_t *in, fts_integer_vector_t *out)
+{
+  fts_integer_vector_set_size(out, in->size);
+  fts_vec_icpy(in->values, out->values, in->size);
+}
+
+void
+fts_integer_vector_zero(fts_integer_vector_t *vector)
+{
+  fts_vec_izero(vector->values, vector->size);  
+}
 
 /* set the size of the vector */
 
 void
-fts_integer_vector_set_size(fts_integer_vector_t *this, int n)
+fts_integer_vector_set_size(fts_integer_vector_t *vector, int size)
+{
+  if(size > vector->alloc)
+    {
+      if(vector->values)
+	vector->values = (int *)fts_realloc((void *)vector->values, sizeof(int) * size);
+      else
+	vector->values = (int *)fts_malloc(sizeof(int) * size);
+
+      vector->alloc = size;
+    }
+
+    vector->size = size;
+}
+
+void
+fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int onset, int ac, const fts_atom_t *at)
 {
   int i;
 
-  if (n < 1)
-    n = 1;
-
-  if (n == this->size)
-    return;
-
-  this->vec = (int *)fts_realloc((void *)this->vec, n * sizeof(int));
-
-  if (! this->vec)
-    return;
-
-  for (i = this->size; i < n ; i++)
-    this->vec[i] = 0;
-
-  this->size = n;
+  for (i=onset; i<ac && i<vector->size; i++)
+    if (fts_is_int(&at[i]))
+      vector->values[i] = fts_get_int(&at[i]);
 }
 
 
-/********************************************************************/
-/*                                                                  */
-/*            GET functions on integer vectors                      */
-/*                                                                  */
-/********************************************************************/
-
-
-/* Get the fts_integer_vector size */
+/* sum, min, max */
 
 int
-fts_integer_vector_get_size(fts_integer_vector_t *this)
+fts_integer_vector_get_sum(fts_integer_vector_t *vector)
 {
-  return this->size;
-}
-
-
-int
-fts_integer_vector_get_sum(fts_integer_vector_t *this, int min,  int max)
-{
-  int i;
   int sum = 0;
-  int *l;
-  
-  if (min < 0)
-    min = 0;
+  int i;
 
-  if (max > this->size || max == -1)
-    max = this->size;
-
-  for (i = min; i < max; i++)
-    sum += this->vec[i];
+  for(i=0; i<vector->size; i++)
+    sum += vector->values[i];
 
   return sum;
 }
 
-
 int
-fts_integer_vector_get_value(fts_integer_vector_t *this, int idx)
+fts_integer_vector_get_sub_sum(fts_integer_vector_t *vector, int from, int to)
 {
-  return (this->vec)[idx];
+  int sum = 0;
+  int i;
+  
+  if(from < 0)
+    from = 0;
+
+  if(to >= vector->size)
+    to = vector->size - 1;
+
+  for (i=from; i<=to; i++)
+    sum +=vector->values[i];
+
+  return sum;
 }
 
-
 int
-fts_integer_vector_get_min_value(fts_integer_vector_t *this)
+fts_integer_vector_get_min_value(fts_integer_vector_t *vector)
 {
-  int i, min;
+  int min;
+  int i;
 
-  min = this->vec[0];
+  min = vector->values[0];
 
-  for (i = 1; i < this->size; i++)
-    if (this->vec[i] < min)
-      min = this->vec[i];
+  for (i = 1; i < vector->size; i++)
+    if (vector->values[i] < min)
+      min = vector->values[i];
 
   return min;
 }
 
 
 int
-fts_integer_vector_get_max_value(fts_integer_vector_t *this)
+fts_integer_vector_get_max_value(fts_integer_vector_t *vector)
 {
-  int i, max;
+  int max;
+  int i;
 
-  max = this->vec[0];
+  max = vector->values[0];
 
-  for (i = 1; i < this->size; i++)
-    if (this->vec[i] > max)
-      max = this->vec[i];
+  for (i = 1; i < vector->size; i++)
+    if (vector->values[i] > max)
+      max = vector->values[i];
 
   return max;
 }
 
+/********************************************************************
+ *
+ *   FTS data functions
+ *
+ */
 
-int
-fts_integer_vector_get_quantile(fts_integer_vector_t *this, int n)
+static void fts_integer_vector_export_fun(fts_data_t *data)
 {
-  int v, index, i;
-
-  v = 0;
-  for (i = 0; i < this->size; i++)
-    v += this->vec[i];
-
-  if (! v)
-    return 0;
-
-  index = ((n * v) >> 15) + 1;
-
-  for (i = 0; i < this->size; i++)
-    {
-      index -= this->vec[i];
-      if (index <= 0)
-	break;
-    }
-  
-  if (i >= this->size)
-    i--;
-
-  return i;
-}
-
-/* Assuming  that the vector contain a monotone function,
-   compute the inverse of the function for value n;
-   slow, coud use a binary search
-*/
-
-int
-fts_integer_vector_get_inv(fts_integer_vector_t *this, int n)
-{
+  fts_integer_vector_t *vector = (fts_integer_vector_t *)data;
   int i;
 
-  for (i = 0; i < this->size; i++)
-    if (this->vec[i] > n)
-      return (i > 0) ? i - 1 : i;
-  
-  return this->size;
+  fts_data_start_remote_call(data, INTEGER_VECTOR_SET);
+  fts_client_mess_add_int(vector->size);
+
+  for (i = 0; i < vector->size; i++)
+    fts_client_mess_add_int(vector->values[i]);
+
+  fts_data_end_remote_call();
 }
 
-/********************************************************************/
-/*                                                                  */
-/*            NEW/FREE functions on integer vectors                 */
-/*                                                                  */
-/********************************************************************/
-
-fts_integer_vector_t *fts_integer_vector_new(int size)
+static void 
+fts_integer_vector_remote_set( fts_data_t *data, int ac, const fts_atom_t *at)
 {
-  fts_integer_vector_t *this = (fts_integer_vector_t *)fts_malloc(sizeof(fts_integer_vector_t));
+  fts_integer_vector_t *vector = (fts_integer_vector_t *)data;
+  int offset;
+  int nvalues;
   int i;
 
-  this->vec = (int *) fts_malloc(size * sizeof(int));
-  this->size = size;
+  /* arguments: offset, # of values, values */
 
-  for (i = 0; i < size; i++)
-    this->vec[i] = 0;
+  offset = fts_get_int(&at[0]);
+  nvalues = fts_get_int(&at[1]);
 
-  fts_data_init((fts_data_t *) this, fts_integer_vector_data_class);
-
-  return this;
+  for (i=0; i<nvalues; i++)
+    vector->values[i + offset] = fts_get_int(&at[i + 2]);
 }
 
-void
-fts_integer_vector_delete(fts_integer_vector_t *this)
+
+static void 
+fts_integer_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
 {
-  fts_data_delete((fts_data_t *) this);
-  fts_free((void *)this->vec);
-  fts_free((void *)this);
+  fts_integer_vector_t *vector = (fts_integer_vector_t *)data;
+  int i;
+
+  fts_data_start_remote_call(data, INTEGER_VECTOR_SET);
+  fts_client_mess_add_int(vector->size);
+
+  for (i=0; i<vector->size; i++)
+    fts_client_mess_add_int(vector->values[i]);
+
+  fts_data_end_remote_call();
 }
 
+void fts_integer_vector_config(void)
+{
+  fts_s_integer_vector = fts_new_symbol("integer_vector");
+  fts_integer_vector_data_class = fts_data_class_new(fts_s_integer_vector);
 
-/********************************************************************/
-/*                                                                  */
-/*            BMAX Releated functions on integer vectors            */
-/*                                                                  */
-/********************************************************************/
+  fts_data_class_define_export_function(fts_integer_vector_data_class, fts_integer_vector_export_fun);
+  fts_data_class_define_function(fts_integer_vector_data_class, INTEGER_VECTOR_SET, fts_integer_vector_remote_set);
+  fts_data_class_define_function(fts_integer_vector_data_class, INTEGER_VECTOR_UPDATE, fts_integer_vector_remote_update);
+}
 
-/* This is actually quite a temporary hack; there should be a real
+/********************************************************************
+ *
+ *  bmax format releated functions
+ *
+ */
+
+/* vector is actually quite a temporary hack; there should be a real
    save standard technique for fts_data_t; it assume that is reloaded
    for a vector !!*/
 
-/* Save bmax */
-
-
-void fts_integer_vector_save_bmax(fts_integer_vector_t *this, fts_bmax_file_t *f)
+void fts_integer_vector_save_bmax(fts_integer_vector_t *vector, fts_bmax_file_t *f)
 {
   fts_atom_t av[256];
   int ac = 0;
   int i;
   int offset = 0;
 
-  for  (i = 0; i < this->size; i++)
+  for  (i = 0; i < vector->size; i++)
     {
-      fts_set_int(&av[ac], this->vec[i]);
+      fts_set_int(&av[ac], vector->values[i]);
 
       ac++;
 
@@ -305,90 +289,3 @@ void fts_integer_vector_save_bmax(fts_integer_vector_t *this, fts_bmax_file_t *f
       fts_bmax_code_pop_args(f, ac);
     }
 }
-
-
-/********************************************************************/
-/*                                                                  */
-/*            FTS_DATA functions on integer vectors                 */
-/*                                                                  */
-/********************************************************************/
-
-/*
- * The export function
- */
-
-
-static void fts_integer_vector_export_fun(fts_data_t *d)
-{
-  fts_integer_vector_t *this = (fts_integer_vector_t *)d;
-  int i;
-
-  fts_data_start_remote_call(d, INTEGER_VECTOR_SET);
-  fts_client_mess_add_int(this->size);
-
-  for (i = 0; i < this->size; i++)
-    fts_client_mess_add_int(this->vec[i]);
-
-  fts_data_end_remote_call();
-}
-
-/*
- * The remote set function.
- * No checks here, correctness by design.
- */
-
-static  void fts_integer_vector_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
-{
-  fts_integer_vector_t *this = (fts_integer_vector_t *)d;
-  int offset;
-  int nvalues;
-  int i;
-
-  /*
-   * Arguments: the offset
-   *            the number of values
-   *            the values
-   */
-
-  offset = fts_get_int(&at[0]);
-  nvalues = fts_get_int(&at[1]);
-
-  for (i = 0; i < nvalues; i++)
-    this->vec[i + offset] = fts_get_int(&at[i + 2]);
-}
-
-
-static  void fts_integer_vector_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
-{
-  fts_integer_vector_t *this = (fts_integer_vector_t *)d;
-  int i;
-
-  fts_data_start_remote_call(d, INTEGER_VECTOR_SET);
-  fts_client_mess_add_int(this->size);
-
-  for (i = 0; i < this->size; i++)
-    fts_client_mess_add_int(this->vec[i]);
-
-  fts_data_end_remote_call();
-}
-
-/********************************************************************/
-/*                                                                  */
-/*            INIT_DATA functions on integer vectors                */
-/*                                                                  */
-/********************************************************************/
-
-void fts_integer_vector_config(void)
-{
-  fts_integer_vector_data_class = fts_data_class_new( fts_new_symbol( "integer_vector_data"));
-  fts_data_class_define_export_function(fts_integer_vector_data_class, fts_integer_vector_export_fun);
-  fts_data_class_define_function(fts_integer_vector_data_class, INTEGER_VECTOR_SET, fts_integer_vector_remote_set);
-  fts_data_class_define_function(fts_integer_vector_data_class, INTEGER_VECTOR_UPDATE, fts_integer_vector_remote_update);
-}
-
-
-
-
-
-
-

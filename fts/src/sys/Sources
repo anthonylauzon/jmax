@@ -1,4 +1,3 @@
-
 ifeq ($(VENDOR),sgi)
 	ARCH_SOURCES = sgihw.c
 endif

@@ -1,28 +1,38 @@
 #ifndef _INTVEC_H_
 #define _INTVEC_H_
 
+typedef struct fts_integer_vector
+{
+  fts_data_t dataobj;
+  int *values;
+  int size;	
+  int alloc;
+} fts_integer_vector_t;
 
-struct fts_integer_vector;
-typedef struct fts_integer_vector fts_integer_vector_t;
-
+extern fts_symbol_t fts_s_integer_vector;
 
 extern fts_integer_vector_t *fts_integer_vector_new(int size);
+extern void fts_integer_vector_init(fts_integer_vector_t *vector, int size);
 extern void fts_integer_vector_delete(fts_integer_vector_t *this);
 
-extern int fts_integer_vector_get_size(fts_integer_vector_t *x);
-extern int fts_integer_vector_get_sum(fts_integer_vector_t *tw, int min, int max);
-extern int fts_integer_vector_get_value(fts_integer_vector_t *tw, int idx);
-extern int fts_integer_vector_get_min_value(fts_integer_vector_t *tw);
-extern int fts_integer_vector_get_max_value(fts_integer_vector_t *tw);
-extern int fts_integer_vector_get_quantile(fts_integer_vector_t *x, int n);
-extern int fts_integer_vector_get_inv(fts_integer_vector_t *x, int n);
+extern void fts_integer_vector_copy(fts_integer_vector_t *in, fts_integer_vector_t *out);
+extern void fts_integer_vector_zero(fts_integer_vector_t *vector);
 
-extern void fts_integer_vector_set_value(fts_integer_vector_t *x, int n1, int n2);
+#define fts_integer_vector_get_size(vector) ((vector)->size)
+extern void fts_integer_vector_set_size(fts_integer_vector_t *vector, int size);
+#define fts_integer_vector_is_empty(vector) ((vector)->size == 0)
+
+#define fts_integer_vector_get_element(vector, index) ((vector)->values[index])
+#define fts_integer_vector_set_element(vector, index, value) ((vector)->values[index] = (value))
+
+#define fts_integer_vector_set_const(vector, constant) fts_vec_ifill((constant), (long *)((vector)->values), (vector)->size)
+
+extern int fts_integer_vector_get_sum(fts_integer_vector_t *vector);
+extern int fts_integer_vector_get_sub_sum(fts_integer_vector_t *vector, int from, int to);
+extern int fts_integer_vector_get_min_value(fts_integer_vector_t *vector);
+extern int fts_integer_vector_get_max_value(fts_integer_vector_t *vector);
+
+extern void fts_integer_vector_set_from_atom_list(fts_integer_vector_t *vector, int onset, int ac, const fts_atom_t *at);
 extern void fts_integer_vector_save_bmax(fts_integer_vector_t *this, fts_bmax_file_t *f);
-extern void fts_integer_vector_set_const(fts_integer_vector_t *x, int n);
-extern void fts_integer_vector_set_size(fts_integer_vector_t *x, int n);
-extern void fts_integer_vector_set(fts_integer_vector_t *x, int onset, int ac, const fts_atom_t *at);
-
-
 
 #endif
