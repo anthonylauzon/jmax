@@ -182,11 +182,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
   public void lock(int nArgs , FtsAtom args[])
   {
+      locked = true;
       notifyLock(true);
   }
 
   public void unlock(int nArgs , FtsAtom args[])
   {
+      locked = false;
       notifyLock(false);
   }
 
@@ -272,6 +274,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		if(time>max) max = time;
 	    }
 	return max;
+    }
+
+    public boolean isLocked()
+    {
+	return locked;
     }
     
     /**
@@ -1080,6 +1087,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     //---  AbstractSequence fields
     ValueInfo info;
 
+    boolean locked = false;
     int events_size   = 256;	// 
     int events_fill_p  = 0;	// next available position
     TrackEvent events[] = new TrackEvent[256];

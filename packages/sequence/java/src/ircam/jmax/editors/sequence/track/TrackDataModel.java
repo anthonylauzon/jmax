@@ -55,6 +55,11 @@ public interface TrackDataModel {
     public abstract double getMaximumTime();
         
     /**
+     * true if the track is locked
+     */
+    public abstract boolean isLocked();
+
+    /**
      * returns an enumeration of all the events
      */
     public abstract Enumeration getEvents();

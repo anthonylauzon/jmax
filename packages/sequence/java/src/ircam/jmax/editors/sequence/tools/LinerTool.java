@@ -60,6 +60,7 @@ public class LinerTool extends Tool implements LineListener{
   JLabel stepLabel;
   JSlider stepSlider;
   Box stepBox;
+
   void initPopupMenu()
   {
       itsMenu = new JPopupMenu();
@@ -114,8 +115,10 @@ public class LinerTool extends Tool implements LineListener{
   public void lineStart(int x, int y, int modifiers) 
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;	
-
     egc.getTrack().setProperty("active", Boolean.TRUE);
+
+    if(egc.getDataModel().isLocked()) return;
+
     //with Shift add to selection
     if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
 
@@ -132,6 +135,8 @@ public class LinerTool extends Tool implements LineListener{
   public void lineEnd(int x, int y) 
   {
       SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+      if(egc.getDataModel().isLocked()) return;
+      
       drawLine(startingPoint.x, startingPoint.y, x, y);
   }
 

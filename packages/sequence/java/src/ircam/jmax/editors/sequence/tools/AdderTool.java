@@ -80,6 +80,8 @@ public class AdderTool extends Tool implements PositionListener {
 	
 	egc.getTrack().setProperty("active", Boolean.TRUE);
 
+	if(egc.getDataModel().isLocked()) return;
+
 	// starts an undoable transition	
 	((UndoableData) egc.getDataModel()).beginUpdate();
 	//endUpdate is called in addEvents in dataModel

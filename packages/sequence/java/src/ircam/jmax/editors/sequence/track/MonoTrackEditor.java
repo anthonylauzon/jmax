@@ -80,11 +80,16 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		public void highlight(Enumeration elements, double time)
 		{
 		    TrackEvent temp;
-		    boolean first = true;
+		    boolean first = true; 
+		    
+		    Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
 		    Graphics gr = getGraphics();		    
+		    gr./*setClip*/clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
 			{
 			    temp = (TrackEvent) e.nextElement();
+			    temp.setHighlighted(false);
 			    temp.getRenderer().render(temp, gr, false, gc);
 			}
 		    oldElements.removeAllElements();		    
@@ -92,11 +97,12 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		    for (Enumeration e = elements; e.hasMoreElements();) 
 			{
 			    temp = (TrackEvent) e.nextElement();
-			     if(first)
+			    if(first)
 				{
 				    gc.getScrollManager().makeVisible(temp);
 				    first = false;
 				}
+			    temp.setHighlighted(true);
 			    temp.getRenderer().render(temp, gr, true, gc);
 			    oldElements.addElement(temp);
 			}

@@ -113,6 +113,9 @@ public class CombTool extends Tool implements CombListener{
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
     egc.getTrack().setProperty("active", Boolean.TRUE);
+
+    if(egc.getDataModel().isLocked()) return;
+
     //with Shift add to selection
     if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
 
@@ -128,6 +131,8 @@ public class CombTool extends Tool implements CombListener{
   public void comb(int x, int y, int modifiers) 
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;	
+    if(egc.getDataModel().isLocked()) return;
+    
     PartitionAdapter a = (PartitionAdapter)egc.getAdapter();
     TrackEvent aEvent;
 
@@ -165,9 +170,12 @@ public class CombTool extends Tool implements CombListener{
 
   public void combEnd(int x, int y, int modifiers) 
   {
+      SequenceGraphicContext egc = (SequenceGraphicContext) gc;	
+      if(egc.getDataModel().isLocked()) return;
+
       comb(x, y, modifiers);
-      gc.getGraphicDestination().repaint();
-      ((SequenceGraphicContext)gc).getTrack().getFtsTrack().endUpdate();    	  
+      egc.getGraphicDestination().repaint();
+      egc.getTrack().getFtsTrack().endUpdate();    	  
   }
 
   public void setRay(int ray)

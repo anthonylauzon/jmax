@@ -65,10 +65,13 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-      if(selected)
-	  render(obj, g, Event.SELECTED, theGc); 
+      if(((Event)obj).isHighlighted())
+	  render(obj, g, Event.HIGHLIGHTED, theGc); 
       else
-	  render(obj, g, Event.DESELECTED, theGc); 
+	  if(selected)
+	      render(obj, g, Event.SELECTED, theGc); 
+	  else
+	      render(obj, g, Event.DESELECTED, theGc); 
   }
   
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
@@ -90,6 +93,7 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
 	      break;
 	  case Event.HIGHLIGHTED:
 	      g.setColor(Color.green);
+	      break;
 	  }
       
       if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
@@ -138,7 +142,7 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
 	      else //normal paint
 		  {
 		      if(state != Event.DESELECTED)
-			  g.setColor(Color.black);
+		      g.setColor(Color.black);
 
 		      if(next != null)
 			  g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
