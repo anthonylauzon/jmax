@@ -38,7 +38,16 @@ abstract public class ErmesObjInOutlet {
   
   abstract public void Paint(Graphics g);
 
-  
+  protected void DoublePaint() {
+    
+    Graphics aGraphics = itsOwner.itsSketchPad.getGraphics();
+    if (aGraphics != null) {
+      Paint(aGraphics);	
+    }
+    
+    if (itsOwner.itsSketchPad.offScreenPresent) Paint(itsOwner.itsSketchPad.GetOffGraphics());
+  }
+
   //--------------------------------------------------------
   //	Repaint
   //--------------------------------------------------------

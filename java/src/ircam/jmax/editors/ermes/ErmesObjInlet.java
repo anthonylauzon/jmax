@@ -20,10 +20,6 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
   
   public void Paint(Graphics g) {
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
-    debug_count += 1;
-    if (debug_count % ErmesSketchPad.DEBUG_COUNT == 0) {
-      /* System.out.println("uscito in ErmesObjInlet.paint"); */
-    }
     g.setColor(Color.black);
 
     if(itsOwner.itsSketchPad.itsRunMode) g.fillRect(itsX+1, itsY+7, getPreferredSize().width-2, 2);

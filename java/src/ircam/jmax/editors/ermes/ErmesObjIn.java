@@ -48,15 +48,15 @@ class ErmesObjIn extends ErmesObject {
   	
     itsSketchPad = theSketchPad;
     Dimension d = getPreferredSize();
-    /*    currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
-	  ((Integer)theFtsObject.get("y")).intValue(),
-	  ((Integer)theFtsObject.get("w")).intValue(),
-	  (aInteger == null)?preferredSize.height:
-	  ((Integer)theFtsObject.get("h")).intValue());*/
-    
+        
     currentRect = new Rectangle(x, y, d.width, d.height);
 
     int temp = GetSketchWindow().itsPatcher.getNumberOfInlets();
+    if (temp == 0) {//top patcher special case!
+      //make the first
+      temp = 1;
+      GetSketchWindow().itsPatcher.setNumberOfInlets(1);
+    }
     
     if (theSketchPad.inCount < temp)
       itsId = theSketchPad.inCount++;   //for now no deleting handled
@@ -119,14 +119,7 @@ class ErmesObjIn extends ErmesObject {
     g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
     g.setColor(Color.black);
     g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
-    //first line
-    //g.drawLine(itsX+1,itsY+currentRect.height/2,itsX+ currentRect.width/2, itsY+currentRect.height-1);
-    //second line
-    //g.drawLine(itsX+ currentRect.width/2, itsY+currentRect.height-1, itsX+currentRect.width-2,itsY+currentRect.height/2);
-	//resize box
-    //g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-		
-	g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
+    g.drawString(""+(itsId+1), itsX + 7, itsY + 7+7);
   }
 	
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {

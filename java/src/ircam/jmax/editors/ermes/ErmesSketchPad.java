@@ -60,10 +60,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)
   int outCount = 0;  //the same for ErmesObjOut objects
-  //ErmesObjInOutChoice itsInChoice = null;	//choice control associated with this sketch (sub-patch)
-  //ErmesObjInOutChoice itsOutChoice = null;
-  ErmesObjInOutPop itsInPop = null;//903
-  ErmesObjInOutPop itsOutPop = null;//903
+  ErmesObjInOutPop itsInPop = null;
+  ErmesObjInOutPop itsOutPop = null;
 		
   int itsDirection = NoDirections;
   public boolean itsRunMode = false;
@@ -1043,7 +1041,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	x = aPoint.x;
 	y = aPoint.y;
       }
-
+      
+      //bug 1003.8: waiting for lock on Maurizio's modifs
       boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
       if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
 	//forbidden to add such objects in a top level patch

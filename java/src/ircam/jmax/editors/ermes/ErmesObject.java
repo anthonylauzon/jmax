@@ -117,6 +117,24 @@ public class ErmesObject implements FtsPropertyHandler {
     Paint(g);
   }
   
+  /**
+   * a method to paint the object AND its inlet/outlet
+   * on and off screen
+   */
+  public void PaintComplete() {
+    DoublePaint();
+    ErmesObjInlet aInlet;
+    ErmesObjOutlet aOutlet;
+    for (int i=0; i<itsInletList.size();i++) {
+      aInlet = (ErmesObjInlet) itsInletList.elementAt(i);
+      aInlet.DoublePaint();
+    }
+    for (int i=0; i<itsOutletList.size();i++) {
+      aOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
+      aOutlet.DoublePaint();
+    }
+  }
+
   public  void Paint(Graphics g)
   {
     if(!itsSketchPad.itsGraphicsOn)return;
@@ -187,9 +205,10 @@ public class ErmesObject implements FtsPropertyHandler {
 	}
 	if (offGraphics!= null) {
 	  aErmesObjInlet.Repaint();
-	  itsSketchPad.CopyTheOffScreen(g);
+	  //itsSketchPad.CopyTheOffScreen(g);
 	}
       }
+      itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     else if (n_inlts <= old_ninlts) { //we reduced the number of inlets...
       if(n_inlts>1) aHDist = (currentRect.width-10)/(n_inlts-1);
@@ -199,16 +218,18 @@ public class ErmesObject implements FtsPropertyHandler {
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*aHDist,aErmesObjInlet.itsY);
 	  if (offGraphics!= null) {
-	    aErmesObjInlet.Repaint();
-	    itsSketchPad.CopyTheOffScreen(g);
-	  }
+	    aErmesObjInlet.Repaint(); 
+	    //itsSketchPad.CopyTheOffScreen(g);//e.m.
+	    }
 	}
 	else{
 	  //erase the inlet, and the associated connections
-	  itsInletList.removeElementAt(i);
+	  //itsInletList.removeElementAt(0);
+	  itsInletList.removeElementAt(itsInletList.size()-1);
 	  //we should remove the connections. How?
 	}
       }
+      itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     
 /////////    
@@ -226,9 +247,10 @@ public class ErmesObject implements FtsPropertyHandler {
        aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
        if(offGraphics!= null){
 	 aErmesObjOutlet.Repaint();
-	 itsSketchPad.CopyTheOffScreen(g);
-       }
+	 //itsSketchPad.CopyTheOffScreen(g); //e.m.
+	 }
      }
+     itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     else if (n_outlts <= old_noutlts) { //we reduced the number of outlets
       int size = itsOutletList.size()-1;
@@ -242,13 +264,13 @@ public class ErmesObject implements FtsPropertyHandler {
 	aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
 	aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
       }
-      if(offGraphics!= null) itsSketchPad.repaint();//???????
     }
     
     //prepare to be waked up when values change
     if(NeedPropertyHandler()){
       itsFtsObject.watch("value", this);
     }
+    if(offGraphics!= null) itsSketchPad.repaint();//???????
   }
   
   public boolean NeedPropertyHandler(){
@@ -290,7 +312,7 @@ public class ErmesObject implements FtsPropertyHandler {
     laidOut = false;
     itsX = ((Integer)theFtsObject.get("x")).intValue();
     itsY = ((Integer)theFtsObject.get("y")).intValue();
-
+    
     {
       Integer widthInt = (Integer) theFtsObject.get("w");
 

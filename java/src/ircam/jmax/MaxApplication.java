@@ -144,11 +144,11 @@ public class MaxApplication extends Object {
   {
     MaxData ourData;
     MaxDataEditor ourEditor; 
-
+    
     try
       {
 	ourData = MaxDataHandler.loadDataInstance(source);
-
+	
 	try
 	  {
 	    ourEditor = ourData.edit();
@@ -159,7 +159,7 @@ public class MaxApplication extends Object {
 	    // May be an hack, may be is ok; move this stuff to an action
 	    // handler !!
 	  }
-
+	
 	return ourData;
       }
     catch (MaxDataException e)
@@ -170,7 +170,7 @@ public class MaxApplication extends Object {
 	return null;
       }
   }
-
+  
 
 
 
@@ -558,18 +558,18 @@ public class MaxApplication extends Object {
   public static void makeMaxConsole()
   {
     Console itsConsole;
-
+ 
     itsConsole = new Console(itsInterp);
     itsConsole.Start();
 
     System.setOut(itsConsole.getPrintStream());
 
     itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
+    //itsConsoleWindow.validate();
     itsConsoleWindow.Init();
     itsConsoleWindow.setLocation(0,0);
     itsConsoleWindow.pack();
     itsConsoleWindow.setVisible(true);
-
   }
 
   public static void Quit()
