@@ -26,48 +26,51 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * A simple Mapper that accesses the ambitus parameter
  */ 
-public class AmbitusMapper extends Mapper {
+public class IntervalMapper extends Mapper {
   
   /**
    * set the ambitus of this event
    */
-    public void set(Event e, int value) 
+  public void set(Event e, int value) 
   {
-      if (value < 0)
-	  {
-	      value = -value;
-	  }
-
-      e.setProperty("ambitus", new Integer(value));
-
+    if (value < 0)
+      {
+	value = -value;
+      }
+    
+    e.setProperty("interval", new Double(value));    
   }
 
   /**
    * get the ambitus of this event
    */
-    public int get(Event e) 
+  public int get(Event e) 
   {
-      return ((Integer)e.getProperty("ambitus")).intValue();
+    Object val = e.getProperty("interval");
+    if( val instanceof Double)
+      return (int)((Double)val).doubleValue();
+    else
+      return 0;
   }
 
-    public String getName()
-    {
-	return "ambitus";
-    }
+  public String getName()
+  {
+    return "interval";
+  }
 
   /**
    * access the static instance
    */
   static Mapper getMapper() 
   {
-    if (itsAmbitusMapper == null)
-       itsAmbitusMapper = new AmbitusMapper();
-    return itsAmbitusMapper;
+    if (itsIntervalMapper == null)
+      itsIntervalMapper = new IntervalMapper();
+    return itsIntervalMapper;
   }
 
   //--- Fields
 
-  static AmbitusMapper itsAmbitusMapper;
+  static IntervalMapper itsIntervalMapper;
 }
 
 

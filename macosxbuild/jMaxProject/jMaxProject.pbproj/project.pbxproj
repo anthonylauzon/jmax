@@ -2237,6 +2237,18 @@
 //F72
 //F73
 //F74
+		F704740A04040A7901664058 = {
+			isa = PBXFileReference;
+			name = IntervalMapper.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/IntervalMapper.java;
+			refType = 2;
+		};
+		F704740B04040A7901664058 = {
+			fileRef = F704740A04040A7901664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7112B660401730701664058 = {
 			isa = PBXFileReference;
 			name = udpsend.c;
@@ -8672,7 +8684,6 @@
 				F85123D7028BEAB301664092,
 				F85123D8028BEAB301664092,
 				F85123D9028BEAB301664092,
-				F85123DA028BEAB301664092,
 				F85123DB028BEAB301664092,
 				F85123DC028BEAB301664092,
 				F85123DD028BEAB301664092,
@@ -8691,6 +8702,7 @@
 				F85123EA028BEAB301664092,
 				F85123EB028BEAB301664092,
 				F85123EC028BEAB301664092,
+				F704740A04040A7901664058,
 				F85123ED028BEAB301664092,
 				F85123EE028BEAB301664092,
 				F85123EF028BEAB301664092,
@@ -8985,7 +8997,6 @@
 				F85123A5028BE7EC01664092,
 				F8512414028BEAB401664092,
 				F8512415028BEAB401664092,
-				F8512416028BEAB401664092,
 				F8512417028BEAB401664092,
 				F8512418028BEAB401664092,
 				F8512419028BEAB401664092,
@@ -9143,6 +9154,7 @@
 				F5EA5778038545F201664092,
 				F5EA5779038545F201664092,
 				F5FD9479038BE7C701664092,
+				F704740B04040A7901664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9547,12 +9559,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/Adapter.java;
 			refType = 2;
 		};
-		F85123DA028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = AmbitusMapper.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/AmbitusMapper.java;
-			refType = 2;
-		};
 		F85123DB028BEAB301664092 = {
 			isa = PBXFileReference;
 			name = AmbitusValueDataFlavor.java;
@@ -9903,12 +9909,6 @@
 		};
 		F8512415028BEAB401664092 = {
 			fileRef = F85123D9028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512416028BEAB401664092 = {
-			fileRef = F85123DA028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
