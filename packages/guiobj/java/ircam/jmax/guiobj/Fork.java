@@ -45,7 +45,8 @@ public class Fork extends GraphicObject
   private static final int MINIMUM_WIDTH = DEFAULT_WIDTH;
   static final int CONST_HEIGHT = 12;
   static final int DEFAULT_OUTLETS = 2;
-
+  private static Color selectedColor = new Color( 172, 172, 172, 100);
+  
   public Fork(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
@@ -206,7 +207,8 @@ public class Fork extends GraphicObject
       }
     else
       {
-	g.setColor( Color.lightGray);
+	g.setColor( selectedColor);
+	
 	g.fillRect( getX(), getY(), getWidth(), getHeight());
 	
 	g.setColor( Color.black);
