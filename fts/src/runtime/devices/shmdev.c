@@ -21,6 +21,10 @@
 #include <ulocks.h>
 #include <assert.h>
 
+#if 1
+#include <stdio.h>
+#endif
+
 #include "fts.h"
 
 /**** SHM_FIFO_T ****/
@@ -75,11 +79,21 @@ static shm_fifo_t *shm_fifo_allocate( usptr_t *handle, int size)
 
   sf = (shm_fifo_t *) usmalloc( sizeof( shm_fifo_t), handle);
   if ( !sf)
-    return NULL;
+    {
+#if 1
+      fprintf( stderr, "usmalloc() failed [1]\n");
+#endif
+      return NULL;
+    }
 
   sf->buf = (float *) usmalloc( sizeof(float) * size, handle);
   if ( !sf->buf)
-    return NULL;
+    {
+#if 1
+      fprintf( stderr, "usmalloc() failed [2]\n");
+#endif
+      return NULL;
+    }
 
   sf->size = size;
 
@@ -88,14 +102,24 @@ static shm_fifo_t *shm_fifo_allocate( usptr_t *handle, int size)
   sf->read_status  = 0;
   sf->read_semaphore = usnewsema( handle, 0);
   if ( sf->read_semaphore == NULL)
-    return NULL;
+    {
+#if 1
+      fprintf( stderr, "usnewsema() failed [1]\n");
+#endif
+      return NULL;
+    }
 
   sf->write_p = 0;
   sf->write_pending = 0;
   sf->write_status  = 0;
   sf->write_semaphore = usnewsema( handle, 0);
   if (sf->write_semaphore == NULL)
-    return NULL;
+    {
+#if 1
+      fprintf( stderr, "usnewsema() failed [2]\n");
+#endif
+      return NULL;
+    }
 
   return sf;
 }
@@ -109,7 +133,12 @@ shm_fifo_t *shm_fifo_new( const char *name, int size)
   handle = usinit( name);
 
   if ( handle == NULL)
-    return NULL;
+    {
+#if 1
+      fprintf( stderr, "usinit() failed\n");
+#endif
+      return NULL;
+    }
 
   fifo = (shm_fifo_t *)usgetinfo( handle);
 
@@ -313,15 +342,16 @@ static fts_status_t shmout_open(fts_dev_t *dev, int nargs, const fts_atom_t *arg
   dev_data = (shm_data_t *)fts_malloc( sizeof( shm_data_t));
   fts_dev_set_device_data( dev, dev_data);
 
-  name = fts_get_symbol_by_name( nargs, args, fts_new_symbol( "name"), fts_new_symbol( "/tmp/shmdev.fts"));
+  name = fts_get_symbol_by_name( nargs, args, fts_new_symbol( "name"), fts_new_symbol( "/tmp/shmdev"));
 
   dev_data->n_channels = fts_get_int_by_name( nargs, args, fts_new_symbol("channels"), 2);
 
   size = fts_param_get_int( fts_s_fifo_size, 256);
-  
-  fifo = shm_fifo_new( fts_symbol_name( name), size);
+
+  fifo = shm_fifo_new( fts_symbol_name( name), size * dev_data->n_channels);
   if (fifo == NULL)
     return &fts_dev_open_error;
+
   dev_data->fifo = fifo;
 
   shm_fifo_set_write_status( fifo, SHM_ACTIVE);
@@ -354,7 +384,7 @@ static void shmout_put(fts_word_t *argv)
   dev_data = fts_dev_get_device_data(dev);
   n_channels = fts_word_get_long(argv + 1);
 
-  if ( shm_fifo_get_read_status( dev_data->fifo) != SHM_CLOSE)
+  if ( shm_fifo_get_read_status( dev_data->fifo) == SHM_ACTIVE)
     {
       float *buf;
 
@@ -400,15 +430,16 @@ static fts_status_t shmin_open(fts_dev_t *dev, int nargs, const fts_atom_t *args
   dev_data = (shm_data_t *)fts_malloc( sizeof( shm_data_t));
   fts_dev_set_device_data( dev, dev_data);
 
-  name = fts_get_symbol_by_name( nargs, args, fts_new_symbol( "name"), fts_new_symbol( "/tmp/shmdev.fts"));
+  name = fts_get_symbol_by_name( nargs, args, fts_new_symbol( "name"), fts_new_symbol( "/tmp/shmdev"));
 
   dev_data->n_channels = fts_get_int_by_name( nargs, args, fts_new_symbol("channels"), 2);
 
   size = fts_param_get_int( fts_s_fifo_size, 256);
   
-  fifo = shm_fifo_new( fts_symbol_name( name), size);
+  fifo = shm_fifo_new( fts_symbol_name( name), size * dev_data->n_channels);
   if (fifo == NULL)
     return &fts_dev_open_error;
+
   dev_data->fifo = fifo;
 
   shm_fifo_set_read_status( fifo, SHM_ACTIVE);
@@ -441,7 +472,7 @@ static void shmin_get(fts_word_t *argv)
   dev_data = fts_dev_get_device_data(dev);
   n_channels = fts_word_get_long(argv + 1);
 
-  if ( shm_fifo_get_write_status( dev_data->fifo) != SHM_CLOSE)
+  if ( shm_fifo_get_write_status( dev_data->fifo) == SHM_ACTIVE)
     {
       float *buf;
 

@@ -25,7 +25,6 @@
  */
 
 
-fts_symbol_t fts_s_atom_array = 0;
 fts_data_class_t *fts_atom_array_data_class = 0;
 
 /* remote call codes */
@@ -262,7 +261,6 @@ fts_atom_array_constructor(int ac, const fts_atom_t *at)
 
 void fts_atom_array_config(void)
 {
-  fts_s_atom_array = fts_new_symbol("atom_array");
   fts_atom_array_data_class = fts_data_class_new(fts_s_atom_array);
 
   fts_data_class_define_export_function(fts_atom_array_data_class, fts_atom_array_export_fun);

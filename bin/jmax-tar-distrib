@@ -139,6 +139,14 @@ remove_dest_dir()
 
 
 # ---------------------------------------------------------------------------
+# args: STATUS
+clean_exit()
+{
+	remove_dest_dir
+	exit $1
+}
+
+# ---------------------------------------------------------------------------
 # args: DIR
 chmod_dir ()
 {
@@ -146,10 +154,11 @@ chmod_dir ()
     for d in `echo $1 | sed 's/\// /g'`
     do
 	i="$i/$d"
-	echo chmod 755 "$i"
+#	echo chmod 755 "$i"
 	chmod 755 $i
     done
 }
+
 
 # ---------------------------------------------------------------------------
 # args: ARCH TYPE DIR
@@ -158,8 +167,7 @@ copy_files ()
     if [ \! -f $3/distrib ]
     then
 	echo "File $3/distrib missing" >&2
-	remove_dest_dir
-	exit 1
+	clean_exit 1
     fi
 
     {
@@ -178,7 +186,6 @@ copy_files ()
 		    if [ ! -d $DEST_DIR/$D ]
 		    then
 			mkdir -p $DEST_DIR/$D
-			echo "Created $DEST_DIR/$D"
 			chmod_dir $D
 		    fi
 
@@ -190,7 +197,6 @@ copy_files ()
 		    fi
 
 		    cp $F $DST
-		    echo "Copyied $DST"
 		    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
 		    then
 			chmod 755 $DST
@@ -203,7 +209,7 @@ copy_files ()
 
 		    D=`echo $3/$NAME | sed 's/^\.\///'`
 		    mkdir -p $DEST_DIR/$D
-		    echo "Created $DEST_DIR/$D"
+#		    echo "Created $DEST_DIR/$D"
 #		    chmod 755 $4/$NAME
 		    chmod_dir $D
 		    copy_files $1 $2 $D
@@ -214,16 +220,18 @@ copy_files ()
 
 		    if [ $QUIET = "false" ]
 		    then
-		        remove_dest_dir
-			exit 2
+			clean_exit 1
 		    fi
 
 		fi
 	    fi
+
 	    read TYPE_F ARCH_F NAME NEW_NAME
 	    #echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
 	done
     } < $3/distrib
+
+    echo "Copied $3"
 }
 
 # ---------------------------------------------------------------------------
@@ -276,4 +284,4 @@ copy_files $ARCH $TYPE .
 
 create_tar
 
-remove_dest_dir
+clean_exit 0
