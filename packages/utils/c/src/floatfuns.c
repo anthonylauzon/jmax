@@ -168,7 +168,7 @@ fts_float_function_t fts_ffun_get_ptr( fts_symbol_t name)
 
 static float hanning( float f)
 {
-  return (0.5 - 0.5 * cos(f));
+  return (float)(0.5 - 0.5 * cos(f));
 }
 
 #ifndef HAVE_SINF
@@ -290,7 +290,7 @@ fftab_new( fts_ffun_t *ffun, int size, float min, float max)
   else
     {
       fftab->min = fftab->max = min;
-      fftab->scale = size;
+      fftab->scale = (float)size;
     }
     
   fftab->size = size;
