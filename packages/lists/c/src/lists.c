@@ -38,6 +38,7 @@ extern void listsize_config(void);
 extern void listreverse_config(void);
 extern void listsublist_config(void);
 extern void listtail_config(void);
+extern void listcomp_config(void);
 
 void
 lists_config(void)
@@ -52,4 +53,5 @@ lists_config(void)
   listreverse_config();
   listsublist_config();
   listtail_config();
+  listcomp_config();
 }

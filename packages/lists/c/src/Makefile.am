@@ -11,4 +11,5 @@ lists.c \
 listsize.c \
 listsublist.c \
 listsum.c \
-listtail.c 
+listtail.c \
+listcomp.c 

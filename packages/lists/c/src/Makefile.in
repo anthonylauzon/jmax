@@ -79,7 +79,7 @@ VERSION = @VERSION@
 
 packagedir = $(pkgdatadir)/packages/lists/c
 package_LTLIBRARIES = liblists.la
-liblists_la_SOURCES =  list.c listarith.c listelement.c listhead.c listjoin.c listreverse.c lists.c listsize.c listsublist.c listsum.c listtail.c 
+liblists_la_SOURCES =  list.c listarith.c listelement.c listhead.c listjoin.c listreverse.c lists.c listsize.c listsublist.c listsum.c listtail.c listcomp.c 
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
@@ -95,7 +95,7 @@ liblists_la_LDFLAGS =
 liblists_la_LIBADD = 
 liblists_la_OBJECTS =  list.lo listarith.lo listelement.lo listhead.lo \
 listjoin.lo listreverse.lo lists.lo listsize.lo listsublist.lo \
-listsum.lo listtail.lo
+listsum.lo listtail.lo listcomp.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -108,9 +108,10 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/list.P .deps/listarith.P .deps/listelement.P \
-.deps/listhead.P .deps/listjoin.P .deps/listreverse.P .deps/lists.P \
-.deps/listsize.P .deps/listsublist.P .deps/listsum.P .deps/listtail.P
+DEP_FILES =  .deps/list.P .deps/listarith.P .deps/listcomp.P \
+.deps/listelement.P .deps/listhead.P .deps/listjoin.P \
+.deps/listreverse.P .deps/lists.P .deps/listsize.P .deps/listsublist.P \
+.deps/listsum.P .deps/listtail.P
 SOURCES = $(liblists_la_SOURCES)
 OBJECTS = $(liblists_la_OBJECTS)
 
