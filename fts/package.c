@@ -29,10 +29,7 @@
 #include <ftsprivate/platform.h>
 #include <ftsprivate/class.h>
 #include <ftsconfig.h>
-
 #include <stdlib.h> 
-#include <string.h>
-#include <stdio.h>
 
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -286,9 +283,6 @@ delete_fts_package(fts_package_t* pkg)
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
-  if (pkg->error != NULL) {
-    fts_free(pkg->error);
-  }
 
   fts_free(pkg);
 }
@@ -323,15 +317,6 @@ fts_package_get_error(fts_package_t* pkg)
   return pkg->error;
 }
 
-void 
-fts_package_set_error(fts_package_t* pkg, const char* message)
-{
-  if (pkg->error != NULL) {
-    fts_free(pkg->error);
-  }
-  pkg->error = strcpy(fts_malloc(strlen(message) + 1), message);
-}
-
 int 
 fts_package_load(fts_package_t* pkg)
 {
@@ -352,8 +337,7 @@ fts_package_load(fts_package_t* pkg)
   /* locate the directory of the package */
   if (!fts_find_file(fts_get_package_paths(), fts_symbol_name(pkg->name), path, MAXPATHLEN) 
       || !fts_is_directory(path)) {
-    fts_package_set_error(pkg, "Couldn't find package");
-    post("Couldn't find package %s\n", fts_symbol_name(pkg->name));
+    fprintf(stderr, "Couldn't find package %s\n", fts_symbol_name(pkg->name));
     pkg->state = fts_package_corrupt;
     return -1;
   }
@@ -380,19 +364,21 @@ fts_package_load(fts_package_t* pkg)
   }
 
   /* load the shared library */
-  sprintf(filename, "%s%c%s%c%s%c%s%s%s", 
+  sprintf(filename, "%s%c%s%c%s%s%s", 
 	  fts_symbol_name(pkg->dir), fts_file_separator, 
 	  "c", fts_file_separator, 
-	  "lib", fts_file_separator, 
 	  fts_lib_prefix, fts_symbol_name(pkg->name), fts_lib_postfix);
 
   if (fts_file_exists(filename)) {
     snprintf(function, 256, "%s_config", fts_symbol_name(pkg->name));
     ret = fts_load_library(filename, function);
     if (ret != fts_Success) {
-      fts_package_set_error(pkg, ret->description);
-      post("Error loading library of module %s: %s\n", fts_symbol_name(pkg->name), ret->description);
+      fprintf(stderr, "Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
+    } else {
+      fprintf(stderr, "debug: loaded library %s\n", fts_symbol_name(pkg->name));
     }
+  } else {
+    fprintf(stderr, "debug: no found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
   }
 
   /* pop the current package of the stack */
