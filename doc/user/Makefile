@@ -23,13 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-doc:
+install:
 	$(INSTALL_DIR) $(doc_install_dir)/user
 	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user ; done
-	(cd config ; $(MAKE) $@)
-.PHONY: install-doc
-
-# remove the files copied by make install ?
-uninstall:
-.PHONY: uninstall
+.PHONY: install
 
