@@ -228,14 +228,38 @@ FTS_API double fts_dsp_set_sample_rate(double sample_rate);
  * The \e tick \e size is the size block size of the DSP calculations performed by the
  * DSP subsystem.
  *
- * @fn double fts_dsp_get_tick_size(void)
+ * @fn int fts_dsp_get_tick_size(void)
+ * @return the tick size
+ *
+ * @ingroup dsp
+ */
+FTS_API int fts_dsp_get_tick_size(void);
+
+/**
+ * Get the buffer size used for audio device
+ *
+ * @fn int fts_dsp_get_tick_size(void)
  * @return the sample rate
  *
  * @see fts_dsp_get_sample_rate()
  *
  * @ingroup dsp
  */
-FTS_API int fts_dsp_get_tick_size(void);
+FTS_API int fts_dsp_get_buffer_size(void);
+
+
+/**
+ * Set the buffer size for audio device
+ *
+ * @fn void fts_dsp_get_tick_size(int buffer_size)
+ * @param buffer_size the buffer size
+ *
+ * @see fts_dsp_get_buffer_size()
+ *
+ * @ingroup dsp
+ */
+FTS_API void fts_dsp_set_buffer_size(int buffer_size);
+
 
 /*@}*/ /* runtime parameters */
 
@@ -336,6 +360,10 @@ FTS_API void fts_dsp_active_remove_listener(fts_object_t *object);
 /* DSP sample rate listener */
 FTS_API void fts_dsp_sample_rate_add_listener(fts_object_t *object, fts_method_t method);
 FTS_API void fts_dsp_sample_rate_remove_listener(fts_object_t *object);
+
+/* DSP buffer size listener */
+FTS_API void fts_dsp_buffer_size_add_listener(fts_object_t *object, fts_method_t method);
+FTS_API void fts_dsp_buffer_size_remove_listener(fts_object_t *object);
 
 /* DSP edge */
 typedef struct fts_dsp_edge
