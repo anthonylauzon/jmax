@@ -186,7 +186,11 @@ you will find there a list of known and fixed bugs, updated
 on a daily base, and a bug report submission page that must be used for
 bug report submission.
 
+<p>
+In order to ease bug tracking and fixing, users are kindly required to use
+the previously mentionned URL to report bugs.
 
+</body>
 </HTML>
 EOF
 generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
