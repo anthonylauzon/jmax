@@ -12,6 +12,9 @@ extern fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 
 extern int fts_expression_get_count(fts_expression_state_t *e);
 
+typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
+
+
 /* Error codes must be negative numbers */
 
 #define  FTS_EXPRESSION_OK                      0
@@ -19,6 +22,8 @@ extern int fts_expression_get_count(fts_expression_state_t *e);
 #define  FTS_EXPRESSION_UNDEFINED_VARIABLE     -2
 #define  FTS_EXPRESSION_OP_TYPE_ERROR          -3
 #define  FTS_EXPRESSION_ERROR_OBJECT_REFERENCE -4
+#define  FTS_EXPRESSION_UNDEFINED_FUNCTION     -5
+
 
 extern int  fts_expression_get_status(fts_expression_state_t *e);
 extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);

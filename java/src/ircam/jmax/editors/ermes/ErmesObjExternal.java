@@ -13,7 +13,7 @@ import ircam.jmax.mda.*;
  * The generic "extern" object in ermes. (example: adc1~) 
  */
 public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler{
-
+  int isError = -1;			// cache of the error property, to speed up paint
   public boolean iAmPatcher = false;
   private String itsBackupText = new String();
   public static final int WHITE_OFFSET = 6;
@@ -59,15 +59,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
     if (name.equals("error"))
       {
-	if (value != null)
-	  DoublePaint();
+	if ((value != null) && (value instanceof Integer))
+	  {
+	    isError = ((Integer)value).intValue();
+	    DoublePaint();
+	  }
       }
     else
-      {
-	System.err.println("Got property " + name + " value " + value);
-      
-	super.propertyChanged(obj, name, value);
-      }
+      super.propertyChanged(obj, name, value);
   }
 
   public void YouArePatcher(boolean what) {
@@ -91,15 +90,22 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
   public void makeFtsObject()
   {
-    try{
-      if (itsArgs.equals("")) itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "__void");
-      else itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
-    }
-    catch (FtsException e){
-      Toolkit.getDefaultToolkit().beep();
-      System.out.println("Cannot create object: " + itsArgs);
-      
-    }
+    try
+      {
+	if (itsArgs.equals(""))
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "__void");
+	else
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
+
+	itsFtsObject.watch("error", this);
+	isError = -1;
+      }
+    catch (FtsException e)
+      {
+	Toolkit.getDefaultToolkit().beep();
+	System.out.println("Cannot create object: " + itsArgs);
+      }
+
     if (itsFtsObject instanceof FtsContainerObject)
       YouArePatcher(true);
   }
@@ -112,6 +118,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
 	itsFtsObject.watch("ins", this);
 	itsFtsObject.watch("outs", this);
+	itsFtsObject.watch("error", this);
+	isError = -1;
       }
     catch (FtsException e)
       {
@@ -196,24 +204,31 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   // paint
   //--------------------------------------------------------
   int paintCount = 0;
-  public void Paint_specific(Graphics g) {
-    Integer errorFlag = null;
-    if (itsFtsObject != null) errorFlag = (Integer) itsFtsObject.get("error");
-    if (errorFlag == null) {
-      if(!itsSelected) g.setColor(itsLangNormalColor);
-      else g.setColor(itsLangSelectedColor);
-    }
-    else  g.setColor(Color.red);
+  public void Paint_specific(Graphics g)
+  {
+    if (isError == -1)
+      isError = ((Integer)itsFtsObject.get("error")).intValue();
+
+    if (isError == 0)
+      {
+	if (! itsSelected)
+	  g.setColor(itsLangNormalColor);
+	else
+	  g.setColor(itsLangSelectedColor);
+      }
+    else
+      g.setColor(Color.red);
 
     g.fillRect(getItsX()+1,getItsY()+1,getItsWidth()-2, getItsHeight()-2);
     g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
     
     //paint white square
-    if(!itsSelected) g.setColor(Color.white);
-    else g.setColor(itsLangNormalColor);
+    if (! itsSelected)
+      g.setColor(Color.white);
+    else
+      g.setColor(itsLangNormalColor);
 
     g.fillRect(getItsX()+getWhiteOffset(), getItsY()+2, getItsWidth()-(getWhiteOffset()*2), getItsHeight()-2*HEIGHT_DIFF);
-    
 
     g.setColor(Color.black);
     g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);

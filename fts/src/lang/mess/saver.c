@@ -8,9 +8,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
-#include "lang/mess/vm.h"
-#include "lang/mess/loader.h"
-
 
 
 /* #define SAVER_DEBUG */
@@ -433,35 +430,19 @@ void fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 
 void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
-  if (fts_is_builtin_symbol(sym))
-    {
-      /* PUSH_BUILTIN_SYM   <int>  */
+  /* PUSH_SYM   <int>   */
+
+  int value;
 
 #ifdef SAVER_DEBUG
-      fprintf(stderr, "\tPUSH_BUILTIN_SYM %d (%s)\n",
-	      fts_get_builtin_symbol_index(sym),
-	      fts_symbol_name(sym));
+  fprintf(stderr, "\tPUSH_SYM %d (%s)\n",
+	  fts_bmax_add_symbol(f, sym),
+	  fts_symbol_name(sym));
 #endif
+  value = fts_bmax_add_symbol(f, sym);
 
-      fts_bmax_write_opcode(f, FVM_PUSH_BUILTIN_SYM);
-      fts_bmax_write_b_int(f, fts_get_builtin_symbol_index(sym));
-    }
-  else
-    {
-      /* PUSH_SYM   <int>   */
-
-      int value;
-
-#ifdef SAVER_DEBUG
-      fprintf(stderr, "\tPUSH_SYM %d (%s)\n",
-	      fts_bmax_add_symbol(f, sym),
-	      fts_symbol_name(sym));
-#endif
-      value = fts_bmax_add_symbol(f, sym);
-
-      fts_bmax_write_opcode_for(f, FVM_PUSH_SYM, value );
-      fts_bmax_write_int(f, value);
-    }
+  fts_bmax_write_opcode_for(f, FVM_PUSH_SYM, value );
+  fts_bmax_write_int(f, value);
 }
 
 void fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
@@ -495,35 +476,19 @@ void fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
 
 void fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
-  if (fts_is_builtin_symbol(sym))
-    {
-      /* SET_BUILTIN_SYM   <int>  */
+  /* SET_SYM   <int>   */
+
+  int value;
 
 #ifdef SAVER_DEBUG
-      fprintf(stderr, "\tSET_BUILTIN_SYM %d (%s)\n",
-	      fts_get_builtin_symbol_index(sym),
-	      fts_symbol_name(sym));
+  fprintf(stderr, "\tSET_SYM %d (%s)\n",
+	  fts_bmax_add_symbol(f, sym),
+	  fts_symbol_name(sym));
 #endif
+  value = fts_bmax_add_symbol(f, sym);
 
-      fts_bmax_write_opcode(f, FVM_SET_BUILTIN_SYM);
-      fts_bmax_write_b_int(f, fts_get_builtin_symbol_index(sym));
-    }
-  else
-    {
-      /* SET_SYM   <int>   */
-
-      int value;
-
-#ifdef SAVER_DEBUG
-      fprintf(stderr, "\tSET_SYM %d (%s)\n",
-	      fts_bmax_add_symbol(f, sym),
-	      fts_symbol_name(sym));
-#endif
-      value = fts_bmax_add_symbol(f, sym);
-
-      fts_bmax_write_opcode_for(f, FVM_SET_SYM, value );
-      fts_bmax_write_int(f, value);
-    }
+  fts_bmax_write_opcode_for(f, FVM_SET_SYM, value );
+  fts_bmax_write_int(f, value);
 }
 
 
@@ -607,75 +572,39 @@ void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
 
 void fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
 {
-  if (fts_is_builtin_symbol(sym))
-    {
-      /* PUT_BUILTIN_PROP   <sym> */
+  /* PUT_PROP   <sym> */
+
+  int value;
 
 #ifdef SAVER_DEBUG
-      fprintf(stderr, "\tPUT_BUILTIN_PROP %d (%s)\n",
-	      fts_get_builtin_symbol_index(sym),
-	      fts_symbol_name(sym));
+  fprintf(stderr, "\tPUT_PROP %d (%s)\n",
+	  fts_bmax_add_symbol(f, sym),
+	  fts_symbol_name(sym));
 #endif
 
-      fts_bmax_write_opcode(f, FVM_PUT_BUILTIN_PROP);
-      fts_bmax_write_b_int(f, fts_get_builtin_symbol_index(sym));
-    }
-  else
-    {
-      /* PUT_PROP   <sym> */
+  value = fts_bmax_add_symbol(f, sym);
 
-      int value;
-
-#ifdef SAVER_DEBUG
-      fprintf(stderr, "\tPUT_PROP %d (%s)\n",
-	      fts_bmax_add_symbol(f, sym),
-	      fts_symbol_name(sym));
-#endif
-
-      value = fts_bmax_add_symbol(f, sym);
-
-      fts_bmax_write_opcode_for(f, FVM_PUT_PROP, value );
-      fts_bmax_write_int(f, value);
-    }
+  fts_bmax_write_opcode_for(f, FVM_PUT_PROP, value );
+  fts_bmax_write_int(f, value);
 }
 
 
 void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs)
 {
-  if (fts_is_builtin_symbol(sel))
-    {
-      /* OBJ_BUILTIN_MESS   <inlet> <sel> <nargs> */
+  /* OBJ_MESS   <inlet> <sel> <nargs> */
 
 #ifdef SAVER_DEBUG
-      fprintf(stderr, "\tOBJ_BUILTIN_MESS %d %d (%s) %d\n",
-	      inlet,
-	      fts_get_builtin_symbol_index(sel),
-	      fts_symbol_name(sel),
-	      nargs);
+  fprintf(stderr, "\tOBJ_MESS %d %d (%s) %d\n",
+	  inlet,
+	  fts_bmax_add_symbol(f, sel),
+	  fts_symbol_name(sel),
+	  nargs);
 #endif
 
-      fts_bmax_write_opcode(f, FVM_OBJ_BUILTIN_MESS);
-      fts_bmax_write_l_int(f, inlet);
-      fts_bmax_write_b_int(f, fts_get_builtin_symbol_index(sel));
-      fts_bmax_write_l_int(f, nargs);
-    }
-  else
-    {
-      /* OBJ_MESS   <inlet> <sel> <nargs> */
-
-#ifdef SAVER_DEBUG
-      fprintf(stderr, "\tOBJ_BUILTIN_MESS %d %d (%s) %d\n",
-	      inlet,
-	      fts_bmax_add_symbol(f, sel),
-	      fts_symbol_name(sel),
-	      nargs);
-#endif
-
-      fts_bmax_write_opcode(f, FVM_OBJ_MESS);
-      fts_bmax_write_l_int(f, inlet);
-      fts_bmax_write_l_int(f, fts_bmax_add_symbol(f, sel));
-      fts_bmax_write_l_int(f, nargs);
-    }
+  fts_bmax_write_opcode(f, FVM_OBJ_MESS);
+  fts_bmax_write_l_int(f, inlet);
+  fts_bmax_write_l_int(f, fts_bmax_add_symbol(f, sel));
+  fts_bmax_write_l_int(f, nargs);
 }
 
 

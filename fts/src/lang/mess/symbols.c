@@ -8,8 +8,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-static fts_symbol_t fts_new_builtin_symbol(const char *name, int code);
-static int same_string(const char *s1, const char *s2);
 
 /* Predefined ATOM TYPE symbols */
 
@@ -21,10 +19,12 @@ fts_symbol_t fts_s_ptr;
 fts_symbol_t fts_s_string;
 fts_symbol_t fts_s_symbol;
 fts_symbol_t fts_s_object;
+fts_symbol_t fts_s_atom_array;
 fts_symbol_t fts_s_connection;
 fts_symbol_t fts_s_true;
 fts_symbol_t fts_s_false;
 fts_symbol_t fts_s_data;
+
 
 /* Predefined symbols for the mess system */
 
@@ -73,6 +73,7 @@ fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
 fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
+fts_symbol_t fts_s_state;
 
 /* Symbols related to builtin classes */
 
@@ -92,6 +93,10 @@ fts_symbol_t fts_s_times;
 fts_symbol_t fts_s_div;
 fts_symbol_t fts_s_open_par;
 fts_symbol_t fts_s_closed_par;
+fts_symbol_t fts_s_open_sqpar;
+fts_symbol_t fts_s_closed_sqpar;
+fts_symbol_t fts_s_open_cpar;
+fts_symbol_t fts_s_closed_cpar;
 fts_symbol_t fts_s_dot;
 fts_symbol_t fts_s_remainder;
 fts_symbol_t fts_s_shift_left;
@@ -110,153 +115,122 @@ fts_symbol_t fts_s_greater_equal;
 fts_symbol_t fts_s_smaller;
 fts_symbol_t fts_s_smaller_equal;
 fts_symbol_t fts_s_conditional;
-fts_symbol_t fts_s_else;
+fts_symbol_t fts_s_column;
 fts_symbol_t fts_s_assign;
+
+/* Predefined variable names */
+
+fts_symbol_t fts_s_args;
 
 static void
 fts_predefine_symbols(void)
 {
-  /* **************** WARNING *************************
-     In ANY case, do not change the index assigned to  symbols in the following;
-     just add new pairs, in any order, but do not change existing values;
-     this code are part of the binary format, and of the client protocol; you
-     would simply screw up compatibility with existing files;
-     You cannot also delete symbols, just add them.
-     */
-
-  fts_s_void       = fts_new_builtin_symbol("void",   0);
-  fts_s_float      = fts_new_builtin_symbol("float",  1);
-  fts_s_int        = fts_new_builtin_symbol("int",    2);
-  fts_s_number     = fts_new_builtin_symbol("number", 3);
-  fts_s_ptr        = fts_new_builtin_symbol("ptr",    4);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_string     = fts_new_builtin_symbol("string", 5);
-  fts_s_symbol     = fts_new_builtin_symbol("symbol", 6);
-  fts_s_object     = fts_new_builtin_symbol("object", 7);
-  fts_s_connection = fts_new_builtin_symbol("connection", 8);
-  fts_s_true       = fts_new_builtin_symbol("true",   9);
-  fts_s_false      = fts_new_builtin_symbol("false",  10);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_init 	   = fts_new_builtin_symbol("$init",   11);
-  fts_s_delete	   = fts_new_builtin_symbol("$delete", 12);
-  fts_s_ninlets    = fts_new_builtin_symbol("ins",     13);
-  fts_s_noutlets   = fts_new_builtin_symbol("outs",    14);
-  fts_s_bang       = fts_new_builtin_symbol("bang",    15);
-  fts_s_list       = fts_new_builtin_symbol("list",    16);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_set        = fts_new_builtin_symbol("set",     17);
-  fts_s_append     = fts_new_builtin_symbol("append",  18);
-  fts_s_print      = fts_new_builtin_symbol("print",   19);
-  fts_s_clear      = fts_new_builtin_symbol("clear",   20);
-  fts_s_stop       = fts_new_builtin_symbol("stop",    21);
-  fts_s_start      = fts_new_builtin_symbol("start",   22);
-  fts_s_restore    = fts_new_builtin_symbol("restore", 23);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_open       = fts_new_builtin_symbol("open",    24);
-  fts_s_upload     = fts_new_builtin_symbol("upload",  57);
-  fts_s_close      = fts_new_builtin_symbol("close",   25);
-  fts_s_load       = fts_new_builtin_symbol("load",    26);
-  fts_s_read       = fts_new_builtin_symbol("read",    27);
-  fts_s_write      = fts_new_builtin_symbol("write",   28);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_save_bmax  = fts_new_builtin_symbol("save_bmax", 29);
-  fts_s_anything   = fts_new_builtin_symbol("anything", 30);
-  fts_s_comma      = fts_new_builtin_symbol(",",       31);
-  fts_s_quote      = fts_new_builtin_symbol("'",       32);
-  fts_s_dollar     = fts_new_builtin_symbol("$",       33);
-  fts_s_semi       = fts_new_builtin_symbol(";",       34);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  /* Predefined symbol for properties */
-
-  fts_s_value      = fts_new_builtin_symbol("value",    35);
-  fts_s_max_value  = fts_new_builtin_symbol("maxValue", 36);
-  fts_s_min_value  = fts_new_builtin_symbol("minValue", 37);
-  fts_s_name       = fts_new_builtin_symbol("name",     38);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_x          = fts_new_builtin_symbol("x",        39);
-  fts_s_wx         = fts_new_builtin_symbol("wx",       40);
-  fts_s_y          = fts_new_builtin_symbol("y",        41);
-  fts_s_wy         = fts_new_builtin_symbol("wy",       42);
-  fts_s_width      = fts_new_builtin_symbol("w",        43);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_ww         = fts_new_builtin_symbol("ww",       44);
-  fts_s_height     = fts_new_builtin_symbol("h",        45);
-  fts_s_wh         = fts_new_builtin_symbol("wh",       46);
-  fts_s_range      = fts_new_builtin_symbol("range",    47);
-  fts_s_font       = fts_new_builtin_symbol("font",     48);
-  fts_s_fontSize   = fts_new_builtin_symbol("fs",       49);
-  fts_s_error      = fts_new_builtin_symbol("error",    56);
-  fts_s_size       = fts_new_builtin_symbol("size",     85);
+  fts_s_void       = fts_new_symbol("void");
+  fts_s_float      = fts_new_symbol("float");
+  fts_s_int        = fts_new_symbol("int");
+  fts_s_number     = fts_new_symbol("number");
+  fts_s_ptr        = fts_new_symbol("ptr");
+  fts_s_string     = fts_new_symbol("string");
+  fts_s_symbol     = fts_new_symbol("symbol");
+  fts_s_object     = fts_new_symbol("object");
+  fts_s_atom_array = fts_new_symbol("atom_array");
+  fts_s_connection = fts_new_symbol("connection");
+  fts_s_true       = fts_new_symbol("true");
+  fts_s_false      = fts_new_symbol("false");
+  fts_s_init 	   = fts_new_symbol("$init");
+  fts_s_delete	   = fts_new_symbol("$delete");
+  fts_s_ninlets    = fts_new_symbol("ins");
+  fts_s_noutlets   = fts_new_symbol("outs");
+  fts_s_bang       = fts_new_symbol("bang");
+  fts_s_list       = fts_new_symbol("list");
+  fts_s_set        = fts_new_symbol("set");
+  fts_s_append     = fts_new_symbol("append");
+  fts_s_print      = fts_new_symbol("print");
+  fts_s_clear      = fts_new_symbol("clear");
+  fts_s_stop       = fts_new_symbol("stop");
+  fts_s_start      = fts_new_symbol("start");
+  fts_s_restore    = fts_new_symbol("restore");
+  fts_s_open       = fts_new_symbol("open");
+  fts_s_upload     = fts_new_symbol("upload");
+  fts_s_close      = fts_new_symbol("close");
+  fts_s_load       = fts_new_symbol("load");
+  fts_s_read       = fts_new_symbol("read");
+  fts_s_write      = fts_new_symbol("write");
+  fts_s_save_bmax  = fts_new_symbol("save_bmax");
+  fts_s_anything   = fts_new_symbol("anything");
+  fts_s_comma      = fts_new_symbol(",");
+  fts_s_quote      = fts_new_symbol("'");
+  fts_s_dollar     = fts_new_symbol("$");
+  fts_s_semi       = fts_new_symbol(";");
+  fts_s_value      = fts_new_symbol("value");
+  fts_s_max_value  = fts_new_symbol("maxValue");
+  fts_s_min_value  = fts_new_symbol("minValue");
+  fts_s_name       = fts_new_symbol("name");
+  fts_s_x          = fts_new_symbol("x");
+  fts_s_wx         = fts_new_symbol("wx");
+  fts_s_y          = fts_new_symbol("y");
+  fts_s_wy         = fts_new_symbol("wy");
+  fts_s_width      = fts_new_symbol("w");
+  fts_s_ww         = fts_new_symbol("ww");
+  fts_s_height     = fts_new_symbol("h");
+  fts_s_wh         = fts_new_symbol("wh");
+  fts_s_range      = fts_new_symbol("range");
+  fts_s_font       = fts_new_symbol("font");
+  fts_s_fontSize   = fts_new_symbol("fs");
+  fts_s_error      = fts_new_symbol("error");
+  fts_s_size       = fts_new_symbol("size");
+  fts_s_state      = fts_new_symbol("state");
 
   /* Symbols related to builtin classes */
-  /* WARNING: read the warning at the beginning of the function */
 
-  fts_s_old_patcher    = fts_new_builtin_symbol("patcher", 50);
-  fts_s_patcher    = fts_new_builtin_symbol("jpatcher", 86);
-  fts_s_inlet      = fts_new_builtin_symbol("inlet",   51);
-  fts_s_outlet     = fts_new_builtin_symbol("outlet",  52);
-  fts_s_qlist      = fts_new_builtin_symbol("qlist",   53);
-  fts_s_table      = fts_new_builtin_symbol("table",   54);
-  fts_s_explode    = fts_new_builtin_symbol("explode", 55);
+  fts_s_old_patcher    = fts_new_symbol("patcher");
+  fts_s_patcher    = fts_new_symbol("jpatcher");
+  fts_s_inlet      = fts_new_symbol("inlet");
+  fts_s_outlet     = fts_new_symbol("outlet");
+  fts_s_qlist      = fts_new_symbol("qlist");
+  fts_s_table      = fts_new_symbol("table");
+  fts_s_explode    = fts_new_symbol("explode");
 
   /* Espression operators */
-  /* WARNING: read the warning at the beginning of the function */
 
-  fts_s_plus       = fts_new_builtin_symbol("+", 58);
-  fts_s_minus      = fts_new_builtin_symbol("-", 59);
-  fts_s_times      = fts_new_builtin_symbol("*", 60);
-  fts_s_div        = fts_new_builtin_symbol("/", 61);
-  fts_s_open_par   = fts_new_builtin_symbol("(", 62);
-  fts_s_closed_par = fts_new_builtin_symbol(")", 63);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_dot        = fts_new_builtin_symbol(".",    65);
-  fts_s_remainder  = fts_new_builtin_symbol("%",    66);
-  fts_s_shift_left = fts_new_builtin_symbol("<<",   67);
-  fts_s_shift_right = fts_new_builtin_symbol(">>",  68);
-  fts_s_bit_and    = fts_new_builtin_symbol("&",    69);
-  fts_s_bit_or     = fts_new_builtin_symbol("|",    70);
-  fts_s_bit_xor     = fts_new_builtin_symbol("^",   71);
-  fts_s_bit_not    = fts_new_builtin_symbol("~",    72);
-
-  /* WARNING: read the warning at the beginning of the function */
-
-  fts_s_logical_and = fts_new_builtin_symbol("&&",  73);
-  fts_s_logical_or  = fts_new_builtin_symbol("||",   74);
-  fts_s_logical_not = fts_new_builtin_symbol("!",    75);
-  fts_s_equal       = fts_new_builtin_symbol("==",   76);
-  fts_s_not_equal   = fts_new_builtin_symbol("!=",   77);
-  fts_s_greater     = fts_new_builtin_symbol(">",    78);
-  fts_s_greater_equal = fts_new_builtin_symbol(">=", 79);
-  fts_s_smaller     = fts_new_builtin_symbol("<",    80);
-  fts_s_smaller_equal = fts_new_builtin_symbol("<=", 81);
-  fts_s_conditional = fts_new_builtin_symbol("?", 82);
-  fts_s_else        = fts_new_builtin_symbol(":", 83);
-  fts_s_assign      = fts_new_builtin_symbol("=", 84);
+  fts_s_plus       = fts_new_symbol("+");
+  fts_s_minus      = fts_new_symbol("-");
+  fts_s_times      = fts_new_symbol("*");
+  fts_s_div        = fts_new_symbol("/");
+  fts_s_open_par   = fts_new_symbol("(");
+  fts_s_closed_par = fts_new_symbol(")");
+  fts_s_open_sqpar   = fts_new_symbol("[");
+  fts_s_closed_sqpar = fts_new_symbol("]");
+  fts_s_open_cpar   = fts_new_symbol("{");
+  fts_s_closed_cpar = fts_new_symbol("}");
+  fts_s_dot        = fts_new_symbol(".");
+  fts_s_remainder  = fts_new_symbol("%");
+  fts_s_shift_left = fts_new_symbol("<<");
+  fts_s_shift_right = fts_new_symbol(">>");
+  fts_s_bit_and    = fts_new_symbol("&");
+  fts_s_bit_or     = fts_new_symbol("|");
+  fts_s_bit_xor     = fts_new_symbol("^");
+  fts_s_bit_not    = fts_new_symbol("~");
+  fts_s_logical_and = fts_new_symbol("&&");
+  fts_s_logical_or  = fts_new_symbol("||");
+  fts_s_logical_not = fts_new_symbol("!");
+  fts_s_equal       = fts_new_symbol("==");
+  fts_s_not_equal   = fts_new_symbol("!=");
+  fts_s_greater     = fts_new_symbol(">");
+  fts_s_greater_equal = fts_new_symbol(">=");
+  fts_s_smaller     = fts_new_symbol("<");
+  fts_s_smaller_equal = fts_new_symbol("<=");
+  fts_s_conditional = fts_new_symbol("?");
+  fts_s_column        = fts_new_symbol(":");
+  fts_s_assign      = fts_new_symbol("=");
 
   /* FTS Data  */
 
-  fts_s_data        = fts_new_builtin_symbol("data", 87);
+  fts_s_data        = fts_new_symbol("data");
 
-  /* Last number used: 87 (max, 255 predefined symbols !! ) */
-  /* WARNING: read the warning at the beginning of the function */
+  /* Predefined variable names */
+
+  fts_s_args        = fts_new_symbol("args");
 }
 
 
@@ -283,25 +257,6 @@ static struct _symbol_table
   fts_symbol_t builtin_symbols[BUILTIN_SYMBOL_SIZE];
 } symbol_table;
 
-
-
-static void
-fts_print_symbol_table(const char *msg, const char *name)
-{
-  int i;
-
-  fprintf(stderr, "Symbol table %s adding %s\n", msg, name);
-
-  for (i = 0; i < SYMTABSIZE; i++)
-    {
-      struct fts_symbol_descr *sp;		/* use the structure, not the type, so it is not 'const' */
-
-      sp = (struct fts_symbol_descr *) symbol_table.symbol_hash_table[i];
-
-      for (; sp; sp = sp->next_in_table)
-	fprintf(stderr, "-\t%s\n", sp->name);
-    }
-}
 
 void
 fts_symbols_init(void)
@@ -359,7 +314,7 @@ fts_new_symbol(const char *name)
 
   for (; sp; sp = sp->next_in_table)
     {
-      if (same_string(name, sp->name))
+      if (! strcmp(name, sp->name))
 	return sp;
     }
 
@@ -368,7 +323,6 @@ fts_new_symbol(const char *name)
 
   sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
   sp->name = name;
-  sp->index = -1;
   sp->operator = -1;
 
   /* third, add the new symbol in the hash table */
@@ -397,7 +351,7 @@ fts_new_symbol_copy(const char *name)
 
   for (; sp; sp = sp->next_in_table)
     {
-      if (same_string(name, sp->name))
+      if (! strcmp(name, sp->name))
 	return sp;
     }
 
@@ -410,7 +364,6 @@ fts_new_symbol_copy(const char *name)
   sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
 
   sp->name = s;
-  sp->index = -1;
   sp->operator = -1;
 
   /* third, add the new symbol in the has table */
@@ -421,66 +374,4 @@ fts_new_symbol_copy(const char *name)
   return sp;
 }
 
-/* USed here to define the predefined symbols */
-
-static fts_symbol_t 
-fts_new_builtin_symbol(const char *name, int code)
-{
-  struct fts_symbol_descr *s;		/* use the structure, not the type, so it is not 'const' */
-
-  s = (struct fts_symbol_descr *) fts_new_symbol(name);
-
-  if (code < BUILTIN_SYMBOL_SIZE)
-    {
-      s->index = code;
-      symbol_table.builtin_symbols[s->index] = s;
-    }
-
-  return (fts_symbol_t) s;
-}
-
-
-/* These function are reserved to those protocol/binary format modules */
-
-fts_symbol_t fts_get_builtin_symbol(int idx)
-{
-  return symbol_table.builtin_symbols[idx];
-}
-
-int fts_is_builtin_symbol(fts_symbol_t s)
-{
-  return s->index != -1;
-}
-
-
-int fts_get_builtin_symbol_index(fts_symbol_t s)
-{
-  return s->index;
-}
-
-
-/* Local implementation string equality test */
-
-static int same_string(const char *s1, const char *s2)
-{
-  if (s1 == s2)
-    return 1;
-
-  if ((s1 == 0) || (s2 == 0))
-    {
-      fprintf(stderr, "Null argument for same_string\n");
-      return 0;
-    }
-
-  while (*s1 == *s2)
-    {
-      s1++;
-      s2++;
-
-      if ((*s1 == '\0') && (*s2 == '\0'))
-	return 1;
-    }
-
-  return 0;
-}
 

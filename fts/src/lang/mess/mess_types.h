@@ -26,6 +26,7 @@
 typedef const struct fts_symbol_descr *fts_symbol_t;
 typedef union  fts_word          fts_word_t;
 typedef struct fts_atom          fts_atom_t;
+typedef struct fts_atom_array    fts_atom_array_t;
 
 typedef struct fts_plist                 fts_plist_t;
 
@@ -71,7 +72,7 @@ typedef struct fts_data_class		fts_data_class_t;
 struct fts_symbol_descr
 {
   const char *name;		/* name */
-  int index;			/* index in the builtin table, -1 otherwise */
+
   int operator;			/* index in the operator table, for the expression eval */
   struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
 };
@@ -95,6 +96,7 @@ union fts_word
   char                *fts_str;
   fts_object_t        *fts_obj;
   fts_connection_t    *fts_connection;
+  fts_atom_array_t    *fts_atom_array;
   fts_data_t          *fts_data;
 };
 
@@ -131,6 +133,17 @@ struct fts_atom
   fts_word_t value;
 };
 
+/* 
+   An atom array is an array of atoms of fixed length.
+   For now, used as value in expression, may become more
+   widely used later.
+   */
+
+struct fts_atom_array
+{
+  int ac;
+  fts_atom_t *at;
+};
 
 /*
  *  PROPERTY LISTS
@@ -138,7 +151,8 @@ struct fts_atom
  * Used to store properties.
  */
 
-struct fts_plist {
+struct fts_plist
+{
   struct fts_plist_cell *head;
 };
 
@@ -146,6 +160,7 @@ struct fts_plist {
 /*
  * Data functions
  */
+
 typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, fts_atom_t *at);
 typedef void (*fts_data_export_fun_t)( fts_data_t *d);
 
@@ -363,11 +378,12 @@ struct fts_patcher
 
   fts_inlet_t  **inlets;	/* the patcher inlet array */
   fts_outlet_t **outlets;	/* the patcher outlet array */
-
   fts_object_t *objects;	/* the patcher content, organized as a list */
 
   int open;			/* the open flag */
   int load_init_fired;		/* the multiple load init protection flag*/
+
+  fts_atom_array_t *args;	/* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 

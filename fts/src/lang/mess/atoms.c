@@ -48,6 +48,8 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	}
       else if (fts_is_void(&at[i]))
 	fprintf(f,"<void>%s", ps);
+      else if (fts_is_error(&at[i]))
+	fprintf(f,"<error>%s", ps);
       else
 	fprintf(f,"<%s>%lx%s", fts_symbol_name(fts_get_type(&at[i])), 
 		(unsigned long) fts_get_ptr( &at[i]), ps);
@@ -62,10 +64,14 @@ fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2)
     {
       if (fts_is_void(a1))
 	return fts_is_void(a2);
+      if (fts_is_error(a1))
+	return fts_is_error(a2);
       else if (fts_is_symbol(a1))
 	return fts_get_symbol(a1) == fts_get_symbol(a2);
       else if (fts_is_string(a1))
 	return ! strcmp(fts_get_string(a1), fts_get_string(a2));
+      else if (fts_is_atom_array(a1))
+	return fts_get_atom_array(a1) == fts_get_atom_array(a2);
       else if (fts_is_ptr(a1))
 	return fts_get_ptr(a1) == fts_get_ptr(a2);
       else if (fts_is_int(a1))

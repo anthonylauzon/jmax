@@ -6,9 +6,6 @@
 extern fts_symbol_t fts_new_symbol(const char *name);
 extern fts_symbol_t fts_new_symbol_copy(const char *name);
 
-extern fts_symbol_t fts_get_builtin_symbol(int idx);
-extern int fts_is_builtin_symbol(fts_symbol_t s);
-extern int fts_get_builtin_symbol_index(fts_symbol_t s);
 
 /* Get the symbol name from a symbol;
    note that users should never access the internal structure
@@ -42,6 +39,7 @@ extern fts_symbol_t fts_s_connection;
 extern fts_symbol_t fts_s_true;
 extern fts_symbol_t fts_s_false;
 extern fts_symbol_t fts_s_data;
+extern fts_symbol_t fts_s_atom_array;
 
 /* Symbols related to messages, objects and classes */
 
@@ -91,6 +89,7 @@ extern fts_symbol_t fts_s_font;
 extern fts_symbol_t fts_s_fontSize;
 extern fts_symbol_t fts_s_size;
 extern fts_symbol_t fts_s_error;
+extern fts_symbol_t fts_s_state;
 
 /* Symbols related to builtin classes */
 
@@ -110,6 +109,10 @@ extern fts_symbol_t fts_s_times;
 extern fts_symbol_t fts_s_div;
 extern fts_symbol_t fts_s_open_par;
 extern fts_symbol_t fts_s_closed_par;
+extern fts_symbol_t fts_s_open_sqpar;
+extern fts_symbol_t fts_s_closed_sqpar;
+extern fts_symbol_t fts_s_open_cpar;
+extern fts_symbol_t fts_s_closed_cpar;
 extern fts_symbol_t fts_s_dot;
 extern fts_symbol_t fts_s_remainder;
 extern fts_symbol_t fts_s_shift_left;
@@ -128,8 +131,12 @@ extern fts_symbol_t fts_s_greater_equal;
 extern fts_symbol_t fts_s_smaller;
 extern fts_symbol_t fts_s_smaller_equal;
 extern fts_symbol_t fts_s_conditional;
-extern fts_symbol_t fts_s_else;
+extern fts_symbol_t fts_s_column;
 extern fts_symbol_t fts_s_assign;
+
+/* Predefined variable names */
+
+extern fts_symbol_t fts_s_args;
 
 #endif
 

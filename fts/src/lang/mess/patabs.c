@@ -218,15 +218,6 @@ fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const
   char *p;
   FILE *file;
 
-  /* @@@ */
-  unsigned long foo = (unsigned long) fts_symbol_name(fts_get_symbol(at));
-
-  if (foo < (32 * 1024))
-    {
-      fprintf(stderr, "Suspect symbol address %lx\n", foo);
-      fprintf(stderr, "Suspect symbol >%s<\n", fts_symbol_name(fts_get_symbol(at)));
-    }
-
   strcpy(name_buf, fts_symbol_name(fts_get_symbol(&at[0])));
 
   p = strrchr(name_buf, '.');

@@ -354,8 +354,19 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   int i;
   int ninlets, noutlets;
-
+  fts_atom_t va;
   fts_patcher_t *this = (fts_patcher_t *) o;
+
+  fts_env_init(&(this->env), (fts_object_t *) this);
+  fts_patcher_set_standard(this);
+
+  /* Define the "args" variable */
+
+  this->args = fts_atom_array_new_fill(ac, at);
+
+  fts_variable_define(o, fts_s_args, o);
+  fts_set_atom_array(&va, this->args);
+  fts_variable_restore(o, fts_s_args, &va, o);
 
   /* Put the name as property if any */
 
@@ -390,8 +401,6 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->objects = (fts_object_t *) 0;
   this->open    = 0;		/* start as closed */
   
-  fts_env_init(&(this->env), (fts_object_t *) this);
-  fts_patcher_set_standard(this);
 }
 
 
@@ -405,6 +414,8 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
    * from the list, including inlets and outlets; this will undo the
    * connections also to the inlets and outlets.
    */
+
+  fts_atom_array_free(this->args);
 
   while (this->objects)
     fts_object_delete(this->objects);
@@ -420,18 +431,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (this->outlets)
     fts_block_free((char *) this->outlets, sizeof(fts_outlet_t *)*fts_object_get_outlets_number((fts_object_t *) this));
-}
-
-/* Error property handling */
-
-static void
-patcher_get_error(fts_daemon_action_t action, fts_object_t *obj,
-		  int idx, fts_symbol_t property, fts_atom_t *value)
-{
-  if (fts_object_is_error(obj))
-    fts_set_int(value, 1);
-  else
-    fts_set_int(value, 0);
 }
 
 /* Daemons to set nins and nouts */
@@ -491,10 +490,6 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("open"), patcher_open, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close, 0, 0); 
 
-  /* daemon for error property */
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_error, patcher_get_error);
-
   /* daemons for setting nins and nouts */
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_put_ninlets);
@@ -536,21 +531,32 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
 {
   fts_expression_state_t *e;
   int ac;
-  fts_atom_t at[3]; /* Actually, the evaluated atom vector */
+  fts_atom_t at[1024];
+  fts_atom_t va;
 
   /* 1- suspend  the patcher internal variables if any */
 
   fts_variables_suspend((fts_object_t *) this, (fts_object_t *) this);
 
+  /* 1-bis: free the args array */
+
+  fts_atom_array_free(this->args);
+
   /* 2- eval the expression
      Ignore the errors, for the moment !!
      */
 
-  e = fts_expression_eval((fts_object_t *)this, aoc, aot, 3, at);
+  e = fts_expression_eval((fts_object_t *)this, aoc, aot, 1024, at);
   ac = fts_expression_get_count(e);
 
+  /* 2 bis, reallocate the atom array */
+
+  this->args = fts_atom_array_new_fill(ac, at);
+  
   /* 3- set the new variables */
 
+  fts_set_atom_array(&va, this->args);
+  fts_variable_restore((fts_object_t *)this, fts_s_args, &va, (fts_object_t *)this);
   fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
   /* 4- register the patcher as user of the used variables */

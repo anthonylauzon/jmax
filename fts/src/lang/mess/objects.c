@@ -6,10 +6,14 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.34 $ IRCAM $Date: 1998/07/27 10:46:14 $
+ *      $Revision: 1.35 $ IRCAM $Date: 1998/08/19 15:15:49 $
  *
  *  Eric Viara for Ircam, January 1995
  */
+
+/* Define TRACE_DEBUG to get some debug printing during object creation.  */
+
+/* #define TRACE_DEBUG */
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -169,6 +173,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
   fts_metaclass_t *mcl;
   fts_symbol_t  var;
   fts_expression_state_t *e = 0;
+  fts_atom_t state;
   int ac;
   const fts_atom_t *at;
   fts_atom_t new_args[1024]; /* Actually, the evaluated atom vector
@@ -186,7 +191,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
   /* First of all, we check if we are in the case of a object variable definition syntax */
 
-  if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_else))
+  if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_column))
     {
       /* foo : <obj> syntax; extract the variable name */
       
@@ -303,19 +308,11 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
   if (! obj)
     {
-      /* Note that waiting for the new parser we just do *not* evaluate the class name */
-      /* TMP HACK BEGIN */
-
-      /* TMP HACK END*/
       /* Compute the expressions with the correct offset */
-      /* e = fts_expression_eval((fts_object_t *)patcher, ac, at,  1024, new_args); */
-      /* TMP IF */
 
       if (ac > 1)
 	{
-	  new_args[0] = at[0];
-
-	  e = fts_expression_eval((fts_object_t *)patcher, ac - 1, at + 1,  1023, new_args + 1);
+	  e = fts_expression_eval((fts_object_t *)patcher, ac, at,  1024, new_args);
 	  
 	  if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
 	    {
@@ -336,7 +333,7 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 	  else
 	    {
 	      at = new_args;
-	      ac = fts_expression_get_count(e) + 1; /* + 1 TMP */
+	      ac = fts_expression_get_count(e);
 	    }
 	}
     }
@@ -425,6 +422,32 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
       obj = fts_error_object_new(patcher, aoc, aot);
     }
 
+  /* 10 - check if we are defining a variable *and* we have a state;
+   * If yes, just store the state in the variable state for later use.
+   * if not, destroy the current object, and substitute it with an error object
+   * and store an error value in the variable state.
+   */
+
+  if ((! fts_object_is_error(obj)) && (var != 0))
+    {
+      fts_object_get_prop(obj, fts_s_state, &state);
+      
+      if (fts_is_void(&state))
+	{
+	  /* ERROR: the object cannot define a variable,
+	     it does not have a "state" property */
+
+	  fprintf(stderr, "@@@ Error: Object %s cannot define a variable\n",
+		  fts_symbol_name(fts_get_symbol(aot)));
+
+	  fts_object_delete(obj);
+	  obj = fts_error_object_new(patcher, aoc, aot);
+	}
+    }
+
+  if (fts_object_is_error(obj))
+    fts_set_error(&state);
+
   /* Object created (at worst, a error object) do the last operations, like setting 
      the object description, variables and properties;
      We check if the argv exists already; a doctor may have
@@ -459,12 +482,25 @@ fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 
   if (var != 0)
     {
-      fts_atom_t a;
-
-      fts_set_object(&a, obj);
-      fts_variable_restore(obj, var, &a, obj);
+      fts_variable_restore(obj, var, &state, obj);
       obj->varname = var;
     }
+
+  /* Finally, assign the error property;
+     Always present, and always explicit for the moment,
+     until we don't have global daemons again.
+   */
+
+  {
+    fts_atom_t a;
+
+    if (fts_object_is_error(obj))
+      fts_set_int(&a, 1);
+    else
+      fts_set_int(&a, 0);
+
+    fts_object_put_prop(obj, fts_s_error, &a);
+  }
 
   return obj;
 }
@@ -499,17 +535,7 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
      */
 
   if (obj->id != FTS_NO_ID)
-    {
-      if (! fts_object_is_error(obj))
-	{
-	  fts_atom_t a;
-
-	  fts_set_int(&a, 0);
-	  fts_object_put_prop(obj, fts_s_error, &a);
-	}
-
-      fts_object_send_kernel_properties(obj);
-    }
+    fts_object_send_kernel_properties(obj);
 
   return obj;
 }
@@ -523,7 +549,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *a
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
 
-  if ((ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_else))
+  if ((ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column))
     var = fts_get_symbol(&at[0]);
   else
     var = 0;
@@ -869,9 +895,7 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed_urgent(obj, fts_s_value); 
       fts_object_property_changed_urgent(obj, fts_s_size); 
       fts_object_property_changed_urgent(obj, fts_s_name) ;
-
-      if (fts_object_is_error(obj))
-	fts_object_property_changed_urgent(obj, fts_s_error);
+      fts_object_property_changed_urgent(obj, fts_s_error);
 
       /* Declarations are not yet really supported */
 

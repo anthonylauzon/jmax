@@ -64,7 +64,5 @@ extern void fts_doctor_init();
 extern fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 extern int fts_object_doctor_exists(fts_symbol_t class_name);
 
-#include "lang/mess/variables.h"
-
 
 #endif

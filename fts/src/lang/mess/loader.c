@@ -5,7 +5,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
-#include "lang/mess/loader.h"
 
 /* Private structure */
 typedef struct fts_binary_file_desc_t {

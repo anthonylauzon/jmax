@@ -5,8 +5,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-#include "lang/mess/ftsdata.h"
-#include "lang/mess/ftsdataid.h"
 
 #define DATA_TABLE_INIT_SIZE (1024)
 #define DATA_TABLE_GROW  2

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.14 $ IRCAM $Date: 1998/06/26 15:43:01 $
+ *      $Revision: 1.15 $ IRCAM $Date: 1998/08/19 15:15:45 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -32,6 +32,10 @@ fts_mess_init(void)
   /* Init the symbol table */
 
   fts_symbols_init();
+
+  /* Init the atom array module */
+
+  fts_atom_array_init();
 
   /* Init the FTS data module  and id table */
 
@@ -81,6 +85,10 @@ fts_mess_init(void)
   /* Initialize the .pat parser */
 
   fts_patparser_init();
+
+  /* Init the loader vm  */
+
+  fts_vm_init();
 
   /* Create the selection class */
 

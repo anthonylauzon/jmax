@@ -14,7 +14,10 @@
  * The special
  * symbol fts_s_void means a void value, while fts_s_anything
  * means any type (but cannot be used as type tag, is just used
- * in type checking).
+ * in type checking)
+ * 
+ * The special symbol fts_s_error means an error value, i.e. a value
+ * that should generate an error each time somebody try to use it.
  *
  * fts_s_true and fts_s_false are used to build boolean atoms.
 */
@@ -63,7 +66,11 @@
 #define fts_set_data(ap, x)       \
      do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_get_value(ap), (x));} while (0)
 
+#define fts_set_atom_array(ap, x)       \
+     do {fts_set_type(ap, fts_s_atom_array); fts_word_set_atom_array( fts_get_value(ap), (x));} while (0)
+
 #define fts_set_void(ap)           (fts_set_type(ap, fts_s_void))
+#define fts_set_error(ap)           (fts_set_type(ap, fts_s_error))
 
 #define fts_set_true(ap)           (fts_set_type(ap, fts_s_true))
 #define fts_set_false(ap)          (fts_set_type(ap, fts_s_false))
@@ -82,9 +89,11 @@
 
 #define fts_get_object(ap)         (fts_word_get_object(fts_get_value(ap)))
 #define fts_get_connection(ap)     (fts_word_get_connection(fts_get_value(ap)))
-#define fts_get_data(ap)         (fts_word_get_data(fts_get_value(ap)))
+#define fts_get_data(ap)           (fts_word_get_data(fts_get_value(ap)))
+#define fts_get_atom_array(ap)     (fts_word_get_atom_array(fts_get_value(ap)))
 
 #define fts_is_void(ap)            fts_is_a(ap, fts_s_void)
+#define fts_is_error(ap)            fts_is_a(ap, fts_s_error)
 #define fts_is_symbol(ap)          fts_is_a(ap, fts_s_symbol)
 #define fts_is_string(ap)          fts_is_a(ap, fts_s_string)
 #define fts_is_ptr(ap)             fts_is_a(ap, fts_s_ptr)
@@ -97,6 +106,7 @@
 #define fts_is_true(ap)            fts_is_a(ap, fts_s_true)
 #define fts_is_false(ap)           fts_is_a(ap, fts_s_false)
 #define fts_is_data(ap)            fts_is_a(ap, fts_s_data)
+#define fts_is_atom_array(ap)      fts_is_a(ap, fts_s_atom_array)
 
 /* Convenience macros to deal with type and atom algebra */
 

@@ -15,7 +15,7 @@
 #include "lang.h"
 #include "lang/mess/messP.h"
 
-#define TRACE_DEBUG
+/* #define TRACE_DEBUG */
 
 /* Errors */
 

@@ -22,7 +22,8 @@
 #define fts_word_set_float(ap, x)       ((ap)->fts_float = (x))
 #define fts_word_set_object(ap, x)      ((ap)->fts_obj = (x))
 #define fts_word_set_connection(ap, x)  ((ap)->fts_connection = (x))
-#define fts_word_set_data(ap, x)      ((ap)->fts_data = (x))
+#define fts_word_set_data(ap, x)        ((ap)->fts_data = (x))
+#define fts_word_set_atom_array(ap, x)  ((ap)->fts_atom_array = (x))
 
 #define fts_word_get_symbol(ap)         ((ap)->fts_symbol)
 #define fts_word_get_string(ap)         ((ap)->fts_str)
@@ -33,6 +34,7 @@
 #define fts_word_get_object(ap)         ((ap)->fts_obj)
 #define fts_word_get_connection(ap)     ((ap)->fts_connection)
 #define fts_word_get_data(ap)           ((ap)->fts_data)
+#define fts_word_get_atom_array(ap)     ((ap)->fts_atom_array)
 
 #endif
 

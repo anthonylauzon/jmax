@@ -5,8 +5,6 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-#include "lang/mess/ftsdata.h"
-#include "lang/mess/ftsdataid.h"
 /* (fd) I know, this is not correct. But it is needed ... */
 #include "runtime.h"
 

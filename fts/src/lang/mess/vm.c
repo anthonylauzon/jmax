@@ -21,6 +21,9 @@
    The execution engine is anyway based on atoms and words, i.e. all ints are 4 bytes
    in the registers.
 
+   NOTE That builtin symbols are obsolete; the resolution is done here, and will go
+   away soon.
+
    The instructions are:
 
    PUSH_INT   <int>   // push an int value in the argument stack
@@ -94,7 +97,6 @@
 
 #include "sys.h"
 #include "lang/mess.h"
-#include "lang/mess/vm.h"
 
 
 #define EVAL_STACK_DEPTH   4096
@@ -110,6 +112,9 @@ static fts_object_t **object_tos = object_stack + OBJECT_STACK_DEPTH;
 static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
 static fts_object_t ***object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH;
 static fts_object_t **object_table = 0;
+
+#define MAX_BUILTIN_SYMBOLS 88
+static fts_symbol_t builtin_symbols[MAX_BUILTIN_SYMBOLS];
 
 /* Macros to do checks operations */
 
@@ -298,7 +303,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    fts_symbol_t s;
 
-	    s  = fts_get_builtin_symbol(GET_B(p));
+	    s = builtin_symbols[GET_B(p)];
 
 #ifdef VM_DEBUG
 	    fprintf(stderr, "PUSH_BUILTIN_SYM %s\n", fts_symbol_name(s));
@@ -424,8 +429,8 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "SET_BUILTIN_SYM %d\n", GET_B(p));
 #endif
-
-	    fts_set_symbol(eval_tos, fts_get_builtin_symbol(GET_B(p)));
+	    
+	    fts_set_symbol(eval_tos, builtin_symbols[GET_B(p)]);
 	    p++;
 	  }
 	break;
@@ -821,7 +826,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    fts_symbol_t prop;
 
-	    prop = fts_get_builtin_symbol(GET_B(p++));
+	    prop = builtin_symbols[GET_B(p++)];
 
 #ifdef VM_DEBUG
 	    fprintf(stderr, "PUT_BUILTIN_PROP %s\n", fts_symbol_name(prop));
@@ -864,7 +869,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    inlet = GET_L(p);
 	    p += 4;
-	    sel = fts_get_builtin_symbol(GET_B(p));
+	    sel = builtin_symbols[GET_B(p)];
 	    p += 1;
 	    nargs = GET_L(p);
 	    p += 4;
@@ -983,6 +988,111 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
       CHECK_EVAL_STACK;
     }
 }
+
+
+/* Backward compatibility builtin symbol support.
+   Will go away soon.
+   */
+
+
+
+void fts_vm_init()
+{
+  /* Don't add or change anything to this list; be patient, will go away
+     next release.
+     */
+
+  builtin_symbols[0] =  fts_s_void;
+  builtin_symbols[1] =  fts_s_float;
+  builtin_symbols[2] =  fts_s_int;
+  builtin_symbols[3] =  fts_s_number;
+  builtin_symbols[4] =  fts_s_ptr;
+  builtin_symbols[5] =  fts_s_string;
+  builtin_symbols[6] =  fts_s_symbol;
+  builtin_symbols[7] =  fts_s_object;
+  builtin_symbols[8] =  fts_s_connection;
+  builtin_symbols[9] =  fts_s_true;
+  builtin_symbols[10] =  fts_s_false;
+  builtin_symbols[11] =  fts_s_init;
+  builtin_symbols[12] =  fts_s_delete;
+  builtin_symbols[13] =  fts_s_ninlets;
+  builtin_symbols[14] =  fts_s_noutlets;
+  builtin_symbols[15] =  fts_s_bang;
+  builtin_symbols[16] =  fts_s_list;
+  builtin_symbols[17] =  fts_s_set;
+  builtin_symbols[18] =  fts_s_append;
+  builtin_symbols[19] =  fts_s_print;
+  builtin_symbols[20] =  fts_s_clear;
+  builtin_symbols[21] =  fts_s_stop;
+  builtin_symbols[22] =  fts_s_start;
+  builtin_symbols[23] =  fts_s_restore;
+  builtin_symbols[24] =  fts_s_open;
+  builtin_symbols[25] =  fts_s_close;
+  builtin_symbols[26] =  fts_s_load;
+  builtin_symbols[27] =  fts_s_read;
+  builtin_symbols[28] =  fts_s_write;
+  builtin_symbols[29] =  fts_s_save_bmax;
+  builtin_symbols[30] =  fts_s_anything;
+  builtin_symbols[31] =  fts_s_comma;
+  builtin_symbols[32] =  fts_s_quote;
+  builtin_symbols[33] =  fts_s_dollar;
+  builtin_symbols[34] =  fts_s_semi;
+  builtin_symbols[35] =  fts_s_value;
+  builtin_symbols[36] =  fts_s_max_value;
+  builtin_symbols[37] =  fts_s_min_value;
+  builtin_symbols[38] =  fts_s_name;
+  builtin_symbols[39] =  fts_s_x;
+  builtin_symbols[40] =  fts_s_wx;
+  builtin_symbols[41] =  fts_s_y;
+  builtin_symbols[42] =  fts_s_wy;
+  builtin_symbols[43] =  fts_s_width;
+  builtin_symbols[44] =  fts_s_ww;
+  builtin_symbols[45] =  fts_s_height;
+  builtin_symbols[46] =  fts_s_wh;
+  builtin_symbols[47] =  fts_s_range;
+  builtin_symbols[48] =  fts_s_font;
+  builtin_symbols[49] =  fts_s_fontSize;
+  builtin_symbols[50] =  fts_s_old_patcher;
+  builtin_symbols[51] =  fts_s_inlet;
+  builtin_symbols[52] =  fts_s_outlet;
+  builtin_symbols[53] =  fts_s_qlist;
+  builtin_symbols[54] =  fts_s_table;
+  builtin_symbols[55] =  fts_s_explode;
+  builtin_symbols[56] =  fts_s_error;
+  builtin_symbols[57] =  fts_s_upload;
+  builtin_symbols[58] =  fts_s_plus;
+  builtin_symbols[59] =  fts_s_minus;
+  builtin_symbols[60] =  fts_s_times;
+  builtin_symbols[61] =  fts_s_div;
+  builtin_symbols[62] =  fts_s_open_par;
+  builtin_symbols[63] =  fts_s_closed_par;
+  builtin_symbols[65] =  fts_s_dot;
+  builtin_symbols[66] =  fts_s_remainder;
+  builtin_symbols[67] =  fts_s_shift_left;
+  builtin_symbols[68] =  fts_s_shift_right;
+  builtin_symbols[69] =  fts_s_bit_and;
+  builtin_symbols[70] =  fts_s_bit_or;
+  builtin_symbols[71] =  fts_s_bit_xor;
+  builtin_symbols[72] =  fts_s_bit_not;
+  builtin_symbols[73] =  fts_s_logical_and;
+  builtin_symbols[74] =  fts_s_logical_or;
+  builtin_symbols[75] =  fts_s_logical_not;
+  builtin_symbols[76] =  fts_s_equal;
+  builtin_symbols[77] =  fts_s_not_equal;
+  builtin_symbols[78] =  fts_s_greater;
+  builtin_symbols[79] =  fts_s_greater_equal;
+  builtin_symbols[80] =  fts_s_smaller;
+  builtin_symbols[81] =  fts_s_smaller_equal;
+  builtin_symbols[82] =  fts_s_conditional;
+  builtin_symbols[83] =  fts_s_column;
+  builtin_symbols[84] =  fts_s_assign;
+  builtin_symbols[85] =  fts_s_size;
+  builtin_symbols[86] =  fts_s_patcher;
+  builtin_symbols[87] =  fts_s_data;
+}
+
+
+
 
 
 
