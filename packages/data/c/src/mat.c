@@ -202,6 +202,7 @@ mat_set_from_tuples(mat_t *mat, int ac, const fts_atom_t *at)
   }
 }
 
+
 void
 mat_copy(mat_t *org, mat_t *copy)
 {
@@ -215,11 +216,15 @@ mat_copy(mat_t *org, mat_t *copy)
     copy->data[i] = org->data[i];
 }
 
+
+
+
 /********************************************************
  *
  *  files
  *
  */
+
 #define MAT_BLOCK_SIZE 256
 
 static void
@@ -1228,6 +1233,15 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
 }
 
+
+/* class copy method compatible wrapper around copy function */
+static void
+mat_copy_function(const fts_object_t *from, fts_object_t *to)
+{
+  mat_copy((mat_t *) from, (mat_t *) to);
+}
+
+
 static int
 mat_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
@@ -1370,6 +1384,7 @@ mat_instantiate(fts_class_t *cl)
     
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
+  fts_class_set_copy_function(cl, mat_copy_function);
   fts_class_set_equals_function(cl, mat_equals_function);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
