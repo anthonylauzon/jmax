@@ -240,6 +240,28 @@ public class JMaxApplication {
     return singleInstance.properties.getProperty(key, defaultValue);
   }
 
+  public static void reportException( Throwable t)
+  {
+    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+    PrintWriter pw = new PrintWriter( bs);
+
+    t.printStackTrace( pw);
+    pw.flush();
+
+    JTextArea textArea = new JTextArea( bs.toString());
+
+    textArea.setEditable( false);
+    JScrollPane scrollPane = new JScrollPane( textArea);
+                
+    Object[] message = new Object[2];
+    message[0] = new JLabel( "Caught Java exception:");
+    message[1] = scrollPane;
+
+    String[] options = { "OK"};
+
+    int ret = JOptionPane.showOptionDialog( null, message, "Java exception", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+  }
+
   private JMaxApplication()
   {
     singleInstance = this;
@@ -345,10 +367,20 @@ public class JMaxApplication {
   private class PackageServerListener implements FtsServerListener {
     public void messageReceived( FtsServerEvent event, FtsArgs args)
     {
-      /*if ( args.isSymbol( 0) 
-	&& args.getSymbol( 0).equals( sPackageLoaded) 
-	&& args.isSymbol( 1) )
-	JMaxPackageLoader.load( args.getSymbol( 1).toString());*/
+      if ( args.isSymbol( 0) 
+	   && args.getSymbol( 0).equals( sPackageLoaded) 
+	   && args.isSymbol( 1) )
+	{
+	  System.err.println( "Got package_loaded " + args.getSymbol( 1));
+	  try
+	    {
+	      JMaxPackageLoader.load( args.getSymbol( 1).toString());
+	    }
+	  catch( JMaxPackageLoadingException e)
+	    {
+	      JMaxApplication.reportException( e);
+	    }
+	}
     }
   }
 

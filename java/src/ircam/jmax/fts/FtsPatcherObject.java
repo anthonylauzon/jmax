@@ -84,28 +84,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   static GraphicObject makeGraphicObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
 						   FtsAtom args[], int offset, int nArgs)
   {
-    GraphicObject obj = null;
-    
     if (className != null)
       {
-	JMaxObjectCreator creator = JMaxClassMap.getCreator(className);
+	JMaxObjectCreator creator = JMaxClassMap.getCreator( className);
 	if(creator != null)
-	  {
-	    obj = (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
-	  }
-	else if (className == "jpatcher")
-	  obj =  new Patcher(new FtsPatcherObject(server, parent, objId, args, offset, nArgs));
-	else if (className == "inlet")
-	  obj =  new Inlet(new FtsInletObject(server, parent, objId, args, offset, nArgs));
-	else if (className == "outlet")
-	  obj =  new Outlet(new FtsOutletObject(server, parent, objId, args, offset, nArgs));
-	else
-	  obj = new Standard(new FtsGraphicObject(server, parent, objId, args, offset, nArgs));
+	  return (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
       }
-    else
-      obj = new Standard(new FtsGraphicObject(server, parent, objId, args, offset, nArgs));
 
-    return obj;
+    creator = JMaxClassMap.getCreator( "standard");
+    if(creator != null)
+      return (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
+
+    return null;
   }
 
   /*****************************************************************************/
