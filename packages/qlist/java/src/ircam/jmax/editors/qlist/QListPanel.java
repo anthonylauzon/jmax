@@ -261,6 +261,14 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
     File file;
     Writer w;
 
+//      JFileChooser fileChooser;
+
+//      fileChooser = new JFileChooser();
+
+//      fileChooser.setSelectedFile( new File("qlist.txt"));
+
+//      fileChooser.showDialog( itsEditorContainer.getFrame(), "Export");
+
     file = MaxFileChooser.chooseFileToSave(itsEditorContainer.getFrame(), new File("qlist.txt"),  "Export");
 
     if (file == null)
