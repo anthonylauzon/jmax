@@ -260,44 +260,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
       {
 	g.setXORMode(Color.gray); 
 
-	 //clip deltaY///////////////////
-	/*if(dy > 0)
-	  {
-	  int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	  int h = bgc.getGraphicDestination().getSize().height;
-	  if(minY + dy > h)
-	  dy = h - minY;
-	  }
-	  else
-	  {
-	  int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
-	  if(maxY + dy < 0)
-	  dy = -maxY;
-	  }
-	
-	  //// Clip deltaX
-	  BpfPoint last, first;
-	  first =  bgc.getSelection().getFirstInSelection();
-	  if(bgc.getSelection().size()==1)
-	  last = first;
-	  else
-	  last =  bgc.getSelection().getLastInSelection();
-	  int lastX =  a.getX(last);
-	  int firstX = a.getX(first);
-
-	  BpfPoint next = ftsObj.getNextPoint(last);
-	  BpfPoint prev = ftsObj.getPreviousPoint(first);
-	  int nextX = -1;
-	  int prevX = -1;
-	  if(next!=null)
-	  nextX = a.getX(next);
-	  if(prev!=null)
-	  prevX = a.getX(prev);
-
-	  if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
-	  else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;*/
-
-	////////////////////////
 	for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movPoint = (BpfPoint) e.nextElement();
@@ -354,7 +316,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
   //--- Fields
   Rectangle enclosingRect = new Rectangle();
   UtilBpfPoint tempPoint = new UtilBpfPoint();
-
 }
 
 
