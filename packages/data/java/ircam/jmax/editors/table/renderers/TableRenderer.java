@@ -52,63 +52,6 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     addLayer( new SelectionLayer( theGc));
   }
 
-
-  /**
-   * This method is the substitution of the ObjectRenderer mechanism
-   * for editors based on arrays of (int)values instead of objects. 
-   * This mechanism can be represented as an ObjectRenderer that draws Points, but
-   * this means building a Point each single value painting...*/
-  private void render(Graphics g, int x, int y)
-  {
-    int zero = gc.getAdapter().getY(0);
-    
-    int width = (int)( gc.getAdapter().getXZoom());
-    int height;
-
-    if (width < 1) width = 1;
-    
-    // erase the old point
-    g.setColor( backColor);
-    g.fillRect(x, 1, width, gc.getGraphicDestination().getSize().height-2);    
-
-    // redraw it
-    g.setColor( foreColor);
-    
-    if (itsMode == SOLID)
-      {
-	int startY = (y <= zero)?y:zero; //remember: y are (graphically) INVERTED!  
-	height = Math.abs(zero-y);
-	
-	g.fillRect(x, startY, width, height);
-      }
-    else
-      {
-	height = (int) gc.getAdapter().getYZoom();
-	if (height == 0) height = 1;
-	
-	g.fillRect(x,  y, width, height);
-      }
-    
-    // draw the red line
-    g.setColor(Color.red);
-    g.fillRect(x, zero, width, 1);
-  }
-
-  /**
-   * Renders a single value in the table */
-  public void renderPoint(Graphics g, int index)
-  {
-    if (index < 0 || index >= gc.getDataModel().getSize()) return;
-    int val = gc.getFtsObject().getVisibleValue(index);
-
-    render(g, gc.getAdapter().getX(index), gc.getAdapter().getY(val));
-  }
-
-  public void renderPoint(Graphics g, int index, int value)
-  {
-    render(g, (int)(index*gc.getAdapter().getXZoom()), gc.getAdapter().getY(value));
-  }
-
   public void drawSolidPoint( Graphics g, int x, int y, int zero)
   {
     int width = (int)( gc.getAdapter().getXZoom());

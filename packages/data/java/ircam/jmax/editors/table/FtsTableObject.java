@@ -179,12 +179,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     if(startIndex+i > lastIndex)
 	lastIndex = startIndex+i;
     
-    if( i == 1)
-      notifyValueChanged( startIndex);
-    else if( i <= 10)
-      notifyValueChanged( startIndex, startIndex+i-1);
-    else
-      notifySet();
+    notifySet();
   }  
   
   public void startEdit()
