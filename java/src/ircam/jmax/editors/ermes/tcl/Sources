@@ -14,5 +14,4 @@ SOURCES =  \
           ErmesObjectSetSizeCmd.java \
           ErmesPatNewCmd.java \
           ErmesSelectedCmd.java \
-          ErmesShowCmd.java   \
 	  TclErmesPackage.java
