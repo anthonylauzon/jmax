@@ -25,6 +25,8 @@ static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_a
       fts_object_t *obj;
       fts_atom_t a[6];
 
+      /* object: const $args[<value>] */
+
       fts_set_symbol(&a[0], fts_new_symbol("const"));
       fts_set_symbol(&a[1], fts_s_dollar);
       fts_set_symbol(&a[2], fts_s_args);
@@ -33,6 +35,30 @@ static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_a
       fts_set_symbol(&a[5], fts_s_closed_sqpar);
 
       obj = fts_object_new(patcher, 6, a);
+      fts_object_reset_description(obj);
+      return obj;
+    }
+  else if ((ac == 3) && fts_is_int(&(at[1])))
+    {
+      fts_object_t *obj;
+      fts_atom_t a[12];
+
+      /* object: const _getElement($args, <value2>, <value3>)  */
+
+      fts_set_symbol(&a[0], fts_new_symbol("const"));
+      fts_set_symbol(&a[1], fts_s_open_par);
+      fts_set_symbol(&a[2], fts_new_symbol("_getElement"));
+      fts_set_symbol(&a[3], fts_s_open_par);
+      fts_set_symbol(&a[4], fts_s_dollar);
+      fts_set_symbol(&a[5], fts_s_args);
+      fts_set_symbol(&a[6], fts_s_comma);
+      a[7] = at[1];
+      fts_set_symbol(&a[8], fts_s_comma);
+      a[9] = at[2];
+      fts_set_symbol(&a[10], fts_s_closed_par);
+      fts_set_symbol(&a[11], fts_s_closed_par);
+
+      obj = fts_object_new(patcher, 12, a);
       fts_object_reset_description(obj);
       return obj;
     }

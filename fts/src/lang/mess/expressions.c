@@ -542,7 +542,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  name = fts_get_symbol(value_stack_top(e));
 		  args = 1;	/* count and pass also the function name */
 		  
-		  next_in(e);
+		  next_in(e);	/* Skip the parentesys */
 
 		  while (more_in(e) && (! fts_is_closed_par(current_in(e))))
 		    {
@@ -550,6 +550,11 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		      /* Evaluate the expression arguments, and push them in the value stack */
 
 		      TRY(fts_expression_eval_one(e));
+
+		      /* Skip the comma if any (little HACK !!) */
+		      
+		      if (fts_is_comma(current_in(e)))
+			next_in(e);
 
 		      args++;
 		    }
@@ -1529,15 +1534,15 @@ static int unique(int ac, const fts_atom_t *at, fts_atom_t *result)
 
 static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
-  if ((ac == 3) && fts_is_atom_array(&at[0]) && fts_is_int(&at[1]))
+  if ((ac == 4) && fts_is_atom_array(&at[1]) && fts_is_int(&at[2]))
     {
-      fts_atom_array_t *array = fts_get_atom_array(&at[0]);
-      int idx = fts_is_int(&at[1]);
+      fts_atom_array_t *array = fts_get_atom_array(&at[1]);
+      int idx = fts_get_int(&at[2]);
 
       if (fts_atom_array_check(array, idx))
 	*result = fts_atom_array_get(array, idx);
       else
-	*result = at[2];
+	*result = at[3];
   
       return FTS_EXPRESSION_OK;
     }

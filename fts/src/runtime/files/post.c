@@ -75,8 +75,15 @@ post_atoms(int ac, const fts_atom_t *at)
 	post("%lx%s", (unsigned long) fts_get_ptr( &at[i]), ps);
       else if (fts_is_void(&at[i]))
 	post("(void)%s", ps);
+      else if (fts_is_atom_array(&at[i]))
+	{
+	  fts_atom_array_t *v;
+
+	  v = fts_get_atom_array(&at[i]);
+	  post("<ARRAY %lx %d>%s", v, fts_atom_array_get_size(v), ps);
+	}
       else
-	post("???%s", ps);
+	post("<%s>%s", fts_symbol_name(fts_get_type(&at[i])), ps);
     }
 }
 

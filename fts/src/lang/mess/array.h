@@ -25,6 +25,8 @@ extern void fts_atom_array_free(fts_atom_array_t *v);
 
 #define fts_atom_array_check(v, i)  ((i >= 0) && (i < (v)->ac))
 
+#define fts_atom_array_get_size(v)  ((v)->ac)
+
 extern void fprintf_atom_array(FILE *file, fts_atom_array_t *v);
 
 extern void fts_atom_array_init(void);
