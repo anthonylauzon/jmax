@@ -1169,7 +1169,7 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
  * Client message sending
  *
  */
-void fts_client_start_message( fts_object_t *o, fts_symbol_t selector)
+void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1180,7 +1180,7 @@ void fts_client_start_message( fts_object_t *o, fts_symbol_t selector)
   protocol_encoder_write_symbol( &client->encoder, selector);
 }
 
-void fts_client_add_int( fts_object_t *o, int v)
+void fts_client_add_int( fts_object_t *obj, int v)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1190,7 +1190,7 @@ void fts_client_add_int( fts_object_t *o, int v)
   protocol_encoder_write_int( &client->encoder, v);
 }
 
-void fts_client_add_float( fts_object_t *o, float v)
+void fts_client_add_float( fts_object_t *obj, float v)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1200,7 +1200,7 @@ void fts_client_add_float( fts_object_t *o, float v)
   protocol_encoder_write_float( &client->encoder, v);
 }
 
-void fts_client_add_symbol( fts_object_t *o, fts_symbol_t v)
+void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1210,7 +1210,7 @@ void fts_client_add_symbol( fts_object_t *o, fts_symbol_t v)
   protocol_encoder_write_symbol( &client->encoder, v);
 }
 
-void fts_client_add_string( fts_object_t *o, const char *v)
+void fts_client_add_string( fts_object_t *obj, const char *v)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1220,7 +1220,7 @@ void fts_client_add_string( fts_object_t *o, const char *v)
   protocol_encoder_write_string( &client->encoder, v);
 }
 
-void fts_client_add_object( fts_object_t *o, fts_object_t *v)
+void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1230,7 +1230,7 @@ void fts_client_add_object( fts_object_t *o, fts_object_t *v)
   protocol_encoder_write_object( &client->encoder, v);
 }
 
-void fts_client_add_atoms( fts_object_t *o, int ac, const fts_atom_t *at)
+void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
 
@@ -1250,7 +1250,7 @@ void fts_client_done_message( fts_object_t *o)
   protocol_encoder_flush( &client->encoder);
 }
 
-void fts_client_send_message( fts_object_t *o, fts_symbol_t selector, int ac, const fts_atom_t *at)
+void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
   fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", o, selector, ac);
   fts_log_atoms( ac, at);
