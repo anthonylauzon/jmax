@@ -116,7 +116,7 @@ public class AddPopUp extends JPopupMenu
     JMenuItem item;
 
     if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-      item = new JMenuItem(Icons.get(cmd));
+      item = new JMenuItem(SystemIcons.get(cmd));
     else
       item = new JMenuItem(cmd);
 
@@ -127,7 +127,7 @@ public class AddPopUp extends JPopupMenu
 
   static public void addAbbreviation(String className, ImageIcon icon, boolean edit)
   {
-    JMenuItem item = new JMenuItem(icon);
+    JMenuItem item = new JMenuItem(icon);  
 
     item.addActionListener(new AddPopUpListener(className, "Adding New "+className+" Object", edit));
     popup.add(item);
@@ -141,7 +141,7 @@ public class AddPopUp extends JPopupMenu
     if (name.charAt(0) == '%')
       {
 	menu = new JMenu();
-	menu.setIcon(Icons.get(name));
+	menu.setIcon(SystemIcons.get(name));
       }
     else
       menu = new JMenu(name);
@@ -164,7 +164,7 @@ public class AddPopUp extends JPopupMenu
       menu = addAbbreviationMenu(menuName);
     
     if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-      item = new JMenuItem(Icons.get(cmd));
+      item = new JMenuItem(SystemIcons.get(cmd));
     else
       item = new JMenuItem(cmd);
 
