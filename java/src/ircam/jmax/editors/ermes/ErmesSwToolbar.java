@@ -120,7 +120,11 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
   }
   
   public void mouseReleased(MouseEvent e){
-    if(!itsLastPressed.contains(e.getX(), e.getY())) itsSketchPad.DoNothing();
+    if(!itsLastPressed.contains(e.getX(), e.getY())) {
+      itsLastPressed = null;
+      pressed = false;
+      itsSketchPad.DoNothing();
+    }
   }
   public void mouseEntered(MouseEvent e){}
   public void mouseExited(MouseEvent e){}
