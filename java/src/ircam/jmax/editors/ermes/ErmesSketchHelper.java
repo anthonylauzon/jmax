@@ -215,6 +215,7 @@ class ErmesSketchHelper extends Object{
     itsSketchPad.itsSelectedList.removeElement(theObject);
     //removes theObject from the element list (delete)
     itsSketchPad.itsElements.removeElement(theObject);
+    itsSketchPad.RemoveInOutlets(theObject);
     //removes theObject from the container (sketchpad)
     //remove(theObject);	//from the sketchpad components
     
@@ -444,8 +445,12 @@ class ErmesSketchHelper extends Object{
     if(itsSketchPad.itsConnectingLetList.size()!=0){
       for (Enumeration e = itsSketchPad.itsConnectingLetList.elements(); e.hasMoreElements();) {
 	aInOutlet = (ErmesObjInOutlet)e.nextElement();
-	aInOutlet.ChangeState(false, aInOutlet.connected);
+	//aInOutlet.ChangeState(false, aInOutlet.connected);
+	aInOutlet.selected = false;
+	if(itsSketchPad.offGraphics!=null)
+	  aInOutlet.Update(itsSketchPad.offGraphics);
       }
+      //itsSketchPad.DrawLinesOffScreen();
     }
     itsSketchPad.ResetConnect();
   }
@@ -524,25 +529,27 @@ class ErmesSketchHelper extends Object{
     ErmesObjInlet aInlet;
     ErmesObjOutlet aOutlet;
     Rectangle aRect;
-    for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-      aObject = (ErmesObject)e.nextElement();
-      for(Enumeration e1 = aObject.GetInletList().elements(); e1.hasMoreElements();) {
-	aInlet = (ErmesObjInlet)e1.nextElement();
-	aRect = aInlet.Bounds();
-	if(aRect.contains(x,y)) {
-	  itsSketchPad.itsCurrentInOutlet = aInlet;
-	  return true;
-	}
-      }
-      for(Enumeration e2 = aObject.GetOutletList().elements(); e2.hasMoreElements();) {
-	aOutlet = (ErmesObjOutlet)e2.nextElement();
-	aRect = aOutlet.Bounds();
-	if(aRect.contains(x,y)) {
-	  itsSketchPad.itsCurrentInOutlet = aOutlet;
-	  return true;
-	}
+    // for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
+    //aObject = (ErmesObject)e.nextElement();
+    //for(Enumeration e1 = aObject.GetInletList().elements(); e1.hasMoreElements();) {
+    for(Enumeration e = itsSketchPad.itsInletList.elements(); e.hasMoreElements();) {
+      aInlet = (ErmesObjInlet)e.nextElement();
+      aRect = aInlet.Bounds();
+      if(aRect.contains(x,y)) {
+	itsSketchPad.itsCurrentInOutlet = aInlet;
+	return true;
       }
     }
+    //for(Enumeration e2 = aObject.GetOutletList().elements(); e2.hasMoreElements();) {
+    for(Enumeration e2 = itsSketchPad.itsOutletList.elements(); e2.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet)e2.nextElement();
+      aRect = aOutlet.Bounds();
+      if(aRect.contains(x,y)) {
+	itsSketchPad.itsCurrentInOutlet = aOutlet;
+	return true;
+      }
+    }
+    //  }
     return false;
   }
   

@@ -121,7 +121,8 @@ class ErmesObjComment extends ErmesObject {
       itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width, itsFontMetrics.getHeight()*5);
     else
       itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-    
+
+    itsMaxString = "";
     itsParsedTextVector.removeAllElements();
     
     itsSketchPad.GetTextArea().setVisible(true);

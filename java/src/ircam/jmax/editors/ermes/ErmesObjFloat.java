@@ -241,7 +241,7 @@ class ErmesObjFloat extends ErmesObject {
 
     //fill the triangle
     if(!itsSelected) g.setColor(itsUINormalColor);
-    else g.setColor(itsUISelectedColor);
+    else g.setColor(itsUISelectedColor/*Color.black*/);
     
     g.fill3DRect(itsX+currentRect.width-4,itsY+1, 3, currentRect.height-2, true);
 
@@ -265,9 +265,11 @@ class ErmesObjFloat extends ErmesObject {
     if (itsFloat != 0) aString = GetVisibleString(String.valueOf(itsFloat));
     else aString = "0.0";
     g.setFont(itsFont);
-    g.setColor(Color.black);
+    /*if(!itsSelected)*/ g.setColor(Color.black);
+    // else  g.setColor(Color.white);
     g.drawString(aString, itsX+currentRect.height/2+5,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2+1);
     
+    //g.setColor(Color.black);
     //draw the drag box
     if(!itsSketchPad.itsRunMode)
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);

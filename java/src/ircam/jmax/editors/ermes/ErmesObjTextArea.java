@@ -95,9 +95,13 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       itsOwner.ParseText(aTextString);
       itsOwner.makeFtsObject();
     }
+    
+    itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
-  
+    
+    System.out.println("lenght = "+lenght);
+
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+10;
@@ -110,16 +114,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       itsOwner.setSize(d1.width, d1.height);
     }
         
-    /* setVisible(false);
-       setLocation(-200,-200);
-       focused = false;
-       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-       
-       if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-       itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-       itsOwner = null;*/
-    itsOwner.Repaint();
-    
+    //itsOwner.Repaint();
+   
     AbortEdit();
 
     setRows(5);
@@ -157,7 +153,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     if (isEditable()) {
       if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	itsOwner.itsTextRowNumber++;
-	if(itsOwner.itsTextRowNumber>4){
+	if((itsOwner.itsTextRowNumber>4)||(getRows()<=5)){
 	  setRows(getRows()+1);
 	  Dimension d2 = itsOwner.Size();
 	  itsOwner.setSize(d2.width, d2.height+fm.getHeight());
@@ -166,6 +162,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
 	}
 	return;
       }
+      else if((e.getKeyCode()==37)||(e.getKeyCode()==38)||(e.getKeyCode()==39)||(e.getKeyCode()==40))//frecce
+	return;
       else{//scrittura
 	aCurrentLineChars = GetCurrentLineChars(s);//s.length() - itsOldLineChars;
 	if(aCurrentLineChars+10 > getColumns())

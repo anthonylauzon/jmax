@@ -104,25 +104,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     itsTimer.stop();
     }*/
 
-  public void RestartEditing(){
-    if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
-    itsSketchPad.GetEditField().setFont(itsFont);
-    itsSketchPad.GetEditField().setText(itsArgs);//warning: what will it happen if itsArgs is not here yet?
-    itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-    
-    if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
-    else
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-    
-    itsParsedTextVector.removeAllElements();
-    
-    itsSketchPad.GetEditField().setVisible(true);
-    itsSketchPad.GetEditField().requestFocus();
-    itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
-  }
-
-
   //--------------------------------------------------------
   // resize
   //--------------------------------------------------------

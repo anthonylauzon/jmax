@@ -163,7 +163,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   }
   
 
-
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------

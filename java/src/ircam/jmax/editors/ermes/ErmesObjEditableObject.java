@@ -118,11 +118,6 @@ import ircam.jmax.fts.*;
 	
   public void RestartEditing(){
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
-    /*if((iAmPatcher)&&(itsSubWindow != null)){
-      GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-      itsSubWindow.dispose();
-      itsSubWindow = null;
-      }*/
     
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText(itsArgs);
@@ -134,18 +129,14 @@ import ircam.jmax.fts.*;
     else
       itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
+
+    itsMaxString = "";
     itsParsedTextVector.removeAllElements();
     
     itsSketchPad.GetEditField().setVisible(true);
     itsSketchPad.GetEditField().requestFocus();
     itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
   }
-  /*  public void RestartEditing(){
-    if (itsSketchPad.GetEditField() != null) {
-      itsSketchPad.GetEditField().setEditable(true);
-      itsInEdit = true;
-    }
-  }*/
 
   public boolean MouseUp(MouseEvent evt,int x,int y){
     if(itsInEdit) return true;

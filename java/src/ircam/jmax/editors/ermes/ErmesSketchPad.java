@@ -83,6 +83,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   ErmesRegion itsHSegmRgn;
   ErmesRegion itsVSegmRgn;
   Vector itsConnections;
+  Vector itsInletList;
+  Vector itsOutletList;
   public Vector itsSelectedList;
   Vector itsTempSelected;
   public Vector itsElements;
@@ -558,7 +560,6 @@ Rectangle previousResizeRect = new Rectangle();
       if (offScreenPresent) {
 	aConnection.Paint(offGraphics);
       }
-
       else 
 	if (getGraphics() != null) aConnection.Paint(getGraphics());
     }
@@ -862,6 +863,8 @@ Rectangle previousResizeRect = new Rectangle();
     itsHSegmRgn = new ErmesRegion();
     itsVSegmRgn = new ErmesRegion();
     itsConnections = new Vector();
+    itsInletList = new Vector();
+    itsOutletList = new Vector();
     itsSelectedList = new Vector();
     itsElements = new Vector();
     itsSelectedConnections = new Vector();
@@ -1833,6 +1836,36 @@ Rectangle previousResizeRect = new Rectangle();
     }
     else itsSketchWindow.ToSave();
   }
+
+  public void AddInlet(ErmesObjInlet theInlet){
+    itsInletList.addElement(theInlet);
+  }
+
+  public void RemoveInlet(ErmesObjInlet theInlet){
+    itsInletList.removeElement(theInlet);
+  }
+  
+  public void AddOutlet(ErmesObjOutlet theOutlet){
+    itsOutletList.addElement(theOutlet);
+  }
+
+  public void RemoveOutlet(ErmesObjOutlet theOutlet){
+    itsOutletList.removeElement(theOutlet);
+  }
+
+  public void RemoveInOutlets(ErmesObject theObject){
+    ErmesObjInlet aInlet;
+    ErmesObjOutlet aOutlet;
+    for(Enumeration e = theObject.itsInletList.elements(); e.hasMoreElements();) {
+      aInlet = (ErmesObjInlet)e.nextElement();
+      itsInletList.removeElement(aInlet);
+    }
+    for(Enumeration e1 = theObject.itsOutletList.elements(); e1.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet)e1.nextElement();
+      itsOutletList.removeElement(aOutlet);
+    }
+  }
+
 
   boolean erased = false;
 

@@ -114,10 +114,19 @@ public class ErmesObject implements FtsPropertyHandler {
   public void Update(Graphics g) {
     if(!itsSketchPad.itsGraphicsOn)return;
     g.setColor(itsSketchPad.getBackground());
-    g.fillRect(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
+    //g.fillRect(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
+    g.fillRect(itsX, itsY, currentRect.width, currentRect.height);
     Paint(g);
   }
   
+  public void UpdateOnly(Graphics g) {
+    if(!itsSketchPad.itsGraphicsOn)return;
+    g.setColor(itsSketchPad.getBackground());
+    //g.fillRect(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
+    g.fillRect(itsX, itsY, currentRect.width, currentRect.height);
+  }
+
+
   /**
    * a method to paint the object AND its inlet/outlet
    * on and off screen
@@ -203,6 +212,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	    aErmesObjInlet = new ErmesObjOutInlet(i, this, itsX+2+(i)*in_local_distance, itsY);
 	  else aErmesObjInlet = new ErmesObjInlet(i, this, itsX+2+(i)*in_local_distance, itsY);
 	  itsInletList.addElement(aErmesObjInlet);
+	  itsSketchPad.AddInlet(aErmesObjInlet);
 	}
 	//2303if (offGraphics!= null) aErmesObjInlet.Repaint();
       }
@@ -220,7 +230,9 @@ public class ErmesObject implements FtsPropertyHandler {
 	}
 	else{
 	  //erase the inlet, and the associated connections
+	  aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt(itsInletList.size()-1);
 	  itsInletList.removeElementAt(itsInletList.size()-1);
+	  itsSketchPad.RemoveInlet(aErmesObjInlet);
 	  //we should remove the connections. How?
 	}
       }
@@ -236,6 +248,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	 aErmesObjOutlet = new ErmesObjInletOutlet(i,this,itsX,itsY);
        else aErmesObjOutlet = new ErmesObjOutlet(i,this,itsX,itsY);
        itsOutletList.addElement(aErmesObjOutlet);
+       itsSketchPad.AddOutlet(aErmesObjOutlet);
      }
      for (i=0; i<itsOutletList.size(); i++) {
        aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
@@ -248,7 +261,9 @@ public class ErmesObject implements FtsPropertyHandler {
     else if (n_outlts <= old_noutlts) { //we reduced the number of outlets
       int size = itsOutletList.size()-1;
       for (i=n_outlts;i<old_noutlts;i++){
+	aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt(size);
 	itsOutletList.removeElementAt(size);
+	itsSketchPad.RemoveOutlet(aErmesObjOutlet);
 	size--;
       }
       if(n_outlts>1) aHDist = (currentRect.width-10)/(n_outlts-1);
