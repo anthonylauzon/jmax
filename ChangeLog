@@ -1,3 +1,9 @@
+2002-12-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* Split audio.h into audio.h, audioconfig.h and audiolabel.h
+
+	* Clean ftsprivate header to be conform with current convention (no include in header)
+
 2002-12-06  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* Split audio.c into audio.c, audioconfig.c and audiolabel.c
