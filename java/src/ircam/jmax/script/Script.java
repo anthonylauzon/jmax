@@ -23,13 +23,14 @@
 // Author: Peter Hanappe
 //
 
-/** Interface Script
+package ircam.jmax.script;
+
+/**
+ * Interface Script
  *
  * An interface for all scripts. To convert a script String to a
  * Script use Interp.convert(). 
  */
-package ircam.jmax.script;
-
 public interface Script 
 {
     /** Evaluate the script. */

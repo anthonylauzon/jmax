@@ -115,25 +115,33 @@ public interface Interpreter
      */
     public MaxDocument loadScriptedDocument(Package context, File script) throws ScriptException;
 
-    /** Get the language signature. Returns "scheme" for a Scheme
-     * interpreter. */
+    /**
+     * Get the language signature. Returns "scheme" for a Scheme
+     * interpreter. 
+     */
     public String getScriptLanguage();
 
-    /** Add a menu item in the script menu. There's on general script
+    /**
+     *  Add a menu item in the script menu. There's on general script
      *  menu, visible in all editors, and one script menu per document
      *  type. 
      *
-     * @param type The document type to which this script applies
-     * menu. "all" signifies the all document types. In that case the
-     * script will be visible in all editors.
-     * @param name The label of the menu. If the name is equal to "-"
-     * a menu separator is inserted.
+     * @param name The label of the menu. 
      * @param key The key binding. Key should be of type KeyStroke to
      * be effective.
-     * @param script The script to execute.  */
-    public void addScriptMenuItem(String type, String name, Object key, Script script);
+     * @param script The script to execute.  
+     */
+    public void addScriptMenu(String type, Script script, String name, Object key);
 
-    /** Returns the script menu for a given document type, or null if
-     *  non is avaible. */
-    public Menu getScriptMenu(String type);
+    /**
+     *  Ask the user to enter a value in a dialog box. 
+     *
+     * @param question The question to ask the user.
+     * @param type The return type of the answer. Valid types are
+     * "boolean", "int", "float", "string" and "symbol". 
+     */
+    public Object ask(String question, String type);
 }
+
+
+
