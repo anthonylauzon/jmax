@@ -98,13 +98,24 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     }
   }
 
-  MaxDocumentType editedType;
-
   private Menu itsFileMenu;
-  private Menu itsNewFileMenu;
   private Menu itsEditMenu;	
   private Menu itsWindowsMenu;
   private Menu itsToolsMenu;
+
+  // File Menu Items
+
+  private MenuItem itsOpenMenuItem;
+  private MenuItem itsCloseMenuItem;
+
+  private MenuItem itsSaveMenuItem;
+  private MenuItem itsSaveAsMenuItem;
+  private MenuItem itsSaveToMenuItem;
+  private MenuItem itsPrintMenuItem;
+  private MenuItem itsStatisticsMenuItem;
+  private MenuItem itsQuitMenuItem;
+
+  // Edit Menu Items
 
   private MenuItem itsCutMenuItem;
   private MenuItem itsCopyMenuItem;
@@ -114,35 +125,23 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   private MenuItem itsUndoMenuItem;
   private MenuItem itsRedoMenuItem;
 
-  public MaxEditor(String title, MaxDocumentType type, boolean register)
+  public MaxEditor(String title, boolean register)
   {
     super(title);
     
-    editedType = type;
-
     if (register) 
       MaxWindowManager.getWindowManager().addWindow(this);
   }
 
-  public MaxEditor(String title, MaxDocumentType type)
-  {
-    this(title, type, true);
-  }
-
   public MaxEditor(String title)
   {
-    this(title, null, true);
+    this(title, true);
   }
 
   
-  public MaxEditor(MaxDocumentType type)
-  {
-    this("", type, true);
-  }
-
   public MaxEditor()
   {
-    this("", null, true);
+    this("", true);
   }
 
   public final void Init()
@@ -174,7 +173,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Destroy()
   {
-    itsFileMenu.remove(itsNewFileMenu);
     getMenuBar().remove(itsFileMenu);
     getMenuBar().remove(itsEditMenu);	
     getMenuBar().remove(itsWindowsMenu);
@@ -237,20 +235,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     }
   }
 
-  private MenuItem CreateNewTypeMenu()
-  {
-    MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName(), new MenuShortcut(KeyEvent.VK_N));
-
-    newMenu.addActionListener(new NewDocumentCreator(newMenu, editedType));
-
-    return newMenu;
-  }
-
-  private Menu CreateNewFileMenu()
+  private void  CreateNewMenuItems(Menu menu)
   {
     MenuItem aMenuItem;
     String aString;
-    Menu newFileMenu = new Menu("New...");
     
     for (Enumeration e = Mda.getDocumentTypes().elements(); e.hasMoreElements();)
       {
@@ -258,88 +246,83 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
 	if (aDocumentType.canMakeNewDocument())
 	  {
-	    aMenuItem = new MenuItem(aDocumentType.getPrettyName());
-	    newFileMenu.add(aMenuItem); 
+	    aMenuItem = new MenuItem("New " + aDocumentType.getPrettyName());
+	    menu.add(aMenuItem); 
 
 	    aMenuItem.addActionListener(new NewDocumentCreator(aMenuItem, aDocumentType));
 	  }
       }
-
-    return newFileMenu;
   }
   
 
   private Menu CreateFileMenu()
   {
-    MenuItem aMenuItem;
     CheckboxMenuItem aCheckItem;
     Menu fileMenu = new Menu("File");
 
-    if (editedType != null)
-      fileMenu.add(CreateNewTypeMenu());
+    CreateNewMenuItems(fileMenu);
 
-    itsNewFileMenu = CreateNewFileMenu();
+    itsOpenMenuItem = new MenuItem("Open...",  new MenuShortcut(KeyEvent.VK_O));
+    fileMenu.add(itsOpenMenuItem);
 
-    fileMenu.add(itsNewFileMenu);
+    fileMenu.addSeparator();
 
-    aMenuItem = new MenuItem("Open...",  new MenuShortcut(KeyEvent.VK_O));
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsOpenMenuItem.addActionListener(new MaxActionListener(itsOpenMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Open();}});
 
-    aMenuItem = new MenuItem("Close", new MenuShortcut(KeyEvent.VK_W));
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    { 
-				      Close();}});
 
-    fileMenu.add(new MenuItem("-"));
-
-    aMenuItem = new MenuItem("Save", new MenuShortcut(KeyEvent.VK_S));
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsSaveMenuItem = new MenuItem("Save", new MenuShortcut(KeyEvent.VK_S));
+    fileMenu.add(itsSaveMenuItem);
+    itsSaveMenuItem.addActionListener(new MaxActionListener(itsSaveMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Save();}});
 
 
-    aMenuItem = new MenuItem("Save As ...");
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsSaveAsMenuItem = new MenuItem("Save As ...");
+    fileMenu.add(itsSaveAsMenuItem);
+    itsSaveAsMenuItem.addActionListener(new MaxActionListener(itsSaveAsMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { SaveAs();}});
 
-    aMenuItem = new MenuItem("Save To ...");
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsSaveToMenuItem = new MenuItem("Save To ...");
+    fileMenu.add(itsSaveToMenuItem);
+    itsSaveToMenuItem.addActionListener(new MaxActionListener(itsSaveToMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { SaveTo();}});
 
-    fileMenu.add(new MenuItem("-"));
 
-    aMenuItem = new MenuItem("Print...", new MenuShortcut(KeyEvent.VK_P));
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsCloseMenuItem = new MenuItem("Close", new MenuShortcut(KeyEvent.VK_W));
+    fileMenu.add(itsCloseMenuItem);
+    itsCloseMenuItem.addActionListener(new MaxActionListener(itsCloseMenuItem)
+				{
+				  public  void actionPerformed(ActionEvent e)
+				    { 
+				      Close();}});
+
+    fileMenu.addSeparator();
+
+    itsPrintMenuItem = new MenuItem("Print...", new MenuShortcut(KeyEvent.VK_P));
+    fileMenu.add(itsPrintMenuItem);
+    itsPrintMenuItem.addActionListener(new MaxActionListener(itsPrintMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Print();}});
 
-    aMenuItem = new MenuItem("Statistics...");
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
-				{
-				  public  void actionPerformed(ActionEvent e)
-				    {      new StatisticsDialog(MaxEditor.this);}});
+    itsStatisticsMenuItem = new MenuItem("Statistics...");
+    fileMenu.add(itsStatisticsMenuItem);
+    itsStatisticsMenuItem.addActionListener(new MaxActionListener(itsStatisticsMenuItem)
+						     {
+						       public  void actionPerformed(ActionEvent e)
+							 {      new StatisticsDialog(MaxEditor.this);}});
 
-    aMenuItem = new MenuItem("Quit", new MenuShortcut(KeyEvent.VK_Q));
-    fileMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsQuitMenuItem = new MenuItem("Quit", new MenuShortcut(KeyEvent.VK_Q));
+    fileMenu.add(itsQuitMenuItem);
+    itsQuitMenuItem.addActionListener(new MaxActionListener(itsQuitMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { MaxApplication.Quit();}});
@@ -539,68 +522,44 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     return itsEditMenu;
   }
 
-  public MenuItem getNewMenu()
-  {
-    if (editedType != null)
-      return itsFileMenu.getItem(1);
-    else
-      return itsFileMenu.getItem(0);
-  }
-
   public MenuItem getOpenMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(2);
-    else
-      return itsFileMenu.getItem(1);
+    return itsOpenMenuItem;
   }
 
   public MenuItem getCloseMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(3);
-    else
-      return itsFileMenu.getItem(2);
+    return itsCloseMenuItem;
   }
 
   public MenuItem getSaveMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(6);
-    else
-      return itsFileMenu.getItem(5);
+    return itsSaveMenuItem;
   }
 
   public MenuItem getSaveAsMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(7);
-    else
-      return itsFileMenu.getItem(6);
+    return itsSaveAsMenuItem;
+  }
+
+  public MenuItem getSaveToMenu()
+  {
+    return itsSaveToMenuItem;
   }
   
   public MenuItem getPrintMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(9);
-    else
-      return itsFileMenu.getItem(8);
+    return itsPrintMenuItem;
   }
 
-  public MenuItem getSystemStatisticsMenu()
+  public MenuItem getStatisticsMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(10);
-    else
-      return itsFileMenu.getItem(9);
+    return itsStatisticsMenuItem;
   }
 
   public MenuItem getQuitMenu()
   {
-    if (editedType != null)
-      return itsFileMenu.getItem(11);
-    else
-      return itsFileMenu.getItem(10);
+    return itsQuitMenuItem;
   }
 
   public MenuItem getCutMenu()
