@@ -2,6 +2,7 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.util.*;
+import java.awt.event.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -14,7 +15,7 @@ import ircam.jmax.editors.project.*;
  * it is showing, and the fospatcher to which it is associated.
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
-public class ErmesSketchWindow extends Frame implements MaxWindow {
+public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,FocusListener,WindowListener,ActionListener, ItemListener {
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
   final String FILEDIALOGMENUITEM = "File dialog...";
@@ -67,6 +68,11 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
       //if(isSubPatcher){
       //if(itsTopWindow!=null)itsSketchPad.doAutorouting = itsTopWindow.itsSketchPad.doAutorouting;
       //}
+
+      //addKeyListener(this);
+      addFocusListener(this);
+      addWindowListener(this);
+
       validate();
     }
 
@@ -90,7 +96,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 
       FtsWindowDescription aFtsWindow = (FtsWindowDescription) itsDocument.GetFtsPatcher().getWindowDescription();
       //get the FtsWindowDescription, and use it for: reshape to the right dimensions
-      reshape(aFtsWindow.x, aFtsWindow.y, aFtsWindow.width, aFtsWindow.height+80);
+      setBounds(aFtsWindow.x, aFtsWindow.y, aFtsWindow.width, aFtsWindow.height+80);
       //assigning the right name to the window.
       if (aFtsWindow.ermesInfo != null) {
       StringTokenizer st = new StringTokenizer(aFtsWindow.ermesInfo, "\"\t\n\r:()");
@@ -168,13 +174,18 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   }
 	
   private Menu CreateFileMenu() {
+    MenuItem aMenuItem;
     Menu fileMenu = new Menu("File");
-    fileMenu.add(new MenuItem("Close   Ctrl+W"));
+    fileMenu.add(aMenuItem = new MenuItem("Close   Ctrl+W"));
+    aMenuItem.addActionListener(this);
     fileMenu.add(new MenuItem("-"));
-    fileMenu.add(new MenuItem("Save  Ctrl+S"));
-    fileMenu.add(new MenuItem("Save As..."));
+    fileMenu.add(aMenuItem = new MenuItem("Save  Ctrl+S"));
+    aMenuItem.addActionListener(this);
+    fileMenu.add(aMenuItem = new MenuItem("Save As..."));
+    aMenuItem.addActionListener(this);
     fileMenu.add(new MenuItem("-"));
-    fileMenu.add(new MenuItem("Print... Ctrl+P"));
+    fileMenu.add(aMenuItem = new MenuItem("Print... Ctrl+P"));
+    aMenuItem.addActionListener(this);
     return fileMenu;
   }
 
@@ -193,23 +204,32 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   }
 
   private Menu CreateEditMenu() {
+    MenuItem aMenuItem;
+    CheckboxMenuItem aCheckItem;
     Menu editMenu = new Menu("Edit");
-    editMenu.add(new MenuItem("Cut"));
-    editMenu.add(new MenuItem("Copy"));
-    editMenu.add(new MenuItem("Paste"));
-    editMenu.add(new MenuItem("Clear"));
+    editMenu.add(aMenuItem = new MenuItem("Cut"));
+    aMenuItem.addActionListener(this);
+    editMenu.add(aMenuItem = new MenuItem("Copy"));
+    aMenuItem.addActionListener(this);
+    editMenu.add(aMenuItem = new MenuItem("Paste"));
+    aMenuItem.addActionListener(this);
+    editMenu.add(aMenuItem = new MenuItem("Clear"));
+    aMenuItem.addActionListener(this);
     editMenu.add(new MenuItem("-"));
-    editMenu.add(new MenuItem("Select All"));
+    editMenu.add(aMenuItem = new MenuItem("Select All"));
+    aMenuItem.addActionListener(this);
     editMenu.add(new MenuItem("-"));
-    editMenu.add(new CheckboxMenuItem("Snap to Grid"));
+    editMenu.add(aCheckItem = new CheckboxMenuItem("Snap to Grid"));
+    aCheckItem.addItemListener(this);
     editMenu.add(new MenuItem("-"));
-    CheckboxMenuItem aCheckItem = new CheckboxMenuItem("Autorouting");
-    aCheckItem.setState(true);
+    aCheckItem = new CheckboxMenuItem("Autorouting", true);
+    //aCheckItem.setState(true);
     editMenu.add(aCheckItem);
-    editMenu.getItem(0).disable();
-    editMenu.getItem(1).disable();
-    editMenu.getItem(2).disable();
-    editMenu.getItem(3).disable();
+    aCheckItem.addItemListener(this);
+    editMenu.getItem(0).setEnabled(false);
+    editMenu.getItem(1).setEnabled(false);
+    editMenu.getItem(2).setEnabled(false);
+    editMenu.getItem(3).setEnabled(false);
     return editMenu;
   }
 
@@ -222,22 +242,33 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   private Menu CreateFontMenu() {
     Menu fontMenu = new Menu("Fonts");
     String aString;
-    
+    CheckboxMenuItem aCheckItem;
+
     itsSizesMenu = new Menu("Sizes");
-    itsSizesMenu.add(new CheckboxMenuItem("8"));
-    itsSizesMenu.add(new CheckboxMenuItem("9"));
-    itsSizesMenu.add(new CheckboxMenuItem("10"));
-    itsSizesMenu.add(new CheckboxMenuItem("12"));
-    itsSizesMenu.add(new CheckboxMenuItem("14"));
-    itsSizesMenu.add(new CheckboxMenuItem("18"));
-    itsSizesMenu.add(new CheckboxMenuItem("24"));
-    itsSizesMenu.add(new CheckboxMenuItem("36"));
-    itsSizesMenu.add(new CheckboxMenuItem("48"));
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("8"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("9"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("10"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("12"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("14"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("18"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("24"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("36"));
+    aCheckItem.addItemListener(this);
+    itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("48"));
+    aCheckItem.addItemListener(this);
     fontMenu.add(itsSizesMenu);
     fontMenu.add(new MenuItem("-"));
     for(int i = 0;i<itsFontList.length;i++){
       aString = (String) itsFontList[i];
-      fontMenu.add(new CheckboxMenuItem(aString));
+      fontMenu.add(aCheckItem = new CheckboxMenuItem(aString));
+      aCheckItem.addItemListener(this);
     }
     return fontMenu;
   }
@@ -246,14 +277,18 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     for (int i = 0;i<itsFontList.length;i++) {
       if (theName.equals(itsFontList[i])) return true;
     }
-    return false;	//for now...
+    return false;
   }
 	
   private Menu CreateProjectMenu() {
+    MenuItem aMenuItem;
     Menu ProjectMenu = new Menu("Project");
-    ProjectMenu.add(new MenuItem("Add Window"));
-    ProjectMenu.add(new MenuItem("Add files..."));
-    ProjectMenu.add(new MenuItem("Remove files"));
+    ProjectMenu.add(aMenuItem = new MenuItem("Add Window"));
+    aMenuItem.addActionListener(this);
+    ProjectMenu.add(aMenuItem = new MenuItem("Add files..."));
+    aMenuItem.addActionListener(this);
+    ProjectMenu.add(aMenuItem = new MenuItem("Remove files"));
+    aMenuItem.addActionListener(this);
     return ProjectMenu;
   }
 
@@ -262,23 +297,28 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   }
 
   private Menu CreateWindowsMenu() {
+    MenuItem aMenuItem;
     Menu windowsMenu = new Menu("Windows");
-    windowsMenu.add(new MenuItem("Run mode Ctrl+E"));
+    windowsMenu.add(aMenuItem = new MenuItem("Run mode Ctrl+E"));
+    aMenuItem.addActionListener(this);
     windowsMenu.add(new MenuItem("-"));
-    windowsMenu.add(new MenuItem("Project Manager Ctrl+M"));
-    windowsMenu.add(new MenuItem("Ermes Console"));
-    windowsMenu.add(new MenuItem("Jacl Console"));
+    windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
+    aMenuItem.addActionListener(this);
+    windowsMenu.add(aMenuItem = new MenuItem("jMax Console"));
+    aMenuItem.addActionListener(this);
     AddWindowItems(windowsMenu);
     return windowsMenu;
   }
 	
   public void AddWindowToMenu(String theName){
-    itsWindowsMenu.add(new MenuItem(theName));
+    MenuItem aMenuItem;
+    itsWindowsMenu.add(aMenuItem = new MenuItem(theName));
+    aMenuItem.addActionListener(this);
   }
 
   public void RemoveWindowFromMenu(String theName){
     MenuItem aItem;
-    for(int i=0; i<itsWindowsMenu.countItems();i++){
+    for(int i=0; i<itsWindowsMenu.getItemCount();i++){
       aItem = itsWindowsMenu.getItem(i);
       if(aItem.getLabel().equals(theName)){
 	itsWindowsMenu.remove(aItem);
@@ -289,7 +329,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   
   public void ChangeWinNameMenu(String theOldName, String theNewName){
     MenuItem aItem;
-    for(int i=0; i<itsWindowsMenu.countItems();i++){
+    for(int i=0; i<itsWindowsMenu.getItemCount();i++){
       aItem = itsWindowsMenu.getItem(i);
       if(aItem.getLabel().equals(theOldName)){
 	aItem.setLabel(theNewName);
@@ -302,19 +342,26 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     ErmesSketchWindow aSketchWindow;
     ErmesSketchWindow aSubWindow;
     MaxWindow aWindow;
+    MenuItem aMenuItem;
     Menu aMenu;
     for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
       aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
       if(aSketchWindow!= this){
 	if(!aSketchWindow.isSubPatcher) {
-	  if(aSketchWindow.itsSubWindowList.size()==0)
-	    theWindowMenu.add(new MenuItem(aSketchWindow.getTitle()));
+	  if(aSketchWindow.itsSubWindowList.size()==0){
+	    theWindowMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
+	    aMenuItem.addActionListener(this);
+	  }
 	  else{
 	    aMenu = new Menu(aSketchWindow.getTitle());
-	    aMenu.add(new MenuItem(aSketchWindow.getTitle()));
+	    aMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
+	    aMenuItem.addActionListener(this);
 	    for(int k=0; k<aSketchWindow.itsSubWindowList.size(); k++ ){
 	      aSubWindow = (ErmesSketchWindow)aSketchWindow.itsSubWindowList.elementAt(k);
-	      if(aSubWindow!=this) aMenu.add(new MenuItem(aSubWindow.getTitle()));
+	      if(aSubWindow!=this) {
+		aMenu.add(aMenuItem = new MenuItem(aSubWindow.getTitle()));
+		aMenuItem.addActionListener(this);
+	      }
 	    }
 	    theWindowMenu.add(aMenu);
 	    itsWindowMenuList.addElement(aMenu);
@@ -324,7 +371,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     }
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      theWindowMenu.add(new MenuItem(aWindow.GetDocument().GetName()));
+      theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetName()));
+      aMenuItem.addActionListener(this);
     }
   }
 
@@ -379,17 +427,19 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 	
 
   public void AddToSubWindowList(ErmesSketchWindow theSketchWindow){
+    MenuItem aMenuItem;
     if(isSubPatcher) itsTopWindow.AddToSubWindowList(theSketchWindow);
     else{
       boolean aFirstItem = false;
       if(itsSubWindowList.size()==0){
-	itsSubWindowsMenu.add(new MenuItem(theSketchWindow.getTitle()));
-	//itsWindowsMenu.add(itsSubWindowsMenu);
+	itsSubWindowsMenu.add(aMenuItem = new MenuItem(theSketchWindow.getTitle()));
+	aMenuItem.addActionListener(this);
 	itsWindowsMenu.insert(itsSubWindowsMenu, 5);
 	aFirstItem = true;
       }
       else{
-	itsSubWindowsMenu.add(new MenuItem(theSketchWindow.getTitle()));
+	itsSubWindowsMenu.add(aMenuItem = new MenuItem(theSketchWindow.getTitle()));
+	aMenuItem.addActionListener(this);
       }
       MaxApplication.getApplication().AddToSubWindowsList(this, theSketchWindow, aFirstItem);
       itsSubWindowList.addElement(theSketchWindow);
@@ -401,7 +451,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     Menu aMenu;
     int aIndex = 0;
     if(theFirstItem){
-      for(int i=0; i<itsWindowsMenu.countItems();i++){
+      for(int i=0; i<itsWindowsMenu.getItemCount();i++){
 	aItem = itsWindowsMenu.getItem(i);
 	if(aItem.getLabel().equals(theTopWindowName)){
 	  itsWindowsMenu.remove(aItem);
@@ -410,8 +460,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 	}
       }
       aMenu = new Menu(theTopWindowName);
-      aMenu.add(new MenuItem(theTopWindowName));
-      aMenu.add(new MenuItem(theSubWindowName));
+      aMenu.add(aItem = new MenuItem(theTopWindowName));
+      aItem.addActionListener(this);
+      aMenu.add(aItem = new MenuItem(theSubWindowName));
+      aItem.addActionListener(this);
       itsWindowsMenu.insert(aMenu, aIndex);
       itsWindowMenuList.addElement(aMenu);
     }
@@ -419,7 +471,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
       for(Enumeration e = itsWindowMenuList.elements(); e.hasMoreElements();) {
 	aMenu = (Menu) e.nextElement();
 	if(theTopWindowName.equals(aMenu.getLabel())){
-	  aMenu.add(new MenuItem(theSubWindowName));
+	  aMenu.add(aItem = new MenuItem(theSubWindowName));
+	  aItem.addActionListener(this);
 	  return;
 	}
       }
@@ -438,7 +491,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 	itsWindowsMenu.remove(itsSubWindowsMenu);
       }
       else{
-	for(int i=0; i<itsSubWindowsMenu.countItems();i++){
+	for(int i=0; i<itsSubWindowsMenu.getItemCount();i++){
 	  aItem = itsSubWindowsMenu.getItem(i);
 	  if(aItem.getLabel().equals(theSubWindow.getTitle())){
 	    itsSubWindowsMenu.remove(aItem);
@@ -457,7 +510,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     Menu aMenu;
     int aIndex = 0;
     if(theLastItem){
-      for(int i=0; i<itsWindowsMenu.countItems();i++){
+      for(int i=0; i<itsWindowsMenu.getItemCount();i++){
 	aItem = itsWindowsMenu.getItem(i);
 	if(aItem.getLabel().equals(theTopWindowName)){
 	  itsWindowsMenu.remove(aItem);
@@ -473,7 +526,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
       for(Enumeration e = itsWindowMenuList.elements(); e.hasMoreElements();) {
 	aMenu = (Menu) e.nextElement();
 	if(theTopWindowName.equals(aMenu.getLabel())){
-	  for(int j=0; j<aMenu.countItems();j++){
+	  for(int j=0; j<aMenu.getItemCount();j++){
 	    aItem1 = aMenu.getItem(j);
 	    if(aItem1.getLabel().equals(theSubWindowName)){
 	      aMenu.remove(aItem1);
@@ -518,119 +571,255 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
   //--------------------------------------------------------
   //	keyDown
   //--------------------------------------------------------
-   public boolean keyDown(Event evt,int key){
-     //MaxApplication.getPostStream().println("pressed key number "+key+" representation "+(char) key+" or "+(char) evt.key);
+  /* public boolean keyDown(Event evt,int key){
      if (evt.controlDown()){
-       if(key == 13) MaxApplication.getApplication().GetProjectWindow().toFront();
-       else if(key == 14) MaxApplication.getApplication().itsProjectWindow.New();
-       else if(key == 15) MaxApplication.getApplication().itsProjectWindow.Open();
-       else if(key == 16) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
-       else if(key == 17) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
-       else if(key == 19)itsDocument.Save();
-       else if(key == 23) {
-	 if (isSubPatcher){
-	   hide();
-	   itsTopWindow.RemoveFromSubWindowList(this);
-	 }
-	 else {
-	   MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
-	   dispose();
-	 }
-       }       
-       else if(key == 5){//Control+E
-	 ErmesObject aObject;
-	 itsChangingRunEditMode = true;
-	 MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
-	 MenuItem aSelectAllItem = itsEditMenu.getItem(5);
-	 if(!itsSketchPad.GetRunMode()){  
-	   setBackground(Color.white);
-	   itsSketchPad.SetRunMode(true);
-	   for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-	     aObject = (ErmesObject)e.nextElement();
-	     aObject.RunModeSetted();
-	   }
-	   itsToolBar.RunModeSetted(true);
-	   aRunEditItem.setLabel("Edit mode Ctrl+E");
-	   aSelectAllItem.disable();
-	 }
-	 else {
-	   itsChangingRunEditMode = true;
-	   setBackground(ErmesSketchPad.sketchColor);
-	   itsSketchPad.SetRunMode(false);
-	   itsToolBar.RunModeSetted(false);
-	   aRunEditItem.setLabel("Run mode Ctrl+E");
-	   aSelectAllItem.enable();
-	 }
-       }
-       else if (key == '?')
-	 {
-	   //ask help for the reference Manual for the selected element...
-	   // open one url *only*, because we open only one browser.
+     if(key == 13) MaxApplication.getApplication().GetProjectWindow().toFront();
+     else if(key == 14) MaxApplication.getApplication().itsProjectWindow.New();
+     else if(key == 15) MaxApplication.getApplication().itsProjectWindow.Open();
+     else if(key == 16) MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
+     else if(key == 17) MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
+     else if(key == 19)itsDocument.Save();
+     else if(key == 23) {
+     if (isSubPatcher){
+     hide();
+     itsTopWindow.RemoveFromSubWindowList(this);
+     }
+     else {
+     MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+     dispose();
+     }
+     }       
+     else if(key == 5){//Control+E
+     ErmesObject aObject;
+     itsChangingRunEditMode = true;
+     MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
+     MenuItem aSelectAllItem = itsEditMenu.getItem(5);
+     if(!itsSketchPad.GetRunMode()){  
+     setBackground(Color.white);
+     itsSketchPad.SetRunMode(true);
+     for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
+     aObject = (ErmesObject)e.nextElement();
+     aObject.RunModeSetted();
+     }
+     itsToolBar.RunModeSetted(true);
+     aRunEditItem.setLabel("Edit mode Ctrl+E");
+     aSelectAllItem.disable();
+     }
+     else {
+     itsChangingRunEditMode = true;
+     setBackground(ErmesSketchPad.sketchColor);
+     itsSketchPad.SetRunMode(false);
+     itsToolBar.RunModeSetted(false);
+     aRunEditItem.setLabel("Run mode Ctrl+E");
+     aSelectAllItem.enable();
+     }
+     }
+     else if (key == '?')
+     {
+     //ask help for the reference Manual for the selected element...
+     // open one url *only*, because we open only one browser.
+     
+     ErmesObject aObject;
+     String urlToOpen;
+     
+     if (itsSketchPad.itsSelectedList.size() > 0)
+     {
+     aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
+     
+     urlToOpen = aObject.itsFtsObject.getReferenceURL();
 
-	   ErmesObject aObject;
-	   String urlToOpen;
-
-	   if (itsSketchPad.itsSelectedList.size() > 0)
-	     {
-	       aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
-
-	       urlToOpen = aObject.itsFtsObject.getReferenceURL();
-
-	       if (urlToOpen != null)
-		 {
-		   // @@@@@@ the "browseLocation" should be a MaxApplication 
-		   // command; the application provide an documentation service
-		   // to *all* the editors.
-		   // Better, it should provide an "OpenDocumentation" command
-		   // that can be implemented in different ways
-		   // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
-		 }
-	     }
-	 }
+     if (urlToOpen != null)
+     {
+     // @@@@@@ the "browseLocation" should be a MaxApplication 
+     // command; the application provide an documentation service
+     // to *all* the editors.
+     // Better, it should provide an "OpenDocumentation" command
+     // that can be implemented in different ways
+     // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
+     }
+     }
+     }
      }
      else if(key == ircam.jmax.utils.Platform.DELETE_KEY||key==ircam.jmax.utils.Platform.BACKSPACE_KEY){
-	 if(itsSketchPad.GetEditField()!=null){
-	   if(!itsSketchPad.GetEditField().HasFocus())
-	     itsSketchPad.itsHelper.DeleteSelected();
-	 }
-       }
-
+     if(itsSketchPad.GetEditField()!=null){
+     if(!itsSketchPad.GetEditField().HasFocus())
+     itsSketchPad.itsHelper.DeleteSelected();
+     }
+     }
+     
      else if (key == '?') {//this is a patch to trap the '?'
-	 //ask help for the selected element...
-	 ErmesObject aObject = null;
-	 String fileToOpen;
-	 for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
-	   aObject = (ErmesObject) e.nextElement();
-
-	   fileToOpen = aObject.itsFtsObject.getHelpPatch();
-
-	   if (fileToOpen != null)
-	     MaxApplication.getApplication().Load(fileToOpen, "");
-	 }
-       }
+     //ask help for the selected element...
+     ErmesObject aObject = null;
+     String fileToOpen;
+     for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
+     aObject = (ErmesObject) e.nextElement();
+     
+     fileToOpen = aObject.itsFtsObject.getHelpPatch();
+     
+     if (fileToOpen != null)
+     MaxApplication.getApplication().Load(fileToOpen, "");
+     }
+     }
      return true;
-   }
-   	
+     }
+     */
+
+
+  /////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////keyListener --inizio
+  protected void processKeyEvent(KeyEvent e){
+    
+  }
+  
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+
+  public void keyPressed(KeyEvent e){
+    if (e.isControlDown()){
+      if(e.getKeyChar() == 'm') MaxApplication.getApplication().GetProjectWindow().toFront();
+      else if(e.getKeyChar() == 'n') MaxApplication.getApplication().itsProjectWindow.New();
+      else if(e.getKeyChar() == 'o') MaxApplication.getApplication().itsProjectWindow.Open();
+      else if(e.getKeyChar() == 'p') MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
+      else if(e.getKeyChar() == 'q') MaxApplication.getApplication().ObeyCommand(MaxApplication.QUIT_APPLICATION);
+      else if(e.getKeyChar() == 's')itsDocument.Save();
+      else if(e.getKeyChar() == 'w') {
+	if (isSubPatcher){
+	  setVisible(false);
+	  itsTopWindow.RemoveFromSubWindowList(this);
+	}
+	else {
+	  MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+	  dispose();
+	}
+      }       
+      else if(e.getKeyChar() == 'e'){
+	ErmesObject aObject;
+	itsChangingRunEditMode = true;
+	MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
+	MenuItem aSelectAllItem = itsEditMenu.getItem(5);
+	if(!itsSketchPad.GetRunMode()){  
+	  setBackground(Color.white);
+	  itsSketchPad.SetRunMode(true);
+	  for(Enumeration en1 = itsSketchPad.itsElements.elements(); en1.hasMoreElements();) {
+	    aObject = (ErmesObject)en1.nextElement();
+	    aObject.RunModeSetted();
+	  }
+	  itsToolBar.RunModeSetted(true);
+	  aRunEditItem.setLabel("Edit mode Ctrl+E");
+	  aSelectAllItem.setEnabled(false);
+	}
+	else {
+	  itsChangingRunEditMode = true;
+	  setBackground(ErmesSketchPad.sketchColor);
+	  itsSketchPad.SetRunMode(false);
+	  itsToolBar.RunModeSetted(false);
+	  aRunEditItem.setLabel("Run mode Ctrl+E");
+	  aSelectAllItem.setEnabled(true);
+	}
+      }
+      else if (e.getKeyChar() == '?'){
+	//ask help for the reference Manual for the selected element...
+	// open one url *only*, because we open only one browser.
+      
+	ErmesObject aObject;
+	String urlToOpen;
+	
+	if (itsSketchPad.itsSelectedList.size() > 0){
+	  aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
+	  
+	  urlToOpen = aObject.itsFtsObject.getReferenceURL();
+	  
+	  if (urlToOpen != null){
+	    // @@@@@@ the "browseLocation" should be a MaxApplication 
+	    // command; the application provide an documentation service
+	    // to *all* the editors.
+	    // Better, it should provide an "OpenDocumentation" command
+	    // that can be implemented in different ways
+	    // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
+	  }
+	}
+      }
+    }
+    else if((e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY)||(e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
+      if(itsSketchPad.GetEditField()!=null){
+	if(!itsSketchPad.GetEditField().HasFocus())
+	  itsSketchPad.itsHelper.DeleteSelected();
+      }
+    }
+    else if (e.getKeyChar() == '?') {//this is a patch to trap the '?'
+      //ask help for the selected element...
+      ErmesObject aObject = null;
+      String fileToOpen;
+      for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
+	aObject = (ErmesObject) en.nextElement();
+	
+	fileToOpen = aObject.itsFtsObject.getHelpPatch();
+	
+	if (fileToOpen != null)
+	  MaxApplication.getApplication().Load(fileToOpen, "");
+      }
+    }
+  }
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// keyListener --fine
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// itemListener --inizio
+  public void itemStateChanged(ItemEvent e){
+    if(e.getItemSelectable() instanceof CheckboxMenuItem ){
+      CheckboxMenuItem aCheckItem = (CheckboxMenuItem)e.getItemSelectable();
+      String itemName = aCheckItem.getLabel();
+      
+      if (IsInEditMenu(itemName)) EditMenuAction(aCheckItem, itemName);
+      if (IsInFontMenu(itemName)) FontMenuAction(aCheckItem, itemName);
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// itemListener --fine
+  
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// actionListener --inizio
+
+  public void actionPerformed(ActionEvent e){
+    if(e.getSource() instanceof MenuItem ){
+      MenuItem aMenuItem = (MenuItem)e.getSource();
+      String itemName = aMenuItem.getLabel();
+    
+      if (IsInFileMenu(itemName)) FileMenuAction(aMenuItem, itemName);
+      if (IsInEditMenu(itemName)) EditMenuAction(aMenuItem, itemName);
+      if (IsInFontMenu(itemName)) FontMenuAction(aMenuItem, itemName);
+      if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
+      if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
+      if (IsInSizesMenu(itemName)) SizesMenuAction(aMenuItem, itemName);
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// actionListener --fine
+
+
     //--------------------------------------------------------
     //	action
     //	high-level events handler
     //--------------------------------------------------------
-    public boolean action(Event event, Object arg) {
-      if (event.target instanceof MenuItem) {
-	MenuItem aMenuItem = (MenuItem) event.target;
-	String itemName = aMenuItem.getLabel();
-	
-	if (IsInFileMenu(itemName)) return FileMenuAction(aMenuItem, itemName);
-	if (IsInEditMenu(itemName)) return EditMenuAction(aMenuItem, itemName);
-	if (IsInFontMenu(itemName)) return FontMenuAction(aMenuItem, itemName);
-	if (IsInProjectMenu(itemName)) return ProjectMenuAction(aMenuItem, itemName);
-	if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
-	if (IsInSizesMenu(itemName)) return SizesMenuAction(aMenuItem, itemName);
-      }
-      return true;
+  /* public boolean action(Event event, Object arg) {
+     if (event.target instanceof MenuItem) {
+     MenuItem aMenuItem = (MenuItem) event.target;
+     String itemName = aMenuItem.getLabel();
+     
+     if (IsInFileMenu(itemName)) return FileMenuAction(aMenuItem, itemName);
+     if (IsInEditMenu(itemName)) return EditMenuAction(aMenuItem, itemName);
+     if (IsInFontMenu(itemName)) return FontMenuAction(aMenuItem, itemName);
+     if (IsInProjectMenu(itemName)) return ProjectMenuAction(aMenuItem, itemName);
+     if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
+     if (IsInSizesMenu(itemName)) return SizesMenuAction(aMenuItem, itemName);
+     }
+     return true;
     }
+    */
   
-  private boolean FileMenuAction(MenuItem theMenuItem, String theString) {
+  private void FileMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Save  Ctrl+S")) {
       itsDocument.Save();
     }
@@ -640,7 +829,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     }
     else if (theString.equals("Close   Ctrl+W")) {
       if (isSubPatcher){
-	hide();
+	setVisible(false);
 	itsTopWindow.RemoveFromSubWindowList(this);
       }
       else {
@@ -652,7 +841,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     else if (theString.equals("Print... Ctrl+P")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.PRINT_WINDOW);
     }
-    return true;
   }
 	
   public boolean Close(){
@@ -661,7 +849,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     if (!isSubPatcher) itsDocument.itsPatcher.close();
     if(!GetDocument().GetSaveFlag()){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
-      aDialog.move(300, 300);
+      aDialog.setLocation(300, 300);
       aDialog.show();
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
@@ -698,7 +886,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 	if(aExternal.iAmPatcher){
 	  if(aExternal.itsSubWindow!=null){
 	    aExternal.itsSubWindow.CloseAllSubWindows();
-	    aExternal.itsSubWindow.hide();
+	    aExternal.itsSubWindow.setVisible(false);
 	    aExternal.itsSubWindow.dispose();
 	    aExternal.itsSubWindow = null;
 	  }
@@ -708,7 +896,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
 	aPatcher = (ErmesObjPatcher)aObject;
 	if(aPatcher.itsSubWindow!=null){
 	  aPatcher.itsSubWindow.CloseAllSubWindows();
-	  aPatcher.itsSubWindow.hide();
+	  aPatcher.itsSubWindow.setVisible(false);
 	  aPatcher.itsSubWindow.dispose();
 	  aPatcher.itsSubWindow = null;
 	}
@@ -728,29 +916,34 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     }
   }
 
-  private boolean EditMenuAction(MenuItem theMenuItem, String theString) {
+  private void EditMenuAction(MenuItem theMenuItem, String theString) {
+    CheckboxMenuItem aCheckItem;
     if (theString.equals("Select All")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.SELECT_ALL);
     }
     if (theString.equals("Snap to Grid")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.SNAP_TO_GRID);
+      aCheckItem = (CheckboxMenuItem)theMenuItem;
+      if(aCheckItem.getState()) aCheckItem.setState(false);
+      else aCheckItem.setState(true);
     }
     else if (theString.equals("Autorouting")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.AUTO_ROUTING);
+      aCheckItem = (CheckboxMenuItem)theMenuItem;
+      if(aCheckItem.getState())aCheckItem.setState(false);
+      else aCheckItem.setState(true);
     }
-    return true;
   }
 
-  private boolean FontMenuAction(MenuItem theMenuItem, String theString) {
+  private void FontMenuAction(MenuItem theMenuItem, String theString) {
     //if we are here, a font name have been choosen from the menu
     itsCurrentFontMenu.setState(false);
     itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
     itsCurrentFontMenu = (CheckboxMenuItem) theMenuItem;
     itsCurrentFontMenu.setState(true);
-    return true;
   }
 
-  private boolean ProjectMenuAction(MenuItem theMenuItem, String theString) {
+  private void ProjectMenuAction(MenuItem theMenuItem, String theString) {
     if (theString.equals("Add Window")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.ADD_WINDOW);
     }
@@ -758,22 +951,21 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
       FileDialog fd = new FileDialog(this, "Add To Project");
       fd.setFile("");
       fd.show();
-      if(fd.getFile()==null) return false;
+      if(fd.getFile()==null) return;
       if(fd.getFile().compareTo("")!= 0)
 	MaxApplication.getApplication().AddToProject(fd.getFile(), fd.getDirectory());
     }
     else if (theString.equals("Remove files")) {
       MaxApplication.getApplication().ObeyCommand(MaxApplication.REMOVE_FILES);
     }
-    return true;
   }
 
-  private boolean WindowsMenuAction(MenuItem theMenuItem, String theString) {
+  private void WindowsMenuAction(MenuItem theMenuItem, String theString) {
     ErmesObject aObject;
     if (theString.equals("Run mode Ctrl+E")) {   
       itsChangingRunEditMode = true;
       theMenuItem.setLabel("Edit mode Ctrl+E");
-      itsEditMenu.getItem(5).disable();//selectall
+      itsEditMenu.getItem(5).setEnabled(false);//selectall
       setBackground(Color.white);
       itsSketchPad.SetRunMode(true);
       for (Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
@@ -785,7 +977,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     else if (theString.equals("Edit mode Ctrl+E")) {
       itsChangingRunEditMode = true;
       theMenuItem.setLabel("Run mode Ctrl+E");
-      itsEditMenu.getItem(5).enable();//selectall
+      itsEditMenu.getItem(5).setEnabled(true);//selectall
       setBackground(ErmesSketchPad.sketchColor);
       itsSketchPad.SetRunMode(false);
       itsToolBar.RunModeSetted(false);
@@ -794,13 +986,9 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
       MaxApplication.getApplication().GetProjectWindow().toFront();
     }
     else if (theString.equals("Ermes Console")) {
-      MaxApplication.getApplication().GetConsole().ToFront();
-    }
-    else if (theString.equals("Jacl Console")) {
-      MaxApplication.getApplication().GetShell().ToFront();
+      MaxApplication.getApplication().GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
-    return true;
   }
     
   private void BringToFront(String theName){
@@ -844,43 +1032,84 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     //	handleEvent
     //	low-level events handler
     //--------------------------------------------------------
-  public boolean handleEvent(Event event) {
-    // If it's a subpatcher, just hide it 
-    if (event.id == Event.WINDOW_DESTROY) {
-      if (inAnApplet) {
-		dispose();
-      } else {
-	if (isSubPatcher) {
-		hide();
-		//itsSketchPad.offScreenPresent = false;
-	}
-	else {MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
-		dispose();
-	}
+  /* public boolean handleEvent(Event event) {
+     // If it's a subpatcher, just hide it 
+     if (event.id == Event.WINDOW_DESTROY) {
+     if (inAnApplet) {
+     dispose();
+     } else {
+     if (isSubPatcher) {
+     hide();
+     //itsSketchPad.offScreenPresent = false;
+     }
+     else {MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+     dispose();
+     }
+     }
+     }
+     else 
+     if (event.id == Event.GOT_FOCUS) {
+     if(!itsClosing){
+     MaxApplication.getApplication().SetCurrentWindow(this);
+     ErmesSketchPad.RequestOffScreen(itsSketchPad);
+     if(itsSketchPad.getGraphics()!= null)
+     itsSketchPad.update(itsSketchPad.getGraphics());
+     }
+     }
+     else if(event.id == Event.LOST_FOCUS){
+     itsSketchPad.itsFirstClick = true;
+     itsSketchPad.itsScrolled = false;
+     }
+     else if(event.id == Event.WINDOW_EXPOSE){
+     }
+     return super.handleEvent(event);
+    }
+    */
+	
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////focusListener --inizio
+  public void focusGained(FocusEvent e){
+    if(!itsClosing){
+      MaxApplication.getApplication().SetCurrentWindow(this);
+      ErmesSketchPad.RequestOffScreen(itsSketchPad);
+      if(itsSketchPad.getGraphics()!= null)
+	itsSketchPad.update(itsSketchPad.getGraphics());
+    }
+  }
+
+  public void focusLost(FocusEvent e){
+    itsSketchPad.itsFirstClick = true;
+    itsSketchPad.itsScrolled = false;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////focusListener --fine
+  
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////WindowListener --inizio  
+  public void windowClosing(WindowEvent e){
+    if (inAnApplet) {
+      dispose();
+    } else {
+      if (isSubPatcher) {
+	setVisible(false);
+      }
+      else {MaxApplication.getApplication().ObeyCommand(MaxApplication.CLOSE_WINDOW);
+      dispose();
       }
     }
-    else 
-      if (event.id == Event.GOT_FOCUS) {
-      	if(!itsClosing){
-	  MaxApplication.getApplication().SetCurrentWindow(this);
-	  //itsSketchPad.offScreenPresent = true;
-	  ErmesSketchPad.RequestOffScreen(itsSketchPad);
-	  if(itsSketchPad.getGraphics()!= null) //????
-	    itsSketchPad.update(itsSketchPad.getGraphics());
-	}
-      }
-      else if(event.id == Event.LOST_FOCUS){
-	//if(!itsChangingRunEditMode) itsSketchPad.offScreenPresent = false;
-	//else itsChangingRunEditMode = false;
-	itsSketchPad.itsFirstClick = true;
-	itsSketchPad.itsScrolled = false;
-      }
-      else if(event.id == Event.WINDOW_EXPOSE){
-      }
-    return super.handleEvent(event);
-
   }
-	
+  public void windowOpened(WindowEvent e){}
+  public void windowClosed(WindowEvent e){}
+  public void windowIconified(WindowEvent e){}       
+  public void windowDeiconified(WindowEvent e){}
+  public void windowActivated(WindowEvent e){}
+  public void windowDeactivated(WindowEvent e){}  
+
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////WindowListener --fine
+
+
   //--------------------------------------------------------
   //	paint
   //--------------------------------------------------------
@@ -921,17 +1150,18 @@ public class ErmesSketchWindow extends Frame implements MaxWindow {
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize();//(depending on the layout manager).
+    public Dimension getMinimumSize() {
+        return getPreferredSize();//(depending on the layout manager).
     }
 
     //--------------------------------------------------------
 	// preferredSize()
     //--------------------------------------------------------
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredsize;
     }
 }
+
 
 
 

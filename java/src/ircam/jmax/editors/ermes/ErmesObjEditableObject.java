@@ -2,6 +2,7 @@ package ircam.jmax.editors.ermes;
 
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -61,11 +62,11 @@ import ircam.jmax.fts.*;
     currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
     Reshape(itsX, itsY, preferredSize.width, preferredSize.height);
     
-    itsSketchPad.GetEditField().reshape(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight() + 20);	
+    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight() + 20);	
     itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
     
-    itsSketchPad.GetEditField().show();
-    itsSketchPad.GetEditField(). requestFocus();
+    itsSketchPad.GetEditField().setVisible(true);
+    itsSketchPad.GetEditField().requestFocus();
     
     return true;
   }
@@ -120,8 +121,8 @@ import ircam.jmax.fts.*;
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(Event evt,int x, int y) {
-    if(evt.clickCount>1) {
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    if(evt.getClickCount()>1) {
       if (itsSketchPad.GetEditField() != null) {
 	itsSketchPad.GetEditField().setEditable(true);
 	itsInEdit = true;
@@ -131,7 +132,7 @@ import ircam.jmax.fts.*;
     return true;
   }
 	
-  public boolean MouseUp(Event evt,int x,int y){
+  public boolean MouseUp(MouseEvent evt,int x,int y){
     if(itsInEdit) return true;
     else return super.MouseUp(evt, x, y);
   }
@@ -170,7 +171,7 @@ import ircam.jmax.fts.*;
     itsSketchPad.SaveOneElementRgn(this);//???
     //preferredSize = d1;//prova prova
     itsSketchPad.GetEditField().setText(theString);
-    itsSketchPad.GetEditField().resize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
+    itsSketchPad.GetEditField().setSize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();
     itsSketchPad.validate();//??
     itsSketchPad.repaint();
@@ -218,18 +219,20 @@ import ircam.jmax.fts.*;
   //--------------------------------------------------------
   // minimumSize
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
   }
   
   //--------------------------------------------------------
   // preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
 	
 }
+
+
 
 
 

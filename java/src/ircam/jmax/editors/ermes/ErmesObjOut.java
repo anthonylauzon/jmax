@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -22,7 +23,7 @@ class ErmesObjOut extends ErmesObject {
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
 
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(theFtsGraphic.x, theFtsGraphic.y,theFtsGraphic.width,theFtsGraphic.height);
 
     itsId = (Integer) theFtsObject.getArguments().elementAt(0);
@@ -38,7 +39,7 @@ class ErmesObjOut extends ErmesObject {
   //We need here the information about the maximum number of inlets
   	
 	int temp = ((ErmesSketchWindow)theSketchPad.itsSketchWindow).itsDocument.itsPatcher.getNumberOfOutlets();
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
 
 	if (theSketchPad.outCount < temp)
@@ -91,14 +92,14 @@ class ErmesObjOut extends ErmesObject {
 		return true;	//for now, everything is allowed
 	}
 
-	public boolean MouseDown_specific(Event evt, int x, int y) {
-	    if (itsSketchPad.itsRunMode || evt.clickCount == 1) {
-			return itsSketchPad.ClickOnObject(this, evt, x, y);
+	public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
+	    if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {
+	      return itsSketchPad.ClickOnObject(this, evt, x, y);
 	    }
 	    else  {	//we want to choose among the different Outlet number
 	    	itsSketchPad.itsOutChoice.SetNewOwner(this); //make the Choice pointing to this
-	    	itsSketchPad.itsOutChoice.move(x, y);
-	        itsSketchPad.itsOutChoice.show();
+	    	itsSketchPad.itsOutChoice.setLocation(x, y);
+	        itsSketchPad.itsOutChoice.setVisible(true);
 			//itsSketchPad.itsInChoice.mouseDown(evt, x, y);
 	    }
 	    return true;
@@ -136,14 +137,15 @@ class ErmesObjOut extends ErmesObject {
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize(); //(depending on the layout manager).
+    public Dimension getMinimumSize() {
+        return getPreferredSize(); //(depending on the layout manager).
     }
 
     //If we don't specify this, the canvas might not show up at all
     //(depending on the layout manager).
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredSize;
     }
 
 }
+

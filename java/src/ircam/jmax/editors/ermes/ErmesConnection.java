@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 import java.lang.Math;
@@ -996,11 +997,11 @@ public class ErmesConnection {
 	itsRectTemp5.height = itsTempPt6.y - itsTempPt5.y +2-/*8*/6;//segue correzione segment3
 	itsRectTemp5.width = 3;
 	
-	itsRectTemp21.reshape(itsRectTemp1.x, itsRectTemp1.y, itsRectTemp1.width, itsRectTemp1.height);
-	itsRectTemp22.reshape(itsRectTemp2.x, itsRectTemp2.y, itsRectTemp2.width, itsRectTemp2.height);
-	itsRectTemp23.reshape(itsRectTemp3.x, itsRectTemp3.y, itsRectTemp3.width, itsRectTemp3.height);
-	itsRectTemp24.reshape(itsRectTemp4.x, itsRectTemp4.y, itsRectTemp4.width, itsRectTemp4.height);
-	itsRectTemp25.reshape(itsRectTemp5.x, itsRectTemp5.y, itsRectTemp5.width, itsRectTemp5.height);
+	itsRectTemp21.setBounds(itsRectTemp1.x, itsRectTemp1.y, itsRectTemp1.width, itsRectTemp1.height);
+	itsRectTemp22.setBounds(itsRectTemp2.x, itsRectTemp2.y, itsRectTemp2.width, itsRectTemp2.height);
+	itsRectTemp23.setBounds(itsRectTemp3.x, itsRectTemp3.y, itsRectTemp3.width, itsRectTemp3.height);
+	itsRectTemp24.setBounds(itsRectTemp4.x, itsRectTemp4.y, itsRectTemp4.width, itsRectTemp4.height);
+	itsRectTemp25.setBounds(itsRectTemp5.x, itsRectTemp5.y, itsRectTemp5.width, itsRectTemp5.height);
 	
 	itsTempPt21.x = itsTempPt1.x;
 	itsTempPt21.y = itsTempPt1.y;
@@ -1158,11 +1159,11 @@ public class ErmesConnection {
 	  itsRectTemp5.width = 3;
 	  
 	  
-	  itsRectTemp21.reshape(itsRectTemp1.x, itsRectTemp1.y, itsRectTemp1.width, itsRectTemp1.height);
-	  itsRectTemp22.reshape(itsRectTemp2.x, itsRectTemp2.y, itsRectTemp2.width, itsRectTemp2.height);
-	  itsRectTemp23.reshape(itsRectTemp3.x, itsRectTemp3.y, itsRectTemp3.width, itsRectTemp3.height);
-	  itsRectTemp24.reshape(itsRectTemp4.x, itsRectTemp4.y, itsRectTemp4.width, itsRectTemp4.height);
-	  itsRectTemp25.reshape(itsRectTemp5.x, itsRectTemp5.y, itsRectTemp5.width, itsRectTemp5.height);
+	  itsRectTemp21.setBounds(itsRectTemp1.x, itsRectTemp1.y, itsRectTemp1.width, itsRectTemp1.height);
+	  itsRectTemp22.setBounds(itsRectTemp2.x, itsRectTemp2.y, itsRectTemp2.width, itsRectTemp2.height);
+	  itsRectTemp23.setBounds(itsRectTemp3.x, itsRectTemp3.y, itsRectTemp3.width, itsRectTemp3.height);
+	  itsRectTemp24.setBounds(itsRectTemp4.x, itsRectTemp4.y, itsRectTemp4.width, itsRectTemp4.height);
+	  itsRectTemp25.setBounds(itsRectTemp5.x, itsRectTemp5.y, itsRectTemp5.width, itsRectTemp5.height);
 	  
 	  itsTempPt21.x = itsTempPt1.x;
 	  itsTempPt21.y = itsTempPt1.y;
@@ -1716,7 +1717,7 @@ public class ErmesConnection {
   }
   
 	
-  public boolean MouseDown(Event evt,int x, int y) {
+  public boolean MouseDown(MouseEvent evt,int x, int y) {
     if (!itsSketchPad.itsRunMode){
       itsSketchPad.ClickOnConnection(evt, x, y);
     }

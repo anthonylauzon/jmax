@@ -21,7 +21,7 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener{
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener{
   Frame itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -265,7 +265,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
     }
     catch (Exception e) {
       ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
-      aErr.move(100, 100);
+      aErr.setLocation(100, 100);
       aErr.show();  
       e.printStackTrace(); // temporary, MDC
       return;
@@ -287,14 +287,14 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
   //	ClickOnConnection
   //--------------------------------------------------------
 
-  public boolean ClickOnConnection(Event evt,int x, int y){
+  public boolean ClickOnConnection(MouseEvent evt,int x, int y){
     switch(editStatus) {
     case START_ADD:
       break;
     case DOING_NOTHING:
       itsHelper.DeselectInOutlet();
-      if(evt.clickCount>1){   
-	if((evt.modifiers & Event.SHIFT_MASK) == 0) itsCurrentConnection.ChangeRoutingMode();
+      if(evt.getClickCount()>1){   
+	if(!evt.isShiftDown()) itsCurrentConnection.ChangeRoutingMode();
 	else  itsCurrentConnection.ReroutingConn();
 	
 	editStatus = START_SELECT;
@@ -322,9 +322,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
       }
       break;
     case START_SELECT:
-      if ((evt.modifiers & Event.SHIFT_MASK) == 0) {//lo shift non e' premuto
+      if (!evt.isShiftDown()) {//lo shift non e' premuto
 	itsHelper.DeselectAll(itsCurrentConnection);
-	if(evt.clickCount>1){
+	if(evt.getClickCount()>1){
 	  itsCurrentConnection.ChangeRoutingMode();
 	  ToSave();
 	  repaint();
@@ -344,7 +344,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
 	}
       }
       else{//se c'e' lo shift premuto
-	if(evt.clickCount>1){
+	if(evt.getClickCount()>1){
 	  itsCurrentConnection.ReroutingConn();
 	  ToSave();
 	}
@@ -373,7 +373,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
   //	ClickOnObject
   //--------------------------------------------------------
 
-  boolean ClickOnObject(ErmesObject theObject, Event evt, int theX, int theY){
+  boolean ClickOnObject(ErmesObject theObject, MouseEvent evt, int theX, int theY){
     
     if(!itsRunMode){
       switch(editStatus) {
@@ -393,7 +393,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
 	ToSave();
 	break;
       case START_SELECT:
-	if ((evt.modifiers & Event.SHIFT_MASK) != 0) {
+	if (evt.isShiftDown()) {
 	  if(!itsSelectedList.contains(theObject)){
 	    itsSelectedList.addElement(theObject);
 	    theObject.Select();
@@ -479,7 +479,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
       return;
     }
     
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     
     //Create the offscreen graphics context, if no good one exists.
     if ( (offGraphics == null)){	//first sketch created, allocate the offscreen buffer
@@ -744,10 +744,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
     itsMessThread = new ErmesObjMessThread(this, "aFlash");
     add(itsEditField);
     validate();
-    itsEditField.hide();
-    itsEditField.move(-200,-200);
+    itsEditField.setVisible(false);
+    itsEditField.setLocation(-200,-200);
 
     setBackground(sketchColor);
+    addMouseMotionListener(this);
+    addMouseListener(this);
   }
 	
   //--------------------------------------------------------
@@ -780,16 +782,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
   //--------------------------------------------------------
     //	minimumSize
   //--------------------------------------------------------
-    public Dimension minimumSize() {
+    public Dimension getMinimumSize() {
         return new Dimension(30, 20);
     }
 	
-    //--------------------------------------------------------
-    //	mouseDown
-    //	click on the sketchpad
-    //--------------------------------------------------------
-  public boolean mouseDown(Event evt,int x, int y) {
+  /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////mouseListener--inizio
+  public void mouseClicked(MouseEvent e){}
+
+  public void mousePressed(MouseEvent e){
     //create the object whose name is objectNames[addObject] in coord x, y
+    int x = e.getX();
+    int y = e.getY();
     int i;
     Rectangle aRect = null;
     ErmesObject aObject = null;
@@ -804,11 +808,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
     
     if (itsRunMode) {
       if(itsHelper.IsInObject(x,y)) {
-	itsCurrentObject.MouseDown(evt,x,y);
+	itsCurrentObject.MouseDown(e,x,y);
 	itsStartDragObject = itsCurrentObject;	//object FROM WHICH we started drag
-	return true;//the return value of the object is ignored, we don't have to handle the mousedown anyway
       }
-      else return true;
+      return;
     }
     
     if(editStatus == EDITING_OBJECT){
@@ -818,7 +821,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){
       itsHelper.DeselectObjAndConn();
-      if ((evt.modifiers & Event.SHIFT_MASK) != 0){
+      if (e.isShiftDown()){
 	MultiConnect(itsCurrentInOutlet);
       }
       else{
@@ -829,18 +832,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
 	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
 	}
       }
-      return true;
+      return;
     }
     ///if we are in a Object
     if(itsHelper.IsInObject(x,y)){
-      itsCurrentObject.MouseDown(evt,x,y);
-      return true;
+      itsCurrentObject.MouseDown(e,x,y);
+      return;
     }
     
     ///if we are in a Connection
     if(itsHelper.IsInConnection(x,y)) {
-      itsCurrentConnection.MouseDown(evt,x,y);
-      return true;
+      itsCurrentConnection.MouseDown(e,x,y);
+      return;
     }
     
     if (!itsToolBar.locked) itsToolBar.Deselect();
@@ -855,17 +858,17 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener{
       if (isTopPatcher && (objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjIn") || objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
 	//forbidden to add such objects in a top level patch
 	ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
-	aErr.move(100, 100);
+	aErr.setLocation(100, 100);
 	aErr.show();
 	editStatus = DOING_NOTHING;
-return true;
+	return;
       }
       try {
 	//there was an error "aObject may not have been initialized"
 	aObject = (ErmesObject) Class.forName(objectNames[itsAddObject]).newInstance();
-      } catch(ClassNotFoundException e) {i = 0;}
-      catch(IllegalAccessException e) {i = 1;}
-      catch(InstantiationException e) {i = 2;}
+      } catch(ClassNotFoundException e1) {i = 0;}
+      catch(IllegalAccessException e2) {i = 1;}
+      catch(InstantiationException e3) {i = 2;}
       finally {
 	aObject.Init(this, x, y, "");
 	itsElements.addElement(aObject);
@@ -877,155 +880,38 @@ return true;
 	aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
 	aRect.grow(3,6);
 	itsElementRgn.Add(aRect);
-	for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-	  aOutlet = (ErmesObjOutlet)e.nextElement();
+	for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
+	  aOutlet = (ErmesObjOutlet)en.nextElement();
 	  itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
 	}
 	ToSave();
       }
     }
     else{
-      if ((evt.modifiers & Event.SHIFT_MASK) == 0) itsHelper.DeselectAll();//24/6 baco e mammeta
+      if (!e.isShiftDown()) itsHelper.DeselectAll();
       editStatus = AREA_SELECT;
       currentRect = new Rectangle(x, y, 0, 0);
       currentPoint = new Point(x,y);
     }
-    return true;
   }
-  
-  //--------------------------------------------------------
-  //	mouseDrag
-  //	handling the movements
-  //--------------------------------------------------------
-  public boolean mouseDrag(Event event, int x, int y) {
-    Rectangle aRect;
+       
+  public void mouseReleased(MouseEvent e){
     
-    if(itsRunMode) {
-      if(itsStartDragObject != null) itsStartDragObject.MouseDrag(event, x, y);
-      return true;
-    }
-
-    DynamicScrolling(x, y);
-
-    if(editStatus == AREA_SELECT) {
-      if((java.lang.Math.abs(x-currentPoint.x)<5)||(java.lang.Math.abs(y-currentPoint.y)<5)) 
-	return true;
-      if(x>currentPoint.x) 
-	if(y>currentPoint.y)	
-	  currentRect.reshape(currentPoint.x,currentPoint.y,x-currentPoint.x, y-currentPoint.y);
-	else currentRect.reshape(currentPoint.x, y, x-currentPoint.x, currentPoint.y-y);
-      else if(y>currentPoint.y)  
-	currentRect.reshape(x, currentPoint.y, currentPoint.x-x, y-currentPoint.y); 
-      else currentRect.reshape(x, y, currentPoint.x-x, currentPoint.y-y);
-      
-      update(getGraphics());
-      return true;
-    } 
-    if(editStatus == RESIZING_OBJECT) {
-      if((java.lang.Math.abs(x-currentResizeRect.x)<5)||
-	 (java.lang.Math.abs(y-currentResizeRect.y)<5)) return true;
-      currentResizeRect.resize(x-currentResizeRect.x, y-currentResizeRect.y);
-      update(getGraphics());
-      return true;
-    } 
-    else if (editStatus == MOVING){
-      repaint();
-      if((itsStartInclusionRect.x+(x-itsStartMovingPt.x)>0)&&
-	 (itsStartInclusionRect.y+(y-itsStartMovingPt.y)>0)){
-	currentMouseX = x;
-	currentMouseY = y;
-      }
-      repaint();
-      return true;
-    }
-    else if(editStatus == MOVINGSEGMENT){
-      currentMouseX = x;
-      currentMouseY = y;
-      repaint();
-      return true;
-    }
-    else return false;
-  }
-  
-  public boolean DynamicScrolling(int theX, int theY){
-    //qui si inserisce una funzione che fa lo scrolling dinamico
-    //1-controlla che la posizione del mouse sia su un bordo della sketch visibile 
-    //se si, se non coincide con il bordo estremo,  scrolla di una unita'
+    int x = e.getX();
+    int y = e.getY();
     
-    //si usa la parte visibile della sketch... o il view-port
-    Adjustable aHAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getHAdjustable();
-    Adjustable aVAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getVAdjustable();
-    if(theX>=aHAdjustable.getVisibleAmount()+aHAdjustable.getValue()){
-      aHAdjustable.setValue(aHAdjustable.getValue()+aHAdjustable.getUnitIncrement());
-      return true;
-    }
-    if(theY>=aVAdjustable.getVisibleAmount()+aVAdjustable.getValue()){
-      aVAdjustable.setValue(aVAdjustable.getValue()+aVAdjustable.getUnitIncrement());
-      return true;
-    }
-    else return false;
-  }
-
-
-  //--------------------------------------------------------
-  //	mouseExit
-  //--------------------------------------------------------
-  public boolean mouseExit(Event evt,int x,int y) {
-    if (itsRunMode) return false;		
-    if(itsSketchWindow.getCursorType()==Frame.CROSSHAIR_CURSOR){ 
-      itsSketchWindow.setCursor(Frame.DEFAULT_CURSOR);
-      itsCurrentInOutlet.itsAlreadyMoveIn = false;
-    }
-    return true;
-  }
-  
-  //--------------------------------------------------------
-  //	mouseMove
-  //--------------------------------------------------------
-  public boolean mouseMove(Event evt,int x,int y){
-    if (itsRunMode) return false;
-    if(itsHelper.IsInInOutLet(x,y)) {
-      itsSketchWindow.setCursor(Frame.CROSSHAIR_CURSOR);
-      //qui potrebbe essere che se c'e' il control pigiato fa come se avessi cliccato
-      if(((evt.modifiers & Event.CTRL_MASK)!=0)&&(!itsCurrentInOutlet.itsAlreadyMoveIn)){
-	if ((evt.modifiers & Event.SHIFT_MASK) != 0) MultiConnect(itsCurrentInOutlet);
-	else{
-	  if (!itsCurrentInOutlet.GetSelected())
-	    itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
-	  else 
-	    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
-	}
-	itsCurrentInOutlet.itsAlreadyMoveIn = true;
-      }
-      return true;
-    }
-    else 
-      if(itsHelper.IsInObject(x,y))
-	if(itsCurrentObject.MouseMove(evt,x,y)) return true;
-    itsSketchWindow.setCursor(Frame.DEFAULT_CURSOR);
-    if(itsCurrentInOutlet!=null)
-      if(itsCurrentInOutlet.itsAlreadyMoveIn) itsCurrentInOutlet.itsAlreadyMoveIn = false;
-    return true;
-  }
-  
-  //--------------------------------------------------------
-  //	mouseUp
-  //	handling of AREA_SELECT and MOVING states termination
-  //--------------------------------------------------------
-
-  public boolean mouseUp(Event event, int x, int y) {
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {
-      if (itsStartDragObject != null) itsStartDragObject.MouseUp(event, x, y);
+      if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
     }
     if (editStatus == AREA_SELECT) {
       
       Rectangle aRect = itsHelper.NormalizedRect(currentRect);
       if (!aRect.isEmpty()) { 
-	for (Enumeration e = itsElements.elements() ; e.hasMoreElements() ;) {
-	  ErmesObject aObject = (ErmesObject) e.nextElement();
+	for (Enumeration en = itsElements.elements() ; en.hasMoreElements() ;) {
+	  ErmesObject aObject = (ErmesObject) en.nextElement();
 	  if (aObject.Bounds().intersects(aRect)) {
 	    aObject.Select();
 	    aObject.Paint(offGraphics);
@@ -1039,13 +925,13 @@ return true;
 	  DrawOffScreen(getGraphics());
 	}
       }
-      else if ((event.modifiers & Event.SHIFT_MASK) == 0) itsHelper.DeselectAll();
-      
+      else if (!e.isShiftDown()) itsHelper.DeselectAll();
+	       
       currentRect = null;
       currentPoint = null;
       if (itsSelectedList.isEmpty()) editStatus = DOING_NOTHING;
       else editStatus = START_SELECT;
-      return true;
+      return;
     }
     else if (editStatus == MOVING) {
       int aDeltaH, aDeltaV;
@@ -1076,23 +962,426 @@ return true;
       repaint();
     }
     else if (editStatus == RESIZING_OBJECT){
-      itsCurrentObject.MouseUp(event,x,y);
+      itsCurrentObject.MouseUp(e,x,y);
       editStatus = START_SELECT;
       repaint();
     }
-    else if(editStatus == DOING_NOTHING) return false;
-    return true;
-  }
-  
-  public ErmesObjEditField GetEditField(){
-    return itsEditField;
+    else if(editStatus == DOING_NOTHING) return;
   }
 
+  public void mouseEntered(MouseEvent e){}
+
+  public void mouseExited(MouseEvent e){
+    if (itsRunMode) return;		
+    if(itsSketchWindow.getCursor().getType()==Cursor.CROSSHAIR_CURSOR){ 
+      itsSketchWindow.setCursor(Cursor.getDefaultCursor());
+      itsCurrentInOutlet.itsAlreadyMoveIn = false;
+    }
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////mouseListener--fine
+
+    //--------------------------------------------------------
+    //	mouseDown
+    //	click on the sketchpad
+    //--------------------------------------------------------
+  /*public boolean mouseDown(Event evt,int x, int y) {
+    int i;
+    Rectangle aRect = null;
+    ErmesObject aObject = null;
+    ErmesObjOutlet aOutlet;
+    ErmesConnection aConnection;
+		
+    
+    if(itsFirstClick){
+    DrawOffScreen(getGraphics());
+    itsFirstClick = false;
+    }
+    
+    if (itsRunMode) {
+    if(itsHelper.IsInObject(x,y)) {
+    itsCurrentObject.MouseDown(evt,x,y);
+    itsStartDragObject = itsCurrentObject;	//object FROM WHICH we started drag
+    return true;//the return value of the object is ignored, we don't have to handle the mousedown anyway
+    }
+    else return true;
+    }
+    
+    if(editStatus == EDITING_OBJECT){
+    itsEditField.LostFocus();
+    }
+    
+    ///if we are in a InOutLet
+    if(itsHelper.IsInInOutLet(x,y)){
+    itsHelper.DeselectObjAndConn();
+    if ((evt.modifiers & Event.SHIFT_MASK) != 0){
+    MultiConnect(itsCurrentInOutlet);
+    }
+    else{
+    if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
+    itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+    }
+    else {
+    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
+    }
+    }
+    return true;
+    }
+    if(itsHelper.IsInObject(x,y)){
+    itsCurrentObject.MouseDown(evt,x,y);
+    return true;
+    }
+    
+    if(itsHelper.IsInConnection(x,y)) {
+    itsCurrentConnection.MouseDown(evt,x,y);
+    return true;
+    }
+    
+    if (!itsToolBar.locked) itsToolBar.Deselect();
+    
+    if(editStatus == START_ADD){
+    if(doSnapToGrid){
+    Point aPoint = itsHelper.SnapToGrid(x, y);
+    x = aPoint.x;
+    y = aPoint.y;
+    }
+    boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
+    if (isTopPatcher && (objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjIn") || objectNames[itsAddObject].equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
+    //forbidden to add such objects in a top level patch
+    ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
+    aErr.move(100, 100);
+    aErr.show();
+    editStatus = DOING_NOTHING;
+    return true;
+    }
+    try {
+    //there was an error "aObject may not have been initialized"
+    aObject = (ErmesObject) Class.forName(objectNames[itsAddObject]).newInstance();
+    } catch(ClassNotFoundException e) {i = 0;}
+    catch(IllegalAccessException e) {i = 1;}
+    catch(InstantiationException e) {i = 2;}
+    finally {
+    aObject.Init(this, x, y, "");
+    itsElements.addElement(aObject);
+    aObject.Paint(offGraphics);
+    CopyTheOffScreen(getGraphics());
+    if(objectNames[itsAddObject] == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+    itsPatcherElements.addElement(aObject);
+    if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
+    aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
+    aRect.grow(3,6);
+    itsElementRgn.Add(aRect);
+    for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
+    aOutlet = (ErmesObjOutlet)e.nextElement();
+    itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
+    }
+    ToSave();
+    }
+    }
+    else{
+    if ((evt.modifiers & Event.SHIFT_MASK) == 0) itsHelper.DeselectAll();//24/6 baco e mammeta
+    editStatus = AREA_SELECT;
+    currentRect = new Rectangle(x, y, 0, 0);
+    currentPoint = new Point(x,y);
+    }
+    return true;
+    }*/
+  
   //--------------------------------------------------------
-  //	MoveSegment
+  //	mouseDrag
+  //	handling the movements
   //--------------------------------------------------------
-  public void MoveSegment(ErmesConnSegment theSegment, Event evt, int theX, int theY)
-  {
+  /*public boolean mouseDrag(Event event, int x, int y) {
+    Rectangle aRect;
+    
+    if(itsRunMode) {
+    if(itsStartDragObject != null) itsStartDragObject.MouseDrag(event, x, y);
+    return true;
+    }
+
+    DynamicScrolling(x, y);
+
+    if(editStatus == AREA_SELECT) {
+    if((java.lang.Math.abs(x-currentPoint.x)<5)||(java.lang.Math.abs(y-currentPoint.y)<5)) 
+    return true;
+    if(x>currentPoint.x) 
+    if(y>currentPoint.y)	
+    currentRect.reshape(currentPoint.x,currentPoint.y,x-currentPoint.x, y-currentPoint.y);
+    else currentRect.reshape(currentPoint.x, y, x-currentPoint.x, currentPoint.y-y);
+    else if(y>currentPoint.y)  
+    currentRect.reshape(x, currentPoint.y, currentPoint.x-x, y-currentPoint.y); 
+    else currentRect.reshape(x, y, currentPoint.x-x, currentPoint.y-y);
+      
+    update(getGraphics());
+    return true;
+    } 
+    if(editStatus == RESIZING_OBJECT) {
+    if((java.lang.Math.abs(x-currentResizeRect.x)<5)||
+    (java.lang.Math.abs(y-currentResizeRect.y)<5)) return true;
+    currentResizeRect.resize(x-currentResizeRect.x, y-currentResizeRect.y);
+    update(getGraphics());
+    return true;
+    } 
+    else if (editStatus == MOVING){
+    repaint();
+    if((itsStartInclusionRect.x+(x-itsStartMovingPt.x)>0)&&
+    (itsStartInclusionRect.y+(y-itsStartMovingPt.y)>0)){
+    currentMouseX = x;
+    currentMouseY = y;
+    }
+    repaint();
+    return true;
+    }
+    else if(editStatus == MOVINGSEGMENT){
+    currentMouseX = x;
+    currentMouseY = y;
+    repaint();
+    return true;
+    }
+    else return false;
+    }*/
+  
+  public boolean DynamicScrolling(int theX, int theY){
+    //qui si inserisce una funzione che fa lo scrolling dinamico
+    //1-controlla che la posizione del mouse sia su un bordo della sketch visibile 
+    //se si, se non coincide con il bordo estremo,  scrolla di una unita'
+    
+    //si usa la parte visibile della sketch... o il view-port
+    Adjustable aHAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getHAdjustable();
+    Adjustable aVAdjustable =((ErmesSketchWindow)itsSketchWindow).itsScrollerView.getVAdjustable();
+    if(theX>=aHAdjustable.getVisibleAmount()+aHAdjustable.getValue()){
+      aHAdjustable.setValue(aHAdjustable.getValue()+aHAdjustable.getUnitIncrement());
+      return true;
+    }
+    if(theY>=aVAdjustable.getVisibleAmount()+aVAdjustable.getValue()){
+      aVAdjustable.setValue(aVAdjustable.getValue()+aVAdjustable.getUnitIncrement());
+      return true;
+    }
+    if(theX<=aHAdjustable.getValue()){
+      aHAdjustable.setValue(aHAdjustable.getValue()-aHAdjustable.getUnitIncrement());
+      return true;
+    }
+    if(theY<=aVAdjustable.getValue()){
+      aVAdjustable.setValue(aVAdjustable.getValue()-aVAdjustable.getUnitIncrement());
+      return true;
+    }
+    else return false;
+  }
+
+
+  //--------------------------------------------------------
+  //	mouseExit
+  //--------------------------------------------------------
+  /* public boolean mouseExit(Event evt,int x,int y) {
+     if (itsRunMode) return false;		
+     if(itsSketchWindow.getCursorType()==Frame.CROSSHAIR_CURSOR){ 
+     itsSketchWindow.setCursor(Frame.DEFAULT_CURSOR);
+     itsCurrentInOutlet.itsAlreadyMoveIn = false;
+     }
+     return true;
+     }*/
+  
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////mouseMotionListener--inizio
+
+  public void mouseDragged(MouseEvent e){
+    Rectangle aRect;
+    int x = e.getX();
+    int y = e.getY();
+    
+    if(itsRunMode) {
+      if(itsStartDragObject != null) itsStartDragObject.MouseDrag(e, x, y);
+      return;
+    }
+
+    DynamicScrolling(x, y);
+
+    if(editStatus == AREA_SELECT) {
+      if((java.lang.Math.abs(x-currentPoint.x)<5)||(java.lang.Math.abs(y-currentPoint.y)<5)) 
+	return;
+      if(x>currentPoint.x) 
+	if(y>currentPoint.y)	
+	  currentRect.setBounds(currentPoint.x,currentPoint.y,x-currentPoint.x, y-currentPoint.y);
+	else currentRect.setBounds(currentPoint.x, y, x-currentPoint.x, currentPoint.y-y);
+      else if(y>currentPoint.y)  
+	currentRect.setBounds(x, currentPoint.y, currentPoint.x-x, y-currentPoint.y); 
+      else currentRect.setBounds(x, y, currentPoint.x-x, currentPoint.y-y);
+      
+      update(getGraphics());
+      return;
+    } 
+    if(editStatus == RESIZING_OBJECT) {
+      if((java.lang.Math.abs(x-currentResizeRect.x)<5)||
+	 (java.lang.Math.abs(y-currentResizeRect.y)<5)) return;
+      currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
+      update(getGraphics());
+      return;
+    } 
+    else if (editStatus == MOVING){
+      repaint();
+      if((itsStartInclusionRect.x+(x-itsStartMovingPt.x)>0)&&
+	 (itsStartInclusionRect.y+(y-itsStartMovingPt.y)>0)){
+	currentMouseX = x;
+	currentMouseY = y;
+      }
+      repaint();
+      return;
+    }
+    else if(editStatus == MOVINGSEGMENT){
+      currentMouseX = x;
+      currentMouseY = y;
+      repaint();
+      return;
+    }
+    else return;
+  }
+
+  public void mouseMoved(MouseEvent e){
+    int x = e.getX();
+    int y = e.getY();
+    if (itsRunMode) return;
+    if(itsHelper.IsInInOutLet(x,y)) {
+      itsSketchWindow.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+      if((e.isControlDown())&&(!itsCurrentInOutlet.itsAlreadyMoveIn)){
+	if (e.isShiftDown()) MultiConnect(itsCurrentInOutlet);
+	else{
+	  if (!itsCurrentInOutlet.GetSelected())
+	    itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+	  else 
+	    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
+	}
+	itsCurrentInOutlet.itsAlreadyMoveIn = true;
+      }
+      return;
+    }
+    else 
+      if(itsHelper.IsInObject(x,y))
+	if(itsCurrentObject.MouseMove(e,x,y)) return;
+    itsSketchWindow.setCursor(Cursor.getDefaultCursor());
+    if(itsCurrentInOutlet!=null)
+      if(itsCurrentInOutlet.itsAlreadyMoveIn) itsCurrentInOutlet.itsAlreadyMoveIn = false;
+  }
+
+  //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////mouseMotionListenr--fine
+  
+
+  //--------------------------------------------------------
+  //	mouseMove
+  //--------------------------------------------------------
+  /*public boolean mouseMove(Event evt,int x,int y){
+    if (itsRunMode) return false;
+    if(itsHelper.IsInInOutLet(x,y)) {
+    itsSketchWindow.setCursor(Frame.CROSSHAIR_CURSOR);
+    //qui potrebbe essere che se c'e' il control pigiato fa come se avessi cliccato
+    if(((evt.modifiers & Event.CTRL_MASK)!=0)&&(!itsCurrentInOutlet.itsAlreadyMoveIn)){
+    if ((evt.modifiers & Event.SHIFT_MASK) != 0) MultiConnect(itsCurrentInOutlet);
+    else{
+    if (!itsCurrentInOutlet.GetSelected())
+    itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+    else 
+    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
+    }
+    itsCurrentInOutlet.itsAlreadyMoveIn = true;
+    }
+    return true;
+    }
+    else 
+    if(itsHelper.IsInObject(x,y))
+    if(itsCurrentObject.MouseMove(evt,x,y)) return true;
+    itsSketchWindow.setCursor(Frame.DEFAULT_CURSOR);
+    if(itsCurrentInOutlet!=null)
+    if(itsCurrentInOutlet.itsAlreadyMoveIn) itsCurrentInOutlet.itsAlreadyMoveIn = false;
+    return true;
+    }*/
+  
+  //--------------------------------------------------------
+  //	mouseUp
+  //	handling of AREA_SELECT and MOVING states termination
+  //--------------------------------------------------------
+
+      /*public boolean mouseUp(Event event, int x, int y) {
+	if(itsScrolled) itsScrolled=false;
+	
+	if (itsRunMode) {
+	if (itsStartDragObject != null) itsStartDragObject.MouseUp(event, x, y);
+	itsStartDragObject = null;
+	}
+	if (editStatus == AREA_SELECT) {
+	
+	Rectangle aRect = itsHelper.NormalizedRect(currentRect);
+	if (!aRect.isEmpty()) { 
+	for (Enumeration e = itsElements.elements() ; e.hasMoreElements() ;) {
+	ErmesObject aObject = (ErmesObject) e.nextElement();
+	if (aObject.Bounds().intersects(aRect)) {
+	aObject.Select();
+	aObject.Paint(offGraphics);
+	itsSelectedList.addElement(aObject);
+	}
+	}			
+	if (offScreenPresent) {
+	CopyTheOffScreen(getGraphics());
+	}
+	else {//should never happen, but..
+	DrawOffScreen(getGraphics());
+	}
+	}
+	else if ((event.modifiers & Event.SHIFT_MASK) == 0) itsHelper.DeselectAll();
+	
+	currentRect = null;
+	currentPoint = null;
+	if (itsSelectedList.isEmpty()) editStatus = DOING_NOTHING;
+	else editStatus = START_SELECT;
+	return true;
+	}
+	else if (editStatus == MOVING) {
+	int aDeltaH, aDeltaV;
+	editStatus = START_SELECT;
+	if((currentMouseX-itsStartMovingPt.x!=0)||(currentMouseY-itsStartMovingPt.y!=0)){
+	aDeltaH = currentMouseX-itsStartMovingPt.x;
+	aDeltaV = currentMouseY-itsStartMovingPt.y;
+	if(doSnapToGrid){
+	Point aPoint = itsHelper.SnapToGrid(aDeltaH, aDeltaV);
+	aDeltaH = aPoint.x;
+	aDeltaV = aPoint.y;
+	}
+	itsHelper.MoveElements(aDeltaH, aDeltaV);
+	itsHelper.SaveElementRgn();
+	itsHelper.MoveElemConnections(aDeltaH,aDeltaV);
+	}
+	repaint();
+	}
+	else if (editStatus == MOVINGSEGMENT){
+	if(itsHelper.IsMovable(itsSelectedSegment)) {
+	itsHelper.MoveDraggedSegment(currentMouseX-itsStartMovingPt.x, currentMouseY-itsStartMovingPt.y);
+	ErmesConnection aConnection = itsSelectedSegment.GetConnection();
+	SaveConnectionRgn(aConnection);
+	aConnection.GetConnectionSet().SaveRgn(aConnection);
+	aConnection.GetConnectionSet().UpdateCircles();
+	}
+	editStatus = START_SELECT;
+	repaint();
+	}
+	else if (editStatus == RESIZING_OBJECT){
+	itsCurrentObject.MouseUp(event,x,y);
+	editStatus = START_SELECT;
+	repaint();
+	}
+	else if(editStatus == DOING_NOTHING) return false;
+	return true;
+	}*/
+  
+      public ErmesObjEditField GetEditField(){
+	return itsEditField;
+      }
+
+      //--------------------------------------------------------
+      //	MoveSegment
+      //--------------------------------------------------------
+  public void MoveSegment(ErmesConnSegment theSegment, MouseEvent evt, int theX, int theY)
+    {
     itsSelectedSegment = theSegment;
     editStatus = MOVINGSEGMENT;
     itsStartMovingPt.x = theX;
@@ -1241,7 +1530,7 @@ return true;
   //--------------------------------------------------------
   //	preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
   
@@ -1253,8 +1542,8 @@ return true;
     for (int i=0; i<temp; i++) {
       itsInChoice.addItem(Integer.toString(i+1));
     }
-    itsInChoice.move(-200, -200);
-    itsInChoice.hide();
+    itsInChoice.setLocation(-200, -200);
+    itsInChoice.setVisible(false);
     add(itsInChoice);
   }
 
@@ -1266,8 +1555,8 @@ return true;
     for (int i=0; i<temp; i++) {
       itsOutChoice.addItem(Integer.toString(i+1));
     }
-    itsOutChoice.move(-200, -200);
-    itsOutChoice.hide();
+    itsOutChoice.setLocation(-200, -200);
+    itsOutChoice.setVisible(false);
     add(itsOutChoice);
   }
 

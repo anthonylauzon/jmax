@@ -1,12 +1,13 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 
 /**
  * The toolbar's button. It handles the selected/unselected state,
  * and inform the toolbar when it is pressed.
  */
-class ErmesToggleButton extends Canvas {
+class ErmesToggleButton extends Canvas implements MouseListener{
   boolean pressed;
   private int itsNum;
   Image itsImage1, itsImage2;
@@ -22,13 +23,14 @@ class ErmesToggleButton extends Canvas {
     itsToolBar = theToolBar;
     itsImage1 = theImage1;
     itsImage2 = theImage2;
+    addMouseListener(this);
   }
   
   //--------------------------------------------------------
   //	paint
   //--------------------------------------------------------
   public void paint(Graphics g) {
-    Dimension d = size();
+    Dimension d = getSize();
     g.setColor(Color.lightGray);
     
     g.draw3DRect(0, 0, d.width - 1, d.height - 1, true);
@@ -41,7 +43,7 @@ class ErmesToggleButton extends Canvas {
   //--------------------------------------------------------
   //	mouseDown
   //--------------------------------------------------------
-  public boolean mouseDown(Event evt,int x, int y) {
+  /*public boolean mouseDown(MouseEvent evt,int x, int y) {
     
     if(evt.clickCount>1 && pressed) {//double click = lock
       pressed = false;	  
@@ -56,8 +58,36 @@ class ErmesToggleButton extends Canvas {
     }
     else itsToolBar.ButtonDepressed(itsNum);
     return true;
-  }
+  }*/
   
+  /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////mouseListener--inizio
+  public void mouseClicked(MouseEvent e){}
+
+  public void mousePressed(MouseEvent e){
+     if(e.getClickCount()>1 && pressed) {//double click = lock
+      pressed = false;	  
+      itsToolBar.ButtonPressed(itsNum);
+      repaint();
+      itsToolBar.Lock();
+      return;
+    }
+    Toggle();
+    if (pressed) {
+      itsToolBar.ButtonPressed(itsNum);
+    }
+    else itsToolBar.ButtonDepressed(itsNum);
+  }
+
+  public void mouseReleased(MouseEvent e){}
+  
+  public void mouseEntered(MouseEvent e){}
+
+  public void mouseExited(MouseEvent e){}
+
+  /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////mouseListener--fine
+
   //--------------------------------------------------------
   //	Toggle
   //--------------------------------------------------------
@@ -69,15 +99,15 @@ class ErmesToggleButton extends Canvas {
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
-  public Dimension minimumSize() {
+  public Dimension getMinimumSize() {
     return new Dimension(40,32);
   }
 
   //--------------------------------------------------------
   //	preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
-    return minimumSize();
+  public Dimension getPreferredSize() {
+    return getMinimumSize();
   }
 }
 

@@ -94,7 +94,7 @@ class ErmesRegion
     Point aPoint = new Point(thePoint.x,thePoint.y);
     for(int i=0; i<itsRegions.size() ; i++){
       aRect = (Rectangle)itsRegions.elementAt(i);
-      if(aRect.inside(aPoint.x, aPoint.y)) return true;
+      if(aRect.contains(aPoint.x, aPoint.y)) return true;
     }
     return false;
   }

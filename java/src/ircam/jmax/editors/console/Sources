@@ -1,4 +1,6 @@
 SOURCES = Console.java \
 	  ConsoleKeyListener.java \
-	  ConsoleWriter.java
-
+	  ConsoleWriter.java \
+          ConsoleWindow.java \
+	  ConsoleThread.java \
+	  ConsoleDocument.java

@@ -226,7 +226,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     ErmesObject aErmesObject = null;
     FtsObject aFObject = null;
     FtsGraphicDescription aGDescription = null;
-    Rectangle aRect = itsSketchWindow.bounds();
+    Rectangle aRect = itsSketchWindow.getBounds();
     String ermesInfo = new String();
     
     itsPatcher.setWindowDescription(new FtsWindowDescription(""+aRect.x+" "+aRect.y+" "+aRect.width+" "+aRect.height+" "+"1"+" \"(name:"+itsFileName+")\""));

@@ -16,7 +16,7 @@ public class ErmesScrollerView extends ScrollPane {
   public ErmesScrollerView(Frame theSketchWindow, Panel theView) {
     view = theView;
     view.validate();
-    imageSize = new Dimension(view.preferredSize());
+    imageSize = new Dimension(view.getPreferredSize());
     add(view, 0);
     getHAdjustable().setUnitIncrement(10);
     getVAdjustable().setUnitIncrement(10);

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -154,7 +155,7 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   //  mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(Event evt,int x, int y) {
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
       itsFirstY = y;
       if (firstClick) {
@@ -163,14 +164,14 @@ class ErmesObjFloat extends ErmesObject {
       }
       itsFtsObject.putProperty("value", new Float(itsFloat));
       DoublePaint();
-      if(evt.clickCount>1) fastMode = true;
+      if(evt.getClickCount()>1) fastMode = true;
       else fastMode = false;	//ENZOOOOOO!
     }
-    else if(evt.clickCount>1) {
-      Point aPoint = GetSketchWindow().location();
-      itsFloatDialog.move(aPoint.x + itsX,aPoint.y + itsY - 25);
+    else if(evt.getClickCount()>1) {
+      Point aPoint = GetSketchWindow().getLocation();
+      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
       itsFloatDialog.ReInit(String.valueOf(itsFloat), this, GetSketchWindow());
-      itsFloatDialog.show();
+      itsFloatDialog.setVisible(true);
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
@@ -179,7 +180,7 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   //  mouseUp
   //--------------------------------------------------------
-  public boolean MouseUp(Event evt,int x, int y) {
+  public boolean MouseUp(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
       itsStartingValue = itsFloat;
       firstClick = true;
@@ -206,7 +207,7 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   // mouseDrag
   //--------------------------------------------------------
-  public boolean MouseDrag(Event evt,int x, int y) {
+  public boolean MouseDrag(MouseEvent evt,int x, int y) {
     
     if(itsSketchPad.itsRunMode){
       if (fastMode)
@@ -287,14 +288,14 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
   }
   
   //--------------------------------------------------------
   // preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
 

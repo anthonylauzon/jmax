@@ -158,18 +158,20 @@ abstract public class ErmesObjInOutlet {
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
     
   }
   
   //--------------------------------------------------------
   //	preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
   
 }
+
+
 
 

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -46,7 +47,7 @@ class ErmesObjComment extends ErmesObject {
       itsTextArea.setBackground(Color.white);
       currentRect = new Rectangle();
       itsSketchPad.add(itsTextArea);
-      itsTextArea.hide();	//for now...
+      itsTextArea.setVisible(false);
     }
     else {
       itsFontMetrics = itsTextArea.getFontMetrics(itsFont);
@@ -61,9 +62,9 @@ class ErmesObjComment extends ErmesObject {
     
     Reshape(itsX, itsY, preferredSize.width, preferredSize.height);//?
     
-    itsTextArea.reshape(itsX, itsY+currentRect.height,currentRect.width, currentRect.height);
+    itsTextArea.setBounds(itsX, itsY+currentRect.height,currentRect.width, currentRect.height);
     itsSketchPad.validate();
-    itsTextArea.show();
+    itsTextArea.setVisible(true);
     itsTextArea.requestFocus();
     return true;
   }
@@ -86,7 +87,7 @@ class ErmesObjComment extends ErmesObject {
       itsTextArea.setBackground(Color.white);
       currentRect = new Rectangle();
       itsSketchPad.add(itsTextArea);
-      itsTextArea.hide();    
+      itsTextArea.setVisible(false);    
     }
 
     // MDC:
@@ -96,7 +97,7 @@ class ErmesObjComment extends ErmesObject {
   }
 	
   
-  public boolean MouseUp(Event evt,int x,int y) {
+  public boolean MouseUp(MouseEvent evt,int x,int y) {
     int newCols = 20;
     //int temp = itsFontMetrics.getMaxAdvance();	//debug only
     int temp = itsFontMetrics.stringWidth(check) / check.length();
@@ -207,14 +208,14 @@ class ErmesObjComment extends ErmesObject {
     return true;	//for now, everything is allowed
   }
 
-  public boolean MouseDown_specific(Event evt, int x, int y) {
+  public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
     if (itsSketchPad.itsRunMode) return true;
     else   
-      if (evt.clickCount > 1) { //re-edit the field.. 
+      if (evt.getClickCount() > 1) { //re-edit the field.. 
 	itsTextArea.setText(itsArgs);
 	itsTextArea.itsOwner = this;
-	itsTextArea.reshape(itsX, itsY, itsFontMetrics.stringWidth("linea campione italiana, moltiplicata diciamo 5 righe"), itsFontMetrics.getHeight()*5);
-	itsTextArea.show();
+	itsTextArea.setBounds(itsX, itsY, itsFontMetrics.stringWidth("linea campione italiana, moltiplicata diciamo 5 righe"), itsFontMetrics.getHeight()*5);
+	itsTextArea.setVisible(true);
 	itsTextArea.requestFocus();
       }
       else itsSketchPad.ClickOnObject(this, evt, x, y);
@@ -282,13 +283,13 @@ class ErmesObjComment extends ErmesObject {
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize(); //(depending on the layout manager).
+    public Dimension getMinimumSize() {
+        return getPreferredSize(); //(depending on the layout manager).
     }
 
     //If we don't specify this, the canvas might not show up at all
     //(depending on the layout manager).
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredSize;
     }
 

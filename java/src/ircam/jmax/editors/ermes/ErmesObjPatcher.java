@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -155,8 +156,8 @@ public class ErmesObjPatcher extends ErmesObject {
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(Event evt,int x, int y) {
-    if(evt.clickCount>1){
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    if(evt.getClickCount()>1){
       if (itsSubWindow != null) {
 	itsSubWindow.show();
 	itsSketchPad.itsFirstClick = true;

@@ -300,7 +300,7 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject;
     ErmesConnection aConnection; 
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
-      itsSketchPad.GetEditField().nextFocus();
+      itsSketchPad.GetEditField().transferFocus();
     }
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
@@ -334,7 +334,7 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject;
     ErmesConnection aConnection; 
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
-      itsSketchPad.GetEditField().nextFocus();
+      itsSketchPad.GetEditField().transferFocus();
     }
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
@@ -368,7 +368,7 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject;
     ErmesConnection aConnection; 
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
-      itsSketchPad.GetEditField().nextFocus();
+      itsSketchPad.GetEditField().transferFocus();
     }
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
@@ -494,7 +494,7 @@ class ErmesSketchHelper extends Object{
       for(Enumeration e1 = aObject.GetInletList().elements(); e1.hasMoreElements();) {
 	aInlet = (ErmesObjInlet)e1.nextElement();
 	aRect = aInlet.Bounds();
-	if(aRect.inside(x,y)) {
+	if(aRect.contains(x,y)) {
 	  itsSketchPad.itsCurrentInOutlet = aInlet;
 	  return true;
 	}
@@ -502,7 +502,7 @@ class ErmesSketchHelper extends Object{
       for(Enumeration e2 = aObject.GetOutletList().elements(); e2.hasMoreElements();) {
 	aOutlet = (ErmesObjOutlet)e2.nextElement();
 	aRect = aOutlet.Bounds();
-	if(aRect.inside(x,y)) {
+	if(aRect.contains(x,y)) {
 	  itsSketchPad.itsCurrentInOutlet = aOutlet;
 	  return true;
 	}
@@ -520,7 +520,7 @@ class ErmesSketchHelper extends Object{
     for(int i = itsSketchPad.itsElements.size()-1; i>=0;i--){//???
       aObject = (ErmesObject)itsSketchPad.itsElements.elementAt(i);//????
       aRect = aObject.Bounds();
-      if(aRect.inside(x,y)) {
+      if(aRect.contains(x,y)) {
 	itsSketchPad.itsCurrentObject = aObject;
 	return true;
       }
@@ -898,8 +898,8 @@ class ErmesSketchHelper extends Object{
 	if (itsSketchPad.ftsNames[i].equals(theName)) return itsSketchPad.objectNames[i];
     }		
     ErrorDialog aErr = new ErrorDialog(itsSketchPad.itsSketchWindow, theName + " Not known in ermes");
-    aErr.move(50, 50);
-    aErr.show();
+    aErr.setLocation(50, 50);
+    aErr.setVisible(true);
     
     return ("ermes.ErmesObjComment");
   }

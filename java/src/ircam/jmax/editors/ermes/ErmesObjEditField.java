@@ -1,13 +1,14 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 
 /**
  * The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
  */
-public class ErmesObjEditField extends TextField {
+public class ErmesObjEditField extends TextField implements KeyListener, FocusListener {
   boolean laidOut = false;
   boolean focused = false;    
   ErmesObjEditableObject itsOwner= null;
@@ -23,12 +24,14 @@ public class ErmesObjEditField extends TextField {
     setEditable(true); 
     selectAll();
     itsSketchPad = theSketchPad;
+    addKeyListener(this);
+    addFocusListener(this);
   }
  
   ////////////////
-  public boolean lostFocus() {
+  /*public boolean lostFocus() {
     return true;
-  }
+    }*/
   //--------------------------------------------------------
   // lostFocus
   //--------------------------------------------------------
@@ -43,8 +46,8 @@ public class ErmesObjEditField extends TextField {
     // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
     if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
-      hide();
-      move(-200,-200);
+      setVisible(false);
+      setLocation(-200,-200);
       
       if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
       itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
@@ -73,7 +76,7 @@ public class ErmesObjEditField extends TextField {
 
     int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
     
-    if((lenght< size().width-20)&&(!itsOwner.itsResized)){
+    if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+itsOwner.WIDTH_DIFF+10;
       itsOwner.resize(d1.width, d1.height);
@@ -82,8 +85,8 @@ public class ErmesObjEditField extends TextField {
     
     itsOwner.itsInEdit = false;
 
-    hide();
-    move(-200,-200);
+    setVisible(false);
+    setLocation(-200,-200);
     focused = false;
     itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     
@@ -96,15 +99,32 @@ public class ErmesObjEditField extends TextField {
   //--------------------------------------------------------
   // gotFocus
   //--------------------------------------------------------
-  public boolean gotFocus(Event evt, Object what) {
+  /*public boolean gotFocus(Event evt, Object what) {
     itsSketchPad.editStatus = ErmesSketchPad.EDITING_OBJECT;
     if (focused) return true;
     else focused = true;
     
     if (getText().compareTo("") == 0) return true; 
     else return true;
-  }
+    }*/
 	
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////focusListener --inizio
+  public void focusGained(FocusEvent e){
+    itsSketchPad.editStatus = ErmesSketchPad.EDITING_OBJECT;
+    if (focused) return;
+    else focused = true;
+    
+    //if (getText().compareTo("") == 0) return true; 
+    //else return true;
+  }
+
+  public void focusLost(FocusEvent e){}
+
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////focusListener --fine
+
+
 	
   //--------------------------------------------------------
   // HasFocus()
@@ -113,10 +133,14 @@ public class ErmesObjEditField extends TextField {
     return focused;
   }
 
-  //--------------------------------------------------------
-  // keyDown()
-  //--------------------------------------------------------
-  public boolean keyDown(Event e, int k){
+   /////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////keyListener --inizio
+
+
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+
+  public void keyPressed(KeyEvent e){
     int lenght;
     String s1, s2;
     int start = getSelectionStart();
@@ -126,48 +150,48 @@ public class ErmesObjEditField extends TextField {
     int aWidth;
     
     if (isEditable()) {
-      if(k == ircam.jmax.utils.Platform.ENTER_KEY || k == ircam.jmax.utils.Platform.RETURN_KEY){//return
-	/*Dimension d2 = itsOwner.size();
-	  d2.height += fm.getHeight();
-	  itsOwner.ResizeTo(d2);
-	  itsOwner.validate();*/
-	return true;
+      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
+	//Dimension d2 = itsOwner.size();
+	//d2.height += fm.getHeight();
+	// itsOwner.ResizeTo(d2);
+	//itsOwner.validate();
+	return;
       }
-      else if(k == Event.LEFT){//freccia a sinistra
+      else if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
 	if(start==end){
 	  if(start>0){
-	    if(e.shiftDown())
+	    if(e.isShiftDown())
 	      select(start-1, start);
 	    else
 	      select(start-1,start-1);
 	  }
 	}
 	else{
-	  if(e.shiftDown())
+	  if(e.isShiftDown())
 	    select(start-1, end);
 	  else
 	    select(start,start);
 	}
       }
-      else if(k == Event.RIGHT){//freccia a destra
+      else if(e.getKeyCode() == Event.RIGHT){//freccia a destra
 	if(start==end){
 	  if(start < s.length()){
-	    if(e.shiftDown())
+	    if(e.isShiftDown())
 	      select(start, end+1);
 	    else
 	      select(start+1,start+1);
 	  }
 	}
 	else{
-	  if(e.shiftDown())
+	  if(e.isShiftDown())
 	    select(start, end+1);
 	  else
 	    select(end,end);
 	}
       }
-      else if((k== Event.UP)||(k== Event.DOWN))
-	return true;
-      else if (k == ircam.jmax.utils.Platform.DELETE_KEY || k == ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
+      else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
+	return;
+      else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
 	if(start==end){//se non c' testo selezionato
 	  if(start>0){
 	    if(start < s.length()){//cancella intermedio
@@ -189,8 +213,8 @@ public class ErmesObjEditField extends TextField {
 	  select(start,start);
 	}
 	
-	/*meglio che cancellando non faccia il resize*/
-
+	//meglio che cancellando non faccia il resize
+	
 	//lenght = fm.stringWidth(s);
 	//if ((lenght< size().width-20)&&(lenght>itsOwner.minimumSize().width-20)){
 	// Dimension d1 = itsOwner.Size();
@@ -200,6 +224,7 @@ public class ErmesObjEditField extends TextField {
 	//}
       }
       else{//scrittura
+	char k = e.getKeyChar();
 	if(start!=end){//cancella selezione
 	  s1 = s.substring(0, start);
 	  s2 = s.substring(end, s.length());
@@ -209,16 +234,15 @@ public class ErmesObjEditField extends TextField {
 	if(start < s.length()){//inserisce testo intermedio
 	  s1 = s.substring(0, start);
 	  s2 = s.substring(start, s.length());
-	  s = s1+(char)k+s2;
+	  s = s1+k+s2;
 	  setText(s);
 	}
 	else//inserisce testo in coda
-	  s = s+(char)k;
-	
+	  s = s+k;
 	
 	lenght = fm.stringWidth(s);
 	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	if (lenght >= size().width-5) {
+	if (lenght >= getSize().width-5) {
 	  Dimension d = itsOwner.Size();
 	  if(aWidth>20) d.width += aWidth;
 	  else d.width += 30;
@@ -228,9 +252,131 @@ public class ErmesObjEditField extends TextField {
 	select(start+1,start+1);
       }
     }
-    return true;
   }
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// keyListener --fine
 
+
+
+
+  //--------------------------------------------------------
+  // keyDown()
+  //--------------------------------------------------------
+  /* public boolean keyDown(Event e, int k){
+     int lenght;
+     String s1, s2;
+     int start = getSelectionStart();
+     int end = getSelectionEnd();
+     String s = getText();
+     FontMetrics fm = getFontMetrics(getFont());
+     int aWidth;
+    
+     if (isEditable()) {
+     if(k == ircam.jmax.utils.Platform.ENTER_KEY || k == ircam.jmax.utils.Platform.RETURN_KEY){//return
+     //Dimension d2 = itsOwner.size();
+     //d2.height += fm.getHeight();
+     // itsOwner.ResizeTo(d2);
+     //itsOwner.validate();
+     return true;
+     }
+     else if(k == Event.LEFT){//freccia a sinistra
+     if(start==end){
+     if(start>0){
+     if(e.shiftDown())
+     select(start-1, start);
+     else
+     select(start-1,start-1);
+     }
+     }
+     else{
+     if(e.shiftDown())
+     select(start-1, end);
+     else
+     select(start,start);
+     }
+     }
+     else if(k == Event.RIGHT){//freccia a destra
+     if(start==end){
+     if(start < s.length()){
+     if(e.shiftDown())
+     select(start, end+1);
+     else
+     select(start+1,start+1);
+     }
+     }
+     else{
+     if(e.shiftDown())
+     select(start, end+1);
+     else
+     select(end,end);
+     }
+     }
+     else if((k== Event.UP)||(k== Event.DOWN))
+     return true;
+     else if (k == ircam.jmax.utils.Platform.DELETE_KEY || k == ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
+     if(start==end){//se non c' testo selezionato
+     if(start>0){
+     if(start < s.length()){//cancella intermedio
+     s1 = s.substring(0, start-1);
+     s2 = s.substring(start, s.length());
+     s = s1+s2;
+     }
+     else//cancella in coda
+     s = s.substring(0, s.length()-1);
+     setText(s);
+     select(start-1,start-1);
+     }
+     }
+     else{//se c' testo selezionato
+     s1 = s.substring(0, start);
+     s2 = s.substring(end, s.length());
+     s = s1+s2;
+     setText(s);
+     select(start,start);
+     }
+	
+     //meglio che cancellando non faccia il resize
+     
+     //lenght = fm.stringWidth(s);
+     //if ((lenght< size().width-20)&&(lenght>itsOwner.minimumSize().width-20)){
+     // Dimension d1 = itsOwner.Size();
+     // d1.width -= 20;
+     itsOwner.itsArgs = s;
+     //itsOwner.resize(d1.width, d1.height);
+     //}
+     }
+     else{//scrittura
+     if(start!=end){//cancella selezione
+     s1 = s.substring(0, start);
+     s2 = s.substring(end, s.length());
+     s = s1+s2;
+     select(start,start);
+     }
+     if(start < s.length()){//inserisce testo intermedio
+     s1 = s.substring(0, start);
+     s2 = s.substring(start, s.length());
+     s = s1+(char)k+s2;
+     setText(s);
+     }
+     else//inserisce testo in coda
+     s = s+(char)k;
+     
+     
+     lenght = fm.stringWidth(s);
+     aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
+     if (lenght >= size().width-5) {
+     Dimension d = itsOwner.Size();
+     if(aWidth>20) d.width += aWidth;
+     else d.width += 30;
+     itsOwner.resize(d.width, d.height);
+     }
+     setText(s);
+     select(start+1,start+1);
+     }
+     }
+     return true;
+     }
+     */
   //--------------------------------------------------------
   // paint()
   //--------------------------------------------------------
@@ -240,8 +386,8 @@ public class ErmesObjEditField extends TextField {
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    Dimension r = itsOwner.preferredSize();
+  public Dimension getMinimumSize() {
+    Dimension r = itsOwner.getPreferredSize();
     Dimension d = new Dimension(r.width-itsOwner.WIDTH_DIFF, r.height-itsOwner.HEIGHT_DIFF);
     return d;
   }
@@ -249,8 +395,8 @@ public class ErmesObjEditField extends TextField {
   //--------------------------------------------------------
   // preferredSize()
   //--------------------------------------------------------
-  public Dimension preferredSize() {
-    return minimumSize();
+  public Dimension getPreferredSize() {
+    return getMinimumSize();
   }
   
 }

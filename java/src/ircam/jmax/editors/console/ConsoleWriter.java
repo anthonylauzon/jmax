@@ -21,8 +21,8 @@ class ConsoleWriter extends Writer {
 		    int len) throws IOException {				 
 		      temp.setLength(0);
 		      temp.append(cbuf, off, len);
-		      itsConsole.text.append(temp.toString());
-		      System.err.println("Console Output:"+temp.toString());
+		      itsConsole.getTextArea().append(temp.toString());
+		      //System.err.println("Console Output:"+temp.toString());
   }
   public void flush() {
   }

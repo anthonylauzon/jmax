@@ -26,16 +26,16 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
     }
     g.setColor(Color.black);
 
-    if(itsOwner.itsSketchPad.itsRunMode) g.fillRect(itsX+1, itsY+7, preferredSize().width-2, 2);
+    if(itsOwner.itsSketchPad.itsRunMode) g.fillRect(itsX+1, itsY+7, getPreferredSize().width-2, 2);
     else{
       if (selected){
-	g.drawOval(itsX+1, itsY, preferredSize().width-2,preferredSize().height-4);
+	g.drawOval(itsX+1, itsY, getPreferredSize().width-2,getPreferredSize().height-4);
 	g.drawLine(itsX+3, itsY+4, itsX+3, itsY+8);
       }
       else 
-	if(connected) g.fillRect(itsX+1, itsY+7, preferredSize().width-2, 2);
+	if(connected) g.fillRect(itsX+1, itsY+7, getPreferredSize().width-2, 2);
 	else{	// not selected, not connected
-	  g.fillOval(itsX+1, itsY+3, preferredSize().width-2,preferredSize().height-4);
+	  g.fillOval(itsX+1, itsY+3, getPreferredSize().width-2,getPreferredSize().height-4);
 	  g.drawLine(itsX+3, itsY+7, itsX+3, itsY+8);
 	}
     }
@@ -55,3 +55,4 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
     return aPoint;
   }
 }
+

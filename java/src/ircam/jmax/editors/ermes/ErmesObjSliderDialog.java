@@ -1,10 +1,11 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import ircam.jmax.utils.*;
 
 
-class ErmesObjSliderDialog extends Dialog {
+class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -25,7 +26,8 @@ class ErmesObjSliderDialog extends Dialog {
     p1.setLayout(new FlowLayout(FlowLayout.LEFT));
     
     p1.add(new Label("Slider Maximum Value"));
-    value = new TextField(/*itsFloatObject.GetFloatString()*/"", 20);
+    value = new TextField("", 20);
+    value.addActionListener(this);
     p1.add(value);
     
     add("North",p1);
@@ -36,42 +38,73 @@ class ErmesObjSliderDialog extends Dialog {
     
     okButton = new Button("OK");
     okButton.setBackground(Color.white);
+    okButton.addActionListener(this);
     p2.add("East", okButton);
     cancelButton = new Button("Cancel");
     cancelButton.setBackground(Color.white);
+    cancelButton.addActionListener(this);
     p2.add("West", cancelButton);
     
     add("South", p2);
     //Initialize this dialog to its preferred size.
     pack();
+
+    addKeyListener(this);
   }
 
-  public boolean action(Event event, Object arg) {
-    
+   ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// actionListener --inizio
+
+  public void actionPerformed(ActionEvent e){        
     Integer aInt = null;
-    if ( event.target == okButton) {
-      //	Ok action
+    if (e.getSource() == okButton) {
       itsValue = value.getText();
       try{
 	aInt = new Integer(itsValue);
       }
-      catch (NumberFormatException e){
-	hide();
-	return false;
+      catch (NumberFormatException e1){
+	setVisible(false);
+	return;
       }
       itsSliderObject.FromDialogValueChanged(aInt);
-      hide();
+      setVisible(false);
+    }
+    else if (e.getSource()==cancelButton) {
+      setVisible(false);
+    }
+    else if (e.getSource()==value) {
+      itsValue = value.getText();
+    }
+  }
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// actionListener --fine
+
+  /*public boolean action(Event event, Object arg) {
+    
+    Integer aInt = null;
+    if ( event.target == okButton) {
+    //	Ok action
+    itsValue = value.getText();
+    try{
+    aInt = new Integer(itsValue);
+    }
+    catch (NumberFormatException e){
+    hide();
+    return false;
+    }
+    itsSliderObject.FromDialogValueChanged(aInt);
+    hide();
     }
     else if ( event.target == cancelButton) {
-      //	Cancel action
-      hide();
+    //	Cancel action
+    hide();
     }
     else if ( event.target == value) {
-      itsValue = value.getText();
-      //	Connection choose action
+    itsValue = value.getText();
+    //	Connection choose action
     }
     return true;
-  }
+    }*/
     
   public void ReInit(String theValue, ErmesObjSlider theSlider, Frame theFrame){
     itsValue = theValue;
@@ -80,21 +113,52 @@ class ErmesObjSliderDialog extends Dialog {
     itsParent = theFrame;
   }
     
-  public boolean keyDown(Event evt,int key) {
+  /*public boolean keyDown(Event evt,int key) {
     Integer aInteger = null;
     if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
+    itsValue = value.getText();
+    try{
+    aInteger = new Integer(itsValue);
+    }
+    catch (NumberFormatException e){
+    hide();
+    return false;
+    }
+    itsSliderObject.FromDialogValueChanged(aInteger);
+    hide();
+    return true;
+    }
+    return false;
+    }*/
+
+ /////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////keyListener --inizio
+  
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+
+  public void keyPressed(KeyEvent e){
+    Integer aInteger = null;
+    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
       itsValue = value.getText();
       try{
 	aInteger = new Integer(itsValue);
       }
-      catch (NumberFormatException e){
-	hide();
-	return false;
+      catch (NumberFormatException e1){
+	setVisible(false);
+	return;
       }
       itsSliderObject.FromDialogValueChanged(aInteger);
-      hide();
-      return true;
+      setVisible(false);
     }
-    return false;
   }
+  ////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////// keyListener --fine
 }
+
+
+
+
+
+
+

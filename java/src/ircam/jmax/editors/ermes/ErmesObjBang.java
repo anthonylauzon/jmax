@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.fts.*;
@@ -71,12 +72,12 @@ class ErmesObjBang extends ErmesObject {
   public void makeFtsObject() {
     itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "button", (Vector) null);
   }
-
+  
   public void redefineFtsObject() {
     // Bang don't redefine itself
   }
     
-  public boolean MouseDown_specific(Event evt,int x, int y) {
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
       //itsFtsObject.putProperty("value", new Integer(1));//?????
       itsFtsObject.sendMessage(0, "bang", null);
@@ -133,14 +134,19 @@ class ErmesObjBang extends ErmesObject {
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize(); //(depending on the layout manager).
+  public Dimension getMinimumSize() {
+    return getPreferredSize(); //(depending on the layout manager).
   }
   
   //If we don't specify this, the canvas might not show up at all
   //(depending on the layout manager).
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
   
 }
+
+
+
+
+

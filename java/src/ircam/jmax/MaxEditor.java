@@ -71,8 +71,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow {
   private Menu CreateWindowsMenu() {
     Menu windowsMenu = new Menu("Windows");
     windowsMenu.add(new MenuItem("Project Manager Ctrl+M"));
-    windowsMenu.add(new MenuItem("Ermes Console"));
-    windowsMenu.add(new MenuItem("Jacl Console"));
+    windowsMenu.add(new MenuItem("jMax Console"));
     AddWindowItems(windowsMenu);
     return windowsMenu;
   }
@@ -309,11 +308,8 @@ public abstract class MaxEditor extends Frame implements MaxWindow {
     if (theString.equals("Project Manager Ctrl+M")) {
       itsProject.itsProjectWindow.toFront();
     }
-    if (theString.equals("Ermes Console")) {
-      MaxApplication.getApplication().GetConsole().ToFront();
-    }
-    if (theString.equals("Jacl Console")) {
-      MaxApplication.getApplication().GetShell().ToFront();
+    if (theString.equals("jMax Console")) {
+      MaxApplication.getApplication().GetConsoleWindow().ToFront();
     }
     else BringToFront(theString);
     return true;
@@ -364,7 +360,8 @@ public abstract class MaxEditor extends Frame implements MaxWindow {
   }
 
   public abstract boolean OpenFile(String thename, String thePath);
-  
+  public abstract MaxDocument GetDocument();
+
   public Frame GetFrame(){
     return this;
   }

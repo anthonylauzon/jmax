@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.lang.Math;
 import ircam.jmax.*;
@@ -38,7 +39,7 @@ class ErmesObjSlider extends ErmesObject {
   
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
     itsThrottle = new ErmesObjThrottle(this);
     if(itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(theSketchPad.GetSketchWindow(), this);
@@ -59,7 +60,7 @@ class ErmesObjSlider extends ErmesObject {
     itsPixelRange += theDeltaV;
 
     itsStep = (float)itsRange/itsPixelRange;
-    itsThrottle.Resize(itsThrottle.preferredSize().width+theDeltaH, itsThrottle.preferredSize().height);
+    itsThrottle.Resize(itsThrottle.getPreferredSize().width+theDeltaH, itsThrottle.getPreferredSize().height);
     itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -itsInteger/itsStep));
   }
 
@@ -99,7 +100,7 @@ class ErmesObjSlider extends ErmesObject {
   
 
   
-  public boolean MouseDown_specific(Event evt, int x, int y){
+  public boolean MouseDown_specific(MouseEvent evt, int x, int y){
     if(itsSketchPad.itsRunMode){
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
@@ -107,17 +108,17 @@ class ErmesObjSlider extends ErmesObject {
 	return true;
       }
     }
-    else if(evt.clickCount>1) {
-      Point aPoint = GetSketchWindow().location();
-      itsSliderDialog.move(aPoint.x + itsX,aPoint.y + itsY - 25);
+    else if(evt.getClickCount()>1) {
+      Point aPoint = GetSketchWindow().getLocation();
+      itsSliderDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
       itsSliderDialog.ReInit(String.valueOf(itsRange), this, GetSketchWindow());
-      itsSliderDialog.show();
+      itsSliderDialog.setVisible(true);
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return false;
   }
   
-  public boolean MouseDrag(Event evt,int x, int y){
+  public boolean MouseDrag(MouseEvent evt,int x, int y){
     if((itsSketchPad.itsRunMode)&&(itsMovingThrottle == true)){
       if (itsY+currentRect.height-y> BOTTOM_OFFSET && itsY+UP_OFFSET<y) {
 	//compute the value and send to FTS
@@ -148,7 +149,7 @@ class ErmesObjSlider extends ErmesObject {
     }
   }
 	  
-  public boolean MouseUp(Event evt,int x, int y){
+  public boolean MouseUp(MouseEvent evt,int x, int y){
     if(itsSketchPad.itsRunMode){
       MaxApplication.getFtsServer().syncToFts();
       itsMovingThrottle = false;
@@ -160,7 +161,7 @@ class ErmesObjSlider extends ErmesObject {
   
   public boolean IsInThrottle(int theX, int theY){
     Rectangle aRect = itsThrottle.Bounds();
-    return aRect.inside(theX,theY);
+    return aRect.contains(theX,theY);
   }
   
   void MoveThrottleTo(int value) {//value between 0 and itsRange, to be scaled to 0ÖcurrentRect.height
@@ -216,11 +217,11 @@ class ErmesObjSlider extends ErmesObject {
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
   }
   
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
 }

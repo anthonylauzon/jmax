@@ -1,6 +1,7 @@
 package ircam.jmax; 
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 
@@ -100,7 +101,8 @@ public class MaxApplication extends Object {
   public final static int OPEN_WITH_AUTO_ROUTING = 17;
   public final static int SELECT_ALL = 18;
   public final static int PRINT_WINDOW = 19;
-  public Console itsConsole;//e.m.
+  Console itsConsole;
+  public ConsoleWindow itsConsoleWindow;
   Dimension d = new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
   final int SCREENVERT = d.height;
   final int SCREENHOR = d.width;
@@ -123,29 +125,23 @@ public class MaxApplication extends Object {
     ircam.jmax.fts.tcl.TclFtsPackage.installPackage(itsInterp);
     ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage(itsInterp);
 
-    itsConsole = new Console(itsInterp, 40, 40);//e.m.
-    itsConsole.getFrame().pack()/*resize(200, 300)*/;//e.m.
-    itsConsole.start();
-    itsConsole.getFrame().setVisible(true);
-    itsPrintWriter = itsConsole.getPrintWriter();
+
+    //LoadResources();
+    //ObeyCommand(NEW_PROJECT);
+
+    itsConsole = new Console(itsInterp);
+    itsConsole.Start();
+    itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
+    itsPrintWriter = itsConsoleWindow.getPrintWriter();
     itsPrintWriter.println("loading resources...");
+    
     LoadResources();
-
     ObeyCommand(NEW_PROJECT);
-
-    /*Rectangle r = itsProjectWindow.bounds();
-        itsShell = new ConsShell();//ermes package, ConsShell derives from cornell.jacl.Shell
-    itsShell.move(r.x + r.width, r.y); //put these constant in a conf. file
-    itsShell.resize(300, 150);           //put these constants in a conf. file
-    itsShell.init();
-
-    itsConsole.move(r.x+r.width, r.y+150);
-    itsConsole.pack();
-    itsConsole.show();*/
-
-
-    //      FIRST SCRIPT: user defined	
-
+    itsConsoleWindow.Init(itsProjectWindow.itsProject);
+    itsConsoleWindow.setLocation(0,0);
+    itsConsoleWindow.pack();
+    itsConsoleWindow.setVisible(true);
+    
     try
       {
 	itsInterp.evalFile(ermesProperties.getProperty("user.home")+ermesProperties.getProperty("file.separator")+".ermesrc");
@@ -326,7 +322,7 @@ public class MaxApplication extends Object {
 	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
       itsProjectWindow.AddWindowToMenu(theSketchWindow.getTitle());
-      itsConsole.AddWindowToMenu(theSketchWindow.getTitle());
+      itsConsoleWindow.AddWindowToMenu(theSketchWindow.getTitle());
     }
   }
 
@@ -343,7 +339,7 @@ public class MaxApplication extends Object {
 	  aWindow.AddWindowToMenu(theName);
     }
     itsProjectWindow.AddWindowToMenu(theName);
-    itsConsole.AddWindowToMenu(theName);
+    itsConsoleWindow.AddWindowToMenu(theName);
   }
 
   public void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
@@ -359,7 +355,7 @@ public class MaxApplication extends Object {
       aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
     itsProjectWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
-    itsConsole.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
+    itsConsoleWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
   }
 
    public void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
@@ -375,7 +371,7 @@ public class MaxApplication extends Object {
       aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     }
     itsProjectWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(),theLastItem);
-    itsConsole.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
+    itsConsoleWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     itsSketchWindowList.removeElement(theSubWindow);
   }
 
@@ -394,7 +390,7 @@ public class MaxApplication extends Object {
 	aWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
     }
     itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
-    itsConsole.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
+    itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetName());
   }
   
   public void ChangeWinNameMenus(String theOldName, String theNewName){
@@ -409,7 +405,7 @@ public class MaxApplication extends Object {
       aWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
     itsProjectWindow.ChangeWinNameMenu(theOldName, theNewName);
-    itsConsole.ChangeWinNameMenu(theOldName, theNewName);
+    itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
   }
   
 
@@ -529,6 +525,7 @@ public class MaxApplication extends Object {
       itsProjectWindow.move(0, 0);//start in the upper left position
       itsProjectWindow.pack();
       itsProjectWindow.show();
+      itsProjectWindow.addKeyListener(itsProjectWindow);
       break;
       
     case REQUIRE_CONNECTION:
@@ -545,7 +542,7 @@ public class MaxApplication extends Object {
 	int port = Integer.parseInt(itsConnDialog.portNo);
 	itsServer = new FtsSocketServer(itsConnDialog.hostName, port);
 
-	itsServer.setPostStream(itsConsole.getPrintWriter());
+	itsServer.setPostStream(itsConsoleWindow.getPrintWriter());
 	itsServer.setParameter("ftsdir", "/u/worksta/dececco/projects/imax/fts/bin/origin/debug");
 
 	itsServer.setParameter("ftsname", "fts");
@@ -638,9 +635,9 @@ public class MaxApplication extends Object {
 	aWindow = (MaxWindow)e.nextElement();
 	if(!aWindow.Close()) return true;
       }
-      itsConsole.getFrame().hide();
+      itsConsoleWindow.setVisible(false);
       itsProjectWindow.hide();
-      itsConsole.getFrame().dispose();//e.m.
+      itsConsoleWindow.dispose();
       itsProjectWindow.dispose();
       if (itsServer != null) itsServer.stop();
       Runtime.getRuntime().exit(0);
@@ -818,14 +815,14 @@ public class MaxApplication extends Object {
     return itsProjectWindow;
   }
 	
-  public Console GetConsole() {
-    return itsConsole;
+  public ConsoleWindow GetConsoleWindow() {
+    return itsConsoleWindow;
   }
 
   // just for compatibility with the current menus
-  public Console GetShell() {
-    return itsConsole;
-  }
+  //public ConsoleWindow GetShell() {
+  // return itsConsoleWindow;
+  //}
 
   public Project GetCurrentProject() {
     return itsProjectWindow.itsProject;

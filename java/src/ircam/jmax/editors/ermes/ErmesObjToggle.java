@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -35,17 +36,17 @@ class ErmesObjToggle extends ErmesObject {
     // vtoggle do not redefine themselves
   }
 
-	public boolean MouseDown_specific(Event evt,int x, int y) {
-		if (itsSketchPad.itsRunMode) {
-			itsToggled = !itsToggled;
-			itsFtsObject.putProperty("value", new Integer(itsToggled?1:0));
-			//((FtsInteger) itsFtsActive).setValue(itsToggled?1:0);	//ENZOOOOO
-			DoublePaint();
-		}
-		else 
-			itsSketchPad.ClickOnObject(this, evt, x, y);
-		return true;
-	}
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    if (itsSketchPad.itsRunMode) {
+      itsToggled = !itsToggled;
+      itsFtsObject.putProperty("value", new Integer(itsToggled?1:0));
+      //((FtsInteger) itsFtsActive).setValue(itsToggled?1:0);	//ENZOOOOO
+      DoublePaint();
+    }
+    else 
+      itsSketchPad.ClickOnObject(this, evt, x, y);
+    return true;
+  }
 
 	protected void FtsValueChanged(Object value) {
 		// toggle the toggle
@@ -92,13 +93,13 @@ class ErmesObjToggle extends ErmesObject {
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize(); //(depending on the layout manager).
+    public Dimension getMinimumSize() {
+        return getPreferredSize(); //(depending on the layout manager).
     }
 
     //If we don't specify this, the canvas might not show up at all
     //(depending on the layout manager).
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredSize;
     }
 

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 import ircam.jmax.*;
@@ -70,7 +71,7 @@ public class ErmesObject implements FtsPropertyHandler {
     }
   }
 
-  /*abstract */Dimension preferredSize() {return new Dimension(0,0);};
+  /*abstract */Dimension getPreferredSize() {return new Dimension(0,0);};
   
   //
   public void propertyChanged(String name, Object value) {
@@ -85,7 +86,7 @@ public class ErmesObject implements FtsPropertyHandler {
   }
   
   /*abstract*/ public void Paint_specific(Graphics g) {};  
-  /*abstract*/ public boolean MouseDown_specific(Event evt, int x, int y) {return true;};  
+  /*abstract*/ public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void ChangeFont(Font theFont) {
     itsFont = theFont;
     itsFontMetrics =itsSketchPad.getFontMetrics(theFont);
@@ -102,7 +103,7 @@ public class ErmesObject implements FtsPropertyHandler {
   public void Update(Graphics g) {
     if(!itsSketchPad.itsGraphicsOn)return;
     g.setColor(itsSketchPad.getBackground());
-    g.fillRect(itsX, itsY, preferredSize().width, preferredSize().height);
+    g.fillRect(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     Paint(g);
   }
   
@@ -238,7 +239,7 @@ public class ErmesObject implements FtsPropertyHandler {
     itsX = x;
     itsY = y;
 		
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
     Reshape(itsX, itsY, d.width, d.height);
     
@@ -264,8 +265,8 @@ public class ErmesObject implements FtsPropertyHandler {
     itsX = itsFtsGraphicDescription.x;
     itsY =itsFtsGraphicDescription.y;
     if((itsFtsGraphicDescription.width<10)||(itsFtsGraphicDescription.height<10)){
-       width  = preferredSize().width;
-       height  = preferredSize().height;
+       width  = getPreferredSize().width;
+       height  = getPreferredSize().height;
     }
     else{
       width = itsFtsGraphicDescription.width;
@@ -273,8 +274,8 @@ public class ErmesObject implements FtsPropertyHandler {
     }
     currentRect = new Rectangle(itsFtsGraphicDescription.x, itsFtsGraphicDescription.y, width, height);
     //Reshape(itsX, itsY, width, height);
-    if((itsFtsGraphicDescription.width != preferredSize().width)||
-       (itsFtsGraphicDescription.height != preferredSize().height))
+    if((itsFtsGraphicDescription.width != getPreferredSize().width)||
+       (itsFtsGraphicDescription.height != getPreferredSize().height))
       itsResized = true;
     itsFtsObject = theFtsObject;
     update(itsFtsObject);
@@ -314,16 +315,16 @@ public class ErmesObject implements FtsPropertyHandler {
   public /*abstract*/ boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;};
   
   
-  public boolean MouseMove(Event evt,int x,int y){
+  public boolean MouseMove(MouseEvent e,int x,int y){
     if (itsSketchPad.itsRunMode) return false;
     if(IsInDragBox(x,y)){
-      GetSketchWindow().setCursor(Frame.SE_RESIZE_CURSOR);
+      GetSketchWindow().setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
       return true;
     }
     else return false;
   }
   
-  public boolean MouseDrag(Event evt,int x,int y){
+  public boolean MouseDrag(MouseEvent e,int x,int y){
     if (itsSketchPad.itsRunMode) return true;
     else return false;	
   }
@@ -338,9 +339,9 @@ public class ErmesObject implements FtsPropertyHandler {
     
   }
 
-  public boolean MouseDown(Event evt,int x, int y) {
+  public boolean MouseDown(MouseEvent e,int x, int y) {
     if (!itsSketchPad.itsRunMode){
-      if((itsResized)&&(evt.clickCount>1)&&((evt.modifiers & Event.SHIFT_MASK) != 0)) {
+      if((itsResized)&&(e.getClickCount()>1)&&(e.isShiftDown())) {
 	RestoreDimensions();
 	return true;
       }
@@ -349,12 +350,12 @@ public class ErmesObject implements FtsPropertyHandler {
 	  SetInitDrag(x,y);
 	  return true;
 	}
-	else return MouseDown_specific(evt, x, y);
+	else return MouseDown_specific(e, x, y);
     }
-    else return MouseDown_specific(evt, x, y);
+    else return MouseDown_specific(e, x, y);
   }
 	
-  public boolean MouseUp(Event evt,int x,int y) {
+  public boolean MouseUp(MouseEvent e,int x,int y) {
     if (itsSketchPad.itsRunMode) return false;		
     if(itsDragging) {
       itsSketchPad.RemoveElementRgn(this);
@@ -370,7 +371,7 @@ public class ErmesObject implements FtsPropertyHandler {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    Resize(preferredSize().width - currentRect.width, preferredSize().height-currentRect.height);
+    Resize(getPreferredSize().width - currentRect.width, getPreferredSize().height-currentRect.height);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }

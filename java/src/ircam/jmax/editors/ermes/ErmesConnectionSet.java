@@ -2,7 +2,6 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.util.*;
-
 import ircam.jmax.editors.ermes.*;
 
 /**

@@ -54,15 +54,15 @@ class ErmesObjThrottle{
     int deltaX = itsSlider.itsX + LATERAL_OFFSET;
     int deltaY = itsSlider.itsY + AbsoluteToSlider(itsY);
     g.setColor(itsSlider.itsUISelectedColor);
-    g.fillRect(deltaX+1, deltaY+1, preferredSize().width-2, preferredSize().height);
-    g.fill3DRect(deltaX+2, deltaY+2, preferredSize().width-4, preferredSize().height-2, true);
+    g.fillRect(deltaX+1, deltaY+1, getPreferredSize().width-2, getPreferredSize().height);
+    g.fill3DRect(deltaX+2, deltaY+2, getPreferredSize().width-4, getPreferredSize().height-2, true);
     g.setColor(Color.black);
-    g.drawRect(deltaX+0, deltaY+0, preferredSize().width-1, preferredSize().height-1);
+    g.drawRect(deltaX+0, deltaY+0, getPreferredSize().width-1, getPreferredSize().height-1);
   }
   
 	
   public Rectangle Bounds(){
-    return new Rectangle(itsX, itsY, preferredSize.width, preferredSize.height);
+    return new Rectangle(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
   }
   
@@ -95,11 +95,11 @@ class ErmesObjThrottle{
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
   }
   
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
 }

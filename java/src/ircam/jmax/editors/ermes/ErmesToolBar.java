@@ -67,8 +67,8 @@ public class ErmesToolBar extends Panel {
     else setBackground(Color.lightGray);
     for (int i=0; i<NUM_BUTTONS; i++) {
       aToggleButton = (ErmesToggleButton) getComponent(i);
-      if (theRunMode) aToggleButton.hide();
-      else aToggleButton.show();
+      if (theRunMode) aToggleButton.setVisible(false);
+      else aToggleButton.setVisible(true);
     }
   }
 	
@@ -78,7 +78,7 @@ public class ErmesToolBar extends Panel {
   // we make the ipothesys that all the components inside a toolbar are ErmesToggleButtons
   boolean ButtonPressed(int theButton){
     int i;
-    int nComponents = countComponents();
+    int nComponents = getComponentCount();
 
     if(theButton==10) {//ErmesObjPatcher for now is not implemented....
       ErmesToggleButton aToggleButton = (ErmesToggleButton) getComponent(theButton);
@@ -175,4 +175,9 @@ public class ErmesToolBar extends Panel {
     add(new ErmesToggleButton(aImage21, aImage22, this, 10));
   }
 }
+
+
+
+
+
 

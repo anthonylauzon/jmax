@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -20,7 +21,7 @@ class ErmesObjIn extends ErmesObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(theFtsGraphic.x,theFtsGraphic.y,theFtsGraphic.width,theFtsGraphic.height);
 
     itsId = (Integer) theFtsObject.getArguments().elementAt(0);
@@ -36,7 +37,7 @@ class ErmesObjIn extends ErmesObject {
   //the sketchPad represents a subpatcher. 
   //We need here the information about the maximum number of inlets
   	
-    Dimension d = preferredSize();
+    Dimension d = getPreferredSize();
     currentRect = new Rectangle(x, y, d.width, d.height);
 	int temp = ((ErmesSketchWindow)theSketchPad.itsSketchWindow).itsDocument.itsPatcher.getNumberOfInlets();
 
@@ -115,38 +116,38 @@ class ErmesObjIn extends ErmesObject {
 	g.drawString(""+(itsId.intValue()+1), itsX + 7, itsY + 7+7);
   }
 	
-  public boolean MouseDown_specific(Event evt, int x, int y) {
+  public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
+    
+    if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {
+      return itsSketchPad.ClickOnObject(this, evt, x, y);
+    }
+    else  {	//we want to choose among the different Inlet number
+      itsSketchPad.itsInChoice.SetNewOwner(this); //make the Choice pointing to this
+      itsSketchPad.itsInChoice.setLocation(x, y);
+      itsSketchPad.itsInChoice.setVisible(true);
+      //itsSketchPad.itsInChoice.mouseDown(evt, x, y);
+    }
+    return true;
+  }
 
-	    if (itsSketchPad.itsRunMode || evt.clickCount == 1) {
-			return itsSketchPad.ClickOnObject(this, evt, x, y);
-	    }
-	    else  {	//we want to choose among the different Inlet number
-	    	itsSketchPad.itsInChoice.SetNewOwner(this); //make the Choice pointing to this
-	    	itsSketchPad.itsInChoice.move(x, y);
-	        itsSketchPad.itsInChoice.show();
-			//itsSketchPad.itsInChoice.mouseDown(evt, x, y);
-	    }
-	    return true;
-	}
-
-	void ChangeInletNo(int numberChoosen) {
-		if (itsId.intValue() != numberChoosen) {
-			itsId = new Integer(numberChoosen);
-			redefineFtsObject();
-		}
-		itsSketchPad.repaint();
-	}
+  void ChangeInletNo(int numberChoosen) {
+    if (itsId.intValue() != numberChoosen) {
+      itsId = new Integer(numberChoosen);
+      redefineFtsObject();
+    }
+    itsSketchPad.repaint();
+  }
 	
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize(); //(depending on the layout manager).
+    public Dimension getMinimumSize() {
+        return getPreferredSize(); //(depending on the layout manager).
     }
 
     //If we don't specify this, the canvas might not show up at all
     //(depending on the layout manager).
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredSize;
     }
 

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -63,7 +64,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(Event evt,int x, int y) {
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
       if (itsFtsObject != null){
 	itsFtsObject.sendMessage(0, "bang", null);
@@ -73,16 +74,16 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 	else aMessThread.start();
       }
     }
-    else if(evt.clickCount>1) {
+    else if(evt.getClickCount()>1) {
       if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
       //return true;
       //starting from here the bug 55 additions
       itsSketchPad.GetEditField().setFont(itsFont);
       itsSketchPad.GetEditField().setText(itsArgs);//warning: what will it happen if itsArgs is not here yet?
       itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-      itsSketchPad.GetEditField().reshape(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()+20);
+      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()+20);
 	       	
-      itsSketchPad.GetEditField().show();
+      itsSketchPad.GetEditField().setVisible(true);
       itsSketchPad.GetEditField().requestFocus();
       // until here bug 55
     }
@@ -94,21 +95,21 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   //--------------------------------------------------------
   // resize
   //--------------------------------------------------------
-  public void resize(int theH, int theV) {
+  public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
     if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);
     super.Resize1(d.width, d.height);
     if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
-    currentRect.resize(d.width, d.height);
+    currentRect.setSize(d.width, d.height);
     d.width -= (WIDTH_DIFF-6);		
     d.height -= HEIGHT_DIFF;
-    itsSketchPad.GetEditField().reshape(itsX+4, itsY+1, d.width, itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20);
+    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, d.width, itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20);
     if (itsSketchPad != null) itsSketchPad.repaint();
     
   }
   
-  public void resize(Dimension d) {
-    resize(d.width, d.height);
+  public void setSize(Dimension d) {
+    setSize(d.width, d.height);
   }
   
   //--------------------------------------------------------
@@ -154,6 +155,13 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 		 itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);
   }
 }
+
+
+
+
+
+
+
 
 
 

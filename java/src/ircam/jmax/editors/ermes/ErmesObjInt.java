@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
 
@@ -148,20 +149,20 @@ class ErmesObjInt extends ErmesObject {
 	//--------------------------------------------------------
 	//  mouseDown
     //--------------------------------------------------------
-	public boolean MouseDown_specific(Event evt,int x, int y) {
-		if (itsSketchPad.itsRunMode) {
-			itsFirstY = y;
-			if (firstClick) {
-				itsStartingY = itsInteger;
-				firstClick = false;
-			}
-			else itsStartingY = itsInteger;
-			itsFtsObject.putProperty("value", new Integer(itsInteger));
-			Trust(itsInteger);
-		}
-		else 
-			itsSketchPad.ClickOnObject(this, evt, x, y);
-		return true;
+	public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+	  if (itsSketchPad.itsRunMode) {
+	    itsFirstY = y;
+	    if (firstClick) {
+	      itsStartingY = itsInteger;
+	      firstClick = false;
+	    }
+	    else itsStartingY = itsInteger;
+	    itsFtsObject.putProperty("value", new Integer(itsInteger));
+	    Trust(itsInteger);
+	  }
+	  else 
+	    itsSketchPad.ClickOnObject(this, evt, x, y);
+	  return true;
 	}
 	
 	void Trust (int theInt) {
@@ -179,47 +180,47 @@ class ErmesObjInt extends ErmesObject {
 	//--------------------------------------------------------
 	//  mouseUp
     //--------------------------------------------------------
-	public boolean MouseUp(Event evt,int x, int y) {
-		if (itsSketchPad.itsRunMode) {
-			itsStartingY = itsInteger;
-			firstClick = true;
-			
-			String aString = String.valueOf(itsInteger);
-			int lenght = itsFontMetrics.stringWidth(aString);
-			if(!itsResized){
-				if(lenght<currentRect.width*2/3-2-20){
-					itsSketchPad.RemoveElementRgn(this);
-					while(lenght</*currentRect.width-16*/currentRect.width*2/3-2-20){
-						Resize1(currentRect.width-10, currentRect.height);
-					}
-					itsSketchPad.SaveOneElementRgn(this);
-					itsSketchPad.repaint();//???????
-				}
-			}
-			return true;
+	public boolean MouseUp(MouseEvent evt,int x, int y) {
+	  if (itsSketchPad.itsRunMode) {
+	    itsStartingY = itsInteger;
+	    firstClick = true;
+	    
+	    String aString = String.valueOf(itsInteger);
+	    int lenght = itsFontMetrics.stringWidth(aString);
+	    if(!itsResized){
+	      if(lenght<currentRect.width*2/3-2-20){
+		itsSketchPad.RemoveElementRgn(this);
+		while(lenght</*currentRect.width-16*/currentRect.width*2/3-2-20){
+		  Resize1(currentRect.width-10, currentRect.height);
 		}
-		else return super.MouseUp(evt,x,y);
+		itsSketchPad.SaveOneElementRgn(this);
+		itsSketchPad.repaint();//???????
+	      }
+	    }
+	    return true;
+	  }
+	  else return super.MouseUp(evt,x,y);
 	}
 	
-	//--------------------------------------------------------
-	// mouseDrag
+  //--------------------------------------------------------
+  // mouseDrag
     //--------------------------------------------------------
-	public boolean MouseDrag(Event evt,int x, int y) {
+  public boolean MouseDrag(MouseEvent evt,int x, int y) {
 
-		if(itsSketchPad.itsRunMode){
-			itsInteger = itsStartingY+(itsFirstY-y);
-			itsFtsObject.putProperty("value", new Integer(itsInteger));
-			//((FtsInteger) itsFtsActive).setValue(itsInteger);	ENZOOO
-			DoublePaint();
-			Trust(itsInteger);
-			return true;
-		}
-		else return false;
-	}
+    if(itsSketchPad.itsRunMode){
+      itsInteger = itsStartingY+(itsFirstY-y);
+      itsFtsObject.putProperty("value", new Integer(itsInteger));
+      //((FtsInteger) itsFtsActive).setValue(itsInteger);	ENZOOO
+      DoublePaint();
+      Trust(itsInteger);
+      return true;
+    }
+    else return false;
+  }
 
-	//--------------------------------------------------------
-	// ConnectionRequested
-    //--------------------------------------------------------
+  //--------------------------------------------------------
+  // ConnectionRequested
+  //--------------------------------------------------------
 	public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
 		if (!theRequester.IsInlet())
 			return (itsSketchPad.OutletConnect(this, theRequester));
@@ -270,15 +271,18 @@ class ErmesObjInt extends ErmesObject {
     //--------------------------------------------------------
 	// minimumSize
     //--------------------------------------------------------
-    public Dimension minimumSize() {
-        return preferredSize(); 
+    public Dimension getMinimumSize() {
+        return getPreferredSize(); 
     }
 
   	//--------------------------------------------------------
 	// preferredSize
     //--------------------------------------------------------
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return preferredSize;
     }
 
 }
+
+
+
