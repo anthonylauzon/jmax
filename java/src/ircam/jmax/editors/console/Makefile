@@ -32,7 +32,6 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 all: local_all
 	(cd actions ; $(MAKE) all)
 	(cd menus ; $(MAKE) all)
-	(cd tcl ; $(MAKE) all)
 .PHONY: all
 
 local_all: $(CLASSES)
@@ -41,7 +40,6 @@ local_all: $(CLASSES)
 clean: local_clean	
 	(cd actions ; $(MAKE) clean)
 	(cd menus ; $(MAKE) clean)
-	(cd tcl ; $(MAKE) clean)
 .PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
