@@ -38,6 +38,7 @@ static fts_heap_t *atom_list_iterator_heap;
 
 #define ATOM_LIST_UPDATE 1
 #define ATOM_LIST_SET    2
+#define ATOM_LIST_REMOTE_NAME    3
 
 /********************************************************************************/
 /*                                                                              */
@@ -93,7 +94,8 @@ static fts_data_class_t *fts_atom_list_data_class = 0;
 
 struct fts_atom_list
 {
-  fts_data_t dataobj;
+  fts_data_t dataobj;  
+  fts_symbol_t name;	       /* list name */
   fts_atom_list_cell_t *head;
   fts_atom_list_cell_t *tail;
 };
@@ -106,7 +108,26 @@ fts_atom_list_t *fts_atom_list_new( void)
   list = (fts_atom_list_t *) fts_heap_alloc(atom_list_heap);
 
   if (list)
+    {      
+      list->name = 0;
+      list->head = 0;
+      list->tail = 0;
+    }
+
+  fts_data_init((fts_data_t *) list, fts_atom_list_data_class);
+
+  return list;
+}
+
+fts_atom_list_t *fts_atom_list_new_with_name( fts_symbol_t name)
+{
+  fts_atom_list_t *list;
+
+  list = (fts_atom_list_t *) fts_heap_alloc(atom_list_heap);
+
+  if (list)
     {
+      list->name = name;
       list->head = 0;
       list->tail = 0;
     }
@@ -406,6 +427,13 @@ static void fts_atom_list_export_fun(fts_data_t *d)
 {
   fts_atom_list_iterator_t *iterator;
   fts_atom_list_t *this = (fts_atom_list_t *)d;
+
+  if (this->name)
+    {
+      fts_data_start_remote_call((fts_data_t *) this, ATOM_LIST_REMOTE_NAME);
+      fts_client_add_symbol(this->name);
+      fts_data_end_remote_call();
+    }
 
   iterator = fts_atom_list_iterator_new(this);
 
