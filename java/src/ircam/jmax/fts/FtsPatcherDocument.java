@@ -30,6 +30,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.dialogs.*;
 
 /** A FtsPatcherDocument is the Max Document containing an FTS Patch file.
  */
@@ -46,6 +47,20 @@ public class FtsPatcherDocument extends MaxDocument
     super.setRootData(data);
     ((FtsPatcherData) data).getContainerObject().setDocument(this);
   }
+
+    public void saveSubDocumentTo(MaxData data, File file) throws MaxDocumentException
+    {
+	MaxDocumentHandler documentHandler = null;
+		
+	if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+	    documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+	else
+	    documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+	setDocumentHandler( documentHandler);
+
+	super.saveSubDocumentTo(data, file);
+    }
 
   public void dispose()
   {

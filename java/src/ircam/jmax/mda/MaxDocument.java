@@ -29,6 +29,7 @@ import java.util.*;
 import java.io.*;
 import javax.swing.*;
 
+import ircam.jmax.fts.*;
 /**
  * A Max Document.
  * Superclass for all the Max Document
@@ -267,12 +268,12 @@ abstract public class MaxDocument
   {
     if (type.canMakeSubDocumentFile(data))
       {
-	MaxDocumentHandler handler = Mda.findDocumentHandlerFor(file, this);
+	  //MaxDocumentHandler handler = Mda.findDocumentHandlerFor(file, this);
 
-	if (handler == null)
-	  throw new MaxDocumentException("Cannot save to " + file);
+	  if (handler == null)
+	      throw new MaxDocumentException("Cannot save to " + file);
 
-	handler.saveSubDocument(this, data, file);
+	  handler.saveSubDocument(this, data, file);
       }
   }
 

@@ -141,6 +141,21 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
     patcher.sendMessage( -1, "save_dotpat_file", 1, at);
   }
 
+    protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
+    {
+	if ((document instanceof FtsPatcherDocument) && (data instanceof FtsPatcherData))
+	    {
+		FtsObject patcher = ((FtsPatcherData) data).getContainerObject();
+		FtsAtom at[] = new FtsAtom[1];
+		at[0] = new FtsAtom();
+		at[0].setString( file.getAbsolutePath() );
+
+		patcher.sendMessage( -1, "save_dotpat_file", 1, at);
+	    }
+	else
+	    throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");	
+    }
+
   // Overwrite upper class method; we can save to a .pat file (or at least we try to...)
 
   public boolean canSaveTo(File file)

@@ -130,6 +130,9 @@ public class Mda
 
 	    dataEditorTable.put(data, editor);
 
+	    editor = (MaxDataEditor) dataEditorTable.get(data);
+
+
 	    return editor;
 	  }
       }

@@ -221,6 +221,16 @@ public class PatcherSaveManager
     if (file == null)
       return;
 
+    /////////////////////////????????????????
+    /*MaxDocumentHandler documentHandler = null;
+    
+      if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+      documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+      else
+      documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+      document.setDocumentHandler( documentHandler);*/
+      /////////////////////???????????????
     try
       {
 	if (document.isRootData(patcherData))
@@ -231,7 +241,7 @@ public class PatcherSaveManager
 	else
 	  {
 	    // Make a subdocument save to
-	    document.saveSubDocumentTo( patcherData, file);
+	      document.saveSubDocumentTo( patcherData, file);
 	  }
       }
     catch ( MaxDocumentException e)
@@ -266,3 +276,11 @@ public class PatcherSaveManager
     return toClose;
   }
 }
+
+
+
+
+
+
+
+
