@@ -1,3 +1,15 @@
+2003-08-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fixed the fix ;)
+
+	* fts/template.c (fts_template_make_instance): removed uneeded recreation of args member of fts_patcher structure.
+
+	* fts/variable.c (define_expression_callback): reflected fts_patcher structure change (fts_patcher.args is a fts_tuple_t* now)
+
+	* fts/patcher.c (patcher_init, patcher_delete): reflected fts_patcher structure change (fts_patcher.args is a fts_tuple_t* now).
+
+	* include/ftsprivate/patcher.h: reflected fts_patcher structure change (fts_patcher.args is a fts_tuple_t* now).
+
 2003-08-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/object.c, fts/template.c, include/fts/patcher.h: fixed wrong object description 
