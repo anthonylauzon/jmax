@@ -77,7 +77,7 @@ seqobj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 /* add new track by client request */
 void
-seqobj_track_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqobj_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t type = fts_get_symbol(at + 0);
@@ -117,7 +117,7 @@ seqobj_track_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
 
 /* remove track by client request */
 void
-seqobj_track_remove_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqobj_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_get_object(at + 0);
@@ -130,7 +130,7 @@ seqobj_track_remove_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
 }
 
 void
-seqobj_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqobj_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
@@ -169,8 +169,17 @@ seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   sequence_t *this = (sequence_t *)o;
 
   sequence_set_editor_open(this);
-  fts_client_send_message(o, seqsym_openEditor, 0, 0);
-  seqobj_update(o, 0, 0, 0, 0);
+  fts_client_send_message(o, seqsym_createEditor, 0, 0);
+  seqobj_upload(o, 0, 0, 0, 0);
+}
+
+void
+seqobj_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  sequence_set_editor_close(this);
+  /* here we could aswell un-upload the objects (and the client would have to destroy the proxies) */
 }
 
 void
@@ -183,7 +192,7 @@ seqobj_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     sequence_read_midifile(this, name);
 
   if(sequence_editor_open(this))
-    seqobj_update(o, 0, 0, 0, 0);
+    seqobj_upload(o, 0, 0, 0, 0);
 }
 
 void 
@@ -201,7 +210,7 @@ seqobj_import_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_set_symbol(a + 1, fts_new_symbol("Import standard MIDI file"));
   fts_set_symbol(a + 2, fts_get_project_dir());
   fts_set_symbol(a + 3, default_name);
-  fts_client_send_message((fts_object_t *)this, seqsym_dialogFileSave, 4, a);
+  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
 void
@@ -289,8 +298,9 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqobj_delete);
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), seqobj_open_editor);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_add"), seqobj_track_add_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_remove"), seqobj_track_remove_by_client_request);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), seqobj_close_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_track"), seqobj_add_track_by_client_request);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), seqobj_remove_track_by_client_request);
 
       fts_method_define_varargs(cl, 0, fts_s_print, seqobj_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), seqobj_import);
@@ -310,4 +320,3 @@ seqobj_config(void)
 {
   fts_class_install(seqsym_sequence, seqobj_instantiate);
 }
-

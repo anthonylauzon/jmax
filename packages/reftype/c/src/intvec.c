@@ -384,7 +384,7 @@ int_vector_write_atom_file(int_vector_t *vec, fts_symbol_t file_name)
  *
  */
 
-/* vector is actually quite a temporary hack; there should be a real
+/* this is actually quite a temporary hack; there should be a real
    save standard technique for fts_data_t; it assume that is reloaded
    for a vector !!*/
 
@@ -395,7 +395,7 @@ void int_vector_save_bmax(int_vector_t *vector, fts_bmax_file_t *f)
   int i;
   int offset = 0;
 
-  for  (i = 0; i < vector->size; i++)
+  for(i=0; i<vector->size; i++)
     {
       fts_set_int(&av[ac], vector->values[i]);
 
@@ -420,7 +420,7 @@ void int_vector_save_bmax(int_vector_t *vector, fts_bmax_file_t *f)
 	}
     }
 
-  if (ac != 0)
+  if(ac != 0)
     {
       /* Code a push of all the values */
       fts_bmax_code_push_atoms(f, ac, av);

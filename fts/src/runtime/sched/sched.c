@@ -194,10 +194,13 @@ static void fts_sched_do_select( fts_sched_t *sched)
 	if ( callback->fd > n_fd)
 	  n_fd = callback->fd;
 
-	if (callback->read)
-	  FD_SET( callback->fd, &rfds);
-	else
-	  FD_SET( callback->fd, &wfds);
+	if(callback->fd >=0)
+	  {
+	    if (callback->read)
+	      FD_SET( callback->fd, &rfds);
+	    else
+	      FD_SET( callback->fd, &wfds);
+	  }
       }
 
   r = select( n_fd+1, &rfds, &wfds, NULL, &tv);

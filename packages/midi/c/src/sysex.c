@@ -32,69 +32,6 @@ static fts_midiport_t * sysex_get_midiport(int ac, const fts_atom_t *at);
 static void sysex_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void sysex_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-/************************************************
- *
- *  list utils
- *
- */
- 
-typedef struct 
-{
-  fts_atom_t *at;
-  int ac;
-  int alloc;
-} list_t;
-
-#define LIST_ALLOC_BLOCK 64
-
-void
-list_init(list_t *list)
-{
-  int i;
-  
-  list->at = fts_block_alloc(LIST_ALLOC_BLOCK * sizeof(fts_atom_t));
-  list->ac = 0;
-  list->alloc = LIST_ALLOC_BLOCK;
-  
-  /* set all atoms to void */
-  for(i=0; i<LIST_ALLOC_BLOCK; i++)
-    fts_set_void(list->at + i);
-}
-
-void
-list_free(list_t *list)
-{
-  if(list->alloc)
-    fts_block_alloc(list->alloc * sizeof(fts_atom_t));
-}
-
-void
-list_set_size(list_t *list, int size)
-{
-  int alloc = list->alloc;
-
-  if(size > alloc)
-    {
-      int i;
-
-      if(alloc)
-	fts_block_free(list->at, size * sizeof(fts_atom_t));
-
-      while(alloc < size)
-	alloc += LIST_ALLOC_BLOCK;
-
-      list->at = fts_block_alloc(alloc * sizeof(fts_atom_t));
-      list->alloc = alloc;
-    }
-  else
-    {
-      if(size <= 0)
-	size = 0;
-    }
-
-  list->ac = size;
-}
-
 /************************************************************
  *
  *  object
@@ -105,21 +42,14 @@ typedef struct _sysex_
 {
   fts_object_t o;
   fts_midiport_t *port;
-  list_t list;
 } sysex_t;
 
 static void
-sysex_in_callback(fts_object_t *o, int size, char *buffer, double time)
+sysex_in_callback(fts_object_t *o, int ac, const fts_atom_t *at, double time)
 {
   sysex_t *this = (sysex_t *)o;
-  int i;
 
-  list_set_size(&this->list, size);
-
-  for(i=0; i<size; i++)
-    fts_set_int(this->list.at + i, (int)buffer[i]);
-
-  fts_outlet_send(o, 0, fts_s_list, size, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, at);
 }
 
 static void
@@ -137,8 +67,6 @@ sysex_in_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       this->port = port;
       
-      list_init(&this->list);
-      
       callback.system_exclusive = sysex_in_callback;
       
       fts_midiport_add_listener(port, fts_midi_status_system_exclusive, 0, o, callback);
@@ -152,8 +80,6 @@ sysex_in_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(this->port)
     fts_midiport_remove_listener(this->port, fts_midi_status_system_exclusive, 0, o);
-
-  list_free(&this->list);
 }
 
 static void
@@ -201,7 +127,7 @@ sysex_get_classname(int ac, const fts_atom_t *at)
 static fts_midiport_t *
 sysex_get_midiport(int ac, const fts_atom_t *at)
 {
-  if(ac > 1 && fts_is_object(at + 1) && fts_object_get_class_name(fts_get_object(at + 1)) == fts_s__midiport)
+  if(ac > 1 && fts_is_object(at + 1) && fts_midiport_has_superclass(fts_get_object(at + 1)))
     return (fts_midiport_t *)fts_get_object(at + 1);
   else
     return 0;

@@ -27,7 +27,7 @@
 #ifndef _FTS_MIDIPORT_H_
 #define _FTS_MIDIPORT_H_
 
-extern fts_symbol_t fts_s__midiport;
+typedef struct _fts_midiport_ fts_midiport_t;
 
 /****************************************************
  *
@@ -54,7 +54,7 @@ typedef enum _fts_midi_status_ fts_midi_status_t;
  *
  */
 typedef void (*fts_midiport_channel_message_callback_t)(fts_object_t *listener, int channel, int x, int y, double time);
-typedef void (*fts_midiport_system_exclusive_callback_t)(fts_object_t *listener, int size, char *buf, double time);
+typedef void (*fts_midiport_system_exclusive_callback_t)(fts_object_t *listener, int ac, const fts_atom_t *at, double time);
 
 typedef union _fts_midiport_callback_
 {
@@ -71,44 +71,59 @@ typedef struct _fts_midiport_listener_
 
 /****************************************************
  *
+ *  MIDI out functions
+ *
+ */
+typedef void (*fts_midiport_channel_message_output_t)(fts_midiport_t *port, int status, int channel, int x, int y, double time);
+typedef void (*fts_midiport_system_exclusive_output_t)(fts_midiport_t *port, int ac, const fts_atom_t *at, double time);
+typedef int (*fts_midiport_system_exclusive_get_t)(fts_midiport_t *port);
+
+/****************************************************
+ *
  *  MIDI port
  *
  */
-typedef struct _fts_midiport_
+extern fts_symbol_t fts_s__superclass;
+extern fts_symbol_t fts_s_midiport;
+
+struct _fts_midiport_
 {
   fts_object_t o;
+
+  /* call backs */
   fts_midiport_listener_t *channel_message_listeners[fts_midi_status_n - 1][17]; /* 16 channels(1..16) + omni (0) */
   fts_midiport_listener_t *system_exclusive_listeners; /* 16 channels(1..16) + omni (0) */
-} fts_midiport_t;
+
+  /* MIDI output functions */
+  fts_midiport_channel_message_output_t channel_message_output;
+  fts_midiport_system_exclusive_output_t system_exclusive_output;
+
+  /* system exclusive message atoms */
+  fts_atom_t *sysex_at;
+  int sysex_ac;
+  int sysex_alloc;
+};
+
+extern void fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out);
+extern void fts_midiport_class_init(fts_class_t *cl);
 
 extern void fts_midiport_add_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener, fts_midiport_callback_t fun);
 extern void fts_midiport_remove_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener);
 
+extern int fts_midiport_has_superclass(fts_object_t *obj);
+
 /****************************************************
  *
- *  MIDI out functions
+ *  MIDI in/out functions
  *
  */
 
-typedef void (*fts_midiport_channel_message_output_t)(fts_midiport_t *port, int status, int channel, int x, int y, double time);
-typedef void (*fts_midiport_system_exclusive_output_t)(fts_midiport_t *port, int ac, const fts_atom_t *at, double time);
+extern void fts_midiport_channel_message(fts_midiport_t *port, fts_midi_status_t status, int channel, int x, int y, double time);
+extern void fts_midiport_system_exclusive(fts_midiport_t *port, double time);
+extern void fts_midiport_system_exclusive_add_byte(fts_midiport_t *port, int value);
 
-typedef struct _fts_midiport_class_data_
-{
-  fts_midiport_channel_message_output_t channel_message_output;
-  fts_midiport_system_exclusive_output_t system_exclusive_output;
-} fts_midiport_class_data_t;
-
-extern void fts_midiport_class_init(fts_class_t *cl, 
-				    fts_midiport_channel_message_output_t channel_message_output,
-				    fts_midiport_system_exclusive_output_t system_exclusive_output);
-
-#define fts_midiport_output_channel_message(p, s, c, x, y, t) \
-  (((fts_midiport_class_data_t *)fts_object_get_user_data((fts_object_t *)p))->channel_message_output((p), (s), (c), (x), (y), (t)))
-
-#define fts_midiport_output_system_exclusive(p, n, a, t) \
-  (((fts_midiport_class_data_t *)fts_object_get_user_data((fts_object_t *)p))->system_exclusive_output((p), (n), (a), (t)))
-
+#define fts_midiport_output_channel_message(p, s, c, x, y, t) ((p)->channel_message_output((p), (s), (c), (x), (y), (t)))
+#define fts_midiport_output_system_exclusive(p, n, a, t) ((p)->system_exclusive_output((p), (n), (a), (t)))
 
 /****************************************************
  *
@@ -119,5 +134,8 @@ typedef fts_midiport_t * (*fts_midiport_default_function_t)(void);
 
 extern void fts_midiport_set_default_function(fts_midiport_default_function_t fun);
 extern fts_midiport_t *fts_midiport_get_default(void);
+
+extern fts_midiport_t *fts_midiport_get_default(void);
+extern void fts_midiport_set_default_function(fts_midiport_default_function_t fun);
 
 #endif

@@ -263,7 +263,7 @@ eventtrk_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 /* create new event and upload by client request */
 void
-eventtrk_event_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+eventtrk_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
   double time = fts_get_float(at + 0);
@@ -286,7 +286,7 @@ eventtrk_event_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 
 /* create new event by client request without uploading */
 void
-eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+eventtrk_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
   double time = fts_get_float(at + 0);
@@ -302,7 +302,7 @@ eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 
 /* delete event by client request */
 void
-eventtrk_event_remove_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+eventtrk_remove_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
   fts_object_t *event = fts_get_object(at + 0);
@@ -400,7 +400,7 @@ eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_get_project_dir());
   fts_set_symbol(a + 3, default_name);
-  fts_client_send_message((fts_object_t *)this, seqsym_dialogFileSave, 4, a);
+  fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
 static fts_status_t
@@ -417,9 +417,9 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi_dialog, eventtrk_export_to_midifile_with_dialog);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi, eventtrk_export_to_midifile);
     
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), eventtrk_event_new_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_add"), eventtrk_event_add_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_remove"), eventtrk_event_remove_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("make_event"), eventtrk_make_event_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_event"), eventtrk_add_event_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_event"), eventtrk_remove_event_by_client_request);
 
   return fts_Success;
 }

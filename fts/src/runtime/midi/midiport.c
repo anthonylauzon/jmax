@@ -27,14 +27,18 @@
 #include "fts.h"
 #include "midiport.h"
 
-fts_symbol_t fts_s__midiport = 0;
+#define SYSEX_ATOMS_ALLOC_BLOCK 256
 
 static fts_midiport_default_function_t fts_midiport_default_function = 0;
+
+fts_symbol_t fts_s__superclass = 0;
+fts_symbol_t fts_s_midiport = 0;
 
 void
 fts_midiport_config(void)
 {
-  fts_s__midiport = fts_new_symbol("_midiport");
+  fts_s_midiport = fts_new_symbol("midiport");
+  fts_s__superclass = fts_new_symbol("_superclass");
 }
 
 fts_midiport_t *
@@ -50,7 +54,7 @@ fts_midiport_set_default_function(fts_midiport_default_function_t fun)
 }
 
 void
-fts_midiport_init(fts_midiport_t *port)
+fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
 {
   int i, j;
 
@@ -59,6 +63,43 @@ fts_midiport_init(fts_midiport_t *port)
       port->channel_message_listeners[i][j] = 0;
 
   port->system_exclusive_listeners = 0;
+
+  port->channel_message_output = chmess_out;
+  port->system_exclusive_output = sysex_out;
+
+  port->sysex_at = 0;
+  port->sysex_ac = 0;
+  port->sysex_alloc = 0;
+}
+
+void
+fts_midiport_delete(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
+{
+  if(port->sysex_alloc)
+    fts_block_alloc(port->sysex_alloc * sizeof(fts_atom_t));
+}
+
+void 
+fts_midiport_class_init(fts_class_t *cl)
+{
+  fts_atom_t a[1];
+
+  fts_set_symbol(a, fts_s_midiport);
+
+  fts_class_put_prop(cl, fts_s__superclass, a); /* set _superclass property to "midiport" */
+}
+
+int 
+fts_midiport_has_superclass(fts_object_t *obj)
+{
+  fts_atom_t a[1];
+
+  fts_object_get_prop(obj, fts_s__superclass, a);
+
+  if(fts_is_symbol(a) && fts_get_symbol(a) == fts_s_midiport)
+    return 1;
+  else
+    return 0;
 }
 
 void 
@@ -151,24 +192,42 @@ fts_midiport_channel_message(fts_midiport_t *port, fts_midi_status_t status, int
 }
 
 void
-fts_midiport_system_exclusive(fts_midiport_t *port, fts_midi_status_t status, int size, char *buf, double time)
+fts_midiport_system_exclusive(fts_midiport_t *port, double time)
 {
   fts_midiport_listener_t *l = port->system_exclusive_listeners;
 
   while(l)
     {
-      l->callback.system_exclusive(l->listener, size, buf, time);
+      l->callback.system_exclusive(l->listener, port->sysex_ac, port->sysex_at, time);
       l = l->next;
     }
+
+  port->sysex_ac = 0;
 }
 
-void 
-fts_midiport_class_init(fts_class_t *cl, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
+void
+fts_midiport_system_exclusive_add_byte(fts_midiport_t *port, int value)
 {
-  fts_midiport_class_data_t *data = (fts_midiport_class_data_t *)fts_malloc(sizeof(fts_midiport_class_data_t));
+  int index = port->sysex_ac;
 
-  data->channel_message_output = chmess_out;
-  data->system_exclusive_output = sysex_out;
+  if(index >= port->sysex_alloc)
+    {
+      int new_alloc = port->sysex_alloc + SYSEX_ATOMS_ALLOC_BLOCK;
+      fts_atom_t *new_at = fts_block_alloc(new_alloc * sizeof(fts_atom_t));
+      int i;
+      
+      if(port->sysex_alloc)
+	{
+	  for(i=0; i<port->sysex_alloc; i++)
+	    new_at[i] = port->sysex_at[i];
+	  
+	  fts_block_free(port->sysex_at, port->sysex_alloc * sizeof(fts_atom_t));
+	}
+      
+      port->sysex_at = new_at;
+      port->sysex_alloc = new_alloc;
+    }
 
-  fts_class_set_user_data(cl, data);
+  fts_set_int(port->sysex_at + index, value);
+  port->sysex_ac++;
 }

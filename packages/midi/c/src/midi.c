@@ -31,11 +31,11 @@ extern void midiout_config(void);
 extern void sysex_config(void);
 
 static void
-midisgi_init(void)
+midi_init(void)
 {
   midiin_config();
   midiout_config();
   sysex_config();
 }
 
-fts_module_t midisgi_module = {"midisgi", "MIDI i/o classes", midisgi_init, 0, 0};
+fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};

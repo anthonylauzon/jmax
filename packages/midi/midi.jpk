@@ -23,9 +23,12 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-package provide midisgi
+package provide midi
 
 global jmaxArch jmaxMode
-ucs load module midisgi $dir/c/lib/$jmaxArch/$jmaxMode/libmidisgi.so
+ucs load module midi $dir/c/lib/$jmaxArch/$jmaxMode/libmidi.so
 
-puts "package: midisgi (SGI MIDI objects)"
+puts "package: midi (basic MIDI i/o objects)"
+
+
+

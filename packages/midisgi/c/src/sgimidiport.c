@@ -116,54 +116,22 @@ sgimidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	  fts_midiport_channel_message(&port->head, fts_midi_status_pitch_bend, mdGetChannel(msg) + 1, mdGetByte1(msg) + (mdGetByte2(msg) << 7), 0, 0.0);
 	  break;
 	case MD_SYSEX:
-	  fts_midiport_system_exclusive(&port->head, mdGetChannel(msg), midi_events[i].msglen - 2, midi_events[i].sysexmsg + 1, 0.0);
+	  {
+	    int size = midi_events[i].msglen;
+	    int j;
+
+	    for(j=0; j<size - 2; j++)
+	      fts_midiport_system_exclusive_add_byte(&port->head, midi_events[i].sysexmsg[j + 1]);
+
+	  fts_midiport_system_exclusive(&port->head, 0.0);
 
 	  if(midi_events[i].msglen > 0)
 	    mdFree(midi_events[i].sysexmsg);
+	  }
 
 	  break;
       }
   }
-}
-
-/************************************************************
- *
- *  object
- *
- */
-
-static void
-sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  sgimidiport_t *this = (sgimidiport_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  int open = 0;
-
-  fts_midiport_init(this);
-  this->in = 0;
-  this->out = 0;
-  this->name = 0;
-
-  if(name)
-    {
-      open = sgimidiport_open(this, name);
-      this->name = name;
-    }
-
-  if(open)
-    fts_sched_add_fd(fts_sched_get_current(), mdGetFd(this->in), 1, sgimidiport_dispatch, o);
-}
-
-static void 
-sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  sgimidiport_t *this = (sgimidiport_t *)o;
-
-  if(this->in)
-    {
-      fts_sched_remove_fd(fts_sched_get_current(), mdGetFd(this->in));
-      sgimidiport_close(this);
-    }
 }
 
 /************************************************************
@@ -287,6 +255,48 @@ sgimidiport_send_system_exclusive(fts_midiport_t *port, int ac, const fts_atom_t
   mdSend(this->out, &event, 1);
 }
 
+/************************************************************
+ *
+ *  object
+ *
+ */
+
+static void
+sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  sgimidiport_t *this = (sgimidiport_t *)o;
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  int open = 0;
+
+  fts_midiport_init(&this->head, sgimidiport_send_channel_message, sgimidiport_send_system_exclusive);
+
+  this->in = 0;
+  this->out = 0;
+  this->name = 0;
+
+  if(name)
+    {
+      open = sgimidiport_open(this, name);
+      this->name = name;
+    }
+
+  if(open)
+    fts_sched_add_fd(fts_sched_get_current(), mdGetFd(this->in), 1, sgimidiport_dispatch, o);
+}
+
+static void 
+sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  sgimidiport_t *this = (sgimidiport_t *)o;
+
+  if(this->in)
+    {
+      fts_sched_remove_fd(fts_sched_get_current(), mdGetFd(this->in));
+      sgimidiport_close(this);
+    }
+
+  fts_midiport_delete(&this->head);
+}
 
 /************************************************************
  *
@@ -324,7 +334,7 @@ sgimidiport_get_default(void)
       
       post("create SGI default MIDI port: %s\n", fts_symbol_name(fts_midi_hack_default_device_name));
 
-      fts_set_symbol(a + 0, fts_new_symbol("_midiport"));
+      fts_set_symbol(a + 0, fts_new_symbol("sgimidiport"));
       fts_set_symbol(a + 1, fts_midi_hack_default_device_name);
       fts_object_new(0, 2, a, (fts_object_t **)&sgimidiport_default);
     }
@@ -342,7 +352,7 @@ sgimidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sgimidiport_t), 1, 0, 0);
 
-  fts_midiport_class_init(cl, sgimidiport_send_channel_message, sgimidiport_send_system_exclusive);
+  fts_midiport_class_init(cl);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sgimidiport_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sgimidiport_delete);
@@ -358,10 +368,7 @@ sgimidiport_config(void)
 {
   fts_midiport_set_default_function(sgimidiport_get_default);
 
-  fts_class_install(fts_s__midiport, sgimidiport_instantiate);
-  fts_class_alias(fts_new_symbol("sgimidiport"), fts_s__midiport);
+  fts_class_install(fts_new_symbol("sgimidiport"), sgimidiport_instantiate);
 }
-
-extern void sgimidiport_config(void);
 
 fts_module_t midisgi_module = {"midisgi", "SGI MIDI classes", sgimidiport_config, 0, 0};

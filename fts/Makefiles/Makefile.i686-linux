@@ -50,7 +50,7 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 #ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
 #ARCH_OPT_LDFLAGS := -v
 
-FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
+FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread -lMidiShare
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 

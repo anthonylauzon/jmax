@@ -243,7 +243,6 @@ static void fts_patcher_data_set_ww( fts_data_t *d, int ac, const fts_atom_t *at
  * yet been uploaded; it is usefull after paste operations.
  */
 
-  
 static void fts_patcher_data_update( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_patcher_data_t *this = (fts_patcher_data_t *)d;
@@ -281,7 +280,7 @@ static void fts_patcher_data_update( fts_data_t *d, int ac, const fts_atom_t *at
 
 void fts_patcher_data_config(void)
 {
-  patcher_data_heap          = fts_heap_new(sizeof( fts_patcher_data_t));
+  patcher_data_heap = fts_heap_new(sizeof( fts_patcher_data_t));
 
   fts_patcher_data_class = fts_data_class_new( fts_new_symbol( "patcher_data"));
   fts_data_class_define_export_function(fts_patcher_data_class, fts_patcher_data_export_fun);
@@ -294,12 +293,3 @@ void fts_patcher_data_config(void)
   fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WW, fts_patcher_data_set_ww);
   fts_data_class_define_function(fts_patcher_data_class, REMOTE_SET_WH, fts_patcher_data_set_wh);
 }
-
-
-
-
-
-
-
-
-

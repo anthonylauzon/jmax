@@ -28,11 +28,12 @@
 
 #define NO_FILTER -1
 
-/************************************************************
- *
- *  object
- *
- */
+static fts_symbol_t sym_notein = 0;
+static fts_symbol_t sym_polyin = 0;
+static fts_symbol_t sym_ctlin = 0;
+static fts_symbol_t sym_pgmin = 0;
+static fts_symbol_t sym_touchin = 0;
+static fts_symbol_t sym_bendin = 0;
 
 typedef struct _midiin_
 {
@@ -40,73 +41,9 @@ typedef struct _midiin_
   fts_midiport_t *port;
   int channel;
   int filter;
-} midiin_t;
-
-typedef struct _midiin_classdata_
-{
   fts_midi_status_t status;
   fts_midiport_callback_t callback;
-} midiin_classdata_t;
-
-static void
-midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-  midiin_classdata_t *classdata = (midiin_classdata_t *)fts_object_get_user_data(o);
-  fts_midiport_t *port = 0;
-  int channel = 0;
-  int filter = NO_FILTER;
-
-  /* skip class name */
-  ac--;
-  at++;
-
-  if(ac > 1 && fts_is_object(at + 1) && fts_object_get_class_name(fts_get_object(at + 1)) == fts_s__midiport)
-    {
-      port = (fts_midiport_t *)fts_get_object(at + 1);
-
-      /* skip port argument */
-      ac--;
-      at++;
-    }
-
-  /* if there is still no port just get default */
-  if(!port)
-    port = fts_midiport_get_default();
-
-  if(ac == 2)
-    channel = fts_get_int_arg(ac, at, 1, 0);
-  else if(ac == 3)
-    {
-      filter = fts_get_int_arg(ac, at, 1, NO_FILTER);
-      channel = fts_get_int_arg(ac, at, 2, 0);
-    }
-
-  this->port = port;
-
-  /* channel 0 is omni */
-  if(channel < 0)
-    this->channel = 0;
-  else if(channel > 16)
-    this->channel = 16;
-  else
-    this->channel = channel;
-
-  this->filter = filter & 127;
-
-  if(port)
-    fts_midiport_add_listener(port, classdata->status, this->channel, o, classdata->callback);
-}
-
-static void 
-midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-  midiin_classdata_t *classdata = (midiin_classdata_t *)fts_object_get_user_data(o);
-
-  if(this->port)
-    fts_midiport_remove_listener(this->port, classdata->status, this->channel, o);
-}
+} midiin_t;
 
 /************************************************************
  *
@@ -180,6 +117,110 @@ poly_filter_channel_callback(fts_object_t *listener, int channel, int x, int y, 
 
 /************************************************************
  *
+ *  object
+ *
+ */
+
+static void
+midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiin_t *this = (midiin_t *)o;
+  fts_symbol_t classname = fts_get_symbol(at);
+  fts_midiport_t *port = 0;
+  int channel = 0;
+  int filter = NO_FILTER;
+
+  /* skip class name */
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_object(at) && fts_midiport_has_superclass(fts_get_object(at)))
+    {
+      port = (fts_midiport_t *)fts_get_object(at);
+
+      /* skip port argument */
+      ac--;
+      at++;
+    }
+
+  /* if there is still no port just get default */
+  if(port)
+    this->port = port;
+  else
+    this->port = fts_midiport_get_default();
+
+  if(ac == 1)
+    channel = fts_get_number_int(at);
+  else if(ac > 1)
+    {
+      filter = fts_get_number_int(at);
+      channel = fts_get_number_int(at + 1);
+    }
+
+  /* channel 0 is omni */
+  if(channel < 0)
+    this->channel = 0;
+  else if(channel > 16)
+    this->channel = 16;
+  else
+    this->channel = channel;
+
+  this->filter = filter & 127;
+
+  if(classname == sym_notein)
+    {
+      this->status = fts_midi_status_note;
+      this->callback.channel_message = (channel == 0)? note_callback: note_channel_callback;
+    }
+  else if(classname == sym_polyin)
+    {
+      this->status = fts_midi_status_poly_pressure;
+
+      if(filter == NO_FILTER)
+	this->callback.channel_message = (channel == 0)? poly_callback: poly_channel_callback;
+      else
+	this->callback.channel_message = (channel == 0)? poly_filter_callback: poly_filter_channel_callback;	
+    }
+  else if(classname == sym_ctlin)
+    {
+      this->status = fts_midi_status_control_change;
+
+      if(filter == NO_FILTER)
+	this->callback.channel_message = (channel == 0)? poly_callback: poly_channel_callback;
+      else
+	this->callback.channel_message = (channel == 0)? poly_filter_callback: poly_filter_channel_callback;	
+    }
+  else if(classname == sym_pgmin)
+    {
+      this->status = fts_midi_status_program_change;
+      this->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
+    }
+  else if(classname == sym_touchin)
+    {
+      this->status = fts_midi_status_channel_pressure;
+      this->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
+    }
+  else if(classname == sym_bendin)
+    {
+      this->status = fts_midi_status_pitch_bend;
+      this->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
+    }
+  
+  if(this->port)
+    fts_midiport_add_listener(this->port, this->status, this->channel, o, this->callback);
+}
+
+static void 
+midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiin_t *this = (midiin_t *)o;
+
+  if(this->port)
+    fts_midiport_remove_listener(this->port, this->status, this->channel, o);
+}
+
+/************************************************************
+ *
  *  class
  *
  */
@@ -187,13 +228,13 @@ poly_filter_channel_callback(fts_object_t *listener, int channel, int x, int y, 
 static fts_status_t
 midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  midiin_classdata_t *classdata = fts_malloc(sizeof(midiin_classdata_t));
-  fts_symbol_t type;
+  fts_symbol_t classname;
   int channel = 0;
   int filter = NO_FILTER;
   int n_outs = 0;
 
   /* skip class name */
+  classname = fts_get_symbol(at);
   ac--;
   at++;
 
@@ -204,87 +245,36 @@ midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       at++;
     }
 
-  /* generic midiin not yet implemented */
-  if(!ac)
-    return &fts_CannotInstantiate;
-
-  type = fts_get_symbol(at);
-
-  if(ac == 2)
-    channel = fts_get_int_arg(ac, at, 1, 0);
-  else if(ac == 3)
+  if(ac == 1)
+    channel = fts_get_number_int(at);
+  else if(ac > 1)
     {
-      filter = fts_get_int_arg(ac, at, 1, NO_FILTER);
-      channel = fts_get_int_arg(ac, at, 2, 0);
+      filter = fts_get_number_int(at);
+      channel = fts_get_number_int(at + 1);
     }
- 
+
+  /* clip channel */
   if(channel < 0)
     channel = 0;
   else if(channel > 16)
     channel = 16;
 
-  if((type == fts_new_symbol("note") || type == fts_new_symbol("nt")) && ac <= 2)
-   {
-      classdata->status = fts_midi_status_note;
-      classdata->callback.channel_message = (channel == 0)? note_callback: note_channel_callback;
-      
-      n_outs = (channel == 0)? 3: 2;
-    }
-  else if((type == fts_new_symbol("poly-pressure") || type == fts_new_symbol("pp")) && ac <= 3)
-    {
-      classdata->status = fts_midi_status_poly_pressure;
-
-      if(filter == NO_FILTER)
-	{
-	  classdata->callback.channel_message = (channel == 0)? poly_callback: poly_channel_callback;
-	  n_outs = (channel == 0)? 3: 2;
-	}
-      else
-	{
-	  classdata->callback.channel_message = (channel == 0)? poly_filter_callback: poly_filter_channel_callback;	
-	  n_outs = (channel == 0)? 2: 1;
-	}
-    }
-  else if((type == fts_new_symbol("control-change") || type == fts_new_symbol("cc")) && ac <= 3)
-    {
-      classdata->status = fts_midi_status_control_change;
-
-      if(filter == NO_FILTER)
-	{
-	  classdata->callback.channel_message = (channel == 0)? poly_callback: poly_channel_callback;
-	  n_outs = (channel == 0)? 3: 2;
-	}
-      else
-	{
-	  classdata->callback.channel_message = (channel == 0)? poly_filter_callback: poly_filter_channel_callback;	
-	  n_outs = (channel == 0)? 2: 1;
-	}
-    }
-  else if((type == fts_new_symbol("program-change") || type == fts_new_symbol("pc")) && ac <= 2)
-    {
-      classdata->status = fts_midi_status_program_change;
-      classdata->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
-      
-      n_outs = (channel == 0)? 2: 1;
-    } 
-  else if((type == fts_new_symbol("channel-pressure") || type == fts_new_symbol("cp")) && ac <= 2)
-   {
-      classdata->status = fts_midi_status_channel_pressure;
-      classdata->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
-      
-      n_outs = (channel == 0)? 2: 1;
-    }
-  else if((type == fts_new_symbol("pitch-bend") || type == fts_new_symbol("pb")) && ac <= 2)
-    {
-      classdata->status = fts_midi_status_pitch_bend;
-      classdata->callback.channel_message = (channel == 0)? pgm_callback: pgm_channel_callback;
-      
-      n_outs = (channel == 0)? 2: 1;
-    }
+  if(classname == sym_notein && ac <= 1)
+    n_outs = 2 + (channel == 0);
+  else if(classname == sym_polyin && ac <= 2)
+    n_outs = 1 + (filter == NO_FILTER) + (channel == 0);
+  else if(classname == sym_ctlin && ac <= 2)
+    n_outs = 1 + (filter == NO_FILTER) + (channel == 0);
+  else if(classname == sym_pgmin && ac <= 1)
+    n_outs = 1 + (channel == 0);
+  else if(classname == sym_touchin && ac <= 1)
+    n_outs = 1 + (channel == 0);
+  else if(classname == sym_bendin && ac <= 1)
+    n_outs = 1 + (channel == 0);
   else
     return &fts_CannotInstantiate;    
   
-  fts_class_init(cl, sizeof(midiin_t), 0, n_outs, (void *)classdata);
+  fts_class_init(cl, sizeof(midiin_t), 0, n_outs, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiin_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
@@ -292,39 +282,20 @@ midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-int
-midiin_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  /* skip class name */
-  ac0--;
-  ac1--;
-  at0++;
-  at1++;
-
-  if(ac0 <= 0 || ac1 <= 0)
-    return 0;
-
-  /* skip port argument */
-  if(fts_is_object(at0))
-    {
-      ac0--;
-      at0++;
-    }
-
-  if(fts_is_object(at1))
-    {
-      ac1--;
-      at1++;      
-    }
-
-  if(ac0 <= 0 || ac1 <= 0 || !fts_is_symbol(at0) || !fts_is_symbol(at1))
-    return 0;
-
-  return (fts_get_symbol(at0) == fts_get_symbol(at1));
-}
-
 void
 midiin_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("midiin"), midiin_instantiate, midiin_equiv);
+  sym_notein = fts_new_symbol("notein");
+  sym_polyin = fts_new_symbol("polyin");
+  sym_ctlin = fts_new_symbol("ctlin");
+  sym_pgmin = fts_new_symbol("pgmin");
+  sym_touchin = fts_new_symbol("touchin");
+  sym_bendin = fts_new_symbol("bendin");
+
+  fts_metaclass_install(sym_notein, midiin_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(sym_polyin, midiin_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(sym_ctlin, midiin_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(sym_pgmin, midiin_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(sym_touchin, midiin_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(sym_bendin, midiin_instantiate, fts_arg_type_equiv);
 }

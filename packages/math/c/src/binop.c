@@ -105,22 +105,22 @@ binop_doctor_set_default_arg_one(fts_patcher_t *patcher, int ac, const fts_atom_
 void
 math_binop_config(void)
 {
-  math_sym_add = fts_new_symbol("v+");
-  math_sym_sub = fts_new_symbol("v-");
-  math_sym_mul = fts_new_symbol("v*");
-  math_sym_div = fts_new_symbol("v/");
-  math_sym_bus = fts_new_symbol("v-+");
-  math_sym_vid = fts_new_symbol("v/*");
+  math_sym_add = fts_new_symbol("m+");
+  math_sym_sub = fts_new_symbol("m-");
+  math_sym_mul = fts_new_symbol("m*");
+  math_sym_div = fts_new_symbol("m/");
+  math_sym_bus = fts_new_symbol("m-+");
+  math_sym_vid = fts_new_symbol("m/*");
   
-  math_sym_ee = fts_new_symbol("v==");
-  math_sym_ne = fts_new_symbol("v!=");
-  math_sym_gt = fts_new_symbol("v>");
-  math_sym_ge = fts_new_symbol("v>=");
-  math_sym_lt = fts_new_symbol("v<");
-  math_sym_le = fts_new_symbol("v<=");
+  math_sym_ee = fts_new_symbol("m==");
+  math_sym_ne = fts_new_symbol("m!=");
+  math_sym_gt = fts_new_symbol("m>");
+  math_sym_ge = fts_new_symbol("m>=");
+  math_sym_lt = fts_new_symbol("m<");
+  math_sym_le = fts_new_symbol("m<=");
   
-  math_sym_min = fts_new_symbol("vmin");
-  math_sym_max = fts_new_symbol("vmax");
+  math_sym_min = fts_new_symbol("mmin");
+  math_sym_max = fts_new_symbol("mmax");
   
   fts_metaclass_install(math_sym_add, binop_instantiate, fts_arg_type_equiv);
   fts_metaclass_install(math_sym_sub, binop_instantiate, fts_arg_type_equiv);
@@ -152,4 +152,3 @@ math_binop_config(void)
   fts_register_object_doctor(math_sym_min, binop_doctor_set_default_arg_zero);
   fts_register_object_doctor(math_sym_max, binop_doctor_set_default_arg_zero);
 }
-

@@ -50,11 +50,11 @@ fts_symbol_t seqsym_import_midi = 0;
 fts_symbol_t seqsym_import_midi_dialog = 0;
 
 /* messages to client */
-fts_symbol_t seqsym_openEditor = 0;
+fts_symbol_t seqsym_createEditor = 0;
 fts_symbol_t seqsym_destroyEditor = 0;
 fts_symbol_t seqsym_addTracks = 0;
 fts_symbol_t seqsym_addEvents = 0;
-fts_symbol_t seqsym_dialogFileSave = 0;
+fts_symbol_t seqsym_openFileDialog = 0;
 
 void
 seqsym_config(void)
@@ -83,9 +83,9 @@ seqsym_config(void)
   seqsym_import_midi_dialog = fts_new_symbol("import_midi_dialog");
 
   /* messages to client */
-  seqsym_openEditor = fts_new_symbol("openEditor");
+  seqsym_createEditor = fts_new_symbol("createEditor");
   seqsym_destroyEditor = fts_new_symbol("destroyEditor");
   seqsym_addTracks = fts_new_symbol("addTracks");
   seqsym_addEvents = fts_new_symbol("addEvents");
-  seqsym_dialogFileSave = fts_new_symbol("dialogFileSave");
+  seqsym_openFileDialog = fts_new_symbol("openFileDialog");
 }

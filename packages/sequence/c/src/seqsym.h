@@ -52,11 +52,11 @@ extern fts_symbol_t seqsym_import_midi;
 extern fts_symbol_t seqsym_import_midi_dialog;
 
 /* messages to client */
-extern fts_symbol_t seqsym_openEditor;
+extern fts_symbol_t seqsym_createEditor;
 extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_addEvents;
-extern fts_symbol_t seqsym_dialogFileSave;
+extern fts_symbol_t seqsym_openFileDialog;
 
 #endif
 

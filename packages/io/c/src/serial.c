@@ -217,7 +217,7 @@ static fts_status_t serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 {
   fts_type_t t[3];
 
-  fts_class_init( cl, sizeof( serial_t), 0, 1, 0);
+  fts_class_init( cl, sizeof( serial_t), 1, 1, 0);
 
   t[0] = fts_t_symbol;
   t[1] = fts_t_symbol;  /* the device to use: "/dev/ttyd1" for instance */
@@ -227,7 +227,7 @@ static fts_status_t serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, serial_delete, 0, 0);
 
   t[0] = fts_t_int;
-  fts_method_define( cl, 0, fts_type_get_selector( fts_t_int), serial_int, 1, t);
+  fts_method_define( cl, 0, fts_type_get_selector(fts_t_int), serial_int, 1, t);
 
   fts_method_define( cl, 0, fts_s_bang, serial_bang, 0, 0);
 

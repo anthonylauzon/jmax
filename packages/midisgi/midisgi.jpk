@@ -28,4 +28,4 @@ package provide midisgi
 global jmaxArch jmaxMode
 ucs load module midisgi $dir/c/lib/$jmaxArch/$jmaxMode/libmidisgi.so
 
-puts "package: midisgi (SGI MIDI objects)"
+puts "package: midisgi (SGI MIDI port)"
