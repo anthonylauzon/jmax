@@ -721,19 +721,27 @@ int
 fts_audioconfig_set_sample_rate(audioconfig_t* config, int sample_rate)
 {
 #warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate
+  int set_sample_rate = 0;
+  fts_atom_t arg;
   /* check if sample rate is available with current use audioport */
   if (audioconfig_check_sample_rate(config, sample_rate))
   {
     config->sample_rate = sample_rate;
-    /* change dsp sample rate */
-    /* change smaple rate for used audioport */
-    return sample_rate;
+/*     /\* change dsp sample rate *\/ */
+     fts_dsp_set_sample_rate((double)sample_rate);
+    /* change sample rate for used audioport */
+    set_sample_rate = sample_rate;
   }
   else
   {
     /* error */
-    return sample_rate;
+    set_sample_rate =  sample_rate;
   }
+  
+  fts_set_int(&arg, 48000);
+  fts_client_send_message((fts_object_t*)config, audioconfig_s_sampling_rate, 1, &arg);
+
+  return set_sample_rate;
 }
 
 
@@ -768,9 +776,8 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 #warning NOT YET IMPLEMENTED (audioconfig_sample_rate)
   audioconfig_t* self = (audioconfig_t*)o;
   int sample_rate = fts_get_int(at);
-  
+  fts_atom_t arg;
   post("[audioconfig:] new sample rate: %d\n", fts_audioconfig_set_sample_rate(self, sample_rate));  
-
 }
 
 static void
