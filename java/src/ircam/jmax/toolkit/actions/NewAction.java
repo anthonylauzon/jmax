@@ -45,6 +45,8 @@ public class NewAction extends EditorAction
   {
     Cursor temp = container.getFrame().getCursor();
 
+    System.err.println("documentType "+container.getEditor().getDocument().getDocumentType().getName());
+
     try
       {
 	container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
