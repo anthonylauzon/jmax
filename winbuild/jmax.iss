@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=jMax
-AppVerName=jMax 4.1-2003-07-23
+AppVerName=jMax 4.1.0
 AppPublisher=IRCAM
 AppPublisherURL=http://www.ircam.fr/jmax
 AppSupportURL=http://www.ircam.fr/jmax
@@ -23,6 +23,7 @@ Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescri
 ;; Root Files
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\README"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\AUTHORS"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\ChangeLog"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\COPYING"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LISEZMOI"; DestDir: "{app}"; Flags: ignoreversion
@@ -79,6 +80,11 @@ Source: "..\packages\data\images\*.gif"; DestDir: "{app}\packages\data\images\";
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\dsdev\c\dsdev.dll"; DestDir: "{app}\packages\dsdev\c\"; Flags: ignoreversion
 
+;; FUNCTIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Source: "..\packages\functions\c\functions.dll"; DestDir: "{app}\packages\functions\c\"; Flags: ignoreversion
+;Source: "..\packages\functions\help\*.jmax"; DestDir: "{app}\packages\functions\help\"; Flags: ignoreversion
+
 ;; GUIOBJ
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\guiobj\guiobj.jpkg"; DestDir: "{app}\packages\guiobj\"; Flags: ignoreversion
@@ -128,6 +134,7 @@ Source: "..\packages\sequence\c\sequence.dll"; DestDir: "{app}\packages\sequence
 Source: "..\packages\sequence\java\sequence.jar"; DestDir: "{app}\packages\sequence\java\"; Flags: ignoreversion
 Source: "..\packages\sequence\help\*.jmax"; DestDir: "{app}\packages\sequence\help\"; Flags: ignoreversion
 Source: "..\packages\sequence\images\*.gif"; DestDir: "{app}\packages\sequence\images\"; Flags: ignoreversion
+
 ;; SIGNAL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\signal\signal.jpkg"; DestDir: "{app}\packages\signal\"; Flags: ignoreversion
@@ -146,6 +153,8 @@ Source: "..\packages\utils\c\utils.dll"; DestDir: "{app}\packages\utils\c\"; Fla
 
 ;; WINMIDI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Source: "..\packages\winmidi\c\winmidi.dll"; DestDir: "{app}\packages\winmidi\c\"; Flags: ignoreversion
+
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -174,10 +183,10 @@ Root: HKCU; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Root: HKLM; Subkey: "Software\Ircam"; Flags: uninsdeletekeyifempty
 Root: HKLM; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "jMaxVersion"; ValueData: "4.1"
-Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "FtsVersion"; ValueData: "4.1"
-Root: HKLM; Subkey: "Software\Ircam\jMax\4.1"; ValueType: string; ValueName: "ftsRoot"; ValueData: "{app}"
-Root: HKLM; Subkey: "Software\Ircam\jMax\4.1"; ValueType: string; ValueName: "jmaxRoot"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "jMaxVersion"; ValueData: "4.1.0"
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "FtsVersion"; ValueData: "4.1.0"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0"; ValueType: string; ValueName: "ftsRoot"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0"; ValueType: string; ValueName: "jmaxRoot"; ValueData: "{app}"
 
 
 [Run]
