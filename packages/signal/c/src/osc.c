@@ -193,9 +193,6 @@ osc_init_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  osc_t *this = (osc_t *)o;
-  fvec_t *fvec;
-
   osc_init(o, 0, 0, 0, 0);
 
   if(ac == 2)

@@ -52,16 +52,12 @@ typedef struct
 static void
 threshold_output_low(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  threshold_t *this = (threshold_t *)o;
-
   fts_outlet_bang(o, 0);
 }
 
 static void
 threshold_output_high(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  threshold_t *this = (threshold_t *)o;
-
   fts_outlet_bang(o, 1);
 }
 
@@ -244,8 +240,6 @@ threshold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 threshold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  threshold_t *this = (threshold_t *)o;
-
   fts_dsp_remove_object(o);
 }
 

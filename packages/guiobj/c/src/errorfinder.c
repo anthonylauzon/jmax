@@ -35,12 +35,11 @@ static void fts_error_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_error_finder_t *this = (fts_error_finder_t *)o;
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *scope = fts_get_object(at+1);
-
-  fts_atom_t a[1];
+  fts_atom_t a;
 
   fts_objectset_clear(set);
 
-  fts_set_object(&a[0], (fts_object_t *) set);
+  fts_set_object(&a, (fts_object_t *) set);
   fts_send_message(scope, fts_system_inlet, fts_s_find_errors, 1, a);
 }
 

@@ -46,9 +46,11 @@ static double dsp_time = 0.0;
 static fts_symbol_t dsp_zero_fun_symbol = 0;
 static fts_symbol_t dsp_copy_fun_symbol = 0;
 
-static fts_symbol_t dsp_timebase_symbol = 0;
+static fts_metaclass_t *dsp_timebase_metaclass = 0;
 static fts_timebase_t *dsp_timebase = 0;
 static fts_param_t *dsp_active_param = 0;
+
+fts_metaclass_t *fts_dsp_edge_metaclass = 0;
 
 /*********************************************************
  *
@@ -180,13 +182,6 @@ fts_dsp_remove_object(fts_object_t *o)
   fts_dsp_graph_remove_object(&main_dsp_graph, o);
 }
 
-void
-fts_dsp_force_order(fts_object_t *first, fts_object_t *second)
-{
-  /* create hidden order forcing connection between the two objects */
-  fts_connection_new(first, 0, second, 0, fts_c_order_forcing);
-}
-
 void 
 fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 {
@@ -252,6 +247,80 @@ ftl_program_t *
 dsp_get_current_dsp_chain( void)
 {
   return main_dsp_graph.chain;
+}
+
+/**************************************************************************
+ *
+ *  DSP edge
+ *
+ *    The DSP edge is a dummy object to assure the order of input and outputs
+ *    of objects such as busses and delays. All inputs are scheduled BEFORE the
+ *    edge, all outputs AFTER. See fts_dsp_after_edge() and fts_dsp_before_edge(). 
+ *
+ */
+
+static void
+dsp_edge_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_set_object( value, obj);
+}
+
+static void
+dsp_edge_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_dsp_edge_t *this = (fts_dsp_edge_t *)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+
+  this->n_tick = fts_dsp_get_input_size(dsp, 0);
+  this->sr = fts_dsp_get_input_srate(dsp, 0);
+}
+
+static void
+dsp_edge_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_dsp_edge_t *this = (fts_dsp_edge_t *)o;
+
+  this->n_tick = fts_dsp_get_tick_size();
+  this->sr = fts_dsp_get_sample_rate();
+
+  fts_dsp_add_object(o);
+}
+
+static void
+dsp_edge_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_dsp_remove_object(o);
+}
+
+static fts_status_t
+dsp_edge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_dsp_edge_t), 1, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_edge_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsp_edge_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_edge_put);
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsp_edge_get_state);  
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+  
+  return fts_Success;
+}
+
+void
+fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge)
+{
+  /* create hidden order forcing connection */
+  fts_connection_new((fts_object_t *)edge, 0, o, 0, fts_c_order_forcing);
+}
+
+void
+fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge)
+{
+  /* create hidden order forcing connection */
+  fts_connection_new(o, 0, (fts_object_t *)edge, 0, fts_c_order_forcing);
 }
 
 /**************************************************************************
@@ -407,19 +476,17 @@ dsp_active( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 void fts_kernel_dsp_init(void)
 {
-  fts_atom_t a;
-
-  dsp_timebase_symbol = fts_new_symbol("dsp_timebase");
-  
   /* init sample rate */
   dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
   dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
   dsp_tick_duration = 1000.0 * (double)FTS_DSP_DEFAULT_TICK_SIZE / FTS_DSP_DEFAULT_SAMPLE_RATE;
 
   /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
-  fts_class_install(dsp_timebase_symbol, dsp_timebase_instantiate);
-  fts_set_symbol(&a, dsp_timebase_symbol);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 1, &a, (fts_object_t **)&dsp_timebase);
+  dsp_timebase_metaclass = fts_class_install(NULL, dsp_timebase_instantiate);
+  dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_metaclass, 0, 0);
+
+  /* DSP edge class */
+  fts_dsp_edge_metaclass = fts_class_install(NULL, dsp_edge_instantiate);
 
   /* create DSP parameter */
   dsp_active_param = (fts_param_t *)fts_object_create(fts_param_metaclass, 0, 0);

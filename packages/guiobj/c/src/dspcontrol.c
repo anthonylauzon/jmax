@@ -63,7 +63,6 @@ dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int invalid_fpe;
   int divide0_fpe;
   int overflow_fpe;
-  int denormalized_fpe;
   unsigned int fpe_state;
 
   if (fts_dsp_is_running() && fts_audioport_report_xrun())
@@ -156,8 +155,6 @@ dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void 
 dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_control_t *this = (dsp_control_t *)o;
-
   fts_dsp_active_remove_listener(o);
 }
 

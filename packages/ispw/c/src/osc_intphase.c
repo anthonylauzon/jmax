@@ -122,9 +122,9 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 	  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
 	    {
 	      /* In place */
-	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_ftl_data(argv+ 1, ftl_data);
-	      fts_set_int   (argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
 	      fts_dsp_add_function(osc_ftl_sym_freq_inplace, 3, argv);
 	    }

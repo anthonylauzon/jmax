@@ -35,8 +35,7 @@
 typedef struct 
 {
   fts_object_t o;
-  fts_atom_t a;
-  char string[STRING_SIZE];
+  fts_memorystream_t *stream;
   double period;
   int gate;
   int pending;
@@ -46,103 +45,6 @@ typedef struct
 } display_t;
 
 static fts_symbol_t sym_display = 0;
-
-static int
-symbol_contains_blank(fts_symbol_t s)
-{
-  const char *str = s;
-  int n = strlen(str);
-  int i;
-
-  for(i=0; i<n; i++)
-    {
-      if(str[i] == ' ')
-	return 1;
-    }
-
-  return 0;
-}
-
-static void
-append_string(char *str, const char *append)
-{
-  int n = strlen(str);
-  char *s = str + n;
-
-  snprintf(s, STRING_SIZE - n, "%s", append);
-}
-
-static void
-append_char(char *str, const char c)
-{
-  int n = strlen(str);
-
-  if(n < STRING_SIZE - 1)
-    {
-      str[n] = c;
-      str[n + 1] = '\0';
-    }
-}
-
-static void append_atoms(char *str, int ac, const fts_atom_t *at);
-
-static void
-append_atom(char *str, const fts_atom_t *a)
-{
-  int n = strlen(str);
-  char *s = str + n;
-
-  if(fts_is_void(a))
-    snprintf(s, STRING_SIZE - n, "<void>");
-  else if(fts_is_int(a))
-    snprintf(s, STRING_SIZE - n, "%d", fts_get_int(a));
-  else if(fts_is_float(a))
-    {
-      double f_num = fts_get_float(a);
-      long long int i_num = (long long int)f_num;
-      
-      if(i_num == f_num)
-	snprintf(s, STRING_SIZE - n, "%lld.", i_num);
-      else
-	snprintf(s, STRING_SIZE - n, "%g", f_num);
-    }
-  else if(fts_is_symbol(a))
-    {
-      fts_symbol_t sym = fts_get_symbol(a);
-
-      if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, "\"%s\"", sym);
-      else
-	snprintf(s, STRING_SIZE - n, "%s", sym);
-    }
-  else if(fts_is_tuple(a))
-    {
-      fts_tuple_t *t = (fts_tuple_t *)fts_get_object(a);
-      int size = fts_tuple_get_size(t);
-      fts_atom_t *atoms = fts_tuple_get_atoms(t);
-
-      append_char(str, '(');
-      append_atoms(s, size, atoms);
-      append_char(str, ')');
-    }
-  else
-    snprintf(s, STRING_SIZE - n, "<%s>", fts_get_class(a)->name);
-}
-
-static void
-append_atoms(char *str, int ac, const fts_atom_t *at)
-{
-  int i;
-
-  append_atom(str, at);
-  
-  for(i=1; i<ac; i++)
-    {
-      append_char(str, ' ');
-      append_atom(str, at + i);
-    }
-  
-}
 
 /************************************************************
  *
@@ -169,10 +71,13 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    {
 	      if(this->absmax != this->last)
 		{
+		  fts_atom_t a;
+
 		  sprintf(this->string, "~ %#g", this->absmax);
 		  this->last = this->absmax;
 		  
-		  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
+		  fts_set_string(&a, fts_memorystream_get_bytes(this->stream));
+		  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &a);
 		}
 	      
 	      this->absmax = MIN_FLOAT;
@@ -182,10 +87,13 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
       else if(this->pending)
 	{
+	  fts_atom_t a;
+
 	  this->gate = 0;
 	  this->pending = 0;
 	  
-	  fts_client_send_message(o, fts_s_set, 1, &this->a);
+	  fts_set_string(&a, fts_memorystream_get_bytes(this->stream));
+	  fts_client_send_message(o, fts_s_set, 1, &a);
 	  
 	  fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
 	}
@@ -305,19 +213,15 @@ display_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   display_t * this = (display_t *)o;
   
+  fts_memorystream_reset(this->stream);
+
   if(ac == 0)
-    {
-      /* empty tuple (shouldn't happen!!!) */
-      this->string[0] = '(';
-      this->string[1] = ')';
-      this->string[2] = '\0';
-    }
+    fts_spost(this->stream, "()");
   else
     {
-      this->string[0] = '(';
-      this->string[1] = '\0';
-      append_atoms(this->string, ac, at);
-      append_char(this->string, ')');
+      fts_spost(this->stream, "(");
+      spost_atoms(this->string, ac, at);
+      fts_spost(this->stream, ")");
     }
 
   display_deliver(this);
@@ -327,23 +231,10 @@ static void
 display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
-  int i;
-  
-  if(ac == 1 && fts_is_object(at) && s == fts_object_get_class_name(fts_get_object(at)))
-    sprintf(this->string, "<%s> ", s);
-  else 
-    {
-      if(symbol_contains_blank(s))
-	sprintf(this->string, "\"%s\"", s);
-      else
-	sprintf(this->string, "%s", s);
-      
-      for(i=0; i<ac; i++)
-	{
-	  append_char(this->string, ' ');
-	  append_atom(this->string, at + i);
-	}
-    }
+
+  fts_memorystream_reset(this->stream);  
+  fts_spost("%s ", s);
+  fts_spost_atoms(ac, at);
 
   display_deliver(this);
 }
@@ -360,7 +251,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_dsp_add_object(o);
 
-  fts_set_string(&this->a, this->string);
+  this->stream = (fts_memorystream_t *)fts_object_create(fts_memorystream_type, 0, 0);
 
   this->period = 50.0;
   this->gate = 1;
@@ -374,6 +265,8 @@ static void
 display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_remove_object(o);
+  
+  fts_object_destroy(this->stream);
 }
 
 static fts_status_t 

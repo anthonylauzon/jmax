@@ -193,7 +193,6 @@ fts_connection_delete(fts_connection_t *conn)
   fts_object_t *src;
   fts_object_t *dst;
   fts_connection_t **p;		/* indirect precursor */
-  fts_connection_t *prev = 0;
 
   /* First, release the client representation of the connection, if any */
   if ( fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
@@ -244,71 +243,52 @@ fts_connection_get(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 void 
 fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 {
-  int inlet, outlet;
+  fts_connection_t *p;
+  int i;
 
-  /* reproduce in new, and delete in old,  
-     all the old outgoing connections */
-
-  for (outlet = 0; outlet < old->head.cl->noutlets; outlet++)
+  for (i=0; i<fts_object_get_outlets_number(old); i++)
     {
       fts_connection_t *p;
 
-      /* The loop work by iterating on the first connection;
-	 this work because the loop destroy one connection at a time.
-	 */
-
-      if (outlet < fts_object_get_outlets_number(new))
-	{	
-	  for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
-	    {
-	      fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
-	      fts_connection_delete(p);
-	    }
-	}
-      else
-	for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
+      for (p=old->out_conn[i]; p;  p=old->out_conn[i])
+	{
+	  if(i < fts_object_get_outlets_number(new) && p->type > fts_c_hidden)
+	    fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
+	  
 	  fts_connection_delete(p);
-
+	}
     }
 
-  /* reproduce in new, and delete in old, all the old incoming connections */
-  for (inlet = 0; inlet < old->head.cl->ninlets; inlet++)
+  for (i=0; i<fts_object_get_inlets_number(old); i++)
     {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      if (inlet < fts_object_get_inlets_number(new))
+      for (p=old->in_conn[i]; p; p=old->in_conn[i])
 	{
-	  for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
-	    {
-	      fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
-	      fts_connection_delete(p);
-	    }
-	}
-      else
-	for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
+	  if(i < fts_object_get_inlets_number(new) && p->type > fts_c_hidden)
+	    fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
+	  
 	  fts_connection_delete(p);
+	}
     }
 }
 
 void 
 fts_object_upload_connections(fts_object_t *obj)
 {
-  int inlet, outlet;
   fts_connection_t *p;
+  int i;
 
-  for (outlet = 0; outlet < obj->head.cl->noutlets; outlet++)
+  for(i=0; i<fts_object_get_outlets_number(obj); i++)
     {
-      for (p = obj->out_conn[outlet]; p ; p = p->next_same_src)
-	fts_client_upload_object((fts_object_t *)p, -1);
+      for (p = obj->out_conn[i]; p ; p = p->next_same_src)
+	if(p->type > fts_c_hidden)
+	  fts_client_upload_object((fts_object_t *)p, -1);
     }
 
-  for (inlet = 0; inlet < obj->head.cl->ninlets; inlet++)
+  for (i=0; i<fts_object_get_inlets_number(obj); i++)
     {
-      for (p = obj->in_conn[inlet]; p; p = p->next_same_dst)
-	fts_client_upload_object((fts_object_t *)p, -1);
+      for (p=obj->in_conn[i]; p; p=p->next_same_dst)
+	if(p->type > fts_c_hidden)
+	  fts_client_upload_object((fts_object_t *)p, -1);
     }
 }
 

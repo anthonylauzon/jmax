@@ -365,9 +365,9 @@ matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, matrix_put);
     
   fts_method_define_varargs(cl, n_ins, fts_s_list, matrix_node);
-  fts_method_define_varargs(cl, n_ins, fts_new_symbol("in"), matrix_in);
-  fts_method_define_varargs(cl, n_ins, fts_new_symbol("out"), matrix_out);
-  fts_method_define_varargs(cl, n_ins, fts_new_symbol("all"), matrix_all);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("in"), matrix_in);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("out"), matrix_out);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("all"), matrix_all);
     
   /* dsp in/outlets */
   for(i=0; i<n_ins; i++)

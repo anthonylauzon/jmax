@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+/*#define DSP_COMPILER_VERBOSE*/
+/*#define DSP_COMPILER_VERBOSE_DETAILS*/
+
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
@@ -122,16 +125,13 @@ graph_iterator_push(void *ptr, fts_object_t *object, int outlet)
   new->connection_to_thru = 0;
 
   new->next = iter->top;
-
   iter->top = new;
 }
 
 static void 
 graph_iterator_pop( graph_iterator_t *iter)
 {
-  stack_element_t *next;
-
-  next = iter->top->next;
+  stack_element_t *next = iter->top->next;
 
   fts_heap_free( (char *)iter->top, stack_element_heap);
 
@@ -383,12 +383,34 @@ post_signals( fts_dsp_signal_t **sig, int n)
 {
   int i;
 
-  for ( i = 0; i < n; i++)
+  if(n > 0)
     {
-      post( "%s[%d]", sig->name, sig->length);
-      if ( i != n-1)
-	post( ",");
+      for ( i = 0; i < n; i++)
+	{
+	  post( "%s[%d]", sig[i]->name, sig[i]->length);
+	  if ( i != n-1)
+	    post( ", ");
+	}
     }
+  else
+    post("NONE");
+}
+
+static void 
+post_object( fts_object_t *obj)
+{
+  int ac = fts_object_get_description_size( obj);
+  const fts_atom_t *at = fts_object_get_description_atoms( obj);
+
+
+  if(ac > 0)
+    {
+      post("[");
+      post_atoms(ac, at);
+      post("] ");
+    }
+  else
+    post("[???] ");
 }
 #endif
 
@@ -411,12 +433,12 @@ dsp_input_get(fts_object_t *obj, int winlet)
 }
 
 static int 
-dsp_output_get(fts_class_t *cl, int woutlet)
+dsp_output_get(fts_object_t *obj, int woutlet)
 {
   int i, n;
   fts_outlet_decl_t *out;
 
-  for (i = 0, n = 0, out = cl->outlets; i < woutlet; i++, out++)
+  for (i = 0, n = 0, out = fts_object_get_class( obj)->outlets; i < woutlet; i++, out++)
     if (out->tmess.symb == fts_s_sig || !out->tmess.symb)
       n++;
 
@@ -514,43 +536,26 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
   fts_atom_t a;
   int i;
 
-  if (! node->descr)
-    {
-      node->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
-
-      node->descr->ninputs  = dsp_input_get(node->o, fts_object_get_inlets_number(node->o));
-
-      if ( node->descr->ninputs)
-	{
-	  node->descr->in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * node->descr->ninputs); 
-	}
-      node->descr->noutputs = dsp_output_get(fts_object_get_class(node->o), fts_object_get_outlets_number(node->o));
-      node->descr->out = 0;	/* safe initialization */
-    }
-
   /* unreference signal so that they can be reused by the outputs */
-  for (i = 0, sig = node->descr->in; i < node->descr->ninputs; i++, sig++)
-    if (*sig)
-      {
-	if (*sig != sig_zero)
-	  fts_dsp_signal_unreference(*sig);
-      }
-    else
-      *sig = sig_zero;
-
-  if (node->descr->noutputs)
+  for (i=0; i<node->descr.ninputs; i++)
     {
-      node->descr->out = (fts_dsp_signal_t **)fts_zalloc( sizeof(fts_dsp_signal_t *) * node->descr->noutputs);
+      if(node->descr.in[i])
+	{
+	  if (node->descr.in[i] != sig_zero)
+	    fts_dsp_signal_unreference(node->descr.in[i]);
+	}
+      else
+	node->descr.in[i] = sig_zero;
     }
 
-  if (gen_outputs(node->o, node->descr, graph->tick_size, graph->sample_rate))
+  if (gen_outputs(node->o, &node->descr, graph->tick_size, graph->sample_rate))
     {
 #ifdef DSP_COMPILER_VERBOSE
       post( "DSP: scheduling ");
       post_object( node->o);
-      post_signals( node->descr->in, node->descr->ninputs);
-      post( "->");
-      post_signals( node->descr->out, node->descr->noutputs);
+      post_signals( node->descr.in, node->descr.ninputs);
+      post( " --> ");
+      post_signals( node->descr.out, node->descr.noutputs);
       post( "\n");
 #endif
 
@@ -564,25 +569,25 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
       fts_set_pointer(&a, node->descr);
       fts_send_message(node->o, fts_system_inlet, fts_s_put, 1, &a);
 
-      {
+      /*{
 	ftl_instruction_info_t *info;
 
 	info = ftl_program_get_current_instruction_info(graph->chain);
-	if (info)
+	if (info) 
 	  {
 	      int i;
 
 	    ftl_instruction_info_set_object( info, node->o);
 
-	    ftl_instruction_info_set_ninputs( info, node->descr->ninputs);
-	    for ( i = 0; i < node->descr->ninputs; i++)
-		ftl_instruction_info_set_input( info, i, fts_dsp_get_input_name( node->descr, i), fts_dsp_get_input_size( node->descr,i));
+	    ftl_instruction_info_set_ninputs( info, node->descr.ninputs);
+	    for ( i = 0; i < node->descr.ninputs; i++)
+		ftl_instruction_info_set_input( info, i, fts_dsp_get_input_name( &node->descr, i), fts_dsp_get_input_size( &node->descr,i));
 
-	    ftl_instruction_info_set_noutputs( info, node->descr->noutputs);
-	    for ( i = 0; i < node->descr->noutputs; i++)
-		ftl_instruction_info_set_output( info, i, fts_dsp_get_output_name( node->descr, i), fts_dsp_get_output_size( node->descr,i));
+	    ftl_instruction_info_set_noutputs( info, node->descr.noutputs);
+	    for ( i = 0; i < node->descr.noutputs; i++)
+		ftl_instruction_info_set_output( info, i, fts_dsp_get_output_name( &node->descr, i), fts_dsp_get_output_size( &node->descr,i));
 	  }
-      }
+	  }*/
     }
 
   SET_SCHEDULED( node);
@@ -593,22 +598,11 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
      the reference count of all the outputs signals. This happens in case
      of dsp outlets which are not connected
      */
-  for (i = 0, sig = node->descr->out; i < node->descr->noutputs; i++, sig++)
+  for (i=0; i<node->descr.noutputs; i++)
     {
-      if(*sig && fts_dsp_signal_is_pending( *sig))
-	{
-	  fts_dsp_signal_free( *sig);
-	}
+      if(node->descr.out[i] && fts_dsp_signal_is_pending(node->descr.out[i]))
+	fts_dsp_signal_free(node->descr.out[i]);
     }
-
-  if (node->descr->ninputs)
-    fts_free((char *) node->descr->in);
-
-  if (node->descr->noutputs)
-    fts_free((char *) node->descr->out);
-
-  fts_heap_free((char *)node->descr, dsp_descr_heap);
-  node->descr = 0;
 }
 
 /**************************************************************************
@@ -622,18 +616,6 @@ static void
 mark_signal_connection(fts_connection_t* connection, void *arg)
 {
   fts_signal_connection_table_t *table = (fts_signal_connection_table_t *)arg;
-  fts_object_t *source = fts_connection_get_source(connection);
-  int outlet = fts_connection_get_outlet(connection);
-  fts_object_t *destination = fts_connection_get_destination(connection);
-  int inlet = fts_connection_get_inlet(connection);
-
-#ifdef DSP_COMPILER_VERBOSE
-  post("  mark:  ");
-  post_object(source);
-  post(" (%d) --> ", outlet);
-  post_object(destination);
-  post(" (%d)\n", inlet);
-#endif
 
   fts_signal_connection_add(table, connection);
 }
@@ -642,65 +624,48 @@ mark_signal_connection(fts_connection_t* connection, void *arg)
 static void 
 dsp_graph_succ_realize(fts_dsp_graph_t *graph, fts_dsp_node_t *node, edge_fun_t fun, int mark_connections)
 {
-  fts_outlet_decl_t *outlet;
-  int woutlet;
-  fts_dsp_signal_t **sig;
-  static void *zero = 0;
+  fts_outlet_decl_t *outlets = fts_object_get_class(node->o)->outlets;
+  int out;
 
-  if ( node->descr)
-    sig = node->descr->out;
-  else
-    sig = (fts_dsp_signal_t **)(&zero);
-
-  outlet = fts_object_get_class(node->o)->outlets;
-
-  for (woutlet = 0; woutlet < fts_object_get_outlets_number(node->o); woutlet++)
+  for(out=0; out<fts_object_get_outlets_number(node->o); out++)
     {
-      if (outlet->tmess.symb == fts_s_sig || !outlet->tmess.symb)
+      int sig_out = 0;
+
+      /* for each signal outlet */
+      if(outlets[out].tmess.symb == fts_s_sig || !outlets[out].tmess.symb)
 	{
 	  graph_iterator_t iter;
 
-	  graph_iterator_init( &iter, node->o, woutlet);
+	  graph_iterator_init( &iter, node->o, out);
 
-	  while ( !graph_iterator_end( &iter))
+	  while(!graph_iterator_end( &iter))
 	    {
 	      fts_object_t *succ_obj;
 	      fts_dsp_node_t *succ_node;
-	      int winlet;
+	      int in;
 
-	      graph_iterator_get_current( &iter, &succ_obj, &winlet);
+	      graph_iterator_get_current( &iter, &succ_obj, &in);
 
 	      succ_node = dsp_list_lookup( succ_obj);
 
-	      if (succ_node)
+	      if(succ_node)
 		{
 		  if(mark_connections)
 		    {
 		      fts_connection_t *conn = graph_iterator_get_current_connection( &iter);
 
-#ifdef DSP_COMPILER_VERBOSE
-		      post("dsp connection:  ");
-		      post_object(node->o);
-		      post(" (%d) --> ", woutlet);
-		      post_object(succ_node->o);
-		      post(" (%d)\n", winlet);
-#endif
-		      
 		      mark_signal_connection(conn, (void *)&(graph->signal_connection_table));
 		      graph_iterator_apply_to_connection_stack(&iter, mark_signal_connection, (void *)&(graph->signal_connection_table));
 		    }
 
-		  if(sig)
-		    (*fun)( graph, node, woutlet, succ_node, winlet, *sig);
+		  (*fun)( graph, node, out, succ_node, in, node->descr.out[sig_out]);
 		}
 
 	      graph_iterator_next( &iter);
 	    }
 
-	  sig++;
+	  sig_out++;
 	}
-
-      outlet++;
     }
 }
 
@@ -711,6 +676,12 @@ dsp_graph_inc(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutlet, fts_dsp_
   assert( dest != 0);
 
   dest->pred_cnt++;
+
+#ifdef DSP_COMPILER_VERBOSE_DETAILS
+  post("  increment ");
+  post_object(dest->o);
+  post("(%d)\n", dest->pred_cnt);
+#endif
 }
 
 /* Edge function used to decrement predecessors count and increment reference count of signals */
@@ -723,32 +694,20 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int w
 
   dest->pred_cnt--;
 
-  ninputs = dsp_input_get(dest->o, fts_object_get_inlets_number(dest->o));
+#ifdef DSP_COMPILER_VERBOSE_DETAILS
+  post("  decrement ");
+  post_object(dest->o);
+  post("(%d)\n", dest->pred_cnt);
+#endif
 
-  if (! dest->descr)
-    {
-      dest->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
-      dest->descr->ninputs = ninputs;
-      dest->descr->noutputs = dsp_output_get(fts_object_get_class(dest->o), fts_object_get_outlets_number(dest->o));
-      dest->descr->in = 0;
-      dest->descr->out = 0;
-    }
-
-  if (ninputs)
+  if (dest->descr.ninputs)
     {
       fts_connection_t *conn = fts_connection_get(src->o, woutlet, dest->o, winlet);
       fts_dsp_signal_t *previous_sig;
       int nin;
       
-      if (! dest->descr->in)
-	{
-	  /* (fd) to avoid writing past the end of the dsp_descr... */
-	  dest->descr->in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * fts_object_get_inlets_number(dest->o));
-	}
-
       nin = dsp_input_get(dest->o, winlet);
-
-      previous_sig = dest->descr->in[nin];
+      previous_sig = dest->descr.in[nin];
       
       /* ignore hidden connections */
       if(conn == NULL || fts_connection_get_type(conn) != fts_c_order_forcing)
@@ -775,14 +734,14 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int w
 	      fts_dsp_signal_unreference( sig);
 	      fts_dsp_signal_reference( new_sig);
 	      
-	      dest->descr->in[nin] = new_sig;
+	      dest->descr.in[nin] = new_sig;
 	    }
 	  else
 	    {
 	      if (sig)
 		fts_dsp_signal_reference(sig);
 	      
-	      dest->descr->in[nin] = sig;
+	      dest->descr.in[nin] = sig;
 	    }
 	}
     }
@@ -812,60 +771,69 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutle
 static void 
 dsp_graph_reinit( fts_dsp_graph_t *graph)
 {
-  fts_dsp_node_t *nodes = graph->nodes;
   fts_dsp_node_t *node;
 
-  for( node = nodes; node; node = node->next)
-    node->pred_cnt = 0;
+  for( node = graph->nodes; node; node = node->next)
+    {
+      int i;
+
+      node->pred_cnt = 0;
+
+      for (i=0; i<node->descr.ninputs; i++)
+	node->descr.in[i] = 0;
+
+      for (i=0; i<node->descr.noutputs; i++)
+	node->descr.out[i] = 0;
+    }
 }
 
 static void 
 dsp_graph_send_message( fts_dsp_graph_t *graph, fts_symbol_t message)
 {
-  fts_dsp_node_t *nodes = graph->nodes;
   fts_dsp_node_t *node;
 
-  for( node = nodes; node; node = node->next)
+  for( node = graph->nodes; node; node = node->next)
     fts_send_message( node->o, fts_system_inlet, message, 0, 0);
 }
 
 static void 
 dsp_graph_count_predecessors( fts_dsp_graph_t *graph)
 {
-  fts_dsp_node_t *nodes = graph->nodes;
   fts_dsp_node_t *node;
 
-  for( node = nodes; node; node = node->next)
+  for( node = graph->nodes; node; node = node->next)
     dsp_graph_succ_realize(graph, node, dsp_graph_inc, 0);
 }
 
 static void 
 dsp_graph_schedule( fts_dsp_graph_t *graph)
 {
-  fts_dsp_node_t *nodes = graph->nodes;
   fts_dsp_node_t *node;
 
   /* schedule all nodes without predecessors */
-  for( node = nodes; node; node = node->next)
+  for( node = graph->nodes; node; node = node->next)
     {
       if ( node->pred_cnt == 0)
 	dsp_graph_schedule_depth(graph, 0, 0, node, 0, 0);
     }
 }
 
-static void 
+static int
 dsp_graph_check_loop( fts_dsp_graph_t *graph)
 {
-  fts_dsp_node_t *nodes = graph->nodes;
   fts_dsp_node_t *node;
+  int ok = 1;
 
-  for( node = nodes; node; node = node->next)
+  for( node = graph->nodes; node; node = node->next)
     {
       if ( !IS_SCHEDULED(node))
 	{
-	  fts_object_signal_runtime_error( node->o, "Loop in dsp graph: object not scheduled");
+	  fts_object_signal_runtime_error( node->o, "Loop in dsp graph (object not activated)");
+	  ok = 0;
 	}
     }
+
+  return ok;
 }
 
 /**************************************************************************
@@ -904,14 +872,15 @@ fts_dsp_graph_compile(fts_dsp_graph_t *graph)
   dsp_graph_send_message(graph, fts_s_put_prologue);
   dsp_graph_count_predecessors(graph);
   dsp_graph_schedule(graph);
+
   dsp_graph_check_loop(graph);
   dsp_graph_send_message(graph, fts_s_put_epilogue);
-
+  
   ftl_mem_end_memory_relocation();
   
   ftl_program_add_return(graph->chain);
   ftl_program_compile(graph->chain);
-
+  
   graph->status = status_compiled;
 }
 
@@ -936,28 +905,32 @@ fts_dsp_graph_run(fts_dsp_graph_t *graph)
 void 
 fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_object_t *o)
 {
-  fts_dsp_node_t **nodes_ptr = &graph->nodes;
-  fts_dsp_node_t *node;
+  fts_dsp_node_t *node = (fts_dsp_node_t *)fts_heap_zalloc(dsp_node_heap);
   fts_atom_t v;
-
-  node = (fts_dsp_node_t *)fts_heap_zalloc(dsp_node_heap);
 
   node->o = o;
 
   fts_set_pointer(&v, (void *)node);
   _fts_object_put_prop(o, fts_s_dsp_descr, &v);
 
-  node->descr = 0;
+  node->descr.ninputs = dsp_input_get(o, fts_object_get_inlets_number(o));
+  node->descr.noutputs = dsp_output_get(o, fts_object_get_outlets_number(o));
+  
+  if(node->descr.ninputs)
+    node->descr.in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * node->descr.ninputs);
+  
+  if(node->descr.noutputs)
+    node->descr.out = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * node->descr.noutputs);
 
-  node->next = *(nodes_ptr);
-  *(nodes_ptr) = node;
+  /* insert to list */
+  node->next = graph->nodes;
+  graph->nodes = node;
 }
 
 /* remove object from graph */
 void 
 fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
 {
-  fts_dsp_node_t **nodes_ptr = &graph->nodes;
   fts_dsp_node_t *node;
   fts_dsp_node_t *prev_node;
   
@@ -966,27 +939,22 @@ fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
   _fts_object_remove_prop(o, fts_s_dsp_descr);
   
   prev_node = 0;
-  for(node=*(nodes_ptr); node; node=node->next)
+  for(node=graph->nodes; node; node=node->next)
     {
-      if (node->o == o)
+      if(node->o == o)
 	{
-	  if (prev_node)
+	  fts_free(node->descr.in);
+	  fts_free(node->descr.out);
+
+	  if(prev_node)
 	    prev_node->next = node->next;
 	  else
-	    *(nodes_ptr) = node->next;
+	    graph->nodes = node->next;
 	  
-	  if (node->descr)
-	    {
-	      fts_free((char *) node->descr->in);
-	      fts_free((char *) node->descr->out);
-	      fts_heap_free((char *)node->descr, dsp_descr_heap);
-	    }
-	  
-	  fts_heap_free((char *)node, dsp_node_heap);
 	  return;
 	}
-      
-      prev_node = node;
+      else
+	prev_node = node;
     }
 }
 

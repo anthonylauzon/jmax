@@ -37,7 +37,6 @@ static fts_symbol_t white_ftl_sym = 0;
 void
 white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  white_t *this = (white_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t a[2];
   
@@ -67,16 +66,12 @@ white_ftl(fts_word_t *argv)
 static void
 white_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  white_t *this = (white_t *)o;
-
   fts_dsp_add_object(o);
 }
 
 static void
 white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  white_t *this = (white_t *)o;
-
   fts_dsp_remove_object(o);
 }
 

@@ -337,7 +337,6 @@ static void ftl_mul_self(fts_word_t *argv)
 static void ftl_add_self_64(fts_word_t *argv)
 {
   float * restrict v = (float *)fts_word_get_pointer(argv + 0);
-  int n = fts_word_get_int(argv + 1);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -976,7 +975,6 @@ static void
 binop_const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_const_t *this = (binop_const_t *)o;
-  float *data;
 
   this->data = ftl_data_alloc(sizeof(float));
 

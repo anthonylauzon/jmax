@@ -227,8 +227,6 @@ env_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void 
 env_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  env_t *this = (env_t *)o;
-
   if(ac == 1 && bpf_atom_is(at))
     env_set_bpf(o, 0, 0, 1, at);
   else

@@ -29,11 +29,10 @@
 #include "delay.h"
 
 static fts_symbol_t sym_delayline = 0;
-static fts_symbol_t sym_delayline_with_input_and_drain = 0;
-static fts_symbol_t sym_delayline_with_input = 0;
-static fts_symbol_t sym_delayline_with_drain = 0;
+static fts_symbol_t sym_delay = 0;
 static fts_symbol_t sym_tapin = 0;
 static fts_symbol_t sym_tapout = 0;
+static fts_symbol_t sym_retap = 0;
 static fts_symbol_t sym_vtap = 0;
 
 fts_metaclass_t *delayline_metaclass;
@@ -46,32 +45,60 @@ fts_metaclass_t *delayline_metaclass;
 
 #define DELAYLINE_DEFAULT_LENGTH 1000
 
+static void
+delayline_initialize(delayline_t *this)
+{
+  this->buffer = NULL;
+  this->phase = 0;
+  this->delay_size = 0;
+  this->drain_size = 0;
+  this->zero_onset = 0;
+  this->ring_size = 0;
+  this->alloc = 0;
+  this->delay_length = DELAYLINE_DEFAULT_LENGTH;
+  this->drain_length = 0.0;
+  this->edge = NULL;
+  this->sr = fts_dsp_get_sample_rate();
+  this->n_tick = fts_dsp_get_tick_size();
+}
+
 static void 
 delayline_clear(delayline_t *this)
 {
   int i;
       
   for(i=-DELAYLINE_ALLOC_HEAD; i<this->ring_size+DELAYLINE_ALLOC_TAIL; i++)
-    this->samples[i] = 0.0;
+    this->buffer[i] = 0.0;
 
   this->phase = 0;
 }
 
 static void
-delayline_reset(delayline_t *this, double sr, int n_tick)
+delayline_reset(delayline_t *this, int n_tick, double sr)
 {
-  int delay_size = 0.001 * this->delay_length * sr;
-  int drain_size = 0.001 * this->drain_length * sr;
-  int ring_size = delay_size + drain_size + 2 * n_tick + DELAYLINE_ALLOC_HEAD;
+  int delay_size = (0.001 * this->delay_length * sr + 0.5);
+  int drain_size = (0.001 * this->drain_length * sr + 0.5);
+  int ring_size;
+  int size;
 
-  ring_size = (int)ceil((double)ring_size / (double)n_tick) * n_tick; /* aligne ring buffer to tick size */
-  
+  /* align drain size to tick */
+  size = (int)ceil((double)drain_size / (double)n_tick) * n_tick;
+
+  /* set onset for zeroing */
+  this->zero_onset = size;
+
+  /* add delay size and exta points for cubic interpolation */
+  size += delay_size + DELAYLINE_ALLOC_HEAD + DELAYLINE_ALLOC_TAIL;
+
+  /* align size to tick and add extra ticks for input and zeroing */
+  ring_size = (int)ceil((double)size / (double)n_tick) * n_tick + 2 * n_tick;
+
   /* check if new size matches old size */
   if(ring_size > this->alloc) /* need to reallocate */
     {
       /* allocate delayline (with head and tail for interpolation) */
-      this->samples = (float *)fts_realloc(this->samples, (ring_size + DELAYLINE_ALLOC_HEAD + DELAYLINE_ALLOC_TAIL) * sizeof(float));
-      this->samples += DELAYLINE_ALLOC_HEAD;
+      this->buffer = (float *)fts_realloc(this->buffer, (ring_size + DELAYLINE_ALLOC_HEAD + DELAYLINE_ALLOC_TAIL) * sizeof(float));
+      this->buffer += DELAYLINE_ALLOC_HEAD;
 
       this->alloc = ring_size;
     }
@@ -88,174 +115,48 @@ delayline_reset(delayline_t *this, double sr, int n_tick)
 static void
 delayline_destroy(delayline_t *this)
 {
-  if(this->samples != NULL)
-    fts_free(this->samples - DELAYLINE_ALLOC_HEAD);
+  if(this->edge != NULL)
+    fts_object_release((fts_object_t *)this->edge);
+
+  if(this->buffer != NULL)
+    fts_free(this->buffer - DELAYLINE_ALLOC_HEAD);
 }
 
 static void
 delayline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delayline_t *this = (delayline_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  double sr = fts_dsp_get_input_srate(dsp, 0);
-  int n_tick = fts_dsp_get_input_size(dsp, 0);
-  int input = (fts_dsp_is_input_null(dsp, 0) != 0);
-  int drain = (this->drain_length > 0.0);
-  fts_atom_t a[3];
+  int n_tick = fts_dsp_edge_get_n_tick(this->edge);
+  int sr = fts_dsp_edge_get_sr(this->edge);
+  fts_atom_t a;
   
-  delayline_reset(this, sr, n_tick);
+  delayline_reset(this, n_tick, sr);
 
-  if(1 || (input && drain))
-    {
-      fts_set_object(a + 0, o);
-      fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
-      fts_set_int(a + 2, n_tick);  
-      fts_dsp_add_function(sym_delayline_with_input_and_drain, 3, a);
-    }
-  else if(input)
-    {
-      fts_set_object(a + 0, o);
-      fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
-      fts_set_int(a + 2, n_tick);  
-      fts_dsp_add_function(sym_delayline_with_input, 3, a);
-    }
-  else if(drain)
-    {
-      fts_set_object(a + 0, o);
-      fts_set_int(a + 1, n_tick);  
-      fts_dsp_add_function(sym_delayline_with_drain, 2, a);
-    }
-  else
-    {
-      fts_set_object(a + 0, o);
-      fts_set_int(a + 1, n_tick);  
-      fts_dsp_add_function(sym_delayline, 2, a);
-    }
-}
-
-static void 
-delayline_ftl_with_input_and_drain(fts_word_t *argv)
-{
-  delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
-  int n_tick = fts_word_get_int(argv + 2);
-  float * restrict samples = this->samples;
-  int ring_size = this->ring_size;
-  int phase = this->phase;
-  int zero = phase + this->drain_size;
-  int tail;
-  int i;
-
-  if(phase == 0)
-    {
-      /* set head for cubic interpolation */
-      samples[-1] = samples[ring_size - 1];
-
-      /* add input */
-      for(i=0; i<n_tick; i++)
-	samples[phase + i] += in[i];
-      
-      /* set tail for cubic interpolation */
-      samples[ring_size] = samples[0];
-      samples[ring_size + 1] = samples[1];
-
-      phase = n_tick;	
-    }
-  else
-    {
-      for(i=0; i<n_tick; i++)
-	samples[phase + i] += in[i];
-      
-      phase += n_tick;
-      
-      if(phase == ring_size)
-	phase = 0;
-    }
-
-  this->phase = phase;
-
-  /* zero tail of drain buffer */
-  if(zero >= ring_size)
-    zero -= ring_size; /* ring buffer wrap around */
-
-  tail = ring_size - zero;
-  if(tail > n_tick)
-    {
-      for(i=0; i<n_tick; i++)
-	samples[zero + i] = 0.0;
-    }
-  else
-    {
-      int k;
-
-      for(i=0; i<tail; i++)
-	samples[zero + i] = 0.0;
-
-      for(k=0; i<n_tick; k++, i++)
-	samples[k] = 0.0;
-    }
-}
-
-static void 
-delayline_ftl_with_input(fts_word_t *argv)
-{
-  delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
-  int n_tick = fts_word_get_int(argv + 2);
-  float * restrict samples = this->samples;
-  int ring_size = this->ring_size;
-  int phase = this->phase;
-  int i;
-
-}
-
-static void 
-delayline_ftl_with_drain(fts_word_t *argv)
-{
-  delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
-  int n_tick = fts_word_get_int(argv + 1);
-  float * restrict samples = this->samples;
-  int ring_size = this->ring_size;
-  int phase = this->phase;
-  int zero = phase + this->drain_size;
-  int tail;
-  int i;
-
-  /* advance phase and set head and tail */
-
-  /* zero tail of drain buffer */
-  if(zero >= ring_size)
-    zero -= ring_size; /* ring buffer wrap around */
-
-  tail = ring_size - zero;
-  if(tail > n_tick)
-    {
-      for(i=0; i<n_tick; i++)
-	samples[zero + i] = 0.0;
-    }
-  else
-    {
-      int k;
-
-      for(i=0; i<tail; i++)
-	samples[zero + i] = 0.0;
-
-      for(k=0; i<n_tick; k++, i++)
-	samples[k] = 0.0;
-    }
+  fts_set_object(&a, o);
+  fts_dsp_add_function(sym_delayline, 1, &a);
 }
 
 static void 
 delayline_ftl(fts_word_t *argv)
 {
   delayline_t * restrict this = (delayline_t *)fts_word_get_pointer(argv + 0);
-  int n_tick = fts_word_get_int(argv + 1);
-  float * restrict samples = this->samples;
-  int ring_size = this->ring_size;
-  int phase = this->phase;
+  int onset;
   int i;
 
-  /* advance phase and set head and tail */
+  /* increment phase */
+  this->phase += this->n_tick;
+  
+  if(this->phase == this->ring_size)
+    this->phase = 0;  
+  
+  onset = this->phase + this->zero_onset;
+
+  if(onset >= this->ring_size)
+    onset -= this->ring_size;
+
+  /* zero buffer */
+  for(i=0; i<this->n_tick; i++)
+    this->buffer[onset + i] = 0.0;
 }
 
 static void
@@ -263,29 +164,28 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   delayline_t *this = (delayline_t *)o;
 
-  this->samples = NULL;
-  this->phase = 0;
-  this->delay_size = 0;
-  this->drain_size = 0;
-  this->ring_size = 0;
-  this->alloc = 0;
-  this->delay_length = DELAYLINE_DEFAULT_LENGTH;
-  this->drain_length = 0.0;
-  this->stage = (fts_dspstage_t *)o;
-  this->sr = fts_dsp_get_sample_rate();
-  this->n_tick = fts_dsp_get_tick_size();
+  fts_dsp_add_object(o);
 
-  fts_dspstage_self(o);
+  delayline_initialize(this);
+
+  if(ac > 0 && fts_is_a(at, fts_dsp_edge_metaclass))
+    {
+      this->edge = (fts_dsp_edge_t *)fts_get_object(at);
+      fts_object_refer((fts_object_t *)this->edge);
+      ac--;
+      at++;
+    }
+  else
+    {
+      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_metaclass, 0, 0);
+      fts_object_refer((fts_object_t *)this->edge);
+    }
 
   if(ac > 0 && fts_is_number(at))
     this->delay_length = fts_get_number_float(at);
   
   if(ac > 1 && fts_is_number(at + 1))
     this->drain_length = fts_get_number_float(at + 1);
-  
-  delayline_reset(this, fts_dsp_get_sample_rate(), fts_dsp_get_tick_size());  
-
-  fts_dsp_add_object(o);
 }
 
 static void
@@ -300,67 +200,125 @@ delayline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 delayline_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  delayline_t *this = (delayline_t *)o;
-  
   fts_set_object(value, o);
 }
 
 static fts_status_t
 delayline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(delayline_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(delayline_t), 0, 0, 0);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delayline_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delayline_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delayline_put);
-
-  fts_dsp_declare_inlet(cl, 0);
-  fts_dsp_declare_outlet(cl, 0);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put_epilogue, delayline_put);
 
   return fts_ok;
 }
 
 /************************************************************
  *
- *  tapin~ and tapout~
+ *  delay~
  *
  */
 
 typedef struct 
 {
   fts_object_t o;
-  ftl_data_t delay;
-  delayline_t *delayline;
-  fts_dspstage_t *stage;
+  ftl_data_t samples;
+  delayline_t *line;
   enum interpolation_mode {mode_none, mode_cubic} mode;
-} tap_t;
+  enum read_write_order {order_straight, order_loop} order;
+} delay_t;
 
 static void
-tap_set_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  delay_t *this = (delay_t *)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  int n_tick = fts_dsp_get_input_size(dsp, 0);
+  double sr = fts_dsp_get_input_srate(dsp, 0);
+  fts_atom_t a[5];
+  
+  delayline_reset(this->line, n_tick, sr);
+
+  fts_set_pointer(a + 0, this->line);
+  fts_set_ftl_data(a + 1, this->samples);
+  fts_set_symbol(a + 2, fts_dsp_get_input_name(dsp, 0));
+  fts_set_symbol(a + 3, fts_dsp_get_output_name(dsp, 0));
+  fts_set_int(a + 4, n_tick);  
+  fts_dsp_add_function(sym_delay, 5, a);
+}
+
+static void 
+delay_ftl(fts_word_t *argv)
+{
+  delayline_t *delayline = (delayline_t *)fts_word_get_pointer(argv + 0);
+  int samples = *((int *)fts_word_get_pointer(argv + 1));
+  float *in = (float *)fts_word_get_pointer(argv + 2);
+  float *out = (float *)fts_word_get_pointer(argv + 3);
+  int n_tick = fts_word_get_int(argv + 4);
+  int phase = delayline->phase;
+  int onset, tail;
+  int i, k;
+
+  if(samples > delayline->delay_size)
+    samples = delayline->delay_size;
+  
+  onset = phase - samples;
+  if(onset < 0)
+    onset += delayline->ring_size; /* ring buffer wrap around */
+  
+  tail = delayline->ring_size - onset;
+  
+  if(tail > n_tick)
+    tail = n_tick;
+  
+  for(i=0; i<tail; i++)
+    {
+      delayline->buffer[phase + i] = in[i];
+      out[i] = delayline->buffer[onset + i];
+    }
+  
+  for(k=0; i<n_tick; k++, i++)
+    {
+      delayline->buffer[phase + i] = in[i];
+      out[i] = delayline->buffer[k];
+    }
+  
+  phase += n_tick;
+  
+  if(phase == delayline->ring_size)
+    delayline->phase = 0;
+  else
+    delayline->phase = phase;    
+}
+
+static void
+delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  tap_t *this = (tap_t *)o;
+  delay_t *this = (delay_t *)o;
   double time = fts_get_number_float(at);
 	
-  if(time <= 0.0)
+   if(time <= 0.0)
     time = 0;
 
   switch(this->mode)
     {
     case mode_none:
       {
-	int *delay = ftl_data_get_ptr(this->delay);
+	int *samples = ftl_data_get_ptr(this->samples);
 
-	*delay = (int)(0.001 * delayline_get_sr(this->delayline) * time + 0.5);
+	*samples = (int)(0.001 * delayline_get_sr(this->line) * time + 0.5);
       }
       break;
 
     case mode_cubic:
       {
-	int *delay = ftl_data_get_ptr(this->delay);
+	double *samples = ftl_data_get_ptr(this->samples);
 
-	*delay = 0.001 * delayline_get_sr(this->delayline) * time;
+	*samples = 0.001 * delayline_get_sr(this->line) * time;
       }
       break;
 
@@ -370,56 +328,95 @@ tap_set_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-tap_set_delay_double(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  tap_t *this = (tap_t *)o;
-  double *delay = ftl_data_get_ptr(this->delay);
-  double time = fts_get_number_float(at);
-  
-  if(time <= 0.0)
-    *delay = 0.0;
-  else
-    *delay = 0.001 * delayline_get_sr(this->delayline) * time;
-}
+  delay_t *this = (delay_t *)o;
+  delayline_t *line = (delayline_t *)fts_get_object(at);
 
-static void
-tap_set_delayline(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  tap_t *this = (tap_t *)o;
-  delayline_t *delayline = (delayline_t *)fts_get_object(at);
-
-  if(delayline != this->delayline)
+  if(line != this->line)
     {
-      if(this->delayline == NULL || this->stage == NULL || delayline_get_stage(delayline) == this->stage)
+      if(this->line == NULL || delayline_get_edge(line) == delayline_get_edge(this->line))
 	{
-	  if(this->delayline != NULL)
-	    {
-	      fts_object_release((fts_object_t *)this->delayline);
+	  if(this->line != NULL)
+	    fts_object_release((fts_object_t *)this->line);
 
-	      if(this->stage == NULL)
-		this->stage = delayline_get_stage(delayline);
-	    }
-
-	  this->delayline = delayline;
-
-	  fts_object_refer((fts_object_t *)delayline);
+	  this->line = line;
+	  fts_object_refer((fts_object_t *)line);
 	}
       else
-	fts_object_signal_runtime_error(o, "delay line must have same stage");
+	fts_object_signal_runtime_error(o, "delay line must have same edge");
     }
 }
 
 static void
+delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  delay_t *this = (delay_t *)o;
+  ftl_data_t samples = ftl_data_alloc(sizeof(int));
+
+  fts_dsp_add_object(o);
+
+  this->line = (delayline_t *)fts_malloc(sizeof(delayline_t));
+  this->samples = samples;
+  this->mode = mode_none;
+  this->order = order_straight;
+
+  delayline_initialize(this->line);
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      this->line->delay_length = fts_get_number_float(at);
+      delay_set_time(o, 0, 0, 1, at);
+    }
+  
+  if(ac > 1 && fts_is_number(at + 1))
+    delay_set_time(o, 0, 0, 1, at + 1);
+}
+
+static void
+delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  delay_t *this = (delay_t *)o;
+
+  delayline_destroy(this->line);
+  fts_free(this->line);
+  fts_dsp_remove_object(o);
+}
+
+static fts_status_t
+delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, delay_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, delay_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, delay_put);
+
+  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
+
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
+
+  return fts_Success;
+}
+
+/************************************************************
+ *
+ *  tapin~ and tapout~
+ *
+ */
+
+static void
 tapin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tap_t *this = (tap_t *)o;
+  delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  double sr = fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[4];
   
-  fts_set_pointer(a + 0, this->delayline);
-  fts_set_ftl_data(a + 1, this->delay);
+  fts_set_pointer(a + 0, this->line);
+  fts_set_ftl_data(a + 1, this->samples);
   fts_set_symbol(a + 2, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 3, n_tick);
   fts_dsp_add_function(sym_tapin, 4, a);
@@ -432,12 +429,12 @@ tapin_ftl(fts_word_t *argv)
   int delay = *((int *)fts_word_get_pointer(argv + 1));
   float * restrict in = (float *) fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float * restrict samples = delayline->samples;
+  float * restrict buffer = delayline->buffer;
   int phase = delayline->phase;
   int size = delayline->drain_size;
   int ring_size = delayline->ring_size;
   int onset, tail;
-  int i, k;
+  int i;
 
   if(delay > size)
     delay = size;
@@ -452,31 +449,30 @@ tapin_ftl(fts_word_t *argv)
   if(tail > n_tick)
     {
       for(i=0; i<n_tick; i++)
-	samples[onset + i] += in[i];
+	buffer[onset + i] += in[i];
     }
   else
     {
       int k;
 
       for(i=0; i<tail; i++)
-	samples[onset + i] += in[i];
+	buffer[onset + i] += in[i];
 
       for(k=0; i<n_tick; k++, i++)
-	samples[k] += in[i];
+	buffer[k] += in[i];
     }
 }
 
 static void
 tapout_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tap_t *this = (tap_t *)o;
+  delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  double sr = fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[4];
   
-  fts_set_pointer(a + 0, this->delayline);
-  fts_set_ftl_data(a + 1, this->delay);
+  fts_set_pointer(a + 0, this->line);
+  fts_set_ftl_data(a + 1, this->samples);
   fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 3, n_tick);
   fts_dsp_add_function(sym_tapout, 4, a);
@@ -489,7 +485,7 @@ tapout_ftl(fts_word_t *argv)
   int delay = *((int *)fts_word_get_pointer(argv + 1));
   float * restrict out = (float *) fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float * restrict samples = delayline->samples;
+  float * restrict buffer = delayline->buffer;
   int size = delayline->delay_size;
   int ring_size = delayline->ring_size;
   int onset, tail;
@@ -498,7 +494,7 @@ tapout_ftl(fts_word_t *argv)
   if(delay > size)
     delay = size;
 
-  onset = delayline->phase - n_tick - delay;
+  onset = delayline->phase - delay;
   if(onset < 0)
     onset += ring_size; /* ring buffer wrap around */
 
@@ -508,27 +504,26 @@ tapout_ftl(fts_word_t *argv)
     tail = n_tick;
 
   for(i=0; i<tail; i++)
-    out[i] = samples[onset + i];
+    out[i] = buffer[onset + i];
 
   for(k=0; i<n_tick; k++, i++)
-    out[i] = samples[k];
+    out[i] = buffer[k];
 }
 
 static void
 tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  tap_t *this = (tap_t *)o;
-  ftl_data_t delay = ftl_data_alloc(sizeof(int));
+  delay_t *this = (delay_t *)o;
+  ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
   fts_dsp_add_object(o);
 
-  this->delayline = NULL;
-  this->delay = delay;
-  this->stage = NULL;
+  this->line = NULL;
+  this->samples = samples;
   this->mode = mode_none;
 
   if(ac > 0 && fts_is_a(at, delayline_metaclass))
-    tap_set_delayline(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 0, 1, at);
   else
     {
       fts_object_set_error(o, "First argument must be a delay line");
@@ -536,26 +531,25 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     }
 
   if(ac > 1 && fts_is_number(at + 1))
-    tap_set_delay(o, 0, 0, 1, at + 1);
+    delay_set_time(o, 0, 0, 1, at + 1);
   
-  fts_dsp_force_order((fts_object_t *)this, fts_dspstage_get_front(delayline_get_stage(this->delayline)));
+  fts_dsp_before_edge(o, delayline_get_edge(this->line));
 }
 
 static void
 tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  tap_t *this = (tap_t *)o;
-  ftl_data_t delay = ftl_data_alloc(sizeof(int));
+  delay_t *this = (delay_t *)o;
+  ftl_data_t samples = ftl_data_alloc(sizeof(int));
 
   fts_dsp_add_object(o);
 
-  this->delayline = NULL;
-  this->delay = delay;
-  this->stage = NULL;
+  this->line = NULL;
+  this->samples = samples;
   this->mode = mode_none;
 
   if(ac > 0 && fts_is_a(at, delayline_metaclass))
-    tap_set_delayline(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 0, 1, at);
   else
     {
       fts_object_set_error(o, "First argument must be a delay line");
@@ -563,58 +557,35 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   if(ac > 1 && fts_is_number(at + 1))
-    tap_set_delay(o, 0, 0, 1, at + 1);
+    delay_set_time(o, 0, 0, 1, at + 1);
   
-  fts_dsp_force_order(fts_dspstage_get_back(delayline_get_stage(this->delayline)), (fts_object_t *)this);
-}
-
-static void
-vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  tap_t *this = (tap_t *)o;
-
-  fts_dsp_add_object(o);
-
-  this->delayline = NULL;
-  this->delay = NULL;
-  this->stage = NULL;
-  this->mode = mode_cubic;
-
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
-    tap_set_delayline(o, 0, 0, 1, at);
-  else
-    {
-      fts_object_set_error(o, "First argument must be a delay line");
-      return;
-    }
-
-  fts_dsp_force_order(fts_dspstage_get_back(delayline_get_stage(this->delayline)), (fts_object_t *)this);
+  fts_dsp_after_edge(o, delayline_get_edge(this->line));
 }
 
 static void
 tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  tap_t *this = (tap_t *)o;
+  delay_t *this = (delay_t *)o;
 
-  if(this->delayline != NULL)
-    fts_object_release((fts_object_t *)this->delayline);
+  if(this->line != NULL)
+    fts_object_release((fts_object_t *)this->line);
 
-  ftl_data_free(this->delay);
+  ftl_data_free(this->samples);
   fts_dsp_remove_object(o);
 }
 
 static fts_status_t
 tapin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(tap_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), 3, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapin_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapin_put);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, tap_set_delay);
-  fts_method_define_varargs(cl, 1, fts_s_float, tap_set_delay);
-  fts_method_define_varargs(cl, 2, sym_delayline, tap_set_delayline);  
+  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
+  fts_method_define_varargs(cl, 2, sym_delayline, delay_set_line);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0); /* hidden orderforcing connection */
@@ -625,20 +596,147 @@ tapin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 tapout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(tap_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tapout_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, tapout_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, tap_set_delay);
-  fts_method_define_varargs(cl, 0, fts_s_float, tap_set_delay);
-  fts_method_define_varargs(cl, 1, sym_delayline, tap_set_delayline);  
+  fts_method_define_varargs(cl, 0, fts_s_int, delay_set_time);
+  fts_method_define_varargs(cl, 0, fts_s_float, delay_set_time);
+  fts_method_define_varargs(cl, 1, sym_delayline, delay_set_line);  
 
   fts_dsp_declare_inlet(cl, 0); /* hidden orderforcing connection */
   fts_dsp_declare_outlet(cl, 0);
 
   return fts_ok;
+}
+
+/************************************************************
+ *
+ *  tapin~ and tapout~
+ *
+ */
+
+static void
+retap_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  delay_t *this = (delay_t *)o;
+  double time = fts_get_number_float(at);
+  int *samples = ftl_data_get_ptr(this->samples);
+  int n_tick = delayline_get_n_tick(this->line);
+	
+  if(time <= 0.0)
+    time = 0;
+  
+  *samples = (int)(0.001 * delayline_get_sr(this->line) * time + 0.5);
+  
+  if(*samples < n_tick)
+    *samples = n_tick;
+}
+
+static void
+retap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  delay_t *this = (delay_t *)o;
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  int n_tick = fts_dsp_get_input_size(dsp, 0);
+  int *samples = ftl_data_get_ptr(this->samples);
+  fts_atom_t a[4];
+  
+  if(*samples < n_tick)
+    *samples = n_tick;
+
+  fts_set_pointer(a + 0, this->line);
+  fts_set_ftl_data(a + 1, this->samples);
+  fts_set_symbol(a + 2, fts_dsp_get_input_name(dsp, 0));
+  fts_set_int(a + 3, n_tick);
+  fts_dsp_add_function(sym_tapin, 4, a);
+}
+
+static void 
+retap_ftl(fts_word_t *argv)
+{
+  delayline_t *delayline = (delayline_t *)fts_word_get_pointer(argv);
+  int delay = *((int *)fts_word_get_pointer(argv + 1));
+  float * restrict in = (float *) fts_word_get_pointer(argv + 2);
+  int n_tick = fts_word_get_int(argv + 3);
+  float * restrict buffer = delayline->buffer;
+  int phase = delayline->phase;
+  int size = delayline->drain_size;
+  int ring_size = delayline->ring_size;
+  int onset, tail;
+  int i;
+
+  if(delay > size)
+    delay = size;
+  
+  onset = phase + delay;
+  if(onset >= ring_size)
+    onset -= ring_size;
+
+  tail = ring_size - onset;
+
+  /* add input to current tick */
+  if(tail > n_tick)
+    {
+      for(i=0; i<n_tick; i++)
+	buffer[onset + i] += in[i];
+    }
+  else
+    {
+      int k;
+
+      for(i=0; i<tail; i++)
+	buffer[onset + i] += in[i];
+
+      for(k=0; i<n_tick; k++, i++)
+	buffer[k] += in[i];
+    }
+}
+
+static void
+retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  delay_t *this = (delay_t *)o;
+  ftl_data_t samples = ftl_data_alloc(sizeof(int));
+
+  fts_dsp_add_object(o);
+
+  this->line = NULL;
+  this->samples = samples;
+  this->mode = mode_none;
+
+  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+    delay_set_line(o, 0, 0, 1, at);
+  else
+    {
+      fts_object_set_error(o, "First argument must be a delay line");
+      return;
+    }
+
+  if(ac > 1 && fts_is_number(at + 1))
+    retap_set_time(o, 0, 0, 1, at + 1);
+  
+  fts_dsp_after_edge(o, delayline_get_edge(this->line));
+}
+
+static fts_status_t
+retap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(delay_t), 3, 0, 0);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, retap_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, retap_put);
+
+  fts_method_define_varargs(cl, 1, fts_s_int, retap_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, retap_set_time);
+  fts_method_define_varargs(cl, 2, sym_delayline, delay_set_line);  
+
+  fts_dsp_declare_inlet(cl, 0);
+
+  return fts_Success;
 }
 
 /************************************************************
@@ -650,13 +748,12 @@ tapout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 vtap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tap_t *this = (tap_t *)o;
+  delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  double sr = fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[4];
 
-  fts_set_pointer(a + 0, this->delayline);
+  fts_set_pointer(a + 0, this->line);
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 3, n_tick);
@@ -670,7 +767,7 @@ vtap_ftl(fts_word_t *argv)
   float *in = (float *)fts_word_get_pointer(argv + 1);
   float *out = (float *)fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
-  float * restrict samples = delayline->samples;
+  float * restrict buffer = delayline->buffer;
   double conv = 0.001 * delayline->sr;
   int delay_size = delayline->delay_size;
   int ring_size = delayline->ring_size;
@@ -679,6 +776,14 @@ vtap_ftl(fts_word_t *argv)
   double f_phase = (double)phase;
   double f_max_delay =(double)delay_size;
   int i;
+
+  /* set head tail for cubic interpolation */
+  if(phase == 0)
+    {
+      delayline->buffer[-1] = delayline->buffer[delayline->ring_size - 1];
+      delayline->buffer[delayline->ring_size] = delayline->buffer[0];
+      delayline->buffer[delayline->ring_size + 1] = delayline->buffer[1];
+    }
 
   for(i=0; i<n_tick; i++)
     {
@@ -691,7 +796,7 @@ vtap_ftl(fts_word_t *argv)
 	  if(index < 0)
 	    index += ring_size;
 
-	  out[i] = samples[index];
+	  out[i] = buffer[index];
 	}
       else if(f_delay < 1.0)
 	{
@@ -700,7 +805,7 @@ vtap_ftl(fts_word_t *argv)
 	  if(index < 0)
 	    index += ring_size;
 	  
-	  out[i] = samples[index];
+	  out[i] = buffer[index];
 	}
       else if(f_delay > f_max_delay)
 	{
@@ -709,7 +814,7 @@ vtap_ftl(fts_word_t *argv)
 	  if(onset < 0)
 	    onset += ring_size;
 
-	  out[i] = samples[onset];
+	  out[i] = buffer[onset];
 	}
       else
 	{
@@ -718,23 +823,45 @@ vtap_ftl(fts_word_t *argv)
 	  if(f_onset < 0.0)
 	    f_onset += f_ring_size;
 	  
-	  fts_cubic_interpolate(samples, (int)f_onset, f_onset, out + i);
+	  fts_cubic_interpolate(buffer, (int)f_onset, f_onset, out + i);
 	}
 
       f_phase += 1.0;
     }
 }
 
+static void
+vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  delay_t *this = (delay_t *)o;
+
+  fts_dsp_add_object(o);
+
+  this->line = NULL;
+  this->samples = 0;
+  this->mode = mode_cubic;
+
+  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+    delay_set_line(o, 0, 0, 1, at);
+  else
+    {
+      fts_object_set_error(o, "First argument must be a delay line");
+      return;
+    }
+
+  fts_dsp_after_edge(o, delayline_get_edge(this->line));
+}
+
 static fts_status_t
 vtap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(tap_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(delay_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, vtap_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tap_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, vtap_put);
 
-  fts_method_define_varargs(cl, 1, sym_delayline, tap_set_delayline);  
+  fts_method_define_varargs(cl, 1, sym_delayline, delay_set_line);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -752,23 +879,22 @@ void
 signal_delay_config(void)
 {
   sym_delayline = fts_new_symbol("delayline~");
-  sym_delayline_with_input_and_drain = fts_new_symbol("delayline~ (input and drain)");
-  sym_delayline_with_input = fts_new_symbol("delayline~ (drain, no input)");
-  sym_delayline_with_drain = fts_new_symbol("delayline~ (input, no drain)");
+  sym_delay = fts_new_symbol("delay~");
   sym_tapin = fts_new_symbol("tapin~");
   sym_tapout = fts_new_symbol("tapout~");
+  sym_retap = fts_new_symbol("retap~");
   sym_vtap = fts_new_symbol("vtap~");
 
   delayline_metaclass = fts_class_install(sym_delayline, delayline_instantiate);
   fts_alias_install(fts_new_symbol("dline~"), sym_delayline);
-  fts_metaclass_install(sym_tapin, tapin_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(sym_tapout, tapout_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(sym_vtap, vtap_instantiate, fts_arg_type_equiv);
+  fts_class_install(sym_delay, delay_instantiate);
+  fts_class_install(sym_tapin, tapin_instantiate);
+  fts_class_install(sym_tapout, tapout_instantiate);
+  fts_class_install(sym_retap, retap_instantiate);
+  fts_class_install(sym_vtap, vtap_instantiate);
 
-  fts_dsp_declare_function(sym_delayline_with_input_and_drain, delayline_ftl_with_input_and_drain);
-  fts_dsp_declare_function(sym_delayline_with_input, delayline_ftl_with_input);
-  fts_dsp_declare_function(sym_delayline_with_drain, delayline_ftl_with_drain);
   fts_dsp_declare_function(sym_delayline, delayline_ftl);
+  fts_dsp_declare_function(sym_delay, delay_ftl);
   fts_dsp_declare_function(sym_tapin, tapin_ftl);
   fts_dsp_declare_function(sym_tapout, tapout_ftl);
   fts_dsp_declare_function(sym_vtap, vtap_ftl);

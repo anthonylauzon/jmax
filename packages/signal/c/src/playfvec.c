@@ -156,8 +156,6 @@ play_fvec_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static void 
 play_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  play_fvec_t *this = (play_fvec_t *)o;
-
   switch (ac)
     {
     default:
@@ -187,8 +185,6 @@ play_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 play_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  play_fvec_t *this = (play_fvec_t *)o;
-
   play_fvec_set(o, 0, 0, ac, at);
   play_fvec_bang(o, 0, 0, 0, 0);
 }

@@ -71,7 +71,6 @@ rec_fvec_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
   fvec_t *fvec = fvec_atom_get(at);
-  int size = fvec_get_size(fvec);
 
   if(this->fvec)
     fts_object_release((fts_object_t *)this->fvec);
@@ -108,8 +107,6 @@ rec_fvec_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void 
 rec_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  rec_fvec_t *this = (rec_fvec_t *)o;
-
   switch (ac)
     {
     default:
@@ -137,8 +134,6 @@ rec_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 rec_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  rec_fvec_t *this = (rec_fvec_t *)o;
-
   rec_fvec_set(o, 0, 0, ac, at);
   rec_fvec_bang(o, 0, 0, 0, 0);
 }
@@ -311,8 +306,6 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 rec_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  rec_fvec_t *this = (rec_fvec_t *)o;
-
   fts_dsp_remove_object(o);
 }
 

@@ -28,9 +28,9 @@
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 
-#define DEFAULT_FLASH 125.0f
+#define DEFAULT_FLASH 125.0
 
-fts_symbol_t sym_setColor         = 0;
+fts_symbol_t sym_setColor = 0;
 fts_symbol_t sym_setFlash = 0;
 
 typedef struct 
@@ -131,42 +131,68 @@ button_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
 static void
 button_put_value(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  button_t *this = (button_t *)o;
-
   button_on(o, 0, 0, 0, 0);
 }
 
 static void
 button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((button_t *)o)->color = fts_get_int( at);
-  fts_object_put_prop( o, s, at);
+  button_t *this = (button_t *)o;
+
+  this->color = fts_get_int( at);
   
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
 }
 
 static void
 button_set_flash(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((button_t *)o)->flash = fts_get_int( at);
-  fts_object_put_prop( o, s, at);
+  button_t *this = (button_t *)o;
 
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+  this->flash = fts_get_int( at);
+
+  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+}
+
+static void
+button_put_color(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  button_set_color(o, 0, 0, 1, value);
+}
+
+static void
+button_put_flash(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  button_set_flash(o, 0, 0, 1, value);
+}
+
+static void
+button_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  button_t * this = (button_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_atom_t a;
+
+  fts_set_int(&a, this->color);
+  fts_dumper_send(dumper, fts_s_color, 1, &a);
+
+  fts_set_int(&a, this->flash);
+  fts_dumper_send(dumper, fts_s_flash, 1, &a);
 }
 
 static void 
 button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  FILE *file;
-  int x, y, w;
+  FILE *file = (FILE *)fts_get_pointer( at);
   fts_atom_t a;
-
-  file = (FILE *)fts_get_pointer( at);
+  int x, y, w;
 
   fts_object_get_prop( o, fts_s_x, &a);
   x = fts_get_int( &a);
+
   fts_object_get_prop( o, fts_s_y, &a);
   y = fts_get_int( &a);
+
   fts_object_get_prop( o, fts_s_width, &a);
   w = fts_get_int( &a);
 
@@ -174,12 +200,6 @@ button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 
-/************************************************
- *
- *    class
- *
- */
- 
 static void
 button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -196,6 +216,7 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(button_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, button_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, button_dump);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, button_send_properties); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, button_send_ui_properties); 
@@ -208,9 +229,12 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, button_on);
 
-  /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, button_put_value);
+
+  /* property daemons for compatibilty with older bmax files */
+  fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_flash, button_put_flash);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
@@ -225,5 +249,3 @@ button_config(void)
   sym_setColor = fts_new_symbol("setColor");
   sym_setFlash = fts_new_symbol("setFlash");
 }
-
-

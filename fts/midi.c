@@ -69,7 +69,7 @@ fts_midi_get_type_by_name(fts_symbol_t name)
 enum midi_type
 fts_midi_get_type(const fts_atom_t *at)
 {
-  fts_atom_t k, a;
+  fts_atom_t k;
   
   if(fts_is_int(at))
     return fts_get_int(at);
@@ -330,8 +330,6 @@ midievent_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midievent_t *this = (fts_midievent_t *)o;
-
   midievent_set(o, 0, 0, ac, at);
 }
 
@@ -510,7 +508,6 @@ fts_midififo_poll(fts_midififo_t *fifo)
   if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
     {
       fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
-      double now = fts_get_time();
       double delay;
       fts_atom_t a;
       
@@ -673,7 +670,6 @@ fts_midiparser_reset(fts_midiparser_t *parser)
 fts_midievent_t *
 fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 {
-  fts_midiport_t *port = (fts_midiport_t *)parser;
   fts_midievent_t *event = midiparser_get_event(parser);
 
   if(byte >= midi_status_timing_clock)
@@ -1241,7 +1237,6 @@ static fts_metaclass_t *midibus_type = NULL;
 static void
 midibus_output(fts_object_t *o, fts_midievent_t *event, double time)
 {
-  fts_midiport_t *this = (fts_midiport_t *)o;
   fts_atom_t a;
 
   fts_set_object(&a, event);
@@ -1289,7 +1284,6 @@ static fts_metaclass_t *midinull_type = NULL;
 static void
 midinull_output(fts_object_t *o, fts_midievent_t *event, double time)
 {
-  fts_midiport_t *this = (fts_midiport_t *)o;
 }
 
 static void
@@ -1878,7 +1872,6 @@ void
 fts_midiconfig_add_manager(fts_midimanager_t *mm)
 {
   fts_midimanager_t **p = &midimanagers;
-  fts_atom_t a;
   
   while(*p != NULL)
     p = &((*p)->next);
@@ -2090,7 +2083,6 @@ midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midiconfig_t *this = (midiconfig_t *)o;
   fts_symbol_t file_name = fts_get_symbol(at);
   fts_symbol_t project_dir = fts_project_get_dir();
   fts_object_t *obj = NULL;
@@ -2127,7 +2119,6 @@ midiconfig_save( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if (fts_bmax_file_open(&f, path, 0, 0, 0) >= 0)
     {
       midilabel_t *label = this->labels;
-      int i;
 
       fts_bmax_code_new_object(&f, o, -1);
       
@@ -2189,10 +2180,15 @@ midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   midiconfig_t *this = (midiconfig_t *)o;
   midilabel_t *label = this->labels;
+  fts_midimanager_t *mm;
 
   post("labels\n");
   for(label = this->labels; label != NULL; label = label->next) 
     post("  %s: '%s' '%s'\n", label->name, label->input_name, label->output_name);
+
+  /* redirect to MIDI managers */
+  for(mm = midimanagers; mm != NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_s_print, ac, at);
 }
 
 static void
@@ -2242,30 +2238,6 @@ midiconfig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, midiconfig_save);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, midiconfig_print);
-
-  return fts_ok;
-}
-
-/* temporary object for debugging */
-static void
-mm_redirect( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm;
-      
-  /* redirect to MIDI config */
-  fts_send_message((fts_object_t *)midiconfig, fts_system_inlet, s, ac, at);
-  
-  /* redirect to MIDI managers */
-  for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_system_inlet, s, ac, at);
-}
-
-static fts_status_t
-mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_object_t), 1, 0, 0);
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, mm_redirect);
 
   return fts_ok;
 }
@@ -2338,6 +2310,4 @@ fts_midi_config(void)
   fts_set_object(&a, midiconfig);
   fts_variable_define(fts_get_root_patcher(), midiconfig_s_name);
   fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)midiconfig);
-
-  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
 }

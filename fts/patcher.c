@@ -108,6 +108,9 @@ printf_mess(const char *msg, int ac, const fts_atom_t *av)
 extern fts_status_t receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
 extern fts_status_t send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
 
+extern fts_status_t preceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+extern fts_status_t psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+
 /*************************************************************
  *
  *  inlet class
@@ -218,6 +221,8 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       return fts_ok;
     }
+  else if(ac == 1 && fts_is_a(at, fts_param_metaclass))
+    return preceive_instantiate(cl, ac, at);
   else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return receive_instantiate(cl, ac, at);
   else
@@ -353,6 +358,8 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       return fts_ok;
     }
+  else if(ac == 1 && fts_is_a(at, fts_param_metaclass))
+    return psend_instantiate(cl, ac, at);
   else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return send_instantiate(cl, ac, at);
   else
@@ -1195,6 +1202,12 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
 }
 
+static void 
+patcher_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  post("coucou!!!\n");
+}
+
 /*
  * The remote functions
  */
@@ -1756,16 +1769,11 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_objects"), 
-			    fts_patcher_delete_objects_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_connection"), 
-			    fts_patcher_add_connection_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_connection"),
-			    fts_patcher_delete_connection_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_object"),
-			    fts_patcher_redefine_object_from_client);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_patcher"),
-			    fts_patcher_redefine_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
 
   fts_method_define_varargs( cl, fts_system_inlet, fts_s_spost_description, patcher_spost_description); 
 

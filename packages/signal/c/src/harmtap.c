@@ -157,8 +157,6 @@ harmtap_reset_frames(harmtap_params_t *params)
 static void
 harmtap_params_reset(harmtap_params_t *params, double sr, int n_tick)
 {
-  double del_size = (double)delayline_get_delay_size(params->delayline);
-
   sr *= 0.001; /* convert to samples per msec */
 
   if(params->sr == 1.0)
@@ -205,7 +203,6 @@ harmtap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   double sr = fts_dsp_get_output_srate(dsp, 0);
   harmtap_params_t *params = (harmtap_params_t *)ftl_data_get_ptr(this->params);
-  delayline_t *delayline;
   fts_atom_t argv[3];
   
   harmtap_params_reset(params, sr, n_tick);
@@ -223,9 +220,8 @@ ftl_harmtap(fts_word_t *argv)
   harmtap_params_t *params = (harmtap_params_t *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   delayline_t *dl = params->delayline;
-  float * restrict del_ptr = delayline_get_samples(dl);
+  float * restrict del_ptr = delayline_get_buffer(dl);
   int del_phase = delayline_get_phase(dl);
-  double window = params->window;
   fts_intphase_t phi = params->phi;
   fts_intphase_t pho;
   fts_intphase_t phi_incr = params->phi_incr;
@@ -360,9 +356,6 @@ harmtap_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void 
 harmtap_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  harmtap_t *this = (harmtap_t *)o;
-  harmtap_params_t *params = ftl_data_get_ptr(this->params);
-  
   if(ac > 0)
     {
       /* first set delay line */

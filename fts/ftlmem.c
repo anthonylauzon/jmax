@@ -221,6 +221,12 @@ ftl_mem_start_memory_relocation(void)
   ftl_mem_is_relocating = 1;
 }
 
+void
+ftl_mem_abort_memory_relocation(void)
+{
+  ftl_mem_is_relocating = 0;
+}
+
 
 void
 ftl_mem_end_memory_relocation(void)

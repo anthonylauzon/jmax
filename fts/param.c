@@ -68,7 +68,24 @@ fts_param_remove_listener(fts_param_t *param, fts_object_t *object)
 static void 
 param_call_listeners(fts_param_t *param)
 {
-  if(!fts_is_void(&param->value))
+  if(fts_is_tuple(&param->value))
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&param->value);
+      int n = fts_tuple_get_size(tuple);
+      const fts_atom_t *a = fts_tuple_get_atoms(tuple);
+      fts_param_listener_t *listener = param->listeners;
+      
+      /* call listeners */
+      while(listener)
+	{
+	  listener->callback(listener->object, 0, 0, n, a);
+	  listener = listener->next;
+	}
+      
+      /* send from outlet */
+      fts_outlet_atoms((fts_object_t *)param, 0, n, a);
+    }
+  else if(!fts_is_void(&param->value))
     {
       fts_param_listener_t *listener = param->listeners;
       
@@ -134,7 +151,7 @@ param_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);
-      fts_atom_assign(&this->value, at);
+      fts_atom_assign(&this->value, &a);
     }
 }
 
@@ -170,10 +187,20 @@ param_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_param_t *this = (fts_param_t *)o;
 
   if(fts_is_void(&this->value))
-    post("{<empty param>\n");
+    post("{<empty param>}\n");
+  else if(fts_is_tuple(&this->value))
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
+      int n = fts_tuple_get_size(tuple);
+      const fts_atom_t *a = fts_tuple_get_atoms(tuple);
+
+      post("{");
+      post_atoms(n, a);
+      post("}\n");
+    }
   else
     {
-      post("{<param> ");
+      post("{");
       post_atoms(1, &this->value);
       post("}\n");
     }
@@ -236,6 +263,8 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   fts_set_void(&this->value);
   this->keep = fts_s_no;
+
+  param_set_atoms(o, 0, 0, ac, at);
 }
 
 static void
@@ -318,12 +347,6 @@ typedef struct _psend_
   fts_param_t *param;
 } psend_t;
 
-typedef struct _preceive_
-{
-  fts_object_t head;
-  fts_param_t *param;
-} preceive_t;
-
 static void
 psend_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -340,19 +363,17 @@ psend_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   param_input_anything((fts_object_t *)this->param, 0, s, ac, at);
 }
 
+static void 
+psend_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 static void
 psend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   psend_t *this = (psend_t *) o;
-  fts_param_t *param = 0;
-
-  if(fts_is_a(at + 1, fts_param_metaclass))
-    param = (fts_param_t *)fts_get_object(at + 1);
-  else
-    {
-      fts_object_set_error(o, "Wrong argument");
-      return;
-    }
+  fts_param_t *param = (fts_param_t *)fts_get_object(at);
 
   this->param = param;
   fts_object_refer(param);
@@ -374,6 +395,8 @@ psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, psend_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, psend_delete);
 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, psend_spost_description);
+
   fts_method_define_varargs(cl, 0, fts_s_int, psend_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_float, psend_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_symbol, psend_input_atoms);
@@ -388,6 +411,12 @@ psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *  preceive
  *
  */
+
+typedef struct _preceive_
+{
+  fts_object_t head;
+  fts_param_t *param;
+} preceive_t;
 
 static void
 preceive_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -409,15 +438,7 @@ static void
 preceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preceive_t *this = (preceive_t *)o;
-  fts_param_t *param = 0;
-
-  if(fts_is_a(at + 1, fts_param_metaclass))
-    param = (fts_param_t *)fts_get_object(at + 1);
-  else
-    {
-      fts_object_set_error(o, "Wrong argument");
-      return;
-    }
+  fts_param_t *param = (fts_param_t *)fts_get_object(at);
 
   fts_param_add_listener(param, o, preceive_output);
   this->param = param;
@@ -438,6 +459,8 @@ preceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, preceive_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, preceive_delete);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, psend_spost_description);
 
   return fts_ok;
 }

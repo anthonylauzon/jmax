@@ -98,9 +98,7 @@ wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 wave_put(wave_t *this, fts_dsp_descr_t *dsp, struct wave_ftl_symbols *sym)
 {
-  float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
-  fts_atom_t a[3];
   
   if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
     {
@@ -170,8 +168,6 @@ wave_init_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 wave_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  wave_t *this = (wave_t *)o;
-
   wave_init(o, 0, 0, 0, 0);
   wave_set_fvec(o, 0, 0, 1, at);
 }

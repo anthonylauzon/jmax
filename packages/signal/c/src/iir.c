@@ -291,9 +291,6 @@ ftl_iir_n(fts_word_t *argv)
   int n_tick;
   int n_order;
   float *x, *y;
-  float ynm2, ynm1;
-  float b1, b2;
-  float ynp0, ynp1, ynp2, ynp3;
   int i, n;
 
   x = (float *)fts_word_get_pointer(argv); /* in0 */

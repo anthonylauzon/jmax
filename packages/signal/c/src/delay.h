@@ -30,26 +30,14 @@
 #define DELAYLINE_ALLOC_TAIL 2 /* tail for cubic interpolation */
 #define DELAYLINE_ALLOC_HEAD 1 /* head for cubic interpolation */
 
-typedef struct fts_dspstage
-{
-  fts_object_t o;
-  fts_object_t *front;
-  fts_object_t *back;
-} fts_dspstage_t;
-
-#define fts_dspstage_self(o) (((fts_dspstage_t *)(o))->front = ((fts_dspstage_t *)(o))->back = (o))
-
-/* it's a dream hack for now */
-#define fts_dspstage_get_front(s) ((s)->front)
-#define fts_dspstage_get_back(s) ((s)->back)
-
 typedef struct 
 {
-  fts_dspstage_t o; /* delay line can be its own dsp stage */
-  fts_dspstage_t *stage; /* DSP stage */
-  float *samples; /* pointer to delay line */
+  fts_object_t o;
+  fts_dsp_edge_t *edge; /* DSP edge */
+  float *buffer; /* pointer to delay line */
   int delay_size; /* size of delay buffer (max delay in samples) */
   int drain_size; /* size of drain buffer (max drain in samples) */
+  int zero_onset; /* onset for buffer zeroing */
   int ring_size; /* size of ring buffer = size + 2 * n_tick */
   int alloc; /* size of biggest allocation */
   double delay_length; /* delay size given in msec */
@@ -59,8 +47,8 @@ typedef struct
   int n_tick; /* cash tick size */
 } delayline_t;
 
-#define delayline_get_stage(d) ((d)->stage)
-#define delayline_get_samples(d) ((d)->samples)
+#define delayline_get_edge(d) ((d)->edge)
+#define delayline_get_buffer(d) ((d)->buffer)
 #define delayline_get_ring_size(d) ((d)->ring_size)
 #define delayline_get_delay_size(d) ((d)->delay_size)
 #define delayline_get_drain_size(d) ((d)->drain_size)

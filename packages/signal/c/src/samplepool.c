@@ -69,7 +69,6 @@ sample_pool_t *
 sample_pool_new(int size)
 {
   sample_pool_t *pool = fts_malloc(sizeof(sample_pool_t));
-  int i;
   
   pool->mem = 0;
   pool->size = 0;

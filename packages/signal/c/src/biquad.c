@@ -109,8 +109,6 @@ biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  biquad_t *this = (biquad_t *)o;
-
   switch(ac)
     {
     default:
@@ -282,8 +280,6 @@ biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int i;
-
   fts_class_init(cl, sizeof(biquad_t), 6, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, biquad_init);
