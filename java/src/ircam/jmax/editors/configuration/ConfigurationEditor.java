@@ -104,6 +104,13 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 	  else
 	    audioPanel.close(false);    
 	}
+	public void windowDeactivated(WindowEvent e)
+	{
+	  if( tabbedPane.getSelectedIndex() == tabbedPane.indexOfTab( "MIDI"))
+	    midiPanel.stopEdit();    
+	  else
+	    audioPanel.stopEdit(); 
+	}
       });
   }
 

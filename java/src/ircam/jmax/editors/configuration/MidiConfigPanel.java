@@ -95,9 +95,7 @@ public class MidiConfigPanel extends JPanel implements Editor
     scrollPane.addMouseListener( new MouseAdapter(){
       public void mousePressed( MouseEvent e){
         midiTable.clearSelection();
-        if( midiTable.getCellEditor() != null)
-          midiTable.getCellEditor().stopCellEditing();
-        midiTable.transferFocus();
+        stopEdit();
       }
     });
 
@@ -105,6 +103,13 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     if( midiMan == null)
       midiTable.setEnabled( false);
+  }
+
+  public void stopEdit()
+  {
+    if( midiTable.getCellEditor() != null)
+      midiTable.getCellEditor().stopCellEditing();
+    midiTable.transferFocus();
   }
 
   void initDataModel()

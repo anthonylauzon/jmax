@@ -169,9 +169,7 @@ public class AudioConfigPanel extends JPanel implements Editor
     scrollPane.addMouseListener( new MouseAdapter(){
 	public void mousePressed( MouseEvent e){
 	  audioTable.clearSelection();
-	  if( audioTable.getCellEditor() != null)
-	    audioTable.getCellEditor().stopCellEditing();
-	  audioTable.transferFocus();
+	  stopEdit();
 	}
       });
 
@@ -179,6 +177,13 @@ public class AudioConfigPanel extends JPanel implements Editor
 
     if( config == null)
       audioTable.setEnabled( false);
+  }
+
+  public void stopEdit()
+  {
+    if( audioTable.getCellEditor() != null)
+      audioTable.getCellEditor().stopCellEditing();
+    audioTable.transferFocus();
   }
 
   void initDataModel()
