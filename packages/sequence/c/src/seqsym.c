@@ -43,6 +43,7 @@ fts_symbol_t seqsym_midi_channel = 0;
 fts_symbol_t seqsym_midi_velocity = 0;
 
 /* messages */
+fts_symbol_t seqsym_get_atoms = 0;
 fts_symbol_t seqsym_export_midi = 0;
 fts_symbol_t seqsym_export_midi_dialog = 0;
 fts_symbol_t seqsym_import_midi = 0;
@@ -75,6 +76,7 @@ seqsym_config(void)
   seqsym_midi_velocity = fts_new_symbol("midi_velocity");
 
   /* messages */
+  seqsym_get_atoms = fts_new_symbol("get_atoms");
   seqsym_export_midi = fts_new_symbol("export_midi");
   seqsym_export_midi_dialog = fts_new_symbol("export_midi_dialog");
   seqsym_import_midi = fts_new_symbol("import_midi");

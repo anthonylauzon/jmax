@@ -38,6 +38,11 @@ typedef struct _noteevt_
   int midi_velocity; /* optinal property for MIDI notes (will get fts property */
 } noteevt_t;
 
+#define NOTEEVT_DEF_PITCH 64
+#define NOTEEVT_DEF_DURATION 400
+#define NOTEEVT_DEF_MIDI_CHANNEL 1
+#define NOTEEVT_DEF_MIDI_VELOCITY 64
+
 #define noteevt_set_pitch(n, x) ((n)->pitch = (x))
 #define noteevt_get_pitch(n) ((n)->pitch)
 
@@ -45,9 +50,9 @@ typedef struct _noteevt_
 #define noteevt_get_duration(n) ((n)->duration)
 
 #define noteevt_set_midi_channel(n, x) ((n)->midi_channel = (x))
-#define noteevt_get_midi_channel(n) ((n)->midi_channel)
+#define noteevt_get_midi_channel(n) (((n)->midi_channel >= 0)? (n)->midi_channel: NOTEEVT_DEF_MIDI_CHANNEL)
 
 #define noteevt_set_midi_velocity(n, x) ((n)->midi_velocity = (x))
-#define noteevt_get_midi_velocity(n) ((n)->midi_velocity)
+#define noteevt_get_midi_velocity(n) (((n)->midi_velocity >= 0)? (n)->midi_velocity: NOTEEVT_DEF_MIDI_VELOCITY)
 
 #endif

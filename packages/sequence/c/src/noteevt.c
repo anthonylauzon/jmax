@@ -30,11 +30,6 @@
 #include "eventtrk.h"
 #include "noteevt.h"
 
-#define NOTEEVT_DEF_PITCH 64
-#define NOTEEVT_DEF_DURATION 400
-#define NOTEEVT_DEF_MIDI_CHANNEL 1
-#define NOTEEVT_DEF_MIDI_VELOCITY 64
-
 static void
 noteevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -98,6 +93,21 @@ noteevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   post("pitch %d, duration %lf\n", this->pitch, this->duration);
 }
 
+void 
+noteevt_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  noteevt_t *this = (noteevt_t *)o;
+  int *n = fts_get_ptr(at);
+  fts_atom_t *a = fts_get_ptr(at + 1);
+
+  *n = 4;
+
+  fts_set_int(a, this->pitch);
+  fts_set_float(a + 1, this->duration);
+  fts_set_int(a + 2, noteevt_get_midi_channel(this));
+  fts_set_int(a + 3, noteevt_get_midi_velocity(this));
+}
+
 /**************************************************************
  *
  *  set event methods
@@ -134,11 +144,9 @@ noteevt_export_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   noteevt_t *this = (noteevt_t *)o;
   fts_midifile_t *file = (fts_midifile_t *)fts_get_ptr(at);
   double time = event_get_time(&this->head);
-  int channel = (this->midi_channel >= 0)? this->midi_channel: NOTEEVT_DEF_MIDI_CHANNEL;
-  int velocity = (this->midi_velocity >= 0)? this->midi_velocity: NOTEEVT_DEF_MIDI_VELOCITY;
 
   /* declare note with off time */
-  seqmidi_write_note(file, time, channel, this->pitch, velocity, this->duration);
+  seqmidi_write_note(file, time, noteevt_get_midi_channel(this), this->pitch, noteevt_get_midi_velocity(this), this->duration);
 }
 
 /**************************************************************
@@ -208,8 +216,10 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), noteevt_set);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("pitch"), noteevt_pitch);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("duration"), noteevt_duration);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), noteevt_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("export_midi"), noteevt_export_midi);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, noteevt_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_get_atoms, noteevt_get_atoms);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi, noteevt_export_midi);
 
   return fts_Success;
 }

@@ -28,24 +28,28 @@
 
 extern void seqsym_config(void);
 
-extern void seqobj_config(void);
 extern void eventtrk_config(void);
 extern void intevt_config(void);
 extern void noteevt_config(void);
 extern void messevt_config(void);
 extern void floatevt_config(void);
 
+extern void seqobj_config(void);
+extern void seqplay_config(void);
+
 static void
 sequence_module_init(void)
 {
   seqsym_config();
 
-  seqobj_config();
   eventtrk_config();
   intevt_config();
   noteevt_config();
   messevt_config();
   floatevt_config();
+
+  seqobj_config();
+  seqplay_config();
 }
 
 fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

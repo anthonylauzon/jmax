@@ -31,6 +31,7 @@ track.c \
 event.c \
 seqmidi.c \
 seqobj.c \
+seqplay.c \
 eventtrk.c \
 intevt.c \
 noteevt.c \

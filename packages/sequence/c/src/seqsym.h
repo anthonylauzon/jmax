@@ -45,6 +45,7 @@ extern fts_symbol_t seqsym_midi_channel;
 extern fts_symbol_t seqsym_midi_velocity;
 
 /* messages */
+extern fts_symbol_t seqsym_get_atoms;
 extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;
 extern fts_symbol_t seqsym_import_midi;
