@@ -1,0 +1,5 @@
+src	all	Makefile
+all	all	help
+all	all	data.jpk
+src	all	src
+all	all	lib

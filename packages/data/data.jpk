@@ -1,0 +1,24 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
+## package declaration
+package provide data
+
+# load the dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module data $dir/c/lib/$jmaxArch/$jmaxMode/libdata.so
+
+## load the help patch data base
+#sourceFile $dir/help/data.help.index.tcl
+
+post "package: data (basic data handling classes)"

@@ -1,0 +1,27 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+SOURCES = \
+data.c \
+expr.c \
+atoms.c \
+types.c \
+recycle.c \
+utils.c \
+getelem.c \
+getsize.c \
+post.c \
+binops.c \
+binop_arith.c \
+binop_arith_inplace.c \
+binop_obj.c \
+
