@@ -224,5 +224,5 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 range_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("range"), range_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("range"), range_instantiate, fts_narg_equiv);
 }

@@ -168,5 +168,5 @@ fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fit_config(void)
 {
-  fts_class_install(fts_new_symbol("fit"), fit_instantiate);
+  fts_metaclass_install(fts_new_symbol("fit"), fit_instantiate, fts_narg_equiv);
 }
