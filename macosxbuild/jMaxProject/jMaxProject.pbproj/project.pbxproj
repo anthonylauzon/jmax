@@ -11994,7 +11994,7 @@
 				F88000900283072101664092,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/borghesi/projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
@@ -13052,7 +13052,7 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = /Users/borghesi/projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = build;
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "../../client/include ../../include";
 				INSTALL_PATH = "";
@@ -17106,7 +17106,7 @@
 				F880FFF5028301DA01664092,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/borghesi/projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
@@ -17242,7 +17242,6 @@
 			);
 			isa = PBXApplicationTarget;
 			name = jMax;
-			productInstallPath = "$(USER_APPS_DIR)";
 			productName = jMax;
 			productReference = F880FFF70283022401664092;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -17596,7 +17595,7 @@
 				F8B8E4D702867E1C01664092,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/borghesi/projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages/utils/c/src ../../include";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
@@ -19357,7 +19356,7 @@
 				F8B8E5C60286822601664092,
 			);
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = /Users/borghesi/projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
