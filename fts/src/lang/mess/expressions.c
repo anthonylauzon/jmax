@@ -98,13 +98,14 @@ typedef struct fts_expr_prop
 
 static fts_heap_t expr_prop_heap;
 
-/* First prototype version; only int, not variables, only +, -, *, / */
+
 
 void
 fts_expressions_init(void)
 {
 
   fts_heap_init(&expr_prop_heap, sizeof(fts_expr_prop_t), 16);
+
 
   fts_symbol_set_operator(fts_s_plus,  FTS_OP_PLUS);
   fts_symbol_set_operator(fts_s_minus, FTS_OP_MINUS);
@@ -255,11 +256,15 @@ typedef struct fts_epression_state
 } fts_expression_state_t;
 
 
+
 /* Private Macros and functions */
 
 /* Return 1 in case of error, 0 otherwise */
 
 static int fts_op_eval(fts_object_t *object, fts_expression_state_t *e);
+static void fts_expression_add_prop(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value);
+
+
 
 static fts_expression_state_t expr_state;
 
@@ -626,7 +631,7 @@ static int fts_op_eval(fts_object_t *object, fts_expression_state_t *e)
 			fts_symbol_name(fts_get_symbol(&e->value_stack[tos - 1])),
 			fts_get_int(&e->value_stack[tos]));
 	      else if (fts_is_float(&e->value_stack[tos]))
-		sprintf(buf, "%s%d",
+		sprintf(buf, "%s%f",
 			fts_symbol_name(fts_get_symbol(&e->value_stack[tos - 1])),
 			fts_get_float(&e->value_stack[tos]));
 
@@ -849,15 +854,7 @@ static int fts_op_eval(fts_object_t *object, fts_expression_state_t *e)
 	case FTS_OP_ASSIGN:
 	  if (fts_is_symbol(&e->value_stack[tos - 1]))
 	    {
-	      fts_expr_prop_t *p;
-
-	      p = (fts_expr_prop_t *) fts_heap_alloc(&expr_prop_heap);
-
-	      p->name = fts_get_symbol(&e->value_stack[tos - 1]);
-	      p->value = e->value_stack[tos];
-	      p->next  = e->props;
-	      e->props = p;
-
+	      fts_expression_add_prop(e, fts_get_symbol(&e->value_stack[tos - 1]), &e->value_stack[tos]);
 	      (e->value_stack_p)--; /* forget the value */
 	    }
 	  else
@@ -884,6 +881,26 @@ int fts_expression_get_status(fts_expression_state_t *e)
   return e->ret;
 }
 
+
+/*
+ *
+ * expression property  handling support
+ *
+ */
+
+static void fts_expression_add_prop(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value)
+{
+  fts_expr_prop_t *p;
+
+  p = (fts_expr_prop_t *) fts_heap_alloc(&expr_prop_heap);
+
+  p->name  = name;
+  p->value = *value;
+  p->next  = e->props;
+  e->props = p;
+}
+
+
 void fts_expression_assign_properties(fts_expression_state_t *e, fts_object_t *obj)
 {
   fts_expr_prop_t *p;
@@ -897,7 +914,7 @@ void fts_expression_assign_properties(fts_expression_state_t *e, fts_object_t *o
       p2 = p;
 
       if (fts_object_is_patcher(obj))
-	fts_variable_define(obj, p->name, &(p->value));
+	fts_patcher_variable_define((fts_patcher_t *) obj, p->name, &(p->value));
       else
 	fts_object_put_prop(obj, p->name, &(p->value));
 
@@ -905,6 +922,5 @@ void fts_expression_assign_properties(fts_expression_state_t *e, fts_object_t *o
       fts_heap_free((char *) p2, &expr_prop_heap);
     }
 }
-
 
 

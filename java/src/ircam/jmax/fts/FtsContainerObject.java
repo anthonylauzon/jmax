@@ -245,16 +245,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     return connections;
   }
 
-  /** Update the FTS object; redefined it to have the
-   * correct name, ninlets and noutlets; the fts object for a container
-   * is always a patcher.
-   */
-
-  public void updateFtsObject()
-  {
-    Fts.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
-  }
-
   /** Open tell FTS that this patcher is "alive";
    * open need to download the patcher if not downloaded.
    */

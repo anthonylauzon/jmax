@@ -183,6 +183,27 @@ FtsSocketServerPort:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSocketServerPort.java)
 .PHONY: FtsSocketServerPort
 
+FtsDatagramPort:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDatagramPort.java)
+.PHONY: FtsDatagramPort
+
+FtsRexecDatagramPort:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRexecDatagramPort.java)
+.PHONY: FtsRexecDatagramPort
+
+FtsDatagramClientPort:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDatagramClientPort.java)
+.PHONY: FtsDatagramClientPort
+
+FtsDatagramServer:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDatagramServer.java)
+.PHONY: FtsDatagramServer
+
+
+FtsRexecDatagramServer:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRexecDatagramServer.java)
+.PHONY: FtsRexecDatagramServer
+
 FtsStandardObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsStandardObject.java)
 .PHONY: FtsStandardObject

@@ -44,6 +44,7 @@ static void init_stdio(void);
 static void init_npipe(void);
 static void init_socket_server(void);
 static void init_socket_client(void);
+static void init_udp_client(void);
 static void file_dev_init(void);
 
 #ifdef HAS_TTY_DEV
@@ -57,6 +58,7 @@ unixdev_init(void)
  init_npipe();
  init_socket_server();
  init_socket_client();
+ init_udp_client();
  file_dev_init();
 
 #ifdef HAS_TTY_DEV
@@ -97,7 +99,7 @@ typedef struct fd_dev_data
 
   /* socket server related  */
 
-  int  listener;
+  int listener;
   int block_on_listen;
 
 } fd_dev_data_t;
@@ -733,7 +735,6 @@ static unsigned short ascii_to_ushort(const char *src)
 static fts_status_t open_socket_client(fts_dev_t *dev, int nargs, const fts_atom_t *args);
 static fts_status_t close_socket_client(fts_dev_t *dev);
 
-static int fts_client_listener;
 
 static void
 init_socket_client(void)
@@ -1034,5 +1035,291 @@ file_dev_seek(fts_dev_t *dev, long offset, int whence)
 
   return fts_Success;
 }
+
+
+/******************************************************************************/
+/*                                                                            */
+/*                              UDP  Device                                   */
+/*                                                                            */
+/******************************************************************************/
+
+/* we emulate a byte oriented connection on top of a UDP packet; if we fully adopt 
+   UDP, we may also drop the byte emulation and go straight for packets.
+   Hostname and port are passed as mandatory argument  (host:port).
+   */
+   
+
+/* 
+   The UNIX udp_client  device, called "up" support input and output on the same
+   device, mapped to a couple of UDP ports connection to a given IP address/port number (first argument
+   of port);
+   The device will send an init packet at the open.
+   */
+
+
+/******************************************************************************/
+/*                                                                            */
+/*            Generic  Character Device Support                               */
+/*                                                                            */
+/******************************************************************************/
+
+/*
+  Support for bidirectional character devices, based on intro(2) file descriptor;
+  handle buffering and non-blocking wait, and eof and file closed errors and so on.
+  */
+
+
+#define UDP_PACKET_SIZE 256
+
+typedef struct udp_dev_data
+{
+  /* In data */
+
+  char get_buf[UDP_PACKET_SIZE];
+  int  get_read_p; 
+  int  get_size;
+
+  /* Out data */
+
+  char put_buf[UDP_PACKET_SIZE];
+  int  put_buf_fill;
+
+  /* socket related  */
+
+  int  socket;
+  struct sockaddr_in client_addr;
+} udp_dev_data_t;
+
+
+
+
+static udp_dev_data_t *
+make_udp_data()
+{
+  udp_dev_data_t *p;
+
+  p = fts_malloc(sizeof(udp_dev_data_t));
+  p->get_read_p = 0;
+  p->get_size = 0;
+  p->put_buf_fill = 0;
+
+  return p;
+}
+
+
+static void
+free_udp_data(udp_dev_data_t *d)
+{
+  fts_free(d);
+}
+
+/* Buffered non-blocking select based char read */
+
+static fts_status_t 
+udp_dev_get(fts_dev_t *dev, unsigned char *cp)
+{
+  udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
+
+  if (dev_data->get_read_p < dev_data->get_size)
+    {
+      *cp = dev_data->get_buf[dev_data->get_read_p];
+      dev_data->get_read_p++;
+      
+      return fts_Success;
+    }
+  else
+    {
+      fd_set check;
+      struct timeval timeout;
+
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 0;
+
+      FD_ZERO(&check);
+      FD_SET(dev_data->socket, &check);
+      select(64, &check, (fd_set *)0, (fd_set *)0, &timeout);
+
+      if (FD_ISSET(dev_data->socket, &check))
+	{
+	  dev_data->get_size = recvfrom(dev_data->socket, dev_data->get_buf, UDP_PACKET_SIZE, 0, 0, 0);
+                                   
+	  if (dev_data->get_size < 0)
+	    {
+	      if (errno == EAGAIN)
+		return &fts_data_not_ready;
+	      else
+		return &fts_dev_io_error; /* error: File IO error */
+	    }
+	  else if (dev_data->get_size == 0)
+	    return &fts_data_not_ready;
+	  
+	  dev_data->get_read_p = 0;
+      
+	  /* read ok */
+
+	  *cp = dev_data->get_buf[dev_data->get_read_p];
+	  dev_data->get_read_p++;
+	  
+	  return fts_Success;
+	}
+      else
+	return &fts_data_not_ready;
+    }
+}
+
+/* output buffering */
+
+
+static fts_status_t
+udp_dev_put(fts_dev_t *dev, unsigned char c)
+{
+  udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
+
+  dev_data->put_buf[dev_data->put_buf_fill++] = c;
+
+  if (dev_data->put_buf_fill >= UDP_PACKET_SIZE)
+    {
+      int r;
+
+      r = sendto(dev_data->socket, dev_data->put_buf, dev_data->put_buf_fill, 0,
+		 &(dev_data->client_addr), sizeof(dev_data->client_addr));
+
+      if (r != dev_data->put_buf_fill)
+	{
+	  dev_data->put_buf_fill = 0;
+	  return &fts_dev_io_error; /* error: File IO error */
+	}
+      else
+	dev_data->put_buf_fill = 0;
+    }
+  
+  return fts_Success;
+}
+
+static fts_status_t
+udp_dev_flush(fts_dev_t *dev)
+{
+  udp_dev_data_t *dev_data = (udp_dev_data_t *) fts_dev_get_device_data(dev);
+
+  if (dev_data->put_buf_fill > 0)
+    {
+      int r;
+
+      r = sendto(dev_data->socket, dev_data->put_buf, dev_data->put_buf_fill, 0,
+		 &(dev_data->client_addr), sizeof(dev_data->client_addr))	;
+
+      if (r != dev_data->put_buf_fill)
+	{
+	  dev_data->put_buf_fill = 0;
+	  return &fts_dev_io_error; /* error: File IO error */
+	}
+      else
+	dev_data->put_buf_fill = 0;
+    }
+  
+  return fts_Success;
+}
+
+
+/* Forward declaration of host device/class functions */
+
+static fts_status_t open_udp_client(fts_dev_t *dev, int nargs, const fts_atom_t *args);
+static fts_status_t close_udp_client(fts_dev_t *dev);
+static fts_status_t udp_dev_get(fts_dev_t *dev, unsigned char *cp);
+static fts_status_t udp_dev_put(fts_dev_t *dev, unsigned char c);
+static fts_status_t udp_dev_flush(fts_dev_t *dev);
+
+static void
+init_udp_client(void)
+{
+  fts_dev_class_t *udp_client_class;
+
+  udp_client_class = fts_dev_class_new(fts_char_dev);
+
+  set_open_fun(udp_client_class, open_udp_client);
+  set_close_fun(udp_client_class, close_udp_client);
+  set_char_dev_get_fun(udp_client_class, udp_dev_get);
+  set_char_dev_put_fun(udp_client_class, udp_dev_put);
+  set_char_dev_flush_fun(udp_client_class, udp_dev_flush);
+
+  /* Installing the class */
+
+  fts_dev_class_register(fts_new_symbol("udp"), udp_client_class);
+}
+
+
+static fts_status_t
+open_udp_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+{
+  struct sockaddr_in my_addr;
+  char *address;
+  unsigned short port;
+  int sock;
+  udp_dev_data_t *p;
+
+  p = make_udp_data();
+
+  fts_socket_parse(fts_get_symbol_arg(nargs, args, 0, 0), &address, &port);
+
+  /* */
+
+  if (address == NULL)
+    return &fts_dev_open_error;
+
+  /* Create an Internet stream socket */
+
+  sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+  if (sock == -1)
+    return &fts_dev_open_error;
+
+  /* Bind the socket to an arbitrary available port  */
+
+  memset( (char *)&my_addr, 0, sizeof(struct sockaddr_in));
+  my_addr.sin_family = AF_INET;
+  my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  my_addr.sin_port = 0;
+
+  if (bind(sock, &my_addr, sizeof(struct sockaddr_in)) == -1)
+    return &fts_dev_open_error;
+
+  bzero((char *)&(p->client_addr), sizeof(p->client_addr));
+  p->client_addr.sin_family = AF_INET;
+  p->client_addr.sin_addr.s_addr = inet_addr(address);
+  p->client_addr.sin_port = htons(port);
+
+  p->socket = sock;
+
+  fts_dev_set_device_data(dev, (void *) p);
+
+  /* Send an init package: empty content, just the packet */
+
+  {
+    char *init = "init";
+    
+    sendto(sock, init, 4, 0, &(p->client_addr), sizeof(p->client_addr));
+  }
+
+  return fts_Success;
+}
+
+
+static fts_status_t
+close_udp_client(fts_dev_t *dev)
+{
+  udp_dev_data_t *p = fts_dev_get_device_data(dev);
+
+  close(p->socket);/* only one needed, in and out are the same fd */
+
+  free_udp_data(fts_dev_get_device_data(dev));
+
+  return fts_Success;
+}
+
+
+
+
+
+
 
 

@@ -12,7 +12,6 @@ import ircam.jmax.utils.*;
  * The "bang" graphic object.
  */
 class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
-
   boolean itsFlashing = false;
   static Dimension preferredSize = new Dimension(20,20);
   static Dimension minimumSize = new Dimension(15, 15);
@@ -78,7 +77,6 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   }
 
   public void Paint_specific(Graphics g) {
-    
     if (g == null) return;
     if(!itsFlashing){
       if(!itsSelected) g.setColor(itsUINormalColor);

@@ -40,7 +40,6 @@ class FtsPatcherCmd implements Command
 	if (FtsContainerObject.containerStack.empty())
 	  {
 	    parent     = Fts.getServer().getRootObject();
-	    Fts.getServer().setFlushing(false);
 	  }
 	else
 	  parent     = (FtsContainerObject) FtsContainerObject.containerStack.peek();
@@ -53,7 +52,8 @@ class FtsPatcherCmd implements Command
 	    object = (FtsPatcherObject) Fts.makeFtsObject(parent, "patcher", "unnamed 0 0");
 
 	    object.parseTclProperties(interp, properties);
-	    object.updateFtsObject(); //neede to update ins/outs and name
+	    // @@@ BROKEN BY THE EXPRESSION THINGS FOR PATCHERS !!!
+	    // object.updateFtsObject(); //neede to update ins/outs and name
 	    object.setDownloaded();
 	    object.eval(interp, body);
 	    
@@ -64,7 +64,6 @@ class FtsPatcherCmd implements Command
 	      {
 		// Run the after load init of the top level patcher 
 		object.loaded();
-		Fts.getServer().setFlushing(true);
 	      }
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

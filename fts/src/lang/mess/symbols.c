@@ -69,6 +69,7 @@ fts_symbol_t fts_s_wh;
 fts_symbol_t fts_s_range;
 fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
+fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
 
 /* Symbols related to builtin classes */
@@ -198,6 +199,7 @@ fts_predefine_symbols(void)
   fts_s_font       = fts_new_builtin_symbol("font",     48);
   fts_s_fontSize   = fts_new_builtin_symbol("fs",       49);
   fts_s_error      = fts_new_builtin_symbol("error",    56);
+  fts_s_size       = fts_new_builtin_symbol("size",     85);
 
   /* Symbols related to builtin classes */
   /* WARNING: read the warning at the beginning of the function */
@@ -245,7 +247,7 @@ fts_predefine_symbols(void)
   fts_s_else        = fts_new_builtin_symbol(":", 83);
   fts_s_assign      = fts_new_builtin_symbol("=", 84);
 
-  /* Last number user: 84 (max, 255 predefined symbols !! ) */
+  /* Last number user: 85 (max, 255 predefined symbols !! ) */
   /* WARNING: read the warning at the beginning of the function */
 }
 

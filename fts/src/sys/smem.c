@@ -92,7 +92,7 @@ check_integrity(char *p, const char *msg)
   else
     return;
 
-  fprintf(stderr, "%s %s\nOriginally allocated file %s line %n\n", err, msg, 
+  fprintf(stderr, "%s %s\nOriginally allocated file %s line %d\n", err, msg, 
 	  ((struct mem_header *)p)->filename,  ((struct mem_header *)p)->line);
 
   fprintf(stderr, " - Trapping !!!!\n");

@@ -19,6 +19,8 @@ class FtsSocketServerPort extends FtsPort
   String path = ".";
   String ftsName = "fts";
   Process proc;
+  InputStream in_stream = null;
+  OutputStream out_stream = null;
 
   FtsSocketServerPort(String host)
   {
@@ -38,7 +40,7 @@ class FtsSocketServerPort extends FtsPort
       }
   }
 
-  void openIOStreams()
+  void open()
   {
     String command;
 
@@ -101,9 +103,11 @@ class FtsSocketServerPort extends FtsPort
 	System.out.println("Couldn't get I/O for the socket ");
 	return;
       }    
+
+    super.open();
   }
 
-  void closeIOStreams()
+  void doClose()
   {
     try
       {
@@ -118,6 +122,12 @@ class FtsSocketServerPort extends FtsPort
 	System.out.println("I/O failed on closing the serverSocket connection to " + host);
       }
   }
+
+  boolean isOpen()
+  {
+    return (in_stream != null) && (out_stream != null);
+  }
+
 
   void setParameter(String property, Object value)
   {
@@ -134,6 +144,31 @@ class FtsSocketServerPort extends FtsPort
   void start()
   {
     open();
+  }
+
+  /** Method to send a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  protected void write(int data) throws java.io.IOException
+  {
+    out_stream.write(data);
+  }
+
+  /** Method to receive a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  protected int read() throws java.io.IOException
+  {
+    return in_stream.read();
+  }
+
+  /** Method to Ask for an explicit output flush ; since we
+    can use datagram sockets or other means I/O is not necessarly done
+    thru streams */
+
+  void flush() throws java.io.IOException
+  {
+    out_stream.flush();
   }
 }
 

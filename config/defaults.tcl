@@ -28,7 +28,8 @@ set jmaxDefaultMidiPort "jmaxMidi"
 ## very expert settings
 
 ## set jMax client/server connection mode
-set jmaxDefaultConnection "client"
+set jmaxDefaultConnection "udp"
+#set jmaxDefaultConnection "client"
 #set jmaxDefaultConnection "socket"
 #set jmaxDefaultConnection "local"
 

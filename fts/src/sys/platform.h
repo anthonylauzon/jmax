@@ -20,6 +20,9 @@
 
 #if defined(GNU)		/* gnu (gcc) standard basic platform */
 
+/* Needed for compatibility with the newer restrict keyword */
+#define restrict
+
 /* #define HAS_DL */
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
@@ -33,6 +36,9 @@
 
 #elif defined(LINUX)		/* Linux/gnu (gcc) standard basic platform */
 
+/* Needed for compatibility with the newer restrict keyword */
+#define restrict
+
 #undef HI_OPT			/* hyper experimental optimizations */
 #define HAS_DL
 #define HAS_TIME_OF_THE_DAY
@@ -45,6 +51,7 @@
 #define FTS_USE_NAMED_PIPES
 
 #define FTS_ARCH_NAME        "linux"
+#define LITTLE_ENDIAN
 
 #elif defined(SGI)
 
@@ -60,6 +67,7 @@
 #define VECLIB_LOOP_UNROLL 8
 
 #define FTS_USE_NAMED_PIPES
+#define BIG_ENDIAN
 
 #define FTS_ARCH_NAME        "sgi"
 
@@ -70,6 +78,7 @@
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
+#define BIG_ENDIAN
 
 #define FTS_ARCH_NAME        "solaris2"
 

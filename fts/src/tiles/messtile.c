@@ -56,6 +56,8 @@
    CLIENTPROP (obj)o (symbol)name (atom) value
    CLIENTMESS (obj)obj (symbol)selector [(atom)<args>]*
 
+   FTS_SHUTDOWN_CODE  quit fts.
+
    Other messages will be added ...
  */
 
@@ -560,17 +562,12 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 {
   trace_mess("Received redefine patcher", ac, av);
 
-  if (ac == 4 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]) 
+  if (ac >= 4 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]) 
       && fts_is_int(&av[2]) && fts_is_int(&av[3]))
     {
       fts_patcher_t  *patcher;
-      fts_symbol_t   name;
-      int            ins, outs;
 
       patcher = (fts_patcher_t *) fts_get_object(&av[0]);
-      name    = fts_get_symbol(&av[1]);
-      ins     = fts_get_int(&av[2]);
-      outs    = fts_get_int(&av[3]);
 
       if (! patcher)
 	{
@@ -578,8 +575,7 @@ fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-
-      fts_patcher_redefine(patcher, name, ins, outs);
+      fts_patcher_redefine_description(patcher, ac - 1, av + 1);
     }
   else
     post_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);
@@ -893,6 +889,22 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
 }
 
 
+/*
+   SHUTDOWN
+
+   Quit FTS
+   */
+
+
+static void 
+fts_mess_client_shutdown(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received shutdown", ac, av);
+
+  fts_halt();
+}
+
+
 static void
 fts_messtile_install_all()
 {
@@ -924,6 +936,7 @@ fts_messtile_install_all()
   fts_client_mess_install(NAMED_MESSAGE_CODE, fts_mess_client_nmess);
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
+  fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);
 }
 
 

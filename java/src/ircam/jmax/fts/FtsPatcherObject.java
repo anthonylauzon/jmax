@@ -27,71 +27,24 @@ public class FtsPatcherObject extends FtsContainerObject
    */
 
 
-  public FtsPatcherObject(FtsContainerObject parent, String name, int ninlets, int noutlets, int objId)
+  public FtsPatcherObject(FtsContainerObject parent, String description, int objId)
   {
-    super(parent, "patcher", "", objId);
-
-    setObjectName(name);
-    setNumberOfInlets(ninlets);
-    setNumberOfOutlets(noutlets);
-
-    updateDescription();
+    super(parent, "patcher", description, objId);
   }
 
-  /** Special method to redefine a patcher without looosing its content 
+
+  /**
+   * Special method to redefine a patcher without looosing its content 
    */
 
   public void redefinePatcher(String description)
   {
-    Vector args;
+    Fts.getServer().redefinePatcherObject(this, description);
+    Fts.getServer().syncToFts();
 
-    args = new Vector();
-    
-    FtsParse.parseAtoms(description, args);
-
-    if (args.size() >= 1)
-      put("name", args.elementAt(0));
-    else
-      put("name", "unnamed");
-
-    if (args.size() >= 2)
-      put("ins", args.elementAt(1));
-    else
-      put("ins", new Integer(0));
-
-    if (args.size() >= 3)
-      put("outs", args.elementAt(2));
-    else
-      put("outs", new Integer(0));
-
-    updateFtsObject();
+    this.description = description;
 
     setDirty();
-  }
-
-
-  /** Overwrite the Update FTS object;
-   * a pure patcher, for now, change its description every time
-   * the number of inlets/outlets is changed; for the moment is done
-   * directly, because there is no description property (and we don't
-   * want it for the moment); also, this behaviour should disappear
-   * when the patcher will have its own representation.
-   */
-
-  public void updateFtsObject()
-  {
-    super.updateFtsObject();
-
-    updateDescription();
-  }
-
-  /** update the description;
-    temporary code, waiting for the real thing (the green box)
-   */
-
-  void updateDescription()
-  {
-    description = objectName + " " + ninlets + " " + noutlets;
   }
 
   /** Save the object to a TCL stream. 

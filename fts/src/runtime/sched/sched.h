@@ -9,7 +9,7 @@ extern fts_module_t fts_sched_module;
 
 extern void fts_sched_run(void);
 extern void fts_restart(void);
-extern void fts_sched_halt(void);
+extern void fts_halt(void);
 
 /* declarations Scheduler */
 

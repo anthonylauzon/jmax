@@ -10,6 +10,8 @@
  *
  */
 
+/* #define DO_EXPRESSIONS */
+
 /* THE REAL FTS 2.0 patcher class
 
 The patcher class is a standard class, with real inlets and real
@@ -43,7 +45,7 @@ fts_metaclass_t *patcher_metaclass;
 fts_metaclass_t *inlet_metaclass;
 fts_metaclass_t *outlet_metaclass;
 
-static fts_heap_t variables_heap;
+
 
 /* INlets; inlets are only placeholders for the internal connections
    they receive no messages, send no messages; the messages are sent
@@ -389,6 +391,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->objects = (fts_object_t *) 0;
   this->open    = 0;		/* start as closed */
+  this->env     = 0;
   fts_patcher_set_standard(this);
 }
 
@@ -410,15 +413,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* Delete all the variables */
 
-  while (this->env)
-    {
-      fts_variable_t *v;
-
-      v = this->env;
-      this->env = this->env->next;
-
-      fts_heap_free((char *) v, &variables_heap);
-    }
+  fts_variable_env_clean(&(this->env));
 
   /* delete the inlets and inlets tables */
 
@@ -430,6 +425,37 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 /* Error property handling */
+
+static void
+patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
+		  int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_patcher_t *this = (fts_patcher_t *) obj;
+
+  if (fts_patcher_is_standard(this))
+    {
+      fts_set_symbol(value, this->name);
+    }
+  else
+    {
+      /* Template, or error, use the class name as patcher name, for the moment */
+
+      if ((obj->argc >= 3) &&
+	  fts_is_symbol(&obj->argv[0]) &&
+	  fts_is_symbol(&obj->argv[1])
+	  && (fts_get_symbol(&obj->argv[1]) == fts_s_else))
+	{
+	  /* foo : <obj> syntax; extract the class name */
+
+	  *value = obj->argv[2];
+	}
+      else
+	{
+	  *value = obj->argv[0];
+	}
+    }
+}
+
 
 static void
 patcher_get_error(fts_daemon_action_t action, fts_object_t *obj,
@@ -481,7 +507,66 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_error, patcher_get_error);
 
+  /* daemon for name property */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_name, patcher_get_name);
+
   return fts_Success;
+}
+
+
+/* 
+ * Redefine a patcher inplace from a new description in term of "object" description.
+ * 
+ * For the moment, parse the arguments, and call fts_patcher redefine.
+ * It should also reset the local patcher variables (only those defined by the 
+ * previuos definition !!!, and parse the new ones).
+ * Than, send back properties nins, nouts and name.
+ */
+
+void
+fts_patcher_redefine_description(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
+{
+#ifdef DO_EXPRESSIONS 
+  fts_expression_state_t *e;
+  int ac;
+  fts_atom_t at[3]; /* Actually, the evaluated atom vector */
+#else
+#define at aot  
+#define ac aoc
+#endif
+
+#ifdef DO_EXPRESSIONS 
+
+  /* 1- unbound the patcher variable if any */
+
+  /* To be implemented !!! */
+
+  /* 2- delete  the patcher internal variable if any */
+
+  fts_patcher_remove_variables(this);
+
+  /* 3- eval the expression
+     Ignore the errors, for the moment !!
+     */
+
+  e = fts_expression_eval((fts_object_t *)this, aoc, aot, 3, at);
+  ac = fts_expression_get_count(e);
+#endif
+
+    /* 4- redefine the patcher */
+
+    fts_patcher_redefine(this, fts_get_symbol(&at[0]),fts_get_int(&at[1]), fts_get_int(&at[2]));
+
+    /* 5- set the new variables */
+
+#ifdef DO_EXPRESSIONS
+    fts_expression_assign_properties(e, (fts_object_t *)this);
+#endif
+
+    /* 6- Send the properties */
+
+    fts_object_send_properties((fts_object_t *)this);
 }
 
 /*
@@ -905,99 +990,11 @@ fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at
 }
 
 
-/* Variable handling */
-
-static fts_status_description_t fts_redefinedVariable = {"Redefined variable"};
-
-static fts_variable_t *fts_patcher_variable_new(fts_patcher_t *p, fts_symbol_t name, fts_atom_t *value)
-{
-  fts_variable_t *v;
-
-  v = (fts_variable_t *) fts_heap_alloc(&variables_heap);
-
-  v->name = name;
-  v->next = p->env;
-  v->value = *value;
-
-  p->env = v;
-
-  return v;
-}
-
-static void fts_patcher_variable_remove(fts_patcher_t *p, fts_symbol_t name)
-{
-  /* ??? */
-}
-
-static fts_variable_t *fts_patcher_variable_get(fts_patcher_t *patcher, fts_symbol_t name)
-{
-  fts_variable_t *p;
-
-  for (p = patcher->env; p ; p = p->next)
-    if (p->name == name)
-      return p;
-
-  return 0;
-}
-
-
-fts_atom_t *fts_variable_get_value(fts_object_t *obj, fts_symbol_t name)
-{
-  fts_patcher_t *patcher;
-
-  if (fts_object_is_patcher(obj))
-    patcher = (fts_patcher_t *) obj;
-  else
-    patcher = fts_object_get_patcher(obj);
-
-  while (patcher)
-    {
-      fts_variable_t *v;
-
-      v = fts_patcher_variable_get(patcher, name);
-
-      if (v)
-	return &(v->value);
-      
-      patcher = fts_object_get_patcher((fts_object_t *) patcher);
-    }
-
-  return 0;
-}
-
-
-fts_status_t
-fts_variable_define(fts_object_t *obj, fts_symbol_t name, fts_atom_t *value)
-{
-  fts_patcher_t *patcher;
-  fts_variable_t *v;
-
-  if (fts_object_is_patcher(obj))
-    patcher = (fts_patcher_t *) obj;
-  else
-    patcher = fts_object_get_patcher(obj);
-
-  v = fts_patcher_variable_get(patcher, name);
-
-  if (v)
-    return &fts_redefinedVariable;
-  else
-    {
-      fts_patcher_variable_new(patcher, name, value);
-
-      return fts_Success;
-    }
-}
-
-
-
 static void
 internal_patcher_config(void)
 {
   fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_patcher_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
-
-  fts_heap_init(&variables_heap, sizeof(fts_variable_t), 256);
 }
 
 

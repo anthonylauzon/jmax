@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.12 $ IRCAM $Date: 1998/06/03 11:42:21 $
+ *      $Revision: 1.13 $ IRCAM $Date: 1998/06/17 15:42:47 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -266,6 +266,11 @@ struct fts_object
 
   int id;		/*  id for the object */
 
+  /* Variable: If this object is bound to a variable,
+     this is the variable (and object) name */
+
+  fts_symbol_t varname;
+
   /* connections */
 
   fts_connection_t **in_conn;
@@ -284,6 +289,7 @@ struct fts_variable
 {
   fts_symbol_t  name;
   fts_atom_t    value;
+  fts_object_t  *owner;		/* the object that defined this variable */
   fts_variable_t *next;
 };
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.29 $ IRCAM $Date: 1998/06/04 16:16:04 $
+ *      $Revision: 1.30 $ IRCAM $Date: 1998/06/05 13:35:50 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -69,12 +69,16 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   cl = fts_class_instantiate(ac, at);
 
+  if (! cl)
+    return 0;
+
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
 
   /* Other Initializations */
 
   obj->properties = 0;
+  obj->varname    = 0;
 
   if (cl->noutlets)
     {
@@ -194,7 +198,7 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 	  var = fts_get_symbol(&aot[0]);
 	  /* If the variable already exists, make an error object  */
 
-	  if (fts_variable_get_value(patcher, var))
+	  if (fts_variable_get_value((fts_object_t *) patcher, var))
 	    obj = fts_error_object_new(patcher, id, aoc, aot);
 	}
       else
@@ -285,18 +289,169 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
       /* then, assign it to the variable if any */
 
       if (var != 0)
-	{
-	  fts_atom_t a;
-	  	    
-	  fts_set_object(&a, obj);
-	  fts_variable_define(obj, var, &a);
-	}
+	fts_variable_bind_to_object(var, obj);
     }
 #endif
 
   return obj;
 }
 
+#ifdef TO_DO
+
+/*
+ * fts_object_redefine replace an object with a new
+ * one whose definition is passed as argument, leaving the same
+ * connections (including their ids) and the same id.
+ *
+ * If the object is a standandard object, and the class do not change, 
+ * if the object define the "redefine" method, a message with the new
+ * description is sent, and then the object description is changed; otherwise
+ * a new object is created, and the old one is deleted; *no* mechanism for transferring
+ * the old state to the new object is defined (it probabily should !! for properties).
+ * Waiting for a better property system, persistent/clint properties are anyway 
+ * transferred to the new object before deleting the old one.
+ * 
+ * If the object is a patcher (either standard patcher or abstraction/template)
+ * the patcher redefine function is called instead, look in the patcher.c file.
+ */
+
+fts_object_t *
+fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *parent;
+  fts_object_t  *new;
+
+  /* First of all, if the object being redefined is bound to a variable,
+     unbind the variable (and let the system propagate the unbinding */
+
+  if (fts_object_is_patcher(old))
+    return fts_patcher_redefine(old, ac, at); /* @@@ nome funzione sbagliata lato patcher !! */
+
+  /* We got an object here */
+
+  /* Get the new class name  */
+
+  /* Verify if it is the same */
+  
+  /* It is, look for the redefine method; 
+     if there, send the message and return old */
+
+  /* not there, make a new object with the same ID, transfer connections
+     and properties; doing this, check connections: if some connections
+     with ID are removed, we need to inform the client (raise events ?? HOW ???)
+     */
+
+  parent = fts_object_get_patcher(old);
+  new    = fts_object_new(parent, FTS_NO_ID, ac, at);
+
+  if (! new)
+    return (fts_object_t *) 0;
+
+  fts_object_replace(old, new);
+  fts_object_delete(old);
+
+
+  /* Finally, also for patchers, rebuild the variable bindings if needed or not already done */
+
+  return new;
+}
+
+
+/*
+ * object replace substitute an object with another in the
+ * graph, i.e. rebuild all the connection the old object had
+ * in the new object.
+ *
+ * Also, the new object actually get the id of the old object.
+ * and the old object get the id of the new one.
+ *
+ * It should raise a property changed event on the client side.
+ * It should also handle the case of a container object; may be we should
+ * have a "fts_object_replace" method
+ * 
+ * fts_object_replace do *not* delete the old object; it may be used
+ * to build debug structures, for example, where you want to keep
+ * the original object inside a wrapper patcher !!!
+ * the new Id can be used to access the old object; note that the
+ * old object is kept under the same patcher, until deleted.
+ *
+ * Note that the new object should be instantiated in the same
+ * patch as the old; the behaviour is undefined in other cases.
+ */
+
+void
+fts_object_replace(fts_object_t *old, fts_object_t *new)
+{
+  int inlet, outlet;
+  fts_atom_t at[1];
+  fts_patcher_t *patcher;
+  int id;
+
+  /*
+   * first, send to the new object a message "replace" <old>;
+   * ignore errors (i.e.,if it is not understood, no problem, 
+   * nothing to do).
+   * 
+   * The message can be used by complex object to transfer the content
+   * from the old to the new object, for example in case of a patcher.
+   */
+
+  fts_set_object(&at[0], old);
+
+  fts_message_send(new, fts_SystemInlet, fts_s_replace, 1, at);
+
+  /* swap old and new in the object table */
+
+  id = new->id;
+  fts_object_table_remove(old->id);
+
+  new->id = old->id;
+  fts_object_table_put(new->id, new);
+
+  old->id = id;
+  fts_object_table_put(old->id, old);
+
+  /* reproduce in new, and delete in old,  
+     all the old outgoing connections */
+
+  for (outlet = 0; outlet < old->cl->noutlets; outlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons
+	 and methods  can fire correctly */
+
+      for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
+	{
+	  if (outlet < fts_object_get_outlets_number(new))
+	    fts_object_connect(new, p->woutlet, p->dst, p->winlet);
+
+	  fts_object_disconnect(old, p->woutlet, p->dst, p->winlet);
+	}
+    }
+
+  /* reproduce in new, and delete in old,  
+     all the old incoming connections */
+
+  for (inlet = 0; inlet < old->cl->ninlets; inlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons
+	 and methods  can fire correctly */
+
+      for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
+	{
+	  if (inlet < fts_object_get_inlets_number(new))
+	    fts_object_connect(p->src, p->woutlet, new, p->winlet);
+
+	  fts_object_disconnect(p->src, p->woutlet, old, p->winlet);
+	}
+    }
+}
+
+
+#endif
 /* This is to support "changing" objects; usefull during 
  * .pat loading, where not all the information is available 
  *    at the right place; used currently explode in the fts1.5 package.
@@ -418,7 +573,12 @@ fts_object_send_properties(fts_object_t *obj)
 
       fts_object_property_changed_urgent(obj, fts_s_min_value);
       fts_object_property_changed_urgent(obj, fts_s_max_value);
-      fts_object_property_changed_urgent(obj, fts_s_value); /* should this be here or elsewhere ?? */
+
+      /* The following properties are here only temporarly; they should
+	 be in the relative objects */
+
+      fts_object_property_changed_urgent(obj, fts_s_value); 
+      fts_object_property_changed_urgent(obj, fts_s_size); 
 
       if (fts_object_is_error(obj))
 	fts_object_property_changed_urgent(obj, fts_s_error);
@@ -436,13 +596,17 @@ fts_object_delete(fts_object_t *obj)
 {
   int outlet, inlet;
 
-  /* tell the object we are going to delete him */
+  /* Unbind it from its if needed variable */
 
-  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+  fts_variable_unbind_to_object(obj);
 
   /* take it away from the update queue, if there */
 
   fts_object_reset_changed(obj);
+
+  /* tell the object we are going to delete him */
+
+  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* delete all the survived connections starting in the object */
 

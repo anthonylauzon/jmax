@@ -116,9 +116,14 @@ then
 elif [ -f ${JAVA_DIR}/lib/classes.jar ]
 then
     JAVA_CLASSES=${JAVA_DIR}/lib/classes.jar
+elif [ -f /System/Library/Frameworks/JavaVM.framework/Classes/classes.jar ]
+then 
+    JAVA_CLASSES=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Classes/awt.jar
+else
+    echo Java System classes not found.
 fi
 
-CLASSPATH=.:${JAVA_CLASSES}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing-1.0.1/swingall.jar
+CLASSPATH=.:${JAVA_CLASSES}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing-1.0.1/swingall.jar:${ROOTDIR}/java/lib/NetComponents.jar
 
 if [ _${HIGHPRIORITY}_ = "_true_" ]
 then
@@ -136,5 +141,6 @@ then
     echo "java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
 fi
 
-java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &
+
+java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT 
 

@@ -232,7 +232,12 @@ public class MaxApplication extends Object
       {
 	jmaxProperties.put("jmaxVersion", "version info not available");
       }
-    
+
+    // Get optional username and password
+
+    Fts.setUserName((String) jmaxProperties.get("jmaxUserName"));
+    Fts.setUserPassword((String) jmaxProperties.get("jmaxUserPassword"));
+
     itsHookTable = new MaxWhenHookTable(); 
 
     ircam.jmax.utils.Platform.setValues();
@@ -321,7 +326,7 @@ public class MaxApplication extends Object
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
-    
+
     Notifier notifier = itsInterp.getNotifier();
       
     while (true)

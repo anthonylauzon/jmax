@@ -124,7 +124,7 @@ final public class FtsMessage
   {
     StringBuffer buf = new StringBuffer();
 
-    buf.append("FtsMessage<" + command + " [");
+    buf.append("FtsMessage<" + FtsClientProtocol.getCommandName(command) + " [");
 
     for (int i = 0; i < args_fill ; i++)
       if (args[i] == null)

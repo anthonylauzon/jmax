@@ -73,8 +73,13 @@ public class Probe implements OscillSource
 	if (eventCounter < MAX_EVENTS)
 	  {
 	    times[eventCounter] = System.currentTimeMillis();
-	    labels[eventCounter++] = markName;
-	    lastDelta = times[eventCounter-1] - times[eventCounter-2];
+	    labels[eventCounter] = markName;
+	    eventCounter++;
+
+	    if (eventCounter > 1)
+	      lastDelta = times[eventCounter-1] - times[eventCounter-2];
+	    else
+	      lastDelta = 0;
 	  }
 
 	if (autoReport != 0)

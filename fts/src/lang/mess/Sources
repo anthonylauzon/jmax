@@ -21,4 +21,5 @@ patparser.c     \
 selection.c     \
 clipboard.c     \
 doctor.c        \
-expressions.c
+expressions.c   \
+variables.c

@@ -18,7 +18,7 @@ import java.io.*;
 abstract class FtsPort implements Runnable
 {
   FtsMessage portMsg = new FtsMessage();
-  boolean flushing = true;
+
   /** Local Exception represeting a crash in the FTS server. */
 
   class FtsQuittedException extends Exception
@@ -31,10 +31,6 @@ abstract class FtsPort implements Runnable
 
   String name;
   FtsServer server;
-
-  InputStream in_stream = null;
-  OutputStream out_stream = null;
-
   boolean running  = true;
   Thread inputThread;
 
@@ -59,9 +55,7 @@ abstract class FtsPort implements Runnable
 
   void open()
   {
-    // Create the streams 
-
-    openIOStreams();
+    // the subclasses will do the actual opening, before calling super.open()
 
     // start the input thread
 
@@ -82,44 +76,30 @@ abstract class FtsPort implements Runnable
 
   /** Check if the connection is open. */
 
-  boolean isOpen()
-  {
-    return (in_stream != null) && (out_stream != null);
-  }
+  abstract boolean isOpen();
 
   /**
-   * Create the comunication streams.
-   * Must be created by the subclass,
-   * i.e. the implementation of the connection If the connection
-   * actually bootstrap the server, it must be bootstrapped in the
-   * openIOStreams method.
-   */
-
-  abstract void openIOStreams();
-
-  /**
-   * Destroy the comunication streams.
+   * Close the comunication.
    * Must be created by the implementation of the connection
    * If the connection actually bootstrap the server, 
-   * it must be shutdown in the closeIOStreams method.
+   * it must be shutdown in the doClose method.
    */
 
-  abstract void closeIOStreams();
+  abstract void doClose();
        
   /** the main loop of the input listener thread. */
 
   public void run()
   {
-    while (running && (in_stream !=  null) && (out_stream != null))
+    while (running && isOpen())
       {
 	try
 	  {
 	    FtsMessage msg;
 	    msg = receiveMessage();
 
-	    if (msg != null) {
+	    if (msg != null)
 	      server.dispatchMessage(msg);
-	    }
 	  }
 	catch (java.io.InterruptedIOException e)
 	  {
@@ -138,8 +118,21 @@ abstract class FtsPort implements Runnable
 	  }
       }
 
+    // Send a shutdown message to fts
+
+    try
+      {
+	sendCmd(FtsClientProtocol.fts_shutdown_cmd);
+	sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	// ignore
+      }
+
     // close the thread and the streams
-    closeIOStreams();
+
+    doClose();
   }
 
   /**
@@ -170,7 +163,7 @@ abstract class FtsPort implements Runnable
 
   final void sendCmd(int command) throws java.io.IOException 
   {
-    out_stream.write(command);
+    write(command);
   }
 
   final void sendInt(Integer io) throws java.io.IOException 
@@ -182,21 +175,21 @@ abstract class FtsPort implements Runnable
   {
     String s;
     
-    out_stream.write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type_code);
     s = Integer.toString(value);
     
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
   /** Send an Int passed got as a string */
 
   final void sendInt(String s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type_code);
     
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
  
 
@@ -204,10 +197,10 @@ abstract class FtsPort implements Runnable
 
   final void sendInt(StringBuffer s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.int_type_code);
+    write(FtsClientProtocol.int_type_code);
     
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
  
 
@@ -215,61 +208,64 @@ abstract class FtsPort implements Runnable
   {
     String s;
 
-    out_stream.write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type_code);
     s = fo.toString();
 
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
   final void sendFloat(float value) throws java.io.IOException 
   {
     String s;
 
-    out_stream.write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type_code);
     s = String.valueOf(value);
 
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
   /** Send a float got as a string */
 
   final void sendFloat(String s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type_code);
 
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
   /** Send a float got as a string buffer */
 
   final void sendFloat(StringBuffer s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.float_type_code);
+    write(FtsClientProtocol.float_type_code);
 
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
 
 
   final void sendString(String s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.string_start_code);
-    out_stream.write(s.getBytes());
-    out_stream.write(FtsClientProtocol.string_end_code);
+    write(FtsClientProtocol.string_start_code);
+
+    for (int i = 0; i < s.length(); i++)
+      write(s.charAt(i));
+
+    write(FtsClientProtocol.string_end_code);
   }
 
   final void sendString(StringBuffer s) throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.string_start_code);
+    write(FtsClientProtocol.string_start_code);
 
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
 
-    out_stream.write(FtsClientProtocol.string_end_code);
+    write(FtsClientProtocol.string_end_code);
   }
   
   final void sendObject(FtsObject obj) throws java.io.IOException 
@@ -282,11 +278,11 @@ abstract class FtsPort implements Runnable
     else
       value = 0;
 
-    out_stream.write(FtsClientProtocol.object_type_code);
+    write(FtsClientProtocol.object_type_code);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
 
@@ -297,11 +293,11 @@ abstract class FtsPort implements Runnable
 
     value = id;
 
-    out_stream.write(FtsClientProtocol.object_type_code);
+    write(FtsClientProtocol.object_type_code);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
 
@@ -315,11 +311,11 @@ abstract class FtsPort implements Runnable
     else
       value = 0;
 
-    out_stream.write(FtsClientProtocol.connection_type_code);
+    write(FtsClientProtocol.connection_type_code);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
 
@@ -330,11 +326,11 @@ abstract class FtsPort implements Runnable
 
     value = id;
 
-    out_stream.write(FtsClientProtocol.connection_type_code);
+    write(FtsClientProtocol.connection_type_code);
     s = Integer.toString(value);
 		
     for (int i = 0; i < s.length(); i++)
-      out_stream.write(s.charAt(i));
+      write(s.charAt(i));
   }
 
 
@@ -395,20 +391,16 @@ abstract class FtsPort implements Runnable
   }
 
 
-  
   final void sendEom() throws java.io.IOException 
   {
-    out_stream.write(FtsClientProtocol.end_of_message_code);
-
-    if (flushing)
-      out_stream.flush();
+    write(FtsClientProtocol.end_of_message_code);
+    flush();
   }
 
 
   final void sendMessage(FtsMessage msg)
   {
-    if (out_stream != null)
-      try
+    try
       {
 	msg.writeTo(this);
       }
@@ -419,30 +411,6 @@ abstract class FtsPort implements Runnable
       }
   }
 
-  /** Set the flushing mode */
-
-  final void setFlushing(boolean b) 
-  {
-    flushing = b;
-    
-    try
-      {
-	if (out_stream != null && flushing)
-	  out_stream.flush();
-      }
-    catch (java.io.IOException e)
-      {
-	// ???
-      }
-  }
-
-  /** Ask for an explicit flush */
-
-  final void flush() throws java.io.IOException
-  {
-    if (out_stream != null)
-      out_stream.flush();
-  }
 
   /******************************************************************************/
   /*                                                                            */
@@ -497,7 +465,8 @@ abstract class FtsPort implements Runnable
     portMsg.reset();
 
     // read command
-    command   = in_stream.read();
+
+    command   = read();
 
     if (command == -1)
       throw new FtsQuittedException();
@@ -511,7 +480,7 @@ abstract class FtsPort implements Runnable
 
     int status = blank_token;
 
-    c =  in_stream.read();
+    c =  read();
 
     if (c == -1)
       throw new FtsQuittedException();
@@ -618,7 +587,7 @@ abstract class FtsPort implements Runnable
 
 	if (status != end_token)
 	  {
-	    c = in_stream.read();
+	    c = read();
 
 	    if (c == -1)
 	      throw new FtsQuittedException();
@@ -629,6 +598,22 @@ abstract class FtsPort implements Runnable
 
     return portMsg;
   }
+
+  /** Abstract method to send a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  abstract protected void write(int data) throws java.io.IOException;
+
+  /** Abstract method to receive a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  abstract protected int read() throws java.io.IOException;
+
+  /** Abstract method to Ask for an explicit output flush ; since we
+    can use datagram sockets or other means I/O is not necessarly done
+    thru streams */
+
+  abstract void flush() throws java.io.IOException;
 }
 
 

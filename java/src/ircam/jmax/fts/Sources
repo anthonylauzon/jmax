@@ -39,6 +39,11 @@ SOURCES =  \
 	  FtsSocketPort.java \
 	  FtsSocketServer.java \
 	  FtsSocketServerPort.java \
+	  FtsDatagramPort.java \
+  	  FtsRexecDatagramPort.java  \
+	  FtsDatagramClientPort.java \
+	  FtsDatagramServer.java \
+	  FtsRexecDatagramServer.java \
 	  FtsStandardObject.java \
 	  FtsSubProcessPort.java \
 	  FtsSubProcessServer.java \

@@ -78,7 +78,7 @@ public class FtsServer
 
   public void start()
   {
-    // probe = new Probe("FTS", 10000, 100); //@@@
+    // probe = new Probe("FTS", 10000, 1000); //@@@
     // probe.start();//@@@
 
     port.start();
@@ -86,7 +86,7 @@ public class FtsServer
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(null, "root", 0, 0, 1);
+    root = new FtsPatcherObject(null, "root 0 0", 1);
     registerObject(root);
   }
 
@@ -95,6 +95,10 @@ public class FtsServer
   public void stop()
   {
     port.close();
+
+    /* This will cause the actual close to happen */
+
+    syncToFts();
   }
 
   /** Set a server parameter, <i>before</i> the server start. */
@@ -104,16 +108,6 @@ public class FtsServer
     port.setParameter(name, value);
   }
 
-
-  /** Set the flushing mode; set this to true during loading,
-   *  false during interaction. Sync ask for a flush, to avoid deadlocks.
-   */
-
-  public void setFlushing(boolean flushing)
-  {
-    if (port != null)
-      port.setFlushing(flushing);
-  }
 
   /** Send a "save patcher as bmax" messages to FTS.*/
 
@@ -418,18 +412,16 @@ public class FtsServer
    *  Special optimized version for patcher loading/editing
    */
 
-  final void redefinePatcherObject(FtsObject obj, String name, int ninlets, int noutlets)
+  final void redefinePatcherObject(FtsObject obj, String description)
   {
     if (FtsServer.debug)
-      System.err.println("redefinePatcherObject(" + obj + ", " + name + ", " + ninlets + ", " + noutlets + ")");
+      System.err.println("redefinePatcherObject(" + description + ")");
 
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
 	port.sendObject(obj);
-	port.sendString(name);
-	port.sendInt(ninlets);
-	port.sendInt(noutlets);
+	FtsParseToPort.parseAndSendObject(description, port);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -802,7 +794,8 @@ public class FtsServer
    * wait for FTS to answer; this guarantee that all the
    * pending callbacks and updates from FTS have been processed,
    * and all the values are consistents with the FTS counterpart.
-   * Should probabily be available elsewhere, and not in this class.
+   * Note that now a eom always imply a flush, so no explicit flush
+   * are needed anymore in sync.
    */
 
   final public synchronized void syncToFts()
@@ -810,12 +803,10 @@ public class FtsServer
     if (FtsServer.debug)
       System.err.println("syncToFts()");
 
-    // probe.mark("Sync ping");	// @@@
     try
       {
 	port.sendCmd(FtsClientProtocol.sync_cmd);
 	port.sendEom();
-	port.flush();
       }
 
     catch (java.io.IOException e)
@@ -875,14 +866,12 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
-	  // probe.mark("Property value in"); // @@@
-
  	  if (msg.getNumberOfArguments() >= 3)
  	    {
  	      FtsObject obj;
 
 	      // if (msg.getArgument(1).equals("value"))
-	      // return;
+		// probe.mark("Property value in"); // @@@
 
  	      obj = (FtsObject) msg.getArgument(0);
 
@@ -917,7 +906,6 @@ public class FtsServer
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
-	// probe.mark("Pong in"); // @@@
 	deliverPong();
 	break;
 	
@@ -1024,7 +1012,6 @@ public class FtsServer
       {
 	// ignore iand continue
       }
-    // probe.mark("Sync pong"); // @@@
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */

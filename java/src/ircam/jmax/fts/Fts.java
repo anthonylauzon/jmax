@@ -23,6 +23,12 @@ public class Fts
   {
     if (mode.equals("socket")) 
       server = new FtsSocketServer(serverName, Integer.parseInt(port));
+    else if (mode.equals("udp")) 
+      server = new FtsDatagramServer(serverName);
+    else if (mode.equals("udprx")) 
+      server = new FtsRexecDatagramServer(serverName);
+    else if (mode.equals("udpclient")) 
+      server = new FtsDatagramClientServer(serverName, Integer.parseInt(port));
     else if (mode.equals("client"))
       server = new FtsSocketClientServer(serverName);
     else if (mode.equals("local"))
@@ -279,5 +285,31 @@ public class Fts
       }
     
     return selection;
+  }
+
+
+  /* handling of user/password */
+
+  private static String userName;
+  private static String userPassword;
+
+  static public void setUserName(String name)
+  {
+    userName = name;
+  }
+
+  static public void setUserPassword(String password)
+  {
+    userPassword = password;
+  }
+
+  static String getUserName()
+  {
+    return userName;
+  }
+
+  static String getUserPassword()
+  {
+    return userPassword;
   }
 }

@@ -26,7 +26,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
   }
 
   FtsIntegerVector vector;
-  int vectorSize = 128;
+  int vectorSize;
 
   /*****************************************************************************/
   /*                                                                           */
@@ -43,32 +43,43 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
   {
     super(parent, className, description, objId);
 
-
-    //Then, look for the size in the argument
-
-    Vector args;
-
-    args = new Vector();
-    
-    FtsParse.parseAtoms(description, args);
-
-    if (args.size() >= 3)
-      vectorSize = Integer.parseInt(args.elementAt(2).toString());
-    else
-      {
-	try
-	  {
-	    if (args.size() >= 2) 
-	      vectorSize = Integer.parseInt(args.elementAt(1).toString());
-	  }
-	catch (NumberFormatException e)
-	  {
-	  }
-      }
-	
-    vector = new FtsIntegerVector(this, vectorSize);
-
     installMessageHandler(new TableMessageHandler());
+  }
+
+  /*
+   * Size is now a property, in principle set only
+   * from the fts object, but it may become bidirectional later.
+   */
+
+  protected void builtinPropertyNames(Vector names)
+  {
+    names.addElement("size");
+    super.builtinPropertyNames(names);
+  }
+
+  protected boolean builtinPut(String name, Object value)
+  {
+    if (name.equals("size"))
+      {
+	vectorSize = ((Integer)value).intValue();
+	
+	if (vector == null)
+	  vector = new FtsIntegerVector(this, vectorSize);
+	else
+	  vector.setSize(vectorSize);
+
+	return true;
+      }
+    else
+      return super.builtinPut(name, value);
+  }
+
+  protected Object builtinGet(String name)
+  {
+    if (name.equals("size"))
+      return new Integer(this.vectorSize);
+    else
+      return super.builtinGet(name);
   }
 
   // FtsObjectWithData implementation

@@ -14,13 +14,15 @@ class FtsSubProcessPort extends FtsPort
   String path = ".";
   String ftsName = "fts";
   Process proc;
+  InputStream in_stream = null;
+  OutputStream out_stream = null;
 
   FtsSubProcessPort(String name)
   {
     super(name);
   }
 
-  void openIOStreams()
+  void open()
   {
     try
       {
@@ -34,9 +36,11 @@ class FtsSubProcessPort extends FtsPort
       {
 	System.out.println("Don't know about command " + path);
       }    
+
+    super.open();
   }
 
-  void closeIOStreams()
+  void doClose()
   {
     try
       {
@@ -48,7 +52,11 @@ class FtsSubProcessPort extends FtsPort
       {
 	System.out.println("Cannot quit " + path);
       }
+  }
 
+  boolean isOpen()
+  {
+    return (in_stream != null) && (out_stream != null);
   }
 
   void setParameter(String property, Object value)
@@ -68,6 +76,31 @@ class FtsSubProcessPort extends FtsPort
   void start()
   {
     open();
+  }
+
+  /** Method to send a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  protected void write(int data) throws java.io.IOException
+  {
+    out_stream.write(data);
+  }
+
+  /** Method to receive a char; since we can use datagram sockets or other
+    means I/O is not necessarly done thru streams */
+
+  protected int read() throws java.io.IOException
+  {
+    return in_stream.read();
+  }
+
+  /** Method to Ask for an explicit output flush ; since we
+    can use datagram sockets or other means I/O is not necessarly done
+    thru streams */
+
+  void flush() throws java.io.IOException
+  {
+    out_stream.flush();
   }
 }
 
