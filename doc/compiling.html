@@ -338,8 +338,9 @@ The following platform specific targets are defined:
 <li> <code>ppc-linux</code>: compilation of C and Java parts for architecture ppc-linux
 <li> <code>ppc-macosx</code>: compilation of C and Java parts for architecture ppc-macosx
 <li> <code>sgi</code>: compilation of C and Java parts for architectures r10k-irix6.5 and r5k-irix6.5
+<li> <code>r5k-irix6.5</code>: compilation of C and Java parts for architecture r5k-irix6.5
+<li> <code>r10k-irix6.5</code>: compilation of C and Java parts for architecture r10k-irix6.5
 </ul>
-
 
 <h4>Compilation commands</h4>
 
@@ -370,6 +371,15 @@ compile with ALSA support:
 <pre>
 make i686-linux ENABLE_ALSA=yes
 </pre>
+
+
+<h4>Platform specifics</h4>
+
+<p>
+<b>SGI platforms</b><br>
+The <code>make</code> command to use is <code>gmake</code> and resides
+in <code>/usr/freeware/bin/gmake</code>. Makefiles will <strong>not</strong>
+work with standard make.
 
 
 <!-- ---------------------------------------------------------------------- -->

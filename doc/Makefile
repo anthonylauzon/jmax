@@ -23,10 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-doc:
+install:
 	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir) ; done
 	(cd user ; $(MAKE) $@)
 	(cd images ; $(MAKE) $@)
-#	(cd release_notes ; $(MAKE) $@)
-.PHONY: install-doc
+.PHONY: install
 
