@@ -76,6 +76,9 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
    */
     public void dragStart(int x, int y, MouseEvent e)
     {
+	/* workaround: right-mouse events used when popup is visible */
+	if(((BpfEditor)gc.getGraphicSource()).getMenu().isVisible()) return;
+
 	if(e.getClickCount() > 1) 
 	    {
 		Geometry g = ((BpfGraphicContext)gc).getAdapter().getGeometry();
@@ -90,6 +93,8 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
     private boolean rep = false;
     public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
+	/* workaround: right-mouse events used when popup is visible */
+	if(((BpfEditor)gc.getGraphicSource()).getMenu().isVisible()) return;
 	BpfGraphicContext bgc = (BpfGraphicContext) gc;
 	Geometry geometry = bgc.getAdapter().getGeometry();
 

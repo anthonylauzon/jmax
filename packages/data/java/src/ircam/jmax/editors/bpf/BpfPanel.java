@@ -111,12 +111,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     manager.addContextSwitcher(new WindowContextSwitcher(editor.getGraphicContext().getFrame(), editor.getGraphicContext()));
 
     editor.getGraphicContext().getSelection().addListSelectionListener(this);
-    //------------------     
-    /*Box northSection = new Box(BoxLayout.Y_AXIS);
-
-      ruler.setSize(300, 20);
-      northSection.add(ruler);	
-      container_panel.add(northSection, BorderLayout.NORTH);*/
 
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
@@ -151,12 +145,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     add(container_panel, BorderLayout.CENTER);
     validate();
   }
-
-    /*boolean isVisible(int y)
-      {
-      Rectangle r = scrollTracks.getViewport().getViewRect();
-      return ((y >= r.y)&&(y <= r.y +r.height));
-      }*/
 
    /**
      * called when the database is changed: BpfDataListener interface
