@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.106 2003/01/30 10:19:31 p_tisserand Exp $
+dnl $Id: configure.in,v 1.107 2003/01/31 12:16:26 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.107  2003/01/31 12:16:26  p_tisserand
+dnl Fix AM_CONDITIONAL error with Jack Audio Connection Kit (thanks to Andre Almeida)
+dnl
 dnl Revision 1.106  2003/01/30 10:19:31  p_tisserand
 dnl Add installation of default configuration file
 dnl
@@ -417,6 +420,8 @@ then
 	dnl Set default project and AUDIO/MIDI configuration file
 	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
 	DEFAULT_CONFIG_FILE=default_config_linux_jack.jcfg
+	dnl define USE_JACK for preprocessor conditionnal in linux.c fts_platform_init
+	CFLAGS="$CFLAGS -DUSE_JACK"
 fi
 		
 dnl Add jack in packages to compile	
