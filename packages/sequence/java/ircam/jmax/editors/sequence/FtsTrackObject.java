@@ -222,6 +222,7 @@ public void setTrackProperties( int nArgs, FtsAtom args[])
     if(type.equals("enum"))
     {
       int num = args[i+2].intValue;
+			eventTypesEnum.removeAllElements();
       for(int j = 1; j <= num ; j++)
         eventTypesEnum.addElement(args[i+2+j].symbolValue.toString());
       i+=num+1;
