@@ -1,3 +1,689 @@
+2005-02-22  Diemo Schwarz  <diemo>
+
+	* packages/control/c/src/tup.c:
+	mark bugs possibly left over from tuple/varargs changes
+
+	* packages/numeric/c/src/for.c: fixed bug with float values
+
+	* include/fts/patcherobject.h, fts/define.c, packages/guiobj/c/src/messconst.c, fts/bmaxfile.c, fts/patcherobject.c, include/fts/patcher.h, include/ftsprivate/patcher.h:
+	fixed bug [ 1068801 ] references inside subpatches broken:
+	when evaluating expressions with fts_expression_reduce in
+	patcherobject.c, messconst.c, and define.c, lookup of definitions for
+	references took place in the patcher and not in its scope
+
+	fixed bug [ 1032743 ] window size and position not saved: position
+	is stored as properties, but the (now removed) wx, wy, ww, wh
+	fields in patcher.h were still used in bmaxfile.c
+
+2005-02-22  nschnell  <nschnell>
+
+	* packages/sequence/c/src/track.c, packages/data/c/src/tabeditor.c, packages/data/c/src/fvec.c, packages/data/c/src/data.c, packages/data/c/src/fmat.c, packages/data/c/include/fts/packages/data/data.h, packages/data/c/include/fts/packages/data/fmat.h, packages/data/c/include/fts/packages/data/fvec.h, packages/data/c/src/cvec.c, packages/data/c/include/fts/packages/data/cvec.h, include/fts/message.h, include/fts/class.h, fts/object.c, fts/class.c:
+	 - the return of fvec (replacing fcol and frow)
+
+2005-02-14  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/include/fts/packages/sequence/track.h:
+	check for marker track with new macro
+
+2005-02-14  borghesi  <borghesi>
+
+	* fts/parser.y: *** empty log message ***
+
+2005-02-14  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/fmat.c:
+	fix access to empty matrix: no error, just return 0
+	fix row index wraparound
+
+	* packages/data/c/src/fmat.c: zero rest of partially initialised fmat
+
+2005-02-11  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c: *** empty log message ***
+
+2005-02-10  Diemo Schwarz  <diemo>
+
+	* fts/parser.y:
+	allow multiple indexing in syntax, e.g. $mydict[a][0 1][2 3]
+
+2005-02-09  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/track.c:
+	adapted to fixed fts_atom_copy (changed pre/postcondition)
+	remove warning for NULL
+
+	* packages/data/c/src/mat.c, packages/data/c/src/dict.c:
+	adapted to fixed fts_atom_copy (changed pre/postcondition)
+
+	* include/fts/atom.h, fts/atom.c: fixed fts_atom_copy
+
+2005-02-09  borghesi  <borghesi>
+
+	* packages/data/c/src/mat.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c, packages/data/c/include/fts/packages/data/fmat.h, packages/data/c/include/fts/packages/data/dict.h:
+	dict, fmat: added upload in DATA_API
+
+2005-02-08  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/src/marker.c:
+	import text label file as exported by audacity into marker track
+
+	* packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/track.h:
+	re-found marker access with getmarkers message
+
+2005-02-07  borghesi  <borghesi>
+
+	* packages/data/c/src/mat.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c:
+	 fmat, mat, dict: added upload in copy function
+
+2005-02-04  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: 
+	fixed missing assign in copy
+	implemented set from mat
+
+2005-02-03  Diemo Schwarz  <diemo>
+
+	* autogen-local.sh:
+	This autogen script calls the auto* tools in a specific place
+
+2005-02-03  borghesi  <borghesi>
+
+	* packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatWindow.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java, packages/data/c/src/mat.c:
+	fixed some display problems in mat editor
+
+2005-02-01  borghesi  <borghesi>
+
+	* packages/data/java/ircam/jmax/editors/mat/MatDataListener.java, packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatWindow.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java, packages/data/c/src/mat.c:
+	Mat table editor: fixed bug in insert_row
+
+2005-01-27  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: more precise doc
+
+2005-01-26  Diemo Schwarz  <diemo>
+
+	* packages/functions/c/src/functions.c: typeof function
+	todo: mess output for int is misunderstood as an int selector with missing
+	arg.  workaround: always send a list: "(typeof $1) 0"
+
+2005-01-25  nschnell  <nschnell>
+
+	* packages/utils/c/include/fts/packages/utils/utils.h:
+	 - added multichannel support for cubic interpolation
+
+2005-01-24  nschnell  <nschnell>
+
+	* packages/utils/c/include/fts/packages/utils/utils.h:
+	 - added cubic interpolation with stride (for interleaved multi-channel)
+
+	* packages/sequence/c/src/track.c, packages/data/c/include/fts/packages/data/fmat.h, packages/data/c/src/fmat.c, fts/hashtable.c, fts/object.c, fts/objectlist.c, include/fts/object.h:
+	 - introduced fts_object_listener (implemented for fmat only)
+	 - changed return value of track inmport/export handlers to the track object (instead of size)
+	 - removed fmat_format
+
+2005-01-20  borghesi  <borghesi>
+
+	* packages/data/c/src/fmat.c, packages/data/c/include/fts/packages/data/fmat.h, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java:
+	*** empty log message ***
+
+	* packages/data/c/src/fmat.c: fixed upload in some fmat functions
+
+2005-01-19  borghesi  <borghesi>
+
+	* packages/data/c/src/fmat.c: [fmat]: added upload in fill_varargs
+
+2005-01-19  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: added class copy function
+
+2005-01-17  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/data/java/ircam/jmax/editors/table/FtsFvecObject.java, packages/data/java/ircam/jmax/editors/table/FtsIvecObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsSequenceObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/bpf/FtsBpfObject.java, macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj, client/java/ircam/fts/client/FtsObject.java, java/src/ircam/jmax/fts/FtsObjectWithEditor.java:
+	*** empty log message ***
+
+2005-01-14  Diemo Schwarz  <diemo>
+
+	* packages/functions/c/src/mathfuns.h, packages/utils/c/src/floatfuns.c:
+	sqrt func
+
+	* packages/data/c/src/mat.c, packages/data/c/src/fmat.c: do set data!
+	correct set_from_instance doc
+
+	* fts/object.c: clearer error messages for imp/exp handlers
+
+2005-01-12  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/track/IntegerTrackEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/MonoTrackEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBase.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackEditorObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/track/FloatTrackEditor.java:
+	*** empty log message ***
+
+2005-01-05  nschnell  <nschnell>
+
+	* include/fts/class.h, fts/class.c:
+	FINALLY removed definition of fts_system_intet from header file!
+	(if there was a reason for this definition - windows version ??? - there for sure is another solution for the given problem)
+
+2004-12-28  nschnell  <nschnell>
+
+	* packages/data/c/src/data.c, packages/sequence/c/src/track.c:
+	*** empty log message ***
+
+2004-12-16  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/UndoableAdd.java, packages/sequence/c/src/marker.c:
+	*** empty log message ***
+
+2004-12-13  nschnell  <nschnell>
+
+	* packages/sequence/c/src/track.c:
+	fixed bug in track.c (pakg sequence): track_remove_event_and_upload was missing a track_editor_is_open condition
+
+	* packages/sequence/c/src/track.c, packages/data/c/src/fmat.c, fts/tuple.c:
+	 - minor fixes
+
+2004-12-10  borghesi  <borghesi>
+
+	* packages/data/java/ircam/jmax/editors/table/tools/TableSelecter.java, packages/data/java/ircam/jmax/editors/table/tools/ZoomTool.java, packages/ispw/java/ircam/jmax/editors/explode/SelecterTool.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/SelecterTool.java, java/src/ircam/jmax/toolkit/GraphicSelectionListener.java, java/src/ircam/jmax/toolkit/Selecter.java, packages/data/java/ircam/jmax/editors/bpf/tools/SelecterTool.java:
+	[track]: drag/select in track editor, select notes only; with ALT pressed select markers only
+
+2004-12-09  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/java/ircam/jmax/editors/sequence/actions/Actions.java, packages/sequence/java/ircam/jmax/editors/sequence/menus/MidiTrackPopupMenu.java:
+	*** empty log message ***
+
+2004-12-08  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/java/ircam/jmax/editors/sequence/menus/MidiTrackPopupMenu.java:
+	[track]: added collapse_track method
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/menus/TrackSimpleMenu.java, packages/sequence/c/src/track.c:
+	*** empty log message ***
+
+2004-12-07  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/actions/Actions.java, packages/sequence/java/ircam/jmax/editors/sequence/menus/EditMenu.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/c/src/track.c, packages/sequence/c/src/marker.c, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java:
+	*** empty log message ***
+
+2004-12-06  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java:
+	*** empty log message ***
+
+2004-12-03  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c:
+	*** empty log message ***
+
+2004-12-01  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c:
+	*** empty log message ***
+
+2004-12-01  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c:
+	recommitted changes overwritten by Norbert
+	untabified
+
+2004-11-30  nschnell  <nschnell>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/data/c/src/fmat.c, packages/sequence/c/include/fts/packages/sequence/track.h, fts/class.c, include/fts/class.h:
+	 - fmat.c: added set method for fcol and frow
+	 - track.c: added _and_update() functions for event add, remove, move
+	 - track.c: added function track_get_left_by_time()
+
+2004-11-30  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/menus/MidiTrackPopupMenu.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/SequencePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/actions/Actions.java:
+	*** empty log message ***
+
+2004-11-26  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java:
+	method to get marker track from track
+	marker type change method, todo: get type?
+	renumber_bars method, make-bars renamed make_bars
+	first bar counts from 1
+
+2004-11-25  Diemo Schwarz  <diemo>
+
+	* packages/functions/c/src/functions.c: sqrt and pow functions
+
+2004-11-25  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c: *** empty log message ***
+
+2004-11-24  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, include/fts/predefsymbols.h, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java:
+	*** empty log message ***
+
+2004-11-23  borghesi  <borghesi>
+
+	* packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java, packages/sequence/c/src/event.c, packages/sequence/c/src/marker.c, packages/sequence/c/src/note.c, packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/include/fts/packages/sequence/track.h:
+	*** empty log message ***
+
+2004-11-19  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/include/fts/packages/sequence/marker.h:
+	*** empty log message ***
+
+2004-11-18  borghesi  <borghesi>
+
+	* include/ftsprivate/Makefile.am, include/fts/Makefile.am:
+	*** empty log message ***
+
+	* packages/sequence/c/src/marker.c, packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java, macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj, fts/dsp.c, fts/time.c, include/fts/fts.h, include/fts/time.h, include/fts/timebase.h, include/ftsprivate/time.h, include/ftsprivate/timebase.h:
+	time.h renamed timebase.h
+
+2004-11-15  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java:
+	[FtsTrackObject]: fixed export message
+
+2004-11-15  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/note.c, packages/sequence/c/src/track.c:
+	make compile
+	preliminary suivi property definitions
+
+2004-10-29  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/fvec.c: fix of fix: get min/max index were ok
+
+2004-10-28  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/fvec.c: 
+	fixed size bug also for get min/max index
+	riccardo's fix for fmat absmax also for fvec
+
+	* packages/data/c/src/fvec.c:
+	i is index into original fmat (fslice index * stride), so size has to be
+	fslice size * stride!
+
+2004-10-28  borghesi  <borghesi>
+
+	* packages/data/c/src/fmat.c: [fmat]: fix in fmat_get_absmax
+
+2004-10-27  borghesi  <borghesi>
+
+	* packages/sequence/c/src/sequence.c, packages/sequence/c/include/fts/packages/sequence/sequence.h:
+	[sequence.c]: hack to fix loading of multitracks... message append are redirect to the last loaded track
+	              in sequence (to be changed...)
+
+2004-10-26  borghesi  <borghesi>
+
+	* java/src/ircam/jmax/toolkit/UndoableData.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java, java/src/ircam/jmax/fts/FtsUndoableObject.java, java/src/ircam/jmax/toolkit/AbstractUndoableObject.java:
+	- changed UndoableData interface
+	- makeTrill in track is undoable
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/menus/TempoBarPopupMenu.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/renderers/PartitionBackground.java, packages/sequence/java/ircam/jmax/editors/sequence/PartitionAdapter.java:
+	fix in PartitionAdapter
+
+2004-10-25  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/ArrowTool.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelectionMover.java, packages/sequence/c/src/marker.c:
+	*** empty log message ***
+
+2004-10-23  nschnell  <nschnell>
+
+	* packages/data/c/src/fmat.c: ???
+
+2004-10-21  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/menus/TrackSimpleMenu.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/actions/Actions.java, packages/sequence/java/ircam/jmax/editors/sequence/menus/EditMenu.java, packages/sequence/java/ircam/jmax/editors/sequence/menus/MidiTrackPopupMenu.java, packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/c/include/fts/packages/sequence/marker.h:
+	[track && markers]: added append_bar method
+
+2004-10-21  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/track.c: update on insert if editor is open
+
+	* packages/sequence/c/src/note.c:
+	check scoob type argument, error if no string
+
+2004-10-20  borghesi  <borghesi>
+
+	* packages/sequence/c/src/track.c: *** empty log message ***
+
+2004-10-19  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/menus/MidiTrackPopupMenu.java, packages/sequence/c/src/track.c:
+	[track]: added make_trill function (replace a selction of event with a trill event)
+
+2004-10-18  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/marker.h:
+	[track & markers] added bar numbering
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java:
+	[FtsTrackObject] fixed import from popup menu
+
+2004-10-15  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/fmat.c: factorise fmat_realloc_values
+
+2004-10-15  borghesi  <borghesi>
+
+	* packages/sequence/c/src/marker.c, packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceDataListener.java, packages/sequence/java/ircam/jmax/editors/sequence/SequencePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelection.java, packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTableDialog.java, packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTablePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/ToggleBar.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackDataListener.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, packages/sequence/c/src/seqsym.c, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/c/include/fts/packages/sequence/seqsym.h:
+	*** empty log message ***
+
+2004-10-14  borghesi  <borghesi>
+
+	* packages/sequence/c/src/track.c, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java, packages/sequence/c/src/marker.c, packages/sequence/c/src/seqmidi.c:
+	*** empty log message ***
+
+	* packages/sequence/c/src/track.c:
+	[track.c]: added include of <string.h>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/tools/ArrowTool.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/SelecterTool.java, packages/sequence/java/ircam/jmax/editors/sequence/track/AbstractEventValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/EventValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelection.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelectionMover.java, packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/src/marker.c, packages/sequence/c/src/seqmidi.c, packages/sequence/c/src/track.c:
+	[track & markers]: - possible to move markers without tempo (dragging it)
+			   - delete of markers with tempo stretch track content
+	                   - markers dump fixed
+
+2004-10-12  Diemo Schwarz  <diemo>
+
+	* include/fts/object.h: declare fts_object_try_handlers
+
+	* include/fts/ftmext.h, include/fts/Makefile.am:
+	ftmext.h for jmax needed to compile jmaxsdif
+
+	* fts/file.c, include/fts/file.h: completed filename parsing functions
+
+	* fts/atom.c, fts/class.c, fts/object.c, include/fts/class.h, include/fts/object.h, packages/sequence/c/src/track.c:
+	added list of export handlers to class
+	default for track: midifile export
+	import handlers are list, too, no more array
+
+2004-10-11  nschnell  <nschnell>
+
+	* include/fts/class.h, packages/control/c/src/change.c, packages/control/c/src/tup.c, packages/data/c/src/bpf.c, fts/atom.c, fts/class.c:
+	 - introduced interpolation_select to FTS class
+	 - adapted FTS operator classes
+
+2004-10-08  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/c/src/marker.c, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/trackeditor.c, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackEditorObject.java, packages/sequence/java/ircam/jmax/editors/sequence/track/MidiTrackEditor.java, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/trackeditor.h:
+	[trackeditor]: grid_mode saved in trackeditor state
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsSequenceObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/ispw/java/ircam/jmax/editors/qlist/FtsQListObject.java, packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/event.c, packages/sequence/c/src/marker.c, packages/sequence/c/src/note.c, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/track.c, packages/data/java/ircam/jmax/editors/bpf/FtsBpfObject.java, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/table/FtsFvecObject.java, packages/data/java/ircam/jmax/editors/table/FtsIvecObject.java, packages/ispw/java/ircam/jmax/editors/explode/FtsExplodeObject.java, packages/data/c/include/fts/packages/data/data.h, packages/data/c/src/data.c, java/src/ircam/jmax/fts/FtsConfig.java, java/src/ircam/jmax/fts/FtsObjectWithEditor.java, java/src/ircam/jmax/fts/FtsPackage.java, java/src/ircam/jmax/fts/FtsPatcherObject.java, macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj, include/fts/predefsymbols.h:
+	[track]: fixed stretch function
+	[marker]: tampo change on scomark stretch track between current and next scomark
+
+2004-10-07  Diemo Schwarz  <diemo>
+
+	* packages/sequence/c/src/track.c: hum, wrong update?
+
+	* packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/track.c:
+	track_update_editor hides the details of client communication
+
+	* fts/class.c, fts/object.c, include/fts/object.h:
+	added import_handler mechanism
+	midifile import is default import_handler for track
+
+2004-10-07  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelection.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/c/src/track.c, packages/sequence/c/src/marker.c:
+	finalized shift/stretch/quantize segment in track
+
+2004-10-07  Diemo Schwarz  <diemo>
+
+	* include/fts/predefsymbols.h: unique symbol
+
+	* packages/data/c/src/mat.c:
+	"unique" message with col argument, eliminates runs of same atoms
+	(does not do sort)
+	extracted mat_delete_rows method (later: -> matrix.c) from _mat_delete_rows
+
+2004-10-06  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/ArrowTool.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/SelecterTool.java, packages/sequence/c/src/track.c:
+	[track]: added track_add_marker_from_client
+
+2004-10-05  borghesi  <borghesi>
+
+	* macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java, packages/sequence/c/src/marker.c, packages/sequence/c/src/module.c, packages/sequence/c/src/note.c, packages/sequence/c/include/fts/packages/sequence/Makefile.am, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/include/fts/packages/sequence/note.h, packages/sequence/c/include/fts/packages/sequence/sequence.h, packages/sequence/c/src/Makefile.am:
+	markers are now in marker.c
+
+2004-10-05  nschnell  <nschnell>
+
+	* packages/sequence/c/src/seqmidi.c, packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/note.h, packages/sequence/c/src/note.c:
+	 - fixed MIDI import and track_make_bars method regarding new scomark implementation
+
+2004-10-05  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java:
+	fixed unset of "meter" property in scomark
+
+2004-10-05  nschnell  <nschnell>
+
+	* packages/sequence/c/src/note.c, packages/sequence/c/src/trackeditor.c:
+	*** empty log message ***
+
+	* packages/sequence/c/src/seqsym.c, packages/sequence/c/src/sequence.c, packages/sequence/c/src/track.c, packages/sequence/c/src/trackeditor.c, packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java, packages/sequence/c/include/fts/packages/sequence/note.h, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/sequence.h, packages/sequence/c/src/note.c, packages/sequence/c/src/seqmidi.c, packages/data/c/src/bpf.c:
+	 - package sequence: startet lifting of score markers
+	 - bpf.c: added doc and insert method
+
+2004-10-01  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/AnythingTrackEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/AnythingValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackBaseEditor.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java:
+	listView in AnythingTrackEditor can display objects
+
+2004-09-30  Diemo Schwarz  <diemo>
+
+	* fts/post.c: fix tuple print one atom too much
+
+2004-09-30  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/SequenceRuler.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/SequenceRuler.java:
+	[SequenceRuler]: marker is an object inside ruler
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/SequenceRuler.java:
+	[SequenceRuler]: changed marker in Ruler
+
+2004-09-30  nschnell  <nschnell>
+
+	* fts/class.c, packages/control/c/src/tup.c:
+	 - class.c: removed default_array_function (now set to NULL)
+	 - adapted getup class in control package
+
+	* packages/data/c/src/bpf.c, packages/data/c/src/fmat.c:
+	 - added set method implementations fmat_set_from_bpf() and bpf_set_from_fmat()
+	 - added _get_size to bpf
+
+2004-09-29  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackWindow.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/PartitionAdapter.java, packages/sequence/java/ircam/jmax/editors/sequence/renderers/AmbitusEventRenderer.java:
+	added minimal length to scoob
+
+	* packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java:
+	*** empty log message ***
+
+2004-09-28  nschnell  <nschnell>
+
+	* packages/data/c/src/data.c, packages/data/c/include/fts/packages/data/data.h, fts/post.c:
+	 - added missing description function to expr class
+
+2004-09-28  borghesi  <borghesi>
+
+	* packages/data/java/ircam/jmax/editors/mat/MatTableModel.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java:
+	*** empty log message ***
+
+	* fts/patcher.c:
+	fixed bug closing patcher window with opened subpatcher ( in patcher_mark_objects_as_deleted)
+
+	* fts/client.c:
+	added closeEditor message in  in fts_client_unregister_object
+
+2004-09-28  nschnell  <nschnell>
+
+	* packages/sequence/c/src/track.c, fts/midievent.c, fts/post.c, fts/tuple.c, packages/data/c/src/fvec.c, packages/sequence/c/src/note.c, fts/class.c:
+	 - fixed class description_function (now appends class name as first argument)
+	 - reintroduced default description_function (appends class name only)
+	 - adapted concerned objects
+
+2004-09-27  Diemo Schwarz  <diemo>
+
+	* fts/atom.c: remove post_function from initialiser
+
+2004-09-27  borghesi  <borghesi>
+
+	* java/src/ircam/jmax/fts/FtsPatcherObject.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java, java/src/ircam/jmax/JMaxClassMap.java, java/src/ircam/jmax/editors/patcher/objects/Editable.java, java/src/ircam/jmax/editors/patcher/objects/GraphicObject.java, java/src/ircam/jmax/editors/patcher/objects/Standard.java, java/src/ircam/jmax/fts/FtsGraphicObject.java, include/ftsprivate/client.h, java/src/ircam/jmax/JMaxApplication.java, fts/client.c, fts/object.c, fts/patcher.c, client/java/ircam/fts/client/FtsObject.java:
+	*** empty log message ***
+
+2004-09-27  Diemo Schwarz  <diemo>
+
+	* include/fts/class.h: added array of import handlers
+
+	* fts/atom.c: don't use signbit (not portable and not useful)
+	macros for primitive class init
+
+2004-09-24  nschnell  <nschnell>
+
+	* packages/system/c/src/print.c, packages/sequence/c/src/note.c, packages/sequence/c/src/seqmess.c, packages/sequence/c/src/sequence.c, packages/sequence/c/src/track.c, packages/data/c/src/ivec.c, packages/data/c/src/mat.c, packages/data/c/src/vec.c, packages/data/c/src/fvec.c, packages/data/c/src/bpf.c, packages/data/c/src/cvec.c, packages/data/c/src/data.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c, include/fts/array.h, include/fts/class.h, fts/class.c, fts/midievent.c, fts/param.c, fts/post.c, fts/tuple.c, fts/array.c:
+	 - removed post_function from class (post uses description function instead)
+
+2004-09-24  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: ascending and descending sorting
+
+	* fts/atom.c: correct class and float comparison
+
+2004-09-24  nschnell  <nschnell>
+
+	* packages/data/c/src/dict.c, packages/data/c/src/fmat.c, packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/src/event.c, packages/sequence/c/src/track.c, fts/tuple.c:
+	 - track.c : added quantize, shift and stretch methods
+	 - minor fixes
+
+2004-09-23  borghesi  <borghesi>
+
+	* packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/sequence/c/src/track.c, packages/data/c/src/dict.c, java/src/ircam/jmax/JMaxApplication.java, java/src/ircam/jmax/fts/FtsObjectWithEditor.java, include/fts/client.h, fts/client.c:
+	added in client fts_client_upload_object (used in dict, mat, track to recursive upload of content objects)
+
+2004-09-22  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: 
+	sort method (only ascending)
+	messages for number of rows/cols (only get)
+	new symbols used for matrices
+
+	* packages/data/c/src/fmat.c, include/fts/predefsymbols.h:
+	new symbols used for matrices
+
+	* include/fts/atom.h: 
+	atom comparison function
+	TODO: class compare function for objects
+
+	* fts/tuple.c: tuple array function for tolist
+
+	* fts/atom.c: 
+	atom comparison function
+	TODO: class compare function for objects
+
+2004-09-20  borghesi  <borghesi>
+
+	* packages/data/c/src/dict.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java:
+	added "remove_entries" in Dict editor
+
+	* packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java, packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java:
+	*** empty log message ***
+
+2004-09-17  borghesi  <borghesi>
+
+	* packages/data/c/src/mat.c, packages/data/c/src/fmat.c:
+	added deleteCol  deleteRow insertCol insertRow to FMat editor
+
+	* packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatDataModel.java, packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java, packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java:
+	added removeSelectedCols in Mat editor
+
+	* packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatDataModel.java, packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java, packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java, packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTablePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java:
+	*** empty log message ***
+
+2004-09-14  borghesi  <borghesi>
+
+	* packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java, packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatDataModel.java, packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java, packages/data/java/ircam/jmax/editors/mat/MatPanel.java:
+	Mat Editor: added insert row functionality
+
+	* packages/data/java/ircam/jmax/editors/mat/Makefile.am:
+	*** empty log message ***
+
+	* packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java, packages/data/java/ircam/jmax/editors/mat/MatTableModel.java, packages/data/java/ircam/jmax/editors/mat/MatWindow.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatDataModel.java, packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java, macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj, packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java:
+	added removeRows to Mat editor
+
+2004-09-09  borghesi  <borghesi>
+
+	* java/src/ircam/jmax/fts/FtsPatcherObject.java, include/fts/client.h, java/src/ircam/jmax/editors/patcher/ErmesSketchPad.java, fts/client.c, fts/object.c, fts/patcher.c:
+	fixed bug closing subpatcher winodw
+
+2004-09-08  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTablePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackTableModel.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/track/AbstractEventValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/FmatValue.java, packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTablePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackTableModel.java, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/track.c, packages/data/c/src/dict.c, packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatRowIndex.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java, java/src/ircam/jmax/toolkit/Makefile.am, macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj, include/fts/predefsymbols.h, java/src/ircam/jmax/fts/FtsObjectWithEditor.java:
+	added JMaxMatTable, JTable with renderer and editor for FtsObjects. Used by MatTable and
+	SequenceTableEditor
+
+2004-09-06  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, java/src/ircam/jmax/toolkit/PopupToolbarPanel.java:
+	*** empty log message ***
+
+2004-09-03  nschnell  <nschnell>
+
+	* fts/tuple.c: Oops!
+
+	* packages/data/c/src/fvec.c, packages/sequence/c/src/track.c, fts/expression.c, fts/tuple.c, packages/data/c/include/fts/packages/data/fvec.h:
+	 - tuple.c: added description function to tuple class
+	 - fvec.h: added fslice_get_fmat macro
+	 - fvec.c: fixed post of fslice (now displays matrix dimensions correctly)
+	 - track.c: replaced "this" by "self"
+	 - expression.c: fixed parenthesis error message
+
+2004-08-31  borghesi  <borghesi>
+
+	* packages/sequence/c/src/track.c: *** empty log message ***
+
+2004-08-30  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c: mat insert/delete rows
+
+2004-08-27  nschnell  <nschnell>
+
+	* packages/data/c/src/mat.c, packages/sequence/c/src/track.c, fts/package.c, include/fts/stack.h, packages/data/c/src/dict.c:
+	 - fixed newly introduced bug in fts_get_class_by_name()
+	 - fixed bugs in mat persistence
+	 - moved track editor settings from upload_gui (deprecated for data objects) to track_upload
+
+2004-08-26  Diemo Schwarz  <diemo>
+
+	* packages/data/c/src/mat.c:
+	realloc on Max OS X does not define behaviour on NULL,
+	so we have to do it ourselves
+
+2004-08-26  borghesi  <borghesi>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackWindow.java, packages/data/java/ircam/jmax/editors/mat/MatWindow.java:
+	*** empty log message ***
+
+2004-08-26  nschnell  <nschnell>
+
+	* ChangeLog, fts/expression.c, fts/bmaxfile.c, fts/bytestream.c, include/fts/bytestream.h, packages/sequence/c/src/track.c:
+	*** empty log message ***
+
 2004-08-26  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* expression.c: bug fix for accessing global names which have been shadowed by a local one before
