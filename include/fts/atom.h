@@ -32,8 +32,7 @@
 /*
  * Definition of types and predefined values
  *
- * The type of an atom is a "hacked" pointer to a metaclass. The lower bit 
- * of the pointer is used to separate primitive types from object types.
+ * The type of an atom is a pointer to a metaclass.
  *
  */
 
@@ -45,8 +44,7 @@
  * @return the type of the atom as a fts_metaclass_t *
  * @ingroup atom
  */
-#define fts_get_class_from_type(T) ((fts_metaclass_t *)UINT_TO_POINTER(POINTER_TO_UINT(T) & ~1))
-#define fts_get_class(p) fts_get_class_from_type((p)->type)
+#define fts_get_class(p) (p)->type
 
 /**
  * Get the selector associated with the type of the atom.
@@ -239,7 +237,7 @@ FTS_API fts_metaclass_t *fts_t_string;
  * @return 1 if atom type is object
  * @ingroup atom
  */
-#define fts_is_object(p) ( !( POINTER_TO_UINT((p)->type) & 1) )
+#define fts_is_object(p) (!fts_metaclass_is_primitive( (p)->type))
 
 /**
  * Tests if atom contains a pointer

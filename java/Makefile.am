@@ -20,7 +20,7 @@ JAR_DEP=\
 	src/ircam/jmax/toolkit/menus/classpackage.stamp \
 	src/ircam/jmax/widgets/classpackage.stamp 
 
-CLEANFILES=${JARFILE}
+CLEANFILES=$(JARFILE)
 
 $(JARFILE): $(JAR_DEP)
 	if test -f $(JARFILE); then \

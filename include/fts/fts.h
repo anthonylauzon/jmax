@@ -69,8 +69,6 @@ extern "C" {
 #define FTS_API extern
 #endif
 
-#include <fts/config.h>
-
 /* *** The inclusion order is important *** */
 #include <fts/types.h>
 #include <fts/status.h>

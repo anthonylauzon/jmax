@@ -99,6 +99,9 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
+/* Define if you have the asound library (-lasound).  */
+#undef HAVE_LIBASOUND
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
@@ -110,9 +113,6 @@
 
 /* Define to enable debug */
 #undef DEBUG
-
-/* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
-#undef restrict
 
 /* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
 #undef restrict

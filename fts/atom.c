@@ -84,6 +84,7 @@ static fts_metaclass_t void_metaclass = {
   NULL,
   NULL
 }; 
+fts_metaclass_t *fts_t_void = &void_metaclass;
 static fts_metaclass_t int_metaclass = { 
   int_metaclass_name,
   NULL,
@@ -93,6 +94,7 @@ static fts_metaclass_t int_metaclass = {
   NULL,
   NULL
 }; 
+fts_metaclass_t *fts_t_int = &int_metaclass;
 static fts_metaclass_t double_metaclass = { 
   double_metaclass_name,
   NULL,
@@ -102,6 +104,7 @@ static fts_metaclass_t double_metaclass = {
   NULL,
   NULL
 }; 
+fts_metaclass_t *fts_t_double = &double_metaclass;
 static fts_metaclass_t symbol_metaclass = { 
   symbol_metaclass_name,
   NULL,
@@ -111,6 +114,7 @@ static fts_metaclass_t symbol_metaclass = {
   NULL,
   NULL
 }; 
+fts_metaclass_t *fts_t_symbol = &symbol_metaclass;
 static fts_metaclass_t pointer_metaclass = { 
   pointer_metaclass_name,
   NULL,
@@ -120,6 +124,7 @@ static fts_metaclass_t pointer_metaclass = {
   NULL,
   NULL
 }; 
+fts_metaclass_t *fts_t_pointer = &pointer_metaclass;
 static fts_metaclass_t string_metaclass = { 
   string_metaclass_name,
   NULL,
@@ -129,15 +134,7 @@ static fts_metaclass_t string_metaclass = {
   NULL,
   NULL
 }; 
-
-#define make_primitive_typeid(M) ((fts_metaclass_t *)UINT_TO_POINTER( POINTER_TO_UINT(M) + 1))
-
-fts_metaclass_t *fts_t_void = make_primitive_typeid( &void_metaclass);
-fts_metaclass_t *fts_t_int = make_primitive_typeid( &int_metaclass);
-fts_metaclass_t *fts_t_double = make_primitive_typeid( &double_metaclass);
-fts_metaclass_t *fts_t_symbol = make_primitive_typeid( &symbol_metaclass);
-fts_metaclass_t *fts_t_pointer = make_primitive_typeid( &pointer_metaclass);
-fts_metaclass_t *fts_t_string = make_primitive_typeid( &string_metaclass);
+fts_metaclass_t *fts_t_string = &string_metaclass;
 
 void fts_kernel_atom_init( void)
 {

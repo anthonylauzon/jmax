@@ -64,14 +64,4 @@ struct fts_outlet_decl
 extern fts_class_mess_t *fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything);
 extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s);
 
-/* Predefined typeids */
-#define FTS_TYPEID_VOID     1
-#define FTS_TYPEID_INT      2
-#define FTS_TYPEID_DOUBLE   3
-#define FTS_TYPEID_SYMBOL   4
-#define FTS_TYPEID_POINTER  5
-#define FTS_TYPEID_STRING   6
-#define FTS_TYPEID_FIRST_FREE 16
-
-
 #endif

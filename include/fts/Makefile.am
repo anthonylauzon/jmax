@@ -8,7 +8,6 @@ audiofile.h \
 bytestream.h \
 class.h \
 client.h \
-config.h \
 connection.h \
 doctor.h \
 dsp.h \

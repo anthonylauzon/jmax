@@ -95,14 +95,13 @@ fts_init_package_paths(void)
   char path[MAXPATHLEN];
 
   /* add the default package path */
-  if (fts_package_paths == NULL) {
-    s = fts_get_root_directory();
-    if (s) {
+  s = fts_get_root_directory();
+  if (s) 
+    {
       snprintf(path, MAXPATHLEN, "%s%c%s", s, fts_file_separator, "packages");
       fts_set_symbol(&a, fts_new_symbol_copy(path));
       fts_package_paths = fts_list_append(fts_package_paths, &a);
     }
-  }
 }
 
 fts_list_t *

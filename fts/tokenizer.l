@@ -40,12 +40,12 @@
 %option noyywrap
 
 whites		[ \t\n]
-letter		[A-Za-z_~]
+letter		[A-Za-z_]
 decdigit	[0-9]
 hexdigit	[0-9a-fA-F]
-decint		-?{decdigit}+
+decint		{decdigit}+
 hexint		0x{hexdigit}+
-float		-?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
+float		{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 dollar		\$
 semi		;
 plus		\+
@@ -73,8 +73,11 @@ smaller		\<
 smaller_equal	\<=
 colon		:
 equal		=
-/*  symbol		[^ \t\$\;\(\)\[\]\{\}:]+ */
-symbol		({letter}|{decdigit})({letter}|{decdigit}|\+|\-)*
+symbol		[^ \t=\.\$\(\)\[\]\{\};,:]+
+/*  stdsymbol	({letter}|{decdigit})({letter}|{decdigit}|\+|\-)*~? */
+/*  operator	({plus}|{minus}|{times}|{div}|{percent}|{shift_left}|{shift_right}|{logical_and}|{logical_or}|{logical_not}|{equal_equal}|{not_equal}|{greater}|{greater_equal}|{smaller}|{smaller_equal}|{equal}) */
+/*  optilde		{operator}~ */
+/*  symbol		{stdsymbol}|{optilde} */
 quoted_symbol	\"[^\"]+\"
 
 %%

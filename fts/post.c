@@ -226,23 +226,36 @@ static void init_punctuation( void)
 static int needs_quote( fts_atom_t *p)
 {
   fts_symbol_t s;
+
   if (check_symbol_in( p, operators))
     return 0;
-  else
-    {
-      s = fts_get_symbol( p);      
-      if( !isalnum( *s) )
+
+  s = fts_get_symbol( p);      
+
+  while( *s != '\0')
+    {	    
+      switch (*s) {
+      case ' ':
+      case '\t':
+      case '=':
+      case '.':
+      case '$':
+      case '(':
+      case ')':
+      case '[':
+      case ']':
+      case '{':
+      case '}':
+      case ';':
+      case ',':
+      case ':':
 	return 1;
-      
+      }
+
       s++;
-      while( *s != '\0')
-	{	    
-	  if( !(isalnum( *s) | ( *s == '+') | ( *s == '-') | ( *s == '~')))
-	    return 1;
-	  s++;
-	}
-      return 0;
-    }    
+    }
+
+  return 0;
 }
 
 void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)

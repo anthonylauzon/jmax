@@ -26,6 +26,15 @@ typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *)
 typedef struct fts_inlet_decl fts_inlet_decl_t;
 typedef struct fts_outlet_decl fts_outlet_decl_t;
 
+/* Predefined typeids */
+#define FTS_TYPEID_VOID     1
+#define FTS_TYPEID_INT      2
+#define FTS_TYPEID_DOUBLE   3
+#define FTS_TYPEID_SYMBOL   4
+#define FTS_TYPEID_POINTER  5
+#define FTS_TYPEID_STRING   6
+#define FTS_FIRST_OBJECT_TYPEID   16
+
 struct fts_metaclass {
   fts_symbol_t name; /* name of the metaclass, i.e. the first name used to register it */
 
@@ -35,7 +44,7 @@ struct fts_metaclass {
   */
   fts_symbol_t selector; 
   
-  /* An integer id used for efficient dispatch */
+  /* An integer id: lower values are primitive types */
   int typeid;
 
   fts_instantiate_fun_t instantiate_fun;
@@ -93,6 +102,7 @@ FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_f
 FTS_API void fts_alias_install(fts_symbol_t alias_name, fts_symbol_t class_name);
 
 #define fts_metaclass_get_selector(MCL) ((MCL)->selector ? (MCL)->selector : (MCL)->name)
+#define fts_metaclass_is_primitive(MCL) ((MCL)->typeid < FTS_FIRST_OBJECT_TYPEID)
 
 /* Class functions  and macros */
 #define FTS_VAR_ARGS  -1

@@ -31,7 +31,7 @@
 
 const int fts_SystemInlet = -1;
 
-static int typeid = FTS_TYPEID_FIRST_FREE;
+static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
 /* Return Status declarations */
 

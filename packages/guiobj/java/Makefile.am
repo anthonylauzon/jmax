@@ -9,16 +9,20 @@ JAVAROOT= @top_srcdir@/packages/guiobj/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
 jardir=$(pkgdatadir)/packages/guiobj/java
-JAR= guiobj.jar
-jar_DATA= $(JAR)
+JARFILE= guiobj.jar
+jar_DATA= $(JARFILE)
 
 JAR_DEP= \
-classpackage.stamp \
-icons/time.stamp \
-ircam/jmax/guiobj/classpackage.stamp
+	classpackage.stamp \
+	icons/time.stamp \
+	ircam/jmax/guiobj/classpackage.stamp
 
-CLEANFILES=${JAR}
+CLEANFILES=$(JARFILE)
 
-$(JAR): $(JAR_DEP)	
-	-test -f $(JAR) || rm -f $(JAR)
-	jar -cvf $(JAR) *.class icons/*.gif ircam/jmax/guiobj/*.class
+$(JARFILE): $(JAR_DEP)	
+	if test -f $(JARFILE); then \
+		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` ; \
+	else \
+		jar -cvf $(JARFILE) `find . -name "*.class"`; \
+	fi
+

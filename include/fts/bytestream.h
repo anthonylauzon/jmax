@@ -409,8 +409,6 @@ typedef struct _fts_memorystream_t fts_memorystream_t;
 
 /*@}*/
 
-void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c);
-
 /**
  * Returns the characters written to the stream as an array. The array is not
  * allocated; instead, the internal buffer itself is returned.
@@ -422,7 +420,7 @@ void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c);
  * @param stream the memory stream
  * @return the bytes that were written to the stream
  */
-unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream);
+FTS_API unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream);
 
 /**
  * Resets the stream to zero, so that all currently accumulated output is discarded.
@@ -430,5 +428,5 @@ unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream);
  * @fn void fts_memorystream_reset( fts_memorystream_t *stream)
  * @param stream the memory stream
  */
-void fts_memorystream_reset( fts_memorystream_t *stream);
+FTS_API void fts_memorystream_reset( fts_memorystream_t *stream);
 
