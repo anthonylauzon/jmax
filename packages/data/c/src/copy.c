@@ -25,6 +25,7 @@
 #include "ivec.h"
 #include "fvec.h"
 #include "mat.h"
+#include "bpf.h"
 
 /******************************************************
  *
@@ -160,6 +161,18 @@ copyto_fvec_from_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_outlet_send(o, 0, fvec_symbol, 1, &this->a);
 }
 
+static void
+copyto_bpf_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  copy_t *this = (copy_t *)o;
+  bpf_t *this_bpf = bpf_atom_get(&this->a);
+  bpf_t *in_bpf = bpf_atom_get(at);
+
+  bpf_copy(in_bpf, this_bpf);
+
+  fts_outlet_send(o, 0, bpf_symbol, 1, &this->a);
+}
+
 /******************************************************
  *
  *  class
@@ -171,7 +184,10 @@ copyto_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  if(ac == 2)
+  ac--;
+  at++;
+
+  if(ac == 1)
     {
       fts_class_init(cl, sizeof(copy_t), 2, 1, 0); 
       
@@ -179,17 +195,22 @@ copyto_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, copy_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, copy_delete);
       
-      if(ivec_atom_is(at + 1))
+      if(ivec_atom_is(at))
 	{
 	  fts_method_define_varargs(cl, 0, ivec_symbol, copyto_ivec_from_ivec);
 	  fts_method_define_varargs(cl, 0, fvec_symbol, copyto_ivec_from_fvec);
 	  fts_method_define_varargs(cl, 1, ivec_symbol, copy_set_reference);
 	}
-      else if(fvec_atom_is(at + 1))
+      else if(fvec_atom_is(at))
 	{
 	  fts_method_define_varargs(cl, 0, ivec_symbol, copyto_fvec_from_ivec);
 	  fts_method_define_varargs(cl, 0, fvec_symbol, copyto_fvec_from_fvec);
 	  fts_method_define_varargs(cl, 1, fvec_symbol, copy_set_reference);
+	}
+      else if(bpf_atom_is(at))
+	{
+	  fts_method_define_varargs(cl, 0, bpf_symbol, copyto_bpf_from_bpf);
+	  fts_method_define_varargs(cl, 1, bpf_symbol, copy_set_reference);
 	}
       else
 	return &fts_CannotInstantiate;

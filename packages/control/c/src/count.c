@@ -46,7 +46,8 @@ typedef struct
   int begin;
   int end;
   int step;
-  int reverse;
+  int reverse; /* running direction when for reverse mode */
+  int signal; /* flag whether carrier has to be signaled */
 } count_int_t;
 
 typedef struct 
@@ -58,6 +59,7 @@ typedef struct
   double end;
   double step;
   double reverse;
+  int signal;
 } count_float_t;
 
 /************************************************************
@@ -84,8 +86,11 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       switch(this->mode)
 	{
 	case mode_clip:
+
 	  value = target;
+
 	  break;
+
 	case mode_wrap:
 	  {
 	    value += begin - end;
@@ -111,14 +116,20 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  }
 	  break;
 	}
-      
-      carrier = 1;
+
+      carrier = this->signal;
     }
   else
-    this->value = value + step;
+    {
+      this->value = value + step;
+      this->signal = 1;
+    }
   
   if(carrier)
-    fts_outlet_bang(o, 1);
+    {
+      this->signal = 0;
+      fts_outlet_bang(o, 1);
+    }
 
   fts_outlet_int(o, 0, value);
 }
@@ -312,13 +323,16 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  break;
 	}
       
-      carrier = 1;
+      carrier = this->signal;
     }
   else
     this->value = value + step;
   
   if(carrier)
-    fts_outlet_bang(o, 1);
+    {
+      this->signal = 0;
+      fts_outlet_bang(o, 1);
+    }
 
   fts_outlet_float(o, 0, value);
 }
@@ -492,6 +506,7 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->end = 127;
   this->step = 1;
   this->reverse = 1;
+  this->signal = 1;
 
   count_int_set_parameters(o, 0, 0, ac - 1, at + 1);
   count_int_reset(o, 0, 0, 0, 0);
@@ -508,6 +523,7 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->end = 0.1;
   this->step = 0.01;
   this->reverse = 1;
+  this->signal = 1;
 
   count_float_set_parameters(o, 0, 0, ac - 1, at + 1);
   count_float_reset(o, 0, 0, 0, 0);

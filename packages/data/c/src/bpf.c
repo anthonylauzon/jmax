@@ -329,13 +329,25 @@ bpf_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
 }
 
+void
+bpf_copy(bpf_t *bpf, bpf_t *copy)
+{
+  int size = bpf_get_size(copy);
+  int i;
+
+  set_size(copy, size);
+
+  for(i=0; i<size; i++)
+    copy->points[i] = bpf->points[i];
+}
+
 /************************************************************
  *
  *  client methods
  *
  */
 
-void
+static void
 bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
@@ -359,7 +371,7 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_client_send_message(o, sym_addPoint, ac, at);
 }
 
-void
+static void
 bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
@@ -388,7 +400,7 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   fts_client_send_message(o, sym_removePoints, ac, at);
 }
 
-void
+static void
 bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;

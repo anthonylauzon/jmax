@@ -76,4 +76,6 @@ DATA_API int bpf_search_index(bpf_t *bpf, double time, int index);
 #define bpf_atom_get(ap) ((bpf_t *)fts_get_object(ap))
 #define bpf_atom_is(ap) (fts_is_a((ap), bpf_type))
 
+DATA_API void bpf_copy(bpf_t *bpf, bpf_t *copy);
+
 #endif

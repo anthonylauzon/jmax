@@ -26,6 +26,8 @@
 
 #include <fts/fts.h>
 
+#define SYNC_MAX_SIZE (sizeof(unsigned int))
+
 static fts_symbol_t sym_all = 0;
 static fts_symbol_t sym_none = 0;
 
@@ -41,7 +43,7 @@ typedef struct
   unsigned int require; /* control bits: require input on given inlets */
   unsigned int reset; /* control bits: reset memory of given inputs after on each input */
   unsigned int wait; /* status bits: wait for input at given inlet before output */
-  fts_atom_t a[32];
+  fts_atom_t a[SYNC_MAX_SIZE];
   enum {mode_all, mode_select} mode;
 } sync_t;
 
@@ -57,12 +59,8 @@ sync_output(sync_t *this)
   int i;
 
   for(i=this->n-1; i>=0; i--)
-    {
-      if(fts_is_void(this->a + i))
-	fts_outlet_bang((fts_object_t *)this, i);
-      else
-	fts_outlet_send((fts_object_t *)this, i, fts_get_selector(this->a + i), 1, this->a + i);
-    }
+    if(!fts_is_void(this->a + i))
+      fts_outlet_send((fts_object_t *)this, i, fts_get_selector(this->a + i), 1, this->a + i);
 }
 
 static void
@@ -213,31 +211,37 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ac--;
   at++;
 
-  if(ac <= 1)
-    {
-      if(ac == 1 && fts_is_number(at))
-	n = fts_get_number_int(at);
-      
-      if(n < 2) 
-	n = 2;
-      else if(n > 32)
-	n = 32;
+  /* void state */
+  for(i=0; i<SYNC_MAX_SIZE; i++)
+    fts_set_void(this->a + i);
 
-      for(i=0; i<n; i++)
-	fts_set_void(this->a + i);
+  if(ac == 1)
+    {
+      if(fts_is_number(at))
+	{
+	  n = fts_get_number_int(at);
+	  
+	  if(n < 2) 
+	    n = 2;
+	  else if(n > SYNC_MAX_SIZE)
+	    n = SYNC_MAX_SIZE;
+	}
+      else
+	{
+	  fts_object_set_error(o, "Wrong argument");
+	  return;
+	}
     }
   else if(ac > 1)
     {
+      if(ac > SYNC_MAX_SIZE)
+	ac = SYNC_MAX_SIZE;
+
       n = ac;
 
       for(i=0; i<n; i++)
-	{
-	  fts_set_void(this->a + i);
-	  fts_atom_assign(this->a + i, at + i);
-	}
+	fts_atom_assign(this->a + i, at + i);
     }
-  else
-    fts_object_set_error(o, "Wrong arguments");
 
   this->n = n;
   this->trigger = this->require = this->reset = this->wait = (1 << n) - 1;
@@ -252,13 +256,15 @@ sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  if(ac > 0 && fts_is_number(at))
+  if(ac == 1 && fts_is_number(at))
     n = fts_get_number_int(at);
+  else if(ac > 1)
+    n = ac;
 
   if(n < 2) 
     n = 2;
-  else if(n > 32)
-    n = 32;
+  else if(n > SYNC_MAX_SIZE)
+    n = SYNC_MAX_SIZE;
 
   fts_class_init(cl, sizeof(sync_t), n, n, 0);
   
@@ -282,5 +288,5 @@ sync_config(void)
   sym_left = fts_new_symbol("left");
   sym_right = fts_new_symbol("right");
 
-  fts_metaclass_install(fts_new_symbol("sync"), sync_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("sync"), sync_instantiate, fts_narg_equiv);
 }
