@@ -234,8 +234,7 @@ add_arg(fts_atom_t *a)
 }
 
 
-void
-fts_client_parse_char(char c)
+void fts_client_parse_char(char c)
 {
   fts_atom_t a;
 

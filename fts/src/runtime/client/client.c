@@ -191,8 +191,7 @@ client_poll(void)
 
 /* functions to set the action on end of file */
 
-void
-set_restart_on_eof(int v)
+void set_restart_on_eof(int v)
 {
   restart_on_eof = v;
 }

@@ -179,13 +179,15 @@ fts_client_updates_sync(void)
 void
 fts_updates_set_updates_per_ticks(int upt)
 {
-  fts_updates_per_ticks = upt;
+  if (upt > 0)
+    fts_updates_per_ticks = upt;
 }
 
 void
 fts_updates_set_update_period(int upt)
 {
-  fts_update_period = upt;
+  if (upt > 0)
+    fts_update_period = upt;
 }
 
 

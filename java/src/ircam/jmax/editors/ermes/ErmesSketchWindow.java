@@ -740,9 +740,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   public void Destroy()
   {
-    System.err.println("ErmesSketchWindow.Destroy()");
-    Thread.dumpStack();
-
     setVisible(false);
     itsPatcherData.resetPatcherListener();
     removeComponentListener( this);

@@ -45,8 +45,7 @@ extern void post( const char *format, ...);
 
 static void fts_heaps_init(void);
 
-void
-mem_init(void)
+void mem_init(void)
 {
   fts_heaps_init();
 }
@@ -59,8 +58,7 @@ mem_init(void)
 
 /* statistic routines */
 
-void *
-fts_zalloc(int size)
+void *fts_zalloc(int size)
 {
   if (size <= 0)
     return 0;
@@ -78,8 +76,7 @@ fts_zalloc(int size)
 }
 
 
-void *
-fts_malloc(int size)
+void *fts_malloc(int size)
 {
   void *p;
 
@@ -87,15 +84,18 @@ fts_malloc(int size)
 
   if (p == 0)
     {
-      if (fts_memory_is_locked)
+      if (fts_memory_is_locked())
 	{
 	  fts_unlock_memory();
 	  p = real_malloc(size);
 	  
 	  if (p == 0)
-	    fprintf(stderr, "Out of memory\n");
+	    fprintf(stderr, "Out of virtual memory\n");
 	  else
-	    post("Physical memory exhausted : non real-time mode\n");
+	    {
+	      post("Cannot allocate more physical memory, switching to non real-time mode\n");
+	      post("See your maxlkmem parameter (man systune)");
+	    }
 	}
       else
 	fprintf(stderr, "Out of memory\n");
@@ -105,14 +105,12 @@ fts_malloc(int size)
 }
 
 
-void *
-fts_realloc(void *p, int size)
+void *fts_realloc(void *p, int size)
 {
   return real_realloc(p, size);
 }
 
-void
-fts_free(void *p)
+void fts_free(void *p)
 {
   real_free(p);
 }
