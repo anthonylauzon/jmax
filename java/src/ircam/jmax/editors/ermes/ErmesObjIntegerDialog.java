@@ -7,7 +7,7 @@ import ircam.jmax.utils.*;
 /**
  * A dialog used to edit the value inside a "float box".
  */
-class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListener{
+class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListener, WindowListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -29,6 +29,7 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
     p1.add(new Label("Integer Value"));
     value = new TextField("", 20);
     value.addActionListener(this);
+    value.addKeyListener(this);
     p1.add(value);
     
     add("North",p1);
@@ -51,6 +52,7 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
     pack();
 
     addKeyListener(this);
+    addWindowListener(this);
   }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -110,6 +112,17 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
+  public void windowClosing(WindowEvent e){}
+  public void windowOpened(WindowEvent e){}
+  public void windowClosed(WindowEvent e){}
+  public void windowIconified(WindowEvent e){}       
+  public void windowDeiconified(WindowEvent e){}
+  public void windowActivated(WindowEvent e)
+  {
+    requestFocus();
+    value.selectAll();
+  }
+  public void windowDeactivated(WindowEvent e){}  
 }
 
 

@@ -173,7 +173,7 @@ class ErmesObjInt extends ErmesObject {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
     if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(itsFalseFrame);
-      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY);
       itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
       itsIntegerDialog.setVisible(true);
       return true;
