@@ -30,6 +30,8 @@
 
 typedef struct
 {
+  fts_object_t o;
+
   fts_array_t args;
   fts_symbol_t s;
 } fts_message_t;
