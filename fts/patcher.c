@@ -1831,9 +1831,28 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_object_set_outlets_number(o, 0);
   
   fts_patcher_set_standard(self);
-  
-  self->args = NULL;
 
+  /* set arguments */
+  if(ac > 0)
+  {
+    fts_definition_t *def = fts_definition_get(self, fts_s_args);
+    fts_atom_t a;
+
+    self->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
+    fts_object_refer(self->args);
+
+    /* set new definiton */
+    fts_set_object(&a, (fts_object_t *)self->args);
+    fts_definition_update(def, &a);
+
+    /* store definition in object */
+    fts_object_set_definition((fts_object_t *)self->args, def);
+
+    fts_patcher_set_template(self, NULL);
+  }
+  else
+    self->args = NULL;
+    
   /* init object list */
   self->objects = NULL;
 
@@ -1880,8 +1899,8 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* delete arguments */
   if(self->args != NULL)
-    fts_object_release( self->args);
-
+    fts_object_release(self->args);
+  
   /* delete the inlet and outlet tables */
   if (self->inlets)
     fts_free( self->inlets);
@@ -1986,7 +2005,7 @@ fts_patcher_get_scope(fts_patcher_t *patcher)
   {
     fts_patcher_t *parent = fts_object_get_patcher((fts_object_t *)patcher);
 
-    while(parent != NULL && parent != fts_root_patcher && fts_patcher_get_template(patcher) == NULL)
+    while(parent != NULL && parent != fts_root_patcher && fts_patcher_is_template(patcher) == NULL)
     {
       patcher = parent;
       parent = fts_object_get_patcher((fts_object_t *)patcher);

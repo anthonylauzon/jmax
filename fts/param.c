@@ -342,13 +342,14 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_remove_listener, param_remove_listener);
 
   fts_class_message_varargs(cl, fts_s_clear, param_clear);
-  fts_class_message_varargs(cl, fts_s_send, param_input_atom);
+  fts_class_message_atom(cl, fts_s_send, param_input_atom);
 
   fts_class_message_atom(cl, fts_s_set, param_set);
   fts_class_message(cl, fts_s_set_from_instance, cl, param_set_from_instance);
   
   fts_class_inlet_bang(cl, 0, param_update);
   fts_class_inlet_atom(cl, 0, param_input_atom);
+  fts_class_inlet_atom(cl, 1, param_set);
   fts_class_outlet_atom(cl, 0);
 }
 

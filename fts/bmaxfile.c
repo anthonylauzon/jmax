@@ -301,14 +301,12 @@ fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, cons
 		       -- Push the new object in the object stack
 		       -- Don't touch the argument stack.
 
-   MAKE_TOP_OBJ   <nargs>   -- Take <nargs> + lambda argument from the evaluation stack
+   MAKE_TOP_OBJ   <nargs>   -- Take <nargs> + ac argument from the evaluation stack
                        -- and make an object with top of the object stack as parent.
 		       -- Push the new object in the object stack
 		       -- Don't touch the argument stack.
-		       -- lambda is the value of a special internal vm register
-		       -- that is filled loading templates; it is used to
-		       -- add arguments to the first object created from the vm invocation
-		       -- environment
+                       -- The + ac is used to add the arguments from the vm invocation
+                          environment to the first object created (e.g. for loading templates) 
 
    PUT_PROP   <sym> -- Put the top of the evaluation stack value
                     -- as property <sym> for the object at the top 
@@ -814,7 +812,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    int nargs = GET_B(p);
 
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;
@@ -829,7 +827,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;
@@ -845,7 +843,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;

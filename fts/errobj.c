@@ -73,7 +73,7 @@ fts_error_object_get_class(fts_error_object_t *obj)
   fts_class_t *class = NULL;
   int argc = fts_object_get_description_size(o);
   fts_atom_t *argv = fts_object_get_description_atoms(o);
-  
+
   if(argc > 1 && fts_is_symbol(argv) && fts_get_symbol(argv) == fts_s_colon && fts_is_symbol(argv + 1))
     class_name = fts_get_symbol(argv + 1);
   else if(argc > 2 && 
@@ -85,6 +85,8 @@ fts_error_object_get_class(fts_error_object_t *obj)
       package_name = fts_get_symbol(argv);
       class_name = fts_get_symbol(argv + 2);
     }
+  else if(argc > 0 && fts_is_symbol(argv))
+    class_name = fts_get_symbol(argv);
 
   if(class_name != NULL)
     class = fts_class_get_by_name( package_name, class_name);

@@ -309,6 +309,7 @@ typedef struct
   fts_object_t o;
   fts_symbol_t name;
   fts_atom_t value;
+  fts_patcher_t *patcher;
 } define_t;
 
 static void 
@@ -322,12 +323,20 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       fts_patcher_t *patcher = fts_object_get_patcher(o);
       fts_symbol_t name = fts_name_get_unused(patcher, fts_get_symbol(at));
+      fts_atom_t a[3];
 
       fts_name_set_value(patcher, name, (fts_atom_t *)(at + 1));
       this->name = name;
       this->value = at[1];
+      this->patcher = patcher;
 
       fts_atom_refer(&this->value);
+
+      fts_set_symbol(a, fts_s_colon);
+      fts_set_symbol(a + 1, fts_s_define);
+      fts_set_symbol(a + 2, name);
+      a[3] = at[1];
+      fts_object_set_description(o, 4, a);
     }
   else
     fts_object_error(o, "bad arguments");
@@ -338,7 +347,7 @@ define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   define_t *this = (define_t *) o;  
 
-  fts_name_set_value(fts_object_get_patcher( o), this->name, fts_null);
+  fts_name_set_value(this->patcher, this->name, fts_null);
   fts_atom_release(&this->value);
 }
 
@@ -412,7 +421,7 @@ args_instantiate(fts_class_t *cl)
 void 
 fts_kernel_variable_init(void)
 {
-  fts_class_install( fts_s_define, define_instantiate);
+  /*fts_class_install( fts_s_define, define_instantiate);*/
   /*fts_class_install( fts_s_args, args_instantiate);*/
 
   definition_heap = fts_heap_new(sizeof(fts_definition_t));
