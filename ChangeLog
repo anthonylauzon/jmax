@@ -1,5 +1,16 @@
 2003-10-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* include/fts/tuple.h: added the following functions:
+	  fts_tuple_prepend_int
+	  fts_tuple_prepend_float
+	  fts_tuple_prepend_symbol
+
+	* fts/array.c, include/fts/array.h: added the following functions:
+	  fts_array_prepend_int
+	  fts_array_prepend_float
+	  fts_array_prepend_symbol
+	  which are shortcuts for fts_array_prepend.
+
 	* packages/guiobj/c/src/toggle.c (toggle_instantiate): fixed bug "[ 832351 ] persistence on toggle does not work".
 	Now toggle_set is called for fts_s_value selector.
 
