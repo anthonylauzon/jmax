@@ -152,6 +152,16 @@ public class EditField extends JTextArea implements FocusListener
     setWrapStyleWord(true);
 
     addFocusListener(this);
+
+    //bug fix: to avoid caret position bigger than text length after a drag selection
+    addCaretListener(new CaretListener(){
+	    public void caretUpdate(CaretEvent e)
+	    {
+		int lt = EditField.this.getText().length();
+		if(e.getDot()>lt)
+		    setSelectionEnd(lt);
+	    };
+	});
   }
 
   // actually starts the edit operation.
