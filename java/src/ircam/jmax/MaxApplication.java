@@ -232,10 +232,7 @@ public class MaxApplication extends Object
     // (fd) hack to try the new console
     String useNewConsole = jmaxProperties.getProperty( "jmaxNewConsole");
 
-    if ( useNewConsole != null && useNewConsole.equals( "true"))
-      ircam.jmax.editors.newconsole.ConsoleModule.initModule();
-    else
-      ircam.jmax.editors.console.ConsoleModule.initModule();
+    ircam.jmax.editors.console.ConsoleModule.initModule();
 
     ircam.jmax.editors.ermes.ErmesModule.initModule();
     ircam.jmax.editors.control.ControlModule.initModule();
