@@ -47,36 +47,48 @@
 <hr>
 <a NAME="2.5.1"><h1>Release notes for <i>j</i>Max 2.5.1</h1></a>
 
+Please note that the release 2.5.1 was pre-released by Christian Klippel on his mamalala site.
+Unfortunately there is no obvious distiction of these premature packages.
+Anyway, THIS is jMax 2.5.1.
+
 <h3>Java</h3>
 
 <p>
-<h3>GUI</h3>
+<h3>Audio and MIDI configuration</h3>
 
-The DSP
-
-<p>
-<h3>audio and MIDI configuration</h3>
+After the classes alsaaudioport and ossaudioport for the audio configuration a class alsarawmidiport 
+was introduced for the MIDI configuartion on the ALSA/Linux platform.
 
 <p>
-<h3>Scheduling, Clocks and Alarms</h3>
+<h3>User interface</h3>
 
-The FTS scheduling as well as the clock and alarm abstractions have changed.
-Before this version 
+The DSP calculation can be switched on an of by the keyboard short cut Control/SpaceBar.
 
 <p>
-<h3>Object Set</h3>
+<h3>Object set</h3>
 
 The classes "clock" and "at" of the ISPW packages where removed. 
-It is no more possible to give a clock as first argument of some of the timing objects 
-such as metro or delay.
+It is no more possible to give a clock as first argument of the timing objects 
+such as metro or delay as it was before.
 
 The object "at dsp_msec 0", or "at dsp_tick 0", which is used in some patches in order 
 to obtain a trigger at the instant of the DSP calculation being switched on must be 
-replaced by an object "dsp" connected to an object "select 1".
+replaced by an object "dsp" connected to an object "select 1" or "sel 1".
 
-In the signal package the classes play~ and rec~ where introduced (see the help patches).
+In the signal package the classes play~ and rec~ where add (see the help patches).
 
-The toolbar has 
+Two new objects have been introduced to the toolbar: 
+an oscilloscope and an object to display numerical values or vectors of values in a scrolling display.
+
+<p>
+<h3>API</h3>
+The API for FTS clocks 
+
+
+<p>
+<h3>Scheduling</h3>
+The scheduling 
+
 
 <p>
 <!------------------------------------------------------------------------------->

@@ -1368,10 +1368,13 @@ public class FtsServer implements Runnable
 	    ftsQuitted();
 	    running = false;
 	  }
+	catch (java.net.SocketException e)
+	  {
+	    /* coucou! */
+	  }
 	catch (java.lang.Exception e)
 	  {
 	    //Try to survive an exception
-	    
 	    System.err.println("System exception " + e);
 	    e.printStackTrace();
 	  }
