@@ -582,6 +582,29 @@ public class FtsServer
       }
   }
 
+  /** Send an "set_atom_list" messages to the system inletof an FTS object with as arguments elements
+    from a Vector; the vector should only contains String, Floats and Integers, of course.
+    */
+
+  final void sendSetAtomListMessage(FtsObject dst, Vector values)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(dst);
+	port.sendInt(-1);
+	port.sendString("set_atom_list");
+
+	if (values != null)
+	  port.sendVector(values);
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
   /** Send a "named object message" messages to FTS.
     @deprecated
    */

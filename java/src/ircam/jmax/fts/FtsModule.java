@@ -24,6 +24,7 @@ public class FtsModule
 
     MaxDataType.installDataType(new FtsPatchDataType());
     MaxDataType.installDataType(new FtsIntegerVectorDataType());
+    MaxDataType.installDataType(new FtsAtomListDataType());
 
     // Install the FTS tcl commands
 

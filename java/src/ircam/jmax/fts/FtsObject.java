@@ -103,6 +103,8 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     if (className.equals("table"))
       return new FtsTableObject(parent, className, description);
+    if (className.equals("qlist"))
+      return new FtsQlistObject(parent, className, description);
     else if (className.equals("patcher"))
       throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "patcher"));
     else if (className.equals("inlet"))
@@ -179,6 +181,8 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     if (className.equals("table"))
       return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
+    if (className.equals("qlist"))
+      return new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("patcher"))
       return new FtsPatcherObject(parent, (String) msg.getArgument(3),
 				  ((Integer) msg.getArgument(4)).intValue(),
@@ -415,8 +419,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void put(String name, Object value)
   {
-    if (! FtsPropertyDescriptor.isClientOnly(name))
-	FtsServer.getServer().putObjectProperty(this, name, value);
+    FtsServer.getServer().putObjectProperty(this, name, value);
 
     localPut(name, value);
   }

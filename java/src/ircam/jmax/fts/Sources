@@ -43,13 +43,17 @@ SOURCES = \
 	  FtsDotPatRemoteDataHandler.java  \
 	  FtsPatchData.java  \
 	  FtsIntegerVectorData.java  \
+	  FtsAtomListData.java  \
 	  FtsPatchDataType.java \
 	  FtsIntegerVectorDataType.java \
+	  FtsAtomListDataType.java \
           FtsUpdateGroupListener.java \
 	  FtsIntegerVectorData.java \
-	  FtsIntegerVectorObject.java
-
-
+	  FtsAtomListData.java \
+	  FtsAtomListObject.java \
+	  FtsTableObject.java      \
+	  FtsQlistObject.java 
+	
 
 
 

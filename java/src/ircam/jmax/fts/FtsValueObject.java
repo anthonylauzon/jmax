@@ -22,7 +22,6 @@ public class FtsValueObject extends FtsStandardObject
 
   static
   {
-    FtsPropertyDescriptor.setClientOnly("value", false);
     FtsPropertyDescriptor.setPersistent("initValue", true);
   }
 

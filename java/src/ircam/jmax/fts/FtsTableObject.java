@@ -117,8 +117,9 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
   public void unbindVector(FtsIntegerVector vector)
   {
     // We may have a pending save/update
-    vector.setObject(null);
     FtsServer.getServer().syncToFts();
+
+    vector.setObject(null);
   }
 
   /** Tell MDA that this FTS object support a integerVector data object */

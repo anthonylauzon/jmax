@@ -6,24 +6,24 @@ import ircam.jmax.mda.*;
 /** Class defining the fts patch type (named patch);
  */
 
-public class FtsIntegerVectorDataType extends MaxDataType
+public class FtsAtomListDataType extends MaxDataType
 {
-  public FtsIntegerVectorDataType()
+  public FtsAtomListDataType()
   {
-    super("integerVector");
+    super("atomList");
 
-    setPrettyName("Table");
+    setPrettyName("Qlist");
   }
 
   /** Build an empty instance of FtsPatchData, i.e. an instance
-   * corresponding to an empty, new, patcher
+   * corresponding to an empty, new, patcher; should we be able to do so ??
    */
 
   public MaxData newInstance()
   {
     MaxData data;
 
-    return new FtsIntegerVectorData();
+    return new FtsAtomListData();
   }
 
   public boolean canMakeNewInstance()

@@ -6,10 +6,10 @@ package ircam.jmax.fts;
  * hierarchy, and not only "table"
  */
 
-interface FtsIntegerVectorObject
+interface FtsAtomListObject
 {
-  abstract public void saveVectorToFts();
-  abstract public void loadVectorFromFts();
-  abstract public void bindVector(FtsIntegerVector vector);
-  abstract public void unbindVector(FtsIntegerVector vector);
+  abstract public void saveAtomListToFts();
+  abstract public void loadAtomListFromFts();
+  abstract public void bindList(FtsAtomList vector);
+  abstract public void unbindList(FtsAtomList vector);
 }

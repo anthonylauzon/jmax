@@ -9,24 +9,26 @@ import ircam.jmax.mda.*;
 
 /**
  * This class implement the MaxData for an integer vector;
+ * NOTE: since most of the code here is in common with IntegerVector,
+ * Why we don't do a common API and enough superclasses ?
  * it can be loaded/saved from FTS, from a .tpa file (embedded in the
  * patch), or in a standalone tcl file.
  */
 
-public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsData
+public class FtsAtomListData extends MaxData implements MaxTclData, MaxFtsData
 {
-  FtsIntegerVector vector = new FtsIntegerVector();
+  FtsAtomList list = new FtsAtomList();
 
-  public FtsIntegerVectorData()
+  public FtsAtomListData()
   {
-    super(MaxDataType.getTypeByName("integerVector"));
+    super(MaxDataType.getTypeByName("atomList"));
   }
 
   /** Get the content (a patcher) as TCL code */
 
   public Object getContent()
   {
-    return vector;
+    return list;
   }
   
   /** One shot save function */
@@ -37,17 +39,17 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
       {
 	FtsObject object = ((MaxFtsDataSource) source).getFtsLocation().getObject();
 
-	if (object instanceof FtsIntegerVectorObject)
+	if (object instanceof FtsAtomListObject)
 	  {
-	    FtsIntegerVectorObject v = (FtsIntegerVectorObject) object;
+	    FtsAtomListObject v = (FtsAtomListObject) object;
 
-	    v.saveVectorToFts();	
+	    v.saveAtomListToFts();	
 
 	    return;
 	  }
       }
 
-    throw new MaxDataException("Cannot save vector to " + source);
+    throw new MaxDataException("Cannot save list to " + source);
   }
 
   /** One shot load function */
@@ -58,17 +60,17 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
       {
 	FtsObject object = ((MaxFtsDataSource) source).getFtsLocation().getObject();
 
-	if (object instanceof FtsIntegerVectorObject)
+	if (object instanceof FtsAtomListObject)
 	  {
-	    FtsIntegerVectorObject v = (FtsIntegerVectorObject) object;
+	    FtsAtomListObject v = (FtsAtomListObject) object;
 	
-	    v.loadVectorFromFts();
+	    v.loadAtomListFromFts();
 
 	    return;
 	  }
       }
 
-    throw new MaxDataException("Cannot save vector to " + source);
+    throw new MaxDataException("Cannot save list to " + source);
   } 
 
   /** We overwrite the setDataSource method locally to handle the
@@ -77,15 +79,15 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
 
   public void setDataSource(MaxDataSource newSource)
   {
-    FtsIntegerVectorObject oldObject = null;
-    FtsIntegerVectorObject newObject = null;
+    FtsAtomListObject oldObject = null;
+    FtsAtomListObject newObject = null;
 
     if (source instanceof MaxFtsDataSource)
       {
 	FtsObject object = ((MaxFtsDataSource) source).getFtsLocation().getObject();
 
-	if (object instanceof FtsIntegerVectorObject)
-	  oldObject = (FtsIntegerVectorObject) object;
+	if (object instanceof FtsAtomListObject)
+	  oldObject = (FtsAtomListObject) object;
       }
 
     super.setDataSource(newSource);
@@ -94,8 +96,8 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
       {
 	FtsObject object = ((MaxFtsDataSource) newSource).getFtsLocation().getObject();
 
-	if (object instanceof FtsIntegerVectorObject)
-	  oldObject = (FtsIntegerVectorObject) object;
+	if (object instanceof FtsAtomListObject)
+	  oldObject = (FtsAtomListObject) object;
       }
 
     /** If the new Object is the same good old one, nothing to do */
@@ -107,13 +109,13 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
     
     if (oldObject != null)
       {
-	oldObject.unbindVector(vector);
+	oldObject.unbindList(list);
 	((FtsDataObject) oldObject).setData(null);
       }
 
-    /** And, if we have a new one, bind it to the vector */
+    /** And, if we have a new one, bind it to the list */
 
-    newObject.bindVector(vector);
+    newObject.bindList(list);
     ((FtsDataObject) newObject).setData(this);
   }
 
@@ -128,11 +130,11 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
 
     FtsServer.getServer().syncToFts();
 
-    vector.saveAsTcl(pw);
+    list.saveAsTcl(pw);
   }
 
   /**
-   * Eval function, to built the vector Data from a Tcl file.
+   * Eval function, to built the list Data from a Tcl file.
    * Eval a given script inside this documeynt
    */
 
@@ -149,20 +151,20 @@ public class FtsIntegerVectorData extends MaxData implements MaxTclData, MaxFtsD
   public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
   {
     Object object;
-    TclObject list = TclList.newInstance();
+    TclObject tclList = TclList.newInstance();
 
-    TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
-    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
-    TclList.append(interp, list, script);
+    TclList.append(interp, tclList, TclString.newInstance("_BasicThisWrapper"));
+    TclList.append(interp, tclList, ReflectObject.newInstance(interp, this));
+    TclList.append(interp, tclList, script);
 
-    interp.eval(list, 0);
+    interp.eval(tclList, 0);
 
     object = ReflectObject.get(interp, interp.getResult());
 
-    if (object instanceof FtsIntegerVector)
-      vector = (FtsIntegerVector) ReflectObject.get(interp, interp.getResult());
+    if (object instanceof FtsAtomList)
+      list = (FtsAtomList) ReflectObject.get(interp, interp.getResult());
     else
-      throw new TclException(interp, "Syntax error in integerVector data");
+      throw new TclException(interp, "Syntax error in AtomList data");
   }
 }
 

@@ -22,7 +22,6 @@ import tcl.lang.*;
 public class FtsPropertyDescriptor
 {
   boolean persistent = false;
-  boolean clientOnly = true;
   FtsTclPropertyParser parser = null;
   Object defaultValue = null;
 
@@ -48,28 +47,6 @@ public class FtsPropertyDescriptor
 	propertyDescriptors.put(property, p);
       }
   }
-
-  static boolean isClientOnly(String property)
-  {
-    if (propertyDescriptors.containsKey(property))
-      return ((FtsPropertyDescriptor) propertyDescriptors.get(property)).clientOnly;
-    else
-      return true;
-  }
-
-  static void setClientOnly(String property, boolean v)
-  {
-    if (propertyDescriptors.containsKey(property))
-      ((FtsPropertyDescriptor) propertyDescriptors.get(property)).clientOnly = v;
-    else
-      {
-	FtsPropertyDescriptor p = new FtsPropertyDescriptor();
-
-	p.clientOnly = v;
-	propertyDescriptors.put(property, p);
-      }
-  }
-
 
   static void setTclParser(String property, FtsTclPropertyParser parser)
   {
