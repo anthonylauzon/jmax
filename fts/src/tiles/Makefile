@@ -29,7 +29,7 @@ ROOTDIR = ../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-DATE:= $(shell date)
+DATE:= $(shell date | sed 's/\"//'g)
 HOST:= $(shell hostname)
 MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"(compiled by $(USER) for $(ARCH) on $(DATE) on host $(HOST))"'
 
