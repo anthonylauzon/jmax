@@ -199,10 +199,10 @@ create_tuple(int ac, const fts_atom_t *at, fts_atom_t *atup)
 *  unfold method args
 *
 */
-static int unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t* atup, const fts_atom_t *rat);
+static int unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t* atup, const fts_atom_t** rat);
 
 static int
-unfold_atom(const fts_atom_t *at, const fts_atom_t *rat)
+unfold_atom(const fts_atom_t *at, const fts_atom_t** rat)
 {
   if(fts_is_tuple(at))
   {
@@ -214,18 +214,18 @@ unfold_atom(const fts_atom_t *at, const fts_atom_t *rat)
   }
   else if(fts_is_void(at))
   {
-    rat = NULL;
+    *rat = NULL;
     return 0;
   }
   else
   {
-    rat = at;
+    *rat = at;
     return 1;
   }
 }
 
 static int
-unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t *rat)
+unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t** rat)
 {
   switch(ac)
   {
@@ -235,7 +235,7 @@ unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t 
     case 1:
       return unfold_atom(at, rat);
     default:
-      rat = at;
+      *rat = at;
       return ac;
   }
 }
@@ -253,7 +253,7 @@ fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_
   const fts_atom_t *meth_at;
   fts_atom_t atup;
 
-  meth_ac = unfold_varargs(ac, at, &atup, meth_at);
+  meth_ac = unfold_varargs(ac, at, &atup, &meth_at);
   (*method)(o, 0, NULL, meth_ac, meth_at);
 }
 
@@ -266,7 +266,7 @@ fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *
 
   fts_set_void(&atup);
 
-  meth_ac = unfold_varargs(ac, at, &atup, meth_at);
+  meth_ac = unfold_varargs(ac, at, &atup, &meth_at);
 
   if(meth_ac > 0)
   {
