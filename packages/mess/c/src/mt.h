@@ -44,9 +44,11 @@ typedef struct
   message_t *mess;
   int size;
   int alloc;
+  int refcnt;
 } message_table_t;
 
 #define message_table_get_element(mt, i) ((mt)->mess[i])
+#define message_table_get_size(mt) ((mt)->size)
 
 extern fts_type_t message_table_type;
 
@@ -54,6 +56,10 @@ extern message_table_t *message_table_new(int size);
 extern void message_table_clear(message_table_t *mt);
 extern void message_table_delete(message_table_t *mt);
 extern void message_table_set_size(message_table_t *mt, int size);
+
+extern void message_table_refer(message_table_t *mt);
+extern void message_table_release(message_table_t *mt);
+
 extern int message_table_file_import_ascii(message_table_t *mt, fts_symbol_t file_name);
 extern int message_table_file_export_ascii(message_table_t *mt, fts_symbol_t file_name);
 

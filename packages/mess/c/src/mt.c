@@ -126,6 +126,8 @@ message_table_init(message_table_t *mt, int size)
       mt->size = 0;
       mt->alloc = 0;
     }
+
+  mt->refcnt = 0;
 }
 
 message_table_t *
@@ -186,6 +188,21 @@ message_table_set_size(message_table_t *mt, int size)
 	  
       mt->size = size;
     }
+}
+
+void
+message_table_refer(message_table_t *mt)
+{
+  mt->refcnt++;  
+}
+
+void
+message_table_release(message_table_t *mt)
+{
+  mt->refcnt--;
+
+  if(mt->refcnt == 0)
+    message_table_delete(mt);
 }
 
 /**********************************************************
