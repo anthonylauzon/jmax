@@ -650,7 +650,7 @@ static void FUN_NAME( fts_word_t *argv)					\
 									\
   port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);		\
   n = fts_word_get_int(argv + 1);					\
-  channels = fts_audioport_get_input_channels( port);			\
+/*   channels = fts_audioport_get_input_channels( port); */			\
   buffer = (TYPE *)port->input_buffer;					\
 									\
   data = (u_char *)buffer;						\
@@ -699,7 +699,7 @@ static void FUN_NAME( fts_word_t *argv)					\
 									\
   port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);		\
   n = fts_word_get_int(argv + 1);					\
-  channels = fts_audioport_get_output_channels( port);			\
+  /* WARNING channels = fts_audioport_get_output_channels( port); */			\
   buffer = (TYPE *)port->output_buffer;					\
 									\
   for ( ch = 0; ch < channels; ch++)					\
@@ -747,7 +747,7 @@ static void FUN_NAME( fts_word_t *argv)									\
 													\
   port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);						\
   n = fts_word_get_int(argv + 1);									\
-  channels = fts_audioport_get_input_channels( port);							\
+/* WARNING  channels = fts_audioport_get_input_channels( port); */							\
 													\
   buffers = (u_char **)alloca( channels * sizeof( u_char *));						\
   count = n;												\
@@ -794,7 +794,7 @@ static void FUN_NAME( fts_word_t *argv)									\
 													\
   port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);						\
   n = fts_word_get_int(argv + 1);									\
-  channels = fts_audioport_get_output_channels( port);							\
+/*  WARNING channels = fts_audioport_get_output_channels( port); */							\
 													\
   for ( ch = 0; ch < channels; ch++)									\
     {													\
@@ -904,9 +904,11 @@ alsaaudioport_update_audioport_input_function(alsaaudioport_t* self, alsastream_
       return;
     }
     format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
-  
-    fts_audioport_set_input_channels( (fts_audioport_t *)self, stream->channels);
-    fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]);
+
+#warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_channels (OLD API)  
+/*     fts_audioport_set_input_channels( (fts_audioport_t *)self, stream->channels); */
+#warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_function (OLD API)  
+/*     fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]); */
     if (self->input_buffer)
     {
       fts_free(self->input_buffer);
@@ -928,9 +930,10 @@ alsaaudioport_update_audioport_output_function(alsaaudioport_t* self, alsastream
       return;
     }
     format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
-  
-    fts_audioport_set_output_channels( (fts_audioport_t *)self, stream->channels);
-    fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]);
+#warning (OLD API) alsaaudioport_update_audioport_output_function use   fts_audioport_set_output_channels (OLD API)
+/*     fts_audioport_set_output_channels( (fts_audioport_t *)self, stream->channels); */
+#warning (OLD API) alsaaudioport_update_audioport_output_function use   fts_audioport_set_output_function (OLD API)
+/*     fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]); */
     if (self->input_buffer)
     {
       fts_free(self->input_buffer);
@@ -1057,13 +1060,16 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
     format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 
-    fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels);
-    fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][1]);
+#warning (OLD API) alsaaudioport_init use fts_audioport_set_output_channels (OLD API)
+/*     fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels); */
+#warning (OLD API) alsaaudioport_init use fts_audioport_set_output_function (OLD API)
+/*     fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][1]); */
 
     this->output_buffer = alsaaudioport_allocate_buffer( access, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
   }
 
-  fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function);
+#warning (OLD API) alsaaudioport_init use fts_audioport_set_xrun_function (OLD API)
+/*   fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function); */
 
 #ifdef DEBUG
   if (this->capture.handle)
@@ -1204,7 +1210,6 @@ void alsaaudioport_config( void)
   s_rw_interleaved = fts_new_symbol( "rw_interleaved");
 
   fts_class_install( s, alsaaudioport_instantiate);
-  fts_audioport_set_default_class( s);
 }
 
 
