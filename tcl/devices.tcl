@@ -84,9 +84,9 @@ proc openDefaultAudioOut { device {args ""} } {
     global jmaxDeviceTable
     global jmaxDeviceDoc
 
-    puts $args
+#    puts $args
     puts "Opening default audio out: $jmaxDeviceDoc($device)"
-    puts [concat " ucs open device out~ __defaultAudioOut as " $jmaxDeviceTable($device) $args]
+#    puts [concat " ucs open device out~ __defaultAudioOut as " $jmaxDeviceTable($device) $args]
     eval [concat " ucs open device out~ __defaultAudioOut as " $jmaxDeviceTable($device) $args]
     ucs default out~ __defaultAudioOut
 }
