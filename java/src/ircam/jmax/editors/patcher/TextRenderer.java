@@ -149,12 +149,17 @@ public class TextRenderer implements ObjectRenderer
   }
 
   boolean isTextLonger(){
-    return (SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs()) > 
+    return (SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs()) >= 
 	     owner.getWidth() - owner.getTextWidthOffset());
+  }
+
+  public int getRHeight(){
+    return area.getRHeight();
   }
 
   public int getHeight()
   {
+    //return area.getPreferredSize().height;
     if(isTextLonger()||isMultiLine())
       return area.getPreferredSize().height;
     else
