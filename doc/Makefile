@@ -27,11 +27,11 @@ JMAXDISTDIR=..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
-	(cd api ; $(MAKE) $@)
+#	(cd api ; $(MAKE) $@)
 
 install:
 	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir) ; done
-	(cd api ; $(MAKE) $@)
+#	(cd api ; $(MAKE) $@)
 	(cd images ; $(MAKE) $@)
 .PHONY: install
 
@@ -51,10 +51,10 @@ webdoc:
 		cd ../packages/guiobj/images/ ; \
 		for f in *.gif ; do $(INSTALL_DATA) $$f $(webdoc_dir)/images/$$f ; done \
 	)
-	( \
-		cd api/html ; \
-		$(INSTALL_DATA) doxygen.css $(webdoc_dir)/api/html/doxygen.css ; \
-		$(INSTALL_DATA) doxygen.gif $(webdoc_dir)/api/html/doxygen.gif ; \
-		for f in *.html ; do $(INSTALL_DATA) $$f $(webdoc_dir)/api/html/$$f ; done ; \
-	)
+#	( \
+#		cd api/html ; \
+#		$(INSTALL_DATA) doxygen.css $(webdoc_dir)/api/html/doxygen.css ; \
+#		$(INSTALL_DATA) doxygen.gif $(webdoc_dir)/api/html/doxygen.gif ; \
+#		for f in *.html ; do $(INSTALL_DATA) $$f $(webdoc_dir)/api/html/$$f ; done ; \
+#	)
 .PHONY: webdoc
