@@ -44,7 +44,7 @@ udpsend_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
   udpsend_t* self = (udpsend_t*)o;
   fts_binary_protocol_t* binary_protocol = self->binary_protocol;
 
-  fts_binary_protocol_start_message(binary_protocol, o, s);
+/*   fts_binary_protocol_start_message(binary_protocol, o, s); */
   fts_binary_protocol_add_atoms(binary_protocol, ac, at);
   fts_binary_protocol_end_message(binary_protocol);
 
@@ -97,7 +97,7 @@ udpsend_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( udpsend_t), udpsend_init, udpsend_delete);
 
-  fts_class_inlet_varargs(cl, 0, udpsend_input);
+  fts_class_input_handler(cl, udpsend_input);
 }
 
 void udpsend_config( void)
