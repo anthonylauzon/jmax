@@ -24,8 +24,8 @@
 #
 
 JMAXDISTDIR=..
-include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 include $(JMAXDISTDIR)/VERSION
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/images
