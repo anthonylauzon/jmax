@@ -674,27 +674,31 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(ac == 1 && fts_is_symbol(at))
     {
       fts_symbol_t file_name = fts_get_symbol(at);
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
       int size = 0;
       
-      if(sf) /* soundfile successfully opened */
+      if (fts_file_is_text( file_name))
 	{
-	  float *ptr;
-	  
-	  size = fts_soundfile_get_size(sf);
-	  
-	  fvec_set_size(this, size);
-	  ptr = fvec_get_ptr(this);
-	  
-	  size = fts_soundfile_read_float(sf, ptr, size);
-	  fvec_set_size(this, size);
-
-	  fts_soundfile_close(sf);
-	  
-	  return;
+	  size = fvec_read_atom_file(this, file_name);
 	}
       else
-	size = fvec_read_atom_file(this, file_name);
+	{
+	  fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
+
+	  if(sf) /* soundfile successfully opened */
+	    {
+	      float *ptr;
+	  
+	      size = fts_soundfile_get_size(sf);
+	  
+	      fvec_set_size(this, size);
+	      ptr = fvec_get_ptr(this);
+	  
+	      size = fts_soundfile_read_float(sf, ptr, size);
+	      fvec_set_size(this, size);
+
+	      fts_soundfile_close(sf);
+	    }
+	}
 
       if(size == 0)
 	fts_object_set_error(o, "can't load from file \"%s\"", fts_symbol_name(file_name));
