@@ -1,15 +1,11 @@
 ## package declaration
-
 package provide qlist
 
-## Load the qlist class
-## The qlist extension will install
-## the data type and handler
-##
+# load server module
+global jmaxArch jmaxMode
+ucs load module qlist $dir/c/lib/$jmaxArch/$jmaxMode/libqlist.so
 
+# load client java class
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtension
 
-puts "qlist editor loaded"
-
-
-
+puts "package: qlist (ISPW queue file class with editor)"

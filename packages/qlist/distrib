@@ -1,2 +1,3 @@
 all	all     qlist.jpk
-all	all     java
+all	all     java/classes/qlist.jar
+all	all	c/lib/ARCH/opt/libqlist.so
