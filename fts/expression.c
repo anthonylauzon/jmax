@@ -243,11 +243,21 @@ static void expression_stack_push_frame( fts_expression_t *exp)
 
 static void expression_stack_pop_frame( fts_expression_t *exp)
 {
-  int old_fp;
+  int old_fp, ac, i;
+  fts_atom_t *at;
 
 #ifdef STACK_DEBUG
   expression_stack_print( exp, "Stack before poping frame");
 #endif
+
+  /* Release all the objects that are in the frame */
+  ac = expression_stack_frame_count( exp);
+  at = expression_stack_frame( exp);
+  for ( i = 0; i < ac; i++, at++)
+    {
+      if (fts_is_object( at))
+	fts_object_release( fts_get_object( at));
+    }
 
   old_fp = exp->fp;
   exp->fp = fts_get_int( (fts_atom_t *)fts_stack_base(&exp->stack) + exp->fp - FRAME_OFFSET);
@@ -387,7 +397,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     if (ac > 1 || toplevel)
       {
 	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
-	/*fts_object_refer( obj);*/
+	fts_object_refer( obj);
 	fts_set_object( ret, obj);
       }
     else
@@ -465,7 +475,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     obj = fts_object_create( cl, scope, ac, at);
     if (obj)
       {
-	/*fts_object_refer( obj);*/
+	fts_object_refer( obj);
 	fts_set_object( ret, obj);
       }
     else

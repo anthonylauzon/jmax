@@ -184,8 +184,9 @@ class_name: TK_SYMBOL
 		{ fts_set_symbol( &($$), fts_s_logical_and); }
 ;
 
-tuple: term term_list  /*---*/ %prec TK_SPACE
-		{ $$ = fts_parsetree_new( TK_SPACE, 0, $2, $1); }
+tuple: tuple term /*---*/ %prec TK_SPACE
+		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
+	| term
 ;
 
 invocation: reference TK_DOT TK_SYMBOL term_list
