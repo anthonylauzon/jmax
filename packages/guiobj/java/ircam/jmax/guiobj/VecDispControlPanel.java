@@ -133,6 +133,11 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
     maxValueField.setText(""+max);    
   }
 
+  public void done()
+  {
+    setRange();
+  }
+
   public void setRange()
   {
     try

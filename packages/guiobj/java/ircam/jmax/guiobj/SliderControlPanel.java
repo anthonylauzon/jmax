@@ -207,6 +207,11 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
       }
   }
 
+  public void done()
+  {
+    setRange();
+  }
+
   public void setRange()
   {
     try

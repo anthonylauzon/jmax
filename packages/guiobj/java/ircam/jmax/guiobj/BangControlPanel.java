@@ -93,6 +93,7 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
     durationSlider.setValue(duration);
     durationLabel.setText(""+duration);    
   }
+  public void done(){}
 }
 
 

@@ -212,6 +212,8 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 	}
     revalidate();
   }
+
+  public void done(){}
 }
 
 

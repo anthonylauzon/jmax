@@ -34,4 +34,5 @@ import ircam.jmax.editors.patcher.objects.*;
 public interface ObjectControlPanel
 {
   public void update(GraphicObject obj);
+  public void done();
 }

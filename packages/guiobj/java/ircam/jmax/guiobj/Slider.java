@@ -318,7 +318,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   public void popUpReset()
   {
     super.popUpReset();
-    controlPanel.setRange();
+    getControlPanel().done();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     ObjectPopUp.removeSeparation();
   }
