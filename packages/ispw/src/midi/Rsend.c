@@ -20,12 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Zack Settel.
  *
  */
-
-/* Rsend - remote send/receive ---   zack settel 11/93  */
-/* note: this is an experimental object and may change  */
 
 #include <math.h>
 #include <stdio.h>		/* for sprintf */

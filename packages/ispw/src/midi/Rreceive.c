@@ -20,20 +20,12 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette, Zack Settel.
  *
  */
-
-/* Rreceive - remote send/receive ---   zack settel 11/93 */
-/* note: this is an experimental object and may change  */
-/* bug in Rreceive_int() fixed 7/93 - typedmess now correctly setup */
-
 #include <math.h>
-
 #include "fts.h"
 #include "Rsend.h"
-
-
 
 typedef struct 
 {

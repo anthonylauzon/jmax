@@ -149,10 +149,10 @@ ftab_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       switch(n)
 	{
 	case 0:
-	  fts_object_blip(o, "<number>: index to recall/store value from/to table");
+	  fts_object_blip(o, "<int>: index to recall/store value from/to table");
 	  break;
 	case 1:
-	  fts_object_blip(o, "<number>: set value to be stored");
+	  fts_object_blip(o, "<float>: set value to be stored");
 	}
     }
   else if (cmd == fts_s_outlet)
@@ -165,7 +165,7 @@ ftab_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  fts_object_blip(o, "<int>: recalled value", n);
 	  break;
 	case 1:
-	  fts_object_blip(o, "<int>: # of values read from file (= current table size)");
+	  fts_object_blip(o, "<int>: # of values read from file");
 	}
     }
 }

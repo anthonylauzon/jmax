@@ -20,13 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Zack Settel.
  *
  */
-
-/******************** sigabs ***********************/
-/* generates a the absolute value of a signal */ 
-/* ported to the new FTS by MDC from the original Zack Settel code */
 
 #include "fts.h"
 

@@ -20,13 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Zack Settel.
  *
  */
-
-/* pbank - zack settel 1994  */
-/* Heavily modified (50% reimplemented) and ported to the new FTS by MDC */
-/* ... ein bisschen Senf dazu von Nos */
 
 #include "fts.h"
 
@@ -47,8 +43,8 @@ typedef struct
   fts_atom_t **matrix; /* matrix  pointer */
   fts_atom_t *buffer; /* one row of buffer */
   int set; /* flag 1, if buffer set and not yet stored to matrix */
-  int n_rows; /* memory dimension */
-  int n_cols; /* memory dimension */
+  int m; /* memory dimension */
+  int n; /* memory dimension */
   int refcount; /* number of objects pointing to "matrix" */
 } pbank_data_t;
 
@@ -67,13 +63,14 @@ typedef struct
 
 /* read and write pbank files */
 
-static int pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
+static int 
+pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_file_t *f;
   int ret;
   fts_atom_t a, *av;
   char c;
-  int i_col, i_row;
+  int j, i;
 
   f = fts_atom_file_open(fts_symbol_name(file_name), "r");
 
@@ -95,49 +92,46 @@ static int pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
 
   /* skip the column, row and comma in the file (we rebuild the matrix size
      from the data itself, and we trust the method) */
-
   fts_atom_file_read(f, &a, &c);
   fts_atom_file_read(f, &a, &c);
   fts_atom_file_read(f, &a, &c);
 
   /* note: the above line is intentionally repeated three times */
+  i = 0;
+  j = 0;
 
-  i_row = 0;
-  i_col = 0;
+  av = data->matrix[i];
 
-  av = data->matrix[i_row];
-
-  while (fts_atom_file_read(f, &a, &c))
+  while(fts_atom_file_read(f, &a, &c))
     {
       if (fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(",")))
 	{
-	  i_row++;
-	  i_col = 0;
+	  i++;
+	  j = 0;
 
 	  /* in case of row overflow, break and skip the other data */
-
-	  if (i_row >= data->n_rows)
+	  if (i >= data->m)
 	    break;
 
-	  av = data->matrix[i_row];
+	  av = data->matrix[i];
 	}
-      else if (i_col < data->n_cols)
+      else if (j < data->n)
 	{
-	  av[i_col] = a;
-	  i_col++;
+	  av[j] = a;
+	  j++;
 	}
     }
 
   fts_atom_file_close(f);
-  return i_row;
+  return i;
 }
 
-static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
+static int 
+pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *ap;
   fts_atom_file_t *f;
   int i, j;
-
 
   f = fts_atom_file_open(fts_symbol_name(file_name), "w");
   if(!f)
@@ -146,25 +140,25 @@ static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
       return(0);
     }
 
-  /* first, write the header: a line with "pbank <n_rows> <n_cols>" where n_rows and n_cols are ints */
+  /* first, write the header: a line with "pbank <m> <n>" where m and n are ints */
   fts_set_symbol(&a, fts_new_symbol("pbank"));
   fts_atom_file_write(f, &a, ' ');
 
-  fts_set_int(&a, data->n_cols);
+  fts_set_int(&a, data->n);
   fts_atom_file_write(f, &a, ' ');
 
-  fts_set_int(&a, data->n_rows);
+  fts_set_int(&a, data->m);
   fts_atom_file_write(f, &a, ' ');
 
   fts_set_symbol(&a, fts_new_symbol(","));
   fts_atom_file_write(f, &a, '\n');
 
   /* write the content of the matrix */
-  for(i=0; i<data->n_rows; i++)     
+  for(i=0; i<data->m; i++)     
     {
       ap = data->matrix[i];
 
-      for (j=0; j<data->n_cols; j++, ap++)	
+      for (j=0; j<data->n; j++, ap++)	
 	fts_atom_file_write(f, ap, ' ');
 
       fts_set_symbol(&a, fts_new_symbol(","));
@@ -177,7 +171,8 @@ static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
   return(1);
 }
 
-static int pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
+static int 
+pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *ap;
   fts_atom_file_t *f;
@@ -191,11 +186,11 @@ static int pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
     }
 
   /* write the content of the matrix */
-  for(i=0; i<data->n_rows; i++)     
+  for(i=0; i<data->m; i++)     
     {
       ap = data->matrix[i];
 
-      for(j=0; j<data->n_cols; j++, ap++)	
+      for(j=0; j<data->n; j++, ap++)	
 	fts_atom_file_write(f, ap, ' ');
 
       fts_set_symbol(&a, fts_new_symbol(""));
@@ -210,24 +205,24 @@ static int pbank_export_file_ascii(pbank_data_t *data, fts_symbol_t file_name)
 /* allocate/free pbank data */
 
 static pbank_data_t *
-pbank_data_get(fts_symbol_t name, int n_cols, int n_rows)
+pbank_data_get(fts_symbol_t name, int n, int m)
 {
   fts_atom_t atom;
 
-  if(n_cols < 1)
-    n_cols = DEFAULT_N_COLS;
+  if(n < 1)
+    n = DEFAULT_N_COLS;
 
-  if(n_rows < 1)
-    n_rows = DEFAULT_N_ROWS;
+  if(m < 1)
+    m = DEFAULT_N_ROWS;
 
   if (name && fts_hash_table_lookup(&pbank_data_table, name, &atom))
     {
       /* data found by name , check its dimension and reference it */
       pbank_data_t *data = (pbank_data_t *) fts_get_ptr(&atom);
 
-      if(data->n_cols != n_cols || data->n_rows != n_rows)
+      if(data->n != n || data->m != m)
 	{
-	  post("pbank: %s %d %d: dimensions don't match\n", fts_symbol_name(name), data->n_cols, data->n_rows);
+	  post("pbank: %s %d %d: dimensions don't match\n", fts_symbol_name(name), data->n, data->m);
 	  return 0;
 	}
       else
@@ -245,29 +240,29 @@ pbank_data_get(fts_symbol_t name, int n_cols, int n_rows)
 
       data = (pbank_data_t *) fts_malloc(sizeof(pbank_data_t));
       data->refcount = 1;
-      data->n_cols = n_cols;
-      data->n_rows = n_rows;
+      data->m = m;
+      data->n = n;
 
       /* allocate the matrix */
-      data->matrix = (fts_atom_t **) fts_malloc(sizeof(fts_atom_t *) * n_rows);
-      for(i=0; i<n_rows; i++) 
-	data->matrix[i] = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n_cols);
+      data->matrix = (fts_atom_t **) fts_malloc(sizeof(fts_atom_t *) * m);
+      for(i=0; i<m; i++) 
+	data->matrix[i] = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n);
 
       /* zero matrix */
-      for(i=0; i<n_rows; i++)	
+      for(i=0; i<m; i++)	
 	{
 	  fts_atom_t *row;
 
 	  row = data->matrix[i];
-	  for(j=0; j<n_cols; j++)
+	  for(j=0; j<n; j++)
 	    fts_set_int(row + j, 0);
 	}
 
       /* allocate preset buffer */
-      data->buffer = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n_cols);
+      data->buffer = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * n);
 
       /* zero buffer */
-      for (j=0; j<n_cols; j++)
+      for (j=0; j<n; j++)
 	fts_set_int(data->buffer + j, 0);
 
        if(name)
@@ -302,7 +297,7 @@ pbank_data_release(pbank_data_t *data)
       if(data->name)
 	fts_hash_table_remove(&pbank_data_table, data->name);
 
-      for (i=0; i<data->n_rows; i++) 
+      for(i=0; i<data->m; i++) 
 	fts_free((void *)data->matrix[i]);
 
       fts_free((void *)data->buffer);
@@ -329,22 +324,21 @@ static void
 pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int n_cols = fts_get_int_arg(ac, at, 1, 0);
-  int n_rows = fts_get_int_arg(ac, at, 2, 0);
+  int n = fts_get_int_arg(ac, at, 1, 0);
+  int m = fts_get_int_arg(ac, at, 2, 0);
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 3, 0);
   fts_symbol_t receive = fts_get_symbol_arg(ac, at, 4, 0);
-  int i;
   
-  if (n_cols <= 0)
+  if (n <= 0)
     {
-      n_cols = DEFAULT_N_COLS;
-      post("pbank: n_cols argument out of range, setting to %d\n", n_cols);
+      n = DEFAULT_N_COLS;
+      post("pbank: n_cols argument out of range, setting to %d\n", n);
     }
        
-  if (n_rows <= 0)
+  if (m <= 0)
     {
-      n_rows = DEFAULT_N_ROWS;
-      post("pbank: n_rows argument out of range, setting to %d\n",n_rows);
+      m = DEFAULT_N_ROWS;
+      post("pbank: m argument out of range, setting to %d\n",m);
     }
 
   /* name skip arg is "" */
@@ -353,23 +347,26 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	
   if(receive)	
     {
+      int j;
+
       /* create array of receive names */
-      this->receives = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t ) * n_cols);
-    
-      for(i=0; i<n_cols; i++) 
+      this->receives = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t ) * n);
+
+      /* compose receive names for */
+      for(j=0; j<n; j++) 
 	{
 	  char buf[256];
 
-	  sprintf(buf, "%d-%s", i, fts_symbol_name(receive));
-	  this->receives[i] = fts_new_symbol_copy(buf);
+	  sprintf(buf, "%d-%s", j, fts_symbol_name(receive));
+	  this->receives[j] = fts_new_symbol_copy(buf);
 	}
     }
 
   /* tempory buffer for list output */
-  this->out_list = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * n_cols);
+  this->out_list = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * n);
 
   /* the matrix object */
-  this->data = pbank_data_get(name, n_cols, n_rows);
+  this->data = pbank_data_get(name, n, m);
 }
 
 static void
@@ -398,116 +395,116 @@ static void
 pbank_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_col = fts_get_int_arg(ac, at, 0, 0);
-  int i_row = fts_get_int_arg(ac, at, 1, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int j = fts_get_int_arg(ac, at, 0, 0);
+  int i = fts_get_int_arg(ac, at, 1, 0);
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *p;
-  int i;
+  int k;
 
   /* skip index of row and col */
   ac -= 2;
   at += 2;
 
   /* force column to matrix limits */
-  if(i_col < 0)
-    i_col = 0;
-  else if(i_col >= n_cols)
-    i_col = n_cols-1;
+  if(j < 0)
+    j = 0;
+  else if(j >= n)
+    j = n-1;
 
-  if(i_col + ac > n_cols)
-    ac = n_cols - i_col;
+  if(j + ac > n)
+    ac = n - j;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if (i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if (i >= m)
+    i = m - 1;
 
   /* copy to matrix */
-  p = this->data->matrix[i_row] + i_col;
-  for(i=0; i<ac; i++)
-    p[i] = at[i];
+  p = this->data->matrix[i] + j;
+  for(k=0; k<ac; k++)
+    p[k] = at[k];
 }
 
 static void
 pbank_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_col = fts_get_int_arg(ac, at, 0, 0);
-  int n_cols = this->data->n_cols;
-  int i;
+  int j = fts_get_int_arg(ac, at, 0, 0);
+  int n = this->data->n;
+  int k;
 
   /* skip first argument (index of col) */
   ac--; at++;
 
   /* force column to matrix limits */
-  if (i_col < 0)
-    i_col = 0;
-  else if (i_col >= n_cols)
-    i_col = n_cols - 1;
+  if (j < 0)
+    j = 0;
+  else if (j >= n)
+    j = n - 1;
 
-  if(i_col + ac > n_cols)
-    ac = n_cols - i_col;
+  if(j + ac > n)
+    ac = n - j;
 
   /* copy list to buffer */
-  for(i=0; i<ac; i++)
-    this->data->buffer[i] = at[i];
+  for(k=0; k<ac; k++)
+    this->data->buffer[k] = at[k];
 }
 
 static void
 pbank_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_row = fts_get_int(at);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int i = fts_get_int(at);
+  int j;
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *row;
-  int i;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if(i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if(i >= m)
+    i = m - 1;
 
-  row = this->data->matrix[i_row];
+  row = this->data->matrix[i];
       
   /* copy row to buffer and output */
-  for(i=0; i<n_cols; i++)
+  for(j=0; j<n; j++)
     {
-      this->data->buffer[i] = row[i];
-      this->out_list[i] = row[i];
+      this->data->buffer[j] = row[j];
+      this->out_list[j] = row[j];
     }
   
-  fts_outlet_list(o, 0, n_cols, this->out_list);
+  fts_outlet_list(o, 0, n, this->out_list);
 }
 
 static void
 pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_row = fts_get_int(at);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int i = fts_get_int(at);
+  int j;
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *row;
-  int i;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if(i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if(i >= m)
+    i = m - 1;
 
-  row = this->data->matrix[i_row];
+  row = this->data->matrix[i];
       
   /* copy matrix row to buffer and send to receives */
-  for(i=n_cols-1; i>=0; i--)
+  for(j=n-1; j>=0; j--)
     {
-      fts_atom_t *atom = row + i;
+      fts_atom_t *atom = row + j;
 
-      this->data->buffer[i] = *atom;
-      fts_send_message_to_receives(this->receives[i], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+      this->data->buffer[j] = *atom;
+      fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
     }
 }
 
@@ -516,40 +513,40 @@ static void
 pbank_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_row = fts_get_int_arg(ac, at, 0, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int i = fts_get_int_arg(ac, at, 0, 0);
+  int j;
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *row;
-  int i;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if(i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if(i >= m)
+    i = m - 1;
 
-  row = this->data->matrix[i_row];
+  row = this->data->matrix[i];
 
-  for(i=0; i<n_cols; i++)
+  for(j=0; j<n; j++)
     {
       fts_atom_t out_list[3];
 
       /* copy matrix element to buffer */
-      this->data->buffer[i] = row[i];
+      this->data->buffer[j] = row[j];
 
       /* output matrix element lead by column */
-      fts_set_int(out_list + 0, i);
+      fts_set_int(out_list + 0, j);
       
-      if(fts_is_symbol(row + i))
+      if(fts_is_symbol(row + j))
 	{
 	  /* buaaaarrrrrrrgg zaaaaaaaaaaaaack!!!!!!!*&(*@#&^(*^&*(%#$ */
 	  fts_set_symbol((out_list + 1), fts_s_symbol);
-	  out_list[2] = row[i];
+	  out_list[2] = row[j];
 	  fts_outlet_list(o, 0, 3, out_list);
 	}
       else 
 	{
-	  out_list[1] = row[i];
+	  out_list[1] = row[j];
 	  fts_outlet_list(o, 0, 2, out_list);
 	}
     }
@@ -560,27 +557,27 @@ static void
 pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_row = fts_get_int_arg(ac, at, 0, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int i = fts_get_int_arg(ac, at, 0, 0);
+  int j;
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *row;
-  int i;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if(i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if(i >= m)
+    i = m - 1;
 
-  row = this->data->matrix[i_row];
+  row = this->data->matrix[i];
 
   /* copy matrix row to buffer and send to receives */
-  for(i=n_cols-1; i>=0; i--)
+  for(j=n-1; j>=0; j--)
     {
-      fts_atom_t *atom = row + i;
+      fts_atom_t *atom = row + j;
 
-      this->data->buffer[i] = *atom;
-      fts_send_message_to_receives(this->receives[i], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+      this->data->buffer[j] = *atom;
+      fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
     }
 }
 
@@ -589,23 +586,23 @@ static void
 pbank_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-  int i_row = fts_get_int_arg(ac, at, 0, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int i = fts_get_int_arg(ac, at, 0, 0);
+  int j;
+  int n = this->data->n;
+  int m = this->data->m;
   fts_atom_t *row;
-  int i;
 
   /* force row to matrix limits */
-  if (i_row < 0)
-    i_row = 0;
-  else if (i_row >= n_rows)
-    i_row = n_rows - 1;
+  if (i < 0)
+    i = 0;
+  else if (i >= m)
+    i = m - 1;
 
-  row = this->data->matrix[i_row];
+  row = this->data->matrix[i];
 
   /* copy buffer to matrix row */
-  for(i=0; i<n_cols; i++)
-    row[i] = this->data->buffer[i];
+  for(j=0; j<n; j++)
+    row[j] = this->data->buffer[j];
 }
 
 /* store or recall single element to/from matrix */
@@ -614,31 +611,31 @@ pbank_set_and_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   pbank_t *this = (pbank_t *)o;
   fts_atom_t *atom;
-  int i_col = fts_get_int_arg(ac, at, 0, 0);
-  int i_row = fts_get_int_arg(ac, at, 1, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int j = fts_get_int_arg(ac, at, 0, 0);
+  int i = fts_get_int_arg(ac, at, 1, 0);
+  int n = this->data->n;
+  int m = this->data->m;
 
   /* force column to matrix limits */
-  if(i_col < 0)
-    i_col = 0;
-  else if (i_col >= n_cols)
-    i_col = n_cols - 1;
+  if(j < 0)
+    j = 0;
+  else if (j >= n)
+    j = n - 1;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if (i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if (i >= m)
+    i = m - 1;
 
-  atom = this->data->matrix[i_row] + i_col;
+  atom = this->data->matrix[i] + j;
 
   if(ac == 2) 
     {
       fts_atom_t out_list[3]; 
 
       /* output matrix element lead by column */
-      fts_set_int(out_list, i_col);
+      fts_set_int(out_list, j);
       
       if (fts_is_symbol(atom)) 
 	{
@@ -666,28 +663,28 @@ pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int a
 {
   pbank_t *this = (pbank_t *)o;
   fts_atom_t *atom;
-  int i_col = fts_get_int_arg(ac, at, 0, 0);
-  int i_row = fts_get_int_arg(ac, at, 1, 0);
-  int n_cols = this->data->n_cols;
-  int n_rows = this->data->n_rows;
+  int j = fts_get_int_arg(ac, at, 0, 0);
+  int i = fts_get_int_arg(ac, at, 1, 0);
+  int n = this->data->n;
+  int m = this->data->m;
 
   /* force column to matrix limits */
-  if(i_col < 0)
-    i_col = 0;
-  else if (i_col >= n_cols)
-    i_col = n_cols - 1;
+  if(j < 0)
+    j = 0;
+  else if (j >= n)
+    j = n - 1;
 
   /* force row to matrix limits */
-  if(i_row < 0)
-    i_row = 0;
-  else if (i_row >= n_rows)
-    i_row = n_rows - 1;
+  if(i < 0)
+    i = 0;
+  else if (i >= m)
+    i = m - 1;
 
-  atom = this->data->matrix[i_row] + i_col;
+  atom = this->data->matrix[i] + j;
 
   if(ac == 2) 
     /* read atom from matrix and send to receives */
-    fts_send_message_to_receives(this->receives[i_col], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+    fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
   else
     {
       /* write atom to matrix */
@@ -700,38 +697,29 @@ pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   pbank_t *this = (pbank_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  int read_n_rows = 0;
 
   if(file_name)
-    read_n_rows = pbank_read_file(this->data, file_name);
+    pbank_read_file(this->data, file_name);
 }
 
 static void
 pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
-
-  pbank_write_file(this->data, fts_get_symbol(at));
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+ 
+  if(file_name)
+    pbank_write_file(this->data, file_name);
 }
 
 static void
 pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   
-  if(ac > 1 && fts_is_symbol(at) && fts_is_symbol(at + 1))
-    {
-      fts_symbol_t format = fts_get_symbol(at);
-
-      if(format = fts_new_symbol("ascii"))
-	{
-	  pbank_export_file_ascii(this->data, fts_get_symbol(at + 1));
-	}
-      else
-	post("pbank: unknown export format: %s\n", fts_symbol_name(format));
-    }
-  else
-    post("pbank: usage: export <format> <file name>\n");
+  if(file_name)
+    pbank_export_file_ascii(this->data, file_name);
 }
 
 /******************************************************************
@@ -772,6 +760,18 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
   else
     return &fts_CannotInstantiate;
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), pbank_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("put"), pbank_put);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_new_symbol("store"), pbank_store, 1, a);
+
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("write"), pbank_write, 1, a);
+  fts_method_define(cl, 0, fts_new_symbol("read"), pbank_read, 1, a);
+  fts_method_define(cl, 0, fts_new_symbol("export"), pbank_export, 2, a);
 
   return fts_Success;
 }

@@ -50,13 +50,8 @@ listelement_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if(ac > i)
     {
-      if (fts_is_data(at + i))
-	{
-	  fts_data_t *data = fts_get_data(at + i);
-	  fts_outlet_send(o, 0, fts_data_get_class_name(data), 1, at + i);
-	}
-      else
-	fts_outlet_send(o, 0, fts_get_type(at + 1), 1, at + i);
+      if (!fts_is_void(at + i))
+	fts_outlet_send(o, 0, fts_type_get_selector(fts_get_type(at + i)), 1, at + i);
     }
 }
 

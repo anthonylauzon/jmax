@@ -20,17 +20,12 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Zack Settel.
  *
  */
 
-/* sigapass3 - 2ns order all-pass style (like wahwah) ---   
-zack settel 11/93  Ported to the new fts by mdc */
-
 #include <math.h> 
-
 #include "fts.h"
-
 #include "biquad.h"
 
 static fts_symbol_t sigapass3_function = 0;
