@@ -120,6 +120,10 @@ SOURCE=..\c\src\seqmess.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\seqmess.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\seqmidi.c
 # End Source File
 # Begin Source File
@@ -161,6 +165,14 @@ SOURCE=..\c\src\track.c
 # Begin Source File
 
 SOURCE=..\c\include\fts\packages\sequence\track.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\trackeditor.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\include\fts\packages\sequence\trackeditor.h
 # End Source File
 # End Target
 # End Project
