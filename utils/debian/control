@@ -36,7 +36,7 @@ Description: jMax FTS kernel
 Package: jmax-java
 Section: contrib/sound
 Architecture: any
-Depends: jmax, jmax-common, java-common, java2-common, ${shlibs:Depends}
+Depends: jmax, jmax-common, j2se-common | java2-common, ${shlibs:Depends}
 Description: Java client for jMax
  jMax is the latest generation of real-time platform developed at Ircam by the
  Real time systems team.

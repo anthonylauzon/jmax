@@ -1,3 +1,10 @@
+jmax (4.0.3-030709) unstable; urgency=low
+
+  * Cvs update
+  * Adding j2se-common for Blackdown java runtime compat.
+
+ -- Paul Brossier <piem@altern.org>  Wed,  9 Jul 2003 15:42:29 +0100
+
 jmax (4.0.3-030701) unstable; urgency=low
 
   * Cvs update
