@@ -16,6 +16,7 @@
 
    All the post should generate an error.
 */
+#undef FMT_CHAR
 
 /* Include files */
 
@@ -69,7 +70,11 @@ static struct oss_audio_data_struct
 
   /* buffers  */
 
+#ifdef FMT_CHAR
+  char *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
+#else
   short *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
+#endif
   short *adc_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device_open */
 
 } oss_audio_data;
@@ -105,6 +110,17 @@ static void oss_audio_set_parameters()
 
   if (sr != oss_audio_data.sampling_rate)
     post("Audio device doesn't support requested sampling rate\n");
+
+  {
+    audio_buf_info info;
+
+    if ( ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
+      post( "SNDCTL_DSP_GETOSPACE\n");
+    post( "fragments %d\n", info.fragments);
+    post( "fragstotal %d\n", info.fragstotal);
+    post( "fragsize %d\n", info.fragsize);
+    post( "bytes %d\n", info.bytes);
+  }
 }
 
 /* to put the audio device in the right configuration,
@@ -235,7 +251,11 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the DAC  formatting buffer */
 
+#ifdef FMT_CHAR
+  oss_audio_data.dac_fmtbuf = (char *) fts_malloc(MAXVS * 2 * 2);
+#else
   oss_audio_data.dac_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
+#endif
 
   return fts_Success;
 }
@@ -282,23 +302,57 @@ oss_dac_put(fts_word_t *argv)
       
       in = (float *) fts_word_get_ptr(argv + 2 + ch);
 
+#ifdef FMT_CHAR
       for (i = ch, j = 0; j < n; i = i + 8, j += 4)
 	{
 	  float f1, f2, f3, f4;
+	  short s1, s2, s3, s4;
 
 	  f1 = in[j];
 	  f2 = in[j + 1];
 	  f3 = in[j + 2];
 	  f4 = in[j + 3];
 
-	  oss_audio_data.dac_fmtbuf[i + 0] = (short) ( 32767.0f * f1);
-	  oss_audio_data.dac_fmtbuf[i + 2] = (short) ( 32767.0f * f2);
-	  oss_audio_data.dac_fmtbuf[i + 4] = (short) ( 32767.0f * f3);
-	  oss_audio_data.dac_fmtbuf[i + 6] = (short) ( 32767.0f * f4);
+	  s1 = (short) ( 32767.0f * f1);
+	  oss_audio_data.dac_fmtbuf[i + 0] = s1&0xff;
+	  oss_audio_data.dac_fmtbuf[i + 1] = (s1>>8)&0xff;
+
+	  s2 = (short) ( 32767.0f * f2);
+	  oss_audio_data.dac_fmtbuf[i + 4] = s2&0xff;
+	  oss_audio_data.dac_fmtbuf[i + 5] = (s2>>8)&0xff;
+
+	  s3 = (short) ( 32767.0f * f3);
+	  oss_audio_data.dac_fmtbuf[i + 8] = s3&0xff;
+	  oss_audio_data.dac_fmtbuf[i + 9] = (s3>>8)&0xff;
+
+	  s4 = (short) ( 32767.0f * f4);
+	  oss_audio_data.dac_fmtbuf[i + 12] = s4&0xff;
+	  oss_audio_data.dac_fmtbuf[i + 13] = (s4>>8)&0xff;
 	}
+#else
+      for (i = ch, j = 0; j < n; i = i + 8, j += 4)
+	{
+	  float f0, f1, f2, f3;
+	  short s0, s1, s2, s3;
+
+	  f0 = in[j + 0];
+	  f1 = in[j + 1];
+	  f2 = in[j + 2];
+	  f3 = in[j + 3];
+
+	  s0 = (short) ( 32767.0f * f0);
+	  oss_audio_data.dac_fmtbuf[i + 0] = s0;
+	  s1 = (short) ( 32767.0f * f1);
+	  oss_audio_data.dac_fmtbuf[i + 2] = s1;
+	  s2 = (short) ( 32767.0f * f2);
+	  oss_audio_data.dac_fmtbuf[i + 4] = s2;
+	  s3 = (short) ( 32767.0f * f3);
+	  oss_audio_data.dac_fmtbuf[i + 6] = s3;
+	}
+#endif
     }
 
-  write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, n * 2);
+  write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, n * 2 * sizeof(short));
 }
 
 
