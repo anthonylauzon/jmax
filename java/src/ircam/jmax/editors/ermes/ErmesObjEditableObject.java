@@ -193,7 +193,7 @@ import ircam.jmax.fts.*;
     int i = 0;
 
     itsParsedTextVector.removeAllElements();
-    System.err.println("cucu");
+
     while(aIndex!=-1){
       aString = theString.substring(aOldIndex+1, aIndex);
       length = itsFontMetrics.stringWidth(aString);
