@@ -252,6 +252,8 @@ FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, co
 /**
  * Return a value from a method.
  * The returned value is an atom that is copied by the calling code.
+ * (Although the fts functions are called fts_<blabla>_float, the values
+ * passed and stored in fts_atom_t are double!)
  *
  * @fn void fts_return( fts_atom_t *p)
  * @param p a pointer to the atom to be returned
@@ -259,7 +261,7 @@ FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, co
  */
 FTS_API void fts_return( fts_atom_t *p);
 FTS_API void fts_return_int(int x);
-FTS_API void fts_return_float(float x);
+FTS_API void fts_return_float(double x);
 FTS_API void fts_return_symbol(fts_symbol_t x);
 FTS_API void fts_return_object(fts_object_t *x);
 

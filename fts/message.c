@@ -399,7 +399,9 @@ void fts_return_int(int x)
   fts_set_int(&fts_return_value, x);
 }
 
-void fts_return_float(float x)
+/* although the fts functions are called fts_<blabla>_float, the values
+   passed and stored in fts_atom_t are double! */
+void fts_return_float(double x)
 {
   fts_set_float(&fts_return_value, x);
 }
