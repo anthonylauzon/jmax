@@ -56,7 +56,7 @@ accum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   accum_t *this = (accum_t *)o;
 
   if(this->is_int)
-    fts_outlet_int(o, 0, this->value);
+    fts_outlet_int(o, 0, (int)this->value);
   else
     fts_outlet_float(o, 0, this->value);
 }
