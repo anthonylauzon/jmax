@@ -368,6 +368,11 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     (*lptr)->delay_length = fts_get_number_float(at);
     delay_set_time(o, 0, 0, 1, at);
   }
+  else
+  {
+    int* my_samples = (int*)ftl_data_get_ptr(this->samples);
+    *my_samples = 0;
+  }
 }
 
 static void
@@ -532,7 +537,14 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   /* get time argument */
   if(ac > 1 && fts_is_number(at + 1))
+  {
     delay_set_time(o, 0, 0, 1, at + 1);
+  }
+  else
+  {
+    int* my_samples = (int*)ftl_data_get_ptr(this->samples);
+    *my_samples = 0;
+ }
 
   fts_dsp_before_edge(o, delayline_get_edge(*lptr));
 }
@@ -565,7 +577,14 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   /* get time argument */
   if(ac > 1 && fts_is_number(at + 1))
+  {
     delay_set_time(o, 0, 0, 1, at + 1);
+  }
+  else
+  {
+    int* my_samples = (int*)ftl_data_get_ptr(this->samples);
+    *my_samples = 0;
+  }
 
   fts_dsp_after_edge(o, delayline_get_edge(*lptr));
 }
@@ -914,3 +933,10 @@ signal_delay_config(void)
   fts_dsp_declare_function(sym_retap, retap_ftl);
   fts_dsp_declare_function(sym_vtap, vtap_ftl);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
