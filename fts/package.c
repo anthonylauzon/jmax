@@ -172,7 +172,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
     /*pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto graceful_exit;*/
-
+    fts_package_pop(fts_system_package);
     return NULL;
   }
 
@@ -185,7 +185,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
     /*pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto graceful_exit;*/
-
+    fts_package_pop(fts_system_package);
     return NULL;
   }
 
