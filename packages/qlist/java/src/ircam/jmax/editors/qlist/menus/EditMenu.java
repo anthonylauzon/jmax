@@ -106,10 +106,10 @@ public class EditMenu extends EditorMenu
       copyItem.setEnabled(false);
       cutItem.setEnabled(false);
     }
-    /*pasteItem.setEnabled((flavors != null) &&
-			 clipboardContent.isDataFlavorSupported(DataFlavor.plainTextFlavor));*/
     pasteItem.setEnabled((flavors != null) &&
-			 clipboardContent.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor()));
+			 clipboardContent.isDataFlavorSupported(DataFlavor.plainTextFlavor));
+    /*pasteItem.setEnabled((flavors != null) &&
+      clipboardContent.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor()));*/
   }
 }
 
