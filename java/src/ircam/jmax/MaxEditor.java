@@ -560,36 +560,32 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return itsFileMenu.getItem(1);
   }
 
-  public MenuItem GetImportMenu(){
+  public MenuItem GetCloseMenu(){
     return itsFileMenu.getItem(2);
   }
 
-  public MenuItem GetCloseMenu(){
-    return itsFileMenu.getItem(3);
-  }
-
   public MenuItem GetOpenWithAutoroutingMenu(){
-    return itsFileMenu.getItem(5);
+    return itsFileMenu.getItem(4);
   }
 
   public MenuItem GetSaveMenu(){
-    return itsFileMenu.getItem(7);
+    return itsFileMenu.getItem(6);
   }
 
   public MenuItem GetSaveAsMenu(){
-    return itsFileMenu.getItem(8);
+    return itsFileMenu.getItem(7);
   }
   
   public MenuItem GetPrintMenu(){
-    return itsFileMenu.getItem(10);
+    return itsFileMenu.getItem(9);
   }
 
   public MenuItem GetSystemStatisticsMenu(){
-    return itsFileMenu.getItem(11);
+    return itsFileMenu.getItem(10);
   }
 
   public MenuItem GetQuitMenu(){
-    return itsFileMenu.getItem(12);
+    return itsFileMenu.getItem(11);
   }
 
   public MenuItem GetCutMenu(){
