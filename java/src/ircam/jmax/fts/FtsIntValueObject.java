@@ -67,6 +67,13 @@ public class FtsIntValueObject extends FtsGraphicObject
     setNumberOfOutlets(1);
   }
 
+  public FtsIntValueObject(FtsServer server, FtsObject parent, int id, String arguments)
+  {
+    super(server, parent, id, arguments);
+    setNumberOfInlets(1);
+    setNumberOfOutlets(1);
+  }
+
   public void setValue(int value)
   {
     this.value = value;

@@ -58,14 +58,14 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
     super(server, parent, id, args, offset, length);
   }
 
-  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String description)
   {
-    super(server, parent, ftsClassName, args);
+    super(server, parent, id, description);
   }
-  
-  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
+
+  public  FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
-    super(server, parent, ftsClassName);
+    super(server, parent, className);
   }
 
   public Frame getEditorFrame()

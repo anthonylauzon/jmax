@@ -157,6 +157,11 @@ public class ToolBar extends JPanel implements ComponentListener{
     addComponentListener(this);
   }
 
+  public ErmesSketchPad getSketchPad()
+  {
+    return sketch;
+  }
+
   void buttonSelected(ToolButton button)
   {
     if(selectedButton!=null)

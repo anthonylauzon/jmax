@@ -1023,45 +1023,20 @@ public class FtsParse
 
 	    doNewLine = false;
 
-	    if (i >= nArgs)
+	    if (i >= nArgs+offset)
 	      value2 = null;
 	    else
 	      value2 = args[i++];
 
 	    if(value1.isInt())
-		descr.append(value1.intValue);
-	    else
-		if(value1.isFloat())
-		    descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
-		else
-		    if(value1.isString())
-			{
-			    /* Lexical quoting check */
-			    String s = value1.stringValue;
-		
-			    if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
-				{
-				    descr.append("\"");
-				    descr.append(s);
-				    descr.append("\"");
-				}
-			    else
-				descr.append(s);
-			    
-			    if (s.equals("'"))
-				noNewLine = true;
-			    /*else if (s.equals(";"))
-			      {
-			      if (noNewLine)
-			      noNewLine = false;
-			      else
-			      doNewLine = true;
-			      }*/
-			    else
-				noNewLine = false;			    
-			}
-		    else
-			descr.append("??");
+	      descr.append(value1.intValue);
+	    else if(value1.isFloat())
+	      descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
+	    else if(value1.isString())
+		noNewLine = unparseString( value1.stringValue, descr);
+	    else if(value1.isSymbol())
+		noNewLine = unparseString( value1.symbolValue.toString(), descr);
+	    else descr.append("??");
 
 	    /* decide to put or not a blank between the two */
 	    if (wantASpaceAfter(value1))
@@ -1085,6 +1060,20 @@ public class FtsParse
       }
     else
       return "";
+  }
+
+  static boolean unparseString(String s, StringBuffer descr)
+  {
+     if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
+       {
+	 descr.append("\"");
+	 descr.append(s);
+	 descr.append("\"");
+       }
+     else
+       descr.append(s);
+     
+     return s.equals("'");
   }
 }
 

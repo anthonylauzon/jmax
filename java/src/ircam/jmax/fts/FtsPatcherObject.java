@@ -117,12 +117,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).addObject( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineObject"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsPatcherObject)obj).redefineObject( args.getLength(), args.getAtoms());
-	}
-      });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineTemplateObject"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -261,24 +255,17 @@ public class FtsPatcherObject extends FtsObjectWithEditor
    * Create a FtsPatcherObject object
    */
 
-  public FtsPatcherObject(FtsServer server, FtsObject parent, FtsSymbol className, FtsArgs args) throws IOException
-  {
-    super(server, parent, className, args);
-  }
-  public FtsPatcherObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
-  {
-    super(server, parent, className);
-  }
   public FtsPatcherObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, args, offset, length);
+    super(server, parent, id, FtsParse.unparseArguments( args, offset+1, length-1));
   }
+
   public FtsPatcherObject() throws IOException
   {
     super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
   }
-  /** Get all the objects in this patcherdata */
 
+  /** Get all the objects in this patcherdata */
   public final MaxVector getObjects()
   {
     return objects;
@@ -444,9 +431,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   final void addObject(FtsGraphicObject obj)
   {
     objects.addElement(obj);
-    fireObjectAdded(obj, doedit);
+    fireObjectAdded(obj);
     fireGlobalObjectAdded(obj);
-    doedit = false;
   }
 
   /** Add a connection to this patcher data */
@@ -591,10 +577,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     args.addInt(y);
 
     for(int i=0; i<vec.size(); i++)
-      args.add(vec.elementAt(i));
-      
+	args.add(vec.elementAt(i));
+
     try{
-      send( FtsSymbol.get("add_object"), args);
+      send( FtsSymbol.get("add_object"), args);  
     }
     catch(IOException e)
       {
@@ -612,8 +598,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     args.addObject(oldObject);
 
     for(int i=0; i<vec.size(); i++)
-      args.add(vec.elementAt(i));
-      
+	args.add(vec.elementAt(i));
     try{
       send( FtsSymbol.get("redefine_object"), args);
     }
@@ -677,40 +662,40 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   
 
   //used in addObject method to start editing in added object if needed 
-  boolean doedit = false;
   public void addObject(int nArgs , FtsAtom args[]) 
   {
     int objId = args[0].intValue;
     int x = args[1].intValue;
     int y = args[2].intValue;
+    int numIns = args[3].intValue;
+    int numOuts = args[4].intValue;
+    int error = args[5].intValue;
+    int offset;
+    String errorDescription = "";
+
+    if(error!=0)
+      {
+	errorDescription = args[6].stringValue;
+	offset = 7;
+      }
+    else offset = 6;
 
     String className = null;
-    int offset = 3;
 
-    if(args[3].isSymbol()) 
-      className = args[3].symbolValue.toString();
-    
-    GraphicObject newObj = makeGraphicObjectFromServer(getServer(), this, objId, className, args, offset, nArgs);
+    if(args[offset].isSymbol()) 
+      className = args[offset].symbolValue.toString();
+
+    GraphicObject newObj = makeGraphicObjectFromServer(getServer(), this, objId, className, args, offset, nArgs-offset);
     
     newObj.setX(x);
     newObj.setY(y);
-    
-    //addObject(newObj);
-    objects.addElement(newObj.getFtsObject());
-    newObj.getSketchPad().addNewObject(newObj, false);
-  }
-
-  public void redefineObject(int nArgs , FtsAtom args[]) 
-  {
-    String className = null;
-    int newObjId = args[0].intValue;
-
-    if(args[1].isString()) 
-      className = args[1].stringValue;
-
-    int offset = 1;
-
-    GraphicObject newObj = makeGraphicObjectFromServer(getServer(), this, newObjId, className, args, offset, nArgs);
+    newObj.getFtsObject().setNumberOfInlets(numIns);
+    newObj.getFtsObject().setNumberOfOutlets(numOuts);
+    if(error != 0)
+      {
+	newObj.getFtsObject().setError(error);
+	newObj.getFtsObject().setErrorDescription(errorDescription);
+      }
 
     //addObject(newObj);
     objects.addElement(newObj.getFtsObject());
@@ -869,10 +854,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     listener = null;
   }
 
-  private final void fireObjectAdded(FtsGraphicObject object, boolean doedit)
+  private final void fireObjectAdded(FtsGraphicObject object)
   {
     if (listener != null)
-      listener.objectAdded(this, object, doedit);
+      listener.objectAdded(this, object, false);
   }
 
   private final void fireObjectRedefined(FtsGraphicObject newObject)

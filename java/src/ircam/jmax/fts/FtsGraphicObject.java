@@ -62,7 +62,7 @@ public class FtsGraphicObject extends FtsObject {
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setErrorDescription"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).errorDescription = args.getString( 0);
+	  ((FtsGraphicObject)obj).setErrorDescription(args.getString( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setX"), new FtsMessageHandler(){
@@ -131,18 +131,19 @@ public class FtsGraphicObject extends FtsObject {
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
+    this( server, parent, id, FtsParse.unparseArguments(args, offset, length));
+  }
+
+  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String description)
+  {
     super(server, parent, id);
-    description = FtsParse.unparseArguments(args, offset, length);
+    this.description = description;
   }
-  public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
+
+  public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
-    super(server, parent, ftsClassName, args);
-    this.description = ftsClassName.toString();
-  }
-  public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
-  {
-    super(server, parent, ftsClassName);
-    this.description = ftsClassName.toString();
+    super(server, parent, className);
+    this.description = className.toString();
   }
 
   /****************************************************************************/
@@ -327,6 +328,11 @@ public class FtsGraphicObject extends FtsObject {
   public final String getErrorDescription()
   {
     return errorDescription;
+  }
+
+  public final void setErrorDescription(String ed)
+  {
+    errorDescription = ed;
   }
 
   /** Get the font property */

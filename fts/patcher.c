@@ -1316,7 +1316,7 @@ fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(&at[0]);
-  fts_atom_t a[2];
+  fts_atom_t a[6];
 
   if(fts_object_get_class_name(obj) == fts_s_connection)
     {      
@@ -1333,11 +1333,24 @@ fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     {
       fts_object_get_prop(obj, fts_s_x, a);
       fts_object_get_prop(obj, fts_s_y, a+1);
-
+      fts_object_get_prop(obj, fts_s_ninlets, a+2);
+      fts_object_get_prop(obj, fts_s_noutlets, a+3);
+      fts_object_get_prop(obj, fts_s_error, a+4);
+	        
       fts_client_start_message((fts_object_t *)this, sym_addObject);
       fts_client_add_int((fts_object_t *)this, fts_get_object_id(obj));
       fts_client_add_int((fts_object_t *)this, fts_get_int(a));
       fts_client_add_int((fts_object_t *)this, fts_get_int(a+1));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(a+2));      
+      fts_client_add_int((fts_object_t *)this, fts_get_int(a+3));
+      fts_client_add_int((fts_object_t *)this, fts_get_int(a+4));
+      
+      if(fts_object_is_error(obj))
+	{
+	  fts_object_get_prop(obj, fts_s_error_description, a+5);
+	  fts_client_add_string((fts_object_t *)this, fts_get_string(a+5));
+	}
+
       fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
       fts_client_done_message((fts_object_t *)this);
     }

@@ -1004,7 +1004,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void makeAddModeObject(int x, int y, boolean edit)
   {
-      itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
+    itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
   }
 
   public  InteractionEngine getEngine()

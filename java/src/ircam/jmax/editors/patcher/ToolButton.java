@@ -35,6 +35,7 @@ class ToolButton extends JToggleButton
   private String message;
   private ToolBar toolBar;
   private boolean state = false;
+  private Cursor cursor;
 
   static MouseListener mListener = new MouseAdapter() {
     public void mousePressed(MouseEvent e)
@@ -42,7 +43,8 @@ class ToolButton extends JToggleButton
 	ToolButton button = (ToolButton)e.getSource();
 	if ( !button.isSelected() )
 	  {
-	    button.setCursor( JMaxClassMap.getCursor( button.getDescription()));
+	    button.setCursor( button.getButtonCursor());
+	    button.toolBar.getSketchPad().setCursor(button.getButtonCursor());
 	    button.state = true;
 	    button.setSelected( true);
 	    button.toolBar.buttonSelected( button);
@@ -54,7 +56,12 @@ class ToolButton extends JToggleButton
   {
     super( JMaxClassMap.getIcon( name));
 
-    this.description = name;
+    this.cursor = JMaxClassMap.getCursor( name);
+    if(!name.equals("standard"))
+      this.description = name;
+    else
+      this.description = "";
+
     this.message = "";
     this.toolBar = toolBar;
 
@@ -69,6 +76,7 @@ class ToolButton extends JToggleButton
   {
     state = false;
     setCursor( Cursor.getDefaultCursor());
+    toolBar.getSketchPad().setCursor( Cursor.getDefaultCursor());
   }
 
   String getDescription()
@@ -79,6 +87,11 @@ class ToolButton extends JToggleButton
   String getMessage()
   {
     return message;
+  }
+
+  Cursor getButtonCursor()
+  {
+    return cursor;
   }
 }
 
