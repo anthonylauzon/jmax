@@ -22,8 +22,9 @@
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 /* Define this if you want logs of symbol cache hit */
-/*#define CACHE_REPORT*/
-/*#define CLIENT_LOG*/
+#define CACHE_REPORT
+/* #define CLIENT_LOG */
+/* #define CLIENT_DEBUG */
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
@@ -753,7 +754,7 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 {
   client_t *this = (client_t *)o;
   int i;
-
+  FILE* log;
   if ( size <= 0)
     {
       client_error( "[client] error in reading message, client stopped");
@@ -766,7 +767,18 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 
       return;
     }
-
+#ifdef CLIENT_DEBUG
+  fts_log("[client] receive a message: \n");
+  log = fopen("/home/tisseran/.fts_log", "a");
+  for (i = 0; i < size; i++)
+  {
+      fprintf(log, "%x ", buffer[i]);
+  }
+  fprintf(log, "\n");
+  fflush(log);
+  fclose(log);
+  fts_log("[client] going to parse message \n");
+#endif /* CLIENT_DEBUG */
 
   for ( i = 0; i < size; i++)
     {
@@ -1314,12 +1326,29 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 void fts_client_done_message( fts_object_t *obj)
 {
   client_t *client = object_get_client( obj);
+  FILE* log;
+  unsigned char* buff;
+
+  int i;
 
   if ( !client || client->stream == NULL)
     return;
 
   put_byte( client, FTS_PROTOCOL_END_OF_MESSAGE);
   
+#ifdef CLIENT_DEBUG
+  fts_log("[client] send a message: \n");
+  log = fopen("/home/tisseran/.fts_log", "a");
+  buff = fts_stack_base(&client->output_buffer);
+  for (i = 0; i < fts_stack_size(&client->output_buffer); ++i)
+  {
+      fprintf(log, "%x", buff[i]);
+  }
+  fprintf(log, "\n");
+  fflush(log);
+  fclose(log);
+  fts_log("[client] send message \n");
+#endif /* CLIENT_DEBUG */
   fts_bytestream_output( client->stream, fts_stack_size( &client->output_buffer), fts_stack_base( &client->output_buffer));
 
   fts_stack_clear( &client->output_buffer);
