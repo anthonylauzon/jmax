@@ -61,7 +61,8 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 /* thru objects */
 #define fts_object_is_thru(o) fts_class_is_thru((o)->head.cl)
-extern void fts_object_set_connection_type(fts_object_t *obj, fts_connection_type_t type);
+extern void fts_object_set_thru_type(fts_object_t *obj, fts_connection_type_t type);
+extern fts_connection_type_t fts_object_get_thru_type(fts_object_t *obj);
 
 #define fts_patcher_is_open(p)    ((p)->open)
 #define fts_object_patcher_is_open(o)    ((fts_object_get_patcher(o))->open)

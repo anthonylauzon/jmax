@@ -1781,12 +1781,25 @@ fts_patcher_init(void)
 }
 
 void 
-fts_object_set_connection_type(fts_object_t *obj, fts_connection_type_t type)
+fts_object_set_thru_type(fts_object_t *obj, fts_connection_type_t type)
 {  
   fts_atom_t a;
 
   fts_set_int(&a, type);
-  _fts_object_put_prop(obj, fts_s_connection_type, &a);
+  _fts_object_put_prop(obj, fts_s_thru_type, &a);
+}
+
+fts_connection_type_t
+fts_object_get_thru_type(fts_object_t *obj)
+{ 
+  fts_atom_t a;
+
+  _fts_object_get_prop(obj, fts_s_thru_type, &a);
+  
+  if(!fts_is_void(&a))
+    return (fts_connection_type_t)fts_get_int(&a);
+  else
+    return fts_c_anything;
 }
 
 void

@@ -24,7 +24,6 @@
  *
  */
 
-
 /*
    Support for FOS client/server messages
 */
@@ -609,7 +608,8 @@ fts_mess_client_new_connection(int ac, const fts_atom_t *av)
 
       if (to && from)
 	{
-	  fts_connection_new(id, from, outlet, to, inlet);
+	  if(fts_connection_new(id, from, outlet, to, inlet))
+	    ;
 	}
       else
 	printf_mess("System Error in FOS message CONNECT: Error trying to connect non existing objects", ac, av);

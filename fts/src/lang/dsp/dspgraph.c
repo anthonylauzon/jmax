@@ -204,6 +204,39 @@ static dsp_node_t *dsp_list_lookup(fts_object_t *o)
     return 0;
 }
 
+#define DSP_AUTO_COMPILE_DEFAULT 1
+
+void
+fts_dsp_auto_stop()
+{
+  int auto_compile = ((fts_param_get_int(fts_s_dsp_on, 0) != 0) && (fts_param_get_int(fts_s_dsp_auto_compile, DSP_AUTO_COMPILE_DEFAULT) != 0));
+
+  if(auto_compile)
+    dsp_chain_delete();
+  else if(fts_param_get_int(fts_s_dsp_on, 0) != 0)
+    fts_param_set_int(fts_s_dsp_on, 0);
+}
+
+void
+fts_dsp_auto_restart()
+{
+  int auto_compile = ((fts_param_get_int(fts_s_dsp_on, 0) != 0) && (fts_param_get_int(fts_s_dsp_auto_compile, DSP_AUTO_COMPILE_DEFAULT) != 0));
+
+  if(auto_compile)
+    dsp_chain_create(fts_get_tick_size());
+}
+
+void
+fts_dsp_auto_update()
+{
+  int auto_compile = ((fts_param_get_int(fts_s_dsp_on, 0) != 0) && (fts_param_get_int(fts_s_dsp_auto_compile, DSP_AUTO_COMPILE_DEFAULT) != 0));
+
+  if(auto_compile)
+    {
+      dsp_chain_delete();
+      dsp_chain_create(fts_get_tick_size());
+    }
+}
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -799,11 +832,10 @@ void dsp_list_remove(fts_object_t *o)
 
   /* We stop the dsp chain, because for sure is not more
    consistent with the object network; use the param to propagate */
-
-  fts_param_set_int(fts_s_dsp_on, 0);
+  fts_dsp_auto_stop();
 
   _fts_object_remove_prop(o, fts_s_dsp_descr);
-
+  
   prev_node = 0;
   for( node = dsp_graph; node; node = node->next)
     {
@@ -813,20 +845,22 @@ void dsp_list_remove(fts_object_t *o)
 	    prev_node->next = node->next;
 	  else
 	    dsp_graph = node->next;
-
+	  
 	  if (node->descr)
 	    {
 	      fts_block_free((char *) node->descr->in, sizeof(dsp_signal *) * node->descr->ninputs);
 	      fts_block_free((char *) node->descr->out, sizeof(dsp_signal *) * node->descr->noutputs);
 	      fts_heap_free((char *)node->descr, dsp_descr_heap);
 	    }
-
+	  
 	  fts_heap_free((char *)node, dsp_graph_heap);
 	  return;
 	}
-
+      
       prev_node = node;
     }
+
+  fts_dsp_auto_restart();
 }
 
 void dsp_add_signal(fts_symbol_t name, int vs)

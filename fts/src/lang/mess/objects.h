@@ -71,7 +71,7 @@ extern int fts_object_description_defines_variable(int ac, const fts_atom_t *at)
 
 extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
-#define fts_object_has_method(o, i, s) fts_class_has_method((o)->head.cl, i, s)
+#define fts_object_has_method(o, i, s) fts_class_has_method((o)->head.cl, (i), (s))
 
 /* variables */
 #define fts_object_get_variable(o) ((o)->varname)

@@ -42,8 +42,10 @@ typedef struct
 
 typedef struct 
 {
-  int ninputs, noutputs;
-  dsp_signal **in, **out;
+  int ninputs;
+  int noutputs;
+  dsp_signal **in;
+  dsp_signal **out;
 } fts_dsp_descr_t;
 
 /* Macro to access the input and output characteristics
@@ -69,6 +71,10 @@ extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
 /* End of macros */
+
+extern void fts_dsp_auto_stop(void);
+extern void fts_dsp_auto_restart(void);
+extern void fts_dsp_auto_update(void);
 
 extern dsp_signal * Sig_new(int vectorSize, float sampleRate);
 extern void Sig_free(dsp_signal *s);

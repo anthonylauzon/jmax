@@ -124,7 +124,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
     {
       mess = fts_class_mess_inlet_get(inlet, outlet->tmess.symb, &anything);
 
-      if(!mess)
+      if(!mess || (anything && outlet->tmess.symb == fts_s_sig && !fts_object_is_thru(in)))
 	{
 	  fts_object_blip(out, "Type mismatch, cannot connect");
 	  return 0;
@@ -201,10 +201,6 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
       in->in_conn[winlet] = conn;
     }
 
-  /* if(conn->type == fts_c_signal)
-     connection_propagate_signal_type(conn, fts_c_signal);
-  */
-
   return conn;
 }
 
@@ -215,11 +211,6 @@ fts_object_do_disconnect(fts_connection_t *conn, int do_client)
   fts_object_t *dst;
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
-
-  /*
-  if(conn->type == fts_c_signal)
-    connection_propagate_signal_type(conn, fts_c_anything);
-  */
 
   /* First, release the client representation of the connection, if any */
   if (do_client)
@@ -421,11 +412,6 @@ fprintf_connection(FILE *f, fts_connection_t *conn)
     fprintf(f, "<CONNECTION null>");
 }
 
-/**********************************************************************
- *
- *  mark signal connections
- *
- */
 void 
 fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type)
 {
