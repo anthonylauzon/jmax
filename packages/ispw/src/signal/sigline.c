@@ -126,8 +126,6 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->srate = fts_dsp_get_output_srate(dsp, 0);
   this->vecsize = fts_dsp_get_output_size(dsp, 0);
 
-  
-
   if (this->vecsize == 64)
     {
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
@@ -153,7 +151,7 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   float f;
   int i;
 
-  this->vecsize = DEFAULTVS;
+  this->vecsize = FTS_DEF_TICK_SIZE;
 
   this->set = 0;
   this->srate = fts_param_get_float(fts_s_sampling_rate, 44100.); /* should go away !!! (mdc) */

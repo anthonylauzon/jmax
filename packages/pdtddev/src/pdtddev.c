@@ -624,7 +624,7 @@ pdtd_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   dev_data->fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
 
   /* Make a sample fifo */
-  dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, MAXVS * dev_data->nch, dev_data->file_block);
+  dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, fts_get_tick_size() * dev_data->nch, dev_data->file_block);
   fts_sample_fifo_set_destroy_callback(dev_data->fifo, readsf_destroy_data, dev_data);
 
   /*  Start the reader thread  using a async call*/
@@ -954,7 +954,7 @@ pdtd_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   dev_data->fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
 
   /* Make a sample fifo */
-  dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, dev_data->file_block, MAXVS * dev_data->nch);
+  dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, dev_data->file_block, fts_get_tick_size() * dev_data->nch);
   fts_sample_fifo_set_destroy_callback(dev_data->fifo, writesf_destroy_data, dev_data);
 
   /*  Start the reader thread  using a async call*/

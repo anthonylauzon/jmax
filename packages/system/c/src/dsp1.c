@@ -42,16 +42,10 @@ static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t
     fts_outlet_send((fts_object_t *) this, 0, fts_s_int, 1, value);
 }
 
-
-
 static void
 dsp_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (ac > 0)
-    fts_param_set(fts_s_vector_size, at);
-
   /* Switch off if already on, before switching on again */
-
   if (fts_param_get_int(fts_s_dsp_on, 0))
     fts_param_set_int(fts_s_dsp_on, 0);
 
@@ -131,10 +125,8 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, dsp_delete, 0, 0);
 
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("start"), dsp_start, 1, a, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("stop"), dsp_stop, 0, a);
+  fts_method_define(cl, 0, fts_new_symbol("start"), dsp_start, 0, 0);
+  fts_method_define(cl, 0, fts_new_symbol("stop"), dsp_stop, 0, 0);
  
   a[0] = fts_s_int;
   fts_method_define(cl, 0, fts_s_int, dsp_on_off, 1, a);

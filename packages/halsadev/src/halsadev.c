@@ -82,9 +82,9 @@ static int init( int card, int device)
   sample_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
 
   fifo_size = fts_param_get_int( fts_s_fifo_size, DEF_FIFO_SIZE);
-  if ( fifo_size % 2 != 0 && fifo_size % MAXVS != 0)
+  if ( fifo_size % 2 != 0 && fifo_size % fts_get_tick_size() != 0)
     {
-      post( "Error: fifo size (%d) is not a multiple of 2 and a multiple of %d\n", fifo_size, MAXVS);
+      post( "Error: fifo size (%d) is not a multiple of 2 and a multiple of %d\n", fifo_size, fts_get_tick_size());
       return -1;
     }
 

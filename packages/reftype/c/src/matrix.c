@@ -146,6 +146,9 @@ matrix_set_element(matrix_t *mx, int i, int j, fts_atom_t value)
     refdata_atom_release(ap);
 
   *ap = value;
+
+  if(refdata_atom_is(&value))
+    refdata_atom_refer(&value);
 }
 
 extern void
@@ -163,6 +166,8 @@ void
 matrix_fill(matrix_t *mx, fts_atom_t value)
 {
   int size = mx->m * mx->n;
+  int refer = refdata_atom_is(&value);
+
   int i;
 
   for(i=0; i<size; i++)
@@ -173,6 +178,9 @@ matrix_fill(matrix_t *mx, fts_atom_t value)
 	refdata_atom_release(ap);
 
       *ap = value;
+      
+      if(refer)
+	refdata_atom_refer(&value);
     }
 }
 

@@ -31,12 +31,10 @@
 /* (fd) For post */
 #include "runtime/files.h"
 
-
 static int Sig_count = 0;
-static int Sig_defaultVectorSize = DEFAULTVS;
 
-
-typedef struct _SignalCell {
+typedef struct _SignalCell 
+{
   dsp_signal *s;
   struct _SignalCell *next;
 } SignalCell, *SignalList;
@@ -55,7 +53,7 @@ Sig_genName( int id)
 }
 
 dsp_signal *
-Sig_new( int vectorSize)
+Sig_new( int vectorSize, float sampleRate)
 {
   SignalList *previous;
   SignalList current, tmp;
@@ -66,13 +64,13 @@ Sig_new( int vectorSize)
     {
       s = current->s; 
       if ( s->length == vectorSize)
-		  {
-			 *previous = current->next;
-			 fts_heap_free((char *)current, signal_cell_heap);
-			 break;
-		  }
+	{
+	  *previous = current->next;
+	  fts_heap_free((char *)current, signal_cell_heap);
+	  break;
+	}
       else
-		  previous = &(current->next);
+	previous = &(current->next);
     }
 
   if ( !current)
@@ -86,7 +84,7 @@ Sig_new( int vectorSize)
 
   s->refcnt = 0;
   s->length = vectorSize;
-  s->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / ((double)DEFAULTVS/(double)vectorSize);
+  s->srate = sampleRate;
 
   tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
   tmp->s = s;
@@ -155,7 +153,7 @@ Sig_getById( int id)
     {
       s = current->s;
       if ( s->id == id)
-		  return s;
+	return s;
     }
   return 0;
 }
@@ -180,27 +178,12 @@ SignalList_free(SignalList *list)
   *list = 0;
 }
  
-static void
-Sig_setDefaultVectorSize(int vectorSize)
-{
-  vectorSize &= -MINVS;
-  if (vectorSize < 16)
-    vectorSize = DEFAULTVS;
-  /* 16 because cp_real.c can handle only integral multiple of dac
-     buffer size */
-  else if (vectorSize >= MAXVS)
-    vectorSize = MAXVS;
-  Sig_defaultVectorSize = vectorSize;
-}
-
-
 void
 Sig_setup( int vectorSize)
 {
   SignalList_free(&freeList);
   SignalList_free(&inUseList);
   Sig_count = 0;
-  Sig_setDefaultVectorSize( vectorSize);
 }
 
 int
@@ -214,7 +197,6 @@ Sig_check( void )
 {
   return 1;
 }
-
 
 void Sig_init(void)
 {

@@ -113,6 +113,7 @@ static void fts_kernel_config(void)
 
   /* RUNTIME modules */
 
+  fts_install_module( &fts_time_module);     /* the fts time module */
   fts_install_module( &fts_sched_module);    /* the fts scheduler module */
   fts_install_module( &fts_dev_module);      /* the device support  system */
   fts_install_module( &fts_midi_module);     /* the fts MIDI system */

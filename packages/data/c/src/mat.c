@@ -41,7 +41,6 @@ typedef struct
 {
   fts_object_t ob;
   matrix_t *mat; /* atom matrix */
-  fts_atom_t buf;
 } mat_t;
 
 static void
@@ -51,8 +50,6 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->mat = matrix_create(ac - 1, at + 1);
   matrix_refer(this->mat);
-
-  fts_set_void(&this->buf);
 }
 
 static void

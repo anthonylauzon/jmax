@@ -11,12 +11,12 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
@@ -29,38 +29,7 @@
 
 /********************************
  *
- *   gensampname utility
- *
- */
-
-static void
-gensampname(char *buf, const char *base, long int n)
-{
-  char b2[30];
-  char *s = b2+29;
-  *s = 0;
-
-  if (n < 0)
-    n = 0;
-
-  while ((*buf = *base++))
-    buf++;
-
-  if (!n)
-    *(--s) = '0';
-  else while (n)
-    {
-      *(--s) = '0' + (n%10);
-      n /= 10;
-    }
-  while ((*buf++ = *s++))
-    ;
-}
-
-
-/********************************
- *
- *   catch~
+ * catch~
  *
  */
 
@@ -77,8 +46,8 @@ struct sigcatch_t
 {
   fts_object_t _o;
   fts_symbol_t sym;
-
-  float samps[MAXVS];
+  float *buf;
+  int n_tick;
 };
 
 
@@ -118,21 +87,30 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sigcatch_t *this = (sigcatch_t *)o;
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-
-  fts_vecx_fzero(this->samps, MAXVS);
-
-  if (fts_dsp_get_output_size(dsp, 0) == 64)
+  int n_tick = fts_dsp_get_output_size(dsp, 0);
+ 
+  if(n_tick != this->n_tick)
     {
-      fts_set_symbol(argv,   fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr   (argv+1, this->samps);
+      if(this->buf)
+	fts_free(this->buf);
+
+      this->buf = fts_malloc(sizeof(float) * n_tick);
+    }
+
+  fts_vecx_fzero(this->buf, n_tick);
+
+  if (n_tick == 64)
+    {
+      fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ptr(argv+1, this->buf);
 
       dsp_add_funcall(sigcatch_64_function, 2, argv);
     }
   else
     {
-      fts_set_symbol(argv,   fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr   (argv+1, this->samps);
-      fts_set_long  (argv+2, fts_dsp_get_output_size(dsp, 0));
+      fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ptr(argv+1, this->buf);
+      fts_set_int(argv+2, n_tick);
 
       dsp_add_funcall(sigcatch_function, 3, argv);
     }
@@ -158,6 +136,9 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       fts_set_ptr(&a, this);
       fts_hash_table_insert(&catch_table, this->sym, &a);
     }
+
+  this->buf = 0;
+  this->n_tick = 0;
 
   dsp_list_insert(o);
 }
@@ -188,18 +169,18 @@ sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigcatch_delete, 0, a);
 
-  a[0] = fts_s_ptr;  
+  a[0] = fts_s_ptr; 
   fts_method_define(cl, fts_SystemInlet, fts_s_put, sigcatch_put, 1, a);
-  
+ 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
-  
+ 
   sigcatch_function = fts_new_symbol("sigcatch");
   dsp_declare_function(sigcatch_function, sigcatch_dsp_fun);
 
   sigcatch_64_function = fts_new_symbol("sigcatch_64");
   dsp_declare_function(sigcatch_64_function, sigcatch_64_dsp_fun);
-  
+ 
   return fts_Success;
 }
 
@@ -214,7 +195,7 @@ sigcatch_config(void)
 
 /********************************
  *
- *   throw~
+ * throw~
  *
  */
 
@@ -227,14 +208,14 @@ typedef struct
   fts_object_t _o;
   fts_symbol_t sym;
   ftl_data_t ftl_data;
-  int rec_prot;			/* housekeeping for dead code elimination */
+  int rec_prot;   /* housekeeping for dead code elimination */
 } sigthrow_t;
 
 
 static void
 sigthrow_dsp_fun(fts_word_t *argv)
 {
-  float * restrict in  = (float *)fts_word_get_ptr(argv);
+  float * restrict in = (float *)fts_word_get_ptr(argv);
   float * restrict p = *((float **)fts_word_get_ptr(argv+1));
   int n = fts_word_get_long(argv+2);
 
@@ -251,7 +232,7 @@ sigthrow_dsp_fun(fts_word_t *argv)
 static void
 sigthrow_dsp_64_fun(fts_word_t *argv)
 {
-  float * restrict in  = (float *)fts_word_get_ptr(argv);
+  float * restrict in = (float *)fts_word_get_ptr(argv);
   float * restrict p = *((float **)fts_word_get_ptr(argv+1));
 
   if (p)
@@ -274,14 +255,14 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   /* look here for the corresponing catch buffer, to eliminate
      instantiation order dependency between catch~ and throw~.
-   */
+  */
 
   if (fts_hash_table_lookup(&catch_table, this->sym, &a))
     {
       sigcatch_t *sigc = (sigcatch_t *) fts_get_ptr(&a);
-      float *samps = sigc->samps;
+      float *buf = sigc->buf;
 
-      ftl_data_copy(float *, this->ftl_data, &samps);
+      ftl_data_copy(float *, this->ftl_data, &buf);
     }
   else
     {
@@ -290,14 +271,14 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       ftl_data_copy(float *, this->ftl_data, &zerop);
     }
 
-  fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
-  fts_set_ftl_data   (argv+1, this->ftl_data);
+  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+  fts_set_ftl_data (argv+1, this->ftl_data);
 
   if (fts_dsp_get_input_size(dsp, 0) == 64)
     dsp_add_funcall(sigthrow_64_function, 2, argv);
   else
     {
-      fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0));
+      fts_set_long (argv+2, fts_dsp_get_input_size(dsp, 0));
       dsp_add_funcall(sigthrow_function, 3, argv);
     }
 }
@@ -314,9 +295,9 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   if (fts_hash_table_lookup(&catch_table, s, &a))
     {
       sigcatch_t *c = (sigcatch_t *) fts_get_ptr(&a);
-      float *samps = c->samps;
+      float *buf = c->buf;
 
-      ftl_data_copy(float *, this->ftl_data, &samps);
+      ftl_data_copy(float *, this->ftl_data, &buf);
     }
   else
     {
@@ -341,12 +322,13 @@ sigthrow_print(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 static void
 sigthrow_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  char buf[30];
-  fts_atom_t a;
+  int n = fts_get_int(at);
+  char str[] = "catch999999";
+  fts_atom_t a[1];
 
-  gensampname(buf, "catch", fts_get_long(at));
-  fts_set_symbol(&a, fts_new_symbol_copy(buf));
-  sigthrow_set(o, winlet, s, 1, &a);
+  sprintf(str + 5, "%d", n);
+  fts_set_symbol(a, fts_new_symbol_copy(str));
+  sigthrow_set(o, winlet, s, 1, a);
 }
 
 static void
@@ -373,7 +355,7 @@ sigthrow_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 }
 
 /* Daemon to know if throw is a dsp sink; it look for the throw, and
-   ask him */
+ ask him */
 
 #ifdef _NOT_YET_IMPLEMENTED
 static fts_atom_t *
@@ -382,7 +364,7 @@ throw_is_dsp_sink_get_daemon(fts_object_t *obj, fts_symbol_t property)
   sigthrow_t *this = (sigthrow_t *)obj;
 
   if (this->rec_prot)
-    return 0;			/* recursive search protection */
+    return 0;   /* recursive search protection */
   else
     {
       sigcatch_t *sigc;
@@ -392,7 +374,7 @@ throw_is_dsp_sink_get_daemon(fts_object_t *obj, fts_symbol_t property)
 	  fts_atom_t *a;
 
 	  this->rec_prot = 1;
-	  a =  fts_object_get_prop((fts_object_t *) sigc, property);
+	  a = fts_object_get_prop((fts_object_t *) sigc, property);
 	  this->rec_prot = 0;
 
 	  return a;
@@ -416,15 +398,15 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigthrow_delete, 0, a);
 
-  a[0] = fts_s_ptr;  
+  a[0] = fts_s_ptr; 
   fts_method_define(cl, fts_SystemInlet, fts_s_put, sigthrow_put, 1, a);
 
   a[0] = fts_s_symbol;
   fts_method_define_optargs(cl, 0, fts_s_print, sigthrow_print, 1, a, 0);
-  
+ 
   a[0] = fts_s_symbol;
   fts_method_define(cl, 0, fts_s_set, sigthrow_set, 1, a);
-  
+ 
   a[0] = fts_s_int;
   fts_method_define(cl, 0, fts_s_int, sigthrow_int, 1, a);
 
@@ -435,7 +417,7 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
      catch, and ask him: do not work with dinamic dispatching of the throw;
      we can use it only if we know that the throw do not switch targets
      dynamically ... we can know it by testing the existance of a control input.
-     */
+  */
 
   /* fts_class_add_get_daemon(cl, fts_s_dsp_is_sink, throw_is_dsp_sink_get_daemon); */
 

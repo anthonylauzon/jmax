@@ -89,14 +89,7 @@ extern fts_module_t fts_dev_module;
 
 struct _fts_dev_class;
 
-/* temporarly, we define here the bigger vector size a 
-   signal device can handle */
-
-#define MAXVS  64
-
 /* The device structure */
-
-
 typedef struct _fts_dev
 {
   struct _fts_dev_class *dev_class;

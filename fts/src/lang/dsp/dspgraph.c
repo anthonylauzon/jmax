@@ -31,15 +31,16 @@
 #include "lang/ftl.h"
 #include "lang/dsp.h"
 #include "gphiter.h"
-/* (fd) For post */
-#include "runtime/files.h"
 
+#include "runtime/files.h"
+#include "runtime/sched.h"
+#include "runtime/time.h"
 
 extern void fts_audio_add_unused_zero_fun(void);
 extern void fts_audio_activate_devices(void);
 extern void fts_audio_deactivate_devices(void);
 extern void fts_audio_add_all_zero_fun(void);
-extern float fts_sched_get_tick_length(void);
+extern double fts_sched_get_tick_duration(void);
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -212,11 +213,13 @@ static dsp_node_t *dsp_list_lookup(fts_object_t *o)
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
+static int 
+dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 {
   int i, invs = -1;
   dsp_signal **iop;
   fts_atom_t a;
+  float sr;
   int size;
 
   /*
@@ -240,7 +243,7 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
       }
 
   if (invs < 0) 
-    invs = DEFAULTVS;
+    invs = fts_get_tick_size();
 
   fts_object_get_prop(o, fts_s_dsp_downsampling, &a);
 
@@ -266,20 +269,22 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
   /* Output signals are assigned only when the output have at least
      one connection to a dsp object.
    */
-  for (i = 0, iop = descr->out; i< descr->noutputs; i++, iop++)
+  sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)size / fts_get_tick_size();
+
+  for (i=0, iop=descr->out; i< descr->noutputs; i++, iop++)
     {
       /* TO BE CHANGED USING Inlet and outlet properties !!! */
-      *iop = Sig_new(size);
+      *iop = Sig_new(size, sr);
     }
 
   sig_zero->length = invs;
-
-  sig_zero->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / ((double)DEFAULTVS/(double)size);
+  sig_zero->srate = sr;
 
   return 1;
 }
 
-static void dsp_object_schedule(dsp_node_t *node)
+static void 
+dsp_object_schedule(dsp_node_t *node)
 {
   dsp_signal **sig;
   fts_atom_t a;
@@ -550,6 +555,8 @@ static void dsp_pred_count( dsp_node_t *graph)
 
 static void dsp_chain_create_start(int vs)
 {
+  float sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)vs / fts_get_tick_size();
+
   /* ask ftl to start memory relocation */
   ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
 
@@ -565,7 +572,7 @@ static void dsp_chain_create_start(int vs)
 
   Sig_setup(vs);
 
-  sig_zero = Sig_new(DEFAULTVS);
+  sig_zero = Sig_new(fts_get_tick_size(), sr);
 
   dsp_graph_reinit( dsp_graph);
 
@@ -654,7 +661,7 @@ static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t
       on = fts_get_int(value);
 
       if (on)
-	dsp_chain_create(fts_param_get_float(fts_s_vector_size, DEFAULTVS));
+	dsp_chain_create(fts_get_tick_size());
       else
 	dsp_chain_delete();
     }
@@ -672,6 +679,8 @@ fts_object_t *dsp_get_current_object()
 /* exported, must be redone each time a new out device is installed */
 void dsp_make_dsp_off_chain(void)
 {
+  int vs = fts_get_tick_size();
+  float sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)vs / fts_get_tick_size();
   ftl_program_t *tmp;
 
   if (dsp_chain_off)
@@ -687,12 +696,11 @@ void dsp_make_dsp_off_chain(void)
 
   ftl_program_set_current_subroutine( dsp_chain_on, ftl_program_add_main( dsp_chain_on));
 
-  Sig_setup(DEFAULTVS);
+  Sig_setup(fts_get_tick_size());
 
-  sig_zero = Sig_new(DEFAULTVS);
+  sig_zero = Sig_new(vs, sr);
 
   /* add the zero calls for all the installed out device */
-
   fts_audio_add_all_zero_fun();
   ftl_program_add_return( dsp_chain_on);
   ftl_program_compile(dsp_chain_on);
@@ -861,8 +869,8 @@ void fts_dsp_chain_poll( void)
 	}
       else
 	{
-	  dsp_tick_clock += 1.0;
-	  dsp_ms_clock = dsp_tick_clock * fts_sched_get_tick_length();
+	  dsp_tick_clock += (double)1.0;
+	  dsp_ms_clock = dsp_tick_clock * fts_get_tick_duration();
 	}
     }
 
@@ -885,4 +893,3 @@ void dsp_compiler_init(void)
   
   fts_param_add_listener(fts_s_dsp_on, 0, dsp_on_listener);
 }
-

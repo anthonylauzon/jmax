@@ -356,9 +356,9 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
 
   /* Allocate the formatting buffers */
   if (aud->dac_open)
-    aud->dac_fmtbuf = (short *) fts_malloc( MAXVS * aud->nchannels * sizeof(short));
+    aud->dac_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * aud->nchannels * sizeof(short));
   if (aud->adc_open)
-    aud->adc_fmtbuf = (short *) fts_malloc( MAXVS * aud->nchannels * sizeof(short));
+    aud->adc_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * aud->nchannels * sizeof(short));
 
   return 0;
 }

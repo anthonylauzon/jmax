@@ -323,7 +323,7 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the DAC  formatting buffer */
 
-  dev_data->dac_fmtbuf = (float *) fts_malloc(MAXVS * dev_data->nch * sizeof(float));
+  dev_data->dac_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * dev_data->nch * sizeof(float));
 
   /* Install this device as dac slip check device;
      this means that if multiple sgidac device are opened, the
@@ -652,7 +652,7 @@ sgi_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the ADC  formatting buffer */
 
-  dev_data->adc_fmtbuf = (float *) fts_malloc(MAXVS * dev_data->nch * sizeof(float));
+  dev_data->adc_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * dev_data->nch * sizeof(float));
 
   return fts_Success;
 }
@@ -1304,7 +1304,7 @@ sgi_soundfile_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
       /* allocate the formatting buffer size and zero it */
 
-      dev_data->soundfile_fmtbuf = (short *)fts_malloc(MAXVS * dev_data->nch *sizeof(short));
+      dev_data->soundfile_fmtbuf = (short *)fts_malloc(fts_get_tick_size() * dev_data->nch *sizeof(short));
 
       /* Open the audio file  */
       /* should add check on the result !!! */

@@ -424,7 +424,7 @@ fts_audio_dev_set_input_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at)
   ldev->active = 1;
   ldev->device = dev;
   ldev->nchans = fts_sig_dev_get_nchans(dev);
-  ldev->vecsize = MAXVS;	/* should get it from the ADC !! */
+  ldev->vecsize = fts_get_tick_size();
 
   ldev->buffer = (float *) fts_malloc(sizeof(float) * ldev->vecsize * ldev->nchans);
 
@@ -553,7 +553,7 @@ fts_audio_dev_set_output_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at)
   ldev->active = 1;
   ldev->device = dev;
   ldev->nchans = fts_sig_dev_get_nchans(dev);
-  ldev->vecsize = MAXVS;	/* should get it from the ADC !! */
+  ldev->vecsize = fts_get_tick_size();
 
   ldev->buffer = (float *) fts_malloc(sizeof(float) * ldev->vecsize * ldev->nchans);
 

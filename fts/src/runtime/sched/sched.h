@@ -29,6 +29,28 @@
 
 #include "lang.h"
 
+extern fts_module_t fts_sched_module;
+
+/*****************************************************************************
+ *
+ *  ticks and msecs
+ *
+ */
+
+#define FTS_MIN_TICK_SIZE 8
+#define FTS_MAX_TICK_SIZE 512
+#define FTS_DEF_TICK_SIZE 64
+
+extern double fts_sched_msecs;
+extern double fts_sched_ticks;
+extern int fts_sched_tick_size;
+extern double fts_sched_tick_duration;
+
+#define fts_get_time_in_msecs() (fts_sched_msecs)
+#define fts_get_time_in_ticks() (fts_sched_ticks)
+#define fts_get_tick_size() (fts_sched_tick_size)
+#define fts_get_tick_duration() (fts_sched_tick_duration)
+
 /* 
    Description:
      The fts_sched_t abstraction contains all the data that are relevant for the
@@ -84,14 +106,6 @@ extern void fts_sched_remove_fd( fts_sched_t *sched, int fd);
 extern void fts_sched_run(void);
 extern void fts_halt(void);
 
-/* Tick length handling */
-extern float fts_sched_get_tick_length(void);
-
 extern void fts_sched_set_pause(int p);
-
-/**
- * The sched module
- */
-extern fts_module_t fts_sched_module;
 
 #endif

@@ -320,7 +320,7 @@ static fts_status_t hammerfall_dac_open(fts_dev_t *dev, int nargs, const fts_ato
      we don't do it, because we can set it with the rme ctrl program, 
      and anyhow I don't know if the ioctls are implemented correctly. */
 
-  aud->dac_fmtbuf = (short *) fts_malloc( MAXVS* HAMMERFALL_SAMPLEWIDTH );
+  aud->dac_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * HAMMERFALL_SAMPLEWIDTH);
 
   fts_dev_set_device_data(dev, aud);
 
@@ -541,7 +541,7 @@ static fts_status_t hammerfall_adc_open(fts_dev_t *dev, int nargs, const fts_ato
      we don't do it, because we can set it with the rme ctrl program, 
      and anyhow I don't know if the ioctls are implemented correctly. */
 
-  aud->adc_fmtbuf = (short *) fts_malloc( MAXVS * HAMMERFALL_SAMPLEWIDTH);
+  aud->adc_fmtbuf = (short *) fts_malloc(fts_get_tick_size() * HAMMERFALL_SAMPLEWIDTH);
 
   fts_dev_set_device_data(dev, aud);
 

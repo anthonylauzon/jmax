@@ -123,11 +123,7 @@ dac_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fts_atom_t a;
 
-  if (ac > 0)
-    fts_param_set(fts_s_vector_size, at);
-
   /* Switch off if already on, before switching on again */
-
   if (fts_param_get_int(fts_s_dsp_on, 0))
     fts_param_set_int(fts_s_dsp_on, 0);
 
@@ -379,9 +375,7 @@ dac_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if (ninlets > 0)
     {
-      a[0] = fts_s_int;
-      fts_method_define_optargs(cl, 0, fts_new_symbol("start"), dac_start, 1, a, 0);
-
+      fts_method_define(cl, 0, fts_new_symbol("start"), dac_start, 0, 0);
       fts_method_define(cl, 0, fts_new_symbol("stop"), dac_stop, 0, 0);
     }
 
@@ -491,11 +485,7 @@ adc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 adc_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (ac > 0)
-    fts_param_set(fts_s_vector_size, at);
-
   /* Switch off if already on, before switching on again */
-
   if (fts_param_get_int(fts_s_dsp_on, 0))
     fts_param_set_int(fts_s_dsp_on, 0);
 
@@ -508,14 +498,12 @@ adc_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   fts_param_set_int(fts_s_dsp_on, 0);
 }
 
-
 static void
 adc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigadc_t *this = (sigadc_t *)o;
-  int i;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-
+  int i;
 
   if (! fts_audio_input_device_is_active(this->ldev))
     {
@@ -690,9 +678,8 @@ adc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_put, adc_put, 1, a);
 
   a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("start"), adc_start, 1, a, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("stop"), (fts_method_t)adc_stop, 0, a);
+  fts_method_define(cl, 0, fts_new_symbol("start"), adc_start, 0, 0);
+  fts_method_define(cl, 0, fts_new_symbol("stop"), adc_stop, 0, a);
 
   for (i = 0; i < noutlets; i++)
     dsp_sig_outlet(cl, i);

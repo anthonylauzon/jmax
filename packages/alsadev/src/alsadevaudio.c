@@ -98,7 +98,7 @@ static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   /* Device data settings */
   data->n_voices = n_voices;
   data->bytes_count = 0;
-  data->fmtbuf = (short *)fts_malloc( MAXVS * n_voices * sizeof( short));
+  data->fmtbuf = (short *)fts_malloc(fts_get_tick_size() * n_voices * sizeof( short));
 
   fts_dev_set_device_data( dev, data);
 
@@ -302,7 +302,7 @@ static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   /* Device data settings */
   data->n_voices = n_voices;
   data->bytes_count = 0;
-  data->fmtbuf = (short *)fts_malloc( MAXVS * n_voices * sizeof( short));
+  data->fmtbuf = (short *)fts_malloc(fts_get_tick_size() * n_voices * sizeof( short));
 
   fts_dev_set_device_data( dev, data);
 

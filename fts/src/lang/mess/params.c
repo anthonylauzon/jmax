@@ -85,7 +85,6 @@ void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *au
   int value_not_changed = 0;
 
   /* First, check if there, otherwise add it */
-
   for (p = param_list; p ; p = p->next)
     if (p->name == name)
       {
@@ -97,7 +96,6 @@ void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *au
   if (! p)
     {
       /* Not found, allocate a new one */
-
       p = (fts_param_t *) fts_heap_alloc(param_heap);
       p->name  = name;
       p->value = *value;
@@ -131,8 +129,7 @@ const fts_atom_t *fts_param_get(fts_symbol_t name)
    */
 
 
-void fts_param_add_listener(fts_symbol_t name, void *listener,
-			    fts_param_listener_fun_t listener_fun)
+void fts_param_add_listener(fts_symbol_t name, void *listener, fts_param_listener_fun_t listener_fun)
 {
   fts_param_listener_t *p;
   fts_param_t *pp;
@@ -289,8 +286,3 @@ void fts_params_init()
   param_heap = fts_heap_new(sizeof(fts_param_t));
   param_listener_heap = fts_heap_new(sizeof(fts_param_listener_t));
 }
-
-
-
-
-

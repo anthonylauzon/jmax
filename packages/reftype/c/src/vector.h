@@ -53,8 +53,8 @@ extern vector_t *vector_new(int size);
 #define vector_fill(vec, a) (matrix_fill((matrix_t *)(vec), (a)))
 #define vector_set_from_atom_list(mx, x, ac, at) matrix_set_from_atom_list((matrix_t *)(mx), (x), (ac), (at))
 
-extern int vector_import_ascii(vector_t *vec, fts_symbol_t file_name);
-extern int vector_export_ascii(vector_t *vec, fts_symbol_t file_name);
+extern int vector_read_atom_file(vector_t *vec, fts_symbol_t file_name);
+extern int vector_write_atom_file(vector_t *vec, fts_symbol_t file_name);
 
 /* refdata */
 #define vector_get_constructor(ac, at) (reftype_get_constructor(vector_reftype, (ac), (at)))

@@ -41,7 +41,6 @@ typedef struct
 {
   fts_object_t ob;
   vector_t *vec; /* atom vector */
-  fts_atom_t buf;
 } vec_t;
 
 static void
@@ -51,8 +50,6 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->vec = vector_create(ac - 1, at + 1);
   vector_refer(this->vec);
-
-  fts_set_void(&this->buf);
 }
 
 static void
