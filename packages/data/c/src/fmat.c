@@ -477,26 +477,34 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 
 /* copy matrix row or col reference to an fvec */
 void
-fslice_copy(fslice_t *org, fvec_t *copy)
+fslice_copy_to_fvec(fslice_t *org, fvec_t *copy)
 {
-  fmat_t *orgmat = org->fmat;
-  float  *orgptr = fslice_get_ptr(org);
-  int     step   = fslice_get_stride(org);
-  int     size   = fslice_get_size(org);
-  int     i;
+    if (fslice_check_index(org))
+    {
+        fmat_t *orgmat = org->fmat;
+        float  *orgptr = fslice_get_ptr(org);
+        int     step   = fslice_get_stride(org);
+        int     size   = fslice_get_size(org);
+        int     i;
 
-  fmat_reshape(copy, size, 1);
+        fmat_reshape(copy, size, 1);
 
-  for (i = 0; i < size; i++)
-  {
-    copy->values[i] = *orgptr;
-    orgptr += step;
-  }
+        for (i = 0; i < size; i++)
+        {
+  	    copy->values[i] = *orgptr;
+	    orgptr += step;
+        }
 
-  copy->onset  = orgmat->onset;
-  copy->domain = orgmat->domain;
-  copy->sr     = orgmat->sr;
-  /* don't copy format from orgmat, since it's set to vector by fmat_reshape */
+        copy->onset  = orgmat->onset;
+        copy->domain = orgmat->domain;
+        copy->sr     = orgmat->sr;
+        /* don't copy format from orgmat, since it's set to vector by fmat_reshape */
+    }
+    else
+    {
+        /* slice index out of range: set copy empty */
+        fmat_reshape(copy, 0, 0);
+    }
 }
 
 

@@ -215,7 +215,7 @@ DATA_API fts_symbol_t frow_symbol;
 #define fslice_get_ptr(s) (((s)->type == fslice_row)? \
                            (fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat)): \
                            (fmat_get_ptr((s)->fmat) + (s)->index))
-                           
+
 #define fslice_get_stride(s) (((s)->type == fslice_row)? (1): (fmat_get_n((s)->fmat)))
 #define fslice_get_size(s) (((s)->type == fslice_row)? (fmat_get_n((s)->fmat)): (fmat_get_m((s)->fmat)))
 #define fslice_get_m(s) (((s)->type == fslice_row)? (1): (fmat_get_m((s)->fmat)))
@@ -242,6 +242,6 @@ DATA_API fts_symbol_t frow_symbol;
 /**
 * @ingroup fslice
  */
-DATA_API void fslice_copy(fslice_t *org, fvec_t *copy);
+DATA_API void fslice_copy_to_fvec(fslice_t *org, fvec_t *copy);
 
 #endif
