@@ -344,16 +344,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
    if (theString.equals("Open... Ctrl+O")) {
       Open();
     }
-   else if (theString.equals("Save Ctrl+S")) {
-     GetDocument().Save();
+   else if (theString.equals("Save  Ctrl+S")) {
+     Save();
      
    }
    else if (theString.equals("Save As...")) {
-     GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this, "Save As ", GetDocument().GetFile()));
-     Save();
+     SaveAs();
    }
    else if (theString.equals("Close   Ctrl+W")) {
-     // MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
      Close();
    }
    else if (theString.equals("Print... Ctrl+P")) {
@@ -377,6 +375,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 
 
   public boolean Save(){return true;}//override this function if you want to save your content
+  public boolean SaveAs(){return true;}//override this function if you want to save your content
   public boolean ShouldSave(){return false;}//override this function if your data changed
   public boolean Close(){
     if(ShouldSave()){

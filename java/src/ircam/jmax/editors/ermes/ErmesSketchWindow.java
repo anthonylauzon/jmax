@@ -719,7 +719,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
-	return Save();
+	//return Save();
+	Save();
       }
       aDialog.dispose();
     }
@@ -748,19 +749,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     return !alreadySaved;
   }
 
-  public boolean Save() {
-    // first, tentative implementation:
-    // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
-    // we should RECEIVE this FILE, or contruct it when we load this document
-    FileOutputStream fs;
-    String oldTitle = getTitle();
-		
-    if (itsFile == null)
-      itsFile = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
-
-    if (itsFile == null)
-      return false;
-    
+  private boolean SaveBody(){
     setTitle(itsFile.getName());
 
     CreateFtsGraphics(this);
@@ -787,13 +776,38 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     alreadySaved = true;
     neverSaved = false;
-    
-    //if(!oldTitle.equals(itsTitle)){
-    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
-    //setTitle(itsTitle);
-    //}
     return true;
   }
+
+  public boolean Save() {
+    // first, tentative implementation:
+    // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
+    // we should RECEIVE this FILE, or contruct it when we load this document
+    String oldTitle = getTitle();
+		
+    if (itsFile == null)
+      itsFile = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
+
+    if (itsFile == null) return false;
+    
+    if(!SaveBody()) return false;
+    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
+    return true;
+  }
+
+  public boolean SaveAs() {
+    String oldTitle = getTitle();
+		
+    itsFile = null;
+    itsFile = MaxFileChooser.chooseFileToSave(this, "Save As");
+
+    if (itsFile == null) return false;
+    
+    if(!SaveBody()) return false;
+    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
+    return true;
+  }
+
 
   private void  CloseAllSubWindows(){
     ErmesObject aObject;
