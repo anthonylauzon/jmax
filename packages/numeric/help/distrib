@@ -1,5 +1,5 @@
-all 	all	ftab.help.jmax
-all 	all	itab.help.jmax
+all 	all	fvec.help.jmax
+all 	all	ivec.help.jmax
 all 	all	nsplit.help.jmax
 all 	all	numeric.help.index.tcl
 all 	all	numeric.summary.jmax
