@@ -28,14 +28,17 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: ac_prog_javac.m4,v 1.2 2000/07/19 13:03:32 simons Exp $
+dnl @version $Id: ac_prog_javac.m4,v 1.1 2001/09/07 16:27:53 dechelle Exp $
 dnl
+
+dnl Patrice Tisserand 2003-07-24
+dnl Since jMax can't compile with gcj, I have remove gcj from the list of checked java compiler
 AC_DEFUN([AC_PROG_JAVAC],[
 AC_REQUIRE([AC_EXEEXT])dnl
 if test "x$JAVAPREFIX" = x; then
-        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT)
+        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT guavac$EXEEXT jikes$EXEEXT)
 else
-        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT, $JAVAPREFIX)
+        test "x$JAVAC" = x && AC_CHECK_PROGS(JAVAC, javac$EXEEXT guavac$EXEEXT jikes$EXEEXT, $JAVAPREFIX)
 fi
 test "x$JAVAC" = x && AC_MSG_ERROR([no acceptable Java compiler found in \$PATH])
 AC_PROG_JAVAC_WORKS
