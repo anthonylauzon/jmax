@@ -110,10 +110,10 @@ wavetable_make_cos(void)
   if (! cos_table)
     return (0);
 
-  for (i = 0; i < WAVE_TAB_SIZE; i++)
+  for (i=0; i<WAVE_TAB_SIZE; i++)
     cos_table[i].value = cos(i * (2 * 3.141593f / WAVE_TAB_SIZE));
 
-  for (i = 0; i < WAVE_TAB_SIZE; i++)
+  for (i=0; i<WAVE_TAB_SIZE; i++)
     cos_table[i].slope = (cos_table[(i + 1) & (WAVE_TAB_SIZE - 1)].value - cos_table[i].value);
 
   return (1);

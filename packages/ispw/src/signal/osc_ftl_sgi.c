@@ -262,7 +262,7 @@ osc_ftl_fun_freq(fts_word_t *argv)
       int index = fts_intphase_get_index(phi, WAVE_TAB_BITS);
       float frac = fts_intphase_get_frac(phi, WAVE_TAB_BITS);
 
-      out[i] = tab[index].value + cos_table[index].slope * frac;
+      out[i] = tab[index].value + tab[index].slope * frac;
 
       phi = fts_intphase_wrap(phi + (fts_intphase_t)(incr * freq[i]));
     }
@@ -287,7 +287,7 @@ osc_ftl_fun_freq_inplace(fts_word_t *argv)
       float frac = fts_intphase_get_frac(phi, WAVE_TAB_BITS);
       float this_incr = incr * sig[i];
 
-      sig[i] = tab[index].value + cos_table[index].slope * frac;
+      sig[i] = tab[index].value + tab[index].slope * frac;
 
       phi = fts_intphase_wrap(phi + (fts_intphase_t)(this_incr));
     }
