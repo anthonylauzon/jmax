@@ -1,3 +1,10 @@
+2003-08-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/template.c (fts_template_make_instance): fixed cyclic definition crash in template. (quick hack)
+
+	* fts/package.c (fts_package_require): fixed cyclic dependency crash in package requiremenet (quick hack).
+
+	
 2003-07-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/package.c (fts_package_load): fixed bug "[ 777046 ] No error if a symbol is missing in a library"
