@@ -370,5 +370,3 @@ sgimidiport_config(void)
 
   fts_class_install(fts_new_symbol("sgimidiport"), sgimidiport_instantiate);
 }
-
-fts_module_t midisgi_module = {"midisgi", "SGI MIDI classes", sgimidiport_config, 0, 0};

@@ -35,14 +35,12 @@
 /*                                                                            */
 /******************************************************************************/
 
-static void sgidev_init(void);
-
-fts_module_t sgidev_module = {"sgidev", "SGI devices", sgidev_init, 0, 0};
-
 static void sgidev_init( void)
 {
   sgi_audio_init();
   sgi_midi_init();
   shmdev_init();
+  sgimidiport_config();
 }
 
+fts_module_t sgidev_module = {"sgidev", "SGI devices", sgidev_init, 0, 0};

@@ -28,4 +28,5 @@ sgiaudiodev.c	\
 shmdev.c	\
 sgidev.c	\
 sgimididev.c	\
+sgimidiport.c	\
 

@@ -867,7 +867,8 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_fvec_init_number);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, binop_fvec_delete_number);
-      fts_method_define_varargs(cl, 1, float_vector_symbol, binop_fvec_set_right_number);
+      fts_method_define_varargs(cl, 1, fts_s_int, binop_fvec_set_right_number);
+      fts_method_define_varargs(cl, 1, fts_s_float, binop_fvec_set_right_number);
     }
   else
     {
