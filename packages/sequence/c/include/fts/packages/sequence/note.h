@@ -44,7 +44,8 @@ enum scoob_type_enum
   scoob_note = 0,
   scoob_interval,
   scoob_rest,
-  scoob_trill
+  scoob_trill,
+  scoob_unvoiced
 };
 
 extern fts_class_t *scoob_class;

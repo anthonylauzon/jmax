@@ -42,6 +42,7 @@ extern fts_symbol_t seqsym_note;
 extern fts_symbol_t seqsym_interval;
 extern fts_symbol_t seqsym_rest;
 extern fts_symbol_t seqsym_trill;
+extern fts_symbol_t seqsym_unvoiced;
 extern fts_symbol_t seqsym_midi;
 extern fts_symbol_t seqsym_seqmess;
 extern fts_symbol_t seqsym_bar;

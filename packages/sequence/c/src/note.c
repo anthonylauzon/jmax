@@ -81,6 +81,9 @@ scoob_post_function(fts_object_t *o, fts_bytestream_t *stream)
     case scoob_trill:
       fts_spost(stream, "<scoob trill %g %g %g", self->pitch, self->interval, self->duration);
       break;
+    case scoob_unvoiced:
+      fts_spost(stream, "<scoob unvoiced %g", self->duration);
+      break;
     default:
       fts_spost(stream, "<scoob %s %g %g %g", fts_symbol_name(self->type), self->pitch, self->interval, self->duration);
       break;
@@ -405,10 +408,10 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, scoob_set);
   fts_class_message(cl, fts_s_set, cl, scoob_set_from_scoob);
   
-  fts_class_doc(cl, seqsym_scoob, "[<'note'|'interval'|'rest'|'trill': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "score object");
-  fts_class_doc(cl, fts_s_set, "[<'note'|'interval'|'rest'|'trill': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "set sccob");
+  fts_class_doc(cl, seqsym_scoob, "[<'note'|'interval'|'rest'|'trill'|'unvoiced': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "score object");
+  fts_class_doc(cl, fts_s_set, "[<'note'|'interval'|'rest'|'trill'|'unvoiced': type> [<num: pitch> [<num: interval> [<num: duration>]]]]", "set sccob");
   fts_class_doc(cl, fts_s_set, "<scoob: other>", "set from scoob instance");
-  fts_class_doc(cl, seqsym_type, "[<'note'|'interval'|'rest'|'trill': type>]", "get/set score object type");
+  fts_class_doc(cl, seqsym_type, "[<'note'|'interval'|'rest'|'trill'|'unvoiced': type>]", "get/set score object type");
   fts_class_doc(cl, seqsym_pitch, "[<num: pitch>]", "get/set pitch as (float) MIDI note number");
   fts_class_doc(cl, seqsym_interval, "[<num: interval>]", "get/set interval in (float) MIDI note numbers");
   fts_class_doc(cl, seqsym_duration, "[<num: duration>]", "get/set duration in msecs");
@@ -792,6 +795,7 @@ scoob_config(void)
   enumeration_add_name(scoob_type_enumeration, seqsym_interval);
   enumeration_add_name(scoob_type_enumeration, seqsym_rest);
   enumeration_add_name(scoob_type_enumeration, seqsym_trill);
+  enumeration_add_name(scoob_type_enumeration, seqsym_unvoiced);
   
   enumeration_add_name(scomark_type_enumeration, seqsym_tempo);
   enumeration_add_name(scomark_type_enumeration, seqsym_cue);

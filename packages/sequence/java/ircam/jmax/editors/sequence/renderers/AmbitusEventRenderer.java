@@ -150,7 +150,31 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 		g.drawLine(x + length - 1, y, x + length - 1, y + height - 1);
 		g.fillRect(x , y + height/2 - 1, length, 3);
   }
-	else
+	else if( type.equals("unvoiced"))
+  {		
+    Color col, bordCol;
+		switch(state)
+		{
+			default:
+			case Event.SELECTED:
+				col = restSelColor;
+				bordCol = Color.red;
+				break;
+			case Event.DESELECTED:
+				col = restColor;
+				bordCol = Color.black;
+				break;
+			case Event.HIGHLIGHTED:
+				col = restHighlightColor;
+				bordCol = Color.green;
+        break;
+		}
+    g.setColor(col);
+    g.fillRect(x, y, length, height);
+    g.setColor(bordCol);
+    g.drawRect(x, y, length, height);
+  }
+  else
 		if(type.equals("note") && height > Adapter.NOTE_DEFAULT_HEIGTH) // note with Ambitus 
 		{
 			Color col, bordCol, noteCol;
@@ -228,8 +252,8 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 				g.drawLine( x + 1 + d, y, x + 1 + (int)i, y + height);
 			}
 		}
-		else
-			if ( gc.getSelection().getModel() != gc.getDataModel()) 
+    else
+      if ( gc.getSelection().getModel() != gc.getDataModel()) 
 				g.drawRect(x, y, length, height);
 		else 
 			g.fillRect(x, y, length, height);    
