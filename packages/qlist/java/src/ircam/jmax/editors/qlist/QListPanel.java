@@ -15,15 +15,23 @@ public class QListPanel extends JPanel implements ActionListener {
   //QList itsQList;
   FtsAtomList itsAtomList;
   TextArea itsTextArea;
-  Button itsSendButton;
-  
+  Button itsSetButton;
+  Button itsGetButton;
+
   public QListPanel(FtsAtomList theAtomList) { 
     super();
     itsTextArea = new TextArea(40, 40);
-    itsSendButton = new Button("Send");
+    Panel aPanel = new Panel();
+    itsSetButton = new Button("Set");
+    itsSetButton.addActionListener(this);
+    itsGetButton = new Button("Get");
+    itsGetButton.addActionListener(this);
+    aPanel.add(itsSetButton);
+    aPanel.add(itsGetButton);
 
     setLayout(new BorderLayout());
-    add("North", itsSendButton);
+    add("North", aPanel);
+
     add("Center", itsTextArea);
     validate();
     itsAtomList = theAtomList;
@@ -36,8 +44,14 @@ public class QListPanel extends JPanel implements ActionListener {
   }
  
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == itsSendButton)
+    if (e.getSource() == itsSetButton) {
       itsAtomList.setValuesAsText(itsTextArea.getText());
+    }
+    else if (e.getSource() == itsGetButton) {
+      itsAtomList.forceUpdate();
+      fillContent(itsAtomList);
+      repaint(); //is it necessary?
+    }
   }
 
   public Dimension preferredSize() {
