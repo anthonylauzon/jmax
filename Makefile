@@ -166,6 +166,12 @@ dist:
 	)
 .PHONY: dist
 
+#
+# release
+# makes a final release
+#
+release: cvs-tag dist
+
 
 #
 # install
