@@ -21,6 +21,8 @@ JAR_DEP= \
 	ircam/jmax/editors/sequence/tools/classpackage.stamp \
 	ircam/jmax/editors/sequence/track/classpackage.stamp 
 
+CLEANFILES=$(JARFILE)
+
 $(JARFILE): $(JAR_DEP)	
 	if test -f $(JARFILE); then \
 		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` ; \
