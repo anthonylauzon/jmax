@@ -27,6 +27,8 @@
 #ifdef WIN32
 #include <windows.h>
 
+#include <common/config.h>
+
 int win_close(int socket)
 {
   int r;
@@ -1074,6 +1076,7 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_pipestream_t *this = (fts_pipestream_t *) o;
 #ifdef WIN32
   HANDLE _stdin, _stdout;
+  char stdoutLogFilename[1024];
 #else
   int _stdout;
 #endif
@@ -1113,7 +1116,16 @@ fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 #endif
 
   /* redirect stdout to a file */
-  _stdout = CreateFile("C:\\fts_stdout.txt", 
+  if(fts_config_get_log_dir()) {
+      strcpy(stdoutLogFilename, fts_config_get_log_dir());
+      strcat(stdoutLogFilename, "\\");
+      strcat(stdoutLogFilename, "fts_stdout.txt");
+  }
+  else {
+      strcpy(stdoutLogFilename, "C:\\fts_stdout.txt");
+  }
+  
+  _stdout = CreateFile(stdoutLogFilename, 
 		       GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
 		       FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
   if ((_stdout == INVALID_HANDLE_VALUE) 
