@@ -1,3 +1,17 @@
+2003-04-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* include/fts/predefsymbols.h: added fts_s_none ("none") and fts_s_noaudio ("noaudio") symbols
+
+	* fts/macosx.c, fts/liunx.c (fts_platform_init): added noaudio config, it doesn't load any "audio" packages.
+
+	* fts/fts.c (fts_load_project): 
+	(fts_load_config):
+	added none project, it doesn't load any project file.
+	added none config, it doesn't load any config file.
+
+	* packages/jack/c/src/jackaudiomanager.c: added non connected jMax to allow other applications to connect after 
+	launching jMax.
+	
 2003-04-02  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/fts.c (fts_kernel_init): added call to fts_kernel_socketstream_init
