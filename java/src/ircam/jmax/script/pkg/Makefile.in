@@ -72,25 +72,49 @@ PLATFORM = @PLATFORM@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-java_JAVA =  JMaxPackage.java JavaExtension.java PackageClassLoader.java PackageHandler.java Project.java
+EXTRA_DIST = package.html
+noinst_PROGRAMS = package
+package_SOURCES =  JMaxPackage.java JavaExtension.java PackageClassLoader.java PackageHandler.java Project.java
 
 
-JAVAC = @JAVAC@
-JAVAROOT = @top_srcdir@/java/src
-CLASSPATH_ENV = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+JAVACX = @JAVACX@
+JAVAROOTX = @top_srcdir@/java/src
+CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+
+SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-JAVACFLAGS = 
-DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
+PROGRAMS =  $(noinst_PROGRAMS)
+
+
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../../include
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+package_OBJECTS =  JMaxPackage.class JavaExtension.class \
+PackageClassLoader.class PackageHandler.class Project.class
+package_LDADD = $(LDADD)
+package_DEPENDENCIES = 
+package_LDFLAGS = 
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
+SOURCES = $(package_SOURCES)
+OBJECTS = $(package_OBJECTS)
+
 all: all-redirect
 .SUFFIXES:
+.SUFFIXES: .S .c .class .java .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --foreign java/src/ircam/jmax/script/pkg/Makefile
 
@@ -99,31 +123,44 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-mostlyclean-javaJAVA:
+mostlyclean-noinstPROGRAMS:
 
-clean-javaJAVA:
-	-rm *.class classjava.stamp
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 
-distclean-javaJAVA:
+distclean-noinstPROGRAMS:
 
-maintainer-clean-javaJAVA:
+maintainer-clean-noinstPROGRAMS:
 
-install-javaJAVA: classjava.stamp
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
-	done
+.s.o:
+	$(COMPILE) -c $<
 
-uninstall-javaJAVA:
-	@$(NORMAL_UNINSTALL)
-	for p in *.class; do \
-	  rm -f $(DESTDIR)$(javadir)/$$p; \
-	done
-classjava.stamp: $(java_JAVA)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
-	echo timestamp > classjava.stamp
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
 tags: TAGS
 TAGS:
 
@@ -159,59 +196,74 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-javaJAVA
+install-data-am:
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-javaJAVA
+uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile classjava.stamp
+all-am: Makefile $(PROGRAMS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(javadir)
 
 
 mostlyclean-generic:
-
-clean-generic:
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-javaJAVA mostlyclean-generic
+mostlyclean-am:  mostlyclean-noinstPROGRAMS mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-javaJAVA clean-generic mostlyclean-am
+clean-am:  clean-noinstPROGRAMS clean-compile clean-libtool \
+		clean-generic mostlyclean-am
 
 clean: clean-am
 
-distclean-am:  distclean-javaJAVA distclean-generic clean-am
+distclean-am:  distclean-noinstPROGRAMS distclean-compile \
+		distclean-libtool distclean-generic clean-am
 	-rm -f libtool
 
 distclean: distclean-am
 
-maintainer-clean-am:  maintainer-clean-javaJAVA maintainer-clean-generic \
-		distclean-am
+maintainer-clean-am:  maintainer-clean-noinstPROGRAMS \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: mostlyclean-javaJAVA distclean-javaJAVA clean-javaJAVA \
-maintainer-clean-javaJAVA uninstall-javaJAVA install-javaJAVA tags \
-distdir info-am info dvi-am dvi check check-am installcheck-am \
-installcheck install-exec-am install-exec install-data-am install-data \
-install-am install uninstall-am uninstall all-redirect all-am all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
+.PHONY: mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
+clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool tags distdir info-am info dvi-am \
+dvi check check-am installcheck-am installcheck install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+.java.class:
+	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
+
+package: $(package_OBJECTS) $(package_DEPENDENCIES)
+
+clean-compile:
+	rm -f *.class
+
+clean-generic:
+	rm -f *~
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

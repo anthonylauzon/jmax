@@ -62,7 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
-JAVAC = @JAVAC@
+JAVACX = @JAVACX@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -81,7 +81,7 @@ libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c OLDftsdata.c OLDpatcherdata.c OLDu
 bin_PROGRAMS = fts
 fts_SOURCES = main.c
 fts_LDADD = -L.libs -lfts -ldl -laudiofile -lm
-fts_LDFLAGS = -rpath @ABS_TOP_SRCDIR@/fts/.libs
+#fts_LDFLAGS=-rpath @ABS_TOP_SRCDIR@/fts/.libs
 
 INCLUDES = -I$(top_srcdir)/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -110,6 +110,7 @@ PROGRAMS =  $(bin_PROGRAMS)
 
 fts_OBJECTS =  main.o
 fts_DEPENDENCIES = 
+fts_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -143,7 +144,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu fts/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign fts/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -279,7 +280,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu fts/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign fts/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

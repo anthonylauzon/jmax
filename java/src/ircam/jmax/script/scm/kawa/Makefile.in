@@ -62,7 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
-JAVAC = @JAVAC@
+JAVACX = @JAVACX@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -79,6 +79,7 @@ CLASSPATH_ENV = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/classes:@top_s
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
+JAVAC = javac
 JAVACFLAGS = 
 JAVAROOT = $(top_builddir)
 DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
