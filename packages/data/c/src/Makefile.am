@@ -23,15 +23,20 @@ vec.c \
 dumpfile.c
 
 if MACOSX
-LINK=cc -bundle -undefined error -o $@
-# This should be normal use (twolevel_namespace, explicit library dependencies), but it does not work with libtool
-#XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/fts/.libs -lfts -L$(top_srcdir)/packages/utils/c/src/.libs -lutils
+# This causes libtool to issue a warning and not to produce the .so 
+XLDFLAGS= -no-undefined -module
+XLIBADD= -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
 
-# So we try flat_namespace 
-#XLDFLAGS= -module
-#XLIBADD= 
+# So we add this explicitely !!!
+all-local: .libs/libdata.so
+
+.libs/libdata.so: $(libdata_la_OBJECTS) $(libdata_la_DEPENDENCIES)
+	cc -bundle -undefined error -o .libs/libdata.so $(libdata_la_OBJECTS) $(XLIBADD) -lm -lc 
+
+install-data-local: .libs/libdata.so
+	$(INSTALL_DATA) .libs/libdata.so $(DESTDIR)$(packagedir)/libdata.so
 endif
+
 libdata_la_LDFLAGS=$(XLDFLAGS)
 libdata_la_LIBADD=$(XLIBADD)
 

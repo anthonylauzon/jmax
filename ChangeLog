@@ -1,3 +1,26 @@
+2002-03-08  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* fixed packages compilation problems on Mac OS X:
+Problem on Mac OS X with shared libraries:
+1) Apple has introduced starting at version 10.1 the "two-level namespace" that requires
+that shared libraries and "bundles" (shared libraries that can be dlopened()) do not have 
+unresolved symbols. This can be done by linking the bundle against the shared libraries
+that defines these symbols and passing flag "-no-undefined" to libtool
+2) libtool does not support correctly linking a shared library against other shared libraries
+that are not installed. This is known in libtool terms as "inter-library dependencies" and is not 
+supported by libtool until version 1.4
+
+The first trial was to add all the dependencies on other shared libraries. This did not work because
+of the libtool problem described above.
+
+The second trial was to pass flag -flat_namespace to the linker (flat_namespace libraries can
+have unresolved symbols). But libtool filters the options when linking (i.e. libtool --mode=link)
+and the flag -flat_namespace was not passed to the linker.
+
+The solution that seems to work is to add rules for colling explicitely the C compiler and to
+install the .so library that was produced.
+
+
 2002-03-05  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* porting of version 3.1 to Mac OS X: fixed automake problems, compilation problems

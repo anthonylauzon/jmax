@@ -65,8 +65,6 @@ powerpc-apple-darwin*)
     PLATFORM=macosx ;
     dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code)
     AC_DEFINE(restrict,)
-    dnl hope this is passed as is to ltconfig
-    CFLAGS="$CFLAGS -flat_namespace"
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 
