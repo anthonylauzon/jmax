@@ -12,6 +12,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
+#include "lang/datalib.h"
 #include "lang/mess/messP.h"
 
 /* "receive_list".  
@@ -25,6 +26,7 @@ typedef struct receive_list
   fts_symbol_t name;
 
   struct receive *first_receive;
+  struct send *first_send;
 } receive_list_t;
 
 /* The send object */
@@ -34,6 +36,7 @@ typedef struct send
   fts_object_t  o;
 
   receive_list_t *receive_list;
+  struct send *next_send;
 } send_t;
 
 
@@ -43,8 +46,7 @@ typedef struct receive
 {
   fts_object_t  o;
 
-  fts_symbol_t name;
-
+  receive_list_t *receive_list;
   struct receive *next_receive;
 } receive_t;
 
@@ -137,35 +139,22 @@ static void fts_send_message_to_receive_list(receive_list_t *t, fts_symbol_t sel
   receive_t  *r;
 
   for (r = t->first_receive; r ; r = r->next_receive)
-    {
-      fts_outlet_send((fts_object_t *) r, 0, selector,  ac, at);
-    }
+    fts_outlet_send((fts_object_t *) r, 0, selector,  ac, at);
 }
 
 
-
 static void
-receive_list_add_receive(receive_t *r)
+receive_list_add_receive(receive_list_t *t, receive_t *r)
 {
-  /** Get a receive_list, Add the receive to its receive list,  return it*/
-
-  receive_list_t *t;
-
-  t = get_or_create_receive_list(r->name);
-
   r->next_receive = t->first_receive;
-
   t->first_receive = r;
 }
 
-static void
-receive_list_remove_receive(receive_t *r)
-{
-  /* Indirect precursor iteration */
-  receive_list_t *t;
-  receive_t **pr;
 
-  t = get_or_create_receive_list(r->name);
+static void
+receive_list_remove_receive(receive_list_t *t, receive_t *r)
+{
+  receive_t **pr;  /* Indirect precursor iteration */
 
   for (pr = &(t->first_receive); *pr ; pr = &((*pr)->next_receive))
     {
@@ -176,6 +165,46 @@ receive_list_remove_receive(receive_t *r)
 	  return;
 	}
     }
+}
+
+
+
+static void
+receive_list_add_send(receive_list_t *t, send_t *r)
+{
+  r->next_send = t->first_send;
+  t->first_send = r;
+}
+
+static void
+receive_list_remove_send(receive_list_t *t, send_t *r)
+{
+  /* Indirect precursor iteration */
+
+  send_t **pr;
+
+  for (pr = &(t->first_send); *pr ; pr = &((*pr)->next_send))
+    {
+      if (*(pr) == r)
+	{
+	  *(pr) = r->next_send;
+
+	  return;
+	}
+    }
+}
+
+static void
+receive_list_add_to_set(receive_list_t *t, fts_objectset_t *set)
+{
+  send_t     *s;
+  receive_t  *r;
+
+  for (r = t->first_receive; r ; r = r->next_receive)
+    fts_objectset_add(set, (fts_object_t *) r);
+
+  for (s = t->first_send; s ; s = s->next_send)
+    fts_objectset_add(set, (fts_object_t *) s);
 }
 
 /******************************************************************************/
@@ -205,6 +234,27 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   send_t *this = (send_t *) o;
 
   this->receive_list = get_or_create_receive_list(fts_get_symbol_arg(ac, at, 1, 0));
+  receive_list_add_send(this->receive_list, this);
+}
+
+
+static void
+send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  send_t *this = (send_t *) o;
+
+  this->receive_list = get_or_create_receive_list(fts_get_symbol_arg(ac, at, 1, 0));
+  receive_list_remove_send(this->receive_list, this);
+}
+
+
+static void
+send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  send_t *this = (send_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+
+  receive_list_add_to_set(this->receive_list, set);
 }
 
 
@@ -222,6 +272,9 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
   fts_method_define(cl, fts_SystemInlet, fts_s_init, send_init, 2, a);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, send_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
 
 
   fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
@@ -258,18 +311,27 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   receive_t *this = (receive_t *) o;
 
-  this->name = fts_get_symbol_arg(ac, at, 1, 0);
-
-  receive_list_add_receive(this);
+  this->receive_list = get_or_create_receive_list(fts_get_symbol_arg(ac, at, 1, 0));
+  receive_list_add_receive(this->receive_list, this);
 }
 
 
 static void
 receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  receive_t *receive = (receive_t *) o;
+  receive_t *this = (receive_t *) o;
 
-  receive_list_remove_receive(receive);
+  receive_list_remove_receive(this->receive_list, this);
+}
+
+
+static void
+receive_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  receive_t *this = (receive_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+
+  receive_list_add_to_set(this->receive_list, set);
 }
 
 
@@ -289,6 +351,8 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_init, receive_init, 2, a);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, receive_delete, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
 
   return fts_Success;
 }

@@ -348,7 +348,7 @@ patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 /* 
-   The find engine
+   The find engines
    */
 
 static void
@@ -358,6 +358,11 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
   fts_object_t *p;
   fts_status_t ret;
+
+  /* See if this should be added */
+
+  if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
+    fts_objectset_add(set, o);
 
   /* First, look if the objects in the patchers are to be found */
 
@@ -381,11 +386,40 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    {
 	      /* For error objects do the check */
 
-	      if (fts_atom_is_subsequence(p->argc, p->argv, ac - 1, at + 1))
+	      if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
 		fts_objectset_add(set, p);
 	    }
 	}
     }
+
+  /* First, do the recursive calls  */
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_standard_patcher(p) ||
+	  fts_object_is_template(p) ||
+	  fts_object_is_abstraction(p))
+	fts_send_message(p, winlet, s, ac, at);
+    }
+}
+
+/* 
+   The find engines
+   */
+
+static void
+patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_object_t *p;
+  fts_status_t ret;
+
+  /* First, look if the objects in the patchers are to be found */
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_error(p))
+      fts_objectset_add(set, p);
 
   /* First, do the recursive calls  */
 
@@ -562,6 +596,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, patcher_find);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_errors, patcher_find_errors);
 
   for (i = 0; i < ninlets; i ++)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);

@@ -166,6 +166,24 @@ void fts_objectset_remove(fts_objectset_t *set, fts_object_t *object)
       }
 }
 
+void fts_objectset_remove_all(fts_objectset_t *set)
+{
+  fts_objectset_cell_t *p;
+
+  if (fts_data_is_exported((fts_data_t *) set))
+    fts_data_remote_call((fts_data_t *) set, REMOTE_CLEAN, 0, 0);
+
+  p = set->head;
+  while (p)
+    {
+      fts_objectset_cell_t *cell;
+
+      cell = p;
+      p = p->next;
+      fts_objectset_cell_free(cell);
+    }
+  set->head = 0;
+}
 
 void fts_objectset_send_message(fts_objectset_t *set, int winlet, fts_symbol_t sel,
 				 int ac, const fts_atom_t *av)
@@ -176,14 +194,6 @@ void fts_objectset_send_message(fts_objectset_t *set, int winlet, fts_symbol_t s
     fts_send_message(p->object, winlet, sel, ac, av);
 }
 
-static void fts_objectset_upload_objects(fts_objectset_t *set)
-{
-  fts_objectset_cell_t *p;
-
-  for (p = set->head; p; p = p->next)
-    if (p->object->id == FTS_NO_ID)
-      fts_client_upload_object(p->object);
-}
 
 /********************************************************************/
 /*                                                                  */
@@ -250,6 +260,18 @@ fts_objectset_iterator_current(const fts_objectset_iterator_t *iter)
 /*                                                                  */
 /********************************************************************/
 
+/* utilities */
+
+static void fts_objectset_upload_objects(fts_objectset_t *set)
+{
+  fts_objectset_cell_t *p;
+
+  for (p = set->head; p; p = p->next)
+    if (p->object->id == FTS_NO_ID)
+      fts_client_upload_object(p->object);
+}
+
+
 /* Just a very limited version for now */
 
 
@@ -297,10 +319,12 @@ static void fts_objectset_find( fts_data_t *d, int ac, const fts_atom_t *at)
   fts_object_t *scope = fts_get_object(at);
   fts_atom_t a[256];
   int i;
+  
+  fts_objectset_remove_all(this);
 
   fts_set_data(&a[0], (fts_data_t *) this);
 
-  for (i = 1; i < ac; i++)
+  for (i = 1; (i < ac) && (i < 256); i++)
     a[i] = at[i];
 
   fts_send_message(scope, fts_SystemInlet, fts_s_find, ac, a);
@@ -310,30 +334,24 @@ static void fts_objectset_find_errors( fts_data_t *d, int ac, const fts_atom_t *
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_object_t *scope = fts_get_object(at);
-  fts_atom_t a[256];
-  int i;
+  fts_atom_t a[1];
+
+  fts_objectset_remove_all(this);
 
   fts_set_data(&a[0], (fts_data_t *) this);
-
-  for (i = 1; i < ac; i++)
-    a[i] = at[i];
-
-  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, ac, a);
+  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, 1, a);
 }
 
 static void fts_objectset_find_friends( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
-  fts_object_t *scope = fts_get_object(at);
-  fts_atom_t a[256];
-  int i;
+  fts_object_t *target = fts_get_object(at);
+  fts_atom_t a[1];
+
+  fts_objectset_remove_all(this);
 
   fts_set_data(&a[0], (fts_data_t *) this);
-
-  for (i = 1; i < ac; i++)
-    a[i] = at[i];
-
-  fts_send_message(scope, fts_SystemInlet, fts_s_find_friends, ac, a);
+  fts_send_message(target, fts_SystemInlet, fts_s_find_friends, 1, a);
 }
 
 

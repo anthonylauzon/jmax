@@ -40,6 +40,13 @@ public interface MaxDataEditor
    */
 
   abstract public void syncData();
+
+  /*
+   * Tell the editor to show a specif piece of data, here
+   * represented by a Java Object.
+   */
+
+  abstract public void showObject(Object object);
 }
 
 

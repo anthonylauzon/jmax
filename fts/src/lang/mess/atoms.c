@@ -132,7 +132,7 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
 {
   int i,j;
 
-  for (i = 0; i < (ac - sac); i++)
+  for (i = 0; i < (ac - sac + 1); i++)
     if (fts_atom_equal(&sav[0], &av[i]))
       {
 	/* Found the beginning, test the rest */

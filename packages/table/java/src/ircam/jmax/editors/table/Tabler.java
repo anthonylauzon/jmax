@@ -141,6 +141,11 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
    */
   public void dataChanged(Object reason){}
 
+
+  /** Nothing special to show */
+
+  public showObject(Object obj){}
+
   //end of the MaxDataEditor interface
 
 

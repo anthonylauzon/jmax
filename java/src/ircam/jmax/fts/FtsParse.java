@@ -3,6 +3,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.text.*;
 
+
 /**
  * This class implement a lexical analizer for object and message box
  * content; it is in the object layer
@@ -161,7 +162,7 @@ public class FtsParse
 	    (c == '*') || (c == '/') ||
 	    (c == '%') || 
 	    (c == '&') || (c == '|') ||
-	    (c == '^') || (c == '.') ||
+	    (c == '^') || 
 	    (c == '<') || (c == '>') ||
 	    (c == '!') || (c == '=') ||
 	    (c == '?') || (c == ':') ||
@@ -250,16 +251,19 @@ public class FtsParse
      Reconize tokens which are always tokens, i.e. tokens
      which end is predefined and do not depend on what follow.
 
-     ~ is suppressed
+     ~ and . suppressed
      */
 
   private boolean tryKeywords() throws java.io.IOException
   {
-    String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
+    // The order of this list is important
+
+    String keywords[] = { "+~", "-~", "*~", "/~", "inv+~", "inv*~",
+			  "+", "-", "*", "/", "%", "(", ")",
 			  "[", "]", "{", "}", ",", "^", "&&",
 			  "&", "||", "|", "==", "=", "!=", "!", ">=",
 			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
-			  ".", ";", "'" };
+			  ";", "'"};
 
     tryParse();
 
@@ -639,7 +643,7 @@ public class FtsParse
   {
     if (value instanceof String)
       {
-	String keywords[] = {")", "[", "]", "}", ",", ".", ";"};
+	String keywords[] = {")", "[", "]", "}", ",", ";"};
 
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -676,7 +680,7 @@ public class FtsParse
     if (value instanceof String)
       {
 	String keywords[] = { "(", "[", "{", "^", 
-			      "$", ".", "'" };
+			      "$", "'" };
 
 	for (int i = 0 ; i < keywords.length; i++)
 	  if (keywords[i].equals((String) value))
@@ -695,8 +699,8 @@ public class FtsParse
 			  "[", "]", "{", "}", ",", "^", "&&",
 			  "&", "||", "|", "==", "=", "!=", "!", ">=",
 			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
-			  ".", ";", "'" };
-
+			  ";", "'", "+~", "-~", "*~", "/~", "inv+~", "inv*~" };
+    
     for (int i = 0 ; i < keywords.length; i++)
       if (keywords[i].equals((String) value))
 	return true;
@@ -710,7 +714,7 @@ public class FtsParse
   {
     char chars[] = { '$', ',', '(', ')', '[', ']',
 		     '{', '}', '+', '-', '*', '/',
-		     '%', '&', '|', '^', '.',
+		     '%', '&', '|', '^',
 		     '<', '>', '!', '=', '?', ':',
 		     ';', '\'', '\t', ' ' };
 
@@ -724,7 +728,7 @@ public class FtsParse
 
   static String unparseObjectDescription(int offset, FtsMessage msg)
   {
-    boolean doNewLine = true;
+    boolean doNewLine = false;
     boolean addBlank = false;
     boolean noNewLine = false;
     Object value1 = null;
@@ -811,7 +815,7 @@ public class FtsParse
 
   static String simpleUnparseObjectDescription(int offset, FtsMessage msg)
   {
-    boolean doNewLine = true;
+    boolean doNewLine = false;
     boolean addBlank = false;
     boolean noNewLine = false;
     Object value1 = null;

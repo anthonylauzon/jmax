@@ -65,7 +65,6 @@ public class ErmesConnection implements ErmesDrawable{
       {
 	// ????????
 	System.out.println("Connection Error");
-	Toolkit.getDefaultToolkit().beep();
 	throw e;
       }
 

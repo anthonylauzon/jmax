@@ -871,6 +871,53 @@ public class FtsServer
       }
   }
 
+  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Object args[])
+  {
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendObject(object);
+
+	if (args != null)
+	  port.sendArray( args); // we may have zero args call
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, object, args)");
+      }
+  }
+
+
+  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Vector args)
+  {
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + ", " + object + ", " + args + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+	port.sendObject(object);
+
+	if (args != null)
+	  port.sendVector( args); // we may have zero args call
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, object, args)");
+      }
+  }
+
   /**
    * Sync point with FTS.
    * Send a ping message, and sychroniuosly

@@ -1,12 +1,14 @@
 package ircam.jmax.editors.ermes;
 
 import java.util.*;
+import java.awt.*;
 import java.awt.event.*;
 import com.sun.java.swing.*;
 import com.sun.java.swing.border.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
 
 class FindPanel extends JFrame {
@@ -73,14 +75,68 @@ class FindPanel extends JFrame {
 
     set = (FtsObjectSet) Fts.newRemoteData( "objectset_data", null);
 
+    objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
+      public void objectSelected(FtsObject object)
+	{
+	  try
+	    {
+	      Mda.edit(object.getParent().getData(), object);
+	    } 
+	  catch (MaxDocumentException e)
+	    {
+	    }
+	}
+    });
+    
     //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
+
+    // Finally, add the panel to the window manager, so it will appear
+    // in the Window menu (Should it ?????) MDC.
+
+    MaxWindowManager.getWindowManager().addWindow(this);
   }
 
   public void find()
   {
-    set.find( patcher, textField.getText());
+    String query;
+    Vector args;
+    Cursor temp = getCursor();
 
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+    query = textField.getText();
+    args = new Vector();
+    FtsParse.parseAtoms(query, args);
+
+    objectSetViewer.setModel( null);
+    set.find( patcher, args);
     objectSetViewer.setModel( set.getListModel());
+
+    setCursor(temp);
+  }
+
+  public void findErrors()
+  {
+    Cursor temp = getCursor();
+
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    objectSetViewer.setModel( null);
+    set.findErrors( patcher);
+    objectSetViewer.setModel( set.getListModel());
+
+    setCursor(temp);
+  }
+
+  public void findFriends(FtsObject object)
+  {
+    Cursor temp = getCursor();
+
+    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    objectSetViewer.setModel( null);
+    set.findFriends( object);
+    objectSetViewer.setModel( set.getListModel());
+
+    setCursor(temp);
   }
 
 

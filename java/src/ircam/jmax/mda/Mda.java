@@ -48,6 +48,15 @@ public class Mda
 
   public static MaxDataEditor edit(MaxData data) throws MaxDocumentException
   {
+    return edit(data, null);
+  }
+
+  /** Start an editor for a data, specifing an editor relative "focus" point 
+   * for the editor; something to show, select highlight, center in the screen,
+   * whatever; use the method "showObject" of the MaxDataEditor interface
+   */
+  public static MaxDataEditor edit(MaxData data, Object where) throws MaxDocumentException
+  {
     MaxDataEditor editor;
 
     /* First, check if there is already an editor for the data */
@@ -57,6 +66,9 @@ public class Mda
     if (editor != null)
       {
 	editor.reEdit();
+
+	if (where != null)
+	  editor.showObject(where);
 
 	return editor;
       }
@@ -73,6 +85,9 @@ public class Mda
 	if (factory.canEdit(data))
 	  {
 	    editor = factory.newEditor(data);
+
+	    if (where != null)
+	      editor.showObject(where);
 
 	    data.getDocument().addEditor(editor);
 	    dataEditorTable.put(data, editor);

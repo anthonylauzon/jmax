@@ -12,6 +12,7 @@ extern void fts_objectset_delete(fts_objectset_t *set);
 
 extern void fts_objectset_add(fts_objectset_t *set, fts_object_t *object);
 extern void fts_objectset_remove(fts_objectset_t *set, fts_object_t *object);
+extern void fts_objectset_remove_all(fts_objectset_t *set);
 
 extern int fts_objectset_have_member(fts_objectset_t *set, fts_object_t *object);
 

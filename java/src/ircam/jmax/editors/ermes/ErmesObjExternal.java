@@ -102,7 +102,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
       }
     catch (FtsException e)
       {
-	Toolkit.getDefaultToolkit().beep();
 	System.out.println("Cannot create object: " + itsArgs);
       }
 
@@ -124,7 +123,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
     catch (FtsException e)
       {
 	System.out.println("Error in redefining object, action cancelled");
-	Toolkit.getDefaultToolkit().beep();
 	restoreText();
 	ParseText(itsArgs);
       }

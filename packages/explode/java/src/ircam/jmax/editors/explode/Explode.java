@@ -93,6 +93,10 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
   }
 
 
+  public void showObject(Object object)
+  {
+  }
+
   /**
    * personalize the menubar
    */

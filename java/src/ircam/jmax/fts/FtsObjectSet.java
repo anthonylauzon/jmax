@@ -1,4 +1,4 @@
-bmespackage ircam.jmax.fts;
+package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
@@ -61,7 +61,7 @@ public class FtsObjectSet extends FtsRemoteData
 
 	size = msg.getNumberOfArguments();
 
-	for (int i = 0 ; i < size; i++)
+	for (int i = 0 ; i < size - 2; i++)
 	  list.addElement(msg.getArgument(i + 2));
 	break;
 
@@ -87,39 +87,30 @@ public class FtsObjectSet extends FtsRemoteData
   }
 
 
-  public void find(FtsObject context, String names[])
+  public void find(FtsObject context, Object values[])
   {
-    Object args[] = new Object[names.length + 1];
+    remoteCall(REMOTE_FIND, values);
+    Fts.sync();
+  }
 
-    args[0] = context;
 
-    for (int i = 0; i < names.length; i++)
-      args[i + 1] = names[i];
-
-    remoteCall(REMOTE_FIND, args);
+  public void find(FtsObject context, Vector values)
+  {
+    remoteCall(REMOTE_FIND, context, values);
     Fts.sync();
   }
 
 
   public void findErrors(FtsObject context)
   {
-    Object args[] = new Object[1];
-
-    args[0] = context;
-
-    remoteCall(REMOTE_FIND_ERRORS, args);
+    remoteCall(REMOTE_FIND_ERRORS, context, (Vector) null);
     Fts.sync();
   }
 
 
-  public void findFriends(FtsObject context, FtsObject target)
+  public void findFriends(FtsObject target)
   {
-    Object args[] = new Object[2];
-
-    args[0] = context;
-    args[1] = target;
-
-    remoteCall(REMOTE_FIND_FRIENDS, args);
+    remoteCall(REMOTE_FIND_FRIENDS, target, (Vector) null);
     Fts.sync();
   }
 }

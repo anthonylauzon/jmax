@@ -1,1 +1,3 @@
-SOURCES = MaxWindowMenu.java
+SOURCES = ObjectSetViewer.java \
+	  ObjectSelectedListener.java
+

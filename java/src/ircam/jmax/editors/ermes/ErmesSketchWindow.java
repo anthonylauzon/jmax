@@ -146,6 +146,13 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   {
   }
 
+
+  public void showObject(Object obj)
+  {
+    // Should select or highlight obj if it is an
+    // FtsObject
+  }
+
   //end of the MaxDataEditor interface
 
 
@@ -331,7 +338,26 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
      findMenuItem.addActionListener( new ActionListener() {
        public void actionPerformed( ActionEvent e)
  	{
-	  FindPanel.open().setPatcher( itsPatcher);
+	  FindPanel p;
+	  p = FindPanel.open();
+	  p.setPatcher( itsPatcher);
+
+	  if (itsSelection.getObjects().size() > 0)
+	    {
+	      p.findFriends((FtsObject) itsSelection.getObjects().elementAt(0));
+	    }
+ 	}
+     });
+
+     MenuItem findErrorsMenuItem = new MenuItem( "Find Errors");
+     editMenu.add( findErrorsMenuItem);
+     findErrorsMenuItem.addActionListener( new ActionListener() {
+       public void actionPerformed( ActionEvent e)
+ 	{
+	  FindPanel p;
+	  p = FindPanel.open();
+	  p.setPatcher( itsPatcher);
+	  p.findErrors();
  	}
      });
 

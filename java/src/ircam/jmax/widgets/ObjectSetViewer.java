@@ -2,58 +2,90 @@ package ircam.jmax.widgets;
 
 import java.io.*;
 import java.awt.*;
+import java.awt.event.*;
 import com.sun.java.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
-
-class ObjectCellRenderer extends JLabel implements ListCellRenderer {
-
-  private static ImageIcon patcherIcon = null;
-  private static ImageIcon objectIcon = null;
-
-  private final static Color selectedColor = new Color( 51, 153, 204);
-
-  private static void loadImages()
-  {
-    String fs = MaxApplication.getProperty( "file.separator");
-    String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
-
-    patcherIcon = new ImageIcon( path + "tool_patcher.gif");
-    objectIcon = new ImageIcon( path + "tool_ext.gif");
-  }
-
-  public ObjectCellRenderer() 
-  {
-    if (patcherIcon == null)
-      loadImages();
-
-    setOpaque(true);
-  }
-
-  public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
-  {
-    if (obj != null)
-      {
-	setText( ((FtsObject) obj).getDescription());
-
-	if ( selected)
-	  setBackground( selectedColor);
-	else
-	  setBackground( jlist.getBackground());
-
-	if ( ((FtsObject) obj) instanceof FtsPatcherObject)
-	  setIcon( patcherIcon);
-	else
-	  setIcon( objectIcon);
-      }
-
-    return this;
-  }
-}
-
 public class ObjectSetViewer extends JScrollPane {
+
+  static class ObjectCellRenderer extends JLabel implements ListCellRenderer
+  {
+    private static ImageIcon patcherIcon = null;
+    private static ImageIcon objectIcon = null;
+    private static ImageIcon errorIcon = null;
+    private static ImageIcon commentIcon = null;
+    private static ImageIcon messageIcon = null;
+
+    private final static Color selectedColor = new Color( 51, 153, 204);
+
+    private static void loadImages()
+    {
+      String fs = MaxApplication.getProperty( "file.separator");
+      String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
+
+      patcherIcon = new ImageIcon( path + "tool_patcher.gif");
+      objectIcon = new ImageIcon( path + "tool_ext.gif");
+      errorIcon = new ImageIcon( path + "tool_err.gif");
+      commentIcon = new ImageIcon( path + "tool_text.gif");
+      messageIcon = new ImageIcon( path + "tool_mess.gif");
+    }
+
+    public ObjectCellRenderer() 
+    {
+      if (patcherIcon == null)
+	loadImages();
+      
+      setOpaque(true);
+    }
+
+    public Component getListCellRendererComponent( JList jlist, Object obj, int i, boolean selected, boolean hasFocus)
+    {
+      if (obj != null)
+	{
+	  setText( ((FtsObject) obj).getDescription());
+	  
+	  if ( selected)
+	    setBackground( selectedColor);
+	  else
+	    setBackground( jlist.getBackground());
+
+	  if (((Integer)((FtsObject) obj).get("error")).intValue() != 0)
+	    setIcon( errorIcon);
+	  else if (obj instanceof FtsPatcherObject)
+	    setIcon( patcherIcon);
+	  else if (obj instanceof FtsMessageObject)
+	    setIcon( messageIcon);
+	  else if (obj instanceof FtsCommentObject)
+	    setIcon( commentIcon);
+	  else
+	    setIcon( objectIcon);
+	}
+
+      return this;
+    }
+  }
+
+  class ObjectSetViewerMouseListener implements MouseListener
+  { 
+    public void mouseEntered(MouseEvent e) {} 
+    public void mouseExited(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {}
+
+    public void mouseClicked(MouseEvent e)
+    {
+      if (e.getClickCount() == 2)
+	{
+	  int index = jList.locationToIndex(e.getPoint());
+	  FtsObject object = (FtsObject) jList.getModel().getElementAt(index);
+
+	  if (objectSelectedListener != null)
+	    objectSelectedListener.objectSelected(object);
+	}
+    }
+  }
 
   public ObjectSetViewer()
     {
@@ -68,6 +100,8 @@ public class ObjectSetViewer extends JScrollPane {
 
       jList.setBackground( Color.white);
 
+      jList.addMouseListener(new ObjectSetViewerMouseListener());
+ 
       getViewport().setView( jList);
 
       setAlignmentX( LEFT_ALIGNMENT);
@@ -83,5 +117,13 @@ public class ObjectSetViewer extends JScrollPane {
     repaint();  // sometimes, it seems that setModel() does not force a refresh ???
   }
 
+  public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
+  {
+    this.objectSelectedListener = objectSelectedListener;
+  }
+
   protected JList jList;
+  private ObjectSelectedListener objectSelectedListener;
 }
+
+

@@ -216,4 +216,8 @@ FontCache:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FontCache.java)
 .PHONY: FontCache
 
+FindPanel:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FindPanel.java)
+.PHONY: FindPanel
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
