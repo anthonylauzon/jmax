@@ -3718,9 +3718,11 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 1 && fts_is_number(at + 1))
     n = fts_get_number_int(at + 1);
   
+  /* remaining args are init values */
   if(ac > 2)
   {
     int size = m * n;
+    int i;
     
     ac -= 2;
     at += 2;
@@ -3730,6 +3732,10 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     
     fmat_reshape(self, m, n);  
     fmat_set_from_atoms(self, 0, 1, ac, at);
+
+    /* zero remaining elements */
+    for (i = ac; i < size; i++)
+      self->values[i] = 0.0;
   }
   else
     fmat_set_size(self, m, n);  
