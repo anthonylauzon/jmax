@@ -609,7 +609,7 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
       bar_duration = ((double)numerator * 240000.0) / (tempo * (double)denominator);
       next_time = event_get_time(marker_evt) + bar_duration; 
       
-      /* is quite the next event so do nothing */
+      /* is very near to the next event so nothing to do */
       if(next_time < next_bar_time + MARKERS_BAR_TOLERANCE && next_time > next_bar_time - MARKERS_BAR_TOLERANCE)
         return;
       
@@ -629,10 +629,9 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
   
           track_upload_event(marker_track, new_event);
         }
-
-        /* devo rinumerare tutte le bar */
+        /* renumber bars after inserction */
         marker_track_renumber_bars(marker_track, next_evt, last_number+1, 1);
-        /* l'ultimo bar se non coicide con next_bar avrˆ metrics == * */
+        /* last bar (if not == to next_bar) will have free metrics */
         if(next_time > next_bar_time + MARKERS_BAR_TOLERANCE)
         {
           scomark_bar_set_meter( new_bar, sym_meter_empty, &old_meter);

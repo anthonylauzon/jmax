@@ -65,6 +65,7 @@ PREDEF_SYMBOL( fts_s_bang, "bang")
 PREDEF_SYMBOL( fts_s_assign, "assign")
 PREDEF_SYMBOL( fts_s_compare, "compare")
 PREDEF_SYMBOL( fts_s_set, "set")
+PREDEF_SYMBOL( fts_s_unset, "unset")
 PREDEF_SYMBOL( fts_s_new, "new")
 PREDEF_SYMBOL( fts_s_get, "get")
 

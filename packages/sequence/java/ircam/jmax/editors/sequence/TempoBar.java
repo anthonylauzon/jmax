@@ -432,19 +432,20 @@ public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, bool
 public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
 
 TrackEvent lastBar = null;
-int lastBarIndex = -1;
+double lastBarTime = -1.0;
 public void objectAdded(Object whichObject, int index)
 {
   String type = (String)(((TrackEvent)whichObject).getProperty("type"));  
   if( type.equals("bar"))
-  {
-    if(index > lastBarIndex)
+  {    
+    double time = ((TrackEvent)whichObject).getTime();
+    if(time >= lastBarTime)
     {
       if(lastBar != null) 
         lastBar.getValue().setProperty("last_bar", Boolean.FALSE);
       
       lastBar = (TrackEvent)whichObject;
-      lastBarIndex = index;
+      lastBarTime = time;
       lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
     }
   }
