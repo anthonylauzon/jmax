@@ -27,7 +27,7 @@
 #include <fts/fts.h>
 #include "alsamidi.h"
 
-fts_metaclass_t *alsarawmidiport_type = NULL;
+fts_class_t *alsarawmidiport_type = NULL;
 
 static void 
 alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -30,6 +30,7 @@ FTS_API fts_status_t fts_expression_set( fts_expression_t *exp, int ac, const ft
 
 FTS_API int fts_expression_get_env_count( fts_expression_t *exp);
 
+FTS_API void fts_expression_add_variables_user( fts_expression_t *exp, fts_patcher_t *scope, fts_object_t *obj);
 
 typedef fts_status_t (*fts_expression_callback_t)( int ac, const fts_atom_t *at, void *data);
 

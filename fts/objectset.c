@@ -23,7 +23,7 @@
 #include <fts/fts.h>
 
 fts_symbol_t objectset_symbol = 0;
-fts_metaclass_t *fts_objectset_type = 0;
+fts_class_t *fts_objectset_type = 0;
 fts_symbol_t sym_objectset_append = 0;
 fts_symbol_t sym_objectset_remove = 0;
 
@@ -36,7 +36,7 @@ fts_symbol_t sym_objectset_remove = 0;
 fts_objectset_t* 
 fts_objectset_create()
 {
-  return (fts_objectset_t *) fts_object_create(fts_objectset_type, 0, 0);
+  return (fts_objectset_t *) fts_object_create(fts_objectset_type, NULL, 0, 0);
 }
 
 void 

@@ -29,7 +29,7 @@
 #include <fts/fts.h>
 #include "event.h"
 
-extern fts_metaclass_t *note_type;
+extern fts_class_t *note_type;
 
 typedef struct _note_
 {

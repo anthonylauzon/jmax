@@ -38,6 +38,7 @@
 #include <ftsprivate/property.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/variable.h>
 
 /* forward declarations  */
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
@@ -58,13 +59,14 @@ static fts_status_description_t invalid_class_name_error_description = {
 };
 static fts_status_t invalid_class_name_error = &invalid_class_name_error_description;
 
+
 /******************************************************************************
  *
- *  create object
+ * create an object from a class and arguments
  *
  */
 
-fts_object_t *
+static fts_object_t *
 fts_object_new( fts_class_t *cl)
 {
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
@@ -83,7 +85,7 @@ fts_object_new( fts_class_t *cl)
   return obj;
 }
 
-void 
+static void 
 fts_object_free(fts_object_t *obj)
 {
   fts_properties_free(obj);
@@ -98,6 +100,186 @@ fts_object_free(fts_object_t *obj)
 
   fts_heap_free(obj, obj->head.cl->heap);
 }
+
+fts_object_t *
+fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+
+  /* Is class instantiated ? We can test that with the 'size' member 
+     because it is set by the instantiate function and cannot be set to 0 */
+  if (!cl->size)
+    (*cl->instantiate_fun)(cl);
+
+  obj = fts_object_new( cl);
+
+#if 1
+  if ( patcher != NULL)
+    fts_patcher_add_object( patcher, obj);
+#else
+  if (parent)
+    {
+      fts_atom_t a;
+
+      fts_set_object( &a, obj);
+      fts_class_get_add_child( fts_object_get_class( parent))( parent, fts_system_inlet, 1, &a);
+    }
+#endif
+
+  fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
+
+  if ( fts_object_get_error(obj) != NULL)
+    {
+      fts_object_free(obj);
+      
+      return NULL;
+    }
+
+  return obj;
+}
+
+/***********************************************************************
+ *
+ * evaluate an object description using the expression evaluator
+ *
+ */
+
+struct eval_data {
+  fts_object_t *obj;
+  fts_patcher_t *patcher;
+};
+
+static fts_status_t
+eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
+{
+  struct eval_data *eval_data = (struct eval_data *)data;
+  fts_class_t *cl;
+
+  if (eval_data->obj == NULL)
+    {
+      /* create the object */
+      if (ac == 1 && fts_is_object( at))
+	{
+	  eval_data->obj = fts_get_object( at);
+	  return fts_ok;
+	}
+
+      if (ac >= 1 && fts_is_symbol( at))
+	{
+	  cl = fts_class_get_by_name( NULL, fts_get_symbol( at));
+	  if (cl == NULL)
+	    return class_not_found_error;
+
+	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
+	  if (eval_data->obj == NULL)
+	    return class_instantiation_error;
+
+	  return fts_ok;
+	}
+
+      if (ac >= 1 && fts_is_pointer( at))
+	{
+	  cl = (fts_class_t *)fts_get_pointer( at);
+
+	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
+	  if (eval_data->obj == NULL)
+	    return class_instantiation_error;
+
+	  return fts_ok;
+	}
+
+      return invalid_class_name_error;
+    }
+  else
+    {
+      /* send the message to the already created object */
+    }
+
+  return fts_ok;
+}
+
+#define CHECK_ERROR_PROPERTY(OBJ)		\
+{						\
+  fts_atom_t a;					\
+  						\
+  if (fts_object_is_error(OBJ))			\
+    fts_set_int(&a, 1);				\
+  else						\
+    fts_set_int(&a, 0);				\
+						\
+  fts_object_put_prop( OBJ, fts_s_error, &a);	\
+}
+
+fts_object_t *
+fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj = 0;
+  fts_expression_t *expression;
+  struct eval_data data;
+  fts_status_t status;
+  int new_ac;
+  fts_atom_t *new_at;
+
+  if (ac == 0)
+    {
+      obj = fts_error_object_new( patcher, 0, 0, "empty object");
+      fts_object_set_description(obj, ac, at);
+      CHECK_ERROR_PROPERTY(obj);
+      return obj;
+    }
+
+  data.obj = NULL;
+  data.patcher = patcher;
+
+  if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
+       || (ac >= 2 && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon))
+    {
+      new_ac = ac;
+      new_at = (fts_atom_t *)at;
+    }
+  else
+    {
+      int i;
+
+      new_ac = ac+1;
+      new_at = alloca( new_ac * sizeof (fts_atom_t));
+
+      fts_set_symbol( new_at, fts_s_colon);
+      for ( i = 0; i < ac; i++)
+	new_at[i+1] = at[i];
+    }
+
+  status = fts_expression_new( new_ac, new_at, &expression);
+  if (status == fts_ok)
+    {
+      status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data);
+
+      if (status == fts_ok)
+	obj = data.obj;
+    }
+
+  if (status != fts_ok)
+    obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
+
+  /* Add the newly created object as user of the expression's variables,
+     even if it is an error object, because we may try to recompute, and recover,
+     the object, if one of this variables have been redefined. */
+  fts_expression_add_variables_user( expression, patcher, obj);
+
+  fts_object_set_description(obj, new_ac, new_at);
+  CHECK_ERROR_PROPERTY(obj);
+
+  fts_expression_delete(expression);
+
+  return obj;
+}
+
+
+/***********************************************************************
+ *
+ * Object inlets/outlets
+ *
+ */
 
 void
 fts_object_set_inlets_number(fts_object_t *o, int n)
@@ -135,226 +317,6 @@ fts_object_set_outlets_number(fts_object_t *o, int n)
     }
 }
 
-fts_object_t *
-fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
-{
-  fts_class_t *cl = mcl->inst_list;
-  fts_object_t *obj = 0;
-
-  if(!cl)
-    cl = fts_class_instantiate(mcl);
-
-  obj = fts_object_new( cl);
-  
-  if(fts_class_get_constructor(cl))
-    fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
-
-  return obj;
-}
-
-static fts_status_t
-fts_new_status(const char *description)
-{
-  fts_status_description_t *sd = fts_malloc(sizeof(fts_status_description_t));
-
-  sd->description = description;
-  
-  return (fts_status_t)sd;
-}
-
-fts_status_t 
-fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
-{
-  fts_symbol_t error;
-  fts_class_t *cl = 0;
-  fts_object_t *obj;
-
-  if (fts_get_symbol(at) == fts_s_patcher)
-    {
-      /* Patcher behave diffreentrly w.r.t. than other objects;
-	 the metaclass do not depend on the arguments, but on the inlets/outlets.
-	 New patchers are created with zero in zero outs, and changed later 
-      */
-      fts_atom_t a[2];
-
-      fts_set_int(a, 0);
-      fts_set_int(a + 1, 0);
-      cl = fts_class_instantiate(patcher_metaclass);
-    }
-  else
-    {
-      fts_metaclass_t *mcl = fts_metaclass_get_by_name(NULL, fts_get_symbol(at));
-      
-      if (mcl)
-	cl = fts_class_instantiate(mcl);
-    }
-
-  if (!cl)
-    {
-      *ret = 0;
-      return &fts_CannotInstantiate;
-    }
-
-  obj = fts_object_new( cl);
-
-  obj->patcher = patcher;
-
-  if(fts_class_get_constructor(cl))
-    fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac - 1, at + 1);
-
-  error = fts_object_get_error(obj);
-  
-  if(error)
-    {
-      /* free already allocated */
-      fts_object_free(obj);
-      
-      /* return NULL */
-      *ret = 0;
-      
-      return fts_new_status( error);
-    }
-
-  fts_patcher_add_object(patcher, obj);
-
-  *ret = obj;
-  return fts_ok;
-}
-
-struct eval_data {
-  fts_object_t *obj;
-  fts_patcher_t *patcher;
-};
-
-static fts_status_t
-eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
-{
-  struct eval_data *eval_data = (struct eval_data *)data;
-  fts_metaclass_t *mcl;
-
-  if (eval_data->obj == NULL)
-    {
-      /* create the object */
-      if (ac == 1 && fts_is_object( at))
-	{
-	  eval_data->obj = fts_get_object( at);
-	  return fts_ok;
-	}
-
-      if (ac >= 1 && fts_is_symbol( at))
-	{
-	  mcl = fts_metaclass_get_by_name( NULL, fts_get_symbol( at));
-	  if (mcl == NULL)
-	    return class_not_found_error;
-
-	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
-	  if (eval_data->obj == NULL)
-	    return class_instantiation_error;
-
-	  return fts_ok;
-	}
-
-      if (ac >= 1 && fts_is_pointer( at))
-	{
-	  mcl = (fts_metaclass_t *)fts_get_pointer( at);
-
-	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
-	  if (eval_data->obj == NULL)
-	    return class_instantiation_error;
-
-	  return fts_ok;
-	}
-
-      return invalid_class_name_error;
-    }
-  else
-    {
-      /* send the message to the already created object */
-    }
-
-  return fts_ok;
-}
-
-#define CHECK_ERROR_PROPERTY(OBJ)		\
-{						\
-  fts_atom_t a;					\
-  						\
-  if (fts_object_is_error(OBJ))			\
-    fts_set_int(&a, 1);				\
-  else						\
-    fts_set_int(&a, 0);				\
-						\
-  fts_object_put_prop( OBJ, fts_s_error, &a);	\
-}
-
-fts_object_t *
-fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_object_t *obj;
-  fts_expression_t *expression;
-  struct eval_data data;
-  fts_status_t status;
-  int new_ac;
-  fts_atom_t *new_at;
-
-  if (ac == 0)
-    {
-      obj = fts_error_object_new( patcher, 0, 0, "empty object");
-      fts_object_set_description(obj, ac, at);
-      CHECK_ERROR_PROPERTY(obj);
-      return obj;
-    }
-
-  data.obj = NULL;
-  data.patcher = patcher;
-
-  if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
-       || (ac >= 2 && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon))
-    {
-      new_ac = ac;
-      new_at = (fts_atom_t *)at;
-    }
-  else
-    {
-      int i;
-
-      new_ac = ac+1;
-      new_at = alloca( new_ac * sizeof (fts_atom_t));
-
-      fts_set_symbol( new_at, fts_s_colon);
-      for ( i = 0; i < ac; i++)
-	new_at[i+1] = at[i];
-    }
-
-  if ((status = fts_expression_new( new_ac, new_at, &expression)) != fts_ok)
-    {
-      obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
-      fts_object_set_description(obj, new_ac, new_at);
-      CHECK_ERROR_PROPERTY(obj);
-      return obj;
-    }
-
-  if ((status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data)) == fts_ok)
-    {
-      obj = data.obj;
-      fts_object_set_description(obj, new_ac, new_at);
-      CHECK_ERROR_PROPERTY(obj);
-
-      fts_expression_delete(expression);
-
-      return obj;
-    }      
-
-  obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
-  fts_object_set_description(obj, new_ac, new_at);
-  CHECK_ERROR_PROPERTY(obj);
-
-  fts_expression_delete(expression);
-
-  return obj;
-}
-
-
 /****************************************************************
  *
  *  delete object
@@ -373,15 +335,9 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 static void 
 fts_object_unbind(fts_object_t *obj)
 {
-#if 0
-  /* Unbind it from its variable if any */
-  if (fts_object_get_variable(obj))
-    fts_variable_undefine(obj->patcher, fts_object_get_variable(obj), obj);
-
   /* Remove it as user of its var refs */
   while (obj->var_refs)
     fts_binding_remove_user(obj->var_refs->var, obj);
-#endif
 }
 
 /* remove all connections from the object (done when unplugged from the patcher) */
@@ -692,5 +648,5 @@ fts_object_get_package(fts_object_t *obj)
   if(fts_object_is_template(obj))
     return fts_template_get_package(fts_patcher_get_template((fts_patcher_t *)obj));
   else
-    return fts_metaclass_get_package(fts_object_get_metaclass(obj));
+    return fts_class_get_package(fts_object_get_class(obj));
 }

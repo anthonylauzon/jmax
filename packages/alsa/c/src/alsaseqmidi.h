@@ -87,7 +87,7 @@ typedef struct _alsaseqmidiport_
     int fd; /* poll fd */
 } alsaseqmidiport_t;
 
-extern fts_metaclass_t *alsaseqmidiport_input_type;
-extern fts_metaclass_t *alsaseqmidiport_output_type;
+extern fts_class_t *alsaseqmidiport_input_type;
+extern fts_class_t *alsaseqmidiport_output_type;
 
 #endif /* _ALSASEQMIDI_H_ */

@@ -194,7 +194,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       
   if(fvec == NULL)  
     {
-      fvec = (fvec_t *)fts_object_create(fvec_type, 0, 0);
+      fvec = (fvec_t *)fts_object_create(fvec_type, NULL, 0, 0);
       fvec_set_size(fvec, size);
     }
 

@@ -41,7 +41,7 @@ typedef struct
   fts_symbol_t s;
 } fts_message_t;
 
-FTS_API fts_metaclass_t *fts_message_metaclass;
+FTS_API fts_class_t *fts_message_class;
 
 #define fts_message_get_selector(m) ((m)->s)
 #define fts_message_get_args(m) (&(m)->args)
@@ -57,7 +57,7 @@ FTS_API void fts_message_clear(fts_message_t *mess);
 FTS_API void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
 FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at);
 
-#define fts_is_message(p) (fts_is_a(p, fts_message_metaclass))
+#define fts_is_message(p) (fts_is_a(p, fts_message_class))
 
 #define fts_message_output(o, i, m) do { \
     fts_object_refer((fts_object_t *)(m)); \

@@ -47,7 +47,7 @@ typedef struct fts_atom_list fts_atom_list_t;
 
 #define fts_atom_list_get_size(l)    ((l)->size)
 
-ISPW_API fts_metaclass_t *atomlist_type;
+ISPW_API fts_class_t *atomlist_type;
 ISPW_API fts_symbol_t sym_atomlist_set_name;
 ISPW_API fts_symbol_t sym_atomlist_update;
 

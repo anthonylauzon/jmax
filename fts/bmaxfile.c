@@ -1197,7 +1197,7 @@ void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new)
 
 
 /* saver dumper utility */
-static fts_metaclass_t *saver_dumper_type = 0;
+static fts_class_t *saver_dumper_type = 0;
 
 typedef struct _saver_dumper
 {
@@ -1255,7 +1255,7 @@ fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *symbol_tabl
   if(!saver_dumper)
     {
       /* create dumper */
-      saver_dumper = (saver_dumper_t *)fts_object_create(saver_dumper_type, 0, 0);
+      saver_dumper = (saver_dumper_t *)fts_object_create(saver_dumper_type, NULL, 0, 0);
       fts_object_refer(saver_dumper);
     }
 

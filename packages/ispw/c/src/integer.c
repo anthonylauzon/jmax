@@ -97,6 +97,6 @@ int_instantiate(fts_class_t *cl)
 void
 int_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_s_int, int_instantiate);
-  fts_class_alias(mcl, fts_new_symbol("i"));
+  fts_class_t *cl = fts_class_install(fts_s_int, int_instantiate);
+  fts_class_alias(cl, fts_new_symbol("i"));
 }

@@ -20,10 +20,10 @@
  * 
  */
 
-/* General status return values for FTS. */
-struct fts_status_description {
+/* General status return value */
+typedef struct fts_status_description {
   const char *description;
-};
+} fts_status_description_t, *fts_status_t;
 
 #define fts_ok ((fts_status_t) 0)
 

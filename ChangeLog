@@ -1,3 +1,9 @@
+2002-10-02  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* removed definitively metaclasses.
+	* remove fts_object_new_to_patcher. Now, only 2 functions to create an object:
+	fts_object_create and fts_eval_object_description
+
 2002-10-02  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* removed properties related to the DSP subsystem

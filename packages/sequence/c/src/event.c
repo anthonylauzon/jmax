@@ -29,7 +29,7 @@
 #include "note.h"
 #include "seqmess.h"
 
-fts_metaclass_t *event_type = 0;
+fts_class_t *event_type = 0;
 
 /**************************************************************
  *

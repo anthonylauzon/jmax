@@ -59,8 +59,8 @@ typedef struct _macosxmidiport_
 #define macosxmidiport_get_id(p) ((p)->id)
 #define macosxmidiport_get_reference(p) ((p)->ref)
 
-extern fts_metaclass_t *macosxmidi_input_type;
-extern fts_metaclass_t *macosxmidi_output_type;
+extern fts_class_t *macosxmidi_input_type;
+extern fts_class_t *macosxmidi_output_type;
 
 extern MIDIEndpointRef macosxmidi_get_reference_by_id(int id, macosxmidi_type_t type);
 

@@ -206,7 +206,7 @@ macosxmidi_insert_reference(fts_hashtable_t *ht, MIDIEndpointRef ref)
 }
 
 static fts_midiport_t *
-macosxmidi_create_midiport(macosxmidi_t *this, fts_metaclass_t *mcl, fts_symbol_t name, int id)
+macosxmidi_create_midiport(macosxmidi_t *this, fts_class_t *cl, fts_symbol_t name, int id)
 {
   fts_object_t *port = NULL;
   fts_atom_t args[3];
@@ -215,7 +215,7 @@ macosxmidi_create_midiport(macosxmidi_t *this, fts_metaclass_t *mcl, fts_symbol_
   fts_set_object(args + 0, (fts_object_t *)this);
   fts_set_symbol(args + 1, name);
   fts_set_int(args + 2, id);
-  port = fts_object_create(mcl, 2 + (id != 0), args);
+  port = fts_object_create(cl, NULL, 2 + (id != 0), args);
 
   if(port == NULL || fts_object_get_error(port) == NULL)
     return (fts_midiport_t *)port;
@@ -530,11 +530,11 @@ macosxmidi_instantiate(fts_class_t *cl)
 void 
 macosxmidi_config( void)
 {
-  fts_metaclass_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
+  fts_class_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
 
   macosxmidi_symbol_jmax_prefix = fts_new_symbol("jMax: ");
   macosxmidi_symbol_iac_midi_source = fts_new_symbol("IAC Source");
   macosxmidi_symbol_iac_midi_destination = fts_new_symbol("IAC Destination");
   
-  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, 0, 0));
+  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, NULL, 0, 0));
 }

@@ -29,7 +29,7 @@
 #include "track.h"
 #include "note.h"
 
-fts_metaclass_t *note_type = 0;
+fts_class_t *note_type = 0;
 
 /**************************************************************
  *

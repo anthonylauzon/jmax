@@ -38,7 +38,7 @@
 static fts_heap_t *atom_list_cell_heap;
 static fts_heap_t *atom_list_iterator_heap;
 
-fts_metaclass_t *atomlist_type = 0;
+fts_class_t *atomlist_type = 0;
 fts_symbol_t sym_setValues = 0;
 fts_symbol_t sym_setName = 0;
 fts_symbol_t sym_atomlist_set = 0;  

@@ -32,42 +32,41 @@
 /*
  * Definition of types and predefined values
  *
- * The type of an atom is a pointer to a metaclass.
+ * The type of an atom is a pointer to a class.
  *
  */
 
 /**
  * Get the class of the atom
  * 
- * @fn fts_metaclass_t *fts_get_class( const fts_atom_t *p)
+ * @fn fts_class_t *fts_get_class( const fts_atom_t *p)
  * @param p pointer to the atom
- * @return the type of the atom as a fts_metaclass_t *
+ * @return the type of the atom as a fts_class_t *
  * @ingroup atom
  */
 #define fts_get_class(p) (p)->type
 
 /**
  * Get the name associated with the type of the atom.
- * This selector will be used when sending this atom in a message.
  * 
  * @fn fts_symbol_t fts_get_class_name( const fts_atom_t *p)
  * @param p pointer to the atom
  * @return the selector
  * @ingroup atom
  */
-#define fts_get_class_name(p) fts_metaclass_get_name( fts_get_class(p))
+#define fts_get_class_name(p) fts_class_get_name( fts_get_class(p))
 
 #define fts_is_a(p,c) ((p)->type == (c))
 
 /* 
  * Primitive types
  */
-FTS_API fts_metaclass_t *fts_t_void;
-FTS_API fts_metaclass_t *fts_t_int;
-FTS_API fts_metaclass_t *fts_t_float;
-FTS_API fts_metaclass_t *fts_t_symbol;
-FTS_API fts_metaclass_t *fts_t_pointer;
-FTS_API fts_metaclass_t *fts_t_string;
+FTS_API fts_class_t *fts_t_void;
+FTS_API fts_class_t *fts_t_int;
+FTS_API fts_class_t *fts_t_float;
+FTS_API fts_class_t *fts_t_symbol;
+FTS_API fts_class_t *fts_t_pointer;
+FTS_API fts_class_t *fts_t_string;
 
 /*
  * fts_word_t accessors
@@ -135,7 +134,7 @@ FTS_API fts_metaclass_t *fts_t_string;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_object(p, v) ((p)->type = fts_object_get_metaclass((fts_object_t *)(v)), fts_word_set_object( &(p)->value, (fts_object_t *)(v)))
+#define fts_set_object(p, v) ((p)->type = fts_object_get_class((fts_object_t *)(v)), fts_word_set_object( &(p)->value, (fts_object_t *)(v)))
 
 /**
  * Set the pointer value
@@ -215,7 +214,7 @@ FTS_API fts_metaclass_t *fts_t_string;
  * @return 1 if atom type is object
  * @ingroup atom
  */
-#define fts_is_object(p) (!fts_metaclass_is_primitive( (p)->type))
+#define fts_is_object(p) (!fts_class_is_primitive( (p)->type))
 
 /**
  * Tests if atom contains a pointer

@@ -65,4 +65,5 @@ AM_LFLAGS=-olex.yy.c
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
 INCLUDES=-I$(top_srcdir)/include
-AM_CFLAGS=-DREIMPLEMENTING_VARIABLES
+AM_CFLAGS=
+

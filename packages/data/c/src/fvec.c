@@ -31,7 +31,7 @@
 #define FVEC_NO_ALLOC -1
 
 fts_symbol_t fvec_symbol = 0;
-fts_metaclass_t *fvec_type = 0;
+fts_class_t *fvec_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_open_file = 0;

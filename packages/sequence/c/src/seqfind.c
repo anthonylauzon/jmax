@@ -78,7 +78,7 @@ seqfind_find_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     seqfind_find_single(o, 0, 0, 1, at);
   else if(ac > 1)
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, tuple);

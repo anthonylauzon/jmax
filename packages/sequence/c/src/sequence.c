@@ -575,7 +575,7 @@ static void
 sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  track_t *track = (track_t *)fts_object_create(track_type, 1, at);
+  track_t *track = (track_t *)fts_object_create(track_type, NULL, 1, at);
 
   /* add it to the sequence */
   sequence_add_track(this, track);
@@ -600,7 +600,7 @@ static void
 sequence_add_track_without_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  track_t *track = (track_t *)fts_object_create(track_type, 1, at);
+  track_t *track = (track_t *)fts_object_create(track_type, NULL, 1, at);
 
   /* add it to the sequence */
   sequence_add_track(this, track);
@@ -697,7 +697,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->open = 0;  
   this->keep = fts_s_no;
 
-  this->tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, 0, 0);
+  this->tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, 0, 0);
 
   if(ac == 1 && fts_is_int(at))
     {
@@ -714,7 +714,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       
       for(i=0; i<size; i++)
 	{
-	  track_t *track = (track_t *)fts_object_create(track_type, 1, &a);
+	  track_t *track = (track_t *)fts_object_create(track_type, NULL, 1, &a);
 	  
 	  /* add it to the sequence */
 	  sequence_add_track(this, track);
@@ -733,7 +733,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  if(fts_is_symbol(at + i))
 	    {
 	      fts_symbol_t type = fts_get_symbol(at + i);
-	      track_t *track = (track_t *)fts_object_create(track_type, 1, at + i);
+	      track_t *track = (track_t *)fts_object_create(track_type, NULL, 1, at + i);
 	      
 	      if(track)
 		{

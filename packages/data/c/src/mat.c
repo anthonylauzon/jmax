@@ -26,7 +26,7 @@
 #include "mat.h"
 
 fts_symbol_t mat_symbol = 0;
-fts_metaclass_t *mat_type = 0;
+fts_class_t *mat_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;

@@ -167,7 +167,7 @@ messconst_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_atom_assign(this->at + winlet, at);
   else
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, tuple);

@@ -46,12 +46,12 @@ static double dsp_time = 0.0;
 static fts_symbol_t dsp_zero_fun_symbol = 0;
 static fts_symbol_t dsp_copy_fun_symbol = 0;
 
-static fts_metaclass_t *dsp_timebase_metaclass = 0;
+static fts_class_t *dsp_timebase_class = 0;
 static fts_timebase_t *dsp_timebase = 0;
 static fts_param_t *dsp_active_param = 0;
 
-fts_metaclass_t *fts_dsp_edge_metaclass = 0;
-fts_metaclass_t *fts_dsp_signal_metaclass = 0;
+fts_class_t *fts_dsp_edge_class = 0;
+fts_class_t *fts_dsp_signal_class = 0;
 
 void 
 fts_dsp_default_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -157,13 +157,13 @@ fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
 void 
 fts_dsp_declare_inlet(fts_class_t *cl, int num)
 {
-  fts_class_inlet(cl, num, fts_dsp_signal_metaclass, fts_dsp_default_method);
+  fts_class_inlet(cl, num, fts_dsp_signal_class, fts_dsp_default_method);
 }
 
 void 
 fts_dsp_declare_outlet(fts_class_t *cl, int num)
 {
-  fts_class_outlet(cl, num, fts_dsp_signal_metaclass);
+  fts_class_outlet(cl, num, fts_dsp_signal_class);
 }
 
 static int
@@ -175,7 +175,7 @@ dsp_object_get_n_inlets(fts_dsp_object_t *obj)
 
   for(i=0; i<fts_object_get_inlets_number(o); i++)
     {
-      if(fts_class_inlet_get_method(cl, i, fts_dsp_signal_metaclass) == NULL)
+      if(fts_class_inlet_get_method(cl, i, fts_dsp_signal_class) == NULL)
 	break;
     }
 
@@ -191,7 +191,7 @@ dsp_object_get_n_outlets(fts_dsp_object_t *obj)
 
   for(i=0; i<fts_object_get_outlets_number(o); i++)
     {
-      if(!fts_class_outlet_has_type(cl, i, fts_dsp_signal_metaclass))
+      if(!fts_class_outlet_has_type(cl, i, fts_dsp_signal_class))
 	break;
     }
 
@@ -245,7 +245,7 @@ fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
-  return fts_class_inlet_get_method(fts_object_get_class(o), num, fts_dsp_signal_metaclass) != NULL;
+  return fts_class_inlet_get_method(fts_object_get_class(o), num, fts_dsp_signal_class) != NULL;
 }
 
 int 
@@ -378,7 +378,7 @@ fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge)
  *
  */
 
-/* DSP signal dummy metaclass */
+/* DSP signal dummy class */
 static void
 dsp_signal_instantiate(fts_class_t *cl)
 {
@@ -560,17 +560,17 @@ void fts_kernel_dsp_init(void)
   dsp_tick_duration = 1000.0 * (double)FTS_DSP_DEFAULT_TICK_SIZE / FTS_DSP_DEFAULT_SAMPLE_RATE;
 
   /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
-  dsp_timebase_metaclass = fts_class_install(NULL, dsp_timebase_instantiate);
-  dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_metaclass, 0, 0);
+  dsp_timebase_class = fts_class_install(NULL, dsp_timebase_instantiate);
+  dsp_timebase = (fts_timebase_t *)fts_object_create(dsp_timebase_class, NULL, 0, 0);
 
   /* DSP edge class */
-  fts_dsp_edge_metaclass = fts_class_install(NULL, dsp_edge_instantiate);
+  fts_dsp_edge_class = fts_class_install(NULL, dsp_edge_instantiate);
 
   /* DSP signal dummy class */
-  fts_dsp_signal_metaclass = fts_class_install(NULL, dsp_signal_instantiate);
+  fts_dsp_signal_class = fts_class_install(NULL, dsp_signal_instantiate);
 
   /* create DSP parameter */
-  dsp_active_param = (fts_param_t *)fts_object_create(fts_param_metaclass, 0, 0);
+  dsp_active_param = (fts_param_t *)fts_object_create(fts_param_class, NULL, 0, 0);
   fts_param_add_listener(dsp_active_param, NULL, dsp_active);
 
   /* create main DSP graph */

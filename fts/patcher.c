@@ -62,11 +62,12 @@
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/label.h>
+#include <ftsprivate/variable.h>
 
-fts_metaclass_t *patcher_metaclass = 0;
-static fts_metaclass_t *patcher_inout_metaclass = 0;
-static fts_metaclass_t *receive_metaclass = 0;
-static fts_metaclass_t *send_metaclass = 0;
+fts_class_t *patcher_class = 0;
+static fts_class_t *patcher_inout_class = 0;
+static fts_class_t *receive_class = 0;
+static fts_class_t *send_class = 0;
 
 fts_symbol_t sym_showObject = 0;
 fts_symbol_t sym_stopWaiting = 0;
@@ -385,7 +386,7 @@ patcher_get_inlet(fts_patcher_t *patcher, int index)
   /* create inlet if needed */
   if(patcher->inlets[index] == NULL)
     {
-      patcher_inout_t *inlet = (patcher_inout_t *)fts_object_create(patcher_inout_metaclass, 0, 0);
+      patcher_inout_t *inlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, NULL, 0, 0);
       
       inlet->patcher = patcher;
       inlet->index = index;
@@ -410,7 +411,7 @@ patcher_get_outlet(fts_patcher_t *patcher, int index)
   /* create outlet if needed */
   if(patcher->outlets[index] == NULL)
     {
-      patcher_inout_t *outlet = (patcher_inout_t *)fts_object_create(patcher_inout_metaclass, 0, 0);
+      patcher_inout_t *outlet = (patcher_inout_t *)fts_object_create(patcher_inout_class, NULL, 0, 0);
       
       outlet->patcher = patcher;
       outlet->index = index;
@@ -522,9 +523,9 @@ static void
 receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_receive_t *this  = (fts_receive_t *)o;
-  fts_metaclass_t *mcl = fts_object_get_metaclass(this->obj);
+  fts_class_t *cl = fts_object_get_class(this->obj);
 
-  if(mcl == patcher_inout_metaclass)
+  if(cl == patcher_inout_class)
     {
       /* send inlet index as object description */
       patcher_inout_t *inout = (patcher_inout_t *)this->obj;
@@ -541,7 +542,7 @@ static void
 receive_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_receive_t *this = (fts_receive_t *) o;
-  fts_metaclass_t *mcl = fts_object_get_metaclass(this->obj);
+  fts_class_t *cl = fts_object_get_class(this->obj);
   FILE *file = (FILE *)fts_get_pointer(at);
   fts_atom_t xa, ya, wa;
   
@@ -549,9 +550,9 @@ receive_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_object_get_prop(o, fts_s_y, &ya);
   fts_object_get_prop(o, fts_s_width, &wa);
   
-  if(mcl == patcher_inout_metaclass)
+  if(cl == patcher_inout_class)
     fprintf( file, "#P inlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
-  else if(mcl == fts_label_metaclass)
+  else if(cl == fts_label_class)
     {
       /* save r object */
     }
@@ -670,7 +671,7 @@ static void
 send_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_send_t *this = (fts_send_t *) o;
-  fts_metaclass_t *mcl = fts_object_get_metaclass(this->obj);
+  fts_class_t *cl = fts_object_get_class(this->obj);
   FILE *file = (FILE *)fts_get_pointer(at);
   fts_atom_t xa, ya, wa;
   
@@ -678,7 +679,7 @@ send_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_object_get_prop( o, fts_s_y, &ya);
   fts_object_get_prop( o, fts_s_width, &wa);
   
-  if(mcl == patcher_inout_metaclass)
+  if(cl == patcher_inout_class)
     fprintf( file, "#P outlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
   else
     {
@@ -969,21 +970,17 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_inlets = 0;
   this->n_outlets = 0;
 
-#ifndef REIMPLEMENTING_VARIABLES
   fts_env_init(&this->env, (fts_object_t *) this);
-#endif
 
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
-  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
   fts_object_refer(this->args);
 
-#ifndef REIMPLEMENTING_VARIABLES
   fts_variable_define( this, fts_s_args);
   fts_set_object( &va, (fts_object_t *)this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
-#endif
 
   patcher_redefine_number_of_inlets(this, n_inlets);
   patcher_redefine_number_of_outlets(this, n_outlets);
@@ -1047,9 +1044,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   /* delete all the variables */
   fts_object_release( this->args);
 
-#ifndef REIMPLEMENTING_VARIABLES
   fts_variables_undefine(this, (fts_object_t *)this);
-#endif
 
   /* delete the inlets and inlets tables */
   if (this->inlets)
@@ -1500,7 +1495,7 @@ static fts_memorystream_t *patcher_memory_stream ;
 static fts_memorystream_t * patcher_get_memory_stream()
 {
   if(!patcher_memory_stream)
-    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
   return patcher_memory_stream;
 }
 
@@ -1640,24 +1635,10 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
       fts_atom_t argv[512];
       int argc;
 
-#ifndef REIMPLEMENTING_VARIABLES
-      if (fts_object_description_defines_variable(ac, at))
-	{
-	  fts_set_symbol(&argv[0], fts_s_patcher); 
+      fts_set_symbol(&argv[0], fts_s_patcher);
 
-	  /* copy arguments (ignoring variable) */
-	  for (argc = 1; (argc < ac - 1) && (argc < 512) ; argc++) 
-	    argv[argc] = at[argc+1];
-	}
-      else
-#endif
-	{
-	  /* Plain syntax */
-	  fts_set_symbol(&argv[0], fts_s_patcher);
-
-	  for (argc = 1; (argc <= ac) && (argc < 512) ; argc++)
-	    argv[argc] = at[argc-1];
-	}
+      for (argc = 1; (argc <= ac) && (argc < 512) ; argc++)
+	argv[argc] = at[argc-1];
 
       fts_patcher_redefine(this, argc, argv);
 
@@ -1900,56 +1881,29 @@ patcher_instantiate(fts_class_t *cl)
  */
 
 /* assign variables to a patcher as found by the expression parser */
-#ifndef REIMPLEMENTING_VARIABLES
-static void 
-fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data)
-{
-  fts_patcher_t *this = (fts_patcher_t *)data;
-
-  if(! fts_variable_is_suspended(this, name))
-    fts_variable_define(this, name);
-
-  fts_variable_restore(this, name, value, (fts_object_t *)this);
-}
-#endif
 
 fts_patcher_t *
-fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
+fts_patcher_redefine(fts_patcher_t *this, int ac, const fts_atom_t *at)
 {
+#if 0
   fts_object_t *obj;
   int ac;
   fts_atom_t at[1024];
-  int rac;
-  const fts_atom_t *rat;
   fts_atom_t a;
-#ifndef REIMPLEMENTING_VARIABLES
-  fts_oldexpression_state_t *e;
 
   obj = (fts_object_t *) this; 
 
   /* change the patcher definition */
-  fts_object_set_description(obj, aoc, aot);
-
-  /* check for the "var : <obj> syntax" and ignore the variable if any */
-  if (fts_object_description_defines_variable(aoc, aot))
-    {
-      rat = aot + 2;
-      rac = aoc - 2;
-    }
-  else
-    {
-      rat = aot;
-      rac = aoc;
-    }
+  fts_object_set_description(obj, ac, at);
 
   /* change the patcher definition */
-  fts_object_set_description(obj, rac, rat);
+  fts_object_set_description(obj, ac, at);
 
   /* suspend  the patcher internal variables if any */
   fts_variables_suspend(this, obj);
 
   /* eval the expression */
-  e = fts_oldexpression_eval(obj->patcher, rac, rat, 1024, at);
+  e = fts_oldexpression_eval(obj->patcher, ac, at, 1024, at);
   ac = fts_oldexpression_get_result_count(e);
 
   if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
@@ -1969,9 +1923,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
       /* reallocate the args */
       fts_tuple_set( this->args, ac - 1, at + 1);
 
-      /* set the new variables */
-      fts_oldexpression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
-
       fts_set_object(&a, (fts_object_t *)this->args);
       fts_variable_restore(this, fts_s_args, &a, obj);
 
@@ -1984,7 +1935,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 
   /* free the expression state structure */
   fts_oldexpression_state_free(e);
-
 #endif
 
   return this;
@@ -2006,12 +1956,14 @@ fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
   fts_object_t **p;
 
-  /* add object at end (???) */
+  obj->patcher = this;
+
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     {
     }
 
   *p = obj;
+
   fts_object_refer(obj);
 }
 
@@ -2028,6 +1980,7 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 	*p = obj->next_in_patcher;
 
 	fts_object_release(remove);
+
 	return;
       }
 }
@@ -2095,7 +2048,8 @@ fts_create_root_patcher()
   fts_atom_t a[1];
 
   fts_set_symbol(a, fts_new_symbol("root"));
-  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_metaclass, 1, a);
+
+  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, NULL, 1, a);
 
   fts_object_refer((fts_object_t *)fts_root_patcher);
 }
@@ -2144,19 +2098,19 @@ void fts_kernel_patcher_init(void)
   sym_endPaste = fts_new_symbol("endPaste");
   sym_noHelp = fts_new_symbol("noHelp");
 
-  patcher_metaclass = fts_class_install(fts_s_patcher, patcher_instantiate);
-  patcher_inout_metaclass = fts_class_install(NULL, patcher_inout_instantiate);
+  patcher_class = fts_class_install(fts_s_patcher, patcher_instantiate);
+  patcher_inout_class = fts_class_install(NULL, patcher_inout_instantiate);
 
-  receive_metaclass = fts_class_install(fts_s_receive, receive_instantiate);
-  send_metaclass = fts_class_install(fts_s_send, send_instantiate);
-  fts_class_alias(receive_metaclass, fts_s_inlet);
-  fts_class_alias(send_metaclass, fts_s_outlet);
+  receive_class = fts_class_install(fts_s_receive, receive_instantiate);
+  send_class = fts_class_install(fts_s_send, send_instantiate);
+  fts_class_alias(receive_class, fts_s_inlet);
+  fts_class_alias(send_class, fts_s_outlet);
 
   /* historical aliases */
-  fts_class_alias(receive_metaclass, fts_new_symbol("r"));
-  fts_class_alias(receive_metaclass, fts_new_symbol("r~"));
-  fts_class_alias(send_metaclass, fts_new_symbol("s"));
-  fts_class_alias(send_metaclass, fts_new_symbol("s~"));
+  fts_class_alias(receive_class, fts_new_symbol("r"));
+  fts_class_alias(receive_class, fts_new_symbol("r~"));
+  fts_class_alias(send_class, fts_new_symbol("s"));
+  fts_class_alias(send_class, fts_new_symbol("s~"));
 
   fts_create_root_patcher();
 }

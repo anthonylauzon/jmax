@@ -172,7 +172,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	{
 	    
 	    /* create the reader thread */
-	    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, 0, 0);
+	    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, NULL, 0, 0);
 	    fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
 	    reader->sf = sf;
 	    reader->com_buffer = self->com_buffer;

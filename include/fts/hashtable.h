@@ -96,6 +96,38 @@ typedef struct {
 FTS_API void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity);
 
 /**
+ * Deinitializes a hashtable.
+ *
+ * @fn void fts_hashtable_destroy( fts_hashtable_t *h)
+ * @param h the hashtable
+ * @ingroup hashtable
+ */
+FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
+
+/**
+ * Allocates and initializes a hashtable
+ *
+ * @fn fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity)
+ * @param key_type the type of the key.<BR>
+ *  Must be one of FTS_HASHTABLE_INT, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_STRING
+ *  If 0, the key type will be FTS_HASHTABLE_SYMBOL
+ * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
+ * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
+ * @return the allocated hashtable
+ * @ingroup hashtable
+ */
+FTS_API fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity);
+
+/**
+ * Frees a hashtable that was obtained by fts_hashtable_new().
+ *
+ * @fn void fts_hashtable_free( fts_hashtable_t *h)
+ * @param h the hashtable
+ * @ingroup hashtable
+ */
+FTS_API void fts_hashtable_free( fts_hashtable_t *h);
+
+/**
  * Clears hashtable's content.<BR>
  * After calling <CODE>fts_hashtable_clear</CODE>, hashtable will contain no keys, but
  * will keep its allocation state (i.e. its capacity will be its capacity before call).
@@ -105,15 +137,6 @@ FTS_API void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_c
  * @ingroup hashtable
  */
 FTS_API void fts_hashtable_clear( fts_hashtable_t *h);
-
-/**
- * Deinitializes a hashtable.
- *
- * @fn void fts_hashtable_destroy( fts_hashtable_t *h)
- * @param h the hashtable
- * @ingroup hashtable
- */
-FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
 
 /**
  * Retrieve value mapped to specified key.

@@ -26,7 +26,7 @@
 #include "row.h"
 
 fts_symbol_t row_symbol = 0;
-fts_metaclass_t *row_type = 0;
+fts_class_t *row_type = 0;
 
 /********************************************************
  *

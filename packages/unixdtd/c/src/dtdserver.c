@@ -72,40 +72,13 @@ struct _dtdserver_t {
   dtdfifo_t *fifo_table[DTD_MAX_FIFOS];
 };
 
-static fts_metaclass_t *dtdserver_type;
+static fts_class_t *dtdserver_type;
 static dtdserver_t *default_instance;
-
-dtdserver_t* dtdserver_set_default_instance(int argc, const fts_atom_t* argv)
-{
-    fts_object_t* obj;
-    fts_atom_t a[1];
-
-    fts_object_new_to_patcher(fts_get_root_patcher(), argc, argv, &obj);
-    if (!obj)
-    {
-	return NULL;
-    }
-
-    fts_object_get_prop(obj, fts_s_state, a);
-    
-    if (!fts_is_object(a))
-    {
-	fts_object_delete_from_patcher(obj);
-	return NULL;
-    }
-    return (dtdserver_t*)(fts_get_object(a));
-}
 
 dtdserver_t *dtdserver_get_default_instance( void)
 {
   if (!default_instance)
-  {
-      fts_atom_t a[1];
-      
-      fts_set_symbol(a, fts_new_symbol("dtdserver"));
-      default_instance = dtdserver_set_default_instance(1, a);
-/*    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0); */
-  }
+    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, NULL, 0, 0);
   
   return default_instance;
 }

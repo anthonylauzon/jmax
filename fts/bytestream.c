@@ -93,9 +93,9 @@ typedef int socket_t;
 static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_bytestream = 0;
 
-fts_metaclass_t *fts_socketstream_type = 0;
-fts_metaclass_t *fts_pipestream_type = 0;
-fts_metaclass_t *fts_memorystream_type = 0;
+fts_class_t *fts_socketstream_type = 0;
+fts_class_t *fts_pipestream_type = 0;
+fts_class_t *fts_memorystream_type = 0;
 
 void fts_bytestream_init(fts_bytestream_t *stream)
 {

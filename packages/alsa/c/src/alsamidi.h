@@ -58,6 +58,6 @@ typedef struct _alsarawmidiport_
   int sysex_head;
 } alsarawmidiport_t;
 
-extern fts_metaclass_t *alsarawmidiport_type;
+extern fts_class_t *alsarawmidiport_type;
 
 #endif

@@ -30,8 +30,8 @@
 #define INPUT_TYPE 1
 #define OUTPUT_TYPE 2
 
-fts_metaclass_t* alsaseqmidiport_input_type = NULL;
-fts_metaclass_t* alsaseqmidiport_output_type = NULL;
+fts_class_t* alsaseqmidiport_input_type = NULL;
+fts_class_t* alsaseqmidiport_output_type = NULL;
 
 
 

@@ -27,7 +27,7 @@
 #include <data/c/include/bpf.h>
 
 fts_symbol_t bpf_symbol = 0;
-fts_metaclass_t *bpf_type = 0;
+fts_class_t *bpf_type = 0;
 
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;

@@ -63,7 +63,7 @@ select_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     select_input_single(o, 0, 0, 1, at);
   else
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, tuple);
@@ -89,7 +89,7 @@ select_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     select_set_single(o, winlet, 0, 1, at);
   else
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, tuple);
@@ -152,6 +152,6 @@ select_instantiate(fts_class_t *cl)
 void
 select_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("select"), select_instantiate);
-  fts_class_alias(mcl, fts_new_symbol("sel"));
+  fts_class_t *cl = fts_class_install(fts_new_symbol("select"), select_instantiate);
+  fts_class_alias(cl, fts_new_symbol("sel"));
 }

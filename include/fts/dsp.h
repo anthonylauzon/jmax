@@ -285,11 +285,11 @@ typedef struct fts_dsp_edge
 #define fts_dsp_edge_get_n_tick(e) ((e)->n_tick)
 #define fts_dsp_edge_get_sr(e) ((e)->sr)
 
-FTS_API fts_metaclass_t *fts_dsp_edge_metaclass;
+FTS_API fts_class_t *fts_dsp_edge_class;
 FTS_API void fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge);
 FTS_API void fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge);
 
-FTS_API fts_metaclass_t *fts_dsp_signal_metaclass;
+FTS_API fts_class_t *fts_dsp_signal_class;
 
 /*@}*/ /* Object declarations */
 

@@ -21,54 +21,76 @@
  */
 
 
-/****************************************************************************
- *
- *  FTS Variable handling
- *
- *
- *  fts_binding_t
- *    A binding is the implementation of the binding of a name to a value
- *    (i.e. the low level implementation of a variable).
- *
- *  fts_env_t  
- *    The environment consists of a list of bindings.
- */
-
-
 #include <fts/fts.h>
-
-#ifdef REIMPLEMENTING_VARIABLES
-fts_atom_t *
-fts_variable_get_value( fts_patcher_t *scope, fts_symbol_t name)
-{
-  static fts_atom_t a;
-
-  fts_set_void( &a);
-
-  return &a;
-}
-
-fts_atom_t *
-fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name)
-{
-  return fts_variable_get_value( scope, name);
-}
-
-void 
-fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
-{
-}
-
-void
-fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
-{
-}
-
-#else
 
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/variable.h>
+
+/****************************************************************************
+ *
+ * "define" object
+ *
+ */
+
+static void define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t var_name;
+  fts_patcher_t *patcher;
+  fts_atom_t *value;
+
+  var_name = fts_get_symbol( at);
+  value = (fts_atom_t *)at+1;
+  patcher = fts_object_get_patcher( o);
+
+  /* if the variable already exists in this local context, make a double definition error object  */
+  if (!fts_variable_can_define(patcher, var_name))
+    {
+      fts_object_set_error( o, "Variable %s doubly defined", var_name);
+      return;
+    }
+
+  /* prepare the variable, if defined */
+  if ( ! fts_variable_is_suspended(patcher, var_name))
+    {
+      /* Define the variable, suspended;
+	 this will also steal all the objects referring to the same variable name
+	 in the local scope from any variable defined outside the scope */
+
+      fts_variable_define( patcher, var_name);
+    }
+
+  /* then, assign it to the variable if any */
+  fts_variable_restore( patcher, var_name, value, o);
+
+  /* should set the variable name for the created object */
+  fts_object_set_variable( o, var_name);
+}
+
+static void define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_variable_undefine( fts_object_get_patcher( o), fts_object_get_variable(o), o);
+}
+
+static void
+define_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(fts_object_t),  define_init, define_delete);
+}
+
+
+
+
+/****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
+ *
+ * Old variable implementation
+ *
+ ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************/
+
 
 /****************************************************************************
  *
@@ -773,6 +795,7 @@ fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *
 }
 
 /* find all the users and definitions of a variable visible in the given scope */
+/* UNUSED */
 void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_objectset_t *set)
 {
   fts_binding_t *b;
@@ -799,5 +822,7 @@ void fts_kernel_variable_init(void)
   bindings_heap = fts_heap_new(sizeof(fts_binding_t));
   objlist_heap  = fts_heap_new(sizeof(fts_mess_obj_list_t));
   var_refs_heap = fts_heap_new(sizeof(fts_binding_list_t));
+
+  fts_class_install( fts_new_symbol( "define"), define_instantiate);
 }
-#endif
+

@@ -32,7 +32,7 @@
 typedef fmat_t cvec_t;
 
 DATA_API fts_symbol_t cvec_symbol;
-DATA_API fts_metaclass_t *cvec_type;
+DATA_API fts_class_t *cvec_type;
 
 #define cvec_get_size(v) ((v)->m)
 DATA_API void cvec_set_size(cvec_t *vector, int size);

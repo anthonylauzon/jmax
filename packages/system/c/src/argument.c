@@ -120,10 +120,10 @@ argument_instantiate(fts_class_t *cl)
 void
 argument_config(void)
 {
-  fts_metaclass_t *mcl;
+  fts_class_t *cl;
 
   sym_argument = fts_new_symbol("argument");
 
-  mcl = fts_class_install(sym_argument, argument_instantiate);
-  fts_class_alias(mcl, fts_new_symbol("arg"));
+  cl = fts_class_install(sym_argument, argument_instantiate);
+  fts_class_alias(cl, fts_new_symbol("arg"));
 }

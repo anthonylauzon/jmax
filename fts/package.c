@@ -50,12 +50,12 @@ fts_symbol_t s_uploadDone = 0;
 static fts_hashtable_t fts_packages;
 static fts_list_t* fts_package_paths = NULL;
 
-static fts_metaclass_t *fts_package_type = NULL;
+static fts_class_t *fts_package_type = NULL;
 static fts_package_t* fts_system_package = NULL;
 static fts_package_t* fts_package_stack[PACKAGE_STACK_SIZE];
 static int fts_package_stack_top = 0;
 
-static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
+static fts_status_description_t fts_DuplicatedClass = {"Duplicated class"};
 
 #if defined(WIN32)
 #define fts_lib_prefix   ""
@@ -167,7 +167,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   }
 
   /* check whether it's a package object */
-  if (fts_object_get_metaclass(obj) != fts_package_type) {
+  if (fts_object_get_class(obj) != fts_package_type) {
 /* FIXME: error corruption     fts_object_destroy(obj); */
     fts_log("[package]: Invalid package file %s\n", path);
     
@@ -666,7 +666,7 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
  */
 
 fts_status_t 
-fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name)
+fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
 {
   fts_atom_t data, k;
 
@@ -679,21 +679,21 @@ fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_
 
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(pkg->classes, &k, &data))
-    return &fts_DuplicatedMetaclass;
+    return &fts_DuplicatedClass;
   else
     {
-      fts_set_pointer(&data, mcl);
+      fts_set_pointer(&data, cl);
       fts_hashtable_put(pkg->classes, &k, &data);
     }
 
-  if(fts_metaclass_get_package(mcl) == NULL)
-    fts_metaclass_set_package(mcl, pkg);
+  if(fts_class_get_package(cl) == NULL)
+    fts_class_set_package(cl, pkg);
 
   return fts_ok;
 }
 
-fts_metaclass_t *
-fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
+fts_class_t *
+fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
 {
   fts_atom_t data, k;
   
@@ -706,7 +706,7 @@ fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
 }
 
 void 
-fts_package_get_metaclass_names(fts_package_t* pkg, fts_iterator_t* iter)
+fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
 {
   if(pkg->classes == NULL)
     {
@@ -1480,7 +1480,7 @@ fts_package_new(fts_symbol_t name)
   fts_atom_t a[1];
   
   fts_set_symbol(&a[0], name);
-  return (fts_package_t *) fts_object_create(fts_package_type, 1, a);
+  return (fts_package_t *) fts_object_create(fts_package_type, NULL, 1, a);
 }
 
 void 
@@ -1544,7 +1544,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   /* Send a "print" message to the result */
   fts_send_message( obj, fts_s_print, 0, 0);
 
-  if (fts_object_get_metaclass(obj) == fts_package_type) {
+  if (fts_object_get_class(obj) == fts_package_type) {
     post( "Loaded package\n");
   }
 }
@@ -1606,12 +1606,11 @@ fts_kernel_package_init(void)
 
   fts_package_push(fts_system_package);
 
-  /* now that there's a system package, we can define the package
-     (meta-) class */
+  /* now that there's a system package, we can define the package class */
   fts_package_type = fts_class_install(fts_s_package, fts_package_instantiate);
 
   /* update the system package with the correct class */
-  fts_system_package->object.head.cl = fts_package_type->inst_list;
+  fts_system_package->object.head.cl = fts_package_type;
 
   /* Debug code */
   fts_class_install( fts_new_symbol( "loader"), loader_instantiate);

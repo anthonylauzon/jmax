@@ -204,7 +204,7 @@ typedef struct fts_midievent
 
 } fts_midievent_t;
 
-FTS_API fts_metaclass_t *fts_midievent_type;
+FTS_API fts_class_t *fts_midievent_type;
 FTS_API fts_symbol_t fts_s_midievent;
 
 #define fts_midievent_get_type(e) ((e)->type)

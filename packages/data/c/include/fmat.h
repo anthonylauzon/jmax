@@ -37,7 +37,7 @@ typedef struct _fmat_
 } fmat_t;
 
 DATA_API fts_symbol_t fmat_symbol;
-DATA_API fts_metaclass_t *fmat_type;
+DATA_API fts_class_t *fmat_type;
 
 #define fmat_get_m(x) ((x)->m)
 #define fmat_get_n(x) ((x)->n)

@@ -340,7 +340,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   int ac;
   fts_atom_t *at, *top, ret[1];
   fts_status_t status;
-  fts_tuple_t *tuple;
+  fts_object_t *tuple;
 
   if (!tree)
     return fts_ok;
@@ -366,36 +366,34 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_PAR:
-    /* if there is more than one term or if we are at toplevel,
-       we always create a tuple 
-    */
-    if (tree->right->token == TK_TUPLE || toplevel)
+    expression_stack_push_frame( exp);
+
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+
+    ac = expression_stack_frame_count( exp);
+    at = expression_stack_frame( exp);
+
+    /* if there is more than one term or if we are at toplevel, we always create a tuple */
+    if (ac > 1 || toplevel)
       {
-	expression_stack_push_frame( exp);
-
-	if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
-	  return status;
-
-	ac = expression_stack_frame_count( exp);
-	at = expression_stack_frame( exp);
-
-	tuple = (fts_tuple_t *)fts_object_create( fts_tuple_metaclass, ac, at);
+	tuple = fts_object_create( fts_tuple_class, NULL, ac, at);
 
 	/* FIXME */
 	/* When is this tuple released ? Should we go through the stack when
 	   popping a frame and release the tuples ? */
 	fts_object_refer( tuple);
 	
-	fts_set_object( ret, (fts_object_t *)tuple);
-
-	expression_stack_pop_frame( exp);
-	expression_stack_push( exp, ret);
+	fts_set_object( ret, tuple);
       }
     else
       {
 	if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
 	  return status;
       }
+
+    expression_stack_pop_frame( exp);
+    expression_stack_push( exp, ret);
 
     break;
 
@@ -413,7 +411,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_COLON:
-    /* for now, metaclasses are returned as pointers.
+    /* for now, classes are returned as pointers.
        Once moved to classes, they will be returned as objects of the class "class"
     */
 
@@ -424,12 +422,12 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       {
 	fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
 	fts_symbol_t class_name = fts_get_symbol( &tree->right->value);
-	fts_metaclass_t *mcl = fts_metaclass_get_by_name( package_name, class_name);
+	fts_class_t *cl = fts_class_get_by_name( package_name, class_name);
 
-	if ( !mcl)
+	if ( !cl)
 	  return undefined_class_error;
 
-	fts_set_pointer( &tree->value, mcl);
+	fts_set_pointer( &tree->value, cl);
 	
 	expression_stack_push( exp, &tree->value);
       }
@@ -446,17 +444,17 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	else
 	  return invalid_environment_variable_error;
       }
-#ifndef REIMPLEMENTING_VARIABLES
     else if (fts_is_symbol( &tree->value))
       {
-	fts_atom_t *p;
+	fts_atom_t *value;
 
-	if ((p = fts_variable_get_value(scope, fts_get_symbol( &tree->value))))
-	  expression_stack_push( exp, p);
-	else
+	value = fts_variable_get_value_or_void( scope, fts_get_symbol( &tree->value));
+
+	if (value == 0 || fts_is_void( value))
 	  return undefined_variable_error;
+	else
+	  expression_stack_push( exp, value);
       }
-#endif
     else
       return invalid_environment_variable_error;
 
@@ -607,17 +605,13 @@ static void get_env_count_aux( fts_parsetree_t *tree, int *count_p)
   get_env_count_aux( tree->left, count_p);
   get_env_count_aux( tree->right, count_p);
 
-  switch( tree->token) {
-  case TK_DOLLAR: 
-    if ( fts_is_int( &tree->value))
-      {
-	int n = fts_get_int( &tree->value) + 1;
-
-	if (n > *count_p)
-	  *count_p = n;
-      }
-    break;
-  }
+  if ( tree->token == TK_DOLLAR && fts_is_int( &tree->value))
+    {
+      int n = fts_get_int( &tree->value) + 1;
+      
+      if (n > *count_p)
+	*count_p = n;
+    }
 }
 
 int fts_expression_get_env_count( fts_expression_t *exp)
@@ -627,6 +621,29 @@ int fts_expression_get_env_count( fts_expression_t *exp)
   get_env_count_aux( exp->tree, &count);
   
   return count;
+}
+
+/* **********************************************************************
+ *
+ * Expression variables user
+ *
+ */
+
+static void add_variables_user_aux( fts_parsetree_t *tree, fts_patcher_t *scope, fts_object_t *obj)
+{
+  if (!tree)
+    return;
+
+  add_variables_user_aux( tree->left, scope, obj);
+  add_variables_user_aux( tree->right, scope, obj);
+
+  if ( tree->token == TK_DOLLAR && fts_is_symbol( &tree->value) )
+    fts_variable_add_user( scope, fts_get_symbol( &tree->value), obj);
+}
+
+void fts_expression_add_variables_user( fts_expression_t *exp, fts_patcher_t *scope, fts_object_t *obj)
+{
+  add_variables_user_aux( exp->tree, scope, obj);
 }
 
 /* **********************************************************************

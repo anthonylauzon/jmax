@@ -47,6 +47,9 @@ struct fts_patcher
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
 
+  /* Variables */
+  fts_env_t env;
+
   fts_symbol_t file_name;
   
   int save_id;

@@ -56,7 +56,7 @@ typedef struct
 #define delayline_get_sr(d) ((d)->sr)
 #define delayline_get_n_tick(d) ((d)->n_tick)
 
-extern fts_metaclass_t *delayline_metaclass;
+extern fts_class_t *delayline_class;
 
 #endif
 

@@ -34,8 +34,8 @@
 
 #define BUFFER_LENGTH 256
 
-fts_metaclass_t *macosxmidi_input_type = NULL;
-fts_metaclass_t *macosxmidi_output_type = NULL;
+fts_class_t *macosxmidi_input_type = NULL;
+fts_class_t *macosxmidi_output_type = NULL;
 
 /****************************************************
  *

@@ -225,10 +225,8 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
 {
   fts_object_t *obj;
   fts_patlex_t *in; 
-  fts_atom_t description[1];
 
-  fts_set_symbol(&description[0], fts_s_patcher);
-  fts_object_new_to_patcher((fts_patcher_t *)patcher, 1, description, &obj);
+  obj = fts_object_create( patcher_class, patcher, 0, 0);
 
   /* flag the patcher as abstraction */
 

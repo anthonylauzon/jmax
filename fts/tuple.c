@@ -22,7 +22,7 @@
 
 #include <fts/fts.h>
 
-fts_metaclass_t *fts_tuple_metaclass = 0;
+fts_class_t *fts_tuple_class = 0;
 
 static void
 tuple_compare(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -91,5 +91,5 @@ tuple_instantiate(fts_class_t *cl)
 void
 fts_kernel_tuple_init(void)
 {
-  fts_tuple_metaclass = fts_class_install(NULL, tuple_instantiate);
+  fts_tuple_class = fts_class_install(NULL, tuple_instantiate);
 }

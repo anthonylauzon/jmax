@@ -120,7 +120,7 @@ tup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     tup_input_single(o, winlet, s, 1, at);
   else
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);

@@ -6,7 +6,7 @@
 ## automake --add-missing --copy --foreign
 SUBDIRS=client fts include java packages bin images tutorials config utils help doc
 
-EXTRA_DIST= AUTHORS CHANGES ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
+EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
 
 #
 # TAGS

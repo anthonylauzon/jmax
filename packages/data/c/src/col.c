@@ -25,7 +25,7 @@
 #include <fts/fts.h>
 #include "col.h"
 
-fts_metaclass_t *col_type = 0;
+fts_class_t *col_type = 0;
 fts_symbol_t col_symbol = 0;
 
 /********************************************************

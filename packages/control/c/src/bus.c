@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 
-static fts_metaclass_t *bus_type = 0;
+static fts_class_t *bus_type = 0;
 static fts_symbol_t bus_symbol = 0;
 
 static fts_symbol_t throw_symbol = 0;

@@ -35,7 +35,7 @@ static fts_symbol_t sym_tapout = 0;
 static fts_symbol_t sym_retap = 0;
 static fts_symbol_t sym_vtap = 0;
 
-fts_metaclass_t *delayline_metaclass;
+fts_class_t *delayline_class;
 
 /************************************************************
  *
@@ -168,7 +168,7 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   delayline_initialize(this);
 
-  if(ac > 0 && fts_is_a(at, fts_dsp_edge_metaclass))
+  if(ac > 0 && fts_is_a(at, fts_dsp_edge_class))
     {
       this->edge = (fts_dsp_edge_t *)fts_get_object(at);
       fts_object_refer((fts_object_t *)this->edge);
@@ -177,7 +177,7 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
   else
     {
-      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_metaclass, 0, 0);
+      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, NULL, 0, 0);
       fts_object_refer((fts_object_t *)this->edge);
     }
 
@@ -514,7 +514,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->samples = samples;
   this->mode = mode_none;
 
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+  if(ac > 0 && fts_is_a(at, delayline_class))
     delay_set_line(o, 0, 0, 1, at);
   else
     {
@@ -540,7 +540,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->samples = samples;
   this->mode = mode_none;
 
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+  if(ac > 0 && fts_is_a(at, delayline_class))
     delay_set_line(o, 0, 0, 1, at);
   else
     {
@@ -575,7 +575,7 @@ tapin_instantiate(fts_class_t *cl)
 
   fts_class_inlet_int(cl, 1, delay_set_time);
   fts_class_inlet_float(cl, 1, delay_set_time);
-  fts_class_inlet(cl, 2, delayline_metaclass, delay_set_line);
+  fts_class_inlet(cl, 2, delayline_class, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0); /* hidden orderforcing connection */
@@ -591,7 +591,7 @@ tapout_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 0, delay_set_time);
   fts_class_inlet_float(cl, 0, delay_set_time);
 
-  fts_class_inlet(cl, 1, delayline_metaclass, delay_set_line);
+  fts_class_inlet(cl, 1, delayline_class, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -692,7 +692,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->samples = samples;
   this->mode = mode_none;
 
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+  if(ac > 0 && fts_is_a(at, delayline_class))
     delay_set_line(o, 0, 0, 1, at);
   else
     {
@@ -715,7 +715,7 @@ retap_instantiate(fts_class_t *cl)
 
   fts_class_inlet_int(cl, 1, retap_set_time);
   fts_class_inlet_float(cl, 1, retap_set_time);
-  fts_class_inlet(cl, 2, delayline_metaclass, delay_set_line);
+  fts_class_inlet(cl, 2, delayline_class, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
 }
@@ -822,7 +822,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->samples = 0;
   this->mode = mode_cubic;
 
-  if(ac > 0 && fts_is_a(at, delayline_metaclass))
+  if(ac > 0 && fts_is_a(at, delayline_class))
     delay_set_line(o, 0, 0, 1, at);
   else
     {
@@ -840,7 +840,7 @@ vtap_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, vtap_put);
 
-  fts_class_inlet(cl, 1, delayline_metaclass, delay_set_line);
+  fts_class_inlet(cl, 1, delayline_class, delay_set_line);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -862,8 +862,8 @@ signal_delay_config(void)
   sym_retap = fts_new_symbol("retap~");
   sym_vtap = fts_new_symbol("vtap~");
 
-  delayline_metaclass = fts_class_install(sym_delayline, delayline_instantiate);
-  fts_class_alias(delayline_metaclass, fts_new_symbol("dline~"));
+  delayline_class = fts_class_install(sym_delayline, delayline_instantiate);
+  fts_class_alias(delayline_class, fts_new_symbol("dline~"));
   fts_class_install(sym_delay, delay_instantiate);
   fts_class_install(sym_tapin, tapin_instantiate);
   fts_class_install(sym_tapout, tapout_instantiate);

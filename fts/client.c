@@ -104,8 +104,9 @@ typedef int socket_t;
 #include "ftsprivate/client.h"
 #include "ftsprivate/protocol.h"
 
-static fts_symbol_t s_client;
-static fts_symbol_t s_client_manager;
+static fts_class_t *client_class;
+static fts_class_t *client_manager_class;
+
 static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
 static fts_symbol_t s_show_message;
@@ -181,7 +182,7 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
 {
   client_manager_t *this = (client_manager_t *)o;
   socket_t new_socket;
-  fts_atom_t argv[3];
+  fts_atom_t a;
   fts_object_t *client_object;
   fts_object_t *socket_stream; 
 
@@ -193,13 +194,11 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
       return;
     }
 
-  fts_set_int( argv, new_socket);
-  socket_stream = fts_object_create( fts_socketstream_type, 1, argv);
+  fts_set_int( &a, new_socket);
+  socket_stream = fts_object_create( fts_socketstream_type, NULL, 1, &a);
 
-  fts_set_symbol( argv, s_client);
-  fts_set_object( argv+1, socket_stream);
-
-  fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
+  fts_set_object( &a, socket_stream);
+  client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
 
   if (!client_object)
     {
@@ -979,14 +978,10 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
 static void client_predefine_objects( client_t *this)
 {
-  fts_atom_t k, v;
-  fts_atom_t a[1];
-
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
   client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
 #else
-  fts_set_symbol( a, fts_s_patcher);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &this->root_patcher);
+  this->root_patcher = fts_object_create( patcher_class, fts_get_root_patcher(), 0, 0);
 
   if ( !this->root_patcher)
     {
@@ -1140,9 +1135,6 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_symbol_t s_bus = fts_new_symbol( "bus");
   fts_symbol_t s_label = fts_new_symbol( "label");
 
-#ifdef REIMPLEMENTING_VARIABLES
-  fts_object_set_error( (fts_object_t *)this, "object required");
-#else
   this->gate = 0;
 
   /* By default, we don't echo the message coming from the client to the client */
@@ -1189,10 +1181,10 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_set_symbol( a, fts_new_symbol( "catch"));
       fts_set_object( a+1, target);
       fts_set_int( a+2, channel_number);
-      fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 3, a, &from);
+      from = fts_eval_object_description( fts_object_get_patcher( (fts_object_t *)this), 3, a);
 
       fts_set_symbol( a, fts_new_symbol( "throw"));
-      fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 3, a, &to);
+      to = fts_eval_object_description( fts_object_get_patcher( (fts_object_t *)this), 3, a);
     }
   else
     {
@@ -1200,10 +1192,10 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
       fts_set_symbol( a, fts_new_symbol( "inlet"));
       fts_set_object( a+1, target);
-      fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 2, a, &from);
+      from = fts_eval_object_description( fts_object_get_patcher( (fts_object_t *)this), 2, a);
 
       fts_set_symbol( a, fts_new_symbol( "outlet"));
-      fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 2, a, &to);
+      to = fts_eval_object_description( fts_object_get_patcher( (fts_object_t *)this), 2, a);
     }
 
   if( !from || !to)
@@ -1214,7 +1206,6 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_connection_new(from, 0, (fts_object_t *)this, 0, fts_c_anything);
   fts_connection_new((fts_object_t *)this, 0, to, 0, fts_c_anything);
-#endif
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1546,21 +1537,18 @@ void fts_client_release_object(fts_object_t *obj)
 
 static void client_tcp_manager_install( void)
 {
-  int argc = 0;
-  fts_atom_t argv[2];
+  int ac = 0;
+  fts_atom_t at[1];
   fts_object_t *client_manager_object;
   fts_symbol_t s;
 
-  fts_set_symbol( argv, s_client_manager);
-  argc++;
-    
   if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
     {
-      fts_set_int( argv+1, atoi( s));
-      argc++;
+      fts_set_int( at, atoi( s));
+      ac++;
     }
     
-  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &client_manager_object);
+  client_manager_object = fts_object_create( client_manager_class, fts_get_root_patcher(), ac, at);
   
   if ( !client_manager_object)
     fprintf( stderr, "[client] cannot create client manager\n");
@@ -1568,17 +1556,14 @@ static void client_tcp_manager_install( void)
 
 static void client_pipe_install( void)
 {
-  fts_atom_t argv[3];
+  fts_atom_t a;
   fts_object_t *client_object;
   fts_object_t *pipe_stream; 
 
-  pipe_stream = fts_object_create(fts_pipestream_type, 0, 0);
+  pipe_stream = fts_object_create(fts_pipestream_type, NULL, 0, 0);
   
-  fts_set_symbol( argv, s_client);
-  fts_set_object( argv+1, pipe_stream);
-  fts_set_int( argv+2, 1);
-  
-  fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
+  fts_set_object( &a, pipe_stream);
+  client_object = fts_object_create( client_class, fts_get_root_patcher(), 1, &a);
   
   if (!client_object)
     {
@@ -1589,17 +1574,15 @@ static void client_pipe_install( void)
 
 void fts_client_config( void)
 {
-  s_client_manager = fts_new_symbol("client_manager");
-  s_client = fts_new_symbol("client");
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");
   s_show_message = fts_new_symbol( "showMessage");
 
   client_table_init();
 
-  fts_class_install( s_client_manager, client_manager_instantiate);
+  client_manager_class = fts_class_install( NULL, client_manager_instantiate);
 
-  fts_class_install( s_client, client_instantiate);
+  client_class = fts_class_install( NULL, client_instantiate);
 
   fts_class_install( fts_new_symbol("client_controller"), client_controller_instantiate);
 

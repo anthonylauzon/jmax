@@ -20,21 +20,22 @@
  * 
  */
 
+/* Must be declared forward */
 typedef const char *fts_symbol_t;
 typedef struct fts_object fts_object_t;
 typedef union  fts_word fts_word_t;
 typedef struct fts_atom fts_atom_t;
-typedef struct fts_connection fts_connection_t;
-typedef struct fts_metaclass fts_metaclass_t;
 typedef struct fts_class fts_class_t;
+typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
+
+/* Should it be declared forward ??? */
+typedef struct fts_connection fts_connection_t;
 typedef struct fts_patcher fts_patcher_t;
 typedef struct fts_inlet fts_inlet_t;
 typedef struct fts_outlet fts_outlet_t;
 typedef struct fts_template fts_template_t;
 typedef struct fts_abstraction fts_abstraction_t;
 typedef struct fts_package fts_package_t;
-
-typedef struct fts_status_description fts_status_description_t, *fts_status_t;
 
 /**
  * A fts_word_t is an union of the different basic types used in FTS.
@@ -55,25 +56,9 @@ union fts_word
  */
 
 struct fts_atom { 
-  fts_metaclass_t *type;
+  fts_class_t *type;
   fts_word_t value;
 };
 
 
-typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
-typedef void (*fts_function_t) (int, const fts_atom_t *);
 
-/* typedef void (*fts_return_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *, fts_atom_t *ret); */
-/* typedef void (*fts_function_t) (int, const fts_atom_t *, fts_atom_t *ret); */
-
-typedef enum fts_connection_type
-{
-  fts_c_order_forcing = -3, /* order forcing */
-  fts_c_hidden = -2, /* hidden connection */
-  fts_c_null = -1, /* from error object or type missmatch */
-  fts_c_anything = 0, /* message, value or signal */
-  fts_c_message = 1, /* message, value or signal */
-  fts_c_value = 2, /* varargs (unpacked tuple) or single value */
-  fts_c_audio = 3, /* signal connection */
-  fts_c_audio_active = 4 /* active signal connection */
-} fts_connection_type_t;

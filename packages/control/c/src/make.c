@@ -36,7 +36,7 @@ typedef struct
 {
   fts_object_t o;
   fts_symbol_t classname;
-  fts_metaclass_t *class;
+  fts_class_t *class;
 } make_t;
 
 /************************************************************
@@ -49,7 +49,7 @@ static void
 make_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   make_t *this = (make_t *)o;
-  fts_object_t *obj = fts_object_create(this->class, ac, at);
+  fts_object_t *obj = fts_object_create(this->class, NULL, ac, at);
   fts_symbol_t error = fts_object_get_error(obj);
   fts_atom_t a;
 
@@ -73,7 +73,7 @@ make_set_classname(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   make_t *this = (make_t *)o;
   fts_symbol_t classname = fts_get_symbol(at);
-  fts_metaclass_t *class = fts_metaclass_get_by_name(NULL, classname);
+  fts_class_t *class = fts_class_get_by_name(NULL, classname);
 
   if(class)
     {

@@ -39,7 +39,7 @@
  *  message class
  *
  */
-fts_metaclass_t *fts_message_metaclass = 0;
+fts_class_t *fts_message_class = 0;
 
 void
 fts_message_clear(fts_message_t *mess)
@@ -107,7 +107,7 @@ message_instantiate(fts_class_t *cl)
 void
 fts_message_config(void)
 {
-  fts_message_metaclass = fts_class_install(NULL, message_instantiate);
+  fts_message_class = fts_class_install(NULL, message_instantiate);
 }
 
 /************************************************
@@ -120,7 +120,7 @@ void
 fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
 {
   dumper->send = send;
-  dumper->message = (fts_message_t *)fts_object_create(fts_message_metaclass, 0, 0);
+  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, NULL, 0, 0);
 
   fts_object_refer(dumper->message);
 }
@@ -266,7 +266,7 @@ output_value(fts_object_t *o, int woutlet, const fts_atom_t *at)
 
   if (!FTS_REACHED_MAX_CALL_DEPTH()) 
     {
-      fts_metaclass_t *class = fts_get_class(at);
+      fts_class_t *class = fts_get_class(at);
 
       while(conn)
 	{
@@ -312,7 +312,7 @@ static void
 output_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 {
   fts_connection_t *conn = o->out_conn[woutlet];
-  fts_metaclass_t *class = fts_get_class(at);
+  fts_class_t *class = fts_get_class(at);
 
   if(!check_outlet(o, woutlet))
     return;

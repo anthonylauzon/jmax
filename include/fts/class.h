@@ -21,46 +21,29 @@
  */
 
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
-typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
 /* Predefined typeids */
 #define FTS_FIRST_OBJECT_TYPEID   16
 
-struct fts_metaclass 
-{
-  fts_symbol_t name; /* name of the metaclass, i.e. the first name used to register it */
+struct fts_class {
+  fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
 
-  /* Selector used if an instance of this class is send in a message.
-     Defaults to class name.
-     Set only for metaclasses representing primitive types.
-  */
-  fts_symbol_t selector; 
-  
   /* A type id that separates primitive types from objects: lower values are primitive types */
   int typeid;
 
   fts_instantiate_fun_t instantiate_fun;
-  fts_equiv_fun_t equiv_fun;
-  fts_class_t *inst_list; /* instance data base */
   
-  fts_package_t *package; /* home package of the metaclass */
-  struct fts_metaclass *next; /* next metaclass with the same name in the same package */
-};
-
-struct fts_class 
-{
-  /* Object management */
-  fts_metaclass_t *mcl;
-
   fts_method_t constructor;
   fts_method_t deconstructor;
 
-  fts_hashtable_t messages;
+  fts_package_t *package;
+
+  fts_hashtable_t *messages;
 
   int ninlets;
-  fts_hashtable_t inlets;
+  fts_hashtable_t *inlets;
   fts_method_t default_handler;
 
   int noutlets;
@@ -69,11 +52,6 @@ struct fts_class
 
   int size;
   fts_heap_t *heap;
-
-  /* Class Instance Data Base support */
-  int ac;
-  const fts_atom_t *at;
-  fts_class_t *next;
 
   /* property list handling */
   fts_plist_t *properties;		/* class' dynamic properties */
@@ -88,28 +66,14 @@ FTS_API fts_status_description_t fts_InletOutOfRange;
 FTS_API fts_status_description_t fts_OutletOutOfRange;
 FTS_API fts_status_description_t fts_CannotInstantiate;
 
-/**
- * Create an instance of a class.
- *
- * A new instance of the class is created and initialized.
- * If parent patcher is not NULL, the created instance will be added as child to the parent patcher.
- *
- * @fn fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *cl, fts_patcher_t *parent, int ac, const fts_atom_t *at)
- * @param cl the class to instantiate
- * @param parent the parent of the created object
- * @param ac argument count
- * @param at the arguments
- * @return the created object, NULL if instantiation failed
- */
-FTS_API fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *cl, fts_patcher_t *parent, int ac, const fts_atom_t *at);
-FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
+FTS_API fts_class_t *fts_class_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
 
-FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
-FTS_API void fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
+FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
+FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 
-#define fts_metaclass_is_primitive(MCL) ((MCL)->typeid < FTS_FIRST_OBJECT_TYPEID)
+#define fts_class_is_primitive(CL) ((CL)->typeid < FTS_FIRST_OBJECT_TYPEID)
 
-FTS_API fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
+FTS_API void fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
 
 /* default input handler */
 #define fts_class_get_default_handler(c) ((c)->default_handler)
@@ -119,11 +83,11 @@ FTS_API void fts_class_default_error_handler(fts_object_t *o, int winlet, fts_sy
 
 /* method definition */
 FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
-FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_metaclass_t *type, fts_method_t mth);
-FTS_API void fts_class_inlet_anything(fts_class_t *cl, int winlet);
+FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth);
+FTS_API void fts_class_inlet_anything(fts_class_t *cl, int woutlet);
 
 /* outlet definition */
-FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_metaclass_t *type);
+FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
 FTS_API void fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t selector);
 FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 
@@ -148,8 +112,8 @@ FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 /* marcros for most popular outlet messages */
 #define fts_class_outlet_bang(c, i) fts_class_outlet_message((c), (i), fts_s_bang)
 
-#define fts_class_get_name(C) ((C)->mcl->name)
-#define fts_metaclass_get_name(C) ((C)->name)
+#define fts_class_get_name(C) ((C)->cl->name)
+#define fts_class_get_name(C) ((C)->name)
 
 FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s);
 #define fts_class_get_constructor(c) ((c)->constructor)

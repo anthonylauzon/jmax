@@ -35,7 +35,7 @@
 
 #define TRACK_BLOCK_SIZE 256
 
-fts_metaclass_t *track_type = 0;
+fts_class_t *track_type = 0;
 
 /*********************************************************
  *
@@ -51,14 +51,14 @@ create_event(int ac, const fts_atom_t *at)
   event_t *event = 0;
 
   if(type_name == fts_s_int || type_name == fts_s_float || type_name == fts_s_symbol)
-    event = (event_t *)fts_object_create(event_type, 1, at + 1);
+    event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
   else
     {
-      fts_metaclass_t *type = fts_metaclass_get_by_name( NULL, type_name);
+      fts_class_t *type = fts_class_get_by_name( NULL, type_name);
 
       if(type)
 	{
-	  fts_object_t *obj = fts_object_create(type, 0, 0);	
+	  fts_object_t *obj = fts_object_create(type, NULL, 0, 0);	
 	  fts_class_t *class = fts_object_get_class(obj);
 	  fts_method_t meth_set = fts_class_get_method(class, fts_s_set_from_array);
 
@@ -69,7 +69,7 @@ create_event(int ac, const fts_atom_t *at)
 	      meth_set(obj, 0, 0, ac - 1, at + 1);
 
 	      fts_set_object(&a, obj);
-	      event = (event_t *)fts_object_create(event_type, 1, &a);
+	      event = (event_t *)fts_object_create(event_type, NULL, 1, &a);
 	    }
 	}
     }
@@ -687,7 +687,7 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(track_type == fts_s_void || fts_get_class_name(at + 1) == track_type)
 	{
 	  double time = fts_get_number_float(at);
-	  event_t *event = (event_t *)fts_object_create(event_type, 1, at + 1);
+	  event_t *event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
 	  
 	  /* add event to track */
 	  track_add_event(this, time, event);
@@ -967,7 +967,7 @@ track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   
   /* make new event object */
   if(ac == 2)
-    event = (event_t *)fts_object_create(event_type, 1, at + 1);
+    event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
   else
     event = create_event(ac - 1, at + 1);
   

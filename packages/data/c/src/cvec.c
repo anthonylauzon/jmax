@@ -28,7 +28,7 @@
 #include <ctype.h>
 
 fts_symbol_t cvec_symbol = 0;
-fts_metaclass_t *cvec_type = 0;
+fts_class_t *cvec_type = 0;
 
 /********************************************************
  *

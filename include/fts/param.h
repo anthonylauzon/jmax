@@ -48,5 +48,5 @@ FTS_API void fts_param_set_float(fts_param_t *param, double f);
 
 #define fts_param_get_value(p) (&((p)->value))
 
-FTS_API fts_metaclass_t *fts_param_metaclass;
+FTS_API fts_class_t *fts_param_class;
 

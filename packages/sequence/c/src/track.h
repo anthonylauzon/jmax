@@ -30,7 +30,7 @@
 #include "track.h"
 #include "event.h"
 
-extern fts_metaclass_t *track_type;
+extern fts_class_t *track_type;
 
 typedef struct _track_ track_t;
 

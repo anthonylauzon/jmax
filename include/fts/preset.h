@@ -31,4 +31,4 @@ typedef struct
   fts_object_t **current; /* current preset (for loading) */
 } fts_preset_t;
 
-FTS_API fts_metaclass_t *fts_preset_metaclass;
+FTS_API fts_class_t *fts_preset_class;

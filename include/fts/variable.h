@@ -20,15 +20,6 @@
  * 
  */
 
-#if 1
-
-FTS_API fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
-FTS_API fts_atom_t *fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name);
-FTS_API void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
-FTS_API void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
-
-#else
-
 typedef struct fts_binding_list fts_binding_list_t;
 typedef struct fts_mess_obj_list fts_mess_obj_list_t;
 typedef struct fts_binding fts_binding_t;
@@ -84,4 +75,3 @@ FTS_API fts_atom_t *fts_variable_get_value_or_void(fts_patcher_t *scope, fts_sym
 FTS_API void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 FTS_API void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 
-#endif

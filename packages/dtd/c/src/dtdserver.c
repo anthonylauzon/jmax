@@ -72,40 +72,13 @@ struct _dtdserver_t {
   dtdfifo_t *fifo_table[DTD_MAX_FIFOS];
 };
 
-static fts_metaclass_t *dtdserver_type;
+static fts_class_t *dtdserver_type;
 static dtdserver_t *default_instance;
-
-dtdserver_t* dtdserver_set_default_instance(int argc, const fts_atom_t* argv)
-{
-    fts_object_t* obj;
-    fts_atom_t a[1];
-
-    fts_object_new_to_patcher(fts_get_root_patcher(), argc, argv, &obj);
-    if (!obj)
-    {
-	return NULL;
-    }
-
-    fts_object_get_prop(obj, fts_s_state, a);
-    
-    if (!fts_is_object(a))
-    {
-	fts_object_delete_from_patcher(obj);
-	return NULL;
-    }
-    return (dtdserver_t*)(fts_get_object(a));
-}
 
 dtdserver_t *dtdserver_get_default_instance( void)
 {
   if (!default_instance)
-  {
-      fts_atom_t a[1];
-      
-      fts_set_symbol(a, fts_new_symbol("dtdserver"));
-      default_instance = dtdserver_set_default_instance(1, a);
-/*    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0); */
-  }
+    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, NULL, 0, 0);
   
   return default_instance;
 }
@@ -381,27 +354,16 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
     }
 }
 
-static void
-dtdserver_get_state(fts_daemon_action_t action, fts_object_t* o, fts_symbol_t property, 
-		    fts_atom_t* value)
-{
-    fts_set_object(value, o);
-}
-
 static void dtdserver_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof(dtdserver_t), dtdserver_init, dtdserver_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, dtdserver_select);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, dtdserver_get_state);
 }
 
 void dtdserver_config( void)
 {
-  fts_symbol_t s = fts_new_symbol( "dtdserver");
-
-  dtdserver_type = fts_class_install( s, dtdserver_instantiate);
+  dtdserver_type = fts_class_install( NULL, dtdserver_instantiate);
 }
 
 

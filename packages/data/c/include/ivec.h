@@ -42,7 +42,7 @@ typedef struct _ivec_
 } ivec_t;
 
 DATA_API fts_symbol_t ivec_symbol;
-DATA_API fts_metaclass_t *ivec_type;
+DATA_API fts_class_t *ivec_type;
 
 DATA_API void ivec_set_with_onset_from_atoms(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 

@@ -246,23 +246,23 @@ fts_abstraction_t *fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_s
 /**
  * Add a new meta class to this package.
  *
- * @fn fts_status_t fts_package_add_metaclass(fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name)
+ * @fn fts_status_t fts_package_add_class(fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
  * @param pkg the package
- * @param mcl the meta class
+ * @param cl the meta class
  * @param name the registery name
  * @return a status object 
  * @ingroup package */
-fts_status_t fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name);
+fts_status_t fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name);
 
 /**
  * Returns the meta class with the specified name. 
  *
- * @fn fts_metaclass_t *fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
+ * @fn fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
  * @param pkg the package
  * @param name the name of the meta class
- * @return the metaclass or NULL if this package doesn't define the meta class.
+ * @return the class or NULL if this package doesn't define the meta class.
  * @ingroup package */
-fts_metaclass_t *fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name);
+fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
 /**
  * Defines a new help.

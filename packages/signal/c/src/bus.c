@@ -32,7 +32,7 @@ static fts_symbol_t bus_tilda_symbol = 0;
 static fts_symbol_t throw_tilda_symbol = 0;
 static fts_symbol_t catch_tilda_symbol = 0;
 
-static fts_metaclass_t *bus_type = 0;
+static fts_class_t *bus_type = 0;
 
 typedef struct
 {
@@ -107,7 +107,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
   int n_channels = 0;
   int n;
 
-  if(ac > 0 && fts_is_a(at, fts_dsp_edge_metaclass))
+  if(ac > 0 && fts_is_a(at, fts_dsp_edge_class))
     {
       this->edge = (fts_dsp_edge_t *)fts_get_object(at);
       fts_object_refer((fts_object_t *)this->edge);
@@ -116,7 +116,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
     }
   else
     {
-      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_metaclass, 0, 0);
+      this->edge = (fts_dsp_edge_t *)fts_object_create(fts_dsp_edge_class, NULL, 0, 0);
       fts_object_refer((fts_object_t *)this->edge);
     }
 
@@ -173,7 +173,7 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       fts_object_t *obj = fts_get_object(value);
       
-      if(fts_object_get_metaclass(obj) == bus_type)
+      if(fts_object_get_class(obj) == bus_type)
 	return bus = (bus_t *)obj;
     }
   
@@ -187,7 +187,7 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     return (bus_t *)fts_get_object(&a);
 
   /* if there wasn't a variable nor a default, make a default */
-  bus = (bus_t *)fts_object_create(bus_type, 0, 0);
+  bus = (bus_t *)fts_object_create(bus_type, NULL, 0, 0);
   
   fts_set_object(&a, (fts_object_t *)bus);
   fts_hashtable_put(default_busses, &key, &a);

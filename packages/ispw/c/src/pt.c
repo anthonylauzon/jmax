@@ -322,7 +322,7 @@ static void pt_class_instantiate(fts_class_t *cl)
 void
 pt_config(void)
 {
-  fts_metaclass_t *thiscl;
+  fts_class_t *thiscl;
 
   sym_pt_tilda = fts_new_symbol("pt~");
   fts_dsp_declare_function(sym_pt_tilda, pt_common_dsp_function);  

@@ -27,7 +27,7 @@
 
 #include <data/c/include/data.h>
 
-DATA_API fts_metaclass_t *mat_type;
+DATA_API fts_class_t *mat_type;
 DATA_API fts_symbol_t mat_symbol;
 
 typedef struct

@@ -166,7 +166,7 @@ samppeek_instantiate(fts_class_t *cl)
 void
 samppeek_config(void)
 {
-  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("samppeek"), samppeek_instantiate);
-  fts_class_alias(mcl, fts_new_symbol("samppeek~"));
+  fts_class_t *cl = fts_class_install(fts_new_symbol("samppeek"), samppeek_instantiate);
+  fts_class_alias(cl, fts_new_symbol("samppeek~"));
 }
 

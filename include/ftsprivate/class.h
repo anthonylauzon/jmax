@@ -28,19 +28,17 @@ struct fts_class_outlet
   fts_list_t *declarations;
 };
 
-#define fts_metaclass_get_package(m) ((m)->package)
-#define fts_metaclass_set_package(m, p) ((m)->package = (p))
+#define fts_class_get_package(m) ((m)->package)
+#define fts_class_set_package(m, p) ((m)->package = (p))
 
-#define fts_metaclass_set_name(m, s) ((m)->name = (s))
-#define fts_metaclass_get_typeid(m) ((m)->typeid)
+#define fts_class_set_name(m, s) ((m)->name = (s))
+#define fts_class_get_typeid(m) ((m)->typeid)
 
-extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_metaclass_t *type);
+extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_class_t *type);
 
 extern int fts_class_outlet_get_declarations(fts_class_t *cl, int woutlet, fts_iterator_t *iter);
-extern int fts_class_outlet_has_type(fts_class_t *cl, int woutlet, fts_metaclass_t *type);
+extern int fts_class_outlet_has_type(fts_class_t *cl, int woutlet, fts_class_t *type);
 extern int fts_class_outlet_has_message(fts_class_t *cl, int woutlet, fts_symbol_t selector);
-
-extern fts_class_t *fts_class_instantiate(fts_metaclass_t *mcl);
 
 #endif
 

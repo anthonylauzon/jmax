@@ -29,7 +29,7 @@
 #include "fmat.h"
 
 DATA_API fts_symbol_t fvec_symbol;
-DATA_API fts_metaclass_t *fvec_type;
+DATA_API fts_class_t *fvec_type;
 
 typedef fmat_t fvec_t;
 

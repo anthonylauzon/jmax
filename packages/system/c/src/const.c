@@ -41,7 +41,7 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 1)
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       
       fts_object_refer(tuple);
       fts_set_object(&this->a, tuple);

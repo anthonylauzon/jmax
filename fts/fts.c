@@ -170,14 +170,11 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_atom_init);
   _K_DECNCALL( fts_kernel_post_init);
   _K_DECNCALL( fts_kernel_list_init);
-  _K_DECNCALL( fts_kernel_class_init);
   _K_DECNCALL( fts_kernel_property_init);
   _K_DECNCALL( fts_kernel_package_init);
   _K_DECNCALL( fts_kernel_tuple_init);
   _K_DECNCALL( fts_kernel_connection_init);
-#if 0
   _K_DECNCALL( fts_kernel_variable_init);
-#endif
   _K_DECNCALL( fts_kernel_patcher_init);
   _K_DECNCALL( fts_kernel_parser_init);
   _K_DECNCALL( fts_kernel_expression_init); /* Must be after parser_init */

@@ -28,7 +28,7 @@
 static fts_symbol_t sym_text = 0;
 
 fts_symbol_t ivec_symbol = 0;
-fts_metaclass_t *ivec_type = 0;
+fts_class_t *ivec_type = 0;
 
 static fts_symbol_t sym_local = 0;
 
@@ -762,7 +762,7 @@ ivec_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       int i;
       
       if(!this->copy)
-	this->copy = (ivec_t *)fts_object_create(ivec_type, 1, at + 1);
+	this->copy = (ivec_t *)fts_object_create(ivec_type, NULL, 1, at + 1);
       else
 	ivec_set_size(this->copy, size);
       

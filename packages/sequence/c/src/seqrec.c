@@ -128,7 +128,7 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 	  if(track_type == fts_s_void || fts_get_class_name(at) == track_type)
 	    {
-	      event_t *event = (event_t *)fts_object_create(event_type, 1, at);
+	      event_t *event = (event_t *)fts_object_create(event_type, NULL, 1, at);
 	  
 	      /* add event to recording track */
 	      track_append_event(this->recording, here, event);
@@ -150,7 +150,7 @@ seqrec_record_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	seqrec_record_atom(o, 0, 0, 1, at);
       else if(ac > 1)
 	{
-	  fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+	  fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
 	  fts_atom_t a;
 	  
 	  fts_set_object(&a, tuple);
@@ -193,7 +193,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
       
-      this->recording = (track_t *)fts_object_create(track_type, 0, 0);
+      this->recording = (track_t *)fts_object_create(track_type, NULL, 0, 0);
     }
   else
     fts_object_set_error(o, "argument of track required");

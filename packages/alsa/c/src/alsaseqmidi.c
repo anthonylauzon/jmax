@@ -232,7 +232,7 @@ alsaseqmidi_append_outputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 
 
 static fts_midiport_t*
-alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_metaclass_t* mcl, fts_symbol_t device_name, fts_symbol_t label_name, fts_symbol_t port_address)
+alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_class_t* cl, fts_symbol_t device_name, fts_symbol_t label_name, fts_symbol_t port_address)
 {
     fts_object_t* port = NULL;
     fts_atom_t args[4];    
@@ -244,7 +244,7 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_metaclass_t* mcl, fts_symbo
     fts_set_symbol(args + 3, port_address);
     fts_log("[alsaseqmidi] Create alsaseqmidiport label_name: %s, device_name: %s, port_address: %s\n", label_name, device_name, port_address);
     
-    port = fts_object_create(mcl, 4, args);
+    port = fts_object_create(cl, NULL, 4, args);
     if((port == NULL)
        || (fts_object_get_error(port) == NULL))
     {
@@ -259,7 +259,7 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_metaclass_t* mcl, fts_symbo
 
 
 static void
-alsaseqmidi_get_io(alsaseqmidi_t* this, fts_metaclass_t* alsaseqmidiport_type, const fts_atom_t* at, fts_hashtable_t* ht, fts_symbol_t* default_port)
+alsaseqmidi_get_io(alsaseqmidi_t* this, fts_class_t* alsaseqmidiport_type, const fts_atom_t* at, fts_hashtable_t* ht, fts_symbol_t* default_port)
 {
     fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
     fts_symbol_t device_name = fts_get_symbol(at + 1);
@@ -460,13 +460,13 @@ alsaseqmidi_instantiate(fts_class_t* cl)
 void
 alsaseqmidi_config(void)
 {
-    fts_metaclass_t* mc = fts_class_install(fts_new_symbol("alsaseqmidi"), alsaseqmidi_instantiate);
+    fts_class_t* mc = fts_class_install(fts_new_symbol("alsaseqmidi"), alsaseqmidi_instantiate);
     fts_object_t* o;
     alsaseqmidi_symbol_jmax_prefix = fts_new_symbol("jMax");
     alsaseqmidi_symbol_default_unset = fts_new_symbol("default unset");
     alsaseqmidi_symbol_alsaseq_midi_destination = fts_new_symbol("ALSA Destination");
     alsaseqmidi_symbol_alsaseq_midi_source = fts_new_symbol("ALSA Source");
-    o = fts_object_create(mc, 0, 0);
+    o = fts_object_create(mc, NULL, 0, 0);
     if (0 == fts_object_get_error(o))
       {
 	fts_midiconfig_add_manager((fts_midimanager_t*)o);

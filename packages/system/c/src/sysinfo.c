@@ -34,9 +34,9 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   fts_package_t *pkg;
   fts_iterator_t pkg_iter;
-  fts_iterator_t mcl_iter;
+  fts_iterator_t cl_iter;
   fts_atom_t pkg_name;
-  fts_atom_t mcl_name;
+  fts_atom_t cl_name;
 
   /* post html header */
   post("<html>\n");
@@ -61,11 +61,11 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	{
 	  post("  <tr><td colspan=2><h2>%s</h2></td></tr>\n", fts_get_symbol(&pkg_name));
 	  
-	  fts_package_get_metaclass_names(pkg, &mcl_iter);
-	  while(fts_iterator_has_more(&mcl_iter)) 
+	  fts_package_get_class_names(pkg, &cl_iter);
+	  while(fts_iterator_has_more(&cl_iter)) 
 	    {
-	      fts_iterator_next(&mcl_iter, &mcl_name);	      
-	      post("    <tr><td width=10%>%s</td><td>&nbsp;</td></tr>\n", fts_get_symbol(&mcl_name));
+	      fts_iterator_next(&cl_iter, &cl_name);	      
+	      post("    <tr><td width=10%>%s</td><td>&nbsp;</td></tr>\n", fts_get_symbol(&cl_name));
 	    }
 
 	}
@@ -79,16 +79,16 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   post("</html>\n");
 }
 
-extern fts_metaclass_t *fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name);
+extern fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
 static void
 sysinfo_noouts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *pkg;
   fts_iterator_t pkg_iter;
-  fts_iterator_t mcl_iter;
+  fts_iterator_t cl_iter;
   fts_atom_t pkg_name;
-  fts_atom_t mcl_name;
+  fts_atom_t cl_name;
 
   fts_get_package_names(&pkg_iter);
   while (fts_iterator_has_more(&pkg_iter))
@@ -98,24 +98,20 @@ sysinfo_noouts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
 	{
-	  fts_package_get_metaclass_names(pkg, &mcl_iter);
-	  while(fts_iterator_has_more(&mcl_iter)) 
+	  fts_package_get_class_names(pkg, &cl_iter);
+
+	  while(fts_iterator_has_more(&cl_iter)) 
 	    {
-	      fts_metaclass_t *mcl;
 	      fts_class_t *cl;
 	      fts_symbol_t name;
 
-	      fts_iterator_next(&mcl_iter, &mcl_name);	      
-	      name = fts_get_symbol(&mcl_name);		      
+	      fts_iterator_next(&cl_iter, &cl_name);	      
+	      name = fts_get_symbol(&cl_name);		      
 
-	      mcl = fts_package_get_metaclass(pkg, name);
-	      if(mcl)
-		{
-		  cl = mcl->inst_list;
+	      cl = fts_package_get_class(pkg, name);
 
-		  if(cl && cl->noutlets == 0)
-		    post("class %s has no outputs\n", name);
-		}
+	      if(cl && cl->noutlets == 0)
+		post("class %s has no outputs\n", name);
 	    }
 	}
     }

@@ -127,13 +127,13 @@ FTS_API char* fts_package_get_error(fts_package_t* pkg);
 FTS_API void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter);
 
 /**
- * Initializes an iterator for all the metaclass names of this
+ * Initializes an iterator for all the class names of this
  * package. The iterator returns the names of the classes.
  *
- * @fn void fts_package_get_metaclass_names(fts_package_t* pkg, fts_iterator_t* i)
+ * @fn void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* i)
  * @param pkg the package
  * @param iter a pointer to an iterator object
  * @ingroup package */
-FTS_API void fts_package_get_metaclass_names(fts_package_t* pkg, fts_iterator_t* iter);
+FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter);
 
 

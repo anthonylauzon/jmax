@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 
-fts_metaclass_t *fts_param_metaclass = 0;
+fts_class_t *fts_param_class = 0;
 
 void 
 fts_param_add_listener(fts_param_t *param, fts_object_t *object, fts_method_t callback)
@@ -145,7 +145,7 @@ param_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_atom_assign(&this->value, at);
   else if(ac > 1)
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);
@@ -337,5 +337,5 @@ fts_kernel_param_init(void)
 {
   fts_s_param = fts_new_symbol("param");
 
-  fts_param_metaclass = fts_class_install(fts_s_param, param_instantiate);
+  fts_param_class = fts_class_install(fts_s_param, param_instantiate);
 }

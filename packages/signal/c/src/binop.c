@@ -817,7 +817,7 @@ binop_lt_instantiate(fts_class_t *cl)
 void
 signal_binop_config(void)
 {
-  fts_metaclass_t *bus_class, *vid_class;
+  fts_class_t *bus_class, *vid_class;
 
   /* signal x signal */
   sym_add = fts_new_symbol("+~");

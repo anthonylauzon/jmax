@@ -28,7 +28,7 @@
 #include <data/c/include/data.h>
 #include "mat.h"
 
-DATA_API fts_metaclass_t *vec_type;
+DATA_API fts_class_t *vec_type;
 DATA_API fts_symbol_t vec_symbol;
 
 typedef mat_t vec_t;

@@ -24,7 +24,7 @@
 #include "dict.h"
 
 fts_symbol_t dict_symbol = 0;
-fts_metaclass_t *dict_type = 0;
+fts_class_t *dict_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
@@ -60,7 +60,7 @@ dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *
     dict_store(dict, key, at);
   else if(ac > 1)
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);

@@ -95,7 +95,7 @@ change_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     change_single(o, 0, 0, 1, at);
   else if(ac > 0)
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
 
       fts_set_object(&a, tuple);
@@ -120,7 +120,7 @@ change_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     change_set_single(o, 0, 0, 1, at);
   else if(ac > 0)
     {
-      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
 
       fts_set_object(&a, tuple);

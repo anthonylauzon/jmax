@@ -39,7 +39,7 @@ static fts_symbol_t thread_manager_s_name;
 static fts_symbol_t thread_manager_s_create_thread;
 static fts_symbol_t thread_manager_s_start;
 
-static fts_metaclass_t* thread_manager_type = NULL;
+static fts_class_t* thread_manager_type = NULL;
 /** 
  * External function to start fts_thread_manager 
  * 
@@ -50,7 +50,7 @@ int fts_thread_manager_start(void)
 {
     if (NULL == fts_thread_manager)
     {
-	fts_thread_manager = (thread_manager_t*)fts_object_create(thread_manager_type, 0, 0);	
+	fts_thread_manager = (thread_manager_t*)fts_object_create(thread_manager_type, NULL, 0, 0);	
     }
     if (0 == fts_object_get_error((fts_object_t*)fts_thread_manager))
     {

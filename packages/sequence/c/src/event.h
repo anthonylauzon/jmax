@@ -28,7 +28,7 @@
 
 #include <fts/fts.h>
 
-extern fts_metaclass_t *event_type;
+extern fts_class_t *event_type;
 
 typedef struct _event_ event_t;
 

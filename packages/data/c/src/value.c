@@ -26,7 +26,7 @@
 #include "value.h"
 
 fts_symbol_t value_symbol = 0;
-fts_metaclass_t *value_type = 0;
+fts_class_t *value_type = 0;
 
 /********************************************************************
  *
@@ -59,7 +59,7 @@ value_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     value_set_atom(o, winlet, s, 1, at);
   else
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
       fts_atom_t a;
       
       fts_set_object(&a, (fts_object_t *)tuple);

@@ -30,7 +30,7 @@
 
 /* #define TRACE_DEBUG */
 
-fts_metaclass_t *fts_connection_metaclass = 0;
+fts_class_t *fts_connection_class = 0;
 
 static int
 connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
@@ -43,10 +43,10 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
       /* no declaration is always good */
       return 1;
     }
-  else if(n_types == 1 && fts_class_outlet_has_type(fts_object_get_class(src), woutlet, fts_dsp_signal_metaclass))
+  else if(n_types == 1 && fts_class_outlet_has_type(fts_object_get_class(src), woutlet, fts_dsp_signal_class))
     {
       /* pur signal outlet connects to signal inlet only */
-      return (fts_class_inlet_get_method(fts_object_get_class(dst), winlet, fts_dsp_signal_metaclass) != NULL);
+      return (fts_class_inlet_get_method(fts_object_get_class(dst), winlet, fts_dsp_signal_class) != NULL);
     }
   else 
     {
@@ -62,7 +62,7 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 
 	  if(fts_is_pointer(&a))
 	    {
-	      fts_metaclass_t *class = (fts_metaclass_t *)fts_get_pointer(&a);
+	      fts_class_t *class = (fts_class_t *)fts_get_pointer(&a);
 
 	      /* varargs connects to everything (we could be more severe here) */
 	      if(class == NULL)
@@ -145,7 +145,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     }
 
   /* init connection */
-  conn = (fts_connection_t *)fts_object_create(fts_connection_metaclass, 0, 0);
+  conn = (fts_connection_t *)fts_object_create(fts_connection_class, NULL, 0, 0);
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;
@@ -365,6 +365,6 @@ connection_instantiate(fts_class_t *cl)
 
 void fts_kernel_connection_init()
 {
-  fts_connection_metaclass = fts_class_install(fts_s_connection, connection_instantiate);
+  fts_connection_class = fts_class_install(fts_s_connection, connection_instantiate);
 }
 

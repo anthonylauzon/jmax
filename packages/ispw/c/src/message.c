@@ -543,7 +543,7 @@ static fts_memorystream_t *message_memory_stream ;
 static fts_memorystream_t * message_get_memory_stream()
 {
   if( !message_memory_stream)
-    message_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+    message_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
   return message_memory_stream;
 }
 
@@ -582,7 +582,7 @@ static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   messbox_t *this = (messbox_t *) o;
 
-  this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 0, 0);
+  this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, NULL, 0, 0);
 
   this->value = 0;
 }

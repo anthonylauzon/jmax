@@ -27,7 +27,7 @@
 #include "vec.h"
 
 fts_symbol_t vec_symbol = 0;
-fts_metaclass_t *vec_type = 0;
+fts_class_t *vec_type = 0;
 
 static fts_symbol_t sym_text = 0;
 

@@ -48,11 +48,13 @@ static fts_audioport_t *audioport_list = 0;
 static fts_symbol_t s_default_audio_port;
 static fts_symbol_t s__superclass;
 static fts_symbol_t s_audioport;
-static fts_symbol_t s_audioportin;
-static fts_symbol_t s_audioportout;
-static fts_symbol_t s_indispatcher;
-static fts_symbol_t s_outdispatcher;
+
 static fts_symbol_t s_audioport_guard;
+
+static fts_class_t *indispatcher_class;
+static fts_class_t *outdispatcher_class;
+static fts_class_t *audioportin_class;
+static fts_class_t *audioportout_class;
 
 /*		   
 
@@ -442,23 +444,21 @@ static void indispatcher_instantiate(fts_class_t *cl)
 
 static void fts_audioport_create_in_objects( fts_audioport_t *port)
 {
-  fts_atom_t a[2];
+  fts_atom_t a;
   int channels, i;
 
   channels = fts_audioport_get_input_channels( port);
 
-  fts_set_symbol( a+0, s_audioportin);
-  fts_set_object( a+1, (fts_object_t *)port);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->input.dsp_object);
+  fts_set_object( &a, (fts_object_t *)port);
+  port->input.dsp_object = fts_object_create( audioportin_class, fts_get_root_patcher(), 1, &a);
   if ( !port->input.dsp_object)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create input dsp object)\n");
       return;
     }
 
-  fts_set_symbol( a+0, s_indispatcher);
-  fts_set_int( a+1, channels);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->input.dispatcher);
+  fts_set_int( &a, channels);
+  port->input.dispatcher = fts_object_create( indispatcher_class, fts_get_root_patcher(), 1, &a);
   if ( !port->input.dispatcher)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create input dispatcher)\n");
@@ -568,23 +568,21 @@ static void outdispatcher_instantiate(fts_class_t *cl)
 
 static void fts_audioport_create_out_objects( fts_audioport_t *port)
 {
-  fts_atom_t a[2];
+  fts_atom_t a;
   int channels, i;
 
   channels = fts_audioport_get_output_channels( port);
 
-  fts_set_symbol( a+0, s_outdispatcher);
-  fts_set_int( a+1, channels);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->output.dispatcher);
+  fts_set_int( &a, channels);
+  port->output.dispatcher = fts_object_create( outdispatcher_class, fts_get_root_patcher(), 1, &a);
   if ( !port->output.dispatcher)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create output dispatcher)\n");
       return;
     }
 
-  fts_set_symbol( a+0, s_audioportout);
-  fts_set_object( a+1, (fts_object_t *)port);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->output.dsp_object);
+  fts_set_object( &a, (fts_object_t *)port);
+  port->output.dsp_object = fts_object_create( audioportout_class, fts_get_root_patcher(), 1, &a);
   if ( !port->output.dsp_object)
     {
       fprintf( stderr, "[FTS] audioport internal error (cannot create output dsp object)\n");
@@ -668,7 +666,7 @@ static void fts_audioport_set_default( int argc, const fts_atom_t *argv)
   fts_object_t *obj;
   fts_atom_t a[1];
 
-  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
+  obj = fts_eval_object_description( fts_get_root_patcher(), argc, argv);
 
   if (!obj)
     return;
@@ -717,25 +715,21 @@ fts_symbol_t fts_audioport_get_default_class( void)
 
 void fts_audio_config( void)
 {
-  fts_atom_t argv[1];
+  fts_class_t *audioport_guard_class;
 
   s_default_audio_port = fts_new_symbol( "DefaultAudioPort");
   s__superclass = fts_new_symbol( "_superclass");
   s_audioport = fts_new_symbol( "audioport");
-  s_audioportin = fts_new_symbol( "audioportin");
-  s_audioportout = fts_new_symbol( "audioportout");
-  s_indispatcher = fts_new_symbol( "indispatcher");
-  s_outdispatcher = fts_new_symbol( "outdispatcher");
+
   s_audioport_guard = fts_new_symbol( "audioport_guard");
 
-  fts_class_install( s_indispatcher, indispatcher_instantiate);
-  fts_class_install( s_outdispatcher, outdispatcher_instantiate);
-  fts_class_install( s_audioportin, audioportin_instantiate);
-  fts_class_install( s_audioportout, audioportout_instantiate);
-  fts_class_install( s_audioport_guard, audioport_guard_instantiate);
+  indispatcher_class = fts_class_install( NULL, indispatcher_instantiate);
+  outdispatcher_class = fts_class_install( NULL, outdispatcher_instantiate);
+  audioportin_class = fts_class_install( NULL, audioportin_instantiate);
+  audioportout_class = fts_class_install( NULL, audioportout_instantiate);
 
-  fts_set_symbol( &argv[0], fts_new_symbol("audioport_guard"));
-  fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&audioport_guard);
+  audioport_guard_class = fts_class_install( NULL, audioport_guard_instantiate);
+  audioport_guard = (audioport_guard_t *)fts_object_create( audioport_guard_class, fts_get_root_patcher(), 0, 0);
 }
 
 

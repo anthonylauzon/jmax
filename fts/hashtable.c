@@ -46,6 +46,7 @@ typedef struct {
   fts_hashtable_cell_t *cell;
 } fts_hashtable_iterator_t;
 
+static fts_heap_t *hashtable_heap = 0;
 static fts_heap_t *cell_heap = 0;
 static fts_heap_t *iterator_heap = 0;
 
@@ -148,6 +149,27 @@ void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
 }
 
+fts_hashtable_t *fts_hashtable_new( int key_type, int initial_capacity)
+{
+  fts_hashtable_t *h = (fts_hashtable_t *)fts_heap_alloc( hashtable_heap);
+
+  fts_hashtable_init( h, key_type, initial_capacity);
+
+  return h;
+}
+
+void fts_hashtable_destroy( fts_hashtable_t *h)
+{
+  fts_hashtable_clear( h);
+  fts_free( h->table);
+}
+
+void fts_hashtable_free( fts_hashtable_t *h)
+{
+  fts_hashtable_destroy( h);
+  fts_heap_free( h, hashtable_heap);
+}
+
 void fts_hashtable_clear( fts_hashtable_t *h)
 {
   unsigned int i;
@@ -166,12 +188,6 @@ void fts_hashtable_clear( fts_hashtable_t *h)
     }
 
   h->count = 0;
-}
-
-void fts_hashtable_destroy( fts_hashtable_t *h)
-{
-  fts_hashtable_clear( h);
-  fts_free( h->table);
 }
 
 static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, const fts_atom_t *key)
@@ -449,6 +465,7 @@ void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
 
 void fts_kernel_hashtable_init( void)
 {
+  hashtable_heap = fts_heap_new(sizeof( fts_hashtable_t));
   cell_heap = fts_heap_new(sizeof( fts_hashtable_cell_t));
   iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
 }

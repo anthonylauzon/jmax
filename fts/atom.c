@@ -98,79 +98,139 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 #define FTS_TYPEID_POINTER  5
 #define FTS_TYPEID_STRING   6
 
-static fts_metaclass_t void_metaclass = {
-  NULL,
+static fts_class_t void_class = {
   NULL,
   FTS_TYPEID_VOID,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_void = &void_metaclass;
+fts_class_t *fts_t_void = &void_class;
 
-static fts_metaclass_t int_metaclass = { 
-  NULL,
+static fts_class_t int_class = { 
   NULL,
   FTS_TYPEID_INT,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_int = &int_metaclass;
+fts_class_t *fts_t_int = &int_class;
 
-static fts_metaclass_t float_metaclass = { 
-  NULL,
+static fts_class_t float_class = { 
   NULL,
   FTS_TYPEID_FLOAT,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_float = &float_metaclass;
+fts_class_t *fts_t_float = &float_class;
 
-static fts_metaclass_t symbol_metaclass = { 
-  NULL,
+static fts_class_t symbol_class = { 
   NULL,
   FTS_TYPEID_SYMBOL,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_symbol = &symbol_metaclass;
+fts_class_t *fts_t_symbol = &symbol_class;
 
-static fts_metaclass_t pointer_metaclass = { 
-  NULL,
+static fts_class_t pointer_class = { 
   NULL,
   FTS_TYPEID_POINTER,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_pointer = &pointer_metaclass;
+fts_class_t *fts_t_pointer = &pointer_class;
 
-static fts_metaclass_t string_metaclass = { 
-  NULL,
+static fts_class_t string_class = { 
   NULL,
   FTS_TYPEID_STRING,
   NULL,
   NULL,
   NULL,
+  NULL,
+  NULL,
+  0,
+  NULL,
+  NULL,
+  0,
+  0,
+  NULL,
+  0,
+  NULL,
+  NULL,
   NULL
 }; 
-fts_metaclass_t *fts_t_string = &string_metaclass;
+fts_class_t *fts_t_string = &string_class;
 
 void fts_kernel_atom_init( void)
 {
-  fts_metaclass_set_name( &int_metaclass, fts_s_int);
-  fts_metaclass_set_name( &float_metaclass, fts_s_float);
-  fts_metaclass_set_name( &symbol_metaclass, fts_s_symbol);
-  fts_metaclass_set_name( &pointer_metaclass, fts_s_pointer);
-  fts_metaclass_set_name( &string_metaclass, fts_s_string);
+  fts_class_set_name( &int_class, fts_s_int);
+  fts_class_set_name( &float_class, fts_s_float);
+  fts_class_set_name( &symbol_class, fts_s_symbol);
+  fts_class_set_name( &pointer_class, fts_s_pointer);
+  fts_class_set_name( &string_class, fts_s_string);
 
   fts_set_void( &__fts_null);
 }
