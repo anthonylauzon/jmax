@@ -123,9 +123,8 @@ fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int
 	  fts_atom_t va;
    
 	  /* define the "args" name */
-	  instance->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, ac, at);
-	  fts_object_refer(instance->args);
-   
+	  /* instance->args is already created by patcher constructor */
+   	  fts_tuple_set(instance->args, ac, at);
 	  fts_set_object( &va, (fts_object_t *)instance->args);
 	  fts_name_set_value( instance, fts_s_args, &va);
 	}
