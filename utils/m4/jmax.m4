@@ -128,7 +128,7 @@ dnl
 AC_DEFUN(AC_CHECK_JMAX_VERSION,
 [
 dnl variable to store result of test
-jmax_version_is_enough="no"
+jmax_version_is_enough="yes"
 
 dnl Get the first argument if any, if no argumnet is given use 4.0.2 as default
 min_jmax_version=ifelse([$1], ,4.0.2,$1)
@@ -151,15 +151,21 @@ AC_MSG_CHECKING(for jMax version >= $min_jmax_version)
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)\(.*\)/\3/'`
     jmax_installed_additionnal_tag=`echo $JMAX_VERSION | \
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)\(.*\)/\4/'`
-
-dnl Check for version
-if test $jmax_installed_major_version -ge  $jmax_min_major_version ; then
-	if test $jmax_installed_minor_version -ge  $jmax_min_minor_version ; then
-		if test $jmax_installed_micro_version -ge  $jmax_min_micro_version ; then
-			jmax_version_is_enough="yes"
-		fi
-	fi
-fi
+#dnl Check for version
+  jmax_version_is_enough="yes"
+  if test $jmax_installed_major_version -gt $jmax_min_major_version; then
+      jmax_version_is_enough="yes"
+  elif test $jmax_installed_major_version -eq $jmax_min_major_version; then
+      if test $jmax_installed_minor_version -gt $jmax_min_minor_version; then
+	  jmax_version_is_enough="yes"
+      elif test $jmax_installed_minor_version -eq $jmax_min_minor_version; then
+	  if test $jmax_installed_micro_version -ge $jmax_min_micro_version; then
+	      jmax_version_is_enough="yes";
+	  else
+	      jmax_version_is_enough="no";
+	  fi
+      fi
+  fi
 
 AC_MSG_RESULT($jmax_version_is_enough)
 dnl Special check for unofficial release
