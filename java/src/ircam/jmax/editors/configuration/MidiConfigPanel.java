@@ -60,36 +60,24 @@ public class MidiConfigPanel extends JPanel implements Editor
     defaultLabelFont = tableFont.deriveFont( Font.BOLD);
 
     midiTable = new JTable( midiModel){
-	public TableCellEditor getCellEditor(int row, int column){
-	  switch( column)
-	    {
-	    case 0:
-	      return super.getCellEditor(row, column);
-	    case 1:
-	      return inputCellEditor;
-	    case 2:
-	      return outputCellEditor;
+	public TableCellEditor getCellEditor(int row, int column)
+      {
+    switch( column)
+      {
+      case 0:
+        return super.getCellEditor(row, column);
+      case 1:
+        return inputCellEditor;
+      case 2:
+        return outputCellEditor;
 	    default: 
 	      return super.getCellEditor(row, column);
-	    }
-	}
-      }; 
-    midiTable.setDefaultRenderer( String.class, 
-				  new DefaultTableCellRenderer()
-				    {
-				      public Component getTableCellRendererComponent(JTable table, Object value, 
-										     boolean isSelected, boolean hasFocus,
-										     int row, int column) {
-					if(row == 0 && column == 0)
-					  setForeground( Color.magenta);
-					return this;
-				      }
-				    });
-
+      }
+      }
+    }; 
     midiTable.setPreferredScrollableViewportSize( new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     midiTable.setRowHeight(17);
     midiTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-    midiTable.setPreferredSize( new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
     scrollPane = new JScrollPane( midiTable);
     scrollPane.setPreferredSize( new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
