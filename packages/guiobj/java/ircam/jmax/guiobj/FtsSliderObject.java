@@ -93,11 +93,10 @@ public class FtsSliderObject extends FtsIntValueObject
     minValue = value;
 
     args.clear();
-    args.addSymbol(FtsSymbol.get("minValue"));
     args.addInt(value);
     
     try{
-      sendProperty( args);
+      send(FtsSymbol.get("minValue"), args);
     }
     catch(IOException e)
       {
@@ -121,10 +120,10 @@ public class FtsSliderObject extends FtsIntValueObject
     maxValue = value;
 
     args.clear();
-    args.addSymbol(FtsSymbol.get("maxValue"));
     args.addInt(value);
+
     try{
-	sendProperty( args);
+	send(FtsSymbol.get("maxValue"), args);
     }
     catch(IOException e)
 	{
@@ -146,10 +145,10 @@ public class FtsSliderObject extends FtsIntValueObject
     orientation = or;
 
     args.clear();
-    args.addSymbol(FtsSymbol.get("orientation"));
     args.addInt(or);
+
     try{
-	sendProperty(args);
+	send(FtsSymbol.get("orientation"), args);
     }
     catch(IOException e)
 	{

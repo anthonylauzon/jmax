@@ -1539,15 +1539,6 @@ void fts_client_release_object(fts_object_t *obj)
   client_release_object( client, obj);
 }
 
-void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
-{
-}
-
-void fts_client_send_property(fts_object_t *obj, fts_symbol_t property)
-{
-}
-
-
 /***********************************************************************
  *
  * Initialization

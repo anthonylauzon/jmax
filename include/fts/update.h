@@ -20,8 +20,5 @@
  * 
  */
 
-/* compatibility */
-/* implemented for updates */
-FTS_API void fts_object_ui_property_changed( fts_object_t *obj, fts_symbol_t property);
-
-FTS_API void fts_object_reset_changed( fts_object_t *obj);
+FTS_API void fts_update_request( fts_object_t *obj);
+FTS_API void fts_update_reset( fts_object_t *obj);

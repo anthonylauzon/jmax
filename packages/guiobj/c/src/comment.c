@@ -37,7 +37,7 @@ typedef struct
 
 
 static void 
-comment_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   comment_t *this = (comment_t *)o;
   fts_atom_t a;
@@ -158,7 +158,7 @@ comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, comment_dump);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, comment_save_dotpat); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, comment_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, comment_update_gui); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_comment, comment_set_text);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_color, comment_set_color); 

@@ -107,7 +107,7 @@ messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   this->value = 0;
 
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+  fts_update_request((fts_object_t *)this);
 }
 
 static void
@@ -128,7 +128,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {
       /* messbox on */
       this->value = 1;
-      fts_object_ui_property_changed(o, fts_s_value);
+      fts_update_request(o);
   
       fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
     }
@@ -153,9 +153,13 @@ messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-messconst_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_ui_property_changed(o, fts_s_value);
+  messconst_t *this = (messconst_t *) o;
+  fts_atom_t a;
+
+  fts_set_int( &a, this->value);  
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
 }
  
 static void messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -250,7 +254,7 @@ messconst_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t 
 
   fts_outlet_bang(obj, 0);
 
-  fts_object_ui_property_changed(obj, fts_s_value);
+  fts_update_request(obj);
 }
 
 /************************************************
@@ -322,7 +326,7 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, messconst_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, messconst_update_real_time); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_spost_description, messconst_spost_description); 
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, messconst_send);
@@ -334,10 +338,6 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, i, fts_s_list, messconst_tuple);
       fts_method_define_varargs(cl, i, fts_s_anything, messconst_anything);
     }
-
-  /* value daemons */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, messconst_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, messconst_put_value);
 
   return fts_ok;
 }

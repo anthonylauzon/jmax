@@ -539,7 +539,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, scope_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, scope_delete);      
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, scope_upload); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, scope_upload); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, scope_put);
   

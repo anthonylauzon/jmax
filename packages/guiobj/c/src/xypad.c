@@ -46,7 +46,7 @@ typedef struct {
 
 
 static void
-xypad_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   xypad_t * this = (xypad_t *)o;
   fts_atom_t a[1];
@@ -247,7 +247,7 @@ xypad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xypad_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, xypad_dump);  
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, xypad_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, xypad_update_gui); 
   fts_method_define_varargs(cl, fts_system_inlet, sym_setXMinValue, xypad_set_xminvalue); 
   fts_method_define_varargs(cl, fts_system_inlet, sym_setXMaxValue, xypad_set_xmaxvalue); 
   fts_method_define_varargs(cl, fts_system_inlet, sym_setYMinValue, xypad_set_yminvalue); 

@@ -204,19 +204,6 @@ count_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-count_int_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  if(fts_is_tuple(value))
-    {
-      fts_tuple_t *list = (fts_tuple_t *)fts_get_object(value);
-
-      count_int_set(o, 0, 0, fts_tuple_get_size(list), fts_tuple_get_atoms(list));
-    }
-  else if(fts_is_number(value))
-    count_int_set_value(o, 0, 0, 1, value);
-}
-
-static void
 count_int_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   count_int_t *this = (count_int_t *)o;
@@ -520,8 +507,6 @@ count_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), count_int_set_mode_prop);
 
       fts_method_define_varargs(cl, 0, fts_s_set, count_int_set);
-      fts_class_add_daemon(cl, obj_property_put, fts_s_set, count_int_set_prop);
-
       fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), count_int_reset);
       fts_method_define_varargs(cl, 0, fts_s_bang, count_int_step);
 
@@ -544,7 +529,6 @@ count_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), count_float_set_mode_prop);
 
       fts_method_define_varargs(cl, 0, fts_s_set, count_float_set);
-      fts_class_add_daemon(cl, obj_property_put, fts_s_set, count_float_set_prop);
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), count_float_reset);
       fts_method_define_varargs(cl, 0, fts_s_bang, count_float_step);

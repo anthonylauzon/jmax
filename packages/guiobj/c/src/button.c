@@ -48,31 +48,26 @@ typedef struct
  */
 
 static void
-button_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   button_t *this = (button_t *)o;
-  fts_atom_t a[1];
+  fts_atom_t a;
 
-  fts_object_get_prop(o, fts_s_color, a);
-  if( !fts_get_int( a))
-    fts_set_int( a, this->color);
-  else
-    this->color = fts_get_int( a);
-  
-  fts_client_send_message(o, sym_setColor, 1, a);
+  fts_set_int( &a, this->color);  
+  fts_client_send_message(o, sym_setColor, 1, &a);
 
-  fts_object_get_prop(o, fts_s_flash, a);  
-  if( !fts_get_int( a))
-    fts_set_int( a, this->flash);
-  else
-    this->flash = fts_get_int( a);
-  fts_client_send_message(o, sym_setFlash, 1, a);  
+  fts_set_int( &a, this->flash);
+  fts_client_send_message(o, sym_setFlash, 1, &a);  
 }
 
 static void
-button_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_ui_property_changed(o, fts_s_value);
+  button_t *this = (button_t *)o;
+  fts_atom_t a;
+
+  fts_set_int( &a, this->value);  
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
 }
  
 /************************************************
@@ -87,7 +82,7 @@ button_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   button_t *this = (button_t *)o;
 
   this->value = 0;
-  fts_object_ui_property_changed( (fts_object_t *)this, fts_s_value);
+  fts_update_request( (fts_object_t *)this);
 }
 
 static void
@@ -103,7 +98,7 @@ button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
       /* button on */
       this->value = this->color;
-      fts_object_ui_property_changed(o, fts_s_value);
+      fts_update_request(o);
 
       /* schedule button off */
       fts_timebase_add_call(fts_get_timebase(), o, button_off, 0, this->flash);
@@ -218,8 +213,8 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, button_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, button_dump);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, button_send_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, button_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, button_update_gui); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, button_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_color, button_set_color); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_flash, button_set_flash); 
@@ -228,9 +223,6 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, button_on);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, button_on);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, button_put_value);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
@@ -245,7 +237,8 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 button_config(void)
 {
-  fts_class_install(fts_new_symbol("button"), button_instantiate);
   sym_setColor = fts_new_symbol("setColor");
   sym_setFlash = fts_new_symbol("setFlash");
+
+  fts_class_install(fts_new_symbol("button"), button_instantiate);
 }

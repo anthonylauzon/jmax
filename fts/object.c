@@ -531,7 +531,7 @@ fts_object_destroy(fts_object_t *obj)
     fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
 
   /* take the object away from the update queue (if there) and free it */
-  fts_object_reset_changed(obj);
+  fts_update_reset(obj);
 
   /* release all client components */
   fts_object_unclient(obj);
@@ -550,7 +550,7 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   fts_object_unconnect(obj);
 
   /* take the object away from the update queue (if there) and free it */
-  fts_object_reset_changed(obj);
+  fts_update_reset(obj);
 
   /* unreference by hand */
   obj->refcnt--;
@@ -615,9 +615,15 @@ fts_object_recompute(fts_object_t *old)
 
       if(obj != NULL && old_id != FTS_NO_ID)
 	{
-	  fts_object_send_kernel_properties(obj);
 	  fts_client_upload_object(obj, -1);
 	  fts_object_upload_connections(obj);
+
+	  /* ask the object to send to the client object specific gui properties */
+	  fts_send_message(obj, fts_system_inlet, fts_s_update_gui, 0, 0);
+
+	  /* add to real time update list */
+	  if(fts_class_has_method( fts_object_get_class(obj), fts_system_inlet, fts_s_update_real_time))
+	    fts_update_request(obj);
 	}
     }
 
@@ -673,7 +679,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       if(old->patcher)
 	fts_patcher_remove_object(old->patcher, old);
       
-      fts_object_reset_changed(old);
+      fts_update_reset(old);
       
       if(old->refcnt == 0)
 	fts_object_free(old);
@@ -885,9 +891,6 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
     fts_set_int(&a, new_noutlets);
     o->head.cl = fts_class_instantiate(mcl, 1, &a);
   }
-
-  if (fts_object_has_id(o))
-    fts_object_property_changed(o, fts_s_noutlets);
 }
 
 /*****************************************************************************
@@ -935,39 +938,6 @@ fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
 }
 
 
-/* properties used by the ui (value for the moment) at run time (update related) */
-void
-fts_object_send_ui_properties(fts_object_t *obj)
-{
-  if (obj->head.id != FTS_NO_ID)
-    {
-      /* Ask the object to send to the client object specific UI properties */
-      fts_send_message(obj, fts_system_inlet, fts_s_send_ui_properties, 0, 0);
-    }
-}
-
-
-/* properties to be sent after a recomputing (i.e all the non geometrical properties) */
-static void
-fts_object_send_kernel_properties(fts_object_t *obj)
-{
-  /* If the object have an ID (i.e. was created by the client, or a property has
-     been assigned to it),
-     ask the object to send the ninlets and noutlets  properties,
-     and name and declaration if any. */
-
-  if (obj->head.id != FTS_NO_ID) 
-    { 
-      fts_object_property_changed(obj, fts_s_ninlets);
-      fts_object_property_changed(obj, fts_s_noutlets);
-      fts_object_property_changed(obj, fts_s_error);
-      fts_object_property_changed(obj, fts_s_error_description);
-
-      /* ask the object to send to the client object specific properties */
-      fts_send_message(obj, fts_system_inlet, fts_s_send_properties, 0, 0);
-    }
-}
-
 static void 
 fts_move_property(fts_object_t *old, fts_object_t *new, fts_symbol_t name)
 {
@@ -983,7 +953,6 @@ static void
 fts_object_move_properties(fts_object_t *old, fts_object_t *new)
 {
   /* copy only the editor properties here, not the others !!! */
-
   if (fts_object_is_standard_patcher(old))
     {
       fts_move_property(old, new, fts_s_wx);

@@ -29,16 +29,19 @@
 typedef struct
 {
   fts_object_t o;
-  int n;
+  int value;
 } toggle_t;
 
 
 static void 
-toggle_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
-}
+  toggle_t *this = (toggle_t *) o;
+  fts_atom_t a;
 
+  fts_set_int( &a, this->value);  
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
+}
 
 static void 
 toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -49,11 +52,11 @@ toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       int n = (fts_get_number_int(at) != 0);
 
-      if(this->n != n)
+      if(this->value != n)
 	{
-	  this->n = n;
+	  this->value = n;
 	  
-	  fts_object_ui_property_changed(o, fts_s_value);
+	  fts_update_request(o);
 	}
     }
 }
@@ -65,7 +68,7 @@ toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   toggle_set(o, 0, 0, 1, at);
 
-  fts_outlet_int(o, 0, this->n);
+  fts_outlet_int(o, 0, this->value);
 }
 
 static void 
@@ -81,11 +84,11 @@ toggle_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   toggle_t *this = (toggle_t *) o;
 
-  this->n = !this->n;
+  this->value = !this->value;
 
-  fts_object_ui_property_changed(o, fts_s_value);
+  fts_update_request(o);
 
-  fts_outlet_int(o, 0, this->n);
+  fts_outlet_int(o, 0, this->value);
 }
 
 static void 
@@ -108,7 +111,7 @@ toggle_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
 {
   toggle_t *this = (toggle_t *)obj;
 
-  fts_set_int(value, this->n);
+  fts_set_int(value, this->value);
 }
 
 static fts_status_t 
@@ -116,8 +119,7 @@ toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(toggle_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, toggle_send_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, toggle_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, toggle_update_real_time); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, toggle_toggle);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, toggle_save_dotpat); 

@@ -41,15 +41,20 @@ monitor_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-monitor_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_ui_property_changed(o, fts_s_value);
+  monitor_t *this = (monitor_t *) o;
+  int active = fts_dsp_get_active();
+  fts_atom_t a;
+
+  fts_set_int( &a, active);
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
 }
 
 static void 
 monitor_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_ui_property_changed(o, fts_s_value);
+  fts_update_request(o);
 }
 
 static void 
@@ -63,7 +68,7 @@ monitor_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else
     fts_dsp_activate();
 
-  fts_object_ui_property_changed(o, fts_s_value);
+  fts_update_request(o);
 }
 
 static void 
@@ -125,8 +130,7 @@ monitor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, monitor_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, monitor_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, monitor_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, monitor_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, monitor_update_real_time); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_bang, monitor_bang);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);

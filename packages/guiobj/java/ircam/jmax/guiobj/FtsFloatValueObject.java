@@ -43,7 +43,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
 {
   static
   {
-    FtsObject.registerMessageHandler(FtsFloatValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler(FtsFloatValueObject.class, FtsSymbol.get("value"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsFloatValueObject)obj).setCurrentValue( args.getDouble( 0));
@@ -75,7 +75,7 @@ public class FtsFloatValueObject extends FtsGraphicObject
     args.clear();
     args.addDouble( value);
     try{
-      send( FtsSymbol.get("setValue"), args);
+      send( FtsSymbol.get("value"), args);
     }
     catch(IOException e)
       {

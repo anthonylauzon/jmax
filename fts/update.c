@@ -25,7 +25,6 @@
 
 static fts_symbol_t s_update_group_begin;
 static fts_symbol_t s_update_group_end;
-static fts_symbol_t s_set_value;
 static fts_heap_t *update_heap;
 
 #define DEFAULT_PERIOD 20
@@ -33,7 +32,6 @@ static fts_heap_t *update_heap;
 
 typedef struct update_entry {
   fts_object_t *obj;
-  fts_symbol_t property_name;
   struct update_entry *next;
 } update_entry_t;
 
@@ -87,17 +85,10 @@ static void update_group_timebase( fts_object_t *o, int winlet, fts_symbol_t s, 
       for( count = 0; this->update_fifo && count < this->max_updates; count++)
 	{
 	  update_entry_t *p = this->update_fifo;
-	  fts_atom_t a[1];
 
 	  this->update_fifo = p->next;
-
-	  fts_object_get_prop( p->obj, p->property_name, a);
-
-	  if ( !fts_is_void( a))
-	    fts_client_send_message( p->obj, s_set_value, 1, a);
-
+	  fts_send_message(p->obj, fts_system_inlet, fts_s_update_real_time, 0, 0);
 	  fts_object_release( p->obj);
-
 	  fts_heap_free( p, update_heap);
 	}
 
@@ -156,27 +147,24 @@ static update_group_t *object_get_update_group( fts_object_t *obj)
   return update_group_table[ index];
 }
 
-static void update_group_add_object( update_group_t *this, fts_object_t *obj, fts_symbol_t property_name)
+static void update_group_add_object( update_group_t *this, fts_object_t *obj)
 {
   update_entry_t **pp;
 
   /* check if the object is already in the update fifo */
   for ( pp = &this->update_fifo; *pp; pp = &(*pp)->next)
-    if ( (*pp)->obj == obj && (*pp)->property_name == property_name )
+    if ((*pp)->obj == obj)
       return;
 
   *pp = (update_entry_t *)fts_heap_alloc( update_heap);
 
   (*pp)->obj = obj;
-  (*pp)->property_name = property_name;
   (*pp)->next = 0;
 
   fts_object_refer(obj);
 
   if (this->object_count == 0)
-    {
-      fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, update_group_timebase, 0, this->period);
-    }
+    fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, update_group_timebase, 0, this->period);
 
   this->object_count++;
 }
@@ -207,7 +195,7 @@ static void update_group_remove_object( update_group_t *this, fts_object_t *obj)
     }
 }
 
-void fts_object_ui_property_changed( fts_object_t *obj, fts_symbol_t property_name)
+void fts_update_request( fts_object_t *obj)
 {
   update_group_t *update_group;
   fts_patcher_t *patcher;
@@ -222,10 +210,10 @@ void fts_object_ui_property_changed( fts_object_t *obj, fts_symbol_t property_na
   if ( !patcher || !fts_patcher_is_open(patcher))
     return;
 
-  update_group_add_object( update_group, obj, property_name);
+  update_group_add_object( update_group, obj);
 }
 
-void fts_object_reset_changed( fts_object_t *obj)
+void fts_update_reset( fts_object_t *obj)
 {
   update_group_t *update_group;
 
@@ -249,7 +237,6 @@ void fts_update_config( void)
 {
   s_update_group_begin = fts_new_symbol( "update_group_begin");
   s_update_group_end = fts_new_symbol( "update_group_end");
-  s_set_value = fts_new_symbol( "setValue");
 
   update_heap = fts_heap_new( sizeof( update_entry_t));
 

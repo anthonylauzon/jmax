@@ -75,6 +75,7 @@ FTS_API void fts_spost( fts_bytestream_t *stream, const char *format, ...);
  * @ingroup post
  */
 FTS_API void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at);
+FTS_API void fts_spost_float( fts_bytestream_t *stream, double f);
 
 /**
  * Print an object description on a bytestream

@@ -449,7 +449,7 @@ matdisplay_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-matdisplay_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t *this = (matdisplay_t *)o;
   fts_atom_t a[2];  
@@ -533,7 +533,7 @@ matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, matdisplay_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, matdisplay_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, matdisplay_send_properties); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, matdisplay_update_gui); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, matdisplay_dump);
 
   fts_method_define_varargs(cl, fts_system_inlet, sym_window, matdisplay_set_window_size_by_client);

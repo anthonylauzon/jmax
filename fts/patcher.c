@@ -603,8 +603,11 @@ patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->open = 1;
 
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    fts_object_send_ui_properties(p);
+  for(p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if(fts_class_has_method( fts_object_get_class(p), fts_system_inlet, fts_s_update_real_time))
+	fts_update_request(p);
+    }
 }
 
 /* close a patch;
@@ -1166,12 +1169,6 @@ fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
  *
  */
 
-static void 
-patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_property_changed(o, fts_s_patcher_type);
-}
-
 /* daemon to get the patcher_type property */
 static void 
 patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
@@ -1442,8 +1439,13 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	  fts_object_get_prop(obj, fts_s_fontStyle, a+2);
 	  fts_client_send_message(obj, fts_s_setFont, 3, a);
 	}
-      
-      fts_send_message(obj, fts_system_inlet, fts_s_send_properties, 0, 0);
+
+      /* send gui properties */
+      fts_send_message(obj, fts_system_inlet, fts_s_update_gui, 0, 0);
+
+      /* add to real time update list */
+      if(fts_class_has_method( fts_object_get_class(obj), fts_system_inlet, fts_s_update_real_time))
+	fts_update_request(obj);
     }
 }
 
@@ -1550,7 +1552,7 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 	    {
 	      if (fts_object_has_id(obj))
 		{
-		  fts_object_reset_changed(obj);
+		  fts_update_reset(obj);
 		  
 		  fts_send_message( obj, fts_system_inlet, fts_s_closeEditor, 0, 0);   
 
@@ -1736,8 +1738,6 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_find, patcher_find);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_errors, patcher_find_errors);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, patcher_send_properties); 
-
   fts_class_define_thru(cl, patcher_propagate_input);
 
   for (i = 0; i < ninlets; i ++)
@@ -1889,14 +1889,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 
   /* free the expression state structure */
   fts_oldexpression_state_free(e);
-
-  /* inform the UI that the name is probabily changed (the type cannot change) and the error property too. */
-
-  if (fts_object_has_id(obj))
-    {
-      fts_object_property_changed(obj, fts_s_error);
-      fts_object_property_changed(obj, fts_s_error_description);
-    }
 
   return this;
 }

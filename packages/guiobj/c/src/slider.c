@@ -27,6 +27,7 @@
 
 #include <fts/fts.h>
 
+fts_symbol_t sym_setValue = 0;
 fts_symbol_t sym_setOrientation = 0;
 fts_symbol_t sym_setMaxValue = 0;
 fts_symbol_t sym_setMinValue = 0;
@@ -41,7 +42,7 @@ typedef struct
 } slider_t;
 
 static void
-slider_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
   fts_atom_t a;
@@ -54,14 +55,16 @@ slider_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   fts_set_int(&a, this->max);
   fts_client_send_message(o, sym_setMaxValue, 1, &a);
-
-  fts_object_ui_property_changed(o, fts_s_value);
 }
 
 static void
-slider_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_ui_property_changed(o, fts_s_value);
+  slider_t *this = (slider_t *)o;
+  fts_atom_t a;
+
+  fts_set_int(&a, this->n);
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);  
 }
 
 static void 
@@ -75,7 +78,7 @@ slider_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if ( this->n != n)
     {
       this->n = n;
-      fts_object_ui_property_changed( (fts_object_t *)this, fts_s_value);
+      fts_update_request( (fts_object_t *)this);
     }
 
   fts_outlet_int( o, 0, n);
@@ -98,7 +101,7 @@ slider_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if (this->n != n)
     {
-      fts_object_ui_property_changed(o, fts_s_value);
+      fts_update_request(o);
       this->n = n;
     }
 
@@ -114,7 +117,7 @@ slider_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if (this->n != n)
     {
-      fts_object_ui_property_changed(o, fts_s_value);
+      fts_update_request(o);
       this->n = n;
     }
 
@@ -156,6 +159,24 @@ slider_set_orientation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
+slider_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  slider_t *this = (slider_t *)o;
+
+  if(ac > 1 && fts_is_number(at))
+    {
+      this->min = fts_get_number_int(at);
+      ac--;
+      at++;
+    }
+  else
+    this->min = 0;
+  
+  if(ac > 0 && fts_is_number(at))
+    this->max = fts_get_number_int(at);
+}
+
+static void
 slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
@@ -164,7 +185,7 @@ slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (this->n != n)
     {
       this->n = n;
-      fts_object_ui_property_changed(o, fts_s_value);
+      fts_update_request(o);
     }
 }
 
@@ -185,7 +206,7 @@ slider_put_value(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t prope
   this->n = fts_get_int(value);
 
   fts_outlet_int(o, 0, this->n);
-  fts_object_ui_property_changed(o, fts_s_value);
+  fts_update_request(o);
 }
 
 static void
@@ -265,25 +286,23 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, slider_init); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, slider_dump); 
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, slider_send_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, slider_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("setValue"), slider_set_value); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, slider_update_gui); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, slider_update_real_time); 
 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_value, slider_set_value); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_min_value, slider_set_min); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_max_value, slider_set_max); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_orientation, slider_set_orientation); 
 
   fts_method_define_varargs(cl, 0, fts_s_set, slider_set);
-  fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
+  fts_method_define_varargs(cl, 0, fts_s_range, slider_set_range);
 
+  fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, slider_int);
   fts_method_define_varargs(cl, 0, fts_s_float, slider_float);
   fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_save_dotpat, slider_save_dotpat); 
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_put_value);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_min_value, slider_put_min);

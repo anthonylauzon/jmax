@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <math.h>
 #include <time.h>
 #include <assert.h>
 #include <ctype.h>
@@ -109,17 +110,57 @@ static int mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
     {
       int n = 0;
 
-      n += mempost( pp, psize, offset+n, "{");
+      n += mempost( pp, psize, offset+n, "(:");
       n += mempost_atoms( pp, psize, offset+n, obj->argc, obj->argv);
-      n += mempost( pp, psize, offset+n, "}");
+      n += mempost( pp, psize, offset+n, ")");
 
       return n;
     }
 
-  return mempost( pp, psize, offset, "<%s>", fts_object_get_class_name(obj));
+  return mempost( pp, psize, offset, "(:%s)", fts_object_get_class_name(obj));
 }
 
-static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)
+static int mempost_float( char **pp, int *psize, int offset, double f)
+{
+  if(f == 0.0)
+     return mempost( pp, psize, offset, "0.");
+  else
+    {
+      double intr, frac;
+      int n = 0;
+      
+      if(f < 0.0)
+	{
+	  f = -f;
+	  mempost( pp, psize, offset, "-");
+	  n++;
+	}
+
+      frac = modf(f, &intr);
+
+      if(frac == 0.0)
+	{
+	  if(f < 10000000.0)
+	    n += mempost( pp, psize, offset + n, "%.7g.", f);
+	  else
+	    n += mempost( pp, psize, offset + n, "%.7g", f);	    
+	}
+      else
+	{
+	  if(f >= 0.0001)
+	    n += mempost( pp, psize, offset + n, "%.7g", f);
+	  else if(f >= 0.0000001)
+	    n += mempost( pp, psize, offset + n, "%.7f", f);
+	  else
+	    n += mempost( pp, psize, offset + n, "%.6e", f);
+	}
+
+      return n;
+    }
+}
+
+static int 
+mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)
 {
   int i, n = 0;
 
@@ -130,7 +171,7 @@ static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_a
       else if ( fts_is_int( at))
 	n += mempost( pp, psize, offset+n, "%d", fts_get_int( at));
       else if ( fts_is_float( at))
-	n += mempost( pp, psize, offset+n, "%g", fts_get_float( at));
+	n += mempost_float( pp, psize, offset+n, fts_get_float( at));
       else if ( fts_is_symbol( at))
 	n += mempost( pp, psize, offset+n, "%s", fts_get_symbol( at));
       else if ( fts_is_object( at))
@@ -187,6 +228,15 @@ void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
   fts_bytestream_flush( stream);
 }
 
+void fts_spost_float( fts_bytestream_t *stream, double f)
+{
+  int n;
+
+  n = mempost_float( &post_buffer, &post_buffer_size, 0, f);
+
+  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_flush( stream);
+}
 
 static int check_symbol_in( fts_atom_t *p, fts_symbol_t *symbols)
 {

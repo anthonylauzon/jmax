@@ -73,11 +73,16 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 		{
 		  fts_atom_t a;
 
-		  sprintf(this->string, "~ %#g", this->absmax);
-		  this->last = this->absmax;
+		  fts_memorystream_reset(this->stream);
+  
+		  fts_spost((fts_bytestream_t *)this->stream, "~ ");
+		  fts_spost_float((fts_bytestream_t *)this->stream, this->absmax);
+		  fts_bytestream_output_char((fts_bytestream_t *)this->stream, '\0');
 		  
 		  fts_set_string(&a, fts_memorystream_get_bytes(this->stream));
 		  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &a);
+
+		  this->last = this->absmax;
 		}
 	      
 	      this->absmax = MIN_FLOAT;
@@ -92,6 +97,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  this->gate = 0;
 	  this->pending = 0;
 	  
+	  fts_bytestream_output_char((fts_bytestream_t *)this->stream, '\0');
 	  fts_set_string(&a, fts_memorystream_get_bytes(this->stream));
 	  fts_client_send_message(o, fts_s_set, 1, &a);
 	  
@@ -174,54 +180,33 @@ display_ftl(fts_word_t *argv)
  *
  */
 static void
-display_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  display_t * this = (display_t *)o;
-
-  sprintf(this->string, "%d", fts_get_int(at));
-
-  display_deliver(this);
-}
-
-static void
-display_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
   double f_num = fts_get_float(at);
   long long int i_num = (long long int)f_num;
       
-  if(i_num == f_num)
-    sprintf(this->string, "%lld.", i_num);
-  else
-    sprintf(this->string, "%g", f_num);
+  fts_memorystream_reset(this->stream);
 
-  display_deliver(this);
-}
-
-static void
-display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  display_t * this = (display_t *)o;
-
-  sprintf(this->string, "'%s\'", fts_get_symbol(at));
+  fts_spost_atoms((fts_bytestream_t *)this->stream, 1, at);
 
   display_deliver(this);
 }
 
 static void 
-display_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
   
   fts_memorystream_reset(this->stream);
 
   if(ac == 0)
-    fts_spost(this->stream, "()");
+    fts_spost((fts_bytestream_t *)this->stream, "()");
   else
     {
-      fts_spost(this->stream, "(");
-      spost_atoms(this->string, ac, at);
-      fts_spost(this->stream, ")");
+      fts_spost((fts_bytestream_t *)this->stream, "(");
+      fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+      fts_spost((fts_bytestream_t *)this->stream, ")");
     }
 
   display_deliver(this);
@@ -233,8 +218,8 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   display_t * this = (display_t *)o;
 
   fts_memorystream_reset(this->stream);  
-  fts_spost("%s ", s);
-  fts_spost_atoms(ac, at);
+  fts_spost((fts_bytestream_t *)this->stream, "%s ", s);
+  fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
 
   display_deliver(this);
 }
@@ -264,9 +249,11 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  display_t * this = (display_t *)o;
+
   fts_dsp_remove_object(o);
   
-  fts_object_destroy(this->stream);
+  fts_object_destroy((fts_object_t *)this->stream);
 }
 
 static fts_status_t 
@@ -279,10 +266,10 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, display_put);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, display_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, display_float);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, display_symbol);
-  fts_method_define_varargs(cl, 0, fts_s_list, display_tuple);
+  fts_method_define_varargs(cl, 0, fts_s_int, display_atom);
+  fts_method_define_varargs(cl, 0, fts_s_float, display_atom);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, display_atom);
+  fts_method_define_varargs(cl, 0, fts_s_list, display_atoms);
   fts_method_define_varargs(cl, 0, fts_s_anything, display_anything);
 
   fts_dsp_declare_inlet(cl, 0);

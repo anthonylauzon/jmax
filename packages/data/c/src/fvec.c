@@ -1207,7 +1207,6 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_symbol_t file_name = fts_get_symbol(at);
       int size = 0;
-      float sr = 0.0;
       int onset, n_read;
 
       if(ac > 1 && fts_is_number(at + 1))
@@ -1219,12 +1218,6 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	n_read = fts_get_number_int(at + 2);
       else
 	n_read = 0;
-
-      if(ac > 3 && fts_is_number(at + 3))
-	sr = fts_get_number_float(at + 3);
-      else if(this->sr > 0.0)
-	/* force sampling rate to given property */
-	sr = this->sr;
 
       if (fvec_file_is_text( file_name))
 	size = fvec_read_atom_file(this, file_name);
@@ -1255,15 +1248,11 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
   if(file_name)
     {
       int n_write = fts_get_int_arg(ac, at, 1, 0);
-      float sr = fts_get_float_arg(ac, at, 2, 0.0f);
       int vec_size = fvec_get_size(this);
       fts_audiofile_t *sf = 0;
       int size = 0;
       
-      if(sr <= 0.0)
-	sr = fts_dsp_get_sample_rate();
-    
-      sf = fts_audiofile_open_write(file_name, 1, sr, fts_s_int16);
+      sf = fts_audiofile_open_write(file_name, 1, fts_dsp_get_sample_rate(), fts_s_int16);
     
       if( fts_audiofile_is_valid(sf))
 	{
@@ -1437,20 +1426,6 @@ fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
   fts_set_object(value, obj);
 }
 
-static void
-fvec_set_sr(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fvec_t *this = (fvec_t *)obj;
-
-  if(fts_is_number(value))
-    {
-      float sr = fts_get_number_float(value);
-      
-      if(sr > 0.0)
-	this->sr = sr;
-    }
-}
-
 /*********************************************************
  *
  *  class
@@ -1465,8 +1440,6 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->size = 0;
   this->alloc = FVEC_NO_ALLOC;
   data_object_set_keep((data_object_t *)o, fts_s_no);
-
-  this->sr = 0.0;
 
   if(ac == 0)
     fvec_set_size(this, 0);
@@ -1542,7 +1515,6 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_save, fvec_save_soundfile); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_load, fvec_load);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);

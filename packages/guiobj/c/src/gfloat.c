@@ -1,4 +1,3 @@
-
 /*
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -28,32 +27,30 @@
 
 #include <fts/fts.h>
 
-typedef struct {
+typedef struct
+{
   fts_object_t o;
-  double f;
+  double value;
 } gfloat_t;
 
 
 static void
-gfloat_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
-}
+  gfloat_t *this = (gfloat_t *)o;
+  fts_atom_t a;
 
-
-static void
-gfloat_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_ui_property_changed(o, fts_s_value);
+  fts_set_float( &a, this->value);
+  fts_client_send_message_real_time(o, fts_s_value, 1, &a);
 }
 
 static void
 gfloat_update(gfloat_t *this, double f)
 {
-  if (this->f != f)
+  if (this->value != f)
     {
-      this->f = f;
-      fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+      this->value = f;
+      fts_update_request((fts_object_t *)this);
     }
 }
 
@@ -62,7 +59,7 @@ gfloat_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   gfloat_t *this = (gfloat_t *)o;
 
-  fts_outlet_float(o, 0, this->f);
+  fts_outlet_float(o, 0, this->value);
 }
 
 static void
@@ -72,7 +69,7 @@ gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   double f = fts_get_number_float(at);
 
   gfloat_update(this, f);
-  fts_outlet_float(o, 0, this->f);
+  fts_outlet_float(o, 0, this->value);
 }
 
 static void
@@ -85,7 +82,7 @@ gfloat_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       double f = fts_get_number_float(at);
       
       gfloat_update(this, f);
-      fts_outlet_float(o, 0, this->f);
+      fts_outlet_float(o, 0, this->value);
     }
 }
 
@@ -96,9 +93,9 @@ gfloat_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   double f;
 
   if(ac && fts_is_number(at))
-    f = this->f + fts_get_number_float(at);
+    f = this->value + fts_get_number_float(at);
   else
-    f = this->f + 1.0;
+    f = this->value + 1.0;
 
   gfloat_update(this, f);
   fts_outlet_float(o, 0, f);
@@ -133,36 +130,13 @@ gfloat_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fprintf( file, "#P flonum %d %d %d %d;\n", x, y, w, font_index);
 }
 
-static void
-gfloat_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  gfloat_t *this = (gfloat_t *)obj;
-
-  fts_set_float(value, this->f);
-}
-
-
-static void
-gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  gfloat_t *this = (gfloat_t *)obj;
-  double f = fts_get_float(value);
-
-  this->f = f;
-
-  fts_object_ui_property_changed(obj, fts_s_value);
-  fts_outlet_float(obj, 0, f);
-}
-
-
 static fts_status_t
 gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(gfloat_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_properties, gfloat_send_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_send_ui_properties, gfloat_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol( "setValue"), gfloat_number);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, gfloat_update_real_time); 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_value, gfloat_number);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, gfloat_bang);
 
@@ -176,11 +150,6 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, gfloat_set);
 
   fts_method_define_varargs( cl, fts_system_inlet, fts_s_save_dotpat, gfloat_save_dotpat); 
-
-  /* Add  the value daemons */
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, gfloat_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, gfloat_put_value);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_float);
 

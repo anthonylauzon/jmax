@@ -38,7 +38,7 @@
  * @ingroup client
  */
 FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
-
+#define fts_client_send_message_real_time fts_client_send_message
 
 /**
  * Start a message to the client mirror of an object
@@ -149,8 +149,4 @@ FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
 
 FTS_API void fts_client_register_object( fts_object_t *obj, int client_id);
 FTS_API void fts_client_release_object( fts_object_t *obj);
-
-/* these functions are empty */
-FTS_API void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
-FTS_API void fts_client_send_property(fts_object_t *obj, fts_symbol_t property);
 
