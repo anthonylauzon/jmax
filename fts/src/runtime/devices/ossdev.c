@@ -30,7 +30,7 @@
    All the post should generate an error.
 */
 
-#define OSSDEV_DEBUG
+#undef OSSDEV_DEBUG
 
 /* Include files */
 
@@ -82,8 +82,6 @@ static struct oss_audio_data_struct
 
   int sampling_rate;
 
-  int fragment_size;
-  int max_fragments;
   int fifo_size;
 
   /* buffers  */
@@ -99,15 +97,19 @@ static struct oss_audio_data_struct
 
 static void oss_audio_set_parameters(void)
 {
-  int format, stereo, sr, fragparam, fragment_size, i;
+  int format, stereo, sr, fragparam, fragment_size, max_fragments, i;
 
   /* Set fragment size */
-  fragment_size = oss_audio_data.fragment_size;
+  /* HACK !!! */
+  fragment_size = 2 /* channels */ * sizeof( short) * 64;
+
   for( i = 0; i < 16; i++)
     if (fragment_size & (1<<i))
       break;
 
-  fragparam = (oss_audio_data.max_fragments<<16) | (i);
+  max_fragments = oss_audio_data.fifo_size / 64;
+
+  fragparam = (max_fragments<<16) | (i);
 
   if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
     {
@@ -284,8 +286,7 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Parameter parsing  */
   
   oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);
-  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 256);
-  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 20);
+  oss_audio_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
 
   s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("device"), fts_new_symbol("/dev/audio"));
   oss_audio_data.device_name = fts_symbol_name(s);
@@ -334,7 +335,7 @@ oss_dac_get_nchans(fts_dev_t *dev)
 static int oss_dac_get_nerrors(fts_dev_t *dev)
 {
   count_info info;
-  int fifo_size;
+  int size;
   
   if (ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOPTR, &info) < 0)
     {
@@ -342,8 +343,8 @@ static int oss_dac_get_nerrors(fts_dev_t *dev)
       return 0;
     }
 
-  fifo_size = oss_audio_data.fragment_size * oss_audio_data.max_fragments;
-  if (info.bytes > (oss_audio_data.bytes_count + fifo_size))
+  size = 2 * sizeof( short) * oss_audio_data.fifo_size;
+  if (info.bytes > (oss_audio_data.bytes_count + size))
     {
       oss_audio_data.bytes_count = info.bytes;
       return 1;
@@ -364,7 +365,7 @@ static void oss_dac_put(fts_word_t *argv)
   float *in1;
   float *in2;
 
-  oss_audio_data.bytes_count += (4*n);
+  oss_audio_data.bytes_count += (2*sizeof(short)*n);
 
   in1 = (float *) fts_word_get_ptr(argv + 2);
   in2 = (float *) fts_word_get_ptr(argv + 3);
@@ -428,8 +429,7 @@ oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Parameter parsing  */
 
   oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);  
-  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
-  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
+  oss_audio_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
 
   /* open the device */
 
