@@ -1,10 +1,4 @@
 #!/bin/sh
 
-
-#CLASSPATH=/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0/jacl.jar:/usr/local/max/java/lib/swing-1.0.1/swingall.jar ; export CLASSPATH
-
-
-#java -noasyncgc -mx64m -ms2m  ircam.jmax.MaxApplication -root /usr/local/max $*
-
-java -noasyncgc -mx64m -ms2m -classpath .:/usr/java/lib/rt.jar:/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0/jacl.jar:/usr/local/max/java/lib/swing-1.0.1/swingall.jar ircam.jmax.MaxApplication -root /u/worksta/dececco/projects/max $*
+java -noasyncgc -mx64m -ms2m -classpath .:/usr/java/lib/rt.jar:/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0/jacl.jar:/usr/local/max/java/lib/swing-1.0.1/swingall.jar ircam.jmax.MaxApplication -root /usr/local/max $*
 
