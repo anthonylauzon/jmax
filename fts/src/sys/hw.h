@@ -4,6 +4,7 @@
 /* generic include with the prototypes of HW dependent functions. */
 
 extern void fts_platform_init(void);
+extern void fts_set_no_real_time();
 extern void fts_pause(void);
 extern unsigned int fts_check_fpe(void);
 

@@ -19,6 +19,10 @@ void fts_platform_init(void)
   fts_add_welcome(&solaris_welcome);
 }
 
+void fts_set_no_real_time()
+{
+}
+
 void fts_pause( void)
 {
 }

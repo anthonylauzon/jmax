@@ -2,6 +2,7 @@
    Platform initialization for the SGI platform.
 */
 
+#include <stdio.h>
 #include <errno.h>
 
 #include <sys/fcntl.h>
@@ -24,7 +25,7 @@
 
 
 static fts_welcome_t  sgi_welcome = {"SGI platform\n"};
-static int running_high_priority = 0;
+static int running_real_time = 1;
 struct timespec pause_time;
 
 /*
@@ -63,48 +64,54 @@ fts_platform_init(void)
 
   flush_all_underflows_to_zero();
 
-
-  /* Lock to physical memory, if we can */
-
-  plock(PROCLOCK);
-
-  /* raise priority to a high value */
-
 #ifdef IRIX6_4
-  {
-    struct sched_param param;
+  if (running_real_time)
+    {
+      struct sched_param param;
   
-    param.sched_priority  = sched_get_priority_max(SCHED_FIFO);
+      /* Lock to physical memory, if we can */
+
+      plock( PROCLOCK);
+
+      /* raise priority to a high value */
+
+      param.sched_priority  = sched_get_priority_max(SCHED_FIFO);
 
       if (sched_setscheduler(0, SCHED_FIFO, &param) < 0)
-	running_high_priority = 0;
-      else
-	running_high_priority = 1;
-  }
-
+	running_real_time = 0;
+    }
 #else
+  if (running_real_time)
+    {
+      /* Lock to physical memory, if we can */
 
-  if (schedctl( NDPRI,  0,  NDPNORMMAX) < 0)
-    running_high_priority = 0;
-  else
-    running_high_priority = 1;
+      plock( PROCLOCK);
 
+      /* raise priority to a high value */
+
+      if (schedctl( NDPRI,  0,  NDPNORMMAX) < 0)
+	running_real_time = 0;
+    }
 #endif
 
   /* Get rid of root privilege if we have them  */
 
-  setreuid(getuid(), getuid());
+  setreuid( getuid(), getuid());
 
   pause_time.tv_sec = 0;
   pause_time.tv_nsec = 100000;
 }
 
+void fts_set_no_real_time()
+{
+  running_real_time = 0;
+}
 
 
 void fts_pause(void)
 {
-  if (running_high_priority)
-    nanosleep(&pause_time, 0);
+  if ( running_real_time)
+    nanosleep( &pause_time, 0);
 }
 
 

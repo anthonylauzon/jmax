@@ -18,7 +18,7 @@
 /*****************************************************************************/
 
 static fts_welcome_t  gnu_welcome = {"GNU generic version\n"};
-static int running_high_priority = 0;
+static int running_real_time = 1;
 struct timespec pause_time = { 0, 10000};
 
 
@@ -27,22 +27,28 @@ fts_platform_init(void)
 {
   fts_add_welcome(&gnu_welcome);
 
-  if (setpriority(PRIO_PROCESS, 0, -20) < 0)
+  if (running_real_time)
     {
-      fprintf( stderr, "fts: cannot set priority (%s) using normal priority\n", strerror(errno));
-      running_high_priority = 0;
+      if (setpriority(PRIO_PROCESS, 0, -20) < 0)
+	{
+	  fprintf( stderr, "fts: cannot set priority (%s) using normal priority\n", strerror(errno));
+	  running_real_time = 0;
+	}
     }
-  else
-    running_high_priority = 1;
 
   /* Get rid of root privilege if we have them */
   if (setreuid(geteuid(), getuid()) == -1)
     fprintf( stderr, "setreuid failed (%s) continuing\n", strerror(errno));
 }
 
+void fts_set_no_real_time()
+{
+  running_real_time = 0;
+}
+
 void fts_pause(void)
 {
-  if ( running_high_priority)
+  if ( running_real_time)
     nanosleep( &pause_time, 0);
 }
 
