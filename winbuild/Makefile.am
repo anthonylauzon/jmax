@@ -12,6 +12,8 @@ EXTRA_DIST= \
 	winprep.sh \
 	jmax.iss \
 	jmax.ico \
-	jmax_ico.rc 
+	jmax_ico.rc \
+	resource.h
+
 
 
