@@ -248,8 +248,16 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     {
       eval_data->obj = fts_get_object( at);
 
-      /* keep object in state of creation */
-      fts_object_set_status(eval_data->obj, FTS_OBJECT_STATUS_CREATE);
+/* Patrice Tisserand 2003-08-05 
+   Why we need this piece of code ?
+   If somebody have the answer, I have the question ....
+   
+   By the way I have comment it to readd error support in GUI Error Panel
+*/
+
+/*       /\* keep object in state of creation *\/ */
+/*       fts_object_set_status(eval_data->obj, FTS_OBJECT_STATUS_CREATE); */
+/* End of Patrice Tisserand 2003-08-05 */
 
       /* add object to patcher */
       fts_patcher_add_object( eval_data->patcher, eval_data->obj);
