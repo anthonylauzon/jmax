@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,31 +23,26 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.explode;
+package ircam.jmax.editors.explode.actions;
 
-import java.awt.datatransfer.*;
+import java.awt.*;
+import java.awt.event.*;
 
-/**
- * The clipboard flavor representing a selection of ScrEvent.
- * This is the only flavor supported by the Explode editor
- * for copy and paste operations (for now)
- */
-public class ExplodeDataFlavor extends DataFlavor {
-  
-  ExplodeDataFlavor(Class representation, String name)
+import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
+import ircam.jmax.editors.explode.*;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class SettingsAction extends EditorAction
+{
+  public void doAction(EditorContainer container)
   {
-    super(representation, name);
+    ((ExplodePanel)container.getEditor()).Settings();    
   }
-
-  public static ExplodeDataFlavor getInstance()
-  {
-    if (sharedInstance == null)
-      sharedInstance = new ExplodeDataFlavor(ircam.jmax.editors.explode.ExplodeSelection.class, "ExplodeSelection"); 
-    return sharedInstance;
-  }
-
-  private static ExplodeDataFlavor sharedInstance;
 }
-
 
 

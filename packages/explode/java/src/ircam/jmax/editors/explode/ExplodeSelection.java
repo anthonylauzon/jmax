@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.datatransfer.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
+import java.lang.reflect.*;
 
 /**
  * The Explode selection. This class is implemented on the base of the
@@ -44,6 +45,18 @@ import ircam.jmax.utils.*;
  * @see ExplodeTablePanel */
 public class ExplodeSelection extends DefaultListSelectionModel implements ExplodeDataListener, Transferable, Cloneable{
 
+  
+  //--- Fields
+  private static ExplodeSelection current;
+  private static MaxVector itsCopy = new MaxVector();
+
+  public static DataFlavor flavors[];
+
+  private MaxVector temp = new MaxVector();
+
+  private SelectionOwner itsOwner;  
+  protected  ExplodeDataModel itsModel;
+
   // Implementation notes: 
   // The ListSelectionModel, and then the ExplodeSelection, 
   // are based on indexes, while the identity
@@ -56,11 +69,9 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   {
     setModel(model);
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
-    if (dataFlavors == null) 
-      {
-	dataFlavors = new MaxVector();
-	addFlavor(ExplodeDataFlavor.getInstance());
-      }
+    if (flavors == null)
+      flavors = new DataFlavor[1];
+    flavors[0] = ExplodeDataFlavor.getInstance();
 
     // make this selection a listener of its own data model
     model.addListener(this);
@@ -68,8 +79,9 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
    
   ExplodeSelection()
   {
-    dataFlavors = new MaxVector();
-    addFlavor(ExplodeDataFlavor.getInstance());
+    if (flavors == null)
+      flavors = new DataFlavor[1];
+    flavors[0] = ExplodeDataFlavor.getInstance();
   }
 
 
@@ -328,25 +340,29 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   /** Transferable interface */
   public boolean isDataFlavorSupported(DataFlavor flavor)
   {
-    for (int i = 0; i < dataFlavors.size(); i++)
+    for (int i = 0; i < Array.getLength(flavors); i++)
       {
-	if (flavor.equals(dataFlavors.getObjectArray()[i]))
+	if (flavor.equals(flavors[i]))
 	  return true;
       }
     return false;
   }
 
-
-  /** Transferable interface */
-  public DataFlavor[] getTransferDataFlavors()
+  public DataFlavor[]  getTransferDataFlavors() 
   {
-    return (DataFlavor[]) dataFlavors.getObjectArray();
+    return flavors;
   }
 
   /** utility function */
   protected void addFlavor(DataFlavor flavor)
   {
-    dataFlavors.addElement(flavor);
+    int dim = Array.getLength(flavors);
+    DataFlavor temp[] = new DataFlavor[dim+1];
+    for (int i = 0; i < dim; i++){
+      temp[i] = flavors[i];
+    }
+    temp[dim+1]=flavor;
+    flavors = temp;
   }
   
   /**
@@ -415,14 +431,15 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   {
     itsCopy.removeAllElements();
   }
-
-  //--- Fields
-  private static ExplodeSelection current;
-  private static MaxVector itsCopy = new MaxVector();
-  protected static MaxVector dataFlavors;
-  private MaxVector temp = new MaxVector();
-
-  private SelectionOwner itsOwner;  
-  protected  ExplodeDataModel itsModel;
 }
+
+
+
+
+
+
+
+
+
+
 

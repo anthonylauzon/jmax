@@ -23,31 +23,42 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.explode;
+package ircam.jmax.editors.explode.actions;
 
-import java.awt.datatransfer.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-/**
- * The clipboard flavor representing a selection of ScrEvent.
- * This is the only flavor supported by the Explode editor
- * for copy and paste operations (for now)
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+/** This class define a set of static variables 
+ *  containing all the standard actions used for the
+ *  patcher editor; please notes that actions objects are
+ *  shared between all the editor instances.
  */
-public class ExplodeDataFlavor extends DataFlavor {
-  
-  ExplodeDataFlavor(Class representation, String name)
-  {
-    super(representation, name);
-  }
 
-  public static ExplodeDataFlavor getInstance()
-  {
-    if (sharedInstance == null)
-      sharedInstance = new ExplodeDataFlavor(ircam.jmax.editors.explode.ExplodeSelection.class, "ExplodeSelection"); 
-    return sharedInstance;
-  }
+public class Actions
+{
+  public static EditorAction cutAction       = new CutAction();
+  public static EditorAction copyAction      = new CopyAction();
+  public static EditorAction pasteAction     = new PasteAction();
+  public static EditorAction duplicateAction = new DuplicateAction();
 
-  private static ExplodeDataFlavor sharedInstance;
+  public static EditorAction undoAction      = new UndoAction();
+  public static EditorAction redoAction      = new RedoAction();
+
+  public static EditorAction settingsAction  = new SettingsAction();
+  public static EditorAction viewAction      = new ViewAction();
 }
+
+
+
+
+
+
+
+
+
 
 
 

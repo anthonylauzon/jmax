@@ -49,8 +49,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   /**
    * Constructor based on a ExplodeDataModel and a selection model
    */
-  public ScrPanel(ExplodeDataModel ep, ExplodeSelection s) 
+  public ScrPanel(ExplodePanel panel, ExplodeDataModel ep, ExplodeSelection s) 
   {  
+    explodePanel = panel;
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
@@ -211,8 +212,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public EditorToolbar prepareToolbar() 
   {
-
-    gc.setFrame(GraphicContext.getFrame(this));
+    //gc.setFrame(GraphicContext.getFrame(explodePanel));
+    gc.setFrame(explodePanel.getFrame());
 
     tb = new EditorToolbar(this, EditorToolbar.HORIZONTAL);
     tb.setFloatable(false);
@@ -278,7 +279,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
     tools = new Vector();
     String fs = File.separator;
-    String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
+    //String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
+    String path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
 
     itsDefaultTool = new ArrowTool(new ImageIcon(path+"selecter.gif"));
     tools.addElement( itsDefaultTool);
@@ -458,7 +460,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   
   InfoPanel itsStatusBar;
   JPanel itsScore;
-
+  ExplodePanel explodePanel;
 }
 
 

@@ -702,7 +702,6 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   {
     if (ExplodeSelection.getCurrent().getModel() != this) 
       return;
-
     ExplodeSelection.getCurrent().prepareACopy();
     MaxApplication.systemClipboard.setContents(ExplodeSelection.getCurrent(), this);
   }  
