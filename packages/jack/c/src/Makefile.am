@@ -6,8 +6,8 @@ jackaudioport.c
 
 
 # libjack_la_CFLAGS = -DDEBUG `pkg-config --cflags jack`
-CFLAGS = @CFLAGS@ `pkg-config --cflags jack`
-libjack_la_LDFLAGS= @LDFLAGS@ `pkg-config --libs jack`
+CFLAGS = @CFLAGS@ @JACK_CFLAGS@
+libjack_la_LDFLAGS= @LDFLAGS@ @JACK_LDFLAGS@
 
 INCLUDES=-I$(top_srcdir)/include
 
