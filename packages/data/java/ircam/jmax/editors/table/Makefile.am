@@ -2,6 +2,7 @@ SUBDIRS= actions menus renderers tools
 
 noinst_PROGRAMS = package
 package_SOURCES = \
+Actions.java \
 ChangeRangeDialog.java \
 CoordinateWriter.java \
 FreeHandDrawer.java \
