@@ -7,6 +7,7 @@ class.h \
 client.h \
 connection.h \
 config.h \
+dsp.h \
 dspgraph.h \
 errobj.h \
 fpe.h \
