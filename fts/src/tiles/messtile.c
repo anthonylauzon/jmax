@@ -512,10 +512,13 @@ fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
 
 
 
-/*    NEW  (obj)pid (int)new-id [<args>]+
+/*    NEW  (obj)pid (int)new-id [<args>]*
 
       Create a new object, in the parent patcher, with 
       local id new-lid, and description args.
+
+      Now new accept an empty argument list; in this case
+      fts_object_new produce an error object.
  */
 
 static void
@@ -523,7 +526,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 {
   trace_mess("Received new", ac, av);
 
-  if (ac >= 3 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
+  if (ac >= 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
     {
       int id;
       fts_patcher_t *parent;

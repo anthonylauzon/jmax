@@ -194,27 +194,27 @@ public class Fts
     Object value;
 
     value = oldObject.get("x");
-    if (value)
+    if (value != null)
       newObject.put("x", value); 
 
     value = oldObject.get("y");
-    if (value)
+    if (value != null)
       newObject.put("y", value); 
 
     value = oldObject.get("w");
-    if (value)
+    if (value != null)
       newObject.put("w", value); 
 
     value = oldObject.get("h");
-    if (value)
+    if (value != null)
       newObject.put("h", value); 
 
     value = oldObject.get("font");
-    if (value)
+    if (value != null)
       newObject.put("font", value); 
 
     value = oldObject.get("fs");
-    if (value)
+    if (value != null)
       newObject.put("fs", value); 
 
     oldObject.delete();
