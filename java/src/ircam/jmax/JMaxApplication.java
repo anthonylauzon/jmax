@@ -629,7 +629,7 @@ public class JMaxApplication {
   private void openConnection()
   {
     if (properties.get("jmaxConnection") == null)
-      properties.put("jmaxConnection", "socket");
+      properties.put("jmaxConnection", "pipe");
 
     try
       {
