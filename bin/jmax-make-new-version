@@ -161,7 +161,7 @@ generate_file ()
 # ---------------------------------------------------------------------------
 send_a_mail ()
 {
-    TEAM="dechelle@ircam.fr dececco@ircam.fr maggi@ircam.fr schnell@ircam.fr"
+    TEAM="dechelle@ircam.fr maggi@ircam.fr schnell@ircam.fr"
     inform Sending a mail to $TEAM
     echo "Don't forget to do 'cvs update'\n" | Mail -s "New jMax version is now $NEW_VERSION" $TEAM
 }
