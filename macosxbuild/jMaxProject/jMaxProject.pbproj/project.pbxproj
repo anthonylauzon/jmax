@@ -473,6 +473,42 @@
 			isa = PBXBuildStyle;
 			name = Debug;
 		};
+		F5EA5774038545B501664092 = {
+			isa = PBXFileReference;
+			name = SequenceEditor.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/SequenceEditor.java;
+			refType = 2;
+		};
+		F5EA5775038545B501664092 = {
+			fileRef = F5EA5774038545B501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5EA5776038545F201664092 = {
+			isa = PBXFileReference;
+			name = TrackPanel.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java;
+			refType = 2;
+		};
+		F5EA5777038545F201664092 = {
+			isa = PBXFileReference;
+			name = TrackWindow.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/TrackWindow.java;
+			refType = 2;
+		};
+		F5EA5778038545F201664092 = {
+			fileRef = F5EA5776038545F201664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5EA5779038545F201664092 = {
+			fileRef = F5EA5777038545F201664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5EF54340352D8FC01664092 = {
 			isa = PBXFileReference;
 			name = parser.c;
@@ -8551,6 +8587,7 @@
 				F85123FC028BEAB301664092,
 				F85123FD028BEAB301664092,
 				F85123FE028BEAB301664092,
+				F5EA5774038545B501664092,
 				F85123FF028BEAB301664092,
 				F8512400028BEAB301664092,
 				F8512401028BEAB301664092,
@@ -9034,6 +9071,9 @@
 				F85124EE028BEBB301664092,
 				F85124EF028BEBB301664092,
 				F85124F0028BEBB301664092,
+				F5EA5775038545B501664092,
+				F5EA5778038545F201664092,
+				F5EA5779038545F201664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9454,8 +9494,10 @@
 				F85124AE028BEBB201664092,
 				F85124AF028BEBB201664092,
 				F85124B0028BEBB201664092,
+				F5EA5776038545F201664092,
 				F85124B1028BEBB201664092,
 				F85124B2028BEBB201664092,
+				F5EA5777038545F201664092,
 				F85124B3028BEBB201664092,
 				F85124B4028BEBB201664092,
 				F85124B5028BEBB201664092,
