@@ -23,11 +23,18 @@
 #ifndef _FTS_PRIVATE_CLIENT_H_
 #define _FTS_PRIVATE_CLIENT_H_
 
+extern fts_class_t *fts_client_class;
+
+/* 
+   (fd) WRONG!!!: the client_t structure is internal to fts/client.c and has never been
+   visible.
+   This is used (apart from client.c) ***only*** in config.c. Thus config.c must be fixed.
+   Moreover, the naming does not comply to fts standard naming for non-static functions,
+   structures and variables.
+*/
 typedef struct _client_t client_t;
+extern client_t *object_get_client( fts_object_t *obj);
 
-#define FTS_CLIENT_DEFAULT_PORT 2023
-
-#define MAX_CLIENTS (1<<(32-OBJECT_ID_BITS))
 
 /**
  * Load a patcher from file
@@ -40,32 +47,5 @@ typedef struct _client_t client_t;
  * @ingroup client
  */
 extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
-extern client_t *object_get_client( fts_object_t *obj);
-
-/** 
- * Start a pipe connection client 
- *
- * @fn int fts_client_pipe_start(void)
- * 
- * @return 0 if success, -1 if client object cannot be created
- * @ingroup client
- */
-extern int fts_client_pipe_start(void);
-
-/** 
- * Start a tcp connection client 
- *
- * @fn int fts_client_tcp_start(void)
- * 
- * @return 0 if success, -1 if client object cannot be created
- * @ingroup client
- */
-extern int fts_client_tcp_start(void);
 
 #endif
-
-
-
-
-
-

@@ -296,9 +296,9 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_t a[1];
 
   if(!fts_object_has_id((fts_object_t *)this->atom_list))
-    fts_client_register_object((fts_object_t *)this->atom_list, fts_get_client_id((fts_object_t *)this));
+    fts_client_register_object((fts_object_t *)this->atom_list, fts_object_get_client_id((fts_object_t *)this));
   
-  fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));
+  fts_set_int(a, fts_object_get_id((fts_object_t *)this->atom_list));
   fts_client_send_message((fts_object_t *)this, sym_setAtomList, 1, a);
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, fts_s_upload, 0, 0);

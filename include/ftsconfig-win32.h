@@ -57,19 +57,17 @@
 #define getpid _getpid
 #define isatty _isatty
 #define snprintf _snprintf
+#define vsnprintf _vsnprintf
 #define bcopy(src,dst,n)  memcpy(dst,src,n)
 
 /* file handling macros */
 
 #define MAXPATHLEN _MAX_PATH
-#define realpath  win32_realpath
 
 /* Valid absolute paths are:  /c/jmax, c:/jmax, c:\jmax */
 #define fts_path_is_absolute(_p) \
  ((_p[0] == '/') || \
   ((_p[1] == ':') && (_p[2] == '/')) || \
   ((_p[1] == ':') && (_p[2] == '\\')))
-
-char* win32_realpath(const char* path, char* resolved_path);
 
 #endif /* _CONFIG_WIN32_H */

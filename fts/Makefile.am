@@ -15,6 +15,7 @@ bmaxfile.c \
 bytestream.c \
 class.c \
 client.c \
+clientmanager.c \
 clipboard.c \
 config.c \
 connection.c \

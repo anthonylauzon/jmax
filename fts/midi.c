@@ -2040,40 +2040,6 @@ fts_midiconfig_remove_listener(fts_object_t *obj)
   fts_objectlist_remove(&midiconfig_listeners, obj);
 }
 
-/* fts_object_t * */
-/* fts_midiconfig_get(void) */
-/* { */
-/*   return (fts_object_t *)midiconfig; */
-/* } */
-
-void
-fts_midiconfig_set(fts_midiconfig_t *config)
-{
-  fts_midiconfig_t* midiconfig = (fts_midiconfig_t*)fts_midiconfig_get();
-  if(config != NULL)
-  {
-    fts_object_refer((fts_object_t *)config);
- 
-    if( (midiconfig != NULL) && fts_object_has_id( (fts_object_t *)midiconfig))
-    {
-      fts_atom_t a;
-      
-      if( ! fts_object_has_id( (fts_object_t *)config))
-	fts_client_register_object(  (fts_object_t *)config, fts_get_client_id( (fts_object_t *)midiconfig));
-	  
-      fts_set_int(&a, fts_get_object_id( (fts_object_t *)config));
-      fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)config), fts_s_midi_config, 1, &a);
-      
-      fts_send_message( (fts_object_t *)config, fts_s_upload, 0, 0);
-    }
-  }
-  
-  if(midiconfig != NULL)
-    fts_object_release((fts_object_t *)midiconfig);
-    
-  midiconfig = config;
-}
-
 /****************************************************
  *
  *  MIDI configuration class

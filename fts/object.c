@@ -132,7 +132,8 @@ fts_object_new( fts_class_t *cl)
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
   obj->cl = cl;
-  obj->client_id = FTS_CREATE;
+  fts_object_set_id( obj, FTS_NO_ID);
+  fts_object_set_status( obj, FTS_OBJECT_STATUS_CREATE);
 
   return obj;
 }
@@ -158,7 +159,7 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* call constructor */
   fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
 
-  if(obj->client_id == FTS_INVALID)
+  if( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
   {
     /* destroy invalid object */
     fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
@@ -167,7 +168,7 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
     return NULL;
   }
 
-  obj->client_id = FTS_NO_ID;
+  fts_object_set_status( obj, 0);
 
   return obj;
 }
@@ -188,7 +189,7 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
   /* call constructor */
   fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
 
-  if(obj->client_id == FTS_INVALID)
+  if ( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
   {
     /* destroy invalid object */
     fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
@@ -197,7 +198,7 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
     return NULL;
   }
 
-  obj->client_id = FTS_NO_ID;
+  fts_object_set_status( obj, 0);
 
   return obj;
 }
@@ -247,7 +248,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
       eval_data->obj = fts_get_object( at);
 
       /* keep object in state of creation */
-      fts_object_set_id(eval_data->obj, FTS_CREATE);
+      fts_object_set_status(eval_data->obj, FTS_OBJECT_STATUS_CREATE);
 
       /* add object to patcher */
       fts_patcher_add_object( eval_data->patcher, eval_data->obj);
@@ -263,7 +264,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
       /* send message to fresh object */
       if(fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
       {
-        if(fts_object_get_id(eval_data->obj) == FTS_INVALID)
+        if(fts_object_get_status(eval_data->obj) == FTS_OBJECT_STATUS_INVALID)
           status = fts_status_new(fts_get_error());
       }
       else
@@ -714,7 +715,7 @@ fts_object_upload(fts_object_t *obj)
 static void
 fts_object_reset_client(fts_object_t *obj)
 {
-  if(fts_object_get_id( obj) > FTS_NO_ID)
+  if(fts_object_has_id( obj))
   {
     fts_send_message(obj, fts_s_closeEditor, 0, 0);
     fts_client_release_object(obj);
@@ -885,8 +886,8 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
   int old_id = fts_object_get_id( old);
 
-  /* redefine object if not scheduled for removal */
-  if(old_id != FTS_DELETE)
+  /* redefine object if not scheduled for deletion */
+  if(fts_object_get_status(old) != FTS_OBJECT_STATUS_PENDING_DELETE)
   {
     fts_patcher_t *patcher = fts_object_get_patcher(old);
     fts_symbol_t name = fts_object_get_name(old);

@@ -21,12 +21,8 @@
  */
 
 #define FTS_NO_ID -1
-#define FTS_DELETE -2
-#define FTS_CREATE -3
-#define FTS_INVALID -4
 
-typedef struct fts_object_patcher_data
-{
+typedef struct fts_object_patcher_data {
   /* the object description */
   int argc;
   fts_atom_t *argv;
@@ -46,12 +42,20 @@ typedef struct fts_object_patcher_data
 
 } fts_object_patcher_data_t;
 
-struct fts_object 
-{
+#define FTS_OBJECT_BITS_STATUS 2
+#define FTS_OBJECT_BITS_CLIENT 8
+#define FTS_OBJECT_BITS_ID     (32-FTS_OBJECT_BITS_STATUS-FTS_OBJECT_BITS_CLIENT)
+
+struct fts_object {
   fts_class_t *cl;
 
-  /* id for the client communication */
-  int client_id;
+  struct {
+    unsigned long status:FTS_OBJECT_BITS_STATUS;
+
+    /* IDs for the client communication */
+    long client_id:FTS_OBJECT_BITS_CLIENT;
+    long id:FTS_OBJECT_BITS_ID;
+  } flag;
   
   /* reference counter */
   int refcnt;
@@ -96,8 +100,9 @@ FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac
 #define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
 
 /* client id */
-#define fts_object_get_id(o) ((o)->client_id)
+#define fts_object_get_id(o) ((o)->flag.id)
 #define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
+#define fts_object_get_client_id(o) ((o)->flag.client_id)
 
 /* class */
 #define fts_object_get_class(o) ((o)->cl)

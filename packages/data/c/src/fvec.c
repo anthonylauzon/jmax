@@ -388,9 +388,9 @@ fvec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if( !fts_object_has_id( this->editor))
     {
-      fts_client_register_object( this->editor, fts_get_client_id( o));
+      fts_client_register_object( this->editor, fts_object_get_client_id( o));
 	  
-      fts_set_int(&a, fts_get_object_id( this->editor));
+      fts_set_int(&a, fts_object_get_id( this->editor));
       fts_client_send_message( o, fts_s_editor, 1, &a);
       
       /*fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0);*/

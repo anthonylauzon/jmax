@@ -29,12 +29,11 @@
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/audioconfig.h> /* require bmaxfile.h */
 #include <ftsprivate/midi.h> /* require bmaxfile.h */
-
 #include <ftsprivate/client.h> 
 #include <ftsprivate/loader.h> 
 #include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
-
 #include <ftsprivate/platform.h> /* fts_get_user_configuration */
+#include <ftsprivate/object.h> /* require audioconfig.h and midi.h */
 /****************************************************
  *
  *  AUDIO/MIDI configuration class
@@ -42,7 +41,7 @@
  */
 static fts_symbol_t config_s_name;
 
-fts_class_t* config_type = NULL;
+fts_class_t* fts_config_class = NULL;
 
 static fts_config_t *config;
 
@@ -64,25 +63,26 @@ config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
 }
 
-void
+
+fts_config_t *
 fts_config_open(fts_symbol_t file_name)
 {
   fts_config_t *config = NULL;
   
   fts_bmax_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0, (fts_object_t **)&config);
   
-  if (config != NULL && fts_object_get_class((fts_object_t *)config) == config_type)
-  {
-    config->file_name = file_name;
+  if (config != NULL && fts_object_get_class((fts_object_t *)config) == fts_config_class)
+    {
+      config->file_name = file_name;
     
-    /* replace current config by loaded config */
-    fts_config_set(config);
-    fts_log("[config]: Opening configuration %s\n", file_name);
-  }
+      fts_midiconfig_set_defaults(config->midi_config);
+
+      fts_log("[config]: Opening configuration %s\n", file_name);
+    }
   else
     fts_log("[config]: Cannot read AUDIO/MIDI configuration from file %s\n", file_name);
 
-  fts_midiconfig_set_defaults(config->midi_config);
+  return config;
 }
 
 static void
@@ -90,9 +90,11 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fts_config_t* self = (fts_config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
+  fts_config_t *config;
 
   fts_log("[config] load file %s\n", file_name);
-  fts_config_open(file_name);
+  config = fts_config_open(file_name);
+  fts_config_set( config);
 
   /* @@@@@ upload config @@@@@ */
   self->uploaded = 0;
@@ -111,22 +113,22 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_make_absolute_path( project_dir, file_name, path, MAXPATHLEN);
 
   if (fts_bmax_file_open( &f, path, 0, 0, 0) >= 0)
-  {
-    /* write config object */
-    fts_bmax_code_new_object( &f, o, -1);
+    {
+      /* write config object */
+      fts_bmax_code_new_object( &f, o, -1);
 
-    /* save audio config */
-    fts_audioconfig_dump( this->audio_config, &f);
+      /* save audio config */
+      fts_audioconfig_dump( this->audio_config, &f);
     
-    /* save midi config */
-    fts_midiconfig_dump( this->midi_config, &f);
+      /* save midi config */
+      fts_midiconfig_dump( this->midi_config, &f);
     
-    fts_bmax_code_return( &f);
-    fts_bmax_file_close( &f);    
+      fts_bmax_code_return( &f);
+      fts_bmax_file_close( &f);    
     
-    fts_config_set_dirty( this, 0);
-    fts_log("config save in file %s \n", path);
-  }
+      fts_config_set_dirty( this, 0);
+      fts_log("config save in file %s \n", path);
+    }
   else
     fts_log( "config save: cannot open file %s\n", file_name);
 }
@@ -204,17 +206,17 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_atom_t a;
 
   if ( !fts_object_has_id( ((fts_object_t *)this->audio_config)))
-    fts_client_register_object( ((fts_object_t *)this->audio_config), fts_get_client_id( o));
+    fts_client_register_object( ((fts_object_t *)this->audio_config), fts_object_get_client_id( o));
 
-  fts_set_int( &a, fts_get_object_id( ((fts_object_t *)this->audio_config)));
+  fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->audio_config)));
   fts_client_send_message( o, fts_s_audio_config, 1, &a);
       
   fts_send_message( ((fts_object_t *)this->audio_config), fts_s_upload, 0, 0);
 
   if ( !fts_object_has_id( ((fts_object_t *)this->midi_config)))
-    fts_client_register_object( ((fts_object_t *)this->midi_config), fts_get_client_id( o));
+    fts_client_register_object( ((fts_object_t *)this->midi_config), fts_object_get_client_id( o));
 
-  fts_set_int( &a, fts_get_object_id( ((fts_object_t *)this->midi_config)));
+  fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->midi_config)));
   fts_client_send_message( o, fts_s_midi_config, 1, &a);
   fts_send_message( ((fts_object_t *)this->midi_config), fts_s_upload, 0, 0);
 
@@ -245,7 +247,7 @@ static void
 config_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_config_t* self = (fts_config_t*)o;
-/*   fts_object_release( o); */
+  /*   fts_object_release( o); */
   config_clear(o, 0, 0, 0, 0);
   self->uploaded = 0;  
 }
@@ -310,32 +312,25 @@ fts_object_t*
 fts_audioconfig_get(void)
 {
   if (NULL != config)
-  {
     return (fts_object_t*)config->audio_config;
-  }
-  else
-  {
-    return NULL;
-  }
+
+  return NULL;
 }
 
 fts_object_t* 
 fts_midiconfig_get(void)
 {
   if (NULL != config)
-  {
     return (fts_object_t*)config->midi_config;
-  }
-  else
-  {
-    return NULL;
-  }
+
+  return NULL;
 }
 
 void
 fts_config_set( fts_config_t *new_config)
 {
   fts_config_t* old_config = (fts_config_t*)fts_config_get();
+
   if( new_config != NULL)
     {
       fts_object_refer((fts_object_t *)new_config);
@@ -345,14 +340,14 @@ fts_config_set( fts_config_t *new_config)
 	  fts_atom_t a;
       
 	  if( ! fts_object_has_id( (fts_object_t *)new_config))
-	    fts_client_register_object(  (fts_object_t *)new_config, fts_get_client_id( (fts_object_t *)old_config));
+	    fts_client_register_object(  (fts_object_t *)new_config, fts_object_get_client_id( (fts_object_t *)old_config));
 	  
-	  fts_set_int(&a, fts_get_object_id( (fts_object_t *)new_config));
+	  fts_set_int(&a, fts_object_get_id( (fts_object_t *)new_config));
 	  fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)new_config), fts_s_config, 1, &a);
       
 	  fts_send_message( (fts_object_t *)new_config, fts_s_upload, 0, 0);
+	}
     }
-  }
   
   if( old_config != NULL)
     fts_object_release((fts_object_t *)old_config);
@@ -363,14 +358,7 @@ fts_config_set( fts_config_t *new_config)
 fts_object_t* 
 fts_config_get(void)
 {
-  if (NULL != config)
-    {
-      return (fts_object_t*)config;
-    }
-  else
-    {
-      return NULL;
-    }
+  return (fts_object_t*)config;
 }
 
 /* **********************************************************************
@@ -384,17 +372,7 @@ fts_kernel_config_init(void)
   config_s_name = fts_new_symbol("__config");
 
   /* Configuration class */
-  config_type = fts_class_install(config_s_name, config_instantiate);
-
-  /* @@@@@ Default config must be created in fts_load_config @@@@@@ */
-#if 0
-  /* create config object */
-  fts_config_set( (fts_config_t*)fts_object_create(config_type, 0, 0));
-
-  /* define global config variable */
-  fts_set_object(&a, config);
-  fts_name_set_value(fts_get_root_patcher(), config_s_name, &a);
-#endif 
+  fts_config_class = fts_class_install(config_s_name, config_instantiate);
 }
 
 /** EMACS **

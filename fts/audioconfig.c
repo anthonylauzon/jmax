@@ -38,6 +38,7 @@
 #include <ftsprivate/midi.h>
 #include <ftsprivate/config.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/object.h>
 
 
 #define AUDIO_CONFIG_DEFAULT_SAMPLE_RATE 44100.
@@ -399,11 +400,11 @@ audioconfig_upload_label(fts_object_t *o, fts_audiolabel_t *label, int index)
     fts_symbol_t name = fts_audiolabel_get_name(label);
     fts_atom_t args[7];
 
-    fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
+    fts_client_register_object((fts_object_t *)label, fts_object_get_client_id(o));
 
     /* send new label to client */
     fts_set_int(args, index);
-    fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label));
+    fts_set_int(args + 1, fts_object_get_id((fts_object_t*)label));
     fts_set_symbol(args + 2, name);
 
     fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));

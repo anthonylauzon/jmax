@@ -254,11 +254,12 @@ fts_object_error(fts_object_t *obj, const char *format, ...)
 
   error = fts_new_symbol(buf);
 
-  if(fts_object_get_id(obj) == FTS_CREATE || fts_object_get_id(obj) == FTS_INVALID)
-  {
-    fts_object_set_id(obj, FTS_INVALID);
-    the_error = error;
-  }
+  if (fts_object_get_status(obj) == FTS_OBJECT_STATUS_CREATE 
+      || fts_object_get_status(obj) == FTS_OBJECT_STATUS_INVALID)
+    {
+      fts_object_set_status(obj, FTS_OBJECT_STATUS_INVALID);
+      the_error = error;
+    }
   else
     fts_object_runtime_error(obj, error);
 }

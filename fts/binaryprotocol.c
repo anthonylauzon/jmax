@@ -503,7 +503,7 @@ void fts_binary_protocol_add_string(fts_binary_protocol_t* binary_protocol, cons
 void fts_binary_protocol_add_object(fts_binary_protocol_t* binary_protocol, fts_object_t* obj)
 {
   put_byte(binary_protocol, FTS_PROTOCOL_OBJECT);
-  put_int(binary_protocol, OBJECT_ID_OBJ(fts_object_get_id(obj)));
+  put_int(binary_protocol, fts_object_get_id(obj));
 }
 
 

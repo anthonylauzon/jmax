@@ -841,7 +841,7 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
 
   if(!fts_object_has_id((fts_object_t *)event))
   {
-    fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
+    fts_client_register_object((fts_object_t *)event, fts_object_get_client_id((fts_object_t *)this));
 
     if(fts_is_object(&event->value))
     {
@@ -850,7 +850,7 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
       fts_atom_t *atoms = 0;
 
       fts_array_set_size(temp_array, 0);
-      fts_array_append_int(temp_array, fts_get_object_id((fts_object_t *)event));
+      fts_array_append_int(temp_array, fts_object_get_id((fts_object_t *)event));
       fts_array_append_float(temp_array, event_get_time(event));
       fts_array_append_symbol(temp_array, fts_get_class_name(&event->value));
 
@@ -873,7 +873,7 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
     }
     else
     {
-      fts_set_int(a + 0, fts_get_object_id((fts_object_t *)event));
+      fts_set_int(a + 0, fts_object_get_id((fts_object_t *)event));
       fts_set_float(a + 1, event_get_time(event));
       fts_set_symbol(a + 2, fts_get_class_name(&event->value));
       a[3] = event->value;

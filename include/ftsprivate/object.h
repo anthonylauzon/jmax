@@ -23,7 +23,17 @@
 #ifndef _FTS_PRIVATE_OBJECT_H_
 #define _FTS_PRIVATE_OBJECT_H_
 
-#define fts_object_set_id(o, i) ((o)->client_id = (i))
+/* object status */
+#define FTS_OBJECT_STATUS_CREATE ((unsigned long)1)
+#define FTS_OBJECT_STATUS_INVALID ((unsigned long)2)
+#define FTS_OBJECT_STATUS_PENDING_DELETE ((unsigned long)3)
+
+#define fts_object_get_status(o) ((o)->flag.status)
+#define fts_object_set_status(o,f) ((o)->flag.status = (f))
+
+/* client id */
+#define fts_object_set_id(o, i) ((o)->flag.id = (i))
+#define fts_object_set_client_id(o,i) ((o)->flag.client_id = (i))
 
 #define fts_object_set_definition(o, d) ((o)->definition = (d))
 #define fts_object_get_definition(o) ((o)->definition)

@@ -29,8 +29,9 @@ FTS_API int fts_is_directory(const char *name);
 
 FTS_API char *fts_dirname( char *name);
 
-/** Creates the absolute file path. The result is copied in the buf
- *  argument. 
+/** 
+ * Creates the absolute file path. The result is copied in the buf
+ * argument. 
  *
  * @fn char* fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
  * @param parent the parent directory of the file 

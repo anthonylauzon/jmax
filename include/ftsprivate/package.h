@@ -120,8 +120,6 @@ struct fts_package {
 
   fts_list_t* windows;
 
-  fts_symbol_t config;
-
   int dirty; /* set to one if package's content is not saved */
 };
 

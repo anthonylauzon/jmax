@@ -72,28 +72,32 @@ char fts_file_separator = '/';
 #endif
 
 
-int fts_file_exists( const char *filename)
+int
+fts_file_exists( const char *filename)
 {
   struct stat statbuf;
 
   return stat( filename, &statbuf) == 0;
 }
 
-int fts_is_file(const char *name)
+int
+fts_is_file(const char *name)
 {
   struct stat statbuf;
 
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
-int fts_is_directory(const char *name)
+int 
+fts_is_directory(const char *name)
 {
   struct stat statbuf;
 
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
 }
 
-char *fts_dirname( char *name)
+char *
+fts_dirname( char *name)
 {
   char *end;
 
@@ -103,55 +107,59 @@ char *fts_dirname( char *name)
   return name;
 }
 
-static int fts_file_correct_separators( char *filename)
+static int
+fts_file_correct_separators( char *filename)
 {
 #ifdef WIN32
   int i, len, r = 0;
 
   len = strlen(filename);
-  for (i = 0; i < len; i++) {
-    if (filename[i] == '/') {
-      filename[i] = '\\';
-      r = 1;
+  for (i = 0; i < len; i++) 
+    {
+      if (filename[i] == '/') 
+	{
+	  filename[i] = '\\';
+	  r = 1;
+	}
     }
-  }
   return r;
 #else
   return 0;
 #endif
 }
 
-char *fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+char *
+fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {
   char path[MAXPATHLEN];
 
   if (!fts_path_is_absolute(file))
-  {
-    if (parent != NULL)
-      snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
-    else 
     {
-      char cwd[MAXPATHLEN];
+      if (parent != NULL)
+	snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
+      else 
+	{
+	  char cwd[MAXPATHLEN];
 
-      getcwd( cwd, MAXPATHLEN);
-      snprintf( path, len, "%s%c%s", cwd, fts_file_separator, file);      
-    }
-  } 
+	  getcwd( cwd, MAXPATHLEN);
+	  snprintf( path, len, "%s%c%s", cwd, fts_file_separator, file);      
+	}
+    } 
   else
     snprintf( path, len, "%s", file);
-
 
   /* correct possible separators */
   fts_file_correct_separators(path);
 
-  /* try to resolve symbolic links */
 #ifdef HAVE_REALPATH
-  if (realpath(path, buf) != NULL)
-    return buf;
-  return path;
+  /* try to resolve symbolic links */
+  if (realpath(path, buf) == NULL)
+    strcpy( buf, path);
 #else
-  return path;
+    strcpy( buf, path);
 #endif
+
+  return buf;
 }
 
 /*  fts_find_file_aux
@@ -169,51 +177,62 @@ fts_find_file_aux(const char* root, const char* path, const char* filename, char
 {
   char newroot[MAXPATHLEN];
 
-  if (root != NULL) {
-    if (path != NULL) {
-      fts_make_absolute_path(root, path, newroot, MAXPATHLEN);
-      fts_make_absolute_path(newroot, filename, buf, len);
-    } else {
-      snprintf(newroot, MAXPATHLEN, "%s", root);
-      fts_make_absolute_path(newroot, filename, buf, len);
+  if (root != NULL) 
+    {
+      if (path != NULL) 
+	{
+	  fts_make_absolute_path(root, path, newroot, MAXPATHLEN);
+	  fts_make_absolute_path(newroot, filename, buf, len);
+	} 
+      else 
+	{
+	  snprintf(newroot, MAXPATHLEN, "%s", root);
+	  fts_make_absolute_path(newroot, filename, buf, len);
+	}
     }
-  } else {
-    if (path != NULL) {
-      snprintf(newroot, MAXPATHLEN, "%s", path);
-      fts_make_absolute_path(newroot, filename, buf, len);
-    } else {
-      snprintf(buf, len, "%s", filename);      
+  else 
+    {
+      if (path != NULL) 
+	{
+	  snprintf(newroot, MAXPATHLEN, "%s", path);
+	  fts_make_absolute_path(newroot, filename, buf, len);
+	} 
+      else 
+	{
+	  snprintf(buf, len, "%s", filename);      
+	}
     }
-  }
 
   return fts_file_exists(buf);
 }
 
-int fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
+int
+fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
 {
   const char* path;
 
-  if ((filename == NULL) || (strlen(filename) == 0)) {
+  if ((filename == NULL) || (strlen(filename) == 0))
     return 0;
-  }
 
-  while (paths) {
-    path = fts_get_symbol(fts_list_get(paths));
-    if (fts_find_file_aux(root, path, filename, buf, len)) {
-      return 1;
+  while (paths)
+    {
+      path = fts_get_symbol(fts_list_get(paths));
+
+      if (fts_find_file_aux(root, path, filename, buf, len))
+	return 1;
+
+      paths = fts_list_next(paths);
     }
-    paths = fts_list_next(paths);
-  }
 
-  if ((root != NULL) && fts_find_file_aux(root, NULL, filename, buf, len)) {
+  if ((root != NULL) && fts_find_file_aux(root, NULL, filename, buf, len))
     return 1;
-  }
 
   return 0;
 }
 
 
-int fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filename, char *buf, int len)
+int
+fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filename, char *buf, int len)
 {
   fts_list_t* path_list = NULL;
   const char* start;
@@ -225,44 +244,45 @@ int fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filena
 
   /* split env into path list */
   if (env)
-  {
-    start = env;
-    while (*start != '\0')
     {
-      end = start;
-      while (*end != fts_path_separator && *end != '\0')
-      {
-	end++;
-      }
-      if (end > start)
-      {
-	buffer = fts_malloc((end - start + 1) * sizeof(char));
-	buffer = strncpy(buffer, start, end - start);
-	/* add null char */
-	buffer[end - start] = '\0';
-	buff_symbol = fts_new_symbol(buffer);
-	fts_set_symbol(&a, buff_symbol);
-	path_list = fts_list_append(path_list, &a);
-	fts_free(buffer);
-      }
+      start = env;
+      while (*start != '\0')
+	{
+	  end = start;
+	  while (*end != fts_path_separator && *end != '\0')
+	    {
+	      end++;
+	    }
+	  if (end > start)
+	    {
+	      buffer = fts_malloc((end - start + 1) * sizeof(char));
+	      buffer = strncpy(buffer, start, end - start);
+	      /* add null char */
+	      buffer[end - start] = '\0';
+	      buff_symbol = fts_new_symbol(buffer);
+	      fts_set_symbol(&a, buff_symbol);
+	      path_list = fts_list_append(path_list, &a);
+	      fts_free(buffer);
+	    }
       
-      start = end;
-      if (*start == ':')
-      {
-	start++;
-      }
+	  start = end;
+	  if (*start == ':')
+	    {
+	      start++;
+	    }
+	}
     }
-  }
   status = fts_file_find_in_path(root, path_list, filename, buf, len);
   if (NULL != path_list)
-  {
-    fts_list_delete(path_list);
-  }
+    {
+      fts_list_delete(path_list);
+    }
   return status;
 }
 
 
-char *fts_file_find( const char *filename, char *buf, int len)
+char *
+fts_file_find( const char *filename, char *buf, int len)
 {
   fts_package_t *pkg;
   fts_iterator_t pkg_iter;
@@ -276,16 +296,16 @@ char *fts_file_find( const char *filename, char *buf, int len)
   fts_package_get_required_packages( pkg, &pkg_iter);
 
   while ( fts_iterator_has_more( &pkg_iter)) 
-  {
-    fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_package_get(fts_get_symbol(&pkg_name));
+    {
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
       
-    if (pkg == NULL)
-      continue;
+      if (pkg == NULL)
+	continue;
       
-    if (fts_package_get_data_file( pkg, filename, buf, len))
-      return buf;
-  }
+      if (fts_package_get_data_file( pkg, filename, buf, len))
+	return buf;
+    }
 
   return NULL;
 }

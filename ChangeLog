@@ -1,3 +1,17 @@
+2003-04-04  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* changed the client and object id C declarations in include/fts/object.h: used a bit field that 
+	contains the object status (for object creation, error and deletion), the client id and the object
+	id.
+	* changed the access macros for object and client id: 
+	  fts_get_object_id -> fts_object_get_id
+	  fts_get_client_id -> fts_object_get_client_id
+	  fts_object_get_id -> removed
+	* splitted client.c into
+	  ** client.c that depends only on bytestreams and that is 100% platform independant
+	  ** clientmanager.c that still has some platform dependant socket code 
+	* fixed realtpath in fts/file.c
+
 2003-04-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* include/fts/predefsymbols.h: added fts_s_none ("none") and fts_s_noaudio ("noaudio") symbols

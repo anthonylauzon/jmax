@@ -23,19 +23,16 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <fts/fts.h>
+
 #include <ftsprivate/platform.h>
 #include <ftsprivate/package.h>
-
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/audioconfig.h> /* require bmaxfile.h */
 #include <ftsprivate/midi.h> /* require bmaxfile.h */
 #include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
-
-#include <ftsprivate/client.h> /* provide fts_client_pipe_start and fts_client_tcp_start */
-
-#include <fts/project.h>
-
+#include "ftsprivate/clientmanager.h"
 
 /***********************************************************************
  * 
@@ -86,36 +83,36 @@ static void fts_cmd_args_parse( int argc, char **argv)
   argc--;
   argv++;
   while (argc)
-  {
-    if (!strncmp( *argv, "--", 2))
     {
-      char *p = strchr( *argv, '=');
+      if (!strncmp( *argv, "--", 2))
+	{
+	  char *p = strchr( *argv, '=');
 
-      if (p != NULL)
-	*p = '\0';
+	  if (p != NULL)
+	    *p = '\0';
 
-      name = fts_new_symbol( *argv + 2);
+	  name = fts_new_symbol( *argv + 2);
 
-      if (p == NULL || p[1] == '\0')
-	value = s_yes;
+	  if (p == NULL || p[1] == '\0')
+	    value = s_yes;
+	  else
+	    {
+	      p++;
+	      value = fts_new_symbol( p);
+	    }
+	}
       else
-      {
-	p++;
-	value = fts_new_symbol( p);
-      }
-    }
-    else
-    {
-      sprintf( filevar, "file%d", filecount++);
-      name = fts_new_symbol( filevar);
-      value = fts_new_symbol( *argv);
-    }
+	{
+	  sprintf( filevar, "file%d", filecount++);
+	  name = fts_new_symbol( filevar);
+	  value = fts_new_symbol( *argv);
+	}
 
-    fts_cmd_args_put( name, value);
+      fts_cmd_args_put( name, value);
 
-    argc--;
-    argv++;
-  }
+      argc--;
+      argv++;
+    }
 }
 
 fts_symbol_t fts_get_root_directory( void)
@@ -149,29 +146,29 @@ fts_load_project( void)
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( fts_s_project);
   if (fts_s_none != project_file)
-  {
-    if (project_file != NULL)
     {
-      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
-    }
+      if (project_file != NULL)
+	{
+	  project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+	}
     
-    /* check if the user has a project file in the home directory  */
-    if (!project_found)
-    {
-      project_file = fts_get_user_project();
-      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
-    }
+      /* check if the user has a project file in the home directory  */
+      if (!project_found)
+	{
+	  project_file = fts_get_user_project();
+	  project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+	}
     
-    /* check if there's a system wide project */
-    if (!project_found)
-    {
-      project_file = fts_get_system_project();
-      project_found = fts_file_exists( project_file) && fts_is_file( project_file);
-    }
+      /* check if there's a system wide project */
+      if (!project_found)
+	{
+	  project_file = fts_get_system_project();
+	  project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+	}
 
-    if (project_found)
-      project = fts_project_open(project_file);
-  }
+      if (project_found)
+	project = fts_project_open(project_file);
+    }
 
   /* create an empty project */
   if (project == NULL)
@@ -184,7 +181,7 @@ fts_load_project( void)
     }
   else
     {
-      fts_log( "[boot]: Opened project: %s\n", project_file);
+      fts_log( "[boot] opened project: %s\n", project_file);
     }
 
   fts_project_set( project);
@@ -195,47 +192,51 @@ static void
 fts_load_config( void)
 {
   fts_symbol_t config_file;
+  fts_config_t *config = NULL;
   int config_found = 0;
 
   /* check if the user specified a config file on the command line  */
   config_file = fts_cmd_args_get( fts_s_config);
   if (fts_s_none != config_file)
-  {
-    if (config_file != NULL)
     {
-      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
-    }
+      if (config_file != NULL)
+	{
+	  config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+	}
     
-    /* check if the user has a config file in the home directory  */
-    if (!config_found)
+      /* check if the user has a config file in the home directory  */
+      if (!config_found)
+	{
+	  config_file = fts_get_user_configuration();
+	  config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+	}
+
+      /* check if there's a system wide config */
+      if (!config_found)
+	{
+	  config_file = fts_get_system_configuration();
+	  config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+	}
+      if (config_found)
+	config = fts_config_open( config_file);
+    }    
+  
+  if (config == NULL)
     {
-      config_file = fts_get_user_configuration();
-      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
+      /* create an empty config */
+      config = (fts_config_t*)fts_object_create(fts_config_class, 0, 0);
+      fts_midiconfig_set_defaults(config->midi_config);
+      fts_audioconfig_set_defaults(config->audio_config);
+
+      fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
+      post( "Warning: no configuration found\n");
+    }
+  else
+    {
+      fts_log( "[boot] opened config : %s\n", config_file);
     }
 
-    /* check if there's a system wide config */
-    if (!config_found)
-    {
-      config_file = fts_get_system_configuration();
-      config_found = fts_file_exists( config_file) && fts_is_file( config_file);
-    }
-  }    
-  if (!config_found)
-  {
-    fts_config_t *config;
-    
-    /* create an empty config */
-    fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
-    config = (fts_config_t*)fts_object_create(config_type, 0, 0);
-    fts_midiconfig_set_defaults(config->midi_config);
-    fts_audioconfig_set_defaults(config->audio_config);
-    
-    fts_config_set(config);
-  }
-  else
-  {
-    fts_config_open(config_file);
-  }
+  fts_config_set(config);
 }
 
 /***********************************************************************
@@ -289,6 +290,7 @@ void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_audio_init);
   _K_DECNCALL( fts_kernel_audioconfig_init);  
   _K_DECNCALL( fts_kernel_client_init);
+  _K_DECNCALL( fts_kernel_client_manager_init);
   _K_DECNCALL( fts_kernel_update_init);
   _K_DECNCALL( fts_kernel_clipboard_init);
   _K_DECNCALL( fts_kernel_label_init);
@@ -322,9 +324,9 @@ void fts_init( int argc, char **argv)
 
   /* check whether we should use a piped connection thru the stdio file handles */
   if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
-    fts_client_pipe_start();
+    fts_client_manager_pipe_start();
   else
-    fts_client_tcp_start();
+    fts_client_manager_tcp_start();
   
   fts_log("[fts]: Loading project\n");
 

@@ -162,10 +162,10 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 
   if( !fts_object_has_id((fts_object_t *)track))
   {
-    fts_client_register_object((fts_object_t *)track, fts_get_client_id((fts_object_t *)this));
+    fts_client_register_object((fts_object_t *)track, fts_object_get_client_id((fts_object_t *)this));
 
     fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
-    fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
+    fts_client_add_int( (fts_object_t *)this, fts_object_get_id((fts_object_t *)track));
 
     if(track_type != NULL)
       fts_client_add_symbol( (fts_object_t *)this, fts_class_get_name(track_type));

@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/object.h>
 
 static fts_symbol_t s_update_group_begin;
 static fts_symbol_t s_update_group_end;
@@ -110,7 +111,7 @@ static void update_group_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 static void update_group_start( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  update_group_table_add( (update_group_t *)o, fts_get_client_id( o));
+  update_group_table_add( (update_group_t *)o, fts_object_get_client_id( o));
 }
 
 static void update_group_instantiate(fts_class_t *cl)
@@ -130,11 +131,9 @@ static void update_group_instantiate(fts_class_t *cl)
 static update_group_t *
 object_get_update_group( fts_object_t *obj)
 {
-  int id = fts_object_get_id( obj);
-
-  if (id > FTS_NO_ID)
+  if (fts_object_has_id( obj))
     {
-      int index = OBJECT_ID_CLIENT( id );
+      int index = fts_object_get_client_id( obj);
       
       if (index >= 0 && index < update_group_table_length)
 	return update_group_table[ index];

@@ -40,12 +40,11 @@
 #include <ftsprivate/platform.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/audio.h>
 #include <ftsprivate/file.h>
 #include <ftsprivate/midi.h>
-#include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
-#include <ftsprivate/config.h> /* requires audioconfig.h and midi.h */
 
 #define PACKAGE_STACK_SIZE    32
 
@@ -146,9 +145,8 @@ fts_list_t *
 fts_get_package_paths(void)
 {
   /* initialize the package path */
-  if (fts_package_paths == NULL) {
+  if (fts_package_paths == NULL)
     fts_init_package_paths();
-  }
   
   return fts_package_paths;
 }
@@ -170,24 +168,24 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   fts_bmax_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0, &obj);
 
   if (!obj)
-  {
-    fts_log("[package]: Failed to load package file %s\n", path);
+    {
+      fts_log("[package]: Failed to load package file %s\n", path);
     
-    fts_package_pop(fts_system_package);
+      fts_package_pop(fts_system_package);
 
-    return NULL;
-  }
+      return NULL;
+    }
 
   /* check whether it's a package object */
   if (fts_object_get_class(obj) != fts_package_type)
-  {
-    fts_patcher_remove_object(fts_get_root_patcher(), obj);
-    fts_log("[package]: Invalid package file %s\n", path);
+    {
+      fts_patcher_remove_object(fts_get_root_patcher(), obj);
+      fts_log("[package]: Invalid package file %s\n", path);
     
-    fts_package_pop(fts_system_package);
+      fts_package_pop(fts_system_package);
 
-    return NULL;
-  }
+      return NULL;
+    }
 
   /* so, we have a package. now load all the default files. */
   pkg = (fts_package_t*)obj;
@@ -215,18 +213,17 @@ fts_package_load(fts_symbol_t name)
 
   /* avoid loading the package twice */
   fts_set_symbol(&n, name);
-  if (fts_hashtable_get(&fts_packages, &n, &p)) {
+  if (fts_hashtable_get(&fts_packages, &n, &p))
     return fts_get_pointer(&p);
-  }
 
   /* locate the directory of the package */
   if (!fts_file_find_in_path(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
       || !fts_is_directory(path))
-  {
-    fts_log("[package]: Couldn't find package %s\n", name);
+    {
+      fts_log("[package]: Couldn't find package %s\n", name);
 
-    return NULL;
-  }
+      return NULL;
+    }
   
   /* load the definition file */
   sprintf(filename, "%s%c%s.jpkg", path, fts_file_separator, name);
@@ -234,26 +231,26 @@ fts_package_load(fts_symbol_t name)
   if (fts_file_exists(filename))
     pkg = fts_package_load_from_file(name, filename);
   else
-  {
-    pkg = fts_package_new(name);
-    pkg->state = fts_package_defined;
-    pkg->name = name;
-    pkg->filename = fts_new_symbol(filename);
-    pkg->dir = fts_new_symbol(path);
-  }
+    {
+      pkg = fts_package_new(name);
+      pkg->state = fts_package_defined;
+      pkg->name = name;
+      pkg->filename = fts_new_symbol(filename);
+      pkg->dir = fts_new_symbol(path);
+    }
 
   if(pkg != NULL)
-  {
-    post("load package: %s\n", name);
+    {
+      post("load package: %s\n", name);
 
-    /* load the default files */
-    fts_package_load_default_files(pkg);
+      /* load the default files */
+      fts_package_load_default_files(pkg);
 
-    /* put the package in the hashtable */
-    fts_set_symbol(&n, name);
-    fts_set_pointer(&p, pkg);
-    fts_hashtable_put(&fts_packages, &n, &p);
-  }
+      /* put the package in the hashtable */
+      fts_set_symbol(&n, name);
+      fts_set_pointer(&p, pkg);
+      fts_hashtable_put(&fts_packages, &n, &p);
+    }
 
   return pkg;
 }
@@ -266,13 +263,14 @@ fts_package_get(fts_symbol_t name)
 
   fts_set_symbol(&n, name);
 
-  if (fts_hashtable_get(&fts_packages, &n, &p)) {
+  if (fts_hashtable_get(&fts_packages, &n, &p))
     return fts_get_pointer(&p);
-  } else {
-    /* try to load it */
-    pkg = fts_package_load(name);
-    return pkg;
-  }
+  else
+    {
+      /* try to load it */
+      pkg = fts_package_load(name);
+      return pkg;
+    }
 }
 
 /***********************************************
@@ -295,23 +293,20 @@ fts_get_system_package(void)
 void 
 fts_package_push(fts_package_t* pkg)
 {
-  if (fts_package_stack_top < PACKAGE_STACK_SIZE) {
+  if (fts_package_stack_top < PACKAGE_STACK_SIZE)
     fts_package_stack[fts_package_stack_top++] = pkg;
-  } else {
+  else
     post("Package stack overflow\n");
-  }
 }
 
 void 
 fts_package_pop(fts_package_t* pkg)
 {
-  if (fts_get_current_package() != pkg) {
+  if (fts_get_current_package() != pkg)
     post("Warning: fts_package_pop: interleaved push-pop pairs\n");
-  }
 
-  if (fts_package_stack_top > 0) {
+  if (fts_package_stack_top > 0)
     fts_package_stack[--fts_package_stack_top] = NULL;
-  }
 }
 
 /********************************************************************
@@ -330,10 +325,11 @@ static void fts_package_load_default_files(fts_package_t* pkg)
      package may depend on the libraries and other data loaded by the
      required packages. */
   list = pkg->packages;
-  while (list) {
-    fts_package_get(fts_get_symbol(fts_list_get(list)));
-    list = fts_list_next(list);
-  }
+  while (list)
+    {
+      fts_package_get(fts_get_symbol(fts_list_get(list)));
+      list = fts_list_next(list);
+    }
 
   fts_package_push(pkg);
 
@@ -343,42 +339,45 @@ static void fts_package_load_default_files(fts_package_t* pkg)
 	  "c", fts_file_separator, 
 	  fts_lib_prefix, pkg->name, fts_lib_postfix);
 
-  if(!fts_file_exists(filename)) {
-    sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
-	    pkg->dir, fts_file_separator, 
-	    "c", fts_file_separator,
-	    "src", fts_file_separator,
-	    ".libs", fts_file_separator,
-	    fts_lib_prefix, pkg->name, fts_lib_postfix);
-  }
-
-  if(!fts_file_exists(filename)) {
-    sprintf(filename, "%s%c%s%c%s%s%s", 
-	  pkg->dir, fts_file_separator, 
-	  "c", fts_file_separator, 
-	  fts_lib_prefix, pkg->name, fts_other_lib_postfix);
-  }
-
-  if(!fts_file_exists(filename)) {
-    sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
-	    pkg->dir, fts_file_separator, 
-	    "c", fts_file_separator, 
-	    "src", fts_file_separator,
-	    ".libs", fts_file_separator,
-	  fts_lib_prefix, pkg->name, fts_other_lib_postfix);
-  }
-
-  if (fts_file_exists(filename)) {
-    snprintf(function, 256, "%s_config", pkg->name);
-    ret = fts_load_library(filename, function);
-    if (ret != fts_ok) {
-      fts_log("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
-    } else {
-      fts_log("[package]: Loaded %s library\n", pkg->name);
+  if(!fts_file_exists(filename)) 
+    {
+      sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
+	      pkg->dir, fts_file_separator, 
+	      "c", fts_file_separator,
+	      "src", fts_file_separator,
+	      ".libs", fts_file_separator,
+	      fts_lib_prefix, pkg->name, fts_lib_postfix);
     }
-  } else {
+
+  if(!fts_file_exists(filename)) 
+    {
+      sprintf(filename, "%s%c%s%c%s%s%s", 
+	      pkg->dir, fts_file_separator, 
+	      "c", fts_file_separator, 
+	      fts_lib_prefix, pkg->name, fts_other_lib_postfix);
+    }
+
+  if(!fts_file_exists(filename)) 
+    {
+      sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
+	      pkg->dir, fts_file_separator, 
+	      "c", fts_file_separator, 
+	      "src", fts_file_separator,
+	      ".libs", fts_file_separator,
+	      fts_lib_prefix, pkg->name, fts_other_lib_postfix);
+    }
+
+  if (fts_file_exists(filename)) 
+    {
+      snprintf(function, 256, "%s_config", pkg->name);
+      ret = fts_load_library(filename, function);
+      if (ret != fts_ok) 
+	fts_log("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
+      else 
+	fts_log("[package]: Loaded %s library\n", pkg->name);
+    }
+  else 
     fts_log("[package]: Didn't found no library for %s (tried %s)\n", pkg->name, filename);
-  }
 
   fts_package_pop(pkg);
 }
@@ -395,10 +394,10 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
 
   /* provoke the loading the package */
   if(NULL != fts_package_load(required_pkg))
-  {
-    fts_set_symbol(&n, required_pkg);
-    pkg->packages = fts_list_append(pkg->packages, &n);    
-  }
+    {
+      fts_set_symbol(&n, required_pkg);
+      pkg->packages = fts_list_append(pkg->packages, &n);    
+    }
 }
 
 void 
@@ -420,9 +419,9 @@ fts_package_add_package_path(fts_package_t* pkg, fts_symbol_t path)
   fts_set_symbol(&n, path);
   pkg->package_paths = fts_list_append(pkg->package_paths, &n);
   
-  if (fts_package_paths == NULL) {
+  if (fts_package_paths == NULL)
     fts_init_package_paths();
-  }
+
   fts_package_paths = fts_list_append(fts_package_paths, &n);
 }
 
@@ -556,27 +555,26 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
   
   fts_hashtable_get_values(pkg->declared_templates, &iter);
 
-  while ( fts_iterator_has_more( &iter)) {
-    fts_iterator_next( &iter, &tmpl_atom);
-    template = fts_get_pointer(&tmpl_atom);
-    if (fts_template_get_filename(template) == filename) {
-      return template;
+  while ( fts_iterator_has_more( &iter)) 
+    {
+      fts_iterator_next( &iter, &tmpl_atom);
+      template = fts_get_pointer(&tmpl_atom);
+      if (fts_template_get_filename(template) == filename)
+	return template;
     }
-  }
 
-  if (pkg->templates_in_path == NULL) {
+  if (pkg->templates_in_path == NULL)
     return NULL;    
-  }
 
   fts_hashtable_get_values(pkg->templates_in_path, &iter);
 
-  while ( fts_iterator_has_more( &iter)) {
-    fts_iterator_next( &iter, &tmpl_atom);
-    template = fts_get_pointer(&tmpl_atom);
-    if (fts_template_get_filename(template) == filename) {
-      return template;
+  while ( fts_iterator_has_more( &iter))
+    {
+      fts_iterator_next( &iter, &tmpl_atom);
+      template = fts_get_pointer(&tmpl_atom);
+      if (fts_template_get_filename(template) == filename)
+	return template;
     }
-  }
 
   return NULL;
 }
@@ -652,10 +650,11 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 {
   fts_atom_t n, p;
 
-  if (pkg->help == NULL) {
-    pkg->help = fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init( pkg->help, FTS_HASHTABLE_SMALL);
-  }
+  if (pkg->help == NULL)
+    {
+      pkg->help = fts_malloc(sizeof(fts_hashtable_t));
+      fts_hashtable_init( pkg->help, FTS_HASHTABLE_SMALL);
+    }
   
   fts_set_symbol(&n, name);
   fts_set_symbol(&p, file);
@@ -671,11 +670,10 @@ fts_package_get_help(fts_package_t* pkg, fts_symbol_t name)
   
   fts_set_symbol( &k, name);
   
-  if ((pkg->help != NULL) && fts_hashtable_get(pkg->help, &k, &data)) {
+  if ((pkg->help != NULL) && fts_hashtable_get(pkg->help, &k, &data))
     return fts_get_symbol(&data);
-  } else {
+  else
     return NULL;
-  }
 }
 
 /***********************************************
@@ -797,11 +795,11 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   pkg->packages = NULL; 
 
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      fts_package_require(pkg, fts_get_symbol(&at[i]));
+  for (i = 0; i < ac; i++)
+    {
+      if (fts_is_symbol(&at[i]))
+	fts_package_require(pkg, fts_get_symbol(&at[i]));
     }
-  }
   
   if( fts_object_has_id( o) && pkg->packages)
     fts_package_upload_requires( pkg);
@@ -863,12 +861,14 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   pkg->template_paths = NULL;  
 
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
-      fts_package_add_template_path(pkg, path);
+  for (i = 0; i < ac; i++)
+    {
+      if (fts_is_symbol(&at[i]))
+	{
+	  path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+	  fts_package_add_template_path(pkg, path);
+	}
     }
-  }
 
   if( fts_object_has_id( o) && pkg->template_paths)
     fts_package_upload_template_paths( pkg);
@@ -886,12 +886,14 @@ __fts_package_package_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   pkg->package_paths = NULL;  
 
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
-      fts_package_add_package_path(pkg, path);
+  for (i = 0; i < ac; i++)
+    {
+      if (fts_is_symbol(&at[i]))
+	{
+	  path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+	  fts_package_add_package_path(pkg, path);
+	}
     }
-  }
 
   if( fts_object_has_id( o) && pkg->package_paths)
     fts_package_upload_package_paths( pkg);
@@ -908,12 +910,14 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   pkg->data_paths = NULL;  
 
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
-      fts_package_add_data_path(pkg, path);
+  for (i = 0; i < ac; i++)
+    {
+      if (fts_is_symbol(&at[i]))
+	{
+	  path = fts_package_make_relative_path(pkg, fts_get_symbol(&at[i]));
+	  fts_package_add_data_path(pkg, path);
+	}
     }
-  }
 
   if( fts_object_has_id( o) && pkg->data_paths)
     fts_package_upload_data_paths( pkg);
@@ -931,13 +935,15 @@ __fts_package_save_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   pkg->windows = NULL;  
 
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol( &at[i])) {
-      file_name = fts_package_make_relative_path( pkg, fts_get_symbol(&at[i]));
-      fts_set_symbol( &n, file_name);
-      pkg->windows = fts_list_append( pkg->windows, &n);
+  for (i = 0; i < ac; i++)
+    {
+      if (fts_is_symbol( &at[i]))
+	{
+	  file_name = fts_package_make_relative_path( pkg, fts_get_symbol(&at[i]));
+	  fts_set_symbol( &n, file_name);
+	  pkg->windows = fts_list_append( pkg->windows, &n);
+	}
     }
-  }
 }
 
 static void 
@@ -948,10 +954,11 @@ __fts_package_open_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   pkg->windows = NULL;  
 
-  for (i = 0; i < ac; i++) {
-    if ( fts_is_symbol( &at[i]))
-      pkg->windows = fts_list_append( pkg->windows, &at[i]);
-  }
+  for (i = 0; i < ac; i++)
+    {
+      if ( fts_is_symbol( &at[i]))
+	pkg->windows = fts_list_append( pkg->windows, &at[i]);
+    }
 }
 
 static void 
@@ -971,7 +978,7 @@ fts_package_upload_windows( fts_package_t *this)
       if ( fts_file_exists(buf) && fts_is_file(buf)) 
 	{
 	  file_name = fts_new_symbol(buf);
-	  fts_client_load_patcher( file_name, fts_get_client_id( (fts_object_t *)this));
+	  fts_client_load_patcher( file_name, fts_object_get_client_id( (fts_object_t *)this));
 	} 
     }
 }
@@ -992,39 +999,6 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_package_upload_help( pkg);
   
   fts_package_set_dirty( pkg, 1);
-}
-
-static void 
-__fts_package_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  
-  if( ac == 1)
-    pkg->config = fts_package_make_relative_path(pkg, fts_get_symbol(&at[0]));  
-  else
-    pkg->config = NULL;
-
-  if( fts_object_has_id( o))
-    {
-      fts_client_start_message( o, fts_s_config);
-      if( pkg->config != NULL)
-	fts_client_add_symbol( o, pkg->config);      
-      fts_client_done_message( o);    
-    }
-
-  fts_package_set_dirty( pkg, 1);
-
-  if(( pkg->config != NULL) && ( fts_config_get() != NULL))
-    {
-      fts_atom_t a[1];
-      fts_set_symbol( a, pkg->config);
-      fts_send_message((fts_object_t *)fts_config_get(), fts_s_load, 1, a);
-    }
-  else
-  {
-    if (fts_config_get() != NULL)
-      fts_send_message((fts_object_t *)fts_config_get(), fts_s_default, 0, 0);
-  }
 }
 
 static void 
@@ -1084,7 +1058,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_push_atoms(&f, i, a);
       fts_bmax_code_obj_mess(&f, fts_s_template, i);
       fts_bmax_code_pop_args(&f, i);
-      }
+    }
 
   if ((this->help ) &&  fts_hashtable_get_size(this->help))
     {
@@ -1105,15 +1079,6 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_push_atoms(&f, i, a);
       fts_bmax_code_obj_mess(&f, fts_s_help, i);
       fts_bmax_code_pop_args(&f, i);
-    }
-
-  if( this->config)
-    {
-      fts_atom_t a[1];
-      fts_set_symbol(a, this->config);
-      fts_bmax_code_push_atoms(&f, 1, a);
-      fts_bmax_code_obj_mess(&f, fts_s_config, 1);
-      fts_bmax_code_pop_args(&f, 1);
     }
 
   if( this->windows)
@@ -1144,28 +1109,23 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   post( "package %s:\n", fts_package_get_name( this));
 
-  if ( this->packages) {
+  if ( this->packages)
     fts_package_print_list( this->packages, fts_s_require);
-  }
-  if ( this->template_paths) {
+
+  if ( this->template_paths)
     fts_package_print_list( this->template_paths, fts_s_template_path);
-  }
 
-  if ( this->data_paths) {
+  if ( this->data_paths)
     fts_package_print_list( this->data_paths, fts_s_data_path);
-  }
   
-  if ( this->package_paths) {
+  if ( this->package_paths)
     fts_package_print_list( this->package_paths, fts_s_package_path);
-  }
 
-  if ( this->declared_templates) {
+  if ( this->declared_templates)
     fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
-  }
 
-  if ( this->help) {
+  if ( this->help)
     fts_package_print_hashtable( this->help, fts_s_help, NULL);
-  }
 }
 
 /* set a package as dirty or as saved.
@@ -1198,11 +1158,11 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fts_package_t* pkg = (fts_package_t *)o;
 
-  if ((ac > 0) && fts_is_symbol(at)) { 
+  if ((ac > 0) && fts_is_symbol(at))
     pkg->name = fts_get_symbol(at);
-  } else {
+  else
     pkg->name = NULL;
-  }
+
   pkg->dir = NULL;
   pkg->filename = NULL;
   pkg->state = fts_package_defined;
@@ -1225,46 +1185,43 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->package_paths = NULL;
 
   pkg->windows = NULL;
-
-  pkg->config = NULL;
 }
 
 void 
 __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
-  if (pkg->packages != NULL) {
+  if (pkg->packages != NULL)
     fts_list_delete(pkg->packages);
-  }
-  if (pkg->package_paths != NULL) {
+
+  if (pkg->package_paths != NULL)
     fts_list_delete(pkg->package_paths);
-  }
-  if (pkg->data_paths != NULL) {
+
+  if (pkg->data_paths != NULL)
     fts_list_delete(pkg->data_paths);
-  }
-  if (pkg->windows != NULL) {
+
+  if (pkg->windows != NULL)
     fts_list_delete(pkg->windows);
-  }
 
   fts_hashtable_destroy(pkg->classes);
 
   fts_hashtable_destroy(pkg->declared_templates);
   fts_list_delete(pkg->template_names);
 
-  if (pkg->templates_in_path != NULL) {
+  if (pkg->templates_in_path != NULL)
     fts_hashtable_destroy(pkg->templates_in_path);
-  }
-  if (pkg->template_paths != NULL) {
-    fts_list_delete(pkg->template_paths);
-  }
 
-  if (pkg->help != NULL) {
-    fts_hashtable_destroy(pkg->help);
-    fts_list_delete(pkg->help_classes);
-  }
-  if (pkg->patcher != NULL) {
+  if (pkg->template_paths != NULL)
+    fts_list_delete(pkg->template_paths);
+
+  if (pkg->help != NULL) 
+    {
+      fts_hashtable_destroy(pkg->help);
+      fts_list_delete(pkg->help_classes);
+    }
+
+  if (pkg->patcher != NULL)
     fts_object_destroy(pkg->patcher);
-  }
 }
 
 static void 
@@ -1273,11 +1230,13 @@ fts_package_send_list( fts_object_t *o, fts_iterator_t i, fts_symbol_t selector)
   fts_atom_t a[1];
 
   fts_client_start_message( o, selector);
+
   while (fts_iterator_has_more( &i))
     {
       fts_iterator_next( &i, a);
       fts_client_add_symbol( o, fts_get_symbol( a));      
     } 
+
   fts_client_done_message( o);
 }
 
@@ -1297,14 +1256,14 @@ fts_package_upload_requires( fts_package_t *this)
 
       pkg = fts_package_get( fts_get_symbol( a));
       if(pkg != NULL)
-      {
-	fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));
+	{
+	  fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));
 	
-        if (!fts_object_has_id( (fts_object_t *)pkg))
-          fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( (fts_object_t *)this));
+	  if (!fts_object_has_id( (fts_object_t *)pkg))
+	    fts_client_register_object( (fts_object_t *)pkg, fts_object_get_client_id( (fts_object_t *)this));
 	
-        fts_client_add_int( (fts_object_t *)this, fts_get_object_id( (fts_object_t *)pkg));
-      }
+	  fts_client_add_int( (fts_object_t *)this, fts_object_get_id( (fts_object_t *)pkg));
+	}
     }
   
   fts_client_done_message( (fts_object_t *)this);    
@@ -1314,6 +1273,7 @@ static void
 fts_package_upload_package_paths( fts_package_t *this)
 {
   fts_iterator_t i;
+
   fts_list_get_values( this->package_paths, &i);
   fts_package_send_list( (fts_object_t *)this, i, fts_s_package_path);
 }
@@ -1322,6 +1282,7 @@ static void
 fts_package_upload_template_paths( fts_package_t *this)
 {
   fts_iterator_t i;
+
   fts_list_get_values( this->template_paths, &i);
   fts_package_send_list( (fts_object_t *)this, i, fts_s_template_path);
 }
@@ -1330,6 +1291,7 @@ static void
 fts_package_upload_data_paths( fts_package_t *this)
 {
   fts_iterator_t i;
+
   fts_list_get_values( this->data_paths, &i);
   fts_package_send_list( (fts_object_t *)this, i, fts_s_data_path);
 }
@@ -1340,10 +1302,11 @@ fts_package_upload_help( fts_package_t *this)
   fts_atom_t a[2]; 
   int ok = 0;
   fts_iterator_t i;
+
   fts_list_get_values( this->help_classes, &i);
   
   fts_client_start_message( (fts_object_t *)this, fts_s_help);
-  
+
   while ( fts_iterator_has_more( &i))
     {
       fts_iterator_next( &i, a);
@@ -1354,7 +1317,7 @@ fts_package_upload_help( fts_package_t *this)
 	  fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a+1));   
 	}
     } 
-  
+
   fts_client_done_message( (fts_object_t *)this);    
 }
 
@@ -1365,6 +1328,7 @@ fts_package_upload_templates( fts_package_t *this)
   fts_atom_t a[2]; 
   int ok = 0;
   fts_iterator_t i;
+
   fts_list_get_values( this->template_names, &i);
   
   fts_client_start_message( (fts_object_t *)this, fts_s_template);
@@ -1412,13 +1376,6 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if ( this->declared_templates)
     fts_package_upload_templates( this);
 
-  if( this->config)
-    if( fts_object_has_id( o))
-      {
-	fts_client_start_message( o, fts_s_config);
-	fts_client_add_symbol( o, this->config);      
-	fts_client_done_message( o);    
-      }
   
   fts_set_symbol(a, this->name);
   fts_set_symbol(a+1, this->dir);
@@ -1500,7 +1457,6 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
   fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
   fts_class_message_varargs(cl, fts_new_symbol("save_as_default"), __fts_package_save_as_default);
-  fts_class_message_varargs(cl, fts_s_config, __fts_package_config);
 
   fts_class_message_varargs(cl, fts_s_loaded, __fts_package_loaded);
 }
@@ -1531,13 +1487,13 @@ fts_package_delete(fts_package_t* pkg)
     pkg is in root_patcher object list
   */
   if (pkg_obj->patcher_data != NULL)
-  {
-    fts_patcher_remove_object(pkg_obj->patcher_data->patcher,pkg_obj);
-  }
+    {
+      fts_patcher_remove_object(pkg_obj->patcher_data->patcher,pkg_obj);
+    }
   else
-  {
-    fts_object_release(pkg_obj);
-  }
+    {
+      fts_object_release(pkg_obj);
+    }
 }
 
 
@@ -1594,9 +1550,8 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   /* Send a "print" message to the result */
   fts_send_message( obj, fts_s_print, 0, 0);
 
-  if (fts_object_get_class(obj) == fts_package_type) {
+  if (fts_object_get_class(obj) == fts_package_type)
     post( "Loaded package\n");
-  }
 }
 
 static void loader_instantiate(fts_class_t *cl)
@@ -1623,9 +1578,8 @@ fts_kernel_package_init(void)
   s_updateDone = fts_new_symbol("updateDone");
   s_uploadDone = fts_new_symbol("uploadDone");
 
-  for (i = 0; i < PACKAGE_STACK_SIZE; i++) {
+  for (i = 0; i < PACKAGE_STACK_SIZE; i++)
     fts_package_stack[i] = NULL;
-  }
 
   fts_hashtable_init( &fts_packages, FTS_HASHTABLE_MEDIUM);
 
@@ -1640,7 +1594,7 @@ fts_kernel_package_init(void)
   fts_system_package = fts_zalloc(sizeof(fts_package_t));
 
   fts_system_package->object.cl = 0;
-  fts_system_package->object.client_id = FTS_NO_ID;
+  fts_system_package->object.flag.id = FTS_NO_ID;
   fts_system_package->object.properties = 0;
   fts_system_package->object.refcnt = 0;
   

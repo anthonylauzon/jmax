@@ -955,7 +955,7 @@ patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     if(help_patch)
       patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
     else
-      help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
+      help_patch = fts_client_load_patcher(file_name, fts_object_get_client_id(o));
 
     if(!help_patch)
       fts_client_send_message(o, sym_noHelp, 1, at);
@@ -1191,7 +1191,7 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	return;
 
       fts_client_start_message( o, sym_addConnection);
-      fts_client_add_int( o, fts_get_object_id(obj));
+      fts_client_add_int( o, fts_object_get_id(obj));
       fts_client_add_object( o, conn->src);
       fts_client_add_int( o, conn->woutlet);
       fts_client_add_object( o, conn->dst);
@@ -1215,7 +1215,7 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       fts_object_get_prop(obj, fts_s_layer, &a_layer);
 
       fts_client_start_message( o, sym_addObject);
-      fts_client_add_int( o, fts_get_object_id(obj));
+      fts_client_add_int( o, fts_object_get_id(obj));
       fts_client_add_int( o, fts_get_int(&a_x));
       fts_client_add_int( o, fts_get_int(&a_y));
       fts_client_add_int( o, fts_get_int(&a_w));
@@ -1363,7 +1363,7 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
           fts_send_message_varargs( obj, fts_s_closeEditor, 0, 0);
 
           fts_client_release_object(obj);
-          fts_object_set_id(obj, FTS_DELETE);
+          fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
         }
       }
       else
@@ -1877,7 +1877,7 @@ patcher_mark_objects_as_deleted( fts_patcher_t *p)
       
       fts_update_reset(obj);
       fts_client_release_object(obj);
-      fts_object_set_id(obj, FTS_DELETE);
+      fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
     }
 }
 
@@ -1899,7 +1899,7 @@ patcher_delete_objects( fts_object_t *obj)
   
     fts_update_reset(obj);
     fts_client_release_object(obj);
-    fts_object_set_id(obj, FTS_DELETE);
+    fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
 
     if( fts_object_is_patcher( obj))
       patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
