@@ -141,7 +141,7 @@ public interface TrackDataModel {
      * @param theEvent the TrackEvent to be removed
      */
     public abstract void removeEvent(TrackEvent theEvent);
-    
+    public abstract void removeEvents(Enumeration events);
     /**
      * Deletes all the events 
      */

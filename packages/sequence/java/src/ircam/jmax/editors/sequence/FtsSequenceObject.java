@@ -38,7 +38,7 @@ import ircam.jmax.toolkit.*;
 import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
-
+import javax.swing.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,
@@ -202,8 +202,19 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   {
     if(track==null) return;
 
-    sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
-    sendMessage(FtsObject.systemInlet, "remove_track", 1, sendArgs);
+    int result = JOptionPane.OK_OPTION;
+    if(track.getTrackDataModel().length() > 0)
+	result = JOptionPane.showConfirmDialog( sequence,
+						"Removing tracks is not Undoable.\nOK to remove ?",
+						"Warning",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+
+    if (result == JOptionPane.OK_OPTION)
+	{
+	    sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
+	    sendMessage(FtsObject.systemInlet, "remove_track", 1, sendArgs);
+	}
   }
 
   public void changeTrack(Track track)

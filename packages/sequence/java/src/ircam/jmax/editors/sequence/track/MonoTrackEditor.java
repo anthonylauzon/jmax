@@ -255,7 +255,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    {
 		((UndoableData)track.getTrackDataModel()).beginUpdate();
 		selection.deleteAll();
-		((UndoableData)track.getTrackDataModel()).endUpdate();
+		//((UndoableData)track.getTrackDataModel()).endUpdate();
 	    }
 	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 	    if(e.isControlDown())

@@ -143,6 +143,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     int removeIndex;
     TrackEvent event = null;
 
+    // starts an undoable transition	
+    beginUpdate();
+
     for(int i=0; i<nArgs; i++)
       {
 	event = (TrackEvent)(args[i].getObject());
@@ -504,7 +507,14 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	sendArgs[0].setObject(event);
 	sendMessage(FtsObject.systemInlet, "remove_event", 1, sendArgs);
     }
-    
+    public void removeEvents(Enumeration events)
+    {
+      int i = 0;
+      for (Enumeration e = events; e.hasMoreElements();) 
+	    sendArgs[i++].setObject((TrackEvent) e.nextElement());
+      
+      sendMessage(FtsObject.systemInlet, "remove_event", i, sendArgs);
+    }
 
     public void removeAllEvents()
     {
