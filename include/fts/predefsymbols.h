@@ -188,6 +188,7 @@ PREDEF_SYMBOL( fts_s_windows, "windows")
 
 /* Symbols related to builtin classes */
 PREDEF_SYMBOL( fts_s_old_patcher, "patcher")
+PREDEF_SYMBOL( fts_s_jcomment, "jcomment")
 PREDEF_SYMBOL( fts_s_jpatcher, "jpatcher")
 PREDEF_SYMBOL( fts_s_inlet, "inlet")
 PREDEF_SYMBOL( fts_s_outlet, "outlet")

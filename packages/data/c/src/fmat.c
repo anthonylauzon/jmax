@@ -455,31 +455,46 @@ static void
 fmat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
-  int old_size = fmat_get_m(this) * fmat_get_n(this);
-  int m = 0;
-  int n = 0;
-  int i;
 
-  if(ac == 1 && fts_is_number(at))
+  if(ac == 0)
     {
-      m = fts_get_number_int(at);
-      n = fmat_get_n(this);
-      
-      if(m >= 0 && n >= 0)
-	fmat_set_size(this, m, n);
-    }  
-  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
-    {
-      m = fts_get_number_int(at);
-      n = fts_get_number_int(at + 1);
-      
-      if(m >= 0 && n >= 0)
-	fmat_set_size(this, m, n);
+      fts_atom_t a[2];
+      fts_atom_t t;
+
+      fts_set_int(a + 0, fmat_get_m(this));
+      fts_set_int(a + 1, fmat_get_n(this));
+      fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
+
+      fts_return(&t);
     }
+  else
+    {
+      int old_size = fmat_get_m(this) * fmat_get_n(this);
+      int m = 0;
+      int n = 0;
+      int i;
 
-  /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
-    this->values[i] = 0.0;
+      if(ac == 1 && fts_is_number(at))
+	{
+	  m = fts_get_number_int(at);
+	  n = fmat_get_n(this);
+	  
+	  if(m >= 0 && n >= 0)
+	    fmat_set_size(this, m, n);
+	}  
+      else if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
+	{
+	  m = fts_get_number_int(at);
+	  n = fts_get_number_int(at + 1);
+	  
+	  if(m >= 0 && n >= 0)
+	    fmat_set_size(this, m, n);
+	}
+      
+      /* set newly allocated region to void */
+      for(i=old_size; i<m*n; i++)
+	this->values[i] = 0.0;
+    }
 }
 
 /**************************************************************************************
@@ -1166,7 +1181,7 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  for(j=0; j<n-1; j++)
 	    fts_spost(stream, "%.7g ", fmat_get_element(this, i, j));
 	  
-	  fts_spost(stream, "%.7g,\n");
+	  fts_spost(stream, "%.7g,\n", fmat_get_element(this, i, n-1));
 	}
       
       fts_spost(stream, "}\n");

@@ -35,16 +35,7 @@ typedef struct
 } timer_t;
 
 static void
-timer_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  timer_t *this = (timer_t *)o;
-
-  this->time = 0.0;
-  this->start = fts_get_time();
-}
-
-static void
-timer_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   timer_t *this = (timer_t *)o;
 
@@ -65,21 +56,13 @@ timer_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   timer_t *this = (timer_t *)o;
-  double now = fts_get_time();
 
-  this->time = now; 
-
-  if(!this->running)
-    {
-      this->running = 1;
-      this->start = now;
-    }
+  this->time = 0.0;
+  this->start = fts_get_time();
 }
-
-/* bang message into rite corner sends fix out  */
 
 static void
 timer_send_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -98,7 +81,7 @@ timer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   timer_t *this = (timer_t *)o;
 
-  this->running = 1;
+  this->running = 0;
   this->start = fts_get_time();
   this->time = 0.0;
 }
@@ -111,8 +94,6 @@ timer_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("reset"), timer_reset);
   fts_class_message_varargs(cl, fts_s_start, timer_start);
   fts_class_message_varargs(cl, fts_s_stop, timer_stop);
-  fts_class_message_varargs(cl, fts_new_symbol("continue"), timer_continue);
-  fts_class_message_varargs(cl, fts_new_symbol("time"), timer_send_time);
   fts_class_message_varargs(cl, fts_s_bang, timer_send_time);
 
   fts_class_inlet_anything(cl, 0);

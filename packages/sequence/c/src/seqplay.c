@@ -40,7 +40,7 @@ typedef struct _seqplay_
 
   /* status */
   event_t *event; /* current event */
-  enum seqplay_status {status_reset, status_ready, status_playing} status;
+  enum seqplay_status {status_reset, status_ready, status_playing, status_looping} status;
   double begin;
   double end;
   double speed; /* set speed */
@@ -50,10 +50,13 @@ typedef struct _seqplay_
   int sync_speed;
 } seqplay_t;
 
+static void seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void seqplay_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 static void
 seqplay_reset(seqplay_t *this)
 {
-  if(this->status == status_playing || this->sync_speed)
+  if(this->status >= status_playing || this->sync_speed)
     {
       fts_timebase_remove_object(this->timebase, (fts_object_t *)this);
       this->sync_speed = 0;
@@ -93,13 +96,23 @@ seqplay_position(seqplay_t *this, double there)
     }
 }
 
-static void
-seqplay_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplay_t *this = (seqplay_t *)o;
+static void 
+seqplay_go(seqplay_t *this)
+{ 
+  fts_object_t *o = (fts_object_t *)this;
 
-  seqplay_reset(this);  
-  fts_outlet_bang(o, 1);  
+  if(track_is_active(this->track) && this->status == status_ready && this->speed > 0.0 && this->end > this->begin)
+    {
+      /* set start time and speed */
+      this->last_time = fts_timebase_get_time(this->timebase);
+      this->last_speed = this->speed;
+      
+      /* schedule event */
+      fts_timebase_add_call(this->timebase, o, seqplay_next, 0, (event_get_time(this->event) - this->last_location) / this->speed);
+      
+      /* play */
+      this->status = status_playing;
+    }
 }
 
 static void
@@ -148,6 +161,23 @@ seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+seqplay_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqplay_t *this = (seqplay_t *)o;
+
+  if(this->status == status_looping)
+    {
+      seqplay_position(this, this->begin);
+      seqplay_go(this);
+    }
+  else
+    {
+      seqplay_reset(this);  
+      fts_outlet_bang(o, 1);  
+    }
+}
+
+static void
 seqplay_sync_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqplay_t *this = (seqplay_t *)o;
@@ -171,28 +201,9 @@ seqplay_sync_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-seqplay_go(seqplay_t *this)
-{ 
-  fts_object_t *o = (fts_object_t *)this;
-
-  if(track_is_active(this->track) && this->status == status_ready && this->speed > 0.0 && this->end > this->begin)
-    {
-      /* set start time and speed */
-      this->last_time = fts_timebase_get_time(this->timebase);
-      this->last_speed = this->speed;
-      
-      /* schedule event */
-      fts_timebase_add_call(this->timebase, o, seqplay_next, 0, (event_get_time(this->event) - this->last_location) / this->speed);
-      
-      /* play */
-      this->status = status_playing;
-    }
-}
-
-static void 
 seqplay_halt(seqplay_t *this)
 { 
-  if(this->status == status_playing)
+  if(this->status >= status_playing)
     {
       double time = fts_timebase_get_time(this->timebase);
       double here = this->last_location + (time - this->last_time) * this->last_speed;
@@ -258,7 +269,7 @@ seqplay_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       this->end = end;
       
-      if(this->status == status_playing)
+      if(this->status >= status_playing)
 	{
 	  double time = fts_timebase_get_time(this->timebase);
 	  double here = this->last_location + (time - this->last_time) * this->last_speed;
@@ -284,7 +295,7 @@ seqplay_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
       seqplay_halt(this);
     }
-  else if(this->status == status_playing)
+  else if(this->status >= status_playing)
     {
       this->speed = speed;
 
@@ -349,7 +360,7 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
   
 static void 
-seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
   
@@ -361,11 +372,33 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       seqplay_go(this);
     case status_playing:
       break;
+    case status_looping:
+      this->status = status_playing;
+      break;
     }
 }
 
 static void 
-seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqplay_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  seqplay_t *this = (seqplay_t *)o;
+  
+  switch(this->status)
+    {
+    case status_reset:
+      seqplay_position(this, this->begin);
+    case status_ready:
+      seqplay_go(this);
+    case status_playing:
+      this->status = status_looping;
+      break;
+    case status_looping:
+      break;
+    }
+}
+
+static void 
+seqplay_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqplay_t *this = (seqplay_t *)o;
 
@@ -408,7 +441,7 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	{
 	  event_t *event = this->event;
 
-	  if(this->status == status_playing)
+	  if(this->status >= status_playing)
 	    {
 	      fts_timebase_remove_object(this->timebase, (fts_object_t *)this);
 	      this->last_time = time;
@@ -500,23 +533,19 @@ seqplay_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(seqplay_t), seqplay_init, seqplay_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("locate"), seqplay_locate);
-  fts_class_message_varargs(cl, fts_s_start, seqplay_start);
-  fts_class_message_varargs(cl, fts_s_stop, seqplay_stop);
+  fts_class_message_varargs(cl, fts_new_symbol("play"), seqplay_play);
+  fts_class_message_varargs(cl, fts_new_symbol("stop"), seqplay_stop);
   fts_class_message_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
-  /* fts_class_message_varargs(cl, fts_new_symbol("loop"), seqplay_loop); */
+  fts_class_message_varargs(cl, fts_new_symbol("loop"), seqplay_loop);
 
-  fts_class_message_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
-  fts_class_message_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
-  fts_class_message_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
   fts_class_message_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
   fts_class_message_varargs(cl, fts_s_set, seqplay_set);
 
   fts_class_message_varargs(cl, fts_new_symbol("sync"), seqplay_sync);
 
-  fts_class_message_varargs(cl, fts_s_bang, seqplay_play);
-  fts_class_message_varargs(cl, seqsym_track, seqplay_play);
+  fts_class_message_varargs(cl, fts_s_bang, seqplay_segment);
   
-  fts_class_inlet_varargs(cl, 0, seqplay_play);
+  fts_class_inlet_varargs(cl, 0, seqplay_segment);
   fts_class_inlet_number(cl, 1, seqplay_set_begin);
   fts_class_inlet_number(cl, 2, seqplay_set_end);
   fts_class_inlet_number(cl, 3, seqplay_set_speed);

@@ -845,6 +845,20 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
+static void
+track_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  if(ac == 0)
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, track_get_duration(this));
+      fts_return(&a);      
+    }
+}
+
 /******************************************************
  *
  *  MIDI files
@@ -1115,6 +1129,8 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_remove, track_remove);
   fts_class_message_varargs(cl, fts_s_import, track_import);
   fts_class_message_varargs(cl, fts_s_export, track_export);
+
+  fts_class_message_varargs(cl, fts_new_symbol("duration"), track_duration);
 
   fts_class_inlet_anything(cl, 0);
 }

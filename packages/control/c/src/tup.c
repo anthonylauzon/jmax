@@ -40,6 +40,8 @@
 
 #define TUP_MAX_SIZE (sizeof(unsigned int) * 8)
 
+static fts_symbol_t sym_mode = 0;
+
 static fts_symbol_t sym_all = 0;
 static fts_symbol_t sym_none = 0;
 
@@ -176,12 +178,6 @@ tup_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-tup_set_trigger_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  tup_set_trigger(o, 0, 0, 1, value);
-}
-
-static void
 tup_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
@@ -192,12 +188,6 @@ tup_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   this->reset = ~once;
   this->wait = this->require | once;
-}
-
-static void
-tup_set_require_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  tup_set_require(o, 0, 0, 1, value);
 }
 
 static void
@@ -241,9 +231,20 @@ tup_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-tup_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+tup_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tup_set_mode(o, 0, 0, 1, value);
+  tup_t *this = (tup_t *)o;
+
+  this->trigger = (1 << this->n) - 1;
+  this->reset = 0;
+  this->require = 0;
+}
+static void
+tup_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  tup_t *this = (tup_t *)o;
+
+  this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
 }
 
 static void
@@ -318,12 +319,15 @@ tup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(tup_t), tup_init, tup_delete);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), tup_set_trigger_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), tup_set_require_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), tup_set_mode_prop);
-
   fts_class_message_varargs(cl, fts_s_bang, tup_output);
   fts_class_message_varargs(cl, fts_s_set, tup_set);
+
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), tup_set_mode);
+  fts_class_message_varargs(cl, fts_new_symbol("any"), tup_set_mode_any);
+  fts_class_message_varargs(cl, fts_new_symbol("all"), tup_set_mode_all);
+
+  fts_class_message_varargs(cl, fts_new_symbol("trigger"), tup_set_trigger);
+  fts_class_message_varargs(cl, fts_new_symbol("require"), tup_set_require);
 
   fts_class_inlet_number(cl, 0, tup_input_single);
   fts_class_inlet_symbol(cl, 0, tup_input_single);
@@ -628,57 +632,21 @@ getup_instantiate(fts_class_t *cl)
   fts_class_outlet_varargs(cl, 0);
 }
 
-typedef struct 
-{
-  fts_object_t o;
-  fts_symbol_t selector;
-} messtup_t;
-
 static void
 messtup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messtup_t *this = (messtup_t *)o;
-
-  if(this->selector != NULL)
-    fts_outlet_send(o, 0, this->selector, ac, at);
-  else 
-    {
-      if(fts_is_symbol(at))
-	fts_outlet_send(o, 0, fts_get_symbol(at), ac - 1, at + 1);
-      else
-	fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
-    }
-}
-
-static void
-messtup_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messtup_t *this = (messtup_t *)o;
-  fts_symbol_t selector = fts_get_symbol(at);
-  
-  this->selector = selector;
-}
-
-static void
-messtup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  messtup_t *this = (messtup_t *)o;
-  
-  this->selector = NULL;
-
-  if(ac > 0 && fts_is_symbol(at))
-    messtup_set_selector(o, 0, 0, 1, at);
+  if(fts_is_symbol(at))
+    fts_outlet_send(o, 0, fts_get_symbol(at), ac - 1, at + 1);
+  else
+    fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
 }
 
 static void
 messtup_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(messtup_t), messtup_init, NULL);
+  fts_class_init(cl, sizeof(fts_object_t), NULL, NULL);
   
-  fts_class_message_varargs(cl, fts_s_bang, messtup_varargs);
-
   fts_class_inlet_varargs(cl, 0, messtup_varargs);  
-  fts_class_inlet_symbol(cl, 1, messtup_set_selector);
 
   fts_class_outlet_anything(cl, 0);
 }
@@ -692,6 +660,7 @@ messtup_instantiate(fts_class_t *cl)
 void
 tup_config(void)
 {
+  sym_mode = fts_new_symbol("mode");
   sym_all = fts_new_symbol("all");
   sym_none = fts_new_symbol("none");
   sym_any = fts_new_symbol("any");

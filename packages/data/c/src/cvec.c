@@ -159,6 +159,13 @@ cvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    values[i] = CZERO;
 	}
     }
+  else
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, cvec_get_size(this));
+      fts_return(&a);
+    }
 }
 
 /**************************************************************************************

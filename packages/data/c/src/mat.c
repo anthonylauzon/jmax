@@ -449,31 +449,46 @@ static void
 mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  int old_size = mat_get_m(this)* mat_get_n(this);
-  int m = 0;
-  int n = 0;
-  int i;
 
-  if(ac == 1 && fts_is_number(at))
+  if(ac == 0)
     {
-      m = fts_get_number_int(at);
-      n = mat_get_n(this);
-      
-      if(m >= 0 && n >= 0)
-	mat_set_size(this, m, n);
-    }  
-  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
-    {
-      m = fts_get_number_int(at);
-      n = fts_get_number_int(at + 1);
-      
-      if(m >= 0 && n >= 0)
-	mat_set_size(this, m, n);
+      fts_atom_t a[2];
+      fts_atom_t t;
+
+      fts_set_int(a + 0, mat_get_m(this));
+      fts_set_int(a + 1, mat_get_n(this));
+      fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
+
+      fts_return(&t);
     }
-
-  /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
-    fts_set_int(this->data + i, 0);
+  else
+    {
+      int old_size = mat_get_m(this)* mat_get_n(this);
+      int m = 0;
+      int n = 0;
+      int i;
+      
+      if(ac == 1 && fts_is_number(at))
+	{
+	  m = fts_get_number_int(at);
+	  n = mat_get_n(this);
+	  
+	  if(m >= 0 && n >= 0)
+	    mat_set_size(this, m, n);
+	}  
+      else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+	{
+	  m = fts_get_number_int(at);
+	  n = fts_get_number_int(at + 1);
+	  
+	  if(m >= 0 && n >= 0)
+	    mat_set_size(this, m, n);
+	}
+      
+      /* set newly allocated region to void */
+      for(i=old_size; i<m*n; i++)
+	fts_set_int(this->data + i, 0);
+    }
 }
 
 static void

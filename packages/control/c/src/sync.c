@@ -144,12 +144,6 @@ sync_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sync_set_trigger_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  sync_set_trigger(o, 0, 0, 1, value);
-}
-
-static void
 sync_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sync_t *this = (sync_t *)o;
@@ -160,12 +154,6 @@ sync_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   this->reset = ~once;
   this->wait = this->require | once;
-}
-
-static void
-sync_set_require_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  sync_set_require(o, 0, 0, 1, value);
 }
 
 static void
@@ -183,6 +171,8 @@ sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  this->reset = 0;
 	  this->require = 0;
 	}
+      else if(mode == sym_all)
+	this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
       else if(mode == sym_left)
 	{
 	  this->trigger = 1;
@@ -201,9 +191,21 @@ sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sync_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+sync_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sync_set_mode(o, 0, 0, 1, value);
+  sync_t *this = (sync_t *)o;
+
+  this->trigger = (1 << this->n) - 1;
+  this->reset = 0;
+  this->require = 0;
+}
+
+static void
+sync_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sync_t *this = (sync_t *)o;
+
+  this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
 }
 
 /************************************************************
@@ -260,9 +262,12 @@ sync_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sync_t), sync_init, NULL);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), sync_set_trigger_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), sync_set_require_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), sync_set_mode_prop);
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), sync_set_mode);
+  fts_class_message_varargs(cl, fts_new_symbol("any"), sync_set_mode_any);
+  fts_class_message_varargs(cl, fts_new_symbol("all"), sync_set_mode_all);
+
+  fts_class_message_varargs(cl, fts_new_symbol("trigger"), sync_set_trigger);
+  fts_class_message_varargs(cl, fts_new_symbol("require"), sync_set_require);
       
   fts_class_inlet_varargs(cl, 0, sync_input_atoms);
   fts_class_inlet_number(cl, 0, sync_input_atom);

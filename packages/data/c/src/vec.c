@@ -81,7 +81,14 @@ vec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	  for(i=old_size; i<size; i++)
 	    fts_set_void(this->data + i);
 	}
-    }  
+    }
+  else
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, vec_get_size(this));
+      fts_return(&a);
+    }
 }
 
 static void

@@ -622,6 +622,13 @@ ivec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    fts_client_send_message((fts_object_t *)this, sym_set_size, ac, at);
 	}
     }
+  else
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, ivec_get_size(this));
+      fts_return(&a);
+    }
 }
 
 static void

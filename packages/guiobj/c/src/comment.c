@@ -35,6 +35,15 @@ typedef struct
   int color;
 } comment_t;
 
+static fts_memorystream_t *comment_memory_stream ;
+
+static fts_memorystream_t *comment_get_memory_stream()
+{
+  if(!comment_memory_stream)
+    comment_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
+
+  return comment_memory_stream;
+}
 
 static void 
 comment_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -59,6 +68,26 @@ static void
 comment_set_text(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   comment_t *this = (comment_t *)o;
+  
+  this->text = fts_get_symbol(at);
+}
+
+static void
+comment_set_text_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  comment_t *this = (comment_t *)o;  
+  fts_memorystream_t *stream = comment_get_memory_stream();
+  fts_atom_t a;
+  int i;
+
+  fts_memorystream_reset(stream);
+  fts_spost_object_description_args( (fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
+  fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+  fts_set_string(&a, fts_memorystream_get_bytes(stream));
+      fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, &a);
+      
+      fts_patcher_set_dirty(this, 1);
+    }
   
   this->text = fts_get_symbol(at);
 }
@@ -162,6 +191,7 @@ comment_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
   fts_class_message_varargs(cl, fts_s_update_gui, comment_update_gui); 
 
+  fts_class_message_varargs(cl, fts_s_set_from_array, comment_set_text_from_array);
   fts_class_message_varargs(cl, fts_s_comment, comment_set_text);
   fts_class_message_varargs(cl, fts_s_color, comment_set_color); 
 
@@ -172,6 +202,6 @@ comment_instantiate(fts_class_t *cl)
 void 
 comment_config(void)
 {
-  fts_class_install(fts_new_symbol("jcomment"), comment_instantiate);
+  fts_class_install(fts_s_jcomment, comment_instantiate);
   sym_setComment = fts_new_symbol("setComment");
 }

@@ -446,6 +446,20 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 
 	  return obj;
 	}
+      else if(class_name == fts_s_comment)
+	{
+	  fts_atom_t s;
+	  fts_object_t *obj;
+
+	  fts_set_symbol(&s, fts_s_jcomment);
+
+	  obj = fts_eval_object_description(patcher, 1, &s);
+	  
+	  if(ac > 1)
+	    fts_send_message(obj, fts_s_comment, ac - 1, a + 1);
+
+	  return obj;
+	}
       else if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon)
 	{
 	  /* fix bmax 1 variable definition */
