@@ -10,12 +10,12 @@ class ErmesObjThrottle{
   ErmesObjSlider itsSlider;
   Dimension preferredSize = null;
   final int LATERAL_OFFSET = 2;
-  final int THROTTLE_HEIGHT = 6;
+  final int THROTTLE_HEIGHT = /*6*/5;
   
   ErmesObjThrottle(ErmesObjSlider theSlider) {
     itsSlider = theSlider;
     itsX = itsSlider.itsX+LATERAL_OFFSET;
-    itsY = itsSlider.itsY+itsSlider.currentRect.height-itsSlider.BOTTOM_OFFSET;
+    itsY = itsSlider.itsY+itsSlider.currentRect.height-itsSlider.BOTTOM_OFFSET-2;
     preferredSize = new Dimension(itsSlider.currentRect.width-2*LATERAL_OFFSET,THROTTLE_HEIGHT);
   }
 	

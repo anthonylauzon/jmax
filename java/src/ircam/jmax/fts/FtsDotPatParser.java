@@ -87,7 +87,7 @@ public class FtsDotPatParser
       obj.setX(x);
       obj.setY(y);
       obj.setWidth(width);
-      obj.setHeight(range + 20);
+      obj.setHeight(range /*+ 10*/);
       obj.put("minValue", 0);
       obj.put("maxValue", range);
     }

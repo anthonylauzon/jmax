@@ -14,8 +14,8 @@ class ErmesObjSlider extends ErmesObject {
 	
   ErmesObjThrottle itsThrottle;
   int itsInteger = 0;
-  final static int BOTTOM_OFFSET = 10;
-  final static int UP_OFFSET = 10;
+  final static int BOTTOM_OFFSET = /*10*/5;
+  final static int UP_OFFSET = /*10*/5;
   final static int PREFERRED_RANGE_MAX = 127;
   final static int PREFERRED_RANGE_MIN = 0;
   int itsRangeMax = PREFERRED_RANGE_MAX;
@@ -69,7 +69,7 @@ class ErmesObjSlider extends ErmesObject {
     
     itsStep = (float)itsRange/itsPixelRange;
     itsThrottle.Resize(itsThrottle.getPreferredSize().width+theDeltaH, itsThrottle.getPreferredSize().height);
-    itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -itsInteger/itsStep));
+    itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET-2 -itsInteger/itsStep));
   }
 
   // starting of the graphic/FTS mix
@@ -114,7 +114,7 @@ class ErmesObjSlider extends ErmesObject {
     clippedValue-=itsRangeMin;
     last_value = temp;
     if ((itsThrottle != null) && (!itsMovingThrottle)) {
-      itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height-BOTTOM_OFFSET-clippedValue/itsStep));
+      itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height-BOTTOM_OFFSET-2-clippedValue/itsStep));
       DoublePaint();
     }
   }
@@ -149,20 +149,20 @@ class ErmesObjSlider extends ErmesObject {
 	  //compute the value and send to FTS
 	  itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
-	  itsThrottle.Move(itsThrottle.itsX, y);
+	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;
 	  DoublePaint();
 	}
 	else if(itsY+currentRect.height-BOTTOM_OFFSET<y){
 	  itsFtsObject.put("value", new Integer(itsRangeMin));
 	  itsInteger = 0;
-	  itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET);
+	  itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET-2);
 	  DoublePaint();
 	}
 	else if(itsY+UP_OFFSET>=y){
 	  itsFtsObject.put("value", new Integer(itsRangeMax));
 	  itsInteger = itsRangeMax;
-	  itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET);
+	  itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET-2);
 	  DoublePaint();
 	}
 	//else if(evt.getClickCount()>1){
@@ -182,19 +182,19 @@ class ErmesObjSlider extends ErmesObject {
 	//compute the value and send to FTS
 	itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
-	itsThrottle.Move(itsThrottle.itsX, y);
+	itsThrottle.Move(itsThrottle.itsX, y-2);
 	DoublePaint();
       }
       else if(itsY+currentRect.height-BOTTOM_OFFSET<y){//theValue is the minimum
 	itsFtsObject.put("value", new Integer(itsRangeMin));
 	itsInteger = 0;
-	itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET);
+	itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET-2);
 	DoublePaint();
       }
       else if(itsY+UP_OFFSET>=y){
 	itsFtsObject.put("value", new Integer(itsRangeMax));
 	itsInteger = itsRangeMax;
-	itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET);
+	itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET-2);
 	DoublePaint();
       }
       return true;
@@ -252,7 +252,7 @@ class ErmesObjSlider extends ErmesObject {
   }
   
   void MoveThrottleTo(int value) {//value between 0 and itsRange, to be scaled to 0ÖcurrentRect.height
-    itsThrottle.Move(itsThrottle.itsX, itsThrottle.DragToAbsolute((int)(value*itsStep)));
+    itsThrottle.Move(itsThrottle.itsX, itsThrottle.DragToAbsolute((int)(value*itsStep))-2);
     if (itsSketchPad.getGraphics() != null)
       DoublePaint();//?
   }

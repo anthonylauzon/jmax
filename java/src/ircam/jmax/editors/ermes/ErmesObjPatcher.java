@@ -58,8 +58,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
     
     ParseText(itsArgs);
-    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
-    RestoreDimensions();
+    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
 
     return true;		// Why this method return a value ????
   }

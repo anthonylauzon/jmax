@@ -59,7 +59,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       this.YouArePatcher(true);
     
     ParseText(itsArgs);
-    RestoreDimensions();
+    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
 
     return true;		// Why this method return a value ????
   }

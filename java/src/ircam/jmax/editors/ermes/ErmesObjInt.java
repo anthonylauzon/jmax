@@ -20,7 +20,7 @@ class ErmesObjInt extends ErmesObject {
   int last_value = 0;
   
   int DEFAULT_WIDTH = 40;
-  int DEFAULT_HEIGHT = 20;
+  int DEFAULT_HEIGHT = 15;
   int itsStartingY, itsFirstY;
   boolean firstClick = true;
   Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
@@ -61,6 +61,7 @@ class ErmesObjInt extends ErmesObject {
        preferredSize.width = DEFAULT_WIDTH+DEFAULT_HEIGHT/2+20;
        currentRect.width = preferredSize.width;
      }
+
      return true;
    }
 	

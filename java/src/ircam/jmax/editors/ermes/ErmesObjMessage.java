@@ -44,8 +44,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
-    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
-    RestoreDimensions();
+    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
     return true;  
   }
 	

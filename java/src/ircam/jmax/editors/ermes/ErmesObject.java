@@ -318,24 +318,25 @@ public class ErmesObject implements FtsPropertyHandler {
     
     {
       Integer widthInt = (Integer) theFtsObject.get("w");
-
       if (widthInt != null)
 	width  = widthInt.intValue();
     }
 
     {
       Integer heightInt = (Integer)theFtsObject.get("h");
-
       if (heightInt != null)
 	height = heightInt.intValue();
     }
     
-    if((width<10)||(height<10)){
-       width  = getPreferredSize().width;
-       height  = getPreferredSize().height;
+    if(width<10){
+      width  = getPreferredSize().width;
       itsResized = true;
     }
-
+    if(height<10){
+      height  = getPreferredSize().height;
+      itsResized = true;
+    }
+    
     currentRect = new Rectangle(itsX, itsY, width, height);
 
     itsFtsObject = theFtsObject;

@@ -14,7 +14,7 @@ class ErmesObjFloat extends ErmesObject {
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
   int DEFAULT_WIDTH = 50;
-  int DEFAULT_HEIGHT = 20;
+  int DEFAULT_HEIGHT = /*20*/15;
   float itsStartingValue;
   int itsFirstY;
   boolean firstClick = true;

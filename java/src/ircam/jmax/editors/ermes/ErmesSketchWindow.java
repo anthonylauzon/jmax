@@ -785,9 +785,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   private boolean SaveBody(){
-
+    setVisible(false);
     setTitle(itsData.getDataSource().toString()); 
-
+    setVisible(true);
     CreateFtsGraphics(this);
 
     try
@@ -840,6 +840,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       itsData.setDataSource(source);
     
     if(!SaveBody()) return false;
+
     MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
     return true;
   }
