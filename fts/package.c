@@ -1070,11 +1070,6 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   char path[MAXPATHLEN];
   char *dir;
 
-  if (this->dirty == 0)
-  {
-    /* no need to save package */
-    return;
-  }
   if (ac == 0)
     {
       fts_post( "No filename specified\n");    
@@ -1082,6 +1077,14 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
 
   filename = fts_get_symbol( at);
+
+  if ((0 == this->dirty)
+      && (0 == strcmp(this->filename, filename)))
+  {
+    /* no need to save package if it's not dirty
+     and the filename is the same */
+    return;
+  }
   
   if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
     {
