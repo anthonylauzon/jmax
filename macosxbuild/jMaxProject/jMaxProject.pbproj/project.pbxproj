@@ -147,6 +147,32 @@
 			isa = PBXTargetDependency;
 			target = F880FFF80283022401664092;
 		};
+		F820CB9802910DF301664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			name = "Shell Script";
+			neededFileNames = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "cd ../../packages/ispw/java\njar -uvf ../../../macosxbuild/jMaxProject/build/ispw.jar icons/*.gif";
+		};
+		F820CB990291112501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			name = "Shell Script";
+			neededFileNames = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "cd ../../packages/guiobj/java\njar -uvf ../../../macosxbuild/jMaxProject/build/guiobj.jar icons/*.gif";
+		};
 		F8386E97028D3F9101664092 = {
 			fileRef = F88000960283082801664092;
 			isa = PBXBuildFile;
@@ -482,19 +508,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		F8386ECF028D454401664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			generatedFileNames = (
-			);
-			isa = PBXShellScriptBuildPhase;
-			name = "Shell Script";
-			neededFileNames = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "mkdir build/intermediates/ispw.jar.build/JavaClasses/icons\ncp ../../packages/ispw/java/icons/*.gif build/intermediates/ispw.jar.build/JavaClasses/icons/";
 		};
 		F844692E028BCAD001664092 = {
 			children = (
@@ -1952,7 +1965,6 @@
 		};
 		F8446A01028BCC2301664092 = {
 			children = (
-				F85120F0028BD4D301664092,
 				F85120F1028BD4D301664092,
 				F85120FB028BD4D301664092,
 				F85120FE028BD4D301664092,
@@ -3194,9 +3206,9 @@
 		F8446AA6028BCC2401664092 = {
 			buildPhases = (
 				F8446AA7028BCC2401664092,
-				F8386ECF028D454401664092,
 				F8446AA8028BCC2401664092,
 				F8446AA9028BCC2401664092,
+				F820CB9802910DF301664092,
 			);
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3474,15 +3486,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		F85120F0028BD4D301664092 = {
-			children = (
-				F8512124028BD7EA01664092,
-				F8512125028BD7EA01664092,
-			);
-			isa = PBXGroup;
-			name = icons;
-			refType = 4;
 		};
 		F85120F1028BD4D301664092 = {
 			children = (
@@ -3886,18 +3889,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		F8512124028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = messbox_cursor.gif;
-			path = ../../packages/ispw/java/icons/messbox_cursor.gif;
-			refType = 2;
-		};
-		F8512125028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = messbox.gif;
-			path = ../../packages/ispw/java/icons/messbox.gif;
-			refType = 2;
 		};
 		F8512126028BD7EA01664092 = {
 			isa = PBXFileReference;
@@ -11251,7 +11242,6 @@
 				F85C87960290238D01664092,
 			);
 			buildSettings = {
-				OPTIMIZATION_CFLAGS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -11314,19 +11304,6 @@
 		F85C8797029023E401664092 = {
 			isa = PBXTargetDependency;
 			target = F85C87900290238D01664092;
-		};
-		F8605DF8028C50E601664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			generatedFileNames = (
-			);
-			isa = PBXShellScriptBuildPhase;
-			name = "Shell Script";
-			neededFileNames = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "mkdir build/intermediates/guiobj.jar.build/JavaClasses/icons\ncp ../../packages/guiobj/java/icons/*.gif build/intermediates/guiobj.jar.build/JavaClasses/icons/";
 		};
 		F88000000283043C01664092 = {
 			children = (
@@ -19789,9 +19766,9 @@
 		F8B8E5C70286822601664092 = {
 			buildPhases = (
 				F8B8E5C80286822601664092,
-				F8605DF8028C50E601664092,
 				F8B8E5C90286822601664092,
 				F8B8E5CA0286822601664092,
+				F820CB990291112501664092,
 			);
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
