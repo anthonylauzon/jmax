@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -130,17 +130,17 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
 
   public Color getTextBackground()
   {
-      if( isFlashing) 
-	  return Settings.sharedInstance().getUIColor();
-      else
-	  {
-	      if (isSelected()) 
-		  return Settings.sharedInstance().getUIColor().darker();
-	      else
-		  return Color.white;
-	  }
+    if( isFlashing) 
+      return Settings.sharedInstance().getUIColor();
+    else
+      {
+	if (isSelected()) 
+	  return Settings.sharedInstance().getUIColor().darker();
+	else
+	  return Color.white;
+      }
   }
-
+  
   public void paint(Graphics g) 
   {
     g.setColor(getTextBackground());

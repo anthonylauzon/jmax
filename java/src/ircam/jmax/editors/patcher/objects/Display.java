@@ -41,7 +41,9 @@ import ircam.jmax.editors.patcher.interactions.*;
 class Display extends GraphicObject implements FtsMessageListener
 {
   String display = null; // the display content
-  int minWidth = 0; //
+  int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+  int underWidth = 0;
+  int underWidthMax = 0;
 
   public Display(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -74,6 +76,11 @@ class Display extends GraphicObject implements FtsMessageListener
       super.setWidth( w);
 
     super.setHeight( h);
+
+    if(w < underWidthMax)
+      underWidth = w;
+    else
+      underWidth = underWidthMax;
   }
 
   // Set the text when FTS change the display content
@@ -104,14 +111,18 @@ class Display extends GraphicObject implements FtsMessageListener
     int w = getFontMetrics().stringWidth(display) + 4;
     int h = getFontMetrics().getHeight() + 4;
 
-    minWidth = h;
-
     if(w < minWidth)
-      super.setWidth(minWidth);
-    else
-      super.setWidth( w);
+      w = minWidth;
+    
+    super.setWidth(w);
+    super.setHeight(h);
 
-    super.setHeight( h);
+    underWidthMax = getFontMetrics().stringWidth("xx");
+
+    if(w < underWidthMax)
+      underWidth = w;
+    else
+      underWidth = underWidthMax;
 
     redraw();
   }
@@ -145,41 +156,21 @@ class Display extends GraphicObject implements FtsMessageListener
     int w = getWidth();
     int h = getHeight();
 
+    g.setColor(getTextBackground());
+    
     if(itsSketchPad.isLocked())
-      {
-	g.setColor( Color.white);
-	g.fillRect( x + 1, y + 1, w - 2, h - 2);
-
-	g.setColor( Color.black);
-	//g.drawLine( x, y, x + w - 1, y);
-	g.drawLine( x, y, x + minWidth, y);
-	g.drawLine( x, y, x, y + h/4);
-	
-	paintInlets(g);
-	
-	g.setColor( Color.gray);
-	g.setFont(getFont());
-	g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
-      }
+      g.fillRect( x + 1, y + 1, w - 2, h - 2);
     else
-      {
-	if (isSelected())
-	  g.setColor(Color.gray);
-	else
-	  g.setColor(itsSketchPad.getBackground());
-
-	g.fill3DRect( x, y + 1, w, h - 1, true); 
-
-	g.setColor( Color.black);
-	//g.drawLine( x, y, x + w - 1, y);
-	g.drawLine( x, y, x + minWidth, y);
-	g.drawLine( x, y, x, y + h/4);
-
-	paintInlets(g);
-	
-	g.setFont(getFont());
-	g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
-      }
+      g.fill3DRect( x, y + 1, w, h - 1, true);     
+    
+    g.setColor( Color.black);
+    g.drawLine( x, y, x + underWidth - 1, y);
+    g.drawLine( x, y, x, y + h/4);
+    
+    paintInlets(g);
+    
+    g.setFont(getFont());
+    g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
   }
 
   public void updatePaint(Graphics g) 

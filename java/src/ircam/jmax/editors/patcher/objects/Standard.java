@@ -131,7 +131,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public int getTextWidthOffset()
   {
-    return 5; /* was 8 */
+    return 5;
   }
 
   public int getTextHeightOffset()

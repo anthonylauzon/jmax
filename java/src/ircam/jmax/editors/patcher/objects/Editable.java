@@ -161,7 +161,8 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     renderer.update();
     
-    int w = ((TextRenderer)renderer).getTextWidth()+getTextWidthOffset();
+    int w = ((TextRenderer)renderer).getTextWidth() + getTextWidthOffset() + 2;
+
     if(w < getMinimumWidth())
       super.setWidth( getMinimumWidth());
     else

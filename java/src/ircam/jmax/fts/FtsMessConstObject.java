@@ -38,7 +38,7 @@ import ircam.jmax.*;
  * from the server.
  */
 
-public class FtsMessageObject extends FtsIntValueObject
+public class FtsMessConstObject extends FtsIntValueObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -46,43 +46,16 @@ public class FtsMessageObject extends FtsIntValueObject
   /*                                                                           */
   /*****************************************************************************/
 
-  String message; // the message content
-  
-  public FtsMessageObject(Fts fts, FtsObject parent, String description)
+  public FtsMessConstObject(Fts fts, FtsObject parent, String description)
   {
-    super(fts, parent, "messbox", description);
+    super(fts, parent, "messconst", description);
     
     ninlets = 1;
     noutlets = 1;
-    
-    message = description;
-  }
-
-  /** Set the message content. Tell the server, too */
-
-  public void setMessage(String message)
-  {
-    this.message = message;
-    fts.getServer().sendSetMessage(this, message);
-    setDirty();
-  }
-
-  /** Get the message content. */
-
-  public String getMessage()
-  {
-    return message;
-  }
-       
-  /** Over write the handle message to handle message box changes. */
-
-  public void handleMessage(String selector, int nArgs, FtsAtom args[])
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    this.message = FtsParse.unparseArguments(nArgs, args);
-    setDirty();
-
-    if (listener instanceof FtsMessageListener)
-      ((FtsMessageListener) listener).messageChanged(message);
   }
 }
+
+
+
+
+
