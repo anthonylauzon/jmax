@@ -673,9 +673,6 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
     fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
 
-  /* remove old from client */
-  fts_object_unclient(old);
-
   /* make the new object  */
   new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
   
@@ -698,6 +695,9 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 
   /* move the connections from the old to the new object, tell the client if needed */
   fts_object_move_connections(old, new);
+
+  /* remove old from client */
+  fts_object_unclient(old);
 
   /* remove the object from the patcher */
   if(old->patcher)
