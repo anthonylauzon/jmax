@@ -160,7 +160,9 @@ public class Tabler extends JFrame implements EditorContainer {
     maxValueField.setPreferredSize(new Dimension(50, 15));
     maxValueField.setMaximumSize(new Dimension(50, 15));
     maxValueField.setFont( displayFont);
-    maxValueField.setText( ""+itsPanel.getGraphicContext().getVerticalMaximum());
+    String maxText = ( itsPanel.getGraphicContext().isIvec()) ? ""+itsPanel.getGraphicContext().getVerticalMaximum() :
+      ""+(int)(itsPanel.getGraphicContext().getVerticalMaximum()/100);
+    maxValueField.setText( maxText);
     maxValueField.addActionListener( new ActionListener(){
 	public void actionPerformed( ActionEvent e)
 	{
@@ -193,7 +195,9 @@ public class Tabler extends JFrame implements EditorContainer {
     minValueField.setPreferredSize(new Dimension(50, 15));
     minValueField.setMaximumSize(new Dimension(50, 15));
     minValueField.setFont( displayFont);
-    minValueField.setText( ""+itsPanel.getGraphicContext().getVerticalMinimum());
+    String minText = ( itsPanel.getGraphicContext().isIvec()) ? ""+itsPanel.getGraphicContext().getVerticalMinimum() :
+      ""+(int)(itsPanel.getGraphicContext().getVerticalMinimum()/100);
+    minValueField.setText( minText);
     minValueField.addActionListener( new ActionListener(){
 	public void actionPerformed( ActionEvent e)
 	{

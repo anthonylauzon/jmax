@@ -47,4 +47,8 @@ DATA_API void fvec_set_const(fvec_t *vector, float c);
 
 DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
 
+#define fvec_set_editor_open(v) ((v)->opened = 1)
+#define fvec_set_editor_close(v) ((v)->opened = 0)
+#define fvec_editor_is_open(v) ((v)->opened)
+
 #endif

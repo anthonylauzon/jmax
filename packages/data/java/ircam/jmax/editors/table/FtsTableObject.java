@@ -121,7 +121,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	int oldSize = size;
 	size = newSize;
 	
-	int[] temp =  new int[size];
+	double[] temp =  new double[size];
 	if(lastIndex > size-1) lastIndex = size-1; 
 	for(int i = 0; i< lastIndex; i++)
 	  temp[i] = visibles[i];
@@ -139,18 +139,32 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int oldSize = size;
     size = args[0].intValue;    
     visibleSize = args[1].intValue;    
-    visibles = new int[size];
+    visibles = new double[size];
 
-    if (isInGroup()) 
-	for(i = 0; i<nArgs-2; i++)
-        {
-	  postEdit(new UndoableValueSet(this, i, visibles[i]));
-	  visibles[i] = args[i+2].intValue;
-	}
+    if( isIvec())
+      {
+	if (isInGroup()) 
+	  for(i = 0; i<nArgs-2; i++)
+	    {
+	      postEdit(new UndoableValueSet(this, i, visibles[i]));
+	      visibles[i] = (double)args[i+2].intValue;
+	    }
+	else
+	  for(i = 0; i<nArgs-2; i++)
+	    visibles[i] = (double)args[i+2].intValue;
+      }
     else
-      for(i = 0; i<nArgs-2; i++)
-	visibles[i] = args[i+2].intValue;
-    
+      {
+	if (isInGroup()) 
+	  for(i = 0; i<nArgs-2; i++)
+	    {
+	      postEdit(new UndoableValueSet(this, i, visibles[i]));
+	      visibles[i] = args[i+2].doubleValue;
+	    }
+	else
+	  for(i = 0; i<nArgs-2; i++)
+	    visibles[i] = args[i+2].doubleValue;
+      }
     lastIndex = i;
     
     notifySizeChanged(size, oldSize);
@@ -168,16 +182,31 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int startIndex = args[0].intValue;
     int i=0;
 
-    if (isInGroup()) 
-	for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
-	{      
-	  postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
-	  visibles[startIndex+i] = args[i+1].intValue;
-	}
+    if( isIvec())
+      {
+	if (isInGroup()) 
+	  for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
+	    {      
+	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
+	      visibles[startIndex+i] = (double)args[i+1].intValue;
+	    }
+	else
+	  for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
+	    visibles[startIndex+i] = (double)args[i+1].intValue;
+      }
     else
-	for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
-	  visibles[startIndex+i] = args[i+1].intValue;
-    
+      {
+	if (isInGroup()) 
+	  for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
+	    {      
+	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
+	      visibles[startIndex+i] = args[i+1].doubleValue;
+	    }
+	else
+	  for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
+	    visibles[startIndex+i] = args[i+1].doubleValue;
+      }
+
     if(startIndex+i > lastIndex)
       lastIndex = startIndex+i;
     
@@ -206,11 +235,15 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     int i = 0;      
     pixelsSize = args[0].intValue;    
-    pixels = new int[pixelsSize + 10];
+    pixels = new double[pixelsSize + 10];
 
-    for(i = 0; i<nArgs-1; i++)
-      pixels[i] = args[i+1].intValue;
-
+    if( isIvec())
+      for(i = 0; i<nArgs-1; i++)
+	pixels[i] = (double)args[i+1].intValue;
+    else
+      for(i = 0; i<nArgs-1; i++)
+	pixels[i] = args[i+1].doubleValue;
+    
     if(pixelsSize <= nArgs-1)
       notifySet();
   }
@@ -220,9 +253,13 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int startIndex = args[0].intValue;
     int i=0;
 
-    for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
-      pixels[startIndex+i] = args[i+1].intValue;
-
+    if( isIvec())
+      for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
+	pixels[startIndex+i] = (double)args[i+1].intValue;
+    else
+      for(i = 0; (i < nArgs-1)&&(startIndex+i < pixels.length) ; i++)
+	pixels[startIndex+i] = args[i+1].doubleValue;
+    
     if(pixelsSize <= startIndex+nArgs-1)
       notifyPixelsChanged( startIndex, startIndex+i-1);
   }
@@ -232,21 +269,31 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     int startIndex = args[0].intValue;
     int i=0;
     int newp = nArgs-1;
-    int[] temp = new int[pixelsSize + 10];    
+    double[] temp = new double[pixelsSize + 10];    
 
     if(startIndex==0)
-    {
-      for(i = 0; i < newp; i++)
-	temp[i] = args[i+1].intValue;
-      for(i = newp; i< pixelsSize; i++)
-	temp[i] = pixels[i-newp];
-    }
+      {
+	if( isIvec())
+	  for(i = 0; i < newp; i++)
+	    temp[i] = (double)args[i+1].intValue;
+	else
+	  for(i = 0; i < newp; i++)
+	    temp[i] = args[i+1].doubleValue;
+
+	for(i = newp; i< pixelsSize; i++)
+	  temp[i] = pixels[i-newp];
+      }
     else
       {
 	for(i = 0; i<pixelsSize-newp; i++)
 	  temp[i] = pixels[i+newp];
-	for(i = 1; i<= newp; i++)
-	  temp[pixelsSize-newp-1+i] = args[i].intValue;
+	
+	if( isIvec())
+	  for(i = 1; i<= newp; i++)
+	    temp[pixelsSize-newp-1+i] = (double)args[i].intValue;
+	else
+	  for(i = 1; i<= newp; i++)
+	    temp[pixelsSize-newp-1+i] = args[i].doubleValue;
       }
     pixels = temp;
     notifySet();
@@ -255,12 +302,15 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   /*
   ** Requests to the server
   */
-  public void requestSetValue( int index, int value)
+  public void requestSetValue( int index, double value)
   {
     args.clear();
     args.addInt( index);
-    args.addInt( value);
-      
+    if( isIvec())
+      args.addInt( (int)value);
+    else
+      args.addDouble( value);
+
     try{
       send( FtsSymbol.get("set_from_client"), args);
     }
@@ -270,14 +320,18 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	e.printStackTrace(); 
       }
   }
-  public void requestSetValues(int[] values, int startIndex, int size)
+  public void requestSetValues(double[] values, int startIndex, int size)
   {
     args.clear();
     args.addInt( startIndex);
     
-    for(int i=0; i < size; i++)
-      args.addInt( values[i]);
-    
+    if( isIvec())
+      for(int i=0; i < size; i++)
+	args.addInt( (int)values[i]);
+    else
+      for(int i=0; i < size; i++)
+	args.addDouble( values[i]);
+
     try{
       send( FtsSymbol.get("set_from_client"), args);
     }
@@ -288,12 +342,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       }
   }
   
-  public void requestSetVisibleWindow(int size, int startIndex, float zoom, int sizePixels)
+  public void requestSetVisibleWindow(int size, int startIndex, double zoom, int sizePixels)
   {
     args.clear();
     args.addInt(size+10);
     args.addInt(startIndex);
-    args.addFloat(zoom);
+    args.addDouble(zoom);
     args.addInt(sizePixels);
     
     try{
@@ -456,16 +510,16 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     clearAllUndoRedo();
   }
 
-  private int[] visibles;
+  private double[] visibles;
   private int visibleSize = 0;
-  private int[] pixels;
+  private double[] pixels;
   private int pixelsSize = 0;
   
   public int getVisibleSize()
   {
     return visibleSize;
   }
-  public int getVisibleValue(int index)
+  public double getVisibleValue(int index)
   {
     return visibles[index];
   }
@@ -473,18 +527,19 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     return pixelsSize;
   }
-  public int getPixel(int index)
+  public double getPixel(int index)
   {
     if(index >= pixelsSize) return 0;
     else
       return pixels[index];
   }
   
-  private int[] values;
   public int getSize()
   {
     return size;
   }
+  
+  private int[] values;
   public int getVerticalSize(){return Math.abs(max()-min());}
   public int max()
   {
@@ -517,11 +572,11 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     return values[index];
   }
   
-  public void interpolate(int start, int end, int startValue, int endValue)
+  public void interpolate(int start, int end, double startValue, double endValue)
   {
-    float coeff;
+     double coeff;
     if (startValue != endValue) 
-      coeff = ((float)(startValue - endValue))/(end - start);
+      coeff = ((double)(startValue - endValue))/(end - start);
     else coeff = 0;
     
     prepareBuffer(end-start+1);
@@ -530,20 +585,18 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       end = getSize()-1;
     
     for (int i = start; i < end; i+=1)
-      {
-	buffer[i-start] = (int)(startValue-Math.abs(i-start)*coeff + 0.5);
-      }
+      buffer[i-start] = (double)(startValue-Math.abs(i-start)*coeff);
     
     requestSetValues(buffer, start, end-start);
   }
   /**
    * Utility private function to allocate a buffer used during the interpolate operations.
    * The computation is done in a private vector that is stored in one shot. */  
-  static int buffer[];
+  static double buffer[];
   private static void prepareBuffer(int lenght)
   {
     if (buffer == null || buffer.length < lenght)
-      buffer = new int[lenght];
+      buffer = new double[lenght];
   }
   
   /**

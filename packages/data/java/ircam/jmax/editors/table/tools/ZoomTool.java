@@ -120,10 +120,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
 
     public void doubleClick()
     {
-      TableAdapter a = ((TableGraphicContext)gc).getAdapter();
-      a.setXZoom((float)1.0);
-      if( a.getYZoom() != (float)1.0)
-	a.setYZoom((float)1.0);
+      (((TableGraphicContext)gc).getAdapter()).setDefaultZooms();
     }
   
   /**

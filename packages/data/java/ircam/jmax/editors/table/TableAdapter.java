@@ -54,15 +54,8 @@ public class TableAdapter {
   public TableAdapter(TableDataModel tm, TableGraphicContext gc)
   {
     this.gc = gc;
+    this.dataModel = tm;
 
-    float fx;
-    if(tm.getSize()!=0)
-      fx = findZoomRatioClosestTo(((float)(gc.getGraphicDestination().getSize().width))/tm.getSize());
-    else
-      fx = (float)1.0;
-
-    setXZoom(fx);
-    
     int maxY = Math.abs(tm.max());
     int minY = Math.abs(tm.min());
     
@@ -72,14 +65,19 @@ public class TableAdapter {
     //maxY now contains the max absolute value in the table
     if(maxY < gc.getVerticalMaximum()) maxY = gc.getVerticalMaximum();
     
-    setYZoom((float)1.0);
-  
+    setDefaultZooms();
+
     setYTransposition( 0);
   } 
 
+  public void setDefaultZooms()
+  {
+    setXZoom( (float)1.0);
+    setYZoom( (float)1.0);
+  }
   /**
-   * Utility routine to find a float number under the form n/1 or 1/n closest
-   * to the given float. This kind of ratios are usefull to avoid graphical
+   * Utility routine to find a double number under the form n/1 or 1/n closest
+   * to the given double. This kind of ratios are usefull to avoid graphical
    * interpolation problems */
   public float findZoomRatioClosestTo(float f)
   {
@@ -134,10 +132,13 @@ public class TableAdapter {
   /**
    * returns the graphic y corresponding to the value.
    * The y coordinates are implicitily inverted. */
-  public int getY(int value)
+  public int getY(double value)
   {
-    float V = value - gc.getVerticalMinimum();
+    if( !gc.isIvec()) value = ((double)value*100); 
+    
+    double V = value - gc.getVerticalMinimum();
     int h = gc.getGraphicDestination().getSize().height;
+    
     if( gc.isVerticalScrollbarVisible())
       return h - (int)((V - yTransposition) * itsYZoom);
     else
@@ -146,13 +147,19 @@ public class TableAdapter {
 
   /**
    * returns the value corresponding to the graphic y */ 
-  public int getInvY(int y)
+  public double getInvY(int y)
   {
+    double value;
     int h = gc.getGraphicDestination().getSize().height;
+    
     if( gc.isVerticalScrollbarVisible())
-      return (int)(( h - y)/itsYZoom) + yTransposition + gc.getVerticalMinimum();
+      value = (h - y)/itsYZoom + yTransposition + gc.getVerticalMinimum();
     else
-      return (int) ((h - y)/itsYZoom) + gc.getVerticalMinimum();
+      value = (h - y)/itsYZoom + gc.getVerticalMinimum();
+  
+    if( !gc.isIvec()) value = (double)(value/100.0); 
+    
+    return value;
   }
 
   /**
@@ -182,7 +189,7 @@ public class TableAdapter {
     for (int i = 0; i< listeners.size(); i++)
       {
 	zl = (ZoomListener) listeners.elementAt(i);
-	zl.zoomChanged(value, oldValue);
+	zl.zoomChanged( value, oldValue);
       }
   }
   
@@ -278,6 +285,7 @@ public class TableAdapter {
   }
 
   TableGraphicContext gc;
+  TableDataModel dataModel;
 }
 
 

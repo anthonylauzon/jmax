@@ -38,7 +38,6 @@ typedef struct _ivec_
   
   fts_object_t *editor;
 
-  struct _ivec_ *copy;
 } ivec_t;
 
 DATA_API fts_symbol_t ivec_symbol;

@@ -769,8 +769,6 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->size = 0;
   this->alloc = 0;
 
-  this->copy = 0;
-
   this->editor = 0;
 
   if(ac == 0)
@@ -813,9 +811,6 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
       fts_object_destroy((fts_object_t *)this->editor);
     }  
-
-  if(this->copy)
-    fts_object_destroy((fts_object_t *)this->copy);
 
   if(this->values)
     fts_free(this->values);

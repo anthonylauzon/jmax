@@ -22,6 +22,7 @@
 #include <fts/fts.h>
 #include <utils/c/include/utils.h>
 #include <data/c/include/ivec.h>
+#include <data/c/include/fvec.h>
 #include <data/c/include/tabeditor.h>
 
 #include <stdlib.h>
@@ -51,7 +52,7 @@ static fts_symbol_t sym_insert_client = 0;
  *  utility functions
  *
  */
-#define tabeditor_is_ivec(t) ((t)->type = 1)
+#define tabeditor_is_ivec(t) ((t)->type)
 
 /*********************************************************
 *
@@ -63,8 +64,7 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  ivec_t *ivec = (ivec_t *)tabeditor->vec;
-  int vecsize = ivec_get_size(ivec);
+  int vecsize = tabeditor_get_size( tabeditor);
   int n = (tabeditor->vindex + tabeditor->vsize <= vecsize)? (tabeditor->vindex + tabeditor->vsize) : vecsize;
 
   int append = 0;
@@ -87,8 +87,12 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
 	}
       send = (n > IVEC_CLIENT_BLOCK_SIZE-veconset)? IVEC_CLIENT_BLOCK_SIZE-veconset: n;
   
-      for(i = 0; ((i < send)&&(current+i<vecsize)); i++)
-	fts_set_int(&a[i+veconset], ivec->values[current+i]);
+      if( tabeditor_is_ivec( tabeditor))
+	for(i = 0; ((i < send)&&( current+i < vecsize)); i++)
+	  fts_set_int(&a[i+veconset], ((ivec_t *)tabeditor->vec)->values[current+i]);
+      else
+	for(i = 0; ((i < send)&&( current+i < vecsize)); i++)
+	  fts_set_float(&a[i+veconset], ((fvec_t *)tabeditor->vec)->values[current+i]);
 
       if(!append)
 	{
@@ -109,8 +113,7 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  ivec_t *ivec = (ivec_t *)tabeditor->vec;
-  int vecsize = ivec_get_size(ivec);
+  int vecsize = tabeditor_get_size( tabeditor);
   int n = tabeditor->pixsize;
   float k = (1/tabeditor->zoom);
 
@@ -128,9 +131,13 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   
       send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? (IVEC_CLIENT_BLOCK_SIZE-1): n;
   
-      for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
-	fts_set_int(&a[i+1], ivec->values[(int)(current+k*i)]);
-  
+      if( tabeditor_is_ivec( tabeditor))
+	for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
+	  fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[(int)(current+k*i)]);
+      else
+	for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
+	  fts_set_float(&a[i+1], ((fvec_t *)tabeditor->vec)->values[(int)(current+k*i)]);
+      
       if(!append)
 	{
 	  fts_client_send_message((fts_object_t *)tabeditor, sym_set_pixels, send+1, a);
@@ -150,16 +157,19 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int size)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  ivec_t *ivec = (ivec_t *)tabeditor->vec;
-  int vecsize = ivec_get_size(ivec);
+  int vecsize = tabeditor_get_size( tabeditor);
   float k = (1 / tabeditor->zoom);
   int send = (int)(size * tabeditor->zoom) + 1;
   int current = startId;
 
   fts_set_int(&a[0], (int)((startId - tabeditor->vindex) * tabeditor->zoom));
 
-  for(i = 0; ((i < send) && ((int)(current + i * k) < vecsize)); i++)
-    fts_set_int(&a[i+1], ivec->values[(int)(current+k*i)]);
+  if( tabeditor_is_ivec( tabeditor))
+    for(i = 0; ((i < send) && ((int)(current + i * k) < vecsize)); i++)
+      fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[(int)(current+k*i)]);
+  else
+    for(i = 0; ((i < send) && ((int)(current + i * k) < vecsize)); i++)
+      fts_set_float(&a[i+1], ((fvec_t *)tabeditor->vec)->values[(int)(current+k*i)]);
 
   fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send + 1, a);
 }
@@ -169,7 +179,6 @@ tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  ivec_t *ivec = (ivec_t *)tabeditor->vec;
 
   int n = (last-first);
 
@@ -181,9 +190,13 @@ tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
   
       fts_set_int(&a[0], current);
   
-      for(i = 0; i < send; i++)
-	fts_set_int(&a[i+1], ivec->values[current+i]);
-  
+      if( tabeditor_is_ivec( tabeditor))
+	for(i = 0; i < send; i++)
+	  fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[current+i]);
+      else
+	for(i = 0; i < send; i++)
+	  fts_set_float(&a[i+1], ((fvec_t *)tabeditor->vec)->values[current+i]);
+
       fts_client_send_message((fts_object_t *)tabeditor, sym_append_visibles, send+1, a);
   
       current+=send;
@@ -196,23 +209,26 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  ivec_t *ivec = (ivec_t *)tabeditor->vec;
-  int vecsize = ivec_get_size(ivec);
+  int vecsize = tabeditor_get_size( tabeditor);
   float k = (1/tabeditor->zoom);
   int n = (deltax > 0)? deltax : -deltax;
 
   int current = (deltax < 0)? tabeditor->vindex : (tabeditor->vindex + tabeditor->vsize-deltap);
   int start = (deltax < 0)? 0 : tabeditor->pixsize-deltax;
-
+  
   while(n > 0)
     {
       int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
-  
+      
       fts_set_int(&a[0], start);
-  
-      for(i = 0; ((i < send)&&((int)(current+i*k) < vecsize)); i++)
-	fts_set_int(&a[i+1], ivec->values[(int)(current+k*i)]);
-  
+      
+      if( tabeditor_is_ivec( tabeditor))
+	for(i = 0; ((i < send)&&((int)(current+i*k) < vecsize)); i++)
+	  fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[(int)(current+k*i)]);
+      else
+	for(i = 0; ((i < send)&&((int)(current+i*k) < vecsize)); i++)
+	  fts_set_float(&a[i+1], ((fvec_t *)tabeditor->vec)->values[(int)(current+k*i)]);  
+
       fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send+1, a);
   
       current+=k*i;
@@ -277,29 +293,54 @@ static void
 tabeditor_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabeditor_t *this = (tabeditor_t *)o;
-  ivec_t *ivec = (ivec_t *)this->vec;
   int start = fts_get_int(at);
   int size = fts_get_int(at + 1);
-  int this_size = ivec_get_size( ivec);
+  int this_size;
   
   if(size > 0)
     {
-      int *src, *dst;
       int i;
   
-      if(!ivec->copy)
-	ivec->copy = (ivec_t *)fts_object_create(ivec_type, 1, at + 1);
+      if( tabeditor_is_ivec( this))
+	{
+	  int *src, *dst;
+
+	  this_size = ivec_get_size( (ivec_t *)this->vec);
+
+	  if(!this->copy)
+	    this->copy = fts_object_create(ivec_type, 1, at + 1);
+	  else
+	    ivec_set_size( (ivec_t *)this->copy, size);
+	
+	  src = ivec_get_ptr( (ivec_t *)this->vec);
+	  dst = ivec_get_ptr( (ivec_t *)this->copy);
+	
+	  if(start + size > this_size)
+	    size = this_size - start;
+	  
+	  for(i=0; i<size; i++)
+	    dst[i] = src[start + i];
+	}
       else
-	ivec_set_size(ivec->copy, size);
-  
-      src = ivec_get_ptr(ivec);
-      dst = ivec_get_ptr(ivec->copy);
-  
-      if(start + size > this_size)
-	size = this_size - start;
-      
-      for(i=0; i<size; i++)
-	dst[i] = src[start + i];
+	{
+	  float *src, *dst;
+		
+	  this_size = fvec_get_size( (fvec_t *)this->vec);
+
+	  if(!this->copy)
+	    this->copy = fts_object_create(fvec_type, 1, at + 1);
+	  else
+	    fvec_set_size( (fvec_t *)this->copy, size);
+	
+	  src = fvec_get_ptr( (fvec_t *)this->vec);
+	  dst = fvec_get_ptr( (fvec_t *)this->copy);
+	  
+	  if(start + size > this_size)
+	    size = this_size - start;
+	  
+	  for(i=0; i<size; i++)
+	    dst[i] = src[start + i];
+	}
     }
 }
 
@@ -307,24 +348,36 @@ static void
 tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabeditor_t *this = (tabeditor_t *)o;
-  ivec_t *ivec = (ivec_t *)this->vec;
   int v_size = fts_get_int(at);
   int pix_size = fts_get_int(at + 1);
   int start = fts_get_int(at + 2);
   int copy_size;
-  int *ptr;
   int i;
 
   tabeditor_copy_by_client_request(o, 0, 0, ac - 2, at + 2);
-  copy_size = ivec_get_size(ivec->copy);
+  if( tabeditor_is_ivec( this))
+    {
+      int *ptr;
+      copy_size = ivec_get_size( (ivec_t *)this->copy);
+      ptr = ivec_get_ptr( (ivec_t *)this->vec);
+    
+      for(i=0; i<ivec_get_size( (ivec_t *)this->vec); i++)
+	ptr[start + i] = ptr[i + start + copy_size];
 
-  ptr = ivec_get_ptr(ivec);
-  
-  for(i=0; i<ivec_get_size(ivec); i++)
-    ptr[start + i] = ptr[i + start + copy_size];
+      ivec_set_size((ivec_t *)this->vec, ivec_get_size( (ivec_t *)this->vec) - copy_size);
+    }  
+  else
+    {
+      float *ptr;
+      copy_size = fvec_get_size( (fvec_t *)this->copy);
+      ptr = fvec_get_ptr( (fvec_t *)this->vec);
+    
+      for(i = 0; i < fvec_get_size( (fvec_t *)this->vec); i++)
+	ptr[start + i] = ptr[i + start + copy_size];
 
-  ivec_set_size(ivec, ivec_get_size(ivec) - copy_size);
-  
+      fvec_set_size((fvec_t *)this->vec, fvec_get_size( (fvec_t *)this->vec) - copy_size);
+    }
+    
   this->vsize = v_size;
   this->pixsize = pix_size;
 
@@ -338,30 +391,54 @@ static void
 tabeditor_paste_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabeditor_t *this = (tabeditor_t *)o;
-  ivec_t *ivec = (ivec_t *)this->vec;
 
-  if(ivec->copy)
+  if( this->copy)
     {
+      int this_size, copy_size;
+      int i;
       int start = fts_get_int(at);
       int size = fts_get_int(at + 1);
-      int this_size = ivec_get_size( ivec);
-      int copy_size = ivec_get_size( ivec->copy);
-      int *src, *dst;
-      int i;
       
-      if(size == 0)
-	size = copy_size;
-      else if(size > copy_size)
-	size = copy_size;
+      if( tabeditor_is_ivec( this))
+	{
+	  int *src, *dst;
+	  this_size = ivec_get_size((ivec_t *)this->vec);
+	  copy_size = ivec_get_size((ivec_t *)this->copy);
+	  
+	  src = ivec_get_ptr((ivec_t *)this->copy);
+	  dst = ivec_get_ptr((ivec_t *)this->vec);
+
+	  if(size == 0)
+	    size = copy_size;
+	  else if(size > copy_size)
+	    size = copy_size;
       
-      src = ivec_get_ptr( ivec->copy);
-      dst = ivec_get_ptr( ivec);
-  
-      if(start + size > this_size)
-	size = this_size - start;
-  
-      for(i=0; i<size; i++)
-	dst[start+ i] = src[i];
+	  if(start + size > this_size)
+	    size = this_size - start;
+	  
+	  for(i=0; i<size; i++)
+	    dst[start+ i] = src[i];
+	}
+      else
+	{
+	  float *src, *dst;
+	  this_size = fvec_get_size((fvec_t *)this->vec);
+	  copy_size = fvec_get_size((fvec_t *)this->copy);
+	
+	  src = fvec_get_ptr((fvec_t *)this->copy);
+	  dst = fvec_get_ptr((fvec_t *)this->vec);
+	  
+	  if(size == 0)
+	    size = copy_size;
+	  else if(size > copy_size)
+	    size = copy_size;
+	  
+	  if(start + size > this_size)
+	    size = this_size - start;
+	  
+	  for(i=0; i<size; i++)
+	    dst[start+ i] = src[i];
+	}
   
       if(this->zoom < 0.5) tabeditor_send_pixels( this);
       tabeditor_send_visibles( this);
@@ -374,36 +451,54 @@ static void
 tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabeditor_t *this = (tabeditor_t *)o;
-  ivec_t *ivec = (ivec_t *)this->vec;
 
-  if(ivec->copy)
+  if(this->copy)
     {
       int v_size = fts_get_int(at);
       int pix_size = fts_get_int(at+1);
       int start = fts_get_int(at+2);
-      int copy_size = ivec_get_size( ivec->copy);
-      int this_size;
-      int *src, *dst;
+      int copy_size, this_size;
       int i;
       
-      ivec_set_size( ivec, ivec_get_size( ivec) + copy_size);
-      this_size = ivec_get_size( ivec);
+      if(tabeditor_is_ivec(this))
+	{
+	  int *src, *dst;
+	  copy_size = ivec_get_size( (ivec_t *)this->copy);
+	  ivec_set_size( (ivec_t *)this->vec, ivec_get_size( (ivec_t *)this->vec) + copy_size);
+	  this_size = ivec_get_size( (ivec_t *)this->vec);
+	    
+	  src = ivec_get_ptr((ivec_t *)this->copy);
+	  dst = ivec_get_ptr((ivec_t *)this->vec);
+
+	  for(i=this_size - 1; i>=start; i--)
+	    dst[i] = dst[i - copy_size];
   
-      src = ivec_get_ptr(ivec->copy);
-      dst = ivec_get_ptr(ivec);
-  
-      for(i=this_size - 1; i>=start; i--)
-	dst[i] = dst[i - copy_size];
-  
-      for(i=0; i < copy_size; i++)
-	dst[start + i] = src[i];
+	  for(i=0; i < copy_size; i++)
+	    dst[start + i] = src[i];	  
+	}
+      else
+	{
+	  float *src, *dst;		
+	  copy_size = fvec_get_size( (fvec_t *)this->copy);
+	  fvec_set_size( (fvec_t *)this->vec, fvec_get_size( (fvec_t *)this->vec) + copy_size);
+	  this_size = fvec_get_size( (fvec_t *)this->vec);
+	
+	  src = fvec_get_ptr((fvec_t *)this->copy);
+	  dst = fvec_get_ptr((fvec_t *)this->vec);
+	
+	  for(i=this_size - 1; i>=start; i--)
+	    dst[i] = dst[i - copy_size];
+	  
+	  for(i=0; i < copy_size; i++)
+	    dst[start + i] = src[i];	  
+	}
   
       this->vsize = v_size;
       this->pixsize = pix_size;
   
       if( this->zoom < 0.5) tabeditor_send_pixels( this);
       tabeditor_send_visibles(this);
-    
+      
       data_object_set_dirty( this->vec);
     }
 }
@@ -421,16 +516,26 @@ tabeditor_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   
   if(ac > 1 && fts_is_number(at))
     {
-      int size = ivec_get_size( (ivec_t *)this->vec);
+      int size = tabeditor_get_size( this);
       int onset = fts_get_number_int(at);
   
       if(onset >= 0 && onset < size)
 	{
-	  ivec_set_with_onset_from_atoms( (ivec_t *)this->vec, onset, ac - 1, at + 1);
+	  if( tabeditor_is_ivec(this))
+	    {
+	      ivec_set_with_onset_from_atoms( (ivec_t *)this->vec, onset, ac - 1, at + 1);
 	  
-	  if( ivec_editor_is_open( (ivec_t *)this->vec))
-	    tabeditor_insert_append( this, onset, ac, at);
-	
+	      if( ivec_editor_is_open( (ivec_t *)this->vec))
+		tabeditor_insert_append( this, onset, ac, at);
+	    }
+	  else
+	    {
+	      fvec_set_with_onset_from_atoms( (fvec_t *)this->vec, onset, ac - 1, at + 1);
+	  
+	      if( fvec_editor_is_open( (fvec_t *)this->vec))
+		tabeditor_insert_append( this, onset, ac, at);
+	    }
+
 	  data_object_set_dirty( this->vec);
 	}
     }
@@ -451,6 +556,18 @@ void tabeditor_send( tabeditor_t *tabeditor)
       
   tabeditor_send_visibles( tabeditor);
 }
+
+int tabeditor_get_size( tabeditor_t *tabeditor)
+{
+  int size;
+  if( tabeditor_is_ivec( tabeditor))
+    size = ivec_get_size( ((ivec_t *)tabeditor->vec));
+  else
+    size = fvec_get_size( ((fvec_t *)tabeditor->vec));
+
+  return size;
+}
+
 /*********************************************************
  *
  *  class
@@ -477,6 +594,8 @@ tabeditor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       this->vec = 0; 
       this->type = -1;
    }
+  
+  this->copy = 0;
 }
 
 static void
@@ -486,6 +605,9 @@ tabeditor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   
   if(fts_object_has_id(o))
     fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
+
+  if(this->copy)
+    fts_object_destroy((fts_object_t *)this->copy);
 }
 
 static void

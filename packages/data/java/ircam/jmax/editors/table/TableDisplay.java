@@ -65,11 +65,14 @@ public class TableDisplay extends PopupToolbarPanel
 	  if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
 	    {
 	      int index = gc.getAdapter().getInvX( e.getX());
-	      int value = gc.getAdapter().getInvY( e.getY());
+	      double value = gc.getAdapter().getInvY( e.getY());
 	      if( index < 0) index = 0;
 
 	      if (index < gc.getDataModel().getSize() && index >=0)
-		gc.display( "( "+index+" , "+value+" )");
+		if( gc.isIvec())
+		  gc.display( "( "+index+" , "+(int)value+" )");
+		else
+		  gc.display( "( "+index+" , "+value+" )");
 	    }
 	}
 	public void mouseDragged(MouseEvent e)
@@ -80,11 +83,14 @@ public class TableDisplay extends PopupToolbarPanel
 	  if(!toolName.equals("zoomer"))
 	    {
 	      int index = gc.getAdapter().getInvX( e.getX());
-	      int value = gc.getAdapter().getInvY( e.getY());
+	      double value = gc.getAdapter().getInvY( e.getY());
 	      if( index < 0) index = 0;
 	      
 	      if (index < gc.getDataModel().getSize() && index >=0)
-		gc.display( "( "+index+" , "+value+" )");
+		if( gc.isIvec())
+		  gc.display( "( "+index+" , "+(int)value+" )");
+		else
+		  gc.display( "( "+index+" , "+value+" )");
 	    }
 	}
       });

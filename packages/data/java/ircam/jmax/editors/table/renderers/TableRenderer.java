@@ -86,8 +86,8 @@ public class TableRenderer extends AbstractRenderer implements Layer{
    * Layer interface */
   public void render(Graphics g, Rectangle r, int order)
   {    
-    int yMax = gc.getAdapter().getY( gc.getVerticalMaximum());
-    int yMin = gc.getAdapter().getY( gc.getVerticalMinimum());
+    int yMax = gc.getAdapter().getY( (gc.isIvec()) ? gc.getVerticalMaximum() : gc.getVerticalMaximum()/100);
+    int yMin = gc.getAdapter().getY( (gc.isIvec()) ? gc.getVerticalMinimum() :  gc.getVerticalMinimum()/100);
 
     g.setColor( outRangeColor);
     g.fillRect(r.x, r.y, r.width, r.height);

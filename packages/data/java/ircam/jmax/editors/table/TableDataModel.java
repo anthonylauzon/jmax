@@ -45,11 +45,11 @@ public interface TableDataModel {
 
   /**
    * Returns the maximum (signed) value in the table */
-    public abstract int max();
+  public abstract int max();
 
   /**
    * Returns the minimum (signed) value in the table */
-    public abstract int min();
+  public abstract int min();
 
   /**
    * returns a vector of all the values
@@ -74,7 +74,7 @@ public interface TableDataModel {
   /**
    * Sets the range of points between start and end interpolating between the initial
    * and ending values. This operation corresponds to draw a line in the model. */
-    public abstract void interpolate(int start, int end, int startValue, int endValue);
+    public abstract void interpolate(int start, int end, double startValue, double endValue);
 
 
   /**

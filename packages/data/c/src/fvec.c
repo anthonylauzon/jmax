@@ -20,10 +20,12 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/client.h>
 #include <utils/c/include/utils.h>
 #include <data/c/include/fvec.h>
 #include <data/c/include/cvec.h>
 #include <data/c/include/ivec.h>
+#include <data/c/include/tabeditor.h>
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -315,6 +317,60 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
   return size;
 }
 
+/*********************************************************
+*
+*  client methods
+*
+*
+*********************************************************/
+
+static void 
+fvec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  fts_atom_t a;
+
+  if(this->editor == NULL)
+    {
+      fts_set_object(&a, o);
+      this->editor = fts_object_create( tabeditor_type, 1, &a);
+      fts_object_refer( this->editor);
+    }
+
+  if( !fts_object_has_id( this->editor))
+    {
+      fts_client_register_object( this->editor, fts_get_client_id( o));
+	  
+      fts_set_int(&a, fts_get_object_id( this->editor));
+      fts_client_send_message( o, fts_s_editor, 1, &a);
+      
+      /*fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0);*/
+    }
+
+  fvec_set_editor_open( this);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+}
+
+static void
+fvec_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  fvec_set_editor_close( this);
+}
+
+static void 
+fvec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *) o;
+
+  if(fvec_editor_is_open(this))
+    {
+      fvec_set_editor_close(this);
+      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
+    }
+}
+
 /********************************************************************
  *
  *   user methods
@@ -327,6 +383,11 @@ fvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fvec_t *this = (fvec_t *)o;
 
   fvec_set_const(this, fts_get_number_float(at));
+
+  if( fvec_editor_is_open( this))
+    tabeditor_send( (tabeditor_t *)this->editor);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -340,7 +401,14 @@ fvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       int offset = fts_get_number_int(at);
 
       if(offset >= 0 && offset < size)
-	fvec_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
+	{
+	  fvec_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
+	
+	  if(fvec_editor_is_open( this))
+	    tabeditor_insert_append( (tabeditor_t *)this->editor, offset, ac, at);
+	
+	  data_object_set_dirty( o);
+	}
     }
 }
 
@@ -359,7 +427,8 @@ fvec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       ptr[i] = ptr[j];
       ptr[j] = f;
     }
-  
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -441,6 +510,8 @@ fvec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 		}
 	    }
 	}
+      
+      data_object_set_dirty( o);
     }
 }
 
@@ -460,6 +531,8 @@ fvec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   float *ptr = fvec_get_ptr(this);
 
   qsort((void *)ptr, fvec_get_size(this), sizeof(float), fvec_element_compare);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -481,6 +554,8 @@ fvec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       range -= 1.0;
     }
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -514,7 +589,9 @@ fvec_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
       for(i=0; i<size; i++)
 	ptr[i] *= scale;
-    }
+ 
+      data_object_set_dirty( o);
+   }
 }
 
 static void
@@ -543,6 +620,12 @@ fvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     /* when extending: zero new values */
     for(i=old_size; i<size; i++)
       this->values[i] = 0.0;
+ 
+    if( fvec_editor_is_open(this))
+      {
+	fts_client_send_message( this->editor, fts_s_size, ac, at);
+	data_object_set_dirty( o);
+      }
   }
 }
 
@@ -1262,6 +1345,8 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       
       if(size <= 0)
 	fts_object_error(o, "cannot import from text file \"%s\"\n", file_name);
+      else
+	data_object_set_dirty( o);
     }
   else
     fts_object_error(o, "unknown import file format \"%s\"\n", file_format);
@@ -1466,6 +1551,8 @@ fvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fvec_t *in = (fvec_t *)fts_get_object(at);
   
   fvec_copy(in, this);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -1611,6 +1698,8 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->n = 1;
   this->alloc = FVEC_NO_ALLOC;
 
+  this->editor = 0;
+
   if(ac == 0)
     fvec_set_size(this, 0);
   else if(ac == 1 && fts_is_int(at))
@@ -1659,6 +1748,14 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fvec_t *this = (fvec_t *)o;
 
+  if(this->editor) 
+    {  
+      if(fts_object_has_id( this->editor))
+	fts_client_send_message( (fts_object_t *)this->editor, fts_s_destroyEditor, 0, 0);
+      
+      fts_object_destroy((fts_object_t *)this->editor);
+    }  
+
   if(this->values != NULL)
     fts_free(this->values - FTS_CUBIC_HEAD);
 }
@@ -1673,6 +1770,11 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
   fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, fvec_dump);
+
+  /* graphical editor */
+  fts_class_message_varargs(cl, fts_s_openEditor, fvec_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, fvec_close_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, fvec_destroy_editor);
 
   fts_class_message_varargs(cl, fts_s_post, fvec_post); 
   fts_class_message_varargs(cl, fts_s_print, fvec_print); 

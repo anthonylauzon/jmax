@@ -37,7 +37,7 @@ public class UndoableValueSet extends AbstractUndoableEdit {
   /**
    * Constructor with the data model, the index, and the value
    * that is going to be stored */
-  public UndoableValueSet(TableDataModel tm, int index, int oldValue)
+  public UndoableValueSet(TableDataModel tm, int index, double oldValue)
   {
     this.tm = (FtsTableObject)tm;
     this.index = index;
@@ -81,7 +81,6 @@ public class UndoableValueSet extends AbstractUndoableEdit {
   public void undo()
   {
     redoValue = tm.getVisibleValue(index);
-    //tm.setValue(index, undoValue);
     tm.requestSetValue(index, undoValue);
   }
 
@@ -90,7 +89,6 @@ public class UndoableValueSet extends AbstractUndoableEdit {
   public void redo()
   {
     undoValue = tm.getVisibleValue(index);
-    //tm.setValue(index, redoValue);
     tm.requestSetValue(index, redoValue);
   }
 
@@ -98,8 +96,8 @@ public class UndoableValueSet extends AbstractUndoableEdit {
     //TableDataModel tm;
   FtsTableObject tm;
   int index;
-  int undoValue;
-  int redoValue;
+  double undoValue;
+  double redoValue;
 
   boolean alive = true;
 }

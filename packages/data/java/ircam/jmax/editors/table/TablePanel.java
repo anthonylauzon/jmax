@@ -53,11 +53,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   //--- Fields  
   final static int SCROLLBAR_SIZE = 30;
   final static int PANEL_WIDTH = 500;
-  final static int PANEL_HEIGHT = 270;
+  static int PANEL_HEIGHT;
+  final static int IVEC_PANEL_HEIGHT = 270;
+  final static int FVEC_PANEL_HEIGHT = 200;
 
   public JScrollBar itsVerticalControl, itsHorizontalControl;
 
-  Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
+  Dimension size;
 
   public EditorToolbar toolbar;
   TableGraphicContext gc;
@@ -75,6 +77,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     this.ftsObj = ftsObj;
     tableData = tm;
     itsEditorContainer = container;
+
+    PANEL_HEIGHT = (ftsObj instanceof FtsIvecObject) ? IVEC_PANEL_HEIGHT : FVEC_PANEL_HEIGHT;
+    size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
 
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
@@ -125,7 +130,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	}
       });
     //470 is the default size of the TableDisplay .......
-    gc.getFtsObject().requestSetVisibleWindow( 470, 0, (float)1.0, gc.getVisiblePixelsSize());
+    gc.getFtsObject().requestSetVisibleWindow( 470, 0, (double)1.0, gc.getVisiblePixelsSize());
     gc.getFtsObject().requestGetValues();
   }
   
@@ -228,7 +233,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   void updateVerticalScrollbar()
   {
-    int verticalScope = gc.getVisibleVerticalScope();
+    int verticalScope = (gc.isIvec()) ? gc.getVisibleVerticalScope() : gc.getVisibleVerticalScope()*100;
 
     if(verticalScope >= gc.getVerticalRange())
       {
@@ -249,7 +254,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	int oldValue = itsVerticalControl.getValue();
 	
 	itsVerticalControl.setVisibleAmount( verticalScope);
-	
+
 	if( oldAmount != 0)
 	  {
 	    int val = oldValue*verticalScope/oldAmount;
@@ -340,7 +345,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void setMaximumValue(int value)
   {
     gc.setVerticalMaximum(value);
-    itsVerticalControl.setMaximum(value);
+    itsVerticalControl.setMaximum( gc.isIvec() ? value : value*100);
     updateVerticalScrollbar();
     repaint();
   }
@@ -348,7 +353,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void setMinimumValue(int value)
   {
     gc.setVerticalMinimum(value);
-    itsVerticalControl.setMinimum(value);
+    itsVerticalControl.setMinimum( gc.isIvec() ? value : value*100);
     updateVerticalScrollbar();
     repaint();
   }
@@ -483,15 +488,15 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     int sizeAfterInsert = gc.getFtsObject().getSize()+lastCopySize;
     
     if((sizeAfterInsert >= gc.getLastVisibleIndex(sizeAfterInsert))&&(sizeAfterInsert > gc.getWindowHorizontalScope()))
-	{
-	    vsize = gc.getWindowHorizontalScope();
-	    pixsize = gc.getGraphicDestination().getSize().width;
-	} 
+      {
+	vsize = gc.getWindowHorizontalScope();
+	pixsize = gc.getGraphicDestination().getSize().width;
+      } 
     else
-	{
-	    vsize = sizeAfterInsert-gc.getFirstVisibleIndex();
-	    pixsize = gc.getAdapter().getX(vsize);
-	}
+      {
+	vsize = sizeAfterInsert-gc.getFirstVisibleIndex();
+	pixsize = gc.getAdapter().getX(vsize);
+      }
 
     gc.getFtsObject().requestInsert(first, vsize, pixsize);
     gc.getSelection().deselectAll();

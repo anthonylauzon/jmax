@@ -30,11 +30,10 @@ import javax.swing.*;
 
 /**
  * The graphic context for a generic Table editing session.
- * It handles the data model, the Adapter, the CoordinateWriter.
+ * It handles the data model, the Adapter.
  * @see GraphicContext
  * @see TableDataModel
  * @see TableAdapter
- * @see CoordinateWriter
  */ 
 public class TableGraphicContext extends GraphicContext{
   
@@ -44,6 +43,9 @@ public class TableGraphicContext extends GraphicContext{
   {
     itsModel = dm;
     itsFtsObject = (FtsTableObject)dm;
+    
+    itsVerticalMaximum = itsFtsObject.isIvec() ? IVEC_DEFAULT_V_MAXIMUM : FVEC_DEFAULT_V_MAXIMUM*100;
+    itsVerticalMinimum = itsFtsObject.isIvec() ? IVEC_DEFAULT_V_MINIMUM : FVEC_DEFAULT_V_MINIMUM*100;
   }
 
 
@@ -55,7 +57,10 @@ public class TableGraphicContext extends GraphicContext{
       TableSelection.setCurrent(itsSelection);
   }
 
-
+  public boolean isIvec()
+  {
+    return itsFtsObject.isIvec();
+  }
   /*
    * redefined to handle selection ownership when
    * the owner is closed (bug #171) */
@@ -148,7 +153,7 @@ public class TableGraphicContext extends GraphicContext{
 
   public int getVisibleVerticalScope()
   {
-    return itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height);
+    return (int)(itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height));
   }
 
   public boolean isVerticalScrollbarVisible()
@@ -168,10 +173,11 @@ public class TableGraphicContext extends GraphicContext{
     return pixsize;
   }
 
-  int itsVerticalMaximum = DEFAULT_V_MAXIMUM;
-  int itsVerticalMinimum = DEFAULT_V_MINIMUM;
-  final public static int DEFAULT_V_MAXIMUM = 135;
-  final public static int DEFAULT_V_MINIMUM = -135;
+  int itsVerticalMaximum, itsVerticalMinimum;
+  final public static int IVEC_DEFAULT_V_MAXIMUM = 135;
+  final public static int IVEC_DEFAULT_V_MINIMUM = -135;
+  final public static int FVEC_DEFAULT_V_MAXIMUM = 1;
+  final public static int FVEC_DEFAULT_V_MINIMUM = -1;
 
   public int getVerticalMaximum()
   {
@@ -179,7 +185,10 @@ public class TableGraphicContext extends GraphicContext{
   }
   public void setVerticalMaximum(int max)
   {
-    itsVerticalMaximum = max;
+    if( isIvec())
+      itsVerticalMaximum = max;
+    else
+      itsVerticalMaximum = max*100;
   }
   public int getVerticalMinimum()
   {
@@ -187,7 +196,10 @@ public class TableGraphicContext extends GraphicContext{
   }
   public void setVerticalMinimum(int min)
   {
-    itsVerticalMinimum = min;
+    if( isIvec())
+      itsVerticalMinimum = min;
+    else
+      itsVerticalMinimum = min*100;
   }
 
   public int getVerticalRange()

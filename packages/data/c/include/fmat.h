@@ -34,6 +34,10 @@ typedef struct _fmat_
   int m;
   int n;
   int alloc;
+
+  int opened; /* non zero if editor open */
+  fts_object_t *editor;
+
 } fmat_t;
 
 DATA_API fts_symbol_t fmat_symbol;

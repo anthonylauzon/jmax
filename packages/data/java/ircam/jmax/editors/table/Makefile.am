@@ -3,14 +3,12 @@ SUBDIRS= menus renderers tools
 packagedir=$(pkgdatadir)/packages/data/java/classes/ircam/jmax/editors/table
 package_JAVA = \
 Actions.java \
-CoordinateWriter.java \
 FreeHandDrawer.java \
 FtsFvecObject.java \
 FtsIvecObject.java \
 FtsTableObject.java \
 LineDrawer.java \
 LineListener.java \
-ScalePanel.java \
 StripeSelecter.java \
 TableAdapter.java \
 TableDataListener.java \
