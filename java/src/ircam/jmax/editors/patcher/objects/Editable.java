@@ -264,6 +264,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addSeparation();
     TextPopUpMenu.update(this);
     ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
   }
@@ -271,5 +272,6 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     super.popUpReset();
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
+    ObjectPopUp.removeSeparation();
   }
 }

@@ -47,7 +47,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   static private ObjectPopUp popup = new ObjectPopUp();
   private Hashtable subMenus = new Hashtable();
   private Hashtable items = new Hashtable();
-  private JMenuItem removeMenuItem;
+  public JMenuItem removeMenuItem;
 
   int x;
   int y;
@@ -56,13 +56,64 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   public ObjectPopUp()
   {
     super();
-    removeMenuItem = add(Actions.removeConnectionsAction, "Remove Connections");
+    removeMenuItem = new JMenuItem("Remove Connections");
+    removeMenuItem.addActionListener(Actions.removeConnectionsAction);
+
     add(Actions.bringToFrontObjectAction, "Bring To Front");
     add(Actions.sendToBackObjectAction, "Send To Back");
-    addSeparator();
+    //addSeparator();
     pack();
 
     addPopupMenuListener(this);
+  }
+
+  boolean separation = false;
+  static public void addSeparation()
+  {
+    if(popup.inOutItemAdded)
+      popup.insert(new Separator(), 3);
+    else
+      popup.insert(new Separator(), 2);
+    popup.separation = true;
+  }
+  static public void removeSeparation()
+  {
+      if(popup.separation)
+      {
+	if(popup.inOutItemAdded)
+	  popup.remove(3);
+	else
+	  popup.remove(2);
+	      
+	popup.separation = false;
+      }
+  }
+ 
+  boolean inOutItemAdded = false;
+  static public void update(int where, String text)
+  {
+      popup.removeMenuItem.setText(text);
+      switch(where)
+	  {
+	  case GraphicObject.ON_INLET:	      
+	  case GraphicObject.ON_OUTLET:
+	    if(!popup.inOutItemAdded)
+	      {
+		popup.add(popup.removeMenuItem, 0);
+		popup.inOutItemAdded = true;
+	      }
+	    break;
+	  case GraphicObject.ON_OBJECT:
+	  default:
+	    if(popup.inOutItemAdded)
+	      {
+		popup.remove(0);
+		popup.inOutItemAdded = false;
+	      }
+	    break;
+	  }
+      popup.revalidate();
+      popup.pack();
   }
 
   static public GraphicObject getPopUpTarget(){

@@ -348,6 +348,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addSeparation();
     TextPopUpMenu.update(this);
     ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
   }
@@ -355,6 +356,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   {
     super.popUpReset();
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
+    ObjectPopUp.removeSeparation();
   }
 }
 

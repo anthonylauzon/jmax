@@ -62,6 +62,8 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     boolean isResizing = false;
     int flashColorIndex = ColorPopUpMenu.getColorIndex("yellow")+1;  
 
+    public static BangControlPanel controlPanel = new BangControlPanel();
+
     public Bang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
     {
 	super( theSketchPad, theFtsObject);
@@ -301,17 +303,26 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	updateImages(w, flashColorIndex);
   }
 
+  public ObjectControlPanel getControlPanel()
+  {
+    return this.controlPanel;
+  }
+
   //popup interaction 
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
-    BangPopUpMenu.update(this);
-    ObjectPopUp.addMenu(BangPopUpMenu.getInstance());
+    ObjectPopUp.addSeparation();
+    ObjectPopUp.getInstance().add(ColorPopUpMenu.getInstance());    
+    getControlPanel().update(this);
+    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
   }
   public void popUpReset()
   {
     super.popUpReset();
-    ObjectPopUp.removeMenu(BangPopUpMenu.getInstance());
+    ObjectPopUp.getInstance().remove(ColorPopUpMenu.getInstance());
+    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+    ObjectPopUp.removeSeparation();
   }
     /*
      * Double key class (image width and flash color) to the image HashTable 

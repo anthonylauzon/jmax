@@ -966,25 +966,23 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   }
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
-    JMenuItem item = ObjectPopUp.getMenuItem("Remove Connections");
+    String text = "";
     if(onInlet)
       {
 	wherePopup = ON_INLET;
-	item.setText("Disconnect Inlet n."+area.getNumber());
-	item.setEnabled(true);
+	text = "Disconnect Inlet n."+area.getNumber();
       }    
     else if(onOutlet)
       {
 	wherePopup = ON_OUTLET; 
-	item.setText("Disconnect Outlet n."+area.getNumber());
-	item.setEnabled(true);
+	text = "Disconnect Outlet n."+area.getNumber();
       }
     else
       {
 	wherePopup = ON_OBJECT;
-	item.setText("");
-	item.setEnabled(false);
+	text = "";
       }
+    ObjectPopUp.update(wherePopup, text); 
   }
 
   public void popUpEdit(Point p)

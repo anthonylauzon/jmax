@@ -285,6 +285,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addSeparation();
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
     ObjectPopUp.getInstance().revalidate();
@@ -294,15 +295,9 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     super.popUpReset();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+    ObjectPopUp.removeSeparation();
   }
 
-    /*public void changeOrientation()
-      {
-      if(orientation == VERTICAL_OR) setOrientation(HORIZONTAL_OR);
-      else setOrientation(VERTICAL_OR);
-    
-      updateDimension();
-      }*/
   void updateDimension()
   {
     int w = getWidth();

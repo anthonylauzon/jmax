@@ -303,6 +303,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
+    ObjectPopUp.addSeparation();
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
     ObjectPopUp.getInstance().revalidate();
@@ -312,5 +313,6 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
   {
     super.popUpReset();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+    ObjectPopUp.removeSeparation();
   }
 }
