@@ -178,6 +178,7 @@ public class ControlPanel extends JPanel {
     try
       {
 	control = new FtsDspControl();
+	control.send( FtsSymbol.get("upload"));
       }
     catch(IOException e)
       {
