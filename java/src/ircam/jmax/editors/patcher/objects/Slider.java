@@ -138,8 +138,10 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     setMaxValue( theMaxInt);
     setMinValue( theMinInt);
 
-    if(value<rangeMin) ((FtsSliderObject)ftsObject).setValue(rangeMin);
-    else if(value>rangeMax) ((FtsSliderObject)ftsObject).setValue(rangeMax);
+    if(value < rangeMin)
+      value = rangeMin;
+    else if(value>rangeMax) 
+      value = rangeMax;
 
     redraw();
   }

@@ -60,7 +60,7 @@ print_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: <bang>\n", fts_symbol_name(this->prompt));
+  post("%s: bang\n", fts_symbol_name(this->prompt));
 }
 
 
@@ -83,9 +83,8 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(ac == 0)
     {
-      post("<%s>\n", fts_symbol_name(s));
-      
-      return;
+      post_symbol(s);
+      post("\n");
     }
   else if(ac == 1 && fts_is_object(at))
     {
@@ -93,27 +92,27 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(s == fts_object_get_class_name(obj))
 	{
-	  post("<%s>", fts_symbol_name(s));
+	  post_symbol(s);
+	  post(" ");
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
 	    post("?");
       
 	  post("\n");
-
-	  return;
 	}
     }
   else if(ac == 1 && s == fts_get_selector(at))
     {
       post_atoms(1, at);
       post("\n");
-
-      return;
     }
-
-  post("<%s> ", fts_symbol_name(s));
-  post_atoms(ac, at);
-  post("\n");
+  else
+    {
+      post_symbol(s);
+      post(" ");
+      post_atoms(ac, at);
+      post("\n");
+    }
 }
 
 /**********************************************************************

@@ -68,7 +68,7 @@ declareIcon %warning       	$jmaxRootDir/images/warning.gif
 declareIcon %info               $jmaxRootDir/images/info.gif
 declareIcon %linux              $jmaxRootDir/images/linux.gif
 declareIcon %forum              $jmaxRootDir/images/forum.gif
-
-
-
-
+declareIcon %arrow_left         $jmaxRootDir/images/arrow_left.gif
+declareIcon %arrow_right        $jmaxRootDir/images/arrow_right.gif
+declareIcon %arrow_up           $jmaxRootDir/images/arrow_up.gif
+declareIcon %arrow_down         $jmaxRootDir/images/arrow_down.gif

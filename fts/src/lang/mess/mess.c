@@ -31,6 +31,8 @@
 #include "clipboard.h"
 
 extern void fts_autosave_init(void);
+extern void fts_label_config(void);
+extern void fts_inout_config(void);
 
 static void fts_mess_init( void )
 {

@@ -47,6 +47,22 @@
    post cannot be buffer events, must be immediate events.
 */
 
+static int
+symbol_contains_blank(fts_symbol_t s)
+{
+  const char *str = fts_symbol_name(s);
+  int n = strlen(str);
+  int i;
+
+  for(i=0; i<n; i++)
+    {
+      if(str[i] == ' ')
+	return 1;
+    }
+
+  return 0;
+}
+
 void
 post_vector(int n, float *fp)
 {
@@ -59,6 +75,15 @@ post_vector(int n, float *fp)
 }
 
 void
+post_symbol(fts_symbol_t sym)
+{
+  if(symbol_contains_blank(sym))
+    post("\"%s\"", fts_symbol_name(sym));
+  else
+    post("%s", fts_symbol_name(sym));
+}
+
+void
 post_atoms(int ac, const fts_atom_t *at)
 {
   int i;
@@ -67,21 +92,28 @@ post_atoms(int ac, const fts_atom_t *at)
     {
       char *ps;
 
-      if (i == (ac-1))
+      if (i == (ac - 1))
 	ps = "";
       else
 	ps = " ";
 
-      if (fts_is_int(&at[i]))
-	post("%d%s", fts_get_int(&at[i]), ps);
-      else if (fts_is_float(&at[i]))
-	post("%g%s", fts_get_float(&at[i]), ps);
-      else if (fts_is_symbol(&at[i]))
-	post("%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
-      else if (fts_is_void(&at[i]))
+      if (fts_is_int(at + i))
+	post("%d%s", fts_get_int(at + i), ps);
+      else if (fts_is_float(at + i))
+	post("%g%s", fts_get_float(at + i), ps);
+      else if (fts_is_symbol(at + i))
+	{
+	  fts_symbol_t sym = fts_get_symbol(at + i);
+	  
+	  if(symbol_contains_blank(sym))
+	    post("\"%s\"%s", fts_symbol_name(sym), ps);
+	  else
+	    post("%s%s", fts_symbol_name(sym), ps);
+	}
+      else if (fts_is_void(at + i))
 	post("<void>%s", ps);
       else
-	post("<%s>%s", fts_symbol_name(fts_get_type(&at[i])), ps);
+	post("<%s>%s", fts_symbol_name(fts_get_type(at + i)), ps);
     }
 }
 

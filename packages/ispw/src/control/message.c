@@ -166,7 +166,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 
 #define SEND_MESSAGE \
   if (ev_dest_is_object) \
-    { if(target) fts_message_send((fts_object_t *)target, fts_SystemInlet, ev_sym, ev_argc, ev_fp); } \
+    { if(target) fts_message_send((fts_object_t *)target, 0, ev_sym, ev_argc, ev_fp); } \
   else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 

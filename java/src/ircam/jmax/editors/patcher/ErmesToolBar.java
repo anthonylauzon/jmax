@@ -207,7 +207,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 
     addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
     addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");
-    addButton( "messconst", "_messconst_", path+"cursor_message.gif", "Adding New Message");
+    addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message");
     addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
     addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
     addButton( "outlet -1","_outlet_", path+"cursor_out.gif", "Adding New Outlet");

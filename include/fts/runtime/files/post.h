@@ -30,6 +30,7 @@
 /* definition file for  logging functions (post and co) */
 
 extern void post_vector(int n, float *fp);
+extern void post_symbol(fts_symbol_t sym);
 extern void post_atoms(int ac, const fts_atom_t *at);
 extern void post(const char *format , ...); 
 
