@@ -46,14 +46,15 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 		table.setGridColor(ircam.jmax.editors.sequence.renderers.PartitionBackground.horizontalGridLinesColor);
 		table.setShowGrid(true);				
 		/************/
-    JComboBox combo = new JComboBox( trackObj.getEventTypes());
-    combo.setBackground(Color.white);
-    typeEditor = new ComboCellEditor( combo);		
-		table.getColumnModel().getColumn(2).setCellEditor(typeEditor);
+    if(trackObj.getType() == AmbitusValue.info)
+		{
+			JComboBox combo = new JComboBox( trackObj.getEventTypes());
+			combo.setBackground(Color.white);
+			typeEditor = new ComboCellEditor( combo);		
+			table.getColumnModel().getColumn(2).setCellEditor(typeEditor);
+			combo.setFont(table.getFont());
+		}
 		/************/
-		
-    combo.setFont(table.getFont());
-    
     table.setPreferredScrollableViewportSize(new Dimension(600, 300));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);

@@ -26,23 +26,23 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * a mapper into the pitch value of the SequenceEvents
  */
-public class PitchMapper extends Mapper {
+public class PitchMapper extends DoubleMapper {
   
   /**
    * set the given pitch in the given event
    */
-  public void set(Event e, int val) 
+  public void set(Event e, double val) 
   {
-    e.setProperty("pitch", new Integer(val));
+    e.setProperty("pitch", new Double(val));
   }
 
 
   /**
    * get the pitch from the given event
    */
-    public int get(Event e) 
+    public double get(Event e) 
   {
-    return ((Integer)e.getProperty("pitch")).intValue();
+    return ((Double)e.getProperty("pitch")).doubleValue();
   }
 
     public String getName()
@@ -51,7 +51,7 @@ public class PitchMapper extends Mapper {
     }
   /**
    * access the static instance of the class */
-  static Mapper getMapper() 
+  static DoubleMapper getMapper() 
   {
     return itsPitchMapper;
   }

@@ -290,7 +290,8 @@ public void XORDraw(int dx, int dy)
 			// and make the keyboard in the MidiTrack a listener of such movements.
 			// (something like using the ircam.jmax.toolkit.DynamicDragListener).
 			if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
-				ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
+				//ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
+				ScoreBackground.pressKey((int)((Double)tempEvent.getProperty("pitch")).doubleValue(), getGc());
 			
 			if(movTrackEvent == last) 
 			{

@@ -55,7 +55,7 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
      */
   public int getY(Event e) 
   {  
-    int value = YMapper.get(e) - minValue;
+    int value = (int)YMapper.get(e) - minValue;
     int height = gc.getGraphicDestination().getSize().height;
     int range = getRange();
     float step = (float)((float)height/(float)range);

@@ -26,22 +26,22 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * A simple Mapper that accesses the Integer parameter
  */ 
-public class IntegerMapper extends Mapper {
+public class IntegerMapper extends DoubleMapper {
   
   /**
    * set the Integer of this event
    */
-  public void set(Event e, int value) 
+  public void set(Event e, double value) 
   {
-    e.setProperty("value", new Integer(value));
+    e.setProperty("value", new Integer((int)value));
   }
 
   /**
    * get the Integer of this event
    */
-  public int get(Event e) 
+  public double get(Event e) 
   {
-    return ((Integer)e.getProperty("value")).intValue();
+    return (double)((Integer)e.getProperty("value")).intValue();
   }
 
   public String getName()
@@ -52,7 +52,7 @@ public class IntegerMapper extends Mapper {
   /**
    * access the static instance
    */
-  public static Mapper getMapper() 
+  public static DoubleMapper getMapper() 
   {
     if (itsIntegerMapper == null)
        itsIntegerMapper = new IntegerMapper();

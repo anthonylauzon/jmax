@@ -71,8 +71,8 @@ abstract public class Adapter implements MappingListener{
      */
     public int getY(Event e) 
     {
-	if (YMapper != null) return YMapper.get(e);
-	else return 0;
+	    if (YMapper != null) return (int)YMapper.get(e);
+	    else return 0;
     }
 
     /**
@@ -210,8 +210,9 @@ abstract public class Adapter implements MappingListener{
 
   //--- Fields
   public DoubleMapper XMapper;
-  public Mapper YMapper;
-  public DoubleMapper LenghtMapper;
+  //public Mapper YMapper;
+  public DoubleMapper YMapper;
+	public DoubleMapper LenghtMapper;
 	public DoubleMapper HeigthMapper;
   public LabelsMapper LabelMapper;
 

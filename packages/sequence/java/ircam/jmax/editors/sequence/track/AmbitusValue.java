@@ -56,11 +56,14 @@ public void setProperty(String name, Object value)
 {
 	if(name.equals("pitch"))
 	{
-		if(value instanceof Double)
+		/*if(value instanceof Double)
 			value = new Integer( ((Double)value).intValue());
 		
 		if(((Integer)value).intValue() > 127)
-			value = new Integer(127);
+			value = new Integer(127);*/
+		if(((Double)value).intValue() > 127.0)
+			value = new Double(127.0);
+		
 		pitch = value;
 	}
 	else if(name.equals("duration"))

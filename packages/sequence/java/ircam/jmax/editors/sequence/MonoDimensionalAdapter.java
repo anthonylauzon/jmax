@@ -35,11 +35,11 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 
     public MonoDimensionalAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
     {
-	super(geometry, gc);
-	this.constant = constant;
-	
-	YMapper = IntegerMapper.getMapper();
-	viewMode = MonoTrackEditor.PEAKS_VIEW;
+			super(geometry, gc);
+			this.constant = constant;
+			
+			YMapper = IntegerMapper.getMapper();
+			viewMode = MonoTrackEditor.PEAKS_VIEW;
     }
 
     /**
@@ -49,12 +49,12 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
      */
     public int getY(Event e) 
     {  
-	int value = YMapper.get(e) - minValue;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)height/(float)range);
+			int value = (int)YMapper.get(e) - minValue;
+			int height = gc.getGraphicDestination().getSize().height;
+			int range = getRange();
+			float step = (float)((float)height/(float)range);
 	
-	return height - (int)(value*step);
+			return height - (int)(value*step);
     }
 
     /**
@@ -63,11 +63,11 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
      */
     public int getY(int y) 
     {  
-	int value = y - minValue;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)height/(float)range);
-	return height - (int)(value*step);
+			int value = y - minValue;
+			int height = gc.getGraphicDestination().getSize().height;
+			int range = getRange();
+			float step = (float)((float)height/(float)range);
+			return height - (int)(value*step);
     }
 
     /**
