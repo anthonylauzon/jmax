@@ -1833,31 +1833,11 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_client_send_message((fts_object_t *)this, sym_endPaste, 0, 0);
 }
 
-/****************************************************************/
-/****************************************************************/
-
-/* daemon for setting the number of inlets */
-static void
-patcher_set_ninlets(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *)obj;
-  int n_inlets = fts_get_int(value);
-
-  if(n_inlets != this->n_inlets)
-    patcher_redefine_number_of_inlets((fts_patcher_t *)obj, n_inlets);
-}
-
-/* daemon for setting the number of outlets */
-static void
-patcher_set_noutlets(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *)obj;
-  int n_outlets = fts_get_int(value);
-
-  if(n_outlets != this->n_outlets)
-    patcher_redefine_number_of_outlets((fts_patcher_t *)obj, n_outlets);
-}
-
+/***********************************************************************
+ *
+ * Class instantiation
+ *
+ */
 static void
 patcher_instantiate(fts_class_t *cl)
 {
@@ -1919,18 +1899,18 @@ patcher_instantiate(fts_class_t *cl)
  */
 
 /* assign variables to a patcher as found by the expression parser */
-void 
+#ifndef REIMPLEMENTING_VARIABLES
+static void 
 fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data)
 {
-#ifndef REIMPLEMENTING_VARIABLES
   fts_patcher_t *this = (fts_patcher_t *)data;
 
   if(! fts_variable_is_suspended(this, name))
     fts_variable_define(this, name);
 
   fts_variable_restore(this, name, value, (fts_object_t *)this);
-#endif
 }
+#endif
 
 fts_patcher_t *
 fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
