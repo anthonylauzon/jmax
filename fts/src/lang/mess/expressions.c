@@ -275,6 +275,7 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
   e->op_stack_p = -1;		/* point to the last actually used cell */
   e->count = 0;			/* result counter */
   e->props = 0;			/* init property assign list */
+  e->ret  = FTS_EXPRESSION_OK;	/* init return status */
 
   /* Expression pointer: no backtrack, so we just iterate once
      on the whole expression list */

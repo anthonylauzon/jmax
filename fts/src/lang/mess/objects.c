@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.26 $ IRCAM $Date: 1998/06/03 11:42:22 $
+ *      $Revision: 1.27 $ IRCAM $Date: 1998/06/04 14:01:18 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -196,20 +196,19 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 	  /* Compute the expressions with the correct offset */
 
 	  e = fts_expression_eval((fts_object_t *)patcher, aoc - 2, aot + 2, 1024, at);
-	  ac = fts_expression_get_count(e);
 	}
       else
 	{
 	  /* variable less syntax, consider everything as expressions */
 	  var = 0;
 	  e = fts_expression_eval((fts_object_t *)patcher, aoc, aot, 1024, at);
-
 	}
 
-      if (ac == -1)
+      if (fts_expression_get_status(e) == FTS_EXPRESSION_OK)
+	ac = fts_expression_get_count(e);
+      else
 	obj = fts_error_object_new(patcher, id, aoc, aot);
 
-      ac = fts_expression_get_count(e);
     }
 #endif
 
@@ -365,9 +364,9 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
 
       /* reallocate the description if argc > -0 and copy the arguments */
 
-      obj->argc = argc;
+      obj->argc = argc + 1;
       
-      obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
+      obj->argv = (fts_atom_t *) fts_block_zalloc((argc + 1) * sizeof(fts_atom_t));
 
       fts_set_symbol(&(obj->argv[0]), class_name);
 
