@@ -68,11 +68,13 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     if (width < 1) width = 1;
     
     // erase the old point
-    g.setColor(Color.white);
+    //g.setColor(Color.white);
+    g.setColor( backColor);
     g.fillRect(x, 0, width, gc.getGraphicDestination().getSize().height);
 
     // redraw it
-    g.setColor(Color.black);
+    //g.setColor(Color.black);
+    g.setColor( foreColor);
     
     if (itsMode == SOLID)
       {
@@ -91,7 +93,8 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   
     // draw the red line
     g.setColor(Color.red);
-    g.setXORMode(Color.white);
+    //g.setXORMode(Color.white);
+    g.setXORMode( backColor);
     g.fillRect(x, zero, width, 1);
     g.setPaintMode();
   }
@@ -161,7 +164,10 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   {
     itsMode = mode;
   }
-
+  public int getMode()
+  {
+    return itsMode;
+  }
   
   //--- Fields
 
@@ -171,5 +177,8 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   TopLayer itsTopLayer;
   public final static int HOLLOW = 0;
   public final static int SOLID = 1;
+  
+  Color backColor = new Color(247, 247, 247);
+  Color foreColor = new Color( 0, 0, 0, 60);
 }
 

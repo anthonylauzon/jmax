@@ -58,16 +58,16 @@ public class BpfPopupMenu extends JPopupMenu
     Tool tool;
     ButtonGroup toolsMenuGroup = new ButtonGroup();
     for(Enumeration e = BpfTools.instance.getTools(); e.hasMoreElements();)
-	{
-	    tool = (Tool)e.nextElement();
-	    aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
-	    aMenuItem.addActionListener(target.getGraphicContext().getToolManager());
-	    toolsMenuGroup.add(aMenuItem);
-	    add(aMenuItem);
-	}
-
+      {
+	tool = (Tool)e.nextElement();
+	aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
+	aMenuItem.addActionListener(target.getGraphicContext().getToolManager());
+	toolsMenuGroup.add(aMenuItem);
+	add(aMenuItem);
+      }
+    
     ((JRadioButtonMenuItem)getComponent(0)).setSelected(true);
-
+    
     addSeparator();    
 
     /////////////////// list /////////////////////////////////////
@@ -75,20 +75,20 @@ public class BpfPopupMenu extends JPopupMenu
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
-	    {
-		target.showListDialog();
-	    }
-    });
+	{
+	  target.showListDialog();
+	}
+      });
     add(item);
-
+    
     addSeparator();
     ////////////////////// others  //////////////////////////////
     item = new JMenuItem("Select All");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    target.getGraphicContext().getSelection().selectAll();
-	    target.getGraphicContext().getGraphicDestination().requestFocus();
+	  target.getGraphicContext().getSelection().selectAll();
+	  target.getGraphicContext().getGraphicDestination().requestFocus();
 	}
     });
     add(item);
@@ -110,11 +110,11 @@ public class BpfPopupMenu extends JPopupMenu
     rangePanel.add(labelRangeBox);    
 
     ActionListener rangeListener = new ActionListener(){
-	    public void actionPerformed( ActionEvent e)
-	    {
-		setRange();
-	    }
-	};
+	public void actionPerformed( ActionEvent e)
+	{
+	  setRange();
+	}
+      };
 
     JLabel maxLabel = new JLabel("max", JLabel.CENTER);
     maxValueField = new JTextField();
@@ -153,13 +153,13 @@ public class BpfPopupMenu extends JPopupMenu
 
     ///////////////////////////////////
     addPopupMenuListener(new PopupMenuListener(){
-	    public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
-	    public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
-	    {
-		setRange();
-	    }
-	    public void popupMenuCanceled(PopupMenuEvent e){}
-	});
+	public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
+	public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+	{
+	  setRange();
+	}
+	public void popupMenuCanceled(PopupMenuEvent e){}
+      });
 
     validate();
     pack();
@@ -167,25 +167,25 @@ public class BpfPopupMenu extends JPopupMenu
 
     public void setRange()
     {
-	try
-	    {
-		float min = Float.valueOf(minValueField.getText()).floatValue();
-		float max = Float.valueOf(maxValueField.getText()).floatValue();
-		target.getGraphicContext().getDataModel().setMinimumValue(min);
-		target.getGraphicContext().getDataModel().setMaximumValue(max);
-		target.getGraphicContext().getGraphicDestination().repaint();
-	    }
-	catch (NumberFormatException e1)
-	    {
-		System.err.println("Error:  invalid number format!");
-		return;
-	    }
+      try
+	{
+	  float min = Float.valueOf(minValueField.getText()).floatValue();
+	  float max = Float.valueOf(maxValueField.getText()).floatValue();
+	  target.getGraphicContext().getDataModel().setMinimumValue(min);
+	  target.getGraphicContext().getDataModel().setMaximumValue(max);
+	  target.getGraphicContext().getGraphicDestination().repaint();
+	}
+      catch (NumberFormatException e1)
+	{
+	  System.err.println("Error:  invalid number format!");
+	  return;
+	}
     }
 
   public void show(Component invoker, int x, int y)
   {
-      update();
-      super.show(invoker, x, y);
+    update();
+    super.show(invoker, x, y);
   }
     
   public void update()

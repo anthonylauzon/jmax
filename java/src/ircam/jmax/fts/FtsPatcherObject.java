@@ -890,7 +890,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     boolean isTemplate;
     int offset = 9;
 
-    if(error!=0)
+    if( error!=0)
       {
 	errorDescription = args[offset++].stringValue;
 	

@@ -58,8 +58,8 @@ public class TableTools implements ToolProvider{
      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;//??????????????????	 
      /*************************************************************/
 
-    tools[0] = new TableSelecter(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new PencilTool(new ImageIcon(path+"edit.gif"));
+    tools[0] = new PencilTool(new ImageIcon(path+"edit.gif"));
+    tools[1] = new TableSelecter(new ImageIcon(path+"arrow.gif"));
     tools[2] = new LinerTool(new ImageIcon(path+"liner.gif"));
     tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
   }

@@ -48,14 +48,12 @@ import javax.swing.undo.*;
  * This class takes care of creating all the components of an editing session
  * (tools, Renderer, ...) and link them togheter.
  */
-public class TablePanel extends JPanel implements StatusBarClient, TableDataListener, Editor{
+public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   //--- Fields  
   final static int SCROLLBAR_SIZE = 30;
   final static int PANEL_WIDTH = 500;
   final static int PANEL_HEIGHT = 240+SCROLLBAR_SIZE;
-
-  /*InfoPanel itsStatusBar;*/
 
   JScrollBar itsVerticalControl, itsHorizontalControl;
 
@@ -66,7 +64,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   TableRenderer itsTableRenderer;
   TableDataModel tableData;
   TableDisplay itsCenterPanel;
-  ToolManager toolManager;
+  TableToolManager toolManager;
 
   /*ScalePanel scalePanel;*/
 
@@ -80,9 +78,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
-
-    //make the NORTH Status bar 
-    //prepareStatusBar();
 
     prepareToolbarPanel();
     
@@ -110,31 +105,31 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
       public void valueChanged(ListSelectionEvent e)
 	{
 	  if (e.getValueIsAdjusting())
-	      return;
+	    return;
 	  itsCenterPanel.repaint();
 	}
-    });
+      });
 
     addComponentListener( new ComponentAdapter() {
-      public void componentResized(ComponentEvent e)
+	public void componentResized(ComponentEvent e)
 	{
-	    updateHorizontalScrollbar();
-	    updateVerticalScrollbar();
-	    gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-						      ((TableAdapter)gc.getAdapter()).getXZoom(), 
-						      gc.getVisiblePixelsSize());
-	    if(gc.getAdapter().getXZoom() > 0.5)		    
-		gc.getFtsObject().requestGetValues();
+	  updateHorizontalScrollbar();
+	  updateVerticalScrollbar();
+	  gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+						    ((TableAdapter)gc.getAdapter()).getXZoom(), 
+						    gc.getVisiblePixelsSize());
+	  if(gc.getAdapter().getXZoom() > 0.5)		    
+	    gc.getFtsObject().requestGetValues();
 	    else
-		gc.getFtsObject().requestGetPixels(0, 0);
+	      gc.getFtsObject().requestGetPixels(0, 0);
 	}
-    });
+      });
     //470 is the default size of the TableDisplay .......
     gc.getFtsObject().requestSetVisibleWindow(/*gc.getVisibleHorizontalScope()*/470, /*gc.getFirstVisibleIndex()*/0, 
 					      (float)1.0, gc.getVisiblePixelsSize());
     gc.getFtsObject().requestGetValues();
   }
-
+  
   void frameAvailable()
   {
     gc.setFrame(GraphicContext.getFrame(this));
@@ -142,39 +137,13 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     toolManager.activate(TableTools.getDefaultTool(), gc);
   }
 
-  /*private void prepareStatusBar()
-    {
-    JPanel northSection = new JPanel();
-    northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));    
-    itsStatusBar = new InfoPanel();    
-    itsStatusBar.setSize(300, 20);
-    northSection.add(itsStatusBar);
-    add(northSection, BorderLayout.NORTH);
-    }*/
-  
   private void prepareToolbarPanel()
   {
-    toolManager = new ToolManager(TableTools.instance);    
-    /*toolManager.addToolListener(new ToolListener(){
-      public void toolChanged(ToolChangeEvent e) 
-      {
-      if (e.getTool() != null) 
-      {
-      itsStatusBar.post(e.getTool(), "");			
-      }	    
-      }
-      });*/
+    toolManager = new TableToolManager( TableTools.instance);    
+    Tool arrow = toolManager.getToolByName("edit tool");     
+    toolManager.activate(arrow, null);
+
     toolbar = new EditorToolbar(toolManager, EditorToolbar.HORIZONTAL);
-    /*toolbar.setSize(60, 25);    
-      toolbar.setPreferredSize(new Dimension(60, 25));    
-      
-      JPanel toolbarPanel = new JPanel();
-      toolbarPanel.setSize(108, 25);
-      toolbarPanel.setPreferredSize(new Dimension(108, 25));
-      toolbarPanel.setLayout(new BorderLayout());
-      toolbarPanel.add(toolbar, BorderLayout.CENTER);
-      itsStatusBar.addWidgetAt(toolbarPanel, 2);
-      itsStatusBar.validate();*/
   }
 
   private void prepareCenterPanel()
@@ -183,11 +152,8 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setBorder(new EtchedBorder());
 
-    itsCenterPanel.setBounds(/*toolbarDimension.width+ScalePanel.scaleDimension.width, 
-			       InfoPanel.INFO_WIDTH,*/ 
-			     0,0, 
-			     getSize().width/*-toolbarDimension.width-ScalePanel.scaleDimension.width*/-SCROLLBAR_SIZE, 
-			     getSize().height/*-InfoPanel.INFO_HEIGHT*/-SCROLLBAR_SIZE);
+    itsCenterPanel.setBounds(0,0, getSize().width-SCROLLBAR_SIZE, 
+			     getSize().height-SCROLLBAR_SIZE);
 
     add(itsCenterPanel, BorderLayout.CENTER);
     validate();
@@ -200,7 +166,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     gc.setGraphicSource(itsCenterPanel);
     gc.setGraphicDestination(itsCenterPanel);
     gc.setCoordWriter(new CoordinateWriter(gc));
-    gc.setToolManager(toolManager);
+    gc.setToolManager( toolManager);
     gc.setSelection(new TableSelection(tableData));
     TableAdapter ta = new TableAdapter(tableData, itsCenterPanel.getSize(), gc.getVerticalMaximum());
 
@@ -237,7 +203,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
       });
 
     gc.setAdapter(ta);
-    //gc.setStatusBar(itsStatusBar);
   }
 
   private void prepareVerticalScrollbar()
@@ -366,29 +331,12 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 	  }    
   }
 
-    public void setMaximumValue(int value)
-    {
-	gc.setVerticalMaximum(value);
-	itsVerticalControl.setMaximum(value);
-	itsVerticalControl.setMinimum(-value);
-	updateVerticalScrollbar();
-    }
-
-  /**
-   * from the StatusBarClient interface
-   */
-  public String getName() 
+  public void setMaximumValue(int value)
   {
-    return "";
-  }
-
-
-  /**
-   * from the StatusBarClient interface
-   */
-  public ImageIcon getIcon() 
-  {
-    return null;
+    gc.setVerticalMaximum(value);
+    itsVerticalControl.setMaximum(value);
+    itsVerticalControl.setMinimum(-value);
+    updateVerticalScrollbar();
   }
 
   /**

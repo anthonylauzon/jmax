@@ -73,7 +73,7 @@ public class TableGraphicContext extends GraphicContext{
   CoordinateWriter itsWriter;
   //EditorToolbar toolbar;
   TableSelection itsSelection;
-  ToolManager toolManager;
+  TableToolManager toolManager;
 
   public TableDataModel getDataModel()
   {
@@ -123,11 +123,11 @@ public class TableGraphicContext extends GraphicContext{
     return toolbar;
     }*/
 
-  public void setToolManager(ToolManager tm)
+  public void setToolManager( TableToolManager tm)
   {
     toolManager = tm;
   }
-  public ToolManager getToolManager()
+  public TableToolManager getToolManager()
   {
     return toolManager;
   }
