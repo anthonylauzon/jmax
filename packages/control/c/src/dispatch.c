@@ -48,7 +48,7 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(method)
 	method(obj, fts_system_inlet, fts_s_send, ac, at);
       else
-	fts_object_error(o, "cannot dispatch to object %s", s);
+	fts_object_error(o, "cannot dispatch to object %s", fts_symbol_name(s));
     }
   else
     fts_outlet_send(o, 2, s, ac, at);

@@ -1,3 +1,9 @@
+2003-12-15  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* added fts_symbol_name() calls to several files
+
+	* removed newline characters from the end of strings used in calls to fts_object_error() (errors are always single line)
+
 2003-12-11  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/alsa/c/src/alsaaudio.h, packages/alsa/c/src/alsaaudiomanager.c, packages/alsa/c/src/alsaaudioport.c, packages/alsa/c/src/alsamidi.h, packages/alsa/c/src/alsaseqmidi.h: added defines for ALSA API change between 0.9 and 1.0 version.	
@@ -36,6 +42,12 @@
 	
 	* changed osc~, phi~ and wave~ classes for MacOS X for using DSP code based on fts_intphase_t instead of fts_wrapper_t (both in <fts/packages/utils/utils.h>)
 	  (only by including osc_intphase.c and wave_intphase.c instead of the _ieeewrap.c files to the Xcode projet)
+
+	* introduced fts_object_set_dirty() replacing fts_patcher_set_dirty() (staying for FTS private use)
+
+	* introduced fts_get_class_by_name() replacing fts_class_get_by_name() (removed!!)
+
+	* (re-)introduced fts_symbol_name() macro (with empty definition for jMax) to gain flexibility when embedding FTS into different contexts
 
 2003-11-14  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 

@@ -291,8 +291,7 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
       for(k=0; k<ac; k++)
 	{
 	  /* ooops! */
-	  /*if( a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)*/
-	  if( fts_atom_same_type(&a, &at[k]) && a.value.fts_int == at[k].value.fts_int)
+	  if(fts_atom_same_type(&a, &at[k]) && fts_get_int(&a) == fts_get_int(&at[k]))
 	    {
 	      skip = 1;
 	      break;
@@ -522,10 +521,10 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_read_atom_file_newline(this, file_name);
 
       if(size <= 0)
-	fts_post("mat: can't import from text file \"%s\"\n", file_name);
+	fts_post("mat: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
-    fts_post("mat: unknown import file format \"%s\"\n", file_format);
+    fts_post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
 static void
@@ -549,10 +548,10 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_write_atom_file_newline(this, file_name);
 
       if(size < 0)
-	fts_post("mat: can't export to text file \"%s\"\n", file_name);
+	fts_post("mat: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
-    fts_post("mat: unknown export file format \"%s\"\n", file_format);
+    fts_post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
 static void

@@ -141,7 +141,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(!check_args(ac, at, &type, &real_spec))
     {
-      fts_object_error(o, "bad arguments\n");
+      fts_object_error(o, "bad arguments");
       return;
     }
 
@@ -183,7 +183,7 @@ ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(!check_args(ac, at, &type, &real_spec))
     {
-      fts_object_error(o, "bad arguments\n", x->name);
+      fts_object_error(o, "bad arguments", x->name);
       return;
     }
 

@@ -126,7 +126,7 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	      track_append_event(this->recording, here, event);
 	    }
 	  else
-	    fts_object_error(o, "Cannot record event of type %s", fts_get_class_name(at));
+	    fts_object_error(o, "Cannot record event of type %s", fts_symbol_name(fts_get_class_name(at)));
 	}
     }
 }

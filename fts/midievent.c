@@ -484,7 +484,7 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int type = fts_midievent_get_type(this);
 
-  fts_spost(stream, "(:midievent %s ", fts_midi_types[type]);
+  fts_spost(stream, "(:midievent %s ", fts_symbol_name(fts_midi_types[type]));
 
   switch (type)
   {

@@ -512,7 +512,7 @@ scoob_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     
     if(!fts_is_void(a))
     {
-      fts_spost(stream, ", %s: ", scoob_properties[i].name);
+      fts_spost(stream, ", %s: ", fts_symbol_name(scoob_properties[i].name));
       fts_spost_atoms(stream, 1, a);
     }
   }

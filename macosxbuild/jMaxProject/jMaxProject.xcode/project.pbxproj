@@ -351,6 +351,19 @@
 			settings = {
 			};
 		};
+		5CE48A4B057CCA5E0077F4A6 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p jMaxSDK/include; cp ../../include/*.h ./jMaxSDK/include";
+		};
 //5C0
 //5C1
 //5C2
@@ -527,6 +540,7 @@
 		};
 		F527AE1C03D30629016640F1 = {
 			buildPhases = (
+				5CE48A4B057CCA5E0077F4A6,
 				F522D43103D32DA5016640F1,
 				F522D43603D40A07016640F1,
 				F522D43703D40A5B016640F1,
@@ -17162,7 +17176,7 @@
 			expectedFileType = sourcecode.java;
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			name = RunCtrlInteraction.java;
+			name = "ÒunCtrlInteraction.java";
 			path = ../../java/src/ircam/jmax/editors/patcher/interactions/RunCtrlInteraction.java;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;

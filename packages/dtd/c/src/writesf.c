@@ -81,7 +81,7 @@ static void create_writer_thread(writesf_t* self)
   if (0 == thread_job->method)
   {
     fts_log("[readsf~] no such method \n");
-    fts_object_error((fts_object_t*)self, "no such method, init failed \n");
+    fts_object_error((fts_object_t*)self, "no such method, init failed");
     fts_free(thread_job);
     return;
   }

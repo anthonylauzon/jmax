@@ -283,11 +283,11 @@ static void expression_stack_init( fts_expression_t *exp)
 static fts_symbol_t 
 concatenate_symbol( fts_atom_t *left, fts_atom_t *right)
 {
-  fts_symbol_t lsym, rsym;
+  const char *lsym, *rsym;
   char *buffer;
 
-  lsym = fts_get_symbol( left);
-  rsym = fts_get_symbol( right);
+  lsym = fts_symbol_name(fts_get_symbol( left));
+  rsym = fts_symbol_name(fts_get_symbol( right));
   buffer = alloca( strlen( lsym) + strlen( rsym) + 1);
 
   strcpy( buffer, lsym);
@@ -299,11 +299,11 @@ concatenate_symbol( fts_atom_t *left, fts_atom_t *right)
 static fts_symbol_t 
 concatenate_symbol_int( fts_atom_t *left, fts_atom_t *right)
 {
-  fts_symbol_t sym;
+  const char *sym;
   int r, len;
   char *buffer;
 
-  sym = fts_get_symbol( left);
+  sym = fts_symbol_name(fts_get_symbol( left));
   len = strlen( sym);
   buffer = alloca( len + 256);
 
@@ -316,11 +316,11 @@ concatenate_symbol_int( fts_atom_t *left, fts_atom_t *right)
 static fts_symbol_t 
 concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
 {
-  fts_symbol_t sym;
+  const char *sym;
   int r;
   char *buffer;
 
-  sym = fts_get_symbol( right);
+  sym = fts_symbol_name(fts_get_symbol( right));
   buffer = alloca( strlen( sym) + 256);
 
   sprintf( buffer, "%d", fts_get_int( left));

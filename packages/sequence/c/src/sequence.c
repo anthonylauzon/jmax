@@ -274,9 +274,9 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       char *error = fts_midifile_get_error(file);
 
       if(error)
-        fts_object_error(o, "import: read error in \"%s\" (%s)\n", name, error);
+        fts_object_error(o, "import: read error in \"%s\" (%s)", fts_symbol_name(name), error);
       else if(size <= 0)
-        fts_object_error(o, "import: couldn't get any data from \"%s\"\n", fts_midifile_get_name(file));
+        fts_object_error(o, "import: couldn't get any data from \"%s\"", fts_symbol_name(fts_midifile_get_name(file)));
 
       fts_midifile_close(file);
 
@@ -286,7 +286,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       fts_object_update_name(o);
     }
     else
-      fts_object_error(o, "import: cannot open \"%s\"\n", name);
+      fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
   }
 }
 
@@ -427,12 +427,12 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_symbol_t track_name = track_get_name(track);
       fts_class_t *track_type = track_get_type(track);
       int track_size = track_get_size(track);
-      const char *name_str = track_name? track_name: "untitled";
+      const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
 
       if(track_type != NULL)
       {
         fts_symbol_t type_name = fts_class_get_name(track_type);
-        fts_spost(stream, "  track %d: \"%s\" %d %s event(s)\n", i, name_str, track_size, type_name);
+        fts_spost(stream, "  track %d: \"%s\" %d %s event(s)\n", i, name_str, track_size, fts_symbol_name(type_name));
       }
       else
         fts_spost(stream, "  track %d: \"%s\" %d event(s)\n", i, name_str, track_size);

@@ -44,6 +44,9 @@
 */
 FTS_API fts_symbol_t fts_new_symbol( const char *name);
 
+/* get string from symbol (symbol might be more than just a string) */
+#define fts_symbol_name(s) (s)
+
 /*
   Predefined symbols. See predefsymbols.h
 */

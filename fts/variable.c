@@ -224,7 +224,7 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 
     if(!fts_is_void(&def->value))
     {
-      const char *str = name;
+      const char *str = fts_symbol_name(name);
       int len = strlen(str);
       char *new_str = alloca((len + 10) * sizeof(char));
       int num = 0;

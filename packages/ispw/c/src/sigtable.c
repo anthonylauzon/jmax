@@ -89,7 +89,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       
       if(sampbuf_name_already_registered(name))
 	{
-	  fts_object_error(o, "table %s multiply defined\n", name);
+	  fts_object_error(o, "table %s multiply defined", name);
 	  return;
 	}
       
@@ -108,7 +108,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     }
   else
     {
-      fts_object_error(o, "name required\n");
+      fts_object_error(o, "name required");
       return;
     }
 }

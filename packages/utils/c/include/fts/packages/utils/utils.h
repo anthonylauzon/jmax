@@ -23,7 +23,7 @@
 
 
 #include <fts/fts.h>
-#include <fts/config.h>
+#include <ftsconfig.h>
 #include <math.h>
 
 #ifdef WIN32

@@ -176,7 +176,7 @@ static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     self->label = fts_audiolabel_get(label_name);
     if (NULL == self->label)
     {
-      fts_object_error(o, "no audiolabel named: %s\n", label_name);
+      fts_object_error(o, "no audiolabel named: %s", label_name);
       return;
     }
     self->label_name = label_name;

@@ -76,10 +76,11 @@ FTS_API void fts_object_destroy(fts_object_t *obj);
 #define fts_object_release(o) ((--(((fts_object_t *)(o))->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
 #define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
 
-/* client id */
+/* client */
 #define fts_object_get_id(o) ((o)->flag.id)
 #define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
 #define fts_object_get_client_id(o) ((o)->flag.client_id)
+FTS_API void fts_object_upload(fts_object_t *obj);
 
 /* class */
 #define fts_object_get_class(o) ((o)->cl)

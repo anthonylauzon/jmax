@@ -84,7 +84,7 @@ fts_atomfile_check( fts_symbol_t file_name)
 }
 
 fts_atom_file_t *
-fts_atom_file_open(const char *name, const char *mode)
+fts_atom_file_open(fts_symbol_t name, const char *mode)
 {
   fts_atom_file_t *f;
   char buf[MAXPATHLEN];
@@ -95,14 +95,14 @@ fts_atom_file_open(const char *name, const char *mode)
 
   if (f->mode == 'w')
     {
-      fts_make_absolute_path( NULL, name, buf, MAXPATHLEN);
+      fts_make_absolute_path( NULL, fts_symbol_name(name), buf, MAXPATHLEN);
       f->fd = fopen( buf, mode);
     }
   else
     {
       /* anything else is like 'r' */
 
-      if (fts_file_find( name, buf, MAXPATHLEN) == NULL)
+      if (fts_file_find( fts_symbol_name(name), buf, MAXPATHLEN) == NULL)
 	return 0;
 
       f->fd = fopen( buf, mode);
@@ -454,7 +454,7 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
     sprintf(buf, "%#f%c", fts_get_float(at), separator);
   else if (fts_is_symbol(at))
     {
-      const char *sym_str = fts_get_symbol(at);
+      const char *sym_str = fts_symbol_name(fts_get_symbol(at));
 
       if(strlen(sym_str) == 1 && IS_ATOM_CHAR(sym_str[0]))
 	{

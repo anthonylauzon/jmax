@@ -161,7 +161,7 @@ fts_audiofile_open_read(fts_symbol_t filename)
       if (fts_file_find( filename, buf, MAXPATHLEN) == NULL)
 	return NULL;
       
-      aufile = audiofile_new( buf, fts_s_read);
+      aufile = audiofile_new(fts_new_symbol(buf), fts_s_read);
 
       /* open file */
       ret = fts_audiofile_loader->open_read(aufile);
@@ -191,7 +191,7 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
       fts_make_absolute_path( NULL, filename, buf, MAXPATHLEN);
 
       aufile = audiofile_new(filename, fts_s_write);
-      suffix = strrchr(filename, '.');
+      suffix = strrchr(fts_symbol_name(filename), '.');
 
       aufile->channels = channels;
       aufile->sample_rate = sample_rate;

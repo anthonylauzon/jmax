@@ -56,7 +56,7 @@ seqmess_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   seqmess_t *this = (seqmess_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  fts_spost(stream, "(:seqmess %s)", this->s);
+  fts_spost(stream, "(:seqmess %s)", fts_symbol_name(this->s));
 }
 
 static void

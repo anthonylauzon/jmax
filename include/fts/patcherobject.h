@@ -92,9 +92,6 @@ FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 #define fts_object_inlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->in_conn[(i)] != 0): 0)
 #define fts_object_outlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->out_conn[(i)] != 0): 0)
 
-/* client */
-FTS_API void fts_object_upload(fts_object_t *obj);
-
 /* package */
 FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);
 

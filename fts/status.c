@@ -27,7 +27,7 @@ fts_status_new( fts_symbol_t description)
 {
   fts_status_t status = (fts_status_t)fts_malloc( sizeof( fts_status_description_t));
 
-  status->description = description;
+  status->description = fts_symbol_name(description);
 
   return status;
 }

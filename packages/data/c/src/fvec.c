@@ -257,12 +257,12 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
       if(n > 0)
 	fvec_set_size(vec, n);
       else
-	fts_object_error((fts_object_t *)vec, "cannot load from file \"%s\"\n", file_name);
+	fts_object_error((fts_object_t *)vec, "cannot load from file \"%s\"", fts_symbol_name(file_name));
       
       fts_atom_file_close(file);
     }
   else
-    fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
+    fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"", fts_symbol_name(file_name));
   
   return n;
 }
@@ -305,7 +305,7 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
       
       if(onset > 0 && fts_audiofile_seek(sf, onset) != 0) 
 	{
-	  fts_object_error((fts_object_t *)vec, "cannot seek position in file \"%s\"\n", file_name);
+	  fts_object_error((fts_object_t *)vec, "cannot seek position in file \"%s\"", fts_symbol_name(file_name));
 	  fts_audiofile_close(sf);
 	  return 0;
 	}
@@ -322,13 +322,13 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
       
       if(size <= 0)
 	{
-	  fts_object_error((fts_object_t *)vec, "cannot load from soundfile \"%s\"\n", file_name);
+	  fts_object_error((fts_object_t *)vec, "cannot load from soundfile \"%s\"", fts_symbol_name(file_name));
 	  size = 0;
 	}
     }
   else
     {
-      fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
+      fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"", fts_symbol_name(file_name));
       fts_audiofile_close(sf);
     }
 
@@ -1474,12 +1474,12 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_read_atom_file(this, file_name);
       
       if(size <= 0)
-	fts_object_error(o, "cannot import from text file \"%s\"\n", file_name);
+	fts_object_error(o, "cannot import from text file \"%s\"", fts_symbol_name(file_name));
       else
 	data_object_set_dirty( o);
     }
   else
-    fts_object_error(o, "unknown import file format \"%s\"\n", file_format);
+    fts_object_error(o, "unknown import file format \"%s\"", fts_symbol_name(file_format));
 }
 
 static void
@@ -1498,10 +1498,10 @@ fvec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_write_atom_file(this, file_name);
       
       if(size < 0)
-	fts_object_error(o, "cannot export to text file \"%s\"\n", file_name);
+	fts_object_error(o, "cannot export to text file \"%s\"", fts_symbol_name(file_name));
     }
   else
-    fts_object_error(o, "export file format \"%s\"\n", file_format);
+    fts_object_error(o, "export file format \"%s\"", fts_symbol_name(file_format));
 }
 
 static void
@@ -1574,11 +1574,11 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
 	  fts_audiofile_close(sf);
     
 	  if(size <= 0)
-	    fts_object_error(o, "cannot save to soundfile \"%s\"\n", file_name);
+	    fts_object_error(o, "cannot save to soundfile \"%s\"", fts_symbol_name(file_name));
 	}
       else
 	{
-	  fts_object_error(o, "cannot open soundfile to write \"%s\"\n", file_name);
+	  fts_object_error(o, "cannot open soundfile to write \"%s\"", fts_symbol_name(file_name));
 	  fts_audiofile_close(sf);
 	}
     }
@@ -1885,7 +1885,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
         size = fvec_load_audiofile(this, file_name, 0, 0);
 
       if(size == 0)
-	fts_object_error(o, "cannot load fvec from file \"%s\"", file_name);
+	fts_object_error(o, "cannot load fvec from file \"%s\"", fts_symbol_name(file_name));
 
       data_object_persistence_args(o);
     }

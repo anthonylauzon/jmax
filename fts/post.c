@@ -135,10 +135,10 @@ static int mempost_float( char **pp, int *psize, int offset, double f)
 
 static int mempost_symbol( char **pp, int *psize, int offset, fts_symbol_t s)
 {
-  if ( strchr( s, ' ') != NULL)
-    return mempost( pp, psize, offset, "\"%s\"", s);
+  if ( strchr( fts_symbol_name(s), ' ') != NULL)
+    return mempost( pp, psize, offset, "\"%s\"", fts_symbol_name(s));
 
-  return mempost( pp, psize, offset, "%s", s);
+  return mempost( pp, psize, offset, "%s", fts_symbol_name(s));
 }
 
 static int 
@@ -246,20 +246,37 @@ check_symbol_in( fts_symbol_t s, fts_symbol_t *symbols)
   return 0;
 }
 
-static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "**", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", 0};
-static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", 0};
-static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "^", ";", 0 };
-static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", 0 };
-static fts_symbol_t operators[] = { "$", ";", ",", "(", ")", "[", "]", "{", "}", "+", "-", "*", "/", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", 0};
+static const char *want_a_space_before_strings[] = {"+", "-", "*", "/", "**", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<="};
+static const char *dont_want_a_space_before_strings[] = {")", "[", "]", "}", ",", ";"};
+static const char *want_a_space_after_strings[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "^", ";"};
+static const char *dont_want_a_space_after_strings[] = { "(", "[", "{", "$", "'"};
+static const char *operator_strings[] = { "$", ";", ",", "(", ")", "[", "]", "{", "}", "+", "-", "*", "/", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<="};
 
-static void init_punctuation( void)
+static fts_symbol_t want_a_space_before_symbols[sizeof(want_a_space_before_strings)/sizeof(const char *)];
+static fts_symbol_t dont_want_a_space_before_symbols[sizeof(want_a_space_after_strings)/sizeof(const char *)];
+static fts_symbol_t want_a_space_after_symbols[sizeof(want_a_space_after_strings)/sizeof(const char *)];
+static fts_symbol_t dont_want_a_space_after_symbols[sizeof(dont_want_a_space_after_strings)/sizeof(const char *)];
+static fts_symbol_t operator_symbols[sizeof(operator_strings)/sizeof(const char *)];
+
+static void 
+init_punctuation( void)
 {
-  int i, j;
-  fts_symbol_t *p, *tab[] = { want_a_space_before_symbols, dont_want_a_space_before_symbols, want_a_space_after_symbols, dont_want_a_space_after_symbols, operators};
+  int i;
 
-  for ( i = 0; i < sizeof( tab)/sizeof( fts_symbol_t *); i++)
-    for ( j = 0, p = tab[i]; *p; p++)
-      *p = fts_new_symbol( *p);
+  for(i=0; i<sizeof(want_a_space_before_strings)/sizeof(const char *); i++)
+    want_a_space_before_symbols[i] = fts_new_symbol(want_a_space_before_strings[i]);
+  
+  for(i=0; i<sizeof(dont_want_a_space_before_strings)/sizeof(const char *); i++)
+    dont_want_a_space_before_symbols[i] = fts_new_symbol(dont_want_a_space_before_strings[i]);
+  
+  for(i=0; i<sizeof(want_a_space_after_strings)/sizeof(const char *); i++)
+    want_a_space_after_symbols[i] = fts_new_symbol(want_a_space_after_strings[i]);
+  
+  for(i=0; i<sizeof(dont_want_a_space_after_strings)/sizeof(const char *); i++)
+    dont_want_a_space_after_symbols[i] = fts_new_symbol(dont_want_a_space_after_strings[i]);
+  
+  for(i=0; i<sizeof(operator_strings)/sizeof(const char *); i++)
+    operator_symbols[i] = fts_new_symbol(operator_strings[i]);
 }
 
 #define want_a_space_before(v) (fts_is_symbol(v)? check_symbol_in( fts_get_symbol(v), want_a_space_before_symbols): 0)
@@ -270,12 +287,14 @@ static void init_punctuation( void)
 static int 
 needs_quote( fts_symbol_t s)
 {
-  if (check_symbol_in( s, operators))
+  const char *c = fts_symbol_name(s);
+  
+  if (check_symbol_in( s, operator_symbols))
     return 0;
 
-  while( *s != '\0')
+  while( *c != '\0')
     {	    
-      switch (*s) {
+      switch (*c) {
       case '$':
       case ';':
       case ',':
@@ -292,7 +311,7 @@ needs_quote( fts_symbol_t s)
 	return 1;
       }
 
-      s++;
+      c++;
     }
 
   return 0;

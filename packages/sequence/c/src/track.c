@@ -693,10 +693,10 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       track_add_event(this, time, event);
     }
     else
-      fts_object_error(o, "insert: event type missmatch\n");
+      fts_object_error(o, "insert: event type missmatch");
   }
   else
-    fts_object_error(o, "insert: bad time value\n");
+    fts_object_error(o, "insert: bad time value");
 }
 
 static void
@@ -747,12 +747,12 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     if(track_type == NULL)
       fts_spost(stream, "<empty track>\n");
     else
-      fts_spost(stream, "<empty %s track>\n", fts_class_get_name(track_type));
+      fts_spost(stream, "<empty %s track>\n", fts_symbol_name(fts_class_get_name(track_type)));
   }
   else
   {
     if(track_type != NULL)
-      fts_spost(stream, "<%s ", fts_class_get_name(track_type));
+      fts_spost(stream, "<%s ", fts_symbol_name(fts_class_get_name(track_type)));
     else
       fts_spost(stream, "<");
 
@@ -1124,9 +1124,9 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     error = fts_midifile_get_error(file);
 
     if(error)
-      fts_object_error(o, "import: read error in \"%s\" (%s)\n", name, error);
+      fts_object_error(o, "import: read error in \"%s\" (%s)", fts_symbol_name(name), error);
     else if(size <= 0)
-      fts_object_error(o, "import: couldn't get any data from \"%s\"\n", name);
+      fts_object_error(o, "import: couldn't get any data from \"%s\"", fts_symbol_name(name));
 
     fts_midifile_close(file);
 
@@ -1134,7 +1134,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       track_upload(o, 0, 0, 0, 0);
   }
   else
-    fts_object_error(o, "import: cannot open \"%s\"\n", name);
+    fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
 }
 
 static void
@@ -1146,7 +1146,7 @@ track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   char str[1024];
   fts_atom_t a[4];
 
-  snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
+  snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol(str);
 
   fts_set_symbol(a, seqsym_import_midifile);
@@ -1173,7 +1173,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_error(o, "import: wrong arguments");
   }
   else
-    fts_object_error(o, "import: cannot import MIDI file to track of type %s", type);
+    fts_object_error(o, "import: cannot import MIDI file to track of type %s", fts_symbol_name(fts_class_get_name(type)));
 }
 
 static void
@@ -1189,14 +1189,14 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     char *error = fts_midifile_get_error(file);
 
     if(error)
-      fts_object_error(o, "export: write error in \"%s\" (%s)\n", error, name);
+      fts_object_error(o, "export: write error in \"%s\" (%s)", error, fts_symbol_name(name));
     else if(size <= 0)
-      fts_object_error(o, "export: couldn't write any data to \"%s\"\n", name);
+      fts_object_error(o, "export: couldn't write any data to \"%s\"", fts_symbol_name(name));
 
     fts_midifile_close(file);
   }
   else
-    fts_object_error(o, "export: cannot open \"%s\"\n", name);
+    fts_object_error(o, "export: cannot open \"%s\"", fts_symbol_name(name));
 }
 
 static void
@@ -1208,9 +1208,11 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   char str[1024];
   fts_atom_t a[4];
 
-  snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
+  snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol(str);
 
+  /* fts_client_open_file_dialog(seqsym_export_midifile, fts_new_symbol("Save standard MIDI file"), fts_project_get_dir(), default_name) */
+  
   fts_set_symbol(a, seqsym_export_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_project_get_dir());
@@ -1486,7 +1488,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
           this->type = fts_get_class_by_name(class_name);
 
         if(this->type == NULL)
-          fts_object_error(o, "cannot create track of %s", class_name);
+          fts_object_error(o, "cannot create track of %s", fts_symbol_name(class_name));
       }
     }
     else

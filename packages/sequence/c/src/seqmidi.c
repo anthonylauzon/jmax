@@ -35,7 +35,7 @@
 static void
 get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
 {
-  const char *s = name;
+  const char *s = fts_symbol_name(name);
   int size;
   int i = strlen(s) - 1;
 
@@ -595,6 +595,43 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
       
       return data.size;
     }
+  else if(track_type == NULL)
+  {
+    seqmidi_write_data_t data;
+    event_t *event;
+    
+    fts_midifile_set_user_data(file, &data);
+    
+    data.track = track;
+    data.size = 0;
+    
+    /* write file header */
+    fts_midifile_write_header(file, 0, 1, 384);
+    fts_midifile_write_track_begin(file);
+    fts_midifile_write_tempo(file, 500000);
+    
+    /* write events */
+    event = track_get_first(track);
+    while(event)
+    {
+      fts_object_t *obj = fts_get_object(&event->value);
+      
+      if(fts_object_get_class(obj) == fts_midievent_type)
+      {
+        double time = event_get_time(event);
+        long time_in_ticks = fts_midifile_time_to_ticks(file, time);
+        
+        fts_midifile_write_midievent(file, time_in_ticks, (fts_midievent_t *)obj);
+        data.size++;
+      }
+      event = event_get_next(event);
+    }  
+    
+    /* close file */
+    fts_midifile_write_track_end(file);
+    
+    return data.size;
+  }
   else
     return 0;
 }
