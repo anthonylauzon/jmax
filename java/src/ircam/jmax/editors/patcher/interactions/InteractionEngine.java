@@ -515,6 +515,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
     sketch.setKeyEventClient(null);
     sketch.requestFocus();
+    sketch.getToolBar().transferFocus();
   }
 
   public void mouseReleased( MouseEvent e)
