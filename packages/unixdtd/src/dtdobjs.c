@@ -638,11 +638,6 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   writesf_t *this = (writesf_t *)o;
   int n_channels;
 
-  /* *************** */
-  fts_object_set_error( o, "Not yet implemented");
-  return;
-  /* *************** */
-
   ac--;
   at++;
 
