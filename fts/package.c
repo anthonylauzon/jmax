@@ -1426,6 +1426,9 @@ static void
 __fts_package_save_as_default(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a[1];
+  fts_package_t* self = (fts_package_t*)o;
+  /* force saving of package even with dirty flag */
+  self->dirty = 1;
 
   fts_set_symbol( a, fts_get_user_project());
   __fts_package_save( o, 0, s, 1, a);
