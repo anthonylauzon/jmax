@@ -50,4 +50,6 @@ DATA_API fts_class_t *tabeditor_type;
 DATA_API void tabeditor_insert_append(tabeditor_t *tabeditor, int onset, int ac, const fts_atom_t *at);
 DATA_API void tabeditor_send( tabeditor_t *tabeditor);
 
+DATA_API int tabeditor_get_size( tabeditor_t *tabeditor);
+
 #endif
