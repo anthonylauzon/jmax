@@ -20,6 +20,11 @@ extern const char *fts_symbol_name(fts_symbol_t sym)
 
 #define fts_symbol_name(sym)      ((sym)->name)
 
+#define fts_symbol_get_operator(sym)       ((sym)->operator)
+#define fts_symbol_set_operator(sym, op)   ((sym)->operator = (op))
+#define fts_symbol_is_operator(sym)        ((sym)->operator != (-1))
+
+
 /* Predefined symbols used in the lang module */
 
 
@@ -93,6 +98,15 @@ extern fts_symbol_t fts_s_outlet;
 extern fts_symbol_t fts_s_qlist;
 extern fts_symbol_t fts_s_table;
 extern fts_symbol_t fts_s_explode;
+
+/* Operator symbols (also $ is an operator) */
+
+extern fts_symbol_t fts_s_plus;
+extern fts_symbol_t fts_s_minus;
+extern fts_symbol_t fts_s_times;
+extern fts_symbol_t fts_s_div;
+extern fts_symbol_t fts_s_open_par;
+extern fts_symbol_t fts_s_closed_par;
 
 #endif
 

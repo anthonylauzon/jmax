@@ -37,7 +37,6 @@ public class FtsConnection
     this.inlet  = inlet;
 
     from.getParent().addConnectionToContainer(this);
-    from.setDirty();
   }
 
   /**

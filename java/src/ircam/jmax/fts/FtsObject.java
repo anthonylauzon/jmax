@@ -318,9 +318,19 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void put(String name, Object value)
   {
-    Fts.getServer().putObjectProperty(this, name, value);
+    Object old;
 
-    localPut(name, value);
+    old = get(name);
+    
+    if ((old == null) || (! old.equals(value)))
+      {
+	if (FtsPropertyDescriptor.isPersistent(name))
+	  setDirty();
+
+	Fts.getServer().putObjectProperty(this, name, value);
+
+	localPut(name, value);
+      }
   }
 
   /** Check if a property correspond to a Java builtin property
@@ -431,11 +441,6 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   void localPut(String name, Object value)
   {
-    /* if the object has been succesfully created, set the parent dirty */
-
-    if (FtsPropertyDescriptor.isPersistent(name))
-      setDirty();
-
     // local and hardcoded properties
 
     if (! builtinPut(name, value))

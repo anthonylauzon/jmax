@@ -414,10 +414,6 @@ public class MaxApplication extends Object
 	quitDialog.dispose();
       }
 
-    // Now, the quit is sure, we execute the exit hooks
-
-    runHooks("exit");
-
     // dispose (and optionally save) all the documents
 
     for (int i = 0; i < types.getSize(); i++)
@@ -465,6 +461,10 @@ public class MaxApplication extends Object
 	      }
 	  }
       }
+
+    // Now, the quit is sure, we execute the exit hooks
+
+    runHooks("exit");
 
     if (ConsoleWindow.getConsoleWindow() != null)
       {

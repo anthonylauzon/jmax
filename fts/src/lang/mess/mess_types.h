@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.9 $ IRCAM $Date: 1998/05/13 16:04:33 $
+ *      $Revision: 1.10 $ IRCAM $Date: 1998/05/18 14:59:03 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -60,6 +60,7 @@ struct fts_symbol_descr
 {
   const char *name;		/* name */
   int index;			/* index in the builtin table, -1 otherwise */
+  int operator;			/* index in the operator table, for the expression eval */
   struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
 };
 

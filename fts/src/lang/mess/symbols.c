@@ -80,7 +80,15 @@ fts_symbol_t fts_s_qlist;
 fts_symbol_t fts_s_table;
 fts_symbol_t fts_s_explode;
 
-static void 
+/* Expression operators */
+
+fts_symbol_t fts_s_plus;
+fts_symbol_t fts_s_minus;
+fts_symbol_t fts_s_times;
+fts_symbol_t fts_s_div;
+fts_symbol_t fts_s_open_par;
+fts_symbol_t fts_s_closed_par;
+
 fts_predefine_symbols(void)
 {
   /* In ANY case, do not change the association symbol value in the following;
@@ -90,73 +98,82 @@ fts_predefine_symbols(void)
      You cannot also delete symbols, just add them.
      */
 
-  fts_s_void   = fts_new_builtin_symbol("void",   0);
-  fts_s_float  = fts_new_builtin_symbol("float",  1);
-  fts_s_int    = fts_new_builtin_symbol("int",    2);
-  fts_s_number = fts_new_builtin_symbol("number", 3);
-  fts_s_ptr    = fts_new_builtin_symbol("ptr",    4);
-  fts_s_string = fts_new_builtin_symbol("string", 5);
-  fts_s_symbol = fts_new_builtin_symbol("symbol", 6);
-  fts_s_object = fts_new_builtin_symbol("object", 7);
+  fts_s_void       = fts_new_builtin_symbol("void",   0);
+  fts_s_float      = fts_new_builtin_symbol("float",  1);
+  fts_s_int        = fts_new_builtin_symbol("int",    2);
+  fts_s_number     = fts_new_builtin_symbol("number", 3);
+  fts_s_ptr        = fts_new_builtin_symbol("ptr",    4);
+  fts_s_string     = fts_new_builtin_symbol("string", 5);
+  fts_s_symbol     = fts_new_builtin_symbol("symbol", 6);
+  fts_s_object     = fts_new_builtin_symbol("object", 7);
   fts_s_connection = fts_new_builtin_symbol("connection", 8);
-  fts_s_true   = fts_new_builtin_symbol("true",   9);
-  fts_s_false  = fts_new_builtin_symbol("false",  10);
+  fts_s_true       = fts_new_builtin_symbol("true",   9);
+  fts_s_false      = fts_new_builtin_symbol("false",  10);
 
-  fts_s_init 	          = fts_new_builtin_symbol("$init",   11);
-  fts_s_delete	          = fts_new_builtin_symbol("$delete", 12);
-  fts_s_ninlets           = fts_new_builtin_symbol("ins",     13);
-  fts_s_noutlets          = fts_new_builtin_symbol("outs",    14);
-  fts_s_bang              = fts_new_builtin_symbol("bang",    15);
-  fts_s_list              = fts_new_builtin_symbol("list",    16);
-  fts_s_set               = fts_new_builtin_symbol("set",     17);
-  fts_s_append            = fts_new_builtin_symbol("append",  18);
-  fts_s_print             = fts_new_builtin_symbol("print",   19);
-  fts_s_clear             = fts_new_builtin_symbol("clear",   20);
-  fts_s_stop              = fts_new_builtin_symbol("stop",    21);
-  fts_s_start             = fts_new_builtin_symbol("start",   22);
-  fts_s_restore           = fts_new_builtin_symbol("restore", 23);
-  fts_s_open              = fts_new_builtin_symbol("open",    24);
-  fts_s_upload            = fts_new_builtin_symbol("upload",  57);
-  fts_s_close             = fts_new_builtin_symbol("close",   25);
-  fts_s_load              = fts_new_builtin_symbol("load",    26);
-  fts_s_read              = fts_new_builtin_symbol("read",    27);
-  fts_s_write             = fts_new_builtin_symbol("write",   28);
-  fts_s_save_bmax         = fts_new_builtin_symbol("save_bmax", 29);
-  fts_s_anything          = fts_new_builtin_symbol("anything", 30);
-  fts_s_comma             = fts_new_builtin_symbol(",",       31);
-  fts_s_quote             = fts_new_builtin_symbol("'",       32);
-  fts_s_dollar            = fts_new_builtin_symbol("$",       33);
-  fts_s_semi              = fts_new_builtin_symbol(";",       34);
+  fts_s_init 	   = fts_new_builtin_symbol("$init",   11);
+  fts_s_delete	   = fts_new_builtin_symbol("$delete", 12);
+  fts_s_ninlets    = fts_new_builtin_symbol("ins",     13);
+  fts_s_noutlets   = fts_new_builtin_symbol("outs",    14);
+  fts_s_bang       = fts_new_builtin_symbol("bang",    15);
+  fts_s_list       = fts_new_builtin_symbol("list",    16);
+  fts_s_set        = fts_new_builtin_symbol("set",     17);
+  fts_s_append     = fts_new_builtin_symbol("append",  18);
+  fts_s_print      = fts_new_builtin_symbol("print",   19);
+  fts_s_clear      = fts_new_builtin_symbol("clear",   20);
+  fts_s_stop       = fts_new_builtin_symbol("stop",    21);
+  fts_s_start      = fts_new_builtin_symbol("start",   22);
+  fts_s_restore    = fts_new_builtin_symbol("restore", 23);
+  fts_s_open       = fts_new_builtin_symbol("open",    24);
+  fts_s_upload     = fts_new_builtin_symbol("upload",  57);
+  fts_s_close      = fts_new_builtin_symbol("close",   25);
+  fts_s_load       = fts_new_builtin_symbol("load",    26);
+  fts_s_read       = fts_new_builtin_symbol("read",    27);
+  fts_s_write      = fts_new_builtin_symbol("write",   28);
+  fts_s_save_bmax  = fts_new_builtin_symbol("save_bmax", 29);
+  fts_s_anything   = fts_new_builtin_symbol("anything", 30);
+  fts_s_comma      = fts_new_builtin_symbol(",",       31);
+  fts_s_quote      = fts_new_builtin_symbol("'",       32);
+  fts_s_dollar     = fts_new_builtin_symbol("$",       33);
+  fts_s_semi       = fts_new_builtin_symbol(";",       34);
 
   /* Predefined symbol for properties */
 
-  fts_s_value             = fts_new_builtin_symbol("value",    35);
-  fts_s_max_value         = fts_new_builtin_symbol("maxValue", 36);
-  fts_s_min_value         = fts_new_builtin_symbol("minValue", 37);
-  fts_s_name              = fts_new_builtin_symbol("name",     38);
-  fts_s_x                 = fts_new_builtin_symbol("x",        39);
-  fts_s_wx                = fts_new_builtin_symbol("wx",       40);
-  fts_s_y                 = fts_new_builtin_symbol("y",        41);
-  fts_s_wy                = fts_new_builtin_symbol("wy",       42);
-  fts_s_width             = fts_new_builtin_symbol("w",        43);
-  fts_s_ww                = fts_new_builtin_symbol("ww",       44);
-  fts_s_height            = fts_new_builtin_symbol("h",        45);
-  fts_s_wh                = fts_new_builtin_symbol("wh",       46);
-  fts_s_range             = fts_new_builtin_symbol("range",    47);
-  fts_s_font              = fts_new_builtin_symbol("font",     48);
-  fts_s_fontSize          = fts_new_builtin_symbol("fs",       49);
-  fts_s_error             = fts_new_builtin_symbol("error",    56);
+  fts_s_value      = fts_new_builtin_symbol("value",    35);
+  fts_s_max_value  = fts_new_builtin_symbol("maxValue", 36);
+  fts_s_min_value  = fts_new_builtin_symbol("minValue", 37);
+  fts_s_name       = fts_new_builtin_symbol("name",     38);
+  fts_s_x          = fts_new_builtin_symbol("x",        39);
+  fts_s_wx         = fts_new_builtin_symbol("wx",       40);
+  fts_s_y          = fts_new_builtin_symbol("y",        41);
+  fts_s_wy         = fts_new_builtin_symbol("wy",       42);
+  fts_s_width      = fts_new_builtin_symbol("w",        43);
+  fts_s_ww         = fts_new_builtin_symbol("ww",       44);
+  fts_s_height     = fts_new_builtin_symbol("h",        45);
+  fts_s_wh         = fts_new_builtin_symbol("wh",       46);
+  fts_s_range      = fts_new_builtin_symbol("range",    47);
+  fts_s_font       = fts_new_builtin_symbol("font",     48);
+  fts_s_fontSize   = fts_new_builtin_symbol("fs",       49);
+  fts_s_error      = fts_new_builtin_symbol("error",    56);
 
   /* Symbols related to builtin classes */
 
-  fts_s_patcher           = fts_new_builtin_symbol("patcher", 50);
-  fts_s_inlet             = fts_new_builtin_symbol("inlet",   51);
-  fts_s_outlet            = fts_new_builtin_symbol("outlet",  52);
-  fts_s_qlist             = fts_new_builtin_symbol("qlist",   53);
-  fts_s_table             = fts_new_builtin_symbol("table",   54);
-  fts_s_explode           = fts_new_builtin_symbol("explode", 55);
+  fts_s_patcher    = fts_new_builtin_symbol("patcher", 50);
+  fts_s_inlet      = fts_new_builtin_symbol("inlet",   51);
+  fts_s_outlet     = fts_new_builtin_symbol("outlet",  52);
+  fts_s_qlist      = fts_new_builtin_symbol("qlist",   53);
+  fts_s_table      = fts_new_builtin_symbol("table",   54);
+  fts_s_explode    = fts_new_builtin_symbol("explode", 55);
 
-  /* Last number user: 57 (max, 255 predefined symbols !! ) */
+  /* Espression operators */
+
+  fts_s_plus       = fts_new_builtin_symbol("+", 58);
+  fts_s_minus      = fts_new_builtin_symbol("-", 59);
+  fts_s_times      = fts_new_builtin_symbol("*", 60);
+  fts_s_div        = fts_new_builtin_symbol("/", 61);
+  fts_s_open_par   = fts_new_builtin_symbol("(", 62);
+  fts_s_closed_par = fts_new_builtin_symbol(")", 63);
+
+  /* Last number user: 64 (max, 255 predefined symbols !! ) */
 }
 
 
@@ -269,6 +286,7 @@ fts_new_symbol(const char *name)
   sp = (struct fts_symbol_descr *) fts_heap_alloc(&symbol_heap);
   sp->name = name;
   sp->index = -1;
+  sp->operator = -1;
 
   /* third, add the new symbol in the hash table */
 
@@ -308,6 +326,7 @@ fts_new_symbol_copy(const char *name)
 
   sp->name = s;
   sp->index = -1;
+  sp->operator = -1;
 
   /* third, add the new symbol in the has table */
 
