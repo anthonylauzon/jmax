@@ -122,12 +122,13 @@ fts_client_updates_sched(void)
 
 	  fts_client_send_prop(obj, property);
 	}
-
-      if (one_done)
-	update_group_end();
     }
   else
     period_count++;
+
+  if (one_done)
+    update_group_end();
+
 }
 
 /* Sync empty the change fifo; this is used to introduce a sequence
