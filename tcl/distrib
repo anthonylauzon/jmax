@@ -1,8 +1,8 @@
-all	all	config.tcl
-all	all	intrinsics.tcl
-all	all	jmaxboot.tcl
-all	all	jmaxpkg.tcl
-all	all	packages.tcl
-all	all	startup.tcl
-all	all	ucs.tcl
-all	all	wrappers.tcl
+all	all 	defaults.tcl
+all	all 	intrinsics.tcl
+all	all 	jmaxboot.tcl
+all	all 	jmaxpkg.tcl
+all	all 	packages.tcl
+all	all 	projects.tcl
+all	all 	sgi.tcl
+all	all 	startup.tcl

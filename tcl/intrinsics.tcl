@@ -47,42 +47,5 @@ proc help {} {
 }
 
 
-##
-## abstractionDirectory check if in the directory given as argument
-## there is a abstractions.tcl file, and load it if there; otherwise
-## it add the given directory to the abstraction search path using
-## the abstractionPath command
-##
-
-proc abstractionDirectory { dir } {
-    if {[file exists "$dir/abstractions.tcl"]} then {
-	sourceFile $dir/abstractions.tcl
-    } else {
-	abstractionPath $dir
-    }
-}
-    
-##
-## Same thing for templates
-##
-
-proc templateDirectory { dir } {
-    if {[file exists "$dir/templates.tcl"]} then {
-	sourceFile $dir/templates.tcl
-    } else {
-	templatePath $dir
-    }
-}
-    
-
-
-
-##
-## Commands for the .tpa format; source from a separate file
-##
-
-
-#source $jmaxRootDir/tcl/tpacmds.tcl
-
 
 

@@ -16,29 +16,40 @@ set jmaxRootDir [systemProperty "root"]
 source $jmaxRootDir/tcl/intrinsics.tcl
 
 ##
-## The config command
+## Intrinsic functions for the Sgi platform
 ##
 
-source $jmaxRootDir/tcl/config.tcl
+source $jmaxRootDir/tcl/sgi.tcl
 
 ##
-## Wrapper for MDA and TclMDA
-## 
+## Tcl functions to handle projects primitives
+##
 
-source $jmaxRootDir/tcl/wrappers.tcl
-
+source $jmaxRootDir/tcl/projects.tcl
 
 ##
 ## Tcl implementation of the tcl package command
 ##
 
-sourceFile $jmaxRootDir/tcl/packages.tcl
+source $jmaxRootDir/tcl/packages.tcl
 
 ##
 ## Max packages 
 ##
 
-sourceFile $jmaxRootDir/tcl/jmaxpkg.tcl
+source $jmaxRootDir/tcl/jmaxpkg.tcl
+
+##
+## System Defaults values
+##
+
+source $jmaxRootDir/tcl/defaults.tcl
+
+##
+## Site Defaults values
+##
+
+source $jmaxRootDir/config/site.tcl
 
 ##
 ## Declare the 'virtual' jmax package
@@ -48,15 +59,17 @@ package provide jMax 2.0.2
 
 
 ##
-## User Configuration (use source to get global variables)
+## User Configuration
 ##
 
 if {[file exists [systemProperty user.home]/.jmaxrc]} then {
     source [systemProperty user.home]/.jmaxrc
 }
 
+
 ##
-## startup with configuration
+## do the real startup 
 ##
 
-sourceFile $jmaxRootDir/tcl/startup.tcl
+source $jmaxRootDir/tcl/startup.tcl
+

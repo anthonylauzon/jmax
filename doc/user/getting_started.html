@@ -55,7 +55,7 @@
 <I>j</I>Max can be run by executing the shell script &lt;INSTALLATION_DIRECTORY&gt;/bin/jmax.
 This script accepts a set of options (see <B><TT> jmax -help </TT></B> for description)
 that are either interpreted by the script or passed as command line arguments
-to the Java application as <I>system properties</I>.
+to the <code>Java</code> application as <I>system properties</I>.
 
 
 <A NAME="System properties"> 
@@ -64,13 +64,13 @@ to the Java application as <I>system properties</I>.
 
 <P>
 <I>j</I>Max uses a number of <I>properties</I> to parametrize the system. 
-A <I>property</I> is a named variable with a default value,
-that can be set by a Tcl script or by command-line arguments, and that can be accessed from
-Java code.
-
+A <I>property</I> is a named option,
+that can be set by a <code>tcl</code> script or by command-line arguments, and that can be accessed from
+<code>Java</code> and <code>tcl</code> code.
 
 <P>
-The system properties given by a default in <TT>defaults.tcl</TT> or in the user configuration file.
+The system properties given by a default in
+<TT>defaults.<code>tcl</code></TT> or in the user configuration file.
 can be overwritten by command line arguments to <TT>jmax</TT> script:
 
 <P>
@@ -79,22 +79,28 @@ can be overwritten by command line arguments to <TT>jmax</TT> script:
 
 <P>
 Additional system properties can be defined by using the same syntax 
-(see <A HREF="./configuration.html"><I>Configuration and Environment Setup</I></A>).
+(see <A HREF="./configuration.html"><I>Configuration</I></A>).
 
 
 <A NAME=".jmaxrc">
 <H2> <B><TT>.jmaxrc</TT></B> file </H2>
 
 <P>
-The <B><TT>.jmaxrc</TT></B> file is a Tcl script that is loaded at <I>j</I>Max startup.
-It can contain any Tcl code, though the following is probably of main interest:
+The <B><TT>.jmaxrc</TT></B> file is a <code>tcl</code> script that is loaded at <I>j</I>Max startup.
+It can contain any <code>tcl</code> code, though the following is probably of main interest:
 <UL>
-<LI> set system properties to customize your environmnet
-<LI> declare a number of <I>hooks</I>, Tcl code that will be executed at precise
-points during the initialization process. In particular, the <B><I>start</I></B>
-hook is executed after server start and is especially usefull for configuration
-purpose.
+<LI> <A HREF="configuration/system.html"> set system properties to customize system environment </A>
+<LI> <A HREF="configuration/ioconfig.html"> set the <i>j</i>Max configuration </A>
+<LI> <A HREF="configuration/projects.html"> optionally, set the environment for your patches</A>
+<LI> <A HREF="configuration/packages.html"> optionally, load some prepackaged library</A>
 </UL>
+
+In the current release, the first two step, system and i/o configuration <strong>must</strong>
+be present.
+
+It is possible to declare declare a number of <I>hooks</I>, <code>tcl</code> code that will be executed at precise points during the initialization process. In particular, the <B><I>start</I></B>
+hook is executed after server start and must be used for I/O, environment and package loading
+purpose.
 
 <P>
 A set of template <TT>.jmaxrc</TT> files can be found in the distribution.
