@@ -124,8 +124,8 @@ static fts_status_t no_such_function_error = &no_such_function_error_description
 #define expression_stack_top(E) ((fts_atom_t *)fts_stack_base(&(E)->stack) + fts_stack_top(&(E)->stack))
 
 
-#ifdef STACK_DEBUG
-static void expression_stack_print( fts_expression_t *exp, const char *msg)
+static void
+expression_stack_print( fts_expression_t *exp, const char *msg)
 {
   int i, fp;
   fts_atom_t *p = (fts_atom_t *)fts_stack_base(&exp->stack);
@@ -158,9 +158,9 @@ static void expression_stack_print( fts_expression_t *exp, const char *msg)
 	fprintf( stderr, "%-7s %p\n", "POINTER", fts_get_pointer(p+i));
     }
 }
-#endif
 
-static void expression_stack_push_frame( fts_expression_t *exp)
+static void
+expression_stack_push_frame( fts_expression_t *exp)
 {
   fts_atom_t a;
 
@@ -176,7 +176,8 @@ static void expression_stack_push_frame( fts_expression_t *exp)
 #endif
 }
 
-static void expression_stack_pop_frame( fts_expression_t *exp)
+static void
+expression_stack_pop_frame( fts_expression_t *exp)
 {
   int old_fp, ac, i;
   fts_atom_t *at;
@@ -471,6 +472,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	if (!fun)
 	  return no_such_function_error;
 
+	fts_set_void( fts_get_return_value());
+
 	(*fun)(ac-1, at+1);
 
 	expression_stack_pop_frame( exp);
@@ -486,6 +489,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     else if (ac > 1 && fts_is_object( at) && fts_is_symbol( at+1))
       {
 	/* it is a method invocation */
+
+	fts_set_void( fts_get_return_value());
 
 	if (!fts_send_message(fts_get_object( at), fts_get_symbol(at+1), ac-2, at+2))
 	  return invalid_method_invocation_error;
@@ -641,25 +646,6 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     LBINOP_EVAL(<=);
     break;
 
-#if 0
-  case TK_FUNCALL:
-    expression_stack_push_frame( exp);
-
-    expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data);
-
-    ac = expression_stack_frame_count( exp);
-    at = expression_stack_frame( exp);
-
-    expression_stack_pop_frame( exp);
-
-    fts_set_void( fts_get_return_value());
-
-    (*(fts_function_t)fts_get_pointer( &tree->value))( ac, at);
-
-    expression_stack_push( exp, fts_get_return_value());
-
-    break;
-#endif
   }
 
   return fts_ok;
