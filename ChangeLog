@@ -1,3 +1,10 @@
+2002-10-02  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* removed properties related to the DSP subsystem
+	* introduced fts_dsp_object_t as base structure for all DSP objects
+	* changed API for DSP objects: fts_dsp_object_init(), fts_dsp_object_delete(), ...
+	* adapted object set to DSP API changes
+
 2002-09-30  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* changed bmax file magic number. It is now bMa2 (was bMax) and the 
