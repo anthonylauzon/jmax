@@ -36,12 +36,12 @@ listelement_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   i = this->index;
 
   if(ac > i)
-    if (fts_is_float(at+i))
-      fts_outlet_send(o, 0, fts_s_float, 1, at+i);
-    else if (fts_is_long(at+i))
-      fts_outlet_send(o, 0, fts_s_int, 1, at+i);
-    else if (fts_is_symbol(at+i))
-      fts_outlet_send(o, 0, fts_s_symbol, 1, at+i);
+    {
+      if (fts_is_data(at + i))
+	fts_outlet_data(o, 0, fts_get_data(at + i));
+      else
+	fts_outlet_send(o, 0, fts_get_type(at + 1), 1, at + i);
+    }
 }
 
 static void
