@@ -50,5 +50,6 @@ extern void fts_channel_remove_origin(fts_channel_t *channel, fts_access_t *orig
 
 extern void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
+extern void fts_channel_propagate_input(fts_channel_t *channel, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif
