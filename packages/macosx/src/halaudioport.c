@@ -75,8 +75,10 @@ static void halaudioport_output( fts_word_t *argv)
 
   this->count += n * channels;
 
-  if (port->count >= port->buffer_size)
+  if (this->count >= this->buffer_size)
     {
+      char c;
+
       read( this->pipe[0], &c, 1);
       this->count = 0;
     }
@@ -160,7 +162,7 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
   
-  err = AudioDeviceStart( p->device, ioproc);
+  err = AudioDeviceStart( this->device, halaudioport_ioproc);
   if (err != noErr)
     {
       fts_object_set_error( o, "Cannot start device");
