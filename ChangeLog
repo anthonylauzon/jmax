@@ -1,3 +1,11 @@
+2003-10-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/tuple.c (tuple_init): fixed bugs "[ 766924 ] [tuple] crash" and "[ 822060 ] crash when trying to create [tuple]".
+	Now an error occur when a [tuple] is created in a patcher.
+	If haven't found any side effect with this fix, but it certainly need more checking.
+
+	* fts/message.c (dispatch_message_atom): we need to check when this function is called with a tuple as at (just a remember in changelog).....
+
 2003-10-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/ispw/c/src/deltable.h: fixed bug "[ 822062 ] delay~.help.jmax patch has problems".
