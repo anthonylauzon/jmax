@@ -22,13 +22,12 @@
 #include <fts/ftsclient.h>
 
 #include "SymbolCache.h"
+#include "Buffer.h"
 #include "BinaryProtocol.h"
 
 namespace ircam {
 namespace fts {
 namespace client {
-
-  class OutputBuffer;
 
   class BinaryProtocolEncoder {
   public:
@@ -62,7 +61,7 @@ namespace client {
 
     void write( const char *v);
 
-    OutputBuffer *_outputBuffer;
+    Buffer *_outputBuffer;
     SymbolCache *_symbolCache;
     FtsServerConnection *_connection;
   };

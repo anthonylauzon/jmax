@@ -24,7 +24,7 @@
 
 using namespace ircam::fts::client;
 
-FtsSymbol *FtsSymbol::get( const char *s)
+const FtsSymbol *FtsSymbol::get( const char *s)
 {
   FtsSymbol *symbol;
 

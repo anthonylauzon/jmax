@@ -34,7 +34,7 @@ namespace client {
 
   class FTSCLIENT_API FtsSymbol {
   public:
-    static FtsSymbol *get( const char *s);
+    static const FtsSymbol *get( const char *s);
 
     const char *getString() const { return _s; }
 

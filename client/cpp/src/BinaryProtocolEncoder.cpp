@@ -25,63 +25,10 @@
 
 using namespace ircam::fts::client;
 
-namespace ircam {
-namespace fts {
-namespace client {
-
-  class OutputBuffer {
-  public:
-    OutputBuffer()
-    {
-      _length = 256;
-      _buffer = new unsigned char[_length];
-      _current = 0;
-    }
-
-    void clear()
-    {
-      _current = 0;
-    }
-
-    void append( unsigned char b)
-    {
-      if (_current + 1 >= _length)
-	{
-	  _length *= 2;
-	  unsigned char *newBuffer = new unsigned char[_length];
-	  for ( int i = 0; i < _current; i++)
-	    newBuffer[i] = _buffer[i];
-
-	  _buffer = newBuffer;
-	}
-
-      _buffer[_current++] = b;
-    }
-
-    unsigned char *getBytes()
-    {
-      return _buffer;
-    }
-
-    int getLength()
-    {
-      return _current;
-    }
-
-  private:
-    unsigned char *_buffer;
-    int _current;
-    int _length;
-  };
-
-};
-};
-};
-
 BinaryProtocolEncoder::BinaryProtocolEncoder( FtsServerConnection *connection)
 {
   _connection = connection;
-  _outputBuffer = new OutputBuffer();
+  _outputBuffer = new Buffer();
   _symbolCache = new SymbolCache();
 }
 

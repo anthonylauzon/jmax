@@ -43,7 +43,7 @@ namespace client {
       _array[_current++].setDouble( value);
     }
 
-    void addSymbol( FtsSymbol *value)
+    void addSymbol( const FtsSymbol *value)
     {
       ensureCapacity(1);
       _array[_current++].setSymbol( value);
@@ -108,7 +108,7 @@ namespace client {
       return _array[index].doubleValue;
     }
 
-    FtsSymbol *getSymbol( int index)
+    const FtsSymbol *getSymbol( int index)
     {
       return _array[index].symbolValue;
     }

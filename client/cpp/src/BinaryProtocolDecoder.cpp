@@ -19,353 +19,345 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.fts.client;
+#include <fts/ftsclient.h>
 
-class BinaryProtocolDecoder {
+#include "BinaryProtocol.h"
+#include "BinaryProtocolDecoder.h"
 
-  private static final int qInitial = 1;
+using namespace ircam::fts::client;
 
-  private static final int qInt0 = 10;
-  private static final int qInt1 = 11;
-  private static final int qInt2 = 12;
-  private static final int qInt3 = 13;
+#define qInitial 1
 
-  private static final int qFloat0 = 20;
-  private static final int qFloat1 = 21;
-  private static final int qFloat2 = 22;
-  private static final int qFloat3 = 23;
-  private static final int qFloat4 = 24;
-  private static final int qFloat5 = 25;
-  private static final int qFloat6 = 26;
-  private static final int qFloat7 = 27;
+#define qInt0 10
+#define qInt1 11
+#define qInt2 12
+#define qInt3 13
 
-  private static final int qString = 30;
+#define qFloat0 20
+#define qFloat1 21
+#define qFloat2 22
+#define qFloat3 23
+#define qFloat4 24
+#define qFloat5 25
+#define qFloat6 26
+#define qFloat7 27
 
-  private static final int qObject0 = 40;
-  private static final int qObject1 = 41;
-  private static final int qObject2 = 42;
-  private static final int qObject3 = 43;
+#define qString 30
 
-  private static final int qSymbolIndex0 = 50;
-  private static final int qSymbolIndex1 = 51;
-  private static final int qSymbolIndex2 = 52;
-  private static final int qSymbolIndex3 = 53;
+#define qObject0 40
+#define qObject1 41
+#define qObject2 42
+#define qObject3 43
 
-  private static final int qSymbolCache0 = 60;
-  private static final int qSymbolCache1 = 61;
-  private static final int qSymbolCache2 = 62;
-  private static final int qSymbolCache3 = 63;
-  private static final int qSymbolCache4 = 64;
+#define qSymbolIndex0 50
+#define qSymbolIndex1 51
+#define qSymbolIndex2 52
+#define qSymbolIndex3 53
 
-  private final void clearAction( int input)
-  {
-    lval = 0;
-  }
+#define qSymbolCache0 60
+#define qSymbolCache1 61
+#define qSymbolCache2 62
+#define qSymbolCache3 63
+#define qSymbolCache4 64
 
-  private final void shiftAction( int input)
-  {
-    lval = lval << 8 | input;
-  }
-
-  private final void shiftLongAction( int input)
-  {
-    lval = lval << 8 | input;
-  }
-
-  private final void bufferClearAction( int input)
-  {
-    buffer.setLength( 0);
-  }
-
-  private final void clearAllAction( int input)
-  {
-    lval = 0;
-    buffer.setLength( 0);
-  }
-
-  private final void bufferShiftAction( int input)
-  {
-    buffer.append( (char)input);
-  }
-
-  private final void endIntAction( int input)
-  {
-    lval = lval << 8 | input;
-
-    if (argsCount >= 2)
-      args.addInt( (int)lval);
-    argsCount++;
-  }
-
-  private final void endFloatAction( int input)
-  {
-    lval = lval << 8 | input;
-
-    if (argsCount >= 2)
-      args.addDouble( Double.longBitsToDouble( lval) );
-
-    argsCount++;
-  }
-
-  private final void endSymbolIndexAction( int input)
-  {
-    lval = lval << 8 | input;
-
-    FtsSymbol s = symbolCache.get( (int)lval);
-
-    if (argsCount == 1)
-      selector = s;
-    else
-      args.addSymbol( s);
-
-    argsCount++;
-  }
-
-  private final void endSymbolCacheAction( int input)
-  {
-    FtsSymbol s = FtsSymbol.get( buffer.toString());
-
-    symbolCache.put( (int)lval, s);
-
-    if (argsCount == 1)
-      selector = s;
-    else
-      args.addSymbol( s);
-
-    argsCount++;
-  }
-
-  private final void endStringAction( int input)
-  {
-    if (argsCount >= 2)
-      args.addString( buffer.toString());
-    argsCount++;
-  }
-
-  private final void endObjectAction( int input)
-  {
-    lval = lval << 8 | input;
-
-    FtsObject obj = server.getObject( (int)lval);
-
-    if (argsCount == 0)
-      target = obj;
-    else
-      args.addObject( obj);
-
-    argsCount++;
-  }
-
-  private final void endMessageAction( int input)
-  {
-    FtsObject.invokeMessageHandler( target, selector, args);
-    args.clear();
-    argsCount = 0;
-  }
-
-  private final void nextState( int input)
-  {
-    switch( currentState) {
-    case 0:
-      /* try to skip till end of message */
-      if ( input == BinaryProtocol.END_OF_MESSAGE)
-	currentState = qInitial;
-    break;
-    case qInitial:
-      if ( input == BinaryProtocol.INT)
-	{
-	  currentState = qInt0;
-	  clearAction( input);
-	}
-      else if ( input == BinaryProtocol.FLOAT)
-	{
-	  currentState = qFloat0;
-	  clearAction( input);
-	}
-      else if ( input == BinaryProtocol.SYMBOL_INDEX)
-	{
-	  currentState = qSymbolIndex0;
-	  clearAction( input);
-	}
-      else if ( input == BinaryProtocol.SYMBOL_CACHE)
-	{
-	  currentState = qSymbolCache0;
-	  clearAllAction( input);
-	}
-      else if ( input == BinaryProtocol.STRING)
-	{
-	  currentState = qString;
-	  bufferClearAction( input);
-	}
-      else if ( input == BinaryProtocol.OBJECT)
-	{
-	  currentState = qObject0;
-	  clearAction( input);
-	}
-      else if ( input == BinaryProtocol.END_OF_MESSAGE)
-	endMessageAction( input);
-      else
-	currentState = 0;
-      break;
-    case qInt0:
-      currentState = qInt1;
-      shiftAction( input);
-      break;
-    case qInt1:
-      currentState = qInt2;
-      shiftAction( input);
-      break;
-    case qInt2:
-      currentState = qInt3;
-      shiftAction( input);
-      break;
-    case qInt3:
-      currentState = qInitial;
-      endIntAction( input);
-      break;
-    case qFloat0:
-      currentState = qFloat1;
-      shiftAction( input);
-      break;
-    case qFloat1:
-      currentState = qFloat2;
-      shiftAction( input);
-      break;
-    case qFloat2:
-      currentState = qFloat3;
-      shiftAction( input);
-      break;
-    case qFloat3:
-      currentState = qFloat4;
-      shiftAction( input);
-      break;
-    case qFloat4:
-      currentState = qFloat5;
-      shiftAction( input);
-      break;
-    case qFloat5:
-      currentState = qFloat6;
-      shiftAction( input);
-      break;
-    case qFloat6:
-      currentState = qFloat7;
-      shiftAction( input);
-      break;
-    case qFloat7:
-      currentState = qInitial;
-      endFloatAction( input);
-      break;
-    case qSymbolIndex0:
-      currentState = qSymbolIndex1;
-      shiftAction( input);
-      break;
-    case qSymbolIndex1:
-      currentState = qSymbolIndex2;
-      shiftAction( input);
-      break;
-    case qSymbolIndex2:
-      currentState = qSymbolIndex3;
-      shiftAction( input);
-      break;
-    case qSymbolIndex3:
-      currentState = qInitial;
-      endSymbolIndexAction( input);
-      break;
-    case qSymbolCache0:
-      currentState = qSymbolCache1;
-      shiftAction( input);
-      break;
-    case qSymbolCache1:
-      currentState = qSymbolCache2;
-      shiftAction( input);
-      break;
-    case qSymbolCache2:
-      currentState = qSymbolCache3;
-      shiftAction( input);
-      break;
-    case qSymbolCache3:
-      currentState = qSymbolCache4;
-      shiftAction( input);
-      break;
-    case qSymbolCache4:
-      if ( input == 0)
-	{
-	  currentState = qInitial;
-	  endSymbolCacheAction( input);
-	}
-      else
-	bufferShiftAction( input);
-      break;
-    case qString:
-      if ( input == 0)
-	{
-	  currentState = qInitial;
-	  endStringAction( input);
-	}
-      else
-	bufferShiftAction( input);
-      break;
-    case qObject0:
-      currentState = qObject1;
-      shiftAction( input);
-      break;
-    case qObject1:
-      currentState = qObject2;
-      shiftAction( input);
-      break;
-    case qObject2:
-      currentState = qObject3;
-      shiftAction( input);
-      break;
-    case qObject3:
-      currentState = qInitial;
-      endObjectAction( input);
-      break;
-    }
-  }
-
-  BinaryProtocolDecoder( FtsServer server)
-  {
-    this.server = server;
-    connection = server.getConnection();
-
-    buffer = new StringBuffer();
-    args = new FtsArgs();
-    argsCount = 0;
-
-    symbolCache = new SymbolCache();
-
-    currentState = qInitial;
-  }
-
-  void decode( byte[] data, int offset, int length) throws FtsClientException
-  {
-    for ( int i = offset; i < length; i++)
-      {
-	int c = data[i];
-
-	if ( c < 0)
-	  c += 256;
-
-	nextState( c);
-
-	if (currentState == 0)
-	  throw new FtsClientException( "Invalid data in protocol : state=" + currentState + " input=" + c);
-      }
-  }
-
-  private FtsServer server;
-  private FtsServerConnection connection;
-
-  private long lval;
-  private StringBuffer buffer;
-
-  private FtsObject target;
-  private FtsSymbol selector;
-  private FtsArgs args;
-  private int argsCount;
-
-  private int currentState;
-
-  private SymbolCache symbolCache;
+void BinaryProtocolDecoder::clearAction( int input)
+{
+  _lval = 0;
 }
+
+void BinaryProtocolDecoder::shiftAction( int input)
+{
+  _lval = _lval << 8 | input;
+}
+
+void BinaryProtocolDecoder::shiftLongAction( int input)
+{
+  _lval = _lval << 8 | input;
+}
+
+void BinaryProtocolDecoder::bufferClearAction( int input)
+{
+  _buffer->clear();
+}
+
+void BinaryProtocolDecoder::clearAllAction( int input)
+{
+  _lval = 0;
+  _buffer->clear();
+}
+
+void BinaryProtocolDecoder::bufferShiftAction( int input)
+{
+  _buffer->append( (char)input);
+}
+
+void BinaryProtocolDecoder::endIntAction( int input)
+{
+  _lval = _lval << 8 | input;
+
+  if (_argsCount >= 2)
+    _args->addInt( (int)_lval);
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endFloatAction( int input)
+{
+  _lval = _lval << 8 | input;
+
+  // FIXME
+  if (_argsCount >= 2)
+    _args->addDouble( 3.14);
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endSymbolIndexAction( int input)
+{
+  _lval = _lval << 8 | input;
+
+  const FtsSymbol *s = _symbolCache->get( (int)_lval);
+
+  if (_argsCount == 1)
+    _selector = s;
+  else
+    _args->addSymbol( s);
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endSymbolCacheAction( int input)
+{
+  const FtsSymbol *s = FtsSymbol::get( (char *)_buffer->getBytes());
+
+  _symbolCache->put( (int)_lval, s);
+
+  if (_argsCount == 1)
+    _selector = s;
+  else
+    _args->addSymbol( s);
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endStringAction( int input)
+{
+  if (_argsCount >= 2)
+    _args->addString( (char *)_buffer->getBytes());
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endObjectAction( int input)
+{
+  _lval = _lval << 8 | input;
+
+  //  FtsObject *obj = server.getObject( (int)_lval);
+  FtsObject *obj = NULL;
+
+  if (_argsCount == 0)
+    _target = obj;
+  else
+    _args->addObject( obj);
+
+  _argsCount++;
+}
+
+void BinaryProtocolDecoder::endMessageAction( int input)
+{
+  //  FtsObject.invokeMessageHandler( target, selector, _args);
+  _args->clear();
+  _argsCount = 0;
+}
+
+void BinaryProtocolDecoder::nextState( int input)
+{
+  switch( _currentState) {
+  case 0:
+    /* try to skip till end of message */
+    if ( input == BinaryProtocol::END_OF_MESSAGE)
+      _currentState = qInitial;
+    break;
+  case qInitial:
+    if ( input == BinaryProtocol::INT)
+      {
+	_currentState = qInt0;
+	clearAction( input);
+      }
+    else if ( input == BinaryProtocol::FLOAT)
+      {
+	_currentState = qFloat0;
+	clearAction( input);
+      }
+    else if ( input == BinaryProtocol::SYMBOL_INDEX)
+      {
+	_currentState = qSymbolIndex0;
+	clearAction( input);
+      }
+    else if ( input == BinaryProtocol::SYMBOL_CACHE)
+      {
+	_currentState = qSymbolCache0;
+	clearAllAction( input);
+      }
+    else if ( input == BinaryProtocol::STRING)
+      {
+	_currentState = qString;
+	bufferClearAction( input);
+      }
+    else if ( input == BinaryProtocol::OBJECT)
+      {
+	_currentState = qObject0;
+	clearAction( input);
+      }
+    else if ( input == BinaryProtocol::END_OF_MESSAGE)
+      endMessageAction( input);
+    else
+      _currentState = 0;
+    break;
+  case qInt0:
+    _currentState = qInt1;
+    shiftAction( input);
+    break;
+  case qInt1:
+    _currentState = qInt2;
+    shiftAction( input);
+    break;
+  case qInt2:
+    _currentState = qInt3;
+    shiftAction( input);
+    break;
+  case qInt3:
+    _currentState = qInitial;
+    endIntAction( input);
+    break;
+  case qFloat0:
+    _currentState = qFloat1;
+    shiftAction( input);
+    break;
+  case qFloat1:
+    _currentState = qFloat2;
+    shiftAction( input);
+    break;
+  case qFloat2:
+    _currentState = qFloat3;
+    shiftAction( input);
+    break;
+  case qFloat3:
+    _currentState = qFloat4;
+    shiftAction( input);
+    break;
+  case qFloat4:
+    _currentState = qFloat5;
+    shiftAction( input);
+    break;
+  case qFloat5:
+    _currentState = qFloat6;
+    shiftAction( input);
+    break;
+  case qFloat6:
+    _currentState = qFloat7;
+    shiftAction( input);
+    break;
+  case qFloat7:
+    _currentState = qInitial;
+    endFloatAction( input);
+    break;
+  case qSymbolIndex0:
+    _currentState = qSymbolIndex1;
+    shiftAction( input);
+    break;
+  case qSymbolIndex1:
+    _currentState = qSymbolIndex2;
+    shiftAction( input);
+    break;
+  case qSymbolIndex2:
+    _currentState = qSymbolIndex3;
+    shiftAction( input);
+    break;
+  case qSymbolIndex3:
+    _currentState = qInitial;
+    endSymbolIndexAction( input);
+    break;
+  case qSymbolCache0:
+    _currentState = qSymbolCache1;
+    shiftAction( input);
+    break;
+  case qSymbolCache1:
+    _currentState = qSymbolCache2;
+    shiftAction( input);
+    break;
+  case qSymbolCache2:
+    _currentState = qSymbolCache3;
+    shiftAction( input);
+    break;
+  case qSymbolCache3:
+    _currentState = qSymbolCache4;
+    shiftAction( input);
+    break;
+  case qSymbolCache4:
+    if ( input == 0)
+      {
+	_currentState = qInitial;
+	endSymbolCacheAction( input);
+      }
+    else
+      bufferShiftAction( input);
+    break;
+  case qString:
+    if ( input == 0)
+      {
+	_currentState = qInitial;
+	endStringAction( input);
+      }
+    else
+      bufferShiftAction( input);
+    break;
+  case qObject0:
+    _currentState = qObject1;
+    shiftAction( input);
+    break;
+  case qObject1:
+    _currentState = qObject2;
+    shiftAction( input);
+    break;
+  case qObject2:
+    _currentState = qObject3;
+    shiftAction( input);
+    break;
+  case qObject3:
+    _currentState = qInitial;
+    endObjectAction( input);
+    break;
+  }
+}
+
+BinaryProtocolDecoder::BinaryProtocolDecoder( FtsServer *server)
+{
+  _server = server;
+  //  _connection = server.getConnection();
+
+  _buffer = new Buffer();
+  _args = new FtsArgs();
+  _argsCount = 0;
+
+  _symbolCache = new SymbolCache();
+
+  _currentState = qInitial;
+}
+
+void BinaryProtocolDecoder::decode( const char *data, int offset, int length) throw( FtsClientException)
+{
+  for ( int i = offset; i < length; i++)
+    {
+      int c = data[i];
+
+      if ( c < 0)
+	c += 256;
+
+      nextState( c);
+
+      if (_currentState == 0)
+	throw FtsClientException( "Invalid data in protocol");
+    }
+}
+

@@ -50,7 +50,7 @@ namespace client {
     /**
      * If the atom is a FtsSymbol, holds the FtsSymbol value
      */
-    FtsSymbol *symbolValue;
+    const FtsSymbol *symbolValue;
 
     /**
      * If the atom is a string, holds the string value
@@ -168,7 +168,7 @@ namespace client {
      * 
      * @param s the value
      */
-    void setSymbol( FtsSymbol *s)
+    void setSymbol( const FtsSymbol *s)
     {
       _type = SYMBOL;
       symbolValue = s;
