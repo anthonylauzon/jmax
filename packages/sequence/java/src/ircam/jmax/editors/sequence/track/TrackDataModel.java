@@ -44,7 +44,7 @@ import java.util.Enumeration;
 public interface TrackDataModel {
 
     /**
-     * how many events in the database?
+     * how many events in the database
      */
     public abstract int length();
     
@@ -56,47 +56,75 @@ public interface TrackDataModel {
     
     
     /**
-     * returns a given event
+     * returns a given event 
      */
     public abstract TrackEvent getEventAt(int index);
     
     /**
      * return the index of the given event, if it exists, or the error constants
-     * NO_SUCH_EVENT, EMPTY_COLLECTION */
+     * NO_SUCH_EVENT, EMPTY_COLLECTION 
+     */
     public abstract int indexOf(TrackEvent event);
     
-    public abstract Enumeration intersectionSearch(/*int*/double start, /*int*/double end);
+    public abstract Enumeration intersectionSearch(double start, double end);
     
-    public abstract Enumeration inclusionSearch(/*int*/double start, /*int*/double end);
+    public abstract Enumeration inclusionSearch(double start, double end);
     
-    public abstract int getFirstEventAt(/*int*/double time);
+    public abstract int getFirstEventAt(double time);
     
     /**
      * adds an event in the database
+     * @param theEvent the TrackEvent to be added
      */
     public abstract void addEvent(TrackEvent theEvent);
+
+    /**
+     * create an event and add it in the database. 
+     * callback from fts 
+     * @param objId the id of the new FtsSequenceEventObject
+     * @param timeTag the time tag of the new event
+     * @param valueType the EventVale type for the new Event
+     * @param nArgs the num of args for this value
+     * @param args the Vector of arguments (Objects)
+     */
+    public abstract void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[]);
     
+    /**
+     * send a addEvent message to fts
+     * @param trackId the id of the track where we wont to add the new event
+     * @param objId the id of the new event
+     * @param time the time tag of the new event
+     * @param valueType the EventVale type for the new event
+     * @param nArgs the num of args for this value
+     * @param args the Vector of arguments (Objects)
+     */
+    public abstract void sendAddEventMessage(int trackId, int objId, float time, String valueType, int nArgs, Object args[]);
+
     /**
      * generic change of an event in the database.
      * Call this function to signal the parameters changing of the event, except
      * the initial time and the duration parameters. Use moveEvent and resizeEvent for that.
+     * @param theEvent the TrackEvent to be changed
      */
     public abstract void changeEvent(TrackEvent event);
     
     /**
      * move an event in the database
+     * @param theEvent the TrackEvent to be moved
+     * @param time the new time tag
      */
-    public abstract void moveEvent(TrackEvent event, /*int*/double time);
-    
+    public abstract void moveEvent(TrackEvent event, double time);
     
     /**
      * deletes an event from the database
+     * @param theEvent the TrackEvent to be removed
      */
     public abstract void removeEvent(TrackEvent theEvent);
     
 
     /**
-     * Deletes all the events */
+     * Deletes all the events 
+     */
     public abstract void removeAllEvents();
     
     /**
@@ -151,7 +179,6 @@ public interface TrackDataModel {
      * Error code
      */
     public int NO_SUCH_EVENT = Integer.MIN_VALUE;
-
   
 }
 

@@ -6,6 +6,8 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.*;
 import java.io.*;
+import java.util.*;
+
 import javax.swing.*;
 
 /**
@@ -59,28 +61,47 @@ public class FricativeValue extends AbstractEventValue
 	return FricativeEventRenderer.getRenderer();
     }
 
-  
+    public Enumeration getPropertyNames()
+    {
+	return new ArrayEnumeration(nameArray);
+    }
+
+    public int getPropertyCount()
+    {
+	return propertyCount;
+    }
+
+    public Object[] getPropertyValues()
+    {
+	for(int i = 0; i<propertyCount; i++)
+	    propertyValuesArray[i] = getProperty(nameArray[i]);
+	
+	return propertyValuesArray;
+    }
+
     //--- Fields
 
-  public static final String fs = File.separator;
-  public static final String FRICATIVE_NAME = "Fricative";
-  static String path;
-  public static ImageIcon FRICATIVE_ICON;
-  public static FricativeValueInfo info = new FricativeValueInfo();
+    public static final String fs = File.separator;
+    public static final String FRICATIVE_NAME = "Fricative";
+    static String path;
+    public static ImageIcon FRICATIVE_ICON;
+    public static FricativeValueInfo info = new FricativeValueInfo();
+    static String nameArray[] = {"duration"};
+    static int propertyCount = 1;
 
-  static 
-  {
-     try
-      {
-	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-    catch(FileNotFoundException e){
-	//System.err.println("Couldn't locate sequence images");
-	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+    static 
+    {
+	try
+	    {
+		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	    }
+	catch(FileNotFoundException e){
+	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}
+	FRICATIVE_ICON = new ImageIcon(path+"fricative.gif");
     }
-    FRICATIVE_ICON = new ImageIcon(path+"fricative.gif");
-  }
 }
+
 
 
 

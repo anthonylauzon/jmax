@@ -86,6 +86,18 @@ public class AmbitusValue extends AbstractEventValue
   {
     return new ArrayEnumeration(nameArray);
   }
+  public int getPropertyCount()
+  {
+    return propertyCount;
+  }
+
+  public Object[] getPropertyValues()
+  {
+      for(int i = 0; i<propertyCount; i++)
+	  propertyValuesArray[i] = getProperty(nameArray[i]);
+
+      return propertyValuesArray;
+  }
 
 
   //--- Fields
@@ -108,7 +120,8 @@ public class AmbitusValue extends AbstractEventValue
     AMBITUS_ICON = new ImageIcon(path+"ambitusAdder.gif");
   }
 
-    static String nameArray[] = {"pitch", "duration","velocity", "channel", "ambitus"};
+    static String nameArray[] = {"pitch", "duration"};
+    static int propertyCount = 2;
 }
 
 

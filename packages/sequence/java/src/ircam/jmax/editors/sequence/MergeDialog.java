@@ -269,7 +269,7 @@ public class MergeDialog extends JDialog {
 			for (Enumeration e = types.elements(); e.hasMoreElements();)
 			    {
 				ValueInfo info = (ValueInfo) e.nextElement();
-				TrackDataModel trackmodel = new AbstractSequence(info);
+				TrackDataModel trackmodel = new AbstractSequence(model, info);
 				calderone.unmergeModel(trackmodel, info);
 
 				model.addTrack(new TrackBase(trackmodel)/*info.newTrackInstance(trackmodel)*/);

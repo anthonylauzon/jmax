@@ -70,13 +70,11 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	
 	public void actionPerformed(ActionEvent ae)
 	{
-	    //sequencePanel.makeVisible(evt);	    
 	    int time = (int)event.getTime();
 	    if(sequencePanel.scrollBy(time))
 		event.setTime(time+delta);
 	    else
 		event.setTime(time-delta);
-	
 	}
 	void setEditor(SequencePanel editor)
 	{
@@ -181,6 +179,15 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 			  a.getY(max_y)-a.getY(min_y)+10);
   }
 
+    public void mouseReleased(MouseEvent e)
+    {
+	if (scrollTimer.isRunning())
+	{
+	    scrollTimer.stop();
+	}
+	super.mouseReleased(e);
+    }
+
   /**
    * overrides SelectionMover.mouseDragged()
    */
@@ -244,6 +251,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 
 	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 
+	    System.err.println("xor tempEvent time"+tempEvent.getTime());
+
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
 	    // and make the keyboard in the MidiTrack a listener of such movements.
 	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).
@@ -266,5 +275,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }
+
 
 

@@ -68,11 +68,9 @@ public class Sequence extends JFrame implements EditorContainer{
 
     sequenceData = data;
 
-    TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
-    TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonodimensionalTrackEditorFactory.instance);
-    TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonodimensionalTrackEditorFactory.instance);
-    TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonodimensionalTrackEditorFactory.instance);
-    TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonodimensionalTrackEditorFactory.instance);
+    initTrackEditorFactoryTable();
+
+    initValueInfoTable();
     
     makeTitle(data);
 
@@ -104,11 +102,28 @@ public class Sequence extends JFrame implements EditorContainer{
       pw.println();
       }*/
     
+    private final void initTrackEditorFactoryTable()
+    {
+	TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonodimensionalTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonodimensionalTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonodimensionalTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonodimensionalTrackEditorFactory.instance);
+    }
+
+    private final void initValueInfoTable()
+    {
+	ValueInfoTable.registerInfo(AmbitusValue.info);
+	ValueInfoTable.registerInfo(FricativeValue.info);
+	ValueInfoTable.registerInfo(LogicValue.info);
+	ValueInfoTable.registerInfo(CueValue.info);
+	ValueInfoTable.registerInfo(IntegerValue.info);
+    }
 
     private final void makeTitle(FtsSequenceObject maxData){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
-    MaxWindowManager.getWindowManager().windowChanged(this);
-  } 
+	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
+	MaxWindowManager.getWindowManager().windowChanged(this);
+    } 
 
 
     private final void makeMenuBar(){

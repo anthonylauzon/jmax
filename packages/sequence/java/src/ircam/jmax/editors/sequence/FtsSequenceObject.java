@@ -52,13 +52,16 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    */
   public FtsSequenceObject(Fts fts, FtsObject parent, String description, int objId)
   {
-    super(fts, parent, objId, null, "sequence");
+    super(fts, parent, objId, null, "sequence", description);
       
     listeners = new MaxVector();
   }
 
+   /**
+   * MESSAGES called from fts.
+   */
   Sequence sequence = null;
-  public void openEditor()
+  public void openEditor(int nArgs , FtsAtom args[])
   {
     if(sequence==null)
       sequence = new Sequence(this);
@@ -67,7 +70,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     sequence.toFront();
   }
 
-  public void destroyEditor()
+  public void destroyEditor(int nArgs , FtsAtom args[])
   {
     if(sequence!=null)
     {
@@ -75,7 +78,22 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       sequence = null;
     }
   }
+    
+  static Object[] evtArgs = new Object[128];
+  
+  public void addEvent(int nArgs , FtsAtom args[])
+  {
+      int trackId = args[0].getInt();
+      int objId = args[1].getInt();
+      double time = (double)args[2].getFloat();
+      String type = args[3].getString();
+      int numArgs = args[4].getInt();
+      
+      for(int i = 0; i<numArgs; i++)
+	  evtArgs[i] = args[5+i].getValue();
 
+      getTrackById(trackId).getTrackDataModel().addNewEvent(objId, time, type, numArgs, evtArgs);
+  }
 
   /**
    * how many events in the data base?

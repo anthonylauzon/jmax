@@ -77,12 +77,26 @@ public class IntegerValue extends AbstractEventValue
     {
 	return new ArrayEnumeration(nameArray);
     }
-
+    
+    public int getPropertyCount()
+    {
+	return propertyCount;
+    }
+   
+    public Object[] getPropertyValues()
+    {
+	for(int i = 0; i<propertyCount; i++)
+	    propertyValuesArray[i] = getProperty(nameArray[i]);
+	
+	return propertyValuesArray;
+    }
+   
     //--- Fields
 
     public static final String INTEGER_NAME = "Integer";
     public static IntegerValueInfo info = new IntegerValueInfo();
 
     static String nameArray[] = {"integer"};
+    static int propertyCount = 1;
 }
 

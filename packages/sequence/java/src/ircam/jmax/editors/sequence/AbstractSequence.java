@@ -49,10 +49,11 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
      * Create an AbstractSequence and initialize the type vector
      * with the given type.
      */
-    public AbstractSequence( ValueInfo info)
+    public AbstractSequence(SequenceDataModel sequence, ValueInfo info)
     {
 	super();
 	listeners = new MaxVector();
+	sequenceData = sequence;
 	
 	/* prepare the flavors for the clipboard */
 	if (flavors == null)
@@ -60,8 +61,6 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	flavors[0] = sequenceFlavor;
 
 	infos.addElement(info);
-
-
     }
     
     /**
@@ -188,6 +187,19 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	else return NO_SUCH_EVENT;
     }
     
+    public void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[])
+    {
+	/*
+	  1) crea un TrackValue con tipo e parametri passati
+	  2) crea un TrackEvent (FtsSequenceEventObject) con timeTag e TrackValue associati
+	  3) lo aggiunge alla traccia chiamando addEvent(TrackEvent)
+	 
+	*/
+	//EventValue evtValue = ValueInfoTable.getValueInfo(valueType).newInstance();
+	//evtValue.setArgs(args);//set arguments
+	//addEvent(new TrackEvent(objId, timeTag, value));
+    }
+
     /**
      * adds an event in the database
      */
@@ -206,24 +218,34 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
 	
 	makeRoomAt(index);
 	events[index] = event;
-	
-	/////////////   FTS COMMUNICATION (to be implemented)
-	/*Object args[] = new Object[6];
-	  args[0] = new Integer(index);
-	  args[1] = new Integer(event.getTime());
-	  args[2] = new Integer(event.getPitch());
-	  args[3] = new Integer(event.getVelocity());
-	  args[4] = new Integer(event.getDuration());
-	  args[5] = new Integer(event.getChannel());
-	  
-	  remoteCall(REMOTE_ADD, args);*/
-	
+		
 	notifyObjectAdded(event, index);
 	
 	if (isInGroup())     
 	    {
 		postEdit(new UndoableAdd(event));
 	    }
+    }
+
+    static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
+
+    public void sendAddEventMessage(int trackId, int objId, float time, String type, int nArgs, Object args[])
+    {    
+	sendArgs[0].setInt(trackId); 
+	sendArgs[1].setInt(objId);
+	sendArgs[2].setFloat(time); 
+	sendArgs[3].setString(type);
+	sendArgs[4].setInt(nArgs);
+
+	for(int i=0; i<nArgs; i++)
+	    sendArgs[5+i].setValue(args[i]);
+
+	((FtsSequenceObject)sequenceData).sendMessage(FtsObject.systemInlet, "event_add", 5+nArgs , sendArgs);
     }
     
     /**
@@ -781,6 +803,7 @@ public class AbstractSequence extends FtsRemoteUndoableData implements TrackData
     private MaxVector listeners;
     private MaxVector tempVector = new MaxVector();
     MaxVector infos = new MaxVector();
+    SequenceDataModel sequenceData;
 
     public static DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");

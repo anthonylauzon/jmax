@@ -145,7 +145,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      ********** so we insert some false track to test the track editors */
 
 
-    ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(AmbitusValue.info)));
+    ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(ftsSequenceObject, AmbitusValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(FricativeValue.info)));
     //    sequenceRemoteData.addTrack(new TrackBase(new AbstractSequence(CueValue.info)));
 

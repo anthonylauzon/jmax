@@ -48,6 +48,17 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 	return new EmptyEnumeration();
     }
 
+    public int getPropertyCount()
+    {
+	return 0;
+    }
+
+    public static Object[] propertyValuesArray = new Object[128];
+    public Object[] getPropertyValues()
+    {
+	return propertyValuesArray;
+    }
+
     /**
      * Returns the renderer for this object */
     public ObjectRenderer getRenderer()

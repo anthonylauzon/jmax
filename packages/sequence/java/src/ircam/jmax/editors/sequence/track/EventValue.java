@@ -44,6 +44,16 @@ public interface EventValue
     public abstract Enumeration getPropertyNames();
 
     /**
+     * Returns the number of properties known by this
+     * EventValue */
+    public abstract int getPropertyCount();
+
+    /**
+     * Returns all the property values known by this
+     * EventValue like a FtsAtom array */
+    public abstract Object[] getPropertyValues();
+
+    /**
      * getProperty on an unknown property should return this value */
     public static Object UNKNOWN_PROPERTY = new Integer(Integer.MAX_VALUE);
  
@@ -54,5 +64,7 @@ public interface EventValue
      * values */
     public Object DEFAULT_PROPERTY = new Integer(64);
 }
+
+
 
 

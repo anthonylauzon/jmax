@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.sequence.tools;
 
+import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
@@ -104,7 +105,6 @@ public class AdderTool extends Tool implements PositionListener {
 	    }
     }
     
-    
     void addEvent(int x, int y, EventValue value)
     {
 	TrackEvent aEvent = new TrackEvent(value); // create a new event with the given FtsRemoteData type
@@ -120,7 +120,14 @@ public class AdderTool extends Tool implements PositionListener {
 	
 	// ends the undoable transition
 	((UndoableData) egc.getDataModel()).endUpdate();
-	
+
+	//only for now: 
+	egc.getDataModel().sendAddEventMessage(egc.getTrack().getId(),
+					       MaxApplication.getFts().FTS_NO_ID,
+					       (float)aEvent.getTime(), 
+					       value.getValueInfo().getName(), 
+					       value.getPropertyCount(), 
+					       value.getPropertyValues());
     }
 
     void popupChoose(int x, int y, Track track)
@@ -129,13 +136,6 @@ public class AdderTool extends Tool implements PositionListener {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	JPopupMenu popup = new JPopupMenu();
 
-	/*for (Enumeration e = ((MultiSequence)track.getTrackDataModel()).getTypes(); e.hasMoreElements();)
-	  {
-	  ValueInfo info = (ValueInfo) e.nextElement();
-	  PrivateAction a = new PrivateAction(info, x, y);
-	  
-	  popup.add(a);
-	  }*/
 	for (Enumeration e = track.getTrackDataModel().getTypes(); e.hasMoreElements();)
 	  {
 	      ValueInfo info = (ValueInfo) e.nextElement();
@@ -161,7 +161,6 @@ public class AdderTool extends Tool implements PositionListener {
 	public void actionPerformed(ActionEvent e)
 	{
 	    addEvent(x, y, (EventValue) info.newInstance());
-	    	    
 	}
 
 	int x;

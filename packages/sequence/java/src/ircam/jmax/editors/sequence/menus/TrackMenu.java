@@ -90,7 +90,7 @@ public class TrackMenu extends EditorMenu
     
     public void actionPerformed(ActionEvent e)
     {
-      sequenceModel.addTrack(new TrackBase(new AbstractSequence(info)));
+      sequenceModel.addTrack(new TrackBase(new AbstractSequence(sequenceModel, info)));
     }
 	
     ValueInfo info;    
