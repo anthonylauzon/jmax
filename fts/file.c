@@ -336,15 +336,33 @@ fts_get_project_dir(void)
     }
 }
 
-fts_symbol_t 
-fts_make_absolute_path(fts_symbol_t parent, fts_symbol_t file)
+char*
+fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {
-  char buf[MAXPATHLEN];
-  
-  if (!fts_path_is_absolute(fts_symbol_name(file))) {
-    sprintf(buf, "%s%c%s", fts_symbol_name(parent), fts_file_separator, fts_symbol_name(file));
-    return fts_new_symbol(buf);
+  if (!fts_path_is_absolute(file)) {
+    snprintf(buf, len, "%s%c%s", parent, fts_file_separator, file);
   } else {
-    return file;
+    snprintf(buf, len, "%s", file);
   }
+  return buf;
+}
+
+int 
+fts_find_file(fts_list_t* paths, const char* filename, char* buf, int len)
+{
+  struct stat statbuf;
+
+  while (paths) {
+    
+    fts_make_absolute_path(fts_symbol_name(fts_get_symbol(fts_list_get(paths))), filename, buf, len);
+
+    if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG)) {
+      return 1;
+    }
+
+    paths = fts_list_next(paths);
+  }
+
+  buf[0] = 0;
+  return 0;
 }

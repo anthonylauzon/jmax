@@ -713,6 +713,10 @@ void fts_client_add_object(fts_object_t *obj)
   fprintf_object( stderr, obj);
 #endif
 
+  if (obj && fts_object_get_id(obj) == FTS_NO_ID) {
+    int dummy = 0;
+  }
+
   oldclient_put_char( oldclient, OBJECT_CODE);
   fts_client_send_int( obj ? fts_object_get_id(obj) : 0);
 }

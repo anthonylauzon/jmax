@@ -410,7 +410,7 @@ jmax_get_root_from_registry(char *buf, jint bufsize)
     jmax_log("Error opening registry key '%s'\n", JMAX_KEY);
     return 0;
   }
-  
+
   if (!jmax_get_string_from_registry(key, "jmaxRoot", buf, bufsize)) {
     jmax_log("Failed reading value of registry key:\n\t%s\\jmaxRoot\n", JMAX_KEY);
     RegCloseKey(key);

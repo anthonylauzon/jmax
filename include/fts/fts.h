@@ -99,6 +99,7 @@ extern "C" {
 #include <fts/inout.h>
 #include <fts/saver.h>
 #include <fts/param.h>
+#include <fts/package.h>
 
 #include <fts/ftl.h>
 #include <fts/ftlmem.h>

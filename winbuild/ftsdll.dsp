@@ -233,6 +233,10 @@ SOURCE=..\fts\OLDucs.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\package.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\param.c
 # End Source File
 # Begin Source File

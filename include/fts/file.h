@@ -70,7 +70,12 @@ FTS_API fts_symbol_t fts_get_search_path(void);
 FTS_API void fts_set_project_dir(fts_symbol_t project_dir);
 FTS_API fts_symbol_t fts_get_project_dir(void);
 
-FTS_API fts_symbol_t fts_make_absolute_path(fts_symbol_t parent, fts_symbol_t file);
+/** Creates the absolute file path. The result is copied in the buf
+    argument. Returns the pointer to buf. */
+FTS_API char* fts_make_absolute_path(const char* parent, const char* file, char* buf, int len);
+
+/** Returns 0 if the file was not found, 1 if the file was found */
+FTS_API int fts_find_file(fts_list_t* paths, const char *filename, char* buf, int len);
 
 FTS_API char fts_file_separator;
 FTS_API char fts_path_separator;

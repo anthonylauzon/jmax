@@ -33,10 +33,6 @@ jmax:
 	$(JAVAC) -classpath ..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
 	-@cd ..\..\..\..
 
-	cd src\ircam\jmax\utils
-	$(JAVAC) -classpath ..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
-	-@cd ..\..\..\..
-
 	cd src\ircam\jmax\widgets
 	$(JAVAC) -classpath ..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
 	-@cd ..\..\..\..

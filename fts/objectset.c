@@ -21,8 +21,10 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/OLDclient.h>
 
 fts_symbol_t objectset_symbol = 0;
+fts_symbol_t sym_objectset_append = 0;
 
 
 /***********************************************************************
@@ -40,7 +42,7 @@ fts_objectset_create()
 void 
 fts_objectset_destroy( fts_objectset_t *set)
 {
-  fts_object_destroy( (fts_object_*) set);
+  fts_object_destroy( (fts_object_t*) set);
 }
 
 void 
@@ -61,12 +63,12 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
   exits_already = fts_hashtable_put( &set->hashtable, &k, &v);
 
   /* inform the client if necessary */
-  if (fts_object_has_id((fts_object_t *)this) && !exits_already) {
+  if (fts_object_has_id((fts_object_t *) set) && !exits_already) {
 
-    if (!fts_object_has_id(obj))
-      fts_client_upload_object(obj);
+    if (!fts_object_has_id(object))
+      fts_client_upload_object(object);
     
-    fts_client_send_message((fts_object_t *)this, sym_objectset_append, 1, &k);
+    fts_client_send_message((fts_object_t *) set, sym_objectset_append, 1, &k);
   }
 }
 
@@ -84,7 +86,6 @@ fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
 {
   fts_hashtable_get_keys( &set->hashtable, i);
 }
-
 
 /***********************************************************************
  *
@@ -126,5 +127,6 @@ objectset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void fts_kernel_objectset_init( void)
 {
   objectset_symbol = fts_new_symbol("__objectset");
+  sym_objectset_append = fts_new_symbol("append");
   fts_class_install(objectset_symbol, objectset_instantiate);
 }

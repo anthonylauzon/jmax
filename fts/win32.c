@@ -198,7 +198,7 @@ static int
 fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
 {
   DWORD type, size;
-  
+
   if (RegQueryValueEx(key, name, 0, &type, 0, &size) == 0
       && type == REG_SZ
       && (size < (unsigned int)bufsize)) {

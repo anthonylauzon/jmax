@@ -58,11 +58,11 @@ typedef struct _fts_object_set_t {
 /**
  * Creates a new objectset
  *
- * @fn fts_objectset_t *fts_objectset_init( void)
+ * @fn fts_objectset_t *fts_objectset_create( void)
  * @returns the new objectset
  * @ingroup objectset
  */
-FTS_API fts_objectset_t *fts_objectset_init( void);
+FTS_API fts_objectset_t *fts_objectset_create( void);
 
 /**
  * Frees all the ressources of the objectset

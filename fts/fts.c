@@ -116,7 +116,7 @@ static void fts_cmd_args_init( void)
 
 static void fts_cmd_args_parse( int argc, char **argv)
 {
-  int filecount = 1, r;
+  int filecount = 1;
   char filevar[32];
   fts_symbol_t name, value;
 
@@ -213,6 +213,8 @@ extern void fts_kernel_variable_init( void);
 extern void fts_kernel_time_init(void);
 extern void fts_kernel_list_init( void);
 
+extern void fts_kernel_package_init(void);
+
 extern void fts_oldclient_start( void);
 
 
@@ -255,6 +257,8 @@ void fts_init( int argc, char **argv)
   fts_kernel_olducs_init();
   fts_kernel_time_init();
   fts_kernel_list_init();
+
+  fts_kernel_package_init();
 
   fts_cmd_args_parse( argc, argv);
 
