@@ -16,5 +16,17 @@ public interface EventRenderer {
    * returns true if the given event contains the given (graphic) point
    */
   public abstract boolean contains(ScrEvent theEvent, int x, int y);
+
+  /**
+   * returns true if the representation of the given event "touches" the given rectangle
+   */
+  public abstract boolean touches(ScrEvent theEvent, int x, int y, int w, int h);
+
 }
+
+
+
+
+
+
 

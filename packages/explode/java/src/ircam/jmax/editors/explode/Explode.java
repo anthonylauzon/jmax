@@ -11,8 +11,17 @@ import com.sun.java.swing.*;
 import com.sun.java.swing.table.*;
 import com.sun.java.swing.event.*;
 
+
+/**
+ * the main class of the explode package.
+ * It inherits from MaxEditor, and implements the MaxDataEditor Interface
+ */
 public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
+  /**
+   * constructor.
+   * It creates a panel that will display the datas in maxData
+   */
   public Explode( MaxData maxData)
   {
     super( Mda.getDocumentTypeByName( "explodeRemoteData"));
@@ -25,19 +34,10 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 
-
-    /* JDK1.1 version */
-    /*JScrollPane aScrollPane = new JScrollPane();
-      aScrollPane.add(new ScrPanel(explodeRemoteData));
-      aScrollPane.setSize(200, 200);*/
-    /* swing version (too slow!!) 
-       JScrollPane aScrollPane = new JScrollPane();
-       aScrollPane.getViewport().add(new ScrPanel(explodeRemoteData)); */
-    
     getContentPane().add(new ScrPanel(explodeRemoteData));
     
-    /**
-     * just to be able to exit...*/
+    /*
+     * just to be able to exit quickly...*/
     addWindowListener((new WindowAdapter() {
 
       public void windowClosing(WindowEvent e) {
@@ -51,17 +51,21 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
     validate();
     pack();
     setVisible(true);
-
   }
 
 
-  // MaxDataEditor interface
+  /** 
+   * MaxDataEditor interface
+   */
   public MaxData getData()
   {
     return maxData;
   }
 
-  // MaxDataEditor interface
+
+  /** 
+   * MaxDataEditor interface
+   */
   public void reEdit()
   {
     if (!isVisible()) 
@@ -70,22 +74,33 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
     toFront();
   }
 
-  // MaxDataEditor interface
+
+  /** 
+   * MaxDataEditor interface
+   */
   public void quitEdit()
   {
     Close();
     dispose();
   }
 
-  // MaxDataEditor interface
+
+  /** 
+   * MaxDataEditor interface
+   */
   public void syncData()
   {
   }
 
-  // MaxEditor
+
+  /**
+   * personalize the menubar
+   */
   public void SetupMenu()
   {
   }
+
+  //------------------- fields
 
   MaxData maxData;
 }  

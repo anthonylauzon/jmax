@@ -6,25 +6,30 @@ import java.awt.event.*;
 
 /**
  * a VERY simple interaction module:
- * just waits the choice of a point in a component via mouse-click.
+ * it just waits the choice of a point in a graphicContext via mouse-clicks.
  * It communicates the choice to a "Position listener"
  */
 public class MouseTracker extends InteractionModule {
-  PositionListener itsListener;
 
-  public MouseTracker(PositionListener theListener, Component theGraphicObject) {
-    super(theGraphicObject, theGraphicObject);
+  /**
+   * constructor.
+   */
+  public MouseTracker(PositionListener theListener, GraphicContext gc) 
+  {
+    super(gc.getGraphicEventSource(), gc.getGraphicDestination());
     itsListener = theListener;
   }
 
 
-  //----------- Mouse interface ------------
+  //Mouse interface
   
-  public void mousePressed(MouseEvent e) {
-    
+  public void mousePressed(MouseEvent e) 
+  {  
     itsListener.positionChoosen(e.getX(), e.getY(), e.getModifiers());
-
   } 
+
+  //------------- fields
+  PositionListener itsListener;
 }
 
 

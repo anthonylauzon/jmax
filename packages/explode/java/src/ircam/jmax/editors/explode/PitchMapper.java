@@ -1,13 +1,24 @@
 package ircam.jmax.editors.explode;
 
+/**
+ * a mapper into the pitch value of the ScrEvents
+ */
 public class PitchMapper extends Mapper {
   
-  public void set(ScrEvent e, int val) {
-
+  /**
+   * set the given pitch in the given event
+   */
+  public void set(ScrEvent e, int val) 
+  {
     e.setPitch(val);
   }
 
-  public int get(ScrEvent e) {
+
+  /**
+   * get the pitch from the given event
+   */
+  public int get(ScrEvent e) 
+  {
     return e.getPitch();
   }
 }

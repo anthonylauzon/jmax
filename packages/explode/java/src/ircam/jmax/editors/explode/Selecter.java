@@ -4,98 +4,108 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * a rubber-banding interaction module.
+ * A rubber-banding interaction module.
  * It takes care of drawing a "selection rectangle" in a 
- * component, and communicate it to a SelectionListener
+ * component, and communicate the result to a SelectionListener
  */
-public class Selecter extends InteractionModule {
-  SelectionListener itsListener;
+public class Selecter extends InteractionModule implements XORPainter {
 
-  boolean updated = true;
-
-  Point startSelection = new Point();
-  int oldX = 0;
-  int oldY = 0;
-  
-
-  public Selecter(SelectionListener theListener, Component theGraphicObject) {
-    super(theGraphicObject, theGraphicObject);
+  /**
+   * Constructor. This class uses a XORHandler to draw the shape
+   * of the rubber banding rectangle
+   */
+  public Selecter(SelectionListener theListener, GraphicContext gc) 
+  {
+    super(gc.getGraphicEventSource(), gc.getGraphicDestination());
+    
+    itsXORHandler = new XORHandler(this);
     itsListener = theListener;
   }
   
-  public void mousePressed(MouseEvent e) {
+
+  /**
+   * overrides InteractionModule.mousePressed()
+   */
+  public void mousePressed(MouseEvent e) 
+  {
     interactionBeginAt(e.getX(), e.getY());
   } 
 
-  public void interactionBeginAt(int x, int y) {
-    oldX = x;  //vars used to XOR-paint the selection rectangle
-    oldY = y;
-    startSelection.setLocation(oldX, oldY);
+
+  /**
+   * called to set the starting point of the selection
+   */
+  public void interactionBeginAt(int x, int y) 
+  {  
+    startSelection.setLocation(x, y);
+    movingPoint.setLocation(x, y);
+    itsXORHandler.beginAt(x, y);
   }
 
-  public void mouseDragged(MouseEvent e) {
 
-    drawXORSelection(e.getX(), e.getY());
+  /**
+   * overrides InteractionModule.mouseDragged()
+   */
+  public void mouseDragged(MouseEvent e) 
+  {
+    itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
-  public void mouseReleased(MouseEvent e) {
+  /**
+   * overrides InteractionModule.mouseReleased()
+   */
+  public void mouseReleased(MouseEvent e) 
+  {
     int x = e.getX();
     int y = e.getY();
-    updated = true;
-    drawXORSelection(x, y);
-    updated = false;
+
+    itsXORHandler.end();
 
     tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
     normalizeRectangle(tempRect);
     
+    if (tempRect.width == 0) tempRect.width =1;
+    if (tempRect.height == 0) tempRect.height =1;
+    
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
   }
 
+  /**
+   * from the XORPainter interface
+   */
+  public void XORErase() 
+  {
+    XORDeltaDraw(0, 0);
+  }
 
   /**
-   * draws the rubber rectangle during a drag-selection.
-   * This method is invoked during a selection
+   * from the XOR painter interface. The actual drawing routine
    */
-  public void drawXORSelection(int x1, int y1) {
-    
+  public void XORDeltaDraw(int dx, int dy) 
+  {
     Graphics g = itsGraphicDestination.getGraphics();
+
     g.setColor(Color.gray);
     g.setXORMode(Color.white); //there's an assumption here on the color of the background.
-    
-    if (!updated) { /*erase the shadow*/
-      drawRectGiven2Points(g, startSelection.x, startSelection.y, oldX, oldY);
-      updated = true;
-    
-    }
-    
-    drawRectGiven2Points(g, startSelection.x, startSelection.y, x1, y1);
-    oldX = x1; oldY = y1;
-    
-    g.setPaintMode();
-    g.setColor(Color.black);
-    updated = false;
-  
-  } 
 
-  Rectangle tempRect = new Rectangle();
-  /**
-   * utility function. Gets rid of the "negative lenght" problems
-   * in the selection rectangles.
-   */
-  private void drawRectGiven2Points(Graphics g, int x1, int y1, int x2, int y2) {
-    tempRect.setBounds(x1, y1, x2-x1, y2-y1);
+    movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy);
+
+    tempRect.setBounds(startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
     normalizeRectangle(tempRect);
 
     g.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
 
+    g.setPaintMode();
+    g.setColor(Color.black);
   }
+
 
   /**
    * utility function. Gets rid of the "negative width/lenght" problems
    * in rectangles.
    */
-  public void normalizeRectangle(Rectangle r) {
-    
+  public void normalizeRectangle(Rectangle r) 
+  {  
     /* sets the origin */
     if (r.width < 0) r.x = r.x+r.width;
     
@@ -104,8 +114,17 @@ public class Selecter extends InteractionModule {
     /* sets width and height */
     if (r.width<0) r.width = -r.width;
     if (r.height<0) r.height = -r.height;
-
   }
+
+  //--- Fields
+  SelectionListener itsListener;
+
+  Point startSelection = new Point();
+  Point movingPoint = new Point();
+  XORHandler itsXORHandler;
+  
+  Rectangle tempRect = new Rectangle();
+
 }
 
 

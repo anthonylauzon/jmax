@@ -5,27 +5,27 @@ package ircam.jmax.editors.explode;
  * The class representing a generic event in the score
  */
 public class ScrEvent {
-  int itsTime;
-  int itsPitch;
-  int itsVelocity;
-  int itsDuration;
-  int itsChannel;
-  int itsSomethingElse;
 
-
-  public ScrEvent() {
-    itsTime = 0;
-    itsPitch = 64;
-    itsVelocity = 64;
-    itsDuration = 100;
-    itsChannel = 1;
-    itsSomethingElse = 0;
+  /**
+   * default constructor.
+   * It provides an event with a default set of parameters
+   */
+  public ScrEvent() 
+  {
+    itsTime = DEFAULT_TIME;
+    itsPitch = DEFAULT_PITCH;
+    itsVelocity = DEFAULT_VELOCITY;
+    itsDuration = DEFAULT_DURATION;
+    itsChannel = DEFAULT_CHANNEL;
+    itsSomethingElse = DEFAULT_SOMETHING;
   }
+
 
   /**
    * constructor with all the parameters
    */
-  public ScrEvent(int theTime, int thePitch, int theVelocity, int theDuration, int theSomething) {
+  public ScrEvent(int theTime, int thePitch, int theVelocity, int theDuration, int theSomething) 
+  {
     itsTime = theTime;
     itsPitch = thePitch;
     itsVelocity = theVelocity;
@@ -35,64 +35,90 @@ public class ScrEvent {
   }
 
   /**
-   * the starting time of this event
+   * get the starting time of this event
    */
-  public final int getTime() {
+  public final int getTime() 
+  {
     return itsTime;
   }
 
   /**
-   * the pitch of this event
+   * get the pitch of this event
    */
-  public final int getPitch() {
+  public final int getPitch() 
+  {
     return itsPitch;
   }
 
   /**
    * the MIDI velocity associated to this event
    */
-  public final int getVelocity() {
+  public final int getVelocity() 
+  {
     return itsVelocity;
   }
 
   /**
-   * the MIDI channel associated to this event
+   * get the MIDI channel associated to this event
    */
-  public final int getChannel() {
+  public final int getChannel() 
+  {
     return itsChannel;
   }
 
   /**
-   * the duration of this event
+   * get the duration of this event
    */
-  public final int getDuration() {
+  public final int getDuration() 
+  {
     return itsDuration;
   }
 
-  public final int getSomething() {
+  public final int getSomething() 
+  {
     return itsSomethingElse;
   }
   
   /* the corresponding set functions.. */
-  public final void setTime(int time) {
+  public final void setTime(int time) 
+  {
     itsTime = time;
   }
 
-  public final void setPitch(int pitch) {
+  public final void setPitch(int pitch) 
+  {
     itsPitch = pitch;
   }
 
-  public final void setDuration(int duration) {
+  public final void setDuration(int duration) 
+  {
     itsDuration = duration;
   }
 
-  public final void setVelocity(int theVelocity) {
+  public final void setVelocity(int theVelocity) 
+  {
     itsVelocity = theVelocity;
   }
 
-  public final void setChannel(int theChannel) {
+  public final void setChannel(int theChannel) 
+  {
     itsChannel = theChannel;
   }
+
+  //------------ Fields
+  int itsTime;
+  int itsPitch;
+  int itsVelocity;
+  int itsDuration;
+  int itsChannel;
+  int itsSomethingElse;
+
+  public static int DEFAULT_TIME = 0;
+  public static int DEFAULT_PITCH = 64;
+  public static int DEFAULT_VELOCITY = 64;
+  public static int DEFAULT_DURATION = 100;
+  public static int DEFAULT_CHANNEL = 0;
+  public static int DEFAULT_SOMETHING = 0;
 
 }
 

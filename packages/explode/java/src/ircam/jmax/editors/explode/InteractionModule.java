@@ -7,49 +7,66 @@ import java.awt.event.*;
 /**
  * the base classe of modules that handles the user interaction.
  * Specialization of these modules are used by the tools, 
- * in order to separate the low-level interaction (es. mouse callback) 
- * from the semantic (es. rubber-banding of a selection rect).
+ * in order to separate the low-level interaction (example rubber-banding 
+ * of a selection rect) 
+ * from the semantic (example selection of the objects in the rect).
  * This base class acts like a multiple adapter for the derived class.
  */
 public class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
 
-  Component itsEventSource;
-  Component itsGraphicDestination;
 
-  static InteractionModule currentActiveModule;
-
-  public InteractionModule(Component theSource, Component theDestination) {
+  /**
+   * constructor. It needs to know the source of events, and
+   * the destination of the drawing operations
+   */
+  public InteractionModule(Component theSource, Component theDestination) 
+  {
     itsEventSource = theSource;
     itsGraphicDestination = theDestination;
   }
 
-  public void takeInteraction() {
+  /**
+   * called when this modules must take the interaction.
+   * don't call this function directly: call ScrTool.mountIModule instead
+   */ 
+  public void takeInteraction() 
+  {
+    
     if (currentActiveModule != null)
       currentActiveModule.unBindFromProducer();
-
+    
     currentActiveModule = this;
     bindToProducer(itsEventSource);
   }
 
-  public void bindToProducer(Component eventProducer) {
-    if (eventProducer == null) {
-      return;
-    }
 
-    itsEventSource = eventProducer;
-    eventProducer.addMouseListener(this);
-    eventProducer.addMouseMotionListener(this);
-    eventProducer.addKeyListener(this);
+  /**
+   * make this UI Module listen the event coming from the given event producer.
+   */
+  public void bindToProducer(Component eventProducer) 
+  {  
+    if (eventProducer != null) 
+      {
+	itsEventSource = eventProducer;
+
+	itsEventSource.addMouseListener(this);
+	itsEventSource.addMouseMotionListener(this);
+	itsEventSource.addKeyListener(this);
+      }
   }
 
-  public void unBindFromProducer() {
-    if (itsEventSource == null)
-      return;
 
-    itsEventSource.removeMouseListener(this);
-    itsEventSource.removeMouseMotionListener(this);
-    itsEventSource.removeKeyListener(this);
-    
+  /**
+   * stop listening events from the current producer
+   */
+  public void unBindFromProducer() 
+  {
+    if (itsEventSource != null) 
+      {   
+	itsEventSource.removeMouseListener(this);
+	itsEventSource.removeMouseMotionListener(this);
+	itsEventSource.removeKeyListener(this);	
+      }
   }
 
   //----------- Mouse interface ------------
@@ -74,6 +91,14 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
   public void keyPressed(KeyEvent e) {}
 
   public void keyReleased(KeyEvent e) {}
+
+
+  //--------------- Fields
+  static InteractionModule currentActiveModule = null;
+
+  Component itsEventSource;
+  Component itsGraphicDestination;
+
 }
 
 

@@ -5,7 +5,8 @@ import ircam.jmax.fts.*;
 import java.util.Enumeration;
 
 /**
- * the model for the explode data. ExplodeRemoteData implements it.
+ * the functionalities of the model for the explode data. 
+ * ExplodeRemoteData implements it.
  */
 public interface ExplodeDataModel {
 
@@ -20,6 +21,7 @@ public interface ExplodeDataModel {
    */
   public abstract Enumeration getEvents();
   
+
   /**
    * returns a given event
    */
@@ -32,6 +34,7 @@ public interface ExplodeDataModel {
    */
   public abstract int indexOfFirstEventStartingAfter(int time);
 
+
   /**
    * access the last event whose ENDING time is 
    * before a given time
@@ -40,9 +43,10 @@ public interface ExplodeDataModel {
 
 
   /**
-   * the enumeration of all the events active in a given moment
+   * the enumeration of all the events active at a given time value
    */
   public abstract Enumeration eventsLivingAt(int time);
+
 
   /**
    * adds an event in the database
@@ -54,6 +58,7 @@ public interface ExplodeDataModel {
    * deletes an event from the database
    */
   public abstract void removeEvent(ScrEvent theEvent);
+
 
   /**
    * requires to be notified when the database changes

@@ -3,67 +3,77 @@ package ircam.jmax.editors.explode;
 
 import java.util.*;
 
+/**
+ * A selection of explode events.
+ */ 
 public class ExplodeSelection implements SelectionHandler {
 
-  public ExplodeSelection(ExplodeDataModel theModel, Adapter theAdapter) {
+  /**
+   * constructor
+   */
+  public ExplodeSelection(ExplodeDataModel theModel) 
+  {
     itsModel = theModel;
-    itsAdapter = theAdapter;
     selected = new Hashtable();
   }
 
-  public void select(Object obj) {
+  /**
+   * select the object 
+   */
+  public void select(Object obj) 
+  {
     selected.put(obj, obj);
   }
 
-  public void deSelect(Object obj) {
+  /**
+   * remove the object from the selection
+   */
+  public void deSelect(Object obj) 
+  {
     selected.remove(obj);
   }
 
-  public boolean isInSelection(Object obj) {
 
+  /**
+   * returns true if the object is currently selected
+   */
+  public boolean isInSelection(Object obj) 
+  {
     return selected.containsKey(obj);
   }
 
-  public Enumeration getSelected() {
+
+  /**
+   * returns an enumeration of all the selected objects
+   */
+  public Enumeration getSelected() 
+  {
     return selected.elements();
   }
 
-  public void deselectAll() {
+
+  /**
+   * deselects all the objects
+   */
+  public void deselectAll() 
+  {
     selected.clear();
   }
 
-  public void selectAll() {
-    for (Enumeration e = itsModel.getEvents(); e.hasMoreElements();) {
-      select(e.nextElement());
-    }
-  }
 
   /**
-   * ExplodeSelection make an assumption on the x-y mapping:
-   * x is mapped to time, y to pitch. This method, maybe, should not be
-   * in the generic SelectionHandler interface.
+   * selects all the objects of the data model
    */
-  public void selectArea(int x, int y, int w, int h) {
-    int startTime = itsAdapter.getInvX(x);
-    int endTime = itsAdapter.getInvX(x+w);
-    int upperPitch = itsAdapter.getInvY(y);
-    int lowerPitch = itsAdapter.getInvY(y+h);
-
-    int startIndex = itsModel.indexOfLastEventEndingBefore(startTime)+1;
-    int endIndex = itsModel.indexOfFirstEventStartingAfter(endTime)-1;
-
-    ScrEvent aScrEvent;
-    for (int i = startIndex; i<= endIndex; i++) {
-      aScrEvent = itsModel.getEventAt(i);
-      if (aScrEvent.getPitch() >=lowerPitch && aScrEvent.getPitch() <= upperPitch)
-	select(itsModel.getEventAt(i));
-    }
+  public void selectAll() 
+  {
+    for (Enumeration e = itsModel.getEvents(); e.hasMoreElements();) 
+      {
+	select(e.nextElement());
+      }
   }
 
-
-  // fields
+  //--- Fields
   ExplodeDataModel itsModel;
-  Adapter itsAdapter;
   Hashtable selected;
 }
 

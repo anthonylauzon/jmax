@@ -3,67 +3,118 @@ package ircam.jmax.editors.explode;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import com.sun.java.swing.ImageIcon;
 
 /**
  * the tool used to perform the different operations associated
  * with the "arrow" tool, that is:
- * selection, area_selection, deselection, moving, resizing etc.
+ * selection, area_selection, deselection
  * The default (initial) interface module for this tool is the MouseTracker.
  */ 
 public class ArrowTool extends ScrTool implements PositionListener, SelectionListener{
 
-  Component itsGraphicObject;
-  RenderProvider itsRenderProvider;
-  MouseTracker itsMouseTracker;
-  Selecter itsSelecter;
-  SelectionHandler itsSelectionHandler;
-
   /**
-   * Constructor. It needs to know the panel and the SelectionHandler
-   * on which to operate 
+   * Constructor. 
    */
-  public ArrowTool(Component theGraphicObject, RenderProvider theRenderProvider, SelectionHandler theSelectionHandler) {
-    super("arrow", new ImageIcon("/u/worksta/maggi/projects/max/images/tool_bang.gif"));
-    itsGraphicObject = theGraphicObject;
-    itsSelectionHandler = theSelectionHandler;
-    itsRenderProvider = theRenderProvider;
-    itsMouseTracker = new MouseTracker(this, itsGraphicObject);
-    itsSelecter = new Selecter(this, itsGraphicObject);
+  public ArrowTool(GraphicContext theGc) 
+  {
+    super("arrow", new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/selecter.gif"));
+    
+    gc = theGc;
+    
+    itsMouseTracker = new MouseTracker(this, gc);
+    itsSelecter = new Selecter(this, gc);
   }
 
-  public void activate() {
-
+  
+  /**
+   * called when this tool has been choosen
+   */
+  public void activate() 
+  {
     mountIModule(itsMouseTracker);
   }
 
+
+  /**
+   * called when this tool is unmounted
+   */
   public void deactivate(){}
 
-  //position listening (MouseTracker InterfaceModule)
-  public void positionChoosen(int x, int y, int modifiers) {
-    ScrEvent aScrEvent = itsRenderProvider.getRenderer().eventContaining(x, y);
+  
+  /**
+   * called by the UI modules
+   */
+  public void positionChoosen(int x, int y, int modifiers) 
+  {
+    ScrEvent aScrEvent = gc.getRenderer().eventContaining(x, y);
+    
+    if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+      gc.getSelection().deselectAll();
+    
+    itsSelecter.interactionBeginAt(x, y);
+    mountIModule(itsSelecter);
     
     if (aScrEvent == null)
       {
-	if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	  itsSelectionHandler.deselectAll();
-	itsGraphicObject.repaint();
-	itsSelecter.interactionBeginAt(x, y);
-	mountIModule(itsSelecter);
+	gc.getGraphicDestination().repaint();
       }
     else 
       {
-	System.err.println("vorresti muovere?");
+	System.err.println("hit an object");
       }
   }
 
-  //selection listening (Selecter IM)
+
+  /**
+   * called by the UI modules
+   */
   public void selectionChoosen(int x, int y, int w, int h) 
   {
-    itsSelectionHandler.selectArea(x, y, w, h);
-    itsGraphicObject.repaint();
+    if (w ==0) w=1;// at least 1 pixel wide
+    if (h==0) h=1;
+    
+    selectArea(x, y, w, h);
+    
+    gc.getGraphicDestination().repaint();
+    
     mountIModule(itsMouseTracker);
   }
+
+
+  /**
+   * Selects all the objects in a given rectangle
+   */
+  void selectArea(int x, int y, int w, int h) 
+  { 
+    selectArea(gc.getRenderer(), gc.getSelection(), x, y,  w,  h);
+  }
+
+  
+  /**
+   * Selects all the objects in a given rectangle, given a Render
+   * and a Selection
+   */
+  public static void selectArea(Renderer r, SelectionHandler s, int x, int y, int w, int h) 
+  {
+    ScrEvent aScrEvent;
+
+    for (Enumeration e = r.eventsIntersecting(x, y, w, h); e.hasMoreElements();) 
+      {
+	aScrEvent = (ScrEvent)e.nextElement() ;
+	s.select(aScrEvent);
+      }
+  }
+
+
+
+  //---Fields
+
+  MouseTracker itsMouseTracker;
+  Selecter itsSelecter;
+
+  GraphicContext gc;
 
 }
 

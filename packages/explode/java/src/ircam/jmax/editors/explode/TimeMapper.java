@@ -1,12 +1,23 @@
 package ircam.jmax.editors.explode;
 
+/**
+ * a mapper into the time value of the ScrEvents
+ */
 public class TimeMapper extends Mapper {
   
-  public void set(ScrEvent e, int value) {
+  /**
+   * set the given starting time in the given event
+   */
+  public void set(ScrEvent e, int value) 
+  {
     e.setTime(value);
   }
-
-  public int get(ScrEvent e) {
+  
+  /**
+   * get the starting time from the given event
+   */
+  public int get(ScrEvent e) 
+  {
     return e.getTime();
   }
 }

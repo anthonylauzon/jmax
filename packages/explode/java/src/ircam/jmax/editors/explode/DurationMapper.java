@@ -1,12 +1,24 @@
 package ircam.jmax.editors.explode;
 
+/**
+ * A simple Mapper that accesses the duration parameter
+ */ 
 public class DurationMapper extends Mapper {
   
-  public void set(ScrEvent e, int value) {
+  /**
+   * set the duration of this event
+   */
+  public void set(ScrEvent e, int value) 
+  {
     e.setDuration(value);
   }
 
-  public int get(ScrEvent e) {
+  /**
+   * get the duration of this event
+   */
+  public int get(ScrEvent e) 
+  {
     return e.getDuration();
   }
 }
+

@@ -1,0 +1,156 @@
+package ircam.jmax.editors.explode;
+
+import java.awt.*;
+import java.util.*;
+import java.awt.event.*;
+
+/**
+ * an interaction module used to move a selection of objects.
+ * At the end of a move operation, it communicates the new position to the listener
+ */
+public class SelectionMover extends InteractionModule implements XORPainter {
+
+  /**
+   * constructor. 
+   * It uses a XORHandler to keep track of the drawing positions.
+   */
+  public SelectionMover(DragListener theListener, GraphicContext theGc, int theMovement) 
+  {
+    super(theGc.getGraphicEventSource(), theGc.getGraphicDestination());
+    
+    gc = theGc;
+    itsListener = theListener;
+    itsXORHandler = new XORHandler(this);
+    itsStartingPoint = new Point();
+
+    itsMovements = theMovement;
+  }
+  
+
+  /**
+   * sets the point on which to start the movement
+   */
+  public void interactionBeginAt(int x, int y) 
+  {
+    itsStartingPoint.setLocation(x, y);
+    computeEnclosure(enclosingRect);
+
+    itsXORHandler.beginAt(x, y);
+  }
+
+  /**
+   * computes the rectangle that surrounds the selection
+   * and sets the given rectangle.
+   */
+  void computeEnclosure(Rectangle destination) 
+  {  
+    ScrEvent min_x;
+    ScrEvent min_y;
+    ScrEvent max_x;
+    ScrEvent max_y;
+    
+    ScrEvent aEvent;
+    
+    Enumeration e=gc.getSelection().getSelected();
+    aEvent = (ScrEvent) e.nextElement();    
+    
+    if (aEvent == null) return; //empty selection...
+    else 
+      {
+	min_x = aEvent;
+	max_x = aEvent;
+	min_y = aEvent;
+	max_y = aEvent;
+      }
+
+    Adapter a = gc.getAdapter();
+
+    for (; e.hasMoreElements();)
+      {
+	aEvent = (ScrEvent) e.nextElement();
+
+	if (a.getX(aEvent) < a.getX(min_x)) 
+	 min_x = aEvent;
+     
+	if (a.getY(aEvent) < a.getY(min_y)) 
+	  min_y = aEvent;
+	
+	if (a.getX(aEvent)+a.getLenght(aEvent) > a.getX(max_x)+a.getLenght(max_x)) 
+	  max_x = aEvent;
+	
+	if (a.getY(aEvent) > a.getY(max_y)) 
+	  max_y = aEvent;
+      }
+    
+    destination.setBounds(a.getX(min_x), a.getY(min_y),
+			  a.getX(max_x)+a.getLenght(max_x)-a.getX(min_x),
+			  a.getY(max_y)-a.getY(min_y)+10);
+  }
+
+
+  /**
+   * overrides InteractionModule.mouseDragged()
+   */
+  public void mouseDragged(MouseEvent e) 
+  {
+    itsXORHandler.moveTo(e.getX(), e.getY());
+  }
+
+  /**
+   * overrides InteractionModule.mouseReleased()
+   */
+  public void mouseReleased(MouseEvent e) 
+  {
+    itsXORHandler.end();
+
+    int endX = itsStartingPoint.x;
+    int endY = itsStartingPoint.y;
+
+    if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0)
+      endY = e.getY();
+    if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0)
+      endX = e.getX();
+    
+    itsListener.dragEnd(endX, endY);
+  }
+
+
+  /**
+   * from the XORPainter interface
+   */
+  public void XORErase() 
+  {
+    XORDeltaDraw(0, 0);
+  }
+
+
+  /**
+   * from the XORPainter interface. The actual drawing function.
+   */
+  public void XORDeltaDraw(int dx, int dy) 
+  {
+    Graphics g = gc.getGraphicDestination().getGraphics();
+    g.setColor(Color.gray);
+    g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0) 
+      enclosingRect.x += dx;
+
+    if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0) 
+      enclosingRect.y += dy;
+
+    g.drawRect(enclosingRect.x,enclosingRect.y, enclosingRect.width, enclosingRect.height);
+
+    g.setPaintMode();
+    g.setColor(Color.black);
+  }
+
+  //---- Fields
+  DragListener itsListener;
+  XORHandler itsXORHandler;  
+
+  GraphicContext gc;
+  Rectangle enclosingRect = new Rectangle();
+
+  Point itsStartingPoint;
+  int itsMovements;
+}

@@ -11,44 +11,54 @@ import com.sun.java.swing.ImageIcon;
  */ 
 public class ScrAddingTool extends ScrTool implements PositionListener {
 
-  AdapterProvider itsAdapterProvider;
-  ExplodeDataModel itsProvider;
-  MouseTracker itsMouseTracker;
-  Component itsGraphicSource;
-
   /**
    * Constructor. It needs to know the graphic source of events,
-   * the Adapter, the database.
+   * the Adapter, the model. All these informations are in the
+   * given graphic context.
    */
-  public ScrAddingTool(Component graphicSource, AdapterProvider theAdapterProvider, ExplodeDataModel theProvider) {
-    super("adder", new ImageIcon("/u/worksta/maggi/projects/max/images/tool_slider.gif"));
+  public ScrAddingTool(GraphicContext theGc) 
+  {
+    super("adder", new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/adder.gif"));
 
-    itsMouseTracker = new MouseTracker(this, graphicSource);
-    itsAdapterProvider = theAdapterProvider;
-    itsGraphicSource = graphicSource;
-    itsProvider = theProvider;
+    gc = theGc;
+    itsMouseTracker = new MouseTracker(this, gc);
   }
+
 
   /**
    * called when this tool becomes the active tool
    */
-  public void activate() {
+  public void activate() 
+  {
     mountIModule(itsMouseTracker);
   }
 
-  public void deactivate() {}
+
+  /**
+   * called when this tool is "unmounted"
+   */
+  public void deactivate() 
+  {
+  }
 
   
-  //----------- PositionListener interface ------------
-  
-  public void positionChoosen(int x, int y, int modifiers) {
+  /**
+   *PositionListener interface
+   */
+  public void positionChoosen(int x, int y, int modifiers) 
+  {
     ScrEvent aEvent = new ScrEvent();
-    itsAdapterProvider.getAdapter().setX(aEvent, x);
-    itsAdapterProvider.getAdapter().setY(aEvent, y);
 
-    itsProvider.addEvent(aEvent);
+    gc.getAdapter().setX(aEvent, x);
+    gc.getAdapter().setY(aEvent, y);
+
+    gc.getDataModel().addEvent(aEvent);
   } 
   
+
+  //-------------- Fields
+  GraphicContext gc;
+  MouseTracker itsMouseTracker;
 }
 
 

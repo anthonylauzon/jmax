@@ -6,14 +6,13 @@ import java.lang.*;
 import java.io.*;
 import java.util.*;
 
+
+/**
+ * A concrete implementation of the ExplodeDataModel.
+ * It handles the datas coming from a remote explode in FTS
+ */
 public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 {
-  /** Key for remote calls */
-
-  static final int REMOTE_CLEAN  = 1;
-  static final int REMOTE_APPEND = 2;
-  static final int REMOTE_ADD    = 1;
-  static final int REMOTE_REMOVE = 2;
 
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
@@ -22,11 +21,10 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
      is more frequent than editing (true, every repain imply
      a look up) */
 
-  int events_size   = 256;	// 
-  int events_fill_p  = 0;	// next available position
-  ScrEvent events[] = new ScrEvent[256];
-  private Vector listeners;
 
+  /**
+   * constructor.
+   */
   public ExplodeRemoteData()
   {
     super();
@@ -61,7 +59,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
       }
   }
 
-
+  /**
+   * utility function to make the event vector bigger
+   */
   private final void reallocateEvents()
   {
     int new_size;
@@ -77,6 +77,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     events_size = new_size;
   }
 
+  /**
+   * utility function to create a new place at the given index
+   */
   private final void makeRoomAt(int index)
   {
     if (events_fill_p >= events_size) 
@@ -88,6 +91,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     events_fill_p++;
   }
 
+  /**
+   * deletes the place at the given index
+   */
   private final void deleteRoomAt(int index)
   {
     for (int i = index;  i < events_fill_p; i++)
@@ -98,12 +104,18 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 			 
 
   /* the ExplodeDataModel interface... */
-
+  /**
+   * how many events in the data base?
+   */
   public int length()
   {
     return events_fill_p;
   }
 
+  /**
+   * an utility class to efficiently implement the getEvents()
+   * call
+   */
   private class ExplodeEnumeration implements Enumeration
   {
     int p;
@@ -119,11 +131,18 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     }
   }
 
+  /**
+   * returns an enumeration of all the events
+   */
   public Enumeration getEvents()
   {
     return new ExplodeEnumeration();
   }
 
+
+  /**
+   * adds an event in the data base
+   */
   public void addEvent(ScrEvent event)
   {
     int index;
@@ -146,6 +165,10 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     notifyListeners();
   }
 
+
+  /**
+   * remove an event from the data base
+   */
   public void removeEvent(ScrEvent event)
   {
     int removeIndex;
@@ -171,75 +194,117 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
       }
   }
 
+  /**
+   * utility to notify the data base change to all the listeners
+   */
  private void notifyListeners()
   {
     ExplodeDataListener el;
     
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) {
-      el = (ExplodeDataListener) e.nextElement();
-      el.dataChanged(null);
-    }
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      {
+	el = (ExplodeDataListener) e.nextElement();
+	el.dataChanged(null);
+      }
   }
 
-  public void addListener(ExplodeDataListener theListener) {
+  /**
+   * require to be notified when data change
+   */
+  public void addListener(ExplodeDataListener theListener) 
+  {
     listeners.addElement(theListener);
   }
+  
 
-  public void removeListener(ExplodeDataListener theListener) {
+  /**
+   * remove the listener
+   */
+  public void removeListener(ExplodeDataListener theListener) 
+  {
     listeners.removeElement(theListener);
   }
 
-  public ScrEvent getEventAt(int index) {
+
+  /**
+   * access the event at the given index
+   */
+  public ScrEvent getEventAt(int index) 
+  {
     return events[index];
   }
+  
 
-  public int indexOfFirstEventStartingAfter(int time) {
+  /**
+   * access the first event whose starting time is 
+   * after a given time
+   */
+  public int indexOfFirstEventStartingAfter(int time) 
+  {
     int index;
-
+    
     index = getIndexAfter(time);
-
+    
     if (index == events_fill_p)
       return -1;
     else
       return index;
   }
 
-  public int indexOfLastEventEndingBefore(int time) {
-    int index;
 
+  /**
+   * access the last event whose ENDING time is 
+   * before a given time
+   */
+  public int indexOfLastEventEndingBefore(int time) 
+  {
+    int index;
+    
     index = getIndexAfter(time);
     
-    for (;index>=0;index--) {
-      if (events[index].getTime()+events[index].getDuration() < time)
-	break;
-    }
-    return index;
+    for (;index>=0;index--) 
+      {
+	if (events[index].getTime()+events[index].getDuration() < time)
+	  break;
+      }
 
+    return index;    
   }
 
+
+  /**
+   * utility class to efficiently implement the eventsLivingAt call
+   */
   private class ExplodeLivingEnumeration implements Enumeration {
     
     int index;
     int time;
     
-    private ExplodeLivingEnumeration(int theTime) {
+    private ExplodeLivingEnumeration(int theTime) 
+    {
       time = theTime;
       index = indexOfLastEventEndingBefore(time);
       while(events[index].getTime()+events[index].getDuration() < time ) 
 	index++;
     }
 
-    public boolean hasMoreElements() {
+    public boolean hasMoreElements() 
+    {
       return events[index].getTime() <= time;
     }
     
-    public Object nextElement() {
+    public Object nextElement() 
+    {
       return events[index++];
     }
     
   }
   
-  public Enumeration eventsLivingAt(int time) {
+  /**
+   * the enumeration of all the events active in a given moment
+   */
+  public Enumeration eventsLivingAt(int time) 
+  {  
     return new ExplodeLivingEnumeration(time);
   }
 
@@ -273,15 +338,30 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     }
 
 
-
   /* The MaxData interface */
 
 
-  /** Get the a name for this data, for UI purposes only */
-
+  /** 
+   * Get the a name for this data, for UI purposes only 
+   */
   public String getName()
   {
     return "explode";
   }
+
+  //----- Fields
+  /** Key for remote call add */
+
+  static final int REMOTE_CLEAN  = 1;
+  static final int REMOTE_APPEND = 2;
+  static final int REMOTE_ADD    = 1;
+  static final int REMOTE_REMOVE = 2;
+
+  int events_size   = 256;	// 
+  int events_fill_p  = 0;	// next available position
+  ScrEvent events[] = new ScrEvent[256];
+  private Vector listeners;
+
 }
+
 
