@@ -24,19 +24,10 @@
 
 
 ROOTDIR = ../../../..
-
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
-
-MODULE_LIB=$(LIBDIR)/libPortableVecLib.a
-
-all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib/portable
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib/portable ; done
 .PHONY: install
 
-TOCLEAN = $(MODULE_LIB)
-
-include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -23,13 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 ROOTDIR = ../..
-
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
-
-MODULE_LIB=$(LIBDIR)/libSys.a
-
-all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
 $(OBJDIR)/version.o: version.h
 
@@ -43,6 +37,3 @@ install:
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/sys ; done
 .PHONY: install
 
-TOCLEAN = $(MODULE_LIB)
-
-include $(ROOTDIR)/Makefiles/Makefile.misc

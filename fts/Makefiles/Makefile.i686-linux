@@ -51,7 +51,6 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 #ARCH_OPT_LDFLAGS := -v
 
 FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
-FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 
 

@@ -24,14 +24,9 @@
 
 
 ROOTDIR = ../../..
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
-
-
-MODULE_LIB=$(LIBDIR)/libVecLib.a
-
-all: $(LIBDIR) $(OBJDIR) portable $(MODULE_LIB)
+all: portable
 
 clean : portable_clean
 
@@ -50,6 +45,3 @@ install:
 	(cd portable ; $(MAKE) install)
 .PHONY: install
 
-TOCLEAN = $(MODULE_LIB)
-
-include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -98,6 +98,8 @@ MODE=opt
 endif
 include $(ROOTDIR)/Makefiles/Makefile.$(MODE)
 
+include Sources
+
 ##
 ## Definitions
 ##
@@ -130,7 +132,8 @@ FTS_LIB=$(LIBDIR)/libfts.a
 ## Rules
 ##
 
-lib: $(OBJDIR) $(LIBDIR) $(FTS_LIB)
+lib: $(OBJDIR) $(LIBDIR) $(OBJECTS) $(FTS_LIB)($(addsuffix .o, $(basename $(SOURCES))))
+.PHONY: lib
 
 ifdef RANLIB
 $(FTS_LIB)(%.o): $(OBJDIR)/%.o

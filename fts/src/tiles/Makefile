@@ -22,12 +22,8 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
-
 ROOTDIR = ../..
-
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
 DATE:= $(shell date | sed 's/\"//'g)
 HOST:= $(shell hostname)
@@ -35,7 +31,7 @@ MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"(compiled by $(USER) for $(ARCH) on 
 
 FTS_BIN = $(BINDIR)/fts
 
-all:  $(BINDIR) $(LIBDIR) $(OBJDIR) $(FTS_BIN)
+bin:  $(BINDIR) $(FTS_BIN)
 
 TOCLEAN = $(FTS_BIN)
 
@@ -50,27 +46,8 @@ $(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)
 	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJDIR)/*.o $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
 else
-$(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
+$(FTS_BIN) : $(OBJECTS) $(FTS_LIB) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)
-	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIBS) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG)   $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
+	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIB) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG) $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
 endif
-
-cleanobjs:
-	rm -f $(OBJECTS)
-
-clean:
-	rm -f $(OBJECTS)
-	rm -f $(TOCLEAN)
-
-$(OBJDIR)/%.o : %.c
-	$(CC) -c  $(CFLAGS) $< -o $@
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
-$(LIBDIR):
-	mkdir -p $(LIBDIR)
-
-$(BINDIR):
-	mkdir -p $(BINDIR)
 

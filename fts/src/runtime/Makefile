@@ -32,7 +32,7 @@ all:
 	(cd devices; $(MAKE) $@)
 .PHONY: all
 
-clean:
+cleanobjs:
 	(cd sched; $(MAKE) $@)
 	(cd time; $(MAKE) $@)
 	(cd files; $(MAKE) $@)
@@ -40,7 +40,7 @@ clean:
 	(cd audio; $(MAKE) $@)
 	(cd client; $(MAKE) $@)
 	(cd devices; $(MAKE) $@)
-.PHONY: all
+.PHONY: cleanobjs
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime

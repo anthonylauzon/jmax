@@ -23,7 +23,6 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 ROOTDIR = ../..
-
 include $(ROOTDIR)/Makefiles/Makefile.common
 
 all:

@@ -23,22 +23,22 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 all:
-	(cd mess; $(MAKE) all)
-	(cd utils; $(MAKE) all)
-	(cd datalib; $(MAKE) all)
-	(cd ftl; $(MAKE) all)
-	(cd dsp; $(MAKE) all)
-	(cd veclib; $(MAKE) all)
+	(cd mess; $(MAKE) $@)
+	(cd utils; $(MAKE) $@)
+	(cd datalib; $(MAKE) $@)
+	(cd ftl; $(MAKE) $@)
+	(cd dsp; $(MAKE) $@)
+	(cd veclib; $(MAKE) $@)
 .PHONY: all
 
-clean:
-	(cd mess; $(MAKE) clean)
-	(cd utils; $(MAKE) clean)
-	(cd datalib; $(MAKE) clean)
-	(cd ftl; $(MAKE) clean)
-	(cd dsp; $(MAKE) clean)
-	(cd veclib; $(MAKE) clean)
-.PHONY: clean
+cleanobjs:
+	(cd mess; $(MAKE) $@)
+	(cd utils; $(MAKE) $@)
+	(cd datalib; $(MAKE) $@)
+	(cd ftl; $(MAKE) $@)
+	(cd dsp; $(MAKE) $@)
+	(cd veclib; $(MAKE) $@)
+.PHONY: cleanobjs
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang

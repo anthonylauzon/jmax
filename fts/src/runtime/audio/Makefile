@@ -22,21 +22,11 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
 ROOTDIR = ../../..
-
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
-
-MODULE_LIB=$(LIBDIR)/libAudio.a
-
-all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime/audio
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/runtime/audio ; done
 .PHONY: install
 
-TOCLEAN = $(MODULE_LIB)
-
-include $(ROOTDIR)/Makefiles/Makefile.misc

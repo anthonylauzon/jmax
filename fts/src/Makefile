@@ -22,27 +22,35 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
+ROOTDIR = .
+
 all_c: all
 .PHONY: all_c
 
 clean_c: clean
 .PHONY: clean_c
 
-all: 
-	(cd non-portable ; $(MAKE) $@)
-	(cd sys; $(MAKE) $@)
-	(cd lang; $(MAKE) $@)
-	(cd runtime; $(MAKE) $@)
-	(cd tiles; $(MAKE) $@)
+all: lib
+	(cd tiles; $(MAKE) bin)
 .PHONY: all
 
-clean:
+lib:
 	(cd non-portable ; $(MAKE) $@)
 	(cd sys; $(MAKE) $@)
 	(cd lang; $(MAKE) $@)
 	(cd runtime; $(MAKE) $@)
+.PHONY: lib
+
+clean: cleanobjs
 	(cd tiles; $(MAKE) $@)
 .PHONY: clean
+
+cleanobjs:
+	(cd non-portable ; $(MAKE) $@)
+	(cd sys; $(MAKE) $@)
+	(cd lang; $(MAKE) $@)
+	(cd runtime; $(MAKE) $@)
+.PHONY: cleanobjs
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts

@@ -22,22 +22,19 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
+ftslib: $(FTS_LIB)
+
 # 
 # Generic rule to make a libray
 #
 ifdef RANLIB
-$(LIBDIR)/%.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
-	$(RANLIB) $(LIBDIR)/$*.a
-.PRECIOUS: $(OBJECTS)
+$(FTS_LIB)(%.o): $(OBJDIR)/%.o
+	$(AR) $(ARFLAGS) $(FTS_LIB) $(OBJDIR)/$*.o
+	$(RANLIB) $(LIBDIR)/libfts.a
 else
-$(LIBDIR)/%.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
-.PRECIOUS: $(OBJECTS)
+$(FTS_LIB)(%.o): $(OBJDIR)/%.o
+	$(AR) $(ARFLAGS) $(FTS_LIB) $(OBJDIR)/$*.o
 endif
-
-
-TODELETE = $(FTSBIN)
 
 #depend:
 #	$(MAKEDEPEND) $(SOURCES)
