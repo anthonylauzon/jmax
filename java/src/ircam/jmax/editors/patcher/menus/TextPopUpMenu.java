@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.menus;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -52,16 +53,26 @@ public class TextPopUpMenu extends JMenu
 
   private JMenu itsSizesMenu;
   private ButtonGroup itsSizesMenuGroup;
+  JRadioButtonMenuItem fakeSizeButton;
 
   private JMenu itsFontsMenu;
   private ButtonGroup itsFontMenuGroup;
   
   private JMenu itsStylesMenu;
   private ButtonGroup itsStylesMenuGroup;
+
+  Vector fontNameItems = new Vector();
+  Vector fontSizeItems = new Vector();
   
   public TextPopUpMenu()
   {
     super("Text");
+
+    itsSizesMenuGroup = new ButtonGroup();
+    fakeSizeButton = new JRadioButtonMenuItem( "fake");
+    itsSizesMenuGroup.add(fakeSizeButton);
+
+    itsFontMenuGroup = new ButtonGroup();
 
     JMenuItem item;
     item = new JMenuItem("Fit To Text");
@@ -80,13 +91,36 @@ public class TextPopUpMenu extends JMenu
 
     addSeparator();
 
-    itsSizesMenu = new JMenu("Sizes");
-    FillSizesMenu( itsSizesMenu);
-    add(itsSizesMenu);
+    JRadioButtonMenuItem radioItem;
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontPopUpAction);
+	itsFontMenuGroup.add(radioItem);
+	fontNameItems.addElement(radioItem);
+    }
 
-    itsFontsMenu = new JMenu("Fonts");
+    itsFontsMenu = new JMenu("Java Fonts");
     FillFontMenu(itsFontsMenu);
     add(itsFontsMenu);
+
+    addSeparator();
+    
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontSizes()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontSizesPopUpAction);
+	itsSizesMenuGroup.add(radioItem);
+	fontSizeItems.addElement(radioItem);
+    }
+
+    itsSizesMenu = new JMenu("Java Sizes");
+    FillSizesMenu( itsSizesMenu);
+    add(itsSizesMenu);
+    
+    addSeparator();
 
     itsStylesMenu = new JMenu("Styles");
     FillStylesMenu(itsStylesMenu);
@@ -97,7 +131,6 @@ public class TextPopUpMenu extends JMenu
   {
     int sizes[] = {8, 9, 10, 12, 14, 18, 24, 36, 48};
     JRadioButtonMenuItem item; 
-    itsSizesMenuGroup = new ButtonGroup();
 
     for (int i = 0; i < sizes.length; i++)
       {
@@ -119,7 +152,6 @@ public class TextPopUpMenu extends JMenu
 	/*****************/
 
 	JRadioButtonMenuItem item;
-	itsFontMenuGroup = new ButtonGroup();
 	
 	int num = 0;
 	JMenu currentMenu = theFontMenu;
@@ -174,7 +206,33 @@ public class TextPopUpMenu extends JMenu
     int fontSize = obj.getFontSize();
     int fontStyle = obj.getFontStyle();
 
-    if(textPopup.numFontFloor>1)
+    if(PatcherFontManager.getInstance().isDefaultFontName(fontName))
+    {
+	for(int i = 0; i<textPopup.fontNameItems.size(); i++)
+	{
+	    item = (JRadioButtonMenuItem)textPopup.fontNameItems.elementAt(i);
+	    if(fontName.equals(PatcherFontManager.getInstance().getFontName(item.getText()))) 
+	    {
+		item.setSelected(true);
+		break;
+	    }	   
+	}
+	boolean sizeExist = false;
+	for(int i = 0; i<textPopup.fontSizeItems.size(); i++)
+	{
+	    item = (JRadioButtonMenuItem)textPopup.fontSizeItems.elementAt(i);
+	    if(fontSize == PatcherFontManager.getInstance().getFontSize(item.getText())) 
+	    {
+		item.setSelected(true);
+		sizeExist = true;
+		break;
+	    }	 
+	}
+	if(!sizeExist) textPopup.fakeSizeButton.setSelected(true); 
+    }
+    else
+    {
+	if(textPopup.numFontFloor>1)
 	{
 	    JMenu currentMenu = textPopup.itsFontsMenu;
 	    for(int i = 0; i<textPopup.numFontFloor; i++)
@@ -215,7 +273,7 @@ public class TextPopUpMenu extends JMenu
 			}
 		}
     
-    for ( int i = 0; i < textPopup.itsSizesMenu.getItemCount(); i++)
+	for ( int i = 0; i < textPopup.itsSizesMenu.getItemCount(); i++)
 	{
 	    item = (JRadioButtonMenuItem)textPopup.itsSizesMenu.getItem( i);
 	    
@@ -225,7 +283,8 @@ public class TextPopUpMenu extends JMenu
 		    break;
 		}
 	}
-    
+    }
+
     switch(fontStyle)
 	{
 	case Font.PLAIN:

@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.menus;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -64,27 +65,26 @@ public class TextMenu extends EditorMenu
   private ButtonGroup itsStylesMenuGroup;
   JRadioButtonMenuItem fakeStylesButton;
 
-    /*private JMenu itsBaseSizesMenu;
-      private ButtonGroup itsBaseSizesMenuGroup;
-      JRadioButtonMenuItem fakeBaseSizeButton;  */
+    Vector fontNameItems = new Vector();
+    Vector fontSizeItems = new Vector();
 
-  ErmesSketchPad sketch;
+    ErmesSketchPad sketch;
 
-  class TextMenuListener implements MenuListener
-  {
-    public void menuSelected(MenuEvent e)
+    class TextMenuListener implements MenuListener
     {
-      updateMenu();
-    }
+	public void menuSelected(MenuEvent e)
+	{
+	    updateMenu();
+	}
+	
+	public void menuDeselected(MenuEvent e)
+	{
+	}
 
-    public void menuDeselected(MenuEvent e)
-    {
+	public void menuCanceled(MenuEvent e)
+	{
+	}
     }
-
-    public void menuCanceled(MenuEvent e)
-    {
-    }
-  }
 
   public TextMenu(ErmesSketchPad sketch)
   {
@@ -94,6 +94,13 @@ public class TextMenu extends EditorMenu
     JMenuItem item;
     this.sketch = sketch;
 
+    itsSizesMenuGroup = new ButtonGroup();
+    fakeSizeButton = new JRadioButtonMenuItem( "fake");
+    itsSizesMenuGroup.add(fakeSizeButton);
+    itsFontMenuGroup = new ButtonGroup();
+    fakeFontButton = new JRadioButtonMenuItem( "fake");
+    itsFontMenuGroup.add(fakeFontButton);
+	
     biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
     smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
 
@@ -108,21 +115,44 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    JRadioButtonMenuItem radioItem;
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontAction);
+	itsFontMenuGroup.add(radioItem);
+	fontNameItems.addElement(radioItem);
+    }
+
+    itsFontsMenu = new JMenu("Java Fonts");
+
+    FillFontMenu(itsFontsMenu);
+    add(itsFontsMenu);
+
+    addSeparator();
+
+    for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
+    {
+	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontSizes()[i]);
+	add(radioItem);
+	radioItem.addActionListener(Actions.jmaxFontSizesAction);
+	itsSizesMenuGroup.add(radioItem);
+	fontSizeItems.addElement(radioItem);
+    }
+
     /*itsBaseSizesMenu = new JMenu("Change Base Size");
       FillBaseSizesMenu( itsBaseSizesMenu);    
       add(itsBaseSizesMenu);
 
       addSeparator();*/
 
-    itsSizesMenu = new JMenu("Sizes");
+    itsSizesMenu = new JMenu("Java Sizes");
 
     FillSizesMenu( itsSizesMenu);    
     add(itsSizesMenu);
 
-    itsFontsMenu = new JMenu("Fonts");
-
-    FillFontMenu(itsFontsMenu);
-    add(itsFontsMenu);
+    addSeparator();
 
     itsStylesMenu = new JMenu("Styles");
 
@@ -154,11 +184,6 @@ public class TextMenu extends EditorMenu
   {
     int sizes[] = {8, 9, 10, 12, 14, 18, 24, 36, 48};
     JRadioButtonMenuItem item; 
-    itsSizesMenuGroup = new ButtonGroup();
-
-    fakeSizeButton = new JRadioButtonMenuItem( "fake");
-    itsSizesMenuGroup.add(fakeSizeButton);
-
     for (int i = 0; i < sizes.length; i++)
       {
 	  item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
@@ -175,7 +200,7 @@ public class TextMenu extends EditorMenu
     itsStylesMenuGroup = new ButtonGroup();
 
     fakeStylesButton = new JRadioButtonMenuItem( "fake");
-    itsSizesMenuGroup.add(fakeSizeButton);
+    itsStylesMenuGroup.add(fakeStylesButton);
 
     for (int i = 0; i < styles.length; i++)
       {
@@ -196,11 +221,7 @@ public class TextMenu extends EditorMenu
 	/*****************/
 
 	JRadioButtonMenuItem item;
-	itsFontMenuGroup = new ButtonGroup();
 	
-	fakeFontButton = new JRadioButtonMenuItem( "fake");
-	itsFontMenuGroup.add(fakeFontButton);
-
 	int num = 0;
 	JMenu currentMenu = theFontMenu;
 	for ( int i = 0; i < itsFontList.length; i++)
@@ -238,6 +259,7 @@ public class TextMenu extends EditorMenu
   private void updateMenu()
   {
     JRadioButtonMenuItem item;
+    boolean sizeExist;
     String fontName;
     int    fontSize;
     int    fontStyle;
@@ -272,11 +294,36 @@ public class TextMenu extends EditorMenu
 	fakeFontButton.setSelected(true);
 	fakeSizeButton.setSelected(true);
 	fakeStylesButton.setSelected(true);
-
 	return;
       }
 
-    if(numFontFloor>1)
+    if(PatcherFontManager.getInstance().isDefaultFontName(fontName))
+	{
+	    for(int i = 0; i<fontNameItems.size(); i++)
+	    {
+	      item = (JRadioButtonMenuItem)fontNameItems.elementAt(i);
+	      if(fontName.equals(PatcherFontManager.getInstance().getFontName(item.getText()))) 
+	      {
+		  item.setSelected(true);
+		  break;
+	      }	   
+	    } 
+	    sizeExist = false;
+	    for(int i = 0; i<fontSizeItems.size(); i++)
+	    {
+		item = (JRadioButtonMenuItem)fontSizeItems.elementAt(i);
+		if(fontSize == PatcherFontManager.getInstance().getFontSize(item.getText())) 
+		{
+		    item.setSelected(true);
+		    sizeExist = true;
+		    break;
+		}	 
+	    }
+	    if(!sizeExist) fakeSizeButton.setSelected(true); 
+	}
+    else
+    {
+	if(numFontFloor>1)
 	{
 	    JMenu currentMenu = itsFontsMenu;
 	    for(int i = 0; i<numFontFloor; i++)
@@ -317,21 +364,22 @@ public class TextMenu extends EditorMenu
 			}
 		}
 
-    boolean sizeExist = false;
-    for ( int i = 0; i < itsSizesMenu.getItemCount(); i++)
-      {
-	item = (JRadioButtonMenuItem)itsSizesMenu.getItem( i);
+	sizeExist = false;
+	for ( int i = 0; i < itsSizesMenu.getItemCount(); i++)
+	    {
+		item = (JRadioButtonMenuItem)itsSizesMenu.getItem( i);
 
-	if (Integer.parseInt(item.getText()) == fontSize)
-	  {
-	    item.setSelected(true);
-	    sizeExist = true;
-	    break;
-	  }
-      }
+		if (Integer.parseInt(item.getText()) == fontSize)
+		    {
+			item.setSelected(true);
+			sizeExist = true;
+			break;
+		    }
+	    }
     
-    if(!sizeExist) fakeSizeButton.setSelected(true);
-  
+	if(!sizeExist) fakeSizeButton.setSelected(true);
+    }
+
     switch(fontStyle)
 	{
 	case Font.PLAIN:

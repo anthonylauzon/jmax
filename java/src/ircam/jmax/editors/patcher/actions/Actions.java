@@ -78,11 +78,13 @@ public class Actions
   public static EditorAction fontSmallerAction     = new FontSmallerAction();
   public static EditorAction fontBiggerAction      = new FontBiggerAction();
   public static EditorAction fontSizesAction       = new FontSizesAction();
+  public static EditorAction jmaxFontSizesAction   = new JMaxFontSizesAction();
   public static EditorAction fontStylesAction      = new FontStylesAction();
   public static EditorAction fontAction            = new FontAction();
+  public static EditorAction jmaxFontAction        = new JMaxFontAction();
   public static EditorAction setAutomaticFitAction = new SetAutomaticFitAction();
   public static EditorAction fitToTextAction       = new FitToTextAction();
-    //public static EditorAction fontBaseSizesAction   = new FontBaseSizesAction();
+  //public static EditorAction fontBaseSizesAction   = new FontBaseSizesAction();
 
   public static EditorAction cutAction       = new CutAction();
   public static EditorAction copyAction      = new CopyAction();
@@ -114,8 +116,10 @@ public class Actions
   public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
   public static EditorAction fontSmallerPopUpAction = new FontSmallerPopUpAction();
   public static EditorAction fontSizesPopUpAction = new FontSizesPopUpAction();
+  public static EditorAction jmaxFontSizesPopUpAction = new JMaxFontSizesPopUpAction();
   public static EditorAction fontStylesPopUpAction = new FontStylesPopUpAction();
   public static EditorAction fontPopUpAction = new FontPopUpAction();
+  public static EditorAction jmaxFontPopUpAction = new JMaxFontPopUpAction();
   public static EditorAction inspectObjectAction = new InspectObjectAction();
   public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientation();
 }
