@@ -908,8 +908,11 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   track_t *this = (track_t *)o;
   fts_atom_t a;
 
-  fts_set_symbol(&a, fts_class_get_name(this->type));
-  fts_client_send_message(o, fts_s_type, 1, &a);
+  if(this->type != NULL)
+  {
+      fts_set_symbol(&a, fts_class_get_name(this->type));
+      fts_client_send_message(o, fts_s_type, 1, &a);
+  }
 
   fts_set_int(&a, (this->persistence > 0));
   fts_client_send_message(o, fts_s_persistence, 1, &a);
