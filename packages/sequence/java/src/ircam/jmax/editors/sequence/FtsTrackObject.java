@@ -55,7 +55,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public FtsTrackObject(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
   {
       super(fts, null, null, "seqtrack", "seqtrack");
-	
+
       this.info = ValueInfoTable.getValueInfo(args[0].getString());
 
       if(nArgs>1)

@@ -274,21 +274,21 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
     public void requestTrackCreation(String type)
     {
-	FtsTrackObject.sendArgs[0].setString(type); 
-	sendMessage(FtsObject.systemInlet, "add_track", 1, FtsTrackObject.sendArgs);
+	sendArgs[0].setString(type); 
+	sendMessage(FtsObject.systemInlet, "add_track", 1, sendArgs);
     }
 
     public void requestTrackMove(Track track, int position)
     {
-	FtsTrackObject.sendArgs[0].setObject(track.getFtsTrack()); 
-	FtsTrackObject.sendArgs[1].setInt(position); 
-	sendMessage(FtsObject.systemInlet, "move_track", 2, FtsTrackObject.sendArgs);
+	sendArgs[0].setObject(track.getFtsTrack()); 
+	sendArgs[1].setInt(position); 
+	sendMessage(FtsObject.systemInlet, "move_track", 2, sendArgs);
     }
 
     public void requestTrackRemove(Track track)
     {
-	FtsTrackObject.sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
-	sendMessage(FtsObject.systemInlet, "remove_track", 1, FtsTrackObject.sendArgs);
+	sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
+	sendMessage(FtsObject.systemInlet, "remove_track", 1, sendArgs);
     }
 
     public void requestSequenceName()
