@@ -102,3 +102,7 @@ FTS_API void fts_sched_halt(void);
 
 FTS_API void fts_sleep(void);
 
+#ifdef USE_JACK
+FTS_API void fts_sched_run_one_tick(void);
+FTS_API void fts_sched_run_one_tick_without_select(void);
+#endif /* USE_JACK */
