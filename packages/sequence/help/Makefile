@@ -22,6 +22,9 @@
 #
 #
 
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/help
 	for f in *.jmax *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/sequence/help/$$f ; done

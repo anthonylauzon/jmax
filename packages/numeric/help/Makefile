@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric/help
 	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/numeric/help/$$f ; done

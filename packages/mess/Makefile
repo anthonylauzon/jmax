@@ -10,6 +10,9 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 all:
 #	(cd java ; $(MAKE) all)
 	(cd c ; $(MAKE) all)

@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 all:
 	(cd c ; $(MAKE) all)
 .PHONY: all

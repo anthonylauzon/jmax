@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/sounds
 	for f in *.aiff *.snd ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/sounds/$$f ; done

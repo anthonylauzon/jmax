@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(doc_install_dir)/user
 	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user ; done

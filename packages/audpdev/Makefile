@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 all:
 	(cd src; $(MAKE) -k -lpthread all)
 .PHONY: all
@@ -36,7 +39,7 @@ install:
 	$(INSTALL_DATA) audpdev.jpk $(lib_install_dir)/packages/audpdev
 	$(INSTALL_DATA) audpdev.scm $(lib_install_dir)/packages/audpdev
 	$(INSTALL_DIR) $(lib_install_dir)/packages/audpdev/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) audpdev.so $(lib_install_dir)/packages/audpdev/lib/$(ARCH)/opt ) 
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libaudpdev.so $(lib_install_dir)/packages/audpdev/lib/$(ARCH)/opt ) 
 .PHONY: install
 
 install-noarch:

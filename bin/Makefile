@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_PROGRAM) jmax $(bin_install_dir)/jmax
 .PHONY: install

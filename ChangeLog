@@ -1,3 +1,7 @@
+2001-01-02  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Fixed install errors in new Makefiles
+
 2000-12-20  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	*  operation "Mani Pulite" on Makefiles is going on:

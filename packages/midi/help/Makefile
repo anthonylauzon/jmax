@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/midi/help
 	for f in *.tcl *.jmax *.gif *.env; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/midi/help/$$f ; done

@@ -23,6 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 
+JMAXDISTDIR=../../../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib/include
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib/include ; done

@@ -22,6 +22,9 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
 lib-recursive:
 	(cd sched; $(MAKE) lib)
 	(cd time; $(MAKE) lib)
