@@ -103,7 +103,7 @@ static void hashtable_get_functions( fts_hashtable_t *h)
       h->hash_function = hash_string;
       h->equals_function = equals_string;
     }
-  else if (!h->key_type)
+  else if (h->key_type == fts_s_symbol)
     {
       h->hash_function = hash_symbol;
       h->equals_function = equals_symbol;
@@ -132,9 +132,12 @@ void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_ca
   if ( !iterator_heap)
     iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
 
-  if (key_type == fts_s_symbol)
-    h->key_type = 0;
-  else if (key_type && (key_type == fts_s_int || key_type == fts_s_ptr || key_type == fts_s_string))
+  if (!key_type)
+    h->key_type = fts_s_symbol;
+  else if (key_type == fts_s_int 
+	   || key_type == fts_s_ptr 
+	   || key_type == fts_s_symbol 
+	   || key_type == fts_s_string)
     h->key_type = key_type;
   else
     {
@@ -181,20 +184,10 @@ static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, const fts_a
 {
   fts_hashtable_cell_t **c;
 
-  if (h->key_type)
-    {
-      c = &h->table[ (*h->hash_function)( key) % h->length];
+  c = &h->table[ (*h->hash_function)( key) % h->length];
 
-      while (*c && !(*h->equals_function)( &(*c)->key, key))
-	c = &(*c)->next;
-    }
-  else
-    {
-      c = &h->table[ hash_symbol( key) % h->length];
-
-      while ( *c && fts_get_symbol( &(*c)->key) != fts_get_symbol( key) )
-	c = &(*c)->next;
-    }
+  while (*c && !(*h->equals_function)( &(*c)->key, key))
+    c = &(*c)->next;
 
   return c;
 }
