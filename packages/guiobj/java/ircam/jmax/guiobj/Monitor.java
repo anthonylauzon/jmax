@@ -41,7 +41,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 public class Monitor extends GraphicObject implements FtsIntValueListener
 {
   private static transient final int FIXED_WIDTH = 60;
-  private static transient final int FIXED_HEIGHT = 20;
+  private static transient final int FIXED_HEIGHT = 24;
 
   private transient static final Color itsCrossColor = new Color(0, 0, 128);
 
