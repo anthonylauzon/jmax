@@ -75,6 +75,9 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_object_is_object(o) ((! fts_object_is_patcher((o))) || fts_object_is_error((o)))
 
+#define fts_patcher_set_save_id(p, i) ((p)->save_id == (i))
+#define fts_patcher_get_save_id(p, i) ((p)->save_id)
+
 extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
 extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
 

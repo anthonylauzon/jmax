@@ -32,7 +32,7 @@ typedef struct _fts_dsp_node_
 {
   fts_object_t *o;
   int pred_cnt;
-  fts_dsp_descr_t *descr;
+  fts_dsp_descr_t descr;
   struct _fts_dsp_node_ *next;
 } fts_dsp_node_t;
 

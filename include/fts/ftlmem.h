@@ -111,6 +111,7 @@ but are more than symbols.
 /* Private definition for the dsp module: don't use */
 
 FTS_API void ftl_mem_start_memory_relocation(void);
+FTS_API void ftl_mem_abort_memory_relocation(void);
 FTS_API void ftl_mem_end_memory_relocation(void);
 FTS_API void *ftl_data_relocate_and_get(struct ftl_data_handle *h);
 

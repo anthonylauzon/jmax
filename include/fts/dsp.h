@@ -264,6 +264,21 @@ FTS_API int fts_dsp_get_active(void);
 FTS_API void fts_dsp_active_add_listener(fts_object_t *object, fts_method_t method);
 FTS_API void fts_dsp_active_remove_listener(fts_object_t *object);
 
+/* DSP edge */
+typedef struct fts_dsp_edge
+{
+  fts_object_t o;
+  int n_tick;
+  double sr;
+} fts_dsp_edge_t;
+
+#define fts_dsp_edge_get_n_tick(e) ((e)->n_tick)
+#define fts_dsp_edge_get_sr(e) ((e)->sr)
+
+FTS_API fts_metaclass_t *fts_dsp_edge_metaclass;
+FTS_API void fts_dsp_after_edge(fts_object_t *o, fts_dsp_edge_t *edge);
+FTS_API void fts_dsp_before_edge(fts_object_t *o, fts_dsp_edge_t *edge);
+
 /*@}*/ /* Object declarations */
 
 /** 
@@ -409,9 +424,6 @@ FTS_API double fts_dsp_get_time(void);
 #define fts_dsp_get_output_name(DESC, OUT) ((DESC)->out[(OUT)]->name)
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
-
-FTS_API void fts_dsp_force_order(fts_object_t *first, fts_object_t *second);
-
 
 /* internal misc */
 FTS_API fts_object_t *dsp_get_current_object(void);

@@ -96,6 +96,7 @@ extern "C" {
 #include <fts/label.h>
 #include <fts/param.h>
 #include <fts/package.h>
+#include <fts/preset.h>
 
 #include <fts/time.h>
 

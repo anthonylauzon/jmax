@@ -46,6 +46,8 @@ struct fts_patcher
 
   /* Variables */
   fts_env_t env;
+  
+  int save_id;
 };    
 
 #define fts_patcher_get_args(p)    ((p)->args)
