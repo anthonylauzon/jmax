@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-#include <ftsprivate/bmaxfile.h> 
 
 #ifndef _FTS_PRIVATE_MIDI_H_
 #define _FTS_PRIVATE_MIDI_H_ 1

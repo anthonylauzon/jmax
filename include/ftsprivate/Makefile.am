@@ -1,6 +1,8 @@
 noinst_HEADERS= \
 abstraction.h \
 audio.h \
+audioconfig.h \
+audiolabel.h \
 bmaxfile.h \
 class.h \
 client.h \

@@ -20,22 +20,28 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_CONFIG_H_
-#define _FTS_PRIVATE_CONFIG_H_ 1
+#ifndef _FTS_PRIVATE_AUDIOCONFIG_H_
+#define _FTS_PRIVATE_AUDIOCONFIG_H_
 
-typedef struct
+/* Requires audiolabel */
+
+typedef struct _audioconfig
 {
-  fts_object_t o;
-  fts_symbol_t file_name;
-  midiconfig_t* midi_config;
-  audioconfig_t* audio_config;
-  int dirty;
-} config_t;
+    fts_object_t o;
+    audiolabel_t* labels;
+    int n_labels;    
 
-extern fts_class_t* config_type;
+    int buffer_size;
+    int sample_rate;
 
-extern fts_object_t *fts_config_get( void);
-extern void fts_config_set( config_t* config);
-extern void fts_config_set_dirty( config_t* config, int is_dirty);
+} audioconfig_t;
 
-#endif /* _FTS_PRIVATE_CONFIG_H_ */
+extern fts_class_t* audioconfig_type;
+
+extern void fts_audioconfig_set_defaults(audioconfig_t* config);
+extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
+
+
+#endif /* _FTS_PRIVATE_AUDIOCONFIG_H_ */
+
+
