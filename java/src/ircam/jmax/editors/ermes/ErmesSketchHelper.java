@@ -123,7 +123,7 @@ class ErmesSketchHelper extends Object{
 	  aConnection.GetConnectionSet().Remove(aConnection);
 	}
 	if(aConnection.GetSelected()) itsSketchPad.itsSelectedConnections.removeElement(aConnection);
-	if (aConnection.itsFtsConnection != null)) aConnection.itsFtsConnection.delete();
+	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();
       }
     }
     for(Enumeration e1 = theObject.GetOutletList().elements() ; e1.hasMoreElements() ;) {
