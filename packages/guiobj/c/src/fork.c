@@ -40,7 +40,14 @@ fork_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void 
 fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_change_number_of_outlets(o, fts_get_int(at));
+  int n = fts_get_int(at);
+  fts_atom_t a[2];
+
+  fts_set_symbol(a + 0, sym_fork);
+  fts_set_int(a + 1, n);      
+  fts_object_set_description(o, 2, a);
+
+  fts_object_change_number_of_outlets(o, n);
 }
 
 static fts_status_t 

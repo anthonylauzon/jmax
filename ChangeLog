@@ -1,3 +1,7 @@
+Fri Jun  9 15:35:11 2000  Norbert Schnell  <schnell@astor.ircam.fr>
+
+	* fts/src/runtime/midi.h: added fts_midiport abstraction to midiport.*
+
 2000-06-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* packages/io/c/src/iomodule.c: fixed missing call to serial_config()

@@ -23,14 +23,18 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-Rreceive.c \
-Rsend.c \
-makenote.c \
-midi.c \
-midi_module.c \
-mididecrypt.c \
-midiparse.c \
-stripnote.c \
-sustain.c \
-midiformat.c \
+all:
+	(cd src; $(MAKE) -k all)
+.PHONY: all
+
+clean:
+	(cd src; $(MAKE) clean)
+.PHONY: clean
+
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c
+	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libmymodule.so $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt )
+.PHONY: install-arch
+
+

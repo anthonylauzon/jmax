@@ -1727,9 +1727,9 @@ midi_config(void)
   notein_config();
   polyout_config();
   polyin_config();
-  midiout_config();
-  midiin_config();
-  sysexin_config();
   rtin_config();
   mtc_config();
+  /*sysexin_config();*/
+  /*midiout_config();*/
+  /*midiin_config();*/
 }

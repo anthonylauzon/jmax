@@ -23,14 +23,41 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-Rreceive.c \
-Rsend.c \
-makenote.c \
-midi.c \
-midi_module.c \
-mididecrypt.c \
-midiparse.c \
-stripnote.c \
-sustain.c \
-midiformat.c \
+all:
+	(cd java ; $(MAKE) all)
+	(cd c ; $(MAKE) all)
+.PHONY: all
+
+clean:
+	(cd java ; $(MAKE) clean)
+	(cd c ; $(MAKE) clean)
+.PHONY: clean
+
+all_c:
+	(cd c ; $(MAKE) all)
+.PHONY: all
+
+clean_c:
+	(cd c ; $(MAKE) clean)
+.PHONY: clean
+
+all_java:
+	(cd java ; $(MAKE) all)
+.PHONY: all
+
+clean_java:
+	(cd java ; $(MAKE) clean)
+.PHONY: clean
+
+
+install-exec:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/midisgi
+	$(INSTALL_DATA) midisgi.jpk $(lib_install_dir)/packages/midisgi
+	( cd c ; $(MAKE) $@)
+	( cd help; $(MAKE) $@)
+	( cd java; $(MAKE) $@)
+.PHONY: install-noarch
+
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch

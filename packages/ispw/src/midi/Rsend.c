@@ -50,6 +50,7 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
   Rsend_t *this = (Rsend_t *)o;
   int i;
   int len;
+  fts_atom_t a[SYSEXMAX + 1];
   char outstr[SYSEXMAX+1];
   char data[STRLENMAX];
   int bytecount = 0;
@@ -82,27 +83,27 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
 	}
       else
 	{
-	  post("Rsend: unrecognized token\n",STRLENMAX);
+	  post("Rsend: unrecognized token\n");
 	  return;
 	}
 
       len = strlen(data)+1;
       if (bytecount+len >= SYSEXMAX)
 	{
-	  post("Rsend: message longer than %d charactors\n",SYSEXMAX);
+	  post("Rsend: message longer than %d charactors\n", SYSEXMAX);
 	  return;
 	}
       strcpy(outstr+bytecount, data);
       bytecount += len;
     }
 
-  fts_outlet_int(o, 0, 0xF0L);		/* header */
-  fts_outlet_int(o, 0, 0x7FL);
+  fts_set_int(a, 0x7f);
 
-  for (i = 0; i < (bytecount - 1); i++)
-    fts_outlet_int(o, 0, outstr[i]);
+  for(i=0; i<bytecount-1; i++)
+    fts_set_int(a + i + 1, (int)outstr[i]);
+
   
-  fts_outlet_int(o, 0, 0xF7L);
+  fts_outlet_send(o, 0, fts_s_list, bytecount, a);
 }
 
 

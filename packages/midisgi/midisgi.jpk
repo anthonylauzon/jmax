@@ -23,14 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-Rreceive.c \
-Rsend.c \
-makenote.c \
-midi.c \
-midi_module.c \
-mididecrypt.c \
-midiparse.c \
-stripnote.c \
-sustain.c \
-midiformat.c \
+package provide midisgi
+
+global jmaxArch jmaxMode
+ucs load module midisgi $dir/c/lib/$jmaxArch/$jmaxMode/libmidisgi.so
+
+puts "package: midisgi (SGI MIDI objects)"

@@ -24,13 +24,6 @@
 #
 
 SOURCES = \
-Rreceive.c \
-Rsend.c \
-makenote.c \
-midi.c \
-midi_module.c \
-mididecrypt.c \
-midiparse.c \
-stripnote.c \
-sustain.c \
-midiformat.c \
+midisgi.c \
+sgimidiport.c \
+midiobj.c \

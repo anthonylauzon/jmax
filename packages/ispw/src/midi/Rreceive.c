@@ -50,7 +50,7 @@ Rreceive_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-Rreceive_int(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const fts_atom_t *at)
+Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const fts_atom_t *at)
 {
   Rreceive_t *this = (Rreceive_t *)o;
   long n = fts_get_long(at);
@@ -154,6 +154,23 @@ Rreceive_int(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const fts_
 }
 
 
+static void
+Rreceive_list(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_atom_t *at)
+{
+  Rreceive_t *this = (Rreceive_t *)o;
+  fts_atom_t a[1];
+  int i;
+
+  fts_set_int(a, 0xF0);
+  Rreceive_set_atom(o, 0, 0, 1, a);
+
+  for(i=0; i<ac; i++)
+    Rreceive_set_atom(o, 0, 0, 1, at + i);
+
+  fts_set_int(a, 0xF7);
+  Rreceive_set_atom(o, 0, 0, 1, a);
+}
+
 /* No init , no delete */
 
 /* One inlet, one outlet  */
@@ -167,8 +184,7 @@ Rreceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_s_bang, Rreceive_bang, 0, 0);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, Rreceive_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_list, Rreceive_list);
 
   return fts_Success;
 }

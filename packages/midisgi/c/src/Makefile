@@ -23,14 +23,19 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-Rreceive.c \
-Rsend.c \
-makenote.c \
-midi.c \
-midi_module.c \
-mididecrypt.c \
-midiparse.c \
-stripnote.c \
-sustain.c \
-midiformat.c \
+DISTDIR = ../../../../fts
+PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
+PACKAGELIB=$(LIBDIR)/libmidisgi.so
+
+MODULE_CFLAGS=
+
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
+

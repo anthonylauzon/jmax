@@ -23,4 +23,6 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = midi.c	
+SOURCES = \
+midi.c \
+midiport.c

@@ -44,7 +44,7 @@ ispw_midi_module_init(void)
   makenote_config();
   midi_config();
   mididecrypt_config();
-  midiformat_config();
+  /*midiformat_config();*/
   midiparse_config();
   stripnote_config();
   sustain_config();

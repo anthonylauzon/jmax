@@ -24,10 +24,16 @@
  *
  */
 
-#ifndef _RUNTIME_MIDI_H_
-#define _RUNTIME_MIDI_H_
+#include "fts.h"
 
-#include "runtime/midi/midi.h"
-#include "runtime/midi/midiport.h"
+extern void sgimidiport_config(void);
+extern void midiobj_config(void);
 
-#endif
+static void
+midisgi_init(void)
+{
+  sgimidiport_config();
+  midiobj_config();
+}
+
+fts_module_t midisgi_module = {"midisgi", "SGI MIDI classes", midisgi_init, 0, 0};

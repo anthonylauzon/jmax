@@ -54,6 +54,10 @@
 #include "runtime/sched.h"
 #include "runtime/midi/midi.h"
 
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+fts_symbol_t fts_midi_hack_default_device_name = 0;
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+
 /******************************************************************************/
 /*                                                                            */
 /*             error description definition                                   */
@@ -198,6 +202,11 @@ fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at)
 
       idx = fts_get_int(at);
       p = fts_midi_get_port(idx);
+
+      /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+      if(idx == 0)
+	fts_midi_hack_default_device_name = fts_get_symbol(at + 4);
+      /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 
       if (p)
 	{
