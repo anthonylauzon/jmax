@@ -26,11 +26,11 @@
 ROOTDIR=../..
 include $(ROOTDIR)/VERSION
 
-spec-files: jmax.spec
+spec-files: jmax.pkgdef
 
-jmax.spec: $(ROOTDIR)/VERSION
+jmax.pkgdef: $(ROOTDIR)/VERSION
 	awk -v version=$(JMAX_VERSION) '\
 $$1 == "version" { printf( "        version \"%s\"\n", version ); } \
 $$1 != "version" { print} \
-' jmax.spec > jmax.spec.out
-	mv jmax.spec.out jmax.spec
+' jmax.pkgdef > jmax.pkgdef.out
+	mv jmax.pkgdef.out jmax.pkgdef
