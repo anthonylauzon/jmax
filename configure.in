@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.113 2003/04/02 13:36:53 p_tisserand Exp $
+dnl $Id: configure.in,v 1.114 2003/04/28 14:22:39 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.114  2003/04/28 14:22:39  p_tisserand
+dnl Added -DUSE_ALSA in CFLAGS if ALSA have been found (for preprocessor conditionnal in jmax/fts/linux.c)
+dnl
 dnl Revision 1.113  2003/04/02 13:36:53  p_tisserand
 dnl Added realpath check in configure.
 dnl
@@ -618,6 +621,7 @@ packages/utils/c/include/fts/packages/Makefile
 packages/utils/c/include/fts/packages/utils/Makefile
 packages/utils/c/src/Makefile
 utils/Makefile
+utils/debian/Makefile
 utils/jmax-config/Makefile
 utils/jmax-config/jmax-config
 utils/linux_desktop/Makefile
