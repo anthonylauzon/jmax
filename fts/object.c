@@ -55,7 +55,6 @@ static void fts_object_remove_description(fts_object_t *obj);
 static void fts_object_remove_connections(fts_object_t *obj);
 static void fts_object_remove_inoutlets(fts_object_t *obj);
 static void fts_object_remove_bindings(fts_object_t *obj);
-static void fts_object_remove_name(fts_object_t *obj);
 static void fts_object_reset_client(fts_object_t *obj);
 
 /******************************************************************************
@@ -625,7 +624,7 @@ fts_object_get_name(fts_object_t *obj)
   return fts_s_empty_string;
 }
 
-static void
+void
 fts_object_remove_name(fts_object_t *obj)
 {
   /* remove definition of named object */
@@ -907,7 +906,11 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
     fts_object_reset_client(old);
     fts_update_reset(old);
 
-    /* if new is an error object, assure that there are enough inlets and outlets for the connections */
+    /* if old is an error object, get its name */
+    if(fts_object_is_error(old))
+      name = fts_error_object_get_name((fts_error_object_t *)old);
+    
+      /* if new is an error object, assure that there are enough inlets and outlets for the connections */
     if (fts_object_is_error(new))
     {
       fts_error_object_fit_inlet(new, fts_object_get_inlets_number(old) - 1);
@@ -919,7 +922,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
     fts_object_move_connections(old, new);
 
     /* set name of new object */
-    if(name != fts_s_empty_string)
+    if(name != NULL && name != fts_s_empty_string)
     {
       fts_atom_t a;
 

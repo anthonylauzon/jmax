@@ -26,11 +26,13 @@
 typedef struct
 {
   fts_object_t o;
+  fts_symbol_t name;
   fts_symbol_t description;
 } fts_error_object_t;
 
 extern fts_class_t *fts_error_object_class;
 
+#define fts_error_object_get_name(e) ((e)->name)
 #define fts_error_object_get_description(e) ((e)->description)
 
 extern fts_class_t *fts_error_object_get_class(fts_error_object_t *obj);

@@ -41,10 +41,59 @@ error_object_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void
+error_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_error_object_t *this = (fts_error_object_t *)o;
+
+  if(this->name != NULL && this->name != fts_s_empty_string)
+  {
+    fts_atom_t a;
+
+    fts_set_symbol(&a, this->name);
+    fts_client_send_message(o, fts_s_name, 1, &a);
+  }
+}
+
+static void
+error_object_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_error_object_t *this = (fts_error_object_t *)o;
+
+  if(this->name != NULL && this->name != fts_s_empty_string)
+  {
+    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+    fts_atom_t a;
+    
+    fts_set_symbol(&a, this->name);
+    fts_dumper_send(dumper, fts_s_name, 1, &a);
+  }
+}
+
+static void
+error_object_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_error_object_t *this = (fts_error_object_t *)o;
+
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    this->name = fts_get_symbol(at);
+
+    if(fts_object_has_id(o))
+    {
+      fts_atom_t a;
+
+      fts_set_symbol(&a, this->name);
+      fts_client_send_message(o, fts_s_name, 1, &a);
+    }
+  }
+}
+
+static void
 error_object_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 
+  this->name = fts_s_empty_string;
   this->description = fts_get_symbol(at);
 
   fts_object_set_inlets_number(o, 0);
@@ -55,6 +104,10 @@ static void
 error_object_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_error_object_t), error_object_init, NULL);
+
+  fts_class_message_varargs(cl, fts_s_name, error_object_set_name);
+  fts_class_message_varargs(cl, fts_s_update_gui, error_object_update_gui);
+  fts_class_message_varargs(cl, fts_s_dump, error_object_dump);
 
   fts_class_input_handler(cl, error_object_input_handler);
 

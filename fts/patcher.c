@@ -86,10 +86,10 @@ fts_patcher_add_object(fts_patcher_t *self, fts_object_t *obj)
   
   /* add object to list of objects in patcher */
   for (p = &(self->objects); *p; p = &(fts_object_get_next_in_patcher(*p)))
-    {
-      if (*p == obj)
-	return;
-    }
+  {
+    if (*p == obj)
+      return;
+  }
 
   *p = obj;
   fts_object_set_next_in_patcher(obj, NULL);
@@ -104,19 +104,19 @@ fts_patcher_remove_object(fts_patcher_t *self, fts_object_t *obj)
   fts_object_t **p;
 
   for (p = &(self->objects); *p; p = &(fts_object_get_next_in_patcher(*p)))
+  {
+    if (*p == obj)
     {
-      if (*p == obj)
-	{
-	  /* remove object from list */
-	  *p = fts_object_get_next_in_patcher(obj);
+      /* remove object from list */
+      *p = fts_object_get_next_in_patcher(obj);
 
-	  fts_object_set_next_in_patcher(obj, NULL);
+      fts_object_remove_name(obj);
+      fts_object_remove_patcher_data(obj);
+      fts_object_release(obj);
 
-	  fts_object_release(obj);
-
-	  return;
-	}
+      return;
     }
+  }
 }
 
 int
@@ -1342,8 +1342,16 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
     {
       obj = fts_get_object(at + i);
 
-      if (obj)
+      if(obj)
       {
+        /* stop DSP */
+        if(fts_dsp_is_active() && fts_is_dsp_object(obj))
+        {
+          fts_dsp_desactivate();
+          dsp_restart = 1;
+        }
+
+        /* remove from client */
         if (fts_object_has_id(obj))
         {
           fts_update_reset(obj);
@@ -1366,17 +1374,9 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
     {
       obj = fts_get_object(at + i);
 
-      if (obj)
-      {
-        if(fts_dsp_is_active() && fts_is_dsp_object(obj))
-        {
-          fts_dsp_desactivate();
-          dsp_restart = 1;
-        }
-
-        /* release object */
+      /* remove object from patcher */
+      if(obj)
         fts_patcher_remove_object(self, obj);
-      }
     }
 
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
@@ -1868,9 +1868,14 @@ patcher_delete_objects( fts_object_t *obj)
   if (obj == NULL)
     return;
 
+  fts_update_reset(obj);
+  fts_client_release_object(obj);
+  fts_object_set_id(obj, FTS_DELETE);
+  
   patcher_delete_objects( fts_object_get_next_in_patcher(obj) );
 
-  fts_object_set_next_in_patcher(obj, NULL);
+  fts_object_remove_name(obj);
+  fts_object_remove_patcher_data(obj);
   fts_object_release( obj);
 }
 

@@ -47,7 +47,7 @@ extern fts_object_t *fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t
 extern fts_object_patcher_data_t *fts_object_get_patcher_data(fts_object_t *obj);
 extern void fts_object_remove_patcher_data(fts_object_t *obj);
 
-extern void fts_object_unpatch(fts_object_t *obj);
+extern void fts_object_remove_name(fts_object_t *obj);
 
 extern void fts_object_add_binding(fts_object_t *obj, fts_definition_t *def);
 
