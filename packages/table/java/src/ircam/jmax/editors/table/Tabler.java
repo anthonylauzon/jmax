@@ -22,6 +22,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   Label itsCurrentValue;
   Panel itsFrontHeader;
   MenuItem itsRefreshMenuItem;
+  Dimension preferredSize = new Dimension(512,412);
   
   public FtsIntegerVectorData itsData;
   static int untitledCounter = 1;
@@ -83,6 +84,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
     itsTablePanel.fillTable((FtsIntegerVector) theData.getContent());
     itsTablePanel.repaint();
+    preferredSize.width = itsTablePanel.getPreferredSize().width;//????????
 
     validate();
     itsFormula.addKeyListener(this);
@@ -150,7 +152,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
   public Dimension preferredSize() {
-    return new Dimension(/*310*/512,412);
+    return preferredSize; /*new Dimension(512,412);*/
   }
 
   public Dimension minimumSize() {
