@@ -26,18 +26,36 @@
 
 #include "fts.h"
 
+extern void filestream_config(void);
+extern void fakestream_config(void);
+extern void loopback_config(void);
+extern void serial_config( void);
+
+extern void in_config(void);
+extern void out_config(void);
+
+extern void wacom_config(void);
+
 extern void udp_config(void);
 extern void udpsend_config(void);
 extern void udpreceive_config(void);
-extern void serial_config( void);
 
 static void
 fts_io_init(void)
 {
+  filestream_config();
+  fakestream_config();
+  loopback_config();
+  serial_config();
+
+  in_config();
+  out_config();
+
+  wacom_config();
+
   udp_config();
   udpsend_config();
   udpreceive_config();
-  serial_config();
 }
 
 fts_module_t io_module = {"io", "I/O objects", fts_io_init, 0, 0};

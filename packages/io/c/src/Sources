@@ -24,9 +24,15 @@
 #
 
 SOURCES= \
-iomodule.c	\
-udp.c		\
-udpreceive.c	\
-udpsend.c	\
-serial.c	\
+iomodule.c \
+filestream.c \
+fakestream.c \
+loopback.c \
+in.c \
+out.c \
+udp.c \
+udpreceive.c \
+udpsend.c \
+serial.c \
+wacom.c \
 
