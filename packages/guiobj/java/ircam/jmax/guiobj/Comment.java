@@ -130,22 +130,26 @@ public class Comment extends Editable
 
   public int getTextXOffset()
   {
-    return TEXT_X_OFFSET;
+    //return TEXT_X_OFFSET;
+    return 1;
   }
 
   public int getTextYOffset()
   {
-    return TEXT_Y_OFFSET;
+    //return TEXT_Y_OFFSET;
+    return 1;
   }
 
   public int getTextWidthOffset()
   {
-    return 6;
+    //return 6;
+    return 2;
   }
 
   public int getTextHeightOffset()
   {
-    return 4;
+    //return 4;
+    return 2;
   }
 
   public Color getTextForeground()
