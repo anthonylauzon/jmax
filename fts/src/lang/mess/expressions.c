@@ -877,7 +877,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 #ifdef EXPRESSION_TRACE_DEBUG
   fprintf(stderr, "Evaluting op %d\n", op);
 #endif
-    
+
   if (op_type == FTS_UNARY_OP_TYPE)
     {
       fts_atom_t *tos = value_stack_top(e);
@@ -1177,68 +1177,71 @@ static int fts_op_eval(fts_expression_state_t *e)
 	case FTS_OP_GREATER:
 	  if (fts_is_float(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) > fts_get_float(tos));
+	      fts_set_int(ptos, fts_get_float(ptos) > fts_get_float(tos));
 	    else if (fts_is_int(ptos))
-	      fts_set_float(ptos, ((float) fts_get_int(ptos)) > fts_get_float(tos));
+	      fts_set_int(ptos, ((float) fts_get_int(ptos)) > fts_get_float(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
 	  else if (fts_is_int(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) > ((float) fts_get_int(tos)));
+	      fts_set_int(ptos, fts_get_float(ptos) > ((float) fts_get_int(tos)));
 	    else if (fts_is_int(ptos))
 	      fts_set_int(ptos, fts_get_int(ptos) > fts_get_int(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
+	  break;
 
 	case FTS_OP_GREATER_EQUAL:
 	  if (fts_is_float(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) >= fts_get_float(tos));
+	      fts_set_int(ptos, fts_get_float(ptos) >= fts_get_float(tos));
 	    else if (fts_is_int(ptos))
-	      fts_set_float(ptos, ((float) fts_get_int(ptos)) >= fts_get_float(tos));
+	      fts_set_int(ptos, ((float) fts_get_int(ptos)) >= fts_get_float(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
 	  else if (fts_is_int(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) >= ((float) fts_get_int(tos)));
+	      fts_set_int(ptos, fts_get_float(ptos) >= ((float) fts_get_int(tos)));
 	    else if (fts_is_int(ptos))
 	      fts_set_int(ptos, fts_get_int(ptos) >= fts_get_int(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
+	  break;
 
 	case FTS_OP_SMALLER:
 	  if (fts_is_float(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) < fts_get_float(tos));
+	      fts_set_int(ptos, fts_get_float(ptos) < fts_get_float(tos));
 	    else if (fts_is_int(ptos))
-	      fts_set_float(ptos, ((float) fts_get_int(ptos)) < fts_get_float(tos));
+	      fts_set_int(ptos, ((float) fts_get_int(ptos)) < fts_get_float(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
 	  else if (fts_is_int(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) < ((float) fts_get_int(tos)));
+	      fts_set_int(ptos, fts_get_float(ptos) < ((float) fts_get_int(tos)));
 	    else if (fts_is_int(ptos))
 	      fts_set_int(ptos, fts_get_int(ptos) < fts_get_int(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
+	  break;
 
 	case FTS_OP_SMALLER_EQUAL:
 	  if (fts_is_float(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) <= fts_get_float(tos));
+	      fts_set_int(ptos, fts_get_float(ptos) <= fts_get_float(tos));
 	    else if (fts_is_int(ptos))
-	      fts_set_float(ptos, ((float) fts_get_int(ptos)) <= fts_get_float(tos));
+	      fts_set_int(ptos, ((float) fts_get_int(ptos)) <= fts_get_float(tos));
 	    else
 	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <=", 0);
 	  else if (fts_is_int(tos))
 	    if (fts_is_float(ptos))
-	      fts_set_float(ptos, fts_get_float(ptos) <= ((float) fts_get_int(tos)));
+	      fts_set_int(ptos, fts_get_float(ptos) <= ((float) fts_get_int(tos)));
 	    else if (fts_is_int(ptos))
 	      fts_set_int(ptos, fts_get_int(ptos) <= fts_get_int(tos));
 	    else
