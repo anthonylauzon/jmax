@@ -43,7 +43,8 @@ public class TclErmesPackage
     interp.createCommand("ObjGetPosY", new ErmesObjectGetPositionYCmd());
     interp.createCommand("ObjGetSizeW", new ErmesObjectGetSizeWCmd());
     interp.createCommand("ObjGetSizeH", new ErmesObjectGetSizeHCmd());
-    interp.createCommand("ObjMove", new ErmesObjectMoveCmd());
+    //interp.createCommand("ObjMove", new ErmesObjectMoveCmd());
+    //mdc, remember to commit before holidays
 
     /* current selection */
     interp.createCommand("SelGetObjList", new ErmesSelectedCmd());
