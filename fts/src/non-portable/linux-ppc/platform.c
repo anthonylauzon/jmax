@@ -30,6 +30,7 @@
  */
 
 #include <unistd.h>
+#include <sched.h>
 
 #include "sys/hw.h"
 

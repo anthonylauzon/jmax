@@ -28,7 +28,7 @@ SOURCES = \
 	fpu.c		\
 	memory.c	\
 	platform.c	\
-	sched.c		\
+	syssched.c	\
 
 
 
