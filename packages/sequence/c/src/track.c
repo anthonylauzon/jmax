@@ -407,7 +407,8 @@ track_remove_event_and_upload(track_t *track, event_t *event)
   fts_set_object(&at, (fts_object_t *) event);  
   fts_client_send_message((fts_object_t *) track, seqsym_removeEvents, 1, &at);  
   
-  track_remove_event(track, event);
+  if(track_editor_is_open(track))
+    track_remove_event(track, event);
   
   fts_object_set_state_dirty((fts_object_t *)track);
 }
@@ -1403,7 +1404,7 @@ track_highlight_and_next(track_t *track, event_t *event)
 void
 track_move_events_at_client(track_t *self, event_t *first, event_t *after)
 {
-  if(first != NULL)
+  if(track_editor_is_open(self) && first != NULL)
   {
     event_t *event = first;
     fts_array_t array;
