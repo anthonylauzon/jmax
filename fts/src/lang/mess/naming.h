@@ -16,7 +16,10 @@
 
 
 /* Only for compatibility with the ISPW Object set; don't use for new objects. */
-
+/* (fd) Should this be moved to the ISPW package ? It is referred by:
+ - message box (in package guiobj)
+ - qlist (in package qlist)
+*/
 
 
 extern fts_object_t *fts_get_object_by_name(fts_symbol_t name);
