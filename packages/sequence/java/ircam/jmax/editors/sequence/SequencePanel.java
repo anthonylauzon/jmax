@@ -576,9 +576,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     if(track!=null)
     {
       ((ClipableData) track.getTrackDataModel()).copy();
-			
-      if(JMaxApplication.getProperty("no_menus") == null)
-        Actions.pasteAction.setEnabled(true);
+      Actions.pasteAction.setEnabled(true);
     }
   }
 	
@@ -588,8 +586,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     if(track!=null)
     {
       ((ClipableData) track.getTrackDataModel()).cut();
-      if(JMaxApplication.getProperty("no_menus") == null)
-        Actions.pasteAction.setEnabled(true);
+      Actions.pasteAction.setEnabled(true);
     }
   }
   
@@ -689,13 +686,11 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 			makeVisible(evt);
 		}
 		
-		if(itsContainer instanceof SequenceWindow && (JMaxApplication.getProperty("no_menus") == null))
-		{
-			SequenceWindow window = (SequenceWindow)itsContainer;
-			window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-			window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-			window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
-		}
+		SequenceWindow window = (SequenceWindow)itsContainer;
+		if(JMaxApplication.getProperty("no_menus") == null)
+			window.getEditMenu().updateMenu();
+    else
+      window.getSimpleMenu().updateMenu();
   }
 	
   public boolean eventIsVisible(Event evt)

@@ -143,6 +143,15 @@ public class SequenceWindow extends JMaxEditor {
     setJMenuBar(mb);
   }
   
+  EditorMenu simpleMenu = null;
+  public EditorMenu getSimpleMenu()
+  {
+    if(simpleMenu == null)
+      simpleMenu = new SequenceSimpleMenu(this);
+    
+    return simpleMenu; 
+  }  
+  
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsSequencePanel;
