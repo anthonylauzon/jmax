@@ -9,7 +9,7 @@ libjmax_jack_la_LDFLAGS= @LDFLAGS@ @JACK_LDFLAGS@
 INCLUDES=-I$(top_srcdir)/include
 
 install-data-hook:
-	rm $(DESTDIR)$(packagedir)/libjack.so
+	-rm $(DESTDIR)$(packagedir)/libjack.so
 	ln $(DESTDIR)$(packagedir)/libjmax-jack.so $(DESTDIR)$(packagedir)/libjack.so
 
 # Must be uninstall-hook but there is a bug in automake 1.4-pr5 which doesn't call uninstall-hook 
