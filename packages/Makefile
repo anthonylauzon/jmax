@@ -34,7 +34,6 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 	control \
 	guiobj \
 	io \
-	ispw \
 	ispwmath \
 	lists \
 	math \
@@ -47,7 +46,7 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 
 JAVA_PACKAGES=''
 
-MIXED_PACKAGES=data explode qlist sequence
+MIXED_PACKAGES=data ispw explode qlist sequence
 
 all: all_c all_java
 .PHONY: all

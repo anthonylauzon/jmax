@@ -1,5 +1,5 @@
 /*
- * jMax
+ * Jmax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
@@ -25,21 +25,31 @@
  */
 
 #include <fts/fts.h>
-#include "fvec.h"
 
 fts_symbol_t scope_symbol = 0;
+fts_symbol_t sym_display = 0;
+fts_symbol_t sym_auto = 0;
+fts_symbol_t sym_off = 0;
+
+#define MIN_FLOAT -68719476736.
+#define SCOPE_BUFFER_SIZE 1024
+#define SCOPE_READY -1
 
 typedef struct _scope_ftl_
 {
   fts_object_t o;
-  fvec_t *fvec;
-  enum scope_state {scope_ready, scope_triggered} state;
+  float buffer[SCOPE_BUFFER_SIZE];
+  enum scope_trigger {scope_period, scope_auto, scope_threshold} trigger;
   float threshold;
+  float max;
   float last;
-  int alloc;
-  int index;
+  int size;
+  int period;
   int pre;
-  int step;
+  int index;
+  int count;
+  int start;
+  int send;
   fts_alarm_t alarm;
 } scope_ftl_t;
 
@@ -47,6 +57,8 @@ typedef struct _scope_
 {
   fts_object_t o;
   ftl_data_t data;
+  fts_atom_t a[SCOPE_BUFFER_SIZE];
+  int range;
 } scope_t;
 
 /***************************************************************************************
@@ -58,44 +70,25 @@ typedef struct _scope_
 static void 
 scope_reset(scope_ftl_t *data)
 {
-  data->state = scope_ready;
-  data->index = 0;
+  data->count = 0;
+  data->max = MIN_FLOAT;
 
+  data->send = 0;
   fts_alarm_unarm(&data->alarm);
 }
 
 static void 
-scope_output(fts_alarm_t *alarm, void *o)
+scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  fts_atom_t a[1];
-
-  fts_alarm_unarm(alarm);
-
-  fvec_atom_set(a, data->fvec);
-  fts_outlet_send((fts_object_t *)o, 0, fvec_symbol, 1, a);
-}
-
-static void 
-scope_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scope_t *this = (scope_t *)o;
-  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+  int size = data->size;
   int n = fts_get_number_int(at);
 
-  if(n < 16)
-    n = 16;
-  else if(n > 1024)
-    n = 1024;
+  if(n < size)
+    n = size;
 
-  data->alloc = n + 64;
-
-  fvec_set_size(data->fvec, data->alloc);
-  fvec_set_size(data->fvec, n);
-
-  if(data->pre > n)
-    data->pre = n;
+  data->period = n;
 
   scope_reset(data);
 }
@@ -105,9 +98,51 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  float f = fts_get_number_float(at);
 
-  data->threshold = f;
+  if(fts_is_number(at))
+    {
+      float f = fts_get_number_float(at);
+
+      data->trigger = scope_threshold;
+      data->threshold = f;
+
+      scope_reset(data);
+    }
+  else if(fts_is_symbol(at))
+    {
+      fts_symbol_t s = fts_get_symbol(at);
+
+      if(s == sym_auto)
+	{
+	  data->trigger = scope_auto;
+	  scope_reset(data);
+	}
+      else if(s == sym_off)
+	{
+	  data->trigger = scope_threshold;
+	  scope_reset(data);
+	}
+    }
+}
+
+static void 
+scope_set_threshold_auto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t *this = (scope_t *)o;
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+
+  data->trigger = scope_auto;
+  scope_reset(data);
+}
+
+static void 
+scope_set_threshold_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t *this = (scope_t *)o;
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+
+  data->trigger = scope_period;
+  scope_reset(data);
 }
 
 static void 
@@ -115,42 +150,103 @@ scope_set_pre_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  int size = fvec_get_size(data->fvec);
+  int size = data->size;
   int n = fts_get_number_int(at);
 
   if(n < 0)
     n = 0;
-  else if (n > size)
-    n = size;
+  else if(n >= size)
+    n = size - 1;
 
   data->pre = n;
 }
 
+static void
+scope_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t * this = (scope_t *)o;
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+  int n = fts_get_int(at);
+  
+  data->size = n;
 
+  if(data->pre >= n)
+    data->pre = n - 1;
+  
+  scope_reset(data);
+}
+
+static void
+scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t * this = (scope_t *)o;
+  
+  this->range = fts_get_int(at);
+}
+
+/* alarm function */
 static void 
-scope_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_send_to_client(fts_alarm_t *alarm, void *o)
 {
   scope_t *this = (scope_t *)o;
+  fts_atom_t *a = this->a;  
+  float range = (float)this->range;
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
 
-  switch (ac)
+  if(data->send)
     {
-    case 3:
-      if(fts_is_number(at + 2))
-	scope_set_pre_delay(o, 0, 0, 1, at + 2);      
-    case 2:
-      if(fts_is_number(at + 1))
-	scope_set_threshold(o, 0, 0, 1, at + 1);
-    case 1:
-      if(fts_is_number(at))
-	scope_set_size(o, 0, 0, 1, at);
-    default:
-      break;
+      float *buf = data->buffer;
+      int index = data->start;
+      int size = data->size;
+      int tail = index + size - SCOPE_BUFFER_SIZE;
+      int i;
+      
+      fts_alarm_unarm(alarm);
+      
+      if(tail < 0)
+	tail = 0;
+      
+      for(i=0; i<size-tail; i++)
+	{
+	  float value = buf[index];
+	  int display = (int)((range - 1.0) * (value + 1.0) / 2.0 + 0.5);
+
+	  if(display < 0)
+	    display = 0;
+	  else if(display > range)
+	    display = range;
+	  
+	  fts_set_int(a + i, display);
+	  index++;
+	}
+      
+      index = 0;
+      
+      for(; i<size; i++)
+	{
+	  float value = buf[index];
+	  int display = (int)((range - 1.0) * (value + 1.0) / 2.0 + 0.5);
+	  
+	  if(display < 0)
+	    display = 0;
+	  else if(display > range)
+	    display = range;
+	  
+	  fts_set_int(a + i, display);
+	  index++;
+	}
+
+      fts_client_send_message(o, sym_display, data->size, this->a);
+    }
+  else
+    {
+      fts_client_send_message(o, sym_display, 0, 0);      
     }
 }
 
 /***************************************************************************************
  *
- *  put
+ *  dsp
  *
  */
 
@@ -164,9 +260,9 @@ scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[3];
 
-  data->state = scope_ready;
   data->index = 0;
-  
+  scope_reset(data);
+
   fts_set_ftl_data(a + 0, this->data);
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
@@ -179,93 +275,133 @@ scope_ftl(fts_word_t *argv)
   scope_ftl_t *data = (scope_ftl_t *)fts_word_get_ptr(argv + 0);
   float * restrict in = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(data->fvec);
+  float last = data->last;
+  float max = data->max;
+  float *buf = data->buffer;
   int index = data->index;
-  int step = data->step;
+  int count = data->count;
+  int pre = data->pre;
+  int period = data->period;
+  int size = data->size;
   int i;
 
-  if(data->state == scope_triggered)
+  if(data->trigger == scope_period)
     {
-      int size = fvec_get_size(data->fvec);
-      
-      if(size - index <= n_tick)
-	{
-	  fts_alarm_set_delay(&(data->alarm), 0.01);
-	  fts_alarm_arm(&(data->alarm));
-
-	  data->state = scope_ready;
-	}
-      
-      /* there must be enough place in the buffer beyond size in order to put this all there behind */
-      for(i=0; i<n_tick; i+=step)
-	{
-	  buf[index] = in[i];
-	  index++;
-	}
-    }
-  else /* if(data->state == scope_ready) */
-    {
-      int pre = data->pre;
-      int alloc = data->alloc;
-      float threshold = data->threshold;
-      float last = data->last;
-      
-      /* just record all incomming data for pre-delay */
-      for(i=0; i<n_tick; i+=step)
+      for(i=0; i<n_tick; i++)
 	{
 	  float f = in[i];
 	  
-	  if(last < threshold &&  f >= threshold)
+	  buf[index] = f;
+	  
+	  if(count >= period)
 	    {
-	      /* trigger */
-	      data->state = scope_triggered;
-
-	      if(index < pre)
-		{
-		  int tail = pre - index;
-		  int j;
-		  
-		  /* copy pre-delay signal to beginning of vector */
-		  for(j=1; j<=index; j++)
-		    buf[pre - j] = buf[index - j];
-		  
-		  for(j=1; j<=tail; j++)
-		    buf[tail - j] = buf[alloc - j];
-		}
-	      else if(index > pre)
-		{
-		  int head = index - pre;
-		  int j;
-		  
-		  for(j=0; j<pre; j++)
-		    buf[j] = buf[j + head];
-		}
-	      
-	      index = pre;
-	      
-	      break;
+	      /* trigger each period */
+	      count = 0;
+	      data->start = index;
+	      max = MIN_FLOAT;
 	    }
-	  else
+	  else if(count == size)
 	    {
-	      buf[index] = f;
-	      index++;
-	      
-	      if(index >= alloc)
-		index -= alloc;
-
-	      last = f;
+	      /* send recorded data */
+	      data->send = size;
+	      fts_alarm_set_delay(&(data->alarm), 0.01);
+	      fts_alarm_arm(&(data->alarm));	      
 	    }
-	}
 
-      for(; i<n_tick; i+=step)
-	{
-	  buf[index] = in[i];
+	  count++;
+
 	  index++;
+	  if(index >= SCOPE_BUFFER_SIZE)
+	    index = 0;
+	}      
+    }
+  else /* trigger == scope_auto || trigger == scope_threshold */
+    {
+      float threshold = data->threshold;
+
+      for(i=0; i<n_tick; i++)
+	{
+	  float f = in[i];
+	  
+	  buf[index] = f;
+	  
+	  if(count <= 0)
+	    {
+	      /* waiting for trigger */
+	      if(last < threshold && f >= threshold)
+		{
+		  /* trigger */
+		  data->start = index - pre;
+
+		  if(data->start < 0)
+		    data->start += SCOPE_BUFFER_SIZE;
+
+		  /* count upwards from pre delay */
+		  count = pre + 1;
+		}
+	      else
+		{
+		  if(count <= -period)
+		    {
+		      /* end of period without triggered */
+		      count = 0;
+
+		      /* clear display */
+		      data->send = 0;
+		      fts_alarm_set_delay(&(data->alarm), 0.01);
+		      fts_alarm_arm(&(data->alarm));
+
+		      /* reset threshold for auto trigger */
+		      if(data->trigger == scope_auto)
+			data->threshold = 0.9 * max;
+		      
+		      max = MIN_FLOAT;
+		    }
+
+		  count--;
+		}
+	    }
+	  else 
+	    {
+	      if(count >= period)
+		{
+		  /* reset threshold for auto trigger */
+		  if(data->trigger == scope_auto)
+		    data->threshold = 0.9 * max;
+		  
+		  max = MIN_FLOAT;
+
+		  /* start new period looking for trigger */
+		  count = -1;
+		}
+	      else if(count == size)
+		{
+		  /* send recorded data */
+		  data->send = size;
+		  fts_alarm_set_delay(&(data->alarm), 0.01);
+		  fts_alarm_arm(&(data->alarm));
+		  
+		  count++;
+		}
+	      else
+		count++;
+	    }
+
+	  if(f > max)
+	    max = f;
+
+	  last = f;
+
+	  index++;	  
+	  if(index >= SCOPE_BUFFER_SIZE)
+	    index = 0;
 	}
     }
   
-  data->last = in[n_tick - 1];
+  data->max = max;
+  data->last = last;
   data->index = index;
+  data->count = count;
 }
 
 /***************************************************************************************
@@ -274,12 +410,18 @@ scope_ftl(fts_word_t *argv)
  *
  */
 
+static void 
+scope_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t *this = (scope_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);
+}
+
 static void
 scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data;
-  fvec_t *fvec;
   int i;
 
   ac--;
@@ -287,45 +429,22 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   this->data = 0;
 
-  if(ac > 3)
-    {
-      fts_object_set_error(o, "Extra argument");
-      return;
-    }
-
-  for(i=0; i<ac; i++)
-    {
-      if(!fts_is_number(at + i))
-	{
-	  fts_object_set_error(o, "Wrong arguments");
-	  return;
-	}
-    }
-
   this->data = ftl_data_alloc(sizeof(scope_ftl_t));
   data = ftl_data_get_ptr(this->data);
   
-  data->fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  fts_object_refer((fts_object_t *)data->fvec);
-
-  data->state = scope_ready;
+  data->trigger = scope_auto;
   data->threshold = 0.5;
-  data->index = 0;
+  data->last = 0.0;
+
+  data->size = 128;
+  this->range = 128;
+  data->period = 2000;
   data->pre = 0;
-  data->step = 1;
-  fts_alarm_init(&(data->alarm), 0, scope_output, (void *)this);
+  data->start = 0;
+  fts_alarm_init(&(data->alarm), 0, scope_send_to_client, (void *)this);
 
-  scope_set(o, 0, 0, ac, at);
+  scope_reset(data);
   
-  /* set default size */
-  if(fvec_get_size(data->fvec) == 0)
-    {
-      fts_atom_t a[1];
-
-      fts_set_int(a, 256);
-      scope_set_size(o, 0, 0, 1, a);
-    }
-
   fts_dsp_add_object((fts_object_t *)this);
 }
 
@@ -337,9 +456,6 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(this->data)
     {
       scope_ftl_t *data = ftl_data_get_ptr(this->data);
-      
-      if(data->fvec)
-	fts_object_release((fts_object_t *)data->fvec);    
       
       ftl_data_free(this->data);
       
@@ -353,20 +469,17 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   ac--;
   at++;
 
-  fts_class_init(cl, sizeof(scope_t), 4, 2, 0);
+  fts_class_init(cl, sizeof(scope_t), 1, 0, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, scope_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, scope_delete);      
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), scope_put);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, scope_set_size);
-  fts_method_define_varargs(cl, 1, fts_s_float, scope_set_size);
-
-  fts_method_define_varargs(cl, 2, fts_s_int, scope_set_threshold);
-  fts_method_define_varargs(cl, 2, fts_s_float, scope_set_threshold);
-
-  fts_method_define_varargs(cl, 3, fts_s_int, scope_set_pre_delay);
-  fts_method_define_varargs(cl, 3, fts_s_float, scope_set_pre_delay);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), scope_set_size_by_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), scope_set_range_by_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("period"), scope_set_period);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("threshold"), scope_set_threshold);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("onset"), scope_set_pre_delay);
 
   dsp_sig_inlet(cl, 0);
 
@@ -376,8 +489,11 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_scope_config(void)
 {
-  scope_symbol = fts_new_symbol("scope~");
-  dsp_declare_function(scope_symbol, scope_ftl);  
+  scope_symbol = fts_new_symbol("scope");
+  sym_display = fts_new_symbol("display");
+  sym_auto = fts_new_symbol("auto");
+  sym_off = fts_new_symbol("off");
 
+  dsp_declare_function(scope_symbol, scope_ftl);  
   fts_class_install(scope_symbol, scope_instantiate);
 }

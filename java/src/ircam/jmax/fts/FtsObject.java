@@ -47,7 +47,7 @@ public class FtsObject /*extends Object*/
 {
   static final public int systemInlet = -1;
   
-    //private static Hashtable creators = new Hashtable();
+  private static Hashtable creators = new Hashtable();
   
   static private Class parameterTypes[] = new Class[2];
   static Object[] methodArgs = new Object[2];
@@ -141,7 +141,9 @@ public class FtsObject /*extends Object*/
 	else if (className == "display")
 	  obj =  new FtsDisplayObject(fts, parent);
 	else if (className == "vecdisplay")
-	  obj =  new FtsVectorDisplayObject(fts, parent);
+	  obj =  new FtsVectorDisplayObject(fts, parent, className);
+	else if (className == "scope")
+	  obj =  new FtsScopeObject(fts, parent, className);
 	else if (className == "slider")
 	  obj =  new FtsSliderObject(fts, parent);
 	else if (className == "intbox")

@@ -227,7 +227,6 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
 
     addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
-    /*addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");*/
     addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message or Constant");
     addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
     addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
@@ -241,6 +240,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
     addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
     addButton( "vecdisplay", "_vecdisplay_", path+"cursor_vecdisplay.gif", "Adding New Vector Display Object");
+    addButton( "scope", "_scope_", path+"cursor_scope.gif", "Adding New Oscilloscope");
 
     String cname;
     for(Enumeration en = ObjectCreatorManager.getClassNames(); en.hasMoreElements();)

@@ -45,9 +45,9 @@ public class FtsVectorDisplayObject extends FtsObject
   float max = defaultMax;
   int zero = 0; /* y position of zero axis */
 
-  public FtsVectorDisplayObject(Fts fts, FtsObject parent)
+  public FtsVectorDisplayObject(Fts fts, FtsObject parent, String className)
   {
-    super(fts, parent, null, "vecdisplay", "");
+    super(fts, parent, null, className, "");
     
     ninlets = 1;
     noutlets = 0;

@@ -34,10 +34,6 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
-//
-// The display graphic object.
-//
-
 class VectorDisplay extends GraphicObject implements FtsDisplayListener
 {
   private static final int minWidth = 18;
@@ -49,6 +45,10 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
   /* silent agreement with client */
   private static final int defaultWidth = 130;
   private static final int defaultHeight = 130;
+
+  Color backgroundColor = new Color((float)1.0, (float)0.98, (float)0.9);
+  Color markerColor = new Color((float)0.9, (float)0.88, (float)0.8);
+  Color lineColor = Color.black;
 
   int size = 0;
   int range = 0;
@@ -77,7 +77,22 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     redraw();
   }
 
-  public void setWidth( int w) 
+  public void setBackgroundColor(Color c) 
+  {
+    backgroundColor = c;
+  }
+
+  public void setMarkerColor(Color c) 
+  {
+    markerColor = c;
+  }
+
+  public void setLineColor(Color c) 
+  {
+    lineColor = c;
+  }
+
+  public void setWidth(int w) 
   {
     if (w < minWidth)
       w = minWidth;
@@ -91,7 +106,7 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     super.setWidth(w);
   }
 
-  public void setHeight( int h)
+  public void setHeight(int h)
   {
     if (h < minHeight)
       h = minHeight;
@@ -130,6 +145,8 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     
     int fromX = x;
     int fromY = y - from;
+
+    g.setColor(lineColor);
     
     for(int i=1; i<n; i++)
       {
@@ -162,8 +179,6 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     int orgX = x + 1;
     int orgY = y + h - 2;
-    Color backgroundColor = new Color((float)1.0, (float)0.98, (float)0.9);
-    Color zeroColor = new Color((float)0.9, (float)0.88, (float)0.8);
     int i;
 
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -178,9 +193,9 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     if(zero > 0)
       {
 	if (isSelected())
-	  g.setColor(zeroColor.darker());
+	  g.setColor(markerColor.darker());
 	else
-	  g.setColor(zeroColor);
+	  g.setColor(markerColor);
 	
 	g.drawLine(orgX, orgY - zero, orgX + size, orgY - zero);
       }
