@@ -11403,6 +11403,78 @@
 			isa = PBXTargetDependency;
 			target = F85C87900290238D01664092;
 		};
+		F86E9E9002A5326501664092 = {
+			isa = PBXFileReference;
+			name = FtsMatDisplayObject.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/FtsMatDisplayObject.java;
+			refType = 2;
+		};
+		F86E9E9102A5326501664092 = {
+			isa = PBXFileReference;
+			name = MatDispControlPanel.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/MatDispControlPanel.java;
+			refType = 2;
+		};
+		F86E9E9202A5326501664092 = {
+			isa = PBXFileReference;
+			name = MatDisplay.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/MatDisplay.java;
+			refType = 2;
+		};
+		F86E9E9302A5326501664092 = {
+			isa = PBXFileReference;
+			name = MatDispRModePopUp.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/MatDispRModePopUp.java;
+			refType = 2;
+		};
+		F86E9E9402A5326501664092 = {
+			fileRef = F86E9E9002A5326501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86E9E9502A5326501664092 = {
+			fileRef = F86E9E9102A5326501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86E9E9602A5326501664092 = {
+			fileRef = F86E9E9202A5326501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86E9E9702A5326501664092 = {
+			fileRef = F86E9E9302A5326501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86E9E9802A532B001664092 = {
+			isa = PBXFileReference;
+			name = matdisplay.c;
+			path = ../../packages/guiobj/c/src/matdisplay.c;
+			refType = 2;
+		};
+		F86E9E9902A532B001664092 = {
+			fileRef = F86E9E9802A532B001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86E9E9A02A5330001664092 = {
+			isa = PBXFileReference;
+			name = matdisplay.help.jmax;
+			path = ../../packages/guiobj/help/matdisplay.help.jmax;
+			refType = 2;
+		};
+		F86E9E9C02A5330801664092 = {
+			fileRef = F86E9E9A02A5330001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F88000000283043C01664092 = {
 			children = (
 				F88000010283043C01664092,
@@ -19112,6 +19184,7 @@
 				F8B8E58C0286822501664092,
 				F8B8E58D0286822501664092,
 				F8B8E58E0286822501664092,
+				F86E9E9802A532B001664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -19283,6 +19356,7 @@
 				F8DC5EC50286845701664092,
 				F8DC5EC60286845701664092,
 				F8DC5EC70286845701664092,
+				F86E9E9A02A5330001664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -19518,6 +19592,7 @@
 				F8B8E5C00286822601664092,
 				F8B8E5C10286822601664092,
 				F8B8E5C20286822601664092,
+				F86E9E9902A532B001664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -19744,6 +19819,10 @@
 				F8DC5E97028683C301664092,
 				F8DC5E98028683C301664092,
 				F8DC5E99028683C301664092,
+				F86E9E9402A5326501664092,
+				F86E9E9502A5326501664092,
+				F86E9E9602A5326501664092,
+				F86E9E9702A5326501664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -19799,6 +19878,10 @@
 				F8DC5E6F028683C301664092,
 				F8DC5E70028683C301664092,
 				F8DC5E71028683C301664092,
+				F86E9E9002A5326501664092,
+				F86E9E9102A5326501664092,
+				F86E9E9202A5326501664092,
+				F86E9E9302A5326501664092,
 			);
 			isa = PBXGroup;
 			name = guiobj;
@@ -20539,6 +20622,7 @@
 				F8DC5EEE028685AF01664092,
 				F8DC5EEF028685AF01664092,
 				F8DC5EF0028685AF01664092,
+				F86E9E9C02A5330801664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
