@@ -43,7 +43,6 @@ extern void sigtab1_config(void);
 extern void noise_config(void);
 extern void sigparam_config(void);
 extern void sigprint_config(void);
-extern void vecarith_config(void);
 extern void vectrigon_config(void);
 extern void vecsqrt_config(void);
 extern void veclog_config(void);
@@ -72,7 +71,6 @@ static void ispw_signal_module_init(void)
   noise_config();
   sigparam_config();
   sigprint_config();
-  vecarith_config();
   vectrigon_config();
   vecsqrt_config();
   veclog_config();

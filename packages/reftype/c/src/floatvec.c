@@ -136,6 +136,8 @@ float_vector_set_size(float_vector_t *vector, int size)
 
   if(tail > 0)
     fts_vec_fzero(vector->values + old_size, tail);
+  else if(tail < 0)
+    fts_vec_fzero(vector->values + size, -tail);    
 }
 
 void 

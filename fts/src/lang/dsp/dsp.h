@@ -57,8 +57,10 @@ typedef struct
 #define fts_dsp_get_input_srate(DESC, IN) ((DESC)->in[(IN)]->srate)
 
 /* test for the null input special case */
-
 #define fts_dsp_is_input_null(DESC, IN) ((DESC)->in[(IN)]->id == 0)
+
+/* test if inlet is signal inlet */
+extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 
 /* get output properties */
 
@@ -97,7 +99,6 @@ extern void dsp_chain_post_signals(void);
 
 extern void dsp_chain_fprint(FILE *f);
 extern void dsp_chain_fprint_signals(FILE *f);
-
 
 extern fts_object_t *dsp_get_current_object(void);
 

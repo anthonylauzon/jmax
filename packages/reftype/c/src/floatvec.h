@@ -53,6 +53,7 @@ extern void float_vector_copy(float_vector_t *in, float_vector_t *out);
 extern void float_vector_zero(float_vector_t *vector);
 
 #define float_vector_get_size(vector) ((vector)->size)
+#define float_vector_get_alloc_size(vector) ((vector)->alloc)
 extern void float_vector_set_size(float_vector_t *vector, int size);
 
 #define float_vector_is_empty(vector) ((vector)->size == 0)

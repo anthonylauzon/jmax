@@ -1,4 +1,9 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+   <title>jMax Documentation</title>
 <!--                                                                      -->
 <!-- jMax                                                                 -->
 <!--                                                                      -->
@@ -11,1197 +16,741 @@
 <!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
-<head>
-<title>jMax Documentation</title>
 </head>
-
-<body bgcolor="white">
-
-<table width=100% border=0 cellspacing=0 cellpadding=0>
+<body bgcolor="#FFFFFF">
+&nbsp;
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
 <tr>
-  <td align=left valign=top>
-    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
-  </td>
-  <td align=right valign=top>
-    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
-  </td>
-</tr>
+<td ALIGN=LEFT VALIGN=TOP><a href="http://www.ircam.fr/jmax/"><img SRC="jmax_logo_small_transp.gif" ALT="jMax" BORDER=0 ></a></td>
 
+<td ALIGN=RIGHT VALIGN=TOP><a href="http://www.ircam.fr/"><img SRC="ircam_banner.gif" ALT="IRCAM - Centre Georges Pompidou" BORDER=0 ></a></td>
+</tr>
 </table>
 
-
-<table width=75% border=0 cellspacing=0 cellpadding=0>
-
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="75%" >
 <tr>
 <td><spacer type="block" height="1" width="1"></td>
 </tr>
 
 <tr>
-<td align=right><font size=+3><b><i>j</i>Max server kernel API</b></font></td>
+<td ALIGN=RIGHT><b><font size=+3><i>j</i>Max server kernel API</font></b></td>
 </tr>
 
 <tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+<td ALIGN=RIGHT VALIGN=TOP><font size=-1><a href="index.html"><i>j</i>Max
+Documentation</a></font></td>
 </tr>
 
 <tr>
 <td><spacer type="block" height="1" width="1"></td>
 </tr>
-
 </table>
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- End of header                                                          -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<p>
+<!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- End of header                                                          --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
 <ul type=dot>
-<li> <a href="#Introduction">Introduction</a>
-<li> <a href="#Memory Management">Memory Management</a>
-<li> <a href="#Error Handling">Error Handling</a>
-<li> <a href="#FTS data structures">FTS data structures</a>
-<li> <a href="#Time Handling">Time Handling</a>
-<li> <a href="#The Module System">The Module System</a>
-<li> <a href="#Audio Streams">Audio Streams</a>
-<li> <a href="#MIDI Input Output">MIDI Input Output</a>
-<li> <a href="#The FTS Device System">The FTS Device System</a>
-<li> <a href="#Device Creation Support">Device Creation Support</a>
+<li>
+<a href="#Introduction">Introduction</a></li>
+
+<li>
+<a href="#Memory Management">Memory Management</a></li>
+
+<li>
+<a href="#Error Handling">Error Handling</a></li>
+
+<li>
+<a href="#FTS data structures">FTS data structures</a></li>
+
+<li>
+<a href="#Time Handling">Time Handling</a></li>
+
+<li>
+<a href="#The Module System">The Module System</a></li>
+
+<li>
+<a href="#Audio Streams">Audio Streams</a></li>
+
+<li>
+<a href="#MIDI Input Output">MIDI Input Output</a></li>
+
+<li>
+<a href="#The FTS Device System">The FTS Device System</a></li>
+
+<li>
+<a href="#Device Creation Support">Device Creation Support</a></li>
 </ul>
 
-     
-<p>
-<hr size=1>
-
-<a name="Introduction"> <h2>Introduction</h2> </a>
-
-<p>
-The FTS kernel is a set of functionalities on top of which FTS
-application are built; all these functionalities are available to the
-application programmer to build its own applications, or part of them
-(like user objects for the FTS message system).
-
-<p>
-Moreover, the kernel itself is extensible, and users can easily add new
-kernel modules, like new device drivers to use new hardware for existing
+<hr size=1><a NAME="Introduction"></a>
+<h2>
+Introduction</h2>
+The FTS kernel is a set of functionalities on top of which FTS application
+are built; all these functionalities are available to the application programmer
+to build its own applications, or part of them (like user objects for the
+FTS message system).
+<p>Moreover, the kernel itself is extensible, and users can easily add
+new kernel modules, like new device drivers to use new hardware for existing
 platforms.
-
-<p>
-This manual document the programming interface for all the FTS kernel
+<p>This manual document the programming interface for all the FTS kernel
 functionalities.
-
+<p>In order to use any of the functions or data type defined in this document,
+you need to include the file "fts.h" in your sources.
+<p>The current release of this manual is not complete; we privileged documenting
+functionalities needed by user object writers for the FTS message system,
+while other more system related aspects were left behind; anyway, they
+are always described in the general lines; if you are in the situation
+you need the kind of functionalities that are described but not fully documented,
+and you cannot wait for future versions, contact the FTS developement team
+to get detailed information, by using the fts@ircam.fr mailing list.
+<p>FTS do not guarantee binary compatibility with future releases; some
+of the functions documented in this manual may actually be macros, and
+their definition may change, or they may become functions and so on.
+<p>Moreover, you should not make assumption on the current content of include
+files in the distribution, like the definition of a data structure, or
+the size of data type and so on, unless they are explicitly documented
+in this manual; anything that is not documented may change, or disappear,
+from a release to an other; if you really think you need to use something
+defined in an include file, but not documented here, first check with the
+FTS developement team.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-In order to use any of the functions or data type defined in this
-document, you need to include the file "fts.h" in your sources.
-
-<p>
-The current release of this manual is not complete; we privileged
-documenting functionalities needed by user object writers for the FTS
-message system, while other more system related aspects were left
-behind; anyway, they are always described in the general lines; if you
-are in the situation you need the kind of functionalities that are
-described but not fully documented, and you cannot wait for future
-versions, contact the FTS developement team to get detailed information,
-by using the fts@ircam.fr mailing list.
-
-<p>
-FTS do not guarantee binary compatibility with future releases;
-some of the functions documented in this manual may actually be
-macros, and their definition may change, or they may become functions
-and so on.  
-
-<p>
-Moreover, you should not make assumption on the current content of
-include files in the distribution, like the definition of a data
-structure, or the size of data type and so on, unless they are
-explicitly documented in this manual; anything that is not documented
-may change, or disappear, from a release to an other; if you really
-think you need to use something defined in an include file, but not
-documented here, first check with the FTS developement team.
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Memory Management"><h2>Memory Management</h2></a>
-
-
-<p>
-FTS provides itself a number of memory management
-operations that substitute the standard C lib ones; all the applications
-written for FTS <b>should</b> use these primitives, in order to simplify
-statistics on memory usage and similar things; but it is legal
-for an object to bypass the fts memory management and to access directly
-the <code>libc</code> primitives.
-
-<p>
-The memory management primitives closely resemble the C standard functions.
-
-<p>
-<code>void *fts_malloc(int <i>size</i>)</code>
-
-<p>
-Allocate a block of memory of the requested size.
-Remember that by definition, the memory unit is such that
-<code>sizeof(char) == 1</code>.
-
-<p>
-<code>void *fts_zalloc(int <i>size</i>)</code>
-
-<p>
-Like <code>fts_alloc</code>, but fills the newly allocated structure
-with zeros.
-
-<p>
-<code>void *fts_realloc(void *<i>p</i>, int <i>size</i>)</code>
-
-<p>
-Changes the size of the block pointed to by <i>p</i> to <i>size</i> bytes
-and returns a pointer to the (possibly moved) block.  The contents will
-be unchanged up to the lesser of the new and old sizes.
-
-<p>
-<code>void fts_free(void *<i>p</i>)</code>
-
-<p>
-The memory block pointer by <i>p</i> is returned to the memory management
+<hr><a NAME="Memory Management"></a>
+<h2>
+Memory Management</h2>
+FTS provides itself a number of memory management operations that substitute
+the standard C lib ones; all the applications written for FTS <b>should</b>
+use these primitives, in order to simplify statistics on memory usage and
+similar things; but it is legal for an object to bypass the fts memory
+management and to access directly the <tt>libc</tt> primitives.
+<p>The memory management primitives closely resemble the C standard functions.
+<p><tt>void *fts_malloc(int <i>size</i>)</tt>
+<p>Allocate a block of memory of the requested size. Remember that by definition,
+the memory unit is such that
+<tt>sizeof(char) == 1</tt>.
+<p><tt>void *fts_zalloc(int <i>size</i>)</tt>
+<p>Like <tt>fts_alloc</tt>, but fills the newly allocated structure with
+zeros.
+<p><tt>void *fts_realloc(void *<i>p</i>, int <i>size</i>)</tt>
+<p>Changes the size of the block pointed to by <i>p</i> to <i>size</i>
+bytes and returns a pointer to the (possibly moved) block. The contents
+will be unchanged up to the lesser of the new and old sizes.
+<p><tt>void fts_free(void *<i>p</i>)</tt>
+<p>The memory block pointer by <i>p</i> is returned to the memory management
 system; <i>p</i> should point to a memory block allocated by
-<code>fts_alloc</code> or <code>fts_realloc</code>; the memory block should not be
-referred anymore after a call to this function.
-
-
-<!-- ---------------------------------------------------------------------- -->
+<tt>fts_alloc</tt>
+or <tt>fts_realloc</tt>; the memory block should not be referred anymore
+after a call to this function.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
-<h3>Heaps</h3>
-
-Typically the <code>fts_malloc</code> primitive is mapped
-to the native memory allocation subsystem, if any; to get
-more efficency in handling an heap of omogenous objects,
-FTS provide a predefined heap allocator module.
-
-<i> The heap function are not yet documented in this release of the document</i>
-
-<!-- NOT YET DOCUMENTED -->
-
-
-
-<!-- ---------------------------------------------------------------------- -->
+<h3>
+Heaps</h3>
+Typically the <tt>fts_malloc</tt> primitive is mapped to the native memory
+allocation subsystem, if any; to get more efficency in handling an heap
+of omogenous objects, FTS provide a predefined heap allocator module. <i>The
+heap function are not yet documented in this release of the document</i><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-<hr>
-<a name="Error Handling"><h2>Error Handling</h2></a>
-
-
+<hr><a NAME="Error Handling"></a>
+<h2>
+Error Handling</h2>
+The Error Handling support subsystem provide a set of data structure, functions
+and conventions to represent errors, to handle errors and to signal errors
+to clients in FTS applications.
+<p><i>The error handling support is not documented in this release of the
+document.</i><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-The Error Handling support subsystem provide a set of data structure,
-functions and conventions to represent errors, to handle errors and
-to signal errors to clients in FTS applications.
-
-<p>
-<i>The error handling support is not documented in this release of the document.</i>
-
-<!-- NOT YET DOCUMENTED -->
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="FTS data structures"><h2>FTS data structures</h2></a>
-
-<p>
-The FTS kernel defines a number of basic data types, and the relative
-operations, used in most of the kernel API, and freely usable from the
-user to build applications.
-
-<p>
-Vectors are documented <a href="../Vector_Library_Reference_Manual/Vector_Library_Reference_Manual.html#Vectors">in a specific document</a>.
-
-<p>
+<hr><a NAME="FTS data structures"></a>
+<h2>
+FTS data structures</h2>
+The FTS kernel defines a number of basic data types, and the relative operations,
+used in most of the kernel API, and freely usable from the user to build
+applications.
+<p>Vectors are documented <a href="../Vector_Library_Reference_Manual/Vector_Library_Reference_Manual.html#Vectors">in
+a specific document</a>.
 <ul>
-<li> <a href="#Symbols">Symbols</a>
-<li> <a href="#Atoms">Atoms</a>
-<li> <a href="#Atom Lists">Atom Lists</a>
-<li> <a href="#Hash Tables">Hash Tables</a>
-<li> <a href="#Property Lists">Property Lists</a>
+<li>
+<a href="#Symbols">Symbols</a></li>
+
+<li>
+<a href="#Atoms">Atoms</a></li>
+
+<li>
+<a href="#Atom Lists">Atom Lists</a></li>
+
+<li>
+<a href="#Hash Tables">Hash Tables</a></li>
+
+<li>
+<a href="#Property Lists">Property Lists</a></li>
 </ul>
-
-<a name="Symbols"><h3>Symbols</h3></a>
-
-<p>
+<a NAME="Symbols"></a>
+<h3>
+Symbols</h3>
 Symbols are unique representations of strings, in the LISP symbol style;
 if two pointers point to two symbols representing the same string, they
-are actually two pointers to the same C object.
-FTS symbols do not store any other information other than the name they
-are coding.
-
-<p>
-Users cannot modify or access the implementation of a symbol; it is a completely
-opaque structure; the <code>fts_symbol_t</code> type is defined a <code>const</code>
-pointer to an internal structure.
-
-<p>
-<code>fts_symbol_t fts_new_symbol(const char *<i>name</i>)</code>
-
-<p>
-Creates a new symbol corresponding to the string <i>name</i>;
-the passed string is not copied, so it cannot be reused; use
-this function with string constants, use the next function for
-locally allocated buffers. Returns a pointer to the new symbol.
-If a symbol with the same name already existed, it return a pointer
-to the existing one, instead of creating a new one; so two successive
-calls to <code>fts_new_symbol</code> with the same <i>name</i> argument
-will return the same symbol.
-Note that symbols are never destroyed, so that values returned
-by <code>fts_new_symbol</code> are valid until the end of the session.
-
-<p>
-<code>fts_symbol_t *fts_new_symbol_copy(const char *<i>name</i>)</code>
-
-<p>
-Creates a new symbol corresponding to the string <i>name</i>;
-the passed string is internally copied, so it can be reused
-or freed as the caller needs. Returns a pointer to the new symbol.
-If a symbol with the same name already existed, it return a pointer
-to the existing one, instead of creating a new one; so two successive
-calls to <code>fts_new_symbol</code> with the same <i>name</i> argument
-will return the same symbol.
-Note that symbols are never destroyed, so that values returned
-by <code>fts_new_symbol</code> are valid until the end of the session.
-
-<p>
-<code>const char *fts_symbol_name(const fts_symbol_t *<i>sym</i>)</code>
-
-<p>
-Returns the name corresponding to a given symbol.
-The user should not write or modify in any way the returned value.
-
-
-<a name="FTS Atoms"><h3>FTS Atoms</h3></a>
-
-<p>
-Atoms are opaque objects of type <code>fts_atom_t</code>; an atom 
-is a run time typed data item; an atom can store a
-floating point number, an long integer, a symbol, a string
-or a pointer. Atoms and array of atoms are used almost anywhere
-in FTS to represent lists of ethereogenous informations, like
-in messages, device options and so on.
-The FTS kernel provides a number of functions to fill an atom,
-to retrieve it's type or value, and to check its content type.
-Some` of the functions may be implemented as macros.
-
-<p>
-<code>void fts_set_int(fts_atom_t *<i>a</i>, int <i>l</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to int, and it's value to <i>l</i>.
-
-<p>
-<code>void fts_set_float(fts_atom_t *<i>a</i>, float <i>f</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to float, and it's value to <i>f</i>.
-
-<p>
-<code>void fts_set_symbol(fts_atom_t *<i>a</i>, fts_symbol_t *<i>s</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to symbol, and it's value to <i>s</i>.
-
-<p>
-<code>void fts_set_string(fts_atom_t *<i>a</i>, char *<i>str</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to string, and it's value to <i>str</i>.
-
-<p>
-<code>void fts_set_ptr(fts_atom_t *<i>a</i>, void *<i>p</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to obj, and it's value to <i>p</i>.
-
-<p>
-<code>void fts_set_void(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to void, i.e. Sets the atom to
-it's initial, uninitalized status.
-
-<p>
-<code>int fts_get_int(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type int, returns it's contents; 
-if not, the results value is not specified.
-
-<p>
-<code>float fts_get_float(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type float, returns it's contents; 
-if not, the results value is not specified.
-
-<p>
-<code>int fts_get_number_int(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is a number (float or int), returns it's contents converted to
-int, (this is always a macro); if not, the resulting value is not specified.
-
-<p>
-<code>float fts_get_number_float(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is a number (float or int), returns it's contents converted to
-float, (this is always a macro); if not, the resulting value is not specified.
-
-<p>
-<code>fts_symbol_t *fts_get_symbol(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type symbol, returns it's contents converted
-to <code>fts_symbol_t</code>; if not, the resulting value is not specified.
-
-<p>
-<code>char *fts_get_string(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type string, returns it's contents converted
-to <code>char *</code>; if not, the resulting value is not specified.
-
-<p>
-<code>void *fts_get_ptr(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type obj (<code>void *</code> pointer), returns it's
-contents converted to <code>void *</code>; if not, the resulting value is not
+are actually two pointers to the same C object. FTS symbols do not store
+any other information other than the name they are coding.
+<p>Users cannot modify or access the implementation of a symbol; it is
+a completely opaque structure; the <tt>fts_symbol_t</tt> type is defined
+a <tt>const</tt> pointer to an internal structure.
+<p><tt>fts_symbol_t fts_new_symbol(const char *<i>name</i>)</tt>
+<p>Creates a new symbol corresponding to the string <i>name</i>; the passed
+string is not copied, so it cannot be reused; use this function with string
+constants, use the next function for locally allocated buffers. Returns
+a pointer to the new symbol. If a symbol with the same name already existed,
+it return a pointer to the existing one, instead of creating a new one;
+so two successive calls to <tt>fts_new_symbol</tt> with the same <i>name</i>
+argument will return the same symbol. Note that symbols are never destroyed,
+so that values returned by <tt>fts_new_symbol</tt> are valid until the
+end of the session.
+<p><tt>fts_symbol_t *fts_new_symbol_copy(const char *<i>name</i>)</tt>
+<p>Creates a new symbol corresponding to the string <i>name</i>; the passed
+string is internally copied, so it can be reused or freed as the caller
+needs. Returns a pointer to the new symbol. If a symbol with the same name
+already existed, it return a pointer to the existing one, instead of creating
+a new one; so two successive calls to <tt>fts_new_symbol</tt> with the
+same <i>name</i> argument will return the same symbol. Note that symbols
+are never destroyed, so that values returned by <tt>fts_new_symbol</tt>
+are valid until the end of the session.
+<p><tt>const char *fts_symbol_name(const fts_symbol_t *<i>sym</i>)</tt>
+<p>Returns the name corresponding to a given symbol. The user should not
+write or modify in any way the returned value.&nbsp;<a NAME="FTS Atoms"></a>
+<h3>
+FTS Atoms</h3>
+Atoms are opaque objects of type <tt>fts_atom_t</tt>; an atom is a run
+time typed data item; an atom can store a floating point number, an long
+integer, a symbol, a string or a pointer. Atoms and array of atoms are
+used almost anywhere in FTS to represent lists of ethereogenous informations,
+like in messages, device options and so on. The FTS kernel provides a number
+of functions to fill an atom, to retrieve it's type or value, and to check
+its content type. Some` of the functions may be implemented as macros.
+<p><tt>void fts_set_int(fts_atom_t *<i>a</i>, int <i>l</i>)</tt>
+<p>Sets the type of <i>a</i> to int, and it's value to <i>l</i>.
+<p><tt>void fts_set_float(fts_atom_t *<i>a</i>, float <i>f</i>)</tt>
+<p>Sets the type of <i>a</i> to float, and it's value to <i>f</i>.
+<p><tt>void fts_set_symbol(fts_atom_t *<i>a</i>, fts_symbol_t *<i>s</i>)</tt>
+<p>Sets the type of <i>a</i> to symbol, and it's value to <i>s</i>.
+<p><tt>void fts_set_string(fts_atom_t *<i>a</i>, char *<i>str</i>)</tt>
+<p>Sets the type of <i>a</i> to string, and it's value to <i>str</i>.
+<p><tt>void fts_set_ptr(fts_atom_t *<i>a</i>, void *<i>p</i>)</tt>
+<p>Sets the type of <i>a</i> to obj, and it's value to <i>p</i>.
+<p><tt>void fts_set_void(fts_atom_t *<i>a</i>)</tt>
+<p>Sets the type of <i>a</i> to void, i.e. Sets the atom to it's initial,
+uninitalized status.
+<p><tt>int fts_get_int(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is of type int, returns it's contents; if not, the results
+value is not specified.
+<p><tt>float fts_get_float(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is of type float, returns it's contents; if not, the results
+value is not specified.
+<p><tt>int fts_get_number_int(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is a number (float or int), returns it's contents converted
+to int, (this is always a macro); if not, the resulting value is not specified.
+<p><tt>float fts_get_number_float(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is a number (float or int), returns it's contents converted
+to float, (this is always a macro); if not, the resulting value is not
 specified.
-
-<p>
-<code>int fts_is_int(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type int, 0 otherwise.
-
-<p>
-<code>int fts_is_float(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type float, 0 otherwise.
-
-<p>
-<code>int fts_is_number(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type float or int , 0 otherwise.
-
-<p>
-<code>int fts_is_symbol(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type symbol, 0 otherwise.
-
-<p>
-<code>int fts_is_string(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type string, 0 otherwise.
-
-<p>
-<code>int fts_is_ptr(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type obj (void pointer), 0 otherwise.
-
-<p>
-<code>int fts_is_void(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type void (non initialized), 0
+<p><tt>fts_symbol_t *fts_get_symbol(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is of type symbol, returns it's contents converted to <tt>fts_symbol_t</tt>;
+if not, the resulting value is not specified.
+<p><tt>char *fts_get_string(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is of type string, returns it's contents converted to <tt>char
+*</tt>; if not, the resulting value is not specified.
+<p><tt>void *fts_get_ptr(fts_atom_t *<i>a</i>)</tt>
+<p>If the atom is of type obj (<tt>void *</tt> pointer), returns it's contents
+converted to <tt>void *</tt>; if not, the resulting value is not specified.
+<p><tt>int fts_is_int(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type int, 0 otherwise.
+<p><tt>int fts_is_float(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type float, 0 otherwise.
+<p><tt>int fts_is_number(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type float or int , 0 otherwise.
+<p><tt>int fts_is_symbol(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type symbol, 0 otherwise.
+<p><tt>int fts_is_string(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type string, 0 otherwise.
+<p><tt>int fts_is_ptr(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type obj (void pointer), 0 otherwise.
+<p><tt>int fts_is_void(fts_atom_t *<i>a</i>)</tt>
+<p>Returns 1 if the atom <i>a</i> is of type void (non initialized), 0
 otherwise.
-
-<p>
-<code>fts_type_t fts_get_type(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns one of the constants 
-<code>fts_t_int</code>, <code>fts_t_float</code>, <code>fts_t_symbol</code>, 
-<code>fts_t_string</code>, <code>fts_t_ptr</code> or <code>fts_t_void</code>
-depending on the type of the atom <i>a</i>.
-Most of the time it is better to use one of the types predicate
-above instead of this one. This function is really only usefull
-inside switch statements on the whole set of FTS types.
-
-<p>
-<code>int fts_same_types(fts_atom_t *<i>a1</i>, fts_atom_t *<i>a2</i>)</code>
-
-<p>
-Returns 1 if the two atoms <i>a1</i> and <i>a2</i> have the same type,
-0 otherwise.
-
-<a name="Atom Lists"><h3>Atom Lists</h3></a>
-
-<p>
-Atom Lists are data structures representing a variable length list
-of atoms; Atom List Iterators are abstractions that allow iterating 
-on an Atom List.
-
-<p>
-Atom lists and atom list iterators can be allocated explicitly or
-implicitly as part of other structures. The kernel provides a set of
-functions for list manipulations and a mechanism to simplify sending
-the contents of an atom list to a client.
-
-<p>
-<code>void fts_atom_list_init(fts_atom_list_t *<i>list</i>)</code>
-
-<p>
-Initialize a statically or implicitly allocated atom list.
-Calling any other atom list function on a non initialized 
-atom list has unspecified results.
-
-<p>
-<code>fts_atom_list_t *fts_atom_list_new(void)</code>
-
-<p>
-Explicitly allocates, initializes and returns a new atom list.
-
-
-<p>
-<code>void fts_atom_list_destroy(fts_atom_list_t *<i>list</i>)</code>
-
-<p>
-Empties the atom list <i>list</i>, freeing all the internally 
-allocated storage. It can be used to clean an atom list, and
-is recomended  before to stopping use of an implicitly
-or statically allocated atom list.
-
-<p>
-<code>void fts_atom_list_free(fts_atom_list_t *<i>list</i>)</code>
-
-<p>
-Frees an explicitly allocated atom list, i.e. one created using
-<code>fts_atom_list_new</code>; users should not use or refer to the
-<i>list</i> atom list after calling this function.
-
-<p>
-<code>void fts_atom_list_append(fts_atom_list_t *<i>list</i>, int <i>ac</i>, const fts_atom_t *<i>atom</i>)</code>
-
-<p>
-Appends <i>ac</i> atoms stored in the <i>atom</i> array to the end of the atom list <i>list</i>;
-it is the user's responsability to make sure that <i>atom</i> actually points to an array
-at least <i>ac</i> atom int.
-
-<p>
-<code>int fts_atom_list_length( const fts_atom_list_t *<i>list</i>)</code>
-
-<p>
-Returns the length of the atom list, i.e. the number of atoms
-currently stored in the atom list.
-
-<p>
-<code>void fts_atom_list_iterator_init( fts_atom_list_iterator_t *<i>iter</i>, const fts_atom_list_t *<i>list</i>)</code>
-
-<p>
-Initializes an atom list iterator statically or implicitly allocated to
-point to the first element of the atom list <i>list</i>. Calling any other atom
-list iterator function on a non initialized atom list iterator has
-unspecified results.
-
-<p>
-<code>fts_atom_list_iterator_t *fts_atom_list_iterator_new( const fts_atom_list_t *<i>list</i>)</code>
-
-<p> 
-Explicitly allocates, and returns a new atom list iterator, 
-initialized to point to the atom list <i>list</i> first element.
-
-<p>
-<code>void fts_atom_list_iterator_next( fts_atom_list_iterator_t *<i>iter</i>)</code>
-
-<p>
-Advances the atom list iterator <i>iter</i> to point to the next element
+<p><tt>fts_type_t fts_get_type(fts_atom_t *<i>a</i>)</tt>
+<p>Returns one of the constants <tt>fts_t_int</tt>, <tt>fts_t_float</tt>,
+<tt>fts_t_symbol</tt>, <tt>fts_t_string</tt>, <tt>fts_t_ptr</tt> or <tt>fts_t_void</tt>
+depending on the type of the atom <i>a</i>. Most of the time it is better
+to use one of the types predicate above instead of this one. This function
+is really only usefull inside switch statements on the whole set of FTS
+types.
+<p><tt>int fts_same_types(fts_atom_t *<i>a1</i>, fts_atom_t *<i>a2</i>)</tt>
+<p>Returns 1 if the two atoms <i>a1</i> and <i>a2</i> have the same type,
+0 otherwise.&nbsp;<a NAME="Atom Lists"></a>
+<h3>
+Atom Lists</h3>
+Atom Lists are data structures representing a variable length list of atoms;
+Atom List Iterators are abstractions that allow iterating on an Atom List.
+<p>Atom lists and atom list iterators can be allocated explicitly or implicitly
+as part of other structures. The kernel provides a set of functions for
+list manipulations and a mechanism to simplify sending the contents of
+an atom list to a client.
+<p><tt>void fts_atom_list_init(fts_atom_list_t *<i>list</i>)</tt>
+<p>Initialize a statically or implicitly allocated atom list. Calling any
+other atom list function on a non initialized atom list has unspecified
+results.
+<p><tt>fts_atom_list_t *fts_atom_list_new(void)</tt>
+<p>Explicitly allocates, initializes and returns a new atom list.
+<p><tt>void fts_atom_list_destroy(fts_atom_list_t *<i>list</i>)</tt>
+<p>Empties the atom list <i>list</i>, freeing all the internally allocated
+storage. It can be used to clean an atom list, and is recomended before
+to stopping use of an implicitly or statically allocated atom list.
+<p><tt>void fts_atom_list_free(fts_atom_list_t *<i>list</i>)</tt>
+<p>Frees an explicitly allocated atom list, i.e. one created using
+<tt>fts_atom_list_new</tt>;
+users should not use or refer to the
+<i>list</i> atom list after calling
+this function.
+<p><tt>void fts_atom_list_append(fts_atom_list_t *<i>list</i>, int <i>ac</i>,
+const fts_atom_t *<i>atom</i>)</tt>
+<p>Appends <i>ac</i> atoms stored in the <i>atom</i> array to the end of
+the atom list <i>list</i>; it is the user's responsability to make sure
+that <i>atom</i> actually points to an array at least <i>ac</i> atom int.
+<p><tt>int fts_atom_list_length( const fts_atom_list_t *<i>list</i>)</tt>
+<p>Returns the length of the atom list, i.e. the number of atoms currently
+stored in the atom list.
+<p><tt>void fts_atom_list_iterator_init( fts_atom_list_iterator_t *<i>iter</i>,
+const fts_atom_list_t *<i>list</i>)</tt>
+<p>Initializes an atom list iterator statically or implicitly allocated
+to point to the first element of the atom list <i>list</i>. Calling any
+other atom list iterator function on a non initialized atom list iterator
+has unspecified results.
+<p><tt>fts_atom_list_iterator_t *fts_atom_list_iterator_new( const fts_atom_list_t
+*<i>list</i>)</tt>
+<p>Explicitly allocates, and returns a new atom list iterator, initialized
+to point to the atom list <i>list</i> first element.
+<p><tt>void fts_atom_list_iterator_next( fts_atom_list_iterator_t *<i>iter</i>)</tt>
+<p>Advances the atom list iterator <i>iter</i> to point to the next element
 of its atom list.
-
-<p>
-<code>int fts_atom_list_iterator_end( const fts_atom_list_iterator_t *<i>iter</i>)</code>
-
-<p>
-Returns zero if the atom list iterator points beyond the end of the list.
-
-<p>
-<code>fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t *<i>iter</i>)</code>
-
-<p>
-Returns a pointer to the atom currently pointed to by the atom list iterator <i>iter</i>.
-
-<p>
-<a name="Hash Tables"><h3>Hash Tables</h3></a>
-
-<p>
-FTS hash tables are data structures mapping symbols to <code>void *</code> pointers.
-They are intended to be used any time there is the need for naming internal objects.
-It is recomended that a hash table contains homogenous objects, i.e. that every
-time objects are named, a different name space is implemented.
-FTS hash table iterators are abstractions that allow iterations on all the
-pairs symbol value contained in a hash table.
-
-<p>
-<code>void fts_hash_table_init( fts_hash_table_t*<i>ht</i>)</code>
-
-<p>
-Initializes a statically or implicitly allocated hash table.
-Calling any other atom list function on a non initialized 
-hash table has unspecified results.
-
-<p>
-<code>fts_hash_table_t *fts_hash_table_new( void)</code>
-
-<p>
-Explicitly allocates, initializes and returns a new hash table.
-
-<p>
-<code>void fts_hash_table_destroy(fts_hash_table_t *<i>ht</i>)</code>
-
-<p>
-Empties the hash table <i>ht</i>, freeing all the internally 
-allocated storage. It can be used to clean an hash table, and 
-is recomended before stopping use of an implicitly
-or statically allocated hash table.
-
-<p>
-<code>void fts_hash_table_free(fts_hash_table_t *<i>ht</i>)</code>
-
-<p>
-Frees an explicitly allocated hash table, i.e. one created using
-<code>fts_hash_table_new</code>. Users should not use or refer to the
-<i>ht</i> hash table after calling this function.
-
-<p>
-<code>int fts_hash_table_lookup(fts_hash_table_t *<i>ht</i>, fts_symbol_t *<i>sym</i>, void **<i>data</i>)</code>
-
-<p>
-Looks up for the value associated with the symbol <i>sym</i> in the hash table <i>ht</i>,
-and stores it in the pointer pointed by <i>data</i>. Returns non zero if the value has
-been found, zero otherwise. The value of the pointer pointed by <i>data</i> is not specified
-in this case.
-
-<p>
-<code>int fts_hash_table_insert(fts_hash_table_t *<i>ht</i>, fts_symbol_t *<i>sym</i>, void *<i>data</i>)</code>
-
-<p>
-If there is no value associated with <i>sym</i> in the hash table <i>sym</i>, it adds
-the value <i>data</i> associated to the symbol <i>sym</i> and returns non zero, otherwise
-it returns zero.
-
-<p>
-<code>void fts_hash_table_apply( fts_hash_table_t*<i>ht</i>, void (*<i>fun</i>)( fts_symbol_t *<i>sym</i>, void *<i>data</i>))</code>
-
-<p>
-For every association symbol/value defined in the hash table <i>ht</i>, it calls the function <i>fun</i>,
-passing the symbol as argument <i>sym</i>, and the value as argument <i>data</i>.
-
-<p>
-<code>int fts_hash_table_remove( fts_hash_table_t*<i>ht</i>, t_symbol *<i>sym</i>)</code>
-
-<p>
-Removes the symbol <i>sym</i> and its associated value from the hash table <i>ht</i>.
-
-<p>
-<code>void fts_hash_table_iterator_init( fts_hash_table_iterator_t*<i>iter</i>, const fts_hash_table_t*<i>ht</i>)</code>
-
-<p>
-Initializes an hash table iterator statically or implicitly allocated to
-first symbol/value pair of the hash table <i>ht</i>; calling any other 
+<p><tt>int fts_atom_list_iterator_end( const fts_atom_list_iterator_t *<i>iter</i>)</tt>
+<p>Returns zero if the atom list iterator points beyond the end of the
+list.
+<p><tt>fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t
+*<i>iter</i>)</tt>
+<p>Returns a pointer to the atom currently pointed to by the atom list
+iterator <i>iter</i>.
+<p><a NAME="Hash Tables"></a>
+<h3>
+Hash Tables</h3>
+FTS hash tables are data structures mapping symbols to <tt>void *</tt>
+pointers. They are intended to be used any time there is the need for naming
+internal objects. It is recomended that a hash table contains homogenous
+objects, i.e. that every time objects are named, a different name space
+is implemented. FTS hash table iterators are abstractions that allow iterations
+on all the pairs symbol value contained in a hash table.
+<p><tt>void fts_hash_table_init( fts_hash_table_t*<i>ht</i>)</tt>
+<p>Initializes a statically or implicitly allocated hash table. Calling
+any other atom list function on a non initialized hash table has unspecified
+results.
+<p><tt>fts_hash_table_t *fts_hash_table_new( void)</tt>
+<p>Explicitly allocates, initializes and returns a new hash table.
+<p><tt>void fts_hash_table_destroy(fts_hash_table_t *<i>ht</i>)</tt>
+<p>Empties the hash table <i>ht</i>, freeing all the internally allocated
+storage. It can be used to clean an hash table, and is recomended before
+stopping use of an implicitly or statically allocated hash table.
+<p><tt>void fts_hash_table_free(fts_hash_table_t *<i>ht</i>)</tt>
+<p>Frees an explicitly allocated hash table, i.e. one created using
+<tt>fts_hash_table_new</tt>.
+Users should not use or refer to the
+<i>ht</i> hash table after calling
+this function.
+<p><tt>int fts_hash_table_lookup(fts_hash_table_t *<i>ht</i>, fts_symbol_t
+*<i>sym</i>, void **<i>data</i>)</tt>
+<p>Looks up for the value associated with the symbol <i>sym</i> in the
+hash table <i>ht</i>, and stores it in the pointer pointed by <i>data</i>.
+Returns non zero if the value has been found, zero otherwise. The value
+of the pointer pointed by <i>data</i> is not specified in this case.
+<p><tt>int fts_hash_table_insert(fts_hash_table_t *<i>ht</i>, fts_symbol_t
+*<i>sym</i>, void *<i>data</i>)</tt>
+<p>If there is no value associated with <i>sym</i> in the hash table <i>sym</i>,
+it adds the value <i>data</i> associated to the symbol <i>sym</i> and returns
+non zero, otherwise it returns zero.
+<p><tt>void fts_hash_table_apply( fts_hash_table_t*<i>ht</i>, void (*<i>fun</i>)(
+fts_symbol_t *<i>sym</i>, void *<i>data</i>))</tt>
+<p>For every association symbol/value defined in the hash table <i>ht</i>,
+it calls the function <i>fun</i>, passing the symbol as argument <i>sym</i>,
+and the value as argument <i>data</i>.
+<p><tt>int fts_hash_table_remove( fts_hash_table_t*<i>ht</i>, t_symbol
+*<i>sym</i>)</tt>
+<p>Removes the symbol <i>sym</i> and its associated value from the hash
+table <i>ht</i>.
+<p><tt>void fts_hash_table_iterator_init( fts_hash_table_iterator_t*<i>iter</i>,
+const fts_hash_table_t*<i>ht</i>)</tt>
+<p>Initializes an hash table iterator statically or implicitly allocated
+to first symbol/value pair of the hash table <i>ht</i>; calling any other
 hash table iterator function on a non initialized hash table iterator has
 unspecified results.
-
-<p>
-<code>fts_hash_table_iterator_t *fts_hash_table_iterator_new( const fts_hash_table_t *<i>ht</i>)</code>
-
-<p>
-Explicitly allocates, and returns a new hashtable iterator, initialized
+<p><tt>fts_hash_table_iterator_t *fts_hash_table_iterator_new( const fts_hash_table_t
+*<i>ht</i>)</tt>
+<p>Explicitly allocates, and returns a new hashtable iterator, initialized
 to point to the first symbol/value pair of the hash table <i>ht</i>.
-
-<p>
-<code>void fts_hash_table_iterator_next( fts_hash_table_iterator_t*<i>iter</i>)</code>
-
-<p>
-Advances the hash table iterator <i>iter</i> to point to the next
-symbol/value pair in its hash table. The order followed by the hash
-table iterator is not specified, but is guaranteed to cover the whole
+<p><tt>void fts_hash_table_iterator_next( fts_hash_table_iterator_t*<i>iter</i>)</tt>
+<p>Advances the hash table iterator <i>iter</i> to point to the next symbol/value
+pair in its hash table. The order followed by the hash table iterator is
+not specified, but is guaranteed to cover the whole table.
+<p><tt>int fts_hash_table_iterator_end( const fts_hash_table_iterator_t*<i>iter</i>)</tt>
+<p>Returns zero if the atom list iterator points beyond the end of the
 table.
-
-<p>
-<code>int fts_hash_table_iterator_end( const fts_hash_table_iterator_t*<i>iter</i>)</code>
-
-<p>
-Returns zero if the atom list iterator points beyond the end of the table.
-
-<p>
-<code>fts_symbol_t *fts_hash_table_iterator_current_symbol( const fts_hash_table_iterator_t*<i>iter</i>)</code>
-
-<p>
-Returns the symbol of the symbol/value pair pointed to by the iterator.
-
-<p>
-<code>void *fts_hash_table_iterator_current_data( const fts_hash_table_iterator_t*<i>iter</i>)</code>
-
-<p>
-Returns (as a void *) the value of the symbol/value pair pointed to by the iterator.
-
-
-<a name="Property Lists"><h3>Property Lists</h3></a>
-
-<p>
+<p><tt>fts_symbol_t *fts_hash_table_iterator_current_symbol( const fts_hash_table_iterator_t*<i>iter</i>)</tt>
+<p>Returns the symbol of the symbol/value pair pointed to by the iterator.
+<p><tt>void *fts_hash_table_iterator_current_data( const fts_hash_table_iterator_t*<i>iter</i>)</tt>
+<p>Returns (as a void *) the value of the symbol/value pair pointed to
+by the iterator.&nbsp;<a NAME="Property Lists"></a>
+<h3>
+Property Lists</h3>
 Property lists are another way to represent symbol to value association,
-more time and memory efficients in case the values to bstore are just a few,
-or usefull when a symbol can be associated to multiple values.
-
+more time and memory efficients in case the values to bstore are just a
+few, or usefull when a symbol can be associated to multiple values.
+<p><i>The property lists are not yet documented in this release of the
+document</i><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-<i> The property lists are not yet documented in this release of the document</i>
-
-<!-- NOT YET DOCUMENTED -->
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Time Handling"><h2>Time Handling</h2></a>
-
-<p>
+<hr><a NAME="Time Handling"></a>
+<h2>
+Time Handling</h2>
 The FTS kernel provides a number of primitives to cope with time; the time
 itself is a relative concept for FTS, and different times, also user defined,
-can be defined by definining a new time souce (a <code>clock</code>, in fts terminology);
-all the fts time related primitives will work with any time source.
-
-<p>
+can be defined by definining a new time souce (a <tt>clock</tt>, in fts
+terminology); all the fts time related primitives will work with any time
+source.
 <ul>
-<li> <a href="#Clocks">Clocks</a>
-<li> <a href="#Alarms">Alarms</a>
-<li> <a href="#Timers">Timers</a>
-<li> <a href="#Time Gates">Time Gates</a>
+<li>
+<a href="#Clocks">Clocks</a></li>
+
+<li>
+<a href="#Alarms">Alarms</a></li>
+
+<li>
+<a href="#Timers">Timers</a></li>
+
+<li>
+<a href="#Time Gates">Time Gates</a></li>
 </ul>
-
-<a name="Clocks"><h3>Clocks</h3></a>
-
-<p>
-A clock is the definition of a time source; from the FTS point of
-view, a time source is just a floating point number (actually, a
-double precision float) that may change from one scheduling loop to
-another. The FTS time system is not responsable to actually change
-this number, but only to react to this changes accordingly to the user
-requests; the actual time changing must be handled by the module that
-define the clock.
-
-<p>
-There are two issues that must be considered while defining and using
+<a NAME="Clocks"></a>
+<h3>
+Clocks</h3>
+A clock is the definition of a time source; from the FTS point of view,
+a time source is just a floating point number (actually, a double precision
+float) that may change from one scheduling loop to another. The FTS time
+system is not responsable to actually change this number, but only to react
+to this changes accordingly to the user requests; the actual time changing
+must be handled by the module that define the clock.
+<p>There are two issues that must be considered while defining and using
 a clock; the clock time can be expressed in any units, but the time resolution
-of the FTS time system is always the scheduling tick; i.e., clocks are checked
-in the control domain, and the control is undersampled with respect to signals
-by a fixed factor, usually 64.
-
-<p>
-This have two resulting effects: first, since times are always quantized
+of the FTS time system is always the scheduling tick; i.e., clocks are
+checked in the control domain, and the control is undersampled with respect
+to signals by a fixed factor, usually 64.
+<p>This have two resulting effects: first, since times are always quantized
 at run time to the control sampling rate (i.e. an action is executed at
-the next scheduling tick), so you cannot have a time grain in control
-smaller than a scheduling tick; second, for the same reason you can have
-beating between the scheduling tick time and the time used in user
-algorithm, if the unit used by the user clocks are not multiple of the
-scheduling tick time; this was a well known problem with the old Max
-0.26, that offered only the millisecond as a clock unit, and a
-scheduling tick of 1.4 ms at 44.1 Khz.
-
-<p>
-Clocks are named, and are addressed by name in the whole code; users
-have no access to the clock implementation; FTS provides a number of
-pre-defined clocks, that are the following:
-
-<p>
+the next scheduling tick), so you cannot have a time grain in control smaller
+than a scheduling tick; second, for the same reason you can have beating
+between the scheduling tick time and the time used in user algorithm, if
+the unit used by the user clocks are not multiple of the scheduling tick
+time; this was a well known problem with the old Max 0.26, that offered
+only the millisecond as a clock unit, and a scheduling tick of 1.4 ms at
+44.1 Khz.
+<p>Clocks are named, and are addressed by name in the whole code; users
+have no access to the clock implementation; FTS provides a number of pre-defined
+clocks, that are the following:
 <dl>
-<dt> <code>  msec</code> <dd> 
-A free running clock, counting the milliseconds since the FTS boot.
+<dt>
+<tt>msec</tt></dt>
 
-<dt> <code>  tick</code> <dd> 
-A free running clock, counting the scheduling ticks since the FTS boot.
+<dd>
+A free running clock, counting the milliseconds since the FTS boot.</dd>
 
-<dt> <code>  dsp_msec</code> <dd> 
-A clock running during dsp, counting the milliseconds  since dsp started.
+<dt>
+<tt>tick</tt></dt>
 
-<dt> <code>  dsp_tick</code> <dd> 
-A clock running during dsp, counting the scheduling ticks since dsp started.
+<dd>
+A free running clock, counting the scheduling ticks since the FTS boot.</dd>
+
+<dt>
+<tt>dsp_msec</tt></dt>
+
+<dd>
+A clock running during dsp, counting the milliseconds since dsp started.</dd>
+
+<dt>
+<tt>dsp_tick</tt></dt>
+
+<dd>
+A clock running during dsp, counting the scheduling ticks since dsp started.</dd>
 </dl>
-
-<p>
-All the time related primitives get a clock name (as symbol) as argument; if
-this clock name is not specified (by passing a null pointer) the default <code>msec</code>
-clock is taken.
-
-
-<p>
-Note that a clock do not need to be defined before the time related objects
-that use them; for example, the user can allocates an alarm for a clock 
-before this clock is defined.
-
-<p>
-Using the <code>tick</code> or <code>dsp_tick</code> clocks guarantee
-that there will be no problem due to the beating between the
-scheduling clock and the user clock; but the semantic of a patch
-written with these clocks depend on the sampling rate.
-
-<p>
-<code>void fts_clock_define(fts_symbol_t *<i>clock_name</i>, double *<i>clock</i>)</code>
-
-<p>
-Define a new clock, named <i>clock_name</i>, represented by the double
+All the time related primitives get a clock name (as symbol) as argument;
+if this clock name is not specified (by passing a null pointer) the default
+<tt>msec</tt> clock is taken.
+<p>Note that a clock do not need to be defined before the time related
+objects that use them; for example, the user can allocates an alarm for
+a clock before this clock is defined.
+<p>Using the <tt>tick</tt> or <tt>dsp_tick</tt> clocks guarantee that there
+will be no problem due to the beating between the scheduling clock and
+the user clock; but the semantic of a patch written with these clocks depend
+on the sampling rate.
+<p><tt>void fts_clock_define(fts_symbol_t *<i>clock_name</i>, double *<i>clock</i>)</tt>
+<p>Define a new clock, named <i>clock_name</i>, represented by the double
 pointer by <i>clock</i>.
-
-<p>
-<code>void fts_clock_undefine(fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Undefine the clock: undefining a clock *do not* destroy the clock,
-but just undo the association between the clock name and the int
-value established with <code>fts_clock_define</code>.
-The clock is so stopped until the user redefine
-a clock with the same name.
-
-<p>
-Note anyway that undefining and redefining a clock can have weird
-temporary effects on object using the clock; the transition is
-not guaranteed to be smooth, depend on the value of the clock.
-For the alarms, the effect is the same as with a clock value change
-(at the redefinition).
-
-<p>
-Also, system defined clocks cannot be undefined.
-
-<p>
-<code>int fts_clock_exists(fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Returns non zero if a clock named <i>clock_name</i> has been already defined;
-remember, anyway, that in general you do not need to define a clock before
-using it.
-
-<p>
-<code>double fts_clock_get_time(fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Returns a double representing the current time of the clock named <i>clock_name</i>.
-The current time is not the current value of the clock variable, but is the time
-FTS consider as current, i.e. already took in account in scheduling.
-The difference is somehow subtle: current time change only during scheduling tick,
-while the physical clock variable can change due to any cause, including interrupt;
-also it is guaranted that while executing a alarm scheduled for time <i>t</i>, this
-function will returns <i>t</i>, and not the actual value of the clock variable; this
-is needed to avoid accumulation errors using clocks units different from ticks.
-
-
-<a name="Alarms"><h3>Alarms</h3></a>
-
-<p>
-An alarm is an object of type <code>fts_alarm_t</code>; it can be either
-allocated and accessed by means of a pointer, or used as a part of an
-other structure; as most of the kernel objects, it's internal structure
-is not documented or available to the user; all accesses should be done
-by means of the following API.
-
-<p>
-An alarm declare a function to be called when the named clock arrive to
-a given time; a time can armed, i.e. active, or unarmed; if the alarm is
-unarmed, the function will not executed, but the alarm keep its timing
+<p><tt>void fts_clock_undefine(fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Undefine the clock: undefining a clock *do not* destroy the clock, but
+just undo the association between the clock name and the int value established
+with <tt>fts_clock_define</tt>. The clock is so stopped until the user
+redefine a clock with the same name.
+<p>Note anyway that undefining and redefining a clock can have weird temporary
+effects on object using the clock; the transition is not guaranteed to
+be smooth, depend on the value of the clock. For the alarms, the effect
+is the same as with a clock value change (at the redefinition).
+<p>Also, system defined clocks cannot be undefined.
+<p><tt>int fts_clock_exists(fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Returns non zero if a clock named <i>clock_name</i> has been already
+defined; remember, anyway, that in general you do not need to define a
+clock before using it.
+<p><tt>double fts_clock_get_time(fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Returns a double representing the current time of the clock named <i>clock_name</i>.
+The current time is not the current value of the clock variable, but is
+the time FTS consider as current, i.e. already took in account in scheduling.
+The difference is somehow subtle: current time change only during scheduling
+tick, while the physical clock variable can change due to any cause, including
+interrupt; also it is guaranted that while executing a alarm scheduled
+for time <i>t</i>, this function will returns <i>t</i>, and not the actual
+value of the clock variable; this is needed to avoid accumulation errors
+using clocks units different from ticks.&nbsp;<a NAME="Alarms"></a>
+<h3>
+Alarms</h3>
+An alarm is an object of type <tt>fts_alarm_t</tt>; it can be either allocated
+and accessed by means of a pointer, or used as a part of an other structure;
+as most of the kernel objects, it's internal structure is not documented
+or available to the user; all accesses should be done by means of the following
+API.
+<p>An alarm declare a function to be called when the named clock arrive
+to a given time; a time can armed, i.e. active, or unarmed; if the alarm
+is unarmed, the function will not executed, but the alarm keep its timing
 information.
-
-<p>
-When the alarm is fired, and its callback function called, the alarm is
-<b>not</b> unarmed; if needed it must be unarmed by the callback
-function itself; the reason behind this is that with some clock the time
-can actually jump backward, and a fired alarm refired; consider for
-example an alarm that need to be fired one second the start of the dsp
-engine: it can be created using the "dsp_msec" clock, and left armed after
-fired, so it will refire again the next time the dsp start.
-
-<p>
-An alarm can be put a cycle mode: it will fire regularly with a given
-period; the difference with an alarm that reschedule itself in its
-callback function is that in case of backward jumping time (like the
-"dsp_msec" time that is reset at the start of the dsp engine) a cycled
-alarm will continue to fire, keeping phase coherency with respect to the
-clock.
-
-<p>
-<code>void fts_alarm_init(fts_alarm_t *<i>alarm</i>, fts_symbol_t *<i>clock_name</i>, void (* <i>fun</i>)(fts_alarm_t *, void *), void *<i>arg</i>)</code>
-
-<p>
-Initializes a statically or implicitly allocated alarm.
-The alarm will use the clock named <i>clock_name</i>; its callback function is <i>fun</i>; the
-callback function will be called with two arguments, a pointer to the alarm itself,
-and the <code>void *</code> pointer <i>arg</i>, that will be stored in the alarm;
-there is no way to change the callback function or its argument after the alarm creation.
-
-<p>
-<code>fts_alarm_t *fts_alarm_new(fts_symbol_t *<i>clock_name</i>, void (* <i>fun</i>)(fts_alarm_t *, void *), void *<i>arg</i>)</code>
-
-<p>
-Allocates and init new alarm.
-The alarm use the clock named <i>clock_name</i>; its callback function is <i>fun</i>; the
-callback function will be called with two arguments, a pointer to the alarm itself,
-and the <code>void *</code> pointer <i>arg</i>, that will be stored in the alarm;
-there is no way to change the callback function or its argument after the alarm creation.
-
-<p>
-<code>void       fts_alarm_free(fts_alarm_t *<i>alarm</i>)</code>
-
-<p>
-Unarm and frees the alarm <i>alarm</i>; after freeing an alarm,
-it should not be referred any more.
-
-<p>
-<code>void fts_alarm_set_time(fts_alarm_t *<i>alarm</i>, double <i>when</i>)</code>
-
-<p>
-Sets the absolute time at which the alarm callback function will be
+<p>When the alarm is fired, and its callback function called, the alarm
+is
+<b>not</b> unarmed; if needed it must be unarmed by the callback function
+itself; the reason behind this is that with some clock the time can actually
+jump backward, and a fired alarm refired; consider for example an alarm
+that need to be fired one second the start of the dsp engine: it can be
+created using the "dsp_msec" clock, and left armed after fired, so it will
+refire again the next time the dsp start.
+<p>An alarm can be put a cycle mode: it will fire regularly with a given
+period; the difference with an alarm that reschedule itself in its callback
+function is that in case of backward jumping time (like the "dsp_msec"
+time that is reset at the start of the dsp engine) a cycled alarm will
+continue to fire, keeping phase coherency with respect to the clock.
+<p><tt>void fts_alarm_init(fts_alarm_t *<i>alarm</i>, fts_symbol_t *<i>clock_name</i>,
+void (* <i>fun</i>)(fts_alarm_t *, void *), void *<i>arg</i>)</tt>
+<p>Initializes a statically or implicitly allocated alarm. The alarm will
+use the clock named <i>clock_name</i>; its callback function is <i>fun</i>;
+the callback function will be called with two arguments, a pointer to the
+alarm itself, and the <tt>void *</tt> pointer <i>arg</i>, that will be
+stored in the alarm; there is no way to change the callback function or
+its argument after the alarm creation.
+<p><tt>fts_alarm_t *fts_alarm_new(fts_symbol_t *<i>clock_name</i>, void
+(* <i>fun</i>)(fts_alarm_t *, void *), void *<i>arg</i>)</tt>
+<p>Allocates and init new alarm. The alarm use the clock named <i>clock_name</i>;
+its callback function is <i>fun</i>; the callback function will be called
+with two arguments, a pointer to the alarm itself, and the <tt>void *</tt>
+pointer <i>arg</i>, that will be stored in the alarm; there is no way to
+change the callback function or its argument after the alarm creation.
+<p><tt>void fts_alarm_free(fts_alarm_t *<i>alarm</i>)</tt>
+<p>Unarm and frees the alarm <i>alarm</i>; after freeing an alarm, it should
+not be referred any more.
+<p><tt>void fts_alarm_set_time(fts_alarm_t *<i>alarm</i>, double <i>when</i>)</tt>
+<p>Sets the absolute time at which the alarm callback function will be
 called; this time, <i>when</i>, is expressed in the time units used by
-the alarm clock, and can be in the future or in the past (relative to
-the used clock); this function do not change the armed/unarmed status of
-the alarm.
-
-<p>
-<code>void fts_alarm_set_delay(fts_alarm_t *<i>alarm</i>, double <i>when</i>)</code>
-
-<p>
-Sets the relative time (i.e. time from now) at which the alarm
-callback function will be called; this time, <i>when</i>, is expressed
-in the time units used by the alarm clock, and it is relative to the
-clock current time; it can be positive or negative.  This function do
-not change the armed/unarmed status of the alarm.
-
-<p>
-<code>void fts_alarm_set_cycle(fts_alarm_t *<i>alarm</i>, double <i>cycle</i>)</code>
-
-<p>
-Sets the alarm in the cycled mode, and Sets the period which the alarm
-callback function will be called; this time, <i>cycle</i>, is
-expressed in the time units used by the alarm clock, and must be
-positive.  The phase of the cycle is set so that the current time is
-the beginning of the cycle period; note that anyway the alarm will not
-fire the callback function until it is armed, but the period phase
-relatioship is set in this function.  This function do not change the
-armed/unarmed status of the alarm.
-
-<p>
-<code>void fts_alarm_arm(fts_alarm_t *<i>alarm</i>)</code>
-
-<p>
-Arm the alarm, i.e. enable it to actually fire the callback function
+the alarm clock, and can be in the future or in the past (relative to the
+used clock); this function do not change the armed/unarmed status of the
+alarm.
+<p><tt>void fts_alarm_set_delay(fts_alarm_t *<i>alarm</i>, double <i>when</i>)</tt>
+<p>Sets the relative time (i.e. time from now) at which the alarm callback
+function will be called; this time, <i>when</i>, is expressed in the time
+units used by the alarm clock, and it is relative to the clock current
+time; it can be positive or negative. This function do not change the armed/unarmed
+status of the alarm.
+<p><tt>void fts_alarm_arm(fts_alarm_t *<i>alarm</i>)</tt>
+<p>Arm the alarm, i.e. enable it to actually fire the callback function
 when the time come.
-
-<p>
-<code>void fts_alarm_unarm(fts_alarm_t *<i>alarm</i>)</code>	
-
-<p>
-Unarm the alarm, i.e. prevent it to actually fire the callback function.
-The time information of the alarm will not be deleted, so an call
-to <code>fts_alarm_unarm</code> followed by a call to <code>fts_alarm_arm</code>
-leave the alarm in its initial state.
-Remember that an alarm is not automatically unarmed after fired,
+<p><tt>void fts_alarm_unarm(fts_alarm_t *<i>alarm</i>)</tt>
+<p>Unarm the alarm, i.e. prevent it to actually fire the callback function.
+The time information of the alarm will not be deleted, so an call to <tt>fts_alarm_unarm</tt>
+followed by a call to <tt>fts_alarm_arm</tt> leave the alarm in its initial
+state. Remember that an alarm is not automatically unarmed after fired,
 so you should unarm is explicitly in the callback function, if so wished.
-
-<p>
-<code>int  fts_alarm_is_in_future(fts_alarm_t *<i>alarm</i>)</code>
-
-<p>
-Returns non zero if the alarm is set to fire in some time in the future
+<p><tt>int fts_alarm_is_in_future(fts_alarm_t *<i>alarm</i>)</tt>
+<p>Returns non zero if the alarm is set to fire in some time in the future
 (with respect to its clock); the result of this function do not depend
 on the armed/unarmed status of the alarm.
-
-<p>
-<code>int  fts_alarm_is_armed(fts_alarm_t *<i>alarm</i>)</code>
-
-<p>
-Returns non zero if the alarm is armed, zero otherwise.
-
-
-<a name="Timers"><h3>Timers</h3></a>
-
-<p>
-An timer is an object of type <code>fts_timer_t</code>; it can be either
-allocated and accessed by means of a pointer, or used as a part of an
-other structure; as most of the kernel objects, it's internal structure
-is not documented or available to the user; all accesses should be done
-by means of the following API.
-
-<p>
-A timer implement a simple stop watch, to evalute elapsed time since 
+<p><tt>int fts_alarm_is_armed(fts_alarm_t *<i>alarm</i>)</tt>
+<p>Returns non zero if the alarm is armed, zero otherwise.&nbsp;<a NAME="Timers"></a>
+<h3>
+Timers</h3>
+An timer is an object of type <tt>fts_timer_t</tt>; it can be either allocated
+and accessed by means of a pointer, or used as a part of an other structure;
+as most of the kernel objects, it's internal structure is not documented
+or available to the user; all accesses should be done by means of the following
+API.
+<p>A timer implement a simple stop watch, to evalute elapsed time since
 an specific event, or accumulate multiple elapsed times.
-
-<p>
-<code>void fts_timer_init(fts_timer_t *<i>timer</i>, fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Initializes a statically or implicitly allocated timer.
-The timer will use the clock named <i>clock_name</i>; the internally
-accumulated elapsed time is set to zero.
-
-<p>
-<code>fts_timer_t *fts_timer_new(fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Explicitly allocates, initializes and returns a timer.
-The timer will use the clock named <i>clock_name</i>; the internally
-accumulated elapsed time is set to zero.
-
-<p>
-<code>void       fts_timer_free(fts_timer_t *<i>timer</i>)</code>
-
-<p>
-Frees an explicitly allocated timer, i.e. one created using
-<code>fts_timer_new</code>; users should not use or refer to the
-<i>timer</i> timer after calling this function.
-
-<p>
-<code>void fts_timer_zero(fts_timer_t *<i>timer</i>)</code>	
-
-<p>
-Sets the accumulated elapsed time of <i>timer</i> to zero.
-
-<p>
-<code>void fts_timer_start(fts_timer_t *<i>timer</i>)</code>	
-
-<p>
-Start the counting of  elapsed time of <i>timer</i>.
-
-<p>
-<code>void fts_timer_stop(fts_timer_t *<i>timer</i>)</code>	
-
-<p>
-Suspend the counting of  elapsed time of <i>timer</i>,
-but leave the current value.
-
-<p>
-<code>double fts_timer_elapsed_time(fts_timer_t *<i>timer</i>)</code>	
-
-<p>
-Returns the <i>timer</i> accumulated elapsed time.
-
-
-<a name="Time Gates"><h3>Time Gates</h3></a>
-
-<p>
-A time gate is an object of type <code>fts_time_gate_t</code>; it can be
-either allocated and accessed by means of a pointer, or used as a part
-of an other structure; as most of the kernel objects, it's internal
-structure is not documented or available to the user; all accesses
-should be done by means of the following API.
-
-<p>
-A time gate is a gate that when is closed stay closed for a given amount
+<p><tt>void fts_timer_init(fts_timer_t *<i>timer</i>, fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Initializes a statically or implicitly allocated timer. The timer will
+use the clock named <i>clock_name</i>; the internally accumulated elapsed
+time is set to zero.
+<p><tt>fts_timer_t *fts_timer_new(fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Explicitly allocates, initializes and returns a timer. The timer will
+use the clock named <i>clock_name</i>; the internally accumulated elapsed
+time is set to zero.
+<p><tt>void fts_timer_free(fts_timer_t *<i>timer</i>)</tt>
+<p>Frees an explicitly allocated timer, i.e. one created using
+<tt>fts_timer_new</tt>;
+users should not use or refer to the
+<i>timer</i> timer after calling this
+function.
+<p><tt>void fts_timer_zero(fts_timer_t *<i>timer</i>)</tt>
+<p>Sets the accumulated elapsed time of <i>timer</i> to zero.
+<p><tt>void fts_timer_start(fts_timer_t *<i>timer</i>)</tt>
+<p>Start the counting of elapsed time of <i>timer</i>.
+<p><tt>void fts_timer_stop(fts_timer_t *<i>timer</i>)</tt>
+<p>Suspend the counting of elapsed time of <i>timer</i>, but leave the
+current value.
+<p><tt>double fts_timer_elapsed_time(fts_timer_t *<i>timer</i>)</tt>
+<p>Returns the <i>timer</i> accumulated elapsed time.&nbsp;<a NAME="Time Gates"></a>
+<h3>
+Time Gates</h3>
+A time gate is an object of type <tt>fts_time_gate_t</tt>; it can be either
+allocated and accessed by means of a pointer, or used as a part of an other
+structure; as most of the kernel objects, it's internal structure is not
+documented or available to the user; all accesses should be done by means
+of the following API.
+<p>A time gate is a gate that when is closed stay closed for a given amount
 of time; while closed, the gate do not accept any further close command;
-the main purpose of the time gate is to avoid fast repetition of the
-same event, like error messages.
-
+the main purpose of the time gate is to avoid fast repetition of the same
+event, like error messages.
+<p><tt>void fts_time_gate_init(fts_time_gate_t *<i>gate</i>, fts_symbol_t
+*<i>clock_name</i>)</tt>
+<p>Initializes a statically or implicitly allocated time gate. The time
+gate will use the clock named <i>clock_name</i>; the gate is set to open.
+<p><tt>fts_time_gate_t *fts_time_gate_new(fts_symbol_t *<i>clock_name</i>)</tt>
+<p>Explicitly allocates, initializes and returns a time gate. The time
+gate will use the clock named <i>clock_name</i>; the gate is set to open.
+<p><tt>void fts_time_gate_free(fts_time_gate_t *<i>gate</i>)</tt>
+<p>Frees an explicitly allocated time gate, i.e. one created using
+<tt>fts_timer_new</tt>;
+users should not use or refer to the
+<i>gate</i> time gate after calling
+this function.
+<p><tt>int fts_time_gate_close(fts_time_gate_t *<i>gate</i>, double <i>interval</i>)</tt>
+<p>If the <i>gate</i> is closed, returns zero; otherwise, close it for
+<i>interval</i> and returns non zero.<i>interval</i> is expressed in the
+time gate clock units.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-<code>void fts_time_gate_init(fts_time_gate_t *<i>gate</i>, fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Initializes a statically or implicitly allocated time gate.
-The time gate will use the clock named <i>clock_name</i>; the 
-gate is set to open.
-
-<p>
-<code>fts_time_gate_t *fts_time_gate_new(fts_symbol_t *<i>clock_name</i>)</code>
-
-<p>
-Explicitly allocates, initializes and returns a time gate.
-The time gate will use the clock named <i>clock_name</i>; the 
-gate is set to open.
-
-<p>
-<code>void       fts_time_gate_free(fts_time_gate_t *<i>gate</i>)</code>
-
-<p>
-Frees an explicitly allocated time gate, i.e. one created using
-<code>fts_timer_new</code>; users should not use or refer to the
-<i>gate</i> time gate after calling this function.
-
-<p>
-<code>int fts_time_gate_close(fts_time_gate_t *<i>gate</i>, double <i>interval</i>)</code>
-
-<p>
-If the <i>gate</i> is closed, returns zero; otherwise, close it for <i>interval</i>
-and returns non zero.<i>interval</i> is expressed in the time gate clock
-units.
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="The Module System"><h2>The Module System</h2></a>
-
-<p>
+<hr><a NAME="The Module System"></a>
+<h2>
+The Module System</h2>
 Modules are a simple tools to organize and structure FTS applications;
 from the strict programming point of view a module is simply a data structure
 that define an initialization and a shutdown function; conventionally,
 this data structure should correspond to a set of source files implementing
 a set of coherent functionalities, like a new data type with its operations,
-or a library of FTS objects and so on. 
-
-<p>
-The init function is often very important; under FTS, the execution
+or a library of FTS objects and so on.
+<p>The init function is often very important; under FTS, the execution
 of application code usually happen as a reaction to some kind of event,
-like a timer has elapsed, or data is available on the MIDI input,
-or a given client message is arrived, or a scheduling phase
-has been completed.
-
-<p>
-It may be easy to think the FTS kernel as a set of specialized event
-dispatching table, mapping certain kind of events to certain parts of
-application code.
-
-<p>
-This mapping between system events and application code is realized in
-the init function of a module; the function declare the functions to be
-called in the different situations, and install them with the various
+like a timer has elapsed, or data is available on the MIDI input, or a
+given client message is arrived, or a scheduling phase has been completed.
+<p>It may be easy to think the FTS kernel as a set of specialized event
+dispatching table, mapping certain kind of events to certain parts of application
+code.
+<p>This mapping between system events and application code is realized
+in the init function of a module; the function declare the functions to
+be called in the different situations, and install them with the various
 programming interface availables.
-
+<p>Most of the time, the only non static C symbol declared in an FTS application
+is the module itself, because all the other functions are installed as
+pointers in some system structure.
+<p><tt>void fts_install_module(fts_module *<i>s</i>)</tt>
+<p>Install the module pointed by <i>s</i>; a module should be a structure
+defined as in the following example.
+<p><tt>fts_module fts_mess_module = {"Frob", "The new frobber module",
+frob_init, frob_shutdown</tt>;}
+<p>The first two component of the structure are a name and a module description,
+used in debugging messages; the third is a function with zero arguments
+and returning void that is called as init functin, and the fourth is a
+similar function called as shutdown function.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-Most of the time, the only non static C symbol declared in an FTS
-application is the module itself, because all the other functions are
-installed as pointers in some system structure.
-
-<p>
-<code>void fts_install_module(fts_module *<i>s</i>)</code>
-
-<p>
-Install the module pointed by <i>s</i>; a module should
-be a structure defined as in the following example.
-
-<p>
-<code>fts_module fts_mess_module = {"Frob", "The new frobber module", frob_init, frob_shutdown</code>;}
-
-<p>
-The first two component of the structure are a name and a module
-description, used in debugging messages; the third is a function with
-zero arguments and returning void that is called as init functin, and
-the fourth is a similar function called as shutdown function.
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Audio Streams"><h2>Audio Streams</h2></a>
-
+<hr><a NAME="Audio Streams"></a>
+<h2>
+Audio Streams</h2>
 FTS applications are free to access audio input output devices directly
-with the device standard programming interface; the audio stream
-subsystem simplify the handling of audio I/O, from one side providing
-the <code>audio_in</code> and <code>audio_out</code> logical devices, and from the
-other integrating audio device handling inside the scheduler.
+with the device standard programming interface; the audio stream subsystem
+simplify the handling of audio I/O, from one side providing the <tt>audio_in</tt>
+and <tt>audio_out</tt> logical devices, and from the other integrating
+audio device handling inside the scheduler.
+<p>An audio stream is a audio input or output channel; streams are numbered;
+any audio physical device can be mapped to any index by means of UCS commands;
+the audio stream subsystem handle buffer allocation and scheduling for
+input and output operations
+<p><i>This programming interface is not not documented in this release
+of this document.</i>
+<p><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-
-An audio stream is a audio input or output channel; streams are
-numbered; any audio physical device can be mapped to any index by means
-of UCS commands; the audio stream subsystem handle buffer allocation and 
-scheduling for input and output operations
-<p>
-
-<i>This programming interface is not not documented in this release of this document.</i>
-<p>
-
-<!-- NOT YET DOCUMENTED -->
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="MIDI Input Output"><h2>MIDI Input Output</h2></a>
-
+<hr><a NAME="MIDI Input Output"></a>
+<h2>
+MIDI Input Output</h2>
 FTS MIDI handling provides multiport MIDI configurations, MIDI unparsing
 with callback based input, and output operations.
+<p><i>This programming interface is not not documented in this release
+of this document.</i><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-
-<i>This programming interface is not not documented in this release of this document.</i>
-<!-- NOT YET DOCUMENTED -->
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="The FTS Device System"><h2>The FTS Device System</h2></a>
-
-<p>
-The FTS device system represent an abstraction layer over the I/O
-capability of the hardware it run on; it establish a simple and
-uniform programming interface to open and close the connection with a
-I/O channel and to send and receive on that channel.
-
-<p>
-Depending on the undelying platform, FTS device can correspond to
-actual device drivers, like on the ISPW or TMS32C40 platform, or to
-wrappers around existing I/O libraries or devices, like on the SGI
-platform; a uniform interface will allow complete portability of the
-sources between the different architectures.
-
-<p>
-FTS define (for the moment) two kind of devices: character devices and
+<hr><a NAME="The FTS Device System"></a>
+<h2>
+The FTS Device System</h2>
+The FTS device system represent an abstraction layer over the I/O capability
+of the hardware it run on; it establish a simple and uniform programming
+interface to open and close the connection with a I/O channel and to send
+and receive on that channel.
+<p>Depending on the undelying platform, FTS device can correspond to actual
+device drivers, like on the ISPW or TMS32C40 platform, or to wrappers around
+existing I/O libraries or devices, like on the SGI platform; a uniform
+interface will allow complete portability of the sources between the different
+architectures.
+<p>FTS define (for the moment) two kind of devices: character devices and
 signal devices; character device are very similar to Unix character devices;
-they model a byte-stream, supporting byte-oriented I/O operations, and optionally
-seek operations; signal devices are devices modelling the MIDI input 
-
-<p>
-The device system is conceptually divided in two parts: the standard
+they model a byte-stream, supporting byte-oriented I/O operations, and
+optionally seek operations; signal devices are devices modelling the MIDI
+input
+<p>The device system is conceptually divided in two parts: the standard
 programming interface every device support (documented in this chapter),
 and a set of functions and data structure to help building a new device
 driver when needed (documented in the next chapter).
-
+<p>As a complent, the FTS kernel define the concept of logical device,
+that essentially allow the definition of the role of a specific physical
+device in a given configuration (like use serial line one as MIDI input,
+use serial line 2 as client connection and so on); the configuration of
+logical devices is fully perfomed with the UCS configuration system.&nbsp;
+<hr><a NAME="FTS Character Device API"></a>
+<h3>
+FTS Character Device API</h3>
+<i>The FTS Device System is not documented in this release of the document</i>.&nbsp;
+<hr><a NAME="FTS Signal Device API"></a>
+<h3>
+FTS Signal Device API</h3>
+<i>The FTS Device System is not documented in this release of the document</i>.&nbsp;<!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- -->
 <p>
-As a complent, the FTS kernel define the concept of logical device, that 
-essentially allow the definition of the role of a specific physical device 
-in a given configuration (like use serial line one as MIDI input, use serial
-line 2 as client connection and so on); the configuration of logical devices
-is fully perfomed with the UCS configuration system.
-
-
-<hr> <a name="FTS Character Device API"><h3>FTS Character Device API</h3></a>
-
-<p>
-<i>The FTS Device System is not documented in this release of the document</i>.
-
-<hr> <a name="FTS Signal Device API"><h3>FTS Signal Device API</h3></a>
-
-<p>
-<i>The FTS Device System is not documented in this release of the document</i>.
-
-<!-- NOT YET DOCUMENTED -->
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Device Creation Support"><h2>Device Creation Support</h2></a>
-
-<p>
-FTS include a library of macros and functions  to aid the device driver
+<hr><a NAME="Device Creation Support"></a>
+<h2>
+Device Creation Support</h2>
+FTS include a library of macros and functions to aid the device driver
 developement.
-
-<p>
-<i>This programming interface is not not documented in this release of this document</i>
-
-<!-- NOT YET DOCUMENTED -->
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- Beginning of footer                                                    -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
-<p>
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-
+<p><i>This programming interface is not not documented in this release
+of this document</i><!-- NOT YET DOCUMENTED --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- Beginning of footer                                                    --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
 <tr>
 <td><spacer type="block" height="20" width="1"></td>
 </tr>
 
 <tr>
-<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+<td BGCOLOR="#CCCCCC"><spacer type="block" height="1" width="1"></td>
 </tr>
 
 <tr>
@@ -1209,12 +758,9 @@ developement.
 </tr>
 
 <tr>
-<td align=right><font size=-2>
-Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.<br>
-All rights reserved.
-</font></td>
+<td ALIGN=RIGHT><font size=-2>Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.</font>
+<br><font size=-2>All rights reserved.</font></td>
 </tr>
-
 </table>
 
 </body>

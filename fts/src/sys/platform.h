@@ -46,7 +46,7 @@
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
-#define USE_IEEE_WRAP
+#define HAS_IEEE_FLOAT
 
 #elif defined(LINUXPPC)
 
@@ -81,6 +81,7 @@
 #define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_HAS_BIG_ENDIAN
+#define HAS_IEEE_FLOAT
 
 /*********************************************************************
  *
@@ -109,7 +110,7 @@
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
-#define USE_IEEE_WRAP
+#define HAS_IEEE_FLOAT
 
 /* This is included for the null device only (null.c) */
 struct timespec {

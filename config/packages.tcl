@@ -35,6 +35,8 @@ package require mess
 package require numeric
 package require lists
 package require midi
+package require sequence
+package require signal
 
 # ISPW classes
 package require ispw
@@ -42,7 +44,6 @@ package require ispwmath
 package require table
 package require qlist
 package require explode
-package require sequence
 
 
 # I/O package

@@ -37,5 +37,6 @@ extern fts_module_t fts_utils_module;
 #include "utils/ieeewrap.h"
 #include "utils/intphase.h"
 #include "utils/srconv.h"
+#include "utils/random.h"
 
 #endif

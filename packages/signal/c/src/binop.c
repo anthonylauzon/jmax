@@ -76,6 +76,13 @@ static fts_symbol_t sym_div_const;
 static fts_symbol_t sym_bus_const;
 static fts_symbol_t sym_vid_const;
 
+static fts_symbol_t sym_add_const_inplace;
+static fts_symbol_t sym_mul_const_inplace;
+static fts_symbol_t sym_sub_const_inplace;
+static fts_symbol_t sym_div_const_inplace;
+static fts_symbol_t sym_bus_const_inplace;
+static fts_symbol_t sym_vid_const_inplace;
+
 static fts_symbol_t sym_add_ramp;
 static fts_symbol_t sym_mul_ramp;
 static fts_symbol_t sym_sub_ramp;
@@ -394,6 +401,84 @@ ftl_vid_const(fts_word_t *argv)
 
 /**************************************************************
  *
+ *  dsp functions with scalar (const)
+ *
+ */
+
+static void 
+ftl_add_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] += c;
+}
+
+static void 
+ftl_sub_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] -= c;
+}
+
+static void 
+ftl_mul_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] *= c;
+}
+
+static void 
+ftl_div_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] /= c;
+}
+
+static void 
+ftl_bus_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] = c - sig[i];
+}
+
+static void 
+ftl_vid_const_inplace(fts_word_t *argv)
+{
+  float c = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  int n = fts_word_get_int(argv + 2);
+  int i;
+
+  for (i=0; i<n; i++)
+    sig[i] = c / sig[i];
+}
+
+/**************************************************************
+ *
  *  dsp functions with sliding scalar (const)
  *
  */
@@ -604,7 +689,7 @@ binop_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym)
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
 
   dsp_add_funcall(sym, 4, argv);
 }
@@ -613,7 +698,7 @@ static void
 binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   if (fts_dsp_is_input_null(dsp, 0))
     {
@@ -623,7 +708,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	  dsp_add_funcall(sym_copy, 3, argv);
 	}
     }
@@ -635,7 +720,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	  dsp_add_funcall(sym_copy, 3, argv);
 	}
     }
@@ -643,7 +728,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       /* all input connected */
 
-      if (fts_dsp_get_input_size(dsp, 0) == 64)
+      if (fts_dsp_get_output_size(dsp, 0) == 64)
 	{
 	  /* tick size of 64 */
 
@@ -689,7 +774,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      /* all signals equal */
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-	      fts_set_int(argv + 1, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 1, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_add_self, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
@@ -698,7 +783,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_add_inplace, 3, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
@@ -707,7 +792,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_add_inplace, 3, argv);
 	    }
 	  else
@@ -717,7 +802,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_add, 4, argv);
 	    }
 	}
@@ -727,14 +812,14 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 binop_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sub);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub);
 }
 
 static void
 binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   if (fts_dsp_is_input_null(dsp, 0))
     {
@@ -744,7 +829,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	  dsp_add_funcall(sym_copy, 3, argv);
 	}
     }
@@ -756,7 +841,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	  dsp_add_funcall(sym_copy, 3, argv);
 	}
     }
@@ -764,7 +849,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       /* all input connected */
 
-      if (fts_dsp_get_input_size(dsp, 0) == 64)
+      if (fts_dsp_get_output_size(dsp, 0) == 64)
 	{
 	  /* tick size of 64 */
 
@@ -810,7 +895,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      /* all signals equal */
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-	      fts_set_int(argv + 1, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 1, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_mul_self, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
@@ -819,7 +904,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_mul_inplace, 3, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
@@ -828,7 +913,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_mul_inplace, 3, argv);
 	    }
 	  else
@@ -838,7 +923,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+	      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
 	      dsp_add_funcall(sym_mul, 4, argv);
 	    }
 	}
@@ -848,19 +933,19 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 binop_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_div);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div);
 }
 
 static void 
 binop_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_bus);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus);
 }
 
 static void 
 binop_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_vid);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid);
 }
 
 /************************************************
@@ -870,53 +955,65 @@ binop_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 static void
-binop_const_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym)
+binop_const_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_symbol_t sym_inplace)
 {
   binop_const_t *this = (binop_const_t *)o;
   fts_atom_t argv[4];
 
-  fts_set_ftl_data(argv + 0, this->data);
-  fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
-
-  dsp_add_funcall(sym, 4, argv);
+  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+    {
+      /* inplace */
+      fts_set_ftl_data(argv + 0, this->data);
+      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
+      
+      dsp_add_funcall(sym_inplace, 3, argv);
+    }
+  else
+    {
+      fts_set_ftl_data(argv + 0, this->data);
+      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
+      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
+      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
+      
+      dsp_add_funcall(sym, 4, argv);
+    }
 }
 
 static void 
 binop_const_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_add_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_add_const, sym_add_const_inplace);
 }
 
 static void 
 binop_const_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sub_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub_const, sym_sub_const_inplace);
 }
 
 static void 
 binop_const_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_mul_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_mul_const, sym_mul_const_inplace);
 }
 
 static void 
 binop_const_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_div_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div_const, sym_div_const_inplace);
 }
 
 static void 
 binop_const_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_bus_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus_const, sym_bus_const_inplace);
 }
 
 static void 
 binop_const_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_vid_const);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid_const, sym_vid_const_inplace);
 }
 
 /************************************************
@@ -941,7 +1038,7 @@ binop_ramp_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_symb
       /* inplace */
       fts_set_ftl_data(argv + 0, this->data);
       fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
       
       dsp_add_funcall(sym_inplace, 3, argv);
     }
@@ -950,7 +1047,7 @@ binop_ramp_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_symb
       fts_set_ftl_data(argv + 0, this->data);
       fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
       fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-      fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
       
       dsp_add_funcall(sym, 4, argv);
     }
@@ -959,37 +1056,37 @@ binop_ramp_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_symb
 static void 
 binop_ramp_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_add_ramp, sym_add_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_add_ramp, sym_add_ramp_inplace);
 }
 
 static void 
 binop_ramp_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_sub_ramp, sym_sub_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub_ramp, sym_sub_ramp_inplace);
 }
 
 static void 
 binop_ramp_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_mul_ramp, sym_mul_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_mul_ramp, sym_mul_ramp_inplace);
 }
 
 static void 
 binop_ramp_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_div_ramp, sym_div_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div_ramp, sym_div_ramp_inplace);
 }
 
 static void 
 binop_ramp_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_bus_ramp, sym_bus_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus_ramp, sym_bus_ramp_inplace);
 }
 
 static void 
 binop_ramp_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0), sym_vid_ramp, sym_vid_ramp_inplace);
+  binop_ramp_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid_ramp, sym_vid_ramp_inplace);
 }
 
 /************************************************
@@ -1002,9 +1099,9 @@ static void
 binop_set_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_const_t *this = (binop_const_t *)o;
-  float *data = (float *)ftl_data_get_ptr(this->data);
+  float *ptr = (float *)ftl_data_get_ptr(this->data);
 
-  *data = fts_get_number_float(at);
+  *ptr = fts_get_number_float(at);
 }
 
 void
@@ -1076,7 +1173,7 @@ binop_const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   binop_const_t *this = (binop_const_t *)o;
   float *data;
 
-  this->data = ftl_data_new(float);
+  this->data = ftl_data_alloc(sizeof(float));
 
   binop_set_const(o, 0, 0, 1, at + 1);
   
@@ -1097,8 +1194,6 @@ binop_const_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static fts_status_t
 binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t mth)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(binop_const_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_const_init);
@@ -1130,7 +1225,7 @@ binop_ramp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->time = 0.0;
   this->sr = 1.0;
 
-  this->data = ftl_data_new(float);
+  this->data = ftl_data_alloc(sizeof(fts_ramp_t));
 
   binop_set_time(o, 0, 0, 1, at + 2);
   binop_set_target(o, 0, 0, 1, at + 1);
@@ -1152,8 +1247,6 @@ binop_ramp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static fts_status_t
 binop_ramp_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t mth)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(binop_ramp_t), 3, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, binop_ramp_init);
@@ -1186,6 +1279,8 @@ binop_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_add);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_add);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_add);
   else
     return &fts_CannotInstantiate;
 }
@@ -1198,6 +1293,8 @@ binop_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_sub);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_sub);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_sub);
   else
     return &fts_CannotInstantiate;
 }
@@ -1210,6 +1307,8 @@ binop_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_mul);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_mul);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_mul);
   else
     return &fts_CannotInstantiate;
 }
@@ -1222,6 +1321,8 @@ binop_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_div);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_div);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_div);
   else
     return &fts_CannotInstantiate;
 }
@@ -1233,6 +1334,8 @@ binop_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_bus);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_bus);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_bus);
   else
     return &fts_CannotInstantiate;
 }
@@ -1244,6 +1347,8 @@ binop_vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return binop_instantiate_realize(cl, ac, at, binop_put_vid);
   else if (ac == 2)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_vid);
+  else if (ac == 3)
+    return binop_ramp_instantiate_realize(cl, ac, at, binop_ramp_put_vid);
   else
     return &fts_CannotInstantiate;
 }
@@ -1251,17 +1356,19 @@ binop_vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_binop_config(void)
 {
+  /* signal x signal */
+
   sym_copy = fts_new_symbol("copy");
   dsp_declare_function(sym_copy, ftl_copy);
 
   sym_add = fts_new_symbol("add");
   dsp_declare_function(sym_add, ftl_add);
 
-  sym_mul = fts_new_symbol("mul");
-  dsp_declare_function(sym_mul, ftl_mul);
-
   sym_sub = fts_new_symbol("sub");
   dsp_declare_function(sym_sub, ftl_sub);
+
+  sym_mul = fts_new_symbol("mul");
+  dsp_declare_function(sym_mul, ftl_mul);
 
   sym_div = fts_new_symbol("div");
   dsp_declare_function(sym_div, ftl_div);
@@ -1272,11 +1379,15 @@ signal_binop_config(void)
   sym_vid = fts_new_symbol("vid");
   dsp_declare_function(sym_vid, ftl_vid);
 
+  /* signal x signal (tick size of 64) */
+
   sym_add_64 = fts_new_symbol("add_64");
   dsp_declare_function(sym_add_64, ftl_add_64);
 
   sym_mul_64 = fts_new_symbol("mul_64");
   dsp_declare_function(sym_mul_64, ftl_mul_64);
+
+  /* inplace */
 
   sym_add_inplace = fts_new_symbol("add_inplace");
   dsp_declare_function(sym_add_inplace, ftl_add_inplace);
@@ -1290,6 +1401,8 @@ signal_binop_config(void)
   sym_mul_inplace_64 = fts_new_symbol("mul_inplace_64");
   dsp_declare_function(sym_mul_inplace_64, ftl_mul_inplace_64);
 
+  /* v = v x v */
+
   sym_add_self = fts_new_symbol("add_self");
   dsp_declare_function(sym_add_self, ftl_add_self);
 
@@ -1302,64 +1415,94 @@ signal_binop_config(void)
   sym_mul_self_64 = fts_new_symbol("mul_self_64");
   dsp_declare_function(sym_mul_self_64, ftl_mul_self_64);
 
+  /* signal x const */
+
   sym_add_const = fts_new_symbol("add_const");
   dsp_declare_function(sym_add, ftl_add_const);
 
   sym_mul_const = fts_new_symbol("mul_const");
-  dsp_declare_function(sym_mul, ftl_mul_const);
+  dsp_declare_function(sym_mul_const, ftl_mul_const);
 
   sym_sub_const = fts_new_symbol("sub_const");
-  dsp_declare_function(sym_sub, ftl_sub_const);
+  dsp_declare_function(sym_sub_const, ftl_sub_const);
 
   sym_div_const = fts_new_symbol("div_const");
-  dsp_declare_function(sym_div, ftl_div_const);
+  dsp_declare_function(sym_div_const, ftl_div_const);
 
   sym_bus_const = fts_new_symbol("bus_const");
-  dsp_declare_function(sym_bus, ftl_bus_const);
+  dsp_declare_function(sym_bus_const, ftl_bus_const);
 
   sym_vid_const = fts_new_symbol("vid_const");
-  dsp_declare_function(sym_vid, ftl_vid_const);
+  dsp_declare_function(sym_vid_const, ftl_vid_const);
+
+  /* signal x const inplace */
+
+  sym_add_const_inplace = fts_new_symbol("add_const_inplace");
+  dsp_declare_function(sym_add_const_inplace, ftl_add_const_inplace);
+
+  sym_sub_const_inplace = fts_new_symbol("sub_const_inplace");
+  dsp_declare_function(sym_sub_const_inplace, ftl_sub_const_inplace);
+
+  sym_mul_const_inplace = fts_new_symbol("mul_const_inplace");
+  dsp_declare_function(sym_mul_const_inplace, ftl_mul_const_inplace);
+
+  sym_div_const_inplace = fts_new_symbol("div_const_inplace");
+  dsp_declare_function(sym_div_const_inplace, ftl_div_const_inplace);
+
+  sym_bus_const_inplace = fts_new_symbol("bus_const_inplace");
+  dsp_declare_function(sym_bus_const_inplace, ftl_bus_const_inplace);
+
+  sym_vid_const_inplace = fts_new_symbol("vid_const_inplace");
+  dsp_declare_function(sym_vid_const_inplace, ftl_vid_const_inplace);
+
+  /* signal x ramp */
 
   sym_add_ramp = fts_new_symbol("add_ramp");
-  dsp_declare_function(sym_add, ftl_add_ramp);
-
-  sym_mul_ramp = fts_new_symbol("mul_ramp");
-  dsp_declare_function(sym_mul, ftl_mul_ramp);
+  dsp_declare_function(sym_add_ramp, ftl_add_ramp);
 
   sym_sub_ramp = fts_new_symbol("sub_ramp");
   dsp_declare_function(sym_sub, ftl_sub_ramp);
 
+  sym_mul_ramp = fts_new_symbol("mul_ramp");
+  dsp_declare_function(sym_mul_ramp, ftl_mul_ramp);
+
   sym_div_ramp = fts_new_symbol("div_ramp");
-  dsp_declare_function(sym_div, ftl_div_ramp);
+  dsp_declare_function(sym_div_ramp, ftl_div_ramp);
 
   sym_bus_ramp = fts_new_symbol("bus_ramp");
-  dsp_declare_function(sym_bus, ftl_bus_ramp);
+  dsp_declare_function(sym_bus_ramp, ftl_bus_ramp);
 
   sym_vid_ramp = fts_new_symbol("vid_ramp");
-  dsp_declare_function(sym_vid, ftl_vid_ramp);
+  dsp_declare_function(sym_vid_ramp, ftl_vid_ramp);
+
+  /* signal x ramp inplace */
 
   sym_add_ramp_inplace = fts_new_symbol("add_ramp_inplace");
-  dsp_declare_function(sym_add, ftl_add_ramp_inplace);
-
-  sym_mul_ramp_inplace = fts_new_symbol("mul_ramp_inplace");
-  dsp_declare_function(sym_mul, ftl_mul_ramp_inplace);
+  dsp_declare_function(sym_add_ramp_inplace, ftl_add_ramp_inplace);
 
   sym_sub_ramp_inplace = fts_new_symbol("sub_ramp_inplace");
-  dsp_declare_function(sym_sub, ftl_sub_ramp_inplace);
+  dsp_declare_function(sym_sub_ramp_inplace, ftl_sub_ramp_inplace);
+
+  sym_mul_ramp_inplace = fts_new_symbol("mul_ramp_inplace");
+  dsp_declare_function(sym_mul_ramp_inplace, ftl_mul_ramp_inplace);
 
   sym_div_ramp_inplace = fts_new_symbol("div_ramp_inplace");
-  dsp_declare_function(sym_div, ftl_div_ramp_inplace);
+  dsp_declare_function(sym_div_ramp_inplace, ftl_div_ramp_inplace);
 
   sym_bus_ramp_inplace = fts_new_symbol("bus_ramp_inplace");
-  dsp_declare_function(sym_bus, ftl_bus_ramp_inplace);
+  dsp_declare_function(sym_bus_ramp_inplace, ftl_bus_ramp_inplace);
 
   sym_vid_ramp_inplace = fts_new_symbol("vid_ramp_inplace");
-  dsp_declare_function(sym_vid, ftl_vid_ramp_inplace);
+  dsp_declare_function(sym_vid_ramp_inplace, ftl_vid_ramp_inplace);
 
-  fts_metaclass_install(fts_new_symbol("+~"),  binop_add_instantiate, fts_narg_equiv);
-  fts_metaclass_install(fts_new_symbol("-~"),  binop_sub_instantiate, fts_narg_equiv);
-  fts_metaclass_install(fts_new_symbol("*~"),  binop_mul_instantiate, fts_narg_equiv);
-  fts_metaclass_install(fts_new_symbol("/~"),  binop_div_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("+~"), binop_add_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("-~"), binop_sub_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("*~"), binop_mul_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("/~"), binop_div_instantiate, fts_narg_equiv);
   fts_metaclass_install(fts_new_symbol("-+~"), binop_bus_instantiate, fts_narg_equiv);
   fts_metaclass_install(fts_new_symbol("/*~"), binop_vid_instantiate, fts_narg_equiv);
+  
+  /* compatibility */
+  fts_metaclass_install(fts_new_symbol("inv+~"), binop_bus_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("inv*~"), binop_vid_instantiate, fts_narg_equiv);
 }

@@ -53,6 +53,7 @@ extern void int_vector_copy(int_vector_t *in, int_vector_t *out);
 extern void int_vector_zero(int_vector_t *vector);
 
 #define int_vector_get_size(vector) ((vector)->size)
+#define int_vector_get_aloc_size(vector) ((vector)->size)
 extern void int_vector_set_size(int_vector_t *vector, int size);
 
 #define int_vector_is_empty(vector) ((vector)->size == 0)

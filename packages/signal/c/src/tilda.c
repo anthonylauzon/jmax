@@ -201,8 +201,6 @@ tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   if(ac == 1 || (ac == 2 && fts_is_number(at + 1)))
     {
       /* constant */

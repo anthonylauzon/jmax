@@ -20,8 +20,11 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+# Authors: Francois Dechelle, Norbert Schnell.
 #
+
+JMAXDISTDIR=../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
 	(cd src; $(MAKE) -k all)
@@ -31,10 +34,12 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c
-	$(INSTALL_DIR) $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libmymodule.so $(lib_install_dir)/packages/mymodule/c/lib/$(ARCH)/opt )
-.PHONY: install-arch
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/signal/c/lib/$(ARCH)/opt
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/signal/c/lib/$(ARCH)/opt/libsignal.so; \
+	)
+.PHONY: install
 
 

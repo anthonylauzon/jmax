@@ -56,7 +56,6 @@ sigswitch.c \
 sigthres.c \
 sigthrow.c \
 sigthru.c \
-vecarithm.c \
 vecclip.c \
 veclog.c \
 vecsqrt.c \

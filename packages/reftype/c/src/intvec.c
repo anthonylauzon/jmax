@@ -127,6 +127,8 @@ int_vector_set_size(int_vector_t *vector, int size)
 
   if(tail > 0)
     fts_vec_izero(vector->values + old_size, tail);
+  else if(tail < 0)
+    fts_vec_izero(vector->values + size, -tail);    
 }
 
 void 

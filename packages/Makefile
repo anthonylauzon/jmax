@@ -43,6 +43,7 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 	midi \
 	numeric \
 	reftype \
+	signal \
 	sources \
 	system
 

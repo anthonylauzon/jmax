@@ -834,6 +834,11 @@ ftl_program_t *dsp_get_current_dsp_chain( void)
   return dsp_chain;
 }
 
+int fts_dsp_is_sig_inlet(fts_object_t *o, int num)
+{
+  return fts_method_exists(fts_object_get_class(o), num, fts_s_sig);
+}
+
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
 /* DSP clocks management                                                       */

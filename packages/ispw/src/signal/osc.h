@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _OSC_H_
-#define _OSC_H_
+#ifndef _SIGNAL_OSC_H_
+#define _SIGNAL_OSC_H_
 
 typedef struct _osc_ftl osc_ftl_t;
 
