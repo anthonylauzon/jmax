@@ -87,14 +87,17 @@ int main(int argc, char **argv)
     }
 
   /* Install the basic welcome messages */
-  fts_add_welcome(&version_welcome);
-  fts_add_welcome(&compilation_info_welcome);
+  /* fts_add_welcome(&version_welcome); */
+  /* fts_add_welcome(&compilation_info_welcome); */
+  post( "%s\n", FTS_VERSION_STRING);
+  post( "%s\n", COMPILATION_INFO_STRING);
 
 #ifdef DEBUG
-  fts_add_welcome(&debug_welcome);
+  /* fts_add_welcome(&debug_welcome);*/
+  post( "compiled for DEBUG\n");
 
-  sprintf( platform_name, "%s\n", FTS_ARCH_NAME);
-  fts_add_welcome( &platform_welcome);
+  post( "%s\n", FTS_ARCH_NAME);
+  /* fts_add_welcome( &platform_welcome); */
 #endif
 
   /* platform specific initialization */
@@ -110,6 +113,11 @@ int main(int argc, char **argv)
      line arguments.
    */
   fts_assign_boot_devices(argc, argv);
+
+  /* The client device should be there, so try to flush the
+   * post buffer
+   */
+  post_flush();
 
   /* After module initialization, compile the scheduler list */
   fts_sched_compile();

@@ -31,7 +31,7 @@ include Sources
 
 DATE:= $(shell date)
 HOST:= $(shell hostname)
-MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"(compiled by $(USER) for $(ARCH) on $(DATE) on host $(HOST))\n"'
+MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"(compiled by $(USER) for $(ARCH) on $(DATE) on host $(HOST))"'
 
 FTS_BIN = $(BINDIR)/fts
 
