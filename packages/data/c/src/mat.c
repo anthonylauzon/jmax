@@ -982,10 +982,18 @@ static void
 mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *self = (mat_t *) o;
+  fts_atom_t *data = self->data;
+  int m = mat_get_m(self);
+  int n = mat_get_n(self);
+  int size = m * n;
+  int i;
   
   fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
   
-  if (self->data != NULL)
+  for(i=0; i< size; i++)
+    fts_atom_release(data + i);
+  
+  if(self->data != NULL)
     fts_free(self->data);
 }
 

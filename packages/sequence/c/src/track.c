@@ -1125,20 +1125,8 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);
   
   fts_array_destroy(&temp_array);
-}
-
-static void
-track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  fts_atom_t a;
   
-	if(this->type != NULL)
-  {
-    fts_set_symbol(&a, fts_class_get_name(this->type));
-    fts_client_send_message(o, fts_s_type, 1, &a);
-  }
-	
+  /* upload editor stuff */
   if(this->save_editor != 0)
   {
     fts_set_int(&a, this->save_editor); 
@@ -1158,7 +1146,20 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 		}
     
 		track_editor_upload(this->editor);
-	}
+	}  
+}
+
+static void
+track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_atom_t a;
+  
+	if(this->type != NULL)
+  {
+    fts_set_symbol(&a, fts_class_get_name(this->type));
+    fts_client_send_message(o, fts_s_type, 1, &a);
+  }
 }
 
 static void

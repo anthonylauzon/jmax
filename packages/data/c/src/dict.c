@@ -115,7 +115,6 @@ dict_remove_all(dict_t *dict)
 {
   fts_iterator_t iterator;
 
-  /* get int table */
   fts_hashtable_get_values(&dict->hash, &iterator);
 
   while(fts_iterator_has_more(&iterator))
@@ -123,7 +122,7 @@ dict_remove_all(dict_t *dict)
     fts_atom_t value;
 
     fts_iterator_next(&iterator, &value);
-    fts_set_void(&value);
+    fts_atom_void(&value);
   }
 
   fts_hashtable_clear(&dict->hash);
