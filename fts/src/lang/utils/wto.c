@@ -1,15 +1,6 @@
 #include "fts.h"
 #include "ieeewrap.h"
 
-typedef struct _fts_wto
-{
-  float *table;
-  long size;
-  double index;
-  double incr;
-} fts_wto_t;
-
-
 void
 fts_wavetab_osc_init(fts_wto_t *wto, float* table, int size)
 {

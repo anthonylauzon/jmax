@@ -1,5 +1,5 @@
-#ifndef _WRAP_H_
-#define _WRAP_H_
+#ifndef _IEEEWRAP_H_
+#define _IEEEWRAP_H_
 
 /*************************************************************************
  *

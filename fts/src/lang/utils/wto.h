@@ -1,3 +1,6 @@
+#ifndef _WTO_H_
+#define _WTO_H_
+
 #include "fts.h"
 
 typedef struct _fts_wto
@@ -16,3 +19,5 @@ typedef struct _fts_wto
 
 extern void fts_wto_run(fts_wto_t *wto, float *out, long n);
 extern void fts_wto_run_freq(fts_wto_t *wto, float *freq, float *out, long n);
+
+#endif
