@@ -28,6 +28,7 @@
 #include <fts/fts.h>
 #include "ivec.h"
 #include "fvec.h"
+#include "cvec.h"
 #include "fmat.h"
 
 typedef struct 
@@ -78,24 +79,20 @@ matdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  
       /* send when patcher is open */
       if(patcher && fts_patcher_is_open(patcher))
-	{
+	{ 
+	  fts_atom_t a[2];
+	  
+	  /* send matrix dimensions */
+	  fts_set_int(a + 0, this->m_size);
+	  fts_set_int(a + 1, this->n_size);
+	  fts_client_send_message(o, sym_size, 2, a);
+	  
 	  if(this->scroll)
 	    fts_client_send_message(o, sym_scroll, fts_array_get_size(&this->a), fts_array_get_atoms(&this->a));
 	  else
-	    {
-	      fts_atom_t a[2];
-
-	      /* send matrix dimensions */
-	      fts_set_int(a + 0, this->m_size);
-	      fts_set_int(a + 1, this->n_size);
-	      fts_client_send_message(o, sym_size, 2, a);
-	      
-	      /* send data to display */
-	      fts_client_send_message(o, sym_display, fts_array_get_size(&this->a), fts_array_get_atoms(&this->a));
-	    }
-	  
+	    fts_client_send_message(o, sym_display, fts_array_get_size(&this->a), fts_array_get_atoms(&this->a));
+	 
 	  fts_array_set_size(&this->a, 0);
-	  
 	  fts_timebase_add_call(fts_get_timebase(), o, matdisplay_send, 0, this->period);
 	}
     }
@@ -128,17 +125,148 @@ static void
 matdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* todo: same as matdisplay_fvec */
+
+}
+
+static void 
+matdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  matdisplay_t * this = (matdisplay_t *)o;
+  cvec_t * vec = cvec_atom_get(at);
+  float min = this->min;
+  float max = this->max;
+  float range = max - min; 
+  int m = cvec_get_size(vec);
+  int n = this->n_wind / this->n_zoom + 1;
+
+  /* to send only the useful data */
+  
+  if(m * this->m_zoom > this->m_wind)
+    m = this->m_wind / this->m_zoom;
+
+  if(m > 0 && range != 0.0)
+    {
+      complex *c = cvec_get_ptr(vec);
+      fts_atom_t *atoms;
+      int i;
+      
+      this->m_size = m;
+      this->n_size = n;           
+
+      fts_array_set_size(&this->a, m);
+      atoms = fts_array_get_atoms(&this->a);
+
+      for(i=0; i<m;i++)
+	{
+	  float value = c[i].re;
+	  int val;
+	  
+	  if(value < min)
+	    value = min;	      
+	  else if(value > max)
+	    value = max;
+	  
+	  val = (int)((255) * ((value - min) / range));
+	  
+	  fts_set_int(atoms + i, val); 
+	}
+      this->scroll = 1; /* mode scroll = true */
+      matdisplay_deliver(this);
+    }
 }
 
 static void 
 matdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  matdisplay_t * this = (matdisplay_t *)o;
+  ivec_t * vec = ivec_atom_get(at);
+  int min = (int)this->min;
+  int max = (int)this->max;
+  int range = max - min; 
+  int m = ivec_get_size(vec);
+  int n = this->n_wind / this->n_zoom + 1;
+
+  /* to send only the useful data */
+  
+  if(m * this->m_zoom > this->m_wind)
+    m = this->m_wind / this->m_zoom;
+
+  if(m > 0 && range != 0)
+    {
+      int *p = ivec_get_ptr(vec);
+      fts_atom_t *atoms;
+      int i;
+      
+      this->m_size = m;
+      this->n_size = n;           
+
+      fts_array_set_size(&this->a, m);
+      atoms = fts_array_get_atoms(&this->a);
+
+      for(i=0; i<m;i++)
+	{
+	  int value = p[i];
+	  int val;
+	  
+	  if(value < min)
+	    value = min;	      
+	  else if(value > max)
+	    value = max;
+	  
+	  val = (int)((255) * ((value - min) / range));
+	  
+	  fts_set_int(atoms + i, val); 
+	}
+      this->scroll = 1; /* mode scroll = true */
+      matdisplay_deliver(this);
+    }
 }
 
 static void 
 matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /* todo: change the way fvec is displayed */
+  matdisplay_t * this = (matdisplay_t *)o;
+  fvec_t * vec = fvec_atom_get(at);
+  float min = this->min;
+  float max = this->max;
+  float range = max - min; 
+  int m = fvec_get_size(vec);
+  int n = this->n_wind / this->n_zoom + 1;
+
+  /* to send only the useful data */
+  
+  if(m * this->m_zoom > this->m_wind)
+    m = this->m_wind / this->m_zoom;
+
+  if(m > 0 && range != 0.0)
+    {
+      float *f = fvec_get_ptr(vec);
+      fts_atom_t *atoms;
+      int i;
+      
+      this->m_size = m;
+      this->n_size = n;           
+
+      fts_array_set_size(&this->a, m);
+      atoms = fts_array_get_atoms(&this->a);
+
+      for(i=0; i<m;i++)
+	{
+	  float value = f[i];
+	  int val;
+	  
+	  if(value < min)
+	    value = min;	      
+	  else if(value > max)
+	    value = max;
+	  
+	  val = (int)((255) * ((value - min) / range));
+	  
+	  fts_set_int(atoms + i, val); 
+	}
+      this->scroll = 1; /* mode scroll = true */
+      matdisplay_deliver(this);
+    }
 }
 
 static void 
@@ -192,7 +320,7 @@ matdisplay_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	      fts_set_int(atoms + i * n + j, val); 
 	    }
 	}
-      
+      this->scroll = 0; /* mode scroll = false */
       matdisplay_deliver(this);
     }
 }
@@ -374,10 +502,10 @@ matdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   this->min = 0.0;
   this->max = 1.0;
-  this->m_size = 0;
-  this->n_size = 0; 
-  this->m_wind = 0;
-  this->n_wind = 0;
+  this->m_size = 1;
+  this->n_size = 1; 
+  this->m_wind = 1;
+  this->n_wind = 1;
   this->min_color = 0xFFFFE987; /* orange */
   this->max_color = 0;
   this->m_zoom = 1;
@@ -425,6 +553,7 @@ matdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, matdisplay_list);
   fts_method_define_varargs(cl, 0, fvec_symbol, matdisplay_fvec);
   fts_method_define_varargs(cl, 0, ivec_symbol, matdisplay_ivec);
+  fts_method_define_varargs(cl, 0, cvec_symbol, matdisplay_cvec);
   fts_method_define_varargs(cl, 0, fmat_symbol, matdisplay_fmat);
   fts_method_define_varargs(cl, 0, fts_s_clear, matdisplay_clear);
 

@@ -55,6 +55,7 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
   IndexColorModel icm;
   Color minColor;
   Color maxColor;
+  int imageWidth;
 
   public static MatDispControlPanel controlPanel = new MatDispControlPanel();
 
@@ -81,6 +82,7 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
   {
     int width = (((FtsMatDisplayObject)ftsObject).nSize) * (((FtsMatDisplayObject)ftsObject).nZoom);
     int height = (((FtsMatDisplayObject)ftsObject).mSize) * (((FtsMatDisplayObject)ftsObject).mZoom);
+    imageWidth = width;
 
     if((width * height) > 0)
       {
@@ -200,8 +202,17 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
       return Color.orange;
   }
 
-  public void drawVector(Graphics g, int x, int y, byte[] pixels, int n)
+  public void drawMatrix(Graphics g, int x, int y)
   {
+    int scroll = ((FtsMatDisplayObject)ftsObject).getScaledScroll();
+
+    if(scroll == 0)
+      g.drawImage(image, x+1, y+1, itsSketchPad);
+    else
+      {
+	g.drawImage(image, x+1 - scroll, y+1, itsSketchPad);
+	g.drawImage(image, x+1 - scroll + imageWidth, y+1, itsSketchPad);
+      }
   }
 
   public void paint(Graphics g) 
@@ -220,8 +231,10 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
     paintInlets(g);
     Rectangle oldClip = g.getClipRect();
     Rectangle viewRect = SwingUtilities.computeIntersection(x+1,y+1,w-2,h-2, itsSketchPad.getEditorContainer().getViewRectangle());
-    g.setClip( viewRect);    
-    g.drawImage(image, x+1, y+1, itsSketchPad);
+    g.setClip( viewRect);  
+    
+    drawMatrix(g, x, y);
+
     g.setClip(oldClip);
   }
 
@@ -229,8 +242,16 @@ public class MatDisplay extends GraphicObject implements FtsDisplayListener
   {
     int x = getX();
     int y = getY();
+    int w = getWidth();
+    int h = getHeight();
 
-    g.drawImage (image, x, y,  itsSketchPad );
+    Rectangle oldClip = g.getClipRect();
+    Rectangle viewRect = SwingUtilities.computeIntersection(x+1,y+1,w-2,h-2, itsSketchPad.getEditorContainer().getViewRectangle());
+    g.setClip( viewRect);  
+    
+    drawMatrix(g, x, y);
+    
+    g.setClip(oldClip);
   }
 
   public JPopupMenu getRunModePopUpMenu()

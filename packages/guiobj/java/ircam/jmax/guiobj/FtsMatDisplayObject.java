@@ -100,6 +100,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   int maxColor; 
   float min = defaultMin;
   float max = defaultMax;
+  int scroll = 0;
 
   public FtsMatDisplayObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
@@ -110,7 +111,9 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   }
 
   public void display(int nArgs, FtsAtom args[])
-  {
+  { 
+    scroll = 0;
+
     for(int m=0; m<mSize; m++)
       {
 	int offset = m * mZoom * nSize * nZoom;
@@ -126,12 +129,32 @@ public class FtsMatDisplayObject extends FtsGraphicObject
 		pixels[pix + j * step + i] = (byte)args[index].intValue;
 	  }
       }
-    
+
     ((FtsDisplayListener) listener).display();
   }
   
   public void scroll(int nArgs, FtsAtom args[])
   {
+    scroll -= 1;
+
+    if(scroll < 0)
+      scroll += nSize;
+
+    for(int m=0; m<mSize; m++)
+      {
+	int offset = m * mZoom * nSize * nZoom;
+	int step = nSize * nZoom;	
+
+	for(int j=0; j<mZoom;j++)
+	  {
+	    for(int i=0; i<nZoom; i++)
+	      {
+		pixels[offset + j * step + scroll * nZoom + i] = (byte)args[m].intValue;
+	      }
+	  }
+      }
+
+    ((MatDisplay)listener).display();
   }
 
   public void setSize(int m, int n)
@@ -148,6 +171,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
 	nWindow = n;
 
 	pixels = new byte[mWindow * nWindow];
+	scroll = 0;
       }
   }
 
@@ -172,12 +196,12 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   {
     mZoom = mZ;
     nZoom = nZ;
-
-    mSize = 0;
-    nSize = 0;
+    scroll = 0;    
 
     if(listener != null)
-      ((FtsDisplayListener) listener).display();
+      {
+	((FtsDisplayListener) listener).display();
+      }
   }
  
   public void setZoom(int m, int n)
@@ -212,7 +236,9 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     this.max = max;
 
     if(listener != null)
-      ((FtsDisplayListener) listener).display();
+      {
+	((FtsDisplayListener) listener).display();
+      }
   }
   
   public void setRange(float min, float max)
@@ -245,13 +271,14 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     minColor = min; 
     maxColor = max; 
 
-    if(listener != null){
-      ((MatDisplay) listener).setColor( new Color(min), new Color(max));
-      ((FtsDisplayListener) listener).display();
-    }
+    if(listener != null)
+      {
+	((MatDisplay) listener).setColor( new Color(min), new Color(max));
+	((FtsDisplayListener) listener).display();
+      }
   }
-
- public void setColor(int min, int max)
+  
+  public void setColor(int min, int max)
   {
     args.clear();
     args.addInt(min);
@@ -288,6 +315,11 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   {
     return maxColor;
   } 
+
+  public int getScaledScroll()
+  {
+    return (scroll * nZoom);
+  }
 }
 
 
