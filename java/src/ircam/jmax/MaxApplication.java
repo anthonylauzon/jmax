@@ -32,7 +32,15 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
-  public static Clipboard systemClipboard = new Clipboard("system"); // ??
+  public static Clipboard systemClipboard = new Clipboard("system"); 
+  // (em 13-01-99)  in order to use the real system clipboard
+  // instead of a local one, the following declaration would be sufficient:
+  // public static Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+  // Unfortunately, the actual java implementation on Irix (3.1.1) is buggy,
+  // and the X11 selection contained in the systemClipboard returns a null
+  // array for the list of the MIME types (DataFlavors) supported, and
+  // exits with an internal null exception on the isDataFlavorSupported() call
+
 
   // (fd) changed because FtsServer uses MaxApplication.getProperty for timeOut
   // This is not clean because you cannot use the application layer without calling
