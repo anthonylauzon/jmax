@@ -30,6 +30,7 @@
 #include "seqmidi.h"
 
 fts_symbol_t seqevent_symbol = 0;
+fts_symbol_t seqtrack_symbol = 0;
 
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
@@ -39,6 +40,9 @@ static fts_symbol_t sym_addTrack = 0;
 /******************************************************
  *
  *  seqtrack object
+ * 
+ *  This is an FTS object representing a sequence track.
+ *  It is not intended to show up on screen
  *
  */
 
