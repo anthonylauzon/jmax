@@ -2245,6 +2245,18 @@
 			settings = {
 			};
 		};
+		F7104CCA053EAE1C01664058 = {
+			isa = PBXFileReference;
+			name = AddTrackAction.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/AddTrackAction.java;
+			refType = 2;
+		};
+		F7104CCB053EAE1C01664058 = {
+			fileRef = F7104CCA053EAE1C01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7112B660401730701664058 = {
 			isa = PBXFileReference;
 			name = udpsend.c;
@@ -9391,6 +9403,7 @@
 				F7DA5E64052DDD8A01664058,
 				F7DA5E66052DDDD501664058,
 				F7DA5E68052DDDED01664058,
+				F7104CCB053EAE1C01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9424,6 +9437,7 @@
 		F85123A6028BEAB301664092 = {
 			children = (
 				F85123A7028BEAB301664092,
+				F7104CCA053EAE1C01664058,
 				F85123AB028BEAB301664092,
 				F85123AC028BEAB301664092,
 				F7050A2404055D4401664058,
