@@ -28,8 +28,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-%doc LICENCE.fr LICENSE README
+%doc LICENCE.fr LICENSE README doc/*
 /usr/bin/jmax
+/usr/bin/fts
+/usr/lib
 /usr/share/jmax
 /usr/include/fts
 
