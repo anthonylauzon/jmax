@@ -1,3 +1,11 @@
+Mon Apr  6 17:37:16 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
+
+	*  Added:
+	. distrib files in all src/* sub-dirs to distribute the .h for
+	the FTS objects developpers
+	* Changed:
+	. a few things in dspgraph.c (bug, improved reports,...)
+
 Mon Mar  2 19:06:57 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
 
 	* Modified:

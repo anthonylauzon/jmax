@@ -1,0 +1,9 @@
+all    mess_types.h
+all    symbols.h
+all    words.h
+all    atoms.h
+all    classes.h
+all    objects.h
+all    properties.h
+all    events.h
+all    send.h

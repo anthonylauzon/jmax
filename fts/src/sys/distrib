@@ -1,0 +1,6 @@
+all     mem.h
+all     modules.h
+all     platform.h
+all     status.h
+all     version.h
+all     welcome.h

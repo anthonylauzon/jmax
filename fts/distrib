@@ -1,1 +1,3 @@
-sgi	bin
+all	bin
+all     src
+
