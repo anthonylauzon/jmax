@@ -32,6 +32,7 @@
 ## and then the configuration file, that in turn should load
 ## the packages.
 ##
+package require java
 
 set jmaxRootDir [systemProperty "jmaxRoot"]
 
@@ -124,6 +125,9 @@ if {[file exists $jmaxRootDir/config/$jmaxHostType.tcl]} then {
 ## do the real startup 
 ##
 source $jmaxRootDir/tcl/startup.tcl
+
+
+
 
 
 
