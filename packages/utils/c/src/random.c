@@ -44,6 +44,7 @@
 #else
 #include <time.h>
 #endif
+#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 
 #define RA 16807 /* multiplier */

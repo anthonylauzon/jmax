@@ -20,6 +20,7 @@
  *
  */
 
+#include <fts/config.h>
 #include <math.h>
 #include "cfft.h"
 

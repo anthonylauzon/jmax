@@ -20,12 +20,13 @@
  *
  */
 
+#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 
 extern void fts_ffuns_init(void);
 extern void fts_cubic_init(void);
 
-void
+void 
 utils_config(void)
 {
   fts_ffuns_init();

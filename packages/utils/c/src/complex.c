@@ -20,6 +20,7 @@
  *
  */
 
+#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 
 complex CZERO = {0.0f, 0.};
