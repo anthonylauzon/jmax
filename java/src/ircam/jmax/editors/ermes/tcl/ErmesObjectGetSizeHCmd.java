@@ -35,7 +35,7 @@ class ErmesObjectGetSizeHCmd implements Command
       }
     else
       {
-	throw new TclException(interp, "wrong # args: should be \"" + argv[0].toString() + "<id>\"");
+	throw new TclException(interp, "wrong # args: should be \"" + new String(argv[0].toString()) + "<id>\"");
       }
   }
 }

@@ -1,5 +1,6 @@
 package ircam.jmax.fts;
 
+import tcl.lang.*;
 import ircam.jmax.*;
 import java.io.*;
 import java.util.*;
@@ -459,8 +460,30 @@ public class FtsObject
 
 	try
 	  {
-	    // ??? !!!! @@@@
-	    MaxApplication.getTclInterp().eval(FtsTemplateTable.getProc(className) + " " + ftsId + " " + getArgumentsDescription()); 
+	    // Call the tcl template function, with the container (this) as 
+	    // first argument, and the other args following.
+
+	    Interp interp  = MaxApplication.getTclInterp();
+	    TclObject list = TclList.newInstance();
+
+	    TclList.append(interp, list, TclString.newInstance(FtsTemplateTable.getProc(className)));
+	    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
+
+	    for (int i = 1; i < args.size(); i++)
+	      {
+		Object arg = args.elementAt(i);
+
+		if (arg instanceof Integer)
+		  TclList.append(interp, list, TclInteger.newInstance(((Integer)arg).intValue()));
+		else if (arg instanceof Float)
+		  TclList.append(interp, list, TclDouble.newInstance(((Float)arg).doubleValue()));
+		else if (arg instanceof String)
+		  TclList.append(interp, list, TclString.newInstance((String) arg));
+		else
+		  TclList.append(interp, list, ReflectObject.newInstance(interp, arg));
+	      }
+
+	    interp.eval(list, 0);
 	  }
  	catch (tcl.lang.TclException e)
 	  {

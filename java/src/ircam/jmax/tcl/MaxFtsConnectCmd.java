@@ -30,16 +30,16 @@ class MaxFtsConnectCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 6)
-      MaxApplication.getApplication().FTSConnect(argv[1].toString(),
-						 argv[2].toString(),
-						 argv[3].toString(),
-						 argv[4].toString(),
-						 argv[5].toString());
+      MaxApplication.getApplication().FTSConnect(new String(argv[1].toString()),
+						 new String(argv[2].toString()),
+						 new String(argv[3].toString()),
+						 new String(argv[4].toString()),
+						 new String(argv[5].toString()));
     else if (argv.length == 5)
-      MaxApplication.getApplication().FTSConnect(argv[1].toString(),
-						 argv[2].toString(),
-						 argv[3].toString(),
-						 argv[4].toString(),
+      MaxApplication.getApplication().FTSConnect(new String(argv[1].toString()),
+						 new String(argv[2].toString()),
+						 new String(argv[3].toString()),
+						 new String(argv[4].toString()),
 						 null);
     else
       throw new TclException(interp, "wrong # args: should be ftsconnect  <type> ftsdir ftsname socket server port");

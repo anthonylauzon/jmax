@@ -11,7 +11,7 @@ import java.util.*;
 
 public class FtsHelpPatchTable
 {
-  static Hashtable helpTable = new Hashtable();
+  static Hashtable helpTable = new Hashtable(256, 0.99f);
 
   static public void add(String className, String patch)
   {

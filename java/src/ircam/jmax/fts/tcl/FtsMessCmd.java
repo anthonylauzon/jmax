@@ -50,7 +50,7 @@ class FtsMessCmd implements Command
 	      }
 	    catch (TclException e2)
 	      {
-		args.addElement(argv[i].toString());
+		args.addElement(new String(argv[i].toString()));
 	      }
 	  }
       }
@@ -59,13 +59,13 @@ class FtsMessCmd implements Command
       {
 	FtsObject fo = (FtsObject) ReflectObject.get(interp, argv[1]);
 	
-	fo.sendMessage(TclInteger.get(interp, argv[2]), argv[3].toString(), args);
+	fo.sendMessage(TclInteger.get(interp, argv[2]), new String(argv[3].toString()), args);
       }
     catch (TclException e)
       {
-	MaxApplication.getFtsServer().sendNamedObjectMessage(argv[1].toString(),
+	MaxApplication.getFtsServer().sendNamedObjectMessage(new String(argv[1].toString()),
 							  TclInteger.get(interp, argv[2]),
-							  argv[3].toString(),
+							  new String(argv[3].toString()),
 							  args);
       }
   }

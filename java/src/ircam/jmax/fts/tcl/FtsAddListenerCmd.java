@@ -63,8 +63,8 @@ class FtsAddListenerCmd implements Command
     if (argv.length == 4)
       {
 	FtsObject obj = (FtsObject) ReflectObject.get(interp, argv[1]);
-	String property = argv[2].toString();
-	String function = argv[3].toString();
+	String property = new String(argv[2].toString());
+	String function = new String(argv[3].toString());
 
 	new FtsListener(obj, property, function);
       }

@@ -37,7 +37,7 @@ class FtsSetPropertyCmd implements Command
 	// this call should be substituted by a registration service call
 
 	object = (FtsObject) ReflectObject.get(interp, argv[1]);
-	prop   = argv[2].toString();
+	prop   = new String(argv[2].toString());
 
 	try
 	  {
@@ -51,7 +51,7 @@ class FtsSetPropertyCmd implements Command
 	      }
 	    catch (TclException e2)
 	      {
-		value = argv[3].toString();
+		value = new String(argv[3].toString());
 	      }
 	  }
 

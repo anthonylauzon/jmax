@@ -35,10 +35,10 @@ class FtsTemplateCmd implements Command
 
 	// Retrieve the arguments
 
-	name = argv[1].toString();
+	name = new String(argv[1].toString());
 
 	if (argv.length == 3)
-	  proc = argv[2].toString();
+	  proc = new String(argv[2].toString());
 	else
 	  proc = name;
 

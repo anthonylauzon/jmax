@@ -45,7 +45,7 @@ class FtsPatcherCmd implements Command
 	// this call should be substituted by a registration service call
 
 	if (argv.length == 2)
-	  windowDescription = argv[1].toString();
+	  windowDescription = new String(argv[1].toString());
 
 	args = new Vector();
 	args.addElement("unnamed");
@@ -75,16 +75,16 @@ class FtsPatcherCmd implements Command
 	// this call should be substituted by a registration service call
 
 	parent    = (FtsObject) ReflectObject.get(interp, argv[1]);
-	name      = argv[2].toString();
+	name      = new String(argv[2].toString());
 	ninlets   = TclInteger.get(interp, argv[3]);
 	noutlets  = TclInteger.get(interp, argv[4]);
 
 
 	if (argv.length > 5) 
-	  graphicDescription = argv[5].toString();
+	  graphicDescription = new String(argv[5].toString());
 
 	if (argv.length > 6) 
-	  windowDescription = argv[6].toString();
+	  windowDescription = new String(argv[6].toString());
 
 	args = new Vector();
 	args.addElement(name);

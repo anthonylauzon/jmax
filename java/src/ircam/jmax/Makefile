@@ -47,4 +47,8 @@ MaxWindow:
 	javac $(JFLAGS) MaxWindow.java
 .PHONY: MaxWindow
 
+MaxWhenHookTable:
+	javac $(JFLAGS) MaxWhenHookTable.java
+.PHONY: MaxWhenHookTable
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

@@ -41,7 +41,7 @@ class MaxOpenCmd implements Command {
 	ProjectWindow aProjectWindow = MaxApplication.getApplication().itsProjectWindow;
 	String pathName, fileName;
 	String fileSeparator = System.getProperty("file.separator");
-	String name = argv[1].toString();
+	String name = new String(argv[1].toString());
 	int lastSeparatorIndex = name.lastIndexOf(fileSeparator);
 
 	if (lastSeparatorIndex == -1)

@@ -30,8 +30,8 @@ class FtsReferenceURLCmd implements Command
 
 	// Retrieve the arguments
 
-	name = argv[1].toString();
-	url  = argv[2].toString();
+	name = new String(argv[1].toString());
+	url  = new String(argv[2].toString());
 
 	FtsReferenceURLTable.add(name, url);
       }

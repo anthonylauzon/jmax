@@ -12,20 +12,20 @@ import java.util.*;
 
 public class FtsReferenceURLTable
 {
-  static Hashtable FtsReferenceURLTable = new Hashtable();
+  static Hashtable ftsReferenceURLTable = new Hashtable(256, 0.99f);
 
   static public void add(String className, String url)
   {
-    FtsReferenceURLTable.put(className, url);
+    ftsReferenceURLTable.put(className, url);
   }
 
   static public boolean exists(String className)
   {
-    return FtsReferenceURLTable.containsKey(className);
+    return ftsReferenceURLTable.containsKey(className);
   }
 
   static String getReferenceURL(String className)
   {
-    return (String) FtsReferenceURLTable.get(className);
+    return (String) ftsReferenceURLTable.get(className);
   }
 }

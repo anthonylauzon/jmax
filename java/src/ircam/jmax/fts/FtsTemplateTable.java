@@ -11,7 +11,7 @@ import java.util.*;
 
 public class FtsTemplateTable
 {
-  static Hashtable templateTable = new Hashtable();
+  static Hashtable templateTable = new Hashtable(255, 0.99f);
 
   static public void add(String name, String proc)
   {

@@ -10,7 +10,7 @@ import java.util.*;
 
 public class FtsAbstractionTable
 {
-  static Hashtable abstractionTable = new Hashtable();
+  static Hashtable abstractionTable = new Hashtable(256, 0.99f);
 
   static public void add(String name, String filename)
   {

@@ -34,11 +34,11 @@ class FtsObjectCmd implements Command
 	// Retrieve the arguments
 
 	parent = (FtsObject) ReflectObject.get(interp, argv[1]);
-	description = argv[2].toString();
+	description = new String(argv[2].toString());
 
 	if (argv.length == 4)
 	  object = FtsObject.makeFtsObject(parent, description,
-					   new FtsGraphicDescription(argv[3].toString()), false);
+					   new FtsGraphicDescription(new String(argv[3].toString())), false);
 	else
 	  object = FtsObject.makeFtsObject(parent, description);
 

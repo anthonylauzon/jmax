@@ -33,7 +33,7 @@ class FtsUcsCmd implements Command
 
     Vector args = new Vector();
 
-    for (int i = 4; i < argv.length; i++)
+    for (int i = 1; i < argv.length; i++)
       {
 	try
 	  {
@@ -47,7 +47,7 @@ class FtsUcsCmd implements Command
 	      }
 	    catch (TclException e2)
 	      {
-		args.addElement(argv[i].toString());
+		args.addElement(new String(argv[i].toString()));
 	      }
 	  }
       }

@@ -32,8 +32,8 @@ class FtsAbstractionCmd implements Command
 
 	// Retrieve the arguments
 
-	name = argv[1].toString();
-	path = argv[2].toString();
+	name = new String(argv[1].toString());
+	path = new String(argv[2].toString());
 
 	FtsAbstractionTable.add(name, path);
       }

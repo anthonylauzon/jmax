@@ -38,15 +38,15 @@ class ErmesObjNewObjCmd implements Command
 	if (argv.length == 4)
 	  {
 	    //all the modules except the externals and messages
-	    aObject  = pad.AddObjectByName(argv[1].toString(), TclInteger.get(interp, argv[2]),
+	    aObject  = pad.AddObjectByName(new String(argv[1].toString()), TclInteger.get(interp, argv[2]),
 					   TclInteger.get(interp, argv[3]), "");
 	  }
 	else if (argv.length == 5)
 	  {
 	    // externals and messages
 
-	    aObject  = pad.AddObjectByName(argv[1].toString(), TclInteger.get(interp, argv[2]),
-					   TclInteger.get(interp, argv[3]), argv[4].toString());
+	    aObject  = pad.AddObjectByName(new String(argv[1].toString()), TclInteger.get(interp, argv[2]),
+					   TclInteger.get(interp, argv[3]), new String(argv[4].toString()));
 	  }
 
 	if (aObject != null)

@@ -28,7 +28,7 @@ class ErmesPatNewCmd implements Command {
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {  
     if (argv.length > 1)
-      throw new TclException(interp, "wrong # args: should be \"" + argv[0].toString());
+      throw new TclException(interp, "wrong # args: should be \"" + new String(argv[0].toString()));
 
     MaxApplication.getApplication().ObeyCommand(MaxApplication.NEW_COMMAND);
 
