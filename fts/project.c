@@ -48,7 +48,7 @@ fts_open_project(char* filename)
   }
 
   /* make the project the current package context */
-  fts_push_package(fts_project);
+  fts_package_push(fts_project);
 
   return fts_project;
 }
@@ -69,7 +69,7 @@ fts_close_project(void)
   }
 
   /* pop the project of the package context stack */
-  fts_pop_package();
+  fts_package_pop();
   
   delete_fts_package(fts_project);
   fts_project = NULL; 

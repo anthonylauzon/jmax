@@ -76,6 +76,7 @@ struct fts_template
 {
   fts_symbol_t name;
   fts_symbol_t filename;
+  fts_symbol_t original_filename;
   fts_list_t *instances;
 };
 
@@ -93,7 +94,7 @@ static fts_object_t* fts_make_template_instance(fts_template_t *template,
  *
  */
 fts_template_t* 
-fts_new_template(fts_symbol_t name, fts_symbol_t filename)
+fts_new_template(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
   char buf[MAXPATHLEN];
   fts_template_t *template;
@@ -118,6 +119,8 @@ fts_new_template(fts_symbol_t name, fts_symbol_t filename)
 #ifdef TEMPLATE_DEBUG 
   fprintf(stderr, "New template %s, file %s\n", fts_symbol_name(name), fts_symbol_name(filename)); /* @@@ */
 #endif
+
+  template->original_filename = original_filename;
 
   return template;
 }
@@ -332,6 +335,11 @@ fts_template_file_modified(fts_symbol_t filename)
       fts_template_recompute_instances(template);
     }
   }
+}
+
+fts_symbol_t fts_template_get_original_filename( fts_template_t *template)
+{
+  return template->original_filename;
 }
 
 

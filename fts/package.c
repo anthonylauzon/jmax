@@ -28,6 +28,8 @@
 #include <ftsprivate/loader.h>
 #include <ftsprivate/platform.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/saver.h>
 #include <ftsconfig.h>
 #include <stdlib.h> 
 
@@ -46,10 +48,10 @@ static int fts_package_stack_top = 0;
 
 static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 
-static fts_symbol_t fts_s_require = 0;
-static fts_symbol_t fts_s_template_path = 0;
-static fts_symbol_t fts_s_data_path = 0;
-static fts_symbol_t fts_s_package = 0;
+static fts_symbol_t s_require = 0;
+static fts_symbol_t s_template_path = 0;
+static fts_symbol_t s_data_path = 0;
+static fts_symbol_t s_package = 0;
 
 
 static int fts_package_load(fts_package_t* pkg);
@@ -64,7 +66,11 @@ static void __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_
 static void __fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void __fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
+/* Debug code */
+static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
 
 #ifdef WIN32
 #define fts_lib_prefix   ""
@@ -96,23 +102,24 @@ fts_kernel_package_init(void)
   fts_register_package(system_symbol);
   fts_system_package = fts_get_package(system_symbol);
   fts_package_set_state(fts_system_package, fts_package_loaded); /* FIXME: hack [pH07] */
-  fts_push_package(fts_system_package);
+  fts_package_push(fts_system_package);
 
   /* define the package (meta-) class */
-  fts_s_package = fts_new_symbol("package");
-  fts_metaclass_install(fts_s_package, fts_package_instantiate, fts_always_equiv);
+  fts_metaclass_install( fts_s_package, fts_package_instantiate, fts_always_equiv);
 
+  /* Debug code */
+  fts_class_install( fts_new_symbol( "loader"), loader_instantiate);
+
+#if 0
   /******************** FIXME to be removed***********************************/
 
   /* create the package configuration objects */
-  fts_s_require = fts_new_symbol("require");
-  fts_s_template_path = fts_new_symbol("template-path");
-  fts_s_data_path = fts_new_symbol("data-path");
 
   fts_metaclass_install(fts_s_require, fts_require_instantiate, fts_always_equiv);
   fts_metaclass_install(fts_s_template, fts_template_instantiate, fts_always_equiv);
   fts_metaclass_install(fts_s_template_path, fts_template_path_instantiate, fts_always_equiv);
   fts_metaclass_install(fts_s_data_path, fts_data_path_instantiate, fts_always_equiv);
+#endif
 }
 
 /***********************************************
@@ -215,7 +222,7 @@ fts_get_system_package(void)
 }
 
 void 
-fts_push_package(fts_package_t* pkg)
+fts_package_push(fts_package_t* pkg)
 {
   if (fts_package_stack_top < PACKAGE_STACK_SIZE) {
     fts_package_stack[fts_package_stack_top++] = pkg;
@@ -225,7 +232,7 @@ fts_push_package(fts_package_t* pkg)
 }
 
 void 
-fts_pop_package(void)
+fts_package_pop(void)
 {
   if (fts_package_stack_top > 0) {
     fts_package_stack[--fts_package_stack_top] = NULL;
@@ -245,13 +252,28 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, __fts_package_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, __fts_package_delete);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("load"), __fts_package_load);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("require"), __fts_package_require);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("template"), __fts_package_template);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("template-path"), __fts_package_template_path);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("abstraction"), __fts_package_abstraction);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("abstraction-path"), __fts_package_abstraction_path);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("data-path"), __fts_package_data_path);
+  fts_method_define_varargs(cl, 0, fts_s_print, __fts_package_print);
+
+  fts_method_define_varargs(cl, 0, fts_s_load, __fts_package_load);
+  fts_method_define_varargs(cl, 0, fts_s_require, __fts_package_require);
+  fts_method_define_varargs(cl, 0, fts_s_template, __fts_package_template);
+  fts_method_define_varargs(cl, 0, fts_s_template_path, __fts_package_template_path);
+  fts_method_define_varargs(cl, 0, fts_s_abstraction, __fts_package_abstraction);
+  fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
+  fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
+
+  /* All these methods are also defined for SystemInlet, as fts_bmax_save_message
+     allows only messages to SystemInlet... 
+  */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, __fts_package_load);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_require, __fts_package_require);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template, __fts_package_template);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template_path, __fts_package_template_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction, __fts_package_abstraction);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
 
   return fts_Success;
 }
@@ -408,6 +430,152 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }
 }
 
+static int fts_package_save_list_aux( fts_bmax_file_t *f, fts_list_t *list)
+{
+  int r;
+
+  if (!list)
+    return 0;
+
+  r = fts_package_save_list_aux( f, fts_list_next( list));
+
+  fts_bmax_code_push_symbol( f, fts_get_symbol( fts_list_get( list)));
+
+  return r+1;
+}
+
+static void fts_package_save_list( fts_bmax_file_t *f, fts_list_t *list, fts_symbol_t selector)
+{
+  int ac;
+
+  ac = fts_package_save_list_aux( f, list);
+  fts_bmax_code_obj_mess( f, fts_SystemInlet, selector, ac);
+  fts_bmax_code_pop_args( f, ac);
+}
+
+static void fts_package_save_hashtable( fts_bmax_file_t *f, fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
+{
+  fts_iterator_t keys, values;
+
+  fts_hashtable_get_keys( ht, &keys);
+  fts_hashtable_get_values( ht, &values);
+
+  while ( fts_iterator_has_more( &keys))
+    {
+      fts_atom_t a[2];
+
+      fts_iterator_next( &keys, a);
+      fts_iterator_next( &values, a+1);
+
+      if (fun != NULL)
+	(*fun)(a+1);
+
+      fts_bmax_save_message( f, selector, 2, a);
+    }
+}
+
+static void fun_template( fts_atom_t *a)
+{
+  fts_template_t *template = (fts_template_t *)fts_get_ptr( a);
+
+  fts_set_symbol( a, fts_template_get_original_filename( template));
+}
+
+static void fun_abstraction( fts_atom_t *a)
+{
+  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_ptr( a);
+
+  /* Must be done the same way as in templates */
+/*    fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
+}
+
+static void 
+__fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *this = (fts_package_t *)o;
+  fts_bmax_file_t f;
+  fts_atom_t a[1];
+  const char *filename = fts_symbol_name( fts_get_symbol( at));
+
+  if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
+    {
+      post( "Cannot open file %s\n", filename);
+      return;
+    }
+
+  fts_bmax_code_new_object( &f, o, -1);
+
+  fts_package_save_list( &f, this->packages, fts_s_require);
+  fts_package_save_list( &f, this->template_paths, fts_s_template_path);
+  fts_package_save_list( &f, this->abstraction_paths, fts_s_abstraction_path);
+  fts_package_save_list( &f, this->data_paths, fts_s_data_path);
+
+  fts_package_save_hashtable( &f, this->declared_templates, fts_s_template, fun_template);
+  fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
+  fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
+
+  fts_bmax_file_close( &f);
+}
+
+
+static void fts_package_print_list_aux( fts_list_t *list)
+{
+  if (!list)
+    return;
+
+  post( " %s", fts_symbol_name( fts_get_symbol( fts_list_get( list))));
+
+  fts_package_print_list_aux( fts_list_next( list));
+}
+
+static void fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
+{
+  post( "  %s", fts_symbol_name( selector));
+
+  fts_package_print_list_aux( list);
+
+  post( "\n");
+}
+
+static void fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
+{
+  const char *msg = fts_symbol_name( selector);
+  fts_iterator_t keys, values;
+
+  fts_hashtable_get_keys( ht, &keys);
+  fts_hashtable_get_values( ht, &values);
+
+  while ( fts_iterator_has_more( &keys))
+    {
+      fts_atom_t a[2];
+
+      fts_iterator_next( &keys, a);
+      fts_iterator_next( &values, a+1);
+
+      if (fun != NULL)
+	(*fun)(a+1);
+
+      post( "  %s %s %s\n", msg, fts_symbol_name( fts_get_symbol( a)), fts_symbol_name( fts_get_symbol( a+1)));
+    }
+}
+
+static void 
+__fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *this = (fts_package_t *)o;
+
+  post( "package %s:\n", fts_symbol_name( fts_package_get_name( this)));
+
+  fts_package_print_list( this->packages, fts_s_require);
+  fts_package_print_list( this->template_paths, fts_s_template_path);
+  fts_package_print_list( this->abstraction_paths, fts_s_abstraction_path);
+  fts_package_print_list( this->data_paths, fts_s_data_path);
+
+  fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
+  fts_package_print_hashtable( this->declared_abstractions, fts_s_abstraction, fun_abstraction);
+  fts_package_print_hashtable( this->help, fts_s_help, NULL);
+}
+
 /***********************************************
  * 
  *  package object: old methods 
@@ -483,7 +651,7 @@ fts_package_load(fts_package_t* pkg)
   pkg->dir = fts_new_symbol_copy(path);
 
   /* push the current package on the stack */
-  fts_push_package(pkg);
+  fts_package_push(pkg);
   
   /* load the definition patcher */
   sprintf(filename, "%s%c%s.jmax", fts_symbol_name(pkg->dir), fts_file_separator, fts_symbol_name(pkg->name));
@@ -521,7 +689,7 @@ fts_package_load(fts_package_t* pkg)
   }
 
   /* pop the current package of the stack */
-  fts_pop_package();
+  fts_package_pop();
 
   pkg->state = fts_package_loaded;
 
@@ -580,7 +748,7 @@ fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fil
     fprintf(stderr, "after: file=%s\n", buf);
 
     /* Register the template */
-    template = fts_new_template(name, fts_new_symbol_copy(buf));
+    template = fts_new_template(name, fts_new_symbol_copy(buf), file);
 
     /* Create the database if necessary */
     if (pkg->declared_templates == NULL) {
@@ -653,7 +821,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
     }
 
     /* Register the template */
-    t = fts_new_template(name, fts_new_symbol_copy(path));
+    t = fts_new_template(name, fts_new_symbol_copy(path), NULL);
 
     /* Create the database if necessary */
     if (pkg->templates_in_path == NULL) {
@@ -1003,7 +1171,7 @@ fts_template_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       && (ac >= 2) 
       && fts_is_symbol(&at[0])
       && fts_is_symbol(&at[1])) {
-	fts_package_add_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+    fts_package_add_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
   }
 }
 
@@ -1058,3 +1226,42 @@ fts_data_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
   }
 }
+
+
+
+
+/***************************************************
+ *
+ * Debug code to test saving a package
+ *
+ */
+
+static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_atom_t a[1];
+  fts_status_t status;
+
+  /* Load the .jmax file */
+  obj = fts_binary_file_load( fts_symbol_name( fts_get_symbol( at)), (fts_object_t *)fts_get_root_patcher(), 0, a, 0);
+
+  if (!obj)
+    {
+      post( "Load failed\n");
+      return;
+    }
+
+  /* Send a "print" message to the result */
+  if ( (status = fts_message_send( obj, 0, fts_s_print, 0, 0)) != fts_Success)
+    post( "Message send failed (%s)\n", fts_status_get_description(status));
+}
+
+static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof(fts_object_t), 1, 0, 0);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol( "load"), loader_load);
+
+  return fts_Success;
+}
+

@@ -64,17 +64,17 @@ fts_package_t* fts_get_current_package(void);
  * Pushes the package on top of the stack, making it the current
  * package context.
  *
- * @fn void fts_push_package(fts_package_t* pkg)
+ * @fn void fts_package_push(fts_package_t* pkg)
  * @param pkg the package
  * @ingroup package */
-void fts_push_package(fts_package_t* pkg);
+void fts_package_push(fts_package_t* pkg);
 
 /**
  * Removes the current package from the stack.
  *
- * @fn void fts_push_package(fts_package_t* pkg)
+ * @fn void fts_package_pop(void);
  * @ingroup package */
-void fts_pop_package(void);
+void fts_package_pop(void);
 
 /***********************************************
  *

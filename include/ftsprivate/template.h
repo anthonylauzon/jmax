@@ -24,7 +24,7 @@
 #define _FTS_PRIVATE_TEMPLATE_H_
 
 
-extern fts_template_t* fts_new_template(fts_symbol_t name, fts_symbol_t filename);
+extern fts_template_t* fts_new_template(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename);
 extern void fts_template_redefine(fts_template_t *template, fts_symbol_t filename);
 extern fts_symbol_t fts_template_get_filename(fts_template_t *template);
 extern void fts_template_add_instance(fts_template_t *template, fts_object_t *object);
@@ -41,6 +41,6 @@ extern fts_object_t *fts_template_new_search(fts_patcher_t *patcher, int ac, con
 
 extern void fts_template_file_modified(fts_symbol_t filename);
 
-
+extern fts_symbol_t fts_template_get_original_filename( fts_template_t *template);
 
 #endif
