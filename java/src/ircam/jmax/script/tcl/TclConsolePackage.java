@@ -50,6 +50,7 @@ public class TclConsolePackage
     /* open the console */
 
     interp.createCommand("openConsole", new ConsoleOpenCmd());
+    interp.createCommand("initConsole", new ConsoleInitCmd());
   }
 }
 

@@ -60,6 +60,7 @@ public class IndicatorWithMemory extends JPanel {
 
     add( label);
     add( Box.createHorizontalGlue());
+    add( Box.createRigidArea(new Dimension(7,0)));
     add( indicatorLed);
   }
 
@@ -70,7 +71,7 @@ public class IndicatorWithMemory extends JPanel {
     int width = fm.stringWidth( label.getText()) + ldim.width;
     int height = Math.max( fm.getMaxAscent() + fm.getMaxDescent(), ldim.height);
 
-    return new Dimension( width + 2, height + 2);
+    return new Dimension( width + 2 + 7, height + 2);
   }
 
   public Dimension getPreferredSize()

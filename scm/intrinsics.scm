@@ -62,6 +62,7 @@
 (define add-pop-up-add-abbreviation (method "addAbbreviation" "ircam.jmax.editors.patcher.AddPopUp" "java.lang.String" "java.lang.String" "java.lang.String" "boolean"))
 (define add-pop-up-add-abbreviation1 (method "addAbbreviation" "ircam.jmax.editors.patcher.AddPopUp" "java.lang.String" "java.lang.String" "java.lang.String" "java.lang.String" "boolean"))
 (define new-console-window (constructor "ircam.jmax.editors.console.ConsoleWindow"))
+(define init-console-window (method "init" "ircam.jmax.editors.console.ConsoleWindow"))
 (define new-splash-dialog (constructor "ircam.jmax.dialogs.SplashDialog" "java.lang.String" "java.lang.String"))
 (define system-current-time-millis (method "currentTimeMillis" "java.lang.System"))
 (define system-get-properties (method "getProperties" "java.lang.System"))

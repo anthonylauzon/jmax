@@ -123,7 +123,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
-	public void zoomChanged(float zoom)
+	public void zoomChanged(float zoom, float oldZoom)
 	    {
 		repaint();
 		BpfPoint lastPoint = bpfData.getLastPoint();

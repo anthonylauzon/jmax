@@ -37,6 +37,8 @@ typedef struct _ivec_
   int alloc;
   int opened; /* non zero if editor open */
   fts_symbol_t file;
+  int vsize; /* visible points */
+  int vindex; /* first visible point */
 } ivec_t;
 
 extern fts_class_t *ivec_class;

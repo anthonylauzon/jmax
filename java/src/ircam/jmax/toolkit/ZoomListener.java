@@ -30,5 +30,5 @@ package ircam.jmax.toolkit;
  * have a zoomable working area */
 public interface ZoomListener
 {
-  public abstract void zoomChanged(float newZoom);
+  public abstract void zoomChanged(float newZoom, float oldZoom);
 }

@@ -376,6 +376,12 @@
     ())
   ))
 
+(define (init-console-window)
+  ((primitive-static-method
+    <ircam.jmax.editors.console.ConsoleWindow>
+    "init" <void> ())
+  ))
+
 (define (new-splash-dialog a0 a1)
   ((primitive-constructor
     <ircam.jmax.dialogs.SplashDialog>
@@ -471,4 +477,12 @@
     <java.util.Hashtable>
     "put" <java.lang.Object> (<java.lang.Object> <java.lang.Object>))
    a0 a1 a2))
+
+
+
+
+
+
+
+
 

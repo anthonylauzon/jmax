@@ -137,7 +137,7 @@ public class MonoTrackBackground implements Layer, ImageObserver{
     UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
-    	
+
     timeStep = findBestTimeStep(windowTime);
 	
     g.setColor(Color.lightGray);

@@ -28,19 +28,21 @@ public class Geometry
      */
     public void setXZoom(int factor) 
     {
+	float old = xZoomFactor;
 	xZoomFactor = factor/(float)100;
-	notifyZoom(xZoomFactor);
+	notifyZoom(xZoomFactor, old);
     }
     
     public void incrXZoom(int delta) 
     {
+	float old = xZoomFactor;
 	float dlt = (float)delta;
 	if(xZoomFactor < 1) dlt = delta*xZoomFactor;
 
 	xZoomFactor = (xZoomFactor*100+dlt)/(float)100;
 	if(xZoomFactor<0.01) xZoomFactor = (float)0.01;
 	if(xZoomFactor>10) xZoomFactor = (float)10.0;
-	notifyZoom(xZoomFactor);
+	notifyZoom(xZoomFactor, old);
     }
     
     /**
@@ -151,7 +153,7 @@ public class Geometry
 	zoomListeners.removeElement(listener);
     }
     
-    private void notifyZoom(float newZoom)
+    private void notifyZoom(float newZoom, float oldZoom)
     {
 	ZoomListener aListener;
 	
@@ -159,7 +161,7 @@ public class Geometry
 	    {
 		aListener = (ZoomListener) e.nextElement();
 		
-		aListener.zoomChanged(newZoom);
+		aListener.zoomChanged(newZoom, oldZoom);
 	    }
     }
     

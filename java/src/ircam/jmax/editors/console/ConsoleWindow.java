@@ -52,11 +52,12 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
   private ConsoleArea consoleArea;
   private boolean noConsole;
   private ConsoleDocument document;
+  private ControlPanel controlPanel;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-      public String getToolName() { return "Console";}
-      public void open() { consoleWindowSingleInstance.toFront();}
+	    public String getToolName() { return "Console";}
+	    public void open() { consoleWindowSingleInstance.toFront();}
     });
   }
 
@@ -66,6 +67,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
       System.out.println( line);
     else
       consoleWindowSingleInstance.consoleArea.append( line);
+  }
+
+  public static void init()
+  {
+    consoleWindowSingleInstance.getControlPanel().init(MaxApplication.getFts());
   }
 
   public ConsoleWindow()
@@ -104,6 +110,17 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
 
     getContentPane().add( BorderLayout.CENTER, jsp);
 
+
+    JPanel toolbarPanel = new JPanel();
+    toolbarPanel.setLayout(new BorderLayout());
+    toolbarPanel.setPreferredSize(new Dimension(500, 23));
+
+    JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
+    toolbar.setPreferredSize(new Dimension(250, 23));
+    toolbar.add(controlPanel = new ControlPanel(MaxApplication.getFts()));
+    toolbarPanel.add( BorderLayout.NORTH, toolbar);
+    getContentPane().add( BorderLayout.NORTH, toolbarPanel);
+
     setLocation(0,0);
     setSize( 500, 600);
 
@@ -131,6 +148,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
     setJMenuBar( mb);
   }
 
+  public ControlPanel getControlPanel()
+  {
+    return controlPanel;
+  }
+    
   // Methods from interface Editor
   final public Fts getFts()
   {

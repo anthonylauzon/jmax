@@ -44,9 +44,6 @@ public class BpfPopupMenu extends JPopupMenu
   int x;
   int y;
   BpfEditor target = null;    
-  private boolean added = false;
-  JMenu moveMenu;
-  int trackCount = 1;
 
   public BpfPopupMenu(BpfEditor editor)
   {

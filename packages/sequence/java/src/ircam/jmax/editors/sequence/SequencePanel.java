@@ -165,7 +165,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
-	public void zoomChanged(float zoom)
+	public void zoomChanged(float zoom, float oldZoom)
 	    {
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();

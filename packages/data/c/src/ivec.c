@@ -39,7 +39,10 @@ static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_set = 0;
 static fts_symbol_t sym_append = 0;
+static fts_symbol_t sym_set_visibles = 0;
+static fts_symbol_t sym_append_visibles = 0;
 static fts_symbol_t sym_set_size = 0;
+static fts_symbol_t sym_set_visible_size = 0;
 
 /********************************************************
  *
@@ -305,39 +308,114 @@ ivec_write_atom_file(ivec_t *vec, fts_symbol_t file_name)
  *   user methods
  *
  */
-#define IVEC_CLIENT_BLOCK_SIZE 128
+#define IVEC_CLIENT_BLOCK_SIZE 256
 
-static void
-ivec_set_client(ivec_t *ivec)
-{
+/*static void
+  ivec_set_client(ivec_t *ivec, int offset, int size)
+  {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  int n = ivec_get_size(ivec);
+  int vecsize = ivec_get_size(ivec);
+  int n = (offset+size <= vecsize)? size : (vecsize-offset);
+
   int append = 0;
   int current = 0;
 
   while(n > 0)
+  {
+  int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
+  
+  if(!append)
+  fts_set_int(&a[0], n);
+  else
+  fts_set_int(&a[0], current);
+  
+  for(i = 0; i < send; i++)
+  fts_set_int(&a[i+1], ivec->values[current+i]);
+  
+  if(!append)
+  {
+  fts_client_send_message((fts_object_t *)ivec, sym_set, send+1, a);
+  append = 1;
+  }
+  else
+  fts_client_send_message((fts_object_t *)ivec, sym_append, send+1, a);
+  
+  current+=send;
+  n -= send;
+  }
+  }*/
+
+static void
+ivec_send_visibles(ivec_t *ivec)
+{
+  int i;
+  fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
+  int vecsize = ivec_get_size(ivec);
+  int n = (ivec->vindex+ivec->vsize <= vecsize)? (ivec->vindex + ivec->vsize) : vecsize;
+
+  int append = 0;
+  int count = 0; 
+  int send = 0;
+  int current = 0;
+  int vecoffset = 2;
+
+  while(n > 0)
     {
-      int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
-
-      if(!append)
-	fts_set_int(&a[0], n);
-      else
-	fts_set_int(&a[0], current);
-
-      for(i = 0; i < send; i++)
-	  fts_set_int(&a[i+1], ivec->values[current+i]);
-      
       if(!append)
 	{
-	  fts_client_send_message((fts_object_t *)ivec, sym_set, send+1, a);
+	  fts_set_int(&a[0], vecsize);
+	  fts_set_int(&a[1], n);
+	}
+      else
+	{
+	  fts_set_int(&a[0], count);
+	  vecoffset = 1;
+	}
+      send = (n > IVEC_CLIENT_BLOCK_SIZE-vecoffset)? IVEC_CLIENT_BLOCK_SIZE-vecoffset: n;
+
+      for(i = 0; i < send; i++)
+	fts_set_int(&a[i+vecoffset], ivec->values[current+i]);
+
+      if(!append)
+	{
+	  fts_client_send_message((fts_object_t *)ivec, sym_set_visibles, send+2, a);
 	  append = 1;
 	}
       else
-	fts_client_send_message((fts_object_t *)ivec, sym_append, send+1, a);
+	fts_client_send_message((fts_object_t *)ivec, sym_append_visibles, send+1, a);
 
       current+=send;
+      count+=send;
       n -= send;
+    }
+}
+
+static void
+ivec_append_visibles(ivec_t *ivec, int first, int last)
+{
+  int i;
+  fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
+  int vecsize = ivec_get_size(ivec);
+
+  int n = (last-first);
+
+  int append = 0;
+  int current = first;
+
+  while(n > 0)
+    {
+	int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
+
+	fts_set_int(&a[0], current);
+	
+	for(i = 0; i < send; i++)
+	    fts_set_int(&a[i+1], ivec->values[current+i]);
+      
+	fts_client_send_message((fts_object_t *)ivec, sym_append_visibles, send+1, a);
+
+	current+=send;
+	n -= send;
     }
 }
 
@@ -357,6 +435,9 @@ ivec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ivec_t *this = (ivec_t *)o;
 
   ivec_set_const(this, 0);
+
+  if(ivec_editor_is_open(this))
+    ivec_send_visibles(this);
 }
 
 static void
@@ -368,7 +449,7 @@ ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ivec_set_const(this, constant);
 
   if(ivec_editor_is_open(this))
-    ivec_set_client(this);
+    ivec_send_visibles(this);
 }
 
 static void
@@ -381,10 +462,12 @@ ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       int offset = fts_get_number_int(at);
 
       if(offset >= 0 && offset < size)
-	ivec_set_from_atom_list(this, offset, ac - 1, at + 1);
+	  {
+	      ivec_set_from_atom_list(this, offset, ac - 1, at + 1);
   
-      if(ivec_editor_is_open(this))
-	ivec_set_client(this);
+	      if(ivec_editor_is_open(this))
+		  fts_client_send_message((fts_object_t *)this, sym_append_visibles, ac, at);
+	  }
     }
   
 }
@@ -399,7 +482,11 @@ ivec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       int size = fts_get_number_int(at);
       
       if(size >= 0)
-	ivec_set_size(this, size);
+	  {
+	      ivec_set_size(this, size);
+	      if(ivec_editor_is_open(this))
+		  fts_client_send_message((fts_object_t *)this, sym_set_size, ac, at);
+	  }
     }
 }
 
@@ -449,9 +536,9 @@ static void
 ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
+
   ivec_set_editor_open(this);
   fts_client_send_message(o, sym_openEditor, 0, 0);
-  ivec_set_client(this);
 }
 
 static void
@@ -462,6 +549,30 @@ ivec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   ivec_set_editor_close(this);
 }
 
+static void
+ivec_get_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  if(ac > 1 && fts_is_number(at))
+      {
+	  int first =  fts_get_number_int(at);
+	  int last = fts_get_number_int(at+1);
+	  ivec_append_visibles(this, first, last);
+      }
+  else
+      ivec_send_visibles(this);
+}
+
+static void
+ivec_set_visible_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  if(ac > 1 && fts_is_number(at))
+      {
+	  this->vsize = fts_get_number_int(at);
+	  this->vindex = fts_get_number_int(at+1);	  
+      }
+}
 /********************************************************************
  *
  *  system functions
@@ -519,8 +630,9 @@ ivec_save_bmax(ivec_t *vec, fts_bmax_file_t *f)
   int ac = 0;
   int i;
   int offset = 0;
+  int size = ivec_get_size(vec);
 
-  for(i=0; i<vec->size; i++)
+  for(i=0; i<size; i++)
     {
       fts_set_int(&av[ac], vec->values[i]);
 
@@ -567,7 +679,7 @@ ivec_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ivec_t *this = (ivec_t *)o;  
   fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
       
-  /*ivec_save_bmax(this, f);*/
+  ivec_save_bmax(this, f);
 }
 
 static void
@@ -719,10 +831,13 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
 
+      fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
       /* graphical editor */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
 
       /* type outlet */
       fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_type);      
@@ -758,7 +873,12 @@ ivec_config(void)
   sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_set = fts_new_symbol("set");
   sym_append = fts_new_symbol("append");
+
+  sym_set_visibles = fts_new_symbol("setVisibles");
+  sym_append_visibles = fts_new_symbol("appendVisibles");
+
   sym_set_size = fts_new_symbol("setSize");
+  sym_set_visible_size = fts_new_symbol("setVisibleSize");
 
   fts_metaclass_install(ivec_symbol, ivec_instantiate, ivec_equiv);
   ivec_class = fts_class_get_by_name(ivec_symbol);

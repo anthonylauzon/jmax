@@ -44,10 +44,11 @@
 (declare-icon "_slider_"            (string-append jmax-image-root "tool_slider.gif"))
 (declare-icon "_intbox_"            (string-append jmax-image-root "tool_int.gif"))
 (declare-icon "_floatbox_"          (string-append jmax-image-root "tool_float.gif"))
-(declare-icon "_display_"              (string-append jmax-image-root "tool_display.gif"))
+(declare-icon "_display_"           (string-append jmax-image-root "tool_display.gif"))
 (declare-icon "_lock_mode_"         (string-append jmax-image-root "tool_lock_mode.gif"))
 (declare-icon "_edit_mode_"         (string-append jmax-image-root "tool_edit_mode.gif"))
-(declare-icon "_up_"                (string-append jmax-image-root "tool_up.gif"))
+(declare-icon "_dsp_on_"            (string-append jmax-image-root "dsp_on.gif"))
+(declare-icon "_dsp_off_"           (string-append jmax-image-root "dsp_off.gif"))
 
 ;;
 ;; Icons usefull for graphic decorations inside comments

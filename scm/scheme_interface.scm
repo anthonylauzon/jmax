@@ -58,6 +58,7 @@
 (define set-property                 max-application-set-property)
 (define quit                         max-application-quit)
 (define open-console                 new-console-window)
+(define init-console                 init-console-window)
 (define exit                         max-application-quit)
 
 ;;

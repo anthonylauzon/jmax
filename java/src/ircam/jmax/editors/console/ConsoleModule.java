@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.console;
 import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 
 /** The console module; the initModule function is called at init time
  *  by jmax, and install module related things
@@ -34,6 +35,10 @@ public class ConsoleModule
 {
   static public void initModule()
   {    
+    // Install the DspModule remote data
+
+    Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.fts.FtsDspControl.class);
+
     Mda.installDocumentType( new ConsoleDocumentType());
   }
 }

@@ -35,7 +35,7 @@ import java.beans.*;
  * in the Sequence database.
  * The x-coordinates corresponds to time, y and label to pitch, lenght to duration.
  */
-public class BpfAdapter /*implements PropertyChangeListener*/{
+public class BpfAdapter {
   
   /**
    * constructor.

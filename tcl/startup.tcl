@@ -101,4 +101,8 @@ if {[systemProperty "profile"] == "true"} {
     openDefaultAudioOut profile
 } 
 
+# init the console's control panel 
+initConsole
+
+
 

@@ -89,7 +89,7 @@ public class MessageTrackEditor extends MonoTrackEditor
 	validate();
     
 	g.addZoomListener( new ZoomListener() {
-	    public void zoomChanged(float zoom)
+	    public void zoomChanged(float zoom, float oldZoom)
 		{
 		    updateEventsLength();
 		}

@@ -34,7 +34,7 @@ import ircam.jmax.editors.console.*;
  * The "OpenConsole" TCL command in ERMES.
  */
 
-class ConsoleOpenCmd implements Command
+class ConsoleInitCmd implements Command
 {
   /**
    * This procedure is invoked to install the tcl console
@@ -42,7 +42,7 @@ class ConsoleOpenCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-      new ConsoleWindow();
+      ConsoleWindow.init();
   }
 }
 

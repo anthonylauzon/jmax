@@ -275,14 +275,13 @@ public class MaxApplication extends Object
     ircam.jmax.dialogs.DialogsModule.initModule();
 
     // then the builtin editors 
-
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
-    ircam.jmax.editors.control.ControlModule.initModule();
+    ircam.jmax.editors.control.ControlModule.initModule();    
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer
-    
+
     try
 	{
 	    itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
@@ -295,7 +294,7 @@ public class MaxApplication extends Object
     // Splash screen moved to a tcl command
     
     //if there were no connection statements in startup.tcl, ask the user
-    
+
     if (fts == null)
       {
 	System.err.println("No Fts Server Specified");
