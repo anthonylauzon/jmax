@@ -1,33 +1,34 @@
 /*
- * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * jmax
+ * copyright (c) 1994, 1995, 1998, 1999 by ircam-centre georges pompidou, paris, france.
  * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * this program is free software; you can redistribute it and/or
+ * modify it under the terms of the gnu general public license
+ * as published by the free software foundation; either version 2
+ * of the license, or (at your option) any later version.
  * 
- * See file LICENSE for further informations on licensing terms.
+ * see file license for further informations on licensing terms.
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * this program is distributed in the hope that it will be useful,
+ * but without any warranty; without even the implied warranty of
+ * merchantability or fitness for a particular purpose.  see the
+ * gnu general public license for more details.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * you should have received a copy of the gnu general public license
+ * along with this program; if not, write to the free software
+ * foundation, inc., 59 temple place - suite 330, boston, ma  02111-1307, usa.
  * 
- * Based on Max/ISPW by Miller Puckette.
+ * based on max/ispw by miller puckette.
  *
  */
 
 /*
- * This file's authors: Francois Dechelle.
+ * this file's authors: francois dechelle.
  */
 
 
 #include <math.h>
+#include <string.h>
 
 #include <fts/fts.h>
 #include "dtddefs.h"
@@ -36,7 +37,6 @@
 
 static fts_symbol_t s_open;
 static fts_symbol_t s_close;
-static fts_symbol_t s_play;
 static fts_symbol_t s_pause;
 static fts_symbol_t s_record;
 
@@ -65,24 +65,38 @@ typedef struct {
   fts_alarm_t eof_alarm;
   int can_post_data_late;
   fts_alarm_t post_data_late_alarm;
+  char *filename;
 } readsf_t;
 
 static fts_symbol_t readsf_dsp_function;
 
-static void readsf_open_realize( readsf_t *this, const char *filename)
+static void readsf_do_open( readsf_t *this, const char *filename)
 {
-  this->fifo = dtdserver_open_read( this->server, filename, this->n_channels);
+  if (filename)
+    {
+      if (this->filename)
+	fts_free( this->filename);
+
+      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+    }
+  else if (!this->filename)
+    {
+      post( "readsf~: error: no file name specified\n");
+      return;
+    }
+
+  this->fifo = dtdserver_open_read( this->server, this->filename, this->n_channels);
 
   if ( !this->fifo)
     {
-      post( "readsf~: error: cannot allocate fifo for DTD server\n");
+      post( "readsf~: error: cannot allocate fifo for dtd server\n");
       return;
     }
 
   this->state = readsf_opened;
 }
 
-static void readsf_close_realize( readsf_t *this)
+static void readsf_do_close( readsf_t *this)
 {
   if (this->fifo)
     {
@@ -98,12 +112,12 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   switch( this->state) {
   case readsf_closed:
     if (message == s_open)
-      readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
-    else if (message == s_close)
+      readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
+    else if (message == fts_s_stop)
       {
       }
-    else if (message == s_play)
-      post( "readsf~: error: no file opened\n");
+    else if (message == fts_s_start)
+      readsf_do_open( this, 0);
     else if (message == s_pause)
       post( "readsf~: error: not playing\n");
     break;
@@ -111,12 +125,12 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   case readsf_opened:
     if (message == s_open)
       {
-	readsf_close_realize( this);
-	readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	readsf_do_close( this);
+	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
-    else if (message == s_close)
-      readsf_close_realize( this);
-    else if (message == s_play)
+    else if (message == fts_s_stop)
+      readsf_do_close( this);
+    else if (message == fts_s_start)
       this->state = readsf_pending;
     else if (message == s_pause)
       post( "readsf~: error: not playing\n");
@@ -125,12 +139,12 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   case readsf_pending:
     if (message == s_open)
       {
-	readsf_close_realize( this);
-	readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	readsf_do_close( this);
+	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
-    else if (message == s_close)
-      readsf_close_realize( this);
-    else if (message == s_play)
+    else if (message == fts_s_stop)
+      readsf_do_close( this);
+    else if (message == fts_s_start) 
       {
       }
     else if (message == s_pause)
@@ -141,12 +155,12 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   case readsf_playing:
     if (message == s_open)
       {
-	readsf_close_realize( this);
-	readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	readsf_do_close( this);
+	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
-    else if (message == s_close)
-      readsf_close_realize( this);
-    else if (message == s_play)
+    else if (message == fts_s_stop)
+      readsf_do_close( this);
+    else if (message == fts_s_start)
       {
       }
     else if (message == s_pause)
@@ -158,12 +172,12 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   case readsf_paused:
     if (message == s_open)
       {
-	readsf_close_realize( this);
-	readsf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	readsf_do_close( this);
+	readsf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
-    else if (message == s_close)
-      readsf_close_realize( this);
-    else if (message == s_play)
+    else if (message == fts_s_stop)
+      readsf_do_close( this);
+    else if (message == fts_s_start)
       this->state = readsf_playing;
     else if (message == s_pause)
       {
@@ -195,11 +209,30 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t *this = (readsf_t *)o;
   int n_channels;
+  char *filename;
 
   n_channels = fts_get_long_arg(ac, at, 1, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 2, dtdserver_get_default_instance());
+  if ( ac == 3)
+    {
+      if (fts_is_symbol( at+2))
+	{
+	  filename = fts_symbol_name( fts_get_symbol( at+2));
+	  this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+	}
+      if (fts_is_ptr( at+2))
+	this->server = (dtdserver_t *)fts_get_ptr( at+2);
+    }
+  if ( ac == 4)
+    {
+      filename = fts_symbol_name( fts_get_symbol( at+2));
+      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+      this->server = (dtdserver_t *)fts_get_ptr( at+3);
+    }
+
+  if (!this->server)
+    this->server = dtdserver_get_default_instance();
 
   dtdserver_add_object( this->server, this);
 
@@ -317,7 +350,7 @@ static void readsf_dsp( fts_word_t *argv)
 	  }
 	else if ( this->can_post_data_late)
 	  {
-	    post( "Warning: readsf~ data late\n");
+	    post( "warning: readsf~ data late\n");
 
 	    this->can_post_data_late = 0;
 
@@ -351,14 +384,14 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   readsf_state_machine( (readsf_t *)o, s_open, ac, at);
 }
 
-static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  readsf_state_machine( (readsf_t *)o, s_close, ac, at);
+  readsf_state_machine( (readsf_t *)o, fts_s_start, ac, at);
 }
 
-static void readsf_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  readsf_state_machine( (readsf_t *)o, s_play, ac, at);
+  readsf_state_machine( (readsf_t *)o, fts_s_stop, ac, at);
 }
 
 static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -373,9 +406,9 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   n = fts_get_int_arg( ac, at, 0, 0);
 
   if ( n == 1)
-    readsf_state_machine( (readsf_t *)o, s_play, ac, at);
+    readsf_state_machine( (readsf_t *)o, fts_s_start, ac, at);
   else if ( n == 0)
-    readsf_state_machine( (readsf_t *)o, s_close, ac, at);
+    readsf_state_machine( (readsf_t *)o, fts_s_stop, ac, at);
 }
 
 static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -406,13 +439,13 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   a[2] = fts_t_symbol;
   fts_method_define_optargs(cl, 0, fts_new_symbol("open"),  readsf_open, 3, a, 0);
 
-  fts_method_define( cl, 0, fts_new_symbol("play"), readsf_play, 0, 0);
-  fts_method_define( cl, 0, fts_new_symbol("start"), readsf_play, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("start"), readsf_start, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("play"), readsf_start, 0, 0);
 
   fts_method_define( cl, 0, fts_new_symbol("pause"), readsf_pause, 0, 0);
 
-  fts_method_define( cl, 0, fts_new_symbol("close"), readsf_close, 0, 0);
-  fts_method_define( cl, 0, fts_new_symbol("stop"), readsf_close, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("stop"), readsf_stop, 0, 0);
+  fts_method_define( cl, 0, fts_new_symbol("close"), readsf_stop, 0, 0);
 
   a[0] = fts_t_int;
   fts_method_define( cl, 0, fts_s_int, readsf_number, 1, a);
@@ -451,14 +484,28 @@ typedef struct {
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
   fts_alarm_t post_fifo_overflow_alarm;
+  char *filename;
 } writesf_t;
 
 static fts_symbol_t writesf_dsp_function;
 
 
-static void writesf_open_realize( writesf_t *this, const char *filename)
+static void writesf_do_open( writesf_t *this, const char *filename)
 {
-  this->fifo = dtdserver_open_write( this->server, filename, this->n_channels);
+  if (filename)
+    {
+      if (this->filename)
+	fts_free( this->filename);
+
+      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+    }
+  else if (!this->filename)
+    {
+      post( "writesf~: error: no file name specified\n");
+      return;
+    }
+
+  this->fifo = dtdserver_open_write( this->server, this->filename, this->n_channels);
 
   if ( !this->fifo)
     {
@@ -469,7 +516,7 @@ static void writesf_open_realize( writesf_t *this, const char *filename)
   this->state = writesf_opened;
 }
 
-static void writesf_close_realize( writesf_t *this)
+static void writesf_do_close( writesf_t *this)
 {
   if (this->fifo)
     {
@@ -485,11 +532,12 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   switch( this->state) {
   case writesf_closed:
     if (message == s_open)
-      writesf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+      writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
     else if (message == s_close)
-      writesf_close_realize( this);
+      {
+      }
     else if (message == s_record)
-      post( "writesf~: error: no file opened\n");
+      writesf_do_open( this, 0);
     else if (message == s_pause)
       post( "writesf~: error: not recording\n");
     break;
@@ -497,11 +545,11 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   case writesf_opened:
     if (message == s_open)
       {
-	writesf_close_realize( this);
-	writesf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_close( this);
+	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
     else if (message == s_close)
-      writesf_close_realize( this);
+      writesf_do_close( this);
     else if (message == s_record)
       this->state = writesf_recording;
     else if (message == s_pause)
@@ -511,11 +559,11 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   case writesf_recording:
     if (message == s_open)
       {
-	writesf_close_realize( this);
-	writesf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_close( this);
+	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
     else if (message == s_close)
-      writesf_close_realize( this);
+      writesf_do_close( this);
     else if (message == s_record)
       {
       }
@@ -528,11 +576,11 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   case writesf_paused:
     if (message == s_open)
       {
-	writesf_close_realize( this);
-	writesf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
+	writesf_do_close( this);
+	writesf_do_open( this, fts_symbol_name( fts_get_symbol( at)));
       }
     else if (message == s_close)
-      writesf_close_realize( this);
+      writesf_do_close( this);
     else if (message == s_record)
       this->state = writesf_recording;
     else if (message == s_pause)
@@ -755,13 +803,10 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 void dtdobjs_init( void)
 {
   fts_metaclass_install(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
-#if 0
   fts_metaclass_install(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
-#endif
 
   s_open = fts_new_symbol( "open");
   s_close = fts_new_symbol( "close");
-  s_play = fts_new_symbol( "play");
   s_record = fts_new_symbol( "record");
   s_pause = fts_new_symbol( "pause");
 }

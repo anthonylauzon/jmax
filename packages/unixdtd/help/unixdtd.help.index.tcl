@@ -1,4 +1,4 @@
-helpPatch readsf~ $dir/sf~.help.jmax
-helpPatch writesf~ $dir/sf~.help.jmax
+helpPatch readsf~ $dir/readsf~.help.jmax
+helpPatch writesf~ $dir/writesf~.help.jmax
 
-helpSummary "direct-to-disk" $dir/unixdtd.summary.jmax
+helpSummary "Direct-To-Disk" $dir/unixdtd.summary.jmax

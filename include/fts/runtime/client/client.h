@@ -27,7 +27,7 @@
 #ifndef _FTS_CLIENT_H_
 #define _FTS_CLIENT_H_
 
-#include <fts/runtime/devices.h>
+#include <fts/runtime/devices/devices.h>
 
 /* The function that is called by the scheduler */
 extern void fts_client_poll( void);

@@ -50,7 +50,7 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.package
 all: $(LIBDIR) $(OBJDIR) $(BINDIR) $(PACKAGELIB) $(DTD_BIN)
 
 $(DTD_BIN): $(SERVER_OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(FTS_LIB) -laudiofile
+	$(CC) $(CFLAGS) -o $@ $^ $(FTS_LIB) $(FTS_SYS_LIBS)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)

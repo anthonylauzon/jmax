@@ -29,13 +29,13 @@
 
 extern void dac_config(void);
 extern void adc_config(void);
-extern void dac_doctor_init(void);
 
 static void ispw_io_module_init(void)
 {
-  dac_config();
+  dac_tilda_config();
+#if 0
   adc_config();
-  dac_doctor_init();
+#endif
 }
 
 fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};

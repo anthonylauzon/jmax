@@ -47,8 +47,7 @@
 
 #include <fts/sys.h>
 #include <fts/lang.h>
-#include <fts/runtime/files.h>
-#include <fts/runtime/devices/devices.h>
+#include <fts/runtime.h>
 
 /* forward declarations */
 

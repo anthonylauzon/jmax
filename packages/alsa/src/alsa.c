@@ -20,18 +20,25 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Author: Guenter Geiger (geiger@epy.co.at), François Déchelle (dechelle@ircam.fr)
  *
  */
 
-#ifndef _RUNTIME_CLIENT_H_
-#define _RUNTIME_CLIENT_H_
+#include <fts/fts.h>
 
-#include <fts/runtime/client/protocol.h>
-#include <fts/runtime/client/client.h>
-#include <fts/runtime/client/incoming.h>
-#include <fts/runtime/client/outgoing.h>
-#include <fts/runtime/client/updates.h>
-#include <fts/runtime/client/protcodec.h>
+/******************************************************************************/
+/*                                                                            */
+/* Module declaration                                                         */
+/*                                                                            */
+/******************************************************************************/
 
-#endif
+static void alsa_init(void);
+
+fts_module_t alsa_module = { "alsa", "ALSA objects", alsa_init, 0, 0};
+
+extern void alsaaudioport_config( void);
+
+static void alsa_init(void)
+{
+  alsaaudioport_config();
+}

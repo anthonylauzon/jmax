@@ -39,9 +39,9 @@ enum parser_status
 
 enum parser_mtc_status
 {
-  mtc_invalid, 
-  mtc_valid, 
-  mtc_coming
+  mtc_status_invalid, 
+  mtc_status_valid, 
+  mtc_status_coming
 };
 
 enum channel_message 

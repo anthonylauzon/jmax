@@ -149,7 +149,7 @@ graph_iterator_step( graph_iterator_t *iter)
       fts_set_fun(a + 0, (fts_fun_t)graph_iterator_push);
       fts_set_ptr(a + 1, iter);
       fts_set_int(a + 2, iter->top->connection->winlet);
-      stat = fts_message_send(dest, fts_SystemInlet, fts_s_propagate_input, 2, a);
+      stat = fts_message_send(dest, fts_SystemInlet, fts_s_propagate_input, 3, a);
 
       if(stat == fts_Success)
 	{

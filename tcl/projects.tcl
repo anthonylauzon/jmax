@@ -94,7 +94,13 @@ proc jmaxGetAudioBuffer {} {
   return $JmaxAudioBuffer
 }
 
+proc defaultAudio { audioPortName args } {
+  eval [ concat "ucs" "default" "audio" $audioPortName $args ]
+}
 
+proc defaultMidi { midiPortName args } {
+  eval [ concat "ucs" "default" "audio" $midiPortName $args ]
+}
 
 
 

@@ -398,7 +398,6 @@ midishareport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_
 
   fts_set_object(value, o);
 }
-
 /************************************************************
  *
  *  default port

@@ -38,8 +38,8 @@ extern dtdserver_t *dtdserver_get_default_instance( void);
 extern void dtdserver_add_object( dtdserver_t *server, void *object);
 extern void dtdserver_remove_object( dtdserver_t *server, void *object);
 
-extern dtdfifo_t *dtdserver_read( dtdserver_t *server, const char *filename, int n_channels);
-extern dtdfifo_t *dtdserver_write( dtdserver_t *server, const char *filename, int n_channels);
+extern dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n_channels);
+extern dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int n_channels);
 
 extern void dtdserver_close( dtdserver_t *server, dtdfifo_t *fifo);
 

@@ -29,21 +29,18 @@
 
 typedef struct _fts_dsp_signal_
 {
-  int id;
   fts_symbol_t name;
   int refcnt;
   int length;
   float srate;
 } fts_dsp_signal_t;
 
-extern fts_dsp_signal_t * Sig_new(int vectorSize, float sampleRate);
-extern void Sig_free(fts_dsp_signal_t *s);
-extern void Sig_unreference(fts_dsp_signal_t *s);
-extern void Sig_reference(fts_dsp_signal_t *s);
-extern fts_dsp_signal_t * Sig_getById(int id);
-extern void Sig_print(fts_dsp_signal_t *s);
-extern void Sig_setup(int vectorSize);
-extern int Sig_getCount(void);
-extern int Sig_check(void);
+extern fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate);
+extern void fts_dsp_signal_free( fts_dsp_signal_t *sig);
+extern int fts_dsp_signal_is_pending( fts_dsp_signal_t *sig);
+extern void fts_dsp_signal_unreference(fts_dsp_signal_t *sig);
+extern void fts_dsp_signal_reference(fts_dsp_signal_t *sig);
+extern void fts_dsp_signal_print(fts_dsp_signal_t *sig);
+extern void fts_dsp_signal_init( void);
 
 #endif

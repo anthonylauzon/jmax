@@ -43,6 +43,9 @@
 #include "ucs.h"
 #include "messtile.h"
 
+extern fts_module_t fts_files_module;
+extern fts_module_t fts_audio_module;
+
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
 
@@ -224,6 +227,7 @@ static void  fts_assign_boot_devices(int argc, char **argv)
      will prevent fts taking 100% CPU time by running
      unsyncronized */
 
+#if 0
   {
     fts_atom_t ld_argv[1];
 
@@ -238,4 +242,5 @@ static void  fts_assign_boot_devices(int argc, char **argv)
 
     fts_audio_set_pending_close();
   }
+#endif
 }

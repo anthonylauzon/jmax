@@ -25,6 +25,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
@@ -34,15 +35,7 @@
 #include "gphiter.h"
 #include "sigconn.h"
 
-#include <fts/runtime/files.h>
-#include <fts/runtime/sched.h>
-#include <fts/runtime/time.h>
-
-extern void fts_audio_add_unused_zero_fun(void);
-extern void fts_audio_activate_devices(void);
-extern void fts_audio_deactivate_devices(void);
-extern void fts_audio_add_all_zero_fun(void);
-extern double fts_sched_get_tick_duration(void);
+#include <fts/runtime.h>
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -65,17 +58,17 @@ static double dsp_tick_clock = 0;
 static fts_heap_t *dsp_graph_heap;
 static fts_heap_t *dsp_descr_heap;
 
-/* For switch hack, this variable is temporaly made global */
-ftl_program_t *dsp_chain_on = 0;
-static ftl_program_t *dsp_chain_off = 0;
 static ftl_program_t *dsp_chain = 0;
+
+static int dsp_is_running = 0;
 
 static fts_dsp_signal_t *sig_zero;
 
 static int verbose = 0;
-static int depth = 0;
 
 static fts_signal_connection_table_t signal_connection_table;
+
+static fts_symbol_t sym_builtin_add;
 
 /******************************************************************************
  *
@@ -96,7 +89,6 @@ struct _dsp_node_ {
 #define IS_SCHEDULED( node)  ( (node)->pred_cnt == SCHEDULED)
 
 static dsp_node_t *dsp_graph = 0;
-static dsp_node_t *dsp_prolog = 0;
 
 typedef void (*edge_fun_t)(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, fts_dsp_signal_t *sig); 
 
@@ -268,7 +260,7 @@ dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 	  invs = (*iop)->length;
 	else if (invs != (*iop)->length)
 	  {
-	    post("DSP [%d] inputs don't match for object ", depth);
+	    post("DSP: inputs don't match for object ");
 	    post_object( o);
 	    post("\n");
 	    return 0;
@@ -303,7 +295,7 @@ dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 
   /* note that output signals are assigned only when the output have at least one connection to a dsp object */
   for (i=0, iop=descr->out; i< descr->noutputs; i++, iop++)
-    *iop = Sig_new(size, sr);
+    *iop = fts_dsp_signal_new(size, sr);
 
   sig_zero->length = invs;
   sig_zero->srate = sr;
@@ -337,7 +329,7 @@ dsp_object_schedule(dsp_node_t *node)
     if (*sig)
       {
 	if (*sig != sig_zero)
-	  Sig_unreference(*sig);
+	  fts_dsp_signal_unreference(*sig);
       }
     else
       *sig = sig_zero;
@@ -351,7 +343,7 @@ dsp_object_schedule(dsp_node_t *node)
     {
       if(verbose)
 	{
-	  post( "DSP [%d] scheduling ", depth);
+	  post( "DSP: scheduling ");
 	  post_object( node->o);
 	  post( "%s->%s\n", inputs_name( node->descr), outputs_name( node->descr));
 	}
@@ -369,7 +361,7 @@ dsp_object_schedule(dsp_node_t *node)
       {
 	ftl_instruction_info_t *info;
 
-	info = ftl_program_get_current_instruction_info( dsp_chain_on);
+	info = ftl_program_get_current_instruction_info( dsp_chain);
 	if (info)
 	  {
 	      int i;
@@ -397,8 +389,10 @@ dsp_object_schedule(dsp_node_t *node)
      */
   for (i = 0, sig = node->descr->out; i < node->descr->noutputs; i++, sig++)
     {
-      if(*sig && (*sig)->refcnt == 0 && *sig != sig_zero)
-	Sig_free( *sig);
+      if(*sig && fts_dsp_signal_is_pending( *sig))
+	{
+	  fts_dsp_signal_free( *sig);
+	}
     }
 
   if (node->descr->ninputs)
@@ -537,40 +531,44 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
       int nin;
       fts_dsp_signal_t *previous_sig;
 
-#if 0
-      if (! dest->descr->in)
-	dest->descr->in = (fts_dsp_signal_t **)fts_block_zalloc(sizeof(fts_dsp_signal_t *) * ninputs);
-#else
       if (! dest->descr->in)
 	{
 	  /* (fd) to avoid writing past the end of the dsp_descr... */
 	  dest->descr->in = (fts_dsp_signal_t **)fts_block_zalloc(sizeof(fts_dsp_signal_t *) * fts_object_get_inlets_number(dest->o));
 	}
-#endif
 
       nin = dsp_input_get(dest->o, winlet);
 
-#if 0
-      if (nin >= ninputs)
-	{
-	  return;
-	}
-#endif
-
       previous_sig = dest->descr->in[nin];
-      if ((! previous_sig) || (previous_sig == sig_zero))
+
+      if ( previous_sig && previous_sig != sig_zero /*&& fts_dsp_is_order_forced( dest->o)*/)
 	{
-	  if (sig)
-	    Sig_reference(sig);
-	  dest->descr->in[nin] = sig;
+	  fts_atom_t argv[4];
+	  fts_dsp_signal_t *new_sig;
+
+	  fts_dsp_signal_unreference( previous_sig);
+	  fts_dsp_signal_reference( sig);
+
+	  /* Should verify that inputs length match */
+	  new_sig = fts_dsp_signal_new( sig->length, sig->srate);
+
+	  fts_set_symbol(argv + 0, previous_sig->name);
+	  fts_set_symbol(argv + 1, sig->name);
+	  fts_set_symbol(argv + 2, new_sig->name);
+	  fts_set_int(argv + 3, new_sig->length);
+
+	  dsp_add_funcall( sym_builtin_add, 4, argv);
+
+	  fts_dsp_signal_unreference( sig);
+	  fts_dsp_signal_reference( new_sig);
+
+	  dest->descr->in[nin] = new_sig;
 	}
       else
 	{
-#if DSP_MULTIPLE_CONN_WARN
-	  post("Multiple signal connections between outlet %d of object %s and inlet %d of object %s (connection ignored)\n",
-		woutlet, fts_symbol_name(fts_object_get_class_name(src->o)),
-		winlet, fts_symbol_name(fts_object_get_class_name(dest->o)));
-#endif
+	  if (sig)
+	    fts_dsp_signal_reference(sig);
+	  dest->descr->in[nin] = sig;
 	}
     }
 }
@@ -585,9 +583,7 @@ dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, f
     {
       dsp_object_schedule( dest);
       
-      depth++;
       dsp_succ_realize( dest, dsp_schedule_depth, fts_c_signal);
-      depth--;
 
       fts_message_send( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
     }
@@ -607,7 +603,15 @@ static void dsp_graph_reinit( dsp_node_t *graph)
     node->pred_cnt = 0;
 }
 
-static void dsp_pred_count( dsp_node_t *graph)
+static void dsp_graph_send_message( dsp_node_t *graph, fts_symbol_t message)
+{
+  dsp_node_t *node;
+
+  for( node = graph; node; node = node->next)
+    fts_message_send( node->o, fts_SystemInlet, message, 0, 0);
+}
+
+static void dsp_graph_count_predecessors( dsp_node_t *graph)
 {
   dsp_node_t *node;
 
@@ -615,39 +619,9 @@ static void dsp_pred_count( dsp_node_t *graph)
     dsp_succ_realize( node, inc, 0);
 }
 
-static void dsp_chain_create_start(int vs)
-{
-  float sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)vs / fts_get_tick_size();
-
-  /* ask ftl to start memory relocation */
-  ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
-
-  /* ask to  zero the dsp timers next dsp_chain_poll cycle */
-  please_zero_dsp_time = 1;
-
-  if ( !dsp_chain_on)
-    dsp_chain_on = ftl_program_new();
-  else
-    ftl_program_init( dsp_chain_on);
-
-  ftl_program_set_current_subroutine( dsp_chain_on, ftl_program_add_main( dsp_chain_on));
-
-  Sig_setup(vs);
-
-  sig_zero = Sig_new(fts_get_tick_size(), sr);
-
-  dsp_graph_reinit( dsp_prolog);
-  dsp_graph_reinit( dsp_graph);
-
-  dsp_pred_count( dsp_prolog);
-  dsp_pred_count( dsp_graph);
-}
-
 static void dsp_graph_schedule( dsp_node_t *graph)
 {
   dsp_node_t *node;
-
-  depth = 0;
 
   /* schedule all nodes without predecessors */
   for( node = graph; node; node = node->next)
@@ -668,122 +642,71 @@ static void dsp_graph_check_loop( dsp_node_t *graph)
       }
 }
 
-static void dsp_chain_create_end( void)
+void dsp_chain_create(int vs)
 {
-  ftl_program_add_return( dsp_chain_on);
+  if (dsp_is_running)
+    dsp_chain_delete();
+
+  /* ask ftl to start memory relocation */
+  ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
+
+  /* ask to  zero the dsp timers next dsp_chain_poll cycle */
+  please_zero_dsp_time = 1;
+
+  ftl_program_init( dsp_chain);
+  ftl_program_set_current_subroutine( dsp_chain, ftl_program_add_main( dsp_chain));
+
+  fts_dsp_signal_init();
+
+  sig_zero = fts_dsp_signal_new( fts_get_tick_size(), fts_get_sample_rate());
+  fts_dsp_signal_reference( sig_zero);
+
+  dsp_graph_reinit( dsp_graph);
+
+  dsp_graph_send_message( dsp_graph, fts_s_put_prologue);
+
+  dsp_graph_count_predecessors( dsp_graph);
+
+  dsp_graph_schedule(dsp_graph);
+
+  dsp_graph_check_loop(dsp_graph);
+
+  dsp_graph_send_message( dsp_graph, fts_s_put_epilogue);
 
   ftl_mem_end_memory_relocation();
   
-  ftl_program_compile(dsp_chain_on);
+  ftl_program_add_return( dsp_chain);
+  ftl_program_compile(dsp_chain);
 
-  dsp_chain = dsp_chain_on;
-
-  fts_audio_activate_devices();
-}
-
-void dsp_chain_create(int vs)
-{
-  if (dsp_is_running())
-    {
-      post( "DSP is running, cannot create DSP chain\n");
-      return;
-    }
-
-  dsp_chain_create_start(vs);
-
-  dsp_graph_schedule(dsp_prolog);
-  dsp_graph_schedule(dsp_graph);
-
-  /* Add a dac syncronization/zero call for each out device not used by an object */
-  fts_audio_add_unused_zero_fun();
-
-  /* Looks for loop */
-  dsp_graph_check_loop(dsp_prolog);
-  dsp_graph_check_loop(dsp_graph);
-
-  dsp_chain_create_end();
+  dsp_is_running = 1;
 }
 
 void dsp_chain_delete(void)
 {
-  if ( !dsp_is_running())
+  if (!dsp_is_running)
     return;
+
+  dsp_is_running = 0;
   
-  if ( dsp_chain_on)
-    ftl_program_destroy( dsp_chain_on);
-
-  dsp_chain = dsp_chain_off;
-
-  fts_audio_deactivate_devices();
+  ftl_program_destroy( dsp_chain);
 
   fts_signal_connection_remove_all(&signal_connection_table);
 }
 
-/* DSP ON parameter listener */
-static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
-{
-  if (fts_is_int(value))
-    {
-      int on;
-      on = fts_get_int(value);
-
-      if (on)
-	dsp_chain_create(fts_get_tick_size());
-      else
-	dsp_chain_delete();
-    }
-}
-
-
-fts_object_t *dsp_get_current_object()
-{
-  if (dsp_chain_on)
-    return ftl_program_get_current_object(dsp_chain_on);
-  else
-    return 0;
-}
-
-/* exported, must be redone each time a new out device is installed */
-void dsp_make_dsp_off_chain(void)
-{
-  int vs = fts_get_tick_size();
-  float sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)vs / fts_get_tick_size();
-  ftl_program_t *tmp;
-
-  if (dsp_chain_off)
-    {
-      /* delete the old off dsp chain */
-
-      ftl_program_destroy( dsp_chain_off);
-    }
-
-  tmp = dsp_chain_on;
-
-  dsp_chain_on = ftl_program_new();
-
-  ftl_program_set_current_subroutine( dsp_chain_on, ftl_program_add_main( dsp_chain_on));
-
-  Sig_setup(fts_get_tick_size());
-
-  sig_zero = Sig_new(vs, sr);
-
-  /* add the zero calls for all the installed out device */
-  fts_audio_add_all_zero_fun();
-  ftl_program_add_return( dsp_chain_on);
-  ftl_program_compile(dsp_chain_on);
-
-  dsp_chain_off = dsp_chain_on;
-  dsp_chain_on = tmp;
-  dsp_chain = dsp_chain_off;
-}
-
-
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
 /* DSP API functions                                                           */
-/* Most are just wrapper around FTL API, to keep dsp_chain_on local            */
+/* Most are just wrapper around FTL API, to keep dsp_chain local               */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
+
+fts_object_t *dsp_get_current_object()
+{
+  if (dsp_chain)
+    return ftl_program_get_current_object(dsp_chain);
+  else
+    return 0;
+}
 
 void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
 {
@@ -866,48 +789,14 @@ void fts_dsp_remove_object(fts_object_t *o)
   dsp_graph_remove_object(&dsp_graph, o);
 }
 
-void fts_dsp_add_object_to_prolog(fts_object_t *o)
-{
-  dsp_graph_add_object(&dsp_prolog, o);
-}
-
-void fts_dsp_remove_object_from_prolog(fts_object_t *o)
-{
-  dsp_graph_remove_object(&dsp_prolog, o);
-}
-
 void fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 {
-  ftl_program_add_call(dsp_chain_on, symb, ac, av);
-}
-
-fts_dsp_signal_t *fts_dsp_get_privat_signal(int vs)
-{
-  float sr = fts_get_sample_rate() * (double)vs / fts_get_tick_size();
-  fts_dsp_signal_t *signal = Sig_new(vs, sr);
-  
-  /* make sure that nobody else uses it */
-  Sig_reference(signal);
-  
-  return signal;
-}
-
-void fts_dsp_release_privat_signal(fts_dsp_signal_t *signal)
-{
-  Sig_unreference(signal);
-}
-
-void fts_dsp_set_output(fts_dsp_descr_t *descr, int out, fts_dsp_signal_t *sig)
-{
-  if(descr->out[out])
-    Sig_free(descr->out[out]);
-
-  descr->out[out] = sig;
+  ftl_program_add_call(dsp_chain, symb, ac, av);
 }
 
 void dsp_add_signal(fts_symbol_t name, int vs)
 {
-  ftl_program_add_signal(dsp_chain_on, name, vs);
+  ftl_program_add_signal(dsp_chain, name, vs);
 }
 
 void dsp_chain_post(void)
@@ -934,9 +823,9 @@ void dsp_chain_fprint_signals(FILE *f)
   ftl_program_fprint_signals_count(f, dsp_chain);
 }
 
-int dsp_is_running( void)
+int fts_dsp_is_running( void)
 {
-  return dsp_chain == dsp_chain_on;
+  return dsp_is_running;
 }
 
 ftl_program_t *dsp_get_current_dsp_chain( void)
@@ -948,6 +837,12 @@ int fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
   return fts_method_exists(fts_object_get_class(o), num, fts_s_sig);
 }
+
+int fts_dsp_is_input_null( fts_dsp_descr_t *descr, int in)
+{
+  return descr->in[in] == sig_zero;
+}
+
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -970,7 +865,7 @@ void dsp_install_clocks(void)
 
 void fts_dsp_chain_poll( void)
 {
-  if (dsp_chain == dsp_chain_on)
+  if (dsp_is_running)
     {
       if (please_zero_dsp_time)
 	{
@@ -987,9 +882,11 @@ void fts_dsp_chain_poll( void)
 	  dsp_tick_clock += (double)1.0;
 	  dsp_ms_clock = dsp_tick_clock * fts_get_tick_duration();
 	}
-    }
 
-  ftl_program_run(dsp_chain);
+      ftl_program_run(dsp_chain);
+    }
+  else
+    fts_audioport_idle();
 }
 
 /* --------------------------------------------------------------------------- */
@@ -997,13 +894,44 @@ void fts_dsp_chain_poll( void)
 /* DSP compiler control                                                        */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
+static void dspcompiler_builtin_add(fts_word_t *argv)
+{
+  float * in1 = (float *)fts_word_get_ptr(argv + 0);
+  float * in2 = (float *)fts_word_get_ptr(argv + 1);
+  float * out = (float *)fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_int(argv + 3);
+  int i;
+
+  for (i=0; i<n; i++)
+    out[i] = in1[i] + in2[i];
+}
+
+/* DSP ON parameter listener */
+static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+{
+  if (fts_is_int(value))
+    {
+      int on;
+      on = fts_get_int(value);
+
+      if (on)
+	dsp_chain_create(fts_get_tick_size());
+      else
+	dsp_chain_delete();
+    }
+}
 
 void dsp_compiler_init(void)
 {
+  sym_builtin_add = fts_new_symbol( "__builtin_add");
+  dsp_declare_function( sym_builtin_add, dspcompiler_builtin_add);
+
   dsp_graph_heap = fts_heap_new(sizeof(dsp_node_t));
   dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));
 
   fts_signal_connection_table_init(&signal_connection_table);
 
   fts_param_add_listener(fts_s_dsp_on, 0, dsp_on_listener);
+
+  dsp_chain = ftl_program_new();
 }

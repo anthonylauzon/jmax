@@ -23,5 +23,30 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES=	\
-audioport.c	\
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
+all:
+	(cd src; $(MAKE) $@)
+.PHONY: all
+
+clean:
+	(cd src; $(MAKE) $@)
+.PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa
+	$(INSTALL_DATA) alsa.jpk $(lib_install_dir)/packages/alsa/alsa.jpk
+	$(INSTALL_DATA) alsa.scm $(lib_install_dir)/packages/alsa/alsa.scm
+	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsa.so $(lib_install_dir)/packages/alsa/lib/$(ARCH)/opt/libalsa.so )
+.PHONY: install
+
+# The following line is a hack that installs the <package>.jpk file on all platforms
+# (this is so that you can load the sgidev package even if you are running the GUI
+# on Linux
+install-noarch:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa
+	$(INSTALL_DATA) alsa.jpk $(lib_install_dir)/packages/alsa/alsa.jpk
+	$(INSTALL_DATA) alsa.scm $(lib_install_dir)/packages/alsa/alsa.scm
+.PHONY: install-noarch

@@ -95,7 +95,7 @@ cleanobjs:
 	rm -f $(OBJECTS)
 .PHONY: cleanobjs
 
-clean:
+clean-local:
 	rm -f $(OBJECTS)
 	rm -f $(TOCLEAN)
 

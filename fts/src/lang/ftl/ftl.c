@@ -29,7 +29,7 @@
 
 #include <fts/sys.h>
 #include <fts/lang.h>
-#include <fts/runtime/files/post.h>
+#include <fts/runtime.h>
 
 
 /* --------------------------------------------------------------------------- */

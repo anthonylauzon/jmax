@@ -52,10 +52,6 @@ typedef struct
 #define fts_dsp_get_input_size(DESC, IN) ((DESC)->in[(IN)]->length)
 #define fts_dsp_get_input_srate(DESC, IN) ((DESC)->in[(IN)]->srate)
 
-/* test for the null input special case */
-#define fts_dsp_is_input_null(DESC, IN) ((DESC)->in[(IN)]->id == 0)
-#define fts_dsp_is_output_null(DESC, IN) ((DESC)->out[(IN)]->id == 0)
-
 /* test if inlet is signal inlet */
 extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 
@@ -64,16 +60,12 @@ extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
 
-extern void fts_dsp_set_output(fts_dsp_descr_t *descr, int out, fts_dsp_signal_t *sig);
-
-extern fts_dsp_signal_t *fts_dsp_get_privat_signal(int vs);
-extern void fts_dsp_release_privat_signal(fts_dsp_signal_t *signal);
+/* test for the null input special case */
+extern int fts_dsp_is_input_null( fts_dsp_descr_t *descr, int in);
 
 /* object declarations */
 extern void fts_dsp_add_object(fts_object_t *o);
-extern void fts_dsp_add_object_to_prolog(fts_object_t *o);
 extern void fts_dsp_remove_object(fts_object_t *o);
-extern void fts_dsp_remove_object_from_prolog(fts_object_t *o);
 
 extern void fts_dsp_declare_inlet(fts_class_t *cl, int num);
 extern void fts_dsp_declare_outlet(fts_class_t *cl, int num);
@@ -107,11 +99,9 @@ extern void dsp_chain_fprint_signals(FILE *f);
 
 extern fts_object_t *dsp_get_current_object(void);
 
-extern int dsp_is_running( void);
-extern void dsp_make_dsp_off_chain(void);
+extern int fts_dsp_is_running( void);
 extern ftl_program_t *dsp_get_current_dsp_chain( void);
 
-extern fts_symbol_t fts_s_put;
 extern fts_symbol_t fts_s_sig_zero;
 extern fts_symbol_t fts_s_dsp_upsampling;
 extern fts_symbol_t fts_s_dsp_downsampling;

@@ -42,11 +42,6 @@ set jmaxRootDir [systemProperty "jmaxRoot"]
 source $jmaxRootDir/tcl/intrinsics.tcl
 
 ##
-## Intrinsic functions for the Sgi platform
-##
-source $jmaxRootDir/tcl/devices.tcl
-
-##
 ## Tcl functions to handle projects primitives
 ##
 source $jmaxRootDir/tcl/projects.tcl

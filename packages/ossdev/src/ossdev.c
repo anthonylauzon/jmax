@@ -717,7 +717,7 @@ static void oss_adc_get( fts_word_t *argv)
 	  j = channel;
 	  for ( i = 0; i < n; i++)
 	    {
-	      short s0 = aud->adc_fmtbuf[j++];
+	      short s0 = aud->adc_fmtbuf[j];
 
 #ifdef FTS_HAS_BIG_ENDIAN
 	      {

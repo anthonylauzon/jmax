@@ -50,9 +50,7 @@ static void dsp_module_init(void);
 static void dsp_module_shutdown(void);
 extern void fts_dsp_control_config(void);
 extern void fts_signal_bus_config(void);
-extern void Sig_init(void);
 
-fts_symbol_t fts_s_put;
 fts_symbol_t fts_s_sig_zero;
 fts_symbol_t fts_s_dsp_descr;
 
@@ -69,21 +67,14 @@ dsp_module_init(void)
   dsp_install_clocks();
 
   /* symbols used in DSP */
-  fts_s_put = fts_new_symbol("put");
   fts_s_sig_zero = fts_new_symbol("_sig_0");
   fts_s_dsp_upsampling   = fts_new_symbol("DSP_UPSAMPLING");
   fts_s_dsp_downsampling = fts_new_symbol("DSP_DOWNSAMPLING");
   fts_s_dsp_outputsize = fts_new_symbol("DSP_OUTPUTSIZE");
   fts_s_dsp_descr = fts_new_symbol("__DSP_DESCR");
 
-  /* Initialize signals management */
-  Sig_init();
-
   /* Initialize DSP compilation unit */
   dsp_compiler_init();
-
-  /* Make the dsp off program  */
-  dsp_make_dsp_off_chain();
 
   fts_signal_bus_config();
 

@@ -408,113 +408,6 @@ fts_ucs_mess_set_msgmode(int argc, const fts_atom_t *argv)
 }
 
 
-/*
- * DEVICE related commands 
- *
- */
-
-static fts_status_t
-fts_ucs_dev_close_device(int argc, const fts_atom_t *argv)
-{
-  if ((argc >= 1) && fts_is_symbol(&argv[0]))
-    {
-      return fts_close_logical_device(fts_get_symbol(&argv[0]), argc - 1, argv + 1);
-    }
-  else
-    return &bad_command; /* bad unset device command */
-}
-
-
-static fts_status_t fts_ucs_dev_reset_device(int argc, const fts_atom_t *argv)
-{
-  if ((argc >= 1) && fts_is_symbol(&argv[0]))
-    {
-      return fts_reset_logical_device(fts_get_symbol(&argv[0]));
-    }
-  else
-    return &bad_command; /* bad unset device command */
-}
-
-
-static fts_status_t
-fts_ucs_dev_open_device(int argc, const fts_atom_t *argv)
-{
-  if ((argc >= 3) && fts_is_symbol(&argv[0]))
-    {
-      fts_status_t ret;
-      fts_symbol_t logical_dev_name = 0;
-      fts_symbol_t class_name = 0;
-
-      const fts_atom_t *ld_argv;
-      int ld_argc;
-
-      const fts_atom_t *pd_argv;
-      int pd_argc;
-
-      fts_dev_t *dev;
-
-      /* First, parse the command, and found logical and physical device name  and args  */
-
-      logical_dev_name = fts_get_symbol(&argv[0]);
-      ld_argv = argv + 1;
-      ld_argc = 0;
-
-      for (pd_argv = ld_argv ; ld_argc < argc - 1; ld_argc++, pd_argv++)
-	if (fts_is_symbol(pd_argv) && (fts_get_symbol(pd_argv) == fts_new_symbol("as")))
-	  {
-	    break;
-	  }
-
-      if (ld_argc == argc - 1)
-        return &bad_command; /* bad set device command */
-
-      pd_argv++;
-      class_name = fts_get_symbol(pd_argv);
-      pd_argv++;
-
-      pd_argc = argv + argc - pd_argv;
-
-      
-      ret = fts_open_logical_device(logical_dev_name, ld_argc, ld_argv, class_name, pd_argc, pd_argv);
-
-      if (ret != fts_Success)
-	{
-	  post("Error \"%s\" Opening Device", ret->description);
-	  post_atoms(pd_argc, pd_argv);
-	  post(": %s\n", ret->description);
-	}
-
-      return fts_Success;
-    }
-  else
-    return &bad_command; /* bad set device command */
-}
-
-/* ucs function to set the default in and out */
-
-static fts_status_t
-fts_ucs_audio_set_default_in(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1)  && (fts_is_symbol(&argv[0])))
-    { 
-      fts_audio_set_default_in(fts_get_symbol(&argv[0]));
-    }
-
-  return fts_Success;
-}
-
-
-static fts_status_t
-fts_ucs_audio_set_default_out(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1)  && (fts_is_symbol(&argv[0])))
-    {
-      fts_audio_set_default_out(fts_get_symbol(&argv[0]));
-    }
-
-  return fts_Success;
-}
-
 extern void fts_set_mess_trace(int b);
 
 static fts_status_t
@@ -527,6 +420,34 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 
   return fts_Success;
 }
+
+/* ucs function to set the default audio and midi ports */
+
+static fts_status_t
+fts_ucs_default_audio(int argc, const fts_atom_t *argv)
+{
+  post( "ucs default audio ");
+  post_atoms( argc, argv);
+  post( "\n");
+
+  if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
+    {
+      fts_audioport_set_default( argc, argv);
+    }
+
+  return fts_Success;
+}
+
+static fts_status_t
+fts_ucs_default_midi(int argc, const fts_atom_t *argv)
+{
+  if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
+    { 
+    }
+
+  return fts_Success;
+}
+
 
 /*
  * Generic Set Parameters command
@@ -600,31 +521,15 @@ fts_ucs_install_commands()
 			 "mess trace [1 | 0]",
 			 "Activate the trace of messages received by FTS");
 
-  /* DEVICE related commands  */
+  /* Audio and MIDI related commands  */
 
-  fts_ucs_define_command(fts_new_symbol("open"), fts_new_symbol("device"),  fts_ucs_dev_open_device,
-			 "open device <logdev> as <physdev>",
-			 "open the <logdev> logical device\nby assigning to it the <physdev> device");
+  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("audio"), fts_ucs_default_audio,
+			 "default audio <name> [<args>]*",
+			 "defines the default audio port");
 
-  fts_ucs_define_command(fts_new_symbol("close"), fts_new_symbol("device"), fts_ucs_dev_close_device,
-			 "close device <logdev>",
-			 "close the <logdev> logical device");
-
-
-  fts_ucs_define_command(fts_new_symbol("reset"), fts_new_symbol("device"), fts_ucs_dev_reset_device,
-			 "reset device <logdev>",
-			 "close the <logdev> logical device");
-
-
-  /* Audio related commands */
-
-  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("in~"), fts_ucs_audio_set_default_in,
-			 "default in~ <name>",
-			 "set the name of the default audio input device");
-
-  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("out~"), fts_ucs_audio_set_default_out,
-			 "default out~ <name>",
-			 "set the name of the default audio output device");
+  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("midi"), fts_ucs_default_midi,
+			 "default midi <name> [<args>]*",
+			 "defines the default midi port");
 
   /* Parameters */
 

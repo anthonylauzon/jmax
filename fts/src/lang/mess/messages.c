@@ -28,7 +28,7 @@
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
 /* (fd) For post */
-#include <fts/runtime/files.h>
+#include <fts/runtime.h>
 #include "messP.h"
 
 #ifdef DEBUG 

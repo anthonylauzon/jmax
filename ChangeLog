@@ -1,3 +1,17 @@
+2001-03-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed the audio I/O system
+	Audio I/O no longer works with devices and logical devices, but
+	uses a special object ("audioport") in fts/src/runtime/audio/audioport.c
+	Fixed accordingly in~, out~, dac~, adc~ objects
+
+	* Fixed the DSP compiler to accept multiple DSP connections on an inlet.
+	This is used by the new implementation of audio I/O
+
+	* Added a first implementation of audioport for ALSA 0.9.0
+
+	* Removed fts/src/runtime/audio/audio.c
+
 2001-02-09  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Removed packages/alsa0.6dev and moved it to an external package

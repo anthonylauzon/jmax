@@ -25,7 +25,7 @@
  */
 
 #include <fts/sys.h>
-#include <fts/runtime/sched.h>
+#include <fts/runtime.h>
 #include <fts/lang/mess.h>
 #include <fts/lang/ftl.h>
 #include <fts/lang/dsp.h>
@@ -59,10 +59,9 @@ fts_signal_bus_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-fts_signal_bus_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_signal_bus_put_prologue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_signal_bus_t *this = (fts_signal_bus_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_get_tick_size();
   fts_atom_t a[4];
   int i;
@@ -126,8 +125,6 @@ fts_signal_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
   fts_signal_bus_reset(o, 0, 0, 0, 0);
 
   this->n_channels = n_channels;
-
-  fts_dsp_add_object_to_prolog(o);
 }
 
 static void
@@ -138,8 +135,6 @@ fts_signal_bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, cons
   ftl_data_free(this->buf[0]);
   ftl_data_free(this->buf[1]);
   ftl_data_free(this->toggle);
-
-  fts_dsp_remove_object_from_prolog(o);
 }
 
 static fts_status_t
@@ -149,7 +144,7 @@ fts_signal_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_signal_bus_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_signal_bus_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, fts_signal_bus_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_prologue, fts_signal_bus_put_prologue);
 
   return fts_Success;
 }

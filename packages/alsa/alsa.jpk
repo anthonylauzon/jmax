@@ -23,5 +23,12 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES=	\
-audioport.c	\
+
+## package declaration
+package provide alsa
+
+# load dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module alsa $dir/lib/$jmaxArch/$jmaxMode/libalsa.so
+
+post "package: alsa (ALSA objects)"

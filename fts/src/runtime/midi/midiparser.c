@@ -63,7 +63,7 @@ fts_midiparser_init(fts_midiparser_t *parser)
   parser->channel = 0;	
   parser->arg = NO_ARG;
 
-  parser->mtc_status = mtc_invalid;
+  parser->mtc_status = mtc_status_invalid;
   parser->mtc_frame_count = 0;
   parser->mtc_type = 0;
   parser->mtc_hour = 0;
@@ -310,7 +310,7 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 	  
       if (byte == STATUS_BYTE_SYSEX_END)
 	{
-	  parser->mtc_status = mtc_valid;
+	  parser->mtc_status = mtc_status_valid;
 	  midiparser_compute_time_code(parser);
 
 	  /* end of sysex */
@@ -327,17 +327,17 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
     case status_mtc_quarter_frame:
       {
 	if ((byte & 0xf0) == 0x00)
-	  parser->mtc_status = mtc_coming;
+	  parser->mtc_status = mtc_status_coming;
 	    
 	switch ((byte & 0xf0) >> 4)
 	  {
 	  case 0:
-	    if (parser->mtc_status == mtc_invalid)
-	      parser->mtc_status = mtc_coming;
-	    else if (parser->mtc_status == mtc_coming)
-	      parser->mtc_status = mtc_valid;
+	    if (parser->mtc_status == mtc_status_invalid)
+	      parser->mtc_status = mtc_status_coming;
+	    else if (parser->mtc_status == mtc_status_coming)
+	      parser->mtc_status = mtc_status_valid;
 		
-	    if (parser->mtc_status == mtc_valid)
+	    if (parser->mtc_status == mtc_status_valid)
 	      midiparser_compute_time_code(parser);
 		
 	    parser->mtc_frame = (parser->mtc_frame & 0xf0) | (byte & 0x0f);

@@ -24,15 +24,17 @@
 #
 
 SOURCES= \
-iomodule.c \
-filestream.c \
 fakestream.c \
-loopback.c \
+filestream.c \
 in.c \
+in_tilda.c \
+iomodule.c \
+loopback.c \
 out.c \
+out_tilda.c \
+serial.c \
 udp.c \
 udpreceive.c \
 udpsend.c \
-serial.c \
 wacom.c \
 

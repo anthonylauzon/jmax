@@ -34,18 +34,6 @@
 
 #define DTD_MAX_FIFOS 128
 
-/* The default settings for the server.
-   The server receives these parameters as arguments and never 
-   uses the #defined defaults values
-*/
-#define DEFAULT_BLOCK_FRAMES  32768
-#define DEFAULT_BLOCK_MAX_CHANNELS  8
-#define DEFAULT_FIFO_BLOCKS 4
-
-#define DEFAULT_PRELOAD_BLOCK_FRAMES  2048
-
-#define DEFAULT_LOOP_MILLISECONDS 100
-
 #define DEFAULT_BASE_DIR "/tmp/ftsdtd"
 
 #endif

@@ -25,16 +25,16 @@
 
 set jmaxArch ppc-linux
 
-defineDevice analogIn  { oss_adc device "/dev/dsp" } "OSS audio in"
-defineDevice analogOut { oss_dac device "/dev/dsp" } "OSS audio out"
+#defineDevice analogIn  { oss_adc device "/dev/dsp" } "OSS audio in"
+#defineDevice analogOut { oss_dac device "/dev/dsp" } "OSS audio out"
 
-defineDevice stereoIn  { oss_adc device "/dev/dsp" } "OSS audio in"
-defineDevice stereoIn1 { oss_adc device "/dev/dsp" } "OSS audio in"
+#defineDevice stereoIn  { oss_adc device "/dev/dsp" } "OSS audio in"
+#defineDevice stereoIn1 { oss_adc device "/dev/dsp" } "OSS audio in"
 
-defineDevice stereoOut  { oss_dac device "/dev/dsp" } "OSS audio out"
-defineDevice stereoOut1 { oss_dac device "/dev/dsp" } "OSS audio out"
+#defineDevice stereoOut  { oss_dac device "/dev/dsp" } "OSS audio out"
+#defineDevice stereoOut1 { oss_dac device "/dev/dsp" } "OSS audio out"
 
-defineDevice midi { oss_midi } "OSS MIDI"
+#defineDevice midi { oss_midi } "OSS MIDI"
 
 when platformStart {
     package require ossdev

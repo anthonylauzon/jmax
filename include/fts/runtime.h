@@ -27,13 +27,35 @@
 #ifndef _FTS_RUNTIME_H_
 #define _FTS_RUNTIME_H_
 
-/* #include "runtime/STtools.h" */
-#include <fts/runtime/audio.h>
-#include <fts/runtime/client.h>
-#include <fts/runtime/devices.h>
-#include <fts/runtime/files.h>
-#include <fts/runtime/midi.h>
-#include <fts/runtime/sched.h>
-#include <fts/runtime/time.h>
+/* Audio */
+#include <fts/runtime/audio/audioport.h>
+/* Client */
+#include <fts/runtime/client/protocol.h>
+#include <fts/runtime/client/client.h>
+#include <fts/runtime/client/incoming.h>
+#include <fts/runtime/client/outgoing.h>
+#include <fts/runtime/client/updates.h>
+#include <fts/runtime/client/protcodec.h>
+/* Devices */
+#include <fts/runtime/devices/bytestream.h>
+#include <fts/runtime/devices/devices.h>
+#include <fts/runtime/devices/unixdev.h>
+/* Files */
+#include <fts/runtime/files/atomfiles.h>
+#include <fts/runtime/files/directories.h>
+#include <fts/runtime/files/files.h>
+#include <fts/runtime/files/midifiles.h>
+#include <fts/runtime/files/parser.h>
+#include <fts/runtime/files/post.h>
+#include <fts/runtime/files/soundfiles.h>
+#include <fts/runtime/files/soundformats.h>
+/* MIDI */
+#include <fts/runtime/midi/midi.h>
+#include <fts/runtime/midi/midiport.h>
+#include <fts/runtime/midi/midiparser.h>
+/* Scheduler */
+#include <fts/runtime/sched/sched.h>
+/* Timing */
+#include <fts/runtime/time/time.h>
 
 #endif

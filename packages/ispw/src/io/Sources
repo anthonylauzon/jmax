@@ -24,8 +24,7 @@
 #
 
 SOURCES = $(ARCH_SOURCES) \
-disk.c           \
-dac1.c		\
-dac_doctor.c   \
-io.c
+adc_tilda.c	\
+dac_tilda.c	\
+io.c		\
 

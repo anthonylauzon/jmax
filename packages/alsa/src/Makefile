@@ -23,5 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES=	\
-audioport.c	\
+JMAXDISTDIR= ../../..
+PACKAGEROOT = ..
+MORESOLIBS=-lasound
+PACKAGELIB=$(LIBDIR)/libalsa.so
+
+include $(JMAXDISTDIR)/Makefiles/Makefile.package
+

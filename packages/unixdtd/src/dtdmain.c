@@ -96,14 +96,18 @@ static int __debug( const char *format, ...)
  * Constants used by the server
  */
 static int _block_frames;
-static int _preload_block_frames;
+static int _max_channels;
+static int _fifo_blocks;
+static int _preload_frames;
 static int _loop_milliseconds;
 
 static void dtd_init_params( int argc, char **argv)
 {
   sscanf( argv[1], "%d", &_block_frames);
-  sscanf( argv[2], "%d", &_preload_block_frames);
-  sscanf( argv[3], "%d", &_loop_milliseconds);
+  sscanf( argv[2], "%d", &_max_channels);
+  sscanf( argv[3], "%d", &_fifo_blocks);
+  sscanf( argv[4], "%d", &_preload_frames);
+  sscanf( argv[5], "%d", &_loop_milliseconds);
 }
 
 typedef struct {
@@ -266,7 +270,14 @@ static AFfilehandle dtd_open_file_write( const char *filename, const char *path,
   AFfilesetup setup;
   int file_channels, sampfmt, sampwidth;
 
-  /* which path ?? */
+  if (filename[0] == '/')
+    strcpy( full_path, filename);
+  else
+    {
+      strcpy( full_path, path);
+      strcat( full_path, "/");
+      strcat( full_path, filename);
+    }
 
   setup = afNewFileSetup();
 
@@ -312,11 +323,11 @@ static void dtd_open_read( const char *line)
 
   handle->n_channels = n_channels;
 
-  for ( i = 0; i < _block_frames / _preload_block_frames; i++)
+  for ( i = 0; i < _block_frames / _preload_frames; i++)
     {
       int ret;
 
-      ret = dtd_read_block( handle->file, fifo, read_block, _preload_block_frames, n_channels);
+      ret = dtd_read_block( handle->file, fifo, read_block, _preload_frames, n_channels);
     }
 
   DTD_DEBUG( __debug( "preloaded `%s'", filename) );
@@ -325,12 +336,14 @@ static void dtd_open_read( const char *line)
 static void dtd_open_write( const char *line)
 {
   AFfilehandle file;
-  int id, n_channels, i;
-  char filename[N];
+  int id, n_channels, i, af_format;
+  char filename[N], path[N];
   dtdhandle_t *handle;
+  double sr;
   dtdfifo_t *fifo;
+  char *extension;
 
-  sscanf( line, "%*s%d%s%d", &id, filename, &n_channels);
+  sscanf( line, "%*s%d%s%s%lf%d", &id, filename, path, &sr, &n_channels);
 
   handle = &handle_table[id];
   fifo = handle->fifo;
@@ -344,8 +357,18 @@ static void dtd_open_write( const char *line)
       handle->file = AF_NULL_FILEHANDLE;
     }
 
-  /* Where to get the format and the sampling rate ????????? */
-  if ((handle->file = dtd_open_file_write( filename, 0, 0, 0, n_channels)) == AF_NULL_FILEHANDLE)
+  af_format = AF_FILE_AIFF;
+
+  extension = strrchr( filename, '.');
+  if (extension)
+    {
+      fts_atom_t *descr = fts_soundfile_format_get_descriptor( fts_new_symbol( extension+1));
+ 
+      if (descr)
+	af_format = fts_get_int( descr);
+    }
+  
+  if ((handle->file = dtd_open_file_write( filename, path, af_format, sr, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
   handle->n_channels = n_channels;
@@ -376,13 +399,14 @@ static void dtd_close( const char *line)
 
 static void dtd_mmap( const char *line)
 {
-  int id, buffer_size;
+  int id, fifo_size;
   char filename[N];
   dtdfifo_t *fifo;
 
-  sscanf( line, "%*s%d%s%d", &id, filename, &buffer_size);
+  sscanf( line, "%*s%d%s", &id, filename);
 
-  fifo = dtdfifo_mmap( filename, buffer_size);
+  fifo_size = _block_frames * _max_channels * _fifo_blocks * sizeof( float);
+  fifo = dtdfifo_mmap( filename, fifo_size);
 
   if (fifo)
     {
@@ -393,9 +417,9 @@ static void dtd_mmap( const char *line)
 
 /*
  * Commands are:
- * mmap <id> <filename> <buffer_size>
- * openr <id> <sound_file_name> <search_path> <n_channels>
- * openw <id> <sound_file_name> <n_channels>
+ * mmap <id> <filename>
+ * openread <id> <sound_file_name> <search_path> <n_channels>
+ * openwrite <id> <sound_file_name> <path> <sampling_rate> <n_channels>
  * close <id>
  */
 static void dtd_process_command( const char *line)
@@ -406,9 +430,9 @@ static void dtd_process_command( const char *line)
 
   sscanf( line, "%s", command);
 
-  if ( !strcmp( "openr", command))
+  if ( !strcmp( "openread", command))
     dtd_open_read( line);
-  else if ( !strcmp( "openw", command))
+  else if ( !strcmp( "openwrite", command))
     dtd_open_write( line);
   else if ( !strcmp( "close", command))
     dtd_close( line);
@@ -615,6 +639,8 @@ int main( int argc, char **argv)
   dtd_no_real_time();
 
   signal( SIGUSR1, signal_handler);
+
+  read_block = (short *)malloc( _block_frames * _max_channels * sizeof( short));
 
   dtd_main_loop( socket);
 

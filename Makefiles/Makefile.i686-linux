@@ -27,11 +27,7 @@ ARCH_PACKAGES=audpdev ossdev unixdtd
 
 # Special for ALSA.
 ifeq ($(ENABLE_ALSA),yes)
-ARCH_PACKAGES:= $(ARCH_PACKAGES) alsadev
-endif
-
-ifeq ($(ENABLE_ALSA0.6),yes)
-ARCH_PACKAGES:= $(ARCH_PACKAGES) alsa0.6dev
+ARCH_PACKAGES:= $(ARCH_PACKAGES) alsa
 endif
 
 ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops

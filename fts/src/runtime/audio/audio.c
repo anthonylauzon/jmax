@@ -37,8 +37,7 @@
 
 #include <fts/sys.h>
 #include <fts/lang.h>
-#include <fts/runtime/sched.h>
-#include <fts/runtime/devices.h>
+#include <fts/runtime.h>
 #include <fts/runtime/audio/audio.h>
 
 

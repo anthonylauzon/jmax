@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <errno.h>
 #include <assert.h>
 #include <sys/types.h>
@@ -44,16 +45,27 @@
 #include "dtdfifo.h"
 #include "dtdserver.h"
 
+/*
+ * The default settings for the server.
+ * These arguments are passed as command line arguments to the forked server.
+ */
+#define DEFAULT_BLOCK_FRAMES  32768
+#define DEFAULT_MAX_CHANNELS  8
+#define DEFAULT_FIFO_BLOCKS  3
+#define DEFAULT_PRELOAD_FRAMES  2048
+#define DEFAULT_LOOP_MILLISECONDS 100
+
 struct _dtdserver_t {
   fts_object_t head;
 
   int server_pid;
-
   int server_socket;
   int server_port;
 
-  int fifo_size;
-
+  int block_frames;
+  int max_channels;
+  int fifo_blocks;
+  int preload_frames;
   int loop_milliseconds;
 
   const char *base_dir;
@@ -121,16 +133,18 @@ void dtdserver_add_object( dtdserver_t *server, void *object)
     {
       char filename[1024];
       char buffer[1024];
+      int fifo_size;
       dtdfifo_t *fifo;
 
       strcpy( filename, server->base_dir);
       sprintf( filename + strlen( server->base_dir), "%d", server->number_of_fifos);
 
-      fifo = dtdfifo_new( filename, server->fifo_size);
+      fifo_size = server->block_frames * server->max_channels * server->fifo_blocks * sizeof( float);
+      fifo = dtdfifo_new( filename, fifo_size);
       if ( !fifo)
 	return;
 
-      sprintf( buffer, "mmap %d %s %d", server->number_of_fifos, filename, server->fifo_size);
+      sprintf( buffer, "mmap %d %s", server->number_of_fifos, filename);
       dtdserver_send_command( server, buffer);
 
       server->fifo_table[ server->number_of_fifos ] = fifo;
@@ -178,7 +192,7 @@ dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n
 
   if (fifo)
     {
-      sprintf( buffer, "openr %d %s %s %d", id, filename, fts_symbol_name(fts_get_search_path()), n_channels);
+      sprintf( buffer, "openread %d %s %s %d", id, filename, fts_symbol_name(fts_get_search_path()), n_channels);
       dtdserver_send_command( server, buffer);
     }
 
@@ -195,7 +209,11 @@ dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int 
 
   if (fifo)
     {
-      sprintf( buffer, "openw %d %s %d", id, filename, n_channels);
+      double sr;
+
+      sr = (double)fts_param_get_float( fts_s_sampling_rate, 44100.);
+
+      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_symbol_name(fts_get_project_dir()), sr, n_channels);
       dtdserver_send_command( server, buffer);
     }
 
@@ -268,11 +286,13 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   int from_child_pipe[2];
   const char *base_dir;
   char *d;
-  int len, fifo_size;
+  int len;
 
-  fifo_size = DEFAULT_BLOCK_FRAMES * DEFAULT_BLOCK_MAX_CHANNELS * DEFAULT_FIFO_BLOCKS * sizeof( float);
-  this->fifo_size = fts_get_int_arg( ac, at, 1, fifo_size);
-  this->loop_milliseconds = fts_get_int_arg( ac, at, 2, DEFAULT_LOOP_MILLISECONDS);
+  this->block_frames = fts_get_int_arg( ac, at, 1, DEFAULT_BLOCK_FRAMES);
+  this->max_channels = fts_get_int_arg( ac, at, 2, DEFAULT_MAX_CHANNELS);
+  this->fifo_blocks = fts_get_int_arg( ac, at, 3, DEFAULT_FIFO_BLOCKS);
+  this->preload_frames = fts_get_int_arg( ac, at, 4, DEFAULT_PRELOAD_FRAMES);
+  this->loop_milliseconds = fts_get_int_arg( ac, at, 5, DEFAULT_LOOP_MILLISECONDS);
 
   /* fork the server */
   if ( pipe( from_child_pipe) < 0)
@@ -289,6 +309,7 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   else if ( !this->server_pid)
     {
       char exe[256];
+      char buff1[32], buff2[32], buff3[32], buff4[32], buff5[32];
 
       close( from_child_pipe[0]);
       if ( dup2( from_child_pipe[1], 1) < 0)
@@ -299,8 +320,13 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       close( from_child_pipe[1]);
 
       sprintf( exe, "%s/packages/unixdtd/bin/%s/%s/dtd", fts_get_root_dir(), fts_get_arch(), fts_get_mode());
+      sprintf( buff1, "%d", this->block_frames);
+      sprintf( buff2, "%d", this->max_channels);
+      sprintf( buff3, "%d", this->fifo_blocks);
+      sprintf( buff4, "%d", this->preload_frames);
+      sprintf( buff5, "%d", this->loop_milliseconds);
 
-      if ( execl( exe, exe, NULL) < 0)
+      if ( execl( exe, exe, buff1, buff2, buff3, buff4, buff5, NULL) < 0)
 	{
 	  fprintf( stderr, "[dtdserver]: execl() failed (%s)\n", strerror( errno));
 	}

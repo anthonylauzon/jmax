@@ -35,13 +35,11 @@
 
 #include <fts/fts.h>
 
-extern ftl_program_t *dsp_chain_on;
 static fts_symbol_t switch_function = 0;
 
 static int switch_count = 1;
 
-typedef struct
-{
+typedef struct {
   fts_object_t _o;
   ftl_subroutine_t *current, *previous;
   ftl_data_t switch_ftl_data;
@@ -52,10 +50,11 @@ static void
 call_ftl_subr_cond( fts_word_t *argv)
 {
   int *x = (int *)fts_word_get_ptr(argv);
-  ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_word_get_ptr(argv+1);
+  ftl_program_t *dsp_chain = (ftl_program_t *)fts_word_get_ptr(argv+1);
+  ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_word_get_ptr(argv+2);
 
   if (*x)
-    ftl_program_call_subr( dsp_chain_on, subr);
+    ftl_program_call_subr( dsp_chain, subr);
 }
 
 static void
@@ -69,14 +68,15 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sprintf( tmp, "switch_%d", switch_count);
   switch_count++;
 
-  this->current = ftl_program_add_subroutine( dsp_chain_on, fts_new_symbol_copy(tmp));
+  this->current = ftl_program_add_subroutine( dsp_get_current_dsp_chain(), fts_new_symbol_copy(tmp));
 
   /* Add the call FTL subroutine conditionnally function */
   fts_set_ftl_data( argv, this->switch_ftl_data);
-  fts_set_ptr( argv+1, this->current);
-  dsp_add_funcall( switch_function, 2, argv);
+  fts_set_ptr( argv+1, dsp_get_current_dsp_chain());
+  fts_set_ptr( argv+2, this->current);
+  dsp_add_funcall( switch_function, 3, argv);
 
-  this->previous = ftl_program_set_current_subroutine( dsp_chain_on, this->current);
+  this->previous = ftl_program_set_current_subroutine( dsp_get_current_dsp_chain(), this->current);
 
   if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
     {
@@ -92,8 +92,8 @@ sigswitch_put_after(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   sigswitch_t *this = (sigswitch_t *)o;
 
-  ftl_program_add_return( dsp_chain_on);
-  ftl_program_set_current_subroutine( dsp_chain_on, this->previous);
+  ftl_program_add_return( dsp_get_current_dsp_chain());
+  ftl_program_set_current_subroutine( dsp_get_current_dsp_chain(), this->previous);
 }
 
 static void

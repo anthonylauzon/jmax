@@ -28,176 +28,119 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/ftl.h>
 #include <fts/lang/dsp.h>
-#include <fts/runtime/files.h> /* (fd) For post */
+#include <fts/runtime.h> /* (fd) For post */
 
-static int Sig_count = 0;
+/* ********************************************************************** */
+/* Signal list handling                                                   */
+/* ********************************************************************** */
 
-typedef struct _SignalCell 
+typedef struct _fts_dsp_signal_list_t 
 {
-  fts_dsp_signal_t *s;
-  struct _SignalCell *next;
-} SignalCell, *SignalList;
+  fts_dsp_signal_t *signal;
+  struct _fts_dsp_signal_list_t *next;
+} fts_dsp_signal_list_t;
 
-static fts_heap_t *signal_cell_heap;
-
-static SignalList freeList = 0, inUseList = 0;
-
-static fts_symbol_t 
-Sig_genName( int id)
+static void fts_dsp_signal_list_insert( fts_dsp_signal_list_t **list, fts_dsp_signal_t *sig)
 {
-  char tmp[12];
+  fts_dsp_signal_list_t *tmp;
 
-  sprintf( tmp, "_sig_%d", id);
-  return fts_new_symbol_copy( tmp);
+  tmp = (fts_dsp_signal_list_t *)fts_malloc( sizeof( fts_dsp_signal_list_t) );
+  tmp->signal = sig;
+  tmp->next = *list;
+  *list = tmp;
 }
 
-fts_dsp_signal_t *
-Sig_new( int vectorSize, float sampleRate)
+static void fts_dsp_signal_list_delete( fts_dsp_signal_list_t *list)
 {
-  SignalList *previous;
-  SignalList current, tmp;
-  fts_dsp_signal_t *s;
+  fts_dsp_signal_list_t *current, *next;
 
-  previous = &freeList;
-  for ( current = freeList; current; current = current->next )
+  for ( current = list; current; current = next )
     {
-      s = current->s; 
-      if ( s->length == vectorSize)
-	{
-	  *previous = current->next;
-	  fts_heap_free((char *)current, signal_cell_heap);
-	  break;
-	}
-      else
-	previous = &(current->next);
-    }
-
-  if ( !current)
-    {
-      s = (fts_dsp_signal_t *)fts_zalloc( sizeof(fts_dsp_signal_t));
-      s->id = Sig_count;
-      Sig_count++;
-      s->name = Sig_genName( s->id );
-      dsp_add_signal(s->name, vectorSize);
-    }
-
-  s->refcnt = 0;
-  s->length = vectorSize;
-  s->srate = sampleRate;
-
-  tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
-  tmp->s = s;
-  tmp->next = inUseList;
-  inUseList = tmp;
-  return s;
-}
-
-/* sig_free take away the sig from the inUseList,
-   and put it back in the freelist.
- */
-
-void
-Sig_free( fts_dsp_signal_t *s)
-{
-  /* First, delete the signal from the inUseList */
-
-  SignalList *previous;
-  SignalList current;
-  SignalList tmp;
-
-  previous = &inUseList;
-  for (current = inUseList; current; current = current->next )
-    {
-      if (s == current->s)
-	{
-	  *previous = current->next;
-	  fts_heap_free((char *) current, signal_cell_heap);
-
-	  break;
-	}
-      else
-	previous = &(current->next);
-    }
-
-  /* Then add it to the free list */
-
-  tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
-  tmp->s = s;
-  tmp->next = freeList;
-  freeList = tmp;
-}
-
-void
-Sig_unreference(fts_dsp_signal_t *s)
-{
-  s->refcnt--;
-
-  if ( !s->refcnt)
-    Sig_free( s);
-}
-
-void
-Sig_reference(fts_dsp_signal_t *s)
-{
-  s->refcnt++;
-}
-
-fts_dsp_signal_t *
-Sig_getById( int id)
-{
-  fts_dsp_signal_t *s;
-  SignalList current;
-
-  for( current = inUseList; current; current = current->next)
-    {
-      s = current->s;
-      if ( s->id == id)
-	return s;
-    }
-  return 0;
-}
-
-void
-Sig_print( fts_dsp_signal_t *s)
-{
-  post( "dsp_signal *%p{ id=%d name=\"%s\" refCount=%p vs=%d}\n", s, s->id, fts_symbol_name(s->name), s->refcnt, s->length);
-}
-
-static void
-SignalList_free(SignalList *list)
-{
-  SignalList current, next;
-
-  for( current = *list; current; current = next)
-    {
-      fts_free( current->s );
       next = current->next;
-      fts_heap_free((char *) current, signal_cell_heap);
+      fts_free( current);
     }
-  *list = 0;
-}
- 
-void
-Sig_setup( int vectorSize)
-{
-  SignalList_free(&freeList);
-  SignalList_free(&inUseList);
-  Sig_count = 0;
 }
 
-int
-Sig_getCount( void )
+/* ********************************************************************** */
+/* Signals functions                                                      */
+/* ********************************************************************** */
+
+static int signal_count = 0;
+static fts_dsp_signal_list_t *signal_list = 0;
+
+#define SIGNAL_PENDING -1
+
+fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate)
 {
-  return Sig_count;
+  fts_dsp_signal_list_t *current;
+  fts_dsp_signal_t *sig;
+  char buffer[16];
+
+  for ( current = signal_list; current; current = current->next )
+    {
+      if ( current->signal->refcnt == 0 && current->signal->length == vector_size)
+	return current->signal;
+    }
+
+  sig = (fts_dsp_signal_t *)fts_zalloc( sizeof(fts_dsp_signal_t));
+
+  sprintf( buffer, "_sig_%d", signal_count++);
+  sig->name = fts_new_symbol_copy( buffer);
+  sig->refcnt = SIGNAL_PENDING;
+  sig->length = vector_size;
+  sig->srate = sample_rate;
+
+  dsp_add_signal( sig->name, vector_size);
+
+  fts_dsp_signal_list_insert( &signal_list, sig);
+
+  return sig;
 }
 
-int
-Sig_check( void )
+void fts_dsp_signal_free( fts_dsp_signal_t *sig)
 {
-  return 1;
+  sig->refcnt = 0;
 }
 
-void Sig_init(void)
+int fts_dsp_signal_is_pending( fts_dsp_signal_t *sig)
 {
-  signal_cell_heap = fts_heap_new(sizeof(SignalCell));
+  return sig->refcnt == SIGNAL_PENDING;
 }
+
+void fts_dsp_signal_unreference( fts_dsp_signal_t *sig)
+{
+  if (sig->refcnt != SIGNAL_PENDING)
+    sig->refcnt--;
+}
+
+void fts_dsp_signal_reference(fts_dsp_signal_t *sig)
+{
+  if (sig->refcnt == SIGNAL_PENDING)
+    sig->refcnt = 1;
+  else
+    sig->refcnt++;
+}
+
+void fts_dsp_signal_print( fts_dsp_signal_t *s)
+{
+  post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, fts_symbol_name(s->name), s->refcnt, s->length);
+}
+
+void fts_dsp_signal_init( void)
+{
+  fts_dsp_signal_list_t *current;
+
+  /* free all the signal currently in signal list */
+  for ( current = signal_list; current; current = current->next )
+    {
+      fts_free( current->signal);
+    }
+
+  fts_dsp_signal_list_delete( signal_list);
+
+  signal_count = 0;
+  signal_list = 0;
+}
+
+
+

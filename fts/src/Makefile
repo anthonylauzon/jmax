@@ -23,7 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 JMAXDISTDIR=../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+
+TOCLEAN=$(FTS_LIB)
 
 all_c: all
 .PHONY: all_c
@@ -42,8 +44,8 @@ lib-recursive:
 	(cd runtime; $(MAKE) lib-recursive)
 .PHONY: lib-recursive
 
-clean: cleanobjs-recursive
-	(cd tiles; $(MAKE) $@)
+clean: cleanobjs-recursive clean-local
+	(cd tiles; $(MAKE) clean-local)
 .PHONY: clean
 
 cleanobjs-recursive:
