@@ -130,7 +130,7 @@ public class EditField extends JTextArea implements FocusListener
   EditField(ErmesSketchPad editor) 
   {
     super();
-
+    setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
     setCursor( Cursor.getPredefinedCursor( Cursor.TEXT_CURSOR));
 
     sketch = editor;
@@ -294,7 +294,7 @@ public class EditField extends JTextArea implements FocusListener
   //jdk117-->jdk1.3//
   public void paintComponent(Graphics g)
   {
-      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
       super.paintComponent(g);
   }
   /*****************/

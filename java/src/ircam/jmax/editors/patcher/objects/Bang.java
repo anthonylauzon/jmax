@@ -239,8 +239,8 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 
 	/*****************/
 	//jdk117-->jdk1.3//
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-	  RenderingHints.VALUE_ANTIALIAS_ON);
+	//((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+	//RenderingHints.VALUE_ANTIALIAS_ON);
 
 	if(isSelected() || isResizing)
 	    {		
@@ -275,8 +275,8 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 
 	/*****************/
 	//jdk117-->jdk1.3//
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-					 RenderingHints.VALUE_ANTIALIAS_OFF);
+	//((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+	//RenderingHints.VALUE_ANTIALIAS_OFF);
 
 	super.paint( g);
     }

@@ -99,7 +99,10 @@ public class TextMenu extends EditorMenu
     fakeFontButton = new JRadioButtonMenuItem( "fake");
     itsFontMenuGroup.add(fakeFontButton);
 
-    add(new JLabel(" Font Sizes"));
+    //add(new JLabel(" Font Sizes"));
+    item = new JMenuItem(" Font Sizes");
+    item.setEnabled(false);
+    add(item);
 
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
     {
@@ -123,7 +126,10 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    add(new JLabel(" Font Styles"));
+    //add(new JLabel(" Font Styles"));
+    item = new JMenuItem(" Font Styles");
+    item.setEnabled(false);
+    add(item);
 
     boldItem = new JCheckBoxMenuItem("Bold");
     boldItem.addActionListener(Actions.fontStylesAction);
@@ -134,7 +140,11 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    add(new JLabel(" Fonts"));
+    //add(new JLabel(" Fonts"));
+    item = new JMenuItem(" Fonts");
+    item.setEnabled(false);
+    add(item);
+
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
     {
 	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);

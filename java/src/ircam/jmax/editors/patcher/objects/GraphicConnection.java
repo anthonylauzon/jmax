@@ -236,7 +236,7 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 	{
 	    //g.setColor( Color.magenta.darker().darker());
 	    g.setColor(Color.black);
-	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 	    double angle = Math.abs(Math.atan2((float)(start.y - end.y), (float)(end.x - start.x)));
 	    if((angle>Math.PI/4)&&(angle<Math.PI*3/4))
@@ -289,7 +289,7 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 		}
 
 	    ((Graphics2D)g).setStroke(normal);
-	    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
     else
 	{
@@ -298,7 +298,8 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 	    else
 		g.setColor( Color.black);
 		
-	    g.drawLine(start.x, start.y, end.x, end.y);
+	    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	    ((Graphics2D)g).drawLine(start.x, start.y, end.x, end.y);
 	    if (selected) 
 		{
 		    if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))

@@ -178,9 +178,9 @@ class Display extends GraphicObject implements FtsMessageListener
     paintInlets(g);
     
     g.setFont(getFont());      
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
     g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);	
+    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);	
   }
 
   public void updatePaint(Graphics g) 

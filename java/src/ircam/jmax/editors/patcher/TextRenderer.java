@@ -87,6 +87,7 @@ public class TextRenderer implements ObjectRenderer
     area.setEditable(false);
     area.setLineWrap(true);
     area.setWrapStyleWord(true);
+    area.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
     //defaultWidth = SwingUtilities.computeStringWidth(owner.getFontMetrics(), "pack 1 2 3");
   }
 
@@ -194,8 +195,9 @@ public class TextRenderer implements ObjectRenderer
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);	
+      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);	
       SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
-      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);	
+      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);	
   }
 }
+

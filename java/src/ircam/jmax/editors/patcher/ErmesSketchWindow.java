@@ -198,8 +198,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     mb.add( itsTextMenu);
 
     // Build the script menu
-    itsScriptMenu = new ScriptMenu();
-    mb.add( itsScriptMenu);
+    //itsScriptMenu = new ScriptMenu();
+    //mb.add( itsScriptMenu);
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

@@ -89,6 +89,7 @@ class ErmesToolButton extends JToggleButton
 	};	
     Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
     Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
+
     Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
     Cursors.loadCursor(description, cursor);
     /*****************/
