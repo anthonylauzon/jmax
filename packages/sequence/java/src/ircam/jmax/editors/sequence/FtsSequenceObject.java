@@ -84,15 +84,15 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   {
     String trackName = args[0].getString();
     TrackEvent evt = (TrackEvent)(args[1].getObject());
-    TrackdataModel model = getTrackByName(trackName).getTrackDataModel();
+    TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
 
     // starts an undoable transition
-    model.beginUpdate();
+    ((UndoableData)model).beginUpdate();
     
     model.addEvent(evt);
     
     // ends the undoable transition
-    model.endUpdate()
+    ((UndoableData)model).endUpdate();
   }
 
   /**

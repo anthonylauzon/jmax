@@ -228,9 +228,9 @@ public class Fts implements MaxContext
     /*public void makeFtsObjectAsync(String className, int nArgs, FtsAtom args[])
       {
       int id;
-
+	
       id = server.getNewObjectId();
-
+	
       server.newObject( id, className, nArgs, args);
       }*/
     

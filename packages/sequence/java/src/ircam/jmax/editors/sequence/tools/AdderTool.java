@@ -147,7 +147,7 @@ public class AdderTool extends Tool implements PositionListener {
       sendArgs[2].setString(type);
       
       for(int i=0; i<nArgs; i++)
-	sendArgs[3+i].setValue(args[i]);
+	  sendArgs[3+i].setValue(args[i]);
 	
       egc.getFtsSequenceObject().sendMessage(FtsObject.systemInlet, "event_new", 3+nArgs, sendArgs);
     }
