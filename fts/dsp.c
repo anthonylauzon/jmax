@@ -50,6 +50,7 @@ static fts_symbol_t dsp_copy_fun_symbol = 0;
 static fts_timebase_t *dsp_timebase;
 static fts_param_t *dsp_active_param = 0;
 static fts_param_t* dsp_sample_rate_param = 0;
+static fts_param_t* dsp_buffer_size_param = 0;
 
 fts_class_t *fts_dsp_edge_class = 0;
 fts_class_t *fts_dsp_signal_class = 0;
@@ -128,7 +129,7 @@ fts_dsp_get_tick_size( void)
 }
 
 /***************************************************
- *
+ * DSP sample rate support
  */
 double
 fts_dsp_set_sample_rate( double dsp_sample_rate)
@@ -155,6 +156,36 @@ void
 fts_dsp_sample_rate_remove_listener( fts_object_t* object)
 {
   fts_param_remove_listener( dsp_sample_rate_param, object);
+}
+
+
+
+/***************************************************
+ * Audio configuration buffer size change support
+ */
+void
+fts_dsp_set_buffer_size(int dsp_buffer_size)
+{
+  fts_param_set_int( dsp_buffer_size_param, dsp_buffer_size);
+}
+
+int
+fts_dsp_get_buffer_size()
+{
+  fts_atom_t* value = fts_param_get_value( dsp_buffer_size_param);
+  return fts_get_int(value);
+}
+
+void
+fts_dsp_buffer_size_add_listener( fts_object_t* object, fts_method_t method)
+{
+  fts_param_add_listener( dsp_buffer_size_param, object, method);
+}
+
+void
+fts_dsp_buffer_size_remove_listener( fts_object_t* object)
+{
+  fts_param_remove_listener( dsp_buffer_size_param, object);
 }
 
 /***************************************************
@@ -560,6 +591,7 @@ dsp_set_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
     fts_dsp_graph_compile(&main_dsp_graph);
 }
 
+
 static void 
 dsp_active( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -606,6 +638,8 @@ void fts_kernel_dsp_init(void)
 
   dsp_sample_rate_param = (fts_param_t*)fts_object_create(fts_param_class, 0, 0);
   fts_param_add_listener(dsp_sample_rate_param, NULL, dsp_set_sample_rate);
+
+  dsp_buffer_size_param = (fts_param_t*)fts_object_create(fts_param_class, 0, 0);
 
   /* create main DSP graph */
   fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
