@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = explode.jar
-jardir=$(pkgdatadir)/packages/explode/java
-jar_DATA = $(JARFILE)
+packagedir=$(pkgdatadir)/packages/explode/java
+package_DATA = explode.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam -name "*.class"` )
-.PHONY: $(JARFILE)
+explode.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../explode.jar `find ircam -name "*.class"` )

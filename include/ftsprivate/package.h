@@ -23,9 +23,6 @@
 #ifndef _FTS_PRIVATE_PACKAGE_H_
 #define _FTS_PRIVATE_PACKAGE_H_
 
-#include <fts/fts.h>
-#include <fts/package.h>
-
 /***********************************************
  *
  *  Package registry

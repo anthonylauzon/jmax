@@ -23,8 +23,21 @@
 #ifndef _FTS_PRIVATE_SAVER_H
 #define _FTS_PRIVATE_SAVER_H
 
-extern void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher);
-extern void fts_save_selection_as_bmax(FILE *file, fts_object_t *selection);
-extern void fts_save_simple_as_bmax(const char *filename, fts_object_t *patcher);
+
+struct fts_bmax_file {
+  FILE *file;
+  fts_binary_file_header_t header; 
+  fts_symbol_t *symbol_table;
+  unsigned int symbol_table_size;
+  int symbol_table_static;
+};
+
+extern int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size);
+extern void fts_bmax_file_sync( fts_bmax_file_t *f);
+extern void fts_bmax_file_close( fts_bmax_file_t *f);
+
+extern void fts_save_patcher_as_bmax( fts_symbol_t file, fts_object_t *patcher);
+extern void fts_save_selection_as_bmax( FILE *file, fts_object_t *selection);
+extern void fts_save_simple_as_bmax( const char *filename, fts_object_t *patcher);
 
 #endif

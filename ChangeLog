@@ -1,3 +1,9 @@
+2001-09-28  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed fts/saver.c in order to be able to open a .jmax file
+	outside saver.c. Tested that you can save any object in a .jmax
+	file. This is for saving package object.
+
 2001-09-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* moved all packages to automake/autoconf

@@ -43,6 +43,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/loader.h>
+#include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
 
 typedef struct {

@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = qlist.jar
-jardir=$(pkgdatadir)/packages/qlist/java
-jar_DATA = $(JARFILE)
+packagedir=$(pkgdatadir)/packages/qlist/java
+package_DATA = qlist.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam -name "*.class"` )
-.PHONY: $(JARFILE)
+qlist.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../qlist.jar `find ircam -name "*.class"` )

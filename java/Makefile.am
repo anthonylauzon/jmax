@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = jmax.jar
-pkgjavadir=$(pkgdatadir)/java
-pkgjava_DATA = $(JARFILE) jacl.jar tcljava.jar
+packagedir=$(pkgdatadir)/java
+package_DATA = jacl.jar tcljava.jar jmax.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam silk -name "*.class"` )
-.PHONY: $(JARFILE)
+jmax.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../jmax.jar `find ircam silk -name "*.class"` )

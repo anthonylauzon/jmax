@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = guiobj.jar
-jardir=$(pkgdatadir)/packages/guiobj/java
-jar_DATA = $(JARFILE)
+packagedir=$(pkgdatadir)/packages/guiobj/java
+package_DATA = guiobj.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam -name "*.class"` )
-.PHONY: $(JARFILE)
+guiobj.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../guiobj.jar `find ircam -name "*.class"` )

@@ -127,7 +127,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .class .java .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -185,7 +185,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

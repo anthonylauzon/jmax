@@ -57,6 +57,7 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/patparser.h>
+#include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
 #include <ftsprivate/symbol.h>
 #include <ftsprivate/template.h>

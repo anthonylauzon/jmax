@@ -58,7 +58,7 @@ version.c \
 vm.c \
 list.c \
 package.c \
-project.c 
+project.c  
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c

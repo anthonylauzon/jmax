@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = sequence.jar
-jardir=$(pkgdatadir)/packages/sequence/java
-jar_DATA = $(JARFILE)
+packagedir=$(pkgdatadir)/packages/sequence/java
+package_DATA = sequence.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam -name "*.class"` )
-.PHONY: $(JARFILE)
+sequence.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../sequence.jar `find ircam -name "*.class"` )

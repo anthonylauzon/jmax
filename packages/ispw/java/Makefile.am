@@ -1,12 +1,9 @@
 SUBDIRS= src
 
-JARFILE = ispw.jar
-jardir=$(pkgdatadir)/packages/ispw/java
-jar_DATA = $(JARFILE)
+packagedir=$(pkgdatadir)/packages/ispw/java
+package_DATA = ispw.jar
 
-clean-compile:
-	rm -f $(JARFILE)
+JAR_DEP=$(shell find src -name "*.java")
 
-$(JARFILE):
-	( cd src; jar -cvf ../$(JARFILE) `find ircam -name "*.class"` )
-.PHONY: $(JARFILE)
+ispw.jar: $(JAR_DEP)	
+	( cd src; jar -cvf ../ispw.jar `find ircam -name "*.class"` )

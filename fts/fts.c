@@ -294,6 +294,11 @@ void fts_init( int argc, char **argv)
 #endif
   }
 
+  {
+    /* YAH (Yet Another Hack) (fd) */
+    zoo_config();
+  }
+
   fts_cmd_args_parse( argc, argv);
 
   fts_platform_init();

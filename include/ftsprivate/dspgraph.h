@@ -23,8 +23,6 @@
 #ifndef _FTS_PRIVATE_DSPGRAPH_H_
 #define _FTS_PRIVATE_DSPGRAPH_H_
 
-#include <fts/fts.h>
-
 FTS_API fts_symbol_t fts_s_dsp_outputsize;
 FTS_API fts_symbol_t fts_s_dsp_descr;
 
