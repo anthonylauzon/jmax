@@ -1,5 +1,9 @@
 2003-07-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* configure.in, m4/ac_check_java_version.m4: added a m4 macro for checking version of java.
+	Now configure failed if version of java used is less than 1.4.0
+	Java test are only done if java compilation is enable.
+
 	* configure.in, java/src/ircam/jmax/JMaxApplication.java, utils/jmax-config/jmax-config.in, utils/pkgconfig/jmax.pc.in and all Makefile.am in packages: changed installation directory of packages.
 	Now packages are installed in ${libdir}/jmax/packages/
 		
