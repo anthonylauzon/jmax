@@ -25,6 +25,6 @@
 
 SOURCES = \
 numeric.c \
-nsplit.c \
+range.c \
 wrap.c \
 rewrap.c \
