@@ -21,12 +21,45 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
-typedef struct 
-{
-  fts_object_t head;
-  fts_audioport_t *port;
+typedef struct {
+  fts_dsp_object_t head;
+  fts_audiolabel_t *left_label;
+  fts_audiolabel_t *right_label;
 } monitor_t;
+
+static fts_symbol_t monitor_symbol = 0;
+
+static void
+monitor_ftl( fts_word_t *argv)
+{
+  monitor_t *self = (monitor_t *)fts_word_get_pointer( argv+0);
+  float * restrict left_in = (float *) fts_word_get_pointer(argv + 1);
+  float * restrict right_in = (float *) fts_word_get_pointer(argv + 2);
+  int n_tick = fts_word_get_int(argv + 3);
+
+  if (self->left_label)
+    fts_audiolabel_output( self->left_label, left_in, n_tick);
+
+  if (self->right_label)
+    fts_audiolabel_output( self->right_label, right_in, n_tick);
+}
+
+static void 
+monitor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  monitor_t *self = (monitor_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_atom_t argv[4];
+
+  fts_set_object( argv+0, self);
+  fts_set_symbol( argv+1, fts_dsp_get_input_name( dsp, 0));
+  fts_set_symbol( argv+2, fts_dsp_get_input_name( dsp, 1));
+  fts_set_int( argv+3, fts_dsp_get_input_size(dsp, 0));
+
+  fts_dsp_add_function( monitor_symbol, 4, argv);
+}
 
 static void 
 monitor_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -76,37 +109,19 @@ monitor_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 }
 
 static void 
-monitor_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  monitor_t *this  = (monitor_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
-  void *propagate_context = fts_get_pointer(at + 1);
-  int inlet = fts_get_int(at + 2);
-  
-  if(this->port)
-    {
-#warning (OLD API) monitor_propagate_input use fts_audioport_get_output_dispactcher and \
-fts_audioport_get_output_channel (OLD API)
-/*       fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher(this->port); */
-      
-/*       if(outdispatcher && fts_audioport_get_output_channels(this->port) >= 2) */
-/* 	(*propagate_fun)(propagate_context, outdispatcher, inlet); */
-    }
-}
-
-static void 
 monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  monitor_t *this = (monitor_t *)o;
+  monitor_t *self = (monitor_t *)o;
 
-  this->port = 0;
+  fts_dsp_object_init((fts_dsp_object_t *)self);
 
-#warning (OLD API) monitor_init use fts_audioport_get_default (OLD API)
-/*   this->port = fts_audioport_get_default(o); */
-  if (!this->port)
+  self->left_label = fts_audiolabel_get( fts_new_symbol( "default L"));
+  self->right_label = fts_audiolabel_get( fts_new_symbol( "default R"));
+
+  if ( !self->left_label || !self->right_label)
     {
-      fts_object_error( o, "default audio port is not defined");
-      return;    
+      self->left_label = fts_audiolabel_get( fts_new_symbol( "default"));
+      self->right_label = NULL;
     }
 
   fts_dsp_active_add_listener(o, monitor_dsp_active);
@@ -123,10 +138,11 @@ monitor_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(monitor_t), monitor_init, monitor_delete);
 
-  fts_class_message_varargs(cl, fts_s_propagate_input, monitor_propagate_input);
   fts_class_message_varargs(cl, fts_s_update_real_time, monitor_update_real_time); 
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);
+
+  fts_class_message_varargs(cl, fts_s_put, monitor_put);
 
   fts_class_message_varargs(cl, fts_s_start, monitor_start);
   fts_class_message_varargs(cl, fts_s_stop, monitor_stop);
@@ -143,4 +159,6 @@ void
 monitor_config( void)
 {
   fts_class_install(fts_new_symbol( "monitor~"), monitor_instantiate);
+
+  fts_dsp_declare_function( monitor_symbol, monitor_ftl);
 }

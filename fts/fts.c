@@ -235,10 +235,6 @@ void fts_init( int argc, char **argv)
   /* Platform dependant initialization */
   fts_platform_init();
 
-  fts_log("[fts]: Configure DSP timebase\n");
-
-  fts_dsp_timebase_configure();
-
   fts_log("[fts]: Initializing kernel classes\n");
 
   /* Installation of kernel classes */

@@ -499,7 +499,7 @@ fts_object_remove_connections(fts_object_t *obj)
       fts_connection_t *p;
 
       /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
-      while (p = data->out_conn[outlet])
+      while ((p = data->out_conn[outlet]))
         fts_connection_delete(p);
     }
 
@@ -509,7 +509,7 @@ fts_object_remove_connections(fts_object_t *obj)
       fts_connection_t *p;
 
       /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
-      while (p = data->in_conn[inlet])
+      while ((p = data->in_conn[inlet]))
         fts_connection_delete(p);
     }
   }

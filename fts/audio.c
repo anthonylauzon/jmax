@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include <ftsprivate/audio.h>
+#include <ftsprivate/dsp.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/audioconfig.h>
 #include <ftsprivate/midi.h>
@@ -133,7 +134,10 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
       port->inout[direction].nlabels++;
       if (port->inout[direction].nlabels == 1)
       {
-	fts_send_message( (fts_object_t *)port, selector, 0, 0);
+	fts_atom_t a[1];
+
+	fts_set_symbol( a, fts_audiolabel_get_name( label));
+	fts_send_message( (fts_object_t *)port, selector, 1, a);
       }
     }
 }
@@ -173,6 +177,8 @@ typedef struct audiolabel_listener {
 
 static audiolabel_listener_t *audiolabel_listeners;
 static fts_heap_t *audiolabel_listeners_heap;
+
+static fts_hashtable_t audiolabel_table;
 
 static fts_symbol_t s_input_channel;
 static fts_symbol_t s_output_channel;
@@ -238,6 +244,37 @@ audiolabel_fire_removed( fts_symbol_t label_name)
   fts_set_symbol( a, label_name);
   for ( p = audiolabel_listeners; p; p = p->next)
     (*p->label_removed)( p->listener, -1, NULL, 1, a);
+}
+
+fts_audiolabel_t *
+fts_audiolabel_get( fts_symbol_t name)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get( &audiolabel_table, &k, &v))
+    return (fts_audiolabel_t *)fts_get_object( &v);
+
+  return NULL;
+}
+
+static void
+audiolabel_put( fts_symbol_t name, fts_audiolabel_t *label)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, name);
+  fts_set_object (&v, (fts_object_t *)label);
+  fts_hashtable_put( &audiolabel_table, &k, &v);
+}
+
+static void
+audiolabel_remove( fts_symbol_t name)
+{
+  fts_atom_t k, v;
+
+  fts_set_symbol( &k, name);
+  fts_hashtable_remove( &audiolabel_table, &k);
 }
 
 static void
@@ -361,6 +398,8 @@ audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
   else
     self->name = fts_new_symbol( "unnamed");
 
+  audiolabel_put( self->name, self);
+
   self->inout[FTS_AUDIO_INPUT].port_name = fts_s_unconnected;
   self->inout[FTS_AUDIO_INPUT].port = NULL;
   self->inout[FTS_AUDIO_INPUT].channel = -1;
@@ -379,6 +418,8 @@ audiolabel_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 
   audiolabel_set_port( self, FTS_AUDIO_INPUT, NULL);
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, NULL);
+
+  audiolabel_remove( self->name);
 
   audiolabel_fire_removed( self->name);
 }
@@ -465,6 +506,7 @@ static int sort_symbol(const void* a, const void* b)
 {
   fts_symbol_t* pa = (fts_symbol_t*)a;
   fts_symbol_t* pb = (fts_symbol_t*)b;
+
   return strcmp(*pa, *pb);
 }
 
@@ -527,7 +569,8 @@ fts_symbol_t *fts_audiomanager_get_output_names(void)
  *
  */
 
-void fts_audio_idle( void)
+static void 
+audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_audioport_t *port;
   int channel, tick_size, at_least_one_io_fun_called;
@@ -556,6 +599,9 @@ void fts_audio_idle( void)
 	}
     }
 
+  /* Call the DSP */
+  fts_dsp_run_tick();
+
   for ( port = audioport_list; port; port = port->next)
     {
       if ( !fts_audioport_is_output( port) || !fts_audioport_is_open( port, FTS_AUDIO_OUTPUT))
@@ -579,6 +625,27 @@ void fts_audio_idle( void)
     fts_sleep();
 }
 
+static void
+audio_sched_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_sched_add( o, FTS_SCHED_ALWAYS);
+}
+
+static void
+audio_sched_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_sched_remove( o);
+}
+
+static void
+audio_sched_instantiate(fts_class_t *cl)
+{
+  fts_class_init( cl, sizeof(fts_object_t), audio_sched_init, audio_sched_delete);
+
+  fts_class_message_varargs( cl, fts_s_sched_ready, audio_sched_run);
+}
+
+
 /***********************************************************************
  *
  * Initialization
@@ -587,6 +654,8 @@ void fts_audio_idle( void)
 
 void fts_audio_config( void)
 {
+  fts_class_t *audio_sched_class;
+  fts_object_t *audio_sched;
 
   audiolabel_listeners_heap = fts_heap_new( sizeof( audiolabel_listener_t));
 
@@ -595,7 +664,12 @@ void fts_audio_config( void)
 
   fts_audiolabel_class = fts_class_install( fts_new_symbol("__audiolabel"), audiolabel_instantiate);
 
+  fts_hashtable_init( &audiolabel_table, FTS_HASHTABLE_SMALL);
+
   fts_hashtable_init( &audiomanager_table, FTS_HASHTABLE_SMALL);
+
+  audio_sched_class = fts_class_install( NULL, audio_sched_instantiate);
+  audio_sched = fts_object_create( audio_sched_class, NULL, 0, 0);
 }
 
 /** EMACS **

@@ -133,7 +133,6 @@ typedef struct fts_dsp_object
 #define fts_dsp_object_get_resampling(o) ((o)->resamp)
 #define fts_dsp_object_set_resampling(o, r) ((o)->resamp = (r))
 
-FTS_API void fts_dsp_run_tick(void);
 FTS_API int fts_dsp_is_running(void);
 FTS_API void fts_dsp_restart(void);
 
@@ -279,7 +278,6 @@ FTS_API void fts_dsp_object_init(fts_dsp_object_t *object);
 FTS_API void fts_dsp_object_delete(fts_dsp_object_t *obj);
 
 FTS_API int fts_is_dsp_object(fts_object_t *o);
-FTS_API void fts_dsp_default_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /* test inputs */
 FTS_API int fts_dsp_is_sig_inlet(fts_object_t *object, int number);

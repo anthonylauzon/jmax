@@ -23,7 +23,7 @@
 #ifndef _FTS_PRIVATE_DSPGRAPH_H_
 #define _FTS_PRIVATE_DSPGRAPH_H_
 
-FTS_API fts_dsp_signal_t *sig_zero;
+extern fts_dsp_signal_t *sig_zero;
 
 /*************************************************
  *

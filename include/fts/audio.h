@@ -154,6 +154,8 @@ struct fts_audiolabel {
 #define fts_audiolabel_get_port( label, direction) ((label)->inout[(direction)].port)
 #define fts_audiolabel_get_channel( label, direction) ((label)->inout[(direction)].channel)
 
+FTS_API fts_audiolabel_t *fts_audiolabel_get( fts_symbol_t name);
+
 FTS_API void fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize);
 FTS_API void fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int buffsize);
 

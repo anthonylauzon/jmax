@@ -59,7 +59,6 @@ typedef struct fts_sched
 {
   sched_callback_t *callback_head; 
   enum {sched_ready, sched_halted} status;
-  fts_timebase_t *timebase;
 } fts_sched_t;
 
 /* the global scheduler */
@@ -375,5 +374,6 @@ fts_sched_unset_run_under_callback()
 void fts_kernel_sched_init(void)
 {
   sleep_init();
+
   fts_sched_init(&main_sched);
 }

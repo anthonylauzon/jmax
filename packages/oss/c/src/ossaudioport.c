@@ -122,8 +122,6 @@ static void ossaudioport_output_copy_fun( fts_audioport_t *port, float *buff, in
 
 }
 
-
-
 static int ossaudioport_xrun( fts_audioport_t *port)
 {
 /*   ossaudioport_t *ossport = (ossaudioport_t *)port; */
@@ -289,7 +287,6 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
   fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 
-/* WHY IT DOESN'T COMPILE ? */
   fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, channels);
   fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, channels);
 
