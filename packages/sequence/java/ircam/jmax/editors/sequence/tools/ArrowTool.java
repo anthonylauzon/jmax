@@ -36,254 +36,256 @@ import javax.swing.undo.*;
 
 
 /**
- * the tool used to perform the different operations associated
+* the tool used to perform the different operations associated
  * with the "arrow" tool, that is:
  * selection, area_selection, deselection, moving.
  */ 
 public class ArrowTool extends SelecterTool implements DirectionListener, DragListener{
-
+	
   /**
-   * Constructor. 
+	* Constructor. 
    */
   public ArrowTool(ImageIcon theImageIcon) 
-  {
+{
     super("edit", theImageIcon);
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
     itsSelectionResizer = new SequenceSelectionResizer(this);
-  }
+}
 
-  /**
-   * called when this tool is unmounted
-   */
-  public void deactivate(){}
-
-  
-  /**
-   * a single object has been selected, in coordinates x, y.
-   * Starts a move or a clone operation (if ALT is pressed).
-   * overrides the abstract SelecterTool.singleObjectSelected */
-  void singleObjectSelected(int x, int y, int modifiers)
-  {
-    mountIModule(itsDirectionChooser, x, y);
-  }
-
-  /** 
-   * a group of objects was selected 
-   *overrides the abstract SelecterTool.multipleObjectSelected */
-  void multipleObjectSelected()
-  {
-  }
-
-  /******************************************************************************
-   *********** AddingEvents *****************************************************
-   ******************************************************************************/
-  public void controlAction(int x, int y, int modifiers)
-  {
-    mountIModule(itsSelectionMover);
-
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-    egc.getTrack().setProperty("selected", Boolean.TRUE);
-
-    if(egc.getDataModel().isLocked()) return;
-
-    // starts an undoable transition
-    ((UndoableData) egc.getDataModel()).beginUpdate();
-    //endUpdate is called in addEvents in dataModel
-
-    //with Shift add to selection
-    if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
-
-    ValueInfo info = egc.getTrack().getTrackDataModel().getType();
-    addEvent(x, y, (EventValue) info.newInstance());
-
-    mountIModule(itsSelecter);
-  }
-
-  void addEvent(int x, int y, EventValue value)
-  {
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-    UtilTrackEvent aEvent = new UtilTrackEvent(value, egc.getDataModel());
-
-    egc.getAdapter().setX(aEvent, x);
-
-    egc.getAdapter().setY(aEvent, y);
-
-    egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(),
-																											value.getValueInfo().getName(),
-																											value.getDefinedPropertyCount()*2,
-																											value.getDefinedPropertyNamesAndValues());
-  }
-
-  /***********************************************************************************************
-  ************************************************************************************************/
-  
-  public void selectionPointDoubleClicked(int x, int y, int modifiers) 
-  {
-    super.selectionPointDoubleClicked(x, y, modifiers);
-    if (gc.getRenderManager().firstObjectContaining(x, y) == null)
-      ((SequenceGraphicContext)gc).getTrackEditor().showListDialog();
-  }
-
-  public void edit(int x, int y, int modifiers)
-  {
-    TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-    
-    if (aTrackEvent != null) 
-      { //click on event
-	aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
-
-	gc.getGraphicDestination().repaint();
-      }
-  }
+/**
+* called when this tool is unmounted
+ */
+public void deactivate(){}
 
 
-  /**
-   * called by the DirectionChooser UI module
-   */
-  public void directionChoosen(int theDirection, int modifiers) 
-  {
-    if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)!=0)
-      {
-	itsSelectionResizer.setDirection(theDirection);
-	mountIModule(itsSelectionResizer, startingPoint.x, startingPoint.y);
-	resizing = true;
-      }
-    else
-      {
-	itsSelectionMover.setDirection(theDirection);
-	mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
-      }
-  }
-  
-  /**
-   * called by the DirectionChooser UI module
-   */
-  public void directionAbort()
-  {
-    mountIModule(itsSelecter);
-  }
+/**
+* a single object has been selected, in coordinates x, y.
+ * Starts a move or a clone operation (if ALT is pressed).
+ * overrides the abstract SelecterTool.singleObjectSelected */
+void singleObjectSelected(int x, int y, int modifiers)
+{
+	mountIModule(itsDirectionChooser, x, y);
+}
 
-  /**
-   * drag listener called by the SelectionMover UI module,
-   * at the end of its interaction.
-   * Moves all the selected elements
-   */
-  public void dragEnd(int x, int y, MouseEvent evt)
-  {
-    int deltaY = y-startingPoint.y;
-    int deltaX = x-startingPoint.x;
+/** 
+* a group of objects was selected 
+*overrides the abstract SelecterTool.multipleObjectSelected */
+void multipleObjectSelected()
+{
+}
 
-    if(resizing)
-      {
-	resizeSelection(deltaX, deltaY);
-	resizing = false;	    
-      }
-    else
-      moveSelection(deltaX, deltaY);
-
-    mountIModule(itsSelecter);
-    gc.getGraphicDestination().repaint();    
-  }
-  
-  public void updateStartingPoint(int deltaX, int deltaY)
-  {
-    startingPoint.x+=deltaX;
-    startingPoint.y+=deltaY;
-  }
-
-  void resizeSelection(int deltaX, int deltaY)
-  {
-    TrackEvent aEvent;
-	  
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	  
-    // starts a serie of undoable transitions
-    ((UndoableData) egc.getDataModel()).beginUpdate();
-    
-    if( deltaX != 0)
-      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	{
-	  aEvent = (TrackEvent) e.nextElement();
-
-	  if (egc.getAdapter().getLenght( aEvent) + deltaX > 0)
-	    egc.getAdapter().setLenght( aEvent, egc.getAdapter().getLenght( aEvent) + deltaX);
-	}
-    else
-      if( deltaY != 0)
-	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	  {
-	    aEvent = (TrackEvent) e.nextElement();
-	    
-	    if ( egc.getAdapter().getHeigth( aEvent) - deltaY >= 0)
-	      egc.getAdapter().setHeigth( aEvent, egc.getAdapter().getHeigth( aEvent) - deltaY);
-	    else
-	      egc.getAdapter().setHeigth( aEvent, 0);
-	  }          
-
-    egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
-  }
-
-  void moveSelection(int deltaX, int deltaY)
-  {
-    TrackEvent aEvent;
-    TrackEvent newEvent;
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-    Adapter a = egc.getAdapter();
-
-    if(deltaX != 0) 
-      {	    
+/******************************************************************************
+*********** AddingEvents *****************************************************
+******************************************************************************/
+public void controlAction(int x, int y, int modifiers)
+{
+	mountIModule(itsSelectionMover);
+	
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	egc.getTrack().setProperty("selected", Boolean.TRUE);
+	
+	if(egc.getDataModel().isLocked()) return;
+	
+	// starts an undoable transition
 	((UndoableData) egc.getDataModel()).beginUpdate();
-	    
-	if(a.isHorizontalMovementAllowed())
-	  if(!a.isHorizontalMovementBounded())
-	    egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
-	  else
+	//endUpdate is called in addEvents in dataModel
+	
+	//with Shift add to selection
+	if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
+	
+	ValueInfo info = egc.getTrack().getTrackDataModel().getType();
+	addEvent(x, y, (EventValue) info.newInstance());
+	
+	mountIModule(itsSelecter);
+}
+
+void addEvent(int x, int y, EventValue value)
+{
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	UtilTrackEvent aEvent = new UtilTrackEvent(value, egc.getDataModel());
+	
+	egc.getAdapter().setX(aEvent, x);
+	
+	egc.getAdapter().setY(aEvent, y);
+	
+	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(),
+																										value.getValueInfo().getName(),
+																										value.getDefinedPropertyCount()*2,
+																										value.getDefinedPropertyNamesAndValues());
+}
+
+/***********************************************************************************************
+************************************************************************************************/
+
+public void selectionPointDoubleClicked(int x, int y, int modifiers) 
+{
+	super.selectionPointDoubleClicked(x, y, modifiers);
+	if (gc.getRenderManager().firstObjectContaining(x, y) == null)
+		((SequenceGraphicContext)gc).getTrackEditor().showListDialog(); //double click on backGround
+		else
+			((SequenceGraphicContext)gc).getTrackEditor().showListDialog();//double click on event
+}
+
+public void edit(int x, int y, int modifiers)
+{
+	TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+	
+	if (aTrackEvent != null) 
+	{ //click on event
+		aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
+		
+		gc.getGraphicDestination().repaint();
+	}
+}
+
+
+/**
+* called by the DirectionChooser UI module
+ */
+public void directionChoosen(int theDirection, int modifiers) 
+{
+	if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)!=0)
+	{
+		itsSelectionResizer.setDirection(theDirection);
+		mountIModule(itsSelectionResizer, startingPoint.x, startingPoint.y);
+		resizing = true;
+	}
+	else
+	{
+		itsSelectionMover.setDirection(theDirection);
+		mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
+	}
+}
+
+/**
+* called by the DirectionChooser UI module
+ */
+public void directionAbort()
+{
+	mountIModule(itsSelecter);
+}
+
+/**
+* drag listener called by the SelectionMover UI module,
+ * at the end of its interaction.
+ * Moves all the selected elements
+ */
+public void dragEnd(int x, int y, MouseEvent evt)
+{
+	int deltaY = y-startingPoint.y;
+	int deltaX = x-startingPoint.x;
+	
+	if(resizing)
+	{
+		resizeSelection(deltaX, deltaY);
+		resizing = false;	    
+	}
+	else
+		moveSelection(deltaX, deltaY);
+	
+	mountIModule(itsSelecter);
+	gc.getGraphicDestination().repaint();    
+}
+
+public void updateStartingPoint(int deltaX, int deltaY)
+{
+	startingPoint.x+=deltaX;
+	startingPoint.y+=deltaY;
+}
+
+void resizeSelection(int deltaX, int deltaY)
+{
+	TrackEvent aEvent;
+	
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	
+	// starts a serie of undoable transitions
+	((UndoableData) egc.getDataModel()).beginUpdate();
+	
+	if( deltaX != 0)
+		for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 		{
+			aEvent = (TrackEvent) e.nextElement();
+			
+			if (egc.getAdapter().getLenght( aEvent) + deltaX > 0)
+				egc.getAdapter().setLenght( aEvent, egc.getAdapter().getLenght( aEvent) + deltaX);
+		}
+			else
+				if( deltaY != 0)
+					for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+					{
+						aEvent = (TrackEvent) e.nextElement();
+						
+						if ( egc.getAdapter().getHeigth( aEvent) - deltaY >= 0)
+							egc.getAdapter().setHeigth( aEvent, egc.getAdapter().getHeigth( aEvent) - deltaY);
+						else
+							egc.getAdapter().setHeigth( aEvent, 0);
+					}          
+						
+						egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
+}
+
+void moveSelection(int deltaX, int deltaY)
+{
+	TrackEvent aEvent;
+	TrackEvent newEvent;
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	Adapter a = egc.getAdapter();
+	
+	if(deltaX != 0) 
+	{	    
+		((UndoableData) egc.getDataModel()).beginUpdate();
+		
+		if(a.isHorizontalMovementAllowed())
+			if(!a.isHorizontalMovementBounded())
+				egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
+			else
+			{
+				for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+				{
+					int prevX = 0;
+					int nextX = 0;
+					
+					aEvent = (TrackEvent) e.nextElement();
+					
+					FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
+					TrackEvent next = ftsTrk.getNextEvent(aEvent);
+					if(next!=null)
+						nextX = a.getX(next)-1;
+					TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
+					if(prev!=null)
+						prevX = a.getX(prev)+1;
+		      
+					if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
+						a.setX(aEvent, nextX);
+					else
+						if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
+							a.setX(aEvent, prevX);
+					else
+						a.setX(aEvent, a.getX(aEvent) + deltaX);
+				}
+			}
+	}
+		if(deltaY!=0)
+		{
+			((UndoableData) egc.getDataModel()).beginUpdate();
 			for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 			{
-				int prevX = 0;
-				int nextX = 0;
-				
 				aEvent = (TrackEvent) e.nextElement();
-				
-				FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
-				TrackEvent next = ftsTrk.getNextEvent(aEvent);
-				if(next!=null)
-					nextX = a.getX(next)-1;
-				TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
-				if(prev!=null)
-					prevX = a.getX(prev)+1;
-		      
-				if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
-					a.setX(aEvent, nextX);
-				else
-					if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
-						a.setX(aEvent, prevX);
-		    else
-		      a.setX(aEvent, a.getX(aEvent) + deltaX);
-			}
+				a.setY(aEvent, a.getY(aEvent)+deltaY);
+			}    
 		}
-      }
-	if(deltaY!=0)
-	{
-		((UndoableData) egc.getDataModel()).beginUpdate();
-		for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	  {
-	    aEvent = (TrackEvent) e.nextElement();
-	    a.setY(aEvent, a.getY(aEvent)+deltaY);
-	  }    
-	}
-	egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
-  }
+		egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
+}
 
-  //---Fields
-  MaxVector times = new MaxVector();
-  MaxVector movingEvents = new MaxVector();
+//---Fields
+MaxVector times = new MaxVector();
+MaxVector movingEvents = new MaxVector();
 
-  DirectionChooser itsDirectionChooser;
-  SelectionMover itsSelectionMover;
-  SequenceSelectionResizer itsSelectionResizer;
-  boolean resizing = false;
+DirectionChooser itsDirectionChooser;
+SelectionMover itsSelectionMover;
+SequenceSelectionResizer itsSelectionResizer;
+boolean resizing = false;
 }
