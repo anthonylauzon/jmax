@@ -871,7 +871,7 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
   fts_class_set_equals_function(cl, ivec_equals_function);
-  fts_class_set_equals_function(cl, ivec_copy_function);
+  fts_class_set_copy_function(cl, ivec_copy_function);
   fts_class_set_post_function(cl, ivec_post_function);
   fts_class_set_array_function(cl, ivec_array_function);
   

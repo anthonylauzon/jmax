@@ -80,7 +80,7 @@ fslice_copy_to_fmat(fslice_t *org, fmat_t *copy)
 
 
 static void
-fslice_post(fts_object_t *o, fts_bytestream_t *stream)
+fslice_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
   fslice_t *self = (fslice_t *)o;
   int index = fslice_get_index(self);
@@ -91,6 +91,24 @@ fslice_post(fts_object_t *o, fts_bytestream_t *stream)
     fts_spost(stream, "<fcol %d (%dx%d)>", index, m, n);
   else
     fts_spost(stream, "<frow %d (%dx%d)>", index, m, n);
+}
+
+static void
+fslice_array_function(fts_object_t *o, fts_array_t *array)
+{
+  fslice_t *self = (fslice_t *)o;
+  float *values = fslice_get_ptr(self);
+  int size = fslice_get_size(self);
+  int stride = fslice_get_stride(self);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i, j;
+  
+  fts_array_set_size(array, onset + size);
+  atoms = fts_array_get_atoms(array) + onset;
+  
+  for(i=0, j=0; i<size; i++, j+=stride)
+    fts_set_float(atoms + i, values[j]);
 }
 
 
@@ -1112,7 +1130,8 @@ fslice_instantiate(fts_class_t *cl)
 {
   fts_class_message_varargs(cl, fts_s_print, fslice_print);
   
-  fts_class_set_post_function(cl, fslice_post);
+  fts_class_set_post_function(cl, fslice_post_function);
+  fts_class_set_array_function(cl, fslice_array_function);
 
   fslice_message(cl, fts_new_symbol("add"), fslice_add_fslice, fslice_add_number);
   fslice_message(cl, fts_new_symbol("sub"), fslice_sub_fslice, fslice_sub_number);

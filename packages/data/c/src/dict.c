@@ -671,7 +671,7 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, dict_copy_function);
   fts_class_set_post_function(cl, dict_post_function);
-  fts_class_set_post_function(cl, dict_array_function);
+  fts_class_set_array_function(cl, dict_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);

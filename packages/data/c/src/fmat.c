@@ -484,6 +484,23 @@ fmat_post_function(fts_object_t *o, fts_bytestream_t *stream)
     fts_spost(stream, "<fmat %d x %d of %s>", m, n, fts_symbol_name(fmat_format_get_name(format)));
 }
 
+static void
+fmat_array_function(fts_object_t *o, fts_array_t *array)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *values = fmat_get_ptr(self);
+  int size = fmat_get_m(self) * fmat_get_n(self);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i;
+  
+  fts_array_set_size(array, onset + size);
+  atoms = fts_array_get_atoms(array) + onset;
+  
+  for(i=0; i<size; i++)
+    fts_set_float(atoms + i, values[i]);
+}
+
 float
 fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b)
 {
@@ -1193,10 +1210,10 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 _fmat_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t *this = (fmat_t *)o;
-  float *ptr = fmat_get_ptr(this);
-  int m = fmat_get_m(this);
-  int n = fmat_get_n(this);
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
   double ret = 0.0;
   
   if(ac > 0)
@@ -1281,10 +1298,10 @@ _fmat_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static void
 fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t *this = (fmat_t *)o;
-  float *ptr = fmat_get_ptr(this);
-  int m = fmat_get_m(this);
-  int n = fmat_get_n(this);
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
   fts_atom_t *atoms;
   int i;
@@ -1301,12 +1318,12 @@ fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 fvec_pick_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t *this = (fmat_t *)o;
+  fmat_t *self = (fmat_t *)o;
   fmat_t *source = (fmat_t *)fts_get_object(at);
   int source_size = fvec_get_size(source);
-  int size = fvec_get_size(this);
+  int size = fvec_get_size(self);
   float *src = fvec_get_ptr(source);
-  float *ptr = fvec_get_ptr(this);
+  float *ptr = fvec_get_ptr(self);
   int onset = 0;
   int i;
 
@@ -1321,7 +1338,7 @@ fvec_pick_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if(size > 0)
   {
-    fvec_set_size(this, size);
+    fvec_set_size(self, size);
 
     for(i=0; i<size; i++)
       ptr[i] = src[onset + i];
@@ -3697,6 +3714,11 @@ fmat_instantiate(fts_class_t *cl)
   else
     fts_class_init(cl, sizeof(fmat_t), fvec_init, fmat_delete);    
   
+  fts_class_set_copy_function(cl, fmat_copy_function);
+  fts_class_set_equals_function(cl, fmat_equals_function);
+  fts_class_set_post_function(cl, fmat_post_function);
+  fts_class_set_array_function(cl, fmat_array_function);
+  
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, fmat_dump_state);
@@ -3796,10 +3818,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_symbol(cl, fts_s_export, fmat_export);
   fts_class_message_void(cl, fts_s_export, fmat_export_dialog);
   
-  fts_class_set_copy_function(cl, fmat_copy_function);
-  fts_class_set_equals_function(cl, fmat_equals_function);
-  fts_class_set_post_function(cl, fmat_post_function);
-
   fts_class_inlet_bang(cl, 0, data_object_output);
   
   fts_class_inlet_thru(cl, 0);
