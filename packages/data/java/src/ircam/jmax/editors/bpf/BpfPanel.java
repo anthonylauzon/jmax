@@ -117,11 +117,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     northSection.add(ruler);	
     container_panel.add(northSection, BorderLayout.NORTH);
 
-    //itsContainer.getFrame().validate();
-    //itsContainer.getFrame().pack();
-
-    //itsContainer.getFrame().setVisible(true);
-    
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -278,13 +273,18 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
 	return ((time>startTime)&&(time<endTime));
     }
-    
-      ///////AUTOMATIC SCROLLING  
+
+    ///////AUTOMATIC SCROLLING  
     public boolean pointIsVisible(int x, int y)
     {
 	Rectangle r = itsContainer.getViewRectangle();
 	return ((x > r.x) && (x < r.x + r.width));
     } 
+
+    public boolean pointIsScrollable(int x, int y)
+    {
+	return !((editor.getGraphicContext().getLogicalTime()==0)&&(x<=0));
+    }
 
     private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
     private int scrolledDelta = 2;//the corresponding graphic delta

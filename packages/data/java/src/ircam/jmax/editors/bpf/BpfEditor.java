@@ -232,7 +232,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     FtsBpfObject model;
     BpfPopupMenu bpfPopupMenu;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    static public int DEFAULT_HEIGHT = /*127*/Bpf.DEFAULT_HEIGHT - 30;
+    static public int DEFAULT_HEIGHT = Bpf.DEFAULT_HEIGHT - 30;
     BpfRenderer renderer;
     BpfAdapter ad;
 

@@ -70,10 +70,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	    delta = bpfPanel.scrollBy(x, y);
 	    updateStart(-delta, 0);
 	    getListener().updateStartingPoint(-delta, 0);
-
-	    /*BpfAdapter a = getGc().getAdapter();
-	      getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(),
-	      " time "+a.getInvX(x));*/
 	}
 	void setEditor(BpfPanel editor)
 	{
@@ -89,7 +85,8 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     void autoScrollIfNeeded(int x, int y)
     {
 	BpfPanel panel = (BpfPanel)((Bpf)gc.getFrame()).getEditor();
-	if (! panel.pointIsVisible(x , y))
+	
+	if (! panel.pointIsVisible(x , y) && panel.pointIsScrollable(x, y))
 	{
 	    scroller.setXY(x, y);
 	    if (!scrollTimer.isRunning())
@@ -192,7 +189,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
   {
       if(!scrollTimer.isRunning())
 	  super.mouseDragged(e);
-      
+
       autoScrollIfNeeded(e.getX(), e.getY());
   }
 
@@ -275,7 +272,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
 
 	////////////////////////
-
 	for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movPoint = (BpfPoint) e.nextElement();
@@ -332,6 +328,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
   //--- Fields
   Rectangle enclosingRect = new Rectangle();
   UtilBpfPoint tempPoint = new UtilBpfPoint();
+
 }
 
 

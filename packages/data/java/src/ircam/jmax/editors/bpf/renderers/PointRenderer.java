@@ -30,6 +30,7 @@ import ircam.jmax.editors.bpf.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
+import java.text.*;
 
 /**
  * An IntegerValue event renderer. It is represented as a vertical black bar
@@ -115,7 +116,8 @@ public class PointRenderer implements ObjectRenderer {
 		    {
 			g.drawLine(x, y-10, x, y+10);
 			g.drawLine(x-10, y, x+10, y);
-			bgc.display(point.getTime()+" - "+point.getValue());
+			bgc.display(numberFormat.format(point.getTime())+" - "+
+				    numberFormat.format(point.getValue()));
 		    }
 	    }
 	else //normal paint
@@ -198,5 +200,13 @@ public class PointRenderer implements ObjectRenderer {
     public static PointRenderer staticInstance;
     public final static int INTEGER_WIDTH = 2;
     public final static int POINT_RADIUS = 5;
+
+    static public NumberFormat numberFormat;
+    static 
+    {
+	numberFormat = NumberFormat.getInstance();
+	numberFormat.setMaximumFractionDigits(3);
+	numberFormat.setGroupingUsed(false);
+    }
 }
 
