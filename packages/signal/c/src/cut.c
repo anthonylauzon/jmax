@@ -20,6 +20,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 #include "fvec.h"
 
 fts_symbol_t cut_symbol = 0;
@@ -50,7 +51,7 @@ static void cut_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
   fts_atom_t a[1];
 
-  fvec_atom_set(a, data->fvec);
+  fts_set_object(a, data->fvec);
   fts_outlet_send((fts_object_t *)o, 0, fvec_symbol, 1, a);
 }
 

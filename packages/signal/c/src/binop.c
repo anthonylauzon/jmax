@@ -20,6 +20,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 typedef struct
 {
