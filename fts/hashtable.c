@@ -337,7 +337,7 @@ void fts_hashtable_stats( fts_hashtable_t *h)
 
 void fts_hashtable_log( fts_hashtable_t *h)
 {
-  int i;
+  unsigned int i;
 
   fts_log( "Hashtable: length = %d count = %d rehash = %d\n", h->length, h->count, h->rehash_count);
 
