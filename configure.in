@@ -68,7 +68,12 @@ AC_ARG_WITH(javac,
 AC_ARG_WITH(java,
   [  --with-java=JAVA         give java virtual machine (optional)],
   [JAVA="$withval"])
-CLASSPATH=
+
+dnl Check for classpath
+AC_ARG_WITH(classpath,
+  [  --with-classpath=CLASSPATH	additionnal classpath (optionnal)],
+  [ CLASSPATH="$withval"])
+dnl CLASSPATH=
 export CLASSPATH
 AC_PROG_JAVAC
 AC_PROG_JAVA
@@ -113,7 +118,7 @@ case "$host" in
 dnl GNU/Linux on an Intel or compatible
 i*86-*-linux*|powerpc-*-linux-gnu)
 PLATFORM=linux
-CFLAGS="$CFLAGS -Wall -Wno-unused"
+CFLAGS="$CFLAGS -Wall"
 if test "$with_debug" != "yes"
 then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fmove-all-movables -fstrict-aliasing"
@@ -124,7 +129,8 @@ then
 fi
 dnl Platform specific CFLAGS
 case "$host" in
-i*86-*-linux*) CFLAGS="$CFLAGS -mpentiumpro" ;;
+dnl i*86-*-linux*) CFLAGS="$CFLAGS -mpentiumpro" ;;
+i*86-*-linux*) CFLAGS="$CFLAGS" ;;
 esac
 
 PLATFORM_PACKAGES="oss"
@@ -187,6 +193,29 @@ ROOTDIR="${datadir}/jmax"
 
 AC_SUBST(FTSDIR)
 AC_SUBST(ROOTDIR)
+
+dnl Check for jack support
+AC_ARG_ENABLE(jack,
+  [ --enable-jack[=value]	compile jack package [default=no]],
+  with_jack="yes",
+  with_jack="no")
+if test "$with_jack" = "yes"
+then
+	dnl Add jack in packages to compile
+	ADDITIONAL_PACKAGES="jack"
+fi
+ 
+AC_ARG_WITH(jack-cflags,
+  [  --with-jack-cflags=JACK_CFLAGS	jack support cflags (optional)],
+  [JACK_CFLAGS="$withval"])
+AC_ARG_WITH(jack-ldflags,
+  [  --with-jack-ldflags=JACK_LDFLAGS	jack support ldflags (optional)],
+  [JACK_LDFLAGS="$withval"])
+dnl add a jack test here
+AC_SUBST(JACK_CFLAGS)
+AC_SUBST(JACK_LDFLAGS)
+
+AC_SUBST(ADDITIONAL_PACKAGES)
 
 dnl Run configure in subdirectories
 AC_CONFIG_SUBDIRS(client)
@@ -291,6 +320,9 @@ packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
 packages/ispwmath/help/Makefile
+packages/jack/Makefile
+packages/jack/c/Makefile
+packages/jack/c/src/Makefile
 packages/macosx/Makefile
 packages/macosx/c/Makefile
 packages/macosx/c/src/Makefile
