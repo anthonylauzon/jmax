@@ -45,6 +45,7 @@
 #define DSP_CONTROL_FPE_CLEAR_COLLECT  10
 
 #define DSP_CONTROL_DSP_PRINT          11
+#define DSP_CONTROL_SET_POLL_INTERVAL  12
 
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev(void);
@@ -225,6 +226,17 @@ static void fts_dsp_control_remote_dsp_print( fts_data_t *d, int ac, const fts_a
   dsp_chain_post();
 }
 
+static void fts_dsp_control_remote_set_poll_interval( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  if ( (ac == 1) && fts_is_int( at))
+    {
+      fts_dsp_control_t *this = (fts_dsp_control_t *)d;
+
+      this->poll_interval = fts_get_int(&at[0]);
+
+      fts_alarm_set_cycle( &(this->poll_alarm), this->poll_interval);
+    }
+}
 
 void fts_dsp_control_config(void)
 {
@@ -243,11 +255,6 @@ void fts_dsp_control_config(void)
 				 fts_dsp_control_remote_dsp_on);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_PRINT,
 				 fts_dsp_control_remote_dsp_print);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_SET_POLL_INTERVAL,
+				 fts_dsp_control_remote_set_poll_interval);
 }
-
-
-
-
-
-
-
