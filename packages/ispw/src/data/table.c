@@ -360,6 +360,80 @@ table_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   int_vector_save_bmax(vec, f);
 }
 
+static int get_int_property( fts_object_t *object, fts_symbol_t property_name, int def)
+{
+  fts_atom_t a;
+
+  fts_object_get_prop( object, property_name, &a);
+
+  if ( !fts_is_void( &a))
+    return fts_get_int( &a);
+
+  return def;
+}
+
+#define MAX_ATOMS_PER_LINE 16
+
+static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *) o;
+  FILE *file;
+  fts_atom_t a;
+  int size, x_left, y_top, x_right, y_bottom, flags, range;
+  int x, y, w, font_index;
+  int i, count;
+  int_vector_t *vec;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  size = int_vector_get_size( this->vector);
+
+  x_left = get_int_property( o, fts_s_wx, 100);
+  y_top = get_int_property( o, fts_s_wy, 100);
+  x_right = x_left + get_int_property( o, fts_s_ww, 250);
+  y_bottom = y_top + get_int_property( o, fts_s_wh, 250);
+
+  flags = 16;
+  range = 128;
+
+  fprintf( file, "#N vtable %d %d %d %d %d %d %d", size, x_left, y_top, x_right, y_bottom, flags, range);
+
+  if ( this->name)
+    fprintf( file, " %s", fts_symbol_name( this->name)); 
+
+  fprintf( file, ";\n");
+
+  vec = this->vector;
+  count = 0;
+  for( i = 0; i < size; i++)
+    {
+      if ( count == 0)
+	fprintf( file, "#T set %4d", i);
+	   
+      fprintf( file, " %4d", int_vector_get_element(vec, i));
+
+      count++;
+      if ( count >= MAX_ATOMS_PER_LINE)
+	{
+	  fprintf( file, ";\n");
+	  count = 0;
+	}
+    }
+
+  if ( count != 0)
+    fprintf( file, ";\n");
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P newobj %d %d %d %d table;\n", x, y, w, font_index);
+}
+
 /********************************************************************
  *
  *   class
@@ -383,6 +457,9 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
 
+      a[0] = fts_s_ptr;
+      fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, table_save_dotpat, 1, a); 
+
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, table_get_state);
     }
@@ -405,6 +482,9 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       /* save/load bmax file if not instantiated with reference */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
+
+      a[0] = fts_s_ptr;
+      fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, table_save_dotpat, 1, a); 
     }
   else
     return &fts_CannotInstantiate;

@@ -34,6 +34,6 @@ ucs load module qlist $dir/c/lib/$jmaxArch/$jmaxMode/libqlist.so
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtension
 
 # just one help patch to declare
-helpPatch qlist $dir/qlist.help.jmax
+helpPatch qlist $dir/help/qlist.help.jmax
 
 puts "package: qlist (ISPW queue file class with editor)"

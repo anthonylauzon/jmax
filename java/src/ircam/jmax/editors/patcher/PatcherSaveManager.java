@@ -17,6 +17,7 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*;
 import java.io.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -99,28 +100,37 @@ public class PatcherSaveManager
 
     if (file == null)
       return false;
-    else
+
+    // Test if file exists already
+    if (file.exists())
       {
-	//document.bindToDocumentFile( file);
-	// (fd) This does not work... It always binds the document to the *first* document
-	// handler that can handle it. So it there are several document handler, it's the mess.
-	// Conclusion about mda ?
+	int result = JOptionPane.showConfirmDialog( container.getFrame(),
+						    "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.WARNING_MESSAGE);
 
-	document.setDocumentFile( file );
-
-	MaxDocumentHandler documentHandler = null;
-
-	if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
-	  documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
-	else
-	  documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
-
-	document.setDocumentHandler( documentHandler);
-	document.setSaved( false );
+	if ( result != JOptionPane.OK_OPTION)
+	  return false;
       }
 
-//      System.err.println( "now document is " + document + " and handler is " + document.getDocumentHandler());
-    
+    //document.bindToDocumentFile( file);
+    // (fd) This does not work... It always binds the document to the *first* document
+    // handler that can handle it. So it there are several document handler, it's the mess.
+    // Conclusion about mda ?
+
+    document.setDocumentFile( file );
+
+    MaxDocumentHandler documentHandler = null;
+
+    if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+      documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+    else
+      documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+    document.setDocumentHandler( documentHandler);
+    document.setSaved( false );
+
     container.getFrame().setTitle( file.toString()); 
 
     try

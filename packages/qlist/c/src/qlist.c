@@ -285,6 +285,73 @@ qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
+#define MAX_ATOMS_PER_LINE 18
+
+static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  qlist_t *this = (qlist_t *) o;
+  FILE *file;
+  int x, y, w, font_index;
+  fts_atom_t a;
+  fts_atom_list_iterator_t *iterator;
+  int count;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  if ( o->argc > 1)
+    fprintf( file, "#N qlist %s;\n", fts_symbol_name( fts_get_symbol( o->argv + 1)));
+  else
+    fprintf( file, "#N qlist;\n");
+
+  count = 0;
+  iterator = fts_atom_list_iterator_new( this->atom_list);
+
+  while (! fts_atom_list_iterator_end( iterator))
+    {
+      fts_atom_t *p = fts_atom_list_iterator_current( iterator);
+
+      if (count == 0)
+	fprintf( file, "#X append");
+
+      if ( fts_is_int( p))
+	fprintf( file, " %d", fts_get_int( p));
+      else if ( fts_is_float( p) )
+	fprintf( file, " %f", fts_get_float( p));
+      else if ( fts_is_symbol( p) )
+	{
+	  fts_symbol_t s = fts_get_symbol( p);
+
+	  if (s == fts_s_semi || s == fts_s_comma)
+	    fprintf( file, " \\%s", fts_symbol_name( s));
+	  else
+	    fprintf( file, " %s", fts_symbol_name( s));
+	}
+
+      count++;
+      if ( count >= MAX_ATOMS_PER_LINE)
+	{
+	  fprintf( file, ";\n");
+	  count = 0;
+	}
+
+      fts_atom_list_iterator_next( iterator);
+    }
+
+  if (count != MAX_ATOMS_PER_LINE)
+    fprintf( file, ";\n");
+    
+  fts_atom_list_iterator_free( iterator);
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P newobj %d %d %d %d qlist;\n", x, y, w, font_index);
+}
 
 /* Daemon for getting the property "data".
    Note that we return a pointer to the data; 
@@ -321,6 +388,9 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, qlist_save_bmax, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat, 1, a); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, qlist_append);
 

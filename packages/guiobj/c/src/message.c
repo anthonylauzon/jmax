@@ -617,8 +617,6 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   message_t *this = (message_t *) o;
   FILE *file;
   int x, y, w, font_index;
-  int first_atom;
-  fts_symbol_t text;
   fts_atom_t a;
   fts_atom_list_iterator_t *iterator;
   int state;
@@ -641,18 +639,18 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   while (! fts_atom_list_iterator_end( iterator))
     {
-      fts_atom_t *a = fts_atom_list_iterator_current( iterator);
+      fts_atom_t *p = fts_atom_list_iterator_current( iterator);
 
       switch ( state ) {
 
       case 0:
-	if ( fts_is_int( a))
-	  fprintf( file, " %d", fts_get_int( a));
-	else if ( fts_is_float( a) )
-	  fprintf( file, " %f", fts_get_float( a));
-	else if ( fts_is_symbol( a) )
+	if ( fts_is_int( p))
+	  fprintf( file, " %d", fts_get_int( p));
+	else if ( fts_is_float( p) )
+	  fprintf( file, " %f", fts_get_float( p));
+	else if ( fts_is_symbol( p) )
 	  {
-	    fts_symbol_t s = fts_get_symbol( a);
+	    fts_symbol_t s = fts_get_symbol( p);
 
 	    if (s == fts_s_semi || s == fts_s_comma)
 	      fprintf( file, " \\%s", fts_symbol_name( s));
@@ -667,13 +665,13 @@ static void message_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
       case 1:
 	state = 0;
 
-	if (fts_is_int( a))
-	  fprintf( file, " \\$%d", fts_get_int( a));
-	else if ( fts_is_float( a) )
-	  fprintf( file, " $ %f", fts_get_float( a));
-	else if ( fts_is_symbol( a) )
+	if (fts_is_int( p))
+	  fprintf( file, " \\$%d", fts_get_int( p));
+	else if ( fts_is_float( p) )
+	  fprintf( file, " $ %f", fts_get_float( p));
+	else if ( fts_is_symbol( p) )
 	  {
-	    fts_symbol_t s = fts_get_symbol( a);
+	    fts_symbol_t s = fts_get_symbol( p);
 
 	    if (s == fts_s_semi || s == fts_s_comma)
 	      fprintf( file, " $ \\%s", fts_symbol_name( s));
