@@ -43,7 +43,7 @@ import javax.swing.event.*;
 public class MessageTrackEditor extends MonoTrackEditor
 {
   public MessageTrackEditor(Geometry g, Track track)
-  {
+{
     super(g, track);
     
     super.setAdapter(new MessageAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
@@ -53,44 +53,44 @@ public class MessageTrackEditor extends MonoTrackEditor
     area = new SequenceTextArea(TextRenderer.getRenderer(), gc);
     area.setMinimumSize(new Dimension(MessageEventRenderer.MINIMUM_WIDTH, MessageValue.DEFAULT_HEIGHT));
     area.addSequenceTextAreaListener(new SequenceTextAreaListener(){
-	public void widthChanged(int width)
-	{
-	  int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
-	  //currentEvt.setProperty("duration", new Integer(lenght));
-	  currentEvt.setProperty("duration", new Double(lenght));
+			public void widthChanged(int width)
+		  {
+				int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
+				//currentEvt.setProperty("duration", new Integer(lenght));
+				currentEvt.setProperty("duration", new Double(lenght));
 	  
-	  int time = (int)currentEvt.getTime()+lenght;
-	  gc.getScrollManager().scrollIfNeeded(time+((PartitionAdapter)gc.getAdapter()).getInvWidth(20));
-	  
-	  int evtx = gc.getAdapter().getX(currentEvt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
-	  area.setLocation(evtx, area.getLocation().y);
-	}
-	public void heightChanged(int height)
-	{
-	  currentEvt.setProperty("height", new Integer(height));
-	  int evty = gc.getAdapter().getY(currentEvt);
-	  if(evty+height>getSize().height)
-	    {
-	      int y = gc.getAdapter().getInvY(getSize().height-height);
-	      currentEvt.setProperty("integer", new Integer(y));
-	      area.setLocation(area.getLocation().x , getSize().height-height+1);
-	    }
-	}
-	public void endEdit()
-	{
-	  setMessage();
-	  repaint();
-	}
-      });
+				int time = (int)currentEvt.getTime()+lenght;
+				gc.getScrollManager().scrollIfNeeded(time+((PartitionAdapter)gc.getAdapter()).getInvWidth(20));
+				
+				int evtx = gc.getAdapter().getX(currentEvt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
+				area.setLocation(evtx, area.getLocation().y);
+			}
+			public void heightChanged(int height)
+		  {
+				currentEvt.setProperty("height", new Integer(height));
+				int evty = gc.getAdapter().getY(currentEvt);
+				if(evty+height>getSize().height)
+				{
+					int y = gc.getAdapter().getInvY(getSize().height-height);
+					currentEvt.setProperty("integer", new Integer(y));
+					area.setLocation(area.getLocation().x , getSize().height-height+1);
+				}
+			}
+			public void endEdit()
+		  {
+				setMessage();
+				repaint();
+			}
+		});
     add(area);
     validate();
     
     g.addZoomListener( new ZoomListener() {
-	public void zoomChanged(float zoom, float oldZoom)
-	{
-	  updateEventsLength();
-	}
-      });
+			public void zoomChanged(float zoom, float oldZoom)
+		  {
+				updateEventsLength();
+			}
+		});
   }
     
   void createPopupMenu()
@@ -113,15 +113,15 @@ public class MessageTrackEditor extends MonoTrackEditor
     
     text.trim();
     if(!text.equals(""))
-      {
-	evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);
-	evtHeight = TextRenderer.getRenderer().getTextHeight(text, gc);
-      }	
+		{
+			evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);
+			evtHeight = TextRenderer.getRenderer().getTextHeight(text, gc);
+		}	
     else
-      {
-	evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
-	evtHeight = MessageValue.DEFAULT_HEIGHT;
-      }
+		{
+			evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
+			evtHeight = MessageValue.DEFAULT_HEIGHT;
+		}
     
     area.doEdit(text, evtx, evty, evtLenght, evtHeight);
 
@@ -161,15 +161,15 @@ public class MessageTrackEditor extends MonoTrackEditor
     
     if(isEditing)
       if((id==MouseEvent.MOUSE_PRESSED)&&(e.getClickCount() == 1))
-	{
-	  ((UndoableData)track.getTrackDataModel()).beginUpdate();
-	  setMessage();
-	  ((UndoableData)track.getTrackDataModel()).endUpdate();
-	}
-      else if(isExitedFromTrack(e))
-	{
-	  setMessage();
-	  repaint();
+			{
+				((UndoableData)track.getTrackDataModel()).beginUpdate();
+				setMessage();
+				((UndoableData)track.getTrackDataModel()).endUpdate();
+			}
+				else if(isExitedFromTrack(e))
+				{
+					setMessage();
+					repaint();
 	}
     super.processMouseEvent(e);
     

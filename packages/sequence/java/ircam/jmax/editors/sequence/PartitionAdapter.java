@@ -331,42 +331,7 @@ public void setCue(Event e, int cue)
  * Reassign the mappers according to the change, and ask
  * a repaint of the graphic.
  */
-public void mappingChanged(String graphicName, String scoreName) 
-{
-	/*if (graphicName.equals("y")) 
-{
-		if (scoreName.equals("pitch"))
-			YMapper = PitchMapper.getMapper();
-		else if (scoreName.equals("duration"))
-			YMapper = DurationMapper.getMapper();
-		else if (scoreName.equals("velocity"))
-			YMapper = VelocityMapper.getMapper();
-		else if (scoreName.equals("channel"))
-			YMapper = ChannelMapper.getMapper();
-}
-else if (graphicName.equals("lenght")) 
-{
-	if (scoreName.equals("pitch"))
-		LenghtMapper = PitchMapper.getMapper();
-	else if (scoreName.equals("duration"))
-		LenghtMapper = DurationMapper.getMapper();
-	else if (scoreName.equals("velocity"))
-		LenghtMapper = VelocityMapper.getMapper();
-	else if (scoreName.equals("channel"))
-		LenghtMapper = ChannelMapper.getMapper();
-}
-else if (graphicName.equals("label")) 
-{
-	if (scoreName.equals("pitch"))
-		LabelMapper = PitchLabelMapper.getMapper();
-	else if (scoreName.equals("duration"))
-		LabelMapper = DurationLabelMapper.getMapper();
-	else if (scoreName.equals("velocity"))
-		LabelMapper = VelocityLabelMapper.getMapper();
-	else if (scoreName.equals("channel"))
-		LabelMapper = ChannelLabelMapper.getMapper();
-}*/
-}
+public void mappingChanged(String graphicName, String scoreName) {}
 
 public void setLabelType( String type)
 {
@@ -380,6 +345,16 @@ public void setViewMode(int mode)
 public int getViewMode()
 {
 	return viewMode;
+}
+
+public void setRangeMode(int rangeMode)
+{
+	this.rangeMode = rangeMode;
+}
+
+public int getRangeMode()
+{
+	return rangeMode;
 }
 
 public int getRangeHeight()
@@ -413,9 +388,10 @@ public void propertyChange(PropertyChangeEvent e)
 		maxPitch = ((Integer)e.getNewValue()).intValue();
 	else if(e.getPropertyName().equals("minimumPitch"))
 		minPitch = ((Integer)e.getNewValue()).intValue();
-	else 
-		if(e.getPropertyName().equals("viewMode"))
-			setViewMode(((Integer)e.getNewValue()).intValue());
+	else if(e.getPropertyName().equals("viewMode"))
+		setViewMode(((Integer)e.getNewValue()).intValue());
+	else if(e.getPropertyName().equals("rangeMode"))
+		setRangeMode(((Integer)e.getNewValue()).intValue() );
 }
 
 //------------- Fields
@@ -423,6 +399,8 @@ public static final int NOTE_DEFAULT_HEIGTH = 3;
 int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
 int maxPitch = 127;
 int minPitch = 0;
+int rangeMode = 0;
+
 boolean displayLabels = true;
 
 public static final int ALTERATION_DIESIS = 1;

@@ -69,6 +69,8 @@ fts_symbol_t seqsym_window = 0;
 fts_symbol_t seqsym_label = 0;
 fts_symbol_t seqsym_zoom = 0;
 fts_symbol_t seqsym_transp = 0;
+fts_symbol_t seqsym_view = 0;
+fts_symbol_t seqsym_range_mode = 0;
 fts_symbol_t seqsym_save_editor = 0;
 fts_symbol_t seqsym_editor_state = 0;
 fts_symbol_t seqsym_set_editor = 0;
@@ -139,6 +141,8 @@ seqsym_config(void)
   seqsym_label = fts_new_symbol("label");
   seqsym_zoom = fts_new_symbol("zoom");
   seqsym_transp = fts_new_symbol("transp");
+	seqsym_view = fts_new_symbol("view");
+	seqsym_range_mode = fts_new_symbol("range_mode");
   seqsym_save_editor = fts_new_symbol("save_editor");
 	seqsym_editor_state = fts_new_symbol("editor_state");
 	seqsym_set_editor = fts_new_symbol("set_editor");

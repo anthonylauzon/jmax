@@ -5,6 +5,18 @@
 	};
 	objectVersion = 39;
 	objects = {
+		3B55A6740626F711004953A4 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5427F905AB0B900042B7A2;
+			remoteInfo = libsequence.bundle;
+		};
+		3B55A6750626F711004953A4 = {
+			isa = PBXTargetDependency;
+			target = 5C5427F905AB0B900042B7A2;
+			targetProxy = 3B55A6740626F711004953A4;
+		};
 		3B5AB8950610995A00412ACC = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -80,6 +92,65 @@
 		};
 		3B9E151A0621AE7F00CDEBB6 = {
 			fileRef = 3B9E150C0621AE1200CDEBB6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BCA10F6062406F7008FC824 = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Development;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				3B55A6750626F711004953A4,
+				3BCA10FB062406FF008FC824,
+				3BCA10FD06240705008FC824,
+			);
+			isa = PBXAggregateTarget;
+			name = Development;
+			productName = Development;
+		};
+		3BCA10FA062406FF008FC824 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C542A4105AB0B9C0042B7A2;
+			remoteInfo = sequence.jar;
+		};
+		3BCA10FB062406FF008FC824 = {
+			isa = PBXTargetDependency;
+			target = 5C542A4105AB0B9C0042B7A2;
+			targetProxy = 3BCA10FA062406FF008FC824;
+		};
+		3BCA10FC06240705008FC824 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C54253A05AB0B8A0042B7A2;
+			remoteInfo = jMax.app;
+		};
+		3BCA10FD06240705008FC824 = {
+			isa = PBXTargetDependency;
+			target = 5C54253A05AB0B8A0042B7A2;
+			targetProxy = 3BCA10FC06240705008FC824;
+		};
+		3BCA11920624183A008FC824 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = SequenceDefaults.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/SequenceDefaults.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BCA11930624183A008FC824 = {
+			fileRef = 3BCA11920624183A008FC824;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -9901,6 +9972,7 @@
 				5C542AD905AB0B9C0042B7A2,
 				3B7ADDF10611B6320098F129,
 				3BD62EDD0621C07400C689DC,
+				3BCA11930624183A008FC824,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17835,6 +17907,7 @@
 				F85123FC028BEAB301664092,
 				F85123FD028BEAB301664092,
 				F85123FE028BEAB301664092,
+				3BCA11920624183A008FC824,
 				F5EA5774038545B501664092,
 				F85123FF028BEAB301664092,
 				F8512400028BEAB301664092,
@@ -20286,6 +20359,7 @@
 				5C54287805AB0B930042B7A2,
 				5C54288505AB0B950042B7A2,
 				5C542B3105AB0BA00042B7A2,
+				3BCA10F6062406F7008FC824,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {

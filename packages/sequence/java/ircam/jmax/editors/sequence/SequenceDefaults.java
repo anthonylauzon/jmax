@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -19,31 +19,19 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.jmax.editors.patcher.actions;
+package ircam.jmax.editors.sequence;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
-
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
-
-public class LockAction extends EditorAction
-{
-  public LockAction()
-  {
-    super("Lock", "lock", KeyEvent.VK_K, KeyEvent.VK_E, true);
-  }
-
-  public void doAction(EditorContainer container)
-  {
-    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-    sketch.setLocked(!sketch.isLocked());
-		if(sketch.isLocked())
-			putValue(NAME, "Unlock");
-		else
-	   putValue(NAME, "Lock");
-  }
+public class SequenceDefaults{
+  public final static int DEFAULT_RANGE_MODE = ircam.jmax.editors.sequence.track.MidiTrackEditor.WHOLE_RANGE;
+	
+	public static final int DEFAULT_MAX_PITCH = 127;
+  public static final int DEFAULT_MIN_PITCH = 0;
 }
+
+
+
+
+
+
+
+

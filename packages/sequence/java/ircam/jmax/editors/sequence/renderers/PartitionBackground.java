@@ -49,8 +49,7 @@ public class PartitionBackground implements Layer, ImageObserver{
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
 		{		
-				if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
-						e.getPropertyName().equals("repaint"))
+				if(e.getPropertyName().equals("rangeMode") || e.getPropertyName().equals("repaint"))
 				{
 					toRepaintBack = true;
 					gc.getGraphicDestination().repaint();
@@ -65,121 +64,190 @@ public class PartitionBackground implements Layer, ImageObserver{
 		}
 		});
 }
+
+public static int getMaxPitchInStaff(int max)
+{
+	if(max <= 9) return 9;
+	else if(max <= 18) return 18;
+	else if( max <= 33) return 33;
+	else if( max <= 42) return 42;
+	else if( max <= 57) return 57;
+	else if( max <= 62) return 62;
+	else if( max <= 78) return 78;
+	else if( max <= 86) return 86;
+	else if( max <= 102) return 102;
+	else if( max <= 110) return 110;
+	else return 127;
+}
+
+public static int getMinPitchInStaff(int min)
+{
+	if(min >= 111) return 111;
+	else if(min >= 103) return 103;
+	else if( min >= 87) return 87;
+	else if( min >= 79) return 79;
+	else if( min >= 63) return 63;
+	else if( min >= 58) return 58;
+	else if( min >= 43) return 43;
+	else if( min >= 34) return 34;
+	else if( min >= 19) return 19;
+	else if( min >= 10) return 10;
+	else return 0;
+}
+
+private boolean staffIsDrawable(int numGroup, int maxPitch, int minPitch)
+{		
+	if(((PartitionAdapter)gc.getAdapter()).getRangeMode() == MidiTrackEditor.WHOLE_RANGE)
+		return true;
+	else
+		  switch(numGroup)
+			{
+				case 1:
+					return (minPitch <= 9);
+				case 2:
+					return (minPitch <= 18 && maxPitch >= 10);
+				case 3:
+					return (minPitch <= 33 && maxPitch >= 19);
+				case 4:
+					return (minPitch <= 42 && maxPitch >= 34);
+				case 5:
+					return (minPitch <= 57 && maxPitch >= 43);
+				case 6:
+					return (minPitch <= 62 && maxPitch >= 58);
+				case 7:
+					return (minPitch <= 78 && maxPitch >= 63);
+				case 8:
+					return (minPitch <= 86 && maxPitch >= 79);
+				case 9:
+					return (minPitch <= 102 && maxPitch >= 87);
+				case 10:
+					return (minPitch <= 110 && maxPitch >= 103);
+				case 11: 
+					return (maxPitch >= 111);
+				default: 
+					return true;
+			}
+}
+
+/* NOTE: draw always black staff after gray staff */
+private void drawBlackStaff(Graphics g, int startLine, int key)
+{
+	int transp = ((PartitionAdapter)gc.getAdapter()).getVerticalTransp();
+	Dimension d = gc.getGraphicDestination().getSize();
+	int positionY = SC_BOTTOM;
+	int keyPosition;
+	int start = SC_BOTTOM-startLine*STEP-transp;
+	
+	g.setColor(Color.black);
+	for (int i = 0; i < 5; i++)                       /*draw horiz lines*/                              
+	{
+		positionY = start-i*STEP;
+		g.drawLine(KEYX, positionY, d.width, positionY);
+	}
+	if(key == VIOLIN_KEY)                             /*draw key*/
+	{
+		g.setFont( SequenceFonts.getFont(52));
+		g.drawString( SequenceFonts.violinKey, KEYX+5, positionY+34);
+	}
+	else
+	{
+		g.setFont( SequenceFonts.getFont(36));
+		g.drawString( SequenceFonts.bassKey, KEYX+6, positionY+26); 
+	}
+	g.drawLine(KEYX, start, KEYX, start-4*STEP);     /*draw vertical line*/
+}
+
+private void drawGrayStaff(Graphics g, int startLine)
+{
+	int transp = ((PartitionAdapter)gc.getAdapter()).getVerticalTransp();
+	Dimension d = gc.getGraphicDestination().getSize();
+	int positionY = SC_BOTTOM;
+	int start = SC_BOTTOM-startLine*STEP-transp;
+	
+	g.setColor(horizontalGridLinesColor);		
+	for (int j = 0; j < 4; j++)
+	{
+		positionY = start-(j-1)*STEP;
+		g.drawLine(KEYX, positionY, d.width, positionY);
+	}
+	g.setColor(Color.black);
+	g.drawLine(KEYX, start+STEP, KEYX, start-2*STEP);
+}
+
 /** builds an horizontal grid in the given graphic port
 * using the destination size*/
 private void drawHorizontalGrid(Graphics g)
 {
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-	int maxPitch = pa.getY(pa.getMaxPitch());
-	int minPitch = pa.getY(pa.getMinPitch());
-	int delta = pa.getVerticalTransp();
+	int maxPitch = pa.getMaxPitch();
+	int minPitch = pa.getMinPitch();
+	int transp = pa.getVerticalTransp();
+	//int bracket = 0;
 	
 	Dimension d = gc.getGraphicDestination().getSize();
-	
 	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
 	
-	/****************** background *********************************/
+	/********** Background ****************************************************/
 	if(!locked)
 		g.setColor(Color.white);
 	else
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-	
 	g.fillRect(0, 0, d.width, d.height);
 	
-	/* out of range background */
-	g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-	g.fillRect(0, 0 -delta, d.width, maxPitch);
-	g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
-	
-	/* track name */
+	/********** Track Name ***************************************************/
 	if( gc.isInSequence())
 	{
 		g.setColor(Color.gray);
 		g.setFont(ToggleBar.toggleBarFont);	
 		g.drawString(gc.getTrack().getName(), 2, d.height - 2);
 	}
-	
-	/********************** bass key lines ***************************/
-	int positionY = SC_BOTTOM;
-	g.setFont(SequenceFonts.getFont(36));
-	for(int k=0;k<2;k++)
+	/********* First Bass Line ***********************************************/
+	if(staffIsDrawable(2, maxPitch, minPitch))
+		drawGrayStaff( g, 5);
+	if(staffIsDrawable(1, maxPitch, minPitch))
+		drawBlackStaff( g, 0, BASS_KEY);
+	/********* Second Bass Line **********************************************/
+	if(staffIsDrawable(4, maxPitch, minPitch))
+		drawGrayStaff( g, 12);
+	if(staffIsDrawable(3, maxPitch, minPitch))
+		drawBlackStaff( g, 7, BASS_KEY);
+	/********* Third Bass Line ***********************************************/	
+	if(staffIsDrawable(6, maxPitch, minPitch))
 	{
-		/* black lines */
-		g.setColor(Color.black);
-		for (int i = 0; i < 5; i++)
-	  {
-	    positionY = SC_BOTTOM-(i+k*7)*step -delta;
-	    g.drawLine(KEYX, positionY, d.width, positionY);
-	  }
-		
-		/* bass key */
-		g.drawString( SequenceFonts.bassKey, KEYX+6, positionY+26);
-		
-		/* gray lines */
-		g.setColor(horizontalGridLinesColor);		
-		for (int j = 5; j < 7; j++)
-	  {
-	    positionY = SC_BOTTOM-(j+k*7)*step -delta;
-	    g.drawLine(KEYX, positionY, d.width, positionY);
-	  }
-	}
-	
-	/* black lines */
-	g.setColor(Color.black);
-	for (int i = 14; i < 19; i++)
-	{
-		positionY = SC_BOTTOM-(i*step) -delta;
+		g.setColor(horizontalGridLinesColor); 
+		int positionY = SC_BOTTOM-19*STEP-transp;
 		g.drawLine(KEYX, positionY, d.width, positionY);
-	}
-	
-	/* bass key */
-	g.drawString(SequenceFonts.bassKey, KEYX+6, positionY+26);
-	
-	/* gray line */
-	g.setColor(horizontalGridLinesColor);
-	positionY = SC_BOTTOM-(19*step) -delta;
-	g.drawLine(KEYX, positionY, d.width, positionY);
-	
-	/************* violin key lines *************************/
-	g.setFont(SequenceFonts.getFont(52));
-	for(int k=0;k<2;k++)
-	{
-		/* black lines */
 		g.setColor(Color.black);
-		for (int i = 0; i < 5; i++)
-	  {
-	    positionY = SC_BOTTOM-(i+k*7+20)*step -delta;
-	    g.drawLine(KEYX, positionY, d.width, positionY);
-	  }
-		/* violin key position */
-		int keyPosition = positionY+34;
-		
-		/* gray lines */
-		g.setColor(horizontalGridLinesColor);
-		for (int j = 5; j < 7; j++)
-	  {
-	    positionY = SC_BOTTOM-(j+k*7+20)*step -delta;
-	    g.drawLine(KEYX, positionY, d.width, positionY);
-	  }
-		
-		/* violin key */
-		g.setColor(Color.black);
-		g.drawString( SequenceFonts.violinKey, KEYX+5, keyPosition);
+		g.drawLine(KEYX, positionY+STEP, KEYX, positionY-STEP);
 	}
-	
-	/* black lines */
-	g.setColor(Color.black);
-	for (int i = 0; i < 5; i++)
+	if(staffIsDrawable(5, maxPitch, minPitch))
 	{
-		positionY = SC_BOTTOM-(i+34)*step -delta;
-		g.drawLine(KEYX, positionY, d.width, positionY);
+		drawBlackStaff( g, 14, BASS_KEY);
+		//bracket++;
 	}
-	
-	/* violin key */
-	g.drawString(SequenceFonts.violinKey, KEYX+5, SC_TOP+34);
-		
-	/* vertical lines at the end of keyboard */
-	g.drawLine(KEYX, SC_TOP-delta, KEYX, SC_BOTTOM-delta);
+	/********* First Violin Line **********************************************/	
+	if(staffIsDrawable(8, maxPitch, minPitch))
+		drawGrayStaff( g, 25);	
+	if(staffIsDrawable(7, maxPitch, minPitch))
+	{
+		drawBlackStaff( g, 20, VIOLIN_KEY);
+		//bracket++;
+	}
+	/********* Second Violin Line *********************************************/	
+	if(staffIsDrawable(10, maxPitch, minPitch))
+		drawGrayStaff( g, 32);
+	if(staffIsDrawable(9, maxPitch, minPitch))
+		drawBlackStaff( g, 27, VIOLIN_KEY);
+	/********* Third Violin Line **********************************************/	
+	if(staffIsDrawable(11, maxPitch, minPitch))
+		drawBlackStaff( g, 34, VIOLIN_KEY);
+	/********* Bracket of staff 3 and 4 **************************/
+	/*if(bracket == 2)
+	 {
+		g.setFont(bracketFont);
+		g.drawString("{", KEYX-30, SC_BOTTOM-16*STEP-transp+3);
+	 }*/
+	/********* Vertical Lines at the end of keyboard **************************/
 	g.setColor(Color.gray);
 	g.drawLine(KEYEND, 0, KEYEND, d.height);
 }
@@ -294,17 +362,20 @@ boolean toRepaintBack = false;
 boolean locked = false;
 public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
 public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
+//public static final Font bracketFont = new Font("Palatino", Font.PLAIN, 90);
+
 public static final int KEYX = 27;
 public static final int KEYWIDTH = 28;
 public static final int KEYHEIGHT = 3;
 public static final int KEYEND = KEYX + KEYWIDTH;
 
-public static final int step = 8;
+public static int VIOLIN_KEY = 0;
+public static int BASS_KEY = 1;
+
+public static final int STEP = 8;
 
 public static final int SC_BOTTOM = 334;
 public static final int SC_TOP = 30;
-//75 is the number of notes without alteration  
-//public static final float note_step = (float)((SC_BOTTOM-SC_TOP)/(float)75.0);    
 }
 
 

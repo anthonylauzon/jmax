@@ -103,6 +103,8 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				gc.getScrollManager().scrollToValue(-editorState.transp);
 				if(!editorState.label.equals(""))
 					setLabelType(editorState.label);
+				setViewMode(editorState.view);				
+				setRangeMode(editorState.rangeMode);
 			};
 		});
 		
@@ -269,6 +271,7 @@ public void startTrackUpload( TrackDataModel track, int size)
 public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
+	setRangeMode(getRangeMode());
 	repaint();
 }
 public void startPaste(){}
@@ -352,6 +355,15 @@ public int getViewMode()
 	return viewMode;
 }
 
+public void setRangeMode(int rangeMode)
+{
+	this.rangeMode = rangeMode;
+}
+public int getRangeMode()
+{
+	return this.rangeMode;
+}
+
 public void showListDialog()
 {
 	if(listDialog==null) 
@@ -405,7 +417,7 @@ transient MaxVector oldElements = new MaxVector();
 transient SequenceTableDialog listDialog = null;
 
 public int DEFAULT_HEIGHT = 430;
-public int viewMode;
+public int viewMode, rangeMode;
 TrackBasePopupMenu popup = null;
 JLabel displayLabel;
 }

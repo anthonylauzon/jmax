@@ -146,8 +146,8 @@ public class AmbitusValue extends AbstractEventValue
   }
 
   //--- Fields
-  public static final int DEFAULT_MAX_PITCH = 127;
-  public static final int DEFAULT_MIN_PITCH = 0;
+  /*public static final int DEFAULT_MAX_PITCH = 127;
+  public static final int DEFAULT_MIN_PITCH = 0;*/
   public static final String fs = File.separator;
   public static final String AMBITUS_NAME = "scoob";
   public static final String AMBITUS_PUBLIC_NAME = "scoob";

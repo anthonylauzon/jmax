@@ -37,6 +37,7 @@ SequenceClipboard.java \
 SequenceDataFlavor.java \
 SequenceDataListener.java \
 SequenceDataModel.java \
+SequenceDefaults.java \
 SequenceEditor.java \
 SequenceGraphicContext.java \
 SequencePanel.java \

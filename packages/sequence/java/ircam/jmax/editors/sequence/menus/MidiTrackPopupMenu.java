@@ -39,10 +39,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 {
   JMenu labelTypesMenu;
   private ButtonGroup labelTypesMenuGroup;
-	
-  JLabel maxLabel, minLabel;
-  JSlider maxSlider, minSlider;
-  Box maxBox, minBox;
+	JRadioButtonMenuItem usedRangeItem, wholeRangeItem;
   LabelTypesAction labelAction;
   JRadioButtonMenuItem pianoItem, stavesItem;
 	
@@ -62,71 +59,29 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 	
   boolean addRangeMenu()
   {
-    JMenu rangeMenu = new JMenu("Range");
-    JMenu maxRangeMenu = new JMenu("Maximum");
-    JMenu minRangeMenu = new JMenu("Minimum");
-		
-    maxLabel = new JLabel(" 127 ", JLabel.CENTER);
-    maxLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-    maxSlider = new JSlider(JSlider.VERTICAL, 0, 127, 127);
-    maxSlider.setMajorTickSpacing(12);
-    maxSlider.setMinorTickSpacing(6);
-    maxSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
-    maxSlider.setPaintTicks(true);
-    maxSlider.addChangeListener(new ChangeListener(){
-			public void stateChanged(ChangeEvent e) {
-				JSlider source = (JSlider)e.getSource();
-				int max = (int)source.getValue();
-				int min = ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();	    
-				if(max<min) max = min+1;
-				
-				if(!source.getValueIsAdjusting())
-					target.getTrack().setProperty("maximumPitch", new Integer(max));
-				
-				maxLabel.setText(""+max);
-			}
+		ButtonGroup rangeMenuGroup = new ButtonGroup();
+    
+    usedRangeItem = new JRadioButtonMenuItem("Used Range");
+    usedRangeItem.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.USED_RANGE);
+		  }
 		});
-    maxBox = new Box(BoxLayout.Y_AXIS);
-    maxBox.add(maxSlider);
-    maxBox.add(maxLabel);
-    maxBox.validate();
-    
-    minLabel = new JLabel("  0  ", JLabel.CENTER);
-    minLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-    
-    minSlider = new JSlider(JSlider.VERTICAL, 0, 127, 0);
-    minSlider.setMajorTickSpacing(12);
-    minSlider.setMinorTickSpacing(6);
-    minSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
-    minSlider.setPaintTicks(true);
-    minSlider.addChangeListener(new ChangeListener(){
-			public void stateChanged(ChangeEvent e) {
-				JSlider source = (JSlider)e.getSource();
-				int min = (int)source.getValue();
-				int max = ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
-				if(min>max) min = max-1;
-				
-				if (!source.getValueIsAdjusting())
-					target.getTrack().setProperty("minimumPitch", new Integer(min));
-				
-				minLabel.setText(""+min);
-			}
-		});
-    minBox = new Box(BoxLayout.Y_AXIS);
-    minBox.add(minSlider);
-    minBox.add(minLabel);
-    minBox.validate();
-    
-    maxRangeMenu.add(maxBox);
-    minRangeMenu.add(minBox);
-    
-    rangeMenu.add(maxRangeMenu);
-    rangeMenu.add(minRangeMenu);
-    
-    add(rangeMenu);
-    
-    return true;
+    rangeMenuGroup.add(usedRangeItem);
+    add(usedRangeItem);    
+    wholeRangeItem = new JRadioButtonMenuItem("Whole Range");
+    wholeRangeItem.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.WHOLE_RANGE);
+		  }
+		});		
+    rangeMenuGroup.add(wholeRangeItem);
+    add(wholeRangeItem);
+    wholeRangeItem.setSelected(true);
+		
+    return true;				
   }
 	
   boolean addViewMenu()
@@ -134,21 +89,41 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     ButtonGroup viewsMenuGroup = new ButtonGroup();
     
     pianoItem = new JRadioButtonMenuItem("Pianoroll");
-    pianoItem.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW, target));
+		pianoItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.setViewMode( MidiTrackEditor.PIANOROLL_VIEW);
+				if(((Integer)target.getTrack().getProperty("rangeMode")).intValue() == MidiTrackEditor.USED_RANGE)
+				{
+					target.getTrack().setProperty("maximumPitch", new Integer(((MidiTrackEditor)target).getMaximumPitchInTrack()));
+					target.getTrack().setProperty("minimumPitch", new Integer(((MidiTrackEditor)target).getMinimumPitchInTrack()));
+				}
+			}		
+		});		
     viewsMenuGroup.add(pianoItem);
     add(pianoItem);    
     stavesItem = new JRadioButtonMenuItem("Staves");
-    stavesItem.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW, target));
+		stavesItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.setViewMode( MidiTrackEditor.NMS_VIEW);
+				if(((Integer)target.getTrack().getProperty("rangeMode")).intValue() == MidiTrackEditor.USED_RANGE)
+				{
+					target.getTrack().setProperty("maximumPitch", new Integer(((MidiTrackEditor)target).getMaximumPitchInTrack()));
+					target.getTrack().setProperty("minimumPitch", new Integer(((MidiTrackEditor)target).getMinimumPitchInTrack()));
+				}
+			}		
+		});		
     viewsMenuGroup.add(stavesItem);
     add(stavesItem);
     pianoItem.setSelected(true);
-		
+
     return true;
   }
 	
   public void update()
   {
-    updateChangeRangeMenu();
+    updateRangeMenu();
 		
     updateLabelTypesMenu();
 		
@@ -198,13 +173,14 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     if( selectItem != null) selectItem.setSelected( true);
   }
 	
-  void updateChangeRangeMenu()
+  void updateRangeMenu()
   {
-    int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
-    int min =  ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();
-    
-    if(maxSlider.getValue()!=max) maxSlider.setValue(max);
-    if(minSlider.getValue()!=min) minSlider.setValue(min);
+		int rangeMode = ((Integer)target.getTrack().getProperty("rangeMode")).intValue();
+		if(rangeMode == MidiTrackEditor.USED_RANGE && !usedRangeItem.isSelected())
+			usedRangeItem.setSelected(true);
+		else
+			if(rangeMode == MidiTrackEditor.WHOLE_RANGE && !wholeRangeItem.isSelected()) 
+				wholeRangeItem.setSelected(true);
   }
 }
 

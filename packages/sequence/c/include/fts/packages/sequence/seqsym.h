@@ -72,6 +72,8 @@ extern fts_symbol_t seqsym_window;
 extern fts_symbol_t seqsym_label;
 extern fts_symbol_t seqsym_zoom;
 extern fts_symbol_t seqsym_transp;
+extern fts_symbol_t seqsym_view;
+extern fts_symbol_t seqsym_range_mode;
 extern fts_symbol_t seqsym_save_editor;
 extern fts_symbol_t seqsym_editor_state;
 extern fts_symbol_t seqsym_set_editor;

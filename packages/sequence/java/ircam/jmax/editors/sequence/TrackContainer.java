@@ -185,14 +185,14 @@ public class TrackContainer extends JPanel {
 	      else
 		  activeButton.setIcon(SequenceImages.getImageIcon("mute"));
 	  }
-	  else if(name.equals("maximumPitch") || name.equals("minimumPitch"))
-	      {
+	  /*else if(name.equals("maximumPitch") || name.equals("minimumPitch"))
+			{
 		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
 		  setSize(getSize().width, height);
 		  setPreferredSize(new Dimension(getPreferredSize().width, height));
 		  setMaximumSize(new Dimension(getMaximumSize().width, height));
 		  ((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).changeTrack(track);	  
-	      }
+			}*/
 	  else 
 	    if(name.equals("viewMode"))
 	      {

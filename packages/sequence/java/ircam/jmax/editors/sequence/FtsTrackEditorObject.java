@@ -57,6 +57,8 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		label = "";
 		zoom = (float)0.2;
 		transp = 0;
+		view = 0;
+		rangeMode = 0;
 		trackObj = (FtsTrackObject)parent;		
 }
 
@@ -69,10 +71,16 @@ public void setEditorState( int nArgs, FtsAtom args[])
 		String label = args[4].symbolValue.toString();
 		float zoom = (float)args[5].doubleValue;
 		int transp = args[6].intValue;
-		
-		if( x!= this.wx || y!=this.wy || w!=this.ww || h!=this.wh || !label.equals(this.label) || zoom != this.zoom || transp != this.transp)
+		int view = args[7].intValue;
+		int rangeMode = args[8].intValue;
+				
+		if( x!= this.wx || y!=this.wy || w!=this.ww || h!=this.wh || 
+				!label.equals(this.label) || zoom != this.zoom || 
+				transp != this.transp || view != this.view || rangeMode != this.rangeMode) 
 		{	
-			this.wx = x; this.wy = y; this.ww = w; this.wh = h; this.label = label; this.zoom = zoom; this.transp = transp;
+			this.wx = x; this.wy = y; this.ww = w; this.wh = h; 
+			this.label = label; this.zoom = zoom; this.transp = transp; 
+			this.view = view; this.rangeMode = rangeMode;
 			trackObj.restoreEditorState();   
 		}
 }
@@ -175,6 +183,44 @@ public void setTransposition(int transp)
 		}
 }
 
+public void setViewMode(int view)
+{	
+		if(this.view != view)
+		{
+			this.view = view;
+			args.clear();
+			args.addInt( view);
+			
+			try{
+				send( FtsSymbol.get("view"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsTrackEditorObject: I/O Error sending viewMode Message!");
+				e.printStackTrace(); 
+			}
+		}
+}
+
+public void setRangeMode(int rangeMode)
+{	
+		if(this.rangeMode != rangeMode)
+		{
+			this.rangeMode = rangeMode;
+			args.clear();
+			args.addInt( rangeMode);
+			
+			try{
+				send( FtsSymbol.get("range_mode"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsTrackEditorObject: I/O Error sending rangeMode Message!");
+				e.printStackTrace(); 
+			}
+		}
+}
+
 public void requestSetEditorState(Rectangle bounds)
 {	
 	if(wx == -1)
@@ -197,6 +243,8 @@ public void requestSetEditorState(Rectangle bounds)
 	args.addSymbol( FtsSymbol.get(label));
 	args.addFloat( zoom);
 	args.addInt( transp);
+	args.addInt( view);
+	args.addInt( rangeMode);
 	try{
 		send( FtsSymbol.get("editor_state"), args);
 	}
@@ -335,7 +383,7 @@ public void deleteEvents(Enumeration events)
 
 //////////////////////////////////////////////////////////////////////////////////	
 
-public int wx, wy, ww, wh, transp;
+public int wx, wy, ww, wh, transp, view, rangeMode;
 public String label;
 public float zoom;
 FtsTrackObject trackObj;

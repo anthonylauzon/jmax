@@ -34,7 +34,7 @@ track_editor_upload(track_editor_t *this)
   {
 		if(this->win_x!=-1 && this->win_y!=-1 && this->win_w!=-1 && this->win_h!=-1)
 		{
-			fts_atom_t a[7];
+			fts_atom_t a[9];
 			fts_set_int(a, this->win_x);
 			fts_set_int(a+1, this->win_y);
 			fts_set_int(a+2, this->win_w);
@@ -42,8 +42,10 @@ track_editor_upload(track_editor_t *this)
 			fts_set_symbol(a+4, this->label);
 			fts_set_float(a+5, this->zoom);
 			fts_set_int(a+6, this->transp);
+			fts_set_int(a+7, this->view);
+			fts_set_int(a+8, this->range_mode);
 
-			fts_client_send_message((fts_object_t *)this, seqsym_editor, 7, a);
+			fts_client_send_message((fts_object_t *)this, seqsym_editor, 9, a);
 		}
 	}
 }
@@ -67,6 +69,12 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
 
   fts_set_int(a, this->transp);
   fts_dumper_send(dumper, seqsym_transp, 1, a);
+	
+	fts_set_int(a, this->view);
+  fts_dumper_send(dumper, seqsym_view, 1, a);
+	
+	fts_set_int(a, this->range_mode);
+  fts_dumper_send(dumper, seqsym_range_mode, 1, a);
 }
 
 
@@ -139,12 +147,43 @@ track_editor_transp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     }
   }	
 }	
+static void
+track_editor_view(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_editor_t *this = (track_editor_t *)o;
+  if(ac == 1 && fts_is_int(at))
+  {
+    int view = fts_get_int(at);
+    if(this->view != view)
+    {
+      this->view = view;
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }	
+}	
+static void
+track_editor_range_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_editor_t *this = (track_editor_t *)o;
+  if(ac == 1 && fts_is_int(at))
+  {
+    int range_mode = fts_get_int(at);
+    if(this->range_mode != range_mode)
+    {
+      this->range_mode = range_mode;
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }	
+}	
+
 
 static void
 track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_editor_t *this = (track_editor_t *)o;
-  if(ac >= 7)
+  if(ac >= 9)
   {
 		int x = fts_get_int(at);
     int y = fts_get_int(at+1);
@@ -153,7 +192,12 @@ track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 		fts_symbol_t label = fts_get_symbol(at+4);
 		float zoom = fts_get_float(at+5);
     int transp = fts_get_int(at+6);
-		if(this->win_x!=x || this->win_y != y || this->win_w!=w || this->win_h != h || this->label != label || this->zoom != zoom || this->transp != transp)
+		int view = fts_get_int(at+7);
+		int range_mode = fts_get_int(at+8);
+		if(this->win_x!=x || this->win_y != y || 
+			 this->win_w!=w || this->win_h != h || 
+			 this->label != label || this->zoom != zoom || 
+			 this->transp != transp || this->view != view || this->range_mode != range_mode)
     {
       this->win_x = x;
       this->win_y = y;
@@ -162,6 +206,8 @@ track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 			this->label = label;
 			this->zoom = zoom;
       this->transp = transp;
+			this->view = view;
+			this->range_mode = range_mode;
 			if(track_do_save_editor(this->track))
 				fts_object_set_dirty((fts_object_t *)this->track);
 		}
@@ -308,6 +354,8 @@ track_editor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->label = fts_s_empty_string;
   this->zoom = 0.2;
 	this->transp = 0;
+	this->view = 0;
+	this->range_mode = 0;
 	
   this->track = 0;
 	
@@ -329,6 +377,8 @@ track_editor_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_label, track_editor_label);
   fts_class_message_varargs(cl, seqsym_zoom, track_editor_zoom);
   fts_class_message_varargs(cl, seqsym_transp, track_editor_transp);
+	fts_class_message_varargs(cl, seqsym_view, track_editor_view);
+	fts_class_message_varargs(cl, seqsym_range_mode, track_editor_range_mode);
 	fts_class_message_varargs(cl, seqsym_editor_state, track_editor_set_state);
 
   fts_class_message_varargs(cl, seqsym_addEvent, track_editor_add_event);

@@ -167,7 +167,6 @@ public Enumeration objectsIntersecting(int x, int y, int w, int h)
   return tempList.elements();
 }
 
-
 //------------------  Fields
 SequenceGraphicContext gc;
 int viewMode = MidiTrackEditor.PIANOROLL_VIEW;

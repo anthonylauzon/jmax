@@ -40,16 +40,15 @@ public class ScoreBackground implements Layer{
   
   /** Constructor */
   public ScoreBackground ( SequenceGraphicContext theGc)
-{
+  {
     super();
     
     gc = theGc; 
 		
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-		{		
-				if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") ||
-						e.getPropertyName().equals("trackName"))
+		  {		
+				if (e.getPropertyName().equals("rangeMode") || e.getPropertyName().equals("trackName"))
 				{
 					toRepaintBack = true;
 					gc.getGraphicDestination().repaint();
@@ -61,91 +60,124 @@ public class ScoreBackground implements Layer{
 						toRepaintBack = true;
 						gc.getGraphicDestination().repaint();
 					}
-		}
+			}
 		});
+	}
+
+public static int getMaxPitchInStaff(int max)
+{
+	/*int num = max % 12;
+	if(num < 10) return (num+1)*12;
+	else return 127;*/
+	if(max <= 11) return 11;
+	else if(max <= 23) return 23;
+	else if( max <= 35) return 35;
+	else if( max <= 47) return 47;
+	else if( max <= 59) return 59;
+	else if( max <= 71) return 71;
+	else if( max <= 83) return 83;
+	else if( max <= 95) return 95;
+	else if( max <= 107) return 107;
+	else if( max <= 119) return 119;
+	else return 127;
 }
+
+public static int getMinPitchInStaff(int min)
+{
+	if(min >= 120) return 120;
+	else if(min >= 108) return 108;
+	else if( min >= 96) return 96;
+	else if( min >= 84) return 84;
+	else if( min >= 72) return 72;
+	else if( min >= 60) return 60;
+	else if( min >= 48) return 48;
+	else if( min >= 36) return 36;
+	else if( min >= 24) return 24;
+	else if( min >= 12) return 12;
+	else return 0;
+}	
 
 /** builds an horizontal grid in the given graphic port
 * using the destination size*/
 private void drawHorizontalGrid(Graphics g)
 {
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-	int maxPitch = pa.getY(pa.getMaxPitch());
-	int minPitch = pa.getY(pa.getMinPitch());
-	int delta = pa.getVerticalTransp();
+	int maxPitch = pa.getMaxPitch();
+	int minPitch = pa.getMinPitch();
+	int maxPitchY = pa.getY(maxPitch);
+	int minPitchY = pa.getY(minPitch);
+	int transp = pa.getVerticalTransp();
 	
 	Dimension d = gc.getGraphicDestination().getSize();
-	
+	/********** Background ******************************************************/
 	if(!locked)
 		g.setColor(Color.white);
 	else
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
 	g.fillRect(0, 0, d.width, d.height);
 	
-	g.setColor(OUT_RANGE_COLOR);
-	g.fillRect(0 , 0 -delta, d.width, maxPitch);
-	g.fillRect(0, minPitch+2 -delta, d.width, d.height-minPitch-2+delta);
-	
+	/********** Gray Lines ******************************************************/
 	int positionY;
-	g.setFont(gridSubdivisionFont);
-	// the minor subdivision
-	
+	int maxGray = (SC_BOTTOM - maxPitchY)/GRAY_STEP;
+	int minGray = (SC_BOTTOM - minPitchY)/GRAY_STEP;
 	g.setColor(horizontalGridLinesColor);
-	for (int i = 0; i < 381; i+=9)
+	for (int i = minGray+1; i <= maxGray; i++)
 	{
-		positionY = SC_BOTTOM-i;
-		g.drawLine(KEYEND+1, positionY -delta, d.width, positionY -delta);
+		positionY = SC_BOTTOM-i*GRAY_STEP;
+		g.drawLine(KEYEND+1, positionY -transp, d.width, positionY -transp);
 	}
-	
-	// the major subdivision lines and numbers
+	/********** Black Lines *****************************************************/
 	g.setColor(Color.black);
-	g.drawLine(KEYEND+1, SC_BOTTOM+1 -delta, d.width,SC_BOTTOM+1-delta);
-	for (int j = 36; j < 381; j+=36)
+	int maxBlack = (SC_BOTTOM - maxPitchY)/BLACK_STEP;
+	int minBlack = (SC_BOTTOM - minPitchY)/BLACK_STEP;
+	
+	g.drawLine(KEYEND+1, minPitchY+2-transp, d.width, minPitchY+2-transp);
+	for(int j = minBlack+1; j <= maxBlack; j++)
 	{
-		positionY = SC_BOTTOM-j;
-		g.drawLine(KEYEND+1, positionY -delta, d.width, positionY-delta);
+		positionY = SC_BOTTOM-j*BLACK_STEP;
+		g.drawLine(KEYEND+1, positionY-transp, d.width, positionY-transp);
+	}	
+	g.drawLine(KEYEND+1, maxPitchY-2-transp, d.width, maxPitchY-2-transp);
+	/********** Numbers **********************************************************/
+	g.setColor(Color.gray);
+	g.setFont(gridSubdivisionFont);
+	
+	g.drawString(""+minPitch, 10, minPitchY+4-transp);
+	for(int j = minBlack+1; j <= maxBlack; j++)
+	{
+		positionY = SC_BOTTOM-j*BLACK_STEP;
+		g.drawString(""+(j*BLACK_STEP)/3, 10 , positionY+3-transp);
 	}
-	// the last (127) line
-	g.drawLine(KEYEND+1, SC_TOP-3 -delta, d.width, SC_TOP-3 -delta);//?????
-    
-    g.setColor(Color.gray);
-    for (int j = 0; j < 381; j+=36)
+	g.drawString(""+maxPitch, 10, maxPitchY+2-transp);
+	/********** Track Name ********************************************************/
+	if( gc.isInSequence())
+	{
+		g.setFont(backFont);
+		g.drawString(gc.getTrack().getName(), 2, d.height - 2);
+	}
+	/********** Piano Keys *********************************************************/
+	for (int i = minPitch; i <= maxPitch; i++)
+	{
+		positionY = SC_BOTTOM-(i*3)-2;
+		if (isAlteration(i)) 
 		{
-			positionY = SC_BOTTOM-j;
-			g.drawString(""+j/3, 10 , positionY+3-delta);
+			g.setColor(Color.darkGray);
+			g.fillRect(KEYX, positionY-transp, SHORTKEYWIDTH, KEYHEIGHT);
 		}
-    // the last (127) number
-    g.drawString(""+127, 10, SC_TOP+3-delta);
-		
-    // the track name
-    if( gc.isInSequence())
+		else 
 		{
-			g.setFont(backFont);
-			g.drawString(gc.getTrack().getName(), 2, d.height - 2);
+			g.setColor(Color.white);
+			g.fillRect(KEYX, positionY -transp, KEYWIDTH, KEYHEIGHT);
 		}
-		
-    // the piano keys...
-    for (int i = 0; i <= 127; i++)
-		{
-			positionY = SC_BOTTOM-(i*3)-2;
-			if (isAlteration(i)) 
-			{
-				g.setColor(Color.darkGray);
-				g.fillRect(KEYX, positionY-delta, SHORTKEYWIDTH, KEYHEIGHT);
-			}
-			else 
-			{
-				g.setColor(Color.white);
-				g.fillRect(KEYX, positionY -delta, KEYWIDTH, KEYHEIGHT);
-			}
-		}
-    g.setColor(Color.black);
-    //lines at top and bottom of the keybord 
-    g.drawLine(KEYX, SC_TOP-3-delta, KEYEND,SC_TOP-3-delta);
-    g.drawLine(KEYX, SC_BOTTOM+1-delta, KEYEND,SC_BOTTOM+1-delta);
-    // the vertical line at the end of keyboard
-    g.drawLine(KEYEND, SC_TOP-3-delta, KEYEND, SC_BOTTOM+1-delta);
-    g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta); 
+	}
+	/********** lines at top and bottom of the keybord  ****************************/
+	g.setColor(Color.black);
+	g.drawLine(KEYX, maxPitchY-2-transp, KEYEND, maxPitchY-2-transp);
+	g.drawLine(KEYX, minPitchY+2-transp, KEYEND, minPitchY+2-transp);
+	
+	/********** the vertical line at the end of keyboard ****************************/
+	g.drawLine(KEYEND, maxPitchY-2-transp, KEYEND, minPitchY+2-transp);
+	g.drawLine(KEYX-1, maxPitchY-2-transp, KEYX-1, minPitchY+2-transp);					 
 }
 
 public static boolean isAlteration(int note)
@@ -308,6 +340,9 @@ public static final int KEYEND = KEYX + KEYWIDTH;
 
 public static final int SC_BOTTOM = 409;
 public static final int SC_TOP = 28;
+
+public static final int GRAY_STEP = 9;
+public static final int BLACK_STEP = 36;
 
 public static final Color OUT_RANGE_COLOR = new Color(230, 230, 230);
 public static Font backFont = new Font("monospaced", Font.PLAIN, 10);
