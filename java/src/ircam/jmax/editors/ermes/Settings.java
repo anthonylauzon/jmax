@@ -142,38 +142,4 @@ public class Settings {
   {
     this.selectedTextColor = selectedTextColor;
   }
-
-  /** This method, called only once at initialization, 
-   * try to handle the indexed color map problem (missing colors),
-   * implementing an alternative color matching and using 
-   * the available colors in the current colormap */
-  private Color findBestUIColorMatch(int r, int g, int b)
-  {
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    ColorModel cm = toolkit.getColorModel();
-
-    if ( cm instanceof DirectColorModel)
-      return new Color(r, g, b);
-    else
-      {
-	IndexColorModel icm = (IndexColorModel) cm;
-
-	int TOLERANCE = 15;
-
-
-	// find the first color whose blue component is equal or darker
-	// then the g and r, trying to conserve the luminance...
-	for (int i = 0; i < icm.getMapSize(); i++)
-	  {
-	    if (Math.abs(icm.getRed(i) - r) <= TOLERANCE && 
-		Math.abs(icm.getGreen(i) - g) <= TOLERANCE && 
-		Math.abs(icm.getBlue(i) - b) <= TOLERANCE)
-	      {
-		return new Color(icm.getRed(i), icm.getGreen(i), icm.getBlue(i));
-	      }
-	  }
-      }
-    //no way: let the system's color matching do the job
-    return new Color(r, g, b);
-  }
 }
