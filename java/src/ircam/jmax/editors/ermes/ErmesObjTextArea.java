@@ -100,8 +100,6 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
     
-    System.out.println("lenght = "+lenght);
-
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+10;
