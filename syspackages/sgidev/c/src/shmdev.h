@@ -24,12 +24,9 @@
  *
  */
 
-#ifndef _SGIDEV_H_
-#define _SGIDEV_H_
+#ifndef _SHMDEV_H_
+#define _SHMDEV_H_
 
-/* Include file for the sgidev module */
-
-extern void sgidev_init(void);
-
+extern void shmdev_init( void);
 
 #endif

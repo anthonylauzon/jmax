@@ -54,13 +54,6 @@
 
 extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
 
-/* forward declarations */
-
-static void sgi_dac_init(void);
-static void sgi_adc_init(void);
-static void sgi_midi_init(void); 
-static void sgi_soundfile_init(void);
-
 /******************************************************************************/
 /*                                                                            */
 /*                              Error Definition                              */
@@ -71,22 +64,6 @@ static fts_status_description_t sgi_no_midi =
 {
   "No Midi port configured"
 };
-
-
-/******************************************************************************/
-/*                                                                            */
-/*                              Init function                                 */
-/*                                                                            */
-/******************************************************************************/
-
-void
-sgidev_init(void)
-{
-  sgi_dac_init();
-  sgi_adc_init();
-  sgi_midi_init(); 
-  sgi_soundfile_init();
-}
 
 
 /******************************************************************************/
@@ -124,7 +101,7 @@ typedef struct
 
 /* Init functions */
 
-static void sgi_dac_init(void)
+void sgi_dac_init(void)
 {
   fts_dev_class_t *sgi_dac_class;
 
@@ -499,7 +476,7 @@ typedef struct
 
 /* Init  functions */
 
-static void sgi_adc_init(void)
+void sgi_adc_init(void)
 {
   fts_dev_class_t *sgi_adc_class;
 
@@ -784,7 +761,7 @@ static fts_status_t sgi_midi_close(fts_dev_t *dev);
 static fts_status_t sgi_midi_get(fts_dev_t *dev, unsigned char *cp);
 static fts_status_t sgi_midi_put(fts_dev_t *dev, unsigned char c);
 
-static void sgi_midi_init(void)
+void sgi_midi_init(void)
 {
   fts_dev_class_t *sgi_midi_dev_class;
 
@@ -1220,7 +1197,7 @@ static int          sgi_soundfile_get_nchans(fts_dev_t *dev);
 
 
 
-static void sgi_soundfile_init(void)
+void sgi_soundfile_init(void)
 {
   fts_dev_class_t *sgi_soundfile_class;
 

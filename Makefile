@@ -71,12 +71,14 @@ all:
 	(cd java ; $(MAKE) all)
 	(cd lib; $(MAKE) all)
 	(cd packages; $(MAKE) all)
+	(cd syspackages; $(MAKE) all)
 .PHONY: all
 
 all_c:
 	(cd fts; $(MAKE) all)
 	(cd lib; $(MAKE) all_c)
 	(cd packages; $(MAKE) all_c)
+	(cd syspackages; $(MAKE) all)
 .PHONY: all_c
 
 all_java:
@@ -90,12 +92,14 @@ clean:
 	(cd java ; $(MAKE) clean)
 	(cd lib; $(MAKE) clean)
 	(cd packages; $(MAKE) clean)
+	(cd syspackages; $(MAKE) all)
 .PHONY: clean
 
 clean_c:
 	(cd fts; $(MAKE) clean)
 	(cd packages; $(MAKE) clean_c)
 	(cd lib; $(MAKE) clean_c)
+	(cd syspackages; $(MAKE) clean)
 .PHONY: clean_c
 
 clean_java:
@@ -126,7 +130,7 @@ sgi:
 # do the TAGS file
 #
 TAGS:
-	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.tcl" -o -name "*.html" \) -print | etags -t -
+	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.scm" -o -name "*.html" \) -print | etags -t -
 .PHONY: TAGS
 
 #
@@ -191,7 +195,7 @@ install-includes:
 #
 sgi-pkg:
 	/bin/rm -rf /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes
-	( RAWIDB=/tmp/idb-doc ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.doc.documentation" install-doc )
+	( RAWIDB=/tmp/idb-doc ; export RAWIDB ; SRC=$$HOME ; export SRC ; echo $$SRC ; $(MAKE) ARCH=sgi INSTALL="echo jmax.doc.documentation " install-doc )
 	( RAWIDB=/tmp/idb-exec ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.exec" install-exec )
 	( RAWIDB=/tmp/idb-includes ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.includes" install-includes )
 	/bin/rm -rf ./pkg/sgi/jmax.idb

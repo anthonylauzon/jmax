@@ -84,6 +84,8 @@ jmaxSetAudioBuffer $jmaxAudioBuffer
 # that should be defined in the machine type declaration files
 # so we are sure the correct configuration is there ...
 
+runHooks "platformStart"
+
 if {[runHooks "start"] != "true"} {
     runHooks "defaultStart"
 }

@@ -44,7 +44,6 @@
 #define HAS_UNIX
 #define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
-#define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
@@ -63,7 +62,6 @@
 #define HAS_UNIX
 #define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
-#define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
 

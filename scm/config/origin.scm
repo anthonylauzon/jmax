@@ -62,3 +62,16 @@
 (define-device "midi3" (list "sgi_midi" "port" "SerialPort3") "MIDI on startmidi port SerialPort3")
 (define-device "midi4" (list "sgi_midi" "port" "SerialPort4") "MIDI on startmidi port SerialPort4")
 
+(when "platform-start" "(platform-start-hook)")
+
+(define (platform-start-hook)
+  (require-package "sgidev" "0.0.0")
+  (require-package "pdtddev" "0.0.0")
+)
+
+(when "default-start" "(default-start-kook)")
+
+(define (default-start-kook)
+  (open-default-audio-in "adatIn")
+  (open-default-audio-out "adatOut")
+)

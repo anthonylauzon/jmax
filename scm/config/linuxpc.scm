@@ -31,11 +31,26 @@
 (define-device "stereoIn"  "oss_adc" "OSS audio in")
 (define-device "stereoIn1" "oss_adc" "OSS audio in")
 
-(define-device "studioOutA" (list "oss_dac" "device" "/dev/dsp1" "channels" "8") "StudI/O output ADAT port A")
-(define-device "studioInA" (list "oss_adc" "device" "/dev/dsp11" "channels" "2") "StudI/O input ADAT port A")
+;; This is for SONORUS StudI/O
+(define-device "adatOut" (list "oss_dac" "device" "/dev/dsp1" "channels" "8") "ADAT out")
+(define-device "adatIn" (list "oss_adc" "device" "/dev/dsp11" "channels" "2") "ADAT in")
 
 (define-device "stereoOut"  "oss_dac" "OSS audio out")
 (define-device "stereoOut1" "oss_dac" "OSS audio out")
 
 (define-device "midi" "oss_midi" "OSS MIDI")
 
+(when "platform-start" "(platform-start-hook)")
+
+(define (platform-start-hook)
+  (require-package "ossdev" "0.0.0")
+  (require-package "pdtddev" "0.0.0")
+)
+
+(when "default-start" "(default-start-kook)")
+
+(define (default-start-kook)
+  (open-default-audio-in "stereoIn")
+  (open-default-audio-out "stereoOut")
+  (open-default-midi "midi")
+)

@@ -56,19 +56,9 @@
 #include <string.h>
 #include <assert.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices/devices.h"
-#include "runtime/devices/unixdev.h"
-#include "runtime/files.h"
+#include "fts.h"
 
 extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
-
-/* forward declarations */
-
-static void oss_dac_init(void);
-static void oss_adc_init(void);
-static void oss_midi_init(void);
 
 /******************************************************************************/
 /*                                                                            */
@@ -692,6 +682,7 @@ static void oss_adc_get( fts_word_t *argv)
 
 static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
 {
+#if 0
   fts_symbol_t name;
   fd_dev_data_t *p;
   int fd;
@@ -711,10 +702,15 @@ static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
   fd_data_set_output_fd( p, fd);
 
   return fts_Success;
+#endif
+
+  /* For now, midi is broken because of fd_dev_data_t * */
+  return &fts_dev_open_error;
 }
 
 static fts_status_t oss_midi_close( fts_dev_t *dev)
 {
+#if 0
   fd_dev_data_t *p = (fd_dev_data_t *)fts_dev_get_device_data( dev);
 
   close( fd_data_get_input_fd( p));
@@ -722,10 +718,14 @@ static fts_status_t oss_midi_close( fts_dev_t *dev)
   fd_data_delete( p);
 
   return fts_Success;
+#endif
+
+  return fts_Success;
 }
 
 static fts_status_t oss_midi_put( fts_dev_t *dev, unsigned char c)
 {
+#if 0
   fts_status_t status;
 
   status = fd_dev_put( dev, c);
@@ -733,6 +733,9 @@ static fts_status_t oss_midi_put( fts_dev_t *dev, unsigned char c)
     return status;
 
   return fd_dev_flush( dev);
+#endif
+
+  return fts_Success;
 }
 
 
@@ -742,19 +745,26 @@ static void oss_midi_init( void)
 
   oss_midi_class = fts_dev_class_new( fts_char_dev, fts_new_symbol( "oss_midi"));
 
+#if 0
   fts_dev_class_set_open_fun( oss_midi_class, oss_midi_open);
   fts_dev_class_set_close_fun( oss_midi_class, oss_midi_close);
   fts_dev_class_char_set_get_fun( oss_midi_class, fd_dev_get);
   fts_dev_class_char_set_put_fun( oss_midi_class, oss_midi_put);
+#endif
 }
 
+
 /******************************************************************************/
 /*                                                                            */
-/*                              Init function                                 */
+/* Module declaration                                                         */
 /*                                                                            */
 /******************************************************************************/
 
-void ossdev_init(void)
+static void ossdev_init(void);
+
+fts_module_t ossdev_module = {"ossdev", "OSS devices", ossdev_init, 0, 0, 0};
+
+static void ossdev_init(void)
 {
   audio_desc_table = fts_hash_table_new();
 
@@ -763,3 +773,4 @@ void ossdev_init(void)
 
   oss_midi_init();
 }
+

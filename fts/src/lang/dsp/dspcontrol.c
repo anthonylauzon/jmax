@@ -107,8 +107,7 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
       fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_DAC_SLIP_STATE, 1, &a);
     }
 
-  /*fpe_state = fts_check_fpe();*/
-  fpe_state = 0;
+  fpe_state = fts_check_fpe();
 
   invalid_fpe  = ((fpe_state & FTS_INVALID_FPE) ? 1 : 0);
 

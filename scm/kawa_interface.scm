@@ -169,7 +169,7 @@
 (define (new-fts a0 a1 a2 a3 a4)
   ((primitive-constructor
     <ircam.jmax.fts.Fts>
-    (<java.lang.String> <java.lang.String> <java.lang.String> <java.lang.String> <java.lang.String>))
+    (<java.lang.String> <java.lang.String> <java.lang.String> <java.lang.String> <int>))
    a0 a1 a2 a3 a4))
 
 (define (fts-make-fts-object a0 a1 a2 a3)

@@ -60,11 +60,13 @@ JAR_FILE= jmax.jar
 ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
 
 all: $(JAVA_CLASSES_ROOT)
-	(cd ircam ; $(MAKE) all)
+	(cd ircam ; $(MAKE) $@)
+	(cd silk ; $(MAKE) $@)
 .PHONY: all
 
 clean:
-	(cd ircam ; $(MAKE) clean)
+	(cd ircam ; $(MAKE) $@)
+	(cd silk ; $(MAKE) $@)
 .PHONY: clean
 
 doc:  

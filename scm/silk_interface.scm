@@ -26,7 +26,7 @@
 (define package-handler-append-path (method "appendPath" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String"))
 (define package-load-class (method "loadClass" "ircam.jmax.script.pkg.Package" "java.lang.String"))
 (define package-append-local-path (method "appendLocalPath" "ircam.jmax.script.pkg.Package" "java.lang.String"))
-(define new-fts (constructor "ircam.jmax.fts.Fts" "java.lang.String" "java.lang.String" "java.lang.String" "java.lang.String" "java.lang.String"))
+(define new-fts (constructor "ircam.jmax.fts.Fts" "java.lang.String" "java.lang.String" "java.lang.String" "java.lang.String" "int"))
 (define fts-make-fts-object (method "makeFtsObject" "ircam.jmax.fts.Fts" "ircam.jmax.fts.FtsObject" "java.lang.String" "java.lang.String"))
 (define fts-make-fts-connection (method "makeFtsConnection" "ircam.jmax.fts.Fts" "ircam.jmax.fts.FtsObject" "int" "ircam.jmax.fts.FtsObject" "int"))
 (define fts-redefine-fts-object (method "redefineFtsObject" "ircam.jmax.fts.Fts" "ircam.jmax.fts.FtsObject" "java.lang.String"))

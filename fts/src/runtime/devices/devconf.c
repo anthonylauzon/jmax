@@ -36,47 +36,17 @@
 #include "runtime/devices/unixdev.h"
 #endif
 
-#ifdef SGI
-#include "runtime/devices/sgidev.h"
-#endif
-
-#ifdef HAS_OSS
-#include "runtime/devices/ossdev.h"
-#endif
-
 extern void null_init(void);
 extern void profdev_init(void);
 
-#ifdef HAS_OSS
-extern void ossdev_init(void);
-#endif
-
-extern void sfdev_init(void);
-
-#ifdef SGI
-extern void shmdev_init( void);
-#endif
-
 void fts_dev_configure(void)
 {
+  null_init();
   profdev_init();
 
 #ifdef HAS_UNIX
   unixdev_init();
 #endif
-
-#ifdef SGI
-  sgidev_init();
-  sfdev_init();
-  shmdev_init();
-#endif
-
-#ifdef HAS_OSS
-  ossdev_init();
-  sfdev_init();
-#endif
-
-  null_init();
 }
 
 

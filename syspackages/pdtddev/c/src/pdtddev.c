@@ -534,36 +534,36 @@ static void fts_async_init(void)
 /** READSF **/
 
 
-static fts_status_t sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
-static fts_status_t sgi_readsf_close(fts_dev_t *dev);
+static fts_status_t pdtd_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
+static fts_status_t pdtd_readsf_close(fts_dev_t *dev);
 
-static void sgi_readsf_get(fts_word_t *argv);
+static void pdtd_readsf_get(fts_word_t *argv);
 
-static fts_status_t sgi_readsf_activate(fts_dev_t *dev);
-static fts_status_t sgi_readsf_deactivate(fts_dev_t *dev);
-static int          sgi_readsf_get_nchans(fts_dev_t *dev);
+static fts_status_t pdtd_readsf_activate(fts_dev_t *dev);
+static fts_status_t pdtd_readsf_deactivate(fts_dev_t *dev);
+static int          pdtd_readsf_get_nchans(fts_dev_t *dev);
 
 static void fts_readsf_forker(void *data);
 
 
-static void sgi_readsf_init(void)
+static void pdtd_readsf_init(void)
 {
-  fts_dev_class_t *sgi_readsf_class;
+  fts_dev_class_t *pdtd_readsf_class;
 
   /* dac file */
 
-  sgi_readsf_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("readsf"));
+  pdtd_readsf_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("readsf"));
 
   /* Installation of all the device class functions */
 
-  fts_dev_class_set_open_fun(sgi_readsf_class, sgi_readsf_open);
-  fts_dev_class_set_close_fun(sgi_readsf_class, sgi_readsf_close);
+  fts_dev_class_set_open_fun(pdtd_readsf_class, pdtd_readsf_open);
+  fts_dev_class_set_close_fun(pdtd_readsf_class, pdtd_readsf_close);
 
-  fts_dev_class_sig_set_get_fun(sgi_readsf_class, sgi_readsf_get);
+  fts_dev_class_sig_set_get_fun(pdtd_readsf_class, pdtd_readsf_get);
 
-  fts_dev_class_sig_set_activate_fun(sgi_readsf_class, sgi_readsf_activate);
-  fts_dev_class_sig_set_deactivate_fun(sgi_readsf_class, sgi_readsf_deactivate);
-  fts_dev_class_sig_set_get_nchans_fun(sgi_readsf_class, sgi_readsf_get_nchans);
+  fts_dev_class_sig_set_activate_fun(pdtd_readsf_class, pdtd_readsf_activate);
+  fts_dev_class_sig_set_deactivate_fun(pdtd_readsf_class, pdtd_readsf_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(pdtd_readsf_class, pdtd_readsf_get_nchans);
 }
 
 
@@ -602,7 +602,7 @@ void readsf_destroy_data(void *dev_data)
 }
 
 static fts_status_t
-sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+pdtd_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
   struct readsf_data *dev_data;
 
@@ -645,7 +645,7 @@ sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 }
 
 static fts_status_t
-sgi_readsf_close(fts_dev_t *dev)
+pdtd_readsf_close(fts_dev_t *dev)
 {
   struct readsf_data *dev_data;
 
@@ -657,7 +657,7 @@ sgi_readsf_close(fts_dev_t *dev)
 }
 
 
-static fts_status_t sgi_readsf_activate(fts_dev_t *dev)
+static fts_status_t pdtd_readsf_activate(fts_dev_t *dev)
 {
   struct readsf_data *dev_data;
 
@@ -668,7 +668,7 @@ static fts_status_t sgi_readsf_activate(fts_dev_t *dev)
 }
 
 
-static fts_status_t sgi_readsf_deactivate(fts_dev_t *dev)
+static fts_status_t pdtd_readsf_deactivate(fts_dev_t *dev)
 {
   struct readsf_data *dev_data;
 
@@ -679,7 +679,7 @@ static fts_status_t sgi_readsf_deactivate(fts_dev_t *dev)
 }
 
 static int
-sgi_readsf_get_nchans(fts_dev_t *dev)
+pdtd_readsf_get_nchans(fts_dev_t *dev)
 {
   struct readsf_data *dev_data;
 
@@ -689,7 +689,7 @@ sgi_readsf_get_nchans(fts_dev_t *dev)
 
 
 static void
-sgi_readsf_get(fts_word_t *argv)
+pdtd_readsf_get(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   struct readsf_data *dev_data;
@@ -898,35 +898,35 @@ static void fts_readsf_forker(void *data)
 /** WRITESF **/
 
 
-static fts_status_t sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
-static fts_status_t sgi_writesf_close(fts_dev_t *dev);
+static fts_status_t pdtd_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args);
+static fts_status_t pdtd_writesf_close(fts_dev_t *dev);
 
-static void sgi_writesf_put(fts_word_t *argv);
+static void pdtd_writesf_put(fts_word_t *argv);
 
-static fts_status_t sgi_writesf_activate(fts_dev_t *dev);
-static fts_status_t sgi_writesf_deactivate(fts_dev_t *dev);
-static int          sgi_writesf_get_nchans(fts_dev_t *dev);
+static fts_status_t pdtd_writesf_activate(fts_dev_t *dev);
+static fts_status_t pdtd_writesf_deactivate(fts_dev_t *dev);
+static int          pdtd_writesf_get_nchans(fts_dev_t *dev);
 
 static void fts_writesf_forker(void *data);
 
-static void sgi_writesf_init(void)
+static void pdtd_writesf_init(void)
 {
-  fts_dev_class_t *sgi_writesf_class;
+  fts_dev_class_t *pdtd_writesf_class;
 
   /* dac file */
 
-  sgi_writesf_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("writesf"));
+  pdtd_writesf_class = fts_dev_class_new(fts_sig_dev, fts_new_symbol("writesf"));
 
   /* Installation of all the device class functions */
 
-  fts_dev_class_set_open_fun(sgi_writesf_class, sgi_writesf_open);
-  fts_dev_class_set_close_fun(sgi_writesf_class, sgi_writesf_close);
+  fts_dev_class_set_open_fun(pdtd_writesf_class, pdtd_writesf_open);
+  fts_dev_class_set_close_fun(pdtd_writesf_class, pdtd_writesf_close);
 
-  fts_dev_class_sig_set_put_fun(sgi_writesf_class, sgi_writesf_put);
+  fts_dev_class_sig_set_put_fun(pdtd_writesf_class, pdtd_writesf_put);
 
-  fts_dev_class_sig_set_activate_fun(sgi_writesf_class, sgi_writesf_activate);
-  fts_dev_class_sig_set_deactivate_fun(sgi_writesf_class, sgi_writesf_deactivate);
-  fts_dev_class_sig_set_get_nchans_fun(sgi_writesf_class, sgi_writesf_get_nchans);
+  fts_dev_class_sig_set_activate_fun(pdtd_writesf_class, pdtd_writesf_activate);
+  fts_dev_class_sig_set_deactivate_fun(pdtd_writesf_class, pdtd_writesf_deactivate);
+  fts_dev_class_sig_set_get_nchans_fun(pdtd_writesf_class, pdtd_writesf_get_nchans);
 }
 
 
@@ -966,7 +966,7 @@ void writesf_destroy_data(void *dev_data)
 
 
 static fts_status_t
-sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+pdtd_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
   fts_symbol_t format_name;
   struct writesf_data *dev_data;
@@ -1029,7 +1029,7 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 }
 
 static fts_status_t
-sgi_writesf_close(fts_dev_t *dev)
+pdtd_writesf_close(fts_dev_t *dev)
 {
   struct writesf_data *dev_data;
 
@@ -1043,7 +1043,7 @@ sgi_writesf_close(fts_dev_t *dev)
 }
 
 
-static fts_status_t sgi_writesf_activate(fts_dev_t *dev)
+static fts_status_t pdtd_writesf_activate(fts_dev_t *dev)
 {
   struct writesf_data *dev_data;
 
@@ -1054,7 +1054,7 @@ static fts_status_t sgi_writesf_activate(fts_dev_t *dev)
 }
 
 
-static fts_status_t sgi_writesf_deactivate(fts_dev_t *dev)
+static fts_status_t pdtd_writesf_deactivate(fts_dev_t *dev)
 {
   struct writesf_data *dev_data;
 
@@ -1065,7 +1065,7 @@ static fts_status_t sgi_writesf_deactivate(fts_dev_t *dev)
 }
 
 static int
-sgi_writesf_get_nchans(fts_dev_t *dev)
+pdtd_writesf_get_nchans(fts_dev_t *dev)
 {
   struct writesf_data *dev_data;
 
@@ -1076,7 +1076,7 @@ sgi_writesf_get_nchans(fts_dev_t *dev)
 
 
 static void
-sgi_writesf_put(fts_word_t *argv)
+pdtd_writesf_put(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   struct writesf_data *dev_data;
@@ -1219,17 +1219,26 @@ static void fts_writesf_forker(void *data)
 }
 
 
-/* File Init */
+/******************************************************************************/
+/*                                                                            */
+/* Module declaration                                                         */
+/*                                                                            */
+/******************************************************************************/
 
-void sfdev_init(void)
+static void pdtddev_init(void);
+
+fts_module_t pdtddev_module = {"pdtddev", "Posix Direct-To-Disk devices", pdtddev_init, 0, 0, 0};
+
+static void pdtddev_init( void)
 {
   afSetErrorHandler(NULL);	/* avoid stupid error printing in the af library */
 
   fts_sample_fifo_init();
   fts_cmd_fifo_init();
   fts_async_init();
-  sgi_readsf_init();
-  sgi_writesf_init();
+
+  pdtd_readsf_init();
+  pdtd_writesf_init();
 }
 
 

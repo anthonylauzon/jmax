@@ -44,7 +44,6 @@
 ;;
 (define jmax-scm-root (string-append jmax-root slash "scm"))
 (define jmax-image-root (string-append jmax-root slash "images" slash))
-(define jmax-sys-pkg-path (string-append jmax-root slash "packages"))
 
 ;;
 ;; Load the interface functions specific to the Scheme
@@ -61,11 +60,6 @@
 ;; Load the intrinsic Scheme functions. 
 ;;
 (load (string-append jmax-scm-root slash "scheme_interface.scm"))
-
-;;
-;; Pass the system package path to the package handler
-;;
-(append-package-path jmax-sys-pkg-path)
 
 ;;
 ;; Intrinsic functions for the Sgi platform
@@ -86,6 +80,11 @@
 ;; Set parameters default values
 ;;
 (load (file-cat jmax-scm-root "defaults.scm"))
+
+;;
+;; Pass the system package path to the package handler
+;;
+;;(append-package-path jmax-sys-pkg-path)
 
 ;;
 ;; Load the system icons
@@ -146,5 +145,5 @@
 ;;
 ;; FIXME testing only
 ;;
-(println (- (system-current-time-millis) start-time) " ms")
+;; (println (- (system-current-time-millis) start-time) " ms")
 

@@ -23,28 +23,20 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-# (fd) HACK !!!!!!!!
-# ARCH = VENDOR + OS_TYPE + AUDIO_LIBRARY + PLATFORM 
-# Quel bordel !
-
 ifeq ($(PLATFORM),sgi)
-ifeq ($(AUDIO_LIBRARY),sgial2)
-ARCH_SOURCES = sgial2dev.c shmdev.c sfdev.c unixdev.c
-else
-ARCH_SOURCES = sgidev.c sfdev.c
-endif
+ARCH_SOURCES = unixdev.c
 endif
 
 ifeq ($(PLATFORM),linux-intel)
-ARCH_SOURCES = ossdev.c unixdev.c sfdev.c
+ARCH_SOURCES = unixdev.c
 endif
 
 ifeq ($(PLATFORM),linux-ppc)
-ARCH_SOURCES = ossdev.c unixdev.c sfdev.c
+ARCH_SOURCES = unixdev.c
 endif
 
 ifeq ($(OS_TYPE),solaris2)
-ARCH_SOURCES = unixdev.c solaris2dev.c
+ARCH_SOURCES = unixdev.c 
 endif
 
 ifeq ($(PLATFORM),macosx)

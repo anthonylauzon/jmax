@@ -26,6 +26,9 @@
 
 (require-package "reftype" "0.0.0")
 
+;; (fd)
+(println "-- *** ERROR: In package system, dir = " dir " --")
+
 ; load dynamic libraries into the server
 (ucs "load" "module" "system" (file-cat dir "c" "lib" jmax-arch jmax-mode "libsystem.so"))
 

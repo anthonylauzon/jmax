@@ -293,9 +293,9 @@ public class MaxApplication extends Object
 
     if (jmaxProperties.get("jmaxInterp") == null)
       {
-	//user didn't specify the interp. Take ircam.jmax.script.tcl.TclInterpreter as default.
-	jmaxProperties.put("jmaxInterp", "jacl");
-	//jmaxProperties.put("jmaxInterp", "silk");
+	//user didn't specify the interp. Take default.
+	//jmaxProperties.put("jmaxInterp", "jacl");
+	jmaxProperties.put("jmaxInterp", "silk");
       }
 
     //the version number as a system property
@@ -452,12 +452,10 @@ public class MaxApplication extends Object
       if (interpName.equalsIgnoreCase("jacl")) {
 	  interpClassName = "ircam.jmax.script.tcl.TclInterpreter";
       } else if (interpName.equalsIgnoreCase("silk")) {
-	  interpClassName = "ircam.jmax.script.scm.SilkInterpreter";
+	  interpClassName = "ircam.jmax.script.scm.silk.SilkInterpreter";
       } else if (interpName.equalsIgnoreCase("kawa")) {
-	  interpClassName = "ircam.jmax.script.scm.KawaInterpreter";
+	  interpClassName = "ircam.jmax.script.scm.kawa.KawaInterpreter";
       }
-
-      System.out.println("Booting the interpreter " + interpName + " (" + interpClassName + ')');
 
       itsInterp = (Interpreter) Class.forName(interpClassName).newInstance();
   }

@@ -27,9 +27,10 @@
 ##
 
 VENDOR := sgi
-AUDIO_LIBRARY := sgial2
 OS_TYPE := unix
 PLATFORM := sgi
+
+SYS_PACKAGES="sgidev pdtddev"
 
 CC := cc
 LD := cc

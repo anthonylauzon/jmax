@@ -33,7 +33,7 @@ PACKAGELIB=$(LIBDIR)/libdata.so
 
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
-all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)
 

@@ -63,7 +63,7 @@ set jmaxNoConsole "false"
 set jmaxNoRegister "false"
 
 ## Set the system packages path
-set jmaxSysPkgPath "$jmaxRootDir/packages"
+set jmaxSysPkgPath "$jmaxRootDir/packages $jmaxRootDir/syspackages"
 
 ## Splash screen setting
 set jmaxSplashScreen "show"

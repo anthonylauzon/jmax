@@ -101,7 +101,7 @@ public class Fts implements MaxContext
    */
 
   public Fts(String ftsDir, String ftsName, String connectionType,
-	     String serverName, String port)
+	     String serverName, int port)
   {
     if (serverName.equals("local"))
       {
@@ -119,12 +119,12 @@ public class Fts implements MaxContext
       ftsName = ftsName + ".ss";
 
     if (connectionType.equals("socket")) 
-      server = new FtsServer(this, serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
+      server = new FtsServer(this, serverName, new FtsSocketStream(serverName, port));
     else if (connectionType.equals("udp")) 
       server = new FtsServer(this, serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
     else if (connectionType.equals("udpclient")) 
       server = new FtsServer(this, serverName + ":" + port,
-			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, Integer.parseInt(port)));
+			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, port));
     else if (connectionType.equals("client") || connectionType.equals("tcp"))
       server = new FtsServer(this, serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
     else if (connectionType.equals("local"))

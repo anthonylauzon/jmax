@@ -30,10 +30,10 @@ package require reftype
 
 # load the dynamic libraries in FTS
 global jmaxArch jmaxMode
-ucs load module ispw_control $dir/lib/$jmaxArch/$jmaxMode/libispwcontrol.so
-ucs load module ispw_data $dir/lib/$jmaxArch/$jmaxMode/libispwdata.so
+ucs load module ispw_control $dir/lib/$jmaxArch/$jmaxMode/libcontrol.so
+ucs load module ispw_data $dir/lib/$jmaxArch/$jmaxMode/libdata.so
 ucs load module ispw_filters $dir/lib/$jmaxArch/$jmaxMode/libfilters.so
-ucs load module ispw_io $dir/lib/$jmaxArch/$jmaxMode/libispwio.so
+ucs load module ispw_io $dir/lib/$jmaxArch/$jmaxMode/libio.so
 ucs load module ispw_midi $dir/lib/$jmaxArch/$jmaxMode/libmidi.so
 ucs load module ispw_sampling $dir/lib/$jmaxArch/$jmaxMode/libsampling.so
 ucs load module ispw_pitch $dir/lib/$jmaxArch/$jmaxMode/libpitch.so

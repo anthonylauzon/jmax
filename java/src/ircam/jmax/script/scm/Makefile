@@ -30,12 +30,17 @@ PACKAGE_DIR = ircam/jmax/script/scm
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: local_all
+	(cd silk ; $(MAKE) $@)
+	if echo $CLASSPATH | grep -s kawa > /dev/null ; then (cd silk ; $(MAKE) $@) ; fi
 .PHONY: all
 
 local_all: $(CLASSES)
 .PHONY: local_all
 
 clean: local_clean
+	(cd silk ; $(MAKE) $@)
+	if echo $CLASSPATH | grep -s kawa > /dev/null ; then (cd silk ; $(MAKE) $@) ; fi
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

@@ -1,26 +1,19 @@
-/** SilkJavaMethod
+/** SilkJavaConstructor
  *
- * An addation of Peter Norvig's JavaMethod class. It corrects a bug
- * in the conversion of strings, such the (method obj "text") will be
- * called with a String instead of a char array. Hopefully these
- * changes will get integrated into the Silk package.  */
-package ircam.jmax.script.scm;
+ * An addation of Peter Norvig's JavaMethod class for constructors.
+ */
+package ircam.jmax.script.scm.silk;
 import java.lang.reflect.*;
 import silk.*;
 
-public class SilkJavaMethod extends Procedure {
-
+public class SilkJavaConstructor extends Procedure {
     Class[] argClasses;
-    Method method;
-    boolean isStatic;
-    boolean returnsString;
-    boolean returnsBoolean;
+    Constructor constructor;
+    String className;
 
     public static class Factory extends Procedure {
 	public Object apply(Scheme interpreter, Object args) {
-	    Object x = first(args);
-	    Object y = second(args);
-	    return new SilkJavaMethod(new String((char[]) x), new String((char[]) y), rest(rest(args)));
+	    return new SilkJavaConstructor(new String((char[]) first(args)), rest(args));
 	}
     }
 
@@ -28,45 +21,27 @@ public class SilkJavaMethod extends Procedure {
 	return new Factory();
     }
 
-    public SilkJavaMethod(String methodName, Object targetClassName, 
-			  Object argClassNames) {
+    public SilkJavaConstructor(Object targetClassName, Object argClassNames) {
 	//this.name = targetClassName + "." + methodName;
 	try {
+	    className = toClass(targetClassName).getName();
 	    argClasses = classArray(argClassNames);
-	    method = toClass(targetClassName).getMethod(methodName, argClasses);
-	    isStatic = Modifier.isStatic(method.getModifiers());
-	    returnsString = (method.getReturnType() == "".getClass());
-	    returnsBoolean = (method.getReturnType() == Boolean.TYPE);
+	    constructor = toClass(targetClassName).getConstructor(argClasses);
 	} catch (ClassNotFoundException e) { 
-	    error("Bad class, can't get method " + methodName); 
+	    error("Bad class, can't find class " + targetClassName); 
 	} catch (NoSuchMethodException e) { 
-	    error("Can't get tmethod " + methodName); 
-	}
-    
+	    error("Can't get constructor for " + targetClassName); 
+	}    
     }
 
-    /** Apply the method to a list of arguments. **/
+    /** Apply the constructor to a list of arguments. **/
     public Object apply(Scheme interpreter, Object args) {
 	try {
-	    Object r = (isStatic) ? method.invoke(null, toArray(args)) 
-		                  : method.invoke(first(args), toArray(rest(args)));
-	    if (returnsString && (r != null)) {
-		/* Convert the Java string to a Scheme string. */
-		String s = (String) r;
-		r = new char[s.length()];
-		s.getChars(0, s.length(), (char[]) r, 0);
-	    } else if (returnsBoolean) {
-		/* Silk only recognizes #t or #f as Boolean.TRUE or
-                   Boolean.FALSE. Just a Boolean won't do the
-                   trick. */
-		r = truth(((Boolean) r).booleanValue());
-	    }
-	    return r;
+	    return constructor.newInstance(toArray(args));
 	} catch (Exception e) { 
 	    e.printStackTrace(); 
-	    System.out.println(e.getMessage());
-	    return error("Bad Java Method application:" ); 
 	}
+	return error("Bad Java Constructor application:"); 
     }
 
     public static Class toClass(Object arg) throws ClassNotFoundException { 
@@ -79,14 +54,14 @@ public class SilkJavaMethod extends Procedure {
 	} 
 
 	if (arg.equals("void"))    return java.lang.Void.TYPE;
-	else if (arg.equals("boolean")) return Boolean.TYPE;
-	else if (arg.equals("char"))    return Character.TYPE;
-	else if (arg.equals("byte"))    return Byte.TYPE;
-	else if (arg.equals("short"))   return Short.TYPE;
-	else if (arg.equals("int"))     return Integer.TYPE;
-	else if (arg.equals("long"))    return Long.TYPE;
-	else if (arg.equals("float"))   return Float.TYPE;
-	else if (arg.equals("double"))  return Double.TYPE;
+	else if (arg.equals("boolean")) return java.lang.Boolean.TYPE;
+	else if (arg.equals("char"))    return java.lang.Character.TYPE;
+	else if (arg.equals("byte"))    return java.lang.Byte.TYPE;
+	else if (arg.equals("short"))   return java.lang.Short.TYPE;
+	else if (arg.equals("int"))     return java.lang.Integer.TYPE;
+	else if (arg.equals("long"))    return java.lang.Long.TYPE;
+	else if (arg.equals("float"))   return java.lang.Float.TYPE;
+	else if (arg.equals("double"))  return java.lang.Double.TYPE;
 	else return Class.forName((String)arg);
     }
 
@@ -114,9 +89,8 @@ public class SilkJavaMethod extends Procedure {
 		    /* Error. Let the invocation throw an exception. */
 		    array[i] = a;
 		}
-	    } else {
+	    }else
 		array[i] = first(args);
-	    }
 	    args = rest(args);
 	}
 	return array;
@@ -132,5 +106,5 @@ public class SilkJavaMethod extends Procedure {
 	}
 	return array;
     }
-
 }
+

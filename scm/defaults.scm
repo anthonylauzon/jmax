@@ -71,6 +71,13 @@
 
 (define jmax-pkg-path (string-append (get-property "user.home") slash "jmax"))
 
+;; default system package path
+;;(define jmax-sys-pkg-path (string-append (string-append jmax-root slash "packages")
+;;					 " "
+;;					 (string-append jmax-root slash "syspackages")))
+(append-package-path (string-append jmax-root slash "packages"))
+(append-package-path (string-append jmax-root slash "syspackages"))
+
 ;; default architecture if not specified for host name
 
 (define jmax-arch "linuxpc")
@@ -99,6 +106,10 @@
 
 (define jmax-splash-screen "show")
 
+
+;; Compatibility mode
+
+(define jmax-compatibility "ispw")
 
 
 

@@ -20,10 +20,12 @@
 // 
 // Authors: Peter Hanappe
 
-package ircam.jmax.script.scm;
+package ircam.jmax.script.scm.silk;
+
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.script.*;
+import ircam.jmax.script.scm.*;
 import ircam.jmax.script.pkg.*;
 import java.awt.event.*;
 import java.io.*;

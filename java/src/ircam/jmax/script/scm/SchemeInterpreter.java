@@ -211,7 +211,7 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 		// Eval the body inside the document 
 		// FIXME ((MaxSchemeDocument) document).eval(this, body);
 		
-		// Finally, return the document to the tcl interpreter    
+		// Finally, return the document to the interpreter    
 		return document;
 	    }
 	else

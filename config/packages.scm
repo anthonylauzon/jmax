@@ -27,6 +27,11 @@
 ;; Packages installed by default in this site
 ;;
 
+(if (string=? jmax-compatibility "ispw")
+    (require-package "ispwmath" "0.0.0")
+    (require-package "math" "0.0.0")
+)
+
 ; ISPW classes
 (require-package "ispw" "0.0.0")
 (require-package "table" "0.0.0")
@@ -34,9 +39,9 @@
 (require-package "explode" "0.0.0")
 
 ; new classes
+(require-package "data" "0.0.0")
 (require-package "control" "0.0.0")
 (require-package "mess" "0.0.0")
-(require-package "generic" "0.0.0")
 (require-package "numeric" "0.0.0")
 (require-package "lists" "0.0.0")
 

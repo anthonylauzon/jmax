@@ -70,15 +70,6 @@
 #include "lang.h"
 #include "runtime/devices.h"
 
-/* forward declarations */
-
-/*patch by gigi
-static fts_status_t solaris_ucs_init(void);*/
-static fts_status_t solaris_dac_init(void);
-static fts_status_t solaris_adc_init(void);
-static fts_status_t solaris_midi_init(void); 
-static fts_status_t solaris_soundfile_init(void);
-
 /* global variables definition */
 static int sample_rate = 44100;
 
@@ -110,67 +101,6 @@ static fts_status_description_t solaris_set_config_error =
 {
   "Solaris DAC : set configuration error"
 };
-
-/******************************************************************************/
-/*                                                                            */
-/*                              Module Definition                             */
-/*                                                                            */
-/******************************************************************************/
-
-/* Module definition and init function */
-
-static void solarisdev_shutdown(void);
-static void solarisdev_init(void);
-
-fts_module_t fts_solarisdev_module = {"Solarisdev", "Device for the SOLARIS platform", solarisdev_init, solarisdev_shutdown};
-
-static void
-solarisdev_init(void)
-{
-  /*solaris_ucs_init();patch by gigi*/
-  solaris_dac_init();
-  solaris_adc_init();
-#ifndef SOLARIS2_PORTAGE
-  solaris_midi_init(); 
-  solaris_soundfile_init();
-#endif
-}
-
-static void
-solarisdev_shutdown(void)
-{
-}
-
-/******************************************************************************/
-/*                                                                            */
-/*                              SOLARIS UCS COntrol                               */
-/*                                                                            */
-/******************************************************************************/
-
-
-/* This section of the file define a number of UCS commands to control 
-   the solaris audio library parameter; the old control device structure has
-   been dropped. 
-*/
-
-
-/*
- * This ucs commands  allow to configure the
- * solaris audio system; there is (will be) one UCS command for each ALsetparam so
- * that the entire SOLARIS audio configuration can be accessed from the
- * configuration file.  
- *
- *
- * PARAMATER    DESCRIPTION            TYPE     DEFAULT  VALUES
- *
- * sample_rate   the sample_rate source  int      44100
- *
- * SOON we will add SOLARIS all the audio parameters.
- *
- *
- */
-
-
 
 /******************************************************************************/
 /*                                                                            */
@@ -1755,3 +1685,26 @@ solaris_soundfile_get(fts_dev_t *dev, float **buf, int n)
 #endif
   return fts_Success;
 }
+
+/******************************************************************************/
+/*                                                                            */
+/* Module declaration for SOLARIS devices                                     */
+/*                                                                            */
+/******************************************************************************/
+
+static void solarisdev_init(void);
+
+fts_module_t solarisdev_module = {"solarisdev", "SOLARIS devices", solarisdev_init, 0, 0, 0};
+
+extern void shmdev_init( void);
+
+static void solarisdev_init( void)
+{
+  solaris_dac_init();
+  solaris_adc_init();
+
+  solaris_midi_init();
+
+  solaris_soundfile_init();
+}
+

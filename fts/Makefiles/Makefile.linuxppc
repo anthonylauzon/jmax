@@ -30,8 +30,10 @@
 #
 
 VENDOR := gnu
-AUDIO_LIBRARY := oss
 OS_TYPE := unix
+
+#SYS_PACKAGES=ossdev
+SYS_PACKAGES="ossdev alsadev"
 
 CC := gcc
 LD := gcc
