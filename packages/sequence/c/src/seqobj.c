@@ -151,4 +151,3 @@ seqobj_config(void)
 {
   fts_class_install(fts_new_symbol("sequence"), seqobj_instantiate);
 }
-

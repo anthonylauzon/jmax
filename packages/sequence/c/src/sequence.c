@@ -251,7 +251,10 @@ sequence_get_track_by_index(sequence_t *sequence, int index)
   int i = 0;
 
   while(track && i < index)
-    track = track->next;
+    {
+      track = track->next;
+      i++;
+    }
 
   return track;
 }
@@ -274,24 +277,25 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
 
   if(!sequence->tracks)
     {
+      /* first track */
       sequence->tracks = track;
       sequence->n_tracks = 1;
-
-      track->sequence = sequence;
     }
   else
     {
+      /* append at end */
       sequence_track_t *last = sequence->tracks;
 
       while(last->next)
 	last = last->next;
 
-      track->next = 0;
       last->next = track;
-
       sequence->n_tracks++;
     }
-
+  
+  track->sequence = sequence;
+  track->next = 0;
+  
   return track;
 }
 

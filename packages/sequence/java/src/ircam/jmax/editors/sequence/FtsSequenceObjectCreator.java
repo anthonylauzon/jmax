@@ -10,8 +10,8 @@ import java.util.*;
  */
 public class FtsSequenceObjectCreator implements FtsObjectCreator
 {
-    public FtsObject createInstance(Fts fts, FtsObject parent, String description, int objId)
-    {
-	return new FtsSequenceObject(fts, parent, description, objId);
-    }
+  public FtsObject createInstance(Fts fts, FtsObject parent, String description, int objId)
+  {
+    return new FtsSequenceObject(fts, parent, description, objId);
+  }
 }
