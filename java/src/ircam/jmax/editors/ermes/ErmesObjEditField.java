@@ -50,7 +50,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 
     focused = false;
 
-    if (itsSketchPad.itsToolBar.locked)
+    if (itsSketchPad.itsToolBar.staySelected())
       itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
     else
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;

@@ -46,7 +46,7 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
 
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
-    if ( itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown() ) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown() ) 
       {
 	itsFtsObject.sendMessage( 0, "bang", null);
       } 

@@ -19,7 +19,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
   ErmesSketchPad itsSketchPad;
 
-  boolean locked = false;
+  private boolean staySelected = false;
   boolean pressed = false;
 
   CardLayout cardLayout;
@@ -46,9 +46,9 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
       public void itemStateChanged(ItemEvent e)
 	{
 	  if (e.getStateChange() == ItemEvent.SELECTED)
-	    setLockMode( false);
+	    itsSketchPad.itsSketchWindow.setLocked( false);
 	  else
-	    setLockMode( true);
+	    itsSketchPad.itsSketchWindow.setLocked( true);
 	}
     });
 
@@ -95,34 +95,33 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
     
     if (e.getClickCount() > 1)
-      {
-	return;
-      }
+      return;
 
     if (aTButton == itsLastPressed)
       {
 	itsSketchPad.DoNothing();
-	locked = false;
+	staySelected = false;
 	pressed = false;
       }
     else
       { 
 	Deselect(); //deselect the last
-	locked = false;
+	staySelected = false;
 	itsLastPressed = aTButton;
 	pressed = true;
 
-	itsSketchPad.startAdd(aTButton.getNewObjectDescription());
+	itsSketchPad.startAdd( aTButton.getNewObjectDescription());
       }
   }
 
   public void mouseClicked( MouseEvent e)
   {
-    ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
-
     if ( e.getClickCount() > 1)
       {
 	pressed = true;
+
+	ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
+
 	//aTButton.setSelected(true);
 	if (itsLastPressed != aTButton)
 	  {
@@ -132,7 +131,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
 	itsSketchPad.startAdd( aTButton.getNewObjectDescription());
 	aTButton.setSelected( true);
-	locked = true;
+	staySelected = true;
       }
   }
   
@@ -162,12 +161,14 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     pressed = false;
   }
 
-  protected void setLockMode( boolean theLockMode)
+  protected void setLocked( boolean locked)
   {
-    if (pressed)
-      Unlock();
+    if ( pressed)
+      {
+	resetStaySelected();
+      }
 
-    if (theLockMode)
+    if ( locked)
       {
 	if (lockEditButton.isSelected())
 	  lockEditButton.setSelected( false);
@@ -178,26 +179,25 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 	  lockEditButton.setSelected( true);
       }
 
-    cardLayout.show( cards, theLockMode ? "lock" : "edit");
-  }
- 
-  public void Lock()
-  {
+    cardLayout.show( cards, locked ? "lock" : "edit");
   }
 
-  public void Unlock()
+  protected boolean staySelected()
+  {
+    return staySelected;
+  }
+
+  protected void resetStaySelected()
   {
     Deselect();
     itsSketchPad.DoNothing();
-    locked = false;
+    staySelected = false;
     pressed = false;
   }
 
   private void addButton( Container toolbar,String descr, String gifFilePath)
   {
-    ErmesSwToggleButton aToggleButton;
-    
-    aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( gifFilePath) );
+    ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( gifFilePath) );
     toolbar.add( aToggleButton);
     aToggleButton.addMouseListener( this);
   }
@@ -207,17 +207,17 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     String fs = File.separator;
     String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
-    addButton(toolbar, "comment", path + "tool_text.gif");
-    addButton(toolbar, "", path + "tool_ext.gif");
-    addButton(toolbar, "jpatcher",  path + "tool_patcher.gif");
-    addButton(toolbar, "inlet -1", path + "tool_in.gif");
-    addButton(toolbar, "outlet -1", path + "tool_out.gif");
-    addButton(toolbar, "button", path + "tool_bang.gif");
-    addButton(toolbar, "toggle", path + "tool_toggle.gif");
-    addButton(toolbar, "slider", path + "tool_slider.gif");
-    addButton(toolbar, "intbox", path + "tool_int.gif");
-    addButton(toolbar, "floatbox", path + "tool_float.gif");
-    addButton(toolbar, "messbox", path + "tool_mess.gif");
+    addButton( toolbar, "comment", path + "tool_text.gif");
+    addButton( toolbar, "", path + "tool_ext.gif");
+    addButton( toolbar, "jpatcher",  path + "tool_patcher.gif");
+    addButton( toolbar, "inlet -1", path + "tool_in.gif");
+    addButton( toolbar, "outlet -1", path + "tool_out.gif");
+    addButton( toolbar, "button", path + "tool_bang.gif");
+    addButton( toolbar, "toggle", path + "tool_toggle.gif");
+    addButton( toolbar, "slider", path + "tool_slider.gif");
+    addButton( toolbar, "intbox", path + "tool_int.gif");
+    addButton( toolbar, "floatbox", path + "tool_float.gif");
+    addButton( toolbar, "messbox", path + "tool_mess.gif");
   }
 }
 

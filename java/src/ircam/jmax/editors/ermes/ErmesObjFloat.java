@@ -89,7 +89,7 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
     acceleration = 0;
     previousY = y;
 
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE|| evt.isControlDown()) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown()) 
       {
 	if (!evt.isControlDown())
 	  {
@@ -113,7 +113,7 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
     previousVelocity = 0;
     acceleration = 0;
 
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE)
+    if ( itsSketchPad.isLocked())
       {
 	((FtsFloatValueObject)itsFtsObject).updateValue();
 	Fts.sync();
@@ -131,7 +131,7 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
     acceleration = Math.abs(velocity-previousVelocity);
     previousY=y;
 
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown()) 
       {
 	if (!evt.isControlDown())
 	  state = 2;

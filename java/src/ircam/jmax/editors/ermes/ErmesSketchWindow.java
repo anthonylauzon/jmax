@@ -88,7 +88,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   CheckboxMenuItem itsSketchFontMenu;     //the SketchPad font MenuItem
   CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
 
-  MenuItem itsModeMenuItem;
   MenuItem itsSelectAllMenuItem;
 
   public MaxDocument itsDocument;
@@ -153,9 +152,9 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     // to something different than "run" (usually, "edit" :)
 
     if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
-      setLockMode(false);
+      setLocked( false);
     else
-      setLockMode(true);
+      setLocked( true);
 
     // Finally, activate the updates
 
@@ -216,7 +215,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     Menu editMenu = GetEditMenu();
 
-    editMenu.add( new MenuItem( "-"));
+    editMenu.remove(0);
+    editMenu.remove(1);
+
+    editMenu.addSeparator();
 
     itsSelectAllMenuItem = new MenuItem( "Select All  Ctrl+A");
     editMenu.add( itsSelectAllMenuItem);
@@ -326,7 +328,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   protected void Paste()
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE)
+    if (itsSketchPad.isLocked())
       return;
 
     Cursor temp = getCursor();
@@ -620,10 +622,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	  itsSketchPad.SelectAll();//a
 	else if (aInt == 69)
 	  {//e
-	    if (itsSketchPad.itsMode == itsSketchPad.LOCKMODE) 
-	      setLockMode( false);
+	    if (itsSketchPad.isLocked()) 
+	      setLocked( false);
 	    else 
-	      setLockMode( true);
+	      setLocked( true);
 	  }
 	else if (aInt == 47)
 	  {
@@ -1000,23 +1002,24 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     return itsSelectAllMenuItem;
   }
 
-  private void setLockMode( boolean theLockMode)
+  protected void setLocked( boolean locked)
   {
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
 
-    if (theLockMode)
+    if (locked)
       itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
     else
       itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
 
-    itsSketchPad.itsMode = theLockMode ? ErmesSketchPad.LOCKMODE : ErmesSketchPad.EDITMODE;
+    itsSketchPad.setLocked( locked);
 
-    itsToolBar.setLockMode( theLockMode);
+    itsToolBar.setLocked( locked);
 
-    getSelectAllMenuItem().setEnabled( !theLockMode);
+    getSelectAllMenuItem().setEnabled( !locked);
 
     setKeyEventClient( null); //when changing mode, always remove key listeners
+
     requestFocus();
   }
 

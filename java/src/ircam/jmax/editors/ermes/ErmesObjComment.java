@@ -71,7 +71,7 @@ class ErmesObjComment extends ErmesObjEditableObject {
 
   public void Paint_specific(Graphics g) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.EDITMODE)
+    if ( !itsSketchPad.isLocked())
       {
 	if (itsSelected)
 	  g.setColor(Color.gray);

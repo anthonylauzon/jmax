@@ -47,8 +47,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
     setLocation( -200,-200);
 
     focused = false;
-    
-    if( itsSketchPad.itsToolBar.locked) 
+
+    if( itsSketchPad.itsToolBar.staySelected()) 
       itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
     else
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;

@@ -279,7 +279,7 @@ abstract class ErmesObject implements ErmesDrawable {
 	Paint( aGraphics);
       }
 
-    if ( itsSketchPad.offScreenPresent && itsSketchPad.itsMode == ErmesSketchPad.EDITMODE)
+    if ( itsSketchPad.offScreenPresent && !itsSketchPad.isLocked())
       Paint( itsSketchPad.GetOffGraphics());
   }
 
@@ -465,7 +465,7 @@ abstract class ErmesObject implements ErmesDrawable {
 
   void MouseDown( MouseEvent e,int x, int y) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.EDITMODE && !e.isControlDown())
+    if ( !itsSketchPad.isLocked() && !e.isControlDown())
       {
 	if ( itsSelected)
 	  itsSketchPad.clickHappenedOnAnAlreadySelected = true;
@@ -488,7 +488,7 @@ abstract class ErmesObject implements ErmesDrawable {
 
   void MouseUp( MouseEvent e, int x, int y)
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || e.isControlDown())
+    if ( itsSketchPad.isLocked() || e.isControlDown())
       MouseUp_specific( e, x, y);
   }
 

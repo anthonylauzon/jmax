@@ -63,7 +63,7 @@ class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
   //--------------------------------------------------------
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown()) 
       {
 	if (!evt.isControlDown())
 	  {
@@ -83,7 +83,7 @@ class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
 
   void MouseUp(MouseEvent evt,int x, int y) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown()) 
       {
 	Fts.sync();
 	DoublePaint();
@@ -94,7 +94,7 @@ class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
 
   void MouseDrag_specific(MouseEvent evt,int x, int y) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown() ) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown() ) 
       {
 	if (!evt.isControlDown())
 	  state = 2;

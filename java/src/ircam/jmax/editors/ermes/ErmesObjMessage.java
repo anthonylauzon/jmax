@@ -108,7 +108,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
-    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) 
+    if ( itsSketchPad.isLocked() || evt.isControlDown()) 
       {
 	if (itsFtsObject != null)
 	  {
@@ -129,7 +129,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
     if (g == null) 
       return;
 
-    if (itsSketchPad.itsMode == ErmesSketchPad.EDITMODE) 
+    if ( !itsSketchPad.isLocked()) 
       {
 	if( itsFlashing) 
 	  g.setColor( Settings.sharedInstance().getSelectedColor());
