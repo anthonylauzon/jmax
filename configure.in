@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.114 2003/04/28 14:22:39 p_tisserand Exp $
+dnl $Id: configure.in,v 1.115 2003/05/09 11:25:16 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.115  2003/05/09 11:25:16  p_tisserand
+dnl Added debian package definition in make dist
+dnl
 dnl Revision 1.114  2003/04/28 14:22:39  p_tisserand
 dnl Added -DUSE_ALSA in CFLAGS if ALSA have been found (for preprocessor conditionnal in jmax/fts/linux.c)
 dnl
@@ -629,6 +632,7 @@ utils/pkgconfig/jmax.pc
 utils/pkgconfig/Makefile
 utils/rpm/Makefile
 utils/rpm/jmax.spec
+utils/update/Makefile
 utils/xml/Makefile
 )
 
