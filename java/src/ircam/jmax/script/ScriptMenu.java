@@ -20,7 +20,7 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Peter Hanappe.
 // 
 
 package ircam.jmax.script;
@@ -41,6 +41,7 @@ import ircam.jmax.utils.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
 /** Implement the editor Script Menu */
 
@@ -78,6 +79,14 @@ public class ScriptMenu extends EditorMenu
 		ScriptAction a = doctype.getScript(i);
 		add(a, a.getName(), a.getModifiers(), a.getMnemonic());
 	    }
+	}
+    }
+
+    public JMenuItem add(EditorAction action, String name, int modifiers, int mnemonic) {
+	if (modifiers * mnemonic > 0) {
+	    return super.add(action, name, modifiers, mnemonic);
+	} else {
+	    return super.add(action, name);
 	}
     }
 }

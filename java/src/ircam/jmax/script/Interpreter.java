@@ -84,9 +84,6 @@ public interface Interpreter
      */
     public boolean commandComplete(String s);
 
-    /** Returns the package handler. */
-    public PackageHandler getPackageHandler(); 
-
     /** Load the package using the given initialization file.
      * 
      * @param pkg The package to be loaded.

@@ -20,7 +20,7 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Peter Hanappe.
 // 
 
 package ircam.jmax.script;
@@ -31,6 +31,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -62,13 +63,13 @@ public class ScriptAction extends EditorAction
 
     public void doAction(EditorContainer container)
     {
-	final EditorContainer theContainer = container;
+	final MaxDocument doc = container.getEditor().getDocument();
 	/* We have to spin of a new thread otherwise the script will
            be evaluated in the awt thread */
 	new Thread(new Runnable() {
 	    public void run() {
 		try {
-		    itsScript.eval(theContainer);
+		    itsScript.eval(doc);
 		} catch (Exception e) {
 		    System.out.println("Dear user, please contact the author of the script " + itsName);
 		    System.out.println(itsName + " caused an error: " + e.getMessage());
