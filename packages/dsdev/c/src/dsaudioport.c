@@ -235,10 +235,20 @@ dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize)
   for (ch = 0; ch < channels; ch++) 
   {
     float *in = buffers[ch];
-    
-    for (i = 0, j = ch; i < buffsize; i++, j += channels) 
+
+    if (fts_audioport_is_channel_used(port, FTS_AUDIO_OUTPUT, ch))
     {
-      buf1[j] = (short) (32767.0f * in[i]);
+      for (i = 0, j = ch; i < buffsize; i++, j += channels) 
+      {
+	buf1[j] = (short) (32767.0f * in[i]);
+      }
+    }
+    else
+    {
+      for (i = 0, j = ch; i < buffsize; i++, j += channels) 
+      {
+	buf1[j] = 0;
+      }      
     }
   }
 
