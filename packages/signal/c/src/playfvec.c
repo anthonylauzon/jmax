@@ -42,6 +42,7 @@ typedef struct _segment_
   double end; /* end position */
   double speed; /* playing speed */
   struct _segment_ *next; /* next segment */
+  int    empty; /* empty flag (1 = empty) */
 } segment_t;
 
 static segment_t *
@@ -53,7 +54,7 @@ segment_new(void)
   seg->begin = 0.0;
   seg->end = DBL_MAX;
   seg->speed = 1.0;
-
+  seg->empty = 1;
   return seg;
 }
 
@@ -142,6 +143,9 @@ segment_set_duration(segment_t *seg, const fts_atom_t *at)
 static segment_t *
 segment_set(segment_t *seg, int ac, const fts_atom_t *at)
 {
+  int size;
+  fvec_t *fvec;
+      
   if ((ac > 0)
       && (fts_is_a(at, fvec_type)))
   {
@@ -156,9 +160,6 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
       segment_set_begin(seg, at + 1);
     case 1:
     {
-      fvec_t *fvec;
-      int size;
-      
       if(seg->fvec)
 	fts_object_release(seg->fvec);
 
@@ -173,6 +174,16 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
 
       /* reset size if we need */
       size = fvec_get_size(seg->fvec);
+      if (0 == size)
+      {
+	/* we set the empty flag to avoid creation of listener */
+	seg->empty = 1;	
+      }
+      else
+      {
+	seg->empty = 0;
+      }
+
       if (seg->end > size)
       {
 	seg->end = size;
@@ -183,8 +194,24 @@ segment_set(segment_t *seg, int ac, const fts_atom_t *at)
       }
     }
     break;
-    case 0:
-      break;
+    }
+  }
+  if (0 == ac)
+  {
+    if (seg->fvec)
+    {	
+      size = fvec_get_size(seg->fvec);
+      if (0 != size)
+      {
+	if (1 == seg->empty)
+	{
+	  seg->empty = 0;
+	  if (0 == seg->end)
+	  {
+	    seg->end = size;
+	  }
+	}
+      }	
     }
   }
   
