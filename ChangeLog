@@ -1,3 +1,8 @@
+2004-06-01  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* (package sequence) track.c: added markers track (for bars, tempo, signatures, etc.) to track
+	* (package sequence) seqmidi.c: added first version of tempo and time signature event loading for scoob track
+
 2004-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* include/fts/Makefile.am: added missing config-macosx.h and config-win32.h in list of files to  distribute.
