@@ -55,24 +55,24 @@ bool loadAsioDriver(char *name);
  */
 LONG asio_open_driver(asio_driver_t* asio_driver)
 {
-  LPVOID* asiodrv = (void**)& asio_driver->driver_interface;
+  LPVOID* asiodrv = (void**)&asio_driver->driver_interface;
 
   long ret;
   BOOL found = FALSE;
 
-  if (!asio_driver->asiodrv)
-    {
+  if(!asio_driver->asiodrv)
+  {
       ret = CoCreateInstance(asio_driver->clsid, 0, CLSCTX_INPROC_SERVER, asio_driver->clsid, asiodrv);
       if (S_OK == ret)
-	{
-	  asio_driver->asiodrv = *asiodrv;
-	  return 0;
-	}
-    }
+    	{
+	      asio_driver->asiodrv = *asiodrv;
+    	  return 0;
+	    }
+  }
   else
-    {
-      ret = DRVERR_DEVICE_ALREADY_OPEN;
-    }
+  {
+    ret = DRVERR_DEVICE_ALREADY_OPEN;
+  }
 
   return ret;
 }
@@ -98,43 +98,43 @@ static LONG find_driver_path(char* clsid_str, char* dllpath, int dllpath_size)
   CharLowerBuff(clsid_str, strlen(clsid_str));
   err = RegOpenKey(HKEY_CLASSES_ROOT, COM_CLSID, &regKeyEnum);
   if (ERROR_SUCCESS == err)
-    {
+  {
       index = 0;
       while (err == ERROR_SUCCESS && !found)
-	{
-	  err = RegEnumKey(regKeyEnum, index++, (LPSTR)databuf, MAX_PATH_LEN);
-	  if (ERROR_SUCCESS == err)
 	    {
-	      CharLowerBuff(databuf, strlen(databuf));
-	      if (!strcmp(databuf, clsid_str))
-		{
-		  err = RegOpenKeyEx(regKeyEnum, (LPCSTR)databuf, 0, KEY_READ, &regKeySub);
-		  if (ERROR_SUCCESS == err)
-		    {
-		      err = RegOpenKeyEx(regKeySub, (LPCTSTR)INPROC_SERVER, 0, KEY_READ, &regKeyPath);
+    	  err = RegEnumKey(regKeyEnum, index++, (LPSTR)databuf, MAX_PATH_LEN);
+	      if(ERROR_SUCCESS == err)
+  	    {
+	        CharLowerBuff(databuf, strlen(databuf));
+	        if(!strcmp(databuf, clsid_str))
+      		{
+		        err = RegOpenKeyEx(regKeyEnum, (LPCSTR)databuf, 0, KEY_READ, &regKeySub);
+		        if(ERROR_SUCCESS == err)
+		        {
+		          err = RegOpenKeyEx(regKeySub, (LPCTSTR)INPROC_SERVER, 0, KEY_READ, &regKeyPath);
 		      
-		      datatype = REG_SZ;
-		      datasize = (DWORD)dllpath_size;
-		      ret = RegQueryValueEx(regKeyPath, 0, 0, &datatype, (LPBYTE)dllpath, &datasize);
-		      if (ERROR_SUCCESS == err)
-			{
-			  memset(&ofs, 0, sizeof(OFSTRUCT));
-			  ofs.cBytes = sizeof(OFSTRUCT);
-			  file = OpenFile(dllpath, &ofs, OF_EXIST);
-			  if (file)
-			    {
-			      ret = 0;
-		    }
-			  RegCloseKey(regKeyPath);
-			}
-		      RegCloseKey(regKeySub);
-		    }
-		  found = TRUE;
-		}
+    		      datatype = REG_SZ;
+		          datasize = (DWORD)dllpath_size;
+		          ret = RegQueryValueEx(regKeyPath, 0, 0, &datatype, (LPBYTE)dllpath, &datasize);
+		          if(ERROR_SUCCESS == err)
+			        {
+			          memset(&ofs, 0, sizeof(OFSTRUCT));
+			          ofs.cBytes = sizeof(OFSTRUCT);
+			          file = OpenFile(dllpath, &ofs, OF_EXIST);
+			          if(file)
+			          {
+			            ret = 0;
+		            }
+			          RegCloseKey(regKeyPath);
+			        }
+		          RegCloseKey(regKeySub);
+		        }
+		        found = TRUE;
+		      }
+	      }
 	    }
-	}
       RegCloseKey(regKeyEnum);
-    }
+  }
   return ret;
 }
 
@@ -154,46 +154,45 @@ asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driver
 
   err = RegOpenKeyEx(regKey, (LPCSTR)regKeyName, 0, KEY_READ, &regSubKey);
   if (ERROR_SUCCESS == err)
-    {
+  {
       datatype = REG_SZ;
       datasize = 256;
       err = RegQueryValueEx(regSubKey, COM_CLSID, 0, &datatype, (LPBYTE)databuf, &datasize);
       if (ERROR_SUCCESS == err)
-	{
-	  ret = find_driver_path(databuf, dllpath, MAX_PATH_LEN);
-	  if (0 == ret)
 	    {
-	      driver = (asio_driver_t*)fts_malloc(sizeof(asio_driver_t));
-	      if (0 != driver)
-		{
-		  memset(driver, 0, sizeof(asio_driver_t));
-		  driver->ID = driverID;
-		  driver->asiodrv = 0;
-		  /* set dllpath */
-		  strcpy(driver->dllpath, dllpath);
-		  MultiByteToWideChar(CP_ACP, 0, (LPCSTR)databuf, -1, (LPWSTR)data, 100);
-		  err = CLSIDFromString((LPOLESTR)data, (LPCLSID)&clsid);
-		  if (S_OK == err)
-		    {
-		      memcpy(&driver->clsid, &clsid, sizeof(CLSID));
+	      ret = find_driver_path(databuf, dllpath, MAX_PATH_LEN);
+	      if(0 == ret)
+	      {
+	        driver = (asio_driver_t*)fts_malloc(sizeof(asio_driver_t));
+	        if (0 != driver)
+		      {
+		        memset(driver, 0, sizeof(asio_driver_t));
+		        driver->ID = driverID;
+		        driver->asiodrv = 0;
+		        /* set dllpath */
+		        strcpy(driver->dllpath, dllpath);
+		        MultiByteToWideChar(CP_ACP, 0, (LPCSTR)databuf, -1, (LPWSTR)data, 100);
+		        err = CLSIDFromString((LPOLESTR)data, (LPCLSID)&clsid);
+		        if(S_OK == err)
+		        {
+		          memcpy(&driver->clsid, &clsid, sizeof(CLSID));
+		        }
+		        datatype = REG_SZ;
+		        datasize = 256;
+		        err = RegQueryValueEx(regSubKey, ASIODRV_DESC, 0, &datatype, (LPBYTE)databuf, &datasize);
+		        if(ERROR_SUCCESS == err)
+		        {
+		      	  strcpy(driver->name, databuf);
+		        }
+		        else
+		        {
+		          strcpy(driver->name, regKeyName);
+		        }
 		    }
-		  datatype = REG_SZ;
-		  datasize = 256;
-		  err = RegQueryValueEx(regSubKey, ASIODRV_DESC, 0, &datatype, (LPBYTE)databuf, &datasize);
-		  if (ERROR_SUCCESS == err)
-		    {
-			  strcpy(driver->name, databuf);
-		    }
-		  else
-		    {
-		      strcpy(driver->name, regKeyName);
-		    }
-		}
 	    }
-	}
-      RegCloseKey(regSubKey);
-    }
-  
+	  }
+    RegCloseKey(regSubKey);
+  }  
  // ret = CoCreateInstance(driver->clsid, 0, CLSTX_INPROC_SERVER, driver->clsid, (void**)&driver->);
 
   return driver;
@@ -204,7 +203,6 @@ asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driver
  */
 unsigned int asio_util_scan_drivers()
 {
-  fts_hashtable_t driver_hashtable;
   HKEY regKeyEnum = 0;
   char regKeyName[MAX_DRIVER_NAME_LENGTH];
   LONG err;
@@ -215,8 +213,6 @@ unsigned int asio_util_scan_drivers()
 
   /* Initialize COM library */
   CoInitialize(0);
-
-  fts_hashtable_init(&driver_hashtable, FTS_HASHTABLE_SMALL);
 
   /* open registry key for ASIO driver */
   err = RegOpenKey(HKEY_LOCAL_MACHINE, ASIO_PATH,&regKeyEnum);
@@ -229,21 +225,21 @@ unsigned int asio_util_scan_drivers()
 	    driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
 
 	    if(NULL == driver)
-        return -1;
+        continue; /*return -1;*/
 
-	    asio_open_driver(driver);
-      if(NULL != driver)
-      {
-        asio_audioport_t* port;
-	      fts_set_pointer(&at, driver);
-	      port = (asio_audioport_t*)fts_object_create(asio_audioport_type, 1, &at);
-	      if (NULL != port)
-		    {
-		      fts_object_refer((fts_object_t*)port);
-		      fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
-		      fts_log("[asio_audioport] put port : %s\n", port->driver->name);
-		    }
-      }  
+	    if(asio_open_driver(driver)==0)
+        if(NULL != driver)
+        {
+          asio_audioport_t* port;
+	        fts_set_pointer(&at, driver);
+	        port = (asio_audioport_t*)fts_object_create(asio_audioport_type, 1, &at);
+	        if (NULL != port)
+  		    {
+	  	      fts_object_refer((fts_object_t*)port);
+		        fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
+		        fts_log("[asio_audioport] put port : %s\n", port->driver->name);
+  		    }
+        }  
 	  }
     else
 	  {
