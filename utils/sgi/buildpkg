@@ -110,8 +110,11 @@ build_it ()
     )
 
     PRODUCT=`cat $SPEC_FILE | awk '$1 == "product" { print $2;}'`
+    TARDIST=$ROOT_DIR/../$PRODUCT-$VERSION.$ARCH.tardist
 
-    ( cd $BUILD_DIR ; tar cvf - $PRODUCT $PRODUCT.idb $PRODUCT.sw ) > $ROOT_DIR/../$PRODUCT-$VERSION.$ARCH.tardist 
+    ( cd $BUILD_DIR ; tar cvf - $PRODUCT $PRODUCT.idb $PRODUCT.sw ) > $TARDIST
+    chmod 644 $TARDIST
+
     /bin/rm -rf $BUILD_DIR
 }
 
