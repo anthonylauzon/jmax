@@ -1182,7 +1182,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_ARRAY_REF:
-	  if (fts_is_int(tos) || fts_is_atom_array(ptos))
+	  if (fts_is_int(tos) && fts_is_atom_array(ptos))
 	    {
 	      fts_atom_array_t *aa;
 	      int idx;
