@@ -25,14 +25,12 @@
 void 
 winmidiport_config(void);
 
-/*  static HINSTANCE winmidi_instance = NULL; */
-
-/*  BOOL WINAPI  */
-/*  DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) */
-/*  { */
-/*    winmidi_instance = (HINSTANCE) hModule; */
-/*    return TRUE; */
-/*  } */
+BOOL WINAPI 
+DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+{
+  fts_log("[winmidi]: DllMain\n");
+  return TRUE;
+}
 
 /******************************************************************************/
 /*                                                                            */

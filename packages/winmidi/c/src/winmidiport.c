@@ -517,7 +517,7 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 	  fts_log("[winmidiport]: midi out port %d: \"%s\"\n", i, out_caps.szPname); 
 
 	  fts_log("[winmidiport]: Mid=%d, Pid=%d\n", out_caps.wMid, out_caps.wPid); 
-	  if ((out_caps.wMid != MM_MICROSOFT) || (out_caps.wPid != MM_MIDI_MAPPER)) {
+	  if ((out_caps.wMid == MM_MICROSOFT) && (out_caps.wPid == MM_MSFT_WDMAUDIO_MIDIOUT)) {
 	    fts_log("[winmidiport]: It's MicroSoft SW Synth!\n"); 
 	  }
 
@@ -529,7 +529,7 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 	  /* if the user specified the "default" midi device, take the
              first non-microsoft synth in the list */
 	  if ((devname == fts_s_default) && (out_num < 0) && 
-	      ((out_caps.wMid != MM_MICROSOFT) || (out_caps.wPid != MM_MIDI_MAPPER))) {
+	      ((out_caps.wMid != MM_MICROSOFT) || (out_caps.wPid != MM_MSFT_WDMAUDIO_MIDIOUT))) {
 	    out_num = i;
 	    fts_log("[winmidiport]: Using midi out port \"%s\" as default device\n", out_caps.szPname);
 	  }
@@ -560,7 +560,7 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 
 	 */
 
-	if ((out_caps.wMid == MM_MICROSOFT) && (out_caps.wPid == MM_MIDI_MAPPER)) {
+	if ((out_caps.wMid == MM_MICROSOFT) && (out_caps.wPid == MM_MSFT_WDMAUDIO_MIDIOUT)) {
 	  if (MessageBox(NULL, "The Microsoft Soft Synth is not supported by FTS and \n"
 			 "might cause FTS to crash. If you have any problems, please \n"
 			 "select an other MIDI device in the Windows Configuration Panels \n"
