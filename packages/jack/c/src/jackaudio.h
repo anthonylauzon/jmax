@@ -58,6 +58,13 @@ fts_object_t* jackaudiomanager_get_manager_object(void);
 int get_jack_process_nframes(void);
 int get_jack_process_consumed(void);
 
+void jackaudiomanager_open_port(fts_object_t* port, 
+				fts_symbol_t port_name, 
+				fts_symbol_t port_flag);
+void jackaudiomanager_close_port(fts_object_t* port, 
+				 fts_symbol_t flag);
+
+
 #endif /* JACKAUDIO_H_ */
 
 /** EMACS **
