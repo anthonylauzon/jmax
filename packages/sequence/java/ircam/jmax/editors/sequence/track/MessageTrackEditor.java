@@ -95,7 +95,7 @@ public class MessageTrackEditor extends MonoTrackEditor
     
   void createPopupMenu()
   {
-    popup = new MessageTrackPopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
+    popup = new TrackBasePopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
   }
   
   void doEdit(Event evt, int x, int y)

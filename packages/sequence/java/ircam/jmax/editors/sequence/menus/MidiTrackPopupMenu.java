@@ -44,6 +44,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
   LabelTypesAction labelAction;
+  JRadioButtonMenuItem pianoItem, stavesItem;
 
   public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
@@ -59,7 +60,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     pack();
   }
 
-  void addRangeMenu()
+  boolean addRangeMenu()
   {
     JMenu rangeMenu = new JMenu("Range");
     JMenu maxRangeMenu = new JMenu("Maximum");
@@ -124,20 +125,25 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     rangeMenu.add(minRangeMenu);
     
     add(rangeMenu);
+    
+    return true;
   }
 
-  void addViewMenu()
+  boolean addViewMenu()
   {
-    JMenuItem item;
-    JMenu viewMenu = new JMenu("View");
-    item = new JMenuItem("Pianoroll");
-    item.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW, target));
-    viewMenu.add(item);    
-    item = new JMenuItem("Staves");
-    item.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW, target));
-    viewMenu.add(item);
-
-    add(viewMenu);
+    ButtonGroup viewsMenuGroup = new ButtonGroup();
+    
+    pianoItem = new JRadioButtonMenuItem("Pianoroll");
+    pianoItem.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW, target));
+    viewsMenuGroup.add(pianoItem);
+    add(pianoItem);    
+    stavesItem = new JRadioButtonMenuItem("Staves");
+    stavesItem.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW, target));
+    viewsMenuGroup.add(stavesItem);
+    add(stavesItem);
+    pianoItem.setSelected(true);
+  
+    return true;
   }
 
   public void update()
@@ -145,8 +151,22 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     updateChangeRangeMenu();
 
     updateLabelTypesMenu();
-    
+
     super.update();
+  }
+
+  void updateViewMenu()
+  {
+    switch( target.getViewMode())
+      {
+      case MidiTrackEditor.NMS_VIEW:
+	stavesItem.setSelected(true);
+	break;
+      case MidiTrackEditor.PIANOROLL_VIEW:
+      default:
+	pianoItem.setSelected(true);
+	break;
+      }
   }
 
   void updateLabelTypesMenu()

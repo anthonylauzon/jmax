@@ -37,12 +37,14 @@ import ircam.jmax.editors.sequence.track.*;
 
 public class MonoTrackPopupMenu extends TrackBasePopupMenu 
 {
+  JRadioButtonMenuItem peaksItem, stepsItem, breaksItem;
+  
   public MonoTrackPopupMenu( MonoTrackEditor editor, boolean isInSequence)
   {
     super(editor, isInSequence);
   }
 
-  void addRangeMenu()
+  boolean addRangeMenu()
   {
     JMenuItem item = new JMenuItem("Range");
     item.addActionListener(new ActionListener(){
@@ -53,23 +55,49 @@ public class MonoTrackPopupMenu extends TrackBasePopupMenu
 	}
       });
     add(item);
+  
+    return true;
   }
 
-  void addViewMenu()
+  boolean addViewMenu()
   {
-    JMenuItem item;
-    JMenu viewMenu = new JMenu("View");
-    item = new JMenuItem("Peaks view");
-    item.addActionListener(new SetViewAction(MonoTrackEditor.PEAKS_VIEW, target));
-    viewMenu.add(item);    
-    item = new JMenuItem("Steps view");
-    item.addActionListener(new SetViewAction(MonoTrackEditor.STEPS_VIEW, target));
-    viewMenu.add(item);
-    item = new JMenuItem("BreakPoints view");
-    item.addActionListener(new SetViewAction(MonoTrackEditor.BREAK_POINTS_VIEW, target));
-    viewMenu.add(item);
+    ButtonGroup viewsMenuGroup = new ButtonGroup();
+
+    peaksItem = new JRadioButtonMenuItem("Peaks view");
+    peaksItem.addActionListener(new SetViewAction(MonoTrackEditor.PEAKS_VIEW, target));
+    viewsMenuGroup.add(peaksItem);
+    add(peaksItem);    
     
-    add(viewMenu);
+    stepsItem = new JRadioButtonMenuItem("Steps view");
+    stepsItem.addActionListener(new SetViewAction(MonoTrackEditor.STEPS_VIEW, target));
+    viewsMenuGroup.add(stepsItem);
+    add(stepsItem);
+    
+    breaksItem= new JRadioButtonMenuItem("BreakPoints view");
+    breaksItem.addActionListener(new SetViewAction(MonoTrackEditor.BREAK_POINTS_VIEW, target));
+    viewsMenuGroup.add(breaksItem);
+    add(breaksItem);
+    
+    peaksItem.setSelected(true);
+    
+    return true;
+  }
+
+  void updateViewMenu()
+  {
+    switch( target.getViewMode())
+      {
+      case MonoTrackEditor.STEPS_VIEW:
+	stepsItem.setSelected(true);
+	break;
+      case MonoTrackEditor.BREAK_POINTS_VIEW:
+	breaksItem.setSelected(true);
+	break;
+      case MonoTrackEditor.PEAKS_VIEW:
+      default:
+	peaksItem.setSelected(true);
+	break;
+      }
   }
 }
 

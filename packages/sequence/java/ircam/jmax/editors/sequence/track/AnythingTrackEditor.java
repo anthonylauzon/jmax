@@ -55,7 +55,7 @@ public class AnythingTrackEditor extends TrackBaseEditor
   
   void createPopupMenu()
   {
-    popup = new AnythingTrackPopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
+    popup = new TrackBasePopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
   }
 
   SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)

@@ -36,7 +36,7 @@ import ircam.jmax.editors.sequence.actions.*;
 import ircam.jmax.editors.sequence.track.*;
 
 
-public abstract class TrackBasePopupMenu extends JPopupMenu 
+public class TrackBasePopupMenu extends JPopupMenu 
 {
   int x;
   int y;
@@ -62,7 +62,7 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
     /////////// Tools /////////////////////////////////////////
     Tool tool;
     ButtonGroup toolsMenuGroup = new ButtonGroup();
-
+    
     for(Enumeration e = target.getGraphicContext().getToolManager().getTools(); e.hasMoreElements();)
       {
 	tool = (Tool)e.nextElement();
@@ -88,8 +88,6 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
 
     addSeparator();
 
-    addRangeMenu();
-
     if(isInSequence)
       {
 	nameItem = new JMenuItem("Name");
@@ -105,8 +103,13 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
 	
 	add(nameItem);
       }
+    boolean added = addRangeMenu();
+
+    if(added)
+      addSeparator();
+
     ////////////////////// View Menu //////////////////////////////
-    addSeparator();
+
     addViewMenu();
     
     item = new JMenuItem("View as list");
@@ -158,8 +161,15 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
     pack();
   }
 
-  abstract void addRangeMenu();
-  abstract void addViewMenu();
+  boolean addRangeMenu()
+  {
+    return false;
+  }
+  boolean addViewMenu()
+  {
+    return false;
+  }
+  void updateViewMenu(){}
 
   public TrackBaseEditor getPopupTarget(){
     return target;
@@ -169,6 +179,8 @@ public abstract class TrackBasePopupMenu extends JPopupMenu
   {
     if(isInSequence)
       updateMoveToMenu();
+    
+    updateViewMenu();
   }
 
   void updateMoveToMenu()
