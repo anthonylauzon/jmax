@@ -36,13 +36,6 @@ extern void ftl_vec_logb(fts_word_t *argv); extern void ftl_vecx_logb(fts_word_t
 extern void ftl_vec_sqrt(fts_word_t *argv); extern void ftl_vecx_sqrt(fts_word_t *argv);
 extern void ftl_vec_rsqr(fts_word_t *argv); extern void ftl_vecx_rsqr(fts_word_t *argv);
 
-
-
-
-
-
- 
-
 extern void ftl_vec_conj(fts_word_t *argv); extern void ftl_vecx_conj(fts_word_t *argv);
 extern void ftl_vec_csqr(fts_word_t *argv); extern void ftl_vecx_csqr(fts_word_t *argv);
 extern void ftl_vec_cpolar(fts_word_t *argv); extern void ftl_vecx_cpolar(fts_word_t *argv);
@@ -51,37 +44,11 @@ extern void ftl_vec_crect(fts_word_t *argv); extern void ftl_vecx_crect(fts_word
 extern void ftl_vec_cabsf(fts_word_t *argv); extern void ftl_vecx_cabsf(fts_word_t *argv);
 extern void ftl_vec_csqrf(fts_word_t *argv); extern void ftl_vecx_csqrf(fts_word_t *argv);
 
-
-
-
-
-
- 
-
 extern void ftl_vec_round(fts_word_t *argv); extern void ftl_vecx_round(fts_word_t *argv);
-
-
-
-
-
-
- 
 
 extern void ftl_vec_fabs(fts_word_t *argv); extern void ftl_vecx_fabs(fts_word_t *argv);
 extern void ftl_vec_iabs(fts_word_t *argv); extern void ftl_vecx_iabs(fts_word_t *argv);
 extern void ftl_vec_cabs(fts_word_t *argv); extern void ftl_vecx_cabs(fts_word_t *argv);
-#line 10 "vecftl.h"
-#line 1 "../../../../src/lang/veclib/include/vec_arith.h"
- 
-
-
-
-
-
-
-
- 
-
  
 extern void ftl_vec_fadd(fts_word_t *argv); extern void ftl_vecx_fadd(fts_word_t *argv);
 extern void ftl_vec_fsub(fts_word_t *argv); extern void ftl_vecx_fsub(fts_word_t *argv);
@@ -109,14 +76,6 @@ extern void ftl_vec_cbus(fts_word_t *argv); extern void ftl_vecx_cbus(fts_word_t
 extern void ftl_vec_cvid(fts_word_t *argv); extern void ftl_vecx_cvid(fts_word_t *argv);
 
 extern void ftl_vec_cfmul(fts_word_t *argv); extern void ftl_vecx_cfmul(fts_word_t *argv);
-
-
-
-
-
-
- 
-
  
 extern void ftl_vec_scl_fadd(fts_word_t *argv); extern void ftl_vecx_scl_fadd(fts_word_t *argv);
 extern void ftl_vec_scl_fsub(fts_word_t *argv); extern void ftl_vecx_scl_fsub(fts_word_t *argv);
@@ -142,20 +101,6 @@ extern void ftl_vec_scl_cbus(fts_word_t *argv); extern void ftl_vecx_scl_cbus(ft
 extern void ftl_vec_scl_cvid(fts_word_t *argv); extern void ftl_vecx_scl_cvid(fts_word_t *argv);
 extern void ftl_vec_scl_cfmul(fts_word_t *argv); extern void ftl_vecx_scl_cfmul(fts_word_t *argv);
 
-#line 11 "vecftl.h"
-#line 1 "../../../../src/lang/veclib/include/vec_cmp.h"
- 
-
-
-
-
-
-
-
-
- 
-
- 
 extern void ftl_vec_fcmp_eq(fts_word_t *argv); extern void ftl_vecx_fcmp_eq(fts_word_t *argv);
 extern void ftl_vec_fcmp_neq(fts_word_t *argv); extern void ftl_vecx_fcmp_neq(fts_word_t *argv);
 extern void ftl_vec_fcmp_leq(fts_word_t *argv); extern void ftl_vecx_fcmp_leq(fts_word_t *argv);
@@ -170,14 +115,6 @@ extern void ftl_vec_icmp_leq(fts_word_t *argv); extern void ftl_vecx_icmp_leq(ft
 extern void ftl_vec_icmp_geq(fts_word_t *argv); extern void ftl_vecx_icmp_geq(fts_word_t *argv);
 extern void ftl_vec_icmp_le(fts_word_t *argv); extern void ftl_vecx_icmp_le(fts_word_t *argv);
 extern void ftl_vec_icmp_gr(fts_word_t *argv); extern void ftl_vecx_icmp_gr(fts_word_t *argv);
-
-
-
-
-
-
- 
-
  
 extern void ftl_vec_scl_fcmp_eq(fts_word_t *argv); extern void ftl_vecx_scl_fcmp_eq(fts_word_t *argv);
 extern void ftl_vec_scl_fcmp_neq(fts_word_t *argv); extern void ftl_vecx_scl_fcmp_neq(fts_word_t *argv);
@@ -193,17 +130,6 @@ extern void ftl_vec_scl_icmp_leq(fts_word_t *argv); extern void ftl_vecx_scl_icm
 extern void ftl_vec_scl_icmp_geq(fts_word_t *argv); extern void ftl_vecx_scl_icmp_geq(fts_word_t *argv);
 extern void ftl_vec_scl_icmp_le(fts_word_t *argv); extern void ftl_vecx_scl_icmp_le(fts_word_t *argv);
 extern void ftl_vec_scl_icmp_gr(fts_word_t *argv); extern void ftl_vecx_scl_icmp_gr(fts_word_t *argv);
-
-#line 12 "vecftl.h"
-#line 1 "../../../../src/lang/veclib/include/vec_cpy.h"
-
-
-
-
-
-
-
- 
 
 extern void ftl_vec_fcpy(fts_word_t *argv); extern void ftl_vecx_fcpy(fts_word_t *argv);
 extern void ftl_vec_icpy(fts_word_t *argv); extern void ftl_vecx_icpy(fts_word_t *argv);
@@ -225,35 +151,10 @@ extern void ftl_vec_fzero(fts_word_t *argv); extern void ftl_vecx_fzero(fts_word
 extern void ftl_vec_izero(fts_word_t *argv); extern void ftl_vecx_izero(fts_word_t *argv);
 extern void ftl_vec_czero(fts_word_t *argv); extern void ftl_vecx_czero(fts_word_t *argv);
 
-
-
-
-
- 
-
 extern void ftl_vec_fcasti(fts_word_t *argv); extern void ftl_vecx_fcasti(fts_word_t *argv);
 extern void ftl_vec_icastf(fts_word_t *argv); extern void ftl_vecx_icastf(fts_word_t *argv);
-#line 13 "vecftl.h"
-#line 1 "../../../../src/lang/veclib/include/vec_bit.h"
- 
-
-
-
-
-
-
-
-
- 
 
 extern void ftl_vec_bitnot(fts_word_t *argv); extern void ftl_vecx_bitnot(fts_word_t *argv);
-
-
-
-
-
-
- 
 
 extern void ftl_vec_bitand(fts_word_t *argv); extern void ftl_vecx_bitand(fts_word_t *argv);
 extern void ftl_vec_bitor(fts_word_t *argv); extern void ftl_vecx_bitor(fts_word_t *argv);
@@ -262,24 +163,12 @@ extern void ftl_vec_bitxor(fts_word_t *argv); extern void ftl_vecx_bitxor(fts_wo
 extern void ftl_vec_bitshl(fts_word_t *argv); extern void ftl_vecx_bitshl(fts_word_t *argv);
 extern void ftl_vec_bitshr(fts_word_t *argv); extern void ftl_vecx_bitshr(fts_word_t *argv);
 
-
-
-
-
-
- 
-
 extern void ftl_vec_scl_bitand(fts_word_t *argv); extern void ftl_vecx_scl_bitand(fts_word_t *argv);
 extern void ftl_vec_scl_bitor(fts_word_t *argv); extern void ftl_vecx_scl_bitor(fts_word_t *argv);
 extern void ftl_vec_scl_bitxor(fts_word_t *argv); extern void ftl_vecx_scl_bitxor(fts_word_t *argv);
 
 extern void ftl_vec_scl_bitshl(fts_word_t *argv); extern void ftl_vecx_scl_bitshl(fts_word_t *argv);
 extern void ftl_vec_scl_bitshr(fts_word_t *argv); extern void ftl_vecx_scl_bitshr(fts_word_t *argv);
-#line 14 "vecftl.h"
-#line 1 "../../../../src/lang/veclib/include/vec_misc.h"
-
-
- 
 
 extern void ftl_vec_fmin(fts_word_t *argv); extern void ftl_vecx_fmin(fts_word_t *argv);
 extern void ftl_vec_imin(fts_word_t *argv); extern void ftl_vecx_imin(fts_word_t *argv);
@@ -287,15 +176,9 @@ extern void ftl_vec_imin(fts_word_t *argv); extern void ftl_vecx_imin(fts_word_t
 extern void ftl_vec_fmax(fts_word_t *argv); extern void ftl_vecx_fmax(fts_word_t *argv);
 extern void ftl_vec_imax(fts_word_t *argv); extern void ftl_vecx_imax(fts_word_t *argv);
 
-
- 
-
 extern void ftl_vec_fsum(fts_word_t *argv); extern void ftl_vecx_fsum(fts_word_t *argv);
 extern void ftl_vec_isum(fts_word_t *argv); extern void ftl_vecx_isum(fts_word_t *argv);
 extern void ftl_vec_csum(fts_word_t *argv); extern void ftl_vecx_csum(fts_word_t *argv);
-
-
- 
 
 extern void ftl_vec_fclip(fts_word_t *argv); extern void ftl_vecx_fclip(fts_word_t *argv);
 extern void ftl_vec_iclip(fts_word_t *argv); extern void ftl_vecx_iclip(fts_word_t *argv);

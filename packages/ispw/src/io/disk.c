@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/11/12 18:46:26 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/11/26 10:00:24 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -342,7 +342,7 @@ writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (state)
     {
       if (this->fh)
-	this->state = state;
+	this->state = 1;
     }
   else
     {
@@ -359,28 +359,24 @@ static void
 writesf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
-  int ret;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  if (this->state)
-    {
-      post("writesf~: open: already active\n");
-      return;
-    }
+  this->state = 0;
 
-  if (this->fh)
+  if(this->fh)
     writesf_file_close(this);
 
-  if (s)
-    this->sndfile = s;
+  if(file_name)
+    {
+      this->sndfile = file_name;
 
 #ifdef SGI
-  if (writesf_file_open(this))
-    this->state = 1;
+      writesf_file_open(this);
 #elif defined(SOLARIS2)
-  if (writesf_file_open(this, fts_get_symbol_arg(ac, at, 1, 0)))
-    this->state = 1;
+      writesf_file_open(this, fts_get_symbol_arg(ac, at, 1, 0));
 #endif
+    }
+
 }
 
 
@@ -696,7 +692,13 @@ readsf_file_open(readsf_t *this)
 {
   this->fh = AFopenfile(get_readsf_path(this->sndfile), "r", 0);
 
-  return (this->fh != 0);
+  if (this->fh < 0)
+    {
+      post("readsf~: cannot open file '%s' for reading\n", this->sndfile);
+      return 0;
+    }
+  else
+    return 1;
 }
 
 static void
@@ -819,23 +821,19 @@ static void
 readsf_open(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
-  int ret;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  this->state = 0;		/* assure that playback do not start at open time */
+  this->state = 0; /* assure that playback do not start at open time */
 
   if (this->fh)
     readsf_file_close(this);
 
-  if (s)
-    this->sndfile = s;
-
-  ret = readsf_file_open(this);
-
-  if (! ret)
-    post("readsf~: cannot open file `%s' for reading\n", fts_symbol_name(this->sndfile));
+  if (file_name)
+    {
+      this->sndfile = file_name;
+      readsf_file_open(this);
+    }
 }
-
 
 
 static void
