@@ -214,10 +214,9 @@ static int audio_desc_set_parameters( audio_desc_t *aud)
       return -1;
     }
 
-  if (sampling_rate != aud->sampling_rate)
+  if (aud->sampling_rate != sampling_rate)
     {
-      post("Audio device doesn't support requested sampling rate\n");
-      return -1;
+      post("Audio device doesn't support requested sampling rate (wanted %d, got %d)\n", aud->sampling_rate, sampling_rate);
     }
 
   return 0;
