@@ -153,7 +153,7 @@ osc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   double phase;
   
   phase = fts_get_float_arg(ac, at, 0, 0.0f);
-  osc_ftl_data_set_phase(this->ftl_data, phase);
+  osc_ftl_data_set_phase(this->ftl_data, (float)phase);
 }
 
 
@@ -241,7 +241,7 @@ void
 phasor_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   phasor_t *this = (phasor_t *)o;
-  double phi = (double)fts_get_number_float(at);
+  float phi = (float)fts_get_number_float(at);
 
   phasor_ftl_set_phase(this->state, phi);
 }
