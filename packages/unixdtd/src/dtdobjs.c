@@ -93,8 +93,6 @@ static void readsf_open_realize( readsf_t *this, const char *filename)
 
 static void readsf_close_realize( readsf_t *this)
 {
-  fprintf( stderr, "FTS close: fifo %d DTD %d FTS %d\n", this->id, dtdfifo_is_used(this->fifo, DTD_SIDE), dtdfifo_is_used(this->fifo, FTS_SIDE));
-
   if (this->id >= 0)
     {
       dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
@@ -320,7 +318,6 @@ static void readsf_dsp( fts_word_t *argv)
       {
 	read_fifo( n, n_channels, this->fifo, outputs);
 
-	fprintf( stderr, "FTS: pending->playing fifo %d DTD %d FTS %d\n", this->id, dtdfifo_is_used( this->fifo, DTD_SIDE), dtdfifo_is_used( this->fifo, FTS_SIDE));
 	this->state = readsf_playing;
       }
     break;
@@ -470,7 +467,6 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 typedef enum { 
   writesf_closed, 
   writesf_opened, 
-  writesf_pending, 
   writesf_recording, 
   writesf_paused 
 } writesf_state_t;
@@ -536,25 +532,9 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
     else if (message == s_close)
       writesf_close_realize( this);
     else if (message == s_record)
-      this->state = writesf_pending;
+      this->state = writesf_recording;
     else if (message == s_pause)
       post( "writesf~: error: not recording\n");
-    break;
-
-  case writesf_pending:
-    if (message == s_open)
-      {
-	writesf_close_realize( this);
-	writesf_open_realize( this, fts_symbol_name( fts_get_symbol( at)));
-      }
-    else if (message == s_close)
-      writesf_close_realize( this);
-    else if (message == s_record)
-      {
-      }
-    else if (message == s_pause)
-      {
-      }
     break;
 
   case writesf_recording:
@@ -590,15 +570,6 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
     break;
 
   }
-}
-
-static void writesf_eof_alarm( fts_alarm_t *alarm, void *p)
-{
-  fts_object_t *o = (fts_object_t *)p;
-
-  fts_alarm_unarm( alarm);
-
-  fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
 }
 
 static void writesf_post_fifo_overflow_alarm( fts_alarm_t *alarm, void *p)
@@ -639,44 +610,44 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   number_of_dtdobjs--;
 }
 
-static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *outputs)
+static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *inputs)
 {
-  volatile float *src;
+  volatile float *dst;
   int channel;
 
-  src = (volatile float *)dtdfifo_get_read_pointer( fifo);
+  dst = (volatile float *)dtdfifo_get_write_pointer( fifo);
 
   for ( channel = 0; channel < n_channels; channel++)
     {
-      float *out;
+      float *in;
       int i, j;
 
-      out = (float *)fts_word_get_ptr( outputs + channel);
+      in = (float *)fts_word_get_ptr( inputs + channel);
       j = channel;
 
       for ( i = 0; i < n; i++)
 	{
-	  out[i] = src[j];
+	  dst[j] = in[i];
 	  j += n_channels;
 	}
     }
 
-  dtdfifo_incr_read_index( fifo, n_channels * n * sizeof(float));
+  dtdfifo_incr_write_index( fifo, n_channels * n * sizeof(float));
 }
 
 static void writesf_dsp( fts_word_t *argv)
 {
   writesf_t *this;
-  int n, n_channels, read_size;
-  fts_word_t *outputs;
+  int n, n_channels, write_size;
+  fts_word_t *inputs;
 
   this = (writesf_t *)fts_word_get_ptr( argv + 0);
   n = fts_word_get_long( argv + 1);
-  outputs = argv+2;
+  inputs = argv+2;
 
   n_channels = this->n_channels;
 
-  read_size = n_channels * n * sizeof( float);
+  write_size = n_channels * n * sizeof( float);
 
   switch (this->state) {
   case writesf_closed:
@@ -684,29 +655,14 @@ static void writesf_dsp( fts_word_t *argv)
   case writesf_paused:
     break;
 
-  case writesf_pending:
-    if ( dtdfifo_get_read_level( this->fifo) < read_size )
-      {
-      }
-    else
-      {
-	write_fifo( n, n_channels, this->fifo, outputs);
-	this->state = writesf_recording;
-      }
-    break;
-
   case writesf_recording:
-    if ( dtdfifo_get_read_level( this->fifo) >= read_size )
+    if ( dtdfifo_get_write_level( this->fifo) >= write_size )
       {
-	write_fifo( n, n_channels, this->fifo, outputs);
+	write_fifo( n, n_channels, this->fifo, inputs);
       }
     else
       {
-	if ( dtdfifo_is_eof( this->fifo))
-	  {
-	    writesf_close_realize( this);
-	  }
-	else if ( this->can_post_fifo_overflow)
+	if ( this->can_post_fifo_overflow)
 	  {
 	    post( "Warning: writesf~ fifo overflow\n");
 
@@ -727,10 +683,10 @@ static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   int i;
 
   fts_set_ptr( argv + 0, this);
-  fts_set_int( argv + 1, fts_dsp_get_output_size( dsp, 0));
+  fts_set_int( argv + 1, fts_dsp_get_input_size( dsp, 0));
 
   for ( i = 0; i < this->n_channels; i++)
-    fts_set_symbol( argv + 2 + i, fts_dsp_get_output_name( dsp, i));
+    fts_set_symbol( argv + 2 + i, fts_dsp_get_input_name( dsp, i));
 
   dsp_add_funcall( writesf_dsp_function, 2 + this->n_channels, argv);
 }
@@ -807,7 +763,7 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_method_define( cl, 0, fts_s_int, writesf_number, 1, a);
 
   for (i = 0; i < n_channels; i++)
-    dsp_sig_outlet(cl, i);
+    dsp_sig_inlet(cl, i);
 
   writesf_dsp_function = fts_new_symbol( "writesf~");
   dsp_declare_function( writesf_dsp_function, writesf_dsp);

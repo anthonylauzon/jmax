@@ -154,8 +154,6 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
 
   if (n_read < n_frames)
     {
-      fprintf( stderr, "DTD EOF: fifo ? DTD %d FTS %d\n", dtdfifo_is_used( fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
-
       dtdfifo_set_used( fifo, DTD_SIDE, 0);
     }
 
@@ -331,8 +329,6 @@ static void dtd_open( const char *line)
   char filename[N], path[N];
   dtdhandle_t *handle;
 
-  fprintf( stderr, "line=%s\n", line);
-
   sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
   fifo = dtdfifo_get( id);
@@ -345,8 +341,6 @@ static void dtd_open( const char *line)
 
   handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
   
-  fprintf( stderr, "DTD open: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used( fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
-
   dtdfifo_set_used( fifo, DTD_SIDE, 1);
 
   /* This should not happen */
@@ -381,8 +375,6 @@ static void dtd_close( const char *line)
   sscanf( line, "%*s%d", &id);
 
   fifo = dtdfifo_get( id);
-
-  fprintf( stderr, "DTD close: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used(fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
 
   if ( !dtdfifo_is_used( fifo, DTD_SIDE) )
     return;

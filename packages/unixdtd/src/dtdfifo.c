@@ -146,8 +146,6 @@ int dtdfifo_allocate( int side)
 	  dtdfifo_set_read_index( table[id].fifo, 0);
 	  dtdfifo_set_write_index( table[id].fifo, 0);
 
-	  fprintf( stderr, "allocate: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used(table[id].fifo, DTD_SIDE), dtdfifo_is_used(table[id].fifo, FTS_SIDE));
-
 	  dtdfifo_set_used( table[id].fifo, side, 1);
 
 	  return id;
