@@ -43,9 +43,9 @@ typedef struct _seqref_
 
 #define seqref_get_track(o) (((seqref_t *)(o))->track)
 
-extern void seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at);
+extern int seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at);
 extern eventtrk_t *seqref_get_reference(fts_object_t *o);
-extern void seqref_init(fts_object_t *o, int ac, const fts_atom_t *at);
+extern int seqref_init(fts_object_t *o, int ac, const fts_atom_t *at);
 
 extern void seqref_upload(fts_object_t *o);
 

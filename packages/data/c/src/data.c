@@ -35,6 +35,7 @@ extern void vec_config(void);
 extern void mat_config(void);
 
 extern void getval_config(void);
+extern void getinter_config(void);
 extern void getsize_config(void);
 extern void getrange_config(void);
 extern void getlist_config(void);
@@ -56,6 +57,7 @@ data_init(void)
   mat_config();
 
   getval_config();  
+  getinter_config();  
   getsize_config();  
   getrange_config();  
   getlist_config();  

@@ -142,36 +142,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  if(name == fts_s_list)
 	    message_set(this, fts_s_list, ac - 1, at + 1); /* list constructor: "list" [<value> ...] */
 	  else if(fts_atom_type_lookup(name, &cl))
-	    {
-	      /* value constructor: <class name> [<value> ...] (construct object or primitive type) */
-	      
-	      /* skip class name */
-	      ac--;
-	      at++;
-
-	      if(cl)
-		{
-		  fts_object_t *obj = fts_object_create(cl, ac, at);
-		  fts_symbol_t error = fts_object_get_error(obj);
-		  
-		  if(!error)
-		    {
-		      fts_atom_t a;
-		      
-		      fts_set_object_with_type(&a, obj, name);
-		      message_set(this, name, 1, &a);
-		    }
-		  else
-		    {
-		      fts_object_set_error(o, "%s", fts_symbol_name(error));
-		      return;
-		    }
-		}
-	      else if(ac == 1 && fts_get_selector(at) == name)
-		message_set(this, name, 1, at);
-	      else
-		fts_object_set_error(o, "Wrong arguments for %s constructor", fts_symbol_name(name));
-	    }
+	    fts_object_set_error(o, "Message cannot start with type name %s", fts_symbol_name(name));
 	  else
 	    message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}

@@ -32,3 +32,4 @@ range.c \
 fit.c \
 switch.c \
 count.c \
+sync.c \

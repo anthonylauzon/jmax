@@ -726,7 +726,6 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
   fts_symbol_t class_name = fts_get_symbol(at);
 
   /* initialization */
@@ -743,25 +742,25 @@ listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_int(cl, 1, listarith_set_right_atom);
   fts_method_define_symbol(cl, 1, listarith_set_right_atom);
 
-  if(class_name == fts_new_symbol("list+"))
+  if(class_name == fts_new_symbol("list+") || class_name == fts_new_symbol("l+"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_add);
-  else if(class_name == fts_new_symbol("list-"))
+  else if(class_name == fts_new_symbol("list-") || class_name == fts_new_symbol("l-"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_sub);
-  else if(class_name == fts_new_symbol("list*"))
+  else if(class_name == fts_new_symbol("list*") || class_name == fts_new_symbol("l*"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_mul);
-  else if(class_name == fts_new_symbol("list/"))
+  else if(class_name == fts_new_symbol("list/") || class_name == fts_new_symbol("l/"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_div);
-  else if(class_name == fts_new_symbol("list>"))
+  else if(class_name == fts_new_symbol("list>") || class_name == fts_new_symbol("l>"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_gt);
-  else if(class_name == fts_new_symbol("list>="))
+  else if(class_name == fts_new_symbol("list>=") || class_name == fts_new_symbol("l>="))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_ge);
-  else if(class_name == fts_new_symbol("list<"))
+  else if(class_name == fts_new_symbol("list<") || class_name == fts_new_symbol("l<"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_lt);
-  else if(class_name == fts_new_symbol("list<="))
+  else if(class_name == fts_new_symbol("list<=") || class_name == fts_new_symbol("l<="))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_le);
-  else if(class_name == fts_new_symbol("list!="))
+  else if(class_name == fts_new_symbol("list!=") || class_name == fts_new_symbol("l!="))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_ne);
-  else if(class_name == fts_new_symbol("list=="))
+  else if(class_name == fts_new_symbol("list==") || class_name == fts_new_symbol("l=="))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_ee);
   else 
     return &fts_CannotInstantiate;

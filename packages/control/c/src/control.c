@@ -33,6 +33,7 @@ extern void for_config(void);
 extern void count_config(void);
 extern void range_config(void);
 extern void fit_config(void);
+extern void sync_config(void);
 
 static void
 control_init(void)
@@ -44,6 +45,7 @@ control_init(void)
   count_config();
   range_config();
   fit_config();
+  sync_config();
 }
 
 fts_module_t control_module = {"control", "control classes", control_init, 0, 0};

@@ -38,9 +38,12 @@ typedef struct getmess
   fts_atom_t key;
 } getmess_t;
 
+static fts_symbol_t sym_text = 0;
+static fts_symbol_t sym_coll = 0;
+
 static fts_symbol_t messtab_symbol = 0;
 
-static int
+static fts_symbol_t
 messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
@@ -54,12 +57,15 @@ messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac,
     }
   else
     {
-      mess = (message_t *)fts_object_create(message_class, ac, at);
+      fts_symbol_t error = 0;
 
-      if(fts_object_get_error((fts_object_t *)mess))
+      mess = (message_t *)fts_object_create(message_class, ac, at);
+      error = fts_object_get_error((fts_object_t *)mess);
+
+      if(error)
 	{
 	  fts_object_destroy((fts_object_t *)mess);
-	  return 0;
+	  return error;
 	}
     }
 
@@ -73,7 +79,7 @@ messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac,
   fts_set_object(&value, (void *)mess);
   fts_hashtable_put(hash, key, &value);
 
-  return 1;
+  return 0;
 }
 
 static message_t *
@@ -249,10 +255,11 @@ putmess_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 #define MESSTAB_BLOCK_SIZE 64
 
 static fts_atom_t *
-messtab_atom_buf_new(int size)
+messtab_atom_buf_realloc(fts_atom_t *buf, int size)
 {
-  fts_atom_t *buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size);
-  return buf;
+  fts_atom_t *new_buf = (fts_atom_t *)fts_realloc(buf, sizeof(fts_atom_t) * size); /* double size */
+
+  return new_buf;
 }
 
 static void
@@ -262,44 +269,24 @@ messtab_atom_buf_free(fts_atom_t *buf, int size)
     fts_block_free(buf, sizeof(fts_atom_t) * size);
 }
 
-static fts_atom_t *
-messtab_atom_buf_grow(fts_atom_t *buf, int size, int more)
+static int
+messtab_import_from_text(messtab_t *this, fts_symbol_t file_name)
 {
-  int new_size = size + more;
-  fts_atom_t *new_buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size); /* double size */
-  int i;
-  
-  for(i=0; i<size; i++)
-    new_buf[i] = buf[i];
-
-  fts_block_free(buf, sizeof(fts_atom_t) * size);
-
-  return new_buf;
-}
-
-static void
-messtab_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messtab_t *this = (messtab_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_atom_file_t *file;
   fts_atom_t a;
   char c;
   int i = 0;
   int n = 0;
-  fts_atom_t *atoms;
+  fts_atom_t *atoms = 0;
   int atoms_alloc = MESSTAB_ATOM_BUF_BLOCK_SIZE;
 
   file = fts_atom_file_open(fts_symbol_name(file_name), "r");
 
   if(!file)
-    {
-      post("messtab: can't open file to read: %s\n", fts_symbol_name(file_name));
-      return;
-    }
+    return 0;
 
-  messtab_clear(o, 0, 0, 0, 0);
-  atoms = messtab_atom_buf_new(atoms_alloc);
+  messtab_clear((fts_object_t *)this, 0, 0, 0, 0);
+  atoms = messtab_atom_buf_realloc(atoms, atoms_alloc);
 
   i = 0;
   while (fts_atom_file_read(file, &a, &c))
@@ -319,7 +306,10 @@ messtab_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	{
 	  /* next atom */
 	  if(n >= atoms_alloc)
-	    atoms = messtab_atom_buf_grow(atoms, atoms_alloc, MESSTAB_ATOM_BUF_BLOCK_SIZE);
+	    {
+	      atoms_alloc += MESSTAB_ATOM_BUF_BLOCK_SIZE;
+	      atoms = messtab_atom_buf_realloc(atoms, atoms_alloc);
+	    }
 	  
 	  atoms[n] = a;
 	  n++;
@@ -328,6 +318,111 @@ messtab_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   messtab_atom_buf_free(atoms, atoms_alloc);
   fts_atom_file_close(file);
+
+  return i;
+}
+
+int 
+messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  int atoms_alloc = MESSTAB_ATOM_BUF_BLOCK_SIZE;
+  fts_atom_t *atoms = 0;
+  enum {read_key, read_comma, read_argument} state = read_key;
+  char *error = 0;
+  int i = 0;
+  int n = 0;
+  fts_atom_t key;
+  fts_atom_t a;
+  char c;
+
+  if(!file)
+    return 0;
+
+  atoms = messtab_atom_buf_realloc(atoms, atoms_alloc);
+
+  messtab_clear((fts_object_t *)this, 0, 0, 0, 0);
+  fts_set_void(&key);
+
+  while (error == 0 && fts_atom_file_read(file, &a, &c))
+    {
+      switch(state)
+	{
+	case read_key:
+	  {
+	    if(fts_is_symbol(&a) || fts_is_int(&a))
+	      {
+		key = a;
+		state = read_comma;
+	      }
+	    else
+	      error = "wrong key type";	      
+	  }
+	  
+	  break;
+	  
+	case read_comma:
+	  {
+	    if(fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(",")))
+	      state = read_argument;
+	    else
+	      error = "comma expected";
+	  }
+	  
+	  break;
+
+	case read_argument:
+	  {
+	    if(fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(";")))
+	      {
+		if(n != 0)
+		  {
+		    /* store message */
+		    messtab_store(this, &key, 0, n, atoms);
+		    
+		    i++;
+		    n = 0;
+
+		    state = read_key;
+		  }
+		else
+		  post("messtab: empty message found in coll file %s (ignored)\n", fts_symbol_name(file_name));
+	      }
+	    else
+	      {
+		/* read argument */
+		if(n >= atoms_alloc)
+		  {
+		    atoms_alloc += MESSTAB_ATOM_BUF_BLOCK_SIZE;
+		    atoms = messtab_atom_buf_realloc(atoms, atoms_alloc);
+		  }
+		
+		atoms[n] = a;
+		n++;
+	      }
+	  }
+	  
+	  break;
+	}
+    }
+  
+  if(error != 0)
+    post("messtab: error reading coll file %s (%s)\n", fts_symbol_name(file_name), error);
+  else if(state != read_key)
+    {
+      if(n > 0)
+	{
+	  messtab_store(this, &key, 0, n, atoms);
+	  i++;
+	}
+      
+      post("messtab: found unexpected ending in coll file %s\n", fts_symbol_name(file_name));
+    }
+  
+  messtab_atom_buf_free(atoms, atoms_alloc);
+  fts_atom_file_close(file);
+
+  return i;
 }
 
 static void
@@ -392,6 +487,31 @@ messtab_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 
   fts_atom_file_close(file);
+}
+
+static void
+messtab_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
+  int size = 0;
+
+  if(!file_name)
+    return;
+
+  if(file_format == sym_text)
+    size = messtab_import_from_text(this, file_name);
+  else if(file_format == sym_coll)
+    size = messtab_import_from_coll(this, file_name);    
+  else
+    {
+      post("messtab: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+      return;
+    }
+
+  if(size <= 0)
+    post("messtab: can't import from text file \"%s\"\n", fts_symbol_name(file_name));  
 }
 
 /**********************************************************
@@ -474,10 +594,12 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      
 	      if(lac > 0)
 		{
-		  if(!messtab_store(this, key, 0, lac, lat))
+		  fts_symbol_t error = messtab_store(this, key, 0, lac, lat);
+
+		  if(error)
 		    {
 		      messtab_clear(o, 0, 0, 0, 0);
-		      fts_object_set_error(o, "Wrong message definition in initialization");
+		      fts_object_set_error(o, fts_symbol_name(error));
 		    }
 		}
 	      else
@@ -572,6 +694,9 @@ putmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 messtab_config(void)
 {
+  sym_text = fts_new_symbol("text");
+  sym_coll = fts_new_symbol("coll");
+
   messtab_symbol = fts_new_symbol("messtab");
 
   fts_class_install(messtab_symbol, messtab_instantiate);

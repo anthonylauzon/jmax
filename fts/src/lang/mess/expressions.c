@@ -565,9 +565,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      TRY(fts_expression_eval_one(e));
 
 	      if (! fts_is_closed_sqpar(current_in(e)))
-		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					"Syntax error in Array access",
-					0);
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array access", 0);
 
 	      /* Push the array reference operator in the op stack */
 
@@ -842,7 +840,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      TRY(fts_expression_eval_one(e));
 
 	      if (! fts_is_closed_sqpar(current_in(e)))
-		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in Array access", 0);
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array access", 0);
 
 	      /* Push the array reference operator in the op stack */
 	      op_stack_push(e, FTS_OP_ARRAY_REF, FTS_BINARY_OP_TYPE);

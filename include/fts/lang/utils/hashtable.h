@@ -56,6 +56,9 @@ typedef struct _fts_hashtable_cell_t {
  */
 /*@{*/
 
+typedef unsigned int (*hash_function_t)( const fts_atom_t *);
+typedef int (*equals_function_t)( const fts_atom_t *, const fts_atom_t *);
+
 /**
  * The FTS hashtable.
  *
@@ -63,10 +66,7 @@ typedef struct _fts_hashtable_cell_t {
  *
  * @ingroup hashtable
  */
-typedef unsigned int (*hash_function_t)( const fts_atom_t *);
-typedef int (*equals_function_t)( const fts_atom_t *, const fts_atom_t *);
-
-typedef struct {
+typedef struct fts_hashtable {
   unsigned int length;
   int count;
   int rehash_count;
@@ -80,10 +80,16 @@ typedef struct {
 
 /*@}*/
 
-
 #define FTS_HASHTABLE_SMALL 1
 #define FTS_HASHTABLE_MEDIUM 2
 #define FTS_HASHTABLE_BIG 3
+
+/** 
+ * @name Hash table handling
+ *
+ * Functions to initialize, clear and destroy a hash table
+ */
+/*@{*/
 
 /**
  * Initializes a hashtable
@@ -93,6 +99,8 @@ typedef struct {
  * @param key_type the type of the key. If 0, the key type will be `symbol'
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
+ *
+ * @ingroup hashtable
  */
 FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity);
 
@@ -103,6 +111,8 @@ FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int in
  *
  * @fn void fts_hashtable_clear( fts_hashtable_t *h)
  * @param h the hashtable
+ *
+ * @ingroup hashtable
  */
 extern void fts_hashtable_clear( fts_hashtable_t *h);
 
@@ -111,8 +121,19 @@ extern void fts_hashtable_clear( fts_hashtable_t *h);
  *
  * @fn void fts_hashtable_destroy( fts_hashtable_t *h)
  * @param h the hashtable
+ *
+ * @ingroup hashtable
  */
 FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
+
+/*@}*/
+
+/** 
+ * @name Using hash tables
+ *
+ * Insert, retrieve and remove hash table elements
+ */
+/*@{*/
 
 /**
  * Retrieve value mapped to specified key.
@@ -146,12 +167,10 @@ FTS_API int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_at
  */
 FTS_API int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key);
 
-FTS_API void fts_hashtable_stats( fts_hashtable_t *h);
-
 /**
  * Returns an iterator to enumerate the keys contained in the hashtable
  *
- * @fn void fts_hashtable_get_keys( fts_hashtable_t *h, fts_iterator_t *i)
+ * @fn void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i)
  * @param h the hashtable
  * @param i the iterator
  */
@@ -160,10 +179,12 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
 /**
  * Returns an iterator to enumerate the values contained in the hashtable
  *
- * @fn void fts_hashtable_get_values( fts_hashtable_t *h, fts_iterator_t *i)
+ * @fn void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
  * @param h the hashtable
  * @param i the iterator
  */
 FTS_API void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
+
+FTS_API void fts_hashtable_stats( fts_hashtable_t *h);
 
 #endif

@@ -29,7 +29,7 @@
 #include "sequence.h"
 #include "seqref.h"
 
-void 
+int
 seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at)
 { 
   seqref_t *this = (seqref_t *)o;
@@ -43,9 +43,20 @@ seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at)
 	  this->sequence = (sequence_t *)sequence;
 	  
 	  if(ac > 1 && fts_is_number(at + 1))
-	    this->index = fts_get_number_int(at + 1) - 1;
+	    {
+	      int index = fts_get_number_int(at + 1) - 1;
+
+	      if(index >= 0)
+		{
+		  this->index = index;
+		  
+		  return 1;
+		}
+	    }
 	}
     }
+
+  return 0;
 }
 
 eventtrk_t *
@@ -60,7 +71,7 @@ seqref_get_reference(fts_object_t *o)
   return track;
 }
       
-void
+int
 seqref_init(fts_object_t *o, int ac, const fts_atom_t *at)
 { 
   seqref_t *this = (seqref_t *)o;
@@ -69,7 +80,7 @@ seqref_init(fts_object_t *o, int ac, const fts_atom_t *at)
   this->track = 0;
   this->index = 0;
   
-  seqref_set_reference(o, ac - 1, at + 1);
+  return seqref_set_reference(o, ac - 1, at + 1);
 }
 
 void
