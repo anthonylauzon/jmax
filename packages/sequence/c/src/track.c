@@ -21,6 +21,7 @@
  */
 
 #include <alloca.h>
+#include <string.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <fts/packages/data/data.h>
