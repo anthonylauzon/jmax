@@ -202,6 +202,10 @@ SOURCE=..\fts\fts.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\function.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\hashtable.c
 # End Source File
 # Begin Source File
