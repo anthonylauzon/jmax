@@ -96,18 +96,6 @@ SOURCE=..\c\src\event.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\message.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\midival.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\midival.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\module.c
 # End Source File
 # Begin Source File
@@ -121,6 +109,10 @@ SOURCE=..\c\src\note.h
 # Begin Source File
 
 SOURCE=..\c\src\seqfind.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\seqmess.c
 # End Source File
 # Begin Source File
 
