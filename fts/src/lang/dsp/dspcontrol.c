@@ -30,7 +30,7 @@
 #include <fts/lang/datalib.h>
 #include <fts/lang/ftl.h>
 #include <fts/lang/dsp.h>
-#include <fts/runtime.h>	/* @@@@ what should we do ?? */
+#include <fts/runtime.h>
 #include "../mess/fpe.h"
 
 /*
