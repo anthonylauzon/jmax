@@ -530,6 +530,7 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(this->data)
     {
       ftl_data_free(this->data);      
+      fts_param_remove_listener(this);
       fts_dsp_remove_object(o);
     }
 }
