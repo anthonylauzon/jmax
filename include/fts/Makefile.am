@@ -32,6 +32,7 @@ objectlist.h \
 objectset.h \
 package.h \
 param.h \
+parser.h \
 patcher.h \
 post.h \
 predefsymbols.h \
