@@ -41,19 +41,19 @@ typedef struct
 static void
 slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   fts_atom_t a;
 
-  fts_set_int(&a, this->orientation);
+  fts_set_int(&a, self->orientation);
   fts_client_send_message(o, sym_setOrientation, 1, &a);
 
-  fts_set_int(&a, this->min);
+  fts_set_int(&a, self->min);
   fts_client_send_message(o, sym_setMinValue, 1, &a);
 
-  fts_set_int(&a, this->max);
+  fts_set_int(&a, self->max);
   fts_client_send_message(o, sym_setMaxValue, 1, &a);
 
-  fts_set_int(&a, this->persistence);
+  fts_set_int(&a, self->persistence);
   fts_client_send_message(o, fts_s_persistence, 1, &a);
 
   fts_name_gui_method(o, 0, 0, 0, 0);
@@ -62,25 +62,25 @@ slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 slider_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   fts_atom_t a;
 
-  fts_set_int(&a, this->n);
+  fts_set_int(&a, self->n);
   fts_client_send_message_real_time(o, fts_s_value, 1, &a);  
 }
 
 static void
 slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
 
   if(ac > 0 && fts_is_number(at))
   {
     int n = fts_get_number_int(at);
 
-    if (this->n != n)
+    if (self->n != n)
     {
-      this->n = n;
+      self->n = n;
       fts_update_request(o);
     }
   }
@@ -89,23 +89,44 @@ slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 slider_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
 
-  fts_outlet_int(o, 0, this->n);
+  fts_outlet_int(o, 0, self->n);
 }
 
 static void 
 slider_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   int n = fts_get_number_int(at);
   
-  if (this->n != n)
+  if (self->n != n)
     {
       fts_update_request(o);
-      this->n = n;
+      self->n = n;
     }
   
+  fts_outlet_int(o, 0, n);
+}
+
+static void
+slider_incr(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  slider_t *self = (slider_t*)o;
+  int n;
+
+  if (ac > 0 && fts_is_number(at))
+  {
+    n = self->n + fts_get_number_int(at);
+    self->n = n;
+  }
+  else
+  {
+    n = self->n + 1;
+    self->n = n;
+  }
+  
+  fts_update_request(o);
   fts_outlet_int(o, 0, n);
 }
 
@@ -125,71 +146,71 @@ slider_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 slider_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   fts_atom_t a;
   
-  this->min = fts_get_number_int(at);
+  self->min = fts_get_number_int(at);
 
-  fts_set_int(&a, this->min);
+  fts_set_int(&a, self->min);
   fts_client_send_message(o, sym_setMinValue, 1, &a);
 }
 
 static void
 slider_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   fts_atom_t a;
 
-  this->max = fts_get_number_int(at);
+  self->max = fts_get_number_int(at);
 
-  fts_set_int(&a, this->max);
+  fts_set_int(&a, self->max);
   fts_client_send_message(o, sym_setMaxValue, 1, &a);
 }
 
 static void
 slider_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   fts_atom_t a;
 
   if(ac > 1 && fts_is_number(at))
     {
-      this->min = fts_get_number_int(at);
+      self->min = fts_get_number_int(at);
       ac--;
       at++;
     }
   else
-    this->min = 0;
+    self->min = 0;
   
   if(ac > 0 && fts_is_number(at))
-    this->max = fts_get_number_int(at);
+    self->max = fts_get_number_int(at);
 
-  fts_set_int(&a, this->min);
+  fts_set_int(&a, self->min);
   fts_client_send_message(o, sym_setMinValue, 1, &a);
 
-  fts_set_int(&a, this->max);
+  fts_set_int(&a, self->max);
   fts_client_send_message(o, sym_setMaxValue, 1, &a);
 }
 
 static void
 slider_set_orientation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
 
-  this->orientation = fts_get_number_int(at);
+  self->orientation = fts_get_number_int(at);
 }
 
 static void
 slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
 
   if(ac > 0)
     {
       /* set persistence flag (if its not set to args) */
       if(fts_is_number(at))
 	{
-	  this->persistence = (fts_get_number_int(at) != 0);
+	  self->persistence = (fts_get_number_int(at) != 0);
 	  fts_client_send_message(o, fts_s_persistence, 1, at);
 	}
     }
@@ -198,7 +219,7 @@ slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       /* return persistence flag */
       fts_atom_t a;
 
-      fts_set_int(&a, this->persistence);
+      fts_set_int(&a, self->persistence);
       fts_return(&a);
     }
 }
@@ -206,32 +227,32 @@ slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void 
 slider_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
 
-  this->persistence = 0;
-  this->min = 0;
-  this->max = 127;
-  this->orientation = 0;
+  self->persistence = 0;
+  self->min = 0;
+  self->max = 127;
+  self->orientation = 0;
 }
 
 static void
 slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   slider_t *in = (slider_t *)fts_get_object(at);
 
-  this->n = in->n;
-  this->min = in->min;
-  this->max = in->max;
+  self->n = in->n;
+  self->min = in->min;
+  self->max = in->max;
 
   if(fts_object_has_id(o))
   {
     fts_atom_t a;
     
-    fts_set_int(&a, this->min);
+    fts_set_int(&a, self->min);
     fts_client_send_message(o, sym_setMinValue, 1, &a);
 
-    fts_set_int(&a, this->max);
+    fts_set_int(&a, self->max);
     fts_client_send_message(o, sym_setMaxValue, 1, &a);
 
     fts_update_request(o);
@@ -241,36 +262,36 @@ slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void
 slider_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t * this = (slider_t *)o;
+  slider_t * self = (slider_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_atom_t a;
 
-  fts_set_int(&a, this->n);
+  fts_set_int(&a, self->n);
   fts_dumper_send(dumper, fts_s_set, 1, &a);
 }
 
 static void
 slider_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t * this = (slider_t *)o;
+  slider_t * self = (slider_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_atom_t a;
 
-  fts_set_int(&a, this->min);
+  fts_set_int(&a, self->min);
   fts_dumper_send(dumper, fts_s_min_value, 1, &a);
 
-  fts_set_int(&a, this->max);
+  fts_set_int(&a, self->max);
   fts_dumper_send(dumper, fts_s_max_value, 1, &a);
 
-  if(this->orientation != 0)
+  if(self->orientation != 0)
     {
-      fts_set_int(&a, this->orientation);
+      fts_set_int(&a, self->orientation);
       fts_dumper_send(dumper, fts_s_orientation, 1, &a);
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);
 
-  if(this->persistence != 0)
+  if(self->persistence != 0)
     {
       slider_dump_state(o, 0, 0, ac, at);
 
@@ -282,7 +303,7 @@ slider_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void 
 slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  slider_t *this = (slider_t *)o;
+  slider_t *self = (slider_t *)o;
   FILE *file = (FILE *)fts_get_pointer( at);
   fts_atom_t a;
   int x, y, w;
@@ -296,7 +317,7 @@ slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_object_get_prop( o, fts_s_width, &a);
   w = fts_get_int( &a);
 
-  fprintf( file, "#P slider %d %d %d %d;\n", x, y, w, this->max - this->min + 1);
+  fprintf( file, "#P slider %d %d %d %d;\n", x, y, w, self->max - self->min + 1);
 }
 
 
@@ -327,6 +348,8 @@ slider_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_send, slider_set_and_output);
 
+  fts_class_message_varargs(cl, fts_new_symbol("incr"), slider_incr);
+
   fts_class_inlet_void(cl, 0, slider_bang);
   fts_class_inlet_number(cl, 0, slider_number);
   fts_class_inlet_varargs(cl, 0, slider_varargs);
@@ -343,3 +366,10 @@ slider_config(void)
 
   fts_class_install(fts_new_symbol("slider"),slider_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
