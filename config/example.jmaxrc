@@ -47,6 +47,10 @@
 ## set port number needed for socket connection (2000)
 #set jmaxPort 2000
 
+## show or hide splash screen (show)
+#set jmaxSplashScreen hide
+#set jmaxSplashScreen show
+
 
 ###################################################################
 #
@@ -67,8 +71,7 @@ when start {
 
   # declare setup for the examples
   sourceFile $jmaxRootDir/examples/examples.tcl
-
-  puts "Welcome to jMax!"
+  "Welcome to jMax!"
   puts "(try examples in $jmaxRootDir/examples)"
 
 }

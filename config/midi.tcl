@@ -1,34 +1,54 @@
-##################################################################
+######################################################################################
 #
-#  jMax default MIDI device configuration
+#  jMax default startup MIDI configuration
 #
-#    mips1
-#    irix5.3
-#    irix6.2
-#    o2r5k and o2r10k
-#    origin
+#  ... everything here can depend on the following system properties:
+
+global jmaxArch 
+global jmaxHost
+global jmaxSampleRate 
+global jmaxAudioBuffer 
+
+#  ... aswell as any additional system property specified in the command line
+# for example: jmax -myProperty "myValue"
+
+if {[systemProperty "myProperty"] == "myValue"} { 
+  # property dependent code here
+}
+
+######################################################################################
+#
+#   platform dependend startup configuration implementations
+#   for the following platforms:
+#
+#     irix6.2
+#     o2r5k and o2r10k
+#     origin
+#
+#   shell commands for startmidi using the default MIDI Port (jmaxMidi)
+#
+#     origin
+#       serial port 1: startmidi -d /dev/ttyd1 -s 31250 -n jmaxMidi
+#       serial port 2: startmidi -d /dev/ttyd2 -s 31250 -n jmaxMidi
+#
+#     irix 6.2
+#       serial port 1: startmidi -d /dev/ttyd1 -n jmaxMidi
+#       serial port 2: startmidi -d /dev/ttyd2 -n jmaxMidi
+#
+#   MIDI is not yet supported on O2 (o2r5k and o2r10k)
 #
 
+if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
-global jmaxArch jmaxMidiPort
-
-if {$jmaxArch == "mips1" || $jmaxArch == "irix5.3" || $jmaxArch == "origin"} {
     puts "jMax default MIDI configuration"
     puts "(make sure that you lauched the MIDI deamon using the startmidi command)"
     puts "  port: $jmaxMidiPort"
     ucs open device midi 0 as sgi_midi port $jmaxMidiPort
+
 } elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
+
     puts "(MIDI not configured)"
+
 }
 
-# shell commands for startmidi
 
-# origin
-#   serial port 1: startmidi -d /dev/tty4d1 -s 31250 -n FTSmidi
-#   serial port 2: startmidi -d /dev/tty4d2 -s 31250 -n FTSmidi
-
-# mips1, irix5.3 and irix 6.2
-#   serial port 1: startmidi -d /dev/ttyd1 -n FTSmidi
-#   serial port 2: startmidi -d /dev/ttyd2 -n FTSmidi
-
-# MIDI is not yet supported on O2 (o2r5k and o2r10k)
