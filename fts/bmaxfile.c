@@ -419,6 +419,8 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
     {
       fts_symbol_t class_name = fts_get_symbol(at);
       fts_atom_t *a = alloca(ac * sizeof(fts_atom_t));
+      int persistence = 0;
+      fts_object_t *obj;
       int i;
 
       /* scan for "{", "}" and "=" */
@@ -430,8 +432,18 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	    fts_set_symbol(a + i, fts_s_closed_par);
 	  else if(i > 0 && fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_equal)
 	    {
-	      a[i] = at[i - 1];
-	      fts_set_symbol(a + i - 1, fts_s_comma);
+	      if(fts_is_symbol(at + i - 1) && fts_get_symbol(at + i - 1) == fts_s_keep)
+		{
+		  ac = i - 1;
+		  persistence = 1;
+		  
+		  break;
+		}
+	      else
+		{
+		  a[i] = at[i - 1];
+		  fts_set_symbol(a + i - 1, fts_s_comma);
+		}
 	    }
 	  else
 	    a[i] = at[i];
@@ -439,12 +451,10 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 
       if(class_name == fts_s_jpatcher)
 	{
-	  fts_object_t *obj = fts_eval_object_description(patcher, 1, a);
+	  obj = fts_eval_object_description(patcher, 1, a);
 	  
 	  if(ac > 1)
 	    fts_send_message(obj, fts_s_set_arguments, ac - 1, a + 1);
-
-	  return obj;
 	}
       else if(class_name == fts_s_comment)
 	{
@@ -456,22 +466,33 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  obj = fts_eval_object_description(patcher, 1, &s);
 	  
 	  if(ac > 1)
-	    fts_send_message(obj, fts_s_comment, ac - 1, a + 1);
+	    fts_send_message(obj, fts_s_set_from_array, ac - 1, a + 1);
 
 	  return obj;
 	}
       else if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon)
 	{
 	  /* fix bmax 1 variable definition */
-	  fts_object_t *obj = fts_eval_object_description(patcher, ac - 2, a + 2);
+	  obj = fts_eval_object_description(patcher, ac - 2, a + 2);
 
 	  fts_send_message(obj, fts_s_name, 1, a);
-
-	  return obj;
 	}
-    }
+      else
+	obj = fts_eval_object_description( patcher, ac, at);
+
+      if(persistence != 0)
+	{
+	  fts_atom_t a;
+	  
+	  fts_set_int(&a, 1);
+	  fts_send_message(obj, fts_s_persistence, 1, &a);
+	}
+      
+      return obj;
+   }
 
   return fts_eval_object_description( patcher, ac, at);
+
 }
 
 static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_descr_t *descr, int ac, const fts_atom_t *at)

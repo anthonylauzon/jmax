@@ -83,13 +83,8 @@ comment_set_text_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   fts_memorystream_reset(stream);
   fts_spost_object_description_args( (fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
   fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-  fts_set_string(&a, fts_memorystream_get_bytes(stream));
-      fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, &a);
-      
-      fts_patcher_set_dirty(this, 1);
-    }
-  
-  this->text = fts_get_symbol(at);
+
+  this->text = fts_new_symbol(fts_memorystream_get_bytes( stream));
 }
 
 static void
