@@ -26,6 +26,7 @@
 JMAXDISTDIR= ../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libmacosx.so
+MORESOLIBS=-framework CoreAudio
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package
 
