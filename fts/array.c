@@ -99,16 +99,35 @@ fts_array_set(fts_array_t *array, int ac, const fts_atom_t *at)
     fts_atom_assign(array->atoms + i, at + i);
 }
 
+void
+fts_array_insert(fts_array_t *array, int index, int ac, const fts_atom_t *at)
+{
+  int size = array->size;
+  int i;
+
+  if(index > size)
+    index = size;
+  
+  fts_array_set_size(array, size + ac);
+
+  /* shift elements towards end */
+  for(i=size-1; i>=index; i--)
+    array->atoms[ac + i] = array->atoms[i];
+
+  for(i=0; i<ac; i++)
+    fts_atom_assign(array->atoms + index + i, at + i);
+}
+
+void
+fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
+{
+  fts_array_insert(array, 0, ac, at);
+}
+
 void 
 fts_array_append(fts_array_t *array, int ac, const fts_atom_t *at)
 {
-  int old_size = array->size;
-  int i;
- 
-  fts_array_set_size(array, old_size + ac);
-
-  for(i = 0; i < ac; i++)
-    fts_atom_assign(array->atoms + old_size + i, at + i);
+  fts_array_insert(array, array->size, ac, at);
 }
 
 void 
@@ -138,20 +157,22 @@ fts_array_append_symbol(fts_array_t *array, fts_symbol_t s)
   fts_set_symbol(array->atoms + size, s);
 }
 
-void 
-fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
+void
+fts_array_cut(fts_array_t *array, int index, int n)
 {
-  int old_size = array->size;
+  int size = array->size;
   int i;
- 
-  fts_array_set_size(array, old_size + ac);
 
-  /* shift array towards end */
-  for(i=old_size-1; i>=0; i--)
-    array->atoms[ac + i] = array->atoms[i];
+  if(index + n > size)
+    n = size - index;
 
-  for(i=0; i<ac; i++)
-    fts_atom_assign(array->atoms + i, at + i);
+  if(n < 0)
+    n = 0;
+
+  for(i=0; i<n; i++)
+    fts_atom_assign(array->atoms + index + i, array->atoms + n + index + i);
+  
+  fts_array_set_size(array, size - n);
 }
 
 void 
@@ -167,3 +188,52 @@ fts_array_copy(fts_array_t *org, fts_array_t *copy)
   for(i=0; i<size; i++)
     fts_atom_assign(copy->atoms + i, org->atoms + i);
 }
+
+/***********************************************
+ * 
+ *  array iterator
+ *
+ */
+
+typedef struct array_iterator
+{
+  fts_array_t *array;
+  int index;
+} array_iterator_t;
+
+static fts_heap_t *iterator_heap = NULL;
+
+static int
+array_iterator_has_more(fts_iterator_t *iter)
+{
+  array_iterator_t *aiter = (array_iterator_t *)iter->data;
+
+  if(aiter->index >= aiter->array->size)
+    {
+    fts_heap_free(iter->data, iterator_heap);
+    iter->data = NULL;
+    return 0;
+    }
+  else
+    return 1;
+}
+
+static void
+array_iterator_next(fts_iterator_t *iter, fts_atom_t *a)
+{
+  array_iterator_t *aiter = (array_iterator_t *)iter->data;
+
+  *a = aiter->array->atoms[aiter->index++];
+}
+
+void
+fts_array_get_values(fts_array_t *array, fts_iterator_t *iter)
+{
+  if(iterator_heap == NULL)
+    iterator_heap = fts_heap_new(sizeof(array_iterator_t));
+
+  iter->has_more = array_iterator_has_more;
+  iter->next = array_iterator_next;
+  iter->data = (array_iterator_t *)fts_heap_alloc(iterator_heap);
+}
+

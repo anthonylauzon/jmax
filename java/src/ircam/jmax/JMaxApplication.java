@@ -578,7 +578,7 @@ public class JMaxApplication {
 
 	FtsProcess fts = null;
 
-	if (o != null && ((String)o).equals( "true"))
+        if (o != null && ((String)o).equals( "true"))
 	  {
 	    System.out.println( "Attaching to FTS on host " + hostName);
 	    killFtsOnQuit = false;

@@ -46,9 +46,9 @@
 
 typedef struct _rawmidiport_
 {
+  fts_midiport_t port;
   fts_midiparser_t parser; /* parser is a MIDI port */
   fts_bytestream_t *stream;
-
 } rawmidiport_t;
 
 /************************************************************
@@ -60,11 +60,23 @@ typedef struct _rawmidiport_
 static void
 rawmidiport_input(fts_object_t *o, int n, const unsigned char *c)
 {
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
+  rawmidiport_t *this = (rawmidiport_t *)o;
   int i;
   
   for(i=0; i<n; i++)
-    fts_midiparser_byte(parser, c[i]);
+    {
+      fts_midievent_t *event = fts_midiparser_byte(&this->parser, c[i]);
+  
+      if(event != NULL)
+        {
+          fts_atom_t a;
+  
+          fts_set_object(&a, event);
+          fts_object_refer(event);
+          fts_midiport_input(o, 0, 0, 1, &a);
+          fts_object_release(event);
+        }
+    }
 }
 
 /************************************************************
@@ -155,17 +167,18 @@ rawmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_midiparser_t *parser = (fts_midiparser_t *)o;
 
   this->stream = (fts_bytestream_t *)fts_get_object(at + 1);
-  
-  fts_midiparser_init(parser);
+
+  fts_midiport_init(&this->port);
+  fts_midiparser_init(&this->parser);
 
   if(fts_bytestream_is_input(this->stream))
     {
-      fts_midiport_set_input((fts_midiport_t *)parser);
+      fts_midiport_set_input(&this->port);
       fts_bytestream_add_listener(this->stream, o, rawmidiport_input);
     }
 
   if(fts_bytestream_is_output(this->stream))
-    fts_midiport_set_output((fts_midiport_t *)parser, rawmidiport_output);
+    fts_midiport_set_output(&this->port, rawmidiport_output);
 }
 
 static void 
@@ -177,6 +190,7 @@ rawmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_bytestream_remove_listener(this->stream, o);
 
   fts_midiparser_reset(&this->parser);
+  fts_midiport_reset(&this->port);
 }
 
 static int 

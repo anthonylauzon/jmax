@@ -44,94 +44,116 @@ typedef struct _midiin_
  */
 
 static void
-midiin_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+midiin_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(listener, 0, (fts_object_t *)event);
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+  
+  fts_outlet_object(o, 0, (fts_object_t *)event);
 }
 
 static void
-note_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+note_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 2, fts_midievent_channel_message_get_channel(event) + 1);
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_second(event));
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+  
+  fts_outlet_int(o, 2, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_second(event));
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-note_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+note_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_second(event));
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+  
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_second(event));
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-note_channel_number_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+note_channel_number_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midiin_t *this = (midiin_t *)listener;
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event) + 1);
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event) + 1);
 }
 
 static void
-poly_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+poly_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 2, fts_midievent_channel_message_get_channel(event) + 1);
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_first(event));
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 2, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_first(event));
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-poly_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+poly_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_first(event));
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_first(event));
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-poly_channel_number_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+poly_channel_number_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midiin_t *this = (midiin_t *)listener;
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-value_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+value_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-value_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+value_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-bend_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+bend_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-bend_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+bend_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-xbend_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+xbend_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
 }
 
 static void
-xbend_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+xbend_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
+
+  fts_outlet_int(o, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
 }
 
 /************************************************************

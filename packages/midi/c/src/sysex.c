@@ -37,11 +37,11 @@ typedef struct _sysex_
  */
 
 static void
-sysexin_callback(fts_object_t *o, fts_midievent_t *event, double time)
+sysexin_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sysex_t *this = (sysex_t *)o;
+  fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
-  fts_outlet_send(o, 0, fts_s_list, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
+  fts_outlet_atoms(o, 0, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
 }
 
 static void
@@ -116,16 +116,7 @@ sysexout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_midievent_t *event;
       int i;
       
-      event = fts_midievent_system_exclusive_new();
-
-      for(i=0; i<ac; i++)
-	{
-	  if(fts_is_number(at + i))
-	    fts_midievent_system_exclusive_append(event, fts_get_number_int(at + i));
-	  else
-	    fts_midievent_system_exclusive_append(event, 0);
-	}
-
+      event = fts_midievent_system_exclusive_new(ac, at);
       fts_midiport_output(this->port, event, 0.0);
     }
 }
@@ -139,8 +130,7 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   at++;
 
   this->port = 0;
-
-  if(ac > 0)
+   if(ac > 0)
     {
       if(fts_is_object(at))
 	{
@@ -148,7 +138,6 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj))
 	    this->port = (fts_midiport_t *)fts_get_object(at);
-	  
 	}
       
       if(!this->port)

@@ -230,7 +230,7 @@ midifile_system_exclusive_start(fts_midifile_t *file)
   if(sysex_event)
     fts_object_release(sysex_event);
 
-  sysex_event = fts_midievent_system_exclusive_new();
+  sysex_event = fts_midievent_system_exclusive_new(0, 0);
   fts_object_refer(sysex_event);
 
   file->system_exclusive = sysex_event;

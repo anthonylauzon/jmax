@@ -128,8 +128,6 @@ FTS_API void fts_array_append_int( fts_array_t *array, int i);
 FTS_API void fts_array_append_float( fts_array_t *array, float f);
 FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 
-FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
-
 /**
  * Prepend elements at the beginning of the array
  * 
@@ -140,6 +138,40 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
  * @ingroup array
  */
 FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at);
+
+/**
+ * Insert elements at given index of the array
+ *
+ * @fn void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at)
+ * @param array the array
+ * @param index the index
+ * @param ac the atoms count
+ * @param at atoms to append
+ * @ingroup array
+ */
+FTS_API void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at);
+
+/**
+ * Cut given numer of elements from given index of the array
+ *
+ * @fn void fts_array_cut( fts_array_t *array, int index, int n)
+ * @param array the array
+ * @param index the index
+ * @param n the atoms count
+ * @ingroup array
+ */
+FTS_API void fts_array_cut( fts_array_t *array, int index, int n);
+
+/**
+ * Copy array
+ *
+ * @fn void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at)
+ * @param org the source
+ * @param copy the destination of the copy
+ * @ingroup array
+ */
+FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
+
 /**
  * Get the content of an array
  * 
@@ -170,4 +202,8 @@ FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at
  * @ingroup array
  */
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
+
+/* init array iterator */
+FTS_API void fts_array_get_values(fts_array_t *array, fts_iterator_t *iter);
+
 

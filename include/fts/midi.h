@@ -257,7 +257,7 @@ FTS_API fts_midievent_t *fts_midievent_pitch_bend_new(int channel, int LSB, int 
 #define fts_midievent_system_exclusive_get_size(e) (fts_array_get_size(&(e)->data.system_exclusive))
 #define fts_midievent_system_exclusive_get_atoms(e) (fts_array_get_atoms(&(e)->data.system_exclusive))
 
-FTS_API fts_midievent_t *fts_midievent_system_exclusive_new(void);
+FTS_API fts_midievent_t *fts_midievent_system_exclusive_new(int ac, const fts_atom_t *at);
 FTS_API void fts_midievent_system_exclusive_append(fts_midievent_t *event, int byte);
 
 /* time code events */
@@ -340,15 +340,7 @@ FTS_API fts_symbol_t fts_s_midievent;
  * @defgroup midiport MIDI port
  */
 
-/**
- * Function called for incomming MIDI events for registered listeners
- *
- * @typedef void (*fts_midiport_function_t)(fts_object_t *o, fts_midievent_t *event, double time)
- *
- * @ingroup midiport
- */
-
-typedef void (*fts_midiport_function_t)(fts_object_t *o, fts_midievent_t *event, double time);
+typedef void (*fts_midiport_output_t)(fts_object_t *o, fts_midievent_t *event, double time);
 
 /** 
  * @name The FTS MIDI port structure
@@ -378,7 +370,7 @@ typedef void (*fts_midiport_function_t)(fts_object_t *o, fts_midievent_t *event,
  */
 typedef struct fts_midiport_listener
 {
-  fts_midiport_function_t callback;
+  fts_method_t callback;
   fts_object_t *listener;
   struct fts_midiport_listener *next;
 } fts_midiport_listener_t;
@@ -391,10 +383,11 @@ typedef struct fts_midiport
   fts_midiport_listener_t **listeners[n_midi_types + 1];
   
   /* output function (declared by MIDI port class) */
-  fts_midiport_function_t output;
+  fts_midiport_output_t output;
   
 } fts_midiport_t;
 
+FTS_API fts_metaclass_t *fts_midiport_type;
 
 /*@}*/ /* The FTS MIDI port structure */
 
@@ -404,15 +397,6 @@ typedef struct fts_midiport
  * Initialization of classes and objects implementing a MIDI port.
  */
 /*@{*/ /* Initializing a MIDI port */
-
-/**
- * Initialize a class implementing an FTS MIDI port.
- *
- * @fn void fts_midiport_class_init(fts_class_t *cl)
- * @param cl FTS class
- *
- * @ingroup midiport
- */
 
 /**
  * Initialize a MIDI port structure.
@@ -449,7 +433,7 @@ FTS_API void fts_midiport_reset(fts_midiport_t *port);
 /**
  * Declare an initialized MIDI port as output and assign it's output functions.
  *
- * @fn void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_function_t *function)
+ * @fn void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t *function)
  * @param port the MIDI port
  * @param the implemented output function
  *
@@ -457,7 +441,7 @@ FTS_API void fts_midiport_reset(fts_midiport_t *port);
  */
 
 FTS_API void fts_midiport_set_input(fts_midiport_t *port);
-FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_function_t function);
+FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t function);
 
 /*@}*/ /* Initializing a MIDI port */
 
@@ -474,7 +458,7 @@ FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_function
  * For each incoming MIDI event a function is called by the object implementing an MIDI port, which calls all
  * listeners for a given MIDI channel and (if any) note or controller number.
  *
- * @fn void fts_midiport_input(fts_midiport_t *port, fts_midievent_t *event, double time)
+ * @fn void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
  * @param port the MIDI port itself
  * @param event the incoming event
  * @param time an offset time of the incoming MIDI event (in msec) regarding the current logical (tick) time
@@ -482,7 +466,7 @@ FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_function
  * @ingroup midiport
  */
 
-FTS_API void fts_midiport_input(fts_midiport_t *port, fts_midievent_t *event, double time);
+FTS_API void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /*@}*/ /* Handling incoming MIDI events */
 
@@ -527,6 +511,15 @@ FTS_API void fts_midiport_input(fts_midiport_t *port, fts_midievent_t *event, do
  */
 
 /**
+* Initialize a class implementing an FTS MIDI port.
+ *
+ * @fn void fts_midiport_class_init(fts_class_t *cl)
+ * @param cl FTS class
+ *
+ * @ingroup midiport
+ */
+
+/**
  * Check whether an FTS MIDI port is an input
  *
  * @fn int fts_midiport_is_input(fts_midiport_t *port)
@@ -568,7 +561,7 @@ FTS_API int fts_midiport_is_output(fts_midiport_t *port);
  * In order to receive incoming MIDI messages of a certain type and channel from a MIDI port, 
  * an FTS object registeres itself as a listener to the MIDI port using this function.
  *
- * @fn void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj, fts_midiport_function_t fun)
+ * @fn void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj, fts_method_t fun)
  * @param port the listened MIDI port
  * @param type type of midi event
  * @param id the listened MIDI channel (1..16, midi_channel_any for omni) or system event type
@@ -594,7 +587,7 @@ FTS_API int fts_midiport_is_output(fts_midiport_t *port);
  * @ingroup midiport_io
  */
 
-FTS_API void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int chan, int num, fts_object_t *obj, fts_midiport_function_t fun);
+FTS_API void fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int chan, int num, fts_object_t *obj, fts_method_t fun);
 FTS_API void fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int chan, int num, fts_object_t *obj);
 
 /**
@@ -625,7 +618,7 @@ FTS_API void fts_midiport_set_default_class( fts_symbol_t name);
  */
 typedef struct _fts_midiparser_
 {
-  fts_midiport_t port;
+  fts_midievent_t *event;
 
   enum midiparser_status 
   {
@@ -646,10 +639,10 @@ typedef struct _fts_midiparser_
     midiparser_status_song_position_pointer,
     midiparser_status_song_select
   } status;
-  
+
   int channel;	
   int store;
-  fts_midievent_t *system_exclusive;
+  fts_array_t system_exclusive;
 
   enum parser_mtc_status
   {
@@ -667,7 +660,57 @@ typedef struct _fts_midiparser_
 
 } fts_midiparser_t;
 
+#define fts_midiparser_set_event(p, e) fts_object_refer((p)->event = (e))
+#define fts_midiparser_set_time(p, t) ((p)->time = (t))
+
 FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_reset(fts_midiparser_t *parser);
-FTS_API void fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
+FTS_API fts_midievent_t *fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
 
+/*****************************************************
+ *
+ *  MIDI Manager
+ *
+ */
+FTS_API fts_symbol_t fts_s_sources;
+FTS_API fts_symbol_t fts_s_destinations;
+
+typedef struct fts_midilabel
+{
+  fts_symbol_t name;
+  fts_midiport_t *input;
+  fts_midiport_t *output;
+  struct fts_midilabel *next;
+} fts_midilabel_t;
+
+#define fts_midilabel_get_name(l) ((l)->name)
+#define fts_midilabel_get_input(l) ((l)->input)
+#define fts_midilabel_get_output(l) ((l)->output)
+#define fts_midilabel_get_next(l) ((l)->next)
+
+typedef struct fts_midimanager
+{
+  fts_object_t o;
+  fts_midilabel_t *labels;
+  int n_labels;
+} fts_midimanager_t;
+
+#define fts_midimanager_get_labels(m) ((m)->labels)
+#define fts_midimanager_get_n_labels(m) ((m)->n_labels)
+
+FTS_API void fts_midimanager_set(fts_midimanager_t *mm);
+FTS_API fts_midimanager_t *fts_midimanager_get(void);
+
+/* MIDI manager API */
+FTS_API void fts_midimanager_insert_label_at_index(fts_midimanager_t *mm, int index, fts_symbol_t name);
+FTS_API void fts_midimanager_remove_label_at_index(fts_midimanager_t *mm, int index);
+FTS_API fts_midilabel_t *fts_midimanager_get_label_by_index(fts_midimanager_t *mm, int index);
+FTS_API fts_midilabel_t *fts_midimanager_get_label_by_name(fts_midimanager_t *mm, fts_symbol_t name);
+
+FTS_API void fts_midilabel_set_input(fts_midilabel_t *label, fts_midiport_t *port);
+FTS_API void fts_midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port);
+FTS_API void fts_midilabel_set_internal(fts_midilabel_t *label);
+
+/* midi objects API */
+FTS_API fts_midiport_t *fts_midimanager_get_input(fts_midimanager_t *mm, fts_symbol_t name);
+FTS_API fts_midiport_t *fts_midimanager_get_output(fts_midimanager_t *mm, fts_symbol_t name);
