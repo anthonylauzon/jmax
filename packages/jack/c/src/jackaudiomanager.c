@@ -721,7 +721,7 @@ jackaudiomanager_scan_ports(fts_hashtable_t* ht, int flags)
 			 flags);
 
   i = 0;
-  while(NULL != ports[i])
+  while(ports && (NULL != ports[i]))
   {
     fts_atom_t k,a;
     cur_sym = fts_new_symbol(ports[i]);
