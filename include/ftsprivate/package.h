@@ -159,11 +159,13 @@ void fts_package_set_error(fts_package_t* pkg, const char* s);
 /**
  * Tell this package it depends on an other package. 
  *
- * @fn void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
+ * @fn int fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
  * @param pkg the package
  * @param required_pkg the name of the required package
- * @ingroup package */
-void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg);
+ * @return 0 if package is found or -1 if an error occured.
+ * @ingroup package 
+ */
+int fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg);
 
 /**
  * Adds a new path to the template path.
