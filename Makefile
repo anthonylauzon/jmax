@@ -131,8 +131,11 @@ cvs-tag: spec-files
 		echo "Not sync with cvs (do an update or commit)" ; \
 		exit 1 ; \
 	fi
-	echo "Tagging with tag" V`sed 's/\./_/g' VERSION`
-	cvs tag -F V`sed 's/\./_/g' VERSION`
+	( \
+		TTT=V`sed 's/\./_/g' VERSION` ; \
+		echo "Tagging with tag $$TTT" ; \
+		cvs tag -F $$TTT ; \
+	)
 .PHONY: cvs-tag
 
 #
@@ -153,15 +156,31 @@ dist:
 		umask 22 ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
-		TAG=V`echo $(VERSION) | sed 's/\./_/g'` ; \
-		cvs export -r$$TAG jmax ; \
+		VVV=`cat VERSION` ; \
+		TTT=V`sed 's/\./_/g' VERSION` ; \
+		cvs export -r$$TTT jmax ; \
+		mv jmax jmax-$$VVV ; \
+		tar cvf - jmax-$$VVV | gzip -c --best > ../../jmax-$$VVV-src.tar.gz ; \
+		chmod 644 ../../jmax-$$VVV-src.tar.gz ; \
+		cd .. ; \
+		/bin/rm -rf .$$$$ ; \
+	)
+.PHONY: dist
+
+old-dist:
+	( \
+		umask 22 ; \
+		mkdir .$$$$ ; \
+		cd .$$$$ ; \
+		TTT=V`echo $(VERSION) | sed 's/\./_/g'` ; \
+		cvs export -r$$TTT jmax ; \
 		mv jmax jmax-$(VERSION) ; \
 		tar cvf - jmax-$(VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
 		chmod 644 ../../jmax-$(VERSION)-src.tar.gz ; \
 		cd .. ; \
 		/bin/rm -rf .$$$$ ; \
 	)
-.PHONY: dist
+.PHONY: old-dist
 
 
 #
