@@ -126,17 +126,17 @@ char *fts_make_absolute_path(const char* parent, const char* file, char* buf, in
   char path[MAXPATHLEN];
 
   if (!fts_path_is_absolute(file))
+  {
+    if (parent != NULL)
+      snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
+    else 
     {
-      if (parent != NULL)
-	snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
-      else 
-	{
-	  char cwd[MAXPATHLEN];
+      char cwd[MAXPATHLEN];
 
-	  getcwd( cwd, MAXPATHLEN);
-	  snprintf( path, len, "%s%c%s", cwd, fts_file_separator, file);      
-	}
-    } 
+      getcwd( cwd, MAXPATHLEN);
+      snprintf( path, len, "%s%c%s", cwd, fts_file_separator, file);      
+    }
+  } 
   else
     snprintf( path, len, "%s", file);
 
@@ -160,7 +160,7 @@ char *fts_make_absolute_path(const char* parent, const char* file, char* buf, in
  *    root/filename           (root!=null, path==null)
  *    path/filename           (root==null, path!=null)
  *    filename                (root==null, path==null)
-*/        
+ */        
 static int 
 fts_find_file_aux(const char* root, const char* path, const char* filename, char* buf, int len)
 {
@@ -209,6 +209,54 @@ int fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filen
   return 0;
 }
 
+
+int fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filename, char *buf, int len)
+{
+  fts_list_t* path_list = NULL;
+  const char* start;
+  const char* end;
+  char* buffer;
+  fts_atom_t a;
+  fts_symbol_t buff_symbol;
+  int status;
+
+  /* split env into path list */
+  if (env)
+  {
+    start = env;
+    while (*start != '\0')
+    {
+      end = start;
+      while (*end != ':' && *end != '\0')
+      {
+	end++;
+      }
+      if (end > start)
+      {
+	buffer = fts_malloc(end - start + 1);
+	strncpy(buffer, start, end - start);	
+	buff_symbol = fts_new_symbol(buffer);
+	fts_set_symbol(&a, buff_symbol);
+	path_list = fts_list_append(path_list, &a);
+	fts_free(buffer);
+      }
+      
+      start = end;
+      if (*start == ':')
+      {
+	start++;
+      }
+    }
+  }
+  status = fts_file_find_in_path(root, path_list, filename, buf, len);
+  if (NULL != path_list)
+  {
+    fts_list_delete(path_list);
+  }
+  return status;
+}
+
+
 char *fts_file_find( const char *filename, char *buf, int len)
 {
   fts_package_t *pkg;
@@ -223,17 +271,24 @@ char *fts_file_find( const char *filename, char *buf, int len)
   fts_package_get_required_packages( pkg, &pkg_iter);
 
   while ( fts_iterator_has_more( &pkg_iter)) 
-    {
-      fts_iterator_next( &pkg_iter, &pkg_name);
-      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+  {
+    fts_iterator_next( &pkg_iter, &pkg_name);
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
       
-      if (pkg == NULL)
-	continue;
+    if (pkg == NULL)
+      continue;
       
-      if (fts_package_get_data_file( pkg, filename, buf, len))
-	return buf;
-    }
+    if (fts_package_get_data_file( pkg, filename, buf, len))
+      return buf;
+  }
 
   return NULL;
 }
 
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
