@@ -47,12 +47,15 @@
 static fts_heap_t *template_heap;
 
 static fts_hashtable_t template_file_to_load;
+static fts_hashtable_t template_file_loaded;
 
 static void fts_template_recompute_instances(fts_template_t *template);
 
 fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
   fts_template_t *template;
+  fts_atom_t key;
+  fts_atom_t value;
 
   template = (fts_template_t *) fts_heap_alloc(template_heap);
 
@@ -61,6 +64,11 @@ fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_s
   template->original_filename = original_filename;
   template->instances = 0;
   template->package = 0;
+
+  /* add the new template in hashtable */
+  fts_set_symbol(&key, filename);
+  fts_set_pointer(&value, template);
+  fts_hashtable_put(&template_file_loaded, &key, &value);
 
   return template;
 }
@@ -154,24 +162,28 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
 void 
 fts_template_file_modified(fts_symbol_t filename)
 {
-  fts_package_t* pkg;
-  fts_atom_t pkg_atom;
-  fts_iterator_t pkg_iter;
-  char buf[MAXPATHLEN];
-  fts_template_t *template;
-
-  fts_get_packages( &pkg_iter);
+  fts_atom_t key;
+  fts_atom_t value;
+  fts_template_t* template;
   
-  while ( fts_iterator_has_more( &pkg_iter))
+  fts_set_symbol(&key, filename);
+  /* look into hashtable to know if this file is associated to a template */
+  if (1 == fts_hashtable_get(&template_file_loaded, &key, &value))
+  {
+    /* get template poijter and recompute instances */
+    template = fts_get_pointer(&value);
+    if (template)
     {
-      fts_iterator_next( &pkg_iter, &pkg_atom);
-      pkg = fts_get_pointer(&pkg_atom);
-
-      template = fts_package_get_template_from_file(pkg, filename);
-
-      if (template)
-	fts_template_recompute_instances(template);
+      /* template can't be null here but it could be better to check */
+      fts_template_recompute_instances(template);
     }
+    else
+    {
+      /* if we are here it's really bad news ..... */
+      fts_log("[template] a null template is associated with file %s\n",filename);
+      fts_post("[template] a null template is associated with file %s\n",filename);
+    }
+  }
 }
 
 
@@ -185,6 +197,7 @@ void fts_kernel_template_init()
 {
   template_heap = fts_heap_new(sizeof(fts_template_t));
   fts_hashtable_init(&template_file_to_load, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&template_file_loaded, FTS_HASHTABLE_MEDIUM);
 }
 
 
