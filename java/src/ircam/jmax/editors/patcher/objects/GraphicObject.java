@@ -423,7 +423,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
       fontName = itsSketchPad.getDefaultFontName();
     if( fontSize <= 0)
       fontSize = itsSketchPad.getDefaultFontSize();
-    if( ( fontStyle != Font.PLAIN) && ( fontStyle != Font.ITALIC) && ( fontStyle != Font.BOLD))
+    if( ( fontStyle != Font.PLAIN) && ( fontStyle != Font.ITALIC) && 
+	( fontStyle != Font.BOLD) && (fontStyle != (Font.BOLD + Font.ITALIC)))
       fontStyle = itsSketchPad.getDefaultFontStyle();
 
     setCurrentFont( FontCache.lookupFont( fontName, fontSize, fontStyle));
