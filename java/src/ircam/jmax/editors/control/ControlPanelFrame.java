@@ -74,9 +74,9 @@ public class ControlPanelFrame extends JFrame
     panel.add(invalidFpeIndicator);
     new DspControlAdapter("invalidFpe", control, invalidFpeIndicator);
 
-    inexactFpeIndicator = new IndicatorWithMemory("Inexact Operand");
-    panel.add(inexactFpeIndicator);
-    new DspControlAdapter("inexactFpe", control, inexactFpeIndicator);
+//     inexactFpeIndicator = new IndicatorWithMemory("Inexact Operand");
+//     panel.add(inexactFpeIndicator);
+//     new DspControlAdapter("inexactFpe", control, inexactFpeIndicator);
 
     divideByZeroFpeIndicator = new IndicatorWithMemory("Division By Zero");
     panel.add(divideByZeroFpeIndicator);
