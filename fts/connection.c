@@ -49,7 +49,7 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
           fts_class_get_method_varargs(fts_object_get_class(dst), fts_s_propagate_input) == NULL)
   {
     /* pur signal outlet connects to signal inlet or thru object (implements fts_s_propagate_input) only */
-    return (fts_class_get_inlet_method(fts_object_get_class(dst), winlet, fts_dsp_signal_class, &varargs) != NULL);
+    return (fts_class_get_inlet_method(fts_object_get_class(dst), winlet, fts_dsp_signal_class, &varargs) != NULL && varargs == 0);
   }
   else
   {

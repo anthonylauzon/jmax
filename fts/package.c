@@ -1236,8 +1236,6 @@ fts_package_upload_requires( fts_package_t *this)
   fts_atom_t a[1]; 
   fts_iterator_t i;
 
-  fts_log("[package]: upload requires (id %d)\n", fts_object_get_id((fts_object_t *)this));
-  
   fts_list_get_values( this->packages, &i);
   fts_client_start_message( (fts_object_t *)this, fts_s_require);
   while (fts_iterator_has_more( &i))
@@ -1324,8 +1322,6 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_package_t *this = (fts_package_t *)o;
   fts_atom_t a[3]; 
   char summary[256];
-
-  fts_log("[package]: upload\n");
 
   if( this->state == fts_package_corrupt)
     return;

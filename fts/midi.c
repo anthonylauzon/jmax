@@ -2204,10 +2204,3 @@ fts_midi_config(void)
   midinull = (fts_midiport_t *)fts_object_create(midinull_type, NULL, 0, 0);
   fts_object_refer((fts_object_t *)midinull);
 }
-
-/** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */
