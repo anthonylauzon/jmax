@@ -35,6 +35,7 @@
 #include <unistd.h>
 #endif
 
+#include <ftsprivate/sched.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
@@ -51,10 +52,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "ftsprivate/connection.h"
-#include "ftsprivate/patcher.h"
-#include "ftsprivate/client.h"
-#include "ftsprivate/protocol.h"
+#include <ftsprivate/connection.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/client.h>
+#include <ftsprivate/protocol.h>
 
 fts_class_t *fts_client_class;
 

@@ -30,6 +30,7 @@
 #include <alloca.h>
 #endif
 
+#include <ftsprivate/sched.h>
 #include <ftsprivate/audio.h>
 #include <ftsprivate/dsp.h>
 #include <ftsprivate/bmaxfile.h>

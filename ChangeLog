@@ -1,3 +1,8 @@
+2003-06-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/audio.c, fts/client.c, fts/main.c, fts/sched.c, include/fts/sched.h, include/ftsprivate/sched.h:
+	moved non public scheduler function (fts_sched_run, fts_sched_halt, fts_sleep) declaration to non public header.
+
 2003-06-16  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/parser.y: fixed first syntax incompatibility with jMax 2.5, i.e. the fact that you cannot pass a + (or any other operator) as argument to an object. As it introduces an incompatibilty with jMax 4.0.x, the version number is moved to 4.1.0.

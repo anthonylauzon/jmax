@@ -21,6 +21,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/sched.h>
 
 #ifdef WIN32
 

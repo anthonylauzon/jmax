@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <ftsprivate/sched.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
