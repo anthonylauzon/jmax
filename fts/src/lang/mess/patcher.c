@@ -227,7 +227,9 @@ static void inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
   fts_inlet_remove_from_patcher(this, patcher);
-  fts_patcher_trim_number_of_inlets(patcher);
+
+  if (! patcher->deleted)
+    fts_patcher_trim_number_of_inlets(patcher);
 }
 
 
@@ -437,7 +439,9 @@ outlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
   fts_outlet_remove_from_patcher(this, patcher);
-  fts_patcher_trim_number_of_outlets(patcher);
+
+  if (! patcher->deleted)
+    fts_patcher_trim_number_of_outlets(patcher);
 }
 
 
@@ -731,7 +735,7 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   this->objects = (fts_object_t *) 0;
   this->open    = 0;		/* start as closed */
-  
+  this->deleted = 0;
 }
 
 /* Contained objects are deleted in the reverse order (last first);
@@ -763,6 +767,11 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (fts_patcher_is_template(this))
     fts_template_remove_instance(this->template, (fts_object_t *) this);
+
+  /* Set the deleted and reset the open flag */
+
+  this->deleted = 1;
+  this->open    = 0;
 
   /*
    * delete its content; each destroied object will take away himself

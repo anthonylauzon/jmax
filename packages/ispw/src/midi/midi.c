@@ -226,12 +226,12 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_PROGRAM_CHANGE_CH(x->chanout), pgmin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_PROGRAM_CHANGE_CH(x->chanout), pgmin_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_PROGRAM_CHANGE, pgmin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_PROGRAM_CHANGE, pgmin_midi_action, (void *)x);
     }
 }
 
@@ -241,9 +241,9 @@ pgmin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   pgmin_t *x = (pgmin_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_PROGRAM_CHANGE_CH(x->chanout), pgmin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_PROGRAM_CHANGE_CH(x->chanout), pgmin_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_PROGRAM_CHANGE, pgmin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_PROGRAM_CHANGE, pgmin_midi_action, (void *)x);
 }
 
 
@@ -413,12 +413,12 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_PITCH_BEND_CH(x->chanout), bendin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_PITCH_BEND_CH(x->chanout), bendin_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_PITCH_BEND, bendin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_PITCH_BEND, bendin_midi_action, (void *)x);
     }
 }
 
@@ -429,9 +429,9 @@ bendin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   bendin_t *x = (bendin_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_PITCH_BEND_CH(x->chanout), bendin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_PITCH_BEND_CH(x->chanout), bendin_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_PITCH_BEND, bendin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_PITCH_BEND, bendin_midi_action, (void *)x);
 }
 
 static fts_status_t
@@ -597,12 +597,12 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_CHANNEL_AFTERTOUCH_CH(x->chanout), touchin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_CHANNEL_AFTERTOUCH_CH(x->chanout), touchin_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_CHANNEL_AFTERTOUCH, touchin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_CHANNEL_AFTERTOUCH, touchin_midi_action, (void *)x);
     }
 }
 
@@ -613,9 +613,9 @@ touchin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   touchin_t *x = (touchin_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_CHANNEL_AFTERTOUCH_CH(x->chanout), touchin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_CHANNEL_AFTERTOUCH_CH(x->chanout), touchin_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_CHANNEL_AFTERTOUCH, touchin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_CHANNEL_AFTERTOUCH, touchin_midi_action, (void *)x);
 }
 
 static fts_status_t
@@ -829,12 +829,12 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_CONTROLLER_CH(x->chanout), ctlin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_CONTROLLER_CH(x->chanout), ctlin_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_CONTROLLER, ctlin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_CONTROLLER, ctlin_midi_action, (void *)x);
     }
 }
 
@@ -844,9 +844,9 @@ ctlin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ctlin_t *x = (ctlin_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_CONTROLLER_CH(x->chanout), ctlin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_CONTROLLER_CH(x->chanout), ctlin_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_CONTROLLER, ctlin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_CONTROLLER, ctlin_midi_action, (void *)x);
 }
 
 
@@ -1047,12 +1047,12 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_NOTE_CH(x->chanout), notein_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_NOTE_CH(x->chanout), notein_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_NOTE, notein_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_NOTE, notein_midi_action, (void *)x);
     }
 }
 
@@ -1062,9 +1062,9 @@ notein_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   notein_t *x = (notein_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_NOTE_CH(x->chanout), notein_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_NOTE_CH(x->chanout), notein_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_NOTE, notein_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_NOTE, notein_midi_action, (void *)x);
 }
 
 
@@ -1281,12 +1281,12 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if (n)
     {
       x->chanout = RANGE_CH(n);
-      fts_midi_install_fun(x->port, MIDI_POLY_AFTERTOUCH_CH(x->chanout), polyin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_POLY_AFTERTOUCH_CH(x->chanout), polyin_midi_action, (void *)x);
     }
   else
     {
       x->chanout = 0;
-      fts_midi_install_fun(x->port, MIDI_POLY_AFTERTOUCH, polyin_midi_action, (void *)x);
+      fts_midi_install_fun(x->port, FTS_MIDI_POLY_AFTERTOUCH, polyin_midi_action, (void *)x);
     }
 }
 
@@ -1296,9 +1296,9 @@ polyin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   polyin_t *x = (polyin_t *)o;
 
   if (x->chanout)
-    fts_midi_deinstall_fun(x->port, MIDI_POLY_AFTERTOUCH_CH(x->chanout), polyin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_POLY_AFTERTOUCH_CH(x->chanout), polyin_midi_action, (void *)x);
   else
-    fts_midi_deinstall_fun(x->port, MIDI_POLY_AFTERTOUCH, polyin_midi_action, (void *)x);
+    fts_midi_deinstall_fun(x->port, FTS_MIDI_POLY_AFTERTOUCH, polyin_midi_action, (void *)x);
 }
 
 
@@ -1435,7 +1435,7 @@ midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   x->port = fts_midi_get_port(idx);
   
-  fts_midi_install_fun(x->port, MIDI_BYTE, midiin_midi_action, (void *)x);
+  fts_midi_install_fun(x->port, FTS_MIDI_BYTE, midiin_midi_action, (void *)x);
 }
 
 
@@ -1444,7 +1444,7 @@ midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   midiin_t *x = (midiin_t *)o;
 
-  fts_midi_deinstall_fun(x->port, MIDI_BYTE, midiin_midi_action, (void *)x);
+  fts_midi_deinstall_fun(x->port, FTS_MIDI_BYTE, midiin_midi_action, (void *)x);
 }
 
 static fts_status_t
@@ -1504,7 +1504,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   x->port = fts_midi_get_port(idx);
   
-  fts_midi_install_fun(x->port, MIDI_SYSEX, sysexin_midi_action, (void *)x);
+  fts_midi_install_fun(x->port, FTS_MIDI_SYSEX, sysexin_midi_action, (void *)x);
 }
 
 
@@ -1513,7 +1513,7 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   sysexin_t *x = (sysexin_t *)o;
 
-  fts_midi_deinstall_fun(x->port, MIDI_SYSEX, sysexin_midi_action, (void *)x);
+  fts_midi_deinstall_fun(x->port, FTS_MIDI_SYSEX, sysexin_midi_action, (void *)x);
 }
 
 static fts_status_t
@@ -1572,7 +1572,7 @@ rtin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   x->port = fts_midi_get_port(idx);
   
-  fts_midi_install_fun(x->port, MIDI_REALTIME, rtin_midi_action, (void *)x);
+  fts_midi_install_fun(x->port, FTS_MIDI_REALTIME, rtin_midi_action, (void *)x);
 }
 
 
@@ -1581,7 +1581,7 @@ rtin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   rtin_t *x = (rtin_t *)o;
 
-  fts_midi_deinstall_fun(x->port, MIDI_REALTIME, rtin_midi_action, (void *)x);
+  fts_midi_deinstall_fun(x->port, FTS_MIDI_REALTIME, rtin_midi_action, (void *)x);
 }
 
 static fts_status_t
@@ -1644,7 +1644,7 @@ mtc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   x->port = fts_midi_get_port(idx);
   
-  fts_midi_install_fun(x->port, MIDI_MTC, mtc_midi_action, (void *)x);
+  fts_midi_install_fun(x->port, FTS_MIDI_MTC, mtc_midi_action, (void *)x);
 }
 
 
@@ -1653,7 +1653,7 @@ mtc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mtc_t *x = (mtc_t *)o;
 
-  fts_midi_deinstall_fun(x->port, MIDI_MTC, mtc_midi_action, (void *)x);
+  fts_midi_deinstall_fun(x->port, FTS_MIDI_MTC, mtc_midi_action, (void *)x);
 }
 
 

@@ -109,7 +109,7 @@ struct _fts_midi_port
 
   /* action support */
 
-  struct midi_closure *action_table[MAX_MIDI_EV+1];
+  struct midi_closure *action_table[MAX_FTS_MIDI_EV+1];
 
   /* parsing status  */
 
@@ -177,12 +177,12 @@ fts_get_midi_time_code_p(int idx)
 static fts_status_t
 fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at)
 {
-  if (ac == 1 && fts_is_long(at))
+  if (ac == 1 && fts_is_int(at))
     {
       fts_midi_port_t *p;
       int idx;
 
-      idx = fts_get_long(at);
+      idx = fts_get_int(at);
       p = fts_midi_get_port(idx);
 
       if (p)
@@ -216,7 +216,7 @@ fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at)
 
 	  /* initialize the action table */
 	  
-	  for (i = 0; i <= MAX_MIDI_EV; i++)
+	  for (i = 0; i <= MAX_FTS_MIDI_EV; i++)
 	    p->action_table[i] = (struct midi_closure *)0;
 
 	  /* if the index is zero, define the mtc clock */
@@ -235,11 +235,11 @@ fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at)
 static fts_dev_t *
 fts_get_midi_logical_dev(int ac, const fts_atom_t *at)
 {
-  if (ac == 1 && fts_is_long(at))
+  if (ac == 1 && fts_is_int(at))
     {
       fts_midi_port_t *p;
 
-      p = fts_midi_get_port(fts_get_long(at));
+      p = fts_midi_get_port(fts_get_int(at));
 
       if (p)
 	return p->dev;
@@ -254,14 +254,14 @@ fts_get_midi_logical_dev(int ac, const fts_atom_t *at)
 static fts_status_t
 fts_unset_midi_logical_dev(int ac, const fts_atom_t *at)
 {
-  if (ac == 1 && fts_is_long(at))
+  if (ac == 1 && fts_is_int(at))
     {
       fts_midi_port_t **p;
       int idx;
 
       /* indirect precursor iteration */
 
-      idx = fts_get_long(at);
+      idx = fts_get_int(at);
 
       p = &port_list;
 
@@ -318,7 +318,7 @@ fts_midi_close_all(void)
 
 /* Installed in the scheduler */
 
-static void fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte);
+static void fts_run_midi_parser(fts_midi_port_t *port, int nextbyte);
 
 static void
 midi_poll(void)
@@ -459,36 +459,36 @@ fts_midi_compute_time_code(fts_midi_port_t *port)
 
   /* Raise the midi action */
 
-  fts_set_long(&av[0], port->mtc_type);
-  fts_set_long(&av[1], port->mtc_hour);
-  fts_set_long(&av[2], port->mtc_min);
-  fts_set_long(&av[3], port->mtc_sec);
-  fts_set_long(&av[4], port->mtc_frame);
-  run_midi_action(port, MIDI_MTC, 5 , av);
+  fts_set_int(&av[0], port->mtc_type);
+  fts_set_int(&av[1], port->mtc_hour);
+  fts_set_int(&av[2], port->mtc_min);
+  fts_set_int(&av[3], port->mtc_sec);
+  fts_set_int(&av[4], port->mtc_frame);
+  run_midi_action(port, FTS_MIDI_MTC, 5 , av);
 }
 
 
 
 static void
-fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)	
+fts_run_midi_parser(fts_midi_port_t *port, int nextbyte)	
 {
   fts_atom_t av[5];
 
   if (nextbyte >= 0xf8)
     {
-      fts_set_long(av, nextbyte);
-      run_midi_action(port, MIDI_REALTIME, 1 , av);
+      fts_set_int(av, nextbyte);
+      run_midi_action(port, FTS_MIDI_REALTIME, 1 , av);
 
       return;
     }
   
-  fts_set_long(&av[0], nextbyte);
-  run_midi_action(port, MIDI_BYTE, 1 , av);
+  fts_set_int(&av[0], nextbyte);
+  run_midi_action(port, FTS_MIDI_BYTE, 1 , av);
 
   if (port->status == midi_mtc_fm)
     {
-      fts_set_long(av, nextbyte);
-      run_midi_action(port, MIDI_SYSEX, 1 , av);
+      fts_set_int(av, nextbyte);
+      run_midi_action(port, FTS_MIDI_SYSEX, 1 , av);
 
       switch (port->mtc_fm_count)
 	{
@@ -519,8 +519,8 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
     }
   else if (port->status == midi_mtc_sysex)
     {
-      fts_set_long(av, nextbyte);
-      run_midi_action(port, MIDI_SYSEX, 1 , av);
+      fts_set_int(av, nextbyte);
+      run_midi_action(port, FTS_MIDI_SYSEX, 1 , av);
 
       if (nextbyte == 0x01)
 	{
@@ -530,16 +530,16 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
     }
   else if (port->status == midi_sysex_system)
     {
-      fts_set_long(av, nextbyte);
-      run_midi_action(port, MIDI_SYSEX, 1 , av);
+      fts_set_int(av, nextbyte);
+      run_midi_action(port, FTS_MIDI_SYSEX, 1 , av);
 
       if (nextbyte == 0x01)
 	port->status = midi_mtc_sysex;
     }
   else if (port->status == midi_sysex)
     {
-      fts_set_long(av, nextbyte);
-      run_midi_action(port, MIDI_SYSEX, 1 , av);
+      fts_set_int(av, nextbyte);
+      run_midi_action(port, FTS_MIDI_SYSEX, 1 , av);
 
       if (nextbyte == 0xf7)
 	port->status = midi_normal;
@@ -603,7 +603,11 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
       if (nextbyte == 0xf1)
 	port->status = midi_mtc_qf;
       else if (nextbyte == 0xf0)
-	port->status = midi_sysex;
+	{
+	  port->status = midi_sysex;
+	  fts_set_int(&av[0], nextbyte);
+	  run_midi_action(port, FTS_MIDI_SYSEX, 1 , av);
+	}
       else if (nextbyte & 0x80)
 	{
 	  port->cmd = (nextbyte >> 4) & 7;
@@ -620,12 +624,12 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	    }
 	  else if (port->argc == 1)
 	    {
-	      fts_set_long(av + 0, port->chan);
-	      fts_set_long(av + 1, port->arg1);
-	      fts_set_long(av + 2, nextbyte);
+	      fts_set_int(av + 0, port->chan);
+	      fts_set_int(av + 1, port->arg1);
+	      fts_set_int(av + 2, nextbyte);
 
-	      run_midi_action(port, MIDI_NOTE, 3 , av);
-	      run_midi_action(port, MIDI_NOTE_CH(port->chan), 3, av);
+	      run_midi_action(port, FTS_MIDI_NOTE, 3 , av);
+	      run_midi_action(port, FTS_MIDI_NOTE_CH(port->chan), 3, av);
 
 	      port->argc = 0;
 	    }
@@ -640,12 +644,12 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	    }
 	  else if (port->argc == 1)
 	    {
-	      fts_set_long(av + 0, port->chan);
-	      fts_set_long(av + 1, port->arg1);
-	      fts_set_long(av + 2, nextbyte);
+	      fts_set_int(av + 0, port->chan);
+	      fts_set_int(av + 1, port->arg1);
+	      fts_set_int(av + 2, nextbyte);
 
-	      run_midi_action(port, MIDI_POLY_AFTERTOUCH, 3 , av);
-	      run_midi_action(port, MIDI_POLY_AFTERTOUCH_CH(port->chan), 3 , av);
+	      run_midi_action(port, FTS_MIDI_POLY_AFTERTOUCH, 3 , av);
+	      run_midi_action(port, FTS_MIDI_POLY_AFTERTOUCH_CH(port->chan), 3 , av);
 
 	      port->argc = 0;
 	    }
@@ -660,12 +664,12 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	    }
 	  else if (port->argc == 1)
 	    {
-	      fts_set_long(av + 0, port->chan);
-	      fts_set_long(av + 1, port->arg1);
-	      fts_set_long(av + 2, nextbyte);
+	      fts_set_int(av + 0, port->chan);
+	      fts_set_int(av + 1, port->arg1);
+	      fts_set_int(av + 2, nextbyte);
 
-	      run_midi_action(port, MIDI_CONTROLLER, 3 , av);
-	      run_midi_action(port, MIDI_CONTROLLER_CH(port->chan), 3 , av);
+	      run_midi_action(port, FTS_MIDI_CONTROLLER, 3 , av);
+	      run_midi_action(port, FTS_MIDI_CONTROLLER_CH(port->chan), 3 , av);
 
 	      port->argc = 0;
 	    }
@@ -679,12 +683,12 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	    }
 	  else if (port->argc == 1)
 	    {
-	      fts_set_long(av + 0, port->chan);
-	      fts_set_long(av + 1, port->arg1);
-	      fts_set_long(av + 2, nextbyte);
+	      fts_set_int(av + 0, port->chan);
+	      fts_set_int(av + 1, port->arg1);
+	      fts_set_int(av + 2, nextbyte);
 
-	      run_midi_action(port, MIDI_PITCH_BEND, 3 , av);
-	      run_midi_action(port, MIDI_PITCH_BEND_CH(port->chan), 3 , av);
+	      run_midi_action(port, FTS_MIDI_PITCH_BEND, 3 , av);
+	      run_midi_action(port, FTS_MIDI_PITCH_BEND_CH(port->chan), 3 , av);
 
 	      port->argc = 0;
 	    }
@@ -694,11 +698,11 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	  {
 	    /* channel aftertouch */
 
-	    fts_set_long(av + 0, port->chan);
-	    fts_set_long(av + 1, nextbyte);
+	    fts_set_int(av + 0, port->chan);
+	    fts_set_int(av + 1, nextbyte);
 
-	    run_midi_action(port, MIDI_CHANNEL_AFTERTOUCH, 2 , av);
-	    run_midi_action(port, MIDI_CHANNEL_AFTERTOUCH_CH(port->chan), 2 , av);
+	    run_midi_action(port, FTS_MIDI_CHANNEL_AFTERTOUCH, 2 , av);
+	    run_midi_action(port, FTS_MIDI_CHANNEL_AFTERTOUCH_CH(port->chan), 2 , av);
 
 	    port->argc = 0;
 	    break;
@@ -708,11 +712,11 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	  {
 	    /* program change */
 
-	    fts_set_long(av + 0, port->chan);
-	    fts_set_long(av + 1, nextbyte);
+	    fts_set_int(av + 0, port->chan);
+	    fts_set_int(av + 1, nextbyte);
 
-	    run_midi_action(port, MIDI_PROGRAM_CHANGE, 2 , av);
-	    run_midi_action(port, MIDI_PROGRAM_CHANGE_CH(port->chan), 2 , av);
+	    run_midi_action(port, FTS_MIDI_PROGRAM_CHANGE, 2 , av);
+	    run_midi_action(port, FTS_MIDI_PROGRAM_CHANGE_CH(port->chan), 2 , av);
 
 	    port->argc = 0;
 	    break;
@@ -726,12 +730,12 @@ fts_run_midi_parser(fts_midi_port_t *port, long int nextbyte)
 	    }
 	  else if (port->argc == 1)
 	    {
-	      fts_set_long(av + 0, port->chan);
-	      fts_set_long(av + 1, port->arg1);
-	      fts_set_long(av + 2, 0);
+	      fts_set_int(av + 0, port->chan);
+	      fts_set_int(av + 1, port->arg1);
+	      fts_set_int(av + 2, 0);
 
-	      run_midi_action(port, MIDI_NOTE, 3 , av);
-	      run_midi_action(port, MIDI_NOTE_CH(port->chan), 3 , av);
+	      run_midi_action(port, FTS_MIDI_NOTE, 3 , av);
+	      run_midi_action(port, FTS_MIDI_NOTE_CH(port->chan), 3 , av);
 
 	      port->argc = 0;
 	    }

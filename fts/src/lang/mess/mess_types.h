@@ -375,6 +375,7 @@ struct fts_patcher
 
   int open;			/* the open flag */
   int load_init_fired;		/* the multiple load init protection flag*/
+  int deleted;			/* set to one during content deleting */
 
   fts_atom_array_t *args;	/* the arguments used for the "args" variable */
 

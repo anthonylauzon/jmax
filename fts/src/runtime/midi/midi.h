@@ -1,5 +1,5 @@
-#ifndef _FTSMIDI_H
-#define _FTSMIDI_H
+#ifndef _FTSMIDI_H_
+#define _FTSMIDI_H_
 
 extern fts_module_t fts_midi_module;
 
@@ -21,24 +21,24 @@ extern void fts_midi_deinstall_fun(fts_midi_port_t *port, int midi_ev, midi_acti
 */
 
 
-#define MIDI_NOTE                       0
-#define MIDI_NOTE_CH(n)                 (MIDI_NOTE + (n))
-#define MIDI_POLY_AFTERTOUCH            (MIDI_NOTE + 16 + 1)
-#define MIDI_POLY_AFTERTOUCH_CH(n)      (MIDI_POLY_AFTERTOUCH + (n))
-#define MIDI_CONTROLLER                 (MIDI_POLY_AFTERTOUCH + 16 + 1)
-#define MIDI_CONTROLLER_CH(n)           (MIDI_CONTROLLER + (n))
-#define MIDI_PROGRAM_CHANGE             (MIDI_CONTROLLER + 16 + 1)
-#define MIDI_PROGRAM_CHANGE_CH(n)       (MIDI_PROGRAM_CHANGE + (n))
-#define MIDI_CHANNEL_AFTERTOUCH         (MIDI_PROGRAM_CHANGE + 16 + 1)
-#define MIDI_CHANNEL_AFTERTOUCH_CH(n)   (MIDI_CHANNEL_AFTERTOUCH + (n))
-#define MIDI_PITCH_BEND                 (MIDI_CHANNEL_AFTERTOUCH + 16 + 1)
-#define MIDI_PITCH_BEND_CH(n)           (MIDI_PITCH_BEND + (n))
-#define MIDI_BYTE                       (MIDI_PITCH_BEND + 16 + 1)
-#define MIDI_SYSEX                      (MIDI_BYTE + 1)
-#define MIDI_REALTIME                   (MIDI_SYSEX + 1)
-#define MIDI_MTC                        (MIDI_REALTIME + 1)
+#define FTS_MIDI_NOTE                       0
+#define FTS_MIDI_NOTE_CH(n)                 (FTS_MIDI_NOTE + (n))
+#define FTS_MIDI_POLY_AFTERTOUCH            (FTS_MIDI_NOTE + 16 + 1)
+#define FTS_MIDI_POLY_AFTERTOUCH_CH(n)      (FTS_MIDI_POLY_AFTERTOUCH + (n))
+#define FTS_MIDI_CONTROLLER                 (FTS_MIDI_POLY_AFTERTOUCH + 16 + 1)
+#define FTS_MIDI_CONTROLLER_CH(n)           (FTS_MIDI_CONTROLLER + (n))
+#define FTS_MIDI_PROGRAM_CHANGE             (FTS_MIDI_CONTROLLER + 16 + 1)
+#define FTS_MIDI_PROGRAM_CHANGE_CH(n)       (FTS_MIDI_PROGRAM_CHANGE + (n))
+#define FTS_MIDI_CHANNEL_AFTERTOUCH         (FTS_MIDI_PROGRAM_CHANGE + 16 + 1)
+#define FTS_MIDI_CHANNEL_AFTERTOUCH_CH(n)   (FTS_MIDI_CHANNEL_AFTERTOUCH + (n))
+#define FTS_MIDI_PITCH_BEND                 (FTS_MIDI_CHANNEL_AFTERTOUCH + 16 + 1)
+#define FTS_MIDI_PITCH_BEND_CH(n)           (FTS_MIDI_PITCH_BEND + (n))
+#define FTS_MIDI_BYTE                       (FTS_MIDI_PITCH_BEND + 16 + 1)
+#define FTS_MIDI_SYSEX                      (FTS_MIDI_BYTE + 1)
+#define FTS_MIDI_REALTIME                   (FTS_MIDI_SYSEX + 1)
+#define FTS_MIDI_MTC                        (FTS_MIDI_REALTIME + 1)
 
-#define MAX_MIDI_EV                     MIDI_MTC
+#define MAX_FTS_MIDI_EV                     FTS_MIDI_MTC
 
 extern void fts_midi_send(fts_midi_port_t *p, long val);
 #endif

@@ -792,7 +792,7 @@ sgi_midi_init(void)
    */
 
 #define MAX_OUT_SYSEX 1024
-#define MAX_MIDI_EV 32
+#define SGI_MAX_MIDI_EV 32
 
 typedef struct
 {
@@ -805,7 +805,7 @@ typedef struct
   unsigned char in_buf[3];	
   unsigned char *in_sysex_buf;
 
-  MDevent in_midi_event[MAX_MIDI_EV];
+  MDevent in_midi_event[SGI_MAX_MIDI_EV];
   int in_current_char_count;
   int in_current_event_length;
   int in_current_event;
@@ -895,7 +895,7 @@ sgi_midi_close(fts_dev_t *dev)
 /* I/O functions */
 
 static void
-sgi_midi_prepare_next_event(sgimidi_dev_data *data)
+sgi_midi_prepare_current_event(sgimidi_dev_data *data)
 {
   MDevent *midi_event;
 
@@ -935,31 +935,68 @@ sgi_midi_get(fts_dev_t *dev, unsigned char *cp)
   switch(data->input_status)
     {
     case reading_message:
-      *cp = (char) (data->in_buf[data->in_current_char_count ++]);
-      if (data->in_current_char_count >= data->in_current_event_length)
+      if (data->in_current_char_count < data->in_current_event_length)
 	{
-	  data->in_current_event++;
-	  if (data->in_current_event == data->in_event_count)
-	    data->input_status = input_waiting;
-	  else
-	    sgi_midi_prepare_next_event(data);
+	  /* More bytes in the buffer, just read the next byte */
+
+	  *cp = (char) (data->in_buf[data->in_current_char_count ++]);
+
+	  return fts_Success;
 	}
-      return fts_Success;
+      else if (data->in_current_event < data->in_event_count)
+	{
+	  /* No more bytes in the buffer,
+	     but more events received, look at the next event */
+
+	  (data->in_current_event)++;
+	  sgi_midi_prepare_current_event(data);
+
+	  /* And call recursively this function */
+
+	  return sgi_midi_get(dev, cp);
+	}
+      else
+	{
+	  /* No more events, no more chars, do a recursive call to see
+	   * if there is more data ready.
+	   */
+
+	  data->input_status = input_waiting;
+	  return sgi_midi_get(dev, cp);
+	}
 
     case reading_sysex:
-      *cp = (char) (data->in_sysex_buf[data->in_current_char_count ++]);
-      if (data->in_current_char_count == data->in_current_event_length)
+      if (data->in_current_char_count < data->in_current_event_length)
 	{
-	  data->in_current_event++;
-	  if (data->in_current_event == data->in_event_count)
-	    {
-	      data->input_status = input_waiting;
-	      mdFree(data->in_sysex_buf);
-	    }
-	  else
-	    sgi_midi_prepare_next_event(data);
+	  /* More bytes in the buffer, just read the next byte */
+
+	  *cp = (char) (data->in_sysex_buf[data->in_current_char_count ++]);
+	  return fts_Success;
 	}
-      return fts_Success;
+      else if (data->in_current_event < data->in_event_count)
+	{
+	  /* No more bytes in the buffer,
+	     but more events received, look at the next event */
+
+	  mdFree(data->in_sysex_buf);
+
+	  (data->in_current_event)++;
+	  sgi_midi_prepare_current_event(data);
+
+	  /* And call recursively this function */
+
+	  return sgi_midi_get(dev, cp);
+	}
+      else
+	{
+	  /* No more events, no more chars, do a recursive call to see
+	   * if there is more data ready.
+	   */
+
+	  data->input_status = input_waiting;
+	  mdFree(data->in_sysex_buf);
+	  return sgi_midi_get(dev, cp);
+	}
 
     case input_waiting:
       {
@@ -981,38 +1018,24 @@ sgi_midi_get(fts_dev_t *dev, unsigned char *cp)
 
 	if (FD_ISSET(fd, &check))
 	  {
-	    data->in_event_count = mdReceive(data->in_port,  data->in_midi_event,  MAX_MIDI_EV);
+	    data->in_event_count = mdReceive(data->in_port,  data->in_midi_event,  SGI_MAX_MIDI_EV);
 
 	    if (data->in_event_count <= 0)
 	      return &fts_data_not_ready;
 	    else
 	      {
 		data->in_current_event = 0;
-
-		sgi_midi_prepare_next_event(data);
-
-		if (data->input_status == reading_message)
-		  {
-		    *cp = (char) (data->in_buf[data->in_current_char_count++]);
-		    return fts_Success;
-		  }
-		else if (data->input_status == reading_sysex)
-		  {
-		    *cp = (char) (data->in_sysex_buf[data->in_current_char_count++]);
-		    return fts_Success;
-		  }
+		sgi_midi_prepare_current_event(data);
+		return sgi_midi_get(dev, cp);
 	      }
 	  }
 	else
 	  return &fts_data_not_ready;
       }
-      break;
 
     default :
       return &fts_data_not_ready;
     }
-
-  return fts_Success;
 }
 
 
