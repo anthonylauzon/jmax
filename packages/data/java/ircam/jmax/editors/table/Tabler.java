@@ -51,69 +51,54 @@ public class Tabler extends JFrame implements EditorContainer {
   public Tabler( FtsObjectWithEditor ftsObj, TableDataModel tm) {
     
     super();
+    
     getContentPane().setLayout( new BorderLayout());
-
-    MaxWindowManager.getWindowManager().addWindow(this);
-    
-    // Make the title
     makeTitle();
-
     itsPanel = new TablePanel( this, ftsObj, tm);
-    
-    // Build The Menus and Menu Bar
-    makeMenuBar();
-
     getContentPane().add(itsPanel, BorderLayout.CENTER);
-
     itsPanel.frameAvailable(); 
 
-    //... the control bar
     makeControlBar();
 
-    //--
+    addWindowListener( new WindowListener(){
+      public void windowOpened(WindowEvent e){}
+      public void windowClosed(WindowEvent e){}
+      public void windowClosing(WindowEvent e)
+      {
+        itsPanel.close( false);
+      }
+      public void windowDeiconified(WindowEvent e){}
+      public void windowIconified(WindowEvent e){}
+      public void windowActivated(WindowEvent e){}
+      public void windowDeactivated(WindowEvent e){}
+    });
+    
+    pack();
+    makeMenuBar();    
     validate();
     pack();
-    setVisible(true);
-
-    addWindowListener(new WindowListener(){
-	    public void windowOpened(WindowEvent e){}
-	    public void windowClosed(WindowEvent e){}
-	    public void windowClosing(WindowEvent e)
-	    {
-		itsPanel.close( false);
-	    }
-	    public void windowDeiconified(WindowEvent e){}
-	    public void windowIconified(WindowEvent e){}
-	    public void windowActivated(WindowEvent e){}
-	    public void windowDeactivated(WindowEvent e){}
-	});    
   }
 
   private final void makeTitle()
   { 
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));
-    
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
 
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
 
-    // Build the file menu
     itsFileMenu = new ircam.jmax.toolkit.menus.DefaultFileMenu();
     itsFileMenu.setEnabled( false, 3);
     itsFileMenu.setEnabled( false, 4);
     mb.add( itsFileMenu); 
     
-    // Build the edit menu
     itsEditMenu = new EditMenu(this); 
     mb.add( itsEditMenu); 
     
-    // Build the view menu
     itsViewMenu = new ViewMenu(this);
     mb.add( itsViewMenu);
 
-    // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
     mb.add(itsWindowsMenu);
 
