@@ -111,7 +111,7 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
-    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Event.CTRL_MASK, KeyEvent.VK_H);
+    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Event.CTRL_MASK, KeyEvent.VK_U);
     toBackMenuItem  = add(Actions.sendToBackAction, "Send To Back", Event.CTRL_MASK, KeyEvent.VK_B);
 
     addSeparator();

@@ -193,7 +193,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     mb.add(Box.createHorizontalGlue());
 
     // Build up the help Menu 
-    itsHelpMenu = new HelpMenu(itsSketchPad);
+    itsHelpMenu = new HelpMenu();
     mb.add( itsHelpMenu);
 
     setJMenuBar(mb);

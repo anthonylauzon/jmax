@@ -96,6 +96,7 @@ public class Actions
   public static EditorAction saveToAction   = new SaveToAction();
   public static EditorAction printAction    = new PrintAction();
 
+  public static EditorAction openHelpPatchAction = new OpenHelpPatchAction();
   public static EditorAction showHtmlAction = new ShowHTMLAction();
 }
 

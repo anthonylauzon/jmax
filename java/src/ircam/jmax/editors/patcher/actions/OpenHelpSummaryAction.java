@@ -23,54 +23,34 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.menus;
+package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
-
 import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.fts.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
-/** Implement the patcher editor File Menu */
-
-public class HelpMenu extends EditorMenu
+public class OpenHelpSummaryAction extends EditorAction
 {
-  public HelpMenu()
+  String argument;
+
+  public OpenHelpSummaryAction(String arg)
   {
-    super("Help");
-    setHorizontalTextPosition(AbstractButton.LEFT);
+    super("Open Help Summary");
+    argument = arg;
+  }
 
-    add(Actions.openHelpPatchAction, "Help Patch", Event.CTRL_MASK, KeyEvent.VK_H);
-
-    // Adding the summaries 
-
-    Enumeration en = FtsHelpPatchTable.getSummaries(); 
-
-    while (en.hasMoreElements())
-       {
-	 final String str = (String) en.nextElement();
-	 add( new OpenHelpSummaryAction(str), str + " summary");
-       }
-
-    addSeparator();
-
-    add(Actions.showHtmlAction, "Patch Editor summary");
+  public void doAction(EditorContainer container)
+  {
+    FtsHelpPatchTable.openHelpSummary( container.getEditor().getFts(), argument);
   }
 }
-
-
-
-
-
