@@ -1,28 +1,33 @@
-#
-#  jMax
-#  
-#  Copyright (C) 1999 by IRCAM
-#  All rights reserved.
-#  
-#  Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
-#  This program may be used and distributed under the terms of the 
-#  accompanying LICENSE.
 # 
-#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
-#  for DISCLAIMER OF WARRANTY.
-#  
+# jMax
+# Copyright (C) 1999 by IRCAM
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# See file LICENSE for further informations on licensing terms.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+#
+
 
 # JAVAC_FLAGS: FLAGS defined for the compilation mode, in the global
 #              Makefile.$(MODE) files; currently, either -g or -O.
 #
-# SYSTEM_CLASSPATH: define where to find the system Java classes.
-#	defined in the Makefile.$(ARCH) files. 
-#
-# LIBS_CLASSPATH: define where to find the library classes.
-#		library classes are all those classes included
-#               in the Jmax source tree but which we do not
-#               develop (Swing, Tcl, etc etc).	
+# JAVA_LIBS_CLASSPATH: define where to find the library classes.
+#		Library classes are libraries included in the jMax source 
+#               tree but which we do not develop (Tcl, ...).	
 #
 # PACKAGE_DIR : must be set in the local makefile, with the directory
 #               corresponding to the package.	
@@ -61,11 +66,16 @@ include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 JAVA_CLASSES_ROOT =  $(ROOTDIR)/java/classes
 JAVA_SRC_ROOT =  $(ROOTDIR)/java/src
-JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl/jacl.jar:$(ROOTDIR)/java/lib/swing/swingall.jar
+
+# JAVA_LIBS_CLASSPATH does not contain Swing: Swing classes are either
+# in environment's CLASSPATH (for JDK1.1) or are system classes (for 
+# JDK1.2)
+JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl/jacl.jar
 
 LOCAL_PATH = $(ROOTDIR)/$(PACKAGE_DIR)
 
-JMAX_CLASSPATH = $(JAVA_SRC_ROOT):$(JAVA_CLASSES_ROOT):$(JAVA_LIBS_CLASSPATH)
+# Includes environment's CLASSPATH, for Swing on JDK 1.1
+JMAX_CLASSPATH = $$CLASSPATH:$(JAVA_SRC_ROOT):$(JAVA_CLASSES_ROOT):$(JAVA_LIBS_CLASSPATH)
 
 JFLAGS = -d $(JAVA_CLASSES_ROOT) $(JAVAC_FLAGS) $(DEPFLAG)
 
