@@ -5,50 +5,6 @@
 	};
 	objectVersion = 39;
 	objects = {
-		3B5AB887061097D200412ACC = {
-			buildPhases = (
-			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = development;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-			};
-			dependencies = (
-				3B5AB8900610983B00412ACC,
-				3B7ADDEA0611B5D00098F129,
-				3B5AB8920610984100412ACC,
-			);
-			isa = PBXAggregateTarget;
-			name = development;
-			productName = development;
-		};
-		3B5AB88F0610983B00412ACC = {
-			containerPortal = F880FCE90282F7CE01664092;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = 5C5427F905AB0B900042B7A2;
-			remoteInfo = libsequence.bundle;
-		};
-		3B5AB8900610983B00412ACC = {
-			isa = PBXTargetDependency;
-			target = 5C5427F905AB0B900042B7A2;
-			targetProxy = 3B5AB88F0610983B00412ACC;
-		};
-		3B5AB8910610984100412ACC = {
-			containerPortal = F880FCE90282F7CE01664092;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = 5C54253A05AB0B8A0042B7A2;
-			remoteInfo = jMax.app;
-		};
-		3B5AB8920610984100412ACC = {
-			isa = PBXTargetDependency;
-			target = 5C54253A05AB0B8A0042B7A2;
-			targetProxy = 3B5AB8910610984100412ACC;
-		};
 		3B5AB8950610995A00412ACC = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -63,18 +19,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		3B7ADDE90611B5D00098F129 = {
-			containerPortal = F880FCE90282F7CE01664092;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = 5C542A4105AB0B9C0042B7A2;
-			remoteInfo = sequence.jar;
-		};
-		3B7ADDEA0611B5D00098F129 = {
-			isa = PBXTargetDependency;
-			target = 5C542A4105AB0B9C0042B7A2;
-			targetProxy = 3B7ADDE90611B5D00098F129;
 		};
 		3B7ADDF00611B6320098F129 = {
 			fileEncoding = 30;
@@ -20306,7 +20250,6 @@
 				5C54287805AB0B930042B7A2,
 				5C54288505AB0B950042B7A2,
 				5C542B3105AB0BA00042B7A2,
-				3B5AB887061097D200412ACC,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {
