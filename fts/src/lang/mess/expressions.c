@@ -102,7 +102,7 @@ static int op_binary[FTS_OP_FIRST_UNUSED];
 #define fts_is_comma(a)          (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_comma))
 #define fts_is_dollar(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dollar))
 #define fts_is_dot(a)            (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dot)) 
-#define fts_is_assign(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_assign))
+#define fts_is_assign(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_equal))
 
 /* Function hash table */
 
@@ -1429,25 +1429,25 @@ fts_expressions_init(void)
   fts_symbol_set_operator(fts_s_div,   FTS_OP_DIV);
   fts_symbol_set_operator(fts_s_dollar, FTS_OP_DOLLAR);
   fts_symbol_set_operator(fts_s_dot,    FTS_OP_DOT);
-  fts_symbol_set_operator(fts_s_remainder,   FTS_OP_REMAINDER);
+  fts_symbol_set_operator(fts_s_percent,     FTS_OP_REMAINDER);
   fts_symbol_set_operator(fts_s_shift_left,  FTS_OP_SHIFT_LEFT);
   fts_symbol_set_operator(fts_s_shift_right, FTS_OP_SHIFT_RIGHT);
-  fts_symbol_set_operator(fts_s_bit_and, FTS_OP_BIT_AND);
-  fts_symbol_set_operator(fts_s_bit_or,  FTS_OP_BIT_OR);
-  fts_symbol_set_operator(fts_s_bit_xor,  FTS_OP_BIT_XOR);
-  /* fts_symbol_set_operator(fts_s_bit_not, FTS_OP_BIT_NOT); */
+  fts_symbol_set_operator(fts_s_bit_and,     FTS_OP_BIT_AND);
+  fts_symbol_set_operator(fts_s_bit_or,      FTS_OP_BIT_OR);
+  fts_symbol_set_operator(fts_s_bit_xor,     FTS_OP_BIT_XOR);
+  /* fts_symbol_set_operator(fts_s_bit_not,  FTS_OP_BIT_NOT); */
   fts_symbol_set_operator(fts_s_logical_and, FTS_OP_LOGICAL_AND);
   fts_symbol_set_operator(fts_s_logical_or,  FTS_OP_LOGICAL_OR);
   fts_symbol_set_operator(fts_s_logical_not, FTS_OP_LOGICAL_NOT);
-  fts_symbol_set_operator(fts_s_equal,   FTS_OP_EQUAL);
+  fts_symbol_set_operator(fts_s_equal_equal, FTS_OP_EQUAL);
   fts_symbol_set_operator(fts_s_not_equal,   FTS_OP_NOT_EQUAL);
-  fts_symbol_set_operator(fts_s_greater, FTS_OP_GREATER);
+  fts_symbol_set_operator(fts_s_greater,     FTS_OP_GREATER);
   fts_symbol_set_operator(fts_s_greater_equal, FTS_OP_GREATER_EQUAL);
   fts_symbol_set_operator(fts_s_smaller, FTS_OP_SMALLER);
   fts_symbol_set_operator(fts_s_smaller_equal, FTS_OP_SMALLER_EQUAL);
   fts_symbol_set_operator(fts_s_conditional, FTS_OP_CONDITIONAL);
   fts_symbol_set_operator(fts_s_column, FTS_OP_ELSE);
-  fts_symbol_set_operator(fts_s_assign, FTS_OP_ASSIGN);
+  fts_symbol_set_operator(fts_s_equal, FTS_OP_ASSIGN);
 
 
   op_priority[FTS_OP_PLUS] = 3;

@@ -68,6 +68,9 @@ extern fts_symbol_t fts_s_comma;
 extern fts_symbol_t fts_s_quote;
 extern fts_symbol_t fts_s_dollar;
 extern fts_symbol_t fts_s_semi;
+extern fts_symbol_t fts_s_find;
+extern fts_symbol_t fts_s_find_errors;
+extern fts_symbol_t fts_s_find_friends;
 extern fts_symbol_t fts_s_anything;
 
 /* Symbols related to object properties */
@@ -115,7 +118,7 @@ extern fts_symbol_t fts_s_closed_sqpar;
 extern fts_symbol_t fts_s_open_cpar;
 extern fts_symbol_t fts_s_closed_cpar;
 extern fts_symbol_t fts_s_dot;
-extern fts_symbol_t fts_s_remainder;
+extern fts_symbol_t fts_s_percent;
 extern fts_symbol_t fts_s_shift_left;
 extern fts_symbol_t fts_s_shift_right;
 extern fts_symbol_t fts_s_bit_and;
@@ -125,7 +128,7 @@ extern fts_symbol_t fts_s_bit_not;
 extern fts_symbol_t fts_s_logical_and;
 extern fts_symbol_t fts_s_logical_or;
 extern fts_symbol_t fts_s_logical_not;
-extern fts_symbol_t fts_s_equal;
+extern fts_symbol_t fts_s_equal_equal;
 extern fts_symbol_t fts_s_not_equal;
 extern fts_symbol_t fts_s_greater;
 extern fts_symbol_t fts_s_greater_equal;
@@ -133,7 +136,7 @@ extern fts_symbol_t fts_s_smaller;
 extern fts_symbol_t fts_s_smaller_equal;
 extern fts_symbol_t fts_s_conditional;
 extern fts_symbol_t fts_s_column;
-extern fts_symbol_t fts_s_assign;
+extern fts_symbol_t fts_s_equal;
 
 /* Predefined variable names */
 

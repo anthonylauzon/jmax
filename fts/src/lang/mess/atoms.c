@@ -63,7 +63,7 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 
 
 int
-fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2)
+fts_atom_equal(const fts_atom_t *a1, const fts_atom_t *a2)
 {
   if (fts_same_types(a1, a2))
     {
@@ -99,7 +99,7 @@ fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2)
 }
 
 int
-fts_atom_is_null(fts_atom_t *a)
+fts_atom_is_null(const fts_atom_t *a)
 {
   if (fts_is_void(a))
     return 1;
@@ -125,5 +125,24 @@ fts_atom_is_null(fts_atom_t *a)
     return 0;
 }
 
+/* Functions to compare list of atoms */
 
 
+int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av)
+{
+  int i,j;
+
+  for (i = 0; i < (ac - sac); i++)
+    if (fts_atom_equal(&sav[0], &av[i]))
+      {
+	/* Found the beginning, test the rest */
+	
+	for (j = 1; j < sac; j++)
+	  if (! fts_atom_equal(&sav[j], &av[j + i]))
+	    return 0;
+
+	return 1;
+      }
+
+  return 0;
+}

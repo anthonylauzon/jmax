@@ -179,6 +179,13 @@ fts_client_upload_object(fts_object_t *obj)
   if (obj->id == FTS_NO_ID)
     fts_object_table_register(obj);
 
+  /* First, check if the parent has been uploaded; if it is not,
+     upload it; recursively, this will upload all the chain up
+     to the root */
+
+  if (obj->patcher && ((fts_object_t *)obj->patcher)->id == FTS_NO_ID)
+    fts_client_upload_object((fts_object_t *) obj->patcher);
+
   if (fts_object_is_abstraction(obj) || fts_object_is_template(obj))
     {
       /* Send the abstraction object */

@@ -347,6 +347,58 @@ patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_send_message(p, winlet, s, ac, at);
 }
 
+/* 
+   The find engine
+   */
+
+static void
+patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_object_t *p;
+  fts_status_t ret;
+
+  /* First, look if the objects in the patchers are to be found */
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_object(p))
+	{
+	  if (! fts_object_is_error(p))
+	    {
+	      /* Send the find message to the object; 
+		 if the object do not implement it,
+		 do the standard check */
+
+	      ret = fts_send_message(p, winlet, s, ac, at);
+	      
+	      if (ret == &fts_MethodNotFound)
+	        if (fts_atom_is_subsequence(p->argc, p->argv, ac - 1, at + 1))
+		  fts_objectset_add(set, p);
+	    }
+	  else
+	    {
+	      /* For error objects do the check */
+
+	      if (fts_atom_is_subsequence(p->argc, p->argv, ac - 1, at + 1))
+		fts_objectset_add(set, p);
+	    }
+	}
+    }
+
+  /* First, do the recursive calls  */
+
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_standard_patcher(p) ||
+	  fts_object_is_template(p) ||
+	  fts_object_is_abstraction(p))
+	fts_send_message(p, winlet, s, ac, at);
+    }
+}
+
+
 /* Methods: init put the pointers to zero */
 
 static void
@@ -508,6 +560,8 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, patcher_init);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, patcher_find);
 
   for (i = 0; i < ninlets; i ++)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);

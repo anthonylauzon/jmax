@@ -52,6 +52,9 @@ fts_symbol_t fts_s_comma;
 fts_symbol_t fts_s_quote;
 fts_symbol_t fts_s_dollar;
 fts_symbol_t fts_s_semi;
+fts_symbol_t fts_s_find;
+fts_symbol_t fts_s_find_errors;
+fts_symbol_t fts_s_find_friends;
 fts_symbol_t fts_s_anything;
 
 /* Predefined symbol for properties */
@@ -99,7 +102,7 @@ fts_symbol_t fts_s_closed_sqpar;
 fts_symbol_t fts_s_open_cpar;
 fts_symbol_t fts_s_closed_cpar;
 fts_symbol_t fts_s_dot;
-fts_symbol_t fts_s_remainder;
+fts_symbol_t fts_s_percent;
 fts_symbol_t fts_s_shift_left;
 fts_symbol_t fts_s_shift_right;
 fts_symbol_t fts_s_bit_and;
@@ -109,7 +112,7 @@ fts_symbol_t fts_s_bit_not;
 fts_symbol_t fts_s_logical_and;
 fts_symbol_t fts_s_logical_or;
 fts_symbol_t fts_s_logical_not;
-fts_symbol_t fts_s_equal;
+fts_symbol_t fts_s_equal_equal;
 fts_symbol_t fts_s_not_equal;
 fts_symbol_t fts_s_greater;
 fts_symbol_t fts_s_greater_equal;
@@ -117,7 +120,7 @@ fts_symbol_t fts_s_smaller;
 fts_symbol_t fts_s_smaller_equal;
 fts_symbol_t fts_s_conditional;
 fts_symbol_t fts_s_column;
-fts_symbol_t fts_s_assign;
+fts_symbol_t fts_s_equal;
 
 /* Predefined variable names */
 
@@ -138,8 +141,8 @@ fts_predefine_symbols(void)
   fts_s_connection = fts_new_symbol("connection");
   fts_s_true       = fts_new_symbol("true");
   fts_s_false      = fts_new_symbol("false");
-  fts_s_init 	   = fts_new_symbol("$init");
-  fts_s_delete	   = fts_new_symbol("$delete");
+  fts_s_init 	   = fts_new_symbol("init");
+  fts_s_delete	   = fts_new_symbol("delete");
   fts_s_ninlets    = fts_new_symbol("ins");
   fts_s_noutlets   = fts_new_symbol("outs");
   fts_s_bang       = fts_new_symbol("bang");
@@ -158,6 +161,9 @@ fts_predefine_symbols(void)
   fts_s_read       = fts_new_symbol("read");
   fts_s_write      = fts_new_symbol("write");
   fts_s_save_bmax  = fts_new_symbol("save_bmax");
+  fts_s_find       = fts_new_symbol("find");
+  fts_s_find_errors = fts_new_symbol("find_errors");
+  fts_s_find_friends = fts_new_symbol("find_friends");
   fts_s_anything   = fts_new_symbol("anything");
   fts_s_comma      = fts_new_symbol(",");
   fts_s_quote      = fts_new_symbol("'");
@@ -206,7 +212,7 @@ fts_predefine_symbols(void)
   fts_s_open_cpar   = fts_new_symbol("{");
   fts_s_closed_cpar = fts_new_symbol("}");
   fts_s_dot        = fts_new_symbol(".");
-  fts_s_remainder  = fts_new_symbol("%");
+  fts_s_percent    = fts_new_symbol("%");
   fts_s_shift_left = fts_new_symbol("<<");
   fts_s_shift_right = fts_new_symbol(">>");
   fts_s_bit_and    = fts_new_symbol("&");
@@ -216,7 +222,7 @@ fts_predefine_symbols(void)
   fts_s_logical_and = fts_new_symbol("&&");
   fts_s_logical_or  = fts_new_symbol("||");
   fts_s_logical_not = fts_new_symbol("!");
-  fts_s_equal       = fts_new_symbol("==");
+  fts_s_equal_equal       = fts_new_symbol("==");
   fts_s_not_equal   = fts_new_symbol("!=");
   fts_s_greater     = fts_new_symbol(">");
   fts_s_greater_equal = fts_new_symbol(">=");
@@ -224,7 +230,7 @@ fts_predefine_symbols(void)
   fts_s_smaller_equal = fts_new_symbol("<=");
   fts_s_conditional = fts_new_symbol("?");
   fts_s_column        = fts_new_symbol(":");
-  fts_s_assign      = fts_new_symbol("=");
+  fts_s_equal      = fts_new_symbol("=");
 
   /* FTS Data  */
 

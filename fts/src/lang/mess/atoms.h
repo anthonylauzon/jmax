@@ -114,11 +114,16 @@
 
 /* equality test between two atoms */
 
-extern int fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2);
+extern int fts_atom_equal(const fts_atom_t *a1, const fts_atom_t *a2);
 
 /* null test: a null content can be a null pointer or a zero value */
 
-extern int fts_atom_is_null(fts_atom_t *a);
+extern int fts_atom_is_null(const fts_atom_t *a);
+
+/* Subsequence  testing */
+
+extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
+
 
 /* Convenience macro for symbols */
 

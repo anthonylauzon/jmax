@@ -3,8 +3,13 @@
 
 extern fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name);
 extern void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun);
+
 extern void fts_data_class_define_remote_constructor( fts_data_class_t *class,
-						      fts_data_remote_constructor_t export_fun);
+						      fts_data_remote_constructor_t constructor);
+
+extern void fts_data_class_define_remote_destructor( fts_data_class_t *class,
+						     fts_data_remote_destructor_t destructor);
+
 extern void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t fun);
 
 

@@ -81,6 +81,7 @@ fts_objectset_new( void)
   set = (fts_objectset_t *) fts_heap_alloc(objectset_heap);
   assert( set != 0);
   set->head = 0;
+  fts_data_init((fts_data_t *)set, fts_objectset_data_class);
 
   return set;
 }
@@ -126,6 +127,9 @@ void fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
 	{
 	  fts_atom_t a;
 
+	  if (object->id == FTS_NO_ID)
+	    fts_client_upload_object(object);
+
 	  fts_set_object(&a, object);
 	  fts_data_remote_call((fts_data_t *) set, REMOTE_APPEND, 1, &a);
 	}
@@ -170,6 +174,15 @@ void fts_objectset_send_message(fts_objectset_t *set, int winlet, fts_symbol_t s
 
   for (p = set->head; p; p = p->next)
     fts_send_message(p->object, winlet, sel, ac, av);
+}
+
+static void fts_objectset_upload_objects(fts_objectset_t *set)
+{
+  fts_objectset_cell_t *p;
+
+  for (p = set->head; p; p = p->next)
+    if (p->object->id == FTS_NO_ID)
+      fts_client_upload_object(p->object);
 }
 
 /********************************************************************/
@@ -239,6 +252,21 @@ fts_objectset_iterator_current(const fts_objectset_iterator_t *iter)
 
 /* Just a very limited version for now */
 
+
+static fts_data_t *fts_objectset_remote_constructor(int ac, const fts_atom_t *at)
+{
+  return (fts_data_t *) fts_objectset_new();
+}
+
+
+static void fts_objectset_remote_destructor(fts_data_t *d)
+{
+  fts_objectset_t *this = (fts_objectset_t *)d;
+
+  fts_objectset_delete(this);
+}
+
+
 /*
  * The export function
  */
@@ -248,6 +276,8 @@ static void fts_objectset_export_fun(fts_data_t *d)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
   fts_objectset_cell_t *p;
+
+  fts_objectset_upload_objects(this);
 
   fts_data_export(d);
 
@@ -264,24 +294,32 @@ static void fts_objectset_export_fun(fts_data_t *d)
 static void fts_objectset_find( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
+  fts_object_t *scope = fts_get_object(at);
+  fts_atom_t a;
 
-  /* @@@@ To be implemented */
+  fts_set_data(&a, (fts_data_t *) this);
+  fts_send_message(scope, fts_SystemInlet, fts_s_find, 1, &a);
 }
 
 static void fts_objectset_find_errors( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
+  fts_object_t *scope = fts_get_object(at);
+  fts_atom_t a;
 
-  /* @@@@ To be implemented */
+  fts_set_data(&a, (fts_data_t *) this);
+  fts_send_message(scope, fts_SystemInlet, fts_s_find_errors, 1, &a);
 }
 
 static void fts_objectset_find_friends( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *this = (fts_objectset_t *)d;
+  fts_object_t *scope = fts_get_object(at);
+  fts_atom_t a;
 
-  /* @@@@ To be implemented */
+  fts_set_data(&a, (fts_data_t *) this);
+  fts_send_message(scope, fts_SystemInlet, fts_s_find_friends, 1, &a);
 }
-
 
 
 /********************************************************************/
@@ -299,7 +337,8 @@ void fts_objectset_config(void)
   fts_objectset_data_class = fts_data_class_new( fts_new_symbol( "objectset_data"));
   fts_data_class_define_export_function(fts_objectset_data_class, fts_objectset_export_fun);
 
-  /* @@@@@@@@@@@ remote constructor and remote destructor */
+  fts_data_class_define_remote_constructor(fts_objectset_data_class, fts_objectset_remote_constructor);
+  fts_data_class_define_remote_destructor(fts_objectset_data_class, fts_objectset_remote_destructor);
 
   fts_data_class_define_function(fts_objectset_data_class, REMOTE_FIND, fts_objectset_find);
   fts_data_class_define_function(fts_objectset_data_class, REMOTE_FIND_ERRORS, fts_objectset_find_errors);

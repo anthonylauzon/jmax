@@ -36,6 +36,7 @@ extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
 #define fts_object_is_template(o) (fts_object_is_patcher((o)) &&  \
 				      fts_patcher_is_template((fts_patcher_t *) (o)))
 
+#define fts_object_is_object(o) ((! fts_object_is_patcher((o))) || fts_object_is_error((o)))
 
 #define fts_patcher_is_open(p)    ((p)->open)
 #define fts_object_patcher_is_open(o)    ((fts_object_get_patcher(o))->open)

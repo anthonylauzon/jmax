@@ -155,7 +155,10 @@ void fts_data_delete( fts_data_t *d)
     }
 }
 
-/* Remote version, as remote function of the meta data object */
+/* Remote version, as remote function of the meta data object;
+   the remote constructor should return a properly initialized
+   fts_data_t (i.e. must call fts_data_init).
+ */
 
 static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
 {
@@ -183,7 +186,6 @@ static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
       fts_atom_t a[2];
 
       new = class->remote_constructor(ac - 2, at + 2);
-      new->class = class;
       new->id = id;
 
       fts_data_id_put(id, new);
@@ -201,7 +203,8 @@ static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
 
 /* Remote Delete is a remote function of the object itself;
    there is no remote release; the release is only meaningfull
-   for the client.
+   for the client. Note that the remote destructor, if existing,
+   must call fts_data_delete.
  */
 
 static void fts_data_remote_delete(fts_data_t *d, int ac, const fts_atom_t *at)
@@ -210,8 +213,8 @@ static void fts_data_remote_delete(fts_data_t *d, int ac, const fts_atom_t *at)
     {
       if (d->class->remote_destructor)
 	(* d->class->remote_destructor)(d);
-
-      fts_data_id_remove(d->id, d);
+      else
+	fts_data_id_remove(d->id, d);
     }
 }
 

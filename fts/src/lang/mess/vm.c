@@ -175,7 +175,7 @@ static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, vo
   eval_tos--;
   *eval_tos = *value;
 
-  fts_set_symbol(&a, fts_s_assign);
+  fts_set_symbol(&a, fts_s_equal);
   eval_tos--;
   *eval_tos = a;
 
@@ -1067,7 +1067,7 @@ void fts_vm_init()
   builtin_symbols[62] =  fts_s_open_par;
   builtin_symbols[63] =  fts_s_closed_par;
   builtin_symbols[65] =  fts_s_dot;
-  builtin_symbols[66] =  fts_s_remainder;
+  builtin_symbols[66] =  fts_s_percent;
   builtin_symbols[67] =  fts_s_shift_left;
   builtin_symbols[68] =  fts_s_shift_right;
   builtin_symbols[69] =  fts_s_bit_and;
@@ -1077,7 +1077,7 @@ void fts_vm_init()
   builtin_symbols[73] =  fts_s_logical_and;
   builtin_symbols[74] =  fts_s_logical_or;
   builtin_symbols[75] =  fts_s_logical_not;
-  builtin_symbols[76] =  fts_s_equal;
+  builtin_symbols[76] =  fts_s_equal_equal;
   builtin_symbols[77] =  fts_s_not_equal;
   builtin_symbols[78] =  fts_s_greater;
   builtin_symbols[79] =  fts_s_greater_equal;
@@ -1085,7 +1085,7 @@ void fts_vm_init()
   builtin_symbols[81] =  fts_s_smaller_equal;
   builtin_symbols[82] =  fts_s_conditional;
   builtin_symbols[83] =  fts_s_column;
-  builtin_symbols[84] =  fts_s_assign;
+  builtin_symbols[84] =  fts_s_equal;
   builtin_symbols[85] =  fts_s_size;
   builtin_symbols[86] =  fts_s_patcher;
   builtin_symbols[87] =  fts_s_data;

@@ -250,14 +250,13 @@ public class FtsParse
      Reconize tokens which are always tokens, i.e. tokens
      which end is predefined and do not depend on what follow.
 
-     Current only example is "$", but there will be more.
-
+     ~ is suppressed
      */
 
   private boolean tryKeywords() throws java.io.IOException
   {
     String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
-			  "[", "]", "{", "}", ",", "~", "^", "&&",
+			  "[", "]", "{", "}", ",", "^", "&&",
 			  "&", "||", "|", "==", "=", "!=", "!", ">=",
 			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
 			  ".", ";", "'" };
@@ -676,7 +675,7 @@ public class FtsParse
   {
     if (value instanceof String)
       {
-	String keywords[] = { "(", "[", "{", "~", "^", 
+	String keywords[] = { "(", "[", "{", "^", 
 			      "$", ".", "'" };
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -693,7 +692,7 @@ public class FtsParse
   static private final boolean isAKeyword(String value)
   {
     String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
-			  "[", "]", "{", "}", ",", "~", "^", "&&",
+			  "[", "]", "{", "}", ",", "^", "&&",
 			  "&", "||", "|", "==", "=", "!=", "!", ">=",
 			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
 			  ".", ";", "'" };
@@ -711,7 +710,7 @@ public class FtsParse
   {
     char chars[] = { '$', ',', '(', ')', '[', ']',
 		     '{', '}', '+', '-', '*', '/',
-		     '%', '~', '&', '|', '^', '.',
+		     '%', '&', '|', '^', '.',
 		     '<', '>', '!', '=', '?', ':',
 		     ';', '\'', '\t', ' ' };
 
