@@ -35,7 +35,7 @@ static void
 listtail_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(ac > 1)
-    fts_outlet_send(o, 0, fts_s_list, ac - 1, at + 1);
+    fts_outlet_atoms(o, 0, ac - 1, at + 1);
 }
 
 static fts_status_t

@@ -151,7 +151,6 @@ static void
 expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   t_expr *x = (t_expr *)o;
-  fts_atom_t a;
 
 #ifdef EXPR_DEBUG
   {
@@ -189,16 +188,11 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   switch(x->exp_res.ex_type)
     {
     case ET_INT:
-      fts_set_int(&a, x->exp_res.ex_int);
-      fts_outlet_send((fts_object_t *)x, 0, fts_s_int, 1, &a);
+      fts_outlet_int((fts_object_t *)x, 0, x->exp_res.ex_int);
       break;
 
     case ET_FLT:
-      /* CHANGE do we need a fts_set_float_outlet here */
-/*       fts_set_float(&a, x->exp_res.ex_flt); */
-/*       fts_outlet_send((fts_object_t *)x, 0, fts_s_float, 1, &a); */
-
-       fts_outlet_float((fts_object_t *)x, 0, x->exp_res.ex_flt);
+      fts_outlet_float((fts_object_t *)x, 0, x->exp_res.ex_flt);
       break;
 
     case ET_SYM:
@@ -249,9 +243,6 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int varnum;
   struct ex_ex *eptr;
 
-  ac--;
-  at++;
-  
   if (!ac)
     return &fts_ArgumentMissing;
 

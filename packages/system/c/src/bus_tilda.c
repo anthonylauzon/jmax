@@ -264,9 +264,6 @@ throw_tilda_write_to_channel(fts_word_t *a)
 static fts_status_t
 throw_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
@@ -426,9 +423,6 @@ catch_tilda_read_from_channel(fts_word_t *a)
 static fts_status_t
 catch_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
@@ -617,7 +611,7 @@ bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
     n_channels = fts_get_int(at);
 
   fts_set_int(&a, n_channels);
-  this->bus = (fts_signal_bus_t *)fts_object_create(fts_signal_bus_class, 1, &a);
+  this->bus = (fts_signal_bus_t *)fts_object_create(fts_signal_bus_type, 1, &a);
   fts_object_refer((fts_object_t *)this->bus);
 
   fts_dsp_add_object(o);
@@ -646,9 +640,6 @@ bus_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels = 0;
   int i;
-
-  ac--;
-  at++;
 
   if(ac == 0)
     n_channels = 1;

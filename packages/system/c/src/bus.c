@@ -170,9 +170,6 @@ throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 static fts_status_t
 throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_a( at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))  
     {
       if(ac == 1) 
@@ -290,9 +287,6 @@ catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 static fts_status_t
 catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac > 0 && fts_is_a(at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
@@ -384,9 +378,6 @@ bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels = 0;
   int i;
-
-  ac--;
-  at++;
 
   if(ac == 0)
     n_channels = 1;

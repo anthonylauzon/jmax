@@ -35,12 +35,14 @@ struct fts_patcher
   int deleted;			/* set to one during content deleting */
   int dirty;                    /* set to one if patcher's content is not saved */
 
-  fts_array_t *args;	/* the arguments used for the "args" variable */
+  fts_tuple_t *args;	/* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
+
+  fts_symbol_t file_name;
 
   /* Variables */
   fts_env_t env;
@@ -50,6 +52,3 @@ struct fts_patcher
 #define fts_patcher_is_open(p)     ((p)->open)
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
-
-
-

@@ -97,9 +97,6 @@ static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   int inlets, i;
   fts_audioport_t *port;
 
-  ac--;
-  at++;
-
   if (ac == 0)
     inlets = 2;
   else

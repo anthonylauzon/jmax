@@ -249,9 +249,9 @@ wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1)
+  if(ac == 0)
     return wave_instantiate_cosine(cl, ac, at);
-  else if (ac == 2 && fvec_atom_is(at + 1))
+  else if (ac == 1 && fvec_atom_is(at))
     return wave_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

@@ -30,7 +30,6 @@
 
 fts_symbol_t fvec_symbol = 0;
 fts_metaclass_t *fvec_type = 0;
-fts_class_t *fvec_class = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_open_file = 0;
@@ -306,10 +305,7 @@ fvec_file_is_text( fts_symbol_t file_name)
 static void
 fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, fvec_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -722,7 +718,7 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	    post("%f ", fvec_get_element(this, i));
 	}
 
-      post("\n}");
+      post("\n}\n");
     }
   else if(size)
     {
@@ -741,7 +737,7 @@ fvec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fvec_t *this = (fvec_t *)o;
   float *values = fvec_get_ptr(this);
   int size = fvec_get_size(this);
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
   int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
@@ -873,13 +869,13 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fvec_set_size(this, fts_get_int(at));
       fvec_zero(this);
     }
-  else if(ac == 1 && fts_is_array(at))
+  else if(ac == 1 && fts_is_tuple(at))
     {
-      fts_array_t *aa = fts_get_array(at);
-      int size = fts_array_get_size(aa);
+      fts_tuple_t *tup = fts_get_tuple(at);
+      int size = fts_tuple_get_size(tup);
       
       fvec_set_size(this, size);
-      fvec_set_with_onset_from_atoms(this, 0, size, fts_array_get_atoms(aa));
+      fvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
       this->keep = fts_s_args;
     }
   else if(ac == 1 && fts_is_symbol(at))
@@ -1003,5 +999,4 @@ fvec_config(void)
   fvec_symbol = fts_new_symbol("fvec");
 
   fvec_type = fts_class_install(fvec_symbol, fvec_instantiate);
-  fvec_class = fts_class_get_by_name(fvec_symbol);
 }

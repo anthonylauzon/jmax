@@ -170,7 +170,6 @@ client_t *object_get_client( fts_object_t *obj)
 typedef struct {
   fts_object_t head;
   socket_t socket;
-  fts_class_t *socketstream_class;
 } client_manager_t;
 
 
@@ -191,7 +190,7 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
     }
 
   fts_set_int( argv, new_socket);
-  socket_stream = fts_object_create( this->socketstream_class, 1, argv);
+  socket_stream = fts_object_create( fts_socketstream_type, 1, argv);
 
   fts_set_symbol( argv, s_client);
   fts_set_object( argv+1, socket_stream);
@@ -252,8 +251,6 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
-
-  this->socketstream_class = fts_class_get_by_name( fts_new_symbol("socketstream"));
 
   fts_log( "[client]: Listening on port %d\n", port);
 }
@@ -1010,11 +1007,12 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
   fts_client_load_patcher( fts_get_symbol( at), fts_get_object( at+1), this->client_id);
 }
 
-int fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
+fts_patcher_t *
+fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
 {
-  fts_atom_t a[3];
-  fts_object_t *patcher;
+  fts_patcher_t *patcher = 0;
   int type = 1;
+  fts_atom_t a[3];
   int client_id;
   client_t *client;
 
@@ -1025,7 +1023,7 @@ int fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
 
   client = client_table_get(client_id);
 
-  fts_log("[client]: Load patcher %s\n", filename);
+  fts_log("[client]: Load patcher %s\n", file_name);
 
   /* here finds the file-type if is a jmax_file do 
      fts_binary_file_load( filename, parent, 0, 0)
@@ -1033,42 +1031,61 @@ int fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
      fts_load_dotpat_patcher(parent, filename)
    */
   
-  type = ! fts_is_dotpat_file( filename);
+  type = ! fts_is_dotpat_file( file_name);
 
   if( type)
-    patcher = fts_binary_file_load( filename, parent, 0, 0, 0);
+    patcher = (fts_patcher_t *)fts_binary_file_load( file_name, parent, 0, 0, 0);
   else
-    patcher = fts_load_dotpat_patcher( parent, filename);
+    patcher = (fts_patcher_t *)fts_load_dotpat_patcher( parent, file_name);
 
   if (patcher == 0)
     {
-      fts_log("[patcher]: Cannot read file %s\n", filename);
+      fts_log("[patcher]: Cannot read file %s\n", file_name);
       return 0;
     }
 
-  client_register_object( client, patcher);
+  client_register_object( client, (fts_object_t *)patcher);
 
   /* Save the file name, for future autosaves and other services */
-  fts_set_symbol(a, filename);
-  fts_object_put_prop( patcher, fts_s_filename, a);
+  fts_patcher_set_file_name(patcher, file_name);
 
   /* activate the post-load init, like loadbangs */	  
-  fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 
-  fts_set_int(a, fts_get_object_id(patcher));
-  fts_set_symbol(a+1, filename);
+  fts_set_int(a, fts_get_object_id((fts_object_t *)patcher));
+  fts_set_symbol(a+1, file_name);
   fts_set_int(a+2, type);
   fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
   /* uploaod the patcher to the client */
-  fts_send_message( patcher, fts_SystemInlet, fts_s_upload, 0, 0);
-  fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
 
-  fts_log("[patcher]: Finished loading patcher %s\n", filename);
+  fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
-  return 1;
+  return patcher;
 }
 
+fts_patcher_t *
+fts_client_get_patcher_by_file_name(fts_symbol_t file_name)
+{
+  fts_patcher_t *root = fts_get_root_patcher();  
+  fts_object_t *p = 0;
+
+  for (p = root->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_patcher(p))
+	{
+	  fts_patcher_t *patcher = (fts_patcher_t *)p;
+	  fts_symbol_t fime_name = fts_patcher_get_file_name(patcher);
+	  
+	  if(file_name == fts_patcher_get_file_name(patcher))
+	    return patcher;
+	}
+    }
+
+  return 0;
+}
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1661,7 +1678,7 @@ static void client_pipe_install( void)
   fts_object_t *client_object;
   fts_object_t *pipe_stream; 
 
-  pipe_stream = fts_object_create(fts_class_get_by_name( fts_new_symbol("pipestream")), 0, 0);
+  pipe_stream = fts_object_create(fts_pipestream_type, 0, 0);
   
   fts_set_symbol( argv, s_client);
   fts_set_object( argv+1, pipe_stream);

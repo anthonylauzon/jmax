@@ -253,9 +253,6 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[3];
   int i;
 
-  ac--;
-  at++;
-
   for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
       return &fts_CannotInstantiate;
@@ -304,7 +301,7 @@ for_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 int
 for_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return for_is_int(ac0 - 1, at0 + 1) == for_is_int(ac1 - 1, at1 + 1);
+  return for_is_int(ac0, at0) == for_is_int(ac1, at1);
 }
 
 void

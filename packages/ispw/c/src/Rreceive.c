@@ -145,7 +145,7 @@ Rreceive_input(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
       int size = fts_array_get_size(&this->args);
 	
       if(size)
-	fts_outlet_send(o, 0, fts_s_list, size, fts_array_get_atoms(&this->args));
+	fts_outlet_atoms(o, 0, size, fts_array_get_atoms(&this->args));
     }
 }
 

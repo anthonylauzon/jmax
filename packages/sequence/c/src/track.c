@@ -43,14 +43,14 @@ fts_class_t *track_class = 0;
 static event_t *
 create_event(int ac, const fts_atom_t *at)
 {
-  fts_symbol_t type = fts_get_symbol(at);
+  fts_symbol_t type_name = fts_get_symbol(at);
   event_t *event = 0;
 
-  if(type == fts_s_int || type == fts_s_float || type == fts_s_symbol)
-    event = (event_t *)fts_object_create(event_class, 1, at + 1);
+  if(type_name == fts_s_int || type_name == fts_s_float || type_name == fts_s_symbol)
+    event = (event_t *)fts_object_create(event_type, 1, at + 1);
   else
     {
-      fts_class_t *class = fts_class_get_by_name(type);
+      fts_metaclass_t *type = fts_class_get_by_name(type_name);
 
       if(class)
 	{
@@ -940,6 +940,5 @@ track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 track_config(void)
 {
-  fts_class_install(seqsym_track, track_instantiate);
-  track_class = fts_class_get_by_name(seqsym_track);
+  track_type = fts_class_install(seqsym_track, track_instantiate);
 }

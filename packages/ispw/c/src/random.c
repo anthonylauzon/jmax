@@ -31,38 +31,41 @@
 typedef struct random
 {
   fts_object_t o;
-  long r_n;
+  long range;
 } random_t;
+
+extern int rand (void);
 
 static void
 random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  extern int rand (void);
-  fts_atom_t a;
+  random_t *this = (random_t *)o;
+  int n = (this->range * (rand() & 0x7fffL)) >> 15;
 
-  fts_set_int(&a, (((random_t *)o)->r_n * (rand() & 0x7fffL)) >> 15);
-  fts_outlet_send(o, 0, fts_s_int, 1, &a);
+  fts_outlet_int(o, 0, n);
 }
 
 static void
 random_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  random_t *this = (random_t *)o;
   long n = fts_get_int_arg(ac, at, 0, 0);
 
   if (n <= 1)
     n = 1;
 
-  ((random_t *)o)->r_n = n;
+  this->range = n;
 }
 
 static void
 random_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  random_t *this = (random_t *)o;
   long n = fts_get_int_arg(ac, at, 1, 0);
 
   if (n < 1)
     n = 1;
-  ((random_t *)o)->r_n = n;
+  this->range = n;
 }
 
 static fts_status_t

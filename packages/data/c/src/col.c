@@ -29,7 +29,6 @@
 
 fts_metaclass_t *col_type = 0;
 fts_symbol_t col_symbol = 0;
-fts_class_t *col_class = 0;
 
 /********************************************************
  *
@@ -47,9 +46,9 @@ col_void(col_t *this)
 
   for(i=0; i<size; i++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, i, j);
+      fts_atom_t *elem = mat_get_element(mat, i, j);
 
-      fts_set_void(elem);
+      fts_atom_void(elem);
     }
 }
 
@@ -63,7 +62,7 @@ col_set_const(col_t *this, fts_atom_t value)
 
   for(i=0; i<size; i++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, i, j);
+      fts_atom_t *elem = mat_get_element(mat, i, j);
 
       fts_atom_assign(elem, &value);
     }
@@ -82,7 +81,7 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
 
   for(i=0; i<ac; i++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, onset + i, j);
+      fts_atom_t *elem = mat_get_element(mat, onset + i, j);
 
       fts_atom_assign(elem, at + i);
     }
@@ -97,10 +96,7 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 col_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, col_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -165,7 +161,7 @@ col_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   post("{");
 
   for(i=0; i<size; i++)
-    post_atoms(1, &col_get_element(this, i));
+    post_atoms(1, col_get_element(this, i));
 
   post("}\n");
 }
@@ -252,5 +248,4 @@ col_config(void)
   col_symbol = fts_new_symbol("col");
 
   col_type = fts_class_install(col_symbol, col_instantiate);
-  col_class = fts_class_get_by_name(col_symbol);
 }

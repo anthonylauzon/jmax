@@ -32,7 +32,6 @@
 
 DATA_API fts_symbol_t row_symbol;
 DATA_API fts_metaclass_t *row_type;
-DATA_API fts_class_t *row_class;
 
 typedef struct
 {

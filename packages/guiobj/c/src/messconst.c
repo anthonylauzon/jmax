@@ -134,22 +134,22 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {
       fts_message_t *mess;
 
-      if(ac == fts_is_array(at))
+      if(ac == fts_is_tuple(at))
 	{
-	  fts_array_t *list = fts_get_array(at);
+	  fts_tuple_t *tup = fts_get_tuple(at);
 
 	  /* create empty message */
-	  mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+	  mess = (fts_message_t *)fts_object_create(fts_message_metaclass, 0, 0);
 	  
-	  /* set message to list */
-	  fts_message_set(mess, fts_s_list, fts_array_get_size(list), fts_array_get_atoms(list));
+	  /* set message to tup */
+	  fts_message_set(mess, fts_s_list, fts_tuple_get_size(tup), fts_tuple_get_atoms(tup));
 	}
       else
 	{
 	  fts_symbol_t error;
 
 	  /* try to create message */
-	  mess = (fts_message_t *)fts_object_create(fts_message_class, ac, at);
+	  mess = (fts_message_t *)fts_object_create(fts_message_metaclass, ac, at);
 	  error = fts_object_get_error((fts_object_t *)mess);
 	  
 	  if(error)

@@ -26,45 +26,91 @@
 
 #include <fts/fts.h>
 
+
 typedef struct
 {
   fts_object_t o;
+  int n;
+  enum unpack_types {type_int, type_float, type_symbol} *types;
 } unpack_t;
 
-static fts_symbol_t unpack_s_f = 0;
-static fts_symbol_t unpack_s_i = 0;
+static fts_symbol_t sym_f = 0;
+static fts_symbol_t sym_i = 0;
 
 static void
 unpack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  unpack_t *this = (unpack_t *)o;
   int i;
 
-  if (ac > fts_object_get_outlets_number(o))
-    ac = fts_object_get_outlets_number(o);
+  if(ac > this->n)
+    ac = this->n;
 
-  for (i = ac-1; i >= 0; i--)
+  for(i=ac-1; i>=0; i--)
     {
-      fts_atom_t a;
-      fts_symbol_t outlet_type;
-
-      outlet_type = fts_object_get_outlet_type(o, i);
-
-      if ((outlet_type == fts_s_int) && fts_is_int(at + i))
-	fts_outlet_send(o, i, outlet_type, 1, at + i);
-      else if ((outlet_type == fts_s_int) && fts_is_float(at + i))
+      switch(this->types[i])
 	{
-	  fts_set_int(&a, (int)fts_get_float(at + i));
-	  fts_outlet_send(o, i, outlet_type, 1, &a);
+	case type_int:
+	  if(fts_is_number(at + i))
+	    fts_outlet_int(o, i, fts_get_number_int(at + i));
+	  break;
+
+	case type_float:
+	  if(fts_is_number(at + i))
+	    fts_outlet_float(o, i, fts_get_number_float(at + i));
+	  break;
+
+	case type_symbol:
+	  if(fts_is_symbol(at + i))
+	    fts_outlet_symbol(o, i, fts_get_symbol(at + i));
+	  break;
+
+	default:
+	  break;
 	}
-      else if ((outlet_type == fts_s_float) && fts_is_float(at + i))
-	fts_outlet_send(o, i, outlet_type, 1, at + i);
-      else if ((outlet_type == fts_s_float) && fts_is_int(at + i))
+    }
+}
+
+static void
+unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  unpack_t *this = (unpack_t *)o;
+  int i;
+
+  ac--;
+  at++;
+
+  if(!ac)
+    {
+      this->n = 2;
+      this->types = (enum unpack_types *)fts_malloc(2 * sizeof(int));
+
+      this->types[0] = type_int;
+      this->types[1] = type_int;
+    }
+  else
+    {
+      this->n = ac;
+      this->types = (enum unpack_types *)fts_malloc(ac * sizeof(int));      
+
+      for(i=0; i<ac; i++)
 	{
-	  fts_set_float(&a, (float)fts_get_int(at + i));
-	  fts_outlet_send(o, i, outlet_type, 1, &a);
+	  if (fts_is_int(at + i))
+	    this->types[i] = type_int;
+	  else if (fts_is_float(at + i))
+	    this->types[i] = type_float;
+	  else if (fts_is_symbol(at + i))
+	    {
+	      fts_symbol_t sym = fts_get_symbol(at + i);
+	      
+	      if(sym == sym_i)
+		this->types[i] = type_int;
+	      else if(sym == sym_f)
+		this->types[i] = type_float;
+	      else
+		this->types[i] = type_symbol;
+	    }
 	}
-      else if ((outlet_type == fts_s_symbol) && fts_is_symbol(at + i))
-	fts_outlet_send(o, i, outlet_type, 1, at + i);
     }
 }
 
@@ -73,9 +119,6 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a;
   int i;
-
-  ac--;
-  at++;
 
   if (!ac)
     {
@@ -93,17 +136,15 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   for(i=0; i<ac; i++)
     {
-      if (fts_is_float(at + i))
-	fts_outlet_type_define_varargs(cl, i, fts_s_float);
-      else if (fts_is_int(at + i))
-	fts_outlet_type_define_varargs(cl, i, fts_s_int);
+      if (fts_is_number(at + i))
+	fts_outlet_type_define_varargs(cl, i, fts_get_selector(at + i));
       else if (fts_is_symbol(at + i))
 	{
 	  fts_symbol_t sym = fts_get_symbol(at + i);
 
-	  if(sym == unpack_s_i)
+	  if(sym == sym_i)
 	    fts_outlet_type_define_varargs(cl, i, fts_s_int);
-	  else if(sym == unpack_s_f)
+	  else if(sym == sym_f)
 	    fts_outlet_type_define_varargs(cl, i, fts_s_float);
 	  else
 	    fts_outlet_type_define_varargs(cl, i, fts_s_symbol);
@@ -116,8 +157,8 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 unpack_config(void)
 {
-  unpack_s_f = fts_new_symbol("f");
-  unpack_s_i = fts_new_symbol("i");
+  sym_f = fts_new_symbol("f");
+  sym_i = fts_new_symbol("i");
 
-  fts_metaclass_install(fts_new_symbol("unpack"),unpack_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("unpack"), unpack_instantiate, fts_arg_type_equiv);
 }

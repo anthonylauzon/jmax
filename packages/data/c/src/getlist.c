@@ -74,10 +74,10 @@ getlist_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  fts_array_set_size(&this->list, 0);
 	  
 	  /* get object state as array */
-	  fts_set_array(&a, &this->list);
+	  fts_set_pointer(&a, &this->list);
 	  method(input, 0, fts_s_get_array, 1, &a);
 	  
-	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+	  fts_outlet_atoms(o, 0, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 	}
     }
 }
@@ -93,7 +93,7 @@ getlist_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_array_set_size(&this->list, 0);
   preset_get_keys(preset, &this->list);
 
-  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -107,7 +107,7 @@ getlist_messtab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_array_set_size(&this->list, 0);
   messtab_get_keys(messtab, &this->list);
 
-  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 /************************************************

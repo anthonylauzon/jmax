@@ -39,7 +39,6 @@ typedef struct
   fts_symbol_t keep;
 } preset_t;
 
-DATA_API fts_class_t *preset_class;
 DATA_API fts_symbol_t preset_symbol;
 DATA_API fts_metaclass_t *preset_type;
 

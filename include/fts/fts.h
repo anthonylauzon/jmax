@@ -90,6 +90,7 @@ extern "C" {
 #include <fts/expression.h>
 #include <fts/objectset.h>
 #include <fts/array.h>
+#include <fts/tuple.h>
 #include <fts/message.h>
 #include <fts/patcher.h>
 #include <fts/doctor.h>

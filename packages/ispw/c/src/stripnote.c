@@ -42,7 +42,7 @@ stripnote_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if (x->n)
     {
       fts_outlet_int(o, 1, x->n);
-      fts_outlet_send(o, 0, fts_s_int, ac, at);
+      fts_outlet_int(o, 0, fts_get_int(at));
     }
 }
 

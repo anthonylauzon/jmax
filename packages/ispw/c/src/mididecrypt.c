@@ -92,7 +92,7 @@ static void out_list( decrypt_t *x)
   for( i = 0; i < x->nb_elm; i++)
     fts_set_int( &(x->lstout[i]), x->Elm[i]);
 
-  fts_outlet_send( (fts_object_t *)x, 0, fts_s_list, x->nb_elm, x->lstout);
+  fts_outlet_atoms( (fts_object_t *)x, 0, x->nb_elm, x->lstout);
 }
 
 static void Calcul2( decrypt_t *x)

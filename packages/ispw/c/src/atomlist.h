@@ -30,7 +30,7 @@ typedef struct fts_atom_list fts_atom_list_t;
 /*fts_atom_list_t *fts_atom_list_new( void);
   void fts_atom_list_free( fts_atom_list_t *list);*/
 
-ISPW_API fts_symbol_t atomlist_symbol;
+ISPW_API fts_metaclass_t *atomlist_type;
 ISPW_API fts_symbol_t sym_atomlist_set_name;
 ISPW_API fts_symbol_t sym_atomlist_update;
 

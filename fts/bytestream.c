@@ -93,6 +93,9 @@ typedef int socket_t;
 static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_bytestream = 0;
 
+fts_metaclass_t *fts_socketstream_type = 0;
+fts_metaclass_t *fts_pipestream_type = 0;
+
 void fts_bytestream_init(fts_bytestream_t *stream)
 {
   stream->input = 0;
@@ -560,7 +563,7 @@ void fts_bytestream_config( void)
   fts_s_bytestream = fts_new_symbol("bytestream");
   fts_s__superclass = fts_new_symbol("_superclass");
 
-  fts_class_install( fts_new_symbol("socketstream"), fts_socketstream_instantiate);
-  fts_class_install( fts_new_symbol("pipestream"), fts_pipestream_instantiate);
+  fts_socketstream_type = fts_class_install(fts_new_symbol("socketstream"), fts_socketstream_instantiate);
+  fts_pipestream_type = fts_class_install(fts_new_symbol("pipestream"), fts_pipestream_instantiate);
 }
 

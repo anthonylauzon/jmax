@@ -300,7 +300,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int i;
 
-  for(i=1; i<ac; i++)
+  for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
       return &fts_CannotInstantiate;
 

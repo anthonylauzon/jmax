@@ -41,11 +41,8 @@ static void
 midiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
-  fts_atom_t a;
 
-  fts_set_object(&a, (fts_object_t *)event);
-
-  fts_outlet_send(o, 0, fts_s_midievent, 1, &a);
+  fts_outlet_object(o, 0, (fts_object_t *)event);
 }
 
 static void 

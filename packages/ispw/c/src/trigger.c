@@ -40,7 +40,7 @@
 
 typedef enum
 {
-  trigger_outlet_long,
+  trigger_outlet_int,
   trigger_outlet_float,
   trigger_outlet_symbol,
   trigger_outlet_list,
@@ -66,8 +66,8 @@ trigger_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       trigger_outlet_t tot = x->trigger_outlet_table[outlet];
       
-      if (tot == trigger_outlet_long)
-	fts_outlet_send(o, outlet, s, ac, at);
+      if (tot == trigger_outlet_int)
+	fts_outlet_int(o, outlet, fts_get_int(at));
       else if (tot == trigger_outlet_bang)
 	fts_outlet_bang(o, outlet);
       else if (tot == trigger_outlet_float)
@@ -75,9 +75,9 @@ trigger_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       else if (tot == trigger_outlet_symbol)
 	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ???? */
       else if (tot == trigger_outlet_list)
-	fts_outlet_send(o, outlet, fts_s_list, ac, at);
+	fts_outlet_int(o, outlet, fts_get_int(at));
       else if (tot == trigger_outlet_thru)
-	fts_outlet_send(o, outlet, s, ac, at);
+	fts_outlet_int(o, outlet, fts_get_int(at));
     }
 }
 
@@ -96,20 +96,16 @@ trigger_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       if (tot == trigger_outlet_bang)
 	fts_outlet_bang(o, outlet);
-      else if (tot == trigger_outlet_long)
-	fts_outlet_int(o, outlet, 0L);
+      else if (tot == trigger_outlet_int)
+	fts_outlet_int(o, outlet, 0);
       else if (tot == trigger_outlet_float)
 	fts_outlet_float(o, outlet, 0.0f);
       else if (tot == trigger_outlet_symbol)
 	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ???? */
       else if (tot == trigger_outlet_list)
-	{
-	  fts_atom_t at;
-	  fts_set_int(&at, 0);
-	  fts_outlet_list(o, outlet, 1, &at);
-	}
+	fts_outlet_int(o, outlet, 0);
       else if (tot == trigger_outlet_thru)
-	fts_outlet_send(o, outlet, s, ac, at);
+	fts_outlet_bang(o, outlet);
     }
 }
 
@@ -124,17 +120,17 @@ trigger_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       trigger_outlet_t tot = x->trigger_outlet_table[outlet];
 
       if (tot == trigger_outlet_float)
-	fts_outlet_send(o, outlet, s, ac, at);
-      else if (tot == trigger_outlet_long)
-	fts_outlet_int(o, outlet, (long)fts_get_float(at));
+	fts_outlet_float(o, outlet, fts_get_float(at));
+      else if (tot == trigger_outlet_int)
+	fts_outlet_int(o, outlet, (int)fts_get_float(at));
       else if (tot == trigger_outlet_symbol)
 	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ??? */
       else if (tot == trigger_outlet_list)
-	fts_outlet_send(o, outlet, fts_s_list, ac, at);
+	fts_outlet_float(o, outlet, fts_get_float(at));
       else if (tot == trigger_outlet_bang)
 	fts_outlet_bang(o, outlet);
       else if (tot == trigger_outlet_thru)
-	fts_outlet_send(o, outlet, s, ac, at);
+	fts_outlet_float(o, outlet, fts_get_float(at));
     }
 }
 
@@ -148,18 +144,18 @@ trigger_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {
       trigger_outlet_t tot = x->trigger_outlet_table[outlet];
 
-      if (tot == trigger_outlet_long)
+      if (tot == trigger_outlet_int)
 	fts_outlet_int(o, outlet, 0L);
       else if (tot == trigger_outlet_float)
 	fts_outlet_float(o, outlet, 0.0f);
       else if (tot == trigger_outlet_symbol)
-	fts_outlet_send(o, outlet, s, ac, at);
+	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
       else if (tot == trigger_outlet_list)
-	fts_outlet_send(o, outlet, fts_s_list, ac, at);
+	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
       else if (tot == trigger_outlet_bang)
 	fts_outlet_bang(o, outlet);
       else if (tot == trigger_outlet_thru)
-	fts_outlet_send(o, outlet, s, ac, at);
+	fts_outlet_symbol(o, outlet, fts_get_symbol(at));
     }
 }
   
@@ -177,37 +173,37 @@ trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	{
 	  switch (x->trigger_outlet_table[outlet])
 	    {
-	    case trigger_outlet_long:
+	    case trigger_outlet_int:
 	      {
-		if (fts_is_int(at))
-		  fts_outlet_send(o, outlet, fts_s_int, 1, at);
-		else if (fts_is_float(at))
-		  fts_outlet_int(o, outlet, (long) fts_get_float(at));
-		else
-		  fts_outlet_int(o, outlet, 0L);
+		int x = 0;
+
+		if (fts_is_number(at))
+		  x = fts_get_number_int(at);
+
+		fts_outlet_int(o, outlet, x);
 	      }
 	      break;
 
 	    case trigger_outlet_float:
 	      {
-		if (fts_is_int(at))
-		  fts_outlet_float(o, outlet, (float) fts_get_int(at));
-		else if (fts_is_float(at))
-		  fts_outlet_send(o, outlet, fts_s_float, 1, at);
-		else
-		  fts_outlet_float(o, outlet, 0.0f);
+		float x = 0;
+
+		if (fts_is_number(at))
+		  x = fts_get_number_float(at);
+
+		fts_outlet_float(o, outlet, x);
 	      }
 	      break;
 
 	    case trigger_outlet_symbol:
 	      if (fts_is_symbol(at))
-		fts_outlet_send(o, outlet, fts_s_symbol, 1, at);
+		fts_outlet_symbol(o, outlet, fts_get_symbol(at));
 	      else
-		fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ??? */
+		fts_outlet_symbol(o, outlet, fts_new_symbol(""));
 	      break;
 
 	    case trigger_outlet_list:
-	      fts_outlet_send(o, outlet, s, ac, at);
+	      fts_outlet_atoms(o, outlet, ac, at);
 	      break;
 
 	    case trigger_outlet_bang:
@@ -215,7 +211,7 @@ trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      break;
 
 	    case trigger_outlet_thru:
-	      fts_outlet_send(o, outlet, s, ac, at);
+	      fts_outlet_atoms(o, outlet, ac, at);
 	      break;
 	    }
 	}
@@ -231,7 +227,7 @@ trigger_all_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int outlet = x->noutlets;
 
   while (outlet--)
-    fts_outlet_send(o, outlet, fts_s_bang, 0, 0);
+    fts_outlet_bang(o, outlet);
 }
 
 
@@ -268,9 +264,6 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int all_bang, all_thru;
   int n;
 
-  ac--;
-  at++;
-
   /* Create the trigger_outlet_table structure, to be put in the user data of the class 
      Looks for each argument; arguments can be:
 
@@ -292,7 +285,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
      old version, a trigger with a t outlet would creare a bang
      outlet, beacuse no error control was done.
 
-     If there are no arguments, the trigger default to two long
+     If there are no arguments, the trigger default to two int
      outlets (backward compatibility, it would make more sense having two 
      thru as default).
      */
@@ -318,7 +311,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  }
 	else if (fts_is_int(at))
 	  {
-	    trigger_outlet_table[n] = trigger_outlet_long;
+	    trigger_outlet_table[n] = trigger_outlet_int;
 	    all_bang = 0;
 	    all_thru = 0;
 	  }
@@ -329,7 +322,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	    switch(s[0])
 	      {
 	      case 'i':
-		trigger_outlet_table[n] = trigger_outlet_long;
+		trigger_outlet_table[n] = trigger_outlet_int;
 		all_bang = 0;
 		all_thru = 0;
 		break;
@@ -371,8 +364,8 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       }
   else
     {
-      trigger_outlet_table[0] = trigger_outlet_long;
-      trigger_outlet_table[1] = trigger_outlet_long;
+      trigger_outlet_table[0] = trigger_outlet_int;
+      trigger_outlet_table[1] = trigger_outlet_int;
       all_bang = 0;
       all_thru = 0;
     }
@@ -402,7 +395,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       switch (trigger_outlet_table[n])
 	{
-	case trigger_outlet_long:
+	case trigger_outlet_int:
 	  fts_outlet_type_define_varargs(cl,  n,  fts_s_int);
 	  break;
 	case trigger_outlet_float:
@@ -453,20 +446,13 @@ trigger_atoms_conforms(const fts_atom_t *a1, const fts_atom_t *a2)
 static int
 trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  /* skip the two class names */
-
-  ac0--; ac1--;
-  at0++; at1++;
-
-  /* do the test */
-
   if (ac0 == 0)
     {
       if (ac1 == 0)
 	return 1;
       else if (ac1 == 2)
 	{
-	  /* look if at1 is two longs */
+	  /* look if at1 is two ints */
 
 	  fts_atom_t a;
 
@@ -484,7 +470,7 @@ trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 	{
 	  if (ac0 == 2)
 	    {
-	      /* look if at0 is two longs */
+	      /* look if at0 is two ints */
 
 	      fts_atom_t a;
 

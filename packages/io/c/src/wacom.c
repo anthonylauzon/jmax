@@ -658,7 +658,7 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 		    fts_set_int(a + 2, this->range_z);
 		    fts_set_int(a + 3, this->range_tilt_x);
 		    fts_set_int(a + 4, this->range_tilt_y);
-		    fts_outlet_send(o, wacom_outlet_init, fts_s_list, 5, a);
+		    fts_outlet_atoms(o, wacom_outlet_init, 5, a);
 		    
 		    break;
 		  }

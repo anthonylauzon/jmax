@@ -109,7 +109,7 @@ value_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   value_t *x = (value_t *)o;
   fts_atom_t a = x->v->atom;
   
-  fts_outlet_send(o, 0, fts_get_selector(&a), 1, &a);
+  fts_outlet_atom(o, 0, &a);
 }
 
 /* Installed for int, floats and symbols */

@@ -46,7 +46,7 @@ speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       fts_set_void(&this->atom);
 
-      fts_outlet_send((fts_object_t *)o, 0, fts_get_selector(&atom), 1, &atom);
+      fts_outlet_atom(o, 0, &atom);
     }
 
   /* open gate */
@@ -65,7 +65,7 @@ speedlim_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_timebase_remove_object(fts_get_timebase(), o);
       fts_timebase_add_call(fts_get_timebase(), o, speedlim_output, 0, this->time);
 
-      fts_outlet_send(o, 0, fts_get_selector(at), 1, at);      
+      fts_outlet_atom(o, 0, at);
     }
   else
     {

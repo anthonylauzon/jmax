@@ -51,9 +51,9 @@ split_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   float f = fts_get_float(at);
 
   if (f <= this->float_bound[1] && f >= this->float_bound[0])
-    fts_outlet_send(o, 0, fts_s_float, 1, at);
+    fts_outlet_float(o, 0, f);
   else
-    fts_outlet_send(o, 1, fts_s_float, 1, at);
+    fts_outlet_float(o, 1, f);
 }
 
 static void

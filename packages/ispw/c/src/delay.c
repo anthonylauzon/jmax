@@ -96,10 +96,8 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  /* initialize the class */
   fts_class_init(cl, sizeof(delay_t), 2, 1, 0); 
 
-  /* define the system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delay_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, delay_input);
@@ -108,7 +106,6 @@ delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_int, delay_set_delay_time);
   fts_method_define_varargs(cl, 1, fts_s_float, delay_set_delay_time);
 
-  /* Type the outlet */
   fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
 
   return fts_Success;

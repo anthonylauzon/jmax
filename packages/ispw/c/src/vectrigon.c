@@ -239,8 +239,6 @@ vectrigon_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 vectrigon_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t put_method)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(vectrigon_t), 1, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vectrigon_init);

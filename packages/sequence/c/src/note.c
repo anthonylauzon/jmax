@@ -60,7 +60,7 @@ void
 note_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_ptr(at);
   
   fts_array_append_int(array, this->pitch);
   fts_array_append_float(array, (float)this->duration);
@@ -106,6 +106,5 @@ note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 note_config(void)
 {
-  fts_class_install(seqsym_note, note_instantiate);
-  note_class = fts_class_get_by_name(seqsym_note);
+  note_type = fts_class_install(seqsym_note, note_instantiate);
 }

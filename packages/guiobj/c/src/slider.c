@@ -100,15 +100,15 @@ static void
 slider_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int nn = fts_get_int(at);
+  int n = fts_get_int(at);
 
-  if (this->n != nn)
+  if (this->n != n)
     {
       fts_object_ui_property_changed(o, fts_s_value);
-      this->n = nn;
+      this->n = n;
     }
 
-  fts_outlet_send(o, 0, fts_s_int, ac, at);
+  fts_outlet_int(o, 0, n);
 }
 
 
@@ -116,15 +116,15 @@ static void
 slider_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int nn = (int) fts_get_float(at);
+  int n = (int) fts_get_float(at);
 
-  if (this->n != nn)
+  if (this->n != n)
     {
       fts_object_ui_property_changed(o, fts_s_value);
-      this->n = nn;
+      this->n = n;
     }
 
-  fts_outlet_int(o, 0, this->n);
+  fts_outlet_int(o, 0, n);
 }
 
 /* in case of list, only the first value is significative */
@@ -143,19 +143,18 @@ static void
 slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int nn = fts_get_int_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
-  if (this->n != nn)
+  if (this->n != n)
     {
-      this->n = nn;
+      this->n = n;
       fts_object_ui_property_changed(o, fts_s_value);
     }
 }
 
 
 static void
-slider_get_value(fts_daemon_action_t action, fts_object_t *obj,
-	       fts_symbol_t property, fts_atom_t *value)
+slider_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   slider_t *this = (slider_t *)obj;
 
@@ -163,14 +162,14 @@ slider_get_value(fts_daemon_action_t action, fts_object_t *obj,
 }
 
 static void
-slider_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+slider_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   slider_t *this = (slider_t *)obj;
+  int n = fts_get_int(value);
 
-  this->n = fts_get_int(value);
+  this->n = n;
 
-  fts_outlet_send(obj, 0, fts_s_int, 1, value);
+  fts_outlet_int(obj, 0, n);
   fts_object_ui_property_changed(obj, fts_s_value);
 }
 

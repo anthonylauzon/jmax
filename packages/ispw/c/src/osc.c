@@ -97,8 +97,6 @@ sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 static fts_status_t
 sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(sigtab1_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init);

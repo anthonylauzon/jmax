@@ -124,7 +124,7 @@ prepend_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if (x->presym)
     fts_outlet_send(o, 0, x->presym, n, sat);
   else
-    fts_outlet_send(o, 0, fts_s_list, n, sat);
+    fts_outlet_atoms(o, 0, n, sat);
 }
 
 /* As list, but prepend the selector; shadock shadock, but for compatibility 
@@ -152,7 +152,7 @@ prepend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if (x->presym)
     fts_outlet_send(o, 0, x->presym, n, sat);
   else
-    fts_outlet_send(o, 0, fts_s_list, n, sat);
+    fts_outlet_atoms(o, 0, n, sat);
 }
 
 static fts_status_t

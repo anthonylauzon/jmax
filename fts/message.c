@@ -34,7 +34,7 @@
  *  message class
  *
  */
-fts_class_t *fts_message_class = 0;
+fts_metaclass_t *fts_message_metaclass = 0;
 
 static int 
 is_token(fts_symbol_t s)
@@ -87,7 +87,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_object_set_error(o, "Syntax error in message or constant");
 	      return;
 	    }
-	  else if(fts_is_array(at + i))
+	  else if(fts_is_tuple(at + i))
 	    {
 	      fts_object_set_error(o, "List cannot be argument of a message or constructor");
 	      return;
@@ -134,8 +134,7 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_message_config(void)
 {
-  fts_class_install(fts_s_message, message_instantiate);
-  fts_message_class = fts_class_get_by_name(fts_s_message);
+  fts_message_metaclass = fts_class_install(fts_s_message, message_instantiate);
 }
 
 /************************************************
@@ -148,7 +147,7 @@ void
 fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
 {
   dumper->send = send;
-  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+  dumper->message = (fts_message_t *)fts_object_create(fts_message_metaclass, 0, 0);
 
   fts_object_refer(dumper->message);
 }
@@ -410,21 +409,6 @@ void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
     }
 }
 
-#undef fts_outlet_list
-void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
-{
-  fts_connection_t *conn;
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_list, ac, at); 
-
-      conn = conn->next_same_src;
-    }
-}
-
 #undef fts_outlet_bang
 void fts_outlet_bang(fts_object_t *o, int woutlet)
 {
@@ -436,4 +420,40 @@ void fts_outlet_bang(fts_object_t *o, int woutlet)
 
       conn = conn->next_same_src;
     }
+}
+
+void
+fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj)
+{
+  fts_atom_t a;
+
+  fts_set_object(&a, obj);
+
+  fts_object_refer(obj);
+  fts_outlet_send(o, woutlet, fts_metaclass_get_selector(fts_object_get_metaclass(obj)), 1, &a);
+  fts_object_release(obj);
+}
+
+void
+fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t *a)
+{
+  fts_outlet_send(o, woutlet, fts_get_selector(a), 1, a);
+}
+
+void
+fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a)
+{
+  if(fts_is_tuple(a))
+    fts_tuple_output(o, woutlet, fts_get_tuple(a));
+  else
+    fts_outlet_send(o, woutlet, fts_get_selector(a), 1, a);
+}
+
+void
+fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
+{
+  if(ac == 1)
+    fts_outlet_atom(o, woutlet, at);
+  else if(ac > 0)
+    fts_outlet_send(o, woutlet, fts_s_list, ac, at);
 }

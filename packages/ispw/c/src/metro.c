@@ -40,10 +40,12 @@ metro_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   metro_t *this = (metro_t *)o;
 
-  fts_timebase_add_call(fts_get_timebase(), o, metro_tick, 0, this->period);
-  fts_outlet_bang((fts_object_t *)o, 0);
+  if(fts_object_outlet_is_connected(o, 0))
+    {
+      fts_timebase_add_call(fts_get_timebase(), o, metro_tick, 0, this->period);
+      fts_outlet_bang((fts_object_t *)o, 0);
+    }
 }
-
 
 static void
 metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -104,6 +106,8 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(fts_is_number(at))
     metro_set_period(o, 0, 0, 1, at);
+  else
+    this->period = 100;
 }
 
 

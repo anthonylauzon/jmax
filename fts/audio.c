@@ -389,9 +389,6 @@ static fts_status_t audioportin_instantiate(fts_class_t *cl, int ac, const fts_a
 {
   int outlets, i;
 
-  ac--;
-  at++;
-
   if ( ac == 1 && fts_is_object( at))
     outlets = fts_audioport_get_input_channels( (fts_audioport_t *)fts_get_object( at) );
   else
@@ -440,9 +437,6 @@ static void indispatcher_propagate_input(fts_object_t *o, int winlet, fts_symbol
 static fts_status_t indispatcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int inlets, i;
-
-  ac--;
-  at++;
 
   if ( ac == 1 && fts_is_int( at))
     inlets = fts_get_int( at);
@@ -556,9 +550,6 @@ static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_
 {
   int inlets, i;
 
-  ac--;
-  at++;
-
   if ( ac == 1 && fts_is_object( at))
     inlets = fts_audioport_get_output_channels( (fts_audioport_t *)fts_get_object( at) );
   else
@@ -579,9 +570,6 @@ static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_
 static fts_status_t outdispatcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int outlets;
-
-  ac--;
-  at++;
 
   if ( ac == 1 && fts_is_int( at))
     outlets = fts_get_int( at);

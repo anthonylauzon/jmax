@@ -107,8 +107,7 @@ void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t pr
  */
 
 static fts_hashtable_t *default_labels = 0;
-fts_class_t *fts_label_class = 0;
-fts_metaclass_t *fts_label_metaclass = 0;
+fts_metaclass_t *fts_label_type = 0;
 
 static fts_label_t *
 label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
@@ -125,7 +124,7 @@ label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 	{
 	  fts_object_t *obj = fts_get_object(value);
 	  
-	  if(fts_object_get_class(obj) == fts_label_class)
+	  if(fts_object_get_metaclass(obj) == fts_label_type)
 	    label = (fts_label_t *)obj;
 	  else
 	    return 0; /* variable is not a label */
@@ -146,7 +145,7 @@ label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       /* if there wasn't a variable nor a default, make a default */
       fts_set_void(&a);
-      label = (fts_label_t *)fts_object_create(fts_label_class, 1, &a);
+      label = (fts_label_t *)fts_object_create(fts_label_type, 1, &a);
       
       fts_set_object(&a, (fts_object_t *)label);
       fts_hashtable_put(default_labels, &key, &a);
@@ -169,7 +168,7 @@ fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
 	{
 	  fts_object_t *obj = fts_get_object(value);
 	  
-	  if(fts_object_get_class(obj) == fts_label_class)
+	  if(fts_object_get_metaclass(obj) == fts_label_type)
 	    label = (fts_label_t *)obj;
 	}
     }
@@ -433,8 +432,7 @@ label_connection_check(int ac, const fts_atom_t *at)
 void 
 fts_label_config(void)
 {
-  fts_label_metaclass = fts_class_install( fts_s_label, label_instantiate);
-  fts_label_class = fts_class_get_by_name(fts_s_label);
+  fts_label_type = fts_class_install( fts_s_label, label_instantiate);
 
   fts_alias_install(fts_s_receive, fts_s_inlet);
   fts_alias_install(fts_s_send, fts_s_outlet);

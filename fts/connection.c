@@ -42,6 +42,8 @@
 /*                                                                            */
 /******************************************************************************/
   
+fts_metaclass_t *fts_connection_type = 0;
+
 fts_connection_t *
 fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 {
@@ -112,7 +114,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
 	}
     }
 
-  conn = (fts_connection_t *) fts_object_create(fts_class_get_by_name(fts_s_connection), 0, 0);
+  conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
 
   conn->id  = id;
   conn->src = out;
@@ -368,6 +370,7 @@ static fts_status_t
 connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_connection_t), 0, 0, 0); 
+
   return fts_Success;
 }
 
@@ -379,6 +382,6 @@ connection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void fts_kernel_connection_init()
 {
-  fts_class_install(fts_s_connection, connection_instantiate);
+  fts_connection_type = fts_class_install(fts_s_connection, connection_instantiate);
 }
 

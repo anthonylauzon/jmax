@@ -25,7 +25,6 @@
 
 fts_symbol_t messtab_symbol = 0;
 fts_metaclass_t *messtab_type = 0;
-fts_class_t *messtab_class = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
@@ -46,14 +45,14 @@ messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac,
 
   if(s)
     {
-      mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+      mess = (fts_message_t *)fts_object_create(fts_message_metaclass, 0, 0);
       fts_message_set(mess, s, ac, at);
     }
   else
     {
       fts_symbol_t error = 0;
 
-      mess = (fts_message_t *)fts_object_create(fts_message_class, ac, at);
+      mess = (fts_message_t *)fts_object_create(fts_message_metaclass, ac, at);
       error = fts_object_get_error((fts_object_t *)mess);
 
       if(error)
@@ -741,11 +740,11 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for(i=0; i<ac; i++)
     {
-      if(fts_is_array(at + i))
+      if(fts_is_tuple(at + i))
 	{
-	  fts_array_t *list = fts_get_array(at + i);
-	  int lac = fts_array_get_size(list);
-	  fts_atom_t *lat = fts_array_get_atoms(list);
+	  fts_tuple_t *tup = fts_get_tuple(at + i);
+	  int lac = fts_tuple_get_size(tup);
+	  fts_atom_t *lat = fts_tuple_get_atoms(tup);
 	  
 	  if(fts_is_int(lat) || fts_is_symbol(lat))
 	    {
@@ -866,7 +865,6 @@ messtab_config(void)
   messtab_symbol = fts_new_symbol("messtab");
 
   messtab_type = fts_class_install(messtab_symbol, messtab_instantiate);
-  messtab_class = fts_class_get_by_name(messtab_symbol);
 
   fts_class_install(fts_new_symbol("getmess"), getmess_instantiate);
   fts_class_install(fts_new_symbol("putmess"), putmess_instantiate);

@@ -48,7 +48,7 @@ static void fts_audiofile_ftl_write(fts_word_t *argv);
  */
 
 fts_audiofile_loader_t* fts_audiofile_loader = NULL;
-static fts_class_t *fts_audiofile_class = NULL;
+static fts_metaclass_t *fts_audiofile_type = NULL;
 
 /*******************************************************
  *
@@ -60,8 +60,7 @@ void
 fts_kernel_audiofile_init(void)
 {
   fts_s_audiofile = fts_new_symbol("audiofile");
-  fts_metaclass_install(fts_s_audiofile, fts_audiofile_instantiate, fts_always_equiv);
-  fts_audiofile_class = fts_class_get_by_name(fts_s_audiofile);
+  fts_audiofile_type = fts_class_install(fts_s_audiofile, fts_audiofile_instantiate);
 }
 
 /*******************************************************
@@ -238,7 +237,7 @@ fts_audiofile_open_write(fts_symbol_t  filename, int sample_rate, int channels, 
   fts_set_int(&a[2], channels);
   fts_set_symbol(&a[3], fts_new_symbol(sample_format));
 
-  return (fts_audiofile_t *) fts_object_create(fts_audiofile_class, 4, a);
+  return (fts_audiofile_t *) fts_object_create(fts_audiofile_type, 4, a);
 }
 
 fts_audiofile_t* 
@@ -246,7 +245,7 @@ fts_audiofile_open_read(fts_symbol_t filename)
 {
   fts_atom_t a[1];
   fts_set_symbol(&a[0], fts_new_symbol(filename));
-  return (fts_audiofile_t *) fts_object_create(fts_audiofile_class, 1, a);
+  return (fts_audiofile_t *) fts_object_create(fts_audiofile_type, 1, a);
 }
 
 void 

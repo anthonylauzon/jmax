@@ -29,7 +29,6 @@
 
 fts_symbol_t row_symbol = 0;
 fts_metaclass_t *row_type = 0;
-fts_class_t *row_class = 0;
 
 /********************************************************
  *
@@ -47,7 +46,7 @@ row_void(row_t *this)
 
   for(j=0; j<size; j++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, i, j);
+      fts_atom_t *elem = mat_get_element(mat, i, j);
 
       fts_set_void(elem);
     }
@@ -63,7 +62,7 @@ row_set_const(row_t *this, fts_atom_t value)
 
   for(j=0; j<size; j++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, i, j);
+      fts_atom_t *elem = mat_get_element(mat, i, j);
 
       fts_atom_assign(elem, &value);
     }
@@ -82,7 +81,7 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
 
   for(j=0; j<ac; j++)
     {
-      fts_atom_t *elem = &mat_get_element(mat, i, onset + j);
+      fts_atom_t *elem = mat_get_element(mat, i, onset + j);
 
       fts_atom_assign(elem, at + j);
     }
@@ -97,10 +96,7 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 row_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, row_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -165,7 +161,7 @@ row_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   post("{");
 
   for(i=0; i<size; i++)
-    post_atoms(1, &row_get_element(this, i));
+    post_atoms(1, row_get_element(this, i));
 
   post("}\n");
 }
@@ -252,5 +248,4 @@ row_config(void)
   row_symbol = fts_new_symbol("row");
 
   row_type = fts_class_install(row_symbol, row_instantiate);
-  row_class = fts_class_get_by_name(row_symbol);
 }

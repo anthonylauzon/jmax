@@ -140,9 +140,6 @@ fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[3];
   int i, n;
 
-  ac--;
-  at++;
-
   if(ac > 0)
     n = ac;
   else 

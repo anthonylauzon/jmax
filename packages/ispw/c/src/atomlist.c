@@ -38,11 +38,11 @@
 static fts_heap_t *atom_list_cell_heap;
 static fts_heap_t *atom_list_iterator_heap;
 
-fts_symbol_t atomlist_symbol     = 0;
-fts_symbol_t sym_setValues       = 0;
-fts_symbol_t sym_setName         = 0;
-fts_symbol_t sym_atomlist_set    = 0;  
-fts_symbol_t sym_atomlist_set_name    = 0;  
+fts_metaclass_t *atomlist_type = 0;
+fts_symbol_t sym_setValues = 0;
+fts_symbol_t sym_setName = 0;
+fts_symbol_t sym_atomlist_set = 0;  
+fts_symbol_t sym_atomlist_set_name = 0;  
 fts_symbol_t sym_atomlist_update = 0;  
 
 /********************************************************************************/
@@ -468,15 +468,14 @@ atom_list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void atom_list_config(void)
 {
-  atom_list_cell_heap     = fts_heap_new(sizeof( fts_atom_list_cell_t));
+  atom_list_cell_heap = fts_heap_new(sizeof( fts_atom_list_cell_t));
   atom_list_iterator_heap = fts_heap_new(sizeof( fts_atom_list_iterator_t));
 
-  atomlist_symbol = fts_new_symbol("__atomlist");
   sym_setValues = fts_new_symbol("setValues");
   sym_setName = fts_new_symbol("setName");
   sym_atomlist_set_name = fts_new_symbol("atomlist_set_name");  
   sym_atomlist_set = fts_new_symbol("atomlist_set");  
   sym_atomlist_update = fts_new_symbol("atomlist_update");  
 
-  fts_class_install(atomlist_symbol, atom_list_instantiate);
+  atomlist_type = fts_class_install(fts_new_symbol("ispw_atomlist"), atom_list_instantiate);
 }

@@ -44,7 +44,7 @@
 static fts_hashtable_t fts_packages;
 static fts_list_t* fts_package_paths = NULL;
 
-static fts_class_t *fts_package_class = NULL;
+static fts_metaclass_t *fts_package_type = NULL;
 static fts_package_t* fts_system_package = NULL;
 static fts_package_t* fts_package_stack[PACKAGE_STACK_SIZE];
 static int fts_package_stack_top = 0;
@@ -134,7 +134,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   }
 
   /* check whether it's a package object */
-  if (fts_object_get_class(obj) != fts_package_class) {
+  if (fts_object_get_metaclass(obj) != fts_package_type) {
 /* FIXME: error corruption     fts_object_destroy(obj); */
     fts_log("[package]: Invalid package file %s\n", path);
     pkg = fts_package_new(name);
@@ -1145,7 +1145,7 @@ fts_package_new(fts_symbol_t name)
   fts_atom_t a[1];
   
   fts_set_symbol(&a[0], name);
-  return (fts_package_t *) fts_object_create(fts_package_class, 1, a);
+  return (fts_package_t *) fts_object_create(fts_package_type, 1, a);
 }
 
 void 
@@ -1210,7 +1210,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   if ( (status = fts_send_message( obj, 0, fts_s_print, 0, 0)) != fts_Success)
     post( "Message send failed (%s)\n", fts_status_get_description(status));
 
-  if (fts_object_get_class(obj) == fts_package_class) {
+  if (fts_object_get_metaclass(obj) == fts_package_type) {
     post( "Loaded package\n");
   }
 }
@@ -1270,11 +1270,10 @@ fts_kernel_package_init(void)
 
   /* now that there's a system package, we can define the package
      (meta-) class */
-  fts_metaclass_install(fts_s_package, fts_package_instantiate, fts_always_equiv);
+  fts_package_type = fts_class_install(fts_s_package, fts_package_instantiate);
 
   /* update the system package with the correct class */
-  fts_package_class = fts_class_get_by_name(fts_s_package);
-  fts_system_package->object.head.cl = fts_package_class;
+  fts_system_package->object.head.cl = fts_package_type->inst_list;
 
   /* Debug code */
   fts_class_install( fts_new_symbol( "loader"), loader_instantiate);

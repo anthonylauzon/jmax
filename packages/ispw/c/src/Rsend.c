@@ -116,7 +116,7 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	}
     }
 
-  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->output), fts_array_get_atoms(&this->output));
+  fts_outlet_atoms(o, 0, fts_array_get_size(&this->output), fts_array_get_atoms(&this->output));
 }
 
 static void
@@ -138,8 +138,6 @@ Rsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 Rsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(Rsend_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, Rsend_init);

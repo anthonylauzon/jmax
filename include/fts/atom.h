@@ -375,6 +375,24 @@ FTS_API fts_metaclass_t *fts_t_connection;
   while(0)
 
 /**
+ * Assignment between atoms.<br>
+ * This macro takes care of dereferencing the atom if it was an object.
+ *
+ * @fn void fts_atom_void( fts_atom_t *p)
+ * @param dest pointer to the destination atom
+ * @param src pointer to the source atom
+ * @ingroup atom
+ */
+#define fts_atom_void(p)		        \
+  do						\
+    {						\
+      if(fts_is_object(p))			\
+	fts_atom_release(p);			\
+      fts_set_void(p);                          \
+    }						\
+  while(0)
+
+/**
  * Checks if atoms are of the same type
  *
  * @fn int fts_atom_same_type( const fts_atom_t *p1, const fts_atom_t *p2))

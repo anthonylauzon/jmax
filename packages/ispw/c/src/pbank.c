@@ -489,7 +489,7 @@ pbank_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       this->out_list[j] = row[j];
     }
   
-  fts_outlet_list(o, 0, n, this->out_list);
+  fts_outlet_atoms(o, 0, n, this->out_list);
 }
 
 static void
@@ -554,12 +554,12 @@ pbank_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  /* buaaaarrrrrrrgg zaaaaaaaaaaaaack!!!!!!!*&(*@#&^(*^&*(%#$ */
 	  fts_set_symbol((out_list + 1), fts_s_symbol);
 	  out_list[2] = row[j];
-	  fts_outlet_list(o, 0, 3, out_list);
+	  fts_outlet_atoms(o, 0, 3, out_list);
 	}
       else 
 	{
 	  out_list[1] = row[j];
-	  fts_outlet_list(o, 0, 2, out_list);
+	  fts_outlet_atoms(o, 0, 2, out_list);
 	}
     }
 }
@@ -654,12 +654,12 @@ pbank_set_and_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  /* ones more: buaaaarrrrrrrgg zaaaaaaaaaaaaack!!!!!!!*&(*@#&^(*^&*(%#$ */
 	  fts_set_symbol(out_list + 1, fts_s_symbol);
 	  out_list[2] = *atom;
-	  fts_outlet_list(o, 0, 3, out_list);
+	  fts_outlet_atoms(o, 0, 3, out_list);
 	}
       else 
 	{
 	  out_list[1] = *atom;
-	  fts_outlet_list(o, 0, 2, out_list);
+	  fts_outlet_atoms(o, 0, 2, out_list);
 	}
     }
   else
@@ -743,7 +743,7 @@ pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac < 5)
+  if(ac <= 3)
     {
       /* pbank <# of cols> <#of rows> <name> */
       fts_class_init(cl, sizeof(pbank_t), 1, 1, 0);
@@ -753,10 +753,9 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_int, pbank_get_row);
       fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), pbank_recall);
 
-      /* type the outlet */
       fts_outlet_type_define_varargs(cl, 0, fts_s_list);
     }
-  else if(ac == 5)
+  else if(ac == 4)
     {
       /* pbank <# of cols> <#of rows> <name> <root name for receives> ... send output to receives */
       fts_class_init(cl, sizeof(pbank_t), 1, 0, 0);

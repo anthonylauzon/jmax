@@ -173,7 +173,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       idx = 0;
 
     if(idx == here){
-      fts_outlet_list(o, 0, ac, at);	
+      fts_outlet_atoms(o, 0, ac, at);	
       this->idx = idx;
       return;
     }
@@ -226,7 +226,7 @@ voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(fts_get_int_arg(ac, at, 4, 0) == 0)
+  if(fts_get_int_arg(ac, at, 3, 0) == 0)
     fts_class_init(cl, sizeof(voxalloc_t), 2, 2, 0); /* no dur arg in list -> dur inlet */
   else
     fts_class_init(cl, sizeof(voxalloc_t), 1, 2, 0); /* no dur inlet */
@@ -241,7 +241,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, voxalloc_int);
   fts_method_define_varargs(cl, 0, fts_s_float, voxalloc_float);
 
-  if(fts_get_int_arg(ac, at, 4, 0) == 0)
+  if(fts_get_int_arg(ac, at, 3, 0) == 0)
     { 
       /* dur inlet */
       fts_method_define_varargs(cl, 1, fts_s_int, voxalloc_number_1);
@@ -258,7 +258,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 voxalloc_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return(fts_get_int_arg(ac0, at0, 4, 0) == fts_get_int_arg(ac1, at1, 4, 0));
+  return(fts_get_int_arg(ac0, at0, 3, 0) == fts_get_int_arg(ac1, at1, 3, 0));
 }
 
 void

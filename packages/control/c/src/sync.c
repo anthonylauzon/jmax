@@ -59,8 +59,7 @@ sync_output(sync_t *this)
   int i;
 
   for(i=this->n-1; i>=0; i--)
-    if(!fts_is_void(this->a + i))
-      fts_outlet_send((fts_object_t *)this, i, fts_get_selector(this->a + i), 1, this->a + i);
+    fts_outlet_atom((fts_object_t *)this, i, this->a + i);
 }
 
 static void
@@ -103,11 +102,11 @@ sync_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
       if(in >= 0 && in < n)
 	*bits = 1 << in;
     }
-  else if(fts_is_array(at))
+  else if(fts_is_tuple(at))
     {
-      fts_array_t *l = fts_get_array(at);
-      fts_atom_t *a = fts_array_get_atoms(l);
-      int size = fts_array_get_size(l);
+      fts_tuple_t *l = fts_get_tuple(at);
+      fts_atom_t *a = fts_tuple_get_atoms(l);
+      int size = fts_tuple_get_size(l);
       int i;
 
       *bits = 0;
@@ -252,9 +251,6 @@ sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n = 0;
   int i;
-
-  ac--;
-  at++;
 
   if(ac == 1 && fts_is_number(at))
     n = fts_get_number_int(at);

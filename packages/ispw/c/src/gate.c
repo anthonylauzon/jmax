@@ -28,28 +28,36 @@
 
 #include <fts/fts.h>
 
-typedef struct gate
+typedef struct
 {
   fts_object_t o;
   int opened;
 } gate_t;
 
-static void gate_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+gate_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((gate_t *)o)->opened = fts_get_int_arg(ac, at, 0, 0);
+  gate_t *this = (gate_t *)o;
+
+  if(fts_is_number(at))
+    this->opened = fts_get_number_int(at);
 }
 
 static void 
 gate_realize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (((gate_t *)o)->opened)
+  gate_t *this = (gate_t *)o;
+
+  if(this->opened)
     fts_outlet_send(o, 0, s, ac, at);
 }
 
 static void
 gate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((gate_t *)o)->opened = fts_get_int_arg(ac, at, 1, 0);
+  gate_t *this = (gate_t *)o;
+
+  this->opened = fts_get_int_arg(ac, at, 1, 0);
 }
 
 static fts_status_t
@@ -59,7 +67,10 @@ gate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, gate_init);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, gate_open);
+  fts_method_define_varargs(cl, 0, fts_s_int, gate_open);
+  fts_method_define_varargs(cl, 0, fts_s_float, gate_open);
+  fts_method_define_varargs(cl, 0, fts_s_list, gate_open);
+
   fts_method_define_varargs(cl, 1, fts_s_anything, gate_realize);
 
   return fts_Success;

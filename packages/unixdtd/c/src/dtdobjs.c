@@ -432,7 +432,7 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 {
   int n_channels, i;
 
-  n_channels = fts_get_int_arg(ac, at, 1, 1);
+  n_channels = fts_get_int_arg(ac, at, 0, 1);
 
   if (n_channels < 1)
     n_channels = 1;
@@ -761,7 +761,7 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 static fts_status_t 
 writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_channels = fts_get_int_arg(ac, at, 1, 1);
+  int n_channels = fts_get_int_arg(ac, at, 0, 1);
   int i;
 
   if (n_channels < 1)

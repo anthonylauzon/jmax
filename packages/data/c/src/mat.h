@@ -31,7 +31,6 @@
 
 DATA_API fts_metaclass_t *mat_type;
 DATA_API fts_symbol_t mat_symbol;
-DATA_API fts_class_t *mat_class;
 
 typedef struct
 {
@@ -50,7 +49,7 @@ DATA_API void mat_set_size(mat_t *mat, int m, int n);
 #define mat_get_ptr(x) ((x)->data)
 
 DATA_API void mat_set_element(mat_t *mat, int i, int j, fts_atom_t atom);
-#define mat_get_element(x, i, j) ((x)->data[(i) * (x)->n + (j)])
+#define mat_get_element(x, i, j) ((x)->data + (i) * (x)->n + (j))
 DATA_API void mat_void_element(mat_t *mat, int i, int j);
 
 #define mat_get_row(x, i) ((x)->data + (i) * (x)->n)

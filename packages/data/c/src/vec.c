@@ -30,7 +30,6 @@
 
 fts_symbol_t vec_symbol = 0;
 fts_metaclass_t *vec_type = 0;
-fts_class_t *vec_class = 0;
 
 static fts_symbol_t sym_text = 0;
 
@@ -46,10 +45,7 @@ extern void mat_free(mat_t *mat);
 static void
 vec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, vec_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -164,7 +160,7 @@ vec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   vec_t *this = (vec_t *)o;
   fts_atom_t *values = vec_get_ptr(this);
   int size = vec_get_size(this);
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
   int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
@@ -362,13 +358,13 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     mat_alloc((mat_t *)this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
     mat_alloc((mat_t *)this, fts_get_int(at), 1);
-  else if(ac == 1 && fts_is_array(at))
+  else if(ac == 1 && fts_is_tuple(at))
     {
-      fts_array_t *aa = fts_get_array(at);
-      int size = fts_array_get_size(aa);
+      fts_tuple_t *tup = fts_get_tuple(at);
+      int size = fts_tuple_get_size(tup);
       
       mat_alloc((mat_t *)this, size, 1);
-      vec_set_with_onset_from_atoms(this, 0, size, fts_array_get_atoms(aa));
+      vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
 
       this->keep = fts_s_args;
     }
@@ -439,5 +435,4 @@ vec_config(void)
   vec_symbol = fts_new_symbol("vec");
 
   vec_type = fts_class_install(vec_symbol, vec_instantiate);
-  vec_class = fts_class_get_by_name(vec_symbol);
 }

@@ -22,17 +22,6 @@
 
 #include <fts/fts.h>
 
-/***********************************************************************
- * Globals
- */
-
-fts_class_t *fts_array_class = 0;
-fts_metaclass_t *fts_array_metaclass = 0;
-
-/***********************************************************************
- * Array functions
- */
-
 #define ARRAY_DEFAULT_ALLOC_INCREMENT 64
 
 void fts_array_init(fts_array_t *array, int ac, const fts_atom_t *at)
@@ -177,50 +166,4 @@ fts_array_copy(fts_array_t *org, fts_array_t *copy)
   /* shift array towards end */
   for(i=0; i<size; i++)
     fts_atom_assign(copy->atoms + i, org->atoms + i);
-}
-
-/************************************************
- *
- *  array class
- *
- */
-static void
-array_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_array_t *this = (fts_array_t *)o;
-
-  ac--;
-  at++;
-
-  fts_array_init(this, ac, at);
-}
-
-static void
-array_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_array_t *this = (fts_array_t *)o;
-
-  fts_array_destroy(this);
-}
-
-static fts_status_t
-array_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_array_t), 0, 0, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, array_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, array_delete);
-  
-  return fts_Success;
-}
-
-/***********************************************************************
- *
- * Initialization
- *
- */
-void fts_kernel_array_init(void)
-{
-  fts_array_metaclass = fts_class_install( fts_s_array, array_instantiate);
-  fts_array_class = fts_class_get_by_name( fts_s_array);
 }

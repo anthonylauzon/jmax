@@ -32,7 +32,6 @@
 
 DATA_API fts_symbol_t col_symbol;
 DATA_API fts_metaclass_t *col_type;
-DATA_API fts_class_t *col_class;
 
 typedef struct
 {

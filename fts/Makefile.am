@@ -50,6 +50,7 @@ stack.c \
 symbol.c \
 template.c \
 time.c \
+tuple.c \
 variable.c \
 version.c \
 vm.c 

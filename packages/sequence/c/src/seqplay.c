@@ -81,7 +81,7 @@ seqplay_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	{
 	  fts_atom_t *a = event_get_value(event);
 	  
-	  fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+	  fts_outlet_atom(o, 0, a);
 	  event = event_get_next(event);
 	}
     }
@@ -245,7 +245,7 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_atom_t *a = event_get_value(event);
 
 	      if(track_is_active(this->track))
-		fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
+		fts_outlet_atom(o, 0, a);
 
 	      event = event_get_next(event);
 	    }

@@ -20,6 +20,9 @@
  * 
  */
 
+
+FTS_API fts_metaclass_t *fts_connection_type;
+
 typedef enum fts_connection_type
 {
   fts_c_invalid = 0, /* from error object or type missmatch */

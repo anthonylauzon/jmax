@@ -39,7 +39,7 @@ static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t
   dsp_t *this = (dsp_t *)listener;
 
   if (fts_is_int(value))
-    fts_outlet_send((fts_object_t *) this, 0, fts_s_int, 1, value);
+    fts_outlet_int((fts_object_t *) this, 0, fts_get_int(value));
 }
 
 static void

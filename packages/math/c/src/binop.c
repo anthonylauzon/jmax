@@ -52,15 +52,15 @@ extern fts_status_t binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_at
 static fts_status_t
 binop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && fts_is_number(at + 1))
+  if(ac == 1 && fts_is_number(at))
     return binop_number_instantiate(cl, ac, at);
-  else if(ac == 2 && ivec_atom_is(at + 1))
+  else if(ac == 1 && ivec_atom_is(at))
     return binop_ivec_instantiate(cl, ac, at);
-  else if(ac == 2 && fvec_atom_is(at + 1))
+  else if(ac == 1 && fvec_atom_is(at))
     return binop_fvec_instantiate(cl, ac, at);
-  else if(ac == 3 && (fts_is_number(at + 1) || ivec_atom_is(at + 1)) && ivec_atom_is(at + 2)) 
+  else if(ac == 2 && (fts_is_number(at) || ivec_atom_is(at)) && ivec_atom_is(at + 1)) 
     return binop_ivec_instantiate(cl, ac, at);
-  else if(ac == 3 && (fts_is_number(at + 1) || fvec_atom_is(at + 1)) && fvec_atom_is(at + 2)) 
+  else if(ac == 2 && (fts_is_number(at) || fvec_atom_is(at)) && fvec_atom_is(at + 1)) 
     return binop_fvec_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;
@@ -126,20 +126,20 @@ math_binop_config(void)
   math_sym_min = fts_new_symbol("mmin");
   math_sym_max = fts_new_symbol("mmax");
   
-  fts_metaclass_install(math_sym_add, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_sub, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_mul, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_div, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_bus, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_vid, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_ee, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_ne, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_gt, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_ge, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_lt, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_le, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_min, binop_instantiate, fts_arg_type_equiv);
-  fts_metaclass_install(math_sym_max, binop_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_add, binop_add_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_sub, binop_sub_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_mul, binop_mul_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_div, binop_div_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_bus, binop_bus_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_vid, binop_vid_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_ee, binop_ee_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_ne, binop_ne_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_gt, binop_gt_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_ge, binop_ge_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_lt, binop_lt_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_le, binop_le_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_min, binop_min_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(math_sym_max, binop_max_instantiate, fts_arg_type_equiv);
 
   fts_register_object_doctor(math_sym_add, binop_doctor_set_default_arg_zero);
   fts_register_object_doctor(math_sym_sub, binop_doctor_set_default_arg_zero);

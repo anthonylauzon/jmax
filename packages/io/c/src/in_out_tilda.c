@@ -146,9 +146,6 @@ static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom
 {
   int outlets = 0, i;
 
-  ac--;
-  at++;
-
   if ( !in_out_class_check( ac, at, &outlets))
     return &fts_CannotInstantiate;
 
@@ -198,9 +195,6 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
 static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int inlets = 0, i;
-
-  ac--;
-  at++;
 
   if ( !in_out_class_check( ac, at, &inlets))
     return &fts_CannotInstantiate;

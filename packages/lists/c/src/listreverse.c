@@ -45,7 +45,7 @@ listreverse_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   for(i=0, j=ac-1; i<ac; i++, j--)
     fts_atom_assign(ta + i, at + j);
 
-  fts_outlet_send(o, 0, fts_s_list, ac, ta);
+  fts_outlet_atoms(o, 0, ac, ta);
 }
 
 static void

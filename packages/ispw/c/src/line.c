@@ -41,42 +41,48 @@ typedef struct
 static void
 line_int_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  line_t *this = (line_t *)o;
-  
-  if(this->steps)
-    this->steps--;
-  
-  if(this->steps)
+ if(fts_object_outlet_is_connected(o, 0))
     {
-      this->cur += this->inc;
-      fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
-      fts_outlet_int(o, 0, this->cur);	
-    }
-  else
-    {
-      fts_outlet_int(o, 0, this->target);
-      this->running = 0;
+      line_t *this = (line_t *)o;
+      
+      if(this->steps)
+	this->steps--;
+      
+      if(this->steps)
+	{
+	  this->cur += this->inc;
+	  fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
+	  fts_outlet_int(o, 0, this->cur);	
+	}
+      else
+	{
+	  fts_outlet_int(o, 0, this->target);
+	  this->running = 0;
+	}
     }
 }
 
 static void
 line_float_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  line_t *this = (line_t *)o;
-  
-  if(this->steps)
-    this->steps--;
-  
-  if(this->steps)
+ if(fts_object_outlet_is_connected(o, 0))
     {
-      this->cur += this->inc;
-      fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
-      fts_outlet_float(o, 0, this->cur);	
-    }
-  else
-    {
-      fts_outlet_float(o, 0, this->target);
-      this->running = 0;
+      line_t *this = (line_t *)o;
+      
+      if(this->steps)
+	this->steps--;
+      
+      if(this->steps)
+	{
+	  this->cur += this->inc;
+	  fts_timebase_add_call(fts_get_timebase(), o, line_int_advance, 0, this->period);
+	  fts_outlet_float(o, 0, this->cur);	
+	}
+      else
+	{
+	  fts_outlet_float(o, 0, this->target);
+	  this->running = 0;
+	}
     }
 }
 
@@ -295,12 +301,11 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(line_t), 3, 1, 0); 
 
-  /* define the system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, line_init);
 
   fts_method_define_varargs(cl, 0, fts_s_stop, line_stop);
 
-  if(ac <= 1  || fts_is_int(at+1))
+  if(ac == 0  || fts_is_int(at))
     {
       fts_method_define_varargs(cl, 0, fts_s_int, line_int_number);
       fts_method_define_varargs(cl, 0, fts_s_float, line_int_number);

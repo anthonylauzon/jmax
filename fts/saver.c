@@ -40,7 +40,7 @@
 /* #define SAVER_DEBUG */
 
 /* saver dumper utility */
-static fts_class_t *cl_saver_dumper = 0;
+static fts_metaclass_t *saver_dumper_type = 0;
 static fts_symbol_t s_saver_dumper = 0;
 
 typedef struct _saver_dumper
@@ -128,7 +128,7 @@ fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *symbol_tabl
   if(!saver_dumper)
     {
       /* create dumper */
-      saver_dumper = (saver_dumper_t *)fts_object_create(cl_saver_dumper, 0, 0);
+      saver_dumper = (saver_dumper_t *)fts_object_create(saver_dumper_type, 0, 0);
       fts_object_refer(saver_dumper);
     }
 
@@ -1136,6 +1136,5 @@ fts_saver_config(void)
 {
   s_saver_dumper = fts_new_symbol("saver_dumper");
 
-  fts_class_install(s_saver_dumper, saver_dumper_instantiate);
-  cl_saver_dumper = fts_class_get_by_name(s_saver_dumper);
+  saver_dumper_type = fts_class_install(s_saver_dumper, saver_dumper_instantiate);
 }

@@ -190,16 +190,8 @@ static void
 getval_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getval_t *this = (getval_t *)o;
-  fts_atom_t out = value_get((value_t *)this->obj);
 
-  if(fts_is_object(&out))
-    {
-      fts_atom_refer(&out);
-      fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-      fts_atom_release(&out);
-    }
-  else if(!fts_is_void(&out))
-    fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
+  fts_outlet_atom(o, 0, value_get((value_t *)this->obj));
 }
 
 static void
@@ -308,18 +300,7 @@ getelem_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int i = this->i;
   
   if(i >= 0 && i < size)
-    {
-      fts_atom_t out = vec_get_element((vec_t *)this->obj, i);
-      
-      if(fts_is_object(&out))
-	{
-	  fts_atom_refer(&out);
-	  fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-	  fts_atom_release(&out);
-	}
-      else if(!fts_is_void(&out))
-	fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-    }
+    fts_outlet_atom(o, 0, vec_get_element((vec_t *)this->obj, i));
 }
 
 static void
@@ -359,18 +340,7 @@ getelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int j = this->j;
   
   if(i >= 0 && i < m && j >= 0 && j < n)
-    {
-      fts_atom_t out = mat_get_element((mat_t *)this->obj, i, j);
-      
-      if(fts_is_object(&out))
-	{
-	  fts_atom_refer(&out);
-	  fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-	  fts_atom_release(&out);
-	}
-      else if(!fts_is_void(&out))
-	fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-    }
+    fts_outlet_atom(o, 0, mat_get_element((mat_t *)this->obj, i, j));
 }
 
 static void
@@ -413,7 +383,7 @@ setelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && value_atom_is(at + 1))
+  if(ac == 1 && value_atom_is(at))
     {
       fts_class_init(cl, sizeof(getval_t), 2, 1, 0); 
       
@@ -434,7 +404,7 @@ getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac >= 2 && vec_atom_is(at + ac - 1))
+  if(ac >= 1 && vec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
@@ -447,7 +417,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, vec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && ivec_atom_is(at + ac - 1))
+  else if(ac >= 1 && ivec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
@@ -473,7 +443,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, fvec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && mat_atom_is(at + ac - 1))
+  else if(ac >= 1 && mat_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_mat_t), 3, 1, 0);
       
@@ -499,7 +469,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 2 && value_atom_is(at + 1))
+  if(ac == 1 && value_atom_is(at + 1))
     {
       fts_class_init(cl, sizeof(getval_t), 2, 0, 0);
   
@@ -519,7 +489,7 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac >= 2 && vec_atom_is(at + ac - 1))
+  if(ac >= 1 && vec_atom_is(at + ac - 1))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       

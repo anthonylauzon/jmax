@@ -222,6 +222,5 @@ event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 event_config(void)
 {
-  fts_class_install(seqsym_event, event_instantiate);
-  event_class = fts_class_get_by_name(seqsym_event);
+  event_type = fts_class_install(seqsym_event, event_instantiate);
 }

@@ -83,8 +83,6 @@ white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(white_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, white_init);
@@ -103,5 +101,5 @@ white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_white_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("white~"), white_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("white~"), white_instantiate);
 }

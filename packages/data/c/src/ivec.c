@@ -29,7 +29,6 @@ static fts_symbol_t sym_text = 0;
 
 fts_symbol_t ivec_symbol = 0;
 fts_metaclass_t *ivec_type = 0;
-fts_class_t *ivec_class = 0;
 
 static fts_symbol_t sym_local = 0;
 
@@ -428,10 +427,7 @@ ivec_append_pixels(ivec_t *ivec, int deltax, int deltap)
 static void
 ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, ivec_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -790,7 +786,7 @@ ivec_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       int i;
       
       if(!this->copy)
-	this->copy = (ivec_t *)fts_object_create(ivec_class, 1, at + 1);
+	this->copy = (ivec_t *)fts_object_create(ivec_type, 1, at + 1);
       else
 	ivec_set_size(this->copy, size);
       
@@ -938,7 +934,7 @@ ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	    post("%d ", ivec_get_element(this, i));
 	}
 
-      post("\n}");
+      post("\n}\n");
     }
   else if(size > 0)
     {
@@ -1004,7 +1000,7 @@ ivec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   ivec_t *this = (ivec_t *)o;
   int *values = ivec_get_ptr(this);
   int size = ivec_get_size(this);
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
   int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
@@ -1083,13 +1079,13 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       ivec_set_size(this, fts_get_int(at));
       ivec_set_const(this, 0);
     }
-  else if(ac == 1 && fts_is_array(at))
+  else if(ac == 1 && fts_is_tuple(at))
     {
-      fts_array_t *aa = fts_get_array(at);
-      int size = fts_array_get_size(aa);
+      fts_tuple_t *tup = fts_get_tuple(at);
+      int size = fts_tuple_get_size(tup);
 
       ivec_set_size(this, size);
-      ivec_set_with_onset_from_atoms(this, 0, size, fts_array_get_atoms(aa));
+      ivec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
       this->keep = fts_s_args;
     }
   else if(ac > 1)
@@ -1210,5 +1206,4 @@ ivec_config(void)
   sym_set_visible_size = fts_new_symbol("setVisibleSize");
 
   ivec_type = fts_class_install(ivec_symbol, ivec_instantiate);
-  ivec_class = fts_class_get_by_name(ivec_symbol);
 }

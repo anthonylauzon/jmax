@@ -50,15 +50,11 @@
  */
 typedef struct _fts_array_t 
 {
-  fts_object_t head;
   fts_atom_t *atoms;
   int size;
   int alloc_increment;
   int alloc;
 } fts_array_t;
-
-FTS_API fts_class_t *fts_array_class;
-FTS_API fts_metaclass_t *fts_array_metaclass;
 
 /*@}*/
 
@@ -174,34 +170,4 @@ FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at
  * @ingroup array
  */
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
-
-/**
- * Set an element by index
- * 
- * @fn void fts_array_set_element( fts_array_t *array, int index, fts_atom_t *value)
- * @param array the array
- * @param index the index
- * @param value the new value of the element
- * @ingroup array
- */
-#define fts_array_set_element( array, index, value) ((array)->atoms[(index)] = *(value))
-
-/**
- * Check index bounds
- * 
- * @fn fts_array_check_index(array, index)  (((index) >= 0) && ((index) < (array)->size))
- * @param array the array
- * @param index the index
- * @return 1 if index is within bounds, 0 if not
- * @ingroup array
- */
-#define fts_array_check_index(array, index)  (((index) >= 0) && ((index) < (array)->size))
-
-
-/**
- * Atom macros
- */
-#define fts_set_array(p, v) (fts_set_object( (p), (v)))
-#define fts_get_array(p) ((fts_array_t *)fts_get_object(p))
-#define fts_is_array(p) (fts_is_a(p, fts_array_metaclass))
 

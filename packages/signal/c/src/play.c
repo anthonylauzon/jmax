@@ -321,17 +321,21 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
 static fts_status_t
 signal_play_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t name = fts_get_selector(at + 1);
+  fts_symbol_t name;
   fts_atom_t a, k;
 
-  fts_set_symbol( &k, name);
-  if(fts_hashtable_get( &signal_play_class_table, &k, &a))
+  if(ac > 0 && fts_is_object(at))
     {
-      fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_pointer(&a);
-      
-      return fun(cl, ac, at);
+      fts_set_symbol( &k, name);
+      if(fts_hashtable_get( &signal_play_class_table, &k, &a))
+	{
+	  fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_pointer(&a);
+	  
+	  return fun(cl, ac, at);
+	}
     }
-  
+
+      
   return &fts_CannotInstantiate;
 }
 

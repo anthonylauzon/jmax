@@ -96,24 +96,22 @@ demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 demux_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = fts_get_int_arg(ac, at, 1, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
-  if(n >= 2)
-    {
-      fts_class_init(cl, sizeof(demux_t), 2, n, 0);
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, demux_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, demux_delete);
-      
-      fts_method_define_varargs(cl, 0, fts_s_anything, demux_input);
-      
-      fts_method_define_varargs(cl, 1, fts_s_int, demux_set);
-      fts_method_define_varargs(cl, 1, fts_s_float, demux_set);
-      
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  if(n < 2)
+    n = 2;
+
+  fts_class_init(cl, sizeof(demux_t), 2, n, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, demux_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, demux_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_anything, demux_input);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, demux_set);
+  fts_method_define_varargs(cl, 1, fts_s_float, demux_set);
+  
+  return fts_Success;
 }
 
 void

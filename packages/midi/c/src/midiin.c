@@ -46,11 +46,7 @@ typedef struct _midiin_
 static void
 midiin_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_atom_t a;
-
-  /*fts_set_midievent(&a, event);*/
-  fts_set_object(&a, event);
-  fts_outlet_send(listener, 0, fts_s_midievent, 1, &a);
+  fts_outlet_object(listener, 0, (fts_object_t *)event);
 }
 
 static void
@@ -423,9 +419,6 @@ midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiin_init);
@@ -437,9 +430,6 @@ midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 3), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, notein_init);
@@ -451,9 +441,6 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 3), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, polyin_init);
@@ -465,9 +452,6 @@ polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 3), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ctlin_init);
@@ -479,9 +463,6 @@ ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 2), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pgmin_init);
@@ -493,9 +474,6 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 2), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, touchin_init);
@@ -507,9 +485,6 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 2), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bendin_init);
@@ -521,9 +496,6 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 xbendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   fts_class_init(cl, sizeof(midiin_t), 0, midiin_get_outlets(ac, at, 2), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, xbendin_init);

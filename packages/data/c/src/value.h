@@ -33,14 +33,14 @@ typedef struct _value_
 {
   fts_object_t o;
   fts_atom_t a;		
+  fts_symbol_t keep;  
 } value_t;
 
-DATA_API fts_class_t *value_class;
 DATA_API fts_symbol_t value_symbol;
 DATA_API fts_metaclass_t *value_type;
 
 #define value_set(v, x) fts_atom_assign(&(v)->a, (x))
-#define value_get(v) ((v)->a)
+#define value_get(v) (&(v)->a)
 
 /* value atoms */
 #define value_atom_get(ap) ((value_t *)fts_get_object(ap))

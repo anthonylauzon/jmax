@@ -3,9 +3,7 @@ package_LTLIBRARIES=libdata.la
 libdata_la_SOURCES= \
 bpf.c \
 col.c \
-copy.c \
 data.c \
-fill.c \
 fmat.c \
 fvec.c \
 getinter.c \
@@ -32,7 +30,6 @@ fmat.h \
 fvec.h \
 ivec.h \
 mat.h \
-message.h \
 messtab.h \
 preset.h \
 row.h \

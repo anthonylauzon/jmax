@@ -76,7 +76,7 @@ listcomp_output_and_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   listcomp_t *this = (listcomp_t *)o;
 
-  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+  fts_outlet_atoms(o, 0, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
   fts_array_clear(&this->array);
 }
 
@@ -86,7 +86,7 @@ listcomp_append_output_and_clear(fts_object_t *o, int winlet, fts_symbol_t s, in
   listcomp_t *this = (listcomp_t *)o;
 
   fts_array_append(&this->array, ac, at);
-  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+  fts_outlet_atoms(o, 0, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
   fts_array_clear(&this->array);
 }
 
@@ -96,7 +96,7 @@ listdeco_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int i;
 
   for(i=0; i<ac; i++)
-    fts_outlet_send(o, 1, fts_get_selector(at + i), 1, at + i);
+    fts_outlet_atom(o, 1, at + i);
 
   fts_outlet_bang(o, 0);
 }

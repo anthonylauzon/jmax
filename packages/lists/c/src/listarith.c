@@ -412,7 +412,7 @@ listarith_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	atom_add(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -442,7 +442,7 @@ listarith_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	atom_sub(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -472,7 +472,7 @@ listarith_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	atom_mul(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -502,7 +502,7 @@ listarith_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	atom_div(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -532,7 +532,7 @@ listarith_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_gt(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -562,7 +562,7 @@ listarith_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_ge(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -592,7 +592,7 @@ listarith_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_lt(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -622,7 +622,7 @@ listarith_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_le(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -652,7 +652,7 @@ listarith_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_ne(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -682,7 +682,7 @@ listarith_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	atom_ee(at + i, &this->right_atom, fts_array_get_atoms(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, fts_array_get_atoms(&this->list));
+  fts_outlet_atoms(o, 0, ac, fts_array_get_atoms(&this->list));
 }
 
 /*********************************************
@@ -723,67 +723,100 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static fts_status_t
-listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t meth)
 {
-  fts_symbol_t class_name = fts_get_symbol(at);
-
-  /* initialization */
   fts_class_init(cl, sizeof(listarith_t), 2, 1, 0); 
 
-  /* system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listarith_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listarith_delete);
 
-  /* user methods */
   fts_method_define_varargs(cl, 1, fts_s_list, listarith_set_right_list);
 
   fts_method_define_float(cl, 1, listarith_set_right_atom);
   fts_method_define_int(cl, 1, listarith_set_right_atom);
   fts_method_define_symbol(cl, 1, listarith_set_right_atom);
 
-  if(class_name == fts_new_symbol("list+"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_add);
-  else if(class_name == fts_new_symbol("list-"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_sub);
-  else if(class_name == fts_new_symbol("list*"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_mul);
-  else if(class_name == fts_new_symbol("list/"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_div);
-  else if(class_name == fts_new_symbol("list>"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_gt);
-  else if(class_name == fts_new_symbol("list>="))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_ge);
-  else if(class_name == fts_new_symbol("list<"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_lt);
-  else if(class_name == fts_new_symbol("list<="))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_le);
-  else if(class_name == fts_new_symbol("list!="))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_ne);
-  else if(class_name == fts_new_symbol("list=="))
-    fts_method_define_varargs(cl, 0, fts_s_list, listarith_ee);
-  else 
-    return &fts_CannotInstantiate;
+  fts_method_define_varargs(cl, 0, fts_s_list, meth);
 
-  /* outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 
   return fts_Success;
 }
 
+static fts_status_t
+listarith_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_add);
+}
+
+static fts_status_t
+listarith_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_sub);
+}
+
+static fts_status_t
+listarith_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_mul);
+}
+
+static fts_status_t
+listarith_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_div);
+}
+
+static fts_status_t
+listarith_lt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_lt);
+}
+
+static fts_status_t
+listarith_le_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_le);
+}
+
+static fts_status_t
+listarith_gt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_gt);
+}
+
+static fts_status_t
+listarith_ge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_ge);
+}
+
+static fts_status_t
+listarith_ne_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_ne);
+}
+
+static fts_status_t
+listarith_ee_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  return listarith_instantiate(cl, ac, at, listarith_ee);
+}
+
 void
 listarith_config(void)
 {
-  fts_class_install(fts_new_symbol("list+"), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list-"), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list*"), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list/"), listarith_instantiate);
+  fts_class_install(fts_new_symbol("list+"), listarith_add_instantiate);
+  fts_class_install(fts_new_symbol("list-"), listarith_sub_instantiate);
+  fts_class_install(fts_new_symbol("list*"), listarith_mul_instantiate);
+  fts_class_install(fts_new_symbol("list/"), listarith_div_instantiate);
 
-  fts_class_install(fts_new_symbol("list<"), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list<="), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list>"), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list>="), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list!="), listarith_instantiate);
-  fts_class_install(fts_new_symbol("list=="), listarith_instantiate);
+  fts_class_install(fts_new_symbol("list<"), listarith_lt_instantiate);
+  fts_class_install(fts_new_symbol("list<="), listarith_le_instantiate);
+  fts_class_install(fts_new_symbol("list>"), listarith_gt_instantiate);
+  fts_class_install(fts_new_symbol("list>="), listarith_ge_instantiate);
+  fts_class_install(fts_new_symbol("list!="), listarith_ne_instantiate);
+  fts_class_install(fts_new_symbol("list=="), listarith_ee_instantiate);
 
   /* aliases */
   fts_alias_install(fts_new_symbol("l+"), fts_new_symbol("list+"));

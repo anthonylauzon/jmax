@@ -57,7 +57,7 @@ FTS_API void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_
  *
  */
 
-FTS_API fts_class_t *fts_label_class;
+FTS_API fts_metaclass_t *fts_label_type;
 
 typedef struct _fts_label_
 {

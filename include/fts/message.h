@@ -34,7 +34,7 @@ typedef struct
   fts_symbol_t s;
 } fts_message_t;
 
-FTS_API fts_class_t *fts_message_class;
+FTS_API fts_metaclass_t *fts_message_metaclass;
 
 #define fts_message_get_selector(m) ((m)->s)
 #define fts_message_get_args(m) (&(m)->args)
@@ -230,16 +230,6 @@ do { \
   fts_send(__conn, fts_s_bang, 0, 0); \
 } while(0)
 
-
-#define fts_outlet_list(O, WOUTLET, AC, AT) \
-do { \
-  fts_connection_t *__conn; \
-                           \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_s_list, (AC), (AT)); \
-} while(0)
-
 #else
 /* Prototypes of the functions equivalent to the macros; actually
    implemented in messutil.c, but they have to be prototyped here
@@ -250,7 +240,10 @@ FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
 FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
 FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, float f);
 FTS_API void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
-FTS_API void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at);
+FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
+
+FTS_API void fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t* a);
+FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a);
+FTS_API void fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
 
 #endif
-

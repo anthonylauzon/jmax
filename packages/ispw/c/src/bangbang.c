@@ -34,7 +34,7 @@ bangbang_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int i;
 
   for (i=fts_object_get_outlets_number(o)-1; i>=0; i--)
-    fts_outlet_send(o, i, fts_s_bang, 0, 0);
+    fts_outlet_bang(o, i);
 }
 
 
@@ -43,10 +43,9 @@ bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int i;
   int noutlets;
-  fts_symbol_t a[1];
 
-  if ((ac >= 2)  && fts_is_int(&at[1]))
-    noutlets = fts_get_int(&at[1]);
+  if (ac >= 1  && fts_is_int(at))
+    noutlets = fts_get_int(at);
   else
     noutlets = 2;
 

@@ -169,8 +169,6 @@ osc_ctl_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 osc_ctl_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(osc_ctl_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_ctl_init);
@@ -318,8 +316,6 @@ osc_sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(osc_sig_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_sig_init);
@@ -341,12 +337,12 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 1 && !fvec_atom_is(at + 1))
+  if(ac > 0 && !fvec_atom_is(at))
     return &fts_CannotInstantiate;
 
-  if(ac == 1 || (ac == 2 && fvec_atom_is(at + 1)))
+  if(ac == 0 || (ac == 1 && fvec_atom_is(at)))
     return osc_sig_instantiate(cl, ac, at);
-  else if ((ac == 2 && fts_is_number(at + 1)) || (ac == 3 && fts_is_number(at + 1) && fvec_atom_is(at + 2)))
+  else if ((ac == 1 && fts_is_number(at)) || (ac == 2 && fts_is_number(at) && fvec_atom_is(at + 1)))
     return osc_ctl_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;

@@ -43,7 +43,7 @@ listsublist_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int i = this->index;
 
   if(n > 0 && this->index < ac)
-    fts_outlet_send(o, 0, fts_s_list, n, at + this->index);
+    fts_outlet_atoms(o, 0, n, at + this->index);
 }
 
 static void

@@ -57,6 +57,10 @@
  * @defgroup bytestream byte stream
  */
 
+/* system byte stream implementation */
+FTS_API fts_metaclass_t *fts_socketstream_type;
+FTS_API fts_metaclass_t *fts_pipestream_type;
+
 typedef struct fts_bytestream fts_bytestream_t;
 
 /**

@@ -236,9 +236,6 @@ veclog_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if (ac > 0)
     {
       fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);
@@ -269,9 +266,6 @@ veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if (ac > 0)
     {
       fts_class_init(cl, sizeof(veclog_t), 2, 1, 0);

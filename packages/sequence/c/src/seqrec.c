@@ -124,7 +124,7 @@ seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(here > 0.0)
 	{
-	  event_t *event = (event_t *)fts_object_create(event_class, 1, at);
+	  event_t *event = (event_t *)fts_object_create(event_type, 1, at);
 	  fts_symbol_t track_type = track_get_type(this->track);
 	  
 	  if(track_type == fts_s_void || event_get_type(event) == track_type)
@@ -173,7 +173,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
       
-      this->recording = (track_t *)fts_object_create(track_class, 0, 0);
+      this->recording = (track_t *)fts_object_create(track_type, 0, 0);
     }
   else
     fts_object_set_error(o, "Argument of track required");

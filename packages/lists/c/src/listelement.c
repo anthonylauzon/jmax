@@ -47,7 +47,7 @@ listelement_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int i = this->index;
 
   if(i > 0 && i < ac && !fts_is_void(at + i))
-    fts_outlet_send(o, 0, fts_get_selector(at + i), 1, at + i);
+    fts_outlet_atom(o, 0, at + i);
 }
 
 static void

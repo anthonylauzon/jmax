@@ -345,8 +345,8 @@ matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 static fts_status_t 
 matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_ins = fts_get_int_arg(ac, at, 1, 0);
-  int n_outs = fts_get_int_arg(ac, at, 2, 0);
+  int n_ins = fts_get_int_arg(ac, at, 0, 0);
+  int n_outs = fts_get_int_arg(ac, at, 1, 0);
   int i, j;
 
   if(n_ins < 1 || n_outs < 1)

@@ -322,7 +322,7 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(this->name)
     ispw_register_named_object(obj, this->name);
 
-  this->vec = (ivec_t *)fts_object_create(ivec_class, 0, 0);
+  this->vec = (ivec_t *)fts_object_create(ivec_type, 0, 0);
   fts_object_refer(this->vec);
 
   ivec_set_size(this->vec, size);

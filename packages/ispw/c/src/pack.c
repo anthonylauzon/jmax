@@ -92,13 +92,13 @@ pack_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   for (i = 0; i < ac; i++) 
    set_value_preserve_type(&at[i], &(x->argv[i]));
 
-  fts_outlet_send(o, 0, fts_s_list, x->argc, x->argv);
+  fts_outlet_atoms(o, 0, x->argc, x->argv);
 }
 
 static void
 pack_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_send(o, 0, fts_s_list, ((pack_t *)o)->argc, ((pack_t *)o)->argv);
+  fts_outlet_atoms(o, 0, ((pack_t *)o)->argc, ((pack_t *)o)->argv);
 }
 
 static void
@@ -109,7 +109,7 @@ pack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if (ac > 0)
     set_value_preserve_type(&at[0], &(x->argv[0]));
 
-  fts_outlet_send(o, 0, fts_s_list, x->argc, x->argv);
+  fts_outlet_atoms(o, 0, x->argc, x->argv);
 }
 
 static void
@@ -166,10 +166,6 @@ pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_atom_t sat[2];
   int n;
-
-  /* throw away the class name argument */
-  ac--;
-  at++;
 
   /* then provide default arguments */
   if (!ac)

@@ -217,7 +217,7 @@ tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 || (ac == 2 && fts_is_number(at + 1)))
+  if(ac == 0 || (ac == 1 && fts_is_number(at)))
     {
       /* constant */
       fts_class_init(cl, sizeof(tilda_t), 1, 1, 0); 
@@ -230,7 +230,7 @@ tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_int, tilda_set_const);
       fts_method_define_varargs(cl, 0, fts_s_float, tilda_set_const);
    }
-  else  if(ac == 3 && fts_is_number(at + 1) && fts_is_number(at + 2))
+  else  if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
     {
       /* slide with ramp */
       fts_class_init(cl, sizeof(tilda_t), 2, 1, 0);

@@ -27,6 +27,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
+#include <ftsprivate/patcher.h>
 
 /* Implement autosave functions; autosave is implemented
    only for catastrophic situations, but can be easily implemented 
@@ -53,20 +54,21 @@ static void fts_autosave(const char *postfix)
   fts_object_t *p;
 
   /* First, look if the objects in the patchers are to be found */
-
   for (p = root->objects; p ; p = p->next_in_patcher)
     {
-      fts_atom_t a;
-
-      fts_object_get_prop(p, fts_s_filename, &a);
-
-      if (fts_is_symbol(&a))
+      if (fts_object_is_patcher(p))
 	{
-	  char buf[FILENAME_MAX];
-
-	  sprintf(buf, "%s%s", fts_get_symbol(&a), postfix);
-
-	  fts_save_simple_as_bmax(buf, p);
+	  fts_patcher_t *patcher = (fts_patcher_t *)p;
+	  fts_symbol_t file_name = fts_patcher_get_file_name(patcher);
+	  
+	  if(file_name)
+	    {
+	      char buf[FILENAME_MAX];
+	      
+	      sprintf(buf, "%s%s", file_name, postfix);
+	      
+	      fts_save_simple_as_bmax(buf, p);
+	    }
 	}
     }
 }

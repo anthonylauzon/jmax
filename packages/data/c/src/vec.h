@@ -32,7 +32,6 @@
 
 DATA_API fts_metaclass_t *vec_type;
 DATA_API fts_symbol_t vec_symbol;
-DATA_API fts_class_t *vec_class;
 
 typedef mat_t vec_t;
 

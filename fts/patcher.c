@@ -68,8 +68,6 @@
 #include <ftsprivate/label.h>
 
 fts_metaclass_t *patcher_metaclass = 0;
-
-static fts_class_t *patcher_class = 0;
 fts_class_t *inlet_class = 0;
 fts_class_t *outlet_class = 0;
 
@@ -201,9 +199,6 @@ inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static fts_status_t
 inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac == 0 || fts_is_int(at))
     {
       /* initialize the class */
@@ -331,9 +326,6 @@ outlet_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static fts_status_t 
 outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  ac--;
-  at++;
-
   if(ac == 0 || fts_is_int(at))
     {
       fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
@@ -819,11 +811,11 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
-  this->args = (fts_array_t *)fts_object_create( fts_array_class, ac, at);
+  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
   fts_object_refer( this->args);
 
   fts_variable_define( this, fts_s_args);
-  fts_set_array( &va, this->args);
+  fts_set_tuple( &va, this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
 
   /* should use block allocation ?? */
@@ -1260,16 +1252,23 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_package_t *pkg = fts_object_get_package(obj);
   fts_symbol_t dir = fts_package_get_dir( pkg);
   fts_symbol_t class_name = fts_object_get_class_name(obj);
-  fts_symbol_t filename;
+  fts_symbol_t file_name;
+  fts_patcher_t *help_patch;
   char path[256];
 
-  snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, 
-	   class_name, ".help.jmax");
-  filename = fts_new_symbol_copy(path);
+  snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
+  file_name = fts_new_symbol_copy(path);
 
-  fts_log("[patcher] help %s\n", filename);
+  fts_log("[patcher] help %s\n", file_name);
 
-  if( !fts_client_load_patcher(filename, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o)))
+  help_patch = fts_client_get_patcher_by_file_name(file_name);
+
+  if(help_patch)
+    patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
+  else
+    help_patch = fts_client_load_patcher(file_name, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o));
+
+  if(!help_patch)
     fts_client_send_message(o, sym_noHelp, 1, at); 
 }
 
@@ -1603,8 +1602,8 @@ patcher_set_noutlets(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t
 static fts_status_t
 patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int ninlets = fts_get_int_arg(ac, at, 1, 0);
-  int noutlets = fts_get_int_arg(ac, at, 2, 0);
+  int ninlets = fts_get_int_arg(ac, at, 0, 0);
+  int noutlets = fts_get_int_arg(ac, at, 1, 0);
   int i;
 
   /* initialize the class */
@@ -1808,13 +1807,13 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
       fts_set_int(&a, 0);
       fts_object_put_prop(obj, fts_s_error, &a);
 
-      /* reallocate the atom array */
-      fts_array_init( this->args, ac - 1, at + 1);
+      /* reallocate the args */
+      fts_tuple_set( this->args, ac - 1, at + 1);
 
       /* set the new variables */
       fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
-      fts_set_array(&a, this->args);
+      fts_set_tuple(&a, this->args);
       fts_variable_restore(this, fts_s_args, &a, obj);
 
       /* register the patcher as user of the used variables */
@@ -1919,12 +1918,11 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 
   /* change the patcher class */
   {
-    fts_atom_t a[3];
+    fts_atom_t a[2];
 
-    fts_set_symbol(&a[0], fts_s_patcher);
-    fts_set_int(&a[1], new_ninlets);
-    fts_set_int(&a[2], fts_object_get_outlets_number((fts_object_t *) this));
-    obj_this->head.cl = fts_class_instantiate(3, a);
+    fts_set_int(a, new_ninlets);
+    fts_set_int(a + 1, fts_object_get_outlets_number((fts_object_t *) this));
+    obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 2, a);
   }
 
   {
@@ -2013,12 +2011,11 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
 
   /* change the patcher class */
   {
-    fts_atom_t a[3];
+    fts_atom_t a[2];
 
-    fts_set_symbol(&a[0], fts_s_patcher);
-    fts_set_int(&a[1], fts_object_get_inlets_number((fts_object_t *) this));
-    fts_set_int(&a[2], new_noutlets);
-    obj_this->head.cl = fts_class_instantiate(3, a);
+    fts_set_int(a, fts_object_get_inlets_number((fts_object_t *) this));
+    fts_set_int(a + 1, new_noutlets);
+    obj_this->head.cl = fts_class_instantiate(patcher_metaclass, 3, a);
   }
 
   {
@@ -2299,7 +2296,7 @@ fts_create_root_patcher()
   fts_atom_t a[1];
 
   fts_set_symbol(a, fts_new_symbol("root"));
-  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_class, 1, a);
+  fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_metaclass, 1, a);
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);  
 }
 
@@ -2355,6 +2352,8 @@ patcher_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
 void fts_kernel_patcher_init(void)
 {
+  fts_atom_t a;
+
   sym_showObject = fts_new_symbol("showObject");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
   sym_setDirty = fts_new_symbol("setDirty");
@@ -2382,12 +2381,11 @@ void fts_kernel_patcher_init(void)
 
   fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
 
-  fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
+  patcher_metaclass = fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
+  fts_class_instantiate(patcher_metaclass, 0, 0);
+
   fts_metaclass_install(fts_s_inlet, inlet_instantiate, fts_arg_type_equiv);
   fts_metaclass_install(fts_s_outlet, outlet_instantiate, fts_arg_type_equiv);
-
-  patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
-  patcher_class = fts_class_get_by_name(fts_s_patcher);
 
   fts_create_root_patcher();
 }

@@ -57,7 +57,7 @@ void
 seqmess_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqmess_t *this = (seqmess_t *)o;
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_ptr(at);
   fts_atom_t a;
   
   fts_set_symbol(&a, this->s);

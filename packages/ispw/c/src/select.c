@@ -90,7 +90,7 @@ select_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int number = fts_get_int_arg(ac, at, 0, 0);
 
   if(number == this->compare)
-    fts_outlet_send(o, 0, fts_s_bang, 0, 0);
+    fts_outlet_bang(o, 0);
   else
     fts_outlet_int(o, 1, number);
 }
@@ -113,7 +113,7 @@ select_pair(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->compare = compare;
   if(number == compare)
-    fts_outlet_send(o, 0, fts_s_bang, 0, 0);
+    fts_outlet_bang(o, 0);
   else
     fts_outlet_int(o, 1, number);
 }
@@ -131,7 +131,7 @@ select_multi_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     {
       if(number == this->compare[i])
 	{
-	  fts_outlet_send(o, i, fts_s_bang, 0, 0);
+	  fts_outlet_bang(o, i);
 	  return;
 	}
     }
@@ -148,9 +148,7 @@ select_multi_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static fts_status_t 
 select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int i;
-
-  if(ac <= 2)
+  if(ac <= 1)
     {
       fts_class_init(cl, sizeof(select_t), 2, 2, 0);
 
@@ -166,7 +164,7 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
   else /* select multi */
     {
-      fts_class_init(cl, sizeof(select_multi_t), 1, ac, 0);
+      fts_class_init(cl, sizeof(select_multi_t), 1, ac + 1, 0);
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, select_multi_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, select_multi_delete);

@@ -159,8 +159,6 @@ sigclip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(sigclip_t), 3, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigclip_init);

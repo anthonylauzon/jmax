@@ -474,7 +474,7 @@ midishareport_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *a
   fts_symbol_t name;
   int port;
 
-  return midishareport_check(ac1 - 1, at1 + 1, &name, &port);
+  return midishareport_check(ac1, at1, &name, &port);
 }
 
 static fts_status_t
@@ -483,7 +483,7 @@ midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t name;
   int port;
 
-  if(midishareport_check(ac - 1, at + 1, &name, &port))
+  if(midishareport_check(ac, at, &name, &port))
     {
       fts_class_init(cl, sizeof(midishareport_t), 1, 0, 0);
       
@@ -494,7 +494,6 @@ midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("reset_unused"), midishareport_reset_unused);
     
-      /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
       
       return fts_Success;

@@ -40,10 +40,6 @@ arch_bang_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 arch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
-  /* arch control object */
-
   fts_class_init(cl, sizeof(arch_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, arch_bang_mth);
@@ -58,9 +54,3 @@ arch_config(void)
 
   fts_class_install(fts_new_symbol("arch"),arch_instantiate);
 }
-
-
-
-
-
-

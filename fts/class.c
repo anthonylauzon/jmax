@@ -31,7 +31,6 @@
 
 const int fts_SystemInlet = -1;
 
-
 /* Return Status declarations */
 
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
@@ -97,6 +96,8 @@ static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
 /******************************************************************************/
 
 
+static fts_class_t *fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
+
 static fts_metaclass_t*
 fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
@@ -108,25 +109,33 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
   mcl->selector = name;
   mcl->package = 0;
 
+  /* for simple classes create first class instance without arguments */
+  if(equiv_fun == 0)
+    fts_class_new(mcl, 0, 0);
+
   return mcl;
 }
 
-fts_metaclass_t *fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
+fts_metaclass_t *
+fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
-  fts_metaclass_t *mcl =  fts_metaclass_new(name, instantiate_fun, equiv_fun);
+  fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun, equiv_fun);
+  fts_class_t *cl = 0;
 
-  if ( fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
+  if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
     return 0;
 
   return mcl;
 }
 
-fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+fts_metaclass_t *
+fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  return fts_metaclass_install( name, instantiate_fun, fts_always_equiv);
+  return fts_metaclass_install( name, instantiate_fun, 0);
 }
 
-void fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
+void 
+fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
 {
   fts_package_add_alias(fts_get_current_package(), alias_name, class_name);
 }
@@ -186,13 +195,17 @@ fts_metaclass_get_by_name(fts_symbol_t name)
 /******************************************************************************/
 
 
-static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
+static void 
+fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
 {
+  fts_class_t **p;
   fts_atom_t *store;
   int i;
 
   cl->ac = ac;
   cl->at = fts_malloc(ac * sizeof(fts_atom_t));
+  cl->next = 0;
+
   store = (fts_atom_t *)cl->at;
 
   for(i=0; i<ac; i++)
@@ -212,12 +225,18 @@ static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *
 	}
     }
 
-  cl->next = mcl->inst_list;
-  mcl->inst_list = cl;
+  /* append class to end is instance list */
+  p = &(mcl->inst_list);
+
+  while(*p)
+    p = &((*p)->next);
+
+  *p = cl;
 }
 
 
-static fts_class_t *fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
+static fts_class_t *
+fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl = mcl->inst_list;
 
@@ -273,17 +292,9 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 }
 
 fts_class_t *
-fts_class_instantiate( int ac, const fts_atom_t *at)
+fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
-  fts_metaclass_t *mcl;
-  fts_class_t *cl;
-
-  mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
-
-  if (!mcl)
-    return 0;
-
-  cl = fts_class_get(mcl, ac, at);
+  fts_class_t *cl = fts_class_get(mcl, ac, at);
 
   if(!cl)
     cl = fts_class_new(mcl, ac, at);
@@ -291,28 +302,6 @@ fts_class_instantiate( int ac, const fts_atom_t *at)
   return cl;
 }
 
-
-fts_class_t *
-fts_class_get_by_name(fts_symbol_t name)
-{
-  fts_metaclass_t *mcl = fts_metaclass_get_by_name(name);
-  fts_class_t *cl = 0;
-  
-  if(mcl)
-    {
-      cl = mcl->inst_list;
-      
-      if(!cl)
-	{
-	  fts_atom_t a[1];
-
-	  fts_set_symbol(a, name);
-	  cl = fts_class_new(mcl, 1, a);
-	}
-    }
-
-  return cl;
-}
 
 fts_status_t 
 fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
@@ -374,8 +363,8 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
 
   if (fts_class_mess_exists(in, msg))
     {
-      post("fts_method_define: doubly defined method, class %s, inlet number %d message `%s'\n", 
-	   fts_class_get_name(cl), winlet, (s ? s : ""));
+      post("fts_method_define: doubly defined method, class %s, inlet number %d message '%s'\n", 
+	   fts_class_get_name(cl), winlet, (s? s: ""));
     }
   else
     {
@@ -579,13 +568,13 @@ fts_class_is_thru(fts_class_t *class)
 int
 fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
 {
-  int n;
+  int i;
 
   if (ac0 != ac1)
     return 0;
 
-  for (n = 0; n < ac0; n++, at0++, at1++)
-    if ( !fts_atom_same_type(at0, at1))
+  for (i=0; i<ac0; i++)
+    if (!fts_atom_same_type(at0 + i, at1 + i))
       return 0;
 
   return 1;
@@ -593,39 +582,39 @@ fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *a
 
 int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  int n;
+  int i;
 
   if (ac0 != ac1)
     return 0;
 
-  for (n = 0; n < ac0; n++, at0++, at1++)
+  for (i=0; i<ac0; i++)
     {
-      if ( !fts_atom_same_type( at0, at1))
+      if ( !fts_atom_same_type( at0 + i, at1 + i))
 	return 0;
 
-      if (fts_is_int(at0))
+      if (fts_is_int(at0 + i))
 	{
-	  if (fts_get_int(at0) != fts_get_int(at1))
+	  if (fts_get_int(at0 + i) != fts_get_int(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_float(at0))
+      else if (fts_is_float(at0 + i))
 	{
-	  if (fts_get_float(at0) != fts_get_float(at1))
+	  if (fts_get_float(at0 + i) != fts_get_float(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_symbol(at0))
+      else if (fts_is_symbol(at0 + i))
 	{
-	  if (fts_get_symbol(at0) != fts_get_symbol(at1))
+	  if (fts_get_symbol(at0 + i) != fts_get_symbol(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_string(at0))
+      else if (fts_is_string(at0 + i))
 	{
-	  if (strcmp(fts_get_string(at0), fts_get_string(at1)))
+	  if (strcmp(fts_get_string(at0 + i), fts_get_string(at1 + i)))
 	    return 0;
 	}
-      else if (fts_is_pointer(at0))
+      else if (fts_is_pointer(at0 + i))
 	{
-	  if (fts_get_pointer(at0) != fts_get_pointer(at1))
+	  if (fts_get_pointer(at0 + i) != fts_get_pointer(at1 + i))
 	    return 0;
 	}
     }
@@ -641,39 +630,39 @@ int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1
 int
 fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
 {
-  int n;
+  int i;
 
   if (ac0 != ac1)
     return 0;
 
-  for (n = 0; n < ac0; n++, at0++, at1++)
+  for (i=0; i<ac0; i++)
     {
-      if ( !fts_atom_same_type( at0, at1))
+      if ( !fts_atom_same_type( at0 + i, at1 + i))
 	return 0;
 
-      if (fts_is_int(at0))
+      if (fts_is_int(at0 + i))
 	{
-	  if (fts_get_int(at0) != fts_get_int(at1))
+	  if (fts_get_int(at0 + i) != fts_get_int(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_float(at0))
+      else if (fts_is_float(at0 + i))
 	{
-	  if (! fts_is_float(at1))
+	  if (! fts_is_float(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_symbol(at0))
+      else if (fts_is_symbol(at0 + i))
 	{
-	  if (fts_get_symbol(at0) != fts_get_symbol(at1))
+	  if (fts_get_symbol(at0 + i) != fts_get_symbol(at1 + i))
 	    return 0;
 	}
-      else if (fts_is_string(at0))
+      else if (fts_is_string(at0 + i))
 	{
-	  if (strcmp(fts_get_string(at0), fts_get_string(at1)))
+	  if (strcmp(fts_get_string(at0 + i), fts_get_string(at1 + i)))
 	    return 0;
 	}
-      else if (fts_is_pointer(at0))
+      else if (fts_is_pointer(at0 + i))
 	{
-	  if (fts_get_pointer(at0) != fts_get_pointer(at1))
+	  if (fts_get_pointer(at0 + i) != fts_get_pointer(at1 + i))
 	    return 0;
 	}
     }
@@ -685,13 +674,10 @@ fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_
 int
 fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  if (ac0 == 1  && ac1 == 1)
+  if (ac0 == 0  && ac1 == 0)
     return 1;
-  else if (ac0 > 1  && ac1 > 1)
+  else if (ac0 > 0 && ac1 > 0)
     {
-      at0++;
-      at1++;
-
       if ( !fts_atom_same_type( at0, at1))
 	{
 	  if (fts_is_int(at0))
@@ -738,13 +724,6 @@ fts_never_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   return 0;
 }
-
-int
-fts_always_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return 1;
-}
-
 
 /***********************************************************************
  *

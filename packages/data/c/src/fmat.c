@@ -29,7 +29,6 @@
 
 fts_symbol_t fmat_symbol = 0;
 fts_metaclass_t *fmat_type = 0;
-fts_class_t *fmat_class = 0;
 
 static fts_symbol_t sym_text = 0;
 
@@ -113,17 +112,17 @@ fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
   
   for(i=0; i<ac; i++)
     {
-      if(fts_is_array(at + i))
+      if(fts_is_tuple(at + i))
 	{
-	  fts_array_t *aa = fts_get_array(at + i);
-	  int size = fts_array_get_size(aa);
+	  fts_tuple_t *tup = fts_get_tuple(at + i);
+	  int size = fts_tuple_get_size(tup);
 
 	  if(size > n)
 	    size = n;
 	  
 	  for(j=0; j<size; j++)
 	    {
-	      fts_atom_t *a = fts_array_get_element(aa, j);
+	      fts_atom_t *a = fts_tuple_get_element(tup, j);
 	    
 	      if(fts_is_number(a))
 		mat->values[i * n + j] = fts_get_number_float(a);
@@ -398,10 +397,7 @@ fmat_write_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_
 static void
 fmat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, fmat_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -603,7 +599,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fmat_alloc(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
     fmat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
-  else if(fts_is_array(at))
+  else if(fts_is_tuple(at))
     {
       int m = 0;
       int n = 0;
@@ -612,10 +608,10 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       /* check n (longest row) and m */
       for(i=0; i<ac; i++)
 	{
-	  if(fts_is_array(at + i))
+	  if(fts_is_tuple(at + i))
 	    {
-	      fts_array_t *aa = fts_get_array(at + i);
-	      int size = fts_array_get_size(aa);
+	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_pointer(at + i);
+	      int size = fts_tuple_get_size(tup);
 	      
 	      if(size > n)
 		n = size;
@@ -629,6 +625,8 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fmat_alloc(this, m, n);
       fmat_set_from_lists(this, ac, at);
     }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -639,44 +637,33 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free(this->values);
 }
 
-static int
-fmat_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_array(at))) || (ac > 1));
-}
-
 static fts_status_t
 fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(fmat_check(ac - 1, at + 1))
-    {
-      fts_class_init(cl, sizeof(fmat_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fmat_t), 1, 1, 0);
   
-      /* init / delete */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fmat_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
+  /* init / delete */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fmat_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
-
-      /* define variable */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
-
-      fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
-      fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
-      fts_method_define_varargs(cl, 0, fts_s_set, fmat_set);
-      
-      fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
-      fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
-
-      /* type outlet */
-      fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_symbol);      
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
+  
+  /* define variable */
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
+  
+  fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
+  fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
+  fts_method_define_varargs(cl, 0, fts_s_set, fmat_set);
+  
+  fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
+  fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
+  
+  /* type outlet */
+  fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_symbol);      
+  
+  return fts_Success;
 }
 
 /********************************************************************
@@ -685,18 +672,11 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
-static int
-fmat_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return fmat_check(ac1 - 1, at1 + 1);
-}
-
 void 
 fmat_config(void)
 {
   sym_text = fts_new_symbol("text");
   fmat_symbol = fts_new_symbol("fmat");
 
-  fmat_type = fts_metaclass_install(fmat_symbol, fmat_instantiate, fmat_equiv);
-  fmat_class = fts_class_get_by_name(fmat_symbol);
+  fmat_type = fts_class_install(fmat_symbol, fmat_instantiate);
 }

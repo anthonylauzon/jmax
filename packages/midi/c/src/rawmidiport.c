@@ -182,11 +182,12 @@ rawmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static int 
 rawmidiport_check(int ac, const fts_atom_t *at)
 {
-  if(ac > 1 && fts_is_object(at + 1))
+  if(ac > 0 && fts_is_object(at))
     {
-      fts_object_t *obj = fts_get_object(at + 1);
+      fts_object_t *obj = fts_get_object(at);
       
-      if(fts_bytestream_check(obj) && (fts_bytestream_is_output((fts_bytestream_t *)obj) || fts_bytestream_is_input((fts_bytestream_t *)obj)))
+      if(fts_bytestream_check(obj) && 
+	 (fts_bytestream_is_output((fts_bytestream_t *)obj) || fts_bytestream_is_input((fts_bytestream_t *)obj)))
 	return 1;
     }
   

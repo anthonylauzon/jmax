@@ -22,7 +22,6 @@
 #include "data.h"
 
 extern void value_config(void);
-
 extern void ivec_config(void);
 extern void fvec_config(void);
 extern void fmat_config(void);
@@ -31,19 +30,14 @@ extern void mat_config(void);
 extern void col_config(void);
 extern void row_config(void);
 extern void bpf_config(void);
+extern void messtab_config(void);
+extern void preset_config(void);
 
 extern void getval_config(void);
 extern void getinter_config(void);
-
 extern void getsize_config(void);
 extern void getrange_config(void);
 extern void getlist_config(void);
-
-extern void preset_config(void);
-extern void messtab_config(void);
-
-extern void fill_config(void);
-extern void copy_config(void);
 
 extern void dumpfile_config(void);
 
@@ -51,7 +45,6 @@ DATA_API void
 data_config(void)
 {
   value_config();
-
   ivec_config();
   fvec_config();
   fmat_config();
@@ -60,19 +53,14 @@ data_config(void)
   col_config();
   row_config();
   bpf_config();
+  messtab_config();
+  preset_config();
 
   getval_config();  
   getinter_config();
-
   getsize_config();  
   getrange_config();  
   getlist_config();  
-
-  preset_config();
-  messtab_config();
-
-  fill_config();
-  copy_config();
 
   dumpfile_config();
 }

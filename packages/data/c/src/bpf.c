@@ -30,7 +30,6 @@
 
 fts_symbol_t bpf_symbol = 0;
 fts_metaclass_t *bpf_type = 0;
-fts_class_t *bpf_class = 0;
 
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;
@@ -60,11 +59,7 @@ set_size(bpf_t *bpf, int size)
       while(alloc < size)
 	alloc += BPF_BLOCK_SIZE;
 
-      if(bpf->alloc)
-	fts_free( bpf->points);
-      
-      bpf->points = (bp_t *)fts_malloc(sizeof(bp_t) * alloc);
-
+      bpf->points = (bp_t *)fts_realloc(bpf->points, sizeof(bp_t) * alloc);
       bpf->alloc = alloc;
     }
 
@@ -86,20 +81,21 @@ bpf_append_point(bpf_t *bpf, double time, double value)
 
   if(size > 0)
     {
-      /* Keeping trace of a marvelous optimization bug in VC++ compiler. Beats me! */
-      if(time > bpf->points[size - 1].time)
+      double duration = bpf_get_time(bpf, size - 1);
+      
+      if(time <= duration)
+	{
+	  time = duration;
+	  
+	  /* set jump for previous point */
+	  bpf->points[size - 1].slope = DBL_MAX;
+	}
+      else
 	{
 	  /* set slope for previous point */
 	  bpf->points[size - 1].slope = 
 	    (value - bpf->points[size - 1].value) / 
 	    (time - bpf->points[size - 1].time);
-	}
-      else
- 	{
-	  time = bpf->points[size - 1].time;
-	  
-	  /* set jump for previous point */
-	  bpf->points[size - 1].slope = DBL_MAX;
 	}
     }
   
@@ -285,14 +281,11 @@ bpf_set_client(bpf_t *bpf)
 static void
 bpf_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, bpf_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
-bpf_append_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
 
@@ -406,7 +399,7 @@ bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   bpf_t *this = (bpf_t *)o;
   int size = bpf_get_size(this);
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
   fts_atom_t *atoms;
   int i;
   
@@ -548,26 +541,26 @@ bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-bpf_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+bpf_set_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  bpf_t *this = (bpf_t *)obj;
+  bpf_t *this = (bpf_t *)o;
 
   if(this->keep != fts_s_args && fts_is_symbol(value))
     this->keep = fts_get_symbol(value);
 }
 
 static void
-bpf_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+bpf_get_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  bpf_t *this = (bpf_t *)obj;
+  bpf_t *this = (bpf_t *)o;
 
   fts_set_symbol(value, this->keep);
 }
 
 static void
-bpf_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+bpf_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  fts_set_object(value, o);
 }
 
 /************************************************************
@@ -640,11 +633,11 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, bpf_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append);
   
   /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, bpf_open_editor);
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_closeEditor, bpf_close_editor); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, bpf_close_editor); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, bpf_destroy_editor);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
@@ -668,5 +661,4 @@ bpf_config(void)
   sym_setPoints = fts_new_symbol("setPoints");
 
   bpf_type = fts_class_install(bpf_symbol, bpf_instantiate);
-  bpf_class = fts_class_get_by_name(bpf_symbol);
 }

@@ -49,10 +49,8 @@ static void cut_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   cut_t *this = (cut_t *)o;
   cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
-  fts_atom_t a[1];
 
-  fts_set_object(a, data->fvec);
-  fts_outlet_send((fts_object_t *)o, 0, fvec_symbol, 1, a);
+  fts_outlet_object((fts_object_t *)o, 0, (fts_object_t *)data->fvec);
 }
 
 static void 
@@ -142,7 +140,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   data = ftl_data_get_ptr(this->data);
   
   if(fts_is_int(at))
-    data->fvec = (fvec_t *)fts_object_create(fvec_class, 1, at);
+    data->fvec = (fvec_t *)fts_object_create(fvec_type, 1, at);
   else
     data->fvec = fvec_atom_get(at);
 
@@ -171,9 +169,6 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {  
-  ac--;
-  at++;
-
   if(ac == 1 && fts_is_int(at))
     {
       fts_class_init(cl, sizeof(cut_t), 1, 1, 0);

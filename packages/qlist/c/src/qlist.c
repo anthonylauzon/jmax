@@ -108,24 +108,19 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		}
 
 	      if (count == 1)
-		{
-		  if (fts_is_float(&waka[0]))
-		    fts_outlet_send(o, 0, fts_s_float, 1, av);
-		  else
-		    fts_outlet_send(o, 0, fts_s_int, 1, av);
-		}
+		fts_outlet_primitive(o, 0, av);
 	      else 
 		{
 		  if (count > 10)
 		    count = 10;
 
-		  fts_outlet_send(o, 0, fts_s_list, count, waka);
+		  fts_outlet_atoms(o, 0, count, waka);
 		}
 	      break;
 	    }
 	  else if (fts_is_int(av))
 	    {
-	      fts_outlet_send(o, 0, fts_s_int, 1, av);
+	      fts_outlet_primitive(o, 0, av);
 
 	      break;
 	    }
@@ -284,10 +279,10 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(name)
     {
       fts_set_symbol(a, name);
-      this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 1, a);
+      this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 1, a);
     }
   else
-    this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
+    this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 0, 0);
 
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }

@@ -1024,9 +1024,9 @@ binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, f
 static fts_status_t 
 binop_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_add);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_add);
   else
     return &fts_CannotInstantiate;
@@ -1036,9 +1036,9 @@ binop_add_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t 
 binop_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_sub);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_sub);
   else
     return &fts_CannotInstantiate;
@@ -1048,9 +1048,9 @@ binop_sub_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t 
 binop_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_mul);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_mul);
   else
     return &fts_CannotInstantiate;
@@ -1060,9 +1060,9 @@ binop_mul_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t 
 binop_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_div);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_div);
   else
     return &fts_CannotInstantiate;
@@ -1071,9 +1071,9 @@ binop_div_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t 
 binop_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_bus);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_bus);
   else
     return &fts_CannotInstantiate;
@@ -1082,9 +1082,9 @@ binop_bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t 
 binop_vid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if (ac == 1)
+  if (ac == 0)
     return binop_instantiate_realize(cl, ac, at, binop_put_vid);
-  else if (ac == 2)
+  else if (ac == 1)
     return binop_const_instantiate_realize(cl, ac, at, binop_const_put_vid);
   else
     return &fts_CannotInstantiate;

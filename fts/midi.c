@@ -38,13 +38,13 @@
  *
  */
 
-fts_class_t *midievent_class = 0;
+fts_metaclass_t *fts_midievent_type = 0;
 fts_symbol_t fts_s_midievent = 0;
 
 fts_midievent_t *
 fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type , 0, 0);
 
   event->type = type;
   event->id = channel;
@@ -57,7 +57,7 @@ fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, i
 fts_midievent_t *
 fts_midievent_note_new(int channel, int note, int velocity)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_note;
   event->id = channel;
@@ -70,7 +70,7 @@ fts_midievent_note_new(int channel, int note, int velocity)
 fts_midievent_t *
 fts_midievent_poly_pressure_new(int channel, int note, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_poly_pressure;
   event->id = channel;
@@ -83,7 +83,7 @@ fts_midievent_poly_pressure_new(int channel, int note, int value)
 fts_midievent_t *
 fts_midievent_control_change_new(int channel, int number, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_control_change;
   event->id = channel;
@@ -96,7 +96,7 @@ fts_midievent_control_change_new(int channel, int number, int value)
 fts_midievent_t *
 fts_midievent_program_change_new(int channel, int number)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_program_change;
   event->id = channel;
@@ -109,7 +109,7 @@ fts_midievent_program_change_new(int channel, int number)
 fts_midievent_t *
 fts_midievent_channel_pressure_new(int channel, int value)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_channel_pressure;
   event->id = channel;
@@ -122,7 +122,7 @@ fts_midievent_channel_pressure_new(int channel, int value)
 fts_midievent_t * 
 fts_midievent_pitch_bend_new(int channel, int LSB, int MSB)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_pitch_bend;
   event->id = channel;
@@ -135,7 +135,7 @@ fts_midievent_pitch_bend_new(int channel, int LSB, int MSB)
 fts_midievent_t * 
 fts_midievent_system_exclusive_new(void)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_system;
   event->id = midi_system_exclusive;
@@ -156,7 +156,7 @@ fts_midievent_system_exclusive_append(fts_midievent_t *event, int byte)
 fts_midievent_t * 
 fts_midievent_time_code_new(int type, int hour, int minute, int second, int frame)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_system;
   event->id = midi_time_code;
@@ -172,7 +172,7 @@ fts_midievent_time_code_new(int type, int hour, int minute, int second, int fram
 fts_midievent_t * 
 fts_midievent_real_time_new(enum midi_real_time_event tag)
 {
-  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
 
   event->type = midi_type_system;
   event->id = midi_real_time;
@@ -224,7 +224,7 @@ static void
 midievent_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
-  fts_array_t *array = fts_get_array(at);
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
 
   /* set type */
   fts_array_append_int(array, fts_midievent_get_type(this));
@@ -415,8 +415,7 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 midievent_config(void)
 {
-  fts_class_install(fts_s_midievent, midievent_instantiate);
-  midievent_class = fts_class_get_by_name(fts_s_midievent);
+  fts_midievent_type = fts_class_install(fts_s_midievent, midievent_instantiate);
 }
 
 /************************************************************

@@ -72,13 +72,13 @@ struct _dtdserver_t {
   dtdfifo_t *fifo_table[DTD_MAX_FIFOS];
 };
 
-static fts_class_t *dtdserver_class;
+static fts_metaclass_t *dtdserver_type;
 static dtdserver_t *default_instance;
 
 dtdserver_t *dtdserver_get_default_instance( void)
 {
   if (!default_instance)
-    default_instance = (dtdserver_t *)fts_object_create( dtdserver_class, 0, 0);
+    default_instance = (dtdserver_t *)fts_object_create(dtdserver_type, 0, 0);
 
   return default_instance;
 }
@@ -365,8 +365,7 @@ void dtdserver_config( void)
 {
   fts_symbol_t s = fts_new_symbol( "dtdserver");
 
-  fts_class_install( s, dtdserver_instantiate);
-  dtdserver_class = fts_class_get_by_name( s);
+  dtdserver_type = fts_class_install( s, dtdserver_instantiate);
 }
 
 

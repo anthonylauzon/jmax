@@ -29,7 +29,6 @@
 
 fts_symbol_t mat_symbol = 0;
 fts_metaclass_t *mat_type = 0;
-fts_class_t *mat_class = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
@@ -105,7 +104,7 @@ mat_set_size(mat_t *mat, int m, int n)
 	{
 	  fts_atom_t *ap = mat->data + i;
 
-	  fts_set_void(ap);
+	  fts_atom_void(ap);
 	}
       
       if(size > 0)
@@ -134,7 +133,7 @@ mat_void_element(mat_t *mat, int i, int j)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
   
-  fts_set_void(ap);
+  fts_atom_void(ap);
 }
 
 void
@@ -162,7 +161,7 @@ mat_void(mat_t *mat)
     {
       fts_atom_t *ap = mat->data + i;
 
-      fts_set_void(ap);
+      fts_atom_void(ap);
     }
 }
 
@@ -191,10 +190,10 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
   
   for(i=0; i<ac; i++)
     {
-      if(fts_is_array(at + i))
+      if(fts_is_tuple(at + i))
 	{
-	  fts_array_t *aa = fts_get_array(at + i);
-	  int size = fts_array_get_size(aa);
+	  fts_tuple_t *tup = fts_get_tuple(at + i);
+	  int size = fts_tuple_get_size(tup);
 
 	  if(size > n)
 	    size = n;
@@ -202,9 +201,9 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
 	  for(j=0; j<size; j++)
 	    {
 	      fts_atom_t *matp = mat->data + i * n + j;
-	      fts_atom_t *aap = fts_array_get_element(aa, j);
+	      fts_atom_t *ap = fts_tuple_get_element(tup, j);
 	    
-	      fts_atom_assign(matp, aap);
+	      fts_atom_assign(matp, ap);
 	    }
 	}
       else
@@ -466,10 +465,7 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
 static void
 mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-
-  fts_set_object(a, o);
-  fts_outlet_send(o, 0, mat_symbol, 1, a);
+  fts_outlet_object(o, 0, o);
 }
 
 static void
@@ -749,7 +745,7 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     mat_alloc(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
     mat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
-  else if(fts_is_array(at))
+  else if(fts_is_tuple(at))
     {
       int m = 0;
       int n = 0;
@@ -758,10 +754,10 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       /* check n (longest row) and m */
       for(i=0; i<ac; i++)
 	{
-	  if(fts_is_array(at + i))
+	  if(fts_is_tuple(at + i))
 	    {
-	      fts_array_t *aa = fts_get_array(at + i);
-	      int size = fts_array_get_size(aa);
+	      fts_tuple_t *tup = fts_get_tuple(at + i);
+	      int size = fts_tuple_get_size(tup);
 	      
 	      if(size > n)
 		n = size;
@@ -787,12 +783,6 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   mat_t *this = (mat_t *)o;
   
   mat_free(this);
-}
-
-static int
-mat_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && fts_is_int(at)) || (ac == 2 && fts_is_int(at) && fts_is_int(at + 1)) || fts_is_array(at));
 }
 
 static fts_status_t
@@ -844,5 +834,4 @@ mat_config(void)
   mat_symbol = fts_new_symbol("mat");
 
   mat_type = fts_class_install(mat_symbol, mat_instantiate);
-  mat_class = fts_class_get_by_name(mat_symbol);
 }

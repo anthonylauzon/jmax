@@ -27,9 +27,9 @@
 
 #include <fts/fts.h>
 
-#define is_ibinop(ac, at)    (((ac) == 1) || (((ac) == 2) && fts_is_int(&(at)[1])))
-#define is_fbinop(ac, at)    (((ac) == 2) && fts_is_float(&(at)[1]))
-#define is_sbinop(ac, at)    (((ac) == 2) && fts_is_symbol(&(at)[1]))
+#define is_ibinop(ac, at)    (((ac) == 0) || (((ac) == 1) && fts_is_int(at)))
+#define is_fbinop(ac, at)    (((ac) == 1) && fts_is_float(at))
+#define is_sbinop(ac, at)    (((ac) == 1) && fts_is_symbol(at))
 
 typedef struct
 {
@@ -273,7 +273,7 @@ sbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 static fts_status_t
 sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t symbol_meth)
 {
-  if((ac == 2) && fts_is_symbol(&at[1]))
+  if(ac == 1 && fts_is_symbol(at))
     {
       fts_class_init(cl, sizeof(sbinop_t), 2, 1, 0);
 

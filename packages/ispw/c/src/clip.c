@@ -19,12 +19,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include <stdlib.h>
 #include <fts/fts.h>
 
 typedef struct clip_t {
   fts_object_t _o;
-  long i_min;
-  long i_max;
+  int i_min;
+  int i_max;
   float f_min;
   float f_max;
 } clip_t;
@@ -43,7 +44,7 @@ clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else if(fts_is_float(at))
     {
       x->f_min = fts_get_float(at);
-      x->i_min = (long)x->f_min;
+      x->i_min = (int)x->f_min;
     }
 }
 
@@ -60,7 +61,7 @@ clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else if(fts_is_float(at))
     {
       x->f_max = fts_get_float(at);
-      x->i_max = (long)x->f_max;
+      x->i_max = (int)x->f_max;
     }
 }
 
@@ -102,7 +103,7 @@ clip_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n = fts_get_int(at);
+  int n = fts_get_int(at);
   clip_t *x = (clip_t *)o;
 
   if (n > x->i_max)
@@ -116,10 +117,10 @@ clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t temp[256];		/* stack-crushing */
-  register int i;
-  register fts_atom_t *ap;
   clip_t *x = (clip_t *)o;
+  fts_atom_t *temp = alloca(ac * sizeof(fts_atom_t));
+  fts_atom_t *ap;
+  int i;
 
   if (ac > 256)
     ac = 256;
@@ -147,17 +148,15 @@ clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    *ap = *at;
 	}
       else
-	fts_set_int(ap, 0L);
+	fts_set_int(ap, 0);
     }
 
-  fts_outlet_send(o, 0, s, ac, temp);
+  fts_outlet_atoms(o, 0, ac, temp);
 }
 
 static fts_status_t
 clip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[12];
-
   fts_class_init(cl, sizeof(clip_t), 3, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, clip_init);

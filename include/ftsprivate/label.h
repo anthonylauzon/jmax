@@ -20,6 +20,6 @@
  * 
  */
 
-extern fts_metaclass_t *fts_label_metaclass;
+extern fts_metaclass_t *fts_label_type;
 
-#define fts_is_label(p) (fts_is_a(p, fts_label_metaclass))
+#define fts_is_label(p) (fts_is_a(p, fts_label_type))

@@ -24,93 +24,82 @@
 
 /*------------------------- accum class -------------------------------------*/
 
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
-  float s_reg;
+  float value;
 } accum_t;
 
 static void
-iaccum_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+iaccum_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = (float)fts_get_int_arg(ac, at, 0, 0);
-  fts_outlet_send(o, 0, fts_s_int, ac, at);
-}
+  accum_t *this = (accum_t *)o;
+  float f = fts_get_number_float(at);
 
-static void
-iaccum_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t a;
-  ((accum_t *)o)->s_reg = fts_get_float(at);
-  fts_set_int(&a, ((accum_t *)o)->s_reg);
-  fts_outlet_send(o, 0, fts_s_int, 1, &a);
+  this->value = f;
+  fts_outlet_int(o, 0, (int)f);
 }
 
 static void
 iaccum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
-  fts_set_int(&a, (long)((accum_t *)o)->s_reg);
-  fts_outlet_send(o, 0, fts_s_int, 1, &a);
+  accum_t *this = (accum_t *)o;
+
+  fts_outlet_int(o, 0, (int)this->value);
 }
 
 static void
-faccum_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+faccum_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
-  ((accum_t *)o)->s_reg = (float)fts_get_int(at);
-  fts_set_float(&a, ((accum_t *)o)->s_reg);
-  fts_outlet_send(o, 0, fts_s_float, 1, &a);
-}
+  accum_t *this = (accum_t *)o;
+  double f = fts_get_number_float(at);
 
-static void
-faccum_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ((accum_t *)o)->s_reg = fts_get_float(at);
-  fts_outlet_send(o, 0, fts_s_float, ac, at);
+  this->value = f;
+  fts_outlet_float(o, 0, f);
 }
 
 static void
 faccum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
-  fts_set_float(&a, ((accum_t *)o)->s_reg);
-  fts_outlet_send(o, 0, fts_s_float, 1, &a);
+  accum_t *this = (accum_t *)o;
+
+  fts_outlet_float(o, 0, this->value);
 }
 
 static void
 accum_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = fts_get_float_arg(ac, at, 0, 0);
+  accum_t *this = (accum_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    this->value = fts_get_number_float(at);
+}
+
+static void
+accum_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  accum_t *this = (accum_t *)o;
+
+  this->value += fts_get_number_float(at);
+}
+
+static void
+accum_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  accum_t *this = (accum_t *)o;
+
+  this->value *= fts_get_number_float(at);
 }
 
 static void
 accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = fts_get_float_arg(ac, at, 1, 0);
-}
+  accum_t *this = (accum_t *)o;
 
-static void
-accum_int_middle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ((accum_t *)o)->s_reg += fts_get_int_arg(ac, at, 0, 0);
-}
+  ac--;
+  at++;
 
-static void
-accum_int_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ((accum_t *)o)->s_reg *= fts_get_int_arg(ac, at, 0, 0);
-}
-
-static void
-accum_float_middle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ((accum_t *)o)->s_reg += fts_get_float_arg(ac, at, 0, 0);
-}
-
-static void
-accum_float_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ((accum_t *)o)->s_reg *= fts_get_float_arg(ac, at, 0, 0);
+  accum_set(o, 0, 0, 1, at);
 }
 
 static fts_status_t
@@ -122,25 +111,25 @@ accum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_set, accum_set);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, accum_int_middle);
-  fts_method_define_varargs(cl, 1, fts_s_float, accum_float_middle);
+  fts_method_define_varargs(cl, 1, fts_s_int, accum_add);
+  fts_method_define_varargs(cl, 1, fts_s_float, accum_add);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, accum_int_right);
-  fts_method_define_varargs(cl, 2, fts_s_float, accum_float_right);
+  fts_method_define_varargs(cl, 2, fts_s_int, accum_mul);
+  fts_method_define_varargs(cl, 2, fts_s_float, accum_mul);
 
-  if ((ac <= 1) || fts_is_int(at + 1))
+  if(ac == 0 || fts_is_int(at))
     {
       fts_method_define_varargs(cl, 0, fts_s_bang, iaccum_bang);
-      fts_method_define_varargs(cl, 0, fts_s_int, iaccum_int);
-      fts_method_define_varargs(cl, 0, fts_s_float, iaccum_float);      
+      fts_method_define_varargs(cl, 0, fts_s_int, iaccum_number);
+      fts_method_define_varargs(cl, 0, fts_s_float, iaccum_number);      
 
       fts_outlet_type_define_varargs(cl, 0, fts_s_int);
     }
   else
     {
       fts_method_define_varargs(cl, 0, fts_s_bang, faccum_bang);
-      fts_method_define_varargs(cl, 0, fts_s_int, faccum_int);
-      fts_method_define_varargs(cl, 0, fts_s_float, faccum_float);
+      fts_method_define_varargs(cl, 0, fts_s_int, faccum_number);
+      fts_method_define_varargs(cl, 0, fts_s_float, faccum_number);
 
       fts_outlet_type_define_varargs(cl, 0, fts_s_float);
     }

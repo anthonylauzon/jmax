@@ -28,34 +28,45 @@
 
 #include <fts/fts.h>
 
-/*------------------------- change class -------------------------------------*/
-
-typedef struct {
-  fts_object_t o;
-  long r_state;
-} change_t;
-
-static void
-change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+typedef struct 
 {
-  ((change_t *)o)->r_state = (long) fts_get_int_arg(ac, at, 1, 0);
-}
+  fts_object_t o;
+  int state;
+} change_t;
 
 static void
 change_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n;
-  if ((n = fts_get_number_int(at)) != ((change_t *)o)->r_state)
+  change_t *this = (change_t *)o;
+  int n = fts_get_number_int(at);
+
+  if (n != this->state)
     {
-      fts_outlet_send(o, 0, fts_s_int, ac, at);
-      ((change_t *)o)->r_state = n;
+      this->state = n;
+      fts_outlet_int(o, 0, n);
     }
 }
 
 static void
 change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((change_t *)o)->r_state = fts_get_int_arg(ac, at, 0, 0);
+  change_t *this = (change_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+     this->state = fts_get_number_int(at);
+}
+
+static void
+change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  change_t *this = (change_t *)o;
+
+  ac--;
+  at++;
+
+  this->state = 0;
+
+  change_set(o, 0, 0, 1, at);  
 }
 
 static fts_status_t

@@ -62,29 +62,31 @@ static void fts_object_free(fts_object_t *obj);
  */
 
 fts_object_t *
-fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
+fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj = (fts_object_t *)fts_heap_calloc(cl->heap);
+  fts_class_t *cl = mcl->inst_list;
+  fts_object_t *obj = 0;
 
-  obj->head.cl = cl;
-  obj->head.id = FTS_NO_ID;
-  /*obj->properties = 0;*/
-  /*obj->varname = 0;*/
-  /*obj->refcnt = 0;*/
-
-#ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
-#endif
-  
-  if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
-  
-  if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
-
-  /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
-  if(fts_class_get_constructor(cl))
-      fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1); 
+  if(cl)
+    {
+      obj = (fts_object_t *)fts_heap_calloc(cl->heap);
+      
+      obj->head.cl = cl;
+      obj->head.id = FTS_NO_ID;
+      /*obj->properties = 0;*/
+      /*obj->varname = 0;*/
+      /*obj->refcnt = 0;*/
+      
+      if (cl->noutlets)
+	obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
+      
+      if (cl->ninlets)
+	obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
+      
+      /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
+      if(fts_class_get_constructor(cl))
+	fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1); 
+    }
 
   return obj;
 }
@@ -103,7 +105,7 @@ fts_status_t
 fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_symbol_t error;
-  fts_class_t *cl;
+  fts_class_t *cl = 0;
   fts_object_t *obj;
 
   if (fts_get_symbol(at) == fts_s_patcher)
@@ -112,18 +114,21 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 	 the metaclass do not depend on the arguments, but on the inlets/outlets.
 	 New patchers are created with zero in zero outs, and changed later 
       */
-      fts_atom_t a[3];
+      fts_atom_t a[2];
 
-      fts_set_symbol(&a[0], fts_s_patcher);
-      fts_set_int(&a[1], 0);
-      fts_set_int(&a[2], 0);
-
-      cl = fts_class_instantiate(3, a);
+      fts_set_int(a, 0);
+      fts_set_int(a + 1, 0);
+      cl = fts_class_instantiate(patcher_metaclass, 2, a);
     }
   else
-    cl = fts_class_instantiate(ac, at);
+    {
+      fts_metaclass_t *mcl = fts_metaclass_get_by_name(fts_get_symbol(at));
+      
+      if (mcl)
+	cl = fts_class_instantiate(mcl, ac - 1, at + 1);
+    }
 
-  if (! cl)
+  if (!cl)
     {
       *ret = 0;
       return &fts_CannotInstantiate;
@@ -676,8 +681,11 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
 
   /*if((old->head.id == new_id) && fts_object_description_variable_name_changed_only(fts_object_t *old, int ac, const fts_atom_t *at))*/
 
+  /* unreference by hand */
+  old->refcnt--;
+
   /* call deconstructor */
-  if(fts_class_get_deconstructor(old->head.cl))
+  if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
     fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* if old id and new id are the same, do the replace without telling the client */
@@ -725,7 +733,11 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
     fts_patcher_remove_object(old->patcher, old);
 
   fts_object_reset_changed(old);
-  fts_object_free(old);
+
+  if(old->refcnt == 0)
+    fts_object_free(old);
+  else
+    old->patcher = 0;
 
   return new;
 }
@@ -936,11 +948,11 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
 
   /* change the class (of course, not the metaclass). */
   {
-    fts_atom_t a[2];
-
-    fts_set_symbol(&a[0], fts_object_get_class_name(o));
-    fts_set_int(&a[1], new_noutlets);
-    o->head.cl = fts_class_instantiate(2, a);
+    fts_metaclass_t *mcl = fts_object_get_metaclass(o);
+    fts_atom_t a;
+    
+    fts_set_int(&a, new_noutlets);
+    o->head.cl = fts_class_instantiate(mcl, 1, &a);
   }
 
   if (fts_object_has_id(o))

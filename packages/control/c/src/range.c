@@ -111,7 +111,7 @@ range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(v < points[0])
     {
-      fts_outlet_send(o, 0, fts_s_int, 1, at);
+      fts_outlet_int(o, 0, v);
       return;
     }
 
@@ -119,13 +119,13 @@ range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       if(v < points[i])
 	{
-	  fts_outlet_send(o, i, fts_s_int, 1, at);
+	  fts_outlet_int(o, i, v);
 	  return;
 	}
     }
 
   if(v >= points[n-1])
-    fts_outlet_send(o, n, fts_s_int, 1, at);
+    fts_outlet_int(o, n, v);
 }
 
 static void
@@ -139,7 +139,7 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(v < points[0])
     {
-      fts_outlet_send(o, 0, fts_s_float, 1, at);
+      fts_outlet_float(o, 0, v);
       return;
     }
 
@@ -147,13 +147,13 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       if(v < points[i] || v == points[i - 1])
 	{
-	  fts_outlet_send(o, i, fts_s_float, 1, at);
+	  fts_outlet_float(o, i, v);
 	  return;
 	}
     }
 
   if(v >= points[n-1])
-    fts_outlet_send(o, n, fts_s_float, 1, at);
+    fts_outlet_float(o, n, v);
 }
 
 static void
@@ -188,13 +188,13 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int i, n;
 
-  if(ac == 1)
+  if(ac == 0)
     n = 1;
   else 
-    n = ac - 1;
+    n = ac;
 
-  /* test args are numbers */
-  for(i=1; i<ac; i++)
+  /* test whether args are numbers */
+  for(i=0; i<ac; i++)
     {
       if(!fts_is_number(at + i))
 	return &fts_CannotInstantiate;

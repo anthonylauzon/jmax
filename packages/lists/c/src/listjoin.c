@@ -85,7 +85,7 @@ listjoin_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_array_set(&this->out, ac, at);
   fts_array_append(&this->out, right_size, fts_array_get_atoms(&this->right));
   
-  fts_outlet_send(o, 0, fts_s_list, total_size, fts_array_get_atoms(&this->out));
+  fts_outlet_atoms(o, 0, total_size, fts_array_get_atoms(&this->out));
 }
 
 static void
@@ -99,7 +99,7 @@ listjoin_prepend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_array_set(&this->out, right_size, fts_array_get_atoms(&this->right));
   fts_array_append(&this->out, ac, at);
 
-  fts_outlet_send(o, 0, fts_s_list, total_size, fts_array_get_atoms(&this->out));
+  fts_outlet_atoms(o, 0, total_size, fts_array_get_atoms(&this->out));
 }
 
 /*********************************************

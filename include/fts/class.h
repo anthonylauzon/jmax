@@ -95,8 +95,8 @@ FTS_API void fts_alias_install(fts_symbol_t alias_name, fts_symbol_t class_name)
 #define FTS_VAR_ARGS  -1
 
 FTS_API fts_status_t fts_class_init( fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
-FTS_API fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at);
-FTS_API fts_class_t *fts_class_get_by_name( fts_symbol_t name);
+FTS_API fts_class_t *fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
+
 FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t name);
 
 /* method definition */
@@ -175,6 +175,5 @@ FTS_API int fts_arg_equiv_or_float( int ac0, const fts_atom_t *at0, int ac1, con
 FTS_API int fts_first_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 FTS_API int fts_narg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 FTS_API int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-FTS_API int fts_always_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 FTS_API int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 

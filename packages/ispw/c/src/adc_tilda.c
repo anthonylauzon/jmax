@@ -83,9 +83,6 @@ static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 {
   int outlets, i;
 
-  ac--;
-  at++;
-
   if (ac == 0)
     outlets = 2;
   else

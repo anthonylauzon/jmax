@@ -37,7 +37,6 @@ typedef struct messtab
   fts_symbol_t keep;
 } messtab_t;
 
-DATA_API fts_class_t *messtab_class;
 DATA_API fts_symbol_t messtab_symbol;
 DATA_API fts_metaclass_t *messtab_type;
 

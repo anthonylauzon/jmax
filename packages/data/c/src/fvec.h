@@ -39,7 +39,6 @@ typedef struct _fvec_
   float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
 } fvec_t;
 
-DATA_API fts_class_t *fvec_class;
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_metaclass_t *fvec_type;
 

@@ -39,7 +39,7 @@ makenote_send_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   makenote_t *this = (makenote_t *)o;
 
   fts_outlet_int(o, 1, 0);
-  fts_outlet_send(o, 0, fts_s_int, 1, at);
+  fts_outlet_int(o, 0, fts_get_int(at));
 }
 
 static void
@@ -156,7 +156,6 @@ makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_list, makenote_list);
 
-  /* Type the outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
   fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 

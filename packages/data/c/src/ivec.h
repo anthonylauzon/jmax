@@ -44,7 +44,6 @@ typedef struct _ivec_
   struct _ivec_ *copy;
 } ivec_t;
 
-DATA_API fts_class_t *ivec_class;
 DATA_API fts_symbol_t ivec_symbol;
 DATA_API fts_metaclass_t *ivec_type;
 
