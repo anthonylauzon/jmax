@@ -1,3 +1,7 @@
+2001-01-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Fixed error in fts/src/sys/Makefile
+
 2001-01-02  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Fixed install errors in new Makefiles
