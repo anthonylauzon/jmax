@@ -141,7 +141,7 @@ class ErmesObjBang extends ErmesObject implements ActionListener {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return getPreferredSize(); //(depending on the layout manager).
+    return new Dimension(15,15); //(depending on the layout manager).
   }
   
   //If we don't specify this, the canvas might not show up at all

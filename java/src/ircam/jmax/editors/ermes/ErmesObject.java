@@ -373,11 +373,13 @@ public class ErmesObject implements FtsPropertyHandler {
     }
     
     if(width<10){
-      width  = getPreferredSize().width;
+      //width  = getPreferredSize().width;
+      width  = getMinimumSize().width;
       //itsResized = true;
     }
     if(height<10){
-      height  = getPreferredSize().height;
+      //height  = getPreferredSize().height;
+      height  = getMinimumSize().height;
       //itsResized = true;
     }
     currentRect = new Rectangle(itsX, itsY, width, height);

@@ -152,7 +152,7 @@ class ErmesObjFloat extends ErmesObject {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
       if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(itsFalseFrame);
-      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY);
       itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
       itsFloatDialog.setVisible(true);
       return true;
