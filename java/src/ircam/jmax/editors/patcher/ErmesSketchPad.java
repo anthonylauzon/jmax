@@ -320,7 +320,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // Initialize state
     itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
 
-    fts.addUpdateGroupListener( this);
+    //fts.addUpdateGroupListener( this);
     // Get the defaultFontName and Size
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
 

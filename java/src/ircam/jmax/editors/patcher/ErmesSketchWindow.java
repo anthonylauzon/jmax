@@ -69,7 +69,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return getLocation();
   }
   public Rectangle getViewRectangle(){
-    return itsScrollerView.getViewport().getViewRect();
+      JViewport port = itsScrollerView.getViewport();
+    return port.getViewRect();
   }
 
   // ------- messageDisplayer interface -------------\
@@ -151,6 +152,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     
     itsSketchPad.InitLock();
     itsSketchPad.setMessageDisplayer(this);
+    
+    patcherData.getFts().addUpdateGroupListener(itsSketchPad);//bug fix 11/5 
 
     // Finally, activate the updates
     patcherData.startUpdates();
