@@ -14,8 +14,6 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.editors.table.*;//try on 13/03 (to be removed before 20/23)
-//import ircam.jmax.editors.project.*;
 import com.sun.java.swing.*;
 //import com.sun.java.swing.jlf.*;
 
