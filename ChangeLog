@@ -1,5 +1,7 @@
 2000-10-26  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* added compile hint ENABLE_ALSA0.6 to compile package alsa0.6dev
+
 	* moved score following objects
 
 2000-10-25  Francois Dechelle  <dechelle@lipari.ircam.fr>

@@ -25,9 +25,3 @@
 
 include $(DISTDIR)/Makefiles/Makefile.linux
 
-ifeq ($(ENABLE_ALSA),yes)
-ARCH_PACKAGES=ossdev unixdtd alsadev
-else
-ARCH_PACKAGES=ossdev unixdtd
-endif
-
