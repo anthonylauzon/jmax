@@ -1,5 +1,7 @@
 2003-08-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fts/variable.c (define_evaluate): fixed bug "[ 783531 ] error in messconst: undefined variable".
+
 	* fts/object.c (eval_object_description_expression_callback): commented a piece of code to readd error message in GUI Error Panel, but perhaps this piece of code is usefull somewhere....
 
 	* fts/template.c (fts_template_file_modified): fixed reinstanciation of template instance if a template file is modified.

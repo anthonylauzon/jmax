@@ -428,9 +428,8 @@ define_evaluate(define_t *this)
 
     if(error == fts_ok)
     {
-      /* reset definition */
       if(this->name != fts_s_empty_string && !fts_is_void(&this->value))
-        fts_name_set_value(this->patcher, this->name, fts_null);
+        fts_name_set_value(this->patcher, this->name, &this->value);
     }
   }
 
