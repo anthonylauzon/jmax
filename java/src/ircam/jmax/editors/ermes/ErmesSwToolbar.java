@@ -38,7 +38,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     InsertButtons();
 
     add (itsSwToolbar, BorderLayout.WEST);
-    setBackground(itsSwToolbar.getBackground());
+    //setBackground(itsSwToolbar.getBackground());
     validate();
   }
 
@@ -138,8 +138,8 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
 
   public void setRunMode(boolean theRunMode) {
     if(pressed) Unlock();
-    if(theRunMode) setBackground(Color.white);
-    else setBackground(itsSwToolbar.getBackground());
+    //if(theRunMode) setBackground(Color.white);
+    //else setBackground(itsSwToolbar.getBackground());
     itsSwToolbar.setVisible(!theRunMode);
   }
  
