@@ -117,6 +117,12 @@ typedef struct {
   unsigned int cur_cbuffer;
   unsigned int cur_cfragment;
 
+  unsigned int cur_read_position;
+  unsigned int cur_write_position;
+  unsigned int frame_size;
+  unsigned int fifo_frame_size;
+  unsigned int fifo_byte_size;
+
 } dsaudioport_t;
 
 static void dsaudioport_input( fts_word_t *argv);
@@ -206,8 +212,12 @@ dsaudioport_output(fts_word_t *argv)
   dsaudioport_t *dev;
   short *buf1, *buf2;
   DWORD bytes1, bytes2, boffset, soffset;    
-  int n, channels, ch, i, j;
+  DWORD n, channels, ch, i, j, k;
   DWORD bend;
+  
+  DWORD offset = 0;
+  DWORD cur_position, frames, play_position, write_position, bytes;
+  HRESULT res;
 
   dev = (dsaudioport_t *) fts_word_get_ptr(argv+0);
   if (dev->state != dsaudioport_running) {
@@ -220,6 +230,7 @@ dsaudioport_output(fts_word_t *argv)
     n = fts_word_get_int(argv + 1);
     channels = fts_audioport_get_output_channels(dev);
     
+#if 0
     
     /* Calculate the byte and sample offset in the fifo buffer */
     boffset = dev->cur_buffer * dev->buffer_byte_size;    
@@ -243,13 +254,7 @@ dsaudioport_output(fts_word_t *argv)
       FILE* log; /* FIXME */
       IDirectSoundBuffer_GetCurrentPosition(dev->dsBuffer, &bytes1, &bytes2);
       log = fopen("C:\\dsaudioport.txt", "a");
-      fprintf(log, "buf=%i\tfrag=%i\tplay=%u\twrite=%u\tstart=%u\tend=%u\toverlap=%i\n", 
-	      dev->cur_buffer, dev->cur_fragment, 
-	      bytes1, bytes2,
-	      boffset, bend,
-	      (((bytes1 <= boffset) && (boffset <= bytes2))
-	       || (bytes1 <= bend) && (bend <= bytes2)));
-      
+      fprintf(log, "curpos=%u\tplay=%u\twrite=%u\n", dev->cur_write_position * dev->frame_size, bytes1, bytes2);
       fclose(log);
     }
 #endif
@@ -274,6 +279,87 @@ dsaudioport_output(fts_word_t *argv)
     if (dev->cur_buffer == dev->num_buffers) {
       dev->cur_buffer = 0;
     }
+
+#else
+
+    while (offset < n) {
+
+      cur_position = dev->cur_write_position * dev->frame_size;
+      IDirectSoundBuffer_GetCurrentPosition(dev->dsBuffer, &play_position, &write_position);
+
+      if (cur_position <= play_position) {
+	bytes = play_position - cur_position;
+      } else if ((play_position < cur_position) && (write_position <= cur_position)) {
+	bytes = dev->fifo_byte_size + play_position - cur_position;      
+      } else {
+	/* xrun! */
+	bytes = 0;
+      }
+      
+      if (bytes > 0) {
+	
+	frames = bytes / dev->frame_size;
+	
+	if (offset + frames > n) {
+	  frames = n - offset;
+	  bytes = frames * dev->frame_size;
+	}
+    
+#if 0
+    {
+      FILE* log; /* FIXME */
+      IDirectSoundBuffer_GetCurrentPosition(dev->dsBuffer, &bytes1, &bytes2);
+      log = fopen("C:\\dsaudioport.txt", "a");
+      fprintf(log, "curpos=%u\tplay=%u\twrite=%u\tframes=%u\n", cur_position, bytes1, bytes2, frames);
+      fclose(log);
+    }
+#endif
+	
+	/* Lock */
+	res = IDirectSoundBuffer_Lock(dev->dsBuffer, cur_position, bytes, (void*) &buf1, &bytes1, (void*) &buf2, &bytes2, 0);
+	
+	if ((res != DS_OK) || (buf1 == NULL)) {
+	  fts_log("[dsaudioport]: Failed to lock the audio buffer. System lockup might follow. Exiting. (curpos=%u, bytes=%u)\n", 
+		  cur_position, bytes);
+	  ExitProcess(0);
+	}
+
+	/* Interleave the sample buffer into the output buffer */
+	for (ch = 0; ch < channels; ch++) {
+	  
+	  float *in = (float *) fts_word_get_ptr(argv + 2 + ch);
+	  
+	  i = 0;
+	  j = ch;
+	  k = offset;
+	  
+	  while (i < frames) { 
+	    buf1[j] = (short) (32767.0f * in[k++]);
+	    j += channels;
+	    i++;
+	  }
+	}
+	
+	/* Unlock */
+	IDirectSoundBuffer_Unlock(dev->dsBuffer, buf1, bytes1, buf2, bytes2);
+	
+	offset += frames;
+	dev->cur_write_position += frames;
+	
+	if (dev->cur_write_position >= dev->fifo_frame_size) {
+	  dev->cur_write_position -= dev->fifo_frame_size;
+	}
+
+      }
+
+      if (offset < n) {
+	Sleep(1);
+      }
+
+    }
+
+#endif
+
   }
 }
 
@@ -369,6 +455,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dev->cur_cfragment = 0;
   dev->device = NULL;
   dev->mode = NULL;
+  dev->cur_read_position = 0;
+  dev->cur_write_position = 0;
+  dev->frame_size = 0;
+  dev->fifo_frame_size = 0;
+  dev->fifo_byte_size = 0;
 
   /*************************** fts settings ********************************/
 
@@ -386,7 +477,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
    */
   
   dev->device = fts_get_symbol_arg(ac, at, 0, fts_s_default);
-  dev->mode = fts_get_symbol_arg(ac, at, 1, fts_s_write);
+
+/*    dev->mode = fts_get_symbol_arg(ac, at, 1, fts_s_write); */
+
+  dev->mode = fts_s_write;
+
   channels = fts_get_int_arg(ac, at, 2, DEFAULT_CHANNELS);
   dev->num_fragments = fts_get_int_arg(ac, at, 3, DEFAULT_NUM_FRAGMENTS);
 
@@ -441,6 +536,9 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dev->buffer_sample_size = channels * frames;
   dev->buffer_byte_size = dev->buffer_sample_size * sizeof(short);
   dev->num_buffers = fifo_size / frames;
+  dev->fifo_frame_size = fifo_size;
+  dev->frame_size = channels * sizeof(short);
+  dev->fifo_byte_size = dev->fifo_frame_size * dev->frame_size;
 
   /* Assure a useable value of the number of fragments. */
 
@@ -465,7 +563,6 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   dev->fragment_size = dev->num_buffers / dev->num_fragments;
 
-  
 
   /* create and initialize the buffer format */
   dev->format = (WAVEFORMATEX*) fts_malloc(sizeof(WAVEFORMATEX));
@@ -473,8 +570,8 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dev->format->wFormatTag = WAVE_FORMAT_PCM;
   dev->format->nChannels = (unsigned short) channels;
   dev->format->nSamplesPerSec = (DWORD) sample_rate;
-  dev->format->nBlockAlign = channels * sizeof(short);
-  dev->format->nAvgBytesPerSec = dev->format->nSamplesPerSec * dev->format->nBlockAlign;
+  dev->format->nBlockAlign = dev->frame_size;
+  dev->format->nAvgBytesPerSec = (DWORD) sample_rate * dev->frame_size;
   dev->format->wBitsPerSample = sizeof(short) * 8; 
   dev->format->cbSize = 0; 
 
