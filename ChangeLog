@@ -1,5 +1,7 @@
 2004-01-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* client/python: added license information in all python source code files.
+
 	* client/configure.in, client/cpp/src/Makefile.am: added versionning of FTS C++ client library.
 
 2003-12-29  Alexandre Pages  <alexandre.pages@ircam.fr>
