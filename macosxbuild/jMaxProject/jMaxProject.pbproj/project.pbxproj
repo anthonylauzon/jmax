@@ -5,19 +5,6 @@
 	};
 	objectVersion = 34;
 	objects = {
-		F80A5F41028FCF5801664092 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			generatedFileNames = (
-			);
-			isa = PBXShellScriptBuildPhase;
-			name = "Shell Script";
-			neededFileNames = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "echo \"root\" > jmax.jar.root\ncp jmax.jar.root build/intermediates/jmax.jar.build/JavaClasses/jmax.jar.root";
-		};
 		F80A5F42028FD44C01664092 = {
 			buildPhases = (
 			);
@@ -172,6 +159,19 @@
 			);
 			shellPath = /bin/sh;
 			shellScript = "cd ../../packages/guiobj/java\njar -uvf ../../../macosxbuild/jMaxProject/build/guiobj.jar icons/*.gif";
+		};
+		F820CB9A0291129D01664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			name = "Shell Script";
+			neededFileNames = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "echo \"root\" > jmax.jar.root\njar -uvf build/jmax.jar jmax.jar.root";
 		};
 		F8386E97028D3F9101664092 = {
 			fileRef = F88000960283082801664092;
@@ -15328,9 +15328,9 @@
 		F880FEDE0283013E01664092 = {
 			buildPhases = (
 				F880FEDF0283013E01664092,
-				F80A5F41028FCF5801664092,
 				F880FFEA0283013F01664092,
 				F880FFEB0283013F01664092,
+				F820CB9A0291129D01664092,
 			);
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
