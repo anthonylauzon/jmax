@@ -551,7 +551,7 @@ messbox_update(fts_object_t *o)
   int size = fts_atom_list_get_size(this->atom_list);
   fts_atom_t *a = alloca( size * sizeof( fts_atom_t));
   
-  fts_atom_list_get_atoms( atom_list, a);
+  fts_atom_list_get_atoms( this->atom_list, a);
   
   fts_memorystream_reset( stream);      
   fts_spost_object_description_args( (fts_bytestream_t *)stream, size, a);
