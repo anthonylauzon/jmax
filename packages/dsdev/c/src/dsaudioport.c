@@ -197,6 +197,7 @@ dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize)
 
   dev = (dsaudioport_t *)port;
   if (dev->state != dsaudioport_running) {
+	  fts_log("[dsaudioport] output fun but dev->state != dsaudioport_running\n");
     /* FIXME */
     return;
   }
@@ -227,7 +228,7 @@ dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize)
       buf1[j] = (short) (32767.0f * in[i]);
     }
   }
-  
+  /* fts_log("[dsaudioport] after filling buffer (channels=%d , buffsize=%d)\n", channels, buffsize); */
   /* Unlock */
   IDirectSoundBuffer_Unlock(dev->dsBuffer, buf1, bytes1, buf2, bytes2);
   
@@ -264,14 +265,15 @@ static void
 dsaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   /* do something when when you want to open input */
-  fts_audioport_set_open((fts_audioport_t*)o, FTs_AUDIO_INPUT);
+  fts_audioport_set_open((fts_audioport_t*)o, FTS_AUDIO_INPUT);
 }
 
 static void
 dsaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   /* do something when when you want to open output */
-  fts_audioport_set_open((fts_audioport_t*)o, FTs_AUDIO_OUTPUT);
+	fts_log("[dsaudioport] dsaudioport_open_output\n");
+  fts_audioport_set_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
 }
 
 static void
@@ -299,11 +301,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   DSCBUFFERDESC cdesc;
 #endif
 
-/*    fts_log("[dsaudioport]: Available audio output devices\n"); */
-/*    DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); */
+   fts_log("[dsaudioport]: Available audio output devices\n"); 
+   DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); 
 
-/*    fts_log("[dsaudioport]: Available audio input devices\n"); */
-/*    DirectSoundCaptureEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); */
+   fts_log("[dsaudioport]: Available audio input devices\n"); 
+   DirectSoundCaptureEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);
  
   fts_log("[dsaudioport]: Opening audio port\n");
 
@@ -794,6 +796,7 @@ fts_win32_destroy_window()
   return 0;
 }
 
+
 BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 {
   switch (reason) {
@@ -823,6 +826,7 @@ dsaudioport_config(void)
   /* make sure we have a valid instance handle */
   if (dsdev_instance == NULL) {
     post("Warning: dsaudioport: invalid DLL instance handle\n");
+    fts_log("[dsaudioport] Warning: dsaudioport: invalid DLL instance handle\n");
     return;
   }
 
