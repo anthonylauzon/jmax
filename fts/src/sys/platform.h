@@ -54,6 +54,23 @@
 			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
 
+#elif defined(LINUXPPC)
+
+#define FTS_ARCH_NAME "linux"
+#define restrict
+#define HAS_UNIX
+#define HAS_DTD /* direct to disk support */
+#define HAS_PTHREADS
+#define HAS_OSS /* the OSS sound system */
+#define VECLIB_LOOP_UNROLL NO
+#define FTS_HAS_BIG_ENDIAN
+
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
+
+
 /*********************************************************************
  *
  *  different SGI platforms

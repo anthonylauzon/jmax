@@ -31,6 +31,10 @@ ifeq ($(ARCH),linuxpc)
 	ARCH_SOURCES = linuxpchw.c
 endif
 
+ifeq ($(ARCH),linuxppc)
+	ARCH_SOURCES = linuxppchw.c
+endif
+
 ifeq ($(VENDOR),solaris2)
 	ARCH_SOURCES = solaris2hw.c
 endif

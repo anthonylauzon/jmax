@@ -50,7 +50,7 @@ static fts_welcome_t linuxpc_welcome = {"Linux-PC platform\n"};
 static int running_real_time = 1;
 struct timespec pause_time = { 0, 10000};
 
-static void init_fpu( void);
+static void init_fpe( void);
 static void enable_fpu_trap( void);
 static void disable_fpu_trap( void);
 
@@ -79,9 +79,7 @@ void fts_platform_init(void)
       /* Should we post a message ? */
     }
 
-  init_fpu();
-
-  signal( SIGFPE, SIG_IGN);
+  init_fpe();
 }
 
 void fts_set_no_real_time()
@@ -107,31 +105,9 @@ void fts_unlock_memory()
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
-/* Floating-point exceptions traping                                           */
+/* Floating-point exceptions handling                                          */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
-
-static fts_fpe_handler fpe_handler = 0;
-
-/*
-   Function: fts_set_fpe_handler
-   Description:
-     sets the fpe handler.
-     store the argument in the static variable fpe_handler
-     enables fpe trapping
-   Arguments:
-     fh: a pointer to the fpe handler function. This function will be
-     called by the trap handler
-   Returns:
-*/
-void fts_set_fpe_handler( fts_fpe_handler fh)
-{
-  fpe_handler = fh;
-}
-
-void fts_reset_fpe_handler(void)
-{
-}
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -195,29 +171,109 @@ void fts_reset_fpe_handler(void)
 #define _FPU_CLR_SW __asm__ ("fnclex" : : )
 
 
-static void init_fpu( void)
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* FTS specific handling                                                       */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+static fts_fpe_handler fpe_handler = 0;
+
+static void fpe_signal_handler( int sig)
 {
-  unsigned  int cw;
+  if (fpe_handler)
+    {
+      unsigned int s;
 
-  cw = _FPU_CONTROL_IM /* masked */
-    + _FPU_CONTROL_DM /* masked */
-    + _FPU_CONTROL_ZM /* masked */
-    + _FPU_CONTROL_OM /* masked */
-    + _FPU_CONTROL_UM /* masked */
-    + _FPU_CONTROL_PM /* masked */
-    + _FPU_CONTROL_EP
-    + _FPU_CONTROL_NR
-    + 0x1000;
+      _FPU_GET_SW( s);
+      _FPU_CLR_SW;
 
-  _FPU_SET_CW( cw);
+      if (s & _FPU_STATUS_IE)
+	(* fpe_handler)( FTS_INVALID_FPE);
+      else if (s & _FPU_STATUS_ZE)
+	(* fpe_handler)( FTS_DIVIDE0_FPE);
+      else if (s & _FPU_STATUS_OE)
+	(* fpe_handler)( FTS_OVERFLOW_FPE);
+      else if (s & _FPU_STATUS_UE)
+	(* fpe_handler)( FTS_UNDERFLOW_FPE);
+      else if (s & _FPU_STATUS_PE)
+	(* fpe_handler)( FTS_INEXACT_FPE);
+      else
+	(* fpe_handler)(0);
+    }
+}
+
+/*
+   Function: fts_set_fpe_handler
+   Description:
+     sets the fpe handler.
+     store the argument in the static variable fpe_handler
+     enables fpe traps
+   Arguments:
+     fh: a pointer to the fpe handler function. This function will be
+     called by the trap handler
+   Returns:
+*/
+void fts_set_fpe_handler( fts_fpe_handler fh)
+{
+  fpe_handler = fh;
+
+  signal( SIGFPE, fpe_signal_handler);
+
+  enable_fpu_trap();
+}
+
+/*
+   Function: fts_reset_fpe_handler
+   Description:
+     resets the fpe handler.
+     sets the static variable fpe_handler to 0
+     disables fpe traps
+   Arguments:
+     none
+   Returns:
+*/
+void fts_reset_fpe_handler(void)
+{
+  disable_fpu_trap();
+
+  signal( SIGFPE, SIG_IGN);
+
+  fpe_handler = 0;
+}
+
+static void init_fpe( void)
+{
+  disable_fpu_trap();
+
+  signal( SIGFPE, SIG_IGN);
 }
 
 static void enable_fpu_trap( void)
 {
+  unsigned  int cw;
+
+  cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR
+    + _FPU_CONTROL_DM
+    + _FPU_CONTROL_UM
+    + _FPU_CONTROL_PM;
+    
+  _FPU_SET_CW( cw);
 }
 
 static void disable_fpu_trap( void)
 {
+  unsigned  int cw;
+
+  cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR
+    + _FPU_CONTROL_IM
+    + _FPU_CONTROL_DM
+    + _FPU_CONTROL_ZM
+    + _FPU_CONTROL_OM
+    + _FPU_CONTROL_UM
+    + _FPU_CONTROL_PM;
+
+  _FPU_SET_CW( cw);
 }
 
 
@@ -233,6 +289,7 @@ static void disable_fpu_trap( void)
 
 unsigned int fts_check_fpe(void)
 {
+  char buff[256];
   unsigned int s, ret;
 
   _FPU_GET_SW( s);
@@ -248,6 +305,49 @@ unsigned int fts_check_fpe(void)
 
   if (s & _FPU_STATUS_OE)
     ret |= FTS_OVERFLOW_FPE;
+
+  /* (fd) */
+  buff[0] = '\0';
+
+  if (s & _FPU_STATUS_IE)
+    strcat( buff, "'invalid operation' ");
+  if (s & _FPU_STATUS_DE)
+    strcat( buff, "'denormalized operand' ");
+  if (s & _FPU_STATUS_ZE)
+    strcat( buff, "'divide by zero' ");
+  if (s & _FPU_STATUS_OE)
+    strcat( buff, "'overflow' ");
+  if (s & _FPU_STATUS_UE)
+    strcat( buff, "'underflow' ");
+  if (s & _FPU_STATUS_PE)
+    strcat( buff, "'precision' ");
+
+  if ( buff[0] != '\0')
+    post( "FPE: %s\n", buff);
+
+  {
+    unsigned int cw;
+
+    buff[0] = '\0';
+
+    _FPU_GET_CW( cw);
+
+    if ((cw & _FPU_CONTROL_IM) == 0)
+      strcat( buff, "'invalid operation' ");
+    if ((cw & _FPU_CONTROL_DM) == 0)
+      strcat( buff, "'denormalized operand' ");
+    if ((cw & _FPU_CONTROL_ZM) == 0)
+      strcat( buff, "'divide by zero' ");
+    if ((cw & _FPU_CONTROL_OM) == 0)
+      strcat( buff, "'overflow' ");
+    if ((cw & _FPU_CONTROL_UM) == 0)
+      strcat( buff, "'underflow' ");
+    if ((cw & _FPU_CONTROL_PM) == 0)
+      strcat( buff, "'precision' ");
+
+    if (buff[0] != '\0')
+      post( "FPU Exception Mask: %s\n", buff);
+  }
 
   return ret;
 }

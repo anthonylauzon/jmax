@@ -128,7 +128,7 @@ void ftl_functions_init(void)
   
   DSP_DECLARE_ALL_TYPE_FUN(abs, "abs")
 
-#ifndef LINUXPC  
+#ifndef LINUX
   DSP_DECLARE_ONE_TYPE_FUN(cabsf, "cabsf");
   DSP_DECLARE_ONE_TYPE_FUN(csqrf, "csqrf");
 #endif

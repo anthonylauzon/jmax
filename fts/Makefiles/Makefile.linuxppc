@@ -34,7 +34,7 @@ AUDIO_LIBRARY := oss
 OS_TYPE := unix
 CC := gcc
 
-ARCH_CFLAGS := -Wall -DLINUX
+ARCH_CFLAGS := -Wall -DLINUX -DLINUXPPC
 ARCH_LDFLAGS :=
 LD_ALL_FLAG := --whole-archive
 LD_NONE_FLAG := --no-whole-archive

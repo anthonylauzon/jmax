@@ -201,7 +201,7 @@ fts_ffuns_init( void)
   fts_ffun_new( fts_new_symbol( "exp"), expf);
   fts_ffun_new( fts_new_symbol( "log"), logf);
   fts_ffun_new( fts_new_symbol( "log10"), log10f);
-#elif defined( LINUXPC)
+#elif (defined( LINUXPC) || defined( LINUXPPC))
   fts_ffun_new( fts_new_symbol( "sin"), sinf);
   fts_ffun_new( fts_new_symbol( "cos"), cosf);
 #else
