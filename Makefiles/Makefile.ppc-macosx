@@ -51,11 +51,11 @@ INSTALL_SETUID=$(INSTALL) --mode=4755
 INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 
-prefix=
-doc_install_dir=$(prefix)/Library/Documentation/jMax-$(JMAX_VERSION)
-lib_install_dir=$(prefix)/Applications/jMax
-include_install_dir=$(prefix)/usr/include
-bin_install_dir=$(prefix)/Applications/jMax
+prefix=jMax-$(JMAX_VERSION)
+doc_install_dir=$(prefix)/doc
+lib_install_dir=$(prefix)
+include_install_dir=$(prefix)/include
+bin_install_dir=$(prefix)/bin
 
 ARCH_PACKAGES=macosx
 
