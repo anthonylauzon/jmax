@@ -1,3 +1,9 @@
+2003-07-22  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in: added configure error if check class of javax.swing.JButton failed.
+
+	* fixed bug [ 775548 ] Compilation on RedHat 9 (java part with jdkgcj package installed).
+
 2003-07-21  Carl Seleborg  <seleborg@licorne.ircam.fr>
 
 	* java/src/ircam/jmax/editors/patcher/actions/*.java
