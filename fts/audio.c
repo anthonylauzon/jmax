@@ -70,6 +70,9 @@ fts_audioport_init( fts_audioport_t *port)
 
   fts_audioport_unset_open(port, FTS_AUDIO_INPUT);  
   fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
+  port->inout[FTS_AUDIO_INPUT].used = 0;
+  port->inout[FTS_AUDIO_OUTPUT].used = 0;
+
 }
 
 void
@@ -156,6 +159,7 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
     }
 
   port->inout[direction].used++;
+
 
   fts_audioport_set_channel_used( port, direction, fts_audiolabel_get_channel( label, direction));
 }
@@ -359,8 +363,6 @@ audiolabel_set_port( fts_audiolabel_t *label, int direction, fts_symbol_t port_n
       fts_audioport_add_label( port, direction, label);
     }
 
-  if (!fts_audioport_is_open( port, direction))
-    label->inout[direction].port = NULL;
 }
 
 static void
