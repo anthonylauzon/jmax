@@ -11,5 +11,6 @@ SOURCES := \
 	   $(INCLUDE_PATH)/MetaList.java \
 	   $(INCLUDE_PATH)/GlobalProbe.java \
            $(INCLUDE_PATH)/Oscilloscope.java \
-           $(INCLUDE_PATH)/OscillSource.java \
+           $(INCLUDE_PATH)/TDTree.java \
+           $(INCLUDE_PATH)/TwoOrderObject.java \
            $(INCLUDE_PATH)/Probe.java
