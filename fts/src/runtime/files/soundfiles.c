@@ -22,6 +22,7 @@ fts_soundfile_format_platform_init(void)
 
 struct fts_soundfile
 {
+  char unused;
 };
 
 /*************************************************************

@@ -640,13 +640,15 @@ fts_alarm_arm(fts_alarm_t *alarm)
 	     */
 
 	  if (alarm->when >= clock->logical_time)
-	    if (clock->future_alarm_list)
-	      {
-		if (clock->future_alarm_list == alarm->next)
-		  clock->future_alarm_list = alarm;
-	      }
-	    else
-	      clock->future_alarm_list = alarm;
+	    {
+	      if (clock->future_alarm_list)
+		{
+		  if (clock->future_alarm_list == alarm->next)
+		    clock->future_alarm_list = alarm;
+		}
+	      else
+		clock->future_alarm_list = alarm;
+	    }
 	}
       else
 	{

@@ -85,10 +85,12 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 	 better */
 
       if (fts_is_void(&a))
-	if (name == fts_s_data)
-	  fts_set_data(&a, (fts_data_t *) 0);
-	else
-	  return;
+	{
+	  if (name == fts_s_data)
+	    fts_set_data(&a, (fts_data_t *) 0);
+	  else
+	    return;
+	}
 
       fts_client_mess_start_msg(CLIENTPROP_CODE);
       fts_client_mess_add_object(obj);
