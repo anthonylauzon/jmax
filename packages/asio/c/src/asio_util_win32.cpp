@@ -216,45 +216,43 @@ unsigned int asio_util_scan_drivers()
   /* Initialize COM library */
   CoInitialize(0);
 
-  ASIODriverInfo driverInfo;
   fts_hashtable_init(&driver_hashtable, FTS_HASHTABLE_SMALL);
 
   /* open registry key for ASIO driver */
   err = RegOpenKey(HKEY_LOCAL_MACHINE, ASIO_PATH,&regKeyEnum);
   while (err == ERROR_SUCCESS)
-    {
-      /*loop on ASIO drivers */
-      err = RegEnumKey(regKeyEnum, index++, (LPSTR)regKeyName, MAX_DRIVER_NAME_LENGTH);
-      if (err == ERROR_SUCCESS)
-	{	  
-	  driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
-	  asio_open_driver(driver);	  
-	  if (0 != driver)
+  {
+    /*loop on ASIO drivers */
+    err = RegEnumKey(regKeyEnum, index++, (LPSTR)regKeyName, MAX_DRIVER_NAME_LENGTH);
+    if (err == ERROR_SUCCESS)
+    {	  
+	    driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
+	    asio_open_driver(driver);	  
+	    if (0 != driver)
 	    {
 	      asio_audioport_t* port;
 	      fts_set_pointer(&at, driver);
 	      port = (asio_audioport_t*)fts_object_create(asio_audioport_type, 1, &at);
 	      if (NULL != port)
-		{
+		    {
 
-		  fts_object_refer((fts_object_t*)port);
-		  fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
-		  fts_log("[asio_audioport] put port : %s\n", port->driver->name);
-		}
+		      fts_object_refer((fts_object_t*)port);
+		      fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
+		      fts_log("[asio_audioport] put port : %s\n", port->driver->name);
+		    }
 	    }
-	}
-      else
-	{
-	  fin = TRUE;
-	}
-    }
-  if (regKeyEnum)
-    {
-      RegCloseKey(regKeyEnum);
-    }
-  
-  
+	  }
+    else
+	  {
+	    fin = TRUE;
+	  }
+  }
 
+  if(regKeyEnum)
+  {
+    RegCloseKey(regKeyEnum);
+  }
+  
   return index;
 }
 
