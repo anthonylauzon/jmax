@@ -1256,7 +1256,8 @@ void fts_client_release_object(fts_object_t *obj)
       int client_id;
       client_t *client;
       fts_atom_t a[1];
-      
+      fts_object_t *patcher;
+
       client_id = fts_object_get_client_id( obj);
       client = client_table_get(client_id);
       
@@ -1266,10 +1267,11 @@ void fts_client_release_object(fts_object_t *obj)
 	  return;
 	}
       
-      if(fts_object_get_patcher(obj) != NULL)
+      patcher = (fts_object_t *)fts_object_get_patcher(obj);
+      if(patcher != NULL && (fts_object_get_status(patcher) != FTS_OBJECT_STATUS_PENDING_DELETE))
 	{
 	  fts_set_object(a, obj);
-	  fts_client_send_message( (fts_object_t *)fts_object_get_patcher(obj), s_remove_object, 1, a);
+	  fts_client_send_message( patcher, s_remove_object, 1, a);
 	}
       
       client_release_object( client, obj);
