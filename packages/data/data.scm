@@ -30,9 +30,11 @@
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.bpf.BpfExtension")
+(load-class this-package "ircam.jmax.editors.table.TableExtension")
 
 ;; help
 (sshh-load (file-cat dir "help" "data.help.index.scm"))
+(help-summary "data summary" (file-cat dir "help" "data.summary.jmax"))
 
 (println "package: data (data structures)")
 

@@ -51,24 +51,14 @@
 (load (string-append jmax-scm-root slash "scheme_interface.scm"))
 
 ;;
-;; FIXME testing only
-;;
-(define start-time (system-current-time-millis))
-
-;;
 ;; Intrinsic functions for the Sgi platform
 ;;
-(load (file-cat jmax-scm-root "devices.scm"))
+;(load (file-cat jmax-scm-root "devices.scm"))
 
 ;;
 ;; Tcl functions to handle projects primitives
 ;;
 (load (file-cat jmax-scm-root "projects.scm"))
-
-;;
-;; Max packages 
-;;
-;(load (file-cat jmax-scm-root "jmaxpkg.scm"))
 
 ;;
 ;; Set parameters default values
@@ -135,9 +125,4 @@
 ;; do the real startup 
 ;;
 (load (file-cat jmax-scm-root "startup.scm"))
-
-;;
-;; FIXME testing only
-;;
-;; (println (- (system-current-time-millis) start-time) " ms")
 

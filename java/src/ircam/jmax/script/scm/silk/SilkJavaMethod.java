@@ -60,7 +60,6 @@ public class SilkJavaMethod extends Procedure {
     }
 
     public SilkJavaMethod(String methodName, Object targetClassName, Object argClassNames) {
-	//this.name = targetClassName + "." + methodName;
 	try {
 	    argClasses = classArray(argClassNames);
 	    className = (String) targetClassName;
@@ -70,7 +69,7 @@ public class SilkJavaMethod extends Procedure {
 	    returnsString = (method.getReturnType() == "".getClass());
 	    returnsBoolean = (method.getReturnType() == Boolean.TYPE);
 	} catch (ClassNotFoundException e) { 
-	    error("Can't find class of method " + className + "." + methodName); 
+	    error("Failed class name resolution in method " + targetClassName + "." + methodName); 
 	} catch (NoSuchMethodException e) { 
 	    error("Can't get method " + className + "." + methodName); 
 	}

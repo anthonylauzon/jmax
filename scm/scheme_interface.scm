@@ -53,6 +53,7 @@
 (define reference-url                fts-reference-u-r-l-table-add)
 (define splash                       new-splash-dialog)
 (define declare-icon                 icons-load-icon)
+(define declare-system-icon          system-icons-load-icon)
 (define run-hooks                    max-application-run-hooks)
 (define get-property                 max-application-get-property)
 (define set-property                 max-application-set-property)
@@ -373,8 +374,8 @@
 ;;
 ;; fts-connect
 ;;
-(define (fts-connect dir name type server port)
-  (max-application-set-fts (new-fts dir name type server port)))
+(define (fts-connect dir name type server options port)
+  (max-application-set-fts (new-fts dir name type server options port)))
 
 ;;
 ;; open

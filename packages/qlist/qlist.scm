@@ -24,6 +24,8 @@
 ;; package declaration
 (provide-package "qlist" "0.0.0")
 
+(require-package "ispw" "0.0.0")
+
 ; load server module
 (ucs "load" "module" "qlist" (file-cat dir "c" "lib" jmax-arch jmax-mode "libqlist.so"))
 

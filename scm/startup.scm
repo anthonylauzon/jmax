@@ -36,8 +36,8 @@
 ;; Run the official jMax splash screen if not supressed by the user in
 ;; .jmaxrc
 ;;
-(if (not (string=? jmax-splash-screen "hide")) 
-    (splash (file-cat jmax-root "images" "Splash.gif") (get-max-version)))
+;(if (not (string=? jmax-splash-screen "hide")) 
+;    (splash (file-cat jmax-root "images" "Splash.gif") (get-max-version)))
 
 ;;
 ;; Start jMax server
@@ -48,6 +48,10 @@
 
 (if (not (java-null? (get-property "jmaxServerDir")))
     (set! jmax-server-dir (get-property "jmaxServerDir")))
+
+(println "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou")
+(println "jMax is free software with ABSOLUTELY NO WARRANTY.")
+(println "(see file LICENSE for more details)")
 
 (println jmax-server-dir)
 
@@ -63,7 +67,7 @@
 (if (string=? jmax-mode "debug")
     (println "jMax in DEBUG mode"))
 
-(fts-connect jmax-server-dir jmax-server-name jmax-connection jmax-host jmax-port)
+(fts-connect jmax-server-dir jmax-server-name jmax-connection jmax-host "" jmax-port)
 
 ;;
 ;; hello server
@@ -73,8 +77,13 @@
 ;;
 ;; load gui server side objects
 ;;
-(require-package "guiobj" "0.0.0")
 (require-package "system" "0.0.0")
+(require-package "guiobj" "0.0.0")
+
+;; load installation default packages
+;; Use sourceFile as a protection against user errors
+;;
+(sshh-load (file-cat jmax-root "tutorials" "basics" "project.env"))
 
 ;;
 ;; Load installation default packages.
@@ -96,17 +105,5 @@
 
 (if (not (run-hooks "start"))
     (run-hooks "default-start"))
-
-;;
-;; If profiling is on, close audio device 
-;; and install the profile device; this after
-;; the when start, i.e. including user configuration
-;;
-(if (and (not (java-null? (get-property "profile"))) 
-	 (string=? (get-property "profile") "true"))
-    (println "Running with pseudo audio device for profiling")
-    (reset-audio-out)
-    (reset-audio-in)
-    (open-default-audio-out "profile"))
 
 

@@ -33,8 +33,10 @@
 ;; declare templates
 (template "listcompose" (file-cat dir "templates" "listcompose.jmax"))
 (template "listdecompose" (file-cat dir "templates" "listdecompose.jmax"))
+(template "lcomp" (file-cat dir "templates" "listcompose.jmax"))
+(template "ldeco" (file-cat dir "templates" "listdecompose.jmax"))
 
 ;; load the help patch data base
 (sshh-load (file-cat dir "help" "lists.help.index.scm"))
 
-(println "package: lists (basic list handling classes)")
+(println "package: lists (list classes)")

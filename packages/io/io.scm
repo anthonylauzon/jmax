@@ -28,3 +28,6 @@
 (ucs "load" "module" "io" (file-cat dir "c" "lib" jmax-arch jmax-mode "libio.so"))
 
 (println "package: io (I/O class library: udp, ...)")
+
+(sshh-load (file-cat dir "help" "io.help.index.scm"))
+(help-summary "I/O summary" (file-cat dir "help" "io.summary.jmax"))

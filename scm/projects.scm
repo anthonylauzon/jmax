@@ -98,6 +98,26 @@
 ;;
 (define (get-audio-buffer) jmax-audio-buffer)
 
+;;
+;;  default-audio
+;;
+(define default-audio
+  (lambda l 
+    (begin (display "Setting default audio port to ") 
+	   (lprintln l)
+	   (apply ucs (append (list "newobj" "DefaultAudioPort : ") l)))))
+
+
+;;
+;;  default-midi
+;;
+(define default-midi
+  (lambda l 
+    (begin (display "Setting default midi to ") 
+	   (lprintln l)
+	   (apply ucs (append (list "default" "midi") l)))))
+
+
 
 
 
