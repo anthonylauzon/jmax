@@ -533,7 +533,7 @@ ivec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-ivec_scrumble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
   int *ptr = ivec_get_ptr(this);
@@ -1117,7 +1117,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), ivec_reverse);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), ivec_rotate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), ivec_sort);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("scrumble"), ivec_scrumble);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), ivec_scramble);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_keep);

@@ -352,7 +352,7 @@ fvec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fvec_scrumble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   float *ptr = fvec_get_ptr(this);
@@ -905,7 +905,7 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), fvec_reverse);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), fvec_sort);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("scrumble"), fvec_scrumble);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), fvec_scramble);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
   
