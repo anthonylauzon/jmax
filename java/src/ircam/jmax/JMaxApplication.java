@@ -331,6 +331,8 @@ public class JMaxApplication {
 	    System.err.println("JMaxApplication: IOEception quitting application "+e);
 	  }
     
+    FtsErrorStreamer.stopFtsErrorStreamer();
+
     Runtime.getRuntime().exit(0);
   }
 
@@ -341,8 +343,9 @@ public class JMaxApplication {
     if(!shown)
       {
 	shown = true;
-	JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
-				      "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+	JOptionPane.showMessageDialog( getConsoleWindow(), 
+				       "jMax server connection lost! \n Quit user interface.", 
+				       "Fatal Error", JOptionPane.ERROR_MESSAGE); 
 	Runtime.getRuntime().exit(0);
       }
   } 
@@ -635,6 +638,8 @@ public class JMaxApplication {
 	else
 	  {                 
 	    fts = new FtsProcess( argc, argv);
+	    FtsErrorStreamer.startFtsErrorStreamer( fts.getErrorStream());
+
 	    killFtsOnQuit = true;
 	  }
 	FtsServerConnection connection;

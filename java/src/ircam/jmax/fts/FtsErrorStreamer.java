@@ -35,7 +35,7 @@ import ircam.jmax.*;
  * located in user's home directory
  */
 
-class FtsErrorStreamer implements Runnable
+public class FtsErrorStreamer implements Runnable
 {
   private InputStream in;
   private PrintStream out;
@@ -45,12 +45,12 @@ class FtsErrorStreamer implements Runnable
 
   private static FtsErrorStreamer errorStreamer;
   
-  static void startFtsErrorStreamer(InputStream in)
+  public static void startFtsErrorStreamer(InputStream in)
   {  
     errorStreamer = new FtsErrorStreamer(in);
   }
 
-  static void stopFtsErrorStreamer()
+  public static void stopFtsErrorStreamer()
   {
     errorStreamer.running = false;
   }

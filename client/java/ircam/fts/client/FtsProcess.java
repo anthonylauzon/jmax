@@ -55,7 +55,8 @@ public class FtsProcess extends Process {
 
   public InputStream getErrorStream()
   {
-    return null;
+    //return null;
+    return process.getErrorStream();
   }
 
   public InputStream getInputStream()
