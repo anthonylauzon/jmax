@@ -31,7 +31,7 @@ typedef struct
   fts_object_t o;
   fts_atom_t *list;
   int size;
-  int max_size;
+  int alloc;
 } listreverse_t;
 
 static void
@@ -40,11 +40,13 @@ listreverse_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   listreverse_t *this = (listreverse_t *)o;
   int i, j;
 
-  if(ac > this->max_size)
+  if(ac > this->alloc)
     {
-      fts_free(this->list);
-      this->list = (fts_atom_t *) fts_malloc(ac * sizeof(fts_atom_t));
-      this->max_size = ac;
+      if(this->alloc)
+	fts_block_free(this->list, this->alloc);
+
+      this->list = (fts_atom_t *)fts_block_alloc(ac * sizeof(fts_atom_t));
+      this->alloc = ac;
     }
 
   for(i=0, j=ac-1; i<ac; i++, j--)
@@ -61,7 +63,7 @@ listreverse_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   listreverse_t *this = (listreverse_t *)o;
 
   this->size = 0;
-  this->max_size = 0;
+  this->alloc = 0;
 }
 
 static void
@@ -69,7 +71,7 @@ listreverse_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   listreverse_t *this = (listreverse_t *)o;
 
-  fts_free(this->list);
+  fts_block_free(this->list, this->alloc);
 }
 
 static fts_status_t

@@ -34,7 +34,7 @@ typedef struct
 static void
 listhead_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && fts_is_void(at))
+  if(ac > 0 && !fts_is_void(at))
     fts_outlet_send(o, 0, fts_type_get_selector(fts_get_type(at)), 1, at);
 }
 

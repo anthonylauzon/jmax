@@ -282,24 +282,6 @@ to retrieve it's type or value, and to check its content type.
 Some` of the functions may be implemented as macros.
 
 <p>
-<code>void fts_set_symbol(fts_atom_t *<i>a</i>, fts_symbol_t *<i>s</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to symbol, and it's value to <i>s</i>.
-
-<p>
-<code>void fts_set_string(fts_atom_t *<i>a</i>, char *<i>str</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to string, and it's value to <i>str</i>.
-
-<p>
-<code>void fts_set_obj(fts_atom_t *<i>a</i>, void *<i>p</i>)</code>
-
-<p>
-Sets the type of <i>a</i> to obj, and it's value to <i>p</i>.
-
-<p>
 <code>void fts_set_int(fts_atom_t *<i>a</i>, int <i>l</i>)</code>
 
 <p>
@@ -312,11 +294,57 @@ Sets the type of <i>a</i> to int, and it's value to <i>l</i>.
 Sets the type of <i>a</i> to float, and it's value to <i>f</i>.
 
 <p>
-<code>void fts_set_nothing(fts_atom_t *<i>a</i>)</code>
+<code>void fts_set_symbol(fts_atom_t *<i>a</i>, fts_symbol_t *<i>s</i>)</code>
 
 <p>
-Sets the type of <i>a</i> to nothing, i.e. Sets the atom to
+Sets the type of <i>a</i> to symbol, and it's value to <i>s</i>.
+
+<p>
+<code>void fts_set_string(fts_atom_t *<i>a</i>, char *<i>str</i>)</code>
+
+<p>
+Sets the type of <i>a</i> to string, and it's value to <i>str</i>.
+
+<p>
+<code>void fts_set_ptr(fts_atom_t *<i>a</i>, void *<i>p</i>)</code>
+
+<p>
+Sets the type of <i>a</i> to obj, and it's value to <i>p</i>.
+
+<p>
+<code>void fts_set_void(fts_atom_t *<i>a</i>)</code>
+
+<p>
+Sets the type of <i>a</i> to void, i.e. Sets the atom to
 it's initial, uninitalized status.
+
+<p>
+<code>int fts_get_int(fts_atom_t *<i>a</i>)</code>
+
+<p>
+If the atom is of type int, returns it's contents; 
+if not, the results value is not specified.
+
+<p>
+<code>float fts_get_float(fts_atom_t *<i>a</i>)</code>
+
+<p>
+If the atom is of type float, returns it's contents; 
+if not, the results value is not specified.
+
+<p>
+<code>int fts_get_number_int(fts_atom_t *<i>a</i>)</code>
+
+<p>
+If the atom is a number (float or int), returns it's contents converted to
+int, (this is always a macro); if not, the resulting value is not specified.
+
+<p>
+<code>float fts_get_number_float(fts_atom_t *<i>a</i>)</code>
+
+<p>
+If the atom is a number (float or int), returns it's contents converted to
+float, (this is always a macro); if not, the resulting value is not specified.
 
 <p>
 <code>fts_symbol_t *fts_get_symbol(fts_atom_t *<i>a</i>)</code>
@@ -333,59 +361,12 @@ If the atom is of type string, returns it's contents converted
 to <code>char *</code>; if not, the resulting value is not specified.
 
 <p>
-<code>void *fts_get_obj(fts_atom_t *<i>a</i>)</code>
+<code>void *fts_get_ptr(fts_atom_t *<i>a</i>)</code>
 
 <p>
 If the atom is of type obj (<code>void *</code> pointer), returns it's
 contents converted to <code>void *</code>; if not, the resulting value is not
 specified.
-
-<p>
-<code>int fts_get_int(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type int, returns it's contents converted
-to <code>int</code>; if not, the results value is not specified.
-
-<p>
-<code>float fts_get_float(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type float, returns it's contents converted
-to <code>float</code>; if not, the results value is not specified.
-
-<p>
-<code>int/float fts_get_float_int(fts_atom_t *<i>a</i>)</code>
-
-<p>
-If the atom is of type float or int, returns it's contents converted to
-float or int, depending on the context (this is always a macro); if
-not, the resulting value is not specified.
-
-<p>
-<code>int fts_is_nothing(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type nothing (non initialized), 0
-otherwise.
-
-<p>
-<code>int fts_is_symbol(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type symbol, 0 otherwise.
-
-<p>
-<code>int fts_is_string(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type string, 0 otherwise.
-
-<p>
-<code>int fts_is_obj(fts_atom_t *<i>a</i>)</code>
-
-<p>
-Returns 1 if the atom <i>a</i> is of type obj (void pointer), 0 otherwise.
 
 <p>
 <code>int fts_is_int(fts_atom_t *<i>a</i>)</code>
@@ -400,17 +381,43 @@ Returns 1 if the atom <i>a</i> is of type int, 0 otherwise.
 Returns 1 if the atom <i>a</i> is of type float, 0 otherwise.
 
 <p>
-<code>int fts_is_float_int(fts_atom_t *<i>a</i>)</code>
+<code>int fts_is_number(fts_atom_t *<i>a</i>)</code>
 
 <p>
 Returns 1 if the atom <i>a</i> is of type float or int , 0 otherwise.
 
 <p>
-<code>int fts_get_type(fts_atom_t *<i>a</i>)</code>
+<code>int fts_is_symbol(fts_atom_t *<i>a</i>)</code>
 
 <p>
-Returns one of the constants <code>FTS_NOTHING</code>, <code>FTS_INT</code>,
-<code>FTS_FLOAT</code>, <code>FTS_SYM</code>, <code>FTS_OBJ</code>, <code>FTS_STRING</code>,
+Returns 1 if the atom <i>a</i> is of type symbol, 0 otherwise.
+
+<p>
+<code>int fts_is_string(fts_atom_t *<i>a</i>)</code>
+
+<p>
+Returns 1 if the atom <i>a</i> is of type string, 0 otherwise.
+
+<p>
+<code>int fts_is_ptr(fts_atom_t *<i>a</i>)</code>
+
+<p>
+Returns 1 if the atom <i>a</i> is of type obj (void pointer), 0 otherwise.
+
+<p>
+<code>int fts_is_void(fts_atom_t *<i>a</i>)</code>
+
+<p>
+Returns 1 if the atom <i>a</i> is of type void (non initialized), 0
+otherwise.
+
+<p>
+<code>fts_type_t fts_get_type(fts_atom_t *<i>a</i>)</code>
+
+<p>
+Returns one of the constants 
+<code>fts_t_int</code>, <code>fts_t_float</code>, <code>fts_t_symbol</code>, 
+<code>fts_t_string</code>, <code>fts_t_ptr</code> or <code>fts_t_void</code>
 depending on the type of the atom <i>a</i>.
 Most of the time it is better to use one of the types predicate
 above instead of this one. This function is really only usefull

@@ -54,7 +54,7 @@ list_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   list_t *this = (list_t *)o;
 
-  fts_free(this->list);
+  fts_block_free(this->list, this->alloc);
 }
 
 static void
@@ -62,8 +62,10 @@ list_resize_buffer(list_t *this, int size)
 {
   if(size > this->alloc)
     {
-      fts_free(this->list);
-      this->list = (fts_atom_t *) fts_malloc(size * sizeof(fts_atom_t));
+      if(this->alloc)
+	fts_block_free(this->list, this->alloc);
+
+      this->list = (fts_atom_t *)fts_block_alloc(size * sizeof(fts_atom_t));
       this->alloc = size;
     }
 

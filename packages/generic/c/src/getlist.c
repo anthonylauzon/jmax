@@ -17,8 +17,9 @@
 typedef struct 
 {
   fts_object_t o;
-  atom_matrix_t *mx;
-  fts_atom_t *list;
+  atom_matrix_t *mx; /* referenced matrix */
+  fts_atom_t *list; /* ouput buffer */
+  int alloc;
 } getlist_t;
 
 /************************************************
@@ -32,14 +33,21 @@ getlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   getlist_t *this = (getlist_t *)o;
   atom_matrix_t *mx = fts_get_ptr(at + 1);
-  int m = atom_matrix_get_m(mx);
-  int n = atom_matrix_get_n(mx);
-  int size = (m > n)? m: n;
+  int n = atom_matrix_get_n(mx); /* # of cols */
 
   this->mx = mx;
   
-  if(size > 0)
-    this->list = (fts_atom_t *)fts_malloc(size * sizeof(fts_atom_t));
+  /* init output list to # of cols */
+  if(n > 0)
+    {
+      this->list = (fts_atom_t *)fts_block_alloc(n * sizeof(fts_atom_t));
+      this->alloc = n;
+    }
+  else
+    {
+      this->list = 0;
+      this->alloc = 0;
+    }
 }
 
 static void
@@ -47,7 +55,20 @@ getlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   getlist_t *this = (getlist_t *)o;
 
-  fts_free(this->list);
+  fts_block_free(this->list, this->alloc);
+}
+
+static void
+getlist_resize_buffer(getlist_t *this, int size)
+{
+  if(size > this->alloc)
+    {
+      fts_block_free(this->list, this->alloc);
+      this->list = (fts_atom_t *)fts_block_alloc(size * sizeof(fts_atom_t));
+      this->alloc = size;
+    }
+
+  this->alloc = size;
 }
 
 /************************************************
@@ -68,6 +89,8 @@ getlist_matrix_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   if(i >= 0 && i < m)
     {
+      getlist_resize_buffer(this, n);
+
       for(j=0; j<n; j++)
 	this->list[j] = atom_matrix_get_element(mx, i, j);
       
@@ -87,11 +110,23 @@ getlist_matrix_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   if(j >= 0 && j < n)
     {
+      getlist_resize_buffer(this, n);
+
       for(i=0; i<m; i++)
 	this->list[i] = atom_matrix_get_element(mx, i, j);
       
       fts_outlet_send(o, 0, fts_s_list, m, this->list);
     }
+}
+
+static void
+getlist_matrix_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getlist_t *this = (getlist_t *)o;
+  atom_matrix_t *mx = (atom_matrix_t *)fts_get_ptr_arg(ac, at, 0, 0);
+
+  if(mx)
+    this->mx = mx;
 }
 
 /************************************************
@@ -107,7 +142,7 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(getlist_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(getlist_t), 2, 1, 0); 
 
   if(ac == 2 && fts_is_a(at + 1, sym_atom_matrix))
     {
@@ -121,6 +156,8 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define(cl, 0, fts_s_int, getlist_matrix_row, 1, a);
       fts_method_define(cl, 0, fts_new_symbol("row"), getlist_matrix_row, 1, a);
       fts_method_define(cl, 0, fts_new_symbol("col"), getlist_matrix_col, 1, a);
+
+      fts_method_define_varargs(cl, 1, sym_atom_matrix, getlist_matrix_set);
 
       /* type the outlet */
       fts_outlet_type_define_varargs(cl, 0, fts_s_list);
@@ -136,3 +173,7 @@ getlist_config(void)
 {
   fts_metaclass_install(fts_new_symbol("getlist"), getlist_instantiate, fts_arg_type_equiv);
 }
+
+
+
+

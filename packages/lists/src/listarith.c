@@ -419,13 +419,13 @@ list_set_size(list_t *list, int ac)
 
   if(ac > alloc)
     {
-      if(list->at) 
-	fts_free(list->at);
+      if(list->alloc) 
+	fts_block_free(list->at, list->alloc);
       
       while(alloc < ac)
 	alloc += LIST_ALLOC_BLOCK;
       
-      list->at = (fts_atom_t *) fts_malloc(alloc * sizeof(fts_atom_t));
+      list->at = (fts_atom_t *) fts_block_alloc(alloc * sizeof(fts_atom_t));
       list->alloc = alloc;
     }
   else
@@ -768,9 +768,9 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   listarith_t *this = (listarith_t *)o;
 
   if(this->list.at)
-    fts_free(this->list.at);
+    fts_block_free(this->list.at, this->list.alloc);
   if(this->right_list.at)
-    fts_free(this->right_list.at);
+    fts_block_free(this->right_list.at, this->right_list.alloc);
 }
 
 /*********************************************

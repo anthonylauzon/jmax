@@ -54,12 +54,12 @@ list_realloc_empty(list_t *list, int ac)
   int alloc = list->alloc;
 
   if(list->at) 
-    fts_free(list->at);
+    fts_block_free(list->at, list->alloc);
 
   while(alloc < ac)
     alloc += LIST_ALLOC_BLOCK;
 
-  list->at = (fts_atom_t *) fts_malloc(alloc * sizeof(fts_atom_t));
+  list->at = (fts_atom_t *) fts_block_alloc(alloc * sizeof(fts_atom_t));
   list->ac = ac;
   list->alloc = alloc;
 
@@ -141,7 +141,7 @@ listjoin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  this->list.at = (fts_atom_t *) fts_malloc(LIST_ALLOC_BLOCK * sizeof(fts_atom_t));
+  this->list.at = (fts_atom_t *) fts_block_alloc(LIST_ALLOC_BLOCK * sizeof(fts_atom_t));
   this->list.at = 0;
   this->list.ac = 0;
   this->list.alloc = 0;
@@ -159,8 +159,8 @@ listjoin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  fts_free(this->list.at);
-  fts_free(this->store.at);
+  fts_block_free(this->list.at, this->list.alloc);
+  fts_block_free(this->store.at, this->store.alloc);
 }
 
 /*********************************************
