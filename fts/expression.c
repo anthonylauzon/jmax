@@ -238,7 +238,7 @@ static fts_symbol_t
 concatenate_symbol_int( fts_atom_t *left, fts_atom_t *right)
 {
   const char *sym;
-  int r, len;
+  int len;
   char *buffer;
 
   sym = fts_symbol_name(fts_get_symbol( left));
@@ -255,7 +255,6 @@ static fts_symbol_t
 concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
 {
   const char *sym;
-  int r;
   char *buffer;
 
   sym = fts_symbol_name(fts_get_symbol( right));
