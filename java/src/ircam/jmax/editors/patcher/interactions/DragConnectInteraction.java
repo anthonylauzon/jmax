@@ -47,6 +47,7 @@ class DragConnectInteraction extends Interaction
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
+    filter.setFollowingInletLocations(true);
     filter.setAutoScrolling(true);
   }
 
@@ -106,15 +107,15 @@ class DragConnectInteraction extends Interaction
 	dragStart.x = src.getOutletAnchorX(outlet);
 	dragStart.y = src.getOutletAnchorY(outlet);
 	editor.resetHighlightedOutlet();
+	editor.setConnectingObject(src);
 	dragged = false;
       }
-    else if (Squeack.isUp(squeack))
-      {
-	if (dragged )
+    else 
+      if(Squeack.isUp(squeack)){
+	if (dragged)
 	  {
 	    // Dragged: 
 	    //  do the connection if we have a destination
-
 	    if (destinationChoosen)
 	      {
 		editor.resetHighlightedInlet(); 
@@ -122,17 +123,23 @@ class DragConnectInteraction extends Interaction
 	      }
 
 	    // clean up
-
-	    editor.getDisplayList().noDrag();
-	    editor.getDisplayList().redrawDragLine();
-	    destinationChoosen = false;
-
-	    editor.endInteraction();
+	    if((!Squeack.isShift(squeack))||(!destinationChoosen)){
+	      editor.getDisplayList().noDrag();
+	      editor.getDisplayList().redrawDragLine();
+	      editor.setConnectingObject(null);
+	      destinationChoosen = false;
+	    
+	      editor.endInteraction();
+	    }
+	    else if(Squeack.isShift(squeack)){//shift pressed: moveReverseInteraction setting to do multiconnect 
+	      editor.getEngine().setInteraction(Interactions.moveConnectInteraction);
+	      ((MoveConnectInteraction)editor.getEngine().getCurrentInteraction()).setSrc(src, outlet);
+	      editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
+	    }
 	  }
 	else
 	  {
 	    // Not dragged, start a move connection
-
 	    editor.getEngine().setInteraction(Interactions.moveConnectInteraction);
 	    editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
 	  }
@@ -140,17 +147,12 @@ class DragConnectInteraction extends Interaction
     else if (Squeack.isDrag(squeack) && Squeack.onInlet(squeack))
       {
 	dragged = true;
-
-	if ((! destinationChoosen) || dst != (GraphicObject) area.getTarget() || inlet != area.getNumber())
-	  {
-	    dst   = (GraphicObject) area.getTarget();
-	    inlet = area.getNumber();
-
-	    editor.setHighlightedInlet(dst, inlet);
-	    destinationChoosen = true;
-	  }
-
-
+	if ((! destinationChoosen) || dst != (GraphicObject) area.getTarget() || inlet != area.getNumber()){
+	  dst   = (GraphicObject) area.getTarget();
+	  inlet = area.getNumber();
+	  editor.setHighlightedInlet(dst, inlet);
+	  destinationChoosen = true;
+	}
 	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y,
@@ -160,7 +162,6 @@ class DragConnectInteraction extends Interaction
     else if (Squeack.isDrag(squeack))
       {
 	dragged = true;
-
 	if (destinationChoosen)
 	  {
 	    editor.resetHighlightedInlet();

@@ -104,6 +104,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   private boolean followingLocations = false;
   private boolean followingInOutletLocations = false;
   private boolean followingMoves     = false;
+  private boolean followingInletLocations = false;
+  private boolean followingOutletLocations = false;
 
   final void setFollowingMoves(boolean v)
   {
@@ -131,23 +133,37 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     followingLocations = v;
     GraphicObject.setFollowingLocations(v); // Hack ? Should go thru displayList ?
   }
-
   final boolean isFollowingLocations()
   {
     return followingLocations;
   }
-
   final void setFollowingInOutletLocations(boolean v)
   {
     followingInOutletLocations = v;
     GraphicObject.setFollowingInOutletLocations(v);  // Hack ? Should go thru displayList ?
   }
-
   final boolean isFollowingInOutletLocations()
   {
     return followingInOutletLocations;
   }
-
+  final void setFollowingInletLocations(boolean v)
+  {
+    followingInletLocations = v;
+    GraphicObject.setFollowingInletLocations(v);  // Hack ? Should go thru displayList ?
+  }
+  final boolean isFollowingInletLocations()
+  {
+    return followingInletLocations;
+  }
+  final void setFollowingOutletLocations(boolean v)
+  {
+    followingOutletLocations = v;
+    GraphicObject.setFollowingOutletLocations(v);  // Hack ? Should go thru displayList ?
+  }
+  final boolean isFollowingOutletLocations()
+  {
+    return followingOutletLocations;
+  }
   // Utilities
 
   private Point mouse = new Point();
@@ -335,6 +351,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingMoves(false);
     setFollowingLocations(false);
     setFollowingInOutletLocations(false);
+    setFollowingInletLocations(false);
+    setFollowingOutletLocations(false);
     setAutoScrolling(false);
 
     interaction.configureInputFilter(this);
@@ -351,6 +369,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingMoves(false);
     setFollowingLocations(false);
     setFollowingInOutletLocations(false);
+    setFollowingInletLocations(false);
+    setFollowingOutletLocations(false);
     setAutoScrolling(false);
 
     interaction.configureInputFilter(this);

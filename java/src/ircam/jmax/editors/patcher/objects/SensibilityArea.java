@@ -59,7 +59,7 @@ public class SensibilityArea
 
 	return area;
       }
-  }
+  } 
 
   private boolean transparent;
   private int     cost;
@@ -144,5 +144,6 @@ public class SensibilityArea
   }
 
 }
+
 
 

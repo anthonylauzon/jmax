@@ -46,6 +46,7 @@ class MoveConnectInteraction extends Interaction
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
+    filter.setFollowingInletLocations(true);
     filter.setAutoScrolling(true);
   }
 
@@ -89,6 +90,13 @@ class MoveConnectInteraction extends Interaction
       }
   }
 
+  public void setSrc(GraphicObject obj, int out){
+    src = obj;
+    outlet = out;
+    moveStart.x = src.getOutletAnchorX(outlet);
+    moveStart.y = src.getOutletAnchorY(outlet);
+  }
+
   boolean destinationChoosen = false;
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
@@ -104,6 +112,7 @@ class MoveConnectInteraction extends Interaction
 	moveStart.x = src.getOutletAnchorX(outlet);
 	moveStart.y = src.getOutletAnchorY(outlet);
 	editor.resetHighlightedOutlet();
+	editor.setConnectingObject(src);
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack))
       {
@@ -111,6 +120,7 @@ class MoveConnectInteraction extends Interaction
 	  {
 	    editor.resetHighlightedInlet(); 
 	    doConnection(editor, src, outlet, dst, inlet);
+	    //editor.setConnectingObject(null);
 	  }
       }
     else if (Squeack.isDown(squeack))
@@ -125,6 +135,7 @@ class MoveConnectInteraction extends Interaction
 
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().noDrag();
+	editor.setConnectingObject(null);
 	destinationChoosen = false;
 
 	editor.endInteraction();
@@ -162,6 +173,8 @@ class MoveConnectInteraction extends Interaction
       }
   }
 }
+
+
 
 
 

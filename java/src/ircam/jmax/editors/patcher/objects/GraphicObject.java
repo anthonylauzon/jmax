@@ -108,6 +108,8 @@ abstract public class GraphicObject implements DisplayObject
     // Inlet and outlets Max
 
     static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
+ 
+    static final int INOUTLET_CONNECTED_SENSIBLE_AREA = 40;
   }
 
 
@@ -116,12 +118,21 @@ abstract public class GraphicObject implements DisplayObject
 
   private static boolean followingLocations = false;
   private static boolean followingInOutletLocations = false;
+  private static boolean followingInletLocations = false;
+  private static boolean followingOutletLocations = false;
 
   final public static void setFollowingInOutletLocations(boolean v)
   {
     followingInOutletLocations = v;
   }
-
+  final public static void setFollowingInletLocations(boolean v)
+  {
+    followingInletLocations = v;
+  }
+  final public static void setFollowingOutletLocations(boolean v)
+  {
+    followingOutletLocations = v;
+  }
   final public static void setFollowingLocations(boolean v)
   {
     followingLocations = v;
@@ -530,6 +541,16 @@ abstract public class GraphicObject implements DisplayObject
 
   public SensibilityArea getSensibilityAreaAt( int mouseX, int mouseY)
   {
+    if(itsSketchPad.getDisplayList().isDragLine())
+      return getDraggingLineSensibilityAreaAt(mouseX, mouseY);
+    else
+      return getMouseMovingSensibilityAreaAt(mouseX, mouseY);
+  }
+
+
+
+  SensibilityArea getMouseMovingSensibilityAreaAt( int mouseX, int mouseY)
+  {
     SensibilityArea area = null;
     final int x = ftsObject.getX();
     final int y = ftsObject.getY();
@@ -547,14 +568,14 @@ abstract public class GraphicObject implements DisplayObject
       horizontalInletSensibility  = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, w / 2);
     else
       horizontalInletSensibility  = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, inletDistance / 2);
-
+    
     if (nOutlets == 1)
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, w / 2);
     else
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, outletDistance / 2);
-
+    
     verticalInOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, h / 3);
-
+    
     if (followingInOutletLocations)
       {
 	// if the point is the vertical inlet zone,
@@ -570,7 +591,6 @@ abstract public class GraphicObject implements DisplayObject
 	    if ((nInlets == 1) || (mouseX < start))
 	      {
 		d = Math.abs(mouseX - start);
-
 		if (d < horizontalInletSensibility)
 		  return makeInletArea(mouseY, 0, d);
 	      }
@@ -578,7 +598,6 @@ abstract public class GraphicObject implements DisplayObject
 	      {
 		int n = (mouseX - start) / inletDistance;
 		d = (mouseX - start) % inletDistance;
-
 		if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
 		  return makeInletArea(mouseY, n, d);
 		else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
@@ -647,9 +666,109 @@ abstract public class GraphicObject implements DisplayObject
 	if (area == null)
 	  area = SensibilityArea.get(this, Squeack.OBJECT);
       }
-
     return area;
   }
+
+  SensibilityArea getDraggingLineSensibilityAreaAt( int mouseX, int mouseY)
+  {
+    SensibilityArea area = null;
+    final int x = ftsObject.getX();
+    final int y = ftsObject.getY();
+    final int w = ftsObject.getWidth();
+    final int h = ftsObject.getHeight();
+    final int verticalInOutletSensibility;
+    final int horizontalInletSensibility;
+    final int horizontalOutletSensibility;
+    final int inletsAnchorY  = getY() - 1;
+    final int outletsAnchorY = getY() + getHeight();
+    final int nInlets = ftsObject.getNumberOfInlets();
+    final int nOutlets = ftsObject.getNumberOfOutlets();
+
+    if(itsSketchPad.getConnectingObject()!=this){	   
+
+      verticalInOutletSensibility = Math.max(ObjectGeometry.INOUTLET_CONNECTED_SENSIBLE_AREA, h / 2);
+      
+      if (followingInletLocations)
+	{	
+	  // if the point is the vertical inlet zone,
+	  // check if the point in an inlet sensibility area
+	  if (nInlets == 1)
+	    horizontalInletSensibility  = Math.max(ObjectGeometry.INOUTLET_CONNECTED_SENSIBLE_AREA, w / 2);
+	  else
+	    horizontalInletSensibility  = Math.min(ObjectGeometry.INOUTLET_CONNECTED_SENSIBLE_AREA, inletDistance / 2);
+	  
+	  if ((nInlets > 0) &&
+	      (mouseY >= inletsAnchorY - verticalInOutletSensibility) &&
+	      (mouseY <= inletsAnchorY + verticalInOutletSensibility))
+	    {
+	      int start = getInletAnchorX(0);
+	      int d;
+	      
+	      if ((nInlets == 1) || (mouseX < start))
+		{
+		  d = Math.abs(mouseX - start);
+		  
+		  if (d < horizontalInletSensibility)
+		    return makeInletArea(mouseY, 0, d);
+		}
+	      else if (nInlets > 1)
+		{
+		  int n = (mouseX - start) / inletDistance;
+		  d = (mouseX - start) % inletDistance;
+		  
+		  if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
+		    return makeInletArea(mouseY, n, d);
+		  else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
+		    return makeInletArea(mouseY, n + 1, inletDistance - d);
+		}
+	    }
+	}
+      // if we have outlets, and the point is the vertical outlet zone,
+      // check if the point in an outlet sensibility area
+      
+      if (followingOutletLocations)
+	{
+	  if (nOutlets == 1)
+	    horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_CONNECTED_SENSIBLE_AREA, w / 2);
+	  else
+	    horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_CONNECTED_SENSIBLE_AREA, outletDistance / 2);
+	  
+	  if ((nOutlets > 0) &&
+	      (mouseY >= outletsAnchorY - verticalInOutletSensibility) &&
+	      (mouseY <= outletsAnchorY + verticalInOutletSensibility))
+	    {
+	      int start = getOutletAnchorX(0);
+	      int d = 0, n = 0;
+	      
+	      if (nOutlets == 1)
+		{
+		  n = 0;
+		  d = Math.abs(mouseX - start);
+		}
+	      else if (nOutlets > 1)
+		{
+		  n = (mouseX - start) / outletDistance;
+		  d = Math.abs((mouseX - start) % outletDistance);
+		}
+	      
+	      if (n == 0)
+		{
+		  if (d < horizontalOutletSensibility)
+		    return makeOutletArea(mouseY, 0, d);
+		}
+	      else if (n > 0)
+		{
+		  if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
+		    return makeOutletArea(mouseY, n, d);
+		  else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
+		    return makeOutletArea(mouseY, n + 1, outletDistance - d);
+		}
+	    }
+	}
+    }
+    return area;
+  }
+
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {

@@ -45,6 +45,7 @@ class MoveReverseConnectInteraction extends Interaction
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
+    filter.setFollowingOutletLocations(true);
     filter.setAutoScrolling(true);
   }
 
@@ -88,6 +89,13 @@ class MoveReverseConnectInteraction extends Interaction
       }
   }
 
+  public void setDest(GraphicObject obj, int in){
+    dst = obj;
+    inlet = in;
+    moveStart.x = dst.getInletAnchorX(inlet);
+    moveStart.y = dst.getInletAnchorY(inlet);
+  }
+
   boolean destinationChoosen = false;
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
@@ -102,6 +110,7 @@ class MoveReverseConnectInteraction extends Interaction
 
 	moveStart.x = dst.getInletAnchorX(inlet);
 	moveStart.y = dst.getInletAnchorY(inlet);
+	editor.setConnectingObject(dst);
 	editor.resetHighlightedInlet();
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack))
@@ -112,6 +121,7 @@ class MoveReverseConnectInteraction extends Interaction
 	  {
 	    editor.resetHighlightedOutlet(); 
 	    doConnection(editor, src, outlet, dst, inlet);
+	    //editor.setConnectingObject(null);
 	  }
       }
     else if (Squeack.isDown(squeack))
@@ -125,10 +135,10 @@ class MoveReverseConnectInteraction extends Interaction
 	  }
 
 	// clean up
-
 	editor.getDisplayList().noDrag();
 	editor.getDisplayList().redrawDragLine();
 	editor.setCursor(Cursor.getDefaultCursor());
+	editor.setConnectingObject(null);
 	destinationChoosen = false;
 	
 	editor.endInteraction();

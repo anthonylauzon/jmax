@@ -1029,6 +1029,16 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     resetHighlightedInlet();
   }
 
+  // ------------------------------------------------------------------------
+  // current object during a connection drawing (used in getSensibleArea in GraphicObject
+  // ------------------------------------------------------------------------
+  GraphicObject connectingObject = null;
+  public void setConnectingObject(GraphicObject obj){
+    connectingObject = obj;
+  }
+  public GraphicObject getConnectingObject(){
+    return connectingObject;
+  }
   // -----------------------------------------------------------------
   // Messages 
   // -----------------------------------------------------------------

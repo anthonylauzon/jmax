@@ -46,6 +46,7 @@ class DragReverseConnectInteraction extends Interaction
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingInOutletLocations(true);
+    filter.setFollowingOutletLocations(true);
     filter.setAutoScrolling(true);
   }
 
@@ -104,6 +105,7 @@ class DragReverseConnectInteraction extends Interaction
 	dragStart.x = dst.getInletAnchorX(inlet);
 	dragStart.y = dst.getInletAnchorY(inlet);
 	editor.resetHighlightedInlet();
+	editor.setConnectingObject(dst);
 	dragged = false;
       }
     else if (Squeack.isUp(squeack))
@@ -117,32 +119,36 @@ class DragReverseConnectInteraction extends Interaction
 
 	    if (destinationChoosen)
 	      {
-		editor.resetHighlightedOutlet(); 
-
+		editor.resetHighlightedOutlet();
 		doConnection(editor, src, outlet, dst, inlet);
 	      }
 
 	    // clean up
-
-	    editor.getDisplayList().noDrag();
-	    editor.getDisplayList().redrawDragLine();
-	    editor.setCursor(Cursor.getDefaultCursor());
-	    destinationChoosen = false;
-
-	    editor.endInteraction();
+	    if((!Squeack.isShift(squeack))||(!destinationChoosen)){
+	      editor.getDisplayList().noDrag();
+	      editor.getDisplayList().redrawDragLine();
+	      editor.setCursor(Cursor.getDefaultCursor());
+	      editor.setConnectingObject(null);
+	      destinationChoosen = false;
+	    
+	      editor.endInteraction();
+	    }
+	    else if(Squeack.isShift(squeack)){//shift pressed: moveReverseInteraction setting to do multiconnect 
+	      editor.getEngine().setInteraction(Interactions.moveReverseConnectInteraction);
+	      ((MoveReverseConnectInteraction)editor.getEngine().getCurrentInteraction()).setDest(dst, inlet);
+	      editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
+	    }
 	  }
 	else
 	  {
 	    // Not dragged, start a moveReverseConnection interaction
-
-	    editor.getEngine().setInteraction(Interactions.moveReverseConnectInteraction);
+	    editor.getEngine().setInteraction(Interactions.moveReverseConnectInteraction);    
 	    editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
 	  }
       }
     else if (Squeack.isDrag(squeack) && Squeack.onOutlet(squeack))
       {
 	dragged = true;
-
 	if ((! destinationChoosen) || src != (GraphicObject) area.getTarget() || outlet != area.getNumber())
 	  {
 	    src    = (GraphicObject) area.getTarget();
@@ -150,17 +156,16 @@ class DragReverseConnectInteraction extends Interaction
 	    editor.setHighlightedOutlet(src, outlet);
 	    destinationChoosen = true;
 	  }
-
+	  
 	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, 
-					    src.getOutletAnchorX(inlet), src.getOutletAnchorY(inlet));
+					    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
 	editor.getDisplayList().redrawDragLine();
       }
     else if (Squeack.isDrag(squeack))
       {
 	dragged = true;
-
 	if (destinationChoosen)
 	  {
 	    editor.resetHighlightedOutlet();

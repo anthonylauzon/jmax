@@ -446,8 +446,7 @@ public class DisplayList
 		      }
 		  }
 	      }
-	    else /*if (candidateArea == null)*/
-	      return area;
+	    else return area;
 	  }
       }
 
@@ -851,6 +850,11 @@ public class DisplayList
   public void dragLine()
   {
     dragMode = DRAG_LINE;
+  }
+
+  public boolean isDragLine()
+  {
+    return (dragMode == DRAG_LINE);
   }
 
   public void noDrag()
