@@ -285,22 +285,22 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
       }
     else
       {
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	  ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	    
-	if(type == FtsConnection.fts_connection_invalid)
-	  g.setColor( Color.gray);
-	else
-	  g.setColor( Color.black);
-		
-	((Graphics2D)g).drawLine(start.x, start.y, end.x, end.y);
-	if (selected)  
-	  {
-	    if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
-	      g.drawLine(start.x, start.y+1, end.x, end.y+1);
-	    else 
-	      g.drawLine(start.x+1, start.y, end.x+1, end.y);
-	  } 	    
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	  if(type == FtsConnection.fts_connection_invalid)
+	      g.setColor( Color.gray);
+	  else
+	      g.setColor( Color.black);
+	  
+	  ((Graphics2D)g).drawLine(start.x, start.y, end.x, end.y);
+	  if (selected)  
+	      {
+		  if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
+		      g.drawLine(start.x, start.y+1, end.x, end.y+1);
+		  else 
+		      g.drawLine(start.x+1, start.y, end.x+1, end.y);
+	      } 	    
+	  ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       }
   }
 

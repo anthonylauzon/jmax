@@ -1104,7 +1104,7 @@ fvec_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       double f = p[i];
 
-      p[i] = (float)logf(f);
+      /*p[i] = (float)logf(f);*/
     }
 }
 
@@ -1120,7 +1120,7 @@ fvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       double f = p[i];
 
-      p[i] = (float)expf(f);
+      /*p[i] = (float)expf(f);*/
     }
 }
 

@@ -137,7 +137,7 @@ extern void veclog_config(void);
 extern void vecclip_config(void);
 extern void sigarctan2_config(void);
 extern void sigabs_config(void);
-extern void fft_config(void);
+extern void fft_ispw_config(void);
 extern void sigsamphold_config(void);
 
 
@@ -261,7 +261,7 @@ ispw_config(void)
   vecclip_config();
   sigarctan2_config();
   sigabs_config();
-  fft_config();
+  fft_ispw_config();
   sigsamphold_config();
 
 }

@@ -215,7 +215,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     //both CTRL and ALT keys pressed. 
     if(SwingUtilities.isMiddleMouseButton(e)&&!e.isControlDown())
 	ret |= Squeack.MIDDLE_BUTTON;
-
     if((e.getModifiers() & SHORTCUT) != 0)
 	ret |= Squeack.SHORTCUT;
 
@@ -244,8 +243,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     squeack |= getModifiersBits(e);
 
     if (followingLocations || followingInOutletLocations)
-      {
-	
+      {	
 	if ( !isFollowingAlsoConnectionLocations() || isCtrlEditInteraction(squeack))
 	  {
 	    area = displayList.getObjectSensibilityAreaAt(mouse.x, mouse.y);
@@ -254,7 +252,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 	  {
 	    area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
 	  }
-	
+
 	squeack |= getLocationBits(area);
       }
 
@@ -494,12 +492,15 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     sketch.stopTextEditing();
     sketch.requestFocus();
 
+    //jdk bug fix: in macosx platform isPopupTrigger() function return true with
+    //both CTRL and ALT keys pressed. We want that CTRL is popupTrigger (so right button) 
+    //and ALT is middleButton. More: e.isALtdown return true in both CTRL and ALT case  
     if (e.isPopupTrigger())
-      processEvent(Squeack.POP_UP, e);
+	processEvent(Squeack.POP_UP, e);
     else if (e.getClickCount() > 1)
-      processEvent(Squeack.DOUBLE_CLICK, e);
+	processEvent(Squeack.DOUBLE_CLICK, e);
     else
-      processEvent(Squeack.DOWN, e);
+	processEvent(Squeack.DOWN, e);	    
   }
 
   public void mouseReleased( MouseEvent e)

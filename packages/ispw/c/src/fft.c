@@ -574,7 +574,7 @@ fft_class_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 }
 
 void
-fft_config(void)
+fft_ispw_config(void)
 {
   sym_fft = fts_new_symbol("fft~");
   sym_ifft = fts_new_symbol("ifft~");

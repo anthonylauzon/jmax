@@ -363,7 +363,8 @@ public class JMaxApplication extends FtsClient {
 	    
 	    url = ClassLoader.getSystemResource( "jmax.jar");
 	    u = url.toString();
-	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar"));
+
+	    root = u.substring( u.indexOf( '/'), u.lastIndexOf( "jmax.jar"))+"jMax.app/Contents/Resources";
 	    properties.put( "jmaxServerName", "fts.wrapper");
 	  }
 
