@@ -141,7 +141,7 @@ dtd_thread_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-dtd_thread_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+dtd_thread_instantiate(fts_class_t* cl)
 {
     fts_class_init(cl, sizeof(dtd_thread_t), dtd_thread_init, dtd_thread_delete);
     fts_class_message_varargs(cl, fts_s_write, dtd_thread_write);
