@@ -4,7 +4,9 @@ libcontrol_la_SOURCES= \
 control.c \
 count.c \
 demux.c \
+fit.c \
 for.c \
 oneshot.c \
 range.c \
-switch.c 
+switch.c \
+sync.c 

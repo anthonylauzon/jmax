@@ -32,6 +32,8 @@ extern void demux_config(void);
 extern void for_config(void);
 extern void count_config(void);
 extern void range_config(void);
+extern void fit_config(void);
+extern void sync_config(void);
 
 void
 control_config(void)
@@ -42,4 +44,6 @@ control_config(void)
   for_config();
   count_config();
   range_config();
+  fit_config();
+  sync_config();
 }
