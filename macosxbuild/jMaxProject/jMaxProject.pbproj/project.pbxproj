@@ -328,6 +328,18 @@
 			shellPath = /bin/sh;
 			shellScript = "echo \"root\" > jmax.jar.root\njar -uvf build/jmax.jar jmax.jar.root";
 		};
+		F821F1E002D4598701664092 = {
+			isa = PBXFileReference;
+			name = keystat.help.jmax;
+			path = ../../packages/guiobj/help/keystat.help.jmax;
+			refType = 2;
+		};
+		F821F1E202D459AC01664092 = {
+			fileRef = F821F1E002D4598701664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F822188D02BE2B1801664092 = {
 			isa = PBXFileReference;
 			name = NewProjectDialog.java;
@@ -19529,6 +19541,7 @@
 				F86E9E9A02A5330001664092,
 				F820646602AE1B1601664092,
 				F8A4E73902D3775D01664092,
+				F821F1E002D4598701664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -20791,6 +20804,7 @@
 				F86E9E9C02A5330801664092,
 				F820646802AE1B4901664092,
 				F8A4E73B02D3776E01664092,
+				F821F1E202D459AC01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
