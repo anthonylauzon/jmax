@@ -21,6 +21,7 @@
 #include <time.h>
 #include <errno.h>
 #include <string.h>
+#include <sched.h>
 
 #include "sys.h"
 
@@ -38,12 +39,17 @@ struct timespec pause_time = { 0, 10000};
 
 void fts_platform_init(void)
 {
+  struct sched_param sp;
+
   fts_add_welcome(&gnu_welcome);
+
+  sp.sched_priority = 80;
 
   if (running_real_time)
     {
-      if (setpriority(PRIO_PROCESS, 0, -20) < 0)
+      if ( sched_setscheduler( 0, SCHED_FIFO, &sp) < 0)
 	{
+	  perror( "sched_setscheduler");
 	  running_real_time = 0;
 	}
     }
