@@ -544,6 +544,7 @@ static void clear_action( unsigned char input, void *data)
   protocol_decoder_t *decoder = (protocol_decoder_t *)data;
 
   decoder->ival = 0;
+  fts_stack_clear( &decoder->buffer);
 }
 
 static void shift_action( unsigned char input, void *data)
@@ -551,13 +552,6 @@ static void shift_action( unsigned char input, void *data)
   protocol_decoder_t *decoder = (protocol_decoder_t *)data;
 
   decoder->ival = decoder->ival << 8 | input;
-}
-
-static void buffer_clear_action( unsigned char input, void *data)
-{
-  protocol_decoder_t *decoder = (protocol_decoder_t *)data;
-
-  fts_stack_clear( &decoder->buffer);
 }
 
 static void buffer_shift_action( unsigned char input, void *data)
@@ -734,7 +728,7 @@ static state_t *build_state_machine( void)
   state_add_transition( q_initial, FTS_PROTOCOL_FLOAT, q_float0, clear_action);
   state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_INDEX, q_symbol_index0, clear_action);
   state_add_transition( q_initial, FTS_PROTOCOL_SYMBOL_CACHE, q_symbol_cache0, clear_action);
-  state_add_transition( q_initial, FTS_PROTOCOL_STRING, q_string, buffer_clear_action);
+  state_add_transition( q_initial, FTS_PROTOCOL_STRING, q_string, clear_action);
   state_add_transition( q_initial, FTS_PROTOCOL_OBJECT, q_object0, clear_action);
   state_add_transition( q_initial, FTS_PROTOCOL_END_OF_MESSAGE, q_initial, end_message_action);
 
@@ -792,6 +786,8 @@ static void protocol_decoder_init( protocol_decoder_t *decoder, client_t *client
 
   fts_stack_init( &decoder->args, fts_atom_t);
   fts_stack_init( &decoder->buffer, unsigned char);
+
+  symbol_cache_init( &decoder->from_client_cache);
 
   decoder->client = client;
   decoder->state = build_state_machine();
@@ -858,6 +854,9 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   client_put_object( this, id, newobj);
 
   newobj->head.id = OBJECT_ID( id, this->client_id);
+
+  /* WARNING: UPLOAD mechanism to reimplement!!!!!! (added for the moment)*/
+  fts_send_message( newobj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
