@@ -81,7 +81,7 @@ audioconfig_restore(fts_audioconfig_t* config)
 static void
 audiomanagers_get_sample_rates(fts_array_t* sample_rates_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_sample_rates), dummy implementation to test communication between fts server and client
+/* #warning NOT YET IMPLEMENTED (audiomanagers_get_sample_rates), dummy implementation to test communication between fts server and client */
   /*
     loop on registered audio managers:
       foreach audiomanagers check which sample rate are available on audioport
@@ -97,7 +97,7 @@ audiomanagers_get_sample_rates(fts_array_t* sample_rates_array)
 static void
 audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_buffer_sizes), dummy implementation to test communication between fts server and client
+/* #warning NOT YET IMPLEMENTED (audiomanagers_get_buffer_sizes), dummy implementation to test communication between fts server and client */
   /*
     loop on registered audio managers:
       foreach audiomanagers check which buffer size are available on audioport
@@ -116,7 +116,7 @@ audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
 static fts_symbol_t
 audiomanagers_get_default_input(void)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_default_input)
+/* #warning NOT YET IMPLEMENTED (audiomanagers_get_default_input) */
   fts_symbol_t name = NULL;
 /*   fts_audiomanager_t *mm; */
 /*   fts_atom_t arg; */
@@ -132,7 +132,7 @@ audiomanagers_get_default_input(void)
 static fts_symbol_t
 audiomanagers_get_default_output(void)
 {
-#warning NOT YET IMPLEMENTED (audiomanagers_get_default_output)
+/* #warning NOT YET IMPLEMENTED (audiomanagers_get_default_output) */
   fts_symbol_t name = NULL;
 /*   fts_audiomanager_t *mm;  */
 /*   fts_atom_t arg; */
@@ -210,7 +210,7 @@ audioconfig_update_buffer_sizes(fts_audioconfig_t* config)
 static void 
 audioconfig_update_labels(fts_audioconfig_t* config)
 {
-#warning NOT YET IMPLEMENTED (audioconfig_update_labels)
+/* #warning NOT YET IMPLEMENTED (audioconfig_update_labels) */
   fts_audiolabel_t* label = config->labels;
   int n = config->n_labels;
   int i;
@@ -473,7 +473,7 @@ audioconfig_remove_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
 int audioconfig_check_sample_rate(fts_audioconfig_t* config, double sample_rate)
 {
-#warning NOT YET IMPLEMENTED (audioconfig_check_sample_rate)
+/* #warning NOT YET IMPLEMENTED (audioconfig_check_sample_rate) */
   int success = 1;
   /* foreach used audioport:
        check if sample rate is available for selected channels
@@ -487,7 +487,7 @@ int audioconfig_check_sample_rate(fts_audioconfig_t* config, double sample_rate)
 
 int audioconfig_check_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
-#warning NOT YET IMPLEMENTED (audioconfig_check_buffer_size)
+/* #warning NOT YET IMPLEMENTED (audioconfig_check_buffer_size) */
   int success = 1;
   /* foreach used audioport:
        check if buffer size is available for selected channels
@@ -504,14 +504,14 @@ int audioconfig_check_buffer_size(fts_audioconfig_t* config, int buffer_size)
 int 
 fts_audioconfig_get_buffer_size(fts_audioconfig_t* self)
 {
-#warning TODO: Convert this function into a macro
+/* #warning TODO: Convert this function into a macro */
   return self->buffer_size;
 }
 
 int 
 fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
-#warning NOT YET IMPLEMENTED (fts_audioconfig_set_buffer_size)
+/* #warning NOT YET IMPLEMENTED (fts_audioconfig_set_buffer_size) */
   /* check if buffer size is available with current use audioport */
   if (audioconfig_check_buffer_size(config, buffer_size))
   {
@@ -529,14 +529,14 @@ fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size)
 int
 fts_audioconfig_get_sample_rate(fts_audioconfig_t* config)
 {
-#warning TODO: Convert this function into a macro
+/* #warning TODO: Convert this function into a macro */
   return config->sample_rate;
 }
 
 int
 fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate)
 {
-#warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate
+/* #warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate */
   int set_sample_rate = 0;
   fts_atom_t arg;
   /* check if sample rate is available with current use audioport */
@@ -619,7 +619,7 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 static void
 audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-#warning NOT YET IMPLEMENTED (audioconfig_sample_rate)
+/* #warning NOT YET IMPLEMENTED (audioconfig_sample_rate) */
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int sample_rate = fts_get_int(at);
   fts_atom_t arg;
