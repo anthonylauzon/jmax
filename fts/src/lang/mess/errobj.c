@@ -5,7 +5,9 @@
    parsing (inlet and outlets are relative to the position).
 */
 
-#include "fts.h"
+#include "sys.h"
+#include "lang/mess.h"
+#include "lang/mess/messP.h"
 
 /*
  * The error object; actually, error object are patchers, marked as errors,

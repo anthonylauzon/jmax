@@ -21,7 +21,7 @@ extern void fts_mess_naming_init(void);
 
 /* System classes config */
 
-extern void fts_voidobj_config(void);
+extern void fts_void_object_config(void);
 extern void fts_selection_config(void);
 extern void fts_clipboard_config(void);
 

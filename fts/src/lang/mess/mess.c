@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.10 $ IRCAM $Date: 1998/05/18 14:59:02 $
+ *      $Revision: 1.11 $ IRCAM $Date: 1998/05/22 11:55:26 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -81,6 +81,11 @@ fts_mess_init(void)
   /* Initialize the object doctor housekeeping */
 
   fts_doctor_init();
+
+
+  /* Do the void object */
+
+  fts_void_object_config();
 
   /* Now that everything is up and running, create the root patcher */
 
