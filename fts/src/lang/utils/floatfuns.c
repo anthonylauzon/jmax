@@ -144,8 +144,7 @@ fts_ffun_get_ptr(fts_symbol_t name)
     return 0;
 }
 
-void
-fts_ffuns_init(void)
+void fts_ffuns_init(void)
 {
   fts_hash_table_init(&the_fts_ffun_hashtable);
 
@@ -237,8 +236,7 @@ fftab_new(fts_ffun_t *ffun, int size, float min, float max)
   return fftab;
 }
 
-void
-fftab_delete(fts_fftab_t *fftab)
+static void fftab_delete(fts_fftab_t *fftab)
 {
   fts_free(fftab->values);
   fts_free(fftab);

@@ -70,8 +70,8 @@
  *      FILL: (name, t_scl, t_out, fun) ... scalar -> vector
  *      SET: (name, t_out, fun) ... -> vector
  *
- *        t_in, t_in0, t_in1 ... type of vector argument (float, long, complex, ... - no "*" for pointer!!)
- *        t_out, t_out0, t_out1 ... type of vector result (float, long, complex, ... - no "*" for pointer!!)
+ *        t_in, t_in0, t_in1 ... type of vector argument (float, int, complex, ... - no "*" for pointer!!)
+ *        t_out, t_out0, t_out1 ... type of vector result (float, int, complex, ... - no "*" for pointer!!)
  *        t_scl, t_scl0, t_scl1 ... type of scalar argument
  *        t_ptr ... type of scalar result
  *        fun, op ... defined functions and operations (see all.h)

@@ -2,6 +2,7 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*; 
 import java.util.*;
+import java.awt.datatransfer.*;
 
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
@@ -15,7 +16,7 @@ import ircam.jmax.editors.patcher.objects.*;
 //
 
 
-public class ErmesSelection
+public class ErmesSelection implements Transferable
 {
   static public ErmesSelection patcherSelection =  new ErmesSelection();
 
@@ -23,9 +24,32 @@ public class ErmesSelection
   private MaxVector connections = new MaxVector();
   private ErmesSketchPad owner;
 
+  public static DataFlavor patcherSelectionFlavor = new DataFlavor(ircam.jmax.fts.FtsSelection.class, "PatcherSelection");
+  public static DataFlavor flavors[];
+
+  public Object getTransferData(DataFlavor flavor)
+  {
+    return Fts.getSelection();
+  } 
+
+  public DataFlavor[]  getTransferDataFlavors() 
+  {
+    return flavors;
+  }
+
+  public boolean isDataFlavorSupported(DataFlavor flavor) 
+  {
+    return flavor.equals(patcherSelectionFlavor);
+  } 
+
   public ErmesSelection() 
   {
+    if (flavors == null)
+      flavors = new DataFlavor[1];
+
+    flavors[0] = patcherSelectionFlavor;
   }
+
 
   public void select(ErmesObject object) 
   {
@@ -198,12 +222,29 @@ public class ErmesSelection
     owner.selectionChanged();
   }
 
+
+  // Generic operation on objects in the selection
+
+  public void apply(ObjectAction action)
+  {
+    Object[] values = objects.getObjectArray();
+    int size = objects.size();
+
+    for (int i = 0; i < size; i++)
+      {
+	ErmesObject object = (ErmesObject) values[i];
+
+	action.processObject(object);
+      }
+  }
+
+
   //--------------------------------------------------------
   //	moveAll
   //	Move the selected elements
   //--------------------------------------------------------
 
-  void moveAll( int dh, int dv)
+  public void moveAll( int dh, int dv)
   {
     ErmesObject object;
 
@@ -238,9 +279,8 @@ public class ErmesSelection
   }
 
 
-  void resizeToMaxWidth()
+  public void resizeToMaxWidth()
   {
-    
     int max = 0;
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -259,7 +299,7 @@ public class ErmesSelection
       }
   }
 
-  void resizeToMaxHeight()
+  public void resizeToMaxHeight()
   {
     int max = 0;
 
@@ -280,7 +320,7 @@ public class ErmesSelection
       }
   }
 
-  void alignTop()
+  public void alignTop()
   {
     int value = minY();
 
@@ -294,7 +334,7 @@ public class ErmesSelection
       }
   }
 
-  void alignBottom()
+  public void alignBottom()
   {
     int value = maxY();
 
@@ -308,7 +348,7 @@ public class ErmesSelection
       }
   }
 
-  void alignLeft()
+  public void alignLeft()
   {
     int value = minX();
 
@@ -322,7 +362,7 @@ public class ErmesSelection
       }
   }
 
-  void alignRight()
+  public void alignRight()
   {
     int value = maxX();
 
@@ -338,7 +378,7 @@ public class ErmesSelection
 
   // Add the proper throw
 
-  void setFontName( String theFontName)
+  public void setFontName( String theFontName)
   {
     Font font;
 
@@ -357,7 +397,7 @@ public class ErmesSelection
 
   // Add the proper throw exception
 
-  void setFontSize( int fontSize) 
+  public void setFontSize( int fontSize) 
   {
     Object[] values = objects.getObjectArray();
     int size = objects.size();
@@ -372,17 +412,7 @@ public class ErmesSelection
       }
   }
 
-  void inspect() 
-  {
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for ( int i = 0; i < size; i++) 
-      ((ErmesObject) values[i]).inspect();
-  }
-
-
-  boolean openHelpPatches()
+  public boolean openHelpPatches()
   {
     ErmesObject object;
       
@@ -397,11 +427,6 @@ public class ErmesSelection
     return true;
   }
 
-  void showErrorDescriptions()
-  {
-    for ( Enumeration e = objects.elements(); e.hasMoreElements();)
-      ((ErmesObject) e.nextElement()).showErrorDescription();
-  }
 
   // Queries about selection geometry
 

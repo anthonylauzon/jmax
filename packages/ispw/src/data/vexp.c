@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:24 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:24 $
  *
  * vexp.c -- a variable expression evaluator
  *
@@ -27,9 +27,11 @@
  */
 
 
+#include <string.h>
 
 #include "fts.h"
 #include "vexp.h" 
+#include "vexp_util.h" 
 
 
 char *atoif(char *s, long int *value, long int *type);
@@ -57,8 +59,7 @@ void ex_print (struct ex_ex *eptr);
  *	     if successfull it will return 0 otherwise 1
  */
 
-int
-ex_new(struct expr *expr, char *exp_string)
+int ex_new(struct expr *expr, char *exp_string)
 {
   struct ex_ex *list;
   struct ex_ex *ret;

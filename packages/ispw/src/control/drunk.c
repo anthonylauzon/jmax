@@ -49,7 +49,7 @@ static void
 drunk_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   if (n < 0)
     n = 0;
@@ -67,7 +67,7 @@ static void
 drunk_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   if (n <= 0)
     n = 1;
@@ -85,7 +85,7 @@ static void
 drunk_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   n = (n > x->range / 2L) ? (x->range / 2L) : n;
   x->scaler = (float)n / MAXVAL;
@@ -113,7 +113,7 @@ static void
 drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   x->reg = n % x->range;
 }
@@ -123,8 +123,8 @@ static void
 drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   drunk_t *x = (drunk_t *)o;
-  long int range       = (long) fts_get_number_arg(ac, at, 1, 0);
-  long int correlation = (long) fts_get_number_arg(ac, at, 2, 0);
+  long int range       = (long) fts_get_int_arg(ac, at, 1, 0);
+  long int correlation = (long) fts_get_int_arg(ac, at, 2, 0);
 
   if (range <= 0)
     range = 128;

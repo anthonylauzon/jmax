@@ -154,12 +154,12 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(ac > 1 && fts_is_symbol(at + 1))
     {
       name = fts_get_symbol(at + 1);
-      size = fts_get_number_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
+      size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
     }
   else
     {
       name = 0;
-      size = fts_get_number_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
+      size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);
     }
 
   this->name = name;
@@ -216,7 +216,7 @@ static void
 table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  int index = fts_get_number_arg(ac, at, 0, 0);
+  int index = fts_get_int_arg(ac, at, 0, 0);
   int size = fts_integer_vector_get_size(this->vector);
 
   if (index < 0)
@@ -238,7 +238,7 @@ static void
 table_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  int n = (int) fts_get_number_arg(ac, at, 0, 0);
+  int n = fts_get_int_arg(ac, at, 0, 0);
 
   this->new_value_valid = 1;
   this->new_value = n;

@@ -8,23 +8,27 @@ VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
 
-
 # Standard gcc
-#CC := gcc
-#ARCH_CFLAGS :=  -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-#ARCH_OPT_CFLAGS := -O6 -funroll-all-loops 
-#LD := gcc
-#ARCH_LDFLAGS := -rdynamic  
+
+CC := gcc
+#CC := gcc-2.8
+ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused -DLINUX -DLINUXPC 
+#ARCH_OPT_CFLAGS := -O6 -funroll-loops -fomit-frame-pointer -ffast-math
+#ARCH_OPT_CFLAGS := -O2 -fno-defer-pop -fomit-frame-pointer -ffast-math
+ARCH_OPT_CFLAGS := 
+LD := gcc
+ARCH_LDFLAGS := -rdynamic  
 
 
 # Pentium gcc
-CC := pentium-gcc
-LD := pentium-gcc
+
+#CC := pentium-gcc
+#LD := pentium-gcc
 #ARCH_CFLAGS := -B/usr/lib/gcc-lib/ -idirafter /usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/include/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-ARCH_CFLAGS := -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
-ARCH_LDFLAGS := -rdynamic -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/
-ARCH_OPT_LDFLAGS := 
+#ARCH_CFLAGS := -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
+#ARCH_LDFLAGS := -rdynamic -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/
+#ARCH_OPT_LDFLAGS := 
 
 
 # Common to gcc and Pentium gcc

@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:26 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/11/05 15:25:49 $
  *
  */
 
@@ -15,8 +15,11 @@
 #include "vexp.h"
 #include "vexp_util.h"
 
+extern struct ex_ex *ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr);
+
 /*------------------------- expr class -------------------------------------*/
 
+extern int ex_new(struct expr *expr, char *exp_string);
 
 /*#define EXPR_DEBUG*/
 
@@ -190,13 +193,13 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 expr_setint(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  expr_int_realize((t_expr *)o, fts_get_number_arg(ac, at, 0, 0), winlet);
+  expr_int_realize((t_expr *)o, fts_get_int_arg(ac, at, 0, 0), winlet);
 }
 
 static void
 expr_setfloat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  expr_float_realize((t_expr *)o, fts_get_number_arg(ac, at, 0, 0) , winlet);
+  expr_float_realize((t_expr *)o, (double) fts_get_float_arg(ac, at, 0, 0) , winlet);
 }
 
 static void

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:54 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:59:44 $
  *
  */
 
@@ -19,6 +19,7 @@ typedef struct {
 } ucs_t;
 
 
+extern fts_status_t fts_ucs_execute_command_opcode(fts_symbol_t opcode, int argc, const fts_atom_t *argv);
 
 static void
 ucs_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

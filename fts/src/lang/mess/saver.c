@@ -9,6 +9,8 @@
 #include "lang/mess.h"
 #include "lang/utils.h"
 
+#include "lang/mess/saver.h"
+
 
 /* #define SAVER_DEBUG  */
 
@@ -17,7 +19,7 @@ struct fts_bmax_file
   FILE *fd;
   fts_binary_file_header_t header; 
   fts_symbol_t *symbol_table;
-  int symbol_table_size;
+  unsigned int symbol_table_size;
 };
 
 
@@ -26,7 +28,7 @@ union swap_union_t {
   char c[4];
 };
 
-static int has_to_swap()
+static int has_to_swap(void)
 {
   union swap_union_t u;
 
@@ -125,7 +127,7 @@ fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 static void
 fts_close_bmax_file(fts_bmax_file_t *f)
 {
-  int i;
+  unsigned int i;
   char c;
   fts_binary_file_header_t header;
 
@@ -262,8 +264,8 @@ fts_bmax_count_childs(fts_patcher_t *patcher)
 
 static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
-  int i;
-
+  unsigned int i;
+  
   /* First, search for the symbol in the symbol table */
 
   for (i = 0; i < f->header.n_symbols; i++)
@@ -354,7 +356,7 @@ static void fts_bmax_write_l_int(fts_bmax_file_t *f, int value)
   f->header.code_size += 4;
 }
 
-void fts_bmax_write_int(fts_bmax_file_t *f, int value)
+static void fts_bmax_write_int(fts_bmax_file_t *f, int value)
 {
   unsigned char argcode  = fts_bmax_get_argcode(value);
 
@@ -366,7 +368,7 @@ void fts_bmax_write_int(fts_bmax_file_t *f, int value)
     fts_bmax_write_l_int(f, value);
 }
 
-void fts_bmax_write_float(fts_bmax_file_t *f, float value)
+static void fts_bmax_write_float(fts_bmax_file_t *f, float value)
 {
   float fv = value;
   unsigned int fx = *((unsigned int *)&fv);
@@ -384,8 +386,7 @@ void fts_bmax_write_float(fts_bmax_file_t *f, float value)
 
 /* One functions for each opcode (without considering the argument length) */
 
-static void
-fts_bmax_code_return(fts_bmax_file_t *f)
+static void fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
 
@@ -444,6 +445,7 @@ void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
   fts_bmax_write_opcode_for(f, FVM_PUSH_SYM, value );
   fts_bmax_write_int(f, value);
 }
+
 
 void fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
 {
@@ -557,7 +559,7 @@ void fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
+static void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_TOP_OBJ   <nargs> */
 

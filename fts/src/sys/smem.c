@@ -24,24 +24,25 @@
 */
 
 #include <stdio.h>
+#include <malloc.h>
 
 #define OPS_LIMIT 256*1024
 #define BLOCK_CACHE_SIZE 16
 
-#include <malloc.h>
+#include "smem.h"
 
 #define SMEM_START_MARKER 0xaa55aa55
-#define SMEM_END_MARKER   0xaa5555aa
+#define SMEM_END_MARKER   0xaa5555aaL
 
 
 struct mem_header
 {
-  unsigned long marker;
+  unsigned int marker;
   const char *filename;
   int   line;
   unsigned long size;
   struct mem_header *next;
-  unsigned long marker2;
+  unsigned int  marker2;
 };
 
 static struct mem_header *first_block = 0;
@@ -77,8 +78,7 @@ remove_block(char *block)
 }
 
 
-static void
-check_integrity(char *p, const char *msg)
+void check_integrity(char *p, const char *msg)
 {
   const char *err;
 
@@ -103,8 +103,7 @@ check_integrity(char *p, const char *msg)
   }
 }
 
-void
-check_integrity_all(void)
+static void check_integrity_all(void)
 {
   struct mem_header *p;
 
@@ -322,8 +321,7 @@ register_check_free(char *p)
   block_cache_insert = 0;
 }
 
-void
-fts_check_block(char *p, unsigned long size, const char *msg)
+void fts_check_block(char *p, unsigned long size, const char *msg)
 {
   unsigned int i;
   int found = 0;		/* 1 when we found an including malloced block */
@@ -411,8 +409,7 @@ fts_check_block(char *p, unsigned long size, const char *msg)
 }
 
 
-void
-fts_check_pointer(void *p, char *msg)
+void fts_check_pointer(void *p, char *msg)
 {
   /* check_integrity_all(); */
   fts_check_block(((char *)p) , 1, msg);
@@ -421,8 +418,7 @@ fts_check_pointer(void *p, char *msg)
 
 /* Call this on a malloced block only !! */
 
-void
-fts_check_malloc(void *p, char *msg)
+void fts_check_malloc(void *p, char *msg)
 {
   if (p)
     {
@@ -434,8 +430,7 @@ fts_check_malloc(void *p, char *msg)
 }
 
 
-char *
-fts_safe_malloc(unsigned long size, const char *filename, int line)
+char *fts_safe_malloc(unsigned long size, const char *filename, int line)
 {
   char *p;
 
@@ -463,8 +458,7 @@ fts_safe_malloc(unsigned long size, const char *filename, int line)
   return p + sizeof(struct mem_header);
 }
 
-void
-fts_safe_free(char *p)
+void fts_safe_free(char *p)
 {
   /* check_integrity_all(); */
 
@@ -477,8 +471,7 @@ fts_safe_free(char *p)
 
 
 
-char *
-fts_safe_realloc(void *pv, int size, const char *filename, int line)
+char *fts_safe_realloc(void *pv, int size, const char *filename, int line)
 {
   char *p = (char *)pv;
 

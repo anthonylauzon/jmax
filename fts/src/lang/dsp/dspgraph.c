@@ -9,6 +9,12 @@
 #include "runtime/files.h"
 
 
+extern void fts_audio_add_unused_zero_fun(void);
+extern void fts_audio_activate_devices(void);
+extern void fts_audio_deactivate_devices(void);
+extern void fts_audio_add_all_zero_fun(void);
+extern float fts_sched_get_tick_length(void);
+
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 /* 
@@ -774,6 +780,8 @@ ftl_program_t *dsp_get_current_dsp_chain( void)
 /* DSP chain execution function                                                */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
+
+extern void fts_clock_define_protected(fts_symbol_t name, double *clock);
 
 void dsp_install_clocks(void)
 {

@@ -578,7 +578,7 @@ compile_portable_state_fun( int state, int newstate, fts_atom_t *a, void *user_d
 
       fts_hash_table_lookup( ftl_functions_table, fts_get_symbol(a), &data);
       fdecl =  (ftl_function_declaration *) fts_get_ptr(&data);
-      fts_word_set_fun( bytecode, (void (*)()) fdecl->wrapper);
+      fts_word_set_fun( bytecode, (void (*)(void)) fdecl->wrapper);
       bytecode++;
     }
     break;
@@ -624,8 +624,7 @@ bytecode_size_state_fun( int state, int newstate, fts_atom_t *a, void *user_data
   }
 }
 
-int
-ftl_program_compile_portable( ftl_program_t *prog)
+static int ftl_program_compile_portable( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr;
   fts_status_t ret;

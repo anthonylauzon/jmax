@@ -66,16 +66,16 @@ scale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
   else
     x->logf = 0;
 
-  x->ilow = (double) fts_get_number_arg(ac, at, 0, 0.0);
-  x->ihi  = (double) fts_get_number_arg(ac, at, 1, 127.0);
-  x->olow = (double) fts_get_number_arg(ac, at, 2, 0.0);
-  x->ohi  = (double) fts_get_number_arg(ac, at, 3, 1.0);
+  x->ilow = (double) fts_get_float_arg(ac, at, 0, 0.0f);
+  x->ihi  = (double) fts_get_float_arg(ac, at, 1, 127.0f);
+  x->olow = (double) fts_get_float_arg(ac, at, 2, 0.0f);
+  x->ohi  = (double) fts_get_float_arg(ac, at, 3, 1.0f);
 
   if (x->logf)
     {
       double f;
 
-      f = (double) fts_get_number_arg(ac, at, 4, 1.0);
+      f = (double) fts_get_float_arg(ac, at, 4, 1.0f);
   
       if (f < (double)1.0)
 	f = (double) 1.0;
@@ -92,7 +92,7 @@ scale_set_ilow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   scale_t *x = (scale_t *)o;
 
-  x->ilow = (double) fts_get_number_arg(ac, at, 0, 0.0f);
+  x->ilow = (double) fts_get_float_arg(ac, at, 0, 0.0f);
   do_rescale(x);
 }
 
@@ -102,7 +102,7 @@ scale_set_ihi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   scale_t *x = (scale_t *)o;
 
-  x->ihi = (double) fts_get_number_arg(ac, at, 0, 0.0f);
+  x->ihi = (double) fts_get_float_arg(ac, at, 0, 0.0f);
   do_rescale(x);
 }
 
@@ -112,7 +112,7 @@ scale_set_olow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   scale_t *x = (scale_t *)o;
 
-  x->olow = (double) fts_get_number_arg(ac, at, 0, 0.0f);
+  x->olow = (double) fts_get_float_arg(ac, at, 0, 0.0f);
   do_rescale(x);
 }
 
@@ -122,7 +122,7 @@ scale_set_ohi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   scale_t *x = (scale_t *)o;
 
-  x->ohi = (double) fts_get_number_arg(ac, at, 0, 0.0f);
+  x->ohi = (double) fts_get_float_arg(ac, at, 0, 0.0f);
   do_rescale(x);
 }
 
@@ -134,7 +134,7 @@ scale_set_logincr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   x->logf = 1;
 
-  f = (double) fts_get_number_arg(ac, at, 0, 1.0);
+  f = (double) fts_get_float_arg(ac, at, 0, 1.0f);
   
   if (f < (double)1.0)
     f = (double) 1.0;
@@ -148,7 +148,7 @@ static void
 scale_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scale_t *x = (scale_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if (x->logf)
     {

@@ -100,7 +100,7 @@ static void hfpe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 static void hfpe_activate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n = fts_get_number_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
   
   hfpe_all_off();
 

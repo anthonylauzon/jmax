@@ -10,20 +10,20 @@
  */
 
 /* veccomp_float.c */
-DECLARE_VEC_FUN(OP, (fcmp_eq, float, float, long, COMP_eq))
-DECLARE_VEC_FUN(OP, (fcmp_neq, float, float, long, COMP_neq))
-DECLARE_VEC_FUN(OP, (fcmp_leq, float, float, long, COMP_leq))
-DECLARE_VEC_FUN(OP, (fcmp_geq, float, float, long, COMP_geq))
-DECLARE_VEC_FUN(OP, (fcmp_le, float, float, long, COMP_le))
-DECLARE_VEC_FUN(OP, (fcmp_gr, float, float, long, COMP_gr))
+DECLARE_VEC_FUN(OP, (fcmp_eq, float, float, int, COMP_eq))
+DECLARE_VEC_FUN(OP, (fcmp_neq, float, float, int, COMP_neq))
+DECLARE_VEC_FUN(OP, (fcmp_leq, float, float, int, COMP_leq))
+DECLARE_VEC_FUN(OP, (fcmp_geq, float, float, int, COMP_geq))
+DECLARE_VEC_FUN(OP, (fcmp_le, float, float, int, COMP_le))
+DECLARE_VEC_FUN(OP, (fcmp_gr, float, float, int, COMP_gr))
  
-/* veccomp_long.c */
-DECLARE_VEC_FUN(OP, (icmp_eq, long, long, long, COMP_eq))
-DECLARE_VEC_FUN(OP, (icmp_neq, long, long, long, COMP_neq))
-DECLARE_VEC_FUN(OP, (icmp_leq, long, long, long, COMP_leq))
-DECLARE_VEC_FUN(OP, (icmp_geq, long, long, long, COMP_geq))
-DECLARE_VEC_FUN(OP, (icmp_le, long, long, long, COMP_le))
-DECLARE_VEC_FUN(OP, (icmp_gr, long, long, long, COMP_gr))
+/* veccomp_int.c */
+DECLARE_VEC_FUN(OP, (icmp_eq, int, int, int, COMP_eq))
+DECLARE_VEC_FUN(OP, (icmp_neq, int, int, int, COMP_neq))
+DECLARE_VEC_FUN(OP, (icmp_leq, int, int, int, COMP_leq))
+DECLARE_VEC_FUN(OP, (icmp_geq, int, int, int, COMP_geq))
+DECLARE_VEC_FUN(OP, (icmp_le, int, int, int, COMP_le))
+DECLARE_VEC_FUN(OP, (icmp_gr, int, int, int, COMP_gr))
 
 
 /**********************************************************
@@ -33,18 +33,18 @@ DECLARE_VEC_FUN(OP, (icmp_gr, long, long, long, COMP_gr))
  */
 
 /* veccomp_float.c */
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_eq, float, float, long, COMP_eq))
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_neq, float, float, long, COMP_neq))
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_leq, float, float, long, COMP_leq))
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_geq, float, float, long, COMP_geq))
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_le, float, float, long, COMP_le))
-DECLARE_VEC_FUN(OPSCL, (scl_fcmp_gr, float, float, long, COMP_gr))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_eq, float, float, int, COMP_eq))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_neq, float, float, int, COMP_neq))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_leq, float, float, int, COMP_leq))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_geq, float, float, int, COMP_geq))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_le, float, float, int, COMP_le))
+DECLARE_VEC_FUN(OPSCL, (scl_fcmp_gr, float, float, int, COMP_gr))
  
-/* veccomp_long.c */
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_eq, long, long, long, COMP_eq))
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_neq, long, long, long, COMP_neq))
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_leq, long, long, long, COMP_leq))
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_geq, long, long, long, COMP_geq))
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_le, long, long, long, COMP_le))
-DECLARE_VEC_FUN(OPSCL, (scl_icmp_gr, long, long, long, COMP_gr))
+/* veccomp_int.c */
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_eq, int, int, int, COMP_eq))
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_neq, int, int, int, COMP_neq))
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_leq, int, int, int, COMP_leq))
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_geq, int, int, int, COMP_geq))
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_le, int, int, int, COMP_le))
+DECLARE_VEC_FUN(OPSCL, (scl_icmp_gr, int, int, int, COMP_gr))
 

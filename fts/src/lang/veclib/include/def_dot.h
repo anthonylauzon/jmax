@@ -104,11 +104,11 @@
  */
  
 #define DEFINE_FTS_VEC_DOT(name, t_in0, t_in1, t_ptr, op, init)\
- void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, long size)\
+ void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, int size)\
  {FTS_VEC_DOT(t_in0, t_in1, t_ptr, op, init)}
   
 #define DEFINE_FTS_VECX_DOT(name, t_in0, t_in1, t_ptr, op, init)\
- void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, long size)\
+ void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, int size)\
  {FTS_VECX_DOT(t_in0, t_in1, t_ptr, op, init)}
 
 #define DEFINE_FTL_VEC_DOT(name, t_in0, t_in1, t_ptr, op, init)\
@@ -133,10 +133,10 @@
  */
  
 #define DECLARE_FTS_VEC_DOT(name, t_in0, t_in1, t_ptr, op, init)\
- extern void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, long size);
+ extern void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, int size);
  
 #define DECLARE_FTS_VECX_DOT(name, t_in0, t_in1, t_ptr, op, init)\
- extern void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, long size);
+ extern void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_ptr *ptr, int size);
  
 #define DECLARE_FTL_VEC_DOT(name, t_in0, t_in1, t_ptr, op, init)\
  extern void ftl_vec_ ## name(FTL_ARG);

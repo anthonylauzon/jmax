@@ -27,7 +27,7 @@ static void grow_table( int id)
     data_table[i] = 0;
 }
 
-static void init_table()
+static void init_table(void)
 {
   int i;
 

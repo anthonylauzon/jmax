@@ -49,6 +49,7 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/messP.h"
 
 static const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
 

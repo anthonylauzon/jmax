@@ -34,7 +34,7 @@ static void
 split_bound(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   split_t *this = (split_t *)o;
-  float float_bound = (float)fts_get_number_arg(ac, at, 0, 0);
+  float float_bound = fts_get_float_arg(ac, at, 0, 0.0f);
   long int_bound = float_bound;
 
   this->int_bound[winlet-1] = ((float)int_bound == float_bound)? int_bound: int_bound + 1;

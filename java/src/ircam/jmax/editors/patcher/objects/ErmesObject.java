@@ -467,11 +467,6 @@ abstract public class ErmesObject implements ErmesDrawable {
 
   public void moveBy( int theDeltaH, int theDeltaV) 
   {
-    // Added check for negative positions (mdc)
-
-    if ( -theDeltaH > itsRectangle.x || -theDeltaV > itsRectangle.y)
-      return;
-
     if ( theDeltaH == 0 && theDeltaV == 0)
       return;
 

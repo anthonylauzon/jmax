@@ -74,11 +74,11 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 /*  int i, z = 0, b; */
 
 
-  k0 = (float) fts_get_number_arg(ac, at, 1, 0);   
-  k1 = (float) fts_get_number_arg(ac, at, 2, 0);   
-  k2 = (float) fts_get_number_arg(ac, at, 3, 0);   
-  f1 = (float) fts_get_number_arg(ac, at, 4, 0);   
-  f2 = (float) fts_get_number_arg(ac, at, 5, 0);   
+  k0 = fts_get_float_arg(ac, at, 1, 0.0f);   
+  k1 = fts_get_float_arg(ac, at, 2, 0.0f);   
+  k2 = fts_get_float_arg(ac, at, 3, 0.0f);   
+  f1 = fts_get_float_arg(ac, at, 4, 0.0f);   
+  f2 = fts_get_float_arg(ac, at, 5, 0.0f);   
 
   if (f1 == 0.0f && f2 == 0.0f){ /* all gains = 0db */
    f1 = 150.0f;	
@@ -176,7 +176,7 @@ static void
 sigcoef_hlshelf1_in0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(f - this->s_gain1 > MAX_GAIN)
     f = this->s_gain1 + MAX_GAIN; 
@@ -189,19 +189,19 @@ static void
 sigcoef_hlshelf1_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(f > MAX_GAIN)
     f = MAX_GAIN;
 
-  this->s_gain1 = fts_get_number_arg(ac, at, 0, 0.0f);
+  this->s_gain1 = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 static void
 sigcoef_hlshelf1_in2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(f - this->s_gain1 > MAX_GAIN)
     f = this->s_gain1 + MAX_GAIN; 
@@ -213,7 +213,7 @@ static void
 sigcoef_hlshelf1_in3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
-  float n = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  float n = fts_get_float_arg(ac, at, 0, 0.0f);
 
   /* constrain: 0 <= this->s_ltransfq < this->s_htransfq. */
   this->s_ltransfq = (n < this->s_htransfq) ? n : this->s_htransfq - 0.5f;
@@ -225,7 +225,7 @@ static void
 sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
-  float n = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  float n = fts_get_float_arg(ac, at, 0, 0.0f);
 
   /* constrain: this->s_htransfq. < this->s_ltransfq <=  0.5f * this->s_rate */
   this->s_htransfq = (n > this->s_ltransfq) ? n : this->s_ltransfq + 0.5f;

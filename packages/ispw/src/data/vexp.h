@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/05/13 11:43:03 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:25 $
  *
  * FTS by Miller Puckette
  * x_vexp.h -- an expression evaluator for MAX
@@ -61,10 +61,11 @@
 #define	HI_PRE		((long)(100<<16))	/* infinite precedence */
 #define	PRE_MASK	((long)0xffff0000)	/* precedence level mask */
 
+struct ex_ex;
 
 typedef struct ex_funcs {
   char *f_name;					/* function name */
-  void (*f_func)();				/* the real function performing the function (void, no return!!!) */
+  void (*f_func)(long, struct ex_ex *, struct ex_ex *);				/* the real function performing the function (void, no return!!!) */
   long f_argc;					/* number of arguments */
 } t_ex_func;
 

@@ -116,7 +116,7 @@ static void
 pgmout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmout_t *x = (pgmout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n - 1));
@@ -126,7 +126,7 @@ static void
 pgmout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pgmout_t *x = (pgmout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SPGM + RANGE_CH(n) - 1);
 }
@@ -299,7 +299,7 @@ static void
 bendout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bendout_t *x = (bendout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   n = RANGE_VALUE(n);
 
@@ -312,7 +312,7 @@ static void
 bendout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bendout_t *x = (bendout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SBEND + RANGE_CH(n) - 1);
 }
@@ -485,7 +485,7 @@ static void
 touchout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchout_t *x = (touchout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n));
@@ -495,7 +495,7 @@ static void
 touchout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   touchout_t *x = (touchout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (STCH + RANGE_CH(n) - 1);
 }
@@ -673,7 +673,7 @@ static void
 ctlout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, x->ctlno);
@@ -684,7 +684,7 @@ static void
 ctlout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->ctlno = RANGE_VALUE(n);
 }
@@ -694,7 +694,7 @@ static void
 ctlout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ctlout_t *x = (ctlout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SCTL + RANGE_CH(n) - 1);
 }
@@ -915,7 +915,7 @@ static void
 noteout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, RANGE_VALUE(n));
@@ -926,7 +926,7 @@ static void
 noteout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->vel = RANGE_VALUE(n);
 }
@@ -936,7 +936,7 @@ static void
 noteout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteout_t *x = (noteout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SNOTE + RANGE_CH(n) - 1);
 }
@@ -1123,7 +1123,7 @@ static void
 polyout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
   fts_midi_send(x->port, x->keyno);
@@ -1134,7 +1134,7 @@ static void
 polyout_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->keyno = RANGE_VALUE(n);
 }
@@ -1144,7 +1144,7 @@ static void
 polyout_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   polyout_t *x = (polyout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   x->status = (SPOLY + RANGE_CH(n) - 1);
 }
@@ -1366,7 +1366,7 @@ static void
 midiout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *x = (midiout_t *)o;
-  long int n = fts_get_number_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, n);
 }

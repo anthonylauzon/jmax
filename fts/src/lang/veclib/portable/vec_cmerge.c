@@ -9,7 +9,7 @@
  
 #define FTS_VEC_CMERGE(in0, in1, out) \
 {\
-  long i;\
+  int i;\
   for(i=0; i<size; i++){\
     (out[i+0].re = in0[i+0], out[i+0].im = in1[i+0]);\
   }\
@@ -22,7 +22,7 @@
  *
  */
  
-void fts_vec_cmerge(float *in0, float *in1, complex *out, long size)
+void fts_vec_cmerge(float *in0, float *in1, complex *out, int size)
 {
   FTS_VEC_CMERGE(in0, in1, out)
 }

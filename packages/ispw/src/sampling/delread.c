@@ -48,7 +48,7 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   delread_t *this = (delread_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
-  float time = (unit)? (float)fts_get_number_arg(ac, at, 3, 0.0f): (float)fts_get_number_arg(ac, at, 2, 0.0f);
+  float time = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
   float conv;
   float sr;
 
@@ -152,7 +152,7 @@ delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   delread_t *this = (delread_t *)o;
   del_buf_t *buf = this->buf;
 
-  this->time = (float)fts_get_number_arg(ac, at, 0, 0.0f);
+  this->time = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(this->buf)
     delread_set_delay(this);

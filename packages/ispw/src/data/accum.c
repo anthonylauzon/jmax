@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:45 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:20 $
  *
  */
 
@@ -71,13 +71,13 @@ faccum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 accum_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = fts_get_number_arg(ac, at, 0, 0);
+  ((accum_t *)o)->s_reg = fts_get_float_arg(ac, at, 0, 0);
 }
 
 static void
 accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = fts_get_number_arg(ac, at, 1, 0);
+  ((accum_t *)o)->s_reg = fts_get_float_arg(ac, at, 1, 0);
 }
 
 static void

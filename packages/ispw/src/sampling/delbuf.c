@@ -70,7 +70,7 @@ delbuf_init(del_buf_t *buf, float sr, long n_tick)
 
   if(!buf) return(0);
   
-  size = (long)fts_unit_convert_to_base(buf->unit, buf->raw_size, &sr);
+  size = (long)fts_unit_convert_to_base(buf->unit, buf->raw_size, (void *) &sr);
   if(size < n_tick) size = n_tick;
   
   /* check if new size matches old size */
@@ -116,8 +116,7 @@ delbuf_init(del_buf_t *buf, float sr, long n_tick)
   return(1);
 }
 
-void
-delbuf_set_size(del_buf_t *buf, float raw_size, fts_symbol_t unit)
+void delbuf_set_size(del_buf_t *buf, float raw_size, fts_symbol_t unit)
 {
   if(raw_size > 0)
     {

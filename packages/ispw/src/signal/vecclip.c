@@ -48,8 +48,8 @@ sigclip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->ftl_data_min = ftl_data_new(float);
   this->ftl_data_max = ftl_data_new(float);
 
-  min = (float) fts_get_number_arg(ac, at, OBJ_ARG_min, 0.0f);
-  max = (float) fts_get_number_arg(ac, at, OBJ_ARG_max, 0.0f);
+  min = fts_get_float_arg(ac, at, OBJ_ARG_min, 0.0f);
+  max = fts_get_float_arg(ac, at, OBJ_ARG_max, 0.0f);
 
   ftl_data_copy(float, this->ftl_data_min, &min);
   ftl_data_copy(float, this->ftl_data_max, &max);

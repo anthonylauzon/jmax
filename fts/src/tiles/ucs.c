@@ -535,13 +535,13 @@ fts_ucs_audio_set_default_out(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
+extern void fts_set_mess_trace(int b);
 
 static fts_status_t
 fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 {
   if ((argc == 1)  && fts_is_int(&argv[0]))
     {
-
       fts_set_mess_trace(fts_get_int(&argv[0]));
     }
 

@@ -9,7 +9,7 @@
  *
  */
 
-DECLARE_VEC_FUN(FUN, (bitnot, long, long, FUN_bitnot))
+DECLARE_VEC_FUN(FUN, (bitnot, int, int, FUN_bitnot))
 
 
 /**********************************************************
@@ -18,12 +18,12 @@ DECLARE_VEC_FUN(FUN, (bitnot, long, long, FUN_bitnot))
  *
  */
 
-DECLARE_VEC_FUN(OP, (bitand, long, long, long, OP_bitand))
-DECLARE_VEC_FUN(OP, (bitor, long, long, long, OP_bitor))
-DECLARE_VEC_FUN(OP, (bitxor, long, long, long, OP_bitxor))
+DECLARE_VEC_FUN(OP, (bitand, int, int, int, OP_bitand))
+DECLARE_VEC_FUN(OP, (bitor, int, int, int, OP_bitor))
+DECLARE_VEC_FUN(OP, (bitxor, int, int, int, OP_bitxor))
 
-DECLARE_VEC_FUN(OP, (bitshl, long, long, long, OP_bitshl))
-DECLARE_VEC_FUN(OP, (bitshr, long, long, long, OP_bitshr))
+DECLARE_VEC_FUN(OP, (bitshl, int, int, int, OP_bitshl))
+DECLARE_VEC_FUN(OP, (bitshr, int, int, int, OP_bitshr))
 
 
 /**********************************************************
@@ -32,9 +32,9 @@ DECLARE_VEC_FUN(OP, (bitshr, long, long, long, OP_bitshr))
  *
  */
 
-DECLARE_VEC_FUN(OPSCL, (scl_bitand, long, long, long, OP_bitand))
-DECLARE_VEC_FUN(OPSCL, (scl_bitor, long, long, long, OP_bitor))
-DECLARE_VEC_FUN(OPSCL, (scl_bitxor, long, long, long, OP_bitxor))
+DECLARE_VEC_FUN(OPSCL, (scl_bitand, int, int, int, OP_bitand))
+DECLARE_VEC_FUN(OPSCL, (scl_bitor, int, int, int, OP_bitor))
+DECLARE_VEC_FUN(OPSCL, (scl_bitxor, int, int, int, OP_bitxor))
 
-DECLARE_VEC_FUN(OPSCL, (scl_bitshl, long, long, long, OP_bitshl))
-DECLARE_VEC_FUN(OPSCL, (scl_bitshr, long, long, long, OP_bitshr))
+DECLARE_VEC_FUN(OPSCL, (scl_bitshl, int, int, int, OP_bitshl))
+DECLARE_VEC_FUN(OPSCL, (scl_bitshr, int, int, int, OP_bitshr))

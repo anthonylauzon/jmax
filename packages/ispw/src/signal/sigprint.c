@@ -72,8 +72,7 @@ sigprint_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   x->n_print = fts_get_long(at);
 }
 
-void
-ftl_sigprint(fts_word_t *argv)
+static void ftl_sigprint(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_ptr(argv);
   sigprint_t *x = (sigprint_t *)fts_word_get_ptr(argv + 1);
@@ -114,7 +113,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(size > x->alloc)
     {
       if(x->buf) 
-	free(x->buf); /* REalloc */
+	fts_free(x->buf); /* REalloc */
       x->buf = (float *)fts_zalloc(sizeof(float) * size);
       x->alloc = size;
     }

@@ -219,7 +219,7 @@ void fts_set_fpe_handler(fts_fpe_handler fh)
 		  _USER_HANDLER,  fts_sgi_fpe_handler);
 }
 
-void fts_reset_fpe_handler()
+void fts_reset_fpe_handler(void)
 {
   handle_sigfpes(_OFF, 0, 0, _USER_HANDLER, 0);
 }

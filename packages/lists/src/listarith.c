@@ -24,7 +24,7 @@ typedef struct
  *
  */
 
-void
+static void
 atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -58,7 +58,7 @@ atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
     }
 }
 
-void
+static void
 atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -92,7 +92,7 @@ atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
     }
 }
 
-void
+static void
 atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))
@@ -126,7 +126,7 @@ atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
     }
 }
 
-void
+static void
 atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_a(left, fts_s_int))

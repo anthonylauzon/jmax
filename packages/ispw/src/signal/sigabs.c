@@ -14,8 +14,7 @@ typedef struct
 
 static fts_symbol_t sigabs_function = 0;
 
-void
-ftl_sigabs(fts_word_t *argv)
+static void ftl_sigabs(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_ptr(argv + 0);
   float *out = (float *)fts_word_get_ptr(argv + 1);

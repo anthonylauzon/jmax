@@ -2,6 +2,8 @@
 #include "lang/mess.h"
 #include "lang/utils.h"
 
+#include "lang/mess/messP.h"
+
 /*
  * Basic naming services; for now, just provide global names,
  * Only for compatibility with the ISPW Object set; don't use for new objects.
@@ -73,8 +75,7 @@ void fts_named_object_send(fts_symbol_t name, fts_symbol_t s, int argc, const ft
     }
 }
 
-void
-fts_mess_naming_init(void)
+void fts_mess_naming_init(void)
 {
   fts_hash_table_init(&global_name_table);
 }

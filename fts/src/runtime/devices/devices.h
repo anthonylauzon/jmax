@@ -304,7 +304,7 @@ extern void fts_declare_logical_dev(fts_symbol_t name,
 				    fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at),
 				    fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at),
 				    fts_status_t (* unset_fun)(int ac, const fts_atom_t *at),
-				    fts_status_t (* reset_fun)());
+				    fts_status_t (* reset_fun)(void));
 
 /* Low level C access to logical devices; callers should take care of 
  closing and unsetting previous devices */

@@ -35,7 +35,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   coefs = (float *)ftl_data_get_ptr(this->coefs);
   for(i=0; i<n_order; i++)
-    coefs[i] = fts_get_number_arg(ac, at, i + 1, 0.0f);
+    coefs[i] = fts_get_float_arg(ac, at, i + 1, 0.0f);
   
   dsp_list_insert(o);
  
@@ -103,7 +103,7 @@ iir_set_coef(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *a
   iir_t *this = (iir_t *)o;
   float *coefs = (float *)ftl_data_get_ptr(this->coefs);
 
-  coefs[i-1] = fts_get_number_arg(ac, at, 0, 0.0f);
+  coefs[i-1] = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 /****************************************

@@ -54,7 +54,7 @@ static void ftl_cheese(fts_word_t *argv)
   int i;
 
   for (i = 0; i < vs; i++)
-    if (isnan(in[i]))
+    if (isnanf(in[i]))
       if (this->n_print > 0)
 	{
 	  this->n_print--;

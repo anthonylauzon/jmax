@@ -11,13 +11,14 @@
 
 #include "sys.h"
 
+
 /*****************************************************************************/
 /*                                                                           */
 /*               Hardware configuration functions                            */
 /*                                                                           */
 /*****************************************************************************/
 
-static fts_welcome_t  gnu_welcome = {"GNU generic version\n"};
+static fts_welcome_t gnu_welcome = {"GNU generic version\n"};
 static int running_real_time = 1;
 struct timespec pause_time = { 0, 10000};
 
@@ -66,7 +67,7 @@ void fts_set_fpe_handler(fts_fpe_handler fh)
 {
 }
 
-void fts_reset_fpe_handler()
+void fts_reset_fpe_handler(void)
 {
 }
 

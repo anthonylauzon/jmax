@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/08/26 16:31:40 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1999/01/19 16:58:11 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -75,21 +75,23 @@ extern int fts_mess_get_run_time_check(void);
 
 /* argument macros and functions */
 
-#define fts_get_long_arg(AC, AT, N, DEF)   ((N) < (AC) ? fts_get_long(&(AT)[N]) : (DEF))
-#define fts_get_int_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_int(&(AT)[N]) : (DEF))
-#define fts_get_float_arg(AC, AT, N, DEF)  ((N) < (AC) ? fts_get_float(&(AT)[N]) : (DEF))
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
 #define fts_get_ptr_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_ptr(&(AT)[N]) : (DEF))
 
-#define fts_get_number_arg(AC, AT, N, DEF) \
-((N) < (AC) ? (fts_is_long(&(AT)[N]) ? fts_get_long(&(AT)[N]) : \
-	       (fts_is_float(&(AT)[N]) ? fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
+#define fts_get_int_arg(AC, AT, N, DEF) \
+((N) < (AC) ? (fts_is_int(&(AT)[N]) ? fts_get_int(&(AT)[N]) : \
+	       (fts_is_float(&(AT)[N]) ? (int) fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
+
+#define fts_get_float_arg(AC, AT, N, DEF) \
+((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
+	       (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
 #define fts_get_double_arg(AC, AT, N, DEF) \
 ((N) < (AC) ? (fts_is_long(&(AT)[N]) ? (double) fts_get_long(&(AT)[N]) : \
 	       (fts_is_float(&(AT)[N]) ? (double) fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
+#define fts_get_long_arg(AC, AT, N, DEF)   fts_get_int_arg(AC, AT, N, DEF)
 
 #define fts_get_long_by_name(AC, AR, NAME, DEF)   fts_get_int_by_name(AC, AR, NAME, DEF) 
 extern long fts_get_int_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def);

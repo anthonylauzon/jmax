@@ -35,7 +35,7 @@ void fts_set_fpe_handler(fts_fpe_handler fh)
 }
 
 
-void fts_reset_fpe_handler()
+void fts_reset_fpe_handler(void)
 {
 }
 

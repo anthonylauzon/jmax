@@ -23,7 +23,7 @@ static void
 sustain_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sustain_t *this = (sustain_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
 
   if (this->vel || !this->sust)
     {
@@ -46,7 +46,7 @@ sustain_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sustain_t *this = (sustain_t *)o;
 
-  this->vel = (long) fts_get_number_arg(ac, at, 0, 0);
+  this->vel = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void
@@ -54,7 +54,7 @@ sustain_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sustain_t *this = (sustain_t *)o;
 
-  this->sust = (long) fts_get_number_arg(ac, at, 0, 0);
+  this->sust = fts_get_int_arg(ac, at, 0, 0);
 
   if ((this->sust == 0) && this->sustained_notes)
     {
@@ -81,7 +81,7 @@ sustain_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     sustain_number_2(o, winlet, s, 1, at+2);
 
   if ((ac >= 2) && fts_is_number(&at[1]))
-    this->vel = (long) fts_get_number_arg(ac, at, 1, 0);
+    this->vel = (long) fts_get_int_arg(ac, at, 1, 0);
 
   if ((ac >= 1) && fts_is_number(&at[0]))
     sustain_number(o, winlet, s, 1, at);

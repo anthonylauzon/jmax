@@ -5,6 +5,7 @@
    for the moment; no quoting is interpreted in atoms !!
    */
 
+#include <stdlib.h>
 #include "sys.h"
 #include "lang.h"
 

@@ -34,7 +34,7 @@ stripnote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   stripnote_t *x = (stripnote_t *)o;
 
-  x->n = fts_get_number_arg(ac, at, 0, 0);
+  x->n = fts_get_int_arg(ac, at, 0, 0);
 }
 
 

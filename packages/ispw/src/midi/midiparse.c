@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:18 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:42 $
  *
  * FTS by Miller Puckette
  *
@@ -53,7 +53,7 @@ static void
 midiparse_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiparse_t *this = (midiparse_t *)o;
-  long int byte = fts_get_number_arg(ac, at, 0, 0);
+  long int byte = fts_get_int_arg(ac, at, 0, 0);
   fts_atom_t av[2];
 
   if (byte > 127)

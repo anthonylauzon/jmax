@@ -1,8 +1,7 @@
 #include "fts.h"
 #include "ieeewrap.h"
 
-void
-fts_wavetab_osc_init(fts_wto_t *wto, float* table, int size)
+void fts_wavetab_osc_init(fts_wto_t *wto, float* table, int size)
 {
   wto->table = table;
   wto->size = size;

@@ -18,13 +18,13 @@ DECLARE_VEC_FUN(OP, (fvid, float, float, float, OP_vid))
  
 DECLARE_VEC_FUN(DOT, (fdot, float, float, float, OP_dot, 0))
 
-/* vecarith_long.c */
-DECLARE_VEC_FUN(OP, (iadd, long, long, long, OP_add))
-DECLARE_VEC_FUN(OP, (isub, long, long, long, OP_sub))
-DECLARE_VEC_FUN(OP, (imul, long, long, long, OP_mul))
-DECLARE_VEC_FUN(OP, (idiv, long, long, long, OP_div))
-DECLARE_VEC_FUN(OP, (ibus, long, long, long, OP_bus))
-DECLARE_VEC_FUN(OP, (ivid, long, long, long, OP_vid))
+/* vecarith_int.c */
+DECLARE_VEC_FUN(OP, (iadd, int, int, int, OP_add))
+DECLARE_VEC_FUN(OP, (isub, int, int, int, OP_sub))
+DECLARE_VEC_FUN(OP, (imul, int, int, int, OP_mul))
+DECLARE_VEC_FUN(OP, (idiv, int, int, int, OP_div))
+DECLARE_VEC_FUN(OP, (ibus, int, int, int, OP_bus))
+DECLARE_VEC_FUN(OP, (ivid, int, int, int, OP_vid))
  
 /* vecarith_complex.c */
 DECLARE_VEC_FUN(COP, (cadd, complex, complex, complex, OP_cadd))
@@ -51,13 +51,13 @@ DECLARE_VEC_FUN(OPSCL, (scl_fdiv, float, float, float, OP_div))
 DECLARE_VEC_FUN(OPSCL, (scl_fbus, float, float, float, OP_bus))
 DECLARE_VEC_FUN(OPSCL, (scl_fvid, float, float, float, OP_vid))
  
-/* vecarith_long.c */
-DECLARE_VEC_FUN(OPSCL, (scl_iadd, long, long, long, OP_add))
-DECLARE_VEC_FUN(OPSCL, (scl_isub, long, long, long, OP_sub))
-DECLARE_VEC_FUN(OPSCL, (scl_imul, long, long, long, OP_mul))
-DECLARE_VEC_FUN(OPSCL, (scl_idiv, long, long, long, OP_div))
-DECLARE_VEC_FUN(OPSCL, (scl_ibus, long, long, long, OP_bus))
-DECLARE_VEC_FUN(OPSCL, (scl_ivid, long, long, long, OP_vid))
+/* vecarith_int.c */
+DECLARE_VEC_FUN(OPSCL, (scl_iadd, int, int, int, OP_add))
+DECLARE_VEC_FUN(OPSCL, (scl_isub, int, int, int, OP_sub))
+DECLARE_VEC_FUN(OPSCL, (scl_imul, int, int, int, OP_mul))
+DECLARE_VEC_FUN(OPSCL, (scl_idiv, int, int, int, OP_div))
+DECLARE_VEC_FUN(OPSCL, (scl_ibus, int, int, int, OP_bus))
+DECLARE_VEC_FUN(OPSCL, (scl_ivid, int, int, int, OP_vid))
  
 /* vecarith_complex.c */
 DECLARE_VEC_FUN(OPSCL, (scl_cadd, complex, complex, complex, OP_cadd))

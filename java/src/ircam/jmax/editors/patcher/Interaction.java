@@ -587,7 +587,7 @@ class Interaction  implements MouseMotionListener, MouseListener, KeyListener
   {
     Toolkit.getDefaultToolkit().sync();
 
-    sketch.itsSketchWindow.requestFocus();
+    sketch.requestFocus();
 
     if (cursorState != cursorStateNormal 
 	&& cursorState != cursorStateHResize
@@ -830,6 +830,7 @@ class Interaction  implements MouseMotionListener, MouseListener, KeyListener
 	    aDeltaV = currentMouseY - itsStartMovingPt.y;
 
 	    ErmesSelection.patcherSelection.moveAll( aDeltaH, aDeltaV);
+	    sketch.fixSize();
 	  }
 	else
 	  {
@@ -905,116 +906,27 @@ class Interaction  implements MouseMotionListener, MouseListener, KeyListener
 
   public void keyPressed( KeyEvent e)
   {
-    ErmesSelection selection = ErmesSelection.patcherSelection;
     int aInt = e.getKeyCode();
 
     sketch.cleanAnnotations(); // MDC
 
-    //arrows first:
-    if ( isAnArrow( aInt)) 
-      {
-	if (e.isShiftDown()) 
-	  {
-	    if (e.isControlDown())
-	      {
-		if ( aInt == KeyEvent.VK_LEFT)
-		  selection.resizeAll(-10, 0);
-		else if (aInt == KeyEvent.VK_RIGHT) 
-		  selection.resizeAll(10, 0);
-		else if (aInt == KeyEvent.VK_UP) 
-		  selection.resizeAll(0, -10);
-		else if (aInt == KeyEvent.VK_DOWN) 
-		  selection.resizeAll(0, 10);
-	      }
-	    else
-	      {
-		if (aInt == KeyEvent.VK_LEFT)
-		  selection.moveAll( -10, 0);
-		else if (aInt == KeyEvent.VK_RIGHT)
-		  selection.moveAll( 10, 0);
-		if (aInt == KeyEvent.VK_UP)
-		  selection.moveAll( 0, -10);
-		else if (aInt == KeyEvent.VK_DOWN)
-		  selection.moveAll( 0, 10);
-	      }
-	  }
-	else if (e.isControlDown()) 
-	  {
-	    if (e.isMetaDown())
-	      {
-		if ( aInt == KeyEvent.VK_LEFT)
-		  {
-		    // Do nothing, currently
-		  }
-		else if (aInt == KeyEvent.VK_RIGHT)
-		  {
-		    selection.resizeToMaxWidth();
-		  }
-		else if (aInt == KeyEvent.VK_UP) 
-		  {
-		    // Do nothing, currently
-		  }
-		else if (aInt == KeyEvent.VK_DOWN) 
-		  {
-		    selection.resizeToMaxHeight();
-		  }
-	      }
-	    else
-	      {
-		if ( aInt == KeyEvent.VK_LEFT)
-		  selection.resizeAll(-1, 0);
-		else if (aInt == KeyEvent.VK_RIGHT) 
-		  selection.resizeAll(1, 0);
-		else if (aInt == KeyEvent.VK_UP) 
-		  selection.resizeAll(0, -1);
-		else if (aInt == KeyEvent.VK_DOWN) 
-		  selection.resizeAll(0, 1);
-	      }
-	  }
-	else if ( e.isMetaDown()) 
-	  {
-	    //align
-
-	    if (ErmesSelection.patcherSelection.ownedBy(sketch))
-	      {
-		if (aInt == KeyEvent.VK_LEFT)
-		  ErmesSelection.patcherSelection.alignLeft();
-		else if (aInt == KeyEvent.VK_RIGHT) 
-		  ErmesSelection.patcherSelection.alignRight();
-		else if (aInt == KeyEvent.VK_UP) 
-		  ErmesSelection.patcherSelection.alignTop();
-		else if (aInt == KeyEvent.VK_DOWN) 
-		  ErmesSelection.patcherSelection.alignBottom();
-	      }
-	  }
-	else
-	  {
-	    if (aInt == KeyEvent.VK_LEFT)
-	      selection.moveAll( -1, 0);
-	    else if (aInt == KeyEvent.VK_RIGHT)
-	      selection.moveAll( 1, 0);
-	    if (aInt == KeyEvent.VK_UP)
-	      selection.moveAll( 0, -1);
-	    else if (aInt == KeyEvent.VK_DOWN)
-	      selection.moveAll( 0, 1);
-	  }
-      }
-    else if (e.isControlDown()) 
-      {
-	if (aInt == KeyEvent.VK_Z)
-	  sketch.showErrorDescriptions();
-      }
-    else if ( keyEventClient != null)
+    if ( keyEventClient != null)
       {
 	keyEventClient.keyPressed( e);
       }
-    else if ( ( aInt == KeyEvent.VK_DELETE)
-	      || ( aInt== KeyEvent.VK_BACK_SPACE) )
+    else if ( (aInt == KeyEvent.VK_DELETE) ||
+	      (aInt== KeyEvent.VK_BACK_SPACE) )
       {
-	/* This test should go away ... the state machine should
-	   guarantee empty selection during field editing */
+	/* This code should move to an Action !!
+	   It currently cannot because the keyEventClient
+	   want to pre-empt DELETE ... (should do something;
+	   also, the keyEventClient should disappear, and just be
+	   a keyListener sullo sketch
+	   */
+	   
+	ErmesSelection selection = ErmesSelection.patcherSelection;
 
-	if (ErmesSelection.patcherSelection.ownedBy(sketch))
+	if (selection.ownedBy(sketch))
 	  if (! sketch.getEditField().HasFocus())
 	    selection.deleteAll();
       }

@@ -162,8 +162,7 @@ fts_event(fts_symbol_t s, int ac, const fts_atom_t *at)
     }
 }
 
-void
-fts_events_init(void)
+void fts_events_init(void)
 {
   handler_heap = fts_heap_new(sizeof(fts_event_handler_t));
 }

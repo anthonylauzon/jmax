@@ -49,7 +49,7 @@ static void
 sigexp_init_vec_scl(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   obj_t *obj = (obj_t *)o;
-  float base = fts_get_number_arg(ac, at, OBJ_ARG_base, 0.0f);
+  float base = fts_get_float_arg(ac, at, OBJ_ARG_base, 0.0f);
   
   dsp_list_insert(o);
   
@@ -60,7 +60,7 @@ static void
 siglog_init_vec_scl(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   obj_t *obj = (obj_t *)o;
-  float base = fts_get_number_arg(ac, at, OBJ_ARG_base, 0.0f);
+  float base = fts_get_float_arg(ac, at, OBJ_ARG_base, 0.0f);
   
   dsp_list_insert(o);
   

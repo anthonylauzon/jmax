@@ -53,7 +53,7 @@ extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
 extern fts_object_t *fts_outlet_get_next_inlet(fts_object_t *outlet);
 extern fts_object_t *fts_inlet_get_next_inlet(fts_object_t *inlet);
 
-extern fts_patcher_t *fts_get_root_patcher();
+extern fts_patcher_t *fts_get_root_patcher(void);
 
 #endif
 

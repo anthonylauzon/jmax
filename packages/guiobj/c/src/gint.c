@@ -88,7 +88,7 @@ static void
 gint_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gint_t *this = (gint_t *)o;
-  int nn = fts_get_number_arg(ac, at, 0, 0);
+  int nn = fts_get_int_arg(ac, at, 0, 0);
 
   if (this->n != nn)
     {

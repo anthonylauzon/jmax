@@ -52,8 +52,7 @@ typedef struct
 
 static fts_hash_table_t pbank_data_table;
 
-int
-pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
+static int pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_file_t *f;
   int ret;
@@ -117,8 +116,7 @@ pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
   return(1);
 }
 
-int
-pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
+static int pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *av;
   fts_atom_file_t *f;

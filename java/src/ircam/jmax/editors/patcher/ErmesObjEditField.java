@@ -88,7 +88,7 @@ public class ErmesObjEditField extends JTextArea implements KeyListener, FocusLi
 
   public void focusGained( FocusEvent e) 
   { 
-    System.err.println("focusGained");
+    System.err.println("ErmesObjEditField:focusGained");
 
     if (!focused)
       focused = true;
@@ -96,7 +96,7 @@ public class ErmesObjEditField extends JTextArea implements KeyListener, FocusLi
 
   public void focusLost(FocusEvent e) 
   {
-    System.err.println("focusLost");
+    System.err.println("ErmesObjEditField:focusLost");
   }
 
   public boolean HasFocus() 

@@ -34,8 +34,8 @@
  *      FUN_iabs ... integer absolut value
  *
  *    copy / type conversion:
- *      FUN_round ... round float to long: out = in + 0.5 (casts implicit: float -> long)
- *      FUN_cpy ... cast real type: out = in (casts implicit: long -> float, float -> long)
+ *      FUN_round ... round float to int: out = in + 0.5 (casts implicit: float -> int)
+ *      FUN_cpy ... cast real type: out = in (casts implicit: int -> float, float -> int)
  *      FUN_ccpy ... copies complex
  *
  *      FUN_re ... get real part of complex

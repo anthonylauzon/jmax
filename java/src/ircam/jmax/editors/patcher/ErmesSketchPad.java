@@ -42,6 +42,13 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   }
 
+  private KeyMap keyMap;
+
+  KeyMap getKeyMap()
+  {
+    return keyMap;
+  }
+
   private long lastUpdateGroupStartTime = 0;
   private long updateGroupStartTime = 0;
   private long lastUpdateGroupEndTime = 0;
@@ -178,17 +185,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	int newPosX = fo.getX() + numberOfPaste*incrementalPasteOffsetX;
 	int newPosY = fo.getY() + numberOfPaste*incrementalPasteOffsetY;
 
-	// Added check for negative positions 
-
-	if (newPosX >= 0)
-	  fo.setX( newPosX);
-	else
-	  fo.setX( 0);     
-
-	if (newPosY >= 0)
-	  fo.setY( newPosY);
-	else
-       	  fo.setY( 0);
+	fo.setX( newPosX);
+	fo.setY( newPosY);
 
 	object = ErmesObject.makeErmesObject( this, fo);
 	displayList.addObject( object);
@@ -264,6 +262,12 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     String s;
 
+    // Setting the local variables
+
+    itsSketchWindow = theSketchWindow;
+    itsPatcherData  = thePatcherData;
+    itsPatcher      = thePatcherData.getContainerObject(); // ???
+
     // Get the defaultFontName and Size
 
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
@@ -282,23 +286,18 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     displayList = new DisplayList(this);
     interaction = new Interaction(this, displayList);
+    keyMap = new KeyMap(this);
 
     // Next two temporary (mdc)
 
     RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
     setDoubleBuffered(false);
 
-    setPreferredSize(preferredSize);
     setOpaque(true);
-
-    itsPatcherData = thePatcherData;
-    itsPatcher = thePatcherData.getContainerObject(); // ???
 
     Fts.getServer().addUpdateGroupListener( this);
 
     setLayout( null);
-
-    itsSketchWindow = theSketchWindow;
 
     itsEditField = new ErmesObjEditField( this);
     add( itsEditField);
@@ -312,11 +311,33 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     addKeyListener( interaction);
 
     InitFromFtsContainer( itsPatcherData);
+
+    displayList.getAndFixContainerSize(preferredSize);
+    setPreferredSize(preferredSize);
+
     PrepareInChoice(); 
     PrepareOutChoice();
+
+    requestDefaultFocus(); // ???
   }
 	
 
+  /* To be called to fix the sketchpad size after some changes (move
+     and paste); it also assure the selection is in the scrolled area. */
+
+  public void fixSize()
+  {
+    boolean redraw;
+
+    redraw = displayList.getAndFixContainerSize(preferredSize);
+    setPreferredSize(preferredSize);
+
+    itsSketchWindow.validate();
+
+    if (redraw)
+      redraw();
+  }
+  
   static final private Dimension minSize = new Dimension(30, 20);
 
   public Dimension getMinimumSize() 
@@ -417,7 +438,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     displayList.paint(g);
   }		
 
-  final void redraw()
+  final public void redraw()
   {
     repaint();
   }
@@ -565,31 +586,21 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     itsEditField.deleteSelectedText();
   }
 
-  // Annotations
+  // Annotations; should be done better ..
 
   private boolean annotating = false;
 
-  void setAnnotating()
+  public void setAnnotating()
   {
     annotating = true;
   }
 
-  void showErrorDescriptions()
+  public boolean isAnnotating()
   {
-    if (! annotating)
-      {
-	ErmesObject object;
-
-	setAnnotating();
-
-	if (ErmesSelection.patcherSelection.hasObjects())
-	  ErmesSelection.patcherSelection.showErrorDescriptions();
-	else
-	  displayList.showErrorDescriptions();
-      }
+    return annotating;
   }
 
-  void cleanAnnotations()
+  public void cleanAnnotations()
   {
     if (annotating)
       {

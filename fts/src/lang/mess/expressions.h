@@ -19,6 +19,7 @@ extern int fts_expression_get_count(fts_expression_state_t *e);
 
 typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
 
+void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 
 /* Error codes must be negative numbers */
 

@@ -16,6 +16,6 @@
  t_scl scl = *((t_scl*)fts_word_get_ptr(argv + idx));
 
 #define UNWRAP_SIZE(idx)\
- long size = fts_word_get_long(argv + idx);
+ int size = fts_word_get_int(argv + idx);
 
 #define FTL_ARG fts_word_t *argv

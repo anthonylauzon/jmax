@@ -23,6 +23,10 @@ extern void cfft_bitreversal_outplc(complex *in, complex *out, int *bitrev, int 
 
 extern int *cfft_make_bitreversed_table(int size);
 
+/* declarations Added by MDC */
+
+extern void cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int over, int size);
+extern void cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int over, int size);
 
 #endif
 

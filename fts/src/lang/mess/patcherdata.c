@@ -2,6 +2,7 @@
 #include "lang/mess.h"
 #include "lang/datalib.h"
 #include "runtime.h"
+#include "lang/mess/messP.h"
 
 /* Remote call codes */
 

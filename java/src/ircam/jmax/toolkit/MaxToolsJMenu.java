@@ -35,6 +35,7 @@ public class MaxToolsJMenu extends JMenu implements ListDataListener
   public MaxToolsJMenu(String title)
   {
     super(title);
+    setHorizontalTextPosition(AbstractButton.LEFT);
     
     toolFinders = MaxWindowManager.getWindowManager().getToolFinderList();
     toolFinders.addListDataListener(this);

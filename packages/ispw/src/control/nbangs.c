@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:36 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:10 $
  *
  */
 
@@ -68,7 +68,7 @@ nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   nbangs_t *this = (nbangs_t *) o;
 
-  this->count = fts_get_number_arg(ac, at, 1, 0);
+  this->count = fts_get_int_arg(ac, at, 1, 0);
 }
 
 

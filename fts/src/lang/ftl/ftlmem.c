@@ -28,7 +28,7 @@ static struct ftl_data_handle_page
 
 /* Memory heap static data */
 
-#define FTL_MEM_BLOCK_SIZE 8192
+#define FTL_MEM_BLOCK_SIZE (8192 * 4)
 #define FTL_MEM_TOO_FAR    64
 
 struct ftl_mem_block
@@ -45,7 +45,7 @@ struct ftl_mem_block
 
 static struct ftl_mem_block *ftl_mem_new_block(void);
 static  void ftl_mem_free_block(struct ftl_mem_block *p);
-static void *ftl_mem_allocate(int size, struct ftl_mem_block **hp);
+static void *ftl_mem_allocate(unsigned int size, struct ftl_mem_block **hp);
 static int ftl_mem_ptr_in_heap(void *ptr, struct ftl_mem_block *p);
 
 static int ftl_mem_is_relocating = 0;
@@ -62,7 +62,7 @@ static struct ftl_mem_block *ftl_mem_block_list   = 0;
   */
 
 static struct ftl_data_handle *
-ftl_get_new_handle()
+ftl_get_new_handle(void)
 {
   struct ftl_data_handle_page *p;
   int i;
@@ -84,7 +84,7 @@ ftl_get_new_handle()
 
   /* handle not found: allocate a new*/
 
-  p = fts_malloc(sizeof(struct ftl_data_handle_page));
+  p = (struct ftl_data_handle_page *) fts_malloc(sizeof(struct ftl_data_handle_page));
 
   for (i = 0; i < FTL_HANDLE_PER_PAGE; i++)
     p->handles[i].state = ftl_handle_free;
@@ -419,9 +419,9 @@ ftl_mem_allocate_aligned(int size, struct ftl_mem_block *p)
 
 
 static void *
-ftl_mem_allocate(int size, struct ftl_mem_block **hp)
+ftl_mem_allocate(unsigned int size, struct ftl_mem_block **hp)
 {
-  int new_size;
+  unsigned int new_size;
   struct ftl_mem_block *p = *hp;
 
   if (size > FTL_MEM_BLOCK_SIZE)

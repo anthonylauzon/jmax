@@ -62,7 +62,7 @@
 
 /* Forward declarations */
 
-static void fts_messtile_install_all();
+static void fts_messtile_install_all(void);
 
 static fts_symbol_t fts_s_download;
 static fts_symbol_t fts_s_load_init;
@@ -73,7 +73,7 @@ static fts_symbol_t fts_s_load_init;
 /*                                                                            */
 /******************************************************************************/
 
-static void fts_messtile_init();
+static void fts_messtile_init(void);
 
 /* Init function */
 
@@ -81,7 +81,7 @@ fts_module_t fts_messtile_module = {"MessTile", "The interpreter of the client c
 				    fts_messtile_init, 0};
 
 static void
-fts_messtile_init()
+fts_messtile_init(void)
 {
   fts_messtile_install_all();
 
@@ -871,7 +871,7 @@ fts_mess_client_shutdown(int ac, const fts_atom_t *av)
 
 
 static void
-fts_messtile_install_all()
+fts_messtile_install_all(void)
 {
   fts_client_mess_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
 

@@ -363,7 +363,7 @@ static void fts_binding_add_wannabe(fts_binding_t *var, fts_object_t *object)
 }
 
 
-void fts_binding_remove_wannabe(fts_binding_t *var, fts_object_t *object)
+static void fts_binding_remove_wannabe(fts_binding_t *var, fts_object_t *object)
 {
   fts_object_list_t   **w;	/* indirect precursor */
 

@@ -27,10 +27,9 @@
 
 /* forward declarations */
 
-static void prof_dac_init();
+static void prof_dac_init(void);
 
-void
-profdev_init(void)
+void profdev_init(void)
 {
   prof_dac_init();
 }
@@ -87,8 +86,7 @@ static struct
 
 /* Init functions */
 
-void
-prof_dac_init(void)
+static void prof_dac_init(void)
 {
   fts_status_t ret;
   fts_dev_class_t *prof_dac_class;
@@ -239,6 +237,7 @@ prof_dac_put(fts_word_t *argv)
 static fts_status_t 
 prof_dac_activate(fts_dev_t *dev)
 {
+  post("prof_dac Activated\n");	/* @@@ */
   prof_dac_data.active = 1;
   
   return fts_Success;
@@ -248,6 +247,8 @@ prof_dac_activate(fts_dev_t *dev)
 static fts_status_t 
 prof_dac_deactivate(fts_dev_t *dev)
 {
+  post("prof_dac Deactivated\n");	/* @@@ */
+
   prof_dac_data.active = 0;
   prof_dac_data.one_done = 0;
 

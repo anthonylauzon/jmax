@@ -12,6 +12,7 @@
 #define TAB_K3       (1.0f / (TAB_NPOINTS * TAB_FRAC))
 #define TAB_K4       (31 - TAB_BITS-TAB_FRACBITS)
 
+
 typedef struct
 {
   float value;
@@ -504,6 +505,8 @@ ftl_osc_phase_64_inplace(fts_word_t *argv)
 }
 
 
+
+
 static void
 ftl_osc_freq(fts_word_t *argv)
 {
@@ -512,7 +515,7 @@ ftl_osc_freq(fts_word_t *argv)
   osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
   long int n = fts_word_get_long(argv + 3);
   int     ophase;
-  float   fconv;
+  double  fconv;
   wavetab_samp_t *tab;
   int i;
 
@@ -520,44 +523,18 @@ ftl_osc_freq(fts_word_t *argv)
   fconv = this->fconv * 0x7fffffffL;
   tab = this->samps;
 
-  for (i = 0; i < n; i+=4)
+  for (i = 0; i < n; i++)
     {
       int idx;
       long k;
-      float o0, o1, o2, o3;
-      int d0, d1, d2, d3;
+      int d;
 
-      d0 = (int)(fconv * freq[i + 0]);
-      d1 = (int)(fconv * freq[i + 1]);
-      d2 = (int)(fconv * freq[i + 2]);
-      d3 = (int)(fconv * freq[i + 3]);
-
+      d = (int)(fconv * freq[i]);
 
       k = ophase >> TAB_K4;
       idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
-      ophase = (ophase + d0) & 0x7fffffffL;
-
-
-      k = ophase >> TAB_K4;
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d1) & 0x7fffffffL;
-
-      k = ophase >> TAB_K4;
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d2) & 0x7fffffffL;
-
-      k = ophase >> TAB_K4;
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d3) & 0x7fffffffL;
-
-      out[i + 0] = o0;
-      out[i + 1] = o1;
-      out[i + 2] = o2;
-      out[i + 3] = o3;
+      out[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
+      ophase = (ophase + d) & 0x7fffffffL;
     }
 
   this->phase = ophase;
@@ -573,7 +550,7 @@ ftl_osc(fts_word_t *argv)
   osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 3);
   long int n = fts_word_get_long(argv + 4);
   int     ophase;
-  float   fconv;
+  double   fconv;
   wavetab_samp_t *tab;
   int i;
 
@@ -581,52 +558,21 @@ ftl_osc(fts_word_t *argv)
   fconv = this->fconv * 0x7fffffffL;
   tab = this->samps;
 
-  for (i = 0; i < n; i+=4)
+  for (i = 0; i < n; i++)
     {
       int idx;
       long k;
-      float o0, o1, o2, o3;
-      float ph0, ph1, ph2, ph3;
-      int d0, d1, d2, d3;
+      float ph;
+      int d;
 
-      d0 = (int)(fconv * freq[i + 0]);
-      d1 = (int)(fconv * freq[i + 1]);
-      d2 = (int)(fconv * freq[i + 2]);
-      d3 = (int)(fconv * freq[i + 3]);
+      d = (int)(fconv * freq[i]);
 
-      ph0 = phase[i + 0] * TAB_K1;
-      ph1 = phase[i + 1] * TAB_K1;
-      ph2 = phase[i + 2] * TAB_K1;
-      ph3 = phase[i + 3] * TAB_K1;
+      ph = phase[i] * TAB_K1;
 
-
-      k = (long)(ph0 + (ophase >> TAB_K4));
+      k = (long)(ph + (ophase >> TAB_K4));
       idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
-      ophase = (ophase + d0) & 0x7fffffffL;
-
-
-      k = (long)(ph1 + (ophase >> TAB_K4));
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d1) & 0x7fffffffL;
-
-
-      k = (long)(ph2 + (ophase >> TAB_K4));
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d2) & 0x7fffffffL;
-
-
-      k = (long)(ph3 + (ophase >> TAB_K4));
-      idx = ((k & TAB_K2) >> TAB_FRACBITS);
-      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
-      ophase = (ophase + d3) & 0x7fffffffL;
-
-      out[i + 0] = o0;
-      out[i + 1] = o1;
-      out[i + 2] = o2;
-      out[i + 3] = o3;
+      out[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
+      ophase = (ophase + d) & 0x7fffffffL;
     }
 
   this->phase = ophase;
@@ -645,7 +591,7 @@ osc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   osc_t *this = (osc_t *)o;
   double phase;
   
-  phase = 0x7fffffffL * ((float) fts_get_number_arg(ac, at, 0, 0));
+  phase = 0x7fffffffL * fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(osc_control_t, this->osc_ftl_data, phase, &phase);
 }
 

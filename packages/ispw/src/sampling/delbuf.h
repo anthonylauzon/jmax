@@ -31,6 +31,9 @@ extern void delbuf_clear_is_init_flag(del_buf_t *buf);
 extern void delbuf_delete_delayline(del_buf_t *buf); /* free delayline */
 extern void delbuf_clear_delayline(del_buf_t *buf); /* clear delayline (fill with 0.0) */
 
+
+extern void delbuf_set_size(del_buf_t *buf, float raw_size, fts_symbol_t unit);
+
 #define delbuf_get_tick_size(buf) ((buf)->n_tick)
 #define delbuf_get_size_in_samples(buf) ((buf)->size)
 

@@ -103,11 +103,11 @@
  */
  
 #define DEFINE_FTS_VEC_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
- void fts_vec_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, long size)\
+ void fts_vec_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, int size)\
  {FTS_VEC_TWOSCL(t_in, t_scl0, t_scl1, t_out, op)}
   
 #define DEFINE_FTS_VECX_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
- void fts_vecx_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, long size)\
+ void fts_vecx_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, int size)\
  {FTS_VECX_TWOSCL(t_in, t_scl0, t_scl1, t_out, op)}
 
 #define DEFINE_FTL_VEC_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
@@ -132,10 +132,10 @@
  */
  
 #define DECLARE_FTS_VEC_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
- extern void fts_vec_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, long size);
+ extern void fts_vec_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, int size);
  
 #define DECLARE_FTS_VECX_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
- extern void fts_vecx_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, long size);
+ extern void fts_vecx_ ## name(t_in *in, t_scl0 scl0, t_scl1 scl1, t_out *out, int size);
  
 #define DECLARE_FTL_VEC_TWOSCL(name, t_in, t_scl0, t_scl1, t_out, op)\
  extern void ftl_vec_ ## name(FTL_ARG);

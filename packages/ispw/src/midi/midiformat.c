@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:18 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:42 $
  *
  *
  */
@@ -144,7 +144,7 @@ midiformat_prog_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   midiformat_t *this = (midiformat_t *)o;
 
   fts_outlet_int((fts_object_t *)this, 0, this->prog);
-  fts_outlet_int((fts_object_t *)this, 0, (long) fts_get_number_arg(ac, at, 0, 0));
+  fts_outlet_int((fts_object_t *)this, 0, fts_get_int_arg(ac, at, 0, 0));
 }
 
 
@@ -156,7 +156,7 @@ midiformat_after_touch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   midiformat_t *this = (midiformat_t *)o;
 
   fts_outlet_int((fts_object_t *)this, 0, this->touch);
-  fts_outlet_int((fts_object_t *)this, 0, (long) fts_get_number_arg(ac, at, 0, 0));
+  fts_outlet_int((fts_object_t *)this, 0, fts_get_int_arg(ac, at, 0, 0));
 }
 
 /* bend:  method midiformat_bend, inlet 5, long message */
@@ -165,7 +165,7 @@ static void
 midiformat_bend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiformat_t *this = (midiformat_t *)o;
-  long int v1 = fts_get_number_arg(ac, at, 0, 0);
+  long int v1 = fts_get_int_arg(ac, at, 0, 0);
 
   fts_outlet_int((fts_object_t *)this, 0, this->bend);
   fts_outlet_int((fts_object_t *)this, 0, (v1 > 65) ? (long)(2 * (v1 - 64)) : 0L);
@@ -178,7 +178,7 @@ static void
 midiformat_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiformat_t *this = (midiformat_t *)o;
-  long int v = fts_get_number_arg(ac, at, 0, 0);
+  long int v = fts_get_int_arg(ac, at, 0, 0);
 
   v = ((v-1) & 0xFL);
   this->noteon = (this->noteon & 0xF0L) + v;
@@ -195,7 +195,7 @@ static void
 midiformat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiformat_t *this = (midiformat_t *)o;
-  long int channel = fts_get_number_arg(ac, at, 1, 0);
+  long int channel = fts_get_int_arg(ac, at, 1, 0);
   
   channel = (channel == 0) ? 1 : channel;
 

@@ -9,7 +9,7 @@
 
 #define FTS_VEC_CSPLIT(in, out0, out1) \
 {\
-  long i;\
+  int i;\
   for(i=0; i<size; i++){\
     out0[i] = in[i].re;\
     out1[i] = in[i].im;\
@@ -22,7 +22,7 @@
  *
  */
  
-void fts_vec_csplit(complex *in, float *out0, float *out1, long size)
+void fts_vec_csplit(complex *in, float *out0, float *out1, int size)
 {
   FTS_VEC_CSPLIT(in, out0, out1)
 }

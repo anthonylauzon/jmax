@@ -13,6 +13,7 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/clipboard.h"
 
 typedef struct 
 {

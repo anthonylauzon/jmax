@@ -35,9 +35,6 @@
 #include "runtime/devices/unixdev.h"
 #include "runtime/files.h"
 
-/* Check this is right */
-
-#define AUDIO_DEVICE "/dev/dsp"
 
 /* forward declarations */
 
@@ -58,6 +55,8 @@ static void oss_midi_init(void);
 
 static struct oss_audio_data_struct
 {
+  const char *device_name;
+
   /* status */
 
   int device_opened;
@@ -81,7 +80,7 @@ static struct oss_audio_data_struct
 } oss_audio_data;
 
 
-static void oss_audio_set_parameters()
+static void oss_audio_set_parameters(void)
 {
   int format, stereo, sr, fragparam, fragment_size, i;
 
@@ -150,7 +149,7 @@ static void oss_audio_set_parameters()
   */
 
 
-static int oss_audiodev_update_device()
+static int oss_audiodev_update_device(void)
 {
   int fd;
 
@@ -162,15 +161,15 @@ static int oss_audiodev_update_device()
 
   if (oss_audio_data.dac_opened && oss_audio_data.adc_opened)
     {
-      fd = open(AUDIO_DEVICE, O_RDWR, 0);
+      fd = open(oss_audio_data.device_name, O_RDWR, 0);
     }
   else if (oss_audio_data.dac_opened)
     {
-      fd = open(AUDIO_DEVICE, O_WRONLY, 0);
+      fd = open(oss_audio_data.device_name, O_WRONLY, 0);
     }
   else if (oss_audio_data.adc_opened)
     {
-      fd = open(AUDIO_DEVICE, O_RDONLY, 0);
+      fd = open(oss_audio_data.device_name, O_RDONLY, 0);
     }
 
   if ( fd >= 0 )
@@ -260,14 +259,19 @@ static void oss_dac_init(void)
 static fts_status_t
 oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
+  fts_symbol_t s;
+
   if (oss_audio_data.dac_opened)
     return &fts_dev_open_error; /*Error: a device was already opened for the ch */
 
   /* Parameter parsing  */
   
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.);
+  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);
   oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
   oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
+
+  s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("device"), fts_new_symbol("/dev/audio"));
+  oss_audio_data.device_name = fts_symbol_name(s);
 
   /* open the device */
 
@@ -382,7 +386,7 @@ oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  */
 
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100);  
+  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);  
   oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
   oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
 

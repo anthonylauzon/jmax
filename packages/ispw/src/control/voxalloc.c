@@ -108,7 +108,7 @@ voxalloc_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   voxalloc_t *this = (voxalloc_t *) o;
 
-  this->dur = (float) fts_get_number_arg(ac, at, 0, 0);
+  this->dur = (float) fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 static void
@@ -128,7 +128,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if (i_dur == -1)
     dur = this->dur;
   else{
-    dur = fts_get_number_arg(ac, at, i_dur, this->last_dur);
+    dur = fts_get_float_arg(ac, at, i_dur, this->last_dur);
     this->last_dur = dur;
   }
 	

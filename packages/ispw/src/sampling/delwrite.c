@@ -29,9 +29,9 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
   float size;
   if(unit)
-    size = (float)fts_get_number_arg(ac, at, 3, 0.0f);
+    size = fts_get_float_arg(ac, at, 3, 0.0f);
   else{
-    size = (float)fts_get_number_arg(ac, at, 2, 0.0f);
+    size = fts_get_float_arg(ac, at, 2, 0.0f);
     unit = fts_s_msec; /* default */
   }
 
@@ -124,7 +124,7 @@ static void
 delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delwrite_t *this = (delwrite_t *)o;
-  float size  = (float)fts_get_number_arg(ac, at, 1, 0.0f);
+  float size  = fts_get_float_arg(ac, at, 1, 0.0f);
 
   if(!this->name) return;
 

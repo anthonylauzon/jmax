@@ -12,7 +12,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
 
-class FindPanel extends JFrame {
+public class FindPanel extends JFrame {
 
   static void registerFindPanel()
   {

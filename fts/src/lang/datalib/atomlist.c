@@ -1,7 +1,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/datalib.h"
-
+#include "runtime.h"		/* @@@ */
 /* Heaps */
 
 static fts_heap_t *atom_list_cell_heap;

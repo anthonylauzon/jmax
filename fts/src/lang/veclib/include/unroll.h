@@ -78,7 +78,7 @@
  *
  */
 
-#define NO_UNROLL_LOOP(body) {long i; for(i=0; i<size; i++){body}}
+#define NO_UNROLL_LOOP(body) {int i; for(i=0; i<size; i++){body}}
 #define NO_UNROLL_REGS(t_reg, reg) t_reg reg ## _0;
 #define NO_UNROLL_IN(in) in ## _0 = in ## _0 = in[i];
 #define NO_UNROLL_CIN(in) (in ## _0.re = in[i].re, in ## _0.im = in[i].im);
@@ -98,9 +98,9 @@
  */
 #if VECLIB_LOOP_UNROLL == 4
 
-#define UNROLL_LOOP(body) {long i; for(i=0; i<size; i+=4){body}}
-#define UNROLL_LOOP_H(body) {long i; for(i=0; i<size; i+=2){body}}
-#define UNROLL_LOOP_Q(body) {long i; for(i=0; i<size; i++){body}}
+#define UNROLL_LOOP(body) {int i; for(i=0; i<size; i+=4){body}}
+#define UNROLL_LOOP_H(body) {int i; for(i=0; i<size; i+=2){body}}
+#define UNROLL_LOOP_Q(body) {int i; for(i=0; i<size; i++){body}}
 
 #define UNROLL_REGS(t_reg, reg) t_reg reg ## _0, reg ## _1, reg ## _2, reg ## _3;
 #define UNROLL_REGS_H(t_reg, reg) t_reg reg ## _0, reg ## _1;
@@ -201,9 +201,9 @@
  */
 #elif VECLIB_LOOP_UNROLL == 8
 
-#define UNROLL_LOOP(body) {long i; for(i=0; i<size; i+=8){body}}
-#define UNROLL_LOOP_H(body) {long i; for(i=0; i<size; i+=4){body}}
-#define UNROLL_LOOP_Q(body) {long i; for(i=0; i<size; i+=2){body}}
+#define UNROLL_LOOP(body) {int i; for(i=0; i<size; i+=8){body}}
+#define UNROLL_LOOP_H(body) {int i; for(i=0; i<size; i+=4){body}}
+#define UNROLL_LOOP_Q(body) {int i; for(i=0; i<size; i+=2){body}}
 
 #define UNROLL_REGS(t_reg, reg)\
  t_reg reg ## _0, reg ## _1, reg ## _2, reg ## _3, reg ## _4, reg ## _5, reg ## _6, reg ## _7;
@@ -361,9 +361,9 @@
  */
 #elif VECLIB_LOOP_UNROLL == 16
 
-#define UNROLL_LOOP(body) {long i; for(i=0; i<size; i+=16){body}}
-#define UNROLL_LOOP_H(body) {long i; for(i=0; i<size; i+=8){body}}
-#define UNROLL_LOOP_Q(body) {long i; for(i=0; i<size; i+=4){body}}
+#define UNROLL_LOOP(body) {int i; for(i=0; i<size; i+=16){body}}
+#define UNROLL_LOOP_H(body) {int i; for(i=0; i<size; i+=8){body}}
+#define UNROLL_LOOP_Q(body) {int i; for(i=0; i<size; i+=4){body}}
 
 #define UNROLL_REGS(t_reg, reg)\
  t_reg reg ## _0, reg ## _1, reg ## _2, reg ## _3, reg ## _4, reg ## _5, reg ## _6, reg ## _7,\

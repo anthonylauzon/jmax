@@ -91,7 +91,7 @@ static void
 slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int nn = fts_get_number_arg(ac, at, 0, 0);
+  int nn = fts_get_int_arg(ac, at, 0, 0);
 
   if (this->n != nn)
     {

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/08/25 12:52:51 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:22 $
  *
  * Maintain a symbol table and define a message-passing system
  */
@@ -114,7 +114,7 @@ float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   float_t *this = (float_t *) o;
 
-  this->f = fts_get_number_arg(ac, at, 1, 0.0f);
+  this->f = fts_get_float_arg(ac, at, 1, 0.0f);
 }
 
 /* ------------------------- the bang method ----------------------------- */
@@ -140,7 +140,7 @@ float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   float_t *this = (float_t *) o;
 
-  this->f = (float) fts_get_number_arg(ac, at, 0, 0);
+  this->f = fts_get_float_arg(ac, at, 0, 0.0f);
   fts_outlet_float(o, 0, this->f);
 }
 
@@ -151,7 +151,7 @@ float_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_a
 {
   float_t *this = (float_t *) o;
 
-  this->f = (float) fts_get_number_arg(ac, at, 0, 0);
+  this->f = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 

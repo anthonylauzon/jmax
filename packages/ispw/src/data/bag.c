@@ -21,7 +21,7 @@ static void
 bag_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bag_t *x = (bag_t *)o;
-  long n   = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n   = (long) fts_get_int_arg(ac, at, 0, 0);
   struct blink *b;
 
   if (x->in)
@@ -98,7 +98,7 @@ bag_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   bag_t *x = (bag_t *)o;
 
-  x->in = (long) fts_get_number_arg(ac, at, 0, 0);
+  x->in = fts_get_int_arg(ac, at, 0, 0);
 }
 
 /* list method */

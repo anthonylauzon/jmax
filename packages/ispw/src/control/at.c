@@ -19,8 +19,7 @@ typedef struct
 } at_t;
 
 
-void
-at_tick(fts_alarm_t *alarm, void *o)
+static void at_tick(fts_alarm_t *alarm, void *o)
 {
   /* Do not unarm the alarm; keep it good if time go
      backward (can happen, everything can happen in FTS :->) */
@@ -127,8 +126,7 @@ at_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 
-void
-at_config(void)
+void at_config(void)
 {
   fts_metaclass_create(fts_new_symbol("at"),at_instantiate, fts_always_equiv);
 }

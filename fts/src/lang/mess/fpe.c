@@ -29,7 +29,7 @@ static void fpe_handler(int which)
     }
 }
 
-void fts_fpe_empty_collection()
+void fts_fpe_empty_collection(void)
 {
   if (fpe_objects)
     fts_object_set_remove_all(fpe_objects);
@@ -47,7 +47,7 @@ void fts_fpe_start_collect(fts_object_set_t *set)
 
 
 
-void fts_fpe_stop_collect()
+void fts_fpe_stop_collect(void)
 {
   fts_reset_fpe_handler();
   fpe_objects = 0;

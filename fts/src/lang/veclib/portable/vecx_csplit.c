@@ -62,7 +62,7 @@
  *
  */
  
-void fts_vecx_csplit(complex *in, float *out0, float *out1, long size)
+void fts_vecx_csplit(complex *in, float *out0, float *out1, int size)
 {
   FTS_VECX_CSPLIT(in, out0, out1)
 }

@@ -76,7 +76,7 @@ static void
 line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double target = (long) fts_get_number_arg(ac, at, 0, 0);
+  double target = (double) fts_get_int_arg(ac, at, 0, 0);
 
   /* if some dweezul has talked to middle inlet, do fixfix */
 
@@ -115,7 +115,7 @@ static void
 line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double target = (double) fts_get_number_arg(ac, at, 0, 0);
+  double target = (double) fts_get_float_arg(ac, at, 0, 0.0f);
 
   /* if some dweezul has talked to middle inlet, do fixfix */
 
@@ -156,7 +156,7 @@ static void
 line_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double target = (long)fts_get_number_arg(ac, at, 0, 0);
+  double target = (double)fts_get_int_arg(ac, at, 0, 0);
 
   this->target = target;
   this->steps = 0;
@@ -168,7 +168,7 @@ static void
 line_float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double target = (double)fts_get_number_arg(ac, at, 0, 0);
+  double target = (double)fts_get_float_arg(ac, at, 0, 0.0f);
 
   this->target = target;
   this->steps = 0;
@@ -196,7 +196,7 @@ static void
 line_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   if (n < 0)
     this->inval = 0;
@@ -244,12 +244,12 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 1 && fts_is_symbol(at + 1))
     {
       clock = fts_get_symbol(at + 1);
-      target = fts_get_number_arg(ac, at, 2, 0);
+      target = (double) fts_get_float_arg(ac, at, 2, 0.0f);
       grain = fts_get_double_arg(ac, at, 3, 0);
     }
   else
     {
-      target = fts_get_number_arg(ac, at, 1, 0);
+      target = (double) fts_get_float_arg(ac, at, 1, 0.0f);
       grain =  fts_get_double_arg(ac, at, 2, 0);    
     }
 

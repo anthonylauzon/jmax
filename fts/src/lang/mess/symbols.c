@@ -7,6 +7,7 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/messP.h"
 
 
 /* Predefined ATOM TYPE symbols */
@@ -292,8 +293,7 @@ static struct _symbol_table
 } symbol_table;
 
 
-void
-fts_symbols_init(void)
+void fts_symbols_init(void)
 {
   int i;
 

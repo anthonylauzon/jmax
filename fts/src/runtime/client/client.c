@@ -39,6 +39,9 @@ fts_dev_t *client_dev = 0;
 /*                                                                            */
 /******************************************************************************/
 
+extern void fts_client_updates_init(void);
+extern void fts_client_sync_init(void);
+
 static void client_init(void);
 static void client_restart(void);
 static void client_shutdown(void);
@@ -47,7 +50,7 @@ static void client_poll(void);
 
 static fts_status_t fts_set_client_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_status_t fts_unset_client_logical_dev(int ac, const fts_atom_t *at);
-static fts_status_t fts_reset_client_logical_dev();
+static fts_status_t fts_reset_client_logical_dev(void);
 static fts_dev_t   *fts_get_client_logical_dev(int ac, const fts_atom_t *at);
 
 fts_module_t fts_client_module = {"Client", "Client communication", client_init, client_restart, client_shutdown, 0};
@@ -115,7 +118,7 @@ fts_unset_client_logical_dev(int ac, const fts_atom_t *at)
 }
 
 static fts_status_t
-fts_reset_client_logical_dev()
+fts_reset_client_logical_dev(void)
 {
   /* No reset action for the client (otherwise, bye bye FTS) */
 

@@ -124,10 +124,9 @@ fts_status_description_t fts_data_not_ready =
 /*                                                                            */
 /******************************************************************************/
 
+extern void fts_dev_configure(void);
 static void fts_dev_init(void);
 static void fts_dev_shutdown(void);
-
-
 
 static fts_dev_class_t *dev_class_list = 0;
 static fts_dev_t *open_dev_list = 0;
@@ -370,6 +369,7 @@ fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args)
 
   dev_class = fts_dev_class_get_by_name(class_name);
 
+
   if (dev_class)
     {
       fts_dev_t *dev;
@@ -389,7 +389,13 @@ fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args)
 	  return dev;
 	}
       else
-	return (fts_dev_t *)0;
+	{
+	  post("Error Opening Device");
+	  post_atoms(nargs, args);
+	  post(": %s\n", ret->description);
+
+	  return (fts_dev_t *)0;
+	}
     }
   else
     return (fts_dev_t *)0;
@@ -448,7 +454,7 @@ struct fts_logical_dev_declaration
   fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at);
   fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at);
   fts_status_t (* unset_fun)(int ac, const fts_atom_t *at);
-  fts_status_t (* reset_fun)();
+  fts_status_t (* reset_fun)(void);
 
   struct fts_logical_dev_declaration *next;
 };
@@ -463,7 +469,7 @@ fts_declare_logical_dev(fts_symbol_t name,
 			fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at),
 			fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at),
 			fts_status_t (* unset_fun)(int ac, const fts_atom_t *at),
-			fts_status_t (* reset_fun)()
+			fts_status_t (* reset_fun)(void)
 			)
 {
   struct fts_logical_dev_declaration *ld;

@@ -71,7 +71,7 @@ toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   toggle_t *this = (toggle_t *) o;
   int v;
 
-  v = fts_get_number_arg(ac, at, 0, 0);
+  v = fts_get_int_arg(ac, at, 0, 0);
 
   this->n = (v ? 1 : 0);
 

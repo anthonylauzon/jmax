@@ -282,8 +282,8 @@ static void
 pitch_vibrato(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long n = fts_get_number_arg(ac, at, 0, 0);
-  float f = fts_get_number_arg(ac, at, 1, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
+  float f = fts_get_float_arg(ac, at, 1, 0);
   
   x->ctl.vib_time = (n >= 0)? n: 0;
   x->ctl.vib_depth = (f >= 0)? f: 0;
@@ -296,7 +296,7 @@ static void
 pitch_max_error(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0);
+  float f = fts_get_float_arg(ac, at, 0, 0);
   
   if(f < 0.0f) f = 0.0f;
   else if(f > 0.5f) f = 0.5f;
@@ -307,8 +307,8 @@ static void
 pitch_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0);
-  long n = fts_get_number_arg(ac, at, 1, 0);
+  float f = (float) fts_get_float_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 1, 0);
   
   x->ctl.reattack_thresh = (f > 0)? f: 0;
   x->ctl.reattack_time = (n > 0)? n: 0;
@@ -320,7 +320,7 @@ static void
 pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long n = fts_get_number_arg(ac, at, 0, 1);
+  long n = fts_get_int_arg(ac, at, 0, 1);
   
   x->ctl.print_me = (n > 0)? n: 0;
   
@@ -340,7 +340,7 @@ pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void 
 pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
-  ((pitch_t *)o)->ctl.loud = fts_get_number_arg(ac, at, 0, 0);
+  ((pitch_t *)o)->ctl.loud = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void 
@@ -392,7 +392,7 @@ pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   pitch_reattack(o, 0, 0, 2, a);
   
   fts_set_ptr(a, (void *)o);
-  fts_set_fun(a+1, analysis);
+  fts_set_fun(a+1, (void (*)(void))analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_long(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);
@@ -402,8 +402,8 @@ static void
 pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pitch_t *x = (pitch_t *)o;
-  long pt_common_arg_0 = fts_get_number_arg(ac, at, 1, 0);
-  long pt_common_arg_1 = fts_get_number_arg(ac, at, 2, 0);
+  long pt_common_arg_0 = fts_get_int_arg(ac, at, 1, 0);
+  long pt_common_arg_1 = fts_get_int_arg(ac, at, 2, 0);
   int i;
   
   fts_alarm_init(&(x->clock), 0, pitch_tick, x);  

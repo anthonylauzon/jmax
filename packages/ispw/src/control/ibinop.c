@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/04/16 18:05:39 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:08 $
  *
  * Eric Viara for Ircam <February 1995>
  *
@@ -51,7 +51,7 @@ ibinop_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = (long) fts_get_number_arg(ac, at, 0, 0.0f);
+  this->value = (long) fts_get_int_arg(ac, at, 0, 0);
 }
 
 
@@ -146,7 +146,7 @@ fbinop_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  this->value = (float) fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 

@@ -112,24 +112,9 @@ Settings:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Settings.java)
 .PHONY: Settings
 
-FileMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FileMenu.java)
-.PHONY: FileMenu
+ObjectAction:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ObjectAction.java)
+.PHONY: ObjectAction
 
-EditMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) EditMenu.java)
-.PHONY: EditMenu
-
-AlignMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) AlignMenu.java)
-.PHONY: AlignMenu
-
-TextMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TextMenu.java)
-.PHONY: TextMenu
-
-HelpMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) HelpMenu.java)
-.PHONY: HelpMenu
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

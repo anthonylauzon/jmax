@@ -14,7 +14,7 @@ extern void fts_halt(void);
 /* declarations Scheduler */
 
 enum declaration_verb {provide, require, freerun};
-extern void fts_sched_declare(void (* fun)(), enum declaration_verb decl, fts_symbol_t state, const char *name);
+extern void fts_sched_declare(void (* fun)(void), enum declaration_verb decl, fts_symbol_t state, const char *name);
 
 extern void fts_sched_compile(void);
 
@@ -26,5 +26,8 @@ extern void fts_sched_describe_declarations(void);
 /* Tick length handling */
 
 extern float fts_sched_get_tick_length(void);
+
+
+extern void fts_sched_set_pause(int p);
 
 #endif

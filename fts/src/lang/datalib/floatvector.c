@@ -1,6 +1,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/datalib.h"
+#include "lang/veclib.h"
 #include "runtime.h"	/* @@@@ what should we do ?? */
 
 fts_symbol_t fts_s_float_vector = 0;

@@ -46,11 +46,11 @@ DECLARE_VEC_FUN(CFUN, (csqrf, complex, float, FUN_csqrf))
 
 /***************************************************
  *
- *    float/long conversion 
+ *    float/int conversion 
  *
  */
 
-DECLARE_VEC_FUN(FUN, (round, float, long, FUN_round))
+DECLARE_VEC_FUN(FUN, (round, float, int, FUN_round))
 
 
 /***************************************************
@@ -60,5 +60,5 @@ DECLARE_VEC_FUN(FUN, (round, float, long, FUN_round))
  */
 
 DECLARE_VEC_FUN(FUN, (fabs, float, float, FUN_fabs))
-DECLARE_VEC_FUN(FUN, (iabs, long, long, FUN_iabs))
+DECLARE_VEC_FUN(FUN, (iabs, int, int, FUN_iabs))
 DECLARE_VEC_FUN(CFUN, (cabs, complex, complex, FUN_cabs))

@@ -258,7 +258,7 @@ public class DisplayList
 
   // This one don't do redraws ... should it ?
 
-  void selectAll()
+  public void selectAll()
   {
     Object values[] = objects.getObjectArray();
     int size = objects.size();
@@ -323,20 +323,90 @@ public class DisplayList
     Toolkit.getDefaultToolkit().sync();
   }		
 
+
   ////////////////////////////////////////////////////////////////////////////////
   //                                                                            //
-  //                   EFFEMERAL PAINTING  (Annotations)                        //
+  //                   GEOMETRICAL COMPUTATIONS                                 //
   //                                                                            //
   ////////////////////////////////////////////////////////////////////////////////
 
 
-  void showErrorDescriptions()
+  /** Compute the rectangle including all the objects, on a rectagle passed as object */
+
+  Rectangle getTotalBounds(Rectangle r)
   {
+    r.x = 0;
+    r.y = 0;
+    r.height = 0;
+    r.width = 0;
+
     Object values[] = objects.getObjectArray();
     int size = objects.size();
 
     for ( int i = 0; i < size; i++)
-      ((ErmesObject) values[i]).showErrorDescription();
+      {
+	Rectangle bounds = ((ErmesObject) values[i]).getBounds();
+
+	SwingUtilities.computeUnion(bounds.x, bounds.y, bounds.width, bounds.height, r);
+      }
+
+    return r;
+  }
+
+  /** Move all the objects to positive coordinates, and put in the rectangle
+   *  passed as argument, a dimension that is suitable for a container for the patch.
+   *  Return true if a coordinate change has been done, false otherwise.
+   */
+
+  static Rectangle totalBounds = new Rectangle();
+
+  boolean getAndFixContainerSize(Dimension d)
+  {
+    boolean fixed = false;
+    int dx, dy;
+
+    getTotalBounds(totalBounds);
+
+    if (totalBounds.x < 0)
+      dx = (-1) * totalBounds.x;
+    else
+      dx = 0;
+
+    if (totalBounds.y < 0)
+      dy = (-1) * totalBounds.y;
+    else
+      dy = 0;
+
+    if ((dx > 0) || (dy > 0))
+      {
+	Object values[] = objects.getObjectArray();
+	int size = objects.size();
+
+	for ( int i = 0; i < size; i++)
+	  ((ErmesObject) values[i]).moveBy(dx, dy);
+
+	fixed = true;
+      }
+
+    d.width = totalBounds.width + 20;
+    d.height = totalBounds.height + 20;
+
+    return fixed;
+  }
+
+  // Generic operation on objects in the display List
+
+  public void apply(ObjectAction action)
+  {
+    Object[] values = objects.getObjectArray();
+    int size = objects.size();
+
+    for (int i = 0; i < size; i++)
+      {
+	ErmesObject object = (ErmesObject) values[i];
+
+	action.processObject(object);
+      }
   }
 }
 

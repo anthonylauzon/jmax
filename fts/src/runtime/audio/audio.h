@@ -21,7 +21,7 @@ extern fts_audio_output_logical_device_t *fts_audio_get_output_logical_device(ft
 
 /* Audio logical device buffers access */
 
-extern void fts_audio_set_pending_close();
+extern void fts_audio_set_pending_close(void);
 
 extern fts_dev_t *fts_audio_get_input_device(fts_audio_input_logical_device_t *ldev);
 extern fts_dev_t *fts_audio_get_output_device(fts_audio_output_logical_device_t *ldev);

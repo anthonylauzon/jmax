@@ -71,12 +71,13 @@ fts_classes_init(void)
 /******************************************************************************/
 
 static void
-fts_array_alloc(void **array, int size, int *nalloc, int wanted)
+fts_array_alloc(void **array, int size, unsigned int *nalloc, unsigned int wanted)
 {
 #define ALLOC_INC 8
   if (*nalloc < wanted)
     {
-      int newalloc = wanted + ALLOC_INC;
+      unsigned int newalloc = wanted + ALLOC_INC;
+
       if (*array)
 	*array = fts_realloc(*array, newalloc*size);
       else
@@ -192,9 +193,13 @@ fts_metaclass_get_by_name(fts_symbol_t name)
 static void
 fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
 {
+  int i;
+
   cl->ac = ac;
   cl->at = fts_malloc(ac * sizeof(fts_atom_t));
-  memcpy((char *)cl->at, at, ac * sizeof(fts_atom_t));
+
+  for (i = 0; i < ac; i++)
+    (((fts_atom_t *) cl->at)[i]) = at[i];
 
   cl->next = mcl->inst_list;
   mcl->inst_list = cl;

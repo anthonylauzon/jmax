@@ -217,7 +217,7 @@ vecsclbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   vecsclbinop_t *this = (vecsclbinop_t *)o;
   float scl;
 
-  scl = fts_get_number_arg(ac, at, 1, 0.0f);
+  scl = fts_get_float_arg(ac, at, 1, 0.0f);
 
   this->scl_ftl_data = ftl_data_new(float);
   ftl_data_copy(float, this->scl_ftl_data, &scl);
@@ -486,7 +486,7 @@ vecsclbinop_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   vecsclbinop_t *this = (vecsclbinop_t *)o;
   float scl;
 
-  scl = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  scl = fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_copy(float, this->scl_ftl_data, &scl);
 }

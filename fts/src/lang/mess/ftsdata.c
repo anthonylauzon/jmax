@@ -60,7 +60,7 @@ static fts_hash_table_t fts_data_class_table;
 static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at);
 static void fts_data_remote_delete(fts_data_t *d, int ac, const fts_atom_t *at);
 
-static void meta_data_init()
+static void meta_data_init(void)
 {
   meta_data = (fts_data_t *) fts_malloc( sizeof( fts_data_t));
   assert( meta_data != 0);
@@ -129,7 +129,7 @@ void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_
   class->functions_table[key] = function;
 }
 
-static int new_id()
+static int new_id(void)
 {
   /* First allocated ID is two */
 

@@ -30,7 +30,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   sampread_t *this = (sampread_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit =     fts_unit_get_samples_arg(ac, at, 2, 0);
-  float max_speed = (unit)? (float)fts_get_number_arg(ac, at, 3, 0.0f): (float)fts_get_number_arg(ac, at, 2, 0.0f);
+  float max_speed = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
   sampbuf_t *null = 0;
   float    zero = 0.0f;
 

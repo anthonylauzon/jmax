@@ -28,7 +28,7 @@ static void
 poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
   long i;
   voice_t *v;
 
@@ -123,7 +123,7 @@ static void
 poly_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long n = (long) fts_get_number_arg(ac, at, 0, 0);
+  long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   x->in1 = ((n > 0) ? n : 0);
 }

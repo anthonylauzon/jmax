@@ -98,6 +98,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 
+extern void post(const char *format , ...); 
 
 #define EVAL_STACK_DEPTH   8192
 #define OBJECT_STACK_DEPTH 8192
@@ -976,7 +977,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	case FVM_RETURN:
 	  {
-	    fts_object_t *obj;
+	    fts_object_t *obj = 0;
 
 	    /* RETURN */
 

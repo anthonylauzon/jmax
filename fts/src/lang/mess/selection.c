@@ -23,6 +23,7 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/messP.h"
 
 static void
 selection_object_size_to_fit(fts_selection_t *this)
@@ -226,8 +227,7 @@ selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 
-void
-fts_selection_config(void)
+void fts_selection_config(void)
 {
   fts_metaclass_create(fts_new_symbol("__selection"), selection_instantiate, fts_always_equiv);
 }

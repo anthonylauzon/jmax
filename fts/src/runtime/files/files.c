@@ -3,6 +3,7 @@
 #include "runtime/files/files.h"
 #include "runtime/files/directories.h"
 
+#include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>

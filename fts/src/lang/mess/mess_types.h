@@ -97,7 +97,7 @@ union fts_word
   fts_atom_array_t    *fts_atom_array;
   fts_data_t          *fts_data;
   void                *fts_ptr;		/*  just a pointer somewhere */
-  void                (*fts_fun)();     /*  just a pointer to some function */
+  void                (*fts_fun)(void);     /*  just a pointer to some function */
 };
 
 /*

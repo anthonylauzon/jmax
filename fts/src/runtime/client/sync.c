@@ -23,8 +23,7 @@
 static void fts_sync_dispatch(int ac, const fts_atom_t *av);
 
 
-void
-fts_client_sync_init(void)
+void fts_client_sync_init(void)
 {
   fts_client_mess_install(SYNC_CODE, fts_sync_dispatch);
 }

@@ -61,7 +61,7 @@
  *
  */
  
-void fts_vecx_cmerge(float *in0, float *in1, complex *out, long size)
+void fts_vecx_cmerge(float *in0, float *in1, complex *out, int size)
 {
   FTS_VECX_CMERGE(in0, in1, out)
 }

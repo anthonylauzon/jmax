@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:38 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:13 $
  *
  * Maintain a symbol table and define a message-passing system
  */
@@ -73,7 +73,7 @@ static void
 select_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
-  long number = (long)fts_get_number_arg(ac, at, 0, 0);
+  long number = (long)fts_get_int_arg(ac, at, 0, 0);
 
   if(number == this->compare)
     fts_outlet_send(o, 0, fts_s_bang, 0, 0);
@@ -85,7 +85,7 @@ static void
 select_number_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
-  this->compare = (long)fts_get_number_arg(ac, at, 0, 0);
+  this->compare = (long)fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void 
@@ -94,8 +94,8 @@ select_pair(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   select_t *this = (select_t *)o;
   long number, compare;
 
-  number = (long)fts_get_number_arg(ac, at, 0, 0);
-  compare = (long)fts_get_number_arg(ac, at, 1, 0);
+  number = (long)fts_get_int_arg(ac, at, 0, 0);
+  compare = (long)fts_get_int_arg(ac, at, 1, 0);
 
   this->compare = compare;
   if(number == compare)
@@ -113,7 +113,7 @@ select_multi_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   long number;
   int i;
 
-  number = (long)fts_get_number_arg(ac, at, 0, 0);
+  number = (long)fts_get_int_arg(ac, at, 0, 0);
   
   for(i=0; i<this->n_compares; i++)
     {

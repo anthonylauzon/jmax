@@ -176,7 +176,7 @@ static void fts_patparse_set_slider_graphic_properties(fts_graphic_description_t
 }
 
 
-void fts_patparse_set_square_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
+static void fts_patparse_set_square_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {
   fts_object_put_prop(obj, fts_s_x, &(this->x));
   fts_object_put_prop(obj, fts_s_y, &(this->y));

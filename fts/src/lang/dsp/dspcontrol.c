@@ -34,7 +34,7 @@
 #define DSP_CONTROL_DSP_PRINT          11
 
 
-extern fts_dev_t * fts_dsp_get_dac_slip_dev();
+extern fts_dev_t * fts_dsp_get_dac_slip_dev(void);
 
 static fts_data_class_t *fts_dsp_control_data_class = 0;
 
@@ -155,7 +155,7 @@ static void fts_dsp_control_export_fun(fts_data_t *d)
   fts_set_int(&a, fts_param_get_int(fts_s_fifo_size, 0));
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_FIFO_SIZE, 1, &a);
 
-  fts_set_int(&a, (int) fts_param_get_float(fts_s_sampling_rate, 44100.0));
+  fts_set_int(&a, (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f));
   fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_SAMPLING_RATE, 1, &a);
 }
 

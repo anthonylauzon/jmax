@@ -21,6 +21,7 @@ public class MaxWindowJMenu extends JMenu implements WindowListener, ListDataLis
   public MaxWindowJMenu(String title, Frame frame)
   {
     super(title);
+    setHorizontalTextPosition(AbstractButton.LEFT);
     
     this.frame = frame;
     windowList = MaxWindowManager.getWindowManager().getWindowList();

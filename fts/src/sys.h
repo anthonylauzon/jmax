@@ -11,6 +11,7 @@
   Generic include file for the sys layer.
   */
 
+#include "sys/sysinit.h"
 #include "sys/hw.h"
 #include "sys/status.h"
 #include "sys/platform.h"
@@ -20,3 +21,15 @@
 #include "sys/welcome.h"
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+

@@ -20,7 +20,7 @@ union swap_union_t {
   char c[4];
 };
 
-static int has_to_swap()
+static int has_to_swap(void)
 {
   union swap_union_t u;
 
@@ -47,7 +47,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
   int fd;
   fts_binary_file_header_t header;
   off_t file_size;
-  int symbols_size;
+  unsigned int symbols_size;
   char *symbuf;
 
 #ifdef LOAD_DEBUG

@@ -29,7 +29,7 @@ static fts_object_t *message_doctor(fts_patcher_t *patcher, int ac, const fts_at
 }
 
 
-void message_doctor_init()
+void message_doctor_init(void)
 {
   fts_register_object_doctor(fts_new_symbol("messbox"), message_doctor);
 }

@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:38 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:12 $
  *
  * FTS by Miller Puckette
  *
@@ -35,7 +35,7 @@ random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 random_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n = fts_get_number_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
 
   if (n <= 1)
     n = 1;

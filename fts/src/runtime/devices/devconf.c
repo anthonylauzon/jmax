@@ -19,6 +19,11 @@
 #endif
 
 extern void null_init(void);
+extern void profdev_init(void);
+
+#ifdef HAS_OSS
+extern void ossdev_init(void);
+#endif
 
 void fts_dev_configure(void)
 {

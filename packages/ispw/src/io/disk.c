@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/12/07 10:37:07 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/12/07 17:10:18 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -329,7 +329,7 @@ static void
 writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  int state = fts_get_number_arg(ac, at, 0, 0);
+  int state = fts_get_int_arg(ac, at, 0, 0);
 
   /*
      Messy behaviour, for compatibilty with old Max 0.26:
@@ -791,7 +791,7 @@ static void
 readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  int state = fts_get_number_arg(ac, at, 0, 0);
+  int state = fts_get_int_arg(ac, at, 0, 0);
 
   /*
      Messy behaviour, for compatibilty with old Max 0.26:

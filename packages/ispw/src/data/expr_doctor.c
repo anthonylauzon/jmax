@@ -36,7 +36,7 @@ static fts_object_t *expr_doctor(fts_patcher_t *patcher, int ac, const fts_atom_
 }
 
 
-void expr_doctor_init()
+void expr_doctor_init(void)
 {
   fts_register_object_doctor(fts_new_symbol("expr"), expr_doctor);
 }
@@ -59,7 +59,7 @@ static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv)
   char buf[1024];
   int size = 1024;
   char *p = buf;
-  char *s;
+  const char *s;
   int i;
   
   *p = 0;
@@ -69,7 +69,7 @@ static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv)
     {
       if (fts_is_long(argv))
 	{
-	  sprintf(p, "%ld ", fts_get_long(argv));
+	  sprintf(p, "%d ", fts_get_int(argv));
 	  while (*p)
 	    {
 	      if (++i >= size)
@@ -98,9 +98,9 @@ static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv)
 	  char c;
 	  int quoted = 0;
 
-	  s = (char *)fts_symbol_name(fts_get_symbol(argv));
+	  s = (const char *)fts_symbol_name(fts_get_symbol(argv));
 
-	  while (c = *s++)
+	  while ((c = *s++))
 	    {
 	      if (quoted)
 		{

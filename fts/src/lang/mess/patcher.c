@@ -1627,12 +1627,12 @@ void fts_create_root_patcher()
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);
 }
 
-static void fts_delete_root_patcher()
+static void fts_delete_root_patcher(void)
 {
   fts_object_delete((fts_object_t *) fts_root_patcher);
 }
 
-fts_patcher_t *fts_get_root_patcher()
+fts_patcher_t *fts_get_root_patcher(void)
 {
   return fts_root_patcher;
 }

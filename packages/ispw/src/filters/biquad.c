@@ -138,7 +138,7 @@ biquad_set_coef_a0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   biquad_t *this = (biquad_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, a0, &f);
 }
 
@@ -148,7 +148,7 @@ biquad_set_coef_a1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   biquad_t *this = (biquad_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, a1, &f);
 }
 
@@ -158,7 +158,7 @@ biquad_set_coef_a2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   biquad_t *this = (biquad_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, a2, &f);
 }
 
@@ -168,7 +168,7 @@ biquad_set_coef_b1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   biquad_t *this = (biquad_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, b1, &f);
 }
 
@@ -178,7 +178,7 @@ biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   biquad_t *this = (biquad_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, b2, &f);
 }
 

@@ -87,11 +87,11 @@
  */
  
 #define DEFINE_FTS_VEC_CFUN(name, t_in, t_out, fun)\
- void fts_vec_ ## name(t_in *in, t_out *out, long size)\
+ void fts_vec_ ## name(t_in *in, t_out *out, int size)\
  {FTS_VEC_CFUN(t_in, t_out, fun)}
   
 #define DEFINE_FTS_VECX_CFUN(name, t_in, t_out, fun)\
- void fts_vecx_ ## name(t_in *in, t_out *out, long size)\
+ void fts_vecx_ ## name(t_in *in, t_out *out, int size)\
  {FTS_VECX_CFUN(t_in, t_out, fun)}
 
 #define DEFINE_FTL_VEC_CFUN(name, t_in, t_out, fun)\
@@ -116,10 +116,10 @@
  */
  
 #define DECLARE_FTS_VEC_CFUN(name, t_in, t_out, fun)\
- extern void fts_vec_ ## name(t_in *in, t_out *out, long size);
+ extern void fts_vec_ ## name(t_in *in, t_out *out, int size);
  
 #define DECLARE_FTS_VECX_CFUN(name, t_in, t_out, fun)\
- extern void fts_vecx_ ## name(t_in *in, t_out *out, long size);
+ extern void fts_vecx_ ## name(t_in *in, t_out *out, int size);
  
 #define DECLARE_FTL_VEC_CFUN(name, t_in, t_out, fun)\
  extern void ftl_vec_ ## name(FTL_ARG);

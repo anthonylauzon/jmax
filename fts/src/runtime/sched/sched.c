@@ -139,7 +139,7 @@ fts_sched_init(void)
 }
 
 void
-fts_sched_declare(void (* fun)(), enum declaration_verb decl, fts_symbol_t state, const char *name)
+fts_sched_declare(void (* fun)(void), enum declaration_verb decl, fts_symbol_t state, const char *name)
 {
   if (declaration_count >= declaration_alloc)
     {
@@ -185,7 +185,7 @@ sched_is_provided(fts_symbol_t state, int state_size, fts_symbol_t *state_list)
 	      
 
 static int
-sched_is_executable(void (* f)(), int decl_size, struct declaration *table, int state_size, fts_symbol_t *state_list)
+sched_is_executable(void (* f)(void), int decl_size, struct declaration *table, int state_size, fts_symbol_t *state_list)
 {
   int i;
 
@@ -224,7 +224,7 @@ sched_is_executable(void (* f)(), int decl_size, struct declaration *table, int 
 
 
 static void
-sched_add_provides(void (* f)(), int decl_size, struct declaration *table, int *state_size, fts_symbol_t *state_list)
+sched_add_provides(void (* f)(void), int decl_size, struct declaration *table, int *state_size, fts_symbol_t *state_list)
 {
   int i;
 
@@ -236,7 +236,7 @@ sched_add_provides(void (* f)(), int decl_size, struct declaration *table, int *
 
 
 static void
-sched_delete_declarations(void (* f)(), int decl_size, struct declaration *table)
+sched_delete_declarations(void (* f)(void), int decl_size, struct declaration *table)
 {
   int i;
 
@@ -268,7 +268,7 @@ fts_sched_compile(void)
 
       for (i = 0; i < declaration_count; i++)
 	{
-	  void (* candidate_fun)();
+	  void (* candidate_fun)(void);
 
 	  candidate_fun = declaration_table[i].f;
 
@@ -479,8 +479,7 @@ fts_sched_describe_failure(void)
 
 /* Tick length handling */
 
-float
-fts_sched_get_tick_length()
+float fts_sched_get_tick_length(void)
 {
   return tick_length;
 }

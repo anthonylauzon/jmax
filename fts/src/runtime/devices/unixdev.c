@@ -719,7 +719,7 @@ fts_socket_parse(fts_symbol_t addr, char **host, unsigned short *port)
 	{
 	  /* maybe was supplied in dotted format already */
 
-	  if (inet_addr((char *)address) == -1)
+	  if (inet_addr((char *)address) == INADDR_NONE)
 	    *host = 0;
 	  else
 	    {
@@ -1119,8 +1119,7 @@ typedef struct udp_dev_data
 
 
 
-static udp_dev_data_t *
-make_udp_data()
+static udp_dev_data_t *make_udp_data(void)
 {
   udp_dev_data_t *p;
 

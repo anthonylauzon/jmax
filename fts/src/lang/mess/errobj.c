@@ -78,7 +78,7 @@ void fts_recompute_errors()
   an "env" change.
    */
 
-void fts_do_recompute_errors()
+void fts_do_recompute_errors(void)
 {
   fts_object_set_t *errors;
   fts_object_t *root;

@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/10/30 17:49:31 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/11/18 15:06:03 $
  *
  */
 
@@ -83,7 +83,7 @@ gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   gfloat_t *this = (gfloat_t *)o;
 
-  this->f = fts_get_number_arg(ac, at, 0, 0);
+  this->f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   fts_object_ui_property_changed(o, fts_s_value);
 }

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/11/02 10:37:20 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/11/05 15:25:50 $
  *
  */
 #include <stdio.h>		/* for sprintf */
@@ -84,8 +84,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
 }
 
 
-int
-ex_getsym(char *p, fts_symbol_t *s)
+int ex_getsym(char *p, fts_symbol_t *s)
 {
   *s = fts_new_symbol_copy(p);
   return(*s ? 0 : 1);
@@ -131,7 +130,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
     {
       if (fts_is_long(argv))
 	{
-	  sprintf(p, "%ld ", fts_get_long(argv));
+	  sprintf(p, "%d ", fts_get_int(argv));
 	  while (*p)
 	    {
 	      if (++i >= size)
@@ -162,9 +161,9 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	  char c;
 	  int quoted = 0;
 
-	  s = (char *)fts_symbol_name(fts_get_symbol(argv));
+	  s = (const char *)fts_symbol_name(fts_get_symbol(argv));
 
-	  while (c = *s++)
+	  while ((c = *s++))
 	    {
 	      if (quoted)
 		{

@@ -16,14 +16,13 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.objects.*;
-
-
+import ircam.jmax.editors.patcher.menus.*;
 
 //
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
-public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener, FocusListener, ClipboardOwner
+public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener, ClipboardOwner
 {
 
   // Primitive and fast implementation of multi-type clipboard.
@@ -58,7 +57,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private EditMenu itsEditMenu;	
   private JMenu itsWindowsMenu;
   private JMenu itsToolsMenu;
-  private JMenu itsTextMenu;
+  private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
 
   public MaxDocument itsDocument;
@@ -101,8 +100,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsScrollerView.setViewportView( itsSketchPad); 
     itsScrollerView.getHorizontalScrollBar().setUnitIncrement( 10);
     itsScrollerView.getVerticalScrollBar().setUnitIncrement( 10);
-    itsScrollerView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-    itsScrollerView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    itsScrollerView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    itsScrollerView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
     // Build The Menus and Menu Bar
 
@@ -132,6 +131,10 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowJMenu("Windows", this); 
     mb.add(itsWindowsMenu);
+
+    // Add some separation between help and the others.
+
+    mb.add(Box.createHorizontalGlue());
 
     // Build up the help Menu 
 
@@ -175,7 +178,9 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     itsPatcherData.startUpdates();
 
+
     // Make it visible, at the end
+
 
     setVisible( true);
   }
@@ -249,6 +254,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   void selectionChanged()
   {
     itsEditMenu.selectionChanged();
+    itsTextMenu.selectionChanged();
   }
 
   /****************************************************************************/
@@ -258,13 +264,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   /****************************************************************************/
 
 
-  public void inspectAction()
-  {
-    if (ErmesSelection.patcherSelection.ownedBy(itsSketchPad))
-      ErmesSelection.patcherSelection.inspect();
-  }
-
-  protected void Cut()
+  public void Cut()
   {
     if (itsSketchPad.canCopyText())
       {
@@ -286,7 +286,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private int lastCopyCount;
 
-  protected void Copy()
+  public void Copy()
   {
     if (itsSketchPad.canCopyText())
       {
@@ -295,6 +295,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       }
     else if (ErmesSelection.patcherSelection.ownedBy(itsSketchPad))
       {
+	MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
@@ -308,33 +309,46 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private boolean pasting = false;
 
-  protected void Paste()
+  /**
+   * Paste the content of clipboard.
+   * The patcher supports text and "patcherSelectionFlavor" DataFlavor.
+   * A text can be pasted only if an editable field is currently opened,
+   * and a patcher selection can be pasted if we're not currently editing
+   * a text. */
+
+  public void Paste()
   {
     if (isLocked())
       setLocked(false);
 
-    Cursor temp = getCursor();
-
-    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
 
-    if ((clipboardContent != null) &&
-	clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor) &&
-	itsSketchPad.canPasteText())
+    if (clipboardContent == null)
+      return;  // Should never happen
+
+    if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
       {
-	try
+	if (itsSketchPad.canPasteText())
 	  {
-	    textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
-	    itsSketchPad.pasteText(textClipboard);
-	  }
-	catch (Exception e)
-	  {
-	    System.err.println("error while pasting text: " + e);
+	    try
+	      {
+		textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+		itsSketchPad.pasteText(textClipboard);
+	      }
+	    catch (Exception e)
+	      {
+		System.err.println("error while pasting text: " + e);
+	      }
 	  }
       }
-    else 
+    else if (clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor))
       {
+	Cursor temp = getCursor();
+    
+	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
+	// @@@@: Should get the fts clipboard from the System.clipboard content !!!!!
+
 	pasting = true;
 
 	if (lastCopyCount != ftsClipboard.getCopyCount())
@@ -355,16 +369,17 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
 	  {
 	    itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
+	    itsSketchPad.fixSize();
 	  }
 
 	ftsObjectsPasted.removeAllElements();
 	ftsConnectionsPasted.removeAllElements();
-      }
 
-    setCursor( temp);
+	setCursor( temp);
+      }
   }
 
-  boolean ftsClipboardIsEmpty()
+  public static boolean ftsClipboardIsEmpty()
   {
     return ftsClipboard.isEmpty();
   }
@@ -373,7 +388,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
   }
 
-  protected void Duplicate()
+  public void Duplicate()
   {
     Copy(); 
     Paste();
@@ -412,17 +427,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   void addPastedConnection(FtsConnection c)
   {
     ftsConnectionsPasted.addElement( c);
-  }
-
-  // Help support
-
-  void Help()
-  {
-    if (ErmesSelection.patcherSelection.ownedBy(itsSketchPad))
-      {
-	if (! ErmesSelection.patcherSelection.openHelpPatches())
-	  new ErrorDialog( this, "Sorry, no help for object ");
-      }
   }
 
   // 
@@ -623,7 +627,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   /*                                                                          */
   /****************************************************************************/
 
-  protected void setLocked( boolean locked)
+  public void setLocked( boolean locked)
   {
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
@@ -641,10 +645,10 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     itsSketchPad.setKeyEventClient( null); //when changing mode, always remove key listeners
 
-    requestFocus();
+    itsSketchPad.requestFocus();
   }
 
-  final boolean isLocked()
+  final public boolean isLocked()
   {
     return itsSketchPad.isLocked();
   }
@@ -655,17 +659,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   /*                                                                          */
   /****************************************************************************/
 
-
-  // Focus Listener Interface 
-
-  public void focusGained( FocusEvent e)
-  {
-    // itsSketchPad.redraw();
-  } 
-
-  public void focusLost( FocusEvent e)
-  {
-  }
 
   // Window Listener Interface 
 
@@ -698,7 +691,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void windowActivated(WindowEvent e)
   {
-    requestFocus();
+    itsSketchPad.requestFocus();
   }
 
   public void windowDeactivated(WindowEvent e)

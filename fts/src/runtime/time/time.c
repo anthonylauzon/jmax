@@ -247,8 +247,7 @@ fts_clock_define(fts_symbol_t name, double *clock)
 }
 
 
-void
-fts_clock_define_protected(fts_symbol_t name, double *clock)
+void fts_clock_define_protected(fts_symbol_t name, double *clock)
 {
   fts_clock_t *cl;
 

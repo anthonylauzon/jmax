@@ -23,6 +23,7 @@ static void dsp_module_init(void);
 static void dsp_module_restart(void);
 static void dsp_module_shutdown(void);
 extern void fts_dsp_control_config(void);
+extern void Sig_init(void);
 
 fts_symbol_t fts_s_put;
 fts_symbol_t fts_s_sig;
@@ -91,7 +92,7 @@ void fts_dsp_set_dac_slip_dev(fts_dev_t *dev)
   dac_slip_device = dev;
 }
 
-fts_dev_t * fts_dsp_get_dac_slip_dev()
+fts_dev_t * fts_dsp_get_dac_slip_dev(void)
 {
   return dac_slip_device;
 }

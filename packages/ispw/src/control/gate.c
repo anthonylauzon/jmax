@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:35 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:08 $
  *
  * FTS by Miller Puckette
  *
@@ -25,7 +25,7 @@ typedef struct gate
 static void gate_open(fts_object_t *o, int winlet, fts_symbol_t s,
 		      int ac, const fts_atom_t *at)
 {
-  ((gate_t *)o)->opened = fts_get_number_arg(ac, at, 0, 0);
+  ((gate_t *)o)->opened = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void gate_realize(fts_object_t *o, int winlet, fts_symbol_t s,

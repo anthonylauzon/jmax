@@ -70,8 +70,7 @@ ftl_2p2z(fts_word_t *argv)
 }
 
 
-void
-ftl_64_2p2z(fts_word_t *argv)
+static void ftl_64_2p2z(fts_word_t *argv)
 {
   float * restrict in = (float *)fts_word_get_ptr(argv + 0);
   float * restrict out = (float *)fts_word_get_ptr(argv + 1);
@@ -104,8 +103,7 @@ ftl_64_2p2z(fts_word_t *argv)
   x->state2 = ym2;
 }
 
-void
-ftl_64_1ops_2p2z(fts_word_t *argv)
+static void ftl_64_1ops_2p2z(fts_word_t *argv)
 {
   float * restrict vec = (float *)fts_word_get_ptr(argv + 0);
   ctlf2p2z_t * restrict x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 1);
@@ -195,22 +193,22 @@ sig2p2z_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f;
 
-  f = fts_get_number_arg(ac, at, 0, 0.0f);
+  f = fts_get_float_arg(ac, at, 0, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, gain, &f);
 
-  f = fts_get_number_arg(ac, at, 1, 0.0f);
+  f = fts_get_float_arg(ac, at, 1, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, fbcoef1, &f);
 
-  f = fts_get_number_arg(ac, at, 2, 0.0f);
+  f = fts_get_float_arg(ac, at, 2, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, fbcoef2, &f);
 
-  f = fts_get_number_arg(ac, at, 3, 0.0f);
+  f = fts_get_float_arg(ac, at, 3, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef0, &f);
 
-  f = fts_get_number_arg(ac, at, 4, 0.0f);
+  f = fts_get_float_arg(ac, at, 4, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef1, &f);
 
-  f = fts_get_number_arg(ac, at, 5, 0.0f);
+  f = fts_get_float_arg(ac, at, 5, 0.0f);
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef2, &f);
 }
 
@@ -218,7 +216,7 @@ static void
 sig2p2z_gain_c0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, gain, &f);
 }
@@ -227,7 +225,7 @@ static void
 sig2p2z_fbcoef1_c1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0);
+  float f =  fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, fbcoef1, &f);
 }
@@ -236,7 +234,7 @@ static void
 sig2p2z_fbcoef2_c2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0);
+  float f =  fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, fbcoef2, &f);
 }
@@ -245,7 +243,7 @@ static void
 sig2p2z_ffcoef0_c3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef0, &f);
 }
@@ -254,7 +252,7 @@ static void
 sig2p2z_ffcoef1_c4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef1, &f);
 }
@@ -263,7 +261,7 @@ static void
 sig2p2z_ffcoef2_c5(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
-  float f = (float) fts_get_number_arg(ac, at, 0, 0.0f);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   ftl_data_set(ctlf2p2z_t, this->ftl_data, ffcoef2, &f);
 }
@@ -347,8 +345,7 @@ sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-void
-sig2p2z_config(void)
+static void sig2p2z_config(void)
 {
   sig2p2z_function = fts_new_symbol("2p2z");
   dsp_declare_function(sig2p2z_function, ftl_2p2z);

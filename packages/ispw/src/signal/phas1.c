@@ -11,8 +11,8 @@ typedef struct
 } phasor_state_t;
 
 
-void
-ftl_phasor(fts_word_t *argv)
+
+static void ftl_phasor(fts_word_t *argv)
 {
   float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
   float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
@@ -34,8 +34,7 @@ ftl_phasor(fts_word_t *argv)
   x->phase = (1.0f/0x7fffffffL) * phase;
 }
 
-void
-ftl_inplace_phasor(fts_word_t *argv)
+static void ftl_inplace_phasor(fts_word_t *argv)
 {
   float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
   phasor_state_t * restrict x = (phasor_state_t *) fts_word_get_ptr(argv + 1);

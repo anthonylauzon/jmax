@@ -12,7 +12,7 @@ extern unsigned int fts_check_fpe(void);
 
 typedef void (* fts_fpe_handler)(int which);
 extern void fts_set_fpe_handler(fts_fpe_handler fh);
-extern void fts_reset_fpe_handler();
+extern void fts_reset_fpe_handler(void);
 
 /* bit masks to be used with fts_check_fpe;
  * 

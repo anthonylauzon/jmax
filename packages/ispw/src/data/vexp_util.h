@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/11 16:55:54 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:26 $
  *
  */
 
@@ -22,4 +22,5 @@ extern int ex_getsym(char *p, fts_symbol_t *s);
 extern const char *ex_symname(fts_symbol_t s);
 
 extern void argstostr(int argc, const fts_atom_t *argv, char *buf, int size);
+
 

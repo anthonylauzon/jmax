@@ -86,12 +86,12 @@ struct fts_audio_output_logical_device
 static fts_status_t fts_audio_dev_set_input_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_audio_dev_get_input_ldev(int ac, const fts_atom_t *at);
 static fts_status_t fts_audio_unset_input_logical_dev(int ac, const fts_atom_t *at);
-static fts_status_t fts_audio_reset_input_logical_dev();
+static fts_status_t fts_audio_reset_input_logical_dev(void);
 
 static fts_status_t fts_audio_dev_set_output_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_audio_dev_get_output_ldev(int ac, const fts_atom_t *at);
 static fts_status_t fts_audio_unset_output_logical_dev(int ac, const fts_atom_t *at);
-static fts_status_t fts_audio_reset_output_logical_dev();
+static fts_status_t fts_audio_reset_output_logical_dev(void);
 
 
 static void fts_audio_init(void);
@@ -495,7 +495,7 @@ fts_audio_unset_input_logical_dev(int ac, const fts_atom_t *at)
 }
 
 
-static fts_status_t fts_audio_reset_input_logical_dev()
+static fts_status_t fts_audio_reset_input_logical_dev(void)
 {
   fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
 
@@ -643,7 +643,7 @@ fts_audio_unset_output_logical_dev(int ac, const fts_atom_t *at)
 }
 
 
-static fts_status_t fts_audio_reset_output_logical_dev()
+static fts_status_t fts_audio_reset_output_logical_dev(void)
 {
   fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);
 
@@ -823,8 +823,7 @@ static void fts_audio_deactivate_output_logical_device(fts_symbol_t name, fts_at
 }
 
 
-void
-fts_audio_deactivate_devices(void)
+void fts_audio_deactivate_devices(void)
 {
   fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_deactivate_input_logical_device, 0);
   fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_deactivate_output_logical_device, 0);
@@ -889,8 +888,7 @@ static void fts_audio_add_in_read_fun_uncond(fts_symbol_t name, fts_atom_t *data
 }
 
 
-void
-fts_audio_add_all_zero_fun(void)
+void fts_audio_add_all_zero_fun(void)
 {
   fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_add_in_read_fun_uncond, 0);
   fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_add_out_zero_fun_uncond, 0);
@@ -945,8 +943,7 @@ static void fts_audio_add_in_read_fun_unused(fts_symbol_t name, fts_atom_t *data
 }
 
 
-void
-fts_audio_add_unused_zero_fun(void)
+void fts_audio_add_unused_zero_fun(void)
 {
   fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_add_in_read_fun_unused, 0);
   fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_add_zero_fun_unused, 0);

@@ -44,15 +44,13 @@ typedef struct
  
 /* predefined dummy for base units */
 
-float 
-fts_unit_conv_identity(float value, void *nix)
+static float  fts_unit_conv_identity(float value, void *nix)
 {
   return value;
 }
 
 
-int 
-fts_unit_add(fts_symbol_t unit_name, fts_symbol_t base, fts_unit_conv_t conv, int depends)
+int fts_unit_add(fts_symbol_t unit_name, fts_symbol_t base, fts_unit_conv_t conv, int depends)
 {
   fts_atom_t a;
   fts_unit_t *unit;
@@ -194,8 +192,7 @@ fts_unit_get_samples_arg(int ac, const fts_atom_t *at, int n, fts_symbol_t def)
 }
 
 
-void
-fts_units_init(void)
+void fts_units_init(void)
 {
   fts_hash_table_init(&the_units_hashtable);
 

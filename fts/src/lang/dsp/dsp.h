@@ -77,7 +77,7 @@ extern void         dsp_chain_fprint(FILE *f);
 extern void         dsp_chain_fprint_signals(FILE *f);
 
 
-extern fts_object_t *dsp_get_current_object();
+extern fts_object_t *dsp_get_current_object(void);
 
 extern int          dsp_is_running( void);
 extern void         dsp_chain_poll(void);
@@ -91,7 +91,6 @@ extern fts_symbol_t fts_s_dsp_upsampling;
 extern fts_symbol_t fts_s_dsp_downsampling;
 extern fts_symbol_t fts_s_dsp_outputsize;
 extern fts_symbol_t fts_s_dsp_descr;
-
 
 #endif
 

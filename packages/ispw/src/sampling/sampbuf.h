@@ -27,4 +27,7 @@ extern void sampbuf_zero(sampbuf_t *buf);
 /* (*&^#(*&^%#_^_#$%_*&%($ */
 extern void gensampname(char *buf, const char *base, long int n);
 
+
+extern int sampbuf_name_already_registered(fts_symbol_t name);
+
 #endif /* _SAMPBUF_H_ */

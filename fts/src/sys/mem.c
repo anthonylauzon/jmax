@@ -59,7 +59,7 @@ void mem_init(void)
 
 /* statistic routines */
 
-void *fts_zalloc(int size)
+void *fts_zalloc(unsigned int size)
 {
   if (size <= 0)
     return 0;
@@ -77,7 +77,7 @@ void *fts_zalloc(int size)
 }
 
 
-void *fts_malloc(int size)
+void *fts_malloc(unsigned int size)
 {
   void *p;
 
@@ -109,7 +109,7 @@ void *fts_malloc(int size)
 }
 
 
-void *fts_realloc(void *p, int size)
+void *fts_realloc(void *p, unsigned int size)
 {
   return real_realloc(p, size);
 }
@@ -132,9 +132,9 @@ void fts_free(void *p)
 struct fts_heap
 {
   char *free_list;
-  int current_block_group;
-  int block_size;
-  int reserved_blocks;
+  unsigned int current_block_group;
+  unsigned int block_size;
+  unsigned int reserved_blocks;
 };
 
 static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
@@ -142,7 +142,7 @@ static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
 static void
 fts_heaps_init(void)
 {
-  int i;
+  unsigned int i;
 
   for (i = 0; i < (SHARED_HEAP_MAX_SIZE / sizeof(long)); i++)
     fts_heaps[i] = 0;
@@ -154,7 +154,7 @@ static void
 fts_heap_grow(fts_heap_t *p)
 {
   char *mem;
-  int i;
+  unsigned int i;
 
   mem = fts_malloc(p->current_block_group * p->block_size);
   
@@ -177,7 +177,7 @@ fts_heap_grow(fts_heap_t *p)
 
 
 fts_heap_t *
-fts_heap_new(int block_size)
+fts_heap_new(unsigned int block_size)
 {
   if (block_size > SHARED_HEAP_MAX_SIZE)
     {
@@ -284,7 +284,7 @@ fts_heap_free(char *m, fts_heap_t *p)
 
 
 char *
-fts_block_alloc(int size)
+fts_block_alloc(unsigned int size)
 {
 #ifdef HELP_PURIFY
   return fts_malloc(size);
@@ -307,7 +307,7 @@ fts_block_alloc(int size)
 
 
 char *
-fts_block_zalloc(int size)
+fts_block_zalloc(unsigned int size)
 {
 #ifdef HELP_PURIFY
   return fts_zalloc(size);
@@ -330,7 +330,7 @@ fts_block_zalloc(int size)
 
 
 void
-fts_block_free(char *p, int size)
+fts_block_free(char *p, unsigned int size)
 {
 #ifdef HELP_PURIFY
   fts_free(p);

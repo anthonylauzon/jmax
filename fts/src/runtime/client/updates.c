@@ -40,8 +40,7 @@ static void fts_client_updates_sched(void);
 static int fts_updates_per_ticks = 40;
 static int fts_update_period = 70; /* every how many ticks we do an update */
 
-void
-fts_client_updates_init(void)
+void fts_client_updates_init(void)
 {
   fts_sched_declare(fts_client_updates_sched, provide, fts_new_symbol("control"), "fts_client_updates_sched");
 }

@@ -68,10 +68,10 @@ sigthres_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sigthres_t *this = (sigthres_t *)o;
   
-  this->ctl.hi_thresh = fts_get_number_arg(ac, at, OBJ_ARG_hi_thresh, 0.0f);
-  this->hi_dead_msec = fts_get_number_arg(ac, at, OBJ_ARG_hi_dead_msec, 0.0f);
-  this->ctl.lo_thresh = fts_get_number_arg(ac, at, OBJ_ARG_lo_thresh, 0.0f);
-  this->lo_dead_msec = fts_get_number_arg(ac, at, OBJ_ARG_lo_dead_msec, 0.0f);
+  this->ctl.hi_thresh = fts_get_float_arg(ac, at, OBJ_ARG_hi_thresh, 0.0f);
+  this->hi_dead_msec  = fts_get_float_arg(ac, at, OBJ_ARG_hi_dead_msec, 0.0f);
+  this->ctl.lo_thresh = fts_get_float_arg(ac, at, OBJ_ARG_lo_thresh, 0.0f);
+  this->lo_dead_msec  = fts_get_float_arg(ac, at, OBJ_ARG_lo_dead_msec, 0.0f);
   
   this->ctl.status = 0;
   this->ctl.wait = 0;
@@ -135,13 +135,13 @@ sigthres_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   switch (ac)
     {
     case 4:
-      this->lo_dead_msec = fts_get_number_arg(ac, at, 3, 0.0f);
+      this->lo_dead_msec = fts_get_float_arg(ac, at, 3, 0.0f);
     case 3:
-      this->ctl.lo_thresh = fts_get_number_arg(ac, at, 2, 0.0f);
+      this->ctl.lo_thresh = fts_get_float_arg(ac, at, 2, 0.0f);
     case 2:
-      this->hi_dead_msec = fts_get_number_arg(ac, at, 1, 0.0f);
+      this->hi_dead_msec = fts_get_float_arg(ac, at, 1, 0.0f);
     case 1:
-      this->ctl.hi_thresh = fts_get_number_arg(ac, at, 0, 0.0f);
+      this->ctl.hi_thresh = fts_get_float_arg(ac, at, 0, 0.0f);
     }
 
   if (this->ctl.lo_thresh > this->ctl.hi_thresh)
@@ -164,7 +164,7 @@ sigthres_status_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   sigthres_t *this = (sigthres_t *)o;
 
-  this->ctl.status = (int)fts_get_number_arg(ac, at, 0, 0.0f);
+  this->ctl.status = fts_get_int_arg(ac, at, 0, 0);
   this->ctl.wait = 0;
 }
 
@@ -183,7 +183,7 @@ static void
 sigthres_hi_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigthres_t *this = (sigthres_t *)o;
-  long hi_dead_msec = fts_get_number_arg(ac, at, 0, 0.0f);
+  long hi_dead_msec = fts_get_int_arg(ac, at, 0, 0);
   long hi_dead_samples = (long)(this->samples_per_msec * hi_dead_msec) - 1;
   
   this->ctl.hi_dead_samples = (hi_dead_samples > 0)? hi_dead_samples: 0;
@@ -205,7 +205,7 @@ static void
 sigthres_lo_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigthres_t *this = (sigthres_t *)o;
-  long lo_dead_msec = fts_get_number_arg(ac, at, 0, 0.0f);
+  long lo_dead_msec = fts_get_int_arg(ac, at, 0, 0);
   long lo_dead_samples = (long)(this->samples_per_msec * lo_dead_msec) - 1;
   
   this->ctl.lo_dead_samples = (lo_dead_samples > 0)? lo_dead_samples: 0;

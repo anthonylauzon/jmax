@@ -179,7 +179,7 @@ static void pt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long n = fts_get_number_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
 	
   x->ctl.gliss_time = (n > 0)? n: 0;
   if(x->ctl.gliss_time)
@@ -191,8 +191,8 @@ static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0);
-  long n = fts_get_number_arg(ac, at, 1, 0);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
+  long n = fts_get_int_arg(ac, at, 1, 0);
 	
   if(f > 0 && n > 0)
     {
@@ -211,7 +211,7 @@ static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long n = fts_get_number_arg(ac, at, 0, 1);
+  long n = fts_get_int_arg(ac, at, 0, 1);
 	
   x->ctl.print_me = (n > 0)? n: 0;
 	
@@ -253,7 +253,7 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   pt_reattack(o, 0, 0, 2, a);
 	
   fts_set_ptr(a, (void *)o);
-  fts_set_fun(a+1, analysis);
+  fts_set_fun(a+1, (void (*)(void))analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_long(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);
@@ -262,8 +262,8 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  long pt_common_arg_0 = fts_get_number_arg(ac, at, 1, 0);
-  long pt_common_arg_1 = fts_get_number_arg(ac, at, 2, 0);
+  long pt_common_arg_0 = fts_get_int_arg(ac, at, 1, 0);
+  long pt_common_arg_1 = fts_get_int_arg(ac, at, 2, 0);
 	
   fts_alarm_init(&(x->clock), 0, pt_tick, x);	
 

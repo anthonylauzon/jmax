@@ -63,7 +63,7 @@ void fprintf_atom_array(FILE *file, fts_atom_array_t *v)
   fprintf(file, "} %lx>",(unsigned long) v);
 }
 
-void fts_atom_array_init()
+void fts_atom_array_init(void)
 {
   atom_array_heap = fts_heap_new(sizeof(fts_atom_array_t));
 }

@@ -77,11 +77,11 @@ exscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   exscale_t *x = (exscale_t *)o;
 
   at++; ac--; /* skip class name */
-  x->params[in_low] = fts_get_number_arg(ac, at, in_low, 0.);
-  x->params[in_high] = fts_get_number_arg(ac, at, in_high, 127.);
-  x->params[out_low] = fts_get_number_arg(ac, at, out_low, 0.);
-  x->params[out_high] = fts_get_number_arg(ac, at, out_high, 1.);
-  x->params[base] = fts_get_number_arg(ac, at, base, 1.);
+  x->params[in_low]   = fts_get_float_arg(ac, at, in_low, 0.f);
+  x->params[in_high]  = fts_get_float_arg(ac, at, in_high, 127.f);
+  x->params[out_low]  = fts_get_float_arg(ac, at, out_low, 0.f);
+  x->params[out_high] = fts_get_float_arg(ac, at, out_high, 1.f);
+  x->params[base]     = fts_get_float_arg(ac, at, base, 1.f);
   exscale_compute_params(x);
 }
 
@@ -89,7 +89,7 @@ static void
 exscale_param(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   exscale_t *x = (exscale_t *)o;
-  x->params[winlet-1] = fts_get_number_arg(ac, at, 0, 0.);
+  x->params[winlet-1] = fts_get_float_arg(ac, at, 0, 0.f);
   exscale_compute_params(x);
 }
 
@@ -100,7 +100,7 @@ exscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int i;
   
   for(i=0; i<ac; i++)
-    x->params[i] = fts_get_number_arg(ac, at, i, 0.);
+    x->params[i] = fts_get_float_arg(ac, at, i, 0.f);
   exscale_compute_params(x);
 }
 
@@ -108,7 +108,7 @@ static void
 exscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   exscale_t *x = (exscale_t *)o;
-  float f = fts_get_number_arg(ac, at, 0, 0);
+  float f = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(x->linear)
     f = f * x->in_scale + x->in_shift;

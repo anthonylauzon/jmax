@@ -14,6 +14,6 @@ extern void fts_atom_array_free(fts_atom_array_t *v);
 
 extern void fprintf_atom_array(FILE *file, fts_atom_array_t *v);
 
-extern void fts_atom_array_init();
+extern void fts_atom_array_init(void);
 
 #endif

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/12/10 14:44:09 $
+ *      $Revision: 1.8 $ IRCAM $Date: 1999/01/08 17:48:23 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -262,7 +262,7 @@ explode_dofollow(explode_t *this, long int n)
 
   /* check against skip array */
 
-  for (sp = &newskip; sp2 = sp->next;)
+  for (sp = &newskip; (sp2 = sp->next);)
     {
       int drop = 0;
       long pit = sp2->evt->pit;
@@ -399,7 +399,7 @@ explode_fnoteoff(explode_t *this, long int n)
 
   stub.next = this->hang;
 
-  for (h = &stub; h2 = h->next; h = h2)
+  for (h = &stub; (h2 = h->next); h = h2)
     {
       if (h2->evt->pit == n)
 	{
@@ -466,7 +466,9 @@ explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->set2 = 0;
   this->set3 = 0;
 
-  if (this->current = this->data.evt)
+  this->current = this->data.evt;
+
+  if (this->current)
     {
       fts_outlet_int((fts_object_t *)this, 0, this->current->time);
       this->mode = MPLAY;
@@ -504,7 +506,9 @@ explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for (e = this->data.evt; e && n--; e = e->next)
     ;
 
-  if (this->current = e)
+  this->current = e;
+
+  if (this->current)
     this->mode = MFOLLOW;
   else
     post("explode: follow: out of range\n");
@@ -524,7 +528,9 @@ explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   explode_at(this, fts_get_long(at + 0), fts_get_long(at + 1), fts_get_long(at + 2));
 
-  if (e = this->current)
+  e = this->current;
+
+  if (e)
     this->current = e->next;
 
   if (this->current)
@@ -609,7 +615,9 @@ explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       fts_outlet_int((fts_object_t *)this, 2, e->vel);
       fts_outlet_int((fts_object_t *)this, 1, e->pit);
 
-      if (this->current = e->next)
+      this->current = e->next;
+
+      if (this->current)
 	fts_outlet_int((fts_object_t *)this, 0, this->current->time - e->time);
       else
 	explode_stop(this);
@@ -660,7 +668,7 @@ explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	      stub.next = this->hang;
 	      this->rectime += n;
 
-	      for (h = &stub; h2 = h->next; h = h2)
+	      for (h = &stub; (h2 = h->next); h = h2)
 		{
 		  if (h2->evt->pit == this->n1)
 		    {
@@ -828,7 +836,7 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 /* Daemon of the "name" property; you can change the name of
    an explode only if the name was not set before */
 
-void explode_put_name_daemon(fts_daemon_action_t action,
+static void explode_put_name_daemon(fts_daemon_action_t action,
 			     fts_object_t *obj,
 			     fts_symbol_t property,
 			     fts_atom_t *value)
@@ -953,7 +961,7 @@ explode_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  * take care of it.
  */
 
-void explode_remote_remove( fts_data_t *d, int ac, const fts_atom_t *at)
+static void explode_remote_remove( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   /* Only argument, the zero based index of the event to suppress */
 
@@ -977,7 +985,7 @@ void explode_remote_remove( fts_data_t *d, int ac, const fts_atom_t *at)
   fts_heap_free((char *) e, explode_evt_heap);
 }
 
-void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
+static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   /* Arguments: 
    * the zero based index
@@ -1020,7 +1028,7 @@ void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
 }
 
 
-void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
+static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
 {
   /* Arguments: 
    * the zero based index

@@ -25,6 +25,7 @@
    
 */
 
+#include <unistd.h>
 #include <string.h>
 #include "sys.h"
 #include "lang.h"
@@ -360,7 +361,7 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
     separator = ' ';
     
   if (fts_is_long(at))
-    sprintf(buf, "%ld", fts_get_long(at));
+    sprintf(buf, "%d", fts_get_int(at));
   else if (fts_is_float(at))
     sprintf(buf, "%#f", fts_get_float(at));
   else if (fts_is_symbol(at))

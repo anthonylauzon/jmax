@@ -1,7 +1,10 @@
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+
 #include "fts.h"
 #include "sampbuf.h"
 
-#include <string.h>
 
 typedef struct{
   long magic;          /* must be equal to SND_MAGIC */
@@ -40,7 +43,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
-  float size = (unit)? (float)fts_get_number_arg(ac, at, 3, 0.0f): (float)fts_get_number_arg(ac, at, 2, 0.0f);
+  float size = (unit ? fts_get_float_arg(ac, at, 3, 0.0f) : fts_get_float_arg(ac, at, 2, 0.0f));
   long n_samps;
   float *samp_buf;
   float sr;
@@ -205,7 +208,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.dataLocation = sizeof(header);
   header.dataSize = 0x10000000;
   header.dataFormat = SND_FORMAT_LINEAR_16;
-  header.samplingRate = (long)fts_param_get_float(fts_s_sampling_rate, 44100.);
+  header.samplingRate = (long)fts_param_get_float(fts_s_sampling_rate, 44100.f);
   header.channelCount = 1;
   header.info = 0x0;
 
@@ -255,8 +258,8 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  float onset = fts_get_number_arg(ac, at, 1, 0);
-  float sr = fts_get_number_arg(ac, at, 2, 0.0);
+  float onset = fts_get_float_arg(ac, at, 1, 0.0f);
+  float sr = fts_get_float_arg(ac, at, 2, 0.0f);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
   long size = this->buf.size;
   float *buf = this->buf.samples;
@@ -292,8 +295,8 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  float save_size = fts_get_number_arg(ac, at, 1, 0);
-  float sr = fts_get_number_arg(ac, at, 2, 0.0f);
+  float save_size = fts_get_float_arg(ac, at, 1, 0.0f);
+  float sr = fts_get_float_arg(ac, at, 2, 0.0f);
   fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
   long size = this->buf.size;
   float *buf = this->buf.samples;
@@ -340,7 +343,7 @@ static void
 sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
-  float size = (float)fts_get_number_arg(ac, at, 0, 0.0f);
+  float size = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(this->name && size > 0)
     {

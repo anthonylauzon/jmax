@@ -7,8 +7,9 @@ extern void fts_event_add_handler(fts_object_t *handler);
 extern void fts_event_remove_handler(fts_object_t *handler);
 extern void fts_event_push_handler(fts_object_t *handler);
 extern void fts_event_pop_handler(fts_object_t *handler);
-
 extern void fts_event_add_default_handler(fts_object_t *handler);
+
+extern void fts_events_init(void);
 
 #define fts_error  fts_event
 

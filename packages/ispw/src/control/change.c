@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:52:34 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:04 $
  *
  */
 
@@ -23,7 +23,7 @@ typedef struct {
 static void
 change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((change_t *)o)->r_state = (long) fts_get_number_arg(ac, at, 1, 0);
+  ((change_t *)o)->r_state = (long) fts_get_int_arg(ac, at, 1, 0);
 }
 
 static void

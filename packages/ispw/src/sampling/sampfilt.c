@@ -1,3 +1,4 @@
+#include "fts.h"
 #include "sampfilt.h"
 
 sampfilt_t *sampfilt_tab = 0;

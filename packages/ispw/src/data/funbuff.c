@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:39 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/02 10:37:18 $
  *
  * Ported to FTS 1.3.x by MDC From the original sources of Zack Settel & Miller Puckette
  */
@@ -500,8 +500,8 @@ funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (ac < 2)
     return;
 
-  sel_x = (long) fts_get_number_arg(ac, at, 0, 0);
-  sel_width = (long) fts_get_number_arg(ac, at, 1, 0);
+  sel_x = (long) fts_get_int_arg(ac, at, 0, 0);
+  sel_width = (long) fts_get_int_arg(ac, at, 1, 0);
 
   if (sel_width < 0)
     {
@@ -708,7 +708,7 @@ funbuff_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   funbuff_t *this = (funbuff_t *)o;
 
-  this->y = (long) fts_get_number_arg(ac, at, 0, 0);
+  this->y = (long) fts_get_int_arg(ac, at, 0, 0);
   this->yvalid = 1;
 }
 
@@ -719,7 +719,7 @@ static void
 funbuff_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  long int index = (long) fts_get_number_arg(ac, at, 0, 0);
+  long int index = (long) fts_get_int_arg(ac, at, 0, 0);
 
   if (this->yvalid)
     {

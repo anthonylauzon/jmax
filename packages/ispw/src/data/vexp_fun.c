@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/28 15:39:41 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/02 10:37:19 $
  *
  * vexp_func.c -- this file include all the functions for vexp.
  *		  the first two arguments to the function are the number
@@ -23,6 +23,8 @@
  *		  It is the users responsibility not to pass strings to the
  *		  function.
  */
+
+#include <stdlib.h>
 
 #define __STRICT_BSD__
 #include <math.h>
@@ -51,10 +53,10 @@ static void ex_tan(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_atan(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_sinh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_cosh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
-static void ex_asinh();
-static void ex_acosh();
+static void ex_asinh(long argc, struct ex_ex *argv, struct ex_ex *optr);
+static void ex_acosh(long argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_tanh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
-static void ex_atanh();
+static void ex_atanh(long argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_atan2(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr);
@@ -237,8 +239,7 @@ ex_pow(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 	pow((double)left->ex_int,(double)right->ex_flt);
     } else {
       optr->ex_type = ET_INT;
-      optr->ex_int = (int)
-	pow((double)left->ex_int,(double)right->ex_int);
+      optr->ex_int = (int) pow((double)left->ex_int,(double)right->ex_int);
     }
   }
 }

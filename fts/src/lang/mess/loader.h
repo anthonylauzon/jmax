@@ -13,8 +13,8 @@
 
 typedef struct fts_binary_file_header_t {
   long magic_number;
-  long code_size;
-  long n_symbols;
+  unsigned long code_size;
+  unsigned long n_symbols;
 } fts_binary_file_header_t;
 
 /* 'bMax' */

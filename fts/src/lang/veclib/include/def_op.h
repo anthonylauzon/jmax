@@ -101,11 +101,11 @@
  */
  
 #define DEFINE_FTS_VEC_OP(name, t_in0, t_in1, t_out, op)\
- void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, long size)\
+ void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size)\
  {FTS_VEC_OP(t_in0, t_in1, t_out, op)}
   
 #define DEFINE_FTS_VECX_OP(name, t_in0, t_in1, t_out, op)\
- void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, long size)\
+ void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size)\
  {FTS_VECX_OP(t_in0, t_in1, t_out, op)}
 
 #define DEFINE_FTL_VEC_OP(name, t_in0, t_in1, t_out, op)\
@@ -130,10 +130,10 @@
  */
  
 #define DECLARE_FTS_VEC_OP(name, t_in0, t_in1, t_out, op)\
- extern void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, long size);
+ extern void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
  
 #define DECLARE_FTS_VECX_OP(name, t_in0, t_in1, t_out, op)\
- extern void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, long size);
+ extern void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
  
 #define DECLARE_FTL_VEC_OP(name, t_in0, t_in1, t_out, op)\
  extern void ftl_vec_ ## name(FTL_ARG);

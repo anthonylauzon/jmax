@@ -19,9 +19,7 @@
 
 
 static void fts_kernel_config(void);
-
-static void fts_assign_boot_devices();
-
+static void fts_assign_boot_devices(int argc, char **argv);
 
 
 /* fts_welcome_t: hw or module dependent welcome should be moved in the proper
@@ -138,8 +136,7 @@ fts_kernel_config(void)
 }
 
 
-static void 
-fts_assign_boot_devices(int argc, char **argv)
+static void  fts_assign_boot_devices(int argc, char **argv)
 {
   fts_atom_t a;
   fts_symbol_t class_name;
