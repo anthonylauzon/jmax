@@ -84,8 +84,7 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
   public void valueChanged(int value) 
   {
     isOn = (value == 1);
-
-    updateRedraw();
+    redraw();
   }
 
   public void paint(Graphics g) 
@@ -115,30 +114,4 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
 
     super.paint( g);
   }
-
-  public void updatePaint(Graphics g) 
-  {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
-
-    if ( !isSelected())
-      g.setColor( deselectedColor);
-    else
-      g.setColor( selectedColor);
-
-    g.fillRect( x + 3, y + 3, w - 6, h - 6);
-
-    int ix = x + (w - JMaxIcons.dspOn.getIconWidth())/2;
-    int iy = y + (h - JMaxIcons.dspOn.getIconHeight())/2;
-
-    if( ftsObject.isError())
-      g.drawImage(JMaxIcons.dspUndef.getImage(), ix, iy, JMaxIcons.dspUndef.getImageObserver());
-    else 
-      if(isOn)
-	g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
-      else
-	g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
-  }  
 }
