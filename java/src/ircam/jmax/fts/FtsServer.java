@@ -576,39 +576,6 @@ public class FtsServer  implements Runnable
       }
   }
 
-
-  /** Send a "named object message" messages to FTS.
-    @deprecated
-   */
-
-  final public void sendNamedObjectMessage(String dst, int inlet, String selector, MaxVector args)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("sendNamedObjectMessage(" + dst + ", " + inlet + ", " +
-			 selector + ", " + args + ")");
-
-    try
-      {
-	stream.sendCmd(FtsClientProtocol.fts_named_message_cmd);
-
-	stream.sendString(dst);
-	stream.sendInt(inlet);
-	stream.sendString(selector);
-
-	if (args != null)
-	  stream.sendVector(args);
-
-	stream.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
   /** Send a "connect objects" messages to FTS. */
 
   final void newConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)

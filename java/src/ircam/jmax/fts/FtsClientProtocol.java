@@ -108,7 +108,6 @@ class FtsClientProtocol
   static final int fts_release_object_data_cmd = 'b';
 
   static final int fts_message_cmd = 'm';
-  static final int fts_named_message_cmd = 'q';
 
   static final int fts_put_property_cmd = 'p';
   static final int fts_get_property_cmd = 'g';

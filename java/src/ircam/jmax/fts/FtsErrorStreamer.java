@@ -55,13 +55,20 @@ class FtsErrorStreamer implements Runnable
 		out = window.getPrintStream();
 		window.pack();
 		window.show();
-	      }
 
+		out.println("Output to this window come from the Fts Standard Error");
+		out.println("In general, it means that you just discovered a jMax bug");
+		out.println("Please, submit a bug report describing");
+		out.println("the situation that generated this output");
+		out.println("For information on how submit a bug for jMax");
+		out.println("please look at http://www.ircam.fr/Bugs/");
+		out.println("");
+	      }
 
 	    if (c == -1)
 	      {
 		running = false;
-		out.println("FTS quitted/crashed !!!\n");
+		out.println("FTS crashed.\n");
 	      }
 	    else
 	      {

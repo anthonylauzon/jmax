@@ -67,7 +67,6 @@
 #define OBJECT_RELEASE_CODE     'l'
 #define OBJECT_RELEASE_DATA_CODE 'b'
 #define MESSAGE_CODE            'm'
-#define NAMED_MESSAGE_CODE      'q'
 
 #define PUTPROP_CODE            'p'
 #define GETPROP_CODE            'g'

@@ -86,6 +86,7 @@ get_or_create_receive_list(fts_symbol_t name)
 
       t->name = name;
       t->first_receive = 0;
+      t->first_send = 0;
 
       fts_set_ptr(&d, t);
       fts_hash_table_insert(&receive_list_table, name, &d);
@@ -93,7 +94,6 @@ get_or_create_receive_list(fts_symbol_t name)
 
   return t;
 }
-
 
 
 /* Global function, used to send a message to receives, like
