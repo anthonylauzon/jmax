@@ -317,6 +317,7 @@ FTS_API int fts_bytestream_is_output(fts_bytestream_t *stream);
  *
  * @ingroup bytestream_io
  */
+FTS_API void fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *obj, fts_bytestream_callback_t fun);
 
 /**
  * Remove listener from a byte stream.
@@ -330,8 +331,6 @@ FTS_API int fts_bytestream_is_output(fts_bytestream_t *stream);
  *
  * @ingroup bytestream_io
  */
-
-FTS_API void fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *obj, fts_bytestream_callback_t fun);
 FTS_API void fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *obj);
 
 /*@}*/ /* Byte stream listeners */
@@ -393,4 +392,41 @@ FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 FTS_API fts_metaclass_t *fts_socketstream_type;
 FTS_API fts_metaclass_t *fts_pipestream_type;
 FTS_API fts_metaclass_t *fts_memorystream_type;
+
+/** 
+ * @name memory stream
+ */
+/*@{*/
+
+/**
+ * @typedef fts_bytestream_t
+ *
+ * A bytestream that writes its data into a byte array. The buffer automatically grows as data 
+ * is written to it. The data can be retrieved using fts_memorystream_get_bytes()
+ * @ingroup bytestream
+ */
+typedef struct _fts_memorystream_t fts_memorystream_t;
+
+/*@}*/
+
+/**
+ * Returns the characters written to the stream as an array. The array is not
+ * allocated; instead, the internal buffer itself is returned.
+ * Note: as the memory stream can reallocate its internal buffer when outputing
+ * a character to it, the value returned by this function must be considered
+ * invalid after the next output operation to the stream.
+ *
+ * @fn unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)
+ * @param stream the memory stream
+ * @return the bytes that were written to the stream
+ */
+unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream);
+
+/**
+ * Resets the stream to zero, so that all currently accumulated output is discarded.
+ *
+ * @fn void fts_memorystream_reset( fts_memorystream_t *stream)
+ * @param stream the memory stream
+ */
+void fts_memorystream_reset( fts_memorystream_t *stream);
 

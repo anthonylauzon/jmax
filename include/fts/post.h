@@ -30,7 +30,6 @@
  * @defgroup post post
  */
 
-#if 0
 /**
  * Print a message on a bytestream, a la printf.
  * This function take a va_list argument.
@@ -54,7 +53,6 @@
  * @ingroup post
  */
 FTS_API void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap);
-#endif
 
 /**
  * Print a message on a bytestream, a la printf.
@@ -77,6 +75,16 @@ FTS_API void fts_spost( fts_bytestream_t *stream, const char *format, ...);
  * @ingroup post
  */
 FTS_API void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at);
+
+/**
+ * Print an object description on a bytestream
+ *
+ * @fn void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
+ * @param stream the bytestream on which the chars will be printed
+ * @param obj the object to print
+ * @ingroup post
+ */
+FTS_API void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj);
 
 /**
  * Print a log message.

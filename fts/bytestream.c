@@ -560,11 +560,11 @@ static fts_status_t fts_pipestream_instantiate(fts_class_t *cl, int ac, const ft
  *
  */
 
-typedef struct _fts_memorystream_t {
+struct _fts_memorystream_t {
   fts_bytestream_t bytestream;
   fts_stack_t output_buffer;
   int input_size;
-} fts_memorystream_t;
+};
 
 static void fts_memorystream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
 {
@@ -621,7 +621,12 @@ static fts_status_t fts_memorystream_instantiate(fts_class_t *cl, int ac, const 
 
 unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)
 {
-  return (unsigned char *)fts_stack_get_base( &((fts_memorystream_t *)stream)->output_buffer);
+  return (unsigned char *)fts_stack_get_base( &stream->output_buffer);
+}
+
+void fts_memorystream_reset( fts_memorystream_t *stream)
+{
+  fts_stack_clear( &stream->output_buffer);
 }
 
 /***********************************************************************
