@@ -35,6 +35,8 @@
 #define real_realloc realloc
 #endif
 
+extern void post( const char *format, ...);
+
 /******************************************************************************/
 /*                                                                            */
 /*          Memory Initialization                                             */
@@ -79,7 +81,27 @@ fts_zalloc(int size)
 void *
 fts_malloc(int size)
 {
-  return real_malloc(size);
+  void *p;
+
+  p = real_malloc(size);
+
+  if (p == 0)
+    {
+      if (fts_memory_is_locked)
+	{
+	  fts_unlock_memory();
+	  p = real_malloc(size);
+	  
+	  if (p == 0)
+	    fprintf(stderr, "Out of memory\n");
+	  else
+	    post("Physical memory exhausted : non real-time mode\n");
+	}
+      else
+	fprintf(stderr, "Out of memory\n");
+    }
+
+  return p;
 }
 
 

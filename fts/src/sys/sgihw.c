@@ -24,9 +24,11 @@
 #include <sched.h>
 #endif
 
+extern void post( const char *format, ...);
 
 static fts_welcome_t  sgi_welcome = {"SGI platform\n"};
 static int running_real_time = 1;
+static int memory_is_locked = 0;
 struct timespec pause_time;
 
 /*
@@ -92,7 +94,16 @@ fts_platform_init(void)
   
       /* Lock to physical memory, if we can */
 
-      plock( PROCLOCK);
+      if (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
+	{
+	  memory_is_locked = 1;
+	}
+      else
+	{
+	  /* ??? */
+
+	  post("Cannot lock memory: %s\n", strerror (errno));
+	}
 
       /* raise priority to a high value */
 
@@ -106,7 +117,13 @@ fts_platform_init(void)
     {
       /* Lock to physical memory, if we can */
 
-      plock( PROCLOCK);
+      if (plock( PROCLOCK) == 0)
+	memory_is_locked = 1;
+      else
+	{
+	  if (errno != EPERM)
+	    post("Cannot lock memory: %s\n", strerror (errno));
+	}
 
       /* raise priority to a high value */
 
@@ -135,7 +152,16 @@ void fts_pause(void)
     nanosleep( &pause_time, 0);
 }
 
+int fts_memory_is_locked()
+{
+  return memory_is_locked;
+}
 
+void fts_unlock_memory()
+{
+  munlockall();
+  memory_is_locked = 0;
+}
 
 /* API to catch the exceptions */
 

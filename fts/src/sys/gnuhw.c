@@ -52,6 +52,15 @@ void fts_pause(void)
     nanosleep( &pause_time, 0);
 }
 
+int fts_memory_is_locked()
+{
+  return 0;
+}
+
+void fts_unlock_memory()
+{
+}
+
 /* API to catch the exceptions */
 
 

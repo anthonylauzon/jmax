@@ -34,7 +34,17 @@ void fts_set_fpe_handler(fts_fpe_handler fh)
 {
 }
 
+
 void fts_reset_fpe_handler()
+{
+}
+
+int fts_memory_is_locked()
+{
+  return 0;
+}
+
+void fts_unlock_memory()
 {
 }
 

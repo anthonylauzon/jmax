@@ -4,8 +4,10 @@
 /* generic include with the prototypes of HW dependent functions. */
 
 extern void fts_platform_init(void);
-extern void fts_set_no_real_time();
+extern void fts_set_no_real_time(void);
 extern void fts_pause(void);
+extern int fts_memory_is_locked(void);
+extern void fts_unlock_memory(void);
 extern unsigned int fts_check_fpe(void);
 
 typedef void (* fts_fpe_handler)(int which);
