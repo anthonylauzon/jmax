@@ -165,6 +165,7 @@ public class MaxApplication extends Object
       return itsHookTable.runHooks(name);
   }
 
+  public static SplashDialog splash = null;
 
   /** His majesty the main method */
 
@@ -227,7 +228,7 @@ public class MaxApplication extends Object
 
     //Splash Screen Dialog
     if((jmaxProperties.get("jmaxSplashScreen") == null)||(!jmaxProperties.get("jmaxSplashScreen").equals("hide")))
-	new SplashDialog(jmaxProperties.get("jmaxRoot")+"/images/Splash.gif", MaxVersion.getMaxVersion());  
+	splash = new SplashDialog(jmaxProperties.get("jmaxRoot")+"/images/Splash.gif", MaxVersion.getMaxVersion());  
 
     if (jmaxProperties.get("jmaxInterp") == null)
       {

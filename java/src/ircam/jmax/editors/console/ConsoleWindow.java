@@ -83,6 +83,9 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   {
     super("jMax Console");
 
+    if(MaxApplication.splash != null)
+	addComponentListener(MaxApplication.splash);
+
     MaxWindowManager.setTopFrame( this);
 
     setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);

@@ -36,7 +36,7 @@ import javax.swing.*;
  * The initial dialog.
  */
 
-public class SplashDialog extends Window implements KeyListener, MouseListener, ActionListener {
+public class SplashDialog extends Window implements KeyListener, MouseListener, /*ActionListener ,*/ ComponentListener{
   static final int SPLASH_WIDTH = 400;
   static final int SPLASH_HEIGHT = 300;
 
@@ -59,41 +59,52 @@ public class SplashDialog extends Window implements KeyListener, MouseListener, 
     pack();
     setVisible(true);
     
-    Timer aTimer = new Timer(4000, this);
-    aTimer.setRepeats(false);
-    aTimer.start();
+    //Timer aTimer = new Timer(4000, this);
+    //aTimer.setRepeats(false);
+    //aTimer.start();
   }
 	
-   public void actionPerformed(ActionEvent e) {
-     setVisible(false);
-     itsImage = null;
-     dispose();
-     Timer aTimer = (Timer) e.getSource();
-     aTimer.stop();
+    /*public void actionPerformed(ActionEvent e) {
+      setVisible(false);
+      itsImage = null;
+      dispose();
+      Timer aTimer = (Timer) e.getSource();
+      aTimer.stop();
+      }*/
+
+   void disposeSplash()
+   {
+       setVisible(false);
+       itsImage = null;
+       dispose();
+       MaxApplication.splash = null;
    }
 
-  /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}
-  
   public void mousePressed(MouseEvent e){
     setVisible(false);
   }
   public void mouseReleased(MouseEvent e){}
   public void mouseEntered(MouseEvent e){}
   public void mouseExited(MouseEvent e){}
-  /////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////mouseListener--fine
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////keyListener--inizio
+
+  //////////////////////////////////////////////////keyListener
   public void keyTyped(KeyEvent e){}
-  public void keyReleased(KeyEvent e){}
-  
+  public void keyReleased(KeyEvent e){}  
   public void keyPressed(KeyEvent e){
     setVisible(false);
   }
-  /////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////keyListener--fine
+  ///////////////////////////////////////////////////ComponentListener
+  
+  public void componentHidden(ComponentEvent e){}
+  public void componentShown(ComponentEvent e)
+  {
+      disposeSplash();
+  }
+  public void componentMoved(ComponentEvent e){}
+  public void componentResized(ComponentEvent e){}
+  ///////////////////////////////////////////////////////////
 
   public Dimension getMinimumSize() {
     Dimension d = new Dimension(SPLASH_WIDTH, SPLASH_HEIGHT);
