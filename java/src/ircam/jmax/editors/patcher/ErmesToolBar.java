@@ -219,7 +219,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "intbox",   "_intbox_", path+"cursor_integer.gif", "Adding New Integer Box");
     addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
     addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
-    addButton( "vecdisplay", "_display_", path+"cursor_display.gif", "Adding New Vector Display Object");
+    addButton( "vecdisplay", "_vecdisplay_", path+"cursor_vecdisplay.gif", "Adding New Vector Display Object");
     AddPopUp.initDone();//????
   }
 
@@ -236,11 +236,3 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
       }
   }
 }
-
-
-
-
-
-
-
-

@@ -30,10 +30,6 @@
 #include "ivec.h"
 #include "fvec.h"
 
-#define MIN_FLOAT -68719476736.
-
-#define STRING_SIZE 256
-
 typedef struct 
 {
   fts_object_t o;
@@ -117,7 +113,7 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       else if (value > max)
 	value = max;
 
-      display = (int)(this->range * (value - min) / value_range);
+      display = (int)((this->range - 1) * (value - min) / value_range + 0.5);
 
       fts_set_int(this->a, display);
       this->n = 1;
@@ -155,7 +151,7 @@ vecdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	      else if (value > max)
 		value = max;
 	      
-	      display = (int)((float)this->range * (value - min) / value_range);
+	      display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
 
 	      fts_set_int(this->a + i, display);
 	    }
@@ -198,7 +194,7 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  else if (value > max)
 	    value = max;
 	  
-	  display = (int)((float)this->range * (value - min) / value_range);
+	  display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
 	  
 	  fts_set_int(this->a + i, display);
 	}
@@ -238,7 +234,7 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  else if (value > max)
 	    value = max;
 	  
-	  display = (int)((float)this->range * (value - min) / value_range);
+	  display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
 	  
 	  fts_set_int(this->a + i, display);
 	}
@@ -255,7 +251,6 @@ vecdisplay_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
   vecdisplay_t * this = (vecdisplay_t *)o;
   
   this->size = fts_get_int(at);
-  post("size: %d\n", this->size);
 }
 
 static void
@@ -264,7 +259,6 @@ vecdisplay_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
   vecdisplay_t * this = (vecdisplay_t *)o;
   
   this->range = fts_get_int(at);
-  post("range: %d\n", this->range);
 }
 
 static void
@@ -299,6 +293,17 @@ vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
+vecdisplay_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vecdisplay_t *this = (vecdisplay_t *)o;
+  fts_atom_t a[2];
+
+  fts_set_float(a + 0, this->min);
+  fts_set_float(a + 1, this->max);
+  fts_client_send_message(o, sym_bounds, 2, a);
+}
+
+static void 
 vecdisplay_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
@@ -324,9 +329,9 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   at++;
 
   /* silent agreement with client */
-  this->min = 0.0;
-  this->max = 127.0;
-  this->size = 256;
+  this->min = -1.0;
+  this->max = 1.0;
+  this->size = 128;
   this->range = 128;
 
   this->n = 0;
@@ -350,6 +355,7 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vecdisplay_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, vecdisplay_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, vecdisplay_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), vecdisplay_set_size_by_client);
