@@ -507,12 +507,14 @@ marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double ol
     event_t *first = NULL;
     event_t *after = NULL;
     double stretch = old_tempo/new_tempo;
+    scomark_t *marker = NULL;
     
     mark_evt = event_get_next(mark_evt);
+    scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
+    
     while(mark_evt != NULL && t < 0.0)
     {
-      scomark_t *marker = (scomark_t *)fts_get_object( event_get_value(mark_evt));
-      scomark_get_tempo(marker, &t);
+      scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
       mark_evt = event_get_next(mark_evt);
     }
     
