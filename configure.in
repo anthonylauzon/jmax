@@ -1,4 +1,18 @@
+dnl $Id$
+dnl
 dnl Process this file with autoconf to produce a configure script
+dnl 
+dnl $Log$
+dnl Revision 1.86 2002/08/30 16:41:10 schwarz
+dnl Added --with-sdif option and configuration options for package sdif.
+dnl
+dnl Revision 1.85 2002/08/27 15:09:54 tisseran
+dnl First integration of jack package in jMax.
+dnl Add a flag to use GNU claspath when compiling with gcj
+dnl
+dnl Revision 1.84 2002/07/24 11:49:24 tisseran
+dnl Add doc/api/Makefile generation to create doxygen api documentation
+
 
 AC_INIT(fts/version.c.in)
 
