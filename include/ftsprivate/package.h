@@ -113,14 +113,6 @@ fts_package_t* fts_package_new(fts_symbol_t name);
 void fts_package_delete(fts_package_t* pkg);
 
 /**
- * Try to load all the default files such as the shared library.
- *
- * @fn void fts_package_load_default_files(fts_package_t* pkg)
- * @param pkg the package
- * @ingroup package */
-void fts_package_load_default_files(fts_package_t* pkg);
-
-/**
  * Explicitely sets the state of the package. This should normally not
  * be used. It's provided only for the system package.
  *

@@ -21,23 +21,35 @@
 
 package ircam.jmax;
 
+import java.io.*;
 import javax.swing.*;
 
 public class JMaxIcons {
-  public static final ImageIcon jmax_patcher_file_ = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon jmax_tiny_logo_ = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon lockMode = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon editMode = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon up = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon toSave = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon dspOn = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon dspOff = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon moreObjects = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon moreObjectsButton = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon patcher = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon errorObject = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon object = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon inlet = JMaxUtilities.loadIconFromResource("");
-  public static final ImageIcon outlet = JMaxUtilities.loadIconFromResource("");
+  public static final ImageIcon jmax_patcher_file_ = loadIcon( "mini_icon_jmax.gif");
+  public static final ImageIcon jmax_tiny_logo_ = loadIcon( "jmax_logo_tiny.gif");
+  public static final ImageIcon lockMode = loadIcon( "tool_lock_mode.gif");
+  public static final ImageIcon editMode = loadIcon( "tool_edit_mode.gif");
+  public static final ImageIcon up = loadIcon( "tool_up.gif");
+  public static final ImageIcon toSave = loadIcon( "to_save.gif");
+  public static final ImageIcon dspOn = loadIcon( "dsp_on.gif");
+  public static final ImageIcon dspOff = loadIcon( "dsp_off.gif");
+  public static final ImageIcon moreObjects = loadIcon( "more_objects.gif");
+
+  // These are used from ErrorTablePanel ???
+  public static final ImageIcon patcher = loadIcon( "");
+  public static final ImageIcon errorObject = loadIcon( "");
+
+  // These are used from ObjectSetViewer ???
+  public static final ImageIcon object = loadIcon( "");
+  public static final ImageIcon inlet = loadIcon( "");
+  public static final ImageIcon outlet = loadIcon( "");
+
+  private static ImageIcon loadIcon( String iconPath)
+  {
+    String fs = File.separator;
+    String fullPath = ((String)JMaxApplication.getProperty( "jmaxRoot")) + fs + "images" + fs + iconPath;
+
+    return new ImageIcon( fullPath);
+  }
 }
  

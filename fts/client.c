@@ -359,8 +359,13 @@ static void client_register_object( client_t *this, fts_object_t *object)
  */
 static void symbol_cache_init( symbol_cache_t *cache)
 {
+  int i;
+
   cache->length = SYMBOL_CACHE_SIZE;
   cache->symbols = (fts_symbol_t *)fts_malloc( cache->length * sizeof( fts_symbol_t));
+
+  for ( i = 0; i < cache->length; i++)
+    cache->symbols[i] = 0;
 }
 
 static void symbol_cache_destroy( symbol_cache_t *cache)
@@ -964,36 +969,13 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 
-static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_predefine_objects( client_t *this)
 {
-  client_t *this = (client_t *)o;
   fts_atom_t k, v;
   fts_atom_t a[1];
 
-  ac--;
-  at++;
-
-  this->stream = (fts_bytestream_t *)fts_get_object_arg( ac, at, 0, NULL);
-
-  if (this->stream == NULL || !fts_bytestream_check( (fts_object_t *)this->stream) || !fts_bytestream_is_input( this->stream) || !fts_bytestream_is_output( this->stream))
-    {
-      fts_object_set_error( (fts_object_t *)this, "Invalid stream");
-      return;
-    }
-
-  this->client_id = client_table_add( this);
-
-  /* Set my client id */
-  this->head.head.id = OBJECT_ID( 1, this->client_id);
-
-  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
-
-  this->object_id_count = 17;
-
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
-  fts_set_int( &k, 0);
-  fts_set_object( &v, (fts_object_t *)fts_get_root_patcher());
-  fts_hashtable_put( &this->object_table, &k, &v);
+  client_put_object( this, 0, (fts_object_t *)fts_get_root_patcher());
 #else
   fts_set_symbol( a, fts_s_patcher);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &this->root_patcher);
@@ -1006,19 +988,66 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_object_refer( this->root_patcher);
 
-  fts_set_int( &k, 0);
-  fts_set_object( &v, this->root_patcher);
-  fts_hashtable_put( &this->object_table, &k, &v);
+  client_put_object( this, 0, (fts_object_t *)this->root_patcher);
 #endif
 
-  fts_set_int( &k, 1);
-  fts_set_object( &v, (fts_object_t *)this);
-  fts_hashtable_put( &this->object_table, &k, &v);
+  client_put_object( this, 1, (fts_object_t *)this);
+}
+
+static void client_send_package_names( client_t *this)
+{
+  fts_iterator_t i;
+  fts_atom_t a[2];
+  fts_symbol_t s;
+
+  s = fts_new_symbol( "notify");
+  fts_set_symbol( a, fts_new_symbol( "package_loaded"));
+
+  fts_get_package_names( &i);
+
+  while (fts_iterator_has_more( &i))
+    {
+      fts_iterator_next( &i, a+1);
+
+      fts_log( "[client] notify package %s\n", fts_get_symbol( a+1));
+      fts_client_send_message( (fts_object_t *)this, s, 2, a);
+    }
+}
+
+static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+
+  ac--;
+  at++;
+
+  this->stream = (fts_bytestream_t *)fts_get_object_arg( ac, at, 0, NULL);
+
+  if ( this->stream == NULL 
+       || !fts_bytestream_check( (fts_object_t *)this->stream) 
+       || !fts_bytestream_is_input( this->stream) 
+       || !fts_bytestream_is_output( this->stream))
+    {
+      fts_object_set_error( (fts_object_t *)this, "Invalid stream");
+      return;
+    }
+
+  this->client_id = client_table_add( this);
+  this->object_id_count = 17;
+
+  /* Set my client id */
+  this->head.head.id = OBJECT_ID( 1, this->client_id);
 
   protocol_encoder_init( &this->encoder, this->stream);
   protocol_decoder_init( &this->decoder, this);
 
-  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
+  fts_bytestream_add_listener( this->stream, (fts_object_t *) this, client_receive);
+
+  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
+
+  client_predefine_objects( this);
+
+  client_send_package_names( this);
 
   fts_log( "[client]: Accepted client connection on socket\n");
 }

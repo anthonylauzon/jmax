@@ -164,6 +164,8 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount >= 2)
 	    args.addInt( ival);
 	  argsCount++;
+
+//  	  System.err.println( "endIntAction (count = " + (argsCount-1) + ") " + ival);
 	}
       };
 
@@ -175,6 +177,8 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount >= 2)
 	    args.addFloat( Float.intBitsToFloat(ival) );
 	  argsCount++;
+
+//  	  System.err.println( "endFloatAction (count = " + (argsCount-1) + ") " + Float.intBitsToFloat(ival));
 	}
       };
 
@@ -191,6 +195,8 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	    args.addSymbol( s);
 
 	  argsCount++;
+
+//  	  System.err.println( "endSymbolIndexAction (count = " + (argsCount-1) + ") " + s);
 	}
       };
 
@@ -207,6 +213,8 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	    args.addSymbol( s);
 
 	  argsCount++;
+
+//  	  System.err.println( "endSymbolCacheAction (count = " + (argsCount-1) + ") " + s);
 	}
       };
 
@@ -216,6 +224,8 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount >= 2)
 	    args.addString( buffer.toString());
 	  argsCount++;
+
+//  	  System.err.println( "endStringAction (count = " + (argsCount-1) + ") " + buffer.toString());
 	}
       };
 
@@ -232,12 +242,16 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	    args.addObject( obj);
 
 	  argsCount++;
+
+//  	  System.err.println( "endObjectAction (count = " + (argsCount-1) + ") " + obj);
 	}
       };
 
     TransitionAction endMessageAction = new TransitionAction() {
 	public void fire( int input)
 	{
+//  	  System.err.println( "endMessageAction (count = " + (argsCount-1) + ") " + target + " " + selector + " " + args);
+
   	  FtsObject.invokeMessageHandler( target, selector, args);
 	  args.clear();
 	  argsCount = 0;

@@ -33,8 +33,13 @@ import java.util.zip.*;
  */
 class PackageClassLoader extends ClassLoader {
 
-  PackageClassLoader( String jarPath) throws IOException
+  PackageClassLoader( String jarPath) throws IOException, FileNotFoundException
   {
+    File f = new File( jarPath);
+
+    if ( ! (f.exists() && f.isFile()) )
+      throw new FileNotFoundException();
+
     jarFile = new JarFile( jarPath);
   }
 

@@ -76,6 +76,8 @@ public class Comment extends Editable
 
     // Change the renderer if needed
 
+//      if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
+//        icon = Icons.get(args);
     /*if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
       icon = JMaxIcons.get(args);
 

@@ -35,9 +35,23 @@ public class JMaxPackageLoader {
     ch[0] = Character.toUpperCase( ch[0]);
     String className = new String( ch);
 
+    PackageClassLoader classLoader;
+
     try
       {
-	PackageClassLoader classLoader = new PackageClassLoader( jarPath);
+	classLoader = new PackageClassLoader( jarPath);
+      }
+    catch( FileNotFoundException e)
+      {
+	return;
+      }
+    catch( Exception e)
+      {
+	throw new JMaxPackageLoadingException( e.getClass().getName() + " " + e.getMessage());
+      }
+
+    try
+      {
 	JMaxPackage jmaxPackage = (JMaxPackage)classLoader.loadClass( className).newInstance();
 	jmaxPackage.load();
       }

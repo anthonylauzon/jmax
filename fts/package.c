@@ -59,6 +59,8 @@ static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass
 #define fts_lib_postfix  ".so"
 #endif
 
+static void fts_package_load_default_files(fts_package_t* pkg);
+
 /***********************************************
  *
  *  Package registry
@@ -261,8 +263,7 @@ fts_package_pop(fts_package_t* pkg)
  *   - load 
  */
 
-void
-fts_package_load_default_files(fts_package_t* pkg)
+static void fts_package_load_default_files(fts_package_t* pkg)
 {
   fts_list_t* list;
   char filename[MAXPATHLEN];

@@ -371,7 +371,6 @@ public class JMaxApplication {
 	   && args.getSymbol( 0).equals( sPackageLoaded) 
 	   && args.isSymbol( 1) )
 	{
-	  System.err.println( "Got package_loaded " + args.getSymbol( 1));
 	  try
 	    {
 	      JMaxPackageLoader.load( args.getSymbol( 1).toString());
