@@ -59,7 +59,7 @@ extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_deleteTracks;
 extern fts_symbol_t seqsym_moveTrack;
-extern fts_symbol_t seqsym_renameTrack;
+extern fts_symbol_t seqsym_setName;
 extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_deleteEvents;
 extern fts_symbol_t seqsym_moveEvent;

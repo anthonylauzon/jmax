@@ -57,7 +57,7 @@ fts_symbol_t seqsym_destroyEditor = 0;
 fts_symbol_t seqsym_addTracks = 0;
 fts_symbol_t seqsym_deleteTracks = 0;
 fts_symbol_t seqsym_moveTrack = 0;
-fts_symbol_t seqsym_renameTrack = 0;
+fts_symbol_t seqsym_setName = 0;
 fts_symbol_t seqsym_addEvents = 0;
 fts_symbol_t seqsym_deleteEvents = 0;
 fts_symbol_t seqsym_moveEvent = 0;
@@ -100,7 +100,7 @@ seqsym_config(void)
   seqsym_addTracks = fts_new_symbol("addTracks");
   seqsym_deleteTracks = fts_new_symbol("deleteTracks");
   seqsym_moveTrack = fts_new_symbol("moveTrack");
-  seqsym_renameTrack = fts_new_symbol("renameTrack");
+  seqsym_setName = fts_new_symbol("setName");
   seqsym_addEvents = fts_new_symbol("addEvents");
   seqsym_deleteEvents = fts_new_symbol("deleteEvents");
   seqsym_moveEvent = fts_new_symbol("moveEvent");

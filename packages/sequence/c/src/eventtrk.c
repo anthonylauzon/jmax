@@ -256,6 +256,31 @@ eventtrk_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 }
 
+/* set name of track by client request (ones this will be about variables!!!) */
+void
+eventtrk_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  fts_symbol_t name = fts_get_symbol(at + 1);
+
+  if(!track_is_locked(&this->head))
+    {
+      /* check if name is in use in this sequence */
+      if(sequence_get_track_by_name(track_get_sequence(&this->head), name))
+	{
+	  fts_atom_t a[1];
+	  
+	  fts_set_symbol(a, track_get_name(&this->head));
+	  fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
+	}
+      else
+	{
+	  track_set_name(&this->head, name);
+	  fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, at + 1);
+	}
+    }
+}
+
 /* create new event and upload by client request */
 void
 eventtrk_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -352,12 +377,15 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   if(!fts_object_has_id((fts_object_t *)this))
     {
-      fts_atom_t a[2];
+      fts_symbol_t name = track_get_name(&this->head);
+      fts_atom_t a[1];
       
-      /* create track at client */
-      fts_set_symbol(a + 0, track_get_name(&this->head));
-      fts_set_symbol(a + 1, eventtrk_get_type(this));
-      fts_client_upload((fts_object_t *)this, seqsym_track, 2, a);
+      /* create track at client (name uploading is not very elegant %!#%^!#)$) */
+      fts_set_symbol(a, eventtrk_get_type(this));
+      fts_client_upload((fts_object_t *)this, seqsym_track, 1, a);
+
+      if(name)
+	fts_client_send_message(o, seqsym_setName, 1, at + 1);
     }
 
   while(event)
@@ -392,7 +420,7 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_symbol_t track_name = track_get_name(&this->head);
   event_t *event = eventtrk_get_first(this);  
   
-  post("track %s: %d event(s)\n", fts_symbol_name(track_name), eventtrk_get_size(this));
+  post("track (%s): %d event(s)\n", track_name? fts_symbol_name(track_name): "untitled", eventtrk_get_size(this));
 
   while(event)
     {
@@ -455,12 +483,24 @@ eventtrk_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   eventtrk_t *this = (eventtrk_t *)o;
   fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
   event_t *event = eventtrk_get_first(this);
+  fts_symbol_t name = track_get_name(&this->head);
 
-  fts_bmax_code_push_symbol(file, this->type);
-  fts_bmax_code_push_symbol(file, track_get_name(&this->head));
 
-  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 2);
-  fts_bmax_code_pop_args(file, 2);
+  if(name)
+    {
+      fts_bmax_code_push_symbol(file, name);
+      fts_bmax_code_push_symbol(file, this->type);
+      
+      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 2);
+      fts_bmax_code_pop_args(file, 2);
+    }
+  else
+    {
+      fts_bmax_code_push_symbol(file, this->type);
+      
+      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 1);
+      fts_bmax_code_pop_args(file, 1);
+    }
   
   while(event)
     {
@@ -486,6 +526,8 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi_dialog, eventtrk_export_to_midifile_with_dialog);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midi, eventtrk_export_to_midifile);
     
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_name"), eventtrk_set_name_by_client_request);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("make_event"), eventtrk_make_event_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_event"), eventtrk_add_event_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_events"), eventtrk_remove_events_by_client_request);

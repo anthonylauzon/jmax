@@ -129,11 +129,11 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  
 	      this->track = track;
 	      this->event = event;
+
+	      this->start_location = locate;      
 	    }
 	}
     }
-
-  this->start_location = locate;
 }
 
 static void 

@@ -227,34 +227,6 @@ sequence_move_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
     }
 }
 
-/* rename track by client request */
-void
-sequence_rename_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  track_t *track = (track_t *)fts_get_object(at + 0);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-
-  if(!track_is_locked(track))
-    {
-      if(sequence_get_track_by_name(this, name))
-	{
-	  fts_atom_t a[2];
-	  
-	  fts_set_object(a + 0, (fts_object_t *)track);
-	  fts_set_symbol(a + 1, track_get_name(track));
-
-	  fts_client_send_message(o, seqsym_renameTrack, 2, a);
-	  
-	}
-      else
-	{
-	  track_set_name(track, name);
-	  fts_client_send_message(o, seqsym_renameTrack, 2, at);
-	}
-    }
-}
-
 void
 sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -369,14 +341,11 @@ void
 sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_symbol_t track_name = fts_get_symbol_arg(ac, at, 0, 0);
-  int i = 0;
+  int index = fts_get_int_arg(ac, at, 0, -1);
 
-  post("sequence: %d track(s)\n", sequence_get_size(this));
-
-  if(track_name)
+  if(index >= 0)
     {
-      track_t *track = sequence_get_track_by_name(this, track_name);
+      track_t *track = sequence_get_track_by_index(this, index);
 
       if(track)
 	fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
@@ -385,11 +354,12 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     {  
       track_t *track = sequence_get_first_track(this);
 
+      post("sequence: %d track(s)\n", sequence_get_size(this));
+
       while(track)
 	{
 	  fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
 	  track = track_get_next(track);
-	  i++;
 	}
     }
 }
@@ -410,29 +380,24 @@ static void
 sequence_add_track_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_symbol_t name = fts_get_symbol(at + 0);
-  fts_symbol_t type = fts_get_symbol(at + 1);
+  fts_symbol_t type = fts_get_symbol(at + 0);
   fts_object_t *track;
   fts_atom_t a[3];
   
   fts_set_symbol(a + 0, seqsym_eventtrk);
-  fts_set_symbol(a + 1, name);
-  fts_set_symbol(a + 2, type);
-  fts_object_new(0, 3, a, &track);  
-      
+  fts_set_symbol(a + 1, type);
+  fts_object_new(0, 2, a, &track);  
+
   /* add it to the sequence */
   sequence_add_track(this, (track_t *)track);
+
+  if(ac > 1)
+    {
+      fts_symbol_t name = fts_get_symbol(at + 1);
+      track_set_name((track_t *)track, name);
+    }
+
   this->currently_loaded_event_track = (track_t *)track;
-      
-  if(0) /* no upload */
-  {
-    /* create track at client */
-    fts_client_upload(track, seqsym_track, 2, a + 1);
-    
-    /* add track to sequence at client */
-    fts_set_object(a + 0, (fts_object_t *)track);	    
-    fts_client_send_message(o, seqsym_addTracks, 1, a);
-  }
 }
 
 static void
@@ -485,7 +450,6 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_track"), sequence_add_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), sequence_remove_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_track"), sequence_move_track_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("rename_track"), sequence_rename_track_by_client_request);
 
       fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), sequence_import);

@@ -42,12 +42,16 @@ void
 track_lock(track_t *track)
 {
   track->lock++;
-  fts_client_send_message((fts_object_t *)track, seqsym_lock, 0, 0);
+
+  if(fts_object_has_id((fts_object_t *)track))
+    fts_client_send_message((fts_object_t *)track, seqsym_lock, 0, 0);
 }
 
 void
 track_unlock(track_t *track)
 {
   track->lock--;
-  fts_client_send_message((fts_object_t *)track, seqsym_unlock, 0, 0);
+
+  if(fts_object_has_id((fts_object_t *)track))
+    fts_client_send_message((fts_object_t *)track, seqsym_unlock, 0, 0);
 }
