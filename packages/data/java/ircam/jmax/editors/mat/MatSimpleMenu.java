@@ -139,7 +139,8 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
       selRowIndex = selection.getMinSelectionIndex();
       selRowSize = selection.getMaxSelectionIndex() - selRowIndex + 1;
     }
-    deleteColAction.setEnabled( (table.getSelectedColumnCount() > 0));
+    if(model.canAppendColumn())
+      deleteColAction.setEnabled( (table.getSelectedColumnCount() > 0));
   }
 }
 
