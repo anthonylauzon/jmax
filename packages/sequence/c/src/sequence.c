@@ -248,7 +248,7 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       /* upload track */
       fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_upload, 0, 0);
-	  
+
       if(!exported)
 	{
 	  fts_set_object(a + n, (fts_object_t *)track);
@@ -343,7 +343,7 @@ sequence_import_from_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s
       fts_symbol_t default_name;
       char str[512];
       fts_atom_t a[4];
-      
+
       snprintf(str, 1024, " ");
       default_name = fts_new_symbol_copy(str);
       
@@ -360,10 +360,12 @@ sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   sequence_t *this = (sequence_t *)o;
 
-  if(ac > 0 && fts_is_symbol(at))
-    sequence_import_from_midifile(o, 0, 0, 1, at);
+  if((ac == 1 && fts_is_symbol(at)) || ac == 2 && fts_is_int(at) && fts_is_symbol(at + 1))
+    sequence_import_from_midifile(o, 0, 0, ac, at);
+  else if(ac == 0 || (ac == 1 && fts_is_int(at)))
+    sequence_import_from_midifile_dialog(o, 0, 0, ac, at);
   else
-    sequence_import_from_midifile_dialog(o, 0, 0, 1, at);
+      fts_object_signal_runtime_error(o, "import: wrong arguments");  
 }
 
 static void
