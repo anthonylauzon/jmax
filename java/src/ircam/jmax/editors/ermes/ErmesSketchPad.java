@@ -21,7 +21,7 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, KeyListener {
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener/*, KeyListener */{
   Frame itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -750,7 +750,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     setBackground(sketchColor);
     addMouseMotionListener(this);
     addMouseListener(this);
-    addKeyListener(this);
+    addKeyListener((ErmesSketchWindow)itsSketchWindow);
   }
 	
   //--------------------------------------------------------
@@ -1825,12 +1825,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
 
   
-  public void keyTyped(KeyEvent e){}
+  /*public void keyTyped(KeyEvent e){}
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
     ((ErmesSketchWindow)itsSketchWindow).keyPressed(e);
-  }
+  }*/
 }
 
 

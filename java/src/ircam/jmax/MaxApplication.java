@@ -622,7 +622,7 @@ public class MaxApplication extends Object {
       PrintJob aPrintJob = Toolkit.getDefaultToolkit().getPrintJob(itsSketchWindow, "print1", null);
       Graphics aPrintGraphics = aPrintJob.getGraphics();
 	
-      itsSketchWindow.paint(aPrintGraphics);
+      itsSketchWindow.itsSketchPad.paint(aPrintGraphics);
       aPrintGraphics.dispose();
       aPrintJob.end();
       /* aPrintJob.finalize(); */

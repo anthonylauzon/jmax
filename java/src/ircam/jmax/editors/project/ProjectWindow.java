@@ -21,7 +21,7 @@ import ircam.jmax.editors.ermes.*;
  * of entries, and all the documents associated. It knows how to
  * associate a file to an editor and then to a java package.
  */
-public class ProjectWindow extends Frame implements KeyListener, WindowListener, ActionListener, ItemListener {
+public class ProjectWindow extends Frame implements KeyListener, WindowListener, ActionListener, ItemListener, FocusListener {
   
   private static int untitledTxtCounter = 1;
   private static int untitledTabCounter = 1;
@@ -661,14 +661,22 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     }
   }
 
+  public void focusGained(FocusEvent e){
+  }
+
+  public void focusLost(FocusEvent e){
+  }
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio
 
 
-  public void keyTyped(KeyEvent e){}
+  public void keyTyped(KeyEvent e){
+    //System.out.println("keyTyped, control is "+e.isControlDown()+" char is "+(char)e.getKeyChar());
+  }
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
+    //    System.out.println("keyPressed, control is "+e.isControlDown()+" char is "+(char)e.getKeyChar());
     if (e.isControlDown()){
       if(e.getKeyChar() == 'n') New();
       else if(e.getKeyChar() == 'o') Open();
@@ -749,7 +757,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
   public void windowClosed(WindowEvent e){}
   public void windowIconified(WindowEvent e){}       
   public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e){}
+  public void windowActivated(WindowEvent e){
+    requestFocus();}
   public void windowDeactivated(WindowEvent e){}  
 
   ///////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*
     Font newFont = new Font(aFontName, fontStyle, 10);
     setFont(newFont);
 
-    //addKeyListener(this);
+    addKeyListener(itsProject.itsProjectWindow);
     addMouseListener(this);
   }
 	

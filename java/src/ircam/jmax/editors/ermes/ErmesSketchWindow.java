@@ -1106,7 +1106,9 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public void windowClosed(WindowEvent e){}
   public void windowIconified(WindowEvent e){}       
   public void windowDeiconified(WindowEvent e){}
-  public void windowActivated(WindowEvent e){}
+  public void windowActivated(WindowEvent e){
+    requestFocus();
+  }
   public void windowDeactivated(WindowEvent e){}  
 
   ///////////////////////////////////////////////////////////////////////////

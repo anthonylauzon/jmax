@@ -37,9 +37,12 @@ public class Project extends Panel implements AdjustmentListener{
     Panel aPanel;
     for(int i=0; i<35; i++){
       aPanel = new Panel();
+      aPanel.addKeyListener(itsProjectWindow);//??
       add(aPanel);
       itsPanelList.addElement(aPanel);
     } 
+    //    addFocusListener(itsProjectWindow); //??
+    addKeyListener(itsProjectWindow);
   }
 	
   //--------------------------------------------------------
