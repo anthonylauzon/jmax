@@ -195,12 +195,11 @@ install-includes:
 #
 sgi-pkg:
 	/bin/rm -rf /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes
-	( RAWIDB=/tmp/idb-doc ; export RAWIDB ; SRC=$$HOME ; export SRC ; echo $$SRC ; $(MAKE) ARCH=sgi INSTALL="echo jmax.doc.documentation " install-doc )
-	( RAWIDB=/tmp/idb-exec ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.exec" install-exec )
-	( RAWIDB=/tmp/idb-includes ; export RAWIDB ; $(MAKE) ARCH=sgi INSTALL="install -idb jmax.sw.includes" install-includes )
-	/bin/rm -rf ./pkg/sgi/jmax.idb
-	cat /tmp/idb-doc /tmp/idb-exec /tmp/idb-includes | sort +4u -6 > ./pkg/sgi/jmax.idb
-	/usr/sbin/gendist -verbose -root / -sbase .. -idb ./pkg/sgi/jmax.idb -spec ./pkg/sgi/jmax.spec -dist /usr/dist -all
+	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.doc.documentation " prefix=usr install-doc > /tmp/rawidb )
+	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.sw.exec " prefix=usr install-exec >> /tmp/rawidb )
+	( MAXHOME=`/bin/pwd` ; export MAXHOME ; $(MAKE) -s ARCH=sgi INSTALL="$${MAXHOME}/bin/mksgipkg jmax.sw.includes " prefix=usr install-includes >> /tmp/rawidb )
+	cat /tmp/rawidb | sort +4u -6 > ./pkg/sgi/jmax.idb
+	/usr/sbin/gendist -verbose -root / -sbase . -idb ./pkg/sgi/jmax.idb -spec ./pkg/sgi/jmax.spec -dist /usr/dist -all
 
 
 #

@@ -10,18 +10,17 @@ jMax (``Java Max'') is a graphical programming environment
 for developing real-time, interactive audio applications. 
 
 
-Installation and requirements
+Documentation
 
-See file installation.html in documentation directory for installation
-instructions.
-
-jMax requires the Java Development Kit or Java Runtime Environment.
-See file installation.html for further information.
+jMax documentation is included in this distribution, under
+doc subdirectory. It is in HTML format. The root file
+of the documentation is doc/index.html.
 
 
-Compiling jMax
+Installation and compilation
 
-See file compiling_jmax.html in doc/developer.
+Refer to the jMax documentation for compiling and installing
+jMax.
 
 
 License Agreement
