@@ -503,10 +503,6 @@ static void a_end_message( client_t *this)
   argc = fts_stack_get_size( &this->receive_args);
   argv = (fts_atom_t *)fts_stack_get_ptr( &this->receive_args);
 
-  fts_log( "[client]: Received message dest=0x%x selector=%s args=", this->dest_object, fts_symbol_name(this->selector));
-  fts_log_atoms( argc, argv);
-  fts_log( "\n");
-
   /* Client messages are sent to the system inlet */
   if (this->dest_object)
     fts_send_message( this->dest_object, fts_SystemInlet, this->selector, argc, argv);
@@ -903,10 +899,6 @@ static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symb
 
   if (client != NULL)
     {
-      fts_log( "[client]: Sending \"%s ", fts_symbol_name(s));
-      fts_log_atoms( ac, at);
-      fts_log( "\"\n");
-
       client_start_message( client);
       client_put_object( client, o);
       client_put_symbol( client, s);
@@ -920,10 +912,6 @@ static void client_controller_anything_client(fts_object_t *o, int winlet, fts_s
   client_controller_t *this = (client_controller_t *)o;
 
   this->gate = 1;
-
-  fts_log( "[client]: Received \"");
-  fts_log_atoms( ac, at);
-  fts_log( "\"\n");
 
   fts_outlet_send( o, 0, s, ac, at);
 
@@ -1229,8 +1217,6 @@ fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *buff
   }
 #else
   
-  fts_log( "[pipe] writing %d bytes\n", n);
-
   if ( write( this->out, buffer, n) < n)
     fts_log("[pipe]: failed to write to pipe: (%s)\n", strerror( errno));
 #endif
