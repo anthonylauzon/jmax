@@ -111,7 +111,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public void reEdit() {
     setVisible(true);
     toFront();
-    ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    //ErmesSketchPad.RequestOffScreen(itsSketchPad);
   }
 
 
@@ -245,21 +245,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       if (height1 == null) patcher.put("wh", new Integer(height));
       else  height = height1.intValue();
       
-      //autorouting = (String) patcher.get("autorouting");
-      //if (autorouting == null) patcher.put("autorouting", "on");
-      //get the window dimension use it for: reshape to the right dimensions
-
       setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
-
-      //assigning the autorouting mode.
-
-      // if (((String)(patcher.get("autorouting"))).equals("on"))
-      //SetAutorouting(true);
-      //else SetAutorouting(false);
 
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
-      //itsSketchPad.repaint();//force a repaint to build an offGraphics context
+
       validate();
     }
 

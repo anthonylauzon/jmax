@@ -104,7 +104,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     // do nothing
   }
   
-  protected synchronized void Paint_specific(Graphics g) {}  
+  protected void Paint_specific(Graphics g) {}  
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void ChangeFont(Font theFont) {
     itsFont = theFont;
