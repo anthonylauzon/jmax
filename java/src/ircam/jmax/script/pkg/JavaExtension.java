@@ -19,28 +19,27 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 // Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
+// Author: Peter Hanappe
+//
 
-package ircam.jmax.editors.table;
-
-import ircam.jmax.script.pkg.*;
+package ircam.jmax.script.pkg;
 import ircam.jmax.script.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 
 /**
- * The table extension; install the table data type
- * and the table file data handler
+ *  Interface JavaExtension
+ *
+ *  A class inside a jMax package that needs special initialisation
+ *  should implement this interface.
  */
-public class TableExtension implements JavaExtension
+public interface JavaExtension 
 {
-  public void init(Interpreter interp)
-  {
-    Mda.installEditorFactory(new TableFactory());
-  }
+    /**
+     * The init method will be called when the class is loaded thru
+     * the Package.loadClass mechanism. The class is generally loaded
+     * after a "(load-class X)" call in the package's init file (.scm).
+     *
+     * @param interp The interpreter
+     */
+    public void init(Interpreter interp);
 }
-
-
-

@@ -23,15 +23,17 @@
 // Author: Peter Hanappe
 //
 
-/** Class Package
- * 
- * Dummy class, for future use.
- */
 package ircam.jmax.script.pkg;
+import ircam.jmax.*;
 import ircam.jmax.script.*;
 import java.util.*;
 import java.io.*;
 
+/**
+ *  Class Package
+ * 
+ * Dummy class, for future use.
+ */
 public class Package {
     /** The name of the package. */
     protected String name;
@@ -101,41 +103,57 @@ public class Package {
 	loaded = l;
     }
 
-    /** Requires this package to have this or a higher version. Throws
-     *  an exception if the package can't meet the requirements. */
+    /**
+     *  Requires this package to have this or a higher version. Throws
+     *  an exception if the package can't meet the requirements. 
+     */
     public void requireVersion(String version) throws Exception
     {
 	return;
     }
 
-    /** Loads the package. 
+    /**
+     * Loads the package. 
      * 
      * @param pkgDir The path to the root directory of the
      * package. See PackageHandler.locatePackage.
      * @param version The minimum version required for this package.
      * @param interp The interpreter in charge to load the init
-     * file.*/
+     * file.
+     */
     public void load(File pkgDir, String version, Interpreter interp) throws Exception
     {
 	interp.loadPackage(this, new File(pkgDir, initScript));
 	requireVersion(version);
     }
     
-    /** Load the class with the given name. The class is found along
-     *  the local paths of this package. */
+    /**
+     *  Load the class with the given name. The class is found along
+     *  the local paths of this package. 
+     */
     public Class loadClass(String classname) throws Exception
     {
         if (classLoader == null) {
 	    classLoader = new PackageClassLoader(this);
 	}
-	return classLoader.loadClass(classname, true);
+	Class claz = classLoader.loadClass(classname, true);
+	Class[] interf = claz.getInterfaces();
+	for (int i = 0; i < interf.length; i++) {
+	    if (interf[i].getName().equals("ircam.jmax.script.pkg.JavaExtension")) {
+		JavaExtension extension = (JavaExtension) claz.newInstance();
+		extension.init(MaxApplication.getInterpreter());
+	    }
+	}
+	return claz;
     }
 
-    /** Locates a file with a given name within the package. The file
+    /**
+     *  Locates a file with a given name within the package. The file
      *  name should be it's full name, with extension and directories
      *  separated with the path separator.
      *  Ex. ircam/jmax/package/file.class. If you need to locate a
-     *  file "Java style", use locateFile(file, extension). */
+     *  file "Java style", use locateFile(file, extension). 
+     */
     public File locateFile(String filename) throws FileNotFoundException
     {
 	if (path == null) {
@@ -158,17 +176,21 @@ public class Package {
 	throw new FileNotFoundException(filename);
     }
 
-    /** Locates a file with the given extension. Dots '.' are
+    /** 
+     *  Locates a file with the given extension. Dots '.' are
      *  considered file separators, and the extension is added to the
-     *  file name. */
+     *  file name. 
+     */
     public File locateFile(String filename, String extension) throws FileNotFoundException
     {
 	filename = filename.replace('.', File.separatorChar) + extension;
 	return locateFile(filename);
     }
 
-    /** Appends a local path to the list of paths along which the
-     *  package searches for files. */
+    /**
+     *  Appends a local path to the list of paths along which the
+     *  package searches for files. 
+     */
     public void appendLocalPath(String path)
     {
 	localPaths = (localPaths == null) ? path : localPaths + File.pathSeparator + path;

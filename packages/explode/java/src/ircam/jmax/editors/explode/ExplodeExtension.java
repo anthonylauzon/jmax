@@ -25,22 +25,23 @@
 
 package ircam.jmax.editors.explode;
 
-import tcl.lang.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.script.pkg.*;
+import ircam.jmax.script.*;
 
 /**
  * The explode extension; install the explode data type,
  * register the remote data class, installs
  * the explode editor factory
  */
-public class ExplodeExtension extends tcl.lang.Extension
+public class ExplodeExtension implements JavaExtension
 {
 
   /**
-   * overrides tcl.lang.Extension.init()
+   * overrides JavaExtension.init()
    */
-  public void init(Interp interp)
+  public void init(Interpreter interp)
   {
     Mda.installEditorFactory( new ExplodeFactory());
 

@@ -23,16 +23,17 @@
 // Author: Peter Hanappe
 //
 
-/** PackageClassLoader
- * 
- *  The class loader for the package management system.
- */
 package ircam.jmax.script.pkg;
 import ircam.jmax.*;
 import ircam.jmax.script.*;
 import java.util.*;
 import java.io.*;
 
+/**
+ *  PackageClassLoader
+ * 
+ *  The class loader for the package management system.
+ */
 public class PackageClassLoader extends ClassLoader {
 
     /** The table containing all the classes the package handler
