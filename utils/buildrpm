@@ -1,6 +1,8 @@
 #!/bin/sh
 ARCH=$1
 
+VERSION=`cat ../VERSION`
+DISTFILE=../../jmax-$VERSION-src.tar.gz
 cp -fv $DISTFILE /usr/src/redhat/SOURCES
 cp -fv jmax.spec /usr/src/redhat/SPECS
 
