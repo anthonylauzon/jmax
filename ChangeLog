@@ -1,5 +1,17 @@
 2003-02-17  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 
+	* udpsend now use fts_binary_protocol for message encoding
+	
+	* udpsend now use a fts_udpstream_t instead of his own udp socket implementation.
+	
+	* add disconnect support for udpin/udpout objects
+	
+	* add disconnect function for fts_udpstream_t
+
+	* change constructor in fts_udpstream_t (only connected if 2 argument are given)
+	
+	* add enconding functions for binary protocol
+	
 	* add udpin and udpout object (jmax/packages/io/c/src/udp.c).
 	  these new object are used to create an udp connection. They use a fts_udpstream_t object for communication abstraction.
 
