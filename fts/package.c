@@ -706,7 +706,7 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 }
 
 void 
-fts_package_add_summary(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
+fts_package_add_summary(fts_package_t* pkg, fts_symbol_t descr, fts_symbol_t file)
 {
   fts_atom_t n, p;
 
@@ -715,7 +715,7 @@ fts_package_add_summary(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file
     fts_hashtable_init(pkg->summaries, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   }
 
-  fts_set_symbol(&n, name);
+  fts_set_symbol(&n, descr);
   fts_set_symbol(&p, file);
   fts_hashtable_put(pkg->summaries, &n, &p);
 }
@@ -1116,8 +1116,8 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
-  fts_method_define_varargs(cl, 0, fts_s_summary, __fts_package_summary);
   fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
+  fts_method_define_varargs(cl, 0, fts_s_summary, __fts_package_summary);
 
   /* All these methods are also defined for SystemInlet, as bmax saving
      allows only messages to SystemInlet... 
@@ -1129,6 +1129,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_summary, __fts_package_summary);
 
   return fts_Success;
 }

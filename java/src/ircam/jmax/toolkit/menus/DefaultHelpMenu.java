@@ -54,7 +54,7 @@ public class DefaultHelpMenu extends EditorMenu {
 	    final String str = (String) en.nextElement();
 	    if(count > numEntries)
 	      {			      
-		add( new OpenHelpSummaryAction(str), str);
+		add( new OpenHelpSummaryAction( FtsHelpPatchTable.getHelpSummaryPatch(str)), str);
 		numEntries++;
 	      }
 	    count++;

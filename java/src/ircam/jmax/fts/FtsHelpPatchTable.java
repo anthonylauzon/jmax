@@ -85,7 +85,7 @@ public class FtsHelpPatchTable
 
   /** Get a named help patch summary filename */
 
-  static String getHelpSummaryPatch(String className)
+  static public String getHelpSummaryPatch(String className)
   {
     return (String) helpSummaryTable.get(className);
   }

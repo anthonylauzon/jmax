@@ -27,6 +27,7 @@ package ircam.jmax.toolkit.actions;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -49,7 +50,14 @@ public class OpenHelpSummaryAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-      //FtsHelpPatchTable.openHelpSummary( container.getEditor().getFts(), argument);
+     try
+      {	
+	JMaxApplication.getFtsServer().getRoot().load( argument);
+      }
+    catch(IOException e)
+      {
+	System.err.println("[OpenHelpSummaryAction]: I/O error loading "+argument);
+      }
   }
 }
 
