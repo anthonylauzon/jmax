@@ -1,3 +1,13 @@
+2003-07-21  Carl Seleborg  <seleborg@licorne.ircam.fr>
+
+	* java/src/ircam/jmax/editors/patcher/actions/*.java
+	* java/src/ircam/jmax/editors/patcher/menus/*.java
+	* java/src/ircam/jmax/editors/patcher/*.java
+	* java/src/ircam/jmax/toolkit/actions/*.java
+	* java/src/ircam/jmax/toolkit/menus/*.java
+	* Modified menus to use actions instead of menu items.
+	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v".
+
 2003-07-18  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* changed post() to fts_post() and post_atoms() to fts_post_atoms()
