@@ -653,7 +653,7 @@ sequence_add_event_to_last_track(fts_object_t *o, int winlet, fts_symbol_t s, in
 }  
 
 static void
-sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
 
@@ -678,6 +678,26 @@ sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  track_dump((fts_object_t *)track, 0, 0, 1, at);
 	  track = track_get_next(track);
 	}
+    }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
+}
+
+static void 
+sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(this->persistence == 1)
+    {
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      fts_atom_t a;
+
+      sequence_dump_state(o, 0, 0, ac, at);
+
+      /* save persistence flag */
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);

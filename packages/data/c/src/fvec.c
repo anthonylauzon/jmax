@@ -1367,47 +1367,56 @@ fvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
+fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
+  int size = fvec_get_size(this);
+  fts_message_t *mess;
+  int i;
+  
+  /* send size message */
+  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_append_int(mess, size);
+  fts_dumper_message_send(dumper, mess);
+  
+  /* get new set message and append onset 0 */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_int(mess, 0);
+  
+  for(i=0; i<size; i++)
+    {
+      fts_message_append_float(mess, this->values[i]);
+      
+      if(fts_message_get_ac(mess) >= 256)
+	{
+	  fts_dumper_message_send(dumper, mess);
+	  
+	  /* new set message and append onset i + 1 */
+	  mess = fts_dumper_message_new(dumper, fts_s_set);
+	  fts_message_append_int(mess, i + 1);
+	}
+    }
+  
+  if(fts_message_get_ac(mess) > 1) 
+    fts_dumper_message_send(dumper, mess);
+}
+
+static void 
 fvec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
 
   if(data_object_is_persistent(o))
     {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
-      int size = fvec_get_size(this);
-      fts_message_t *mess;
-      int i;
-      
-      /* save persistence flag */
-      mess = fts_dumper_message_new(dumper, fts_s_persistence);
-      fts_message_append_int(mess, 1);
-      fts_dumper_message_send(dumper, mess);
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      fts_atom_t a;
 
-      /* send size message */
-      mess = fts_dumper_message_new(dumper, fts_s_size);  
-      fts_message_append_int(mess, size);
-      fts_dumper_message_send(dumper, mess);
-      
-      /* get new set message and append onset 0 */
-      mess = fts_dumper_message_new(dumper, fts_s_set);
-      fts_message_append_int(mess, 0);
-      
-      for(i=0; i<size; i++)
-	{
-	  fts_message_append_float(mess, this->values[i]);
-	  
-	  if(fts_message_get_ac(mess) >= 256)
-	    {
-	      fts_dumper_message_send(dumper, mess);
-	      
-	      /* new set message and append onset i + 1 */
-	      mess = fts_dumper_message_new(dumper, fts_s_set);
-	      fts_message_append_int(mess, i + 1);
-	    }
-	}
-      
-      if(fts_message_get_ac(mess) > 1) 
-	fts_dumper_message_send(dumper, mess);
+      fvec_dump_state(o, 0, 0, ac, at);
+
+      /* save persistence flag */
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);
@@ -1528,6 +1537,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, fvec_dump);
 
   fts_class_message_varargs(cl, fts_s_post, fvec_post); 

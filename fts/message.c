@@ -214,145 +214,147 @@ output_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_a
 {
   fts_connection_t *conn = o->out_conn[woutlet];
 
-  if(!check_outlet(o, woutlet))
-    return;
-
-  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
+  if(check_outlet(o, woutlet))
     {
-      while(conn)
+      fts_connection_t *conn = o->out_conn[woutlet];
+
+      if (!FTS_REACHED_MAX_CALL_DEPTH()) 
 	{
-	  if(conn->selector == s)
+	  while(conn)
 	    {
-	      /* call cached method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*conn->method)(conn->dst, conn->winlet, s, ac, at);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
-	  else
-	    {
-	      /* get method for given selector */
-	      fts_method_t method = fts_class_get_method(fts_object_get_class(conn->dst), s);
+	      if(conn->selector == s)
+		{
+		  /* call cached method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*conn->method)(conn->dst, conn->winlet, s, ac, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
+	      else
+		{
+		  /* get method for given selector */
+		  fts_method_t method = fts_class_get_method(fts_object_get_class(conn->dst), s);
+		  
+		  /* get default handler */
+		  if(method == NULL)
+		    method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+		  
+		  /* update cache */
+		  conn->selector = s;
+		  conn->class = NULL; /* all varargs for now */
+		  conn->method = method;
+		  
+		  /* call method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*method)(conn->dst, conn->winlet, s, ac, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
 	      
-	      /* get default handler */
-	      if(method == NULL)
-		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
-
-	      /* update cache */
-	      conn->selector = s;
-	      conn->class = NULL; /* all varargs for now */
-	      conn->method = method;
-	      
-	      /* call method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*method)(conn->dst, conn->winlet, s, ac, at);
-	      FTS_OBJSTACK_POP(conn->dst);
+	      conn = conn->next_same_src;
 	    }
-
-	  conn = conn->next_same_src;
 	}
+      else
+	fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
     }
-  else
-    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 /* output single value */
 static void
 output_value(fts_object_t *o, int woutlet, const fts_atom_t *at)
 {
-  fts_connection_t *conn = o->out_conn[woutlet];
-
-  if(!check_outlet(o, woutlet))
-    return;
-
-  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
+  if(check_outlet(o, woutlet))
     {
-      fts_class_t *class = fts_get_class(at);
+      fts_connection_t *conn = o->out_conn[woutlet];
 
-      while(conn)
+      if (!FTS_REACHED_MAX_CALL_DEPTH()) 
 	{
-	  if(conn->selector == NULL && conn->class == class)
+	  fts_class_t *class = fts_get_class(at);
+
+	  while(conn)
 	    {
-	      /* call cached method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*conn->method)(conn->dst, conn->winlet, 0, 1, at);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
-	  else
-	    {
-	      /* get method for given class at given inlet */
-	      fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, class);
+	      if(conn->selector == NULL && conn->class == class)
+		{
+		  /* call cached method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*conn->method)(conn->dst, conn->winlet, 0, 1, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
+	      else
+		{
+		  /* get method for given class at given inlet */
+		  fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, class);
 	      
-	      /* ... or get varargs method at given inlet */
-	      if(method == NULL)
-		method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
+		  /* ... or get varargs method at given inlet */
+		  if(method == NULL)
+		    method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
 
-	      /* ... or get default handler */
-	      if(method == NULL)
-		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+		  /* ... or get default handler */
+		  if(method == NULL)
+		    method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
 
-	      /* update cache */
-	      conn->selector = NULL;
-	      conn->class = class;
-	      conn->method = method;
+		  /* update cache */
+		  conn->selector = NULL;
+		  conn->class = class;
+		  conn->method = method;
 	      
-	      /* call method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*method)(conn->dst, conn->winlet, 0, 1, at);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
+		  /* call method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*method)(conn->dst, conn->winlet, 0, 1, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
 
-	  conn = conn->next_same_src;
+	      conn = conn->next_same_src;
+	    }
 	}
+      else
+	fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
     }
-  else
-    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 static void
 output_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 {
-  fts_connection_t *conn = o->out_conn[woutlet];
-  fts_class_t *class = fts_get_class(at);
-
-  if(!check_outlet(o, woutlet))
-    return;
-
-  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
+  if(check_outlet(o, woutlet))
     {
-      while(conn)
+      fts_connection_t *conn = o->out_conn[woutlet];
+      fts_class_t *class = fts_get_class(at);
+
+      if (!FTS_REACHED_MAX_CALL_DEPTH()) 
 	{
-	  if(conn->selector == NULL && conn->class == NULL && conn->method != NULL)
+	  while(conn)
 	    {
-	      /* call cached method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*conn->method)(conn->dst, conn->winlet, 0, ac, at);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
-	  else
-	    {
-	      /* get varargs method at given inlet */
-	      fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
+	      if(conn->selector == NULL && conn->class == NULL && conn->method != NULL)
+		{
+		  /* call cached method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*conn->method)(conn->dst, conn->winlet, 0, ac, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
+	      else
+		{
+		  /* get varargs method at given inlet */
+		  fts_method_t method = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, NULL);
 	      
-	      /* get default handler */
-	      if(method == NULL)
-		method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
+		  /* get default handler */
+		  if(method == NULL)
+		    method = fts_class_get_default_handler(fts_object_get_class(conn->dst));
 
-	      /* ... or update cache */
-	      conn->selector = NULL;
-	      conn->class = NULL;
-	      conn->method = method;
+		  /* ... or update cache */
+		  conn->selector = NULL;
+		  conn->class = NULL;
+		  conn->method = method;
 	      
-	      /* call method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*method)(conn->dst, conn->winlet, 0, ac, at);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
+		  /* call method */
+		  FTS_OBJSTACK_PUSH(conn->dst);
+		  (*method)(conn->dst, conn->winlet, 0, ac, at);
+		  FTS_OBJSTACK_POP(conn->dst);
+		}
 
-	  conn = conn->next_same_src;
+	      conn = conn->next_same_src;
+	    }
 	}
+      else
+	fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
     }
-  else
-    fts_object_signal_runtime_error(o, "message stack overflow at inlet %d", conn->winlet);
 }
 
 void 

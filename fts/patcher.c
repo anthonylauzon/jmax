@@ -91,12 +91,34 @@ static fts_memorystream_t * patcher_get_memory_stream()
  *
  */
 
+static fts_object_t *
+patcher_get_last_object(fts_patcher_t *this)
+{
+  fts_object_t *last = this->objects;
+
+  while(last && last->next_in_patcher)
+    last = last->next_in_patcher;
+
+  return last;
+}
+
 void 
 fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
   /* add object to list of objects in patcher */
-  obj->next_in_patcher = this->objects;
-  this->objects = obj;
+  if(this->last_object == NULL)
+    {
+      /* add object as first, last and only */
+      this->objects = obj;
+      this->last_object = obj;
+    }
+  else
+    {
+      /* add object to end of the list */
+      obj->next_in_patcher = NULL;
+      this->last_object->next_in_patcher = obj;
+      this->last_object = obj;
+    }
 
   /* claim object */
   fts_object_refer(obj);
@@ -110,11 +132,14 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     if (*p == obj)
       {
-	fts_object_t *remove = *p;
-
+	/* remove object from list */
 	*p = obj->next_in_patcher;
 
-	fts_object_release(remove);
+	/* update last object pointer */
+	if(obj == this->last_object)
+	  this->last_object = patcher_get_last_object(this);
+
+	fts_object_release(obj);
 
 	return;
       }
@@ -1817,7 +1842,11 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   patcher_redefine_number_of_inlets(this, n_inlets);
   patcher_redefine_number_of_outlets(this, n_outlets);
 
-  this->objects = (fts_object_t *)0;
+  /* init object list */
+  this->objects = NULL;
+  this->last_object = NULL;
+
+  /* init flags */
   this->open = 0; /* start as closed */
   this->editor_open = 0; /* start with editor closed */  
   this->deleted = 0;
@@ -1843,21 +1872,20 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->deleted = 1;
   this->open = 0;
 
-  while(this->objects)
+  /* remove object from last to first */
+  while(this->last_object)
     {
-      fts_object_t *remove = this->objects;
+      fts_object_t *remove = this->last_object;
 
-      this->objects = remove->next_in_patcher;
-
+      /* stop DSP */
       if(fts_dsp_is_active() && fts_is_dsp_object(remove))
 	fts_dsp_desactivate();
 
-      /* remove connections and unbind the object from used variables */
+      /* remove connections and unbind the object from used and defined variables */
       fts_object_unpatch(remove);
       
-      /* remove object from patcher */
-      remove->patcher = NULL;
-      fts_object_release(remove);
+      /* remove object from list */
+      fts_patcher_remove_object(this, remove);
     }
 
   /* delete arguments */

@@ -29,13 +29,14 @@ struct fts_patcher
   int description_ac;
   fts_atom_t *description_at;
 
-  patcher_inout_t **inlets; /* the patcher inlet array */
-  patcher_inout_t **outlets; /* the patcher outlet array */
+  patcher_inout_t **inlets; /* array of patcher inlets */
+  patcher_inout_t **outlets; /* array of patcher outlets */
 
   int n_inlets;
   int n_outlets;
 
-  fts_object_t *objects; /* the patcher content, organized as a list */
+  fts_object_t *objects; /* list of patcher objects*/
+  fts_object_t *last_object; /* pointer to last object */
 
   int open; /* the open flag */
   int editor_open; /* the open editor flag */

@@ -557,35 +557,41 @@ bpf_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
+bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  int size = bpf_get_size(this);
+  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
+  int i;
+  
+  for(i=0; i<size; i++)
+    {
+      double time = this->points[i].time;
+      double value = this->points[i].value;
+      
+      fts_message_append_float(mess, time);
+      fts_message_append_float(mess, value);
+    }
+  
+  fts_dumper_message_send(dumper, mess);
+}
+  
+static void
 bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   
   if(data_object_is_persistent(o))
     {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      int size = bpf_get_size(this);
-      fts_message_t *mess;
-      int i;
+      fts_atom_t a;
+
+      bpf_dump_state(o, 0, 0, ac, at);
 
       /* save persistence flag */
-      mess = fts_dumper_message_new(dumper, fts_s_persistence);
-      fts_message_append_int(mess, 1);
-      fts_dumper_message_send(dumper, mess);
-
-      /* first message will be send */
-      mess = fts_dumper_message_new(dumper, fts_s_set);
-      
-      for(i=0; i<size; i++)
-	{
-	  double time = this->points[i].time;
-	  double value = this->points[i].value;
-	  
-	  fts_message_append_float(mess, time);
-	  fts_message_append_float(mess, value);
-	}
-      
-      fts_dumper_message_send(dumper, mess);
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);
@@ -644,6 +650,7 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump_state, bpf_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, bpf_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);

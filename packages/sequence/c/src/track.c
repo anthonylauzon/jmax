@@ -862,8 +862,13 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   
   if(file)
     {
-      int size = track_import_from_midifile(this, file);
-      char *error = fts_midifile_get_error(file);
+      int size;
+      char *error;
+
+      track_clear(this);
+
+      size = track_import_from_midifile(this, file);
+      error = fts_midifile_get_error(file);
       
       if(error)
 	fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
@@ -980,8 +985,8 @@ track_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  * 
  */
 
-void 
-track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
 
@@ -995,6 +1000,26 @@ track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  event_dump(event, dumper);
 	  event = event_get_next(event);
 	}  
+    }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
+}
+
+static void 
+track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  if(this->persistence == 1)
+    {
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      fts_atom_t a;
+
+      track_dump_state(o, 0, 0, ac, at);
+
+      /* save persistence flag */
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);

@@ -541,6 +541,46 @@ mat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
+mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_atom_t *data = this->data;
+  int m = mat_get_m(this);
+  int n = mat_get_n(this);
+  int size = m * n;
+  fts_message_t *mess;
+  int i, j;
+      
+  /* dump size message */
+  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_append_int(mess, m);
+  fts_message_append_int(mess, n);
+  fts_dumper_message_send(dumper, mess);
+      
+  for(i=0; i<m; i++)
+    {
+      /* new row */
+      mess = fts_dumper_message_new(dumper, fts_s_row);  
+      fts_message_append_int(mess, i);
+	  
+      for(j=0; j<n; j++)
+	{
+	  fts_atom_t *d = data + i * n + j;
+	      
+	  /* cannot dump objects yet */
+	  if(fts_is_object(d))
+	    fts_message_append_int(mess, 0);
+	  else
+	    fts_message_append(mess, 1, d);
+	}
+	  
+      if(n > 0)
+	fts_dumper_message_send(dumper, mess);
+    }
+}
+
+static void 
 mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
@@ -548,44 +588,13 @@ mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t *data = this->data;
-      int m = mat_get_m(this);
-      int n = mat_get_n(this);
-      int size = m * n;
-      fts_message_t *mess;
-      int i, j;
-      
-      /* save persistence flag */
-      mess = fts_dumper_message_new(dumper, fts_s_persistence);
-      fts_message_append_int(mess, 1);
-      fts_dumper_message_send(dumper, mess);
+      fts_atom_t a;
 
-      /* dump size message */
-      mess = fts_dumper_message_new(dumper, fts_s_size);  
-      fts_message_append_int(mess, m);
-      fts_message_append_int(mess, n);
-      fts_dumper_message_send(dumper, mess);
-      
-      for(i=0; i<m; i++)
-	{
-	  /* new row */
-	  mess = fts_dumper_message_new(dumper, fts_s_row);  
-	  fts_message_append_int(mess, i);
-	  
-	  for(j=0; j<n; j++)
-	    {
-	      fts_atom_t *d = data + i * n + j;
-	      
-	      /* cannot dump objects yet */
-	      if(fts_is_object(d))
-		fts_message_append_int(mess, 0);
-	      else
-		fts_message_append(mess, 1, d);
-	    }
-	  
-	  if(n > 0)
-	    fts_dumper_message_send(dumper, mess);
-	}
+      mat_dump_state(o, 0, 0, ac, at);
+
+      /* save persistence flag */
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
     }
 
   fts_name_dump_method(o, 0, 0, ac, at);
@@ -708,6 +717,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, mat_dump);
 
   fts_class_message_varargs(cl, fts_s_post, mat_post); 

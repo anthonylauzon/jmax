@@ -85,8 +85,6 @@ static void
 preset_dumper_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(preset_dumper_t), preset_dumper_init, preset_dumper_delete);
-
-  return fts_Success;
 }
 
 /******************************************************
@@ -99,10 +97,10 @@ static int
 preset_check_object(fts_preset_t *this, fts_object_t *obj)
 {
   fts_class_t *class = fts_object_get_class(obj);
-  fts_method_t meth_set = fts_class_get_method(class, fts_s_set_from_instance);
-  fts_method_t meth_dump = fts_class_get_method(class, fts_s_dump);
+  fts_method_t meth_set_from_instance = fts_class_get_method(class, fts_s_set_from_instance);
+  fts_method_t meth_dump_state = fts_class_get_method(class, fts_s_dump_state);
 
-  return (meth_set != 0) && (meth_dump != 0);
+  return (meth_set_from_instance != 0) && (meth_dump_state != 0);
 }
 
 static void
@@ -296,6 +294,15 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
+preset_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_preset_t *this = (fts_preset_t *)o;
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+
+  preset_get_keys(this, array);
+}
+
+static void
 preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_preset_t *this = (fts_preset_t *)o;
@@ -327,16 +334,13 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
-  if(this->persistence == 1)
+  if(this->persistence != 0)
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
       preset_dumper_t *preset_dumper = (preset_dumper_t *)fts_object_create(preset_dumper_type, NULL, 1, at);
       fts_iterator_t iterator;
       fts_atom_t a;
 
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
       fts_object_refer(preset_dumper);
       
       /* dump presets */
@@ -366,33 +370,55 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  
 	      /* dump clone messages */
 	      fts_set_object(&a, (fts_object_t *)preset_dumper);
-	      fts_send_message(clones[i], fts_s_dump, 1, &a);
+	      fts_send_message(clones[i], fts_s_dump_state, 1, &a);
 	    }
 	}
-  
+
       fts_object_release((fts_object_t *)preset_dumper);
+
+      /* save persistence flag */  
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
+
+      fts_name_dump_method(o, 0, 0, ac, at);
     }
 }
 
 static void
-preset_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_preset_t *this = (fts_preset_t *)o;
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
 
-  preset_get_keys(this, array);
+  if(ac > 0)
+    {
+      if(fts_is_number(at))
+	{
+	  this->persistence = (fts_get_number_int(at) != 0);
+	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	}
+    }
+  else
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, this->persistence);
+      fts_return(&a);
+    }
 }
 
 static void
-preset_set_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_preset_t *this = (fts_preset_t *)obj;
+  fts_preset_t *this = (fts_preset_t *)o;
+  fts_atom_t a;    
 
-  if(fts_is_number(at) && this->persistence >= 0)
+  if(this->persistence >= 0)
     {
-      this->persistence = fts_get_number_int(at);
-      fts_client_send_message(o, fts_s_persistence, 1, at);
+      fts_set_int(&a, this->persistence);
+      fts_client_send_message(o, fts_s_persistence, 1, &a);
     }
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 /******************************************************
@@ -464,25 +490,26 @@ preset_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_preset_t), preset_init, preset_delete);
 
-  fts_class_message_varargs(cl, fts_s_persistence, preset_set_persistence);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
+  fts_class_message_varargs(cl, fts_s_persistence, preset_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, preset_update_gui); 
 
-  fts_class_message_varargs(cl, fts_s_dump, preset_dump); 
+  fts_class_message_varargs(cl, fts_s_dump, preset_dump);
   fts_class_message_varargs(cl, sym_new_preset, preset_new_preset);
   fts_class_message_varargs(cl, sym_dump_mess, preset_dump_mess);
 
   fts_class_message_varargs(cl, fts_s_get_array, preset_get_array);
 
-
   fts_class_message_varargs(cl, fts_new_symbol("store"), preset_store);
   fts_class_message_varargs(cl, fts_new_symbol("recall"), preset_recall);
   fts_class_message_varargs(cl, fts_s_clear, preset_clear);
 
-  return fts_Success;
+  fts_class_inlet_anything(cl, 0);
+  fts_class_outlet_int(cl, 0);
 }
 
 void
-preset_config(void)
+fts_kernel_preset_init(void)
 {
   sym_new_preset = fts_new_symbol("new_preset");
   sym_dump_mess = fts_new_symbol("dump_mess");

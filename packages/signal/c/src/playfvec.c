@@ -495,6 +495,8 @@ play_fvec_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 3, play_fvec_set_speed);
   fts_class_inlet_float(cl, 3, play_fvec_set_speed);
 
+  fts_class_outlet_bang(cl, 1);
+
   fts_dsp_declare_function(play_fvec_symbol, play_fvec_ftl);
   fts_dsp_declare_outlet(cl, 0);
 }

@@ -40,6 +40,7 @@ param.c \
 patcher.c \
 patfile.c \
 post.c \
+preset.c \
 project.c \
 property.c \
 sched.c \

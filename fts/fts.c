@@ -181,6 +181,7 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_expression_init); /* Must be after parser_init */
   _K_DECNCALL( fts_kernel_ftl_init);
   _K_DECNCALL( fts_kernel_param_init);
+  _K_DECNCALL( fts_kernel_preset_init);
   _K_DECNCALL( fts_kernel_dsp_graph_init);
   _K_DECNCALL( fts_kernel_dsp_init);
   _K_DECNCALL( fts_kernel_abstraction_init);

@@ -375,13 +375,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
 	  
 	  if(ac > 0)
 	    {
-	      if(fts_is_symbol(at + 1) && fts_get_symbol(at + 1) == fts_s_colon)
-		{
-		  ac -= 2;
-		  at += 2;
-		}
-	      
-	      n += mempost( &post_buffer, &post_buffer_size, 0, "(:");
+	      n += mempost( &post_buffer, &post_buffer_size, 0, "(");
 	      n += mempost_atoms( &post_buffer, &post_buffer_size, n, ac, at);
 	      n += mempost( &post_buffer, &post_buffer_size, n, ")");
 	    }

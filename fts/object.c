@@ -502,6 +502,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   /* redefine object if not scheduled for removal */
   if(old_id != FTS_DELETE)
     {
+      
       fts_symbol_t name = fts_object_get_name(old);
       fts_object_t *new;
       
@@ -509,6 +510,13 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       fts_object_unname(old);
       fts_object_unbind(old);
 
+      /* assure that the old object won't be destroyed when removed from patcher */
+      old->refcnt++;
+
+      /* remove the old object from the patcher */
+      if(old->patcher)
+	fts_patcher_remove_object(old->patcher, old);
+      
       /* call deconstructor of old object */
       if(old->refcnt == 1)
 	fts_class_get_deconstructor( fts_object_get_class( old))(old, fts_system_inlet, fts_s_delete, 0, 0);
@@ -545,14 +553,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       fts_object_unclient(old);
       fts_update_reset(old);
       
-      /* assure that object won't be destroyed when removed from patcher */
-      old->refcnt++;
-
-      /* remove the object from the patcher */
-      if(old->patcher)
-	fts_patcher_remove_object(old->patcher, old);
-      
-      /* destroy or  */
+      /* destroy or let live */
       if(old->refcnt == 1)
 	fts_object_free(old);
       else
