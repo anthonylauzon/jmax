@@ -225,6 +225,22 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	//added to update maximum time if needed
 	track.getTrackDataModel().addListener(this);    
+    
+	//resize the frame
+	int height;	
+	Dimension dim = itsContainer.getFrame().getSize();	
+	if(dim.height < Sequence.MAX_HEIGHT)
+	{
+	    if(sequenceData.trackCount() == 1)
+		itsContainer.getFrame().
+		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + trackContainer.getSize().height);
+	    else
+		if(dim.height + trackContainer.getSize().height <= Sequence.MAX_HEIGHT)
+		    itsContainer.getFrame().setSize(dim.width, dim.height + trackContainer.getSize().height);
+		else 
+		    if(dim.height < Sequence.MAX_HEIGHT)
+			itsContainer.getFrame().setSize(dim.width, Sequence.MAX_HEIGHT);
+	}
     }
 
     public void tracksAdded(int maxTime)
@@ -251,6 +267,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	trackContainers.remove(track);
 
+	//resize of the frame
+	Dimension dim = itsContainer.getFrame().getSize();
+ 	if(sequenceData.trackCount() == 0)
+	     itsContainer.getFrame().setSize(dim.width, Sequence.EMPTY_HEIGHT);	
+	else
+	    if(!scrollTracks.getVerticalScrollBar().isVisible())		
+		itsContainer.getFrame().setSize(dim.width, 
+						Sequence.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
     }
 
     /**
@@ -264,6 +288,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
 	scrollTracks.getViewport().scrollRectToVisible(absBounds);
+    }
+
+    public int getAllTracksHeight()
+    {
+	int height = 0;
+	for(Enumeration e = trackContainers.elements(); e.hasMoreElements();)
+	    height += ((TrackContainer)e.nextElement()).getSize().height;
+	return height;
     }
 
     boolean isVisible(int y)

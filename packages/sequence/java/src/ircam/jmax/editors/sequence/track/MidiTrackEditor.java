@@ -289,8 +289,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	/*****************/
 	//list-->table//
-	//listDialog = new ListDialog(track, gc.getFrame(), gc);
-	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	listDialog = new ListDialog(track, gc.getFrame(), gc);
+	//listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
 	/*****************/
     }
 
@@ -385,8 +385,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     /*****************/
     //list-->table//
-    //ListDialog listDialog = null;
-    SequenceTableDialog listDialog = null;
+    ListDialog listDialog = null;
+    //SequenceTableDialog listDialog = null;
     /*****************/
 
     int viewMode = PIANOROLL_VIEW;

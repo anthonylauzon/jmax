@@ -52,10 +52,10 @@ public class Sequence extends JFrame implements EditorContainer{
     SequencePanel itsSequencePanel;
     FtsSequenceObject sequenceData;
 
-    public final int DEFAULT_WIDTH = 800;
-    public final int DEFAULT_HEIGHT = 553;
-
-
+    public final static int DEFAULT_WIDTH  = 800;
+    public final static int DEFAULT_HEIGHT = 553;
+    public final static int MAX_HEIGHT     = 800;
+    public final static int EMPTY_HEIGHT   = 78;
   /**
    * Constructor with the SequenceRemoteData
    * It creates the panels that will display the datas of the maxData
@@ -79,7 +79,7 @@ public class Sequence extends JFrame implements EditorContainer{
 	itsSequencePanel = new SequencePanel(this, data);
 	
 	getContentPane().add(itsSequencePanel);
-	setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+	setSize(new Dimension(DEFAULT_WIDTH, /*DEFAULT*/EMPTY_HEIGHT));
 	
 	validate();
 	setVisible(true);

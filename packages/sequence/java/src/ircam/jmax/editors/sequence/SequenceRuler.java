@@ -134,7 +134,7 @@ public class SequenceRuler extends PopupToolbarPanel{
     }
 
     //--- Ruler fields
-    Dimension rulerDimension = new Dimension(200, 20);
+    Dimension rulerDimension = new Dimension(200, RULER_HEIGHT);
     FontMetrics fm;
     String unityName = "Milliseconds";
     int unity = MILLISECONDS_UNITY;
@@ -143,10 +143,12 @@ public class SequenceRuler extends PopupToolbarPanel{
     Geometry geometry;
     SequencePanel sequencePanel;
     int previousX;
-    public final static int DEFAULT_XZOOM = 20; 
+    public final static int DEFAULT_XZOOM      = 20; 
     public final static int MILLISECONDS_UNITY = 0; 
-    public final static int SECONDS_UNITY     = 1; 
+    public final static int SECONDS_UNITY      = 1; 
     public final static int SAMPLES_UNITY      = 2; 
+
+    public final static int RULER_HEIGHT = 20; 
 }    
 
 
