@@ -475,14 +475,14 @@ fts_project_bmax_file_save(fts_project_t *project, fts_bmax_file_t* f)
   /* save midi in */
   if ((project->midi_in != NULL) && (fts_array_get_size(project->midi_in) > 0)) {
     fts_bmax_code_push_atoms(f, fts_array_get_size(project->midi_in), fts_array_get_atoms(project->midi_in));
-    fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_midi, fts_array_get_size(project->midi_in));
+    fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_midi_in, fts_array_get_size(project->midi_in));
     fts_bmax_code_pop_args(f, fts_array_get_size(project->midi_in));
   }
 
   /* save midi out */
   if ((project->midi_out != NULL) && (fts_array_get_size(project->midi_in) > 0)) {
     fts_bmax_code_push_atoms(f, fts_array_get_size(project->midi_out), fts_array_get_atoms(project->midi_out));
-    fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_midi, fts_array_get_size(project->midi_out));
+    fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_midi_out, fts_array_get_size(project->midi_out));
     fts_bmax_code_pop_args(f, fts_array_get_size(project->midi_out));
   }
 
