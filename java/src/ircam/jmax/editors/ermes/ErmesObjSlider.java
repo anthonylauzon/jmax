@@ -134,6 +134,7 @@ class ErmesObjSlider extends ErmesObject {
 	  itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
 	  itsThrottle.Move(itsThrottle.itsX, y);
+	  itsMovingThrottle = true;//???????????
 	  DoublePaint();
 	  return true;
 	}
@@ -160,6 +161,12 @@ class ErmesObjSlider extends ErmesObject {
 	itsFtsObject.put("value", new Integer(itsRangeMin));
 	itsInteger = 0;
 	itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET);
+	DoublePaint();
+      }
+      else if(itsY+UP_OFFSET>=y){
+	itsFtsObject.put("value", new Integer(itsRangeMax-1));
+	itsInteger = itsRangeMax-1;
+	itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET);
 	DoublePaint();
       }
       return true;
@@ -257,3 +264,4 @@ class ErmesObjSlider extends ErmesObject {
     return preferredSize;
   }
 }
+
