@@ -1,130 +1,6 @@
-dnl $Id: configure.in,v 1.115 2003/05/09 11:25:16 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
-dnl $Log: configure.in,v $
-dnl Revision 1.115  2003/05/09 11:25:16  p_tisserand
-dnl Added debian package definition in make dist
-dnl
-dnl Revision 1.114  2003/04/28 14:22:39  p_tisserand
-dnl Added -DUSE_ALSA in CFLAGS if ALSA have been found (for preprocessor conditionnal in jmax/fts/linux.c)
-dnl
-dnl Revision 1.113  2003/04/02 13:36:53  p_tisserand
-dnl Added realpath check in configure.
-dnl
-dnl Revision 1.112  2003/04/01 14:26:01  borghesi
-dnl *** empty log message ***
-dnl
-dnl Revision 1.111  2003/03/19 14:05:28  dechelle
-dnl - fixed declaration of alloca(): see ChangeLog
-dnl - cleaned code for printing patches
-dnl
-dnl Revision 1.110  2003/02/28 16:22:49  p_tisserand
-dnl Add a check on doxygen
-dnl Add jmax/utils/linux_desktop/Makefile in list of file to generate
-dnl
-dnl Revision 1.109  2003/02/05 11:42:26  p_tisserand
-dnl Remove platform dependant default project file setting
-dnl
-dnl Revision 1.108  2003/02/05 10:39:51  p_tisserand
-dnl Add define of USE_JACK for preprocessor conditionnal in fts_platform_init (linux.c)
-dnl
-dnl Revision 1.107  2003/01/31 12:16:26  p_tisserand
-dnl Fix AM_CONDITIONAL error with Jack Audio Connection Kit (thanks to Andre Almeida)
-dnl
-dnl Revision 1.106  2003/01/30 10:19:31  p_tisserand
-dnl Add installation of default configuration file
-dnl
-dnl Revision 1.105  2003/01/28 12:00:30  borghesi
-dnl changes in utils, data, sequence includes
-dnl
-dnl Revision 1.104  2003/01/24 09:35:22  p_tisserand
-dnl Add an automake conditionnnal for jack package.
-dnl Now this package is always in $make dist
-dnl
-dnl Revision 1.103  2003/01/23 15:51:12  p_tisserand
-dnl Rename default project files:
-dnl 	    config.jprj -> default_project.jprj
-dnl 	    config_linux_alsa.jprj -> default_project_linux_alsa.jprj
-dnl 	    config_linux_oss.jprj  -> default_project_linux_oss.jprj
-dnl 	    config_macosx.jprj     -> default_project_macosx.jprj
-dnl 	    config_win32.jprj      -> default_project_win32.jprj
-dnl Add default project file for jack audio connection kit:
-dnl             default_project_linux_jack.jprj
-dnl
-dnl Revision 1.102  2002/11/21 15:17:47  p_tisserand
-dnl configure.in: add shell script to set restrict definition in include/fts/config-ac.h
-dnl utils.h: change include of ftsconfig.h into include <fts/config.h> and include <fts/wrap.h>
-dnl Move wrap utilities to fts/wrap.h
-dnl
-dnl Revision 1.101  2002/11/21 13:55:19  p_tisserand
-dnl Add config-ac.h for system dependant configuration of packages.
-dnl
-dnl Revision 1.100  2002/11/21 11:38:19  p_tisserand
-dnl add a configure flag to disable jMax java compilation (--disable-java-part or --enable-java-part=no)
-dnl
-dnl Revision 1.99  2002/11/15 17:40:59  nschnell
-dnl *** empty log message ***
-dnl
-dnl Revision 1.98  2002/10/24 09:47:19  borghesi
-dnl *** empty log message ***
-dnl
-dnl Revision 1.97  2002/10/22 14:55:46  p_tisserand
-dnl Fix temporary variable set when checking if jack.h and libhjack are found
-dnl
-dnl Revision 1.96  2002/10/21 13:24:49  dechelle
-dnl C++ client library in progress.
-dnl Fixed $0. in expressions.
-dnl
-dnl Revision 1.95  2002/09/18 15:27:17  borghesi
-dnl *** empty log message ***
-dnl
-dnl Revision 1.94  2002/09/17 19:09:10  tisseran
-dnl First integration of threaded direct to disk (package dtd)
-dnl
-dnl Revision 1.93  2002/09/10 12:57:26  tisseran
-dnl Change package file hierarchy (see ChangeLog)
-dnl
-dnl Revision 1.92  2002/09/10 11:04:19  schwarz
-dnl Removed sdif which is now a separate package and cvs module.
-dnl
-dnl Revision 1.91  2002/09/09 15:01:05  tisseran
-dnl Try to use pkg-config if --with-jack-cflags or --with-jack-ldflags are not used
-dnl Add test on jack/jack.h and libjack if jack support is wanted
-dnl
-dnl Revision 1.90  2002/09/06 08:42:05  dechelle
-dnl Changed protocol floating point values to double.
-dnl Changed the Java client API
-dnl
-dnl Revision 1.89  2002/09/05 16:13:49  tisseran
-dnl Add jmax-config and jmax.pc tools for given flags needed for compilation of external packages.
-dnl To get FTS cflags:
-dnl $ jmax-config --cflags
-dnl $ pkg-config --cflags jmax
-dnl To get FTS ldflags:
-dnl $ jmax-config --libs
-dnl $ pkg-config --libs jmax
-dnl To get directory where jMax standard packages are installed:
-dnl $ jmax-config --package-dir
-dnl $ pkg-config --variable=pkgdatadir jmax
-dnl
-dnl Revision 1.88  2002/09/03 09:12:53  tisseran
-dnl Fix help display of SDIF package setup
-dnl Fix setup of JACK package
-dnl
-dnl Revision 1.87  2002/08/30 16:44:37  schwarz
-dnl Added cvs id and log
-dnl
-dnl Revision 1.86 2002/08/30 16:41:10 schwarz
-dnl Added --with-sdif option and configuration options for package sdif.
-dnl
-dnl Revision 1.85 2002/08/27 15:09:54 tisseran
-dnl First integration of jack package in jMax.
-dnl Add a flag to use GNU claspath when compiling with gcj
-dnl
-dnl Revision 1.84 2002/07/24 11:49:24 tisseran
-dnl Add doc/api/Makefile generation to create doxygen api documentation
-
 
 AC_INIT(fts/version.c.in)
 
@@ -628,6 +504,7 @@ utils/debian/Makefile
 utils/jmax-config/Makefile
 utils/jmax-config/jmax-config
 utils/linux_desktop/Makefile
+utils/m4/Makefile
 utils/pkgconfig/jmax.pc
 utils/pkgconfig/Makefile
 utils/rpm/Makefile
