@@ -1,0 +1,2 @@
+SOURCES = ControlModule.java \
+	  DspControl.java
