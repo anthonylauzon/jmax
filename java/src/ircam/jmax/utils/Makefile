@@ -48,4 +48,8 @@ IndentedPrintWriter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) IndentedPrintWriter.java)
 .PHONY: IndentedPrintWriter
 
+Probe:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Probe.java)
+.PHONY: Probe
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

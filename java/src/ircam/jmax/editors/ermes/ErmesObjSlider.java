@@ -14,6 +14,8 @@ class ErmesObjSlider extends ErmesObject {
 	
   ErmesObjThrottle itsThrottle;
   int itsInteger = 0;
+  static Frame itsFalseFrame = new Frame();
+  static ErmesObjSliderDialog itsSliderDialog = null;
   final static int BOTTOM_OFFSET = /*10*/5;
   final static int UP_OFFSET = /*10*/5;
   final static int PREFERRED_RANGE_MAX = 127;
@@ -127,10 +129,10 @@ class ErmesObjSlider extends ErmesObject {
 
   private void SetSliderDialog(){
     Point aPoint = GetSketchWindow().getLocation();
-    itsSketchPad.GetSliderDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-    itsSketchPad.GetSliderDialog().ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
-				   String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
-    itsSketchPad.GetSliderDialog().setVisible(true);
+    if (itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(itsFalseFrame);
+    itsSliderDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+    itsSliderDialog.ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin), String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
+    itsSliderDialog.setVisible(true);
   }
   
   public boolean MouseDown_specific(MouseEvent evt, int x, int y){

@@ -4,18 +4,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
+//import com.sun.java.swing.Timer;
 
 /**
  * The "message box" graphic object.
  */
-class ErmesObjMessage extends ErmesObjEditableObject {
+class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionListener*/{
   boolean itsFlashing = false;
-
+  //static Timer itsTimer;
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
   public ErmesObjMessage(){
     super();
+    //    if (itsTimer == null)  itsTimer = new Timer(50, this);
   }
 	
 	
@@ -63,6 +65,17 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     ((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
   }
   
+  public boolean MouseUp_specific(MouseEvent e, int x, int y){
+    if (!itsSketchPad.itsRunMode) return false;
+    else {
+      if (itsFlashing) {
+	itsFlashing = false;
+	Paint_specific(itsSketchPad.getGraphics());
+      }
+    }
+    return true;
+  }
+  
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
@@ -70,16 +83,26 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     if (itsSketchPad.itsRunMode) {
       if (itsFtsObject != null){
 	itsFtsObject.sendMessage(0, "bang", null);
-	ErmesObjMessThread aMessThread = itsSketchPad.GetMessThread();
-	aMessThread.SetMessage(this);
-	if(aMessThread.isAlive())aMessThread.resume();
-	else aMessThread.start();
+	itsFlashing = true;
+	Paint_specific(itsSketchPad.getGraphics());
+	/*2003itsTimer.setRepeats(false);
+	itsTimer.start();*/
+	/*2003ErmesObjMessThread aMessThread = itsSketchPad.GetMessThread();
+	  aMessThread.SetMessage(this);
+	  if(aMessThread.isAlive())aMessThread.resume();
+	  else aMessThread.start();*/
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
     
   }
+
+  /*2203  public void actionPerformed(ActionEvent e) {
+    itsFlashing = false;
+    Paint_specific(itsSketchPad.getGraphics());
+    itsTimer.stop();
+    }*/
 
   public void RestartEditing(){
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);

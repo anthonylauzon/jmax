@@ -213,7 +213,7 @@ public class ErmesToolBarLayout implements LayoutManager {
 	  System.err.println("warning! try to add a zero-height component ("+aComponent.getClass().getName()+") to a "+parent.getClass().getName());
 	  aDimension = aComponent.getPreferredSize();
 	  aComponent.setSize(aDimension);
-	  System.err.println("dimensiono un "+aComponent.getClass().getName()+": "+aDimension.width+", "+aDimension.height);
+	  //System.err.println("dimensiono un "+aComponent.getClass().getName()+": "+aDimension.width+", "+aDimension.height);
 	}
       //no else here: no specification, no null dimension, don't change dim.
       if (itsType == VERTICAL) currentY+=aComponent.getSize().height+itsInset;//the Y changes, the X not!

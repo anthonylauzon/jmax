@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import ircam.jmax.utils.*;//probing...
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import com.sun.java.swing.*;
@@ -35,7 +36,9 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     setLayout (new BorderLayout());    
     itsSwToolbar = new JToolBar();
     itsSwToolbar.setFloatable (false);   
+    
     InsertButtons();
+
     add (itsSwToolbar, BorderLayout.WEST);
     setBackground(itsSwToolbar.getBackground());
     validate();
@@ -51,22 +54,10 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     }
   }
   
-  /*public void paint(Graphics g){
-    //    System.err.println("got a paint");
-    super.paint(g);
-    //CreateaDump();
-    }*/
-    
-    public void update(Graphics g) {
-      super.update(g);
-      //System.err.println("got an update()");
-    }
-    
-  /*public void repaint() {
-    super.repaint(); //fosse la madonna
-    // super.repaint();
-    //System.err.println("got a repaint()");
-    }*/
+  public void update(Graphics g) {
+    super.update(g);
+    //System.err.println("got an update()");
+  }
   
   /**
    * Add a button to the toolbar, trying not to load already loaded
@@ -79,12 +70,12 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
       aImageIcon =  new ImageIcon(gifFilePath);
       itsImages.put(gifFilePath, aImageIcon);
     }
-
+    
     aToggleButton = new ErmesSwToggleButton(name, aImageIcon);
     itsSwToolbar.add(aToggleButton);
     aToggleButton.addMouseListener(this);
-  };
-
+  }
+  
   void SelectAButton(ErmesSwToggleButton theButton) {
     theButton.setSelected(true);
     Deselect();

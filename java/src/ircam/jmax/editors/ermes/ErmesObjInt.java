@@ -13,6 +13,9 @@ class ErmesObjInt extends ErmesObject {
   ErmesObjInlet itsInlet;
   ErmesObjOutlet itsOutlet;
   int itsInteger = 0;
+  
+  static Frame itsFalseFrame = new Frame();
+  static ErmesObjIntegerDialog itsIntegerDialog = null;
   static final int TRUST=10;		//how many transmitted values we trust?
   int transmission_buffer[];
   int transmission_index = 0;
@@ -168,9 +171,10 @@ class ErmesObjInt extends ErmesObject {
     
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      itsSketchPad.GetIntegerDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsSketchPad.GetIntegerDialog().ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
-      itsSketchPad.GetIntegerDialog().setVisible(true);
+    if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(itsFalseFrame);
+      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
+      itsIntegerDialog.setVisible(true);
       return true;
     }
     if (itsSketchPad.itsRunMode) {

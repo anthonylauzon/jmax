@@ -7,6 +7,7 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -34,6 +35,7 @@ public class MaxApplication extends Object {
   // Static global services
 
   /** Get the unique active TCL interpreter */
+    public static Probe itsProbe = new Probe("MaxApp profile");
 
   public static Interp getTclInterp()
   {
@@ -105,8 +107,10 @@ public class MaxApplication extends Object {
 
     try
       {
+	//itsProbe.silentMark();
     	ourData = type.newInstance();
 	ourEditor = ourData.edit();
+	//itsProbe.mark("editortime");
       }
     catch (MaxDataException e)
       {
@@ -423,7 +427,7 @@ public class MaxApplication extends Object {
     // main function parse the argument line and create the main class...
     //create a new default Properties object
     jmaxProperties = new Properties(System.getProperties());
-
+    itsProbe.start();//2003
     //start parsing arguments
     // don't check for valid options, so the user can set
     // command line arguments that can be accessed from tcl scripts
@@ -541,6 +545,10 @@ public class MaxApplication extends Object {
     ErmesSketchWindow aSketchWindow;
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
+
+    itsProbe.stop();
+    //itsProbe.reportToFile("/u/worksta/maggi/editortime");
+    //itsProbe.report();
 
     // First, search if there is anything to save,
 

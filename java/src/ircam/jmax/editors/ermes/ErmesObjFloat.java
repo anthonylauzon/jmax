@@ -11,6 +11,8 @@ import ircam.jmax.fts.*;
 class ErmesObjFloat extends ErmesObject {
 	
   float itsFloat =  (float) 0.;
+  static ErmesObjFloatDialog itsFloatDialog = null;
+  static Frame itsFalseFrame = new Frame();
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
   int DEFAULT_WIDTH = 50;
@@ -149,9 +151,10 @@ class ErmesObjFloat extends ErmesObject {
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      itsSketchPad.GetFloatDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsSketchPad.GetFloatDialog().ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
-      itsSketchPad.GetFloatDialog().setVisible(true);
+      if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(itsFalseFrame);
+      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
+      itsFloatDialog.setVisible(true);
       return true;
     }
     if (itsSketchPad.itsRunMode) {

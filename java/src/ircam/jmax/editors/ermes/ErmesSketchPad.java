@@ -24,6 +24,7 @@ import ircam.jmax.utils.*;
  * offscreen and much, much more...
  */
 public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener{
+
   ErmesSketchWindow itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -94,7 +95,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   public boolean offScreenValid = true;
   
-  ErmesObjMessThread itsMessThread = null;
+  //2203ErmesObjMessThread itsMessThread = null;
 
   //  boolean itsFirstClick = true;
   //STATIC OFFSCREEN!!!
@@ -137,10 +138,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   boolean itsScrolled = false;
 
-
-  static ErmesObjSliderDialog itsSliderDialog = null;
-  static ErmesObjIntegerDialog itsIntegerDialog = null;
-  static ErmesObjFloatDialog itsFloatDialog = null;
 
   // debug utility, to be removed //
   public void paintAllRegions() {
@@ -530,8 +527,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     //this is a security check; should never happen, but 
     //a problem has detected during loads, when the Sketch is not visible yet, and some
     //component start to paint. This problem should be insulated
-    if((g!= null)&&(offScreenPresent))
+    if((g!= null)&&(offScreenPresent)) {
       g.drawImage(offImage,0,0, this);	
+    
+    }
   }
 
   //--------------------------------------------------------
@@ -582,7 +581,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       offGraphics = offImage.getGraphics();
       offGraphics.drawImage(oldOffImage, 0, 0, this);
     }
- 
+
     offGraphics.setFont(getFont());
     offGraphics.setColor(getBackground());
     offGraphics.fillRect(0, 0, d.width, d.height);	//prepare the offscreen to be used by me
@@ -688,9 +687,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return itsSketchWindow;
   }
   
-  public ErmesObjMessThread GetMessThread(){
+  /*2203 public ErmesObjMessThread GetMessThread(){
     return itsMessThread;
-  }
+    }*/
 
   // note: the following function is a reduced version of InitFromFtsContainer.
   // better organization urges
@@ -864,13 +863,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     itsUpdateList = new Vector();
     itsPatcherElements = new Vector();
     itsConnectingLetList = new Vector();
-
-    itsSliderDialog = new ErmesObjSliderDialog(itsSketchWindow);
-    itsIntegerDialog = new ErmesObjIntegerDialog(itsSketchWindow);
-    itsFloatDialog = new ErmesObjFloatDialog(itsSketchWindow);
-    
+        
     itsEditField = new ErmesObjEditField(this);
-    itsMessThread = new ErmesObjMessThread(this, "aFlash");
+    //2203itsMessThread = new ErmesObjMessThread(this, "aFlash");
     add(itsEditField);
     validate();
     itsEditField.setVisible(false);
@@ -1362,17 +1357,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListenr--fine
   
-  public ErmesObjSliderDialog GetSliderDialog(){
-    return itsSliderDialog;
-  }
-
-  public ErmesObjIntegerDialog GetIntegerDialog(){
-    return itsIntegerDialog;
-  }
-
-  public ErmesObjFloatDialog GetFloatDialog(){
-    return itsFloatDialog;
-  }
 
   public ErmesObjEditField GetEditField(){
     return itsEditField;
@@ -1578,27 +1562,26 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //--------------------------------------------------------
   //	paint
   //--------------------------------------------------------
-    public void paint(Graphics g) {
-      if(itsScrolled){
-	if (offScreenPresent) {
-	  if (paintForTheFirstTime) {
-	    DrawOffScreen(g);
-	    paintForTheFirstTime = false;
-	  }
-	  else {
-	    CopyTheOffScreen(getGraphics());
-	  }
+  public void paint(Graphics g) {
+    if(itsScrolled){
+      if (offScreenPresent) {
+	if (paintForTheFirstTime) {
+	  DrawOffScreen(g);
+	  paintForTheFirstTime = false;
 	}
 	else {
-	  DrawOffScreen(getGraphics());
+	  CopyTheOffScreen(getGraphics());
 	}
       }
-      else
-	if(itsGraphicsOn) {
-	  DrawOffScreen(g);
-	}
-    }			
-	
+      else {
+	DrawOffScreen(getGraphics());
+      }
+    }
+    else {
+	DrawOffScreen(g);
+    }
+  }			
+  
   //--------------------------------------------------------
   //	RemoveConnRgn
   //	remove the connection's segments region from itsH/VSegmRgn

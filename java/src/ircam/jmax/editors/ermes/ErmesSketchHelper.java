@@ -160,7 +160,6 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject = null;
     ErmesConnection aConnection = null;
 
-    System.err.println("sono qui");
     out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
     in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
     
@@ -170,7 +169,6 @@ class ErmesSketchHelper extends Object{
     }
 
     if(aConnection!=null) {
-      System.err.println("io cerco di cancellarla! "+aConnection);
       DeleteConnection(aConnection);
       itsSketchPad.repaint();
     }

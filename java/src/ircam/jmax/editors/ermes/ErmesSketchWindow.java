@@ -166,23 +166,15 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     Init(); //MaxEditor base class init (standard menu handling)
     //isSubPatcher = false;
     isAbstraction = false;
-    //itsTopWindow = null;
     itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
     itsSubWindowList = new Vector();
     itsWindowMenuList = new Vector();
 
-      
-    //itsDocument = new ErmesPatcherDoc(this);
     InitSketchWin();
     validate();
-    //*-
-    //    itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
-    //itsSketchWindow.Init();
     itsPatcher.open();
-    //repaint();
     MaxApplication.itsWindow = this;
     InitFromContainer(itsPatcher);
-    //aPatcherDoc.SetWindow(itsSketchWindow);
     setVisible(true);
   }
 
@@ -1136,7 +1128,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   //--------------------------------------------------------
   public void paint(Graphics g) {
     super.paint(g);
-    getContentPane().paintComponents(g);
+    //2203getContentPane().paintComponents(g);
   }
 
   //--------------------------------------------------------

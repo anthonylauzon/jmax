@@ -4,6 +4,8 @@ SOURCES = \
            TWPrintStream.java \
            TextWindow.java    \
 	   IndentedPrintWriter.java \
-	   Platform.java
+	   Platform.java \
+	   Probe.java
+
 
 

@@ -438,8 +438,10 @@ public class ErmesObject implements FtsPropertyHandler {
     else return MouseDown_specific(e, x, y);
   }
 	
+  public boolean MouseUp_specific(MouseEvent e, int x, int y){return false;}
+  
   public boolean MouseUp(MouseEvent e,int x,int y) {
-    if (itsSketchPad.itsRunMode) return false;		
+    if (itsSketchPad.itsRunMode) return MouseUp_specific(e, x, y);	       
     if(itsDragging) {
       itsSketchPad.RemoveElementRgn(this);
       if(itsSketchPad.itsResizeMode == itsSketchPad.BOTH_RESIZING){
