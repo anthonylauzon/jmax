@@ -1425,12 +1425,17 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_instantiate(fmat_class);
   
   /* standard functions */
+  fts_class_set_array_function(cl, fvec_array_function);
+
+  /* standard methods for naming, persistence, and dump */
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
+
+  /* access methods */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fvec_get_element);
-  
-  fts_class_set_array_function(cl, fvec_array_function);
-  fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
 
   fts_class_message_varargs(cl, fts_new_symbol("set"), fvec_set);
   fts_class_message(cl, fts_new_symbol("set"), fmat_class, fvec_set_from_fmat_or_fvec);
@@ -1481,6 +1486,12 @@ fvec_instantiate(fts_class_t *cl)
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
 
+  /* let's have standard in/outlets */
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
+  
+
+
   /*
    * fvec class documentation
    */
@@ -1524,6 +1535,7 @@ void
 fvec_config(void)
 {
   fvec_symbol = fts_new_symbol("fvec");
+
   sym_col = fts_new_symbol("col");
   sym_row = fts_new_symbol("row");
   sym_diag = fts_new_symbol("diag");
