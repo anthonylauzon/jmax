@@ -75,7 +75,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
 
-      fts_send_message(obj, fts_SystemInlet, fts_s_set, ac, at);
+      fts_send_message(obj, fts_SystemInlet, fts_s_set_from_array, ac, at);
     }
   else
     this->value = at[0];
