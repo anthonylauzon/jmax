@@ -18,7 +18,7 @@
 #include "runtime.h"	/* @@@@ what should we do ?? */
 
 fts_symbol_t fts_s_float_vector = 0;
-static fts_data_class_t *fts_float_vector_data_class = 0;
+fts_data_class_t *fts_float_vector_data_class = 0;
 
 /* remote call codes */
 
@@ -80,8 +80,22 @@ fts_float_vector_delete(fts_float_vector_t *vector)
   fts_free(vector);
 }
 
-/* copy & zero */
+int
+fts_float_vector_get_atoms(fts_float_vector_t *vector, int ac, fts_atom_t *at)
+{
+  int i;
+  int size = vector->size;
 
+  if(ac > size)
+    ac = size;
+
+  for(i=0; i<ac; i++)
+    fts_set_float(at + i, vector->values[i]);
+
+  return size;
+}
+
+/* copy & zero */
 void
 fts_float_vector_copy(fts_float_vector_t *in, fts_float_vector_t *out)
 {
@@ -108,7 +122,7 @@ fts_float_vector_set_size(fts_float_vector_t *vector, int size)
 }
 
 void 
-fts_float_vector_set(fts_float_vector_t *vector, float *ptr, int size)
+fts_float_vector_set_from_ptr(fts_float_vector_t *vector, float *ptr, int size)
 {
   floatvec_set_size(vector, size);
   fts_vec_fcpy(ptr, vector->values, size);
@@ -117,13 +131,20 @@ fts_float_vector_set(fts_float_vector_t *vector, float *ptr, int size)
 void
 fts_float_vector_set_from_atom_list(fts_float_vector_t *vector, int offset, int ac, const fts_atom_t *at)
 {
+  int size = fts_float_vector_get_size(vector);
   int i;
-
-  for (i=offset; i<ac && i<vector->size; i++)
-    if (fts_is_float(&at[i]))
-      vector->values[i] = fts_get_float(&at[i]);
+  
+  if(offset + ac > size)
+    ac = size - offset;
+  
+  for(i=0; i<ac; i++)
+    {
+      if(fts_is_float(&at[i]))
+	vector->values[i + offset] = fts_get_float(&at[i]);
+      else if(fts_is_int(&at[i]))
+	vector->values[i + offset] = (float)fts_get_int(&at[i]);
+    }
 }
-
 
 /* sum, min, max */
 
@@ -241,6 +262,27 @@ fts_float_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
   fts_data_end_remote_call();
 }
 
+
+fts_float_vector_t *
+fts_float_vector_constructor(int ac, const fts_atom_t *at)
+{
+  fts_float_vector_t *vec = 0;
+
+  if(ac == 1 && fts_is_int(at))
+    {
+      vec = fts_float_vector_new(fts_get_int(at));
+    }
+  else if(ac > 1)
+    {
+      vec = fts_float_vector_new(ac);
+      fts_float_vector_set_from_atom_list(vec, 0, ac, at);
+    }
+  else
+    vec = fts_float_vector_new(0);
+  
+  return vec;
+}
+
 void fts_float_vector_config(void)
 {
   fts_s_float_vector = fts_new_symbol("float_vector");
@@ -249,4 +291,62 @@ void fts_float_vector_config(void)
   fts_data_class_define_export_function(fts_float_vector_data_class, fts_float_vector_export_fun);
   fts_data_class_define_function(fts_float_vector_data_class, FLOAT_VECTOR_SET, fts_float_vector_remote_set);
   fts_data_class_define_function(fts_float_vector_data_class, FLOAT_VECTOR_UPDATE, fts_float_vector_remote_update);
+}
+
+/********************************************************************
+ *
+ *  bmax format releated functions
+ *
+ */
+
+/* vector is actually quite a temporary hack; there should be a real
+   save standard technique for fts_data_t; it assume that is reloaded
+   for a vector !!*/
+
+void fts_float_vector_save_bmax(fts_float_vector_t *vector, fts_bmax_file_t *f)
+{
+  fts_atom_t av[256];
+  int ac = 0;
+  int i;
+  int offset = 0;
+
+  for(i=0; i<vector->size; i++)
+    {
+      fts_set_float(&av[ac], vector->values[i]);
+
+      ac++;
+
+      if (ac == 256)
+	{
+	  /* Code a push of all the values */
+	  fts_bmax_code_push_atoms(f, ac, av);
+
+	  /* Code a push of the offset */
+	  fts_bmax_code_push_int(f, offset);
+
+	  /* Code a "set" message for 256 values plus offset */
+	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
+	  offset = offset + ac;
+
+	  /* Code a pop of all the values  */
+	  fts_bmax_code_pop_args(f, ac);
+
+	  ac = 0;
+	}
+    }
+
+  if (ac != 0)
+    {
+      /* Code a push of all the values */
+      fts_bmax_code_push_atoms(f, ac, av);
+
+      /* Code a push of the offset */
+      fts_bmax_code_push_int(f, offset);
+
+      /* Code an "append" message for the values left */
+      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
+
+      /* Code a pop of all the values  */
+      fts_bmax_code_pop_args(f, ac);
+    }
 }

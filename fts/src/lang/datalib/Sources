@@ -11,10 +11,12 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 
-SOURCES = datalib.c \
-	  floatvector.c \
-	  intvec.c  \
-	  atomlist.c \
-	  objectset.c
+SOURCES = \
+  datalib.c \
+  floatvector.c \
+  intvec.c \
+  atomarray.c \
+  atomlist.c \
+  objectset.c
 
 

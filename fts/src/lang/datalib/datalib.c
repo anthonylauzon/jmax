@@ -17,6 +17,7 @@
 
 extern void fts_integer_vector_config(void);  
 extern void fts_float_vector_config(void);  
+extern void fts_atom_array_config(void);  
 extern void fts_object_set_config(void);  
 extern void fts_atom_list_config(void);
 
@@ -29,6 +30,7 @@ fts_datalib_init(void)
 {
   fts_integer_vector_config();  
   fts_float_vector_config();  
+  fts_atom_array_config();  
   fts_object_set_config();  
   fts_atom_list_config();
 }
