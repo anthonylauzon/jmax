@@ -194,10 +194,10 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     g.drawLine( x, y + h - 1, x + minWidth, y + h - 1);
     g.drawLine( x, y + h - 1, x, y + h - 1 - h/4);
 
+    drawContent(g);
+
     paintInlets(g);
     paintOutlets(g);
-
-    drawContent(g);
   }
 
   public void updatePaint(Graphics g) 

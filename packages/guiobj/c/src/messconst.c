@@ -146,6 +146,14 @@ messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       for ( i = 0; i < this->ac; i++)
 	fts_set_int( this->at + i, 0);
     }
+
+  if (fts_object_has_id((fts_object_t *)this))
+    {
+      fts_atom_t a;
+
+      fts_set_int(&a, ninlets);
+      fts_client_send_message(o, fts_s_n_inlets, 1, &a);
+    }
 }
 
 static void
