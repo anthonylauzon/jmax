@@ -23,7 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = $(ARCH_SOURCES)\
-	vecmod.c	\
-	complex.c
+SOURCES =
+cfft.c \
+complex.c \
+rfft_shuffle.c \
+vec_fft.c \
+complex.c \
 

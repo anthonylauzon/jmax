@@ -26,18 +26,8 @@
 JMAXDISTDIR = ../../../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.fts
 
-lib-recursive: lib
-	(cd portable; $(MAKE) lib)
-.PHONY:lib-recursive
-
-cleanobjs-recursive: cleanobjs
-	(cd portable ; $(MAKE) cleanobjs)
-.PHONY:cleanobjs-recursive
-
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/veclib ; done
-	(cd include ; $(MAKE) install)
-	(cd portable ; $(MAKE) install)
 .PHONY: install
 
