@@ -25,12 +25,11 @@
 
 SOURCES = \
 module.c \
-sequence.c \
 seqsym.c \
+sequence.c \
 track.c \
 event.c \
 seqmidi.c \
-seqobj.c \
 seqplay.c \
 eventtrk.c \
 intevt.c \

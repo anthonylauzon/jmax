@@ -45,14 +45,12 @@ typedef struct _sequence_
   int open; /* flag: is 1 if sequence editor is open */
 } sequence_t;
 
-extern void sequence_init(sequence_t *sequence);
-
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_first_track(s) ((s)->tracks)
 
 #define sequence_set_editor_open(s) ((s)->open = 1)
 #define sequence_set_editor_close(s) ((s)->open = 0)
-#define sequence_editor_open(s) ((s)->open == 1)
+#define sequence_editor_is_open(s) ((s)->open == 1)
 
 extern void sequence_add_track(sequence_t *sequence, track_t *track);
 extern void sequence_remove_track(track_t *track);

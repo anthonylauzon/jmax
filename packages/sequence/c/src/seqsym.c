@@ -53,7 +53,9 @@ fts_symbol_t seqsym_import_midi_dialog = 0;
 fts_symbol_t seqsym_createEditor = 0;
 fts_symbol_t seqsym_destroyEditor = 0;
 fts_symbol_t seqsym_addTracks = 0;
+fts_symbol_t seqsym_deleteTracks = 0;
 fts_symbol_t seqsym_addEvents = 0;
+fts_symbol_t seqsym_deleteEvents = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 
 void
@@ -86,6 +88,8 @@ seqsym_config(void)
   seqsym_createEditor = fts_new_symbol("createEditor");
   seqsym_destroyEditor = fts_new_symbol("destroyEditor");
   seqsym_addTracks = fts_new_symbol("addTracks");
+  seqsym_deleteTracks = fts_new_symbol("deleteTracks");
   seqsym_addEvents = fts_new_symbol("addEvents");
+  seqsym_deleteEvents = fts_new_symbol("deleteEvents");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
 }

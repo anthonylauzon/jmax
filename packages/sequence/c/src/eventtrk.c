@@ -306,9 +306,14 @@ eventtrk_remove_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_
 {
   eventtrk_t *this = (eventtrk_t *)o;
   fts_object_t *event = fts_get_object(at + 0);
+  fts_atom_t a[1];
 
   eventtrk_cut_event(this, (event_t *)event);
 
+  /* add track to sequence at client */
+  fts_set_object(a + 0, (fts_object_t *)event);
+  fts_client_send_message(o, seqsym_deleteEvents, 1, a);
+  
   /* delete event object and remove from client */
   fts_object_delete(event);
 }
