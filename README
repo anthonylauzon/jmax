@@ -19,10 +19,15 @@ jMax requires the Java Development Kit or Java Runtime Environment.
 See file installation.html for further information.
 
 
+Compiling jMax
+
+See file compiling_jmax.html in doc/developer.
+
+
 License Agreement
 
-See the file LICENSE for information on usage, redistribution
-of this software and for DISCLAIMER OF ALL WARRANTIES.
+jMax is free software, distributed under the GNU General
+Public License. See the file LICENSE for further information.
 
 
 Contact
@@ -32,10 +37,3 @@ Ircam Forum: http://www.ircam.fr/departements/valorisation/forum/index-e.html
 
 jMax mailing list: jmax@ircam.fr
 
-
-
-The jMax team.
-François Déchelle
-Maurizio De Cecco
-Enzo Maggi
-Norbert Schnell

@@ -1,0 +1,204 @@
+<html>
+
+<!--                                                                    -->
+<!-- jMax                                                               -->
+<!--                                                                    -->
+<!-- Copyright (C) 1999 by IRCAM                                        -->
+<!-- All rights reserved.                                               -->
+<!--                                                                    -->
+<!-- This program may be used and distributed under the terms of the    -->
+<!-- accompanying LICENSE.                                              -->
+<!--                                                                    -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE  -->
+<!-- for DISCLAIMER OF WARRANTY.                                        -->
+<!--                                                                    -->
+
+<head>
+<title>jMax Documentation - How to recompile jMax</title>
+</head>
+     
+<body text="#000000" bgcolor="#cccccc">
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
+<TR>
+  <TD ALIGN=LEFT>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+  </TD>
+  <TD ALIGN=RIGHT>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+  </TD>
+</TR>
+</TABLE>
+<BR>
+
+<p>
+<UL TYPE=SQUARE>
+  <LI><A HREF=../index.html>Documentation</A>
+  <UL TYPE=SQUARE>
+    <LI><A HREF=index.html>Developer Documentation</A>
+  </UL>
+</UL>
+
+<p>
+<font size=+3 color=#FFFFFF><b>How to recompile jMax</b></font>
+
+<p>
+<hr noshade size=1>
+<ul type=dot>
+  <li><a href="#introduction">Introduction</A>
+  <li><a href="#prerequisites">Prerequisites</A>
+  <li><a href="#compilation">Compilation</A>
+  <li><a href="#starting it">Starting it</A>
+</ul>
+
+<p>
+<hr noshade size=1>
+
+<TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
+<TR>
+<TD>
+
+
+<a name="introduction"> <H2>Introduction</H2> </a>
+
+<p>
+This document explains how to recompile jMax from a source distribution.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="prerequisites"> <H2>Prerequisites</H2> </a>
+
+<h3>Platform independant</h3>
+
+<p>
+The following elements are need to recompile jMax:
+<ul>
+<li> the Java Development Kit (JDK) version 1.1.6 or higher.
+<li> the Swing classes library, which is part of the Java Foundation
+Classes. Swing can be downloaded at: 
+<a href="http://java.sun.com:80/products/jfc/index.html">
+http://java.sun.com:80/products/jfc/index.html</a>
+<li> the C compiler
+<li> GNU make
+</ul>
+
+
+<h3>SGI platform</h3>
+
+<p>
+The JDK for SGI platforms can be downloaded at:
+<a href="http://www.sgi.com/Products/Evaluation/#jdk">
+http://www.sgi.com/Products/Evaluation/#jdk</a>
+
+<p>
+On SGI platform, GNU make resides in <code>/usr/freeware/bin/gmake</code>.
+
+
+<h3>Linux platform</h3>
+
+<p>
+The JDK for Linux platforms can be downloaded at:
+<a href="http://www.blackdown.org/java-linux.html">
+http://www.blackdown.org/java-linux.html</a>
+
+<p>
+The C compiler needed for jMax compilation is Pentium gcc. Check
+<a href="http://www.gcc.ml.org">http://www.gcc.ml.org</a> for 
+further information and download.
+
+<p>
+jMax uses the <i>Audio File Library</i>,
+by Michael Pruett. This library is available under the GNU Library General Public
+License. This library must be installed before recompiling jMax.
+Please refer to <a href="http://www.68k.org/~michael/audiofile/">
+http://www.68k.org/~michael/audiofile/</a> for information and download.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="compilation"> <h2>Compilation</h2></A>
+
+
+<h3> Building source tree </h3>
+
+<p>
+In order to create all the sub-directories for objects and libraries,
+the script
+<a href="../../bin/jmax"><code>jmax-make-dirs</code></a>,
+located in <i>jMax root dir</i>/bin,
+has to be launched prior to any compilation.
+
+
+<h3> <code>make</code> targets </h3>
+
+<p>
+The JAVA compilation needs to access the Swing classes, which must be
+in the <code>CLASSPATH</code> environment variable, i.e. <br>
+<code>setenv CLASSPATH <i>Swing's home</i>/swingall.jar</code> for csh <br>
+<code>export CLASSPATH=<i>Swing's home</i>/swingall.jar</code> for bash <br>
+
+<p>
+To recompile, use the following command line:<br>
+<code>make ARCH=<i>your_architecture</i> MODE=opt all</code>, <br>
+where <i>your_architecture</i> is:
+<ul>
+<li> <code>linuxpc</code> for Linux platform on Intel compatible processors
+<li> <code>irix65r4k</code> for SGI platform, IRIX 6.5, R4000 processor
+<li> <code>irix65r5k</code> for SGI platform, IRIX 6.5, R5000 processor
+<li> <code>irix65r10k</code> for SGI platform, IRIX 6.5, R10000 processor
+<li> <code>irix63r5k</code> for SGI platform, IRIX 6.3, R5000 processor
+<li> <code>irix63r10k</code> for SGI platform, IRIX 6.3, R10000 processor
+</ul>
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="starting it"> <h2>Starting it</h2></A>
+
+
+<p>
+Once recompiled, you can start jMax using the script 
+<a href="../../bin/jmax"><code>jmax</code></a>, 
+located in <i>jMax root dir</i>/bin. 
+
+<p>
+jMax uses for its configuration a file named <code>.jmaxrc</code>,
+located in user's home directory. See <a href="../user/getting_started.html">
+Getting Started</a>, <a href="../user/config/system.html">System Configuration</a>
+and <a href="../user/config/io.html">I/O Configuration</a> for further information.
+
+<p>
+Here is an minimal .jmaxrc file for the Linux platform:
+<pre>
+set jmaxHostType linuxpc
+
+when start {
+
+
+        jmaxSetSampleRate 44100
+        jmaxSetAudioBuffer 1024
+
+        openDefaultAudioIn stereoIn
+        openDefaultAudioOut stereoOut
+        openDefaultMidi midi
+     }
+</pre>
+
+<!-- ---------------------------------------------------------------------- -->
+
+
+</td>
+</tr>
+</table>
+
+<hr noshade size=1>
+
+<p>
+Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.
+
+</body>
+</html>
