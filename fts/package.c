@@ -149,6 +149,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   if (fts_object_get_metaclass(obj) != fts_package_type) {
 /* FIXME: error corruption     fts_object_destroy(obj); */
     fts_log("[package]: Invalid package file %s\n", path);
+    
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto gracefull_exit;
@@ -1121,6 +1122,11 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
+  if( o->patcher)
+    {
+      fts_patcher_remove_object(o->patcher, o);
+      o->patcher = 0;
+    }
 }
 
 static void 

@@ -84,7 +84,7 @@ public class FtsProject extends FtsPackage
 
   public void openEditor(int nArgs, FtsAtom[] args)
   {
-    ProjectEditor.open();
+    ProjectEditor.editCurrent();
   }
 
   Hashtable packages = new Hashtable();

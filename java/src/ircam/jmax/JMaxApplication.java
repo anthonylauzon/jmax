@@ -107,10 +107,27 @@ class JMaxClient extends FtsObject {
     send( FtsSymbol.get("load"), args);
   }
 
+  void loadProject( String name) throws IOException
+  {
+    FtsArgs args = new FtsArgs();
+
+    args.addString( name);
+
+    send( FtsSymbol.get("load_project"), args);
+  }
+
   static
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "showMessage"), new FtsMessageHandler() {
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  if ( args.isSymbol( 0) )
+	    JOptionPane.showMessageDialog( JMaxApplication.getConsoleWindow(), 
+					   args.getSymbol( 0).toString(), "Warning", JOptionPane.INFORMATION_MESSAGE);
+	}
+      });
   }
 }
 
@@ -224,7 +241,6 @@ public class JMaxApplication {
 		  }
 		patcher.stopUpdates();		      
 		patcher.requestDestroyEditor();
-		//FtsPatcherObject.fireAtomicAction(true); 
 		try
 		  {
 		    patcher.delete();
@@ -278,6 +294,11 @@ public class JMaxApplication {
     singleInstance.clientObject.load( name);
   }
 
+  public static void loadProject( String name) throws IOException
+  {
+    singleInstance.clientObject.loadProject( name);
+  }
+
   // **********************************************************************
 
 
@@ -318,6 +339,11 @@ public class JMaxApplication {
   public static FtsDspControl getDspControl()
   {
     return singleInstance.consoleWindow.getControlPanel().getDspControl();
+  }
+
+  public static ConsoleWindow getConsoleWindow()
+  {
+    return singleInstance.consoleWindow;
   }
 
   public static Clipboard getSystemClipboard()

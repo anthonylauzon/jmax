@@ -104,7 +104,7 @@ public class DefaultActions
   public static EditorAction editProjectAction    = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	ProjectEditor.open();
+	ProjectEditor.editCurrent();
       }
     };
 }

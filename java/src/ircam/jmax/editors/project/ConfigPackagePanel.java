@@ -145,6 +145,21 @@ public class ConfigPackagePanel extends JPanel implements Editor
       dataPathModel.addElement(e.nextElement());    
   }
 
+  void setPackage( FtsPackage pkg)
+  {
+    if(ftsPkg == pkg) return;
+
+    ftsPkg = pkg;
+    
+    ftsPkg.setFtsActionListener( new FtsActionListener(){
+	public void ftsActionDone()
+	{
+	  update();
+	  window.setVisible( true);
+	}
+      });
+  }
+
   void update()
   {    
     initDataModels( ftsPkg);

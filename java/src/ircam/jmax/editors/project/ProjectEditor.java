@@ -33,6 +33,7 @@ import java.io.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
@@ -43,11 +44,11 @@ public class ProjectEditor extends JFrame implements EditorContainer
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
 	public String getToolName() { return "Project Editor";}
-	public void open() { ProjectEditor.open();}
+	public void open() { ProjectEditor.editCurrent();}
       });
   }
 
-  public static ProjectEditor open()
+  public static ProjectEditor editCurrent()
   {    
     if (projectEditor == null)
       projectEditor = new ProjectEditor();
@@ -94,6 +95,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   void update()
   {
+    packagePanel.setPackage( JMaxApplication.getProject());
     packagePanel.update();
   } 
 
@@ -124,7 +126,18 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   public static void openProject( Frame frame)
   {
-    
+    File project = MaxFileChooser.chooseFileToOpen( frame);
+    if ( project!= null)
+      {
+	try
+	  {	
+	    JMaxApplication.loadProject( project.getAbsolutePath());
+	  }
+	catch(IOException e)
+	  {
+	    System.err.println("[ProjectEditor]: I/O error loading project "+project.getAbsolutePath());
+	  }
+      }
   }
   /************* interface EditorContainer ************************/
   public Editor getEditor()

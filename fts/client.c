@@ -110,6 +110,7 @@ static fts_symbol_t s_client;
 static fts_symbol_t s_client_manager;
 static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
+static fts_symbol_t s_show_message;
 
 
 /* Predefined ids */
@@ -801,6 +802,7 @@ fts_patcher_t *
 fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 {
   fts_patcher_t *patcher = 0;
+  fts_package_t *project;
   int type = 1;
   fts_atom_t a[3];
   client_t *client;
@@ -869,6 +871,35 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
   return patcher;
+}
+
+static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+  fts_package_t* project;
+  fts_atom_t a[1];
+  char message[1024];
+
+  fts_symbol_t project_file = fts_get_symbol( at);
+  
+  project = fts_project_open(project_file);
+
+  if( project->state == fts_package_corrupt) 
+    {
+      sprintf(message, "Invalid project file: \n%s\n", project_file);
+      fts_set_symbol( a, message);
+      fts_client_send_message( o, s_show_message, 1, a);
+    }  
+  else
+    {
+      client_register_object( this, (fts_object_t *)project, FTS_NO_ID);
+
+      fts_set_int(a, fts_get_object_id( (fts_object_t *)project));
+      fts_client_send_message(o, fts_s_project, 1, a);
+      
+      fts_send_message( (fts_object_t *)project, fts_SystemInlet, fts_s_upload, 0, 0);
+      fts_send_message( (fts_object_t *)project, fts_SystemInlet, fts_s_openEditor, 0, 0);
+    }
 }
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -997,6 +1028,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load"), client_load_patcher_file);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_project"), client_load_project);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
 
@@ -1482,6 +1514,7 @@ void fts_client_config( void)
   s_client = fts_new_symbol("client");
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");
+  s_show_message = fts_new_symbol( "showMessage");
 
   client_table_init();
 
