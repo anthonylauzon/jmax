@@ -267,6 +267,7 @@ alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode)
   if (err < 0)
   {
     fts_log("[alsaaudiomanager] cannot get hardware configuration for device %s (%s)\n", device_name, snd_strerror(err));
+    snd_pcm_close(handle);
     return err;
   }
 
