@@ -72,6 +72,17 @@ tuple_copy_function(const fts_object_t *from, fts_object_t *to)
   tuple_copy((fts_tuple_t *)from, (fts_tuple_t *)to);
 }
 
+
+static void
+tuple_array_function (fts_object_t *o, fts_array_t *array)
+{
+    fts_tuple_t *self = (fts_tuple_t *) o;
+    
+    fts_array_append(array, fts_tuple_get_size(self), 
+		            fts_tuple_get_atoms(self));
+}
+
+
 static void
 tuple_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
@@ -197,6 +208,7 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
   fts_class_set_post_function(cl, tuple_post_function);
+  fts_class_set_array_function(cl, tuple_array_function);
   fts_class_set_description_function(cl, tuple_description_function);
 
   fts_class_doc(cl, fts_s_tuple, "[<any: value> ...]", "immutable array of any values");
