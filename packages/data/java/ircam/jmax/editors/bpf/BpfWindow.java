@@ -96,6 +96,8 @@ public class BpfWindow extends JMaxEditor {
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
+    else
+      makeSimpleMenuBar();
     
     validate();
     pack();
@@ -127,7 +129,6 @@ public class BpfWindow extends JMaxEditor {
     
     setJMenuBar(mb);
   }
-  
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsBpfPanel;

@@ -102,6 +102,8 @@ public class MatWindow extends JMaxEditor {
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
+    else
+      makeSimpleMenuBar();
     
     setLocation(200, 200);
     setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -139,7 +141,7 @@ public class MatWindow extends JMaxEditor {
     
     setJMenuBar(mb);
   }
-  
+
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsMatPanel;

@@ -45,5 +45,9 @@ public abstract class JMaxEditor extends JFrame implements EditorContainer
   public Point getContainerLocation(){
     return getLocation();
   }
+  
+  public void makeSimpleMenuBar(){};
+
+  public static Font menuFont = new Font("Lucida Grande", Font.PLAIN, 12);
 }
 

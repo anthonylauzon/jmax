@@ -76,7 +76,9 @@ public class Tabler extends JMaxEditor{
     pack();
     
     if(JMaxApplication.getProperty("no_menus") == null)
-      makeMenuBar();    
+      makeMenuBar();   
+    else
+      makeSimpleMenuBar();
     validate();
     pack();
   }
@@ -214,7 +216,7 @@ public class Tabler extends JMaxEditor{
     getContentPane().add(controlBar, BorderLayout.SOUTH);
     validate();
   }
-    
+
   // ------ JMaxEditor ---------------
   public Editor getEditor(){
     return itsPanel;

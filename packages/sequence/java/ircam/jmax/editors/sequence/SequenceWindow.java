@@ -105,6 +105,8 @@ public class SequenceWindow extends JMaxEditor {
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
+    else
+      makeSimpleMenuBar();
     
     validate();
     pack();

@@ -155,16 +155,6 @@ public class TrackWindow extends JMaxEditor {
     setJMenuBar(mb);
   }
   
-  private final void makeSimpleMenuBar()
-  {
-    JMenuBar mb = new JMenuBar();
-    mb.add( new DefaultFileMenu());
-    editMenu = new EditMenu(this);
-    mb.add(editMenu);
-		
-    setJMenuBar(mb);
-  }
-	
   public EditMenu getEditMenu()
   {
     return editMenu;
