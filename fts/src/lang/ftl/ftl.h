@@ -23,7 +23,7 @@ extern ftl_subroutine_t *ftl_program_add_main( ftl_program_t *prog);
 
 extern ftl_subroutine_t *ftl_program_set_current_subroutine( ftl_program_t *prog, ftl_subroutine_t *subr);
 
-extern fts_status_t ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv);
+extern fts_status_t ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv, fts_object_t *object);
 extern fts_status_t ftl_program_add_call_subroutine_cond( ftl_program_t *prog, int *pstate, ftl_subroutine_t *called_subr);
 extern fts_status_t ftl_program_add_return( ftl_program_t *prog);
 

@@ -7,7 +7,7 @@
 #include "lang/ftl.h"
 #include "lang/veclib/include/veclib.h"
 
-
+#define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 /* FTL opcodes */
 typedef enum {
@@ -17,13 +17,31 @@ typedef enum {
   FTL_OPCODE_CALL_SUBR_COND  /* call a FTL subroutine conditionnaly */
 } ftl_opcode_t;
 
+
+typedef struct {
+  fts_object_t *object;
+} ftl_instr_debug_info_t;
+
+typedef struct {
+  int size;
+  ftl_instr_debug_info_t *info;
+} ftl_debug_info_table_t;
+
+#define DEFAULT_DEBUG_INFO_SIZE 128
+
+
 struct _ftl_subroutine_t {
   fts_symbol_t name;
   fts_atom_list_t instructions;
   struct _ftl_subroutine_t *next;
 
   fts_word_t *bytecode;
+
+  int instruction_count;
+
+  ftl_debug_info_table_t debug_info_table;
 };
+
 
 struct _ftl_program_t {
   float *buffers;		
@@ -51,6 +69,49 @@ fts_status_description_t ftl_error_uninitialized_program =
 
 static void ftl_call_subr_cond( fts_word_t *argv);
 
+
+/* --------------------------------------------------------------------------- */
+/*                                                                             */
+/* Debug info handling (temporary)                                             */
+/*                                                                             */
+/* --------------------------------------------------------------------------- */
+
+static void ftl_debug_info_table_init( ftl_debug_info_table_t *table)
+{
+  table->size = DEFAULT_DEBUG_INFO_SIZE;
+  table->info = (ftl_instr_debug_info_t *)fts_malloc( table->size * sizeof(ftl_instr_debug_info_t));
+}
+
+static void ftl_debug_info_table_set( ftl_debug_info_table_t *table, int index, fts_object_t *object)
+{
+  if (index >= table->size)
+    {
+      int new_size, i;
+
+      new_size = table->size;
+      while (new_size <= index)
+	new_size *= 2;
+
+      table->info = (ftl_instr_debug_info_t *)fts_realloc( table->info, new_size * sizeof(ftl_instr_debug_info_t));
+
+     for ( i = table->size; i < new_size; i++)
+       table->info[i].object = 0;
+
+     table->size = new_size;
+    }
+
+  ASSERT( index >= 0 && index < table->size);
+
+  table->info[ index ].object = object;
+}
+
+static void ftl_debug_info_table_destroy( ftl_debug_info_table_t *table)
+{
+  fts_free( table->info);
+  table->info = 0;
+  table->size = 0;
+}
+
 /* ********************************************************************** */
 /* Subroutines handling                                                   */
 /* ********************************************************************** */
@@ -66,9 +127,12 @@ ftl_subroutine_new( fts_symbol_t name)
 
   newsubr->name = name;
   fts_atom_list_init( &(newsubr->instructions) );
-  newsubr->bytecode = 0;
 
   newsubr->next = 0;
+  newsubr->bytecode = 0;
+  newsubr->instruction_count = 0;
+
+  ftl_debug_info_table_init( &newsubr->debug_info_table);
 
   return newsubr;
 }
@@ -83,10 +147,12 @@ ftl_subroutine_destroy( ftl_subroutine_t *subr)
       fts_free( subr->bytecode);
       subr->bytecode = 0;
     }
+
+  ftl_debug_info_table_destroy( &subr->debug_info_table);
 }
 
 static fts_status_t
-ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, const fts_atom_t *argv )
+ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, const fts_atom_t *argv, fts_object_t *object )
 {
   fts_atom_t a;
 
@@ -101,6 +167,11 @@ ftl_subroutine_add_call( ftl_subroutine_t *subr, fts_symbol_t name, int argc, co
 
   fts_atom_list_append( &(subr->instructions), argc, argv);
 
+  /* add debugging info */
+  ftl_debug_info_table_set( &subr->debug_info_table, subr->instruction_count, object);
+
+  subr->instruction_count++;
+
   return fts_Success;
 }
 
@@ -111,6 +182,9 @@ ftl_subroutine_add_return( ftl_subroutine_t *subr)
 
   fts_set_long( &a, FTL_OPCODE_RETURN);
   fts_atom_list_append( &(subr->instructions), 1, &a);
+
+  /* add debugging info to be done */
+  subr->instruction_count++;
 
   return fts_Success;
 }
@@ -128,6 +202,9 @@ ftl_subroutine_add_call_subroutine_cond( ftl_subroutine_t *subr, int *pstate, ft
 
   fts_set_ptr( &a, called_subr);
   fts_atom_list_append( &(subr->instructions), 1, &a);
+
+  /* add debugging info to be done */
+  subr->instruction_count++;
 
   return fts_Success;
 }
@@ -173,12 +250,12 @@ ftl_program_add_main( ftl_program_t *prog)
 }
 
 fts_status_t
-ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv )
+ftl_program_add_call( ftl_program_t *prog, fts_symbol_t name, int argc, const fts_atom_t *argv, fts_object_t *object )
 {
   if ( !prog->current_subroutine)
     return &ftl_error_uninitialized_program;
 
-  return ftl_subroutine_add_call( prog->current_subroutine, name, argc, argv );
+  return ftl_subroutine_add_call( prog->current_subroutine, name, argc, argv, object );
 }
 
 
@@ -909,6 +986,7 @@ ftl_program_print_signals_count( const ftl_program_t *prog)
 struct print_info {
   int pc;
   char line[256];
+  ftl_instr_debug_info_t *debug_info;
 };
 
 static fts_status_t
@@ -953,8 +1031,16 @@ print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
     strcat( info->line, buffer);
     if ( newstate == ST_OPCODE)
       {
-	strcat( info->line, " );\n");
-	post( info->line);
+	fts_object_t *object;
+
+	strcat( info->line, " );");
+	object = info->debug_info->object;
+	if (object)
+	  post( "%s /* object %s */\n", info->line, fts_symbol_name( fts_object_get_class_name(object)));
+	else
+	  post( "%s /* object unknown */\n", info->line);
+	  
+	info->debug_info++;
       }
     else
       strcat( info->line, ", ");
@@ -970,9 +1056,9 @@ print_state_fun( int state, int newstate, fts_atom_t *a, void *user_data)
       sprintf( buffer+1, "%s", fts_symbol_name( subr->name));
     }
     strcat( info->line, buffer);
-    post( "%s\n", info->line);
     break;
   }
+
   return fts_Success;
 }
 
@@ -991,6 +1077,7 @@ ftl_program_print( const ftl_program_t *prog )
       post( "{\n");
       info.line[0] = 0;
       info.pc = 0;
+      info.debug_info = subr->debug_info_table.info;
       ftl_state_machine( &subr->instructions, print_state_fun, &info);
       post( "}\n\n");
     }
@@ -1054,7 +1141,3 @@ ftl_call_subr_cond( fts_word_t *argv)
   if (*p)
     ftl_run_portable_bytecode( subr->bytecode);
 }
-
-
-
-
