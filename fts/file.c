@@ -363,8 +363,13 @@ fts_file_get_read_path(const char *path, char *full_path)
   else
     {
       const char *begin, *end, *next;
-
-      next = fts_symbol_name(fts_get_search_path());
+      
+      if(fts_get_search_path()) {
+        next = fts_symbol_name(fts_get_search_path());
+      }
+      else {
+        next = NULL;
+      }
       
       while (next)
 	{
@@ -452,6 +457,7 @@ void fts_file_get_write_path(const char *path, char *full_path)
 
 #define FTS_COPY_FILE_BUFSIZE 32768
 // [RS]: Copies a file. The dest is overwritten.
+// TODO: Test this function better.
 int fts_copy_file(const char *src, const char *dest)
 {
     FILE *fsrc, *fdst;
@@ -509,7 +515,7 @@ int fts_copy_file(const char *src, const char *dest)
     for(i=0; i<div; i++) {
         fread(buffer, bufsize, 1, fsrc);
         fwrite(buffer, bufsize, 1, fdst);
-        /* FIXME: use feof/ferror below. */
+        /* FIXME: use feof/ferror below - in a way that it works */
         /*
         if( fread(buffer, bufsize, 1, fsrc) < 1) {
             fclose(fsrc);
