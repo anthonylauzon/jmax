@@ -53,53 +53,22 @@ import ircam.jmax.toolkit.*;
  * offscreen and much, much more...
  */
 
-class UpdateGroupNotifier {
-  static ArrayList sketchPadList = new ArrayList();
-  
-  static void add( ErmesSketchPad sketchPad)
-  {
-    sketchPadList.add( sketchPad);
-  }
-
-  static void remove( ErmesSketchPad sketchPad)
-  {
-    sketchPadList.remove( sketchPad);
-  }
-
+public class ErmesSketchPad extends JComponent implements  Editor, Printable, FtsUpdateGroupListener
+{
+  public static FtsUpdateGroup updateGroup;
   static
   {
-    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_begin"), new UpdateGroupBeginHandler());
-    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_end"), new UpdateGroupEndHandler());
+    try
+      {
+	updateGroup = new FtsUpdateGroup();
+	updateGroup.start();
+      }
+    catch(IOException e)
+      {
+	System.err.println("[ErmesSketchPad]: Error in FtsUpdateGroup creation!");
+	e.printStackTrace();
+      }
   }
-}
-
-class UpdateGroupBeginHandler implements FtsMessageHandler {
-  public void invoke( FtsObject obj, FtsArgs args)
-  {
-    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
-      {
-	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
-	sketchPad.updateGroupStart();
-      }
-  }  
-}
-
-class UpdateGroupEndHandler implements FtsMessageHandler {
-  public void invoke( FtsObject obj, FtsArgs args)
-  {
-    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
-      {
-	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
-	sketchPad.updateGroupEnd();
-      }
-  }  
-}
-
-
-
-public class ErmesSketchPad extends JComponent implements  Editor, Printable
-{
-
 
   private boolean somethingToUpdate = false;
   private Rectangle invalid = new Rectangle();
@@ -123,12 +92,12 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     return invalid;
   }
 
-  void updateGroupStart()
+  public void updateGroupStart()
   {
-      resetUpdate();
+    resetUpdate();
   }
 
-  void updateGroupEnd()
+  public void updateGroupEnd()
   {
     Rectangle rect = getEditorContainer().getViewRectangle();
     Graphics gr;
@@ -417,7 +386,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
     requestDefaultFocus(); 
 
-    UpdateGroupNotifier.add( this);
+    updateGroup.add( this);
   }
   
   private float sx, sy;
@@ -820,7 +789,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     itsEditField = null;
     anOldPastedObject = null;
 
-    UpdateGroupNotifier.remove( this);
+    updateGroup.remove( this);
   }
 
 

@@ -31,6 +31,8 @@ FtsRuntimeErrors.java\
 FtsSelection.java\
 FtsUndoableObject.java\
 FtsUnparse.java\
+FtsUpdateGroup.java\
+FtsUpdateGroupListener.java\
 FtsActionListener.java
 
 JAVAC= @JAVACX@
