@@ -50,9 +50,3 @@ void fts_dev_configure(void)
   unixdev_init();
 #endif
 }
-
-
-
-
-
-
