@@ -50,6 +50,7 @@ typedef struct _sequence_
 
 #include <fts/packages/sequence/seqsym.h>
 #include <fts/packages/sequence/event.h>
+#include <fts/packages/sequence/marker.h>
 #include <fts/packages/sequence/note.h>
 #include <fts/packages/sequence/track.h>
 #include <fts/packages/sequence/trackeditor.h>

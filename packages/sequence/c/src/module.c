@@ -30,6 +30,7 @@ extern void track_editor_config(void);
 extern void event_config(void);
 
 extern void scoob_config(void);
+extern void scomark_config(void);
 extern void seqmess_config(void);
 
 extern void seqfind_config(void);
@@ -49,6 +50,7 @@ sequence_config(void)
   event_config();
 
   scoob_config();
+  scomark_config();
   seqmess_config();
 
   seqfind_config();

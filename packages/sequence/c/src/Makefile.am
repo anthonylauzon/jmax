@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.21 2004/03/18 19:11:31 p_tisserand Exp $
+# $Id: Makefile.am,v 1.22 2004/03/29 15:56:23 borghesi Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.22  2004/03/29 15:56:23  borghesi
+# added trackeditor.c, trackeditor.h, FtsTrackEditorObject.java to Makefiles
+#
 # Revision 1.21  2004/03/18 19:11:31  p_tisserand
 # Added missing directory to include winced sequence.h include data.h need utils.h
 #
@@ -60,6 +63,7 @@ package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \
 locate.c \
+marker.c \
 module.c \
 note.c \
 seqmess.c \

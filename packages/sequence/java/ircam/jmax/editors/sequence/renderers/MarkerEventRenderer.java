@@ -106,7 +106,7 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 			break;
 		}
 		
-		if(type.equals("tempo"))
+		if(type.equals("marker"))
 		{
 			g.setColor( lightCol);
 			g.drawLine( x, maxY, x, 0);
