@@ -416,10 +416,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	String title =  ( ftsPkg instanceof FtsProject) ? "Project Not Saved" : "Package Not Saved";
 
 	Object[] options = { "Save", "Don't save", "Cancel" };
-	int result = JOptionPane.showOptionDialog(null, message, title, 
-						  JOptionPane.YES_NO_CANCEL_OPTION,
-						  JOptionPane.QUESTION_MESSAGE,
-						  null, options, options[0]);
+	int result = JOptionPane.showOptionDialog( window, message, title, 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
 	
 
 	if( result == JOptionPane.CANCEL_OPTION)

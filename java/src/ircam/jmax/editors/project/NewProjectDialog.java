@@ -175,8 +175,14 @@ public class NewProjectDialog extends JDialog
   public static String getResultName()
   {
     String name = instance.nameField.getText();
-    if( !name.endsWith(".jmax"))
-      name = name.concat(".jmax");
+    
+    if( instance.type == PROJECT_TYPE)
+      { 
+	if( !name.endsWith(".jprj")) name = name.concat(".jprj");
+      }      
+    else
+      if( !name.endsWith(".jpkg")) name = name.concat(".jpkg");
+    
     return name;
   }
   public static String getResultLocation()
@@ -191,9 +197,9 @@ public class NewProjectDialog extends JDialog
   {
     String location = instance.pathField.getText();
     String pkgName = instance.nameField.getText();
-    if( pkgName.endsWith(".jmax"))
+    if( pkgName.endsWith(".jpkg"))
       {
-	int idx = pkgName.indexOf(".jmax"); 
+	int idx = pkgName.indexOf(".jpkg"); 
 	pkgName = pkgName.substring( 0, idx-1);
       }
 

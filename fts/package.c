@@ -213,7 +213,7 @@ fts_package_load(fts_symbol_t name)
   }
   
   /* load the definition file */
-  sprintf(filename, "%s%c%s.jmax", path, fts_file_separator, name);
+  sprintf(filename, "%s%c%s.jpkg", path, fts_file_separator, name);
 
   if (fts_file_exists(filename)) {
     pkg = fts_package_load_from_file(name, filename);

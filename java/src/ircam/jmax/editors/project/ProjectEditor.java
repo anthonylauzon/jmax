@@ -30,6 +30,7 @@ import javax.swing.table.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.filechooser.*;
 import java.io.*;
 
 import ircam.fts.client.*;
@@ -159,16 +160,24 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   public static void openProject( Frame frame)
   {
-    File project = MaxFileChooser.chooseFileToOpen( frame);
-    if ( project!= null)
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.setFileFilter( projectFilter);
+    int result = fileChooser.showOpenDialog( frame);
+
+    if ( result == JFileChooser.APPROVE_OPTION)
       {
-	try
-	  {	
-	    JMaxApplication.loadProject( project.getAbsolutePath());
-	  }
-	catch(IOException e)
+	File project = fileChooser.getSelectedFile();	
+
+	if ( project != null)
 	  {
-	    System.err.println("[ProjectEditor]: I/O error loading project "+project.getAbsolutePath());
+	    try
+	      {	
+		JMaxApplication.loadProject( project.getAbsolutePath());
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: I/O error loading project "+project.getAbsolutePath());
+	      }
 	  }
       }
   }
@@ -200,26 +209,33 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   public static void editPackage( Frame frame)
   {
-    File pkg = MaxFileChooser.chooseFileToOpen( frame);
-    String name = pkg.getName();
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fileChooser.setFileFilter( packageFilter);
+    int result = fileChooser.showOpenDialog( frame);
 
-    if(name == null) return;
-
-    if(name.endsWith(".jmax"))
+    if ( result == JFileChooser.APPROVE_OPTION)
       {
-	int idx = name.indexOf(".jmax"); 
-	name = name.substring( 0, idx);
-      }
+	File pkg = fileChooser.getSelectedFile();	
 
-    if( pkg != null)
-      {
-	try
-	  {	
-	    JMaxApplication.loadPackage( name, pkg.getAbsolutePath());
-	  }
-	catch(IOException e)
+	if ( pkg != null)
 	  {
-	    System.err.println("[ProjectEditor]: I/O error loading package "+pkg.getAbsolutePath());
+	    String name = pkg.getName();
+	     
+	    if(name == null) return;
+
+	    if(name.endsWith(".jpkg"))
+	       {
+		 int idx = name.indexOf(".jpkg"); 
+		 name = name.substring( 0, idx);
+	       }
+	    try
+	      {	
+		JMaxApplication.loadPackage( name, pkg.getAbsolutePath());
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: I/O error loading package "+pkg.getAbsolutePath());
+	      }
 	  }
       }
   }
@@ -244,5 +260,44 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   private ConfigPackagePanel packagePanel;
   private static ProjectEditor projectEditor = null;
+  private static JFileChooser fileChooser = new JFileChooser(); 
+  private static javax.swing.filechooser.FileFilter projectFilter, packageFilter;
+  static
+  {
+     projectFilter = new javax.swing.filechooser.FileFilter(){	
+	 public boolean accept( File f) {
+	   if (f.isDirectory())
+	     return true;
+	  
+	   String name = f.getAbsolutePath();
+	   if (name != null)
+	     if (name.endsWith(".jprj"))
+	       return true;
+	     else
+	       return false;
+	   return false;
+	 }
+	 public String getDescription() {
+	   return "jMax Projects";
+	 }
+       };
+     packageFilter = new javax.swing.filechooser.FileFilter(){	
+	 public boolean accept( File f) {
+	   if (f.isDirectory())
+	     return true;
+	   
+	   String name = f.getAbsolutePath();
+	   if (name != null)
+	     if (name.endsWith(".jpkg"))
+	       return true;
+	     else
+	       return false;
+	   return false;
+	 }
+	 public String getDescription() {
+	   return "jMax Packages";
+	 }
+       };
+  }
 }
 

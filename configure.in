@@ -138,10 +138,10 @@ PLATFORM_PACKAGES="oss"
 
 AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[echo packages unixdtd and aflib will not be build])
 AM_PATH_ALSA(0.9.0,[
-	CONFIG_FILE=config_linux_alsa.jmax
+	CONFIG_FILE=config_linux_alsa.jprj
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 ],[
-	CONFIG_FILE=config_linux_oss.jmax
+	CONFIG_FILE=config_linux_oss.jprj
 ])
 
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
@@ -157,7 +157,7 @@ then
 fi
 PLATFORM_PACKAGES="sgi unixdtd"
 FTS_SYS_LIBS="-ldl -laudiofile"
-CONFIG_FILE=config_sgi.jmax
+CONFIG_FILE=config_sgi.jprj
 ACX_C_RESTRICT
 ;;
 
@@ -170,7 +170,7 @@ then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fno-inline"
 fi
 PLATFORM_PACKAGES="macosx"
-CONFIG_FILE=config_macosx.jmax
+CONFIG_FILE=config_macosx.jprj
 dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code) 
 AC_DEFINE(restrict,)
 ;;

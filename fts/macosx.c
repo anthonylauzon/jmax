@@ -72,7 +72,7 @@ fts_get_system_config( void)
 {
   char path[MAXPATHLEN];
 
-  fts_make_absolute_path( fts_get_root_directory(), "config.jmax", path, MAXPATHLEN);
+  fts_make_absolute_path( fts_get_root_directory(), "config.jprj", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol_copy(path);
   }

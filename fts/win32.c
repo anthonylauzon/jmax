@@ -310,7 +310,7 @@ fts_get_system_config( void)
   /* check the config file in the root directory */
   root = fts_get_default_root_directory();
 
-  fts_make_absolute_path(root, "config.jmax", path, _MAX_PATH);
+  fts_make_absolute_path(root, "config.jprj", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol_copy(path);
   }
@@ -320,7 +320,7 @@ fts_get_system_config( void)
     return NULL;
   }
 
-  fts_make_absolute_path(win, "config.jmax", path, _MAX_PATH);
+  fts_make_absolute_path(win, "config.jprj", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol_copy(path);
   }
