@@ -433,24 +433,13 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      tos = value_stack_top(e);
 	      args = 0;
 		  
+	      next_in(e);
+
 	      while (more_in(e) && (! fts_is_closed_cpar(current_in(e))))
 		{
-		  next_in(e);
-
-		  if (! more_in(e))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector constant", 0);
-
-		  if (fts_is_closed_cpar(current_in(e)))
-		    break;	
-
 		  /* Evaluate the expression arguments, and push them in the value stack */
 
 		  TRY(fts_expression_eval_one(e));
-
-		  if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_cpar(current_in(e))))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					    "Syntax error in vector constant", 0);
 
 		  args++;
 		}
@@ -539,25 +528,14 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  name = fts_get_symbol(value_stack_top(e));
 		  args = 1;	/* count and pass also the function name */
 		  
+		  next_in(e);
+
 		  while (more_in(e) && (! fts_is_closed_par(current_in(e))))
 		    {
-		      next_in(e);
-
-		      if (! more_in(e))
-			return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-						"Syntax error in calling function %s",
-						fts_symbol_name(name));
-
-		      if (fts_is_closed_par(current_in(e)))
-			break;	
 
 		      /* Evaluate the expression arguments, and push them in the value stack */
 
 		      TRY(fts_expression_eval_one(e));
-
-		      if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_par(current_in(e))))
-			return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-						"Syntax error in function arguments", 0);
 
 		      args++;
 		    }

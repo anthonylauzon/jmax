@@ -2,43 +2,54 @@
 ##  jMax system defaults of the system properties
 ##  
 
-##
-## Do not modify unless you actually know what you are doing
-##
-
 ## default audio parameters
 
-set jmaxDefaultSampleRate 44100
-set jmaxDefaultAudioBuffer 2048
+set jmaxSampleRate 44100
+set jmaxAudioBuffer 2048
 
 ## set jMax client/server connection mode
 
-set jmaxDefaultConnection "udp"
+set jmaxConnection "udp"
 
 ## set binary execution mode for jMax server executable
 
-set jmaxDefaultMode "opt"
+set jmaxMode "opt"
 
 ## set name for jMax server executable
 
-set jmaxDefaultServerName "fts"
+set jmaxServerName "fts"
 
 ## set port number needed for socket connection
 
-set jmaxDefaultPort 2000
+set jmaxPort 2000
 
 ## default user package path
 
-set jmaxDefaultPkgPath "[systemProperty user.home]/jmax"
+set jmaxPkgPath "[systemProperty user.home]/jmax"
 
 ## default architecture if not specified for host name
 ## just works if server runns on same machine as client
 
-set jmaxDefaultArch "irix65r10k"
+set jmaxArch "irix65r10k"
 
 ## default "UseIcons" value for Swing File Box
 
-set jmaxDefaultFastFileBox "false"
+set jmaxFastFileBox "false"
 
+## default host 
+
+set jmaxHost "local"
+
+##
+## Set the system packages path
+##
+
+set jmaxSysPkgPath "$jmaxRootDir/packages"
+
+##
+## Splash screen setting
+##
+
+set jmaxSplashScreen "show"
 
 

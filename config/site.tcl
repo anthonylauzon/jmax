@@ -16,4 +16,16 @@
 #	openDefaultAudioOut ADATOut  8     
 #  }
 #
+#
+# Also, in order to simplify your users .jmaxrc file, you can fill up
+# a tcl array called jmaxHostTypeTable, specifing the host type of all your
+# machines; what follow, as an example, is the current host type configuration
+# in Ircam
 
+set jmaxHostTypeTable("astor.ircam.fr")      origin
+set jmaxHostTypeTable("stradivari.ircam.fr") octane
+set jmaxHostTypeTable("maggini.ircam.fr")    octane
+set jmaxHostTypeTable("amati.ircam.fr")      octane
+set jmaxHostTypeTable("marimba.ircam.fr")    o2r5ki63
+set jmaxHostTypeTable("libido.ircam.fr")     linuxpc
+set jmaxHostTypeTable("linotte.ircam.fr")    linuxpc
