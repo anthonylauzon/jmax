@@ -95,6 +95,18 @@ class LoadPatcherMessageHandler implements FtsMessageHandler {
   }
 }
 
+class ProjectMessageHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+     if ( args.isInt( 0) )
+       {
+	 JMaxApplication.setCurrentProject(new FtsPackage( JMaxApplication.getFtsServer(), 
+							   JMaxApplication.getRootPatcher(),
+							   args.getInt( 0)));
+       }
+  }
+}
+
 class RootPatcher extends FtsPatcherObject {
   RootPatcher( FtsServer server)
   {
@@ -121,6 +133,7 @@ class JMaxClient extends FtsObject {
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
   }
 }
 
@@ -315,6 +328,16 @@ public class JMaxApplication {
     return singleInstance.server;
   }
 
+  public static FtsPackage getProject()
+  {
+    return singleInstance.project;
+  }
+
+  public static void setCurrentProject(FtsPackage proj)
+  {
+    singleInstance.project = proj;
+  }
+
   public static FtsDspControl getDspControl()
   {
     return singleInstance.consoleWindow.getControlPanel().getDspControl();
@@ -470,6 +493,7 @@ public class JMaxApplication {
   private void initModules()
   {
     ircam.jmax.editors.patcher.ErmesModule.initModule();
+    ProjectEditor.registerProjectEditor();
   }
 
   private void openConsole()
@@ -608,6 +632,15 @@ public class JMaxApplication {
       {
 	JMaxApplication.reportException( e);
       }
+
+    try
+      {
+	clientObject.send( FtsSymbol.get( "get_project"));
+      }
+    catch(IOException e)
+      {
+	JMaxApplication.reportException( e);
+      }
   }
 
   private static void openCommandLineFiles()
@@ -637,4 +670,5 @@ public class JMaxApplication {
   private boolean killFtsOnQuit;
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
+  private FtsPackage project;
 }

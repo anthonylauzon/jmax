@@ -34,6 +34,7 @@ mini_icon_jmax.gif \
 mini_icon_pat.gif \
 more_objects.gif \
 new.gif \
+project_root.gif \
 question.gif \
 stop.gif \
 to_save.gif \

@@ -88,6 +88,7 @@ YACC = @YACC@
 packagedir = $(pkgdatadir)/packages/system/c
 package_LTLIBRARIES = libsystem.la
 libsystem_la_SOURCES = \
+sysinfo.c \
 argument.c \
 bus.c \
 bus_tilda.c \
@@ -115,8 +116,8 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libsystem_la_LIBADD = 
-libsystem_la_OBJECTS =  argument.lo bus.lo bus_tilda.lo const.lo dsp1.lo \
-print.lo sigbus.lo system.lo
+libsystem_la_OBJECTS =  sysinfo.lo argument.lo bus.lo bus_tilda.lo \
+const.lo dsp1.lo print.lo sigbus.lo system.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -132,7 +133,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/argument.P .deps/bus.P .deps/bus_tilda.P \
-.deps/const.P .deps/dsp1.P .deps/print.P .deps/sigbus.P .deps/system.P
+.deps/const.P .deps/dsp1.P .deps/print.P .deps/sigbus.P .deps/sysinfo.P \
+.deps/system.P
 SOURCES = $(libsystem_la_SOURCES)
 OBJECTS = $(libsystem_la_OBJECTS)
 

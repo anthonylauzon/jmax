@@ -237,7 +237,7 @@ static int needs_quote( fts_atom_t *p)
       s++;
       while( *s != '\0')
 	{	    
-	  if( !(isalnum( *s) | ( *s == '+') | ( *s == '-')))
+	  if( !(isalnum( *s) | ( *s == '+') | ( *s == '-') | ( *s == '~')))
 	    return 1;
 	  s++;
 	}

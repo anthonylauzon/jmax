@@ -45,6 +45,9 @@ public class JMaxIcons {
   public static final ImageIcon inlet = loadIcon( "tool_in.gif");
   public static final ImageIcon outlet = loadIcon( "tool_out.gif");
 
+  // These are used from ProjectEditor ???
+  public static final ImageIcon projectRoot = loadIcon( "project_root.gif");
+
   // These are used from IncrementController ???
   public static final ImageIcon little_up_arrow   = loadIcon( "little_up_arrow.gif");
   public static final ImageIcon little_down_arrow = loadIcon( "little_down_arrow.gif");

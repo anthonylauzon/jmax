@@ -989,6 +989,20 @@ static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 }
 
+static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[1];
+  fts_object_t *project = (fts_object_t *)fts_project_get();
+
+  if (!fts_object_has_id( project))
+    client_register_object( (client_t *)o, project, FTS_NO_ID);
+
+  fts_set_int(a, fts_get_object_id( project));
+  fts_client_send_message(o, fts_s_project, 1, a);
+  
+  fts_send_message( project, fts_SystemInlet, fts_s_upload, 0, 0);
+}
+
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -1021,6 +1035,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_packages"), client_get_packages);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);

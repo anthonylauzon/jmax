@@ -81,6 +81,7 @@ struct fts_package {
 
   fts_symbol_t name;
   fts_symbol_t dir;
+  fts_symbol_t filename;
   fts_package_state_t state;
   char* error;
   fts_object_t* patcher;

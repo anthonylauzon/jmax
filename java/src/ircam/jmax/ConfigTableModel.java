@@ -23,7 +23,7 @@
 // Authors: Francois Dechelle, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher;
+package ircam.jmax;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -38,62 +38,125 @@ import ircam.fts.client.*;
  * A table model used to represent the content of an objectset of error objects
  * in a JTable. 
  */
-class ErrorTableModel extends AbstractTableModel implements ToolTableModel
+class ConfigTableModel extends AbstractTableModel 
 {
   
-  ErrorTableModel(FtsObjectSet set)
+  ConfigTableModel()
   {
     super();
-    this.objectSet = set;
+  }
+
+  public void setFtsPackage(FtsPackage pkg)
+  {
+    ftsPackage = pkg;
   }
 
   /**
    * The number of columns in this model */
   public int getColumnCount() 
   { 
-      return 2;
+    return 2;
   }
   
   public Class getColumnClass(int col)
   {
-      return String.class;
+    return String.class;
   }
 
   public boolean isCellEditable(int row, int col)
   {
-    return false;
+    return true;
   }
 
   public String getColumnName(int col)
   {
-      if(col == 0)
-	  return "object";
-      else 
-	  return "error description";
+    if(col == 0)
+      return "property";
+    else 
+      return "value";
   }
 
   public int getRowCount() { 
-    return objectSet.getSize(); 
+    return size; 
   }
-  
+
+  public void addRow()
+  {
+    size++;    
+    if(size > rows)
+      {
+	Object[][] temp = new Object[size+5][2];
+	for(int i = 0; i < size-1; i++)
+	  {
+	    temp[i][0] = data[i][0];
+	    temp[i][1] = data[i][1];
+	  }
+	data = temp;
+	rows = size+5;
+      }
+    fireTableDataChanged();
+  }
+
+  public void addRow(Object v1, Object v2)
+  {
+    addRow();
+    data[size-1][0] = v1;
+    data[size-1][1] = v2;
+  }
+
+  public void removeRow(int rowId)
+  {
+    if(size > 0)
+      {
+	size--;    
+	if(rowId >= 0)
+	  {
+	    for(int i = rowId; i < size; i++)
+	      {
+		data[i][0] = data[i+1][0];
+		data[i][1] = data[i+1][1];
+	      }
+	  }
+	data[size][0] = null;
+	data[size][1] = null;
+
+	fireTableDataChanged();
+      }
+  }
+
+  public void save()
+  {
+    if( ftsPackage != null)
+      ftsPackage.save();
+  }
+
   public Object getValueAt(int row, int col) 
   { 
-    FtsGraphicObject obj = (FtsGraphicObject)objectSet.getElementAt(row);
-    if(obj==null) return " ";
-    
-    if(col == 0)
-      return obj.getDescription();
+    if(row > size) return null;
     else
-      return obj.getErrorDescription();    
+      return data[row][col];
   }
-  
-  public ListModel getListModel()
+  public void setValueAt(Object value, int row, int col) 
   {
-      return objectSet;
+    if(row > size) return;
+
+    data[row][col] = value;
+    fireTableCellUpdated(row, col);
+    
+    if( ftsPackage != null)
+      {
+	if(( col==1) && ( data[row][0] != null) && ( data[row][1] != null))
+	  ftsPackage.set( (String)data[row][0], (String)data[row][1]);
+      }
   }
-  
-  //--- Fields
-  FtsObjectSet objectSet;
+
+  int size = 0;
+  int rows = 0;
+  Object data[][];
+  FtsPackage ftsPackage;
 }
+
+
+
 
 
