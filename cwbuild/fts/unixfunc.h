@@ -95,4 +95,12 @@ extern int fts_sched_remove( fts_object_t *obj);
 extern void fts_kernel_sched_init(void);
 extern int fts_sched_add( fts_object_t *obj, int flags, ...);
 
+
+/***************************************/
+/* from clientmanager.c                */
+/***************************************/
+extern void fts_client_manager_pipe_start(void);
+extern void fts_client_manager_tcp_start(void);
+extern void fts_kernel_client_manager_init(void);
+
 #endif
