@@ -770,11 +770,27 @@ track_description_function(fts_object_t *o,  fts_array_t *array)
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
+
+
 /******************************************************
 *
 *  markers
 *
 */
+
+static void
+_track_get_markers (fts_object_t *o, int winlet, fts_symbol_t s, 
+                    int ac, const fts_atom_t *at)
+{
+  track_t    *markers = track_get_or_make_markers((track_t *) o);
+  fts_atom_t  ret;
+
+  fts_set_object(&ret, markers);
+
+  fts_return(&ret);
+}
+
+
 track_t *
 track_get_or_make_markers(track_t *track)
 {
@@ -788,11 +804,13 @@ track_get_or_make_markers(track_t *track)
     markers = (track_t *)fts_object_create(track_class, 1, &a);
     fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
     
+    fts_object_refer((fts_object_t *) markers);
     track_set_markers(track, markers);
   }
   
   return markers;
 }
+
 
 scomark_t *
 track_insert_marker(track_t *track, double time, fts_symbol_t type)
@@ -959,7 +977,7 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
         }
         
         if(next_bar_time - time > MARKERS_BAR_TOLERANCE)
-          fts_post("track make-bars: bar @ %g is short by %g msec\n", time, next_bar_time - time);
+          fts_post("track make_bars: bar @ %g is short by %g msec\n", time, next_bar_time - time);
         
         /* next given bar */
         bar_duration = ((double)numerator * 240000.0) / (tempo * (double)denominator);
@@ -1000,12 +1018,29 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       next_bar_time += ((double)numerator * 240000.0) / (tempo * (double)denominator);
     }      
     
-    marker_track_renumber_bars(markers, track_get_first(markers), 0, 0);
+    marker_track_renumber_bars(markers, track_get_first(markers), 
+                               FIRST_BAR_NUMBER, 0);
     
     if(track_editor_is_open(self))
       fts_send_message((fts_object_t *)self->markers, fts_s_upload, 0, NULL);
   }
 }
+
+
+static void
+_track_renumber_bars (fts_object_t *o, int winlet, fts_symbol_t s, 
+                      int ac, const fts_atom_t *at)
+{
+    track_t *markers = (track_t *) o;
+    fts_symbol_t tr_type = fts_class_get_name(track_get_type(markers));
+  
+    if (tr_type != seqsym_scomark)
+        markers = track_get_or_make_markers(markers);
+
+    marker_track_renumber_bars(markers, track_get_first(markers), 
+                               FIRST_BAR_NUMBER, 1);
+}
+
 
 /*********
 * make a trill scoob starting from a set of scoob: 
@@ -1924,7 +1959,9 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	      fts_set_int(&ret, size);
         
         if(self->markers)
-          marker_track_renumber_bars(self->markers, track_get_first(self->markers), 0, 0);
+          marker_track_renumber_bars(self->markers, 
+                                     track_get_first(self->markers), 
+                                     FIRST_BAR_NUMBER, 0);
         
 	      track_update_editor(self);
       }
@@ -1999,6 +2036,8 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
 }
 
 
+
+
 /* editor */
 
 static void
@@ -2057,12 +2096,14 @@ track_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
 }
 
+
 /* upload all changed events if editor is visible */
 void track_update_editor (track_t *self)
 {
   if (track_editor_is_open(self))
     track_upload((fts_object_t *) self, 0, NULL, 0, NULL);
 }
+
 
 static void
 track_end_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -2094,6 +2135,9 @@ track_set_save_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 		fts_object_set_dirty(o);
 	}
 }
+
+
+
 
 /******************************************************
 *
@@ -2188,6 +2232,9 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_send_message_varargs( fts_get_object(&a), fts_s_send, ac, at);
   }
 }
+
+
+
 
 /******************************************************
 *
@@ -2316,10 +2363,9 @@ track_instantiate(fts_class_t *cl)
   
   /* markers */
   fts_class_message_void(cl, fts_new_symbol("getmarkers"), _track_get_markers);
+  fts_class_message_void(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_void(cl, fts_new_symbol("make_bars"), _track_make_bars);
   fts_class_message_void(cl, fts_new_symbol("renumber_bars"), _track_renumber_bars);
-	fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
-
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   
