@@ -30,8 +30,21 @@ extern void fts_hash_table_destroy( fts_hash_table_t *ht);
 
 extern void fts_hash_table_free( fts_hash_table_t *ht);
 
+/*
+  Lookup entry `sym' in hash_table `ht'.
+  If found, copy value in `data'.
+  Returns:
+   0 if entry is not present
+   1 if entry is present
+*/
 extern int fts_hash_table_lookup( const fts_hash_table_t *ht, fts_symbol_t sym, fts_atom_t *data);
 
+/*
+  Insert entry `sym' with value `data' in hash_table `ht'.
+  Returns:
+   0 if entry is already present or insertion failed
+   1 if entry is inserted
+*/
 extern int fts_hash_table_insert( fts_hash_table_t *ht, fts_symbol_t sym, fts_atom_t *data);
 
 extern void fts_hash_table_apply( const fts_hash_table_t *ht, void (*fun)( fts_symbol_t sym, fts_atom_t *data, void *user_data), void *user_data);
