@@ -20,15 +20,20 @@
  * 
  */
 
+
+#include <string.h>
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
+
 
 fts_symbol_t mat_symbol = 0;
 fts_class_t *mat_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
-static fts_symbol_t sym_mat_append_row = 0;
+static fts_symbol_t sym_mat_append_row  = 0;
+static fts_symbol_t sym_mat_insert_rows = 0;
+static fts_symbol_t sym_mat_delete_rows = 0;
 static fts_symbol_t sym_register_obj = 0;
 
 
@@ -221,6 +226,11 @@ mat_post_function(fts_object_t *o, fts_bytestream_t *stream)
   else
     fts_spost(stream, "<mat %d %d>", m, n);
 }
+
+
+
+
+
 
 /********************************************************
 *
@@ -454,6 +464,11 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
   return(m * n);
 }
 
+
+
+
+
+
 /********************************************************************
 *
 *   upload methods
@@ -565,6 +580,11 @@ mat_upload(mat_t *self)
   mat_upload_data(self);
 }
 
+
+
+
+
+
 /********************************************************************
 *
 *   user methods
@@ -643,7 +663,11 @@ mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 
-/* append a row of atoms, augment m, clip row to n */
+/** append a row of atoms, augment m, clip row to n 
+ * 
+ * @method append
+ * @param  atoms	row of atoms to append, will be clipped to width of matrix
+ */
 static void
 mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -666,6 +690,122 @@ mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
   fts_object_set_state_dirty(o);
 }
+
+
+/** insert @p num rows of atoms at row @p pos
+ *  may insert num rows behind last row m --> append num rows
+ *
+ * @method insert
+ * @param  int: pos    index of row where to insert @p num empty rows, default 0
+ * @param  int: num    number of rows to insert, default 1
+ * 
+ * TODO: give data, clip rows to n, you can use mat_set_row_elements for now
+ * @method insert
+ * @param  int: pos    index of row where to insert
+ * @param  tuples: atoms  list of tuples of rows of atoms to append, 
+ *		       will be clipped to width of matrix
+ */
+static void
+mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
+		 int ac, const fts_atom_t *at)
+{
+  mat_t	     *self    = (mat_t *) o;
+  fts_atom_t *newptr;
+  int         m       = mat_get_m(self);
+  int	      n       = mat_get_n(self);
+  int	      pos     = 0;	/* row position at which to insert */
+  int         numrows = 1;	/* number of rows to insert */
+  int         num, tomove, i;
+
+  /* check and test args */
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+
+  if      (pos < 0)		pos = 0;
+  else if (pos > m)		pos = m;
+
+  if (ac > 1  &&  fts_is_number(at+1))
+    numrows = fts_get_number_int(at+1) ;
+  
+  if      (numrows <= 0)	return;	/* nothing to append */
+
+  /* make space, may change ptr, sets new atoms at the end to void */
+  mat_set_size(self, m + numrows, n);
+
+  /* move rows */
+  newptr = mat_get_ptr(self) + n * pos;
+  num    = n * numrows;		/* atoms to insert */
+  tomove = n * (m - pos);	/* atoms to move */
+
+  if (pos < m)	/* don't move when appending behind last row */
+    memmove(newptr + num, newptr, tomove * sizeof(fts_atom_t));
+
+  /* initialise inserted atoms (don't leave void atoms around) */
+  for (i = 0; i < num; i++)
+    fts_set_int(newptr + i, 0);
+
+  /* update editor if open */
+  if (mat_editor_is_open(self))
+  {
+    fts_client_send_message(o, sym_mat_insert_rows, 0, 0);
+    mat_upload_from_index(self, pos, 0, tomove + num);
+  }
+  fts_object_set_state_dirty(o);
+}
+
+
+/** delete @p num rows of atoms 
+ * 
+ * @method delete
+ * @param  int: pos    index of row where to delete @p num rows, default 0
+ * @param  int: num    number of rows to delete, default 1
+ */
+static void
+mat_delete_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
+		 int ac, const fts_atom_t *at)
+{
+  mat_t	     *self    = (mat_t *) o;
+  fts_atom_t *killptr;
+  int         m       = mat_get_m(self);
+  int	      n       = mat_get_n(self);
+  int	      pos     = 0;
+  int         numrows = 1;
+  int         num, tomove, i;
+  
+  /* get and check args */
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+    
+  if      (pos <  0)		pos = 0;
+  else if (pos >= m)		return;	/* nothing to delete */
+
+  if (ac > 1  &&  fts_is_number(at+1))
+    numrows = fts_get_number_int(at+1);
+
+  if      (numrows <= 0)	return;	/* nothing to delete */
+  else if (numrows >  m - pos)	numrows = m - pos;
+  
+  killptr = mat_get_ptr(self) + n * pos;
+  num     = n * numrows;	/* number of atoms to insert */
+  tomove  = n * (m - pos);	/* number of atoms to move */
+
+  /* release atoms to delete */
+  for (i = 0; i < num; i++)
+    fts_atom_release(killptr + i);
+
+  /* move rows */
+  memmove(killptr, killptr + num, tomove * sizeof(fts_atom_t));
+  self->m -= numrows; 
+
+  /* update editor if open */
+  if (mat_editor_is_open(self))
+  {
+    fts_client_send_message(o, sym_mat_delete_rows, 0, 0);
+    mat_upload_from_index(self, pos, 0, tomove);
+  }
+  fts_object_set_state_dirty(o);
+}
+
 
 
 static void
@@ -926,6 +1066,11 @@ mat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   mat_set_editor_close(this);
 }
 
+
+
+
+
+
 /********************************************************************
 *
 *   class
@@ -1017,6 +1162,8 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
   fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
   fts_class_message_varargs(cl, fts_s_append, mat_append_row);
+  fts_class_message_varargs(cl, fts_s_insert, mat_insert_rows);
+  fts_class_message_varargs(cl, fts_s_delete, mat_delete_rows);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);
@@ -1044,7 +1191,11 @@ mat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set matrix values at given index");
   fts_class_doc(cl, fts_s_set, "<mat: other>", "set from mat instance");
   fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");
-  fts_class_doc(cl, fts_new_symbol("append"), "<list: values>", "append row of atoms");
+
+  fts_class_doc(cl, fts_s_append, "<list: values>", "append row of atoms");
+  fts_class_doc(cl, fts_s_insert, "<int: pos> <int: num>", "insert num empty rows at row pos");
+  fts_class_doc(cl, fts_s_delete, "<int: pos> <int: num>", "delete num rows from row pos");
+
   fts_class_doc(cl, fts_s_fill, "<atom: value>", "fill matrix with given value");
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set size");
   
@@ -1060,7 +1211,9 @@ mat_config(void)
 {
   sym_text = fts_new_symbol("text");
   sym_comma = fts_new_symbol(",");
-  sym_mat_append_row = fts_new_symbol("mat_append_row");
+  sym_mat_append_row  = fts_new_symbol("mat_append_row");
+  sym_mat_insert_rows = fts_new_symbol("mat_insert_rows");
+  sym_mat_delete_rows = fts_new_symbol("mat_delete_rows");
   mat_symbol = fts_new_symbol("mat");
   sym_register_obj = fts_new_symbol("register_obj");
   
