@@ -133,6 +133,7 @@ fts_object_new( fts_class_t *cl)
 
   obj->cl = cl;
   fts_object_set_id( obj, FTS_NO_ID);
+  fts_object_set_client_id( obj, FTS_NO_ID);
   fts_object_set_status( obj, FTS_OBJECT_STATUS_CREATE);
 
   return obj;

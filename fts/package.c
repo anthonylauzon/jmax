@@ -1594,6 +1594,7 @@ fts_kernel_package_init(void)
   fts_system_package = fts_zalloc(sizeof(fts_package_t));
 
   fts_system_package->object.cl = 0;
+  fts_system_package->object.flag.client_id = FTS_NO_ID;
   fts_system_package->object.flag.id = FTS_NO_ID;
   fts_system_package->object.properties = 0;
   fts_system_package->object.refcnt = 0;

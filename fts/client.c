@@ -182,6 +182,7 @@ static void client_release_object( client_t *this, fts_object_t *object)
   fts_hashtable_remove( &this->object_table, &k);
 
   fts_object_set_id( object, FTS_NO_ID);
+  fts_object_set_client_id( object, FTS_NO_ID);
 }
 
 static void client_register_object( client_t *this, fts_object_t *object, int object_id)
@@ -1268,7 +1269,7 @@ void fts_client_release_object(fts_object_t *obj)
 	}
       
       patcher = (fts_object_t *)fts_object_get_patcher(obj);
-      if(patcher != NULL && (fts_object_get_status(patcher) != FTS_OBJECT_STATUS_PENDING_DELETE))
+      if(patcher != NULL && fts_object_has_id(patcher))
 	{
 	  fts_set_object(a, obj);
 	  fts_client_send_message( patcher, s_remove_object, 1, a);
