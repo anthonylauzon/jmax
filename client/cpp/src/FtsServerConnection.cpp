@@ -31,7 +31,7 @@ namespace fts {
 namespace client {
 
   const int FtsServerConnection::DEFAULT_RECEIVE_BUFFER_SIZE = 65536;
-  const int FtsServerConnection::CLIENT_OBJECT_ID = 0;
+  const int FtsServerConnection::CLIENT_OBJECT_ID = 1;
 
   void *FtsServerConnection::receiveThread( void *arg)
   {
@@ -51,8 +51,9 @@ namespace client {
 	  connection->_decoder->decode( connection->_receiveBuffer, n);
 	}
     }
-  catch( FtsClientException e)
+  catch( FtsClientException& e)
     {
+	std::cerr << " Exception message : " << e.getMessage() << std::endl;
       pthread_exit( 0);
     }
 
@@ -67,15 +68,16 @@ namespace client {
 
     _decoder = new BinaryProtocolDecoder( this);
     _encoder = new BinaryProtocolEncoder();
-
-    if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
-      throw FtsClientException( "Cannot start receive thread", errno);
+    _receiveBuffer = new unsigned char[FtsServerConnection::DEFAULT_RECEIVE_BUFFER_SIZE];
   }
 
   FtsServerConnection::~FtsServerConnection()
   {
     delete _encoder;
     delete _objectTable;
+    /* Stop thread .... */
+    delete[] _receiveBuffer;
+
   }
 
   FtsObject *FtsServerConnection::getObject( int id)
@@ -143,6 +145,12 @@ namespace client {
     _encoder->clear();
   }
 
+    void FtsServerConnection::startThread() throw(FtsClientException)
+    {
+	if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
+	    throw FtsClientException( "Cannot start receive thread", errno);
+	
+    }
 };
 };
 };

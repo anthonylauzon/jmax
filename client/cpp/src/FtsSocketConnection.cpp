@@ -138,6 +138,7 @@ namespace client {
 #endif
 
     connect();
+    startThread();
   }
 
   void FtsSocketConnection::close() throw (FtsClientException)
@@ -149,7 +150,7 @@ namespace client {
     int r;
 
     r = std::read( _socket, b, len);
-
+    
     if (r == -1)
       throw FtsClientException( "Error in message receiving", errno);
     else if (r == 0)
