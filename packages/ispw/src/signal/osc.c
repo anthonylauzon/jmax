@@ -36,7 +36,7 @@
  *
  */
 
-static fts_hash_table_t *sigtab1_ht;
+static fts_hashtable_t *sigtab1_ht;
 
 typedef struct {
   fts_object_t _o;
@@ -54,7 +54,7 @@ sigtab1_reload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   sigtab1_t *this = (sigtab1_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t wrap_mode = fts_get_symbol_arg(ac, at, 2, 0);
@@ -62,7 +62,8 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   if(!name)
     return;
 
-  if (fts_hash_table_lookup(sigtab1_ht, name, &data))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get( sigtab1_ht, &k, &data))
     {
       this->wavetab = (wavetab_t *)fts_get_ptr(&data);
       this->wavetab->refcnt++;
@@ -70,8 +71,9 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   else
     {
       this->wavetab = wavetable_new(name, wrap_mode);
+
       fts_set_ptr(&data, this->wavetab);
-      fts_hash_table_insert(sigtab1_ht, name, &data);
+      fts_hashtable_put(sigtab1_ht, &k, &data);
     }
 }
 
@@ -82,7 +84,10 @@ sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 
   if (this->wavetab && !--this->wavetab->refcnt)
     {
-      fts_hash_table_remove(sigtab1_ht, this->wavetab->sym);
+      fts_atom_t k;
+
+      fts_set_symbol( &k, this->wavetab->sym);
+      fts_hashtable_remove(sigtab1_ht, &k);
       wavetable_delete(this->wavetab);
     }
 }
@@ -113,8 +118,8 @@ sigtab1_config(void)
 {
   fts_class_install(fts_new_symbol("tab1~"),sigtab1_instantiate);
 
-  sigtab1_ht = fts_hash_table_new();
-  fts_hash_table_init(sigtab1_ht);
+  sigtab1_ht = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
+  fts_hashtable_init(sigtab1_ht, 0, FTS_HASHTABLE_MEDIUM);
 }
 
 
@@ -167,13 +172,15 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_atom_t argv[5];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   double f;
-  fts_atom_t data;
+  fts_atom_t data, k;
 
   osc_ftl_data_init(this->ftl_data, fts_dsp_get_output_srate(dsp, 0));
 
   if(this->sym)
     {
-      if (fts_hash_table_lookup(sigtab1_ht, this->sym, &data))
+      fts_set_symbol( &k, this->sym);
+
+      if (fts_hashtable_get(sigtab1_ht, &k, &data))
 	{
 	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
 	  osc_ftl_data_set_table(this->ftl_data, wavetab->table);
@@ -217,13 +224,15 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 {
   osc_t *this = (osc_t *)o;
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_atom_t data;
+  fts_atom_t data, k;
 
   this->sym = s;
   
   if (s)
     {
-      if (fts_hash_table_lookup(sigtab1_ht, s, &data))
+      fts_set_symbol( &k, s);
+
+      if (fts_hashtable_get(sigtab1_ht, &k, &data))
 	{
 	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
 	  

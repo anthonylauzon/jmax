@@ -779,19 +779,21 @@ fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_clas
   if(!obj)
     {
       const fts_atom_t *happy_prop = fts_class_get_prop(class, fts_s_named_defaults);
-      fts_hash_table_t *happy_hash;
-      fts_atom_t a;
+      fts_hashtable_t *happy_hash;
+      fts_atom_t a, k;
       
       if(happy_prop)
 	{
-	  happy_hash = (fts_hash_table_t *)fts_get_ptr(happy_prop);
+	  happy_hash = (fts_hashtable_t *)fts_get_ptr(happy_prop);
 	  
-	  if(fts_hash_table_lookup(happy_hash, name, &a))
+	  fts_set_symbol( &k, name);
+	  if(fts_hashtable_get(happy_hash, &k, &a))
 	    return fts_get_object(&a);
 	}
       else
 	{      
-	  happy_hash = fts_hash_table_new();
+	  happy_hash = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
+	  fts_hashtable_init( happy_hash, 0, FTS_HASHTABLE_MEDIUM);
 	  
 	  fts_set_ptr(&a, happy_hash);
 	  fts_class_put_prop(class, fts_s_named_defaults, &a);
@@ -800,8 +802,9 @@ fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_clas
       obj = fts_object_create(class, 0, 0);
       fts_object_refer(obj);
       
+      fts_set_symbol( &k, name);
       fts_set_object(&a, obj);
-      fts_hash_table_insert(happy_hash, name, &a);
+      fts_hashtable_put(happy_hash, &k, &a);
     }
 
   return obj;

@@ -83,7 +83,7 @@
 #define REMOTE_RELEASE 3
 
 static fts_data_t *meta_data = 0;
-static fts_hash_table_t fts_data_class_table;
+static fts_hashtable_t fts_data_class_table;
 
 static void fts_data_remote_new(fts_data_t *data, int ac, const fts_atom_t *at);
 static void fts_data_remote_delete(fts_data_t *data, int ac, const fts_atom_t *at);
@@ -105,7 +105,7 @@ meta_data_init(void)
 /* Initialize the fts data module */
 void fts_data_module_init()
 {
-  fts_hash_table_init(&fts_data_class_table);
+  fts_hashtable_init(&fts_data_class_table, 0, FTS_HASHTABLE_MEDIUM);
   meta_data_init();
 }
 
@@ -118,11 +118,13 @@ void fts_data_module_init()
 fts_data_class_t *
 fts_data_class_new( fts_symbol_t data_class_name)
 {
-  fts_atom_t atom;
+  fts_atom_t atom, k;
   fts_data_class_t *class;
   int i;
 
-  if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &atom))
+  fts_set_symbol( &k, data_class_name);
+
+  if (fts_hashtable_get(&fts_data_class_table, &k, &atom))
     return (fts_data_class_t *) fts_get_ptr(&atom);
   else
     {
@@ -139,7 +141,7 @@ fts_data_class_new( fts_symbol_t data_class_name)
 	class->functions_table[i] = 0;
 
       fts_set_ptr(&atom, class);
-      fts_hash_table_insert(&fts_data_class_table, data_class_name, &atom);
+      fts_hashtable_put(&fts_data_class_table, &k, &atom);
 
       return class;
     }
@@ -216,7 +218,7 @@ void fts_data_delete(fts_data_t *data)
  */
 static void fts_data_remote_new(fts_data_t *data, int ac, const fts_atom_t *at)
 {
-  fts_atom_t atom;
+  fts_atom_t atom, k;
   fts_data_class_t *class;
   fts_data_t *new;
   int id;
@@ -228,7 +230,9 @@ static void fts_data_remote_new(fts_data_t *data, int ac, const fts_atom_t *at)
   data_class_name = fts_get_symbol(&at[1]);
   id = fts_get_int(&at[0]);
 
-  if (fts_hash_table_lookup(&fts_data_class_table, data_class_name, &atom))
+  fts_set_symbol( &k, data_class_name);
+
+  if (fts_hashtable_get(&fts_data_class_table, &k, &atom))
     class = (fts_data_class_t *) fts_get_ptr(&atom);
   else
     return;			/* error */

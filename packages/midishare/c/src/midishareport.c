@@ -41,7 +41,7 @@ static union magic{char word[4]; void *ptr;} jmax_magic = {{'j', 'm', 'a', 'x'}}
  *
  */
 
-static fts_hash_table_t midishare_reference_table;
+static fts_hashtable_t midishare_reference_table;
 
 typedef struct _midishare_reference_
 {
@@ -79,9 +79,10 @@ midishare_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static midishare_reference_t *
 midishare_reference_hash(fts_symbol_t name)
 {
-  fts_atom_t atom;
+  fts_atom_t atom, k;
 
-  if(fts_hash_table_lookup(&midishare_reference_table, name, &atom))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get( &midishare_reference_table, &k, &atom))
     return (midishare_reference_t *)fts_get_ptr(&atom);
   else
     return 0;
@@ -92,7 +93,7 @@ midishare_reference_new(fts_symbol_t name)
 {
   int number;
   midishare_reference_t *ref;
-  fts_atom_t atom;
+  fts_atom_t atom, k;
   int i;
 
   /* establish connection to MidiShare */
@@ -114,8 +115,9 @@ midishare_reference_new(fts_symbol_t name)
   ref->count = 0;
   
   /* insert reference to hashtable */
+  fts_set_symbol( &k, name);
   fts_set_ptr(&atom, ref);
-  fts_hash_table_insert(&midishare_reference_table, name, &atom);
+  fts_hashtable_put(&midishare_reference_table, &k, &atom);
 
   return ref;
 }
@@ -504,7 +506,7 @@ midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 midishareport_config(void)
 {
-  fts_hash_table_init(&midishare_reference_table);
+  fts_hashtable_init(&midishare_reference_table, 0, FTS_HASHTABLE_MEDIUM);
 
   fts_metaclass_install( fts_new_symbol("midishareport"), midishareport_instantiate, midishareport_equiv);
 }
@@ -512,13 +514,19 @@ midishareport_config(void)
 void
 midishareport_cleanup(void)
 {
-  fts_hash_table_iterator_t hi;
+  fts_iterator_t i;
 
   /* close all registered connections to MidiShare */
-  for(fts_hash_table_iterator_init(&hi, &midishare_reference_table); !fts_hash_table_iterator_end(&hi); fts_hash_table_iterator_next(&hi))
+  fts_hashtable_get_values( &midishare_reference_table, &i);
+
+  while ( fts_iterator_has_more( &iter))
     {
-      fts_atom_t *atom = fts_hash_table_iterator_current_data(&hi);
-      midishare_reference_t *ref = (midishare_reference_t *)fts_get_ptr(atom);
+      fts_atom_t v;
+      midishare_reference_t *ref;
+
+      fts_iterator_next( &i, &v);
+
+      ref = (midishare_reference_t *)fts_get_ptr( &v);
       
       /* close MidiShare application */
       MidiClose(ref->number);

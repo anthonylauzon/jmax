@@ -29,7 +29,7 @@
 
 #define MAX_DOUBLE ((double)179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.0)
 
-static fts_hash_table_t signal_play_class_table;
+static fts_hashtable_t signal_play_class_table;
 static fts_symbol_t signal_play_symbol = 0;
 
 void
@@ -275,10 +275,11 @@ signal_play_reset(signal_play_t *this)
 void
 signal_play_class_register(fts_symbol_t name, fts_instantiate_fun_t fun)
 {
-  fts_atom_t a;
+  fts_atom_t k, v;
 
-  fts_set_fun(&a, (fts_fun_t)fun);
-  fts_hash_table_insert(&signal_play_class_table, name, &a);
+  fts_set_symbol( &k, name);
+  fts_set_fun(&v, (fts_fun_t)fun);
+  fts_hashtable_put(&signal_play_class_table, &k, &v);
 }
 
 void
@@ -326,9 +327,10 @@ static fts_status_t
 signal_play_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t name = fts_get_selector(at + 1);
-  fts_atom_t a;
+  fts_atom_t a, k;
 
-  if(fts_hash_table_lookup(&signal_play_class_table, name, &a))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get( &signal_play_class_table, &k, &a))
     {
       fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_fun(&a);
       
@@ -343,7 +345,7 @@ signal_play_config(void)
 {
   signal_play_symbol = fts_new_symbol("play~");
 
-  fts_hash_table_init(&signal_play_class_table);
+  fts_hashtable_init(&signal_play_class_table, 0, FTS_HASHTABLE_MEDIUM);
 
   fts_metaclass_install(signal_play_symbol, signal_play_instantiate, fts_arg_type_equiv);
 }

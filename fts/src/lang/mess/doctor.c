@@ -65,24 +65,25 @@ typedef struct fts_object_doctor
   fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 } fts_object_doctor_t;
 
-static fts_hash_table_t fts_doctor_table;
+static fts_hashtable_t fts_doctor_table;
 
 
 void fts_doctor_init()
 {
-  fts_hash_table_init(&fts_doctor_table);
+  fts_hashtable_init(&fts_doctor_table, 0, FTS_HASHTABLE_MEDIUM);
 }
 
 
 void fts_register_object_doctor(fts_symbol_t class_name,
 				fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at))
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   fts_object_doctor_t *d;
 
-  if (fts_hash_table_lookup(&fts_doctor_table, class_name, &data))
+  fts_set_symbol( &k, class_name);
+  if (fts_hashtable_get(&fts_doctor_table, &k, &data))
     {
-      fts_hash_table_remove(&fts_doctor_table, class_name);
+      fts_hashtable_remove(&fts_doctor_table, &k);
       fts_free(fts_get_ptr(&data));
     }
 
@@ -90,25 +91,24 @@ void fts_register_object_doctor(fts_symbol_t class_name,
   d->fun = fun;
 
   fts_set_ptr(&data, d);
-  fts_hash_table_insert(&fts_doctor_table, class_name, &data);
+  fts_hashtable_put(&fts_doctor_table, &k, &data);
 
 }
 
 int fts_object_doctor_exists(fts_symbol_t class_name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  return fts_hash_table_lookup(&fts_doctor_table, class_name, &data);
+  fts_set_symbol( &k, class_name);
+  return fts_hashtable_get(&fts_doctor_table, &k, &data);
 }
 
 fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_atom_t data;
-  fts_symbol_t class_name;
+  fts_atom_t data, k;
 
-  class_name = fts_get_symbol(at);
-
-  if (fts_hash_table_lookup(&fts_doctor_table, class_name, &data))
+  fts_set_symbol( &k, fts_get_symbol(at));
+  if (fts_hashtable_get(&fts_doctor_table, &k, &data))
     {
       fts_object_doctor_t *d = (fts_object_doctor_t *) fts_get_ptr(&data);
 

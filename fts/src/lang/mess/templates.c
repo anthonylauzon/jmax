@@ -90,7 +90,7 @@ struct fts_template
 
 static void fts_template_recompute_instances(fts_template_t *template);
 
-static fts_hash_table_t template_table;
+static fts_hashtable_t template_table;
 #define INIT_TEMPLATE_SEARCH_PATH_SIZE 16
 static fts_symbol_t *template_search_path_table;
 static int template_search_path_size;
@@ -99,7 +99,7 @@ static fts_heap_t *template_heap;
 
 void fts_template_init()
 {
-  fts_hash_table_init(&template_table);
+  fts_hashtable_init(&template_table, 0, FTS_HASHTABLE_MEDIUM);
   template_heap = fts_heap_new(sizeof(fts_template_t));
 
   template_search_path_size  = INIT_TEMPLATE_SEARCH_PATH_SIZE;
@@ -111,7 +111,7 @@ static void fts_template_register_filename(fts_symbol_t name, fts_symbol_t filen
 {
   char buf[MAXPATHLEN];
   fts_template_t *template;
-  fts_atom_t d;
+  fts_atom_t d, k;
 
   /* resolve the links in the path, so that we have a unique name 
      for the file */
@@ -128,8 +128,9 @@ static void fts_template_register_filename(fts_symbol_t name, fts_symbol_t filen
   template->instances = 0;
   template->mode = mode;
 
+  fts_set_symbol( &k, name);
   fts_set_ptr(&d, template);
-  fts_hash_table_insert(&template_table, name, &d);
+  fts_hashtable_put(&template_table, &k, &d);
 
 #ifdef TEMPLATE_DEBUG 
   fprintf(stderr, "Registered template %s file %s mode %s\n",
@@ -141,7 +142,7 @@ static void fts_template_register_filename(fts_symbol_t name, fts_symbol_t filen
 void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts_symbol_t *symbol_table)
 {
   fts_template_t *template;
-  fts_atom_t d;
+  fts_atom_t d, k;
 
   /* Make the template */
      
@@ -154,8 +155,9 @@ void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts
 
   template->mode = fts_template_binary_cached;
 
+  fts_set_symbol( &k, name);
   fts_set_ptr(&d, template);
-  fts_hash_table_insert(&template_table, name, &d);
+  fts_hashtable_put(&template_table, &k, &d);
 
 #ifdef TEMPLATE_DEBUG 
   fprintf(stderr, "Registered binary template %s\n", fts_symbol_name(name)); /* @@@@ */
@@ -172,9 +174,10 @@ static void fts_template_redefine(fts_template_t *template, fts_symbol_t filenam
 
 static fts_template_t *fts_template_find(fts_symbol_t name)
 {
-  fts_atom_t a;
+  fts_atom_t a, k;
 
-  if (fts_hash_table_lookup(&template_table, name, &a))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&template_table, &k, &a))
     return (fts_template_t *) fts_get_ptr(&a);
   else
     return 0;
@@ -408,13 +411,18 @@ fts_object_t *fts_template_new_search(fts_patcher_t *patcher,
 
 static fts_template_t *fts_template_for_file(fts_symbol_t filename)
 {
-  fts_hash_table_iterator_t hit;
+  fts_iterator_t hit;
 
-  fts_hash_table_iterator_init(&hit, &template_table);
+  fts_hashtable_get_values( &template_table, &hit);
 
-  for (; (!   fts_hash_table_iterator_end(&hit)); fts_hash_table_iterator_next(&hit))
+  while ( fts_iterator_has_more( &hit))
     {
-      fts_template_t *template = (fts_template_t *) fts_get_ptr(fts_hash_table_iterator_current_data(&hit));
+      fts_atom_t v;
+      fts_template_t *template;
+
+      fts_iterator_next( &hit, &v);
+
+      template = (fts_template_t *) fts_get_ptr( &v);
 
       if (template->filename == filename)
 	return template;

@@ -114,13 +114,14 @@ struct _ftl_program_t {
   float *buffers;		
   ftl_subroutine_t *subroutines;
   ftl_subroutine_t *current_subroutine, *main;
-  fts_hash_table_t symbol_table;
+  fts_hashtable_t symbol_table;
+  int signals_count;
 
   /* Stack of subroutines calls */
   ftl_subroutine_t *subroutine_tos;
 };
 
-static fts_hash_table_t *ftl_functions_table = 0;
+static fts_hashtable_t *ftl_functions_table = 0;
 
 fts_status_description_t ftl_error_uninitialized_program =
 {
@@ -380,36 +381,44 @@ fts_status_t ftl_program_add_return( ftl_program_t *prog)
 
 int ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
 {
-  fts_atom_t a;
+  fts_atom_t k, v;
 
-  fts_set_ptr(&a, ftl_memory_declaration_new( size));
+  fts_set_symbol( &k, name);
+  fts_set_ptr(&v, ftl_memory_declaration_new( size));
 
-  return fts_hash_table_insert( &(prog->symbol_table), name, &a);
+  prog->signals_count++;
+
+  return fts_hashtable_put( &(prog->symbol_table), &k, &v);
 }
 
 
 int ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
 {
-  fts_atom_t a;
+  fts_atom_t k, v;
   ftl_function_declaration *fdecl;
 
   if ( !ftl_functions_table)
-    ftl_functions_table = fts_hash_table_new();
+    {
+      ftl_functions_table = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
+      fts_hashtable_init( ftl_functions_table, 0, FTS_HASHTABLE_MEDIUM);
+    }
   else
     {
-      fts_atom_t data;
+      fts_atom_t data, k;
   
-      if (fts_hash_table_lookup(ftl_functions_table, name,  &data))
+      fts_set_symbol( &k, name);
+      if (fts_hashtable_get(ftl_functions_table, &k,  &data))
 	{
 	  fdecl = (ftl_function_declaration *)fts_get_ptr(&data);
-	  fts_hash_table_remove(ftl_functions_table, name);
+	  fts_hashtable_remove( ftl_functions_table, &k);
 	  ftl_function_declaration_free(fdecl);
 	}
     }
 
-  fts_set_ptr(&a, ftl_function_declaration_new( wrapper));
+  fts_set_symbol( &k, name);
+  fts_set_ptr(&v, ftl_function_declaration_new( wrapper));
 
-  return fts_hash_table_insert( ftl_functions_table, name, &a);
+  return fts_hashtable_put( ftl_functions_table, &k, &v);
 }
 
 ftl_instruction_info_t *ftl_program_get_current_instruction_info( ftl_program_t *prog)
@@ -427,10 +436,11 @@ void ftl_program_init( ftl_program_t *prog)
   prog->buffers = 0;
   prog->subroutines = 0;
   prog->current_subroutine = 0;
+  prog->signals_count = 0;
   prog->main = 0;
   prog->subroutine_tos = 0;
 
-  fts_hash_table_init( &(prog->symbol_table) );
+  fts_hashtable_init( &(prog->symbol_table), 0, FTS_HASHTABLE_MEDIUM );
 }
 
 ftl_program_t *ftl_program_new( void )
@@ -443,14 +453,10 @@ ftl_program_t *ftl_program_new( void )
   return tmp;
 }
 
-static void free_hash_element(fts_symbol_t ignore, fts_atom_t *data, void *user_data)
-{
-  fts_free(fts_get_ptr(data));
-}
-
 void ftl_program_destroy( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr, *nextsubr;
+  fts_iterator_t iter;
   
   for( subr = prog->subroutines; subr; subr = nextsubr)
     {
@@ -461,6 +467,7 @@ void ftl_program_destroy( ftl_program_t *prog)
   prog->subroutines = 0;
   prog->main = 0;
   prog->current_subroutine = 0;
+  prog->signals_count = 0;
 
   if (prog->buffers)
     {
@@ -468,8 +475,16 @@ void ftl_program_destroy( ftl_program_t *prog)
       prog->buffers = 0;
     }
 
-  fts_hash_table_apply(&(prog->symbol_table), free_hash_element, 0);
-  fts_hash_table_destroy( &(prog->symbol_table) );
+  fts_hashtable_get_values( &(prog->symbol_table), &iter);
+  while ( fts_iterator_has_more( &iter))
+    {
+      fts_atom_t a;
+
+      fts_iterator_next( &iter, &a);
+      fts_free( fts_get_ptr( &a));
+    }
+
+  fts_hashtable_destroy( &(prog->symbol_table) );
 }
 
 
@@ -603,24 +618,27 @@ static void ftl_program_update_instruction_infos( ftl_program_t *prog)
 
 	  for ( n = 0; n < info->ninputs; n++)
 	    {
-	      fts_atom_t data;
+	      fts_atom_t data, k;
 	      ftl_memory_declaration *mdecl;
 	      fts_symbol_t s;
 	
 	      s = info->input_infos[n].name;
-	      fts_hash_table_lookup( &(prog->symbol_table), s, &data);
+	      fts_set_symbol( &k, s);
+	      fts_hashtable_get( &(prog->symbol_table), &k, &data);
 	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
 	      info->input_infos[n].buffer = mdecl->address;
 	    }
 
 	  for ( n = 0; n < info->noutputs; n++)
 	    {
-	      fts_atom_t data;
+	      fts_atom_t data, k;
 	      ftl_memory_declaration *mdecl;
 	      fts_symbol_t s;
 	
 	      s = info->output_infos[n].name;
-	      fts_hash_table_lookup( &(prog->symbol_table), s, &data);
+
+	      fts_set_symbol( &k, s);
+	      fts_hashtable_get( &(prog->symbol_table), &k, &data);
 	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
 	      info->output_infos[n].buffer = mdecl->address;
 	    }
@@ -632,20 +650,20 @@ static void ftl_program_update_instruction_infos( ftl_program_t *prog)
 
 static int ftl_program_allocate_signals( ftl_program_t *prog)
 {
-  fts_hash_table_iterator_t iter;
+  fts_iterator_t iter;
   unsigned long total_size;
   float *p;
 
   total_size = 0;
 
-  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
-      ! fts_hash_table_iterator_end( &iter);
-      fts_hash_table_iterator_next( &iter) )
+  fts_hashtable_get_values( &(prog->symbol_table), &iter);
+  while ( fts_iterator_has_more( &iter))
     {
+      fts_atom_t a;
       ftl_memory_declaration *m;
 
-      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
-
+      fts_iterator_next( &iter, &a);
+      m = (ftl_memory_declaration *)fts_get_ptr( &a);
       total_size = total_size + m->size;
     }
 
@@ -664,16 +682,16 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
 
   fts_vecx_fzero(p, total_size);
 
-  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
-      ! fts_hash_table_iterator_end( &iter);
-      fts_hash_table_iterator_next( &iter) )
+  fts_hashtable_get_values( &(prog->symbol_table), &iter);
+
+  while ( fts_iterator_has_more( &iter))
     {
+      fts_atom_t a;
       ftl_memory_declaration *m;
 
-      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
-
+      fts_iterator_next( &iter, &a);
+      m = (ftl_memory_declaration *)fts_get_ptr( &a);
       m->address = p;
-
       p = p + m->size;
     }
 
@@ -704,10 +722,11 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
     break;
   case ST_CALL_FUN:
     {
-      fts_atom_t data;
+      fts_atom_t data, k;
       ftl_function_declaration *fdecl;
 
-      fts_hash_table_lookup( ftl_functions_table, fts_get_symbol(a), &data);
+      fts_set_symbol( &k, fts_get_symbol(a));
+      fts_hashtable_get( ftl_functions_table, &k, &data);
       fdecl =  (ftl_function_declaration *) fts_get_ptr(&data);
       fts_word_set_fun( bytecode, (void (*)(void)) fdecl->wrapper);
       bytecode++;
@@ -720,10 +739,11 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
   case ST_CALL_ARGV:
     if ( fts_is_symbol(a))
       {
-	fts_atom_t data;
+	fts_atom_t data, k;
 	ftl_memory_declaration *mdecl;
 	
-	fts_hash_table_lookup( &(info->prog->symbol_table), fts_get_symbol(a), &data);
+	fts_set_symbol( &k, fts_get_symbol(a));
+	fts_hashtable_get( &(info->prog->symbol_table), &k, &data);
 	mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
 	fts_word_set_ptr( bytecode, mdecl->address);
 	bytecode++;
@@ -801,24 +821,6 @@ int ftl_program_compile( ftl_program_t *prog)
 /* Print and post functions                                               */
 /* ********************************************************************** */
 
-#ifdef DEBUG
-static void ftl_post_functions_table( void)
-{
-  fts_hash_table_iterator_t it;
-  ftl_function_declaration *decl;
-  fts_symbol_t s;
-
-  for( fts_hash_table_iterator_init( &it, ftl_functions_table);
-      ! fts_hash_table_iterator_end( &it);
-      fts_hash_table_iterator_next( &it) )
-    {
-      decl = (ftl_function_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data(&it));
-      s = fts_hash_table_iterator_current_symbol( &it);
-      post( "/* Function %s (0x%x) */\n", fts_symbol_name(s), decl->wrapper);
-    }
-}
-#endif
-
 static void ftl_print_atom( char *s, const fts_atom_t *a)
 {
   if (fts_is_long(a))
@@ -835,20 +837,24 @@ static void ftl_print_atom( char *s, const fts_atom_t *a)
 
 void ftl_program_post_signals( const ftl_program_t *prog)
 {
-  fts_hash_table_iterator_t iter;
+  fts_iterator_t keys, values;
 
-  post( "/* %d signals declarations */\n", 
-       fts_hash_table_get_count(&(prog->symbol_table)));
+  post( "/* %d signals declarations */\n", prog->signals_count);
 
-  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
-      ! fts_hash_table_iterator_end( &iter);
-      fts_hash_table_iterator_next( &iter) )
+  fts_hashtable_get_keys( &(prog->symbol_table), &keys);
+  fts_hashtable_get_values( &(prog->symbol_table), &values);
+
+  while ( fts_iterator_has_more( &keys))
     {
+      fts_atom_t k, v;
       ftl_memory_declaration *m;
       fts_symbol_t s;
 
-      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
-      s = fts_hash_table_iterator_current_symbol( &iter);
+      fts_iterator_next( &keys, &k);
+      fts_iterator_next( &values, &v);
+
+      m = (ftl_memory_declaration *)fts_get_ptr( &v);
+      s = fts_get_symbol( &k);
       post( "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
     }
   post( "\n");
@@ -856,20 +862,24 @@ void ftl_program_post_signals( const ftl_program_t *prog)
 
 void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
 {
-  fts_hash_table_iterator_t iter;
+  fts_iterator_t keys, values;
 
-  fprintf( f,  "/* %d signals declarations */\n", 
-       fts_hash_table_get_count(&(prog->symbol_table)));
+  fprintf( f, "/* %d signals declarations */\n", prog->signals_count);
 
-  for( fts_hash_table_iterator_init( &iter, &(prog->symbol_table));
-      ! fts_hash_table_iterator_end( &iter);
-      fts_hash_table_iterator_next( &iter) )
+  fts_hashtable_get_keys( &(prog->symbol_table), &keys);
+  fts_hashtable_get_values( &(prog->symbol_table), &values);
+
+  while ( fts_iterator_has_more( &keys))
     {
+      fts_atom_t k, v;
       ftl_memory_declaration *m;
       fts_symbol_t s;
 
-      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
-      s = fts_hash_table_iterator_current_symbol( &iter);
+      fts_iterator_next( &keys, &k);
+      fts_iterator_next( &values, &v);
+
+      m = (ftl_memory_declaration *)fts_get_ptr( &k);
+      s = fts_get_symbol( &k);
       fprintf(f, "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s),
 	      m->size, (unsigned int) m->address);
     }
@@ -878,15 +888,13 @@ void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
 
 void ftl_program_post_signals_count( const ftl_program_t *prog)
 {
-  post( "ftl_program : signals %d\n", 
-       fts_hash_table_get_count(&(prog->symbol_table)));
+  post( "ftl_program : signals %d\n", prog->signals_count);
 }
 
 
 void ftl_program_fprint_signals_count( FILE *f, const ftl_program_t *prog)
 {
-  fprintf( f,  "ftl_program : signals %d\n", 
-	   fts_hash_table_get_count(&(prog->symbol_table)));
+  fprintf( f,  "ftl_program : signals %d\n", prog->signals_count);
 }
 
 struct post_info {

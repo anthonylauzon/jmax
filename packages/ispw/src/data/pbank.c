@@ -26,7 +26,7 @@
 
 #include <fts/fts.h>
 
-static fts_hash_table_t pbank_data_table;
+static fts_hashtable_t pbank_data_table;
 
 #define DEFAULT_N_COLS 8
 #define DEFAULT_N_ROWS 64
@@ -205,7 +205,7 @@ pbank_data_export_ascii(pbank_data_t *data, fts_symbol_t file_name)
 static pbank_data_t *
 pbank_data_get(fts_symbol_t name, int n, int m)
 {
-  fts_atom_t atom;
+  fts_atom_t atom, k;
 
   if(n < 1)
     n = DEFAULT_N_COLS;
@@ -213,7 +213,8 @@ pbank_data_get(fts_symbol_t name, int n, int m)
   if(m < 1)
     m = DEFAULT_N_ROWS;
 
-  if (name && fts_hash_table_lookup(&pbank_data_table, name, &atom))
+  fts_set_symbol( &k, name);
+  if (name && fts_hashtable_get(&pbank_data_table, &k, &atom))
     {
       /* data found by name , check its dimension and reference it */
       pbank_data_t *data = (pbank_data_t *) fts_get_ptr(&atom);
@@ -268,8 +269,9 @@ pbank_data_get(fts_symbol_t name, int n, int m)
 	  data->name = name;
 
 	  /* record in name table */
+	  fts_set_symbol( &k, name);
 	  fts_set_ptr(&atom, data);
-	  fts_hash_table_insert(&pbank_data_table, name, &atom);
+	  fts_hashtable_put(&pbank_data_table, &k, &atom);
 
 	  /* read in data from file (at least try it) */
 	  pbank_data_read_file(data, name);
@@ -290,10 +292,12 @@ pbank_data_release(pbank_data_t *data)
   if(!data->refcount)
     {
       int i;
-      
+      fts_atom_t k;
+
       /* no more referenced, take it away from the table if named and free the memory */
+      fts_set_symbol( &k, data->name);
       if(data->name)
-	fts_hash_table_remove(&pbank_data_table, data->name);
+	fts_hashtable_remove(&pbank_data_table, &k);
 
       for(i=0; i<data->m; i++) 
 	fts_free((void *)data->matrix[i]);
@@ -789,7 +793,7 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 pbank_config(void)
 {
-  fts_hash_table_init(&pbank_data_table);
+  fts_hashtable_init(&pbank_data_table, 0, FTS_HASHTABLE_MEDIUM);
 
   fts_metaclass_install(fts_new_symbol("pbank"), pbank_instantiate, fts_narg_equiv);
 }

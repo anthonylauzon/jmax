@@ -34,7 +34,7 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/utils.h>
 
-static fts_hash_table_t fts_atom_type_table;
+static fts_hashtable_t fts_atom_type_table;
 
 /* An empty atom */
 const fts_atom_t fts_null = FTS_NULL;
@@ -264,10 +264,11 @@ fts_atom_type_function(int ac, const fts_atom_t *at, fts_atom_t *result)
 void
 fts_atom_type_register(fts_symbol_t name, fts_class_t *cl)
 {
-  fts_atom_t a;
+  fts_atom_t k, v;
 
-  fts_set_ptr(&a, cl);
-  fts_hash_table_insert(&fts_atom_type_table, name, &a);
+  fts_set_symbol( &k, name);
+  fts_set_ptr(&v, cl);
+  fts_hashtable_put(&fts_atom_type_table, &k, &v);
 
   fts_expression_declare_fun(name, fts_atom_type_function);
 }
@@ -275,9 +276,10 @@ fts_atom_type_register(fts_symbol_t name, fts_class_t *cl)
 int
 fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl)
 {
-  fts_atom_t a;
+  fts_atom_t a, k;
 
-  if(fts_hash_table_lookup(&fts_atom_type_table, name, &a))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get(&fts_atom_type_table, &k, &a))
     {
       *cl = (fts_class_t *)fts_get_ptr(&a);
       
@@ -290,5 +292,5 @@ fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl)
 void
 fts_atoms_init(void)
 {
-  fts_hash_table_init(&fts_atom_type_table);
+  fts_hashtable_init(&fts_atom_type_table, 0, FTS_HASHTABLE_MEDIUM);
 }

@@ -41,15 +41,17 @@ struct value_keeper
 };
 
 static fts_symbol_t sym_v = 0;
-static fts_hash_table_t value_table;
+static fts_hashtable_t value_table;
 
 static struct value_keeper *
 get_keeper(fts_symbol_t s)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   struct value_keeper *v;
 
-  if (fts_hash_table_lookup(&value_table, s, &data))
+  fts_set_symbol( &k, s);
+
+  if (fts_hashtable_get(&value_table, &k, &data))
     v = (struct value_keeper *)fts_get_ptr(&data);
   else
     {
@@ -57,8 +59,9 @@ get_keeper(fts_symbol_t s)
       v->sym = s;
       v->count = 0;
       fts_set_long(&(v->atom), 0);
+
       fts_set_ptr(&data, v);
-      fts_hash_table_insert(&value_table, s, &data);
+      fts_hashtable_put(&value_table, &k, &data);
     }
 
   v->count++;
@@ -72,7 +75,10 @@ free_keeper(struct value_keeper *v)
   
   if (v->count == 0)
     {
-      fts_hash_table_remove(&value_table, v->sym);
+      fts_atom_t k;
+
+      fts_set_symbol( &k, v->sym);
+      fts_hashtable_remove( &value_table, &k);
       fts_free(v);
     }
 }
@@ -163,9 +169,9 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 ispw_value_config(void)
 {
-  sym_v = fts_new_symbol("v");
+  fts_hashtable_init(&value_table, 0, FTS_HASHTABLE_MEDIUM);
 
-  fts_hash_table_init(&value_table);
+  sym_v = fts_new_symbol("v");
 
   fts_class_install(sym_v, value_instantiate);
 }

@@ -36,7 +36,7 @@
 typedef float (*fts_float_function_t)(float);
 
 FTS_API int fts_ffun_exists(fts_symbol_t name);
-FTS_API int fts_ffun_new(fts_symbol_t name, float (*function)(float));
+FTS_API void fts_ffun_new(fts_symbol_t name, float (*function)(float));
 FTS_API void fts_ffun_delete(fts_symbol_t name);
 FTS_API float fts_ffun_eval(fts_symbol_t name, float f);
 FTS_API void fts_ffun_fill(fts_symbol_t name, float *out, int size, float min, float max);

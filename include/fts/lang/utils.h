@@ -32,7 +32,8 @@ FTS_API fts_module_t fts_utils_module;
 #include <fts/lang/utils/floatfuns.h>
 #include <fts/lang/utils/idefix.h>
 #include <fts/lang/utils/cubic.h>
-#include <fts/lang/utils/hashtab.h>
+#include <fts/lang/utils/iterator.h>
+#include <fts/lang/utils/hashtable.h>
 #include <fts/lang/utils/objectlist.h>
 #include <fts/lang/utils/ieeewrap.h>
 #include <fts/lang/utils/intphase.h>

@@ -1,3 +1,13 @@
+2001-07-20  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed fts_hashtable_t. Now, hashtable do rehashing, accepts any
+	key type, use a good hash function for strings and can replace 1)
+	the symbol table, 2) the object table. There is even a documentation
+	of the API
+
+	* added fts_iterator_t, a generic iterator structure. It is implemented
+	only for hashtables.
+
 2001-07-13  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* added method for "incr" to intbox and floatbox

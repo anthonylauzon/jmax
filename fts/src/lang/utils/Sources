@@ -27,7 +27,7 @@ SOURCES = \
   utils.c \
   floatfuns.c \
   cubic.c \
-  hashtab.c \
+  hashtable.c \
   objectlist.c \
   ramps.c \
   ramp_vectors.c \

@@ -27,25 +27,26 @@
 #include <fts/fts.h>
 #include "sampbuf.h"
  
-static fts_hash_table_t the_sampbuf_hashtable;
+static fts_hashtable_t the_sampbuf_hashtable;
 
 /* names and hash tables */
 
 void
 sampbuf_table_init(void)
 {
-  fts_hash_table_init(&the_sampbuf_hashtable);
+  fts_hashtable_init(&the_sampbuf_hashtable, 0, FTS_HASHTABLE_MEDIUM);
 }
 
 sampbuf_t *
 sampbuf_get(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   
   if (! name)
     return(0);
   
-  if(fts_hash_table_lookup(&the_sampbuf_hashtable, name, &data))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get( &the_sampbuf_hashtable, &k, &data))
     return (sampbuf_t *) fts_get_ptr(&data);
   else
     return 0;
@@ -54,23 +55,29 @@ sampbuf_get(fts_symbol_t name)
 int
 sampbuf_name_already_registered(fts_symbol_t name)
 {
-  fts_atom_t data;
-  return(fts_hash_table_lookup(&the_sampbuf_hashtable, name, &data));
+  fts_atom_t data, k;
+
+  fts_set_symbol( &k, name);
+  return(fts_hashtable_get( &the_sampbuf_hashtable, &k, &data));
 }
 
 void
 sampbuf_add(fts_symbol_t name, sampbuf_t *buf)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
+  fts_set_symbol( &k, name);
   fts_set_ptr(&data, buf);
-  fts_hash_table_insert(&the_sampbuf_hashtable, name, &data);
+  fts_hashtable_put(&the_sampbuf_hashtable, &k, &data);
 }
 
 void
 sampbuf_remove(fts_symbol_t name)
 {
-  fts_hash_table_remove(&the_sampbuf_hashtable, name);
+  fts_atom_t k;
+
+  fts_set_symbol( &k, name);
+  fts_hashtable_remove( &the_sampbuf_hashtable, &k);
 }
 
 /* data */

@@ -33,7 +33,7 @@
  *
  */
 
-static fts_hash_table_t catch_table;
+static fts_hashtable_t catch_table;
 
 static fts_symbol_t sigcatch_function = 0;
 static fts_symbol_t sigcatch_64_function = 0;
@@ -51,9 +51,11 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 {
   sigcatch_t *this = (sigcatch_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_atom_t a;
+  fts_atom_t a, k;
 
-  if(name && fts_symbol_name(name) != "" && fts_hash_table_lookup(&catch_table, name, &a))
+  fts_set_symbol( &k, name);
+
+  if ( name && fts_symbol_name(name) != "" && fts_hashtable_get(&catch_table, &k, &a))
     {
       post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(name));
       this->name = 0;
@@ -61,7 +63,7 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   else
     {
       fts_set_ptr(&a, this);
-      fts_hash_table_insert(&catch_table, name, &a);
+      fts_hashtable_put(&catch_table, &k, &a);
 
       this->name = name;
       dsp_list_insert(o);
@@ -75,14 +77,16 @@ static void
 sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigcatch_t *this = (sigcatch_t *)o;
-  fts_atom_t a;
+  fts_atom_t a, k;
 
   if(this->buf)
     fts_free(this->buf);
 
-  if(this->name && fts_hash_table_lookup(&catch_table, this->name, &a))
+  fts_set_symbol( &k, this->name);
+
+  if ( this->name && fts_hashtable_get(&catch_table, &k, &a))
     {
-      fts_hash_table_remove(&catch_table, this->name); 
+      fts_hashtable_remove(&catch_table, &k); 
       dsp_list_remove(o);
     }
 }
@@ -280,12 +284,13 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   float **bufp = ftl_data_get_ptr(this->bufp);
-  fts_atom_t a;
+  fts_atom_t a, k;
 
   this->n_tick = n_tick;
 
   /* look here for the corresponing catch buffer, to eliminate instantiation order dependency between catch~ and throw~. */
-  if (fts_hash_table_lookup(&catch_table, this->name, &a))
+  fts_set_symbol( &k, this->name);
+  if (fts_hashtable_get( &catch_table, &k, &a))
     {
       sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
 
@@ -330,11 +335,12 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   sigthrow_t *this = (sigthrow_t *)o;
   float **bufp = ftl_data_get_ptr(this->bufp);
-  fts_atom_t a;
+  fts_atom_t a, k;
 
   this->name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  if(this->name && fts_hash_table_lookup(&catch_table, this->name, &a))
+  fts_set_symbol( &k, this->name);
+  if(this->name && fts_hashtable_get(&catch_table, &k, &a))
     {
       sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
 
@@ -464,7 +470,7 @@ sigcatch_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 void
 sigthrow_config(void)
 {
-  fts_hash_table_init(&catch_table);
+  fts_hashtable_init(&catch_table, 0, FTS_HASHTABLE_MEDIUM);
   fts_class_install(fts_new_symbol("cxtch~"), sigcatch_instantiate);
   fts_register_object_doctor(fts_new_symbol("catch~"), sigcatch_doctor);
 

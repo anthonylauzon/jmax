@@ -61,14 +61,15 @@ static fts_heap_t *explode_skip_heap;
    Question: should the explode share data like table ?
 */
 
-static fts_hash_table_t explode_table;
+static fts_hashtable_t explode_table;
 
 explode_t *
 explode_get_by_name(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if (fts_hash_table_lookup(&explode_table, name, &data))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&explode_table, &k, &data))
     return (explode_t *) fts_get_ptr(&data);
   else
     return 0;
@@ -78,14 +79,16 @@ explode_get_by_name(fts_symbol_t name)
 static int
 register_explode(explode_t *this, fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if (fts_hash_table_lookup(&explode_table, name, &data))
+  fts_set_symbol( &k, name);
+
+  if (fts_hashtable_get(&explode_table, &k, &data))
     return 0;
   else
     {
-      fts_set_ptr(&data, this);
-      fts_hash_table_insert(&explode_table, name, &data);
+      fts_set_ptr( &data, this);
+      fts_hashtable_put( &explode_table, &k, &data);
       return 1;
     }
 }
@@ -96,14 +99,17 @@ forget_explode(explode_t *this, fts_symbol_t name)
 {
   if (name)
     {
-      fts_hash_table_remove(&explode_table, name);
+      fts_atom_t k;
+
+      fts_set_symbol( &k, name);
+      fts_hashtable_remove( &explode_table, &k);
     }
 }
 
 static void
 init_explode_register(void)
 {
-  fts_hash_table_init(&explode_table);
+  fts_hashtable_init(&explode_table, 0, FTS_HASHTABLE_MEDIUM);
 
 
 }

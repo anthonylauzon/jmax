@@ -48,7 +48,7 @@
  *
  */
  
-static fts_hash_table_t delay_table;
+static fts_hashtable_t delay_table;
 
 typedef struct{
   del_buf_t *delbuf; /* the delayline buffer */
@@ -62,9 +62,11 @@ typedef struct{
 static delay_entry_t *
 delay_table_get_entry(fts_symbol_t delay_name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   
-  if (fts_hash_table_lookup(&delay_table, delay_name, &data))
+  fts_set_symbol( &k, delay_name);
+
+  if (fts_hashtable_get(&delay_table, &k, &data))
     return (delay_entry_t *) fts_get_ptr(&data);
   else
     {
@@ -82,7 +84,7 @@ delay_table_get_entry(fts_symbol_t delay_name)
       p->first_delreader = 0;
 
       fts_set_ptr(&data, p);
-      fts_hash_table_insert(&delay_table, delay_name, &data);
+      fts_hashtable_put(&delay_table, &k, &data);
       
       return p;
     }
@@ -91,7 +93,7 @@ delay_table_get_entry(fts_symbol_t delay_name)
 void 
 delay_table_init(void)
 {
-  fts_hash_table_init(&delay_table);
+  fts_hashtable_init(&delay_table, 0, FTS_HASHTABLE_MEDIUM);
 }
 
 del_buf_t *

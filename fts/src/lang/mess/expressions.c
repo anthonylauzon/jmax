@@ -152,7 +152,7 @@ static int op_binary[FTS_OP_FIRST_UNUSED];
 
 /* Function hash table */
 
-static fts_hash_table_t fts_expression_fun_table;
+static fts_hashtable_t fts_expression_fun_table;
 
 /* Structure used to store  assignements in expression states */
 
@@ -333,9 +333,10 @@ static int more_in(fts_expression_state_t *e)
 
 static fts_expression_fun_t get_expression_fun(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if (fts_hash_table_lookup(&fts_expression_fun_table, name, &data))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&fts_expression_fun_table, &k, &data))
     return (fts_expression_fun_t) fts_get_fun(&data);
   else
     return (fts_expression_fun_t) 0;
@@ -343,10 +344,11 @@ static fts_expression_fun_t get_expression_fun(fts_symbol_t name)
 
 void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f)
 {
-  fts_atom_t a;
+  fts_atom_t k, v;
 
-  fts_set_fun(&a, (void (*)(void))f);
-  fts_hash_table_insert(&fts_expression_fun_table, name, &a);
+  fts_set_symbol( &k, name);
+  fts_set_fun(&v, (void (*)(void))f);
+  fts_hashtable_put(&fts_expression_fun_table, &k, &v);
 }
 
 
@@ -1592,7 +1594,7 @@ fts_expressions_init(void)
   expr_var_ref_heap = fts_heap_new(sizeof(fts_expr_var_ref_t));
   expr_state_heap = fts_heap_new(sizeof(fts_expression_state_t));
 
-  fts_hash_table_init(&fts_expression_fun_table);
+  fts_hashtable_init(&fts_expression_fun_table, 0, FTS_HASHTABLE_MEDIUM);
 
   /* function installation */
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);

@@ -33,14 +33,15 @@
  * to tables and table~s
  */
 
-static fts_hash_table_t ispw_name_table; /* the name binding table */
+static fts_hashtable_t ispw_name_table; /* the name binding table */
 
 fts_object_t *
 ispw_get_object_by_name(fts_symbol_t name)
 {
-  fts_atom_t d;
+  fts_atom_t d, k;
 
-  if (fts_hash_table_lookup(&ispw_name_table, name, &d))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&ispw_name_table, &k, &d))
     return  (fts_object_t *) fts_get_object(&d);
   else
     return 0;
@@ -49,16 +50,20 @@ ispw_get_object_by_name(fts_symbol_t name)
 void 
 ispw_register_named_object(fts_object_t *obj, fts_symbol_t name)
 {
-  fts_atom_t a;
+  fts_atom_t a, k;
 
+  fts_set_symbol( &k, name);
   fts_set_object(&a, obj);
-  fts_hash_table_insert(&ispw_name_table, name, &a);
+  fts_hashtable_put(&ispw_name_table, &k, &a);
 }
 
 void 
 ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name)
 {
-  fts_hash_table_remove(&ispw_name_table, name);
+  fts_atom_t k;
+
+  fts_set_symbol( &k, name);
+  fts_hashtable_remove( &ispw_name_table, &k);
 }
 
 fts_object_t *
@@ -75,5 +80,5 @@ ispw_get_target(fts_patcher_t *scope, fts_symbol_t name)
 void 
 ispw_naming_init(void)
 {
-  fts_hash_table_init(&ispw_name_table);
+  fts_hashtable_init(&ispw_name_table, 0, FTS_HASHTABLE_MEDIUM);
 }

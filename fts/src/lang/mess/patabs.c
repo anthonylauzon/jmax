@@ -61,7 +61,7 @@ typedef struct fts_abstraction
   fts_symbol_t filename;
 } fts_abstraction_t;
  
-static fts_hash_table_t abstraction_table;
+static fts_hashtable_t abstraction_table;
 #define INIT_SEARCH_PATH_SIZE 16
 static fts_symbol_t *search_path_table;
 static int search_path_size;
@@ -70,7 +70,7 @@ static int search_path_fill;
 
 void fts_abstraction_init()
 {
-  fts_hash_table_init(&abstraction_table);
+  fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM);
 
   search_path_size  = INIT_SEARCH_PATH_SIZE;
   search_path_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *));
@@ -81,20 +81,21 @@ void fts_abstraction_init()
 static void fts_abstraction_add_declaration(fts_symbol_t name, fts_symbol_t filename)
 {
   fts_abstraction_t *abs;
-  fts_atom_t a;
+  fts_atom_t k, v;
 
   /* If the declaration existed already, remove it first */
 
-  if (fts_hash_table_lookup(&abstraction_table, name, &a))
-    fts_hash_table_remove(&abstraction_table, name);
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&abstraction_table, &k, &v))
+    fts_hashtable_remove(&abstraction_table, &k);
 
   abs = (fts_abstraction_t *) fts_malloc(sizeof(fts_abstraction_t));
 
   abs->name = name;
   abs->filename = filename;
 
-  fts_set_ptr(&a, abs);
-  fts_hash_table_insert(&abstraction_table, name, &a);
+  fts_set_ptr(&v, abs);
+  fts_hashtable_put(&abstraction_table, &k, &v);
 }
 
 
@@ -134,11 +135,12 @@ void fts_abstraction_declare_path(fts_symbol_t path)
 static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 {
   FILE *file;
-  fts_atom_t a;
+  fts_atom_t a, k;
 
   /* First, look in the abstraction declaration table */
 
-  if (fts_hash_table_lookup(&abstraction_table, name, &a))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&abstraction_table, &k, &a))
     {
       fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_ptr(&a);
 

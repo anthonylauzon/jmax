@@ -29,7 +29,7 @@
 #include <math.h>
 #include <assert.h>
 
-static fts_hash_table_t the_fts_ffun_hashtable;
+static fts_hashtable_t the_fts_ffun_hashtable;
 
 /* float function tables */
 typedef struct _fts_fftab
@@ -57,9 +57,10 @@ typedef struct _fts_ffun
 /* local */
 static fts_ffun_t *ffun_get_by_name( fts_symbol_t name)
 {
-  fts_atom_t a;
+  fts_atom_t a, n;
 
-  if ( fts_hash_table_lookup( &the_fts_ffun_hashtable, name, &a))
+  fts_set_symbol( &n, name);
+  if ( fts_hashtable_get( &the_fts_ffun_hashtable, &n, &a))
     return fts_get_ptr( &a);
   else
     return 0;
@@ -98,26 +99,27 @@ static void ffun_remove_tab( fts_ffun_t *ffun, fts_fftab_t *fftab)
 int fts_ffun_exists( fts_symbol_t name)
 {
   fts_atom_t a;
+  fts_atom_t n;
 
-  return (fts_hash_table_lookup( &the_fts_ffun_hashtable, name, &a));
+  fts_set_symbol( &n, name);
+  return (fts_hashtable_get( &the_fts_ffun_hashtable, &n, &a));
 }
 
-int fts_ffun_new( fts_symbol_t name, float (*function)(float))
+void fts_ffun_new( fts_symbol_t name, float (*function)(float))
 {
-  fts_atom_t a;
+  fts_atom_t a, n;
   fts_ffun_t *ffun = ffun_get_by_name( name);
   
   if ( ffun)
-    return (ffun->function == function);
-  else
-    {
-      ffun = fts_malloc( sizeof( fts_ffun_t));
-      ffun->function = function;
-      ffun->tables = 0;
+    return;
+
+  ffun = fts_malloc( sizeof( fts_ffun_t));
+  ffun->function = function;
+  ffun->tables = 0;
       
-      fts_set_ptr( &a, ffun);
-      return fts_hash_table_insert( &the_fts_ffun_hashtable, name, &a);
-    }
+  fts_set_symbol( &n, name);
+  fts_set_ptr( &a, ffun);
+  fts_hashtable_put( &the_fts_ffun_hashtable, &n, &a);
 }
 
 float fts_ffun_eval( fts_symbol_t name, float f)
@@ -189,7 +191,7 @@ static float cosf( float f)
 void
 fts_ffuns_init( void)
 {
-  fts_hash_table_init( &the_fts_ffun_hashtable);
+  fts_hashtable_init( &the_fts_ffun_hashtable, 0, FTS_HASHTABLE_SMALL);
 
 #ifdef SGI
   fts_ffun_new( fts_new_symbol( "sin"), sinf);

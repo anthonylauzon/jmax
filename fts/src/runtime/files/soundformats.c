@@ -62,17 +62,18 @@ static fts_soundfile_format_t format_signed32 = {"raw 32 bit twos complement int
  */
 
 
-static fts_hash_table_t the_fts_soundfile_standard_formats_hashtable;
+static fts_hashtable_t the_fts_soundfile_standard_formats_hashtable;
 
 static fts_soundfile_format_t *
 fts_soundfile_format_get_by_name(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   
   if (! name)
     return(0);
   
-  if(fts_hash_table_lookup(&the_fts_soundfile_standard_formats_hashtable, name, &data))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get(&the_fts_soundfile_standard_formats_hashtable, &k, &data))
     return (fts_soundfile_format_t *) fts_get_ptr(&data);
   else
     return 0;
@@ -81,23 +82,29 @@ fts_soundfile_format_get_by_name(fts_symbol_t name)
 int
 fts_soundfile_format_exists(fts_symbol_t name)
 {
-  fts_atom_t data;
-  return(fts_hash_table_lookup(&the_fts_soundfile_standard_formats_hashtable, name, &data));
+  fts_atom_t data, k;
+
+  fts_set_symbol( &k, name);
+  return(fts_hashtable_get(&the_fts_soundfile_standard_formats_hashtable, &k, &data));
 }
 
 void
 fts_soundfile_format_add(fts_symbol_t name, fts_soundfile_format_t *format)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
+  fts_set_symbol( &k, name);
   fts_set_ptr(&data, format);
-  fts_hash_table_insert(&the_fts_soundfile_standard_formats_hashtable, name, &data);
+  fts_hashtable_put(&the_fts_soundfile_standard_formats_hashtable, &k, &data);
 }
 
 void
 fts_soundfile_format_remove(fts_symbol_t name)
 {
-  fts_hash_table_remove(&the_fts_soundfile_standard_formats_hashtable, name);
+  fts_atom_t k;
+
+  fts_set_symbol( &k, name);
+  fts_hashtable_remove( &the_fts_soundfile_standard_formats_hashtable, &k);
 }
 
 /************************************************************************
@@ -171,7 +178,7 @@ void
 fts_soundfile_format_init(void)
 {
   fts_soundfile_format_t format;
-  fts_hash_table_init(&the_fts_soundfile_standard_formats_hashtable);
+  fts_hashtable_init(&the_fts_soundfile_standard_formats_hashtable, 0, FTS_HASHTABLE_MEDIUM);
   
   fts_s_aiffc = fts_new_symbol("aiffc");
   fts_s_aiff = fts_new_symbol("aiff");

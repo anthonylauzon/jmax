@@ -45,8 +45,8 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 
 /* Static  declarations  */
 
-static fts_hash_table_t fts_metaclass_table;
-static fts_hash_table_t fts_metaclass_alias_table;
+static fts_hashtable_t fts_metaclass_table;
+static fts_hashtable_t fts_metaclass_alias_table;
 static fts_heap_t *class_mess_heap;
 
 /* Forward declarations */
@@ -71,8 +71,8 @@ void fts_classes_init(void)
 {
   /* Initialize the heaps */
 
-  fts_hash_table_init(&fts_metaclass_table);
-  fts_hash_table_init(&fts_metaclass_alias_table);
+  fts_hashtable_init(&fts_metaclass_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&fts_metaclass_alias_table, 0, FTS_HASHTABLE_MEDIUM);
   class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
 }
 
@@ -127,7 +127,7 @@ fts_status_t fts_metaclass_install( fts_symbol_t name,
 				    fts_instantiate_fun_t instantiate_fun, 
 				    fts_equiv_fun_t equiv_fun)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
   fts_metaclass_t *mcl;
 
   mcl = fts_zalloc(sizeof(fts_metaclass_t));
@@ -136,14 +136,15 @@ fts_status_t fts_metaclass_install( fts_symbol_t name,
   mcl->equiv_fun = equiv_fun;
   mcl->name = name;
 
-  if (fts_hash_table_lookup(&fts_metaclass_table, name, &data))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&fts_metaclass_table, &k, &data))
     {
       return &fts_DuplicatedMetaclass;
     }
   else
     {
       fts_set_ptr(&data, mcl);
-      fts_hash_table_insert(&fts_metaclass_table, name, &data);
+      fts_hashtable_put(&fts_metaclass_table, &k, &data);
     }
 
   return fts_Success;
@@ -158,15 +159,16 @@ fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instant
 
 static void fts_metaclass_alias_realize( fts_symbol_t new_name, fts_symbol_t old_name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if ((fts_hash_table_lookup(&fts_metaclass_alias_table, new_name, &data)) ||
-      (fts_hash_table_lookup(&fts_metaclass_table, new_name, &data)))
+  fts_set_symbol( &k, new_name);
+  if ((fts_hashtable_get(&fts_metaclass_alias_table, &k, &data)) ||
+      (fts_hashtable_get(&fts_metaclass_table, &k, &data)))
     return;			/* error: duplicated meta class */
   else
     {
       fts_set_symbol(&data, old_name);
-      fts_hash_table_insert(&fts_metaclass_alias_table, new_name, &data);
+      fts_hashtable_put(&fts_metaclass_alias_table, &k, &data);
     }
 }
 
@@ -206,9 +208,10 @@ void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name)
 
 static fts_symbol_t fts_metaclass_get_real_name(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if (fts_hash_table_lookup(&fts_metaclass_alias_table, name, &data))
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get(&fts_metaclass_alias_table, &k, &data))
     return (fts_symbol_t )fts_get_symbol(&data);
   else
     return name;
@@ -217,9 +220,10 @@ static fts_symbol_t fts_metaclass_get_real_name(fts_symbol_t name)
 
 fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name)
 {
-  fts_atom_t data;
+  fts_atom_t data, k;
 
-  if (fts_hash_table_lookup(&fts_metaclass_table, fts_metaclass_get_real_name(name), &data))
+  fts_set_symbol( &k, fts_metaclass_get_real_name(name));
+  if (fts_hashtable_get(&fts_metaclass_table, &k, &data))
     return (fts_metaclass_t *) fts_get_ptr(&data);
   else
     return (fts_metaclass_t *) 0;
