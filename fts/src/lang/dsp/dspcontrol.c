@@ -11,6 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/datalib.h"
@@ -46,6 +47,8 @@
 
 #define DSP_CONTROL_DSP_PRINT          11
 #define DSP_CONTROL_SET_POLL_INTERVAL  12
+
+#define DSP_CONTROL_SET_CHECK_NAN      13
 
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev(void);
@@ -238,23 +241,40 @@ static void fts_dsp_control_remote_set_poll_interval( fts_data_t *d, int ac, con
     }
 }
 
-void fts_dsp_control_config(void)
+static void fts_dsp_control_set_check_nan( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  if ( (ac == 1) && fts_is_int( at))
+    {
+      ftl_program_set_check_nan( dsp_get_current_dsp_chain(), fts_get_int( at));
+    }
+}
+
+void fts_dsp_control_config( void)
 {
   fts_dsp_control_data_class = fts_data_class_new( fts_new_symbol( "dspcontrol_data"));
 
   fts_data_class_define_remote_constructor( fts_dsp_control_data_class, fts_dsp_control_new);
+
   fts_data_class_define_export_function(fts_dsp_control_data_class, fts_dsp_control_export_fun);
+
   fts_data_class_define_remote_destructor(fts_dsp_control_data_class, fts_dsp_control_delete);
+
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_START_COLLECT,
 				 fts_dsp_control_fpe_start_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_STOP_COLLECT,
 				 fts_dsp_control_fpe_stop_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_CLEAR_COLLECT,
 				 fts_dsp_control_fpe_clear_collect);
+
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_ON,
 				 fts_dsp_control_remote_dsp_on);
+
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_PRINT,
 				 fts_dsp_control_remote_dsp_print);
+
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_SET_POLL_INTERVAL,
 				 fts_dsp_control_remote_set_poll_interval);
+
+  fts_data_class_define_function( fts_dsp_control_data_class, DSP_CONTROL_SET_CHECK_NAN,
+				  fts_dsp_control_set_check_nan);
 }
