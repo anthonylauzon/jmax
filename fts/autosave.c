@@ -91,24 +91,22 @@ static void autosave_signal_handler(int sig)
 
 void fts_kernel_autosave_init( void)
 {
-/*#ifndef DEBUG */
+#ifndef DEBUG
   /* Standard quit/int signals */
 
-/*#ifndef WIN32
-signal(SIGHUP,  autosave_signal_handler);
-#endif
-signal(SIGINT,  autosave_signal_handler);
 #ifndef WIN32
-signal(SIGQUIT, autosave_signal_handler);
+  signal(SIGHUP,  autosave_signal_handler);
+  signal(SIGQUIT, autosave_signal_handler);
 #endif
-signal(SIGABRT, autosave_signal_handler);*/
+  signal(SIGINT,  autosave_signal_handler);
+  signal(SIGABRT, autosave_signal_handler);
 
   /* Corruption signals */
 
-/*#ifndef WIN32
-    signal(SIGBUS, autosave_signal_handler);
-    #endif
-    signal(SIGSEGV, autosave_signal_handler);
-    signal(SIGTERM, autosave_signal_handler);
-    #endif*/
+#ifndef WIN32
+  signal(SIGBUS, autosave_signal_handler);
+#endif
+  signal(SIGSEGV, autosave_signal_handler);
+  signal(SIGTERM, autosave_signal_handler);
+#endif
 }
