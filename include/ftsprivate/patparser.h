@@ -82,6 +82,7 @@ extern void fts_patlex_next_token(fts_patlex_t *this);
 
 extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
 extern fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t name);
+extern int fts_is_dotpat_file(fts_symbol_t name);
 extern void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at);
 
 #endif
