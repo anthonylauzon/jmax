@@ -14,6 +14,7 @@ bytestream.c \
 class.c \
 client.c \
 clipboard.c \
+config.c \
 connection.c \
 dsp.c \
 dspgraph.c \
