@@ -77,7 +77,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
   static void registerToolsPanel()
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-	public String getToolName() { return "Tools";}
+	public String getToolName() { return "Errors";}
 	public void open() { ToolsPanel.open();}
       });
   }
@@ -91,19 +91,6 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     
     return toolsPanel;
   }
-
-  /*public static ToolsPanel find(FtsGraphicObject obj)
-    {
-    if (toolsPanel == null)
-    toolsPanel = new ToolsPanel();
-    
-    toolsPanel.tabbedPane.setSelectedComponent(toolsPanel.getFinder());
-    toolsPanel.setVisible(true);
-    if(obj!=null) toolsPanel.getFinder().findFriends(obj);
-    else toolsPanel.getFinder().find();
-	
-    return toolsPanel;
-    }*/
 
   public static ToolsPanel getInstance()
   {
@@ -147,17 +134,11 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     runErrorTable.setObjectSelectedListener(objSelListener);
     runErrorTable.setSelectionListener(listSelListener);
 
-    /* Finder Panel */
-    /*finderTable = new FinderTablePanel();
-      finderTable.setObjectSelectedListener(objSelListener);
-      finderTable.setSelectionListener(listSelListener);*/
-
     currentTableModel = errorTable.getToolTableModel();
 
     tabbedPane = new JTabbedPane();
     tabbedPane.addTab("Errors", errorTable);
     tabbedPane.addTab("Runtime Errors", runErrorTable);
-    /*tabbedPane.addTab("Finder", finderTable);*/
 
     tabbedPane.setSelectedIndex(0);
     tabbedPane.addChangeListener(new ChangeListener(){
@@ -289,12 +270,6 @@ public class ToolsPanel extends JFrame implements FtsActionListener
   }
 
   /*///////////////////////////////////////////////////////////////////*/
-
-  /*public FinderTablePanel getFinder()
-    {
-    return finderTable;
-    }*/
-
   private static ToolsPanel toolsPanel = null;
   private ToolTableModel currentTableModel;
   
@@ -302,7 +277,6 @@ public class ToolsPanel extends JFrame implements FtsActionListener
   private JTabbedPane tabbedPane;
   private ErrorTablePanel errorTable;
   private RuntimeErrorsTablePanel runErrorTable;
-  /*private FinderTablePanel finderTable;*/
 
   /* JTree  */
   private JTree tree;
