@@ -51,25 +51,25 @@ fts_array_set_size(fts_array_t *array, int new_size)
   int i;
 
   if(new_size > array->alloc)
-    {
-      while (array->alloc < new_size)
-	array->alloc += array->alloc_increment;
+  {
+    while (array->alloc < new_size)
+      array->alloc += array->alloc_increment;
     
-      array->atoms = fts_realloc(array->atoms, array->alloc * sizeof(fts_atom_t));
+    array->atoms = fts_realloc(array->atoms, array->alloc * sizeof(fts_atom_t));
       
-      /* void newly allocated region */
-      for(i=array->size; i < array->alloc; i++)
-	fts_set_void(array->atoms + i);
-    }
+    /* void newly allocated region */
+    for(i=array->size; i < array->alloc; i++)
+      fts_set_void(array->atoms + i);
+  }
   else
-    {
-      if(new_size < 0)
-	new_size = 0;
+  {
+    if(new_size < 0)
+      new_size = 0;
   
-      /* void region cut off at end */
-      for(i=new_size; i<array->size; i++)
-	fts_atom_assign( array->atoms + i, fts_null);
-    }
+    /* void region cut off at end */
+    for(i=new_size; i<array->size; i++)
+      fts_atom_assign( array->atoms + i, fts_null);
+  }
 
   array->size = new_size;  
 }
@@ -78,14 +78,14 @@ void
 fts_array_clear(fts_array_t *array)
 {
   if(array->size)
-    {
-      int i;
+  {
+    int i;
 
-      for(i=0; i<array->size; i++)
-	fts_atom_assign(array->atoms + i, fts_null);
+    for(i=0; i<array->size; i++)
+      fts_atom_assign(array->atoms + i, fts_null);
       
-      array->size = 0;
-    }
+    array->size = 0;
+  }
 }
 
 void 
@@ -131,6 +131,30 @@ void
 fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
 {
   fts_array_insert(array, 0, ac, at);
+}
+
+void 
+fts_array_prepend_int(fts_array_t* array, int i)
+{
+  fts_atom_t a;
+  fts_set_int(&a, i);
+  fts_array_insert(array, 0, 1, &a);
+}
+
+void 
+fts_array_prepend_float(fts_array_t* array, float f)
+{
+  fts_atom_t a;
+  fts_set_float(&a, f);
+  fts_array_insert(array, 0, 1, &a);
+}
+
+void 
+fts_array_prepend_symbol(fts_array_t* array, fts_symbol_t s)
+{
+  fts_atom_t a;
+  fts_set_symbol(&a, s);
+  fts_array_insert(array, 0, 1, &a);
 }
 
 void 
@@ -218,11 +242,11 @@ array_iterator_has_more(fts_iterator_t *iter)
   array_iterator_t *aiter = (array_iterator_t *)iter->data;
 
   if(aiter->index >= aiter->array->size)
-    {
-      fts_heap_free(iter->data, iterator_heap);
-      iter->data = NULL;
-      return 0;
-    }
+  {
+    fts_heap_free(iter->data, iterator_heap);
+    iter->data = NULL;
+    return 0;
+  }
   else
     return 1;
 }
@@ -246,3 +270,10 @@ fts_array_get_values(fts_array_t *array, fts_iterator_t *iter)
   iter->data = (array_iterator_t *)fts_heap_alloc(iterator_heap);
 }
 
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */

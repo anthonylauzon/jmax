@@ -166,6 +166,47 @@ FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at);
 
 /**
+ * Prepend elements at the beginning of the array
+ * 
+ * @fn void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @param array the array
+ * @param ac the atoms count
+ * @param at atoms to append
+ * @ingroup array
+ */
+FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at);
+
+/**
+ * Prepend an int element at the beginning of the array
+ * 
+ * @fn void fts_array_prepend_int( fts_array_t *array, int i)
+ * @param array the array
+ * @param i the int to prepend
+ * @ingroup array
+ */
+FTS_API void fts_array_prepend_int( fts_array_t *array, int i);
+
+/**
+ * Prepend a float element at the beginning of the array
+ * 
+ * @fn void fts_array_prepend_float( fts_array_t *array, float f)
+ * @param array the array
+ * @param f the float to prepend
+ * @ingroup array
+ */
+FTS_API void fts_array_prepend_float( fts_array_t *array, float f);
+
+/**
+ * Prepend a symbol element at the beginning of the array
+ * 
+ * @fn void fts_array_prepend_float( fts_array_t *array, fts_symbol_t s)
+ * @param array the array
+ * @param s the symbol to prepend
+ * @ingroup array
+ */
+FTS_API void fts_array_prepend_symbol( fts_array_t *array, fts_symbol_t s);
+
+/**
  * Insert elements at given index of the array
  *
  * @fn void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at)
