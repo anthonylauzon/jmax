@@ -58,11 +58,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#ifdef HAS_TTY_DEV
-#include <termios.h> 
-#endif
-
-
 #include "sys.h"
 #include "lang.h"
 #include "runtime/devices/devices.h"

@@ -740,7 +740,7 @@ ctlout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   x->port = fts_midi_get_port(idx);
   x->ctlno = RANGE_VALUE(ctlno);
-  x->status = (STCH + RANGE_CH(ch) - 1);
+  x->status = (SCTL + RANGE_CH(ch) - 1);
 }
 
 static fts_status_t

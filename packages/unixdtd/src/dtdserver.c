@@ -136,6 +136,10 @@ void dtdserver_init( void)
   dtdserver_fork();
 }
 
+void dtdserver_exit( void)
+{
+}
+
 dtdfifo_t *dtdserver_new( int n_channels)
 {
   int n;

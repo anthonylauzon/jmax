@@ -47,6 +47,6 @@ clean_java:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/midisgi
-	$(INSTALL_DATA) midisgi.jpk $(lib_install_dir)/packages/midisgi
+	$(INSTALL_DATA) midisgi.jpk $(lib_install_dir)/packages/midisgi/midisgi.jpk
 	( cd c ; $(MAKE) $@)
 .PHONY: install

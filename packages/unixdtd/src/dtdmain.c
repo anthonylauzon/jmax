@@ -209,7 +209,7 @@ static void dtd_open( const char *line)
       return;
     }
 
-  file = afOpenFile( filename, "r", 0);
+  file = afOpenFile( full_path, "r", 0);
 
   if (file == AF_NULL_FILEHANDLE)
     {

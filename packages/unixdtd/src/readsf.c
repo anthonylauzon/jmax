@@ -27,6 +27,21 @@
 #include "dtdfifo.h"
 #include "dtdserver.h"
 
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+#include <sys/time.h>
+
+static double get_current_seconds( void)
+{
+  struct timeval tv;
+
+  gettimeofday( &tv, 0);
+
+  return (tv.tv_sec + (double)tv.tv_usec / 1000000.0);
+}
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+
+
+
 typedef struct {
   fts_object_t _o;
   int n_channels;
@@ -178,6 +193,9 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t *this = (readsf_t *)o;
   const char *filename;
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+  double t1, t2;
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 
   filename = fts_symbol_name( fts_get_symbol_arg( ac, at, 0, 0));
 
@@ -187,9 +205,22 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 /*        return; */
 /*      } */
 
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+  t1 = get_current_seconds();
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+
   this->state = dtd_pause;
 
   dtdserver_open( this->fifo, filename, fts_symbol_name(fts_get_search_path()) );
+
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+  t2 = get_current_seconds();
+
+  if (t2 - t1 >= 0.0001)
+    {
+      fprintf( stderr, "Arghure (%f)\n", t2-t1);
+    }
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 }
 
 static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -94,7 +94,7 @@ dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size)
 
   if ( (void *)fifo == MAP_FAILED)
     {
-      fprintf( stderr, "Cannot map file (%s)\n", strerror( errno));
+      fprintf( stderr, "Cannot map file %s (%d,%s)\n", filename, errno, strerror( errno));
       return NULL;
     }
 

@@ -35,7 +35,7 @@ install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/midisgi/c/lib/$(ARCH)/opt
 	( \
 		cd lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libmidisgi.so $(lib_install_dir)/packages/midisgi/c/lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libmidisgi.so $(lib_install_dir)/packages/midisgi/c/lib/$(ARCH)/opt/libmidisgi.so ; \
 	)
 .PHONY: install
 

@@ -41,5 +41,10 @@ static void unixdtd_init(void)
   dtdtest_config();
 }
 
-fts_module_t unixdtd_module = { "unixdtd", "Direct-To-Disk objects (Unix version)", unixdtd_init, 0, 0};
+static void unixdtd_shutdown(void)
+{
+  dtdserver_exit();
+}
+
+fts_module_t unixdtd_module = { "unixdtd", "Direct-To-Disk objects (Unix version)", unixdtd_init, unixdtd_shutdown, 0};
 

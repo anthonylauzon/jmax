@@ -30,6 +30,7 @@
 #include "dtdfifo.h"
 
 extern void dtdserver_init( void);
+extern void dtdserver_exit( void);
 
 extern dtdfifo_t *dtdserver_new( int n_channels);
 
