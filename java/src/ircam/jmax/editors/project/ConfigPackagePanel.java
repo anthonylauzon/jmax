@@ -83,6 +83,29 @@ public class ConfigPackagePanel extends JPanel implements Editor
     dataPathScrollPane = new JScrollPane( dataPathList);
     dataPathScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
+    /******** Templates Panel ******************************************/
+    fileNameCellEditor = new FileNameCellEditor( new JTextField());
+
+    templateTable = new JTable( templateModel){
+	public TableCellEditor getCellEditor(int row, int column)
+	{
+	  switch( column)
+	    {
+	    default: 
+	    case 0:
+	      return super.getCellEditor(row, column);
+	    case 1:
+	      return fileNameCellEditor;
+	    }
+	}
+      }; ;
+    templateTable.setPreferredScrollableViewportSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    templateTable.setRowHeight(17);
+    templateTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+    
+    templateScrollPane = new JScrollPane( templateTable);
+    templateScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
     /******** Help Panel ******************************************/
     
     helpTable = new JTable(helpModel);
@@ -202,11 +225,12 @@ public class ConfigPackagePanel extends JPanel implements Editor
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
     tabbedPane.addTab("Packages", requiresScrollPane);
     tabbedPane.addTab("Template Path", templPathScrollPane);
-    tabbedPane.addTab("Data Path", dataPathScrollPane);    
+    tabbedPane.addTab("Data Path", dataPathScrollPane);
+    tabbedPane.addTab("Templates", templateScrollPane);         
     tabbedPane.addTab("Help Patches", helpScrollPane);    
     tabbedPane.addTab("Audio/MIDI", configPanel);    
     if( !(ftsPkg instanceof FtsPackage)) 
-      tabbedPane.setEnabledAt( 4, false);
+      tabbedPane.setEnabledAt( 5, false);
     tabbedPane.setSelectedIndex(0);
     
     add( tabbedPane);
@@ -267,13 +291,21 @@ public class ConfigPackagePanel extends JPanel implements Editor
     for(Enumeration e = pkg.getDataPaths(); e.hasMoreElements();)
       dataPathModel.addElement(e.nextElement());    
   
+    templateModel = new TemplateTableModel( pkg);
+    
+    FtsPackage.TwoNames tn;
+    for(Enumeration e = pkg.getTemplates(); e.hasMoreElements();)
+      {
+	tn = ( FtsPackage.TwoNames)e.nextElement();
+	templateModel.addRow(tn.name, tn.fileName);    
+      }
+
     helpModel = new HelpTableModel( pkg);
     
-    FtsPackage.HelpPatch hp;
     for(Enumeration e = pkg.getHelps(); e.hasMoreElements();)
       {
-	hp = ( FtsPackage.HelpPatch)e.nextElement();
-	helpModel.addRow(hp.className, hp.fileName);    
+	tn = ( FtsPackage.TwoNames)e.nextElement();
+	helpModel.addRow(tn.name, tn.fileName);    
       }
   }
 
@@ -302,13 +334,16 @@ public class ConfigPackagePanel extends JPanel implements Editor
     dataPathList.revalidate();
     revalidate();    
     
+    templateTable.setModel( templateModel);
+    templateTable.revalidate();
+
     helpTable.setModel( helpModel);
     helpTable.revalidate();
 
     tabbedPane.setSelectedIndex(0);    
     if( ftsPkg instanceof FtsProject)
       {
-	tabbedPane.setEnabledAt( 4, true);
+	tabbedPane.setEnabledAt( 5, true);
 	
 	if( ((FtsProject)ftsPkg).getMidiConfig() != null)
 	  midiField.setText( ((FtsProject)ftsPkg).getMidiConfig());
@@ -320,7 +355,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	  audioField.setText( "");
       }
     else
-      tabbedPane.setEnabledAt( 4, false);
+      tabbedPane.setEnabledAt( 5, false);
     
     window.pack();
   }
@@ -349,15 +384,31 @@ public class ConfigPackagePanel extends JPanel implements Editor
     revalidate();    
   }
 
+  public void templateChanged()
+  {
+    templateModel = new TemplateTableModel( ftsPkg);
+    
+    FtsPackage.TwoNames tn;
+    for(Enumeration e = ftsPkg.getTemplates(); e.hasMoreElements();)
+      {
+	tn = (FtsPackage.TwoNames)e.nextElement();
+	templateModel.addRow(tn.name, tn.fileName);    
+      }
+
+    templateTable.setModel( templateModel);
+    templateTable.revalidate();
+    revalidate();
+  }
+
   public void helpChanged()
   {
     helpModel = new HelpTableModel( ftsPkg);
     
-    FtsPackage.HelpPatch hp;
+    FtsPackage.TwoNames tn;
     for(Enumeration e = ftsPkg.getHelps(); e.hasMoreElements();)
       {
-	hp = (FtsPackage.HelpPatch)e.nextElement();
-	helpModel.addRow(hp.className, hp.fileName);    
+	tn = (FtsPackage.TwoNames)e.nextElement();
+	helpModel.addRow(tn.name, tn.fileName);    
       }
 
     helpTable.setModel( helpModel);
@@ -398,7 +449,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	if( selected == dataPathScrollPane)
 	  chooseAndAddPath( dataPathModel, "data_path", dataPathList.getSelectedIndex());
 	else
-	  helpModel.addRow( helpTable.getSelectedRow());
+	  if( selected == templateScrollPane)
+	    templateModel.addRow( templateTable.getSelectedRow());
+	  else
+	    helpModel.addRow( helpTable.getSelectedRow());
   }
 
   void Delete()
@@ -428,7 +482,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	      }
 	  }
 	else
-	  helpModel.removeRow( helpTable.getSelectedRow());
+	  if( selected == templateScrollPane)
+	    templateModel.removeRow( templateTable.getSelectedRow());
+	  else
+	    helpModel.removeRow( helpTable.getSelectedRow());
   }
 
   /*********************************************************
@@ -714,6 +771,152 @@ public class ConfigPackagePanel extends JPanel implements Editor
     FtsPackage ftsPackage;
   }
 
+  /*********************************************************
+   ***   Table model for the Template JTable             ***
+   *********************************************************/
+  class TemplateTableModel extends AbstractTableModel 
+  {
+    TemplateTableModel( FtsPackage pkg)
+    {
+      super();
+      ftsPackage = pkg;
+    }
+
+    public int getColumnCount() 
+    { 
+      return 2;
+    }
+  
+    public Class getColumnClass(int col)
+    {
+      return String.class;
+    }
+
+    public boolean isCellEditable(int row, int col)
+    {
+      return true;
+    }
+
+    public String getColumnName(int col)
+    {
+      if(col == 0)
+	return "template name";
+      else 
+	return "file name";
+    }
+
+    public int getRowCount() { 
+      return size; 
+    }
+
+    public void addRow(int index)
+    {
+      size++;    
+      if((size > rows) || (index != -1))
+	{
+	  Object[][] temp = new Object[size+5][2];
+	  if(index == -1)
+	    for(int i = 0; i < size-1; i++)
+	      {
+		temp[i][0] = data[i][0];
+		temp[i][1] = data[i][1];
+	      }
+	  else
+	    {
+	      for(int i = 0; i < index+1; i++)
+	      {
+		temp[i][0] = data[i][0];
+		temp[i][1] = data[i][1];
+	      }
+
+	      temp[index+1][0] = null;
+	      temp[index+1][1] = null;
+
+	      for(int j = index+2; j < size; j++)
+	      {
+		temp[j][0] = data[j-1][0];
+		temp[j][1] = data[j-1][1];
+	      }
+	    }
+	  data = temp;
+	  rows = size+5;
+	}
+      fireTableDataChanged();
+    }
+
+    public void addRow(Object v1, Object v2)
+    {
+      addRow(-1);
+      data[size-1][0] = v1;
+      data[size-1][1] = v2;
+    }
+
+    public void removeRow(int rowId)
+    {
+      if(size > 0)
+	{
+	  size--;    
+	  if(rowId >= 0)
+	    {
+	      ftsPackage.requestRemoveTemplate( (String)data[rowId][0], (String)data[rowId][1]);
+
+	      for(int i = rowId; i < size; i++)
+		{
+		  data[i][0] = data[i+1][0];
+		  data[i][1] = data[i+1][1];
+		}
+	    }
+	  data[size][0] = null;
+	  data[size][1] = null;
+
+	  fireTableDataChanged();
+	}
+    }
+
+    public Object getValueAt(int row, int col) 
+    { 
+      if(row > size) return null;
+      else
+	return data[row][col];
+    }
+
+    public void setValueAt(Object value, int row, int col) 
+    {
+      if(row > size) return;
+
+      data[row][col] = value;
+
+      fireTableCellUpdated(row, col);
+    
+      if( ftsPackage != null)
+	{
+	  if(( data[row][0] != null) && ( data[row][1] != null))
+	    {
+	      String[] tmp = {(String)data[row][0], (String)data[row][1]}; 
+	      ftsPackage.set( "template", tmp);
+	    }
+	}
+    }
+
+    public String[] getTemplates() 
+    { 
+      String values[] = new String[ size*2]; 
+      int j = 0;
+      for(int i = 0; i < size; i++)
+	{
+	  values[j] = (String)data[i][0];
+	  values[j+1] = (String)data[i][1];
+	  j+=2;
+	}
+      return values;
+    }
+
+    int size = 0;
+    int rows = 0;
+    Object data[][];
+    FtsPackage ftsPackage;
+  }
+
   public void updateDone()
   {
     update();
@@ -789,19 +992,69 @@ public class ConfigPackagePanel extends JPanel implements Editor
   } 
   /********************************/
   private JTabbedPane tabbedPane;
-  private JTable requiresTable, helpTable;
+  private JTable requiresTable, templateTable, helpTable;
   private JButton addButton, deleteButton;
   private JList templPathList, dataPathList;
-  private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane;
+  private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane, templateScrollPane;
   private RequiresTableModel requiresModel;
   private HelpTableModel helpModel;
+  private TemplateTableModel templateModel;
   private DefaultListModel templPathModel, dataPathModel;
   private Window window;
   private FtsPackage ftsPkg;
   private JFileChooser fileChooser = new JFileChooser(); 
-  private final int DEFAULT_WIDTH = 450;
+  private final int DEFAULT_WIDTH = 550;
   private final int DEFAULT_HEIGHT = 280;
 
+  private DefaultCellEditor fileNameCellEditor;
+
+  class FileNameCellEditor extends DefaultCellEditor {
+    String name = null;
+
+    public FileNameCellEditor(JTextField f) {
+      super( f);
+      f.setEditable( false);
+      f.setFont( (Font)UIManager.get("Table.font"));
+      f.addMouseListener(new MouseAdapter() {
+	  public void mousePressed( MouseEvent e) {
+	    JFileChooser fileChooser = new JFileChooser();
+	    int result = fileChooser.showDialog(null, "Choose");
+	    if ( result == JFileChooser.APPROVE_OPTION)
+	      {
+		String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
+		if(path!=null)
+		  {
+		    name = path;
+		    ((JTextField)editorComponent).setText( path);
+		  }
+		fireEditingStopped();
+	      }
+	  }
+	});
+
+      editorComponent = f;
+      setClickCountToStart(2);
+    }
+
+    protected void fireEditingStopped() {
+      super.fireEditingStopped();
+    }
+
+    public Object getCellEditorValue() {
+      return name;
+    }
+
+    public Component getTableCellEditorComponent(JTable table, 
+						 Object value,
+						 boolean isSelected,
+						 int row,
+						 int column) {
+      ((JTextField)editorComponent).setText( (String)value);
+      name = (String)value;
+      return editorComponent;
+    }
+  }
+  
   JTextField midiField, audioField;
   JPanel configPanel;
   private static javax.swing.filechooser.FileFilter configFilter;

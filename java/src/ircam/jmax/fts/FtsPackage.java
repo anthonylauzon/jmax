@@ -58,6 +58,12 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).addDataPath( args.getLength(), args.getAtoms());
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("template"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).addTemplates( args.getLength(), args.getAtoms());
+	}
+      });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("help"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -107,6 +113,7 @@ public class FtsPackage extends FtsObjectWithEditor
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
+    templates = new Vector();
     helpPatches = new Vector();
   }
 
@@ -118,6 +125,7 @@ public class FtsPackage extends FtsObjectWithEditor
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
+    templates = new Vector();
     helpPatches = new Vector();
   }
 
@@ -167,6 +175,23 @@ public class FtsPackage extends FtsObjectWithEditor
       }
   }
 
+  public void requestRemoveTemplate(String name, String fileName)
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get(name));
+    args.addSymbol( FtsSymbol.get(fileName));
+     
+    try
+      {
+	send( FtsSymbol.get("remove_template"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsPackage: I/O Error sending remove_template Message!");
+	e.printStackTrace(); 
+      }
+  }
+
   public void save( String name)
   {
     args.clear();
@@ -188,6 +213,7 @@ public class FtsPackage extends FtsObjectWithEditor
     requires.removeAllElements();
     templatePaths.removeAllElements();
     dataPaths.removeAllElements();
+    templates.removeAllElements();
     helpPatches.removeAllElements();
 
     try
@@ -257,13 +283,25 @@ public class FtsPackage extends FtsObjectWithEditor
       listener.dataPathChanged();
   }
 
+  void addTemplates(int nArgs, FtsAtom[] args)
+  {
+    templates.removeAllElements();
+
+    for(int i = 0; i < nArgs; i+=2)
+      templates.addElement( new TwoNames( args[i].symbolValue.toString(),  
+					  args[i+1].symbolValue.toString()));
+
+    if( listener != null)
+      listener.templateChanged();
+  }
+
   void addHelps(int nArgs, FtsAtom[] args)
   {
     helpPatches.removeAllElements();
 
     for(int i = 0; i < nArgs; i+=2)
-      helpPatches.addElement( new HelpPatch( args[i].symbolValue.toString(),  
-					     args[i+1].symbolValue.toString()));
+      helpPatches.addElement( new TwoNames( args[i].symbolValue.toString(),  
+					    args[i+1].symbolValue.toString()));
 
     /*if( listener != null)
       listener.helpChanged();*/
@@ -342,27 +380,28 @@ public class FtsPackage extends FtsObjectWithEditor
     return dataPaths.elements();
   }
 
+  public Enumeration getTemplates()
+  {
+    return templates.elements();
+  }
+
   public Enumeration getHelps()
   {
     return helpPatches.elements();
   }
 
-  public class HelpPatch extends Object
+  public class TwoNames extends Object
   {
-    public HelpPatch( String className, String fileName)
+    public TwoNames( String name, String fileName)
     {
-      this.className = className;
+      this.name = name;
       this.fileName = fileName;
     }
-    public void set( String cn, String fn){className = cn; fileName = fn;}
-    public String className, fileName;
+    public void set( String n, String fn){ name = n; fileName = fn;}
+    public String name, fileName;
   }
 
-  private Vector requires;
-  private Vector templatePaths;
-  private Vector absPaths;
-  private Vector dataPaths;
-  private Vector helpPatches;
+  private Vector requires, templatePaths, absPaths, dataPaths, templates, helpPatches;
   private String name;
   private String fileName;
   private String dir;

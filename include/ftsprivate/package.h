@@ -89,6 +89,8 @@ struct fts_package {
   fts_hashtable_t* classes;
 
   fts_hashtable_t* declared_templates;
+  fts_list_t* template_names;
+
   fts_hashtable_t* templates_in_path;
   fts_list_t* template_paths;
 
