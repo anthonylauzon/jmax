@@ -59,7 +59,8 @@ public class Fork extends GraphicObject
     if(nOutlets==0)
 	{
 	    nOutlets = 2;
-	    theFtsObject.noutlets = 2;
+	    sendArgs[0].setInt(nOutlets); 
+	    ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
 	}
 
     setInletDistance(DEFAULT_DISTANCE);
