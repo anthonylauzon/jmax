@@ -84,7 +84,7 @@ public abstract class SchemeUtils {
   /** A continuable error. Prints an error message and then prompts for
    * a value to eval and return. **/
   public static Object error(String message) {
-    System.err.println("**** ERROR: " + message);
+      //System.err.println("**** ERROR: " + message);
     throw new RuntimeException(message);  
   }
 
