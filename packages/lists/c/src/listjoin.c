@@ -109,17 +109,34 @@ listjoin_prepend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static fts_status_t
-listjoin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+listappend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(listjoin_t), 2, 1, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listjoin_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listjoin_delete);
 
-  if(fts_get_symbol(at) == fts_new_symbol("listappend"))
-    fts_method_define_varargs(cl, 0, fts_s_list, listjoin_append);
-  else
-    fts_method_define_varargs(cl, 0, fts_s_list, listjoin_prepend);
+  fts_method_define_varargs(cl, 0, fts_s_list, listjoin_append);
+
+  fts_method_define_varargs(cl, 1, fts_s_int, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_float, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_list, listjoin_set_right_list);
+
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
+
+  return fts_Success;
+}
+
+static fts_status_t
+listprepend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(listjoin_t), 2, 1, 0); 
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listjoin_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listjoin_delete);
+
+  fts_method_define_varargs(cl, 0, fts_s_list, listjoin_prepend);
 
   fts_method_define_varargs(cl, 1, fts_s_int, listjoin_set_right_list);
   fts_method_define_varargs(cl, 1, fts_s_float, listjoin_set_right_list);
@@ -134,8 +151,8 @@ listjoin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 listjoin_config(void)
 {
-  fts_class_install(fts_new_symbol("listappend"), listjoin_instantiate);
-  fts_class_install(fts_new_symbol("listprepend"), listjoin_instantiate);
+  fts_class_install(fts_new_symbol("listappend"), listappend_instantiate);
+  fts_class_install(fts_new_symbol("listprepend"), listprepend_instantiate);
 
   fts_class_alias(fts_new_symbol("lapp"), fts_new_symbol("listappend"));
   fts_class_alias(fts_new_symbol("lpre"), fts_new_symbol("listprepend"));
