@@ -512,7 +512,7 @@ bpf_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
   }
 
-  fts_return_float(ret);
+  fts_return_float((float)ret);
 }
 
 static void
@@ -520,7 +520,7 @@ bpf_return_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   bpf_t *this = (bpf_t *)o;
 
-  fts_return_float(bpf_get_duration(this));  
+  fts_return_float((float)bpf_get_duration(this));  
 }
 
 static void
@@ -658,8 +658,8 @@ bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   for(i=0; i<size; i++)
   {
-    double time = this->points[i].time;
-    double value = this->points[i].value;
+    float time  = (float)this->points[i].time;
+    float value = (float)this->points[i].value;
       
     fts_message_append_float(mess, time);
     fts_message_append_float(mess, value);
