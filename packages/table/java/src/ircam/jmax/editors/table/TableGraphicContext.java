@@ -18,7 +18,7 @@ public class TableGraphicContext extends GraphicContext{
   public TableGraphicContext(TableDataModel dm)
   {
     itsModel = dm;
-    itsWriter = new CoordinateWriter(this);
+    //itsWriter = new CoordinateWriter(this);
   }
 
   //--- Fields & accessors ---//

@@ -13,7 +13,7 @@ import ircam.jmax.toolkit.*;
 public class CoordinateWriter implements StatusBarClient {
   
   /** contructor */
-  CoordinateWriter(TableGraphicContext tgc)
+  public CoordinateWriter(TableGraphicContext tgc)
   {
     this.tgc = tgc;
   }

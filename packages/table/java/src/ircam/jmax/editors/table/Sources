@@ -3,6 +3,7 @@ SOURCES = \
 	  TableExtension.java \
 	  TableFactory.java \
 	  TableDataEditor.java \
+	  TableDisplay.java \
 	  TableDataModel.java \
 	  TableRemoteData.java \
 	  TableSelection.java \

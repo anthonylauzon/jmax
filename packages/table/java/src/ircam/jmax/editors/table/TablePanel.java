@@ -26,6 +26,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   public TablePanel(TableDataModel tm) {
     super();
 
+    this.tm = tm;
     instance = this;
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
@@ -39,11 +40,15 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //... the panel that will contain the toolbar
     prepareToolbarPanel();
 
+
+    gc = new TableGraphicContext(tm);
+    itsTableRenderer = new TableRenderer(gc);
+
     //... the center panel (the sensible area)
     prepareCenterPanel();
 
-    //... the Graphic context (and the Renderer)
-    prepareGraphicContext(tm);
+    //... the Graphic context 
+    prepareGraphicContext();
     
     //... the vertical position controller
     prepareVerticalScrollbar();
@@ -58,64 +63,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   }
 
 
-  /** the panel containing the table representation */
-  class CenterPanel extends JPanel 
-  {
-    /**
-     * The table's representation panel uses the TableRenderManager to
-     * represent its data.*/
-    public void paint(Graphics g) 
-    {
-      Rectangle r = g.getClipBounds();
-      gc.getRenderManager().render(g, r); //et c'est tout	
-    }
-    
-    /**
-     * paints all the points in a given (closed) range */
-    public void rangePaint(int index1, int index2)
-    {
-      Graphics g = getGraphics();
-      TableRenderer tr = (TableRenderer) gc.getRenderManager();
-      for (int i = index1; i<= index2; i++)
-	tr.renderPoint(g, i);
-      
-      g.dispose();
-    }
-    
-    /**
-     * paints a single point */
-    public void singlePaint(int index)
-    {
-      Graphics g = getGraphics();
-      TableRenderer tr = (TableRenderer) gc.getRenderManager();
-      tr.renderPoint(g, index);
-      g.dispose();
-    }
-
-    /**
-     * Filters out the mouse events that trigger the popup menu.
-     * Let all the other event pass undisturbed */
-    protected void processMouseEvent(MouseEvent e)
-    {
-      if (e.isPopupTrigger()) 
-	{
-	  if (!InteractionModule.isSuspended())
-	    {
-	      InteractionModule.suspend();
-	    }
-	  Tabler.toolbar.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
-	}
-      else {
-	if (InteractionModule.isSuspended())
-	  {
-	    InteractionModule.resume();
-	  }
-	super.processMouseEvent(e);
-      }
-    }
-    
-  }
-  
 
   /** 
    * Set the initial parameters of the Adapter */
@@ -352,7 +299,30 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   private void prepareCenterPanel()
   {
-    itsCenterPanel = new CenterPanel();
+    itsCenterPanel = new TableDisplay(itsTableRenderer) {
+      /**
+       * Filters out the mouse events that trigger the popup menu.
+       * Let all the other event pass undisturbed */
+      protected void processMouseEvent(MouseEvent e)
+	{
+	  if (e.isPopupTrigger()) 
+	    {
+	      if (!InteractionModule.isSuspended())
+		{
+		  InteractionModule.suspend();
+		}
+	      Tabler.toolbar.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
+	    }
+	  else {
+	    if (InteractionModule.isSuspended())
+	      {
+		InteractionModule.resume();
+	      }
+	    super.processMouseEvent(e);
+	  }
+	} 
+      
+    };
  
     itsCenterPanel.setBounds(toolbarPanel.getSize().width, InfoPanel.INFO_WIDTH, getSize().width-toolbarPanel.getSize().width/*PANEL_WIDTH*/, getSize().height-InfoPanel.INFO_HEIGHT/*PANEL_HEIGHT*/);
 
@@ -363,14 +333,15 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   }
 
 
-  private void prepareGraphicContext(TableDataModel tm)
+  private void prepareGraphicContext()
     { //prepares the graphic context
-      gc = new TableGraphicContext(tm);
+
       gc.setGraphicSource(itsCenterPanel);
       gc.setGraphicDestination(itsCenterPanel);
+      gc.setCoordWriter(new CoordinateWriter(gc));
 
       TableSelection.createSelection(tm);
-      gc.setRenderManager(new TableRenderer(gc));
+      gc.setRenderManager(itsTableRenderer);
       gc.setStatusBar(itsStatusBar);
       TableAdapter ta = new TableAdapter();
       
@@ -506,7 +477,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
    * Sets the "hollow" representation mode */
   void hollow()
   {
-    ((TableRenderer)gc.getRenderManager()).setMode(TableRenderer.HOLLOW);
+    itsTableRenderer.setMode(TableRenderer.HOLLOW);
     repaint();
   }
 
@@ -514,7 +485,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
    * Sets the "solid" representation mode */
   void solid()
   {
-    ((TableRenderer)gc.getRenderManager()).setMode(TableRenderer.SOLID);
+    itsTableRenderer.setMode(TableRenderer.SOLID);
     repaint();
   }
 
@@ -551,7 +522,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   EditorToolbar tb;
   TableGraphicContext gc;
-  CenterPanel itsCenterPanel;
+  TableRenderer itsTableRenderer;
+  TableDataModel tm;
+  TableDisplay itsCenterPanel;
 
   static boolean toolbarAnchored = true;
   Box toolbarPanel;
@@ -564,8 +537,8 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   public static int INITIAL_Y_ZOOM = 1;
   public static int INITIAL_Y_ORIGIN = 128;
 
-  private JLabel currentXZoom;
-  private JLabel currentYZoom;
+  JLabel currentXZoom;
+  JLabel currentYZoom;
 }
 
 

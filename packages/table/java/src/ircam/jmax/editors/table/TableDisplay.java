@@ -1,0 +1,63 @@
+
+package ircam.jmax.editors.table;
+
+import ircam.jmax.toolkit.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+/**
+ * A JPanel that is able to show the content of a TableDataModel.*/
+public class TableDisplay extends JPanel
+{
+
+  public TableDisplay()
+  {
+    super();
+  }
+
+  public TableDisplay(TableRenderer tr)
+  {
+    super();
+    this.tr = tr;
+  }
+
+  public void setRenderer(TableRenderer tr)
+  {
+    this.tr = tr;
+  }
+
+  /**
+   * The paint routine just delegates to the RenderManager
+   * the representation of its data.*/
+  public void paint(Graphics g) 
+  {
+    Rectangle r = g.getClipBounds();
+    tr.render(g, r); //et c'est tout	
+  }
+  
+  /**
+   * paints all the points in a given (closed) range */
+  public void rangePaint(int index1, int index2)
+  {
+    Graphics g = getGraphics();
+
+    for (int i = index1; i<= index2; i++)
+      tr.renderPoint(g, i);
+    
+    g.dispose();
+  }
+  
+    /**
+     * paints a single point */
+  public void singlePaint(int index)
+  {
+    Graphics g = getGraphics();
+
+    tr.renderPoint(g, index);
+    g.dispose();
+  }
+  
+  //--- Fields
+  TableRenderer tr;
+}

@@ -1,7 +1,6 @@
 
 package ircam.jmax.editors.table;
 
-import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.UndoableData;
 
 import java.util.Enumeration;

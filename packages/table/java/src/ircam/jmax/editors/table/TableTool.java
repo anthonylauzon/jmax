@@ -20,3 +20,4 @@ abstract public class TableTool extends Tool {
     return (TableGraphicContext) gc;
   }
 }
+
