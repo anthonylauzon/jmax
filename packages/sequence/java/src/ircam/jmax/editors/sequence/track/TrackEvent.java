@@ -54,11 +54,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     public TrackEvent(Fts fts, double time, EventValue value)
     {
 	super(fts, null, null, "seqevent", "seqevent");
-      
+
 	this.time = time;
     
 	setValue(value);
-     
     }
 
     /**

@@ -27,3 +27,5 @@ SOURCES = \
 module.c \
 sequence.c \
 seqobj.c \
+seqnote.c \
+seqmidi.c \

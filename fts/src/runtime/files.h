@@ -34,6 +34,7 @@
 #include "runtime/files/parser.h"
 #include "runtime/files/soundfiles.h"
 #include "runtime/files/soundformats.h"
+#include "runtime/files/midifiles.h"
 
 extern fts_module_t fts_files_module;
 

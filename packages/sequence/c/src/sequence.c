@@ -1,76 +1,45 @@
 /*
  * jMax
+ * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
- * Copyright (C) 1999 by IRCAM
- * All rights reserved.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  * 
- * This program may be used and distributed under the terms of the 
- * accompanying LICENSE.
+ * See file LICENSE for further informations on licensing terms.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
  *
- * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
- * for DISCLAIMER OF WARRANTY.
- * 
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 #include "fts.h"
 #include "sequence.h"
 
 /*********************************************************
  *
- *  local new/init/delete sequence event functions
+ *  sequence event
  *
  */
 
-/*
 void
-sequence_event_set_value(sequence_event_t *event, fts_atom_t value)
+sequence_event_init(sequence_event_t *event)
 {
-  event->value = value;
-}
-*/
-
-void
-sequence_event_set_value(sequence_event_t *event, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  int i;
-
-  if(ac > EVENT_MAX_AC)
-    ac = EVENT_MAX_AC;
-
-  event->s = s;
-  event->ac = ac;
-  
-  for(i=0; i<ac; i++)
-    event->at[i] = at[i];
-}
-
-void
-sequence_event_reset_value(sequence_event_t *event)
-{
-  /*
-  if(fts_is_object(&event->value))
-    fts_object_delete(fts_get_object(&event->value));
-  */
-}
-
-void
-sequence_event_init(sequence_event_t *event, double time, fts_symbol_t selector, int ac, const fts_atom_t *at)
-{
-  sequence_event_set_time(event, time);
-  sequence_event_set_value(event, selector, ac, at);
-}
-
-void
-sequence_event_delete(sequence_event_t *event)
-{
-  sequence_event_reset_value(event);
-}
-
-void 
-sequence_event_post(sequence_event_t *event)
-{
-  post("@%f (%s): %s ", event->time, fts_symbol_name(event->track->name), fts_symbol_name(event->s));
-  post_atoms(event->ac, event->at);
-  post("\n");
+  event->prev = 0;
+  event->next = 0;
+  event->track = 0;
+  event->time = 0.0;
+  event->fields = 0;
 }
 
 /*********************************************************
@@ -246,7 +215,9 @@ sequence_append_event(sequence_t *sequence, sequence_event_t *event)
 static void
 sequence_insert_event_before(sequence_t *sequence, sequence_event_t *here, sequence_event_t *event)
 {
-  if(here == sequence->begin)
+  if(here == 0)
+    sequence_append_event(sequence, event);
+  else if(here == sequence->begin)
     sequence_prepend_event(sequence, event);
   else
     {
@@ -259,7 +230,7 @@ sequence_insert_event_before(sequence_t *sequence, sequence_event_t *here, seque
 }
 
 static void
-sequence_insert_event_after(sequence_t *sequence, sequence_event_t *here, sequence_event_t *event)
+sequence_insert_event_behind(sequence_t *sequence, sequence_event_t *here, sequence_event_t *event)
 {
   if(here == sequence->end)
     sequence_append_event(sequence, event);
@@ -271,17 +242,6 @@ sequence_insert_event_after(sequence_t *sequence, sequence_event_t *here, sequen
       here->next->prev = here->next = event;
       sequence->size++;
     }  
-}
-
-void
-sequence_insert_event(sequence_t *sequence, sequence_event_t *event)
-{
-  sequence_event_t *next = sequence_get_event_by_time(sequence, sequence_event_get_time(event));
-  
-  if(next)
-    sequence_insert_event_before(sequence, next, event);
-  else
-    sequence_append_event(sequence, event);
 }
 
 /*********************************************************
@@ -383,12 +343,25 @@ sequence_remove_track(sequence_t *sequence, fts_symbol_t name)
  */
 
 void
-sequence_add_event(sequence_t *sequence, sequence_track_t *track, sequence_event_t *event)
+sequence_add_event(sequence_t *sequence, sequence_track_t *track, double time, sequence_event_t *event)
 {
-  sequence_event_t *next = sequence_get_event_by_time(sequence, sequence_event_get_time(event));
+  sequence_event_t *next = sequence_get_event_by_time(sequence, time);
   
+  sequence_insert_event_before(sequence, next, event);
+
   sequence_event_set_track(event, track);
-  sequence_insert_event(sequence, event);
+  sequence_event_set_time(event, time);
+}
+
+void
+sequence_add_event_after(sequence_t *sequence, sequence_track_t *track, double time, sequence_event_t *event, sequence_event_t *here)
+{
+  sequence_event_t *next = sequence_get_event_by_time_after(sequence, time, here);
+  
+  sequence_insert_event_before(sequence, next, event);
+
+  sequence_event_set_track(event, track);
+  sequence_event_set_time(event, time);
 }
 
 void
@@ -408,8 +381,8 @@ sequence_move_event(sequence_event_t *event, double time)
   if((next && time > next->time) || (prev && time < prev->time))
     {
       sequence_cut_event(sequence, event);
-      sequence_event_set_time(event, time);
-      sequence_insert_event(sequence, event);
+      sequence_event_set_time(event, time);      
+      sequence_insert_event_before(sequence, sequence_get_event_by_time(sequence, time), event);
     }
   else
     sequence_event_set_time(event, time);
@@ -433,32 +406,22 @@ sequence_init(sequence_t *sequence)
 void
 sequence_empty(sequence_t *sequence)
 {
+  /* delete all events */
   while(sequence->size)
     {
       sequence_event_t *event = sequence_cut_begin_event(sequence);
-      sequence_event_delete(event);
+      fts_object_delete((fts_object_t *)event);
     }
-
-  while(sequence->tracks)
-    sequence_remove_track(sequence, 0);
-}
-
-sequence_t *
-sequence_create(void)
-{
-  sequence_t *sequence;
-
-  sequence = (sequence_t *)fts_malloc(sizeof(sequence_t));
-  sequence_init(sequence);
   
-  return sequence;
-}
-
-void
-sequence_destroy(sequence_t *sequence)
-{
-  sequence_empty(sequence);
-  fts_free(sequence);
+  /* delete all tracks */
+  while(sequence->tracks)
+    {
+      sequence_track_t *track = sequence->tracks;
+      
+      sequence->tracks = track->next;
+      sequence_track_delete(track);
+      sequence->n_tracks--;
+    }
 }
 
 /*********************************************************
@@ -484,6 +447,22 @@ sequence_get_event_by_time(sequence_t *sequence, double time)
 }
 
 sequence_event_t *
+sequence_get_event_by_time_after(sequence_t *sequence, double time, sequence_event_t *here)
+{
+  sequence_event_t *event = 0;
+
+  if(sequence_get_size(sequence) > 0 && time <= sequence->end->time)
+    {
+      event = here;
+      
+      while(time > event->time)
+	event = event->next;
+    }
+  
+  return event;  
+}
+
+sequence_event_t *
 sequence_get_event_in_track_by_time(sequence_t *sequence, sequence_track_t *track, double time)
 {
   sequence_event_t *event = 0;
@@ -498,12 +477,3 @@ sequence_get_event_in_track_by_time(sequence_t *sequence, sequence_track_t *trac
 
   return event;  
 }
-
-
-
-
-
-
-
-
-

@@ -51,9 +51,19 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    */
     public FtsSequenceObject(Fts fts, FtsObject parent, String classname)
     {
-	super(fts, parent, null, "sequence", "sequence");
+      super(fts, parent, null, "sequence", "sequence");
 	
-	listeners = new MaxVector();
+      listeners = new MaxVector();
+      initValueInfoTable();
+    }
+
+    private final void initValueInfoTable()
+    {
+	ValueInfoTable.registerInfo(AmbitusValue.info);
+	ValueInfoTable.registerInfo(FricativeValue.info);
+	ValueInfoTable.registerInfo(LogicValue.info);
+	ValueInfoTable.registerInfo(CueValue.info);
+	ValueInfoTable.registerInfo(IntegerValue.info);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////

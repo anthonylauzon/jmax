@@ -70,7 +70,7 @@ public class Sequence extends JFrame implements EditorContainer{
 
     initTrackEditorFactoryTable();
 
-    initValueInfoTable();
+    //initValueInfoTable();
     
     makeTitle(data);
 
@@ -111,6 +111,7 @@ public class Sequence extends JFrame implements EditorContainer{
 	TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonodimensionalTrackEditorFactory.instance);
     }
 
+  /*
     private final void initValueInfoTable()
     {
 	ValueInfoTable.registerInfo(AmbitusValue.info);
@@ -119,7 +120,7 @@ public class Sequence extends JFrame implements EditorContainer{
 	ValueInfoTable.registerInfo(CueValue.info);
 	ValueInfoTable.registerInfo(IntegerValue.info);
     }
-
+  */
     private final void makeTitle(FtsSequenceObject maxData){
 	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
 	MaxWindowManager.getWindowManager().windowChanged(this);

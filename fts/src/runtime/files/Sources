@@ -50,7 +50,8 @@ SOURCES = \
   atomfiles.c \
   post.c \
   parser.c \
-  soundformats.c
+  soundformats.c \
+  midifiles.c
 
 
 

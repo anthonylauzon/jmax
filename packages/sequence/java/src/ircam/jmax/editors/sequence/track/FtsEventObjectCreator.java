@@ -38,7 +38,7 @@ public class FtsEventObjectCreator implements FtsObjectCreator
 
 	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(valueType).newInstance());
 	evtValue.setPropertyValues(nArgs-2, evtArgs);
-	
+
 	return new TrackEvent(fts, time, evtValue);
     }
 }

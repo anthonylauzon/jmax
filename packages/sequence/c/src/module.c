@@ -27,11 +27,13 @@
 #include "fts.h"
 
 extern void seqobj_config(void);
+extern void seqnote_config(void);
 
 static void
 fts_sequence_init(void)
 {
   seqobj_config();
+  seqnote_config();
 }
 
 fts_module_t sequence_module = {"sequence", "sequence and score following classes", fts_sequence_init, 0, 0};
