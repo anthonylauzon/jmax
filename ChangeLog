@@ -1,3 +1,11 @@
+2004-02-20  Alexandre Pages  <Alexandre.Pages@ircam.fr>
+
+     * fts/win32.c : added version conflict warning under win32 (comparison registry vs current)
+
+2004-02-18  Alexandre Pages  <Alexandre.Pages@ircam.fr>
+
+      * packages/control/help/*.jmax : complete rewrite of the help files and summary    
+
 2004-02-18  Diemo Schwarz  <schwarz@ircam.fr>
 
 	* package data: 
