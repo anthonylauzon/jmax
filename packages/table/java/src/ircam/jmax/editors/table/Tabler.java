@@ -7,8 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
-//import tcl.lang.*;
-//import com.sun.java.swing.*;
 
 /** 
  A simple table editor
@@ -121,10 +119,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
   public void reEdit()
   {
+    if (!isVisible()) setVisible(true);
     itsData.forceUpdate();
-    //scure itsTablePanel.recreateOffScreen();
     itsTablePanel.paint(itsTablePanel.getGraphics());
-    itsTablePanel.UpdateOldValues();
+    itsTablePanel.updateOldValues();
 
     toFront();
   }
@@ -154,7 +152,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 	  itsData.forceUpdate();
 	  //scure itsTablePanel.recreateOffScreen();
 	  itsTablePanel.paint(itsTablePanel.getGraphics());
-	  itsTablePanel.UpdateOldValues();
+	  itsTablePanel.updateOldValues();
 	}});
   }
 

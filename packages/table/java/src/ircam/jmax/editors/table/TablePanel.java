@@ -23,36 +23,26 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   int previousHilighted = -1;
   Tabler itsTabler;
   
-  //scure Graphics offGraphics = null;
-  //scure Dimension offDimension;	   
-  //scure Image offImage;	
-
   public TablePanel(Tabler theTabler) {
     super();
     itsTabler = theTabler;
     setBackground(Color.white);
-    values = new int[N_POINTS];
-    oldValues = new int[N_POINTS];
-    //InitOffScreen();
+    values = new int[theTabler.itsData.getSize()];
+    oldValues = new int[theTabler.itsData.getSize()];
     addMouseMotionListener(this);
     addMouseListener(this);
   }
 
-  /*scure void InitOffScreen(){
-    Dimension d = preferredSize();	    
-    if((offGraphics == null)){					  
-      offDimension = d;
-      offImage = createImage(d.width, d.height);
-      offGraphics = offImage.getGraphics();
-    }
-  }*/
-
   public void initValues(int[] vector) {
     if (vector != null && vector.length != 0) {
       values = vector;
-      UpdateOldValues();
-      N_POINTS = vector.length;
+      N_POINTS = itsTabler.itsData.getSize();
+      updateOldValues();
     }
+  }
+
+  public void Close() {
+    setVisible(false);
   }
 
   public int getValue(int i) {
@@ -60,7 +50,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     else return 0;
   }
 
-  public void UpdateOldValues(){
+  void updateOldValues(){
     for(int i=0;i<N_POINTS;i++){
       oldValues[i]=values[i];
     }
@@ -69,31 +59,12 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void update(Graphics g) {
   }
 
-  /*scure   public void recreateOffScreen() {
-    InitOffScreen();
-    for (int i=0; i<N_POINTS; i++) {
-      PaintSingle(i, offGraphics);
-    } 
-  }*/
-
   public void paint(Graphics g) {
     for(int i = 0; i<N_POINTS;i++){
       PaintSingle(i, g);
     }
-    /*scure InitOffScreen();
-      CopyTheOffScreen(g);*/
   }
   
-  /*scure void DoublePaint(int x) {
-    PaintSingle(x, getGraphics());
-    InitOffScreen();
-    PaintSingle(x, offGraphics);
-  }
-
-  public void CopyTheOffScreen(Graphics g) {
-    InitOffScreen();
-    g.drawImage(offImage, 0, 0, this);	
-  }*/
 
   public void fillTable(FtsIntegerVector aIntV) {
     if(aIntV.getSize()!=0) initValues(aIntV.getValues());
@@ -247,12 +218,9 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 	return;
       }
       itsTabler.itsData.changed();
-      //PaintSingle(i, getGraphics());
-      //scure DoublePaint(i);
-      //oldValues[i]=values[i];
     }
     paint(getGraphics());
-    UpdateOldValues();
+    updateOldValues();
   }
 
   public Dimension preferredSize() {
