@@ -103,27 +103,6 @@ getlist_mat_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-getlist_mat_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  getlist_t *this = (getlist_t *)o;
-  mat_t *mat = this->ref.mat;
-  int m = mat_get_m(mat);
-  int n = mat_get_n(mat);
-  int i;
-  int j = fts_get_int(at);
-  
-  if(j >= 0 && j < n)
-    {
-      getlist_resize_buffer(this, n);
-
-      for(i=0; i<m; i++)
-	this->list[i] = mat_get_element(mat, i, j);
-      
-      fts_outlet_send(o, 0, fts_s_list, m, this->list);
-    }
-}
-
-static void
 getlist_mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
@@ -143,28 +122,16 @@ getlist_mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_status_t
 getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(getlist_t), 2, 1, 0); 
 
   if(ac == 2 && mat_atom_is(at + 1))
     {
-      /* define the system methods */
-      a[0] = fts_s_symbol;
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getlist_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getlist_delete);
       
-      /* user methods */
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_s_int, getlist_mat_row, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("row"), getlist_mat_row, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("col"), getlist_mat_col, 1, a);
-
+      fts_method_define_varargs(cl, 0, fts_s_int, getlist_mat_row);
       fts_method_define_varargs(cl, 1, mat_type, getlist_mat_set);
 
-      /* type the outlet */
       fts_outlet_type_define_varargs(cl, 0, fts_s_list);
   
       return fts_Success;

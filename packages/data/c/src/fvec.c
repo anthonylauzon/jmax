@@ -907,9 +907,9 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), fvec_reverse);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), fvec_sort);
   fts_method_define_varargs(cl, 0, fts_new_symbol("scrumble"), fvec_scrumble);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
   

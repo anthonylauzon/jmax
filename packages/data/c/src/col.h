@@ -24,46 +24,39 @@
  *
  */
 
+#ifndef _DATA_COL_H_
+#define _DATA_COL_H_
+
 #include <fts/fts.h>
 
-extern void value_config(void);
+extern fts_type_t col_type;
+extern fts_symbol_t col_symbol;
+extern fts_class_t *col_class;
 
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void fmat_config(void);
-extern void vec_config(void);
-extern void mat_config(void);
-
-extern void getval_config(void);
-extern void getsize_config(void);
-extern void getrange_config(void);
-extern void getlist_config(void);
-
-extern void fill_config(void);
-extern void copy_config(void);
-
-extern void bpf_config(void);
-
-static void
-data_init(void)
+typedef struct
 {
-  value_config();
+  fts_object_t head;
+  mat_t *mat; /* matrix */
+  int j; /* column index */
+} col_t;
 
-  ivec_config();
-  fvec_config();
-  fmat_config();
-  vec_config();
-  mat_config();
+#define col_get_size(x) ((x)->n)
 
-  getval_config();  
-  getsize_config();  
-  getrange_config();  
-  getlist_config();  
+extern void col_set_element(col_t *col, int i, fts_atom_t atom);
+#define col_get_element(x, i) ((x)->mat->data[(i) * (x)->mat->n + (x)->(j)])
 
-  fill_config();
-  copy_config();
+#define col_check(x) ((x)->j < (x)->mat->n)
+#define col_get_onset(x) 
+#define col_get_step(x) 
 
-  bpf_config();
-}
+extern void col_void(col_t *col);
+extern void col_set_const(col_t *col, fts_atom_t atom);
 
-fts_module_t data_module = {"data", "data structures", data_init, 0, 0};
+extern void col_set_from_list(col_t *col, int ac, const fts_atom_t *at);
+
+/* col atoms */
+#define col_atom_set(ap, x) fts_set_object_with_type((ap), (x), col_type)
+#define col_atom_get(ap) ((col_t *)fts_get_object(ap))
+#define col_atom_is(ap) (fts_is_a((ap), col_type))
+
+#endif

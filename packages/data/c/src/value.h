@@ -20,50 +20,31 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
 
+#ifndef _DATA_VALUE_H_
+#define _DATA_VALUE_H_
+
 #include <fts/fts.h>
 
-extern void value_config(void);
-
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void fmat_config(void);
-extern void vec_config(void);
-extern void mat_config(void);
-
-extern void getval_config(void);
-extern void getsize_config(void);
-extern void getrange_config(void);
-extern void getlist_config(void);
-
-extern void fill_config(void);
-extern void copy_config(void);
-
-extern void bpf_config(void);
-
-static void
-data_init(void)
+typedef struct _value_
 {
-  value_config();
+  fts_object_t o;
+  fts_atom_t a;		
+} value_t;
 
-  ivec_config();
-  fvec_config();
-  fmat_config();
-  vec_config();
-  mat_config();
+extern fts_class_t *value_class;
+extern fts_symbol_t value_symbol;
+extern fts_type_t value_type;
 
-  getval_config();  
-  getsize_config();  
-  getrange_config();  
-  getlist_config();  
+extern void value_set(value_t *value, fts_atom_t a);
+#define value_get(v) ((v)->a)
 
-  fill_config();
-  copy_config();
+/* value atoms */
+#define value_atom_set(ap, x) fts_set_object_with_type((ap), (x), value_type)
+#define value_atom_get(ap) ((value_t *)fts_get_object(ap))
+#define value_atom_is(ap) (fts_is_a((ap), value_type))
 
-  bpf_config();
-}
-
-fts_module_t data_module = {"data", "data structures", data_init, 0, 0};
+#endif

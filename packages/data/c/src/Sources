@@ -25,14 +25,13 @@
 
 SOURCES = \
 data.c \
-val.c \
-ref.c \
+value.c \
 ivec.c \
 fvec.c \
 fmat.c \
 vec.c \
 mat.c \
-getelem.c \
+getval.c \
 getsize.c \
 getrange.c \
 getlist.c \

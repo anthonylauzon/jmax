@@ -1102,66 +1102,60 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_free(this->values);
 }
 
-static int
-ivec_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || (ac > 1));
-}
-
 static fts_status_t
 ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ivec_check(ac - 1, at + 1))
-    {
-      fts_class_init(cl, sizeof(ivec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(ivec_t), 1, 1, 0);
   
-      /* init / delete */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ivec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
+  /* init / delete */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ivec_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_save_bmax); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_save_bmax); 
 
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
-      fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_keep);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), ivec_reverse);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), ivec_rotate);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), ivec_sort);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("scrumble"), ivec_scrumble);
 
-      fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_keep);
 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), ivec_clear);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), ivec_fill);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), ivec_set);
+  fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), ivec_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), ivec_fill);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), ivec_set);
       
-      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), ivec_size);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("size"), ivec_size);
 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
 
-      fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
+  fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
 
       /* graphical editor */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("end_edit"), ivec_end_edit);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("end_edit"), ivec_end_edit);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("copy_from_client"), ivec_copy_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("paste_from_client"), ivec_paste_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("cut_from_client"), ivec_cut_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
 
-      /* type outlet */
-      fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_type);      
+  /* type outlet */
+  fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_type);      
 
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  return fts_Success;
 }
 
 /********************************************************************
@@ -1169,12 +1163,6 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *  config
  *
  */
-
-static int
-ivec_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return ivec_check(ac1 - 1, at1 + 1);
-}
 
 void 
 ivec_config(void)
@@ -1205,7 +1193,7 @@ ivec_config(void)
   sym_set_size = fts_new_symbol("setSize");
   sym_set_visible_size = fts_new_symbol("setVisibleSize");
 
-  fts_metaclass_install(ivec_symbol, ivec_instantiate, ivec_equiv);
+  fts_class_install(ivec_symbol, ivec_instantiate);
   ivec_class = fts_class_get_by_name(ivec_symbol);
 
   fts_atom_type_register(ivec_symbol, ivec_class);
