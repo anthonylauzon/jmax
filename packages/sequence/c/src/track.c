@@ -1102,7 +1102,7 @@ _track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     if(too_much_pitch == 0)
     {
       /* remove events */
-      for(i = 1; i<ac ; i++)
+      for(i = 0/*1*/; i<ac ; i++)
         track_remove_event(self, (event_t *)fts_get_object(at+i));
       
       /* remove events at client */
