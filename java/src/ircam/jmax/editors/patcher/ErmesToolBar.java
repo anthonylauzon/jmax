@@ -138,8 +138,10 @@ public class ErmesToolBar extends JPanel  {
 
   public void reset()
   {
-    selectedButton.reset();
-    selectedButton = null;
+    if(selectedButton!=null){
+      selectedButton.reset();
+      selectedButton = null;
+    }
     noneButton.setSelected(true);
   }
 
