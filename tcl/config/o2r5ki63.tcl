@@ -1,7 +1,8 @@
 set jmaxArch irix63r5k
 
 defineDevice analogIn   { SgiALIn ALdevice AnalogIn channels 2 }  "Builtin Analog In"
-defineDevice analogOut  { SgiALIn ALdevice AnalogOut channels 2 } "Builtin Analog Out"
+defineDevice analogOut  { SgiALOut ALdevice AnalogOut channels 2 } "Builtin Analog Out"
+defineDevice analogOut2  { SgiALOut ALdevice AnalogOut2 channels 2 } "Builtin Analog Out 2"
 
 defineDevice stereoIn  { SgiALIn ALdevice RAD1.AESIn channels 2 } "Stereo AES card 1"
 defineDevice stereoIn0 { SgiALIn ALdevice RAD1.AESIn channels 2 } "Stereo AES card 1"
