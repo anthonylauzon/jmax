@@ -60,6 +60,19 @@
 
 extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
 
+/* 
+   (François Déchelle, dechelle@ircam.fr)
+   On LinuxPPC, the natural endianism of the machine is big endian,
+   but the audio driver only supports little endian (!).
+   So samples, once converted from float to short, must be swapped.
+   Hence the following macro...
+*/
+   
+#define SWAP_SHORT(S,C) \
+( C = ((unsigned char *)&S)[0], \
+  ((unsigned char *)&S)[0] = ((unsigned char *)&S)[1], \
+  ((unsigned char *)&S)[1] = C )
+
 /******************************************************************************/
 /*                                                                            */
 /* Audio descriptor: keeps file descriptor and parameters                     */
@@ -149,6 +162,7 @@ static void audio_desc_free( audio_desc_t *aud)
 static int audio_desc_set_parameters( audio_desc_t *aud)
 {
   int format, sampling_rate, fragparam, fragment_size, max_fragments, nchannels, i;
+  count_info count;
 
   /* Set fragment size */
   /* HACK !!! Vector size is not known when this function is called */
@@ -166,6 +180,12 @@ static int audio_desc_set_parameters( audio_desc_t *aud)
     {
       post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT): %s\n", strerror( errno));
       return -1;
+    }
+
+  if (ioctl( aud->fd, SNDCTL_DSP_GETOPTR, &count) < 0)
+    {
+      post( "Warning: this device does not support SNDCTL_DSP_GETOPTR\n");
+      post( "         Synchronisation errors (\"dac slip\") will not be reported\n");
     }
 
 #ifdef OSSDEV_DEBUG
@@ -473,7 +493,9 @@ static int oss_dac_get_nerrors(fts_dev_t *dev)
   
   if (ioctl( aud->fd, SNDCTL_DSP_GETOPTR, &count) < 0)
     {
-      post("Error in ioctl(SNDCTL_DSP_GETOPTR)\n");
+      /* 
+       * Here, we don't post a message because this code can be called quite often.
+       */
       return 0;
     }
 
@@ -491,6 +513,7 @@ static int oss_dac_get_nerrors(fts_dev_t *dev)
 /* 
    Arguments: fts_dev_t *dev, int nchans, int n, float *buf1 ... bufm 
 */
+
 static void oss_dac_put(fts_word_t *argv)
 {
   int n, i, nchannels, channel, j;
@@ -516,8 +539,18 @@ static void oss_dac_put(fts_word_t *argv)
       j = 0;
       for ( i = 0; i < n; i++)
 	{
-	  aud->dac_fmtbuf[j++] = (short) ( 32767.0f * in0[i]);
-	  aud->dac_fmtbuf[j++] = (short) ( 32767.0f * in1[i]);
+	  short s0 = (short) ( 32767.0f * in0[i]);
+	  short s1 = (short) ( 32767.0f * in1[i]);
+#ifdef FTS_HAS_BIG_ENDIAN
+	  {
+	    unsigned char c;
+
+	    SWAP_SHORT( s0, c);
+	    SWAP_SHORT( s1, c);
+	  }
+#endif
+	  aud->dac_fmtbuf[j++] = s0;
+	  aud->dac_fmtbuf[j++] = s1;
 	}
     }
   else
@@ -531,7 +564,17 @@ static void oss_dac_put(fts_word_t *argv)
 	  j = channel;
 	  for ( i = 0; i < n; i++)
 	    {
-	      aud->dac_fmtbuf[j] = (short) ( 32767.0f * in[i]);
+	      short s0 = (short) ( 32767.0f * in[i]);
+
+#ifdef FTS_HAS_BIG_ENDIAN
+	      {
+		unsigned char c;
+
+		SWAP_SHORT( s0, c);
+	      }
+#endif
+
+	      aud->dac_fmtbuf[j] = s0;
 	      j += nchannels;
 	    }
 	}
@@ -649,8 +692,20 @@ static void oss_adc_get( fts_word_t *argv)
       j = 0;
       for ( i = 0; i < n; i++)
 	{
-	  out0[i] = (float)aud->adc_fmtbuf[j++] / 32767.0f;
-	  out1[i] = (float)aud->adc_fmtbuf[j++] / 32767.0f;
+	  short s0 = aud->adc_fmtbuf[j++];
+	  short s1 = aud->adc_fmtbuf[j++];
+
+#ifdef FTS_HAS_BIG_ENDIAN
+	  {
+	    unsigned char c;
+
+	    SWAP_SHORT( s0, c);
+	    SWAP_SHORT( s1, c);
+	  }
+#endif
+
+	  out0[i] = (float)s0 / 32767.0f;
+	  out1[i] = (float)s1 / 32767.0f;
 	}
     }
   else
@@ -664,7 +719,18 @@ static void oss_adc_get( fts_word_t *argv)
 	  j = channel;
 	  for ( i = 0; i < n; i++)
 	    {
-	      out[i] = (float)aud->adc_fmtbuf[j] / 32767.0f;
+	      short s0 = aud->adc_fmtbuf[j++];
+
+#ifdef FTS_HAS_BIG_ENDIAN
+	      {
+		unsigned char c;
+
+		SWAP_SHORT( s0, c);
+	  }
+#endif
+
+	      out[i] = (float)s0 / 32767.0f;
+
 	      j += nchannels;
 	    }
 	}
