@@ -58,28 +58,28 @@ class VResizeInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
-	object.redraw();
-	object.redrawConnections();
-	object.setHeight(mouse.y - object.getY());
-	object.redraw();
-	object.redrawConnections();
-
-	if (ErmesSelection.patcherSelection.ownedBy(editor))
-	  {
-	    dy = mouse.y - oldMouse.y;
-	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	      public void processObject(GraphicObject obj)
-		{
-		  if(obj!=object){
+	if(!object.isSelected()){
+	  object.redraw();
+	  object.redrawConnections();
+	  object.setHeight(mouse.y - object.getY());
+	  object.redraw();
+	  object.redrawConnections();
+	}
+	else{
+	  if (ErmesSelection.patcherSelection.ownedBy(editor))
+	    {
+	      dy = mouse.y - oldMouse.y;	
+	      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+		public void processObject(GraphicObject obj)
+		  {
 		    obj.redraw();
 		    obj.redrawConnections();
-		    obj.setHeight(object.getHeight() + dy);
+		    obj.setHeight(obj.getHeight() + dy);
 		    obj.redraw();
 		    obj.redrawConnections();
-		  }
-		}});
-	  }
-
+		  }});
+	    }
+	}
 	editor.fixSize(); 
       }
     else if (Squeack.isUp(squeack))

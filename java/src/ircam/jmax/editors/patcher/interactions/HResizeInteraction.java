@@ -57,28 +57,28 @@ class HResizeInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
-	//resize only the targert object (we do resize also all selected objects?)
-	object.redraw();
-	object.redrawConnections();
-	object.setWidth(mouse.x - object.getX());
-	object.redraw();
-	object.redrawConnections();
-
-	if (ErmesSelection.patcherSelection.ownedBy(editor))
-	  {
-	    dx = mouse.x - oldMouse.x;
-	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	      public void processObject(GraphicObject obj)
-		{
-		  if(obj!=object){
+	if(!object.isSelected()){
+	  object.redraw();
+	  object.redrawConnections();
+	  object.setWidth(mouse.x - object.getX());
+	  object.redraw();
+	  object.redrawConnections();
+	}
+	else{
+	  if (ErmesSelection.patcherSelection.ownedBy(editor))
+	    {
+	      dx = mouse.x - oldMouse.x;
+	      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+		public void processObject(GraphicObject obj)
+		  {
 		    obj.redraw();
 		    obj.redrawConnections();
-		    obj.setWidth(object.getWidth() + dx);
+		    obj.setWidth(obj.getWidth() + dx);
 		    obj.redraw();
 		    obj.redrawConnections();
-		  }
-		}});
-	  }
+		  }});
+	    }
+	}
 	editor.fixSize();
       }
     else if (Squeack.isUp(squeack))
