@@ -1811,12 +1811,6 @@
 			path = ../../packages/numeric/help/count.help.jmax;
 			refType = 2;
 		};
-		F5FB89D1035E0D1A016640F1 = {
-			isa = PBXFileReference;
-			name = exscale.help.jmax;
-			path = ../../packages/numeric/help/exscale.help.jmax;
-			refType = 2;
-		};
 		F5FB89D2035E0D1A016640F1 = {
 			isa = PBXFileReference;
 			name = fit.help.jmax;
@@ -1827,12 +1821,6 @@
 			isa = PBXFileReference;
 			name = for.help.jmax;
 			path = ../../packages/numeric/help/for.help.jmax;
-			refType = 2;
-		};
-		F5FB89D4035E0D1A016640F1 = {
-			isa = PBXFileReference;
-			name = logscale.help.jmax;
-			path = ../../packages/numeric/help/logscale.help.jmax;
 			refType = 2;
 		};
 		F5FB89D5035E0D1A016640F1 = {
@@ -1853,12 +1841,6 @@
 			settings = {
 			};
 		};
-		F5FB89DF035E0D2B016640F1 = {
-			fileRef = F5FB89D1035E0D1A016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F5FB89E0035E0D2B016640F1 = {
 			fileRef = F5FB89D2035E0D1A016640F1;
 			isa = PBXBuildFile;
@@ -1867,12 +1849,6 @@
 		};
 		F5FB89E1035E0D2B016640F1 = {
 			fileRef = F5FB89D3035E0D1A016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5FB89E2035E0D2B016640F1 = {
-			fileRef = F5FB89D4035E0D1A016640F1;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -2421,6 +2397,18 @@
 		};
 		F75BA0A6040AAC8001664058 = {
 			fileRef = F75BA0A4040AAC4F01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F76E4C2D043C720901664058 = {
+			isa = PBXFileReference;
+			name = scale.help.jmax;
+			path = ../../packages/numeric/help/scale.help.jmax;
+			refType = 2;
+		};
+		F76E4C2F043C724D01664058 = {
+			fileRef = F76E4C2D043C720901664058;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -8520,12 +8508,11 @@
 				F8EE4B77031CE72A01664092,
 				F8EE4B78031CE72A01664092,
 				F5FB89D0035E0D1A016640F1,
-				F5FB89D1035E0D1A016640F1,
 				F5FB89D2035E0D1A016640F1,
 				F5FB89D3035E0D1A016640F1,
-				F5FB89D4035E0D1A016640F1,
 				F5FB89D5035E0D1A016640F1,
 				F5FB89D6035E0D1A016640F1,
+				F76E4C2D043C720901664058,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -8697,10 +8684,8 @@
 			files = (
 				F8512364028BE68701664092,
 				F5FB89DE035E0D2B016640F1,
-				F5FB89DF035E0D2B016640F1,
 				F5FB89E0035E0D2B016640F1,
 				F5FB89E1035E0D2B016640F1,
-				F5FB89E2035E0D2B016640F1,
 				F5FB89E3035E0D2B016640F1,
 				F5FB89E4035E0D2B016640F1,
 				F8512365028BE68701664092,
@@ -8709,6 +8694,7 @@
 				F8EE4B7E031CE75001664092,
 				F8EE4B7F031CE75301664092,
 				F8EE4B80031CE75501664092,
+				F76E4C2F043C724D01664058,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
