@@ -26,14 +26,18 @@
 
 using namespace ircam::fts::client;
 
+
 class ConsoleStreamHandler: public FtsMessageHandler
 {
 public:
     virtual void invoke(FtsObject *obj, const FtsArgs& args)
 	{
-	    std::cerr << " Console Stream Handler Invoke called !!! " << std::endl;
-	}
+	    std::cout << " Console Stream : " 
+		      << args.getString(0) 
+		      << std::endl;
+	}    
 };
+
 
 
 main( int ac, char **av)
@@ -60,9 +64,12 @@ main( int ac, char **av)
   console_stream->send("set_default");
   int c;
   cin >> c;
- 
+
+  delete handler;
+  delete console_stream;
   delete rootPatcher;
   delete connection;
+
 
   std::exit( 0);
 }

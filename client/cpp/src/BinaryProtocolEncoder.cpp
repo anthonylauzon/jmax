@@ -23,14 +23,20 @@
 
 #include "BinaryProtocolEncoder.h"
 
-namespace ircam {
-namespace fts {
+namespace ircam {  
+namespace fts {    
 namespace client {
 
   BinaryProtocolEncoder::BinaryProtocolEncoder()
   {
     _outputBuffer = new Buffer();
     _symbolCache = new SymbolCache();
+  }
+  
+  BinaryProtocolEncoder::~BinaryProtocolEncoder()
+  {
+    delete _symbolCache;
+    delete _outputBuffer;
   }
 
   void BinaryProtocolEncoder::writeInt( int v) throw( FtsClientException)
@@ -96,20 +102,20 @@ namespace client {
   void BinaryProtocolEncoder::writeArgs( const FtsArgs &v) throw( FtsClientException)
   {
     for ( int i = 0; i < v.getLength(); i++)
-      {
-	if ( v.isInt(i))
-	  writeInt( v.getInt(i));
-	else if ( v.isDouble(i))
-	  writeDouble( v.getDouble(i));
-	else if ( v.isSymbol(i))
-	  writeSymbol( v.getSymbol(i));
-	else if ( v.isString(i))
-	  writeString( v.getString(i));
-	else if ( v.isRawString(i))
-	  writeRawString( v.getString(i));
-	else if ( v.isObject(i))
-	  writeObject( v.getObject(i));
-      }
+    {
+      if ( v.isInt(i))
+	writeInt( v.getInt(i));
+      else if ( v.isDouble(i))
+	writeDouble( v.getDouble(i));
+      else if ( v.isSymbol(i))
+	writeSymbol( v.getSymbol(i));
+      else if ( v.isString(i))
+	writeString( v.getString(i));
+      else if ( v.isRawString(i))
+	writeRawString( v.getString(i));
+      else if ( v.isObject(i))
+	writeObject( v.getObject(i));
+    }
   }
 
   void BinaryProtocolEncoder::endOfMessage() throw( FtsClientException)
@@ -141,10 +147,10 @@ namespace client {
   void BinaryProtocolEncoder::write( const char *v)
   {
     while (*v)
-      {
-	_outputBuffer->append( *v);
-	v++;
-      }
+    {
+      _outputBuffer->append( *v);
+      v++;
+    }
 
     _outputBuffer->append( '\0');
   }

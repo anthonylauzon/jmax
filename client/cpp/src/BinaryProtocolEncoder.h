@@ -32,6 +32,7 @@ namespace client {
   class BinaryProtocolEncoder {
   public:
     BinaryProtocolEncoder();
+    ~BinaryProtocolEncoder();
 
     void writeInt( int v) throw( FtsClientException);
 

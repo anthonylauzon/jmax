@@ -37,27 +37,27 @@ namespace client {
   {
     FtsServerConnection *connection = reinterpret_cast<FtsServerConnection *>(arg);
 
-  try
-    {
-      while(1)
-	{
-	  int n = connection->read( connection->_receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
+    try
+      {
+	while(1)
+	  {
+	    int n = connection->read( connection->_receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
   
-	  if (n < 0)
-	    throw FtsClientException( "Failed to read the input connection");
-	  if (n == 0)
-	    throw FtsClientException( "End of input");
+	    if (n < 0)
+	      throw FtsClientException( "Failed to read the input connection");
+	    if (n == 0)
+	      throw FtsClientException( "End of input");
 
-	  connection->_decoder->decode( connection->_receiveBuffer, n);
-	}
-    }
-  catch( FtsClientException& e)
-    {
+	    connection->_decoder->decode( connection->_receiveBuffer, n);
+	  }
+      }
+    catch( FtsClientException& e)
+      {
 	std::cerr << " Exception message : " << e.getMessage() << std::endl;
-      pthread_exit( 0);
-    }
+	pthread_exit( 0);
+      }
 
-  return 0;
+    return 0;
   }
   
   FtsServerConnection::FtsServerConnection() throw( FtsClientException)
@@ -73,11 +73,11 @@ namespace client {
 
   FtsServerConnection::~FtsServerConnection()
   {
-    delete _encoder;
     delete _objectTable;
+    delete _decoder;
+    delete _encoder;	
     /* Stop thread .... */
-    delete[] _receiveBuffer;
-
+    delete[] _receiveBuffer;	
   }
 
   FtsObject *FtsServerConnection::getObject( int id)
@@ -145,12 +145,12 @@ namespace client {
     _encoder->clear();
   }
 
-    void FtsServerConnection::startThread() throw(FtsClientException)
-    {
-	if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
-	    throw FtsClientException( "Cannot start receive thread", errno);
+  void FtsServerConnection::startThread() throw(FtsClientException)
+  {
+    if ( pthread_create( &_receiveThread, NULL, receiveThread, this))
+      throw FtsClientException( "Cannot start receive thread", errno);
 	
-    }
+  }
 };
 };
 };

@@ -35,6 +35,11 @@ namespace client {
       _current = 0;
     }
 
+    ~Buffer()
+    {
+	delete[] _buffer;
+    }
+
     void clear()
     {
       _current = 0;

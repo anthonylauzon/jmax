@@ -43,6 +43,11 @@ namespace client {
 	_cache[i] = 0;
     }
 
+    ~SymbolCache()
+    {
+	delete[] _cache;
+    }
+
     int index( const char *s)
     {
       return hash(s) % _length;

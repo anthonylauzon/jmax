@@ -35,7 +35,7 @@ namespace client {
     static const int CLIENT_OBJECT_ID;
 
     FtsServerConnection() throw( FtsClientException);
-    ~FtsServerConnection();
+    virtual ~FtsServerConnection();
 
     // FIXME
     int getNewObjectID() { int id = _newObjectID; _newObjectID += 2; return id; }

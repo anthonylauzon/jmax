@@ -307,22 +307,20 @@ namespace client {
       shiftAction( input);
       break;
     case qSymbolCache4:
-      if ( input == 0)
+	bufferShiftAction(input);
+	if ( input == 0)
 	{
-	  _currentState = qInitial;
-	  endSymbolCacheAction( input);
+	    _currentState = qInitial;
+	    endSymbolCacheAction( input);
 	}
-      else
-	bufferShiftAction( input);
       break;
     case qString:
-      if ( input == 0)
-	{
-	  _currentState = qInitial;
-	  endStringAction( input);
-	}
-      else
 	bufferShiftAction( input);
+	if ( input == 0)
+	{
+	    _currentState = qInitial;
+	    endStringAction( input);
+	}
       break;
     case qObject0:
       _currentState = qObject1;

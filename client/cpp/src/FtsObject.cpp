@@ -58,6 +58,7 @@ namespace client {
 
   FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, const char* ftsClassName) throw(FtsClientException)
   {
+    _selectorCache = 0;
     _serverConnection = serverConnection;
     _parent = parent;
     _id = serverConnection->getNewObjectID();
@@ -70,11 +71,11 @@ namespace client {
     _serverConnection->writeInt(_id);
     _serverConnection->writeSymbol(ftsClassName);
     _serverConnection->endOfMessage();
-
   }
 
   FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, const char* ftsClassName, FtsArgs* args) throw(FtsClientException)
   {
+    _selectorCache = 0;
     _serverConnection = serverConnection;
     _parent = parent;
 	
@@ -88,10 +89,12 @@ namespace client {
     _serverConnection->writeSymbol(ftsClassName);
     _serverConnection->writeArgs(*args);
     _serverConnection->endOfMessage();
+
   }
 
   FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, int id)
   {
+    _selectorCache = 0;
     _serverConnection = serverConnection;
     _parent = parent;
 	

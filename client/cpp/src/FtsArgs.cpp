@@ -38,6 +38,11 @@ namespace client {
     _current = 0;
   }
 
+  FtsArgs::~FtsArgs()
+  {
+      delete[] _array;
+  }
+
   void FtsArgs::ensureCapacity( int wanted)
   {
     if ( _current + wanted < _size)

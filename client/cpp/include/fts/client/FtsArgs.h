@@ -30,6 +30,7 @@ namespace client {
   class FTSCLIENT_API FtsArgs {
   public:
     FtsArgs();
+    ~FtsArgs();
 
     void addInt( int value)
     {
