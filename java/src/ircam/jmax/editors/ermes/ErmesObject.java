@@ -336,44 +336,8 @@ abstract class ErmesObject implements ErmesDrawable {
     return itsSketchPad;
   }
 
+
   private int findNearestInOutlet( int mouseX, int n)
-  {
-    // (em) consider the sensibility areas as centered in the
-    // inoutlet's graphic appereance,  slice = distance/3, hole = slice, sensibility_width = 2*slice 
-    if ( n ==0) return -1;
-    if ( n == 1) return 0;
-
-    int io = -1;
-
-    int firstLetPosition =  ErmesObjInOutlet.PAD;
-    int distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1); 
-    int lastLetPosition = firstLetPosition + (n-1)*distance;
-    
-
-    int slice = distance / 3;
-
-    int x = mouseX-getX();
-
-    if ( x < firstLetPosition + slice)
-      io = 0;
-    else if ( x > lastLetPosition - slice)
-      io = n-1;
-    else 
-      {
-	int estimatedLet = (distance > 0)? x/distance : 0; 
-	int sensibilityStartX = firstLetPosition+estimatedLet*distance-slice+ErmesObjInOutlet.VISIBLE_WIDTH/2;
-	
-	if (x > sensibilityStartX &&
-	    x < sensibilityStartX + 2*slice)
-	  io = estimatedLet;
-
-      }
-
-    return io;
-  }
-
-
-  private int findNearestInOutlet_old( int mouseX, int n)
   {
     if ( n == 0)
       return -1;
