@@ -87,6 +87,26 @@ To find what is an isolated processor and how to isolate a processor, check the
 is both isolated and non-preemptive. Isolating a processor requires a
 multi-processor system (Origin or Octane with 2 processors at least).
 
+<h4>Reimplementation of the direct-to-disk objects (readsf~)</h4>
+
+<p>
+Because of problems on SGI platform related to bad interaction between threads
+and isolated processor, the readsf~ has been reimplemented using a separate
+server process for reading the sound files. 
+
+<p>
+The <code>readsf~</code> object now has an extra outlet that bangs when the
+sound file is finished, allowing to play a file in loop or build a play list.
+
+<p>
+The readsf~ has a slightly different behaviour as before: the <code>open</code>
+message and the <code>play</code> message can be send in the same tick without
+causing clicks and error messages. The <code>readsf~</code> object will start
+playing the file as soon as the server process has opened the file and preloaded
+the first blocks. This gives usually a delay that is below 20 milliseconds.
+To get really a precise start time, a delay can be inserted between sending
+the <code>open</code> message and the <code>play</code> message.
+
 <!------------------------------------------------------------------------------->
 <br>
 <hr>

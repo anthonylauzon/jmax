@@ -98,7 +98,9 @@ void fts_sched_remove_fd( fts_sched_t *sched, int fd)
 {
   fd_callback_t **p;
 
-  for ( p = &sched->fd_callback_head; *p; p = &(*p)->next )
+  p = &sched->fd_callback_head;
+
+  while (*p)
     {
       if ( (*p)->fd == fd)
 	{
@@ -109,6 +111,8 @@ void fts_sched_remove_fd( fts_sched_t *sched, int fd)
 
 	  fts_free( to_remove);
 	}
+      else
+	p = &(*p)->next;
     }
 }
 

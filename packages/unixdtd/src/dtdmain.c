@@ -273,12 +273,18 @@ static void dtd_main_loop( void)
 
 int main( int argc, char **argv)
 {
+  int sched_policy;
   struct sched_param sp;
 
-  sp.sched_priority = sched_get_priority_min(SCHED_OTHER);
-  if ( sched_setscheduler( 0, SCHED_OTHER, &sp) < 0)
+  sched_policy = sched_getscheduler(0);
+
+  if (sched_policy != SCHED_OTHER)
     {
-      fprintf( stderr, "[dtdserver] cannot give up real-time priority (%s)\n", strerror( errno));
+      sp.sched_priority = sched_get_priority_min(SCHED_OTHER);
+      if ( sched_setscheduler( 0, SCHED_OTHER, &sp) < 0)
+	{
+	  fprintf( stderr, "[dtdserver] cannot give up real-time priority (%s)\n", strerror( errno));
+	}
     }
 
   dtd_init();
