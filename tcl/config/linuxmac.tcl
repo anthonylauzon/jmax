@@ -38,7 +38,7 @@ defineDevice midi { oss_midi } "OSS MIDI"
 
 when platformStart {
     package require ossdev
-#    package require pdtddev
+    package require pdtddev
 }
 
 when defaultStart {
