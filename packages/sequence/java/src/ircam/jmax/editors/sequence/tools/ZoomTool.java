@@ -58,15 +58,12 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
     return itsMouseTracker;
   }
 
-
   /**
    * called when this tool is "unmounted"
    */
   public void deactivate() 
   {
-  }
-
-  
+  }  
   /**
    * DynamicDragListener interface
    */

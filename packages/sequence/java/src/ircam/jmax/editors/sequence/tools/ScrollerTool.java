@@ -49,7 +49,6 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
     itsMouseTracker = new MouseDragTracker(this);
   }
 
-
   /**
    * the default interaction module for this tool
    */
@@ -66,7 +65,6 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
   {
   }
 
-  
   /**
    * DynamicDragListener interface
    */

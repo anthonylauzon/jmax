@@ -43,7 +43,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
   /** constructor */
   public ScrollZoomTool(ImageIcon theImageIcon) 
   {
-    super("scroll&zoom tool", theImageIcon);
+    super("zoom&scroll tool", theImageIcon);
 
     itsDirectionChooser = new DirectionChooser(this);
     itsMouseTracker = new MouseDragTracker(this);
@@ -77,7 +77,6 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
     public void dragStart(int x, int y, MouseEvent e)
     {
 	mountIModule(itsDirectionChooser, x, y);
-	//isZoom = e.isShiftDown(); 
 	tempX = x;
 	tempY = y;
     }
@@ -88,12 +87,12 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
 	Geometry geometry = bgc.getAdapter().getGeometry();
 
 	if(e.isShiftDown())
-	    geometry.incrXZoom(deltaX);
-	else
 	    {
 		int transp = geometry.getXTransposition()+bgc.getAdapter().getInvWidth(deltaX);
-		bgc.getScrollManager().scrollToValue(-transp);
+		bgc.getScrollManager().scrollToValue(-transp);	    
 	    }
+	else
+	    geometry.incrXZoom(deltaX);
     }
     public void dragEnd(int x, int y){}
     public void updateStartingPoint(int deltaX, int deltaY){}
@@ -114,7 +113,6 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
   //-------------- Fields
   MouseDragTracker itsMouseTracker;
   DirectionChooser itsDirectionChooser;
-    //boolean isZoom = false;
   int tempX = 0;
   int tempY = 0;
   int direction;
