@@ -132,7 +132,7 @@ cvs-tag: spec-files
 		exit 1 ; \
 	fi
 	( \
-		TTT=V`cut -f1 -d\ VERSION | sed 's/\./_/g'` ; \
+		TTT=V`cut -f1 -d\  VERSION | sed 's/\./_/g'` ; \
 		echo "Tagging with tag $$TTT" ; \
 		cvs tag -F $$TTT ; \
 	)
@@ -154,8 +154,8 @@ spec-files:
 dist:
 	( \
 		umask 22 ; \
-		VVV=`cut -f1 -d\ VERSION` ; \
-		TTT=V`cut -f1 -d\ VERSION | sed 's/\./_/g'` ; \
+		VVV=`cut -f1 -d\  VERSION` ; \
+		TTT=V`cut -f1 -d\  VERSION | sed 's/\./_/g'` ; \
 		mkdir .$$$$ ; \
 		cd .$$$$ ; \
 		cvs export -r$$TTT jmax ; \
