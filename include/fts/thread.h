@@ -90,8 +90,8 @@ FTS_API int fts_thread_manager_start(void);
 #ifdef WIN32
 FTS_API int thread_manager_start(thread_manager_t* self);
 FTS_API int thread_manager_cancel_thread(fts_thread_worker_t* thread_worker);
-void* WINAPI thread_manager_run_thread(void* arg);
-void* WINAPI thread_manager_main(void* arg);
+unsigned long WINAPI thread_manager_run_thread(void* arg);
+unsigned long WINAPI thread_manager_main(void* arg);
 #else
 FTS_API int thread_manager_start(thread_manager_t* self);
 FTS_API int thread_manager_cancel_thread(fts_thread_worker_t* thread_worker);
