@@ -185,7 +185,7 @@ rpm: $(distfile)
 	umask 22
 	cp -fv $(distfile) /usr/src/redhat/SOURCES
 	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
-	(cd /usr/src/redhat/SPECS ; rpm -ba jmax.spec)
+	(cd /usr/src/redhat/SPECS ; rpm -ba --target i686 jmax.spec)
 
 #
 # install
