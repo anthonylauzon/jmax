@@ -23,13 +23,13 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 ROOTDIR = ../..
-include $(ROOTDIR)/Makefiles/Makefile.common
+include $(ROOTDIR)/Makefiles/Makefile.fts
 
-all:
-	(cd $(PLATFORM); $(MAKE) $@)
-.PHONY: all
+lib-recursive:
+	(cd $(PLATFORM); $(MAKE) lib)
+.PHONY: lib-recursive
 
-clean:
-	(cd $(PLATFORM); $(MAKE) $@)
-.PHONY: all
+cleanobjs-recursive:
+	(cd $(PLATFORM); $(MAKE) cleanobjs)
+.PHONY: cleanobjs-recursive
 

@@ -22,23 +22,23 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-all:
-	(cd mess; $(MAKE) $@)
-	(cd utils; $(MAKE) $@)
-	(cd datalib; $(MAKE) $@)
-	(cd ftl; $(MAKE) $@)
-	(cd dsp; $(MAKE) $@)
-	(cd veclib; $(MAKE) $@)
-.PHONY: all
+lib-recursive:
+	(cd mess; $(MAKE) lib)
+	(cd utils; $(MAKE) lib)
+	(cd datalib; $(MAKE) lib)
+	(cd ftl; $(MAKE) lib)
+	(cd dsp; $(MAKE) lib)
+	(cd veclib; $(MAKE) lib-recursive)
+.PHONY: lib-recursive
 
-cleanobjs:
-	(cd mess; $(MAKE) $@)
-	(cd utils; $(MAKE) $@)
-	(cd datalib; $(MAKE) $@)
-	(cd ftl; $(MAKE) $@)
-	(cd dsp; $(MAKE) $@)
-	(cd veclib; $(MAKE) $@)
-.PHONY: cleanobjs
+cleanobjs-recursive:
+	(cd mess; $(MAKE) cleanobjs)
+	(cd utils; $(MAKE) cleanobjs)
+	(cd datalib; $(MAKE) cleanobjs)
+	(cd ftl; $(MAKE) cleanobjs)
+	(cd dsp; $(MAKE) cleanobjs)
+	(cd veclib; $(MAKE) cleanobjs-recursive)
+.PHONY: cleanobjs-recursive
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang

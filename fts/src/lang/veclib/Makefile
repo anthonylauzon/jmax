@@ -26,17 +26,13 @@
 ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.fts
 
-all: portable
+lib-recursive: lib
+	(cd portable; $(MAKE) lib)
+.PHONY:lib-recursive
 
-clean : portable_clean
-
-portable:
-	(cd portable; $(MAKE) all)	
-.PHONY: portable
-
-portable_clean:
-	(cd portable; $(MAKE) clean)	
-.PHONY: portable_clean
+cleanobjs-recursive: cleanobjs
+	(cd portable ; $(MAKE) cleanobjs)
+.PHONY:cleanobjs-recursive
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib

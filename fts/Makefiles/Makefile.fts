@@ -158,6 +158,7 @@ $(BINDIR):
 
 cleanobjs:
 	rm -f $(OBJECTS)
+.PHONY: cleanobjs
 
 clean:
 	rm -f $(OBJECTS)
