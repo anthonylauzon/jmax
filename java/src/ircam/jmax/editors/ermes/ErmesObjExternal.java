@@ -70,9 +70,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	itsFtsObject.watch("outs", this);
 	itsFtsObject.watch("error", this);
 	isError = -1;
-
-	System.err.println("In redefinition, putting isError to -1, but its value is " +
-			   itsFtsObject.get("error"));
       } 
     catch (FtsException e) 
       {
