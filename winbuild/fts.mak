@@ -13,8 +13,8 @@ CFG=fts - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "fts - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "fts - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "fts - Win32 Release" (based on "Win32 (x86) Application")
+!MESSAGE "fts - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -27,10 +27,10 @@ NULL=nul
 
 !IF  "$(CFG)" == "fts - Win32 Release"
 
-OUTDIR=.\Release
+OUTDIR=.\..\bin
 INTDIR=.\Release
 # Begin Custom Macros
-OutDir=.\Release
+OutDir=.\..\bin
 # End Custom Macros
 
 !IF "$(RECURSE)" == "0" 
@@ -55,8 +55,11 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+"$(INTDIR)" :
+    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
+
 CPP=cl.exe
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"$(INTDIR)\fts.pch" /Yu"stdafx.h" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "..\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"$(INTDIR)\fts.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -88,16 +91,18 @@ CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"
    $(CPP_PROJ) $< 
 <<
 
+MTL=midl.exe
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
 RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fts.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"$(OUTDIR)\fts.exe" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"$(OUTDIR)\fts.exe" /libpath:"..\fts\lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
-	"$(OUTDIR)\fts.lib"
+	"..\fts\lib\fts.lib"
 
 "$(OUTDIR)\fts.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -106,16 +111,19 @@ LINK32_OBJS= \
 
 !ELSEIF  "$(CFG)" == "fts - Win32 Debug"
 
-OUTDIR=.\FtsDebug
-INTDIR=.\FtsDebug
+OUTDIR=.\..\bin
+INTDIR=.\Debug
+# Begin Custom Macros
+OutDir=.\..\bin
+# End Custom Macros
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\bin\fts.exe"
+ALL : "$(OUTDIR)\fts.exe"
 
 !ELSE 
 
-ALL : "ftsdll - Win32 Debug" "..\bin\fts.exe"
+ALL : "ftsdll - Win32 Debug" "$(OUTDIR)\fts.exe"
 
 !ENDIF 
 
@@ -127,15 +135,18 @@ CLEAN :
 	-@erase "$(INTDIR)\main.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
+	-@erase "$(OUTDIR)\fts.exe"
+	-@erase "$(OUTDIR)\fts.ilk"
 	-@erase "$(OUTDIR)\fts.pdb"
-	-@erase "..\bin\fts.exe"
-	-@erase "..\bin\fts.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+"$(INTDIR)" :
+    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
+
 CPP=cl.exe
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"$(INTDIR)\fts.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -167,18 +178,20 @@ CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG"
    $(CPP_PROJ) $< 
 <<
 
+MTL=midl.exe
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
 RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\fts.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\bin\fts.exe" /pdbtype:sept 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib /nologo /subsystem:windows /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"$(OUTDIR)\fts.exe" /pdbtype:sept /libpath:"..\fts\lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
-	"..\fts\lib\i686-win32\debug\fts.lib"
+	"..\fts\lib\fts.lib"
 
-"..\bin\fts.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\fts.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -225,7 +238,7 @@ LINK32_OBJS= \
 
 SOURCE=..\fts\main.c
 
-"$(INTDIR)\main.obj" : $(SOURCE) "$(INTDIR)" "$(INTDIR)\fts.pch"
+"$(INTDIR)\main.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

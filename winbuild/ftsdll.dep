@@ -28,20 +28,24 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\package.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\patparser.h"\
 	
@@ -74,15 +78,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -117,15 +124,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -162,15 +172,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -208,15 +221,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -254,63 +270,24 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
 	"..\include\ftsprivate\saver.h"\
-	
-
-..\fts\buffer.c : \
-	"..\include\fts\array.h"\
-	"..\include\fts\atom.h"\
-	"..\include\fts\atomfile.h"\
-	"..\include\fts\audio.h"\
-	"..\include\fts\bytestream.h"\
-	"..\include\fts\class.h"\
-	"..\include\fts\client.h"\
-	"..\include\fts\connection.h"\
-	"..\include\fts\doctor.h"\
-	"..\include\fts\dsp.h"\
-	"..\include\fts\errobj.h"\
-	"..\include\fts\expression.h"\
-	"..\include\fts\file.h"\
-	"..\include\fts\fpe.h"\
-	"..\include\fts\ftl.h"\
-	"..\include\fts\ftlmem.h"\
-	"..\include\fts\fts.h"\
-	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
-	"..\include\fts\iterator.h"\
-	"..\include\fts\mem.h"\
-	"..\include\fts\message.h"\
-	"..\include\fts\midi.h"\
-	"..\include\fts\midifile.h"\
-	"..\include\fts\object.h"\
-	"..\include\fts\objectlist.h"\
-	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
-	"..\include\fts\param.h"\
-	"..\include\fts\patcher.h"\
-	"..\include\fts\post.h"\
-	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
-	"..\include\fts\sched.h"\
-	"..\include\fts\soundfile.h"\
-	"..\include\fts\status.h"\
-	"..\include\fts\symbol.h"\
-	"..\include\fts\variable.h"\
-	"..\include\fts\word.h"\
 	
 
 ..\fts\bytestream.c : \
@@ -341,15 +318,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -384,20 +364,74 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\package.h"\
+	
+
+..\fts\client.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\connection.h"\
 	
 
 ..\fts\clipboard.c : \
@@ -428,21 +462,25 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
 	"..\include\ftsprivate\loader.h"\
 	"..\include\ftsprivate\saver.h"\
 	
@@ -475,15 +513,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -525,15 +566,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -568,15 +612,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -616,15 +663,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -663,15 +713,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -708,15 +761,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -726,7 +782,8 @@
 	"..\include\ftsprivate\symbol.h"\
 	
 
-..\fts\file.c : \
+..\fts\fifo.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -754,15 +811,68 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\fifo.h"\
+	
+
+..\fts\file.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -799,15 +909,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -843,15 +956,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -886,15 +1002,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -929,20 +1048,23 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
-	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\package.h"\
 	"..\include\ftsprivate\platform.h"\
 	
 
@@ -974,15 +1096,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1017,21 +1142,70 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\inout.h"\
 	"..\include\ftsprivate\patcher.h"\
+	
+
+..\fts\list.c : \
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
 	
 
 ..\fts\loader.c : \
@@ -1062,15 +1236,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1108,15 +1285,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1152,15 +1332,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1196,15 +1379,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1239,15 +1425,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1282,15 +1471,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1339,15 +1531,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1382,19 +1577,23 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\oldclient.h"\
 	
 
 ..\fts\objtable.c : \
@@ -1425,15 +1624,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1470,15 +1672,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1486,6 +1691,7 @@
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
 	"..\include\ftsprivate\abstraction.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
 	"..\include\ftsprivate\connection.h"\
 	"..\include\ftsprivate\errobj.h"\
 	"..\include\ftsprivate\loader.h"\
@@ -1495,6 +1701,7 @@
 	"..\include\ftsprivate\oldftsdata.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\patparser.h"\
+	"..\include\ftsprivate\platform.h"\
 	"..\include\ftsprivate\saver.h"\
 	"..\include\ftsprivate\symbol.h"\
 	"..\include\ftsprivate\template.h"\
@@ -1528,15 +1735,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1573,15 +1783,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1591,7 +1804,7 @@
 	"..\include\ftsprivate\oldpatcherdata.h"\
 	
 
-..\fts\OLDucs.c : \
+..\fts\package.c : \
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -1619,22 +1832,33 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
-	"..\include\ftsprivate\oldclient.h"\
-	"..\include\ftsprivate\patparser.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\abstraction.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\loader.h"\
+	"..\include\ftsprivate\package.h"\
 	"..\include\ftsprivate\platform.h"\
+	"..\include\ftsprivate\saver.h"\
+	"..\include\ftsprivate\template.h"\
 	
 
 ..\fts\param.c : \
@@ -1665,15 +1889,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1708,15 +1935,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1726,6 +1956,7 @@
 	"..\include\ftsprivate\errobj.h"\
 	"..\include\ftsprivate\expression.h"\
 	"..\include\ftsprivate\inout.h"\
+	"..\include\ftsprivate\loader.h"\
 	"..\include\ftsprivate\object.h"\
 	"..\include\ftsprivate\oldclient.h"\
 	"..\include\ftsprivate\oldpatcherdata.h"\
@@ -1762,15 +1993,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1808,20 +2042,72 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsprivate\oldclient.h"\
+	
+
+..\fts\project.c : \
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\package.h"\
 	
 
 ..\fts\property.c : \
@@ -1852,15 +2138,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1895,15 +2184,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1913,6 +2205,7 @@
 	"..\include\ftsprivate\bmaxhdr.h"\
 	"..\include\ftsprivate\object.h"\
 	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\saver.h"\
 	"..\include\ftsprivate\selection.h"\
 	"..\include\ftsprivate\template.h"\
 	"..\include\ftsprivate\vm.h"\
@@ -1947,15 +2240,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -1992,15 +2288,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2036,15 +2335,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2081,15 +2383,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2124,15 +2429,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2167,15 +2475,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2183,6 +2494,52 @@
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
 	"..\include\ftsprivate\srconv.h"\
+	
+
+..\fts\stack.c : \
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
 	
 
 ..\fts\symbol.c : \
@@ -2213,15 +2570,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2256,15 +2616,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2274,6 +2637,7 @@
 	"..\include\ftsprivate\errobj.h"\
 	"..\include\ftsprivate\loader.h"\
 	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\package.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\vm.h"\
 	
@@ -2306,15 +2670,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2349,15 +2716,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2395,15 +2765,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
@@ -2442,15 +2815,18 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
-	"..\include\fts\oldclient.h"\
+	"..\include\fts\OLDclient.h"\
+	"..\include\fts\package.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
+	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
+	"..\include\fts\stack.h"\
 	"..\include\fts\status.h"\
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
