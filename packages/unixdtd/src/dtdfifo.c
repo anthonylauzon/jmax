@@ -292,45 +292,6 @@ void dtdfifo_incr_write_serial( dtdfifo_t *fifo)
 
 
 /* ********************************************************************** */
-/* Debug code                                                             */
-/* ********************************************************************** */
-
-#ifdef DEBUG
-static char *dtdfifo_get_printable_state( dtdfifo_t *fifo)
-{
-  if ( fifo->read_used && fifo->write_used)
-    return "rw";
-  else if (fifo->read_used)
-    return "r";
-  else if (fifo->write_used)
-    return "w";
-  else
-    return "x";
-}
-
-void dtdfifo_debug( dtdfifo_t *fifo, const char *msg)
-{
-  int read_index, write_index, read_level, write_level;
-
-  read_index = dtdfifo_get_read_index(fifo);
-  write_index = dtdfifo_get_write_index(fifo);
-  read_level = dtdfifo_get_read_level(fifo);
-  write_level = dtdfifo_get_write_level(fifo);
-
-  fprintf( stderr, "%s fifo 0x%lx 0x%08x [%s] index R 0x%08x W 0x%08x level R 0x%08x W 0x%08x\n", 
-	   msg, 
-	   (unsigned long)fifo, 
-	   fifo->buffer_size,
-	   dtdfifo_get_printable_state( fifo),
-	   read_index, 
-	   write_index,
-	   read_level,
-	   write_level);
-}
-#endif
-
-
-/* ********************************************************************** */
 /* Apply to all registered fifos                                          */
 /* ********************************************************************** */
 
@@ -347,4 +308,31 @@ void dtdfifo_apply( void (*fun)( int id, dtdfifo_t *, void *))
 	(*fun)( id, table[id].fifo, table[id].user_data);
     }
 }
+
+/* ********************************************************************** */
+/* Debug code                                                             */
+/* ********************************************************************** */
+
+#ifdef DEBUG
+
+void dtdfifo_debug( dtdfifo_t *fifo, const char *msg)
+{
+  int read_index, write_index, read_level, write_level;
+
+  read_index = dtdfifo_get_read_index(fifo);
+  write_index = dtdfifo_get_write_index(fifo);
+  read_level = dtdfifo_get_read_level(fifo);
+  write_level = dtdfifo_get_write_level(fifo);
+
+  fprintf( stderr, "%s fifo 0x%lx 0x%08x index R 0x%08x W 0x%08x level R 0x%08x W 0x%08x\n", 
+	   msg, 
+	   (unsigned long)fifo, 
+	   fifo->buffer_size,
+	   read_index, 
+	   write_index,
+	   read_level,
+	   write_level);
+}
+#endif
+
 

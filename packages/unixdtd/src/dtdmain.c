@@ -99,7 +99,7 @@ static int __debug( const char *format, ...)
 typedef struct {
   AFfilehandle file;
   int n_channels;
-} dtd_handle_t;
+} dtdhandle_t;
 
 /* One read block for all */
 /* @@@@ HACK */
@@ -252,7 +252,7 @@ static void dtd_open( const char *line)
   dtdfifo_t *fifo;
   int id, n_channels, i;
   char filename[N], path[N];
-  dtd_handle_t *handle;
+  dtdhandle_t *handle;
 
   sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
@@ -264,7 +264,7 @@ static void dtd_open( const char *line)
       return;
     }
 
-  handle = (dtd_handle_t *)dtdfifo_get_user_data( id);
+  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
   
   file = handle->file;
   handle->n_channels = n_channels;
@@ -297,12 +297,12 @@ static void dtd_close( const char *line)
 {
   int id;
   dtdfifo_t *fifo;
-  dtd_handle_t *handle;
+  dtdhandle_t *handle;
 
   sscanf( line, "%*s%d", &id);
 
   fifo = dtdfifo_get( id);
-  handle = (dtd_handle_t *)dtdfifo_get_user_data( id);
+  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
 
   /*
    * A "close" command is send by FTS when it closes the fifo.
@@ -324,11 +324,17 @@ static void dtd_close( const char *line)
 static void dtd_new( const char *line)
 {
   int id, buffer_size;
-  char dirname[N], filename[N];
+  char dirname[N];
+  dtdhandle_t *handle;
 
-  sscanf( line, "%*s%d%s%s%d", &id, dirname, filename, &buffer_size);
+  sscanf( line, "%*s%d%s%d", &id, dirname, &buffer_size);
 
   dtdfifo_new( id, dirname, buffer_size);
+
+  handle = (dtdhandle_t *)malloc( sizeof( dtdhandle_t));
+  handle->file = AF_NULL_FILEHANDLE;
+
+  dtdfifo_put_user_data( id, handle);
 }
 
 
@@ -338,6 +344,8 @@ static void dtd_delete( const char *line)
 
   sscanf( line, "%*s%d", &id);
 
+  free( dtdfifo_get_user_data( id));
+
   dtdfifo_delete( id);
 }
 
@@ -345,7 +353,7 @@ static void dtd_delete( const char *line)
 /*
  * Commands are:
  * new <id> <dirname> <filename> <buffer_size>
- * open <id> <sound_file_name> <search_path>
+ * open <id> <sound_file_name> <search_path> <n_channels>
  * close <id>
  */
 static void dtd_process_command( const char *line)
@@ -369,9 +377,9 @@ static void dtd_process_command( const char *line)
 static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 {
   AFfilehandle file;
-  dtd_handle_t *handle;
+  dtdhandle_t *handle;
 
-  handle = (dtd_handle_t *)user_data;
+  handle = (dtdhandle_t *)user_data;
 
   if ( handle->file != AF_NULL_FILEHANDLE && !dtdfifo_is_eof( fifo))
     {
