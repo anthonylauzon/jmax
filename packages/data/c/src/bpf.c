@@ -37,7 +37,7 @@ static fts_symbol_t sym_set = 0;
 static fts_symbol_t sym_append = 0;
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;
-static fts_symbol_t sym_setPoint = 0;
+static fts_symbol_t sym_setPoints = 0;
 
 /************************************************************
  *
@@ -194,7 +194,7 @@ bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   set_size(this, size + ac / 2);
   
   /* detect jump value */
-  if(size > 1 && this->points[size - 2].time == last_time)
+  if(size == 1 || this->points[size - 2].time == last_time)
     jump = 1;
 
   for(i=0; i<ac; i+=2)
@@ -241,6 +241,10 @@ bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	}      
     }
   
+  /* remove jump at end */
+  if(index > 1 && jump)
+    index--;
+
   set_size(this, index);
 }
 
@@ -322,42 +326,13 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   int size = this->size;
   int i;
 
-  if(index == 0)
-    index = 1;
-
-  /* check for double value and jump */
-  if(time <= this->points[index - 1].time || (index < size - 1 && time >= this->points[index + 1].time))
-    {
-      time = this->points[index - 1].time;
-      
-      if(value == this->points[index - 1].value || (index < size - 1 && value == this->points[index + 1].value))
-	{
-	  /* don't add double point */
-	  return;
-	}
-      else if(index > 1 && time == this->points[index - 2].time)
-	{
-	  fts_atom_t a[3];
-
-	  /* set previous jump point */
-	  this->points[index - 1].value = value;
-	  
-	  fts_set_int(a, index - 1);
-	  fts_set_float(a + 1, time);
-	  fts_set_float(a + 2, value);	      
-	  fts_client_send_message(o, sym_setPoint, 3, a);
-
-	  return;
-	}
-    }
-
   /* insert point */
   set_size(this, size + 1);
   
   /* kick points to the back */
   for(i=size; i>index; i--)
     this->points[i] = this->points[i - 1];
-
+  
   /* set new point */
   this->points[index].time = time;
   this->points[index].value = value;  
@@ -395,100 +370,26 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
 }
 
 void
-bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   int index = fts_get_int(at);
-  double time = fts_get_float(at + 1);
-  double value = fts_get_float(at + 2);
-  fts_atom_t a[3];
+  int i;
 
-  if(index == 0)
+  ac--;
+  at++;
+
+  for(i=0; i<ac/2; i++)
     {
-      /* set value of point 0.0 */
-      time = 0.0;
-      this->points[0].value = value;
+      fts_atom_t a[3];
+      double time = fts_get_float(at + 2 * i);
+      double value = fts_get_float(at + 2 * i + 1);
+      
+      this->points[index + i].time = time;
+      this->points[index + i].value = value;
     }
-  else
-    {
-      int size = this->size;
-
-      if(time <= this->points[index - 1].time)
-	{
-	  time = this->points[index - 1].time;
-
-	  if(value == this->points[index - 1].value)
-	    {
-	      /* delete double point */
-	      bpf_remove_point(this, index);
-
-	      fts_set_int(a, index);
-	      fts_client_send_message(o, sym_removePoints, 1, a);
-
-	      return;
-	    }
-	  else if(index > 1 && time == this->points[index - 2].time)
-	    {
-	      /*  remove double jump point */
-	      bpf_remove_point(this, index);
-
-	      fts_set_int(a, index);
-	      fts_client_send_message(o, sym_removePoints, 1, a);
-
-	      /* set previous jump point */
-	      this->points[index - 1].value = value;
-
-	      fts_set_int(a, index - 1);
-	      fts_set_float(a + 1, time);
-	      fts_set_float(a + 2, value);	      
-	      fts_client_send_message(o, sym_setPoint, 3, a);
-
-	      return;
-	    }
-	}
-      else if (index < size - 1 && time >= this->points[index + 1].time)
-	{
-	  time = this->points[index + 1].time;
-
-	  if(value == this->points[index + 1].value)
-	    {
-	      /* delete double point */
-	      bpf_remove_point(this, index);
-	      
-	      fts_set_int(a, index);
-	      fts_client_send_message(o, sym_removePoints, 1, a);
-
-	      return;
-	    }
-	  else if(index < size - 2 && time == this->points[index + 2].time)
-	    {
-	      /*  remove double jump point */
-	      bpf_remove_point(this, index);
-
-	      fts_set_int(a, index);
-	      fts_client_send_message(o, sym_removePoints, 1, a);
-
-	      /* set next jump point */
-	      this->points[index + 1].value = value;
-
-	      fts_set_int(a, index + 1);
-	      fts_set_float(a + 1, time);
-	      fts_set_float(a + 2, value);	      
-	      fts_client_send_message(o, sym_setPoint, 3, a);	      
-
-	      return;
-	    }
-	}
-    }
-
-  this->points[index].time = time;
-  this->points[index].value = value;
   
-  fts_set_int(a, index);
-  fts_set_float(a + 1, time);
-  fts_set_float(a + 2, value);
-  
-  fts_client_send_message(o, sym_setPoint, 3, a);
+  fts_client_send_message(o, sym_setPoints, ac, at);
 }
 
 static void
@@ -520,47 +421,52 @@ static void
 bpf_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  double append_time = 0.0;
-  int append = 0;
 
   if(this->keep == fts_s_yes)
     {
       fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
       int size = bpf_get_size(this);
-      fts_atom_t av[256];
-      int ac = 0;
+      double last_time = this->points[0].time;
+      double append_time = 0.0;
+      int append = 0;
+      fts_atom_t a[256];
+      int n = 2;
       int i;
       
-      for(i=0; i<size; i++)
+      fts_set_float(a, last_time);
+      fts_set_float(a + 1, this->points[0].value);
+
+      for(i=1; i<size; i++)
 	{
 	  double time = this->points[i].time;
+	  double value = this->points[i].value;
 
-	  fts_set_float(av + ac, time - append_time);
-	  fts_set_float(av + ac + 1, this->points[i].value);
-
-	  ac += 2;
-	  
-	  if(ac == 256)
+	  if(n == 256 || time == last_time)
 	    {
 	      if(!append)
 		{
-		  fts_bmax_save_message(f, fts_s_set, ac, av);
+		  fts_bmax_save_message(f, fts_s_set, n, a);
 		  append = 1;
 		}
 	      else
-		fts_bmax_save_message(f, fts_s_append, ac, av);
+		fts_bmax_save_message(f, fts_s_append, n, a);
 
 	      append_time = time;
-	      ac = 0;
+	      n = 0;
 	    }
+
+	  fts_set_float(a + n, time - append_time);
+	  fts_set_float(a + n + 1, value);
+	  
+	  n += 2;
 	}
       
-      if(ac > 1) 
+      if(n > 0) 
 	{
 	  if(!append)
-	    fts_bmax_save_message(f, fts_s_set, ac, av);
+	    fts_bmax_save_message(f, fts_s_set, n, a);
 	  else
-	    fts_bmax_save_message(f, fts_s_append, ac, av);
+	    fts_bmax_save_message(f, fts_s_append, n, a);
 	}
     }
 }
@@ -683,6 +589,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       /* save and restore bmax file */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, bpf_save_bmax); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, bpf_set);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append);
 
       /* graphical editor */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), bpf_open_editor);
@@ -690,7 +597,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_point"), bpf_set_point_by_client_request);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);
 
@@ -720,7 +627,7 @@ bpf_config(void)
   sym_append = fts_new_symbol("append");
   sym_addPoint = fts_new_symbol("addPoint");
   sym_removePoints = fts_new_symbol("removePoints");
-  sym_setPoint = fts_new_symbol("setPoint");
+  sym_setPoints = fts_new_symbol("setPoints");
 
   fts_metaclass_install(bpf_symbol, bpf_instantiate, bpf_equiv);
   bpf_class = fts_class_get_by_name(bpf_symbol);
