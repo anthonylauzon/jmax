@@ -84,7 +84,20 @@ tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
-  fts_array_init(&this->args, ac, at);
+  /* avoid creation of tuple as an object in a patcher */
+  if (0 != fts_object_is_in_patcher(o, fts_get_root_patcher()))
+  {
+      /* @@@@@ REMOVE THIS LOG AFTER MORE CHECKING @@@@@ 
+	 This log should be removed once this fix is validated...
+	 I have add it to check for some side effects
+      */	 
+      fts_log("[tuple] tuple is an internal class, it can't be used in a patch\n");
+      fts_object_error(o, "tuple is an internal class, it can't be used in a patch");
+  }
+  else
+  {
+      fts_array_init(&this->args, ac, at);
+  }
 }
 
 static void
