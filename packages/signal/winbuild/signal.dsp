@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\..\data\c\include" /I "..\..\utils\c\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -52,7 +52,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  fts.lib data.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\data\c" /libpath:"..\..\utils\c"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\data\c" /libpath:"..\..\utils\c"
 
 !ELSEIF  "$(CFG)" == "signal - Win32 Debug"
 
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /I "..\..\data\c\include" /I "..\..\utils\c\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SIGNAL_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
@@ -88,11 +88,59 @@ LINK32=link.exe
 # Name "signal - Win32 Debug"
 # Begin Source File
 
+SOURCE=..\c\src\abs.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\binop.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\cut.c
+SOURCE=..\c\src\biquad.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\biquad.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\bus.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\clip.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\delay.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\delay.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\env.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\fir.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\fir.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\harmtap.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\iir.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\iir.h
 # End Source File
 # Begin Source File
 
@@ -112,19 +160,15 @@ SOURCE=..\c\src\osc_ieeewrap.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\paste.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\pick.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\pink.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\play.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\play.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\playbpf.c
 # End Source File
 # Begin Source File
 
@@ -133,6 +177,10 @@ SOURCE=..\c\src\playfvec.c
 # Begin Source File
 
 SOURCE=..\c\src\recfvec.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\samphold.c
 # End Source File
 # Begin Source File
 
@@ -148,7 +196,27 @@ SOURCE=..\c\src\signal.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\signal.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\snapshot.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\sogs.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\threshold.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\tilda.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\wahwah.c
 # End Source File
 # Begin Source File
 
@@ -165,6 +233,10 @@ SOURCE=..\c\src\wave_ieeewrap.c
 # Begin Source File
 
 SOURCE=..\c\src\white.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\zerocross.c
 # End Source File
 # End Target
 # End Project
