@@ -73,7 +73,9 @@ enable_fpes(void)
   f.fc_struct.en_divide0 = 1;
   f.fc_struct.en_overflow = 1;
   f.fc_struct.en_underflow = 0;
-  f.fc_struct.en_inexact = 1;
+  /* (fd) inexact FPE are useless */
+  /* f.fc_struct.en_inexact = 1; */
+  f.fc_struct.en_inexact = 0;
 
   set_fpc_csr(f.fc_word);
 }
