@@ -177,11 +177,11 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }  catch(ClassNotFoundException e) {return null;}
     catch(IllegalAccessException e) {return null;}
     catch(InstantiationException e) {return null;}
-    finally {
-      if (!aObject.Init(this, x, y, args)) {
-	//something went wrong...
-	return null;
-      };
+    //finally {
+    aObject.Init(this, x, y, args);
+      //something went wrong...
+    //return null;
+    //};
       itsElements.addElement(aObject);
       if (offScreenPresent) {
 	aObject.Paint(offGraphics);
@@ -199,9 +199,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	aOutlet = (ErmesObjOutlet)e.nextElement();
 	itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
       }
-    }
-    ToSave();
-    return aObject;
+      
+      ToSave();
+      return aObject;
   }
   
   //--------------------------------------------------------

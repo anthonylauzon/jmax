@@ -40,6 +40,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString); //OK, we have the args
     itsFtsPatcher = GetSketchWindow().itsPatcher;
+    
+    //(new Throwable()).printStackTrace();
+    ParseText(itsArgs);
     return true;
   }
   
@@ -67,15 +70,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   }
 	
   public void update(FtsObject theFtsObject) {
-    //WARNING: opening an editor associated with an object is hardcoded here.
     super.update(theFtsObject);
-    
-    //don't open an editor, if not required!
-    /*if (iAmPatcher){
-      itsSubWindow = MaxApplication.NewDefaultSubPatcher((FtsContainerObject)itsFtsObject);
-      itsSketchPad.itsFirstClick = true;//??????
-      }*/
-    
   }
 
 
