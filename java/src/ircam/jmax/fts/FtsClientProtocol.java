@@ -71,6 +71,7 @@ class FtsClientProtocol
   static final int sync_done_cmd = '<';
   static final int post_cmd = 'h';
 
+  static final int fts_save_patcher_cmd = 'S';
   static final int fts_open_patcher_cmd = 'O';
   static final int fts_close_patcher_cmd = 'C';
   static final int fts_patcher_loaded_cmd = 'L';

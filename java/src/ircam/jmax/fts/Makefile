@@ -220,6 +220,9 @@ FtsIntegerVectorDataType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorDataType.java)
 .PHONY: FtsIntegerVectorDataType
 
+FtsTableObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTableObject.java)
+.PHONY: FtsTableObject
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

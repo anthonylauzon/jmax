@@ -92,10 +92,10 @@ final public class FtsMessage
 
   final void addArgument(Object obj)
   {
-    args[args_fill++] = obj;
-
-    if (args_fill > args.length)
+    if (args_fill >= args.length)
       doubleSize();
+
+    args[args_fill++] = obj;
   }
 
   /** Write the message to a Connection. */

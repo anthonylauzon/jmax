@@ -75,6 +75,15 @@ public class FtsPatchData extends MaxData implements MaxTclData
 
     patcher = (FtsObject) ReflectObject.get(interp, interp.getResult());
   }
+
+  /**
+   * Highly experimental method for generating a binary file
+   */
+
+  public void saveBmax(String fileName)
+  {
+    FtsServer.getServer().savePatcher(patcher, fileName);
+  }
 }
 
 

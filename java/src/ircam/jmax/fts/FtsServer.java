@@ -134,6 +134,22 @@ public class FtsServer
 
   /** Send a "open patcher" messages to FTS.*/
 
+  final void savePatcher(FtsObject patcher, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_save_patcher_cmd);
+	port.sendObject(patcher);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "open patcher" messages to FTS.*/
+
   final void openPatcher(FtsObject patcher)
   {
     try
