@@ -69,9 +69,11 @@ static receive_list_t *
 get_or_create_receive_list(fts_symbol_t name)
 {
   fts_atom_t a[2];
+  void *d;
   receive_list_t *t;
 
-  void *d;
+  if (name == 0)
+    return;
 
   if (fts_hash_table_lookup(&receive_list_table, name, &d))
     {
@@ -243,7 +245,6 @@ send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   send_t *this = (send_t *) o;
 
-  this->receive_list = get_or_create_receive_list(fts_get_symbol_arg(ac, at, 1, 0));
   receive_list_remove_send(this->receive_list, this);
 }
 
