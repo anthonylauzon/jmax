@@ -236,7 +236,7 @@ static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int i, size, r;
+  int size;
   udpsend_t *self = (udpsend_t *)o;
   char *buff;
   fts_symbol_t selector = s;
