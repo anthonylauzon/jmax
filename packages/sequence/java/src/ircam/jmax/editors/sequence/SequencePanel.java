@@ -224,13 +224,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	track.setProperty("active", Boolean.TRUE);
 
 	//added to update maximum time if needed
-	track.getTrackDataModel().addListener(this);
+	track.getTrackDataModel().addListener(this);    
     }
 
     public void tracksAdded(int maxTime)
     {
 	if(maxTime>0)
-	    resizePanelToTime(maxTime);
+	  resizePanelToTimeWithoutScroll(maxTime);
     }
 
     /**
@@ -341,6 +341,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
 	    itsTimeScrollbar.setMaximum(time-delta);
 	}
+    }
+    private void resizePanelToEventTimeWithoutScroll(TrackEvent evt)
+    {
+	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
+	resizePanelToTimeWithoutScroll(evtTime);
     }
 
     
