@@ -1002,14 +1002,6 @@ track_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
     fts_set_symbol(value, this->keep);
 }
 
-static void
-track_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  track_t *this = (track_t *)o;
-
-  fts_set_object(value, this);
-}
-
 /******************************************************
  *
  *  class
@@ -1079,13 +1071,14 @@ track_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, track_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, track_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, track_get_state);
 
   fts_class_message_varargs(cl, fts_s_clear, track_clear_method);
   fts_class_message_varargs(cl, seqsym_insert, track_insert);
   fts_class_message_varargs(cl, seqsym_remove, track_remove);
   fts_class_message_varargs(cl, fts_s_import, track_import);
   fts_class_message_varargs(cl, fts_s_export, track_export);
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 void

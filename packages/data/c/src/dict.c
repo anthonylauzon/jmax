@@ -560,12 +560,6 @@ dict_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-dict_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-static void
 dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
@@ -677,7 +671,6 @@ dict_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, dict_get_state);
   
   fts_class_message_varargs(cl, fts_s_import, dict_import);
   fts_class_message_varargs(cl, fts_s_export, dict_export);
@@ -686,7 +679,9 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, dict_set);
   fts_class_message_varargs(cl, fts_s_get, dict_get);
   fts_class_message_varargs(cl, fts_s_clear, dict_clear);
-  }
+
+  fts_class_inlet_anything(cl, 0);
+}
 
 void
 dict_config(void)

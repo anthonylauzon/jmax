@@ -1282,12 +1282,6 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fmat_get_fmat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-static void
 fmat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
@@ -1300,7 +1294,6 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_fmat);
 
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill);
   fts_class_message_varargs(cl, fts_s_set, fmat_set_elements);
@@ -1324,6 +1317,8 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_import, fmat_import);
   fts_class_message_varargs(cl, fts_s_export, fmat_export);
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 void 

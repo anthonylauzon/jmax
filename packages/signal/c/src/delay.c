@@ -198,19 +198,11 @@ delayline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-delayline_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, o);
-}
-
-static void
 delayline_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delayline_t), delayline_init, delayline_delete);
 
   fts_class_message_varargs(cl, fts_s_put_epilogue, delayline_put);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
 }
 
 /************************************************************

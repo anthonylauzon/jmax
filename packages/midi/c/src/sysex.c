@@ -48,7 +48,6 @@ static void
 sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   sysex_t *this = (sysex_t *)o;
-  fts_symbol_t name = fts_get_symbol(at);
 
   this->port = NULL;
 
@@ -85,7 +84,7 @@ sysexin_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(sysex_t), sysexin_init, sysexin_delete);
 
   fts_class_message_varargs(cl, fts_s_midievent, sysexin_output);
-  }
+}
 
 /************************************************************
  *
@@ -113,7 +112,6 @@ static void
 sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sysex_t *this = (sysex_t *)o;
-  fts_symbol_t label = fts_get_symbol(at);
 
   this->port = NULL;
 
@@ -145,7 +143,7 @@ sysexout_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 0, sysexout_send);
   fts_class_inlet_float(cl, 0, sysexout_send);
   fts_class_inlet_varargs(cl, 0, sysexout_send);
-  }
+}
 
 void
 sysex_config(void)

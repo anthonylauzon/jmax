@@ -25,12 +25,16 @@
 #define FTS_NO_ID -1
 #define FTS_DELETE -2
 
-struct fts_object {
+struct fts_object 
+{
   fts_class_t *cl;
 
   /* id for the client communication */
   int client_id;
-
+  
+  /* name definition */
+  fts_definition_t *definition;
+  
   /* the object description */
   int argc;
   fts_atom_t *argv;

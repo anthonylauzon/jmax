@@ -62,8 +62,9 @@ static void
 access_set_channel(access_t *this, bus_t *bus, int index)
 {
   fts_channel_t *channel = bus_get_channel(bus, index);
-  
-  fts_object_release((fts_object_t *)this->bus);
+
+  if(this->bus != NULL)
+    fts_object_release((fts_object_t *)this->bus);
   
   this->bus = bus;
   this->index = index;
@@ -183,7 +184,9 @@ catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     {
       bus_t *bus = (bus_t *)fts_get_object(at);
 
-      fts_channel_remove_target(bus_get_channel(this->bus, this->index), o);
+      if(this->bus)
+	fts_channel_remove_target(bus_get_channel(this->bus, this->index), o);
+
       access_set_channel(this, bus, index);
       fts_channel_add_target(bus_get_channel(bus, index), o);
     }
@@ -260,17 +263,9 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 }
 
 static void
-bus_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-static void
 bus_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, bus_get_state);
 }
 
 void

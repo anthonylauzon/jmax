@@ -290,16 +290,9 @@ static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_free( this->dac_fmtbuf);
 }
 
-static void ossaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object( value, o);
-}
-
 static void ossaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
-
-  fts_class_add_daemon( cl, obj_property_get, fts_s_state, ossaudioport_get_state);
 }
 
 void ossaudioport_config( void)

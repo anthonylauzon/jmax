@@ -219,13 +219,69 @@ define_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_spost_description, define_spost_description); 
 }
 
-/***********************************************************************
- *
- * Initialization
- *
- */
+typedef struct
+{
+  fts_object_t o;
+  fts_atom_t *arg;
+  fts_atom_t def;
+} args_t;
 
-void fts_kernel_variable_init(void)
+static void
+args_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  args_t *this = (args_t *)o;
+  int n = ac / 2;
+
+  if((ac == 1 || ac == 2) && fts_is_int(at))
+    {
+      fts_tuple_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
+      fts_atom_t *ptr = fts_tuple_get_atoms(args);
+      int size = fts_tuple_get_size(args);
+      int index;
+      
+      fts_set_void(&this->def);
+      
+      index = fts_get_int(at);
+      
+      if(args && index < size)
+	this->arg = ptr + index;
+      else if(ac > 1)
+	{
+	  fts_atom_assign(&this->def, at + 1);
+	  
+	  this->arg = &this->def;
+	}
+      else
+	{
+	  fts_object_set_error(o, "argument %d is not defined for this patcher", index);
+	  return;
+	}
+
+      fts_name_add_listener(fts_object_get_patcher(o), fts_s_args, o);
+    }
+  else
+    fts_object_set_error(o, "bad arguments");
+}
+
+static void
+args_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  args_t *this = (args_t *)o;
+
+  fts_set_void(&this->def);
+}
+
+static void
+args_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(args_t), args_init, args_delete);
+  
+  fts_class_outlet_varargs(cl, 0);
+}
+
+void 
+fts_kernel_variable_init(void)
 {
   fts_class_install( fts_s_define, define_instantiate);
+  fts_class_install( fts_s_args, args_instantiate);
 }

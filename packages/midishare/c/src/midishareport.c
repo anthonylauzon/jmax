@@ -388,19 +388,6 @@ midishareport_reset_unused(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 /************************************************************
  *
- *  get midiport variable
- *
- */
-static void
-midishareport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  midishareport_t *this = (midishareport_t *)o;
-
-  fts_set_object(value, o);
-}
-
-/************************************************************
- *
  *  class
  *
  */
@@ -482,9 +469,7 @@ midishareport_instantiate(fts_class_t *cl)
   fts_midiport_class_init(cl);
   
   fts_class_message_varargs(cl, fts_new_symbol("reset_unused"), midishareport_reset_unused);
-  
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
-  }
+}
 
 void
 midishareport_config(void)

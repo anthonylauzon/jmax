@@ -1540,6 +1540,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	  fts_client_add_symbol( this, fts_error_object_get_description((fts_error_object_t *)obj));
 	  
 	  class = fts_error_object_get_class((fts_error_object_t *)obj);
+	  fts_class_instantiate(class);
 	}
       else
 	{
@@ -1547,8 +1548,13 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 
 	  class = fts_object_get_class(obj);
 	}
-      
-      fts_client_add_symbol( this, fts_class_get_name(class));
+
+
+      if(fts_class_get_name(class) != NULL)
+	fts_client_add_symbol( this, fts_class_get_name(class));
+      else
+	fts_client_add_symbol( this, fts_s_error);	
+
       fts_client_add_int( this, fts_object_is_template(obj));
       
       stream = patcher_get_memory_stream();
@@ -1603,17 +1609,12 @@ static void
 fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *oldobj = fts_get_object(&at[0]);
-  fts_object_t *obj = fts_object_redefine(oldobj, ac - 1, at + 1);
-  fts_atom_t a[1];
-  int do_var = 0;
+  fts_object_t *old = fts_get_object(at);
+  fts_object_t *obj = fts_object_redefine(old, ac - 1, at + 1);
+  fts_atom_t a;
 
-  fts_client_upload_object(obj, -1);
-  
-  fts_object_upload_connections(obj);
-  
-  fts_set_object(a, obj);
-  fts_client_send_message(o, sym_objectRedefined, 1, a);
+  fts_set_object(&a, obj);
+  fts_client_send_message(o, sym_objectRedefined, 1, &a);
 
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }

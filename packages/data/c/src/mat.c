@@ -624,12 +624,6 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
-static void
-mat_get_mat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
 /********************************************************************
  *
  *   class
@@ -705,7 +699,6 @@ mat_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   fts_class_message_varargs(cl, fts_s_dump, mat_dump);
@@ -718,6 +711,8 @@ mat_instantiate(fts_class_t *cl)
             
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export); 
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 void

@@ -459,14 +459,7 @@ fts_object_recompute(fts_object_t *old)
       if(obj != NULL && old_id != FTS_NO_ID)
 	{
 	  fts_client_upload_object(obj, -1);
-	  fts_object_upload_connections(obj);
-
-	  /* ask the object to send to the client object specific gui properties */
-	  fts_send_message(obj, fts_s_update_gui, 0, 0);
-
-	  /* add to real time update list */
-	  if(fts_class_get_method( fts_object_get_class(obj), fts_s_update_real_time) != NULL)
-	    fts_update_request(obj);
+	  fts_client_upload_object_connections(obj);
 	}
     }
 
@@ -530,6 +523,9 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	  old->patcher = NULL;
 	  fts_object_signal_runtime_error(old, "referenced %s object deleted from patcher", fts_object_get_class_name(old));
 	}
+
+      fts_client_upload_object(new, -1);
+      fts_client_upload_object_connections(new);
       
       return new;
     }

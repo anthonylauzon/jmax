@@ -1024,12 +1024,6 @@ ivec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   ivec_set_with_onset_from_atoms(this, 0, ac, at);
 }
 
-static void
-ivec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
 /*********************************************************
  *
  *  class
@@ -1125,7 +1119,6 @@ ivec_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
 
   fts_class_message_varargs(cl, fts_new_symbol("reverse"), ivec_reverse);
   fts_class_message_varargs(cl, fts_new_symbol("rotate"), ivec_rotate);
@@ -1139,6 +1132,8 @@ ivec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_import, ivec_import);
   fts_class_message_varargs(cl, fts_s_export, ivec_export);
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 /********************************************************************

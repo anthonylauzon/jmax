@@ -416,31 +416,35 @@ static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, vo
 
 static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  int new_ac, i;
-  fts_atom_t *new_at;
-
-  if (version == 1 && ac >= 3 && fts_is_symbol(at) && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon)
+  if (version == 1)
     {
-      new_ac = ac + 3;
-      new_at = (fts_atom_t *)alloca( new_ac * sizeof( fts_atom_t));
+      if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_patcher)
+	{
+	  return fts_eval_object_description( patcher, 1, at);	  
+	}
+      else if(ac >= 3 && fts_is_symbol(at) && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon)
+	{
+	  int new_ac, i;
+	  fts_atom_t *new_at;
 
-      fts_set_symbol( new_at+0, fts_s_define);
-      new_at[1] = at[0];
-      fts_set_symbol( new_at+2, fts_s_open_par);
-      fts_set_symbol( new_at+3, fts_s_colon);
+	  new_ac = ac + 3;
+	  new_at = (fts_atom_t *)alloca( new_ac * sizeof( fts_atom_t));
+	  
+	  fts_set_symbol( new_at+0, fts_s_define);
+	  new_at[1] = at[0];
+	  fts_set_symbol( new_at+2, fts_s_open_par);
+	  fts_set_symbol( new_at+3, fts_s_colon);
+	  
+	  for (i = 2; i < ac; i++)
+	    new_at[i+2] = at[i];
+	  
+	  fts_set_symbol( new_at+new_ac-1, fts_s_closed_par);
 
-      for (i = 2; i < ac; i++)
-	new_at[i+2] = at[i];
-
-      fts_set_symbol( new_at+new_ac-1, fts_s_closed_par);
+	  return fts_eval_object_description( patcher, new_ac, new_at);
+	}
     }
-  else
-    {
-      new_ac = ac;
-      new_at = (fts_atom_t *)at;
-    }
 
-  return fts_eval_object_description( patcher, new_ac, new_at);
+  return fts_eval_object_description( patcher, ac, at);
 }
 
 static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_descr_t *descr, int ac, const fts_atom_t *at)

@@ -970,11 +970,6 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
 	fts_free( this->output_buffer);
 }
 
-static void alsaaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-    fts_set_object( value, o);
-}
-
 static void
 alsaaudioport_print_all_device(alsaaudioport_t* this)
 {
@@ -1056,8 +1051,6 @@ static void alsaaudioport_instantiate(fts_class_t *cl)
 
     /* debug print */
     fts_class_message_varargs(cl, fts_s_print, alsaaudioport_print);
-
-    fts_class_add_daemon( cl, obj_property_get, fts_s_state, alsaaudioport_get_state);
 }
 
 /***********************************************************************

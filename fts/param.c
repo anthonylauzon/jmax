@@ -290,12 +290,6 @@ param_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 }
 
 static void
-param_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-static void
 param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
@@ -320,7 +314,6 @@ param_instantiate(fts_class_t *cl)
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, param_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, param_get_state);
   
   fts_class_inlet_varargs(cl, 0, param_input_atoms);
   fts_class_outlet_varargs(cl, 0);

@@ -314,12 +314,6 @@ dsp_get_current_dsp_chain( void)
  */
 
 static void
-dsp_edge_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object( value, obj);
-}
-
-static void
 dsp_edge_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   fts_dsp_edge_t *this = (fts_dsp_edge_t *)o;
@@ -351,8 +345,6 @@ dsp_edge_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_dsp_edge_t), dsp_edge_init, dsp_edge_delete);
   fts_class_message_varargs(cl, fts_s_put, dsp_edge_put);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsp_edge_get_state);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -552,14 +552,6 @@ sequence_return_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t
   fts_set_symbol(value, this->keep);
 }
 
-static void
-sequence_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  fts_set_object(value, (fts_object_t *)this->tuple);
-}
-
 /******************************************************
  *
  *  add, remove, move, dump
@@ -795,7 +787,6 @@ sequence_instantiate(fts_class_t *cl)
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, sequence_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, sequence_return_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, sequence_get_state);
   
   fts_class_message_varargs(cl, fts_s_clear, sequence_clear);
 
@@ -804,7 +795,9 @@ sequence_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_import, sequence_import);
   fts_class_message_varargs(cl, fts_s_export, sequence_export_track_by_index);
-  }
+
+  fts_class_inlet_anything(cl, 0);
+}
 
 void
 sequence_class_config(void)

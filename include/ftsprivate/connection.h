@@ -30,7 +30,6 @@ extern void fts_connections_init(void);
 /* Connections */
 
 extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new);
-extern void fts_object_upload_connections(fts_object_t *obj);
 
 #define fts_connection_get_id(c) ((c)->id)
 #define fts_connection_get_source(c) ((c)->src)

@@ -371,19 +371,6 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 
 /************************************************************
  *
- *  get midiport variable
- *
- */
-static void
-winmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-
-  fts_set_object(value, o);
-}
-
-/************************************************************
- *
  *  class
  *
  */
@@ -638,9 +625,6 @@ winmidiport_instantiate(fts_class_t *cl)
   fts_midiport_class_init(cl);
   
   fts_class_message_varargs(cl, fts_s_sched_ready, winmidiport_dispatch);
-  
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, winmidiport_get_state);
 }
 
 void

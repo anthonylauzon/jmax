@@ -1332,6 +1332,27 @@ void fts_client_upload_object(fts_object_t *obj, int client_id)
   fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_s_upload_child, 1, a);  
 }
 
+void 
+fts_client_upload_object_connections(fts_object_t *obj)
+{
+  fts_connection_t *p;
+  int i;
+
+  for(i=0; i<fts_object_get_outlets_number(obj); i++)
+    {
+      for (p = obj->out_conn[i]; p ; p = p->next_same_src)
+	if(p->type > fts_c_hidden)
+	  fts_client_upload_object((fts_object_t *)p, -1);
+    }
+
+  for (i=0; i<fts_object_get_inlets_number(obj); i++)
+    {
+      for (p=obj->in_conn[i]; p; p=p->next_same_dst)
+	if(p->type > fts_c_hidden)
+	  fts_client_upload_object((fts_object_t *)p, -1);
+    }
+}
+
 void fts_client_register_object(fts_object_t *obj, int client_id)
 {
   client_t *client;

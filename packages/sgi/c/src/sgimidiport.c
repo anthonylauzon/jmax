@@ -346,22 +346,6 @@ sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 /************************************************************
  *
- *  get midiport variable
- *
- */
-static void
-sgimidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  sgimidiport_t *this = (sgimidiport_t *)o;
-
-  if(this->in)
-    fts_set_object(value, o);
-  else
-    fts_set_void(value);
-}
-
-/************************************************************
- *
  *  class
  *
  */
@@ -370,9 +354,6 @@ sgimidiport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sgimidiport_t), sgimidiport_init, sgimidiport_delete);
   fts_class_message_varargs(cl, fts_s_sched_ready, sgimidiport_dispatch);
-
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, sgimidiport_get_state);
 }
 
 void

@@ -76,7 +76,10 @@ fts_error_object_get_class(fts_error_object_t *obj)
     }
 
   if(class_name != NULL)
-    return fts_class_get_by_name( package_name, class_name);
+    class = fts_class_get_by_name( package_name, class_name);
+
+  if(class != NULL)
+    return class;
   else
     return fts_error_object_class;
 }

@@ -609,12 +609,6 @@ cvec_get_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property
   fts_set_symbol(value, data_object_get_keep((data_object_t *)o));
 }
 
-static void
-cvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
 /*********************************************************
  *
  *  class
@@ -679,7 +673,6 @@ cvec_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, cvec_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, cvec_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, cvec_get_state);
   
   fts_class_message_varargs(cl, fts_s_fill, cvec_fill); 
   fts_class_message_varargs(cl, fts_s_set, cvec_set_elements);
@@ -698,7 +691,9 @@ cvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
 
   fts_class_message_varargs(cl, fts_s_size, cvec_size);
-  }
+
+  fts_class_inlet_anything(cl, 0);
+}
 
 /********************************************************************
  *

@@ -124,6 +124,13 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     }
 
   /* check the outlet range (should never happen, a part from loading) */
+  if (winlet >= fts_object_get_inlets_number(dst) || winlet < 0)
+    {
+      fts_object_signal_runtime_error(dst, "inlet out of range");
+      return NULL;
+    }
+
+  /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {
       fts_object_signal_runtime_error(src, "outlet out of range");
@@ -274,27 +281,6 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	  
 	  fts_connection_delete(p);
 	}
-    }
-}
-
-void 
-fts_object_upload_connections(fts_object_t *obj)
-{
-  fts_connection_t *p;
-  int i;
-
-  for(i=0; i<fts_object_get_outlets_number(obj); i++)
-    {
-      for (p = obj->out_conn[i]; p ; p = p->next_same_src)
-	if(p->type > fts_c_hidden)
-	  fts_client_upload_object((fts_object_t *)p, -1);
-    }
-
-  for (i=0; i<fts_object_get_inlets_number(obj); i++)
-    {
-      for (p=obj->in_conn[i]; p; p=p->next_same_dst)
-	if(p->type > fts_c_hidden)
-	  fts_client_upload_object((fts_object_t *)p, -1);
     }
 }
 

@@ -71,6 +71,13 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   return cl;
 }
 
+void
+fts_class_instantiate(fts_class_t *cl)
+{
+  if (!cl->size)
+    (*cl->instantiate_fun)(cl);
+}
+
 /* for now just recreate the same class and add it to the current package */
 void
 fts_class_alias(fts_class_t *cl, fts_symbol_t alias)

@@ -23,12 +23,6 @@
 #ifndef _FTS_PRIVATE_VARIABLE_H_
 #define _FTS_PRIVATE_VARIABLE_H_
 
-typedef struct
-{
-  fts_atom_t value;
-  fts_objectlist_t listeners;
-} fts_definition_t;
-
 extern fts_definition_t *fts_definition_get(fts_patcher_t *patcher, fts_symbol_t name);
 extern void fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj);
 extern void fts_definition_remove_listener(fts_definition_t *def, fts_object_t *obj);

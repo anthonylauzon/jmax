@@ -20,6 +20,12 @@
  * 
  */
 
+typedef struct
+{
+  fts_atom_t value;
+  fts_objectlist_t listeners;
+} fts_definition_t;
+
 FTS_API void fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value);
 FTS_API void fts_name_undefine(fts_patcher_t *patcher, fts_symbol_t name);
 

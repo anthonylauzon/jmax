@@ -152,16 +152,8 @@ fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
   fts_atom_t *value = fts_name_get_value(scope, name);
   fts_label_t *label = 0;
   
-  if(value)
-    {
-      if(fts_is_object(value))
-	{
-	  fts_object_t *obj = fts_get_object(value);
-	  
-	  if(fts_object_get_class(obj) == fts_label_class)
-	    label = (fts_label_t *)obj;
-	}
-    }
+  if(value && fts_is_object(value) && fts_object_get_class(fts_get_object(value)))
+    label = (fts_label_t *)fts_get_object(value);
   else if(default_labels)
     {
       fts_atom_t a, key;
@@ -214,12 +206,6 @@ label_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-label_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object( value, obj);
-}
-
-static void
 label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *) o;
@@ -248,9 +234,7 @@ label_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_input, label_send);
   fts_class_message_varargs(cl, fts_s_add_listener, label_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, label_remove_listener);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
-  }
+}
 
 void 
 fts_label_config(void)

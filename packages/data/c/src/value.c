@@ -150,12 +150,6 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-value_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-static void
 value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
@@ -170,7 +164,6 @@ value_instantiate(fts_class_t *cl)
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, value_get_state);
 
   fts_class_message_varargs(cl, fts_s_bang, value_output);
   fts_class_message_varargs(cl, fts_s_set, value_set_atom);

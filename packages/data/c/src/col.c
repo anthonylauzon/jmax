@@ -119,18 +119,6 @@ col_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
 /********************************************************************
  *
- *  system functions
- *
- */
-
-static void
-col_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object(value, obj);
-}
-
-/********************************************************************
- *
  *   class
  *
  */
@@ -176,11 +164,9 @@ col_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(col_t), col_init, col_delete);
   
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, col_getobj);
-  
   fts_class_message_varargs(cl, fts_s_fill, col_fill);      
   fts_class_message_varargs(cl, fts_s_set, col_set);
-  }
+}
 
 void
 col_config(void)
