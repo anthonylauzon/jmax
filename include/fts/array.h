@@ -145,14 +145,24 @@ FTS_API void fts_array_append_int( fts_array_t *array, int i);
 FTS_API void fts_array_append_float( fts_array_t *array, float f);
 
 /** 
- * Append a symbol element at the end of array
- * 
- * @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
- * @param array the array
- * @param s the symbol to append
- * @ingroup array
- */
+* Append a symbol element at the end of array
+* 
+* @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
+* @param array the array
+* @param s the symbol to append
+* @ingroup array
+*/
 FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
+
+/** 
+* Append an object element at the end of array
+* 
+* @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
+* @param array the array
+* @param obj the object
+* @ingroup array
+*/
+FTS_API void fts_array_append_object( fts_array_t *array, fts_object_t * obj);
 
 /**
  * Prepend elements at the beginning of the array

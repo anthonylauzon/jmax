@@ -270,26 +270,6 @@ bpf_equals_function(const fts_object_t *a, const fts_object_t *b)
 }
 
 static void
-bpf_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  bpf_t *this = (bpf_t *)o;
-  
-  if(this->size <= FTS_POST_MAX_ELEMENTS/2)
-  {
-    int i;
-    
-    fts_spost(stream, "<bpf");
-    
-    for(i=0; i<this->size; i++)
-      fts_spost(stream, " %.7g %.7g", this->points[i].time, this->points[i].value);
-    
-    fts_spost(stream, ">");
-  }
-  else
-    fts_spost(stream, "<bpf>");
-}
-
-static void
 bpf_array_function(fts_object_t *o, fts_array_t *array)
 {
   bpf_t *this = (bpf_t *)o;
@@ -745,7 +725,6 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, bpf_copy_function);
   fts_class_set_equals_function(cl, bpf_equals_function);
   fts_class_set_array_function(cl, bpf_array_function);
-  fts_class_set_post_function(cl, bpf_post_function);
 
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);

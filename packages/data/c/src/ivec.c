@@ -233,27 +233,6 @@ ivec_equals_function(const fts_object_t *a, const fts_object_t *b)
 }
 
 static void
-ivec_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  ivec_t *this = (ivec_t *)o;
-  int size = ivec_get_size(this);
-  
-  if(size != 1 && size <= FTS_POST_MAX_ELEMENTS)
-  {
-    int i;
-    
-    fts_spost(stream, "<ivec");
-    
-    for(i=0; i<size; i++)
-      fts_spost(stream, " %d", ivec_get_element(this, i));
-    
-    fts_spost(stream, ">");
-  }
-  else
-    fts_spost(stream, "<ivec %d>", size);
-}
-
-static void
 ivec_array_function(fts_object_t *o, fts_array_t *array)
 {
   ivec_t *this = (ivec_t *)o;
@@ -870,7 +849,6 @@ ivec_instantiate(fts_class_t *cl)
   
   fts_class_set_equals_function(cl, ivec_equals_function);
   fts_class_set_copy_function(cl, ivec_copy_function);
-  fts_class_set_post_function(cl, ivec_post_function);
   fts_class_set_array_function(cl, ivec_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);

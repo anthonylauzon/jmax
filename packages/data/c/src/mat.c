@@ -215,31 +215,11 @@ mat_copy(mat_t *org, mat_t *copy)
     copy->data[i] = org->data[i];
 }
 
-static void
-mat_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  mat_t *self = (mat_t *) o;
-  int m = mat_get_m(self);
-  int n = mat_get_n(self);
-  int size = m * n;
-  
-  if(size == 0)
-    fts_spost(stream, "<mat>");
-  else
-    fts_spost(stream, "<mat %d %d>", m, n);
-}
-
-
-
-
-
-
 /********************************************************
-*
-*  files
-*
-*/
-
+ *
+ *  files
+ *
+ */
 #define MAT_BLOCK_SIZE 256
 
 static void
@@ -1345,7 +1325,6 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
   fts_class_set_equals_function(cl, mat_equals_function);
-  fts_class_set_post_function(cl, mat_post_function);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   

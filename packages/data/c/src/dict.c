@@ -166,12 +166,6 @@ dict_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static void
-dict_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  fts_spost(stream, "<dict>");
-}
-
-static void
 dict_array_function(fts_object_t *o, fts_array_t *array)
 {
   dict_t *self = (dict_t *)o;
@@ -799,7 +793,6 @@ dict_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
   fts_class_set_copy_function(cl, dict_copy_function);
-  fts_class_set_post_function(cl, dict_post_function);
   fts_class_set_array_function(cl, dict_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);

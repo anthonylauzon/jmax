@@ -39,16 +39,16 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fts_spost(this->stream, "%s: ", this->prompt);
 
   if (s != NULL)
-    {
-      /* ordinary message */
-      fts_spost_symbol(this->stream, s);
-      fts_spost(this->stream, " ");
-    }
-
+  {
+    /* ordinary message */
+    fts_spost_symbol(this->stream, s);
+    fts_spost(this->stream, " ");
+  }
+  
   if (ac == 1 && !fts_is_symbol(at))
   {
     /* single argument */
-    if (fts_is_object(at))
+    if(fts_is_object(at))
     {
       fts_object_t *obj = fts_get_object(at);
       fts_class_t *cl = fts_object_get_class(obj);
@@ -61,13 +61,6 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         (*meth)(obj, 0, 0, 1, &a);
         return;
       }
-      else
-      {
-        fts_post_function_t fun = fts_class_get_post_function(cl);
-        
-        (*fun)(obj, this->stream);
-        return;
-      }        
     }
     
     /* simple value or object without print method */

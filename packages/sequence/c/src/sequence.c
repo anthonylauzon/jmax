@@ -295,39 +295,6 @@ sequence_set_editor_close(sequence_t *sequence)
 }
 
 static void
-sequence_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  sequence_t *this = (sequence_t *)o;
-  int size = sequence_get_size(this);
-  
-  if(size == 0)
-    fts_spost(stream, "<sequence>");
-  else
-  {
-    track_t *track = sequence_get_first_track(this);
-    
-    fts_spost(stream, "<sequence");
-    
-    while(track != NULL)
-    {
-      fts_class_t *track_type = track_get_type(track);
-      
-      if(track_type != NULL)
-      {
-        fts_spost(stream, " ");
-        fts_spost_symbol(stream, fts_class_get_name(track_type));
-      }
-      else
-        fts_spost(stream, " -");
-      
-      track = sequence_track_get_next(track);
-    }
-    
-    fts_spost(stream, ">");
-  }
-}
-
-static void
 sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -686,8 +653,6 @@ sequence_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_clear, sequence_clear);
   fts_class_message_varargs(cl, fts_s_import, sequence_import);
-
-  fts_class_set_post_function(cl, sequence_post_function);
 
   fts_class_inlet_thru(cl, 0);
 }

@@ -53,26 +53,6 @@ vec_equals_function(const fts_object_t *a, const fts_object_t *b)
 }
 
 static void
-vec_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  vec_t *this = (vec_t *)o;
-  int size = vec_get_size(this);
-  
-  if(size == 0)
-    fts_spost(stream, "<vec>");
-  else if(size <= FTS_POST_MAX_ELEMENTS)
-  {
-    fts_atom_t *p = vec_get_ptr(this);
-    
-    fts_spost(stream, "<vec ", size);
-    fts_spost_atoms(stream, size, p);
-    fts_spost(stream, ">");
-  }
-  else
-    fts_spost(stream, "<vec %d>", size);
-}
-
-static void
 vec_array_function(fts_object_t *o, fts_array_t *array)
 {
   vec_t *this = (vec_t *)o;
@@ -425,7 +405,6 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
 
   fts_class_set_equals_function(cl, vec_equals_function);
-  fts_class_set_post_function(cl, vec_post_function);
   fts_class_set_array_function(cl, vec_array_function);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);

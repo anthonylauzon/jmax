@@ -185,9 +185,20 @@ void
 fts_array_append_symbol(fts_array_t *array, fts_symbol_t s)
 {
   int size = array->size;
- 
+  
   fts_array_set_size(array, size + 1);
   fts_set_symbol(array->atoms + size, s);
+}
+
+void 
+fts_array_append_object(fts_array_t *array, fts_object_t *obj)
+{
+  int size = array->size;
+  
+  fts_array_set_size(array, size + 1);
+  fts_set_object(array->atoms + size, obj);
+  
+  fts_object_refer(obj);
 }
 
 void

@@ -78,21 +78,6 @@ fslice_copy_to_fmat(fslice_t *org, fmat_t *copy)
   }
 }
 
-
-static void
-fslice_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  fslice_t *self = (fslice_t *)o;
-  int index = fslice_get_index(self);
-  int m = fslice_get_m(self);
-  int n = fslice_get_n(self);
-  
-  if(self->type == fslice_column)
-    fts_spost(stream, "<fcol %d (%dx%d)>", index, m, n);
-  else
-    fts_spost(stream, "<frow %d (%dx%d)>", index, m, n);
-}
-
 static void
 fslice_array_function(fts_object_t *o, fts_array_t *array)
 {
@@ -111,7 +96,14 @@ fslice_array_function(fts_object_t *o, fts_array_t *array)
     fts_set_float(atoms + i, values[j]);
 }
 
-
+static void
+fslice_description_function(fts_object_t *o, fts_array_t *array)
+{
+  fslice_t *self = (fslice_t *)o;
+  
+  fts_array_append_object(array, (fts_object_t *)fslice_get_fmat(self));
+  fts_array_append_int(array, fslice_get_index(self));
+}
 
 /********************************************************************
  *
@@ -1206,8 +1198,8 @@ fslice_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_element, _fslice_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fslice_get_element);
   
-  fts_class_set_post_function(cl, fslice_post_function);
   fts_class_set_array_function(cl, fslice_array_function);
+  fts_class_set_description_function(cl, fslice_description_function);
 
   fts_class_message_varargs(cl, fts_new_symbol("set"), fslice_set);
   fts_class_message(cl, fts_new_symbol("set"), fcol_class, fslice_set_fmat_or_fslice);

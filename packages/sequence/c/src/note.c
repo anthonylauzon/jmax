@@ -60,41 +60,6 @@ scoob_equals_function(const fts_object_t *a, const fts_object_t *b)
 }
 
 static void 
-scoob_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  scoob_t *self = (scoob_t *)o;
-  
-  switch(enumeration_get_index(scoob_type_enumeration, self->type))
-  {
-    case scoob_note:
-      if(self->interval > 0)
-        fts_spost(stream, "<scoob note %g (±%g) %g", self->pitch, self->interval, self->duration);
-      else
-        fts_spost(stream, "<scoob note %g %g", self->pitch, self->duration);
-      break;
-    case scoob_interval:
-      fts_spost(stream, "<scoob interval %g %s%g %g", self->pitch, (self->interval >= 0)? "+": "", self->interval, self->duration);
-      break;
-    case scoob_rest:
-      fts_spost(stream, "<scoob rest %g", self->duration);
-      break;
-    case scoob_trill:
-      fts_spost(stream, "<scoob trill %g %g %g", self->pitch, self->interval, self->duration);
-      break;
-    case scoob_unvoiced:
-      fts_spost(stream, "<scoob unvoiced %g", self->duration);
-      break;
-    default:
-      fts_spost(stream, "<scoob %s %g %g %g", fts_symbol_name(self->type), self->pitch, self->interval, self->duration);
-      break;
-  }  
-  
-  propobj_post_properties((propobj_t *)self, stream);
-  
-  fts_spost(stream, ">");
-}
-
-static void 
 scoob_array_function(fts_object_t *o, fts_array_t *array)
 {
   scoob_t *self = (scoob_t *)o;
@@ -103,6 +68,7 @@ scoob_array_function(fts_object_t *o, fts_array_t *array)
   fts_array_append_float(array, self->pitch);
   fts_array_append_float(array, self->interval);
   fts_array_append_float(array, self->duration);
+  propobj_append_properties((propobj_t *)self, array);
 }
 
 static void
@@ -186,9 +152,18 @@ _scoob_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  int i;
+  
   switch(ac)
   {
     default:
+      for(i=4; i<ac-1; i+=2)
+      {  
+        if(fts_is_symbol(at + i))
+          propobj_set_property_by_name((propobj_t *)o, fts_get_symbol(at + i), at + i + 1);
+      }
+      
+    case 4:
       if(fts_is_number(at + 3))
         _scoob_set_duration(o, 0, 0, 1, at + 3);
       
@@ -265,18 +240,6 @@ scoob_get_channel(scoob_t *self)
   else
     return 0;
 }
-
-static void 
-scoob_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_bytestream_t* stream = fts_get_default_console_stream();
-  
-  if(ac > 0 && fts_is_object(at))
-    stream = (fts_bytestream_t *)fts_get_object(at);
-
-  scoob_post_function(o, stream);
-  fts_post("\n");
-}  
 
 static void
 scoob_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -384,14 +347,13 @@ scoob_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, scoob_copy_function);
   fts_class_set_equals_function(cl, scoob_equals_function);
-  fts_class_set_post_function(cl, scoob_post_function);
   fts_class_set_array_function(cl, scoob_array_function);
+  fts_class_set_description_function(cl, scoob_array_function);
   
   fts_class_message_varargs(cl, seqsym_get_property_list, scoob_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);
   
   fts_class_message_varargs(cl, fts_s_dump_state, scoob_dump_state);
-  fts_class_message_varargs(cl, fts_s_print, scoob_print);
   
   fts_class_message_symbol(cl, seqsym_type, _scoob_set_type);
   fts_class_message_void(cl, seqsym_type, _scoob_get_type);
@@ -417,7 +379,6 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_doc(cl, seqsym_duration, "[<num: duration>]", "get/set duration in msecs");
   fts_class_doc(cl, fts_new_symbol("<property name>"), "[<any: value>]", "get/set additional property");
   fts_class_doc(cl, fts_s_remove, "<sym: property name>", "remove value of given additional property");
-  fts_class_doc(cl, fts_s_print, NULL, "print");
 }
 
 /**************************************************************************************
@@ -433,7 +394,7 @@ scomark_post(fts_object_t *o, fts_bytestream_t *stream)
 {
   scomark_t *self = (scomark_t *)o;
   
-  fts_spost(stream, "<scoomark %s", fts_symbol_name(self->type));
+  fts_spost(stream, "scoomark %s", fts_symbol_name(self->type));
   
   if(self->meter_num > 0)
     fts_spost(stream, " %d/%d", self->meter_num, self->meter_den);
@@ -442,8 +403,6 @@ scomark_post(fts_object_t *o, fts_bytestream_t *stream)
     fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
   
   propobj_post_properties((propobj_t *)self, stream);
-  
-  fts_spost(stream, ">");  
 }
 
 static void
@@ -761,7 +720,6 @@ scomark_instantiate(fts_class_t *cl)
   propobj_class_init(cl);
   propobj_class_add_symbol_property(cl, fts_s_label);
   
-  fts_class_set_post_function(cl, scoob_post_function);
   fts_class_message_symbol(cl, fts_s_remove, scomark_remove_property);
 
   fts_class_message_varargs(cl, seqsym_get_property_list, scomark_get_property_list);

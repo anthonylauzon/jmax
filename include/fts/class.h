@@ -25,7 +25,6 @@ typedef void (*fts_instantiate_fun_t)(fts_class_t *);
 typedef unsigned int (*fts_hash_function_t)( const fts_atom_t *);
 typedef int (*fts_equals_function_t)( const fts_object_t *, const fts_object_t *);
 typedef void (*fts_copy_function_t)( const fts_object_t *, fts_object_t *);
-typedef void (*fts_post_function_t)(fts_object_t *obj, fts_bytestream_t *stream);
 typedef void (*fts_array_function_t)(fts_object_t *obj, fts_array_t *array);
 typedef void (*fts_description_function_t)(fts_object_t *obj, fts_array_t *array);
 
@@ -80,7 +79,6 @@ struct fts_class {
   fts_hash_function_t hash_function;
   fts_equals_function_t equals_function;
   fts_copy_function_t copy_function;
-  fts_post_function_t post_function;
   fts_array_function_t array_function;
   fts_description_function_t description_function;
 
@@ -115,14 +113,12 @@ struct fts_class {
 #define fts_class_get_hash_function(cl) ((cl)->hash_function)
 #define fts_class_get_equals_function(cl) ((cl)->equals_function)
 #define fts_class_get_copy_function(cl) ((cl)->copy_function)
-#define fts_class_get_post_function(cl) ((cl)->post_function)
 #define fts_class_get_array_function(cl) ((cl)->array_function)
 #define fts_class_get_description_function(cl) ((cl)->description_function)
 
 #define fts_class_set_hash_function( cl, f) ((cl)->hash_function = (f))
 #define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
 #define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
-#define fts_class_set_post_function( cl, f) ((cl)->post_function = (f))
 #define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
 #define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
 

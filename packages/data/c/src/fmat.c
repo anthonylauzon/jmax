@@ -472,22 +472,6 @@ fmat_equals_function(const fts_object_t *a, const fts_object_t *b)
   return 0;
 }
 
-
-static void
-fmat_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  fmat_t *self = (fmat_t *)o;
-  fmat_format_t *format = fmat_get_format(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int size = n * m;
-  
-  if(size == 0)
-    fts_spost(stream, "<fmat>");
-  else
-    fts_spost(stream, "<fmat %d x %d of %s>", m, n, fts_symbol_name(fmat_format_get_name(format)));
-}
-
 static void
 fmat_array_function(fts_object_t *o, fts_array_t *array)
 {
@@ -4226,7 +4210,6 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, fmat_copy_function);
   fts_class_set_equals_function(cl, fmat_equals_function);
-  fts_class_set_post_function(cl, fmat_post_function);
   fts_class_set_array_function(cl, fmat_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);

@@ -466,28 +466,11 @@ track_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static void
-track_post_function(fts_object_t *o, fts_bytestream_t *stream)
-{
-  track_t *self = (track_t *)o;
-  fts_class_t *track_type = track_get_type(self);
-  
-  if(track_type == NULL)
-    fts_spost(stream, "<track>");
-  else
-  {
-    fts_spost(stream, "<track ");
-    fts_spost_symbol(stream, fts_class_get_name(track_type));
-    fts_spost(stream, ">");
-  }
-}
-
-static void
 track_description_function(fts_object_t *o,  fts_array_t *array)
 {
   track_t *self = (track_t *)o;
   fts_class_t *type = track_get_type(self);
   
-  fts_array_append_symbol(array, seqsym_track);
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
@@ -2091,7 +2074,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
   
   fts_class_set_copy_function(cl, track_copy_function);
-  fts_class_set_post_function(cl, track_post_function);
   fts_class_set_description_function(cl, track_description_function);
   
   fts_class_doc(cl, seqsym_track, "[<sym: type>]", "sequence of time-tagged values");
