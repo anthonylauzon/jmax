@@ -34,43 +34,43 @@ public class DurationMapper extends DoubleMapper/*Mapper*///*@*//
       {
       e.setProperty("duration", new Integer(value));
       }*/
-    public void set(Event e, double value) 
-    {
-	e.setProperty("duration", new Double(value));
-    }
+  public void set(Event e, double value) 
+  {
+    e.setProperty("duration", new Double(value));
+  }
     
     
   /**
    * get the duration of this event
    */
-    /*public int get(Event e) 
-      {
-      return ((Integer)e.getProperty("duration")).intValue();
-      }*/
-    public double get(Event e) 
+  /*public int get(Event e) 
     {
-	return ((Double)e.getProperty("duration")).doubleValue();
-    }
+    return ((Integer)e.getProperty("duration")).intValue();
+    }*/
+  public double get(Event e) 
+  {
+    return ((Double)e.getProperty("duration")).doubleValue();
+  }
     
 
-    public String getName()
-    {
-	return "duration";
-    }
+  public String getName()
+  {
+    return "duration";
+  }
 
     /**
      * access the static instance
      */
-    static DoubleMapper/*Mapper*/ getMapper()
-    {
-	if (itsDurationMapper == null)
-	    itsDurationMapper = new DurationMapper();
-	return itsDurationMapper;
-    }
-
-    //--- Fields
+  static DoubleMapper/*Mapper*/ getMapper()
+  {
+    if (itsDurationMapper == null)
+      itsDurationMapper = new DurationMapper();
+    return itsDurationMapper;
+  }
+  
+  //--- Fields
     
-    static DurationMapper itsDurationMapper;
+  static DurationMapper itsDurationMapper;
 }
 
 

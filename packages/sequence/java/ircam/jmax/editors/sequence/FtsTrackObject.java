@@ -137,6 +137,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	((FtsTrackObject)obj).endPaste();		  
       }
     });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("endUpdate"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).endUpdate();		  
+      }
+    });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("properties"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
    {
@@ -575,6 +581,18 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     catch(IOException e)
       {
 	System.err.println("FtsTrackObject: I/O Error sending endPaste Message!");
+	e.printStackTrace(); 
+      }  
+  }
+
+  public void requestNotifyEndUpdate()
+  {
+    try{
+      send( FtsSymbol.get("endUpdate"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsTrackObject: I/O Error sending endUpdate Message!");
 	e.printStackTrace(); 
       }  
   }
@@ -1109,26 +1127,11 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
 	      beginUpdate();  //the paste is undoable
 
-	      /*requestEventCreationWithoutUpload((float)event.getTime(), 
-		event.getValue().getValueInfo().getName(), 
-		event.getValue().getDefinedPropertyCount()*2, 
-		event.getValue().getDefinedPropertyNamesAndValues());
-		
-		while (objectsToPaste.hasMoreElements())
-		{
-		event = (Event) objectsToPaste.nextElement();
-		requestEventCreationWithoutUpload((float)event.getTime(), 
-		event.getValue().getValueInfo().getName(), 
-		event.getValue().getDefinedPropertyCount()*2, 
-		event.getValue().getDefinedPropertyNamesAndValues());
-		}
-		    
-		requestUpload();*/
 	      requestEventCreation((float)event.getTime(), 
 				   event.getValue().getValueInfo().getName(), 
 				   event.getValue().getDefinedPropertyCount()*2, 
 				   event.getValue().getDefinedPropertyNamesAndValues());
-    
+	      
 	      while (objectsToPaste.hasMoreElements())
 		{
 		  event = (Event) objectsToPaste.nextElement();

@@ -487,9 +487,9 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-	  ((ClipableData) track.getTrackDataModel()).paste();
+      ((ClipableData) track.getTrackDataModel()).paste();
 
-    }
+  }
   
   public void duplicate()
   {

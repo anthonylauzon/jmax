@@ -55,15 +55,15 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
    * Constructor. theEvent is the event that is going to be modified. */
   public UndoableEventTransf(TrackEvent theEvent, String propName, Object newValue)
   {
-      try {
-	  itsEvent = theEvent.duplicate();
-      } catch (Exception ex) {System.err.println("error while cloning event");}
+    try {
+      itsEvent = theEvent.duplicate();
+    } catch (Exception ex) {System.err.println("error while cloning event");}
       
-      trkObj = ((FtsTrackObject)theEvent.getDataModel());
-      
-      this.propName  = propName;
-      undoProp  = theEvent.getProperty(propName);
-      redoProp  = newValue;
+    trkObj = ((FtsTrackObject)theEvent.getDataModel());
+    
+    this.propName  = propName;
+    undoProp  = theEvent.getProperty(propName);
+    redoProp  = newValue;
   }
 
   public boolean addEdit(UndoableEdit anEdit)
@@ -80,26 +80,26 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
    * Undo the trasformation */
   public void undo()
   {
-      itsEvent.setProperty(propName, redoProp);
-      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+    itsEvent.setProperty(propName, redoProp);
+    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       
-      if(evt!=null)
-	  evt.setProperty(propName, undoProp);
-      else
-	  die();
+    if(evt!=null)
+      evt.setProperty(propName, undoProp);
+    else
+      die();
   }
 
   /**
    * redo the trasformation */
   public void redo()
   {
-      itsEvent.setProperty(propName, undoProp);
-      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+    itsEvent.setProperty(propName, undoProp);
+    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       
-      if(evt!=null)
-	  evt.setProperty(propName, redoProp);
-      else
-	  die();
+    if(evt!=null)
+      evt.setProperty(propName, redoProp);
+    else
+      die();
   }
 }
 

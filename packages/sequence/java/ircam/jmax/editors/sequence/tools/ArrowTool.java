@@ -181,7 +181,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	resizing = false;	    
       }
     else
-	moveSelection(deltaX, deltaY);
+      moveSelection(deltaX, deltaY);
 
     mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    
@@ -222,7 +222,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	      egc.getAdapter().setHeigth( aEvent, 0);
 	  }          
 
-    ((UndoableData) egc.getDataModel()).endUpdate();
+    egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
   }
 
   void moveSelection(int deltaX, int deltaY)
@@ -234,7 +234,6 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 
     if(deltaX != 0) 
       {	    
-	// starts a serie of undoable moves
 	((UndoableData) egc.getDataModel()).beginUpdate();
 	    
 	if(a.isHorizontalMovementAllowed())
@@ -275,8 +274,8 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	    aEvent = (TrackEvent) e.nextElement();
 	    a.setY(aEvent, a.getY(aEvent)+deltaY);
 	  }    
-	((UndoableData) egc.getDataModel()).endUpdate();
       }
+    egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
   }
 
   //---Fields

@@ -450,22 +450,22 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
     public void deleteAll()
     {
-	if(size()==itsModel.length())
-	    {			
-		deselectAll();
-		((FtsTrackObject)itsModel).requestClearTrack();			    
-	    }
-	else
-	    {
-		MaxVector v = new MaxVector();		    
-		for (Enumeration en = getSelected(); en.hasMoreElements();)
-		    v.addElement(en.nextElement());
+      if(size()==itsModel.length())
+	{			
+	  deselectAll();
+	  ((FtsTrackObject)itsModel).requestClearTrack();			    
+	}
+      else
+	{
+	  MaxVector v = new MaxVector();		    
+	  for (Enumeration en = getSelected(); en.hasMoreElements();)
+	    v.addElement(en.nextElement());
 
-		deselectAll();
-
-		itsModel.deleteEvents(v.elements());
-		v = null;
-	    }
+	  deselectAll();
+	  
+	  itsModel.deleteEvents(v.elements());
+	  v = null;
+	}
     }
 
     public void selectNext()

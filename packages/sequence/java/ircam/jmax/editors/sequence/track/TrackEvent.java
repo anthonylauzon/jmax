@@ -133,7 +133,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   public void setCurrentProperties( int nArgs, FtsAtom[] args)
   {
     String name;
-    Object newVal;
+    Object newVal, oldVal;
     double doubleVal;
     
     if( nArgs == 1)
@@ -154,31 +154,37 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	{
 	  name = args[i].symbolValue.toString();
 	  newVal = args[i+1].getValue();
+	  oldVal = value.getProperty(name);
 	  
-	  if (itsTrackDataModel != null)
+	  if(!oldVal.toString().equals(newVal.toString()))
 	    {
-	      if (((UndoableData) itsTrackDataModel).isInGroup()&&( !name.equals("time")))
-		((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
-	    }
+	      if (itsTrackDataModel != null)
+		{
+		  if (((UndoableData) itsTrackDataModel).isInGroup()&& !name.equals("time"))
+		    ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
+		}
       
-	  if (newVal instanceof Double) 
-	    {
-	      doubleVal = ((Double)newVal).doubleValue();
-	      if ( name.equals("time"))
-		setTime( doubleVal);
-	      else  {
-		if ( value != null) value.setProperty(name, newVal); //unknown Double property
-	      }
-	    }
-	  else if (value != null)
-	    {
-	      if( newVal instanceof FtsSymbol)
-		value.setProperty(name, ((FtsSymbol)newVal).toString());
-	      else
-		value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
-	    }
-	  itsTrackDataModel.changeEvent(this, name, newVal);
-	}    
+	      if (newVal instanceof Double) 
+		{
+		  doubleVal = ((Double)newVal).doubleValue();
+		  if ( name.equals("time"))
+		    setTime( doubleVal);
+		  else  {
+		    if ( value != null) value.setProperty(name, newVal); //unknown Double property
+		  }
+		}
+	      else if (value != null)
+		{
+		  if( newVal instanceof FtsSymbol)
+		    value.setProperty(name, ((FtsSymbol)newVal).toString());
+		  else
+		    value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
+		}
+	      itsTrackDataModel.changeEvent(this, name, newVal);
+	    }    
+	}
+
+    //((UndoableData) itsTrackDataModel).endUpdate();
   }
 
   /**

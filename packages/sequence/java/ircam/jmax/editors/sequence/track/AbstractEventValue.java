@@ -162,7 +162,7 @@ public class AbstractEventValue implements EventValue, java.io.Serializable
       {
 	name = (String)args[i];
 	myValue = getProperty( name);
-	if(( myValue == null) || ( myValue != args[i+1]))
+	if(( myValue == null) || !myValue.toString().equals(args[i+1].toString()))
 	  return false;
       }
     return true;
