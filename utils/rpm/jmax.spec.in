@@ -6,7 +6,7 @@ Copyright: GPL
 Group: Applications/Multimedia
 Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
-
+Provides: %{name}-common = %{version}, %{name}-java = %{version}
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
 
@@ -20,14 +20,14 @@ jMax FTS kernel
 %package devel
 Summary: Header files for jMax
 Group: Development/Libraries
-Requires: %{name} = %{version} 
+Requires: %{name}-common = %{version} 
 %description devel
 Header files for jMax
 
 %package java
 Summary: Java gui for jMax
 Group: Applications/Multimedia
-Requires: %{name} = %{version}
+Requires: %{name}-common = %{version}
 %description java
 Java Graphical User Interface for jMax
 
@@ -37,50 +37,54 @@ Group: Applications/Multimedia
 %description client
 Contains C++ and Python client for jMax
 
-# %package jack
-# Summary: Jack Audio Connection Kit support for jMax
-# Group: Applications/Multimedia
-# Requires: jack-audio-connection-kit
-# %description jack
-# Jack Audio Connection Kit support for jMax
-# build jack
-# ./configure --with-java=java --with-javac=javac --enable-jack
-# make 
+%package jack
+Summary: Jack Audio Connection Kit support for jMax
+Group: Applications/Multimedia
+Requires: jack-audio-connection-kit, %{name}-common = %{version}
+%description jack
+Jack Audio Connection Kit support for jMax
 
 %prep
 %setup -n jmax-%{version}
 %build
-./configure --with-java=java --with-javac=javac
+./configure --with-java=java --with-javac=javac --enable-jack
 make
-
 
 %install
 rm -f /var/tmp/rpm.jmax.common.list
 rm -f /var/tmp/rpm.jmax.java.list
+rm -f /var/tmp/rpm.jmax.global.list
 rm -rf $RPM_BUILD_ROOT
+
 make DESTDIR=$RPM_BUILD_ROOT install
 # library files for common rpm 
-find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "lib*.so" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+# remove jack to avoid libjack dependency in jmax package and common subpackage
+find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "lib*.so" | grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+
 # jpkg files for common rpm
-find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "*.jpkg" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+# remove jack to avoid libjack dependency in jmax package and common subpackage
+find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "*.jpkg" | grep -v "jack" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+
 # help files for common rpm
 find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -type d -name "help" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # for java rpm
 find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
+
+# for global rpm (without jack support)
+cat /var/tmp/rpm.jmax.java.list /var/tmp/rpm.jmax.common.list >> /var/tmp/rpm.jmax.global.list
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
 
-%files
+%files -f /var/tmp/rpm.jmax.global.list
 %defattr(-, root, root)
 %doc LICENCE.fr LICENSE README doc/*
 %{_bindir}/jmax
 %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
-%{_datadir}/jmax
 
 %files common -f /var/tmp/rpm.jmax.common.list
 %defattr(-,root,root)
@@ -91,7 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root)
 %{_bindir}/jmax-config
-%{_includedir}/fts
+%{_includedir}/fts/*.h
+%{_includedir}/fts/packages
 %{_libdir}/libfts.la
 %{_libdir}/pkgconfig/jmax.pc
 
@@ -101,12 +106,20 @@ rm -rf $RPM_BUILD_ROOT
 
 %files client
 %defattr(-,root,root)
-%{_libdir}/libftsclient.so.0.0.0
-%{_libdir}/libftsclient.so.0
-%{_libdir}/libftsclient.so
+%{_includedir}/fts/client
+%{_libdir}/libftsclient.so*
 %{_datadir}/jmax/client/python
 
+%files jack
+%defattr(-,root,root)
+%{_datadir}/jmax/packages/jack
+
 %changelog
+* Fri Feb  7 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- remove client C++ headers from devel subpackage
+- add jack subpackage building
+- remove dependency between jmax and libjack
+- add dependency between subpackages
 * Thu Feb  6 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - add building of client sub package
 * Thu Nov 21 2002 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
