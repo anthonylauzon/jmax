@@ -163,7 +163,7 @@ FTS_API fts_method_t fts_class_get_method_novarargs(fts_class_t *cl, fts_symbol_
  */
 FTS_API fts_method_t fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s);
 
-static const int fts_system_inlet = -1;
+extern const int fts_system_inlet;
 
 /* Status return values */
 FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
