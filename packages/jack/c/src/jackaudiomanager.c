@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <jack/jack.h>
 #include <fts/fts.h>
 #include <fts/thread.h>
@@ -278,7 +277,6 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 	    port->output_port = NULL;
 	  }
 	}
-	port->is_connected = 0;
 	self->close_state = 0;
 	self->run_state = 0;
 	break;
@@ -329,7 +327,6 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 		    port->port_name, 
 		    jack_port_name(port->input_port));
 	    fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
-	    port->is_connected = 1;
 	  }
 	}
 	else
@@ -349,7 +346,6 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 		    jack_port_name(port->output_port), 
 		    port->port_name);
 	    fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
-	    port->is_connected = 1;
 	  }
 	
 	}
