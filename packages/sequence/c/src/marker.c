@@ -1524,6 +1524,99 @@ marker_track_append_bar(track_t *marker_track, event_t *start_evt)
 }
 
 
+
+
+/******************************************************
+*
+*  import/export
+*
+*/
+
+/* import text label file as exported by audacity into marker track.
+   format: lines of time [s] (no leading space!), tab or space, 
+	   label text until newline
+*/
+
+void
+marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s, 
+                                int ac, const fts_atom_t *at)
+{
+  if (ac > 0  &&  fts_is_symbol(at))
+  {
+    fts_symbol_t      filename = fts_get_symbol(at);
+    fts_atom_file_t  *file;
+    fts_atom_t        a;
+    char              c;
+    double            time;
+    fts_bytestream_t *memstream;
+    enum { TIME, TEXT, ERROR } waitingfor = TIME;
+
+    memstream = fts_object_create(fts_memorystream_class, 0, NULL);
+    fts_object_refer(memstream);
+
+    /* check file name for .txt? */
+
+    if (!(file = fts_atom_file_open(filename, "r")))
+    { /* we were responsible for this file, but can't open it: 
+         don't return void */
+      fts_post("can't open label text file '%s'\n", fts_symbol_name(filename));
+      fts_return_object(o);     
+      return;
+    }
+
+    while (waitingfor != ERROR  &&  fts_atom_file_read(file, &a, &c))
+    {
+      switch (waitingfor)
+      {
+        case TIME:
+          if (fts_is_number(&a))
+          {
+            time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
+
+            /* prepare collection of label */
+            fts_memorystream_reset(memstream);
+            waitingfor = TEXT;
+          }
+          else
+          {
+            waitingfor = ERROR;
+          }
+        break;
+
+        case TEXT:
+          fts_spost_atoms(memstream, 1, &a);
+
+          if (c == '\n')
+          { /* end of label: create marker event, set label */
+            event_t      *event;
+            scomark_t    *mrk;
+            char         *lab;
+            
+            mrk = marker_track_insert_marker((track_t *) o, time, 
+                                             seqsym_marker, &event);
+
+            /* get and zero-terminate label string (NOT KOSHER!) */
+            lab = fts_memorystream_get_bytes(memstream);
+            lab[fts_memorystream_get_size(memstream)] = 0;
+            
+            scomark_set_label(mrk, fts_new_symbol(lab));
+
+            waitingfor = TIME;
+          }
+          else
+            fts_spost(memstream, "%c", c);
+        break;
+      }
+    }
+
+    fts_object_release(memstream); 
+    fts_atom_file_close(file);
+    fts_return_object(o);       
+  }
+}
+
+
+
 /** EMACS **
 * Local variables:
 * mode: c

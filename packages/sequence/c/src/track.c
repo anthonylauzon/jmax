@@ -735,6 +735,7 @@ track_segment_quantize(track_t *self, event_t *first, event_t *after, double beg
   }
 }
 
+
 void 
 track_copy(track_t *org, track_t *copy)
 {
@@ -757,11 +758,13 @@ track_copy(track_t *org, track_t *copy)
   }
 }
 
+
 static void
 track_copy_function(const fts_object_t *from, fts_object_t *to)
 {
   track_copy((track_t *)from, (track_t *)to);
 }
+
 
 static void
 track_description_function(fts_object_t *o,  fts_array_t *array)
@@ -2416,7 +2419,11 @@ track_config(void)
 {
   track_class = fts_class_install(seqsym_track, track_instantiate);
   
-  /* the midifile importer/exporter will be the last handler tried */
+  /* the midifile importer/exporter is registered first, 
+     so it will be the last handler tried */
   fts_class_add_import_handler(track_class, track_import_midifile);
   fts_class_add_export_handler(track_class, track_export_midifile);
+
+  /* marker track import/export */
+  fts_class_add_import_handler(track_class, marker_track_import_labels_txt);
 }

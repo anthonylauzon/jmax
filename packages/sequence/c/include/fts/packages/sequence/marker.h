@@ -97,4 +97,8 @@ extern void marker_track_remove_events(track_t *marker_track, int ac, const fts_
 extern void marker_track_clear(track_t *marker_track);
 extern void marker_track_collapse_markers(track_t *marker_track, int ac, const fts_atom_t *at);
 
+/* import/export */
+void marker_track_import_labels_txt (fts_object_t *o, int w, fts_symbol_t s, 
+                                     int ac, const fts_atom_t *at);
+
 #endif
