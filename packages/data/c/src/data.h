@@ -16,7 +16,6 @@
 
 #include "atoms.h"
 #include "types.h"
-#include "recycle.h"
 #include "utils.h"
 
 extern fts_data_t *data_create(fts_symbol_t type, int ac, const fts_atom_t *at);

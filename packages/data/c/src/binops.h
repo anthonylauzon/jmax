@@ -17,7 +17,6 @@
 #include "fts.h"
 #include "types.h"
 #include "operators.h"
-#include "recycle.h"
 
 extern fts_symbol_t binops_s_recycle;
 extern fts_symbol_t binops_s_inplace;
