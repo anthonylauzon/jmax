@@ -73,6 +73,9 @@
 
 #elif defined(SOLARIS2)
 
+/* Needed for compatibility with the newer restrict keyword */
+#define restrict
+
 #define HAS_DL
 #define HAS_DTD
 #define HAS_TIME_OF_THE_DAY

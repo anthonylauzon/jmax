@@ -502,7 +502,3 @@ void fts_patlex_next_token(fts_patlex_t *this)
     }
 }
 
-
-    
-    
-

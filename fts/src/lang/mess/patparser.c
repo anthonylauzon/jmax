@@ -782,7 +782,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
     }
   else if (objclass == fts_s_outlet)
     {
-      fts_atom_t description[1];
+      fts_atom_t description[2];
 
       /* skip optional dsp flag  */
 

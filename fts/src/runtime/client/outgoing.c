@@ -129,6 +129,9 @@ fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 	fts_client_mess_add_string(fts_get_string(&args[i]));
       else  if (fts_is_object(&args[i]))
 	fts_client_mess_add_object(fts_get_object(&args[i]));
+      else
+	fprintf(stderr, "Wrong atom type in fts_client_mess_add_atoms: %lx\n",
+		(unsigned long) fts_get_type(&args[i]));
     }
 }
 
