@@ -43,7 +43,19 @@ oneshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   oneshot_t *this = (oneshot_t *)o;
   
-  this->open = 1;
+  ac--;
+  at++;
+
+  if(ac == 0)
+    this->open = 1;
+  else if(ac == 1 && fts_is_int(at))
+    {
+      int n = fts_get_int(at);
+
+      this->open = (n != 0);
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 /************************************************************
@@ -72,6 +84,15 @@ oneshot_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->open = 1;
 }
 
+static void
+oneshot_switch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  oneshot_t *this = (oneshot_t *)o;
+  int n = fts_get_int(at);
+  
+  this->open = (n != 0);
+}
+
 /************************************************************
  *
  *  class
@@ -88,6 +109,7 @@ oneshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, oneshot_input);
   fts_method_define_varargs(cl, 1, fts_s_bang, oneshot_open);
+  fts_method_define_varargs(cl, 1, fts_s_int, oneshot_switch);
 
   return fts_Success;
 }
@@ -95,5 +117,5 @@ oneshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 oneshot_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("oneshot"), oneshot_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("oneshot"), oneshot_instantiate);
 }
