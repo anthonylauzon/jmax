@@ -1,4 +1,4 @@
-C_TARGETS= fts1.5 manoury tools eric
+C_TARGETS= fts1.5 manoury eric
 JAVA_TARGETS=table qlist
 
 all: all_c all_java
