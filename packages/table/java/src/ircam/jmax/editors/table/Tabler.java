@@ -46,11 +46,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     
     itsTablePanel = new TablePanel(this);
     itsTablePanel.resize(itsTablePanel.getPreferredSize().width,itsTablePanel.getPreferredSize().height);
-    // getContentPane().add("Center", itsTablePanel);
     
     itsScrollPane = new ScrollPane();
     itsScrollPane.add(itsTablePanel);
-    itsScrollPane.setScrollPosition(0,itsTablePanel.getPreferredSize().height);
+    itsScrollPane.setScrollPosition(0, 0);
     getContentPane().add("Center", itsScrollPane);
 
     itsFrontHeader = new Panel();
@@ -94,6 +93,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     itsTablePanel.repaint();
     preferredSize.width = itsTablePanel.getPreferredSize().width;//????????
 
+    itsScrollPane.setScrollPosition(0,30);
     validate();
     itsFormula.addKeyListener(this);
     setBounds(100, 100, getPreferredSize().width,getPreferredSize().height);
