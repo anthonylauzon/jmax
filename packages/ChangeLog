@@ -1,3 +1,7 @@
+2000-04-06  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* alsadev/src/alsa*.c: added ALSA raw midi device
+
 2000-04-05  Norbert Schnell  <schnell@ircam.fr>
 
 	* added midifile reading to the sequence package

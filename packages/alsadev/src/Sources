@@ -25,4 +25,6 @@
 
 SOURCES= \
 alsadev.c	\
+alsadevaudio.c	\
+alsadevmidi.c	\
 

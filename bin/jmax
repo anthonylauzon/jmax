@@ -49,7 +49,9 @@ Starts jMax.
 Options and arguments:
   -javaopt <java-option>     (optional)
     Defines an option that is to be passed directly to the Java interpreter.
-    Several [-javaopt java-option] can appear in the command line.
+    Several [-javaopt java-option] can appear in the command line, in which
+    case they will be concatenated.
+    Example: -javaopt -verbosegc
 
   -nofork
     Do not go into the background.  By default, jMax forks itself to give control 

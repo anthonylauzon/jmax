@@ -33,7 +33,7 @@ ucs load module alsadev $dir/lib/$jmaxArch/$jmaxMode/libalsadev.so
 
 # devices definitions
 defineDevice alsaIn     { alsa_adc } "ALSA audio in"
-
 defineDevice alsaOut    { alsa_dac } "ALSA audio out"
+defineDevice alsaMidi   { alsa_midi } "ALSA raw MIDI"
 
 post "package: alsadev (ALSA devices)"
