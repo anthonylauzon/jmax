@@ -3,22 +3,6 @@
 #include "delbuf.h"
 #include "deltable.h"
 
-/*
-  Consistency requirements for delwrite, delread to work: the logical length
-  of the buffer (buf->size) and the phase (buf->phase) must be multiples of the
-  vector size.  The actual delay buffer has vecsize elements at the end which are
-  copies of the first vecsize elements.  Thus you can read vecsize consecutive
-  samples starting anywhere as long as they don't cross the write pointer.  The
-  phase can't be zero but can equal the logical length.
-*/
-/*
-  ???
-  The length of a delay line MUST be a multiple of the vector length
-  The last buffer in the delay line
-  (i.e. the buffer starting at adress delay->samples + length - vectorLength)
-  is duplicated at beginning of delay line.
-*/
-
 static fts_symbol_t dsp_symbol = 0;
 extern void ftl_delwrite(fts_word_t *a);
 
@@ -32,6 +16,7 @@ typedef struct _delwrite_t
 {
   fts_object_t o;
   fts_symbol_t name;
+  fts_symbol_t unit;
   del_buf_t *buf;
   int rec_prot; /* housekeeping for dead code elimination */
 } delwrite_t;
@@ -42,11 +27,11 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   delwrite_t *this = (delwrite_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
-  float raw_size;
+  float size;
   if(unit)
-    raw_size = (float)fts_get_number_arg(ac, at, 3, 0.0f);
+    size = (float)fts_get_number_arg(ac, at, 3, 0.0f);
   else{
-    raw_size = (float)fts_get_number_arg(ac, at, 2, 0.0f);
+    size = (float)fts_get_number_arg(ac, at, 2, 0.0f);
     unit = fts_s_msec; /* default */
   }
 
@@ -58,8 +43,10 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 
   this->name = name;
+  this->unit = unit;
+  this->buf = delbuf_new(size, unit);
+
   this->rec_prot = 0;
-  this->buf = delbuf_new(raw_size, unit);
 
   delay_table_add_delwrite(o, this->name, this->buf);
   dsp_list_insert(o); /* just put object in list */
@@ -100,9 +87,8 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(delbuf_is_init(this->buf))
     {
-      if(this->buf->n_tick != n_tick){
-	post("error: delwrite~: %s: sample rate does not match with delread~\n", 
-	     fts_symbol_name(this->name));
+      if(delbuf_get_tick_size(this->buf) != n_tick){
+	post("error: delwrite~: %s: sample rate does not match with delay line\n", fts_symbol_name(this->name));
 	return;
       }
     }
@@ -138,21 +124,11 @@ static void
 delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delwrite_t *this = (delwrite_t *)o;
-  fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 0, 0);
-  float raw_size;
-
-  if(unit)
-    raw_size = (float)fts_get_number_arg(ac, at, 1, 0.0f);
-  else{
-    raw_size = (float)fts_get_number_arg(ac, at, 0, 0.0f);
-    unit = fts_s_msec; /* default */
-  }
+  float size  = (float)fts_get_number_arg(ac, at, 1, 0.0f);
 
   if(!this->name) return;
-  if(raw_size <= 0) raw_size = this->buf->raw_size;
 
-  this->buf->raw_size = raw_size;
-  this->buf->unit = unit;
+  delbuf_set_size(&this->buf, size, this->unit);
 }
 
 
@@ -185,9 +161,8 @@ delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_new_symbol("clear"), delwrite_clear, 0, 0);
   
-  a[0] = fts_s_anything; /* unit or size */
-  a[1] = fts_s_number; /* size or no */
-  fts_method_define_optargs(cl, 0, fts_new_symbol("realloc"), delwrite_realloc, 2, a, 1);
+  a[0] = fts_s_number; /* size or no */
+  fts_method_define(cl, 0, fts_new_symbol("realloc"), delwrite_realloc, 1, a);
 
   /* DSP declarations */
 

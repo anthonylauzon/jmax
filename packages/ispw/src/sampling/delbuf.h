@@ -1,9 +1,6 @@
 #ifndef _DELBUF_H_
 #define _DELBUF_H_
 
-
-
-
 #define VD_TAIL 4
 
 typedef struct {
@@ -33,5 +30,8 @@ extern void delbuf_clear_is_init_flag(del_buf_t *buf);
 
 extern void delbuf_delete_delayline(del_buf_t *buf); /* free delayline */
 extern void delbuf_clear_delayline(del_buf_t *buf); /* clear delayline (fill with 0.0) */
+
+#define delbuf_get_tick_size(buf) ((buf)->n_tick)
+#define delbuf_get_size_in_samples(buf) ((buf)->size)
 
 #endif /* _DELBUF_H_ */

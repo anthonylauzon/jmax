@@ -1,9 +1,5 @@
-
 typedef struct{
-  float fudge; /* 1/(n-1) */
-  long maxspan; /* maximum travel allowed per call */
-  float delonset; /* correction to subtract from deltimes */
-  float writevecsize; /* number of samps in delwrite per vd call */
+  int write_advance; /* n_tick if write before read */
   float conv; /* unit to samples conversion */
 } vd_ctl_t;
 

@@ -1,6 +1,21 @@
 #include "fts.h"
 #include "delbuf.h"
 
+/*
+  Consistency requirements for delwrite, delread to work: the logical length
+  of the buffer (buf->size) and the phase (buf->phase) must be multiples of the
+  vector size.  The actual delay buffer has vecsize elements at the end which are
+  copies of the first vecsize elements.  Thus you can read vecsize consecutive
+  samples starting anywhere as long as they don't cross the write pointer.  The
+  phase can't be zero but can equal the logical length.
+*/
+/*
+  ???
+  The length of a delay line MUST be a multiple of the vector length
+  The last buffer in the delay line
+  (i.e. the buffer starting at adress delay->samples + length - vectorLength)
+  is duplicated at beginning of delay line.
+*/
 
 /* clear delayline (fill with 0.0) */
 void 
@@ -101,6 +116,16 @@ delbuf_init(del_buf_t *buf, float sr, long n_tick)
   return(1);
 }
 
+void
+delbuf_set_size(del_buf_t *buf, float raw_size, fts_symbol_t unit)
+{
+  if(raw_size > 0)
+    {
+      buf->raw_size = raw_size;
+      buf->unit = unit;
+    }
+}
+
 int 
 delbuf_is_init(del_buf_t *buf)
 {
@@ -112,3 +137,4 @@ delbuf_clear_is_init_flag(del_buf_t *buf)
 {
   buf->is_init = 0;
 }
+

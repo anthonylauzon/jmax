@@ -3,12 +3,10 @@
 #include "delbuf.h"
 #include "deltable.h"
 
-
 #define CLASS_NAME "delread~"
 
 static fts_symbol_t delread_function_symbol = 0;
 extern void ftl_delread(fts_word_t *a);
-
 
 /**************************************************
  *
@@ -21,15 +19,28 @@ typedef struct
   fts_object_t  obj;
   fts_symbol_t name;
   fts_object_t *next; /* DCE: pointer to the other delread for the same delay line */
-
   float conv;
   fts_symbol_t unit;
-  float rawdeltime; /* nominal delay time */
-  float delonset; /* for compensation of computation order of write on read */
+  float time; /* nominal delay time */
+  float write_advance; /* for compensation of computation order of write on read */
   del_buf_t *buf; /* pointer to delay buffer */
   ftl_data_t ftl_deltime; /* real backward index to current phase of delayline */
 } delread_t;
 
+static void
+delread_set_delay(delread_t *this)
+{
+  int mindel = delbuf_get_tick_size(this->buf);
+  int maxdel = delbuf_get_size_in_samples(this->buf) + this->write_advance;
+  int del = this->time * this->conv + this->write_advance;
+  
+  if (del < mindel)
+    del = mindel; /* either the delwrite wrote already one tick or the min delay is one tick */
+  else if (del > maxdel)
+    del = maxdel;
+  
+  ftl_data_copy(long, this->ftl_deltime, &del);
+}
 
 static void
 delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -47,10 +58,10 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   conv = fts_unit_convert_to_base(unit, 1.0f, &sr);
   
   this->name = name;
-  this->rawdeltime = time;
+  this->time = time;
   this->conv = conv;
   this->unit = unit;
-  this->delonset = 0;
+  this->write_advance = 0;
   this->buf = 0;
   this->next = 0;
 
@@ -87,7 +98,6 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   long n_tick = fts_dsp_get_input_size(dsp, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   del_buf_t *buf;
-  long del;
   fts_atom_t argv[5];
 
   buf = delay_table_get_delbuf(this->name);
@@ -97,18 +107,15 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
    
   if(delay_table_is_delwrite_scheduled(this->name))
-    {
-      this->delonset = n_tick; /* write before read (data is at least one tick old) */
-    }
+    this->write_advance = n_tick; /* write before read (data is at least one tick old) */
   else
-    {
-      this->delonset = 0; /* read before write */ 
-    }
+    this->write_advance = 0; /* read before write */ 
 
   if(delbuf_is_init(buf))
     {
-      if(buf->n_tick != n_tick){ /* check if n_tick of delread and delwrite matches */
-	post("error: delread~: %s: sample rate does not match with delwrite~\n", fts_symbol_name(this->name));
+      if(delbuf_get_tick_size(buf) != n_tick){ /* check if n_tick of delread and delwrite matches */
+	post("error: delread~: %s: sample rate does not match with delay line\n", fts_symbol_name(this->name));
+	return;
       }
     }
   else
@@ -122,12 +129,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
   this->buf = buf;      
   
-  del = this->rawdeltime * this->conv + this->delonset;
-  if (del < n_tick)
-    del = n_tick; /* either the delwrite wrote already one tick or the min delay is one tick */
-  else if (del > buf->size + n_tick)
-    del = buf->size + n_tick;
-  ftl_data_copy(long, this->ftl_deltime, &del);
+  delread_set_delay(this);
   
   fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
   fts_set_ptr(argv + 1, buf);
@@ -149,20 +151,11 @@ delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   delread_t *this = (delread_t *)o;
   del_buf_t *buf = this->buf;
-  long del;
 
-  this->rawdeltime = (float)fts_get_number_arg(ac, at, 0, 0.0f);
-  del = this->rawdeltime * this->conv + this->delonset;
+  this->time = (float)fts_get_number_arg(ac, at, 0, 0.0f);
 
-  if(buf)
-    {
-      if (del < buf->n_tick)
-	del = buf->n_tick;
-      else if (del > buf->size + buf->n_tick)
-	del = buf->size + buf->n_tick;
-    }
-
-  ftl_data_copy(long, this->ftl_deltime, &del);
+  if(this->buf)
+    delread_set_delay(this);
 }
 
 /**************************************************

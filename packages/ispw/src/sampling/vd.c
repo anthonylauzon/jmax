@@ -13,7 +13,7 @@
    (but bp-offset might point before the beginning; this is guarded
    against in the loop.) */
 
-static fts_symbol_t dsp_symbol = 0;
+static fts_symbol_t vd_dsp_symbol = 0;
 
 /**************************************************
  *
@@ -25,12 +25,9 @@ typedef struct
 {
   fts_object_t  obj;
   fts_symbol_t name;
-  fts_object_t *next; /* DCE: pointer to the other vd for the same delay line */ 
-
-  float maxinc; /* maximum inc allowed per samp */
-  float fixdel;	/* (sr of write) / (sr of vd) */
   fts_symbol_t unit;
   ftl_data_t vd_data;
+  fts_object_t *next; /* DCE: pointer to the other vd for the same delay line */ 
 } vd_t;
 
 
@@ -40,35 +37,17 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   vd_t *this = (vd_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
-  float maxinc;
-  long down;
-
-  if(unit){
-    maxinc = (float)fts_get_number_arg(ac, at, 3, 0.0f);
-    down = (long)fts_get_long_arg(ac, at, 4, 0);
-  }else{
-    maxinc = (float)fts_get_number_arg(ac, at, 2, 0.0f);
-    down = (long)fts_get_long_arg(ac, at, 3, 0);
-    unit = fts_s_msec; /* default */
-  }
 
   this->name = name;
-  this->next = 0;
 
-  if (maxinc < 1.0f) 
-    this->maxinc = 4.0f;
+  if(unit)
+    this->unit = unit;
   else
-    this->maxinc = maxinc;
-
-  if (down < 0)
-    down = 0;
-  else if(down > 15)
-    down = 15;
-
-  this->fixdel = 1.0f/(1 << down);
-  this->unit = unit;
+    this->unit = fts_s_msec;
 
   this->vd_data = ftl_data_new(vd_ctl_t);
+
+  this->next = 0;
 
   delay_table_add_delreader(o, this->name);
   dsp_list_insert(o); 
@@ -102,8 +81,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   long n_tick = fts_dsp_get_input_size(dsp, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
-  float f, conv;
-  long l;
+  float conv;
   del_buf_t *buf;
 
   buf = delay_table_get_delbuf(this->name);
@@ -112,28 +90,33 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
     return;
   }
 
-  l = this->maxinc * n_tick;
-  l += ((-l) & (MINVS));
-  ftl_data_set(vd_ctl_t, this->vd_data, maxspan, &l); 
-  
-  f = ((n_tick > 1)? 1.0f/(n_tick - 1): 0);
-  ftl_data_set(vd_ctl_t, this->vd_data, fudge, &f); 
-  
-  f =  n_tick * this->fixdel;
-  ftl_data_set(vd_ctl_t, this->vd_data, writevecsize, &f); 
-  
   conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
   ftl_data_set(vd_ctl_t, this->vd_data, conv, &conv);
   
   if(delay_table_is_delwrite_scheduled(this->name))
     {
-      f = -n_tick / conv; /* write before read (data is at least one tick old) */
-      ftl_data_set(vd_ctl_t, this->vd_data, delonset, &f); 
+      int i = n_tick; /* write before read! */
+      ftl_data_set(vd_ctl_t, this->vd_data, write_advance, &i);
     }
   else
     {
-      f = 0;
-      ftl_data_set(vd_ctl_t, this->vd_data, delonset, &f);
+      float i = 0;
+      ftl_data_set(vd_ctl_t, this->vd_data, write_advance, &i);
+    }
+
+  if(delbuf_is_init(buf))
+    {
+      if(delbuf_get_tick_size(buf) != n_tick){ /* check if n_tick of delread and delwrite matches */
+	post("error: vd~: %s: sample rate does not match with delay line\n", fts_symbol_name(this->name));
+	return;
+      }
+    }
+  else
+    {
+      /* first delwrite~ or delread~ or vd~ scheduled for this delayline inits buffer */
+      int success;
+      success = delbuf_init(buf, sr, n_tick);
+      if(!success) return;
     }
 
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
@@ -141,8 +124,8 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   fts_set_ptr(argv + 2, buf);
   fts_set_ftl_data(argv + 3, this->vd_data);
   fts_set_long(argv + 4, n_tick);
-  dsp_add_funcall(dsp_symbol, 5, argv);
-    
+  dsp_add_funcall(vd_dsp_symbol, 5, argv);
+
   delay_table_delreader_scheduled(this->name);
 }
 
@@ -161,12 +144,10 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* System methods */
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_anything;
-  a[3] = fts_s_number;
-  a[4] = fts_s_int ;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, vd_init, 4, a, 2);
+  a[0] = fts_s_symbol; /* class name */
+  a[1] = fts_s_symbol; /* delay line name */
+  a[2] = fts_s_symbol; /* opt: unit name */
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, vd_init, 3, a, 2);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, vd_delete, 0, 0);
 
@@ -179,8 +160,8 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_sig_inlet(cl, 1); 
   dsp_sig_outlet(cl, 0);        
   
-  dsp_symbol = fts_new_symbol("vd");
-  dsp_declare_function(dsp_symbol, ftl_vd);
+  vd_dsp_symbol = fts_new_symbol("vd");
+  dsp_declare_function(vd_dsp_symbol, ftl_vd);
 
   return fts_Success;
 }
@@ -190,4 +171,3 @@ vd_config(void)
 {
   fts_metaclass_create(fts_new_symbol("vd~"),vd_instantiate, fts_always_equiv);
 }
-
