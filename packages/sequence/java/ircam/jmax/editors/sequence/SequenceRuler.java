@@ -34,11 +34,12 @@ import java.awt.*;
 import java.awt.event.*;
 /**
 * A graphic JPanel that represents a ruler containing time indications */
-public class SequenceRuler extends PopupToolbarPanel implements HighlightListener{
-	
+public class SequenceRuler extends PopupToolbarPanel implements HighlightListener
+{	
   public SequenceRuler( Geometry geom, ScrollManager scm)
-{
+  {
     super();
+    setLayout(null);//%%%%
     setOpaque(false);
     setDoubleBuffered(false);
     setFont(SequencePanel.rulerFont);
@@ -74,141 +75,168 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 			}
 		});
     popup = new RulerPopupMenu(this);
-}
+  
+    marker = new RulerMarker( this);
+    marker.setBounds( -10, -10, 4, RULER_HEIGHT-2);
+    add( marker);
+    marker.setVisible(false);
+    validate();
+  }
 
-public void paintComponent(Graphics g)
-{
-	int xPosition;
-	int snappedTime;
-	String timeString;
-	Dimension d = getSize();
-	Rectangle clip = g.getClipBounds();
-	
-	int logicalTime = -geometry.getXTransposition();
-	int windowTime = (int) (utilityPartitionAdapter.getInvX(d.width) - utilityPartitionAdapter.getInvX(ScoreBackground.KEYEND))-1;	
-	int timeStep = ScoreBackground.findBestTimeStep(windowTime/*-logicalTime*/);
-	
-	//controll if the time string is too long (in this case draw one string on two)
-	int stringLenght = fm.stringWidth(""+(logicalTime+timeStep));
-	int delta = utilityPartitionAdapter.getX(logicalTime+timeStep)-utilityPartitionAdapter.getX(logicalTime);
-	int k, stringWidth;
-	if(stringLenght>delta-10) k = 2;
-	else k=1;
-		
-	g.setColor(SequencePanel.violetColor);
-  for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep*k) 
+  public void paintComponent(Graphics g)
   {
-    snappedTime = (i/timeStep)*timeStep;
-    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
+    int xPosition;
+    int snappedTime;
+    String timeString;
+    Dimension d = getSize();
+    Rectangle clip = g.getClipBounds();
     
-    if(unity==MILLISECONDS_UNITY)		    
-      timeString = ""+snappedTime;
+    int logicalTime = -geometry.getXTransposition();
+    int windowTime = (int) (utilityPartitionAdapter.getInvX(d.width) - utilityPartitionAdapter.getInvX(ScoreBackground.KEYEND))-1;	
+    int timeStep = ScoreBackground.findBestTimeStep(windowTime/*-logicalTime*/);
+    
+    //controll if the time string is too long (in this case draw one string on two)
+    int stringLenght = fm.stringWidth(""+(logicalTime+timeStep));
+    int delta = utilityPartitionAdapter.getX(logicalTime+timeStep)-utilityPartitionAdapter.getX(logicalTime);
+    int k, stringWidth;
+    if(stringLenght>delta-10) k = 2;
+    else k=1;
+		
+    g.setColor(SequencePanel.violetColor);
+    for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep*k) 
+    {
+      snappedTime = (i/timeStep)*timeStep;
+      xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
+      
+      if(unity==MILLISECONDS_UNITY)		    
+        timeString = ""+snappedTime;
+      else
+        timeString = ""+(float)(snappedTime/(float)1000.0);
+        
+      stringWidth = fm.stringWidth(timeString);
+      g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
+    }
+  }
+  int getXIndentation()
+  {
+    if( scrollManager instanceof SequencePanel)
+      return 3+TrackContainer.BUTTON_WIDTH;
     else
-      timeString = ""+(float)(snappedTime/(float)1000.0);
-	    
-    stringWidth = fm.stringWidth(timeString);
-    g.drawString(timeString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
+      return 1;
+  }
+
+  protected void processMouseEvent(MouseEvent e)
+  {
+    if (e.getClickCount()>1) 
+    {
+      geometry.setXZoom(DEFAULT_XZOOM);
+    }
+    else
+      super.processMouseEvent(e);
+  }
+
+  public String getUnityName()
+  {
+    return unityName;
+  }
+  public void setUnityName(String name)
+  {
+    if(name.equals(unityName)) return;
+    
+    if(name.equals("Milliseconds"))
+      unity = MILLISECONDS_UNITY;
+    else if(name.equals("Seconds"))
+      unity = SECONDS_UNITY;
+	
+    unityName = name;
+    repaint();
+  }
+
+  public Dimension getPreferredSize()
+  { return rulerDimension; }
+
+  public Dimension getMinimumSize()
+  { return rulerDimension; }
+
+  public JPopupMenu getMenu()
+  {
+    popup.update();
+    return popup;
+  }
+  //------- HighlightListener interface
+  Rectangle paintRect = new Rectangle(); 
+  public void highlight(Enumeration elements, double time)
+  {
+    if(!hh)
+    {
+      marker.setVisible(true);
+      //---------
+      hh = true;
+    }
+    marker.setTime(time);
   }
   
-  if(hh)
-    drawMarker(g);
-}
+  //--- Ruler fields
+  boolean hh = false;
 
-void drawMarker(Graphics g)
-{
-  Dimension d = getSize();
-  int hhX = utilityPartitionAdapter.getX(hhTime)+getXIndentation();
-  g.setColor(Color.green);
-  g.fillRect(hhX, 1, 4, d.height-2);
-  g.setColor(Color.darkGray);
-  g.drawRect(hhX, 1, 3, d.height-3);
-}
-
-int getXIndentation()
-{
-	if( scrollManager instanceof SequencePanel)
-		return 3+TrackContainer.BUTTON_WIDTH;
-	else
-		return 1;
-}
-
-protected void processMouseEvent(MouseEvent e)
-{
-	if (e.getClickCount()>1) 
-	{
-		geometry.setXZoom(DEFAULT_XZOOM);
-	}
-	else
-		super.processMouseEvent(e);
-}
-
-public String getUnityName()
-{
-	return unityName;
-}
-public void setUnityName(String name)
-{
-	if(name.equals(unityName)) return;
-	
-	if(name.equals("Milliseconds"))
-		unity = MILLISECONDS_UNITY;
-	else if(name.equals("Seconds"))
-		unity = SECONDS_UNITY;
-	
-	unityName = name;
-	
-	repaint();
-}
-
-public Dimension getPreferredSize()
-{ return rulerDimension; }
-
-public Dimension getMinimumSize()
-{ return rulerDimension; }
-
-public JPopupMenu getMenu()
-{
-	popup.update();
-	return popup;
-}
-//------- HighlightListener interface
-Rectangle paintRect = new Rectangle(); 
-public void highlight(Enumeration elements, double time)
-{
-	//---------
-	hh = true;
-	
-	int hhX = utilityPartitionAdapter.getX(hhTime) + getXIndentation();
-	int timeX = utilityPartitionAdapter.getX(time) + getXIndentation();
-	
-	if(time >= hhTime)
-		paintRect.setBounds(hhX, 1, timeX-hhX+5, getSize().height-2);
-	else
-		paintRect.setBounds(timeX, 1, hhX-timeX+5, getSize().height-2);
-	
-	repaint(paintRect);
-	
-	hhTime = time;
-}
-
-//--- Ruler fields
-boolean hh = false;
-double hhTime;
-
-Dimension rulerDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, RULER_HEIGHT);
-FontMetrics fm;
-String unityName = "Milliseconds";
-int unity = MILLISECONDS_UNITY;
-RulerPopupMenu popup;
-PartitionAdapter utilityPartitionAdapter;
-Geometry geometry;
-ScrollManager scrollManager;
-int previousX;
-public final static int DEFAULT_XZOOM      = 20; 
-public final static int MILLISECONDS_UNITY = 0; 
-public final static int SECONDS_UNITY      = 1; 
-
-public final static int RULER_HEIGHT = 15; 
+  Dimension rulerDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, RULER_HEIGHT);
+  FontMetrics fm;
+  String unityName = "Milliseconds";
+  int unity = MILLISECONDS_UNITY;
+  RulerPopupMenu popup;
+  PartitionAdapter utilityPartitionAdapter;
+  Geometry geometry;
+  ScrollManager scrollManager;
+  int previousX;
+  public final static int DEFAULT_XZOOM      = 20; 
+  public final static int MILLISECONDS_UNITY = 0; 
+  public final static int SECONDS_UNITY      = 1; 
+  
+  public final static int RULER_HEIGHT = 15; 
+  
+  private RulerMarker marker;
+  
+  class RulerMarker extends JPanel
+  {
+    SequenceRuler ruler;
+    double time;
+    RulerMarker(SequenceRuler rul)
+    {
+      super();
+      this.ruler = rul;
+      ruler.geometry.addTranspositionListener( new TranspositionListener() {
+        public void transpositionChanged(int newValue)
+		    {
+          int timeX = ruler.utilityPartitionAdapter.getX(time) + ruler.getXIndentation(); 
+          setLocation( timeX - 1, 1);
+        }
+      });
+      ruler.geometry.addZoomListener( new ZoomListener() {
+        public void zoomChanged(float newZoom, float oldZoom)
+		    {
+          int timeX = ruler.utilityPartitionAdapter.getX(time) + ruler.getXIndentation(); 
+          setLocation( timeX - 1, 1);
+        }
+      });
+    }
+    
+    void setTime(double time)
+    {      
+      this.time = time;
+      int timeX = ruler.utilityPartitionAdapter.getX(time) + ruler.getXIndentation(); 
+      setLocation( timeX, 1);    
+      repaint();
+    }
+    
+    public void paintComponent(Graphics g)
+    {
+      Dimension d = this.getSize();
+      g.setColor( Color.green);
+      g.fillRect( 0, 0, d.width-1, d.height-1);
+      g.setColor( Color.darkGray);
+      g.draw3DRect( 0, 0, d.width-1, d.height-1, true);
+    }    
+  }
 }    
 
 
