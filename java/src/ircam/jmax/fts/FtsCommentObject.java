@@ -26,17 +26,6 @@ public class FtsCommentObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  public FtsCommentObject(FtsContainerObject parent, String description)
-  {
-    super(parent, "comment", description);
-
-    FtsServer.getServer().newObject(parent, this, "comment", description);
-
-    ninlets = 0;
-    noutlets = 0;
-  }
-
-
   public FtsCommentObject(FtsContainerObject parent, String description, int objId)
   {
     super(parent, "comment", description, objId);

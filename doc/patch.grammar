@@ -46,7 +46,7 @@ Where: <size> size of the table
 #T set <index> [ <values> ]*
 #P newobj 42 302 102 1 table [name];
 
-Don't know yest the meaning of the arguments of the vtable message;
+Don't know yet the meaning of the arguments of the vtable message;
 the "set" fill the table, and the "newobj" actually create the table.
 Don't know if we can put other things beside "set", like for example "append".
 We *can* have multiple "set" for a single table (or *NONE*).

@@ -27,6 +27,10 @@ FtsAbstractionCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsAbstractionCmd.java)
 .PHONY: FtsAbstractionCmd
 
+FtsAbstractionPathCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsAbstractionPathCmd.java)
+.PHONY: FtsAbstractionPathCmd
+
 FtsAddListenerCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsAddListenerCmd.java)
 .PHONY: FtsAddListenerCmd

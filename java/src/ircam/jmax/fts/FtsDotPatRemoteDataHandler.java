@@ -62,20 +62,28 @@ public class FtsDotPatRemoteDataHandler extends MaxDataHandler
 
     // Build an empty patcher son of root.
 
-    patcher = new FtsPatcherObject(FtsServer.getServer().getRootObject(), false);
+    try
+      {
+	patcher = (FtsContainerObject) FtsObject.makeFtsObject(FtsServer.getServer().getRootObject(),
+							       "patcher", "unnamed 0 0");
 
-    // ask fts to load the file within this 
-    // patcher, using a dedicated message
+	// ask fts to load the file within this 
+	// patcher, using a dedicated message
 
-    FtsServer.getServer().loadPatcherDpat(patcher, file.getAbsolutePath());
+	FtsServer.getServer().loadPatcherDpat(patcher, file.getAbsolutePath());
 
-    FtsPatchData obj = new FtsPatchData();
+	FtsPatchData obj = new FtsPatchData();
 
-    obj.setPatcher(patcher);
-    obj.setDataSource(source);
-    obj.setDataHandler(this);
+	obj.setPatcher(patcher);
+	obj.setDataSource(source);
+	obj.setDataHandler(this);
 
-    return obj;
+	return obj;
+      }
+    catch (FtsException e)
+      {
+	return null;
+      }
   }
 
   public void saveInstance(MaxData instance) throws MaxDataException

@@ -68,7 +68,15 @@ class ErmesObjOut extends ErmesObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = new FtsOutletObject(itsFtsPatcher, itsId);
+    try
+      {
+	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "outlet", Integer.toString(itsId));
+      }
+    catch (FtsException e)
+      {
+	// ENZO !!!! AIUTO :->
+	System.out.println("Error in Object Instantiation");
+      }
   }
 
   public void redefineFtsObject()

@@ -50,12 +50,13 @@ class FtsPatcherCmd implements Command
 
 	try
 	  {
-	    object = new FtsPatcherObject(parent);
+	    object = (FtsPatcherObject) FtsObject.makeFtsObject(parent, "patcher", "unnamed 0 0");
 
 	    object.parseTclProperties(interp, properties);
 	    object.updateFtsObject(); //neede to update ins/outs and name
+	    object.setDownloaded();
 	    object.eval(interp, body);
-
+	    
 	    // Set back the server to flushing if we are at the top of 
 	    // the stack
 

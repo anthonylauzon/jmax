@@ -18,38 +18,6 @@ import ircam.jmax.utils.*;
 
 public class FtsPatcherObject extends FtsContainerObject
 {
-  /**
-   * MOVE TO FtsPatcher
-   * Build the root object.
-   * The root object is the super patcher of everything;
-   * cannot be edited, can include only patchers.
-   */
-
-  // Should go to the patcher object
-
-  static FtsContainerObject makeRootObject(FtsServer server)
-  {
-    FtsPatcherObject obj;
-
-    // Build the arguments
-
-    obj = new FtsPatcherObject();
-
-    obj.className = "patcher";
-
-    obj.objectName = "root";
-    obj.ninlets = 0;
-    obj.noutlets = 0;
-
-    obj.parent = null;
-
-    // create it in FTS
-
-    server.newPatcherObject(null, obj, "root", 0, 0);
-
-    return obj;
-  }
-
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -57,126 +25,20 @@ public class FtsPatcherObject extends FtsContainerObject
   /*****************************************************************************/
 
   /**
-   * The empty constructor.
-   * Used only to build the special
-   * root object.
+   * Create a FtsPatcherObject object
    */
 
-  FtsPatcherObject()
+
+  public FtsPatcherObject(FtsContainerObject parent, String name, int ninlets, int noutlets, int objId)
   {
-    super();
-  }
-
-  FtsPatcherObject(int objId)
-  {
-    super(objId);
-  }
-
-  /**
-   * Create a FtsPatcherObject object: temporary constructor, should go away
-   * as soon as the graphic patcher object work !
-   */
-
-  public FtsPatcherObject(FtsContainerObject parent, String description)
-  {
-    super(parent, "patcher", description);
-
-    Vector args;
-
-    args = new Vector();
-    
-    FtsParse.parseObjectArguments(description, args);
-
-    if (args.size() >= 1)
-      setObjectName(args.elementAt(0).toString());
-    else
-      setObjectName("unnamed");
-
-    if (args.size() >= 2)
-      setNumberOfInlets(Integer.parseInt(args.elementAt(1).toString()));
-    else
-      setNumberOfInlets(0);
-
-    if (args.size() >= 3)
-      setNumberOfOutlets(Integer.parseInt(args.elementAt(2).toString()));
-    else
-      setNumberOfOutlets(0);
-
-    updateDescription();
-
-    FtsServer.getServer().newPatcherObject(parent, this, getObjectName(), ninlets, noutlets);
-
-    if (parent.isOpen())
-      FtsServer.getServer().syncToFts();
-  }
-
-
-  public FtsPatcherObject(FtsContainerObject parent, String name, int inlets, int outlets, int objId)
-  {
-    // @@@ !!! Verify that this method do not implicitly fire a redefine.
     super(parent, "patcher", "", objId);
 
     setObjectName(name);
-    setNumberOfInlets(inlets);
-    setNumberOfOutlets(outlets);
+    setNumberOfInlets(ninlets);
+    setNumberOfOutlets(noutlets);
 
     updateDescription();
   }
-
-  /**
-   * Create a FtsPatcherObject object: real constructor;
-   * a patcher name nins and nouts are actually taken from
-   * properties, and are not arguments !
-   */
-
-  public FtsPatcherObject(FtsContainerObject parent)
-  {
-    super(parent, "patcher", "unnamed 0 0");
-
-    setObjectName("unnamed");
-    setNumberOfInlets(0);
-    setNumberOfOutlets(0);
-    updateDescription();
-
-    FtsServer.getServer().newPatcherObject(parent, this, objectName, ninlets, noutlets);
-
-    if (parent.isOpen())
-      FtsServer.getServer().syncToFts();
-  }
-
-
-  public FtsPatcherObject(FtsContainerObject parent, int objId)
-  {
-    super(parent, "patcher", "unnamed 0 0", objId);
-
-    setObjectName("unnamed");
-    setNumberOfInlets(0);
-    setNumberOfOutlets(0);
-    updateDescription();
-  }
-
-
-  /** Special constructor used when creating a new patcher to be
-   * filled within FTS
-   */
-
-  public FtsPatcherObject(FtsContainerObject parent, boolean downLoaded)
-  {
-    super(parent, "patcher", "unnamed 0 0");
-
-    this.downLoaded = downLoaded;
-
-    setObjectName("unnamed");
-    setNumberOfInlets(0);
-    setNumberOfOutlets(0);
-    updateDescription();
-
-    FtsServer.getServer().newPatcherObject(parent, this, objectName, ninlets, noutlets);
-
-    if (parent.isOpen())
-      FtsServer.getServer().syncToFts();
-  }
-
 
   /** Special method to redefine a patcher without looosing its content 
    */

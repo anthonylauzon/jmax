@@ -61,7 +61,15 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
 
   public void makeFtsObject()
   {
-    itsFtsObject = new FtsMessageObject(itsFtsPatcher, itsArgs);    
+    try
+      {
+	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "messbox", itsArgs);
+      }
+    catch (FtsException e)
+      {
+	// ENZO !!!! AIUTO :->
+	System.out.println("Error in Object Instantiation");
+      }
   }
 
   public void redefineFtsObject()

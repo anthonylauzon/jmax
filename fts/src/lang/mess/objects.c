@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.11 $ IRCAM $Date: 1998/04/09 10:57:30 $
+ *      $Revision: 1.12 $ IRCAM $Date: 1998/04/16 18:04:48 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -79,11 +79,11 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   cl = fts_class_instantiate(ac, at);
 
-  /* Class not found, try with old style abstraction (temporary !!!) */
+  /* Class not found, try with old style abstraction */
 
   if (! cl)
     {
-      obj =  fts_abstraction_new(patcher, ac, at);
+      obj =  fts_abstraction_new(patcher, id, ac, at);
 
 #ifdef DEBUG
       if (! obj)
@@ -400,37 +400,6 @@ fts_object_replace(fts_object_t *old, fts_object_t *new)
     }
 }
 
-/* 
- * >>>>>>>>> This function , and the corresponding method, will be phased
- * >>>>>>>>> out; redefining is an editing operation, coping with everything in FTS is 
- * >>>>>>>>> too complex and not very generic (think about properties: which properties we
- * >>>>>>>>> should move on to the new object ? "x" for sure, dsp_is_sink surely not !! )
- *
- * fts_object_redefine replace an object with a new
- * one whose definition is passed as argument; it is a convenience
- * function to access _replace in the simplified case.
- *
- * The old object is deleted.
- *
- */
-
-fts_object_t *
-fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
-{
-  fts_atom_t value;
-  fts_patcher_t *parent;
-  fts_object_t  *new;
-
-  parent = fts_object_get_patcher(old);
-  new    = fts_object_new(parent, FTS_NO_ID, ac, at);
-
-  if (! new)
-    return (fts_object_t *) 0;
-
-  fts_object_replace(old, new);
-
-  return new;
-}
 
 /******************************************************************************/
 /*                                                                            */

@@ -12,3 +12,8 @@ clean:
 	(cd runtime; $(MAKE) clean)
 	(cd tiles; $(MAKE) clean)
 .PHONY: all
+
+
+tags:
+	(find . \( -name "*.c" -o -name "*.h" \) -print | etags -t - )
+.PHONY: tags

@@ -17,6 +17,9 @@ import ircam.jmax.*;
  * @see FtsTemplateCmd
  * @see FtsHelpPatchCmd
  * @see FtsReferenceURLCmd
+
+
+
  * @see FtsMessCmd
  * @see FtsUcsCmd
  * @see StatsCmd
@@ -51,6 +54,7 @@ public class TclFtsPackage
     // Abstraction and templates declaration, help and blah blah
 
     interp.createCommand("abstraction",  new FtsAbstractionCmd());
+    interp.createCommand("abstractionPath",  new FtsAbstractionPathCmd());
 
     interp.createCommand("template",  new FtsTemplateCmd());
     interp.createCommand("helpPatch",  new FtsHelpPatchCmd());

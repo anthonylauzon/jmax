@@ -47,8 +47,6 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     FtsPropertyDescriptor.setPersistent("font", true);
     FtsPropertyDescriptor.setPersistent("fs", true);
-    FtsPropertyDescriptor.setPersistent("jsf", true);//justification
-    FtsPropertyDescriptor.setPersistent("resized", true);//resized object flag
     FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
   }
 
@@ -58,85 +56,69 @@ abstract public class FtsObject implements MaxTclInterpreter
   /*                                                                            */
   /******************************************************************************/
 
-
-  /**
-   * Static function to build a FtsObject.
-   * It is a static method, and
-   * not constructor, because the FtsObject created may be of different
-   * classes depending on the content of the object.
-   *
-   * The className can be null; in such case, the description include the class
-   * name as first argument; it is usually the case; the description is persistent,
-   * and invariant,  it will be saved and retrieved as it is, and correspond to what
-   * the user typed.
-   *
-   * Do not use this function to build patchers, inlets and outlets, message and comment objects;
-   * they all have a user accessible constructor in their classes (FtsPatcherObject, FtsInletObject,
-   * FtsOutletObject).
-   *
-   * @param parent the parent object.
-   * @param description a string  containing the object description.
-   */
-
-  static public FtsObject makeFtsObject(FtsContainerObject parent, String description)
-       throws FtsException
-  {
-    String className;
-
-    className = FtsParse.parseClassName(description);
-
-    return makeFtsObject(parent, className, description);
-  }
-  
-  /** Version with className as explicit argument (possibly doubled in the description) */
+  /** makeFtsObject do not create an object, but just assign an
+     ID and ask FTS to create it; fts will create back the object with a message
+     with the good ID, and we get the object thru the ID; if the object
+     is not there, we got an instantiation error, and we throw a exception.
+     Here, we just use a className/description pair of arguments.
+     Version to use for those objects where className and description
+     are available separately.
+     */
 
   static public FtsObject makeFtsObject(FtsContainerObject parent, String className, String description)
        throws FtsException
   {
-    // Add check for declarations, when they exists,
-    // comments and message box when description and argument description
-    // are merged
+    FtsServer server;
+    FtsObject obj;
+    int id;
 
-    // The check on patcher here is temporary; patchers will move
-    // to a specific API as soon as the patcher object is ready.
-    // SHould use an hash table here !
+    server = FtsServer.getServer();
 
-    if (className.equals("table"))
-      return new FtsTableObject(parent, className, description);
-    if (className.equals("qlist"))
-      return new FtsQlistObject(parent, className, description);
-    else if (className.equals("patcher"))
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "patcher"));
-    else if (className.equals("inlet"))
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "inlet"));
-    else if (className.equals("outlet"))
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "outlet"));
-    else if (className.equals("messbox"))
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "messbox"));
-    else if (className.equals("comment"))
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "comment"));
-    else if (className.equals("slider"))
-      return new FtsValueObject(parent, className, description);
-    else if (className.equals("intbox"))
-      return new FtsValueObject(parent, className, description);
-    else if (className.equals("floatbox"))
-      return new FtsValueObject(parent, className, description);
-    else if (className.equals("toggle"))
-      return new FtsValueObject(parent, className, description);
-    else if (className.equals("param"))
-      return new FtsValueObject(parent, className, description);
-    else if (FtsAbstractionTable.exists(className))
-      return new FtsAbstractionObject(parent, className, description);
-    else if (FtsTemplateTable.exists(className))
-      return new FtsTemplateObject(parent, className, description);
+    id = server.getNewObjectId();
+    server.newObject(parent, id, className, description);
+    
+    // Wait for FTS to do his work
+
+    server.syncToFts();
+    obj = server.getObjectByFtsId(id);
+    
+    if (obj != null)
+      return obj;
     else
-      return new FtsStandardObject(parent, className, description);
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, className));
   }
+  
 
+  /* 
+     Version to use for those objects where className and description
+     are available separately.
+     */
+
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String description) throws FtsException
+  {
+    FtsServer server;
+    FtsObject obj;
+    int id;
+
+    server = FtsServer.getServer();
+
+    id = server.getNewObjectId();
+    server.newObject(parent, id, description);
+    
+    // Wait for FTS to do his work
+
+    server.syncToFts();
+    obj = server.getObjectByFtsId(id);
+    
+    if (obj != null)
+      return obj;
+    else
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, FtsParse.parseClassName(description)));
+  }
+  
 
   /** This version create an application layer object for an already existing
    *  object in FTS; take directly the FtsMessage as argument.
-   *  Abstractions and FTS template are represented as ????? !!!!!
    */
 
   static private String makeDescription(int offset, FtsMessage msg)
@@ -235,6 +217,10 @@ abstract public class FtsObject implements MaxTclInterpreter
    *
    * You cannot redefine a message, comment, inlet and outlet object, only object that makeFtsObject
    * can actually create.
+   *
+   * @@@@: can we just throw away the FTS part of it and do everything here ?
+   * @@@@: including moving the connections ? It would be more consistent,
+   * @@@@: expecially for property handling
    *
    * @param obj the object to redefine.
    * @param description  a string containing the description.
@@ -751,30 +737,9 @@ abstract public class FtsObject implements MaxTclInterpreter
   /*                                                                           */
   /*****************************************************************************/
 
-  FtsObject()
-  {
-  }
-
-  FtsObject(int objId)
-  {
-    setObjId(objId);
-  }
-
   /**
    * Create a FtsObject object.
    */
-
-  protected FtsObject(FtsContainerObject parent, String className, String description)
-  {
-    super();
-
-    this.className = className;
-    this.description = description;
-    this.parent = parent;
-
-    parent.addObjectToContainer(this);
-  }
-
 
   protected FtsObject(FtsContainerObject parent, String className, String description, int objId)
   {
@@ -784,9 +749,13 @@ abstract public class FtsObject implements MaxTclInterpreter
     this.description = description;
     this.parent = parent;
 
-    setObjId(objId);
+    if (objId != -1)
+      setObjId(objId);
 
-    parent.addObjectToContainer(this);
+    // this test make sense only for the root patcher
+
+    if (parent != null)
+      parent.addObjectToContainer(this);
   }
 
 

@@ -78,6 +78,9 @@ class FtsClientProtocol
   static final int fts_load_patcher_tpat_cmd = 'V';
   static final int fts_load_patcher_dpat_cmd = 'Z';
 
+  static final int fts_declare_abstraction_cmd      = 'E';
+  static final int fts_declare_abstraction_path_cmd = 'F';
+
   static final int fts_download_patcher_cmd = 'D';
 
   static final int fts_open_patcher_cmd = 'O';
@@ -86,7 +89,10 @@ class FtsClientProtocol
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_new_abstraction_cmd = 'A';
-  static final int fts_redefine_object_cmd = 'N';
+  static final int fts_redefine_patcher_cmd = 'Q';
+  static final int fts_reposition_inlet_cmd = 'X';
+  static final int fts_reposition_outlet_cmd = 'Y';
+
   static final int fts_replace_object_cmd = 'R';
   static final int fts_free_object_cmd = 'f';
   static final int fts_connect_objects_cmd = 'c';

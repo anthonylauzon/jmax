@@ -26,17 +26,6 @@ public class FtsStandardObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  FtsStandardObject(FtsContainerObject parent, String className, String description)
-  {
-    super(parent, className, description);
-
-    FtsServer.getServer().newObject(parent, this, description);
-
-    if (parent.isOpen())
-      FtsServer.getServer().syncToFts();
-  }
-
-
   FtsStandardObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);

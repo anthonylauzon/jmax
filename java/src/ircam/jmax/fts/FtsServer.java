@@ -26,6 +26,8 @@ public class FtsServer
 
   static FtsServer theServer = null;
 
+  static boolean debug = false;
+
   static public FtsServer getServer()
   {
     return theServer;
@@ -113,7 +115,17 @@ public class FtsServer
 
     // Build the root object and the root patcher
 
-    root = FtsPatcherObject.makeRootObject(this);
+    // root = FtsPatcherObject.makeRootObject(this);
+
+    try
+      {
+	root = (FtsContainerObject) FtsObject.makeFtsObject(null, "patcher", "root 0 0");
+      }
+    catch (FtsException e)
+      {
+	// Deep shit 
+	System.out.println("System Error: Unable to create the root object");
+      }
   }
 
   /** Stop the server. */
@@ -223,6 +235,39 @@ public class FtsServer
       }
   }
 
+  /** Send a "abstraction declare" message to FTS */
+
+  final public void sendAbstractionDeclare(String abstraction, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_cmd);
+	port.sendString(abstraction);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "abstraction declare" message to FTS */
+
+  final public void sendAbstractionDeclarePath(String path)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_path_cmd);
+	port.sendString(path);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
   /** Send a "download patcher" messages to FTS.*/
 
   final void sendDownloadPatcher(FtsObject patcher)
@@ -290,14 +335,13 @@ public class FtsServer
    *  i.e. messages.
    */
 
-  final  void newObject(FtsObject patcher, FtsObject obj, String className, String description)
+  final  void newObject(FtsObject patcher, int id, String className, String description)
   {
     try
       {
-	registerObject(obj);
 	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendInt(id);
 	port.sendString(className);
 	FtsParseToPort.parseAndSendObject(description, port);
 	port.sendEom();
@@ -312,14 +356,13 @@ public class FtsServer
    *   Used for all the objects that have the class identity in the string description
    */
 
-  final  void newObject(FtsObject patcher, FtsObject obj, String description)
+  final  void newObject(FtsObject patcher, int id, String description)
   {
     try
       {
-	registerObject(obj);
 	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
+	port.sendInt(id);// cannot send the object, do not exists (yet) on the FTS Side !!
 
 	FtsParseToPort.parseAndSendObject(description, port);
 
@@ -329,105 +372,6 @@ public class FtsServer
       {
       }
   }
-
-  /** Send a "new object" messages to FTS,  specialized version to define a patcher
-   */
-
-  final  void newPatcherObject(FtsObject patcher, FtsObject obj, String name, int ninlets, int noutlets)
-  {
-    try
-      {
-	registerObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	port.sendString("patcher");
-	port.sendString(name);
-	port.sendInt(ninlets);
-	port.sendInt(noutlets);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "new inlet object" messages to FTS, without the inlet number */
-
-  final void newInletObject(FtsObject patcher, FtsInletObject obj)
-  {
-    try
-      {
-	registerObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	port.sendString("inlet");
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  /** Send a "new inlet object" messages to FTS, with the inlet number */
-
-  final void newInletObject(FtsObject patcher, FtsInletObject obj, int pos)
-  {
-    try
-      {
-	registerObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	port.sendString("inlet");
-	port.sendInt(pos);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "new outlet object" messages to FTS, without the outlet number */
-
-  final void newOutletObject(FtsObject patcher, FtsOutletObject obj)
-  {
-    try
-      {
-	registerObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	port.sendString("outlet");
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  /** Send a "new outlet object" messages to FTS, with the outlet number */
-
-  final void newOutletObject(FtsObject patcher, FtsOutletObject obj, int pos)
-  {
-    try
-      {
-	registerObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
-	port.sendObject(patcher);
-	port.sendInt(obj.getObjId());
-	port.sendString("outlet");
-	port.sendInt(pos);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
 
   /** Send a "replace object" messages to FTS.*/
 
@@ -463,9 +407,8 @@ public class FtsServer
   {
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
 	port.sendObject(obj);
-	port.sendString("patcher");
 	port.sendString(name);
 	port.sendInt(ninlets);
 	port.sendInt(noutlets);
@@ -476,15 +419,14 @@ public class FtsServer
       }
   }
 
-  /** Specialized version for inlets */
+  /** Reposition an inlet  */
 
-  final void redefineInletObject(FtsObject obj, int pos)
+  final void repositionInletObject(FtsObject obj, int pos)
   {
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendCmd(FtsClientProtocol.fts_reposition_inlet_cmd);
 	port.sendObject(obj);
-	port.sendString("inlet");
 	port.sendInt(pos);
 	port.sendEom();
       }
@@ -493,36 +435,15 @@ public class FtsServer
       }
   }
 
-  /** Specialized version for outlets */
+  /** Reposition an outlet  */
 
-  final void redefineOutletObject(FtsObject obj, int pos)
+  final void repositionOutletObject(FtsObject obj, int pos)
   {
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendCmd(FtsClientProtocol.fts_reposition_outlet_cmd);
 	port.sendObject(obj);
-	port.sendString("outlet");
 	port.sendInt(pos);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Specialized version for message objects */
-
-  final void redefineMessageObject(FtsObject obj, String description)
-  {
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	port.sendObject(obj);
-	port.sendString("messbox");
-
-	FtsParseToPort.parseAndSendObject(description, port);
-
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -572,10 +493,8 @@ public class FtsServer
   }
 
 
-  /** Send an "_set" messages to inlet 0 of an FTS object with as arguments elements
-    from an int arrays; and have a special function to avoid building 
-    a big Vector of arguments; special for the Table object, may be sustituted by
-    something more generic in the future.
+  /** Send set" messages to the system inlet 0 of an FTS object with as arguments elements
+    from an int arrays
     */
 
   final void sendSetMessage(FtsObject dst, int offset, int[] values, int from, int to)
@@ -584,8 +503,8 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
 	port.sendObject(dst);
-	port.sendInt(0);
-	port.sendString("_set");
+	port.sendInt(-1);
+	port.sendString("set");
 	port.sendInt(offset);
 
 	if (values != null)
@@ -598,18 +517,18 @@ public class FtsServer
       }
   }
 
-  /** Send an "set_atom_list" messages to the system inletof an FTS object with as arguments elements
+  /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a Vector; the vector should only contains String, Floats and Integers, of course.
     */
 
-  final void sendSetAtomListMessage(FtsObject dst, Vector values)
+  final void sendSetMessage(FtsObject dst, Vector values)
   {
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
 	port.sendObject(dst);
 	port.sendInt(-1);
-	port.sendString("set_atom_list");
+	port.sendString("set");
 
 	if (values != null)
 	  port.sendVector(values);
@@ -620,6 +539,29 @@ public class FtsServer
       {
       }
   }
+
+  /** Send an "set" messages to the system inletof an FTS object with as arguments elements
+    from a string description.
+    */
+
+  final void sendSetMessage(FtsObject obj, String description)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(obj);
+	port.sendInt(-1);
+	port.sendString("set");
+
+	FtsParseToPort.parseAndSendObject(description, port);
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
 
   /** Send a "named object message" messages to FTS.
     @deprecated
@@ -813,6 +755,10 @@ public class FtsServer
 		System.err.println("Null object in property value message " + msg);
 	      else
 		obj.localPut((String) msg.getArgument(1), msg.getArgument(2));
+
+	      if (FtsServer.debug)
+		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
+				   + " " + msg.getArgument(2));
 	    }
 	  else
 	    System.err.println("Wrong property value message " + msg);
@@ -825,6 +771,9 @@ public class FtsServer
 
 	  obj = (FtsObject) msg.getArgument(0);
 	  obj.handleMessage(msg);
+
+	  if (FtsServer.debug)
+	    System.err.println("ObjectMessage " + obj + " " + msg);
 	}
       break;
 
@@ -861,6 +810,9 @@ public class FtsServer
 	    {
 	      newObj = FtsObject.makeFtsObjectFromMessage(msg);
 	      registerObject(newObj);
+
+	      if (FtsServer.debug)
+		System.err.println("NewObjectMessage " + newObj + " " + msg);
 	    }
 	  catch (FtsException e)
 	    {
@@ -878,6 +830,9 @@ public class FtsServer
 	    {
 	      newObj = FtsObject.makeFtsAbstractionFromMessage(msg);
 	      registerObject(newObj);
+
+	      if (FtsServer.debug)
+		System.err.println("NewAbstractionMessage " + newObj + " " + msg);
 	    }
 	  catch (FtsException e)
 	    {
@@ -898,6 +853,9 @@ public class FtsServer
 	  inlet = ((Integer) msg.getArgument(3)).intValue();
 
 	  new FtsConnection(from, outlet, to, inlet, false);
+
+	  if (FtsServer.debug)
+	    System.err.println("NewConnection " + from + "." + outlet + " -> " + to + "." + inlet);
 	}
 	break;
 
@@ -994,6 +952,31 @@ public class FtsServer
   }
 
   /**
+   * This method reserve (and return) a new id for an object, and make
+   * place for it in the object table, but just put a null there.
+   *
+   */
+
+  int getNewObjectId()
+  {
+    int newid;
+
+    newid = ftsIDCounter;
+    ftsIDCounter += 2;
+
+    if (newid > maxId)
+      {
+	maxId = newid * 2;
+
+	objTable.setSize(maxId + 1);
+      }
+
+    objTable.setElementAt(null, newid);
+
+    return newid;
+  }
+
+  /**
    * ID handling.
    * Each server instance have it own object table, and provide
    * a register and unregister function; also, the server store and access
@@ -1014,9 +997,11 @@ public class FtsServer
 
   FtsObject getObjectByFtsId(int id)
   {
+    
     if (id == 0)
       {
-	System.err.println("System error: received 0 as object id\n");
+	// This is usually the case at the creation of the root patcher
+
 	return null;
       }
     else if (id == -1)
@@ -1028,9 +1013,8 @@ public class FtsServer
       {
 	FtsObject obj = (FtsObject) objTable.elementAt(id);
 
-	if (obj == null)
-	  System.err.println("getObjectByFtsId: null object for id " + id);
-	
+	// Returned obj can be null here !!
+
 	return obj;
       }
   }

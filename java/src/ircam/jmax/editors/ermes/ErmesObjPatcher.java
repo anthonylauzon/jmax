@@ -72,7 +72,16 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   public void makeFtsObject()
   {
-    itsFtsObject = new FtsPatcherObject(itsFtsPatcher, itsArgs);
+    try
+      {
+	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	((FtsContainerObject) itsFtsObject).setDownloaded();
+      }
+    catch (FtsException e)
+      {
+	// ENZO !!!! AIUTO :->
+	System.out.println("Error in Object Instantiation");
+      }
   }
 
   public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()

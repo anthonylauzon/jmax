@@ -33,6 +33,7 @@ fts_symbol_t fts_s_noutlets;
 fts_symbol_t fts_s_bang;
 fts_symbol_t fts_s_list;
 fts_symbol_t fts_s_set;
+fts_symbol_t fts_s_append;
 fts_symbol_t fts_s_print;
 fts_symbol_t fts_s_clear;
 fts_symbol_t fts_s_stop;
@@ -64,7 +65,17 @@ fts_symbol_t fts_s_range;
 fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
 fts_symbol_t fts_s_autorouting;
+fts_symbol_t fts_s_off;
+fts_symbol_t fts_s_on;
 
+/* Symbols related to builtin classes */
+
+fts_symbol_t fts_s_patcher;
+fts_symbol_t fts_s_inlet;
+fts_symbol_t fts_s_outlet;
+fts_symbol_t fts_s_qlist;
+fts_symbol_t fts_s_table;
+fts_symbol_t fts_s_explode;
 
 static void 
 fts_predefine_symbols(void)
@@ -88,6 +99,7 @@ fts_predefine_symbols(void)
   fts_s_bang              = fts_new_builtin_symbol("bang");
   fts_s_list              = fts_new_builtin_symbol("list");
   fts_s_set               = fts_new_builtin_symbol("set");
+  fts_s_append            = fts_new_builtin_symbol("append");
   fts_s_print             = fts_new_builtin_symbol("print");
   fts_s_clear             = fts_new_builtin_symbol("clear");
   fts_s_stop              = fts_new_builtin_symbol("stop");
@@ -101,7 +113,7 @@ fts_predefine_symbols(void)
   fts_s_comma             = fts_new_builtin_symbol(",");
   fts_s_semi              = fts_new_builtin_symbol(";");
 
-/* Predefined symbol for properties */
+  /* Predefined symbol for properties */
 
   fts_s_value             = fts_new_builtin_symbol("value");
   fts_s_max_value         = fts_new_builtin_symbol("maxValue");
@@ -118,7 +130,18 @@ fts_predefine_symbols(void)
   fts_s_range             = fts_new_builtin_symbol("range");
   fts_s_font              = fts_new_builtin_symbol("font");
   fts_s_fontSize          = fts_new_builtin_symbol("fs");
-  fts_s_autorouting       = fts_new_symbol("autorouting");
+  fts_s_autorouting       = fts_new_builtin_symbol("autorouting");
+  fts_s_off               = fts_new_builtin_symbol("off");
+  fts_s_on                = fts_new_builtin_symbol("on");
+
+  /* Symbols related to builtin classes */
+
+  fts_s_patcher           = fts_new_builtin_symbol("patcher");
+  fts_s_inlet             = fts_new_builtin_symbol("inlet");
+  fts_s_outlet            = fts_new_builtin_symbol("outlet");
+  fts_s_qlist             = fts_new_builtin_symbol("qlist");
+  fts_s_table             = fts_new_builtin_symbol("table");
+  fts_s_explode           = fts_new_builtin_symbol("explode");
 }
 
 

@@ -26,16 +26,6 @@ public class FtsMessageObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  public FtsMessageObject(FtsContainerObject parent, String description)
-  {
-    super(parent, "messbox", description);
-
-    FtsServer.getServer().newObject(parent, this, "messbox", description);
-
-    ninlets = 1;
-    noutlets = 1;
-  }
-
 
   public FtsMessageObject(FtsContainerObject parent, String description, int objId)
   {
@@ -53,7 +43,7 @@ public class FtsMessageObject extends FtsObject
   {
     description = message;
 
-    FtsServer.getServer().redefineMessageObject(this, description);
+    FtsServer.getServer().sendSetMessage(this, description);
   }
 
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/04/09 10:57:29 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/04/16 18:04:47 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -63,6 +63,10 @@ fts_mess_init(void)
   /* Initialize the .pat parser */
 
   fts_patparser_init();
+
+  /* Initialize the .pat abstraction subsystem */
+  
+  fts_abstraction_init();
 }
 
 

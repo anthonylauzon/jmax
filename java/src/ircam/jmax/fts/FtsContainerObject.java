@@ -17,121 +17,157 @@ import ircam.jmax.*;
  * So it add inlets/outlets housekeeping, patcher opening, patcher after load init,
  * patcher relative properties, script evaluation, .pat file support, find and object
  * naming support.
+ * Removed the inlets/outlets housekeeping: since the .pat parsing is done in FTS
+ * we don't need to make them different from the other objects.
  */
 
-abstract public class FtsContainerObject extends FtsAbstractContainerObject
+abstract public class FtsContainerObject extends FtsObject
 {
-  /** The objects that are also inlets */
+  /** The objects contained in the patcher */
 
-  protected Vector inlets      = new Vector();
+  private Vector objects     = new Vector();
 
-  /** The objects that are also outlets */
+  /** All the connections between these objects */
 
-  protected Vector outlets     = new Vector();
+  private Vector connections = new Vector();
 
   /** True if the patcher is Open in FTS */
 
   protected boolean open = false;
 
-  /** True if the patcher content have been downloaded from FTS */
+  /** True if the patcher content have been downloaded from FTS
+   *  or anyway consistent because built in the editor
+   */
 
-  protected boolean downLoaded;
-
-  /** Just for the building of the root object */
-
-  FtsContainerObject()
-  {
-    super();
-    downLoaded = true;
-  }
-
-  FtsContainerObject(int objId)
-  {
-    super(objId);
-    downLoaded = false;
-  }
-
-  protected  FtsContainerObject(FtsContainerObject parent, String className, String description)
-  {
-    super(parent, className, description);
-    downLoaded = true;
-  }
+  protected boolean downLoaded = false;
 
   protected  FtsContainerObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
-    downLoaded = false;
   }
 
+  /*
+   * Object handling
+   */
 
-  /** Overwrite the getConnections methods so to download the patcher
-    by need */
+  /** Add an object to this container  */
 
-  public Vector getConnections()
+  final void addObjectToContainer(FtsObject obj)
   {
-    if (! downLoaded)
-      download();
+    objects.addElement(obj);
+    localPut("newObject", obj); // the newObject property keep the last object created
+  }
 
-    return super.getConnections();
+  /** Remove an object from this container. */
+
+  final void removeObjectFromContainer(FtsObject obj)
+  {
+    put("deletedObject", obj); // the deleteObject property keep the last object deleted
+
+    // First, look in the connections, and collect the connections
+    // to be deleted then delete them
+    // WARNING: doing like that *because* FtsConnection.delete change
+    // the connections vector, so the loop would not work.
+
+    Vector toDelete = new Vector();
+
+    for (int i = 0; i < connections.size() ; i++)
+      {
+	FtsConnection c;
+
+	c = (FtsConnection) connections.elementAt(i);
+	
+	if ((c.from == obj) || (c.to == obj))
+	  toDelete.addElement(c);
+      }
+
+    for (int i = 0; i < toDelete.size() ; i++)
+      {
+	FtsConnection c;
+
+	c = (FtsConnection) toDelete.elementAt(i);
+	
+	if ((c.from == obj) || (c.to == obj))
+	  c.delete();
+      }
+
+    objects.removeElement(obj);
+  }
+
+  /** Replace an object with an other one in all the connections
+   */
+
+  void replaceInConnections(FtsObject oldObject, FtsObject newObject)
+  {    
+    // delete the connections that no more consistent
+    // First collect them in a aux vector, then remove them
+    // It is slow, but safer because removing elements in vector
+    // shift the content
+
+    Vector toDelete = new Vector();
+
+    for (int i = 0; i < connections.size(); i++)
+      {
+	FtsConnection conn = (FtsConnection)connections.elementAt(i);
+
+	if (! (conn.checkConsistency()))
+	  toDelete.addElement(conn);
+      }
+
+    for (int i = 0; i < toDelete.size(); i++)
+      {
+	FtsConnection conn = (FtsConnection)connections.elementAt(i);
+
+	conn.delete();
+      }
+
+    // replace it in all the survived connections
+
+    for (int i = 0; i < connections.size(); i++)
+      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
   }
 
   /** Overwrite the getObjects methods so to download the patcher
     by need */
 
-  public Vector getObjects()
+  public final Vector getObjects()
   {
     if (! downLoaded)
       download();
 
-    return super.getObjects();
+    return objects;
   }
 
-  /** Set the number of inlets */
+  /*
+   * Connections handling
+   */
 
-  public void setNumberOfInlets(int ninlets)
+  /** Add an connection to this container. */
+
+  final void addConnectionToContainer(FtsConnection obj)
   {
-    // delete unneeded inlets 
-
-    for (int i = ninlets; i < this.ninlets; i++)
-      {
-	FtsObject obj;
-
-	obj = (FtsObject) inlets.elementAt(i);
-
-	if (obj != null)
-	  {
-	    inlets.setElementAt(null, i);
-	    obj.delete();
-	  }
-      }
-
-    super.setNumberOfInlets(ninlets);
-    this.inlets.setSize(ninlets);
+    connections.addElement(obj);
+    localPut("newConnection", obj); // the newConnection property keep the last connection created
   }
 
-  /** Set the number of inlets */
+  /** Remove an connection from this container. */
 
-  public void setNumberOfOutlets(int noutlets)
+  final void removeConnectionFromContainer(FtsConnection obj)
   {
-    // delete unneeded inlets 
-
-    for (int i = noutlets; i < this.noutlets; i++)
-      {
-	FtsObject obj;
-
-	obj = (FtsObject) outlets.elementAt(i);
-
-	if (obj != null)
-	  {
-	    outlets.setElementAt(null, i);
-	    obj.delete();
-	  }
-      }
-
-    super.setNumberOfOutlets(noutlets);
-    this.outlets.setSize(noutlets);
+    localPut("deleteConnection", obj); // the deleteConnection property keep the last connection deleted
+    connections.removeElement(obj);
   }
 
+  /** Overwrite the getConnections methods so to download the patcher
+    by need */
+
+  public final Vector getConnections()
+  {
+    if (! downLoaded)
+      download();
+
+    return connections;
+  }
 
   /** Update the FTS object; redefined it to have the
    * correct name, ninlets and noutlets; the fts object for a container
@@ -141,72 +177,6 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   public void updateFtsObject()
   {
     FtsServer.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
-  }
-
-  /** Add an inlet. */
-
-  final void addInlet(FtsInletObject in, int pos)
-  {
-    if (pos > (ninlets - 1))
-      {
-	setNumberOfInlets(pos+1);
-	updateFtsObject(); // update the corresponding FTS object
-      }
-
-    inlets.setElementAt(in, pos);
-  }
-
-  /**
-   * Add an inlet.
-   * This version of addInlet just add the inlet at the
-   * end; it is used for .pat compatibility; the order is
-   * computed later, by sorting the inlets
-   */
-
-  final void addInlet(FtsInletObject in)
-  {
-    inlets.addElement(in);
-  }
-  
-  /** Remove an inlet from the container */
-
-  final void removeInlet(FtsInletObject in, int pos)
-  {
-    if (pos < ninlets)
-      inlets.setElementAt(null, pos);
-  }
-
-  /** Add an oulet. */
-
-  final void addOutlet(FtsObject out, int pos)
-  {
-    if (pos > (noutlets - 1))
-      {
-	setNumberOfOutlets(pos+1);
-	updateFtsObject(); // update the corresponding FTS object
-      }
-
-    outlets.setElementAt(out, pos);
-  }
- 
-  /**
-   * Add an outlet.
-   * This version of addOutlet just add the outlet at
-   * the end; it is used for .pat compatibility; the order is computed
-   * later, by sorting the outlets
-   */
-
-  final void addOutlet(FtsObject in)
-  {
-    outlets.addElement(in);
-  }
-
-  /** Remove an outlet from the container */
-
-  final void removeOutlet(FtsOutletObject out, int pos)
-  {
-    if (pos < ninlets)
-      inlets.setElementAt(null, pos);
   }
 
   /** Open tell FTS that this patcher is "alive";
@@ -252,6 +222,15 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
     downLoaded = true;
   }
 
+  /** Call this method to tell the application layer
+    that this object has been created from the editor,
+    and so it is implicitly downloaded (i.e. consistent
+    with FTS */
+
+  public void setDownloaded()
+  {
+    downLoaded = true;
+  }
 
   /**
    * Loaded tell FTS that this patcher has been loaded, and
@@ -262,7 +241,6 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   {
     FtsServer.getServer().patcherLoaded(this);
   }
-
 
   /** Keep the container handlers */
 
@@ -341,77 +319,9 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   public FtsSelection getSelection()
   {
     if (selection == null)
-      selection = new FtsSelection(this);
+      selection = new FtsSelection();
     
     return selection;
-  }
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                    Special support for .pat files                         */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  /**
-    Redefine the patcher and then assign the inlets and outlets in the good positions 
-    should be used *only* for "fixing" patcher loaded by the FtsDotPatParser.
-    */
-  
-  void assignInOutlets()
-  {
-    // First, compute the actual size of inlets and outlets arrays
-    // and assign as number of inlets and outlets
-
-    ninlets  = inlets.size();
-    noutlets = outlets.size();
-
-    // First, update the FTS object 
-
-    updateFtsObject();
-
-    // Then, sort the inlets and the outlets based on their x
-    // position
-
-    for (int i = 1; i < ninlets; i++)
-      for (int j = 0; j < i; j++)
-	{
-	  int ix = ((Integer) ((FtsObject) inlets.elementAt(i)).get("x")).intValue();
-	  int jx = ((Integer) ((FtsObject) inlets.elementAt(j)).get("x")).intValue();
-
-	  if (jx > ix)
-	    {
-	      Object tmp;
-
-	      tmp = inlets.elementAt(i);
-	      inlets.setElementAt(inlets.elementAt(j), i);
-	      inlets.setElementAt(tmp, j);
-	    }
-	}
-
-    for (int i = 1; i < noutlets; i++)
-      for (int j = 0; j < i; j++)
-	{
-	  int ix = ((Integer) ((FtsObject) outlets.elementAt(i)).get("x")).intValue();
-	  int jx = ((Integer) ((FtsObject) outlets.elementAt(j)).get("x")).intValue();
-
-	  if (jx > ix)
-	    {
-	      Object tmp;
-
-	      tmp = outlets.elementAt(i);
-	      outlets.setElementAt(outlets.elementAt(j), i);
-	      outlets.setElementAt(tmp, j);
-	    }
-	}
-
-    // Then, redefine the existing inlets and outlets
-    // with the computed position
-
-    for (int i = 0; i < ninlets; i++)
-      ((FtsInletObject) inlets.elementAt(i)).setPosition(i);
-	
-    for (int i = 0; i < noutlets; i++)
-      ((FtsOutletObject) outlets.elementAt(i)).setPosition(i);
   }
 
   /*****************************************************************************/

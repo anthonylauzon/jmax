@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:43 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/04/16 18:04:49 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -37,7 +37,6 @@ extern void fts_objects_init(void);
 
 extern fts_object_t *fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at);
 extern void          fts_object_replace(fts_object_t *old, fts_object_t *new);
-extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
 extern void          fts_object_delete(fts_object_t *);
 extern void          fts_object_send_properties(fts_object_t *obj);
 
@@ -195,28 +194,17 @@ extern void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom
 extern int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s);
 extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
-extern fts_metaclass_t *patcher_metaclass;
-extern fts_metaclass_t *inlet_metaclass;
-extern fts_metaclass_t *outlet_metaclass;
-
-extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
-extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
 
 
-#define fts_object_is_patcher(o) ((o)->cl->mcl == patcher_metaclass)
-#define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_abstraction((fts_patcher_t *) (o)))
+
+
 
 #define fts_object_is_outlet(o)  ((o)->cl->mcl == outlet_metaclass)
 #define fts_object_is_inlet(o)   ((o)->cl->mcl == inlet_metaclass)
 
 #define fts_object_get_id(o)     ((o)->id)
 
-#define fts_patcher_is_open(p)    ((p)->open)
-#define fts_patcher_is_abstraction(p)    ((p)->is_abstraction)
-#define fts_patcher_set_abstraction(p)    ((p)->is_abstraction = 1)
 
-#define fts_object_patcher_is_open(o)    ((fts_object_get_patcher(o))->open)
 
 
 #endif

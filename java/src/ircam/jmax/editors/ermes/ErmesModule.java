@@ -22,13 +22,18 @@ public class ErmesModule
     //List of persistent properties
 
     FtsPropertyDescriptor.setPersistent("autorouting", true);    
-    FtsPropertyDescriptor.setDefaultValue("autorouting", "on");
+    FtsPropertyDescriptor.setDefaultValue("autorouting", "off");
 
     FtsPropertyDescriptor.setPersistent("maxValue", true);    
     FtsPropertyDescriptor.setDefaultValue("maxValue", new Integer(128));
 
     FtsPropertyDescriptor.setPersistent("minValue", true);    
     FtsPropertyDescriptor.setDefaultValue("minValue", new Integer(0));
+
+    FtsPropertyDescriptor.setPersistent("jsf", true);//justification
+
+    FtsPropertyDescriptor.setPersistent("resized", true);//resized object flag
+    FtsPropertyDescriptor.setDefaultValue("resized", "off");
   }
 }
 

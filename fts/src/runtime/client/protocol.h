@@ -17,10 +17,11 @@
  * 
  * Used Letters are:
 
+ * Forbidden values : 0x00 (easy message as string in C)
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
  * Lowercase : c d f g h i m n o p q u z 
- * Uppercase : A C D L M N O P R S T U V Z
+ * Uppercase : A C D E F L M N O P Q R S T U V X Y Z 
  * 
  */
 
@@ -38,7 +39,7 @@
 
 #define UCS_CODE      'u'
 
-/* Command defined for the FOS subsystem  */
+/* Command defined for the FOS subsystem: actually they should move to tiles/messtiles.h  */
 
 #define SAVE_PATCHER_BMAX_CODE       'S'
 #define SAVE_PATCHER_TPAT_CODE       'T'
@@ -47,6 +48,8 @@
 #define LOAD_PATCHER_TPAT_CODE       'V'
 #define LOAD_PATCHER_DPAT_CODE       'Z'
 
+#define DECLARE_ABSTRACTION_CODE          'E'
+#define DECLARE_ABSTRACTION_PATH_CODE     'F'
 
 #define OPEN_PATCHER_CODE       'O'
 #define DOWNLOAD_PATCHER_CODE   'D'
@@ -55,7 +58,9 @@
 
 #define NEW_OBJECT_CODE         'n'
 #define NEW_ABSTRACTION_CODE    'A'
-#define REDEFINE_OBJECT_CODE    'N'
+#define REDEFINE_PATCHER_CODE   'Q'
+#define REPOSITION_INLET        'X'
+#define REPOSITION_OUTLET       'Y'
 #define REPLACE_OBJECT_CODE     'R'
 #define FREE_OBJECT_CODE        'f'
 #define CONNECT_OBJECTS_CODE    'c'

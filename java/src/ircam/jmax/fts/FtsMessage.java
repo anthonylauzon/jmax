@@ -96,12 +96,6 @@ final public class FtsMessage
       doubleSize();
 
     args[args_fill++] = obj;
-
-    if (obj == null)
-      {
-	System.err.println("Adding null argument to a message ");
-	Thread.dumpStack();
-      }
   }
 
   /** Write the message to a Connection. */

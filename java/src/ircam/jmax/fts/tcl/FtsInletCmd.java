@@ -29,17 +29,17 @@ class FtsInletCmd implements Command
       {
 	FtsObject object;
 	FtsContainerObject parent;
-	int position;
+	String position;
 	TclObject properties;
 
 	try
 	  {
 	    // Retrieve the arguments
 	    parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
-	    position    = TclInteger.get(interp, argv[1]);
+	    position    = argv[1].toString();
 	    properties = argv[2];
 
-	    object = new FtsInletObject(parent, position);
+	    object = FtsObject.makeFtsObject(parent, "inlet", position);
 	    object.parseTclProperties(interp, properties);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

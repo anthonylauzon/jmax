@@ -77,7 +77,15 @@ class ErmesObjComment extends ErmesObject {
   // starting of the graphic/FTS mix
 
   public void makeFtsObject(){
-    itsFtsObject = new FtsCommentObject(itsFtsPatcher, itsArgs);    
+    try
+      {
+	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "comment", itsArgs);
+      }
+    catch (FtsException e)
+      {
+	// ENZO !!!! AIUTO :->
+	System.out.println("Error in Object Instantiation");
+      }
   }
 
   public void redefineFtsObject(){

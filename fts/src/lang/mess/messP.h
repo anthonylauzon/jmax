@@ -37,7 +37,8 @@ extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 
 /* Functions for direct .pat loading support */
 
-extern void fts_patcher_reassign_inlets_and_outlets(fts_patcher_t *this);
+extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
+
 extern void fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *obj, fts_symbol_t new_name);
 /* 
  * Property related private functions

@@ -10,12 +10,12 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
- * Specialization of the abstract container to implement
- * the selection.
+ * Implement the selection; for now, without listener, and
+ * local to each patcher; later, unique, and more integrated with FTS.
  * 
  */
 
-public class FtsSelection extends FtsAbstractContainerObject
+public class FtsSelection 
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -23,71 +23,76 @@ public class FtsSelection extends FtsAbstractContainerObject
   /*                                                                           */
   /*****************************************************************************/
 
+  /** The objects contained in the patcher */
+
+  private Vector objects     = new Vector();
+
+  /** All the connections between these objects */
+
+  private Vector connections = new Vector();
+
+
   /**
    * Create a FtsObject object;
    */
 
-  FtsSelection(FtsContainerObject parent)
+  FtsSelection()
   {
-    super(parent, "selection", "");
-
-    ninlets = 0;
-    noutlets = 0;
   }
 
   /** Add an object to this container  */
 
   final public void addObject(FtsObject obj)
   {
-    addObjectToContainer(obj);
+    objects.addElement(obj);
   }
 
   /** Remove an object from this container. */
 
   final public void removeObject(FtsObject obj)
   {
-    removeObjectFromContainer(obj);
+    objects.removeElement(obj);
+  }
+
+  /** Get the objects */
+
+  final public Vector getObjects()
+  {
+    return objects;
   }
 
   /** Add a connection to this selection. */
 
   final public void addConnection(FtsConnection obj)
   {
-    addConnectionToContainer(obj);
+    connections.addElement(obj);
   }
 
   /** Remove an connection from this container. */
 
   final void removeConnection(FtsConnection obj)
   {
-    removeConnectionFromContainer(obj);
+    connections.removeElement(obj);
+  }
+
+  /** Get the connections */
+
+  final public Vector getConnections()
+  {
+    return connections;
   }
 
   /** clean: remove everything */
 
   final public void clean()
   {
-    getObjects().removeAllElements();
-    getConnections().removeAllElements();
+    objects.removeAllElements();
+    connections.removeAllElements();
   }
 
-  /** This object is not visible */
 
-  public boolean isRepresented()
-  {
-    return false;
-  }
-
-  /** This object is not persistent */
-
-  protected boolean isPersistent()
-  {
-    return false;
-  }
-
-  /** Since this object is not persistent, this function is
-    not called to save it as a part of a .tpa file, 
-    but it is called for copy/paste operations
+  /** this method is
+   * called for copy/paste operations
     */
 
   public void saveAsTcl(PrintWriter writer)
@@ -97,9 +102,9 @@ public class FtsSelection extends FtsAbstractContainerObject
     // First, store the declarations; declaration don't have
     // connections, so we don't store them in variables.
 
-    for (int i = 0; i < getObjects().size(); i++)
+    for (int i = 0; i < objects.size(); i++)
       {
-	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
+	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 	
 	if (obj instanceof FtsDeclarationObject)
 	  {
@@ -110,9 +115,9 @@ public class FtsSelection extends FtsAbstractContainerObject
 
     // Then store the objects
 
-    for (int i = 0; i < getObjects().size(); i++)
+    for (int i = 0; i < objects.size(); i++)
       {
-	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
+	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 	
 	if (! (obj instanceof FtsDeclarationObject))
 	  {
@@ -127,11 +132,11 @@ public class FtsSelection extends FtsAbstractContainerObject
     // Then, store the connections
     // Connections are only stored if both ends are in the selection !
 
-    for (int i = 0; i < getConnections().size(); i++)
+    for (int i = 0; i < connections.size(); i++)
       {
-	FtsConnection c   =  (FtsConnection) getConnections().elementAt(i);
+	FtsConnection c   =  (FtsConnection) connections.elementAt(i);
 
-	if (getObjects().contains(c.to) && getObjects().contains(c.from))
+	if (objects.contains(c.to) && objects.contains(c.from))
 	  {
 	    c.saveAsTcl(writer);
 	    writer.println();

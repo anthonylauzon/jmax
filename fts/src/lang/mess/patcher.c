@@ -43,9 +43,6 @@ fts_metaclass_t *patcher_metaclass;
 fts_metaclass_t *inlet_metaclass;
 fts_metaclass_t *outlet_metaclass;
 
-fts_symbol_t fts_s_patcher;
-fts_symbol_t fts_s_inlet;
-fts_symbol_t fts_s_outlet;
 
 /* INlets; inlets are only placeholders for the internal connections
    they receive no messages, send no messages; the messages are sent
@@ -70,18 +67,20 @@ inlet_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
-/* function to reposition an inlet, without using redefinition (bad
+/* function and method to reposition an inlet, without using redefinition (bad
    for properties !!)
    */
 
-static void
-inlet_reposition(fts_object_t *o, int pos)
+void
+fts_inlet_reposition(fts_object_t *o, int pos)
 {
   fts_inlet_t *this  = (fts_inlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
   this->position = pos;
-  patcher->inlets[this->position] = this;
+
+  if (this->position < fts_object_get_inlets_number((fts_object_t *)patcher))
+    patcher->inlets[this->position] = this;
 }
 
 /* Arguments:
@@ -97,7 +96,9 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (ac == 2)
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
-      patcher->inlets[this->position] = this;
+
+      if (this->position < fts_object_get_outlets_number((fts_object_t *)patcher))
+	patcher->inlets[this->position] = this;
     }
   else
     {
@@ -118,7 +119,7 @@ inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_inlet_t *this   = (fts_inlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  if (this->position >= 0)
+  if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
     patcher->inlets[this->position] = 0;
 
   dsp_list_remove(o);
@@ -164,7 +165,6 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 internal_inlet_config(void)
 {
-  fts_s_inlet = fts_new_symbol("inlet");
   fts_metaclass_create(fts_s_inlet, inlet_instantiate, fts_always_equiv);
   inlet_metaclass = fts_metaclass_get_by_name(fts_s_inlet);
 }
@@ -208,14 +208,16 @@ outlet_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
    for properties !!)
    */
 
-static void
-outlet_reposition(fts_object_t *o, int pos)
+void
+fts_outlet_reposition(fts_object_t *o, int pos)
 {
   fts_outlet_t *this  = (fts_outlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
   this->position = pos;
-  patcher->outlets[this->position] = this;
+
+  if (this->position < fts_object_get_outlets_number((fts_object_t *)patcher))
+    patcher->outlets[this->position] = this;
 }
 
 
@@ -228,7 +230,9 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if (ac == 2)
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
-      patcher->outlets[this->position] = this;
+
+      if (this->position < fts_object_get_outlets_number((fts_object_t *)patcher))
+	patcher->outlets[this->position] = this;
     }
   else
     {
@@ -242,13 +246,13 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 
-void
+static void
 outlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_t *this   = (fts_outlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  if (this->position >= 0)
+  if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
     patcher->outlets[this->position] = 0;
 
   dsp_list_remove(o);
@@ -293,7 +297,6 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 internal_outlet_config(void)
 {
-  fts_s_outlet = fts_new_symbol("outlet");
   fts_metaclass_create(fts_s_outlet, outlet_instantiate, fts_always_equiv);
   outlet_metaclass = fts_metaclass_get_by_name(fts_s_outlet);
 }
@@ -318,11 +321,11 @@ patcher_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts
 }
 
 
-/* This method , and the corresponding replace/redefine functions, will be phased
-   out; redefining is an editing operation, coping with everything in FTS is 
-   too complex and not very generic (think about properties: which properties we
-   should move on to the new object ? "x" for sure, dsp_is_sink surely not !! )
-   */
+/*
+  This method leave the obsolete inlet around; it just reinstall inlets
+  and outlets from the object list, so that "dead" inlets/outlets
+  can come back in act
+  */
 
 static void
 patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -337,54 +340,6 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   new->open = old->open;
 
-  /* first, delete the inlets that will not be used in the new patcher,
-     if any
-   */
-
-  for (i = fts_object_get_inlets_number((fts_object_t *) new);
-       i < fts_object_get_inlets_number((fts_object_t *) old);
-       i++)
-    if (old->inlets[i])
-      fts_object_delete((fts_object_t *) (old->inlets[i]));
-    
-  /* Move the other inlets to the new patcher (if any) */
-
-  for (i = 0; i < fts_object_get_inlets_number((fts_object_t *) new); i++)
-    {
-
-      if (i < fts_object_get_inlets_number((fts_object_t *) old))
-	{
-	  new->inlets[i] = old->inlets[i];
-	  old->inlets[i] = 0;
-	}
-      else
-	new->inlets[i] = 0;
-    }
-
-  /* second, delete the outlets that will not be used in the new patcher;
-   */
-
-  for (i = fts_object_get_outlets_number((fts_object_t *) new);
-       i < fts_object_get_outlets_number((fts_object_t *) old);
-       i++)
-    if (old->outlets[i])
-      fts_object_delete((fts_object_t *) (old->outlets[i]));
-
-  /* Move the other outlets to the new patcher, leaving to zero
-     the non-initialized inlets.
-   */
-
-  for (i = 0; i < fts_object_get_outlets_number((fts_object_t *) new); i++)
-    {
-      if (i < fts_object_get_outlets_number((fts_object_t *) old))
-	{
-	  new->outlets[i] = old->outlets[i];
-	  old->outlets[i] = 0;
-	}
-      else
-	new->outlets[i] = 0;
-    }
-  
   /* move all the contained objects */
 
   new->objects = old->objects;
@@ -394,6 +349,18 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   for (p = new->objects; p ; p = p->next_in_patcher)
     p->patcher = new;
+
+  /* Reinstall the inlets */
+
+  for (p = new->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_inlet(p))
+      fts_inlet_reposition(p, ((fts_inlet_t *)p)->position);
+
+  /* Reinstall the outlets */
+
+  for (p = new->objects; p ; p = p->next_in_patcher)
+    if (fts_object_is_outlet(p))
+      fts_outlet_reposition(p, ((fts_outlet_t *)p)->position);
 }
 
 
@@ -496,6 +463,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   /* get the name */
 
   this->name = fts_get_symbol_arg(ac, at, 1, 0);
+
   /* should use block allocation ?? */
 
   ninlets = fts_object_get_inlets_number(o);
@@ -935,12 +903,12 @@ fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *this, fts_symbol_t new_n
   /* redefine all the inlets */
 
   for (i = 0; i < ninlets; i++)
-    inlet_reposition((fts_object_t *) this->inlets[i], i);
+    fts_inlet_reposition((fts_object_t *) this->inlets[i], i);
 
   /* redefine all the outlets */
 
   for (i = 0; i < noutlets; i++)
-    outlet_reposition((fts_object_t *) this->outlets[i], i);
+    fts_outlet_reposition((fts_object_t *) this->outlets[i], i);
 }
 
 
@@ -973,7 +941,6 @@ fts_patcher_get_outlet(fts_object_t *patcher, int outlet)
 static int
 fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
 {
-
   return ((fts_get_int(&at0[2]) == fts_get_int(&at1[2])) &&
 	  (fts_get_int(&at0[3]) == fts_get_int(&at1[3])));
 }
@@ -982,7 +949,6 @@ fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at
 static void
 internal_patcher_config(void)
 {
-  fts_s_patcher = fts_new_symbol("patcher");
   fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_patcher_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
 }
@@ -997,4 +963,8 @@ fts_patcher_init(void)
   internal_inlet_config();
   internal_outlet_config();
 }
+
+
+
+
 

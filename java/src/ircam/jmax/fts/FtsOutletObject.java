@@ -24,45 +24,11 @@ public class FtsOutletObject  extends FtsObject
 
   int position;
 
-  /**
-   * Create a FtsOutletObject object: support for .pat
-   */
-
-  FtsOutletObject(FtsContainerObject parent)
-  {
-    super(parent, "outlet", "outlet");
-
-    parent.addOutlet(this); 
-
-    FtsServer.getServer().newOutletObject(parent, this); // create the fts outlet
-
-    ninlets = 1;
-    noutlets = 0;
-  }
-
-
-  public FtsOutletObject(FtsContainerObject parent, int position)
-  {
-    super(parent, "outlet", "outlet " + position);
-
-    this.position = position;
-
-    parent.addOutlet(this, position);
-
-    FtsServer.getServer().newOutletObject(parent, this, position);// create the fts inlet
-
-    ninlets = 1;
-    noutlets = 0;
-  }
-
-
   public FtsOutletObject(FtsContainerObject parent, int position, int objId)
   {
     super(parent, "outlet", "outlet " + position, objId);
 
     this.position = position;
-
-    parent.addOutlet(this, position);
 
     ninlets = 1;
     noutlets = 0;
@@ -73,7 +39,7 @@ public class FtsOutletObject  extends FtsObject
   {
     position = i;
     description = "outlet " + position;
-    FtsServer.getServer().redefineOutletObject(this, position);
+    FtsServer.getServer().repositionOutletObject(this, position);
   }
 
   public int getPosition()
@@ -81,19 +47,11 @@ public class FtsOutletObject  extends FtsObject
     return position;
   }
 
-  public void delete()
-  {
-    super.delete();
-
-    parent.removeOutlet(this, position);
-  }
-
   /** Get the number of outlets of the object 
     Overwrite the FtsObject method because inlets
     do not believe to FTS, when it say outlets have
     outlets.
     */
-
 
   public int getNumberOfOutlets()
   {

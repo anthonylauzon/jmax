@@ -109,7 +109,7 @@ public class FtsAtomList
     // Senza offset
 
     if (object != null)
-      FtsServer.getServer().sendSetAtomListMessage(object, values);
+      FtsServer.getServer().sendSetMessage(object, values);
   }
 
   /** Saving as tcl, both embedded in a .tpa or in a table file*/

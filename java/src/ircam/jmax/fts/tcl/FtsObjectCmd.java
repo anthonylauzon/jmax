@@ -35,14 +35,19 @@ class FtsObjectCmd implements Command
 
 	// Retrieve the arguments
 
-	try {
-	  parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
-	}
-	catch(EmptyStackException e) {
+	try
+	  {
+	    parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
+	  }
+	catch(EmptyStackException e)
+	  {
+	    throw new TclException(interp, " context not defined for 'object' command");
+	  }
+
+	if (parent == null)
 	  throw new TclException(interp, " context not defined for 'object' command");
-	}
-	if (parent == null)  throw new TclException(interp, " context not defined for 'object' command");
-	  description = argv[1].toString();
+
+	description = argv[1].toString();
 	properties = argv[2];
 
 	className = FtsParse.parseClassName(description);
@@ -54,14 +59,14 @@ class FtsObjectCmd implements Command
 		String content = description.substring(description.indexOf('{') + 1,
 						       description.lastIndexOf('}'));
 
-		object = new FtsMessageObject(parent, content);
+		object = FtsObject.makeFtsObject(parent, "messbox", content);
 		object.parseTclProperties(interp, properties);
 
 		interp.setResult(ReflectObject.newInstance(interp, object));
 	      }
 	    else
 	      {
-		object = FtsObject.makeFtsObject(parent, className, description);
+		object = FtsObject.makeFtsObject(parent, description);
 		object.parseTclProperties(interp, properties);
 		interp.setResult(ReflectObject.newInstance(interp, object));
 	      }

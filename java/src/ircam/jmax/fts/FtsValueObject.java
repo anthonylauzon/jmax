@@ -35,10 +35,6 @@ public class FtsValueObject extends FtsStandardObject
    * Create a FtsObject object;
    */
 
-  FtsValueObject(FtsContainerObject parent, String className, String description)
-  {
-    super(parent, className, description);
-  }
 
   FtsValueObject(FtsContainerObject parent, String className, String description, int objId)
   {

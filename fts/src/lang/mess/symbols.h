@@ -47,6 +47,7 @@ extern fts_symbol_t fts_s_noutlets;
 extern fts_symbol_t fts_s_bang;
 extern fts_symbol_t fts_s_list;
 extern fts_symbol_t fts_s_set;
+extern fts_symbol_t fts_s_append;
 extern fts_symbol_t fts_s_print;
 extern fts_symbol_t fts_s_clear;
 extern fts_symbol_t fts_s_stop;
@@ -78,7 +79,20 @@ extern fts_symbol_t fts_s_range;
 extern fts_symbol_t fts_s_font;
 extern fts_symbol_t fts_s_fontSize;
 extern fts_symbol_t fts_s_autorouting;
+extern fts_symbol_t fts_s_off;
+extern fts_symbol_t fts_s_on;
+
+/* Symbols related to builtin classes */
+
+extern fts_symbol_t fts_s_patcher;
+extern fts_symbol_t fts_s_inlet;
+extern fts_symbol_t fts_s_outlet;
+extern fts_symbol_t fts_s_qlist;
+extern fts_symbol_t fts_s_table;
+extern fts_symbol_t fts_s_explode;
 
 #endif
+
+
 
 

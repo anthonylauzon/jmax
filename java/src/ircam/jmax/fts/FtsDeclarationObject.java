@@ -27,13 +27,6 @@ public class FtsDeclarationObject extends FtsObject
    * Note that for declarations, we assume the description include the class name
    */
 
-  FtsDeclarationObject(FtsContainerObject parent, String className, String description)
-  {
-    super(parent, className, description);
-
-    FtsServer.getServer().newObject(parent, this, description);
-  }
-
   FtsDeclarationObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);

@@ -29,7 +29,7 @@ class FtsOutletCmd implements Command
       {
 	FtsObject object;
 	FtsContainerObject parent;
-	int position;
+	String position;
 	TclObject properties;
 
 	try
@@ -37,10 +37,10 @@ class FtsOutletCmd implements Command
 	    // Retrieve the arguments
 
 	    parent = (FtsContainerObject) FtsContainerObject.containerStack.peek();
-	    position    = TclInteger.get(interp, argv[1]);
+	    position    = argv[1].toString();
 	    properties = argv[2];
 
-	    object = new FtsOutletObject(parent, position);
+	    object = FtsObject.makeFtsObject(parent, "outlet", position);
 	    object.parseTclProperties(interp, properties);
 
 	    interp.setResult(ReflectObject.newInstance(interp, object));

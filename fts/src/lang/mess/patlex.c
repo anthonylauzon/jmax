@@ -22,10 +22,10 @@
 
 static int unique_count = 3333; /* the unique number generation */
 
-fts_pat_lexer_t *
-fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_argv)
+fts_patlex_t *
+fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
 {
-  fts_pat_lexer_t *this;
+  fts_patlex_t *this;
   FILE *fd;
 
   fd  = fopen(filename, "r");
@@ -33,7 +33,7 @@ fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_arg
   if (fd == 0)
     return 0;
 
-  this = (fts_pat_lexer_t *) fts_malloc(sizeof(fts_pat_lexer_t));
+  this = (fts_patlex_t *) fts_malloc(sizeof(fts_patlex_t));
   this->fd = fd;
   this->env_argc = env_argc;
   this->env_argv = env_argv;
@@ -51,12 +51,12 @@ fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_arg
    Used for abstractions, where we need to look for a file 
    */
 
-fts_pat_lexer_t *
-fts_open_pat_lexer_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
+fts_patlex_t *
+fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
 {
-  fts_pat_lexer_t *this;
+  fts_patlex_t *this;
 
-  this = (fts_pat_lexer_t *) fts_malloc(sizeof(fts_pat_lexer_t));
+  this = (fts_patlex_t *) fts_malloc(sizeof(fts_patlex_t));
   this->fd = file;
   this->env_argc = env_argc;
   this->env_argv = env_argv;
@@ -71,7 +71,7 @@ fts_open_pat_lexer_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
 }
 
 void
-fts_close_pat_lexer(fts_pat_lexer_t *this)
+fts_patlex_close(fts_patlex_t *this)
 {
   fclose(this->fd);
   fts_free(this);
@@ -79,38 +79,38 @@ fts_close_pat_lexer(fts_pat_lexer_t *this)
 
 /* private predicates for character classes */
 
-static int isDollar(int c)
+static int fts_patlex_is_dollar(int c)
 {
   return c == '$';
 }
 
-static int isBlank(int c)
+static int fts_patlex_is_blank(int c)
 {
   return (c == '\t') || (c == ' ') || (c == '\n') || (c == '\r');
 }
 
-static int isSemi(int c)
+static int fts_patlex_is_semi(int c)
 {
   return (c == ';');
 }
 
-static int isDigit(int c)
+static int fts_patlex_is_digit(int c)
 {
   return ((c == '0') || (c == '1') || (c == '2') || (c == '3') || (c == '4') ||
 	  (c == '5') || (c == '6') || (c == '7') || (c == '8') || (c == '9'));
 }
 
-static int isDecimalPoint(int c)
+static int fts_patlex_is_decimal_point(int c)
 {
   return (c == '.');
 }
 
-static int isSign(int c)
+static int fts_patlex_is_sign(int c)
 {
   return (c == '-');
 }
 
-static int isBackSlash(int c)
+static int fts_patlex_is_backslash(int c)
 {
   return (c == '\\');
 }
@@ -126,7 +126,7 @@ static int isBackSlash(int c)
 #define tt_in_number_or_sign 6
 #define tt_in_float    7
 
-void nextToken(fts_pat_lexer_t *this)
+void fts_patlex_next_token(fts_patlex_t *this)
 {
   this->buf_fill = 0;
 
@@ -161,30 +161,30 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_EOF;
 		  return;
 		}
-	      else if (isDollar(c))
+	      else if (fts_patlex_is_dollar(c))
 		{
 		  status = tt_in_var;
 		}
-	      else if (isSemi(c))
+	      else if (fts_patlex_is_semi(c))
 		{
 		  this->ttype = FTS_LEX_EOC;
 		  return;
 		}
-	      else if (isDigit(c))
+	      else if (fts_patlex_is_digit(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_number;
 		}
-	      else if (isSign(c))
+	      else if (fts_patlex_is_sign(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_number_or_sign;
 		}
-	      else if (isBackSlash(c))
+	      else if (fts_patlex_is_backslash(c))
 		{
 		  status = tt_in_quoted_char;
 		}
-	      else if (isBlank(c))
+	      else if (fts_patlex_is_blank(c))
 		{
 		  status = tt_waiting;
 		}
@@ -197,7 +197,7 @@ void nextToken(fts_pat_lexer_t *this)
 		
 	    case tt_in_var:
 
-	      if (isDigit(c) && (this->env_argv != 0))
+	      if (fts_patlex_is_digit(c) && (this->env_argv != 0))
 		{
 		  int v = c - '0'; 
 
@@ -262,7 +262,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      else if (isSemi(c))
+	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
@@ -271,14 +271,14 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->lookahead_valid = 1;
 		  return;
 	       }
-	      else if (isBlank(c))
+	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      else if (isBackSlash(c))
+	      else if (fts_patlex_is_backslash(c))
 		{
 		  status = tt_in_quoted_char;
 		}
@@ -290,11 +290,11 @@ void nextToken(fts_pat_lexer_t *this)
 	      break;
 
 	    case tt_in_quoted_char:
-	      if (isBackSlash(c))
+	      if (fts_patlex_is_backslash(c))
 		{
 		  status = tt_in_qquoted_char;
 		}
-	      else if (isDollar(c))
+	      else if (fts_patlex_is_dollar(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  this->buf[this->buf_fill++] = '\0';
@@ -310,7 +310,7 @@ void nextToken(fts_pat_lexer_t *this)
 	      break;
 
 	    case tt_in_qquoted_char:
-	      if (isBackSlash(c))
+	      if (fts_patlex_is_backslash(c))
 		{
 		  status = tt_in_quoted_char;
 		}
@@ -330,7 +330,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_NUMBER;
 		  return;
 		}
-	      if (isSemi(c))
+	      if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_int(&(this->val), atoi(this->buf));
@@ -339,19 +339,19 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->lookahead_valid = 1;
 		  return;
 		}
-	      else if (isBlank(c))
+	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_int(&(this->val), atoi(this->buf));
 		  this->ttype = FTS_LEX_NUMBER;
 		  return;
 		}
-	      else if (isDigit(c))
+	      else if (fts_patlex_is_digit(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_number;
 		}
-	      else if (isDecimalPoint(c))
+	      else if (fts_patlex_is_decimal_point(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_float;
@@ -372,7 +372,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      if (isSemi(c))
+	      if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
@@ -381,19 +381,19 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->lookahead_valid = 1;
 		  return;
 		}
-	      else if (isBlank(c))
+	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
 		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
-	      else if (isDigit(c))
+	      else if (fts_patlex_is_digit(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_number;
 		}
-	      else if (isDecimalPoint(c))
+	      else if (fts_patlex_is_decimal_point(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_float;
@@ -415,7 +415,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_FLOAT;
 		  return;
 		}
-	      if (isSemi(c))
+	      if (fts_patlex_is_semi(c))
 		{
 		  float f;
 		  this->buf[this->buf_fill++] = '\0';
@@ -426,7 +426,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->lookahead_valid = 1;
 		  return;
 		}
-	      else if (isBlank(c))
+	      else if (fts_patlex_is_blank(c))
 		{
 		  float f;
 		  this->buf[this->buf_fill++] = '\0';
@@ -435,7 +435,7 @@ void nextToken(fts_pat_lexer_t *this)
 		  this->ttype = FTS_LEX_FLOAT;
 		  return;
 		}
-	      else if (isDigit(c))
+	      else if (fts_patlex_is_digit(c))
 		{
 		  this->buf[this->buf_fill++] = c;
 		  status = tt_in_float;

@@ -39,19 +39,6 @@ public class FtsQlistObject extends FtsObject implements FtsAtomListObject, FtsD
    * Create a FtsObject object;
    */
 
-  FtsQlistObject(FtsContainerObject parent, String className, String description)
-  {
-    super(parent, className, description);
-
-    FtsServer.getServer().newObject(parent, this, description);
-    
-    installMessageHandler(new QlistMessageHandler());
-
-    if (parent.isOpen())
-      FtsServer.getServer().syncToFts();
-  }
-
-
   FtsQlistObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);

@@ -27,46 +27,12 @@ public class FtsInletObject  extends FtsObject
   /**
    * Create a FtsInletObject object.
    */
-
-  // Inlets without a position cannot be 
-  // created by FTS (of course); and soon ,
-  // they will not be created also here !!!
-
-  FtsInletObject(FtsContainerObject parent)
-  {
-    super(parent, "inlet", "inlet");
-
-    parent.addInlet(this); // support for .pat
-
-    FtsServer.getServer().newInletObject(parent, this); // create the fts inlet
-
-    ninlets = 0;
-    noutlets = 1;
-  }
-
   
-  public FtsInletObject(FtsContainerObject parent, int position)
-  {
-    super(parent, "inlet", "inlet " + position);
-
-    this.position = position;
-
-    parent.addInlet(this, position);
-
-    FtsServer.getServer().newInletObject(parent, this, position);// create the fts inlet
-
-    ninlets = 0;
-    noutlets = 1;
-  }
-
-
   public FtsInletObject(FtsContainerObject parent, int position, int objId)
   {
     super(parent, "inlet", "inlet " + position, objId);
 
     this.position = position;
-
-    parent.addInlet(this, position);
 
     ninlets = 0;
     noutlets = 1;
@@ -77,19 +43,12 @@ public class FtsInletObject  extends FtsObject
     position = i;
     description = "inlet " + position;
 
-    FtsServer.getServer().redefineInletObject(this, position);
+    FtsServer.getServer().repositionInletObject(this, position);
   }
 
   public int getPosition()
   {
     return position;
-  }
-
-  public void delete()
-  {
-    super.delete();
-
-    parent.removeInlet(this, position);
   }
 
   /** Get the number of inlets of the object 

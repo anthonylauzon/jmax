@@ -1,7 +1,6 @@
 SOURCES = \
 	  FtsModule.java       \
 	  FtsDotPatParser.java  \
-          FtsAbstractionTable.java \
           FtsClientProtocol.java \
           FtsConnection.java \
           FtsErrorStreamer.java \
@@ -39,7 +38,6 @@ SOURCES = \
           FtsSubProcessServer.java \
           FtsTemplateTable.java \
 	  FtsLocation.java  \
-	  FtsDotPatFileDataHandler.java  \
 	  FtsDotPatRemoteDataHandler.java  \
 	  FtsPatchData.java  \
 	  FtsIntegerVectorData.java  \

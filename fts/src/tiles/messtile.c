@@ -29,7 +29,9 @@
    not yet implemented, but soon !!!
 
    NEW  (obj) p (int)id [<args>]*
-   REDEFINE (obj)old [<args>]*
+   REDEFINE_PATCHER (obj)patcher <name> <ins> <outs>
+   REPOSITION_INLET (obj)obj <pos>
+   REPOSITION_OUTLET (obj)obj <pos>
    REPLACE (obj)old (obj)new
    FREE (obj)obj
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
@@ -109,11 +111,8 @@ post_mess(const char *msg, int ac, const fts_atom_t *av)
   post("\n");
 }
 
-#ifdef DEBUG
-#define INIT_TRACE 1
-#else
+
 #define INIT_TRACE 0
-#endif
 
 static int do_mess_trace = INIT_TRACE;
 
@@ -267,6 +266,47 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
 }
 
 
+/* DECLARE_ABSTRACTION   <name> <file> */
+
+static void
+fts_mess_client_declare_abstraction(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received declare abstraction ", ac, av);
+
+  if (ac == 2 && fts_is_symbol(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      fts_symbol_t abstraction;
+      fts_symbol_t filename;
+
+      abstraction = fts_get_symbol(&av[0]);
+      filename = fts_get_symbol(&av[1]);
+
+      fts_abstraction_declare(abstraction, filename);
+    }
+  else
+    post_mess("System Error in FOS message DEFINE ABSTRACTION: bad args", ac, av);
+
+}
+
+/* DECLARE_ABSTRACTION_PATH   <path> */
+
+static void
+fts_mess_client_declare_abstraction_path(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received declare abstraction path ", ac, av);
+
+  if (ac == 1 && fts_is_symbol(&av[0]))
+    {
+      fts_symbol_t path;
+
+      path = fts_get_symbol(&av[0]);
+
+      fts_abstraction_declare_path(path);
+    }
+  else
+    post_mess("System Error in FOS message DEFINE ABSTRACTION PATH: bad args", ac, av);
+}
+
 
 /*    DOWNLOAD_PATCHER   (obj)p
 
@@ -293,98 +333,7 @@ fts_mess_client_download_patcher(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      /* Code all the objects */
-
-      for (p = patcher->objects; p ; p = p->next_in_patcher)
-	{
-	  /* Assign an ID if needed */
-
-	  if (p->id == FTS_NO_ID)
-	    fts_object_table_register(p);
-
-	  /* Check if it is an abstraction; 
-	     the trick is: if the object is a patcher, but
-	     it first argument is not, then we consider it an abstraction,
-	     (or template or whatever) and we send a different message
-	     to tell it to the client 
-
-	     Some object require special handling, because their description is
-	     not necessarly consistent.
-	     */
-
-	  if (fts_object_is_inlet(p))
-	    {
-	      fts_inlet_t *inlet = (fts_inlet_t *) p;
-
-	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-	      fts_client_mess_add_object((fts_object_t *) p->patcher);
-	      fts_client_mess_add_long(p->id);
-	      fts_client_mess_add_sym(fts_s_inlet);
-	      fts_client_mess_add_long(inlet->position);
-	      fts_client_mess_send_msg();
-	    }
-	  else if (fts_object_is_outlet(p))
-	    {
-	      fts_outlet_t *outlet = (fts_outlet_t *) p;
-
-	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-	      fts_client_mess_add_object((fts_object_t *) p->patcher);
-	      fts_client_mess_add_long(p->id);
-	      fts_client_mess_add_sym(fts_s_outlet);
-	      fts_client_mess_add_long(outlet->position);
-	      fts_client_mess_send_msg();
-	    }
-	  else if (fts_object_is_abstraction(p))
-	    {
-	      /* Send the abstraction object */
-
-	      /* NEW_ABSTRACTION  (obj)pid (int)new-id [<args>]+ */
-
-	      fts_client_mess_start_msg(NEW_ABSTRACTION_CODE);
-	      fts_client_mess_add_object((fts_object_t *) p->patcher);
-	      fts_client_mess_add_long(p->id);
-	      fts_client_mess_add_atoms(p->argc, p->argv);
-	      fts_client_mess_send_msg();
-	    }
-	  else
-	    {
-	      /* Send the object */
-
-	      /* NEW  (obj)pid (int)new-id [<args>]+ */
-
-	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
-	      fts_client_mess_add_object((fts_object_t *) p->patcher);
-	      fts_client_mess_add_long(p->id);
-	      fts_client_mess_add_atoms(p->argc, p->argv);
-	      fts_client_mess_send_msg();
-	    }
-
-	  fts_object_send_properties(p);
-	}
-
-      /* For each object, for each outlet, code all the connections */
-
-      for (p = patcher->objects; p ; p = p->next_in_patcher)
-	{
-	  int outlet;
-
-	  for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
-	    {
-	      fts_connection_t *c;
-
-	      for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-		{
-		  /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
-
-		  fts_client_mess_start_msg(CONNECT_OBJECTS_CODE);
-		  fts_client_mess_add_object(c->src);
-		  fts_client_mess_add_long(c->woutlet);
-		  fts_client_mess_add_object(c->dst);
-		  fts_client_mess_add_long(c->winlet);
-		  fts_client_mess_send_msg();
-		}
-	    }
-	}
+      fts_client_upload_patcher_content(patcher);
     }
   else
     post_mess("System Error in FOS message DOWNLOAD PATCHER: bad args", ac, av);
@@ -484,7 +433,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
   if (ac >= 3 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
     {
-      int pid, id;
+      int id;
       fts_patcher_t *parent;
       fts_object_t  *new;
 
@@ -499,49 +448,115 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      if (parent && fts_patcher_is_open(parent))
-	fts_object_send_properties(new);
+      /* Upload the object if it have an ID */
+
+      if (id != FTS_NO_ID)
+	fts_client_upload_object(new);
     }
   else
     post_mess("System Error in FOS message NEW: bad args", ac, av);
 }
 
 
-/* 
-   REDEFINE (obj)old   [<args>]+
-*/
+/*
+   REDEFINE_PATCHER (obj)old (sym)name (int)ins (int)outs
+   
+   Redefine patcher use a special primitive of the message system
+   to change the patcher class without doing a real redefine.
+
+   */
 
 static void
-fts_mess_client_redefine(int ac, const fts_atom_t *av)
+fts_mess_client_redefine_patcher(int ac, const fts_atom_t *av)
 {
-  trace_mess("Received redefine", ac, av);
+  trace_mess("Received redefine patcher", ac, av);
 
-  if (ac >= 1 && fts_is_object(&av[0]))
+  if (ac == 4 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]) 
+      && fts_is_int(&av[2]) && fts_is_int(&av[3]))
     {
-      int pid, id;
-      fts_object_t  *new;
-      fts_object_t  *old;
+      fts_patcher_t  *patcher;
+      fts_symbol_t   name;
+      int            ins, outs;
 
-      old =  fts_get_object(&av[0]);
+      patcher = (fts_patcher_t *) fts_get_object(&av[0]);
+      name    = fts_get_symbol(&av[1]);
+      ins     = fts_get_int(&av[2]);
+      outs    = fts_get_int(&av[3]);
 
-      if (! old)
+      if (! patcher)
 	{
-	  post_mess("System Error in FOS message REDEFINE: redefining a non existing object", ac, av);
+	  post_mess("System Error in FOS message REDEFINE PATCHER: redefining a non existing patcher", ac, av);
 	  return;
 	}
 
-      new = fts_object_redefine(old, ac - 1, av + 1);
 
-      if (! new)
-	{
-	  post_mess("Error in object creation", ac - 1, av + 1);
-	  return;
-	}
+      fts_patcher_redefine(patcher, name, ins, outs);
     }
   else
-    post_mess("System Error in FOS message REDEFINE: bad args", ac, av);
+    post_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, av);
 }
 
+/*
+  REPOSITION_INLET (obj)obj <pos>
+  
+  */
+
+static void
+fts_mess_client_reposition_inlet(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received reposition inlet", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
+    {
+      fts_object_t  *obj;
+      int            pos;
+
+      obj = fts_get_object(&av[0]);
+      pos = fts_get_int(&av[1]);
+
+      if (! obj)
+	{
+	  post_mess("System Error in FOS message REPOSITION INLET: repositioning a non existing inlet", ac, av);
+	  return;
+	}
+
+      fts_inlet_reposition(obj, pos);
+    }
+  else
+    post_mess("System Error in FOS message REPOSITION INLET: bad args", ac, av);
+}
+
+
+/*
+  REPOSITION_OUTLET (obj)obj <pos>
+  
+  */
+
+static void
+fts_mess_client_reposition_outlet(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received reposition outlet", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_int(&av[1]))
+    {
+      fts_object_t  *obj;
+      int            pos;
+
+      obj = fts_get_object(&av[0]);
+      pos = fts_get_int(&av[1]);
+
+      if (! obj)
+	{
+	  post_mess("System Error in FOS message REPOSITION OUTLET: repositioning a non existing outlet",
+		    ac, av);
+	  return;
+	}
+
+      fts_outlet_reposition(obj, pos);
+    }
+  else
+    post_mess("System Error in FOS message REPOSITION OUTLET: bad args", ac, av);
+}
 
 /* 
    REPLACE (obj)old  (obj)new
@@ -554,7 +569,6 @@ fts_mess_client_replace(int ac, const fts_atom_t *av)
 
   if (ac == 2 && fts_is_object(&av[0]) && fts_is_object(&av[0]))
     {
-      int pid, id;
       fts_object_t  *old;
       fts_object_t  *new;
 
@@ -857,13 +871,18 @@ fts_messtile_install_all()
   fts_client_mess_install(LOAD_PATCHER_TPAT_CODE, fts_mess_client_load_patcher_tpat);
   fts_client_mess_install(LOAD_PATCHER_DPAT_CODE, fts_mess_client_load_patcher_dpat);
 
+  fts_client_mess_install(DECLARE_ABSTRACTION_CODE, fts_mess_client_declare_abstraction);
+  fts_client_mess_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path);
+
   fts_client_mess_install(DOWNLOAD_PATCHER_CODE, fts_mess_client_download_patcher);
 
   fts_client_mess_install(OPEN_PATCHER_CODE, fts_mess_client_open_patcher);
   fts_client_mess_install(CLOSE_PATCHER_CODE, fts_mess_client_close_patcher);
   fts_client_mess_install(PATCHER_LOADED_CODE,  fts_mess_client_patcher_loaded);
   fts_client_mess_install(NEW_OBJECT_CODE,  fts_mess_client_new);
-  fts_client_mess_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine);
+  fts_client_mess_install(REDEFINE_PATCHER_CODE,  fts_mess_client_redefine_patcher);
+  fts_client_mess_install(REPOSITION_INLET,  fts_mess_client_reposition_inlet);
+  fts_client_mess_install(REPOSITION_OUTLET,  fts_mess_client_reposition_outlet);
   fts_client_mess_install(REPLACE_OBJECT_CODE,  fts_mess_client_replace);
   fts_client_mess_install(FREE_OBJECT_CODE,  fts_mess_client_free);
   fts_client_mess_install(CONNECT_OBJECTS_CODE,  fts_mess_client_connect);

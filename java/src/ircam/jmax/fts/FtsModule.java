@@ -13,12 +13,7 @@ public class FtsModule
   {
     // Install the MDA entities
 
-    if (MaxApplication.getProperty("turbo", "off").equals("on"))
-      {
-	MaxDataHandler.installDataHandler( new FtsDotPatRemoteDataHandler());
-      }
-    else
-      MaxDataHandler.installDataHandler( new FtsDotPatFileDataHandler()); 
+    MaxDataHandler.installDataHandler( new FtsDotPatRemoteDataHandler());
 
     MaxDataHandler.installDataHandler( new FtsDataHandler()); 
 

@@ -13,32 +13,30 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *     abstraction <i>name filename </i>
+ *     abstractionPath <i>path </i>
  * </code> <p>
  *
  */
 
-class FtsAbstractionCmd implements Command
+class FtsAbstractionPathCmd implements Command
 {
   /** Method implementing the TCL command. */
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 3)
+    if (argv.length == 2)
       {
-	String name;
-	String filename;
+	String path;
 
 	// Retrieve the arguments
 
-	name = argv[1].toString();
-	filename = argv[2].toString();
+	path = argv[1].toString();
 
-	FtsServer.getServer().sendAbstractionDeclare(name, filename);
+	FtsServer.getServer().sendAbstractionDeclarePath(path);
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<name> <filename>");
+	throw new TclNumArgsException(interp, 1, argv, "<path>");
       }
   }
 }

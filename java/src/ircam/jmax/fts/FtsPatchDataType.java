@@ -26,20 +26,27 @@ public class FtsPatchDataType extends MaxDataType
 
     FtsObject patcher;
 
-    patcher = new FtsPatcherObject(FtsServer.getServer().getRootObject());
+    try
+      {
+	patcher = FtsObject.makeFtsObject(FtsServer.getServer().getRootObject(), "patcher", "unnamed 0 0");
 
-    // Put some geometrical property for the window, so we can see it.
+	// Put some geometrical property for the window, so we can see it.
 
-    patcher.put("wx", 100);
-    patcher.put("wy", 100);
-    patcher.put("ww", 500);
-    patcher.put("wh", 480);
+	patcher.put("wx", 100);
+	patcher.put("wy", 100);
+	patcher.put("ww", 500);
+	patcher.put("wh", 480);
 
-    FtsPatchData obj = new FtsPatchData();
+	FtsPatchData obj = new FtsPatchData();
 
-    obj.setPatcher(patcher);
+	obj.setPatcher(patcher);
 
-    return obj;
+	return obj;
+      }
+    catch (FtsException e)
+      {
+	return null;
+      }
   }
 
   public boolean canMakeNewInstance()

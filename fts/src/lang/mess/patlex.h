@@ -12,7 +12,7 @@
 #define FTS_LEX_EOF  4
 
 
-typedef struct fts_pat_lexer
+typedef struct fts_patlex
 {
   int ttype;
   fts_atom_t val;
@@ -31,16 +31,16 @@ typedef struct fts_pat_lexer
   char buf[512];
   int buf_fill;
 
-} fts_pat_lexer_t;
+} fts_patlex_t;
 
 
-#define pushBack(this) ((this)->pushedBack = 1)
+#define fts_patlex_push_back(this) ((this)->pushedBack = 1)
 
-extern fts_pat_lexer_t *fts_open_pat_lexer(const char *filename, int env_argc, const fts_atom_t *env_argv);
-extern fts_pat_lexer_t *fts_open_pat_lexer_file(FILE *file, int env_argc, const fts_atom_t *env_argv);
-extern void fts_close_pat_lexer(fts_pat_lexer_t *this);
+extern fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv);
+extern fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv);
+extern void fts_patlex_close(fts_patlex_t *this);
 
-extern void nextToken(fts_pat_lexer_t *this);
+extern void fts_patlex_next_token(fts_patlex_t *this);
 
 
 /* Convenience macros: test of a values against a symbol */

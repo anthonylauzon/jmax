@@ -135,12 +135,7 @@ public class MaxTclFileDataHandler extends MaxDataHandler
 	  String bmaxSave = MaxApplication.getProperty("bmax");
 
 	  if ((bmaxSave != null) && bmaxSave.equals("yes") && (instance instanceof ircam.jmax.fts.FtsPatchData))
-	    {
-	      System.err.println("Saving bmax file");
-	      ((ircam.jmax.fts.FtsPatchData) instance).saveBmax("/u/worksta/dececco/tmp/patch.bmax");
-	    }
-	  else
-	    System.err.println("Not Saving bmax file");
+	    ((ircam.jmax.fts.FtsPatchData) instance).saveBmax("/u/worksta/dececco/tmp/patch.bmax");
 	}
       }
     else

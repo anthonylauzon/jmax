@@ -1,4 +1,5 @@
 SOURCES = FtsAbstractionCmd.java \
+          FtsAbstractionPathCmd.java \
           FtsAddListenerCmd.java \
           FtsClassNameCmd.java   \
           FtsConnectionCmd.java  \
