@@ -34,7 +34,7 @@
 */
 
 #ifdef DEBUG
-/* #define HELP_PURIFY  */
+/* #define HELP_PURIFY */
 #endif
 
 /* #include "smem.h"  */
