@@ -37,6 +37,7 @@ clean:
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd
 	$(INSTALL_DATA) unixdtd.jpk $(lib_install_dir)/packages/unixdtd/unixdtd.jpk
+	( cd help; $(MAKE) $@)
 	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd/lib/$(ARCH)/opt
 	( \
 		cd lib/$(ARCH)/opt ; \
