@@ -26,6 +26,7 @@
 
 typedef struct _audiolabel
 {
+    fts_object_t o;
     fts_symbol_t name;
     int stereo_flag; /* 0: mono; 1:stereo */
     fts_symbol_t input_device;
@@ -51,11 +52,29 @@ typedef struct _audioconfig
 } audioconfig_t;
 
 extern fts_class_t* audioconfig_type;
+extern fts_class_t* audiolabel_type;
 
 extern void fts_audio_idle( void);
 
 void fts_audioconfig_set_defaults(audioconfig_t* config);
 extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
+
+/**
+ * audiolabel
+ */
+void audiolabel_set_stereo(audiolabel_t* label, int stereo_flag);
+void audiolabel_set_input_channel(audiolabel_t* label, int channel);
+void audiolabel_set_input_port(audiolabel_t* label, fts_audioport_t* port, fts_symbol_t name);
+void audiolabel_set_output_channel(audiolabel_t* label, int channel);
+void audiolabel_set_output_port(audiolabel_t* label, fts_audioport_t* port, fts_symbol_t name);
+void audiolabel_client_send_message(fts_object_t* o, fts_symbol_t selector, audiolabel_t* label, int index);
+
+
+
+
+
+
+
 
 #endif
 
