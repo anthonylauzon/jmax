@@ -28,7 +28,7 @@
 # Constants
 # ***************************************************************************
 JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
-
+DEFAULT_ROOT_DIR=/usr/lib/jmax
 
 # ***************************************************************************
 # Functions
@@ -41,6 +41,7 @@ Usage:
     jmax [-javaopt <java-option>]
 	    [-nofork]
 	    [-nojar]
+	    [-root|-r <directory>]
 	    [-verbose] [<other-jmax-options>]
 
 Starts jMax.
@@ -58,6 +59,11 @@ Options and arguments:
     Do not use the jMax Java classes in JAR file jmax.jar. Use the .class files
     in their package directories instead.
     By default, jMax uses the jMax Java classes in JAR file jmax.jar
+
+  -root|-r <directory>       (optional)
+    Specify the root directory (where to find the jmax.jar file, the initialization
+    scripts, etc.)
+    Defaults to $DEFAULT_ROOT_DIR
 
   <other-jmax-options>       (optional)
     Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
@@ -87,7 +93,7 @@ decrypt_options ()
     VERBOSE=
     NOFORK=
     NOJAR=
-    ROOTDIR=
+    ROOTDIR=$DEFAULT_ROOT_DIR
 
     for arg in $@
     do
@@ -105,9 +111,8 @@ decrypt_options ()
 		NOFORK="yes" ;;
 	    \-nojar)
 		NOJAR="yes" ;;
-	    \-jmaxRoot)
-		opt=$arg ;
-		JMAXOPT="${JMAXOPT} $arg" ;;
+	    \-root | \-r)
+		opt=$arg ;;
 	    *)
 		JMAXOPT="${JMAXOPT} $arg" ;;
 	    esac
@@ -115,9 +120,8 @@ decrypt_options ()
 	    case $opt in
 	    \-javaopt)
 		JAVAOPT="${JAVAOPT} $arg" ;;
-	    \-jmaxRoot)
-		ROOTDIR=$arg ;
-		JMAXOPT="${JMAXOPT} $arg" ;;
+	    \-root | \-r)
+		ROOTDIR=$arg ;;
 	    esac
 	    opt="none";
 	fi
@@ -134,7 +138,7 @@ start_it ()
 	echo "CLASSPATH=${CLASSPATH}"
     fi
 
-    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT "
+    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -jmaxRoot $ROOTDIR $JMAXOPT "
 
     ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
 
@@ -156,58 +160,50 @@ start_it ()
     fi
 }
 
+# ---------------------------------------------------------------------------
+build_classpath ()
+{
+    if [ $NOJAR ]
+    then
+	JMAX_CLASSPATH=${ROOTDIR}/java/classes
+    else
+	JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
+    fi
+
+    JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl/jacl.jar
+
+    #  if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
+    #  then
+    #      echo > /dev/null
+    #  fi
+
+    if [ $CLASSPATH ]
+    then
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+    else
+	CLASSPATH=${JMAX_CLASSPATH}:${JACL_CLASSPATH}
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
+# further explainations.
+fix_sgi_fonts ()
+{
+    JAVA_SMALL_FONTS=true
+    export JAVA_SMALL_FONTS
+}
+
 # ***************************************************************************
 # Beginning of script
 # ***************************************************************************
 
 decrypt_options $@
 
-DIR=`dirname $0`
-if [ $ROOTDIR ]
-then
-    :
-else
-    ROOTDIR=`(cd ${DIR}/.. ; pwd)`
-fi
+build_classpath
 
-if [ $NOJAR ]
-then
-    JMAX_CLASSPATH=${ROOTDIR}/java/classes
-else
-    JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
-fi
+check_root_dir
 
-JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl/jacl.jar
-
-SWING_DISTRIB_CLASSPATH=
-
-if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
-then
-    echo > /dev/null
-else
-    if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
-    then
-	SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
-    else
-	echo "Swing classes not found. Trying without..."
-    fi
-fi
-
-if [ $CLASSPATH ]
-then
-    if [ $SWING_DISTRIB_CLASSPATH ]
-    then
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
-    else
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
-    fi
-else
-    CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
-fi
-
-# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
-# further explainations.
-JAVA_SMALL_FONTS=true
-export JAVA_SMALL_FONTS
+fix_sgi_fonts
 
 start_it
