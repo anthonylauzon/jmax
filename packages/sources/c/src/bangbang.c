@@ -39,7 +39,7 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
 {
   int i;
   int noutlets;
-  fts_symbol_t a[2];
+  fts_type_t t[2];
 
   post( "Instantiating class `bangbang' of package `sources'\n");
 
@@ -52,9 +52,9 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
 
   fts_method_define(class, 0, fts_s_bang, bangbang_bang, 0, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  fts_method_define_optargs( class, fts_SystemInlet, fts_s_init, bangbang_init, 2, a, 1);
+  t[0] = fts_t_symbol;
+  t[1] = fts_t_int;
+  fts_method_define_optargs( class, fts_SystemInlet, fts_s_init, bangbang_init, 2, t, 1);
 
   for (i = 0; i < noutlets; i++)
     fts_outlet_type_define( class, i, fts_s_bang, 0, 0);

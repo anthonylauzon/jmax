@@ -71,7 +71,7 @@ static void integer_float1( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
 static fts_status_t integer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
+  fts_type_t t[2];
 
   post( "Instantiating class `integer' of package `sources'\n");
 
@@ -79,27 +79,27 @@ static fts_status_t integer_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_class_init( cl, sizeof(integer_t), 2, 1, 0);
 
   /* define the methods */
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, integer_init, 2, a, 1);
+  t[0] = fts_t_symbol;
+  t[1] = fts_t_int;
+  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, integer_init, 2, t, 1);
 
-  a[0] = fts_s_int;
-  fts_method_define( cl, 0, fts_s_int, integer_int, 1, a);
+  t[0] = fts_t_int;
+  fts_method_define( cl, 0, fts_type_get_selector(fts_t_int), integer_int, 1, t);
 
-  a[0] = fts_s_float;
-  fts_method_define( cl, 0, fts_s_float, integer_float, 1, a);
+  t[0] = fts_t_float;
+  fts_method_define( cl, 0, fts_type_get_selector(fts_t_float), integer_float, 1, t);
 
   fts_method_define( cl, 0, fts_s_bang, integer_bang, 0, 0 );
 
-  a[0] = fts_s_int;
-  fts_method_define( cl, 1, fts_s_int, integer_in1, 1, a );
+  t[0] = fts_t_int;
+  fts_method_define( cl, 1, fts_type_get_selector(fts_t_int), integer_in1, 1, t);
 
-  a[0] = fts_s_float;
-  fts_method_define( cl, 1, fts_s_float, integer_float1, 1, a );
+  t[0] = fts_t_float;
+  fts_method_define( cl, 1, fts_type_get_selector(fts_t_float), integer_float1, 1, t);
 
   /* define outlet type */
-  a[0] = fts_s_int;
-  fts_outlet_type_define( cl, 0, fts_s_int, 1, a );
+  t[0] = fts_t_int;
+  fts_outlet_type_define( cl, 0, fts_type_get_selector(fts_t_int), 1, t);
 
   return fts_Success;
 }

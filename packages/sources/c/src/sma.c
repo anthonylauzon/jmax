@@ -105,7 +105,7 @@ static void sma_set( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
+  fts_type_t t[2];
 
   post( "Instantiating class `.*+~' of package `sources'\n");
 
@@ -114,22 +114,22 @@ static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
   fts_class_init( cl, sizeof(sma_t), 2, 1, 0);
 
   /* Definition of DSP specific methods */
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_float;
-  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, sma_init, 2, a, 1);
+  t[0] = fts_t_symbol;
+  t[1] = fts_t_float;
+  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, sma_init, 2, t, 1);
 
   fts_method_define( cl, fts_SystemInlet, fts_s_delete, sma_delete, 0, 0);
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sma_put, 1, a);
+  t[0] = fts_t_ptr;
+  fts_method_define(cl, fts_SystemInlet, fts_s_put, sma_put, 1, t);
 
   /* Definition of other methods */
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sma_set, 1, a);
+  t[0] = fts_t_int;
+  fts_method_define(cl, 0, fts_type_get_selector(fts_t_int), sma_set, 1, t);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sma_set, 1, a);
+  t[0] = fts_t_float;
+  fts_method_define(cl, 0, fts_type_get_selector(fts_t_float), sma_set, 1, t);
 
 
   /* Definition of DSP inlets and outlets */
