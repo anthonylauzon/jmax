@@ -164,6 +164,34 @@ public class Fts implements MaxContext
       throw new FtsException("Instantiation error for " + className + " " + description);
   }
   
+  public FtsObject makeFtsObject(FtsObject parent, String className, int nArgs, FtsAtom args[])
+       throws FtsException
+  {
+    FtsObject obj;
+    int id;
+
+    id = server.getNewObjectId();
+
+    server.newObject(parent, id, className, nArgs, args);
+    server.sendDownloadObject(id);
+    
+    // Wait for FTS to do his work
+
+    sync();
+
+    obj = server.getObjectByFtsId(id);
+    
+    if (obj != null)
+      {
+	if (parent != null)
+	  parent.setDirty();
+
+	return obj;
+      }
+    else
+      throw new FtsException("Instantiation error for " + className + "args: " + nArgs + " (" + args + ")");
+  }
+  
   /** Create an FTS object. 
      Version to use for those objects where the class name is not avaiable
      directly.

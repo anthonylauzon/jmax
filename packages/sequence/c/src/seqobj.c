@@ -45,6 +45,15 @@ seqevt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sequence_remove_event(&this->evt);
 }
 
+static fts_status_t
+seqevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(seqevt_t), 0, 0, 0); 
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqevt_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqevt_delete);
+}
+
 /******************************************************
  *
  *  object
@@ -127,8 +136,6 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   if(ac == 1)
     {
       sym_openEditor = fts_new_symbol("openEditor");
@@ -153,5 +160,6 @@ void
 seqobj_config(void)
 {
   fts_class_install(fts_new_symbol("sequence"), seqobj_instantiate);
+  fts_class_install(fts_new_symbol("seqevt"), seqevt_instantiate);
 }
 
