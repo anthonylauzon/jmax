@@ -18,8 +18,8 @@ defineDevice analogOut { oss_dac } "OSS audio out"
 defineDevice stereoIn  { oss_adc } "OSS audio in"
 defineDevice stereoIn1 { oss_adc } "OSS audio in"
 
-defineDevice sonorusIn12  { oss_adc device /dev/dsp1} "Sonorus in 1 & 2"
-defineDevice sonorusOut12  { oss_dac device /dev/dsp1} "Sonorus out 1 & 2"
+defineDevice studioOutA { oss_dac device /dev/dsp1 channels 8 } "StudI/O output ADAT port A"
+defineDevice studioInA { oss_adc device /dev/dsp11 channels 2 } "StudI/O input ADAT port A"
 
 defineDevice stereoOut  { oss_dac } "OSS audio out"
 defineDevice stereoOut1 { oss_dac } "OSS audio out"
