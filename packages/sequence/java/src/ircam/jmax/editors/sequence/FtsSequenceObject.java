@@ -73,8 +73,8 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   {
     if(sequence == null)
 	{
-	    sequence = new Sequence(this);
-	    setEditorFrame(sequence);
+	  sequence = new Sequence(this);
+	  setEditorFrame(sequence);
 	}
     showEditor();
   }
