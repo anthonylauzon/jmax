@@ -35,187 +35,193 @@ import java.net.*;
 import javax.swing.*;
 
 /**
- * The background layer of a score. It builds the background Image for the 
+* The background layer of a score. It builds the background Image for the 
  * piano roll representation */
 public class PartitionBackground implements Layer, ImageObserver{
   
   /** Constructor */
   public PartitionBackground ( SequenceGraphicContext theGc)
-  {
+{
     super();
     
     gc = theGc;
-
+		
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
-	public void propertyChange(PropertyChangeEvent e)
-	{		
-	  if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
-	      e.getPropertyName().equals("repaint"))
-	    {
-	      toRepaintBack = true;
-	      gc.getGraphicDestination().repaint();
-	    }
-	  else
-	    if(e.getPropertyName().equals("locked"))
-	      {
-		locked = ((Boolean)e.getNewValue()).booleanValue();
-		toRepaintBack = true;
-		gc.getGraphicDestination().repaint();
-	      }
-	}
-      });
-  }
-  /** builds an horizontal grid in the given graphic port
-   * using the destination size*/
-  private void drawHorizontalGrid(Graphics g)
-  {
-    PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-    int maxPitch = pa.getY(pa.getMaxPitch());
-    int minPitch = pa.getY(pa.getMinPitch());
-    int delta = pa.getVerticalTransp();
-
-    Dimension d = gc.getGraphicDestination().getSize();
-
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
-    g.setFont(ScoreRenderer.scoreFont);
-
-    if(!locked)
-	g.setColor(Color.white);
-    else
+			public void propertyChange(PropertyChangeEvent e)
+		{		
+				if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") || 
+						e.getPropertyName().equals("repaint"))
+				{
+					toRepaintBack = true;
+					gc.getGraphicDestination().repaint();
+				}
+				else
+					if(e.getPropertyName().equals("locked"))
+					{
+						locked = ((Boolean)e.getNewValue()).booleanValue();
+						toRepaintBack = true;
+						gc.getGraphicDestination().repaint();
+					}
+		}
+		});
+}
+/** builds an horizontal grid in the given graphic port
+* using the destination size*/
+private void drawHorizontalGrid(Graphics g)
+{
+	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
+	int maxPitch = pa.getY(pa.getMaxPitch());
+	int minPitch = pa.getY(pa.getMinPitch());
+	int delta = pa.getVerticalTransp();
+	
+	Dimension d = gc.getGraphicDestination().getSize();
+	
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+	
+	/****************** background *********************************/
+	if(!locked)
+		g.setColor(Color.white);
+	else
+		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
+	
+	g.fillRect(0, 0, d.width, d.height);
+	
+	/* out of range background */
 	g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-
-    g.fillRect(0, 0, d.width, d.height);
-
-    g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-    g.fillRect(0, 0 -delta, d.width, maxPitch);
-    g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
-    
-    // the track name
-    if( gc.isInSequence())
-      {
-	g.setColor(Color.gray);
-	g.setFont(ToggleBar.toggleBarFont);	
-	g.drawString(gc.getTrack().getName(), 2, d.height - 2);
-      }
-
-    int positionY = SC_BOTTOM;
-    /*g.setFont(gridSubdivisionFont);*/
-
-    // the minor subdivision
-    for(int k=0;k<2;k++)
-      {
-	g.setColor(Color.black);
-	for (int i = 0; i < 5; i++)
+	g.fillRect(0, 0 -delta, d.width, maxPitch);
+	g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
+	
+	/* track name */
+	if( gc.isInSequence())
+	{
+		g.setColor(Color.gray);
+		g.setFont(ToggleBar.toggleBarFont);	
+		g.drawString(gc.getTrack().getName(), 2, d.height - 2);
+	}
+	
+	/********************** bass key lines ***************************/
+	int positionY = SC_BOTTOM;
+	g.setFont(SequenceFonts.getFont(36));
+	for(int k=0;k<2;k++)
+	{
+		/* black lines */
+		g.setColor(Color.black);
+		for (int i = 0; i < 5; i++)
 	  {
 	    positionY = SC_BOTTOM-(i+k*7)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-	/*g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);*/
-	g.drawString("?", KEYX+4, positionY+32);
-
-	g.setColor(horizontalGridLinesColor);
-     
-	for (int j = 5; j < 7; j++)
+		
+		/* bass key */
+		g.drawString( SequenceFonts.bassKey, KEYX+6, positionY+26);
+		
+		/* gray lines */
+		g.setColor(horizontalGridLinesColor);		
+		for (int j = 5; j < 7; j++)
 	  {
 	    positionY = SC_BOTTOM-(j+k*7)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-      }
-    g.setColor(Color.black);
-    /*g.drawString("15", KEYEND-15, SC_BOTTOM-3 -delta);
-    g.drawString("8", KEYEND-14, SC_BOTTOM-step*7-3 -delta);*/
-
-    for (int i = 14; i < 19; i++)
-      {
-	positionY = SC_BOTTOM-(i*step) -delta;
-	g.drawLine(KEYX, positionY, d.width, positionY);
-      }
+	}
 	
-    /*g.drawImage(SequenceImages.getImage("faClef"), KEYX+4, positionY-1, this);*/
-    g.drawString("?", KEYX+4, positionY+32);
-
-    g.setColor(horizontalGridLinesColor);
-    positionY = SC_BOTTOM-(19*step) -delta;
-    g.drawLine(KEYX, positionY, d.width, positionY);
-    
-    for(int k=0;k<2;k++)
-      {
+	/* black lines */
 	g.setColor(Color.black);
-	for (int i = 0; i < 5; i++)
+	for (int i = 14; i < 19; i++)
+	{
+		positionY = SC_BOTTOM-(i*step) -delta;
+		g.drawLine(KEYX, positionY, d.width, positionY);
+	}
+	
+	/* bass key */
+	g.drawString(SequenceFonts.bassKey, KEYX+6, positionY+26);
+	
+	/* gray line */
+	g.setColor(horizontalGridLinesColor);
+	positionY = SC_BOTTOM-(19*step) -delta;
+	g.drawLine(KEYX, positionY, d.width, positionY);
+	
+	/************* violin key lines *************************/
+	g.setFont(SequenceFonts.getFont(52));
+	for(int k=0;k<2;k++)
+	{
+		/* black lines */
+		g.setColor(Color.black);
+		for (int i = 0; i < 5; i++)
 	  {
 	    positionY = SC_BOTTOM-(i+k*7+20)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-	
-	/*g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, positionY-7, this);*/
-	g.drawString("G", KEYX+4, positionY+32);
-
-	g.setColor(horizontalGridLinesColor);
-     
-	for (int j = 5; j < 7; j++)
+		/* violin key position */
+		int keyPosition = positionY+34;
+		
+		/* gray lines */
+		g.setColor(horizontalGridLinesColor);
+		for (int j = 5; j < 7; j++)
 	  {
 	    positionY = SC_BOTTOM-(j+k*7+20)*step -delta;
 	    g.drawLine(KEYX, positionY, d.width, positionY);
 	  }
-      }
-
-    g.setColor(Color.black);
-    for (int i = 0; i < 5; i++)
-      {
-	positionY = SC_BOTTOM-(i+34)*step -delta;
-	g.drawLine(KEYX, positionY, d.width, positionY);
-      }
-
-    /*g.drawImage(SequenceImages.getImage("violinClef"), KEYX+4, SC_TOP-7 -delta, this);*/
-    g.drawString("G", KEYX+4, SC_TOP/*-delta*/+32);
-
-    /*g.drawString("15", KEYEND-9, SC_TOP+2 -delta);
-    g.drawString("8", KEYEND-6, SC_TOP+step*7+2 -delta);*/
-
-    // the vertical line at the end of keyboard
-    g.drawLine(KEYX, SC_TOP-delta, KEYX, SC_BOTTOM-delta);
-    g.setColor(Color.gray);
-    g.drawLine(KEYEND, 0, KEYEND, d.height);
-  }
-
-  //???????????????????????????????
-  static int currentPressedKey = -1;
-  static public void pressKey(int key, GraphicContext sgc){}
-  static public void releaseKey(GraphicContext sgc){}
-
-  /**
-   * Layer interface. Draw the background */
-  public void render( Graphics g, int order)
-  {
-    Dimension d = gc.getGraphicDestination().getSize();
-    
-    if (itsImage == null) 
-      {
-	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-	drawHorizontalGrid(itsImage.getGraphics());
-      }
-    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
-      {
-	itsImage.flush();
-	itsImage = null;
-	System.gc();
-	RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
+		
+		/* violin key */
+		g.setColor(Color.black);
+		g.drawString( SequenceFonts.violinKey, KEYX+5, keyPosition);
+	}
 	
-	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-	drawHorizontalGrid(itsImage.getGraphics());
-	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
-	toRepaintBack = false;
-      } 
-    
-    if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
-      System.err.println("something wrong: incomplete Image  ");
-    
-    drawVerticalGrid(g);
-  }
+	/* black lines */
+	g.setColor(Color.black);
+	for (int i = 0; i < 5; i++)
+	{
+		positionY = SC_BOTTOM-(i+34)*step -delta;
+		g.drawLine(KEYX, positionY, d.width, positionY);
+	}
+	
+	/* violin key */
+	g.drawString(SequenceFonts.violinKey, KEYX+5, SC_TOP+34);
+		
+	/* vertical lines at the end of keyboard */
+	g.drawLine(KEYX, SC_TOP-delta, KEYX, SC_BOTTOM-delta);
+	g.setColor(Color.gray);
+	g.drawLine(KEYEND, 0, KEYEND, d.height);
+}
 
-      
-    private void drawVerticalGrid(Graphics g)
-    {
+//???????????????????????????????
+static int currentPressedKey = -1;
+static public void pressKey(int key, GraphicContext sgc){}
+static public void releaseKey(GraphicContext sgc){}
+
+/**
+* Layer interface. Draw the background */
+public void render( Graphics g, int order)
+{
+	Dimension d = gc.getGraphicDestination().getSize();
+	
+	if (itsImage == null) 
+	{
+		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+		drawHorizontalGrid(itsImage.getGraphics());
+	}
+	else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
+	{
+		itsImage.flush();
+		itsImage = null;
+		System.gc();
+		RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
+		
+		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+		drawHorizontalGrid(itsImage.getGraphics());
+		rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+		toRepaintBack = false;
+	} 
+	
+	if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
+		System.err.println("something wrong: incomplete Image  ");
+	
+	drawVerticalGrid(g);
+}
+
+
+private void drawVerticalGrid(Graphics g)
+{
 	UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), gc.getDataModel());
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
@@ -229,76 +235,76 @@ public class PartitionBackground implements Layer, ImageObserver{
 	int snappedTime;
 	
 	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
-	    {
+	{
 		snappedTime = (i/timeStep)*timeStep;
 		tempEvent.setTime(snappedTime);
 		xPosition = gc.getAdapter().getX(tempEvent);
 		
 		g.drawLine(xPosition, 0, xPosition, d.height);
-	    }
-    }
-  
-  /**
-   * Layer interface. */
-  public void render(Graphics g, Rectangle r, int order)
-  {
-    render(g, order);
-  }
+	}
+}
 
-  public ObjectRenderer getObjectRenderer()
-  {
-    return null; // no events in this layer!
-  }
-  
-  /**
-   * utility function: find a "good" time step for vertical subdivisions
-   * given a window time size.
-   * The politic is to find 
-   * 1) at least 5 divisions 
-   * 2) if possible, a power of 10  */  
-  public static int findBestTimeStep(int windowTime) 
-  {
-    
-    // find a good time interval between two grid
-    
-    int pow = 1;
-      
-    while (windowTime/pow>0) 
-      {
-	pow *= 10;
-      }
+/**
+* Layer interface. */
+public void render(Graphics g, Rectangle r, int order)
+{
+	render(g, order);
+}
 
-    pow = pow/10;
+public ObjectRenderer getObjectRenderer()
+{
+	return null; // no events in this layer!
+}
 
-    if (windowTime/pow < 5) pow = pow/5;
-    if (pow == 0) return 1;
-    return pow;
-  }
-  
-  /* ImageObserver interface*/
-    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
-    {
-      return true;
-    }
+/**
+* utility function: find a "good" time step for vertical subdivisions
+ * given a window time size.
+ * The politic is to find 
+ * 1) at least 5 divisions 
+ * 2) if possible, a power of 10  */  
+public static int findBestTimeStep(int windowTime) 
+{
+	
+	// find a good time interval between two grid
+	
+	int pow = 1;
+	
+	while (windowTime/pow>0) 
+	{
+		pow *= 10;
+	}
+	
+	pow = pow/10;
+	
+	if (windowTime/pow < 5) pow = pow/5;
+	if (pow == 0) return 1;
+	return pow;
+}
 
-  //--- Fields
-  SequenceGraphicContext gc;
-  Image itsImage;
-  boolean toRepaintBack = false;
-  boolean locked = false;
-  public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
-  public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
-  public static final int KEYX = 27;
-  public static final int KEYWIDTH = 28;
-  public static final int KEYHEIGHT = 3;
-  public static final int KEYEND = KEYX + KEYWIDTH;
+/* ImageObserver interface*/
+public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+{
+	return true;
+}
 
-  public static final int step = 8;
+//--- Fields
+SequenceGraphicContext gc;
+Image itsImage;
+boolean toRepaintBack = false;
+boolean locked = false;
+public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
+public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
+public static final int KEYX = 27;
+public static final int KEYWIDTH = 28;
+public static final int KEYHEIGHT = 3;
+public static final int KEYEND = KEYX + KEYWIDTH;
 
-  public static final int SC_BOTTOM = 334;
-  public static final int SC_TOP = 30;
-  //75 is the number of notes without alteration  
-  //public static final float note_step = (float)((SC_BOTTOM-SC_TOP)/(float)75.0);    
+public static final int step = 8;
+
+public static final int SC_BOTTOM = 334;
+public static final int SC_TOP = 30;
+//75 is the number of notes without alteration  
+//public static final float note_step = (float)((SC_BOTTOM-SC_TOP)/(float)75.0);    
 }
 
 

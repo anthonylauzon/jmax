@@ -16,6 +16,7 @@ ScoreBackground.java \
 ScoreForeground.java \
 ScoreRenderer.java \
 SeqObjectRenderer.java \
+SequenceFonts.java \
 SequenceImages.java \
 TextRenderer.java 
 

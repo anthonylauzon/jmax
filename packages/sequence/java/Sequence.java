@@ -48,35 +48,8 @@ public class Sequence implements JMaxPackage {
     JMaxClassMap.put( "sequence", sequenceCreator, null, null, "sequence", this);
     JMaxClassMap.put( "track", trackCreator, null, null, "track", this);
   
-    installSequenceFonts();
-  }
-
-  private static void installSequenceFonts()
-  {
-    String root = JMaxApplication.getProperty("jmaxRoot");
-    String fontPath = root + "/packages/sequence/fonts/";
-    try
-      {
-	Font musicFont;
-	FileInputStream fileStream;
-	fileStream = new FileInputStream(fontPath+"MusiSync.ttf");
-	musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
-	ircam.jmax.editors.sequence.renderers.ScoreRenderer.setScoreFont(musicFont);
-	fileStream = new FileInputStream(fontPath+"MusiTone.ttf");
-	musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
-      }
-    catch(java.io.FileNotFoundException  e)
-      {
-	System.err.println("[Sequence]: no such font file "+fontPath);
-      }
-    catch(java.awt.FontFormatException e)
-      {
-	System.err.println("[Sequence]: bad font format of "+fontPath);
-      }
-    catch(IOException e)
-      {
-	System.err.println("[Sequence]: I/O error creating font "+fontPath);
-      }
+		/*SequenceImages.init();*/
+    ircam.jmax.editors.sequence.renderers.SequenceFonts.init();
   }
 }
 

@@ -164,14 +164,14 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 		if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
 		{
 			int alt = pa.getAlteration(e);
-			g.setFont(altFont);
+			g.setFont(SequenceFonts.getFont(36));
 			switch(alt)
 			{
 				case PartitionAdapter.ALTERATION_DIESIS:
-					g.drawString("#", x-8, y+5);
+					g.drawString( SequenceFonts.diesis, x-8, y+5);
 					break;
 				case PartitionAdapter.ALTERATION_BEMOLLE:
-					g.drawString("b", x-8, y+5);
+					g.drawString( SequenceFonts.bemolle, x-8, y+5);
 			}
 		}	
 	}
@@ -307,7 +307,6 @@ public static AmbitusEventRenderer getRenderer()
 final static int NOTE_DEFAULT_WIDTH = 5;
 public SequenceGraphicContext gc;
 public static AmbitusEventRenderer staticInstance;
-static public Font altFont = new Font("SansSerif", Font.BOLD, 12);
 
 final static int CUE_WIDTH = 8;
 final static int CUE_HEIGHT = 13;

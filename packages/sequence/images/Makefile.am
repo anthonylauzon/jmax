@@ -1,8 +1,6 @@
 
 imgdir=$(pkglibdir)/packages/sequence/images
 img_DATA=\
- violinClef.gif \
- faClef.gif \
  opened_track_arrow.gif \
  closed_track_arrow.gif \
  unselected_track.gif \

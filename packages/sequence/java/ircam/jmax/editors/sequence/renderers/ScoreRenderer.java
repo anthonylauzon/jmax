@@ -167,11 +167,6 @@ public Enumeration objectsIntersecting(int x, int y, int w, int h)
   return tempList.elements();
 }
 
-public static void setScoreFont(Font font)
-{
-  originalFont = font;
-  scoreFont = font.deriveFont((float)48);
-}
 
 //------------------  Fields
 SequenceGraphicContext gc;
@@ -188,8 +183,6 @@ public static final int XINTERVAL = 10;
 public static final int YINTERVAL = 3;
 
 private MaxVector tempList;
-static Font scoreFont;
-static Font originalFont;
 }
 
 
