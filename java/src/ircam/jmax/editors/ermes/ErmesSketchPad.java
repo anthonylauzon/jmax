@@ -69,6 +69,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public boolean doAutorouting = true;
   //  public boolean itsSelectionRouting = true;
   public boolean itsGraphicsOn = true;
+  public boolean paintForTheFirstTime = true;
   
   ErmesObjEditField itsEditField = null;
   ErmesObjTextArea itsTextArea = null;
@@ -917,6 +918,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       lastSketchWithOffScreen.offScreenPresent = false;
     theSketchPad.offScreenPresent = true;
     lastSketchWithOffScreen = theSketchPad;
+    theSketchPad.paintForTheFirstTime = true;
     //no check for now: change the OffScreen property
   }
   
@@ -1568,14 +1570,22 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     public void paint(Graphics g) {
       if(itsScrolled){
 	if (offScreenPresent) {
-	  CopyTheOffScreen(getGraphics());
+	  if (paintForTheFirstTime) {
+	    DrawOffScreen(g);
+	    paintForTheFirstTime = false;
+	  }
+	  else {
+	    CopyTheOffScreen(getGraphics());
+	  }
 	}
 	else {
 	  DrawOffScreen(getGraphics());
 	}
       }
       else
-	if(itsGraphicsOn) DrawOffScreen(g);
+	if(itsGraphicsOn) {
+	  DrawOffScreen(g);
+	}
     }			
 	
   //--------------------------------------------------------

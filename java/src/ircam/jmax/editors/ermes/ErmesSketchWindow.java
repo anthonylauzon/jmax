@@ -1086,11 +1086,11 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if(itsSketchPad.getGraphics()!= null)
 	itsSketchPad.update(itsSketchPad.getGraphics());
     }
-  }
+  } 
 
   public void focusLost(FocusEvent e){
-    //itsSketchPad.itsFirstClick = true;
-    ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    
+    //?ErmesSketchPad.RequestOffScreen(itsSketchPad);
     itsSketchPad.itsScrolled = false;
   }
 
