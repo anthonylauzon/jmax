@@ -190,10 +190,10 @@ Root: HKCU; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Root: HKLM; Subkey: "Software\Ircam"; Flags: uninsdeletekeyifempty
 Root: HKLM; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "jMaxVersion"; ValueData: "4.1.0"
-Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "FtsVersion"; ValueData: "4.1.0"
-Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0"; ValueType: string; ValueName: "ftsRoot"; ValueData: "{app}"
-Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0"; ValueType: string; ValueName: "jmaxRoot"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "jMaxVersion"; ValueData: "4.1.0_WIN32"
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "FtsVersion"; ValueData: "4.1.0_WIN32"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0_WIN32"; ValueType: string; ValueName: "ftsRoot"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1.0_WIN32"; ValueType: string; ValueName: "jmaxRoot"; ValueData: "{app}"
 
 
 [Run]
