@@ -77,6 +77,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
     });
   }
 
+  public boolean hasContent()
+  {
+    return true;
+  }
+
   public void setIgnoreError(boolean v)
   {
     ignoreError = v;

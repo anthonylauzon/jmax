@@ -614,6 +614,11 @@ abstract public class GraphicObject implements DisplayObject
   {
   }
 
+  public boolean hasContent()
+  {
+    return false;
+  }
+
   // Squeack handling; note that squeacks delivered to objects
   // have the locations fields masked to zero, to simplify code writing.
 

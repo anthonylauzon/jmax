@@ -101,11 +101,13 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   }
 
   // redefined from base class
+
   public void setFont( Font f)
   {
     super.setFont( f);
     renderer.update();
     super.setHeight(renderer.getHeight() + getTextHeightOffset());
+    redraw();
   }
 
   // ----------------------------------------

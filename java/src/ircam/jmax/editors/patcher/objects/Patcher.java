@@ -53,6 +53,12 @@ class Patcher extends Editable
     });
   }
 
+  public boolean hasContent()
+  {
+    return true;
+  }
+
+
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------

@@ -19,7 +19,22 @@ class  DoubleClickEditInteraction extends Interaction
   {
     GraphicObject object = (GraphicObject) area.getTarget();
 
-    object.editContent();
+    if (object.hasContent())
+      {
+	object.editContent();
+      }
+    else
+      {
+	// Otherwise, 
+	// Convert the squeack a  standard click
+	// and give it to the object
+
+	squeack &= (~ Squeack.MOUSE_MASK);
+	squeack |= Squeack.DOWN;
+
+	object.gotSqueack(squeack, mouse, oldMouse);    
+      }
+
     editor.endInteraction();
   }
 }
