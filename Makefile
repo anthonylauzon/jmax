@@ -166,10 +166,7 @@ spec-files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-src-dist: $(distfile)
-.PHONY: src-dist
-
-$(distfile): spec-files cvs-tag 
+src-dist: spec-files cvs-tag 
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
@@ -177,6 +174,7 @@ $(distfile): spec-files cvs-tag
 	tar cvf - $(distdir) | gzip -c --best > $(distfile)
 	chmod 644 $(distfile)
 	rm -rf $(distdir)
+.PHONY: src-dist
 
 
 #
@@ -188,24 +186,27 @@ rpm-i686: $(distfile)
 	cp -fv $(distfile) /usr/src/redhat/SOURCES
 	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
 	(cd /usr/src/redhat/SPECS ; rpm -ba --target i686 jmax.spec)
+	cp /usr/src/redhat/RPMS/i686/jMax-$(version)-1.i686.rpm .
+	cp /usr/src/redhat/SRPMS/jMax-$(version)-1.src.rpm .
 
 rpm-ppc: $(distfile)
 	umask 22
 	cp -fv $(distfile) /usr/src/redhat/SOURCES
 	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
 	(cd /usr/src/redhat/SPECS ; rpm -ba --target ppc jmax.spec)
+	cp /usr/src/redhat/RPMS/ppc/jMax-$(version)-1.ppc.rpm .
 
 #
 # sgipkg targets
 # builds a SGI package
 #
-DEFAULT_BUILD_DIR=/data/build
+BUILD_DIR=/data/jmax-build
 
 sgi-pkg: $(distfile)
-	mkdir -p $BUILD_DIR/src
+	mkdir -p $(BUILD_DIR)/src
 	gzip -cd $(distfile) | (cd $(BUILD_DIR)/src ; tar xvf -)
 	( cd $(BUILD_DIR)/src/$(distdir) ; gmake ARCH=r10k-irix6.5 all)
-	gzip -cd $(distfile) | tar xvf - -O jmax-$(version)/pkg/rpm/jmax.spec > /tmp/jmax.spec
+	gzip -cd $(distfile) | tar xvf - -O jmax-$(version)/pkg/sgi/jmax.spec > /tmp/jmax.spec
 	( cd $(BUILD_DIR)/src/$(distdir) ; \
 		/bin/rm -rf /tmp/jmax.idb ; \
 		RAWIDB=/tmp/jmax.idb ; \
@@ -213,7 +214,7 @@ sgi-pkg: $(distfile)
 		gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install ; \
 		sort +4u -6 < /tmp/jmax.idb > /tmp/jmax.idb.sorted ; \
 		/usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax.spec )
-	( cd $(BUILD_DIR)/src/$(distdir) ; tar cvf - jmax jmax.* ) > jmax-$(version).r10k.tardist 
+	( cd $(BUILD_DIR)/src ; tar cvf - jmax jmax.idb jmax.sw ) > jmax-$(version).r10k.tardist 
 .PHONY: sgi-pkg
 
 #
