@@ -40,6 +40,9 @@ static dsp_signal *sig_zero;
 static int verbose = 0;
 static int depth = 0;
 
+/* (fd) Hack for debug information in the FTL program */
+static fts_object_t *currently_scheduled_object = 0;
+
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -307,8 +310,16 @@ static void dsp_object_schedule(dsp_node_t *node)
 	post( "DSP [%d] scheduling %s %s->%s\n", depth, full_name( node->o), 
 	      inputs_name( node->descr), outputs_name( node->descr));
 
+      /*
+	(fd) Hack to add debugging info to the FTL program.
+	We keep the object that was send the message "put" and
+	we pass it to ftl_..._add_call so that it stored in the
+	debugging info of the DSP chain
+	*/
+      currently_scheduled_object = node->o;
       fts_set_ptr(&a, node->descr);
       fts_message_send(node->o, fts_SystemInlet, fts_s_put, 1, &a);
+      currently_scheduled_object = 0;
     }
 
   SET_SCHEDULED( node);
@@ -707,7 +718,7 @@ void dsp_add_signal(fts_symbol_t name, int vs)
 
 void dsp_add_funcall(fts_symbol_t symb, int ac, fts_atom_t *av)
 {
-  ftl_program_add_call(dsp_chain_on, symb, ac, av);
+  ftl_program_add_call(dsp_chain_on, symb, ac, av, currently_scheduled_object);
 }
 
 void dsp_chain_print(void)
