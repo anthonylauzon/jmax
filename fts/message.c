@@ -100,10 +100,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_symbol_t name = fts_get_symbol(at);
 	  fts_class_t *cl;
 
-	  if ( fts_metaclass_get_by_name( name) != NULL)
-	    fts_object_set_error(o, "Symbol %s cannot be used as message", name);
-	  else
-	    fts_message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
+	  fts_message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}
       else if(ac == 1)
 	fts_message_set(this, fts_get_selector(at), 1, at); /* value format: <non symbol value> (without type specifyer) */

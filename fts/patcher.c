@@ -2377,7 +2377,7 @@ void fts_kernel_patcher_init(void)
   sym_endPaste = fts_new_symbol("endPaste");
   sym_noHelp = fts_new_symbol("noHelp");
 
-  fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
+  /*fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);*/
 
   patcher_metaclass = fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   fts_class_instantiate(patcher_metaclass, 0, 0);

@@ -4,7 +4,6 @@ help_DATA=\
  button.help.jmax \
  display.help.jmax \
  floatbox.help.jmax \
- guiobj.help.index.tcl \
  guiobj.summary.jmax \
  intbox.help.jmax \
  key.help.jmax \

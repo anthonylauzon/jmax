@@ -462,8 +462,8 @@ sigthrow_config(void)
 {
   fts_hashtable_init(&catch_table, 0, FTS_HASHTABLE_MEDIUM);
   fts_class_install(fts_new_symbol("cxtch~"), sigcatch_instantiate);
-  fts_register_object_doctor(fts_new_symbol("catch~"), sigcatch_doctor);
+  /*fts_register_object_doctor(fts_new_symbol("catch~"), sigcatch_doctor);*/
 
   fts_class_install(fts_new_symbol("thrxw~"), sigthrow_instantiate);
-  fts_register_object_doctor(fts_new_symbol("throw~"), sigthrow_doctor);
+  /*fts_register_object_doctor(fts_new_symbol("throw~"), sigthrow_doctor);*/
 }

@@ -12,12 +12,12 @@ SUBDIRS=client fts include java packages bin images tutorials config utils
 # do the TAGS file
 #
 TAGS:
-	find . \! \( -name '*~' -o \( -type d -name '*.old' -prune \) \) \( -name "*.c" -o -name "*.c.in" -o -name "*.h" -o -name "*.h.in" -o -name "*.java" -o -name "*.java.in" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.jpk" \) -print | etags -t -
+	find . \! \( -name '*~' -o \( -type d -name '*.old' -prune \) \) \( -name "*.c" -o -name "*.c.in" -o -name "*.h" -o -name "*.h.in" -o -name "*.java" -o -name "*.java.in" -o -name "Makefile.*" -o -name "Makefile" \) -print | etags -t -
 .PHONY: TAGS
 
 # This is for Ctags 4.0.2
 NTAGS:
-	find . \! \( -name '*~' -o \( -type d -name '*.old' -prune \) \) \( -name "*.c" -o -name "*.c.in" -o -name "*.h" -o -name "*.h.in" -o -name "*.java" -o -name "*.java.in" -o -name "Makefile.*" -o -name "Makefile" -o  -name "*.jpk" \) -print | etags -L -
+	find . \! \( -name '*~' -o \( -type d -name '*.old' -prune \) \) \( -name "*.c" -o -name "*.c.in" -o -name "*.h" -o -name "*.h.in" -o -name "*.java" -o -name "*.java.in" -o -name "Makefile.*" -o -name "Makefile" \) -print | etags -L -
 .PHONY: NTAGS
 
 

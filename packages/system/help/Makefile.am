@@ -6,7 +6,6 @@ help_DATA=\
  const.help.jmax \
  inout.help.jmax \
  print.help.jmax \
- system.help.index.tcl \
  system.summary.jmax 
 
 EXTRA_DIST= $(help_DATA)

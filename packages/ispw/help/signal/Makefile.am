@@ -27,7 +27,6 @@ help_DATA=\
  samplerate~.help.jmax \
  samppeek~.help.jmax \
  sampwrite~.help.jmax \
- signal.help.index.tcl \
  sig~.help.jmax \
  snapshot~.help.jmax \
  sqrt~.help.jmax \

@@ -1,7 +1,6 @@
 
 helpdir=$(pkgdatadir)/packages/data/help
 help_DATA=\
- data.help.index.tcl \
  data.summary.jmax \
  fvec.help.jmax \
  getelem.help.jmax \

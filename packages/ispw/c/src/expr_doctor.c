@@ -64,7 +64,7 @@ static fts_object_t *expr_doctor(fts_patcher_t *patcher, int ac, const fts_atom_
 
 void expr_doctor_init(void)
 {
-  fts_register_object_doctor(fts_new_symbol("expr"), expr_doctor);
+  /*fts_register_object_doctor(fts_new_symbol("expr"), expr_doctor);*/
 }
     
 

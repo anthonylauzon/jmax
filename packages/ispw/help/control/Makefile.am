@@ -9,7 +9,6 @@ help_DATA=\
  change.help.jmax \
  clip.help.jmax \
  clock.help.jmax \
- control.help.index.tcl \
  delay.help.jmax \
  drunk.help.jmax \
  expr.help.jmax \

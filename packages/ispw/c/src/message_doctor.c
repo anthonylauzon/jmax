@@ -58,6 +58,6 @@ static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_at
 
 void messbox_doctor_init(void)
 {
-  fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);
+  /*fts_register_object_doctor(fts_new_symbol("messbox"), messbox_doctor);*/
 }
 
