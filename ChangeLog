@@ -1,3 +1,7 @@
+2003-02-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fix bug "[690449] osc~ help patcher does not define $w" submitted by etienne (edelefile) on sourceforge
+
 2003-02-20  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 
 	* add fts_file_find_in_env function (find a file in paths defined by the contains of an environment variable

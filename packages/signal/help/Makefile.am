@@ -25,6 +25,7 @@ help_DATA=\
  white~.help.jmax       \
  zerocross~.help.jmax   \
  heureuse.aiff		\
- drumloop.aiff
+ drumloop.aiff		\
+ wave.aiff
 
 EXTRA_DIST= $(help_DATA)
