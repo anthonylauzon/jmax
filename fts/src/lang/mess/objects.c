@@ -19,12 +19,10 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
-/* (fd) For post */
-#include "runtime/files.h"
+#include "runtime.h"
 
 extern void fts_client_release_object(fts_object_t *c);
 extern void fts_client_release_object_data(fts_object_t *c);
-extern void fts_client_send_property(fts_object_t *obj, fts_symbol_t name);
 extern void fts_client_upload_object(fts_object_t *obj);
 
 /* forward declarations  */
@@ -945,32 +943,32 @@ fts_object_send_properties(fts_object_t *obj)
 
   if (obj->id != FTS_NO_ID) 
     { 
-      fts_client_send_property(obj, fts_s_x);
-      fts_client_send_property(obj, fts_s_y);
-      fts_client_send_property(obj, fts_s_height);
-      fts_client_send_property(obj, fts_s_width);
+      fts_object_property_changed(obj, fts_s_x);
+      fts_object_property_changed(obj, fts_s_y);
+      fts_object_property_changed(obj, fts_s_height);
+      fts_object_property_changed(obj, fts_s_width);
 
-      fts_client_send_property(obj, fts_s_font);
-      fts_client_send_property(obj, fts_s_fontSize);
+      fts_object_property_changed(obj, fts_s_font);
+      fts_object_property_changed(obj, fts_s_fontSize);
 
       if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
 	{
-	  fts_client_send_property(obj, fts_s_wx);
-	  fts_client_send_property(obj, fts_s_wy);
-	  fts_client_send_property(obj, fts_s_wh);
-	  fts_client_send_property(obj, fts_s_ww);
+	  fts_object_property_changed(obj, fts_s_wx);
+	  fts_object_property_changed(obj, fts_s_wy);
+	  fts_object_property_changed(obj, fts_s_wh);
+	  fts_object_property_changed(obj, fts_s_ww);
 	}
 
-      fts_client_send_property(obj, fts_s_ninlets);
-      fts_client_send_property(obj, fts_s_noutlets);
-      fts_client_send_property(obj, fts_s_error);
-      fts_client_send_property(obj, fts_s_error_description);
+      fts_object_property_changed(obj, fts_s_ninlets);
+      fts_object_property_changed(obj, fts_s_noutlets);
+      fts_object_property_changed(obj, fts_s_error);
+      fts_object_property_changed(obj, fts_s_error_description);
 
       /* Usefull for comment or object with comments */
       
-      fts_client_send_property(obj, fts_s_comment);
-      fts_client_send_property(obj, fts_s_layer);
-      fts_client_send_property(obj, fts_s_color);
+      fts_object_property_changed(obj, fts_s_comment);
+      fts_object_property_changed(obj, fts_s_layer);
+      fts_object_property_changed(obj, fts_s_color);
 
       /* Ask the object to send to the client object specific properties */
 
@@ -1005,10 +1003,10 @@ fts_object_send_kernel_properties(fts_object_t *obj)
 
   if (obj->id != FTS_NO_ID) 
     { 
-      fts_client_send_property(obj, fts_s_ninlets);
-      fts_client_send_property(obj, fts_s_noutlets);
-      fts_client_send_property(obj, fts_s_error);
-      fts_client_send_property(obj, fts_s_error_description);
+      fts_object_property_changed(obj, fts_s_ninlets);
+      fts_object_property_changed(obj, fts_s_noutlets);
+      fts_object_property_changed(obj, fts_s_error);
+      fts_object_property_changed(obj, fts_s_error_description);
 
       /* Ask the object to send to the client object specific properties */
 

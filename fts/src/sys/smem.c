@@ -99,8 +99,7 @@ remove_block(char *block)
       }
 }
 
-
-void check_integrity(char *p, const char *msg)
+static void fts_check_block(char *p, const char *msg)
 {
   const char *err;
 
@@ -113,7 +112,8 @@ void check_integrity(char *p, const char *msg)
   else
     return;
 
-  fprintf(stderr, "%s %s\nOriginally allocated file %s line %d\n", err, msg, 
+  fprintf(stderr, "%s %s\n", err, msg);
+  fprintf(stderr, "Originally allocated file %s line %d\n", 
 	  ((struct mem_header *)p)->filename,  ((struct mem_header *)p)->line);
 
 #ifdef TRAP_ON_ERROR
@@ -127,6 +127,26 @@ void check_integrity(char *p, const char *msg)
 #endif
 }
 
+
+void fts_check_pointer(void *p, const char *msg)
+{
+  fts_check_block(((char *)p  - sizeof(struct mem_header)), msg);
+}
+
+void fts_describe_pointer(const char *msg, void *pv, FILE *f)
+{
+  if (pv)
+    {
+      char *p = ((char *)pv  - sizeof(struct mem_header));
+
+      fprintf(f, "%s: Pointer %lx Originally allocated file %s line %d\n", msg, (unsigned long) pv,
+	      ((struct mem_header *)p)->filename,  ((struct mem_header *)p)->line);
+
+      fts_check_pointer(pv, msg);
+    }
+  else
+    fprintf(f, "%s: Null pointer\n", msg);
+}
 
 
 typedef enum { malloced, invalid} mem_status_t;
@@ -307,7 +327,7 @@ void fts_safe_free(void *pv, const char *filename, int line)
   fprintf(stderr, "Free %lx at %s:%d\n", (unsigned long) p, filename, line);
 #endif
 
-  check_integrity((char *)p  - sizeof(struct mem_header), "freeing block");
+  fts_check_block((char *)p  - sizeof(struct mem_header), "freeing block");
   remove_block(p - sizeof(struct mem_header));
   register_check_free(p - sizeof(struct mem_header), filename, line);
   free(p - sizeof(struct mem_header));
@@ -318,7 +338,7 @@ char *fts_safe_realloc(void *pv, int size, const char *filename, int line)
 {
   char *p = (char *)pv;
 
-  check_integrity((char *)p  - sizeof(struct mem_header), "reallocating block");
+  fts_check_block((char *)p  - sizeof(struct mem_header), "reallocating block");
 
   /* align the size */
 

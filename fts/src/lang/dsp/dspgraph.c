@@ -275,10 +275,15 @@ static void dsp_object_schedule(dsp_node_t *node)
   if (! node->descr)
     {
       node->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
+
       node->descr->ninputs  = dsp_input_get(node->o, fts_object_get_inlets_number(node->o));
+
       if ( node->descr->ninputs)
-	node->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->ninputs);
+	{
+	  node->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->ninputs); 
+	}
       node->descr->noutputs = dsp_output_get(node->o->cl, fts_object_get_outlets_number(node->o));
+      node->descr->out = 0;	/* safe initialization */
     }
 
   /* For IRIX 6.2 MipsPro 7.x, we don't reuse signals between in and
@@ -297,7 +302,9 @@ static void dsp_object_schedule(dsp_node_t *node)
       *sig = sig_zero;
 
   if (node->descr->noutputs)
-    node->descr->out = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->noutputs);
+    {
+      node->descr->out = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * node->descr->noutputs);
+    }
 
   /* Now that dsp_gen_outputs compute the downsampling using object
      properties, we don't need to call it in the object put method; it
@@ -441,6 +448,8 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
       dest->descr = (fts_dsp_descr_t *)fts_heap_zalloc(dsp_descr_heap);
       dest->descr->ninputs = ninputs;
       dest->descr->noutputs = dsp_output_get(dest->o->cl, fts_object_get_outlets_number(dest->o));
+      dest->descr->in = 0;
+      dest->descr->out = 0;
     }
 
   if (ninputs)
@@ -453,8 +462,10 @@ static void dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, 
 	dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * ninputs);
 #else
       if (! dest->descr->in)
-	/* (fd) to avoid writing past the end of the dsp_descr... */
-	dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * fts_object_get_inlets_number(dest->o));
+	{
+	  /* (fd) to avoid writing past the end of the dsp_descr... */
+	  dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * fts_object_get_inlets_number(dest->o));
+	}
 #endif
 
       nin = dsp_input_get(dest->o, winlet);

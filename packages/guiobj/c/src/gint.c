@@ -25,7 +25,7 @@ typedef struct {
 static void
 gint_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_client_send_property(o, fts_s_value);
+  fts_object_property_changed(o, fts_s_value);
 }
 
 

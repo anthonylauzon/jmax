@@ -193,40 +193,40 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
 	    }
 	  break;
 	  case KeyEvent.VK_NUMPAD0:
-	    currentText.append('0');
+	    currentText.append("0");
 	    break;
 	  case KeyEvent.VK_NUMPAD1:
-	    currentText.append('1');
+	    currentText.append("1");
 	    break;
 	  case KeyEvent.VK_NUMPAD2:
-	    currentText.append('2');
+	    currentText.append("2");
 	    break;
 	  case KeyEvent.VK_NUMPAD3:
-	    currentText.append('3');
+	    currentText.append("3");
 	    break;
 	  case KeyEvent.VK_NUMPAD4:
-	    currentText.append('4');
+	    currentText.append("4");
 	    break;
 	  case KeyEvent.VK_NUMPAD5:
-	    currentText.append('5');
+	    currentText.append("5");
 	    break;
 	  case KeyEvent.VK_NUMPAD6:
-	    currentText.append('6');
+	    currentText.append("6");
 	    break;
 	  case KeyEvent.VK_NUMPAD7:
-	    currentText.append('7');
+	    currentText.append("7");
 	    break;
 	  case KeyEvent.VK_NUMPAD8:
-	    currentText.append('8');
+	    currentText.append("8");
 	    break;
 	  case KeyEvent.VK_NUMPAD9:
-	    currentText.append('9');
+	    currentText.append("9");
 	    break;
 	  case KeyEvent.VK_DECIMAL:
-	    currentText.append('.');
+	    currentText.append(".");
 	    break;
 	  default:
-	    currentText.append(e.getKeyCode());
+	    currentText.append((char) e.getKeyCode());
 	    break;
 	  }
 
