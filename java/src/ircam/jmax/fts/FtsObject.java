@@ -204,14 +204,18 @@ public class FtsObject
       }
     else if (name == "error")
       {
-	if (value == 0)
-	  isError = false;
-	else
-	  isError = true;
-
+	  if (value == 0)
+	  {
+	    isError = false;
+	  }
+	  else
+	  {
+	    isError = true;
+	    parent.addErrorObject(this);
+	  }
 
 	if (listener instanceof FtsObjectErrorListener)
-	  ((FtsObjectErrorListener)listener).errorChanged(isError);
+	  ((FtsObjectErrorListener)listener).errorChanged(isError);	  
       }
     else if (name == "fs")
       {
@@ -239,7 +243,7 @@ public class FtsObject
    * See the other version of localPut.
    */
 
-  protected void localPut(String name, Object value)
+    protected void localPut(String name, Object value)
   {
     // check first hardcoded properties
     if (name == "errdesc")
@@ -688,6 +692,8 @@ public class FtsObject
       {
 	fts.getSelection().removeObject(this);
 	parent.setDirty();
+	if(hasErrorsInside())
+	    parent.removeErrorObject(this);
 	fts.getServer().deleteObject(this);
       }
   }
@@ -720,6 +726,9 @@ public class FtsObject
 
     parent.setDirty();
 
+    if((isError())||(hasErrorsInside()))
+	parent.removeErrorObject(this);
+
     // Take away the object from the container, if any
 
     if (getPatcherData() != null)
@@ -738,6 +747,7 @@ public class FtsObject
     description = null;
 
     fts.getServer().unregisterObject(this);
+
     setObjectId(-1);
   }
 
@@ -782,6 +792,56 @@ public class FtsObject
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
   }
+
+  /**
+   * count of error-objects in a subpatcher or template (to paint this in orange !!!)
+   */
+    int errcount = 0;
+    public void removeErrorObject(FtsObject obj)
+    {
+	if(!isARootPatcher())
+	    {
+		if(errcount>0){
+		    errcount--;
+		    if (listener instanceof FtsObjectErrorListener)
+			{
+			    if(errcount > 0)
+				((FtsObjectErrorListener)listener).errorChanged(true);
+			    else
+				{
+				    ((FtsObjectErrorListener)listener).errorChanged(false);
+				    parent.removeErrorObject(this);
+				}
+			}
+		    
+		}
+	    }
+    }
+
+    public void addErrorObject(FtsObject obj)
+    {
+	if(!isARootPatcher())
+	    {
+		errcount++;
+		if(errcount==1)
+		    {
+			parent.addErrorObject(this);
+		
+			if (listener instanceof FtsObjectErrorListener)
+			    ((FtsObjectErrorListener)listener).errorChanged(true);
+		    }
+	    }
+    }
+
+    public boolean hasErrorsInside()
+    {
+	return (errcount > 0);
+    }
+    
+    public boolean isARootPatcher()
+    {
+	return (getParent() == getFts().getRootObject());
+    }
 }
 
 

@@ -157,10 +157,16 @@ public class Standard extends Editable implements FtsObjectErrorListener
       g.setColor( Color.red);
     else
       {
-	if (isSelected())
-	  g.setColor( Settings.sharedInstance().getSelectedColor());
+	if(ftsObject.hasErrorsInside())
+	    if (isSelected())
+		g.setColor( Color.orange.darker());
+	    else
+		g.setColor( Color.orange);
 	else
-	  g.setColor( Settings.sharedInstance().getObjColor());
+	    if (isSelected())
+		g.setColor( Settings.sharedInstance().getSelectedColor());
+	    else
+		g.setColor( Settings.sharedInstance().getObjColor());
       } 
 
     int x = getX();
@@ -175,6 +181,10 @@ public class Standard extends Editable implements FtsObjectErrorListener
     super.paint( g);
   }
 }
+
+
+
+
 
 
 

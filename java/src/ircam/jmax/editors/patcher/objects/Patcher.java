@@ -39,7 +39,7 @@ import ircam.jmax.editors.patcher.*;
 // The "patcher" graphic object.
 //
 
-class Patcher extends Editable
+class Patcher extends Editable implements FtsObjectErrorListener
 {
   // ----------------------------------------
   // Constructor
@@ -58,6 +58,13 @@ class Patcher extends Editable
   {
     // get the correct String from the object
     return ftsObject.getDescription();
+  }
+
+  boolean errorsInside = false;
+  public void errorChanged(boolean value) 
+  {
+    errorsInside = value;
+    redraw();
   }
 
   public void redefine( String text) 
@@ -112,10 +119,16 @@ class Patcher extends Editable
 
   public Color getTextBackground()
   {
-    if (isSelected()) 
-      return Settings.sharedInstance().getSelectedColor();
-    else 
-      return Settings.sharedInstance().getObjColor();
+    if (errorsInside)
+	if (isSelected()) 
+	    return Color.orange.darker();
+	else
+	    return Color.orange;
+    else
+	if (isSelected()) 
+	    return Settings.sharedInstance().getSelectedColor();
+	else 
+	    return Settings.sharedInstance().getObjColor();
   }
 
   // ----------------------------------------
@@ -132,16 +145,28 @@ class Patcher extends Editable
 
   public void paint( Graphics g) 
   {
-    if (isSelected()) 
-      g.setColor( Settings.sharedInstance().getSelectedColor());
-    else 
-      g.setColor( Settings.sharedInstance().getObjColor());
-
-    g.fill3DRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2, true);
-    g.draw3DRect( getX() + 2, getY() + 2, getWidth() - 5, getHeight() - 5, false);
-    
-    drawContent( g);
-
-    super.paint( g);
+      if (errorsInside)
+	  if (isSelected())
+	      g.setColor( Color.orange.darker());
+	  else
+	      g.setColor( Color.orange);
+      else
+	  if (isSelected())
+	      g.setColor( Settings.sharedInstance().getSelectedColor());
+	  else 
+	      g.setColor( Settings.sharedInstance().getObjColor());
+      
+      g.fill3DRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2, true);
+      g.draw3DRect( getX() + 2, getY() + 2, getWidth() - 5, getHeight() - 5, false);
+      
+      drawContent( g);
+      
+      super.paint( g);
   }
 }
+
+
+
+
+
+
