@@ -51,7 +51,9 @@ static void
 udpout_symbol(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   udp_t* self = (udp_t*)o;
-  fts_bytestream_output(self->udp_stream, strlen(s), s);
+
+  /* here we have s=0x0, ac = 1 and fts_is_symbol(at) is true */
+  fts_bytestream_output(self->udp_stream, strlen(fts_get_symbol(at)), fts_get_symbol(at));
   fts_bytestream_flush(self->udp_stream);
 }
 
