@@ -262,3 +262,9 @@ void fts_heap_free( void *p, fts_heap_t *heap)
 }
 
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
