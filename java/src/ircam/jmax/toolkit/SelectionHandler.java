@@ -16,7 +16,7 @@ package ircam.jmax.toolkit;
 import java.util.Enumeration;
 
 /**
- * the interface implemented by the handlers of generic selections of objects.
+ * The interface implemented by the handlers of generic selections of objects.
  * It makes no assumption on the kind of objects and on the model of data.
  */
 public interface SelectionHandler {

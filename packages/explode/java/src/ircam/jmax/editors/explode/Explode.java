@@ -36,7 +36,7 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   /**
    * constructor.
-   * It creates a panel that will display the datas in maxData
+   * It creates the panels that will display the datas in maxData
    */
   public Explode(ExplodeRemoteData maxData)
   {
@@ -50,7 +50,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     explodeData = (ExplodeRemoteData) maxData;
 
     // create the Selection model, that will be in common between
-    // the different views
+    // the different views (of the same explode)
 
     ExplodeSelection s = new ExplodeSelection(explodeData);
 
@@ -60,6 +60,9 @@ public class Explode extends MaxEditor implements AAAReadme {
 
     // creates the Piano roll view
     itsScrPanel = new ScrPanel(explodeData, s);
+
+    // make the newly created selection the current one
+    ExplodeSelection.setCurrent(s);
 
     setView(defaultView);
 

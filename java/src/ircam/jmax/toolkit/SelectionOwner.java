@@ -8,7 +8,7 @@ public interface SelectionOwner {
   // implementation notes: This class is used in the Explode package and
   // is currently not used by the toolkit's selection support 
   // (SelectionHandler, SelectionListener, AbstractSelection classes). 
-  // The toolkit currently does not support selection ownership at all (but it should)
+  // The toolkit does not support selection ownership at all (but it should!)
   /**
    * The selection owned by this object has been disactivated */
   public abstract void selectionDisactivated();

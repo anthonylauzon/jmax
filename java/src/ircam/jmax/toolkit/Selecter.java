@@ -87,8 +87,6 @@ public class Selecter extends InteractionModule implements XORPainter {
     tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
     normalizeRectangle(tempRect);
     
-    if (tempRect.width == 0) tempRect.width =1;
-    if (tempRect.height == 0) tempRect.height =1;
     
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
     active = false;
@@ -137,7 +135,7 @@ public class Selecter extends InteractionModule implements XORPainter {
    * utility function. Gets rid of the "negative width/lenght" problems
    * in rectangles.
    */
-  public void normalizeRectangle(Rectangle r) 
+  public static void normalizeRectangle(Rectangle r) 
   {  
     /* sets the origin */
     if (r.width < 0) r.x = r.x+r.width;
