@@ -942,43 +942,16 @@ track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
   track_set_dirty( this);
 }
 
-/*static void
-track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_t *at)
-{
-  if(!fts_object_has_id((fts_object_t *)event))
-    fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
-
-  fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
-  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
-  fts_client_add_atoms( (fts_object_t *)this, ac, at);
-  fts_client_done_message( (fts_object_t *)this);
-}*/
-
 /* create new event and upload by client request */
 static void
 track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
   double time = fts_get_float(at + 0);
-  event_t *event;
-
-  fts_array_t temp_array;
-  fts_array_init(&temp_array, 0, 0);
-
-  /* make new event object */
-  event = create_event(ac - 1, at + 1);
+  event_t *event = create_event(ac - 1, at + 1);
 
   if(event)
-  {
-    /* add event to track */
-    track_add_event(this, time, event);
-    /*track_add_event_at_client(this, event, ac, at);*/
-    track_upload_event(this, event, &temp_array);
-  }
-
-  fts_array_destroy(&temp_array);
-
-  track_set_dirty( this);
+    track_add_event_and_upload( this, time, event);
 }
 
 /* create new event by client request without uploading */
@@ -1362,6 +1335,23 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_iterator_next( &i, &a);
     fts_send_message_varargs( fts_get_object(&a), fts_s_send, ac, at);
   }
+}
+
+void
+track_add_event_and_upload(track_t *track, double time, event_t *event)
+{
+  fts_array_t temp_array;
+
+  track_add_event(track, time, event);
+  
+  if(track_editor_is_open(track))
+    {
+      fts_array_init(&temp_array, 0, 0);
+      track_upload_event( track, event, &temp_array);
+      fts_array_destroy(&temp_array);
+    }
+
+  track_set_dirty( track);
 }
 
 /******************************************************

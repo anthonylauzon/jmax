@@ -75,6 +75,7 @@ struct _track_
 #define track_editor_is_open(t) (((t)->sequence && sequence_editor_is_open((t)->sequence)) || ((!(t)->sequence) && ((t)->open != 0)))
 
 extern void track_add_event(track_t *track, double time, event_t *event);
+extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
 extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *here);
 extern void track_append_event(track_t *track, double time, event_t *event);
 extern void track_remove_event(track_t *track, event_t *event);
