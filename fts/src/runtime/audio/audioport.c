@@ -394,10 +394,22 @@ static fts_status_t indispatch_instantiate(fts_class_t *cl, int ac, const fts_at
   return fts_Success;
 }
 
+static void fts_audioport_create_audioportin( fts_audioport_t *port)
+{
+  if ( !port->audioportin)
+    {
+      fts_set_symbol( a+0, s_audioportin);
+      fts_set_ptr( a+1, port);
+      fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportin);
+    }
+}
+
 fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *owner, int outlet)
 {
   fts_object_t *in;
   fts_atom_t a[3];
+
+  fts_audioport_create_audioportin( port);
 
   fts_set_symbol( a+0, s_indispatch);
   fts_set_object( a+1, owner);
@@ -427,11 +439,22 @@ static fts_status_t outdispatch_instantiate(fts_class_t *cl, int ac, const fts_a
   return fts_Success;
 }
 
+static void fts_audioport_create_audioportout( fts_audioport_t *port)
+{
+  if ( !port->audioportout)
+    {
+      fts_set_symbol( a+0, s_audioportout);
+      fts_set_ptr( a+1, port);
+      fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportout);
+    }
+}
 
 fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet)
 {
   fts_object_t *out;
   fts_atom_t a[2];
+
+  fts_audioport_create_audioportout( port);
 
   fts_set_symbol( a+0, s_outdispatch);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &out);
@@ -456,19 +479,8 @@ void fts_audioport_add_input_output_objects( void)
 
   for ( port = audioport_list; port; port = port->next)
     {
-      if ( !port->audioportin && port->input_channels)
-	{
-	  fts_set_symbol( a+0, s_audioportin);
-	  fts_set_ptr( a+1, port);
-	  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportin);
-	}
-
-      if ( !port->audioportout && port->output_channels)
-	{
-	  fts_set_symbol( a+0, s_audioportout);
-	  fts_set_ptr( a+1, port);
-	  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportout);
-	}
+      fts_audioport_create_audioportin( port);
+      fts_audioport_create_audioportout( port);
     }
 }
 
