@@ -5,6 +5,111 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F5999CC1032E295001664092 = {
+			children = (
+				F5999CC2032E298301664092,
+				F5999CC3032E298301664092,
+				F5999CC4032E298301664092,
+				F5999CC5032E298301664092,
+				F5999CC6032E298301664092,
+				F5999CC7032E298301664092,
+			);
+			isa = PBXGroup;
+			name = includes;
+			refType = 4;
+		};
+		F5999CC2032E298301664092 = {
+			isa = PBXFileReference;
+			name = bpf.h;
+			path = ../../packages/data/c/include/bpf.h;
+			refType = 2;
+		};
+		F5999CC3032E298301664092 = {
+			isa = PBXFileReference;
+			name = cvec.h;
+			path = ../../packages/data/c/include/cvec.h;
+			refType = 2;
+		};
+		F5999CC4032E298301664092 = {
+			isa = PBXFileReference;
+			name = data.h;
+			path = ../../packages/data/c/include/data.h;
+			refType = 2;
+		};
+		F5999CC5032E298301664092 = {
+			isa = PBXFileReference;
+			name = fmat.h;
+			path = ../../packages/data/c/include/fmat.h;
+			refType = 2;
+		};
+		F5999CC6032E298301664092 = {
+			isa = PBXFileReference;
+			name = fvec.h;
+			path = ../../packages/data/c/include/fvec.h;
+			refType = 2;
+		};
+		F5999CC7032E298301664092 = {
+			isa = PBXFileReference;
+			name = ivec.h;
+			path = ../../packages/data/c/include/ivec.h;
+			refType = 2;
+		};
+		F5999CC8032E298301664092 = {
+			fileRef = F5999CC2032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CC9032E298301664092 = {
+			fileRef = F5999CC3032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CCA032E298301664092 = {
+			fileRef = F5999CC4032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CCB032E298301664092 = {
+			fileRef = F5999CC5032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CCC032E298301664092 = {
+			fileRef = F5999CC6032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CCD032E298301664092 = {
+			fileRef = F5999CC7032E298301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5999CCE032E2ABC01664092 = {
+			children = (
+				F5999CCF032E2AE701664092,
+			);
+			isa = PBXGroup;
+			name = includes;
+			refType = 4;
+		};
+		F5999CCF032E2AE701664092 = {
+			isa = PBXFileReference;
+			name = utils.h;
+			path = ../../packages/utils/c/include/utils.h;
+			refType = 2;
+		};
+		F5999CD0032E2AE701664092 = {
+			fileRef = F5999CCF032E2AE701664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5A37B8F0327C67501664092 = {
 			fileRef = F8F010EB028D890E01664092;
 			isa = PBXBuildFile;
@@ -822,7 +927,7 @@
 				F8446937028BCAD101664092,
 			);
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "../../packages/ispw/c/src ../../packages/utils/c/src ../../packages/data/c/src ../../include";
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -2121,7 +2226,7 @@
 				F8446AA5028BCC2401664092,
 			);
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "../../packages/utils/c/src ../../packages/data/c/src ../../include";
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -7240,7 +7345,7 @@
 				F851235C028BE5ED01664092,
 			);
 			buildSettings = {
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -11790,6 +11895,7 @@
 		};
 		F880006C0283072001664092 = {
 			children = (
+				F5999CCE032E2ABC01664092,
 				F880006D0283072001664092,
 				F880006E0283072001664092,
 				F880006F0283072001664092,
@@ -11801,7 +11907,6 @@
 				F88000750283072001664092,
 				F88000760283072001664092,
 				F88000770283072001664092,
-				F88000780283072001664092,
 				F88000790283072001664092,
 			);
 			isa = PBXGroup;
@@ -11874,12 +11979,6 @@
 			path = ../../packages/utils/c/src/utils.c;
 			refType = 2;
 		};
-		F88000780283072001664092 = {
-			isa = PBXFileReference;
-			name = utils.h;
-			path = ../../packages/utils/c/src/utils.h;
-			refType = 2;
-		};
 		F88000790283072001664092 = {
 			isa = PBXFileReference;
 			name = vec_fft.c;
@@ -11901,7 +12000,7 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -11953,7 +12052,7 @@
 			files = (
 				F880007D0283072101664092,
 				F880007E0283072101664092,
-				F880007F0283072101664092,
+				F5999CD0032E2AE701664092,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11966,12 +12065,6 @@
 		};
 		F880007E0283072101664092 = {
 			fileRef = F88000760283072001664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880007F0283072101664092 = {
-			fileRef = F88000780283072001664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17118,24 +17211,20 @@
 		};
 		F8B8E48902867E1C01664092 = {
 			children = (
+				F5999CC1032E295001664092,
 				F8B8E48A02867E1C01664092,
 				F8B8E48C02867E1C01664092,
 				F8B8E48D02867E1C01664092,
 				F8B8E48F02867E1C01664092,
-				F8B8E49002867E1C01664092,
 				F8B8E49102867E1C01664092,
-				F8B8E49202867E1C01664092,
 				F8B8E49302867E1C01664092,
 				F8B8E49502867E1C01664092,
-				F8B8E49602867E1C01664092,
 				F8B8E49702867E1C01664092,
-				F8B8E49802867E1C01664092,
 				F8B8E49902867E1C01664092,
 				F8B8E49B02867E1C01664092,
 				F8B8E49C02867E1C01664092,
 				F8B8E49D02867E1C01664092,
 				F8B8E49E02867E1C01664092,
-				F8B8E49F02867E1C01664092,
 				F8B8E4A002867E1C01664092,
 				F8B8E4A102867E1C01664092,
 				F8B8E4A402867E1C01664092,
@@ -17146,7 +17235,6 @@
 				F8B8E4A902867E1C01664092,
 				F8B8E4AA02867E1C01664092,
 				F8B8E4AB02867E1C01664092,
-				F8EE4B9E031CEE1701664092,
 				F8EE4BA0031CEE1701664092,
 				F8EE4BA1031CEE1701664092,
 			);
@@ -17178,22 +17266,10 @@
 			path = ../../packages/data/c/src/cvec.c;
 			refType = 2;
 		};
-		F8B8E49002867E1C01664092 = {
-			isa = PBXFileReference;
-			name = cvec.h;
-			path = ../../packages/data/c/src/cvec.h;
-			refType = 2;
-		};
 		F8B8E49102867E1C01664092 = {
 			isa = PBXFileReference;
 			name = data.c;
 			path = ../../packages/data/c/src/data.c;
-			refType = 2;
-		};
-		F8B8E49202867E1C01664092 = {
-			isa = PBXFileReference;
-			name = data.h;
-			path = ../../packages/data/c/src/data.h;
 			refType = 2;
 		};
 		F8B8E49302867E1C01664092 = {
@@ -17208,22 +17284,10 @@
 			path = ../../packages/data/c/src/fmat.c;
 			refType = 2;
 		};
-		F8B8E49602867E1C01664092 = {
-			isa = PBXFileReference;
-			name = fmat.h;
-			path = ../../packages/data/c/src/fmat.h;
-			refType = 2;
-		};
 		F8B8E49702867E1C01664092 = {
 			isa = PBXFileReference;
 			name = fvec.c;
 			path = ../../packages/data/c/src/fvec.c;
-			refType = 2;
-		};
-		F8B8E49802867E1C01664092 = {
-			isa = PBXFileReference;
-			name = fvec.h;
-			path = ../../packages/data/c/src/fvec.h;
 			refType = 2;
 		};
 		F8B8E49902867E1C01664092 = {
@@ -17254,12 +17318,6 @@
 			isa = PBXFileReference;
 			name = ivec.c;
 			path = ../../packages/data/c/src/ivec.c;
-			refType = 2;
-		};
-		F8B8E49F02867E1C01664092 = {
-			isa = PBXFileReference;
-			name = ivec.h;
-			path = ../../packages/data/c/src/ivec.h;
 			refType = 2;
 		};
 		F8B8E4A002867E1C01664092 = {
@@ -17363,7 +17421,7 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
-				HEADER_SEARCH_PATHS = "../../packages/utils/c/src ../../include";
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
@@ -17415,54 +17473,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8B8E4B302867E1C01664092,
-				F8B8E4B402867E1C01664092,
-				F8B8E4B502867E1C01664092,
-				F8B8E4B602867E1C01664092,
-				F8B8E4B702867E1C01664092,
-				F8B8E4B802867E1C01664092,
 				F8B8E4B902867E1C01664092,
 				F8B8E4BB02867E1C01664092,
 				F8B8E4BC02867E1C01664092,
 				F8B8E4BD02867E1C01664092,
 				F8B8E4BE02867E1C01664092,
-				F8EE4BA3031CEE1701664092,
 				F8EE4BA6031CEE1701664092,
+				F5999CC8032E298301664092,
+				F5999CC9032E298301664092,
+				F5999CCA032E298301664092,
+				F5999CCB032E298301664092,
+				F5999CCC032E298301664092,
+				F5999CCD032E298301664092,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8B8E4B302867E1C01664092 = {
 			fileRef = F8B8E48D02867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4B402867E1C01664092 = {
-			fileRef = F8B8E49002867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4B502867E1C01664092 = {
-			fileRef = F8B8E49202867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4B602867E1C01664092 = {
-			fileRef = F8B8E49602867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4B702867E1C01664092 = {
-			fileRef = F8B8E49802867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4B802867E1C01664092 = {
-			fileRef = F8B8E49F02867E1C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -19087,7 +19115,7 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -21275,12 +21303,6 @@
 			settings = {
 			};
 		};
-		F8EE4B9E031CEE1701664092 = {
-			isa = PBXFileReference;
-			name = bpf.h;
-			path = ../../packages/data/c/src/bpf.h;
-			refType = 2;
-		};
 		F8EE4BA0031CEE1701664092 = {
 			isa = PBXFileReference;
 			name = dict.c;
@@ -21292,12 +21314,6 @@
 			name = dict.h;
 			path = ../../packages/data/c/src/dict.h;
 			refType = 2;
-		};
-		F8EE4BA3031CEE1701664092 = {
-			fileRef = F8EE4B9E031CEE1701664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8EE4BA5031CEE1701664092 = {
 			fileRef = F8EE4BA0031CEE1701664092;
