@@ -1,5 +1,4 @@
 all	all	abs
-all	all	help
 all	all	ispw.jpk
 all	all	lib/ARCH/opt/libcontrol.so
 all	all	lib/ARCH/opt/libdata.so
