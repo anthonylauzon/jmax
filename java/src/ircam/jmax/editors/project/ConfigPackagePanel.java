@@ -860,7 +860,8 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	  size--;    
 	  if(rowId >= 0)
 	    {
-	      ftsPackage.requestRemoveTemplate( (String)data[rowId][0], (String)data[rowId][1]);
+	      if((data[rowId][0] != null) && (data[rowId][1] != null))
+		ftsPackage.requestRemoveTemplate( (String)data[rowId][0], (String)data[rowId][1]);
 
 	      for(int i = rowId; i < size; i++)
 		{

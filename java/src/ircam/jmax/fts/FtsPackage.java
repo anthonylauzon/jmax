@@ -346,7 +346,10 @@ public class FtsPackage extends FtsObjectWithEditor
 
   public void openEditor(int nArgs, FtsAtom[] args)
   {
-    ProjectEditor.editPackage( this);
+    if(getEditorFrame() == null)
+      setEditorFrame( new ProjectEditor(this));
+    
+    showEditor();
   }
   public void destroyEditor(){}
 

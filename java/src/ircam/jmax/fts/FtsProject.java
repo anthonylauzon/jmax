@@ -165,11 +165,6 @@ public class FtsProject extends FtsPackage
     return audioConfig;
   } 
 
-  public void openEditor(int nArgs, FtsAtom[] args)
-  {
-    ProjectEditor.editCurrent();
-  }
-
   Hashtable packages = new Hashtable();
   String midiConfig = null;
   String audioConfig = null;

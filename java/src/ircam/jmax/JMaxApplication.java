@@ -569,7 +569,6 @@ public class JMaxApplication {
   private void initModules()
   {
     ircam.jmax.editors.patcher.ErmesModule.initModule();
-    ircam.jmax.editors.project.ProjectEditor.registerProjectEditor();
     ircam.jmax.editors.configuration.ConfigurationEditor.registerConfigEditor();
   }
 

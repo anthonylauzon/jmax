@@ -42,53 +42,14 @@ import ircam.jmax.toolkit.menus.*;
 
 public class ProjectEditor extends JFrame implements EditorContainer
 {    
-  public static void registerProjectEditor()
+  public ProjectEditor(FtsPackage pkg)
   {
-    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-	public String getToolName() { return "Project Editor";}
-	public void open() { ProjectEditor.editCurrent();}
-      });
-  }
+    super();
 
-  public static ProjectEditor editCurrent()
-  {    
-    if (projectEditor == null)
-      projectEditor = new ProjectEditor();
+    if( pkg instanceof FtsProject)
+      setTitle("Project Editor: current project");
     else
-      projectEditor.update();
-    
-    projectEditor.setTitle("Project Editor");
-    projectEditor.setVisible(true);
-    
-    return projectEditor;
-  }
-
-  public static ProjectEditor editPackage( FtsPackage pkg)
-  {    
-    if (projectEditor == null)
-      projectEditor = new ProjectEditor( pkg);
-    else
-      projectEditor.update( pkg);
-    
-    projectEditor.setTitle("Package Editor: "+pkg.getName());
-    projectEditor.setVisible(true);
-    
-    return projectEditor;
-  }
-
-  public static ProjectEditor getInstance()
-  {
-    return projectEditor;
-  }
-
-  protected ProjectEditor()
-  {
-    this( JMaxApplication.getProject());
-  }
-
-  protected ProjectEditor(FtsPackage pkg)
-  {
-    super( "Project Editor");
+      setTitle("Package Editor: "+pkg.getName());
 
     makeMenuBar();    
 
@@ -103,6 +64,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	public void windowClosing(WindowEvent e)
 	{
 	  packagePanel.close(false);    
+	  MaxWindowManager.getWindowManager().removeWindow( ProjectEditor.this);
 	}
       });
   }
@@ -121,17 +83,6 @@ public class ProjectEditor extends JFrame implements EditorContainer
     
     setJMenuBar( mb);
   }
-
-  void update()
-  {
-    update( JMaxApplication.getProject());
-  } 
-
-  void update( FtsPackage pkg)
-  {
-    packagePanel.setPackage( pkg);
-    packagePanel.update();
-  } 
 
   public static void newProject( Frame frame)
   {
@@ -259,7 +210,6 @@ public class ProjectEditor extends JFrame implements EditorContainer
   /**************************************************************/
 
   private ConfigPackagePanel packagePanel;
-  private static ProjectEditor projectEditor = null;
   private static JFileChooser fileChooser = new JFileChooser(); 
   private static javax.swing.filechooser.FileFilter projectFilter, packageFilter, configFilter;
   static
