@@ -157,11 +157,13 @@ cvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       
       if(size >= 0)
 	{
-	  complex *values = (complex *)this->values;
+	  complex *values;
 	  int old_size = this->m;
 	  int i;
 
 	  cvec_set_size(this, size);
+
+	  values = (complex *)this->values;
 
 	  /* when extending: zero new values */
 	  for(i=old_size; i<size; i++)
