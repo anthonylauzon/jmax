@@ -22,7 +22,8 @@
 
 #include <fts/fts.h>
 
-#define SYNC_MAX_SIZE (sizeof(unsigned int))
+/* #define SYNC_MAX_SIZE (sizeof(unsigned int)) */
+#define SYNC_MAX_SIZE 32 /* modified by alex_p 2004 */
 
 static fts_symbol_t sym_all = 0;
 static fts_symbol_t sym_none = 0;
