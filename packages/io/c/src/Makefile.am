@@ -19,7 +19,9 @@ udpsend.c
 #wacom.c 
 
 noinst_HEADERS= \
-iomodule.h
+iomodule.h \
+jmax25_protocol.h 
+
 
 libio_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 
