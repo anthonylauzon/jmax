@@ -693,6 +693,31 @@ bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  *
  */
 
+static int
+bpf_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  bpf_t *o = (bpf_t *)fts_get_object(a);
+  bpf_t *p = (bpf_t *)fts_get_object(b);
+  int o_n = bpf_get_size(o);
+  int p_n = bpf_get_size(p);
+
+  if(o_n == p_n)
+  {
+    int i;
+
+    for(i=0; i<o_n; i++)
+    {
+      if(!data_float_equals(bpf_get_time(o, i), bpf_get_time(p, i)) ||
+         !data_float_equals(bpf_get_value(o, i), bpf_get_time(p, i)))
+        return 0;
+    }
+    
+    return 1;
+  }
+
+  return 0;
+}
+
 static void
 bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
@@ -744,6 +769,8 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump, bpf_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);
+
+  fts_class_set_equals_function(cl, bpf_equals);
   
   fts_class_message_varargs(cl, fts_s_get_tuple, bpf_get_tuple);
   

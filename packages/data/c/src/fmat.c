@@ -1135,6 +1135,29 @@ fmat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_name_dump_method(o, 0, 0, ac, at);
 }
 
+static int
+fmat_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  fmat_t *o = (fmat_t *)fts_get_object(a);
+  fmat_t *p = (fmat_t *)fts_get_object(b);
+
+  if(fmat_get_m(o) == fmat_get_m(p) && fmat_get_n(o) == fmat_get_n(p))
+  {
+    int size = fmat_get_m(o) * fmat_get_n(o);
+    float *o_ptr = fmat_get_ptr(o);
+    float *p_ptr = fmat_get_ptr(p);
+    int i;
+
+    for(i=0; i<size; i++)
+      if(!data_float_equals(o_ptr[i], p_ptr[i]))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
 /*********************************************************
 *
 *  class
@@ -1214,6 +1237,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, fmat_post);
   fts_class_message_varargs(cl, fts_s_print, fmat_print);
 
+  fts_class_set_equals_function(cl, fmat_equals);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, fmat_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill);

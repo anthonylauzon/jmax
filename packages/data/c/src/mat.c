@@ -665,12 +665,34 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
-/********************************************************************
- *
- *   class
- *
- */
+static int
+mat_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  mat_t *o = (mat_t *)fts_get_object(a);
+  mat_t *p = (mat_t *)fts_get_object(b);
 
+  if(mat_get_m(o) == mat_get_m(p) && mat_get_n(o) == mat_get_n(p))
+  {
+    int size = mat_get_m(o) * mat_get_n(o);
+    fts_atom_t *o_ptr = mat_get_ptr(o);
+    fts_atom_t *p_ptr = mat_get_ptr(p);
+    int i;
+
+    for(i=0; i<size; i++)
+      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
+/********************************************************************
+*
+*   class
+*
+*/
 static void
 mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -744,6 +766,8 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, mat_post); 
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
 
+  fts_class_set_equals_function(cl, mat_equals);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      

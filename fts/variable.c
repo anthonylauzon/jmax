@@ -167,7 +167,7 @@ fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *
   fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
 
-  if(!fts_atom_equals(value, &def->value))
+  if(!fts_atom_identical(value, &def->value))
     fts_definition_update(def, value);
 }
 

@@ -23,6 +23,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
@@ -32,7 +33,7 @@
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
 
-int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
+int fts_atom_identical( const fts_atom_t *p1, const fts_atom_t *p2)
 {
   if ( !fts_atom_same_type( p1, p2))
     return 0;
@@ -57,7 +58,7 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
   return 0;
 }
 
-int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
+int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 {
   if(fts_is_int(p1))
   {
@@ -67,7 +68,7 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
       return (double)fts_get_int( p1) == fts_get_float( p2);
   }
   else if(fts_is_float(p1) && fts_is_number(p2))
-    return fts_get_float( p1) == fts_get_number_float( p2);
+    return fabs(fts_get_float( p1) - fts_get_number_float( p2)) < 1.0e-7;
   else if (fts_atom_same_type( p1, p2))
   {
     if ( fts_is_symbol( p1))

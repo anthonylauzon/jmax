@@ -429,17 +429,18 @@ FTS_API fts_class_t *fts_string_class;
  * @return 1 if atoms are equals, 0 if not
  * @ingroup atom
  */
-FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
+FTS_API int fts_atom_identical(const fts_atom_t *p1, const fts_atom_t *p2);
 
 /**
- * Compares atoms of number, symbol, and objects (pointer!)
+ * Compares atoms of number, symbol, and objects (pointer!).
+ * For objects the equals function of the class is used to compare the atoms.
  *
  * @param p1 pointer to atom
  * @param p2 pointer to atom
  * @return 1 if atoms are equal, 0 if not
  * @ingroup atom
  */
-FTS_API int fts_atom_compare(const fts_atom_t *p1, const fts_atom_t *p2);
+FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 
 /**
  * Constant representing a 'void' atom

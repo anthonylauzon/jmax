@@ -24,30 +24,6 @@
 
 fts_class_t *fts_tuple_class = 0;
 
-static int
-tuple_equals(const fts_atom_t *a, const fts_atom_t *b)
-{
-  fts_tuple_t *a_tup = (fts_tuple_t *)fts_get_object(a);
-  fts_tuple_t *b_tup = (fts_tuple_t *)fts_get_object(b);
-  int a_n = fts_tuple_get_size(a_tup);
-  int b_n = fts_tuple_get_size(b_tup);
-
-  if(a_n == b_n)
-    {
-      fts_atom_t *ap = fts_tuple_get_atoms(b_tup);
-      fts_atom_t *bp = fts_tuple_get_atoms(a_tup);
-      int sum = 0;
-      int i;
-      
-      for(i=0; i<a_n; i++)
-	sum += fts_atom_equals(ap + i, bp + i);
-
-      return (sum == a_n);
-    }
-
-  return 0;
-}
-
 static void
 tuple_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -72,12 +48,35 @@ tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_message_t *mess;
-
-  /* send size message */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
+  
   fts_message_append(mess, fts_array_get_size(&this->args), fts_array_get_atoms(&this->args));
   fts_dumper_message_send(dumper, mess);
+}
+
+static int
+tuple_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  fts_tuple_t *a_tup = (fts_tuple_t *)fts_get_object(a);
+  fts_tuple_t *b_tup = (fts_tuple_t *)fts_get_object(b);
+  int a_n = fts_tuple_get_size(a_tup);
+  int b_n = fts_tuple_get_size(b_tup);
+
+  if(a_n == b_n)
+  {
+    fts_atom_t *ap = fts_tuple_get_atoms(b_tup);
+    fts_atom_t *bp = fts_tuple_get_atoms(a_tup);
+    int sum = 0;
+    int i;
+
+    for(i=0; i<a_n; i++)
+      if(!fts_atom_equals(ap + i, bp + i))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
 }
 
 static void
@@ -115,13 +114,14 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
 
   fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);
-  fts_class_message_varargs(cl, fts_s_set, tuple_set);
 
   fts_class_set_equals_function(cl, tuple_equals);
+
+  fts_class_message_varargs(cl, fts_s_set, tuple_set);
 }
 
 void
 fts_kernel_tuple_init(void)
 {
-  fts_tuple_class = fts_class_install(NULL, tuple_instantiate);
+  fts_tuple_class = fts_class_install(fts_s_tuple, tuple_instantiate);
 }

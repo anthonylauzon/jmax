@@ -38,7 +38,7 @@ select_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   for(i=0; i<n; i++)
     {
-      if(fts_atom_compare(at, a + i))
+      if(fts_atom_equals(at, a + i))
 	{
 	  fts_outlet_bang(o, i);
 	  return;

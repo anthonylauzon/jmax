@@ -624,7 +624,7 @@ track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   {
     event_t *next = event_get_next(event);
 
-    if(fts_atom_compare(event_get_value(event), at))
+    if(fts_atom_equals(event_get_value(event), at))
       track_remove_event(this, event);
 
     event = next;
@@ -1208,7 +1208,7 @@ track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   if(this->load_obj != NULL)
   {
     fts_symbol_t selector = fts_get_symbol(at);
-    fts_send_message_varargs(this->load_obj, selector, ac - 1, at + 1);
+    fts_send_message(this->load_obj, selector, ac - 1, at + 1);
   }
 }
 
@@ -1258,16 +1258,21 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     if(fts_is_object(value))
     {
       fts_object_t *obj = fts_get_object(value);
-      fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+      fts_symbol_t class_name = fts_object_get_class_name(obj);
 
-      /* save event time and class name */
-      fts_message_append_float(mess, event_get_time(event));
-      fts_message_append_symbol(mess, fts_s_colon);
-      fts_message_append_symbol(mess, fts_object_get_class_name(obj));
-      fts_dumper_message_send(dumper, mess);
+      if(class_name != NULL)
+      {
+        fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
 
-      /* dump object messages */
-      fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
+        /* save event time and class name */
+        fts_message_append_float(mess, event_get_time(event));
+        fts_message_append_symbol(mess, fts_s_colon);
+        fts_message_append_symbol(mess, class_name);
+        fts_dumper_message_send(dumper, mess);
+
+        /* dump object messages */
+        fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
+      }
     }
     else
     {

@@ -91,8 +91,8 @@ seqfind_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(time < 0.0)
     time = 0.0;
 
-  if(ac > 1 && fts_is_number(at))
-    epsilon = fts_get_number_float(at);
+  if(ac > 1 && fts_is_number(at + 1))
+    epsilon = fts_get_number_float(at + 1);
 
   if(epsilon < 0.0)
     epsilon = 0.0;
@@ -130,8 +130,8 @@ seqfind_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if(time < 0.0)
     time = 0.0;
 
-  if(ac > 1 && fts_is_number(at))
-    epsilon = fts_get_number_float(at);
+  if(ac > 1 && fts_is_number(at + 1))
+    epsilon = fts_get_number_float(at + 1);
 
   if(epsilon < 0.0)
     epsilon = 0.0;

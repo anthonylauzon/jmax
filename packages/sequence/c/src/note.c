@@ -517,7 +517,7 @@ scoob_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_message_t *mess;
   int i;
 
-  /* send set message with pitch and duration */
+  /* send set message with type, pitch, interval, and duration */
   mess = fts_dumper_message_new(dumper, fts_s_set);
   fts_message_append_symbol(mess, scoob_type_names[this->type]);
   fts_message_append_float(mess, this->pitch);
@@ -533,6 +533,45 @@ scoob_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     if(!fts_is_void(a))
       fts_dumper_send(dumper, scoob_properties[i].name, 1, a);
   }
+}
+
+static int
+scoob_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  scoob_t *o = (scoob_t *)fts_get_object(a);
+  scoob_t *p = (scoob_t *)fts_get_object(b);
+
+  if(o->type == p->type &&
+     o->pitch == p->pitch &&
+     o->interval == p->pitch &&
+     o->duration == p->duration)
+  {
+    int o_n_prop = fts_array_get_size(&o->properties);
+    int p_n_prop = fts_array_get_size(&p->properties);
+    int i;
+
+    /* send a message for each of the dynamic properties */
+    for(i=0; i<o_n_prop; i++)
+    {
+      fts_atom_t *o_prop = fts_array_get_element(&o->properties, i);
+
+      if(i < p_n_prop)
+      {
+        if(!fts_atom_equals(o_prop, fts_array_get_element(&p->properties, i)))
+          return 0;
+      }
+      else if(!fts_is_void(o_prop))
+        return 0;
+    }
+
+    for(; i<p_n_prop; i++)
+      if(!fts_is_void(fts_array_get_element(&p->properties, i)))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
 }
 
 static void
@@ -564,6 +603,8 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_get_property_list, scoob_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);
 
+  fts_class_set_equals_function(cl, scoob_equals);
+  
   fts_class_message_number(cl, seqsym_type, _scoob_set_type);
   fts_class_message_symbol(cl, seqsym_type, _scoob_set_type);
   fts_class_message_number(cl, seqsym_pitch, _scoob_set_pitch);

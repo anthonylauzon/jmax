@@ -73,7 +73,7 @@ change_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   change_t *this = (change_t *)o;
 
-  if(!fts_atom_compare(&this->state, at))
+  if(!fts_atom_equals(&this->state, at))
     {
       fts_atom_assign(&this->state, at);
       fts_outlet_atom(o, 0, at);

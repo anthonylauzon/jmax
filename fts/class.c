@@ -230,7 +230,7 @@ class_outlet_has_declaration(fts_class_outlet_t *out, const fts_atom_t *p)
 
 	  fts_iterator_next(&iter, &a);
 
-	  if(fts_atom_equals(p, &a))
+	  if(fts_atom_identical(p, &a))
 	    return 1;
 	}
     }

@@ -367,12 +367,36 @@ vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
+
+static int
+vec_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  vec_t *o = (vec_t *)fts_get_object(a);
+  vec_t *p = (vec_t *)fts_get_object(b);
+  int o_n = vec_get_size(o);
+  int p_n = vec_get_size(p);
+
+  if(o_n == p_n)
+  {
+    fts_atom_t *o_ptr = vec_get_ptr(o);
+    fts_atom_t *p_ptr = vec_get_ptr(p);
+    int i;
+
+    for(i=0; i<o_n; i++)
+      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
 /********************************************************************
  *
  *  class
  *
  */
-
 static void
 vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -424,6 +448,8 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
   fts_class_message_varargs(cl, fts_s_dump, vec_dump);
+
+  fts_class_set_equals_function(cl, vec_equals);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
 

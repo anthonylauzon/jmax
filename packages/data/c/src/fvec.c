@@ -1735,6 +1735,28 @@ fvec_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_return_float(ret);
 }
 
+static int
+fvec_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  fvec_t *o = (fvec_t *)fts_get_object(a);
+  fvec_t *p = (fvec_t *)fts_get_object(b);
+  int o_n = fvec_get_size(o);
+  int p_n = fvec_get_size(p);
+
+  if(o_n == p_n)
+  {
+    int i;
+
+    for(i=0; i<o_n; i++)
+      if(!data_float_equals(fvec_get_element(o, i), fvec_get_element(p, i)))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
 /*********************************************************
  *
  *  class
@@ -1833,6 +1855,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, fvec_post); 
   fts_class_message_varargs(cl, fts_s_print, fvec_print); 
 
+  fts_class_set_equals_function(cl, fvec_equals);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, fvec_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_get_tuple, fvec_get_tuple);

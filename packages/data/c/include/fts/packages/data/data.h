@@ -39,6 +39,7 @@ typedef struct _data_object
   int persistence;
 } data_object_t;
 
+#define data_float_equals(f, g) (fabs((f) - (g)) < 1.0e-7)
 
 enum data_object_persistence {data_object_persistence_args = -1, data_object_persistence_no = 0, data_object_persistence_yes = 1};
 

@@ -912,37 +912,51 @@ static void
 patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj = fts_get_object(&at[0]);
-  fts_package_t *pkg = fts_object_get_package(obj);
-  fts_symbol_t dir;
-  fts_symbol_t class_name;
-  fts_symbol_t file_name;
-  fts_patcher_t *help_patch;
-  const char *help_name;
-  char path[256];
+  fts_package_t *pkg = 0;
+  fts_symbol_t class_name = 0;
 
-  if( fts_object_is_error( obj) && (pkg == NULL))
-    return;
+  if(fts_object_is_error(obj))
+  {
+    fts_class_t *class = fts_error_object_get_class((fts_error_object_t *)obj);
 
-  dir = fts_package_get_dir( pkg);
-  class_name = fts_object_get_class_name(obj);
-
-  help_name = fts_package_get_help( pkg, class_name);
-  if( help_name)
-    snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, help_name);
+    if(class)
+    {
+      class_name = fts_class_get_name(class);
+      pkg = fts_class_get_package(class);
+    }
+  }
   else
-    snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
-  
-  file_name = fts_new_symbol(path);
-      
-  help_patch = fts_patcher_get_by_file_name(file_name);
+  {
+    class_name = fts_object_get_class_name(obj);
+    pkg = fts_object_get_package(obj);
+  }
 
-  if(help_patch)
-    patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
-  else
-    help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
+  if(pkg)
+  {
+    fts_symbol_t dir = fts_package_get_dir( pkg);
+    fts_symbol_t file_name;
+    fts_patcher_t *help_patch;
+    const char *help_name;
+    char path[256];
 
-  if(!help_patch)
-    fts_client_send_message(o, sym_noHelp, 1, at); 
+    help_name = fts_package_get_help( pkg, class_name);
+    if( help_name)
+      snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, help_name);
+    else
+      snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
+
+    file_name = fts_new_symbol(path);
+
+    help_patch = fts_patcher_get_by_file_name(file_name);
+
+    if(help_patch)
+      patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
+    else
+      help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
+
+    if(!help_patch)
+      fts_client_send_message(o, sym_noHelp, 1, at);
+  }
 }
 
 /* find utility */
@@ -952,12 +966,12 @@ fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t
   int i,j;
 
   for (i = 0; i < (ac - sac + 1); i++)
-    if (fts_atom_equals(&sav[0], &av[i]))
+    if (fts_atom_identical(&sav[0], &av[i]))
     {
       /* Found the beginning, test the rest */
 
       for (j = 1; j < sac; j++)
-        if (! fts_atom_equals(&sav[j], &av[j + i]))
+        if (! fts_atom_identical(&sav[j], &av[j + i]))
           return 0;
 
       return 1;

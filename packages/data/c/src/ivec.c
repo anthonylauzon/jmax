@@ -798,6 +798,28 @@ ivec_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_return_object((fts_object_t *)tuple);
 }
 
+static int
+ivec_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  ivec_t *o = (ivec_t *)fts_get_object(a);
+  ivec_t *p = (ivec_t *)fts_get_object(b);
+  int o_n = ivec_get_size(o);
+  int p_n = ivec_get_size(p);
+
+  if(o_n == p_n)
+  {
+    int i;
+
+    for(i=0; i<o_n; i++)
+      if(ivec_get_element(o, i) != ivec_get_element(p, i))
+        return 0;
+
+    return 1;
+  }
+
+  return 0;
+}
+
 /*********************************************************
  *
  *  class
@@ -880,6 +902,8 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_post, ivec_post); 
   fts_class_message_varargs(cl, fts_s_print, ivec_print); 
 
+  fts_class_set_equals_function(cl, ivec_equals);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, ivec_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_get_tuple, ivec_get_tuple);

@@ -1,3 +1,8 @@
+2003-02-25  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* fixed several (unreported) minor bugs in object set
+	* added missing help patches in all packages but signal and io
+
 2003-02-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* begin to fix "Open Project" FTS crash
