@@ -33,6 +33,7 @@ public class JMaxIcons {
   public static final ImageIcon toSave = loadIcon( "to_save.gif");
   public static final ImageIcon dspOn = loadIcon( "dsp_on.gif");
   public static final ImageIcon dspOff = loadIcon( "dsp_off.gif");
+  public static final ImageIcon dspUndef = loadIcon( "dsp_undef.gif");
   public static final ImageIcon moreObjects = loadIcon( "more_objects.gif");
 
   // These are used from ErrorTablePanel ???

@@ -14,6 +14,7 @@ cursor_patcher.gif \
 cursor_standard.gif \
 dsp_off.gif \
 dsp_on.gif \
+dsp_undef.gif \
 forum.gif \
 hot.gif \
 info.gif \

@@ -107,10 +107,13 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     int ix = x + (w - JMaxIcons.dspOn.getIconWidth())/2;
     int iy = y + (h - JMaxIcons.dspOn.getIconHeight())/2;
 
-    if(isOn)
-      g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
-    else
-      g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
+    if( ftsObject.isError())
+      g.drawImage(JMaxIcons.dspUndef.getImage(), ix, iy, JMaxIcons.dspUndef.getImageObserver());
+    else 
+      if(isOn)
+	g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
+      else
+	g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
 
     super.paint( g);
   }
@@ -132,9 +135,12 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     int ix = x + (w - JMaxIcons.dspOn.getIconWidth())/2;
     int iy = y + (h - JMaxIcons.dspOn.getIconHeight())/2;
 
-    if(isOn)
-      g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
-    else
-      g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
+    if( ftsObject.isError())
+      g.drawImage(JMaxIcons.dspUndef.getImage(), ix, iy, JMaxIcons.dspUndef.getImageObserver());
+    else 
+      if(isOn)
+	g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
+      else
+	g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
   }  
 }
