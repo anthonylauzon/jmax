@@ -94,7 +94,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     table.addKeyListener(new KeyAdapter(){
       public void keyPressed(KeyEvent e)
       {
-        if(e.getKeyCode() == KeyEvent.VK_ENTER)
+        if(e.getKeyCode() == KeyEvent.VK_ENTER && !table.isEditing())
           matData.requestAppendRow();
       }
     });
