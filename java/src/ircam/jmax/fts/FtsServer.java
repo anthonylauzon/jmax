@@ -27,7 +27,7 @@ package ircam.jmax.fts;
 
 import java.util.*;
 import java.io.*;
-
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
@@ -1359,19 +1359,24 @@ public class FtsServer implements Runnable
 	  {
 	    dispatchMessage(stream);
 	  }
+	catch (FtsQuittedException e)
+	  {
+	    /* open a dialog to quit jmax */
+	    JOptionPane.showMessageDialog(null, "Fts Server Quitted!", "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+
+	    ftsQuitted();
+	    running = false;
+	    Runtime.getRuntime().exit(0);
+	  }
 	catch (java.io.InterruptedIOException e)
 	  {
 	    /* Ignore, just retry */
 	  }
-	catch (FtsQuittedException e)
-	  {
-	    ftsQuitted();
-	    running = false;
-	  }
 	catch (java.net.SocketException e)
-	  {
-	    /* coucou! */
-	  }
+	    {
+		System.err.println("Socket Exception "+ e);
+		e.printStackTrace();
+	    }
 	catch (java.lang.Exception e)
 	  {
 	    //Try to survive an exception
