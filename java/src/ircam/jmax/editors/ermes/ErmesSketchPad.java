@@ -39,7 +39,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static int FromInToOut 	    = -1;
   final static int NoDirections     = 0;
   final static int CENTER_JUSTIFICATION = 20;
-  final static int LEFT_JUSTIFICATION = 21;
+ final static int LEFT_JUSTIFICATION = 21;
   final static int RIGHT_JUSTIFICATION = 22;
   final static int BOTH_RESIZING = 23;
   final static int HORIZONTAL_RESIZING = 24;
@@ -1246,6 +1246,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //////////////////////////////////////////////////mouseMotionListener--inizio
 
   public void mouseDragged(MouseEvent e){
+
     Rectangle aRect;
     int x = e.getX();
     int y = e.getY();
@@ -1342,7 +1343,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     else 
       if(itsHelper.IsInObject(x,y))
 	if(itsCurrentObject.MouseMove(e,x,y)) return;
-    itsSketchWindow.setCursor(Cursor.getDefaultCursor());
+    if (itsSketchWindow.getCursor() != Cursor.getDefaultCursor()) itsSketchWindow.setCursor(Cursor.getDefaultCursor());
     if(itsCurrentInOutlet!=null)
       if(itsCurrentInOutlet.itsAlreadyMoveIn) itsCurrentInOutlet.itsAlreadyMoveIn = false;
   }
@@ -1821,6 +1822,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
 
   public void update(Graphics g) {
+
     if(!itsGraphicsOn)return;
     ErmesSketchPad.debug_count_update += 1;
     if (debug_count_update % ErmesSketchPad.DEBUG_COUNT == 0) {

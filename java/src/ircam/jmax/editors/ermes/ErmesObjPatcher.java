@@ -171,6 +171,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     if(evt.getClickCount()>1) {
       if (itsSubWindow != null) {//show the subpatcher, it's there
 	itsSubWindow.setVisible(true);
+	itsSubWindow.itsPatcher.open();
 	ErmesSketchPad.RequestOffScreen(itsSketchPad);
       }
       else{	//this 'else' shouldn't be reached...

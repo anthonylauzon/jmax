@@ -16,9 +16,9 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
     //ErmesSketchWindow aSketchWindow = new ErmesSketchWindow((FtsContainerObject)theData.getContent());
 
     MaxApplication.itsSketchWindowList.addElement(aSketchWindow);
-    if (theData.getName() != null) aSketchWindow.setTitle(theData.getName());
-    else { //data has no name (did you do a "new"?)
-    }
+    //if (theData.getName() != null) aSketchWindow.setTitle(theData.getName());
+    //else { //data has no name (did you do a "new"?)
+    //}
     MaxApplication.AddThisWindowToMenus(aSketchWindow);
 
     return aSketchWindow;

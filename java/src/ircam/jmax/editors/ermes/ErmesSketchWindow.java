@@ -155,7 +155,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public ErmesSketchWindow(MaxData theData) {
     super();
     if (theData.getName()==null) setTitle(GetNewUntitledName());
-    else setTitle(theData.getName());
+    else {
+      System.err.println("setto il titolo "+theData.getDataSource().toString());
+      setTitle(theData.getDataSource().toString()); 
+   }
+    //else setTitle(theData.getName());
     itsData = theData;
     itsPatcher = (FtsContainerObject)(theData.getContent());
     CommonInitializations();
@@ -775,8 +779,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     // This line will not work for patches loaded from
     // sources that are not files !!!
       
-    setTitle(((MaxFileDataSource)itsData.getDataSource()).getFile().getName()); 
-
+    //e.m.1103setTitle(((MaxFileDataSource)itsData.getDataSource()).getFile().getName()); 
+    setTitle(itsData.getDataSource().toString()); 
     CreateFtsGraphics(this);
 
     // This code is temporary, just to test the MDA

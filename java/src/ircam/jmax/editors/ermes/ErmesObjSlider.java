@@ -23,6 +23,7 @@ class ErmesObjSlider extends ErmesObject {
   int itsRange = itsRangeMax-itsRangeMin;
   int itsPixelRange = itsRangeMax-itsRangeMin;
   static Dimension preferredSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE_MAX+UP_OFFSET);
+  static Dimension currentMinimumSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE_MAX+UP_OFFSET);
   boolean itsMovingThrottle = false;
   int itsDelta = 0;
   float itsStep =  itsRange/itsPixelRange;
@@ -49,7 +50,16 @@ class ErmesObjSlider extends ErmesObject {
 		
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     super.Init(theSketchPad,  theFtsObject);
-    itsThrottle = new ErmesObjThrottle(this);
+    itsThrottle = new ErmesObjThrottle(this);    
+    {
+      Integer aInteger = (Integer)theFtsObject.get("minValue");
+      itsRangeMin = aInteger.intValue();
+      aInteger = (Integer)theFtsObject.get("maxValue");
+      itsRangeMax = aInteger.intValue();
+      itsRange = itsRangeMax-itsRangeMin;
+      itsStep = (float)itsRange/itsPixelRange;      
+    }
+    Resize(0,0);
     return true;
   }
 
@@ -212,18 +222,22 @@ class ErmesObjSlider extends ErmesObject {
     else return super.MouseUp(evt, x, y);
   }
 
-  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < getPreferredSize().width)||(currentRect.height+theDeltaY<getPreferredSize().height))
-      return false;
-    else return true;
+  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY) {
+    //if((currentRect.width+theDeltaX < getPreferredSize().width)||(currentRect.height+theDeltaY<getPreferredSize().height))
+    //  return false;
+    //else return true;
+    
+    return true;
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
-    if(aHeight<getPreferredSize().height) aHeight = getPreferredSize().height;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    //int aWidth = currentRect.width+theDeltaX;
+    //int aHeight = currentRect.height+theDeltaY;
+    //if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
+    //if(aHeight<getPreferredSize().height) aHeight = getPreferredSize().height;
+    //Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    
+    Resize(theDeltaX, theDeltaY);
   }
   
   public boolean IsInThrottle(int theX, int theY){
@@ -283,7 +297,9 @@ class ErmesObjSlider extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    return getPreferredSize();
+    currentMinimumSize.width =20;
+    currentMinimumSize.height = BOTTOM_OFFSET+(itsRangeMax-itsRangeMin)+UP_OFFSET;
+    return currentMinimumSize;
   }
   
   public Dimension getPreferredSize() {
