@@ -194,8 +194,10 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 
     if (event != NULL) {
+      fts_atom_t a;
+      fts_set_object(&a, (fts_object_t*)event);
       fts_object_refer((fts_object_t *)event);
-      fts_midiport_input((fts_midiport_t *) this, event, 0.0);
+      fts_midiport_input(o, 0, 0, 1, &a);
       fts_object_release((fts_object_t *)event);
     }
   }
@@ -213,14 +215,16 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
          byte, and skip the end-of-sysex byte */
       if (size > 2) {
 
-	fts_midievent_t *sysex = fts_midievent_system_exclusive_new();
+	fts_midievent_t *sysex = fts_midievent_system_exclusive_new(0, 0);
+	fts_atom_t a;
 
 	for (j = 1; j < size - 1; j++) {
 	  fts_midievent_system_exclusive_append(sysex, this->inhdr[i].lpData[j]);
 	}
-
+	
+	fts_set_object(&a, (fts_object_t*)sysex);
 	fts_object_refer((fts_object_t *)sysex);
-	fts_midiport_input((fts_midiport_t *) this, sysex, 0.0);
+	fts_midiport_input(o, 0, 0, 1, &a);
 	fts_object_release((fts_object_t *)sysex);
       }
 
@@ -622,8 +626,6 @@ static void
 winmidiport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(winmidiport_t), winmidiport_init, winmidiport_delete);
-
-  fts_midiport_class_init(cl);
   
   fts_class_message_varargs(cl, fts_s_sched_ready, winmidiport_dispatch);
 }
@@ -635,5 +637,11 @@ winmidiport_config(void)
   winmidiport_symbol = fts_new_symbol("winmidiport");
 
   fts_class_install( winmidiport_symbol, winmidiport_instantiate);
-  fts_midiport_set_default_class(winmidiport_symbol);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
