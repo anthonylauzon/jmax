@@ -1,5 +1,9 @@
 # SUBDIRS= api arch HOWTO images
+if COND_DOXYGEN
 SUBDIRS= images api
+else
+SUBDIRS= images
+endif
 
 htmldir=$(pkgdatadir)/doc
 
