@@ -1,3 +1,7 @@
+2000-05-03  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* sigthrow: fixed bug in catch~/throw~
+
 2000-05-03  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fts: fixing 'save as .pat' methods (messages were not saved correctly)
@@ -7,9 +11,26 @@
 	*  fts: added stuff for running fts under purify (ENABLE_PURIFY=yes on make command 
 	line). See doc/running.html for further indications.
 
+2000-04-28  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* fork object added in packages/guiobj java/.../patcher/objects java/.../fts
+	* for object added in packages/control
+	* range moved from packages/numeric to packages/control
+	* vec object added in packages/data
+	* eliminated MAXVS and MINVS in the kernel and packages
+	* sched.h: added functions (makros)
+	    fts_get_time_in_msecs()
+	    fts_get_time_in_ticks()
+	    fts_get_tick_size()
+	    fts_get_tick_duration()
+	* sched.h: added constants
+	    FTS_MIN_TICK_SIZE
+	    FTS_MAX_TICK_SIZE
+	    FTS_DEF_TICK_SIZE
+
 2000-04-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
-	*  Merged all ChangeLog files in subdirectories.
+	* Merged all ChangeLog files in subdirectories.
 
 	* fts and java Makefiles: merged all install-noarch and install-arch targets
 
