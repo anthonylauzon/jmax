@@ -1029,7 +1029,7 @@ _fmat_get_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fmat_t *self = (fmat_t *)o;
   
-  fts_return_float(fts_get_sr(self));
+  fts_return_float(fmat_get_sr(self));
 }
 
 static void
