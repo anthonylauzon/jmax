@@ -101,6 +101,10 @@
 			settings = {
 			};
 		};
+		F53D6D41035DFB96016640F1 = {
+			isa = PBXTargetDependency;
+			target = F880FFF80283022401664092;
+		};
 		F544CD9303387B6001664092 = {
 			isa = PBXFileReference;
 			name = thread.c;
@@ -160,12 +164,6 @@
 		};
 		F5632C2303499A1501664092 = {
 			fileRef = F85494FA02D250E101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5632C2403499A2301664092 = {
-			fileRef = F85494DE02D24EEB01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -493,6 +491,570 @@
 		};
 		F5F80BF403420AC901664092 = {
 			fileRef = F5F80BF203420AB201664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8978035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = bus.help.jmax;
+			path = ../../packages/control/help/bus.help.jmax;
+			refType = 2;
+		};
+		F5FB8979035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = catch.help.jmax;
+			path = ../../packages/control/help/catch.help.jmax;
+			refType = 2;
+		};
+		F5FB897A035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = cotup.help.jmax;
+			path = ../../packages/control/help/cotup.help.jmax;
+			refType = 2;
+		};
+		F5FB897B035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = delay.help.jmax;
+			path = ../../packages/control/help/delay.help.jmax;
+			refType = 2;
+		};
+		F5FB897C035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = detup.help.jmax;
+			path = ../../packages/control/help/detup.help.jmax;
+			refType = 2;
+		};
+		F5FB897D035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = fifo.help.jmax;
+			path = ../../packages/control/help/fifo.help.jmax;
+			refType = 2;
+		};
+		F5FB897E035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = getup.help.jmax;
+			path = ../../packages/control/help/getup.help.jmax;
+			refType = 2;
+		};
+		F5FB897F035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = messtup.help.jmax;
+			path = ../../packages/control/help/messtup.help.jmax;
+			refType = 2;
+		};
+		F5FB8980035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = retard.help.jmax;
+			path = ../../packages/control/help/retard.help.jmax;
+			refType = 2;
+		};
+		F5FB8981035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = stack.help.jmax;
+			path = ../../packages/control/help/stack.help.jmax;
+			refType = 2;
+		};
+		F5FB8982035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = sync.help.jmax;
+			path = ../../packages/control/help/sync.help.jmax;
+			refType = 2;
+		};
+		F5FB8983035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = throw.help.jmax;
+			path = ../../packages/control/help/throw.help.jmax;
+			refType = 2;
+		};
+		F5FB8984035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = timer.help.jmax;
+			path = ../../packages/control/help/timer.help.jmax;
+			refType = 2;
+		};
+		F5FB8985035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = tup.help.jmax;
+			path = ../../packages/control/help/tup.help.jmax;
+			refType = 2;
+		};
+		F5FB8986035E0B3F016640F1 = {
+			isa = PBXFileReference;
+			name = untup.help.jmax;
+			path = ../../packages/control/help/untup.help.jmax;
+			refType = 2;
+		};
+		F5FB8997035E0B99016640F1 = {
+			fileRef = F5FB8978035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8998035E0BA4016640F1 = {
+			fileRef = F5FB8979035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8999035E0BA4016640F1 = {
+			fileRef = F5FB897A035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899A035E0BA4016640F1 = {
+			fileRef = F5FB897B035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899B035E0BA4016640F1 = {
+			fileRef = F5FB897C035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899C035E0BA4016640F1 = {
+			fileRef = F5FB897D035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899D035E0BA4016640F1 = {
+			fileRef = F5FB897E035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899E035E0BA4016640F1 = {
+			fileRef = F5FB897F035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB899F035E0BA4016640F1 = {
+			fileRef = F5FB8980035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A0035E0BA4016640F1 = {
+			fileRef = F5FB8981035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A1035E0BA4016640F1 = {
+			fileRef = F5FB8982035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A2035E0BA4016640F1 = {
+			fileRef = F5FB8983035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A3035E0BA4016640F1 = {
+			fileRef = F5FB8984035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A4035E0BA4016640F1 = {
+			fileRef = F5FB8985035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89A5035E0BA4016640F1 = {
+			fileRef = F5FB8986035E0B3F016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89B2035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = bpf.help.jmax;
+			path = ../../packages/data/help/bpf.help.jmax;
+			refType = 2;
+		};
+		F5FB89B3035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = cvec.help.jmax;
+			path = ../../packages/data/help/cvec.help.jmax;
+			refType = 2;
+		};
+		F5FB89B4035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = dict.help.jmax;
+			path = ../../packages/data/help/dict.help.jmax;
+			refType = 2;
+		};
+		F5FB89B5035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = fmat.help.jmax;
+			path = ../../packages/data/help/fmat.help.jmax;
+			refType = 2;
+		};
+		F5FB89B6035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = getinter.help.jmax;
+			path = ../../packages/data/help/getinter.help.jmax;
+			refType = 2;
+		};
+		F5FB89B7035E0C20016640F1 = {
+			isa = PBXFileReference;
+			name = getrange.help.jmax;
+			path = ../../packages/data/help/getrange.help.jmax;
+			refType = 2;
+		};
+		F5FB89BE035E0C3A016640F1 = {
+			fileRef = F5FB89B2035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89BF035E0C3A016640F1 = {
+			fileRef = F5FB89B3035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89C0035E0C3A016640F1 = {
+			fileRef = F5FB89B4035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89C1035E0C3A016640F1 = {
+			fileRef = F5FB89B5035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89C2035E0C3A016640F1 = {
+			fileRef = F5FB89B6035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89C3035E0C3A016640F1 = {
+			fileRef = F5FB89B7035E0C20016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89C4035E0C68016640F1 = {
+			isa = PBXFileReference;
+			name = fork.help.jmax;
+			path = ../../packages/guiobj/help/fork.help.jmax;
+			refType = 2;
+		};
+		F5FB89C5035E0C68016640F1 = {
+			isa = PBXFileReference;
+			name = keystat.help.jmax;
+			path = ../../packages/guiobj/help/keystat.help.jmax;
+			refType = 2;
+		};
+		F5FB89C6035E0C68016640F1 = {
+			isa = PBXFileReference;
+			name = "monitor~.help.jmax";
+			path = "../../packages/guiobj/help/monitor~.help.jmax";
+			refType = 2;
+		};
+		F5FB89CA035E0C91016640F1 = {
+			fileRef = F5FB89C4035E0C68016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89CB035E0C91016640F1 = {
+			fileRef = F5FB89C5035E0C68016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89CC035E0C91016640F1 = {
+			fileRef = F5FB89C6035E0C68016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89CD035E0CE3016640F1 = {
+			isa = PBXFileReference;
+			name = midiparse.help.jmax;
+			path = ../../packages/midi/help/midiparse.help.jmax;
+			refType = 2;
+		};
+		F5FB89CF035E0CF5016640F1 = {
+			fileRef = F5FB89CD035E0CE3016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89D0035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = count.help.jmax;
+			path = ../../packages/numeric/help/count.help.jmax;
+			refType = 2;
+		};
+		F5FB89D1035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = exscale.help.jmax;
+			path = ../../packages/numeric/help/exscale.help.jmax;
+			refType = 2;
+		};
+		F5FB89D2035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = fit.help.jmax;
+			path = ../../packages/numeric/help/fit.help.jmax;
+			refType = 2;
+		};
+		F5FB89D3035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = for.help.jmax;
+			path = ../../packages/numeric/help/for.help.jmax;
+			refType = 2;
+		};
+		F5FB89D4035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = logscale.help.jmax;
+			path = ../../packages/numeric/help/logscale.help.jmax;
+			refType = 2;
+		};
+		F5FB89D5035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = ramp.help.jmax;
+			path = ../../packages/numeric/help/ramp.help.jmax;
+			refType = 2;
+		};
+		F5FB89D6035E0D1A016640F1 = {
+			isa = PBXFileReference;
+			name = range.help.jmax;
+			path = ../../packages/numeric/help/range.help.jmax;
+			refType = 2;
+		};
+		F5FB89DE035E0D2B016640F1 = {
+			fileRef = F5FB89D0035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89DF035E0D2B016640F1 = {
+			fileRef = F5FB89D1035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E0035E0D2B016640F1 = {
+			fileRef = F5FB89D2035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E1035E0D2B016640F1 = {
+			fileRef = F5FB89D3035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E2035E0D2B016640F1 = {
+			fileRef = F5FB89D4035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E3035E0D2B016640F1 = {
+			fileRef = F5FB89D5035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E4035E0D2B016640F1 = {
+			fileRef = F5FB89D6035E0D1A016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89E5035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "bus~.help.jmax";
+			path = "../../packages/signal/help/bus~.help.jmax";
+			refType = 2;
+		};
+		F5FB89E6035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "delay~.help.jmax";
+			path = "../../packages/signal/help/delay~.help.jmax";
+			refType = 2;
+		};
+		F5FB89E7035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "edge~.help.jmax";
+			path = "../../packages/signal/help/edge~.help.jmax";
+			refType = 2;
+		};
+		F5FB89E8035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "env~.help.jmax";
+			path = "../../packages/signal/help/env~.help.jmax";
+			refType = 2;
+		};
+		F5FB89E9035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "iir~.help.jmax";
+			path = "../../packages/signal/help/iir~.help.jmax";
+			refType = 2;
+		};
+		F5FB89EA035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "pink~.help.jmax";
+			path = "../../packages/signal/help/pink~.help.jmax";
+			refType = 2;
+		};
+		F5FB89EB035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "play~.help.jmax";
+			path = "../../packages/signal/help/play~.help.jmax";
+			refType = 2;
+		};
+		F5FB89EC035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "wave~.help.jmax";
+			path = "../../packages/signal/help/wave~.help.jmax";
+			refType = 2;
+		};
+		F5FB89ED035E0D75016640F1 = {
+			isa = PBXFileReference;
+			name = "white~.help.jmax";
+			path = "../../packages/signal/help/white~.help.jmax";
+			refType = 2;
+		};
+		F5FB89F7035E0D8F016640F1 = {
+			fileRef = F5FB89E5035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89F8035E0D8F016640F1 = {
+			fileRef = F5FB89E6035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89F9035E0D8F016640F1 = {
+			fileRef = F5FB89E7035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FA035E0D8F016640F1 = {
+			fileRef = F5FB89E8035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FB035E0D8F016640F1 = {
+			fileRef = F5FB89E9035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FC035E0D8F016640F1 = {
+			fileRef = F5FB89EA035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FD035E0D8F016640F1 = {
+			fileRef = F5FB89EB035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FE035E0D8F016640F1 = {
+			fileRef = F5FB89EC035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB89FF035E0D8F016640F1 = {
+			fileRef = F5FB89ED035E0D75016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A00035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = jpatcher.help.jmax;
+			path = ../../packages/system/help/jpatcher.help.jmax;
+			refType = 2;
+		};
+		F5FB8A01035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = param.help.jmax;
+			path = ../../packages/system/help/param.help.jmax;
+			refType = 2;
+		};
+		F5FB8A02035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = preset.help.jmax;
+			path = ../../packages/system/help/preset.help.jmax;
+			refType = 2;
+		};
+		F5FB8A03035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = "print~.help.jmax";
+			path = "../../packages/system/help/print~.help.jmax";
+			refType = 2;
+		};
+		F5FB8A04035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = receive.help.jmax;
+			path = ../../packages/system/help/receive.help.jmax;
+			refType = 2;
+		};
+		F5FB8A05035E0DB7016640F1 = {
+			isa = PBXFileReference;
+			name = send.help.jmax;
+			path = ../../packages/system/help/send.help.jmax;
+			refType = 2;
+		};
+		F5FB8A0C035E0DC9016640F1 = {
+			fileRef = F5FB8A00035E0DB7016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A0D035E0DC9016640F1 = {
+			fileRef = F5FB8A01035E0DB7016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A0E035E0DC9016640F1 = {
+			fileRef = F5FB8A02035E0DB7016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A0F035E0DC9016640F1 = {
+			fileRef = F5FB8A03035E0DB7016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A10035E0DC9016640F1 = {
+			fileRef = F5FB8A04035E0DB7016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5FB8A11035E0DC9016640F1 = {
+			fileRef = F5FB8A05035E0DB7016640F1;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1443,6 +2005,15 @@
 				F8EE4B3E031CE61C01664092,
 				F8EE4B3F031CE61C01664092,
 				F8EE4B40031CE61C01664092,
+				F5FB89E5035E0D75016640F1,
+				F5FB89E6035E0D75016640F1,
+				F5FB89E7035E0D75016640F1,
+				F5FB89E8035E0D75016640F1,
+				F5FB89E9035E0D75016640F1,
+				F5FB89EA035E0D75016640F1,
+				F5FB89EB035E0D75016640F1,
+				F5FB89EC035E0D75016640F1,
+				F5FB89ED035E0D75016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -2611,21 +3182,15 @@
 		F8446A02028BCC2301664092 = {
 			children = (
 				F8512164028BD7EA01664092,
-				F8512165028BD7EA01664092,
 				F8512168028BD7EA01664092,
 				F8512169028BD7EA01664092,
 				F851216A028BD7EA01664092,
-				F851216B028BD7EA01664092,
 				F851216C028BD7EA01664092,
 				F851216D028BD7EA01664092,
-				F851216F028BD7EA01664092,
-				F8512173028BD7EA01664092,
-				F8512174028BD7EA01664092,
 				F8512175028BD7EA01664092,
 				F8512176028BD7EA01664092,
 				F8512178028BD7EA01664092,
 				F8512179028BD7EA01664092,
-				F851217A028BD7EA01664092,
 				F851217B028BD7EA01664092,
 				F851217C028BD7EA01664092,
 				F851217E028BD7EA01664092,
@@ -2646,10 +3211,8 @@
 				F8512192028BD7EA01664092,
 				F8512193028BD7EA01664092,
 				F8512194028BD7EA01664092,
-				F8512195028BD7EA01664092,
 				F8512196028BD7EA01664092,
 				F8512198028BD7EA01664092,
-				F8512199028BD7EA01664092,
 				F851219B028BD7EA01664092,
 				F851219C028BD7EA01664092,
 				F851219D028BD7EA01664092,
@@ -2669,7 +3232,6 @@
 				F85121AF028BD7EA01664092,
 				F85121B0028BD7EA01664092,
 				F85121B1028BD7EA01664092,
-				F85121B2028BD7EA01664092,
 				F85121B3028BD7EA01664092,
 				F85121B4028BD7EA01664092,
 				F85121B5028BD7EA01664092,
@@ -3565,6 +4127,7 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
+				F53D6D41035DFB96016640F1,
 			);
 			isa = PBXLibraryTarget;
 			name = ispw.jar;
@@ -3684,33 +4247,18 @@
 		};
 		F8448E500286C23601664092 = {
 			children = (
-				F8448E510286C23601664092,
-				F8448E520286C23601664092,
-				F8448E530286C23601664092,
 				F8448E550286C23601664092,
 				F8448E560286C23601664092,
+				F5FB8A00035E0DB7016640F1,
+				F5FB8A01035E0DB7016640F1,
+				F5FB8A02035E0DB7016640F1,
+				F5FB8A03035E0DB7016640F1,
+				F5FB8A04035E0DB7016640F1,
+				F5FB8A05035E0DB7016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
 			refType = 4;
-		};
-		F8448E510286C23601664092 = {
-			isa = PBXFileReference;
-			name = bus.help.jmax;
-			path = ../../packages/system/help/bus.help.jmax;
-			refType = 2;
-		};
-		F8448E520286C23601664092 = {
-			isa = PBXFileReference;
-			name = "bus~.help.jmax";
-			path = "../../packages/system/help/bus~.help.jmax";
-			refType = 2;
-		};
-		F8448E530286C23601664092 = {
-			isa = PBXFileReference;
-			name = const.help.jmax;
-			path = ../../packages/system/help/const.help.jmax;
-			refType = 2;
 		};
 		F8448E550286C23601664092 = {
 			isa = PBXFileReference;
@@ -3729,32 +4277,17 @@
 			dstPath = share/jmax/packages/system/help;
 			dstSubfolderSpec = 7;
 			files = (
-				F8448E590286C23601664092,
-				F8448E5A0286C23601664092,
-				F8448E5B0286C23601664092,
 				F8448E5D0286C23601664092,
 				F8448E5E0286C23601664092,
+				F5FB8A0C035E0DC9016640F1,
+				F5FB8A0D035E0DC9016640F1,
+				F5FB8A0E035E0DC9016640F1,
+				F5FB8A0F035E0DC9016640F1,
+				F5FB8A10035E0DC9016640F1,
+				F5FB8A11035E0DC9016640F1,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F8448E590286C23601664092 = {
-			fileRef = F8448E510286C23601664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8448E5A0286C23601664092 = {
-			fileRef = F8448E520286C23601664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8448E5B0286C23601664092 = {
-			fileRef = F8448E530286C23601664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8448E5D0286C23601664092 = {
 			fileRef = F8448E550286C23601664092;
@@ -4711,12 +5244,6 @@
 			path = "../../packages/ispw/help/2p2z~.help.jmax";
 			refType = 2;
 		};
-		F8512165028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "2pole~.help.jmax";
-			path = "../../packages/ispw/help/2pole~.help.jmax";
-			refType = 2;
-		};
 		F8512168028BD7EA01664092 = {
 			isa = PBXFileReference;
 			name = accum.help.jmax;
@@ -4735,12 +5262,6 @@
 			path = "../../packages/ispw/help/arctan2~.help.jmax";
 			refType = 2;
 		};
-		F851216B028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "arith~.help.jmax";
-			path = "../../packages/ispw/help/arith~.help.jmax";
-			refType = 2;
-		};
 		F851216C028BD7EA01664092 = {
 			isa = PBXFileReference;
 			name = bag.help.jmax;
@@ -4751,24 +5272,6 @@
 			isa = PBXFileReference;
 			name = bangbang.help.jmax;
 			path = ../../packages/ispw/help/bangbang.help.jmax;
-			refType = 2;
-		};
-		F851216F028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "catch~.help.jmax";
-			path = "../../packages/ispw/help/catch~.help.jmax";
-			refType = 2;
-		};
-		F8512173028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "comp~.help.jmax";
-			path = "../../packages/ispw/help/comp~.help.jmax";
-			refType = 2;
-		};
-		F8512174028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = delay.help.jmax;
-			path = ../../packages/ispw/help/delay.help.jmax;
 			refType = 2;
 		};
 		F8512175028BD7EA01664092 = {
@@ -4793,12 +5296,6 @@
 			isa = PBXFileReference;
 			name = expr.help.jmax;
 			path = ../../packages/ispw/help/expr.help.jmax;
-			refType = 2;
-		};
-		F851217A028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = exscale.help.jmax;
-			path = ../../packages/ispw/help/exscale.help.jmax;
 			refType = 2;
 		};
 		F851217B028BD7EA01664092 = {
@@ -4921,12 +5418,6 @@
 			path = ../../packages/ispw/help/prepend.help.jmax;
 			refType = 2;
 		};
-		F8512195028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "print~.help.jmax";
-			path = "../../packages/ispw/help/print~.help.jmax";
-			refType = 2;
-		};
 		F8512196028BD7EA01664092 = {
 			isa = PBXFileReference;
 			name = "pt~.help.jmax";
@@ -4937,12 +5428,6 @@
 			isa = PBXFileReference;
 			name = route.help.jmax;
 			path = ../../packages/ispw/help/route.help.jmax;
-			refType = 2;
-		};
-		F8512199028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = Rsend.help.jmax;
-			path = ../../packages/ispw/help/Rsend.help.jmax;
 			refType = 2;
 		};
 		F851219B028BD7EA01664092 = {
@@ -5057,12 +5542,6 @@
 			isa = PBXFileReference;
 			name = trigger.help.jmax;
 			path = ../../packages/ispw/help/trigger.help.jmax;
-			refType = 2;
-		};
-		F85121B2028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = "trigon~.help.jmax";
-			path = "../../packages/ispw/help/trigon~.help.jmax";
 			refType = 2;
 		};
 		F85121B3028BD7EA01664092 = {
@@ -5602,21 +6081,15 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F8512261028BDC6D01664092,
-				F8512262028BDC6D01664092,
 				F8512251028BDC6201664092,
 				F8512252028BDC6201664092,
 				F8512253028BDC6201664092,
-				F8512254028BDC6201664092,
 				F8512255028BDC6201664092,
 				F8512256028BDC6201664092,
-				F8512258028BDC6201664092,
-				F851225C028BDC6201664092,
-				F851225D028BDC6201664092,
 				F851225E028BDC6201664092,
 				F851225F028BDC6201664092,
 				F8512210028BDC3701664092,
 				F8512211028BDC3701664092,
-				F8512212028BDC3701664092,
 				F8512213028BDC3701664092,
 				F8512214028BDC3701664092,
 				F8512216028BDC3701664092,
@@ -5637,10 +6110,8 @@
 				F851222A028BDC3701664092,
 				F851222B028BDC3701664092,
 				F851222C028BDC3701664092,
-				F851222D028BDC3701664092,
 				F851222E028BDC3701664092,
 				F8512230028BDC3701664092,
-				F8512231028BDC3701664092,
 				F8512233028BDC3701664092,
 				F8512234028BDC3701664092,
 				F8512235028BDC3701664092,
@@ -5660,7 +6131,6 @@
 				F8512247028BDC3701664092,
 				F8512248028BDC3701664092,
 				F8512249028BDC3701664092,
-				F851224A028BDC3701664092,
 				F851224B028BDC3701664092,
 				F851224C028BDC3701664092,
 				F851224D028BDC3701664092,
@@ -5677,12 +6147,6 @@
 		};
 		F8512211028BDC3701664092 = {
 			fileRef = F8512179028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512212028BDC3701664092 = {
-			fileRef = F851217A028BD7EA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -5807,12 +6271,6 @@
 			settings = {
 			};
 		};
-		F851222D028BDC3701664092 = {
-			fileRef = F8512195028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F851222E028BDC3701664092 = {
 			fileRef = F8512196028BD7EA01664092;
 			isa = PBXBuildFile;
@@ -5821,12 +6279,6 @@
 		};
 		F8512230028BDC3701664092 = {
 			fileRef = F8512198028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512231028BDC3701664092 = {
-			fileRef = F8512199028BD7EA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -5945,12 +6397,6 @@
 			settings = {
 			};
 		};
-		F851224A028BDC3701664092 = {
-			fileRef = F85121B2028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F851224B028BDC3701664092 = {
 			fileRef = F85121B3028BD7EA01664092;
 			isa = PBXBuildFile;
@@ -5987,12 +6433,6 @@
 			settings = {
 			};
 		};
-		F8512254028BDC6201664092 = {
-			fileRef = F851216B028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8512255028BDC6201664092 = {
 			fileRef = F851216C028BD7EA01664092;
 			isa = PBXBuildFile;
@@ -6001,24 +6441,6 @@
 		};
 		F8512256028BDC6201664092 = {
 			fileRef = F851216D028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512258028BDC6201664092 = {
-			fileRef = F851216F028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851225C028BDC6201664092 = {
-			fileRef = F8512173028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851225D028BDC6201664092 = {
-			fileRef = F8512174028BD7EA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -6037,12 +6459,6 @@
 		};
 		F8512261028BDC6D01664092 = {
 			fileRef = F8512164028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512262028BDC6D01664092 = {
-			fileRef = F8512165028BD7EA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -6186,6 +6602,15 @@
 				F851227C028BDF6901664092,
 				F8EE4B4B031CE65E01664092,
 				F8EE4B4C031CE66001664092,
+				F5FB89F7035E0D8F016640F1,
+				F5FB89F8035E0D8F016640F1,
+				F5FB89F9035E0D8F016640F1,
+				F5FB89FA035E0D8F016640F1,
+				F5FB89FB035E0D8F016640F1,
+				F5FB89FC035E0D8F016640F1,
+				F5FB89FD035E0D8F016640F1,
+				F5FB89FE035E0D8F016640F1,
+				F5FB89FF035E0D8F016640F1,
 				F8EE4B4D031CE66401664092,
 				F8EE4B4E031CE66801664092,
 				F8EE4B4F031CE66B01664092,
@@ -6338,16 +6763,28 @@
 		F8512290028BDFF301664092 = {
 			children = (
 				F85122A7028BE08901664092,
-				F85122A8028BE08901664092,
 				F85122A9028BE08901664092,
-				F85122AA028BE08901664092,
 				F85122AB028BE08901664092,
-				F85122AC028BE08901664092,
 				F85122AD028BE08901664092,
 				F8EE4BB8031CEE8E01664092,
 				F8EE4BB9031CEE8E01664092,
 				F8EE4BBA031CEE8E01664092,
 				F8EE4BBB031CEE8E01664092,
+				F5FB8978035E0B3F016640F1,
+				F5FB8979035E0B3F016640F1,
+				F5FB897A035E0B3F016640F1,
+				F5FB897B035E0B3F016640F1,
+				F5FB897C035E0B3F016640F1,
+				F5FB897D035E0B3F016640F1,
+				F5FB897E035E0B3F016640F1,
+				F5FB897F035E0B3F016640F1,
+				F5FB8980035E0B3F016640F1,
+				F5FB8981035E0B3F016640F1,
+				F5FB8982035E0B3F016640F1,
+				F5FB8983035E0B3F016640F1,
+				F5FB8984035E0B3F016640F1,
+				F5FB8985035E0B3F016640F1,
+				F5FB8986035E0B3F016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -6537,34 +6974,16 @@
 			path = ../../packages/control/help/control.summary.jmax;
 			refType = 2;
 		};
-		F85122A8028BE08901664092 = {
-			isa = PBXFileReference;
-			name = count.help.jmax;
-			path = ../../packages/control/help/count.help.jmax;
-			refType = 2;
-		};
 		F85122A9028BE08901664092 = {
 			isa = PBXFileReference;
 			name = demux.help.jmax;
 			path = ../../packages/control/help/demux.help.jmax;
 			refType = 2;
 		};
-		F85122AA028BE08901664092 = {
-			isa = PBXFileReference;
-			name = for.help.jmax;
-			path = ../../packages/control/help/for.help.jmax;
-			refType = 2;
-		};
 		F85122AB028BE08901664092 = {
 			isa = PBXFileReference;
 			name = oneshot.help.jmax;
 			path = ../../packages/control/help/oneshot.help.jmax;
-			refType = 2;
-		};
-		F85122AC028BE08901664092 = {
-			isa = PBXFileReference;
-			name = range.help.jmax;
-			path = ../../packages/control/help/range.help.jmax;
 			refType = 2;
 		};
 		F85122AD028BE08901664092 = {
@@ -6589,16 +7008,28 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F85122B2028BE0F601664092,
-				F85122B3028BE0F601664092,
 				F85122B4028BE0F601664092,
-				F85122B5028BE0F601664092,
 				F85122B6028BE0F601664092,
-				F85122B7028BE0F601664092,
 				F85122B8028BE0F601664092,
 				F8EE4BC0031CEEA401664092,
 				F8EE4BC1031CEEA701664092,
+				F5FB8998035E0BA4016640F1,
+				F5FB8999035E0BA4016640F1,
+				F5FB899A035E0BA4016640F1,
+				F5FB899B035E0BA4016640F1,
+				F5FB899C035E0BA4016640F1,
+				F5FB899D035E0BA4016640F1,
+				F5FB899E035E0BA4016640F1,
+				F5FB899F035E0BA4016640F1,
+				F5FB89A0035E0BA4016640F1,
+				F5FB89A1035E0BA4016640F1,
+				F5FB89A2035E0BA4016640F1,
+				F5FB89A3035E0BA4016640F1,
+				F5FB89A4035E0BA4016640F1,
+				F5FB89A5035E0BA4016640F1,
 				F8EE4BC2031CEEAB01664092,
 				F8EE4BC3031CEEAD01664092,
+				F5FB8997035E0B99016640F1,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6609,32 +7040,14 @@
 			settings = {
 			};
 		};
-		F85122B3028BE0F601664092 = {
-			fileRef = F85122A8028BE08901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85122B4028BE0F601664092 = {
 			fileRef = F85122A9028BE08901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		F85122B5028BE0F601664092 = {
-			fileRef = F85122AA028BE08901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85122B6028BE0F601664092 = {
 			fileRef = F85122AB028BE08901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85122B7028BE0F601664092 = {
-			fileRef = F85122AC028BE08901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -6650,7 +7063,6 @@
 			dstPath = share/jmax/packages/control;
 			dstSubfolderSpec = 7;
 			files = (
-				F5632C2403499A2301664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7451,8 +7863,6 @@
 			children = (
 				F851232D028BE55901664092,
 				F851232E028BE55901664092,
-				F851232F028BE55901664092,
-				F8512330028BE55901664092,
 				F8512331028BE55901664092,
 				F8512332028BE55901664092,
 				F8512333028BE55901664092,
@@ -7460,7 +7870,7 @@
 				F8512336028BE55901664092,
 				F8512337028BE55901664092,
 				F8EE4B8F031CEC4D01664092,
-				F8EE4B90031CEC4D01664092,
+				F5FB89CD035E0CE3016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -7506,18 +7916,6 @@
 			isa = PBXFileReference;
 			name = ctl.help.jmax;
 			path = ../../packages/midi/help/ctl.help.jmax;
-			refType = 2;
-		};
-		F851232F028BE55901664092 = {
-			isa = PBXFileReference;
-			name = ctrl.help.jmax;
-			path = ../../packages/midi/help/ctrl.help.jmax;
-			refType = 2;
-		};
-		F8512330028BE55901664092 = {
-			isa = PBXFileReference;
-			name = midi.gif;
-			path = ../../packages/midi/help/midi.gif;
 			refType = 2;
 		};
 		F8512331028BE55901664092 = {
@@ -7573,16 +7971,14 @@
 			files = (
 				F851233C028BE55901664092,
 				F851233D028BE55901664092,
-				F851233E028BE55901664092,
-				F851233F028BE55901664092,
 				F8512340028BE55901664092,
 				F8512341028BE55901664092,
 				F8512342028BE55901664092,
 				F8512343028BE55901664092,
 				F8512345028BE55901664092,
+				F5FB89CF035E0CF5016640F1,
 				F8512346028BE55901664092,
 				F8EE4B93031CEC6501664092,
-				F8EE4B94031CEC6A01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7595,18 +7991,6 @@
 		};
 		F851233D028BE55901664092 = {
 			fileRef = F851232E028BE55901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851233E028BE55901664092 = {
-			fileRef = F851232F028BE55901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851233F028BE55901664092 = {
-			fileRef = F8512330028BE55901664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -7722,6 +8106,13 @@
 				F8EE4B76031CE72A01664092,
 				F8EE4B77031CE72A01664092,
 				F8EE4B78031CE72A01664092,
+				F5FB89D0035E0D1A016640F1,
+				F5FB89D1035E0D1A016640F1,
+				F5FB89D2035E0D1A016640F1,
+				F5FB89D3035E0D1A016640F1,
+				F5FB89D4035E0D1A016640F1,
+				F5FB89D5035E0D1A016640F1,
+				F5FB89D6035E0D1A016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -7898,6 +8289,13 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F8512364028BE68701664092,
+				F5FB89DE035E0D2B016640F1,
+				F5FB89DF035E0D2B016640F1,
+				F5FB89E0035E0D2B016640F1,
+				F5FB89E1035E0D2B016640F1,
+				F5FB89E2035E0D2B016640F1,
+				F5FB89E3035E0D2B016640F1,
+				F5FB89E4035E0D2B016640F1,
 				F8512365028BE68701664092,
 				F8512366028BE68701664092,
 				F8EE4B7D031CE74D01664092,
@@ -8185,10 +8583,6 @@
 		};
 		F8512382028BE77C01664092 = {
 			children = (
-				F851250A028BEC7D01664092,
-				F851250B028BEC7D01664092,
-				F851250C028BEC7D01664092,
-				F851250D028BEC7D01664092,
 				F851250E028BEC7D01664092,
 				F851250F028BEC7D01664092,
 			);
@@ -10930,30 +11324,6 @@
 			path = ../../packages/sequence/images/zoomer.gif;
 			refType = 2;
 		};
-		F851250A028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = seqfind.help.jmax;
-			path = ../../packages/sequence/help/seqfind.help.jmax;
-			refType = 2;
-		};
-		F851250B028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = seqplay.help.jmax;
-			path = ../../packages/sequence/help/seqplay.help.jmax;
-			refType = 2;
-		};
-		F851250C028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = seqrec.help.jmax;
-			path = ../../packages/sequence/help/seqrec.help.jmax;
-			refType = 2;
-		};
-		F851250D028BEC7D01664092 = {
-			isa = PBXFileReference;
-			name = seqstep.help.jmax;
-			path = ../../packages/sequence/help/seqstep.help.jmax;
-			refType = 2;
-		};
 		F851250E028BEC7D01664092 = {
 			isa = PBXFileReference;
 			name = sequence.help.jmax;
@@ -11168,39 +11538,11 @@
 			dstPath = share/jmax/packages/sequence/help;
 			dstSubfolderSpec = 7;
 			files = (
-				F851252F028BED1101664092,
-				F8512530028BED1101664092,
-				F8512531028BED1101664092,
-				F8512532028BED1101664092,
 				F8512533028BED1101664092,
 				F8512534028BED1101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F851252F028BED1101664092 = {
-			fileRef = F851250A028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512530028BED1101664092 = {
-			fileRef = F851250B028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512531028BED1101664092 = {
-			fileRef = F851250C028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512532028BED1101664092 = {
-			fileRef = F851250D028BEC7D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8512533028BED1101664092 = {
 			fileRef = F851250E028BEC7D01664092;
@@ -17775,14 +18117,17 @@
 			children = (
 				F8B8E5980286822501664092,
 				F8B8E5990286822501664092,
-				F8B8E59A0286822501664092,
-				F8B8E59B0286822501664092,
 				F8B8E59C0286822501664092,
 				F8B8E59D0286822501664092,
 				F8B8E59E0286822501664092,
-				F8B8E59F0286822501664092,
 				F8B8E5A00286822501664092,
 				F8B8E5A10286822501664092,
+				F5FB89B2035E0C20016640F1,
+				F5FB89B3035E0C20016640F1,
+				F5FB89B4035E0C20016640F1,
+				F5FB89B5035E0C20016640F1,
+				F5FB89B6035E0C20016640F1,
+				F5FB89B7035E0C20016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -19191,6 +19536,9 @@
 				F8A4E73902D3775D01664092,
 				F871C22802EDBE2D01664092,
 				F8EE4B9B031CEDC201664092,
+				F5FB89C4035E0C68016640F1,
+				F5FB89C5035E0C68016640F1,
+				F5FB89C6035E0C68016640F1,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -19257,18 +19605,6 @@
 			path = ../../packages/data/help/fvec.help.jmax;
 			refType = 2;
 		};
-		F8B8E59A0286822501664092 = {
-			isa = PBXFileReference;
-			name = getelem.help.jmax;
-			path = ../../packages/data/help/getelem.help.jmax;
-			refType = 2;
-		};
-		F8B8E59B0286822501664092 = {
-			isa = PBXFileReference;
-			name = getlist.help.jmax;
-			path = ../../packages/data/help/getlist.help.jmax;
-			refType = 2;
-		};
 		F8B8E59C0286822501664092 = {
 			isa = PBXFileReference;
 			name = getsize.help.jmax;
@@ -19285,12 +19621,6 @@
 			isa = PBXFileReference;
 			name = mat.help.jmax;
 			path = ../../packages/data/help/mat.help.jmax;
-			refType = 2;
-		};
-		F8B8E59F0286822501664092 = {
-			isa = PBXFileReference;
-			name = setelem.help.jmax;
-			path = ../../packages/data/help/setelem.help.jmax;
 			refType = 2;
 		};
 		F8B8E5A00286822501664092 = {
@@ -20361,13 +20691,16 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F8DC5ED5028685AF01664092,
+				F5FB89BE035E0C3A016640F1,
+				F5FB89BF035E0C3A016640F1,
+				F5FB89C0035E0C3A016640F1,
+				F5FB89C1035E0C3A016640F1,
+				F5FB89C2035E0C3A016640F1,
+				F5FB89C3035E0C3A016640F1,
 				F8DC5ED6028685AF01664092,
-				F8DC5ED7028685AF01664092,
-				F8DC5ED8028685AF01664092,
 				F8DC5ED9028685AF01664092,
 				F8DC5EDA028685AF01664092,
 				F8DC5EDB028685AF01664092,
-				F8DC5EDC028685AF01664092,
 				F8DC5EDD028685AF01664092,
 				F8DC5EDE028685AF01664092,
 			);
@@ -20386,18 +20719,6 @@
 			settings = {
 			};
 		};
-		F8DC5ED7028685AF01664092 = {
-			fileRef = F8B8E59A0286822501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5ED8028685AF01664092 = {
-			fileRef = F8B8E59B0286822501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8DC5ED9028685AF01664092 = {
 			fileRef = F8B8E59C0286822501664092;
 			isa = PBXBuildFile;
@@ -20412,12 +20733,6 @@
 		};
 		F8DC5EDB028685AF01664092 = {
 			fileRef = F8B8E59E0286822501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5EDC028685AF01664092 = {
-			fileRef = F8B8E59F0286822501664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -20475,6 +20790,9 @@
 				F8DC5EE9028685AF01664092,
 				F8DC5EEA028685AF01664092,
 				F8DC5EEB028685AF01664092,
+				F5FB89CA035E0C91016640F1,
+				F5FB89CB035E0C91016640F1,
+				F5FB89CC035E0C91016640F1,
 				F8DC5EEC028685AF01664092,
 				F8DC5EEE028685AF01664092,
 				F8DC5EEF028685AF01664092,
@@ -21347,20 +21665,8 @@
 			path = ../../packages/midi/help/ftom.help.jmax;
 			refType = 2;
 		};
-		F8EE4B90031CEC4D01664092 = {
-			isa = PBXFileReference;
-			name = mtof.help.jmax;
-			path = ../../packages/midi/help/mtof.help.jmax;
-			refType = 2;
-		};
 		F8EE4B93031CEC6501664092 = {
 			fileRef = F8EE4B8F031CEC4D01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8EE4B94031CEC6A01664092 = {
-			fileRef = F8EE4B90031CEC4D01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

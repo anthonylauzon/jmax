@@ -101,8 +101,6 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
   
   pkt->timeStamp = ftstime + this->manager->delta;
 
-  /*post("1 sec: %u, freq: %f\n", (unsigned int)AudioConvertNanosToHostTime(1000000000), AudioGetHostClockFrequency());*/
-  post("host: %u (%u), fts: %u (%u), tag: %u\n", (unsigned int)hosttime, (unsigned int)(hosttime - lasthost), (unsigned int)ftstime, (unsigned int)(ftstime - lastfts), (unsigned int)pkt->timeStamp);
   lasthost = hosttime;
   lastfts = ftstime;
   

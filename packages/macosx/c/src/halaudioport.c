@@ -155,6 +155,8 @@ static void halaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, int a
       return;
     }
 
+    pause();
+    
   /* halt scheduler main loop */
   FD_ZERO( &rfds);
   FD_SET( 0, &rfds);
