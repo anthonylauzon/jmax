@@ -78,7 +78,7 @@ cvec_set_with_onset_from_atoms(cvec_t *vec, int offset, int ac, const fts_atom_t
     {
       if(fts_is_number(at + i))
 	{
-	  values[i + offset].re = fts_get_number_float(at + i);
+	  values[i + offset].re = (float)fts_get_number_float(at + i);
 	  values[i + offset].im = 0.0;
 	  
 	}
@@ -114,7 +114,7 @@ cvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       complex c;
       
-      c.re = fts_get_number_float(at);
+      c.re = (float)fts_get_number_float(at);
       c.im = 0.0;
       
       cvec_set_const(this, c);
@@ -282,7 +282,7 @@ static void
 cvec_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
-  float r = fts_get_number_float(at);
+  float r = (float)fts_get_number_float(at);
   int size = cvec_get_size(this);
   complex *p = cvec_get_ptr(this);
   int i;
@@ -307,7 +307,7 @@ cvec_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       float re = p[i].re;
       float im = p[i].im;
       
-      p[i].re = sqrt(re * re + im * im);
+      p[i].re = (float)sqrt(re * re + im * im);
       p[i].im = 0.0;
     }
 }
@@ -325,8 +325,8 @@ cvec_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       double re = p[i].re;
       double im = p[i].im;
       
-      p[i].re = 0.5 * log(re * re + im * im);
-      p[i].im = atan2(im, re);
+      p[i].re = (float)(0.5 * log(re * re + im * im));
+      p[i].im = (float)atan2(im, re);
     }
 }
 
@@ -343,8 +343,8 @@ cvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       double m = exp(p[i].re);
       double phi = p[i].im;
       
-      p[i].re = m * cos(phi);
-      p[i].im = m * sin(phi);
+      p[i].re = (float)(m * cos(phi));
+      p[i].im = (float)(m * sin(phi));
     }
 }
 
