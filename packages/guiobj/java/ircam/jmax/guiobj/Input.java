@@ -41,7 +41,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 public class Input extends GraphicObject implements FtsIntValueListener
 {
   private static transient final int FIXED_WIDTH = 60;
-  private static transient final int FIXED_HEIGHT = 30;
+  private static transient final int FIXED_HEIGHT = 28;
 
   private transient boolean isOn = false;
   private int iconWidth;
