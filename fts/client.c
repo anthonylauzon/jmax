@@ -817,12 +817,11 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
 }
 
 fts_patcher_t *
-fts_client_load_patcher(fts_symbol_t file_name, int id)
+fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 {
   fts_patcher_t *patcher = 0;
   int type = 1;
   fts_atom_t a[3];
-  int client_id;
   client_t *client;
   char *dir_name;
   fts_object_t *parent = (fts_object_t *)fts_get_root_patcher();

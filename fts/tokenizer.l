@@ -109,8 +109,8 @@ quoted_symbol	\"[^\"]+\"
 {smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
 {colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
 {equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
-{quoted_symbol}	{ SET_SYMBOL( yytext); return 1; }
-{symbol}	{ SET_SYMBOL( yytext); return 1; }
+{quoted_symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
+{symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
 
 %%
 
