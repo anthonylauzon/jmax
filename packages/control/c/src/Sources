@@ -33,3 +33,4 @@ oneshot.c \
 demux.c \
 for.c \
 range.c \
+keys.c\
