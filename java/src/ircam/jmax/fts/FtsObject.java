@@ -368,6 +368,7 @@ public class FtsObject
   String argsDescription = null;
 
   // Property and message handlers (to be converted to Beans style)
+  // Should go in a structure create by need
 
   /** The property Handler Table for this object */
 
@@ -386,6 +387,8 @@ public class FtsObject
   Object representation;
 
   /** Support for saving. Used to count indexes for the objs tcl array.*/
+  // @@@ ??? with the new file structure, idx are patcher local,
+  // so probabily this can go away.
 
   int idx;
 
@@ -394,8 +397,6 @@ public class FtsObject
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
   /*****************************************************************************/
-
-
 
   /**
    * The empty constructor.
@@ -429,6 +430,8 @@ public class FtsObject
 
     patcher.addObject(this);
 
+    // @@@ This go in the template source code
+
     if (FtsTemplateTable.exists(className))
       {
 	// A template is a tcl function that is executed to 
@@ -458,7 +461,7 @@ public class FtsObject
 	oargs.addElement(new Integer(0));
 	oargs.addElement(new Integer(0));
 
-	MaxApplication.getFtsServer().newObject(parent, this, "patcher", oargs);
+	MaxApplication.getFtsServer().newObject(parent, this, oargs);
 
 	// load the patcher content from the file
 
@@ -505,6 +508,8 @@ public class FtsObject
     else if (className.endsWith(".pat") || className.endsWith(".abs") ||
 	FtsAbstractionTable.exists(className))
       {
+	// @@@ This go to the abstraction object code
+
 	// An abstraction is translated in its expansion (code from the FtsDotPat parser)
 	// But, it is stored back as an object
 
@@ -556,7 +561,7 @@ public class FtsObject
 	oargs.addElement(new Integer(0));
 	oargs.addElement(new Integer(0));
 
-	MaxApplication.getFtsServer().newObject(parent, this, "patcher", oargs);
+	MaxApplication.getFtsServer().newObject(parent, this, oargs);
 
 	// load the patcher content from the file
 
@@ -584,33 +589,41 @@ public class FtsObject
       }
     else if (className.equals("patcher"))
       {
+	// This go to the FtsPatcherObject class
 	subPatcher = new FtsPatcher(this, 
 				    (String) args.elementAt(0),
 				    ((Integer)args.elementAt(1)).intValue(),
 				    ((Integer)args.elementAt(2)).intValue());
 
-	MaxApplication.getFtsServer().newObject(parent, this, className, args);// create the fts object
+	MaxApplication.getFtsServer().newObject(parent, this,  args);// create the fts object
       }
     else if (className.equals("inlet"))
       {
+	// This go to the FtsInletObject class
+
 	if (args.size() >= 1)
 	  patcher.addInlet(this, ((Integer)args.elementAt(0)).intValue());
 	else
 	  patcher.addInlet(this); // support for .pat
 
-	MaxApplication.getFtsServer().newObject(parent, this, className, args);// create the fts object
+	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
       }
     else if (className.equals("outlet"))
       {
+	// This go to the FtsOutletObject class
+
 	if (args.size() >= 1)
 	  patcher.addOutlet(this, ((Integer)args.elementAt(0)).intValue());
 	else
 	  patcher.addOutlet(this); // support for .pat
 
-	MaxApplication.getFtsServer().newObject(parent, this, className, args);// create the fts object
+	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
       }
     else
-      MaxApplication.getFtsServer().newObject(parent, this, className, args);// create the fts object
+      {
+	// This go to the FtsStandardObject and Declaration class
+	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
+      }
 
     if (parent.isOpen())
       {
@@ -628,6 +641,7 @@ public class FtsObject
    * The root object is the super patcher of everything;
    * cannot be edited, can include only patchers.
    */
+  // Should go to the patcher object
 
   static FtsObject makeRootObject(FtsServer server)
   {
@@ -638,6 +652,7 @@ public class FtsObject
     obj = new FtsObject();
 
     obj.className = "patcher";
+    obj.ftsClassName = "patcher";
 
     obj.args = new Vector();
 
@@ -650,7 +665,7 @@ public class FtsObject
 
     // create it in FTS
 
-    server.newObject(null, obj, "patcher", obj.args);
+    server.newObject(null, obj, obj.args);
 
     // set the subpatcher (the root patcher)
 
@@ -713,6 +728,13 @@ public class FtsObject
   public String getClassName()
   {
     return className;
+  }
+
+  /** Get the real object class Name */
+  
+  String getFtsClassName()
+  {
+    return ftsClassName;
   }
 
   /** Get the complete textual description of the object. */

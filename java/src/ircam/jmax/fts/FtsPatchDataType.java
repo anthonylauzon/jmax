@@ -10,7 +10,7 @@ import ircam.jmax.mda.*;
 
 public class FtsPatchDataType extends MaxDataType
 {
-  FtsPatchDataType()
+  public FtsPatchDataType()
   {
     super("patch");
 

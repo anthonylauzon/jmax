@@ -140,9 +140,9 @@ public class FtsServer
   }
 
 
-  /** Send a "new object" messages to FTS.*/
+  /** Send a "new object" messages to FTS, extracting the arguments and class name from the object*/
 
-  synchronized void newObject(FtsObject patcher, FtsObject obj, String className, Vector args)
+  synchronized void newObject(FtsObject patcher, FtsObject obj, Vector args)
   {
     try
       {
@@ -150,7 +150,7 @@ public class FtsServer
 	connection.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	connection.sendObject(patcher);
 	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
-	connection.sendString(className);
+	connection.sendString(obj.getFtsClassName());
 
 
 	if (args != null)

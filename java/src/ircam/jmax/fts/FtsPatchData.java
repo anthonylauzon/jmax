@@ -1,5 +1,6 @@
 package ircam.jmax.fts; 
 
+import java.io.*;
 import ircam.jmax.mda.*;
 
 /** A FtsPatchData is the Max Data instance containing an FTS Patch,
@@ -39,7 +40,7 @@ class FtsPatchData extends MaxTclData
     return patcher;
   }
   
-  protected Object setContent(Object content)
+  protected void  setContent(Object content)
   {
     patcher = (FtsObject) content;
   }
@@ -48,7 +49,7 @@ class FtsPatchData extends MaxTclData
 
   public void saveContentAsTcl(PrintWriter pw)
   {
-    patcher.saveAsTcl(pw);
+    // patcher.saveAsTcl(pw);
   }
 }
 

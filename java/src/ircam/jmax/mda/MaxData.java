@@ -244,5 +244,5 @@ abstract public class MaxData
    * by 
    */
 
-  abstract protected Object setContent(Object content);
+  abstract protected void setContent(Object content);
 }

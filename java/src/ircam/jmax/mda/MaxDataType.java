@@ -3,12 +3,12 @@ package ircam.jmax.mda;
 import java.util.*;
 
 /** This class represent a type of editable data, with 
- * all its interesting properties; interesting properties
- * are those properties that have system level interest :->
+ * all its interesting properties.
  *
  * This class maintain a list of all types (its instances) and
  * provide a function to get a type by name, and an enumerator
- * of all the types.
+ * of all the types; a function is given to install a type in 
+ * the global table.
  *
  * Types cannot be deleted once loaded.
  * 
@@ -46,6 +46,11 @@ abstract public class MaxDataType
     return typeList.elements();
   }
 
+  static public void installDataType(MaxDataType type)
+  {
+    typeList.addElement(type);
+  }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                Instance variables                                         */
@@ -76,8 +81,6 @@ abstract public class MaxDataType
   protected MaxDataType(String name)
   {
     this.name = name;
-
-    typeList.addElement(this);
   }
 
   /*****************************************************************************/

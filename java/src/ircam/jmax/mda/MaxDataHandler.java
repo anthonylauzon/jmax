@@ -9,7 +9,7 @@ import java.util.*;
  *  to directly load the instance.
  */
 
-abstract class MaxDataHandler
+abstract public class MaxDataHandler
 {
   /** The data handler able to load/save instances of the type */
 
@@ -35,7 +35,7 @@ abstract class MaxDataHandler
 
   /** Load an instance from a given data source) */
 
-  public static MaxData loadDataInstance(MaxDataSource source)
+  public static MaxData loadDataInstance(MaxDataSource source) throws MaxDataException
   {
     MaxData newInstance;
     
@@ -43,7 +43,7 @@ abstract class MaxDataHandler
       {
 	MaxDataHandler dataHandler;
 
-	dataHandler = (MaxDataHandler) elementAt(i);
+	dataHandler = (MaxDataHandler) allHandlers.elementAt(i);
 
 	if (dataHandler.canLoadFrom(source))
 	  {
@@ -68,7 +68,7 @@ abstract class MaxDataHandler
    * before using them.
    */
 
-  static void installDataHandler(MaxDataHandler handler)
+  static public void installDataHandler(MaxDataHandler handler)
   {
     allHandlers.addElement(handler);
   }

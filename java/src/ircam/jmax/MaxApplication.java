@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
@@ -792,6 +793,20 @@ public class MaxApplication extends Object {
     // The MDA package; still not used, but soon !!!
 
     ircam.jmax.mda.tcl.TclMdaPackage.installPackage(itsInterp);
+
+    // Define types and data handlers for the application layer
+
+    // The standard patch document
+
+    MaxDataType.installDataType(new FtsPatchDataType());
+
+    // the handler of .tpa files 
+
+    MaxDataHandler.installDataHandler(new MaxTclFileDataHandler(".tpa"));
+
+    // the handler of .pat files
+
+    MaxDataHandler.installDataHandler(new FtsDotPatFileDataHandler());
 
     try
       {

@@ -50,15 +50,15 @@ public class ErmesObject implements FtsPropertyHandler {
   }
 	
   void SaveTo(OutputStream stream) {
-    String strArgs = new String();
+    String strArgs;
     Enumeration e = itsFtsObject.getArguments().elements();
 
-    if (this instanceof ircam.jmax.editors.ermes.ErmesObjExternal)   // if it is a ErmesObjExternal add the className
-      strArgs += itsFtsObject.getClassName();
+    // Modified by MDC: use directly the getDescription,
+    // that return the original string the user typed
+    // for the object.
 
-    for (; e.hasMoreElements();) 
-      strArgs += e.nextElement().toString() + " ";	// create a string with the arguments
-    
+    strArgs = itsFtsObject.getDescription();
+
     String temp = "newobj " + getClass().getName() + " " + String.valueOf(itsX)
       + " " + String.valueOf(itsY) + " \"" + strArgs.trim() + "\"";
     

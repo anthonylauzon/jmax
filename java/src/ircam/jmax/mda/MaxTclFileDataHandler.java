@@ -13,11 +13,11 @@ import ircam.jmax.*;
  * that extension will be automatically reconized.
  */
 
-abstract public class MaxTclFileDataHandler extends MaxFileDataHandler
+public class MaxTclFileDataHandler extends MaxFileDataHandler
 {
   String extension;
   
-  protected MaxTclFileDataHandler(String extension)
+  public MaxTclFileDataHandler(String extension)
   {
     super();
 
