@@ -127,9 +127,16 @@ fts_project_new(fts_symbol_t name)
   return (fts_project_t *) fts_eval_object_description(fts_get_root_patcher(), 2, a);
 }
 
-/* this is a copy of fts_package_load_from_file() adapted for projects */
+/* fts_project_open is a copy of fts_package_load_from_file() adapted 
+ * for projects.
+ */
+/*  [RS] force_work_directory, if not NULL, allows to change the directory
+ *  used to load abstractions and templates (and so on). 
+ *  If it is NULL, this directory is set to the directory where the .project
+ *  is located.
+ */
 fts_project_t* 
-fts_project_open(const char* filename)
+fts_project_open(const char* filename, const char *force_work_directory)
 {
   char path[MAXPATHLEN];
   char dir[MAXPATHLEN];
@@ -186,8 +193,14 @@ fts_project_open(const char* filename)
     project = (fts_project_t*) obj;
   }
 
-  fts_dirname(path, dir, MAXPATHLEN);
-  project->package.dir = fts_new_symbol_copy(dir);
+  if(force_work_directory == NULL) {
+      fts_dirname(path, dir, MAXPATHLEN);
+      project->package.dir = fts_new_symbol_copy(dir);
+  }
+  else {
+      project->package.dir = fts_new_symbol_copy(force_work_directory);
+  }
+
   project->package.name = fts_s_project;
   project->package.filename = fts_new_symbol_copy(path);
 
