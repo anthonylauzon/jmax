@@ -30,6 +30,14 @@ typedef struct
 } change_t;
 
 
+static void 
+change_get(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  change_t* self = (change_t*)o;
+  
+  fts_outlet_atom(o, 0, &self->state);
+}
+
 static void
 change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -70,10 +78,16 @@ change_anything(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_t a;
   
   /* special case if we receive symbol set at inlet 1*/
-  if ((1 == winlet)
-      && (fts_s_set == s))
+  if (1 == winlet)
   {
-    change_set(o, winlet, s, ac, at);
+    if (fts_s_set == s)
+    {
+      change_set(o, winlet, s, ac, at);
+    }
+    if (fts_s_get == s)
+    {
+      change_get(o, winlet, s, ac, at);
+    }
   }
   else
   {
@@ -173,6 +187,9 @@ change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   change_t *self = (change_t *)o;
 
+  /* force the 2nd inlet */
+  fts_object_set_inlets_number(o, 2);
+
   fts_set_void(&self->state);
 
   if(ac > 0)
@@ -193,8 +210,10 @@ change_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(change_t), change_init, change_delete);
 
   fts_class_input_handler(cl, change_anything);
-  fts_class_inlet_atom(cl, 1, change_set);
 
+  /* I hope we could do it in a near future */
+  fts_class_message_varargs(cl, fts_s_set, change_set);
+  fts_class_message_varargs(cl, fts_s_get, change_get);
   fts_class_outlet_atom(cl, 0);
 }
 
