@@ -1241,6 +1241,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
 	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)
 	CreateFtsGraphics(((ErmesObjExternal)aErmesObject).itsSubWindow); //recursive call
+      if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjPatcher &&
+	  ((ErmesObjPatcher)aErmesObject).itsSubWindow != null)
+	CreateFtsGraphics(((ErmesObjPatcher)aErmesObject).itsSubWindow); //recursive call
     }
   }
 }

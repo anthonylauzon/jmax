@@ -175,6 +175,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	ErmesSketchPad.RequestOffScreen(itsSketchPad);
       }
       else{	//this 'else' shouldn't be reached...
+	if(itsArgs.equals("")) return false;
 	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
 	MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
 	GetSketchWindow().AddToSubWindowList(itsSubWindow);
