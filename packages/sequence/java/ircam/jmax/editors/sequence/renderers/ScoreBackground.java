@@ -255,8 +255,7 @@ public void render( Graphics g, int order)
 		toRepaintBack = false;
 	} 
 	
-	if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
-		System.err.println("something wrong: incomplete Image  ");
+	g.drawImage(itsImage, 0, 0, gc.getGraphicDestination());
 	
 	if( gc.getGridMode() == TrackEditor.TIME_GRID)
 		drawVerticalGrid(g);

@@ -35,103 +35,102 @@ import java.beans.*;
 
 import java.text.NumberFormat;
 /**
- * The background layer of a monodimensionalTrackeditor. It builds the background Image */
+* The background layer of a monodimensionalTrackeditor. It builds the background Image */
 public class BpfBackground implements Layer, ImageObserver{
   
   /** Constructor */
   public  BpfBackground( BpfGraphicContext theGc)
-  {
-      super();
-      gc = theGc;
+{
+    super();
+    gc = theGc;
+    
+    fm = gc.getGraphicDestination().getFontMetrics(BpfPanel.rulerFont);
+}
 
-      fm = gc.getGraphicDestination().getFontMetrics(BpfPanel.rulerFont);
+/**
+* Layer interface. Draw the background */
+public void render( Graphics g, int order)
+{
+  Dimension d = gc.getGraphicDestination().getSize();
+  
+  if (itsImage == null) 
+  {
+    itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+    drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
   }
-
-  /**
-   * Layer interface. Draw the background */
-  public void render( Graphics g, int order)
+  else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
   {
-    Dimension d = gc.getGraphicDestination().getSize();
+    itsImage.flush();
+    itsImage = null;
+    System.gc();
+    RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
     
-    if (itsImage == null) 
-      {
-	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-	drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
-      }
-    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
-      {
-	itsImage.flush();
-	itsImage = null;
-	System.gc();
-	RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
-	
-	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-	drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
-	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
-	toRepaintBack = false;
-      } 
-    
-    if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
-      System.err.println("something wrong: incomplete Image  ");
-    
-    drawRectangle(g, d.width, d.height);
-
-    //draw zero line if != from minimum
-    if(gc.getFtsObject().getMinimumValue() != 0.0)
+    itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+    drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
+    rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+    toRepaintBack = false;
+  } 
+  
+  g.drawImage(itsImage, 0, 0, gc.getGraphicDestination());
+  
+  drawRectangle(g, d.width, d.height);
+  
+  //draw zero line if != from minimum
+  if(gc.getFtsObject().getMinimumValue() != 0.0)
 	{
-	    int y0 = (gc.getAdapter()).getY((float)0.0); 
-	    int x0 = (gc.getAdapter()).getX((float)0.0); 
-
-	    g.setColor(Color.gray);
-	    g.drawLine(x0, y0, d.width, y0);
+    int y0 = (gc.getAdapter()).getY((float)0.0); 
+    int x0 = (gc.getAdapter()).getX((float)0.0); 
+    
+    g.setColor(Color.gray);
+    g.drawLine(x0, y0, d.width, y0);
 	}
-  }
+}
 
-  private void drawHorizontalLine(Graphics g, int w, int h)
-  {
-      g.setColor(BPF_COLOR);      
-      g.fillRect(0, 0, w, h);      
-  }
+private void drawHorizontalLine(Graphics g, int w, int h)
+{
+  g.setColor(BPF_COLOR);      
+  g.fillRect(0, 0, w, h);      
+}
 
-    private void drawRectangle(Graphics g, int w, int h)
-    {	   
+private void drawRectangle(Graphics g, int w, int h)
+{	   
 	int x0 = gc.getAdapter().getX(0);
-
+  
 	float maxTime = gc.getMaximumTime() - gc.getAdapter().getInvWidth(BpfAdapter.DX);
 	int xMax = gc.getAdapter().getX(maxTime);
-
+  
 	int yMin = gc.getAdapter().getY(gc.getFtsObject().getMinimumValue());
 	int yMax = gc.getAdapter().getY(gc.getFtsObject().getMaximumValue());
-
+  
 	g.setColor(Color.white);	
 	g.drawRect(x0, yMax, xMax-x0, yMin - yMax);
-    }
+}
 
-  /**
-   * Layer interface. */
-  public void render(Graphics g, Rectangle r, int order)
-  {
-    render(g, order);
-  }
+/**
+* Layer interface. */
+public void render(Graphics g, Rectangle r, int order)
+{
+  render(g, order);
+}
 
-  public ObjectRenderer getObjectRenderer()
-  {
-    return null; // no events in this layer!
-  }
-  
-    /* ImageObserver interface*/
-    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
-    {
+public ObjectRenderer getObjectRenderer()
+{
+  return null; // no events in this layer!
+}
+
+/* ImageObserver interface*/
+public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+{
 	return true;
-    }
+}
 
-  //--- Fields
-  BpfGraphicContext gc;
-  Image itsImage;
-  boolean toRepaintBack = false;
-  FontMetrics fm;
-  
-  public static final Color BPF_COLOR = new Color(230, 230, 230);
+//--- Fields
+BpfGraphicContext gc;
+Image itsImage;
+boolean toRepaintBack = false;
+FontMetrics fm;
+
+public static final Color BPF_COLOR = new Color(230, 230, 230);
 }
 
 
