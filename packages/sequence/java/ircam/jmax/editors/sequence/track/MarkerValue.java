@@ -96,6 +96,19 @@ public ValueInfo getValueInfo()
 	return info;
 }
 
+public boolean isMovable()
+{  
+  return (getProperty("tempo") == EventValue.UNKNOWN_PROPERTY);
+}
+
+public String getPropertyMessage(String property)
+{
+  if(property.equals("tempo"))
+    return "tempo_change";
+  else
+    return property;
+}
+
 static class MarkerValueInfo extends AbstractValueInfo {
 	/**
 	* Returns the name of this value object */

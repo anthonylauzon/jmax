@@ -27,51 +27,8 @@ static fts_symbol_t sym_meter_2_4 = NULL;
 static fts_symbol_t sym_meter_3_4 = NULL;
 static fts_symbol_t sym_meter_4_4 = NULL;
 
-/**************************************************************************************
-*
-*  marker track functions
-*
-*/
-
-static void
-marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo)
-{
-  if(new_tempo != 0.0 && old_tempo != 0.0)
-  {
-    track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
-    event_t *first_mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
-    event_t *mark_evt = first_mark_evt;
-    double begin = event_get_time(mark_evt);
-    double end = 2.0 * track_get_total_duration(track);
-    double t = -1.0;
-    event_t *first = NULL;
-    event_t *after = NULL;
-    double stretch = old_tempo/new_tempo;
-        
-    mark_evt = event_get_next(mark_evt);
-    while(mark_evt != NULL && t < 0.0)
-    {
-      scomark_t *marker = (scomark_t *)fts_get_object( event_get_value(mark_evt));
-      scomark_get_tempo(marker, &t);
-      mark_evt = event_get_next(mark_evt);
-    }
-            
-    if(mark_evt != NULL)
-      end = event_get_time(mark_evt);
-        
-    /* stretch scoob track */
-    track_segment_get(track, begin, end, &first, &after);
-    if(first != NULL)
-    {
-      track_segment_stretch(track, first, after, begin, end, stretch);
-      track_move_events_at_client(track, first, NULL);
-    }
-    
-    /* stretch marker track */
-    track_segment_stretch(marker_track, first_mark_evt, mark_evt, begin, end, stretch);  
-    track_move_events_at_client(marker_track, first_mark_evt, NULL);
-  }
-}
+static scomark_t *marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo);
+static void marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload);
 
 /**************************************************************************************
  *
@@ -166,21 +123,41 @@ scomark_meter_quotient_get_symbol(int meter_num, int meter_den)
 }
 
 void
-scomark_set_tempo(scomark_t *self, double tempo)
+scomark_set_tempo(scomark_t *self, double tempo, double *old_tempo)
 {
   if(tempo > 0.0)
   {
     fts_atom_t a;
-    double old_tempo = 0.0;
     track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
-    scomark_get_tempo(self, &old_tempo);
+    scomark_get_tempo(self, old_tempo);
     
+    if(*old_tempo == 0.0)
+      marker_track_get_previous_tempo(marker_track, self, old_tempo);
+      
     fts_set_float(&a, tempo);
     propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);  
-  
-    marker_track_tempo_changed(marker_track, self, old_tempo, tempo);
   }
 }
+
+void
+scomark_unset_tempo(scomark_t *self)
+{
+  double new_tempo = 0.0;
+  double old_tempo = 0.0;
+  scomark_t *prev;
+
+  track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
+  
+  scomark_get_tempo(self, &old_tempo);
+  if(old_tempo > 0.0)
+  {
+    prev = marker_track_get_previous_tempo(marker_track, self, &new_tempo);
+
+    if(new_tempo > 0.0)
+      marker_track_tempo_changed(marker_track, self, old_tempo, new_tempo, 1);
+  }
+}
+
 void
 scomark_get_tempo(scomark_t *self, double *tempo)
 {
@@ -347,7 +324,21 @@ static void
 _scomark_set_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
-  scomark_set_tempo(self, fts_get_number_float(at));
+  double old_tempo = 0.0;
+  scomark_set_tempo(self, fts_get_number_float(at), &old_tempo);
+}
+
+static void
+_scomark_set_tempo_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scomark_t *self = (scomark_t *)o;
+  double old_tempo = 0.0;
+  double tempo = fts_get_number_float(at);
+  track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));    
+  
+  scomark_set_tempo(self, tempo, &old_tempo);
+  
+  marker_track_tempo_changed(marker_track, self, old_tempo, tempo, 1);
 }
 
 static void
@@ -355,6 +346,9 @@ _scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   scomark_t *self = (scomark_t *)o;
   
+  if( fts_get_symbol(at) == seqsym_tempo)
+    scomark_unset_tempo(self);
+    
   propobj_remove_property(o, 0, NULL, ac, at);
 }
 
@@ -405,6 +399,34 @@ scomark_description_function(fts_object_t *o, fts_array_t *array)
   scomark_array_function(o, array);
 }
 
+void
+scomark_set_properties(scomark_t *self, int ac, const fts_atom_t *at)
+{
+  int i;
+  
+  switch(ac)
+  {
+    default:
+      for(i=1; i<ac-1; i+=2)
+      {  
+        if(fts_is_symbol(at + i))
+          propobj_set_property_by_name((propobj_t *)self, fts_get_symbol(at + i), at + i + 1);
+      }
+      
+    case 1:
+      if(fts_is_symbol(at))
+      {
+        fts_symbol_t type = fts_get_symbol(at);
+        
+        if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
+          self->type = type;
+      }
+      
+    case 0:
+      break;
+  }
+}
+
 static void
 scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -412,14 +434,9 @@ scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   propobj_init(o);  
   self->type = seqsym_marker;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t type = fts_get_symbol(at);
-    
-    if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
-      self->type = type;
-  }
+
+  if(ac > 0)
+    scomark_set_properties(self, ac, at);
 }
 
 static void
@@ -452,8 +469,7 @@ scomark_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, seqsym_get_property_list, _scomark_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, _scomark_append_properties);
-    
-  /*fts_class_message_void(cl, seqsym_type, _scomark_get_type);*/
+  fts_class_message_varargs(cl, fts_new_symbol("tempo_change"), _scomark_set_tempo_from_client);
 }
 
 void
@@ -469,6 +485,226 @@ scomark_config(void)
   sym_meter_4_4 = fts_new_symbol("4/4");
   
   scomark_class = fts_class_install(seqsym_scomark, scomark_instantiate);
+}
+
+/**************************************************************************************
+*
+*  marker track functions
+*
+*/
+
+static void
+marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload)
+{  
+  if(new_tempo != 0.0 && old_tempo != 0.0)
+  {
+    track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
+    event_t *first_mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+    event_t *mark_evt = first_mark_evt;
+    double begin = event_get_time(mark_evt);
+    double end = 2.0 * track_get_total_duration(track);
+    double t = -1.0;
+    event_t *first = NULL;
+    event_t *after = NULL;
+    double stretch = old_tempo/new_tempo;
+    
+    mark_evt = event_get_next(mark_evt);
+    while(mark_evt != NULL && t < 0.0)
+    {
+      scomark_t *marker = (scomark_t *)fts_get_object( event_get_value(mark_evt));
+      scomark_get_tempo(marker, &t);
+      mark_evt = event_get_next(mark_evt);
+    }
+    
+    if(mark_evt != NULL)
+      end = event_get_time(mark_evt);
+    
+    /* stretch scoob track */
+    track_segment_get(track, begin, end, &first, &after);
+    if(first != NULL)
+    {
+      track_segment_stretch(track, first, after, begin, end, stretch);
+      if(upload)
+        track_move_events_at_client(track, first, NULL);
+    }
+    
+    /* stretch marker track */
+    track_segment_stretch(marker_track, first_mark_evt, mark_evt, begin, end, stretch);  
+    if(upload)
+      track_move_events_at_client(marker_track, first_mark_evt, NULL);
+  }
+}
+
+/***************************************************************************
+*  unset tempo on selection of scomarks: stretch track to previous tempo if any 
+*****************************/
+static scomark_t *
+marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo)
+{
+  event_t *mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+  event_t *prev = event_get_prev(mark_evt);
+  scomark_t *marker;
+  
+  while(prev != NULL && *tempo <= 0.0)
+  {
+    marker = (scomark_t *)fts_get_object( event_get_value(prev));
+    scomark_get_tempo(marker, tempo);
+    prev = event_get_prev(prev);
+  }
+  
+  if(prev != NULL)
+    return marker;
+  else
+    return NULL;
+}
+
+void
+marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_atom_t *at)
+{
+  int i;
+  event_t *first = NULL;
+  event_t *last = NULL;
+  event_t *evt = NULL;
+  double last_time, first_time, evt_time;
+  double new_tempo = 0.0;
+  
+  if(ac == 1)
+  {
+    scomark_t *marker;
+    double old_tempo = 0.0;
+    first = (event_t *)fts_get_object(at);
+    marker = (scomark_t *)fts_get_object( event_get_value(first));
+    
+    scomark_get_tempo(marker, &old_tempo);
+    if(old_tempo > 0.0)
+    {
+      marker_track_get_previous_tempo(marker_track, marker, &new_tempo);
+      if(new_tempo > 0.0)
+        marker_track_tempo_changed(marker_track, marker, old_tempo, new_tempo, 1);
+    }
+  }
+  else if(ac > 1)
+  {
+    int upload = 0;
+    /* search first and last object in selection */
+    first = (event_t *)fts_get_object(at);
+    last = first;
+    last_time = first_time = event_get_time(last);
+    for(i=1; i<ac; i++)
+    {
+      evt = ((event_t *)fts_get_object(at + i));
+      evt_time = event_get_time(evt);
+      if(evt_time > last_time) 
+      {
+        last = evt;
+        last_time = evt_time;
+      }
+      else
+        if(evt_time < first_time)
+        {
+          first = evt;
+          first_time = evt_time;
+        }
+    }
+    /* find previous tempo in track: that will be the new tempo in selection */
+    marker_track_get_previous_tempo(marker_track, (scomark_t *)fts_get_object( event_get_value(first)), &new_tempo);
+    
+    /* change tempo to new_tempo in selection */
+    if(new_tempo > 0.0)
+    {
+      scomark_t *marker;
+      event_t *prev = NULL;
+      track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
+      
+      prev = last;
+      while( prev != NULL && prev!=first)
+      {
+        double old_tempo = 0.0;
+        marker = (scomark_t *)fts_get_object( event_get_value(prev));
+        scomark_get_tempo(marker, &old_tempo);
+        if( old_tempo > 0.0)
+        {
+          marker_track_tempo_changed(marker_track, marker, old_tempo, new_tempo, 0);
+          upload = 1;
+        }
+        prev = event_get_prev(prev);
+      }   
+      // upload track
+      if(upload)
+      {
+        track_move_events_at_client(marker_track, first, NULL);
+        track_segment_get(track, first_time, last_time, &first, &last);
+        track_move_events_at_client(track, first, NULL);
+      }
+    }
+  }
+}
+
+void
+marker_track_dump_state(track_t *self, fts_dumper_t *dumper)
+{
+  event_t *event = track_get_first(self);
+  
+  /* save markers */
+  while(event)
+  {
+    fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_marker);
+    fts_atom_t *value = event_get_value(event);
+    fts_object_t *marker = fts_get_object(value);
+    
+    fts_message_append_symbol(mess, seqsym_marker);
+    fts_message_append_float(mess, event_get_time(event));
+    scomark_array_function(marker, fts_message_get_args(mess));
+    fts_dumper_message_send(dumper, mess);
+    
+    event = event_get_next(event);
+  }
+}
+
+static scomark_t *
+marker_track_create_marker(track_t *marker_track, fts_symbol_t type, event_t **event)
+{
+  fts_atom_t a;
+  scomark_t *scomark;
+  
+  if(type != NULL)
+  {
+    fts_set_symbol(&a, seqsym_scomark);
+    scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
+  }
+  else
+    scomark = (scomark_t *)fts_object_create(scomark_class, 0,  NULL);  
+  
+  /* create a new event with the scomark */
+  fts_set_object(&a, (fts_object_t *)scomark);
+  *event = (event_t *)fts_object_create(event_class, 1, &a);
+  
+  /* point back to event and marker track */
+  fts_object_set_context((fts_object_t *)(*event), (fts_context_t *)marker_track);
+  fts_object_set_context((fts_object_t *)scomark, (fts_context_t *)(*event));
+  
+  return scomark;
+}
+
+scomark_t *
+marker_track_append_marker(track_t *marker_track, double time, int ac, const fts_atom_t *at, event_t **event)
+{
+  scomark_t *scomark = marker_track_create_marker(marker_track, NULL, event);
+  
+  scomark_set_properties(scomark, ac, at);
+  track_append_event(marker_track, time, *event);
+  
+  return scomark;
+}
+
+scomark_t *
+marker_track_insert_marker(track_t *marker_track, double time, fts_symbol_t type, event_t **event)
+{
+  scomark_t *scomark = marker_track_create_marker(marker_track, type, event);
+    
+  track_add_event(marker_track, time, *event);
+  
+  return scomark;
 }
 
 /** EMACS **

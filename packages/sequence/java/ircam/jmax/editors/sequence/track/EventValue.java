@@ -66,6 +66,10 @@ public interface EventValue
   /**
    * Returns the ObjectRenderer for this object */
   public abstract SeqObjectRenderer getRenderer();
+
+  public abstract boolean isMovable();
+  
+  public abstract String getPropertyMessage(String property);
   
   /**
    * Returns an Enumeration of all the property names known by this
@@ -95,7 +99,7 @@ public interface EventValue
     public abstract Object[] getLocalPropertyValues();
 
     public abstract boolean samePropertyValues(int nArgs, Object args[]);
-   
+
 
   public int getDefinedPropertyCount();
     /**

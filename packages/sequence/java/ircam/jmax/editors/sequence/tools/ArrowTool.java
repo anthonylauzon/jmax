@@ -46,13 +46,13 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	* Constructor. 
    */
   public ArrowTool(ImageIcon theImageIcon) 
-  {
+{
     super("edit", theImageIcon);
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
     itsSelectionResizer = new SequenceSelectionResizer(this);
-  }
+}
 
 /**
 * called when this tool is unmounted
@@ -231,12 +231,12 @@ void resizeSelection(int deltaX, int deltaY)
 }
 
 void moveSelection(int deltaX, int deltaY)
-{
+{  
 	TrackEvent aEvent;
 	TrackEvent newEvent;
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Adapter a = egc.getAdapter();
-	
+	  
 	if(deltaX != 0) 
 	{	    
 		((UndoableData) egc.getDataModel()).beginUpdate();
@@ -270,17 +270,18 @@ void moveSelection(int deltaX, int deltaY)
 						a.setX(aEvent, a.getX(aEvent) + deltaX);
 				}
 			}
+      egc.getMarkersTrack().requestEventsMove( egc.getMarkersSelection().getSelected(), deltaX, a); 
 	}
-		if(deltaY!=0)
-		{
-			((UndoableData) egc.getDataModel()).beginUpdate();
-			for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-			{
-				aEvent = (TrackEvent) e.nextElement();
-				a.setY(aEvent, a.getY(aEvent)+deltaY);
-			}    
-		}
-		egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
+  if(deltaY!=0)
+  {
+    ((UndoableData) egc.getDataModel()).beginUpdate();
+    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+    {
+      aEvent = (TrackEvent) e.nextElement();
+      a.setY(aEvent, a.getY(aEvent)+deltaY);
+    }    
+  }
+  egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
 }
 
 //---Fields

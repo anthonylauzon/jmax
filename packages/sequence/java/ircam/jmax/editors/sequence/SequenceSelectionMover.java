@@ -297,6 +297,25 @@ public void XORDraw(int dx, int dy)
 					((SequenceGraphicContext)gc).getDisplayer().display(""+Displayer.numberFormat.format( a.getInvY( a.getY(tempEvent))));
 			}
 	  }
+    /********************************** */
+    for (Enumeration e = ((SequenceGraphicContext)gc).getMarkersSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    movTrackEvent = (TrackEvent) e.nextElement();
+	    if( movTrackEvent.getValue().isMovable())
+      {
+        tempEvent.setOriginal(movTrackEvent);
+        tempEvent.setTime(movTrackEvent.getTime());
+        a.setType( tempEvent, a.getType(movTrackEvent));
+        
+        if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+          a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+        
+        tempEvent.setDeltaX(dx);
+        
+        movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
+			}
+	  }
+    /*********************************/
 	}
 	
 	g.setPaintMode();

@@ -89,35 +89,43 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	
 	int x = pa.getX(e);
 	Color col, lightCol;
-	switch(state)
+  
+  if( e instanceof UtilTrackEvent)
+  {
+    col = Color.red;
+    lightCol = Color.red;
+  }
+  else
+  {
+    switch(state)
 		{
-		case Event.SELECTED:
-			col = selMarkColor;
-			lightCol = lightSelMarkColor;
-			break;
-		case Event.HIGHLIGHTED:
-			col = highMarkColor;
-			lightCol = lightHighColor;
-			break;
-		default:
-		case Event.DESELECTED:
-			col = markColor;
-			lightCol = lightMarkColor;
-			break;
+      case Event.SELECTED:
+        col = selMarkColor;
+        lightCol = lightSelMarkColor;
+        break;
+      case Event.HIGHLIGHTED:
+        col = highMarkColor;
+        lightCol = lightHighColor;
+        break;
+      default:
+      case Event.DESELECTED:
+        col = markColor;
+        lightCol = lightMarkColor;
+        break;
 		}
-		
-		if(type.equals("marker"))
-		{
-			g.setColor( lightCol);
-			g.drawLine( x, maxY, x, 0);
-		}
-		else
-		{
-			g.setColor( col);
-			g.drawLine( x, minY, x, maxY);
-			g.setColor( lightCol);
-			g.drawLine( x, maxY, x, 0);
-		}
+  }
+  if(type.equals("marker"))
+  {
+    g.setColor( lightCol);
+    g.drawLine( x, maxY, x, 0);
+  }
+  else
+  {
+    g.setColor( col);
+    g.drawLine( x, minY, x, maxY);
+    g.setColor( lightCol);
+    g.drawLine( x, maxY, x, 0);
+  }
 }
 
 public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 

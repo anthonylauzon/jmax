@@ -195,7 +195,7 @@ public void setProperty( String name, Object theValue)
 }
 
 public void unsetProperty( String name)
-{    
+{      
   args.clear();
   args.addSymbol( FtsSymbol.get( name));
   try{
@@ -212,9 +212,10 @@ public void unsetProperty( String name)
 }
 
 void sendSetProperty( String propName, Object propValue)
-{
+{    
   args.clear();
-  args.addSymbol( FtsSymbol.get( propName));
+  /*args.addSymbol( FtsSymbol.get( propName));*/
+  args.addSymbol( FtsSymbol.get( value.getPropertyMessage(propName)));
   
   if( propValue instanceof String)
     args.addSymbol( FtsSymbol.get( (String)propValue));

@@ -66,8 +66,9 @@ extern enumeration_t *scomark_type_enumeration;
 extern int scomark_meter_symbol_get_quotient(fts_symbol_t sym, int *meter_num, int *meter_den);
 extern fts_symbol_t scomark_meter_quotient_get_symbol(int meter_num, int meter_den);
 
-extern void scomark_set_tempo(scomark_t *scomark, double tempo);
+extern void scomark_set_tempo(scomark_t *scomark, double tempo, double *old_tempo);
 extern void scomark_get_tempo(scomark_t *scomark, double *tempo);
+extern void scomark_unset_tempo(scomark_t *scomark);
 extern void scomark_set_cue(scomark_t *scomark, int cue);
 extern void scomark_get_cue(scomark_t *scomark, int *cue);
 extern void scomark_get_label(scomark_t *self, fts_symbol_t *label);
@@ -81,5 +82,10 @@ extern void scomark_bar_set_meter_quotient(scomark_t *scomark, int meter_num, in
 extern void scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den);
 
 extern void scomark_spost(fts_object_t *o, fts_bytestream_t *stream);
+
+extern void marker_track_dump_state(track_t *self, fts_dumper_t *dumper);
+extern void marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_atom_t *at);
+extern scomark_t *marker_track_append_marker(track_t *track, double time, int ac, const fts_atom_t *at, event_t **event);
+extern scomark_t *marker_track_insert_marker(track_t *track, double time, fts_symbol_t type, event_t **event);
 
 #endif

@@ -73,7 +73,16 @@ public class AbstractEventValue implements EventValue, java.io.Serializable
       return properties.get(name);
     else return UNKNOWN_PROPERTY; //to be overloaded
   }
-    
+  
+  public boolean isMovable()
+  {
+    return true;
+  }
+  
+  public String getPropertyMessage(String property)
+  {
+    return property;
+  }
   public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc){}
 
   public JPopupMenu getPopupMenu()

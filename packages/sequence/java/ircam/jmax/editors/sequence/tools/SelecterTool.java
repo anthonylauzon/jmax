@@ -114,6 +114,8 @@ public void selectionPointChoosen(int x, int y, int modifiers)
 			TrackEvent marker = (TrackEvent) ((AbstractTrackRenderer)gc.getRenderManager()).firstMarkerContaining(x, y);
 			if (marker != null) 
 			{ //click on marker				
+        startingPoint.setLocation(x,y);
+        
 				if ( !egc.getMarkersSelection().isInSelection( marker)) 
 				{
 					if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
@@ -123,6 +125,8 @@ public void selectionPointChoosen(int x, int y, int modifiers)
 					}
  					egc.getMarkersSelection().select( marker);
 				}
+        
+        singleObjectSelected(x, y, modifiers);
 			}
 			else	
 			{//click on empty

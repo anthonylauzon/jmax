@@ -568,19 +568,22 @@ public void requestEventCreationWithoutUpload(float time, String type, int nArgs
 }
 
 public void requestEventMove(TrackEvent evt, double newTime)
-{
-	args.clear();
-	args.addObject( evt);
-	args.addDouble(newTime);
-	
-	try{
-		send( FtsSymbol.get("moveEvents"), args);
-	}
-	catch(IOException e)
-	{
-		System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
-		e.printStackTrace(); 
-	}   
+{  
+  if( evt.getValue().isMovable())
+  {
+    args.clear();
+    args.addObject( evt);
+    args.addDouble(newTime);
+    
+    try{
+      send( FtsSymbol.get("moveEvents"), args);
+    }
+    catch(IOException e)
+    {
+      System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
+      e.printStackTrace(); 
+    }   
+  }
 }
 
 public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
@@ -590,10 +593,14 @@ public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
 	args.clear();
 	for (Enumeration e = events; e.hasMoreElements();) 
 	{	  
-		aEvent = (TrackEvent) e.nextElement();		    
-		args.addObject( aEvent);
-		args.addDouble((double)a.getInvX(a.getX(aEvent)+deltaX));
-	}
+		aEvent = (TrackEvent) e.nextElement();
+    
+    if( aEvent.getValue().isMovable())
+    {
+      args.addObject( aEvent);
+      args.addDouble((double)a.getInvX(a.getX(aEvent)+deltaX));
+    }
+  }
 	
 	try{
 		send( FtsSymbol.get("moveEvents"), args);
