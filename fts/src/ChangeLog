@@ -1,0 +1,8 @@
+2000-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Fixed "cannot kill fts without being super-user". This came from a bug in 
+	non-portable/sgi/platform.c
+
+	* Fixed wrong message "cannot lock memory".
+	
+
