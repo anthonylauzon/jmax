@@ -172,7 +172,6 @@ static void
 messconst_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
-  fts_status_t status;
 
   if(ac == 1)
     fts_atom_assign(this->at + winlet, at);

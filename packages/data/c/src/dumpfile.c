@@ -42,7 +42,6 @@ static void
 dumpfile_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dumpfile_t *this = (dumpfile_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)o;
   fts_atom_t a;
   int i;
 

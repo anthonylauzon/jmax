@@ -219,8 +219,6 @@ catch_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 catch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  access_t *this = (access_t *)o;
-
   catch_set_channel(o, fts_system_inlet, 0, ac, at);
 }	
 

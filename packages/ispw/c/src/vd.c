@@ -156,7 +156,6 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   long n_tick = fts_dsp_get_input_size(dsp, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   ftl_vd_t *ftl = (ftl_vd_t *)ftl_data_get_ptr(this->vd_data);
-  float conv;
   del_buf_t *buf;
   fts_atom_t argv[6];
   

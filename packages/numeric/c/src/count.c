@@ -239,8 +239,6 @@ count_set_parameters(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 count_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  count_t *this = (count_t *)o;
-
   switch (ac)
     {
     default:
@@ -294,8 +292,6 @@ static void
 count_mode_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_t *this = (count_t *)o;
-  double step = (this->begin < this->end)? this->step: -this->step;
-
   this->mode = mode_reverse;
 }
 

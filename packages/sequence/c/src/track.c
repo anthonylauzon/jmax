@@ -783,11 +783,9 @@ static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_symbol_t type = track_get_type(this);
   fts_symbol_t name = track_get_name(this);  
   event_t *event = track_get_first(this);
   fts_atom_t a[TRACK_BLOCK_SIZE];
-  int n = 0;
   
   /* set track name */
   if(name)
@@ -969,8 +967,6 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static void
 track_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  track_t *this = (track_t *)o;
-
   if(ac == 0)
     track_export_midifile_dialog(o, 0, 0, 0, 0);
   else if(ac == 1 && fts_is_symbol(at))

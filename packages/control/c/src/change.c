@@ -89,8 +89,6 @@ change_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 change_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  change_t *this = (change_t *)o;
-
   if(ac == 1)
     change_single(o, 0, 0, 1, at);
   else if(ac > 0)
@@ -114,8 +112,6 @@ change_set_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 change_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  change_t *this = (change_t *)o;
-
   if(ac == 1)
     change_set_single(o, 0, 0, 1, at);
   else if(ac > 0)

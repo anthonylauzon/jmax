@@ -114,7 +114,6 @@ mat_set_with_onset_from_atoms(mat_t *mat, int onset, int ac, const fts_atom_t *a
 void
 mat_set_from_tuples(mat_t *mat, int ac, const fts_atom_t *at)
 {
-  int m = mat_get_m(mat);
   int n = mat_get_n(mat);
   int i, j;
   
@@ -548,7 +547,6 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_atom_t *data = this->data;
   int m = mat_get_m(this);
   int n = mat_get_n(this);
-  int size = m * n;
   fts_message_t *mess;
   int i, j;
       
@@ -583,8 +581,6 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t *this = (mat_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

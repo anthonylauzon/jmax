@@ -591,10 +591,6 @@ receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_receive_t *this  = (fts_receive_t *)o;
-  fts_class_t *cl = fts_object_get_class(this->obj);
-  fts_atom_t a;
-
   fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 2, o->argv + 2);
 }
 
@@ -919,7 +915,6 @@ get_patcher_by_file_name( fts_symbol_t file_name)
 static void 
 patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(&at[0]);
   fts_package_t *pkg = fts_object_get_package(obj);
   fts_symbol_t dir = fts_package_get_dir( pkg);
@@ -978,7 +973,6 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *p;
-  fts_status_t ret;
 
   /* see if this should be added */
   if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
@@ -1119,7 +1113,6 @@ patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *p;
-  fts_atom_t a[2];
 
   /* upload all the not uploaded objects */
   for (p = this->objects; p ; p = p->next_in_patcher)
@@ -1174,7 +1167,6 @@ patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(at);
 
   if(fts_object_get_class_name(obj) == fts_s_connection)
@@ -1302,7 +1294,6 @@ patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int
 static void 
 patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *old = fts_get_object(at);
   int dsp_restart = fts_dsp_is_active() && fts_is_dsp_object(old);
   fts_object_t *obj;
@@ -1388,8 +1379,6 @@ static void
 patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *obj;
-  fts_atom_t a[6];
 
   if((ac == 4) &&
      fts_is_object(&at[0]) &&
@@ -1398,9 +1387,7 @@ patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
      fts_is_int(&at[3]))
     {
       int inlet, outlet;
-      int id;
       fts_object_t *from, *to;
-      fts_status_t ret;
       fts_connection_t *connection;
 
       from   = fts_get_object( at);
@@ -1842,7 +1829,6 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int n_inlets = fts_get_int_arg(ac, at, 0, 0);
   int n_outlets = fts_get_int_arg(ac, at, 1, 0);
   fts_atom_t va;
-  int i;
   
   /* raw patcher arguments (the FTS object description stays always "jpatcher") */
   this->description_ac = 0;
@@ -2036,8 +2022,6 @@ fts_patcher_get_scope(fts_patcher_t *patcher)
 
 void fts_kernel_patcher_init(void)
 {
-  fts_atom_t a;
-
   sym_showObject = fts_new_symbol("showObject");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
 

@@ -140,7 +140,6 @@ loopback_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 loopback_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  fts_bytestream_t *stream = (fts_bytestream_t *)o;
 }
 
 /************************************************************

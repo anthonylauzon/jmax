@@ -335,7 +335,6 @@ static void
 bendout_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *this = (midiout_t *)o;
-  fts_midievent_t *event[3];
   int range = 2;
 
   switch (ac)

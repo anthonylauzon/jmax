@@ -75,8 +75,6 @@ fifo_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 fifo_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fifo_t *this = (fifo_t *)o;
-  
   if(ac == 1)
     fifo_input_atom(o, 0, 0, 1, at);
   else if(ac > 1)

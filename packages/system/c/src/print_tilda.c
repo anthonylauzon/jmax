@@ -110,8 +110,6 @@ print_tilda_set_cols(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 print_tilda_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  print_tilda_t *this = ((print_tilda_t *)o);
-
   switch(ac)
     {
     default:
@@ -166,7 +164,6 @@ ftl_print_tilda(fts_word_t *argv)
 static void
 print_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  print_tilda_t *this = ((print_tilda_t *)o);
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t argv[3];

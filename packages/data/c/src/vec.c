@@ -201,8 +201,6 @@ vec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 vec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vec_t *this = (vec_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

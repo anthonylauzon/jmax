@@ -122,9 +122,7 @@ static void
 osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fts_atom_t argv[5];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  double f;
   fts_atom_t data, k;
 
   osc_ftl_data_init(this->ftl_data, fts_dsp_get_output_srate(dsp, 0));
@@ -257,10 +255,8 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   phasor_t *this = (phasor_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  phasor_ftl_t *state = ftl_data_get_ptr(this->state);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   fts_atom_t argv[4];
-  double incr;
 
   phasor_ftl_data_init(this->state, sr);
 

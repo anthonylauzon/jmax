@@ -116,7 +116,6 @@ fts_framps_zero_tail(fts_framps_t *ramp_vector, int index)
 fts_framps_t *
 fts_framps_new(int size)
 {
-  int i;
   fts_framps_t *ramp_vector;
 
   ramp_vector = (fts_framps_t *)fts_malloc(sizeof(fts_framps_t));
@@ -176,8 +175,6 @@ fts_framps_set_size(fts_framps_t *ramp_vector, int size)
 void
 fts_framps_delete(fts_framps_t *ramp_vector)
 {
-  int i;
-
   fts_free(ramp_vector->value);
   fts_free(ramp_vector->target);
   fts_free(ramp_vector->incr);

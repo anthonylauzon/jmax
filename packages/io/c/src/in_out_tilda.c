@@ -127,7 +127,6 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   out_tilda_t *this  = (out_tilda_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
   void *propagate_context = fts_get_pointer(at + 1);
-  int inlet = fts_get_int(at + 2);
   fts_object_t *outdispatcher = fts_audioport_get_output_dispatcher( this->port);
 
   if ( outdispatcher)

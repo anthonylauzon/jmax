@@ -36,8 +36,6 @@ typedef struct
 static void
 makenote_send_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *this = (makenote_t *)o;
-
   fts_outlet_int(o, 1, 0);
   fts_outlet_int(o, 0, fts_get_int(at));
 }
@@ -80,8 +78,6 @@ makenote_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void
 makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *this = (makenote_t *)o;
-
   switch(ac)
     {
     default:
@@ -101,16 +97,12 @@ makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 makenote_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *this = (makenote_t *)o;
-
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
 makenote_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *this = (makenote_t *)o;
-
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
@@ -118,8 +110,6 @@ makenote_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *this = (makenote_t *)o;
-
   switch(ac)
     {
     default:

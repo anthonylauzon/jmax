@@ -211,7 +211,7 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 			      void *inClientData)
 {
   halaudioport_t *this = (halaudioport_t *)inClientData;
-  int requested, available, missing, copied;
+  int requested, available, copied;
 
   requested = outOutputData->mBuffers[0].mDataByteSize / sizeof( float);
   available = FIFO_READ_LEVEL( this->fifo);
@@ -289,9 +289,6 @@ static void set_real_time( float rate)
 {
   thread_t s;
   kern_return_t r;
-  integer_t info;
-  mach_msg_type_number_t count;
-  boolean_t b;
   thread_time_constraint_policy_data_t ttcpolicy;
 
   s = mach_thread_self();

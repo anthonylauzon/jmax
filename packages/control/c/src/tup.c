@@ -114,8 +114,6 @@ tup_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 tup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  tup_t *this = (tup_t *)o;
-
   if(ac == 1)
     tup_input_single(o, winlet, s, 1, at);
   else
@@ -353,8 +351,6 @@ typedef struct _untup_
 static void
 untup_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  untup_t *this = (untup_t *)o;
-
   fts_outlet_varargs(o, 0, 1, at);
 }
 
@@ -590,8 +586,7 @@ getup_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 getup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  cotup_t *this = (cotup_t *)o;
-  
+
   if(ac == 1)
     {
       if(fts_is_object(at))
@@ -604,11 +599,6 @@ getup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  if(method)
 	    {
 	      fts_atom_t a;
-	      int size;
-	      fts_atom_t *atoms;
-	      fts_atom_t *output;
-	      int i;
-	      
 	      fts_array_clear(&this->array);
 	      
 	      /* get object state as array */

@@ -825,7 +825,6 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
 
 static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  client_t *this = (client_t *)o;
   fts_object_t *src, *dst;
   int src_outlet, dst_inlet;
 
@@ -850,7 +849,6 @@ fts_patcher_t *
 fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 {
   fts_patcher_t *patcher = 0;
-  fts_package_t *project;
   int type = 1;
   fts_atom_t a[3];
   client_t *client;
@@ -1359,7 +1357,6 @@ fts_client_upload_object_connections(fts_object_t *obj)
 void fts_client_register_object(fts_object_t *obj, int client_id)
 {
   client_t *client;
-  fts_atom_t a[1];
 
   if(client_id <= FTS_NO_ID)
     client_id = fts_get_client_id((fts_object_t *)fts_object_get_patcher(obj));

@@ -63,7 +63,6 @@ ftl_rsqrt(fts_word_t *argv )
 static void 
 sqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vecsqrt_t *obj = (vecsqrt_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
 
@@ -76,7 +75,6 @@ sqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void 
 rsqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vecsqrt_t *obj = (vecsqrt_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
 

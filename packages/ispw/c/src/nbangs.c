@@ -64,8 +64,6 @@ nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  nbangs_t *this = (nbangs_t *) o;
-
   if(ac > 1 && fts_is_number(at + 1))
     nbangs_set_n(o, 0, 0, 1, at);
 }

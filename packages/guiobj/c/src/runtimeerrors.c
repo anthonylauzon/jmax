@@ -31,15 +31,11 @@ typedef struct _fts_runtime_errors_t
 
 static void fts_runtime_errors_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_runtime_errors_t *this = (fts_runtime_errors_t *)o;
-
   fts_runtime_error_handler_set(o);
 }
 
 static void fts_runtime_errors_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_runtime_errors_t *this = (fts_runtime_errors_t *)o;
-
   fts_runtime_error_handler_remove(o);
 }
 

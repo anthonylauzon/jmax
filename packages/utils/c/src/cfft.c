@@ -35,7 +35,7 @@ void
 cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, unsigned int size)
 {
   unsigned int m, n;
-  unsigned int i, j, k, up, down;
+  unsigned int j, k, up, down;
   
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
@@ -66,7 +66,7 @@ void
 cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, unsigned int size)
 {
   unsigned int m, n;
-  unsigned int i, j, k, up, down;
+  unsigned int j, k, up, down;
   
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
@@ -99,7 +99,7 @@ void
 cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size)
 {
   unsigned int m, n;
-  unsigned int i, j, k, up, down;
+  unsigned int j, k, up, down;
 
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
@@ -130,7 +130,7 @@ void
 cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size)
 {
   unsigned int m, n;
-  unsigned int i, j, k, up, down;
+  unsigned int j, k, up, down;
 
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {

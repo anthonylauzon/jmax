@@ -299,7 +299,6 @@ midifile_read_mt(fts_midifile_t *file, char *s)
 static int
 midifile_read_header(fts_midifile_t *file)
 {
-  FILE *fp = file->fp;
   char c;
 
   if (midifile_read_mt(file, "MThd") == 0)
@@ -342,7 +341,6 @@ midifile_read_header(fts_midifile_t *file)
 static void
 midifile_read_track(fts_midifile_t *file)
 {
-  FILE *fp = file->fp;
   int sysex_continue = 0;
   int status = 0;
   int channel = 0;

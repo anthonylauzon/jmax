@@ -248,9 +248,8 @@ static void fts_socketstream_output_char(fts_bytestream_t *stream, unsigned char
 
 static void fts_socketstream_flush(fts_bytestream_t *stream)
 {
-  fts_socketstream_t *this = (fts_socketstream_t *) stream;
-
 #if WIN32
+  fts_socketstream_t *this = (fts_socketstream_t *) stream;
   FlushFileBuffers((HANDLE) this->socket);
 #endif
 }
@@ -395,9 +394,8 @@ static void fts_pipestream_output_char(fts_bytestream_t *stream, unsigned char c
 
 static void fts_pipestream_flush(fts_bytestream_t *stream)
 {
-  fts_pipestream_t *this = (fts_pipestream_t *) stream;
-
 #if WIN32
+  fts_pipestream_t *this = (fts_pipestream_t *) stream;
   FlushFileBuffers(this->out);
 #endif
 }

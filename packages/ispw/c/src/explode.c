@@ -318,7 +318,6 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
 	  long off_time = event->time + event->dur;
 	  int channel = (event->chan >= 1)? ((event->chan <= 16)? event->chan: 16): 1;
 	  int pitch = event->pit % 128;
-	  int velocity = event->vel % 128;
 	  
 	  /* write all pending note offs before the next event */
 	  stat = noteoffs;

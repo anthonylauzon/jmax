@@ -199,7 +199,6 @@ inttrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     {
       track_t *track = data->track;
       double time = fts_midifile_get_time(file);
-      int channel = fts_midievent_channel_message_get_channel(midievt);
       int number = fts_midievent_channel_message_get_first(midievt);
       int value = number;
       event_t *event;
@@ -220,7 +219,6 @@ static void
 sequence_read_track_start(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  double time = fts_midifile_get_time(file);
   fts_symbol_t name = fts_midifile_get_name(file);
   char str[STRING_SIZE];
   fts_atom_t a;
@@ -242,7 +240,6 @@ static void
 sequence_read_track_end(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  double time = fts_midifile_get_time(file);
 
   if(data->track)
     {
@@ -312,7 +309,6 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
 {
   fts_midifile_read_functions_t read;
   seqmidi_read_data_t data;
-  int i, j;
       
   seqmidi_read_data_init(&data);
   fts_midifile_set_user_data(file, &data);
@@ -433,7 +429,6 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
       seqmidi_write_data_t data;
       event_t *event;
       fts_atom_t a[1];
-      int i, j;
       
       fts_midifile_set_user_data(file, &data);
       
@@ -479,8 +474,6 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
     {
       seqmidi_write_data_t data;
       event_t *event;
-      fts_atom_t a[1];
-      int i, j;
       
       fts_midifile_set_user_data(file, &data);
       

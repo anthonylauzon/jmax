@@ -165,8 +165,6 @@ param_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 param_default_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_t *this = (fts_param_t *)o;
-
   if(s == NULL)
     param_input_varargs(o, 0, 0, ac, at);
   else

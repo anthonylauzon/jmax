@@ -84,7 +84,6 @@ ftl_log10(fts_word_t *argv )
 static void
 veclog_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 {
-  veclog_t *this = (veclog_t *)o;
   fts_atom_t argv[4];
 
   fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));

@@ -74,8 +74,6 @@ toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 toggle_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  toggle_t *this = (toggle_t *) o;
-
   toggle_number(o, 0, 0, 1, at);
 }
 

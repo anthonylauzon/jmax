@@ -460,7 +460,6 @@ gen_outputs(fts_dsp_object_t *obj, int vector_size, double sample_rate)
 static void 
 dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_object_t *obj)
 {
-  fts_dsp_signal_t **sig;
   fts_atom_t a;
   int i;
 
@@ -604,8 +603,6 @@ dsp_graph_inc(fts_dsp_graph_t *graph, fts_dsp_object_t *src, int woutlet, fts_ds
 static void 
 dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_object_t *src, int woutlet, fts_dsp_object_t *dest, int winlet, fts_dsp_signal_t *sig)
 {
-  int ninputs;
-
   assert( dest != 0);
 
   dest->pred_cnt--;

@@ -74,7 +74,6 @@ metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *this = (metro_t *)o;
   int active = fts_get_number_int(at);
 
   if(active)
@@ -110,8 +109,6 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *this = (metro_t *)o;
-
   metro_stop(o, 0, 0, 0, 0);
 }
 

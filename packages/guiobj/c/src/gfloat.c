@@ -75,8 +75,6 @@ gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 gfloat_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  gfloat_t *this = (gfloat_t *)o;
-
   if (ac && fts_is_number(at))
     gfloat_number(o, 0, 0, 1, at);
 }

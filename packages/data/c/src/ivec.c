@@ -367,11 +367,9 @@ ivec_append_visibles(ivec_t *ivec, int first, int last)
 {
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
-  int vecsize = ivec_get_size(ivec);
 
   int n = (last-first);
 
-  int append = 0;
   int current = first;
 
   while(n > 0)
@@ -399,7 +397,6 @@ ivec_append_pixels(ivec_t *ivec, int deltax, int deltap)
   float k = (1/ivec->zoom);
   int n = (deltax > 0)? deltax : -deltax;
 
-  int append = 0;
   int current = (deltax < 0)? ivec->vindex : (ivec->vindex+ivec->vsize-deltap);
   int start = (deltax < 0)? 0 : ivec->pixsize-deltax;
 
@@ -1001,8 +998,6 @@ ivec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 ivec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *this = (ivec_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

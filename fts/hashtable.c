@@ -63,7 +63,7 @@ static int equals_int( const fts_atom_t *a, const fts_atom_t *b)
 static unsigned int hash_string( const fts_atom_t *a)
 {
   char *s = fts_get_string( a);
-  unsigned int h = *s, i = 0;
+  unsigned int h = *s;
 
   for ( s += 1; *s != '\0'; s++)
     h = (h<<1) + *s;

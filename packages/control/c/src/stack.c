@@ -52,8 +52,6 @@ stack_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 stack_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  stack_t *this = (stack_t *)o;
-
   if(ac == 1)
     stack_input_atom(o, 0, 0, 1, at);
   else if(ac > 1)

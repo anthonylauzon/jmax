@@ -74,7 +74,6 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   fts_symbol_t name;
   fts_symbol_t unit;
   float size;
-  float *samp_buf;
 
   name = fts_get_symbol_arg(ac, at, 0, 0);
   unit = samples_unit_get_arg(ac, at, 1);
@@ -285,8 +284,6 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   float onset = fts_get_float_arg(ac, at, 1, 0.0f);
-  float sr = fts_get_float_arg(ac, at, 2, 0.0f);
-  fts_symbol_t format = fts_get_symbol_arg(ac, at, 3, 0);
   int size = this->buf.size;
   float *buf = this->buf.samples;
   int n_onset;
@@ -371,8 +368,6 @@ static void
 sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
-  int i;
-
   sampbuf_zero(&this->buf);
 }
 

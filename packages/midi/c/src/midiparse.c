@@ -72,8 +72,6 @@ static void
 midiparse_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiparse_t *this = (midiparse_t *)o;
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
-
   fts_midiparser_init(&this->parser);
 }
 
@@ -108,7 +106,6 @@ midiparse_instantiate(fts_class_t *cl)
 static void
 midiunparse_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  midiparse_t *this = (midiparse_t *)o;
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
   if(fts_midievent_is_channel_message(event))

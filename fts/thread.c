@@ -42,7 +42,6 @@ int fts_thread_manager_start(void)
 int fts_thread_manager_create_thread(fts_thread_worker_t* thread_worker)
 {
     thread_manager_t* self = fts_thread_manager;
-    int ac = 1;
     int stat = 0;
     fts_atom_t at;
     fts_atom_t* write_atom;
@@ -78,7 +77,6 @@ int fts_thread_manager_create_thread(fts_thread_worker_t* thread_worker)
 int fts_thread_manager_cancel_thread(fts_thread_worker_t* thread_worker)
 {
     thread_manager_t* self = fts_thread_manager;
-    int ac = 1;
     int stat = 0;
     fts_atom_t at;
     fts_atom_t* write_atom;
@@ -111,8 +109,6 @@ int fts_thread_manager_cancel_thread(fts_thread_worker_t* thread_worker)
 static void
 thread_manager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-    thread_manager_t* self = (thread_manager_t*)o;
-
     post("[thread_manager] debug info \n");
 }
 

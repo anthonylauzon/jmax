@@ -175,8 +175,6 @@ static void
 delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delread_t *this = (delread_t *)o;
-  del_buf_t *buf = this->buf;
-
   this->time = fts_get_float_arg(ac, at, 0, 0.0f);
 
   if(this->buf)

@@ -90,8 +90,6 @@ event_get_description(event_t *event, fts_array_t *array)
     }
   else if(!fts_is_void(&event->value))
     {
-      fts_symbol_t type = fts_get_class_name(&event->value);
-      
       fts_array_append_float(array, (float)event->time);
       fts_array_append(array, 1, &event->value);
     }

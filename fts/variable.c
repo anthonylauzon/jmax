@@ -361,7 +361,6 @@ static void
 args_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   args_t *this = (args_t *)o;
-  int n = ac / 2;
 
   if((ac == 1 || ac == 2) && fts_is_int(at))
     {

@@ -291,8 +291,6 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -448,7 +446,6 @@ dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(file_name, "w");
   fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
-  fts_atom_t a;
   int size = 0;
   int tab;
   int i;
@@ -584,7 +581,6 @@ dict_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
   fts_spost(stream, "(:dict)");
@@ -674,8 +670,6 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 dict_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dict_t *this = (dict_t *)o;
-
   dict_clear(o, 0, 0, 0, 0);
 }
 

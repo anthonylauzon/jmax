@@ -58,7 +58,7 @@ fts_random_set_seed(unsigned int ui)
 unsigned int
 fts_random(void)
 {
-  unsigned int lo, hi;
+  unsigned int hi;
 
   hi = RA * (long)((unsigned int)seed >> 16);
   seed = RA * (long)(seed & 0xFFFF);
@@ -131,7 +131,7 @@ fts_random_float(void)
 float
 fts_random_float(void)
 {
-  unsigned int lo, hi;
+  unsigned int hi;
 
   hi = RA * (long)((unsigned int)seed >> 16);
   seed = RA * (long)(seed & 0xFFFF);

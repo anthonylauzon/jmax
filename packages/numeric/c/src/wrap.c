@@ -59,7 +59,6 @@ wrap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 wrap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  wrap_t *this = (wrap_t *)o;
 }
 
 /************************************************************
@@ -76,7 +75,6 @@ wrap_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   float min = this->min;
   float max = this->max;
   float range = max - min;
-  int i;
 
   if(range == 0.0f)
     {

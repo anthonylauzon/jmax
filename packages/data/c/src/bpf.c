@@ -463,7 +463,6 @@ static void
 bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  int index = fts_get_int(at);
   double time = fts_get_float(at + 1);
   double value = fts_get_float(at + 2);
 
@@ -580,7 +579,6 @@ bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  bpf_t *this = (bpf_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   
   if(data_object_is_persistent(o))

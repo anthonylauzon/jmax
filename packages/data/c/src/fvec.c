@@ -555,8 +555,6 @@ fvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -605,8 +603,6 @@ fvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -655,8 +651,6 @@ fvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -705,8 +699,6 @@ fvec_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -763,8 +755,6 @@ fvec_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -813,8 +803,6 @@ fvec_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *right = (fvec_t *)fts_get_object(at);
@@ -1245,8 +1233,6 @@ fvec_pick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(ac > 0)
     {
-      fts_atom_t a;
-
       if(fts_is_a(at, fvec_type))
 	{
 	  fvec_t *source = (fvec_t *)fts_get_object(at);
@@ -1582,8 +1568,6 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 fvec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *this = (fvec_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

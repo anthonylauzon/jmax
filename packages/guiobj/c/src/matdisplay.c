@@ -351,9 +351,6 @@ matdisplay_set_zoom_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
   
   if(ac)
     {
-      int m_zoom;
-      int n_zoom;
-
       switch(ac)
 	{
 	case 2:

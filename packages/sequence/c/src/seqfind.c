@@ -72,8 +72,6 @@ seqfind_find_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 seqfind_find_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  seqfind_t *this = (seqfind_t *)o;
-
   if(ac == 1)
     seqfind_find_single(o, 0, 0, 1, at);
   else if(ac > 1)

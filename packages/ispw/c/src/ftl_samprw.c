@@ -34,7 +34,6 @@ void ftl_sampwrite(fts_word_t *argv)
   int n_tick = fts_word_get_int(argv + 2);
   int onset = ctl->onset;
   sampbuf_t *buf = ctl->buf;
-  float *xp = buf->samples + onset;
   int n_left = buf->size + GUARDPTS - onset;
   int i;
 

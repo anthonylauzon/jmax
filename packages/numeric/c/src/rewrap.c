@@ -59,7 +59,6 @@ rewrap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 rewrap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  rewrap_t *this = (rewrap_t *)o;
 }
 
 /************************************************************
@@ -76,7 +75,6 @@ rewrap_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   float min = this->min;
   float max = this->max;
   float range = 2.0f * (max - min);
-  int i;
 
   if(range == 0.0f)
     {

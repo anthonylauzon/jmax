@@ -170,7 +170,6 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 {
   fts_symbol_t track_type = track_get_type(track);
   fts_symbol_t track_name;
-  fts_atom_t a;
 
   if( !fts_object_has_id((fts_object_t *)track))
     {
@@ -199,7 +198,6 @@ sequence_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static void
 sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sequence_t *this = (sequence_t *)o;
   fts_atom_t a;
   
   fts_set_symbol(&a, seqsym_sequence);
@@ -289,7 +287,6 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void 
 sequence_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sequence_t *this = (sequence_t *)o;
   fts_symbol_t default_name;
   char str[512];
   fts_atom_t a[4];
@@ -491,11 +488,6 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_spost(stream, "<empty sequence>\n");
   else 
     {
-      fts_symbol_t track_name = track_get_name(track);
-      fts_symbol_t track_type = track_get_type(track);
-      int track_size = track_get_size(track);
-      const char *name_str = track_name? track_name: "untitled";
-      
       if(size == 1)
 	fts_spost(stream, "<sequence of 1 track>\n");
       else

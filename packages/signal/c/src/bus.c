@@ -132,7 +132,6 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
 {
   bus_t *this = (bus_t *)o;
   int n_channels = 0;
-  int n;
 
   if(ac > 0 && fts_is_a(at, fts_dsp_edge_class))
     {
@@ -252,8 +251,6 @@ access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 access_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_t *this = (access_t *)o;
-
   if(ac > 1 && fts_is_number(at + 1))
     access_set_index(o, 0, 0, 1, at + 1);
 

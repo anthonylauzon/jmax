@@ -43,7 +43,6 @@ noise_dsp_function(fts_word_t *argv)
 static void
 noise_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noise_t *this = (noise_t *) o;
   fts_atom_t argv[2];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
@@ -55,16 +54,12 @@ noise_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 noise_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noise_t *this = (noise_t *) o;
-
   fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
 }
 
 static void
 noise_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noise_t *this = (noise_t *) o;
-
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 

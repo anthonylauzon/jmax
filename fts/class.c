@@ -89,7 +89,6 @@ fts_class_alias(fts_class_t *cl, fts_symbol_t alias)
 static fts_class_t *get_class( fts_symbol_t package_name, fts_symbol_t class_name)
 {
   fts_package_t *pkg;
-  fts_class_t *cl;
 
   pkg = fts_package_get( package_name);
   if (pkg == NULL)

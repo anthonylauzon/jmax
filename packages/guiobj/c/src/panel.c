@@ -40,9 +40,7 @@ typedef struct
 static void
 panel_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  panel_t *this = (panel_t *)o;
-
-  /* fts_obj_have_events((fts_object_t *)this); */
+  /* fts_obj_have_events( o); */
 }
 
 

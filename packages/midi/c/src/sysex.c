@@ -132,7 +132,6 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 sysexout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  sysex_t *this = (sysex_t *)o;
 }
 
 static void

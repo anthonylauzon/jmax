@@ -72,7 +72,6 @@ filestream_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 filestream_default_input(fts_object_t *o, int n, const unsigned char *c)
 {
-  filestream_t *this = (filestream_t *)o;
   int i;
 
   for(i=0; i<n; i++)
@@ -339,8 +338,6 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 filestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  filestream_t *this = (filestream_t *)o;
-
   filestream_close(o, 0, 0, 0, 0);
 }
 

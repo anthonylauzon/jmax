@@ -350,7 +350,6 @@ osc_ftl_fun(fts_word_t *argv)
       fts_wrapper_t frac;
       int idx;
       double f;
-      double a, b;
 
       /* copy running phase into fractional wrapper */
       fts_wrapper_copy(&phi, &frac);

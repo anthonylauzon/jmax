@@ -510,8 +510,6 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data;
-  fts_atom_t a[1];
-  int i;
 
   this->data = 0;
   this->sr_in_KHz = 0.001 * fts_dsp_get_sample_rate();

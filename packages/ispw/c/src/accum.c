@@ -100,8 +100,6 @@ accum_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  accum_t *this = (accum_t *)o;
-
   accum_set(o, 0, 0, 1, at);
 }
 

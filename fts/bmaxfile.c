@@ -399,7 +399,6 @@ static float GET_F(unsigned char *p)
 
 static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, void *data)
 {
-  fts_object_t *obj = (fts_object_t *)data;
   fts_atom_t a;
 
   eval_tos--;

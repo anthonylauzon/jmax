@@ -80,8 +80,7 @@ locate_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(track_get_size(track) > 0 && time - epsilon <= event_get_time(track->last))
 	{
 	  event_t *event = track->first;
-	  event_t *next = event_get_next(event);
-	  
+
 	  while(time - epsilon > event_get_time(event))
 	    event = event_get_next(event);
 
@@ -177,8 +176,7 @@ static void
 locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   locate_t *this = (locate_t *)o;
-  fts_timebase_t *pseudo = (fts_timebase_t *)o;
-  
+
   this->track = 0;
   this->epsilon = 0.0;
   this->mode = seqsym_event;

@@ -411,8 +411,6 @@ macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_spost(stream, "Mac OS X proposes %d sources(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetSource(i);
-    MIDIEntityRef entity = NULL;
-    MIDIDeviceRef device = NULL;
     
     fts_spost(stream, "  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
     fts_spost(stream, "\n");
@@ -423,8 +421,6 @@ macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_spost(stream, "Mac OS X proposes %d destinations(s)\n", n);
   for(i=0; i<n; i++) {
     MIDIEndpointRef endpoint = MIDIGetDestination(i);
-    MIDIEntityRef entity = NULL;
-    MIDIDeviceRef device = NULL;
 
     fts_spost(stream, "  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
     fts_spost(stream, "\n");

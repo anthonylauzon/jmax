@@ -319,8 +319,7 @@ fts_fftab_get( fts_symbol_t name, int size, float min, float max)
 
       if (!tab)
 	{
-	  float step = (max - min) / size;
-	  fts_fftab_t *fftab = fftab_new( ffun, size, min, max);
+ 	  fts_fftab_t *fftab = fftab_new( ffun, size, min, max);
 
 	  fftab_fill( fftab, ffun, size, min, max);
 	  ffun_insert_tab( ffun, fftab);

@@ -559,7 +559,7 @@ static void audioportout_instantiate(fts_class_t *cl)
 
 static void outdispatcher_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int outlets, i;
+  int outlets;
 
   if (ac > 0 && fts_is_int( at))
     outlets = fts_get_int( at);

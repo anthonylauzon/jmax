@@ -37,7 +37,6 @@ typedef struct
 static void
 noteoff_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noteoff_t *this = (noteoff_t *)o;
   int note = fts_get_int(at);
   int pitch = note >> 4;
   int channel = (note & 0x0f) + 1;
@@ -105,8 +104,6 @@ noteoff_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 noteoff_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noteoff_t *this = (noteoff_t *)o;
-
   switch(ac)
     {
     default:
@@ -129,16 +126,12 @@ noteoff_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 noteoff_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noteoff_t *this = (noteoff_t *)o;
-
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
 noteoff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noteoff_t *this = (noteoff_t *)o;
-
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
@@ -146,8 +139,6 @@ noteoff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 noteoff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  noteoff_t *this = (noteoff_t *)o;
-
   switch(ac)
     {
     default:

@@ -57,8 +57,6 @@ select_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 select_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  select_t *this = (select_t *)o;
-
   if(ac == 1)
     select_input_single(o, 0, 0, 1, at);
   else
@@ -83,8 +81,6 @@ select_set_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 select_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  select_t *this = (select_t *)o;
-
   if(ac == 1)
     select_set_single(o, winlet, 0, 1, at);
   else

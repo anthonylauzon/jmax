@@ -173,7 +173,6 @@ static void
 macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidiport_t *this = (macosxmidiport_t *)o;
-  fts_midiparser_t *parser = &this->parser;
   macosxmidi_t *manager;
   fts_symbol_t name;
   fts_atom_t k, a;
@@ -238,7 +237,6 @@ static void
 macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidiport_t *this = (macosxmidiport_t *)o;
-  fts_midiparser_t *parser = &this->parser;
   macosxmidi_t *manager;
   fts_symbol_t name;
   fts_atom_t k, a;

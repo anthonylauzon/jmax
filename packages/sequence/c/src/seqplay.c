@@ -302,8 +302,6 @@ seqplay_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 seqplay_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  seqplay_t *this = (seqplay_t *)o;  
-  
   switch(ac)
     {
     default:

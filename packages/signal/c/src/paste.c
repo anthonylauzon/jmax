@@ -47,7 +47,6 @@ dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fvec_t *fvec = (fvec_t *)fts_get_object(at);
   delayline_t *delayline = this->line;
   float *buffer = delayline->buffer;
-  int phase = delayline->phase;
   int delay_size = delayline->delay_size;
   int ring_size = delayline->ring_size;
   int size = fvec_get_size(fvec);

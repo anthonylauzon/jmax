@@ -811,10 +811,10 @@ fun_template( fts_atom_t *a)
 static void 
 fun_abstraction( fts_atom_t *a)
 {
-  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_pointer( a);
-
   /* Must be done the same way as in templates */
-/*    fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
+/*    
+  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_pointer( a);        
+  fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
 }
 
 static int 
@@ -971,7 +971,6 @@ static void
 __fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
-  int i;
 
   fts_package_remove_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
 
@@ -1211,7 +1210,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->declared_templates) {
     fts_atom_t* a;
     int i = 0;
-    fts_iterator_t keys, values;
+    fts_iterator_t keys;
 
 #if HAVE_ALLOCA
     a = alloca(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
@@ -1242,7 +1241,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->help) {
     fts_atom_t* a;
     int i = 0;
-    fts_iterator_t keys, values;
+    fts_iterator_t keys;
 
 #if HAVE_ALLOCA
     a = alloca(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
@@ -1499,7 +1498,6 @@ fts_package_upload_data_paths( fts_package_t *this)
 static void 
 fts_package_upload_help( fts_package_t *this)
 {
-  fts_package_t *pkg;
   fts_atom_t a[2]; 
   int ok = 0;
   fts_iterator_t i;
@@ -1524,7 +1522,6 @@ fts_package_upload_help( fts_package_t *this)
 static void 
 fts_package_upload_templates( fts_package_t *this)
 {
-  fts_package_t *pkg;
   fts_template_t *tmpl;
   fts_atom_t a[2]; 
   int ok = 0;
@@ -1553,8 +1550,7 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   fts_package_t *this = (fts_package_t *)o;
   fts_atom_t a[3]; 
-  fts_iterator_t i, j, h, k;
-  fts_package_t *pkg;
+  fts_iterator_t h;
   char summary[256];
 
   if( this->state == fts_package_corrupt)
@@ -1731,7 +1727,6 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   fts_object_t *obj;
   fts_atom_t a[1];
-  fts_status_t status;
 
   /* Load the .jmax file */
   obj = fts_binary_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a);

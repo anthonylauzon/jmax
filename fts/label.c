@@ -208,7 +208,7 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_label_t *this = (fts_label_t *) o;
+    /*fts_label_t *this = (fts_label_t *) o;*/
 }
 
 static void

@@ -92,7 +92,6 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 fts_connection_t *
 fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
-  fts_symbol_t selector = NULL;
   int valid = 1;
   fts_connection_t *conn;
   fts_connection_t *p;

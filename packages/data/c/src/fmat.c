@@ -98,7 +98,6 @@ fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t
 void
 fmat_set_from_tuples(fmat_t *mat, int ac, const fts_atom_t *at)
 {
-  int m = fmat_get_m(mat);
   int n = fmat_get_n(mat);
   int i, j;
   
@@ -1191,7 +1190,6 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   float *data = this->values;
   int m = fmat_get_m(this);
   int n = fmat_get_n(this);
-  int size = m * n;
   fts_message_t *mess;
   int i, j;
   
@@ -1219,8 +1217,6 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 fmat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t *this = (fmat_t *)o;
-
   if(data_object_is_persistent(o))
     {
       fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

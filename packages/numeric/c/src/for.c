@@ -122,8 +122,6 @@ for_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 static void
 for_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  for_t *this = (for_t *)o;
-
   for_set(o, 0, 0, ac, at);
   for_go(o, 0, 0, 0, 0);
 }

@@ -173,9 +173,6 @@ fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 
   if(meth)
     {
-      const fts_atom_t *a;
-      int n;
-      
       /* unpack tuple */
       if(ac == 1 && fts_is_tuple(at))
 	{
@@ -212,8 +209,6 @@ check_outlet(fts_object_t *o, int woutlet)
 static void
 output_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_connection_t *conn = o->out_conn[woutlet];
-
   if(check_outlet(o, woutlet))
     {
       fts_connection_t *conn = o->out_conn[woutlet];
@@ -316,7 +311,6 @@ output_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
   if(check_outlet(o, woutlet))
     {
       fts_connection_t *conn = o->out_conn[woutlet];
-      fts_class_t *class = fts_get_class(at);
 
       if (!FTS_REACHED_MAX_CALL_DEPTH()) 
 	{

@@ -140,7 +140,6 @@ key_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 key_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int code = fts_get_int(at + 0);
   int status = fts_get_int(at + 1);
 
   if(status == 0)
@@ -218,7 +217,6 @@ keystat_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 keystat_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  int code = fts_get_int(at + 0);
   int status = fts_get_int(at + 1);
 
   fts_outlet_int(o, 0, status);

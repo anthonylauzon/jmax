@@ -210,7 +210,6 @@ preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       while(fts_iterator_has_more( &iterator))
 	{
 	  fts_atom_t key;
-	  int i;
 	  
 	  fts_iterator_next( &iterator, &key);
 	  preset_remove(this, &key);
@@ -296,7 +295,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(fts_hashtable_get(&this->hash, &k, &a))
 	{
 	  fts_object_t **clones = fts_get_pointer(&a);
-	  int i, j;
+	  int i;
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
@@ -337,7 +336,6 @@ preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_preset_t *this = (fts_preset_t *)o;
   int index = fts_get_int(at + 0);
   fts_symbol_t selector = fts_get_symbol(at + 1);
-  fts_atom_t a;
   
   /* create new clone */
   if(!this->current[index])
@@ -456,7 +454,6 @@ preset_redefine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       int n = this->n_objects;
       fts_iterator_t iterator;
       fts_atom_t a;
-      int i;
       
       if(n > old->n_objects)
 	n = old->n_objects;
@@ -505,7 +502,6 @@ static void
 preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_preset_t *this = (fts_preset_t *)o;
-  int n_objects = 0;
   int i;
 
   this->persistence = 0;

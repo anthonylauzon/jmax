@@ -41,8 +41,6 @@ typedef struct
 static void
 retard_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  retard_t *this = (retard_t *)o;
-
   fts_outlet_varargs(o, 0, 1, at);
 }
 
@@ -82,16 +80,12 @@ retard_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 retard_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  retard_t *this = (retard_t *)o;
-
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
 retard_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  retard_t *this = (retard_t *)o;
-
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
@@ -115,12 +109,6 @@ retard_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 retard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  retard_t *this = (retard_t *)o;
-  int size = 0;
-  int bytes;
-  fts_atom_t *atoms;
-  int i;
-  
   if(ac > 0 && fts_is_number(at))
     retard_set_time(o, 0, 0, 1, at);
 }
@@ -128,8 +116,6 @@ retard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 retard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  retard_t *this = (retard_t *)o;
-
   retard_clear(o, 0, 0, 0, 0);
 }
 

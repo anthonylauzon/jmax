@@ -71,7 +71,6 @@ sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 ftl_apass3(fts_word_t *argv)
 {
-  fts_word_t biquad_args[5];
   float *in_sig = (float *)fts_word_get_pointer(argv + 0);
   float *in_freq = (float *)fts_word_get_pointer(argv + 1);
   float *in_q = (float *)fts_word_get_pointer(argv + 2);
@@ -124,8 +123,6 @@ sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   sigapass3_t *this = (sigapass3_t *)o;
   biquad_coefs_t *data;
-  float zero = 0.0f;
-  float one = 1.0f;
 
   this->biquad_state = ftl_data_new(biquad_state_t);
   this->biquad_coefs = ftl_data_new(biquad_coefs_t);

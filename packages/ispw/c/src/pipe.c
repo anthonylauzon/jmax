@@ -138,16 +138,12 @@ pipe_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 pipe_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  pipe_t *this = (pipe_t *)o;
-
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 static void
 pipe_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  pipe_t *this = (pipe_t *)o;
-
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 

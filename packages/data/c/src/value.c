@@ -56,8 +56,6 @@ value_set_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 value_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  value_t *this = (value_t *)o;
-
   if(ac == 1)
     value_set_atom(o, winlet, s, 1, at);
   else
