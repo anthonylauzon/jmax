@@ -144,8 +144,18 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 		itsTrackDataModel.changeEvent(this);
 	    }
 
+	//send the set message to the fts event object
+	sendSetMessage(value.getValueInfo().getName(), value.getPropertyCount(), value.getPropertyValues());
     }
 
+    private void sendSetMessage(String type, int nArgs, Object args[])
+    {
+	sendArgs[0].setString(type);
+	for(int i=0; i<nArgs; i++)
+	    sendArgs[1+i].setValue(args[i]);
+	
+	sendMessage(FtsObject.systemInlet, "set", 1+nArgs, sendArgs);
+    }
 
     /**
      * Get the given property.
