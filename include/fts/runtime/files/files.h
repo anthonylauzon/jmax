@@ -62,4 +62,6 @@ extern int fts_file_get_read_path(const char *name, char *pathname);
 extern int fts_file_open(const char *name, const char *mode);
 extern int fts_file_close(int fd);
 
+extern int fts_file_is_text( fts_symbol_t file_name);
+
 #endif

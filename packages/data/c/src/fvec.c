@@ -381,38 +381,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	/* force sampling rate to given property */
 	sr = this->sr;
 
-      sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
-      
-      if(sf) /* soundfile successfully opened */
-	{
-	  float file_sr = fts_soundfile_get_samplerate(sf);
-	  float *ptr;
-
-	  if(!n_read)
-	    n_read = fts_soundfile_get_size(sf);
-
-	  /* make enough space for resampled file */
-	  if(sr > 0.0 && sr != file_sr)
-	    n_read = (int)((float)n_read * sr / file_sr + 0.5f);
-	  else
-	    /* get temporary sample rate from file */
-	    this->sr = -file_sr;
-
-	  fvec_set_size(this, n_read);
-	  ptr = fvec_get_ptr(this);
-
-	  size = fts_soundfile_read_float(sf, ptr, n_read);
-
-	  fts_soundfile_close(sf);
-
-	  if(size > 0)
-	    fvec_output(o, 0, 0, 0, 0);
-	  else
-	    post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
-	  
-	  return;
-	}
-      else
+      if (fts_file_is_text( file_name))
 	{
 	  size = fvec_read_atom_file(this, file_name);
 
@@ -420,6 +389,40 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    fvec_output(o, 0, 0, 0, 0);
 	  else
 	    post("fvec: can't load from file \"%s\"\n", fts_symbol_name(file_name));	  
+	}
+      else
+	{
+	  sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
+      
+	  if(sf) /* soundfile successfully opened */
+	    {
+	      float file_sr = fts_soundfile_get_samplerate(sf);
+	      float *ptr;
+
+	      if(!n_read)
+		n_read = fts_soundfile_get_size(sf);
+
+	      /* make enough space for resampled file */
+	      if(sr > 0.0 && sr != file_sr)
+		n_read = (int)((float)n_read * sr / file_sr + 0.5f);
+	      else
+		/* get temporary sample rate from file */
+		this->sr = -file_sr;
+
+	      fvec_set_size(this, n_read);
+	      ptr = fvec_get_ptr(this);
+
+	      size = fts_soundfile_read_float(sf, ptr, n_read);
+
+	      fts_soundfile_close(sf);
+
+	      if(size > 0)
+		fvec_output(o, 0, 0, 0, 0);
+	      else
+		post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
+	  
+	      return;
+	    }
 	}
     }
   else

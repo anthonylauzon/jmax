@@ -32,6 +32,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 static const char *splitpath( const char *path, char *result, char sep)
 {
@@ -212,6 +213,36 @@ int fts_file_close(int fd)
 {
   return close(fd);
 }
+
+int fts_file_is_text( fts_symbol_t file_name)
+{
+  char full_path[1024];
+  int fd, n, i;
+  char buff[256];
+
+  if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
+     return 0;
+
+  if ( (fd = open( full_path, O_RDONLY)) < 0)
+    return 0;
+
+  if ( (n = read( fd, buff, 256)) < 256)
+    {
+      close( fd);
+      return 0;
+    }
+
+  for ( i = 0; i < n; i++)
+    {
+      if ( !isgraph(buff[i]) && !isspace(buff[i]))
+	return 0;
+    }
+
+  close( fd);
+
+  return 1;
+}
+
 
 /*******************************************************
  *
