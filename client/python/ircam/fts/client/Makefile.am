@@ -1,7 +1,6 @@
 pythonclientdir = $(datadir)/jmax/client/python/ircam/fts/client
 
-#python_PYTHON= \
-
+#python_PYTHON= 
 pythonclient_DATA = \
 BinaryProtocolDecoder.py \
 BinaryProtocolEncoder.py \
