@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SAVER_H
-#define _SAVER_H
+#ifndef _FTS_SAVER_H
+#define _FTS_SAVER_H
 
 struct fts_bmax_file;
 

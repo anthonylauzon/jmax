@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _OBJTABLE_H_
-#define _OBJTABLE_H_
+#ifndef _FTS_OBJTABLE_H_
+#define _FTS_OBJTABLE_H_
 /* New version of the objtable.
 
    This version imply that the object IDs are assigned

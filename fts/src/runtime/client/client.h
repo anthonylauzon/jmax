@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _CLIENT_H_
-#define _CLIENT_H_
+#ifndef _FTS_CLIENT_H_
+#define _FTS_CLIENT_H_
 
 #include "runtime/devices.h"
 

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FLOATFUNS_H_
-#define _FLOATFUNS_H_
+#ifndef _FTS_FLOATFUNS_H_
+#define _FTS_FLOATFUNS_H_
 
 /***************************************************************************************
  *

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SRCONV_H_
-#define _SRCONV_H_
+#ifndef _FTS_SRCONV_H_
+#define _FTS_SRCONV_H_
 
 #define FTS_SRCONV_MAX_RATIO (10.0)
 #define FTS_SRCONV_MAX_CHANNELS 16

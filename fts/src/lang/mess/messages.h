@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _MESSAGES_H_
-#define _MESSAGES_H_
+#ifndef _FTS_MESSAGES_H_
+#define _FTS_MESSAGES_H_
 
 /* Return status values */
 

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _DIRECTORIES_H_
-#define _DIRECTORIES_H_
+#ifndef _FTS_DIRECTORIES_H_
+#define _FTS_DIRECTORIES_H_
 
 
 extern void fts_set_search_path(fts_symbol_t search_path);

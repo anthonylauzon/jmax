@@ -1,3 +1,7 @@
+2000-05-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added _FTS before #ifdef pp-commands in all header files
+
 2000-05-09  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* fts/src/runtime/client/incoming.c: fixed memory corruption bug

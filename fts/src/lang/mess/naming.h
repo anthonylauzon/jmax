@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _NAMING_H_
-#define _NAMING_H_
+#ifndef _FTS_NAMING_H_
+#define _FTS_NAMING_H_
 
 
 /* Only for compatibility with the ISPW Object set; don't use for new objects. */

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _ATOMFILES_H_
-#define _ATOMFILES_H_
+#ifndef _FTS_ATOMFILES_H_
+#define _FTS_ATOMFILES_H_
 
 struct _fts_atom_file_t_;
 typedef struct _fts_atom_file_t_ fts_atom_file_t;

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SCHED_H_
-#define _SCHED_H_
+#ifndef _FTS_SCHED_H_
+#define _FTS_SCHED_H_
 
 #include "lang.h"
 

@@ -58,8 +58,8 @@
    computed based on the ordering info, see below.
 */
 
-#ifndef _MODULES_H_
-#define _MODULES_H_
+#ifndef _FTS_MODULES_H_
+#define _FTS_MODULES_H_
 
 typedef struct _fts_module
 {

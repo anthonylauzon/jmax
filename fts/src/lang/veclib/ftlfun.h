@@ -27,8 +27,8 @@
 
 /* ftlfun.h */
 
-#ifndef _FTLFUN_H_
-#define _FTLFUN_H_
+#ifndef _FTS_FTLFUN_H_
+#define _FTS_FTLFUN_H_
 
 #include "sys.h"
 #include "lang/mess.h"

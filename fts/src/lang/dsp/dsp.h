@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _DSP_H_
-#define _DSP_H_
+#ifndef _FTS_DSP_H_
+#define _FTS_DSP_H_
 
 extern fts_module_t fts_dsp_module;
 

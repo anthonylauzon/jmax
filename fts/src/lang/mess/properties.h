@@ -53,8 +53,8 @@
    to, and the others should specify better.
  */
 
-#ifndef _PROPERTIES_H_
-#define _PROPERTIES_H_
+#ifndef _FTS_PROPERTIES_H_
+#define _FTS_PROPERTIES_H_
 
 /* the non underscored functions will run the daemon (look to the .c file for comments) */
 /* also included are shortcuts to avoid type conversions to atoms */
@@ -101,11 +101,4 @@ extern void fts_class_remove_daemon(fts_class_t *cl,
 extern void fts_obj_prop_init(void);
 
 
-
 #endif
-
-
-
-
-
-

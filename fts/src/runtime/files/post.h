@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _POST_H_
-#define _POST_H_
+#ifndef _FTS_POST_H_
+#define _FTS_POST_H_
 
 /* definition file for  logging functions (post and co) */
 

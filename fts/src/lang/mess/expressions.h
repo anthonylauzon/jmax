@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _EXPRESSIONS_H_
-#define _EXPRESSIONS_H_
+#ifndef _FTS_EXPRESSIONS_H_
+#define _FTS_EXPRESSIONS_H_
 
 extern void fts_expressions_init(void);
 

@@ -24,6 +24,9 @@
  *
  */
 
+#ifndef _FTS_SMEM_H
+#define _FTS_SMEM_H
+
 /* Safe memory library.
 
    To link only during debugging of bugs difficult to trace.
@@ -54,11 +57,4 @@ extern char *fts_safe_realloc(void *pv, int size, const char *filename, int line
 #define real_free(size, filename, line)          fts_safe_free(size, filename, line)
 #define real_realloc(pnt, size, filename, line)  fts_safe_realloc(pnt, size, filename, line)
 
-
-
-
-
-
-
-
-
+#endif

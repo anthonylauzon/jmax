@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _PARAMS_H_
-#define _PARAMS_H_
+#ifndef _FTS_PARAMS_H_
+#define _FTS_PARAMS_H_
 
 typedef void (* fts_param_listener_fun_t) (void *listener, fts_symbol_t name,
 					   const fts_atom_t *value);

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FPE_H_
-#define _FPE_H_
+#ifndef _FTS_FPE_H_
+#define _FTS_FPE_H_
 
 /*
  * FPE handling and collection support 

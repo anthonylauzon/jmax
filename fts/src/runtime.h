@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _RUNTIME_H_
-#define _RUNTIME_H_
+#ifndef _FTS_RUNTIME_H_
+#define _FTS_RUNTIME_H_
 
 /* #include "runtime/STtools.h" */
 #include "runtime/audio.h"

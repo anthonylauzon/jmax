@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _TEMPLATES_H_
-#define _TEMPLATES_H_
+#ifndef _FTS_TEMPLATES_H_
+#define _FTS_TEMPLATES_H_
 
 extern void fts_template_init(void);
 

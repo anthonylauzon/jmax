@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _MESS_H_
-#define _MESS_H_
+#ifndef _LANG_MESS_H_
+#define _LANG_MESS_H_
 
 extern fts_module_t fts_mess_module;
 

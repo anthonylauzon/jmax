@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _RAMPS_H_
-#define _RAMPS_H_
+#ifndef _FTS_RAMPS_H_
+#define _FTS_RAMPS_H_
 
 /*****************************************
  *

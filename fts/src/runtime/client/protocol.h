@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _PROTOCOLS_H
-#define _PROTOCOLS_H
+#ifndef _FTS_PROTOCOLS_H
+#define _FTS_PROTOCOLS_H
 
 /* A message  is conceptually made of:
  *

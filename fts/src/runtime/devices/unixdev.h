@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _UNIXDEV_H_
-#define _UNIXDEV_H_
+#ifndef _FTS_UNIXDEV_H_
+#define _FTS_UNIXDEV_H_
 
 /*#include "sys.h"*/
 /*#include "lang.h"*/

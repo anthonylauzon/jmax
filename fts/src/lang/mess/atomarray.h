@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _ATOMARRAY_H_
-#define _ATOMARRAY_H_
+#ifndef _FTS_ATOMARRAY_H_
+#define _FTS_ATOMARRAY_H_
 
 typedef struct fts_atom_array
 {

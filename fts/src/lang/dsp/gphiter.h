@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _GPHITER_H_
-#define _GPHITER_H_
+#ifndef _FTS_GPHITER_H_
+#define _FTS_GPHITER_H_
 
 typedef struct graph_iterator_t graph_iterator_t;
 

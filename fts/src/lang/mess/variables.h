@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _VARIABLES_H_
-#define _VARIABLES_H_
+#ifndef _FTS_VARIABLES_H_
+#define _FTS_VARIABLES_H_
 
 /* Lower level functions */
 

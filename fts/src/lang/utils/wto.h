@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _WTO_H_
-#define _WTO_H_
+#ifndef _FTS_WTO_H_
+#define _FTS_WTO_H_
 
 typedef struct _fts_wto
 {

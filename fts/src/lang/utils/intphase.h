@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _INTPHASE_H_
-#define _INTPHASE_H_
+#ifndef _FTS_INTPHASE_H_
+#define _FTS_INTPHASE_H_
 
 /* this type should have at least 24 bits and be efficient to be calculated */
 typedef int fts_intphase_t;

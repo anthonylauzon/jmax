@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SYS_H_
-#define _SYS_H_
+#ifndef _FTS_SYS_H_
+#define _FTS_SYS_H_
 
 /* 
    Stdio is included for every FTS file 

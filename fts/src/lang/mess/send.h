@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SEND_H_
-#define _SEND_H_
+#ifndef _FTS_SEND_H_
+#define _FTS_SEND_H_
 
 extern fts_metaclass_t *fts_send_metaclass;
 extern fts_metaclass_t *fts_receive_metaclass;

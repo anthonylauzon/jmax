@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SOUNDFORMATSS_H_
-#define _SOUNDFORMATSS_H_
+#ifndef _FTS_SOUNDFORMATSS_H_
+#define _FTS_SOUNDFORMATSS_H_
 
 typedef struct fts_soundfile_format
 {

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTL_H_
-#define _FTL_H_
+#ifndef _FTS_FTL_H_
+#define _FTS_FTL_H_
 
 extern fts_module_t fts_ftl_module;
 

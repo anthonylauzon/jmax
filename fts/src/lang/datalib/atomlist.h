@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _ATOMLIST_H_
-#define _ATOMLIST_H_
+#ifndef _FTS_ATOMLIST_H_
+#define _FTS_ATOMLIST_H_
 
 struct fts_atom_list;
 typedef struct fts_atom_list fts_atom_list_t;

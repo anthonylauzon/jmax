@@ -25,6 +25,9 @@
  */
 
 
+#ifndef _FTS_FTL_H_
+#define _FTS_FTL_H_
+
 /* 
 
    New interface, compatible with a multi-thread pipelined implementation
@@ -112,3 +115,5 @@ but are more than symbols.
 extern void ftl_mem_start_memory_relocation(void);
 extern void ftl_mem_end_memory_relocation(void);
 extern void *ftl_data_relocate_and_get(struct ftl_data_handle *h);
+
+#endif

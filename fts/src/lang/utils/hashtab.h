@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _HASHTAB_H_
-#define _HASHTAB_H_
+#ifndef _FTS_HASHTAB_H_
+#define _FTS_HASHTAB_H_
 
 typedef struct _hash_cell_t hash_cell_t;
 

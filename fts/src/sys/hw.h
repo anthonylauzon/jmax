@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _HW_H_
-#define _HW_H_
+#ifndef _FTS_HW_H_
+#define _FTS_HW_H_
 
 /* generic include with the prototypes of HW dependent functions. */
 

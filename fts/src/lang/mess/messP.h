@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _MESSP_H_
-#define _MESSP_H_
+#ifndef _FTS_MESSP_H_
+#define _FTS_MESSP_H_
 
 /* extern declarations for private functions of the message system
    Do not included by fts objects or user modules, not exported or distributed

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SOUNDFILES_H_
-#define _SOUNDFILES_H_
+#ifndef _FTS_SOUNDFILES_H_
+#define _FTS_SOUNDFILES_H_
 
 /* platform dependend soundfile implementation */
 typedef struct fts_soundfile fts_soundfile_t;

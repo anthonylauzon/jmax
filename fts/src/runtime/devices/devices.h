@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _DEV_H
-#define _DEV_H
+#ifndef _FTS_DEVICES_H
+#define _FTS_DEVICES_H
 /* 
    Generic device support include file.
 

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTSAUDIO_H_
-#define _FTSAUDIO_H_
+#ifndef _FTS_AUDIO_H_
+#define _FTS_AUDIO_H_
 
 #include "runtime/devices.h"
 

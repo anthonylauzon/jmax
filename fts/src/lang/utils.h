@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#ifndef _LANG_UTILS_H_
+#define _LANG_UTILS_H_
 
 extern fts_module_t fts_utils_module;
 

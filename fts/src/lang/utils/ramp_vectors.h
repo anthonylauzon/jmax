@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _RAMP_VECTORS_H_
-#define _RAMP_VECTORS_H_
+#ifndef _FTS_RAMP_VECTORS_H_
+#define _FTS_RAMP_VECTORS_H_
 
 /*****************************************
  *

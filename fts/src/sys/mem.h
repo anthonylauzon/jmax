@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _MEM_H
-#define _MEM_H
+#ifndef _FTS_MEM_H
+#define _FTS_MEM_H
 /* 
    This file include all the memory allocation 
    tools provided by FTS.

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _ERROBJ_H_
-#define _ERROBJ_H_
+#ifndef _FTS_ERROBJ_H_
+#define _FTS_ERROBJ_H_
 
 extern fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
 

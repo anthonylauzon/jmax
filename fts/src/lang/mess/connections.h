@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _CONNECTIONS_H_
-#define _CONNECTIONS_H_
+#ifndef _FTS_CONNECTIONS_H_
+#define _FTS_CONNECTIONS_H_
 
 /* init function */
 

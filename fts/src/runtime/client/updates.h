@@ -31,8 +31,8 @@
 
 /* Should this be a Tile ??? */
 
-#ifndef _UPDATES_H_
-#define _UPDATES_H_
+#ifndef _FTS_UPDATES_H_
+#define _FTS_UPDATES_H_
 
 /* functions */
 

@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef _MIDIFILES_H_
-#define _MIDIFILES_H_
+#ifndef _FTS_MIDIFILES_H_
+#define _FTS_MIDIFILES_H_
 
 typedef struct _fts_midifile_ fts_midifile_t;
 

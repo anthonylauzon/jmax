@@ -26,8 +26,8 @@
 
 /* vecstat.h */
 
-#ifndef _VECSTAT_H_
-#define _VECSTAT_H_
+#ifndef _FTS_VECSTAT_H_
+#define _FTS_VECSTAT_H_
 
 #include "sys.h"
 

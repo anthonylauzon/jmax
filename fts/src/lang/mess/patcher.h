@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _PATCHER_H_
-#define _PATCHER_H_
+#ifndef _FTS_PATCHER_H_
+#define _FTS_PATCHER_H_
 
 extern fts_metaclass_t *patcher_metaclass;
 extern fts_metaclass_t *inlet_metaclass;

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _OBJECTSET_H_
-#define _OBJECTSET_H_
+#ifndef _FTS_OBJECTSET_H_
+#define _FTS_OBJECTSET_H_
 
 
 struct fts_object_set;

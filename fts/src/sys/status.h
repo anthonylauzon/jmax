@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _STATUS_H_
-#define _STATUS_H_
+#ifndef _FTS_STATUS_H_
+#define _FTS_STATUS_H_
 
 /* General status return values for FTS. */
 typedef struct 

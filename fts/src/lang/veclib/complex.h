@@ -27,8 +27,8 @@
 
 /* mathtypes.h */
 
-#ifndef _MATHTYPES_H_
-#define _MATHTYPES_H_
+#ifndef _FTS_COMPLEX_H_
+#define _FTS_COMPLEX_H_
 
 #define MAG re
 #define ARG im

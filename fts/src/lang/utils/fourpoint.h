@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FOURPOINT_H_
-#define _FOURPOINT_H_
+#ifndef _FTS_FOURPOINT_H_
+#define _FTS_FOURPOINT_H_
 
 #define FTS_FOURPOINT_TABLE_BITS 8
 #define FTS_FOURPOINT_TABLE_SIZE (1 << FTS_FOURPOINT_TABLE_BITS)
@@ -59,26 +59,33 @@ extern int fts_fourpoint_table_make(void);
 #define fts_fourpoint_calc_first(x, p) \
   ((x)[0] * ((p)->pm1 + (p)->p0) + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
-#define fts_fourpoint_interpolate(x, i, y) \
+#define fts_fourpoint_interpolate(p, i, y) \
   do { \
-    float* src = (x) + ((i) >> FTS_FOURPOINT_FRAC_BITS); \
-    fts_fourpoint_t *p = fts_fourpoint_table + (((i) >> FTS_FOURPOINT_LOST_BITS) & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
-    *(y) = fts_fourpoint_calc((src), p); \
+    float* q = (p) + ((i) >> FTS_FOURPOINT_FRAC_BITS); \
+    fts_fourpoint_t *ft = fts_fourpoint_table + (((i) >> FTS_FOURPOINT_LOST_BITS) & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
+    *(y) = fts_fourpoint_calc(q, ft); \
   } while(0)
 
-#define fts_fourpoint_interpolate_frac(x, f, y) \
+#define fts_fourpoint_interpolate_range(p, i, y, a, n) \
   do { \
-    fts_fourpoint_index_t index = ((f) * (float)FTS_FOURPOINT_TABLE_SIZE); \
-    fts_fourpoint_t *p = fts_fourpoint_table + (index & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
-    *(y) = fts_fourpoint_calc((x), p); \
+    float* q = (p) + ((i) >> FTS_FOURPOINT_FRAC_BITS); \
+    fts_fourpoint_t *ft = fts_fourpoint_table + (((i) >> FTS_FOURPOINT_LOST_BITS) & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
+    if(q > (a) && q < (a) + (n) - 2) *(y) = fts_fourpoint_calc(q, ft); \
+    else *(y) = 0.0; \
   } while(0)
 
-#define fts_fourpoint_interpolate_first_frac(x, f, y) \
+#define fts_fourpoint_interpolate_frac(p, f, y) \
   do { \
-    fts_fourpoint_index_t index = ((f) * (float)FTS_FOURPOINT_TABLE_SIZE); \
-    fts_fourpoint_t *p = fts_fourpoint_table + (index & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
-    *(y) = fts_fourpoint_calc_first((x), p); \
+    fts_fourpoint_index_t i = ((f) * (float)FTS_FOURPOINT_TABLE_SIZE); \
+    fts_fourpoint_t *ft = fts_fourpoint_table + (i & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
+    *(y) = fts_fourpoint_calc((p), ft); \
+  } while(0)
+
+#define fts_fourpoint_interpolate_first_frac(p, f, y) \
+  do { \
+    fts_fourpoint_index_t i = ((f) * (float)FTS_FOURPOINT_TABLE_SIZE); \
+    fts_fourpoint_t *ft = fts_fourpoint_table + (i & (FTS_FOURPOINT_TABLE_SIZE - 1)); \
+    *(y) = fts_fourpoint_calc_first((p), ft); \
   } while(0)
 
 #endif
-

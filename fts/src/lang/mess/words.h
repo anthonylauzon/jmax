@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _WORDS_H_
-#define _WORDS_H_
+#ifndef _FTS_WORDS_H_
+#define _FTS_WORDS_H_
 
 /*
  * Macros that deals with words.

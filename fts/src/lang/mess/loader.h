@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _LOADER_H_
-#define _LOADER_H_
+#ifndef _FTS_LOADER_H_
+#define _FTS_LOADER_H_
 
 /*
   A FTS binary file is made of the following:

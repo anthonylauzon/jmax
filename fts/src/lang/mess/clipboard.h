@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _CLIPBOARD_H_
-#define _CLIPBOARD_H_
+#ifndef _FTS_CLIPBOARD_H_
+#define _FTS_CLIPBOARD_H_
 
 extern void fts_clipboard_config(void);
 

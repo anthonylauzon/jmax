@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _SYMBOLS_H_
-#define _SYMBOLS_H_
+#ifndef _FTS_SYMBOLS_H_
+#define _FTS_SYMBOLS_H_
 
 #include <stdio.h>
 

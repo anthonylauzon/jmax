@@ -26,8 +26,8 @@
 
 /* vecmod.h */
 
-#ifndef _VECMOD_H_
-#define _VECMOD_H_
+#ifndef _FTS_VECMOD_H_
+#define _FTS_VECMOD_H_
 
 #include "sys.h"
 

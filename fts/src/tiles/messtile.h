@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _MESSTILE_H_
-#define _MESSTILE_H_
+#ifndef _FTS_MESSTILE_H_
+#define _FTS_MESSTILE_H_
 
 extern fts_module_t fts_messtile_module;
 

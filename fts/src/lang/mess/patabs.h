@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _PATABS_H_
-#define _PATABS_H_
+#ifndef _FTS_PATABS_H_
+#define _FTS_PATABS_H_
 
 extern void fts_abstraction_init(void);
 

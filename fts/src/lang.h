@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _LANG_H_
-#define  _LANG_H_
+#ifndef _FTS_LANG_H_
+#define _FTS_LANG_H_
 
 #include "lang/mess.h"
 #include "lang/utils.h"

@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _CLASSES_H_
-#define _CLASSES_H_
+#ifndef _FTS_CLASSES_H_
+#define _FTS_CLASSES_H_
 
 /* Status return values */
 

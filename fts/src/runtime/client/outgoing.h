@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _OUTGOING_H_
-#define _OUTGOING_H_
+#ifndef _FTS_OUTGOING_H_
+#define _FTS_OUTGOING_H_
 
 /* Sending a message */
 extern void fts_client_mess_start_msg(int type);

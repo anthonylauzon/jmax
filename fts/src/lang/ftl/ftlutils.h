@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTLUTILS_H_
-#define _FTLUTILS_H_
+#ifndef _FTS_FTLUTILS_H_
+#define _FTS_FTLUTILS_H_
 
 typedef struct ftl_memory_declaration {
   int size;

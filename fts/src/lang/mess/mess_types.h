@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _MESS_TYPES_H_
-#define _MESS_TYPES_H_
+#ifndef _FTS_MESS_TYPES_H_
+#define _FTS_MESS_TYPES_H_
 
 /******************************************************************************/
 /*                                                                            */

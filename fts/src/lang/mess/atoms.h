@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _ATOMS_H_
-#define _ATOMS_H_
+#ifndef _FTS_ATOMS_H_
+#define _FTS_ATOMS_H_
 
 /*
  * Atoms are type-tagged words; i.e. an atom include a type tag,

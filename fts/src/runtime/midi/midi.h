@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTSMIDI_H_
-#define _FTSMIDI_H_
+#ifndef _FTS_MIDI_H_
+#define _FTS_MIDI_H_
 
 extern fts_module_t fts_midi_module;
 

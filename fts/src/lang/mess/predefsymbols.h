@@ -24,6 +24,9 @@
  *
  */
 
+#ifndef _FTS_PREDEFSYMBOLS_H_
+#define _FTS_PREDEFSYMBOLS_H_
+
 /**
  * These are the predefined symbols, available in global 
  * variables, so that fts_new_symbol() is not necessary.
@@ -170,3 +173,5 @@ PREDEF_SYMBOL( fts_s_sampling_rate, "sampling_rate")
 PREDEF_SYMBOL( fts_s_tick_size, "tick_size")
 PREDEF_SYMBOL( fts_s_dsp_on, "dsp_on")
 PREDEF_SYMBOL( fts_s_fifo_size, "fifo_size")
+
+#endif

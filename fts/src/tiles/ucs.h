@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _UCS_H_
-#define _UCS_H_
+#ifndef _FTS_UCS_H_
+#define _FTS_UCS_H_
 
 /*
    FTS Universal configuration System include file 

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTSDATA_H_
-#define _FTSDATA_H_
+#ifndef _FTS_FTSDATA_H_
+#define _FTS_FTSDATA_H_
 
 #include "messages.h"
 

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _VM_H_
-#define _VM_H_
+#ifndef _FTS_VM_H_
+#define _FTS_VM_H_
 
 
 /*

@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _FTSTIME_H
-#define _FTSTIME_H
+#ifndef _FTS_TIME_H
+#define _FTS_TIME_H
 
 extern fts_module_t fts_time_module;
 

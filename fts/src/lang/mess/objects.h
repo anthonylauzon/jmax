@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _OBJECTS_H_
-#define _OBJECTS_H_
+#ifndef _FTS_OBJECTS_H_
+#define _FTS_OBJECTS_H_
 
 /* Object functions and macros */
 

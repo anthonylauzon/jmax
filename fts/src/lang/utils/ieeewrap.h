@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef _IEEEWRAP_H_
-#define _IEEEWRAP_H_
+#ifndef _FTS_IEEEWRAP_H_
+#define _FTS_IEEEWRAP_H_
 
 /*************************************************************************
  *

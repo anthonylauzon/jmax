@@ -25,8 +25,8 @@
  */
 
 
-#ifndef _PLATFORM_H
-#define _PLATFORM_H
+#ifndef _FTS_PLATFORM_H
+#define _FTS_PLATFORM_H
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
