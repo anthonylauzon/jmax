@@ -77,6 +77,66 @@
 			settings = {
 			};
 		};
+		F52946E2039E6B2001664092 = {
+			isa = PBXFileReference;
+			name = FtsAudioConfig.java;
+			path = ../../java/src/ircam/jmax/fts/FtsAudioConfig.java;
+			refType = 2;
+		};
+		F52946E3039E6B2001664092 = {
+			isa = PBXFileReference;
+			name = FtsAudioLabel.java;
+			path = ../../java/src/ircam/jmax/fts/FtsAudioLabel.java;
+			refType = 2;
+		};
+		F52946E4039E6B2001664092 = {
+			isa = PBXFileReference;
+			name = FtsConfig.java;
+			path = ../../java/src/ircam/jmax/fts/FtsConfig.java;
+			refType = 2;
+		};
+		F52946E5039E6B2001664092 = {
+			isa = PBXFileReference;
+			name = FtsMidiConfig.java;
+			path = ../../java/src/ircam/jmax/fts/FtsMidiConfig.java;
+			refType = 2;
+		};
+		F52946E6039E6B2001664092 = {
+			fileRef = F52946E2039E6B2001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52946E7039E6B2001664092 = {
+			fileRef = F52946E3039E6B2001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52946E8039E6B2001664092 = {
+			fileRef = F52946E4039E6B2001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52946E9039E6B2001664092 = {
+			fileRef = F52946E5039E6B2001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52946EA039E799A01664092 = {
+			isa = PBXFileReference;
+			name = config.c;
+			path = ../../fts/config.c;
+			refType = 2;
+		};
+		F52946EB039E799A01664092 = {
+			fileRef = F52946EA039E799A01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F53B0614035D7EDF01664090 = {
 			isa = PBXFileReference;
 			name = ToggleControlPanel.java;
@@ -13298,6 +13358,7 @@
 				F880FD4E0282FA3901664092,
 				F880FD4F0282FA3901664092,
 				F880FD500282FA3901664092,
+				F52946EA039E799A01664092,
 				F880FD510282FA3901664092,
 				F880FD530282FA3901664092,
 				F880FD540282FA3901664092,
@@ -13783,6 +13844,7 @@
 				F5EF54350352D8FC01664092,
 				F5FC7B010354298B01664092,
 				F5BE0CA2035DAA3201664092,
+				F52946EB039E799A01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -14832,7 +14894,10 @@
 		F880FE590283013E01664092 = {
 			children = (
 				F880FE5A0283013E01664092,
+				F52946E2039E6B2001664092,
+				F52946E3039E6B2001664092,
 				F880FE5D0283013E01664092,
+				F52946E4039E6B2001664092,
 				F880FE5E0283013E01664092,
 				F880FE5F0283013E01664092,
 				F880FE600283013E01664092,
@@ -14849,6 +14914,7 @@
 				F880FE6B0283013E01664092,
 				F880FE6C0283013E01664092,
 				F880FE6D0283013E01664092,
+				F52946E5039E6B2001664092,
 				F880FE6F0283013E01664092,
 				F880FE700283013E01664092,
 				F880FE710283013E01664092,
@@ -14864,7 +14930,6 @@
 				F848668402A2745401664092,
 				F86A04F302B4AD8401664092,
 				F854BE7202B7C9BC01664092,
-				F8B73FBE02C0DEF301664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -15989,13 +16054,16 @@
 				F854BE7302B7C9BC01664092,
 				F858D1C302B8DCC801664092,
 				F822188E02BE2B1801664092,
-				F8B73FC002C0DEF301664092,
 				F8B73FC502C0DF1A01664092,
 				F8B73FC602C0DF1A01664092,
 				F8B73FC702C0DF1A01664092,
 				F59FA8FB035350B401664092,
 				F59FA8FD0353512801664092,
 				F53B0618035D9B1501664090,
+				F52946E6039E6B2001664092,
+				F52946E7039E6B2001664092,
+				F52946E8039E6B2001664092,
+				F52946E9039E6B2001664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17856,18 +17924,6 @@
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F8B73FBE02C0DEF301664092 = {
-			isa = PBXFileReference;
-			name = FtsMidiManager.java;
-			path = ../../java/src/ircam/jmax/fts/FtsMidiManager.java;
-			refType = 2;
-		};
-		F8B73FC002C0DEF301664092 = {
-			fileRef = F8B73FBE02C0DEF301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8B73FC102C0DEF901664092 = {
 			children = (
