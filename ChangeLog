@@ -1,3 +1,10 @@
+2003-03-31  Olivier Chapuis  <olivier.chapuis@free.fr>
+
+        * packages/jack/c/src/jackaudiomanager.c (jackaudiomanager_thread_run):
+        (jackaudiomanager_halt):
+        (jackaudiomanager_config):
+        Connect registered port only after the client has been activated
+
 2003-03-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/*/c/src/Makefile.am : add link to fts in packages Makefiles to fix link problems with LADSPA 
