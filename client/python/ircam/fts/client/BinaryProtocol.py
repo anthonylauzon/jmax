@@ -1,4 +1,7 @@
 class BinaryProtocol:
+    """
+    This class defines protocol value tags for client-server communication
+    """
     INT = 0x01
     FLOAT = 0x02
     SYMBOL_INDEX = 0x03

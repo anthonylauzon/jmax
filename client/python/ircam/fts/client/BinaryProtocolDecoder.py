@@ -39,6 +39,9 @@ qSymbolCache3 = 63
 qSymbolCache4 = 64
 
 class BinaryProtocolDecoder:
+    """
+    This class decode message using FTS cliet-server protocol
+    """
     symbolTable = HashTable()
     
     def __init__(self, serverConnection):
@@ -249,6 +252,9 @@ class BinaryProtocolDecoder:
             self.endObjectAction(input)
     
     def decode(self, data):
+        """
+        Decode message given as argument
+        """
         for c in data:
             self.nextState(ord(c))
             if self.__currentState == 0:

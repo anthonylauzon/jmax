@@ -1,4 +1,7 @@
 class FtsObject:
+    """
+    This class is the base class for all object manipulated by FTS
+    """
     # private static member
     __lookupEntry = "TO FIXED"
     
@@ -8,6 +11,14 @@ class FtsObject:
     NEW_ID = -2
     
     def __init__(self, serverConnection, parent, *args):
+        """
+        FtsObject constructor: create an object in server side
+        - serverConnection: connection to the FTS server
+        - parent: parent object
+        - *args can be:
+        -- int: object ID to use
+        -- int, args[1]: objectID to use, args[1] are send to FTS object constructor
+        """
         from FtsServerConnection import FtsServerConnection
         # Common constructor
         self.__serverConnection = serverConnection
@@ -44,6 +55,9 @@ class FtsObject:
                 return
     
     def send(self, selector, *args):
+        """
+        Send a message with the given selector and args
+        """
         if len(args) > 1:
             print "FtsObject.send want only 2 arguments"
             return
@@ -60,15 +74,27 @@ class FtsObject:
         return
     
     def getParent(self):
+        """
+        Return object's parent
+        """
         return self.__parent
     
     def getServerConnection(self):
+        """
+        Return object's connection to the FTS server
+        """
         return self.__serverConnection
         
     def getID(self):
+        """
+        Return object ID
+        """
         return self.__id
     
     def __setID(self, id):
+        """
+        Set object ID
+        """
         self.__id = id
         return
 
