@@ -50,13 +50,13 @@ public class ObjectInspector extends JDialog
 
     String title = obj.getName();
     if( title == null) title = obj.getFtsObject().getDescription();
-    setTitle( "Inspector : "+title);
+    setTitle( title);
 
     parent = obj.getSketchPad().getEditorContainer().getFrame();
     this.obj = obj;
     this.controlPanel = obj.getControlPanel();
 
-    ((JPanel)controlPanel).setBorder( BorderFactory.createCompoundBorder(  BorderFactory.createEmptyBorder( 5, 5, 5, 5), BorderFactory.createEtchedBorder()));
+    ((JPanel)controlPanel).setBorder( BorderFactory.createCompoundBorder(  BorderFactory.createEmptyBorder( 3, 3, 3, 3), BorderFactory.createEtchedBorder()));
 
     getContentPane().add( (JPanel) controlPanel);
 

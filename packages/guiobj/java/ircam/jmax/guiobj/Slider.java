@@ -325,9 +325,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public ObjectControlPanel getControlPanel()
   {
-    ObjectControlPanel panel = new SliderControlPanel();
-    panel.update( this);
-    return panel;
+    return new SliderControlPanel( this);
   }
 
   public boolean isInspectable()

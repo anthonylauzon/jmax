@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.util.*;
 import java.awt.*;
@@ -33,19 +33,20 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 import ircam.jmax.widgets.*;
 
-public class StandardControlPanel extends JPanel implements ActionListener, ObjectControlPanel
+public class ToggleControlPanel extends JPanel implements ActionListener, ObjectControlPanel
 {
   GraphicObject target = null;
   JTextField nameField = null;
   String name = null;
   JCheckBox persistentCB = null;
-  private boolean persistenceAdded = false;
 
-  public StandardControlPanel( GraphicObject obj)
+  public ToggleControlPanel( GraphicObject obj)
   {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -54,46 +55,37 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     name = obj.getFtsObject().getVariableName();
 
     /* persistence handling */
-    if( target.getFtsObject().isPersistent() != -1)
-      {
-	persistentCB = new JCheckBox("Persistence");
-	persistentCB.addActionListener( new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-	      int persist = ((JCheckBox)e.getSource()).isSelected() ? 1 : 0;
-	      target.getFtsObject().requestSetPersistent( persist);
-	    }
-	  });
-	persistentCB.setSelected( obj.getFtsObject().isPersistent() == 1);
+    persistentCB = new JCheckBox("Persistence");
+    persistentCB.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  int persist = ((JCheckBox)e.getSource()).isSelected() ? 1 : 0;
+	  target.getFtsObject().requestSetPersistent( persist);
+	}
+      });
+    persistentCB.setSelected( obj.getFtsObject().isPersistent() == 1);
 
-	add( persistentCB);
-	
-	persistenceAdded = true;
-      }
-    
+    add( persistentCB);
+
+    add( new JSeparator());
+
     /* name handling */
-    if( obj.getName() != null)
-      {
-	if( persistenceAdded)
-	  add( new JSeparator());
+    JLabel titleLabel = new JLabel("Name", JLabel.RIGHT);
+    titleLabel.setForeground(Color.black);
 
-	JLabel titleLabel = new JLabel("Name", JLabel.RIGHT);
-	titleLabel.setForeground(Color.black);
+    nameField = new JTextField();
+    nameField.setPreferredSize(new Dimension(180, 20));
+    nameField.addActionListener(this);
+    nameField.setText( name);    
 
-	nameField = new JTextField();
-	nameField.setPreferredSize(new Dimension(180, 20));
-	nameField.addActionListener(this);
-	nameField.setText( name);    
-
-	JPanel namePanel = new JPanel();
-	namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
-	namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
-	namePanel.add(titleLabel);    
-	namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
-	namePanel.add( nameField);
-
-	add(namePanel);
-      }
+    JPanel namePanel = new JPanel();
+    namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
+    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+    namePanel.add(titleLabel);    
+    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+    namePanel.add( nameField);
+    
+    add(namePanel);
 
     validate();
   }

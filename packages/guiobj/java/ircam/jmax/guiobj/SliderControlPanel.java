@@ -45,16 +45,20 @@ import ircam.jmax.editors.patcher.objects.*;
 public class SliderControlPanel extends JPanel implements ActionListener, ObjectControlPanel
 {
   GraphicObject target = null;
-  JTextField maxValueField, minValueField;
+  JTextField maxValueField, minValueField, nameField;
   JRadioButton horizontalItem, verticalItem; 
   JLabel maxLabel, minLabel;
   JPanel minPanel, maxPanel;
+  JCheckBox persistentCB = null;
   int min, max;
+  String name = null;
 
-  public SliderControlPanel()
+  public SliderControlPanel( GraphicObject obj)
   {
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    
+    target = obj;
 
     JLabel rangeLabel = new JLabel("Range", JLabel.CENTER);
     rangeLabel.setForeground(Color.black);
@@ -191,6 +195,41 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     orientationPanel.add(Box.createHorizontalGlue());    
 
     add(orientationPanel);
+
+    add( new JSeparator());
+
+    /* persistence handling */
+    persistentCB = new JCheckBox("Persistence");
+    persistentCB.setAlignmentX( Component.RIGHT_ALIGNMENT);
+    persistentCB.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  int persist = ((JCheckBox)e.getSource()).isSelected() ? 1 : 0;
+	  target.getFtsObject().requestSetPersistent( persist);
+	}
+      });    
+    add( persistentCB);
+
+    add(new JSeparator());
+
+    /* name handling */
+    JLabel nameLabel = new JLabel("Name", JLabel.RIGHT);
+    nameLabel.setForeground(Color.black);
+
+    nameField = new JTextField();
+    nameField.setPreferredSize(new Dimension(150, 20));
+    nameField.addActionListener(this);
+
+    JPanel namePanel = new JPanel();
+    namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
+    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+    namePanel.add(nameLabel);    
+    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+    namePanel.add( nameField);
+
+    add(namePanel);
+
+    update( obj);
     validate();
   }
 
@@ -230,11 +269,17 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 	maxLabel.setText("top");
 	minLabel.setText("bottom");		  
       }
+    
+    persistentCB.setSelected( target.getFtsObject().isPersistent() == 1);
+    
+    name = target.getFtsObject().getVariableName();
+    nameField.setText( name);    
   }
 
   public void done()
   {
     setRange();
+    setName();
   }
 
   public void setRange()
@@ -259,8 +304,26 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
   public void actionPerformed( ActionEvent e)
   {
     if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
-      setRange();
-  }  
+      {
+	setRange();
+	setName();
+      }  
+  }
+
+  public void setName()
+  {
+    if( nameField != null)
+      {
+	String text = nameField.getText().trim();
+	
+	if( text != null)
+	  if( ((this.name == null) && !text.equals("")) || ((this.name != null) && !text.equals( this.name)))
+	    {
+	      target.getFtsObject().requestSetName( text);
+	      name = text;
+	    }
+      }
+  }
 }
 
 

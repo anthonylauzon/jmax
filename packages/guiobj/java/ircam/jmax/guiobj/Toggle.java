@@ -36,6 +36,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
+import ircam.jmax.toolkit.*;
 
 //
 // The "toggle" graphic object.
@@ -169,5 +170,15 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 	g.drawLine( x + 1, y + 1, x + w - 3, y + h - 3);
 	g.drawLine( x + w - 3, y + 1, x + 1, y + h - 3);
       }
+  }
+
+  public ObjectControlPanel getControlPanel()
+  {
+    return new ToggleControlPanel( this);
+  }
+
+  public boolean isInspectable()
+  {
+    return true;
   }
 }
