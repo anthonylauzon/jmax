@@ -1,14 +1,12 @@
-dnl Process this file with autoconf to produce a configure script, as in:
-dnl ./configure --with-jmax-include=/u/worksta/dechelle/projects/jmax/include
+dnl Process this file with autoconf to produce a configure script
+
 AC_INIT(fts/version.c.in)
 
-JMAX_MAJOR_VERSION=3
-JMAX_MINOR_VERSION=0
-JMAX_PATCH_VERSION=2
-JMAX_VERSION_STATUS=_latest_cvs
+. $srcdir/JMAX-VERSION
 JMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${JMAX_VERSION_STATUS}
 
-AC_SUBST(JMAX_VERSION)
+VERSION=${JMAX_VERSION}
+PACKAGE=jmax
 
 AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
 
@@ -140,7 +138,7 @@ config/Makefile
 images/Makefile
 tutorials/Makefile
 tutorials/basics/Makefile
-java/src/ircam/jmax/MaxVersion.java
+java/src/ircam/jmax/JMaxVersion.java
 java/Makefile
 java/lib/Makefile
 java/lib/jacl/Makefile

@@ -6,7 +6,7 @@ RecentFileHistory.java\
 MaxApplication.java\
 MaxToolFinder.java\
 MaxVector.java\
-MaxVersion.java\
+JMaxVersion.java\
 MaxWhenHookTable.java\
 MaxWindowManager.java\
 ObjectCreatorManager.java\

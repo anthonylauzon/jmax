@@ -20,8 +20,8 @@
  * 
  */
 
-static const char *version_string = "@JMAX_VERSION@";
-static const char *full_version_string = "version @JMAX_VERSION@";
+static const char *version_string = "@VERSION@";
+static const char *full_version_string = "version @VERSION@";
 
 const char *fts_get_version( void)
 {

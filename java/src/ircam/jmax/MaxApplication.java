@@ -237,7 +237,7 @@ public class MaxApplication extends Object
 
     //Splash Screen Dialog
     if((jmaxProperties.get("jmaxSplashScreen") == null)||(!jmaxProperties.get("jmaxSplashScreen").equals("hide")))
-	splash = new SplashDialog(jmaxProperties.get("jmaxRoot")+"/images/Splash.gif", MaxVersion.getMaxVersion());  
+	splash = new SplashDialog(jmaxProperties.get("jmaxRoot")+"/images/Splash.gif", JMaxVersion.getVersion());  
 
     if (jmaxProperties.get("jmaxInterp") == null)
       {
@@ -249,7 +249,7 @@ public class MaxApplication extends Object
     //the version number as a system property
     try
       {
-	jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
+	jmaxProperties.put("jmaxVersion", JMaxVersion.getVersion());
       }
     catch (java.lang.NoClassDefFoundError e)
       {
@@ -438,7 +438,7 @@ public class MaxApplication extends Object
 
 	elapsedTime = System.currentTimeMillis() - startTime;
 
-	System.err.println("jMax version " + MaxVersion.getMaxVersion());
+	System.err.println("jMax version " + JMaxVersion.getVersion());
 	System.err.println(" date " + new Date());
 	System.err.println(" loading time " + elapsedTime + " msecs");
 	System.err.println("Total memory " + Runtime.getRuntime().totalMemory());

@@ -21,9 +21,9 @@
 
 package ircam.jmax;
 
-public class MaxVersion {
-  public static String getMaxVersion()
+public class JMaxVersion {
+  public static String getVersion()
   {
-    return "version @JMAX_VERSION@";
+    return "version @VERSION@";
   }
 }
