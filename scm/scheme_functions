@@ -6,7 +6,8 @@ interpreter-load-package
 interpreter-load-project
 interpreter-load-scripted-document
 interpreter-convert
-interpreter-add-script-menu-item
+interpreter-ask
+interpreter-add-script-menu
 interpreter-get-package-handler
 scheme-interpreter-is-null
 scheme-interpreter-to-java-string
@@ -81,3 +82,4 @@ file-exists
 hashtable-put
 hashtable-get
 class-for-name
+

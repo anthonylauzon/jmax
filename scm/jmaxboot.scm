@@ -46,20 +46,14 @@
 (define jmax-image-root (string-append jmax-root slash "images" slash))
 
 ;;
-;; Load the interface functions specific to the Scheme
-;; interpreter.
+;; Load the intrinsic Scheme functions. 
 ;;
-(load (string-append jmax-scm-root slash jmax-interp-name "_interface.scm"))
+(load (string-append jmax-scm-root slash "scheme_interface.scm"))
 
 ;;
 ;; FIXME testing only
 ;;
 (define start-time (system-current-time-millis))
-
-;;
-;; Load the intrinsic Scheme functions. 
-;;
-(load (string-append jmax-scm-root slash "scheme_interface.scm"))
 
 ;;
 ;; Intrinsic functions for the Sgi platform

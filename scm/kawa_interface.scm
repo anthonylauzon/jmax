@@ -31,7 +31,7 @@
 (define (max-application-run-hooks a0)
   ((primitive-static-method
     <ircam.jmax.MaxApplication>
-    "runHooks" <void> (<java.lang.String>))
+    "runHooks" <boolean> (<java.lang.String>))
    a0))
 
 (define (max-application-quit)
@@ -88,11 +88,11 @@
     "loadScriptedDocument" <ircam.jmax.mda.MaxDocument> (<ircam.jmax.script.pkg.Package> <java.io.File>))
    a0 a1 a2))
 
-(define (interpreter-add-script-menu-item a0 a1 a2 a3 a4)
+(define (interpreter-add-script-menu a0 a1 a2 a3)
   ((primitive-interface-method
     <ircam.jmax.script.Interpreter>
-    "addScriptMenuItem" <void> (<java.lang.String> <java.lang.String> <java.lang.Object> <ircam.jmax.script.Script>))
-   a0 a1 a2 a3 a4))
+    "addScriptMenu" <void> (<ircam.jmax.script.Script> <java.lang.String> <java.lang.Object>))
+   a0 a1 a2 a3))
 
 (define (scheme-interpreter-get-key-stroke a0 a1 a2 a3 a4 a5)
   ((primitive-virtual-method

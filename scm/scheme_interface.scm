@@ -23,14 +23,21 @@
 ;; Author: Peter Hanappe
 ;;
 
+;; Load the intrinsic interface functions. This file is generated
+;; automatically with the following command:
+;; java MethodsToScheme SilkMethodPrinter scheme_classes scheme_functions > intrinsics.scm
+;;
+(load (string-append jmax-scm-root slash "intrinsics.scm"))
+
 ;; Scheme interface
 ;;
-;; The files kawa_interface and kawa_interface both define the basic
-;; functions to access jMax objects. This file contains an additional
-;; set of functions to access jMax. In general, they have more "user
-;; friendly" names and provide an easier to use syntax. These functions
-;; are independent of the interpreter.
+;; The file intrinsics.scm defines the basic functions to access jMax
+;; objects. The rest of this file contains an additional set of
+;; functions to access jMax. In general, they have more "user
+;; friendly" names and provide an easier to use syntax. These
+;; functions are independent of the interpreter.
 ;; 
+
 
 ; FIXME
 ;("sourceFile", new MaxSourceCmd());
@@ -149,17 +156,28 @@
 ;;
 ;; script-menu
 ;;
-;; Adds a new entry in the script menu for the given document
-;; type. Document type "all" signifies that the menu will be visible
-;; in all document menu bars. "name" is the user visible menu
-;; name. "key" is the key stroke to which this script is bound. Use
-;; the "key-stroke" procedure to construct the correct key
-;; stroke. "script" detemines the script to be executed. It can be a
-;; string expression or a procedure (Kawa only).
+;; Adds a new entry in the script menu. "type" is the document type
+;; the script handles. Use "all" for all type of documents. "name" is
+;; the user visible menu name. "key" is the key stroke to which this
+;; script is bound. Use the "key-stroke" procedure to construct the
+;; correct key stroke. "script" detemines the script to be
+;; executed. It can be a string expression or a procedure (Kawa only).
 ;;
-(define script-menu
-  (lambda (doc name key script . arg)
-    (interpreter-add-script-menu-item jmax-interp doc name key (make-script script arg))))
+(define (add-script-menu type script name key)
+  (interpreter-add-script-menu jmax-interp type (make-script script ()) name key))
+
+;;
+;; ask
+;; 
+;; Ask the user to enter a value in a dialog. "question" is the string
+;; to be displayed as title in the dialog. "return-type" is the type
+;; of the answer. Valid types are "boolean", "int", "float", "string",
+;; "symbol". 
+;;
+;; Ex. (println (ask "How many iterations?" "int") " iterations")
+;;
+(define (ask question return-type) 
+  (interpreter-ask jmax-interp question return-type))
 
 ;;
 ;; make-script
@@ -375,14 +393,20 @@
   (get-property "jmaxVersion")) 
 
 ;;
-;; when
+;; define-hook
 ;;
-;; "when" takes a label and a procedure. The procedure is either a
+;; "define" takes a label and a procedure. The procedure is either a
 ;; string expression or a Scheme procedure. In the latter case an
 ;; argument list can be given.
 ;;
-(define when
+(define define-hook
   (lambda (label proc . arg)
     (max-application-add-hook label (make-script proc arg))))
+
+(define when
+  (lambda (label proc . arg)
+    (println "Hello! when is no longer used. Please use define-hook instead.")
+    (println "(We defined " label "-hook for you anyway.)")
+    (apply define-hook (append (list label proc) arg))))
 
 

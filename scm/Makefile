@@ -30,7 +30,7 @@ java:
 
 scm:
 	java MethodsToScheme KawaMethodPrinter scheme_classes scheme_functions > kawa_interface.scm;
-	java MethodsToScheme SilkMethodPrinter scheme_classes scheme_functions > silk_interface.scm;
+	java MethodsToScheme SilkMethodPrinter scheme_classes scheme_functions > intrinsics.scm;
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/scm
