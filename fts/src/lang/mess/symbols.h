@@ -43,6 +43,7 @@ extern fts_symbol_t fts_s_disconnect_inlet;
 extern fts_symbol_t fts_s_disconnect_outlet;
 extern fts_symbol_t fts_s_send_update;
 extern fts_symbol_t fts_s_value;
+extern fts_symbol_t fts_s_name;
 extern fts_symbol_t fts_s_ninlets;
 extern fts_symbol_t fts_s_noutlets;
 extern fts_symbol_t fts_s_bang;

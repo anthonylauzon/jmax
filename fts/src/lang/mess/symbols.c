@@ -32,6 +32,7 @@ fts_symbol_t fts_s_connect_outlet;
 fts_symbol_t fts_s_disconnect_inlet;
 fts_symbol_t fts_s_disconnect_outlet;
 fts_symbol_t fts_s_value;
+fts_symbol_t fts_s_name;
 fts_symbol_t fts_s_ninlets;
 fts_symbol_t fts_s_noutlets;
 fts_symbol_t fts_s_bang;
@@ -62,6 +63,7 @@ fts_predefine_symbols(void)
   fts_s_disconnect_inlet  = fts_new_symbol("$disconnect_inlet");
   fts_s_disconnect_outlet = fts_new_symbol("$disconnect_outlet");
   fts_s_value             = fts_new_symbol("value");
+  fts_s_name              = fts_new_symbol("name");
   fts_s_ninlets           = fts_new_symbol("nIns");
   fts_s_noutlets          = fts_new_symbol("nOuts");
   fts_s_bang              = fts_new_symbol("bang");
