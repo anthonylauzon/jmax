@@ -55,10 +55,9 @@ bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   {
     /* create new bus */
     fts_atom_t a;
-	bus_t* bus;
+    bus_t* bus;
     fts_set_symbol(&a, bus_tilda_symbol);
     bus = (bus_t*)fts_eval_object_description(patcher, 1, &a); 
-/*     bus_t *bus = (bus_t *)fts_object_create_in_patcher(bus_class, patcher, 0, 0); */
 
     /* name the bus */
     fts_object_set_name((fts_object_t *)bus, name);
@@ -566,3 +565,10 @@ signal_bus_config(void)
   fts_class_install(catch_tilda_symbol, catch_instantiate);
   fts_class_install(recycle_tilda_symbol, recycle_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
