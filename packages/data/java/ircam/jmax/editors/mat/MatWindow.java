@@ -114,14 +114,19 @@ public class MatWindow extends JMaxEditor {
   
   public void setWindowName(String name)
   {    
+    String title;
     if(name != null && !name.equals(""))
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +"  "+name));
+      title = matData.getType() +"  "+name;
     else
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +" #"+((FtsGraphicObject)matData).getObjectID()));
-    
-    MaxWindowManager.getWindowManager().windowChanged(this);
+      title = matData.getType() +" #"+((FtsGraphicObject)matData).getObjectID();
+      
+    if( !getTitle().equals(title))
+    {
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));    
+      MaxWindowManager.getWindowManager().windowChanged(this);
+    }
   }
-  
+
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
     

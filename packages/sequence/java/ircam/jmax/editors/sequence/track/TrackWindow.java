@@ -135,14 +135,20 @@ public class TrackWindow extends JMaxEditor {
   public void setWindowName(String name)
   {
     String text = "track "+trackData.getType().getName();
-        
-    if(name != null && !name.equals(""))
-      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(text+" "+ name));
-    else
-      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(text+" #"+((FtsGraphicObject)trackData).getObjectID()));
+    String title;
     
-    MaxWindowManager.getWindowManager().windowChanged(this);
-  }
+    if(name != null && !name.equals(""))
+      title = text+" "+ name;
+    else
+      title = text+" #"+((FtsGraphicObject)trackData).getObjectID();
+    
+    if( !getTitle().equals(title))
+    {
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));    
+      MaxWindowManager.getWindowManager().windowChanged(this);
+    }
+	}
+  
 	
   private final void makeMenuBar()
   {
