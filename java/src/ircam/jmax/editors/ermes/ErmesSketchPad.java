@@ -1423,6 +1423,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void SelectAll(){
     ErmesObject aObject;
     ErmesConnection aConnection;
+    if(itsRunMode) return;
+
     for (Enumeration e = itsElements.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
       itsSelectedList.addElement(aObject);
