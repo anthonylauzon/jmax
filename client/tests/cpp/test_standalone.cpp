@@ -133,7 +133,7 @@ main( int ac, char **av)
 	{
 	  int i;
 
-	  cout << "Value ?" << endl;
+//  	  cout << "Value ?" << endl;
 
 	  cin >> i;
 	  if ( cin.eof() )

@@ -364,8 +364,10 @@ FtsSocketConnection::FtsSocketConnection( const char *hostname, int port, int co
 }
 
 FtsSocketConnection::FtsSocketConnection() throw( FtsClientException)
+  : _socket( INVALID_SOCKET), _hostname( "127.0.0.1"), _port( DEFAULT_PORT), _connectTimeout( DEFAULT_CONNECT_TIMEOUT)
 {
-  FtsSocketConnection( "127.0.0.1", DEFAULT_PORT, DEFAULT_CONNECT_TIMEOUT);
+  initializeSocketLayer();
+  connect();
 }
 
 int FtsSocketConnection::poll() throw( FtsClientException)
@@ -533,7 +535,22 @@ int FtsPipeConnection::poll() throw( FtsClientException)
   } 
  
 #else
-  return 0;
+  fd_set readfds;
+  struct timeval tv;
+  int r;
+
+  FD_ZERO( &readfds);
+  FD_SET( _in, &readfds);
+
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+
+  r = select( _in+1, &readfds, NULL, NULL, &tv);
+
+  if (r < 0)
+    throw FtsClientException( "Error in select()", LASTERROR);
+
+  return r;
 #endif
 }
 
@@ -1201,15 +1218,15 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
       argv[i+1] = NULL;
 
       if ( execvp( _path, argv) < 0)
-	{
-	  fprintf( stderr, "[dtdserver]: execl() failed (%s)\n", strerror( errno));
-	}
+	throw FtsClientException( "execvp() failed", errno);
 
       exit( 1);
     }
   else
     {
+      close( from_fts_pipe[1]);
       _in = from_fts_pipe[0];
+      close( to_fts_pipe[0]);
       _out = to_fts_pipe[1];
     }
 }

@@ -1207,6 +1207,8 @@ fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *buff
   }
 #else
   
+  fts_log( "[pipe] writing %d bytes\n", n);
+
   if ( write( this->out, buffer, n) < n)
     fts_log("[pipe]: failed to write to pipe: (%s)\n", strerror( errno));
 #endif
