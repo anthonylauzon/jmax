@@ -35,7 +35,7 @@ static void fts_audiofile_destroy(fts_object_t *o, int winlet, fts_symbol_t s, i
 /*  #define NUM_CHAN  16 */
 #if TEST_READ
 static void fts_audiofile_put_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_audiofile_ftl_read(fts_word_t *argv);
+static void fts_audiofile_ftl_read(fts_word_t *argv)
 #elif TEST_WRITE
 static void fts_audiofile_put_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void fts_audiofile_ftl_write(fts_word_t *argv);
@@ -222,13 +222,14 @@ fts_audiofile_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 #endif
 }
 
+
 /*******************************************************
  *
  * Audio file methods
  *
  */
 fts_audiofile_t* 
-fts_audiofile_open_write(char* filename, int sample_rate, int channels, char* sample_format)
+fts_audiofile_open_write(fts_symbol_t  filename, int sample_rate, int channels, fts_symbol_t sample_format)
 {
   fts_atom_t a[4];
 
@@ -241,7 +242,7 @@ fts_audiofile_open_write(char* filename, int sample_rate, int channels, char* sa
 }
 
 fts_audiofile_t* 
-fts_audiofile_open_read(char* filename)
+fts_audiofile_open_read(fts_symbol_t filename)
 {
   fts_atom_t a[1];
   fts_set_symbol(&a[0], fts_new_symbol(filename));

@@ -20,6 +20,8 @@
  * 
  */
 
+#ifndef _FTS_AUDIOFILE_H_
+#define _FTS_AUDIOFILE_H_
 
 /***********************************************
  *
@@ -51,6 +53,9 @@ struct _fts_audiofile_loader_t {
   int (*read)(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
 
   /** returns 0 if no errors occured, a non null value otherwise */
+  int (*seek)(fts_audiofile_t* aufile, unsigned int offset);
+
+  /** returns 0 if no errors occured, a non null value otherwise */
   int (*close)(fts_audiofile_t* aufile);
 
   /** returns a string description of the last occured error */
@@ -78,14 +83,16 @@ struct _fts_audiofile_t {
 };
 
 
+FTS_API fts_audiofile_t* fts_audiofile_open_write(fts_symbol_t filename, int sample_rate, int channels, fts_symbol_t sample_format);
+FTS_API fts_audiofile_t* fts_audiofile_open_read(fts_symbol_t  filename);
+FTS_API void fts_audiofile_delete(fts_audiofile_t* aufile);
 
-FTS_API fts_audiofile_t* fts_audiofile_open_write(char* filename, int sample_rate, int channels, char* sample_format);
-FTS_API fts_audiofile_t* fts_audiofile_open_read(char* filename);
-
-#define fts_audiofile_write(_f,_b,_n,_l)      (*fts_audiofile_loader->write)(_f,_b,_n,_l)
-#define fts_audiofile_read(_f,_b,_n,_l )      (*fts_audiofile_loader->read)(_f,_b,_n,_l)
-#define fts_audiofile_close(_f)               (*fts_audiofile_loader->close)(_f)
-#define fts_audiofile_error(_f)               (*fts_audiofile_loader->error)(_f)
+#define fts_audiofile_valid(_f)               (((_f) != NULL) && (fts_object_get_error((fts_object_t*) (_f)) == NULL))
+#define fts_audiofile_write(_f,_b,_n,_l)      ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->write)(_f,_b,_n,_l) : -1)
+#define fts_audiofile_read(_f,_b,_n,_l )      ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->read)(_f,_b,_n,_l) : -1)
+#define fts_audiofile_close(_f)               ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->close)(_f) : -1)
+#define fts_audiofile_seek(_f,_n)             ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->seek)(_f,_n) : -1)
+#define fts_audiofile_error(_f)               ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->error)(_f) : "No audiofile loader")
 #define fts_audiofile_get_filename(_f)        (_f)->filename
 #define fts_audiofile_get_sample_rate(_f)     (_f)->sample_rate
 #define fts_audiofile_get_num_channels(_f)    (_f)->channels
@@ -97,4 +104,8 @@ FTS_API fts_audiofile_t* fts_audiofile_open_read(char* filename);
 #define fts_audiofile_set_format(_f,_v)       { (_f)->format = _v; }
 #define fts_audiofile_set_num_frames(_f,_v)   { (_f)->frames = _v; }
 #define fts_audiofile_set_handle(_f,_v)       { (_f)->handle = _v; }
+
+#endif
+
+
 
