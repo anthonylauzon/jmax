@@ -1,5 +1,13 @@
 2003-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fixed C++ compilation when <fts/fts.h> is included.
+	
+	* include/fts/dsp.h: changed function argument class into cl (class is a C++ reserved keyword).
+	
+	* fts/patcher.c, include/fts/patcher.h, include/ftsprivate/patcher.h: 
+	     * renamed member name template of fts_patcher structure into template_definition (template is a C++ reserved keyword).
+	     * renamed this into self (this is a C++ reserved keyword).
+
 	* added dsdev, mmio and winmidi packages in distribution.
 
 	* added Visual C++ project/workspace files in distribution.
