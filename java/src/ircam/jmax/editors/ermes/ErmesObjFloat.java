@@ -158,8 +158,9 @@ class ErmesObjFloat extends ErmesObject {
       itsFtsObject.put("value", itsFloat);
 
       DoublePaint();
-      if(x<itsX+currentRect.width/2) fastMode = true;
-      else fastMode = false;
+      fastMode = false;
+      //if(x<itsX+currentRect.width/2) fastMode = true;
+      //else fastMode = false;
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;

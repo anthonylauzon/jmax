@@ -1308,11 +1308,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     } 
     else if (editStatus == MOVING){
       repaint();
-      if((itsStartInclusionRect.x+(x-itsStartMovingPt.x)>0)&&
-	 (itsStartInclusionRect.y+(y-itsStartMovingPt.y)>0)){
+      if(itsStartInclusionRect.x+(x-itsStartMovingPt.x)>=0)
 	currentMouseX = x;
+      if(itsStartInclusionRect.y+(y-itsStartMovingPt.y)>=0)
 	currentMouseY = y;
-      }
       repaint();
       return;
     }
