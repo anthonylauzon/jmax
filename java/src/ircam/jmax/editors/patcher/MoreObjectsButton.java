@@ -54,13 +54,13 @@ public class MoreObjectsButton extends JMenuBar
       menu.setMinimumSize(new Dimension(24, 19));
 
       for(Enumeration e = buttons; e.hasMoreElements();)
-	  menu.add((ErmesToolButton)e.nextElement(), 0);
+	  menu.add((ToolButton)e.nextElement(), 0);
       add(menu);
   }
 
   public void update(Enumeration buttons, int size)
   {
-      ErmesToolButton button;
+      ToolButton button;
       int count = menu.getItemCount();
       if(size == count) return;
       if(size>count)
@@ -68,7 +68,7 @@ public class MoreObjectsButton extends JMenuBar
 	      int i=0;
 	      for(Enumeration e = buttons; e.hasMoreElements();)
 		  {
-		      button = (ErmesToolButton)e.nextElement();
+		      button = (ToolButton)e.nextElement();
 
 		      if(i++ >= count)
 			menu.add(button, 0);

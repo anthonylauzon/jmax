@@ -11,8 +11,6 @@ ErmesPatcherListener.java\
 ErmesSelection.java\
 ErmesSketchPad.java\
 ErmesSketchWindow.java\
-ErmesToolBar.java\
-ErmesToolButton.java\
 ErrorTableModel.java\
 ErrorTablePanel.java\
 FinderTableModel.java\
@@ -40,6 +38,8 @@ ScaleTransform.java\
 Settings.java\
 TextRenderer.java\
 ToolsPanel.java\
+ToolBar.java\
+ToolButton.java\
 ToolTableModel.java
 
 JAVAC= @JAVACX@

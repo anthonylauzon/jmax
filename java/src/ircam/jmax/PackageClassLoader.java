@@ -26,17 +26,16 @@ import java.util.jar.*;
 import java.util.zip.*;
 
 /**
- * JMaxPackageClassLoader
+ * PackageClassLoader
  * 
  * The class loader for the jMax packages.
  * It simply load the class from a jar file.
  */
+class PackageClassLoader extends ClassLoader {
 
-class JMaxPackageClassLoader extends ClassLoader {
-
-  JMaxPackageClassLoader( JarFile jarFile)
+  PackageClassLoader( String jarPath) throws IOException
   {
-    this.jarFile = jarFile;
+    jarFile = new JarFile( jarPath);
   }
 
   // Note from the Java 2 API documentation about the method loadClass of the class java.lang.ClassLoader:
@@ -49,19 +48,47 @@ class JMaxPackageClassLoader extends ClassLoader {
     return defineClass( name, b, 0, b.length);
   }
 
-  private byte[] loadClassData( String name) throws ClassNotFoundException
+  public InputStream getResourceAsStream( String name)
   {
-    String entryName = name.replace( '.', File.separatorChar) + ".class";
-    ZipEntry ze = jarFile.getEntry( entryName);
+    ZipEntry zipEntry = jarFile.getEntry( name);
 
-    if (ze == null)
-      throw new ClassNotFoundException( "Cannot find JAR file entry " + "\"" + entryName + "\"");
-
-    byte b[] = new byte[ (int)ze.getSize()];
+    if (zipEntry == null)
+      return null;
 
     try
       {
-	jarFile.getInputStream( ze).read( b);
+	return jarFile.getInputStream( zipEntry);
+      }
+    catch( IOException e)
+      {
+      }
+
+    return null;
+  }
+
+  private byte[] loadClassData( String name) throws ClassNotFoundException
+  {
+    String entryName = name.replace( '.', File.separatorChar) + ".class";
+    ZipEntry zipEntry = jarFile.getEntry( entryName);
+
+    if (zipEntry == null)
+      throw new ClassNotFoundException( "Cannot find JAR file entry " + "\"" + entryName + "\"");
+
+    int size = (int)zipEntry.getSize();
+    byte b[] = new byte[ size];
+
+    try
+      {
+	InputStream is = jarFile.getInputStream( zipEntry);
+	int offset = 0;
+
+	do
+	  {
+	    int n = is.read( b, offset, size);
+	    offset += n;
+	    size -= n;
+	  }
+	while ( size > 0);
       }
     catch( IOException e)
       {

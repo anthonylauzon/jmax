@@ -18,32 +18,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
 
-package ircam.jmax;
+package ircam.jmax.guiobj;
 
-import java.io.*;
+import ircam.jmax.editors.patcher.objects.*;
+/**
+ * A specialized listener that listen to value changes
+ * where value is a float.
+ */
 
-public class JMaxPackageLoader {
-  
-  public static void load( String packageName) throws JMaxPackageLoadingException
-  {
-    String fs = File.separator;
-    String packagePath = ((String)MaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
-    String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
-
-    char[] ch = packageName.toCharArray();
-    ch[0] = Character.toUpperCase( ch[0]);
-    String className = new String( ch);
-
-    try
-      {
-	PackageClassLoader classLoader = new PackageClassLoader( jarPath);
-	JMaxPackage jmaxPackage = (JMaxPackage)classLoader.loadClass( className).newInstance();
-	jmaxPackage.load();
-      }
-    catch( Exception e)
-      {
-	throw new JMaxPackageLoadingException( e.getClass().getName() + " " + e.getMessage());
-      }
-  }
+public interface ObjectControlPanel
+{
+  public void update(GraphicObject obj);
 }

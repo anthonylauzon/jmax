@@ -1,5 +1,8 @@
 2002-02-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* java/src/ircam/jmax: added package loading, changed implementation of
+	package class loader (was not JDK 1.2 compliant)
+
 	* fts/: removed global object table. Object table is local to the client.
 
 2002-02-13  Francois Dechelle  <dechelle@lipari.ircam.fr>

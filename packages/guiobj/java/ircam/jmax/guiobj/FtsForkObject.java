@@ -18,32 +18,45 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
 
-package ircam.jmax;
+package ircam.jmax.guiobj;
 
 import java.io.*;
+import java.util.*;
 
-public class JMaxPackageLoader {
-  
-  public static void load( String packageName) throws JMaxPackageLoadingException
-  {
-    String fs = File.separator;
-    String packagePath = ((String)MaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
-    String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.fts.client.*;
 
-    char[] ch = packageName.toCharArray();
-    ch[0] = Character.toUpperCase( ch[0]);
-    String className = new String( ch);
+public class FtsForkObject extends FtsGraphicObject
+{
+    public FtsForkObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
+    {
+	super(server, parent, id, args, offset, length);
+    }
 
-    try
-      {
-	PackageClassLoader classLoader = new PackageClassLoader( jarPath);
-	JMaxPackage jmaxPackage = (JMaxPackage)classLoader.loadClass( className).newInstance();
-	jmaxPackage.load();
-      }
-    catch( Exception e)
-      {
-	throw new JMaxPackageLoadingException( e.getClass().getName() + " " + e.getMessage());
-      }
-  }
+    public void setDefaults()
+    {
+	setWidth(Fork.DEFAULT_WIDTH);
+	setHeight(Fork.CONST_HEIGHT);
+    }
+    
+    public void requestSetOutlets(int nOuts)
+    {
+	args.clear();
+	args.addInt(nOuts);
+	
+	try{
+	    send( FtsSymbol.get("set_outlets"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsForkObject: I/O Error sending set_outlets Message!");
+		e.printStackTrace(); 
+	    }  
+    }
 }

@@ -4,16 +4,18 @@ packagedir=$(pkgdatadir)
 package_JAVA =					\
 DefaultIcons.java				\
 JMaxObjectCreator.java				\
+JMaxClassMap.java				\
 JMaxPackage.java				\
-JMaxPackageClassLoader.java			\
 JMaxPackageLoader.java				\
 JMaxPackageLoadingException.java		\
+JMaxUtilities.java				\
 JMaxVersion.java				\
 MaxApplication.java				\
 MaxToolFinder.java				\
 MaxVector.java					\
 MaxWindowManager.java				\
 ObjectCreatorManager.java			\
+PackageClassLoader.java				\
 Platform.java					\
 RecentFileHistory.java
 

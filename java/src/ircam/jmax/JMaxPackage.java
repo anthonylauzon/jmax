@@ -21,13 +21,11 @@
 
 package ircam.jmax;
 
-import java.util.jar.*;
-
 /**
  * Interface JMaxPackage
  */
 
 public interface JMaxPackage {
-  public void load( JarFile jarFile);
+  public void load();
 }
 

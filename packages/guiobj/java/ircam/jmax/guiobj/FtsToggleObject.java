@@ -18,32 +18,32 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
 
-package ircam.jmax;
+package ircam.jmax.guiobj;
 
 import java.io.*;
+import java.util.*;
 
-public class JMaxPackageLoader {
-  
-  public static void load( String packageName) throws JMaxPackageLoadingException
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.fts.client.*;
+
+public class FtsToggleObject extends FtsIntValueObject
+{
+  public FtsToggleObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
-    String fs = File.separator;
-    String packagePath = ((String)MaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
-    String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
+    super(server, parent, id, args, offset, length);
+    setNumberOfInlets(1);
+    setNumberOfOutlets(1);
+  }
 
-    char[] ch = packageName.toCharArray();
-    ch[0] = Character.toUpperCase( ch[0]);
-    String className = new String( ch);
-
-    try
-      {
-	PackageClassLoader classLoader = new PackageClassLoader( jarPath);
-	JMaxPackage jmaxPackage = (JMaxPackage)classLoader.loadClass( className).newInstance();
-	jmaxPackage.load();
-      }
-    catch( Exception e)
-      {
-	throw new JMaxPackageLoadingException( e.getClass().getName() + " " + e.getMessage());
-      }
+  public void setDefaults()
+  {
+    setWidth(Toggle.DEFAULT_WIDTH);
+    setHeight(Toggle.DEFAULT_WIDTH);
   }
 }

@@ -46,7 +46,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 {
   public ErmesSketchPad itsSketchPad;
   JScrollPane  itsScrollerView;
-  ErmesToolBar itsToolBar;
+  ToolBar itsToolBar;
   JLabel       itsMessageLabel;
   FtsPatcherObject itsPatcher;
 
@@ -122,7 +122,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Make the content
     itsSketchPad = new ErmesSketchPad(this, itsPatcher);
 
-    itsToolBar = new ErmesToolBar( itsSketchPad);
+    itsToolBar = new ToolBar( itsSketchPad);
 
     // Make the title
     makeTitle();

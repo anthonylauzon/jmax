@@ -22,28 +22,38 @@
 package ircam.jmax;
 
 import java.io.*;
+import java.util.*;
+import javax.swing.*;
 
-public class JMaxPackageLoader {
-  
-  public static void load( String packageName) throws JMaxPackageLoadingException
+public class JMaxUtilities {
+  public static ImageIcon loadIconFromResource( String name, JMaxPackage jmaxPackage)
   {
-    String fs = File.separator;
-    String packagePath = ((String)MaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
-    String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
+    InputStream is = jmaxPackage.getClass().getResourceAsStream( name);
 
-    char[] ch = packageName.toCharArray();
-    ch[0] = Character.toUpperCase( ch[0]);
-    String className = new String( ch);
+    if (is == null)
+      return null;
 
+    int n;
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    byte[] b = new byte[4096];
+    
     try
       {
-	PackageClassLoader classLoader = new PackageClassLoader( jarPath);
-	JMaxPackage jmaxPackage = (JMaxPackage)classLoader.loadClass( className).newInstance();
-	jmaxPackage.load();
+	do
+	  {
+	    n = is.read( b);
+	    if ( n <= 0)
+	      break;
+	    buffer.write( b, 0, n);
+	  }
+	while ( n > 0);
       }
-    catch( Exception e)
+    catch( IOException e)
       {
-	throw new JMaxPackageLoadingException( e.getClass().getName() + " " + e.getMessage());
+	return null;
       }
+
+    return new ImageIcon( buffer.toByteArray());
   }
 }
+

@@ -238,11 +238,10 @@ packages/guiobj/Makefile
 packages/guiobj/c/Makefile
 packages/guiobj/c/src/Makefile
 packages/guiobj/java/Makefile
-packages/guiobj/java/src/Makefile
-packages/guiobj/java/src/Makefile
-packages/guiobj/java/src/ircam/Makefile
-packages/guiobj/java/src/ircam/jmax/Makefile
-packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
+packages/guiobj/java/icons/Makefile
+packages/guiobj/java/ircam/Makefile
+packages/guiobj/java/ircam/jmax/Makefile
+packages/guiobj/java/ircam/jmax/guiobj/Makefile
 packages/guiobj/help/Makefile
 packages/guiobj/images/Makefile
 packages/io/Makefile

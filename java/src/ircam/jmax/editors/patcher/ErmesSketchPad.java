@@ -720,14 +720,14 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // ------------------------------------------------------------------------
   // toolbar support
   // ------------------------------------------------------------------------
-  private ErmesToolBar toolBar;
+  private ToolBar toolBar;
 
-  final void setToolBar( ErmesToolBar toolBar)
+  final void setToolBar( ToolBar toolBar)
   {
     this.toolBar = toolBar;
   }
 
-  final public ErmesToolBar getToolBar( )
+  final public ToolBar getToolBar( )
   {
     return toolBar;
   }

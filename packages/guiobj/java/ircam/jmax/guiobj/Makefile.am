@@ -18,7 +18,6 @@ FtsScopeObject.java \
 FtsSliderObject.java \
 FtsToggleObject.java \
 FtsVectorDisplayObject.java \
-Guiobj.java \
 IntBox.java \
 MessConst.java \
 ObjectControlPanel.java \
@@ -34,6 +33,6 @@ VectorDisplay.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
-JAVAROOT= @top_srcdir@/packages/guiobj/java/src
+JAVAROOT= @top_srcdir@/packages/guiobj/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
