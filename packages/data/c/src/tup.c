@@ -25,7 +25,12 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
+
+#if HAVE_ALLOCA_H
 #include <alloca.h>
+#endif
+
 
 void
 fts_outlet_array(fts_object_t *o, int woutlet, fts_array_t *array)
@@ -129,7 +134,7 @@ tup_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   tup_t *this = (tup_t *)o;
   int n = this->n;
   fts_atom_t *a = this->a;
-  fts_atom_t output[n];
+  fts_atom_t *output = (fts_atom_t *)alloca(sizeof(fts_atom_t) * n);
   int i;
   
   this->wait |= this->reset & this->require;

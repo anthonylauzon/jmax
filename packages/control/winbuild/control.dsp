@@ -113,6 +113,14 @@ SOURCE=..\c\src\for.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\make.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\mess.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\oneshot.c
 # End Source File
 # Begin Source File

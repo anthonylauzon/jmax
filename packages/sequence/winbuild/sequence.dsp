@@ -96,6 +96,10 @@ SOURCE=..\c\src\event.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\getdur.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\module.c
 # End Source File
 # Begin Source File
@@ -105,6 +109,14 @@ SOURCE=..\c\src\note.c
 # Begin Source File
 
 SOURCE=..\c\src\note.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\segment.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\segment.h
 # End Source File
 # Begin Source File
 

@@ -118,6 +118,10 @@ SOURCE=..\c\src\data.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\dispatch.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\dumpfile.c
 # End Source File
 # Begin Source File
@@ -178,19 +182,19 @@ SOURCE=..\c\src\mat.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\message.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\message.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\messtab.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\c\src\messtab.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\param.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\param.h
 # End Source File
 # Begin Source File
 
@@ -203,6 +207,10 @@ SOURCE=..\c\src\row.c
 # Begin Source File
 
 SOURCE=..\c\src\row.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\tup.c
 # End Source File
 # Begin Source File
 
