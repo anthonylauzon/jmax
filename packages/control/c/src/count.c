@@ -25,6 +25,8 @@
  */
 
 #include <fts/fts.h>
+#include <limits.h>
+#include <float.h>
 
 static fts_symbol_t sym_clip = 0;
 static fts_symbol_t sym_wrap = 0;
@@ -47,7 +49,6 @@ typedef struct
   int end;
   int step;
   int reverse; /* running direction when for reverse mode */
-  int signal; /* flag whether carrier has to be signaled */
 } count_int_t;
 
 typedef struct 
@@ -59,7 +60,6 @@ typedef struct
   double end;
   double step;
   double reverse;
-  int signal;
 } count_float_t;
 
 /************************************************************
@@ -79,7 +79,6 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int target = (reverse > 0)? end: begin;
   int sign = (begin < end)? reverse: -reverse;
   int step = sign * this->step;
-  int carrier = 0;
   
   if((value - target) * sign >= 0)
     {
@@ -89,6 +88,8 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 	  value = target;
 
+	  this->value = target + step;
+
 	  break;
 
 	case mode_wrap:
@@ -97,7 +98,7 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    
 	    if((value - target) * sign > 0)
 	      value = target;
-	    
+
 	    this->value = value + step;
 	  }
 	  break;
@@ -117,20 +118,11 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  break;
 	}
 
-      carrier = this->signal;
+      fts_outlet_bang(o, 1);      
     }
   else
-    {
-      this->value = value + step;
-      this->signal = 1;
-    }
+    this->value = value + step;
   
-  if(carrier)
-    {
-      this->signal = 0;
-      fts_outlet_bang(o, 1);
-    }
-
   fts_outlet_int(o, 0, value);
 }
 
@@ -233,13 +225,6 @@ count_int_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_int_stepement(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  count_int_t *this = (count_int_t *)o;
-
-}
-
-static void
 count_int_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_int_t *this = (count_int_t *)o;
@@ -287,16 +272,19 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   double target = (reverse > 0)? end: begin;
   double sign = (begin < end)? reverse: -reverse;
   double step = sign * this->step;
-  int carrier = 0;
-  int i;
   
   if((value - target) * sign >= 0)
     {
       switch(this->mode)
 	{
 	case mode_clip:
+
 	  value = target;
+
+	  this->value = value + step;
+
 	  break;
+
 	case mode_wrap:
 	  {
 	    value += begin - end;
@@ -323,17 +311,11 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  break;
 	}
       
-      carrier = this->signal;
+      fts_outlet_bang(o, 1);
     }
   else
     this->value = value + step;
   
-  if(carrier)
-    {
-      this->signal = 0;
-      fts_outlet_bang(o, 1);
-    }
-
   fts_outlet_float(o, 0, value);
 }
 
@@ -341,31 +323,8 @@ static void
 count_float_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_float_t *this = (count_float_t *)o;
-  double value = fts_get_number_float(at);
-  double begin = this->begin;
-  double end = this->end;
-  
-  if(begin < end)
-    {
-      if(value < begin)
-	this->value = begin;
-      else if(value > end)
-	this->value = end;
-      else
-	this->value = value;
-    }
-  else if(begin > end)
-    {
-      if(value < end)
-	this->value = end;
-      else if(value > begin)
-	this->value = begin;
-      else
-	this->value = value;
-    }
-  else
-    this->value = begin;
-  
+
+  this->value = fts_get_number_float(at);
   this->reverse = 1;
 }
 
@@ -500,15 +459,17 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   count_int_t *this = (count_int_t *)o;
 
-  this->mode = mode_clip;
+  ac--;
+  at++;
+  
+  this->mode = mode_wrap;
   this->value = 0;
   this->begin = 0;
-  this->end = 127;
+  this->end = INT_MAX;
   this->step = 1;
   this->reverse = 1;
-  this->signal = 1;
 
-  count_int_set_parameters(o, 0, 0, ac - 1, at + 1);
+  count_int_set_parameters(o, 0, 0, ac, at);
   count_int_reset(o, 0, 0, 0, 0);
 }
 
@@ -516,16 +477,18 @@ static void
 count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   count_float_t *this = (count_float_t *)o;
+
+  ac--;
+  at++;
   
-  this->mode = mode_clip;
+  this->mode = mode_wrap;
   this->value = 0.0;
   this->begin = 0.0;
-  this->end = 0.1;
+  this->end = 0.5 * DBL_MAX;
   this->step = 0.01;
   this->reverse = 1;
-  this->signal = 1;
 
-  count_float_set_parameters(o, 0, 0, ac - 1, at + 1);
+  count_float_set_parameters(o, 0, 0, ac, at);
   count_float_reset(o, 0, 0, 0, 0);
 }
 
@@ -548,6 +511,9 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
   int i;
+
+  ac--;
+  at++;
 
   for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
@@ -608,7 +574,7 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 int
 count_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return count_is_int(ac0, at0) == count_is_int(ac1, at1);
+  return count_is_int(ac0 - 1, at0 + 1) == count_is_int(ac1 - 1, at1 + 1);
 }
 
 void
