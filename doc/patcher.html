@@ -61,7 +61,7 @@
 
 The control panel of the console window contains the indicators for floating-point exceptions
 (<b>FPE</b>) and synchronization errors (<b>Out of sync</b>) as well as
-a button to enable and disable the signal computation (<b>DSP</b>):
+a button to activate or desactivate the signal computation (<b>DSP</b>):
 <center>
 <p><img SRC="images/control_panel.gif" BORDER=0 WIDTH=488 HEIGHT=25 ></center>
 
@@ -71,9 +71,13 @@ a while and than memorizes the signal&nbsp;<img SRC="images/led_memory.gif" BORD
 The indicator can be reset by clicking on it. Synchronization errors are
 signalled when the systems audio buffers are over or under flowing due
 to heavy computation load or external synchronization problems.
+
 <p>When the signal computation is enabled the signal objects (by convention
 having a name ending with ~) are activated. The signal connections are
 marked as active&nbsp;<img SRC="images/dsp_conn.gif" BORDER=0 WIDTH=71 HEIGHT=10 >.
+The key shortcut <b>control-&lt;space bar&gt;</b> permits to toggle the state of the signal computation 
+engine (activate/desactivate) at any time.
+
 <p>The control panel can be detached from the console window by dragging
 its handle at the left border out of the console window.
 
@@ -93,7 +97,7 @@ object <b>print</b>.
 <hr>
 
 <a NAME="toolbar"></a>
-<h2>The Toolbar</h2>
+<h2>Toolbar</h2>
 
 The toolbar of the patcher window gives control over the basic mode and
 edit functions of the patcher window.
@@ -121,9 +125,10 @@ and lock mode.
 <p>When the content of a patcher changes, the <b>save button&nbsp;<img SRC="images/to_save.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></b>
 appears on the right of the toolbar. It disappears when the patcher is
 saved (via the Files menu or by clicking the save button).
-<p>Patchers inside a patcher (sub-patchers) have an additional button on
-the right of the toolbar:&nbsp;<img SRC="images/tool_up.gif" BORDER=0 WIDTH=15 HEIGHT=15 >. This
-button allows to focus the window of the current patchers <b>parent patcher</b>.
+<p>Patchers inside a patcher (sub-patchers) have an additional button 
+<img SRC="images/tool_up.gif" BORDER=0 WIDTH=15 HEIGHT=15 >
+on the right of the toolbar. 
+This button allows to focus the window of the current patchers <b>parent patcher</b>.
 The object associated to the current patcher will appear selected inside
 of its parent patcher window.
 
@@ -138,29 +143,18 @@ in the toolbar and clicks to the position inside the patcher window where
 the object will be instantiated. By holding the shift-key, multiple instances
 of the same object can be created one after the other. The content of the
 toolbar is as well accessible via a contextual pop-up menu (right mouse
-button) inside the patcher window. Objects that can be added are:
-<br>&nbsp;
-<br>&nbsp;
+button) inside the patcher window.
+
+<p>
+By default the toolbar contains the following system classes:
+
+<p>
 <center><table BORDER=0 CELLPADDING=5 WIDTH="90%" BGCOLOR="#CCCCCC" >
 <tr>
 <td VALIGN=TOP><img SRC="images/tool_ext.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>generic object</b>
 <br>generic <i>j</i>Max object, where the class name has to be typed in</td>
-</tr>
-
-<tr>
-<td VALIGN=TOP><img SRC="images/tool_messconst.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
-
-<td><b>message constant</b>
-<br>expression of a single message or constant</td>
-</tr>
-
-<tr>
-<td><img SRC="images/tool_mess.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
-
-<td><b>message box</b>
-<br>ISPW compatible message box</td>
 </tr>
 
 <tr>
@@ -190,49 +184,79 @@ button) inside the patcher window. Objects that can be added are:
 <td><b>comment box</b>
 <br>box to add comments to the patcher&nbsp;</td>
 </tr>
+</table></center>
+
+<p>
+jMax packages can add entries to the toolbar. For example the package guiobj provides 
+the following classes which appear on the right of the system objects at the toolbar:
+
+<p>
+<center>
+<table BORDER=0 CELLPADDING=5 WIDTH="90%" BGCOLOR="#CCCCCC" >
+<tr>
+<td VALIGN=TOP><img SRC="images/messconst.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+
+<td><b>message constant</b>
+<br>expression of a single message or constant</td>
+</tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_bang.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+<td VALIGN=TOP><img SRC="images/button.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>button</b>
 <br>button which outputs a <tt>bang</tt> message when pressed</td>
 </tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_toggle.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+<td VALIGN=TOP><img SRC="images/toggle.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>toggle</b>
-<br>button toggling between (and outputting) <tt>0</tt> and <tt>1</tt>
+<br>button toggling between <tt>0</tt> and <tt>1</tt>
 when pressed</td>
 </tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_slider.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+<td VALIGN=TOP><img SRC="images/slider.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>slider</b>
 <br>slider outputting integers</td>
 </tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_int.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+<td VALIGN=TOP><img SRC="images/intbox.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>integer box</b>
 <br>display and input integer values</td>
 </tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_float.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+<td VALIGN=TOP><img SRC="images/floatbox.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
 
 <td><b>float box</b>
 <br>display and input float values</td>
 </tr>
 
 <tr>
-<td VALIGN=TOP><img SRC="images/tool_display.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+<td VALIGN=TOP><img SRC="images/display.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
 
 <td><b>display field</b>
 <br>generic display field</td>
 </tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="images/vecdisplay.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+
+<td><b>vector scroll</b>
+<br>scrolling graphic display for vectors and numbers</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="images/scope.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+
+<td><b>oscilloscope</b>
+<br>graphical signal display</td>
+</tr>
+
 </table></center>
 
 <p>(Refer to help patches for further information about the objects.)&nbsp;
