@@ -21,7 +21,6 @@ Options:
 
 What is does ?
 The \`\`release process'' is made of the following steps:
-  - blocks all accesses to CVS
   - check that all files are synchronous with the CVS repository
   - check that nothing needs to be recompiled
   - for each architecture { for each type { create the distribution list }}
@@ -101,11 +100,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# - blocks all accesses to CVS
-# NOT YET IMPLEMENTED
-
-# ---------------------------------------------------------------------------
-# 2) check that all files are synchronous with the CVS repository
+# - check that all files are synchronous with the CVS repository
 if cvs -n update | egrep -s '^[UARMC] '
 then
     echo "Working directory is not synchronized with repository."
@@ -114,7 +109,7 @@ then
 fi
 
 # ---------------------------------------------------------------------------
-# 3) check that nothing needs to be recompiled
+# - check that nothing needs to be recompiled
 for ARCH in $ARCHS
 do
     if make -q ARCH=$ARCH MODE=opt all

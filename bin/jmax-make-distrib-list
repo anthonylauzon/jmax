@@ -53,9 +53,9 @@ check_permissions ()
 {
     LLS=`ls -l $1`
 
-    if echo $LLS | awk '{ exit substr($1,8,1)=="r" && substr($1,2,1)!="r"; }'
+    if echo $LLS | awk '{ exit ( !(substr($1,2,1)=="r" && substr($1,8,1)!="r")); }'
     then
-	if chmod go+r $1
+	if chmod o+r $1
  	then
 	    echo "Warning: $1 was not readable by others (corrected)" >&2
  	else
@@ -64,9 +64,9 @@ check_permissions ()
 	fi
     fi
 
-    if echo $LLS | awk '{ exit substr($1,10,1)=="x" && substr($1,4,1)!="x"; }'
+    if echo $LLS | awk '{ exit ( !(substr($1,4,1)=="x" && substr($1,10,1)!="x")); }'
     then
-	if chmod go+x $1
+	if chmod o+x $1
 	then
 	    echo "Warning: $1 was not executable by others (corrected)" >&2
 	else
@@ -196,6 +196,8 @@ do_it_verbose_no_check ()
 OPT="none"
 ARCH="none"
 TYPE="none"
+VERBOSE=
+CHECK_PERMISSION=
 DIR=.
 
 for ARG in $@
@@ -206,7 +208,9 @@ do
 	\-arch | \-type )
 	    OPT=$ARG ;;
 	\-verbose )
-	    VERBOSE="-verbose" ;;
+	    VERBOSE="yes" ;;
+	\-check-permission )
+	    CHECK_PERMISSION="true" ;;
 	\-help | \-h | \-\? )
 	    help ;
 	    exit 2 ;;
@@ -245,14 +249,14 @@ fi
 
 if [ $VERBOSE ]
 then
-    if [ $CHECK ]
+    if [ $CHECK_PERMISSION ]
     then
 	do_it_verbose_check $ARCH $TYPE $DIR
     else
 	do_it_verbose_no_check $ARCH $TYPE $DIR
     fi
 else
-    if [ $CHECK ]
+    if [ $CHECK_PERMISSION ]
     then
 	do_it_non_verbose_check $ARCH $TYPE $DIR
     else
