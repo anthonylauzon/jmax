@@ -52,6 +52,8 @@ public class MoveAction extends EditorAction
 
     if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {
+	sketch.setUndo("Key-Move", false, true);
+
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    {

@@ -288,7 +288,7 @@ public class ErmesSelection implements Transferable
 
   public void deleteAll()
   {
-    getOwner().setUndo( "Remove", true);
+    getOwner().setUndo( "Remove", true, false);
 
     if( connections.size() > 0)
       {
@@ -357,7 +357,7 @@ public class ErmesSelection implements Transferable
 
   public void resizeToMaxWidth()
   {
-    getOwner().setUndo( "Resize", false);
+    getOwner().setUndo( "Resize", false, false);
 
     int max = 0;
 
@@ -381,7 +381,7 @@ public class ErmesSelection implements Transferable
 
   public void resizeToMaxHeight()
   {
-    getOwner().setUndo( "Resize", false);
+    getOwner().setUndo( "Resize", false, false);
 
     int max = 0;
 
@@ -406,7 +406,7 @@ public class ErmesSelection implements Transferable
 
   public void alignTop()
   {
-    getOwner().setUndo( "Align", false);
+    getOwner().setUndo( "Align", false, false);
 
     int value = minY();
 
@@ -424,7 +424,7 @@ public class ErmesSelection implements Transferable
 
   public void alignBottom()
   {
-    getOwner().setUndo( "Align", false);
+    getOwner().setUndo( "Align", false, false);
 
     int value = maxY();
 
@@ -442,7 +442,7 @@ public class ErmesSelection implements Transferable
 
   public void alignLeft()
   {
-    getOwner().setUndo( "Align", false);
+    getOwner().setUndo( "Align", false, false);
 
     int value = minX();
 
@@ -460,7 +460,7 @@ public class ErmesSelection implements Transferable
 
   public void alignRight()
   {
-    getOwner().setUndo( "Align", false);
+    getOwner().setUndo( "Align", false, false);
 
     int value = maxX();
 

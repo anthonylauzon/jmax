@@ -58,9 +58,9 @@ class VResizeInteraction extends Interaction
 
 	if((!object.isSelected())||
 	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
-	  editor.setUndo( "Resize", object, false);
+	  editor.setUndo( "Resize", object, false, false);
 	else
-	  editor.setUndo( "Resize", false);
+	  editor.setUndo( "Resize", false, false);
       }
     else if (Squeack.isDrag(squeack))
       {

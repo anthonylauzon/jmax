@@ -54,6 +54,8 @@ public class ResizeAction extends EditorAction
 
     if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {
+	sketch.setUndo("Key-Resize", false, true);
+
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    {

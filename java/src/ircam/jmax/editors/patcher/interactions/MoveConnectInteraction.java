@@ -62,6 +62,8 @@ class MoveConnectInteraction extends Interaction
 	return;
       }
 
+    editor.resetUndoRedo();
+
     editor.addingConnection();
     editor.getFtsPatcher().requestAddConnection(src.getFtsObject(), outlet, dst.getFtsObject(), inlet);
   }

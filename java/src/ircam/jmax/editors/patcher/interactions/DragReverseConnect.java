@@ -60,6 +60,8 @@ class DragReverseConnect extends Interaction
 	editor.showMessage("Cannot connect an object to itself !");
 	return;
       }
+    
+    editor.resetUndoRedo();
 
     editor.addingConnection();
     editor.getFtsPatcher().requestAddConnection(src.getFtsObject(), outlet, dst.getFtsObject(), inlet);

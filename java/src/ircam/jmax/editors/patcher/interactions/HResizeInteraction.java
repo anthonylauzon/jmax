@@ -59,7 +59,7 @@ class HResizeInteraction extends Interaction
 	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
 	  {  
 	    object.resizing(true);
-	    editor.setUndo( "Resize", object, false);
+	    editor.setUndo( "Resize", object, false, false);
 	  }
 	else
 	  {
@@ -69,7 +69,7 @@ class HResizeInteraction extends Interaction
 		  {
 		    obj.resizing(true);
 		  }});
-	    editor.setUndo( "Resize", false);
+	    editor.setUndo( "Resize", false, false);
 	  }
       }
     else if (Squeack.isDrag(squeack))

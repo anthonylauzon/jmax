@@ -63,7 +63,7 @@ class MoveInteraction extends Interaction
 	    object.redraw();	    
 	  }
 
-	editor.setUndo( "Move", false);
+	editor.setUndo( "Move", false, false);
 
 	editor.setCursor(Cursor.getDefaultCursor());
       }
