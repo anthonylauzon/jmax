@@ -136,6 +136,7 @@ FTS_API void fts_audiofile_close(fts_audiofile_t* aufile);
 #define fts_audiofile_get_sample_rate(_f) (_f)->sample_rate
 #define fts_audiofile_get_num_channels(_f) (_f)->channels
 #define fts_audiofile_get_sample_format(_f) (_f)->sample_format
+#define fts_audiofile_get_file_format(_f) (_f)->file_format
 #define fts_audiofile_get_bytes_per_sample(_f) (_f)->bytes_per_sample
 #define fts_audiofile_get_num_frames(_f) (_f)->frames
 #define fts_audiofile_get_handle(_f) (_f)->handle

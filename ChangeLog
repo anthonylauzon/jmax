@@ -1,3 +1,7 @@
+2003-07-15  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* include/fts/audiofile.h : added missing function fts_audiofile_get_file_format.
+
 2003-07-11  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python/ircam/fts/client/FtsPipeConnection.py: fixed pipe communication in FTS python client library.
