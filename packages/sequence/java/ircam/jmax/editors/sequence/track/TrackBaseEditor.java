@@ -132,23 +132,25 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					temp = (TrackEvent) e.nextElement();
 					if(first)
 					{
+						scrollEvent = temp;
 						SwingUtilities.invokeLater(new Runnable(){
 							public void run()
-						{
+						  {
 								if(scrollEvent != null)
 								{
 									gc.getScrollManager().makeVisible(scrollEvent);
 									scrollEvent = null;
 								}
-						}
+						  }
 						});
+						
 						first = false;
 					}
 					temp.setHighlighted(true);
 					temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 					oldElements.addElement(temp);			    
 				}
-		}
+		 }
 		});
     
     addMouseListener(new MouseListener(){
@@ -156,9 +158,9 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 			public void mousePressed(MouseEvent e){}
 			public void mouseReleased(MouseEvent e){}
 			public void mouseEntered(MouseEvent e)
-		{
+		  {
 				requestFocus();
-		}
+		  }
 			public void mouseExited(MouseEvent e){
 				gc.getDisplayer().display("");
 			}
