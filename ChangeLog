@@ -1,3 +1,7 @@
+2003-12-18  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* bin/jmax.in: fixed bug "[ 791671 ] jmax does not load files specified on the commandline".
+
 2003-12-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* renamed fts_get_class_by_name to fts_class_get_by_name and moved it from package.c
