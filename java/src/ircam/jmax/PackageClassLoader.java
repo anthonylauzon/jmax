@@ -50,7 +50,12 @@ class PackageClassLoader extends ClassLoader {
   protected Class findClass( String name) throws ClassNotFoundException
   {
     byte[] b = loadClassData( name);
-    return defineClass( name, b, 0, b.length);
+
+    Class c = defineClass( name, b, 0, b.length);
+
+    resolveClass( c);
+
+    return c;
   }
 
   public InputStream getResourceAsStream( String name)
@@ -73,7 +78,7 @@ class PackageClassLoader extends ClassLoader {
 
   private byte[] loadClassData( String name) throws ClassNotFoundException
   {
-    String entryName = name.replace( '.', File.separatorChar) + ".class";
+    String entryName = name.replace( '.', '/') + ".class";
     ZipEntry zipEntry = jarFile.getEntry( entryName);
 
     if (zipEntry == null)

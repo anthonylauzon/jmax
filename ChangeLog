@@ -1,3 +1,7 @@
+2003-05-16  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fixed Java bug on Windows. Now, all Java packages load OK.
+
 2003-05-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python/ircam/fts/client/*.py : added documentation for Python client library.
