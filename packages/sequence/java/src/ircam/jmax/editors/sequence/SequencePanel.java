@@ -175,9 +175,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     int totalTime = MINIMUM_TIME;
     
     itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
-    itsTimeScrollbar.setUnitIncrement(Geometry.sizeToMsec(geometry, SequencePanel.this.getSize().width)/10);//WARN: setUnitIncrement seems not to work
-    itsTimeScrollbar.setBlockIncrement(Geometry.sizeToMsec(geometry, SequencePanel.this.getSize().width));
-    
+    itsTimeScrollbar.setUnitIncrement(10);
+    itsTimeScrollbar.setBlockIncrement(1000);
     
     itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
 	
