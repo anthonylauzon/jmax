@@ -28,6 +28,7 @@ import ircam.jmax.fts.*;
  * This class represent the environement where a patch is loaded.
  * For the moment, it provide very trivial experimental functionalities.
  * Actually this file should be somewhere else !!! not in mda package.
+ * Kind of an hack.
  *
  * ^^^^ This file do not work in the multiserver configuration, as everything
  * ^^^^ connected to TCL; in order to have it working, we need to rewrite

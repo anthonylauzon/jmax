@@ -16,12 +16,12 @@
 package ircam.jmax.mda;
 
 
-/** This interface represent the minimum requirement on 
- *  an "Max Editing Unit", any Java object, part of a document,
- *  that we want to "edit" with a single user visible entity
+/** A Class representing editable data.
+ * This interface represent the minimum requirement on 
+ * an "Max Editing Unit", any Java object, part of a document,
+ * that we want to "edit" with a single user visible entity
  * called editor.
  * 
- * For the moment, quite minimal.
  */
 
 public interface MaxData

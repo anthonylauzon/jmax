@@ -16,7 +16,8 @@
 package ircam.jmax.mda;
 
 
-/** Class defining the fts patch type (named patch);
+/**
+ * Class defining the an executable tcl document.
  */
 
 public class MaxTclExecutedDocumentType extends MaxDocumentType
@@ -34,10 +35,16 @@ public class MaxTclExecutedDocumentType extends MaxDocumentType
     return false;
   }
 
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
+
   public MaxDocument newDocument(MaxContext ignore)
   {
     return null;
   }
+
+  /** Tcl executed documents cannot be created inside jMax (still, we may add
+   a text editor, actually) */
 
   public boolean canMakeNewDocument(MaxContext ignore)
   {

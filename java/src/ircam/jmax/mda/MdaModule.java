@@ -16,7 +16,7 @@
 package ircam.jmax.mda;
 
 /** The mda module; the init function is called at init time
- *  by jmax, and install module related things
+ *  by jmax, and install module related things.
  */
 
 public class MdaModule

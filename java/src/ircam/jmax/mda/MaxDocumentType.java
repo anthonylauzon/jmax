@@ -19,7 +19,8 @@ package ircam.jmax.mda;
 import java.util.*;
 import javax.swing.*;
 
-/** This class represent a type of editable document, with 
+/**
+ * This class represent a type of editable document, with 
  * all its interesting properties.
  *
  * This class maintain a list of all types (its documents) and

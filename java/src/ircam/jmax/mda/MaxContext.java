@@ -16,7 +16,7 @@
 
 package ircam.jmax.mda; 
 
-/** An empty interface denoting a "context", i.e. a place where things
+/** An empty interface denoting a "context". A Max context is a place where things
  * can be loaded, executed, edited; for example, an FTS server.
  */
 

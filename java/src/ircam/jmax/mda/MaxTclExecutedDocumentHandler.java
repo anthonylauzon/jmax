@@ -22,12 +22,8 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 
-/** An instance of this document handler can load MaxDocument from
- *  a tcl file obeyng the "jmax" command conventions
- * Now support only files.
- * 
- * A TCL Document file is a file that start with the jmax command
- * at the *beginning* of the first line.
+/** 
+ * A document handler capable to execute a document consisting of tcl commands.
  * 
  * ^^^^ As other tcl scripting related code, do not work with multiservers.
  */
@@ -74,6 +70,8 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
 
     return document;
   }
+
+  /** We cannot save a executed document  */
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {

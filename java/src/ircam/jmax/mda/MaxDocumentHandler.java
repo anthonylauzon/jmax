@@ -23,11 +23,13 @@ import java.awt.*;
 
 import javax.swing.*;
 
-/** A Document Handler is an object able to load a Max Document 
- *  from a document file; the class also handle the document base of all
- *  the existing MaxDocumentHandler, and provide a static function
- *  to find the document handler can reconize an address, and another
- *  to directly load the document.
+/**
+ * An Handler for documents.
+ * A Document Handler is an object able to load a Max Document 
+ * from a document file; the class also handle the document base of all
+ * the existing MaxDocumentHandler, and provide a static function
+ * to find the document handler can reconize an address, and another
+ * to directly load the document.
  */
 
 abstract public class MaxDocumentHandler

@@ -20,12 +20,12 @@ import java.io.*;
 import javax.swing.*;
 
 /**
+ * A Max Document.
  * Superclass for all the Max Document
  * provide basic services, like tracing 
  * the document file and the document handler,
  * registering and disposing
  *
- * TO ADD: very important: a generic naming scheme for data within documents
  */
 
 abstract public class MaxDocument

@@ -28,9 +28,8 @@ import javax.swing.filechooser.*;
 
 import ircam.jmax.utils.*;
 
-/** This class provide central registration services
- * and methods that are not tied to specific classes 
- * All MDA wide global public services are accessed thru this class.
+/** 
+ * Access to MDA wide global public services.
  */
 
 public class Mda
@@ -79,6 +78,7 @@ public class Mda
    * for the editor; something to show, select highlight, center in the screen,
    * whatever; use the method "showObject" of the MaxDataEditor interface
    */
+
   public static MaxDataEditor edit(MaxData data, Object where) throws MaxDocumentException
   {
     MaxDataEditor editor;
@@ -127,7 +127,7 @@ public class Mda
     throw new MaxDocumentException("No editor for " + data);
   }
 
-  /* dispose a data: signal Mda that the data should not be used
+  /** dispose a data. Signal Mda that the data should not be used
      anymore; for the moment, just close the associated editor.
      */
 
@@ -156,7 +156,7 @@ public class Mda
   private static MaxVector allHandlers = new MaxVector();
 
   /**  handle registration in the global
-   * table; note that Document Handlers cannot be deinstalled, once
+   * table. Note that Document Handlers cannot be deinstalled, once
    * created; handler have to be installed after the creation,
    * before using them.
    */
@@ -166,7 +166,7 @@ public class Mda
     allHandlers.addElement(handler);
   }
 
-  /** Return true if we can load a document from a given file) */
+  /** Return true if we can load a document from a given file.*/
 
   public static boolean canLoadDocument(File file)
   {
@@ -182,7 +182,7 @@ public class Mda
     return false;
   }
 
-  /** Load an document from a given file) */
+  /** Load a document from a given file */
 
   public static MaxDocument loadDocument(MaxContext context, File file) throws MaxDocumentException
   {
@@ -252,7 +252,7 @@ public class Mda
 
 
 
-  /** Static method to find a Document Handler for a given Document file/document pair;
+  /** Static method to find a Document Handler for a given Document file/document pair.
    */
 
   public static MaxDocumentHandler findDocumentHandlerFor(File file, MaxDocument document)
@@ -276,15 +276,21 @@ public class Mda
 
   private static DefaultListModel typeList = new DefaultListModel();
 
+  /** Get a list of existing document types */
+
   public static DefaultListModel getDocumentTypes()
   {
     return typeList;
   }
 
+  /** Install a new document type */
+
   public static void installDocumentType(MaxDocumentType type)
   {
     typeList.addElement(type);
   }
+
+  /** Get a document type by name between the installed ones */
 
   public static MaxDocumentType getDocumentTypeByName(String name)
   {
@@ -300,6 +306,9 @@ public class Mda
     
     return null;
   }
+
+
+  /** Instantiate a new MaxDocument for a given data instance */
 
   public static MaxDocument newDocument(MaxData data) throws MaxDocumentException
   {
@@ -317,10 +326,6 @@ public class Mda
   }
 
 
-  /** Produce a FileFilter suitable for a File Box, for all the
-   * jMax document
-   */
-
   static private class MaxAllDocumentFileFilter extends FileFilter
   {
     public boolean accept(File f)
@@ -336,6 +341,10 @@ public class Mda
 	return "jMax Documents";
     }
   }
+
+  /** Produce a FileFilter suitable for a File Box, for all the
+   * jMax document
+   */
 
   static public FileFilter getAllDocumentsFileFilter()
   {
@@ -387,8 +396,6 @@ public class Mda
   }
 
 
-  // Generate a FileView based on Mda suitable for a JFileChooser dialog
-
   static class MaxDocumentFileView extends FileView
   {
     public String getName(File f)
@@ -432,6 +439,9 @@ public class Mda
       return ext;
     }
   }
+
+  /** Generate a FileView based on Mda suitable for a JFileChooser dialog,
+    so that each file type get its Icon and description */
 
   public static FileView getFileView()
   {

@@ -21,10 +21,10 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /**
- * This command install a named tcl function as "editor factory"
- * for a named Max Document type; this function should create an editor
- * for it.
- *
+ * This tcl function support a standard syntax to create
+ * Max document as tcl files; obsolete, left as an example
+ * for the migration to Scheme.
+ * 
  * The Command Syntax is : <p>
  *
  * <code>

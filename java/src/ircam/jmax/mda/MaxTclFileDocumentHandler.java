@@ -28,7 +28,6 @@ import ircam.jmax.utils.*;
 
 /** An instance of this document handler can load MaxDocument from
  *  a tcl file obeyng the "jmax" command conventions
- * Now support only files.
  * 
  * A TCL Document file is a file that start with the jmax command
  * at the *beginning* of the first line.

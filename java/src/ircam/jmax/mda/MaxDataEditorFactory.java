@@ -16,6 +16,7 @@
 package ircam.jmax.mda;
 
 /**
+ * Factory for editors.
  * A MaxDataEditorFactory is an object able to generate an empty, unbound editor
  * for a given type; each data type have its own default editor 
  * factory, but editors can be also instantiated in other ways.
@@ -23,7 +24,12 @@ package ircam.jmax.mda;
 
 public interface MaxDataEditorFactory
 {
+  /** Check if this factory can produce a editor for the given data */
+
   abstract public boolean       canEdit(MaxData data);
+
+  /** Ask the factory to  produce a new editor for the given data */
+
   abstract public MaxDataEditor newEditor(MaxData data);
 }
 
