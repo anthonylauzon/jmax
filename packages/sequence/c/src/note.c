@@ -57,23 +57,25 @@ scoob_get_type_by_name(fts_symbol_t name)
   return fts_get_int(&a);
 }
 
-enum midi_type
+enum scoob_type_enum
 scoob_get_type_from_atom(const fts_atom_t *at)
 {
-  fts_atom_t k;
-
   if(fts_is_int(at))
-    return fts_get_int(at);
+    {
+      int type = fts_get_int(at);
+
+      if(type > 0 && type < n_scoob_types)
+	return type;
+    }
   else if(fts_is_symbol(at))
   {
     fts_atom_t a;
 
-    fts_hashtable_get(&scoob_type_indices, &k, &a);
-
-    return fts_get_int(&a);
+    if(fts_hashtable_get(&scoob_type_indices, at, &a))
+      return fts_get_int(&a);
   }
-  else
-    return scoob_none;
+
+  return scoob_none;
 }
 
 /***********************************************************************
@@ -267,8 +269,10 @@ static void
 _scoob_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scoob_t *this = (scoob_t *)o;
+  enum scoob_type_enum type = scoob_get_type_from_atom(at);
 
-  this->type = scoob_get_type_from_atom(at);
+  if(type > scoob_none)
+    this->type = type;
 }
 
 static void
@@ -323,7 +327,6 @@ static void
 _scoob_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scoob_t *this = (scoob_t *)o;
-
   double duration = fts_get_number_float(at);
 
   if(duration < 0.0)
@@ -345,29 +348,55 @@ scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   scoob_t *this = (scoob_t *)o;
 
-  if(ac > 2)
+  if(ac > 1 && fts_is_symbol(at))
   {
-    _scoob_set_type(o, 0, 0, 1, at);
+    switch(ac)
+      {
+      default:
+	if(ac > 3 && fts_is_number(at + 3))
+	  _scoob_set_duration(o, 0, 0, 1, at + 3);
 
-    if(fts_is_number(at + 1))
-      _scoob_set_pitch(o, 0, 0, 1, at + 1);
+      case 3:
+	if(fts_is_number(at + 2))
+	  _scoob_set_interval(o, 0, 0, 1, at + 2);
 
-    if(fts_is_number(at + 2))
-      _scoob_set_interval(o, 0, 0, 1, at + 2);
+      case 2:
+	if(fts_is_number(at + 1))
+	  _scoob_set_pitch(o, 0, 0, 1, at + 1);
 
-    if(ac > 3 && fts_is_number(at + 3))
-      _scoob_set_duration(o, 0, 0, 1, at + 3);
+      case 1:
+	_scoob_set_type(o, 0, 0, 1, at);
+
+      case 0:
+	break;
+      }
   }
-  else if(ac > 0)
+  else
   {
+    /* old note format compatibility */
     this->type = scoob_note;
     
-    /* compatibility with former two argument note */
-    if(fts_is_number(at))
-      _scoob_set_pitch(o, 0, 0, 1, at);
+    switch(ac)
+      {
+      default:
+	if(fts_is_number(at + 3))
+	  scoob_set_channel(this, fts_get_number_int(at + 3));
 
-    if(ac > 1 && fts_is_number(at + 1))
-      _scoob_set_duration(o, 0, 0, 1, at + 1);
+      case 3:
+	if(fts_is_number(at + 2))
+	  scoob_set_velocity(this, fts_get_number_int(at + 2));
+
+      case 2:
+	if(fts_is_number(at + 1))
+	  _scoob_set_duration(o, 0, 0, 1, at + 1);
+
+      case 1:
+	if(fts_is_number(at))
+	  _scoob_set_pitch(o, 0, 0, 1, at);
+
+      case 0:
+	break;
+      }
   }  
 }
 
@@ -456,11 +485,13 @@ scoob_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* send set message with pitch and duration */
   mess = fts_dumper_message_new(dumper, fts_s_set);
-  fts_message_append_int(mess, this->pitch);
+  fts_message_append_symbol(mess, scoob_type_names[this->type]);
+  fts_message_append_float(mess, this->pitch);
+  fts_message_append_float(mess, this->interval);
   fts_message_append_float(mess, this->duration);
   fts_dumper_message_send(dumper, mess);
 
-  /* send a message for each of the properties */
+  /* send a message for each of the dynamic properties */
   for(i=0; i<fts_array_get_size(&this->properties); i++)
   {
     fts_atom_t *a = fts_array_get_element(&this->properties, i);
@@ -480,8 +511,8 @@ scoob_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->interval = 0;
   this->duration = scoob_DEF_DURATION;
 
-  scoob_set(o, 0, 0, ac, at);
   fts_array_init(&this->properties, 0, 0);
+  scoob_set(o, 0, 0, ac, at);
 }
 
 static void
@@ -500,6 +531,7 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);
 
   fts_class_message_number(cl, seqsym_type, _scoob_set_type);
+  fts_class_message_symbol(cl, seqsym_type, _scoob_set_type);
   fts_class_message_number(cl, seqsym_pitch, _scoob_set_pitch);
   fts_class_message_number(cl, seqsym_interval, _scoob_set_interval);
   fts_class_message_number(cl, seqsym_duration, _scoob_set_duration);

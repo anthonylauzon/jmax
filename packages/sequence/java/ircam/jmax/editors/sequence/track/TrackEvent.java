@@ -153,7 +153,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
       for(int i = 0; i < nArgs-1; i+=2)
 	{
 	  name = args[i].symbolValue.toString();
-	  newVal = args[i].getValue();
+	  newVal = args[i+1].getValue();
 	  
 	  if (itsTrackDataModel != null)
 	    {
@@ -187,8 +187,11 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   void sendSetProperty( String propName, Object propValue)
   {
     args.clear();
-    args.addString( propName);
-    args.add( propValue);
+    args.addSymbol( FtsSymbol.get( propName));
+    if( propValue instanceof String)
+      args.addSymbol( FtsSymbol.get( (String)propValue));
+    else
+      args.add( propValue);
 
     try{
       send( FtsSymbol.get("set"), args);
@@ -204,7 +207,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   {
     args.clear();
     for(int i = 0; i < nArgs; i++)
-      args.add(arguments[i]);
+      if( arguments[i] instanceof String)
+	args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+      else
+	args.add(arguments[i]);
 
     try{
       send( FtsSymbol.get("set"), args);
