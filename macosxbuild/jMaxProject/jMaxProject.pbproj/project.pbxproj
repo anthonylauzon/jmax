@@ -995,9 +995,6 @@
 				F844699D028BCC2301664092,
 				F844699E028BCC2301664092,
 				F844699F028BCC2301664092,
-				F84469A0028BCC2301664092,
-				F84469A1028BCC2301664092,
-				F84469A2028BCC2301664092,
 				F84469A3028BCC2301664092,
 				F84469A4028BCC2301664092,
 				F84469A5028BCC2301664092,
@@ -1404,24 +1401,6 @@
 			isa = PBXFileReference;
 			name = logscale.c;
 			path = ../../packages/ispw/c/src/logscale.c;
-			refType = 2;
-		};
-		F84469A0028BCC2301664092 = {
-			isa = PBXFileReference;
-			name = Makefile;
-			path = ../../packages/ispw/c/src/Makefile;
-			refType = 2;
-		};
-		F84469A1028BCC2301664092 = {
-			isa = PBXFileReference;
-			name = Makefile.am;
-			path = ../../packages/ispw/c/src/Makefile.am;
-			refType = 2;
-		};
-		F84469A2028BCC2301664092 = {
-			isa = PBXFileReference;
-			name = Makefile.in;
-			path = ../../packages/ispw/c/src/Makefile.in;
 			refType = 2;
 		};
 		F84469A3028BCC2301664092 = {
@@ -2374,30 +2353,9 @@
 		F8446A28028BCC2401664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8446A29028BCC2401664092,
-				F8446A2A028BCC2401664092,
-				F8446A2B028BCC2401664092,
 			);
 			isa = PBXResourcesBuildPhase;
 			name = "Bundle Resources";
-		};
-		F8446A29028BCC2401664092 = {
-			fileRef = F84469A0028BCC2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8446A2A028BCC2401664092 = {
-			fileRef = F84469A1028BCC2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8446A2B028BCC2401664092 = {
-			fileRef = F84469A2028BCC2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8446A2D028BCC2401664092 = {
 			buildActionMask = 2147483647;
