@@ -86,10 +86,10 @@ public class Platform
       }  
       else if (SYSTEM.equals("Linux")){
          	setLinuxValues();
-             }  
-            else{
-         	setDefaultValues();
-          }
+      }  
+      else{
+	setDefaultValues();
+      }
    }
 
    //------------------------------------------

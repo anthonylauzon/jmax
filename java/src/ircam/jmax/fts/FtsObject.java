@@ -85,17 +85,19 @@ abstract public class FtsObject implements MaxTclInterpreter
     server = FtsServer.getServer();
 
     id = server.getNewObjectId();
+
     server.newObject(parent, id, className, description);
     
     // Wait for FTS to do his work
 
     server.syncToFts();
+
     obj = server.getObjectByFtsId(id);
     
     if (obj != null)
       return obj;
     else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
+      throw new FtsException( new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
   }
   
 
