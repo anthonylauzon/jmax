@@ -43,6 +43,7 @@ public class FtsHelpPatchTable
 {
   static Hashtable helpTable = new Hashtable(256, 0.99f);
   static Hashtable helpSummaryTable = new Hashtable();
+  static Vector helpSummaryVector = new Vector();
 
   /** Add an help patch for an fts object class */
 
@@ -56,6 +57,7 @@ public class FtsHelpPatchTable
   static public void addSummary(String name, String patch)
   {
     helpSummaryTable.put(name, patch);
+    helpSummaryVector.addElement(name);
   }
 
   /** Check if the help patch for a given fts object class exists */
@@ -142,9 +144,14 @@ public class FtsHelpPatchTable
 
   static public Enumeration getSummaries()
   {
-    return helpSummaryTable.keys();
+      //return helpSummaryTable.keys();
+      return helpSummaryVector.elements();
   }
 }
+
+
+
+
 
 
 
