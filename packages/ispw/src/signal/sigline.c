@@ -95,7 +95,7 @@ static void ftl_line_64(fts_word_t *argv)
       int i;
       float target = lctl->target;
 
-      for (i=0; i<64; i++)
+      for(i=0; i<64; i++)
 	fp[i] = target;
 
       lctl->value = target;
