@@ -23,22 +23,29 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.table;
+package ircam.jmax.editors.table.actions;
 
-import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
+import java.awt.event.*;
+import javax.swing.*;
 
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+import ircam.jmax.editors.table.*;
 
-public class TableFactory implements MaxDataEditorFactory {
+/** This class define a set of static variables 
+ *  containing all the standard actions used for the
+ *  patcher editor; please notes that actions objects are
+ *  shared between all the editor instances.
+ */
 
-  public boolean canEdit(MaxData data){
-    return data instanceof FtsIntegerVector;
-  }
-  
-  public MaxDataEditor newEditor(MaxData theData) {
-    return new TableDataEditor((FtsIntegerVector) theData);
-  }
+public class Actions
+{
+  public static EditorAction copyAction      = new CopyAction();
+  public static EditorAction pasteAction     = new PasteAction();
+  public static EditorAction undoAction      = new UndoAction();
+  public static EditorAction redoAction      = new RedoAction();
+  public static EditorAction refreshAction   = new RefreshAction();
+
+  public static EditorAction hollowAction      = new HollowAction();
+  public static EditorAction solidAction     = new SolidAction();
 }
-
-
-

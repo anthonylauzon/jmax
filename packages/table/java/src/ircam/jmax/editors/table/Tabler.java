@@ -32,123 +32,96 @@ import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.undo.*;
+
+import ircam.jmax.editors.table.menus.*;
 
 /** 
  * The table editor
  */
-public class Tabler extends MaxEditor {
+public class Tabler extends JFrame implements EditorContainer {
   
-    /** Constructor */
-    public Tabler(FtsIntegerVector theData) {
-	super();
-	
-	Init();
-	
-	if (theData.getName() != null)
-	    setTitle("Table " + theData.getName());
-	else
-	    setTitle("Table");
-	
-	itsData = new TableRemoteData(theData);
-	
-	itsPanel = new TablePanel(itsData);
-	getContentPane().add(itsPanel);
-	
-	toolbar = itsPanel.prepareToolbar();
-	
-	//--
-	validate();
-	pack();
-	setVisible(true);
-    }
+  //--- Fields 
+  TablePanel itsPanel;
+  static EditorToolbar toolbar; 
+
+  private JMenu itsFileMenu;
+  private EditMenu itsEditMenu;	
+  private ViewMenu itsViewMenu;
+  private JMenu itsWindowsMenu;
+  private JMenu itsToolsMenu;
+
+  /** Constructor */
+  public Tabler(FtsIntegerVector theData) {
+    super();
+
+    MaxWindowManager.getWindowManager().addWindow(this);
     
-    /** 
-     * Personalize the menubar */
-    public void SetupMenu(){
-	
-	getDuplicateMenu().setEnabled(false);
-	getCutMenu().setEnabled(false);
-	
-	getEditMenu().add(new MenuItem("-"));
-	
-	itsRefreshMenuItem = new MenuItem("Refresh");
-	getEditMenu().add(itsRefreshMenuItem);
-	itsRefreshMenuItem.addActionListener(new ActionListener() {
-	    public  void actionPerformed(ActionEvent e)
-		{ 
-		    itsData.forceUpdate();
-		    itsPanel.repaint();
-		}});
-	
-	Menu ViewMenu = new Menu("View");
-	
-	MenuItem hollow = new MenuItem("Hollow");
-	hollow.addActionListener(new ActionListener() 
-				 {
-				     public void actionPerformed(ActionEvent e) 
-					 {
-					     itsPanel.hollow();
-					 }
-				 }
-				 );
-	
-	
-	MenuItem solid = new MenuItem("Solid");
-	solid.addActionListener(new ActionListener() 
-				{
-				    public void actionPerformed(ActionEvent e) 
-					{
-					    itsPanel.solid();
-					}
-				}
-				);
-	
-	ViewMenu.add(hollow);
-	ViewMenu.add(solid);
-	getMenuBar().add(ViewMenu);
-    }
+    // Make the title
+    makeTitle(theData);
+
+    itsPanel = new TablePanel(this, new TableRemoteData(theData));
     
-    /** NB: these functionalities can be moved in a "MaxEditor with undo"*/
-    protected void Undo()
-    {
-	try 
-	    {
-		itsData.undo();
-	    } catch (CannotUndoException e1) {
-		System.out.println("can't undo");
-		
-	    }
-    }
+    // Build The Menus and Menu Bar
+    makeMenuBar();
+
+    getContentPane().add(itsPanel);
+
+    toolbar = itsPanel.prepareToolbar();
+    //--
+    validate();
+    pack();
+    setVisible(true);
+  }
+
+  private final void makeTitle(FtsIntegerVector data)
+  { 
+    if (data.getName() != null)
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table "+data.getName()));
+    else
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));
     
-    /** NB: these functionalities can be moved in a "MaxEditor with undo"*/
-    protected void Redo()
-    {
-	try 
-	    {
-		itsData.redo();
-	    } catch (CannotRedoException e1) {
-		System.out.println("can't redo");
-	    }
-    }
+    MaxWindowManager.getWindowManager().windowChanged(this);
+  }
+
+  private final void makeMenuBar(){
+    JMenuBar mb = new JMenuBar();
+
+    // Build the file menu
+    itsFileMenu = new ircam.jmax.toolkit.menus.DefaultFileMenu();
+    mb.add( itsFileMenu); 
     
-    protected void Copy()
-    {
-	itsData.copy();
-    }
+    // Build the edit menu
+    itsEditMenu = new EditMenu(this); 
+    mb.add( itsEditMenu); 
     
-    protected void Paste()
-    {
-	itsData.paste();
-    }
-    
-    
-    //--- Fields 
-    TableRemoteData itsData;
-    TablePanel itsPanel;
-    static EditorToolbar toolbar; 
-    
-    MenuItem itsRefreshMenuItem;//?? keep it?
+    // Build the view menu
+    itsViewMenu = new ViewMenu(this);
+    mb.add( itsViewMenu);
+
+    // New Tool menu 
+    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
+    mb.add(itsToolsMenu);
+
+    // New Window Manager based Menu
+    itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
+    mb.add(itsWindowsMenu);
+
+    setJMenuBar(mb);
+  }
+
+  // ------ editorContainer interface ---------------
+  public Editor getEditor(){
+    return itsPanel;
+  }
+  public Frame getFrame(){
+    return this;
+  }
+  public Point getContainerLocation(){
+    return getLocation();
+  }
+  public Rectangle getViewRectangle(){
+    return getContentPane().getBounds();
+  }
 }
 
 

@@ -55,13 +55,11 @@ public class SelectionLayer extends AbstractLayer{
 	}
       public void selectionActivated()
 	{
-
 	  Graphics g = tgc.getGraphicDestination().getGraphics();
 	  eraseSelection(g);
 	  render(g, 1);
 	  g.dispose();
 	}
-
     });
 
   }
@@ -70,7 +68,7 @@ public class SelectionLayer extends AbstractLayer{
    * Layer interface. */
   public void render(Graphics g, int order)
   {
-
+    
     if (tgc.getSelection().getCaretPosition() != TableSelection.NO_CARET)
       {
 	int x = tgc.getAdapter().getX(tgc.getSelection().getCaretPosition());
@@ -141,5 +139,15 @@ public class SelectionLayer extends AbstractLayer{
   Rectangle lastSelectionDraw;
   boolean lastActiveState;
 }
+
+
+
+
+
+
+
+
+
+
 
 

@@ -21,26 +21,21 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-SOURCES = \
-	  Tabler.java \
-	  TableExtension.java \
-	  TableFactory.java \
-	  TableDataEditor.java \
-	  TableDisplay.java \
-	  TableDataModel.java \
-	  TableRemoteData.java \
-	  TableSelection.java \
-	  FreeHandDrawer.java \
-	  TableRenderer.java \
-	  TableGraphicContext.java \
-	  LinerTool.java \
-	  LineDrawer.java \
-	  TableSelecter.java \
-	  PencilTool.java \
-	  TablePanel.java
 
+
+ROOTDIR = ../../../../../../../../..
+PACKAGE_DIR = ircam/jmax/editors/table/menus
+
+include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.common
+
+all: $(CLASSES)
+.PHONY: all
+
+local_all: $(CLASSES)
+.PHONY: local_all
+
+include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.misc
 
 
 

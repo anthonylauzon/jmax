@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,22 +23,46 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.table;
+package ircam.jmax.editors.table.menus;
 
-import ircam.jmax.mda.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.datatransfer.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
+
+import ircam.jmax.editors.table.*;
+import ircam.jmax.editors.table.actions.*;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
 
-public class TableFactory implements MaxDataEditorFactory {
+public class ViewMenu extends EditorMenu
+{
+  JMenuItem hollowItem;
+  JMenuItem solidItem;
 
-  public boolean canEdit(MaxData data){
-    return data instanceof FtsIntegerVector;
-  }
+  EditorContainer container;
   
-  public MaxDataEditor newEditor(MaxData theData) {
-    return new TableDataEditor((FtsIntegerVector) theData);
+  public ViewMenu(EditorContainer container)
+  {
+    super("View");
+
+    this.container = container;
+
+    setHorizontalTextPosition(AbstractButton.LEFT);
+
+    hollowItem   = add(Actions.hollowAction, "Hollow");
+    solidItem    = add(Actions.solidAction, "Solid");
   }
 }
-
 
 

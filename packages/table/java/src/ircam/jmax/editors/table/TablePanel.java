@@ -38,6 +38,7 @@ import tcl.lang.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import javax.swing.undo.*;
 
 /**
  * The panel in the Table editor's window, containing the toolbar, the CenterPanel 
@@ -45,15 +46,50 @@ import javax.swing.event.*;
  * This class takes care of creating all the components of an editing session
  * (tools, Renderer, ...) and link them togheter.
  */
-public class TablePanel extends JPanel implements ToolbarProvider, ToolListener, StatusBarClient, TableDataListener{
-  
+public class TablePanel extends JPanel implements ToolbarProvider, ToolListener, StatusBarClient, TableDataListener, Editor{
+
+  //--- Fields  
+  static Vector tools;
+  final static int PANEL_WIDTH = 500;
+  final static int PANEL_HEIGHT = 300;
+
+  InfoPanel itsStatusBar;
+
+  Scrollbar itsPositionControl;
+
+  static Tool itsDefaultTool;
+  Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
+
+  EditorToolbar tb;
+  TableGraphicContext gc;
+  TableRenderer itsTableRenderer;
+  TableDataModel tm;
+  TableDisplay itsCenterPanel;
+
+  static boolean toolbarAnchored = true;
+  Box toolbarPanel;
+  ScalePanel scalePanel;
+  Font scalePanelFont;
+
+  static Dimension toolbarDimension = new Dimension(30, 200);
+  static Dimension scaleDimension = new Dimension(30, 200);
+
+  static TablePanel instance;
+
+  private static int SCROLLBAR_SIZE = 30;
+ 
+  JLabel currentXZoom;
+  JLabel currentYZoom;
+
   /**
    * Constructor. */
-  public TablePanel(TableDataModel tm) {
+  public TablePanel(EditorContainer container, TableDataModel tm) {
     super();
 
     this.tm = tm;
     instance = this;
+    itsEditorContainer = container;
+
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
@@ -432,7 +468,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 		{
 		  InteractionModule.suspend();
 		}
-	      Tabler.toolbar.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
+	      tb.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
 	    }
 	  else {
 	    if (InteractionModule.isSuspended())
@@ -515,8 +551,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
     tools = new Vector();
     String fs = File.separator;
-    String path = MaxApplication.getProperty("root")+fs+"packages/table/images"+fs;
-
+    //String path1 = MaxApplication.getProperty("root")+fs+"packages/table/images"+fs;
+    String path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;
+    
     itsDefaultTool = new TableSelecter(new ImageIcon(path+"table_selecter.gif"));
 
     tools.addElement( itsDefaultTool);
@@ -597,7 +634,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   /**
    * Sets the "hollow" representation mode */
-  void hollow()
+  public void hollow()
   {
     itsTableRenderer.setMode(TableRenderer.HOLLOW);
     repaint();
@@ -605,10 +642,46 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   /** 
    * Sets the "solid" representation mode */
-  void solid()
+  public void solid()
   {
     itsTableRenderer.setMode(TableRenderer.SOLID);
     repaint();
+  }
+
+  public void Refresh(){
+    getData().forceUpdate();
+    repaint();
+  }
+
+  public void Undo()
+  {
+    try 
+      {
+	getData().undo();
+      } catch (CannotUndoException e1) {
+	System.out.println("can't undo");
+	
+      }
+  }
+
+  public void Redo()
+  {
+    try 
+      {
+	getData().redo();
+      } catch (CannotRedoException e1) {
+	System.out.println("can't redo");
+      }
+  }
+
+  public void Copy()
+  {
+    getData().copy();
+  }
+
+  public void Paste()
+  {
+    getData().paste();
   }
 
   /**
@@ -627,41 +700,23 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     return getMinimumSize();	  
   }
 
+  public TableRemoteData getData(){
+    return (TableRemoteData)tm;
+  }
 
+  //------------------- Editor interface ---------------
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
+  EditorContainer itsEditorContainer;
 
-  //--- Fields
-
-  static Vector tools;
-  final static int PANEL_WIDTH = 500;
-  final static int PANEL_HEIGHT = 300;
-
-  InfoPanel itsStatusBar;
-
-  Scrollbar itsPositionControl;
-
-  static Tool itsDefaultTool;
-  Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
-
-  EditorToolbar tb;
-  TableGraphicContext gc;
-  TableRenderer itsTableRenderer;
-  TableDataModel tm;
-  TableDisplay itsCenterPanel;
-
-  static boolean toolbarAnchored = true;
-  Box toolbarPanel;
-  ScalePanel scalePanel;
-  Font scalePanelFont;
-
-  static Dimension toolbarDimension = new Dimension(30, 200);
-  static Dimension scaleDimension = new Dimension(30, 200);
-
-  static TablePanel instance;
-
-  private static int SCROLLBAR_SIZE = 30;
- 
-  JLabel currentXZoom;
-  JLabel currentYZoom;
+  public EditorContainer getEditorContainer(){
+    return itsEditorContainer;
+  }
+  public void Close(boolean doCancel){
+    ((Component)itsEditorContainer).setVisible(false);
+  }
 }
 
 

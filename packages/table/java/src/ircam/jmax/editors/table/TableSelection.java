@@ -167,7 +167,6 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
     return getMaxSelectionIndex();
   }
   
-
   /** returns the number of objects in the selection
    */
   public  int size()
@@ -284,7 +283,7 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
 
   //--- Fields
   TableDataModel model;
-  private static TableSelection current;
+  /*private*/public static TableSelection current;
   private static int itsCopy[];
   private static int EMPTY_CLIP = -1;
   private static int base = EMPTY_CLIP;
@@ -301,5 +300,8 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
 
   private SelectionOwner itsOwner;
 }
+
+
+
 
 

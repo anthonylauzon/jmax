@@ -38,7 +38,6 @@ public class TableExtension extends tcl.lang.Extension
   public void init(Interp interp)
   {
     Mda.installEditorFactory(new TableFactory());
-
   }
 }
 

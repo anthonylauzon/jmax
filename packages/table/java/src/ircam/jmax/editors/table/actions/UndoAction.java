@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,22 +23,24 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.table;
+package ircam.jmax.editors.table.actions;
 
-import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
+import java.awt.*;
+import java.awt.event.*;
 
+import javax.swing.*;
+import javax.swing.event.*;
 
-public class TableFactory implements MaxDataEditorFactory {
+import ircam.jmax.*;
+import ircam.jmax.editors.table.*;
 
-  public boolean canEdit(MaxData data){
-    return data instanceof FtsIntegerVector;
-  }
-  
-  public MaxDataEditor newEditor(MaxData theData) {
-    return new TableDataEditor((FtsIntegerVector) theData);
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class UndoAction extends EditorAction
+{
+  public  void doAction(EditorContainer container)
+  {
+    ((TablePanel)container.getEditor()).Undo();
   }
 }
-
-
-

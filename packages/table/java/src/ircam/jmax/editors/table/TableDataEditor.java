@@ -63,7 +63,7 @@ public class TableDataEditor extends AbstractMaxDataEditor
     if (! window.isVisible())
       window.setVisible(true);
 
-    window.itsData.forceUpdate();
+    window.itsPanel.getData().forceUpdate();
     window.toFront();
   }
 
