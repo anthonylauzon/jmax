@@ -1,6 +1,4 @@
 /**
-  A registration service for .tcl templates.
-  The class is used thru the Template TCL Command.
   */
 
 package ircam.jmax;

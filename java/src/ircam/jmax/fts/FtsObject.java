@@ -58,6 +58,8 @@ abstract public class FtsObject implements MaxTclInterpreter
     
     numberFormat = NumberFormat.getInstance(Locale.US);
     numberFormat.setMaximumFractionDigits(6);
+    numberFormat.setMinimumFractionDigits(1);
+    numberFormat.setGroupingUsed(false);
   }
 
   /******************************************************************************/
@@ -139,9 +141,10 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   /** This version create an application layer object for an already existing
    *  object in FTS; take directly the FtsMessage as argument.
+   *  Used also in the message box.
    */
 
-  static private String makeDescription(int offset, FtsMessage msg)
+  static String makeDescription(int offset, FtsMessage msg)
   {
     boolean addBlank = false;
     StringBuffer descr = new StringBuffer();
@@ -158,7 +161,9 @@ abstract public class FtsObject implements MaxTclInterpreter
 	value = msg.getArgument(i);
 
 	if (value instanceof Float)
-	  descr.append(numberFormat.format(value));
+	  {
+	    descr.append(numberFormat.format(value));
+	  }
 	else
 	  {
 	    descr.append(value);

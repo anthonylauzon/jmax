@@ -254,10 +254,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Print()
   {}
+
   public void Save()
   {}//override this function if you want to save your content
   public void SaveAs(){}//override this function if you want to save your content
-  public boolean ShouldSave(){return false;}//override this function if your data changed
 
   public void Close()
   {

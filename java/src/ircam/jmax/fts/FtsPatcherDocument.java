@@ -65,6 +65,18 @@ public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
     setRootData(patcher);
   }
 
+
+  public void dispose()
+  {
+    super.dispose();
+
+    FtsContainerObject patcher;
+
+    patcher = (FtsContainerObject) getRootData();
+    patcher.close();
+    patcher.delete();
+  }
+
   /**
    * Highly experimental method for generating a binary file
    */
@@ -73,7 +85,10 @@ public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
 //   {
 //     FtsServer.getServer().savePatcherBmax(patcher, fileName);
 //   }
+
+
 }
+
 
 
 

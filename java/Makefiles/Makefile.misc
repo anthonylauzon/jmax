@@ -7,7 +7,7 @@ clean:
 .PHONY: clean
 
 tags:
-	(cd $(JAVA_SRC_ROOT) ; find . -name "*.java" -print | etags - )
+	(cd $(ROOTDIR) ; find . -name "*.java" -print | etags - )
 .PHONY: tags
 
 help:

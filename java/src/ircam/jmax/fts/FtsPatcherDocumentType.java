@@ -44,6 +44,7 @@ public class FtsPatcherDocumentType extends MaxDocumentType
 	FtsPatcherDocument document = new FtsPatcherDocument();
 
 	document.setRootData(patcher);
+	document.setName(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("untitled")); // temp name
 
 	return document;
       }

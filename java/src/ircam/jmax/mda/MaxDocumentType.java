@@ -130,8 +130,10 @@ abstract public class MaxDocumentType
 
   /** Get the ListModel (a defaultlistmodel, actually) of all the active documents */
 
-  public DefaultListModel documents()
+  public DefaultListModel getDocuments()
   {
     return documentList;
   }
 }
+
+

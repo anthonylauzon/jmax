@@ -10,11 +10,11 @@ import ircam.jmax.mda.*;
 /** 
  *  This is the super class of all
  * objects that include other objects, like
- * patchers, template and abstractions.
+ * patchers,  abstractions.
  * 
  * This is a specialization of the FtsAbstractContainer that 
  * necessarly represent a patcher in the FTS meaning; i.e. 
- * a real patcher or template/abstraction instance.
+ * a real patcher or abstraction instance.
  * So it add inlets/outlets housekeeping, patcher opening, patcher after load init,
  * patcher relative properties, script evaluation, .pat file support, find and object
  * naming support.

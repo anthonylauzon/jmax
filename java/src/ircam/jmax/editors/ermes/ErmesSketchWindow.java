@@ -102,7 +102,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   boolean itsChangingRunEditMode = false;
   //public String itsTitle;
   public MaxDocument itsDocument;
-  static int untitledCounter = 1;
 
   // the MaxDataEditor interface: Please implement me :->
 
@@ -150,20 +149,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     super(Mda.getDocumentTypeByName("patcher"));
 
     itsDocument = patcher.getDocument();
+    itsPatcher = patcher;
 
     if (itsDocument.getRootData() == getData())
-      {
-	if (itsDocument.getName()==null)
-	  setTitle(GetNewUntitledName());
-	else 
-	  setTitle(itsDocument.getDocumentSource().toString());
-      }
+      setTitle(itsDocument.getName());
     else
-      {
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(patcher)));
-      }
-
-    itsPatcher = patcher;
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(patcher)));
 
     itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
     Init(); //MaxEditor base class init (standard menu handling)
@@ -200,10 +191,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return "patcher " + theFtsPatcher.getObjectName();
     else
       return theFtsPatcher.getClassName();
-  }
-
-  public static String GetNewUntitledName() {
-    return "untitled"+(untitledCounter++);
   }
 
     //--------------------------------------------------------
@@ -805,10 +792,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	aDialog.dispose();
       }
 
-      itsPatcher.close();
-      itsPatcher.delete();
+      // Just call dispose on the document
+      // Mda will indirectly call Destroy,
+      // and will close all the other editors
 
-      Destroy();
       itsDocument.dispose();
     }
   }

@@ -4,7 +4,9 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
+
 /**
  * 
  * A File Dialog that provide the concept
@@ -24,7 +26,8 @@ public class MaxFileChooser {
 
   public static MaxDocumentSource chooseFileToOpen(Frame frame, String title)
   {
-    FileDialog fd = new FileDialog(frame, title);
+    FileDialog fd = new FileDialog(((frame != null) ? frame : MaxWindowManager.getWindowManager().getAFrame()),
+				   title);
     String file;
 
     fd.setFile("");
@@ -56,7 +59,9 @@ public class MaxFileChooser {
 
   public static MaxDocumentSource chooseFileToSave(Frame frame, String title, MaxDocumentSource source)
   {
-    FileDialog fd = new FileDialog(frame, title);
+    FileDialog fd = new FileDialog(((frame != null) ? frame : MaxWindowManager.getWindowManager().getAFrame()),
+				   title);
+
     String file;
     String dir;
     String oldDir = null;

@@ -5,8 +5,8 @@ SOURCES = \
 	   QuitDialog.java \
            SplashDialog.java \
 	   MaxFileChooser.java \
-           StatisticsDialog.java 
-
+           StatisticsDialog.java  \
+	   YesOrNo.java
 
 
 

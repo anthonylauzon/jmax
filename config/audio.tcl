@@ -87,7 +87,7 @@ if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
 #    puts "    stereo2: 0/2"
     #ucs open device in~ stereo2 as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo2 as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
+    ucs open device out~ stereo2 as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
 
 #     ucs default in~ multi1
 #     ucs default out~ multi1

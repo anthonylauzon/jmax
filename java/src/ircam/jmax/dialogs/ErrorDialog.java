@@ -3,6 +3,9 @@ package ircam.jmax.dialogs;
 import java.awt.*;
 import java.awt.event.*;
 
+import ircam.jmax.*;
+
+
 /**
  * Provide an error message shown in a dialog; use by the static
  * function "show"
@@ -14,7 +17,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
   Button okButton;
 
   public ErrorDialog(Frame dw, String theError) {
-    super(dw, "ermes Error", false);
+    super(((dw != null) ? dw : MaxWindowManager.getWindowManager().getAFrame()), "ermes Error", false);
     parent = dw;
     itsError = theError;
 

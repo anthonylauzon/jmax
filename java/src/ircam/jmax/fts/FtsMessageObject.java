@@ -16,6 +16,20 @@ import ircam.jmax.*;
 
 public class FtsMessageObject extends FtsObject
 {
+  /**
+   * MessboxMessageHandler interpret the dedicated messages 
+   * coming from FTS to the Messbox object
+   */
+
+  class MessboxMessageHandler implements FtsMessageHandler
+  {
+    public void handleMessage(FtsMessage msg)
+    {
+      FtsMessageObject.this.localPut("value", FtsObject.makeDescription(2, msg));
+    }
+  }
+
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -33,6 +47,8 @@ public class FtsMessageObject extends FtsObject
 
     ninlets = 1;
     noutlets = 1;
+
+    installMessageHandler(new MessboxMessageHandler());
   }
 
   /**

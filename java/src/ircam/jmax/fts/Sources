@@ -43,8 +43,6 @@ SOURCES =  \
 	  FtsSubProcessServer.java \
 	  FtsTableObject.java \
 	  FtsTclPropertyParser.java \
-	  FtsTemplateObject.java \
-	  FtsTemplateTable.java \
 	  FtsUpdateGroupListener.java \
 	  FtsValueObject.java
 

@@ -51,6 +51,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     return true;  
   }
 
+
 	
   //--------------------------------------------------------
   // makeFtsObject, redefineFtsObject
@@ -74,7 +75,21 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   {
     ((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
   }
-  
+
+  // Set the text; it is a try; the message box object in the
+  // application layer take care of converting the message text to the
+  // "value" property; it is an hack, should be done more cleanly.
+
+  protected void FtsValueChanged(Object value) {
+    itsArgs = (String) value;
+    ParseText(itsArgs);
+    DoublePaint();
+  }
+
+  public boolean NeedPropertyHandler(){
+    return true;
+  }
+
   public boolean MouseUp_specific(MouseEvent e, int x, int y){
     if (!itsSketchPad.itsRunMode) return false;
     else {

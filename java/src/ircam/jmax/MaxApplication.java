@@ -247,23 +247,31 @@ public class MaxApplication extends Object
   public static void Quit()
   {
     ListModel windows;
-
-
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
 
-    windows = MaxWindowManager.getWindowManager().getWindowList();
+    // First, search if there is anything to save
+    // Loop in all the documents in all the  types.
+    
+    ListModel types = Mda.getDocumentTypes();
 
-    // First, search if there is anything to save,
+    
+  search: for (int i = 0; i < types.getSize(); i++)
+    {
+      MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
+      ListModel documents = type.getDocuments();
 
-    for (int i = 0; i < windows.getSize(); i++)
-      {
-	Frame w = (Frame) windows.getElementAt(i);
-
-	if (w instanceof MaxEditor)
-	  if (((MaxEditor) w).ShouldSave())
-	    someOneNeedSave = true;
-      }
+      for (int j = 0; j < documents.getSize(); j++)
+	{
+	  MaxDocument document = (MaxDocument) documents.getElementAt(i);
+	
+	  if (! document.isSaved())
+	    {
+	      someOneNeedSave = true;
+	      break search;
+	    }
+	}
+    }
 
     // in such case, should give the offer to cancel the quit.
 
@@ -290,26 +298,51 @@ public class MaxApplication extends Object
 
     runHooks("exit");
 
-    // Then, do the close.
-    // At the moment, the close is responsible for handling 
-    // the save; this should really be done here, so that we
-    // can implement a "SaveAll" option.
-    // Also, this force us to skip the clean close in case
-    // or a real quit; this is no good, there should be
-    // a way to do a Close without being asked for the save !!
-    // Another problem, since the semantic "Close" action is
-    // mixed with the "user interface" Close action, we cannot
-    // take away the "Cancel" from the dialogs here, having
-    // as a result a "Cancel" button that do no means anything.
+    // dispose (and optionally save) all the documents
 
-    if (doTheSave)
+    for (int i = 0; i < types.getSize(); i++)
       {
-	for (int i = 0; i < windows.getSize(); i++)
-	  {
-	    Frame w = (Frame) windows.getElementAt(i);
+	MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
+	ListModel documents = type.getDocuments();
 
-	    if (w instanceof MaxEditor)
-	      ((MaxEditor) w).Close();
+	for (int j = 0; j < documents.getSize(); j++)
+	  {
+	    MaxDocument document = (MaxDocument) documents.getElementAt(i);
+	
+	    if (doTheSave && (! document.isSaved()))
+	      {
+		if (YesOrNo.ask("Save " + document.getName(), "Save", "Don't Save"))
+		  {
+		    if (! document.canSave())
+		      {
+			MaxDocumentSource source;
+			source  = MaxFileChooser.chooseFileToSave(null,
+								  "Save As",
+								  document.getDocumentSource());
+
+			if (source != null)
+			  document.bindToDocumentSource(source);
+		      }
+
+		    if (document.canSave())
+		      {
+			try
+			  {
+			    document.save();
+			  }
+			catch (MaxDocumentException e)
+			  {
+			    System.err.println(e.toString());
+			  }
+		      }
+		    else
+		      {
+			new ErrorDialog(null, "Cannot Save " + document.getName());
+		      }
+		  }		    
+
+		document.dispose();
+	      }
 	  }
       }
 

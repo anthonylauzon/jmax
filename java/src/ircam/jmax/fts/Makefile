@@ -199,10 +199,6 @@ FtsTclPropertyParser:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTclPropertyParser.java)
 .PHONY: FtsTclPropertyParser
 
-FtsTemplateObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateObject.java)
-.PHONY: FtsTemplateObject
-
 FtsTemplateTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateTable.java)
 .PHONY: FtsTemplateTable
