@@ -79,6 +79,10 @@ ErmesObjInOutChoice:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutChoice.java)
 .PHONY: ErmesObjInOutChoice
 
+ErmesObjInOutPop:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutPop.java)
+.PHONY: ErmesObjInOutPop
+
 ErmesObjInOutlet:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutlet.java)
 .PHONY: ErmesObjInOutlet

@@ -249,36 +249,6 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
 
-    //--------------------------------------------------------
-    //	CONSTRUCTOR FROM DOCUMENT
-    //
-    //--------------------------------------------------------
-  /*public void InitFromDocument(MaxDocument theDocument) {
-		
-      Object aObject;
-      int x, y, width, height;
-
-      itsDocument = (ErmesPatcherDoc)theDocument;
-      FtsContainerObject patcher =  itsDocument.GetFtsPatcher();
-
-      x = ((Integer) patcher.get("wx")).intValue();
-      y = ((Integer) patcher.get("wy")).intValue();
-      width  = ((Integer) patcher.get("ww")).intValue();
-      height = ((Integer) patcher.get("wh")).intValue();
-
-      //get the window dimension use it for: reshape to the right dimensions
-
-      setBounds(x, y, width, height+80);
-
-      //assigning the right name to the window.
-
-      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting(false);//???
-      validate();
-      itsSketchPad.InitFromDocument(itsDocument);
-      itsSketchPad.repaint();//force a repaint to build an offGraphics context
-      validate();
-    }*/
-
     public void InitFromContainer(FtsContainerObject patcher) {
 		
       Object aObject;
@@ -1251,7 +1221,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
       aFObject = aErmesObject.itsFtsObject;
-           
+      if (aFObject == null) continue; //security check!           
       // Set geometrical properties
       
       aFObject.put("x", aErmesObject.itsX);

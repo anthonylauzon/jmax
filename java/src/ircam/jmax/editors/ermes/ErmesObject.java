@@ -142,6 +142,12 @@ public class ErmesObject implements FtsPropertyHandler {
     int aHDist;
     
     // retrieve the inlet, outlet informations
+    if (theFtsObject == null) {
+      //this case have been seen during the intentiation of an external
+      //"patcher <name> <nin> <nout>"
+      return;
+      //error? exception? delete the object?
+    }
     itsFtsObject = theFtsObject;//cosi', a occhio
     int n_inlts = theFtsObject.getNumberOfInlets();
     int n_outlts = theFtsObject.getNumberOfOutlets();

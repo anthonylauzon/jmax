@@ -135,10 +135,8 @@ class ErmesObjIn extends ErmesObject {
       return itsSketchPad.ClickOnObject(this, evt, x, y);
     }
     else  {	//we want to choose among the different Inlet number
-      itsSketchPad.itsInChoice.SetNewOwner(this); //make the Choice pointing to this
-      itsSketchPad.itsInChoice.setLocation(x, y);
-      itsSketchPad.itsInChoice.setVisible(true);
-      //itsSketchPad.itsInChoice.mouseDown(evt, x, y);
+      itsSketchPad.itsInPop.SetNewOwner(this);
+      itsSketchPad.itsInPop.show(itsSketchPad, itsX, itsY);
     }
     return true;
   }

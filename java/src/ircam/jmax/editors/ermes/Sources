@@ -25,6 +25,7 @@ SSOURCES = \
           ErmesObjFloatDialog.java \
           ErmesObjIn.java \
           ErmesObjInOutChoice.java \
+	  ErmesObjInOutPop.java \
           ErmesObjInOutlet.java \
           ErmesObjInlet.java \
           ErmesObjInletOutlet.java \

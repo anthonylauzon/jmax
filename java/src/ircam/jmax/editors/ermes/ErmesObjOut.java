@@ -101,10 +101,8 @@ class ErmesObjOut extends ErmesObject {
       return itsSketchPad.ClickOnObject(this, evt, x, y);
     }
     else  {	//we want to choose among the different Outlet number
-      itsSketchPad.itsOutChoice.SetNewOwner(this); //make the Choice pointing to this
-      itsSketchPad.itsOutChoice.setLocation(x, y);
-      itsSketchPad.itsOutChoice.setVisible(true);
-      //itsSketchPad.itsInChoice.mouseDown(evt, x, y);
+      itsSketchPad.itsOutPop.SetNewOwner(this); //make the Choice pointing to this
+      itsSketchPad.itsOutPop.show(itsSketchPad, itsX, itsY);
     }
     return true;
   }

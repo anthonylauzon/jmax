@@ -60,8 +60,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)
   int outCount = 0;  //the same for ErmesObjOut objects
-  ErmesObjInOutChoice itsInChoice = null;	//choice control associated with this sketch (sub-patch)
-  ErmesObjInOutChoice itsOutChoice = null;
+  //ErmesObjInOutChoice itsInChoice = null;	//choice control associated with this sketch (sub-patch)
+  //ErmesObjInOutChoice itsOutChoice = null;
+  ErmesObjInOutPop itsInPop = null;//903
+  ErmesObjInOutPop itsOutPop = null;//903
 		
   int itsDirection = NoDirections;
   public boolean itsRunMode = false;
@@ -1597,29 +1599,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
   
   void PrepareInChoice() {
-    if (itsInChoice != null) return; //it's OK, we did it already
-    
+    if (itsInPop != null) return;
     int temp = itsSketchWindow.itsPatcher.getNumberOfInlets();
-    itsInChoice = new ErmesObjInOutChoice();
-    for (int i=0; i<temp; i++) {
-      itsInChoice.addItem(Integer.toString(i+1));
-    }
-    itsInChoice.setLocation(-200, -200);
-    itsInChoice.setVisible(false);
-    add(itsInChoice);
+    itsInPop = new ErmesObjInOutPop(temp);
+    add(itsInPop);
   }
 
   void PrepareOutChoice() {
-    if (itsOutChoice != null) return; //it's OK, we did it already
+    if (itsOutPop != null) return; //it's OK, we did it already
     
     int temp = itsSketchWindow.itsPatcher.getNumberOfOutlets();
-    itsOutChoice = new ErmesObjInOutChoice();
-    for (int i=0; i<temp; i++) {
-      itsOutChoice.addItem(Integer.toString(i+1));
-    }
-    itsOutChoice.setLocation(-200, -200);
-    itsOutChoice.setVisible(false);
-    add(itsOutChoice);
+    itsOutPop = new ErmesObjInOutPop(temp);
+    add(itsOutPop);
   }
 
   //--------------------------------------------------------
