@@ -182,7 +182,7 @@ public class Platform
     RETURN_KEY  = 10;
     //FONT_NAME = new String("default");
     FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
-    FONT_SIZE   = 12;
+    FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
   }
 }
