@@ -35,6 +35,8 @@ typedef struct
 
 
 #endif  /* WIN32 */
+
+
 typedef struct
 {
   fts_audioport_t head;

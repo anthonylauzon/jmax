@@ -32,7 +32,7 @@
 
 
 /* Define this if you want to post debug message */
-#undef WANT_TO_DEBUG_ASIO_PACKAGES
+#define WANT_TO_DEBUG_ASIO_PACKAGES
 
 /* 
    ASIO Callback:
@@ -50,7 +50,7 @@ fts_class_t* asio_audioport_type;
    it seems that ASIO allows only one driver processing ,
    so we need this global variable to know which driver we use 
 */
-static asio_audioport_t* current_port = 0;
+static asio_audioport_t* current_port = NULL;
 static int nb_port_opened = 0;
 
 /*
@@ -547,6 +547,8 @@ asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
       if(fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
       {
 
+fts_post("Type %d",current_port->channelInfos[0].type);
+
         // ASIO -> jMax type conversion 
         switch (current_port->channelInfos[0].type)
         {
@@ -797,6 +799,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
   fts_post("Current SampleRate : %f\n", self->sampleRate);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
+
   if (ASE_OK == driver->driver_interface->outputReady())
   {
     self->postOutput = true;
@@ -869,6 +872,7 @@ extern "C"
   {
     fts_symbol_t s = fts_new_symbol("asio_audioport");
     asio_audioport_type = fts_class_install(s, asio_audioport_instantiate);
+
   }
 }
 

@@ -62,7 +62,7 @@ void fts_convert_float32_to_uint8clip(long size,float* src,char* dest)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
-		*dest++ = (unsigned char)(128 + tmp * fScaler8); /* { 0, +255 } */
+		*dest++ = (unsigned char)(128 + tmp * fScaler8); /* { 1, +255 } */
   }
 }
 /*****************************************************************************/
@@ -87,7 +87,7 @@ void fts_convert_float32_to_int8clip(long size,float* src,char* dest)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
-		*dest++ = (char)(tmp * fScaler8); /* { -128, +127 } */
+		*dest++ = (char)(tmp * fScaler8); /* { -127, +127 } */
   } 
 }
 /*****************************************************************************/
@@ -97,6 +97,7 @@ void fts_convert_float32_to_int8clip(long size,float* src,char* dest)
 /*****************************************************************************/
 void fts_convert_float32_to_int16(long size,float* src,short* dest)
 {
+  /* slow method */
 	while(--size >= 0)
 		*dest++ = (short)((*src++) * fScaler16);
 }
@@ -107,12 +108,13 @@ void fts_convert_float32_to_int16(long size,float* src,short* dest)
 /*****************************************************************************/
 void fts_convert_float32_to_int16clip(long size,float* src,short* dest)
 {
+  /* slow method */
   float tmp;
 	while(--size >= 0)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
-		*dest++ = (short)(tmp * fScaler16); /* { -32768, +32767 } */
+		*dest++ = (short)(tmp * fScaler16); /* { -32767, +32767 } */
   }
 }
 /*****************************************************************************/
