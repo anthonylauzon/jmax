@@ -1,2 +1,4 @@
-SOURCES = ConsShell.java \
-          Console.java
+SOURCES = Console.java \
+	  ConsoleKeyListener.java \
+	  ConsoleWriter.java
+
