@@ -80,7 +80,11 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   {
     try
       {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	if (itsArgs.equals(""))
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", "unnamed 0 0");
+	else
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+
 	if (itsFtsObject == null) System.err.println("AAAAAAAAAAAHHHHHHHHH");
 	((FtsContainerObject) itsFtsObject).setDownloaded();
       }

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.11 $ IRCAM $Date: 1998/05/22 11:55:26 $
+ *      $Revision: 1.12 $ IRCAM $Date: 1998/05/26 14:56:54 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -82,6 +82,9 @@ fts_mess_init(void)
 
   fts_doctor_init();
 
+  /* Initialize the expression subsystem */
+
+  fts_expressions_init();
 
   /* Do the void object */
 

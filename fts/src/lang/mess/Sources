@@ -20,5 +20,5 @@ patabs.c        \
 patparser.c     \
 selection.c     \
 clipboard.c     \
-doctor.c
-
+doctor.c        \
+expressions.c

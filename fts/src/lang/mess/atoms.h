@@ -104,6 +104,7 @@ extern int fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2);
 /* Convenience macro for symbols */
 
 #define fts_is_operator(a)        (fts_is_symbol((a)) && fts_symbol_is_operator(fts_get_symbol(a)))
+#define fts_get_operator(a)        (fts_symbol_get_operator(fts_get_symbol(a)))
 
 #endif
 

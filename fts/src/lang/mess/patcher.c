@@ -359,7 +359,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   /* get the name */
 
-  this->name = fts_get_symbol_arg(ac, at, 1, 0);
+  this->name = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("unnamed"));
 
   /* should use block allocation ?? */
 
@@ -438,8 +438,8 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int noutlets;
   int i;
 
-  ninlets  = fts_get_long(at + 2);
-  noutlets = fts_get_long(at + 3);
+  ninlets  = fts_get_long_arg(ac, at, 2, 0);
+  noutlets = fts_get_long_arg(ac, at, 3, 0);
 
   /* initialize the class */
 
@@ -451,7 +451,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[1] = fts_s_symbol;
   a[2] = fts_s_int;
   a[3] = fts_s_int;
-  fts_method_define(cl,fts_SystemInlet, fts_s_init, patcher_init, 4, a);
+  fts_method_define_optargs(cl,fts_SystemInlet, fts_s_init, patcher_init, 4, a, 1);
 
   fts_method_define(cl,fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
 

@@ -140,6 +140,7 @@ fts_module_load(const char *name, const char *filename)
     {
       if (s->name && (! strcmp(s->name, name)))
 	{
+	  fprintf(stderr, "Library %s already loaded\n", name);
 	  return &module_loaded;
 	}
     }
@@ -152,7 +153,6 @@ fts_module_load(const char *name, const char *filename)
   else
     libname = filename;
       
-
   if (*libname == '/')
     {
       /* test if the file exists and is readable  */
@@ -161,6 +161,7 @@ fts_module_load(const char *name, const char *filename)
 
       if (fd < 0)
 	{
+	  fprintf(stderr, "Library %s not found\n", name);
 	  return &library_not_found;
 	}
       else
@@ -174,6 +175,7 @@ fts_module_load(const char *name, const char *filename)
 	loadpath = pathbuf;
       else
 	{
+	  fprintf(stderr, "Library %s not found\n", name);
 	  return &library_not_found;
 	}
     }
@@ -183,7 +185,7 @@ fts_module_load(const char *name, const char *filename)
 
   if (! handle)
     {
-      fprintf(stderr, "%s\n",dlerror());
+      fprintf(stderr, "Error: %s\n",dlerror());
       return &error_loading;
     }
 

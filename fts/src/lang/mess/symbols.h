@@ -21,7 +21,7 @@ extern const char *fts_symbol_name(fts_symbol_t sym)
 #define fts_symbol_name(sym)      ((sym)->name)
 
 #define fts_symbol_get_operator(sym)       ((sym)->operator)
-#define fts_symbol_set_operator(sym, op)   ((sym)->operator = (op))
+#define fts_symbol_set_operator(sym, op)   (((struct fts_symbol_descr *) sym)->operator = (op))
 #define fts_symbol_is_operator(sym)        ((sym)->operator != (-1))
 
 

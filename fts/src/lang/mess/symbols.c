@@ -89,6 +89,7 @@ fts_symbol_t fts_s_div;
 fts_symbol_t fts_s_open_par;
 fts_symbol_t fts_s_closed_par;
 
+static void
 fts_predefine_symbols(void)
 {
   /* In ANY case, do not change the association symbol value in the following;

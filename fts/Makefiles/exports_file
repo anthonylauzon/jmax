@@ -22,6 +22,7 @@ fts_welcome_apply
 fts_mess_module
 fts_new_symbol
 fts_new_symbol_copy
+fts_expression_eval
 fts_s_void
 fts_s_float
 fts_s_int
