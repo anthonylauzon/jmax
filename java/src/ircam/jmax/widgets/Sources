@@ -1,3 +1,9 @@
-SOURCES = ObjectSetViewer.java \
-	  ObjectSelectedListener.java
+SOURCES = \
+	ControlPanelFrame.java		\
+	DacSlipPanel.java		\
+	Led.java			\
+	ObjectSelectedListener.java	\
+	ObjectSetViewer.java		\
+
+
 

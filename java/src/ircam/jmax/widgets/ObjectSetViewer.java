@@ -8,7 +8,7 @@ import com.sun.java.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
-public class ObjectSetViewer extends JScrollPane {
+public class ObjectSetViewer extends JPanel {
 
   static class ObjectCellRenderer extends JLabel implements ListCellRenderer
   {
@@ -89,8 +89,6 @@ public class ObjectSetViewer extends JScrollPane {
 
   public ObjectSetViewer()
     {
-      super();
-
       jList = new JList() {
 	public Dimension getMaximumSize() 
 	  {
@@ -100,15 +98,20 @@ public class ObjectSetViewer extends JScrollPane {
 
       jList.setBackground( Color.white);
 
-      jList.addMouseListener(new ObjectSetViewerMouseListener());
- 
-      getViewport().setView( jList);
-
-      setAlignmentX( LEFT_ALIGNMENT);
-      setAlignmentY( TOP_ALIGNMENT);
-
       // Create the cell renderer
       jList.setCellRenderer( new ObjectCellRenderer());
+
+      jList.addMouseListener(new ObjectSetViewerMouseListener());
+ 
+      JScrollPane scrollPane = new JScrollPane();
+      scrollPane.getViewport().setView( jList);
+
+      scrollPane.setAlignmentX( LEFT_ALIGNMENT);
+      scrollPane.setAlignmentY( TOP_ALIGNMENT);
+
+      setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
+
+      add( scrollPane);
     }
 
   public void setModel( ListModel model)
