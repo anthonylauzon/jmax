@@ -84,7 +84,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 	{
 	  Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
 	  if(!(frame instanceof ConsoleWindow))
-	    MaxWindowManager.getWindowManager().addWindow(frame);
+	    {
+	      if(frame.getState()==Frame.ICONIFIED)
+		frame.setState(Frame.NORMAL);
+	      MaxWindowManager.getWindowManager().addWindow(frame);
+	    }
 	}
 	public void ancestorRemoved(AncestorEvent event)
 	{

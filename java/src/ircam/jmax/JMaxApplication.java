@@ -584,7 +584,8 @@ public class JMaxApplication {
         }
 
 	properties.put( "jmaxRoot", root + "/share/jmax");
-	properties.put( "jmaxServerDir", root + "/bin");
+	if (properties.get( "jmaxServerDir") == null)
+	  properties.put( "jmaxServerDir", root + "/bin");
       }
   }
 
@@ -639,6 +640,9 @@ public class JMaxApplication {
 	
 	String ftsDir = (String)properties.get( "jmaxServerDir");
 	String ftsName = (String)properties.get( "jmaxServerName");
+
+	System.err.println( ftsDir);
+	System.err.println( ftsName);
 
 	if (ftsName == null)
 	  ftsName = "fts";

@@ -1,3 +1,16 @@
+2003-03-11  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* java/src/ircam/jmax/JMaxApplication.java: fixed overwriting of jmaxServerDir
+	in method guessDirectories()
+
+2003-03-10  olicha  <olivier.chapuis@free.fr>
+
+	* java/src/ircam/jmax/dialogs/SplashDialog.java (SplashDialog):
+	Set the size of the splash dialog
+
+	* java/src/ircam/jmax/editors/console/ConsoleWindow.java (makeContent):
+	Uniconify the floating toolbar when needed
+	
 2003-03-07  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
 	* FloatBox and IntBox (NumberBox) inherit from Editable
