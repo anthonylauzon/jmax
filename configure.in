@@ -22,12 +22,41 @@ AC_PROG_CC
 if test "$ac_cv_prog_cc" = "no" ; then
    AC_MSG_ERROR([*** No C compiler])
 fi
+CFLAGS=""
 AC_ISC_POSIX
 AC_PROG_INSTALL
 
 dnl Check for libtool
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
+
+dnl Checks for libraries.
+AC_CHECK_LIB(m, sin)
+AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
+
+dnl Checks for library functions.
+AC_FUNC_ALLOCA
+AC_CHECK_FUNCS(socket)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_BIGENDIAN
+
+dnl Check for Java compiler
+dnl AC_PROG_JAVAC
+JAVACX=javac
+AC_SUBST(JAVACX)
+JAVACFLAGSX=
+case "$debug" in
+ yes)
+  JAVACFLAGSX="-g"
+  ;;
+esac
+AC_SUBST(JAVACFLAGSX)
 
 dnl Big hack for Mac OS X (see ChangeLog about the -twolevel_namespace)
 case "$host" in
@@ -36,10 +65,6 @@ powerpc-apple-darwin*)
   mv libtool.out libtool
 ;;
 esac
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_C_BIGENDIAN
 
 dnl Check for memory allocation debug
 AC_ARG_ENABLE(check_memory,
@@ -78,11 +103,10 @@ if test "$with_debug" != "yes"
 then
   CFLAGS="$CFLAGS -O3 -funroll-loops -fmove-all-movables -fstrict-aliasing"
 fi
-case "$check_memory" in
- yes)
+if test "$check_memory" = "yes"
+then
   CFLAGS="$CFLAGS -fcheck-memory-usage"
-  ;;
-esac
+fi
 
 AC_CHECK_HEADER( "alsa/asoundlib.h", alsa_found="yes")
 
@@ -126,19 +150,6 @@ AC_DEFINE(restrict,)
 
 esac
 
-
-dnl Checks for libraries.
-AC_CHECK_LIB(m, sin)
-AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
-
-dnl Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
-
-dnl Checks for library functions.
-AC_FUNC_ALLOCA
-AC_CHECK_FUNCS(socket)
-
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
 AC_SUBST(FTS_SYS_LIBS)
@@ -156,18 +167,6 @@ ROOTDIR="${datadir}/jmax"
 
 AC_SUBST(FTSDIR)
 AC_SUBST(ROOTDIR)
-
-dnl Check for Java compiler
-dnl AC_PROG_JAVAC
-JAVACX=javac
-AC_SUBST(JAVACX)
-JAVACFLAGSX=
-case "$debug" in
- yes)
-  JAVACFLAGSX="-g"
-  ;;
-esac
-AC_SUBST(JAVACFLAGSX)
 
 dnl Generate include/fts/config.h
 dnl provides: pointer-to-int conversions
