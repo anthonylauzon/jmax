@@ -190,7 +190,10 @@ untup_input_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     n = ac;
 
   for(i=n-1; i>=0; i--)
-    fts_outlet_atom(o, i, at + i);
+    {
+      if(!fts_is_void(at + i))
+	fts_outlet_atom(o, i, at + i);
+    }
 }
 
 /************************************************
@@ -274,29 +277,29 @@ tup_set_require_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
 }
 
 static void
-tup_set_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tup_t *this = (tup_t *)o;
 
   if(fts_is_symbol(at))
     {
-      fts_symbol_t sync = fts_get_symbol(at);
+      fts_symbol_t mode = fts_get_symbol(at);
       
-      if(sync == sym_any)
+      if(mode == sym_any)
 	{
 	  this->trigger = (1 << this->n) - 1;
 	  this->reset = 0;
 	  this->require = 0;
 	}
-      else if(sync == sym_all)
+      else if(mode == sym_all)
 	this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
-      else if(sync == sym_left)
+      else if(mode == sym_left)
 	{
 	  this->trigger = 1;
 	  this->reset = 0;
 	  this->require = 0;
 	}
-      else if(sync == sym_right)
+      else if(mode == sym_right)
 	{
 	  this->trigger = (1 << (this->n - 1));
 	  this->reset = 0;
@@ -308,9 +311,9 @@ tup_set_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-tup_set_sync_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+tup_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  tup_set_sync(o, 0, 0, 1, value);
+  tup_set_mode(o, 0, 0, 1, value);
 }
 
 /************************************************
@@ -333,8 +336,14 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   for(i=0; i<TUP_MAX_SIZE; i++)
     fts_set_void(this->a + i);
 
-  if(ac == 1)
+  switch(ac)
     {
+    case 0:
+      n = 2;
+
+      break;
+
+    case 1:
       if(fts_is_number(at))
 	{
 	  n = fts_get_number_int(at);
@@ -349,16 +358,19 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	  fts_object_set_error(o, "Wrong argument");
 	  return;
 	}
-    }
-  else if(ac > 1)
-    {
+
+      break;
+
+    default:
       if(ac > TUP_MAX_SIZE)
 	ac = TUP_MAX_SIZE;
-
+      
       n = ac;
-
+      
       for(i=0; i<n; i++)
 	fts_atom_assign(this->a + i, at + i);
+      
+      break;
     }
 
   this->n = n;
@@ -402,9 +414,6 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int n = 0;
   int i;
 
-  ac--;
-  at++;
-
   if(ac == 1 && fts_is_int(at))
     n = fts_get_int(at);
   else
@@ -422,7 +431,7 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), tup_set_trigger_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), tup_set_require_prop);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sync"), tup_set_sync_prop);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), tup_set_mode_prop);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, tup_output);
   fts_method_define_varargs(cl, 0, fts_s_set, tup_set);
@@ -443,9 +452,6 @@ static fts_status_t
 untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n = 0;
-
-  ac--;
-  at++;
 
   if(ac == 1 && fts_is_number(at))
     n = fts_get_number_int(at);

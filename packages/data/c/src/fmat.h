@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell.
- *
  */
 
 #ifndef _DATA_FMAT_H_
@@ -44,6 +42,8 @@ DATA_API fts_metaclass_t *fmat_type;
 
 #define fmat_get_m(x) ((x)->m)
 #define fmat_get_n(x) ((x)->n)
+
+DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 
 #define fmat_get_ptr(m) ((m)->values)
 

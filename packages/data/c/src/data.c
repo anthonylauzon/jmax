@@ -22,11 +22,12 @@
 #include "data.h"
 
 extern void value_config(void);
+extern void vec_config(void);
 extern void ivec_config(void);
 extern void fvec_config(void);
-extern void fmat_config(void);
-extern void vec_config(void);
+extern void cvec_config(void);
 extern void mat_config(void);
+extern void fmat_config(void);
 extern void col_config(void);
 extern void row_config(void);
 extern void bpf_config(void);
@@ -45,11 +46,12 @@ DATA_API void
 data_config(void)
 {
   value_config();
+  vec_config();
   ivec_config();
   fvec_config();
-  fmat_config();
-  vec_config();
+  cvec_config();
   mat_config();
+  fmat_config();
   col_config();
   row_config();
   bpf_config();

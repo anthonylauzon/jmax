@@ -224,7 +224,7 @@ mroute_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=ns-1; i>=0; i--)
     {
-      if (this->symbols[i] == fts_get_selector(at))
+      if (this->symbols[i] == s)
 	{
 	  match = 1;
 
@@ -256,7 +256,7 @@ mroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   at++;
 
   this->ns = ac;
-  this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t ) * ac);
+  this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
 
   for(i=0; i<ac; i++)
     {

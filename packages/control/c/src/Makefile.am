@@ -7,6 +7,7 @@ demux.c \
 dispatch.c \
 fit.c \
 for.c \
+invoke.c \
 make.c \
 mess.c \
 oneshot.c \

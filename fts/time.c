@@ -267,9 +267,9 @@ fts_timebase_advance_slaves(fts_timebase_t *timebase)
 void 
 fts_timebase_advance(fts_timebase_t *timebase)
 {
-  double tick_start = timebase->time;
   double time = timebase->time + timebase->step;
 
+  timebase->tick_time = timebase->time;
   fts_timebase_advance_slaves(timebase);
 
   /* fire all current entries */	  

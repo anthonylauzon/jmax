@@ -186,26 +186,13 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-line_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   line_t *this = (line_t *)o;
-  double target = (double)fts_get_int_arg(ac, at, 0, 0);
+  double target = 0.0;
 
-  if(this->running)
-    {
-      fts_timebase_remove_object(fts_get_timebase(), o);
-      this->running = 0;
-    }
-
-  this->target = target;
-  this->steps = 0;
-}
-
-static void
-line_float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  line_t *this = (line_t *)o;
-  double target = (double)fts_get_float_arg(ac, at, 0, 0.0f);
+  if(fts_is_number(at))
+    target = fts_get_number_float(at);
 
   if(this->running)
     {
@@ -256,6 +243,8 @@ line_int_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     case 1:
       if(fts_is_number(at + 0))
 	line_int_number(o, winlet, s, 1, at + 0);
+    case 0:
+      break;
     }
 }
 
@@ -274,26 +263,33 @@ line_float_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     case 1:
       if(fts_is_number(at + 0))
 	line_float_number(o, winlet, s, 1, at + 0);
+    case 0:
+      break;
     }
 }
 
 static void
 line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  line_t *this   = (line_t *)o;
-  double target =  fts_get_float_arg(ac, at, 1, 0.0f);
-  double period =  fts_get_float_arg(ac, at, 2, 0);    
-  
-  this->target = target;
-  this->steps  = 0;
-  this->inval  = 0;
+  line_t *this = (line_t *)o;
 
-  if(this->period < 1.0)
-    this->period = 20.0;
-  else
-    this->period = period;
+  ac--;
+  at++;
 
+  this->target = 0.0;
+  this->steps = 0;
+  this->inval = 0;
   this->running = 0;
+
+  switch(ac)
+    {
+    case 2:
+      line_set_period(o, 0, 0, 1, at + 1);
+    case 1:
+      line_set_value(o, 0, 0, 1, at);
+    case 0:
+      break;
+    }
 }
 
 static fts_status_t
@@ -310,7 +306,6 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_int, line_int_number);
       fts_method_define_varargs(cl, 0, fts_s_float, line_int_number);
       fts_method_define_varargs(cl, 0, fts_s_list, line_int_list); 
-      fts_method_define_varargs(cl, 0, fts_s_set, line_int_set);
  
       fts_outlet_type_define_varargs(cl, 0, fts_s_int);
     }
@@ -319,10 +314,11 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_int, line_float_number);
       fts_method_define_varargs(cl, 0, fts_s_float, line_float_number);
       fts_method_define_varargs(cl, 0, fts_s_list, line_float_list);
-      fts_method_define_varargs(cl, 0, fts_s_set, line_float_set);
  
       fts_outlet_type_define_varargs(cl, 0, fts_s_float);
     }
+
+  fts_method_define_varargs(cl, 0, fts_s_set, line_set_value);
 
   fts_method_define_varargs(cl, 1, fts_s_int, line_set_time);
   fts_method_define_varargs(cl, 1, fts_s_float, line_set_time);

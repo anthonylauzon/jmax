@@ -393,6 +393,7 @@ FTS_API int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
  * @ingroup dsp
  */
 FTS_API void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av);
+FTS_API double fts_dsp_get_time(void);
 
 /*@}*/ /* Functions of the put method */
 

@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include <fts/fts.h>
@@ -40,40 +38,6 @@ static fts_symbol_t sym_comma = 0;
  */
 
 void
-mat_alloc(mat_t *mat, int m, int n)
-{
-  int size = m * n;
-
-  if(size > 0)
-    {
-      int i;
-
-      mat->data = fts_malloc(m * n * sizeof(fts_atom_t));
-      mat->m = m;
-      mat->n = n;
-      mat->alloc = size;
-
-      /* set all atoms to void */
-      for(i=0; i<size; i++)
-	fts_set_void(mat->data + i);
-    }
-  else
-    {
-      mat->data = 0;
-      mat->m = 0;
-      mat->n = 0;    
-      mat->alloc = 0;
-    }
-}
-
-void
-mat_free(mat_t *mat)
-{
-  if(mat->m * mat->n)
-    fts_free(mat->data);
-}
-
-void
 mat_set_size(mat_t *mat, int m, int n)
 {
   int size = m * n;
@@ -82,13 +46,7 @@ mat_set_size(mat_t *mat, int m, int n)
     {
       int i;
 
-      if(mat->alloc)
-	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
-      else
-	mat->data = fts_malloc(size * sizeof(fts_atom_t));
-
-      mat->m = m;
-      mat->n = n;
+      mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
       mat->alloc = size;
     }
   else
@@ -106,18 +64,10 @@ mat_set_size(mat_t *mat, int m, int n)
 
 	  fts_atom_void(ap);
 	}
-      
-      if(size > 0)
-	{
-	  mat->m = m;
-	  mat->n = n;
-	}
-      else
-	{
-	  mat->m = 0;
-	  mat->n = 0;
-	}
     }
+
+  mat->m = m;
+  mat->n = n;
 }
 
 void
@@ -182,7 +132,7 @@ mat_set_with_onset_from_atoms(mat_t *mat, int onset, int ac, const fts_atom_t *a
 }
 
 void
-mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
+mat_set_from_tuples(mat_t *mat, int ac, const fts_atom_t *at)
 {
   int m = mat_get_m(mat);
   int n = mat_get_n(mat);
@@ -740,11 +690,11 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->keep = fts_s_no;
 
   if(ac == 0)
-    mat_alloc(this, 0, 0);
+    mat_set_size(this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
-    mat_alloc(this, fts_get_int(at), 1);
+    mat_set_size(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
-    mat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
+    mat_set_size(this, fts_get_int(at), fts_get_int(at + 1));
   else if(fts_is_tuple(at))
     {
       int m = 0;
@@ -768,8 +718,8 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    break;
 	}
       
-      mat_alloc(this, m, n);
-      mat_set_from_lists(this, ac, at);
+      mat_set_size(this, m, n);
+      mat_set_from_tuples(this, ac, at);
 
       this->keep = fts_s_args;
     }
@@ -782,7 +732,8 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   mat_t *this = (mat_t *)o;
   
-  mat_free(this);
+  if(this->m * this->n)
+    fts_free(this->data);
 }
 
 static fts_status_t
@@ -807,7 +758,6 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, mat_dump);
   
-  /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
 
   fts_method_define_varargs(cl, 0, fts_s_clear, mat_clear);
@@ -819,9 +769,6 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
             
   fts_method_define_varargs(cl, 0, fts_s_import, mat_import); 
   fts_method_define_varargs(cl, 0, fts_s_export, mat_export); 
-
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, mat_symbol, 1, &mat_symbol);
 
   return fts_Success;
 }

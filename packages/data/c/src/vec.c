@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include <fts/fts.h>
@@ -32,9 +30,6 @@ fts_symbol_t vec_symbol = 0;
 fts_metaclass_t *vec_type = 0;
 
 static fts_symbol_t sym_text = 0;
-
-extern void mat_alloc(mat_t *mat, int m, int n);
-extern void mat_free(mat_t *mat);
 
 /********************************************************************
  *
@@ -355,22 +350,22 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->keep = fts_s_no;
 
   if(ac == 0)
-    mat_alloc((mat_t *)this, 0, 0);
+    mat_set_size((mat_t *)this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
-    mat_alloc((mat_t *)this, fts_get_int(at), 1);
+    mat_set_size((mat_t *)this, fts_get_int(at), 1);
   else if(ac == 1 && fts_is_tuple(at))
     {
       fts_tuple_t *tup = fts_get_tuple(at);
       int size = fts_tuple_get_size(tup);
       
-      mat_alloc((mat_t *)this, size, 1);
+      mat_set_size((mat_t *)this, size, 1);
       vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
 
       this->keep = fts_s_args;
     }
   else if(ac > 1)
     {
-      mat_alloc((mat_t *)this, ac, 1);
+      mat_set_size((mat_t *)this, ac, 1);
       vec_set_with_onset_from_atoms(this, 0, ac, at);
 
       this->keep = fts_s_args;
@@ -383,8 +378,9 @@ static void
 vec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-
-  mat_free((mat_t *)this);
+  
+  if((mat_t *)this->data)
+    fts_free((mat_t *)this->data);
 }
 
 static fts_status_t

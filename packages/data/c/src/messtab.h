@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell.
- *
  */
 
 #ifndef _MESS_MESSTAB_H_

@@ -20,11 +20,11 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include "numeric.h"
+
+extern void fft_config(void);
 
 extern void wrap_config(void);
 extern void rewrap_config(void);
@@ -32,6 +32,8 @@ extern void rewrap_config(void);
 void
 numeric_config(void)
 {
+  fft_config();
+
   wrap_config();
   rewrap_config();
 }

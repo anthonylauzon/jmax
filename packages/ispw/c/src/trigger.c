@@ -162,9 +162,7 @@ trigger_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (!ac)
-    return;
-  else
+  if (ac)
     {
       trigger_t *x = (trigger_t *)o;
       int outlet = x->noutlets;
@@ -214,6 +212,60 @@ trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_outlet_atoms(o, outlet, ac, at);
 	      break;
 	    }
+	}
+    }
+}
+
+static void
+trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  trigger_t *x = (trigger_t *)o;
+  int outlet = x->noutlets;
+  
+  while (outlet--)
+    {
+      switch (x->trigger_outlet_table[outlet])
+	{
+	case trigger_outlet_int:
+	  {
+	    int x = 0;
+	    
+	    if (fts_is_number(at))
+	      x = fts_get_number_int(at);
+	    
+	    fts_outlet_int(o, outlet, x);
+	  }
+	  break;
+	  
+	case trigger_outlet_float:
+	  {
+	    float x = 0;
+	    
+	    if (fts_is_number(at))
+	      x = fts_get_number_float(at);
+	    
+	    fts_outlet_float(o, outlet, x);
+	  }
+	  break;
+	  
+	case trigger_outlet_symbol:
+	  if (fts_is_symbol(at))
+	    fts_outlet_symbol(o, outlet, fts_get_symbol(at));
+	  else
+	    fts_outlet_symbol(o, outlet, fts_new_symbol(""));
+	  break;
+	  
+	case trigger_outlet_list:
+	  fts_outlet_atoms(o, outlet, ac, at);
+	  break;
+	  
+	case trigger_outlet_bang:
+	  fts_outlet_bang(o, outlet);
+	  break;
+	  
+	case trigger_outlet_thru:
+	  fts_outlet_send(o, outlet, s, ac, at);
+	  break;
 	}
     }
 }
@@ -380,14 +432,12 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_thru);
   else
     {
+      fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
       fts_method_define_varargs(cl, 0, fts_s_int, trigger_int);
       fts_method_define_varargs(cl, 0, fts_s_float, trigger_float);
       fts_method_define_varargs(cl, 0, fts_s_symbol, trigger_symbol);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
-
       fts_method_define_varargs(cl, 0, fts_s_list, trigger_list);
-      fts_method_define_varargs(cl, 0, fts_s_anything, trigger_bang);
+      fts_method_define_varargs(cl, 0, fts_s_anything, trigger_anything);
     }
 
   /* Type the outlet using the trigger_outlet_table */
@@ -503,7 +553,7 @@ trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 void
 trigger_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("trigger"),trigger_instantiate, trigger_equiv);
+  fts_metaclass_install(fts_new_symbol("trigger"), trigger_instantiate, trigger_equiv);
   fts_alias_install(fts_new_symbol("t"), fts_new_symbol("trigger"));
 }
 

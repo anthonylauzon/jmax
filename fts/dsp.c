@@ -205,6 +205,12 @@ fts_dsp_get_sample_rate()
   return fts_dsp_graph_get_sample_rate(&main_dsp_graph);
 }
 
+double
+fts_dsp_get_time()
+{
+  return fts_timebase_get_tick_time(dsp_timebase);
+}
+
 void 
 fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
 {

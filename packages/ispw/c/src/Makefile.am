@@ -96,7 +96,6 @@ sigsnap.c \
 sigswitch.c \
 sigtable.c \
 sigthres.c \
-sigthrow.c \
 sigthru.c \
 speedlim.c \
 split.c \

@@ -20,17 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
- *
  */
 
 #include <fts/fts.h>
-
-/************************************************************
- *
- *  object
- *
- */
 
 typedef struct 
 {
@@ -39,12 +31,6 @@ typedef struct
   fts_symbol_t selector;
   fts_method_t method;
 } mess_t;
-
-/************************************************************
- *
- *  user methods
- *
- */
 
 static void
 mess_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

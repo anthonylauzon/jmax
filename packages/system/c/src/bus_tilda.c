@@ -38,6 +38,8 @@ static fts_symbol_t throw_tilda_channel_symbol = 0;
 static fts_symbol_t catch_tilda_symbol = 0;
 static fts_symbol_t catch_tilda_channel_symbol = 0;
 
+static fts_hashtable_t *default_busses = 0;
+
 typedef struct _bus_tilda_
 {
   fts_object_t _o;
@@ -57,6 +59,52 @@ typedef struct _access_tilda_channel_
   fts_signal_bus_t *bus;
   ftl_data_t channel;
 } access_tilda_channel_t;
+
+static fts_signal_bus_t *
+bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
+{
+  fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
+  fts_signal_bus_t *bus = 0;
+  fts_atom_t key, a;
+  
+  fts_set_symbol(&key, name);
+
+  if(value && !fts_is_void(value))
+    {
+      if(fts_is_object(value))
+	{
+	  fts_object_t *obj = fts_get_object(value);
+	  
+	  if(fts_object_get_metaclass(obj) == fts_signal_bus_type)
+	    bus = (fts_signal_bus_t *)obj;
+	  else
+	    return 0; /* variable is not a bus */
+	}
+      else
+	return 0; /* variable is even not an object */
+    }
+  else if(default_busses == 0)
+    {
+      /* create hashtable if not existing yet */
+      default_busses = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
+      fts_hashtable_init( default_busses, 0, FTS_HASHTABLE_MEDIUM);
+    }
+  else if(fts_hashtable_get(default_busses, &key, &a))
+    bus = (fts_signal_bus_t *)fts_get_object(&a);
+
+  if(!bus)
+    {
+      /* if there wasn't a variable nor a default, make a default */
+      bus = (fts_signal_bus_t *)fts_object_create(fts_signal_bus_type, 0, 0);
+      
+      fts_set_object(&a, (fts_object_t *)bus);
+      fts_hashtable_put(default_busses, &key, &a);
+      
+      fts_object_refer((fts_object_t *)bus);
+    }
+
+  return bus;
+}
 
 /*****************************************************************************
  *
@@ -96,16 +144,47 @@ access_tilda_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, cons
 
   ac--;
   at++;
-  
-  this->bus = ftl_data_alloc(sizeof(fts_signal_bus_t *));
-  bus = ftl_data_get_ptr(this->bus);
-  *bus = (fts_signal_bus_t *)fts_get_object(at + 0);
 
-  fts_object_refer((fts_object_t *)*bus);
-
-  this->n_channels = fts_signal_bus_get_size(*bus);
+  this->bus = 0;
+  this->n_channels = 0;
 
   fts_dsp_add_object(o);
+
+  if(ac > 0)
+    {
+      this->bus = ftl_data_alloc(sizeof(fts_signal_bus_t *));
+      bus = ftl_data_get_ptr(this->bus);
+      
+      if(fts_is_symbol(at))
+	{
+	  fts_symbol_t name = fts_get_symbol(at);
+	  
+	  *bus = bus_get_or_create(fts_object_get_patcher(o), name);
+	  fts_variable_add_user(fts_object_get_patcher(o), name, o);
+	  
+	  if(!*bus)
+	    {
+	      fts_object_set_error(o, "Variable %s is not a bus~", name);
+	      return;
+	    }
+
+	  this->n_channels = 1;
+	}
+      else if(fts_is_a(at, fts_signal_bus_type))
+	{
+	  *bus = (fts_signal_bus_t *)fts_get_object(at);
+	  this->n_channels = fts_signal_bus_get_size(*bus);
+	}
+      else
+	{
+	  fts_object_set_error(o, "Wrong argument");
+	  return;
+	}
+      
+      fts_object_refer((fts_object_t *)*bus);
+    }
+  else
+    fts_object_set_error(o, "Argument of bus~ required");
 }	
 
 static void
@@ -117,14 +196,22 @@ access_tilda_channel_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, 
   ac--;
   at++;
   
-  this->bus = (fts_signal_bus_t *)fts_get_object(at + 0);
-  fts_object_refer((fts_object_t *)this->bus);
-
-  this->channel = ftl_data_alloc(sizeof(int));
-  channel = ftl_data_get_ptr(this->channel);      
-  *channel = fts_get_int(at + 1);
+  this->bus = 0;
+  this->channel = 0;
 
   fts_dsp_add_object(o);
+
+  if(ac >= 2 && fts_is_a(at, fts_signal_bus_type) && fts_is_number(at + 1))
+    {
+      this->bus = (fts_signal_bus_t *)fts_get_object(at);
+      fts_object_refer((fts_object_t *)this->bus);
+
+      this->channel = ftl_data_alloc(sizeof(int));
+      channel = ftl_data_get_ptr(this->channel);      
+      *channel = fts_get_number_int(at + 1);
+    }
+  else
+    fts_object_set_error(o, "Argument of bus~ required");
 }	
 
 static void
@@ -135,8 +222,11 @@ access_tilda_bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, co
 
   fts_dsp_remove_object(o);
 
-  fts_object_release((fts_object_t *)*bus);
-  ftl_data_free(this->bus);
+  if(this->bus)
+    {
+      fts_object_release((fts_object_t *)*bus);
+      ftl_data_free(this->bus);
+    }
 }
 
 static void
@@ -146,8 +236,11 @@ access_tilda_channel_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac
 
   fts_dsp_remove_object(o);
 
-  fts_object_release((fts_object_t *)this->bus);
-  ftl_data_free(this->channel);
+  if(this->bus)
+    fts_object_release((fts_object_t *)this->bus);
+
+  if(this->channel)
+    ftl_data_free(this->channel);
 }
 
 static void
@@ -264,43 +357,42 @@ throw_tilda_write_to_channel(fts_word_t *a)
 static fts_status_t
 throw_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac == 1) 
     {
-      if(ac == 1) 
+      int n_channels = 1;
+      int i;
+	  
+      if(fts_is_a(at, fts_signal_bus_type))
 	{
-	  /* bus */
 	  fts_signal_bus_t *bus = (fts_signal_bus_t *)fts_get_object(at);
-	  int n_channels = fts_signal_bus_get_size(bus);
-	  int i;
 
-	  fts_class_init(cl, sizeof(access_tilda_bus_t), n_channels + 1, 0, 0);
-	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_bus_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_bus_delete);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, throw_tilda_bus_put);
-	  
-	  for(i=0; i<n_channels; i++)
-	    fts_dsp_declare_inlet(cl, i);
-	  
-	  fts_method_define_varargs(cl, n_channels, fts_signal_bus_symbol, access_tilda_set_bus);
+	  n_channels = fts_signal_bus_get_size(bus);
 	}
-      else
-	{
-	  /* channel */
-	  fts_class_init(cl, sizeof(access_tilda_channel_t), 2, 0, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_channel_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_channel_delete);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, throw_tilda_channel_put);
-	  
-	  fts_dsp_declare_inlet(cl, 0);
-	  fts_method_define_varargs(cl, 1, fts_s_int, access_tilda_set_channel);
-	}
-
-      return fts_Success;
+      fts_class_init(cl, sizeof(access_tilda_bus_t), n_channels + 1, 0, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_bus_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_bus_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, throw_tilda_bus_put);
+      
+      for(i=0; i<n_channels; i++)
+	fts_dsp_declare_inlet(cl, i);
+      
+      fts_method_define_varargs(cl, n_channels, fts_signal_bus_symbol, access_tilda_set_bus);
     }
   else
-    return &fts_CannotInstantiate;
+    {
+      fts_class_init(cl, sizeof(access_tilda_channel_t), 2, 0, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_channel_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_channel_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, throw_tilda_channel_put);
+      
+      fts_dsp_declare_inlet(cl, 0);
+      fts_method_define_varargs(cl, 1, fts_s_int, access_tilda_set_channel);
+    }
+  
+  return fts_Success;
 }
 
 /*****************************************************************************
@@ -423,44 +515,44 @@ catch_tilda_read_from_channel(fts_word_t *a)
 static fts_status_t
 catch_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && fts_is_a(at, fts_signal_bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  if(ac == 1) 
     {
-      if(ac == 1) 
+      int n_channels = 1;
+      int i;
+
+      if(fts_is_a(at, fts_signal_bus_type))
 	{
-	  /* bus */
 	  fts_signal_bus_t *bus = (fts_signal_bus_t *)fts_get_object(at);
-	  int n_channels = fts_signal_bus_get_size(bus);
-	  int i;
 
-	  fts_class_init(cl, sizeof(access_tilda_bus_t), 1, n_channels, 0);
-	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_bus_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_bus_delete);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, catch_tilda_bus_put);
-	  
-	  fts_method_define_varargs(cl, 0, fts_signal_bus_symbol, access_tilda_set_bus);
-	  
-	  for(i=0; i<n_channels; i++)
-	    fts_dsp_declare_outlet(cl, i);
+	  n_channels = fts_signal_bus_get_size(bus);
 	}
-      else
-	{
-	  /* channel */
-	  fts_class_init(cl, sizeof(access_tilda_channel_t), 1, 1, 0);
 	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_channel_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_channel_delete);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, catch_tilda_channel_put);
-	  
-	  fts_method_define_varargs(cl, 0, fts_s_int, access_tilda_set_channel);
-	  
-	  fts_dsp_declare_outlet(cl, 0);
-	}
-
-      return fts_Success;
+      fts_class_init(cl, sizeof(access_tilda_bus_t), 1, n_channels, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_bus_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_bus_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, catch_tilda_bus_put);
+      
+      fts_method_define_varargs(cl, 0, fts_signal_bus_symbol, access_tilda_set_bus);
+      
+      for(i=0; i<n_channels; i++)
+	fts_dsp_declare_outlet(cl, i);
     }
   else
-    return &fts_CannotInstantiate;
+    {
+      /* channel */
+      fts_class_init(cl, sizeof(access_tilda_channel_t), 1, 1, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, access_tilda_channel_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, access_tilda_channel_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, catch_tilda_channel_put);
+      
+      fts_method_define_varargs(cl, 0, fts_s_int, access_tilda_set_channel);
+      
+      fts_dsp_declare_outlet(cl, 0);
+    }
+  
+  return fts_Success;
 }
 
 /*****************************************************************************

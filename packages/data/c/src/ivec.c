@@ -63,11 +63,7 @@ ivec_set_size(ivec_t *vec, int size)
 
   if(size > vec->alloc)
     {
-      if(vec->alloc)
-	vec->values = (int *)fts_realloc((void *)vec->values, sizeof(int) * size);
-      else
-	vec->values = (int *)fts_malloc(sizeof(int) * size);
-
+      vec->values = (int *)fts_realloc(vec->values, sizeof(int) * size);
       vec->alloc = size;
     }
 

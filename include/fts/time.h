@@ -86,6 +86,8 @@ struct fts_timebase
 #define fts_timebase_get_time(t) ((t)->time)
 #define fts_timebase_set_time(t, x) ((t)->time = (x))
 
+#define fts_timebase_get_tick_time(t) ((t)->tick_time)
+
 #define fts_timebase_get_step(t) ((t)->step)
 #define fts_timebase_set_step(t, x) ((t)->step = (x))
 

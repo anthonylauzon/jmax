@@ -118,7 +118,6 @@ extern void pt_config(void);
 /* signal */
 extern void zerocross_config(void);
 extern void sigthru_config(void);
-extern void sigthrow_config(void);
 extern void sigthreshold_config(void);
 extern void sigswitch_config(void);
 extern void sigsnapshot_config(void);
@@ -243,7 +242,6 @@ ispw_config(void)
   /* signal */
   zerocross_config();
   sigthru_config();
-  sigthrow_config();
   sigthreshold_config();
   sigswitch_config();
   sigsnapshot_config();

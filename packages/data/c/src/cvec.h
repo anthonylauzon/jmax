@@ -22,43 +22,40 @@
  *
  */
 
-#ifndef _DATA_FVEC_H_
-#define _DATA_FVEC_H_
+#ifndef _DATA_CVEC_H_
+#define _DATA_CVEC_H_
 
 #include "data.h"
 
-typedef struct _fvec_
+typedef struct _cvec_
 {
   fts_object_t o;
-  float *values;
+  complex *values;
   int size;
   int alloc;
   fts_symbol_t keep;
-  float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
-} fvec_t;
+} cvec_t;
 
-DATA_API fts_symbol_t fvec_symbol;
-DATA_API fts_metaclass_t *fvec_type;
+DATA_API fts_symbol_t cvec_symbol;
+DATA_API fts_metaclass_t *cvec_type;
 
-#define fvec_get_sr(v) ((((v)->sr) > 0)? ((v)->sr): (-(v)->sr))
+#define cvec_get_size(v) ((v)->size)
+DATA_API void cvec_set_size(cvec_t *vector, int size);
 
-#define fvec_get_size(v) ((v)->size)
-DATA_API void fvec_set_size(fvec_t *vector, int size);
+#define cvec_get_ptr(v) ((v)->values)
 
-#define fvec_get_ptr(v) ((v)->values)
+#define cvec_get_element(v, i) ((v)->values[i])
+#define cvec_set_element(v, i, x) ((v)->values[i] = (x))
 
-#define fvec_get_element(v, i) ((v)->values[i])
-#define fvec_set_element(v, i, x) ((v)->values[i] = (x))
+DATA_API void cvec_copy(cvec_t *org, cvec_t *copy);
 
-DATA_API void fvec_copy(fvec_t *org, fvec_t *copy);
+DATA_API void cvec_set_const(cvec_t *vector, complex c);
+#define cvec_zero(v) cvec_set_const((v), CZERO)
 
-DATA_API void fvec_set_const(fvec_t *vector, float c);
-#define fvec_zero(v) fvec_set_const((v), 0.0)
+DATA_API void cvec_set_with_onset_from_atoms(cvec_t *vector, int offset, int ac, const fts_atom_t *at);
 
-DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
-
-/* fvec atoms */
-#define fvec_atom_get(ap) ((fvec_t *)fts_get_object(ap))
-#define fvec_atom_is(ap) (fts_is_a((ap), fvec_type))
+/* cvec atoms */
+#define cvec_atom_get(ap) ((cvec_t *)fts_get_object(ap))
+#define cvec_atom_is(ap) (fts_is_a((ap), cvec_type))
 
 #endif

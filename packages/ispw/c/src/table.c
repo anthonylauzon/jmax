@@ -347,6 +347,7 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   table_t *this = (table_t *)o;
 
+  fts_patcher_upload_object(fts_get_root_patcher(), (fts_object_t *)this->vec);
   fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_openEditor, 0, 0);
 }
 

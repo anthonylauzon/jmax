@@ -287,9 +287,12 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   send_t *this = (send_t *) o;
   fts_label_t *label = 0;
 
-  if(fts_is_symbol(at + 1))
+  ac--;
+  at++;
+
+  if(fts_is_symbol(at))
     {
-      fts_symbol_t name = fts_get_symbol(at + 1);
+      fts_symbol_t name = fts_get_symbol(at);
       
       label = label_get_or_create(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
@@ -300,8 +303,8 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  return;
 	}
     }
-  else if(fts_is_label(at + 1))
-    label = (fts_label_t *)fts_get_object(at + 1);
+  else if(fts_is_label(at))
+    label = (fts_label_t *)fts_get_object(at);
   else
     {
       fts_object_set_error(o, "Wrong argument");
@@ -365,9 +368,12 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   receive_t *this = (receive_t *)o;
   fts_label_t *label = 0;
 
-  if(fts_is_symbol(at + 1))
+  ac--;
+  at++;
+
+  if(fts_is_symbol(at))
     {
-      fts_symbol_t name = fts_get_symbol(at + 1);
+      fts_symbol_t name = fts_get_symbol(at);
       
       label = label_get_or_create(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
@@ -378,8 +384,8 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  return;
 	}
     }
-  else if(fts_is_label(at + 1))
-    label = (fts_label_t *)fts_get_object(at + 1);
+  else if(fts_is_label(at))
+    label = (fts_label_t *)fts_get_object(at);
   else
     {
       fts_object_set_error(o, "Wrong argument");

@@ -3,6 +3,7 @@ package_LTLIBRARIES=libdata.la
 libdata_la_SOURCES= \
 bpf.c \
 col.c \
+cvec.c \
 data.c \
 fmat.c \
 fvec.c \
@@ -25,6 +26,7 @@ INCLUDES=-I$(top_srcdir)/packages/utils/c/src
 noinst_HEADERS= \
 bpf.h \
 col.h \
+cvec.h \
 data.h \
 fmat.h \
 fvec.h \

@@ -25,18 +25,13 @@
 
 fts_symbol_t cut_symbol = 0;
 
-typedef struct _cut_ftl_
-{
-  fts_object_t *object;
-  fvec_t *fvec;
-  int index;
-} cut_ftl_t;
-
-
 typedef struct _cut_
 {
   fts_object_t o;
-  ftl_data_t data;
+  float *buf;
+  int size;
+  int index;
+  fvec_t *fvec;
 } cut_t;
 
 /***************************************************************************************
@@ -45,40 +40,70 @@ typedef struct _cut_
  *
  */
 
-static void cut_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cut_t *this = (cut_t *)o;
-  cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
-
-  fts_outlet_object((fts_object_t *)o, 0, (fts_object_t *)data->fvec);
-}
-
 static void 
 cut_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cut_t *this = (cut_t *)o;
-  cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
+  float *buf = this->buf;
+  int ring_size = this->size;
+  int size = fvec_get_size(this->fvec);
+  float *ptr = fvec_get_ptr(this->fvec);
+  int onset = 0;
+  int tail;
+  int index;
+  int i;
 
-  data->index = 0;
+  if(size > ring_size)
+    {
+      onset = size - ring_size;
+      size = ring_size;
+
+      for(i=0; i<onset; i++)
+	ptr[i] = 0.0;
+    }
+  
+  index = this->index - size;
+
+  if(index < 0)
+    {
+      tail = -index;
+      index += ring_size;
+    }
+  else
+    tail = ring_size - index;
+
+  if(tail > size)
+    tail = size;
+
+  /* fill fvec from ring buffer */
+  for(i=0; i<tail; i++)
+    ptr[onset + i] = buf[index + i];
+  
+  for(i=0; i<size-tail; i++)
+    ptr[onset + tail + i] = buf[i];
+
+  fts_outlet_object(o, 0, (fts_object_t *)this->fvec);
 }
 
 static void 
 cut_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cut_t *this = (cut_t *)o;
-  cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
   fvec_t *fvec = fvec_atom_get(at);
 
-  fts_object_release((fts_object_t *)data->fvec);
-  data->fvec = fvec;
-  fts_object_refer((fts_object_t *)fvec);
-
-  data->index = fvec_get_size(fvec);
+  if(this->fvec != fvec)
+    {
+      if(this->fvec != NULL)
+	fts_object_release((fts_object_t *)this->fvec);
+      
+      this->fvec = fvec;
+      fts_object_refer((fts_object_t *)fvec);
+    }
 }
 
 /***************************************************************************************
  *
- *  put
+ *  dsp
  *
  */
 
@@ -91,7 +116,7 @@ cut_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[3];
   
-  fts_set_ftl_data(a + 0, this->data);
+  fts_set_object(a + 0, this);
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   fts_dsp_add_function(cut_symbol, 3, a);
@@ -100,24 +125,33 @@ cut_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 static void
 cut_ftl(fts_word_t *argv)
 {
-  cut_ftl_t *data = (cut_ftl_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
+  cut_t *this = (cut_t *)fts_word_get_pointer(argv + 0);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  float *buf = fvec_get_ptr(data->fvec);
-  int size = fvec_get_size(data->fvec);
-  int index = data->index;
-  int n = size - index;
+  float *buf = this->buf;
+  int size = this->size;
+  int index = this->index;
+  int tail = size - index;
   int i;
 
-  if(n > n_tick)
-    n = n_tick;
-  else if(n)
-    fts_timebase_add_call(fts_get_timebase(), data->object, cut_output, 0, 0.0);
+  /* fill ring buffer */
+  if(tail > n_tick)
+    {
+      for(i=0; i<n_tick; i++)
+	buf[index + i] = in[i];
 
-  for(i=0; i<n; i++)
-    buf[index + i] = in[i];
+      this->index += n_tick;
+    }
+  else
+    {
+      for(i=0; i<tail; i++)
+	buf[index + i] = in[i];
 
-  data->index += n;
+      for(i=0; i<n_tick-tail; i++)
+	buf[i] = in[tail + i];
+
+      this->index = i;
+    }
 }
 
 /***************************************************************************************
@@ -130,38 +164,63 @@ static void
 cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   cut_t *this = (cut_t *)o;
-  cut_ftl_t *data;
-  fvec_t *fvec;
+  int size = 1024;
+  fvec_t *fvec = NULL;
 
   ac--;
   at++;
 
-  this->data = ftl_data_alloc(sizeof(cut_ftl_t));
-  data = ftl_data_get_ptr(this->data);
-  
-  if(fts_is_int(at))
-    data->fvec = (fvec_t *)fts_object_create(fvec_type, 1, at);
-  else
-    data->fvec = fvec_atom_get(at);
+  this->buf = NULL;
+  this->index = 0;
+  this->size = 0;
+  this->fvec = NULL;
 
-  fts_object_refer((fts_object_t *)data->fvec);
+  if(ac > 0)
+    {
+      if(fts_is_number(at))
+	{
+	  size = fts_get_number_int(at);
+	  
+	  if(size < 0)
+	    size = 0;
+	}
+      else if(fts_is_a(at, fvec_type))
+	{
+	  fvec = fvec_atom_get(at);
+	  size = fvec_get_size(fvec);
+	}
+      else
+	{
+	  fts_object_set_error(o, "Wrong argument");
+	  return;
+	}
+    }
+      
+  if(fvec == NULL)  
+    {
+      fvec = (fvec_t *)fts_object_create(fvec_type, 0, 0);
+      fvec_set_size(fvec, size);
+    }
 
-  data->object = o;
-  data->index = fvec_get_size(data->fvec);
+  this->buf = (float *)fts_malloc(size * sizeof(float));
+  this->size = size;
 
-  fts_dsp_add_object((fts_object_t *)this);
+  this->fvec = fvec;
+  fts_object_refer((fts_object_t *)fvec);
+
+  fts_dsp_add_object(o);
 }
 
 static void
 cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cut_t *this = (cut_t *)o;
-  cut_ftl_t *data = ftl_data_get_ptr(this->data);
 
-  if(data->fvec)
-    fts_object_release((fts_object_t *)data->fvec);    
+  if(this->buf != NULL)
+    fts_free(this->buf);
 
-  ftl_data_free(this->data);
+  if(this->fvec != NULL)
+    fts_object_release((fts_object_t *)this->fvec);    
 
   fts_dsp_remove_object(o);
 }
@@ -169,31 +228,15 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {  
-  if(ac == 1 && fts_is_int(at))
-    {
-      fts_class_init(cl, sizeof(cut_t), 1, 1, 0);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cut_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
-    }
-  else if(ac == 1 && fvec_atom_is(at))
-    {
-      fts_class_init(cl, sizeof(cut_t), 2, 1, 0);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cut_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
-      fts_method_define_varargs(cl, 1, fvec_symbol, cut_set_fvec);
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(cut_t), 2, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cut_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
+  fts_method_define_varargs(cl, 1, fvec_symbol, cut_set_fvec);
 
   fts_dsp_declare_inlet(cl, 0);
 
@@ -206,5 +249,5 @@ signal_cut_config(void)
   cut_symbol = fts_new_symbol("cut~");
   fts_dsp_declare_function(cut_symbol, cut_ftl);  
 
-  fts_metaclass_install(cut_symbol, cut_instantiate, fts_arg_type_equiv);
+  fts_class_install(cut_symbol, cut_instantiate);
 }

@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell.
- *
  */
 
 #include <fts/fts.h>
@@ -38,20 +36,14 @@ static fts_symbol_t sym_text = 0;
  *
  */
 
-/* local */
-static void
-set_size(fmat_t *mat, int m, int n)
+void
+fmat_set_size(fmat_t *mat, int m, int n)
 {
   int size = m * n;
   
   if(size > mat->alloc)
     {
-      int i;
-
-      if(mat->alloc)
-	mat->values = fts_realloc(mat->values, size * sizeof(float));
-      else
-	mat->values = fts_malloc(size * sizeof(float));
+      mat->values = fts_realloc(mat->values, size * sizeof(float));
 
       mat->m = m;
       mat->n = n;
@@ -68,10 +60,10 @@ set_size(fmat_t *mat, int m, int n)
       /* zero region cut off */
       for(i=size; i<old_size; i++)
 	mat->values[i] = 0.0;
-      
-      mat->m = m;
-      mat->n = n;
     }
+      
+  mat->m = m;
+  mat->n = n;
 }
 
 void
@@ -104,7 +96,7 @@ fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t
 }
 
 void
-fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
+fmat_set_from_tuples(fmat_t *mat, int ac, const fts_atom_t *at)
 {
   int m = fmat_get_m(mat);
   int n = fmat_get_n(mat);
@@ -135,6 +127,19 @@ fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
     }
 }
 
+void
+fmat_copy(fmat_t *org, fmat_t *copy)
+{
+  int m = fmat_get_m(org);
+  int n = fmat_get_n(org);
+  int i;
+
+  fmat_set_size(copy, org->m, org->n);
+
+  for(i=0; i<m*n; i++)
+    copy->values[i] = org->values[i];
+}
+
 /********************************************************
  *
  *  files
@@ -151,7 +156,7 @@ fmat_grow(fmat_t *fmat, int size)
   while(size > alloc)
     alloc += FMAT_BLOCK_SIZE;
 
-  set_size(fmat, alloc, 1);
+  fmat_set_size(fmat, alloc, 1);
 }
 
 int 
@@ -422,19 +427,660 @@ fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fmat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
+    {
+      int m = fmat_get_m(this);
+      int n = fmat_get_n(this);
+      int i = fts_get_number_int(at);
+      int j = fts_get_number_int(at + 1);
+
+      if(i >= 0 && i < m && j >= 0 && j < n)
+	fmat_set_with_onset_from_atoms(this, i * n + j, ac - 2, at + 2);
+    }
+}
+
+static void
+fmat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
 
   if(ac > 1 && fts_is_number(at))
     {
-      int size = fmat_get_m(this) * fmat_get_n(this);
-      int offset = fts_get_number_int(at);
+      int m = fmat_get_m(this);
+      int n = fmat_get_n(this);
+      int i = fts_get_number_int(at);
 
-      if(offset >= 0 && offset < size)
-	fmat_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
+      ac--;
+      at++;
+      
+      /* clip to row */
+      if(ac > n)
+	ac = n;
+
+      if(i >= 0 && i < m)
+	fmat_set_with_onset_from_atoms(this, i * n, ac, at);
     }
 }
+
+static void
+fmat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+  int old_size = fmat_get_m(this)* fmat_get_n(this);
+  int m = 0;
+  int n = 0;
+  int i;
+
+  if(ac == 1 && fts_is_number(at))
+    {
+      m = fts_get_number_int(at);
+      n = fmat_get_n(this);
+      
+      if(m >= 0 && n >= 0)
+	fmat_set_size(this, m, n);
+    }  
+  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+    {
+      m = fts_get_number_int(at);
+      n = fts_get_number_int(at + 1);
+      
+      if(m >= 0 && n >= 0)
+	fmat_set_size(this, m, n);
+    }
+
+  /* set newly allocated region to void */
+  for(i=old_size; i<m*n; i++)
+    this->values[i] = 0.0;
+}
+
+/**************************************************************************************
+ *
+ *  arithmetics
+ *
+ */
+
+static void
+fmat_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] += r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] += r;
+	}
+    }
+}
+
+static void
+fmat_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] -= r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] -= r;
+	}
+    }
+}
+
+static void
+fmat_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] *= r[i];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] *= r;
+	}
+    }
+}
+
+static void
+fmat_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      {
+		if(r[i] != 0)
+		  l[i * n + j] /= r[i];
+		else
+		  l[i * n + j] = 0;
+	      }
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] /= r;
+	}
+    }
+}
+
+static void
+fmat_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = r[i] - l[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = r - p[i];
+	}
+    }
+}
+
+static void
+fmat_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      {
+		if(l[i * n + j] != 0)
+		  l[i * n + j] = r[i] / l[i * n + j];
+		else
+		  l[i * n + j] = 0;
+	      }
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	      
+	  if(r != 0.0)
+	    {
+	      int i;
+	      
+	      for(i=0; i<size; i++)
+		p[i] = r / p[i];
+	    }
+	  else
+	    {
+	      int i;
+
+	      for(i=0; i<size; i++)
+		p[i] = 0.0;
+	    }
+	}
+    }
+}
+
+/**************************************************************************************
+ *
+ *  comparison
+ *
+ */
+
+static void
+fmat_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] == r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] == r;
+	}
+    }
+}
+
+static void
+fmat_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] != r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] != r;
+	}
+    }
+}
+
+static void
+fmat_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] > r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] > r;
+	}
+    }
+}
+
+static void
+fmat_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] >= r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] >= r;
+	}
+    }
+}
+
+static void
+fmat_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] < r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] < r;
+	}
+    }
+}
+
+static void
+fmat_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = l[i * n + j] <= r[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = p[i] <= r;
+	}
+    }
+}
+
+static void
+fmat_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = (r[i * n + j] <= l[i * n + j])? r[i * n + j]: l[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = (r <= p[i])? r: p[i];
+	}
+    }
+}
+
+static void
+fmat_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, fmat_type))
+	{
+	  fmat_t *right = fmat_atom_get(at);
+	  int this_m = fmat_get_m(this);
+	  int this_n = fmat_get_n(this);
+	  int right_m = fmat_get_m(right);
+	  int right_n = fmat_get_n(right);
+	  int m = (this_m <= right_m)? this_m: right_m;
+	  int n = (this_n <= right_n)? this_n: right_n;
+	  float *l, *r;
+	  int i, j;
+  
+	  l = fmat_get_ptr(this);
+	  r = fmat_get_ptr(right);
+  
+	  for(i=0; i<m; i++)
+	    for(j=0; j<n; j++)
+	      l[i * n + j] = (r[i * n + j] >= l[i * n + j])? r[i * n + j]: l[i * n + j];
+	}
+      else if(fts_is_number(at))
+	{
+	  float r = fts_get_number_float(at);
+	  int size = fmat_get_m(this) * fmat_get_n(this);
+	  float *p = fmat_get_ptr(this);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    p[i] = (r >= p[i])? r: p[i];
+	}
+    }
+}
+
+/**************************************************************************************
+ *
+ *  load, save, import, export
+ *
+ */
 
 static void
 fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
@@ -513,43 +1159,52 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       for(j=0; j<n-1; j++)
 	post("%f ", fmat_get_element(this, i, j));
 
-      post("%f", fmat_get_element(this, i, j));
-
-      post("}\n");
+      post("%f}\n", fmat_get_element(this, i, j));
     }
 
   post("}\n");
 }
 
-void 
-fmat_dump(fmat_t *mat, fts_dumper_t *dumper)
+static void
+fmat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t av[256];
-  int size = fmat_get_m(mat) * fmat_get_n(mat);
-  int ac = 0;
-  int offset = 0;
-  int i;
+  fmat_t *this = (fmat_t *)o;
+  fmat_t *set = fmat_atom_get(at);
 
-  for(i=0; i<size; i++)
-    {
-      fts_set_float(&av[ac], mat->values[i]);
-
-      ac++;
-
-      if (ac == 256)
-	{
-	}
-    }
-
-  if (ac != 0)
-    {
-    }
+  fmat_copy(set, this);
 }
 
-static void
-fmat_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+static void 
+fmat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_set_object(value, obj);
+  fmat_t *this = (fmat_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  float *data = this->values;
+  int m = fmat_get_m(this);
+  int n = fmat_get_n(this);
+  int size = m * n;
+  fts_message_t *mess;
+  int i, j;
+
+  /* dump size message */
+  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_append_int(mess, m);
+  fts_message_append_int(mess, n);
+  fts_dumper_message_send(dumper, mess);
+
+  for(i=0; i<m; i++)
+    {
+      /* new row */
+      mess = fts_dumper_message_new(dumper, fts_s_row);  
+      fts_message_append_int(mess, i);
+  
+      for(j=0; j<n; j++)
+	{
+	  float f = data[i * n + j];
+
+	  fts_message_append_float(mess, f);
+	}
+    }
 }
 
 /*********************************************************
@@ -558,47 +1213,21 @@ fmat_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
  *
  */
 static void
-fmat_alloc(fmat_t *mat, int m, int n)
-{
-  int size = m * n;
-  int i;
-
-  if(size > 0)
-    {
-      mat->values = (float *) fts_malloc(size * sizeof(float));
-      mat->m = m;
-      mat->n = n;
-      fmat_zero(mat);
-
-      /* init to zero */
-      for(i=0; i<size; i++)
-	mat->values[i] = 0.0;
-    }
-  else
-    {
-      mat->values = 0;
-      mat->m = 0;
-      mat->n = 0;
-    }
-
-  mat->alloc = size;
-}
-
-static void
 fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
   
-  /* skip class name */
   ac--;
   at++;
 
+  this->keep = fts_s_no;
+
   if(ac == 0)
-    fmat_alloc(this, 0, 0);
+    fmat_set_size(this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
-    fmat_alloc(this, fts_get_int(at), 1);
+    fmat_set_size(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
-    fmat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
+    fmat_set_size(this, fts_get_int(at), fts_get_int(at + 1));
   else if(fts_is_tuple(at))
     {
       int m = 0;
@@ -610,7 +1239,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	{
 	  if(fts_is_tuple(at + i))
 	    {
-	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_pointer(at + i);
+	      fts_tuple_t *tup = fts_get_tuple(at + i);
 	      int size = fts_tuple_get_size(tup);
 	      
 	      if(size > n)
@@ -622,8 +1251,10 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    break;
 	}
       
-      fmat_alloc(this, m, n);
-      fmat_set_from_lists(this, ac, at);
+      fmat_set_size(this, m, n);
+      fmat_set_from_tuples(this, ac, at);
+
+      this->keep = fts_s_args;
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -637,6 +1268,29 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free(this->values);
 }
 
+static void
+fmat_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fmat_t *this = (fmat_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
+}
+
+static void
+fmat_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fmat_t *this = (fmat_t *)obj;
+
+  fts_set_symbol(value, this->keep);
+}
+
+static void
+fmat_get_fmat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_set_object(value, obj);
+}
+
 static fts_status_t
 fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -647,30 +1301,48 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
-  
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, fmat_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, fmat_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_fmat);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, fmat_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, fmat_set_elements);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_row, fmat_set_row_elements);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, fmat_size);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, fmat_dump);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
   
   fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, fmat_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, fmat_set_elements);
+  fts_method_define_varargs(cl, 0, fts_s_row, fmat_set_row_elements);
   
+  fts_method_define_varargs(cl, 0, fts_new_symbol("add"), fmat_add);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), fmat_sub);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), fmat_mul);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("div"), fmat_div);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("bus"), fmat_bus);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("vid"), fmat_vid);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("ee"), fmat_ee);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("ne"), fmat_ne);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("gt"), fmat_gt);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("ge"), fmat_ge);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("lt"), fmat_lt);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("le"), fmat_le);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("min"), fmat_min);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("max"), fmat_max);
+
+  fts_method_define_varargs(cl, 0, fts_s_size, fmat_size);
+            
   fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
   fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
-  
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_symbol);      
-  
+    
   return fts_Success;
 }
-
-/********************************************************************
- *
- *  config
- *
- */
 
 void 
 fmat_config(void)

@@ -89,7 +89,9 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
   int n = strlen(str);
   char *s = str + n;
 
-  if(fts_is_int(a))
+  if(fts_is_void(a))
+    snprintf(s, STRING_SIZE - n, " <void>");
+  else if(fts_is_int(a))
     snprintf(s, STRING_SIZE - n, " %d", fts_get_int(a));
   else if(fts_is_float(a))
     snprintf(s, STRING_SIZE - n, " %g", fts_get_float(a));
@@ -112,7 +114,9 @@ append_atom(char *str, const fts_atom_t *a)
   int n = strlen(str);
   char *s = str + n;
 
-  if(fts_is_int(a))
+  if(fts_is_void(a))
+    snprintf(s, STRING_SIZE - n, "<void>");
+  else if(fts_is_int(a))
     snprintf(s, STRING_SIZE - n, "%d", fts_get_int(a));
   else if(fts_is_float(a))
     snprintf(s, STRING_SIZE - n, "%g", fts_get_float(a));
