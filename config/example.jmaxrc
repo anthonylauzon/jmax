@@ -1,0 +1,80 @@
+## This in an example for a personal jMax configuration file.
+## Copy it to ~/.jmaxrc and customize as you need
+
+
+###################################################################
+#
+#  customized configuration settings
+#
+
+####################################
+## mashine setup (for now here)
+
+## set jMax servers host architecture
+#set jmaxArch "origin"
+#set jmaxArch "irix6.2"
+#set jmaxArch "o2r5k"
+#set jmaxArch "o2r10k"
+
+## jMax servers host name
+#set jmaxHost "astor"
+#set jmaxHost "mimi"
+
+
+####################################
+## audio/MIDI configuration
+
+#set jmaxSampleRate 44100
+#set jmaxAudioBuffer 2048
+#set jmaxMidiPort "jmaxMidi"
+
+
+####################################
+## expert settings ("hard coded" defaults)
+
+## set jMax client/server connection mode (client)
+#set jmaxConnection "client"
+#set jmaxConnection "socket"
+#set jmaxConnection "local"
+
+## set execution mode for jMax server executable (opt)
+#set jmaxMode "opt"
+#set jmaxMode "debug"
+
+## set name for jMax server executable (fts)
+#set jmaxServerName "fts"
+
+## set port number needed for socket connection (2000)
+#set jmaxPort 2000
+
+
+###################################################################
+#
+#  personal TCL functions
+#
+
+proc helloWorld {x y} {
+  puts "Hello World ($x, $y)"
+}
+
+
+###################################################################
+#
+#  start up and exit actions
+#
+
+when start {
+
+  # declare setup for the examples
+  sourceFile $jmaxRootDir/examples/examples.tcl
+
+  puts "Welcome to jMax!"
+  puts "(try examples in $jmaxRootDir/examples)"
+
+}
+
+when exit {
+
+    puts "Bye, bye!"
+
+}
