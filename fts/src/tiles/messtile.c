@@ -926,18 +926,17 @@ fts_mess_client_get_done(int ac, const fts_atom_t *av)
 {
   trace_mess("Received get done", ac, av);
 
-  if ((ac == 1) &&
-      fts_is_object(&av[0]))
+  if ((ac == 1)
+      && fts_is_object(&av[0]))
     {
       fts_object_t *obj;
-      fts_atom_t   a;
-
+      fts_atom_t a;
 
       obj  = fts_get_object(&av[0]);
-      fts_set_int(&a, 1);
+      fts_set_int( &a, 1);
 
       fts_object_put_prop(obj, fts_s_done, &a);
-      fts_object_property_changed(obj, fts_s_done);
+      fts_object_property_changed( obj, fts_s_done);
     }
   else
     post_mess("System Error in FOS message GETDONE: bad args", ac, av);
