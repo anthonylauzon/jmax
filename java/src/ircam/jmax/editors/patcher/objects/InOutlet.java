@@ -77,7 +77,8 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   public void setFont( Font theFont)
   {
     super.setFont( theFont);
-    fitToText();
+    setWidth(getWidth());
+    fitToText();    
   }
 
   public void redefine( String text) 
