@@ -844,6 +844,72 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 }
 
+/*********
+ * make a trill scoob starting from a set of scoob: 
+ *     - the first event gives first pitch; 
+ *     - the second event gives second pitch (so interval); 
+ *     - The duration is time from starting time of first event and end time of last endind event.
+ * The set of events is removed and a new event (of type trill) take his place in track.
+ */
+static void
+_track_make_trill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  
+  fts_post("make_trill ac=%d\n", ac);
+  
+  if(ac > 1)
+  {
+    int i;
+    event_t *evt;
+    double time, start, end, duration;
+    double first_pitch = 0.0;
+    double second_pitch = 0.0;
+    fts_atom_t a[9];
+    
+    /* first object */
+    evt = (event_t *)fts_get_object(at);
+    start = event_get_time(evt);
+    end = start + event_get_duration(evt);
+    
+    first_pitch = scoob_get_pitch((scoob_t *)fts_get_object(event_get_value(evt)));
+    second_pitch = scoob_get_pitch((scoob_t *)fts_get_object(event_get_value((event_t *)fts_get_object(at+1))));
+    if(first_pitch > second_pitch) 
+    {
+      double temp = first_pitch;
+      first_pitch = second_pitch;
+      second_pitch = temp;
+    }
+    
+    /* find start time and duration */
+    for(i = 1; i<ac ; i++)
+    {
+      evt = (event_t *)fts_get_object(at+i);
+      time = event_get_time(evt);
+      duration = event_get_duration(evt);
+      if(time < start) start = time;
+      if(time + duration > end) end = time + duration;
+          
+      track_remove_event(self, evt);
+    }
+    /* remove events at client */
+    fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
+        
+    /* create new event and add to track */
+    fts_set_symbol(a, seqsym_scoob);
+    fts_set_symbol(a+1, seqsym_type);
+    fts_set_symbol(a+2, seqsym_trill);
+    fts_set_symbol(a+3, seqsym_pitch);
+    fts_set_int(a+4, first_pitch);
+    fts_set_symbol(a+5, seqsym_interval);
+    fts_set_int(a+6, second_pitch - first_pitch);
+    fts_set_symbol(a+7, seqsym_duration);
+    fts_set_float(a+8, end-start);
+    evt = track_event_create( 9, a);
+    if(evt)
+      track_add_event_and_upload( self, start, evt);    
+  }
+}
 /******************************************************
 *
 *  persistence compatibility
@@ -2136,6 +2202,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
   
   fts_class_message_void(cl, fts_new_symbol("make-bars"), _track_make_bars);
+  fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   
   fts_class_inlet_thru(cl, 0);

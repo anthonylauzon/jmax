@@ -652,6 +652,21 @@ public void requestInsertMarker(double time)
   }
 }
 
+public void makeTrillFromSelection( Enumeration events)
+{  
+  try{
+    args.clear();
+    for (Enumeration e = events; e.hasMoreElements();) 
+      args.addObject( (TrackEvent) e.nextElement());
+
+    send( FtsSymbol.get("make_trill"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTrackObject: I/O Error sending make_trill Message!");
+    e.printStackTrace();
+  }
+}
 /**
 * how many events in the database?
  */

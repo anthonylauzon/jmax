@@ -270,6 +270,11 @@ void listenToMarkers( FtsTrackObject markers, SequenceSelection markSel)
 	currentMarkers.addListener( markerTrackListener);	
 }
 
+public SequenceSelection getMarkerSelection()
+{
+	return currentSelMarkers;
+}
+
 public abstract void reinit();
 abstract void createPopupMenu();
 abstract SequenceGraphicContext createGraphicContext(Geometry geometry, Track track);

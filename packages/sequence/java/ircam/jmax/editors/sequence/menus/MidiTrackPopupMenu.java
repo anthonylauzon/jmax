@@ -47,14 +47,24 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
   public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
     super(editor, isInSequence);
-		
+		JMenuItem item;
+    
     addSeparator();
     
-    JMenuItem item = new JMenuItem("Create Bars");
+    item = new JMenuItem("Create Bars");
     item.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
 				((MidiTrackEditor)target).getTrack().getFtsTrack().createMarkers();
+		  }
+		});	
+    add(item);
+    
+    item = new JMenuItem("Make Trill");
+    item.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				((MidiTrackEditor)target).getTrack().getFtsTrack().makeTrillFromSelection( target.getSelection().getSelected());
 		  }
 		});	
     add(item);
