@@ -47,16 +47,23 @@ class MaxWhenHookTable
       this.code = code;
     }
 
-    void runHook(String name, Interpreter interp)
+    boolean runHook(String name, Interpreter interp)
     {
       if (this.name.equals(name))
-	try
 	{
-	    Object result = code.eval();
+	  try
+	    {
+	      interp.eval(code);
+	    }
+	  catch (ScriptException e)
+	    {
+	      System.out.println("Interpreter error running hook " + name + " : " + e.getMessage());
+	    }
+
+	  return true;
 	}
-      catch (ScriptException e) {
-	System.out.println("Interpreter error running hook " + name + " : " + e.getMessage());
-      }
+      else
+	return false;
     }
   }
 
@@ -71,15 +78,20 @@ class MaxWhenHookTable
     hookList.addElement(new HookEntry(name, code));
   }
 
-  void runHooks(String name)
+  // Return true if one hook has been run
+
+  boolean runHooks(String name)
   {
     int i;
+    boolean ret = false;
 
     for (i = 0; i < hookList.size(); i++)
       {
 	HookEntry e = (HookEntry) hookList.elementAt(i);
 
-	e.runHook(name, MaxApplication.getInterpreter());
+	ret = ret | e.runHook(name, MaxApplication.getInterpreter());
       }
+
+    return ret;
   }
 }

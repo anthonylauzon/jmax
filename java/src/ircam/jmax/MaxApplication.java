@@ -158,12 +158,12 @@ public class MaxApplication extends Object
 
   /** Functions to run application hooks */
 
-  public static void runHooks(String name)
+  public static boolean runHooks(String name)
   {
     if (itsHookTable == null)
-      itsHookTable = new MaxWhenHookTable(); 
-      
-    itsHookTable.runHooks(name);
+      return false;
+    else
+      return itsHookTable.runHooks(name);
   }
 
 
