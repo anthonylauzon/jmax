@@ -40,8 +40,6 @@ extern void seqfind_config(void);
 extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
-extern void seqplode_config(void);
-extern void seqf9_config(void);
 
 static void
 sequence_module_init(void)
@@ -60,8 +58,6 @@ sequence_module_init(void)
   seqstep_config();
   seqplay_config();
   seqrec_config();
-  seqplode_config();
-  seqf9_config();
 }
 
 fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

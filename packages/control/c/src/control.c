@@ -47,7 +47,6 @@ control_init(void)
   demux_config();
   for_config();
   range_config();
-  keys_config();
 }
 
 fts_module_t control_module = {"control", "control classes", control_init, 0, 0};
