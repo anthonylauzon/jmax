@@ -23,9 +23,7 @@
 
 #include <fts/ftsclient.h>
 
-using namespace ircam::fts::client;
-
-std::ostream &::operator<<( std::ostream &os, const FtsClientException &e)
+std::ostream& operator<<( std::ostream &os, const ircam::fts::client::FtsClientException &e)
 {
   if (e.getErr() != 0)
     os << "FtsClientException: " << e.getMessage() << " (err=\"" << strerror( e.getErr()) << "\")";
