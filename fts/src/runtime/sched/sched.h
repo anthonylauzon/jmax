@@ -101,6 +101,28 @@ extern void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t
 */
 extern void fts_sched_remove_fd( fts_sched_t *sched, int fd);
 
+/*
+  Function: fts_sched_add
+  Description:
+    Add to the sched a method that will be at each scheduler run.
+  Arguments:
+    sched: the sched 
+    method: the method to call
+    object: the object on which to call the method
+  Returns: nothing.
+*/
+extern void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t *object);
+
+/*
+  Function: fts_sched_remove
+  Description:
+    Remove from the sched a method that has been added with fts_sched_add
+  Arguments:
+    sched: the sched 
+    method: the method to remove
+  Returns: nothing.
+*/
+extern void fts_sched_remove( fts_sched_t *sched, fts_method_t method);
 
 /* run time */
 extern void fts_sched_run(void);

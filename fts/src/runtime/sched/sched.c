@@ -80,18 +80,41 @@ fts_sched_t *fts_sched_get_current( void)
   return main_sched;
 }
 
-void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
+static void fts_sched_add_fd_realize( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
 {
   fd_callback_t *callback;
+  fd_callback_t **p;
 
   callback = (fd_callback_t *)fts_malloc( sizeof( fd_callback_t));
   callback->fd = fd;
   callback->read = read;
   callback->method = method;
   callback->object = object;
-  callback->next = sched->fd_callback_head;
+  callback->next = 0;
 
-  sched->fd_callback_head = callback;
+  /* Add the new entry at end of list, so that the functions will be called in
+     order of add */
+  p = &sched->fd_callback_head;
+
+  while (*p)
+    {
+      p = &(*p)->next;
+    }
+
+  *p = callback;
+}
+
+void fts_sched_add_fd( fts_sched_t *sched, int fd, int read, fts_method_t method, fts_object_t *object)
+{
+  if (fd < 0)
+    return;
+
+  fts_sched_add_fd_realize( sched, fd, read, method, object);
+}
+
+void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t *object)
+{
+  fts_sched_add_fd_realize( sched, -1, 1, method, object);
 }
 
 void fts_sched_remove_fd( fts_sched_t *sched, int fd)
@@ -103,6 +126,28 @@ void fts_sched_remove_fd( fts_sched_t *sched, int fd)
   while (*p)
     {
       if ( (*p)->fd == fd)
+	{
+	  fd_callback_t *to_remove;
+
+	  to_remove = *p;
+	  *p = (*p)->next;
+
+	  fts_free( to_remove);
+	}
+      else
+	p = &(*p)->next;
+    }
+}
+
+void fts_sched_remove( fts_sched_t *sched, fts_method_t method)
+{
+  fd_callback_t **p;
+
+  p = &sched->fd_callback_head;
+
+  while (*p)
+    {
+      if ( (*p)->fd == -1 && (*p)->method == method)
 	{
 	  fd_callback_t *to_remove;
 
@@ -165,6 +210,11 @@ static void fts_sched_do_select( fts_sched_t *sched)
 	      fts_set_int( &a, fd);
 	      (*(callback->method))( callback->object, -1, 0, 1, &a);
 	    }
+	}
+      else 
+	{
+	  /* Special entry that is called without select() */
+	  (*(callback->method))( callback->object, -1, 0, 0, 0);
 	}
     }
 }
