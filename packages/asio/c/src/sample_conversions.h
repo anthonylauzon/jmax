@@ -34,7 +34,10 @@
 #ifndef FTS_SAMPLE_CONVERSION_ROUTINES_H
 #define FTS_SAMPLE_CONVERSION_ROUTINES_H
 
-
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
 
 /* One channel, Floating point to Integer */
 void fts_convert_float32_to_uint8(long size,float* src,char* dest);
@@ -46,9 +49,9 @@ void fts_convert_float32_to_int24R(long size,float* src,long* dest);
 void fts_convert_float32_to_int32(long size,float* src,long* dest);
 
 /* One channel, Floating point to cliped Integer */
-void fts_convert_float32_to_uint8clip(long size,float* src,char* dest)
-void fts_convert_float32_to_int8clip(long size,float* src,char* dest)
-void fts_convert_float32_to_int16clip(long size,float* src,short* dest)
+void fts_convert_float32_to_uint8clip(long size,float* src,char* dest);
+void fts_convert_float32_to_int8clip(long size,float* src,char* dest);
+void fts_convert_float32_to_int16clip(long size,float* src,short* dest);
 void fts_convert_float32_to_int24Pclip(long size,float* src,char* dest);
 void fts_convert_float32_to_int24Lclip(long size,float* src,long* dest);
 void fts_convert_float32_to_int24Rclip(long size,float* src,long* dest);
@@ -63,6 +66,8 @@ void fts_convert_int24L_to_float32(long size,long* src,float* dest);
 void fts_convert_int24R_to_float32(long size,long* src,float* dest);
 void fts_convert_int32_to_float32(long size,long* src,float* dest);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
