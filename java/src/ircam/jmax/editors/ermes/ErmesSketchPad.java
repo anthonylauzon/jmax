@@ -815,8 +815,11 @@ Rectangle previousResizeRect = new Rectangle();
 	}
 	ResetConnect();
       }
-      else itsConnectingObj.ConnectionAbort(itsConnectingLet, false);
-      
+      else {
+	itsConnectingObj.ConnectionAbort(itsConnectingLet, false);
+	if (editStatus == START_CONNECT) CopyTheOffScreen(getGraphics());//to erase the pending line 
+      }
+
       if(theRequester!=itsConnectingLet){
 	//selection of new outlet
 	itsConnectingObj = theObject;
@@ -1084,7 +1087,6 @@ Rectangle previousResizeRect = new Rectangle();
   }
 
   public void mouseReleased(MouseEvent e){
-    //System.err.println("mouseRelease in stato "+editStatus);    
     int x = e.getX();
     int y = e.getY();
 
@@ -1350,7 +1352,8 @@ Rectangle previousResizeRect = new Rectangle();
       update(getGraphics());
       if (itsHelper.IsInInOutLet(x, y)) {
 	if (itsCurrentInOutlet != itsConnectingLet)
-	  setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	  if (itsCurrentInOutlet.IsInlet()) setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+	  else setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
       } else 
 	if (itsSketchWindow.getCursor() != Cursor.getDefaultCursor()) 
 	  setCursor(Cursor.getDefaultCursor());
@@ -1422,8 +1425,9 @@ Rectangle previousResizeRect = new Rectangle();
       return;
     }
     else 
-      if(itsHelper.IsInObject(x,y))
+      if(itsHelper.IsInObject(x,y)) {
 	if(itsCurrentObject.MouseMove(e,x,y)) return;
+      }
     if (itsSketchWindow.getCursor() != Cursor.getDefaultCursor()) itsSketchWindow.setCursor(Cursor.getDefaultCursor());
     if(itsCurrentInOutlet!=null)
       if(itsCurrentInOutlet.itsAlreadyMoveIn) itsCurrentInOutlet.itsAlreadyMoveIn = false;
@@ -1515,6 +1519,7 @@ Rectangle previousResizeRect = new Rectangle();
       }
       else {
 	itsConnectingObj.ConnectionAbort(itsConnectingLet, true);
+	if (editStatus == START_CONNECT) CopyTheOffScreen(getGraphics());//to erase the pending line 
       }
       if(theRequester!=itsConnectingLet){
 	//selection of new outlet
