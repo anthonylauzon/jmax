@@ -1005,7 +1005,7 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_name_dump_method(o, 0, 0, ac, at);
 }
 
-static void 
+void 
 track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
