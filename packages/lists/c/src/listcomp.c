@@ -93,12 +93,10 @@ listcomp_append_output_and_clear(fts_object_t *o, int winlet, fts_symbol_t s, in
 static void
 listdeco_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  listcomp_t *this = (listcomp_t *)o;
-  fts_atom_t *atoms = fts_array_get_atoms(&this->array);
   int i;
 
-  for(i=ac-1; i>=0; i--)
-    fts_outlet_send(o, 1, fts_get_selector(at + i), 1, atoms + i);
+  for(i=0; i<ac; i++)
+    fts_outlet_send(o, 1, fts_get_selector(at + i), 1, at + i);
 
   fts_outlet_bang(o, 0);
 }
@@ -136,15 +134,12 @@ listcompose_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 listdecompose_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(listcomp_t), 2, 1, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), 1, 2, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listcomp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listcomp_delete);
-
-  fts_method_define_varargs(cl, 1, fts_s_int, listdeco_input);
-  fts_method_define_varargs(cl, 1, fts_s_float, listdeco_input);
-  fts_method_define_varargs(cl, 1, fts_s_symbol, listdeco_input);
-  fts_method_define_varargs(cl, 1, fts_s_list, listdeco_input);
+  fts_method_define_varargs(cl, 0, fts_s_int, listdeco_input);
+  fts_method_define_varargs(cl, 0, fts_s_float, listdeco_input);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, listdeco_input);
+  fts_method_define_varargs(cl, 0, fts_s_list, listdeco_input);
 
   return fts_Success;
 }
