@@ -480,8 +480,8 @@ track_clear_and_upload(track_t *track)
 {
   track_clear(track);
 
-  if(track_editor_is_open(track))
-	fts_client_send_message((fts_object_t *)track, fts_s_clear, 0, 0);
+  if( fts_object_has_client((fts_object_t *)track))
+    fts_client_send_message((fts_object_t *)track, fts_s_clear, 0, 0);
   
   fts_object_set_state_dirty((fts_object_t *)track);
 }
