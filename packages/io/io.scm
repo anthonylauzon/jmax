@@ -25,7 +25,7 @@
 (provide-package "io" "0.0.0")
 
 ; load dynamic libraries into the server
-(ucs "load" "module" "io" (file-cat dir "c" "lib" jmax-arch jmax-mode "libio.so"))
+(ucs "load" "module" "io" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "io")))
 
 (println "package: io (I/O class library: udp, ...)")
 

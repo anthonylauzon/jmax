@@ -25,7 +25,7 @@
 
 (provide-package "control" "0.0.0")
 
-(ucs "load" "module" "control" (file-cat dir "c" "lib" jmax-arch jmax-mode "libcontrol.so"))
+(ucs "load" "module" "control" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "control")))
 
 ;; help
 (sshh-load (file-cat dir "help" "control.help.index.scm"))

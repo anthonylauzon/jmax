@@ -31,6 +31,7 @@ import ircam.jmax.script.*;
 import ircam.jmax.script.scm.*;
 import ircam.jmax.script.pkg.*;
 import java.awt.event.*;
+import ircam.jmax.utils.Platform;
 import java.io.*;
 import silk.*;
 
@@ -123,6 +124,14 @@ public class SilkInterpreter extends SchemeInterpreter
 		define("jmax-interp-name", "silk");
 		define("jmax-root", root);
 		define("slash", File.separator);
+
+		if (Platform.SYSTEM.equals("windows")) {
+		    define("lib-prefix", "");
+		    define("lib-suffix", ".dll");
+		} else {
+		    define("lib-prefix", "lib");
+		    define("lib-suffix", ".so");
+		}
 
 		/* Silk prints out an error message and stops the
 		 * evaluation if you try to lookup a variable name

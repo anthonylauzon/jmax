@@ -25,7 +25,7 @@
 
 (provide-package "math" "0.0.0")
 
-(ucs "load" "module" "math" (file-cat dir "c" "lib" jmax-arch jmax-mode "libmath.so"))
+(ucs "load" "module" "math" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "math")))
 
 ;; help
 (sshh-load (file-cat dir "help" "math.help.index.scm"))

@@ -76,6 +76,8 @@
 ;;   file-cat: Concatenates all the strings given as argument, putting a
 ;;   file separator in between.
 ;;
+;;   libname: creates the platform specific library name
+;;
 (define warning 
   (lambda l 
     (begin (display "jMax: Warning: ") 
@@ -101,6 +103,8 @@
       s
       (begin 
 	(lfile-cat (string-append s slash (car l)) (cdr l)))))
+
+(define (libname lib) (string-append lib-prefix lib lib-suffix))
 
 ;;
 ;; A default implementation of the browse command

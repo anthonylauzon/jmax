@@ -25,7 +25,7 @@
 
 (provide-package "midi" "0.0.0")
 
-(ucs "load" "module" "midi" (file-cat dir "c" "lib" jmax-arch jmax-mode "libmidi.so"))
+(ucs "load" "module" "midi" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "midi")))
 
 (help-summary "MIDI summary" (file-cat dir "help" "midi.summary.jmax"))
 (sshh-load (file-cat dir "help" "midi.help.index.scm"))

@@ -25,7 +25,7 @@
 (provide-package "ispw" "0.0.0")
 
 ; load the dynamic libraries in FTS
-(ucs "load" "module" "ispw" (file-cat dir "c" "lib" jmax-arch jmax-mode "libispw.so"))
+(ucs "load" "module" "ispw" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "ispw")))
 
 ;; set path for abstractions
 (abstraction-directory (file-cat dir "abs" "compatibility"))

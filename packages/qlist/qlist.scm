@@ -27,7 +27,7 @@
 (require-package "ispw" "0.0.0")
 
 ; load server module
-(ucs "load" "module" "qlist" (file-cat dir "c" "lib" jmax-arch jmax-mode "libqlist.so"))
+(ucs "load" "module" "qlist" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "qlist")))
 
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))

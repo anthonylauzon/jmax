@@ -28,7 +28,7 @@
 (provide-package "guiobj" "0.0.0")
 
 ; load dynamic libraries into the server
-(ucs "load" "module" "guiobj" (file-cat dir "c" "lib" jmax-arch jmax-mode "libguiobj.so"))
+(ucs "load" "module" "guiobj" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "guiobj")))
 
 ;; load help patch table
 (sshh-load (file-cat dir "help" "guiobj.help.index.scm"))

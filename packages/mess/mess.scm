@@ -12,7 +12,7 @@
 ;;  
 (provide-package "mess" "0.0.0")
 
-(ucs "load" "module" "mess" (file-cat dir "c" "lib" jmax-arch jmax-mode "libmess.so"))
+(ucs "load" "module" "mess" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "mess")))
 
 (println "package: mess (message classes)")
 
