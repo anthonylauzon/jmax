@@ -8,7 +8,7 @@ help_DATA=\
  intbox.help.jmax \
  key.help.jmax \
  jcomment.help.jmax \
- messbox.help.jmax \
+ messconst.help.jmax \
  scope~.help.jmax \
  slider.help.jmax \
  toggle.help.jmax \
