@@ -1,1 +1,5 @@
-SOURCES = MaxWindowMenu.java
+SOURCES = \
+	AbstractSelection.java	\
+	MaxWindowMenu.java	\
+	SelectionHandler.java	\
+	SelectionListener.java	
