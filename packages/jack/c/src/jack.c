@@ -32,9 +32,10 @@
 /******************************************************************************/
 
 extern void jackaudioport_config( void);
+extern void jackaudiomanager_config(void);
 
 void jack_config(void)
 {
+  jackaudiomanager_config();
   jackaudioport_config();
-
 }

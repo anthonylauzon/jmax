@@ -2,6 +2,7 @@ packagedir=$(pkgdatadir)/packages/jack/c
 package_LTLIBRARIES=libjmax-jack.la
 libjmax_jack_la_SOURCES= \
 jack.c \
+jackaudiomanager.c \
 jackaudioport.c 
 
 CFLAGS = @CFLAGS@ @JACK_CFLAGS@
