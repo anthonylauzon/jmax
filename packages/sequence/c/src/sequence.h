@@ -66,6 +66,7 @@ typedef struct _sequence_
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_first_track(s) ((s)->tracks)
 #define sequence_get_keep(s) ((s)->keep)
+#define sequence_is_keeping(s) ((s)->keep == fts_s_yes)
 
 #define sequence_set_editor_open(s) ((s)->open = 1)
 #define sequence_set_editor_close(s) ((s)->open = 0)
@@ -73,6 +74,7 @@ typedef struct _sequence_
 
 extern void sequence_add_track(sequence_t *sequence, track_t *track);
 extern void sequence_remove_track(sequence_t *sequence, track_t *track);
+extern void sequence_set_dirty(sequence_t *sequence);
 
 extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
 extern track_t *sequence_get_track_by_index(sequence_t *sequence, int index);

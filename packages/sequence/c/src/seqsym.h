@@ -47,6 +47,7 @@ extern fts_symbol_t seqsym_export_midifile_dialog;
 extern fts_symbol_t seqsym_import_midifile;
 extern fts_symbol_t seqsym_import_midifile_dialog;
 extern fts_symbol_t seqsym_add_track;
+extern fts_symbol_t seqsym_make_track;
 extern fts_symbol_t seqsym_remove_track;
 extern fts_symbol_t seqsym_move_track;
 extern fts_symbol_t seqsym_add_event;

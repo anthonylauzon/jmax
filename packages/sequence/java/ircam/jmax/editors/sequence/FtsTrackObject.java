@@ -421,7 +421,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void export()
   {
     try{
-      send( FtsSymbol.get("export_midi_dialog"));
+      send( FtsSymbol.get("export_midifile_dialog"));
     }
     catch(IOException e)
       {

@@ -346,11 +346,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   public void importMidiFile()
   {
     try{
-      send( FtsSymbol.get("import_midi_dialog"));
+      send( FtsSymbol.get("import_midifile_dialog"));
     }
     catch(IOException e)
       {
-	System.err.println("FtsSequenceObject: I/O Error sending import_midi_dialog Message!");
+	System.err.println("FtsSequenceObject: I/O Error sending import_midifile_dialog Message!");
 	e.printStackTrace(); 		
       }
   }

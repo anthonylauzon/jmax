@@ -25,6 +25,7 @@
  */
 #include <fts/fts.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
 #include "seqsym.h"
 #include "sequence.h"
@@ -134,6 +135,13 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
     }
 }
 
+void
+sequence_set_dirty(sequence_t *sequence)
+{
+  if(sequence_is_keeping( sequence))
+    fts_patcher_set_dirty( fts_object_get_patcher( (fts_object_t *)sequence), 1);
+}
+
 static void
 sequence_move_track(sequence_t *sequence, track_t *track, int index)
 {
@@ -194,6 +202,12 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
   fts_symbol_t track_type = track_get_type(track);
   fts_symbol_t track_name;
   fts_atom_t a;
+
+  if( !fts_object_has_id((fts_object_t *)track))
+    {
+      ((fts_object_t *)track)->patcher = fts_object_get_patcher((fts_object_t *)this);
+      fts_client_register_object((fts_object_t *)track, -1);
+    }
 
   fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
   fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
@@ -530,9 +544,6 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_object_create(track_type, 1, at);
 
-  ((fts_object_t *)track)->patcher = fts_object_get_patcher(o);
-  fts_client_register_object((fts_object_t *)track, -1);
-
   /* add it to the sequence */
   sequence_add_track(this, track);
 
@@ -544,8 +555,29 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   sequence_tuple_append(this, track);
 
-  //if(sequence_editor_is_open(this))
-  sequence_add_track_at_client(this, track);
+  if(sequence_editor_is_open(this))
+    sequence_add_track_at_client(this, track);
+
+  sequence_set_dirty( this);
+}
+
+/* add new track without upload at client */
+static void
+sequence_add_track_without_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  track_t *track = (track_t *)fts_object_create(track_type, 1, at);
+
+  /* add it to the sequence */
+  sequence_add_track(this, track);
+
+  /* set name */
+  if(ac > 1 && fts_is_symbol(at + 1))
+    track_set_name(track, fts_get_symbol(at + 1));
+
+  this->last_track = track;
+
+  sequence_tuple_append(this, track);
 }
 
 /* remove track by client request */
@@ -561,6 +593,8 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
     fts_client_send_message(o, seqsym_removeTracks, 1, at);
 
   sequence_tuple_update(this);
+
+  sequence_set_dirty( this);
 }
 
 static void
@@ -576,6 +610,8 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
     fts_client_send_message(o, seqsym_moveTrack, 2, at);
 
   sequence_tuple_update(this);
+
+  sequence_set_dirty( this);
 }
 
 static void
@@ -715,6 +751,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sequence_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sequence_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload_child, sequence_upload_child);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, sequence_upload);
 
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_add_track, sequence_add_track_and_update);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_remove_track, sequence_remove_track_and_update);
