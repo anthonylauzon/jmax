@@ -83,7 +83,10 @@ message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
       mess->ac = ac;
 
       for(i=0; i<ac; i++)
-	fts_atom_assign(mess->at + i, at + i);
+	{
+	  fts_set_void(mess->at + i);
+	  fts_atom_assign(mess->at + i, at + i);
+	}
     }
   else
     {
@@ -115,31 +118,21 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       int i;
 
-      /* check for separators */
+      /* check for separators and lists */
       for(i=0; i<ac; i++)
 	{
-	  fts_symbol_t s = fts_get_symbol(at + i);
-
-	  if(is_token(s))
+	  if(fts_is_symbol(at + i) && is_token(fts_get_symbol(at + i)))
 	    {
 	      fts_object_set_error(o, "Syntax error in message or constant");
 	      return;
 	    }
+	  else if(fts_is_list(at + i))
+	    {
+	      fts_object_set_error(o, "List cannot be argument of a message or constructor");
+	      return;
+	    }
 	}
 
-      if(ac == 1)
-	{
-	  if(fts_is_list(at))
-	    {
-	      fts_list_t *aa = fts_get_list(at);
-	      message_set(this, fts_s_list, fts_list_get_size(aa), fts_list_get_ptr(aa)); /* explicit list format: "{" [<value> ...] "}" */
-	    }
-	  else if(!fts_is_symbol(at))
-	    message_set(this, fts_get_selector(at), 1, at); /* value format: <non symbol value> (without type specifyer) */
-	}
-      else if(!fts_is_symbol(at))
-	message_set(this, fts_s_list, ac, at); /* implicit list format: <non symbol value> [<value> ...] */
-      
       /* first arg is symbol */
       if(fts_is_symbol(at))
 	{
@@ -147,10 +140,10 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_class_t *cl;
 
 	  if(name == fts_s_list)
-	    fts_object_set_error(o, "Use { } for lists");
+	    message_set(this, fts_s_list, ac - 1, at + 1); /* list constructor: "list" [<value> ...] */
 	  else if(fts_atom_type_lookup(name, &cl))
 	    {
-	      /* constructor format: <class name> [<value> ...] (construct object or primitive type) */
+	      /* value constructor: <class name> [<value> ...] (construct object or primitive type) */
 	      
 	      /* skip class name */
 	      ac--;
@@ -180,11 +173,12 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 		fts_object_set_error(o, "Wrong arguments for %s constructor", fts_symbol_name(name));
 	    }
 	  else
-	    {
-	      /* message format: <selector> [<value> ...] (any message - type specifyers are not allowed as selectors) */
-	      message_set(this, name, ac - 1, at + 1);
-	    }
+	    message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}
+      else if(ac == 1)
+	message_set(this, fts_get_selector(at), 1, at); /* value format: <non symbol value> (without type specifyer) */
+      else
+	message_set(this, fts_s_list, ac, at); /* implicit list format: <non symbol value> [<value> ...] */
     }
 }
 

@@ -142,23 +142,40 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if(ac > 0)
     {
-      message_t *mess = (message_t *)fts_object_create(message_class, ac, at);
-      fts_symbol_t error = fts_object_get_error((fts_object_t *)mess);
-      
-      if(!error)
-	{
-	  fts_object_refer((fts_object_t *)mess);
+      message_t *mess;
 
-	  this->mess = mess;
+      if(ac == fts_is_list(at))
+	{
+	  fts_list_t *list = fts_get_list(at);
+
+	  /* create empty message */
+	  mess = (message_t *)fts_object_create(message_class, 0, 0);
 	  
-	  this->value = 0;
-	  fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
+	  /* set message to list */
+	  message_set(mess, fts_s_list, fts_list_get_size(list), fts_list_get_ptr(list));
 	}
       else
 	{
-	  fts_object_destroy((fts_object_t *)mess);
-	  fts_object_set_error(o, "%s", fts_symbol_name(error));
+	  fts_symbol_t error;
+
+	  /* try to create message */
+	  mess = (message_t *)fts_object_create(message_class, ac, at);
+	  error = fts_object_get_error((fts_object_t *)mess);
+	  
+	  if(error)
+	    {
+	      fts_object_destroy((fts_object_t *)mess);
+	      fts_object_set_error(o, "%s", fts_symbol_name(error));
+	      return;
+	    }
 	}
+
+      fts_object_refer((fts_object_t *)mess);
+      
+      this->mess = mess;
+      this->value = 0;
+
+      fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
     }
   else
     fts_object_set_error(o, "Empty message or constant");
