@@ -103,4 +103,9 @@ extern void fts_client_manager_pipe_start(void);
 extern void fts_client_manager_tcp_start(void);
 extern void fts_kernel_client_manager_init(void);
 
+/***************************************/
+/* from ppcclient.c                */
+/***************************************/
+extern void fts_client_release_all_objects(int client_id);
+
 #endif

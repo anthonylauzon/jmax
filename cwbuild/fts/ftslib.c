@@ -31,6 +31,7 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <ftsprivate/package.h>
+#include <ftsprivate/client.h>
 #include <fts/packages/utils/utils.h>
 #include <fts/packages/data/data.h>
 #include <fts/packages/sequence/sequence.h>
@@ -44,6 +45,14 @@ ftslib_set_project(void)
   project = fts_package_new(fts_new_symbol("ftslib_global_project"));
   fts_package_add_data_path(project, fts_new_symbol(""));
   fts_project_set(project);
+}
+
+static void
+ftslib_set_default_client(void)
+{
+  fts_object_t *client_object = NULL;  
+  client_object = (fts_object_t *)fts_object_create_in_patcher( fts_client_class, fts_get_root_patcher());
+  fts_patcher_add_object(fts_get_root_patcher(), client_object);
 }
 
 /***************************************************************************************
@@ -69,5 +78,7 @@ ftslib_init(void)
     sequence_config();
     
     ftslib_set_project();
+    
+    ftslib_set_default_client();
   }
 }
