@@ -247,7 +247,6 @@ int fts_unlock_memory( void)
 /*                                                                             */
 /* *************************************************************************** */
 
-static int watchdog_low_pid, watchdog_high_pid;
 static int wdpipe[2];
 
 void set_priority( int delta)
@@ -268,10 +267,22 @@ static void abandon_root( void)
   seteuid( getuid());
 }
 
-static void stop_watchdog( void)
+static void watchdog_signal_handler( int sig)
 {
-  kill( watchdog_high_pid, SIGKILL);
-  kill( watchdog_low_pid, SIGKILL);
+  struct timeval timeout;
+
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 30000;
+  
+  select( 0, 0, 0, 0, &timeout);
+
+  fprintf( stderr, "[FTS] watchdog activated\n");
+}
+
+static void sigchld_signal_handler( int sig)
+{
+  fprintf( stderr, "[%d] Child has exited. Exiting...\n", getpid());
+  _exit( 1);
 }
 
 static void watchdog_low( void)
@@ -329,32 +340,14 @@ static void watchdog_high( void)
     }
 }
 
-static int do_fork( void (*f)(void))
+static void do_fork( void (*f)(void))
 {
   int pid;
 
-  pid = fork();
-  if (pid < 0)
-    {
-      fprintf( stderr, "cannot fork (%s)\n", strerror( errno));
-      return -1;
-    }
-  else if (!pid)
+  if ((pid = fork()) < 0)
+    fprintf( stderr, "cannot fork (%s)\n", strerror( errno));
+  else if (pid)
     (*f)();
-
-  return pid;
-}
-
-static void watchdog_signal_handler( int sig)
-{
-  struct timeval timeout;
-
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 30000;
-  
-  select( 0, 0, 0, 0, &timeout);
-
-  fprintf( stderr, "FTS: watchdog activated\n");
 }
 
 static void start_watchdog( void)
@@ -365,12 +358,12 @@ static void start_watchdog( void)
       return;
     }
 
+  signal( SIGCHLD, sigchld_signal_handler);
+
+  do_fork( watchdog_low);
+  do_fork( watchdog_high);
+
   signal( SIGHUP, watchdog_signal_handler);
-
-  watchdog_low_pid = do_fork( watchdog_low);
-  watchdog_high_pid = do_fork( watchdog_high);
-
-  atexit( stop_watchdog);
 }
 
 
