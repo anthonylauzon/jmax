@@ -190,7 +190,6 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	}
     }
 
-
   TrackTableModel tmodel;
   SequenceGraphicContext gc;
   JScrollPane scrollPane; 
