@@ -63,15 +63,26 @@ fts_audioport_init( fts_audioport_t *port)
   port->next = audioport_list;
   audioport_list = port;
 
+  /* FIXME */
+  /* should allocate later the mix_buffers */
   for ( i = 0; i < FTS_AUDIOPORT_MAX_CHANNELS; i++)
-    port->mix_buffers[i] = NULL;
+    {
+      int j;
+      float *buff;
+
+      buff = (float *)fts_malloc( sizeof(float) * fts_dsp_get_tick_size());
+
+      for ( j = 0; j < fts_dsp_get_tick_size(); j++)
+	buff[j] = 0.0;
+
+      port->mix_buffers[i] = buff;
+    }
 
   fts_audioport_unset_valid(port, FTS_AUDIO_INPUT);
   fts_audioport_unset_valid(port, FTS_AUDIO_OUTPUT);
 
   fts_audioport_unset_open(port, FTS_AUDIO_INPUT);  
   fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
-
 }
 
 void
@@ -139,6 +150,10 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
 	fts_set_symbol( a, fts_audiolabel_get_name( label));
 	fts_send_message( (fts_object_t *)port, selector, 1, a);
       }
+
+      /* FIXME */
+      /* when do we set the channel used ??? */
+      fts_audioport_set_channel_used( port, fts_audiolabel_get_channel( label, direction), direction, 1);
     }
 }
 
@@ -402,11 +417,11 @@ audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   self->inout[FTS_AUDIO_INPUT].port_name = fts_s_unconnected;
   self->inout[FTS_AUDIO_INPUT].port = NULL;
-  self->inout[FTS_AUDIO_INPUT].channel = -1;
+  self->inout[FTS_AUDIO_INPUT].channel = 0;
 
   self->inout[FTS_AUDIO_OUTPUT].port_name = fts_s_unconnected;
   self->inout[FTS_AUDIO_OUTPUT].port = NULL;
-  self->inout[FTS_AUDIO_OUTPUT].channel = -1;
+  self->inout[FTS_AUDIO_OUTPUT].channel = 0;
 
   audiolabel_fire_added( self->name);
 }
@@ -585,13 +600,19 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
       (*fts_audioport_get_io_fun( port, FTS_AUDIO_INPUT))( port);
       at_least_one_io_fun_called = 1;
+    }
 
-      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_INPUT); channel++)
+  for ( port = audioport_list; port; port = port->next)
+    {
+      if ( !fts_audioport_is_output( port) || !fts_audioport_is_open( port, FTS_AUDIO_OUTPUT))
+	continue;
+
+      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT); channel++)
 	{
-	  int i;
 	  float *mix_buff = port->mix_buffers[channel];
+	  int i;
 
-	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_INPUT, channel))
+	  if (!fts_audioport_is_channel_used( port, channel, FTS_AUDIO_OUTPUT))
 	    continue;
 
 	  for ( i = 0; i < tick_size; i++)
@@ -611,7 +632,7 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	{
 	  float *mix_buff = port->mix_buffers[channel];
 
-	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
+	  if (!fts_audioport_is_channel_used( port, channel, FTS_AUDIO_OUTPUT))
 	    continue;
 
 	  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_OUTPUT))(port, mix_buff, tick_size, channel);

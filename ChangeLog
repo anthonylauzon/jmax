@@ -1,7 +1,10 @@
+2002-12-26  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fixed many bugs in audio and ossaudioport. Now, audio out works with OSS.
+
 2002-12-24  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
-	* commited a first version of working audio, including the "monitor~"
-	object
+	* commited a first version of working audio, including the "monitor~" object
 
 2002-12-20  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 

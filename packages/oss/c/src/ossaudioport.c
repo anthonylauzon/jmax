@@ -177,24 +177,15 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   ossaudioport_t* self = (ossaudioport_t*)o;
   int sample_rate, p_sample_rate, fragparam, fragment_size, channels, p_channels, flags, format, wanted_format, i;
   float sr;
-  char device_name[256];
-
+  fts_symbol_t device_name;
 
   sr = fts_dsp_get_sample_rate();
   sample_rate = (int)sr ;
 
-
-  /* HACK */
-  strcpy( device_name, s_slash_dev_slash_dsp);
-
-  channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
-
-  if ( fts_get_symbol_arg( ac, at, 2, 0) == s_read_only)
-    flags = O_RDONLY;
-  else if ( fts_get_symbol_arg( ac, at, 2, 0) == s_write_only)
-    flags = O_WRONLY;
-  else
-    flags = O_RDWR;
+  /* FIXME */
+  device_name = s_slash_dev_slash_audio;
+  channels = DEFAULT_CHANNELS;
+  flags = O_RDWR;
 
   if (-1 != self->fd)
   {
@@ -269,18 +260,18 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
 
- if (sample_rate != p_sample_rate)
- {
-     post("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
-	  sample_rate, p_sample_rate);
-     fts_log("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
-	     sample_rate, p_sample_rate);
- }
- 
- fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
-  fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+  if (sample_rate != p_sample_rate)
+    {
+      post("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
+	   sample_rate, p_sample_rate);
+      fts_log("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
+	      sample_rate, p_sample_rate);
+    }
 
- fts_log("[ossaudioport] oss audioport is open \n");
+  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT);
+  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT);
+  
+  fts_log("[ossaudioport] oss audioport is open \n");
 }
 
 static void ossaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -341,8 +332,8 @@ static void ossaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
 
-  fts_class_message_varargs(cl, fts_s_open_input, ossaudioport_open);
-  fts_class_message_varargs(cl, fts_s_open_output, ossaudioport_open);
+  fts_class_message_varargs( cl, fts_s_open_input, ossaudioport_open);
+  fts_class_message_varargs( cl, fts_s_open_output, ossaudioport_open);
 }
 
 void ossaudioport_config( void)
