@@ -25,7 +25,7 @@
 
 package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.track.*;
-
+import ircam.jmax.editors.sequence.track.Event;
 import java.awt.*;
 import java.util.*;
 
@@ -35,11 +35,16 @@ import javax.swing.undo.*;
 /** 
  * Undo support: this class knows how to undo an "delete note" */
 class UndoableDelete extends AbstractUndoableEdit {
-  TrackEvent itsEvent;
+  Event itsEvent;
+  FtsTrackObject trkObj;
 
   public UndoableDelete(TrackEvent theDeletedEvent)
   {
-    itsEvent = theDeletedEvent;
+      try {
+	  itsEvent = theDeletedEvent.duplicate();
+      } catch (Exception ex) {System.err.println("error while cloning event");}
+      
+      trkObj = ((FtsTrackObject)theDeletedEvent.getDataModel());
   }
   
   public boolean addEdit(UndoableEdit anEdit)
@@ -51,19 +56,26 @@ class UndoableDelete extends AbstractUndoableEdit {
   {
     return "delete";
   }
-  
+
   public void redo()
   {
     //since a redo can only occur after a corresponding undo,
     // there's no need to copy-construct the deleted event.
-    itsEvent.getDataModel().removeEvent(itsEvent);
+      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+      if(evt!=null)
+	  trkObj.removeEvent(evt);
+      else
+	  die();
   }  
   
   public void undo()
   {
-    itsEvent.getDataModel().addEvent(itsEvent);
+      SequenceSelection.getCurrent().deselectAll();
+      trkObj.requestEventCreation((float)itsEvent.getTime(), 
+				  itsEvent.getValue().getValueInfo().getName(), 
+				  itsEvent.getValue().getPropertyCount(), 
+				  itsEvent.getValue().getPropertyValues());
   }
-
 }
 
 

@@ -334,17 +334,23 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   ////////////////////////////////////////////////////////////
   public void Copy()
   {
-    ((ClipableData) sequenceData).copy();
+      Track track = mutex.getCurrent();
+      if(track!=null)
+	  ((ClipableData) track.getTrackDataModel()).copy();
   }
 
   public void Cut()
   {
-    ((ClipableData) sequenceData).cut();
+      Track track = mutex.getCurrent();
+      if(track!=null)
+	  ((ClipableData) track.getTrackDataModel()).cut();
   }
 
   public void Paste()
   {
-    ((ClipableData) sequenceData).paste();
+      Track track = mutex.getCurrent();
+      if(track!=null)
+	  ((ClipableData) track.getTrackDataModel()).paste();
   }
 
   public void Duplicate()
@@ -355,22 +361,26 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
   public void Undo()
   {
-    try 
-      {
-	//((UndoableData) sequenceData).undo();
-      } catch (CannotUndoException e1) {
-	System.out.println("can't undo");
-      }
+      Track track = mutex.getCurrent();
+      if(track!=null)
+	  try 
+	      {
+		  ((UndoableData) track.getTrackDataModel()).undo();
+	      } catch (CannotUndoException e1) {
+		  System.out.println("can't undo");
+	      }
   }
 
   public void Redo()
   {
-    try 
-      {
-	//((UndoableData) sequenceData).redo();
-      } catch (CannotRedoException e1) {
-	System.out.println("can't redo");
-      }
+      Track track = mutex.getCurrent();
+      if(track!=null)
+	  try 
+	      {
+		  ((UndoableData) track.getTrackDataModel()).redo();
+	      } catch (CannotRedoException e1) {
+		  System.out.println("can't redo");
+	      }
   }
 
     public void Settings(){

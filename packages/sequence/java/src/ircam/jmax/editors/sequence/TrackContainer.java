@@ -128,7 +128,6 @@ public class TrackContainer extends JPanel {
 
 	      if(opened)
 		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
-	      //validate();
 	  }
       else 
 	  if(name.equals("maximumPitch") || name.equals("minimumPitch"))
@@ -151,9 +150,9 @@ public class TrackContainer extends JPanel {
 			     trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
 			 }
 		 }
-	      else 
-		  if(name.equals("maximumValue") || name.equals("minimumValue"))
-		      trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+      /*else 
+	if(name.equals("maximumValue") || name.equals("minimumValue"))
+	trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);*/
     }
     
     AbstractButton b;

@@ -53,14 +53,6 @@ public class MonoTrackRenderer extends AbstractRenderer{
   {  
     super();
     gc = theGc;
-    {//-- prepares the parameters for the geometry object
-
-	Geometry g = gc.getAdapter().getGeometry();
-	g.setXZoom(20);
-	g.setYZoom(300);
-	g.setYInvertion(true);
-	g.setYTransposition(136);
-    }
 
     tempList = new MaxVector();
 

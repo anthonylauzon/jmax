@@ -443,6 +443,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	double doubleValue = 0;
 	if(currentEvent!=null)
 	    {
+		((UndoableData) gc.getDataModel()).beginUpdate();
+		
 		if(currentParamInEvent==0)
 		    {
 			try { 
@@ -462,6 +464,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			if(objVal!=null)
 			    currentEvent.setProperty(getPropNameByIndex(currentParamInEvent-1), objVal);
 		    }
+
+		((UndoableData) gc.getDataModel()).endUpdate();
 	    }
 	endEdit();
     }
@@ -528,8 +532,12 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	
 	int index=currentIndex;
 	
-	if((e.getKeyCode()==KeyEvent.VK_BACK_SPACE)||(e.getKeyCode()==KeyEvent.VK_CANCEL))
-	    removeSelection();
+	if(SequenceTextArea.isDeleteKey(e))
+	    {
+		((UndoableData)gc.getDataModel()).beginUpdate();
+		SequenceSelection.getCurrent().deleteAll();
+		((UndoableData)gc.getDataModel()).endUpdate();
+	    }
 	else
 	    if(e.getKeyCode()==KeyEvent.VK_UP)
 	    {
@@ -555,20 +563,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     public void keyReleased(KeyEvent e){}
     public void keyTyped(KeyEvent e){}
 
-    public void removeSelection()
-    {
-	MaxVector v = new MaxVector();
-	// copy the selected elements in another MaxVector (cannot remove
-	// elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
-	for (Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
-	    v.addElement(e.nextElement());
-	    
-	// remove them
-	for (int i = 0; i< v.size(); i++)
-	    data.removeEvent((TrackEvent)(v.elementAt(i)));
-	v = null;
-    }
-
     public void addAfter()
     {
 	int index = getEventIndex(popupy);
@@ -576,10 +570,18 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
 	TrackEvent popupEvent = data.getEventAt(index);  
 	if(popupEvent!=null)
-	    ((FtsTrackObject)data).requestEventCreation((float)popupEvent.getTime(), 
-				      popupEvent.getValue().getValueInfo().getName(), 
-				      popupEvent.getValue().getPropertyCount(), 
-				      popupEvent.getValue().getPropertyValues());
+	    {
+		((UndoableData)gc.getDataModel()).beginUpdate();
+		((FtsTrackObject)data).requestEventCreation((float)popupEvent.getTime(), 
+							    popupEvent.getValue().getValueInfo().getName(), 
+							    popupEvent.getValue().getPropertyCount(), 
+							    popupEvent.getValue().getPropertyValues());
+	    }
+    }
+
+    public SequenceGraphicContext getGc()
+    {
+	return gc;
     }
 
     final public static int xstep = 120;

@@ -41,7 +41,7 @@ public interface EventValue
     /**
      * Returns the ObjectRenderer for this object */
     public abstract ObjectRenderer getRenderer();
-    
+
     /**
      * Returns an Enumeration of all the property names known by this
      * EventValue */
@@ -64,6 +64,8 @@ public interface EventValue
     public abstract Object[] getPropertyValues();
     
     public abstract Object[] getLocalPropertyValues();
+
+    public abstract boolean samePropertyValues(Object args[]);
    
     /**
      * Returns all the property values known by this

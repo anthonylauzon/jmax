@@ -105,6 +105,7 @@ public class ChangeRangeDialog extends JDialog {
     public static void changeRange(Track track, Frame frame)
     {
 	ChangeRangeDialog dialog = new ChangeRangeDialog(track, frame);
+	dialog.requestFocus();//????
 	dialog.setVisible(true);
     }
 }

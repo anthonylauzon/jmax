@@ -39,6 +39,8 @@ import ircam.jmax.toolkit.actions.*;
 
 public class Actions
 {
+  public static EditorAction printAction      = new PrintAction();
+
   public static EditorAction cutAction       = new CutAction();
   public static EditorAction copyAction      = new CopyAction();
   public static EditorAction pasteAction     = new PasteAction();
@@ -47,7 +49,7 @@ public class Actions
   public static EditorAction undoAction      = new UndoAction();
   public static EditorAction redoAction      = new RedoAction();
 
-  public static EditorAction removeTrackAction      = new RemoveTrackAction();
+  public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
   public static EditorAction settingsAction  = new SettingsAction();
     //public static EditorAction mergeAction     = new MergeAction();

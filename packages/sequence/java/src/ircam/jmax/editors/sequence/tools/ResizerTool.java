@@ -50,7 +50,6 @@ public class ResizerTool extends SelecterTool implements DragListener {
     super("Resizer", theIcon);
     
     itsSelectionResizer = new SequenceSelectionResizer(this);
-
   }
 
 
@@ -90,7 +89,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
     // starts a serie of undoable transitions
-    //((UndoableData) egc.getDataModel()).beginUpdate();
+    ((UndoableData) egc.getDataModel()).beginUpdate();
     
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
@@ -100,7 +99,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
 	  egc.getAdapter().setLenght(aEvent, egc.getAdapter().getLenght(aEvent)+deltaX);
       }
 
-    //((UndoableData) egc.getDataModel()).endUpdate();
+    ((UndoableData) egc.getDataModel()).endUpdate();
     
     mountIModule(itsSelecter);
 

@@ -4,9 +4,12 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.*;
 import java.awt.Component;
 import ircam.jmax.editors.sequence.SequenceGraphicContext;
+import java.awt.datatransfer.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.*;
+
+import ircam.jmax.editors.sequence.*;
 
 /**
  * A convenience implementation of the ValueInfo interface.
@@ -56,6 +59,11 @@ public class AbstractValueInfo implements ValueInfo {
     public int getPropertyCount()
     {
 	return 0; 
+    }
+
+    public DataFlavor getDataFlavor()
+    {
+	return AbstractValueDataFlavor.getInstance();
     }
 
     /**

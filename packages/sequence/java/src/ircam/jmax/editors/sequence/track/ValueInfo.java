@@ -4,6 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import java.awt.*;
 import javax.swing.*;
 import ircam.jmax.editors.sequence.*;
+import java.awt.datatransfer.*;
 import java.util.*;
 
 /**
@@ -34,6 +35,8 @@ public interface ValueInfo {
      * Creates a widget (an editor for this value) that will be
      * used inside the Sequencer editor */
     abstract public Component newWidget(SequenceGraphicContext gc);
+
+    abstract public DataFlavor getDataFlavor();
 
     abstract public Enumeration getPropertyNames();
     abstract public int getPropertyCount();

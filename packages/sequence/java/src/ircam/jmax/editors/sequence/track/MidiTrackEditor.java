@@ -74,7 +74,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
 	geometry.addTranspositionListener(new TranspositionListener() {
 	    public void transpositionChanged(int newTranspose)
-	{
+		{
 		    itsScore.repaint();
 		}
 	});
@@ -116,7 +116,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
     {
 	selection = new SequenceSelection(track.getTrackDataModel());
-
+	
 	//--- make this selection the current one when the track is activated
 	track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
 
@@ -337,7 +337,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	public void processKeyEvent(KeyEvent e)
 	{
 	    if(SequenceTextArea.isDeleteKey(e))
-		editor.getSelection().deleteAll();
+		{
+		    ((UndoableData)track.getTrackDataModel()).beginUpdate();
+		    editor.getSelection().deleteAll();
+		    ((UndoableData)track.getTrackDataModel()).endUpdate();
+		}	    
 	    else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 		if(e.isControlDown())
 		    editor.getSelection().selectPrevious();

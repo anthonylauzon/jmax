@@ -35,6 +35,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
 
 /**
  * The EventValue object that represents a Integer event. Is used during score-recognition */
@@ -145,13 +146,20 @@ public class MessageValue extends AbstractEventValue
 		height = DEFAULT_HEIGHT;
 	    }
 
-	setProperty("message", text);
-	setProperty("duration", new Integer(width));
-	setProperty("height", new Integer(height));
-	
-	if(evt!=null)
-	    //evt.sendSetMessage(info.getName(), getPropertyCount(), getPropertyValues());
-	    evt.sendThisMessage("set_from_string", info.getName(), getPropertyCount(), getPropertyValues());
+	if(evt != null)
+	    {
+		//for the undo/redo
+		evt.setProperty("message", text);
+		evt.setProperty("duration", new Integer(width));
+		evt.setProperty("height", new Integer(height));
+		evt.sendThisMessage("set_from_string", info.getName(), getPropertyCount(), getPropertyValues());
+	    }
+	else
+	    {
+		setProperty("message", text);
+		setProperty("duration", new Integer(width));
+		setProperty("height", new Integer(height));
+	    }
     }
 
     public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
@@ -209,6 +217,11 @@ public class MessageValue extends AbstractEventValue
 	public int getPropertyCount()
 	{
 	    return defPropertyCount;
+	}
+
+	public DataFlavor getDataFlavor()
+	{
+	    return MessageValueDataFlavor.getInstance();
 	}
  
 	String defNamesArray[] = {"message", "integer"};
@@ -275,6 +288,12 @@ public class MessageValue extends AbstractEventValue
     {
 	for(int i = 0; i<nArgs; i++)
 	    setProperty(localNameArray[i], args[i]);
+    }
+
+    public boolean samePropertyValues(Object args[])
+    {
+	return (((String)getProperty("message")).equals((String)args[0]) &&
+	    (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
     }
 
     //--- Fields

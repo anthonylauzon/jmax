@@ -60,7 +60,7 @@ public class ListPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	    {
-		ListPopupMenu.getPopupTarget().removeSelection();
+		ListPopupMenu.getPopupTarget().getGc().getSelection().deleteAll();
 	    }
     });
     add(item);    

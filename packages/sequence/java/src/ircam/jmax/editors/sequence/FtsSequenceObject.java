@@ -108,7 +108,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
       Track track = new TrackBase(trackObj);
       tracks.addElement(track);
-      
+	
       notifyTrackAdded(track);
       }*/
     
@@ -170,23 +170,6 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       }
     return null;
   }
-
-  /**
-   * Adds a track
-   */
-    /*public void addTrack(Track track)
-      {
-      track.setId(trackId++);
-      tracks.addElement(track);
-      
-      messVect.removeAllElements();
-      messVect.addElement(track.getName());
-      messVect.addElement("anything");
-      
-      sendMessage(FtsObject.systemInlet, "track_add", messVect);
-      
-      notifyTrackAdded(track);
-      }*/
 
   /**
    * Remove a Track from this sequencer 
@@ -281,12 +264,20 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();
-    //MaxVector messVect = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
 
   //unic id for a track, starting from zero;
   private int trackId = 0; 
   static final int REMOTE_TRACK_ADD = 0; 
 }
+
+
+
+
+
+
+
+
+
 
 

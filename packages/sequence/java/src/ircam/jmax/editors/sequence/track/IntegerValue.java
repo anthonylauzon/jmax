@@ -30,10 +30,11 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.*;
 import java.io.File.*;
 import javax.swing.*;
 import java.util.*;
-
+import java.awt.datatransfer.*;
 /**
  * The EventValue object that represents a Integer event. Is used during score-recognition */
 public class IntegerValue extends AbstractEventValue
@@ -92,6 +93,11 @@ public class IntegerValue extends AbstractEventValue
 	{
 	    return defPropertyCount;
 	}
+
+	public DataFlavor getDataFlavor()
+	{
+	    return IntegerValueDataFlavor.getInstance();
+	}
  
 	String defNamesArray[] = {"integer"};
 	int defPropertyCount = 1;
@@ -134,7 +140,12 @@ public class IntegerValue extends AbstractEventValue
 	for(int i = 0; i<nArgs; i++)
 	    setProperty(nameArray[i], args[i]);
     }
-   
+
+    public boolean samePropertyValues(Object args[])
+    {
+	return (((Integer)propertyValuesArray[0]).intValue() == ((Integer)args[0]).intValue());
+    }
+
     //--- Fields
 
     public static final String INTEGER_NAME = "intevt";

@@ -163,7 +163,11 @@ public class MessageTrackEditor extends MonoTrackEditor
 
       if(isEditing)
 	  if((id==MouseEvent.MOUSE_PRESSED)&&(e.getClickCount() == 1))
-	      setMessage();
+	      {
+		  ((UndoableData)track.getTrackDataModel()).beginUpdate();
+		  setMessage();
+		  ((UndoableData)track.getTrackDataModel()).endUpdate();
+	      }
 	  else if(isExitedFromTrack(e))
 	      {
 		  setMessage();

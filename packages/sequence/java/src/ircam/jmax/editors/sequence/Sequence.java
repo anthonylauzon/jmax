@@ -123,7 +123,8 @@ public class Sequence extends JFrame implements EditorContainer{
 	
 	// Build the file menu
 	
-	mb.add( new DefaultFileMenu());
+	//mb.add( new DefaultFileMenu());
+	mb.add( new FileMenu());
 	
 	// Build the edit menu
 	mb.add(new EditMenu(this)); 

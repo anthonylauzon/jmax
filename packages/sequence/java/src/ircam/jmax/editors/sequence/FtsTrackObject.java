@@ -35,14 +35,15 @@ import ircam.jmax.toolkit.*;
 import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
-
+import java.lang.reflect.*;
+import javax.swing.undo.*;
 /**
  * A general-purpose TrackDataModel, this class
  * offers an implementation based on a variable-length 
  * array.
  * @see ircam.jmax.editors.sequence.track.TrackDataModel*/
 
-public class FtsTrackObject extends FtsObject implements TrackDataModel, ClipableData, ClipboardOwner
+public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel, ClipableData, ClipboardOwner
 {
 
     /**
@@ -80,6 +81,8 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 			numProperties++;
 		    }
 	    }
+
+	addFlavor(info.getDataFlavor());
     }
 
     boolean propertyNameExist(String name)
@@ -107,47 +110,28 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	TrackEvent evt = (TrackEvent)(args[0].getObject());
 
 	// starts an undoable transition
-	//((UndoableData)model).beginUpdate();
+	//beginUpdate();//is called in adderTool
     
 	addEvent(evt);
     
 	// ends the undoable transition
-	//((UndoableData)model).endUpdate();
+	endUpdate();
     }
     public void addEvents(int nArgs , FtsAtom args[])
     {
 	TrackEvent evt = null;
 	int evtTime;
 	int index = -1;
-	int maxTime = 0;//???
+
+	// starts an undoable transition
+	//beginUpdate();
+	//begin update is called in adderTool 
+
 	for(int i=0; i<nArgs; i++)
-	    {
-		evt = (TrackEvent)(args[i].getObject());
-		///////////FIND THE MAX TIME
-		
-		addEvent(evt);
+	    addEvent((TrackEvent)(args[i].getObject()));
 
-		/*
-		evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
-		if(evtTime>maxTime) maxTime = evtTime;
-
-		/////////////////////////////
-		evt.setDataModel(this);
-		index = getIndexAfter(evt.getTime());
-	
-		if (index == EMPTY_COLLECTION)
-		    index = 0;
-		else if (index == NO_SUCH_EVENT)
-		    index = events_fill_p;
-	
-		makeRoomAt(index);
-		events[index] = evt;
-		*/
-		////////////////////////
-	    }
-
-	if(nArgs>1)
-	    notifyObjectsAdded(maxTime);
+	// ends the undoable transition
+	endUpdate();
     }
 
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
@@ -158,9 +142,20 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     for(int i=0; i<nArgs; i++)
 	sendArgs[2+i].setValue(args[i]);
 
-    sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
+    //sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
+    sendMessage(FtsObject.systemInlet, "event_add", 2+nArgs, sendArgs);
   }
   
+  public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object args[])
+  {
+    sendArgs[0].setFloat(time); 
+    sendArgs[1].setString(type);
+      
+    for(int i=0; i<nArgs; i++)
+	sendArgs[2+i].setValue(args[i]);
+
+    sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
+  }
     
     /**
      * how many events in the database?
@@ -370,10 +365,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 		
 	notifyObjectAdded(event, index);
 	
-	/*if (isInGroup())     
-	  {
-	  postEdit(new UndoableAdd(event));
-	  }*/
+	if (isInGroup())     
+	    {
+		postEdit(new UndoableAdd(event));
+	    }
     }
 
     /**
@@ -447,7 +442,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     public void removeEvent(TrackEvent event)
     {
 	int removeIndex;
-	
+
 	removeIndex = indexOf(event);
 	removeEventAt(removeIndex);
 
@@ -459,13 +454,15 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     public void removeAllEvents()
     {
 	// help a little the garbage collector
-	for (int i = 0; i<events_fill_p; i++)
-	    {
-		sendArgs[0].setObject(events[i]);
-		sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
-		events[i] = null;
-	    }
-	events_fill_p = 0;
+	/*for (int i = 0; i<events_fill_p; i++)
+	  {
+	  sendArgs[0].setObject(events[i]);
+	  sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
+	  events[i] = null;
+	  }
+	  events_fill_p = 0;*/
+	while(events_fill_p != 0)
+	    removeEvent(events[0]);
     }
 
     private void removeEventAt(int removeIndex)
@@ -474,8 +471,8 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)
 	    return;
 	
-	/*if (isInGroup())
-	  postEdit(new UndoableDelete(event));*/
+	if (isInGroup())
+	    postEdit(new UndoableDelete(event));
 	
 	deleteRoomAt(removeIndex);
 	
@@ -547,14 +544,11 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	
 	// ... and remove 
 	
-	//beginUpdate(); //cut is undoable
-	
-	for (Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
-	    {
-		removeEvent((TrackEvent) e.nextElement());
-	    }
-	
-	//endUpdate();
+	beginUpdate(); //cut is undoable
+
+	SequenceSelection.getCurrent().deleteAll();
+
+	endUpdate();
     }
     
     public void copy()
@@ -563,18 +557,18 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    return;
 	SequenceSelection.getCurrent().prepareACopy();
 	MaxApplication.systemClipboard.setContents(SequenceSelection.getCurrent(), this);
+
     }  
-    
     
     public void paste()
     {
 	if (SequenceSelection.getCurrent().getModel() != this) 
 	    return;
-	
+
 	Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
 	Enumeration objectsToPaste = null;
-	
-	if (clipboardContent != null && clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()))
+
+	if (clipboardContent != null && areMyDataFlavorsSupported(clipboardContent))
 	    {
 		try {
 		    objectsToPaste = (Enumeration) clipboardContent.getTransferData(SequenceDataFlavor.getInstance());
@@ -586,33 +580,33 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 		catch (IOException ioe)
 		    {
 			System.err.println("Clipboard error in paste: content is no more an "+SequenceDataFlavor.getInstance().getHumanPresentableName());
-		    }
-		
+		    }		
 	    }
-	
+
 	if (objectsToPaste != null)
 	    {
-		TrackEvent event;
-		TrackEvent event1;
+		Event event;
 		
-		//beginUpdate();  //the paste is undoable
+		
 		SequenceSelection.getCurrent().deselectAll();
-		
+
+		beginUpdate();  //the paste is undoable
+
 		try {
 		    while (objectsToPaste.hasMoreElements())
 			{
-			    event = (TrackEvent) objectsToPaste.nextElement();
-			    event1 = event.duplicate();
-			    addEvent(event1);
-			    SequenceSelection.getCurrent().select(event1);
+			    event = (Event) objectsToPaste.nextElement();
+			    requestEventCreationWithoutUpload((float)event.getTime(), 
+							      event.getValue().getValueInfo().getName(), 
+							      event.getValue().getPropertyCount(), 
+							      event.getValue().getPropertyValues());
 			}
 		    
+		    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
 		}
 		catch (Exception e) {}
 		
-		//endUpdate();
-		
-	    }
+	  }
     }
     
     /** ClipboardOwner interface */
@@ -623,6 +617,16 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	//SequenceSelection.discardTheCopy();
     }
     
+    boolean areMyDataFlavorsSupported(Transferable clipboardContent)
+    {
+	boolean supported = true;
+	
+	for(int i=0; i<flavors.length;i++)
+	    supported = supported&&clipboardContent.isDataFlavorSupported(flavors[i]);
+	
+	return supported;
+    }
+
     //-------------------------------------------------------
     
     /* Private methods */
@@ -746,12 +750,12 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     /*  FtsRemoteData. To be implemented. Look at ExplodeRemoteData for a 
      * complete example. */
     
-    public void call( int key, FtsStream stream)
-	throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-    {
-	return;
+    /*public void call( int key, FtsStream stream)
+      throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+      {
+      return;
 
-    }
+      }*/
 
     /**
      * an utility class to implement the intersection with a range */
@@ -941,6 +945,55 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	return namePropertyVector.elements();
     }
 
+    public DataFlavor[] getDataFlavors()
+    {
+	return flavors;
+    }
+
+    public TrackEvent getEventLikeThis(Event e)
+    {
+	TrackEvent evt;
+	TrackEvent retEvt = null;
+	//per ora ritorna il primo, poi dovra' controllare se e' uguale e continuare la ricerca
+	int index = getFirstEventAt((float)e.getTime());
+		
+	if((index != EMPTY_COLLECTION) && (index < events_fill_p) && (index >= 0))	    
+	    {
+		evt = events[index];	
+		
+		if(e.getValue().samePropertyValues(evt.getValue().getPropertyValues()))
+		    retEvt = evt;
+		else
+		    {
+			evt = getNextEvent(evt);
+			
+			while((evt!=null)&&(evt.getTime()==e.getTime()))
+			    {
+				if(e.getValue().samePropertyValues(evt.getValue().getPropertyValues()))
+				    {					
+					retEvt = evt;
+					break;
+				    }		    
+				else
+				    evt = getNextEvent(evt);
+			    }       			
+		    }
+	    }
+	return retEvt;
+    }
+
+    /** utility function */
+    protected void addFlavor(DataFlavor flavor)
+    {
+	int dim = flavors.length;
+	DataFlavor temp[] = new DataFlavor[dim+1];
+	for (int i = 0; i < dim; i++){
+	    temp[i] = flavors[i];
+	}
+	temp[dim]=flavor;
+	flavors = temp;
+    }
+
     //---  AbstractSequence fields
     int numProperties = 0;
     Vector namePropertyVector = new Vector();
@@ -953,7 +1006,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     MaxVector infos = new MaxVector();
     //SequenceDataModel sequenceData;
     private String name;
-    public static DataFlavor flavors[];
+    public DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
     static FtsAtom[] sendArgs = new FtsAtom[128];

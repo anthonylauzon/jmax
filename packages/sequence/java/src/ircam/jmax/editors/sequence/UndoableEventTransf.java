@@ -25,37 +25,49 @@
 
 package ircam.jmax.editors.sequence;
 
-import ircam.jmax.editors.sequence.track.*;
-import ircam.jmax.editors.sequence.track.Event;
 import java.awt.*;
 import java.util.*;
 
 import javax.swing.undo.*;
+import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 
 /**
  * A simple UndoableEdit that can be used when  the action to undo 
- * is related to the initial time of the object.
+ * is related to one (or more) parameters changing in an event. 
  * It takes as argument the event that is going to be modified. 
+ * This implementation only try to save known properties of the event, that is:
+ * <ul>
+ *  <li> time </li>
+ *  <li> duration </li>
+ *  <li> pitch </li>
+ *  <li> velocity </li>
+ *  <li> channel </li>
+ *  <li> ambitus </li>
+ * </ul>
+ * A better organization is needed...
  * @see UndoableAdd */  
-public class UndoableMove extends AbstractUndoableEdit {
-    
-  Event itsEvent;  
+public class UndoableEventTransf extends AbstractUndoableEdit {
+  
+  Event itsEvent;    
   FtsTrackObject trkObj;
-  double undoTime;
-  double redoTime;
+  String propName;
+  Object undoProp;
+  Object redoProp;
 
   /**
    * Constructor. theEvent is the event that is going to be modified. */
-  public UndoableMove(TrackEvent theEvent, double newTime)
+  public UndoableEventTransf(TrackEvent theEvent, String propName, Object newValue)
   {
       try {
 	  itsEvent = theEvent.duplicate();
       } catch (Exception ex) {System.err.println("error while cloning event");}
       
       trkObj = ((FtsTrackObject)theEvent.getDataModel());
-
-      undoTime = theEvent.getTime();
-      redoTime = newTime;
+      
+      this.propName  = propName;
+      undoProp  = theEvent.getProperty(propName);
+      redoProp  = newValue;
   }
 
   public boolean addEdit(UndoableEdit anEdit)
@@ -65,18 +77,18 @@ public class UndoableMove extends AbstractUndoableEdit {
 
   public String getPresentationName()
   {
-    return "event moving";
+    return "simple event transformation";
   }
   
   /**
    * Undo the trasformation */
   public void undo()
   {
-      itsEvent.setTime(redoTime);
+      itsEvent.setProperty(propName, redoProp);
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       
       if(evt!=null)
-	  evt.move(undoTime);
+	  evt.setProperty(propName, undoProp);
       else
 	  die();
   }
@@ -85,16 +97,15 @@ public class UndoableMove extends AbstractUndoableEdit {
    * redo the trasformation */
   public void redo()
   {
-      itsEvent.setTime(undoTime);
+      itsEvent.setProperty(propName, undoProp);
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+      
       if(evt!=null)
-	  evt.move(redoTime);
+	  evt.setProperty(propName, redoProp);
       else
 	  die();
   }
-
 }
-
 
 
 

@@ -88,8 +88,8 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	if (time < 0) time = 0;
 	if (itsTrackDataModel != null)
 	  {
-	    //if (((UndoableData) itsTrackDataModel).isInGroup())
-	    //((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this));
+	    if (((UndoableData) itsTrackDataModel).isInGroup())
+		((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this, time));
 		
 		itsTrackDataModel.moveEvent(this, time);
 		
@@ -107,14 +107,12 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
 	//int intVal;
 	double doubleVal;
-
-	/*
+	
 	if (itsTrackDataModel != null)
 	    {
-		if (((UndoableData) itsTrackDataModel).isInGroup())
-		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this));
+		if (((UndoableData) itsTrackDataModel).isInGroup()&&(!name.equals("time")))
+		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this, name, theValue));
 	    }
-	*/
 	
 	if (theValue instanceof Double) 
 	    {
@@ -247,9 +245,24 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	else return NullEditor.getInstance();
     }
 
-    public TrackEvent duplicate () throws CloneNotSupportedException
+    public Event duplicate () throws CloneNotSupportedException
     {
-	return (TrackEvent) clone();
+	//qui dovrebbe restituire un oggetto che ocntiene gli stessi dati ma che non e' un fts object
+	//per esempio un UtilTrackEvent
+
+	//return (TrackEvent) clone();
+	/*((FtsTrackObject)itsTrackDataModel).requestEventCreation((float)getTime(), 
+				      getValue().getValueInfo().getName(), 
+				      getValue().getPropertyCount(), 
+				      getValue().getPropertyValues());
+				      return null;*/
+	UtilTrackEvent evt = new UtilTrackEvent();
+	evt.setTime(getTime());
+	EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
+	evtValue.setPropertyValues(getValue().getPropertyCount(), getValue().getPropertyValues());
+	evtValue.setLocalPropertyValues(getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
+	evt.setValue(evtValue);
+	return evt;
     }
 
     //--- Fields

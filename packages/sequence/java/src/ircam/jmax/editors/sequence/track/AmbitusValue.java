@@ -9,6 +9,7 @@ import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 
@@ -101,6 +102,11 @@ public class AmbitusValue extends AbstractEventValue
       {
 	  return defPropertyCount;
       }
+
+    public DataFlavor getDataFlavor()
+      {
+	  return AmbitusValueDataFlavor.getInstance();
+      }
  
     String defNamesArray[] = {"pitch", "duration"};
     int defPropertyCount = 2;
@@ -135,18 +141,24 @@ public class AmbitusValue extends AbstractEventValue
       else return UNKNOWN_TYPE;
   }
 
-  public Object[] getPropertyValues()
-  {
-      for(int i = 0; i<propertyCount; i++)
-	  propertyValuesArray[i] = getProperty(nameArray[i]);
+    public Object[] getPropertyValues()
+    {
+	for(int i = 0; i<propertyCount; i++)
+	    propertyValuesArray[i] = getProperty(nameArray[i]);
 
-      return propertyValuesArray;
-  }
+	return propertyValuesArray;
+    }
 
     public void setPropertyValues(int nArgs, Object args[])
     {
 	for(int i = 0; i<nArgs; i++)
 	    setProperty(nameArray[i], args[i]);
+    }
+
+    public boolean samePropertyValues(Object args[])
+    {
+	return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
+	    (((Integer)getProperty("duration")).intValue() == ((Integer)args[1]).intValue())); 
     }
 
   //--- Fields

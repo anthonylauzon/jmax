@@ -81,6 +81,11 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     {
     }
 
+    public boolean samePropertyValues(Object args[])
+    {
+	return false;
+    }
+
     public Object[] getLocalPropertyValues()
     {
 	return propertyValuesArray;
@@ -95,7 +100,6 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     {
 	return null; 
     }
-
 
     public ValueInfo getValueInfo()
     {

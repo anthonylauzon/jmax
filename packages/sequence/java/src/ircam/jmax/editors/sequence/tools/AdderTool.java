@@ -81,6 +81,10 @@ public class AdderTool extends Tool implements PositionListener {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	
 	egc.getTrack().setProperty("active", Boolean.TRUE);
+
+	// starts an undoable transition	
+	((UndoableData) egc.getDataModel()).beginUpdate();
+	//endUpdate is called in addEvents in dataModel
 	
 	if (egc.getTrack().getTrackDataModel().getNumTypes()>1)
 	  {
@@ -91,6 +95,9 @@ public class AdderTool extends Tool implements PositionListener {
 	  }
 	else
 	    {
+		//whit Shift add to selection
+		if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
+	       
 		ValueInfo info = (ValueInfo) egc.getTrack().getTrackDataModel().getTypes().nextElement();
 		addEvent(x, y, (EventValue) info.newInstance());
 	    }
@@ -113,13 +120,6 @@ public class AdderTool extends Tool implements PositionListener {
 
 	egc.getAdapter().setY(aEvent, y);
 
-	// starts an undoable transition
-	/*((UndoableData) egc.getDataModel()).beginUpdate();
-	
-	  egc.getDataModel().addEvent(aEvent);
-	
-	  // ends the undoable transition
-	  ((UndoableData) egc.getDataModel()).endUpdate();*/
 	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
 							  value.getValueInfo().getName(), 
 							  value.getPropertyCount(), 

@@ -49,9 +49,9 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   
   //--- Fields
   private static SequenceSelection current;
-  private static MaxVector itsCopy = new MaxVector();
+    private static MaxVector itsCopy = new MaxVector();
 
-  public static DataFlavor flavors[];
+  public DataFlavor flavors[];
 
   private MaxVector temp = new MaxVector();
 
@@ -71,9 +71,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   {
     itsModel = model;
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
-    if (flavors == null)
-      flavors = new DataFlavor[1];
-    flavors[0] = SequenceDataFlavor.getInstance();
+    initDataFlavors();
 
     // make this selection a listener of its own data model
     model.addListener(this);
@@ -86,6 +84,16 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     flavors[0] = SequenceDataFlavor.getInstance();
   }
 
+  void initDataFlavors()
+    {
+	if (flavors == null)
+	    flavors = new DataFlavor[1];
+	flavors[0] = SequenceDataFlavor.getInstance();
+	
+	DataFlavor[] trackFlavors = ((FtsTrackObject)itsModel).getDataFlavors();
+	for(int i=0; i<trackFlavors.length;i++)
+	    addFlavor(trackFlavors[i]);
+    }
 
   public void addSelectionInterval(int index1, int index2)
   {
@@ -286,7 +294,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	addSelectionInterval(i, i);
 	else removeSelectionInterval(i, i);
 	}*/
-      deselectAll();
+      //deselectAll();
       select(spec);
     
   }
@@ -355,14 +363,12 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	    removeSelectionInterval(i,i);
 	  }
       }
-    
-    
   }
   
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {
-    return itsCopy.elements(); 
+      return itsCopy.elements(); 
   }
 
   /** Transferable interface */
@@ -384,12 +390,14 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   /** utility function */
   protected void addFlavor(DataFlavor flavor)
   {
-    int dim = Array.getLength(flavors);
+      //int dim = Array.getLength(flavors);
+      int dim = flavors.length;
     DataFlavor temp[] = new DataFlavor[dim+1];
     for (int i = 0; i < dim; i++){
       temp[i] = flavors[i];
     }
-    temp[dim+1]=flavor;
+    //temp[dim+1]=flavor;
+    temp[dim]=flavor;
     flavors = temp;
   }
 
@@ -398,23 +406,23 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
     public void deleteAll()
     {
-	if(size()==itsModel.length())
-	    {			
-		deselectAll();
-		itsModel.removeAllEvents();			    
-	    }
-	else
-	    {
-		MaxVector v = new MaxVector();		    
-		for (Enumeration en = getSelected(); en.hasMoreElements();)
-		    v.addElement(en.nextElement());
+	/*if(size()==itsModel.length())
+	  {			
+	  deselectAll();
+	  itsModel.removeAllEvents();			    
+	  }
+	  else
+	  {*/
+	MaxVector v = new MaxVector();		    
+	for (Enumeration en = getSelected(); en.hasMoreElements();)
+	    v.addElement(en.nextElement());
 
-		deselectAll();
+	deselectAll();
 
-		for (int i = 0; i< v.size(); i++)
-		    itsModel.removeEvent((TrackEvent)(v.elementAt(i)));
-		v = null;
-	    }
+	for (int i = 0; i< v.size(); i++)
+	    itsModel.removeEvent((TrackEvent)(v.elementAt(i)));
+	v = null;
+	// }
     }
 
     public void selectNext()
@@ -515,6 +523,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	}
 
     } catch (Exception ex) {System.err.println("error while cloning events");}
+
   }
 
   static void discardTheCopy()
