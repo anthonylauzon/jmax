@@ -1,5 +1,6 @@
 2000-06-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* packages/io/c/src/iomodule.c: fixed missing call to serial_config()
 	* packages/unixdtd: new (?) implementation of Direct-To-Disk objects, using
 	a separate process (the thread implementation leaded to real-time problems
 	on IRIX)
