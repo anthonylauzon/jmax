@@ -2,6 +2,7 @@
 	
 	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v" in Track and Sequence editors.
 	* (see 2003-07-21).
+	* Changed "Save to..." to "Save as..." in the template editor window.
 
 2003-08-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
