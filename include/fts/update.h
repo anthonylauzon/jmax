@@ -20,28 +20,7 @@
  * 
  */
 
-/* 
-   This file include all the memory allocation tools provided by FTS.
-*/
-
-/* Standard allocation routines */
-FTS_API void *fts_malloc(unsigned int size);
-FTS_API void *fts_zalloc(unsigned int size);
-FTS_API void *fts_realloc(void *p, unsigned int size);
-FTS_API void fts_free(void *p);
-
-/* Heap allocator */
-typedef struct _fts_heap_t fts_heap_t;
-
-FTS_API fts_heap_t *fts_heap_new(unsigned int block_size);
-
-FTS_API void *fts_heap_alloc( fts_heap_t *heap);
-FTS_API void *fts_heap_zalloc( fts_heap_t *heap);
-FTS_API void  fts_heap_free( void *p, fts_heap_t *heap);
-
-
-
-
-
-
+/* compatibility */
+/* implemented for updates */
+FTS_API void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
 

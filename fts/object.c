@@ -69,7 +69,7 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 
   if(cl)
     {
-      obj = (fts_object_t *)fts_heap_calloc(cl->heap);
+      obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
       
       obj->head.cl = cl;
       obj->head.id = FTS_NO_ID;
@@ -78,10 +78,10 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       obj->refcnt = 0;
       
       if (cl->noutlets)
-	obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
+	obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
       
       if (cl->ninlets)
-	obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
+	obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
       
       /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
       if(fts_class_get_constructor(cl))
@@ -134,7 +134,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
       return &fts_CannotInstantiate;
     }
 
-  obj = (fts_object_t *)fts_heap_calloc(cl->heap);
+  obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
   obj->patcher = patcher;
   obj->head.cl = cl;
@@ -148,10 +148,10 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 #endif
 
   if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
+    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
 
   if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
+    obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
     
   if(fts_class_get_constructor(cl))
     fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac, at);
@@ -798,7 +798,7 @@ fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 
       if (argc > 0)
 	{
-	  obj->argv = (fts_atom_t *) fts_calloc(argc * sizeof(fts_atom_t));
+	  obj->argv = (fts_atom_t *) fts_zalloc(argc * sizeof(fts_atom_t));
 
 	  for (i = 0; i < argc; i++)
 	    obj->argv[i] = argv[i];
@@ -838,7 +838,7 @@ fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
 
       /* reallocate the description if argc > -0 and copy the arguments */
       obj->argc = argc + 1;
-      obj->argv = (fts_atom_t *) fts_calloc((argc + 1) * sizeof(fts_atom_t));
+      obj->argv = (fts_atom_t *) fts_zalloc((argc + 1) * sizeof(fts_atom_t));
 
       fts_set_symbol(&(obj->argv[0]), class_name);
 
@@ -912,7 +912,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
       fts_connection_t **new_out_conn;
 
       new_outlets  = (fts_outlet_t **)  fts_malloc(new_noutlets * sizeof(fts_outlet_t *));
-      new_out_conn = (fts_connection_t **) fts_calloc(new_noutlets * sizeof(fts_connection_t *));
+      new_out_conn = (fts_connection_t **) fts_zalloc(new_noutlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	{
@@ -933,7 +933,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
       /* there are new outlets, but there were no outlets before (allocate without copying old stuff) */
       int i;
 
-      o->out_conn = (fts_connection_t **) fts_calloc(new_noutlets * sizeof(fts_connection_t *));
+      o->out_conn = (fts_connection_t **) fts_zalloc(new_noutlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	o->out_conn[i] = 0;

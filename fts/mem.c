@@ -23,7 +23,7 @@
 /* 
  * Memory allocators
  *
- * fts_malloc, fts_realloc, fts_calloc and fts_free
+ * fts_malloc, fts_realloc, fts_zalloc and fts_free
  * are just wrappers on top of the corresponding libc functions.
  * fts_malloc retries allocation in case of error: if the platform
  * provides memory locking for real-time processes, the memory
@@ -52,7 +52,7 @@
  *
  */
 
-void *fts_calloc( unsigned int size)
+void *fts_zalloc( unsigned int size)
 {
   void *p;
 
@@ -234,10 +234,10 @@ void *fts_heap_alloc( fts_heap_t *p)
 #endif
 }
 
-void *fts_heap_calloc( fts_heap_t *heap)
+void *fts_heap_zalloc( fts_heap_t *heap)
 {
 #ifdef HELP_PURIFY
-  return fts_calloc( heap->block_size);
+  return fts_zalloc( heap->block_size);
 #else
   char *p;
 

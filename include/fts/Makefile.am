@@ -44,4 +44,5 @@ status.h \
 symbol.h \
 time.h \
 types.h \
+update.h \
 variable.h

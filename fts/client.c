@@ -108,13 +108,9 @@ typedef struct _client_t client_t;
 
 static fts_symbol_t s_client;
 static fts_symbol_t s_client_manager;
-static fts_symbol_t s_update_group_begin;
-static fts_symbol_t s_update_group_end;
-static fts_symbol_t s_set_value;
 static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
 
-static fts_heap_t *update_heap;
 
 /* Predefined ids */
 #define FTS_CLIENT_ROOT_OBJECT_ID 0
@@ -292,9 +288,6 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
  *
  */
 
-#define DEFAULT_UPDATE_PERIOD 20
-#define DEFAULT_MAX_UPDATES 40
-
 #define SYMBOL_CACHE_SIZE 512
 
 typedef struct {
@@ -304,12 +297,6 @@ typedef struct {
   int naccess, nhit;
 #endif
 } symbol_cache_t;
-
-typedef struct update_entry {
-  fts_object_t *obj;
-  fts_symbol_t property_name;
-  struct update_entry *next;
-} update_entry_t;
 
 struct _client_t {
   fts_object_t head;
@@ -339,11 +326,6 @@ struct _client_t {
   fts_stack_t output_buffer;
   /* Symbol caches */
   symbol_cache_t output_cache;
-
-  /* Updates */
-  int update_period;
-  int max_updates;
-  update_entry_t *update_fifo;
 };
 
 /*----------------------------------------------------------------------
@@ -713,7 +695,6 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
       client_error( "[client] error in reading message, client stopped");
       fts_log( "[client] error in reading message, client stopped\n");
       fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
-      fts_timebase_remove_object( fts_get_timebase(), (fts_object_t *) this);
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
@@ -895,39 +876,6 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_sched_halt();
 }
 
-static void client_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_t *this = (client_t *)o;
-
-  if ( this->update_fifo)
-    {
-      int count;
-
-      fts_client_send_message( (fts_object_t *)this, s_update_group_begin, 0, 0);
-
-      for( count = 0; this->update_fifo && count < this->max_updates; count++)
-	{
-	  update_entry_t *p = this->update_fifo;
-	  fts_atom_t a[1];
-
-	  this->update_fifo = p->next;
-
-	  fts_object_get_prop( p->obj, p->property_name, a);
-
-	  if ( !fts_is_void( a))
-	    fts_client_send_message( p->obj, s_set_value, 1, a);
-
-	  fts_object_release( p->obj);
-
-	  fts_heap_free( p, update_heap);
-	}
-
-      fts_client_send_message( (fts_object_t *)this, s_update_group_end, 0, 0);
-    }
-
-  fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, client_update, 0, this->update_period);
-}
-
 static void client_predefine_objects( client_t *this)
 {
   fts_atom_t k, v;
@@ -953,20 +901,6 @@ static void client_predefine_objects( client_t *this)
   client_register_object( this, (fts_object_t *)this, FTS_CLIENT_CLIENT_OBJECT_ID);
 }
 
-static void client_update_period( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_t *this = (client_t *)o;
-
-  this->update_period = fts_get_int_arg( ac, at, 0, DEFAULT_UPDATE_PERIOD);
-}
-
-static void client_max_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_t *this = (client_t *)o;
-
-  this->max_updates = fts_get_int_arg( ac, at, 0, DEFAULT_MAX_UPDATES);
-}
-
 static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -987,8 +921,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   this->client_id = client_table_add( this);
   this->object_id_count = 17;
-  this->update_period = fts_get_int_arg( ac, at, 1, DEFAULT_UPDATE_PERIOD);
-  this->max_updates = fts_get_int_arg( ac, at, 2, DEFAULT_MAX_UPDATES);
 
   /* Set my client id */
   this->head.head.id = OBJECT_ID( 1, this->client_id);
@@ -1009,8 +941,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
   client_predefine_objects( this);
-
-  fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, client_update, 0, this->update_period);
 
   fts_log( "[client]: Accepted client connection\n");
 }
@@ -1087,9 +1017,6 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_packages"), client_get_packages);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "update_period"), client_update_period);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "max_updates"), client_max_updates);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
@@ -1513,67 +1440,8 @@ void fts_client_release_object(fts_object_t *obj)
       fts_set_object(a, obj);
       fts_client_send_message( (fts_object_t *)obj->patcher, s_remove_object, 1, a);
     }
+
   client_release_object( client, obj);
-}
-
-/* compatibility */
-void fts_object_ui_property_changed( fts_object_t *obj, fts_symbol_t property_name)
-{
-  client_t *client;
-  fts_patcher_t *patcher;
-  update_entry_t **pp;
-
-  client = object_get_client( obj);
-
-  if ( !client)
-    return;
-
-  patcher = fts_object_get_patcher( obj);
-
-  if ( !patcher || !fts_patcher_is_open(patcher))
-    return;
-
-  /* check if the object is already in the evsched list */
-  for ( pp = &client->update_fifo; *pp; pp = &(*pp)->next)
-    if ( (*pp)->obj == obj && (*pp)->property_name == property_name )
-      return;
-
-  *pp = (update_entry_t *)fts_heap_alloc( update_heap);
-
-  (*pp)->obj = obj;
-  (*pp)->property_name = property_name;
-  (*pp)->next = 0;
-
-  fts_object_refer(obj);
-}
-
-void fts_object_reset_changed( fts_object_t *obj)
-{
-  client_t *client;
-  update_entry_t **pp;
-
-  client = object_get_client( obj);
-
-  if ( !client)
-    return;
-
-  pp = &client->update_fifo;
-
-  while (*pp)
-    {
-      if ( (*pp)->obj == obj)
-	{
-	  update_entry_t *to_remove = *pp;
-
-	  *pp = (*pp)->next;
-
-	  fts_object_release( to_remove->obj);
-
-	  fts_heap_free( to_remove, update_heap);
-	}
-      else
-	pp = &(*pp)->next;
-    }
 }
 
 void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
@@ -1590,6 +1458,7 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t property)
  * Initialization
  *
  */
+
 static void client_tcp_manager_install( void)
 {
   int argc = 0;
@@ -1637,13 +1506,8 @@ void fts_client_config( void)
 {
   s_client_manager = fts_new_symbol("client_manager");
   s_client = fts_new_symbol("client");
-  s_update_group_begin = fts_new_symbol( "update_group_begin");
-  s_update_group_end = fts_new_symbol( "update_group_end");
-  s_set_value = fts_new_symbol( "setValue");
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");
-
-  update_heap = fts_heap_new( sizeof( update_entry_t));
 
   client_table_init();
 

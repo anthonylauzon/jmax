@@ -51,7 +51,7 @@ mmio_loader_open_read(fts_audiofile_t* aufile)
   char* file;
   MMRESULT res;
 
-  wave = (wave_t*) fts_calloc(sizeof(wave_t));
+  wave = (wave_t*) fts_zalloc(sizeof(wave_t));
   file = (char*) fts_audiofile_get_filename(aufile);
 
   /* open the file */
@@ -174,7 +174,7 @@ mmio_loader_open_write(fts_audiofile_t* aufile)
     goto error_recovery;
   }
 
-  wave = (wave_t*) fts_calloc(sizeof(wave_t));
+  wave = (wave_t*) fts_zalloc(sizeof(wave_t));
   file = (char*) fts_audiofile_get_filename(aufile);
 
   /* open the file */

@@ -51,6 +51,7 @@ symbol.c \
 template.c \
 time.c \
 tuple.c \
+update.c \
 variable.c \
 version.c \
 vm.c \

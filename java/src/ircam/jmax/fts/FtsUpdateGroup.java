@@ -53,17 +53,18 @@ public class FtsUpdateGroup extends FtsObject
     
   public FtsUpdateGroup() throws IOException
   {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("update"));    
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("update_group"));
   }
   
   public void start()
   {
-    try{
-      send( FtsSymbol.get("start"));
-    }
+    try
+      {
+	send( FtsSymbol.get("start"));
+      }
     catch(IOException e)
       {
-	System.err.println("[FtsIpdateGroup]: I/O Error sending Start Message!");
+	System.err.println("[FtsUpdateGroup]: I/O Error sending Start Message!");
 	e.printStackTrace(); 
       }
   }

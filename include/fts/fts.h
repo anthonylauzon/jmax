@@ -120,6 +120,7 @@ extern "C" {
 #include <fts/project.h>
 
 #include <fts/client.h>
+#include <fts/update.h>
 
 
 /*

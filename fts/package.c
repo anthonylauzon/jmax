@@ -1271,7 +1271,7 @@ fts_kernel_package_init(void)
   /* since we need a class to construct a package and a package to
      find a class, we have to do some non standard hacking to
      bootstrap the system */
-  fts_system_package = fts_calloc(sizeof(fts_package_t));
+  fts_system_package = fts_zalloc(sizeof(fts_package_t));
 
   fts_system_package->object.head.cl = 0;
   fts_system_package->object.head.id = FTS_NO_ID;
@@ -1279,7 +1279,7 @@ fts_kernel_package_init(void)
   fts_system_package->object.varname = 0;
   fts_system_package->object.refcnt = 0;
   fts_system_package->object.out_conn = 0;
-  fts_system_package->object.in_conn = (fts_connection_t **) fts_calloc(sizeof(fts_connection_t *));
+  fts_system_package->object.in_conn = (fts_connection_t **) fts_zalloc(sizeof(fts_connection_t *));
   
   __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 1, &a); 
   fts_package_set_state(fts_system_package, fts_package_loaded); 

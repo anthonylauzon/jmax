@@ -1899,7 +1899,7 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
       fts_connection_t **new_in_conn;
 
       new_inlets  = (fts_inlet_t **)  fts_malloc(new_ninlets * sizeof(fts_inlet_t *));
-      new_in_conn = (fts_connection_t **) fts_calloc(new_ninlets * sizeof(fts_connection_t *));
+      new_in_conn = (fts_connection_t **) fts_zalloc(new_ninlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_ninlets; i++)
 	{
@@ -1927,7 +1927,7 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
       
       /* there are new inlets, but there were no inlets before (just allocate without copying old stuff) */
       this->inlets = (fts_inlet_t **) fts_malloc(new_ninlets * sizeof(fts_inlet_t *));
-      obj_this->in_conn = (fts_connection_t **) fts_calloc(new_ninlets * sizeof(fts_connection_t *));
+      obj_this->in_conn = (fts_connection_t **) fts_zalloc(new_ninlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_ninlets; i++)
 	{
@@ -1996,7 +1996,7 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
       fts_connection_t **new_out_conn;
 
       new_outlets  = (fts_outlet_t **)  fts_malloc(new_noutlets * sizeof(fts_outlet_t *));
-      new_out_conn = (fts_connection_t **) fts_calloc(new_noutlets * sizeof(fts_connection_t *));
+      new_out_conn = (fts_connection_t **) fts_zalloc(new_noutlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	{
@@ -2020,7 +2020,7 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
 
       /* new outlets, but no old outlets before (just allocate without copying old stuff) */
       this->outlets = (fts_outlet_t **) fts_malloc(new_noutlets * sizeof(fts_outlet_t *));
-      obj_this->out_conn = (fts_connection_t **) fts_calloc(new_noutlets*sizeof(fts_connection_t *));
+      obj_this->out_conn = (fts_connection_t **) fts_zalloc(new_noutlets*sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	{

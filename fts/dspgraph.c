@@ -522,7 +522,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
 
       if ( node->descr->ninputs)
 	{
-	  node->descr->in = (fts_dsp_signal_t **)fts_calloc(sizeof(fts_dsp_signal_t *) * node->descr->ninputs); 
+	  node->descr->in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * node->descr->ninputs); 
 	}
       node->descr->noutputs = dsp_output_get(fts_object_get_class(node->o), fts_object_get_outlets_number(node->o));
       node->descr->out = 0;	/* safe initialization */
@@ -540,7 +540,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
 
   if (node->descr->noutputs)
     {
-      node->descr->out = (fts_dsp_signal_t **)fts_calloc( sizeof(fts_dsp_signal_t *) * node->descr->noutputs);
+      node->descr->out = (fts_dsp_signal_t **)fts_zalloc( sizeof(fts_dsp_signal_t *) * node->descr->noutputs);
     }
 
   if (gen_outputs(node->o, node->descr, graph->tick_size, graph->sample_rate))
@@ -741,7 +741,7 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int w
       if (! dest->descr->in)
 	{
 	  /* (fd) to avoid writing past the end of the dsp_descr... */
-	  dest->descr->in = (fts_dsp_signal_t **)fts_calloc(sizeof(fts_dsp_signal_t *) * fts_object_get_inlets_number(dest->o));
+	  dest->descr->in = (fts_dsp_signal_t **)fts_zalloc(sizeof(fts_dsp_signal_t *) * fts_object_get_inlets_number(dest->o));
 	}
 
       nin = dsp_input_get(dest->o, winlet);

@@ -23,6 +23,7 @@ selection.h \
 sigconn.h \
 srconv.h \
 template.h \
+tokenizer.h \
 time.h \
 variable.h \
 vm.h

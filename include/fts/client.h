@@ -150,10 +150,6 @@ FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
 FTS_API void fts_client_register_object( fts_object_t *obj, int client_id);
 FTS_API void fts_client_release_object( fts_object_t *obj);
 
-/* compatibility */
-/* implemented for updates */
-FTS_API void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
-
 /* these functions are empty */
 FTS_API void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
 FTS_API void fts_client_send_property(fts_object_t *obj, fts_symbol_t property);
