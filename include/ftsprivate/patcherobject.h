@@ -28,29 +28,41 @@
 #define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) && fts_patcher_is_abstraction((fts_patcher_t *) (o)))
 #define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) && fts_patcher_is_standard((fts_patcher_t *) (o)))
 #define fts_object_is_template(o) (fts_object_is_patcher((o)) && fts_patcher_is_template((fts_patcher_t *) (o)))
+#define fts_object_get_definition(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->definition): NULL)
 
-#define fts_object_has_patcher_data(o) ((o)->patcher_data != NULL)
+#define fts_object_has_patcher_data(o) ((o)->context != NULL)
 
-#define fts_object_get_next_in_patcher(o) ((o)->patcher_data->next_in_patcher)
-#define fts_object_set_next_in_patcher(o, x) ((o)->patcher_data->next_in_patcher = (x))
+#define fts_object_get_next_in_patcher(o) (((fts_object_patcher_data_t *)(o)->context)->next_in_patcher)
+#define fts_object_set_next_in_patcher(o, x) (((fts_object_patcher_data_t *)(o)->context)->next_in_patcher = (x))
 
-#define fts_object_get_inlet_connections(o, i) ((o)->patcher_data->in_conn[(i)])
-#define fts_object_get_outlet_connections(o, i) ((o)->patcher_data->out_conn[(i)])
+#define fts_object_get_inlet_connections(o, i) (((fts_object_patcher_data_t *)(o)->context)->in_conn[(i)])
+#define fts_object_get_outlet_connections(o, i) (((fts_object_patcher_data_t *)(o)->context)->out_conn[(i)])
 
 extern fts_object_t *fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 extern fts_object_patcher_data_t *fts_object_get_patcher_data(fts_object_t *obj);
 extern void fts_object_remove_patcher_data(fts_object_t *obj);
 
-extern void fts_object_add_binding(fts_object_t *obj, fts_definition_t *def);
-
 /* object properties */
-FTS_API void fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
-FTS_API void fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
-FTS_API void fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
+extern void fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
+extern void fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+extern void fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
+
+/* name of object in patcher */
+extern void fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t sym, int global);
+extern fts_symbol_t fts_patcher_object_get_name(fts_object_t *obj);
+extern int fts_patcher_object_is_global(fts_object_t *obj);
+
+extern void fts_patcher_object_add_binding(fts_object_t *obj, fts_definition_t *def);
+
+/* persistence */
+extern void fts_patcher_object_set_state_persistence(fts_object_t *obj, int persistence);
+extern void fts_patcher_object_set_state_dirty(fts_object_t *obj);
+extern void fts_patcher_object_set_dirty(fts_object_t *obj);
+extern int fts_patcher_object_is_persistent(fts_object_t *obj);
 
 #endif

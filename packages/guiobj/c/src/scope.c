@@ -439,7 +439,7 @@ scope_ftl(fts_word_t *argv)
  */
 
 static void 
-scope_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -551,7 +551,7 @@ scope_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_real_time, scope_update_real_time); 
 
   fts_class_message_varargs(cl, fts_s_put, scope_put);
-  fts_class_message_varargs(cl, fts_s_dump, scope_dump); 
+  fts_class_message_varargs(cl, fts_s_dump_gui, scope_dump_gui); 
   fts_class_message_varargs(cl, fts_s_upload, scope_upload);   
   fts_class_message_varargs(cl, fts_s_size, scope_set_size_by_client);
   fts_class_message_varargs(cl, fts_new_symbol("range"), scope_set_range_by_client);

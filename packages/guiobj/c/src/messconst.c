@@ -181,7 +181,7 @@ messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-messconst_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -282,7 +282,7 @@ messconst_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(messconst_t), messconst_init, messconst_delete);
 
   fts_class_message_varargs(cl, fts_s_set, messconst_set_expression);
-  fts_class_message_varargs(cl, fts_s_dump, messconst_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, messconst_dump_gui);
 
   fts_class_message_varargs(cl, fts_s_update_real_time, messconst_update_real_time); 
   fts_class_message_varargs(cl, fts_s_spost_description, messconst_spost_description); 

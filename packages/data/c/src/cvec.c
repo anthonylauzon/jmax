@@ -602,8 +602,6 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   cvec_t *this = (cvec_t *)o;
   
-  data_object_init(o);
-
   this->values = 0;
   this->m = 0;
   this->n = 2;
@@ -623,15 +621,11 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       cvec_set_size(this, size);
       cvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-
-      data_object_persistence_args(o);
     }
   else if(ac > 1)
     {
       cvec_set_size(this, ac);
       cvec_set_with_onset_from_atoms(this, 0, ac, at);
-
-      data_object_persistence_args(o);
     }
   else
     fts_object_error(o, "bad arguments for cvec constructor");
@@ -651,11 +645,7 @@ cvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cvec_t), cvec_init, cvec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
-  /* fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence); */
-  /* fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); */
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_s_post, cvec_post); 
   fts_class_message_varargs(cl, fts_s_print, cvec_print); 

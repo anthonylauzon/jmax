@@ -229,7 +229,7 @@ xypad_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-xypad_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   xypad_t * this = (xypad_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -253,10 +253,10 @@ xypad_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(xypad_t), xypad_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_update_real_time, xypad_update_real_time); 
-  fts_class_message_varargs(cl, fts_s_dump, xypad_dump);  
-
+  fts_class_message_varargs(cl, fts_s_dump_gui, xypad_dump_gui);  
   fts_class_message_varargs(cl, fts_s_update_gui, xypad_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, xypad_update_real_time); 
+
   fts_class_message_varargs(cl, sym_setXMinValue, xypad_set_xminvalue); 
   fts_class_message_varargs(cl, sym_setXMaxValue, xypad_set_xmaxvalue); 
   fts_class_message_varargs(cl, sym_setYMinValue, xypad_set_yminvalue); 

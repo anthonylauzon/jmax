@@ -32,6 +32,7 @@ static fts_symbol_t recycle_tilda_symbol = 0;
 typedef struct
 {
   fts_dsp_object_t o;
+  fts_symbol_t name; /* name of bus implicitly created by an access */
   fts_dsp_edge_t *edge; /* DSP edge */
   int n_channels;
   float *buf[2]; /* two buffers */
@@ -39,7 +40,7 @@ typedef struct
   int n_tick;
 } bus_t;
 
-bus_t *
+static bus_t *
 bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_atom_t *value = fts_name_get_value(patcher, name);
@@ -54,13 +55,13 @@ bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   else if(fts_is_void(value))
   {
     /* create new bus */
+    bus_t *bus = (bus_t *)fts_object_create(bus_class, 0, 0);
     fts_atom_t a;
-    bus_t* bus;
-    fts_set_symbol(&a, bus_tilda_symbol);
-    bus = (bus_t*)fts_eval_object_description(patcher, 1, &a); 
 
     /* name the bus */
-    fts_object_set_name((fts_object_t *)bus, name);
+    fts_set_object(&a, (fts_object_t *)bus);
+    fts_name_set_value(fts_get_root_patcher(), name, &a);
+    bus->name = name;
 
     return bus;
   }
@@ -132,6 +133,8 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
 {
   bus_t *this = (bus_t *)o;
   int n_channels = 0;
+  
+  this->name = NULL;
 
   if(ac > 0 && fts_is_a(at, fts_dsp_edge_class))
   {
@@ -170,6 +173,9 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 
   if(this->buf[1] != NULL)
     fts_free(this->buf[1]);
+  
+  if(this->name != NULL)
+    fts_name_set_value(fts_get_root_patcher(), this->name, fts_null);
 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
@@ -179,10 +185,7 @@ bus_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
-
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_put_epilogue, bus_put_epilogue);
 }
 
@@ -288,8 +291,6 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
         fts_object_error(o, "%s is not a bus~", name);
         return;
       }
-
-      fts_name_add_listener(fts_object_get_patcher(o), name, o);
     }
     else if(fts_is_a(at, bus_class))
       *bus = (bus_t *)fts_get_object(at);

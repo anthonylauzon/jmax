@@ -161,42 +161,42 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   dumpfile_t *this = (dumpfile_t *)o;
 
   if(this->status == dumpfile_opened_write)
+  {
+    if(ac > 0 && fts_is_object(at))
     {
-      if(ac > 0 && fts_is_object(at))
-	{
-	  fts_object_t *object = fts_get_object(at);
-	  fts_class_t *class = fts_object_get_class(object);
-	  fts_symbol_t class_name = fts_class_get_name(class);
-	  fts_method_t meth_dump = fts_class_get_method_varargs(class, fts_s_dump);
-
-	  if(meth_dump)
+      fts_object_t *object = fts_get_object(at);
+      fts_class_t *class = fts_object_get_class(object);
+      fts_symbol_t class_name = fts_class_get_name(class);
+      fts_method_t meth_dump_state = fts_class_get_method_varargs(class, fts_s_dump_state);
+      
+      if(meth_dump_state)
 	    {
 	      fts_atom_t a;
 	      
 	      /* write class comment */
 	      fts_set_symbol(&a, sym_comment);
 	      fts_atom_file_write(this->file, &a, ' ');
-
+        
 	      fts_set_symbol(&a, class_name);
 	      fts_atom_file_write(this->file, &a, '\n');
-
+        
 	      /* set dumpfile as dumper */
 	      fts_set_object(&a, (fts_object_t *)o);
-	      meth_dump(object, fts_system_inlet, fts_s_dump, 1, &a);
+	      (*meth_dump_state)(object, fts_system_inlet, fts_s_dump_state, 1, &a);
 	      
 	      /* write final semicolon */
 	      fts_set_symbol(&a, fts_s_semi);
 	      fts_atom_file_write(this->file, &a, '\n');	  
-
+        
 	      /* reset flag */
 	      this->block = 0;
 	    }
-	  else
-	    fts_object_error(o, "cannot dump object of class %s", class_name);
-	}
       else
-	fts_object_error(o, "object argument required for message dump");
+        fts_object_error(o, "cannot dump object of class %s", class_name);
     }
+    else
+      fts_object_error(o, "object argument required for message dump");
+  }
   else
     fts_object_error(o, "file not opened in write mode (cannot dump)");
 }
@@ -341,7 +341,7 @@ dumpfile_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dumpfile_t), dumpfile_init, dumpfile_delete);
 
-  fts_class_message_varargs(cl, fts_s_dump, dumpfile_dump_object); 
+  fts_class_message_varargs(cl, fts_new_symbol("dump"), dumpfile_dump_object); 
 
   fts_class_message_varargs(cl, fts_s_open, dumpfile_open);
   fts_class_message_varargs(cl, fts_s_close, dumpfile_close);

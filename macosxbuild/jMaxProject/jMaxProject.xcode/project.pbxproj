@@ -5569,7 +5569,7 @@
 			buildSettings = {
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "../../include ../../packages/sequence/c/include";
+				HEADER_SEARCH_PATHS = "../../include ../../packages/utils/c/include ../../packages/data/c/include ../../packages/sequence/c/include";
 				INFOPLIST_FILE = "libsequence-info.plist";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				OTHER_CFLAGS = "-Wno-unused";
@@ -11763,6 +11763,892 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = wave_intphase.c;
 			path = ../../packages/signal/c/src/wave_intphase.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74560A06098EDD00B69585 = {
+			children = (
+				5C74560B06098EFF00B69585,
+				5C74560C06098F0900B69585,
+			);
+			isa = PBXGroup;
+			name = include;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		5C74560B06098EFF00B69585 = {
+			children = (
+				5C74560D06098F4700B69585,
+				5C74560E06098F4700B69585,
+				5C74560F06098F4700B69585,
+				5C74561006098F4700B69585,
+				5C74561106098F4700B69585,
+				5C74561206098F4700B69585,
+				5C74561306098F4700B69585,
+				5C74561406098F4700B69585,
+				5C74561506098F4700B69585,
+				5C74561606098F4700B69585,
+				5C74561706098F4700B69585,
+				5C74561806098F4700B69585,
+				5C74561906098F4700B69585,
+				5C74561A06098F4700B69585,
+				5C74561B06098F4700B69585,
+				5C74561C06098F4700B69585,
+				5C74561D06098F4700B69585,
+				5C74561E06098F4700B69585,
+				5C74561F06098F4700B69585,
+				5C74562006098F4700B69585,
+				5C74562106098F4700B69585,
+				5C74562206098F4700B69585,
+				5C74562306098F4800B69585,
+				5C74562406098F4800B69585,
+				5C74562606098F4800B69585,
+				5C74562706098F4800B69585,
+				5C74562806098F4800B69585,
+				5C74562906098F4800B69585,
+				5C74562A06098F4800B69585,
+				5C74562B06098F4800B69585,
+				5C74562C06098F4800B69585,
+				5C74562D06098F4800B69585,
+				5C74562E06098F4800B69585,
+				5C74562F06098F4800B69585,
+				5C74563006098F4800B69585,
+				5C74563106098F4800B69585,
+				5C74563206098F4800B69585,
+				5C74563306098F4800B69585,
+				5C74563406098F4800B69585,
+				5C74563506098F4800B69585,
+				5C74563606098F4800B69585,
+				5C74563706098F4800B69585,
+				5C74563806098F4800B69585,
+				5C74563906098F4800B69585,
+				5C74563A06098F4800B69585,
+				5C74563B06098F4800B69585,
+				5C74563C06098F4800B69585,
+				5C74563D06098F4800B69585,
+				5C74563F06098F4800B69585,
+				5C74564006098F4800B69585,
+				5C74564106098F4800B69585,
+				5C74564206098F4800B69585,
+			);
+			isa = PBXGroup;
+			name = fts;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		5C74560C06098F0900B69585 = {
+			children = (
+				5C74564306098F6800B69585,
+				5C74564406098F6800B69585,
+				5C74564506098F6800B69585,
+				5C74564606098F6800B69585,
+				5C74564706098F6800B69585,
+				5C74564806098F6800B69585,
+				5C74564906098F6800B69585,
+				5C74564A06098F6800B69585,
+				5C74564B06098F6800B69585,
+				5C74564C06098F6800B69585,
+				5C74564D06098F6800B69585,
+				5C74564E06098F6800B69585,
+				5C74564F06098F6800B69585,
+				5C74565006098F6800B69585,
+				5C74565106098F6800B69585,
+				5C74565206098F6800B69585,
+				5C74565306098F6800B69585,
+				5C74565406098F6800B69585,
+				5C74565506098F6800B69585,
+				5C74565606098F6800B69585,
+				5C74565706098F6800B69585,
+				5C74565806098F6800B69585,
+				5C74565906098F6800B69585,
+				5C74565A06098F6800B69585,
+				5C74565B06098F6800B69585,
+				5C74565C06098F6800B69585,
+				5C74565D06098F6800B69585,
+				5C74565E06098F6800B69585,
+				5C74565F06098F6800B69585,
+				5C74566006098F6800B69585,
+				5C74566106098F6800B69585,
+				5C74566206098F6800B69585,
+				5C74566406098F6800B69585,
+				5C74566506098F6900B69585,
+			);
+			isa = PBXGroup;
+			name = ftsprivate;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		5C74560D06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = array.h;
+			path = ../../include/fts/array.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74560E06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = atom.h;
+			path = ../../include/fts/atom.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74560F06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = atomfile.h;
+			path = ../../include/fts/atomfile.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561006098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = audio.h;
+			path = ../../include/fts/audio.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561106098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = audiofile.h;
+			path = ../../include/fts/audiofile.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561206098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = binaryprotocol.h;
+			path = ../../include/fts/binaryprotocol.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561306098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = bytestream.h;
+			path = ../../include/fts/bytestream.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561406098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = class.h;
+			path = ../../include/fts/class.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561506098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = client.h;
+			path = ../../include/fts/client.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561606098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = connection.h;
+			path = ../../include/fts/connection.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561706098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = dsp.h;
+			path = ../../include/fts/dsp.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561806098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = errobj.h;
+			path = ../../include/fts/errobj.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561906098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = expression.h;
+			path = ../../include/fts/expression.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561A06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fifo.h;
+			path = ../../include/fts/fifo.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561B06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = file.h;
+			path = ../../include/fts/file.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561C06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fpe.h;
+			path = ../../include/fts/fpe.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561D06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ftl.h;
+			path = ../../include/fts/ftl.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561E06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ftlmem.h;
+			path = ../../include/fts/ftlmem.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74561F06098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fts.h;
+			path = ../../include/fts/fts.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562006098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = function.h;
+			path = ../../include/fts/function.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562106098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = hashtable.h;
+			path = ../../include/fts/hashtable.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562206098F4700B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = iterator.h;
+			path = ../../include/fts/iterator.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562306098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = label.h;
+			path = ../../include/fts/label.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562406098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = list.h;
+			path = ../../include/fts/list.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562606098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = malloc.h;
+			path = ../../include/fts/malloc.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562706098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = message.h;
+			path = ../../include/fts/message.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562806098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = midi.h;
+			path = ../../include/fts/midi.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562906098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = midievent.h;
+			path = ../../include/fts/midievent.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562A06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = midifile.h;
+			path = ../../include/fts/midifile.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562B06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = object.h;
+			path = ../../include/fts/object.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562C06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = objectlist.h;
+			path = ../../include/fts/objectlist.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562D06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = objectset.h;
+			path = ../../include/fts/objectset.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562E06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = outlet.h;
+			path = ../../include/fts/outlet.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74562F06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = package.h;
+			path = ../../include/fts/package.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563006098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = param.h;
+			path = ../../include/fts/param.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563106098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = patcher.h;
+			path = ../../include/fts/patcher.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563206098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = patcherobject.h;
+			path = ../../include/fts/patcherobject.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563306098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = post.h;
+			path = ../../include/fts/post.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563406098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = predefsymbols.h;
+			path = ../../include/fts/predefsymbols.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563506098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = preset.h;
+			path = ../../include/fts/preset.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563606098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = project.h;
+			path = ../../include/fts/project.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563706098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = property.h;
+			path = ../../include/fts/property.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563806098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = sched.h;
+			path = ../../include/fts/sched.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563906098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = socketstream.h;
+			path = ../../include/fts/socketstream.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563A06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = stack.h;
+			path = ../../include/fts/stack.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563B06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = status.h;
+			path = ../../include/fts/status.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563C06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = symbol.h;
+			path = ../../include/fts/symbol.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563D06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = thread.h;
+			path = ../../include/fts/thread.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74563F06098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tuple.h;
+			path = ../../include/fts/tuple.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564006098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = types.h;
+			path = ../../include/fts/types.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564106098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = update.h;
+			path = ../../include/fts/update.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564206098F4800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = variable.h;
+			path = ../../include/fts/variable.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564306098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = abstraction.h;
+			path = ../../include/ftsprivate/abstraction.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564406098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = audio.h;
+			path = ../../include/ftsprivate/audio.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564506098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = audioconfig.h;
+			path = ../../include/ftsprivate/audioconfig.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564606098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = bmaxfile.h;
+			path = ../../include/ftsprivate/bmaxfile.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564706098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = class.h;
+			path = ../../include/ftsprivate/class.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564806098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = client.h;
+			path = ../../include/ftsprivate/client.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564906098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = clientmanager.h;
+			path = ../../include/ftsprivate/clientmanager.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564A06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = config.h;
+			path = ../../include/ftsprivate/config.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564B06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = connection.h;
+			path = ../../include/ftsprivate/connection.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564C06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = dsp.h;
+			path = ../../include/ftsprivate/dsp.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564D06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = dspgraph.h;
+			path = ../../include/ftsprivate/dspgraph.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564E06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = errobj.h;
+			path = ../../include/ftsprivate/errobj.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74564F06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = file.h;
+			path = ../../include/ftsprivate/file.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565006098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = fpe.h;
+			path = ../../include/ftsprivate/fpe.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565106098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = label.h;
+			path = ../../include/ftsprivate/label.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565206098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = loader.h;
+			path = ../../include/ftsprivate/loader.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565306098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = message.h;
+			path = ../../include/ftsprivate/message.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565406098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = midi.h;
+			path = ../../include/ftsprivate/midi.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565506098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = object.h;
+			path = ../../include/ftsprivate/object.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565606098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = outlet.h;
+			path = ../../include/ftsprivate/outlet.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565706098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = package.h;
+			path = ../../include/ftsprivate/package.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565806098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = parser.h;
+			path = ../../include/ftsprivate/parser.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565906098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = patcher.h;
+			path = ../../include/ftsprivate/patcher.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565A06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = patcherobject.h;
+			path = ../../include/ftsprivate/patcherobject.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565B06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = patfile.h;
+			path = ../../include/ftsprivate/patfile.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565C06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = platform.h;
+			path = ../../include/ftsprivate/platform.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565D06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = property.h;
+			path = ../../include/ftsprivate/property.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565E06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = protocol.h;
+			path = ../../include/ftsprivate/protocol.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74565F06098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = sched.h;
+			path = ../../include/ftsprivate/sched.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74566006098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = selection.h;
+			path = ../../include/ftsprivate/selection.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74566106098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = sigconn.h;
+			path = ../../include/ftsprivate/sigconn.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74566206098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = template.h;
+			path = ../../include/ftsprivate/template.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74566406098F6800B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tokenizer.h;
+			path = ../../include/ftsprivate/tokenizer.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C74566506098F6900B69585 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = variable.h;
+			path = ../../include/ftsprivate/variable.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -19348,6 +20234,7 @@
 				F880006A0283072001664092,
 				F880FDC50283013E01664092,
 				F880FD450282FA3901664092,
+				5C74560A06098EDD00B69585,
 				F88000000283043C01664092,
 				F880FCF90282F8A501664092,
 				F560DCA303D5609C016640F1,

@@ -28,10 +28,4 @@ FTS_API void fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, ft
 FTS_API void fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
 
 FTS_API fts_atom_t *fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name);
-
 FTS_API fts_symbol_t fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name);
-
-FTS_API void fts_name_set_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_name_dump_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_name_gui_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-

@@ -55,7 +55,7 @@ error_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-error_object_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 
@@ -107,7 +107,7 @@ error_object_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_name, error_object_set_name);
   fts_class_message_varargs(cl, fts_s_update_gui, error_object_update_gui);
-  fts_class_message_varargs(cl, fts_s_dump, error_object_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, error_object_dump_gui);
 
   fts_class_input_handler(cl, error_object_input_handler);
 

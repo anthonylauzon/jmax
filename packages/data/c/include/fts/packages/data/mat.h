@@ -31,7 +31,7 @@ DATA_API fts_symbol_t mat_symbol;
 
 typedef struct
 {
-  data_object_t head;
+  fts_object_t o;
   fts_atom_t *data; /* mat data */
   int m; /* # of rows */
   int n; /* # of columns */

@@ -397,7 +397,7 @@ vecdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void 
-vecdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -437,7 +437,7 @@ vecdisplay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vecdisplay_t), vecdisplay_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_dump, vecdisplay_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, vecdisplay_dump_gui);
 
   fts_class_message_varargs(cl, fts_s_update_gui, vecdisplay_update_gui); 
   fts_class_message_varargs(cl, fts_s_update_real_time, vecdisplay_update_real_time); 

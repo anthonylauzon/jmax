@@ -43,14 +43,10 @@ struct _track_
 { 
   fts_object_t o;
 
-  int persistence;
-
   struct _sequence_ *sequence; /* sequence of track */
   track_t *next; /* list of tracks in sequence */
 
-  fts_symbol_t name;
   int active; /* active flag */
-
   int open; /* flag: is 1 if track editor is open */
 
   ed_state_t *ed_state;
@@ -65,12 +61,14 @@ struct _track_
   fts_object_t *load_obj; /* object (event value) of currently loaded event */
 };
 
+/* for sequence */
+#define track_get_next(t) ((t)->next)
+
+#define track_get_name(t) (NULL)
+#define track_set_name(t, n)
+
 #define track_set_sequence(t, s) ((t)->sequence = (s))
 #define track_get_sequence(t) ((t)->sequence)
-
-#define track_get_next(t) ((t)->next)
-#define track_get_name(t) ((t)->name)
-#define track_set_name(t, n) ((t)->name = (n))
 
 #define track_get_type(t) ((t)->type)
 #define track_get_first(t) ((t)->first)

@@ -27,7 +27,7 @@
 
 typedef struct dict
 {
-  data_object_t o;
+  fts_object_t o;
   fts_hashtable_t hash;
 } dict_t;
 

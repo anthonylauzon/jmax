@@ -468,7 +468,7 @@ matdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
-matdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t *this = (matdisplay_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -538,7 +538,7 @@ matdisplay_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_update_gui, matdisplay_update_gui); 
   fts_class_message_varargs(cl, fts_s_update_real_time, matdisplay_update_real_time); 
-  fts_class_message_varargs(cl, fts_s_dump, matdisplay_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, matdisplay_dump_gui);
 
   fts_class_message_varargs(cl, sym_window, matdisplay_set_window_size_by_client);
   fts_class_message_varargs(cl, sym_zoom, matdisplay_set_zoom_by_client);

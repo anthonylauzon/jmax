@@ -94,7 +94,7 @@ event_set_at_client(event_t *this)
   else
     fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->value);
 
-  track_set_dirty( event_get_track(this));
+  fts_object_set_state_dirty((fts_object_t *)event_get_track(this));
 }
 
 static void

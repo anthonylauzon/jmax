@@ -29,6 +29,11 @@
 #define FTS_OBJECT_BITS_CLIENT 8
 #define FTS_OBJECT_BITS_ID (32 - FTS_OBJECT_BITS_STATUS-FTS_OBJECT_BITS_CLIENT)
 
+typedef struct
+{
+  fts_object_t *container;
+} fts_context_t;
+
 struct fts_object {
   fts_class_t *cl;
   
@@ -49,11 +54,7 @@ struct fts_object {
   int cache_varargs;
   fts_method_t cache_method;
 
-  /* name definition */
-  fts_definition_t *definition;
-  
-  /* patcher data */
-  fts_object_patcher_data_t *patcher_data;
+  fts_context_t *context; /* (back) pointer to container (or container related data structure) */
 };
 
 /**
@@ -76,6 +77,16 @@ FTS_API void fts_object_destroy(fts_object_t *obj);
 #define fts_object_release(o) ((--(((fts_object_t *)(o))->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
 #define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
 
+/* set name and persistence by container */
+FTS_API void fts_object_set_name(fts_object_t *obj, fts_symbol_t name);
+FTS_API void fts_object_set_persistence(fts_object_t *obj, int persistence);
+FTS_API void fts_object_set_dirty(fts_object_t *obj);
+FTS_API void fts_object_set_state_dirty(fts_object_t *obj);
+
+/* standard name and persistence methods */
+FTS_API void fts_object_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /* client */
 #define fts_object_get_id(o) ((o)->flag.id)
 #define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
@@ -86,11 +97,10 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 #define fts_object_get_class(o) ((o)->cl)
 #define fts_object_get_class_name(o) (fts_class_get_name((o)->cl))
 
-/* object name */
-FTS_API void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
-FTS_API fts_symbol_t fts_object_get_name(fts_object_t *obj);
-FTS_API void fts_object_update_name(fts_object_t *obj);
-FTS_API void fts_object_remove_name(fts_object_t *obj);
+/* context & container*/
+#define fts_object_get_context(o) ((o)->context)
+#define fts_object_set_context(o, c) ((o)->context = c)
+#define fts_object_get_container(o) (((o)->context != NULL)? ((o)->context->container): NULL)
 
 /* message cache */
 #define fts_object_message_cache_get_selector(o) ((o)->cache_selector)

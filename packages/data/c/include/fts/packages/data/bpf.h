@@ -44,7 +44,7 @@ typedef struct _bp_
  */
 typedef struct _bpf_
 {
-  data_object_t o;
+  fts_object_t o;
   bp_t *points; /* break points */
   int alloc;
   int size;

@@ -24,6 +24,7 @@
 #define _SEQUENCE_H_
 
 #include <fts/fts.h>
+#include <fts/packages/data/data.h>
 
 #ifdef WIN32
 #if defined(SEQUENCE_EXPORTS)
@@ -41,12 +42,8 @@ typedef struct _event_ event_t;
 typedef struct _sequence_
 { 
   fts_object_t o;
-
-  int persistence;
-
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
-
   int open; /* flag: is 1 if sequence editor is open */
   track_t *last_track; /* last created track */
 } sequence_t;

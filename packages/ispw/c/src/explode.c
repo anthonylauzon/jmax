@@ -1008,15 +1008,19 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->data.evt = 0;
 
   if (name)
+  {
     if (register_explode(this, name))
       this->data.name = name;
     else
-      {
-	fts_post("explode: %s: named already exists\n", name);
-	this->data.name = 0;
-      }
+    {
+      fts_post("explode: %s: named already exists\n", name);
+      this->data.name = 0;
+    }
+  }
   else
     this->data.name = 0;
+  
+  fts_object_set_persistence(o, 1);
 }
 
 static void
@@ -1091,7 +1095,7 @@ explode_append_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 
 static void
-explode_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -1388,7 +1392,7 @@ explode_instantiate(fts_class_t *cl)
   
   /*fts_class_message_varargs(cl, fts_s_upload, explode_upload);*/
   /*fts_class_message_varargs(cl, fts_s_append, explode_append_event);*/
-  fts_class_message_varargs(cl, fts_s_dump, explode_dump);
+  fts_class_message_varargs(cl, fts_s_dump_state, explode_dump_state);
   fts_class_message_varargs(cl, fts_s_save_dotpat, explode_save_dotpat); 
 
   /* graphical editor */

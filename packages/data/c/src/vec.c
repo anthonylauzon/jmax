@@ -204,24 +204,6 @@ vec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_dumper_message_send(dumper, mess);
 }
 
-static void 
-vec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(data_object_is_persistent(o))
-    {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
-      vec_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
 /********************************************************
  *
  *  files
@@ -401,30 +383,24 @@ static void
 vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-
-  data_object_init(o);
-
+  
   if(ac == 0)
     mat_set_size((mat_t *)this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
     mat_set_size((mat_t *)this, fts_get_int(at), 1);
   else if(ac == 1 && fts_is_tuple(at))
-    {
-      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-      int size = fts_tuple_get_size(tup);
-      
-      mat_set_size((mat_t *)this, size, 1);
-      vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-
-      data_object_persistence_args(o);
-    }
+  {
+    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
+    int size = fts_tuple_get_size(tup);
+    
+    mat_set_size((mat_t *)this, size, 1);
+    vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
+  }
   else if(ac > 1)
-    {
-      mat_set_size((mat_t *)this, ac, 1);
-      vec_set_with_onset_from_atoms(this, 0, ac, at);
-
-      data_object_persistence_args(o);
-    }
+  {
+    mat_set_size((mat_t *)this, ac, 1);
+    vec_set_with_onset_from_atoms(this, 0, ac, at);
+  }
   else
     fts_object_error(o, "bad arguments");
 }
@@ -443,11 +419,9 @@ vec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vec_t), vec_init, vec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, vec_dump);
 
   fts_class_set_equals_function(cl, vec_equals);
 

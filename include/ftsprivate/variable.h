@@ -29,6 +29,7 @@ struct fts_definition
 {
   fts_symbol_t name;
   fts_atom_t value;
+  struct fts_definition *global;
   fts_definition_listener_t *listeners;
 };
 
@@ -36,6 +37,8 @@ struct fts_definition
 
 #define fts_definition_get_value(d) (&(d)->value)
 #define fts_definition_set_value(d, x) ((d)->value = (*x))
+
+#define fts_definition_is_global(d) ((d)->global != NULL)
 
 #define fts_definition_get_listeners(d) (&(d)->listeners)
 extern void fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj);
@@ -46,5 +49,9 @@ extern fts_definition_t *fts_definition_get(fts_patcher_t *patcher, fts_symbol_t
 
 /* set value and call listeners */
 extern void fts_definition_update(fts_definition_t *def, const fts_atom_t *a);
+
+/* set scope */
+extern void fts_definition_set_global(fts_definition_t *def);
+extern void fts_definition_set_local(fts_definition_t *def);
 
 #endif

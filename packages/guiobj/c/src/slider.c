@@ -52,11 +52,6 @@ slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   fts_set_int(&a, self->max);
   fts_object_update_gui_property(o, sym_setMaxValue, &a);
-
-  fts_set_int(&a, self->persistence);
-  fts_object_update_gui_property(o, fts_s_persistence, &a);
-
-  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 static void
@@ -200,30 +195,6 @@ slider_set_orientation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   self->orientation = fts_get_number_int(at);
 }
 
-static void
-slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  slider_t *self = (slider_t *)o;
-
-  if(ac > 0)
-    {
-      /* set persistence flag (if its not set to args) */
-      if(fts_is_number(at))
-	{
-	  self->persistence = (fts_get_number_int(at) != 0);
-	  fts_object_update_gui_property(o, fts_s_persistence, at);
-	}
-    }
-  else
-    {
-      /* return persistence flag */
-      fts_atom_t a;
-
-      fts_set_int(&a, self->persistence);
-      fts_return(&a);
-    }
-}
-
 static void 
 slider_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -271,7 +242,7 @@ slider_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-slider_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t * self = (slider_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -284,20 +255,10 @@ slider_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_dumper_send(dumper, fts_s_max_value, 1, &a);
 
   if(self->orientation != 0)
-    {
-      fts_set_int(&a, self->orientation);
-      fts_dumper_send(dumper, fts_s_orientation, 1, &a);
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-
-  if(self->persistence != 0)
-    {
-      slider_dump_state(o, 0, 0, ac, at);
-
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-    }
+  {
+    fts_set_int(&a, self->orientation);
+    fts_dumper_send(dumper, fts_s_orientation, 1, &a);
+  }
 }
 
 static void 
@@ -326,15 +287,16 @@ slider_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(slider_t), slider_init, NULL); 
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_update_gui, slider_update_gui); 
-  fts_class_message_varargs(cl, fts_s_update_real_time, slider_update_real_time);  
-
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence); 
+  
   fts_class_message_varargs(cl, fts_s_dump_state, slider_dump_state); 
+  fts_class_message_varargs(cl, fts_s_dump_gui, slider_dump_gui); 
+  
+  fts_class_message_varargs(cl, fts_s_update_gui, slider_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, slider_update_real_time);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, slider_set_from_instance);
-
-  fts_class_message_varargs(cl, fts_s_persistence, slider_persistence); 
-  fts_class_message_varargs(cl, fts_s_dump, slider_dump); 
 
   fts_class_message_varargs(cl, fts_s_save_dotpat, slider_save_dotpat); 
 

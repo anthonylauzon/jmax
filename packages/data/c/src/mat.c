@@ -617,24 +617,6 @@ mat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 }
 
-static void 
-mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(data_object_is_persistent(o))
-    {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
-      mat_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
 static void
 mat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -711,50 +693,46 @@ static void
 mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *self = (mat_t *) o;
-
-  data_object_init(o);
-
+  
   self->data = NULL;
   self->m = 0;
   self->n = 0;
   self->alloc = 0;
-
+  
   if (ac == 0)
-      mat_set_size(self, 0, 0);
+    mat_set_size(self, 0, 0);
   else if (ac == 1  &&  fts_is_int(at))
-      mat_set_size(self, fts_get_int(at), 1);
+    mat_set_size(self, fts_get_int(at), 1);
   else if (ac == 2  &&  fts_is_int(at)  && fts_is_int(at + 1))
-      mat_set_size(self, fts_get_int(at), fts_get_int(at + 1));
+    mat_set_size(self, fts_get_int(at), fts_get_int(at + 1));
   else if (fts_is_tuple(at))
   {
-      int m = 0;
-      int n = 0;
-      int i;
-      
-      /* check n (longest row) and m */
-      for (i = 0; i < ac; i++)
+    int m = 0;
+    int n = 0;
+    int i;
+    
+    /* check n (longest row) and m */
+    for (i = 0; i < ac; i++)
+    {
+      if (fts_is_tuple(at + i))
       {
-	  if (fts_is_tuple(at + i))
-	  {
 	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
 	      int size = fts_tuple_get_size(tup);
 	      
 	      if(size > n)
-		n = size;
+          n = size;
 	      
 	      m++;
-	  }
-	  else
-	      break;
       }
-      
-      mat_set_size(self, m, n);
-      mat_set_from_tuples(self, ac, at);
-
-      data_object_persistence_args(o);
+      else
+	      break;
+    }
+    
+    mat_set_size(self, m, n);
+    mat_set_from_tuples(self, ac, at);
   }
   else
-      fts_object_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void
@@ -772,11 +750,9 @@ mat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mat_t), mat_init, mat_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, mat_dump);
 
   fts_class_message_varargs(cl, fts_s_post, mat_post); 
   fts_class_message_varargs(cl, fts_s_print, mat_print); 

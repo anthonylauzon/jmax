@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <fts/packages/data/data.h>
 #include <fts/packages/sequence/sequence.h>
 #include "seqmidi.h"
 #include "seqmess.h"
@@ -335,7 +336,7 @@ track_add_event_and_upload(track_t *track, double time, event_t *event)
       fts_array_destroy(&temp_array);
     }
 
-  track_set_dirty( track);
+  fts_object_set_state_dirty((fts_object_t *)track);
 }
 
 void
@@ -371,7 +372,7 @@ track_remove_event_and_upload(track_t *track, event_t *event)
 
   track_remove_event(track, event);
 
-  track_set_dirty(track);
+  fts_object_set_state_dirty((fts_object_t *)track);
 }
 
 void
@@ -470,7 +471,7 @@ track_copy(track_t *org, track_t *copy)
     event = (event_t *)fts_object_create(event_class, 1, &a);
     track_append_event(copy, time, event);
   
-    event = event_get_next(event);;
+    event = event_get_next(event);
   }
 }
 
@@ -700,7 +701,7 @@ track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   track_clear(this);
 
-  track_set_dirty( this);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -972,41 +973,6 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-track_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-
-  if(ac > 0 && fts_is_symbol(at))
-    this->name = fts_get_symbol(at);
-
-  fts_name_set_method(o, 0, NULL, ac, at);
-}
-
-static void
-track_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-
-  if(ac > 0)
-  {
-    /* set persistence flag */
-    if(fts_is_number(at) && this->persistence >= 0)
-    {
-      this->persistence = (fts_get_number_int(at) != 0);
-	    fts_object_update_gui_property(o, fts_s_persistence, at);
-    }
-  }
-  else
-  {
-    /* return persistence flag */
-    fts_atom_t a;
-
-    fts_set_int(&a, this->persistence);
-    fts_return(&a);
-  }
-}
-
-static void
 track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -1018,11 +984,6 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_client_send_message(o, fts_s_type, 1, &a);
   }
 
-  fts_set_int(&a, (this->persistence > 0));
-  fts_object_update_gui_property(o, fts_s_persistence, &a);
-	
-  fts_name_gui_method(o, 0, 0, 0, 0);
-	
 	track_upload_editor_state(this);
 }
 
@@ -1073,7 +1034,6 @@ track_editor_state_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 		fts_symbol_t label = fts_get_symbol(at+4);
 		float zoom = fts_get_float(at+5);
 		int transp = fts_get_int(at+6);
-		int dirty = 0;
 		
 		if(this->ed_state->win_x != wx || 
 			 this->ed_state->win_y != wy || 
@@ -1091,7 +1051,7 @@ track_editor_state_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 			this->ed_state->zoom = zoom;
 			this->ed_state->transp = transp;
 		
-			track_set_dirty( this);
+      fts_object_set_dirty(o);
 		}
 	}
 }
@@ -1101,37 +1061,6 @@ track_editor_state_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 *  client calls
 *
 */
-
-/* set name of track by client request */
-static void
-track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  fts_symbol_t name = fts_get_symbol(at);
-
-  /* check if name is in use in this sequence */
-  if(sequence_get_track_by_name(track_get_sequence(this), name))
-  {
-    fts_symbol_t old_name = track_get_name(this);
-
-    if(old_name)
-    {
-      fts_atom_t a[1];
-
-      fts_set_symbol(a, old_name);
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
-    }
-    else
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 0, 0);
-  }
-  else
-  {
-    track_set_name(this, name);
-    fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, at);
-  }
-
-  track_set_dirty( this);
-}
 
 /* create new event and upload by client request */
 static void
@@ -1160,7 +1089,7 @@ track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   if(event)
     track_add_event(this, time, event);
 
-  track_set_dirty( this);
+  fts_object_set_state_dirty(o);
 }
 
 /* delete event by client request */
@@ -1180,7 +1109,7 @@ track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
     track_remove_event(this, (event_t *)event);
   }
 
-  track_set_dirty( this);
+  fts_object_set_state_dirty(o);
 }
 
 
@@ -1201,7 +1130,7 @@ track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
 
   fts_client_send_message(o, seqsym_moveEvents, ac, at);
 
-  track_set_dirty( this);
+  fts_object_set_state_dirty(o);
 }
 
 /******************************************************
@@ -1351,16 +1280,6 @@ track_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
 }
 
-void
-track_set_dirty(track_t *track)
-{
-  if(track_get_sequence(track))
-    sequence_set_dirty(track_get_sequence(track));
-  else
-    if(track->persistence == 1)
-      fts_object_set_dirty((fts_object_t *)track);
-}
-
 static void
 track_end_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1476,44 +1395,31 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-track_dump_editor_state(fts_dumper_t *dumper, track_t *this)
+track_dump_editor_state(fts_dumper_t *dumper, ed_state_t *state)
 {
-	/*save editor state*/
-	fts_atom_t a[7];
-	
-	if(this->ed_state->win_x != -1)
+	if(state->win_x != -1)
 	{
-		fts_set_int(a, this->ed_state->win_x);
-		fts_set_int(a+1, this->ed_state->win_y);
-		fts_set_int(a+2, this->ed_state->win_w);
-		fts_set_int(a+3, this->ed_state->win_h);
-		fts_set_symbol(a+4, this->ed_state->label);
-		fts_set_float(a+5, this->ed_state->zoom);
-		fts_set_int(a+6, this->ed_state->transp);
+    fts_atom_t a[7];
+    
+		fts_set_int(a, state->win_x);
+		fts_set_int(a+1, state->win_y);
+		fts_set_int(a+2, state->win_w);
+		fts_set_int(a+3, state->win_h);
+		fts_set_symbol(a+4, state->label);
+		fts_set_float(a+5, state->zoom);
+		fts_set_int(a+6, state->transp);
 		
 		fts_dumper_send(dumper, seqsym_editorState, 7, a);
 	}
 }
 
 static void
-track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+track_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-
-  if(this->persistence == 1)
-  {
-    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-    fts_atom_t a;
-
-    track_dump_state(o, 0, 0, ac, at);
-
-    /* save persistence flag */
-    fts_set_int(&a, 1);
-    fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-		
-		track_dump_editor_state(dumper, this);
-  }
-  fts_name_dump_method(o, 0, 0, ac, at);
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  
+  track_dump_editor_state(dumper, this->ed_state);
 }
 
 static void
@@ -1578,14 +1484,10 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   track_t *this = (track_t *)o;
 
-  this->persistence = 0;
-
   this->sequence = 0;
   this->next = 0;
 
-  this->name = 0;
   this->active = 1;
-
   this->open = 0;
 
   this->first = 0;
@@ -1636,10 +1538,14 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, track_name);
-  fts_class_message_varargs(cl, fts_s_persistence, track_persistence);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  
+  fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
+  fts_class_message_varargs(cl, fts_s_dump_gui, track_dump_gui);
+  
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
-  fts_class_message_varargs(cl, fts_s_dump, track_dump);
+
 	fts_class_message_varargs(cl, seqsym_editor_state, track_editor_state);
 	
   fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_file);
@@ -1656,7 +1562,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
   fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
 
-  fts_class_message_varargs(cl, seqsym_setName, track_set_name_by_client_request);
   fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_by_client_request);
   fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_by_client_request);
   fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_by_client_request);

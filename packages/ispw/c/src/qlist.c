@@ -275,6 +275,8 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 0, 0);
 
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
+  
+  fts_object_set_persistence(o, 1);
 }
 
 
@@ -305,7 +307,7 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-qlist_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -405,10 +407,10 @@ qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   qlist_t *this = (qlist_t *) o;
 
   if(qlist_editor_is_open(this))
-    {
-      qlist_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
-    }
+  {
+    qlist_set_editor_close(this);
+    fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
+  }
 }
 
 static void
@@ -417,7 +419,7 @@ qlist_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(qlist_t), qlist_init, qlist_delete);
 
   fts_class_message_varargs(cl, fts_s_upload, qlist_upload);
-  fts_class_message_varargs(cl, fts_s_dump, qlist_dump);
+  fts_class_message_varargs(cl, fts_s_dump_state, qlist_dump_state);
   fts_class_message_varargs(cl, fts_s_save_dotpat, qlist_save_dotpat); 
 
   fts_class_message_varargs(cl, fts_s_openEditor, qlist_open_editor);

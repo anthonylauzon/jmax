@@ -386,10 +386,7 @@ static void fts_udpstream_instantiate(fts_class_t* cl)
   fts_bytestream_class_init(cl);
 
   /* name support */
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
-
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name); 
   fts_class_message_varargs(cl, fts_s_sched_ready, fts_udpstream_receive);
 }
 

@@ -279,7 +279,7 @@ define_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-define_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   define_t *self = (define_t *) o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -362,7 +362,7 @@ define_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
 
-  fts_class_message_varargs(cl, fts_s_dump, define_dump);
+  fts_class_message_varargs(cl, fts_s_dump, define_dump_gui);
   fts_class_message_varargs(cl, fts_s_name, define_name);
 
   fts_class_message_varargs(cl, fts_s_type, define_type);

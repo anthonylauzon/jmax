@@ -490,7 +490,7 @@ fix_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   else
     obj = fts_eval_object_description(patcher, ac, at);
 
-  /* fix persistence (keep = yes) */
+  /* fix name */
   if(name != NULL)
     {
       fts_atom_t s;
@@ -1713,12 +1713,35 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
     fts_bmax_code_pop_args(f, 1);
   else
     fts_bmax_code_pop_args(f, fts_object_get_description_size(obj));
+  
+  /* save name and scope of named objects */
+  if(fts_patcher_object_get_name(obj) != fts_s_empty_string)
+  {
+    int global = fts_patcher_object_is_global(obj);
+    
+    if(global)
+      fts_bmax_code_push_int(f, 1);
+    
+    fts_bmax_code_push_symbol(f, fts_patcher_object_get_name(obj));
+      
+    fts_bmax_code_obj_mess(f, fts_s_name, 1 + global);
+    fts_bmax_code_pop_args(f, 1 + global);
+  }  
 
-  /* send a dump message to the object to give it the opportunity to save its data */
+  /* send a dump messages to the object to give it the opportunity to save its data */
   fts_set_object(&a, (fts_object_t *)saver_dumper);
-  fts_send_message_varargs(obj, fts_s_dump, 1, &a);
-}
+  
+  fts_send_message_varargs(obj, fts_s_dump_gui, 1, &a);
+  
+  if(fts_patcher_object_is_persistent(obj))
+  {
+    fts_send_message_varargs(obj, fts_s_dump_state, 1, &a);
 
+    fts_bmax_code_push_int(f, 1);    
+    fts_bmax_code_obj_mess(f, fts_s_persistence, 1);
+    fts_bmax_code_pop_args(f, 1);
+  }
+}
 
 /* Code the top level patcher object instantiation and properties */
 static void
@@ -1814,63 +1837,63 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
   fts_patcher_t *patcher = (fts_patcher_t *) obj;
   fts_object_t *p;
   int i;
-
+  
   fts_patcher_set_save_id(patcher, idx);
-
+  
   /* First generate the code to push the patcher in the top of the stack,
-     asking for the top_level special code (template argument fetch and
-     patcher object instead of 
-     (no effect for not a template or no args).
-     */
+    asking for the top_level special code (template argument fetch and
+                                           patcher object instead of 
+                                           (no effect for not a template or no args).
+                                           */
   if (idx == BMAX_TOP_LEVEL_PATCHER)
     fts_bmax_code_new_top_object(f, obj, idx);
   else
     fts_bmax_code_new_object(f, obj, idx);
-    
+  
   /* save messages to patcher here (before the objets) */
-
+  
   /* Allocate a new object table frame of the right dimension */
   fts_bmax_code_push_obj_table(f, fts_patcher_get_objects_count(patcher));
-
+  
   /* Code all the objects */
   i = 0;
   for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
+  {
+    if (fts_object_is_patcher(p) &&
+        (! fts_object_is_abstraction(p)) &&
+        (! fts_object_is_template(p)))
     {
-      if (fts_object_is_patcher(p) &&
-	  (! fts_object_is_abstraction(p)) &&
-	  (! fts_object_is_template(p)))
-	{
-	  /* Save the object recursively as a patcher, and then pop it from the stack */
-	  fts_bmax_code_new_patcher(f, p, i);
-	  fts_bmax_code_pop_objs(f, 1);
-	}
-      else
-	{
-	  /* Code a new object and pop it from the object stack */
-	  fts_bmax_code_new_object(f, p, i);
-	  fts_bmax_code_pop_objs(f, 1);
-	}
-
-      i++;
+      /* Save the object recursively as a patcher, and then pop it from the stack */
+      fts_bmax_code_new_patcher(f, p, i);
+      fts_bmax_code_pop_objs(f, 1);
     }
-
+    else
+    {
+      /* Code a new object and pop it from the object stack */
+      fts_bmax_code_new_object(f, p, i);
+      fts_bmax_code_pop_objs(f, 1);
+    }
+    
+    i++;
+  }
+  
   /* For each object, for each outlet, code all the connections */
   i = 0;
   for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
+  {
+    int outlet;
+    
+    for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
     {
-      int outlet;
-
-      for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
-	{
-	  fts_connection_t *c;
-
-	  for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
-	    fts_bmax_code_new_connection(f, c, i);
-	}
-
-      i++;
+      fts_connection_t *c;
+      
+      for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
+        fts_bmax_code_new_connection(f, c, i);
     }
-
+    
+    i++;
+  }
+  
   /* Finally, pop the object table */
   fts_bmax_code_pop_obj_table(f);
 }

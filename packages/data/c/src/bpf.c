@@ -278,42 +278,42 @@ static void
 bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-
+  
   if(ac)
   {
     double onset_time = bpf_get_duration(this);
     double time = 0.0;
     double value = 0.0;
     int i;
-      
+    
     if(ac & 1)
     {
       if(fts_is_number(at))
-	value = fts_get_number_float(at);
-	  
+        value = fts_get_number_float(at);
+      
       bpf_append_point(this, onset_time, value);
-	  
+      
       /* skip first value */
       ac--;
       at++;
     }
-      
+    
     for(i=0; i<ac; i+=2)
     {
       if(fts_is_number(at + i))
-	time = onset_time + fts_get_number_float(at + i);
+        time = onset_time + fts_get_number_float(at + i);
       else
-	time = onset_time;
-	  
+        time = onset_time;
+      
       if(fts_is_number(at + i + 1))
-	value = fts_get_number_float(at + i + 1);
+        value = fts_get_number_float(at + i + 1);
       else
-	value = 0.0;
-	  
+        value = 0.0;
+      
       bpf_append_point(this, time, value);
     }      
-
-    data_object_set_dirty(o);
+    
+    fts_object_set_state_dirty(o);
   }
 }
 
@@ -367,7 +367,7 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   if(bpf_editor_is_open(this))
     bpf_set_client(this);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -383,7 +383,7 @@ bpf_set_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(bpf_editor_is_open(this))
     bpf_set_client(this);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -542,7 +542,7 @@ bpf_change_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if(bpf_editor_is_open(this))
     bpf_set_client(this);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 /************************************************************
@@ -561,7 +561,7 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   bpf_insert_point(this, time, value);
   fts_client_send_message(o, sym_addPoint, ac, at);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -574,7 +574,7 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   bpf_remove_points(this, index, size);
   fts_client_send_message(o, sym_removePoints, ac, at);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -595,7 +595,7 @@ bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
   
   fts_client_send_message(o, sym_setPoints, ac, at);
 
-  data_object_set_dirty(o);
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -668,25 +668,6 @@ bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dumper_message_send(dumper, mess);
 }
   
-static void
-bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  
-  if(data_object_is_persistent(o))
-  {
-    fts_atom_t a;
-
-    bpf_dump_state(o, 0, 0, ac, at);
-
-    /* save persistence flag */
-    fts_set_int(&a, 1);
-    fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-  }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
 /************************************************************
  *
  *  class
@@ -723,19 +704,13 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   bpf_t *this = (bpf_t *)o;
 
-  data_object_init(o);
-
   this->points = 0;
   this->alloc = 0;
   this->size = 0;
   this->opened = 0;
 
   if(ac > 0)
-  {
     bpf_set(o, 0, 0, ac, at);
-
-    data_object_persistence_args(o);
-  }
   else
   {
     set_size(this, 1);
@@ -762,11 +737,9 @@ bpf_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bpf_t), bpf_init, bpf_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, bpf_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, bpf_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);
 

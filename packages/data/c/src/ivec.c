@@ -349,7 +349,7 @@ ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if( this->editor)
     tabeditor_send( (tabeditor_t *)this->editor);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -369,7 +369,7 @@ ivec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  if( this->editor)
 	    tabeditor_insert_append( (tabeditor_t *)this->editor, onset, ac, at);
 	
-	  data_object_set_dirty( o);
+	  fts_object_set_state_dirty( o);
 	}
     }
 }
@@ -390,7 +390,7 @@ ivec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       ptr[j] = f;
     }
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static int 
@@ -410,7 +410,7 @@ ivec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   qsort((void *)ptr, ivec_get_size(this), sizeof(int), ivec_element_compare);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -433,7 +433,7 @@ ivec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       range -= 1.0;
     }
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -516,7 +516,7 @@ ivec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	    }
 	}
 
-      data_object_set_dirty( o);
+      fts_object_set_state_dirty( o);
     }
 }
 
@@ -584,7 +584,7 @@ ivec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       if( this->editor)
 	{
 	  fts_client_send_message( this->editor, fts_s_size, ac, at);
-	  data_object_set_dirty( o);
+	  fts_object_set_state_dirty( o);
 	}
     }
 }
@@ -611,7 +611,7 @@ ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       if(size <= 0)
 	fts_post("ivec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
       else
-	data_object_set_dirty( o);
+	fts_object_set_state_dirty( o);
    }
   else
     fts_post("ivec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -722,7 +722,7 @@ ivec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   ivec_copy(set, this);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -759,24 +759,6 @@ ivec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   if(fts_message_get_ac(mess) > 1) 
     fts_dumper_message_send(dumper, mess);
-}
-
-static void 
-ivec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(data_object_is_persistent(o))
-    {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
-      ivec_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
@@ -830,38 +812,32 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ivec_t *this = (ivec_t *)o;
   
-  data_object_init(o);
-
   this->values = 0;
   this->size = 0;
   this->alloc = 0;
-
+  
   this->editor = 0;
-
+  
   if(ac == 0)
     ivec_set_size(this, 0);
   else if(ac == 1 && fts_is_int(at))
-    {
-      ivec_set_size(this, fts_get_int(at));
-      ivec_set_const(this, 0);
-    }
+  {
+    ivec_set_size(this, fts_get_int(at));
+    ivec_set_const(this, 0);
+  }
   else if(ac == 1 && fts_is_tuple(at))
-    {
-      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-      int size = fts_tuple_get_size(tup);
-
-      ivec_set_size(this, size);
-      ivec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-
-      data_object_persistence_args(o);
-    }
+  {
+    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
+    int size = fts_tuple_get_size(tup);
+    
+    ivec_set_size(this, size);
+    ivec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
+  }
   else if(ac > 1)
-    {
-      ivec_set_size(this, ac);
-      ivec_set_with_onset_from_atoms(this, 0, ac, at);
-
-      data_object_persistence_args(o);
-    }
+  {
+    ivec_set_size(this, ac);
+    ivec_set_with_onset_from_atoms(this, 0, ac, at);
+  }
   else
     fts_object_error(o, "bad arguments for ivec constructor");
 }
@@ -888,11 +864,9 @@ ivec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, ivec_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, ivec_dump);
 
   /* graphical editor */
   fts_class_message_varargs(cl, fts_s_openEditor, ivec_open_editor);

@@ -20,6 +20,7 @@
  *
  */
 
+#include <fts/fts.h>
 #include <fts/packages/data/data.h>
 
 extern void vec_config(void);
@@ -37,59 +38,6 @@ extern void tabeditor_config(void);
 extern void getrange_config(void);
 
 extern void dumpfile_config(void);
-
-void 
-data_object_init(fts_object_t *o)
-{
-  data_object_t *this = (data_object_t *)o;
-  
-  this->persistence = data_object_persistence_no;
-}
-
-void 
-data_object_set_dirty(fts_object_t *o)
-{
-  if(data_object_is_persistent(o))
-    fts_object_set_dirty(o);
-}
-
-void
-data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  data_object_t *this = (data_object_t *)o;
-
-  if(ac > 0)
-    {
-      /* set persistence flag (if its not set to args) */
-      if(fts_is_number(at) && this->persistence > data_object_persistence_args)
-	{
-	  this->persistence = (fts_get_number_int(at) != 0);
-	  fts_object_update_gui_property(o, fts_s_persistence, at);
-	  
-	  fts_object_set_dirty(o);
-	}
-    }
-  else
-    {
-      /* return persistence flag */
-      fts_atom_t a;
-
-      fts_set_int(&a, this->persistence);
-      fts_return(&a);
-    }
-}
-
-void
-data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  data_object_t *this = (data_object_t *)o;
-  fts_atom_t a;
-
-  fts_set_int(&a, (this->persistence > data_object_persistence_no));
-  fts_object_update_gui_property(o, fts_s_persistence, &a);
-
-  fts_name_gui_method(o, 0, 0, 0, 0);
-}
 
 void
 data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -116,5 +64,3 @@ data_config(void)
 
   dumpfile_config();
 }
-
-

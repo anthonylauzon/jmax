@@ -111,7 +111,7 @@ comment_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-comment_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   comment_t * this = (comment_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -169,7 +169,7 @@ comment_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( comment_t), comment_init, NULL);
 
-  fts_class_message_varargs(cl, fts_s_dump, comment_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, comment_dump_gui);
 
   fts_class_message_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
   fts_class_message_varargs(cl, fts_s_update_gui, comment_update_gui); 

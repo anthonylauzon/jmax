@@ -85,11 +85,6 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_object_destroy(fts_object_t *obj)
 {
-  fts_object_remove_patcher_data(obj);
-
-  /* unregister name */
-  fts_object_remove_name(obj);
-
   /* call deconstructor */
   if(fts_class_get_deconstructor(fts_object_get_class(obj)))
     fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
@@ -101,81 +96,6 @@ fts_object_destroy(fts_object_t *obj)
   fts_object_free(obj);
 }
 
-/*********************************************************************************
-*
-*  object name
-*
-*/
-void
-fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
-{
-  fts_patcher_t *patcher = fts_object_get_patcher(obj);
-  fts_atom_t a;
-  if(patcher != NULL)
-  {
-    /* reset current definition */
-    if(fts_object_get_definition(obj) != NULL)
-      fts_definition_update(fts_object_get_definition(obj), fts_null);
-
-    if(sym != fts_s_empty_string && sym != fts_s_none)
-    {
-      fts_patcher_t *scope = fts_patcher_get_scope(patcher);
-      fts_symbol_t name = fts_name_get_unused(scope, sym);
-      fts_definition_t *def = fts_definition_get(scope, name);
-      
-      /* set new definiton */
-      fts_set_object(&a, obj);
-      fts_definition_update(def, &a);
-
-      /* store definition in object */
-      fts_object_set_definition(obj, def);
-
-      /* set name of object */
-	  fts_set_symbol(&a, name);
-	  fts_object_update_gui_property(obj, fts_s_name, &a);
-    }
-    else 
-    {
-		/* we cleared the name since we have an empty string */
-		fts_object_remove_name(obj);
-	
-		fts_set_symbol(&a, fts_s_empty_string);
-		fts_object_update_gui_property(obj, fts_s_name, &a);
-    }
-  }
-}
-
-void
-fts_object_update_name(fts_object_t *obj)
-{
-  fts_definition_t *def = fts_object_get_definition(obj);
-
-  if(def)
-    fts_definition_update(def, &def->value);
-}
-
-fts_symbol_t
-fts_object_get_name(fts_object_t *obj)
-{
-  fts_definition_t *def = fts_object_get_definition(obj);
-
-  if(def)
-    return fts_definition_get_name(def);
-
-  return fts_s_empty_string;
-}
-
-void
-fts_object_remove_name(fts_object_t *obj)
-{
-  /* remove definition of named object */
-  if(obj->definition != NULL)
-  {
-    fts_definition_update(obj->definition, fts_null);
-    obj->definition = NULL;
-  }
-}
-
 /*****************************************************************************
 *
 *  client
@@ -185,16 +105,16 @@ fts_object_remove_name(fts_object_t *obj)
 void
 fts_object_upload(fts_object_t *obj)
 {
-  fts_object_t *parent = (fts_object_t *)fts_object_get_patcher(obj);
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
 
-  if(parent != NULL)
+  if(container != NULL)
   {
     fts_atom_t a;
 
     fts_client_register_object(obj, -1);
 
     fts_set_object(&a, obj);
-    fts_send_message(parent, fts_s_upload_child, 1, &a);
+    fts_send_message(container, fts_s_member_upload, 1, &a);
   }
 }
 
@@ -206,4 +126,95 @@ fts_object_reset_client(fts_object_t *obj)
     fts_send_message(obj, fts_s_closeEditor, 0, 0);
     fts_client_release_object(obj);
   }
+}
+
+/*****************************************************************************
+*
+*  container
+*
+*/
+
+void
+fts_object_set_name(fts_object_t *obj, fts_symbol_t name)
+{
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
+  
+  if(container != NULL)
+  {
+    fts_atom_t a[2];
+    
+    fts_set_object(a, obj);
+    fts_set_symbol(a + 1, name);
+    fts_send_message(container, fts_s_member_name, 2, a);
+  }
+}
+
+void
+fts_object_set_persistence(fts_object_t *obj, int persistence)
+{
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
+  
+  if(container != NULL)
+  {
+    fts_atom_t a[2];
+    
+    fts_set_object(a, obj);
+    fts_set_int(a + 1, persistence);
+    fts_send_message(container, fts_s_member_persistence, 2, a);
+  }
+}
+
+void
+fts_object_set_dirty(fts_object_t *obj)
+{
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
+  
+  if(container != NULL)
+  {
+    fts_atom_t a;
+    
+    fts_set_object(&a, obj);
+    fts_send_message(container, fts_s_member_dirty, 1, &a);
+  }
+}
+
+void
+fts_object_set_state_dirty(fts_object_t *obj)
+{
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(obj);
+  
+  if(container != NULL)
+  {
+    fts_atom_t a[2];
+    
+    fts_set_object(a, obj);
+    fts_set_symbol(a + 1, fts_s_state);
+    fts_send_message(container, fts_s_member_dirty, 2, a);
+  }
+}
+
+void
+fts_object_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_t *container = (fts_object_t *)fts_object_get_container(o);
+  
+  if(container != NULL && ac > 0 && fts_is_symbol(at))
+  {
+    fts_atom_t a[3];
+    
+    fts_set_object(a, o);
+    a[1] = at[0];
+      
+    if(ac > 1)
+      a[2] = at[1];
+
+    fts_send_message(container, fts_s_member_name, 2 + (ac > 1), a);
+  }
+}
+
+void
+fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(ac > 0 && fts_is_number(at))
+    fts_object_set_persistence(o, fts_get_number_int(at));
 }

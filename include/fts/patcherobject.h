@@ -30,6 +30,10 @@ typedef struct plist_cell {
 } fts_plist_cell_t;
 
 typedef struct fts_object_patcher_data {
+  /* patcher housekeeping */
+  fts_patcher_t *patcher;
+  fts_object_t *next_in_patcher;
+  
   /* the object description */
   int argc;
   fts_atom_t *argv;
@@ -37,25 +41,25 @@ typedef struct fts_object_patcher_data {
   /* names refered by the object */
   fts_list_t *name_refs;
 
-  /* patcher housekeeping */
-  fts_patcher_t *patcher;
-  fts_object_t *next_in_patcher;
-
   /* connections */
   int n_inlets;
   int n_outlets;
   fts_connection_t **in_conn;
   fts_connection_t **out_conn;
 
+  /* name definition */
+  fts_definition_t *definition;
+  
+  /* persistence flag */
+  int persistence;
+  
   /* properties */
   fts_plist_cell_t *properties;
   
 } fts_object_patcher_data_t;
 
-FTS_API void fts_object_set_dirty(fts_object_t *o);
-
 /**
-* Evaluate an object description.
+ * Evaluate an object description.
  * An object description is supposed to begin with a class name followed
  * by the object constructor arguments.
  * fts_eval_object_description evaluates all the arguments using the
@@ -71,26 +75,26 @@ FTS_API void fts_object_set_dirty(fts_object_t *o);
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /* object description (system functions) */
-#define fts_object_get_description_size(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->argc): 0)
-#define fts_object_get_description_atoms(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->argv): NULL)
+#define fts_object_get_description_size(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->argc): 0)
+#define fts_object_get_description_atoms(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->argv): NULL)
 FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
 
 /* inlets and outlets */
-#define fts_object_get_outlets_number(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->n_outlets): 0)
-#define fts_object_get_inlets_number(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->n_inlets): 0)
+#define fts_object_get_outlets_number(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->n_outlets): 0)
+#define fts_object_get_inlets_number(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->n_inlets): 0)
 FTS_API void fts_object_set_outlets_number(fts_object_t *o, int n);
 FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
 
 /* object in patcher */
-#define fts_object_get_patcher(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->patcher): NULL)
+#define fts_object_get_patcher(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->patcher): NULL)
 FTS_API void fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher);
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
 /* inlets and outlets */
-#define fts_object_inlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->in_conn[(i)] != 0): 0)
-#define fts_object_outlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->out_conn[(i)] != 0): 0)
+#define fts_object_inlet_is_connected(o, i) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->in_conn[(i)] != 0): 0)
+#define fts_object_outlet_is_connected(o, i) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->out_conn[(i)] != 0): 0)
 
 /* open/save Dialog */
 FTS_API void fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t path, fts_symbol_t default_name);

@@ -177,11 +177,11 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-table_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
   
-  fts_send_message_varargs((fts_object_t *)this->vec, fts_s_dump, ac, at);
+  fts_send_message_varargs((fts_object_t *)this->vec, fts_s_dump_state, ac, at);
 }
 
 static int 
@@ -277,50 +277,49 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   table_t *this = (table_t *)o;
   fts_atom_t a;
   int size = FTS_TABLE_DEFAULT_SIZE;
-
+  
   this->name = NULL;
   this->vec = NULL;
-
+  
   if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_object_t *obj = ispw_get_object_by_name(name);
+    
+    if(ac > 1 && fts_is_number(at + 1)) 
+      size = fts_get_number_int(at + 1);
+    
+    this->name = name;
+    
+    if(obj)
     {
-      fts_symbol_t name = fts_get_symbol(at);
-      fts_object_t *obj = ispw_get_object_by_name(name);
-
-      if(ac > 1 && fts_is_number(at + 1)) 
-	size = fts_get_number_int(at + 1);
-      
-      this->name = name;
-
-      if(obj)
-	{
-	  if(fts_object_get_class_name(obj) == ivec_symbol)
+      if(fts_object_get_class_name(obj) == ivec_symbol)
 	    {
 	      /* refer to existing vector */
 	      fts_object_refer(obj);
 	      
 	      if(size > ivec_get_size((ivec_t *)obj))
-		ivec_set_size(this->vec, size);
+          ivec_set_size(this->vec, size);
 	      
 	      this->vec = (ivec_t *)obj;
 	    }
-	  else
-	    fts_object_error(o, "object %s is not a table", name);
-
-	  return;
-	}
+      else
+        fts_object_error(o, "object %s is not a table", name);
+      
+      return;
     }
+  }
   else if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
   
   /* create and register new vector */
   this->vec = (ivec_t *)fts_object_create(ivec_type, 0, 0);
   fts_object_refer(this->vec);
-
+  
   ivec_set_size(this->vec, size);
-
-  fts_set_int(&a, 1);
-  data_object_persistence((fts_object_t *)this->vec, 0, 0, 1, &a);
-
+  
+  fts_object_set_persistence((fts_object_t *)this->vec, 1);
+  
   if(this->name != NULL)
     ispw_register_named_object((fts_object_t *)this->vec, this->name);
 }
@@ -343,7 +342,7 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a;
 
   fts_set_object(&a, (fts_object_t *)this->vec);
-  fts_send_message_varargs( (fts_object_t *)fts_object_get_patcher(o), fts_s_upload_child, 1, &a);  
+  fts_send_message_varargs( (fts_object_t *)fts_object_get_patcher(o), fts_s_member_upload, 1, &a);  
 
   fts_send_message_varargs((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
 }
@@ -355,7 +354,7 @@ table_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_openEditor, table_open_editor);
   
-  fts_class_message_varargs(cl, fts_s_dump, table_dump);  
+  fts_class_message_varargs(cl, fts_s_dump_state, table_dump_state);  
   fts_class_message_varargs(cl, fts_s_save_dotpat, table_save_dotpat); 
   
   fts_class_message_varargs(cl, fts_s_set, table_set_with_onset_from_atoms);

@@ -209,9 +209,7 @@ udpin_instantiate(fts_class_t* cl)
   fts_class_init(cl, sizeof(udp_t), udpin_init, udpin_delete);
 
   /* name support */
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name); 
 }
 
 static void
@@ -225,9 +223,7 @@ udpout_instantiate(fts_class_t* cl)
   fts_class_inlet_bang(cl, 0, udpout_bang);   
 
   /* name support */
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name); 
 }
 
 

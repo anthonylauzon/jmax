@@ -57,6 +57,7 @@ fts_definition_new(fts_symbol_t name)
   def->name = name;
   fts_set_void(&def->value);
   def->listeners = NULL;
+  def->global = NULL;
 
   return def;
 }
@@ -97,9 +98,9 @@ fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj)
   fts_definition_listener_t *l;
 
   /* make sure that we don't add the same listener twice */
-  for(l = def->listeners; l != NULL; l = l->next)
+  for(l=def->listeners; l!=NULL; l=l->next)
   {
-    if (l->object == obj)
+    if(l->object == obj)
       return;
   }
 
@@ -160,15 +161,57 @@ fts_definition_update(fts_definition_t *def, const fts_atom_t *value)
 {
   fts_definition_set_value(def, value);
   definition_recompute_listeners(def);
+
+  if(def->global != NULL)
+  {
+    fts_definition_set_value(def->global, value);
+    definition_recompute_listeners(def->global);
+    
+    /* undefined names are always local */
+    if(fts_is_void(value))
+      def->global = NULL;
+  }
+}
+
+void
+fts_definition_set_global(fts_definition_t *def)
+{
+  if(!fts_is_void(&def->value) && def->global == NULL)
+  {
+    fts_definition_t *global = fts_definition_get(fts_get_root_patcher(), def->name);
+    fts_atom_t *value = fts_definition_get_value(global);
+    
+    if(fts_is_void(value))
+    {
+      /* set global definition to local value */
+      fts_definition_update(global, fts_definition_get_value(def));
+      
+      /* set global (cash global definiton) */
+      def->global = global;
+    }
+  }
+}
+
+void
+fts_definition_set_local(fts_definition_t *def)
+{
+  fts_definition_t *global = def->global;
+
+  if(def->global != NULL)
+  {
+    /* reset value of global definition */
+    fts_definition_update(global, fts_null);
+    
+    /* set local */
+    def->global = NULL;
+  }
 }
 
 /*************************************************************
  *
  *  names (high level API)
  *
- *
  */
-/* fts_patcher_definition_set_value() */
 void
 fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value)
 {
@@ -179,7 +222,6 @@ fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *
     fts_definition_update(def, value);
 }
 
-/* fts_patcher_definition_add_listener() */
 void
 fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj)
 {
@@ -187,10 +229,17 @@ fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *o
   fts_definition_t *def = fts_definition_get(scope, name);
 
   fts_definition_add_listener(def, obj);
-  fts_object_add_binding(obj, def);
+  fts_patcher_object_add_binding(obj, def);
+  
+  if(fts_is_void(&def->value))
+  {
+    def = fts_definition_get(fts_get_root_patcher(), name);
+
+    fts_definition_add_listener(def, obj);
+    fts_patcher_object_add_binding(obj, def);
+  }
 }
 
-/* fts_patcher_definition_remove_listener() */
 void
 fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj)
 {
@@ -198,6 +247,13 @@ fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t
   fts_definition_t *def = fts_definition_get(scope, name);
 
   fts_definition_remove_listener(def, obj);
+
+  if(fts_is_void(&def->value))
+  {
+    def = fts_definition_get(fts_get_root_patcher(), name);
+    
+    fts_definition_remove_listener(def, obj);
+  }
 }
 
 fts_atom_t *
@@ -205,6 +261,10 @@ fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
+  
+  /* if there is no local value get the global */
+  if(fts_is_void(&def->value))
+    def = fts_definition_get(fts_get_root_patcher(), name);
 
   return &def->value;
 }
@@ -265,45 +325,11 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 }
 
 void
-fts_name_set_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac > 0 && fts_is_symbol(at) && fts_object_get_patcher(o) != NULL)
-  {
-    fts_object_set_name(o, fts_get_symbol(at));
-    fts_object_set_dirty(o);
-  }
-}
-
-void
-fts_name_dump_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_symbol_t name = fts_object_get_name(o);
-  fts_atom_t a;
-
-  if(name != fts_s_empty_string)
-  {
-    fts_set_symbol(&a, name);
-    fts_dumper_send(dumper, fts_s_name, 1, &a);
-  }
-}
-
-void
-fts_name_gui_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t a;
-
-  fts_set_symbol(&a, fts_object_get_name(o));
-  fts_object_update_gui_property(o, fts_s_name, &a);
-}
-
-void
 fts_kernel_variable_init(void)
 {
   definition_heap = fts_heap_new(sizeof(fts_definition_t));
   definition_listener_heap = fts_heap_new(sizeof(fts_definition_listener_t));
 }
-
 
 /** EMACS **
  * Local variables:

@@ -597,7 +597,7 @@ static void messbox_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   messbox_update(o);
 }
 
-static void messbox_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messbox_t *this = (messbox_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *) fts_get_object(at);
@@ -809,7 +809,7 @@ static void messbox_instantiate(fts_class_t *cl)
   /* atom list saving/loading/update support */
   fts_class_message_varargs(cl, fts_s_upload, messbox_upload);
 
-  fts_class_message_varargs(cl, fts_s_dump, messbox_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, messbox_dump_gui);
   fts_class_message_varargs(cl, fts_s_save_dotpat, messbox_save_dotpat); 
 
   fts_class_message_varargs(cl, fts_s_update_gui, messbox_update_gui); 

@@ -33,27 +33,9 @@
 #define DATA_API extern
 #endif
 
-typedef struct _data_object
-{
-  fts_object_t o;
-  int persistence;
-} data_object_t;
-
 #define data_float_equals(f, g) (fabs((f) - (g)) < 1.0e-7)
 
-enum data_object_persistence {data_object_persistence_args = -1, data_object_persistence_no = 0, data_object_persistence_yes = 1};
-
-#define data_object_persistence_args(o) (((data_object_t *)o)->persistence = data_object_persistence_args)
-
-#define data_object_is_persistent(o) (((data_object_t *)o)->persistence == data_object_persistence_yes)
-
-DATA_API void data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-DATA_API void data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-  
-DATA_API void data_object_set_dirty(fts_object_t *o);
-
-DATA_API void data_object_init(fts_object_t *o);
+DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);  
 
 #include <fts/packages/data/mat.h>
 #include <fts/packages/data/vec.h>

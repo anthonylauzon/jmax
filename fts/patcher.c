@@ -114,7 +114,6 @@ fts_patcher_remove_object(fts_patcher_t *self, fts_object_t *obj)
       /* remove object from list */
       *p = fts_object_get_next_in_patcher(obj);
 
-      fts_object_remove_name(obj);
       fts_object_remove_patcher_data(obj);
       fts_object_release(obj);
 
@@ -522,7 +521,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
     fts_set_symbol(a + 0, fts_s_colon);
     fts_set_symbol(a + 1, fts_s_receive);
-    fts_set_symbol(a + 2, fts_object_get_name((fts_object_t *)label));
+    fts_set_symbol(a + 2, name);
     fts_object_set_description(o, 3, a);
 
     obj = (fts_object_t *)label;
@@ -659,7 +658,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
     fts_set_symbol(a + 0, fts_s_colon);
     fts_set_symbol(a + 1, fts_s_send);
-    fts_set_symbol(a + 2, fts_object_get_name((fts_object_t *)label));
+    fts_set_symbol(a + 2, name);
     fts_object_set_description(o, 3, a);
 
     obj = (fts_object_t *)label;
@@ -1186,112 +1185,168 @@ patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_member_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj = fts_get_object(at);
-
+  
   if(fts_object_get_class_name(obj) == fts_s_connection)
-    {
-      fts_connection_t *conn = (fts_connection_t *)obj;
-
-      /* don't upload hidden connections */
-      if(fts_connection_get_type(conn) <= fts_c_hidden)
-	return;
-
-      fts_client_start_message( o, sym_addConnection);
-      fts_client_add_int( o, fts_object_get_id(obj));
-      fts_client_add_object( o, conn->src);
-      fts_client_add_int( o, conn->woutlet);
-      fts_client_add_object( o, conn->dst);
-      fts_client_add_int( o, conn->winlet);
-      fts_client_add_int( o, conn->type);
-      fts_client_done_message( o);
-    }
+  {
+    fts_connection_t *conn = (fts_connection_t *)obj;
+    
+    /* don't upload hidden connections */
+    if(fts_connection_get_type(conn) <= fts_c_hidden)
+      return;
+    
+    fts_client_start_message( o, sym_addConnection);
+    fts_client_add_int( o, fts_object_get_id(obj));
+    fts_client_add_object( o, conn->src);
+    fts_client_add_int( o, conn->woutlet);
+    fts_client_add_object( o, conn->dst);
+    fts_client_add_int( o, conn->winlet);
+    fts_client_add_int( o, conn->type);
+    fts_client_done_message( o);
+  }
   else
+  {
+    fts_class_t *class;
+    fts_method_t spost_method;
+    fts_memorystream_t *stream;
+    fts_atom_t a, a_x, a_y, a_w, a_h, a_layer, a_font[3];
+    
+    fts_object_get_prop(obj, fts_s_x, &a_x);
+    fts_object_get_prop(obj, fts_s_y, &a_y);
+    fts_object_get_prop(obj, fts_s_width, &a_w);
+    fts_object_get_prop(obj, fts_s_height, &a_h);
+    
+    fts_object_get_prop(obj, fts_s_layer, &a_layer);
+    
+    fts_client_start_message( o, sym_addObject);
+    fts_client_add_int( o, fts_object_get_id(obj));
+    fts_client_add_int( o, fts_get_int(&a_x));
+    fts_client_add_int( o, fts_get_int(&a_y));
+    fts_client_add_int( o, fts_get_int(&a_w));
+    fts_client_add_int( o, fts_get_int(&a_h));
+    fts_client_add_int( o, fts_object_get_inlets_number(obj));
+    fts_client_add_int( o, fts_object_get_outlets_number(obj));
+    fts_client_add_int( o, fts_get_int(&a_layer));
+    
+    if(fts_object_is_error(obj))
     {
-      fts_class_t *class;
-      fts_method_t spost_method;
-      fts_memorystream_t *stream;
-      fts_atom_t a_x, a_y, a_w, a_h, a_layer, a_font[3];
-      fts_atom_t b[1];
-
-      fts_object_get_prop(obj, fts_s_x, &a_x);
-      fts_object_get_prop(obj, fts_s_y, &a_y);
-      fts_object_get_prop(obj, fts_s_width, &a_w);
-      fts_object_get_prop(obj, fts_s_height, &a_h);
-
-      fts_object_get_prop(obj, fts_s_layer, &a_layer);
-
-      fts_client_start_message( o, sym_addObject);
-      fts_client_add_int( o, fts_object_get_id(obj));
-      fts_client_add_int( o, fts_get_int(&a_x));
-      fts_client_add_int( o, fts_get_int(&a_y));
-      fts_client_add_int( o, fts_get_int(&a_w));
-      fts_client_add_int( o, fts_get_int(&a_h));
-      fts_client_add_int( o, fts_object_get_inlets_number(obj));
-      fts_client_add_int( o, fts_object_get_outlets_number(obj));
-      fts_client_add_int( o, fts_get_int(&a_layer));
-
-      if(fts_object_is_error(obj))
-	{
-	  fts_client_add_symbol( o, fts_error_object_get_description((fts_error_object_t *)obj));
-
-	  class = fts_error_object_get_class((fts_error_object_t *)obj);
-	  /* ??? */
-	  fts_class_instantiate(class);
-	}
-      else
-	{
-	  fts_client_add_symbol( o, fts_s_no_error);
-
-	  class = fts_object_get_class(obj);
-	}
-
-      if(fts_class_get_name(class) != NULL)
-	fts_client_add_symbol( o, fts_class_get_name(class));
-      else
-	{
-	  if(fts_object_get_description_size(obj) > 0 && fts_is_symbol(fts_object_get_description_atoms(obj)))	  
-	    fts_client_add_symbol( o, fts_get_symbol(fts_object_get_description_atoms(obj)));
-	  else
-	    fts_client_add_symbol( o, fts_s_error);
-	}
-
-      fts_client_add_int( o, fts_object_is_template(obj));
-
-      stream = patcher_memory_stream;
-      fts_memorystream_reset( stream);
-
-      fts_set_object( b, stream);
-
-      spost_method = fts_class_get_method_varargs(class, fts_s_spost_description);
-
-      if(spost_method != NULL)
-	(*spost_method)(obj, fts_system_inlet, fts_s_spost_description, 1, b);
-      else
-	fts_spost_object_description((fts_bytestream_t *)stream, obj);
-
-      fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-      fts_client_add_string( o, (char *)fts_memorystream_get_bytes( stream));
-
-      fts_client_done_message( o);
-
-      fts_object_get_prop(obj, fts_s_font, a_font + 0);
-
-      if(fts_get_symbol(a_font))
-	{
-	  fts_object_get_prop(obj, fts_s_fontSize, a_font + 1);
-	  fts_object_get_prop(obj, fts_s_fontStyle, a_font + 2);
-	  fts_client_send_message(obj, fts_s_setFont, 3, a_font);
-	}
-
-      /* send gui properties */
-      fts_send_message_varargs(obj, fts_s_update_gui, 0, 0);
-
-      /* add to real time update list */
-      if(fts_class_get_method_varargs( fts_object_get_class(obj), fts_s_update_real_time) != NULL)
-	fts_update_request(obj);
+      fts_client_add_symbol( o, fts_error_object_get_description((fts_error_object_t *)obj));
+      
+      class = fts_error_object_get_class((fts_error_object_t *)obj);
+      /* ??? */
+      fts_class_instantiate(class);
     }
+    else
+    {
+      fts_client_add_symbol( o, fts_s_no_error);
+      
+      class = fts_object_get_class(obj);
+    }
+    
+    if(fts_class_get_name(class) != NULL)
+      fts_client_add_symbol( o, fts_class_get_name(class));
+    else
+    {
+      if(fts_object_get_description_size(obj) > 0 && fts_is_symbol(fts_object_get_description_atoms(obj)))	  
+        fts_client_add_symbol( o, fts_get_symbol(fts_object_get_description_atoms(obj)));
+      else
+        fts_client_add_symbol( o, fts_s_error);
+    }
+    
+    fts_client_add_int( o, fts_object_is_template(obj));
+    
+    stream = patcher_memory_stream;
+    fts_memorystream_reset( stream);
+    
+    fts_set_object(&a, stream);
+    
+    spost_method = fts_class_get_method_varargs(class, fts_s_spost_description);
+    
+    if(spost_method != NULL)
+      (*spost_method)(obj, fts_system_inlet, fts_s_spost_description, 1, &a);
+    else
+      fts_spost_object_description((fts_bytestream_t *)stream, obj);
+    
+    fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+    fts_client_add_string( o, (char *)fts_memorystream_get_bytes( stream));
+    
+    fts_client_done_message( o);
+    
+    fts_object_get_prop(obj, fts_s_font, a_font + 0);
+    
+    if(fts_get_symbol(a_font))
+    {
+      fts_object_get_prop(obj, fts_s_fontSize, a_font + 1);
+      fts_object_get_prop(obj, fts_s_fontStyle, a_font + 2);
+      fts_client_send_message(obj, fts_s_setFont, 3, a_font);
+    }
+    
+    /* send name or empty string for nameable objects */
+    if(fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_name) != NULL)
+    {
+      fts_atom_t a_name[2];
+      
+      fts_set_symbol(a_name, fts_patcher_object_get_name(obj));
+      fts_set_int(a_name + 1, fts_patcher_object_is_global(obj));
+      fts_client_send_message(obj, fts_s_name, 2, a_name);
+    }
+    
+    /* send persistence flag for "persistable" objects */
+    if(fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_persistence) != NULL)
+    {
+      fts_set_int(&a, fts_patcher_object_is_persistent(obj));
+      fts_client_send_message(obj, fts_s_persistence, 1, &a);
+    }
+    
+    /* send gui properties */
+    fts_send_message_varargs(obj, fts_s_update_gui, 0, 0);
+    
+    /* add to real time update list */
+    if(fts_class_get_method_varargs( fts_object_get_class(obj), fts_s_update_real_time) != NULL)
+      fts_update_request(obj);
+  }
+}
+
+static void
+patcher_member_name( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *patcher = (fts_patcher_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  
+  if(ac > 1 && fts_is_symbol(at + 1))
+  {
+    int global = 0;
+    
+    /* whatever it is it means global */
+    if(ac > 2)
+      global = 1;
+    
+    fts_patcher_object_set_name(obj, fts_get_symbol(at + 1), global);
+  }
+}
+
+static void
+patcher_member_persistence( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *patcher = (fts_patcher_t *)o;  
+  fts_object_t *obj = fts_get_object(at);
+  
+  if(ac > 1 && fts_is_number(at + 1))
+    fts_patcher_object_set_state_persistence(obj, fts_get_number_int(at + 1));
+}
+
+static void
+patcher_member_dirty( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *patcher = (fts_patcher_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  
+  if(ac > 1)
+    fts_patcher_object_set_state_dirty(obj);
+  else
+    fts_patcher_object_set_dirty(obj);
 }
 
 /***********************************************************************
@@ -1829,12 +1884,12 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-patcher_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *self = (fts_patcher_t *) o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_message_t *mess = fts_dumper_message_new( dumper, fts_s_set_arguments);
-
+  
   fts_message_append(mess, self->description_ac, self->description_at);
   fts_dumper_message_send(dumper, mess);
 }
@@ -1874,21 +1929,24 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   self->editor_open = 0; /* start with editor closed */
   self->deleted = 0;
   self->dirty = 0; /* start as saved */
+  
+  fts_object_set_persistence(o, 1);
 }
 
 static void 
 patcher_mark_objects_as_deleted( fts_patcher_t *p)
 {
   fts_object_t *obj;
+  
   for (obj = p->objects; obj ; obj = fts_object_get_next_in_patcher(obj))
-    {
-      if( fts_object_is_patcher(obj))
-	patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
-      
-      fts_update_reset(obj);
-      fts_client_release_object(obj);
-      fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
-    }
+  {
+    if( fts_object_is_patcher(obj))
+      patcher_mark_objects_as_deleted( (fts_patcher_t *)obj);
+    
+    fts_update_reset(obj);
+    fts_client_release_object(obj);
+    fts_object_set_status(obj, FTS_OBJECT_STATUS_PENDING_DELETE);
+  }
 }
 
 static void
@@ -1919,7 +1977,6 @@ patcher_delete_objects( fts_object_t *obj)
     if(fts_dsp_is_active() && fts_is_dsp_object(obj))
       fts_dsp_desactivate();
     
-    fts_object_remove_name(obj);
     fts_object_remove_patcher_data(obj);
     fts_object_release( obj);
   }
@@ -1974,7 +2031,7 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_find, patcher_find);
   fts_class_message_varargs(cl, fts_s_find_errors, patcher_find_errors);
 
-  fts_class_message_varargs(cl, fts_s_dump, patcher_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, patcher_dump_gui);
   fts_class_message_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
   fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description);
 
@@ -1993,7 +2050,10 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), patcher_stop_waiting);
 
   fts_class_message_varargs(cl, fts_s_upload, patcher_upload);
-  fts_class_message_varargs(cl, fts_s_upload_child, patcher_upload_child);
+  fts_class_message_varargs(cl, fts_s_member_upload, patcher_member_upload);
+  fts_class_message_varargs(cl, fts_s_member_name, patcher_member_name);
+  fts_class_message_varargs(cl, fts_s_member_persistence, patcher_member_persistence);
+  fts_class_message_varargs(cl, fts_s_member_dirty, patcher_member_dirty);
 
   fts_class_message_varargs(cl, fts_new_symbol("start_updates"), patcher_start_updates);
   fts_class_message_varargs(cl, fts_new_symbol("stop_updates"), patcher_stop_updates);

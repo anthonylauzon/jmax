@@ -54,7 +54,7 @@ DATA_API fmat_format_t *fmat_format_real;
 
 typedef struct
 {
-  data_object_t o;
+  fts_object_t o;
   float *values;
   int m;
   int n;

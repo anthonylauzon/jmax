@@ -235,62 +235,6 @@ param_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
 }
 
-static void
-param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_atom_t a;
-
-  if(this->persistence == 1)
-    {
-      param_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
-static void
-param_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-  fts_atom_t a;    
-
-  if(this->persistence >= 0)
-    {
-      fts_set_int(&a, this->persistence);
-	  fts_object_update_gui_property(o, fts_s_persistence, &a);
-    }
-
-  fts_name_gui_method(o, 0, 0, 0, 0);
-}
-
-static void
-param_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-
-  if(ac > 0)
-    {
-      if(fts_is_number(at) && this->persistence >= 0)
-	{
-	  this->persistence = fts_get_number_int(at);
-	  fts_object_update_gui_property(o, fts_s_persistence, at);
-	}
-    }
-  else
-    {
-      fts_atom_t a;
-
-      fts_set_int(&a, this->persistence);
-      fts_return(&a);
-    }
-}
-
 /********************************************************************
  *
  *   class
@@ -325,14 +269,12 @@ param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
 
   fts_class_message_varargs(cl, fts_s_dump_state, param_dump_state);
-  fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
-  fts_class_message_varargs(cl, fts_s_persistence, param_persistence);
-  fts_class_message_varargs(cl, fts_s_dump, param_dump);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_post, param_post);
 

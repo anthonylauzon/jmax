@@ -195,9 +195,7 @@ osc_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, osc_put);
 
   /* name support */
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
-  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
 
   fts_class_message_varargs(cl, fts_new_symbol("phase"), osc_set_phase);
   fts_class_message_varargs(cl, fts_new_symbol("freq"), osc_set_freq);

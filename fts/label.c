@@ -114,21 +114,23 @@ fts_label_t *
 fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_atom_t *value = fts_name_get_value(patcher, name);
-  fts_label_t *label = NULL;
-
+  
   if(fts_is_object(value))
-    {
-      fts_object_t *obj = fts_get_object(value);
-      
-      if(fts_object_get_class(obj) == fts_label_class)
-	return (fts_label_t *)obj;
-    }
+  {
+    fts_object_t *obj = fts_get_object(value);
+    
+    if(fts_object_get_class(obj) == fts_label_class)
+      return (fts_label_t *)obj;
+  }
 
   /* create new label */
-  label = (fts_label_t *)fts_object_create_in_patcher(fts_label_class, patcher, 0, 0);
+  fts_label_t *label = (fts_label_t *)fts_object_create(fts_label_class, 0, 0);
+  fts_atom_t a;
   
   /* name the label */
-  fts_object_set_name((fts_object_t *)label, name);
+  fts_set_object(&a, (fts_object_t *)label);
+  fts_name_set_value(fts_get_root_patcher(), name, &a);
+  label->name = name;
   
   return label;
 }
@@ -185,8 +187,10 @@ label_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fts_label_t *this = (fts_label_t *) o;
   fts_channel_t *channel = fts_label_get_channel(this);
-
-  fts_channel_add_target(channel, fts_get_object(at));
+  fts_patcher_t *patcher = fts_object_get_patcher(o);
+  fts_object_t *obj = fts_get_object(at);
+  
+  fts_channel_add_target(channel, obj);
 }
 
 static void
@@ -194,7 +198,9 @@ label_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   fts_label_t *this = (fts_label_t *) o;
   fts_channel_t *channel = fts_label_get_channel(this);
-
+  fts_patcher_t *patcher = fts_object_get_patcher(o);
+  fts_object_t *obj = fts_get_object(at);
+  
   fts_channel_remove_target(channel, fts_get_object(at));
 }
 
@@ -209,7 +215,10 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    /*fts_label_t *this = (fts_label_t *) o;*/
+  fts_label_t *this = (fts_label_t *)o;
+
+  if(this->name != NULL)
+    fts_name_set_value(fts_get_root_patcher(), this->name, fts_null);
 }
 
 static void
@@ -232,6 +241,8 @@ label_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_add_listener, label_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, label_remove_listener);
+
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
 
   fts_class_message_varargs(cl, fts_s_send, label_varargs);
   fts_class_message_varargs(cl, fts_new_symbol("mess"), label_mess);

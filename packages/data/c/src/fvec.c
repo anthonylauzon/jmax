@@ -337,7 +337,7 @@ void fvec_changed(fvec_t *this)
     if (this->editor)
 	tabeditor_send((tabeditor_t *) this->editor);
 
-    data_object_set_dirty((fts_object_t *) this);
+    fts_object_set_state_dirty((fts_object_t *) this);
 }
 
 
@@ -412,7 +412,7 @@ fvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if( this->editor)
     tabeditor_send( (tabeditor_t *)this->editor);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -432,7 +432,7 @@ fvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  if( this->editor)
 	    tabeditor_insert_append( (tabeditor_t *)this->editor, offset, ac, at);
 	
-	  data_object_set_dirty( o);
+	  fts_object_set_state_dirty( o);
 	}
     }
 }
@@ -453,7 +453,7 @@ fvec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       ptr[j] = f;
     }
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -536,7 +536,7 @@ fvec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	    }
 	}
       
-      data_object_set_dirty( o);
+      fts_object_set_state_dirty( o);
     }
 }
 
@@ -557,7 +557,7 @@ fvec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   qsort((void *)ptr, fvec_get_size(this), sizeof(float), fvec_element_compare);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -580,7 +580,7 @@ fvec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       range -= 1.0;
     }
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -615,7 +615,7 @@ fvec_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       for(i=0; i<size; i++)
 	ptr[i] *= scale;
  
-      data_object_set_dirty( o);
+      fts_object_set_state_dirty( o);
    }
 }
 
@@ -649,7 +649,7 @@ fvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     if( this->editor)
       {
 	fts_client_send_message( this->editor, fts_s_size, ac, at);
-	data_object_set_dirty( o);
+	fts_object_set_state_dirty( o);
       }
   }
 }
@@ -1471,7 +1471,7 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       if(size <= 0)
 	fts_object_error(o, "cannot import from text file \"%s\"", fts_symbol_name(file_name));
       else
-	data_object_set_dirty( o);
+	fts_object_set_state_dirty( o);
     }
   else
     fts_object_error(o, "unknown import file format \"%s\"", fts_symbol_name(file_format));
@@ -1528,7 +1528,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if( this->editor)
 	tabeditor_send( (tabeditor_t *)this->editor);
 
-      data_object_set_dirty( o);
+      fts_object_set_state_dirty( o);
     }
   else
 	fts_object_open_dialog(o, fts_s_load, sym_open_file);
@@ -1674,7 +1674,7 @@ fvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   
   fvec_copy(in, this);
 
-  data_object_set_dirty( o);
+  fts_object_set_state_dirty( o);
 }
 
 static void
@@ -1711,24 +1711,6 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   if(fts_message_get_ac(mess) > 1) 
     fts_dumper_message_send(dumper, mess);
-}
-
-static void 
-fvec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(data_object_is_persistent(o))
-    {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
-      fvec_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);      
-    }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
@@ -1834,55 +1816,47 @@ static void
 fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
-
-  data_object_init(o);
   
   this->values = NULL;
   this->m = 0;
   this->n = 1;
   this->alloc = FVEC_NO_ALLOC;
-
+  
   this->editor = 0;
-
+  
   if(ac == 0)
     fvec_set_size(this, 0);
   else if(ac == 1 && fts_is_int(at))
-    {
-      fvec_set_size(this, fts_get_int(at));
-      fvec_set_const(this, 0.0);
-    }
+  {
+    fvec_set_size(this, fts_get_int(at));
+    fvec_set_const(this, 0.0);
+  }
   else if(ac == 1 && fts_is_tuple(at))
-    {
-      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
-      int size = fts_tuple_get_size(tup);
-      
-      fvec_set_size(this, size);
-      fvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-
-      data_object_persistence_args(o);
-    }
+  {
+    fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
+    int size = fts_tuple_get_size(tup);
+    
+    fvec_set_size(this, size);
+    fvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
+  }
   else if(ac == 1 && fts_is_symbol(at))
-    {
-      fts_symbol_t file_name = fts_get_symbol(at);
-      int size = 0;
-      
-      if (fts_atomfile_check( file_name))
-        size = fvec_read_atom_file(this, file_name);
-      else
-        size = fvec_load_audiofile(this, file_name, 0, 0);
-
-      if(size == 0)
-	fts_object_error(o, "cannot load fvec from file \"%s\"", fts_symbol_name(file_name));
-
-      data_object_persistence_args(o);
-    }
+  {
+    fts_symbol_t file_name = fts_get_symbol(at);
+    int size = 0;
+    
+    if (fts_atomfile_check( file_name))
+      size = fvec_read_atom_file(this, file_name);
+    else
+      size = fvec_load_audiofile(this, file_name, 0, 0);
+    
+    if(size == 0)
+      fts_object_error(o, "cannot load fvec from file \"%s\"", fts_symbol_name(file_name));
+  }
   else if(ac > 1)
-    {
-      fvec_set_size(this, ac);
-      fvec_set_with_onset_from_atoms(this, 0, ac, at);
-
-      data_object_persistence_args(o);
-    }
+  {
+    fvec_set_size(this, ac);
+    fvec_set_with_onset_from_atoms(this, 0, ac, at);
+  }
   else
     fts_object_error(o, "bad arguments for fvec constructor");
 }
@@ -1909,11 +1883,9 @@ fvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, fvec_dump);
 
   /* graphical editor */
   fts_class_message_varargs(cl, fts_s_openEditor, fvec_open_editor);

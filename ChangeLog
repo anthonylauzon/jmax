@@ -1,14 +1,29 @@
+2004-03-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* fundamental changes in the management of names and persistence in FTS needing minor adaptation in the packages (no API changes!!)
+	* generalization of patcher_data to fts_context_t = data attached to an object handled by its "container"
+	* only container implemented is the patcher (sequence will follow)
+	* names and persistence are now entirely handled by the objects container (if any) - which perfectly matches the actual behaviour before these changes
+	* messages "name" and "persistence" to objects are redirected to their contianer (name and persitence flag added to patcher_data)
+	* continer *interface* via messages "member_name", "member_persistence" and "member_dirty"" (added messages to patcher class)
+	* introduced fts_object_set_state_dirty() to handle changes of the dynamic state for persistent objects only - fts_object_set_dirty() stays for changes of GUI attributes
+	* introduced distinction of "fts_s_dump_gui" and "fts_s_dump_state" (fts_s_dump is obsolete)
+	* the bmax saver allways calls fts_s_dump_gui and fts_s_dump_state only for persistent objects
+	* introduced global names by adding a pointer to a corresponding definition in the global scope to the definition in the local scope
+	* sending a message name with a (any) second argument (after the name) to an object will now create a global variable
+
 2004-03-05  Alexandre Pages  <Alexandre.Pages@ircam.fr>
     
       * added file floatfuns.h in 'packages/data/c/src/fmat.c', which contains the definitions for the float versions of the math functions.
 
-2004-03-01  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+2004-03-01  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* added \r in parallel to \n to tokenizer.l
 	* added fmat_set_m(), fmat_set_n(), et fmat_reshape() to fmat API
 	* redefined fmat_set_size()
+	* added some mathematical functions as methods to fmat
 
-2004-02-25  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+2004-02-25  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* added several methods to fmat class (fmat.c in package data)
 
@@ -101,7 +116,7 @@
 
 	* configure.in: fixed java check test failed if CLASSPATH env variable was set.
 
-2004-01-08  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+2004-01-08  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* moved fts_function_get_by_name() from function.c to fts_get_function_by_name() to package.c
 
@@ -413,7 +428,7 @@
 
 	* packages/dsdev/c/src/dsaudioport.c (dsaudioport_output): fill buffer with 0 if channel is not used.
 
-2003-07-25  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+2003-07-25  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	*  class.c: temporarily added condition to method_get to avoid crashes while loading patches
 
@@ -475,7 +490,7 @@
 	* Modified menus to use actions instead of menu items.
 	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v".
 
-2003-07-18  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+2003-07-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* changed post() to fts_post() and post_atoms() to fts_post_atoms()
 

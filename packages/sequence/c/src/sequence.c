@@ -21,6 +21,7 @@
  */
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <fts/packages/data/data.h>
 #include <fts/packages/sequence/sequence.h>
 #include "seqmidi.h"
 
@@ -141,20 +142,11 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
   }
 }
 
-void
-sequence_set_dirty(sequence_t *sequence)
-{
-  if(sequence->persistence == 1)
-    fts_object_set_dirty((fts_object_t *)sequence);
-}
-
 /******************************************************
-*
-
-*  system methods
-*
-*/
-
+ *
+ *  system methods
+ *
+ */
 static void
 sequence_add_track_at_client(sequence_t *this, track_t *track)
 {
@@ -178,36 +170,9 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 }
 
 static void
-sequence_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sequence_member_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_add_track_at_client((sequence_t *)o, (track_t *)fts_get_object(&at[0]));
-}
-
-static void
-sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  fts_symbol_t name = fts_object_get_name(o);
-  fts_atom_t a;
-
-  if(name != NULL)
-    fts_set_symbol(&a, name);
-  else
-    fts_set_symbol(&a, seqsym_sequence);
-
-  if(sequence_editor_is_open(this))
-    fts_client_send_message(o, seqsym_setName, 1, &a);
-}
-
-static void
-sequence_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  if(sequence_editor_is_open(this))
-    fts_client_send_message(o, seqsym_setName, 1, at);
-  
-  fts_name_set_method(o, 0, 0, ac, at);
 }
 
 /* move track by client request */
@@ -283,7 +248,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       if(sequence_editor_is_open(this))
         sequence_upload(o, 0, 0, 0, 0);
 
-      fts_object_update_name(o);
+      /* fts_name_update(o); */
     }
     else
       fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
@@ -326,7 +291,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       track = sequence_get_first_track(this);
     }
 
-    fts_object_update_name(o);
+    /* fts_name_update(o); */
   }
 }
 
@@ -433,44 +398,6 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
 }
 
-
-
-static void
-sequence_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  if(ac > 0)
-  {
-    /* set persistence flag */
-    if(fts_is_number(at) && this->persistence >= 0)
-    {
-      this->persistence = fts_get_number_int(at);
-	  fts_object_update_gui_property((fts_object_t *)this, fts_s_persistence, at);
-    }
-  }
-  else
-  {
-    /* return persistence flag */
-    fts_atom_t a;
-
-    fts_set_int(&a, this->persistence);
-    fts_return(&a);
-  }
-}
-
-static void
-sequence_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  fts_atom_t a;
-
-  fts_set_int(&a, (this->persistence > 0));
-  fts_object_update_gui_property((fts_object_t *)this, fts_s_persistence, &a);
-
-  fts_name_gui_method(o, 0, 0, 0, 0);
-}
-
 /******************************************************
 *
 *  add, remove, move, dump
@@ -499,7 +426,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   {
     sequence_add_track_at_client(this, track);
     fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
-    sequence_set_dirty( this);
+    fts_object_set_state_dirty(o);
   }
 }
 
@@ -515,8 +442,8 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
 
   sequence_remove_track(this, track);
 
-  fts_object_update_name(o);
-  sequence_set_dirty( this);
+  /* fts_name_update(o); */
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -531,8 +458,8 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_moveTrack, 2, at);
 
-  fts_object_update_name(o);
-  sequence_set_dirty( this);
+  /* fts_name_update(o); */
+  fts_object_set_state_dirty(o);
 }
 
 static void
@@ -555,55 +482,29 @@ static void
 sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-
-  if(this->persistence == 1)
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  track_t *track = sequence_get_first_track(this);
+  
+  while(track)
   {
-    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-    track_t *track = sequence_get_first_track(this);
-
-    while(track)
-    {
-      fts_symbol_t name = track_get_name(track);
-      fts_class_t *type = track_get_type(track);
-      fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_track);
-
-      if(type != NULL)
-	fts_message_append_symbol(mess, fts_class_get_name(type));
-      else
-	fts_message_append_symbol(mess, fts_s_void);
-
-      if(name)
-        fts_message_append_symbol(mess, name);
-
-      fts_dumper_message_send(dumper, mess);
-
-      /* write track events */
-      track_dump_state((fts_object_t *)track, 0, 0, 1, at);
-      track = track_get_next(track);
-    }
+    fts_symbol_t name = track_get_name(track);
+    fts_class_t *type = track_get_type(track);
+    fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_track);
+    
+    if(type != NULL)
+      fts_message_append_symbol(mess, fts_class_get_name(type));
+    else
+      fts_message_append_symbol(mess, fts_s_void);
+    
+    if(name)
+      fts_message_append_symbol(mess, name);
+    
+    fts_dumper_message_send(dumper, mess);
+    
+    /* write track events */
+    track_dump_state((fts_object_t *)track, 0, 0, 1, at);
+    track = track_get_next(track);
   }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
-static void
-sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  if(this->persistence == 1)
-  {
-    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-    fts_atom_t a;
-
-    sequence_dump_state(o, 0, 0, ac, at);
-
-    /* save persistence flag */
-    fts_set_int(&a, 1);
-    fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-  }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 /******************************************************
@@ -616,42 +517,39 @@ static void
 sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-
-  this->persistence = 0;
+  
   this->tracks = 0;
   this->size = 0;
   this->open = 0;
-
+  
   if(ac == 1 && fts_is_number(at))
   {
     /* create void tracks */
     int size = fts_get_number_int(at);
     int i;
-
+    
     if(size < 0)
       size = 0;
-
+    
     for(i=0; i<size; i++)
     {
       track_t *track = (track_t *)fts_object_create(track_class, 0, NULL);
-
+      
       /* add it to the sequence */
       sequence_add_track(this, track);
     }
-
-    this->persistence = -1;
   }
   else if(ac > 0)
   {
     int i;
-
+    
     /* create typed tracks */
     for(i=0; i<ac; i++)
     {
       if(fts_is_symbol(at + i))
       {
         track_t *track = (track_t *)fts_object_create(track_class, 1, at + i);
-
+        
         if(track != NULL)
           sequence_add_track(this, track);
         else
@@ -663,8 +561,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
         return;
       }
     }
-
-    this->persistence = -1;
   }
 }
 
@@ -688,16 +584,15 @@ sequence_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sequence_t), sequence_init, sequence_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, sequence_set_name);
-  fts_class_message_varargs(cl, fts_s_persistence, sequence_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, sequence_update_gui);
-  fts_class_message_varargs(cl, fts_s_dump, sequence_dump);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  fts_class_message_varargs(cl, fts_s_dump_state, sequence_dump_state);
 
   /* old sequence bmax files */
   fts_class_message_varargs(cl, fts_new_symbol("bmax_add_track"), sequence_add_track_and_update);
   fts_class_message_varargs(cl, fts_new_symbol("bmax_add_event"), sequence_add_event_from_file);
 
-  fts_class_message_varargs(cl, fts_s_upload_child, sequence_upload_child);
+  fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
 
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);
@@ -717,7 +612,6 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_import_midifile, sequence_import_midifile);
 
   /* graphical editor */
-  fts_class_message_varargs(cl, fts_new_symbol("getName"), sequence_send_name_to_client);
   fts_class_message_varargs(cl, fts_s_openEditor, sequence_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, sequence_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, sequence_close_editor);

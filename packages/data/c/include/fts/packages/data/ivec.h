@@ -27,7 +27,7 @@
 
 typedef struct _ivec_
 {
-  data_object_t o;
+  fts_object_t o;
 
   int *values;
   int size;

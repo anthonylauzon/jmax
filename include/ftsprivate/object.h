@@ -31,7 +31,6 @@
 #define fts_object_get_status(o) ((o)->flag.status)
 #define fts_object_set_status(o,f) ((o)->flag.status = (f))
 
-
 extern fts_object_t *fts_object_new( fts_class_t *cl);
 extern void fts_object_free(fts_object_t *obj);
 extern void fts_object_reset_client(fts_object_t *obj);
@@ -39,8 +38,5 @@ extern void fts_object_reset_client(fts_object_t *obj);
 /* client id */
 #define fts_object_set_id(o, i) ((o)->flag.id = (i))
 #define fts_object_set_client_id(o,i) ((o)->flag.client_id = (i))
-
-#define fts_object_set_definition(o, d) ((o)->definition = (d))
-#define fts_object_get_definition(o) ((o)->definition)
 
 #endif

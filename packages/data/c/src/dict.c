@@ -172,7 +172,7 @@ dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   dict_t *self = (dict_t *)o;
   
   dict_remove_all(self);
-  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
@@ -181,7 +181,7 @@ dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   dict_t *self = (dict_t *)o;
   
   dict_store_list(self, ac, at);
-  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
@@ -190,7 +190,7 @@ dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   dict_t *self = (dict_t *)o;
   
   dict_remove(self, at);
-  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
@@ -214,7 +214,7 @@ dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   dict_copy((dict_t *)fts_get_object(at), self);
 
-  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
@@ -265,28 +265,6 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
   }
 }
-
-static void
-dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(data_object_is_persistent(o))
-    {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
-      /* save state */
-      dict_dump_state(o, 0, 0, ac, at);
-
-      /* save persistence flag */
-      fts_set_int(&a, 1);
-      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-    }
-
-  /* save name */
-  fts_name_dump_method(o, 0, 0, ac, at);
-}
-
-
 
 /**********************************************************
  *
@@ -520,7 +498,7 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   if(size <= 0)
     fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
 
-  data_object_set_dirty(o);	/* if obj persistent patch becomes dirty */
+  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
 }
 
 static void
@@ -631,25 +609,22 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   dict_t *self = (dict_t *)o;
   int i;
-
+  
   ac &= -2;	/* round down to even number (drop last bit) */
-
-  data_object_init(o);
-
+  
   fts_hashtable_init(&self->hash, FTS_HASHTABLE_SMALL);
-
+  
   for(i=0; i<ac; i+=2)
+  {
+    if(fts_is_int(at + i) || fts_is_symbol(at + i))
+      dict_store(self, at + i, at + i + 1);
+    else
     {
-      if(fts_is_int(at + i) || fts_is_symbol(at + i))
-	dict_store(self, at + i, at + i + 1);
-      else
-	{
-	  dict_remove_all(self);
-	  fts_object_error(o, "wrong key type in initialization");
-	}
-
-      data_object_persistence_args(o);
+      dict_remove_all(self);
+      fts_object_error(o, "wrong key type in initialization");
     }
+    
+  }
 }
 
 
@@ -667,11 +642,9 @@ dict_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
-  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
-  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, dict_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_dict);
   fts_class_message_varargs(cl, fts_s_get_tuple, dict_get_keys);

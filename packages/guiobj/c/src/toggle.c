@@ -29,7 +29,6 @@ typedef struct
   int persistence;
 } toggle_t;
 
-
 static void 
 toggle_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -107,45 +106,13 @@ toggle_dump_state(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-toggle_dump(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+toggle_dump_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   toggle_t* self = (toggle_t*)o;
   fts_dumper_t* dumper = (fts_dumper_t*)fts_get_object(at);
-  fts_atom_t a;
 
-  /* save name if any */
-  fts_name_dump_method(o, 0, 0, ac, at);
-  if (self->persistence != 0)
-  {
-    toggle_dump_state(o, 0, 0, ac, at);
-    
-    fts_set_int(&a, 1);
-    fts_dumper_send(dumper, fts_s_persistence, 1, &a);
-  }
+  /* nothing to save */
 }
-
-static void
-toggle_persistence(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  toggle_t* self = (toggle_t*)o;
-  
-  if (ac > 0)
-  {
-    /* set persistence flag */
-    if (fts_is_number(at))
-    {
-      self->persistence = (fts_get_number_int(at) != 0);
-	  fts_object_update_gui_property(o, fts_s_persistence, at);
-    }
-  }
-  else
-  {
-    fts_atom_t a;
-    fts_set_int(&a, self->persistence);
-    fts_return(&a);
-  }
-}
-
 
 static void
 toggle_update_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -153,13 +120,8 @@ toggle_update_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   toggle_t* self = (toggle_t*)o;
   fts_atom_t a;
   
-  fts_set_int(&a, self->persistence);
-  fts_object_update_gui_property(o, fts_s_persistence, &a);
-
   fts_set_int( &a, self->value);  
   fts_client_send_message_real_time(o, fts_s_value, 1, &a);
-  
-  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 static void
@@ -176,17 +138,14 @@ toggle_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(toggle_t), toggle_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
-  fts_class_message_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
-
-  /* persistence part */
-  fts_class_message_varargs(cl, fts_s_persistence, toggle_persistence);
+  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  
   fts_class_message_varargs(cl, fts_s_dump_state, toggle_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump, toggle_dump);
+  fts_class_message_varargs(cl, fts_s_dump_gui, toggle_dump_gui);
 
-  /* name support */
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_update_gui, toggle_update_gui);
+  fts_class_message_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
   
   fts_class_message_varargs(cl, fts_s_set, toggle_toggle);
   fts_class_message_varargs(cl, fts_s_value, toggle_set);
@@ -197,6 +156,8 @@ toggle_instantiate(fts_class_t *cl)
   fts_class_inlet_number(cl, 0, toggle_number);
   fts_class_inlet_varargs(cl, 0, toggle_number);
 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
+  
   fts_class_outlet_int(cl, 0);
 }
 
