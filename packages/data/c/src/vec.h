@@ -27,7 +27,7 @@
 #ifndef _DATA_VEC_H_
 #define _DATA_VEC_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "mat.h"
 
 extern fts_type_t vec_type;

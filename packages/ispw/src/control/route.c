@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct {
   fts_object_t o;

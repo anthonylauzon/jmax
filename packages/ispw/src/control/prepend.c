@@ -27,7 +27,7 @@
 
 /* class prepend */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include <math.h>
 
 enum {

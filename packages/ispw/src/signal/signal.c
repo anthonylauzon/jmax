@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void zerocross_config(void);
 extern void sigthru_config(void);

@@ -30,7 +30,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define DEFAULT_BUFFER_SIZE 128
 #define DEFAULT_SERIAL_PORT_NAME "/dev/ttyS0"

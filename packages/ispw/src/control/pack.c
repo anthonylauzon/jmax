@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* utility function for pack: assign a value from a source atom to the
    destination atom, without changing the type of the destination

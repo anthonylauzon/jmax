@@ -25,7 +25,7 @@
  */
 
 #include <string.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 #define MIN_FLOAT -68719476736.
 

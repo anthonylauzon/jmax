@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_symbol_t sym_S = 0;
 static fts_symbol_t sym_KS = 0;

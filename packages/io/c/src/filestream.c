@@ -29,7 +29,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_symbol_t sym_in = 0;
 static fts_symbol_t sym_out = 0;

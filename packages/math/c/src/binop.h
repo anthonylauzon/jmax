@@ -1,7 +1,7 @@
 #ifndef _BINOP_H_
 #define _BINOP_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "ivec.h"
 #include "fvec.h"
 

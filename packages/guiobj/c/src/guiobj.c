@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void toggle_config(void);
 extern void messconst_config(void);

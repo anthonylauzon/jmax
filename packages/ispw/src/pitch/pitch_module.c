@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void pitch_config(void);
 extern void pt_config(void);

@@ -33,7 +33,7 @@
    MDC
 */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "naming.h"
 
 #define DEFAULT_DURATION 125.0f

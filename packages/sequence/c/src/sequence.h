@@ -26,7 +26,7 @@
 #ifndef _SEQUENCE_H_
 #define _SEQUENCE_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "track.h"
 
 /*****************************************************************

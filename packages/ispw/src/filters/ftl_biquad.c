@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "filters.h"
 #include "biquad.h"
 

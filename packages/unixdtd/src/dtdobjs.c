@@ -29,7 +29,7 @@
 
 #include <math.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "dtddefs.h"
 #include "dtdfifo.h"
 #include "dtdserver.h"

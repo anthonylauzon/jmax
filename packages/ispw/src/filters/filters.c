@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct ctlf2p2z		/* control structure for 2p2z~ */
 {

@@ -29,7 +29,7 @@
   where i should be an integer.
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {

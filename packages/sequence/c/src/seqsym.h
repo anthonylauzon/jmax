@@ -26,7 +26,7 @@
 #ifndef _SEQSYM_H_
 #define _SEQSYM_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* sequence components */
 extern fts_symbol_t seqsym_sequence;

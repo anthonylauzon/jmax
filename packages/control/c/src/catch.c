@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "bus.h"
 
 /* "catch". get messages from a bus.

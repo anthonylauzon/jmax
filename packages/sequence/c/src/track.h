@@ -26,7 +26,7 @@
 #ifndef _TRACK_H_
 #define _TRACK_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct _track_ track_t;
 

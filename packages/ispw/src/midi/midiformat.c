@@ -28,7 +28,7 @@
 /* modified by DDZ to format polyphonic aftertouch a0 messages */
 /* ported by mdc to the new FTS */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 typedef struct midiformat

@@ -26,7 +26,7 @@
 
 #include <unistd.h>
 #include <dmedia/midi.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 #define MAX_MIDI_EVENTS 512
 #define SYSEX_BLOCK_SIZE 512

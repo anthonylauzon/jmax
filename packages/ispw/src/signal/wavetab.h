@@ -27,7 +27,7 @@
 #ifndef _WAVETAB_H_
 #define _WAVETAB_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define WAVE_TAB_BITS 9
 #define WAVE_TAB_SIZE (1 << WAVE_TAB_BITS)

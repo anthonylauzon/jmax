@@ -31,7 +31,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* Utility macro to map a channel number 
  in a 1-16 range; note that for compatibility 

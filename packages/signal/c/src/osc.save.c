@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "fvec.h"
 
 #define OSC_TABLE_BITS 9

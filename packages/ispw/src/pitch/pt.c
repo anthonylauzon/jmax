@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 #include "pt_obj.h"

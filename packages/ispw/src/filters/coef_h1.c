@@ -47,7 +47,7 @@
    */
 
 #include <math.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 
 

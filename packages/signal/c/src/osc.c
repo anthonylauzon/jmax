@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "osc.h"
 
 struct osc_ftl_symbols osc_ftl_symbols_ptr = {0, 0, 0};

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "fts.h"
+#include <fts/fts.h>
 #include "audp_fifo.h"
 
 

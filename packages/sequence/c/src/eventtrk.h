@@ -26,7 +26,7 @@
 #ifndef _EVENTTRK_H_
 #define _EVENTTRK_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "track.h"
 #include "event.h"
 

@@ -42,7 +42,7 @@
    on many platforms.
 */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct 
 {

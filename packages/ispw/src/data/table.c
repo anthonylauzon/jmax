@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "ivec.h"
 #include "naming.h"
 

@@ -29,7 +29,7 @@
 /* modified by DDZ to parse/format polyphonic aftertouch a0 messages */
 /* Ported to the new fts by mdc */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define NOTEOFF 0x80
 #define NOTEON 0x90

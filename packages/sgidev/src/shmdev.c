@@ -38,7 +38,7 @@
 #include <stdio.h>
 #endif
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /**** SHM_FIFO_T ****/
 

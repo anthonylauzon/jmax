@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* The Cheese object print a signal vector (like print~), 
    but print the vector automatically only when there are NaN (Cheese Nan) in the

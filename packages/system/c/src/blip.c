@@ -26,7 +26,7 @@
 
 
 #include <string.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct
 {

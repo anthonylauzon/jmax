@@ -26,7 +26,7 @@
 #ifndef _SEQREF_H_
 #define _SEQREF_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "eventtrk.h"
 
 typedef struct _seqref_

@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static void midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);

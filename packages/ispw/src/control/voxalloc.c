@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define CLASS_name "voxalloc"
 #define MAX_size_rec_name 256

@@ -35,7 +35,7 @@
 
    */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "explode.h"
 
 typedef struct

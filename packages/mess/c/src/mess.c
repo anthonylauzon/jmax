@@ -11,7 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void messtab_config(void);
 extern message_table_config(void);

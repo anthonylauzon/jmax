@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define WACOM_REQUEST_TIMEOUT 500
 #define WACOM_INIT_TRIALS 10

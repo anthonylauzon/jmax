@@ -27,7 +27,7 @@
 
 /* Bus based send/receive */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "bus.h"
 
 fts_symbol_t fts_s_bus = 0;

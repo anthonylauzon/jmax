@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /*extern void midi_config(void);*/
 /*extern void midiformat_config(void);*/

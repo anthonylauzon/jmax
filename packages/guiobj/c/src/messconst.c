@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define MESSCONST_FLASH_TIME 125.0f
 

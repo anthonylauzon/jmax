@@ -30,7 +30,7 @@
  *  set of handler properties, so it is a different class.
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /*------------------------- slider class -------------------------------------*/
 

@@ -33,7 +33,7 @@
  * The property is stored as normal property, no daemons used.
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

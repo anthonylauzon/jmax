@@ -26,7 +26,7 @@
 
 #include <unistd.h>
 #include <MidiShare.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 #define SYSEX_REALTIME 0x7f
 

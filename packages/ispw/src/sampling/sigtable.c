@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "sampbuf.h"
 #include "sampunit.h"
 #include "naming.h"

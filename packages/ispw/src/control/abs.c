@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define LO 0
 #define HI 1

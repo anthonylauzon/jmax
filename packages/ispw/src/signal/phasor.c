@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "phasor.h"
 
 fts_symbol_t phasor_function = 0;

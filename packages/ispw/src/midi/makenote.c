@@ -26,7 +26,7 @@
 
 /* Make a note (note-on/note-off events). */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* A simplified version of the Miller Puckette code */
 

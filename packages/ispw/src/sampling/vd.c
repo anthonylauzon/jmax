@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "deltable.h"
 #include "delbuf.h"
 #include "vd.h"

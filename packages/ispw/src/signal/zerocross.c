@@ -27,7 +27,7 @@
 /* a zero crossing counter */
 /* By : Francois Dechelle; ported to the new FTS by mdc */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 typedef struct S_zerocross

@@ -27,7 +27,7 @@
 #ifndef _DATA_BPF_H_
 #define _DATA_BPF_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct _bp_
 {

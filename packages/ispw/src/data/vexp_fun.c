@@ -48,7 +48,7 @@
 #include <math.h>
 #undef __STRICT_BSD__
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "ivec.h"
 #include "vexp.h"
 #include "vexp_util.h"

@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 

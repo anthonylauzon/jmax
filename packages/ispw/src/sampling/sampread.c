@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "sampbuf.h"
 #include "sampread.h"
 #include "sampunit.h"

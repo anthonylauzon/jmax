@@ -46,7 +46,7 @@
 #include <dmedia/audio.h>
 #include <dmedia/audiofile.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /******************************************************************************/
 /*                                                                            */

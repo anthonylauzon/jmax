@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define DEFAULT_FLASH 125.0f
 

@@ -27,7 +27,7 @@
 #ifndef _DATA_MAT_H_
 #define _DATA_MAT_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern fts_type_t mat_type;
 extern fts_symbol_t mat_symbol;

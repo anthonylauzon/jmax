@@ -26,7 +26,7 @@
 #ifndef _MIDIVAL_H_
 #define _MIDIVAL_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "event.h"
 
 extern fts_class_t *midival_class;

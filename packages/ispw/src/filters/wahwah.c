@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "filters.h"
 
 static fts_symbol_t wahwah_function = 0;

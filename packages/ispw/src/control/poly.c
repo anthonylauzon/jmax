@@ -27,7 +27,7 @@
 /* Voice allocator; from the original Miller Puckette code */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* <a> totally rewritten to add voice-stealing */
 

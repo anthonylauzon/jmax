@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* New implementation of send/receive: the connections correspond strictly to what the user 
  * does (and the connection method has been scrapped).

@@ -26,7 +26,7 @@
 
 /* Frequency to midi conversion */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include <math.h>
 
 typedef struct 

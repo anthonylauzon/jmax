@@ -11,7 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#include "fts.h"
+#include <fts/fts.h>
 #include "mt.h"
 
 static fts_symbol_t sym_list = 0;

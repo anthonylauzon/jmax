@@ -42,7 +42,7 @@
 /*#include <string.h>*/
 #include <assert.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 

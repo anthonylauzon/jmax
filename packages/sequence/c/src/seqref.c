@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "seqsym.h"
 #include "sequence.h"
 #include "seqref.h"

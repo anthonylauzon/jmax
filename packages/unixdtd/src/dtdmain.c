@@ -47,7 +47,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #include "dtddefs.h"
 #include "dtdfifo.h"

@@ -26,7 +26,7 @@
 
 /* The sustain object */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 struct blink
 {

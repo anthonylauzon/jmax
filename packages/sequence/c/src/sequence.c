@@ -23,7 +23,7 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#include "fts.h"
+#include <fts/fts.h>
 #include "seqsym.h"
 #include "sequence.h"
 #include "track.h"

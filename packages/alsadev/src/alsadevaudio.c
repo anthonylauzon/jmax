@@ -37,7 +37,7 @@
 #include <sys/asoundlib.h>
 #include <linux/asound.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /******************************************************************************/
 /*                                                                            */

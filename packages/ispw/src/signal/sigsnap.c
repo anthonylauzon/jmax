@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 static fts_symbol_t sigsnapshot_function = 0;

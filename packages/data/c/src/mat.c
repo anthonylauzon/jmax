@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "mat.h"
 
 fts_type_t mat_type = 0;

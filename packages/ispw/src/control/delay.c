@@ -26,7 +26,7 @@
 
 /* delay class: delay a bang for a given amount of time. */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct 
 {

@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "ivec.h"
 
 static fts_symbol_t sym_text = 0;

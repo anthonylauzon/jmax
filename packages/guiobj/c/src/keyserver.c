@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "keyserver.h"
 
 fts_symbol_t sym_f1 = 0;

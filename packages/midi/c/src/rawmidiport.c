@@ -25,7 +25,7 @@
  */
 
 #include <unistd.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 /* MIDI status bytes */
 #define STATUS_BYTE_NOTE 0x90

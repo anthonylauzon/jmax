@@ -33,7 +33,7 @@
   around, saved before 20/5/1998.
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {

@@ -47,7 +47,7 @@
 
 #include <string.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "vexp.h" 
 #include "vexp_util.h" 
 

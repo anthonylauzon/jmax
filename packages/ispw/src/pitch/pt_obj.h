@@ -27,7 +27,7 @@
 #ifndef _PT_OBJ_H_
 #define _PT_OBJ_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* filter bands */
 #define pt_common_CHANNELS_PER_OCTAVE 24

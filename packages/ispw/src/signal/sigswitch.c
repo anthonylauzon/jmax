@@ -33,7 +33,7 @@
      searching. There is for that a hack in dspgraph.c !!!
 */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern ftl_program_t *dsp_chain_on;
 static fts_symbol_t switch_function = 0;

@@ -27,7 +27,7 @@
 /***************** sigarctan2 *******************************/
 
 #include "math.h"
-#include "fts.h"
+#include <fts/fts.h>
 
 
 #define TABLE_SIZE 4096

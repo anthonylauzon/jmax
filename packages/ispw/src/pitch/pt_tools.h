@@ -30,7 +30,7 @@
 #define _PT_TOOLS_H_
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 

@@ -26,7 +26,7 @@
 
 
 #include <stdio.h>
-#include "fts.h"
+#include <fts/fts.h>
 #include "explode.h"
 
 /* explode data function keys */

@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void signal_tilda_config(void);
 extern void signal_binop_config(void);

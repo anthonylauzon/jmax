@@ -46,7 +46,7 @@
 
 #include "audp.h"
 #include "audp_fifo.h"
-#include "fts.h"
+#include <fts/fts.h>
 
 
 /******************************************************************************/

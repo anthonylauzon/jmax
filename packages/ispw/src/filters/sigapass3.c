@@ -25,7 +25,7 @@
  */
 
 #include <math.h> 
-#include "fts.h"
+#include <fts/fts.h>
 #include "biquad.h"
 
 static fts_symbol_t sigapass3_function = 0;

@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void dac_config(void);
 extern void adc_config(void);

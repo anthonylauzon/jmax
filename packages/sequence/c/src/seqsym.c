@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* sequence components */
 fts_symbol_t seqsym_sequence = 0;

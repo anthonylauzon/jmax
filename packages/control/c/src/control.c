@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /*extern void bus_config(void);*/
 /*extern void throw_config(void);*/

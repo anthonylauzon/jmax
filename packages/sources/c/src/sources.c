@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void src_integer_config(void);
 extern void src_bangbang_config(void);

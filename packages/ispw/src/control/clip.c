@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct clip_t {
   fts_object_t _o;

@@ -26,7 +26,7 @@
 
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void list_config(void);
 extern void listarith_config(void);

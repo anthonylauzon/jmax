@@ -32,7 +32,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #include <string.h>
 

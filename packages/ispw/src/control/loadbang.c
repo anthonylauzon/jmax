@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct loadbang_t {
   fts_object_t _o;

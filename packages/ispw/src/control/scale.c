@@ -28,7 +28,7 @@
 /* class scale */
 
 #include <math.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct scale_t
 {

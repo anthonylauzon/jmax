@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "fvec.h"
 
 fts_symbol_t fvec_symbol = 0;

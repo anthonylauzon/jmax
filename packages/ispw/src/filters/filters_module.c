@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void biquad_config(void);
 extern void sigcoef_bpass2_config(void);

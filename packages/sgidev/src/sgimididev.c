@@ -26,7 +26,7 @@
 
 #include <unistd.h>
 #include <dmedia/midi.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 #undef MIDI_SYSEX_DEBUG
 

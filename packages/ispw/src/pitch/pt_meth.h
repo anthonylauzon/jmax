@@ -29,7 +29,7 @@
 #ifndef _PT_METH_H_
 #define _PT_METH_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 typedef void (*analysis_t)(fts_object_t *);

@@ -28,7 +28,7 @@
 #include <pthread.h>
 #include <audiofile.h>
 #include <string.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 /* Implementation of asynchronius io for sound files based on pthreads */
 

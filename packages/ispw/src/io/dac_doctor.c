@@ -34,7 +34,7 @@
 
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_object_t *sigin_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {

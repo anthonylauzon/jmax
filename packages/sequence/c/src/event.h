@@ -26,7 +26,7 @@
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /*****************************************************************
  *

@@ -27,7 +27,7 @@
 #ifndef _KEYSERVER_H_
 #define _KEYSERVER_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* the first 128 codes are ASCII, from 128 we invented these */
 enum key_codes {

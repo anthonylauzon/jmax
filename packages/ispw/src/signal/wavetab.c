@@ -26,7 +26,7 @@
 
 #include <math.h>
 #include <string.h>
-#include "fts.h"
+#include <fts/fts.h>
 #include "wavetab.h"
 
 fts_symbol_t sym_nowrap = 0;

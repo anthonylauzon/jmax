@@ -40,7 +40,7 @@
 		 OPTIMIZE is set at compilation time
 */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* ---------------------- the float object type ---------------------------
 

@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "sampbuf.h"
  
 static fts_hash_table_t the_sampbuf_hashtable;

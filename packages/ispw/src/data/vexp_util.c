@@ -26,7 +26,7 @@
 
 
 #include <stdio.h>		/* for sprintf */
-#include "fts.h"
+#include <fts/fts.h>
 #include "vexp.h"
 #include "vexp_util.h"
 #include "ivec.h"

@@ -56,7 +56,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 
 /* 
    (François Déchelle, dechelle@ircam.fr)

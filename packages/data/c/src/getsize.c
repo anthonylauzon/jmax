@@ -13,7 +13,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#include "fts.h"
+#include <fts/fts.h>
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"

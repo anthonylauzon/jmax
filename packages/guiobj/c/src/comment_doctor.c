@@ -32,7 +32,7 @@
   arguments; later comments should work like message boxes.
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_symbol_t get_comment_symbol(int argc, const fts_atom_t *argv);
 

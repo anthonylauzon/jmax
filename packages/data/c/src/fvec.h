@@ -27,7 +27,7 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct _fvec_
 {

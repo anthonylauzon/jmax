@@ -11,7 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#include "fts.h"
+#include <fts/fts.h>
 #include "mat.h"
 
 typedef struct 

@@ -26,7 +26,7 @@
 #ifndef _NOTE_H_
 #define _NOTE_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "event.h"
 
 extern fts_class_t *note_class;

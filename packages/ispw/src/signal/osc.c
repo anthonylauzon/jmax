@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 #include <math.h>
 #include <string.h>
 #include "wavetab.h"

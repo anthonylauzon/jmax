@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 #define is_ibinop(ac, at)    (((ac) == 1) || (((ac) == 2) && fts_is_long(&(at)[1])))
 #define is_fbinop(ac, at)    (((ac) == 2) && fts_is_float(&(at)[1]))

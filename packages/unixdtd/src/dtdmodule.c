@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "dtdserver.h"
 
 extern void dtdserver_config( void);

@@ -34,7 +34,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "naming.h"
 
 typedef struct

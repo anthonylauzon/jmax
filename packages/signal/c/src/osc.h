@@ -30,7 +30,7 @@
 #define OSC_TABLE_BITS 9
 #define OSC_TABLE_SIZE 512
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "fvec.h"
 
 struct osc_ftl_symbols

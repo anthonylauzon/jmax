@@ -24,7 +24,7 @@
  *
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern void sampbuf_table_init(void);
 extern void sigtable_config(void);

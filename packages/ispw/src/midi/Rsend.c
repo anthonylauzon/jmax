@@ -26,7 +26,7 @@
 
 #include <math.h>
 #include <stdio.h>		/* for sprintf */
-#include "fts.h"
+#include <fts/fts.h>
 #include "Rsend.h"
 
 

@@ -27,7 +27,7 @@
 #ifndef _DATA_IVEC_H_
 #define _DATA_IVEC_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 typedef struct _ivec_
 {

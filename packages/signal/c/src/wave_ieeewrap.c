@@ -25,7 +25,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 #include "wave.h"
 
 #define PHASE_FRAC_BITS 8

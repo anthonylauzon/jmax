@@ -30,7 +30,7 @@
  */
 
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 struct value_keeper

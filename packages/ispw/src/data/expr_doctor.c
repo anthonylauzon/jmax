@@ -34,7 +34,7 @@
   symbol argument
  */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv);
 

@@ -26,7 +26,7 @@
 
 /* sigthresh.c */
 
-#include "fts.h"
+#include <fts/fts.h>
 
 
 #define CLASS_NAME "threshold~"

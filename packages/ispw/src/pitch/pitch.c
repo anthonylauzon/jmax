@@ -27,7 +27,7 @@
 /* pitch.c */
 
 #include <math.h>
-#include "fts.h"
+#include <fts/fts.h>
 
 #define FTS_TWO_PI (6.283185307f)
 

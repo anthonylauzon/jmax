@@ -27,7 +27,7 @@
 #ifndef _BUS_H_
 #define _BUS_H_
 
-#include "fts.h"
+#include <fts/fts.h>
 
 extern fts_symbol_t fts_s_bus;
 
