@@ -382,7 +382,9 @@ void fts_platform_init( int argc, char **argv)
   closesocket(sock);
 
   /* boost the priority of the fts thread */
-  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+  // TODO: [RS] find a better way to avoid the "Microsoft synth" bug (in MusiqueLab).
+  // Maybe some command-line option ?
+  //SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
   /* print out the current version in the log file */
   if ((RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) == 0) &&
