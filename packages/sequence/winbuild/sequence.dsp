@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\c\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\c\include" /I "..\..\..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SEQUENCE_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -92,7 +92,11 @@ SOURCE=..\c\src\event.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\event.h
+SOURCE=..\c\include\fts\packages\sequence\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\locate.c
 # End Source File
 # Begin Source File
 
@@ -104,7 +108,7 @@ SOURCE=..\c\src\note.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\note.h
+SOURCE=..\c\include\fts\packages\sequence\note.h
 # End Source File
 # Begin Source File
 
@@ -140,7 +144,7 @@ SOURCE=..\c\src\seqsym.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\seqsym.h
+SOURCE=..\c\include\fts\packages\sequence\seqsym.h
 # End Source File
 # Begin Source File
 
@@ -148,7 +152,7 @@ SOURCE=..\c\src\sequence.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\sequence.h
+SOURCE=..\c\include\fts\packages\sequence\sequence.h
 # End Source File
 # Begin Source File
 
@@ -156,7 +160,7 @@ SOURCE=..\c\src\track.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\track.h
+SOURCE=..\c\include\fts\packages\sequence\track.h
 # End Source File
 # End Target
 # End Project
