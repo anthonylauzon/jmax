@@ -1,3 +1,19 @@
+2003-07-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fixed distcheck for jMax.
+
+	* java/src/Makefile.am: removed jmax.jar.root in distclean.
+	
+	* config/Makefile.am: fixed uninstall of default_project.jprj and default_config.jcfg
+
+	* Makefile.am: removed obsolete files from EXTRA_DIST.
+
+	* configure.in: added a configure flag to enable compilation of unixdtd packages.
+
+	* packages/Makefile.am: added a conditionnal to compile unixdtd packages (maybe we could removed unixdtd packages?).
+	
+	* m4/ac_prog_javac.m4 : since jMax can't compile with gcj, I have removed gcj from the list of checked java compiler.
+
 2003-07-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in, m4/ac_check_java_version.m4: added a m4 macro for checking version of java.
