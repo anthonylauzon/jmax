@@ -1,3 +1,9 @@
+2001-04-03  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added vector display object to guiobj package and client sources (includiong images)
+
+	* added cut~ and scope~ to signal package
+
 2001-03-30  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* java/src/ircam/jmax/editors/patcher/objects/Display.java: bug
