@@ -140,9 +140,13 @@ void fts_enable_fpe_traps( void)
   signal( SIGFPE, linux_fpe_signal_handler);
 
   cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR
-    + _FPU_CONTROL_DM
-    + _FPU_CONTROL_UM
-    + _FPU_CONTROL_PM;
+    + _FPU_CONTROL_DM /* disable denormalized */
+    + _FPU_CONTROL_UM /* disable underflow */
+    + _FPU_CONTROL_PM; /* disable precision */
+
+    /* enable invalid operand (_FPU_CONTROL_IM) */
+    /* enable divide by zero (_FPU_CONTROL_ZM) */
+    /* enable overflow (_FPU_CONTROL_OM) */
     
   _FPU_SET_CW( cw);
 }
@@ -166,12 +170,12 @@ void fts_disable_fpe_traps( void)
   signal( SIGFPE, SIG_IGN);
 
   cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR
-    + _FPU_CONTROL_IM
-    + _FPU_CONTROL_DM
-    + _FPU_CONTROL_ZM
-    + _FPU_CONTROL_OM
-    + _FPU_CONTROL_UM
-    + _FPU_CONTROL_PM;
+    + _FPU_CONTROL_IM /* disable invalid operand */
+    + _FPU_CONTROL_DM /* disable denormalized */
+    + _FPU_CONTROL_ZM /* disable divide by zero */
+    + _FPU_CONTROL_OM /* disable overflow */
+    + _FPU_CONTROL_UM /* disable underflow */
+    + _FPU_CONTROL_PM; /* disable precision */
 
   _FPU_SET_CW( cw);
 }
