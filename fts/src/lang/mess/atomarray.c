@@ -50,7 +50,7 @@ fts_list_set_size(fts_list_t *list, int size)
 
       new_atoms = fts_block_alloc(alloc * sizeof(fts_atom_t));
 
-      if(alloc)
+      if(list->atoms)
 	{
 	  /* copy old content */
 	  for(i=0; i<list->size; i++)

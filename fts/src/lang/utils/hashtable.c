@@ -419,3 +419,5 @@ void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
 {
   hashtable_iterator_get( h, i, 0);
 }
+
+
