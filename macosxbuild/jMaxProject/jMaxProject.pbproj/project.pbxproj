@@ -2237,6 +2237,18 @@
 //F72
 //F73
 //F74
+		F7112B660401730701664058 = {
+			isa = PBXFileReference;
+			name = udpsend.c;
+			path = ../../packages/io/c/src/udpsend.c;
+			refType = 2;
+		};
+		F7112B670401730701664058 = {
+			fileRef = F7112B660401730701664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F746F84603F3D4BE01664058 = {
 			isa = PBXFileReference;
 			name = guilistener.c;
@@ -7337,6 +7349,7 @@
 				F85122C6028BE16601664092,
 				F85122C7028BE16601664092,
 				F567FA7803FC1B8A016640F1,
+				F7112B660401730701664058,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -7498,6 +7511,7 @@
 				F85122D8028BE16701664092,
 				F7B6E71203FBE61901664058,
 				F567FA7903FC1B8A016640F1,
+				F7112B670401730701664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
