@@ -248,10 +248,9 @@ static wavetab_samp_t *sin_tab;
 static fts_symbol_t osc_function = 0;
 static fts_symbol_t osc_freq_function = 0;
 static fts_symbol_t osc_phase_function = 0;
-
-#ifdef HI_OPT
+static fts_symbol_t osc_phase_inplace_function = 0;
 static fts_symbol_t osc_phase_64_function = 0;
-#endif
+static fts_symbol_t osc_phase_64_inplace_function = 0;
 
 /* 
    TODO: 
@@ -320,33 +319,50 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	}
       else
 	{
-	  /* phase input, no frequency input */
 
-#ifdef HI_OPT
-	  if (fts_dsp_get_input_size(dsp, 0) == 64)
+	  /* Different code generated for inplace and not in place operations */
+
+	  if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
 	    {
-	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+	      /* Inplace phase input, no frequency input */
 
-	      dsp_add_funcall(osc_phase_64_function, 3, argv);
+	      if (fts_dsp_get_input_size(dsp, 0) == 64)
+		{
+		  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+		  fts_set_ftl_data(argv+ 1, this->osc_ftl_data);
+
+		  dsp_add_funcall(osc_phase_64_inplace_function, 2, argv);
+		}
+	      else
+		{
+		  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+		  fts_set_ftl_data(argv+ 1, this->osc_ftl_data);
+		  fts_set_long   (argv + 2, fts_dsp_get_input_size(dsp, 0));
+		  dsp_add_funcall(osc_phase_inplace_function, 3, argv);
+		}
 	    }
 	  else
 	    {
-	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-	      fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
-	      dsp_add_funcall(osc_phase_function, 4, argv);
-	    }
-#else
-	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-	  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+	      /* Non inplace phase input, no frequency input */
 
-	  dsp_add_funcall(osc_phase_function, 4, argv);
-#endif
+	      if (fts_dsp_get_input_size(dsp, 0) == 64)
+		{
+		  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+		  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+		  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+
+		  dsp_add_funcall(osc_phase_64_function, 3, argv);
+		}
+	      else
+		{
+		  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+		  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+		  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+		  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+		  dsp_add_funcall(osc_phase_function, 4, argv);
+		}
+
+	    }
 	}
     }
   else
@@ -377,123 +393,15 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     }
 }
 
- #ifdef OLD
-static void
-osc_wrapper(fts_word_t *argv)
-{
-  float *freq  = (float *) fts_word_get_ptr(argv + 0);
-  float *phase = (float *) fts_word_get_ptr(argv + 1);
-  float *out   = (float *) fts_word_get_ptr(argv + 2);
-  osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 3);
-  long int n = fts_word_get_long(argv + 4);
-  int     ophase;
-  float   fconv;
-  wavetab_samp_t *tab;
-
-  ophase = this->phase;
-  fconv  = this->fconv * 0x7fffffffL;
-  tab    = this->samps;
-
-  while (n--)
-    {
-      int idx;
-
-
-      idx    = ((((long)(*phase * TAB_K1 + (ophase >> TAB_K4))) & TAB_K2) >> TAB_FRACBITS);
-      *out   = (tab[idx].value +
-		tab[idx].slope * ((((long)(*phase * TAB_K1 + (ophase >> TAB_K4))) & (TAB_FRAC-1))));
-      ophase = (ophase + (int)(fconv * *freq)) & 0x7fffffffL;
-
-      freq++;
-      phase++;
-      out++;
-    }
-
-  this->phase = ophase;
-}
-
 
 static void
-osc_phase_wrapper(fts_word_t *argv)
+ftl_osc_phase(fts_word_t *argv)
 {
-  float *phase = (float *) fts_word_get_ptr(argv + 0);
-  float *out   = (float *) fts_word_get_ptr(argv + 1);
-  osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
+  float * restrict phase = (float *) fts_word_get_ptr(argv + 0);
+  float * restrict out   = (float *) fts_word_get_ptr(argv + 1);
+  osc_control_t * restrict this = (osc_control_t *)fts_word_get_ptr(argv + 2);
   long int n = fts_word_get_long(argv + 3);
-
-  int     ophase;
-  float   fconv;
-  wavetab_samp_t *tab;
-
-  /* This function is used when osc is used as a wave shaper; result,
-     frequency and accumulated phase are always 0 */
-
-  fconv  = this->fconv * 0x7fffffffL;
-  tab    = this->samps;
-
-  while (n--)
-    {
-      int idx;
-
-      idx    = ((((long)(*phase * TAB_K1) & TAB_K2) >> TAB_FRACBITS);
-      *out   = (tab[idx].value +
-		tab[idx].slope * (((long)(*phase * TAB_K1 )) & (TAB_FRAC-1)));
-
-      phase++;
-      out++;
-    }
-}
-
-static void
-osc_freq_wrapper(fts_word_t *argv)
-{
-  float *freq = (float *) fts_word_get_ptr(argv + 0);
-  float *out  = (float *) fts_word_get_ptr(argv + 1);
-  osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
-  long int n = fts_word_get_long(argv + 3);
-  int     ophase;
-  float   fconv;
-  wavetab_samp_t *tab;
-
-  /* This version is used when there is no phase modulation */
-
-  ophase = this->phase;
-  fconv  = this->fconv * 0x7fffffffL;
-  tab    = this->samps;
-
-  while (n--)
-    {
-      int idx;
-
-
-      idx    = (((ophase >> TAB_K4)) & TAB_K2) >> TAB_FRACBITS;
-      *out   = (tab[idx].value +
-		tab[idx].slope * ((ophase >> TAB_K4) & (TAB_FRAC - 1)))
-      ophase = (ophase + (int)(fconv * *freq)) & 0x7fffffffL;
-
-      freq++;
-      out++;
-    }
-
-  this->phase = ophase;
-}
-
-#else
-
-/* This version is faster than the previous one in pipelined machines, because using
-   a little bit of loop unrolling reordering get less dependencies
-   and work a little bit better in pipelined arch.
-   For superscalar processor should be modified again.
-*/
-
-static void
-osc_phase_wrapper(fts_word_t *argv)
-{
-  float *phase = (float *) fts_word_get_ptr(argv + 0);
-  float *out   = (float *) fts_word_get_ptr(argv + 1);
-  osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
-  long int n = fts_word_get_long(argv + 3);
-  wavetab_samp_t *tab;
+  wavetab_samp_t * restrict tab;
   int i;
 
   /* This function is used when osc is used as a wave shaper; result,
@@ -501,46 +409,55 @@ osc_phase_wrapper(fts_word_t *argv)
 
   tab = this->samps;
 
-  for (i = 0; i < n; i+=4)
+  for (i = 0; i < n; i ++)
     {
-      int idx0, idx1, idx2, idx3;
-      float o0, o1, o2, o3;
-      float ph0, ph1, ph2, ph3;
+      int idx;
+      float ph;
 
-      ph0 = phase[i + 0] * TAB_K1;
-      ph1 = phase[i + 1] * TAB_K1;
-      ph2 = phase[i + 2] * TAB_K1;
-      ph3 = phase[i + 3] * TAB_K1;
+      ph = phase[i] * TAB_K1;
 
-      idx0 = ((long)ph0 & TAB_K2) >> TAB_FRACBITS;
-      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (TAB_FRAC - 1)));
-
-      idx1 = ((long)ph1 & TAB_K2) >> TAB_FRACBITS;
-      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (TAB_FRAC - 1)));
-
-      idx2 = ((long)ph2 & TAB_K2) >> TAB_FRACBITS;
-      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (TAB_FRAC - 1)));
-
-      idx3 = ((long)ph3 & TAB_K2) >> TAB_FRACBITS;
-      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (TAB_FRAC - 1)));
-
-      out[i + 0] = o0;
-      out[i + 1] = o1;
-      out[i + 2] = o2;
-      out[i + 3] = o3;
+      idx = ((long)ph & TAB_K2) >> TAB_FRACBITS;
+      out[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) ((long)ph & (TAB_FRAC - 1)));
     }
 }
+
+
+static void
+ftl_osc_phase_inplace(fts_word_t *argv)
+{
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 0);
+  osc_control_t * restrict this = (osc_control_t *)fts_word_get_ptr(argv + 1);
+  long int n = fts_word_get_long(argv + 2);
+  wavetab_samp_t * restrict tab;
+  int i;
+
+  /* This function is used when osc is used as a wave shaper; result,
+     frequency and accumulated phase are always 0 */
+
+  tab = this->samps;
+
+  for (i = 0; i < n; i ++)
+    {
+      int idx;
+      float ph;
+
+      ph = sig[i] * TAB_K1;
+
+      idx = ((long)ph & TAB_K2) >> TAB_FRACBITS;
+      sig[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) ((long)ph & (TAB_FRAC - 1)));
+    }
+}
+
 
 /* version with vs == 64 */
 
-#ifdef HI_OPT
 static void
-osc_phase_64_wrapper(fts_word_t *argv)
+ftl_osc_phase_64(fts_word_t *argv)
 {
-  float *phase = (float *) fts_word_get_ptr(argv + 0);
-  float *out   = (float *) fts_word_get_ptr(argv + 1);
-  osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
-  wavetab_samp_t *tab;
+  float * restrict phase = (float *) fts_word_get_ptr(argv + 0);
+  float * restrict out   = (float *) fts_word_get_ptr(argv + 1);
+  osc_control_t * restrict this = (osc_control_t *)fts_word_get_ptr(argv + 2);
+  wavetab_samp_t * restrict tab;
   int i;
 
   /* This function is used when osc is used as a wave shaper; result,
@@ -548,39 +465,47 @@ osc_phase_64_wrapper(fts_word_t *argv)
 
   tab = this->samps;
 
-  for (i = 0; i < 64; i+=4)
+  for (i = 0; i < 64; i ++)
     {
-      int idx0, idx1, idx2, idx3;
-      float o0, o1, o2, o3;
-      float ph0, ph1, ph2, ph3;
+      int idx;
+      float ph;
 
-      ph0 = phase[i + 0] * TAB_K1;
-      ph1 = phase[i + 1] * TAB_K1;
-      ph2 = phase[i + 2] * TAB_K1;
-      ph3 = phase[i + 3] * TAB_K1;
+      ph = phase[i] * TAB_K1;
 
-      idx0 = ((long)ph0 & TAB_K2) >> TAB_FRACBITS;
-      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (TAB_FRAC - 1)));
-
-      idx1 = ((long)ph1 & TAB_K2) >> TAB_FRACBITS;
-      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (TAB_FRAC - 1)));
-
-      idx2 = ((long)ph2 & TAB_K2) >> TAB_FRACBITS;
-      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (TAB_FRAC - 1)));
-
-      idx3 = ((long)ph3 & TAB_K2) >> TAB_FRACBITS;
-      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (TAB_FRAC - 1)));
-
-      out[i + 0] = o0;
-      out[i + 1] = o1;
-      out[i + 2] = o2;
-      out[i + 3] = o3;
+      idx = ((long)ph & TAB_K2) >> TAB_FRACBITS;
+      out[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) ((long)ph & (TAB_FRAC - 1)));
     }
 }
-#endif
+
 
 static void
-osc_freq_wrapper(fts_word_t *argv)
+ftl_osc_phase_64_inplace(fts_word_t *argv)
+{
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 0);
+  osc_control_t * restrict this = (osc_control_t *)fts_word_get_ptr(argv + 1);
+  wavetab_samp_t * restrict tab;
+  int i;
+
+  /* This function is used when osc is used as a wave shaper; result,
+     frequency and accumulated phase are always 0 */
+
+  tab = this->samps;
+
+  for (i = 0; i < 64; i ++)
+    {
+      int idx;
+      float ph;
+
+      ph = sig[i] * TAB_K1;
+
+      idx = ((long)ph & TAB_K2) >> TAB_FRACBITS;
+      sig[i] = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) ((long)ph & (TAB_FRAC - 1)));
+    }
+}
+
+
+static void
+ftl_osc_freq(fts_word_t *argv)
 {
   float *freq = (float *) fts_word_get_ptr(argv + 0);
   float *out  = (float *) fts_word_get_ptr(argv + 1);
@@ -640,7 +565,7 @@ osc_freq_wrapper(fts_word_t *argv)
 
 
 static void
-osc_wrapper(fts_word_t *argv)
+ftl_osc(fts_word_t *argv)
 {
   float *freq  = (float *) fts_word_get_ptr(argv + 0);
   float *phase = (float *) fts_word_get_ptr(argv + 1);
@@ -706,7 +631,7 @@ osc_wrapper(fts_word_t *argv)
 
   this->phase = ophase;
 }
-#endif
+
 
 /***************************************************************************************
  *
@@ -823,22 +748,23 @@ osc_config(void)
 
   /* Declare the oscillator related FTL functions */
 
-  osc_phase_function = fts_new_symbol("osc_p");
-  dsp_declare_function(osc_phase_function, osc_phase_wrapper);
+  osc_phase_function = fts_new_symbol("ftl_osc_phase");
+  dsp_declare_function(osc_phase_function, ftl_osc_phase);
 
-#ifdef HI_OPT
-  osc_phase_function = fts_new_symbol("osc_p");
-  dsp_declare_function(osc_phase_function, osc_phase_wrapper);
+  osc_phase_64_function = fts_new_symbol("ftl_osc_phase_64");
+  dsp_declare_function(osc_phase_64_function, ftl_osc_phase_64);
 
-  osc_phase_64_function = fts_new_symbol("osc_p_64");
-  dsp_declare_function(osc_phase_64_function, osc_phase_64_wrapper);
-#endif
+  osc_phase_inplace_function = fts_new_symbol("ftl_osc_phase_inplace");
+  dsp_declare_function(osc_phase_inplace_function, ftl_osc_phase_inplace);
 
-  osc_freq_function = fts_new_symbol("osc_f");
-  dsp_declare_function(osc_freq_function, osc_freq_wrapper);
+  osc_phase_64_inplace_function = fts_new_symbol("ftl_osc_phase_64_inplace");
+  dsp_declare_function(osc_phase_64_inplace_function, ftl_osc_phase_64_inplace);
 
-  osc_function = fts_new_symbol("osc");
-  dsp_declare_function(osc_function, osc_wrapper);
+  osc_freq_function = fts_new_symbol("ftl_osc_freq");
+  dsp_declare_function(osc_freq_function, ftl_osc_freq);
+
+  osc_function = fts_new_symbol("ftl_osc");
+  dsp_declare_function(osc_function, ftl_osc);
 
   /* class declaration */
 

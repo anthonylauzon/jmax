@@ -28,9 +28,7 @@
 #define OPS_LIMIT 256*1024
 #define BLOCK_CACHE_SIZE 16
 
-#ifdef SGI
 #include <malloc.h>
-#endif
 
 #define SMEM_START_MARKER 0xaa55aa55
 #define SMEM_END_MARKER   0xaa5555aa

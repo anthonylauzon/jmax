@@ -12,6 +12,7 @@
    against in the loop.) */
 
 static fts_symbol_t vd_dsp_symbol = 0;
+static fts_symbol_t vd_dsp_inplace_symbol = 0;
 
 /**************************************************
  *
@@ -112,17 +113,28 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   else
     {
       /* first delwrite~ or delread~ or vd~ scheduled for this delayline inits buffer */
-      int success;
-      success = delbuf_init(buf, sr, n_tick);
-      if(!success) return;
+
+      if (! delbuf_init(buf, sr, n_tick))
+	return;
     }
 
-  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_ptr(argv + 2, buf);
-  fts_set_ftl_data(argv + 3, this->vd_data);
-  fts_set_long(argv + 4, n_tick);
-  dsp_add_funcall(vd_dsp_symbol, 5, argv);
+  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+    {
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_ptr(argv + 1, buf);
+      fts_set_ftl_data(argv + 2, this->vd_data);
+      fts_set_long(argv + 3, n_tick);
+      dsp_add_funcall(vd_dsp_inplace_symbol, 4, argv);
+    }
+  else
+    {
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ptr(argv + 2, buf);
+      fts_set_ftl_data(argv + 3, this->vd_data);
+      fts_set_long(argv + 4, n_tick);
+      dsp_add_funcall(vd_dsp_symbol, 5, argv);
+    }
 
   delay_table_delreader_scheduled(this->name);
 }
@@ -160,6 +172,9 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   vd_dsp_symbol = fts_new_symbol("vd");
   dsp_declare_function(vd_dsp_symbol, ftl_vd);
+
+  vd_dsp_inplace_symbol = fts_new_symbol("vd_inplace");
+  dsp_declare_function(vd_dsp_inplace_symbol, ftl_vd_inplace);
 
   return fts_Success;
 }

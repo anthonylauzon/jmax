@@ -7,6 +7,9 @@
    types in a lot of systems
 */
 
+static fts_symbol_t sig_dsp_function = 0;
+static fts_symbol_t sig_64_dsp_function = 0;
+
 #define CLASS_NAME "sig~"
 
 /**********************************************************
@@ -59,7 +62,30 @@ sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *    dsp
  *
  */
- 
+
+static void ftl_sig(fts_word_t *argv)
+{
+  float f = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  long int n = fts_word_get_long(argv + 2);
+  int i;
+
+  for (i = 0; i < n; i++)
+    out[i] = f;
+}
+
+static void ftl_sig_64(fts_word_t *argv)
+{
+  float f = *((float *)fts_word_get_ptr(argv + 0));
+  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  int i;
+
+  for (i = 0; i < 64; i++)
+    out[i] = f;
+}
+
+
+
 static void
 sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -67,11 +93,20 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 
-  fts_set_ftl_data(argv, this->sig_ftl_data);
-  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv+2, fts_dsp_get_output_size(dsp, 0));
+  if (fts_dsp_get_output_size(dsp, 0) == 64)
+    {
+      fts_set_ftl_data(argv, this->sig_ftl_data);
+      fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
+      dsp_add_funcall(sig_64_dsp_function, 2, argv);
+    }
+  else
+    {
+      fts_set_ftl_data(argv, this->sig_ftl_data);
+      fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_long  (argv+2, fts_dsp_get_output_size(dsp, 0));
+      dsp_add_funcall(sig_dsp_function, 3, argv);
+    }
 
-  dsp_add_funcall(ftl_sym.fill.f, 3, argv);
 }
 
 /**********************************************************
@@ -131,6 +166,12 @@ sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
+
+  sig_dsp_function = fts_new_symbol("sig");
+  dsp_declare_function(sig_dsp_function, ftl_sig);
+
+  sig_64_dsp_function = fts_new_symbol("sig64");
+  dsp_declare_function(sig_64_dsp_function, ftl_sig_64);
 
   return fts_Success;
 }

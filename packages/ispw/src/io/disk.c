@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/11/26 10:00:24 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/12/07 10:37:07 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -1235,8 +1235,8 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   for (i = 0; i < nchans; i++)
     dsp_sig_inlet(cl, i);
 
-  writesf_mono_function = fts_new_symbol("writesf_mono");
-  writesf_stereo_function = fts_new_symbol("writesf_stereo");
+  writesf_mono_function = fts_new_symbol("ftl_writesf_mono");
+  writesf_stereo_function = fts_new_symbol("ftl_writesf_stereo");
   dsp_declare_function(writesf_mono_function, ftl_mono_writesf);
   dsp_declare_function(writesf_stereo_function, ftl_stereo_writesf);
 

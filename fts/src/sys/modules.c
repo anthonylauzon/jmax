@@ -25,14 +25,21 @@
 
 #include "sys.h"
 
-#ifdef HAS_DL
+#ifdef LINUX
+#include <unist.h>
+#endif
+
 #include <stdlib.h>
 #include <fcntl.h>
+#include <string.h>
+
+#ifdef HAS_DL
 #include <dlfcn.h>
 #endif
 
 
 
+extern int fts_file_get_read_path(const char *path, char *full_path);
 
 /******************************************************************************/
 /*                                                                            */

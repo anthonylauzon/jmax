@@ -2,9 +2,8 @@
 
 
 static fts_symbol_t sigline_function = 0;
-#ifdef  COMP_7_2
 static fts_symbol_t sigline_64_function = 0;
-#endif
+
 typedef struct
 {
   float val;
@@ -26,16 +25,13 @@ typedef struct
 } sigline_t;
 
 
-/* #define COMP_7_2 */
-
-#ifdef  COMP_7_2
 
 static void ftl_line(fts_word_t *argv)
 {
   float * restrict fp = (float *)fts_word_get_ptr(argv);
   line_control_t * restrict lctl = (line_control_t *)fts_word_get_ptr(argv+1);
   long int n = fts_word_get_long(argv+2);
-  
+
   if (lctl->steps > 0)
     {
       int i;
@@ -93,57 +89,6 @@ static void ftl_line_64(fts_word_t *argv)
     }
 }
 
-#else
-
-static void ftl_line(fts_word_t *argv)
-{
-  float *fp = (float *)fts_word_get_ptr(argv);
-  line_control_t *lctl = (line_control_t *)fts_word_get_ptr(argv+1);
-  long int n = fts_word_get_long(argv+2);
-  
-  if (lctl->steps > 0)
-    {
-      int i;
-      float val = lctl->val, diff = (lctl->target - val)/lctl->steps;
-
-      for (i = 0; i < n; i += 8)
-	{
-	  fp[i + 0] = (val += diff);
-	  fp[i + 1] = (val += diff);
-	  fp[i + 2] = (val += diff);
-	  fp[i + 3] = (val += diff);
-	  fp[i + 4] = (val += diff);
-	  fp[i + 5] = (val += diff);
-	  fp[i + 6] = (val += diff);
-	  fp[i + 7] = (val += diff);
-	}
-
-      lctl->val = val;
-      lctl->steps -= lctl->vecsize;
-    }
-  else
-    {
-      int i;
-      float target = lctl->target;
-
-      for (i = 0; i < n; i += 8)
-	{
-	  fp[i + 0] = target;
-	  fp[i + 1] = target;
-	  fp[i + 2] = target;
-	  fp[i + 3] = target;
-	  fp[i + 4] = target;
-	  fp[i + 5] = target;
-	  fp[i + 6] = target;
-	  fp[i + 7] = target;
-	}
-
-      lctl->val = target;
-    }
-}
-
-#endif
-
 static void
 sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -158,7 +103,6 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   f = (float) this->vecsize;
   ftl_data_set(line_control_t, this->ftl_data, vecsize, &f); 
 
-#ifdef  COMP_7_2
   if (this->vecsize == 64)
     {
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
@@ -167,14 +111,11 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
   else
     {
-#endif
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv+1, this->ftl_data);
       fts_set_long   (argv+2, fts_dsp_get_output_size(dsp, 0));
       dsp_add_funcall(sigline_function, 3, argv);
-#ifdef  COMP_7_2
     }
-#endif
 }
 
 
@@ -301,13 +242,11 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
   
-  sigline_function = fts_new_symbol("line");
+  sigline_function = fts_new_symbol("ftl_line");
   dsp_declare_function(sigline_function, ftl_line);
 
-#ifdef  COMP_7_2
-  sigline_64_function = fts_new_symbol("line64");
+  sigline_64_function = fts_new_symbol("ftl_line64");
   dsp_declare_function(sigline_64_function, ftl_line_64);
-#endif
 
   return fts_Success;
 }

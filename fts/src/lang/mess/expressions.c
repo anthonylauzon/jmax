@@ -1421,6 +1421,7 @@ void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *
 
 /* DEBUG CODE */
 
+#ifdef EXPRESSION_TRACE_DEBUG
 void fts_expression_printf_assignements(fts_expression_state_t *e)
 {
   fts_expression_assignement_t *p;
@@ -1435,6 +1436,7 @@ void fts_expression_printf_assignements(fts_expression_state_t *e)
       p = p->next;
     }
 }
+#endif
 
 
 fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,

@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/ftl.h"

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.57 $ IRCAM $Date: 1998/12/03 14:37:15 $
+ *      $Revision: 1.58 $ IRCAM $Date: 1998/12/03 19:05:33 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -20,7 +20,9 @@
 #include "lang/mess/messP.h"
 
 extern void fts_client_release_object(fts_object_t *c);
+extern void fts_client_release_object_data(fts_object_t *c);
 extern void fts_client_send_property(fts_object_t *obj, fts_symbol_t name);
+extern void fts_client_upload_object(fts_object_t *obj);
 
 /* forward declarations  */
 
@@ -836,7 +838,7 @@ static void fts_object_free(fts_object_t *obj, int release)
       /* must call the real disconnect function, so that all the daemons
 	 and methods  can fire correctly */
 
-      while (p = obj->out_conn[outlet])
+      while ((p = obj->out_conn[outlet]))
 	fts_connection_delete(p);
     }
 
@@ -849,7 +851,7 @@ static void fts_object_free(fts_object_t *obj, int release)
       /* must call the real disconnect function, so that all the daemons
 	 and methods  can fire correctly */
 
-      while (p = obj->in_conn[inlet])
+      while ((p = obj->in_conn[inlet]))
 	fts_connection_delete(p);
     }
 
@@ -1070,10 +1072,11 @@ void fprintf_object(FILE *f, fts_object_t *obj)
 	fprintf(f, "<{");
 
       fprintf_atoms(f, obj->argc, obj->argv);
-      fprintf(f, "} #%lx(%d)>", (unsigned int) obj, obj->id);
+      fprintf(f, "} #%lx(%d)>", (unsigned long) obj, obj->id);
     }
   else
-    fprintf(f, "<\"%s\" #%lx(%d)>", fts_symbol_name(fts_object_get_class_name(obj)), (unsigned int) obj, obj->id);
+    fprintf(f, "<\"%s\" #%lx(%d)>", fts_symbol_name(fts_object_get_class_name(obj)),
+	    (unsigned long) obj, obj->id);
 }
 
 

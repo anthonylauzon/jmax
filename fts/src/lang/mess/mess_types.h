@@ -88,7 +88,7 @@ struct fts_symbol_descr
 
 union fts_word
 {
-  long                fts_long;
+  int                 fts_int;
   float               fts_float;
   fts_symbol_t        fts_symbol;
   char                *fts_str;

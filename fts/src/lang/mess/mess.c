@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.18 $ IRCAM $Date: 1998/10/21 16:35:28 $
+ *      $Revision: 1.19 $ IRCAM $Date: 1998/10/28 15:50:31 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -16,7 +16,9 @@
 #include "lang/mess/messP.h"
 #include "lang/mess/objtable.h"
 
+
 static void  fts_mess_init(void);
+
 static void  fts_mess_restart(void);
 static void  fts_mess_shutdown(void);
 

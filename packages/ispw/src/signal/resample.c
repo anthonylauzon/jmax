@@ -141,15 +141,13 @@ typedef struct down
 static void
 ftl_down(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv);
-  float *out = (float *)fts_word_get_ptr(argv+1);
+  float * restrict in = (float *)fts_word_get_ptr(argv);
+  float * restrict out = (float *)fts_word_get_ptr(argv+1);
   long int n = fts_word_get_long(argv+2);
+  int i, j;
 
-  while (n--)
-    {
-      *out++ = *in;
-      in += 2;
-    }
+  for (i = 0, j = 0; i < n; i++, j += 2)
+    out[i] = in[j];
 }
 
 
@@ -161,7 +159,6 @@ sigdown_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-
   fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0) >> 1);
 
   dsp_add_funcall(sigdown_function, 3, argv);

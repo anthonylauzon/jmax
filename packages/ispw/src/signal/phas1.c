@@ -2,6 +2,7 @@
 
 
 static fts_symbol_t phasor_function = 0;
+static fts_symbol_t phasor_inplace_function = 0;
 
 typedef struct 
 {
@@ -13,10 +14,10 @@ typedef struct
 void
 ftl_phasor(fts_word_t *argv)
 {
-  float *freq = (float *)  fts_word_get_ptr(argv + 0);
-  float *out  = (float *)  fts_word_get_ptr(argv + 1);
-  phasor_state_t *x = (phasor_state_t *) fts_word_get_ptr(argv + 2);
-  long int n = fts_word_get_long(argv + 3);
+  float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
+  float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
+  phasor_state_t * restrict x = (phasor_state_t *) fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_long(argv + 3);
   int phase;
   float fconv;
   int i;
@@ -24,29 +25,32 @@ ftl_phasor(fts_word_t *argv)
   phase = 0x7fffffffL * x->phase;
   fconv = x->fconv * 0x7fffffffL;
 
-  for (i = 0; i < n ; i += 8)
+  for (i = 0; i < n ; i ++)
     {
-      int p0, p1, p2, p3, p4, p5, p6, p7;
+      phase = (phase + (int)(fconv * freq[i])) & 0x7fffffffL;
+      out[i] = (1.0f/0x7fffffffL) * phase;
+    }
 
-      p0 = (phase + (int)(fconv * freq[i + 0])) & 0x7fffffffL;
-      p1 = (p0 + (int)(fconv * freq[i + 1])) & 0x7fffffffL;
-      p2 = (p1 + (int)(fconv * freq[i + 2])) & 0x7fffffffL;
-      p3 = (p2 + (int)(fconv * freq[i + 3])) & 0x7fffffffL;
-      p4 = (p3 + (int)(fconv * freq[i + 4])) & 0x7fffffffL;
-      p5 = (p4 + (int)(fconv * freq[i + 5])) & 0x7fffffffL;
-      p6 = (p5 + (int)(fconv * freq[i + 6])) & 0x7fffffffL;
-      p7 = (p6 + (int)(fconv * freq[i + 7])) & 0x7fffffffL;
+  x->phase = (1.0f/0x7fffffffL) * phase;
+}
 
-      out[i + 0] = (1.0f/0x7fffffffL) * p0;
-      out[i + 1] = (1.0f/0x7fffffffL) * p1;
-      out[i + 2] = (1.0f/0x7fffffffL) * p2;
-      out[i + 3] = (1.0f/0x7fffffffL) * p3;
-      out[i + 4] = (1.0f/0x7fffffffL) * p4;
-      out[i + 5] = (1.0f/0x7fffffffL) * p5;
-      out[i + 6] = (1.0f/0x7fffffffL) * p6;
-      out[i + 7] = (1.0f/0x7fffffffL) * p7;
+void
+ftl_inplace_phasor(fts_word_t *argv)
+{
+  float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
+  phasor_state_t * restrict x = (phasor_state_t *) fts_word_get_ptr(argv + 1);
+  long int n = fts_word_get_long(argv + 2);
+  int phase;
+  float fconv;
+  int i;
 
-      phase = p7;
+  phase = 0x7fffffffL * x->phase;
+  fconv = x->fconv * 0x7fffffffL;
+
+  for (i = 0; i < n ; i ++)
+    {
+      phase = (phase + (int)(fconv * sig[i])) & 0x7fffffffL;
+      sig[i] = (1.0f/0x7fffffffL) * phase;
     }
 
   x->phase = (1.0f/0x7fffffffL) * phase;
@@ -74,12 +78,26 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   ftl_data_set(phasor_state_t, this->phasor_ftl_data, fconv, &fconv);
 
-  fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_ftl_data( argv+2, this->phasor_ftl_data);
-  fts_set_long( argv+3, fts_dsp_get_input_size(dsp, 0));
+  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+    {
+      /* Use the inplace version */
 
-  dsp_add_funcall(phasor_function, 4, argv);
+      fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_ftl_data( argv+1, this->phasor_ftl_data);
+      fts_set_long( argv+2, fts_dsp_get_input_size(dsp, 0));
+
+      dsp_add_funcall(phasor_inplace_function, 3, argv);
+    }
+  else
+    {
+      /* standard code */
+      fts_set_symbol( argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ftl_data( argv+2, this->phasor_ftl_data);
+      fts_set_long( argv+3, fts_dsp_get_input_size(dsp, 0));
+
+      dsp_add_funcall(phasor_function, 4, argv);
+    }
 }
 
 
@@ -151,6 +169,9 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   phasor_function = fts_new_symbol("phasor");
   dsp_declare_function(phasor_function, ftl_phasor);
+
+  phasor_inplace_function = fts_new_symbol("phasor_inplace");
+  dsp_declare_function(phasor_inplace_function, ftl_inplace_phasor);
 
   return fts_Success;
 }

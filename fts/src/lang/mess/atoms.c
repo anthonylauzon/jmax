@@ -6,8 +6,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-void
-fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
+void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -23,7 +22,7 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
       if (fts_is_symbol(&at[i]))
 	fprintf(f,"%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
       else if (fts_is_long(&at[i]))
-	fprintf(f,"%d%s", fts_get_long(&at[i]), ps);
+	fprintf(f,"%d%s", fts_get_int(&at[i]), ps);
       else if (fts_is_float(&at[i]))
 	fprintf(f,"%f%s", fts_get_float(&at[i]), ps);
       else if (fts_is_ptr(&at[i]) )
@@ -108,8 +107,7 @@ int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
     return 0;
 }
 
-int
-fts_atom_is_null(const fts_atom_t *a)
+int fts_atom_is_null(const fts_atom_t *a)
 {
   if (fts_is_void(a))
     return 1;

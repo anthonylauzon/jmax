@@ -43,10 +43,7 @@ static fts_hash_table_t catch_table;
 #define MAXVS 64
 
 static fts_symbol_t sigcatch_function = 0;
-
-#ifdef HI_OPT
 static fts_symbol_t sigcatch_64_function = 0;
-#endif
 
 typedef struct sigcatch_t sigcatch_t;
 
@@ -58,15 +55,13 @@ struct sigcatch_t
   float samps[MAXVS];
 };
 
-#ifdef HI_OPT
+
 static void
 sigcatch_64_dsp_fun(fts_word_t *argv)
 {
-  float *out = (float *)fts_word_get_ptr(argv);
-  float *buf = (float *)fts_word_get_ptr(argv+1);
+  float * restrict out = (float *)fts_word_get_ptr(argv);
+  float * restrict buf = (float *)fts_word_get_ptr(argv+1);
   int i;
-
-  /* #pragma ivdep   */
 
   for (i = 0; i < 64; i++)
     {
@@ -74,16 +69,21 @@ sigcatch_64_dsp_fun(fts_word_t *argv)
       buf[i] = 0;
     }
 }
-#endif
+
 
 static void
 sigcatch_dsp_fun(fts_word_t *argv)
 {
-  fts_vecx_fcpy(fts_word_get_ptr(argv+1),
-		(float *)fts_word_get_ptr(argv), 
-		fts_word_get_long(argv+2));
+  float * restrict out = (float *)fts_word_get_ptr(argv);
+  float * restrict buf = (float *)fts_word_get_ptr(argv+1);
+  int n = fts_word_get_long(argv+2);
+  int i;
 
-  fts_vecx_fzero((float *)fts_word_get_ptr(argv+1), fts_word_get_long(argv+2));
+  for (i = 0; i < n; i++)
+    {
+      out[i] = buf[i];
+      buf[i] = 0;
+    }
 }
 
 static void
@@ -94,7 +94,6 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 
   fts_vecx_fzero(this->samps, MAXVS);
-#ifdef HI_OPT
 
   if (fts_dsp_get_output_size(dsp, 0) == 64)
     {
@@ -111,14 +110,8 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       dsp_add_funcall(sigcatch_function, 3, argv);
     }
-#else
-  fts_set_symbol(argv,   fts_dsp_get_output_name(dsp, 0));
-  fts_set_ptr   (argv+1, this->samps);
-  fts_set_long  (argv+2, fts_dsp_get_output_size(dsp, 0));
-
-  dsp_add_funcall(sigcatch_function, 3, argv);
-#endif
 }
+
 
 static void
 sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
@@ -178,10 +171,8 @@ sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   sigcatch_function = fts_new_symbol("sigcatch");
   dsp_declare_function(sigcatch_function, sigcatch_dsp_fun);
 
-#ifdef HI_OPT
   sigcatch_64_function = fts_new_symbol("sigcatch_64");
   dsp_declare_function(sigcatch_64_function, sigcatch_64_dsp_fun);
-#endif
   
   return fts_Success;
 }
@@ -202,10 +193,8 @@ sigcatch_config(void)
  */
 
 static fts_symbol_t sigthrow_function = 0;
-
-#ifdef HI_OPT
 static fts_symbol_t sigthrow_64_function = 0;
-#endif
+
 
 typedef struct
 {
@@ -219,55 +208,35 @@ typedef struct
 static void
 sigthrow_dsp_fun(fts_word_t *argv)
 {
-  float *p;
+  float * restrict in  = (float *)fts_word_get_ptr(argv);
+  float * restrict p = *((float **)fts_word_get_ptr(argv+1));
+  int n = fts_word_get_long(argv+2);
 
-  p = *((float **)fts_word_get_ptr(argv+1));
+  if (p)
+    {
+      int i;
 
-  if(p)
-    fts_vecx_fadd((float *)fts_word_get_ptr(argv), p, p, fts_word_get_long(argv+2));
+      for (i = 0; i < n; i++)
+	p[i] = p[i] + in[i];
+    }
 }
 
-#ifdef HI_OPT
+
 static void
 sigthrow_dsp_64_fun(fts_word_t *argv)
 {
-  float *out;
+  float * restrict in  = (float *)fts_word_get_ptr(argv);
+  float * restrict p = *((float **)fts_word_get_ptr(argv+1));
 
-  out = *((float **)fts_word_get_ptr(argv+1));
-
-
-  if (out)
+  if (p)
     {
-      float *in = (float *)fts_word_get_ptr(argv+0);
       int i;
 
-      /* #pragma ivdep */
-
-      for (i = 0; i < 64; i+=8)
-	{
-	  float f0, f1, f2, f3, f4, f5, f6, f7;
-
-	  f0 = in[i + 0];
-	  f1 = in[i + 1];
-	  f2 = in[i + 2];
-	  f3 = in[i + 3];
-	  f4 = in[i + 4];
-	  f5 = in[i + 5];
-	  f6 = in[i + 6];
-	  f7 = in[i + 7];
-
-	  out[i + 0] = out[i + 0] + f0;
-	  out[i + 1] = out[i + 1] + f1;
-	  out[i + 2] = out[i + 2] + f2;
-	  out[i + 3] = out[i + 3] + f3;
-	  out[i + 4] = out[i + 4] + f4;
-	  out[i + 5] = out[i + 5] + f5;
-	  out[i + 6] = out[i + 6] + f6;
-	  out[i + 7] = out[i + 7] + f7;
-	}
+      for (i = 0; i < 64; i++)
+	p[i] = p[i] + in[i];
     }
 }
-#endif
+
 
 static void
 sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -298,7 +267,6 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
   fts_set_ftl_data   (argv+1, this->ftl_data);
 
-#ifdef HI_OPT
   if (fts_dsp_get_input_size(dsp, 0) == 64)
     dsp_add_funcall(sigthrow_64_function, 2, argv);
   else
@@ -306,10 +274,6 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0));
       dsp_add_funcall(sigthrow_function, 3, argv);
     }
-#else
-  fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(sigthrow_function, 3, argv);
-#endif
 }
 
 static void
@@ -452,10 +416,8 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   sigthrow_function = fts_new_symbol("sigthrow");
   dsp_declare_function(sigthrow_function, sigthrow_dsp_fun);
 
-#ifdef HI_OPT
   sigthrow_64_function = fts_new_symbol("sigthrow_64");
   dsp_declare_function(sigthrow_64_function, sigthrow_dsp_64_fun);
-#endif
 
   return fts_Success;
 }

@@ -18,6 +18,10 @@ extern void class_config(void);
 extern void send_config(void);
 extern void fts_patparser_init(void);
 extern void fts_mess_naming_init(void);
+extern void fts_params_init(void);
+extern void fts_properties_init(void);
+extern void fts_patcher_data_config(void);
+extern void fts_variables_init(void);
 
 /* System classes config */
 

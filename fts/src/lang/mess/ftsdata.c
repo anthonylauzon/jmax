@@ -338,10 +338,11 @@ void fprintf_data(FILE *f, fts_data_t *data)
     }
   else if (data->class)
     {
-      fprintf(f, "<:%s #%lx(%d):>", fts_symbol_name(data->class->data_class_name), data, data->id);
+      fprintf(f, "<:%s #%lx(%d):>", fts_symbol_name(data->class->data_class_name),
+	      (unsigned long) data, (unsigned int) data->id);
     }
   else
-    fprintf(f, "<: Unconsistent data #%lx :>", data);
+    fprintf(f, "<: Unconsistent data #%lx :>", (unsigned long) data);
   
 }
 

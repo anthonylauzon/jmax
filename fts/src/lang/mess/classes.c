@@ -13,6 +13,7 @@
 
 /* This file implement the class/metaclass structure */
 
+#include <string.h>
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -40,6 +41,7 @@ static fts_heap_t *class_mess_heap;
 static fts_class_mess_t *fts_class_mess_create(fts_symbol_t s, fts_method_t mth,
 					       int mandatory_args, int nargs, fts_symbol_t *arg_types);
 
+static int fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg);
 
 
 /******************************************************************************/

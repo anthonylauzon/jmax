@@ -4,3 +4,4 @@ typedef struct{
 } vd_ctl_t;
 
 extern void ftl_vd(fts_word_t *argv);
+extern void ftl_vd_inplace(fts_word_t *argv);

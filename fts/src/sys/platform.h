@@ -24,7 +24,7 @@
 #if defined(GNU)
 
 #define FTS_ARCH_NAME        "gnu"
-#define restrict /* needed for compatibility with the newer restrict keyword */
+#define restrict
 /* #define HAS_DL */
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
@@ -40,7 +40,7 @@
 #elif defined(LINUX)
 
 #define FTS_ARCH_NAME "linux"
-#define restrict /* needed for compatibility with the newer restrict keyword */
+#define restrict
 #undef HI_OPT /* hyper experimental optimizations */
 #define HAS_DL
 #define HAS_TIME_OF_THE_DAY

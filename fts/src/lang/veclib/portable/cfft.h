@@ -25,7 +25,7 @@ extern fft_lookup_t *the_fft_lookups;
  *
  */
 
-extern void cfft_inplc(complex *buf, complex *coef, long nstep, long npoints);
+extern void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, long npoints);
 
 extern void bitreversal_inplc(complex *buf, long *bitrev, long nstep, long npoints);
 extern void bitreversal(complex *in, complex *out, long *bitrev, long nstep, long npoints);

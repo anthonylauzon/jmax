@@ -1,27 +1,51 @@
 #include "fts.h"
 
-/* Esperimental, for IRIX 6.2, versions with constant 64 vector sizes */
-
-#ifdef SGI
-#define COMP_7_2 
-#endif
-
-#ifdef  COMP_7_2
-#undef  HI_OPT
+fts_symbol_t dsp_add;
+fts_symbol_t dsp_mul;
 
 fts_symbol_t dsp_64_add;
 fts_symbol_t dsp_64_mul;
 
+fts_symbol_t dsp_2ops_add;
+fts_symbol_t dsp_2ops_mul;
+
 fts_symbol_t dsp_64_2ops_add;
 fts_symbol_t dsp_64_2ops_mul;
+
+fts_symbol_t dsp_1ops_add;
+fts_symbol_t dsp_1ops_mul;
 
 fts_symbol_t dsp_64_1ops_add;
 fts_symbol_t dsp_64_1ops_mul;
 
-/* We do it only for mul and add */
+/* We do it only for mul and add, plain and for size == 64  */
 
-void
-dsp_add_64(fts_word_t *argv)
+static void ftl_add(fts_word_t *argv)
+{
+  float * restrict in1 = (float *)fts_word_get_ptr(argv+0);
+  float * restrict in2 = (float *)fts_word_get_ptr(argv+1);
+  float * restrict out = (float *)fts_word_get_ptr(argv+2);
+  int n = fts_word_get_long(argv+3);
+  int i;
+
+  for (i = 0; i < n; i++)
+    out[i] = in1[i] + in2[i];
+}
+
+static void ftl_mul(fts_word_t *argv)
+{
+  float * restrict in1 = (float *)fts_word_get_ptr(argv+0);
+  float * restrict in2 = (float *)fts_word_get_ptr(argv+1);
+  float * restrict out = (float *)fts_word_get_ptr(argv+2);
+  int n = fts_word_get_long(argv+3);
+  int i;
+
+  for (i = 0; i < n; i++)
+    out[i] = in1[i] * in2[i];
+}
+
+
+static void ftl_add_64(fts_word_t *argv)
 {
   float * restrict in1 = (float *)fts_word_get_ptr(argv+0);
   float * restrict in2 = (float *)fts_word_get_ptr(argv+1);
@@ -32,8 +56,7 @@ dsp_add_64(fts_word_t *argv)
     out[i] = in1[i] + in2[i];
 }
 
-void
-dsp_mul_64(fts_word_t *argv)
+static void ftl_mul_64(fts_word_t *argv)
 {
   float * restrict in1 = (float *)fts_word_get_ptr(argv+0);
   float * restrict in2 = (float *)fts_word_get_ptr(argv+1);
@@ -46,8 +69,29 @@ dsp_mul_64(fts_word_t *argv)
 
 /* versions with two args: out = out + in */
 
-void
-dsp_add_64_2ops(fts_word_t *argv)
+static void ftl_add_2ops(fts_word_t *argv)
+{
+  float * restrict in = (float *)fts_word_get_ptr(argv+0);
+  float * restrict out = (float *)fts_word_get_ptr(argv+1);
+  int n = fts_word_get_long(argv+2);
+  int i;
+
+  for (i = 0; i < n; i++)
+    out[i] = out[i] + in[i];
+}
+
+static void ftl_mul_2ops(fts_word_t *argv)
+{
+  float * restrict in = (float *)fts_word_get_ptr(argv+0);
+  float * restrict out = (float *)fts_word_get_ptr(argv+1);
+  int n = fts_word_get_long(argv+2);
+  int i;
+
+  for (i = 0; i < n; i++)
+    out[i] = out[i] * in[i];
+}
+
+static void ftl_add_64_2ops(fts_word_t *argv)
 {
   float * restrict in = (float *)fts_word_get_ptr(argv+0);
   float * restrict out = (float *)fts_word_get_ptr(argv+1);
@@ -57,8 +101,7 @@ dsp_add_64_2ops(fts_word_t *argv)
     out[i] = out[i] + in[i];
 }
 
-void
-dsp_mul_64_2ops(fts_word_t *argv)
+static void ftl_mul_64_2ops(fts_word_t *argv)
 {
   float * restrict in = (float *)fts_word_get_ptr(argv+0);
   float * restrict out = (float *)fts_word_get_ptr(argv+1);
@@ -72,18 +115,37 @@ dsp_mul_64_2ops(fts_word_t *argv)
    Probabily useless, but needed for consitency of
    the ivdep thing */
 
-void
-dsp_add_64_1ops(fts_word_t *argv)
+static void ftl_add_1ops(fts_word_t *argv)
 {
   float * restrict v = (float *)fts_word_get_ptr(argv+0);
+  int n = fts_word_get_long(argv+1);
+  int i;
+
+  for (i = 0; i < n; i++)
+    v[i] = v[i] + v[i];
+}
+
+static void ftl_mul_1ops(fts_word_t *argv)
+{
+  float * restrict v = (float *)fts_word_get_ptr(argv+0);
+  int n = fts_word_get_long(argv+1);
+  int i;
+
+  for (i = 0; i < n; i++)
+    v[i] = v[i] * v[i];
+}
+
+static void ftl_add_64_1ops(fts_word_t *argv)
+{
+  float * restrict v = (float *)fts_word_get_ptr(argv+0);
+  int n = fts_word_get_long(argv+1);
   int i;
 
   for (i = 0; i < 64; i++)
     v[i] = v[i] + v[i];
 }
 
-void
-dsp_mul_64_1ops(fts_word_t *argv)
+static void ftl_mul_64_1ops(fts_word_t *argv)
 {
   float * restrict v = (float *)fts_word_get_ptr(argv+0);
   int i;
@@ -92,184 +154,6 @@ dsp_mul_64_1ops(fts_word_t *argv)
     v[i] = v[i] * v[i];
 }
 
-#endif
-
-#ifdef HI_OPT
-fts_symbol_t dsp_64_add;
-fts_symbol_t dsp_64_mul;
-
-fts_symbol_t dsp_64_2ops_add;
-fts_symbol_t dsp_64_2ops_mul;
-
-fts_symbol_t dsp_64_1ops_add;
-fts_symbol_t dsp_64_1ops_mul;
-
-/* We do it only for mul and add */
-void
-dsp_add_64(fts_word_t *argv)
-{
-  float *in1 = (float *)fts_word_get_ptr(argv+0);
-  float *in2 = (float *)fts_word_get_ptr(argv+1);
-  float *out = (float *)fts_word_get_ptr(argv+2);
-  int i;
-
-#pragma ivdep
-
-  for (i = 0; i < 64; i+=8)
-    {
-      out[i + 0] = in1[i + 0] + in2[i + 0];
-      out[i + 1] = in1[i + 1] + in2[i + 1];
-      out[i + 2] = in1[i + 2] + in2[i + 2];
-      out[i + 3] = in1[i + 3] + in2[i + 3];
-      out[i + 4] = in1[i + 4] + in2[i + 4];
-      out[i + 5] = in1[i + 5] + in2[i + 5];
-      out[i + 6] = in1[i + 6] + in2[i + 6];
-      out[i + 7] = in1[i + 7] + in2[i + 7];
-    }
-
-}
-
-void
-dsp_mul_64(fts_word_t *argv)
-{
-  float *in1 = (float *)fts_word_get_ptr(argv+0);
-  float *in2 = (float *)fts_word_get_ptr(argv+1);
-  float *out = (float *)fts_word_get_ptr(argv+2);
-  int i;
-
-#pragma ivdep
-  for (i = 0; i < 64; i+=8)
-    {
-      out[i + 0] = in1[i + 0] * in2[i + 0];
-      out[i + 1] = in1[i + 1] * in2[i + 1];
-      out[i + 2] = in1[i + 2] * in2[i + 2];
-      out[i + 3] = in1[i + 3] * in2[i + 3];
-      out[i + 4] = in1[i + 4] * in2[i + 4];
-      out[i + 5] = in1[i + 5] * in2[i + 5];
-      out[i + 6] = in1[i + 6] * in2[i + 6];
-      out[i + 7] = in1[i + 7] * in2[i + 7];
-    }
-}
-
-/* versions with two args: out = out + in */
-
-void
-dsp_add_64_2ops(fts_word_t *argv)
-{
-  float *in = (float *)fts_word_get_ptr(argv+0);
-  float *out = (float *)fts_word_get_ptr(argv+1);
-  int i;
-
-  /* #pragma ivdep */
-
-  for (i = 0; i < 64; i+=8)
-    {
-      float f0, f1, f2, f3, f4, f5, f6, f7;
-
-      f0 = in[i + 0];
-      f1 = in[i + 1];
-      f2 = in[i + 2];
-      f3 = in[i + 3];
-      f4 = in[i + 4];
-      f5 = in[i + 5];
-      f6 = in[i + 6];
-      f7 = in[i + 7];
-
-      out[i + 0] = out[i + 0] + f0;
-      out[i + 1] = out[i + 1] + f1;
-      out[i + 2] = out[i + 2] + f2;
-      out[i + 3] = out[i + 3] + f3;
-      out[i + 4] = out[i + 4] + f4;
-      out[i + 5] = out[i + 5] + f5;
-      out[i + 6] = out[i + 6] + f6;
-      out[i + 7] = out[i + 7] + f7;
-    }
-}
-
-void
-dsp_mul_64_2ops(fts_word_t *argv)
-{
-  float *in = (float *)fts_word_get_ptr(argv+0);
-  float *out = (float *)fts_word_get_ptr(argv+1);
-  int i;
-
-  /* #pragma ivdep */
-
-  for (i = 0; i < 64; i+=8)
-    {
-      float f0, f1, f2, f3, f4, f5, f6, f7;
-
-      f0 = in[i + 0];
-      f1 = in[i + 1];
-      f2 = in[i + 2];
-      f3 = in[i + 3];
-      f4 = in[i + 4];
-      f5 = in[i + 5];
-      f6 = in[i + 6];
-      f7 = in[i + 7];
-
-      out[i + 0] = out[i + 0] * f0;
-      out[i + 1] = out[i + 1] * f1;
-      out[i + 2] = out[i + 2] * f2;
-      out[i + 3] = out[i + 3] * f3;
-      out[i + 4] = out[i + 4] * f4;
-      out[i + 5] = out[i + 5] * f5;
-      out[i + 6] = out[i + 6] * f6;
-      out[i + 7] = out[i + 7] * f7;
-    }
-}
-
-/* version with one arg ( v = v + v, v = v * v)
-   Probabily useless, but needed for consitency of
-   the ivdep thing */
-
-void
-dsp_add_64_1ops(fts_word_t *argv)
-{
-  float *v = (float *)fts_word_get_ptr(argv+0);
-  int i;
-
-  /* #pragma ivdep */
-
-  for (i = 0; i < 64; i+=8)
-    {
-      v[i + 0] = v[i + 0] + v[i + 0];
-      v[i + 1] = v[i + 1] + v[i + 1];
-      v[i + 2] = v[i + 2] + v[i + 2];
-      v[i + 3] = v[i + 3] + v[i + 3];
-      v[i + 4] = v[i + 4] + v[i + 4];
-      v[i + 5] = v[i + 5] + v[i + 5];
-      v[i + 6] = v[i + 6] + v[i + 6];
-      v[i + 7] = v[i + 7] + v[i + 7];
-    }
-}
-
-void
-dsp_mul_64_1ops(fts_word_t *argv)
-{
-  float *v = (float *)fts_word_get_ptr(argv+0);
-  int i;
-
-  /* #pragma ivdep */
-
-  for (i = 0; i < 64; i+=8)
-    {
-      v[i + 0] = v[i + 0] * v[i + 0];
-      v[i + 1] = v[i + 1] * v[i + 1];
-      v[i + 2] = v[i + 2] * v[i + 2];
-      v[i + 3] = v[i + 3] * v[i + 3];
-      v[i + 4] = v[i + 4] * v[i + 4];
-      v[i + 5] = v[i + 5] * v[i + 5];
-      v[i + 6] = v[i + 6] * v[i + 6];
-      v[i + 7] = v[i + 7] * v[i + 7];
-    }
-}
-
-#endif
-
-#ifdef  COMP_7_2
-#define HI_OPT
-#endif
 
 /* the class */
 
@@ -416,7 +300,6 @@ vecvecbinop_put_vec_vec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     }
   else
     {
-#ifdef HI_OPT
       if (fts_dsp_get_input_size(dsp, 0) == 64)
 	{
 	  if ((fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0)) && 
@@ -447,19 +330,36 @@ vecvecbinop_put_vec_vec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 	}
       else
 	{
-	  fts_set_symbol(argv + DSP_ARG_in0,    fts_dsp_get_input_name(dsp, 0));
-	  fts_set_symbol(argv + DSP_ARG_in1,    fts_dsp_get_input_name(dsp, 1));
-	  fts_set_symbol(argv + DSP_ARG_out,    fts_dsp_get_output_name(dsp, 0));
-	  fts_set_long  (argv + DSP_ARG_n_tick, fts_dsp_get_input_size(dsp, 0));
-	  dsp_add_funcall(ftl_sym.add.f.vec.vec, N_DSP_ARGS, argv);
+	  if ((fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0)) && 
+	      (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0)))
+	    {
+	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_int(argv + 1, fts_dsp_get_input_size(dsp, 0));
+	      dsp_add_funcall(dsp_1ops_add, 2, argv);
+	    }
+	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+	    {
+	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
+	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      dsp_add_funcall(dsp_2ops_add, 3, argv);
+	    }
+	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
+	    {
+	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
+	      dsp_add_funcall(dsp_2ops_add, 3, argv);
+	    }
+	  else
+	    {
+	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
+	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+	      dsp_add_funcall(dsp_add, 4, argv);
+	    }
 	}
-#else
-      fts_set_symbol(argv + DSP_ARG_in0,    fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + DSP_ARG_in1,    fts_dsp_get_input_name(dsp, 1));
-      fts_set_symbol(argv + DSP_ARG_out,    fts_dsp_get_output_name(dsp, 0));
-      fts_set_long  (argv + DSP_ARG_n_tick, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(ftl_sym.add.f.vec.vec, N_DSP_ARGS, argv);
-#endif
     }
 }
 
@@ -470,7 +370,6 @@ vecvecbinop_put_vec_vec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   fts_symbol_t dsp_function = ftl_sym.mul.f.vec.vec;
 
-#ifdef HI_OPT
   if (fts_dsp_get_input_size(dsp, 0) == 64)
     {
       if ((fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0)) && 
@@ -501,19 +400,36 @@ vecvecbinop_put_vec_vec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     }
   else
     {
-      fts_set_symbol(argv + DSP_ARG_in0,    fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + DSP_ARG_in1,    fts_dsp_get_input_name(dsp, 1));
-      fts_set_symbol(argv + DSP_ARG_out,    fts_dsp_get_output_name(dsp, 0));
-      fts_set_long  (argv + DSP_ARG_n_tick, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(ftl_sym.mul.f.vec.vec, N_DSP_ARGS, argv);
+      if ((fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0)) && 
+	  (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0)))
+	{
+	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_int   (argv + 1, fts_dsp_get_input_size(dsp, 0));
+	  dsp_add_funcall(dsp_1ops_mul, 2, argv);
+	}
+      else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+	{
+	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
+	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int   (argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  dsp_add_funcall(dsp_2ops_mul, 3, argv);
+	}
+      else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
+	{
+	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int   (argv + 2, fts_dsp_get_input_size(dsp, 0));
+	  dsp_add_funcall(dsp_2ops_mul, 3, argv);
+	}
+      else
+	{
+	  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
+	  fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+	  dsp_add_funcall(dsp_mul, 4, argv);
+	}
     }
-#else
-  fts_set_symbol(argv + DSP_ARG_in0,    fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv + DSP_ARG_in1,    fts_dsp_get_input_name(dsp, 1));
-  fts_set_symbol(argv + DSP_ARG_out,    fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv + DSP_ARG_n_tick, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(ftl_sym.mul.f.vec.vec, N_DSP_ARGS, argv);
-#endif
 }
 
   DEFINE_PUT_VEC_VEC_FUN(sub)
@@ -710,25 +626,41 @@ vecvid_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 vecarith_config(void)
 {
-#ifdef HI_OPT
+  dsp_add = fts_new_symbol("add_vec");
+  dsp_declare_function(dsp_add, ftl_add);
+
+  dsp_mul = fts_new_symbol("mul_vec");
+  dsp_declare_function(dsp_mul, ftl_mul);
+
   dsp_64_add = fts_new_symbol("add_vec_64");
-  dsp_declare_function(dsp_64_add, dsp_add_64);
+  dsp_declare_function(dsp_64_add, ftl_add_64);
 
   dsp_64_mul = fts_new_symbol("mul_vec_64");
-  dsp_declare_function(dsp_64_mul, dsp_mul_64);
+  dsp_declare_function(dsp_64_mul, ftl_mul_64);
+
+  dsp_2ops_add = fts_new_symbol("add_vec_2ops");
+  dsp_declare_function(dsp_2ops_add, ftl_add_2ops);
+
+  dsp_2ops_mul = fts_new_symbol("mul_vec_2ops");
+  dsp_declare_function(dsp_2ops_mul, ftl_mul_2ops);
 
   dsp_64_2ops_add = fts_new_symbol("add_vec_64_2ops");
-  dsp_declare_function(dsp_64_2ops_add, dsp_add_64_2ops);
+  dsp_declare_function(dsp_64_2ops_add, ftl_add_64_2ops);
 
   dsp_64_2ops_mul = fts_new_symbol("mul_vec_64_2ops");
-  dsp_declare_function(dsp_64_2ops_mul, dsp_mul_64_2ops);
+  dsp_declare_function(dsp_64_2ops_mul, ftl_mul_64_2ops);
+
+  dsp_1ops_add = fts_new_symbol("add_vec_1ops");
+  dsp_declare_function(dsp_1ops_add, ftl_add_1ops);
+
+  dsp_1ops_mul = fts_new_symbol("mul_vec_1ops");
+  dsp_declare_function(dsp_1ops_mul, ftl_mul_1ops);
 
   dsp_64_1ops_add = fts_new_symbol("add_vec_64_1ops");
-  dsp_declare_function(dsp_64_1ops_add, dsp_add_64_1ops);
+  dsp_declare_function(dsp_64_1ops_add, ftl_add_64_1ops);
 
   dsp_64_1ops_mul = fts_new_symbol("mul_vec_64_1ops");
-  dsp_declare_function(dsp_64_1ops_mul, dsp_mul_64_1ops);
-#endif
+  dsp_declare_function(dsp_64_1ops_mul, ftl_mul_64_1ops);
 
   fts_metaclass_create(fts_new_symbol("+~"),  vecadd_instantiate, fts_narg_equiv);
   fts_metaclass_create(fts_new_symbol("-~"),  vecsub_instantiate, fts_narg_equiv);

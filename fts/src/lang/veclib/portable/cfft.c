@@ -1,5 +1,3 @@
-/* cfft.c */
-
 #include <math.h>
 #include "lang/veclib/complex.h"
 #include "lang/veclib/portable/cfft.h"
@@ -54,7 +52,7 @@ void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, lon
  */
 void bitreversal_inplc(complex * restrict buf, long * restrict bitrev, long nstep, long npoints)
 {
-  long idx, xdi;
+  long idx;
   complex z;
   long nshift;
 
@@ -76,7 +74,7 @@ void bitreversal_inplc(complex * restrict buf, long * restrict bitrev, long nste
 
 void bitreversal_outplc(complex * restrict in, complex * restrict out, long * restrict bitrev, long nstep, long npoints)
 {
-  long idx, xdi;
+  long idx;
   long nshift;
 
   /* nshift = log2(nstep) */
@@ -85,8 +83,8 @@ void bitreversal_outplc(complex * restrict in, complex * restrict out, long * re
 
   for(idx=0; idx<npoints; idx++)
     {
-      xdi = bitrev[idx]>>nshift;
-      out[idx] = in[xdi];
+      idx = bitrev[idx]>>nshift;
+      out[idx] = in[idx];
     }
 }
 

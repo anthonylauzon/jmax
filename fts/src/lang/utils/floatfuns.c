@@ -106,6 +106,7 @@ fts_ffuns_init(void)
 {
   fts_hash_table_init(&the_fts_ffun_hashtable);
 
+#ifdef SGI
   fts_ffun_new(fts_new_symbol("sin"), sinf);
   fts_ffun_new(fts_new_symbol("cos"), cosf);
   fts_ffun_new(fts_new_symbol("tan"), tanf);
@@ -115,6 +116,7 @@ fts_ffuns_init(void)
   fts_ffun_new(fts_new_symbol("exp"), expf);
   fts_ffun_new(fts_new_symbol("log"), logf);
   fts_ffun_new(fts_new_symbol("log10"), log10f);
+#endif
 }
 
 

@@ -187,8 +187,7 @@ Sig_check( void )
 }
 
 
-void
-Sig_init(void)
+void Sig_init(void)
 {
   signal_cell_heap = fts_heap_new(sizeof(SignalCell));
 }

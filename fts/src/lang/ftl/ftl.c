@@ -700,13 +700,13 @@ static void ftl_post_functions_table( void)
 static void ftl_print_atom( char *s, const fts_atom_t *a)
 {
   if (fts_is_long(a))
-    sprintf( s, "%ld", fts_get_long(a));
+    sprintf( s, "%d", fts_get_int(a));
   else if (fts_is_float(a))
     sprintf( s, "%f", fts_get_float(a));
   else if (fts_is_symbol(a))
     sprintf( s, "%s", fts_symbol_name(fts_get_symbol(a)));
   else if (fts_is_ptr(a))
-    sprintf( s, "0x%x", fts_get_ptr(a));
+    sprintf( s, "0x%x", (unsigned int ) fts_get_ptr(a));
   else
     sprintf( s, "?");
 }
@@ -748,7 +748,8 @@ void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
 
       m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
       s = fts_hash_table_iterator_current_symbol( &iter);
-      fprintf(f, "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
+      fprintf(f, "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s),
+	      m->size, (unsigned int) m->address);
     }
   fprintf(f, "\n");
 }
@@ -796,7 +797,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
     break;
   case ST_CALL_ARGV:
     if (fts_is_ptr(a))
-      sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
+      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_ptr(a));
     else
       ftl_print_atom( buffer, a);
     strcat( info->line, buffer);
@@ -853,7 +854,7 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
     break;
   case ST_CALL_ARGV:
     if (fts_is_ptr(a))
-      sprintf( buffer, "(void *)0x%x", fts_get_ptr(a));
+      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_ptr(a));
     else
       ftl_print_atom( buffer, a);
     strcat( info->line, buffer);

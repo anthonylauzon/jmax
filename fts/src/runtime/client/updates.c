@@ -156,8 +156,7 @@ fts_client_updates_sched(void)
    under request from the server 
    */
 
-void
-fts_client_updates_sync(void)
+void fts_client_updates_sync(void)
 {
   fts_symbol_t property;
   fts_object_t *obj;

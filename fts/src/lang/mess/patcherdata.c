@@ -1,8 +1,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/datalib.h"
-
-extern void fts_client_updates_sync(void);
+#include "runtime.h"
 
 /* Remote call codes */
 
