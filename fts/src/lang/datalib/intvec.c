@@ -19,6 +19,24 @@ static fts_data_class_t *fts_integer_vector_data_class = 0;
 #define INTEGER_VECTOR_SET    1
 #define INTEGER_VECTOR_UPDATE 2
 
+/* local */
+
+static void
+intvec_set_size(fts_integer_vector_t *vector, int size)
+{
+  if(size > vector->alloc)
+    {
+      if(vector->alloc)
+	vector->values = (int *)fts_realloc((void *)vector->values, sizeof(int) * size);
+      else
+	vector->values = (int *)fts_malloc(sizeof(int) * size);
+
+      vector->alloc = size;
+    }
+
+  vector->size = size;
+}
+
 /* new/delete */
 
 fts_integer_vector_t *
@@ -33,13 +51,15 @@ fts_integer_vector_new(int size)
     {
       vector->values = (int *) fts_malloc(size * sizeof(int));
       vector->size = size;
-      fts_integer_vector_zero(vector);
+      fts_vec_izero(vector->values, vector->size);  
     }
   else
     {
       vector->values = 0;
       vector->size = 0;
     }
+
+  vector->alloc = size;
 
   fts_data_init((fts_data_t *) vector, fts_integer_vector_data_class);
 
@@ -59,7 +79,7 @@ fts_integer_vector_delete(fts_integer_vector_t *vector)
 void
 fts_integer_vector_copy(fts_integer_vector_t *in, fts_integer_vector_t *out)
 {
-  fts_integer_vector_set_size(out, in->size);
+  intvec_set_size(out, in->size);
   fts_vec_icpy(in->values, out->values, in->size);
 }
 
@@ -74,17 +94,20 @@ fts_integer_vector_zero(fts_integer_vector_t *vector)
 void
 fts_integer_vector_set_size(fts_integer_vector_t *vector, int size)
 {
-  if(size > vector->alloc)
-    {
-      if(vector->values)
-	vector->values = (int *)fts_realloc((void *)vector->values, sizeof(int) * size);
-      else
-	vector->values = (int *)fts_malloc(sizeof(int) * size);
+  int old_size = vector->size;
+  int tail = size - old_size;
 
-      vector->alloc = size;
-    }
+  intvec_set_size(vector, size);
 
-    vector->size = size;
+  if(tail > 0)
+    fts_vec_izero(vector->values + old_size, tail);
+}
+
+void 
+fts_integer_vector_set(fts_integer_vector_t *vector, int *ptr, int size)
+{
+  intvec_set_size(vector, size);
+  fts_vec_icpy(ptr, vector->values, size);
 }
 
 void

@@ -1,12 +1,13 @@
 #ifndef _DSP_H_
 #define _DSP_H_
 
-
 extern fts_module_t fts_dsp_module;
 
 #define MINVS 8	      /* vectors must be a multiple of MINVS points */
 #define DEFAULTVS 64
 #define MAXVS 64
+
+#define FTS_DSP_VECTOR_DEFAULT_SIZE DEFAULTVS
 
 typedef struct {
   int id;

@@ -4,6 +4,7 @@ abstraction 2pole~ $dir/2pole~.abs
 abstraction adc1~ $dir/adc1~.abs
 abstraction apass1~ $dir/apass1~.abs
 abstraction apass2~ $dir/apass2~.abs
+abstraction bag~ $dir/bag~.abs
 abstraction bpass1~ $dir/bpass1~.abs
 abstraction bstop1~ $dir/bstop1~.abs
 abstraction comb1~ $dir/comb1~.abs

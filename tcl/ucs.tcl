@@ -3,6 +3,10 @@
 #  UCS command wrappers
 #  
 
+proc projectDirectory {dir} {
+  ucs set projectdir $dir
+}
+
 proc dataDirectory {dir} {
   global DataDirectory
 

@@ -45,11 +45,11 @@ biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   this->biquad_coefs = ftl_data_new(biquad_coefs_t);
-  biquad_set_coef_a0(o, 0, 0, 1, at + 1);
-  biquad_set_coef_a1(o, 0, 0, 1, at + 2);
-  biquad_set_coef_a2(o, 0, 0, 1, at + 3);
-  biquad_set_coef_b1(o, 0, 0, 1, at + 4);
-  biquad_set_coef_b2(o, 0, 0, 1, at + 5);
+  biquad_set_coef_a0(o, 0, 0, ac-1, at + 1);
+  biquad_set_coef_a1(o, 0, 0, ac-2, at + 2);
+  biquad_set_coef_a2(o, 0, 0, ac-3, at + 3);
+  biquad_set_coef_b1(o, 0, 0, ac-4, at + 4);
+  biquad_set_coef_b2(o, 0, 0, ac-5, at + 5);
 
   if(type == sym_df1)
     this->biquad_state = ftl_data_new(biquad_df1_state_t);  
@@ -182,6 +182,17 @@ biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, b2, &f);
 }
 
+static void
+biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  biquad_t *this = (biquad_t *)o;
+  biquad_set_coef_a0(o, 0, 0, ac - 0, at + 0);
+  biquad_set_coef_a1(o, 0, 0, ac - 1, at + 1);
+  biquad_set_coef_a2(o, 0, 0, ac - 2, at + 2);
+  biquad_set_coef_b1(o, 0, 0, ac - 3, at + 3);
+  biquad_set_coef_b2(o, 0, 0, ac - 4, at + 4);
+}
+
 /****************************************
  *
  *  class
@@ -228,6 +239,8 @@ biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 4, fts_s_int, biquad_set_coef_b1, 1, a);
   fts_method_define(cl, 5, fts_s_int, biquad_set_coef_b2, 1, a);
   
+  fts_method_define_varargs(cl, 0, fts_s_set, biquad_set_coefs);
+
   fts_method_define(cl, 0, sym_clear, biquad_state_clear, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, biquad_init);

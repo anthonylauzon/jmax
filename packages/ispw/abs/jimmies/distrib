@@ -1,6 +1,7 @@
 all	all	adc1~.abs
 all	all	apass1~.abs
 all	all	apass2~.abs
+all	all	bag~.abs
 all	all	bpass1~.abs
 all	all	bstop1~.abs
 all	all	comb1~.abs

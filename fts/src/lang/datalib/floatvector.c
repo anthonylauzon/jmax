@@ -11,6 +11,24 @@ static fts_data_class_t *fts_float_vector_data_class = 0;
 #define FLOAT_VECTOR_SET    1
 #define FLOAT_VECTOR_UPDATE 2
 
+/* local */
+
+static void
+floatvec_set_size(fts_float_vector_t *vector, int size)
+{
+  if(size > vector->alloc)
+    {
+      if(vector->alloc)
+	vector->values = (float *)fts_realloc((void *)vector->values, sizeof(float) * size);
+      else
+	vector->values = (float *)fts_malloc(sizeof(float) * size);
+
+      vector->alloc = size;
+    }
+
+  vector->size = size;
+}
+
 /* new/delete */
 
 fts_float_vector_t *
@@ -33,6 +51,8 @@ fts_float_vector_new(int size)
       vector->size = 0;
     }
 
+  vector->alloc = size;
+
   fts_data_init((fts_data_t *) vector, fts_float_vector_data_class);
 
   return vector;
@@ -51,7 +71,7 @@ fts_float_vector_delete(fts_float_vector_t *vector)
 void
 fts_float_vector_copy(fts_float_vector_t *in, fts_float_vector_t *out)
 {
-  fts_float_vector_set_size(out, in->size);
+  floatvec_set_size(out, in->size);
   fts_vec_fcpy(in->values, out->values, in->size);
 }
 
@@ -62,19 +82,22 @@ fts_float_vector_zero(fts_float_vector_t *vector)
 }
 
 void
-fts_float_vector_set_size(fts_float_vector_t *vector, long size)
+fts_float_vector_set_size(fts_float_vector_t *vector, int size)
 {
-  if(size > vector->alloc)
-    {
-      if(vector->alloc)
-	vector->values = (float *)fts_realloc((void *)vector->values, sizeof(float) * size);
-      else
-	vector->values = (float *)fts_malloc(sizeof(float) * size);
+  int old_size = vector->size;
+  int tail = size - old_size;
 
-      vector->alloc = size;
-    }
+  floatvec_set_size(vector, size);
 
-    vector->size = size;
+  if(tail > 0)
+    fts_vec_fzero(vector->values + old_size, tail);
+}
+
+void 
+fts_float_vector_set(fts_float_vector_t *vector, float *ptr, int size)
+{
+  floatvec_set_size(vector, size);
+  fts_vec_fcpy(ptr, vector->values, size);
 }
 
 void

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/10/28 15:51:33 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/12 18:46:26 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -103,12 +103,12 @@ writesf_file_open(writesf_t *this)
   AFinitchannels(fs, AF_DEFAULT_TRACK, this->nchans);
 
   this->fh = AFopenfile(get_writesf_path(this->sndfile), "w", fs);
+
   AFfreefilesetup(fs);
 
   if (!this->fh)
     {
-      post("writesf~: cannot open file '%s' for writing\n", 
-	   fts_symbol_name(this->sndfile));
+      post("writesf~: cannot open file '%s' for writing\n", fts_symbol_name(this->sndfile));
       return 0;
     }
   
