@@ -6,14 +6,14 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:05 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:53:49 $
  *
  */
 
 #include "fts.h"
 
 extern void list_config(void);
-extern void listclasses_config(void);
+extern void listarith_config(void);
 extern void listelement_config(void);
 extern void listhead_config(void);
 extern void listjoin_config(void);
@@ -23,10 +23,10 @@ extern void listsublist_config(void);
 extern void listtail_config(void);
 
 static void
-fts_lists_init(void)
+lists_module_init(void)
 {
   list_config();
-  listclasses_config();
+  listarith_config();
   listelement_config();
   listhead_config();
   listjoin_config();
@@ -36,4 +36,4 @@ fts_lists_init(void)
   listtail_config();
 }
 
-fts_module_t lists_module = {"lists", "Basic Lists Objects", fts_lists_init};
+fts_module_t lists_module = {"lists", "basic list handling classes", lists_module_init};

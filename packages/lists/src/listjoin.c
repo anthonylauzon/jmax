@@ -14,7 +14,7 @@ typedef struct
   list_t store;
 } listjoin_t;
 
-#define LIST_ALLOC_BLOCK 8
+#define LIST_ALLOC_BLOC 32
 
 /*********************************************
  *
