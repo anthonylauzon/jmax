@@ -21,27 +21,11 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+#
 
-PLATFORM:=macosx
+JMAXDISTDIR= ../../..
+PACKAGEROOT = ..
+PACKAGELIB=$(LIBDIR)/libmacosx.so
 
-ARCH_PACKAGES=macosx
-
-CC := cc
-LD := cc
-RANLIB = ranlib
-ARCH_CFLAGS := -pipe -Wall -Wno-unused -DMACOSX
-#ARCH_LDFLAGS := -rdynamic
-LDSO = cc
-LDSOFLAGS = -bundle -undefined suppress
-
-CC_ALL_FLAG := -Xlinker -all_load
-CC_NONE_FLAG := 
-LD_ALL_FLAG = --whole-archive
-LD_NONE_FLAG = --no-whole-archive
-
-ARCH_OPT_CFLAGS := -O3 -funroll-loops 
-ARCH_OPT_LDFLAGS := 
-
-FTS_SYS_LIBS =
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package
 
