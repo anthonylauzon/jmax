@@ -1,3 +1,7 @@
+2004-01-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in: fixed java check test failed if CLASSPATH env variable was set.
+
 2004-01-08  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* moved fts_function_get_by_name() from function.c to fts_get_function_by_name() to package.c
