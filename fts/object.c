@@ -40,9 +40,6 @@
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/variable.h>
 
-/* forward declarations  */
-static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
-
 static fts_status_description_t invalid_object_description_error_description = {
   "invalid object description"
 };
@@ -110,7 +107,7 @@ fts_object_remove_patcher_data(fts_object_t *obj)
     /* remove binding to variables */
     fts_object_remove_bindings(obj);
     
-    fts_heap_free(patcher_data_heap, (void *)data);
+    fts_heap_free((void *)data, patcher_data_heap);
     obj->patcher_data = NULL;
   }
 }

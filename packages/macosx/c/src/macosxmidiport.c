@@ -56,8 +56,6 @@ macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
   fts_midiparser_set_event(parser, event);
 
   for(i=0; i<pktlist->numPackets; i++) {
-    double time = 0.000001 * (double)AudioConvertHostTimeToNanos(packet->timeStamp);
-
     if(event != NULL) {
       for(j=0; j<packet->length; j++) {
         fts_midievent_t *parsed = fts_midiparser_byte(parser, packet->data[j]);
@@ -65,7 +63,7 @@ macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
         if(parsed != NULL) {
         
           /* write fifo entry */
-          fts_midififo_write(fifo, o, time);
+          fts_midififo_write(fifo, o, 0.0);
 
           /* get event of next entry and set parser */
           event = fts_midififo_get_event(fifo);

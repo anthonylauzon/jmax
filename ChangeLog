@@ -1,3 +1,9 @@
+2003-02-20  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* fixed MacOS X MIDI input (no more delay!)
+	* fixed ugly bug in patcher data (inversed arguments in fts_heap_free when destroying)
+	* reimplemented midiconfig listener with fts_objectlist_t (removed fake variable in root patcher)
+
 2003-02-19  Olivier Chapuis  <olivier.chapuis@free.fr>
 
 	* packages/alsa/c/src/alsaaudioport.c

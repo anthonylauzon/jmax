@@ -401,9 +401,18 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+midiout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiout_t *this = (midiout_t *)o;
+  
+  if(this->port)
+    fts_midiconfig_remove_listener(o);
+}
+
+static void
 midiout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("panic"), midiout_panic);
   fts_class_message_varargs(cl, fts_new_symbol("GM"), midiout_general_midi);
@@ -415,7 +424,7 @@ midiout_instantiate(fts_class_t *cl)
 static void
 noteout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("off"), noteout_all_off);
 
@@ -433,7 +442,7 @@ noteout_instantiate(fts_class_t *cl)
 static void
 polyout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_inlet_int(cl, 0, polyout_send);
   fts_class_inlet_float(cl, 0, polyout_send);
@@ -449,7 +458,7 @@ polyout_instantiate(fts_class_t *cl)
 static void
 ctlout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_inlet_int(cl, 0, ctlout_send);
   fts_class_inlet_float(cl, 0, ctlout_send);
@@ -465,7 +474,7 @@ ctlout_instantiate(fts_class_t *cl)
 static void
 pgmout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_inlet_int(cl, 0, pgmout_send);
   fts_class_inlet_float(cl, 0, pgmout_send);
@@ -478,7 +487,7 @@ pgmout_instantiate(fts_class_t *cl)
 static void
 touchout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_inlet_int(cl, 0, touchout_send);
   fts_class_inlet_float(cl, 0, touchout_send);
@@ -492,7 +501,7 @@ touchout_instantiate(fts_class_t *cl)
 static void
 bendout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("range"), bendout_range);
 
@@ -507,7 +516,7 @@ bendout_instantiate(fts_class_t *cl)
 static void
 xbendout_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midiout_t), midiout_init, 0);
+  fts_class_init(cl, sizeof(midiout_t), midiout_init, midiout_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("range"), bendout_range);
 

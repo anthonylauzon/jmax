@@ -220,6 +220,13 @@ macosxmidi_create_midiport(macosxmidi_t *this, fts_class_t *cl, fts_symbol_t nam
 }
 
 static void
+macosxmidi_resync(macosxmidi_t *this)
+{
+  this->delta = 0;
+  fts_midififo_resync(&this->fifo);
+}
+
+static void
 macosxmidi_get_default_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
@@ -257,6 +264,8 @@ macosxmidi_append_input_names( fts_object_t *o, int winlet, fts_symbol_t s, int 
   }
 
   fts_array_append_symbol(inputs, macosxmidi_symbol_iac_midi_destination);
+
+  macosxmidi_resync(this);
 }
 
 static void
@@ -277,6 +286,8 @@ macosxmidi_append_output_names( fts_object_t *o, int winlet, fts_symbol_t s, int
   }
 
   fts_array_append_symbol(outputs, macosxmidi_symbol_iac_midi_source);
+
+  macosxmidi_resync(this);
 }
 
 static void
@@ -319,6 +330,8 @@ macosxmidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       }
     }
   }
+
+  macosxmidi_resync(this);
 }
 
 static void
@@ -360,6 +373,8 @@ macosxmidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
         *ptr = macosxmidi_create_midiport(this, macosxmidi_output_type, device_name, fts_get_int(&a));
     }
   }
+
+  macosxmidi_resync(this);
 }
 
 static void

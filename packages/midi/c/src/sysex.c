@@ -73,7 +73,10 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sysex_t *this = (sysex_t *)o;
 
   if(this->port != NULL)
+  {
     fts_midiport_remove_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o);
+    fts_midiconfig_remove_listener(o);
+  }
 }
 
 static void
@@ -131,7 +134,11 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 static void 
 sysexout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
+{
+  sysex_t *this = (sysex_t *)o;
+  
+  if(this->port != NULL)
+    fts_midiconfig_remove_listener(o);
 }
 
 static void

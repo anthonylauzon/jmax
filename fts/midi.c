@@ -31,6 +31,7 @@
 
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/midi.h>
 #include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
@@ -470,6 +471,12 @@ fts_midififo_reset(fts_midififo_t *fifo)
     fts_object_release((fts_object_t *)entries[i].event);
 
   fts_free((void *)fifo->data.buffer);
+}
+
+void
+fts_midififo_resync(fts_midififo_t *fifo)
+{
+  fifo->delta = 0.0;
 }
 
 /* read next fifo entry into time base (returns pointer to atom of newly allocated entry) */
@@ -1350,6 +1357,9 @@ midilabel_set_output(fts_midilabel_t *label, fts_midiport_t *port, fts_symbol_t 
 /* static midiconfig_t *midiconfig = NULL; */
 
 /* array of device names */
+static fts_objectlist_t midiconfig_listeners;
+
+/* array of device names */
 static fts_array_t midiconfig_inputs;
 static fts_array_t midiconfig_outputs;
 
@@ -1677,11 +1687,16 @@ midiconfig_get_fresh_label_name(fts_midiconfig_t *config, fts_symbol_t name)
 static void
 midiconfig_restore(fts_midiconfig_t *config)
 {
-  fts_atom_t a;
+  fts_objectlist_cell_t *p = fts_objectlist_get_head(&midiconfig_listeners);
 
-  fts_set_object(&a, config);
-  fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, fts_null);
-  fts_name_set_value(fts_get_root_patcher(), midiconfig_s_name, &a);
+  while(p != NULL)
+  {
+    fts_objectlist_cell_t *next = fts_objectlist_get_next(p);
+
+    fts_object_recompute(fts_objectlist_get_object(p));
+
+    p = next;
+  }
 }
 
 static void
@@ -1854,6 +1869,7 @@ fts_midiport_t *
 fts_midiconfig_get_input(fts_symbol_t name)
 {
   fts_midiconfig_t* midiconfig = (fts_midiconfig_t*)fts_midiconfig_get();
+  
   if(midiconfig != NULL)
   {
     fts_midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
@@ -1869,6 +1885,7 @@ fts_midiport_t *
 fts_midiconfig_get_output(fts_symbol_t name)
 {
   fts_midiconfig_t* midiconfig = (fts_midiconfig_t*)fts_midiconfig_get();
+  
   if(midiconfig != NULL)
   {
     fts_midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
@@ -1883,7 +1900,13 @@ fts_midiconfig_get_output(fts_symbol_t name)
 void
 fts_midiconfig_add_listener(fts_object_t *obj)
 {
-  fts_name_add_listener(fts_get_root_patcher(), midiconfig_s_name, obj);
+  fts_objectlist_insert(&midiconfig_listeners, obj);
+}
+
+void
+fts_midiconfig_remove_listener(fts_object_t *obj)
+{
+  fts_objectlist_remove(&midiconfig_listeners, obj);
 }
 
 /* fts_object_t * */
@@ -2075,7 +2098,6 @@ fts_midiconfig_dump( fts_midiconfig_t *this, fts_bmax_file_t *f)
     fts_bmax_code_push_symbol(f, fts_s_label);
     fts_bmax_code_obj_mess(f, fts_s_midi_config, 4);
     fts_bmax_code_pop_args(f, 4);
-
       
     label = label->next;	  
   }
@@ -2206,4 +2228,6 @@ fts_midi_config(void)
   /* create global NULL MIDI port */
   midinull = (fts_midiport_t *)fts_object_create(midinull_type, 0, 0);
   fts_object_refer((fts_object_t *)midinull);
+
+  fts_objectlist_init(&midiconfig_listeners);
 }

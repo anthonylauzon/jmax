@@ -385,6 +385,16 @@ FTS_API fts_midievent_t *fts_midififo_get_event(fts_midififo_t *fifo);
  */
 FTS_API void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time);
 
+/**
+ * Resynchronize MIDI fifo (set delta time to 0)
+ *
+ * @fn void fts_midififo_sync(fts_midififo_t *fifo)
+ * @param fifo the MIDI fifo
+ *
+ * @ingroup midififo
+ */
+FTS_API void fts_midififo_resync(fts_midififo_t *fifo);
+
 /*@}*/
 
 /****************************************************
@@ -776,6 +786,7 @@ FTS_API fts_symbol_t fts_midimanager_s_get_output;
 FTS_API fts_midiport_t *fts_midiconfig_get_input(fts_symbol_t name);
 FTS_API fts_midiport_t *fts_midiconfig_get_output(fts_symbol_t name);
 FTS_API void fts_midiconfig_add_listener(fts_object_t *obj);
+FTS_API void fts_midiconfig_remove_listener(fts_object_t *obj);
 
 /* MIDI manager API */
 FTS_API void fts_midiconfig_update(void);

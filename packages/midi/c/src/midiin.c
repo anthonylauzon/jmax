@@ -423,7 +423,10 @@ midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   midiin_t *this = (midiin_t *)o;
 
   if(this->port)
+  {
     fts_midiport_remove_listener(this->port, this->type, this->channel, this->number, o);
+    fts_midiconfig_remove_listener(o);
+  }
 }
 
 static void
