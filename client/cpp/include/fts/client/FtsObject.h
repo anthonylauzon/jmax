@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#include <typeinfo>
 namespace ircam {
 namespace fts {
 namespace client {
@@ -50,7 +51,7 @@ namespace client {
       return _serverConnection;
     }
 
-    static void registerMessageHandler( const type_info &ftsClass, const char *selector, FtsMessageHandler *messageHandler);
+    static void registerMessageHandler( const std::type_info &ftsClass, const char *selector, FtsMessageHandler *messageHandler);
 
   private:
     static void invokeMessageHandler( FtsObject *obj, const char *selector, const FtsArgs &args);

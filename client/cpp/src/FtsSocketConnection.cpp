@@ -19,12 +19,16 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#include <cstring>
+
+#include <cerrno>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <errno.h>
-#include <unistd.h>
+
 #include <fts/ftsclient.h>
 
 namespace ircam {
@@ -75,12 +79,12 @@ namespace client {
     /* convert the host name to the inet address. call gethostbyname
        only when the host is not in a numbers-and-dots notation. this
        avoids a name resolution on windows machines */
-    addr.s_addr = std::inet_addr( _hostname);
+    addr.s_addr = ::inet_addr( _hostname);
 
     if (addr.s_addr == INADDR_NONE) {
 
       /* host is not a numbers-and-dots notation. resolve the name. */
-      hostptr = std::gethostbyname( _hostname);
+      hostptr = ::gethostbyname( _hostname);
 
       if ( !hostptr)
 	throw FtsClientException( "Unknown host");
@@ -88,7 +92,7 @@ namespace client {
       addr = *(struct in_addr *)hostptr->h_addr_list[0];
     }
 
-    _socket = std::socket( PF_INET, SOCK_STREAM, 0);
+    _socket = ::socket( PF_INET, SOCK_STREAM, 0);
 
     if (_socket == INVALID_SOCKET)
       throw FtsClientException( "Can't create socket", errno);
@@ -96,15 +100,15 @@ namespace client {
     std::memset( &server_addr, 0, sizeof( server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr = addr;
-    server_addr.sin_port = std::htons( _port);
+    server_addr.sin_port = ::htons( _port);
 
-    if (std::connect( _socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == 0)
+    if (::connect( _socket, (struct sockaddr *)&server_addr, (socklen_t)sizeof(server_addr)) == 0)
       return 0;
 
 #ifdef WIN32
-    std::closesocket( _socket);
+    ::closesocket( _socket);
 #else
-    std::close( _socket);
+    ::close( _socket);
 #endif
 
     _socket = INVALID_SOCKET;
@@ -149,7 +153,7 @@ namespace client {
   {
     int r;
 
-    r = std::read( _socket, b, len);
+    r = ::read( _socket, b, len);
     
     if (r == -1)
       throw FtsClientException( "Error in message receiving", errno);
@@ -161,7 +165,7 @@ namespace client {
 
   void FtsSocketConnection::write( const unsigned char *b, int len) throw (FtsClientException)
   {
-    if ( std::write( _socket, b, len) < 0)
+    if ( ::write( _socket, b, len) < 0)
       {
 	throw FtsClientException( "Error in sending message", errno);
       }

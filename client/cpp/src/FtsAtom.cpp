@@ -20,7 +20,6 @@
 // 
 
 #include <fts/ftsclient.h>
-#include "hashtable.h"
 
 namespace ircam {
 namespace fts {

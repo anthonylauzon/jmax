@@ -78,7 +78,7 @@ namespace client {
     int get( const KeyT& key, ValT &value);
     int remove( const KeyT& key);
 
-    void stats( ostream &os);
+    void stats(std::ostream &os);
 
   protected:
 

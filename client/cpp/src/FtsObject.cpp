@@ -32,7 +32,7 @@ namespace client {
 
   class MessageHandlerEntry {
   public:
-    MessageHandlerEntry( const type_info &tid, const char *selector) 
+    MessageHandlerEntry( const std::type_info &tid, const char *selector) 
       : _tid( tid), _selector( selector)
     {
     }
@@ -47,7 +47,7 @@ namespace client {
     }
 
   private:
-    const type_info &_tid;
+    const std::type_info &_tid;
     const char *_selector;
   };
 
@@ -114,7 +114,7 @@ namespace client {
     _serverConnection->endOfMessage();
   }
 
-  void FtsObject::registerMessageHandler(const type_info &tid, const char* selector, FtsMessageHandler* messageHandler)
+  void FtsObject::registerMessageHandler(const std::type_info &tid, const char* selector, FtsMessageHandler* messageHandler)
   {
     MessageHandlerEntry entry( tid, selector);
 
