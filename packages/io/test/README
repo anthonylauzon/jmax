@@ -1,0 +1,36 @@
+
+This directory contains test material for io package.
+
+1) udp test
+
+This test requires to recompile the Java sources.
+  make all
+(swingall.jar must be in CLASSPATH)
+
+To test the udp object:
+ - run jmax
+ - load patch test-udp.jmax
+ - run UDPTest.class
+   java UDPTest <host name> <port>
+     where <host name> is the host name of the host running jMax
+           <port> is the port number (specified as argument of the udp object)
+ - this will open a Java application with a window containing a slider. Move the slider, 
+   the slider in the jMax patch should move too... 
+
+2) udpmessage test
+
+This test requires to recompile the Java sources.
+  make all
+(swingall.jar must be in CLASSPATH)
+
+To test the udpmessage object:
+ - run jmax
+ - load patch test-udpmessage.jmax
+ - run UDPMessageTest.class
+   make run MAIN=UDPMessageTest ARGS="<host name> <port> freq vol mod"
+     where <host name> is the host name of the host running jMax
+           <port> is the port number (specified as argument of the udp object)
+	   and remaining arguments are message names
+ - this will open a Java application with a window containing a slider. Move the slider, 
+   the slider in the jMax patch should move too... 
+

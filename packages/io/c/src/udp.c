@@ -1,0 +1,116 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <string.h>
+
+#include <stdio.h>
+
+#include "fts.h"
+
+#define UDP_PACKET_SIZE 512
+
+typedef struct {
+    fts_object_t o;
+    int socket;
+    char buffer[UDP_PACKET_SIZE];
+} udp_t;
+
+static void udp_fd_fun( int fd, void *data)
+{
+    udp_t *this = (udp_t *)data;
+    int size;
+
+    size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
+    if ( size > 0)
+	{
+	  int i;
+
+	  for ( i = 0; i < size; i++)
+	    fts_outlet_int( (fts_object_t *)this, 0, this->buffer[i]);
+	}
+}
+
+static void udp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    udp_t *this = (udp_t *)o;
+    int port;
+    struct sockaddr_in addr;
+
+    port = fts_get_int( &at[1]);
+
+    post( "Created UDP object on port %d\n", port);
+
+    this->socket = socket(AF_INET, SOCK_DGRAM, 0);
+
+    if (this->socket == -1)
+	{
+	    post( "Cannot open socket\n");
+	    return;
+	}
+
+    memset( &addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(port);
+
+    if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
+	{
+	    post( "Cannot bind socket\n");
+	    close( this->socket);
+	    return;
+	}
+
+  fts_thread_add_fd( fts_thread_get_current(), this->socket, udp_fd_fun, this);
+}
+
+static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    udp_t *this = (udp_t *)o;
+
+    if ( this->socket >= 0)
+      {
+	fts_thread_remove_fd( fts_thread_get_current(), this->socket);
+
+	close( this->socket);
+      }
+}
+
+static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[2];
+
+  fts_class_init( cl, sizeof( udp_t), 0, 1, 0);
+
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_int;
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, udp_init, 2, a);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, udp_delete, 0, 0);
+
+  a[0] = fts_s_int;
+  fts_outlet_type_define(cl, 0, fts_s_int, 1, a	);
+
+  return fts_Success;
+}
+
+void udp_config( void)
+{
+  fts_metaclass_create( fts_new_symbol("udp"), udp_instantiate, fts_always_equiv);
+}
