@@ -1,6 +1,0 @@
-SOURCES = $(ARCH_SOURCES)\
-	ftlfun.c	\
-	vecmod.c	\
-	vecstat.c	\
-	complex.c
-

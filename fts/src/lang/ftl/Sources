@@ -1,4 +1,0 @@
-SOURCES = \
-	ftl.c \
-	ftlmem.c \
-	ftlutils.c 
