@@ -231,6 +231,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 				if(markersSelection != null)
 					currentMarkersSelection.addListSelectionListener( markersSelectionListener);
 			}
+      public void ftsNameChanged(String name){}
 		});		
 	}
 	

@@ -141,6 +141,9 @@ public interface TrackDataModel {
     public abstract void removeListener(TrackDataListener theListener);
     
     public abstract String getName();
+    
+    /* name of the object in patcher */
+    public abstract String getFtsName();
 
     /**
      * Returns the types (ValueInfo) contained in this

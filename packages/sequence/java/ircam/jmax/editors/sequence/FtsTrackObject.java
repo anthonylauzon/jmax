@@ -386,6 +386,12 @@ public void setName(String name)
   notifyTrackNameChanged(old, trackName);
 }
 
+public void nameChanged( String name)
+{
+  super.nameChanged( name);
+  notifyFtsNameChanged( name);
+}
+
 public void lock()
 {
   locked = true;
@@ -1031,6 +1037,11 @@ private void notifyTrackNameChanged(String oldName, String newName)
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackDataListener) e.nextElement()).trackNameChanged(oldName, newName);
 }
+void notifyFtsNameChanged(String name)
+{
+  for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
+    ((TrackStateListener) e.nextElement()).ftsNameChanged(name);
+}
 private void notifyTrackCleared()
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
@@ -1499,6 +1510,11 @@ public ValueInfo getType()
 public String getName()
 {
   return trackName;
+}
+
+public String getFtsName()
+{
+  return super.getVariableName();
 }
 
 public DataFlavor[] getDataFlavors()

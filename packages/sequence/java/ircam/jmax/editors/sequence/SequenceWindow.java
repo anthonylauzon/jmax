@@ -38,30 +38,30 @@ import javax.swing.table.*;
 import ircam.jmax.editors.sequence.menus.*;
 
 /**
- * This implementation builds a SequencePanel to represent the data.
+* This implementation builds a SequencePanel to represent the data.
  */
 public class SequenceWindow extends JFrame implements EditorContainer{
-
+  
   //------------------- fields
   SequencePanel itsSequencePanel;
   FtsSequenceObject sequenceData;
-   EditMenu editMenu;
+  EditMenu editMenu;
   
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
   public final static int MAX_HEIGHT     = 800;
   public final static int EMPTY_HEIGHT   = 92;
   /**
-   * Constructor with FtsSequenceObject
+    * Constructor with FtsSequenceObject
    */
   public SequenceWindow(FtsSequenceObject data)
   {
     super();
-        
+    
     sequenceData = data;
-
+    
     TrackEditorFactoryTable.init();
-
+    
     makeTitle();
     
     sequenceData.requestSequenceName();
@@ -73,47 +73,58 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     setSize(new Dimension(DEFAULT_WIDTH + TrackContainer.BUTTON_WIDTH, EMPTY_HEIGHT));
     
     addWindowListener(new WindowListener(){
-	public void windowOpened(WindowEvent e){}
-	public void windowClosed(WindowEvent e){}
-	public void windowClosing(WindowEvent e)
-	{
-	  MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	}
-	public void windowDeiconified(WindowEvent e){}
-	public void windowIconified(WindowEvent e){}
-	public void windowActivated(WindowEvent e)
-	{
-	  TrackEditor current = itsSequencePanel.getCurrentTrackEditor();
-	  if(current!=null)
-	    SequenceSelection.setCurrent(current.getSelection());
-	}
-	public void windowDeactivated(WindowEvent e){}
-      });
+      public void windowOpened(WindowEvent e){}
+      public void windowClosed(WindowEvent e){}
+      public void windowClosing(WindowEvent e)
+      {
+        MaxWindowManager.getWindowManager().removeWindow(getFrame());
+      }
+      public void windowDeiconified(WindowEvent e){}
+      public void windowIconified(WindowEvent e){}
+      public void windowActivated(WindowEvent e)
+    {
+        TrackEditor current = itsSequencePanel.getCurrentTrackEditor();
+        if(current!=null)
+          SequenceSelection.setCurrent(current.getSelection());
+    }
+      public void windowDeactivated(WindowEvent e){}
+    });
+    
+    sequenceData.addTrackListener( new TrackListener(){
+      public void trackAdded(Track track){}
+      public void tracksAdded(int maxTime){}
+      public void trackRemoved(Track track){}
+      public void trackChanged(Track track){}
+      public void trackMoved(Track track, int oldPosition, int newPosition){}   
+      public void ftsNameChanged(String name)
+      {
+        setWindowName(name);
+      }      
+    });
     pack();
-
+    
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
     
     validate();
     pack();
   }
-
+  
   private final void makeTitle(){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence"));
-    MaxWindowManager.getWindowManager().windowChanged(this);
+    setWindowName( sequenceData.getFtsName());
   } 
   
-  public void setName(String name)
+  public void setWindowName(String name)
   {
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + name));
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
-
+  
   public EditMenu getEditMenu()
   {
-     return editMenu;
+    return editMenu;
   }
-
+  
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
     
@@ -125,7 +136,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     
     setJMenuBar(mb);
   }
-    
+  
   // ------ editorContainer interface ---------------
   public Editor getEditor(){
     return itsSequencePanel;

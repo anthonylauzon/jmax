@@ -182,6 +182,16 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     }
   }
     
+  public void nameChanged( String name)
+  {
+    super.nameChanged( name);
+    notifyNameChanged( name);
+  }
+  
+  public String getName()
+  {
+    return super.getVariableName();
+  }
   /*
   ** Requests to the server
   */
@@ -482,6 +492,11 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((BpfDataListener) e.nextElement()).cleared();
+  }
+  private void notifyNameChanged( String name)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((BpfDataListener) e.nextElement()).nameChanged( name);
   }
   ///////////////////////////////////////////////////////////
   public Enumeration intersectionSearch(float start, float end, BpfAdapter adapter)

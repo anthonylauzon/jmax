@@ -595,8 +595,13 @@ public class FtsGraphicObject extends FtsObject {
     this.varName = name;
     if(getObjectListener() != null)
       ((GraphicObject)getObjectListener()).setCurrentName( name);
+    
+    nameChanged(name);
   }
 
+  /* redifine this method to have a name change notification */
+  public void nameChanged(String newName){}
+    
   public final String getVariableName()
   {
     return varName;

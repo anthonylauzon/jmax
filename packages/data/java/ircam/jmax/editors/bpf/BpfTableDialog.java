@@ -81,6 +81,8 @@ class BpfTableDialog extends JDialog implements BpfDataListener {
 	tabPanel.validate();
 	validate();
     }
+  
+  public void nameChanged(String name){}
 
     public void relocate()
     {

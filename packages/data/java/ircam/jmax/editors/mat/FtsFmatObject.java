@@ -168,6 +168,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     notifyUpload(false);
   } 
   
+  public void nameChanged( String name)
+  {
+    super.nameChanged( name);
+    notifyNameChanged( name);
+  }
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES to the server
   //////////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +263,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     return "FMat";
   }  
   
+  public String getName()
+  {
+    return super.getVariableName();
+  }
+  
   public void setRows(int m)
   {
     setSize(m, n_cols);
@@ -312,6 +322,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((MatDataListener) e.nextElement()).uploading(uploading);
+  }
+  private void notifyNameChanged(String name)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((MatDataListener) e.nextElement()).matNameChanged(name);
   }
   /*******************************************************************/
   private Object[][] values;

@@ -129,6 +129,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				}
 				repaint();
 			}
+      public void ftsNameChanged(String name){}
 		});
 		
     track.getTrackDataModel().addHighlightListener(new HighlightListener(){

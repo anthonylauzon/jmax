@@ -156,6 +156,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     notifySizeChanged(n_rows, n_cols);
   }
   
+  public void nameChanged( String name)
+  {
+    super.nameChanged( name);
+    notifyNameChanged( name);
+  }
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES to the server
   //////////////////////////////////////////////////////////////////////////////////////
@@ -271,6 +276,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     return "Dict";
   }
+ 
+  public String getName()
+  {
+    return super.getVariableName();
+  }
   
   public void setRows(int m)
   {
@@ -321,6 +331,12 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((MatDataListener) e.nextElement()).matSizeChanged(n_rows, n_cols);
+  }
+  
+  private void notifyNameChanged(String name)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((MatDataListener) e.nextElement()).matNameChanged(name);
   }
   /*******************************************************************/
   private Object[][] values;

@@ -26,5 +26,6 @@ public interface MatDataListener {
    abstract public void matDataChanged();
    abstract public void matSizeChanged(int n_rows, int n_cols);
    abstract public void uploading(boolean uploading);
+   abstract public void matNameChanged(String name);
 }
 

@@ -193,6 +193,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       repaint();
     }
   }
+  public void matNameChanged(String name){}
   //------------------- Editor interface ---------------
 
   public EditorContainer getEditorContainer(){

@@ -32,4 +32,5 @@ public interface TrackListener
     public abstract void trackRemoved(Track track);   
     public abstract void trackChanged(Track track);   
     public abstract void trackMoved(Track track, int oldPosition, int newPosition);   
+    public abstract void ftsNameChanged(String name);
 }

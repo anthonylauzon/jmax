@@ -35,66 +35,77 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 /**
- * This implementation builds a SequencePanel to represent the data.
+* This implementation builds a SequencePanel to represent the data.
  */
 public class BpfWindow extends JFrame implements EditorContainer{
-
-    //------------------- fields
-    BpfPanel itsBpfPanel;
-    FtsBpfObject bpfData;
-
-    public final static int DEFAULT_WIDTH  = 300;
-    public final static int DEFAULT_HEIGHT = 150;
-    public final static int MAX_HEIGHT     = 800;
-    public final static int EMPTY_HEIGHT   = 78;
+  
+  //------------------- fields
+  BpfPanel itsBpfPanel;
+  FtsBpfObject bpfData;
+  
+  public final static int DEFAULT_WIDTH  = 300;
+  public final static int DEFAULT_HEIGHT = 150;
+  public final static int MAX_HEIGHT     = 800;
+  public final static int EMPTY_HEIGHT   = 78;
   /**
-   * Constructor with FtsSequenceObject
+    * Constructor with FtsSequenceObject
    */
-    public BpfWindow(FtsBpfObject data)
-    {
-      super();
-      
-      bpfData = data;
-      
-      makeTitle();
-            
-      setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-      
-      //... then the SequencePanel
-      itsBpfPanel = new BpfPanel(this, data);
-      getContentPane().add(itsBpfPanel);
-      
-      addWindowListener(new WindowListener(){
-	  public void windowOpened(WindowEvent e){}
-	  public void windowClosed(WindowEvent e){}
-	  public void windowClosing(WindowEvent e)
-	  {
-	    MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	  }
-	  public void windowDeiconified(WindowEvent e){}
-	  public void windowIconified(WindowEvent e){}
-	  public void windowActivated(WindowEvent e)
-	  {
-	  }
-	  public void windowDeactivated(WindowEvent e)
-	  {
-	  }
-	});
-      pack();
-
-      if(JMaxApplication.getProperty("no_menus") == null)
-        makeMenuBar();
-      
-      validate();
-      pack();
-    }
+  public BpfWindow(FtsBpfObject data)
+  {
+    super();
+    
+    bpfData = data;
+    
+    makeTitle();
+    
+    setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    
+    //... then the SequencePanel
+    itsBpfPanel = new BpfPanel(this, data);
+    getContentPane().add(itsBpfPanel);
+    
+    bpfData.addBpfListener( new BpfDataListener(){
+      public void pointsDeleted(int index, int size){}
+      public void pointAdded(int index){}
+      public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue){}
+      public void pointsChanged(){}
+      public void cleared(){}
+      public void nameChanged( String name)
+      {
+        setWindowName(name);
+      }
+    });
+    
+    addWindowListener(new WindowListener(){
+      public void windowOpened(WindowEvent e){}
+      public void windowClosed(WindowEvent e){}
+      public void windowClosing(WindowEvent e)
+	    {
+        MaxWindowManager.getWindowManager().removeWindow(getFrame());
+      }
+      public void windowDeiconified(WindowEvent e){}
+      public void windowIconified(WindowEvent e){}
+      public void windowActivated(WindowEvent e)
+	    {
+      }
+      public void windowDeactivated(WindowEvent e)
+	    {
+      }
+    });
+    pack();
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
+    
+    validate();
+    pack();
+  }
   
   private final void makeTitle(){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf"));
-    MaxWindowManager.getWindowManager().windowChanged(this);
+    setWindowName( bpfData.getName());
   } 
   
-  public void setName(String name)
+  public void setWindowName(String name)
   {
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf " + name));
     MaxWindowManager.getWindowManager().windowChanged(this);
@@ -112,7 +123,7 @@ public class BpfWindow extends JFrame implements EditorContainer{
     
     setJMenuBar(mb);
   }
-    
+  
   // ------ editorContainer interface ---------------
   public Editor getEditor(){
     return itsBpfPanel;

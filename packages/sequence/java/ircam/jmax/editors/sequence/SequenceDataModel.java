@@ -69,7 +69,7 @@ public interface SequenceDataModel {
    */
   public abstract void removeTrackListener(TrackListener theListener);
 
-
+  public abstract String getFtsName();
 }
 
 

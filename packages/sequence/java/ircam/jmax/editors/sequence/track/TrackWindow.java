@@ -103,6 +103,18 @@ public class TrackWindow extends JFrame implements EditorContainer{
 		  }
 		});
 		
+    trackData.addTrackStateListener(new TrackStateListener(){
+			public void lock(boolean lock){}
+			public void active(boolean active){}
+			public void restoreEditorState(FtsTrackEditorObject editorState){}
+			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection){}
+			public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection){}
+      public void ftsNameChanged(String name)
+      {
+        setWindowName(name);
+      }
+		});		
+    
 		if( !trackData.editorObject.haveContent())
 			pack();
 		
@@ -115,11 +127,10 @@ public class TrackWindow extends JFrame implements EditorContainer{
   }
 	
   private final void makeTitle(){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track"));
-    MaxWindowManager.getWindowManager().windowChanged(this);
+    setWindowName( trackData.getFtsName());
   } 
   
-  public void setName(String name)
+  public void setWindowName(String name)
   {
     setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track " + name));
     MaxWindowManager.getWindowManager().windowChanged(this);

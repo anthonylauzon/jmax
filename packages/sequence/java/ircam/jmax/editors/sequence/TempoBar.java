@@ -448,6 +448,7 @@ public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 	repaint();
 	popup = null;
 }
+public void ftsNameChanged(String name){}
 //===================== TrackListener interface =============================
 public void trackAdded(Track track)
 {

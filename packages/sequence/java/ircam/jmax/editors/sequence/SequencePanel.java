@@ -46,7 +46,7 @@ import ircam.jmax.toolkit.Geometry;
 /**
 * The graphic component containing the tracks of a Sequence.
  */
-public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
+public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
 	
   FtsSequenceObject ftsSequenceObject;
   SequenceDataModel sequenceData;
@@ -286,6 +286,7 @@ public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements Sequen
 					if( currentMarkersSelection != null)
 						currentMarkersSelection.addListSelectionListener( markersSelectionListener);
 				}
+        public void ftsNameChanged(String name){}
 			});		
 		
 		//resize the frame //////////////////////////////////////////////////////////////
@@ -375,6 +376,7 @@ public class SequencePanel extends /*JPanel*/PopupToolbarPanel implements Sequen
   {
     resetTrackIndexs();
   }
+  public void ftsNameChanged(String name){}
 	
   void resetTrackIndexs()
   {

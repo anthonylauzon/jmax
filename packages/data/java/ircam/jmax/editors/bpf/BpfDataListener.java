@@ -38,5 +38,6 @@ public interface BpfDataListener {
   abstract public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue);
   abstract public void pointsChanged();
   abstract public void cleared();
+  abstract public void nameChanged( String name);
 }
 

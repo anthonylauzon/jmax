@@ -63,24 +63,28 @@ public class MatWindow extends JFrame implements EditorContainer{
     
     matData.addMatListener( new MatDataListener(){
       public void matCleared()
-    {
+      {
         getContentPane().validate();
         itsMatPanel.validate();
         validate();
-    }
+      }
       public void matDataChanged()
-    {
+      {
         getContentPane().validate();
         itsMatPanel.validate();
         validate();
-    }
+      }
       public void matSizeChanged(int n_rows, int n_cols)
-    {
+      {
         getContentPane().validate();
         itsMatPanel.validate();
         validate();
-    }   
+      }   
       public void uploading(boolean uploading){}
+      public void matNameChanged(String name)
+      {
+        setWindowName(name);
+      }
     });
     
     addWindowListener(new WindowListener(){
@@ -108,14 +112,14 @@ public class MatWindow extends JFrame implements EditorContainer{
     pack();
   }
   
-  private final void makeTitle(){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType()));
-    MaxWindowManager.getWindowManager().windowChanged(this);
+  private final void makeTitle()
+  {
+    setWindowName(matData.getName());
   } 
   
-  public void setName(String name)
+  public void setWindowName(String name)
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +" : "+name));
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +"  "+name));
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
   

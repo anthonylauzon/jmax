@@ -37,6 +37,8 @@ public interface MatDataModel {
     
     public abstract String getType();
     
+    public abstract String getName();
+    
     public abstract boolean haveRowIdCol();
     
     public abstract boolean canAppendColumn();

@@ -71,10 +71,10 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 
     //Create abd init a Geometry object for this sequencer 
     {
-	geometry = new Geometry();
-	geometry.setXZoom(20);
-	geometry.setYZoom(300);
-	geometry.setYTransposition(136);
+      geometry = new Geometry();
+      geometry.setXZoom(20);
+      geometry.setYZoom(300);
+      geometry.setYTransposition(136);
     }
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
@@ -158,7 +158,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     {
 	//resizePanelToPointTime(bpfData.getPointAt(newIndex));//????????
     }
-    public void cleared(){}
+  public void cleared(){}
+  public void nameChanged( String name){}
     /////////////////////////////////////////////////////////////
 
     //controll if the object is in the actual scrollable area. if not extend the area

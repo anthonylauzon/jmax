@@ -207,6 +207,17 @@ public void setOpenedAllTracks(boolean opened)
 		((Track)e.nextElement()).setProperty("opened", val);
 }
 
+public void nameChanged( String name)
+{
+  super.nameChanged( name);
+  notifyFtsNameChanged( name);
+}
+
+public String getFtsName()
+{
+  return super.getVariableName();
+}
+
 /**
 * return how many tracks in the sequence
  */
@@ -438,6 +449,12 @@ private void notifyTrackMoved(Track track, int oldPosition, int newPosition)
 {
 	for (Enumeration e=listeners.elements(); e.hasMoreElements();)
 		((TrackListener)(e.nextElement())).trackMoved(track, oldPosition, newPosition);
+}
+
+void notifyFtsNameChanged(String name)
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackListener) e.nextElement()).ftsNameChanged(name);
 }
 
 transient Vector tracks = new Vector();
