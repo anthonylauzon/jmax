@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: readsdif.c,v 1.1 2002/08/30 14:07:13 schwarz Exp $
  *
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999, 2002 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -29,7 +29,13 @@
  */
 
 /* 
- * $Log$
+ * $Log: readsdif.c,v $
+ * Revision 1.1  2002/08/30 14:07:13  schwarz
+ * First working version of sdif package.
+ * In/out of scalars (singleton matrices).
+ * Definition of file-scope description types.
+ * Compiles under jmax 2.5.3 and 3.
+ *
  */
 
 
@@ -38,27 +44,25 @@
 #include <assert.h>
 
 #include <fts/fts.h>
+#include <fmat.h>	/* internal include from package "data" */
 #include "jmaxsdif.h"
 
 
 #define DEBUG_OUTPUT	1
 
 
-/* where the hell is that defined?  urgh, ugly brutal test definition */
-#define fmat_t double
-
 typedef struct
 {
-    jmaxsdif_t		base;
-    double		starttime;	/* time of start message */
-    double		offset;		/* read start time in file
-					   (output at real time zero) */
-    double		currenttime;	/* time of current frame in ms */
-    fmat_t		*currentmatrix;	/* next matrix to be sent in jmax format */
-    int			matricesleft;
+    jmaxsdif_t	base;
+    double	starttime;	/* time of start message */
+    double	offset;		/* read start time in file
+				   (output at real time zero) */
+    double	currenttime;	/* time of current frame in ms */
+    fmat_t	*currentmatrix;	/* next matrix to be sent in jmax format */
+    int		matricesleft;
 
 #if !JMAXSDIF_JMAX3
-    fts_alarm_t		alarm;
+    fts_alarm_t	alarm;
 #endif   
 } readsdif_t;
 
@@ -132,7 +136,10 @@ fts_status_t readsdif_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
     /* type the outlets */
     for (i = 0; i < numoutlet; i++)
-	fts_outlet_type_define(cl, i, fts_s_float, 0, 0);
+	/* scalar 	fts_outlet_type_define(cl, i, fts_s_float, 0, 0); */
+	/* list */
+	fts_outlet_type_define(cl, i, fts_s_list, 0, 0);
+    /* fmat: fts_outlet_type_define(cl, i, fmat_symbol, 0, 0); */
 
     fts_outlet_type_define(cl, numoutlet, fts_s_bang, 0, 0);
 
@@ -320,7 +327,19 @@ static void readsdif_emitdata(fts_alarm_t *alarm, void *obj)
     if (this->base.state == state_running)
     {
 	/* it's time to output the current matrix */
-	fts_outlet_float(obj, 0, *this->currentmatrix);
+	/* scalar: */
+	/* fts_outlet_float(obj, 0, fmat_get_element(this->currentmatrix, 0, 0)); */
+	/* list: */
+	int		i;
+	int		n = fmat_get_n(this->currentmatrix);
+	fts_atom_t	l[n];
+	
+	for (i = 0; i < n; i++)
+	    fts_set_float(l + i, fmat_get_element(this->currentmatrix, 0, i));
+
+	fts_outlet_send(obj, 0, fts_s_list, n, l);
+
+	/* fmat: fts_outlet_object(obj, 0, (fts_object_t*) this->currentmatrix); */
 
 	/* read next matrix, schedule next call of readsdif_emitdata */
 	readsdif_schedulenext(obj);
@@ -439,30 +458,30 @@ static int readsdif_readmatrix(readsdif_t *this)
     int		nrows = SdifFCurrNbRow(file);
     int		ncols = SdifFCurrNbCol(file);
     int		row, col;
+    fmat_t*     x;
     
 #if DEBUG_OUTPUT
     post("readmatrix t=%g ms  nrows=%d  ncols=%d\n", 
 	 this->currenttime, nrows, ncols);
 #endif
 
+    /* create new fmat */
+    /* fts_atom_t  size[2];
+    fts_set_int(size + 0, nrows);
+    fts_set_int(size + 1, ncols);
+    x = this->currentmatrix = (fmat_t*) fts_object_create(fmat_type, 2, size); */
+    x = this->currentmatrix = (fmat_t*) fts_object_create(fmat_type, 0, 0);
+    fmat_set_size(x, nrows, ncols);
+
     for (row = 0; row < nrows; row++)
     {
 	bytesread += SdifFReadOneRow(file);
 
-#if 0
-	for (col = 1; col <= ncols; col++)
+	for (col = 0; col < ncols; col++)
 	{
 	    /* copy value by value to jmax matrix */
-	    this->currentmatrix = SdifFCurrOneRowCol(file, col);
+	    fmat_set_element(x, row, col, SdifFCurrOneRowCol(file, col + 1));
 	}
-#else
-	/* keep first value only */
-	if (row == 0)
-	{
-	    blurb =  SdifFCurrOneRowCol(file, 1);
-	    this->currentmatrix = &blurb;
-	}
-#endif
     }
 
     SdifFReadPadding(file, SdifFPaddingCalculate(file->Stream, bytesread));
