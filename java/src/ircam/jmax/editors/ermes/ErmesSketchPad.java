@@ -128,20 +128,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int editStatus = DOING_NOTHING;
   int oldEditStatus = DOING_NOTHING;
 
-  // ?? Not used anymore ??
-
-  static String objectNames[] ={ "ircam.jmax.editors.ermes.ErmesObjExternal",
-				 "ircam.jmax.editors.ermes.ErmesObjMessage",
-				 "ircam.jmax.editors.ermes.ErmesObjBang",
-				 "ircam.jmax.editors.ermes.ErmesObjToggle",
-				 "ircam.jmax.editors.ermes.ErmesObjInt",
-				 "ircam.jmax.editors.ermes.ErmesObjFloat",
-				 "ircam.jmax.editors.ermes.ErmesObjComment",
-				 "ircam.jmax.editors.ermes.ErmesObjSlider",
-				 "ircam.jmax.editors.ermes.ErmesObjIn",
-				 "ircam.jmax.editors.ermes.ErmesObjOut",
-				 "ircam.jmax.editors.ermes.ErmesObjPatcher"};
-
   Hashtable nameTable; // substitute name lists, initialized in the constructor.
   int itsAddObject;
   String itsAddObjectName;
@@ -727,7 +713,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // additional information, like a non default graphic representation
       // the code will need a small change here
       
-      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      Class objectClass = itsHelper.SearchFtsName(fo);
       if (objectClass==null) continue;
 
       objectX = ((Integer)fo.get("x")).intValue();
@@ -778,7 +764,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       // additional information, like a non default graphic representation
       // the code will need a small change here
 
-      Class objectClass = itsHelper.SearchFtsName(fo.getClassName());
+      Class objectClass = itsHelper.SearchFtsName(fo);
       if (objectClass==null) continue;
       aObject = itsHelper.AddObject(objectClass, fo);
     
@@ -974,7 +960,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     MaxApplication.itsSketchWindow = itsSketchWindow; //demo only: 4/03/98 0:55
     itsSketchWindow.requestFocus();//???
     
-    //create the object whose name is objectNames[addObject] in coord x, y
+    //create the object whose name is 
     int x = e.getX();
     int y = e.getY();
     int i;

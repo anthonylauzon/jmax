@@ -293,6 +293,11 @@ patcher_replace(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_object_t *p;
   int i;
 
+  /* Very first, copy the "open" state from the old patcher to the new,
+     otherwise we loose the updates for open redefined patchers */
+
+  new->open = old->open;
+
   /* first, delete the inlets that will not be used in the new patcher,
      if any
    */

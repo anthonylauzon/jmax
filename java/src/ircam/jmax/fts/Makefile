@@ -104,6 +104,10 @@ FtsCommentObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsCommentObject.java)
 .PHONY: FtsCommentObject
 
+FtsVoidObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsVoidObject.java)
+.PHONY: FtsVoidObject
+
 FtsDeclarationObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDeclarationObject.java)
 .PHONY: FtsDeclarationObject

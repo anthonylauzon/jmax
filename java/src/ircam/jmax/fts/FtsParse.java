@@ -17,6 +17,36 @@ import java.util.*;
 
 public class FtsParse
 {
+  static public class FloatString 
+  {
+    String str;
+
+    FloatString(String str)
+    {
+      this.str = str;
+    }
+
+    public String toString()
+    {
+      return str;
+    }
+  }
+
+  static public class IntegerString 
+  {
+    String str;
+
+    IntegerString(String str)
+    {
+      this.str = str;
+    }
+
+    public String toString()
+    {
+      return str;
+    }
+  }
+  
   final static int lex_long_start = 0;
   final static int lex_long_in_value = 1;
   final static int lex_long_in_sign = 2;
@@ -166,12 +196,12 @@ public class FtsParse
 
   final private void ParseLong()
   {
-    parsedToken = new Integer(token.toString());
+    parsedToken = new IntegerString(token.toString());
   }
 
   final private void ParseFloat()
   {
-    parsedToken = new Float(token.toString());
+    parsedToken = new FloatString(token.toString());
   }
 
   final private void ParseString()
@@ -442,14 +472,18 @@ public class FtsParse
   }
 
 
-  /** Parse an object description */
+  /** Parse the argument of a .abs abstraction;
+   * .abs abstraction arguments are anyway used as strings,
+   * because the abstraction argument substitution is a lexical
+   * mechanism in Max 0.26, so we just parse strings.
+   */
 
   public static String parseObject(String str, Vector values)
   {
     FtsParse parser = new FtsParse(str);
     String className;
 
-    // First, get a string that is the className
+    // First, get a string that is the className, and just skip it
 
     if (! parser.tryKeywords())
       if (! parser.tryQString())

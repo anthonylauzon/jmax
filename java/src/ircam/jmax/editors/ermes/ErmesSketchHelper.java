@@ -923,9 +923,11 @@ class ErmesSketchHelper extends Object{
   //	SearchFtsName
   //  corrispondence between fts names and ermes names (new and old format...)
   //--------------------------------------------------------
-  public Class SearchFtsName(String theName)
+  public Class SearchFtsName(FtsObject fo)
   {
-    if (theName.equals("selection"))
+    String theName = fo.getClassName();
+
+    if (! fo.isRepresented())
       return null;
     else if (itsSketchPad.nameTable.containsKey(theName))
       return (Class) itsSketchPad.nameTable.get(theName);

@@ -73,13 +73,19 @@ public class FtsSelection extends FtsAbstractContainerObject
     connections.removeAllElements();
   }
 
+  /** This object is not visible */
+
+  public boolean isRepresented()
+  {
+    return false;
+  }
+
   /** This object is not persistent */
 
   protected boolean isPersistent()
   {
     return false;
   }
-
 
   /** Since this object is not persistent, this function is
     not called to save it as a part of a .tpa file, 

@@ -2,6 +2,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 /**
  * A lexical analyser for .pat files, similar to the StreamTokenizer class.  <p>
@@ -81,7 +82,7 @@ class FtsDotPatTokenizer
   Object getEnvValue(int idx)
   {
     if (idx > env.size())
-      return new Integer(0);
+      return "0";
     else
       return env.elementAt(idx - 1);
   }
@@ -225,26 +226,16 @@ class FtsDotPatTokenizer
 		      {
 			Object value = getEnvValue(v);
 
-			if (value instanceof Integer)
-			  {
-			    buf.append(value.toString());
-			    status = tt_in_number;
-			  }
-			else if (value instanceof Float)
-			  {
-			    buf.append(value.toString());
-			    status = tt_in_float;
-			  }
+			if (value instanceof FtsParse.IntegerString)
+			  status = tt_in_number;
+			else if (value instanceof FtsParse.FloatString)
+			  status = tt_in_float;
 			else if (value instanceof String)
-			  {
-			    buf.append((String) value);
-			    status = tt_in_string;
-			  }
+			  status = tt_in_string;
 			else
-			  {
-			    buf.append(value.toString());
-			    status = tt_in_string;
-			  }
+			  status = tt_in_string;
+
+			buf.append(value.toString());
 		      }
 		  }
 		else

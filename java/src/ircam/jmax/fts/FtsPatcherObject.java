@@ -82,17 +82,17 @@ public class FtsPatcherObject extends FtsContainerObject
     FtsParse.parseObjectArguments(description, args);
 
     if (args.size() >= 1)
-      setObjectName((String) args.elementAt(0));
+      setObjectName(args.elementAt(0).toString());
     else
       setObjectName("unnamed");
 
     if (args.size() >= 2)
-      setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
+      setNumberOfInlets(Integer.parseInt(args.elementAt(1).toString()));
     else
       setNumberOfInlets(0);
 
     if (args.size() >= 3)
-      setNumberOfOutlets(((Integer) args.elementAt(2)).intValue());
+      setNumberOfOutlets(Integer.parseInt(args.elementAt(2).toString()));
     else
       setNumberOfOutlets(0);
 
@@ -147,12 +147,12 @@ public class FtsPatcherObject extends FtsContainerObject
       setObjectName("unnamed");
 
     if (args.size() >= 2)
-      setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
+      setNumberOfInlets(Integer.parseInt(args.elementAt(1).toString()));
     else
       setNumberOfInlets(0);
 
     if (args.size() >= 3)
-      setNumberOfOutlets(((Integer) args.elementAt(2)).intValue());
+      setNumberOfOutlets(Integer.parseInt(args.elementAt(2).toString()));
     else
       setNumberOfOutlets(0);
 

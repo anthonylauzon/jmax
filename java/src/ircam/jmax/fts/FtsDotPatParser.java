@@ -158,12 +158,12 @@ public class FtsDotPatParser
 
     in.nextToken();
 	
-    if ((in.ttype != FtsDotPatTokenizer.TT_STRING) && ! in.sval.equals("max"))
+    if (! in.sval.equals("max"))
       syntaxError("file not in .pat format (header error)");
 
     in.nextToken(); 
 
-    if ((in.ttype != FtsDotPatTokenizer.TT_STRING) && ! in.sval.equals("v2"))
+    if (! in.sval.equals("v2"))
       syntaxError("file not in .pat format (header error)");
 
     // Skip possible declarations
@@ -216,10 +216,6 @@ public class FtsDotPatParser
 	while (in.ttype != FtsDotPatTokenizer.TT_EOF)
 	  {
 	    in.nextToken(); 
-
-
-	    if (in.ttype != FtsDotPatTokenizer.TT_STRING)
-	      syntaxError("System Error parsing .pat file (" + (char) in.ttype + ")");
 
 	    if (in.sval.equals("#N"))
 	      {
@@ -298,9 +294,6 @@ public class FtsDotPatParser
 		// get the line name
 
 		in.nextToken(); 
-
-		if (in.ttype != FtsDotPatTokenizer.TT_STRING) 
-		  syntaxError("file not in .pat format (syntax error)");
 
 		if (in.sval.equals("connect"))
 		  {
@@ -473,11 +466,6 @@ public class FtsDotPatParser
     in.nextToken(); 
     inlet  = (int) in.getNVal();
 
-    //    System.err.println("In " + parent + " adding connection " + fromIdx + " " + outlet + " " + toIdx + " " + inlet);
-
-    // for (int i = 0; i < objects.size(); i++)
-    //      System.err.println("Object " + (objects.size() - i - 1) + " : " + objects.elementAt(i));
-
     from = (FtsObject) objects.elementAt(objects.size() - fromIdx - 1);
     to = (FtsObject) objects.elementAt(objects.size() - toIdx - 1);
 
@@ -592,7 +580,16 @@ public class FtsDotPatParser
 	in.nextToken();//get the object name
 
 	// Abstraction are handled directly by the makeFtsObject function now.
-	
+
+	if (in.ttype == FtsDotPatTokenizer.TT_EOC)
+	  {
+	    // Empty object, built and return a 
+	    // void object 
+
+	    in.pushBack();
+
+	    return new FtsVoidObject(parent);
+	  }
 	if (in.ttype == FtsDotPatTokenizer.TT_STRING)
 	  {
 	    description.append(in.sval);

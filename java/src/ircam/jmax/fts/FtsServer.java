@@ -181,17 +181,11 @@ public class FtsServer
 
   /** Send a "new object" messages to FTS; receive the class Name and a description as a string;
    *  It is actually used only for those objects that don't have the class name in the description,
-   *  i.e. messages and (temporarly) comments.
+   *  i.e. messages.
    */
 
   final  void newObject(FtsObject patcher, FtsObject obj, String className, String description)
   {
-    Vector args;
-
-    args = new Vector();
-    
-    FtsParse.parseObjectArguments(description, args);
-
     try
       {
 	registerObject(obj);
@@ -199,10 +193,7 @@ public class FtsServer
 	port.sendObject(patcher);
 	port.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
 	port.sendString(className);
-
-	if (args != null)
-	  port.sendVector(args);
-
+	FtsParseToPort.parseAndSendObject(description, port);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -712,7 +703,7 @@ public class FtsServer
 	// it should be smarter, detect the problem,
 	// and set the server as halted.
 
-	wait(5000);
+	wait(10000);
       }
     catch (java.lang.InterruptedException e)
       {
