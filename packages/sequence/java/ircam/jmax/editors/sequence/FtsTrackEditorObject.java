@@ -50,6 +50,12 @@ public class FtsTrackEditorObject extends FtsObject
 				((FtsTrackEditorObject)obj).restoreTableColumns(args.getLength(), args.getAtoms());		  
 		  }
 		});
+    FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("props_to_draw"), new FtsMessageHandler(){
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				((FtsTrackEditorObject)obj).restorePropertiesToDraw(args.getLength(), args.getAtoms());		  
+		  }
+		});
     FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("grid_mode"), new FtsMessageHandler(){
 			public void invoke( FtsObject obj, FtsArgs args)
 		  {
@@ -82,6 +88,7 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
     gridMode = 0;
 		trackObj = (FtsTrackObject)parent;		
 		columnNames = new Vector();
+    propsToDraw = new Vector();
 }
 
 public void setEditorState( int nArgs, FtsAtom args[])
@@ -114,6 +121,13 @@ public void restoreTableColumns( int nArgs, FtsAtom args[])
 		columnNames.add( args[i].symbolValue.toString());
 }
 
+public void restorePropertiesToDraw( int nArgs, FtsAtom args[])
+{
+	propsToDraw.removeAllElements();
+	for(int i = 0; i<nArgs; i++)
+		propsToDraw.add( args[i].symbolValue.toString());  
+}
+
 public void restoreTableSize( int nArgs, FtsAtom args[])
 {	
 	if(nArgs==2)
@@ -134,6 +148,13 @@ public Enumeration getTableColumns()
 {
 	if(columnNames.size() > 0)
 		return columnNames.elements();
+	else return null;
+}
+
+public Enumeration getPropertiesToDraw()
+{
+	if(propsToDraw.size() > 0)
+		return propsToDraw.elements();
 	else return null;
 }
 
@@ -343,6 +364,31 @@ public void setTableColumnOrder(int size, Enumeration colNames)
 	}
 }
 
+public void setPropertiesToDraw(Enumeration enum)
+{
+  this.propsToDraw.removeAllElements();
+	args.clear();
+	
+	String name;
+	for(Enumeration e = enum; e.hasMoreElements(); )
+	{
+		name = (String)e.nextElement();
+		this.propsToDraw.add( name);
+		args.addSymbol( FtsSymbol.get(name));
+	}
+	
+	if( args.getLength() > 0)
+	{
+		try{
+			send( FtsSymbol.get("props_to_draw"), args);
+		}
+		catch(IOException e)
+  {
+			System.err.println("FtsTrackEditorObject: I/O Error sending prop_to_draw Message!");
+			e.printStackTrace(); 
+		}
+	}  
+}
 
 public void requestSetEditorState(Rectangle bounds)
 {	
@@ -388,7 +434,7 @@ public boolean haveContent()
 public int wx, wy, ww, wh, transp, view, rangeMode, gridMode, tab_w, tab_h;
 public String label;
 public float zoom;
-public Vector columnNames;
+public Vector columnNames, propsToDraw;
 FtsTrackObject trackObj;
 protected transient FtsArgs args = new FtsArgs();
 }

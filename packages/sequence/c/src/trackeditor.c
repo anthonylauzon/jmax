@@ -40,6 +40,8 @@ track_editor_upload(track_editor_t *this)
   {
 		fts_atom_t *atoms = fts_array_get_atoms(&this->columns);
 		int size = fts_array_get_size(&this->columns);
+    fts_atom_t *props_atoms = fts_array_get_atoms(&this->props_to_draw);
+		int props_size = fts_array_get_size(&this->props_to_draw);
     fts_atom_t a[9];
     
 		if(this->win_x!=-1 && this->win_y!=-1 && this->win_w!=-1 && this->win_h!=-1)
@@ -70,6 +72,9 @@ track_editor_upload(track_editor_t *this)
 		
 		if(size > 0)
 			fts_client_send_message((fts_object_t *)this, seqsym_columns, size, atoms);
+    
+    if(props_size > 0)
+			fts_client_send_message((fts_object_t *)this, seqsym_props_to_draw, props_size, props_atoms);
 	}
 }
 
@@ -131,6 +136,21 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
       
 		fts_dumper_send(dumper, seqsym_editor, n_cols + 1, b);
   }
+  
+  if(fts_array_get_size(&this->props_to_draw) > 0)
+  {
+    fts_atom_t *props = fts_array_get_atoms(&this->props_to_draw);
+    int n_props = fts_array_get_size(&this->props_to_draw);
+    fts_atom_t *b = alloca(sizeof(fts_atom_t) * (n_props + 1));
+    int i;
+    
+    fts_set_symbol(b, seqsym_props_to_draw);
+    
+    for(i=0; i<n_props; i++)
+      b[i + 1] = props[i];
+    
+		fts_dumper_send(dumper, seqsym_editor, n_props + 1, b);
+  }  
  }
 
 
@@ -262,6 +282,20 @@ track_editor_set_table_columns(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }	
 
 static void
+track_editor_set_properties_to_draw(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_editor_t *this = (track_editor_t *)o;
+	  
+  if(ac > 0 && fts_is_symbol(at))
+	{
+		fts_array_set(&this->props_to_draw, ac, at);
+    
+		if(track_do_save_editor(this->track))
+			fts_object_set_dirty((fts_object_t *)this->track);
+  }	
+}	
+
+static void
 track_editor_set_table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_editor_t *this = (track_editor_t *)o;
@@ -340,7 +374,8 @@ track_editor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	this->tab_h = -1;
 	
 	fts_array_init(&this->columns, 0, NULL);
-	
+	fts_array_init(&this->props_to_draw, 0, NULL);
+  
   this->track = 0;
 	
   if(ac > 0)
@@ -358,6 +393,7 @@ track_editor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   track_editor_t *this = (track_editor_t *)o;
 	
 	fts_array_destroy(&this->columns);
+  fts_array_destroy(&this->props_to_draw);
 }
 
 static void
@@ -375,6 +411,7 @@ track_editor_instantiate(fts_class_t *cl)
 	fts_class_message_varargs(cl, seqsym_columns, track_editor_set_table_columns);
 	fts_class_message_varargs(cl, seqsym_table_size, track_editor_set_table_size);
 	fts_class_message_varargs(cl, seqsym_editor_state, track_editor_set_state);
+  fts_class_message_varargs(cl, seqsym_props_to_draw, track_editor_set_properties_to_draw);
 }
 
 void

@@ -170,7 +170,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
         }
         if(lastEvent != null)
           notesTime = lastEvent.getTime() + ((Double)lastEvent.getProperty("duration")).intValue();
-                
+        
         if(notesTime > 0.0 || markersTime > 0.0)
           resizePanelToTimeWithoutScroll((int)((notesTime > markersTime) ? notesTime : markersTime));
         

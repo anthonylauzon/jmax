@@ -47,6 +47,7 @@ struct _track_editor
   int tab_w;           /* table editor width */
   int tab_h;           /* table editor height */
   fts_array_t columns; /* list of table column names */
+  fts_array_t props_to_draw; /* list of property names to draw in tempo_bar */
 };
 
 FTS_API void track_editor_upload(track_editor_t *this);

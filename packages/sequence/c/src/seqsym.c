@@ -95,6 +95,7 @@ fts_symbol_t seqsym_markers = 0;
 fts_symbol_t seqsym_shift = 0;
 fts_symbol_t seqsym_stretch = 0;
 fts_symbol_t seqsym_quantize = 0;
+fts_symbol_t seqsym_props_to_draw = 0;
 
 /* messages from/to client */
 fts_symbol_t seqsym_addTracks = 0;
@@ -189,6 +190,7 @@ seqsym_config(void)
   seqsym_shift = fts_new_symbol("shift");
   seqsym_stretch = fts_new_symbol("stretch");
   seqsym_quantize = fts_new_symbol("quantize");
+  seqsym_props_to_draw = fts_new_symbol("props_to_draw");
 		
   /* messages to client */
   seqsym_addTracks = fts_new_symbol("addTracks");

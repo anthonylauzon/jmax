@@ -96,9 +96,18 @@ public JPopupMenu getMenu()
 	return popup;
 }
 
-public void setPropertyToDraw(String propName, boolean toDraw)
+public Enumeration getPropertyNamesToDraw()
 {
-	boolean changeSize = false;
+  Vector temp = new Vector();
+  for(int i=0 ; i < propertyNames.length; i++)
+		if(propertyToDraw[i])
+      temp.addElement(propertyNames[i]);
+  return temp.elements();
+}
+
+boolean propertyToDraw(String propName, boolean toDraw)
+{
+  boolean changeSize = false;
 	
 	for(int i=0 ; i < propertyNames.length; i++)
 		if(propertyNames[i].equals(propName))
@@ -110,37 +119,48 @@ public void setPropertyToDraw(String propName, boolean toDraw)
 			}
 			break;
 		}
-	
+      
+  if(changeSize)
+  {
+    Dimension d = getSize();    
+    int delta;
+    if(toDraw) 
+    {
+      numPropToDraw++;
+      delta = DELTA_H;
+    }
+    else 	
+    {
+      numPropToDraw--;			
+      delta = -DELTA_H;
+    }
+    d.height += delta;		
+    setSize(d.width, d.height);
+    setPreferredSize(d);
+    setMinimumSize(d);
+  }  
+  return changeSize;
+}
+
+public void setPropertyToDraw(String propName, boolean toDraw)
+{
+	boolean changeSize = propertyToDraw(propName, toDraw);
 	if(changeSize)
 	{
-		Dimension d = getSize();    
-		int delta;
-		if(toDraw) 
-		{
-			numPropToDraw++;
-			delta = DELTA_H;
-		}
-		else 	
-		{
-			numPropToDraw--;			
-			delta = -DELTA_H;
-		}
-		d.height += delta;		
-		setSize(d.width, d.height);
-		setPreferredSize(d);
-		setMinimumSize(d);
 		validate();		
     container.getEditorContainer().getFrame().pack();
+
+    if( !isInSequence && (((FtsTrackObject)ftsObj).editorObject != null))
+		  ((FtsTrackObject)ftsObj).editorObject.setPropertiesToDraw( getPropertyNamesToDraw());
 	}
-		
 	repaint();
 }
 
 boolean propInited = false;
 void initPropertiesToDraw()
-{
+{  
   if( !propInited)
-  {
+  {   
     String pname;
     int i = 0;
     int count = markersTrack.getPropertyCount()-1;
@@ -160,6 +180,20 @@ void initPropertiesToDraw()
     propInited = true;
   }
 }
+
+void deInitPropertiesToDraw()
+{  
+  int height = tempoDimension.height - numPropToDraw*DELTA_H;  
+  for(int i = 0; i < propertyToDraw.length; i++)
+    propertyToDraw[i] = false;
+  numPropToDraw = 0;
+  
+  setSize(tempoDimension.width, height);
+  Dimension d = new Dimension(tempoDimension.width, height);
+  setPreferredSize(d);
+  setMinimumSize(d);
+}
+
 void createPopup()
 {
   if(propertyNames.length > 0)
@@ -516,7 +550,30 @@ public void valueChanged(ListSelectionEvent e){repaint();}
 //==================== TrackStateListener interface ========================
 public void lock(boolean lock){}
 public void active(boolean active){}
-public void restoreEditorState(FtsTrackEditorObject editorState){};
+boolean stateRestored = false;
+public void restoreEditorState(FtsTrackEditorObject editorState)
+{
+  if(!stateRestored)
+  {
+    Enumeration props = editorState.getPropertiesToDraw();
+    if(props == null) return;
+    else
+    {
+      String propName;
+      deInitPropertiesToDraw();
+      
+      for(Enumeration e = props; e.hasMoreElements();)
+      {
+        propName = (String)e.nextElement();
+        propertyToDraw(propName, true);
+      }
+      validate();
+      container.getEditorContainer().getFrame().pack();
+      repaint();
+    }  
+    stateRestored = true;
+  }
+};
 public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 {
 	this.markersSelection = markersSelection;
