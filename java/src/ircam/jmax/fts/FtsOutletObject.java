@@ -46,22 +46,13 @@ public class FtsOutletObject  extends FtsInOutletObject
    * Create a FtsOutletObject object.
    */
 
-    public FtsOutletObject(Fts fts, FtsObject parent/*, int objId*/, int position)
+    public FtsOutletObject(Fts fts, FtsObject parent, FtsAtom target)
     {
-      super(fts, parent/*, objId*/, "outlet", position);
+      super(fts, parent, "outlet", target);
 
-    ninlets = 1;
-    noutlets = 0;
-  }
-
-  /** Set the position. Tell the server about the new position */
-
-  public void setPosition(int i)
-  {
-    super.setPosition(i);
-
-    fts.getServer().repositionOutletObject(this, i);
-  }
+      ninlets = 1;
+      noutlets = 0;
+    }
 
   /** Get the number of outlets of the object 
     Overwrite the FtsObject method because inlets

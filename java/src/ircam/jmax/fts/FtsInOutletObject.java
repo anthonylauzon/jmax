@@ -42,39 +42,26 @@ public class FtsInOutletObject  extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
-  int position;
+  FtsAtom target;
 
   /**
    * Create a FtsInOutletObject object.
    */
   
-    public FtsInOutletObject(Fts fts, FtsObject parent/*, int objId*/, String className, int position)
+  public FtsInOutletObject(Fts fts, FtsObject parent, String className, FtsAtom target)
   {
-      super(fts, parent/*, objId*/, null, className, className + " " + position);
-
-    this.position = position;
+      super(fts, parent, null, className, ""+
+	    ((target.type == FtsAtom.INT) ? ""+target.intValue : target.getString()));
+      
+      this.target = target;
   }
 
-  /** Se the position of the inlet/outlet.
-   * Do nothing on fts here; it is the responsability
-   * of the subclass
-   */
-
-  public void setPosition(int i)
+  public FtsAtom getTarget()
   {
-    position = i;
-    description = className + " " + position;
-
-    setDirty();
-  }
-
-  /** Get the position of the inlet/outlet. */
-
-  public int getPosition()
-  {
-    return position;
+      return target;
   }
 }
+
 
 
 

@@ -205,3 +205,5 @@ public class Standard extends Editable implements FtsObjectErrorListener
     super.paint( g);
   }
 }
+
+

@@ -36,56 +36,147 @@ import ircam.jmax.editors.patcher.*;
 // The abstract base class graphic in/outlet contained in subpatchers
 //
 
-abstract public class InOutlet extends GraphicObject {
+abstract public class InOutlet extends Editable implements FtsObjectErrorListener{
 
-  protected int itsId;
-  private static final int DEFAULT_WIDTH = 20;
-  private static final int MINIMUM_WIDTH = 10;
+  protected String target;
+  private static final int DEFAULT_WIDTH = 64;
+  private static final int MINIMUM_WIDTH = 30;
 
-  InOutlet( ErmesSketchPad theSketchPad, FtsObject theFtsObject, int id) 
+  InOutlet( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String target) 
   {
     super(theSketchPad, theFtsObject);
 
-    itsId = id;
+    this.target = target;
 
     int width = getWidth();
+
     if (width == -1)
-      setWidth( DEFAULT_WIDTH);
+	setWidth( DEFAULT_WIDTH);
     else if (width <= MINIMUM_WIDTH)
-      setWidth( width);
+	setWidth( width);
+
+    updateDimensions();
+  }
+
+  public String getArgs()
+  {
+    return ftsObject.getDescription();
   }
 
   // redefined from base class
-
   public void setWidth( int theWidth)
   {
     if (theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
 
     super.setWidth( theWidth);
-    super.setHeight( theWidth);
+    
+    fitToText();
   }
 
-  // redefined from base class
-  public void setHeight( int theHeight)
+  public void setFont( Font theFont)
   {
+    super.setFont( theFont);
+    fitToText();
   }
 
-  public void changeNo( int n) 
+  public void redefine( String text) 
   {
-    if (itsId != n)
-      {
-	itsId = n;
-	((FtsInOutletObject) ftsObject).setPosition(n);
-	updateInOutlets();
-      }
+      try 
+	  {
+	      ftsObject = ftsObject.getFts().redefineFtsObject( ftsObject, ftsObject.getClassName() + " " + text);
+	      
+	      if (ftsObject.isError())
+		  itsSketchPad.showMessage(ftsObject.getErrorDescription());
+	  } 
+      catch (FtsException e) 
+	  {
+	      System.err.println("Error in redefining object, action cancelled");
+	  }
 
+      redraw();
+      setWidth(getWidth());
+      super.redefine(text);      
+  }
+
+  public void errorChanged(boolean value) 
+  {
     redraw();
-  }
+  } 
 
   public Dimension getMinimumSize() 
   {
     return null;
   }
+
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+
+  private static final int TEXT_X_OFFSET = 3;
+  private static final int TEXT_Y_OFFSET = 4;
+
+  public int getTextXOffset()
+  {
+    return getHeight()+TEXT_X_OFFSET;
+  }
+
+  public int getTextYOffset()
+  {
+    return TEXT_Y_OFFSET;
+  }
+
+  public int getTextWidthOffset()
+  {
+    return getHeight()+5;
+  }
+
+  public int getTextHeightOffset()
+  {
+      return 7;
+  }
+    
+  public Color getTextForeground()
+  {
+    if(ftsObject.isError())
+      {
+	if(isSelected())
+	  return Color.gray.darker();
+	else
+	  return Color.gray;
+      }
+    else
+      return Color.black;
+  }
+
+  public Color getTextBackground()
+  {
+      if(isSelected())
+	  return Settings.sharedInstance().getObjColor().darker();
+      else
+	  return Settings.sharedInstance().getObjColor();
+  }
+
+ public void paint(Graphics g) 
+  {
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    int hLine = ((TextRenderer)renderer).getRHeight()+getTextHeightOffset();
+
+    g.setColor(getTextBackground());
+
+    g.fillRect( x + 1, y + 1, w - 2,  h - 2);
+    g.fill3DRect( x + 1, y + 1, hLine-2,  h-2, true);
+
+    drawTriangle(g, x, y, w, hLine);
+    drawContent( g);
+
+    super.paint( g);
+  }
+
+  abstract void drawTriangle(Graphics g, int x, int y, int w, int h);
 }
+
 

@@ -32,7 +32,6 @@ import java.util.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.menus.InOutletPopUpMenu;
 
 //
 // The "out" graphic object used in subpatchers.
@@ -40,65 +39,21 @@ import ircam.jmax.editors.patcher.menus.InOutletPopUpMenu;
 
 public class Outlet extends InOutlet
 {
-  InOutletPopUpMenu inoutletMenu;
-
   public Outlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject, ((FtsOutletObject) theFtsObject).getPosition());
+    super(theSketchPad, theFtsObject, theFtsObject.getDescription());
   }
 
-  public void paint(Graphics g) 
+  public void drawTriangle(Graphics g, int x, int y, int w, int h) 
   {
-    if (isSelected())
-      g.setColor( Settings.sharedInstance().getObjColor().darker());
-    else 
-      g.setColor( Settings.sharedInstance().getObjColor());
-
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
-
-    g.fill3DRect( x + 1, y + 1, w - 2,  h - 2, true);
-
-    //the triangle
     Color color = g.getColor();
-
-    int xpwd2 = x + w/2;
-    int S = 4;
-
+    int offset = 2*h/7;
+      
     g.setColor( color.brighter());
-    g.drawLine( xpwd2, y + h - 3 - S, xpwd2 + S, y + h - 3);
-
+    g.drawLine( x + h - offset, y + offset, x + h/2, y + h - offset);
+      
     g.setColor( color.darker());
-    g.drawLine( xpwd2 - 1 - S, y + h - 3, xpwd2 - 1, y + h - 3 - S);
-
-    int ys = y + getFontMetrics().getAscent() + 1;
-    String s = "" + itsId;
-    int xs = xpwd2 - getFontMetrics().stringWidth( s)/2;
-
-    g.setFont( getFont());
-    g.setColor( Color.black);
-    g.drawString( s, xs, ys);
-
-    super.paint( g);
-  }
-
-  //popup interaction 
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
-  {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    inoutletMenu = new InOutletPopUpMenu( new NumberChoosenListener()
-					  {
-					      public void numberChoosen(int v) { changeNo(v);}
-					  }, 
-					  0, itsSketchPad.getFtsPatcher().getNumberOfOutlets() + 4);
-    ObjectPopUp.addMenu(inoutletMenu);
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    ObjectPopUp.removeMenu(inoutletMenu);
-    inoutletMenu=null;
+    g.drawLine( x + offset, y + offset, x + h - offset, y + offset);
+    g.drawLine( x + offset, y + offset, x + h/2 - 1, y + h - offset - 1);
   }
 }

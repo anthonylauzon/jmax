@@ -46,22 +46,12 @@ public class FtsInletObject  extends FtsInOutletObject
    * Create a FtsInletObject object.
    */
   
-    public FtsInletObject(Fts fts, FtsObject parent/*, int objId*/, int position)
+  public FtsInletObject(Fts fts, FtsObject parent, FtsAtom arg)
   {
-      super(fts, parent/*, objId*/, "inlet", position);
+      super(fts, parent, "inlet", arg);
 
-    ninlets = 0;
-    noutlets = 1;
-  }
-
-
-  /** Set the position. Tell the server about the new position */
-
-  public void setPosition(int i)
-  {
-    super.setPosition(i);
-
-    fts.getServer().repositionInletObject(this, i);
+      ninlets = 0;
+      noutlets = 1;
   }
 
   /** Get the number of inlets of the object.
