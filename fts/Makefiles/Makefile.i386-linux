@@ -28,12 +28,6 @@ VENDOR := gnu
 OS_TYPE := unix
 PLATFORM := linux-intel
 
-ifeq ($(ENABLE_ALSA),yes)
-SYS_PACKAGES=ossdev alsadev pdtddev
-else
-SYS_PACKAGES=ossdev pdtddev
-endif
-
 CC := gcc
 LD := gcc
 ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC

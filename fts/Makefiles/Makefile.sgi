@@ -24,5 +24,4 @@
 
 ## Install-only makefile, in order to be able to do a "make install ARCH=sgi"
 
-SYS_PACKAGES=sgidev pdtddev
 

@@ -23,49 +23,56 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-C_TARGETS=reftype system io guiobj mess control data numeric math ispw ispwmath lists sources
+JMAXROOTDIR= ..
+DISTDIR=$(JMAXROOTDIR)
 
-JAVA_TARGETS=table
-MIXED_TARGETS=explode qlist
+ifdef ARCH
+include $(JMAXROOTDIR)/Makefiles/Makefile.$(ARCH)
+endif
+
+# Architecture dependant packages are supposed to be C...
+C_PACKAGES=$(ARCH_PACKAGES) reftype system io guiobj mess control data numeric math ispw ispwmath lists sources
+JAVA_PACKAGES=table
+MIXED_PACKAGES=explode qlist
 
 all: all_c all_java
 .PHONY: all
 
 all_c:
-	for i in $(C_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi) ; done
-	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_c ; fi ) ; done
+	for i in $(C_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi) ; done
+	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_c ; fi ) ; done
 .PHONY: all_c
 
 all_java:
-	for i in $(JAVA_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done
-	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_java ; fi ) ; done
+	for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done
+	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_java ; fi ) ; done
 .PHONY: all_java
 
 clean: clean_c clean_java
 .PHONY: clean
 
 clean_c:
-	for i in $(C_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
-	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_c ; fi ) ; done
+	for i in $(C_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
+	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_c ; fi ) ; done
 .PHONY: clean_c
 
 clean_java:
-	for i in $(JAVA_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
-	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
+	for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
+	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages
-	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) $@) ; done
-	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	for i in $(C_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
+	for i in $(JAVA_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
 .PHONY: install-noarch
 
 install-arch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages
-	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) $@) ; done
-	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	for i in $(C_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
+	for i in $(JAVA_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
 .PHONY: install-arch
 
 

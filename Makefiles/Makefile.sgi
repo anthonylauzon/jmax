@@ -37,3 +37,5 @@ include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 
 INSTALL_ARCHS=r10k-irix6.5 r5k-irix6.5
+
+ARCH_PACKAGES=sgidev pdtddev

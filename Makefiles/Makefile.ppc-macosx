@@ -23,14 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.linux
+INSTALL_ARCHS=ppc-macosx
 
-INSTALL_ARCHS=i686-linux
-
-ifeq ($(ENABLE_ALSA),yes)
-ARCH_PACKAGES=ossdev pdtddev alsadev
-else
-ARCH_PACKAGES=ossdev pdtddev
-endif
+ARCH_PACKAGES=   # nothing yet !
 
 

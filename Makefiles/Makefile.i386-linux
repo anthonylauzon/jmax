@@ -26,3 +26,10 @@
 include $(DISTDIR)/Makefiles/Makefile.linux
 
 INSTALL_ARCHS=i386-linux
+
+ifeq ($(ENABLE_ALSA),yes)
+ARCH_PACKAGES=ossdev alsadev pdtddev
+else
+ARCH_PACKAGES=ossdev pdtddev
+endif
+
