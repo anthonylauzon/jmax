@@ -24,7 +24,7 @@ dataDirectory $dir/sounds
 
 ## load the help patch tables
 sourceFile $dir/help/control/control.help.index.tcl
-sourceFile $dir/help/jimmies/jimmies.help.index.tcl
+#sourceFile $dir/help/jimmies/jimmies.help.index.tcl
 sourceFile $dir/help/signal/signal.help.index.tcl
 
 ## load the reference manual data base
