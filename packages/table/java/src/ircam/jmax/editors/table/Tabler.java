@@ -135,6 +135,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
       public  void actionPerformed(ActionEvent e)
 	{ 
 	  ((FtsIntegerVector)(itsData.getContent())).forceUpdate();
+	  //scure itsTablePanel.recreateOffScreen();
 	  itsTablePanel.paint(itsTablePanel.getGraphics());
 	}});
   }

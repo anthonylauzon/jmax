@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
+import java.math.*;
 import tcl.lang.*;
 import com.sun.java.swing.*;
 
@@ -18,11 +19,12 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   int old_dragx = 0;
   int old_dragy = 0;
   int values[];
+  int previousHilighted = -1;
   Tabler itsTabler;
   
-  Graphics offGraphics = null;
-  Dimension offDimension;	   
-  Image offImage;	
+  //scure Graphics offGraphics = null;
+  //scure Dimension offDimension;	   
+  //scure Image offImage;	
 
   public TablePanel(Tabler theTabler) {
     super();
@@ -34,14 +36,14 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     addMouseListener(this);
   }
 
-  void InitOffScreen(){
+  /*scure void InitOffScreen(){
     Dimension d = preferredSize();	    
     if((offGraphics == null)){					  
       offDimension = d;
       offImage = createImage(d.width, d.height);
       offGraphics = offImage.getGraphics();
     }
-  }
+  }*/
 
   public void initValues(int[] vector) {
     if (vector != null && vector.length != 0) {
@@ -58,16 +60,22 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void update(Graphics g) {
   }
 
-  public void paint(Graphics g) {
-    //System.err.println("fava");
-    /*for(int i = 0; i<N_POINTS;i++){
-      PaintSingle(i, g);
-    }*/
+  /*scure   public void recreateOffScreen() {
     InitOffScreen();
-    CopyTheOffScreen(g);
+    for (int i=0; i<N_POINTS; i++) {
+      PaintSingle(i, offGraphics);
+    } 
+  }*/
+
+  public void paint(Graphics g) {
+    for(int i = 0; i<N_POINTS;i++){
+      PaintSingle(i, g);
+    }
+    /*scure InitOffScreen();
+    CopyTheOffScreen(g);*/
   }
   
-  void DoublePaint(int x) {
+  /*scure void DoublePaint(int x) {
     PaintSingle(x, getGraphics());
     InitOffScreen();
     PaintSingle(x, offGraphics);
@@ -76,7 +84,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void CopyTheOffScreen(Graphics g) {
     InitOffScreen();
     g.drawImage(offImage, 0, 0, this);	
-  }
+  }*/
 
   public void fillTable(FtsIntegerVector aIntV) {
     if(aIntV.getSize()!=0) initValues(aIntV.getValues());
@@ -87,8 +95,13 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void mouseMoved(MouseEvent e){
     int x = e.getX()/x_scale_factor;
     int y = e.getY();
-    if (x < values.length) 
+    if (x < values.length) { 
       itsTabler.setCoordinates(x, getSize().height-y);
+      //working code, commented for efficiency
+      /*if (previousHilighted != -1) highlight(previousHilighted, false);
+	previousHilighted = x;
+	highlight(x, true);*/
+    }
   }
   
   public void mouseDragged(MouseEvent e){
@@ -99,29 +112,29 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     values[x] = y;
     Interpolate(old_dragx, old_dragy, x, y);
     old_dragx = x; old_dragy = y;
-    //PaintSingle(x, getGraphics());
-    DoublePaint(x);
+    PaintSingle(x, getGraphics());
+    //scure DoublePaint(x);
     itsTabler.setCoordinates(x, y);
   }
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListenr--fine
 
-  void Interpolate(int x1, int y1, int x2, int y2) {
+  void Interpolate(int oldx, int oldy, int newx, int newy) {
     Dimension d = size();
     Graphics temp = getGraphics();
     
-    if (x1 == x2) return;	//nothing to do
+    if (oldx == newx) return;	//nothing to do
     
-    float factor = (y2-y1)/(x2-x1);
-    if (x2>x1) for (int i=x1+1; i<x2; i++) {
+    float factor = (newy-oldy)/Math.abs(newx-oldx);
+    if (newx>oldx) for (int i=oldx+1; i<newx; i++) {
       values[i] = (int) (values[i-1]+factor);
-      //PaintSingle(i, getGraphics());
-      DoublePaint(i);
+      PaintSingle(i, getGraphics());
+      //scure DoublePaint(i);
     }
-    else for (int i=x1-1; i>x2; i--) {
+    else for (int i=oldx-1; i>newx; i--) {
       values[i] = (int) (values[i+1]+factor);
-      //PaintSingle(i, getGraphics());
-      DoublePaint(i);
+      PaintSingle(i, getGraphics());
+      //scure DoublePaint(i);
     }
   }
   
@@ -137,8 +150,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     old_dragx = x;
     old_dragy = y;
     values[x] = y;
-    //PaintSingle(x, getGraphics());
-    DoublePaint(x);
+    PaintSingle(x, getGraphics());
+    //scure DoublePaint(x);
   }
 
   public void mouseReleased(MouseEvent e){
@@ -151,34 +164,38 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   //////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////mouseListener--fine
 
-  /*void DrawPoint(int index, Graphics g) {
+  void whitenPoint(int index, Graphics g) {
     Dimension d = size();
-     for(int i=0;i<x_scale_factor;i++){
-       g.drawLine(index+i, d.height, index+i,0);
-     }   
-   }
-  
-   void PaintSingle(int index, Graphics g) {
-     Dimension d = size();
-     index = index*x_scale_factor;
-     g.setColor(Color.white);
-     DrawPoint(index, g);
-     g.setColor(Color.black);
-     DrawPoint(index, g);
-     g.setColor(Color.white);
-   }*/
-  
+
+    g.setColor(Color.white);
+    g.fillRect(index*x_scale_factor, 0, x_scale_factor, d.height);
+  }
+
+  Rectangle toolRect = new Rectangle();
   void PaintSingle(int index, Graphics g) {
     Dimension d = size();
-    index = index*x_scale_factor;
-    g.setColor(Color.white);
-    for(int i=0;i<x_scale_factor;i++){
+    
+    /*    g.setColor(Color.white);
+    g.fillRect(index*x_scale_factor, 0, x_scale_factor, d.height);*/
+    whitenPoint(index, g);
+
+    /*for(int i=0;i<x_scale_factor;i++){
       g.drawLine(index+i, d.height, index+i,0);
-    }    
+    } */   
     g.setColor(Color.black);
-    for(int i=0;i<x_scale_factor;i++){
+    g.fillRect(index*x_scale_factor, d.height-values[index], x_scale_factor, values[index]);
+    /*for(int i=0;i<x_scale_factor;i++){
       g.drawLine(index+i, d.height, index+i, d.height-values[index/x_scale_factor]);
-    }
+    }*/
+  }
+
+  void highlight(int index, boolean on_off) {
+    Graphics g = getGraphics();
+    Dimension d = getSize();
+
+    if (on_off) g.setColor(Color.gray);
+    else g.setColor(Color.black);
+    g.fillRect(index*x_scale_factor, d.height-values[index], x_scale_factor, values[index]);
   }
 
   void ApplyFormula(String theFormula) {
@@ -224,8 +241,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 	return;
       }
       ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
-      //PaintSingle(i, getGraphics());
-      DoublePaint(i);
+      PaintSingle(i, getGraphics());
+      //scure DoublePaint(i);
     }
   }
 
