@@ -36,6 +36,32 @@
   </UL>
 </UL>
 
+
+
+<!--Missing:-->
+
+<!--  The popmenu menu on the background to add a new object, -->
+<!--  and the tcl commands to customize it. -->
+
+<!--  Object ordering (needed ?): selecting an object put in the foreground. -->
+
+<!--  Ctrl-Z to see the object error message (should be change this ?). -->
+
+<!--  Selectin and Shift-Selecting connections. -->
+
+<!--  Object specifics: -->
+
+<!--          Popup menus on buttons for the color. -->
+
+<!--          The %icon notation and how to define a new icon. -->
+
+<!--          How to use icons on templates. -->
+
+
+
+
+
+
 <p>
 <font size=+3 color=#FFFFFF><b>The Patch Editor</b></font>
 
@@ -186,11 +212,12 @@ interpreted the following way:
 <ul>
 <li> CLICK adds the object at the chosen location and returns the patch editor to normal mode
 <li> SHIFT-CLICK adds the object and leaves the patch editor in "Adding ..." mode, allowing
-to add easily multiple instances of the same object without reselecting the toolbar
+to add a new instance of the same object without reselecting the toolbar. 
 </ul>
 
 <p>
-A difference with Max/ISPW is that there is no need to drag the object from the palette.
+When the patch editor is in "Adding ..." mode, right clicking will terminate this mode
+and return the patch editor to normal mode without adding an object.
 
 
 <P>
@@ -229,6 +256,10 @@ Editing text inside objects is done by clicking inside the text area of the obje
 The text cursor will be positionned at the click's position. Selecting one word 
 can be done by double-click in text, selecting whole text can be done by triple-click
 in text.
+
+<p>
+Text editing can be terminated either by clicking outside the object, or by
+typing the "End" key.
 
 
 <P>
