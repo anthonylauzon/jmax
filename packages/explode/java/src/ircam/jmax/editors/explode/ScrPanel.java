@@ -85,7 +85,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       gc.setRenderManager(new ScoreRenderer(gc));
       gc.setLogicalTime(0);
       gc.setStatusBar(itsStatusBar);
-
+      
     }
 
     ExplodeSelection.getSelection().addSelectionListener(this);
@@ -175,7 +175,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
     // create the unique instance of toolbar if it does not exist already
     if (Explode.toolbar == null) {
-      tb = new EditorToolbar(this);
+      tb = new EditorToolbar(this, EditorToolbar.HORIZONTAL);
     }
     else tb = Explode.toolbar;
     

@@ -119,6 +119,7 @@ public class ScrEvent extends AbstractUndoableObject {
   public final void setPitch(int pitch) 
   {
 
+    if (pitch < 0) pitch = 0;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())
@@ -136,6 +137,7 @@ public class ScrEvent extends AbstractUndoableObject {
   public final void setDuration(int duration) 
   {
 
+    if (duration < 0) duration = 0;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())
@@ -150,16 +152,17 @@ public class ScrEvent extends AbstractUndoableObject {
       }
   }
   
-  public final void setVelocity(int theVelocity) 
+  public final void setVelocity(int velocity) 
   {
 
+    if (velocity <0) velocity = 0;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())
 	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
       }
 
-    itsVelocity = theVelocity;
+    itsVelocity = velocity;
 
     if (itsExplodeDataModel != null)
       {
@@ -167,16 +170,18 @@ public class ScrEvent extends AbstractUndoableObject {
       }
   }
 
-  public final void setChannel(int theChannel) 
+  public final void setChannel(int channel) 
   {
 
+    if (channel < 0) channel = 0;
+    if (channel > 15) channel = 15;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())
 	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
       }
 
-    itsChannel = theChannel;
+    itsChannel = channel;
 
     if (itsExplodeDataModel != null)
       {

@@ -216,8 +216,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     Menu editMenu = GetEditMenu();
 
-    editMenu.remove(0);
-    editMenu.remove(0);
+    editMenu.remove(GetUndoMenu());
+    editMenu.remove(GetRedoMenu());
 
     editMenu.addSeparator();
 

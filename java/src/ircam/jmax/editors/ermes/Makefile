@@ -198,6 +198,10 @@ FindPanel:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FindPanel.java)
 .PHONY: FindPanel
 
+Settings:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Settings.java)
+.PHONY: Settings
+
 MultiLineText:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MultiLineText.java)
 .PHONY: FindPanel MultiLineText

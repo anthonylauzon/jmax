@@ -15,7 +15,7 @@ import ircam.jmax.MaxApplication;
  * The grid is rendered in the ScoreBackground
  * The events are painted by the ScoreForeground.
  */
-public class ScoreRenderer implements RenderManager{
+public class ScoreRenderer extends AbstractRenderer{
   
   /**
    * Constructor.
@@ -43,18 +43,6 @@ public class ScoreRenderer implements RenderManager{
   }
   
 
-  /**
-   * render all the visible objects */
-  public void render(Graphics g)
-  {
-    Layer aLayer;
-
-    for (int i = 0; i< itsLayers.size(); i++)
-      {
-	aLayer = (Layer) itsLayers.elementAt(i);
-	aLayer.render(g, i);
-      }
-  }
 
   /**
    * render all the objects in the given rectangle */
@@ -69,19 +57,6 @@ public class ScoreRenderer implements RenderManager{
       }
   }
 
-  /** add a layer */
-  public void addLayer(Layer l)
-  {
-    itsLayers.addElement(l);
-  }
-
-  /** remove a layer */
-  public void removeLayer(Layer l)
-  {
-    itsLayers.removeElement(l);
-  }
-
-
   /**
    * returns its (current) event renderer
    */
@@ -92,7 +67,6 @@ public class ScoreRenderer implements RenderManager{
 
 
   
-
   /**
    * returns the events whose graphic representation contains
    * the given point.
@@ -165,7 +139,6 @@ public class ScoreRenderer implements RenderManager{
 
   //------------------  Fields
   ExplodeGraphicContext gc;
-  private Vector itsLayers;
 
   ExplodeDataModel itsExplodeDataModel;
 

@@ -497,8 +497,6 @@ abstract class ErmesObject implements ErmesDrawable {
 
     setX( itsRectangle.x + theDeltaH);
     setY( itsRectangle.y + theDeltaV);
-    itsRectangle.x = itsRectangle.x; // ?????
-    itsRectangle.y = itsRectangle.y; // ?????
   }
 
   void resizeBy( int theDeltaW, int theDeltaH) 

@@ -1,6 +1,7 @@
 package ircam.jmax.editors.ermes;
 
 import java.awt.*;
+import java.awt.image.*;
 
 public class Settings {
 
@@ -22,6 +23,7 @@ public class Settings {
 
   public Settings()
   {
+    Toolkit.getDefaultToolkit().sync();
     UIColor = new Color( 173, 224, 255);
     objColor = new Color( 153, 204, 204);
     editBackgroundColor = new Color( 230, 230, 230);
@@ -139,5 +141,39 @@ public class Settings {
   public void setSelectedTextColor( Color selectedTextColor)
   {
     this.selectedTextColor = selectedTextColor;
+  }
+
+  /** This method, called only once at initialization, 
+   * try to handle the indexed color map problem (missing colors),
+   * implementing an alternative color matching and using 
+   * the available colors in the current colormap */
+  private Color findBestUIColorMatch(int r, int g, int b)
+  {
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    ColorModel cm = toolkit.getColorModel();
+
+    if ( cm instanceof DirectColorModel)
+      return new Color(r, g, b);
+    else
+      {
+	IndexColorModel icm = (IndexColorModel) cm;
+
+	int TOLERANCE = 15;
+
+
+	// find the first color whose blue component is equal or darker
+	// then the g and r, trying to conserve the luminance...
+	for (int i = 0; i < icm.getMapSize(); i++)
+	  {
+	    if (Math.abs(icm.getRed(i) - r) <= TOLERANCE && 
+		Math.abs(icm.getGreen(i) - g) <= TOLERANCE && 
+		Math.abs(icm.getBlue(i) - b) <= TOLERANCE)
+	      {
+		return new Color(icm.getRed(i), icm.getGreen(i), icm.getBlue(i));
+	      }
+	  }
+      }
+    //no way: let the system's color matching do the job
+    return new Color(r, g, b);
   }
 }

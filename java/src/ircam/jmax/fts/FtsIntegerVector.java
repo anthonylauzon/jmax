@@ -10,14 +10,14 @@ import ircam.jmax.utils.*;
  *  FTS
  */
 
-public class FtsIntegerVector extends FtsRemoteData
+public class FtsIntegerVector extends FtsRemoteUndoableData
 {
   /** Key for remote calls */
 
   static final int REMOTE_SET     = 1;
   static final int REMOTE_UPDATE  = 2;
 
-  int[] values = null;
+  protected int[] values = null;
 
   public FtsIntegerVector()
   {

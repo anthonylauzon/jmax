@@ -69,7 +69,7 @@ public class ScoreBackground implements Layer{
 	else 
 	  {
 	    g.setColor(Color.lightGray);
-	    g.fillRect(31, positionY, 25, 3);
+	    g.fillRect(31, positionY, 24, 3);
 	  }
       }
   }

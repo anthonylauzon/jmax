@@ -58,8 +58,14 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   public void SetupMenu()
   {
-    Menu optionsMenu = new Menu("Options");
-    
+    Menu editMenu = GetEditMenu();
+
+    editMenu.remove(GetCopyMenu());
+    editMenu.remove(GetPasteMenu());
+    editMenu.remove(GetCutMenu());
+
+    Menu optionsMenu = new Menu("Options");    
+
     MenuItem settings = new MenuItem("Settings...");
     settings.addActionListener(new ActionListener() 
 			     {
@@ -92,7 +98,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     optionsMenu.add(pianoRollView);
     optionsMenu.add(tableView);
     getMenuBar().add(optionsMenu);
-  
+
   }
 
   protected void Undo()

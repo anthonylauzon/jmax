@@ -106,6 +106,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   private Menu itsWindowsMenu;
   private Menu itsToolsMenu;
 
+  private MenuItem itsCutMenuItem;
+  private MenuItem itsCopyMenuItem;
+  private MenuItem itsPasteMenuItem;  
+  
+  private MenuItem itsUndoMenuItem;
+  private MenuItem itsRedoMenuItem;
 
   public MaxEditor(String title, MaxDocumentType type, boolean register)
   {
@@ -343,43 +349,42 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   protected Menu CreateEditMenu()
   {
-    MenuItem aMenuItem;
     Menu editMenu = new Menu("Edit");
 
-    aMenuItem = new MenuItem("Undo  Ctrl+Z", new MenuShortcut(90));
-    editMenu.add(aMenuItem);
+    itsUndoMenuItem = new MenuItem("Undo  Ctrl+Z", new MenuShortcut(90));
+    editMenu.add(itsUndoMenuItem);
     
-    aMenuItem.addActionListener(new ActionListener()
+    itsUndoMenuItem.addActionListener(new MaxActionListener(itsUndoMenuItem)
       {
 	public void actionPerformed(ActionEvent e)
 	  { Undo();}
       });
 
-    aMenuItem = new MenuItem("Redo  Ctrl+R", new MenuShortcut(82));
-    editMenu.add(aMenuItem);
+    itsRedoMenuItem = new MenuItem("Redo  Ctrl+R", new MenuShortcut(82));
+    editMenu.add(itsRedoMenuItem);
 
-    aMenuItem.addActionListener(new ActionListener()
+    itsRedoMenuItem.addActionListener(new MaxActionListener(itsRedoMenuItem)
 				{
 				  public void actionPerformed(ActionEvent e)
 				    { Redo();}});
 
-    aMenuItem = new MenuItem("Cut  Ctrl+X");
-    editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsCutMenuItem = new MenuItem("Cut  Ctrl+X");
+    editMenu.add(itsCutMenuItem);
+    itsCutMenuItem.addActionListener(new MaxActionListener(itsCutMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Cut();}});
 
-    aMenuItem = new MenuItem("Copy  Ctrl+C");
-    editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsCopyMenuItem = new MenuItem("Copy  Ctrl+C");
+    editMenu.add(itsCopyMenuItem);
+    itsCopyMenuItem.addActionListener(new MaxActionListener(itsCopyMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Copy();}});
 
-    aMenuItem = new MenuItem("Paste  Ctrl+V");
-    editMenu.add(aMenuItem);
-    aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
+    itsPasteMenuItem = new MenuItem("Paste  Ctrl+V");
+    editMenu.add(itsPasteMenuItem);
+    itsPasteMenuItem.addActionListener(new MaxActionListener(itsPasteMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Paste();}});
@@ -643,16 +648,26 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public MenuItem GetCutMenu()
   {
-    return itsEditMenu.getItem(0);
+    return itsCutMenuItem;
   }
   
   public MenuItem GetCopyMenu()
   {
-    return itsEditMenu.getItem(1);
+    return itsCopyMenuItem;
   }
   
   public MenuItem GetPasteMenu()
   {
-    return itsEditMenu.getItem(2);
+    return itsPasteMenuItem;
+  }  
+
+  public MenuItem GetUndoMenu()
+  {
+    return itsUndoMenuItem;
+  }  
+
+  public MenuItem GetRedoMenu()
+  {
+    return itsRedoMenuItem;
   }
 }
