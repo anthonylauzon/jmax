@@ -169,7 +169,6 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 	  }
       catch (NumberFormatException e1)
 	  {
-	      setVisible(false);
 	      return;
 	  }
       ((Slider)target).setRange(max, min);
