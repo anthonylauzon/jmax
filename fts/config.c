@@ -220,7 +220,8 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   audio_config = (audioconfig_t*)fts_object_create(audioconfig_type, NULL, 0, 0);
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
-  
+  fts_audioconfig_set_defaults(self->audio_config);
+
   /* modify object description */
   fts_set_symbol(&a, config_s_name);
   fts_object_set_description(o, 1, &a);
