@@ -6,6 +6,8 @@ class FtsObject:
     # public:
     # static const int NO_ID = -1
     NO_ID = -1
+    NEW_ID = -2
+    
     def __init__(self, serverConnection, parent, *args):
         from FtsServerConnection import FtsServerConnection
         # Common constructor
@@ -21,8 +23,7 @@ class FtsObject:
                     self.__serverConnection.putObject(self.__id, self)
                 return
             
-            self.__id = serverConnection.getNewObjectID()
-            self.__serverConnection.putObject(self.__id, self)
+            self.__id = self.__serverConnection.putObject(FtsObject.NEW_ID, self)
             self.__serverConnection.writeObject(FtsServerConnection.CLIENT_OBJECT_ID)
             self.__serverConnection.writeSymbol("new_object")
             

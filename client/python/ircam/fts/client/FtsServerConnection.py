@@ -37,8 +37,15 @@ class FtsServerConnection:
         return obj
     
     def putObject(self,id, obj):
+        import FtsObject
+        if id == FtsObject.FtsObject.NO_ID:
+            return FtsObject.FtsObject.NO_ID
+
+        if id == FtsObject.FtsObject.NEW_ID:
+            id = self.getNewObjectID()
+            
         self.__objectTable[id] = obj
-        return
+        return id
     
     def writeInt(self, v):
         self.__encoder.writeInt(v)
