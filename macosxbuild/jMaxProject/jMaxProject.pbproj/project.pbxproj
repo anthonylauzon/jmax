@@ -9329,7 +9329,6 @@
 				F8512478028BEAB401664092,
 				F8512479028BEAB401664092,
 				F851247B028BEAB401664092,
-				F85124B9028BEBB301664092,
 				F85124BB028BEBB301664092,
 				F85124BC028BEBB301664092,
 				F85124BF028BEBB301664092,
@@ -9673,7 +9672,6 @@
 		F85123D3028BEAB301664092 = {
 			children = (
 				F85123D5028BEAB301664092,
-				F851247F028BEBB201664092,
 				F8512481028BEBB201664092,
 				F7DA5E65052DDDD501664058,
 				F8512482028BEBB201664092,
@@ -10582,12 +10580,6 @@
 			settings = {
 			};
 		};
-		F851247F028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = ResizerTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/ResizerTool.java;
-			refType = 2;
-		};
 		F8512481028BEBB201664092 = {
 			isa = PBXFileReference;
 			name = SelecterTool.java;
@@ -10899,12 +10891,6 @@
 			name = ValueInfoTable.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueInfoTable.java;
 			refType = 2;
-		};
-		F85124B9028BEBB301664092 = {
-			fileRef = F851247F028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85124BB028BEBB301664092 = {
 			fileRef = F8512481028BEBB201664092;
