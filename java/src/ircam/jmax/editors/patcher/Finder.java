@@ -58,7 +58,7 @@ import ircam.jmax.widgets.*;
 // ^^^^ how to make the binding; static, dynamic, in parallel on all the server ?
 // ^^^^ The is a big user environment question to be solved before the technical one.
 
-public class ToolsPanel extends JFrame implements FtsActionListener
+public class Finder extends JFrame implements FtsActionListener
 {
   class FtsMutableTreeNode extends DefaultMutableTreeNode
   { 
@@ -74,101 +74,48 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     }
   }
   
-  static void registerToolsPanel()
+  public static Finder find( FtsGraphicObject obj)
   {
-    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-	public String getToolName() { return "Tools";}
-	public void open() { ToolsPanel.open();}
-      });
-  }
-
-  public static ToolsPanel open()
-  {
-    if (toolsPanel == null)
-      toolsPanel = new ToolsPanel();
-    
-    toolsPanel.setVisible(true);
-    
-    return toolsPanel;
-  }
-
-  /*public static ToolsPanel find(FtsGraphicObject obj)
-    {
-    if (toolsPanel == null)
-    toolsPanel = new ToolsPanel();
-    
-    toolsPanel.tabbedPane.setSelectedComponent(toolsPanel.getFinder());
-    toolsPanel.setVisible(true);
-    if(obj!=null) toolsPanel.getFinder().findFriends(obj);
-    else toolsPanel.getFinder().find();
+    if (finder == null)
+      finder = new Finder();
 	
-    return toolsPanel;
-    }*/
-
-  public static ToolsPanel getInstance()
-  {
-    if (toolsPanel == null)
-      toolsPanel = new ToolsPanel();
-
-    return toolsPanel;
+    finder.setVisible(true);
+    if(obj!=null) finder.getFinderPanel().findFriends(obj);
+    else finder.getFinderPanel().find();
+	
+    return finder;
   }
 
-  protected ToolsPanel()
+  protected Finder()
   {
-    super( "Tools Panel");
+    super( "Finder");
 
     /* #############    listeners    ######################################## */
     objSelListener = new ObjectSelectedListener(){
 	public void objectSelected(FtsGraphicObject object)
 	{
-	  ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	  Finder.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 	  ((FtsPatcherObject)object.getParent()).requestShowObject(object);
-	  ((FtsPatcherObject)object.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
+	  ((FtsPatcherObject)object.getParent()).requestStopWaiting(Finder.finder);
 	}
       };
 
     listSelListener = new ListSelectionListener(){
-	    public void valueChanged(ListSelectionEvent e) {
-	    
-		if (e.getValueIsAdjusting()) return;	    
-
-		createTreeModelFromSelection((ListSelectionModel)e.getSource());
-	    }
-	};
+	public void valueChanged(ListSelectionEvent e) {
+	  
+	  if (e.getValueIsAdjusting()) return;	    
+	  
+	  createTreeModelFromSelection((ListSelectionModel)e.getSource());
+	}
+      };
     /* ################################################################ */
 
-    /* Error Panel */
-    errorTable = new ErrorTablePanel();
-    errorTable.setObjectSelectedListener(objSelListener);
-    errorTable.setSelectionListener(listSelListener);
-
-    /* RuntimeErrors Panel */
-    runErrorTable = new RuntimeErrorsTablePanel();
-    runErrorTable.setObjectSelectedListener(objSelListener);
-    runErrorTable.setSelectionListener(listSelListener);
-
     /* Finder Panel */
-    /*finderTable = new FinderTablePanel();
-      finderTable.setObjectSelectedListener(objSelListener);
-      finderTable.setSelectionListener(listSelListener);*/
+    finderTable = new FinderTablePanel();
+    finderTable.setObjectSelectedListener( objSelListener);
+    finderTable.setSelectionListener( listSelListener);
 
-    currentTableModel = errorTable.getToolTableModel();
-
-    tabbedPane = new JTabbedPane();
-    tabbedPane.addTab("Errors", errorTable);
-    tabbedPane.addTab("Runtime Errors", runErrorTable);
-    /*tabbedPane.addTab("Finder", finderTable);*/
-
-    tabbedPane.setSelectedIndex(0);
-    tabbedPane.addChangeListener(new ChangeListener(){
-	public void stateChanged(ChangeEvent e)
-	{		
-	  //set current table model
-	  currentTableModel = ((JMaxToolPanel)tabbedPane.getSelectedComponent()).getToolTableModel();	    
-	  //updates JTree model
-	  createTreeModelFromSelection(((JMaxToolPanel)tabbedPane.getSelectedComponent()).getListSelectionModel());
-	}
-      });
+    finderTableModel = finderTable.getToolTableModel();
 
     ////////////////////////////////////////////////////////////////
 
@@ -198,17 +145,17 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	      TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 	      FtsGraphicObject obj = ((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
 	      
-	      ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	      Finder.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 	      
 	      if(obj instanceof FtsPatcherObject)
 		{
 		  ((FtsPatcherObject)obj).requestOpenEditor();
-		  ((FtsPatcherObject)obj).requestStopWaiting(ToolsPanel.toolsPanel);
+		  ((FtsPatcherObject)obj).requestStopWaiting( Finder.finder);
 		}
 	      else
 		{
 		  ((FtsPatcherObject)obj.getParent()).requestShowObject(obj);
-		  ((FtsPatcherObject)obj.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
+		  ((FtsPatcherObject)obj.getParent()).requestStopWaiting( Finder.finder);
 		}
 	    }
 	}
@@ -221,7 +168,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     /////////////////////////////
     
     JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    splitPane.setTopComponent(tabbedPane);
+    splitPane.setTopComponent(finderTable);
     splitPane.setBottomComponent(treeView);
     splitPane.setDividerLocation(200); 
     splitPane.setPreferredSize(new Dimension(400, 300));
@@ -234,7 +181,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
   public void ftsActionDone()
   {
-    setCursor(Cursor.getDefaultCursor());
+    setCursor( Cursor.getDefaultCursor());
   }
 
   private void createTreeModelFromSelection(ListSelectionModel lsm)
@@ -242,7 +189,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     if (lsm.isSelectionEmpty()) 
       {
 	((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
-	tree.setModel(emptyTreeModel);
+	tree.setModel( emptyTreeModel);
       } 
     else 
       {
@@ -251,11 +198,8 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	top = start = node = null;
 	FtsGraphicObject ftsObj;			
 	String nodeText;
-	////////????????????????? comment eviter ca?????????
-	if(currentTableModel instanceof RuntimeErrorsTableModel)
-	  ftsObj = ((RuntimeError)currentTableModel.getListModel().getElementAt(selRow)).getObject();
-	else
-	  ftsObj = (FtsGraphicObject)currentTableModel.getListModel().getElementAt(selRow);
+	
+	ftsObj = (FtsGraphicObject)finderTableModel.getListModel().getElementAt(selRow);
 	
 	for(Enumeration enum = ftsObj.getGenealogy(); enum.hasMoreElements(); )
 	  {
@@ -290,19 +234,15 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
   /*///////////////////////////////////////////////////////////////////*/
 
-  /*public FinderTablePanel getFinder()
-    {
+  public FinderTablePanel getFinderPanel()
+  {
     return finderTable;
-    }*/
+  }
 
-  private static ToolsPanel toolsPanel = null;
-  private ToolTableModel currentTableModel;
+  private static Finder finder = null;
+  private ToolTableModel finderTableModel;
   
-  /* JTabbedPane */
-  private JTabbedPane tabbedPane;
-  private ErrorTablePanel errorTable;
-  private RuntimeErrorsTablePanel runErrorTable;
-  /*private FinderTablePanel finderTable;*/
+  private FinderTablePanel finderTable;
 
   /* JTree  */
   private JTree tree;

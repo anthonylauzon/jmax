@@ -11,6 +11,7 @@ ErmesSketchPad.java\
 ErmesSketchWindow.java\
 ErrorTableModel.java\
 ErrorTablePanel.java\
+Finder.java \
 FinderTableModel.java\
 FinderTablePanel.java\
 FontCache.java\

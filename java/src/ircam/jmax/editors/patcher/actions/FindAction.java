@@ -43,11 +43,11 @@ public class FindAction extends EditorAction
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
-	    { 
-		ToolsPanel.find(object.getFtsObject());
-	    }});
+	  { 
+	    Finder.find( object.getFtsObject());
+	  }});
       }
     else
-	ToolsPanel.find(null);
+      Finder.find(null);
   }
 }
