@@ -120,7 +120,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if (((BpfGraphicContext)gc).getSelection().size() > 20) 
 	{
 	    dragMode = RECT_DRAG;
-	    //previousX=0;previousY=0;
 	    computeEnclosure(enclosingRect);
 	}
     else dragMode = GROUP_DRAG;    

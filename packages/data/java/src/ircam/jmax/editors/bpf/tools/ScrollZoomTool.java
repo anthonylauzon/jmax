@@ -68,7 +68,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
 
   public Cursor getCursor()
   {
-    return Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+      return Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
   }  
   
   /**
