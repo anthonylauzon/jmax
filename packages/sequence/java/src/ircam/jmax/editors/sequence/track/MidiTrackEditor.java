@@ -59,7 +59,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	this.track = track;
 	this.geometry = geometry;
 
-
 	//-- prepares the CENTER panel (the score)
 	// a simple panel, that just uses a Renderer as its paint method...
 	// it takes care of the popup showing.
@@ -78,7 +77,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		    itsScore.repaint();
 		}
 	});
-
 	// make this panel repaint when the selection status change
 	// either in content or in ownership.
 	selection.addListSelectionListener(this);
@@ -93,7 +91,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		    itsScore.repaint();
 		}
 	});
-	
+
 	track.getTrackDataModel().addListener(this);
 	
 	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
@@ -101,7 +99,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		{
 		    TrackEvent temp;
 		    boolean first = true;
+		    Rectangle clipRect = gc.getTrackClip();
 		    Graphics g = itsScore.getGraphics();
+		    g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 		    
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
 			{
@@ -148,16 +148,14 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	
 	//--- make this selection the current one when the track is activated
 	track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
-
 	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, track); //loopback?
 	gc.setGraphicSource(itsScore);
 	gc.setGraphicDestination(itsScore);
 	PartitionAdapter ad = new PartitionAdapter(geometry, gc);
 	track.getPropertySupport().addPropertyChangeListener(ad);
 	gc.setAdapter(ad);
-	
+
 	renderer = new ScoreRenderer(gc);
-	
 	return gc;
     }
 
@@ -282,6 +280,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	return track;
     }
+
+    public void updateNewObject(Object obj){};
+
     public SequenceGraphicContext getGc()
     {
 	return gc;
@@ -317,8 +318,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	/*****************/
 	//list-->table//
-	listDialog = new ListDialog(track, gc.getFrame(), gc);
-	//listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	//listDialog = new ListDialog(track, gc.getFrame(), gc);
+	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
 	/*****************/
     }
 
@@ -413,8 +414,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     MaxVector oldElements = new MaxVector();
     /*****************/
     //list-->table//
-    ListDialog listDialog = null;
-    //SequenceTableDialog listDialog = null;
+    //ListDialog listDialog = null;
+    SequenceTableDialog listDialog = null;
     /*****************/
 
     int viewMode = PIANOROLL_VIEW;

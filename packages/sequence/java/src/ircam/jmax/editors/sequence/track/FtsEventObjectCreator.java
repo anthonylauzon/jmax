@@ -21,7 +21,7 @@ public class FtsEventObjectCreator implements FtsObjectCreator
 		Object obj = args[2+i].getValue();
 		if(obj instanceof Float) //obj = new Double((double)((Float)obj).floatValue());
 		  obj = new Double(((Float)obj).doubleValue());
-		evtArgs[i] = obj;
+		evtArgs[i] = obj;	  
 	    }
 
 	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(valueType).newInstance());

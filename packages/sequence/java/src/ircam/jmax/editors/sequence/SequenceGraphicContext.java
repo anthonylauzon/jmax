@@ -111,6 +111,9 @@ public class SequenceGraphicContext extends GraphicContext {
     return -itsAdapter.getGeometry().getXTransposition();
   }
 
+    /*
+     * returns visible rectangle of the associated track editor
+     */
   public Rectangle getTrackClip()
   {
       return new Rectangle(ScoreBackground.KEYEND, 0, ((Sequence)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);

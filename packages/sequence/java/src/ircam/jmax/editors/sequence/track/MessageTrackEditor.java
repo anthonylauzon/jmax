@@ -231,7 +231,6 @@ public class MessageTrackEditor extends MonoTrackEditor
 		height = MessageValue.DEFAULT_HEIGHT;		
 		    
 	    int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
-	    //evt.setProperty("duration", new Integer(lenght));
 	    evt.setProperty("duration", new Double(lenght));
 	    evt.setProperty("height", new Integer(height));
 	}

@@ -102,19 +102,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     }
   }
 
-  /**
-   * Fts callback: add a new Track(first arg) . 
-   * 
-   */
-    /*public void addTrack(int nArgs , FtsAtom args[])
-      {
-      FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
-      Track track = new TrackBase(trackObj);
-      tracks.addElement(track);
-	
-      notifyTrackAdded(track);
-      }*/
-    
   public void addTracks(int nArgs , FtsAtom args[])
   {
       FtsTrackObject trackObj;
@@ -129,10 +116,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
 	      track = new TrackBase(trackObj);
 	      tracks.addElement(track);
+
 	      notifyTrackAdded(track);
+
 	      time = (int)trackObj.getMaximumTime();
-	      if(time>trackTime) trackTime = time;
-	      
+	      if(time>trackTime) trackTime = time;	      
 	  }
 
       setDirty();
@@ -150,7 +138,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       for(int i=0; i<nArgs; i++)
 	  {
 	      trackObj = (FtsTrackObject)(args[i].getObject());
-	      track = getTrackByName(trackObj.getName());
+	      track = getTrack(trackObj);
 	      tracks.removeElement(track);
 	      notifyTrackRemoved(track);
 	  }    
@@ -181,19 +169,20 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     return (Track) tracks.elementAt(i);
   }
 
-  /**
-   * Returns the track with this name 
+   /**
+   * Returns the track associated with this FtsTrackObject 
    */
-  public Track getTrackByName(String name)
+  public Track getTrack(FtsTrackObject obj)
   {
     Track track;
     for(Enumeration e = tracks.elements(); e.hasMoreElements();)
       {
 	track = (Track)e.nextElement();
-	if(track.getName().equals(name)) return track;
+	if(track.getFtsTrack() == obj) return track;
       }
     return null;
   }
+  
 
   /**
    * Remove a Track from this sequencer 

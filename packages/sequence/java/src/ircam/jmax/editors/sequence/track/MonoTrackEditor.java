@@ -226,8 +226,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	/*****************/
 	//list-->table//
-	listDialog = new ListDialog(track, gc.getFrame(), gc);
-	//listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	//listDialog = new ListDialog(track, gc.getFrame(), gc);
+	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
 	/*****************/
     }
 
@@ -307,8 +307,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     MaxVector oldElements = new MaxVector();
     /*****************/
     //list-->table//
-    ListDialog listDialog = null;
-    //SequenceTableDialog listDialog = null;
+    //ListDialog listDialog = null;
+    SequenceTableDialog listDialog = null;
     /*****************/
 
     int viewMode = PEAKS_VIEW;

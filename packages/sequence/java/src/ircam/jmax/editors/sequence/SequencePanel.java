@@ -87,8 +87,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     ftsSequenceObject = (FtsSequenceObject)data;
     ftsSequenceObject.addTrackListener(this);
 
-    //Create a Geometry object for this sequencer
-    geometry = new Geometry();
+    //Create abd init a Geometry object for this sequencer 
+    {
+	geometry = new Geometry();
+	geometry.setXZoom(20);
+	geometry.setYZoom(300);
+	geometry.setYInvertion(true);
+	geometry.setYTransposition(136);
+    }
     //------------------------------------------------
     // Create the ruler
     ruler = new SequenceRuler(geometry, this);
@@ -205,14 +211,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
 
 	trackPanel.remove(verticalGlue);
-
 	TrackContainer trackContainer = new TrackContainer(track, teditor);
 	trackContainer.setBorder(new EtchedBorder()); 
 	trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
 
 	trackPanel.add(trackContainer);
 	trackPanel.add(verticalGlue);
-	
+
 	trackPanel.validate();
 	scrollTracks.validate();
 	scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
@@ -243,6 +248,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		    if(dim.height < Sequence.MAX_HEIGHT)
 			itsContainer.getFrame().setSize(dim.width, Sequence.MAX_HEIGHT);
 	}
+
+	//updates events in track
+	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
+	  teditor.updateNewObject((TrackEvent)e.nextElement());
     }
 
     public void tracksAdded(int maxTime)

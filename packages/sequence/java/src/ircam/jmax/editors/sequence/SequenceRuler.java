@@ -165,14 +165,22 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	return popup;
     }
     //------- HighlightListener interface
+    Rectangle paintRect = new Rectangle(); 
     public void highlight(Enumeration elements, double time)
     {
 	//---------
 	hh = true;
+
 	int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
 	int timeX = utilityPartitionAdapter.getX(time)+3+TrackContainer.BUTTON_WIDTH;
-	repaint(new Rectangle(hhX-1, 1, timeX-hhX+3, getSize().height-2));
-    
+
+	if(time >= hhTime)
+	    paintRect.setBounds(hhX-1, 1, timeX-hhX+3, getSize().height-2);
+	else
+	    paintRect.setBounds(timeX-1, 1, hhX-timeX+3, getSize().height-2);
+	
+	repaint(paintRect);
+
 	hhTime = time;
     }
     //--- Ruler fields

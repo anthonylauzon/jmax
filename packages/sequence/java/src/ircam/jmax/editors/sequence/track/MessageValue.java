@@ -174,7 +174,7 @@ public class MessageValue extends AbstractEventValue
     {
 	int height;
 	String text = (String) message;
-	
+
 	if(!text.equals(""))
 	    height = TextRenderer.getRenderer().getTextHeight(text, gc);
 	else
@@ -186,6 +186,7 @@ public class MessageValue extends AbstractEventValue
     public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
     {
 	int width, evtLenght;
+
 	String text = (String) message;
 	boolean open = ((Boolean)getProperty("open")).booleanValue();
 	if(open)

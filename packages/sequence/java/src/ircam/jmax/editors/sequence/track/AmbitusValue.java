@@ -193,12 +193,11 @@ public class AmbitusValue extends AbstractEventValue
   }
 
     static String nameArray[] = {"pitch", "duration"};
-    //static int propertyTypes[] = {INTEGER_TYPE, INTEGER_TYPE};
-    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE};//*@*//
+    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE};
     static int propertyCount = 2;
 }
 
-
+ 
 
 
 

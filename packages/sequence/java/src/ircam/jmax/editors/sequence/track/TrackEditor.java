@@ -24,6 +24,7 @@ public interface TrackEditor {
     public void dispose();
     public SequenceSelection getSelection();
 
+    public void updateNewObject(Object obj);
 }
 
 
