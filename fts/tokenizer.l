@@ -41,9 +41,9 @@
 
 whites		[ \t\n]
 letter		[A-Za-z_~]
-decdigit	-?[0-9]
+decdigit	[0-9]
 hexdigit	[0-9a-fA-F]
-decint		{decdigit}+
+decint		-?{decdigit}+
 hexint		0x{hexdigit}+
 float		-?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 dollar		\$
