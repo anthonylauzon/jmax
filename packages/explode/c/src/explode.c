@@ -1555,7 +1555,7 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 0, fts_new_symbol("params"), explode_params_mth, 3, a);
 
   /* export standard MIDI file */
-  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export_track_by_name);
 
   /* Type the outlet */
   a[0] = fts_s_int;
