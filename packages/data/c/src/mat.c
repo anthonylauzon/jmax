@@ -31,6 +31,8 @@ fts_metaclass_t *mat_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
 
+#define MAT_BLOCK_SIZE 64
+
 /********************************************************
  *
  *  utility functions
@@ -40,30 +42,32 @@ static fts_symbol_t sym_comma = 0;
 void
 mat_set_size(mat_t *mat, int m, int n)
 {
+  int old_size = mat->m * mat->n;
+  int alloc = mat->alloc;
   int size = m * n;
+  int i;
   
-  if(size > mat->alloc)
+  if(size > alloc)
     {
-      int i;
+      while(size > alloc)
+	alloc += MAT_BLOCK_SIZE;
 
-      mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
-      mat->alloc = size;
+      mat->data = fts_realloc(mat->data, alloc * sizeof(fts_atom_t));
+
+      /* init new region to void */
+      for(i=mat->alloc; i<alloc; i++)
+	fts_set_void(mat->data + i);
+
+      mat->alloc = alloc;
     }
   else
     {
-      int old_size = mat->m * mat->n;
-      int i;
-
       if(size <= 0)
 	m = n = size = 0;
 
       /* void region cut off */
       for(i=size; i<old_size; i++)
-	{
-	  fts_atom_t *ap = mat->data + i;
-
-	  fts_atom_void(ap);
-	}
+	fts_atom_void(mat->data + i);
     }
 
   mat->m = m;
