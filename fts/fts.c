@@ -202,6 +202,8 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_error_object_config);
   _K_DECNCALL( fts_message_config);
   _K_DECNCALL( fts_audio_config);
+  _K_DECNCALL( fts_audiolabel_config);  
+  _K_DECNCALL( fts_audioconfig_config);  
   _K_DECNCALL( fts_bytestream_config);
   _K_DECNCALL( fts_client_config);
   _K_DECNCALL( fts_update_config);
