@@ -41,7 +41,7 @@ clean_c:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math
-	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math ; done
+	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math ; done
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 .PHONY: install-exec
