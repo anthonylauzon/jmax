@@ -1115,14 +1115,14 @@ static void
 patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_ww, at);
-  /* fts_patcher_set_dirty((fts_patcher_t *)o, 1); */
+  fts_patcher_set_dirty((fts_patcher_t *)o, 1); 
 }
 
 static void 
 patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_wh, at);
-  /* fts_patcher_set_dirty((fts_patcher_t *)o, 1); */
+  fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 void 
@@ -1473,7 +1473,6 @@ static void
 patcher_save_dotpat_atoms( FILE *file, int ac, const fts_atom_t *at)
 {
   int i;
-
   for ( i = 0; i < ac; i++)
     {
       if (fts_is_int( at + i ))

@@ -601,6 +601,7 @@ public class FtsGraphicObject extends FtsObject {
   public void setPersistent( int persist)
   {
     this.isPersistent = persist;
+    ((GraphicObject)getObjectListener()).redraw();
   }
 
   public int isPersistent()
@@ -623,8 +624,6 @@ public class FtsGraphicObject extends FtsObject {
 	    System.err.println("FtsGraphicObject: I/O Error sending persistence Message!");
 	    e.printStackTrace(); 
 	  }
-
-	this.isPersistent = persist;
       }
   }
   /********************************************************************************/

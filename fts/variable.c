@@ -271,7 +271,7 @@ fts_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(ac > 0 && fts_is_symbol(at) && fts_object_get_patcher(o) != NULL)
     {
       fts_object_set_name(o, fts_get_symbol(at));
-      fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+      /*fts_patcher_set_dirty(fts_object_get_patcher(o), 1);*/
     }
 }
 

@@ -180,15 +180,18 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public Color getTextBackground()
   {
     if (isSelected())
-	if (ftsObject.isError())
-	    return Color.lightGray;
+      if (ftsObject.isError())
+	return Color.lightGray;
+      else
+	if( ftsObject.isPersistent() == 1)
+	  return persistColor;
 	else
-	    return Settings.sharedInstance().getObjColor();
+	  return Settings.sharedInstance().getObjColor();
     else	
-	if(isEditing())
-	    return Settings.sharedInstance().getEditBackgroundColor();
-	else
-	    return Color.white;	    
+      if(isEditing())
+	return Settings.sharedInstance().getEditBackgroundColor();
+      else
+	return Color.white;	    
   }
 
   public boolean isMultiline()
@@ -211,10 +214,16 @@ public class Standard extends Editable implements FtsObjectErrorListener
       }
     else
       {
+	if( ftsObject.isPersistent() == 1)
 	  if (isSelected())
-	      g.setColor( Settings.sharedInstance().getObjColor().darker());
+	    g.setColor( selPersistColor);
 	  else
-	      g.setColor( Settings.sharedInstance().getObjColor());
+	    g.setColor( persistColor);
+	else
+	  if (isSelected())
+	    g.setColor( Settings.sharedInstance().getObjColor().darker());
+	  else
+	    g.setColor( Settings.sharedInstance().getObjColor());
       }
 
     int x = getX();
@@ -230,17 +239,29 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
     if( varName!= null)
       {	  
-	if( isSelected())
-	  g.setColor( selVarColor);
+	if( ftsObject.isPersistent() == 1)
+	  if (isSelected())
+	    g.setColor( selVarPersistColor);
+	  else
+	    g.setColor( varPersistColor);
 	else
-	  g.setColor( varColor);
+	  if( isSelected())
+	    g.setColor( selVarColor);
+	  else
+	    g.setColor( varColor);
 
 	g.fillRect( x+w, y+1, varWidth-1, h-2);
 
-	if( isSelected())
-	  g.setColor( Settings.sharedInstance().getObjColor().darker());
+	if( ftsObject.isPersistent() == 1)
+	  if (isSelected())
+	    g.setColor( selPersistColor);
+	  else
+	    g.setColor( persistColor);
 	else
-	  g.setColor( Settings.sharedInstance().getObjColor());
+	  if( isSelected())
+	    g.setColor( Settings.sharedInstance().getObjColor().darker());
+	  else
+	    g.setColor( Settings.sharedInstance().getObjColor());
 
 	g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
 	g.setColor( Color.black);
@@ -281,6 +302,10 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public static StandardControlPanel controlPanel = new StandardControlPanel();
   Color varColor = new Color( 153, 204, 204, 100);
   Color selVarColor = new Color( 107, 142, 142, 100);
+  Color persistColor = new Color( 230, 230, 40);
+  Color selPersistColor = new Color( 178, 178, 40);
+  Color varPersistColor = new Color( 230, 230, 40, 100);
+  Color selVarPersistColor = new Color( 178, 178, 40, 100);
   static transient private JCheckBoxMenuItem persistenceItem = new JCheckBoxMenuItem("Persistence");
   static
   {
