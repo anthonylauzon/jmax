@@ -119,12 +119,26 @@ tuple_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
+tuple_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *) o;
+  fts_atom_t   ret;
+
+  if (ac == 0)
+  {
+      fts_set_int(&ret, fts_tuple_get_size(this));
+      fts_return(&ret);
+  }
+}
+
+static void
 tuple_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
 
   fts_class_message_varargs(cl, fts_s_post, tuple_post);
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
+  fts_class_message_varargs(cl, fts_s_size, tuple_size);
 
   fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);
 
