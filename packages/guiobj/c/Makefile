@@ -33,6 +33,9 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libguiobj.so $(lib_install_dir)/packages/guiobj/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libguiobj.so $(lib_install_dir)/packages/guiobj/c/lib/$(ARCH)/opt/libguiobj.so ; \
+	)
 .PHONY: install
 

@@ -41,7 +41,7 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype
-	$(INSTALL_DATA) reftype.jpk $(lib_install_dir)/packages/reftype
-	$(INSTALL_DATA) reftype.scm $(lib_install_dir)/packages/reftype
+	$(INSTALL_DATA) reftype.jpk $(lib_install_dir)/packages/reftype/reftype.jpk
+	$(INSTALL_DATA) reftype.scm $(lib_install_dir)/packages/reftype/reftype.scm
 	( cd c ; $(MAKE) $@)
 .PHONY: install

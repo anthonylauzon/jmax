@@ -41,8 +41,8 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric
-	$(INSTALL_DATA) numeric.jpk $(lib_install_dir)/packages/numeric
-	$(INSTALL_DATA) numeric.scm $(lib_install_dir)/packages/numeric
+	$(INSTALL_DATA) numeric.jpk $(lib_install_dir)/packages/numeric/numeric.jpk
+	$(INSTALL_DATA) numeric.scm $(lib_install_dir)/packages/numeric/numeric.scm
 	( cd help; $(MAKE) $@)
 	( cd c ; $(MAKE) $@)
 .PHONY: install

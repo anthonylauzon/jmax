@@ -41,8 +41,8 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispwmath
-	$(INSTALL_DATA) ispwmath.jpk $(lib_install_dir)/packages/ispwmath
-	$(INSTALL_DATA) ispwmath.scm $(lib_install_dir)/packages/ispwmath
+	$(INSTALL_DATA) ispwmath.jpk $(lib_install_dir)/packages/ispwmath/ispwmath.jpk
+	$(INSTALL_DATA) ispwmath.scm $(lib_install_dir)/packages/ispwmath/ispwmath.scm
 	( cd help; $(MAKE) $@)
 	( cd c ; $(MAKE) $@)
 .PHONY: install

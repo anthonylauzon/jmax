@@ -41,8 +41,8 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control
-	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control
-	$(INSTALL_DATA) control.scm $(lib_install_dir)/packages/control
+	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control/control.jpk
+	$(INSTALL_DATA) control.scm $(lib_install_dir)/packages/control/control.scm
 	( cd help; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
 .PHONY: install

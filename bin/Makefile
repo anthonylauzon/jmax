@@ -24,6 +24,6 @@
 #
 
 install:
-	$(INSTALL_PROGRAM) jmax $(bin_install_dir)
+	$(INSTALL_PROGRAM) jmax $(bin_install_dir)/jmax
 .PHONY: install
 

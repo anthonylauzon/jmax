@@ -33,8 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/io
-	$(INSTALL_DATA) io.jpk $(lib_install_dir)/packages/io
-	$(INSTALL_DATA) io.scm $(lib_install_dir)/packages/io
+	$(INSTALL_DATA) io.jpk $(lib_install_dir)/packages/io/io.jpk
+	$(INSTALL_DATA) io.scm $(lib_install_dir)/packages/io/io.scm
 	( cd c; $(MAKE) $@)
 .PHONY: install
 

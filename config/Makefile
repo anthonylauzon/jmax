@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/config
-	for f in *.scm *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/config ; done
+	for f in *.scm *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/config/$$f ; done
 .PHONY: install
 
 

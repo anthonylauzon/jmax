@@ -25,6 +25,6 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/tcl/config
-	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/tcl/config ; done
+	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/tcl/config/$$f ; done
 .PHONY: install
 

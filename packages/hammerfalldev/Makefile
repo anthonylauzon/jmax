@@ -33,7 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/hammerfalldev
-	$(INSTALL_DATA) hammerfalldev.jpk $(lib_install_dir)/packages/hammerfalldev
+	$(INSTALL_DATA) hammerfalldev.jpk $(lib_install_dir)/packages/hammerfalldev/hammerfalldev.jpk
 	$(INSTALL_DIR) $(lib_install_dir)/packages/hammerfalldev/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libhammerfalldev.so $(lib_install_dir)/packages/hammerfall/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libhammerfalldev.so $(lib_install_dir)/packages/hammerfall/lib/$(ARCH)/opt/libhammerfalldev.so ; \
+	)
 .PHONY: install

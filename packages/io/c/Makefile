@@ -33,5 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/io/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libio.so $(lib_install_dir)/packages/io/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/io/c/lib/$(ARCH)/opt/libio.so ; \
+	)
 .PHONY: install

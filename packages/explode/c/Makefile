@@ -33,6 +33,9 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libexplode.so $(lib_install_dir)/packages/explode/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libexplode.so $(lib_install_dir)/packages/explode/c/lib/$(ARCH)/opt/libexplode.so ; \
+	)
 .PHONY: install
 

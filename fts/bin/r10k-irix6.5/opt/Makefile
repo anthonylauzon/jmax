@@ -24,6 +24,6 @@
 #
 
 install:
-	$(INSTALL_PROGRAM) fts.on0 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
-	$(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
+	$(INSTALL_PROGRAM) fts.on0 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt/fts.on0
+	$(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt/fts.on1
 .PHONY: install

@@ -33,7 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libsequence.so $(lib_install_dir)/packages/sequence/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libsequence.so $(lib_install_dir)/packages/sequence/c/lib/$(ARCH)/opt/libsequence.so ; \
+	)
 .PHONY: install
 
 

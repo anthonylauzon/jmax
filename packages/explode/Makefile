@@ -51,8 +51,8 @@ clean_java:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode
-	$(INSTALL_DATA) explode.jpk $(lib_install_dir)/packages/explode
-	$(INSTALL_DATA) explode.scm $(lib_install_dir)/packages/explode
+	$(INSTALL_DATA) explode.jpk $(lib_install_dir)/packages/explode/explode.jpk
+	$(INSTALL_DATA) explode.scm $(lib_install_dir)/packages/explode/explode.scm
 	( cd help; $(MAKE) $@)
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)

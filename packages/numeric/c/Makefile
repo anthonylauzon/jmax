@@ -33,7 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libnumeric.so $(lib_install_dir)/packages/numeric/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libnumeric.so $(lib_install_dir)/packages/numeric/c/lib/$(ARCH)/opt/libnumeric.so ; \
+	)
 .PHONY: install
 
 

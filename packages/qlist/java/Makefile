@@ -34,6 +34,9 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist/java/classes
-	( cd classes ; $(INSTALL_DATA) qlist.jar $(lib_install_dir)/packages/qlist/java/classes )
+	( \
+		cd classes ; \
+		$(INSTALL_DATA) qlist.jar $(lib_install_dir)/packages/qlist/java/classes/qlist.jar ; \
+	)
 .PHONY: install
 

@@ -41,8 +41,8 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math
-	$(INSTALL_DATA) math.jpk $(lib_install_dir)/packages/math
-	$(INSTALL_DATA) math.scm $(lib_install_dir)/packages/math
+	$(INSTALL_DATA) math.jpk $(lib_install_dir)/packages/math/math.jpk
+	$(INSTALL_DATA) math.scm $(lib_install_dir)/packages/math/math.scm
 	( cd help; $(MAKE) $@)
 	( cd c ; $(MAKE) $@)
 .PHONY: install

@@ -20,7 +20,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/mess/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libmess.so $(lib_install_dir)/packages/mess/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libmess.so $(lib_install_dir)/packages/mess/c/lib/$(ARCH)/opt/libmess.so ; \
+	)
 .PHONY: install
 
 

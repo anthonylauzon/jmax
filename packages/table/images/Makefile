@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table/images
-	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/table/images ; done
+	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/table/images/$$f ; done
 .PHONY: install
 
 

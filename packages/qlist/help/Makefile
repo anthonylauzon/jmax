@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist/help
-	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/qlist/help ; done
+	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/qlist/help/$$f ; done
 .PHONY: install
 
 

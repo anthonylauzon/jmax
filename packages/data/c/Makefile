@@ -33,5 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/data/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/data/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/data/c/lib/$(ARCH)/opt/libdata.so ;\
+	)
 .PHONY: install

@@ -49,12 +49,10 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-
-install-exec:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence
-	$(INSTALL_DATA) sequence.jpk $(lib_install_dir)/packages/sequence
+	$(INSTALL_DATA) sequence.jpk $(lib_install_dir)/packages/sequence/sequence.jpk
 	( cd c ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 .PHONY: install

@@ -33,8 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
-	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj
-	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj
+	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj/guiobj.jpk
+	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj/guiobj.scm
 	( cd help; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
 .PHONY: install

@@ -33,21 +33,22 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
-	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
-	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw
+	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw/ispw.jpk
+	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw/ispw.scm
 	( cd abs ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libfilters.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libmidi.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libpitch.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
-		$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libcontrol.so ; \
+		$(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libdata.so ; \
+		$(INSTALL_LIB) libfilters.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libfilters.so ; \
+		$(INSTALL_LIB) libio.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libio.so ; \
+		$(INSTALL_LIB) libmidi.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libmidi.so ; \
+		$(INSTALL_LIB) libpitch.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libpitch.so ; \
+		$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libsampling.so ; \
+		$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt/libsignal.so ; \
 	)
 .PHONY: install

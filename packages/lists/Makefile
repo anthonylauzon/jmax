@@ -33,11 +33,14 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists
-	$(INSTALL_DATA) lists.jpk $(lib_install_dir)/packages/lists
-	$(INSTALL_DATA) lists.scm $(lib_install_dir)/packages/lists
+	$(INSTALL_DATA) lists.jpk $(lib_install_dir)/packages/lists/lists.jpk
+	$(INSTALL_DATA) lists.scm $(lib_install_dir)/packages/lists/lists.scm
 	( cd help; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) liblists.so $(lib_install_dir)/packages/lists/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) liblists.so $(lib_install_dir)/packages/lists/lib/$(ARCH)/opt/liblists.so ; \
+	)
 .PHONY: install
 

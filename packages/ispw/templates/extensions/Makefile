@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/templates/extensions
-	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/templates/extensions ; done
+	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/templates/extensions/$$f ; done
 .PHONY: install
 
 

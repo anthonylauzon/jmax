@@ -33,7 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libqlist.so $(lib_install_dir)/packages/qlist/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libqlist.so $(lib_install_dir)/packages/qlist/c/lib/$(ARCH)/opt/libqlist.so ; \
+	)
 .PHONY: install
 
 

@@ -33,7 +33,7 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/system
-	$(INSTALL_DATA) system.jpk $(lib_install_dir)/packages/system
+	$(INSTALL_DATA) system.jpk $(lib_install_dir)/packages/system/system.jpk
 	( cd help; $(MAKE) $@)
 	( cd c ; $(MAKE) $@)
 .PHONY: install

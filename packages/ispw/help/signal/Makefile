@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/help/signal
-	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/help/signal ; done
+	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/help/signal/$$f ; done
 .PHONY: install
 
 

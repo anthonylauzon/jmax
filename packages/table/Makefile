@@ -33,7 +33,7 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table
-	$(INSTALL_DATA) table.jpk $(lib_install_dir)/packages/table
+	$(INSTALL_DATA) table.jpk $(lib_install_dir)/packages/table/table.jpk
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 .PHONY: install

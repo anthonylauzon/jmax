@@ -34,5 +34,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table/java/classes
-	( cd classes ; $(INSTALL_DATA) table.jar $(lib_install_dir)/packages/table/java/classes )
+	( \
+		cd classes ; \
+		$(INSTALL_DATA) table.jar $(lib_install_dir)/packages/table/java/classes/table.jar ; \
+	)
 .PHONY: install

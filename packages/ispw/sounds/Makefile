@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/sounds
-	for f in *.aiff *.snd ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/sounds ; done
+	for f in *.aiff *.snd ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/sounds/$$f ; done
 .PHONY: install
 
 

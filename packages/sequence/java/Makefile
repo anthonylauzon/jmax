@@ -34,7 +34,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/java/classes
-	( cd classes ; $(INSTALL_DATA) sequence.jar $(lib_install_dir)/packages/sequence/java/classes )
+	( \
+		cd classes ; \
+		$(INSTALL_DATA) sequence.jar $(lib_install_dir)/packages/sequence/java/classes/sequence.jar ; \
+	)
 .PHONY: install
 
 

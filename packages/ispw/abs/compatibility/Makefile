@@ -25,6 +25,6 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/abs/compatibility
-	for f in *.abs *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/abs/compatibility ; done
+	for f in *.abs *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/abs/compatibility/$$f ; done
 .PHONY: install
 

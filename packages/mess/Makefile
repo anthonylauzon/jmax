@@ -38,8 +38,8 @@ clean_java:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/mess
-	$(INSTALL_DATA) mess.jpk $(lib_install_dir)/packages/mess
-	$(INSTALL_DATA) mess.scm $(lib_install_dir)/packages/mess
+	$(INSTALL_DATA) mess.jpk $(lib_install_dir)/packages/mess/mess.jpk
+	$(INSTALL_DATA) mess.scm $(lib_install_dir)/packages/mess/mess.scm
 	( cd help; $(MAKE) $@)
 	( cd c ; $(MAKE) $@)
 .PHONY: install

@@ -33,5 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libreftype.so $(lib_install_dir)/packages/reftype/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libreftype.so $(lib_install_dir)/packages/reftype/c/lib/$(ARCH)/opt/libreftype.so ; \
+	)
 .PHONY: install

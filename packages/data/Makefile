@@ -41,8 +41,8 @@ clean_c:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/data
-	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data
-	$(INSTALL_DATA) data.scm $(lib_install_dir)/packages/data
+	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data/data.jpk
+	$(INSTALL_DATA) data.scm $(lib_install_dir)/packages/data/data.scm
 	( cd help; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
 .PHONY: install

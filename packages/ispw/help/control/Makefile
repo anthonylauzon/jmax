@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/help/control
-	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/help/control ; done
+	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/help/control/$$f ; done
 .PHONY: install
 
 

@@ -51,8 +51,8 @@ clean_java:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist
-	$(INSTALL_DATA) qlist.jpk $(lib_install_dir)/packages/qlist
-	$(INSTALL_DATA) qlist.scm $(lib_install_dir)/packages/qlist
+	$(INSTALL_DATA) qlist.jpk $(lib_install_dir)/packages/qlist/qlist.jpk
+	$(INSTALL_DATA) qlist.scm $(lib_install_dir)/packages/qlist/qlist.scm
 	( cd help; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 	( cd c; $(MAKE) $@)

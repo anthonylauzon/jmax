@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj/help
-	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/guiobj/help ; done
+	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/guiobj/help/$$f ; done
 .PHONY: install
 
 

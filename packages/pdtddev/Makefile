@@ -33,8 +33,11 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/pdtddev
-	$(INSTALL_DATA) pdtddev.jpk $(lib_install_dir)/packages/pdtddev
-	$(INSTALL_DATA) pdtddev.scm $(lib_install_dir)/packages/pdtddev
+	$(INSTALL_DATA) pdtddev.jpk $(lib_install_dir)/packages/pdtddev/pdtddev.jpk
+	$(INSTALL_DATA) pdtddev.scm $(lib_install_dir)/packages/pdtddev/pdtddev.scm
 	$(INSTALL_DIR) $(lib_install_dir)/packages/pdtddev/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libpdtddev.so $(lib_install_dir)/packages/pdtddev/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libpdtddev.so $(lib_install_dir)/packages/pdtddev/lib/$(ARCH)/opt/libpdtddev.so ; \
+	)
 .PHONY: install

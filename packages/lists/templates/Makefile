@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/lists/templates
-	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/lists/templates ; done
+	for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/lists/templates/$$f ; done
 .PHONY: install
 
 

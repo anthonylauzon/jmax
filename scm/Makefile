@@ -34,7 +34,7 @@ scm:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/scm
-	for f in *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/scm ; done
+	for f in *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/scm/$$f ; done
 	(cd config ; $(MAKE) $@ )
 .PHONY: install
 

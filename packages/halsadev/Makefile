@@ -33,9 +33,12 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/halsadev
-	$(INSTALL_DATA) halsadev.jpk $(lib_install_dir)/packages/halsadev
+	$(INSTALL_DATA) halsadev.jpk $(lib_install_dir)/packages/halsadev/halsadev.jpk
 	$(INSTALL_DIR) $(lib_install_dir)/packages/halsadev/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libhalsadev.so $(lib_install_dir)/packages/halsadev/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libhalsadev.so $(lib_install_dir)/packages/halsadev/lib/$(ARCH)/opt/libhalsadev.so ; \
+	)
 .PHONY: install
 
 

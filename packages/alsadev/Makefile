@@ -33,10 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsadev
-	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/packages/alsadev
-	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/packages/alsadev
+	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/packages/alsadev/alsadev.jpk
+	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/packages/alsadev/alsadev.scm
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsadev/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev.so $(lib_install_dir)/packages/alsadev/lib/$(ARCH)/opt )
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev.so $(lib_install_dir)/packages/alsadev/lib/$(ARCH)/opt/libalsadev.so )
 .PHONY: install
 
 

@@ -194,7 +194,10 @@ MAKE_INSTALL=$(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)"
 
 install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)
-	$(INSTALL_DATA) LICENCE.fr LICENSE README VERSION $(doc_install_dir)
+	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)/LICENCE.fr
+	$(INSTALL_DATA) LICENSE $(doc_install_dir)/LICENSE
+	$(INSTALL_DATA) README $(doc_install_dir)/README
+	$(INSTALL_DATA) VERSION $(doc_install_dir)/VERSION
 	( cd doc ; $(MAKE_INSTALL) doc_install_dir=$(doc_install_dir) install )
 .PHONY: install-doc
 

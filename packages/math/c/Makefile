@@ -33,5 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libmath.so $(lib_install_dir)/packages/math/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libmath.so $(lib_install_dir)/packages/math/c/lib/$(ARCH)/opt/libmath.so ; \
+	)
 .PHONY: install

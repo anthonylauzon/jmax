@@ -25,7 +25,7 @@
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control/help
-	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/control/help ; done
+	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/control/help/$$f ; done
 .PHONY: install
 
 

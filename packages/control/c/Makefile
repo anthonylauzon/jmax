@@ -33,7 +33,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control/c/lib/$(ARCH)/opt
-	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/control/c/lib/$(ARCH)/opt )
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/control/c/lib/$(ARCH)/opt/libcontrol.so; \
+	)
 .PHONY: install
 
 
