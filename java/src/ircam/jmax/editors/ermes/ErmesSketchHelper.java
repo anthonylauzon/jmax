@@ -202,6 +202,11 @@ class ErmesSketchHelper extends Object{
   //	delete one object routine
   //--------------------------------------------------------
   public void DeleteObject(ErmesObject theObject) {
+    DeleteGraphicObject(theObject);
+    if (theObject.itsFtsObject != null) theObject.itsFtsObject.delete();
+  }
+  
+  public void DeleteGraphicObject(ErmesObject theObject) {
     itsSketchPad.RemoveElementRgn(theObject);
     DeleteObjectConnections(theObject);
     //removes theObject from the selected elements list	
@@ -212,7 +217,7 @@ class ErmesSketchHelper extends Object{
     itsSketchPad.itsElements.removeElement(theObject);
     //removes theObject from the container (sketchpad)
     //remove(theObject);	//from the sketchpad components
-
+    
     if(theObject instanceof ErmesObjExternal)
       if (((ErmesObjExternal)theObject).itsSubWindow!= null) 
 	((ErmesObjExternal)theObject).itsSubWindow.dispose();
@@ -220,10 +225,7 @@ class ErmesSketchHelper extends Object{
       ErmesObjPatcher aPatcher = (ErmesObjPatcher)theObject;
       if (aPatcher.itsSubWindow!= null) aPatcher.itsSubWindow.Close(true);
     }
-    if (theObject.itsFtsObject != null) theObject.itsFtsObject.delete();//a Delete() must be implemented in EObject
-    //theObject.finalize();	//Oh-Oh... we HOPE!
   }
-  
   
   //--------------------------------------------------------
   //	DeleteSelected

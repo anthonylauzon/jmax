@@ -37,10 +37,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       //we should avoid the propagations of changing-property to the originator
       //of the change itself
       itsPatcher.removeWatch(this);
-      itsSketchPad.itsHelper.DeleteObject((ErmesObject)(((FtsObject)value).getRepresentation()));
+      itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()));
       itsPatcher.watch("deletedObject", this);
       //another problem: allow the watch removing for single properties!
-itsPatcher.watch("deletedConnection", this);
+      itsPatcher.watch("deletedConnection", this);
     }
     else if (name.equals("deletedConnection")) {
       //see previous comment..
