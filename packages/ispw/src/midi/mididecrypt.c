@@ -11,6 +11,9 @@
 #include "fts.h"
 #include "midicd.h"
 
+/* DEBUG */
+#include <stdio.h>
+
 #define NOM  "mididecrypt"
 
 typedef struct decrypt {
@@ -64,15 +67,15 @@ static void Calcul2( decrypt_t *x)
   int i,j;
   long g,m,s;
 
-  if(x->Buf[1] & SYSEX_F)
+  if( x->Buf[1] & SYSEX_F)
     {
-      n = App2(x->Buf[2], 0, 127);
+      n = App2( x->Buf[2], 0, 127);
       x->nb_elm = x->pt_buf-3;
 
       for( i = 3; i < x->pt_buf; i++)
 	x->Format[i-3] = App2( x->Buf[i], FORMAT_MIN, FORMAT_MAX);
 
-      fts_outlet_int( (fts_object_t *)x, 0, n);
+      fts_outlet_int( (fts_object_t *)x, 1, n);
     }
   else
     {
@@ -84,7 +87,7 @@ static void Calcul2( decrypt_t *x)
 	  s = 0;
 	  p = f+1; /* pointeur sur bit dans s */
 
-	  while(p > k)
+	  while( p > k)
 	    {
 	      m = x->Buf[j++] & ((1 << k) - 1);
 	      s += m << (p-k);
@@ -94,7 +97,8 @@ static void Calcul2( decrypt_t *x)
 
 	  s += (x->Buf[j] >> (k-p)) & ((1 << p) - 1);
 	  k -= p;
-	  if(k==0)
+
+	  if(k == 0)
 	    {
 	      j++;
 	      k = 7;
@@ -103,7 +107,7 @@ static void Calcul2( decrypt_t *x)
 	  g = s >> f;
 	  s -= g << f;
 
-	  if(g)
+	  if (g)
 	    s *= -1;
 
 	  x->Elm[i] = s;
@@ -146,7 +150,9 @@ static void decrypt_int( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	       || (this->chn  & 0x10)
 	       || (this->Buf[1] & 0x10)
 	       ))
-	Calcul2(this);
+	{
+	  Calcul2(this);
+	}
       break;
 
     default:
@@ -236,25 +242,25 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   for( i = 0; i < M_FORMAT; i++)
     this->Elm[i]  = 0;
 
-  if( ac != 0)
+  if( ac != 1)
     {
-      if( ac > M_FORMAT+1)
-	ac = M_FORMAT+1;
+      if( ac > M_FORMAT+2)
+	ac = M_FORMAT+2;
 
-      for( i = 0; i < ac; i++)
+      for( i = 2; i < ac; i++)
 	if ( ! fts_is_long( &at[i]))
 	  {
-	    post("%s: argument(s) non valide(s)", NOM);
+	    post("%s: argument %d non valide (%s)\n", NOM, i, fts_symbol_name( fts_get_type( &at[i])));
 	    return;
 	  }
 
-      Chanel2( this, fts_get_long( &at[0]));
+      Chanel2( this, fts_get_long( &at[1]));
 
-      if (ac > 1)
+      if (ac > 2)
 	{
-	  this->nb_elm = ac-1;
-	  for( i = 1; i < ac; i++)
-	    this->Format[i-1] = App2( fts_get_long( &at[i]), FORMAT_MIN, FORMAT_MAX);
+	  this->nb_elm = ac-2;
+	  for( i = 2; i < ac; i++)
+	    this->Format[i-2] = App2( fts_get_long( &at[i]), FORMAT_MIN, FORMAT_MAX);
 	}
     }
 }
@@ -265,13 +271,18 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 static fts_status_t decrypt_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
+  fts_symbol_t a[5];
 
   fts_class_init( cl, sizeof( decrypt_t), 2, 2, 0);
 
-  fts_method_define_varargs( cl, 0, fts_s_init, decrypt_init);
-
   fts_method_define( cl, 0, fts_s_bang, decrypt_bang, 0, 0);
+
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_int;
+  a[2] = fts_s_int;
+  a[3] = fts_s_int;
+  a[4] = fts_s_int;
+  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, decrypt_init, 5, a, 1);
 
   a[0] = fts_s_int;
   fts_method_define( cl, 0, fts_s_int, decrypt_int, 1, a);
