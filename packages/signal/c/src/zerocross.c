@@ -34,7 +34,6 @@ typedef struct
   float last; /* last stored samples */
 } zerocross_data_t;
 
-
 typedef struct
 {
   fts_object_t o;
@@ -45,24 +44,23 @@ static void
 ftl_zerocross(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_pointer(argv + 0);
-  zerocross_t *data = (zerocross_t *)fts_word_get_pointer(argv + 1);
+  zerocross_data_t *data = (zerocross_data_t *)fts_word_get_pointer(argv + 1);
   long n_tick = (long)fts_word_get_int(argv + 2);
-  float last = data->last
+  float last = data->last;
   int count = data->count;
   int last_sign = (last <= 0.0f);
   int i;
 
   for(i=0; i<n_tick; i++)
     {
-      float current = in[i];
-      int current_sign = (current <= 0.0f);
+      int current_sign = (in[i] <= 0.0f);
 
       count += last_sign ^ current_sign;
       last_sign = current_sign;
     }
 
-  this->last = current;
-  this->count = count;
+  data->last = in[n_tick - 1];
+  data->count = count;
 }
 
 static void

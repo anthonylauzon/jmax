@@ -28,7 +28,8 @@ tilda.c \
 wahwah.c \
 wave.c \
 wave_ieeewrap.c \
-white.c
+white.c \
+zerocross.c
 
 INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src
 
