@@ -1,1 +1,1 @@
-SUBDIRS= rpm xml 
+SUBDIRS= rpm xml pkgconfig jmax-config
