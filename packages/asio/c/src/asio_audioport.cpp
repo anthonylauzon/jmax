@@ -667,6 +667,7 @@ static void asio_audioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int
   current_port->driver->driver_interface->disposeBuffers();
 
   /* We now return the hand to the FTS scheduler loop */
+  current_port = NULL;
 }
 
 
@@ -711,11 +712,10 @@ static int
 asio_audioport_open(asio_audioport_t* port, int input_or_output)
 {
 
-  if(nb_port_opened == 0)
+  if(nb_port_opened==0)
   {
     /* set current port pointer (only one open port at a given time) */
     current_port = port;
-    nb_port_opened++;
     
     /* set port open */
     fts_audioport_set_open((fts_audioport_t*)current_port, input_or_output);
@@ -724,6 +724,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
     if(asio_audioport_create_buffers(current_port)!=ASE_OK)
     {
       fts_post("[asio] Error : could not prepare audio buffers\n");
+      current_port = NULL;
       return 0; /* error */
     }
 
@@ -741,11 +742,13 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
 
         current_port->driver->driver_interface->start();
     }
+    nb_port_opened++;
   }
-  else if(port!=current_port) /* user is trying to open a different port */
+  else if((current_port)&&(port!=current_port)) /* user is trying to open a different port */
   {
      fts_post("ASIO allows to use only one driver at a time\n");
      fts_post("Current driver is : %s\n",current_port->driver->name);
+     nb_port_opened++;
      return 0; /* error */
   }
   else /* user is trying to open another channel of the current port */
@@ -770,7 +773,7 @@ static void asio_audioport_close()
 
   if(nb_port_opened==1)
   {
-    fts_post("[asio] close\n");
+    fts_post("[asio] effective port close\n");
 
     /* restart fts scheduler. when the FTS thread wakes up, it stops */
     /* the ASIO driver and disposes the audio buffers                */
@@ -782,6 +785,7 @@ static void asio_audioport_close()
   else
   {
       nb_port_opened--;
+      if(nb_port_opened<0) nb_port_opened = 0;
   }
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
   fts_post("[asio] close (%d)\n", nb_port_opened);
