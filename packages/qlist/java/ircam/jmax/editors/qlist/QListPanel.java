@@ -235,7 +235,6 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
   public void Set(){
     itsData.getAtomList().setValuesAsText(getText());
     fillContent(itsData);
-    itsData.setDirty();
     changed = false;
   }
 

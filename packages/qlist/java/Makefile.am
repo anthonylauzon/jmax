@@ -1,9 +1,23 @@
-SUBDIRS= src
+SUBDIRS= ircam
 
 packagedir=$(pkgdatadir)/packages/qlist/java
-package_DATA = qlist.jar
+JAR= qlist.jar
+package_DATA= $(JAR)
+package_JAVA= Qlist.java
 
-JAR_DEP=$(shell find src -name "*.java")
+JAVAC= @JAVACX@
+JAVACFLAGS= @JAVACFLAGSX@
+JAVAROOT= @top_srcdir@/packages/qlist/java
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
-qlist.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../qlist.jar `find ircam -name "*.class"` )
+JAR_DEP= \
+classpackage.stamp \
+ircam/jmax/editors/qlist/classpackage.stamp \
+ircam/jmax/editors/qlist/actions/classpackage.stamp \
+ircam/jmax/editors/qlist/menus/classpackage.stamp 
+
+CLEANFILES=${JAR}
+
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	jar -cvf $(JAR) *.class ircam/jmax/editors/qlist/*.class

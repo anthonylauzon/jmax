@@ -18,35 +18,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
-
-
-package ircam.jmax.editors.qlist;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.qlist.*;
+import ircam.fts.client.*;
 
-/**
- * The qlist extension; install the qlist data type
- * and the qlist file data handler
- */
+public class Qlist implements JMaxPackage {
 
-public class Qlist extends JMaxPackage
-{
-  public Qlist()
-  {
-      super("qlist");
-  }
+  public void load()
+  {    
+    JMaxObjectCreator qlistCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Standard( new FtsQListObject( server, parent, objId, className, args, offset, length));
+	}
+      }; 
 
-  public void load() 
-  {
-      ObjectCreatorManager.registerFtsClass("qlist", ircam.jmax.editors.qlist.FtsQListObject.class);
-  
-      ircam.jmax.editors.console.ConsoleWindow.append("package Qlist loaded");	 
+    JMaxClassMap.put( "qlist", qlistCreator, null, null, this);
+
+    System.out.println( "package QList loaded (Java Classes)");
   }
 }
-
-
-

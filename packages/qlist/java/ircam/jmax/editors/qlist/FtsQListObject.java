@@ -26,7 +26,7 @@
 package ircam.jmax.editors.qlist;
 
 import ircam.jmax.fts.*;
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import java.io.*;
 
@@ -48,9 +48,9 @@ public class FtsQListObject extends FtsObjectWithEditor {
   /**
    * constructor.
    */
-  public FtsQListObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
+  public FtsQListObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, classname, nArgs, args, id);		
+    super(server, parent, objId, classname, args, offset, length);		
   }
 
   public void requestOpenEditor()
