@@ -332,7 +332,7 @@ public class Primitive extends Procedure {
     case MINUS:		return numCompute(rest(args), '-', num(x));
     case TIMES:		return numCompute(args, '*', 1.0);
     case DIVIDE:	return numCompute(rest(args), '/', num(x));
-    case QUOTIENT:      double d = num(x)/num(y);
+    case QUOTIENT:      float d = num(x)/num(y);
                         return num(d > 0 ? Math.floor(d) : Math.ceil(d));
     case REMAINDER:     return num((long)num(x) % (long)num(y));
     case MODULO:        long xi = (long)num(x), yi = (long)num(y), m = xi % yi;
@@ -365,7 +365,8 @@ public class Primitive extends Procedure {
     case CHARWHITESPACEQ: return truth(Character.isWhitespace(chr(x)));
     case CHARUPPERCASEQ:  return truth(Character.isUpperCase(chr(x)));
     case CHARLOWERCASEQ:  return truth(Character.isLowerCase(chr(x)));
-    case CHARTOINTEGER:   return new Double((double)chr(x));
+	//    case CHARTOINTEGER:   return new Double((double)chr(x));
+    case CHARTOINTEGER:   return new Integer((int)chr(x));
     case INTEGERTOCHAR:   return chr((char)(int)num(x));
     case CHARUPCASE:      return chr(Character.toUpperCase(chr(x)));
     case CHARDOWNCASE:    return chr(Character.toLowerCase(chr(x)));
@@ -533,8 +534,8 @@ public class Primitive extends Procedure {
 
   public static Object numCompare(Object args, char op) {
     while (rest(args) instanceof Pair) {
-      double x = num(first(args)); args = rest(args);
-      double y = num(first(args));
+      float x = num(first(args)); args = rest(args);
+      float y = num(first(args));
       switch (op) {
       case '>': if (!(x >  y)) return FALSE; break;
       case '<': if (!(x <  y)) return FALSE; break;
@@ -547,7 +548,7 @@ public class Primitive extends Procedure {
     return TRUE;
   }
 
-  public static Object numCompute(Object args, char op, double result) {
+  public static Object numCompute(Object args, char op, float result) {
     if (args == null) {
       switch (op) {
       case '-': return num(0 - result);
@@ -556,7 +557,7 @@ public class Primitive extends Procedure {
       }
     } else {
       while (args instanceof Pair) {
-	double x = num(first(args)); args = rest(args);
+	float x = num(first(args)); args = rest(args);
 	switch (op) {
 	case 'X': if (x > result) result = x; break;
 	case 'N': if (x < result) result = x; break;
@@ -615,7 +616,7 @@ public class Primitive extends Procedure {
     int base = (y instanceof Number) ? (int)num(y) : 10;
     try {
       return (base == 10) 
-	? Double.valueOf(stringify(x, false))
+	? Float.valueOf(stringify(x, false))
 	: num(Long.parseLong(stringify(x, false), base));
     } catch (NumberFormatException e) { return FALSE; }
   }
@@ -646,8 +647,9 @@ public class Primitive extends Procedure {
   }
 
   static boolean isExact(Object x) {
-    if (!(x instanceof Double)) return false;
-    double d = num(x);
+    if (x instanceof Integer) return true;
+    if (!(x instanceof Float)) return false;
+    float d = num(x);
     return (d == Math.round(d) && Math.abs(d) < 102962884861573423.0);
   }
 

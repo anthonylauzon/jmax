@@ -12,8 +12,8 @@ public abstract class SchemeUtils {
   /** Same as Boolean.FALSE. **/
   public static final Boolean FALSE = Boolean.FALSE;
 
-  public static Double ZERO = new Double(0.0);
-  public static Double ONE = new Double(1.0);
+  public static Float ZERO = new Float(0.0);
+  public static Float ONE = new Float(1.0);
   //////////////// Conversion Routines ////////////////
 
   // The following convert or coerce objects to the right type.
@@ -24,13 +24,13 @@ public abstract class SchemeUtils {
   /** Convert Scheme object to boolean.  Only #f is false, others are true. **/
   public static boolean truth(Object x) { return x != FALSE; }
 
-  /** Convert double to Double. Caches 0 and 1; makes new for others. **/
-  public static Double num(double x) { 
-    return (x == 0.0) ? ZERO : (x == 1.0) ? ONE : new Double(x); }
+  /** Convert float to Float. Caches 0 and 1; makes new for others. **/
+  public static Float num(float x) { 
+    return (x == 0.0) ? ZERO : (x == 1.0) ? ONE : new Float(x); }
 
-  /** Converts a Scheme object to a double, or calls error. **/
-  public static double num(Object x) { 
-    if (x instanceof Number) return ((Number)x).doubleValue();
+  /** Converts a Scheme object to a float, or calls error. **/
+  public static float num(Object x) { 
+    if (x instanceof Number) return ((Number)x).floatValue();
     else return num(error("expected a number, got: " + x));
   }
 
@@ -188,7 +188,8 @@ public abstract class SchemeUtils {
   /** Check if two objects are == or are equal numbers or characters. **/
   public static boolean eqv(Object x, Object y) {
     return x == y 
-      || (x instanceof Double && x.equals(y))
+      || (x instanceof Integer && x.equals(y))
+      || (x instanceof Float && x.equals(y))
       || (x instanceof Character && x.equals(y));
   }
 
@@ -255,8 +256,11 @@ public abstract class SchemeUtils {
   static void stringify(Object x, boolean quoted, StringBuffer buf) { 
     if (x == null) 
       buf.append("()");
-    else if (x instanceof Double) {
-      double d = ((Double)x).doubleValue();
+    else if (x instanceof Integer) {
+      int d = ((Integer)x).intValue();
+      buf.append(d);
+    } else if (x instanceof Float) {
+      float d = ((Float)x).floatValue();
       if (Math.round(d) == d) buf.append((long)d); else buf.append(d);
     } else if (x instanceof Character) {
       if (quoted) buf.append("#\\");

@@ -1,0 +1,12 @@
+2001-08-22    <Standard@PC-TEMPS-REEL>
+
+	* InputPort.java: 
+
+	* Primitive.java: 
+
+	* SchemeUtils.java: 
+
+	The original SILK used only Double objects for all number
+	representations. Peter Hanappe modified in to use either Integer
+	or Float objects, since this is a better match for jMax/FTS.
+	
