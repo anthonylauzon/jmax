@@ -62,6 +62,9 @@ static void fts_objectset_add( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_set_void( &v);
   fts_hashtable_put( &this->hashtable, &k, &v);
 
+  if (!fts_object_has_id(obj))
+    fts_client_upload_object(obj);
+
   fts_client_send_message((fts_object_t *)this, sym_objectset_append, 1, at);
 }
 
