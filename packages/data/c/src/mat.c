@@ -36,7 +36,7 @@ static fts_symbol_t sym_mat_append_row  = 0;
 static fts_symbol_t sym_mat_insert_rows = 0;
 static fts_symbol_t sym_insert_cols = 0;
 static fts_symbol_t sym_delete_cols = 0;
-
+static fts_symbol_t sym_select_row = 0;
 
 
 
@@ -697,13 +697,13 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if      (pos < 0)        pos = 0;
-  else if (pos > m)        pos = m;
+  if(pos < 0)        pos = 0;
+  else if(pos > m)   pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if      (numrows <= 0)   return; /* nothing to append */
+  if(numrows <= 0) return; /* nothing to append */
 
   /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m + numrows, n);
@@ -722,8 +722,13 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
 
   /* update editor if open */
   if (mat_editor_is_open(self))
+  {
+    fts_atom_t a;
     mat_upload(self);
-  
+    
+    fts_set_int(&a, pos);
+    fts_client_send_message(o, sym_select_row, 1, &a);
+  }
   fts_object_set_state_dirty(o);
 }
 
@@ -1456,6 +1461,7 @@ mat_config(void)
   sym_mat_insert_rows = fts_new_symbol("mat_insert_rows");
   sym_insert_cols = fts_new_symbol("insert_cols");
   sym_delete_cols = fts_new_symbol("delete_cols");
+  sym_select_row = fts_new_symbol("select_row");
   mat_symbol = fts_new_symbol("mat");
   
   mat_type = fts_class_install(mat_symbol, mat_instantiate);

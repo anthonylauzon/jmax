@@ -216,6 +216,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     }
   }
   public void matNameChanged(String name){}
+  
+  public void matSelectRow( int row_id)
+  {
+    table.getSelectionModel().setSelectionInterval(  row_id, row_id);
+  }
   //------------------- Editor interface ---------------
 
   public EditorContainer getEditorContainer(){

@@ -75,7 +75,13 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
       {
         ((FtsMatObject)obj).endUpload();
       }
-    });      
+    });  
+    FtsObject.registerMessageHandler( FtsMatObject.class, FtsSymbol.get("select_row"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsMatObject)obj).selectRow(args.getInt(0));
+      }
+    });    
   }
 
   /**
@@ -124,7 +130,7 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   }
 
   public void set(int nArgs , FtsAtom args[])
-  {        
+  {            
     if(nArgs > 2)
     {
       int m = args[0].intValue;
@@ -172,6 +178,10 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     notifySizeChanged(n_rows, n_cols);
   }
   
+  public void selectRow(int row_id)
+  {
+    notifySelectRow( row_id);
+  }
   boolean uploading = false;
   public void startUpload()
   {
@@ -357,10 +367,15 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     setSize(n_rows, n);
   }
   
+  Integer prut = new Integer(0); 
   public Object getValueAt(int m, int n)
   {
-    return values[m][n];
+    if((m < n_rows) && (n < n_cols))
+      return values[m][n];
+    else
+      return prut;/* to avoid out_of_range access */
   }
+
   public void setValueAt(int m, int n, Object value)
   {
     values[m][n] = values;
@@ -413,6 +428,11 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((MatDataListener) e.nextElement()).matNameChanged(name);
+  }  
+  private void notifySelectRow(int row_id)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((MatDataListener) e.nextElement()).matSelectRow(row_id);
   }  
   /*******************************************************************/
   private Object[][] values;

@@ -78,6 +78,7 @@ public class MatWindow extends JMaxEditor {
       {
         setWindowName(name);
       }
+      public void matSelectRow(int row_id){}
     });
     
     addWindowListener(new WindowListener(){

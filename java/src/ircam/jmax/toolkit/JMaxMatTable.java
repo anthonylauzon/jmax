@@ -79,6 +79,12 @@ public class JMaxMatTable extends JTable
       return super.getCellRenderer(row, col);
   }
   
+  protected void processKeyEvent(KeyEvent e)
+  {
+    if(isEditing() || !(e.getKeyText(e.getKeyCode()).equals("Command") && e.getKeyChar() == KeyEvent.CHAR_UNDEFINED))
+      super.processKeyEvent(e);
+  }
+  
   /************************     FtsObject Table CellEditor ***********************************/
   public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener 
   {
