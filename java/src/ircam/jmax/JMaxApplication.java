@@ -35,6 +35,7 @@ import ircam.jmax.dialogs.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.editors.console.*;
+import ircam.jmax.editors.patcher.*;
 
 // JMaxApplication.getProperty should disappear, and properties stored in the system
 // properties, that can *also* be loaded from a file.
@@ -71,103 +72,95 @@ public class JMaxApplication extends FtsClient {
 
   public static void Quit()
   {
-    ListModel windows;
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
-
+    FtsPatcherObject patcher;
+    
     // First, search if there is anything to save
     // Loop in all the documents in all the  types.
     
-    /* WARNING:    */
-    /*ListModel types = Mda.getDocumentTypes();
+    ListModel windows = MaxWindowManager.getWindowManager().getWindowList();
 
-      search: for (int i = 0; i < types.getSize(); i++)
+  search: for (int i = 0; i < windows.getSize(); i++)
+    {
+      Frame win = (Frame) windows.getElementAt(i);
+      if( win instanceof ErmesSketchWindow)
+	{
+	  patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+	  if(patcher.isDirty())
+	    {      
+	      someOneNeedSave = true;
+	      break search;
+	    }
+	}
+    }
+    // in such case, should give the offer to cancel the quit.
+    if (someOneNeedSave)
       {
-      MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
-      ListModel documents = type.getDocuments();
-	  
-      for (int j = 0; j < documents.getSize(); j++)
-      {
-      MaxDocument document = (MaxDocument) documents.getElementAt(j);
+	Object[] options = { "Quit", "Review unsaved and quit", "Cancel" };
+	int result = JOptionPane.showOptionDialog( singleInstance.consoleWindow, 
+						   "There are unsaved documents; you really want to Quit ?", 
+						   "Quit", 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
+	if(result == JOptionPane.YES_OPTION)
+	  doTheSave = false;	
+	if(result == JOptionPane.NO_OPTION)
+	  doTheSave = true;	
+	if(result == JOptionPane.CANCEL_OPTION)
+	  return;
+      }
       
-      if (! document.isSaved())
+    // dispose (and optionally save) all the documents
+    Frame win;
+    for (int i = 0; i < windows.getSize(); i++)
       {
-      someOneNeedSave = true;
-      break search;
-      }
-      }
-      }
+	win = (Frame) windows.getElementAt(i);
+	if( win instanceof ErmesSketchWindow)
+	  {
+	    patcher = ((ErmesSketchWindow)win).getSketchPad().getFtsPatcher();
+	    
+	    if( patcher.isARootPatcher() )
+	      {
+		if( doTheSave && patcher.isDirty())
+		  {		 
+		    if( patcher.canSave())
+		      patcher.save();
+		    else
+		      {
+			File file = MaxFileChooser.chooseFileToSave(null, null, "Save As", MaxFileChooser.JMAX_FILE_TYPE);
+		      
+			if( file != null)
+			  {
+			    
+			    int result = JOptionPane.showConfirmDialog( win,
+									"File \"" + file.getName()+"\" exists.\nOK to overwrite ?",
+									"Warning",
+									JOptionPane.YES_NO_OPTION,
+									JOptionPane.WARNING_MESSAGE);
 
-      // in such case, should give the offer to cancel the quit.
-      if (someOneNeedSave)
-      {
-      Object[] options = { "Quit", "Review unsaved and quit", "Cancel" };
-      int result = JOptionPane.showOptionDialog(null, 
-      "There are unsaved documents; you really want to Quit ?", 
-      "Quit", 
-      JOptionPane.YES_NO_CANCEL_OPTION,
-      JOptionPane.QUESTION_MESSAGE,
-      null, options, options[0]);
-      if(result == JOptionPane.YES_OPTION)
-      doTheSave = false;	
-      if(result == JOptionPane.NO_OPTION)
-      doTheSave = true;	
-      if(result == JOptionPane.CANCEL_OPTION)
-      return;
+			    if ( result == JOptionPane.OK_OPTION)
+			      patcher.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+			  }		    
+		      }
+		  }
+		patcher.stopUpdates();		      
+		patcher.requestDestroyEditor();
+		//FtsPatcherObject.fireAtomicAction(true); 
+		try
+		  {
+		    patcher.delete();
+		  }
+		catch(IOException e){
+		  System.err.println("[ErmesSketchPad]: IO error deleting patcher");
+		}
+		
+		((ErmesSketchWindow)win).Destroy();
+	      }
+	  }
       }
-      
-      // dispose (and optionally save) all the documents
-      
-      for (int i = 0; i < types.getSize(); i++)
-      {
-      MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
-      ListModel documents = type.getDocuments();
-      
-      for (int j = 0; j < documents.getSize(); j++)
-      {
-      MaxDocument document = (MaxDocument) documents.getElementAt(j);
-      
-      if (doTheSave && (! document.isSaved()))
-      {
-      int result = JOptionPane.showConfirmDialog(MaxWindowManager.getWindowManager().getTopFrame(),
-      "Save "+document.getName()+" ?",
-      "Warning",
-      JOptionPane.YES_NO_OPTION,
-      JOptionPane.QUESTION_MESSAGE);  
-      if (result == JOptionPane.OK_OPTION)
-      {
-      if (! document.canSave())
-      {
-      File file;
-      file= MaxFileChooser.chooseFileToSave(null, document.getDocumentFile(), "Save As");
-      
-      if (file != null)
-      document.bindToDocumentFile(file);
-      }
-      
-      if (document.canSave())
-      {
-      try
-      {
-      document.save();
-      }
-      catch (MaxDocumentException e)
-      {
-      System.err.println(e.toString());
-      }
-      }
-      else
-      { 
-      JOptionPane.showMessageDialog(MaxWindowManager.getWindowManager().getTopFrame(), 
-      "Cannot Save "+document.getName(), 
-      "Error", JOptionPane.ERROR_MESSAGE); 
-      }
-      }		    
-
-      document.dispose();
-      }
-      }
-      }*/
+    /////////////////////////////////////////////////////////////////////////
 
     singleInstance.recentFileHistory.save();
 
@@ -182,7 +175,7 @@ public class JMaxApplication extends FtsClient {
 	singleInstance.server.shutdown();
       }
       catch(FtsClientException e){}
-
+    
     Runtime.getRuntime().exit(0);
   }
 
@@ -436,6 +429,23 @@ public class JMaxApplication extends FtsClient {
 	server = new FtsServer( connection, this);
 
 	FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
+	FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "patcher_loaded"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, FtsArgs args)
+	    {
+	      if ( args.isInt( 0) )
+		{
+		  FtsPatcherObject patcher = new FtsPatcherObject( JMaxApplication.getFtsServer(), 
+								   JMaxApplication.getFtsServer().getRoot(), 
+								   args.getInt( 0), "jpatcher", null, 0, 0);
+		  ErmesSketchWindow win = new ErmesSketchWindow(patcher);
+		  String name =  args.getSymbol( 1).toString();
+		  win.setTitle( name);
+		  patcher.setEditorFrame( win);
+		  patcher.setName( name);
+		  patcher.setType( args.getInt( 2));
+		}
+	    }
+	  });
 
 	send( FtsSymbol.get( "get_packages"));
       }
@@ -486,11 +496,22 @@ public class JMaxApplication extends FtsClient {
   }
 
 
-
-
   private static void openCommandLineFiles()
   {
-    // for now, empty, till we replace mda
+    String fileName = null;
+    try
+      {	
+	
+	for(Enumeration e = singleInstance.toOpen.elements(); e.hasMoreElements(); )
+	  {
+	    fileName = (String)e.nextElement();
+	    JMaxApplication.getFtsServer().getRoot().load(fileName);
+	  }
+      }
+    catch(IOException e)
+      {
+	System.err.println("[JMaxApplication]: I/O error loading file "+fileName);
+      }
   }
 
   private RecentFileHistory recentFileHistory;

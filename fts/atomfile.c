@@ -411,7 +411,7 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
     sprintf(buf, "%#f%c", fts_get_float(at), separator);
   else if (fts_is_symbol(at))
     {
-      const char *sym_str = fts_symbol_name(fts_get_symbol(at));
+      const char *sym_str = fts_get_symbol(at);
 
       if(strlen(sym_str) == 1 && IS_ATOM_CHAR(sym_str[0]))
 	{

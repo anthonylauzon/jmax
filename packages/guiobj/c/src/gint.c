@@ -164,6 +164,7 @@ static fts_status_t gint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, gint_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, gint_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "setValue"), gint_number); 
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, gint_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, gint_put_value);

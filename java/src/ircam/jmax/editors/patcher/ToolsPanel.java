@@ -225,53 +225,53 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
   private void createTreeModelFromSelection(ListSelectionModel lsm)
   {
-      if (lsm.isSelectionEmpty()) 
+    if (lsm.isSelectionEmpty()) 
+      {
+	((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
+	tree.setModel(emptyTreeModel);
+      } 
+    else 
+      {
+	int selRow = lsm.getMinSelectionIndex();
+	DefaultMutableTreeNode top, node, start;
+	top = start = node = null;
+	FtsGraphicObject ftsObj;			
+	String nodeText;
+	////////????????????????? comment eviter ca?????????
+	if(currentTableModel instanceof RuntimeErrorsTableModel)
+	  ftsObj = ((RuntimeError)currentTableModel.getListModel().getElementAt(selRow)).getObject();
+	else
+	  ftsObj = (FtsGraphicObject)currentTableModel.getListModel().getElementAt(selRow);
+	
+	for(Enumeration enum = ftsObj.getGenealogy(); enum.hasMoreElements(); )
 	  {
-	      ((DefaultTreeCellRenderer)tree.getCellRenderer()).setLeafIcon(null);
-	      tree.setModel(emptyTreeModel);
-	  } 
-      else 
-	  {
-	      int selRow = lsm.getMinSelectionIndex();
-	      DefaultMutableTreeNode top, node, start;
-	      top = start = node = null;
-	      FtsGraphicObject ftsObj;			
-	      String nodeText;
-	      ////////????????????????? comment eviter ca?????????
-	      if(currentTableModel instanceof RuntimeErrorsTableModel)
-		  ftsObj = ((RuntimeError)currentTableModel.getListModel().getElementAt(selRow)).getObject();
-	      else
-		  ftsObj = (FtsGraphicObject)currentTableModel.getListModel().getElementAt(selRow);
-	      
-	      for(Enumeration enum = ftsObj.getGenealogy(); enum.hasMoreElements(); )
-		  {
-		      ftsObj = (FtsGraphicObject)enum.nextElement();
-		      if(top==null)
-			  {
-			      /* WARNING: decomment when reimplemented document stuffs */
-			      /*top = new FtsMutableTreeNode(ftsObj, (ftsObj.getDocument()!=null) ? 
-				ftsObj.getDocument().getName() : ftsObj.getDescription());*/
-			      top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());
-			      start = top;
-			  }				
-		      else
-			  {
-			      nodeText = ftsObj.getDescription();
-			      if(nodeText.equals("")) nodeText = ftsObj.getComment();
-			      node = new FtsMutableTreeNode(ftsObj, nodeText);
-			      top.add(node);
-			      top = node;
-			  }
-		  }
-	      DefaultTreeModel treeModel = new DefaultTreeModel(start);
-	      ((DefaultTreeCellRenderer)tree.getCellRenderer()).
-		  setLeafIcon(ObjectSetViewer.getObjectIcon(((FtsMutableTreeNode)node).getFtsObject()));
-	      
-	      tree.setModel(treeModel);
-	      
-	      if(node!=null)
-		  tree.setSelectionPath(new TreePath(node.getPath()));
+	    ftsObj = (FtsGraphicObject)enum.nextElement();
+	    if(top==null)
+	      {
+		/* WARNING: decomment when reimplemented document stuffs */
+		/*top = new FtsMutableTreeNode(ftsObj, (ftsObj.getDocument()!=null) ? 
+		  ftsObj.getDocument().getName() : ftsObj.getDescription());*/
+		top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());
+		start = top;
+	      }				
+	    else
+	      {
+		nodeText = ftsObj.getDescription();
+		if(nodeText.equals("")) nodeText = ftsObj.getComment();
+		node = new FtsMutableTreeNode(ftsObj, nodeText);
+		top.add(node);
+		top = node;
+	      }
 	  }
+	DefaultTreeModel treeModel = new DefaultTreeModel(start);
+	((DefaultTreeCellRenderer)tree.getCellRenderer()).
+	  setLeafIcon(ObjectSetViewer.getObjectIcon(((FtsMutableTreeNode)node).getFtsObject()));
+	
+	tree.setModel(treeModel);
+	
+	if(node!=null)
+	  tree.setSelectionPath(new TreePath(node.getPath()));
+      }
   }
 
   /*///////////////////////////////////////////////////////////////////*/

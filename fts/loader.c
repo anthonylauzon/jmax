@@ -152,7 +152,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 	    {
 	      desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
 #ifdef LOAD_DEBUG
-	      fts_log( "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
+	      fts_log( "Reading symbol %s\n", desc->symbols[symbolIndex]);
 #endif
 	      symbolIndex++;
 	      i = 0;

@@ -46,7 +46,7 @@ public class Fork extends GraphicObject
   static final int CONST_HEIGHT = 12;
   static final int DEFAULT_OUTLETS = 2;
 
-  private int nOutlets = 0; /* @@@@@*/
+  private int nOutlets = 0;
 
   public Fork(FtsGraphicObject theFtsObject) 
   {
@@ -61,29 +61,34 @@ public class Fork extends GraphicObject
 
     setInletDistance(DEFAULT_DISTANCE);
     setOutletDistance(DEFAULT_DISTANCE);
+  }
 
-    int width = getWidth();
-
-    if (width == -1)
-      setWidth( DEFAULT_WIDTH);
-    else if (width <= MINIMUM_WIDTH)
-      setWidth( MINIMUM_WIDTH);
-    else
-      setWidth(width);
-
-    super.setHeight(CONST_HEIGHT);
+  public void setDefaults()
+  {
+    setWidth( getWidth());
+    setHeight(CONST_HEIGHT);
   }
 
   // redefined from base class
 
   public void setWidth( int theWidth)
   {
-    int minWidth = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH * nOutlets;
+    if( theWidth <= 0)
+      theWidth = DEFAULT_WIDTH;
+    else
+      {
+	int minWidth = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH * nOutlets;
       
-    if(theWidth < minWidth)
-      theWidth = minWidth;
+	if(theWidth < minWidth)
+	  theWidth = minWidth;
+      }
 
     super.setWidth( theWidth);
+  }
+
+  public void setHeight(int h)
+  {
+    super.setHeight(CONST_HEIGHT);
   }
 
   public void setWidthShift( int theWidth) 

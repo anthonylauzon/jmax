@@ -28,7 +28,7 @@
 #include "bpf.h"
 
 fts_symbol_t bpf_symbol = 0;
-fts_type_t bpf_type = 0;
+/*fts_type_t bpf_type = 0;*/
 fts_class_t *bpf_class = 0;
 
 static fts_symbol_t sym_addPoint = 0;
@@ -160,7 +160,8 @@ bpf_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   bpf_t *this = (bpf_t *)o;
   fts_atom_t a[1];
 
-  bpf_atom_set(a, this);
+  /*bpf_atom_set(a, this);*/
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, bpf_symbol, 1, a);
 }
 
@@ -530,7 +531,8 @@ bpf_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 {
   bpf_t *this = (bpf_t *)obj;
 
-  bpf_atom_set(value, this);
+  /*bpf_atom_set(value, this);*/
+  fts_set_object(value, obj);
 }
 
 /************************************************************
@@ -650,7 +652,7 @@ void
 bpf_config(void)
 {
   bpf_symbol = fts_new_symbol("bpf");
-  bpf_type = bpf_symbol;
+  /*bpf_type = bpf_symbol;*/
 
   sym_addPoint = fts_new_symbol("addPoint");
   sym_removePoints = fts_new_symbol("removePoints");
@@ -659,5 +661,5 @@ bpf_config(void)
   fts_metaclass_install(bpf_symbol, bpf_instantiate, bpf_equiv);
   bpf_class = fts_class_get_by_name(bpf_symbol);
 
-  fts_atom_type_register(bpf_symbol, bpf_class);
+  /*fts_atom_type_register(bpf_symbol, bpf_class);*/
 }

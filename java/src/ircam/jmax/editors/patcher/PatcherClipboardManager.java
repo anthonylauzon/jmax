@@ -51,12 +51,8 @@ public class PatcherClipboardManager implements ClipboardOwner
   public static PatcherClipboardManager clipboardManager = null;
   
   private static FtsClipboard ftsClipboard;
-  
-  private MaxVector ftsObjectsPasted = new MaxVector();
-  private MaxVector ftsConnectionsPasted = new MaxVector();
-  
-  private boolean pasting = false;
 
+  private EditorContainer currentContainer;
   /****************************************************************************/
   /*                                                                          */
   /*           CONSTRUCTOR                                                      */
@@ -113,6 +109,8 @@ public class PatcherClipboardManager implements ClipboardOwner
 	    ftsClipboard.copy(ErmesSelection.getFtsSelection());
 	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
 	    sketch.resetPaste(-1);
+	    GraphicObject obj = ErmesSelection.patcherSelection.getSingleton();
+	    sketch.setStartPasteXY( obj.getX(), obj.getY());
 	  }
 	ErmesSelection.patcherSelection.redraw();
 	ErmesSelection.patcherSelection.deleteAll();
@@ -121,23 +119,25 @@ public class PatcherClipboardManager implements ClipboardOwner
       }
   }
 
-  public void Copy(EditorContainer container)
+  public void Copy( EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-    if (sketch.canCopyText())
+    if ( sketch.canCopyText())
       {
 	sketch.copyText();
       }
     else 
-      if (ErmesSelection.patcherSelection.ownedBy(sketch)&&!ErmesSelection.patcherSelection.isObjectsEmpty())
+      if ( ErmesSelection.patcherSelection.ownedBy( sketch)&&!ErmesSelection.patcherSelection.isObjectsEmpty())
 	{
 	  Cursor temp = container.getFrame().getCursor();
 	  container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  JMaxApplication.getSystemClipboard().setContents(ErmesSelection.patcherSelection, this);
+	  JMaxApplication.getSystemClipboard().setContents( ErmesSelection.patcherSelection, this);
 	  ftsClipboard.copy( ErmesSelection.getFtsSelection());
-	  sketch.setLastCopyCount(ftsClipboard.getCopyCount());
-	  sketch.resetPaste(0);	  
+	  sketch.setLastCopyCount( ftsClipboard.getCopyCount());
+	  sketch.resetPaste( 0);	  
+	  GraphicObject obj = ErmesSelection.patcherSelection.getSingleton();
+	  sketch.setStartPasteXY( obj.getX(), obj.getY());
 	  container.getFrame().setCursor( temp);
 	}
   }
@@ -152,6 +152,7 @@ public class PatcherClipboardManager implements ClipboardOwner
   public void Paste(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+    currentContainer = container;
 
     if (sketch.isLocked())
       sketch.setLocked(false);
@@ -165,133 +166,62 @@ public class PatcherClipboardManager implements ClipboardOwner
       return; // Should never happen, protection against system clipboard bug.
 
     if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
-	{
-	    if (sketch.canPasteText())
-		{
-		    try
-			{
-			    sketch.pasteText();
-			}
-		    catch (Exception e)
-			{
-			    System.err.println("error while pasting text: " + e);
-			}
-		}
-	}
-    else //if(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor))
-	{
-
-	    Cursor temp = container.getFrame().getCursor();
-	    container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-	    
-	    // Should get the fts clipboard from the System.clipboard content !!!!!
-	    
-	    pasting = true;
-	    
-	    if (sketch.getLastCopyCount() != ftsClipboard.getCopyCount())
-		{
-		    sketch.resetPaste(-1);
-		    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
-		}
-
-	    ftsClipboard.paste( sketch.getFtsPatcher());
-	    
-	    sketch.getFtsPatcher().update();
-    
-	    //sketch.getFts().sync();
-
-	    pasting = false;
-	    
-	    // make the sketch do the graphic job
-
-	    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
-		{
-		    PasteObjects(sketch);
-		    sketch.fixSize();
-		}
-	    
-	    ftsObjectsPasted.removeAllElements();
-	    ftsConnectionsPasted.removeAllElements();
-
-	    container.getFrame().setCursor(temp);
-	}
+      {
+	if (sketch.canPasteText())
+	  {
+	    try
+	      {
+		sketch.pasteText();
+	      }
+	    catch (Exception e)
+	      {
+		System.err.println("error while pasting text: " + e);
+	      }
+	  }
+      }
+    else 
+      {	
+	container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	
+	if (sketch.getLastCopyCount() != ftsClipboard.getCopyCount())
+	  {
+	    sketch.resetPaste(-1);
+	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
+	    sketch.setOldPastedObject( null);
+	    sketch.setStartPasteXY( -1, -1);
+	  }
+	
+	newPaste(sketch);
+	sketch.getFtsPatcher().requestPaste( ftsClipboard, sketch.getPasteDX(), sketch.getPasteDY());
+	
+	sketch.getFtsPatcher().requestStopWaiting(new FtsActionListener(){
+	    public void ftsActionDone()
+	    {
+	      currentContainer.getFrame().setCursor(Cursor.getDefaultCursor());
+	    }
+	  });	
+      }
   }
 
-  void PasteObjects(ErmesSketchPad sketch) 
+  void newPaste(ErmesSketchPad sketch)
   {
-    /*FtsGraphicObject	fo;
-      FtsConnection fc;
-      DisplayList displayList = sketch.getDisplayList();
-      GraphicObject object;
-      GraphicConnection connection;
-      int  incrementalPasteOffsetX;
-      int  incrementalPasteOffsetY;
-      int pasteNum;
-      
-      pasteNum = sketch.getPasteNumber();
-    
-      if (sketch.isTextEditingObject())
+    int pasteNum = sketch.getPasteNumber();
+    int  incrementalPasteOffsetX;
+    int  incrementalPasteOffsetY;    
+
+    if (sketch.isTextEditingObject())
       sketch.stopTextEditing();
 
-      ErmesSelection.patcherSelection.setOwner(sketch); 
-
-      if (! ErmesSelection.patcherSelection.isEmpty())
-      {
-      ErmesSelection.patcherSelection.redraw(); 
-      ErmesSelection.patcherSelection.deselectAll();
-      }
-      
-      fo = (FtsGraphicObject)ftsObjectsPasted.elementAt( 0);
-
-      if (pasteNum == 0) 
+    if (pasteNum == 0) 
       sketch.setIncrementalPasteOffsets(0, 0);
-      else if (pasteNum == 1) 
-      {
-      sketch.setOldPastedObject(fo);
+    else if (pasteNum == 1) 
       sketch.setIncrementalPasteOffsets(20, 20);
-      }
-      else if (pasteNum == 2) 
-      sketch.setIncrementalPasteOffsets((int)(sketch.getOldPastedObject().getX() - fo.getX()),
-      (int)(sketch.getOldPastedObject().getY() - fo.getY()));
-      
-      for ( Enumeration e = ftsObjectsPasted.elements(); e.hasMoreElements();) 
+    else if (pasteNum == 2) 
       {
-      fo = (FtsGraphicObject)e.nextElement();
-
-      float newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
-      float newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();
-      
-      fo.setX( newPosX);
-      fo.setY( newPosY);
-      
-      object = GraphicObject.makeGraphicObject( sketch, fo);
-      displayList.add( object);
-      ErmesSelection.patcherSelection.select( object);
-      object.redraw();
+	sketch.setIncrementalPasteOffsets((int)(sketch.getOldPastedObject().getX() - sketch.getStartPasteX()),
+					  (int)(sketch.getOldPastedObject().getY() - sketch.getStartPasteY()));    
       }
-      
-      GraphicObject fromObj, toObj;
-      
-      for ( Enumeration e2 = ftsConnectionsPasted.elements(); e2.hasMoreElements();) 
-      {
-      fc = (FtsConnection)e2.nextElement();
-      
-      connection = new GraphicConnection( sketch, 
-      displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
-      displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
-      fc.getType(), fc);
-      
-      displayList.add( connection);
-
-      ErmesSelection.patcherSelection.select( connection);
-      connection.updateDimensions();
-      connection.redraw();
-      }
-      
-      displayList.reassignLayers();
-      displayList.sortDisplayList();*/
   }
-
 
   public boolean ftsClipboardIsEmpty()
   {
@@ -332,21 +262,6 @@ public class PatcherClipboardManager implements ClipboardOwner
 	    });
 	  }
       }
-  }
-
-  public boolean isPasting()
-  {
-    return pasting;
-  }
-  
-  void addPastedObject(FtsObject obj)
-  {
-    ftsObjectsPasted.addElement( obj);
-  }
-
-  void addPastedConnection(FtsConnection c)
-  {
-    ftsConnectionsPasted.addElement( c);
   }
 }
 

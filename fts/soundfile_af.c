@@ -176,7 +176,7 @@ fts_soundfile_t *
 fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(file_name);
+  const char *path = file_name;
   AFfilesetup af_setup = afNewFileSetup();
   AFfilehandle af_handle;
   fts_soundfile_t *sf;
@@ -195,7 +195,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, doubl
 	}
       else /* float is only supported raw format for now */
 	{
-	  post("soundfile: unsupported raw format: %s\n", fts_symbol_name(format));
+	  post("soundfile: unsupported raw format: %s\n", format);
 	  return 0;
 	}
     }
@@ -243,7 +243,7 @@ fts_soundfile_t *
 fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, double sr)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(file_name);
+  const char *path = file_name;
   AFfilesetup af_setup = afNewFileSetup();
   AFfilehandle af_handle;
   int af_format;
@@ -259,7 +259,7 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
 	{
 	case AF_FILE_UNKNOWN:
 	  {
-	    post("soundfile: unknown format: %s\n", fts_symbol_name(format_name));
+	    post("soundfile: unknown format: %s\n", format_name);
 	    return 0;
 	  }
 	case AF_FILE_RAWDATA:
@@ -279,7 +279,7 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
     }
   else /* no format specified (use file extension or default format) */
     {
-      char *extension = strrchr(fts_symbol_name(file_name), '.');
+      char *extension = strrchr(file_name, '.');
       
       if (extension)
 	af_format = fts_af_get_format(fts_new_symbol(extension + 1));

@@ -64,7 +64,7 @@ static void fts_autosave(const char *postfix)
 	{
 	  char buf[FILENAME_MAX];
 
-	  sprintf(buf, "%s%s", fts_symbol_name(fts_get_symbol(&a)), postfix);
+	  sprintf(buf, "%s%s", fts_get_symbol(&a), postfix);
 
 	  fts_save_simple_as_bmax(buf, p);
 	}

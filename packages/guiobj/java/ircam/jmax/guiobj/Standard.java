@@ -77,7 +77,12 @@ public class Standard extends Editable implements FtsObjectErrorListener
     if( !ftsObject.isError() && ( ftsObject instanceof FtsObjectWithEditor))
       {
 	itsSketchPad.waiting();
-	((FtsObjectWithEditor)ftsObject).requestOpenEditor();
+
+	if(ftsObject instanceof FtsPatcherObject)
+	   ((FtsPatcherObject)ftsObject).requestSubPatcherUpload();
+	else
+	  ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
+
 	((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
       }
   }

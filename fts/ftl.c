@@ -809,7 +809,7 @@ void ftl_program_post_signals( const ftl_program_t *prog)
 
       m = (ftl_memory_declaration *)fts_get_pointer( &v);
       s = fts_get_symbol( &k);
-      post( "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
+      post( "float %s[%d];  /* adress 0x%x */\n", s, m->size, m->address);
     }
   post( "\n");
 }
@@ -894,7 +894,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
 	instr_info = info->instr_info;
 	object = instr_info->object;
 	if (object)
-	  post( "%s /* object %s", info->line, fts_symbol_name( fts_object_get_class_name(object)));
+	  post( "%s /* object %s", info->line, fts_object_get_class_name(object));
 	else
 	  post( "%s /* object unknown", info->line);
 
@@ -903,7 +903,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
 
 	  post( ", %d inputs {", instr_info->ninputs);
 	  for ( i = 0; i < instr_info->ninputs; i++)
-	    post( " %s[%d]", fts_symbol_name( instr_info->input_infos[i].name), instr_info->input_infos[i].size);
+	    post( " %s[%d]", instr_info->input_infos[i].name, instr_info->input_infos[i].size);
 	  post( "} ");
 	}
 
@@ -912,7 +912,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
 
 	  post( ", %d outputs {", instr_info->noutputs);
 	  for ( i = 0; i < instr_info->noutputs; i++)
-	    post( " %s[%d]", fts_symbol_name( instr_info->output_infos[i].name), instr_info->output_infos[i].size);
+	    post( " %s[%d]", instr_info->output_infos[i].name, instr_info->output_infos[i].size);
 	  post( "}");
 	}
 
@@ -956,7 +956,7 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
     }
     break;
   case ST_CALL_FUN:
-    sprintf( info->line, "/* %5d */   %s( ", pc, fts_symbol_name(fts_get_symbol(a)));
+    sprintf( info->line, "/* %5d */   %s( ", pc, fts_get_symbol(a));
     break;
   case ST_CALL_ARGV:
     if (fts_is_pointer(a))
@@ -971,7 +971,7 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
 	strcat( info->line, " );");
 	object = info->instr_info->object;
 	if (object)
-	  fprintf(info->f, "%s /* object %s */\n", info->line, fts_symbol_name( fts_object_get_class_name(object)));
+	  fprintf(info->f, "%s /* object %s */\n", info->line, fts_object_get_class_name(object));
 	else
 	  fprintf(info->f, "%s /* object unknown */\n", info->line);
 	  
@@ -995,7 +995,7 @@ void ftl_program_post( const ftl_program_t *prog )
 
   for( subr = prog->subroutines; subr; subr = subr->next)
     {
-      post( "%s()\n", fts_symbol_name( subr->name));
+      post( "%s()\n", subr->name);
       post( "{\n");
       info.line[0] = 0;
       info.pc = 0;
@@ -1015,7 +1015,7 @@ void ftl_program_fprint( FILE *f, const ftl_program_t *prog )
 
   for( subr = prog->subroutines; subr; subr = subr->next)
     {
-      fprintf( f, "%s()\n", fts_symbol_name( subr->name));
+      fprintf( f, "%s()\n", subr->name);
       fprintf( f, "{\n");
       info.f = f;
       info.line[0] = 0;

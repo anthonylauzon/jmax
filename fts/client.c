@@ -26,6 +26,8 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <ftsprivate/loader.h>
+#include <ftsprivate/patparser.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -900,16 +902,12 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 {
   client_t *this = (client_t *)o;
 
-  if ( size < 0)
+  if ( size <= 0)
     {
       client_error( "[client] error in reading message, client stopped");
       fts_log( "[client] error in reading message, client stopped\n");
-      fts_object_delete_from_patcher( (fts_object_t *)this);
-      return;
-    }
-  else if (size == 0)
-    {
-      fts_log( "[client] client stopped\n");
+      fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
+      fts_timebase_remove_object( fts_get_timebase(), (fts_object_t *) this);
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
@@ -960,6 +958,8 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
       obj  = fts_get_object(&at[0]);
       name = fts_get_symbol(&at[1]);
 
+      fts_log("client set Obj property %s\n", name);
+
       fts_object_put_prop(obj, name, &at[2]);
 
       fts_patcher_set_dirty( obj->patcher, 1);
@@ -1000,6 +1000,59 @@ static void client_delete_object( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   fts_set_int( &k, OBJECT_ID_OBJ( fts_object_get_id( obj)) );
   fts_hashtable_remove( &this->object_table, &k);
+}
+
+static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+  fts_object_t *parent;
+  fts_atom_t a[3];
+  fts_object_t *patcher;
+  int type = 1;
+
+  const char *filename = fts_get_symbol( at);
+
+  parent = fts_get_object( at+1);
+
+  fts_log("[client]: Load patcher %s\n", filename);
+
+  /* here finds the file-type if is a jmax_file do 
+     fts_binary_file_load( filename, parent, 0, 0)
+     else if is a dot_pat file do 
+     fts_load_dotpat_patcher(parent, filename)
+   */
+  
+  type = ! fts_is_dotpat_file( filename);
+
+  if( type)
+    patcher = fts_binary_file_load( filename, parent, 0, 0, 0);
+  else
+    patcher = fts_load_dotpat_patcher( parent, filename);
+
+  if (patcher == 0)
+    {
+      fts_log("[patcher]: Cannot read file %s\n", filename);
+      return;
+    }
+
+  client_register_object( this, patcher);
+
+  /* Save the file name, for future autosaves and other services */
+  fts_object_put_prop( patcher, fts_s_filename, at);
+
+  /* activate the post-load init, like loadbangs */	  
+  fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+
+  fts_set_int(a, fts_get_object_id(patcher));
+  fts_set_symbol(a+1, filename);
+  fts_set_int(a+2, type);
+  fts_client_send_message( o, fts_new_symbol( "patcher_loaded"), 3, a);
+
+  /* uploaod the patcher to the client */
+  fts_send_message( patcher, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
+
+  fts_log("[patcher]: Finished loading patcher %s\n", filename);
 }
 
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1147,8 +1200,6 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   fts_hashtable_destroy( &this->object_table);
 
-  fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
-
   protocol_encoder_destroy( &this->encoder);
   protocol_decoder_destroy( &this->decoder);
 
@@ -1171,6 +1222,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load"), client_load_patcher_file);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
 
@@ -1457,7 +1509,7 @@ void fts_client_upload_object(fts_object_t *obj, int id)
   client_register_object( client, obj);
 
   fts_set_object( a, obj);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);  
 }
 
 /* compatibility */

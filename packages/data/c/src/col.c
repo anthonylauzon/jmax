@@ -27,7 +27,7 @@
 #include <fts/fts.h>
 #include "col.h"
 
-fts_type_t col_type = 0;
+/*fts_type_t col_type = 0;*/
 fts_symbol_t col_symbol = 0;
 fts_class_t *col_class = 0;
 
@@ -253,10 +253,10 @@ void
 col_config(void)
 {
   col_symbol = fts_new_symbol("col");
-  col_type = col_symbol;
+  /*col_type = col_symbol;*/
 
   fts_class_install(col_symbol, col_instantiate);
   col_class = fts_class_get_by_name(col_symbol);
 
-  fts_atom_type_register(col_symbol, col_class);
+  /*fts_atom_type_register(col_symbol, col_class);*/
 }

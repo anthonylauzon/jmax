@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.util.*;
 import java.lang.*;
+import java.io.*;
 
 import javax.swing.*; 
 
@@ -182,8 +183,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public boolean isASubPatcher()
   {
-      /* WARNING: reimplent when document reimplemented */
-      return (/*(!itsDocument.isRootData(itsPatcher))&&*/(itsPatcher instanceof FtsPatcherObject));
+    return !itsPatcher.isARootPatcher();
   }
   public boolean isATemplate()
   {
@@ -191,13 +191,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       //return ((!itsDocument.isRootData(itsPatcher))&&!(itsPatcher instanceof FtsPatcherObject));
       return (itsPatcher instanceof FtsTemplateObject);
   }
-
-    /*MaxDocument itsDocument;
-  
-      public MaxDocument getDocument()
-      {
-      return itsDocument;
-      }*/
 
   // ---------------------------------------------------------------------
   // font handling
@@ -268,8 +261,12 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   private int incrementalPasteOffsetX;
   private int incrementalPasteOffsetY;
   private int numberOfPaste = 0;
-  private FtsGraphicObject anOldPastedObject = null;
+  private GraphicObject anOldPastedObject = null;
+  private int startPasteX = -1;
+  private int startPasteY = -1;
   private int lastCopyCount;
+  private MaxVector pastedObjects     = new MaxVector();
+  private MaxVector pastedConnections = new MaxVector();
 
   int getPasteNumber(){
     return ++numberOfPaste;
@@ -278,12 +275,32 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   {
     numberOfPaste = n;
   }  
-  void setOldPastedObject(FtsGraphicObject obj){
+  void setOldPastedObject(GraphicObject obj){
     anOldPastedObject = obj;
   }
-  FtsGraphicObject getOldPastedObject(){
+  void setStartPasteXY(int x, int y){
+    startPasteX = x;
+    startPasteY = y;
+  }
+  GraphicObject getOldPastedObject(){
     return anOldPastedObject;
   }
+  int getStartPasteX(){
+    return startPasteX;
+  }
+  int getStartPasteY(){
+    return startPasteY;
+  }
+  public void addPastedObject(GraphicObject obj)
+  {
+    pastedObjects.addElement( obj);
+  }
+
+  public void addPastedConnection(GraphicConnection c)
+  {
+    pastedConnections.addElement( c);
+  }
+
   void setIncrementalPasteOffsets(int offsetX, int offsetY){
     incrementalPasteOffsetX = offsetX;
     incrementalPasteOffsetY = offsetY;
@@ -294,6 +311,14 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   int getPasteOffsetY(){
     return incrementalPasteOffsetY;
   }
+  int getPasteDX()
+  {
+    return numberOfPaste*incrementalPasteOffsetX;
+  }
+  int getPasteDY()
+  {
+    return numberOfPaste*incrementalPasteOffsetY;
+  }
   void setLastCopyCount(int count){
     lastCopyCount = count;
   }
@@ -301,51 +326,26 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     return lastCopyCount;
   }
 
-  // --------------------------------------------------------------
-  // init
-  // --------------------------------------------------------------
+  public void startPaste(){}
 
-  /*void InitFromFtsContainer(FtsPatcherObject theContainerObject)
-    {    
-    FtsPatcherObject aFtsPatcherData = theContainerObject;
-    Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
-    int osize = aFtsPatcherData.getObjects().size();
-    boolean doLayers = false;
+  public void endPaste()
+  {
+    ErmesSelection.patcherSelection.deselectAll();
+    for(Enumeration e = pastedObjects.elements(); e.hasMoreElements();)
+      ErmesSelection.patcherSelection.select( (GraphicObject)e.nextElement());
+    for(Enumeration e = pastedConnections.elements(); e.hasMoreElements();)
+      ErmesSelection.patcherSelection.select( (GraphicConnection)e.nextElement());
     
-    for ( int i = 0; i < osize; i++)
-    {
-    GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsGraphicObject)objects[i]);
-    
-    displayList.add( object);
-    
-    if (object.getLayer() < 0)
-    doLayers = true;
-    }
-    
-    MaxVector connectionVector = aFtsPatcherData.getConnections();
-    Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
-    int csize = aFtsPatcherData.getConnections().size();
-    
-    for ( int i = 0; i < csize; i++)
-    {
-    GraphicConnection connection;
-    FtsConnection fc = (FtsConnection)connections[i];
-    
-    connection = new GraphicConnection(this, 
-    displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
-    displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
-    fc.getType(), fc);
-    displayList.add(connection);
-    connection.updateDimensions();
-    }
-    
-    if (doLayers)
-    displayList.reassignLayers();
+    setOldPastedObject(  ErmesSelection.patcherSelection.getSingleton());    
+    if(( startPasteX == -1)||( startPasteY == -1))
+      setStartPasteXY( anOldPastedObject.getX(), anOldPastedObject.getY());
 
-    displayList.sortDisplayList();
+    pastedObjects.removeAllElements();
+    pastedConnections.removeAllElements();
     
-    //aFtsPatcherData.getDocument().setSaved(true);
-    }*/
+    fixSize();
+    repaint();
+  }
 
   //--------------------------------------------------------
   //	CONSTRUCTOR
@@ -358,10 +358,9 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     itsEditorContainer = container;
 
     itsPatcher      = thePatcher;
-    //itsDocument     = itsPatcher.getDocument();
 
     // Initialize state
-    itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
+    //itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
 
     // Get the defaultFontName and Size
     defaultFontName = JMaxApplication.getProperty("jmaxDefaultFont");
@@ -405,8 +404,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
     itsEditField = new EditField( this);
     add( itsEditField);
-
-    //InitFromFtsContainer( itsPatcher);
 
     fixSize();
 
@@ -501,10 +498,13 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   String getTitle(){
     String name;
-    /* WARNING:!!!!!!!!!!!!!!!!!!!!!!!!*/
-    /*if (itsDocument.isRootData(itsPatcher))
-      name = itsDocument.getName();
-      else*/ if(itsPatcher instanceof FtsTemplateObject)
+
+    if (itsPatcher.isARootPatcher())
+      {
+	name = itsPatcher.getName();
+	if(name == null) name = "untitled";
+      }
+      else if(itsPatcher instanceof FtsTemplateObject)
 	  name = "template " + itsPatcher.getDescription();
       else if (itsPatcher instanceof FtsPatcherObject)
 	  name = "patcher " + itsPatcher.getDescription();
@@ -591,8 +591,11 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public void addNewObject(GraphicObject object, boolean doEdit)
   {
-    displayList.add( object);	
-    displayList.reassignLayers();
+    
+    displayList.add( object);
+	
+    if(object.getLayer() == -1)
+      displayList.reassignLayers();
 
     object.redraw();
 	
@@ -610,7 +613,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       }
   }
 
-  public void addNewConnection(FtsConnection fc)
+  public GraphicConnection addNewConnection(FtsConnection fc)
   {
       GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),
 							   fc.getFromOutlet(), 
@@ -621,6 +624,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       connection.updateDimensions();
       ErmesSelection.patcherSelection.select( connection);
       connection.redraw();
+
+      return connection;
   }
 
     /***************************************************************/
@@ -788,7 +793,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     itsPatcher = null;
     itsEditField = null;
     anOldPastedObject = null;
-    //itsDocument = null;
 
     UpdateGroupNotifier.remove( this);
   }
@@ -800,26 +804,33 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public void Close(boolean doCancel)
   {
-      /*if (itsDocument.isRootData(itsPatcher))
-	{
-	if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
-	{
-	itsPatcher.stopUpdates();		      
-	itsPatcher.requestDestroyEditor();
-	if(itsPatcher.isARootPatcher()) FtsPatcherObject.fireAtomicAction(true); 
-	itsPatcher.delete();
-	((ErmesSketchWindow)itsEditorContainer).Destroy();
-	}
-	}
-	else
-	{
+    if ( itsPatcher.isARootPatcher())
+      {
+	if( PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
+	  {
+	    itsPatcher.stopUpdates();		      
+	    itsPatcher.requestDestroyEditor();
+	    //FtsPatcherObject.fireAtomicAction(true); 
+	    try
+	      {
+		itsPatcher.delete();
+	      }
+	    catch(IOException e){
+	      System.err.println("[ErmesSketchPad]: IO error deleting patcher");
+	    }
+
+	    ((ErmesSketchWindow)itsEditorContainer).Destroy();
+	  }
+      }
+    else
+      {
 	itsPatcher.stopUpdates();	
 	itsPatcher.requestDestroyEditor();
 	itsPatcher.resetPatcherListener();
 	((ErmesSketchWindow)itsEditorContainer).Destroy();
-	}*/
+      }
 
-      KeyEventsManager.removeProducer(this);
+    KeyEventsManager.removeProducer(this);
   }
 
   
@@ -1039,7 +1050,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     showMessage(message);
 
     stopTextEditing();
-    setCursor( JMaxClassMap.getCursor( description));     
 
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }

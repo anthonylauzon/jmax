@@ -51,10 +51,10 @@ public class MaxFileChooser
 
   private static boolean configured = false;
 
-  public static final int SAVE_JMAX_TYPE = 0;
-  public static final int SAVE_PAT_TYPE = 1;
+  public static final int JMAX_FILE_TYPE = 1;
+  public static final int PAT_FILE_TYPE = 0;
 
-  private static int saveType = SAVE_JMAX_TYPE;
+  private static int saveType = JMAX_FILE_TYPE;
 
   static void makeFileChooser()
   {
@@ -79,9 +79,9 @@ public class MaxFileChooser
 	name = "untitled.jmax";
     String suffix = "";
 
-    if (saveType == SAVE_JMAX_TYPE)
+    if (saveType == JMAX_FILE_TYPE)
       suffix = ".jmax";
-    else if (saveType == SAVE_PAT_TYPE)
+    else if (saveType == PAT_FILE_TYPE)
       suffix = ".pat";
 
     if ( name.endsWith( ".jmax") || name.endsWith( ".pat"))
@@ -103,7 +103,7 @@ public class MaxFileChooser
     if (!configured)
       configure();
 
-    if (getSaveType() == MaxFileChooser.SAVE_JMAX_TYPE)
+    if (getSaveType() == MaxFileChooser.JMAX_FILE_TYPE)
       formatComboBox.setSelectedIndex( 0);
     else
       formatComboBox.setSelectedIndex( 1);
@@ -191,9 +191,9 @@ public class MaxFileChooser
 	public void actionPerformed( ActionEvent e)
 	{
 	  if ( ((JComboBox)e.getSource()).getSelectedIndex() == 0)
-	    setSaveType( SAVE_JMAX_TYPE);
+	    setSaveType( JMAX_FILE_TYPE);
 	  else
-	    setSaveType( SAVE_PAT_TYPE);
+	    setSaveType( PAT_FILE_TYPE);
 	}
       } );
   }

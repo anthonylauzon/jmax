@@ -34,31 +34,25 @@ import ircam.fts.client.*;
 
 public class FtsForkObject extends FtsGraphicObject
 {
-    public FtsForkObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
-    {
-	super(server, parent, id, args, offset, length);
-	setNumberOfInlets(1);
-	setNumberOfOutlets(2);
-    }
+  public FtsForkObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
+  {
+    super(server, parent, id, className, args, offset, length);
+    setNumberOfInlets(1);
+    setNumberOfOutlets(2);
+  }
 
-    public void setDefaults()
-    {
-	setWidth(Fork.DEFAULT_WIDTH);
-	setHeight(Fork.CONST_HEIGHT);
-    }
+  public void requestSetOutlets(int nOuts)
+  {
+    args.clear();
+    args.addInt(nOuts);
     
-    public void requestSetOutlets(int nOuts)
-    {
-	args.clear();
-	args.addInt(nOuts);
-	
-	try{
-	    send( FtsSymbol.get("set_outlets"), args);
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsForkObject: I/O Error sending set_outlets Message!");
-		e.printStackTrace(); 
-	    }  
+    try{
+      send( FtsSymbol.get("set_outlets"), args);
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsForkObject: I/O Error sending set_outlets Message!");
+	e.printStackTrace(); 
+      }  
+  }
 }

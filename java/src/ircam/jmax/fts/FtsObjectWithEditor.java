@@ -53,14 +53,14 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
       });  
   }
   
-  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, args, offset, length);
+    super(server, parent, id, className, args, offset, length);
   }
 
-  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String description)
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id, String className, String description)
   {
-    super(server, parent, id, description);
+    super(server, parent, id, className, description);
   }
 
   public  FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException

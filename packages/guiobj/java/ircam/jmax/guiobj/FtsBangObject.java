@@ -43,10 +43,16 @@ public class FtsBangObject extends FtsIntValueObject
 {
     static
     {
+      FtsObject.registerMessageHandler( FtsBangObject.class, FtsSymbol.get("setColor"), new FtsMessageHandler(){
+	  public void invoke(FtsObject obj, FtsArgs args)
+	  {
+	    ((FtsBangObject)obj).setCurrentColor( args.getInt(0));
+	  }
+	});
       FtsObject.registerMessageHandler( FtsBangObject.class, FtsSymbol.get("setFlash"), new FtsMessageHandler(){
 	  public void invoke(FtsObject obj, FtsArgs args)
 	  {
-	    ((FtsBangObject)obj).setFlash(args.getInt(0));
+	    ((FtsBangObject)obj).setCurrentFlashDuration( args.getInt(0));
 	  }
 	});
     }
@@ -61,33 +67,54 @@ public class FtsBangObject extends FtsIntValueObject
   protected FtsArgs args = new FtsArgs();
 
   /* for the message box */
-  public FtsBangObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length) 
+  public FtsBangObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length) 
   {
-      super( server, parent, id, args, offset, length);
+      super( server, parent, id, className, args, offset, length);
 
       setNumberOfInlets(1);
       setNumberOfOutlets(1);
   }
 
-  public void setDefaults()
-  {
-    setWidth(Bang.DEFAULT_WIDTH);
-    setHeight(Bang.DEFAULT_WIDTH);
-  }
-
   public void setFlashDuration(int fd)
   {
     flashDuration = fd;
+    
     args.clear();
     args.addInt(fd);
+    
     try{
-      send( FtsSymbol.get("setFlashDuration"), args);
+      send( FtsSymbol.get( "flash"), args);
     }
     catch(IOException e)
       {
 	System.err.println("FtsBangObject: I/O Error sending setFlashDuration Message!");
 	e.printStackTrace(); 
       }
+  }
+
+  public final void setColor(int color)
+  {
+    args.clear();
+    args.addInt(color);
+	  
+    try{
+      send( FtsSymbol.get( "color"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsBangObject: I/O Error sending setColor Message!");
+	e.printStackTrace(); 
+      }  
+  }
+
+  public void setCurrentFlashDuration(int fd)
+  {
+    flashDuration = fd;
+  }
+
+  public void setCurrentColor(int colorIndex)
+  {
+    (( Bang)getObjectListener()).setCurrentColor( colorIndex);
   }
 
   public int getFlashDuration()

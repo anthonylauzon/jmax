@@ -204,9 +204,9 @@ fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
       fts_symbol_t variable = fts_object_get_variable(obj);
 
       if(variable)
-	post("error in %s (%s): %s\n", fts_symbol_name(class), fts_symbol_name(variable), buf);
+	post("error in %s (%s): %s\n", class, variable, buf);
       else
-	post("error in %s: %s\n", fts_symbol_name(class), buf);	
+	post("error in %s: %s\n", class, buf);	
     }
 }
 

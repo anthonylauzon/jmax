@@ -55,7 +55,10 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     currentText = new StringBuffer();
 
     this.filter = filter;
+  }
 
+  public void setDefaults()
+  {
     int minWidth = getMinWidth();
     if (getWidth() < minWidth)
       super.setWidth( minWidth);

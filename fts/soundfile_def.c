@@ -59,7 +59,7 @@ struct fts_soundfile
 fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(file_name);
+  const char *path = file_name;
 
   /* find file in all possible locations */
   fts_file_get_read_path(path, full_path);
@@ -72,7 +72,7 @@ fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbo
 	}
       else /* float is only supported raw format for now */
 	{
-	  post("unsupported raw soundfile format: %s\n", fts_symbol_name(format));
+	  post("unsupported raw soundfile format: %s\n", format);
 	  return 0;
 	}
     }
@@ -93,7 +93,7 @@ fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbo
 	  if(n_skip < onset)
 	    {
 	      /* *** close file */
-	      post("can't open soundfile %s with onset of %d samples\n", fts_symbol_name(file_name), onset);
+	      post("can't open soundfile %s with onset of %d samples\n", file_name, onset);
 	      return 0;
 	    }
 	}
@@ -108,7 +108,7 @@ fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbo
 fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, double sr)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(file_name);
+  const char *path = file_name;
 
   /* get full path of file location */
   fts_file_get_write_path(path, full_path);
@@ -119,7 +119,7 @@ fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symb
     }
   else /* no format specified (use file extension or default format) */
     {
-      char *extension = strrchr(fts_symbol_name(file_name), '.');
+      char *extension = strrchr(file_name, '.');
     }
   
   /* *** init common parameters (rate, channels, ...?) */

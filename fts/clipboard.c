@@ -68,7 +68,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (ac == 1)
     name = "clipboard";
   else
-    name = fts_symbol_name(fts_get_symbol(at));
+    name = fts_get_symbol(at);
 
   tmp = getenv ("JMAX_TMP");
 
@@ -100,7 +100,6 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 
-
 static void
 clipboard_copy_selection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -127,8 +126,8 @@ clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init,  clipboard_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete,  clipboard_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("paste"),  clipboard_paste_in);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("copy"),  clipboard_copy_selection);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_paste,  clipboard_paste_in);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_copy,   clipboard_copy_selection);
 
   return fts_Success;
 }
@@ -144,4 +143,5 @@ void fts_clipboard_config(void)
 {
   fts_class_install(fts_new_symbol("__clipboard"), clipboard_instantiate);
 }
+
 

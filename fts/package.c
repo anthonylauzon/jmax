@@ -89,7 +89,7 @@ fts_init_package_paths(void)
   if (fts_package_paths == NULL) {
     s = fts_get_root_directory();
     if (s) {
-      snprintf(path, MAXPATHLEN, "%s%c%s", fts_symbol_name(s), fts_file_separator, "packages");
+      snprintf(path, MAXPATHLEN, "%s%c%s", s, fts_file_separator, "packages");
       fts_set_symbol(&a, fts_new_symbol_copy(path));
       fts_package_paths = fts_list_append(fts_package_paths, &a);
     }
@@ -168,20 +168,20 @@ fts_package_load(fts_symbol_t name)
   }
 
   /* locate the directory of the package */
-  if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
+  if (!fts_find_file(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
       || !fts_is_directory(path)) {
-    fts_log("[package]: Couldn't find package %s\n", fts_symbol_name(name));
+    fts_log("[package]: Couldn't find package %s\n", name);
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto graceful_exit;
   }
   
   /* load the definition file */
-  sprintf(filename, "%s%c%s.jmax", path, fts_file_separator, fts_symbol_name(name));
+  sprintf(filename, "%s%c%s.jmax", path, fts_file_separator, name);
 
   if (fts_file_exists(filename)) {
     pkg = fts_package_load_from_file(name, filename);
-    fts_log("[package]: Loaded %s package definition\n", fts_symbol_name(name));
+    fts_log("[package]: Loaded %s package definition\n", name);
   } else {
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
@@ -283,20 +283,20 @@ static void fts_package_load_default_files(fts_package_t* pkg)
 
   /* load the shared library */
   sprintf(filename, "%s%c%s%c%s%s%s", 
-	  fts_symbol_name(pkg->dir), fts_file_separator, 
+	  pkg->dir, fts_file_separator, 
 	  "c", fts_file_separator, 
-	  fts_lib_prefix, fts_symbol_name(pkg->name), fts_lib_postfix);
+	  fts_lib_prefix, pkg->name, fts_lib_postfix);
 
   if (fts_file_exists(filename)) {
-    snprintf(function, 256, "%s_config", fts_symbol_name(pkg->name));
+    snprintf(function, 256, "%s_config", pkg->name);
     ret = fts_load_library(filename, function);
     if (ret != fts_Success) {
-      fts_log("[package]: Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
+      fts_log("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
     } else {
-      fts_log("[package]: Loaded %s library\n", fts_symbol_name(pkg->name));
+      fts_log("[package]: Loaded %s library\n", pkg->name);
     }
   } else {
-    fts_log("[package]: Didn't found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
+    fts_log("[package]: Didn't found no library for %s (tried %s)\n", pkg->name, filename);
   }
 
   fts_package_pop(pkg);
@@ -388,7 +388,7 @@ fts_package_get_declared_template(fts_package_t* pkg, fts_symbol_t name)
       
       if (fts_template_get_filename(template) == NULL) 
 	{
-	  fts_make_absolute_path(fts_symbol_name(pkg->dir), fts_symbol_name(fts_template_get_original_filename(template)), buf, MAXPATHLEN);
+	  fts_make_absolute_path(pkg->dir, fts_template_get_original_filename(template), buf, MAXPATHLEN);
 	  fts_template_set_filename(template, fts_new_symbol_copy(buf));
 	}
       
@@ -415,9 +415,9 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
       fts_atom_t n, p;
       const char* root;
       
-      root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+      root = (pkg->dir != NULL)? pkg->dir : NULL;
       
-      snprintf(filename, MAXPATHLEN, "%s.jmax", fts_symbol_name(name));
+      snprintf(filename, MAXPATHLEN, "%s.jmax", name);
 
       if (!fts_find_file(root, pkg->template_paths, filename, path, MAXPATHLEN))
 	return NULL;
@@ -540,8 +540,8 @@ fts_package_get_declared_abstraction(fts_package_t* pkg, fts_symbol_t name)
     abstraction = (fts_abstraction_t *) fts_get_pointer(&a);
 
     if (fts_abstraction_get_filename(abstraction) == NULL) {
-      fts_make_absolute_path(fts_symbol_name(pkg->dir), 
-			     fts_symbol_name(fts_abstraction_get_original_filename(abstraction)), 
+      fts_make_absolute_path(pkg->dir, 
+			     fts_abstraction_get_original_filename(abstraction), 
 			     buf, MAXPATHLEN);
       fts_abstraction_set_filename(abstraction, fts_new_symbol_copy(buf));
     }
@@ -569,9 +569,9 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
     fts_atom_t n, p;
     const char* root;
 
-    root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+    root = (pkg->dir != NULL)? pkg->dir : NULL;
 
-    snprintf(filename, MAXPATHLEN, "%s.abs", fts_symbol_name(name));
+    snprintf(filename, MAXPATHLEN, "%s.abs", name);
     if (!fts_find_file(root, pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
       return NULL;
     }
@@ -677,9 +677,9 @@ fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path)
 int 
 fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len)
 {
-  const char* root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+  const char* root = (pkg->dir != NULL)? pkg->dir : NULL;
 
-  return fts_find_file(root, pkg->data_paths, fts_symbol_name(filename), buf, len);
+  return fts_find_file(root, pkg->data_paths, filename, buf, len);
 }
 
 /********************************************************************
@@ -779,7 +779,7 @@ fts_package_print_list_aux( fts_list_t *list)
   if (!list)
     return;
 
-  post( " %s", fts_symbol_name( fts_get_symbol( fts_list_get( list))));
+  post( " %s", fts_get_symbol( fts_list_get( list)));
 
   fts_package_print_list_aux( fts_list_next( list));
 }
@@ -787,7 +787,7 @@ fts_package_print_list_aux( fts_list_t *list)
 static void 
 fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
 {
-  post( "  %s", fts_symbol_name( selector));
+  post( "  %s", selector);
 
   fts_package_print_list_aux( list);
 
@@ -797,7 +797,7 @@ fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
 static void 
 fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
 {
-  const char *msg = fts_symbol_name( selector);
+  const char *msg = selector;
   fts_iterator_t keys, values;
 
   fts_hashtable_get_keys( ht, &keys);
@@ -813,7 +813,7 @@ fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*
       if (fun != NULL)
 	(*fun)(a+1);
 
-      post( "  %s %s %s\n", msg, fts_symbol_name( fts_get_symbol( a)), fts_symbol_name( fts_get_symbol( a+1)));
+      post( "  %s %s %s\n", msg, fts_get_symbol( a), fts_get_symbol( a+1));
     }
 }
 
@@ -916,7 +916,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     return;
   }
 
-  filename = fts_symbol_name( fts_get_symbol( at));
+  filename = fts_get_symbol( at);
 
   if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
     {
@@ -959,7 +959,7 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   fts_package_t *this = (fts_package_t *)o;
 
-  post( "package %s:\n", fts_symbol_name( fts_package_get_name( this)));
+  post( "package %s:\n", fts_package_get_name( this));
 
   if ( this->packages) {
     fts_package_print_list( this->packages, fts_s_require);
@@ -1158,7 +1158,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_status_t status;
 
   /* Load the .jmax file */
-  obj = fts_binary_file_load( fts_symbol_name( fts_get_symbol( at)), (fts_object_t *)fts_get_root_patcher(), 0, a, 0);
+  obj = fts_binary_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a, 0);
 
   if (!obj)
     {

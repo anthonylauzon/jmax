@@ -137,16 +137,10 @@ public class ObjectSetViewer extends JPanel {
   public static ImageIcon getObjectIcon(FtsGraphicObject obj)
   {
       ImageIcon icon;
-      String className = obj.getDescription();
+      String className = obj.getClassName();
 
       if (obj instanceof FtsTemplateObject)
 	  icon = objectIcon;
-      /*else if (obj instanceof FtsPatcherObject)
-	icon = patcherIcon;
-	else if (obj instanceof FtsInletObject)
-	icon = inletIcon;
-	else if (obj instanceof FtsOutletObject)
-	icon = outletIcon;*/
       else 
 	{
 	  icon = JMaxClassMap.getIcon( className);

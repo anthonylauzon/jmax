@@ -65,7 +65,7 @@ public class Display extends GraphicObject implements FtsMessageListener
     else
       underWidth = underWidthMax;
 
-    setFont(getFont());
+    setCurrentFont( getFont());
   }
 
   // ---------------------------------------- 
@@ -130,6 +130,29 @@ public class Display extends GraphicObject implements FtsMessageListener
     
     super.setWidth(w);
     super.setHeight(h);
+
+    underWidthMax = getFontMetrics().stringWidth("xx");
+
+    if(w < underWidthMax)
+      underWidth = w;
+    else
+      underWidth = underWidthMax;
+
+    redraw();
+  }
+
+  public void setCurrentFont( Font theFont)
+  {
+    super.setCurrentFont( theFont);
+
+    int w = getFontMetrics().stringWidth(display) + 4;
+    int h = getFontMetrics().getHeight() + 4;
+
+    if(w < minWidth)
+      w = minWidth;
+    
+    getFtsObject().setCurrentWidth(w);
+    getFtsObject().setCurrentHeight(h);
 
     underWidthMax = getFontMetrics().stringWidth("xx");
 

@@ -722,7 +722,7 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 {
   if ((default_audioport == 0) && (default_audioport_class != 0)) {
     fts_atom_t a[1];
-    fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", fts_symbol_name(default_audioport_class));
+    fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", default_audioport_class);
     fts_set_symbol(a, default_audioport_class);
     fts_audioport_set_default(1, a);
   }

@@ -197,7 +197,7 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 #ifdef TRACE_DEBUG
   fts_log( "Remove User ");
   fprintf_object(stderr, object);
-  fts_log( " for variable %s\n", fts_symbol_name(var->name));
+  fts_log( " for variable %s\n", var->name);
 #endif
 
   /* remove the user from the binding (ignore the case where the binding is not there any more) */
@@ -482,7 +482,7 @@ static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 static int
 fts_variable_is_global(fts_symbol_t name)
 {
-  char c = fts_symbol_name(name)[0];
+  char c = name[0];
 
   /* variables with name starting with a capital letter are GLOBAL */
   return (c >= 'A' && c <= 'Z');

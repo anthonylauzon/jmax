@@ -32,6 +32,10 @@
 
 #include <fts/fts.h>
 
+fts_symbol_t sym_setOrientation = 0;
+fts_symbol_t sym_setMaxValue = 0;
+fts_symbol_t sym_setMinValue = 0;
+
 /*------------------------- slider class -------------------------------------*/
 
 typedef struct {
@@ -43,10 +47,22 @@ typedef struct {
 static void
 slider_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
-  fts_object_property_changed(o, fts_s_orientation);
-  fts_object_property_changed(o, fts_s_min_value);
-  fts_object_property_changed(o, fts_s_max_value);
+  fts_atom_t a[1];
+
+  fts_object_get_prop(o, fts_s_orientation, a);
+  
+  if( fts_get_int(a))
+    fts_client_send_message(o, sym_setOrientation, 1, a);
+
+  fts_object_get_prop(o, fts_s_min_value, a);
+  
+  if( fts_get_int(a))
+    fts_client_send_message(o, sym_setMinValue, 1, a);
+
+  fts_object_get_prop(o, fts_s_max_value, a);
+
+  if( fts_get_int(a))
+    fts_client_send_message(o, sym_setMaxValue, 1, a);
 }
 
 static void
@@ -67,6 +83,8 @@ static void slider_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac
       this->n = n;
       fts_object_ui_property_changed( (fts_object_t *)this, fts_s_value);
     }
+
+  fts_outlet_int( o, 0, n);
 }
 
 static void
@@ -236,5 +254,8 @@ void
 slider_config(void)
 {
   fts_class_install(fts_new_symbol("slider"),slider_instantiate);
+  sym_setOrientation = fts_new_symbol("setOrientation");
+  sym_setMaxValue = fts_new_symbol("setMaxValue");
+  sym_setMinValue = fts_new_symbol("setMinValue");
 }
 

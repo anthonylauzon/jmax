@@ -52,19 +52,20 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
   public Toggle(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
+  }
 
-    int width = getWidth();
-    if (width == -1)
-      setWidth( DEFAULT_WIDTH);
-    else if (width <= MINIMUM_WIDTH)
-      setWidth( MINIMUM_WIDTH);
+  public void setDefaults()
+  {
+    setWidth( getWidth());
   }
 
   // redefined from base class
 
   public void setWidth( int theWidth)
   {
-    if (theWidth < MINIMUM_WIDTH)
+    if ( theWidth <= 0)
+      setWidth( DEFAULT_WIDTH);
+    else if ( theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
 
     super.setWidth( theWidth);
@@ -77,10 +78,10 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
   {
   }
 
-    public boolean isSquare()
-    {
-	return true;
-    }
+  public boolean isSquare()
+  {
+    return true;
+  }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {

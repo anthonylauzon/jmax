@@ -866,7 +866,7 @@ fts_midifile_t *
 fts_midifile_open_read(fts_symbol_t name)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(name);
+  const char *path = name;
   FILE *fp;
 
   if (!fts_file_get_read_path(path, full_path))
@@ -890,7 +890,7 @@ fts_midifile_t *
 fts_midifile_open_write(fts_symbol_t name)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(name);
+  const char *path = name;
   FILE *fp;
 
   /* get full path of file location */

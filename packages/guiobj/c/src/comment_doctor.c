@@ -107,10 +107,10 @@ static fts_symbol_t get_comment_symbol(int argc, const fts_atom_t *argv)
 	}
       else if (fts_is_symbol(&argv[i]))
 	{
-	  if (strlen(buf) + strlen(fts_symbol_name(fts_get_symbol(&argv[i]))) > MAX_LENGTH - 1)
+	  if (strlen(buf) + strlen(fts_get_symbol(&argv[i])) > MAX_LENGTH - 1)
 	    break;
 
-	  sprintf(buf + strlen(buf), "%s%s", fts_symbol_name(fts_get_symbol(&argv[i])), pad);
+	  sprintf(buf + strlen(buf), "%s%s", fts_get_symbol(&argv[i]), pad);
 	}
     }
 

@@ -1,4 +1,4 @@
-SUBDIRS=c java help images
+SUBDIRS=c java help 
 
 packagedir=$(pkgdatadir)/packages/data
 package_DATA=data.jmax data.jpk 

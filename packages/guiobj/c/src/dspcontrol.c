@@ -154,8 +154,6 @@ static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, in
   ac--;
   at++;
 
-  fts_log("[dsp_control]: init 1\n");
-
   if (ac > 0 && fts_is_number(at))
     this->poll_interval = fts_get_number_int(at + 0);
   else
@@ -167,13 +165,9 @@ static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, in
   this->prev_overflow_fpe = 0;
   this->prev_denormalized_fpe = 0;
 
-  fts_log("[dsp_control]: init 2\n");
-
   fts_timebase_add_call(fts_get_timebase(), o, fts_dsp_control_poll, 0, 0.0);
 
   fts_param_add_listener(fts_s_dsp_on, this, fts_dsp_control_dsp_on_listener);
-
-  fts_log("[dsp_control]: init 3\n");
 }
 
 static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -208,8 +202,6 @@ static void fts_dsp_control_fpe_clear_collect( fts_object_t *d, int winlet, fts_
 
 static void fts_dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_log("[dsp_control]: remote_dsp_on \n");
-
   if ((ac == 1) && fts_is_int(at))
     {
       fts_dsp_control_t *this = (fts_dsp_control_t *)o;

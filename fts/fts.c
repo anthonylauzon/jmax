@@ -142,7 +142,7 @@ void fts_load_project( void)
     project = fts_package_new(project_symbol);
     fts_project_set(project);
   } else {
-    project = fts_project_open(fts_symbol_name( project_file));
+    project = fts_project_open(project_file);
   }
 }
 

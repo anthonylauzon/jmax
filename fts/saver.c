@@ -186,10 +186,10 @@ fts_bmax_file_sync( fts_bmax_file_t *f)
   for ( i = 0; i < f->header.n_symbols; i++)
     {
 #ifdef SAVER_DEBUG
-      fts_log( "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
+      fts_log( "\t- %s\n", f->symbol_table[i]);
 #endif
-      fwrite(fts_symbol_name(f->symbol_table[i]), sizeof(char),
-	     strlen(fts_symbol_name(f->symbol_table[i]))+1, f->file);
+      fwrite(f->symbol_table[i], sizeof(char),
+	     strlen(f->symbol_table[i])+1, f->file);
     }
 
 
@@ -467,7 +467,7 @@ fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 #ifdef SAVER_DEBUG
   fts_log( "\tPUSH_SYM %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
-	  fts_symbol_name(sym));
+	  sym);
 #endif
   value = fts_bmax_add_symbol(f, sym);
 
@@ -508,7 +508,7 @@ fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 #ifdef SAVER_DEBUG
   fts_log( "\tSET_SYM %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
-	  fts_symbol_name(sym));
+	  sym);
 #endif
   value = fts_bmax_add_symbol(f, sym);
 
@@ -596,7 +596,7 @@ fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
 #ifdef SAVER_DEBUG
   fts_log( "\tPUT_PROP %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
-	  fts_symbol_name(sym));
+	  sym);
 #endif
 
   value = fts_bmax_add_symbol(f, sym);
@@ -612,7 +612,7 @@ void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int
   fts_log( "\tOBJ_MESS %d %d (%s) %d\n",
 	  inlet,
 	  fts_bmax_add_symbol(f, sel),
-	  fts_symbol_name(sel),
+	  sel,
 	  nargs);
 #endif
 
@@ -971,7 +971,7 @@ fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t f;
 
-  if ( fts_bmax_file_open( &f, fts_symbol_name(file), 1, 0, 0) < 0)
+  if ( fts_bmax_file_open( &f, file, 1, 0, 0) < 0)
     return; /* !!! */
 
   fts_bmax_code_new_patcher( &f, patcher, -1, 1);

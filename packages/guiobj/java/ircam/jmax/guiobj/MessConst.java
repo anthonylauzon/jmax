@@ -45,7 +45,6 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   {
     super(theFtsObject);
     cornerSizeMax = minWidth;
-    setWidth(getWidth());
   }
     
   // ----------------------------------------
@@ -53,7 +52,6 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   // ----------------------------------------
   public String getArgs()
   {
-    // get the correct String from the object
     return ftsObject.getDescription();
   }
     
@@ -74,8 +72,11 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   
   public void setWidth(int w) 
   {
-    if(w < minWidth)
-      w = minWidth;
+    if( w <= 0)
+      w = getDefaultWidth();
+    else
+      if(w < minWidth)
+	w = minWidth;
     
     super.setWidth(w);
     

@@ -1150,7 +1150,7 @@ fts_midiport_t *fts_midiport_get_default(void)
 {
   if ((default_midiport == 0) && (default_midiport_class != 0)) {
     fts_atom_t a[1];
-    fts_log("[midiport]: No default midiport was installed, instanciating the default class %s\n", fts_symbol_name(default_midiport_class));
+    fts_log("[midiport]: No default midiport was installed, instanciating the default class %s\n", default_midiport_class);
     fts_set_symbol(a, default_midiport_class);
     fts_midiport_set_default(1, a);
   }

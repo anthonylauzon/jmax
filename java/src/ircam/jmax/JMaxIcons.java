@@ -36,13 +36,13 @@ public class JMaxIcons {
   public static final ImageIcon moreObjects = loadIcon( "more_objects.gif");
 
   // These are used from ErrorTablePanel ???
-  public static final ImageIcon patcher = loadIcon( "");
-  public static final ImageIcon errorObject = loadIcon( "");
+  public static final ImageIcon patcher = loadIcon( "tool_patcher.gif");
+  public static final ImageIcon errorObject = loadIcon( "tool_err.gif");
 
   // These are used from ObjectSetViewer ???
-  public static final ImageIcon object = loadIcon( "");
-  public static final ImageIcon inlet = loadIcon( "");
-  public static final ImageIcon outlet = loadIcon( "");
+  public static final ImageIcon object = loadIcon( "tool_ext.gif");
+  public static final ImageIcon inlet = loadIcon( "tool_in.gif");
+  public static final ImageIcon outlet = loadIcon( "tool_out.gif");
 
   private static ImageIcon loadIcon( String iconPath)
   {

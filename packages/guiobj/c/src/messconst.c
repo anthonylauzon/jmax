@@ -108,7 +108,6 @@ messconst_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t 
 static void
 messconst_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
 }
 
 static void
@@ -156,7 +155,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  if(error)
 	    {
 	      fts_object_destroy((fts_object_t *)mess);
-	      fts_object_set_error(o, "%s", fts_symbol_name(error));
+	      fts_object_set_error(o, "%s", error);
 	      return;
 	    }
 	}

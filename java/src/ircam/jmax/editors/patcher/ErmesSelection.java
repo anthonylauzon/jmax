@@ -97,7 +97,7 @@ public class ErmesSelection implements Transferable
   }
 
 
-  public void select(GraphicObject object) 
+  public void select( GraphicObject object) 
   {
     if (object.getSketchPad() != owner)
       setOwner(object.getSketchPad());

@@ -73,7 +73,7 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   /*obj->refcnt = 0;*/
 
 #ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
 #endif
   
   if (cl->noutlets)
@@ -139,7 +139,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   obj->refcnt = 0;
 
 #ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
 #endif
 
   if (cl->noutlets)
@@ -161,7 +161,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
       /* return NULL */
       *ret = 0;
       
-      return fts_new_status(fts_symbol_name(error));
+      return fts_new_status( error);
     }
 
   fts_patcher_add_object(patcher, obj);
@@ -199,7 +199,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
       if(!fts_variable_can_define(patcher, var))
 	{
 	  /* error: redefined variable */
-	  obj = fts_error_object_new(patcher, aoc, aot, "Variable %s doubly defined", fts_symbol_name(var));
+	  obj = fts_error_object_new(patcher, aoc, aot, "Variable %s doubly defined", var);
 	}
       else
 	{
@@ -369,7 +369,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
   if (!obj)
     {
       /* Object not found */
-      obj = fts_error_object_new(patcher, aoc, aot, "Object or template %s not found", fts_symbol_name(fts_get_symbol(at)));
+      obj = fts_error_object_new(patcher, aoc, aot, "Object or template %s not found", fts_get_symbol(at));
     }
 
   /* Check if we are defining a variable *and* we have a state;
@@ -526,7 +526,7 @@ fts_object_free(fts_object_t *obj)
 {
 
 #ifdef TRACE_DEBUG
-  fts_log("[object]: p=0x%p,id=%05d,op=free,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+  fts_log("[object]: p=0x%p,id=%05d,op=free,class=%s\n", obj, debugid++, fts_object_get_class_name(obj));
 #endif
 
   /* free the object properties */

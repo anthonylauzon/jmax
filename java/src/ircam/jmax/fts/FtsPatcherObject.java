@@ -60,6 +60,9 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   final public static int UNKNOWN_MODE = 0;
   final public static int EDIT_MODE = 1;
   final public static int RUN_MODE  = 2;
+
+  final public static int JMAX_FILE_TYPE  = 1;
+  final public static int PAT_FILE_TYPE   = 0;
   
   //int editMode = UNKNOWN_MODE;
   int editMode = EDIT_MODE;
@@ -72,7 +75,20 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   
   private MaxVector connections = new MaxVector();
 
+  /** List of subPatchers */
+
+  private MaxVector subPatchers = new MaxVector();
+
+  /** true if patcher need to be saved */
   private boolean dirty = false;
+
+  /** true if is already saved a first time */
+  private boolean canSave = false;
+
+  private String name = null;
+  private int type = JMAX_FILE_TYPE;
+
+  private boolean pasting = false;
 
   /******************************************************************************/
   /*                                                                            */
@@ -93,12 +109,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       {
 	creator = JMaxClassMap.getCreator( className);
 	if(creator != null)
-	  return (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
+	  return (GraphicObject)creator.create(server, parent, objId, className, args, offset, nArgs);	      
       }
 
     creator = JMaxClassMap.getCreator( "standard");
     if(creator != null)
-      return (GraphicObject)creator.create(server, parent, objId, args, offset, nArgs);	      
+      return (GraphicObject)creator.create(server, parent, objId, className, args, offset, nArgs);	      
 
     return null;
   }
@@ -156,7 +172,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setRedefined"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).firePatcherChanged();
+	  //((FtsPatcherObject)obj).firePatcherChanged();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).endUpload();
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setDescription"), new FtsMessageHandler(){
@@ -189,6 +211,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).setWH( args.getInt( 0));
 	}
       });
+     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setPatcherBounds"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setPatcherBounds( args.getInt( 0), args.getInt( 1), args.getInt( 2), args.getInt( 3));
+	}
+      });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setMessage"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -199,6 +227,24 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsPatcherObject)obj).setDirty( (args.getInt( 0) == 1)? true : false);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setSaved"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setSaved( args.getInt( 0), args.getSymbol( 1).toString());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("startPaste"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).startPaste();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("endPaste"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).endPaste();
 	}
       });
   }
@@ -255,9 +301,9 @@ public class FtsPatcherObject extends FtsObjectWithEditor
    * Create a FtsPatcherObject object
    */
 
-  public FtsPatcherObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
+  public FtsPatcherObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, FtsParse.unparseArguments( args, offset+1, length-1));
+    super(server, parent, id, className, FtsParse.unparseArguments( args, offset+1, length-1));
   }
 
   public FtsPatcherObject() throws IOException
@@ -278,15 +324,90 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     return connections;
   }
 
-  private void setDirty(boolean dirty)
+  private void endUpload()
+  {
+    this.canSave = true;
+    this.dirty = false;
+
+    if( getEditorFrame() != null)
+      {
+	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().sortDisplayList();
+	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.setLocked(true);
+      }
+  }
+
+  private void setDirty( boolean dirty)
   {
     this.dirty = dirty;
-    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.setDirty(dirty);
+    if( getEditorFrame() != null)
+      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.setDirty(dirty);
+  
+    for( Enumeration e = subPatchers.elements(); e.hasMoreElements();)
+      ((FtsPatcherObject) e.nextElement()).setDirty( dirty);
   }
 
   public boolean isDirty()
   {
     return dirty;
+  }
+
+  private void setSaved(int type, String name)
+  {
+    this.canSave = true;
+    this.name = name;
+    this.type = type;
+
+    if(getEditorFrame()!=null)
+      getEditorFrame().setTitle( name);
+
+    if(isDirty())
+      setDirty(false);    
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName( String name)
+  {
+    this.name = name;
+  }
+
+  public int getType()
+  {
+    return type;
+  }
+
+  public void setType( int type)
+  {
+    this.type = type;
+  }
+
+  public boolean canSave()
+  {
+    return canSave;
+  }
+
+  public void save()
+  {
+    save(this.type, this.name);
+  }
+
+  public void save( int type, String name)
+  {
+    args.clear();
+    args.addInt( type);
+    args.addString( name);
+    
+    try{
+      send( FtsSymbol.get("save"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending save Message!");
+	e.printStackTrace(); 
+      }
   }
 
   public final int getWindowX()
@@ -431,7 +552,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   final void addObject(FtsGraphicObject obj)
   {
     objects.addElement(obj);
-    fireObjectAdded(obj);
+
+    if(obj instanceof FtsPatcherObject)
+      {
+	((FtsPatcherObject)obj).setDirty(isDirty());
+	subPatchers.addElement(obj);
+      }
     fireGlobalObjectAdded(obj);
   }
 
@@ -440,16 +566,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   final void addConnection(FtsConnection c)
   {
     connections.addElement(c);
-    fireConnectionAdded(c);
     fireGlobalConnectionAdded(c);
   }
 
   /** Remove an object to this patcher data */
 
-  final void removeObject(FtsGraphicObject obj)
+  public final void removeObject(FtsGraphicObject obj)
   {
     objects.removeElement(obj);
-    fireObjectRemoved(obj);
+
+    if(obj instanceof FtsPatcherObject)
+      subPatchers.removeElement(obj);
+
     fireGlobalObjectRemoved(obj);
   }
 
@@ -527,6 +655,23 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
   }
 
+  public void requestPaste( FtsClipboard clipboard, int dx, int dy)
+  {
+    args.clear();
+    args.addObject( clipboard);
+    args.addInt( dx);
+    args.addInt( dy);
+
+    try{
+      send( FtsSymbol.get("paste"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending paste Message!");
+	e.printStackTrace(); 
+      }
+  }
+
   //
   // Updates Management
   //
@@ -547,6 +692,23 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
   }
 
+  public final void requestSubPatcherUpload()
+  {
+    if(getEditorFrame() == null)
+      {
+	setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+
+	try{
+	  send( FtsSymbol.get("upload"));
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("FtsPatcherObject: I/O Error sending upload Message!");
+	    e.printStackTrace(); 
+	  }
+      }
+    requestOpenEditor();
+  }
 
   /** Tell FTS that this patcher is not "alive".
    * Fts will stop sending updates for this patcher.
@@ -563,9 +725,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	e.printStackTrace(); 
       }
   }
-  
-  /***************************************************************/
-  /*************** ASYNCRONOUS ADDING/REMOVING *******************/
   
   public void requestAddObject(String description, int x, int y, boolean doedit)
   {
@@ -667,18 +826,21 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     int objId = args[0].intValue;
     int x = args[1].intValue;
     int y = args[2].intValue;
-    int numIns = args[3].intValue;
-    int numOuts = args[4].intValue;
-    int error = args[5].intValue;
+    int width = args[3].intValue;
+    int height = args[4].intValue;
+    int numIns = args[5].intValue;
+    int numOuts = args[6].intValue;
+    int layer = args[7].intValue;
+    int error = args[8].intValue;
     int offset;
     String errorDescription = "";
 
     if(error!=0)
       {
-	errorDescription = args[6].stringValue;
-	offset = 7;
+	errorDescription = args[9].stringValue;
+	offset = 10;
       }
-    else offset = 6;
+    else offset = 9;
 
     String className = null;
 
@@ -686,20 +848,25 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       className = args[offset].symbolValue.toString();
 
     GraphicObject newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
+
+    newObj.getFtsObject().setCurrentLayer( layer);
+
+    newObj.setCurrentBounds( x, y, width, height);
     
-    newObj.setX(x);
-    newObj.setY(y);
     newObj.getFtsObject().setNumberOfInlets(numIns);
     newObj.getFtsObject().setNumberOfOutlets(numOuts);
+    
     if(error != 0)
       {
 	newObj.getFtsObject().setError(error);
 	newObj.getFtsObject().setErrorDescription(errorDescription);
       }
 
-    //addObject(newObj);
-    objects.addElement(newObj.getFtsObject());
+    addObject(newObj.getFtsObject());
     newObj.getSketchPad().addNewObject(newObj, false);
+  
+    if( pasting)
+      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedObject( newObj);
   }
 
   public void redefineTemplateObject(int nArgs , FtsAtom args[]) 
@@ -740,14 +907,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 						     (FtsGraphicObject)args[3].objectValue, args[4].intValue, 
 						     args[5].intValue);   
 	addConnection(connection);
-	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addNewConnection(connection);
+	GraphicConnection gc = ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addNewConnection(connection);
+      
+	if( pasting)
+	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedConnection( gc);
       }
   }
-  public void objectRedefined(FtsGraphicObject obj)
-  {
-    ((FtsGraphicObject)obj).setDefaults();
-    fireObjectRedefined(obj);
-  }
+
+  public void objectRedefined(FtsGraphicObject obj){}
 
   /**************************************************************/
   /**************************************************************/
@@ -823,6 +990,15 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     windowHeight = value;      
   }
+  public void setPatcherBounds(int x, int y, int w, int h)
+  {
+    windowX = x;
+    windowY = y;
+    windowWidth = w;
+    windowHeight = h;
+
+    if(getEditorFrame() != null) ((ErmesSketchWindow)getEditorFrame()).setPatcherBounds( this); 
+  }
   public void setMessage(String message)
   {
     firePatcherHaveMessage(message);
@@ -834,55 +1010,37 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     update();
   }
 
+  // Paste
+
+  void startPaste()
+  {
+    pasting = true;
+  }
+
+  void endPaste()
+  {
+    pasting = false;
+    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.endPaste();
+  }
+
   //
   // Edit And Change Listener
   //
 
   private FtsPatcherListener listener;
 
-  /** Set the patcher data listener */
+  // Set the patcher data listener 
 
   public void setPatcherListener(FtsPatcherListener listener)
   {
     this.listener = listener;
   }
 
-  /** Reset the patcher data listener */
-
+  // Reset the patcher data listener 
+  
   public void resetPatcherListener()
   {
     listener = null;
-  }
-
-  private final void fireObjectAdded(FtsGraphicObject object)
-  {
-    if (listener != null)
-      listener.objectAdded(this, object, false);
-  }
-
-  private final void fireObjectRedefined(FtsGraphicObject newObject)
-  {
-    if (listener != null)
-      listener.objectRedefined(this, newObject);
-  }
-
-  private final void fireObjectRemoved(FtsGraphicObject object)
-  {
-    if (listener != null)
-      listener.objectRemoved(this, object);
-
-  }
-
-  private final void fireConnectionAdded(FtsConnection connection)
-  {
-    if (listener != null)
-      listener.connectionAdded(this, connection);
-  }
-
-  private final void fireConnectionRemoved(FtsConnection connection)
-  {
-    if (listener != null)
-      listener.connectionRemoved(this, connection);
   }
 
   final void firePatcherChangedNumberOfInlets(int ins)

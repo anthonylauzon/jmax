@@ -250,7 +250,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     TransitionAction endMessageAction = new TransitionAction() {
 	public void fire( int input)
 	{
-//  	  System.err.println( "endMessageAction (count = " + (argsCount-1) + ") " + target + " " + selector + " " + args);
+	  //  	  System.err.println( "endMessageAction (count = " + (argsCount-1) + ") " + target + " " + selector + " " + args);
 
   	  FtsObject.invokeMessageHandler( target, selector, args);
 	  args.clear();

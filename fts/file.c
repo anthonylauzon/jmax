@@ -229,7 +229,7 @@ fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* b
   }
 
   while (paths) {
-    path = fts_symbol_name(fts_get_symbol(fts_list_get(paths)));
+    path = fts_get_symbol(fts_list_get(paths));
     if (fts_find_file_aux(root, path, filename, buf, len)) {
       return 1;
     }
@@ -321,7 +321,7 @@ fts_file_get_read_path(const char *path, char *full_path)
     {
       const char *begin, *end, *next;
 
-      next = fts_symbol_name(fts_get_search_path());
+      next = fts_get_search_path();
       
       while (next)
 	{
@@ -340,7 +340,7 @@ fts_file_get_read_path(const char *path, char *full_path)
 	  if (fts_path_is_absolute(begin)) /* absolute default path */
 	    buf[0] = '\0';
 	  else if (fts_project_get_dir())
-	    strcpy(buf, fts_symbol_name(fts_project_get_dir()));
+	    strcpy(buf, fts_project_get_dir());
 	  else
 	    begin = 0; /* invalid directory */
 
@@ -368,7 +368,7 @@ fts_file_get_read_path(const char *path, char *full_path)
 	{
 	  char buf[1024];
 
-	  strcpy(buf, fts_symbol_name(fts_project_get_dir()));
+	  strcpy(buf, fts_project_get_dir());
 	  strcat(buf, "/");
 	  strcat(buf, path);
 	  
@@ -395,7 +395,7 @@ void fts_file_get_write_path(const char *path, char *full_path)
 	{
 	  if (fts_project_get_dir())
 	    {
-	      strcpy(full_path, fts_symbol_name(fts_project_get_dir()));
+	      strcpy(full_path, fts_project_get_dir());
 	      strcat(full_path, "/");
 	    }
 	  else

@@ -331,7 +331,7 @@ void fts_platform_init( void )
   fts_symbol_t s_cpu;
 
   if ( (s_cpu = fts_cmd_args_get( fts_new_symbol( "cpu"))) )
-    cpu = atoi( fts_symbol_name( s_cpu));
+    cpu = atoi( s_cpu);
 
   if ( cpu >=0 )
     {

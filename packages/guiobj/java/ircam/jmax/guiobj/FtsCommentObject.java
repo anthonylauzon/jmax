@@ -48,12 +48,20 @@ public class FtsCommentObject extends FtsGraphicObject
   /**
    * Create a FtsObject object;
    */
-    public FtsCommentObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
-    {
-	super(server, parent, id, args, offset, length);
-	setNumberOfInlets(0);
-	setNumberOfOutlets(0);
-    }
+  public FtsCommentObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
+  {
+    super(server, parent, id, className, args, offset, length);
+    setNumberOfInlets(0);
+    setNumberOfOutlets(0);
+  }
+
+  public void setCurrentComment( String comment)
+  {
+    super.setCurrentComment( comment);
+    ((Comment)getObjectListener()).computeRenderer();
+    ((Comment)getObjectListener()).renderer.update();
+    ((Comment)getObjectListener()).redraw();
+  }
 }
 
 

@@ -261,7 +261,7 @@ void fts_patlex_next_token(fts_patlex_t *this)
 			      else if (fts_is_symbol(value))
 				{
 				  status = tt_in_string;
-				  strcpy(this->buf, fts_symbol_name(fts_get_symbol(value)));
+				  strcpy(this->buf, fts_get_symbol(value));
 				  this->buf_fill = strlen(this->buf);
 				}
 			      else
@@ -705,7 +705,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 {
   fts_patlex_t *in; 
 
-  in = fts_patlex_open(fts_symbol_name(filename), 0, 0);
+  in = fts_patlex_open(filename, 0, 0);
 
   if (in != 0)
     {
@@ -729,6 +729,35 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
     return 0;
 }
 
+int fts_is_dotpat_file(fts_symbol_t filename) 
+{
+  fts_patlex_t *in; 
+  int isdotpat = 1;
+
+  in = fts_patlex_open(filename, 0, 0);
+  if (in != 0)
+    {
+      fts_patlex_next_token(in);
+
+      if (! token_sym_equals(in, fts_s_max))
+	{
+	  isdotpat = 0;
+	}
+
+      fts_patlex_next_token(in); 
+
+      if (! token_sym_equals(in, fts_s_v2))
+	{
+	  isdotpat = 0;
+	}
+      
+      fts_patlex_close(in);
+    }
+  else
+    isdotpat = 0;
+  
+  return isdotpat;
+}
   
 /*
  * Method implementing the actual reading and parsing.
@@ -1004,7 +1033,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	  if ( in->ttype != FTS_LEX_SYMBOL)
 	    post( "[%d] Expecting symbol, got %d\n", in->line_number, in->ttype);
 	  else
-	    post("[%d] Format not supported (%s)\n", in->line_number, fts_symbol_name( fts_get_symbol( &in->val)));
+	    post("[%d] Format not supported (%s)\n", in->line_number, fts_get_symbol( &in->val));
 	  
 	  /* skip until the next ';' */
 
@@ -1246,7 +1275,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	{
 	  if (fts_is_symbol(&args[0]))
 	    post("Object %s not yet Supported in .pat files",
-		 fts_symbol_name(fts_get_symbol(&(args[0]))));
+		 fts_get_symbol(&(args[0])));
 	}
     }
   else if (objclass == fts_s_inlet)

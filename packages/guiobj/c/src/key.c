@@ -98,7 +98,7 @@ get_code(const fts_atom_t *a)
 	return 32;
       else
 	{
-	  const char *str = fts_symbol_name(sym);
+	  const char *str = sym;
 	  
 	  if(str[1] == '\0')
 	    {

@@ -58,12 +58,11 @@ public class ToolBar extends JPanel implements ComponentListener{
   JToggleButton noneButton;
   ToolButton selectedButton = null;
   int numButtons = 0;
+  boolean dirty = false;
 
   public ToolBar( ErmesSketchPad theSketchPad)
   {
     sketch = theSketchPad;
-
-    //sketch.getDocument().addListener(this);
 
     setDoubleBuffered( false);
 
@@ -107,8 +106,9 @@ public class ToolBar extends JPanel implements ComponentListener{
 	}
       });
     toSaveButton.setToolTipText("save file");
-    toSaveButton.setEnabled(false);
-    toSaveButton.setVisible(false);
+    this.dirty = sketch.getFtsPatcher().isDirty();
+    toSaveButton.setEnabled(dirty);
+    toSaveButton.setVisible(dirty);
 
     widgets.add( toSaveButton);
     /////////////////////
@@ -214,7 +214,6 @@ public class ToolBar extends JPanel implements ComponentListener{
     AddPopUp.initDone();
   }
 
-  boolean dirty = false;
   public void setDirty(boolean dirty)
   {
     if(this.dirty != dirty)

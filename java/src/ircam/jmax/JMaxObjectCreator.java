@@ -30,5 +30,5 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public interface JMaxObjectCreator
 {
-  public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] at, int offset, int ac);
+  public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] at, int offset, int ac);
 }

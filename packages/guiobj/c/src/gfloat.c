@@ -160,6 +160,7 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, gfloat_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, gfloat_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "setValue"), gfloat_number);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, gfloat_bang);
 

@@ -49,7 +49,7 @@ static fts_symbol_t sym_display = 0;
 static int
 symbol_contains_blank(fts_symbol_t s)
 {
-  const char *str = fts_symbol_name(s);
+  const char *str = s;
   int n = strlen(str);
   int i;
 
@@ -98,12 +98,12 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
       fts_symbol_t sym = fts_get_symbol(a);
 
       if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, " \"%s\"", fts_symbol_name(sym));
+	snprintf(s, STRING_SIZE - n, " \"%s\"", sym);
       else
-	snprintf(s, STRING_SIZE - n, " %s", fts_symbol_name(sym));
+	snprintf(s, STRING_SIZE - n, " %s", sym);
     }
   else
-    snprintf(s, STRING_SIZE - n, " <%s>", fts_symbol_name(fts_get_type(a)));
+    snprintf(s, STRING_SIZE - n, " <%s>", fts_get_class(a)->name);
 }
 
 static void
@@ -121,12 +121,12 @@ append_atom(char *str, const fts_atom_t *a)
       fts_symbol_t sym = fts_get_symbol(a);
 
       if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, "\"%s\"", fts_symbol_name(sym));
+	snprintf(s, STRING_SIZE - n, "\"%s\"", sym);
       else
-	snprintf(s, STRING_SIZE - n, "%s", fts_symbol_name(sym));
+	snprintf(s, STRING_SIZE - n, "%s", sym);
     }
   else
-    snprintf(s, STRING_SIZE - n, "<%s>", fts_symbol_name(fts_get_type(a)));
+    snprintf(s, STRING_SIZE - n, "<%s>", fts_get_class(a)->name);
 }
 
 /************************************************************
@@ -275,7 +275,7 @@ display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  sprintf(this->string, "'%s\'", fts_symbol_name(fts_get_symbol(at)));
+  sprintf(this->string, "'%s\'", fts_get_symbol(at));
 
   display_deliver(this);
 }
@@ -316,13 +316,13 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int i;
   
   if(ac == 1 && fts_is_object(at) && s == fts_object_get_class_name(fts_get_object(at)))
-    sprintf(this->string, "<%s> ", fts_symbol_name(s));
+    sprintf(this->string, "<%s> ", s);
   else 
     {
       if(symbol_contains_blank(s))
-	sprintf(this->string, "\"%s\"", fts_symbol_name(s));
+	sprintf(this->string, "\"%s\"", s);
       else
-	sprintf(this->string, "%s", fts_symbol_name(s));
+	sprintf(this->string, "%s", s);
       
       for(i=0; i<ac; i++)
 	append_blank_and_atom(this->string, at + i);

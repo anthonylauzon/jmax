@@ -60,19 +60,13 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
   {
     super(theFtsObject);
 
-    int w = getWidth();
-    int h = getHeight();
-
-    if(w < 0 || h < 0)
-      {
-	w = DEFAULT_WIDTH;
-	h = DEFAULT_HEIGHT;
-      }
-
     maxWidth = FtsVectorDisplayObject.MAX_SIZE + 2;
+  }
 
-    setWidth(w);
-    setHeight(h);
+  public void setDefaults()
+  {    
+    setWidth( getWidth());
+    setHeight( getHeight());
   }
 
   public void display()
@@ -82,7 +76,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void setWidth(int w) 
   {
-    if (w < minWidth)
+    if( w <= 0)
+      w = DEFAULT_WIDTH;
+    else if (w < minWidth)
       w = minWidth;
     else if (w > maxWidth)
       w = maxWidth;
@@ -96,7 +92,9 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public void setHeight(int h)
   {
-    if (h < minHeight)
+    if( h <= 0)
+      h = DEFAULT_HEIGHT;
+    else if (h < minHeight)
       h = minHeight;
     else if (h > maxHeight)
       h = maxHeight;

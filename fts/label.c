@@ -296,7 +296,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
       if(!label)
 	{
-	  fts_object_set_error(o, "Variable %s is not a label", fts_symbol_name(name));
+	  fts_object_set_error(o, "Variable %s is not a label", name);
 	  return;
 	}
     }
@@ -374,7 +374,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       if(!label)
 	{
-	  fts_object_set_error(o, "Variable %s is not a label", fts_symbol_name(name));
+	  fts_object_set_error(o, "Variable %s is not a label", name);
 	  return;
 	}
     }

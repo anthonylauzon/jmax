@@ -34,16 +34,10 @@ import ircam.fts.client.*;
 
 public class FtsToggleObject extends FtsIntValueObject
 {
-  public FtsToggleObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
+  public FtsToggleObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, id, args, offset, length);
+    super(server, parent, id, className, args, offset, length);
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
-  }
-
-  public void setDefaults()
-  {
-    setWidth(Toggle.DEFAULT_WIDTH);
-    setHeight(Toggle.DEFAULT_WIDTH);
   }
 }

@@ -56,59 +56,66 @@ public class OpenAction extends EditorAction
   
   public void doAction(EditorContainer container)
   {
-      File file;
+    File file;
 
-      if (preset_file == null)
-	  file = MaxFileChooser.chooseFileToOpen(container.getFrame());
-      else
-	  file = preset_file;
+    if (preset_file == null)
+      file = MaxFileChooser.chooseFileToOpen(container.getFrame());
+    else
+      file = preset_file;
 	
-      frame = container.getFrame();
-	
-      //fts = container.getEditor().getFts();
+    frame = container.getFrame();
 
-      if (file != null)
-	  {
-	      /*try
-		{
-		FtsPatcherObject.fireAtomicAction(true);
-		
-		//MaxDocument document = Mda.loadDocument(fts, file);
-		
-		RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
-		recentFileHistory.addFile(file);
-	
-		try
-		{		
-		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  
-		
-		if (document.getDocumentType().isEditable())
-		document.edit();
-	
-		((FtsPatcherObject)document.getRootData()).requestStopWaiting(new FtsActionListener(){
-		public void ftsActionDone()
-		{
-		frame.setCursor(Cursor.getDefaultCursor());
-		FtsPatcherObject.fireAtomicAction(false);
-		}
-		});
-		}
-		catch (MaxDocumentException ex)
-		{
-		frame.setCursor(Cursor.getDefaultCursor());
-		// Ignore MaxDocumentException exception in running the editor
-		// May be an hack, may be is ok; move this stuff to an action
-		// handler !!
-		}
-		}
-		catch (MaxDocumentException e)
-		{
-		frame.setCursor(Cursor.getDefaultCursor());
-		JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
-		"Error", JOptionPane.ERROR_MESSAGE);
-		}*/
+    if (file != null)
+      {
+	//FtsPatcherObject.fireAtomicAction(true);
+	RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
+	recentFileHistory.addFile(file);
+
+	try
+	  {	
+	    JMaxApplication.getFtsServer().getRoot().load(file.getAbsolutePath());
 	  }
+	catch(IOException e)
+	  {
+	    System.err.println("[OpenAction]: I/O error loading file "+file.getAbsolutePath());
+	  }
+      }
   }
+
+  /*public static int getFileType(File file)
+    {
+    int type = -1;
+    
+    try
+    {
+    FileReader fr = new FileReader(file);
+    char buf[] = new char[6];
+    String codeBMax, codeDotPat;
+    
+    fr.read(buf);
+    fr.close();
+	    
+    codeBMax = new String(buf, 0, 4);
+    
+    if (codeBMax.equals("bMax") || codeBMax.equals("Mbxa"))
+    type = MaxFileChooser.JMAX_FILE_TYPE;
+    else 
+    {
+    codeDotPat = new String(buf, 0, 6);
+    if ( codeDotPat.equals("max v2"))
+    type = MaxFileChooser.PAT_FILE_TYPE;
+    }
+    return type;
+    }
+    catch (FileNotFoundException e)
+    {
+    return -1;
+    }
+    catch (IOException e)
+    {
+    return -1;
+    }
+    }*/
 }
 
 

@@ -101,7 +101,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_class_t *cl;
 
 	  if ( fts_metaclass_get_by_name( name) != NULL)
-	    fts_object_set_error(o, "Symbol %s cannot be used as message", fts_symbol_name(name));
+	    fts_object_set_error(o, "Symbol %s cannot be used as message", name);
 	    else
 	      fts_message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
 	}
@@ -292,7 +292,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   else
     {
       fts_object_signal_runtime_error(o, "Unknown message %s for object of class %s, inlet %d", 
-				      fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);
+				      s, fts_object_get_class_name(o), winlet);
 
       return &fts_MethodNotFound;
     }

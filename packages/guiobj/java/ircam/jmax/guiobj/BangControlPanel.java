@@ -92,8 +92,6 @@ public class BangControlPanel extends JPanel implements ObjectControlPanel
     int duration = ((FtsBangObject)obj.getFtsObject()).getFlashDuration();
     durationSlider.setValue(duration);
     durationLabel.setText(""+duration);    
-
-    //revalidate();
   }
 }
 

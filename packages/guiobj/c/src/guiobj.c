@@ -30,7 +30,7 @@ extern void button_config(void);
 extern void comment_config(void);
 extern void comment_doctor_init(void);
 extern void console_config( void);
-/*extern void display_config(void);*/
+extern void display_config(void);
 extern void dspcontrol_config(void);
 extern void error_finder_config(void);
 extern void finder_config(void);
@@ -54,7 +54,7 @@ guiobj_config(void)
   comment_config();
   comment_doctor_init();
   console_config();
-  /*display_config();*/
+  display_config();
   dspcontrol_config();
   error_finder_config();
   finder_config();

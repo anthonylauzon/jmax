@@ -25,8 +25,8 @@ UndoableValueSet.java
 
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
-JAVAROOTX=@top_srcdir@/packages/data/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java/src
+JAVAROOTX=@top_srcdir@/packages/data/java
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java
 
 SUFFIXES = .java .class
 
@@ -37,3 +37,6 @@ package: $(package_OBJECTS) $(package_DEPENDENCIES)
 
 clean-compile:
 	rm -f *.class
+
+
+

@@ -45,16 +45,12 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   InOutlet( FtsGraphicObject theFtsObject) 
   {
     super( theFtsObject);
-
-    int width = getWidth();
-
     setDefaultWidth(MINIMUM_WIDTH);
+  }
 
-    if ( width == -1)
-	setWidth( DEFAULT_WIDTH);
-    else if (width <= MINIMUM_WIDTH)
-	setWidth( MINIMUM_WIDTH);
-
+  public void setDefaults()
+  {
+    setWidth( getWidth());
     updateDimensions();
   }
 
@@ -66,7 +62,9 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
   // redefined from base class
   public void setWidth( int theWidth)
   {
-    if (theWidth < MINIMUM_WIDTH)
+    if ( theWidth <= 0)
+      theWidth = DEFAULT_WIDTH;
+    else if (theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
 
     super.setWidth( theWidth);

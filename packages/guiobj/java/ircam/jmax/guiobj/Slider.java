@@ -51,9 +51,12 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   static final int THROTTLE_LATERAL_OFFSET = 3;
   static final int THROTTLE_HEIGHT = 3;
-  private static final int MINIMUM_DIMENSION = 15;
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
+  private static final int MINIMUM_DIMENSION = 15;
+  private static final int DEFAULT_WIDTH = 20;
+  private static final int DEFAULT_RANGE = 127;
+  private static final int DEFAULT_HEIGHT = BOTTOM_OFFSET + UP_OFFSET + DEFAULT_RANGE;
   
   static final int VERTICAL_OR = 0;
   static final int HORIZONTAL_OR = 1;
@@ -77,28 +80,38 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     else if(value>rangeMax) 
       value = rangeMax;
 
+    orientation = ((FtsSliderObject)ftsObject).getOrientation();
+
+    if(( orientation != HORIZONTAL_OR)&&( orientation != VERTICAL_OR))
+      setOrientation(VERTICAL_OR);
+  }
+
+  public void setDefaults()
+  {
     if(getWidth() <= 0)
-      setWidth( 20);
+      setWidth( DEFAULT_WIDTH);
     else if(getWidth() <= MINIMUM_DIMENSION)
       setWidth(MINIMUM_DIMENSION);
 
     /* Probabily usefull only for new object */
 
     int h = BOTTOM_OFFSET + (rangeMax - rangeMin) + UP_OFFSET;
-
+    
     if (getHeight() < BOTTOM_OFFSET +  UP_OFFSET)
       setHeight( h);
-    
-    orientation = ((FtsSliderObject)ftsObject).getOrientation();
-
-    if((orientation!=HORIZONTAL_OR)&&(orientation!=VERTICAL_OR))
-      setOrientation(VERTICAL_OR);
   }
-
   public void setMinValue( int theValue) 
   {
     rangeMin = theValue;
     ((FtsSliderObject)ftsObject).setMinValue(rangeMin);
+  }
+
+  public void setCurrentMinValue( int value)
+  {
+    rangeMin = value;
+
+    if( value < rangeMin)
+      value = rangeMin;
   }
 
   public int getMinValue() 
@@ -112,6 +125,16 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     ((FtsSliderObject)ftsObject).setMaxValue(rangeMax);
   }
 
+  public void setCurrentMaxValue( int value)
+  {
+    rangeMax = value;
+    
+    if( value > rangeMax) 
+      value = rangeMax;
+
+    redraw();
+  }
+
   public int getMaxValue() 
   {
     return rangeMax;
@@ -119,30 +142,34 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void setWidth(int w)
   {
-    if (w < MINIMUM_DIMENSION)
-      //return;
-      w=MINIMUM_DIMENSION;
-    
+    if(w <= 0)
+      w = DEFAULT_WIDTH;
+    else if(w < MINIMUM_DIMENSION)
+      w = MINIMUM_DIMENSION;
+
     super.setWidth(w);
   }
 
   public void setHeight(int h)
   {
-    if (h < MINIMUM_DIMENSION)
-      //return;
-      h=MINIMUM_DIMENSION;
+    if(h <= 0)
+      h = DEFAULT_RANGE;
+    else if (h < MINIMUM_DIMENSION)
+      h = MINIMUM_DIMENSION;
 
     super.setHeight(h);
   }
 
   public void setRange(int theMaxInt, int theMinInt)
   {
+    if(( theMaxInt == rangeMax)&&( theMinInt == rangeMin)) return;
+    
     setMaxValue( theMaxInt);
     setMinValue( theMinInt);
 
     if(value < rangeMin)
       value = rangeMin;
-    else if(value>rangeMax) 
+    else if( value > rangeMax) 
       value = rangeMax;
 
     redraw();
@@ -152,6 +179,12 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     orientation = or;
     ((FtsSliderObject)ftsObject).setOrientation(orientation);
+  }
+
+  public void setCurrentOrientation(int or)
+  {
+    orientation = or;
+    itsSketchPad.repaint();
   }
 
   public int getOrientation()
@@ -217,18 +250,17 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       int pixels, pos;
       if(orientation==VERTICAL_OR)
       {
-	  pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	  pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / range;
-	  //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/range;
-      
-	  g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+	pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / range;
+	
+	g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
       }
       else
-	  {
-	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
-	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
-	  }
+	{
+	  pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	  pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
+	  g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+	}
       super.paint(g);
   }
   
@@ -238,7 +270,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       int y = getY();
       int w = getWidth();
       int h = getHeight();
-      int range = (rangeMax - rangeMin)/*!= 0 ? rangeMax - rangeMin : 1*/;
+      int range = rangeMax - rangeMin;
       
       /* Paint the box */ 
       g.setColor( Settings.sharedInstance().getUIColor());

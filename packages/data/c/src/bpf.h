@@ -56,7 +56,7 @@ typedef struct _bpf_
 } bpf_t;
 
 DATA_API fts_symbol_t bpf_symbol;
-DATA_API fts_type_t bpf_type;
+/*DATA_API fts_type_t bpf_type;*/
 
 #define bpf_get_size(b) ((b)->size)
 
@@ -72,9 +72,9 @@ DATA_API int bpf_search_index(bpf_t *bpf, double time, int index);
 #define bpf_get_index(b, t) (bpf_search_index((b), (t), (b)->size / 2))
 
 /* bpf atoms */
-#define bpf_atom_set(ap, x) fts_set_object_with_type((ap), (x), bpf_type)
+/*#define bpf_atom_set(ap, x) fts_set_object_with_type((ap), (x), bpf_type)*/
 #define bpf_atom_get(ap) ((bpf_t *)fts_get_object(ap))
-#define bpf_atom_is(ap) (fts_is_a((ap), bpf_type))
+/*#define bpf_atom_is(ap) (fts_is_a((ap), bpf_type))*/
 
 DATA_API void bpf_copy(bpf_t *bpf, bpf_t *copy);
 

@@ -76,8 +76,8 @@ static void dump_stack( stack_element_t *elem, int depth)
     {
       fprintf( stderr, "[%3d] %s -> (%s,%d)\n",
 	       depth,
-	       fts_symbol_name(fts_object_get_class_name( elem->object)),
-	       elem->connection ? fts_symbol_name(fts_object_get_class_name(elem->connection->dst)) : "null",
+	       fts_object_get_class_name( elem->object),
+	       elem->connection ? fts_object_get_class_name(elem->connection->dst) : "null",
 	       elem->connection ? elem->connection->winlet : -1);
       dump_stack( elem->next, depth+1);
     }
@@ -334,7 +334,7 @@ void fts_dsp_signal_reference(fts_dsp_signal_t *sig)
 
 void fts_dsp_signal_print( fts_dsp_signal_t *s)
 {
-  post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, fts_symbol_name(s->name), s->refcnt, s->length);
+  post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, s->name, s->refcnt, s->length);
 }
 
 void fts_dsp_signal_init( void)

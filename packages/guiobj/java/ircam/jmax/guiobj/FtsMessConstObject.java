@@ -47,12 +47,12 @@ public class FtsMessConstObject extends FtsIntValueObject
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
   /*****************************************************************************/
-    public FtsMessConstObject(FtsServer fts, FtsObject parent, int id, FtsAtom args[], int offset, int length)
-    {
-	super(fts, parent, id, FtsParse.unparseArguments(args, offset+1, length-1));
-	ninlets = 1;
-	noutlets = 1;
-    }
+  public FtsMessConstObject(FtsServer fts, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
+  {
+    super(fts, parent, id, className, FtsParse.unparseArguments(args, offset+1, length-1));
+    ninlets = 1;
+    noutlets = 1;
+  }
 }
 
 

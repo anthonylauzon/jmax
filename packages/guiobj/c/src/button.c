@@ -29,6 +29,9 @@
 
 #define DEFAULT_FLASH 125.0f
 
+fts_symbol_t sym_setColor         = 0;
+fts_symbol_t sym_setFlash = 0;
+
 typedef struct 
 {
   fts_object_t o;
@@ -46,7 +49,23 @@ typedef struct
 static void
 button_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_value);
+  button_t *this = (button_t *)o;
+  fts_atom_t a[1];
+
+  fts_object_get_prop(o, fts_s_color, a);
+  if( !fts_get_int( a))
+    fts_set_int( a, this->color);
+  else
+    this->color = fts_get_int( a);
+  
+  fts_client_send_message(o, sym_setColor, 1, a);
+
+  fts_object_get_prop(o, fts_s_flash, a);  
+  if( !fts_get_int( a))
+    fts_set_int( a, this->flash);
+  else
+    this->flash = fts_get_int( a);
+  fts_client_send_message(o, sym_setFlash, 1, a);  
 }
 
 static void
@@ -84,7 +103,7 @@ button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       /* button on */
       this->value = this->color;
       fts_object_ui_property_changed(o, fts_s_value);
-      
+
       /* schedule button off */
       fts_timebase_add_call(fts_get_timebase(), o, button_off, 0, this->flash);
     }
@@ -116,38 +135,22 @@ button_put_value(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t prope
   button_on(o, 0, 0, 0, 0);
 }
 
-/* Daemon for the color  propriety */
 static void
-button_get_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  button_t *this = (button_t *)obj;
-
-  fts_set_int(value, this->color);
+  ((button_t *)o)->color = fts_get_int( at);
+  fts_object_put_prop( o, s, at);
+  
+  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 static void
-button_put_color(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+button_set_flash(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  button_t *this = (button_t *)obj;
+  ((button_t *)o)->flash = fts_get_int( at);
+  fts_object_put_prop( o, s, at);
 
-  this->color = fts_get_int(value);
-}
-
-/* Daemon for the flash duration propriety */
-static void
-button_get_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  button_t *this = (button_t *)obj;
-
-  fts_set_int(value, this->flash);
-}
-
-static void
-button_put_flash(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  button_t *this = (button_t *)obj;
-
-  this->flash = fts_get_int(value);
+  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 static void 
@@ -196,6 +199,9 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties); 
 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_color, button_set_color); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_flash, button_set_flash); 
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, button_save_dotpat); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, button_on);
 
@@ -204,14 +210,6 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* value daemons */
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, button_put_value);
-
-  /* color daemons  */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_color, button_get_color);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
-
-  /* flash duration daemons  */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_flash, button_get_flash);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_flash, button_put_flash);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
@@ -223,4 +221,8 @@ void
 button_config(void)
 {
   fts_class_install(fts_new_symbol("button"), button_instantiate);
+  sym_setColor = fts_new_symbol("setColor");
+  sym_setFlash = fts_new_symbol("setFlash");
 }
+
+

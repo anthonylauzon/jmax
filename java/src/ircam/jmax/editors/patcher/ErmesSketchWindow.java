@@ -129,13 +129,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.setToolBar( itsToolBar);
 
     itsMessageLabel = new JLabel("   ");
+    itsMessageLabel.setPreferredSize(new Dimension( patcherObj.getWindowWidth(), 15));
 
     getContentPane().add( itsToolBar, BorderLayout.NORTH);
     getContentPane().add( itsScrollerView, BorderLayout.CENTER);
     getContentPane().add( itsMessageLabel, BorderLayout.SOUTH);
 
     // Compute its Initial Size
-    InitFromContainer(itsPatcher); 
+    setPatcherBounds(itsPatcher); 
 
     validate();
 
@@ -145,9 +146,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.InitLock();
     itsSketchPad.setMessageDisplayer(this);
     
-    /* WARNING : re-add when graphic update reimplemented */
-    //itsPatcher.getServer().addUpdateGroupListener(itsSketchPad);
-
     // Finally, activate the updates
     itsPatcher.startUpdates();
 
@@ -159,8 +157,16 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private final void makeTitle()
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(itsSketchPad.getTitle()));
-    MaxWindowManager.getWindowManager().windowChanged(this);
+    setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle( itsSketchPad.getTitle()));
+  }
+
+  public void setTitle(String title)
+  {
+    if(!getTitle().equals(title))
+      {
+	super.setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));
+	MaxWindowManager.getWindowManager().windowChanged(this);
+      }
   }
 
   public void updateTitle()
@@ -210,7 +216,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return 130;
   }
   
-  private void InitFromContainer(FtsPatcherObject patcherObj)
+  public void setPatcherBounds(FtsPatcherObject patcherObj)
   {
     int x;
     int y;
@@ -218,7 +224,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     int height;
 
     //Double check the existence of the window properties. If there aren't, use defaults
-      
     x = patcherObj.getWindowX();
     y = patcherObj.getWindowY();
     width = ScaleTransform.getInstance().scaleX(patcherObj.getWindowWidth());

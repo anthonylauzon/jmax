@@ -165,55 +165,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   public static final int ON_OUTLET = 1;
   public static final int ON_OBJECT = 2;
 
-  // A Static method that work as a virtual constructor;
-  // given an FTS object, build the proper FTS Object
-
-  /*static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsGraphicObject object) 
-    {
-    GraphicObject gobj = null;
-    String theName = object.getClassName();
-    Class aClass = ObjectCreatorManager.getGraphicClass(theName);
-    
-    System.err.println("[GraphicObject] makeGraphicObject className "+theName+" aClass "+aClass+" ftsObj "+object);
-
-    if(aClass != null)
-    {
-    Object[] arg = new Object[] {sketch, object};
-    try
-    {
-    Constructor constr = aClass.getConstructors()[0];    
-    if(constr != null)
-    gobj = (GraphicObject)(constr.newInstance(arg));
-    
-    } 
-    catch (InstantiationException e) 
-    {
-    System.out.println(e);
-    } 
-    catch (IllegalAccessException e) 
-    {
-    System.out.println(e);
-    } 
-    catch (InvocationTargetException e) 
-    {
-    System.out.println(e);
-    } 
-    }
-    else if (theName.equals( "inlet"))
-    gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
-    else if (theName.equals( "outlet"))
-    gobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
-    else if (theName.equals( "jpatcher"))
-    gobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
-    else
-    gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
-    
-    if(gobj!=null)
-    object.setObjectListener(gobj);
-    
-    return gobj;
-    }*/
-
   protected GraphicObject( FtsGraphicObject theFtsObject) 
   {
     String fontName;
@@ -251,6 +202,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     itsSketchPad.getDisplayList().deleteConnectionsForObject(this);
     itsSketchPad.getDisplayList().remove(this);
+    itsSketchPad.getFtsPatcher().removeObject( ftsObject);
     dispose();
     //ftsObject.delete();
   }
@@ -315,6 +267,26 @@ abstract public class GraphicObject implements DisplayObject, Serializable
       }
   }
 
+  public void setCurrentBounds(int x, int y, int w, int h)
+  {
+    if(( w <= 0)||( h <= 0))
+      {
+	ftsObject.setCurrentX( ScaleTransform.getInstance().invScaleX(x));
+	ftsObject.setCurrentY( ScaleTransform.getInstance().invScaleY(y));
+	setDefaults();
+      }
+    else
+      ftsObject.setCurrentBounds( ScaleTransform.getInstance().invScaleX(x),
+				  ScaleTransform.getInstance().invScaleY(y),
+				  ScaleTransform.getInstance().invScaleX(w),
+				  isSquare() ? ScaleTransform.getInstance().invScaleX(h) 
+				  : ScaleTransform.getInstance().invScaleY(h ));
+    
+    //itsSketchPad.getDisplayList().updateConnectionsFor(this);
+  }
+
+  public void setDefaults(){}
+
   public boolean isSquare()
   {
     return false;
@@ -336,11 +308,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
       {
 	setHeight(h);
       }
-  }
-
-  public void setColor(int color)
-  {
-    ftsObject.setColor(color);
   }
 
   public Font getFont() 
@@ -436,6 +403,28 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     ftsObject.setFont(itsFont.getName());
     ftsObject.setFontSize(itsFont.getSize());
     ftsObject.setFontStyle(itsFont.getStyle());
+  }
+
+  public void setCurrentFont( String fontName, int fontSize, int fontStyle) 
+  {
+    if(fontName == null)
+      fontName = itsSketchPad.getDefaultFontName();
+    if( fontSize <= 0)
+      fontSize = itsSketchPad.getDefaultFontSize();
+    if( ( fontStyle != Font.PLAIN) && ( fontStyle != Font.ITALIC) && ( fontStyle != Font.BOLD))
+      fontStyle = itsSketchPad.getDefaultFontStyle();
+
+    setCurrentFont( FontCache.lookupFont( fontName, fontSize, fontStyle));
+  }
+
+  public void setCurrentFont(Font font)
+  {
+    itsFont = font;
+    itsFontMetrics = itsSketchPad.getFontMetrics( itsFont);
+
+    ftsObject.setCurrentFontName( itsFont.getName());
+    ftsObject.setCurrentFontSize( itsFont.getSize());
+    ftsObject.setCurrentFontStyle( itsFont.getStyle());
   }
 
   public void fitToText()
@@ -802,7 +791,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     final int anchorY  = getY() - 1;
     final int nInlets = ftsObject.getNumberOfInlets();
     
-    if(itsSketchPad.getConnectingObject()!=this)
+    if( itsSketchPad.getConnectingObject()!=this)
       {	   	
 	int d;
 	int start = getInletAnchorX(0);

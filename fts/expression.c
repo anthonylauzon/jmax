@@ -642,12 +642,12 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 			if (ret != FTS_EXPRESSION_OK)
 			  return expression_error(e, ret, "Error in function %s",
-						  fts_symbol_name(name));
+						  name);
 		      }
 		    else
 		      return expression_error(e, FTS_EXPRESSION_UNDEFINED_FUNCTION,
 					      "Undefined function %s",
-					      fts_symbol_name(name));
+					      name);
 		  }
 
 		  /* Pop the stack, and push the result */
@@ -972,13 +972,13 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 		  if (fts_is_void(value))
 		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
-					    fts_symbol_name(varname));
+					    varname);
 		  else
 		    *tos = *value;
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
-					fts_symbol_name(varname));
+					varname);
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax Error", 0);
@@ -1040,24 +1040,24 @@ static int fts_op_eval(fts_expression_state_t *e)
 		{
 		  if (fts_is_symbol(ptos))
 		    sprintf(buf, "%s%s",
-			    fts_symbol_name(fts_get_symbol(ptos)),
-			    fts_symbol_name(fts_get_symbol(tos)));
+			    fts_get_symbol(ptos),
+			    fts_get_symbol(tos));
 		  else if (fts_is_int(ptos))
 		    sprintf(buf, "%d%s",
 			    fts_get_int(ptos),
-			    fts_symbol_name(fts_get_symbol(tos)));
+			    fts_get_symbol(tos));
 		  else if (fts_is_float(ptos))
 		    sprintf(buf, "%f%s",
 			    fts_get_float(ptos),
-			    fts_symbol_name(fts_get_symbol(tos)));
+			    fts_get_symbol(tos));
 		}
 	      else if (fts_is_int(tos))
 		sprintf(buf, "%s%d",
-			fts_symbol_name(fts_get_symbol(ptos)),
+			fts_get_symbol(ptos),
 			fts_get_int(tos));
 	      else if (fts_is_float(tos))
 		sprintf(buf, "%s%f",
-			fts_symbol_name(fts_get_symbol(ptos)),
+			fts_get_symbol(ptos),
 			fts_get_float(tos));
 
 	      fts_set_symbol(ptos, fts_new_symbol_copy(buf));
@@ -1171,13 +1171,13 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 		  if (fts_is_void(value))
 		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
-					    fts_symbol_name(varname));
+					    varname);
 		  else
 		    *ptos = *value;
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is not defined ",
-					fts_symbol_name(varname));
+					varname);
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator .", 0);
@@ -1509,7 +1509,7 @@ void fts_expression_printf_assignements(fts_expression_state_t *e)
 
   while (p)
     {
-      fts_log( "\tGot name %s value ", fts_symbol_name(p->name));
+      fts_log( "\tGot name %s value ", p->name);
       fts_log_atoms( 1, &(p->value));
       fts_log( "\n");
       p = p->next;

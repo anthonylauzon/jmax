@@ -148,6 +148,23 @@ public class FtsObject {
     encoder.writeArgs( args);
     encoder.flush();
   }
+  
+  public void delete() throws IOException
+  {
+    encoder.writeObject( server.getClient());
+    encoder.writeSymbol( sDelObject);
+    encoder.writeObject( this);
+    encoder.flush();
+  }
+
+  public void load( String fileName) throws IOException
+  {
+    encoder.writeObject( server.getClient());
+    encoder.writeSymbol( FtsSymbol.get("load"));    
+    encoder.writeSymbol( FtsSymbol.get(fileName));
+    encoder.writeObject( this);
+    encoder.flush();
+  }
 
   public static void registerMessageHandler( Class cl, FtsSymbol selector, FtsMessageHandler messageHandler)
   {
@@ -232,7 +249,9 @@ public class FtsObject {
   private static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
 
   private static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
+  private static FtsSymbol sDelObject = FtsSymbol.get( "delete_object");
   private static FtsSymbol sInt = FtsSymbol.get( "int");
   private static FtsSymbol sFloat = FtsSymbol.get( "float");
   private static FtsSymbol sList = FtsSymbol.get( "list");
 }
+

@@ -70,18 +70,12 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
   int zero = 0; /* y position of zero axis */
   int wrap = 0;
 
-  public FtsVectorDisplayObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
+  public FtsVectorDisplayObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, id, args, offset, length);
+    super(server, parent, id, className, args, offset, length);
     
     ninlets = 1;
     noutlets = 0;
-  }
-
-  public void setDefaults()
-  {
-      setWidth(VectorDisplay.DEFAULT_WIDTH);
-      setHeight(VectorDisplay.DEFAULT_HEIGHT);
   }
 
   public void computeZero()

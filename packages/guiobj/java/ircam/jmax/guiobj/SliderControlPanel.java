@@ -116,12 +116,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 	    public void itemStateChanged(ItemEvent e)
 	    {
 		if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.HORIZONTAL_OR))
-		{
-		  ((Slider)target).setOrientation(Slider.HORIZONTAL_OR);
-		  ((Slider)target).updateDimension();
-		  maxLabel.setText("right");
-		  minLabel.setText("left");
-		}
+		  changeOrientation( Slider.HORIZONTAL_OR);
 	    }
 	});
     orientationButtonGroup.add(horizontalItem);
@@ -130,12 +125,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 	    public void itemStateChanged(ItemEvent e)
 	    {
 		if((e.getStateChange() == ItemEvent.SELECTED)&&(((Slider)target).getOrientation() != Slider.VERTICAL_OR))
-		{
-		  ((Slider)target).setOrientation(Slider. VERTICAL_OR);
-		  ((Slider)target).updateDimension();
-		  maxLabel.setText("top");
-		  minLabel.setText("bottom");		  
-		}
+		  changeOrientation( Slider.VERTICAL_OR);
 	    }
 	});
     orientationButtonGroup.add(verticalItem);
@@ -150,6 +140,22 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     validate();
   }
 
+  void changeOrientation(int or)
+  {
+    ((Slider)target).setOrientation( or);
+    ((Slider)target).updateDimension();
+    if( or == Slider.VERTICAL_OR)
+      {
+	maxLabel.setText("top");
+	minLabel.setText("bottom");
+      }
+    else
+      {
+	maxLabel.setText("right");
+	minLabel.setText("left");
+      }
+  }
+
   public void update(GraphicObject obj)
   {
     target = obj;
@@ -159,17 +165,17 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxValueField.setText(""+max);    
     
     if(((Slider)obj).getOrientation() == Slider.HORIZONTAL_OR)
-	{
-	    horizontalItem.setSelected(true);
-	    maxLabel.setText("right");
-	    minLabel.setText("left");
-	}    
+      {
+	horizontalItem.setSelected(true);
+	maxLabel.setText("right");
+	minLabel.setText("left");
+      }    
     else
-	{
-	    verticalItem.setSelected(true);
-	    maxLabel.setText("top");
-	    minLabel.setText("bottom");		  
-	}
+      {
+	verticalItem.setSelected(true);
+	maxLabel.setText("top");
+	minLabel.setText("bottom");		  
+      }
   }
 
   public void setRange()
@@ -194,8 +200,8 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 
   public void actionPerformed( ActionEvent e)
   {
-      if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
-	  setRange();
+    if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
+      setRange();
   }
 }
 

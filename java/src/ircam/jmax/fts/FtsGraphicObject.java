@@ -29,6 +29,7 @@ import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 import javax.swing.undo.*;
 import javax.swing.event.*;
@@ -62,7 +63,7 @@ public class FtsGraphicObject extends FtsObject {
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setErrorDescription"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).setErrorDescription(args.getString( 0));
+	  ((FtsGraphicObject)obj).setErrorDescription(args.getSymbol( 0).toString());
 	}
       });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setX"), new FtsMessageHandler(){
@@ -92,7 +93,13 @@ public class FtsGraphicObject extends FtsObject {
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setFont"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).setCurrentFont( args.getString( 0));
+	  ((FtsGraphicObject)obj).setCurrentFont( args.getSymbol( 0).toString(), args.getInt( 1), args.getInt( 2));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setFontName"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsGraphicObject)obj).setCurrentFontName( args.getSymbol( 0).toString());
 	}
       });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setFontSize"), new FtsMessageHandler(){
@@ -116,7 +123,7 @@ public class FtsGraphicObject extends FtsObject {
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setComment"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).setCurrentComment( args.getString( 0));
+	  ((FtsGraphicObject)obj).setCurrentComment( args.getSymbol( 0).toString());
 	}
       });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "openFileDialog"), new FtsMessageHandler(){
@@ -128,16 +135,17 @@ public class FtsGraphicObject extends FtsObject {
   }
   
   protected FtsArgs args = new FtsArgs();
-
-  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
+  
+  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    this( server, parent, id, FtsParse.unparseArguments(args, offset, length));
+    this( server, parent, id, className, FtsParse.unparseArguments(args, offset, length));
   }
 
-  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String description)
+  public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, String description)
   {
     super(server, parent, id);
     this.description = description;
+    this.className = className;
   }
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
@@ -197,12 +205,12 @@ public class FtsGraphicObject extends FtsObject {
   }
 
   /** Get the Y property */
-
+  
   public final float getY()
   {
     return y;
   }
-
+  
   /** Set the Y property. Tell it to the server, too. */
 
   public final void setY(float y)
@@ -221,7 +229,7 @@ public class FtsGraphicObject extends FtsObject {
 	    System.err.println("FtsGraphicObject: I/O Error sending setY Message!");
 	    e.printStackTrace(); 
 	  }
-
+	
 	this.y = y;
       }
   }
@@ -237,7 +245,7 @@ public class FtsGraphicObject extends FtsObject {
   {
     return width;
   }
-
+  
   public final void setWidth(float w)
   {
     if (this.width != w)
@@ -299,10 +307,16 @@ public class FtsGraphicObject extends FtsObject {
     this.height = h;
   }
 
-  public void setDefaults(){}
-
+  public final void setCurrentBounds(float x, float y, float w, float h)
+  {
+    this.x      = x;
+    this.y      = y;
+    this.width  = w;
+    this.height = h;
+  } 
+  
   /** Get the Error property. Error is a read only property. */
-
+  
   public final boolean isError()
   {
     return isError;
@@ -322,14 +336,14 @@ public class FtsGraphicObject extends FtsObject {
     if (listener instanceof FtsObjectErrorListener)
       ((FtsObjectErrorListener)listener).errorChanged(isError);	
   }
-
+  
   /** Get the error description property. Error description is a read only property. */
-
+  
   public final String getErrorDescription()
   {
     return errorDescription;
   }
-
+  
   public final void setErrorDescription(String ed)
   {
     errorDescription = ed;
@@ -344,26 +358,32 @@ public class FtsGraphicObject extends FtsObject {
 
   /** Set the font property. Tell it to the server, too. */
 
-  public final void setFont(String font)
+  public final void setFont( String font)
   {
     if ((this.font == null) || (! this.font.equals(font)))
       {
 	args.clear();
-	args.addSymbol(FtsSymbol.get("font"));
-	args.addString(font);
-	  
+	args.addSymbol( FtsSymbol.get("font"));
+	args.addSymbol( FtsSymbol.get(font));
+	
 	try{
 	  sendProperty( args);
 	}
-	catch(IOException e)
+	catch( IOException e)
 	  {
-	    System.err.println("FtsGraphicObject: I/O Error sending setFont Message!");
+	    System.err.println( "FtsGraphicObject: I/O Error sending setFont Message!");
 	    e.printStackTrace(); 
 	  }  	
 	this.font = font;
       }
   }
-  public final void setCurrentFont(String font)
+
+  public final void setCurrentFont( String font, int size, int style)
+  {
+    ((GraphicObject)getObjectListener()).setCurrentFont( font, size, style);
+  }
+
+  public final void setCurrentFontName(String font)
   {
     this.font = font;
 
@@ -384,7 +404,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontSize != fontSize)
       {
 	args.clear();
-	args.addSymbol(FtsSymbol.get("fs"));
+	args.addSymbol( FtsSymbol.get("fs"));
 	args.addInt(fontSize);
 	  
 	try{
@@ -418,7 +438,7 @@ public class FtsGraphicObject extends FtsObject {
     if (this.fontStyle != fontStyle)
       {
 	args.clear();
-	args.addSymbol(FtsSymbol.get("fst"));
+	args.addSymbol( FtsSymbol.get("fst"));
 	args.addInt(fontStyle);
 	  
 	try{
@@ -446,13 +466,13 @@ public class FtsGraphicObject extends FtsObject {
 
   /** Set the layer property. Tell it to the server, too. */
 
-  public final void setLayer(int layer)
+  public final void setLayer( int layer)
   {
     if (this.layer != layer)
       {
 	args.clear();
-	args.addSymbol(FtsSymbol.get("layer"));
-	args.addInt(layer);
+	args.addSymbol( FtsSymbol.get("layer"));
+	args.addInt( layer);
 	  
 	try{
 	  sendProperty( args);
@@ -469,26 +489,6 @@ public class FtsGraphicObject extends FtsObject {
   public final void setCurrentLayer(int l)
   {
     this.layer = l;
-  }
-  /** Set the color property. Tell it to the server.
-      Colors are not locally stored, can only be set, and they are meaningfull only
-      for some object
-  */
-
-  public final void setColor(int color)
-  {
-    args.clear();
-    args.addSymbol(FtsSymbol.get("color"));
-    args.addInt(color);
-	  
-    try{
-      sendProperty( args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsGraphicObject: I/O Error sending setColor Message!");
-	e.printStackTrace(); 
-      }  
   }
 
   public void setNumberOfInlets(int ins)
@@ -525,11 +525,11 @@ public class FtsGraphicObject extends FtsObject {
   {
     return comment;
   }
-  public void setComment(String comment)
+  public void setComment( String comment)
   {
     args.clear();
-    args.addSymbol(FtsSymbol.get("comment"));    
-    args.addString(comment);
+    args.addSymbol( FtsSymbol.get("comment"));    
+    args.addSymbol( FtsSymbol.get(comment));
 	  
     try{
       sendProperty( args);
@@ -542,7 +542,7 @@ public class FtsGraphicObject extends FtsObject {
     this.comment = comment;
   }
 
-  public void setCurrentComment(String comment)
+  public void setCurrentComment( String comment)
   {
     this.comment = comment;
   }
@@ -574,6 +574,11 @@ public class FtsGraphicObject extends FtsObject {
     return graphicListener;
   }  
 
+  public String getClassName()
+  {
+    return className;
+  }
+
   public String getDescription()
   {
     return description;
@@ -586,6 +591,16 @@ public class FtsGraphicObject extends FtsObject {
   public boolean isARootPatcher()
   {
     return (getParent() == getServer().getRoot());
+  }
+
+  public FtsPatcherObject getRootPatcher()
+  {
+    FtsGraphicObject current = this;
+    
+    while(!current.isARootPatcher())	
+      current = (FtsGraphicObject)current.getParent();
+	
+    return (FtsPatcherObject)current;
   }
 
   public Enumeration getGenealogy()
@@ -607,6 +622,7 @@ public class FtsGraphicObject extends FtsObject {
   }
 
   String description;
+  String className;
   /*****************************************************************/
   //final variables used by invokeLater method
   private transient JFileChooser fd;

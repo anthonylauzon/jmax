@@ -42,19 +42,19 @@ public class FtsSliderObject extends FtsIntValueObject
     FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMinValue"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsSliderObject)obj).minValue = args.getInt(0);
+	  ((FtsSliderObject)obj).setCurrentMinValue( args.getInt(0));
 	}
       });
     FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMaxValue"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsSliderObject)obj).maxValue = args.getInt(0);
+	  ((FtsSliderObject)obj).setCurrentMaxValue( args.getInt(0));
 	}
       });
     FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setOrientation"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsSliderObject)obj).orientation = args.getInt(0);
+	  ((FtsSliderObject)obj).setCurrentOrientation( args.getInt( 0));
 	}
       });
   }
@@ -73,21 +73,15 @@ public class FtsSliderObject extends FtsIntValueObject
   /**
    * Create a FtsObject object;
    */
-  public FtsSliderObject(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
+  public FtsSliderObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-      super(server, parent, id, args, offset, length);
+      super(server, parent, id, className, args, offset, length);
 
       setNumberOfInlets(1);
       setNumberOfOutlets(1);
 
       maxValue = 127;
       minValue = 0;
-  }
-
-  public void setDefaults()
-  {
-      setWidth(20);
-      setHeight(137);
   }
 
   /** Set the Min Value for the slider.
@@ -99,15 +93,23 @@ public class FtsSliderObject extends FtsIntValueObject
     minValue = value;
 
     args.clear();
+    args.addSymbol(FtsSymbol.get("minValue"));
     args.addInt(value);
+    
     try{
-	send( FtsSymbol.get("setMinValue"), args);
+      sendProperty( args);
     }
     catch(IOException e)
-	{
-	    System.err.println("FtsSliderObject: I/O Error sending setMinValue Message!");
-	    e.printStackTrace(); 
-	}
+      {
+	System.err.println("FtsSliderObject: I/O Error sending setMinValue Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  void setCurrentMinValue( int value)
+  {
+    minValue = value;
+    ((Slider)getObjectListener()).setCurrentMinValue( value);
   }
 
   /** Set the Max Value for the slider.
@@ -119,15 +121,22 @@ public class FtsSliderObject extends FtsIntValueObject
     maxValue = value;
 
     args.clear();
+    args.addSymbol(FtsSymbol.get("maxValue"));
     args.addInt(value);
     try{
-	send( FtsSymbol.get("setMaxValue"), args);
+	sendProperty( args);
     }
     catch(IOException e)
 	{
 	    System.err.println("FtsSliderObject: I/O Error sending setMaxValue Message!");
 	    e.printStackTrace(); 
 	}
+  }
+
+  void setCurrentMaxValue( int value)
+  {
+    maxValue = value;
+    ((Slider)getObjectListener()).setCurrentMaxValue( value);
   }
 
   /** Set the orientation */
@@ -137,15 +146,23 @@ public class FtsSliderObject extends FtsIntValueObject
     orientation = or;
 
     args.clear();
+    args.addSymbol(FtsSymbol.get("orientation"));
     args.addInt(or);
     try{
-	send( FtsSymbol.get("setOrientation"), args);
+	sendProperty(args);
     }
     catch(IOException e)
 	{
 	    System.err.println("FtsSliderObject: I/O Error sending setOrientation Message!");
 	    e.printStackTrace(); 
 	}
+  }
+
+
+  public void setCurrentOrientation(int or)
+  {
+    orientation = or;
+    ((Slider)getObjectListener()).setCurrentOrientation( or);
   }
 
   /** Get the Min Value for the slider. */
