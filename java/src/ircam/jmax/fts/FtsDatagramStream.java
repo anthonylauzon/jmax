@@ -169,7 +169,7 @@ class FtsDatagramStream extends FtsStream
 	receivedPacketSize = ((in_data[1] < 0 ? in_data[1] + 256 : in_data[1]) * 256 +
 			      ((in_data[2] < 0 ? in_data[2] + 256 : in_data[2])));
 
-	in_fill_p = 1;
+	in_fill_p = 3;
       }
 
     c = in_data[in_fill_p++];
