@@ -537,8 +537,6 @@ eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_
   snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol_copy(str);
 
-  post("gaga: %s %s\n", fts_symbol_name(seqsym_openFileDialog), str);
-      
   fts_set_symbol(a, seqsym_export_midi);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_get_project_dir());
