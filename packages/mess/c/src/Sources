@@ -12,5 +12,5 @@
 #  
 SOURCES = \
 mess.c \
-mt.c \
+message.c \
 messtab.c \

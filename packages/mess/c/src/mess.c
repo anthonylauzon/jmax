@@ -22,14 +22,14 @@
 
 #include <fts/fts.h>
 
+extern void message_config(void);
 extern void messtab_config(void);
-extern void message_table_config(void);
 
 static void
 mess_init(void)
 {
+  message_config();
   messtab_config();
-  message_table_config();
 }
 
 fts_module_t mess_module = {"mess", "message classes", mess_init, 0, 0};

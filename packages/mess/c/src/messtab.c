@@ -17,82 +17,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
 
 #include <fts/fts.h>
-#include "mt.h"
+#include "message.h"
 
-/**********************************************************
- *
- *  object
- *
- */
-
-typedef struct
+typedef struct messtab
 {
   fts_object_t o;
-  message_table_t *tab;
+  fts_hashtable_t table_symbol;
+  fts_hashtable_t table_int;
+  int locked;
 } messtab_t;
 
-static void
-messtab_init_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+typedef struct getmess
 {
-  messtab_t *this = (messtab_t *)o;
+  fts_object_t o;
+  messtab_t *messtab;
+  fts_atom_t key;
+} getmess_t;
 
-  this->tab = (message_table_t *)fts_get_ptr(at + 1);
-  message_table_refer(this->tab);
-}
+static fts_symbol_t messtab_symbol = 0;
 
-static void
-messtab_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static int
+messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messtab_t *this = (messtab_t *)o;
-  
-  if(ac == 1)
+  fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
+  fts_atom_t value;
+  message_t *mess;
+
+  if(s)
     {
-      this->tab = message_table_new(0);
-    }
-  else if(fts_is_number(at + 1))
-    {
-      int size = fts_get_number_int(at + 1);
-      
-      this->tab = message_table_new(size);
+      mess = (message_t *)fts_object_create(message_class, 0, 0);
+      message_set(mess, s, ac, at);
     }
   else
     {
-      int size = ac - 1;
-      int i;
-      
-      this->tab = message_table_new(size);
+      mess = (message_t *)fts_object_create(message_class, ac, at);
 
-      for(i=0; i<size; i++)
+      if(fts_object_get_error((fts_object_t *)mess))
 	{
-	  message_t *mess = &message_table_get_element(this->tab, i);
-
-	  if(fts_is_list(at + 1 + i))
-	    {
-	      fts_list_t *aa = fts_get_list(at + 1 + i);
-	      int aac = fts_list_get_size(aa);
-	      fts_atom_t *aat = fts_list_get_ptr(aa);
-	      
-	      if(fts_is_symbol(aat))
-		message_set(mess, fts_get_symbol(aat), aac - 1, aat + 1);
-	      else
-		message_set(mess, fts_s_list, aac, aat);
-	    }
+	  fts_object_destroy((fts_object_t *)mess);
+	  return 0;
 	}
     }
+
+  fts_object_refer((fts_object_t *)mess);  
+
+  /* remove old entry for same key */
+  if(fts_hashtable_get(hash, key, &value))
+    fts_atom_release(&value);
+
+  /* insert message to hashtable */
+  fts_set_object(&value, (void *)mess);
+  fts_hashtable_put(hash, key, &value);
+
+  return 1;
+}
+
+static message_t *
+messtab_recall(messtab_t *messtab, const fts_atom_t *key)
+{
+  fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
+  fts_atom_t value;
   
-  message_table_refer(this->tab);
+  if(fts_hashtable_get(hash, key, &value))
+    return (message_t *)fts_get_object(&value);
+  else
+    return 0;
 }
 
 static void
-messtab_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_remove(messtab_t *messtab, const fts_atom_t *key)
 {
-  messtab_t *this = (messtab_t *)o;
-
-  message_table_release(this->tab);
+  fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
+  fts_atom_t value;
+  
+  if(fts_hashtable_get(hash, key, &value))
+    {
+      fts_atom_release(&value);
+      
+      fts_hashtable_remove(hash, key);
+    }
 }
 
 /**********************************************************
@@ -102,53 +113,40 @@ messtab_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-messtab_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
-  int index = fts_get_number_int(at);
-
-  if(index >= 0 && index < message_table_get_size(this->tab))
+  
+  if(ac > 1 && (fts_is_symbol(at) || fts_is_int(at)))
     {
-      message_t *mess = &message_table_get_element(this->tab, index);
+      const fts_atom_t *key = at;
 
-      if(mess->s)
-	fts_outlet_send(o, 0, mess->s, mess->ac, mess->at);
+      /* skip key */
+      ac--;
+      at++;
+
+      if(ac > 0)
+	messtab_store(this, key, 0, ac, at);
+      else
+	messtab_store(this, key, fts_s_bang, 0, 0);
     }
 }
 
 static void
-messtab_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
-
-  if(ac && fts_is_number(at))
+  
+  if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
     {
-      int index = fts_get_number_int(at);
+      message_t *mess = messtab_recall(this, at);
 
-      if(index >= 0 && index < message_table_get_size(this->tab))
+      if(mess)
 	{
-	  message_t *mess = &message_table_get_element(this->tab, index);
-	  
-	  if(fts_is_symbol(at + 1))
-	    message_set(mess, fts_get_symbol(at + 1), ac - 2, (fts_atom_t *)(at + 2));
-	  else
-	    message_set(mess, fts_s_list, ac - 1, (fts_atom_t *)(at + 1));
+	  this->locked = 1;
+	  message_output(o, 0, mess);
+	  this->locked = 0;
 	}
-    }
-}
-
-static void
-messtab_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messtab_t *this = (messtab_t *)o;
-
-  if(ac && fts_is_a(at, message_table_type))
-    {
-      message_table_t *tab = (message_table_t *)fts_get_ptr(at);
-      
-      message_table_release(this->tab);
-      this->tab = tab;
-      message_table_refer(tab);  
     }
 }
 
@@ -157,101 +155,359 @@ messtab_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   messtab_t *this = (messtab_t *)o;
 
-  if(ac == 0)
+  if(!this->locked)
     {
-      int i;
-
-      for(i=0; i<message_table_get_size(this->tab); i++)
-	{
-	  message_t *mess = &message_table_get_element(this->tab, i);
-
-	  message_clear(mess);
+      if(ac > 0)
+	{ 
+	  if(fts_is_int(at) || fts_is_symbol(at))
+	    messtab_remove(this, at);
 	}
-    }
-  else if(fts_is_number(at))
-    {
-      int i = fts_get_number_int(at);
-
-      if(i >= 0 && i < message_table_get_size(this->tab))
+      else
 	{
-	  message_t *mess = &message_table_get_element(this->tab, i);
-	  message_clear(mess);
+	  fts_iterator_t iterator;
+
+	  /* clear int table */
+	  fts_hashtable_get_values(&this->table_int, &iterator);
+	  while ( fts_iterator_has_more( &iterator) )
+	    {
+	      fts_atom_t value;
+	      message_t *mess;
+
+	      fts_iterator_next( &iterator, &value);
+	      fts_atom_void(&value);
+	    }
+	  
+	  fts_hashtable_clear(&this->table_int);
+
+	  /* clear symbol table */
+	  fts_hashtable_get_values(&this->table_symbol, &iterator);
+	  while ( fts_iterator_has_more( &iterator) )
+	    {
+	      fts_atom_t value;
+	      message_t *mess;
+
+	      fts_iterator_next( &iterator, &value);
+	      fts_atom_void(&value);
+	    }
+
+	  fts_hashtable_clear(&this->table_symbol);
 	}
     }
 }
 
 static void
-messtab_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getmess_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messtab_t *this = (messtab_t *)o;
+  getmess_t *this = (getmess_t *)o;
 
-  if(ac && fts_is_number(at))
+  if(this->messtab)
+    fts_object_release((fts_object_t *)this->messtab);
+  
+  this->messtab = (messtab_t *)fts_get_object(at);
+  fts_object_refer((fts_object_t *)this->messtab);
+}
+
+static void
+getmess_set_key(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  this->key = at[0];
+}
+
+static void
+getmess_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+  message_t *mess = messtab_recall(this->messtab, &this->key);
+
+  if(mess)
     {
-      int size = fts_get_number_int(at);
-
-      if(size >= 0)
-	message_table_set_size(this->tab, size);
+      this->messtab->locked = 1;
+      message_output(o, 0, mess);
+      this->messtab->locked = 0;
     }
+}
+
+static void
+getmess_set_key_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_set_key(o, 0, 0, 1, at);
+  getmess_output(o, 0, 0, 0, 0);
+}
+
+static void
+putmess_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  messtab_store(this->messtab, &this->key, s, ac, at);
+}
+
+/**********************************************************
+ *
+ *  files
+ *
+ */
+#define MESSTAB_ATOM_BUF_BLOCK_SIZE 64
+#define MESSTAB_BLOCK_SIZE 64
+
+static fts_atom_t *
+messtab_atom_buf_new(int size)
+{
+  fts_atom_t *buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size);
+  return buf;
+}
+
+static void
+messtab_atom_buf_free(fts_atom_t *buf, int size)
+{
+  if(buf)
+    fts_block_free(buf, sizeof(fts_atom_t) * size);
+}
+
+static fts_atom_t *
+messtab_atom_buf_grow(fts_atom_t *buf, int size, int more)
+{
+  int new_size = size + more;
+  fts_atom_t *new_buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size); /* double size */
+  int i;
+  
+  for(i=0; i<size; i++)
+    new_buf[i] = buf[i];
+
+  fts_block_free(buf, sizeof(fts_atom_t) * size);
+
+  return new_buf;
 }
 
 static void
 messtab_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
-  int n;
-  
-  n = message_table_file_import_ascii(this->tab, name);
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_atom_file_t *file;
+  fts_atom_t a;
+  char c;
+  int i = 0;
+  int n = 0;
+  fts_atom_t *atoms;
+  int atoms_alloc = MESSTAB_ATOM_BUF_BLOCK_SIZE;
+
+  file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+
+  if(!file)
+    {
+      post("messtab: can't open file to read: %s\n", fts_symbol_name(file_name));
+      return;
+    }
+
+  messtab_clear(o, 0, 0, 0, 0);
+  atoms = messtab_atom_buf_new(atoms_alloc);
+
+  i = 0;
+  while (fts_atom_file_read(file, &a, &c))
+    {
+      if (fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(",")))
+	{
+	  /* next message */
+	  fts_atom_t key;
+	  
+	  fts_set_int(&key, n);
+	  messtab_store(this, &key, 0, n, atoms);
+
+	  i++;
+	  n = 0;
+	}
+      else
+	{
+	  /* next atom */
+	  if(n >= atoms_alloc)
+	    atoms = messtab_atom_buf_grow(atoms, atoms_alloc, MESSTAB_ATOM_BUF_BLOCK_SIZE);
+	  
+	  atoms[n] = a;
+	  n++;
+	}
+    }
+
+  messtab_atom_buf_free(atoms, atoms_alloc);
+  fts_atom_file_close(file);
 }
 
 static void
 messtab_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
-  
-  message_table_file_export_ascii(this->tab, name);
-}
+  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_atom_t  a;
+  fts_atom_file_t *file;
+  int i, j;
 
-static void
-messtab_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
+  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
 
-  if (cmd == fts_s_object)
-    fts_object_blip(o, "table of messages");
-  else if (cmd == fts_s_inlet)
+  if(!file)
     {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
-	{
-	case 0:
-	  fts_object_blip(o, "<number>: index to recall message from table");
-	  break;
-	case 1:
-	  fts_object_blip(o, "<messtab>: set reference");
-	  break;
-	}
+      post("messtab: can't open file to write: %s\n", fts_symbol_name(file_name));
+      return;
     }
-  else if (cmd == fts_s_outlet)
+
+  /* iterate */
+  while(1)
     {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
+      message_t *mess = 0;
+      fts_symbol_t selector = message_get_selector(mess);
+      int ac = message_get_ac(mess);
+      const fts_atom_t *at = message_get_at(mess);
+      fts_class_t *class = 0;
+      
+      if(ac == 1 && (fts_get_selector(at) == selector) && fts_atom_type_lookup(selector, &class))
 	{
-	case 0:
-	  fts_object_blip(o, "recalled message", n);
-	  break;
+	  if(!class)
+	    fts_atom_file_write(file, at, ' ');
 	}
+      else
+	{	    
+	  /* write message or list */
+	  if(selector == fts_s_list)
+	    {
+	      fts_set_symbol(&a, fts_s_open_cpar);
+	      fts_atom_file_write(file, &a, ' ');	      
+	    }
+	  else
+	    {
+	      fts_set_symbol(&a, selector);
+	      fts_atom_file_write(file, &a, ' ');
+	    }
+	  
+	  /* write atoms with space */
+	  for(j=0; j<ac; j++)	
+	    fts_atom_file_write(file, at + j, ' ');
+	  
+	  if(selector == fts_s_list)
+	    {
+	      fts_set_symbol(&a, fts_s_closed_cpar);
+	      fts_atom_file_write(file, &a, ' ');	      
+	    }
+	}
+
+      /* write comma and new line */
+      fts_set_symbol(&a, fts_s_comma);
+      fts_atom_file_write(file, &a, '\n');
     }
+
+  fts_atom_file_close(file);
 }
 
 /**********************************************************
  *
- *  class
+ *  classes
  *
  */
+
+static void
+getmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  ac--;
+  at++;
+
+  this->messtab = 0;
+  fts_set_int(&this->key, 0);
+  
+  if(ac > 1)
+    {
+      if(fts_is_int(at) || fts_is_symbol(at))
+	{
+	  this->key = at[0];
+
+	  /* skip key */
+	  ac--;
+	  at++;
+	}
+      else
+	fts_object_set_error(o, "Wrong arguments");
+    }
+
+  if(ac > 0 && fts_is_a((at), messtab_symbol))
+    {
+      this->messtab = (messtab_t *)fts_get_object(at);
+      fts_object_refer((fts_object_t *)this->messtab);
+    }
+  else
+    fts_object_set_error(o, "First argument of messtab required");
+}
+
+static void
+getmess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  fts_object_release((fts_object_t *)this->messtab);
+}
+
+static void
+messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+  int i;
+
+  ac--;
+  at++;
+
+  fts_hashtable_init(&this->table_int, fts_t_int, 64);
+  fts_hashtable_init(&this->table_symbol, fts_t_symbol, 64);
+
+  this->locked = 0;
+
+  for(i=0; i<ac; i++)
+    {
+      if(fts_is_list(at + i))
+	{
+	  fts_list_t *list = fts_get_list(at + i);
+	  int lac = fts_list_get_size(list);
+	  fts_atom_t *lat = fts_list_get_ptr(list);
+	  
+	  if(fts_is_int(lat) || fts_is_symbol(lat))
+	    {
+	      const fts_atom_t *key = lat;
+	      
+	      /* skip key */
+	      lac--;
+	      lat++;
+	      
+	      if(lac > 0)
+		{
+		  if(!messtab_store(this, key, 0, lac, lat))
+		    {
+		      messtab_clear(o, 0, 0, 0, 0);
+		      fts_object_set_error(o, "Wrong message definition in initialization");
+		    }
+		}
+	      else
+		messtab_store(this, key, fts_s_bang, 0, 0);
+	    }
+	  else
+	    {
+	      messtab_clear(o, 0, 0, 0, 0);
+	      fts_object_set_error(o, "Wrong key type in initialization");
+	    }
+	}
+      else
+	{
+	  messtab_clear(o, 0, 0, 0, 0);
+	  fts_object_set_error(o, "Wrong arguments");
+	}
+    }
+}
+
+static void
+messtab_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+
+  messtab_clear(o, 0, 0, 0, 0);
+}
 
 /* when defining a variable: daemon for getting the property "state". */
 static void
@@ -259,57 +515,60 @@ messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 {
   messtab_t *this = (messtab_t *) obj;
   
-  fts_word_set_ptr(fts_atom_value(value), (void *)this->tab);
-  fts_set_type(value, message_table_type);
+  fts_set_object_with_type(value, (fts_object_t *)this, messtab_symbol);
 }
 
 static fts_status_t
 messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-
-  if(ac == 2 && fts_is_a(at + 1, message_table_type))
-    {
-      fts_class_init(cl, sizeof(messtab_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(messtab_t), 1, 1, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messtab_init_refer);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messtab_delete);
-
-      fts_method_define_varargs(cl, 1, fts_s_anything, messtab_set_reference);
-    }
-  else if(ac == 1 || (ac > 1 && (fts_is_int(at + 1) || fts_is_list(at + 1))))
-    {
-      int i;
-
-      for(i=2; i<ac; i++)
-	{
-	  if(!fts_is_list(at + i))
-	    return &fts_CannotInstantiate;	    
-	}
-
-      /* define variable */
-      fts_class_init(cl, sizeof(messtab_t), 1, 1, 0);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
   
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messtab_init_define);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messtab_delete);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), messtab_set_size);
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messtab_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messtab_delete);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, messtab_index);
-  fts_method_define_varargs(cl, 0, fts_s_float, messtab_index);
-
-  fts_method_define_varargs(cl, 0, fts_s_set, messtab_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("put"), messtab_put);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("get"), messtab_get);
   fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), messtab_clear);
+  
+  return fts_Success;
+}
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), messtab_assist); 
+static fts_status_t
+getmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(getmess_t), 2, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, getmess_output);
+  fts_method_define_varargs(cl, 0, fts_s_int, getmess_set_key_and_output);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, getmess_set_key_and_output);
+  
+  fts_method_define_varargs(cl, 1, messtab_symbol, getmess_set_reference);
+
+  return fts_Success;
+}
+
+static fts_status_t
+putmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(getmess_t), 3, 0, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_anything, putmess_message);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, getmess_set_key);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, getmess_set_key);
+
+  fts_method_define_varargs(cl, 2, messtab_symbol, getmess_set_reference);
 
   return fts_Success;
 }
@@ -317,5 +576,9 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 messtab_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("messtab"), messtab_instantiate, fts_arg_type_equiv);
+  messtab_symbol = fts_new_symbol("messtab");
+
+  fts_class_install(messtab_symbol, messtab_instantiate);
+  fts_class_install(fts_new_symbol("getmess"), getmess_instantiate);
+  fts_class_install(fts_new_symbol("putmess"), putmess_instantiate);
 }
