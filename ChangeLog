@@ -1,8 +1,18 @@
+2003-04-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fixed io summary open/close/reopen crash
+
+	* fts/bytestream.c (fts_udpstream_delete): fixed udpstream destructor
+
+	* packages/io/c/src/in_out_tilda.c (in_tilda_instantiate): fixed class instantiation
+
+	* packages/io/c/src/udpreceive.c (udpreceive_delete): fixed udpreceive destructor
+
 2003-03-31  Olivier Chapuis  <olivier.chapuis@free.fr>
 
-        * packages/jack/c/src/jackaudiomanager.c (jackaudiomanager_thread_run):
-        (jackaudiomanager_halt):
-        (jackaudiomanager_config):
+	* packages/jack/c/src/jackaudiomanager.c (jackaudiomanager_thread_run):        
+	(jackaudiomanager_halt):        
+	(jackaudiomanager_config):
         Connect registered port only after the client has been activated
 
 2003-03-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
