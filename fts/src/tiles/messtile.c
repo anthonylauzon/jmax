@@ -487,10 +487,10 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       if (! new)
 	{
-	  /* post_mess("Error in object creation", ac - 2, av + 2); */
-	  /* Error reporting is now done in Java */
-	  return;
+	  post_mess("Cannot create object ", ac - 2, av + 2);
+	  new = fts_error_object_new(parent, id, ac - 2, av + 2);
 	}
+
 
       /* Upload the object if it have an ID */
 

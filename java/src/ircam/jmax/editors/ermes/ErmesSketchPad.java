@@ -978,6 +978,7 @@ Rectangle previousResizeRect = new Rectangle();
     if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
       itsPatcherElements.addElement(aObject);
     if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
+
   }
 
 
@@ -990,7 +991,7 @@ Rectangle previousResizeRect = new Rectangle();
   }
 
   public void mousePressed(MouseEvent e){
-    
+
     MaxApplication.setCurrentWindow(itsSketchWindow);
     itsSketchWindow.requestFocus();//???
     
@@ -1071,6 +1072,7 @@ Rectangle previousResizeRect = new Rectangle();
       previousRect.setBounds(x,y,0,0);
       currentPoint.setLocation(x,y);
     }
+
   }
        
   private void prepareForDynamicConnect(ErmesObjInOutlet io) {

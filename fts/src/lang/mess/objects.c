@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.20 $ IRCAM $Date: 1998/05/12 16:46:25 $
+ *      $Revision: 1.21 $ IRCAM $Date: 1998/05/18 14:59:03 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -244,12 +244,7 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed_urgent(obj, fts_s_value); /* should this be here or elsewhere ?? */
 
       if (fts_object_is_error(obj))
-	{
-	  fts_atom_t a;
-
-	  fts_set_int(&a, 1);
-	  fts_object_property_changed_urgent(obj, fts_s_error);
-	}
+	fts_object_property_changed_urgent(obj, fts_s_error);
 
       /* Declarations are not yet really supported */
 

@@ -14,7 +14,7 @@
  */
 
 
-fts_object_t *fts_error_object_new(fts_object_t *patcher, int id, int ac, const fts_atom_t *at)
+fts_object_t *fts_error_object_new(fts_patcher_t *parent, int id, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
   int i;
@@ -26,7 +26,7 @@ fts_object_t *fts_error_object_new(fts_object_t *patcher, int id, int ac, const 
   fts_set_int(&description[2], 0);
   fts_set_int(&description[3], 0);
 
-  obj = fts_object_new((fts_patcher_t *)patcher, id, 4, description);
+  obj = fts_object_new(parent, id, 4, description);
 
   /* Change the description in the object */
 

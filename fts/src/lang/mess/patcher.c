@@ -418,6 +418,18 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_block_free((char *) this->outlets, sizeof(fts_outlet_t *)*fts_object_get_outlets_number((fts_object_t *) this));
 }
 
+/* Error property handling */
+
+static void
+patcher_get_error(fts_daemon_action_t action, fts_object_t *obj,
+		  int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  if (fts_object_is_error(obj))
+    fts_set_int(value, 1);
+  else
+    fts_set_int(value, 0);
+}
+
 /* Class instantiation */
 
 static fts_status_t
@@ -453,6 +465,10 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close, 0, 0); 
 
   /* No methods really installed on the inlets  */
+
+  /* daemon for error property */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_error, patcher_get_error);
 
   return fts_Success;
 }

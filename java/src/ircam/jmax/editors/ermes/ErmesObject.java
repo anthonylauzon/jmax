@@ -193,7 +193,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     ErmesObjInlet	 aErmesObjInlet;
     ErmesObjOutlet	 aErmesObjOutlet;
     int aHDist;
-    
+
     // retrieve the inlet, outlet informations
     if (theFtsObject == null) {
       //this case have been seen during the instantiation of an external
@@ -259,7 +259,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
       }
       //yahooitsSketchPad.paintDirtyList();
     }
-    
 /////////    
     if (n_outlts>old_noutlts) {	//we added outlets...
      if(n_outlts>1) aHDist = (currentRect.width-10)/(n_outlts-1);
@@ -300,6 +299,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     if(NeedPropertyHandler()){
       itsFtsObject.watch("value", this);
     }
+
     //if (offGraphics!=null) PaintComplete();
   }
   
@@ -334,6 +334,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
     itsSketchPad.addToDirtyObjects(this);
+
     return true;
   }
 

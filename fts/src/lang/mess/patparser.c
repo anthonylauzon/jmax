@@ -672,7 +672,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	  fts_set_symbol(&void_description[0],  fts_new_symbol("empty"));
 
-	  obj = fts_error_object_new(parent, FTS_NO_ID, 1, void_description);
+	  obj = fts_error_object_new((fts_patcher_t *) parent, FTS_NO_ID, 1, void_description);
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, obj);
 
@@ -709,7 +709,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	  postatoms(argc + 1, description);
 	  post("\n");
 
-	  obj = fts_error_object_new(parent, FTS_NO_ID, argc + 1, description);
+	  obj = fts_error_object_new((fts_patcher_t *) parent, FTS_NO_ID, argc + 1, description);
 	}
 
       if (obj)

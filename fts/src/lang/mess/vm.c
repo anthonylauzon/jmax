@@ -599,7 +599,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 		postatoms(nargs, eval_tos);
 		post("\n");
 
-		new = fts_error_object_new(*object_tos, FTS_NO_ID, nargs, eval_tos);
+		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
 	      }
 
 	    /* Push the object in the object stack */
@@ -631,7 +631,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 		postatoms(nargs, eval_tos);
 		post("\n");
 
-		new = fts_error_object_new(*object_tos, FTS_NO_ID, nargs, eval_tos);
+		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
 	      }
 
 	    /* Push the object in the object stack */
@@ -664,7 +664,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 		postatoms(nargs, eval_tos);
 		post("\n");
 
-		new = fts_error_object_new(*object_tos, FTS_NO_ID, nargs, eval_tos);
+		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
 	      }
 
 	    /* Push the object in the object stack */
@@ -815,7 +815,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    p += 1;
 
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
-	    object_table[0] = 0;
 
 	    object_table_tos--;
 	    (* object_table_tos) = object_table;
@@ -835,7 +834,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    p += 2;
 
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
-	    object_table[0] = 0;
 
 	    object_table_tos--;
 	    (* object_table_tos) = object_table;
@@ -857,7 +855,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    p += 1;
 
 	    object_table = fts_malloc(sizeof(fts_object_t *) * size);
-	    object_table[0] = 0;
 
 	    object_table_tos--;
 	    (* object_table_tos) = object_table;
@@ -897,5 +894,19 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
       CHECK_EVAL_STACK;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
