@@ -50,7 +50,7 @@ static void consolestream_output(fts_bytestream_t *stream, int count, const unsi
 
 	  fts_stack_push( &this->line_buffer, char, '\0');
 
-	  fts_set_string( a, fts_stack_get_base( &this->line_buffer));
+	  fts_set_string( a, fts_stack_base( &this->line_buffer));
 	  fts_client_send_message( (fts_object_t *)this, s_print_line, 1, a);
 
 	  fts_stack_clear( &this->line_buffer);

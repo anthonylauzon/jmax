@@ -154,7 +154,3 @@ FTS_API void fts_client_release_object( fts_object_t *obj);
 FTS_API void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
 FTS_API void fts_client_send_property(fts_object_t *obj, fts_symbol_t property);
 
-
-
-
-

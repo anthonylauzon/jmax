@@ -32,26 +32,40 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
-/**
- * Class implementing the proxy of a message box.
- * 
- * If the listener of this object is an instance
- * of FtsMessageListener, fire it when the we got a new message content
- * from the server.
- */
-
 public class FtsMessConstObject extends FtsIntValueObject
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
+  private String message;
+
   public FtsMessConstObject(FtsServer fts, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
     super(fts, parent, id, className, args[offset].stringValue.equals(className) ? "" : args[offset].stringValue);
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
+
+    message = getDescription();
+  }
+
+  public void setMessage( String message)
+  {
+    this.message = message;
+
+    args.clear();
+    args.addRawString( message);
+    
+    try
+      {
+	send(FtsSymbol.get("set"), args);
+      }
+    catch( IOException e)
+      {
+	System.err.println("FtsMessageObject: I/O Error sending set Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public String getMessage()
+  {
+    return message;
   }
 }
 

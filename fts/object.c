@@ -38,7 +38,7 @@ unsigned int debugid = 0;
 #include <ftsprivate/connection.h>
 #include <ftsprivate/doctor.h>
 #include <ftsprivate/errobj.h>
-#include <ftsprivate/expression.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/property.h>
@@ -994,92 +994,6 @@ fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
   fts_object_put_prop(obj, name, value); 
 }
 
-void
-fts_object_send_properties(fts_object_t *obj)
-{
-  /* If the object have an ID (i.e. was created by the client, or a property has
-     been assigned to it),
-     ask the object to send the ninlets and noutlets  properties,
-     and name and declaration if any. */
-  if (obj->head.id != FTS_NO_ID) 
-    { 
-      fts_object_property_changed(obj, fts_s_x);
-      fts_object_property_changed(obj, fts_s_y);
-      fts_object_property_changed(obj, fts_s_height);
-      fts_object_property_changed(obj, fts_s_width);
-
-      fts_object_property_changed(obj, fts_s_font);
-      fts_object_property_changed(obj, fts_s_fontSize);
-      fts_object_property_changed(obj, fts_s_fontStyle);
-
-      if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
-	{
-	  fts_object_property_changed(obj, fts_s_wx);
-	  fts_object_property_changed(obj, fts_s_wy);
-	  fts_object_property_changed(obj, fts_s_wh);
-	  fts_object_property_changed(obj, fts_s_ww);
-	}
-
-      fts_object_property_changed(obj, fts_s_ninlets);
-      fts_object_property_changed(obj, fts_s_noutlets);
-      fts_object_property_changed(obj, fts_s_error);
-      fts_object_property_changed(obj, fts_s_error_description);
-
-      /* Usefull for comment or object with comments */
-      
-      fts_object_property_changed(obj, fts_s_comment);
-      fts_object_property_changed(obj, fts_s_layer);
-      fts_object_property_changed(obj, fts_s_color);
-      fts_object_property_changed(obj, fts_s_flash);
-
-      /* Ask the object to send to the client object specific properties */
-      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
-    }
-}
-
-
-void
-fts_object_send_properties_immediately(fts_object_t *obj)
-{
-  /* If the object have an ID (i.e. was created by the client, or a property has
-     been assigned to it),
-     ask the object to send the ninlets and noutlets  properties,
-     and name and declaration if any. */
-  if (obj->head.id != FTS_NO_ID) 
-    { 
-      fts_client_send_property(obj, fts_s_x);
-      fts_client_send_property(obj, fts_s_y);
-      fts_client_send_property(obj, fts_s_height);
-      fts_client_send_property(obj, fts_s_width);
-
-      fts_client_send_property(obj, fts_s_font);
-      fts_client_send_property(obj, fts_s_fontSize);
-      fts_client_send_property(obj, fts_s_fontStyle);
-
-      if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
-	{
-	  fts_client_send_property(obj, fts_s_wx);
-	  fts_client_send_property(obj, fts_s_wy);
-	  fts_client_send_property(obj, fts_s_wh);
-	  fts_client_send_property(obj, fts_s_ww);
-	}
-
-      fts_client_send_property(obj, fts_s_ninlets);
-      fts_client_send_property(obj, fts_s_noutlets);
-      fts_client_send_property(obj, fts_s_error);
-      fts_client_send_property(obj, fts_s_error_description);
-
-      /* Usefull for comment or object with comments */
-      
-      fts_client_send_property(obj, fts_s_comment);
-      fts_client_send_property(obj, fts_s_layer);
-      fts_client_send_property(obj, fts_s_color);
-      fts_client_send_property(obj, fts_s_flash);
-
-      /* Ask the object to send to the client object specific properties */
-      fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
-    }
-}
 
 /* properties used by the ui (value for the moment) at run time (update related) */
 void

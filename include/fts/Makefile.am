@@ -12,7 +12,7 @@ connection.h \
 doctor.h \
 dsp.h \
 errobj.h \
-expression.h \
+fifo.h \
 file.h \
 fifo.h \
 fpe.h \

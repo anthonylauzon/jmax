@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.guiobj;
 
@@ -37,23 +33,21 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class MessConst extends Editable implements FtsObjectErrorListener, FtsIntValueListener
 {
-  boolean isFlashing = false;
-  int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
-  int cornerSize = 0;
-  int cornerSizeMax = 0;
+  private boolean isFlashing = false;
+  private int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+  private int cornerSize = 0;
+  private int cornerSizeMax = 0;
 
-  public MessConst(FtsGraphicObject theFtsObject) 
+  public MessConst( FtsGraphicObject theFtsObject) 
   {
-    super(theFtsObject);
+    super( theFtsObject);
+
     cornerSizeMax = minWidth;
   }
     
-  // ----------------------------------------
-  // ``Args'' property
-  // ----------------------------------------
   public String getArgs()
   {
-    return ftsObject.getDescription();
+    return ((FtsMessConstObject)ftsObject).getMessage();
   }
     
   public void errorChanged(boolean value) 
@@ -71,24 +65,24 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     updateRedraw();
   }
   
-  public void setWidth(int w) 
-  {
-    if( w <= 0)
-      w = getDefaultWidth();
-    else
-      if(w < minWidth)
-	w = minWidth;
+//    public void setWidth(int w) 
+//    {
+//      if( w <= 0)
+//        w = getDefaultWidth();
+//      else
+//        if(w < minWidth)
+//  	w = minWidth;
     
-    super.setWidth(w);
+//      super.setWidth(w);
     
-    if(w < cornerSizeMax)
-      cornerSize = w;
-    else
-      cornerSize = cornerSizeMax;
+//      if(w < cornerSizeMax)
+//        cornerSize = w;
+//      else
+//        cornerSize = cornerSizeMax;
 
-    redraw();
-    fitToText();
-  }
+//      redraw();
+//      fitToText();
+//    }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {          
@@ -97,22 +91,26 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 	((FtsMessConstObject)ftsObject).sendBang();
   }
 
-  // redefined from base class
-  public void setFont( Font theFont)
-  {
-    super.setFont( theFont);
+//    // redefined from base class
+//    public void setFont( Font theFont)
+//    {
+//      super.setFont( theFont);
 
-    cornerSizeMax = getFontMetrics().stringWidth("x");
+//      cornerSizeMax = getFontMetrics().stringWidth("x");
 
-    setWidth(getWidth());
-    redraw();
-  }
+//      setWidth(getWidth());
+//      redraw();
+//    }
 
   public void redefine( String text) 
   {
-    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, "messconst " +text);
-    itsSketchPad.getDisplayList().remove(this);
-    dispose();
+    ((FtsMessConstObject)ftsObject).setMessage( text);
+
+    computeRenderer();
+    renderer.update();
+
+    redraw();
+    redrawConnections();
   }
 
   public void redefined()
@@ -190,7 +188,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
   public boolean isMultiline()
   {
-    return false;
+    return true;
   }
 
   // ----------------------------------------

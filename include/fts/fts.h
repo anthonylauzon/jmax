@@ -86,7 +86,7 @@ extern "C" {
 #include <fts/atom.h>
 #include <fts/object.h>
 #include <fts/connection.h>
-#include <fts/expression.h>
+#include <fts/parser.h>
 #include <fts/objectset.h>
 #include <fts/array.h>
 #include <fts/tuple.h>

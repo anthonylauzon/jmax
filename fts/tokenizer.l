@@ -27,7 +27,7 @@
 #include <fts/fts.h>
 #include "ftsprivate/tokenizer.h"
 
-#define YY_DECL int yylex( fts_atom_t *lvalp)
+#define YY_DECL static int yylex( fts_atom_t *lvalp)
 
 #define SET_INT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 10))
 #define SET_HEXINT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 16))
@@ -38,6 +38,7 @@
 %}
 
 %option noyywrap
+%option never-interactive
 
 whites		[ \t\n]
 letter		[A-Za-z_]
@@ -52,6 +53,7 @@ plus		\+
 minus		\-
 times		\*
 div		\/
+power		\*\*
 open_par	\(
 closed_par	\)
 open_sqpar	\[
@@ -73,11 +75,7 @@ smaller		\<
 smaller_equal	\<=
 colon		:
 equal		=
-symbol		[^ \t=\.\$\(\)\[\]\{\};,:]+
-/*  stdsymbol	({letter}|{decdigit})({letter}|{decdigit}|\+|\-)*~? */
-/*  operator	({plus}|{minus}|{times}|{div}|{percent}|{shift_left}|{shift_right}|{logical_and}|{logical_or}|{logical_not}|{equal_equal}|{not_equal}|{greater}|{greater_equal}|{smaller}|{smaller_equal}|{equal}) */
-/*  optilde		{operator}~ */
-/*  symbol		{stdsymbol}|{optilde} */
+symbol		[^ \t=\.\$\(\)\[\]\{\};,:\-+][^ \t=\.\$\(\)\[\]\{\};,:]*
 quoted_symbol	\"[^\"]+\"
 
 %%
@@ -92,6 +90,7 @@ quoted_symbol	\"[^\"]+\"
 {minus}		{ SET_SYMBOL( fts_s_minus); return 1; }
 {times}		{ SET_SYMBOL( fts_s_times); return 1; }
 {div}		{ SET_SYMBOL( fts_s_div); return 1; }
+{power}		{ SET_SYMBOL( fts_s_power); return 1; }
 {open_par}	{ SET_SYMBOL( fts_s_open_par); return 1; }
 {closed_par}	{ SET_SYMBOL( fts_s_closed_par); return 1; }
 {open_sqpar}	{ SET_SYMBOL( fts_s_open_sqpar); return 1; }

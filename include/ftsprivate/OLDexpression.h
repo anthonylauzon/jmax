@@ -20,6 +20,9 @@
  * 
  */
 
+#ifndef _FTS_PRIVATE_OLDEXPRESSION_H_
+#define _FTS_PRIVATE_OLDEXPRESSION_H_
+
 typedef struct fts_expression_state fts_expression_state_t;
 typedef struct fts_expression_assignement fts_expression_assignement_t;
 typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
@@ -41,3 +44,25 @@ FTS_API int fts_expression_get_status(fts_expression_state_t *e);
 
 FTS_API void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 
+extern void fts_expressions_init(void);
+
+
+extern int fts_expression_get_result_count(fts_expression_state_t *e);
+
+extern const char *fts_expression_get_msg(fts_expression_state_t *e);
+extern const char *fts_expression_get_err_arg(fts_expression_state_t *e);
+
+extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
+
+extern int fts_expression_map_to_assignements(fts_expression_state_t *e, 
+					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
+
+/*
+ * non documented 
+ */
+extern int fts_symbol_get_operator( fts_symbol_t s);
+extern void fts_symbol_set_operator( fts_symbol_t s, int op);
+extern int fts_symbol_is_operator( fts_symbol_t s);
+
+
+#endif

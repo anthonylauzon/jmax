@@ -105,7 +105,7 @@
 #endif
 
 #include <fts/fts.h>
-#include <ftsprivate/expression.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/vm.h>
 

@@ -77,8 +77,6 @@ FTS_API fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, c
 FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
 
 /* properties */
-FTS_API void fts_object_send_properties(fts_object_t *obj);
-FTS_API void fts_object_send_properties_immediately(fts_object_t *obj);
 FTS_API void fts_object_send_ui_properties(fts_object_t *obj);
 
 /* object description (system functions) */

@@ -48,6 +48,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/vm.h>
 
 /* **********************************************************************
@@ -80,7 +81,7 @@ static void xml_args( FILE *out, int *indent, int ac, fts_atom_t *at)
       else if (fts_is_symbol( at))
 	fprintf( out, "\"%s\"", fts_get_symbol( at));
 
-      fprintf( out, ">\n");
+      fprintf( out, " />\n");
     }
 }
 

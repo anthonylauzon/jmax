@@ -58,6 +58,10 @@ FTS connection lost results in tons of exceptions
 <p>
 FTS client library:
 <ul>
+<li> fix the setRootObject() and co: the FtsPatcherObject should probably be inside the FTS client 
+library (this requires big cleanup of the current ircam.jmax.fts.FtsPatcherObject). A FtsContainer 
+object should be introduced and all object creation from client side is delegated to 
+the 'parent' argument that is a FtsContainerObject. The client object is also a FtsContainerObject.
 <li>Add a UDP socket: create a udpstream derived from bytestream, add packet numbering 
 and may be simple packet reordering (window of N packets, with N < 10), add methods for
 sending message over the UDP socket instead of TCP
@@ -104,10 +108,17 @@ Configuration editor [see <a href="notes/io-configuration.html">notes/io-configu
 Extends this parser to be able to parse arrays of atoms (by switching scanner)
 and implement a first grammar for expressions (similar to the actual grammar,
 plus implementation of the dot operator and may be object creation).
-</p>
-
-<p>
-Add the action table, reintroduce evaluation stack
+<ul>
+<li>add variables evaluation ?? should we use fts_variable_add_user ???
+<li>add error handling
+<li>add [] evaluation: move getelem_* code from getval.c to respective classes,
+make fts_return global (may be create evaluator.c or expression.c ?)
+<li>add functions: make contiguous symbols (all symbols are copied) and dispatch 
+by selector+typeid ? sin(3.14) is a method of class __primitive_float ?
+<li>add object creation (new ???)
+<li>reuse the parser for object expressions
+<li>reuse the tokenizer for atom files ??
+</ul>
 </p>
 
 <p>
@@ -121,7 +132,7 @@ Evaluate variables.c reimplementation
 <p>
 Implement a message fifo. The message arguments should be in  a separate
 buffer (allocator?) so that one message arguments are contiguous and cannot
-overlap.
+wrap around the buffer.
 </p>
 
 <p>
@@ -163,6 +174,40 @@ after the .pat loader, or it must understand that the file is a .pat and
 refuse to load it (which implies some knowledger between the different loader
 objects).
 </p>
+
+<!-- ---------------------------------------------------------------------- -->
+<h3>API cleanup</h3>
+
+<p>
+Remove fts_object_property_changed and fts_client_send_property
+
+<p>
+Clean property handling: keep property list (replace by a hashtable ?),
+replace daemon by methods using fts_return
+
+<p>
+Remove meta-classes ???
+
+<p>
+Remove doctors
+
+<p>
+Replace FTS_HASHTABLE_INT and co by fts_t_int
+
+<p>
+Remove parameters
+
+<p>
+Change scheduler API to insert directly a method
+
+<p>
+Remove soundfile
+
+<p>
+Remove fts_new_symbol_copy (symbols are always copied into a contiguous area)
+
+<p>
+Remove updates with properties
 
 
 <!-- ---------------------------------------------------------------------- -->

@@ -60,5 +60,7 @@ FTS_API void fts_connection_delete(fts_connection_t *conn);
 
 #define fts_is_connection(p) (fts_object_get_metaclass(p) == fts_connection_type)
 
+FTS_API void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
+FTS_API void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);
 
 

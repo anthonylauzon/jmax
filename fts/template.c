@@ -56,6 +56,7 @@
 #endif
 
 #include <ftsprivate/errobj.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/vm.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>

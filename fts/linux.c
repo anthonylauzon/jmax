@@ -362,7 +362,7 @@ static void watchdog_signal_handler( int sig)
   
   select( 0, 0, 0, 0, &timeout);
 
-  fprintf( stderr, "[FTS] watchdog activated\n");
+  fts_log( "[FTS] watchdog activated\n");
 }
 
 static void sigchld_signal_handler( int sig)
@@ -373,8 +373,9 @@ static void sigchld_signal_handler( int sig)
 
 static void watchdog_low( void)
 {
-  set_priority( -3);
   abandon_root();
+
+  signal( SIGCHLD, sigchld_signal_handler);
 
   while (1)
     {
@@ -399,12 +400,14 @@ static void my_fd_set( int fd, fd_set *fds)
   FD_SET( fd, fds);
 }
 
-static void watchdog_high( void)
+static void watchdog_high( int fts_pid)
 {
   int armed = 0;
 
   set_priority( -1);
   abandon_root();
+
+  signal( SIGCHLD, sigchld_signal_handler);
 
   while (1)
     {
@@ -432,7 +435,7 @@ static void watchdog_high( void)
       else if (r == 0)
 	{
 	  armed = 1;
-	  kill( getppid(), SIGHUP);
+	  kill( fts_pid, SIGHUP);
 	  fts_log( "watchdog waking up\n"); 
 	}
       else
@@ -440,28 +443,34 @@ static void watchdog_high( void)
     }
 }
 
-static void do_fork( void (*f)(void))
+static int do_fork( void)
 {
   int pid;
 
   if ((pid = fork()) < 0)
-    fprintf( stderr, "cannot fork (%s)\n", strerror( errno));
-  else if (pid)
-    (*f)();
+    {
+      fts_log( "cannot fork (%s)\n", strerror( errno));
+      exit( 2);
+    }
+
+  return pid;
 }
 
 static void start_watchdog( void)
 {
+  int child_pid;
+
   if (pipe( wdpipe) < 0)
     {
       fprintf( stderr, "cannot create pipe (%s)\n", strerror( errno));
       return;
     }
 
-  signal( SIGCHLD, sigchld_signal_handler);
+  if ((child_pid = do_fork()))
+    watchdog_low();
 
-  do_fork( watchdog_low);
-  do_fork( watchdog_high);
+  if ((child_pid = do_fork()))
+    watchdog_high( child_pid);
 
   signal( SIGHUP, watchdog_signal_handler);
 }

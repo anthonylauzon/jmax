@@ -62,7 +62,7 @@
 /* #define EXPRESSION_TRACE_DEBUG */
 
 #include <fts/fts.h>
-#include <ftsprivate/expression.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/patcher.h>
 

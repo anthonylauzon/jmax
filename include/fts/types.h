@@ -44,7 +44,7 @@ typedef struct fts_status_description fts_status_description_t, *fts_status_t;
 union fts_word
 {
   int                 fts_int;
-  double              fts_double;
+  double              fts_float;
   fts_symbol_t        fts_symbol;
   fts_object_t        *fts_object;
   void                *fts_pointer;

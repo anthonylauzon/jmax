@@ -29,6 +29,7 @@
 #include <unistd.h>
 #endif
 
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/object.h>

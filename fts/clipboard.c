@@ -42,6 +42,7 @@
 #include <process.h>
 #endif
 
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>

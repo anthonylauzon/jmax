@@ -621,7 +621,7 @@ static fts_status_t fts_memorystream_instantiate(fts_class_t *cl, int ac, const 
 
 unsigned char *fts_memorystream_get_bytes( fts_memorystream_t *stream)
 {
-  return (unsigned char *)fts_stack_get_base( &stream->output_buffer);
+  return (unsigned char *)fts_stack_base( &stream->output_buffer);
 }
 
 void fts_memorystream_reset( fts_memorystream_t *stream)

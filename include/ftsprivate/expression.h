@@ -23,26 +23,4 @@
 #ifndef _FTS_PRIVATE_EXPRESSION_H_
 #define _FTS_PRIVATE_EXPRESSION_H_
 
-extern void fts_expressions_init(void);
-
-
-
-extern int fts_expression_get_result_count(fts_expression_state_t *e);
-
-extern const char *fts_expression_get_msg(fts_expression_state_t *e);
-extern const char *fts_expression_get_err_arg(fts_expression_state_t *e);
-
-extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
-
-extern int fts_expression_map_to_assignements(fts_expression_state_t *e, 
-					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
-
-/*
- * non documented 
- */
-extern int fts_symbol_get_operator( fts_symbol_t s);
-extern void fts_symbol_set_operator( fts_symbol_t s, int op);
-extern int fts_symbol_is_operator( fts_symbol_t s);
-
-
 #endif

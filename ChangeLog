@@ -1,3 +1,12 @@
+2002-07-08  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* commited first version of the message box with expression parser
+
+2002-06-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fts/object.c: removed unused functions fts_object_send_properties
+	and fts_object_send_properties_immediately
+
 2002-06-11  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* added include/fts/fifo.h and fts/fifo.c that may help writing
@@ -42,7 +51,7 @@
 	* minor changes in fts/audiofile.c
 	* adapted fvec.c (table~ and tab1~ to be tested!)
 
-2002-03-15  FranÃ§ois DÃ©chelle  <dechelle@mac-dechelle.ircam.fr>
+2002-03-15  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed audio on Mac OS X and added time-constrainted scheduling
 
@@ -53,16 +62,16 @@
 	* bug fix in object redefinition and metro (crashed when redefined while running)
 	* removed math package from compilation
 
-2002-03-14  FranÃ§ois DÃ©chelle  <dechelle@mac-dechelle.ircam.fr>
+2002-03-14  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed packages compilation problems on Mac OS X (libtool is edited
 	by configure+sed). Fixed wrong ENDIAN macro in utils.h
 
-2002-03-12  FranÃ§ois DÃ©chelle  <dechelle@mac-dechelle.ircam.fr>
+2002-03-12  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fts/audio.c: fixed code for installing default audio port class
 
-2002-03-08  FranÃ§ois DÃ©chelle  <dechelle@mac-dechelle.ircam.fr>
+2002-03-08  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed packages compilation problems on Mac OS X:
 Problem on Mac OS X with shared libraries:
@@ -85,7 +94,7 @@ The solution that seems to work is to add rules for colling explicitely the C co
 install the .so library that was produced.
 
 
-2002-03-05  FranÃ§ois DÃ©chelle  <dechelle@mac-dechelle.ircam.fr>
+2002-03-05  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* porting of version 3.1 to Mac OS X: fixed automake problems, compilation problems
 

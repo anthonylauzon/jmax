@@ -1,4 +1,5 @@
 noinst_HEADERS= \
+OLDexpression.h \
 abstraction.h \
 audio.h \
 bmaxhdr.h \
@@ -8,7 +9,6 @@ connection.h \
 doctor.h \
 dspgraph.h \
 errobj.h \
-expression.h \
 fpe.h \
 label.h \
 loader.h \

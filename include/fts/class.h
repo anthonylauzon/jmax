@@ -29,7 +29,7 @@ typedef struct fts_outlet_decl fts_outlet_decl_t;
 /* Predefined typeids */
 #define FTS_TYPEID_VOID     1
 #define FTS_TYPEID_INT      2
-#define FTS_TYPEID_DOUBLE   3
+#define FTS_TYPEID_FLOAT    3
 #define FTS_TYPEID_SYMBOL   4
 #define FTS_TYPEID_POINTER  5
 #define FTS_TYPEID_STRING   6
