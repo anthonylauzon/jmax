@@ -119,8 +119,11 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     separate_tracks.setLayout(new BorderLayout());
 		
 		//------------------ prepares TempoBar
-		tempoBar = new TempoBar(geometry, ftsSequenceObject);
+		Dimension td = new Dimension(SequenceWindow.DEFAULT_WIDTH+TrackContainer.BUTTON_WIDTH, TempoBar.TEMPO_HEIGHT);
+		tempoBar = new TempoBar(geometry, ftsSequenceObject, this);
 		tempoBar.setSize(SequenceWindow.DEFAULT_WIDTH+TrackContainer.BUTTON_WIDTH, TempoBar.TEMPO_HEIGHT);
+		tempoBar.setPreferredSize(td);
+		tempoBar.setMinimumSize(td);
 		
 		centerSection = new JPanel();			
 		Border border = scrollTracks.getBorder();

@@ -36,16 +36,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-public class TempoBar extends JPanel implements TrackDataListener, TrackStateListener, TrackListener, ListSelectionListener
+public class TempoBar extends PopupToolbarPanel implements TrackDataListener, TrackStateListener, TrackListener, ListSelectionListener
 {
-  public TempoBar( Geometry geom, FtsGraphicObject obj)
-  {
+  public TempoBar( Geometry geom, FtsGraphicObject obj, SequenceEditor ed)
+	{
     super();
-	
+		
 		setFont(SequencePanel.rulerFont);
     fm = getFontMetrics( SequencePanel.rulerFont);
     this.geometry = geom;
 		this.ftsObj = obj;
+		this.container = ed;
 		this.isInSequence = (ftsObj instanceof FtsSequenceObject);
 		pa = new PartitionAdapter(geometry, null);
     
@@ -53,13 +54,10 @@ public class TempoBar extends JPanel implements TrackDataListener, TrackStateLis
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
     
 		if( !isInSequence)
-		{
-			//createDisplayer();
 			((FtsTrackObject)ftsObj).addTrackStateListener(this);		
-		}
 		else
 			((FtsSequenceObject)ftsObj).addTrackListener(this);
-							
+		
     geometry.addTranspositionListener( new TranspositionListener() {
 			public void transpositionChanged(int newValue)
 		  {
@@ -68,56 +66,128 @@ public class TempoBar extends JPanel implements TrackDataListener, TrackStateLis
 		});		
 		geometry.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-			{	  
+		{	  
 				if( e.getPropertyName().equals("gridMode"))
 					repaint();
-			}
+		}
+		});
+		
+		addMouseListener(new MouseListener(){
+			public void mouseClicked(MouseEvent e){}
+			public void mousePressed(MouseEvent e){}
+			public void mouseReleased(MouseEvent e){}
+			public void mouseEntered(MouseEvent e)
+		  {
+				requestFocus();
+		  }
+			public void mouseExited(MouseEvent e){}
 		});				
+		
+		validate();
 	}
 
-/*public void createDisplayer()
+public FtsTrackObject getMarkers()
 {
-	JPanel labelPanel = new JPanel();
-	labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
-	labelPanel.setOpaque(false);
-	
-	displayLabel = new JLabel();
-	displayLabel.setFont( Displayer.displayFont);
-	displayLabel.setForeground( Color.gray);
-	displayLabel.setBackground( Color.red);
-	displayLabel.setPreferredSize( new Dimension(102, 15));
-	displayLabel.setMaximumSize( new Dimension(102, 15));
-	displayLabel.setMinimumSize( new Dimension(102, 15));
-	
-	labelPanel.add( Box.createRigidArea( new Dimension(5, 0)) );
-	labelPanel.add( displayLabel);
-	labelPanel.add( Box.createHorizontalGlue());
-	
-	add(labelPanel);
-	add(displayLabel);
-	
-	add(Box.createVerticalGlue());
-	 
-	setDisplayer( new Displayer(){
-		public void display(String text)
-	  {
-			displayLabel.setText( text);
-		}
-	});
-	validate();
-}*/
+	return markersTrack;
+} 
 
-public void paintComponent(Graphics g)
+public JPopupMenu getMenu()
 {
-	paintMeasures(g);
+	if(popup == null)
+		createPopup();
+		
+	popup.update();
+	return popup;
 }
 
-public void paintMeasures(Graphics g)
+public void setPropertyToDraw(String propName, boolean toDraw)
+{
+	boolean changeSize = false;
+	
+	for(int i=0 ; i < propertyNames.length; i++)
+		if(propertyNames[i].equals(propName))
+		{
+			if(propertyToDraw[i] != toDraw)
+			{				
+				propertyToDraw[i] = toDraw;
+				changeSize = true;
+			}
+			break;
+		}
+	
+	if(changeSize)
+	{
+		Dimension d = getSize();
+		int delta;
+		if(toDraw) 
+		{
+			numPropToDraw++;
+			delta = DELTA_H;
+		}
+		else 	
+		{
+			numPropToDraw--;			
+			delta = -DELTA_H;
+		}
+		d.height += delta;
+		
+		setSize(d.width, d.height);
+		setPreferredSize(d);
+		setMinimumSize(d);
+		validate();
+		container.getEditorContainer().getFrame().pack();
+	}
+		
+	repaint();
+}
+
+void initPropertiesToDraw()
+{
+	int i = 0;
+	int count = markersTrack.getPropertyCount();
+	propertyNames = new String[ count];
+	propertyToDraw = new boolean[ count];
+	for(Enumeration e = markersTrack.getPropertyNames(); e.hasMoreElements();)
+	{
+		propertyNames[i] = (String)e.nextElement();	
+		propertyToDraw[i] = (propertyNames[i].equals("tempo") || propertyNames[i].equals("meter"));
+		i++;
+	}
+	numPropToDraw = 2;
+}
+
+void createPopup()
+{
+	popup = new TempoBarPopupMenu(this);
+}
+
+public void paintComponent(Graphics g)
 {
 	Rectangle clip = g.getClipBounds();
 	g.setColor( Color.white);
 	g.fillRect( clip.x, clip.y, clip.width, clip.height);
 	
+	paintLegend(g, clip);
+	paintMeasures(g, clip);
+}
+
+public void paintLegend(Graphics g, Rectangle clip)
+{
+	if(markersTrack!=null)
+	{
+		int h = DELTA_H-1;
+		g.setColor( Color.lightGray);
+		g.setFont( Displayer.displayFont);
+		for(int i = 0; i < propertyNames.length; i++)
+			if(propertyToDraw[i])
+			{
+				g.drawString( propertyNames[i], clip.x + 3, clip.y+h);
+				h+=DELTA_H;
+			}
+	}
+}
+public void paintMeasures(Graphics g, Rectangle clip)
+{
 	if( markersTrack!= null)
 	{
 		TrackEvent evt;		
@@ -138,32 +208,36 @@ public void paintMeasures(Graphics g)
 				if( markersSelection.isInSelection(evt))
 					g.setColor( selTempoColor);
 				else
-					g.setColor( tempoColor);		
-					
-				Double tempo = (Double)evt.getProperty("tempo");
-				if(tempo!=null)
-				{
-					String str = ""+tempo.intValue();
-					int strw = fm.stringWidth(str);
-					g.drawString( str, x - strw/2 + 1, 12);
-				}
+					g.setColor( tempoColor);	
 			}
-			else if(type.equals("bar"))
-			{					
+			else
+			{
 				if( markersSelection.isInSelection(evt))
 					g.setColor( Color.red);
 				else
-					g.setColor( Color.darkGray);			
-					
-				String meterUp = ((MarkerValue)evt.getValue()).getMeterValue();
-				String meterDown = ((MarkerValue)evt.getValue()).getMeterType();
-				
-				if(meterUp != null && meterDown != null)
-				{
-					g.drawString(""+meterUp, x - 3, 8);
-					g.drawString(""+meterDown, x - 3, 16);
-				}
+					g.setColor( Color.darkGray);	
 			}
+			
+			int h = DELTA_H-1;
+			Object prop;
+			String str;
+			int strw;
+			g.setFont( Displayer.displayFont);
+			for(int i = 0; i < propertyNames.length; i++)
+				if(propertyToDraw[i])
+				{
+					prop = evt.getProperty(propertyNames[i]);
+					if(prop!=null)
+					{
+						if(prop instanceof Double)
+							str = ""+((Double)prop).intValue();
+						else
+							str = prop.toString();
+						strw = fm.stringWidth(str);
+						g.drawString( str, x - strw/2 + 1, h);
+					}
+					h+=DELTA_H;
+				}
 		}
 	}
 }
@@ -176,24 +250,6 @@ int getXIndentation()
 		return 0;
 }
 
-/*void setDisplayer(Displayer d)
-{
-	oldDisplayer = d;
-}
-
-public void resetDisplayer()
-{
-	Displayer disp = gc.getDisplayer();
-	gc.setDisplayer(oldDisplayer);
-	oldDisplayer = disp;
-}*/
-
-public Dimension getPreferredSize()
-{ return tempoDimension; }
-
-public Dimension getMinimumSize()
-{ return tempoDimension; }
-
 //=================== TrackDataListener interface ========================
 
 public void objectChanged(Object spec, String propName, Object propValue){repaint();}
@@ -204,7 +260,7 @@ public void objectsAdded(int maxTime){repaint();}
 public void objectDeleted(Object whichObject, int oldIndex){repaint();}
 public void trackCleared(){repaint();}
 public void startTrackUpload( TrackDataModel track, int size){}
-public void endTrackUpload( TrackDataModel track){}
+public void endTrackUpload( TrackDataModel track){ initPropertiesToDraw();}
 public void startPaste(){}
 public void endPaste(){}
 public void trackNameChanged(String oldName, String newName) {}
@@ -221,6 +277,8 @@ public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelectio
 	markersSelection.addListSelectionListener(this);
 	markersTrack = markers;
 	markersTrack.addListener(this);
+	
+	initPropertiesToDraw();
 }
 public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 {
@@ -233,7 +291,10 @@ public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 		markersSelection = null;
 		markersTrack = null;
 	}
+	initPropertiesToDraw();
+	
 	repaint();
+	popup = null;
 }
 //===================== TrackListener interface =============================
 public void trackAdded(Track track)
@@ -246,19 +307,23 @@ public void trackChanged(Track track){};
 public void trackMoved(Track track, int oldPosition, int newPosition){};   
 
 //--- Ruler fields
-Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, TEMPO_HEIGHT);
 FontMetrics fm;
 PartitionAdapter utilityPartitionAdapter;
 Geometry geometry;
 FtsGraphicObject ftsObj;
 PartitionAdapter pa;
-public final static int TEMPO_HEIGHT = 20; 
+SequenceEditor container;
+public final static int TEMPO_HEIGHT = 23; 
+public final static int DELTA_H = 10; 
+public static Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, TEMPO_HEIGHT);
 public boolean isInSequence;
 FtsTrackObject markersTrack = null;
 SequenceSelection markersSelection = null;
-/*JLabel displayLabel;
-Displayer oldDisplayer;*/
+String[] propertyNames;
+public boolean[] propertyToDraw;
+int numPropToDraw;
 
+TempoBarPopupMenu popup = null;
 Color tempoColor = new Color(165, 165, 165, 100);
 Color selTempoColor = new Color(255, 0, 0, 100);
 Color highTempoColor = new Color(0, 255, 0, 100);

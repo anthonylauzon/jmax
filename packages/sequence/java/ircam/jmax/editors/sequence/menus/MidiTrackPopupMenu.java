@@ -131,7 +131,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 		});		
     gridMenuGroup.add(timeItem);
     add(timeItem);    
-    measuresItem = new JRadioButtonMenuItem("Show Measures");
+    measuresItem = new JRadioButtonMenuItem("Show Markers");
 		measuresItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {

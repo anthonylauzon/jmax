@@ -24,6 +24,8 @@ package ircam.jmax.editors.sequence;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.fts.*;
 
+import java.awt.*;
+
 /** An interface for the editor 
   */
 public interface SequenceEditor extends Editor

@@ -60,7 +60,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 	transient SequenceSelection currentMarkersSelection = null;
 	
   transient JScrollPane scrollTracks;
-	transient JPanel centerSection;
+	transient JPanel centerSection, separate_tracks;
   //---
   transient JLabel itsZoomLabel;
   transient JScrollBar itsTimeScrollbar;
@@ -122,18 +122,21 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 		setLayout( new BorderLayout());
 		
 		//------------------------------------------------
-		JPanel separate_tracks = new JPanel();
+		separate_tracks = new JPanel();
 		separate_tracks.setLayout( new BorderLayout());
 		
 		if( trackData.getType().getPublicName().equals( AmbitusValue.SCOOB_PUBLIC_NAME))
 		{
 			// Create TempoBar
-			tempoBar = new TempoBar(geometry, ftsTrackObject);
+			tempoBar = new TempoBar(geometry, ftsTrackObject, this);
 			tempoBar.setSize(SequenceWindow.DEFAULT_WIDTH, TempoBar.TEMPO_HEIGHT);
+			tempoBar.setPreferredSize(TempoBar.tempoDimension);
+			tempoBar.setMinimumSize(TempoBar.tempoDimension);
+			
 			//------------------ prepares Center Section
 			centerSection = new JPanel();			
 			Border border = scrollTracks.getBorder();
-			scrollTracks.setBorder(BorderFactory.createEmptyBorder());
+			scrollTracks.setBorder(new EtchedBorder());
 			centerSection.setBorder(border);
 			centerSection.setLayout( new BorderLayout());
 			centerSection.add( scrollTracks, BorderLayout.CENTER);
@@ -193,13 +196,15 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 					{
 						centerSection.add( tempoBar, BorderLayout.NORTH);
 						/*tempoBar.resetDisplayer();*/
-						revalidate();
+						centerSection.validate();
+						TrackPanel.this.validate();
 					}
 					else
 					{
 						centerSection.remove( tempoBar);
 						/*tempoBar.resetDisplayer();*/
-						revalidate();
+						centerSection.validate();
+						TrackPanel.this.validate();
 					}
 				}
 			}
@@ -345,7 +350,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
     resizePanelToTimeWithoutScroll(evtTime);
   }
-  
+	
   ////////////////////////////////////////////////////////////
   //------------------- SequenceEditor interface ---------------
   public void copy()
