@@ -37,12 +37,13 @@
 
 /* defines for language features */
 #define restrict 
+#undef WORDS_BIGENDIAN 
 
 /* mapping posix names to win32 names */
-#define open  _open
-#define read  _read
-#define write  _write
-#define close  _close
+/*  #define open  _open */
+/*  #define read  _read */
+/*  #define write  _write */
+/*  #define close  _close */
 #define getcwd _getcwd
 #define isatty _isatty
 #define alloca _alloca

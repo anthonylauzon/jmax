@@ -320,12 +320,14 @@ void fts_kernel_dsp_init(void)
   fts_s_dsp_on = fts_new_symbol("dsp_on");
   fts_s_sample_rate = fts_new_symbol("sample_rate");
 
-  /* create main DSP graph */
-  fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
-
   /* init sample rate */
+  /* FIXME: pH07: sample rate and tick size where initialized AFTER 
+     fts_dsp_graph_init. */
   dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
   dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
+
+  /* create main DSP graph */
+  fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
 
   dsp_tick_duration = (double)dsp_tick_size * 1000.0 / 44100.0;
   dsp_tick_duration_minus_one_sample = (double)(FTS_DSP_DEFAULT_TICK_SIZE - 1) * 1000.0 / 44100.0;

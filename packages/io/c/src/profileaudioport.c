@@ -25,8 +25,17 @@
  * measured by dividing the profile_interval by the elapsed system time.
  */
 
-#include <sys/time.h>
 #include <fts/fts.h>
+#include <ftsconfig.h>
+
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#if HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+
 
 #define DEFAULT_PROFILE_INTERVAL 10000
 
@@ -58,12 +67,15 @@ static void profileaudioport_output( fts_word_t *argv)
 
   if (this->samples_count >= this->profile_interval)
     {
+#ifdef WIN32
+      double now = GetTickCount() * 1000.0;
+#else
       struct timeval tm;
       double now;
 
       gettimeofday( &tm, 0);
-
-      now = (double)tm.tv_sec + (double)tm.tv_usec / 1000000.0;
+      now = (double)tm.tv_sec + (double)tm.tv_usec * 1000000.0;
+#endif
 
       this->estimated_sample_rate = (int)(this->samples_count / (now - this->last_time));
       this->last_time = now;
@@ -77,7 +89,9 @@ static void profileaudioport_output( fts_word_t *argv)
 static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
+#ifndef WIN32
   struct timeval tm;
+#endif
 
   fts_audioport_init( &this->head);
 
@@ -92,8 +106,12 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_alarm_init( &(this->output_alarm), 0, profileaudioport_output_alarm, this);	
 
+#ifdef WIN32
+  this->last_time = GetTickCount() * 1000.0;
+#else
   gettimeofday( &tm, 0);
   this->last_time = tm.tv_sec + 1000000 * tm.tv_usec;
+#endif
 
   this->samples_count = 0;
 }

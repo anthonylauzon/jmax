@@ -78,13 +78,12 @@
 ;;
 ;;   libname: creates the platform specific library name
 ;;
-(define warning 
-  (lambda l 
-    (begin (display "jMax: Warning: ") 
-	   (lprintln l))))
+(define (warning . l) 
+  (display "jMax: Warning: ") 
+  (lprintln l))
 
-(define println 
-  (lambda l (lprintln l)))
+(define (println . l) 
+  (lprintln l))
 
 (define (lprintln l) 
   (if (null? l) 
@@ -95,8 +94,8 @@
 
 (define cat string-append)
 
-(define file-cat 
-  (lambda l (lfile-cat (car l) (cdr l))))
+(define (file-cat . l)
+  (lfile-cat (car l) (cdr l)))
 
 (define (lfile-cat s l) 
   (if (null? l) 
@@ -364,16 +363,14 @@
 ;;
 ;; ucs
 ;;
-(define ucs 
-  (lambda arg (fts-ucs-command (get-fts) (list->max-vector arg))))
+(define (ucs . arg) 
+  (fts-ucs-command (get-fts) (list->max-vector arg)))
 
 ;;
 ;; sync
 ;;
-(define (sync)
-  (let ((before (system-current-time-millis)))
-    (fts-sync (get-fts))
-    (- (system-current-time-millis) before)))
+(define (sync) 
+  (fts-sync (get-fts)))
 
 ;;
 ;; fts-connect

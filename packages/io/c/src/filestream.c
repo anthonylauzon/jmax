@@ -23,13 +23,17 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
 
-#include <fts/fts.h>
 
 static fts_symbol_t sym_in = 0;
 static fts_symbol_t sym_out = 0;
@@ -38,7 +42,7 @@ typedef struct _filestream_
 {
   fts_bytestream_t head;
   fts_symbol_t name;
-  int fd;
+  FILE* fd;
   unsigned char *in_buf; /* input buffer */
   int in_size;
   unsigned char *out_buf; /* output buffer */
@@ -55,8 +59,8 @@ filestream_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   do
     {
-      n_read = read(this->fd, this->in_buf, size);
-      
+      n_read = fread(this->in_buf, 1, size, this->fd);
+
       fts_bytestream_input((fts_bytestream_t *)o, n_read, this->in_buf);
     }      
   while(n_read == size);
@@ -81,8 +85,8 @@ static void
 filestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
 {
   filestream_t *this = (filestream_t *)stream;
-  int n_wrote = write(this->fd, c, n);
-  
+  int n_wrote = fwrite(&c, 1, n, this->fd);
+
   if(n_wrote != n)
     post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
 }
@@ -92,7 +96,7 @@ filestream_output_char(fts_bytestream_t *stream, unsigned char c)
 {
   filestream_t *this = (filestream_t *)stream;
   /* un-buffered output */
-  int n_wrote = write(this->fd, &c, 1);
+  int n_wrote = fwrite(&c, 1, 1, this->fd);
   
   if(n_wrote != 1)
     post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
@@ -110,7 +114,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
   if(n_over > 0)
     {
       bcopy(c, this->out_buf + this->out_fill, n - n_over);
-      n_wrote = write(this->fd, this->out_buf, this->out_size);
+      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
       
       bcopy(c, this->out_buf, n_over);
       this->out_fill = n_over;
@@ -118,7 +122,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
   else if(n_over == 0)
     {
       bcopy(c, this->out_buf + this->out_fill, n);
-      n_wrote = write(this->fd, this->out_buf, this->out_size);
+      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
       
       this->out_fill = 0;
     }
@@ -145,7 +149,7 @@ filestream_output_char_buffered(fts_bytestream_t *stream, unsigned char c)
   
   if(this->out_fill >= out_size)
     {
-      n_wrote = write(this->fd, this->out_buf, this->out_size);
+      n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
       
       if(n_wrote != out_size)
 	post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
@@ -163,7 +167,7 @@ filestream_flush(fts_bytestream_t *stream)
   
   if(n > 0)
     {
-      int n_wrote = write(this->fd, this->out_buf, n);
+      int n_wrote = fwrite(this->out_buf, 1, n, this->fd);
       
       if(n_wrote != n)
 	post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
@@ -229,9 +233,9 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       int out = 0;
       int in_size = 0;
       int out_size = 0;
-      int fd = -1;
+      FILE* fd = NULL;
 
-      this->fd = -1;
+      this->fd = NULL;
       this->in_buf = 0;
       this->in_size = 0;
       this->out_buf = 0;
@@ -309,13 +313,13 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       /* open file */
       if(in && out)
-	fd = open(fts_symbol_name(name), O_RDWR | O_NONBLOCK);
+	fd = fopen(fts_symbol_name(name), "w+b");
       else if(in)
-	fd = open(fts_symbol_name(name), O_RDONLY | O_NONBLOCK);
+	fd = fopen(fts_symbol_name(name), "rb");
       else if(out)
-	fd = open(fts_symbol_name(name), O_WRONLY | O_NONBLOCK);
+	fd = fopen(fts_symbol_name(name), "wb");
       
-      if(fd < 0)
+      if(fd == NULL)
 	{
 	  fts_object_set_error(o, "filestream: Can't open file \"%s\" (%s)\n", fts_symbol_name(name), strerror(errno));
 	  return;
@@ -354,7 +358,7 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
   else
     {
-      this->fd = -1;
+      this->fd = NULL;
       this->name = 0;
 
       this->in_buf = 0;
@@ -367,9 +371,9 @@ filestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 { 
   filestream_t *this = (filestream_t *)o;
 
-  if(this->fd >= 0)
+  if(this->fd != NULL)
     {
-      close(this->fd);
+      fclose(this->fd);
       fts_bytestream_remove_listener(&this->head, o);
       fts_sched_remove( (fts_object_t *)this);
     }
@@ -385,7 +389,7 @@ filestream_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
 {
   filestream_t *this = (filestream_t *)o;
 
-  if(this->fd >= 0)
+  if(this->fd != NULL)
     fts_set_object(value, o);
   else
     fts_set_void(value);

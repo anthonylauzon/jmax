@@ -28,6 +28,7 @@
 	"..\include\fts\object.h"\
 	"..\include\fts\objectlist.h"\
 	"..\include\fts\objectset.h"\
+	"..\include\fts\oldclient.h"\
 	"..\include\fts\param.h"\
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\

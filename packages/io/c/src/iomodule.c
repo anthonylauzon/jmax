@@ -30,8 +30,8 @@ extern void out_config(void);
 extern void profileaudioport_config( void);
 extern void serial_config( void);
 extern void udp_config(void);
-/*  extern void udpreceive_config(void); */
-/*  extern void udpsend_config(void); */
+extern void udpreceive_config(void);
+extern void udpsend_config(void);
 extern void wacom_config(void);
 
 void
@@ -44,9 +44,13 @@ io_config(void)
   loopback_config();
   out_config();
   profileaudioport_config();
+#ifndef WIN32
   serial_config();
   udp_config();
-/*    udpreceive_config(); */
-/*    udpsend_config(); */
+#if 0
+  udpreceive_config();
+  udpsend_config();
+#endif
   wacom_config();
+#endif
 }

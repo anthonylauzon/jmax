@@ -366,6 +366,12 @@ static void add_char( char c)
   buffer[ buffer_fill_p++ ] = c;
 }
 
+/* FIXME: pH07 */
+static char* buffer_copy(void)
+{
+  return strcpy(fts_malloc(strlen(buffer) + 1), buffer);
+}
+
 static void add_arg( fts_atom_t *a)
 {
   if (ac >= at_size) 
@@ -439,8 +445,7 @@ static void fts_client_parse_char( char c)
     if ( c == STRING_END_CODE)
       {
 	add_char( '\0');
-	fts_set_symbol( &a, fts_new_symbol_copy( buffer));
-
+	fts_set_symbol( &a, fts_new_symbol_copy( buffer_copy()));
 	add_arg( &a);
 	state = S_ARG;
       }
@@ -492,7 +497,7 @@ static void fts_client_parse_char( char c)
 	if (ivalue >= symbol_cache_size)
 	  reallocate_symbol_cache( ivalue);
 
-	symbol_cache[ ivalue ] = fts_new_symbol_copy( buffer);
+	symbol_cache[ ivalue ] = fts_new_symbol_copy( buffer_copy());
 
 	fts_set_symbol( &a, symbol_cache[ ivalue]);
 
@@ -507,7 +512,7 @@ static void fts_client_parse_char( char c)
     if ( c == STRING_END_CODE)
       {
 	add_char( '\0');
-	fts_set_symbol( &a, fts_new_symbol_copy( buffer));
+	fts_set_symbol( &a, fts_new_symbol_copy( buffer_copy()));
 	add_arg( &a);
 	state = S_ARG;
       }

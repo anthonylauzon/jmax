@@ -240,7 +240,7 @@ fts_file_open(const char *name,  const char *mode)
       if (fts_file_get_read_path(name, path))
 	return fts_do_file_open(path, mode); /* @@@ */
       else
-	return -1;
+	return NULL;
     }
 }
 
@@ -254,18 +254,19 @@ int
 fts_file_is_text( fts_symbol_t file_name)
 {
   char full_path[1024];
-  int fd, n, i;
+  int n, i;
   char buff[256];
+  FILE* fd;
 
   if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
      return 0;
 
-  if ( (fd = open( full_path, O_RDONLY)) < 0)
+  if ( (fd = fopen( full_path, "rb")) == NULL)
     return 0;
 
-  if ( (n = read( fd, buff, 256)) < 256)
+  if ( (n = fread( buff, 1, 256, fd)) < 256)
     {
-      close( fd);
+      fclose( fd);
       return 0;
     }
 
@@ -275,7 +276,7 @@ fts_file_is_text( fts_symbol_t file_name)
 	return 0;
     }
 
-  close( fd);
+  fclose( fd);
 
   return 1;
 }

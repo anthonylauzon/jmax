@@ -26,11 +26,12 @@
 (set! jmax-arch "i686-win32")
 
 (define (platform-start-hook)
-;  (require-package "ossdev" "0.0.0")
-;  (require-package "pdtddev" "0.0.0")
+  (require-package "dsdev" "0.0.0")
+  (require-package "winmidi" "0.0.0")
 )
 (define-hook "platform-start" platform-start-hook)
 
 (define (default-start-hook) )
 
 (define-hook "default-start" default-start-hook)
+

@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+#include <fts/fts.h>
 #include <windows.h>
 #include "ftsconfig-win32.h"
 
@@ -55,7 +56,7 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved
 /*                                                                             */
 /* *************************************************************************** */
 
-/* The Win32 implementation uses dlopen() and dlsym(). */
+/* The Win32 implementation uses LoadLibrary() and GetProcAddress(). */
 
 /*
     The dl code was adapted from TiMidity++
@@ -64,38 +65,40 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved
     Copyright (C) 1999-2001 Masanao Izumo <mo@goice.co.jp>
     Copyright (C) 1995 Tuukka Toivonen <tt@cgs.fi>
 */
-void *fts_dl_open( const char *filename, char *error)
+fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
-  void *handle;
-  
-  handle = (void*) LoadLibrary(filename);
+  static char error_description[1024];
+  static fts_status_description_t load_library_error = { error_description};
+  HINSTANCE handle;
+  void (*fun)(void);
 
-  if (!handle) {
-    LPVOID msg;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
-    strcpy( error, msg);
-    LocalFree(msg);
-  }
+  handle = LoadLibrary(filename);
 
-  return handle;
-}
+  if (!handle)
+    {
+      LPVOID msg;
+      FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		    NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
+      strcpy( error_description, msg);
+      LocalFree(msg);
+      return &load_library_error;
+    }
 
+  fun = (void (*)(void))GetProcAddress(handle, symbol);
 
-int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error)
-{
-  *address  = (void*) GetProcAddress((HINSTANCE) handle, symbol);
+  if ( fun == NULL)
+    {
+      LPVOID msg;
+      FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		    NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
+      strcpy( error_description, msg);
+      LocalFree(msg);
+      return &load_library_error;
+    }
 
-  if (*address == NULL) {
-    LPVOID msg;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
-    strcpy( error, msg);
-    LocalFree(msg);
-    return 0;
-  }
+  (*fun)();
 
-  return 1;
+  return fts_Success;
 }
 
 
@@ -172,4 +175,7 @@ void fts_platform_init( int argc, char **argv)
     return /* FIXME */;
   }
 
+  /* boost the priority of the fts thread */
+  SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 }
