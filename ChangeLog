@@ -1,5 +1,9 @@
 2003-04-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fts/fts.c (fts_init): added --no-client flag to start fts without client support (use for libfts)
+
+	* fts/linux.c, fts/macosx.c (fts_platform_init): change --jmaxConfig=noaudio into --no-audio flag to start fts without any "audio" packages loaded (used for jmaxladspa)
+
 	* include/fts/patcher.h, fts/patcher.c: added fts_patcher_get_objects function which return an iterator 
 	to enumerate all objects contained in a given patcher
 
