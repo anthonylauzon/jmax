@@ -1,3 +1,10 @@
+2003-02-17  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+
+	* add udpin and udpout object (jmax/packages/io/c/src/udp.c).
+	  these new object are used to create an udp connection. They use a fts_udpstream_t object for communication abstraction.
+
+	* clean fts_udpstream_t implementation (use recv/send instead of read/write see man socket(2))	
+
 2003-02-13  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 
 	* add fts_udpstream_t in bytestream.c
