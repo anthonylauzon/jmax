@@ -1,7 +1,6 @@
 #include "fts.h"
 
 
-fts_symbol_t fts_s_print;
 static fts_symbol_t phasor_function = 0;
 
 typedef struct 
@@ -159,7 +158,5 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 phasor_config(void)
 {
-  fts_s_print = fts_new_symbol("print");
-
   fts_metaclass_create(fts_new_symbol("phasor~"),phasor_instantiate, fts_always_equiv);
 }

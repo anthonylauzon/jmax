@@ -39,7 +39,6 @@ gensampname(char *buf, const char *base, long int n)
  */
 
 static fts_hash_table_t catch_table;
-static fts_symbol_t fts_s_print;
 
 #define MAXVS 64
 
@@ -465,8 +464,6 @@ void
 sigthrow_config(void)
 {
   fts_metaclass_create(fts_new_symbol("throw~"),sigthrow_instantiate, fts_always_equiv);
-
-  fts_s_print = fts_new_symbol("print");
 }
 
 
