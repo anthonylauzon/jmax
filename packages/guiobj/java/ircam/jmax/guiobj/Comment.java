@@ -58,7 +58,6 @@ public class Comment extends Editable
 
   public String getArgs()
   {
-    // get the correct String from the object
     return ftsObject.getComment();
   }
 
@@ -71,20 +70,7 @@ public class Comment extends Editable
 
   public void computeRenderer()
   {
-    String args = getArgs();
-    Icon icon = null;
-
-    // Change the renderer if needed
-
-//      if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
-//        icon = Icons.get(args);
-    /*if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
-      icon = JMaxIcons.get(args);
-
-      if (icon != null)*/
-    renderer = new IconRenderer(this, icon);
-    /*else if (! (renderer instanceof TextRenderer))
-      renderer = new TextRenderer(this);*/
+    renderer = new TextRenderer(this);
   }
 
   // ----------------------------------------

@@ -133,10 +133,7 @@ public class FtsConnection extends FtsObject implements Serializable
     deleted = true;
 
     ircam.jmax.editors.patcher.ErmesSelection.getFtsSelection().removeConnection(this);
-
-    from.setDirty();
 	
-    /*fts.getServer().deleteConnection(this);*/
     ((FtsPatcherObject)from.getParent()).requestDeleteConnection(this);
   }
 
@@ -148,8 +145,6 @@ public class FtsConnection extends FtsObject implements Serializable
  void release()
   {
     deleted = true;
-
-    from.setDirty(); // from and to must be in the same document !!
 
     if ((from.getParent() != null)&&(from.getParent() instanceof FtsPatcherObject))
 	((FtsPatcherObject)from.getParent()).removeConnection(this);

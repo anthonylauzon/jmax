@@ -61,7 +61,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   final public static int EDIT_MODE = 1;
   final public static int RUN_MODE  = 2;
   
-  int editMode = UNKNOWN_MODE;
+  //int editMode = UNKNOWN_MODE;
+  int editMode = EDIT_MODE;
 
   /** Patcher content: objects */
   
@@ -70,6 +71,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   /** Patcher content: connections */
   
   private MaxVector connections = new MaxVector();
+
+  private boolean dirty = false;
 
   /******************************************************************************/
   /*                                                                            */
@@ -84,7 +87,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   static GraphicObject makeGraphicObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
 						   FtsAtom args[], int offset, int nArgs)
   {
-    JMaxObjectCreator creator;
+    JMaxObjectCreator creator = null;
 
     if (className != null)
       {
@@ -198,6 +201,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).setMessage( args.getString( 0));
 	}
       });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setDirty"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setDirty( (args.getInt( 0) == 1)? true : false);
+	}
+      });
   }
 
   /*****************************************************************************************/
@@ -282,6 +291,17 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     return connections;
   }
 
+  private void setDirty(boolean dirty)
+  {
+    this.dirty = dirty;
+    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.setDirty(dirty);
+  }
+
+  public boolean isDirty()
+  {
+    return dirty;
+  }
+
   public final int getWindowX()
   {
     return windowX;
@@ -348,8 +368,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	    System.err.println("FtsPatcherObject: I/O Error sending set_wh Message!");
 	    e.printStackTrace(); 
 	  }
-	
-	setDirty();
       }
   }
   public final int getWindowWidth()
@@ -373,8 +391,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	    System.err.println("FtsPatcherObject: I/O Error sending set_ww Message!");
 	    e.printStackTrace(); 
 	  }
-	
-	setDirty();
       }
   }
 
@@ -741,8 +757,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 						     args[5].intValue);   
 	addConnection(connection);
 	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addNewConnection(connection);
-	
-	setDirty();
       }
   }
   public void objectRedefined(FtsGraphicObject obj)
@@ -808,8 +822,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     this.description = FtsParse.unparseArguments(args, 0, nArgs);
     if(getGraphicListener()!=null) getGraphicListener().redefined(this);
     if(getEditorFrame() != null) ((ErmesSketchWindow)getEditorFrame()).updateTitle(); 
-
-    setDirty();
   }
   public void setWX(int value)
   {

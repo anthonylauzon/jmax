@@ -14,7 +14,6 @@ FtsFinderObject.java\
 FtsErrorFinderObject.java\
 FtsGraphicListener.java\
 FtsHelpPatchTable.java\
-FtsInletObject.java\
 FtsInletsListener.java\
 FtsIntValueListener.java\
 FtsIntValueObject.java\
@@ -23,7 +22,6 @@ FtsModule.java\
 FtsObjectErrorListener.java\
 FtsObjectSet.java\
 FtsObjectWithEditor.java\
-FtsOutletObject.java\
 FtsOutletsListener.java\
 FtsParse.java\
 FtsPatcherListener.java\

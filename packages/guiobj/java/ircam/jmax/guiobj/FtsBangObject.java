@@ -88,8 +88,6 @@ public class FtsBangObject extends FtsIntValueObject
 	System.err.println("FtsBangObject: I/O Error sending setFlashDuration Message!");
 	e.printStackTrace(); 
       }
-    
-    setDirty();
   }
 
   public int getFlashDuration()

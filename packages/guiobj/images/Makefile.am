@@ -13,12 +13,16 @@ img_DATA=\
  intbox_cursor.gif \
  jcomment.gif \
  jcomment_cursor.gif \
+ jpatcher.gif \
+ jpatcher_cursor.gif \
  messconst.gif \
  messconst_cursor.gif \
  scope.gif \
  scope_cursor.gif \
  slider.gif \
  slider_cursor.gif \
+ standard.gif \
+ standard_cursor.gif \
  toggle.gif \
  toggle_cursor.gif \
  vecdisplay.gif \

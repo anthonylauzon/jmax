@@ -187,7 +187,6 @@ public class FtsGraphicObject extends FtsObject {
 	  }
 
 	this.x = x;
-	setDirty();
       }
   }
 
@@ -223,7 +222,6 @@ public class FtsGraphicObject extends FtsObject {
 	  }
 
 	this.y = y;
-	setDirty();
       }
   }
 
@@ -257,7 +255,6 @@ public class FtsGraphicObject extends FtsObject {
 	  }
 
 	this.width = w;
-	setDirty();
       }
   }
 
@@ -293,7 +290,6 @@ public class FtsGraphicObject extends FtsObject {
 	    e.printStackTrace(); 
 	  }
 	this.height = h;
-	setDirty();
       }
   }
 
@@ -359,7 +355,6 @@ public class FtsGraphicObject extends FtsObject {
 	    e.printStackTrace(); 
 	  }  	
 	this.font = font;
-	setDirty();
       }
   }
   public final void setCurrentFont(String font)
@@ -395,7 +390,6 @@ public class FtsGraphicObject extends FtsObject {
 	    e.printStackTrace(); 
 	  }  	
 	this.fontSize = fontSize;
-	setDirty();
       }
   }
 
@@ -430,7 +424,6 @@ public class FtsGraphicObject extends FtsObject {
 	    e.printStackTrace(); 
 	  }  
 	this.fontStyle = fontStyle;
-	setDirty();
       }
   }
 
@@ -464,7 +457,6 @@ public class FtsGraphicObject extends FtsObject {
 	    e.printStackTrace(); 
 	  }  
 	this.layer = layer;
-	setDirty();
       }
   }
 
@@ -491,7 +483,6 @@ public class FtsGraphicObject extends FtsObject {
 	System.err.println("FtsGraphicObject: I/O Error sending setColor Message!");
 	e.printStackTrace(); 
       }  
-    setDirty();
   }
 
   public void setNumberOfInlets(int ins)
@@ -576,12 +567,6 @@ public class FtsGraphicObject extends FtsObject {
   {
     return graphicListener;
   }  
-
-  /* WARNING: to implement when document stuff implemented */
-  public void setDirty()
-  {
-    //nothing for now!!!!
-  }
 
   public String getDescription()
   {

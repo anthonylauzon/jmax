@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -34,10 +34,8 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
-//
-// The generic "extern" object in ermes. (example: adc1~)
-//
 public class Standard extends Editable implements FtsObjectErrorListener
 {
   //--------------------------------------------------------

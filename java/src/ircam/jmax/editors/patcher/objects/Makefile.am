@@ -4,14 +4,9 @@ DisplayObject.java\
 Editable.java\
 GraphicConnection.java\
 GraphicObject.java\
-InOutlet.java\
-Inlet.java\
 NumberBox.java\
 ObjectPopUp.java\
-Outlet.java\
-Patcher.java\
-SensibilityArea.java\
-Standard.java
+SensibilityArea.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

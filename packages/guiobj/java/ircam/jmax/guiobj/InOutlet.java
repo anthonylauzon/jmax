@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,6 +31,7 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 //
 // The abstract base class graphic in/outlet contained in subpatchers

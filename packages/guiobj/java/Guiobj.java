@@ -21,7 +21,7 @@
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.patcher.objects.GraphicObject;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.guiobj.*;
 import ircam.fts.client.*;
 
@@ -36,6 +36,30 @@ public class Guiobj implements JMaxPackage {
 
   public void load()
   {    
+    JMaxObjectCreator standardCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Standard( new FtsGraphicObject( server, parent, objId, args, offset, length));
+	}
+      }; 
+    JMaxObjectCreator patcherCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Patcher( new FtsPatcherObject( server, parent, objId, args, offset, length));
+	}
+      }; 
+    JMaxObjectCreator inletCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Inlet( new FtsInletObject( server, parent, objId, args, offset, length));
+	}
+      }; 
+    JMaxObjectCreator outletCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Outlet( new FtsOutletObject( server, parent, objId, args, offset, length));
+	}
+      }; 
     JMaxObjectCreator forkCreator = new JMaxObjectCreator() {
 	public GraphicObject create( FtsServer server, FtsObject parent, int objId, FtsAtom[] args, int offset, int length) 
 	{
@@ -103,6 +127,10 @@ public class Guiobj implements JMaxPackage {
 	}
       };
 
+    JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", this);
+    JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", this);
+    JMaxClassMap.put( "inlet", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", this);
+    JMaxClassMap.put( "outlet", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", this);
     JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", this);
     JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", this);
     JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", this);

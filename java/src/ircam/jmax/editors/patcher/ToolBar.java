@@ -206,21 +206,20 @@ public class ToolBar extends JPanel implements ComponentListener{
     for ( Iterator i = JMaxClassMap.getClassNames(); i.hasNext(); )
       addButton( (String)i.next());
 
-    AddPopUp.initDone();//????
+    AddPopUp.initDone();
   }
 
-  //MaxDocumentListener interface
-  /*boolean isSaved = true;
-    public void documentChanged(boolean saved)
-    {
-    if(isSaved!=saved)
-    {
-    toSaveButton.setEnabled(!saved);
-    toSaveButton.setVisible(!saved);
-    if(saved) repaint();
-    isSaved = saved;
-    }
-    }*/
+  boolean dirty = false;
+  public void setDirty(boolean dirty)
+  {
+    if(this.dirty != dirty)
+      {
+	toSaveButton.setEnabled(dirty);
+	toSaveButton.setVisible(dirty);
+	if(!dirty) repaint();
+	this.dirty = dirty;
+      }
+  }
 
   // Component Listener Interface
   Vector removedButtons = new Vector();

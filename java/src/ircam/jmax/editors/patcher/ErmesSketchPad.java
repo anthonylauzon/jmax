@@ -677,28 +677,28 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   }
   
   public int print(Graphics g, PageFormat pf, int pi) throws PrinterException 
-    {
-	Paper paper = pf.getPaper();
-	Point sketchPos = SwingUtilities.convertPoint(this, getLocation(), (ErmesSketchWindow)itsEditorContainer);
-	double onsetX = pf.getImageableX()+sketchPos.x;
-	double onsetY = pf.getImageableY()+sketchPos.y;
-	double width = pf.getImageableWidth();
-	double height = pf.getImageableHeight();
-	double scaleX = width / (getSize().width);
-	double scaleY = height / (getSize().height + 31);
-	double scale = (scaleX < scaleY)? scaleX: scaleY;
-
-	if(scale < 1.0)
-	  ((Graphics2D)g).scale(scale, scale);
-
-	((Graphics2D)g).translate(onsetX, onsetY);
-
-	if (pi >= 1) {
-	    return Printable.NO_SUCH_PAGE;
-	}
-	displayList.paint((Graphics2D) g);
-	return Printable.PAGE_EXISTS;
+  {
+    Paper paper = pf.getPaper();
+    Point sketchPos = SwingUtilities.convertPoint(this, getLocation(), (ErmesSketchWindow)itsEditorContainer);
+    double onsetX = pf.getImageableX()+sketchPos.x;
+    double onsetY = pf.getImageableY()+sketchPos.y;
+    double width = pf.getImageableWidth();
+    double height = pf.getImageableHeight();
+    double scaleX = width / (getSize().width);
+    double scaleY = height / (getSize().height + 31);
+    double scale = (scaleX < scaleY)? scaleX: scaleY;
+    
+    if(scale < 1.0)
+      ((Graphics2D)g).scale(scale, scale);
+    
+    ((Graphics2D)g).translate(onsetX, onsetY);
+    
+    if (pi >= 1) {
+      return Printable.NO_SUCH_PAGE;
     }
+    displayList.paint((Graphics2D) g);
+    return Printable.PAGE_EXISTS;
+  }
 
   final public void redraw()
   {
@@ -1199,6 +1199,11 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // Do the test because the awt can call this before itsPatcher is ready
     if (itsPatcher != null)
       itsPatcher.startUpdates();
+  }
+
+  public void setDirty(boolean dirty)
+  {
+    getToolBar().setDirty(dirty);
   }
 }
 

@@ -23,18 +23,20 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
 import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.fts.client.*;
+
 /**
- * Proxy of an Outlet FTS object.
+ * Proxy of an Inlet FTS object.
  */
 
-public class FtsOutletObject  extends FtsGraphicObject
+public class FtsInletObject extends FtsGraphicObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -43,24 +45,24 @@ public class FtsOutletObject  extends FtsGraphicObject
   /*****************************************************************************/
 
   /**
-   * Create a FtsOutletObject object.
+   * Create a FtsInletObject object.
    */
-
-  public FtsOutletObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
+  
+  public FtsInletObject(FtsServer server, FtsObject parent, int id, FtsAtom[] args, int offset, int length)
   {
     super(server, parent, id, args, offset, length);
 
-    ninlets = 1;
-    noutlets = 0;
+    ninlets = 0;
+    noutlets = 1;
   }
 
-  /** Get the number of outlets of the object 
+  /** Get the number of inlets of the object.
     Overwrite the FtsObject method because inlets
-    do not believe to FTS, when it say outlets have
-    outlets.
-    */
+    do not believe to FTS, when it say inlets have
+    inlets.
+   */
 
-  public int getNumberOfOutlets()
+  public int getNumberOfInlets()
   {
     return 0;
   }
