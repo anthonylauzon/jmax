@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include <float.h>
 #include <string.h>
+#include <alloca.h>
 
 fts_class_t *fmat_class = NULL;
 fts_class_t *fvec_class = NULL;
@@ -2412,7 +2413,7 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(in_n == m)
   {
-    float *res = malloc(sizeof(float) * in_m * n);
+    float *res = alloca(sizeof(float) * in_m * n);
     float *res_row = res;
     int i_row, i_col, i, j;
     
@@ -2638,12 +2639,12 @@ fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
             
       case fmat_format_id_rect:
         for(i=0; i<2*m; i++)
-          l[2 * i] *= r;
+          l[i] *= r;
         break;
         
       case fmat_format_id_polar:
         for(i=0; i<2*m; i+=2)
-          l[2 * i] *= r;
+          l[i] *= r;
         break;
         
       default:

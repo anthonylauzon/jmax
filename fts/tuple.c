@@ -55,9 +55,9 @@ tuple_copy(fts_tuple_t *org, fts_tuple_t *copy)
   fts_atom_t *org_atoms = fts_tuple_get_atoms(org);
   fts_atom_t *copy_atoms = fts_tuple_get_atoms(copy);
   int i;
-
+  
   fts_tuple_set_size(copy, size);
-
+  
   for(i=0; i<size; i++)
   {
     fts_atom_release(org_atoms + i);
@@ -72,17 +72,6 @@ tuple_copy_function(const fts_object_t *from, fts_object_t *to)
   tuple_copy((fts_tuple_t *)from, (fts_tuple_t *)to);
 }
 
-
-static void
-tuple_array_function (fts_object_t *o, fts_array_t *array)
-{
-    fts_tuple_t *self = (fts_tuple_t *) o;
-    
-    fts_array_append(array, fts_tuple_get_size(self), 
-		            fts_tuple_get_atoms(self));
-}
-
-
 static void
 tuple_post_function(fts_object_t *o, fts_bytestream_t *stream)
 {
@@ -91,6 +80,16 @@ tuple_post_function(fts_object_t *o, fts_bytestream_t *stream)
   fts_spost(stream, "{");
   fts_spost_atoms(stream, fts_tuple_get_size(self), fts_tuple_get_atoms(self));
   fts_spost(stream, "}");
+}
+
+static void
+tuple_array_function(fts_object_t *o, fts_array_t *array)
+{
+  fts_tuple_t *self = (fts_tuple_t *)o;
+  int size = fts_tuple_get_size(self);
+  fts_atom_t *atoms = fts_tuple_get_atoms(self);
+  
+  fts_array_append(array, size, atoms);
 }
 
 static void
@@ -168,7 +167,7 @@ tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(ac > 0 && fts_is_object(at))
     stream = (fts_bytestream_t *)fts_get_object(at);
-
+  
   tuple_post_function(o, stream);
   fts_post("\n");
 }
@@ -177,7 +176,7 @@ static void
 tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
-
+  
   fts_array_init(&self->args, ac, at);
 }
 
@@ -185,7 +184,7 @@ static void
 tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
-
+  
   fts_array_destroy(&self->args);
 }
 
@@ -193,24 +192,24 @@ static void
 tuple_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
-
+  
   fts_class_message_varargs(cl, fts_s_dump_state, tuple_dump_state);  
   fts_class_message_varargs(cl, fts_s_print, tuple_print);
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   
   fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
   fts_class_message_void(cl, fts_s_size, tuple_size);
-
+  
   fts_class_message_void(cl, fts_new_symbol("first"), tuple_first);
   fts_class_message_void(cl, fts_new_symbol("second"), tuple_second);
   fts_class_message_void(cl, fts_new_symbol("third"), tuple_third);
-
+  
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
   fts_class_set_post_function(cl, tuple_post_function);
   fts_class_set_array_function(cl, tuple_array_function);
   fts_class_set_description_function(cl, tuple_description_function);
-
+  
   fts_class_doc(cl, fts_s_tuple, "[<any: value> ...]", "immutable array of any values");
   fts_class_doc(cl, fts_new_symbol("first"), NULL, "get first value");
   fts_class_doc(cl, fts_new_symbol("second"), NULL, "get second value");

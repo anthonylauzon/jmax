@@ -60,9 +60,10 @@ struct _event_
 #define event_get_type(e) (fts_get_class(&(e)->value))
 
 extern double event_get_duration(event_t *event);
+extern void event_set_duration(event_t *event, double duration);
 
 /**
- * Upload changes in event or event's value to client
+* Upload changes in event or event's value to client
  */
 void event_set_at_client(event_t *this);
 

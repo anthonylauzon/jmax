@@ -841,23 +841,34 @@ track_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_track_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
-  
-  if(track_editor_is_open(self))
-    fts_client_send_message(o, fts_s_clear, 0, 0);
-  
-  track_clear(self);
-  
-  if(self->markers)
-    track_clear(self->markers);
-  
-  fts_object_set_state_dirty(o);
+
+  if(ac > 0)
+  {
+    if(fts_get_symbol(at) && fts_get_symbol(at) == seqsym_markers)
+    {
+      if(self->markers)
+        track_clear(self->markers);
+    }  
+  }
+  else
+  {
+    if(track_editor_is_open(self))
+      fts_client_send_message(o, fts_s_clear, 0, 0);
+    
+    track_clear(self);
+    
+    if(self->markers)
+      track_clear(self->markers);
+    
+    fts_object_set_state_dirty(o);
+  }
 }
 
 static void
-track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
   
@@ -881,7 +892,7 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
   event_t *event = track_get_first(self);
@@ -898,7 +909,215 @@ track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_track_shift(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  double begin = 0.0;
+  double end = 2.0 * track_get_duration(self);
+  double shift = 0.0;
+  double before = 0.0;
+  
+  switch(ac)
+  {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+        end = fts_get_number_float(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+        begin = fts_get_number_float(at + 1);
+    case 1:
+      if(fts_is_number(at))
+        shift = fts_get_number_float(at);
+    case 0:
+      break;
+  }
+  
+  if(shift != 0.0 && begin < track_get_duration(self))
+  {
+    event_t *event = track_get_first(self);
+
+    while(event && event_get_time(event) < begin)
+    {
+      before = event_get_time(event);
+      event = event_get_next(event);
+    }
+
+    if(event != NULL)
+    {
+      double time = event_get_time(event) + shift;
+
+      while(event && event_get_time(event) + shift < before)
+      {
+        double time = event_get_time(event) + shift;
+        event_t *next = event_get_next(event);
+      
+        if(time < 0.0)
+          time = 0.0;
+          
+        track_move_event(self, event, time);
+        
+        event = next;
+      }
+      
+      while(event && event_get_time(event) + shift < end)
+      {
+        event_set_time(event, event_get_time(event) + shift);
+        event = event_get_next(event);
+      }
+      
+      while(event && event_get_time(event) < end)
+      {
+        event_t *next = event_get_next(event);
+        
+        track_move_event(self, event, event_get_time(event) + shift);        
+        
+        event = next;
+      }
+      
+  		fts_object_set_dirty(o);
+    }
+  }
+}
+
+static void
+_track_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  double begin = 0.0;
+  double end = 2.0 * track_get_duration(self);
+  double stretch = 1.0;
+  
+  switch(ac)
+  {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+        end = fts_get_number_float(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+        begin = fts_get_number_float(at + 1);
+    case 1:
+      if(fts_is_number(at))
+        stretch = fts_get_number_float(at);
+    case 0:
+      break;
+  }
+  
+  if(end < begin)
+  {
+    double b = begin;
+    begin = end;
+    end = b;
+  }
+  
+  if(begin < 0.0)
+    begin = 0.0;
+  
+  if(stretch > 0.0 && begin < track_get_duration(self))
+  {
+    event_t *event = track_get_first(self);
+
+    while(event && event_get_time(event) < begin)
+      event = event_get_next(event);
+
+    while(event && event_get_time(event) < end)
+    {
+      event_set_time(event, begin + (event_get_time(event) - begin) * stretch);
+      event = event_get_next(event);
+    }
+
+    end = begin + (end - begin) * stretch;
+    
+    while(event)
+    {
+      event_set_time(event, end + event_get_time(event));
+      event = event_get_next(event);
+    }
+    
+		fts_object_set_dirty(o);
+  }
+}
+
+static void
+_track_quantize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  double begin = 0.0;
+  double end = 2.0 * track_get_duration(self);
+  double quantize = 0.0;
+  int quantize_durations = 1;
+  
+  switch(ac)
+  {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+        end = fts_get_number_float(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+        begin = fts_get_number_float(at + 1);
+    case 1:
+      if(fts_is_number(at))
+        quantize = fts_get_number_float(at);
+    case 0:
+      break;
+  }
+  
+  if(end < begin)
+  {
+    double b = begin;
+    begin = end;
+    end = b;
+  }
+  
+  if(begin < 0.0)
+    begin = 0.0;
+  
+  if(quantize < 0)
+  {
+    quantize *= -1.0;
+    quantize_durations = 0;
+  }
+  
+  if(quantize > 0.0 && begin < track_get_duration(self))
+  {
+    event_t *event = track_get_first(self);
+    double time = begin;
+
+    while(event && event_get_time(event) < begin)
+      event = event_get_next(event);
+
+    while(event && event_get_time(event) < end && time < end)
+    {
+      double next = time + quantize;
+    
+      while(event && fabs(event_get_time(event) - time) < fabs(event_get_time(event) - next))
+      {
+        event_set_time(event, time);
+        
+        if(quantize_durations > 0)
+        {
+          double dur = event_get_duration(event);
+        
+          if(dur > quantize)
+            event_set_duration(event, quantize * floor(dur / quantize + 0.5));
+          else if(dur >= 0.0)
+            event_set_duration(event, quantize);
+        }
+        
+        event = event_get_next(event);
+      }
+      
+      time = next;
+    }
+    
+		fts_object_set_dirty(o);
+  }
+}
+
+static void
+_track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
   fts_class_t *track_type = track_get_type(self);
@@ -1350,7 +1569,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     int size;
     char *error;
     
-    track_clear_method(o, 0, NULL, 0, NULL);
+    _track_clear(o, 0, NULL, 0, NULL);
     
     size = track_import_from_midifile(self, file);
     error = fts_midifile_get_error(file);
@@ -1821,7 +2040,7 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_upload, track_upload);
   
-  fts_class_message_varargs(cl, fts_s_print, track_print);
+  fts_class_message_varargs(cl, fts_s_print, _track_print);
   
   fts_class_message_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
   fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
@@ -1842,15 +2061,14 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_message_number(cl, seqsym_active, track_active);
   
-  fts_class_message_void(cl, fts_s_clear, track_clear_method);
+  fts_class_message_varargs(cl, fts_s_clear, _track_clear);
 	
-	fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_from_client);
-  fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_from_client);
-  fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_from_client);
-  fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
+  fts_class_message_varargs(cl, seqsym_insert, _track_insert);  
+  fts_class_message_varargs(cl, seqsym_remove, _track_remove);
   
-  fts_class_message_varargs(cl, seqsym_insert, track_insert);  
-  fts_class_message_varargs(cl, seqsym_remove, track_remove);
+  fts_class_message_varargs(cl, fts_new_symbol("shift"), _track_shift);
+  fts_class_message_varargs(cl, fts_new_symbol("stretch"), _track_stretch);
+  fts_class_message_varargs(cl, fts_new_symbol("quantize"), _track_quantize);
   
   fts_class_message_void(cl, fts_s_import, track_import_dialog);
   fts_class_message_symbol(cl, fts_s_import, track_import);
@@ -1866,6 +2084,11 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("make-bars"), track_make_bars);
   
   fts_class_inlet_thru(cl, 0);
+  
+	fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_from_client);
+  fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_from_client);
+  fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_from_client);
+  fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
   
   fts_class_set_copy_function(cl, track_copy_function);
   fts_class_set_post_function(cl, track_post_function);
