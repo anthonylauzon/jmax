@@ -40,30 +40,57 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     super(frame, "table dialog: track <"+trk.getName()+">", false);
     this.frame = frame;
     this.track = trk;
-    
+    this.sgc = gc;
+		
 		/* upper section: Events List */
     TrackTableModel eventsModel = new TrackTableModel(track.getTrackDataModel());
     eventsPanel = new SequenceTablePanel(eventsModel, gc, gc.getSelection());
     
 		/* lower section: Measures List */
-		FtsTrackObject markersTrack = gc.getMarkersTrack();
-		TrackTableModel markersModel = null;
-		if( markersTrack!=null)
-		{
-			markersModel = new TrackTableModel( (TrackDataModel)markersTrack);
-			markersPanel = new SequenceTablePanel(markersModel, gc, gc.getMarkersSelection());
-		
-			splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, eventsPanel, markersPanel);
-			splitPane.setOneTouchExpandable(true);
-			splitPane.setDividerLocation(150);
-			
-			getContentPane().add( splitPane);
-		}
+		if( gc.getMarkersTrack()!=null)
+			addMarkersAndSplit();
 		else
 			getContentPane().add(eventsPanel);
     
     track.getTrackDataModel().addListener(this);
     
+		track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+				public void lock(boolean lock){}
+				public void active(boolean active){}
+				public void restoreEditorState(FtsTrackEditorObject editorState){};
+				public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+				{
+					SequenceTableDialog.this.hasMarkers = true; 
+				}
+			});		
+		
+    track.getTrackDataModel().addListener( new TrackDataListener() {
+			public void objectChanged(Object spec, String propName, Object propValue){}
+			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
+			public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+			public void objectAdded(Object whichObject, int index){}
+			public void objectsAdded(int maxTime){}
+			public void objectDeleted(Object whichObject, int oldIndex){}
+			public void trackCleared(){}
+			public void startTrackUpload( TrackDataModel track, int size){}
+			public void endTrackUpload( TrackDataModel track)
+			{
+				if( SequenceTableDialog.this.hasMarkers && sgc.getMarkersTrack()!=null && markersPanel == null)
+				{
+					getContentPane().remove(eventsPanel);
+					addMarkersAndSplit();
+					validate();
+					pack();
+				}
+				else 
+					if( sgc.getMarkersTrack() == null && markersPanel != null)
+						removeMarkersAndSplit();
+			}
+			public void startPaste(){}
+			public void endPaste(){}
+			public void trackNameChanged(String oldName, String newName) {}
+    });
+		
     setLocation(200, 200);
     Dimension dim = eventsPanel.getSize();
     
@@ -90,6 +117,32 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 			setSize(tab_w, tab_h);
 	}
 
+	private void addMarkersAndSplit()
+	{
+		FtsTrackObject markersTrack = sgc.getMarkersTrack();
+		TrackTableModel markersModel = null;
+		markersModel = new TrackTableModel( (TrackDataModel)markersTrack);
+		markersPanel = new SequenceTablePanel(markersModel, sgc, sgc.getMarkersSelection());
+		
+		splitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT, eventsPanel, markersPanel);
+		splitPane.setOneTouchExpandable( true);
+		splitPane.setDividerLocation( DEFAULT_HEIGHT/2);
+		splitPane.setPreferredSize( new Dimension( 650, DEFAULT_HEIGHT));
+			
+		getContentPane().add( splitPane);
+	}
+
+	private void removeMarkersAndSplit()
+	{
+		splitPane.remove(eventsPanel);
+		getContentPane().remove(splitPane);
+		getContentPane().add(eventsPanel);
+		splitPane = null;
+		markersPanel = null;
+		SequenceTableDialog.this.hasMarkers = false;
+		validate();
+		pack();
+	}
     /**
      * TrackDataListener interface
      */
@@ -145,11 +198,13 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 		return eventsPanel;
 	}
 	
+	boolean hasMarkers = false;
   Track track;
+	SequenceGraphicContext sgc;
   SequenceTablePanel eventsPanel, markersPanel;
 	JSplitPane splitPane;
   Frame frame;
-	final static int DEFAULT_HEIGHT = 600;
+	final static int DEFAULT_HEIGHT = 500;
 }
 
 

@@ -79,6 +79,7 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
 	int maxY = pa.getMaxScoreY();
 	int minY = pa.getMinScoreY();
+	String type = (String)(e.getProperty("type"));
 	
 	int x = pa.getX(e);
 	Color col, lightCol;
@@ -98,10 +99,19 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 			lightCol = lightMarkColor;
 			break;
 		}
-	g.setColor( col);
-	g.drawLine( x, minY, x, maxY);
-	g.setColor( lightCol);
-	g.drawLine(x, maxY, x, 0);
+		
+		if(type.equals("tempo"))
+		{
+			g.setColor( lightCol);
+			g.drawLine( x, maxY, x, 0);
+		}
+		else
+		{
+			g.setColor( col);
+			g.drawLine( x, minY, x, maxY);
+			g.setColor( lightCol);
+			g.drawLine( x, maxY, x, 0);
+		}
 }
 
 public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 

@@ -160,18 +160,39 @@ public void paintMeasures(Graphics g)
 																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
 		{
 			evt = (TrackEvent) e.nextElement();
-			x = pa.getX(evt);
 			type = (String)(evt.getProperty("type"));
+			x = pa.getX(evt);
 			
-			if( sel.isInSelection(evt))
-				g.setColor( Color.red);
-			else
-				g.setColor( Color.darkGray);
-
 			if(type.equals("tempo"))
 			{
-				g.drawString("x", x - 2, 8);
-				g.drawString("y", x - 2, 16);
+				if( sel.isInSelection(evt))
+					g.setColor( selTempoColor);
+				else
+					g.setColor( tempoColor);		
+					
+				Double tempo = (Double)evt.getProperty("tempo");
+				if(tempo!=null)
+				{
+					String str = ""+tempo.intValue();
+					int strw = fm.stringWidth(str);
+					g.drawString( str, x - strw/2 + 1, 12);
+				}
+			}
+			else if(type.equals("bar"))
+			{					
+				if( sel.isInSelection(evt))
+					g.setColor( Color.red);
+				else
+					g.setColor( Color.darkGray);			
+					
+				String meterUp = ((MarkerValue)evt.getValue()).getMeterValue();
+				String meterDown = ((MarkerValue)evt.getValue()).getMeterType();
+				
+				if(meterUp != null && meterDown != null)
+				{
+					g.drawString(""+meterUp, x - 3, 8);
+					g.drawString(""+meterDown, x - 3, 16);
+				}
 			}
 		}
 	}
@@ -239,6 +260,10 @@ SequenceGraphicContext gc;
 public final static int TEMPO_HEIGHT = 20; 
 JLabel displayLabel;
 Displayer oldDisplayer;
+
+Color tempoColor = new Color(165, 165, 165, 100);
+Color selTempoColor = new Color(255, 0, 0, 100);
+Color highTempoColor = new Color(0, 255, 0, 100);
 }    
 
 
