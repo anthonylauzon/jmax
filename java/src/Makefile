@@ -41,7 +41,7 @@ DOC_PACKAGES = \
 	ircam.jmax.editors.patcher \
 	to.be.completed
 
-all: 
+all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 

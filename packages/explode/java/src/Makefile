@@ -26,12 +26,11 @@
 ROOTDIR = ../../../..
 PACKAGE_DIR =  $(ROOTDIR)/packages/explode
 
-
-include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.common
+include $(PACKAGE_DIR)/java/Makefiles/Makefile.common
 
 ALL_PACKAGES =  ircam.jmax.editors.explode
 
-all: 
+all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 

@@ -24,7 +24,8 @@
 #
 
 all:
-	(cd src ; $(MAKE) all jar)
+	(cd src ; $(MAKE) all)
+	(cd src ; $(MAKE) jar)
 .PHONY: all
 
 clean:

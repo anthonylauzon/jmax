@@ -24,14 +24,13 @@
 #
 
 ROOTDIR = ../../../..
-PACKAGE_DIR =  
+PACKAGE_DIR =  $(ROOTDIR)/packages/qlist
 
-
-include $(ROOTDIR)/packages/qlist/java/Makefiles/Makefile.common
+include $(PACKAGE_DIR)/java/Makefiles/Makefile.common
 
 ALL_PACKAGES =  ircam.jmax.editors.qlist
 
-all: 
+all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 

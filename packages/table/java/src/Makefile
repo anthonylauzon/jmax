@@ -24,13 +24,13 @@
 #
 
 ROOTDIR = ../../../..
-PACKAGE_DIR =  
+PACKAGE_DIR = $(ROOTDIR)/packages/table
 
-include $(ROOTDIR)/packages/table/java/Makefiles/Makefile.common
+include $(PACKAGE_DIR)/java/Makefiles/Makefile.common
 
 ALL_PACKAGES =  ircam.jmax.editors.table
 
-all: 
+all: $(JAVA_CLASSES_ROOT)
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
