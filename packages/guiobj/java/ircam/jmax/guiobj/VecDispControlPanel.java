@@ -147,7 +147,7 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
       }
     catch (NumberFormatException e1)
       {
-	setVisible(false);
+	//setVisible(false);
 	return;
       }
     ((FtsVectorDisplayObject)target.getFtsObject()).setBounds(min, max);

@@ -325,6 +325,8 @@ vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	  fts_set_float(a + 0, this->min);
 	  fts_set_float(a + 1, this->max);
 	  fts_client_send_message(o, sym_bounds, 2, a);
+
+	  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 	}
     }
 }

@@ -102,7 +102,10 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_set_float(a, this->period_msec);
 
   if(fts_object_has_id(o))
-    fts_client_send_message(o, sym_set_period, 1, a);
+    {
+      fts_client_send_message(o, sym_set_period, 1, a);
+      fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+    }
 }
 
 static void
@@ -140,7 +143,10 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   scope_reset(data);
   
   if(fts_object_has_id(o))
-    fts_client_send_message(o, sym_set_threshold, 1, a);
+    {
+      fts_client_send_message(o, sym_set_threshold, 1, a);
+      fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+    }
 }
 
 static void 

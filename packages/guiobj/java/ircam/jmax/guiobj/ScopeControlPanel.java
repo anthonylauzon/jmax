@@ -106,13 +106,13 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 
     autoItem = new JRadioButton("auto");
     autoItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    ((FtsScopeObject)target.getFtsObject()).
-			setThreshold(FtsScopeObject.THRESHOLD_AUTO);
-	    }
-	});
+	public void itemStateChanged(ItemEvent e)
+	{
+	  if(e.getStateChange() == ItemEvent.SELECTED)
+	    ((FtsScopeObject)target.getFtsObject()).
+	      setThreshold(FtsScopeObject.THRESHOLD_AUTO);
+	}
+      });
     thresholdButtonGroup.add(autoItem);
     JPanel autoPanel = new JPanel();
     autoPanel.setLayout(new BoxLayout(autoPanel, BoxLayout.X_AXIS));
@@ -213,7 +213,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
       }
     else
       {
-	thresholdItem.setSelected(true);
+	//thresholdItem.setSelected(true);
 	thresholdSlider.setEnabled(true);
 	thresholdSlider.setValue((int)(threshold*100));
       }

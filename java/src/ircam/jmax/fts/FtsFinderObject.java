@@ -44,26 +44,6 @@ public class FtsFinderObject extends FtsObject
     super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("__finder"));
   }
   
-  /* Client to server queries */
-  /*public void find(FtsObject context, FtsObjectSet set, Object values[])
-    {
-    args.clear();
-    args.add(set);
-    args.add(context);
-    int i=0;
-    for(i=0; i<values.length ; i++)
-    args.add((String)values[i]);
-    
-    try{
-    send( FtsSymbol.get("finder_find"), args);
-    }
-    catch(IOException e)
-    {
-    System.err.println("[FtsFinderObject]: I/O Error sending find message!");
-    e.printStackTrace(); 
-    }
-    }*/
-
   public void find(FtsObjectSet set, String query)
   {
     find( JMaxApplication.getRootPatcher(), set, query);

@@ -135,7 +135,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("removeObject"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).releaseObject( ( FtsGraphicObject)args.getObject( 0));	  
+	  if(obj != JMaxApplication.getRootPatcher())
+	    ((FtsPatcherObject)obj).releaseObject( ( FtsGraphicObject)args.getObject( 0));	  
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){

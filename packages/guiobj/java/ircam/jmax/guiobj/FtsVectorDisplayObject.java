@@ -212,18 +212,20 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
 
   public void setBounds(float min, float max)
   {
-      args.clear();
-      args.addFloat(min);
-      args.addFloat(max);
+    if(( this.min == min) && ( this.max == max)) return;
 
-      try{
-	  send( FtsSymbol.get("setBounds"), args);
+    args.clear();
+    args.addFloat(min);
+    args.addFloat(max);
+
+    try{
+      send( FtsSymbol.get("setBounds"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsVectorDisplayObject: I/O Error sending setBounds Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsVectorDisplayObject: I/O Error sending setBounds Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   public float getMinimum()

@@ -603,30 +603,30 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
   public GraphicConnection addNewConnection(FtsConnection fc)
   {
-      GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),
-							   fc.getFromOutlet(), 
-							   displayList.getGraphicObjectFor(fc.getTo()),
-							   fc.getToInlet(), fc.getType(), fc);
-      displayList.add(connection);
-      connection.updateDimensions();
-      ErmesSelection.patcherSelection.select( connection);
-      connection.redraw();
-
-      return connection;
+    GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),
+							 fc.getFromOutlet(), 
+							 displayList.getGraphicObjectFor(fc.getTo()),
+							 fc.getToInlet(), fc.getType(), fc);
+    displayList.add(connection);
+    connection.updateDimensions();
+    ErmesSelection.patcherSelection.select( connection);
+    connection.redraw();
+    
+    return connection;
   }
 
-    /***************************************************************/
-    /***************************************************************/
-
-    //debug utility 
-    private void printObjectsDescription()
-    {
-	Object[] objects = itsPatcher.getObjects().getObjectArray();
-	int osize = itsPatcher.getObjects().size();
-
-	for ( int i = 0; i < osize; i++)
-	    System.err.println("obj "+(FtsGraphicObject)objects[i]+" "+((FtsGraphicObject)objects[i]).getDescription());
-    }
+  /***************************************************************/
+  /***************************************************************/
+  
+  //debug utility 
+  private void printObjectsDescription()
+  {
+    Object[] objects = itsPatcher.getObjects().getObjectArray();
+    int osize = itsPatcher.getObjects().size();
+    
+    for ( int i = 0; i < osize; i++)
+      System.err.println("obj "+(FtsGraphicObject)objects[i]+" "+((FtsGraphicObject)objects[i]).getDescription());
+  }
 
   // -----------------------------------------------------------------------
   // Handling of the object text editing
