@@ -89,17 +89,18 @@ public class MaxFileChooser {
       }
 
     fd.setMode(FileDialog.SAVE);
-
     fd.show();
 
-    file = fd.getFile();
+    file = fd.getFile();    
     dir  = fd.getDirectory();
 
     // Patch for the Motif file box  ???
 
-    if (dir.equals(".") || dir.equals("./"))
-      if (oldDir != null)
-	dir = oldDir;
+    if(dir!=null){
+      if (dir.equals(".") || dir.equals("./"))
+	if (oldDir != null)
+	  dir = oldDir;
+    }
       
     if ((file == null) || file.equals(""))
       return null;

@@ -221,7 +221,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     return true;
   }
   
-  void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
+  public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
   {
     //create the graphic descriptions for the FtsObjects, before saving them
     ErmesObject aErmesObject = null;

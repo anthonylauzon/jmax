@@ -740,7 +740,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       }
       else {
 	MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
-	dispose();
+	//dispose();
       }
     }
     //try to print...
@@ -759,7 +759,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       aDialog.show();
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
-	GetDocument().Save();
+	if(!GetDocument().Save()) return false;
 	if(itsProjectEntry!=null) {
 	  if(GetDocument().GetNeverSavedFlag()) DiscardFromProject();
 	  else itsProjectEntry.Reset();

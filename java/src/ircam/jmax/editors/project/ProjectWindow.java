@@ -137,6 +137,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     aMenuItem.addActionListener(this);
     fileMenu.add(aMenuItem = new MenuItem("Close   Ctrl+W"));
     aMenuItem.addActionListener(this);
+    aMenuItem.setEnabled(false);
     fileMenu.add(new MenuItem("-"));
     aCheckItem = new CheckboxMenuItem("Open with Autorouting");
     aCheckItem.setState(true);
@@ -145,8 +146,10 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     fileMenu.add(new MenuItem("-"));
     fileMenu.add(aMenuItem = new MenuItem("Save  Ctrl+S"));
     aMenuItem.addActionListener(this);
+    aMenuItem.setEnabled(false);
     fileMenu.add(aMenuItem = new MenuItem("Save As..."));
     aMenuItem.addActionListener(this);
+    aMenuItem.setEnabled(false);
     fileMenu.add(new MenuItem("-"));
     fileMenu.add(aMenuItem = new MenuItem("Print... Ctrl+P"));
     aMenuItem.addActionListener(this);

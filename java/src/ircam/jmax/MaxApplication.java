@@ -426,6 +426,31 @@ public class MaxApplication extends Object {
 
   public static ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
+    ErmesSketchWindow aSketchWindow;
+    aPatcherDoc.alreadySaved = true;
+    boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
+    aSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
+    aSketchWindow.itsSketchPad.doAutorouting = temp;
+    theFtsPatcher.open();
+    //aSketchWindow.repaint();
+    //aPatcherDoc.CreateFtsGraphics(aSketchWindow);
+    aSketchWindow.InitFromDocument(aPatcherDoc);
+    aSketchWindow.inAnApplet = false;
+    aSketchWindow.setTitle(aSketchWindow.GetDocument().GetTitle());
+    aPatcherDoc.SetWindow(aSketchWindow);
+    //CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)aSketchWindow.itsEditMenu.getItem(9);
+    //aEditMenuItem.setState(temp);
+    //if(itsProjectWindow.itsProject.GetItems().size()==0)
+    //  aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
+    //if(itsSketchWindowList.size() == 1)
+    //  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+    aSketchWindow.pack();
+    aSketchWindow.setVisible(false);
+    return aSketchWindow;
+  }
+  
+  /* public static ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
+    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
     itsSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
@@ -441,14 +466,15 @@ public class MaxApplication extends Object {
     CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
     aEditMenuItem.setState(temp);
     if(itsProjectWindow.itsProject.GetItems().size()==0)
-      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
+     itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
     if(itsSketchWindowList.size() == 1)
       itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
     itsSketchWindow.pack();
     itsSketchWindow.setVisible(true);
     return itsSketchWindow;
-  }
-  
+  }*/
+
+
   public static ErmesSketchWindow NewDefaultSubPatcher( FtsObject theFtsPatcher) {//to use just for 'patcher' externals
     theFtsPatcher.setWindowDescription(new FtsWindowDescription(100, 100, 300, 300));
     ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
@@ -500,8 +526,10 @@ public class MaxApplication extends Object {
 
     case CLOSE_WINDOW:
       if(itsWindow!=null) {
-	itsWindow.Close();
-	itsWindow.GetFrame().setVisible(false);
+	if(itsWindow.Close()) {
+	  itsWindow.GetFrame().setVisible(false);
+	  itsWindow.GetFrame().dispose();
+	}
       }
       if(itsSketchWindowList.isEmpty()){
 	itsSketchWindow = null;

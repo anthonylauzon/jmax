@@ -105,9 +105,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   // ConnectionRequested
   //--------------------------------------------------------
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester){	
-    if (!theRequester.IsInlet())	//if is an outlet...
+    if (!theRequester.IsInlet())   
       return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
+    else return (itsSketchPad.InletConnect(this, theRequester)); 
   }
   
   //--------------------------------------------------------
@@ -116,59 +116,65 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
     theRequester.ChangeState(false, theRequester.connected);
     itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
+    return true;
   }
 
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if (!itsSketchPad.itsRunMode) {
-      if(evt.getClickCount()>1) {
-	if (evt.isControlDown()) { //edit the field
-	  if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
-	  //return true;
-	  //starting from here the bug 55 additions
-	  itsSketchPad.GetEditField().setFont(itsFont);
-	  itsSketchPad.GetEditField().setText(itsArgs);	//warning: what will it happen if itsArgs is not here yet?
-	  itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-	  //itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()+20);
-	  itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+  
+   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+     if (!itsSketchPad.itsRunMode) {
+       if(evt.getClickCount()>1) {
+	 if (evt.isControlDown()) {
+	   if (iAmPatcher) {	
+	     if (itsSubWindow != null) {//show the subpatcher, it's there
+	       itsSubWindow.setVisible(true);
+	       itsSketchPad.itsFirstClick = true;
+	     }
+	     else{	//this 'else' shouldn't be reached...
+	       itsSubWindow = MaxApplication.NewSubPatcherWindow( itsFtsObject);
+	       ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
+	     }
+	     return true;
+	   }
+	 }
+	 else{//edit the text field
+	   if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
+	   ////////////////////////????????????????????????????????????
+	   if((iAmPatcher)&&(itsSubWindow != null)){
+	     ((ErmesPatcherDoc)itsSubWindow.GetDocument()).CreateFtsGraphics(itsSubWindow);
+	     itsSubWindow.dispose();
+	     itsSubWindow = null;
+	   }
+	   
+	   itsSketchPad.GetEditField().setFont(itsFont);
+	   itsSketchPad.GetEditField().setText(itsArgs);
+	   itsSketchPad.GetEditField().itsOwner = this; 
+	   itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+	   
+	   itsParsedTextVector.removeAllElements();
+	   
+	   itsSketchPad.GetEditField().setVisible(true);
+	   itsSketchPad.GetEditField().requestFocus();
+	   itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
+	   return true;
+	 }
+       }
+       //double click, but there's no CTRL key pressed and this is not a subpatcher, so
+       itsSketchPad.ClickOnObject(this, evt, x, y);
+       return true;
+     }
+     else return true;	//run mode, no editing, no subpatcher opening (?)
+   }
 
-	  itsParsedTextVector.removeAllElements();
-       	
-	  itsSketchPad.GetEditField().setVisible(true);
-	  itsSketchPad.GetEditField().requestFocus();
-	  itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
-	  return true;
-	  // until here bug 55
-	}
-	else if (iAmPatcher) {	
-	  if (itsSubWindow != null) {//show the subpatcher, it's there
-	    itsSubWindow.show();
-	    itsSketchPad.itsFirstClick = true;
-	  }
-	  else{	//this 'else' shouldn't be reached...
-	    itsSubWindow = MaxApplication.NewSubPatcherWindow( itsFtsObject);
-	    ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
-	  }
-	  return true;
-	}
-      }
-      //double click, but there's no CTRL key pressed and this is not a subpatcher, so
-      itsSketchPad.ClickOnObject(this, evt, x, y);
-      return true;
-    }
-    else return true;	//run mode, no editing, no subpatcher opening (?)
-  }
   
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
-    //if (itsSketchPad.itsRunMode) return;
-    if(!itsSelected) g.setColor(itsLangNormalColor/*Color.lightGray*/);
-    else g.setColor(itsLangSelectedColor/*Color.gray*/);
+    if(!itsSelected) g.setColor(itsLangNormalColor);
+    else g.setColor(itsLangSelectedColor);
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
@@ -181,8 +187,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont(itsFont);
-    // if (itsArgs != null)
-    // g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);
     DrawParsedString(g);
   }
 	
@@ -225,7 +229,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     currentRect.setSize(d.width, d.height);
     d.width -= WIDTH_DIFF;		
     d.height -= HEIGHT_DIFF;
-    // itsSketchPad.GetEditField().setBounds(itsX+10, itsY+1, d.width,itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.GetEditField().getFont()).getHeight()+20 );
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   
@@ -233,6 +236,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     setSize(d.width, d.height);
   }
 }
+
 
 
 

@@ -631,14 +631,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
       fo = (FtsObject)e.nextElement();
       fg = (FtsGraphicDescription) fo.getGraphicDescription();
-
       // Note that the representation is now found from the fts className,
       // made unique; the new file format will allow for specifing
       // additional information, like a non default graphic representation
       // the code will need a small change here
 
       String objectName = itsHelper.SearchFtsName(fo.getClassName());
-
       aObject = itsHelper.AddObject(fg, objectName, fo);
       //resizes the object to the dimensions 
       //les deux dimensions ne correspondent pas directement aux dimensions effectives

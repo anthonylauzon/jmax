@@ -40,7 +40,20 @@ public class ConsoleWindow extends MaxEditor {
   public MaxDocument GetDocument(){
     return itsConsoleDocument;
   }
-
+  
+  public void SetupMenu(){
+    itsFileMenu.getItem(3).setEnabled(false);
+    itsFileMenu.getItem(7).setEnabled(false);
+    itsFileMenu.getItem(8).setEnabled(false);
+    itsFileMenu.getItem(10).setEnabled(false);
+    itsEditMenu.getItem(0).setEnabled(false);
+    itsEditMenu.getItem(1).setEnabled(false);
+    itsEditMenu.getItem(2).setEnabled(false);
+    itsEditMenu.getItem(3).setEnabled(false);
+  }
 }
+
+
+
 
 

@@ -52,6 +52,7 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     setMenuBar(mb);
     
     addKeyListener(this);
+    SetupMenu();
   }
 
   private Menu CreateNewFileMenu(){
@@ -296,10 +297,6 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
     aMenuItem.addActionListener(this);
     editMenu.add(aMenuItem = new MenuItem("Clear")); 
     aMenuItem.addActionListener(this);
-    editMenu.getItem(0).setEnabled(false);
-    editMenu.getItem(1).setEnabled(false);
-    editMenu.getItem(2).setEnabled(false);
-    editMenu.getItem(3).setEnabled(false);
     return editMenu;
   }
 
@@ -550,7 +547,9 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   public void ToFront(){
     toFront();
   }
+  
 
+  public abstract void SetupMenu();
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
@@ -572,6 +571,11 @@ public abstract class MaxEditor extends Frame implements MaxWindow, KeyListener,
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
 }
+
+
+
+
+
 
 
 
