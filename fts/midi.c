@@ -2188,7 +2188,7 @@ midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   /* redirect to MIDI managers */
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_s_print, ac, at);
+    fts_send_message((fts_object_t *)mm, fts_system_inlet, fts_s_print, ac, at);
 }
 
 static void

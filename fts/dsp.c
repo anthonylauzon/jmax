@@ -297,16 +297,16 @@ dsp_edge_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(fts_dsp_edge_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_edge_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsp_edge_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_edge_put);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dsp_edge_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dsp_edge_delete);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, dsp_edge_put);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsp_edge_get_state);  
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
-  return fts_Success;
+  return fts_ok;
 }
 
 void

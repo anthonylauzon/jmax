@@ -40,7 +40,7 @@ static void fts_error_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_objectset_clear(set);
 
   fts_set_object(&a, (fts_object_t *) set);
-  fts_send_message(scope, fts_system_inlet, fts_s_find_errors, 1, a);
+  fts_send_message(scope, fts_system_inlet, fts_s_find_errors, 1, &a);
 }
 
 static fts_status_t

@@ -566,7 +566,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
 	debugging info of the DSP chain
       */
 
-      fts_set_pointer(&a, node->descr);
+      fts_set_pointer(&a, &node->descr);
       fts_send_message(node->o, fts_system_inlet, fts_s_put, 1, &a);
 
       /*{

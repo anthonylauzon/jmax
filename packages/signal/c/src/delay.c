@@ -398,7 +398,7 @@ delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************
@@ -736,7 +736,7 @@ retap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_dsp_declare_inlet(cl, 0);
 
-  return fts_Success;
+  return fts_ok;
 }
 
 /************************************************************

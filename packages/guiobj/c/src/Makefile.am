@@ -4,7 +4,6 @@ libguiobj_la_SOURCES= \
 button.c \
 comment.c \
 console.c \
-display.c \
 dspcontrol.c\
 errorfinder.c \
 finder.c \
@@ -24,6 +23,7 @@ toggle.c \
 vecdisplay.c \
 matdisplay.c \
 xypad.c
+# display.c \
 
 INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages
 
