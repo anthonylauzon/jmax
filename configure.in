@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.92 2002/09/10 11:04:19 schwarz Exp $
+dnl $Id: configure.in,v 1.93 2002/09/10 12:57:26 tisseran Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.93  2002/09/10 12:57:26  tisseran
+dnl Change package file hierarchy (see ChangeLog)
+dnl
 dnl Revision 1.92  2002/09/10 11:04:19  schwarz
 dnl Removed sdif which is now a separate package and cvs module.
 dnl
@@ -399,6 +402,9 @@ packages/data/java/ircam/jmax/editors/table/renderers/Makefile
 packages/data/java/ircam/jmax/editors/table/tools/Makefile
 packages/data/help/Makefile
 packages/data/images/Makefile
+packages/dtd/Makefile
+packages/dtd/c/Makefile
+packages/dtd/c/src/Makefile
 packages/guiobj/Makefile
 packages/guiobj/c/Makefile
 packages/guiobj/c/src/Makefile
