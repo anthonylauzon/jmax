@@ -19,18 +19,48 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence.renderers;
 
-import java.util.*;
+import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.*;
 
-public interface TrackStateListener
-{
-  public abstract void lock(boolean lock);
-  public abstract void active(boolean active);
-	public abstract void restoreEditorState(FtsTrackEditorObject editorState);
-	public abstract void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection);
+import ircam.jmax.toolkit.*;
+import ircam.jmax.*;
+
+import java.awt.*;
+import java.awt.image.*;
+import java.util.*;
+import java.io.File;
+import ircam.jmax.JMaxApplication;
+
+/**
+ * The main class for a monodimensionalTrack representation.
+ * It provides the support for  editing,
+ * using a background layer and a foreground.
+ * The grid is rendered in the MonoTrackBackground
+ * The events are painted by the MonoTrackForeground.
+ */
+public class AbstractTrackRenderer extends AbstractRenderer{
+  
+  /**
+   * Constructor.
+   */
+  public AbstractTrackRenderer(SequenceGraphicContext theGc) 
+  {  
+    super();
+		gc = theGc;
+  }
+  
+	public Object firstMarkerContaining(int x, int y)
+  {
+    return null;
+  }
+	
+  //------------------  Fields
+  SequenceGraphicContext gc;
+  protected MaxVector tempList;
 }
+
 
 
 

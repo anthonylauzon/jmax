@@ -161,6 +161,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       ((FtsTrackObject)obj).setSaveEditor( args.getInt(0) == 1);
     }
   });
+	FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("markers"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((FtsTrackObject)obj).setMarkersTrack(args.getLength(), args.getAtoms());
+    }
+  });
 }
 
 /**
@@ -177,7 +183,7 @@ public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String clas
   if( args[offset].symbolValue != null)
     this.info = ValueInfoTable.getValueInfo(args[offset].symbolValue.toString());
   else
-    this.info = AnythingValue.info;
+		this.info = AnythingValue.info;
 
   if(length > offset+1)
     this.trackName = args[offset+1].symbolValue.toString();
@@ -278,14 +284,14 @@ public void addEventFromServer(TrackEvent evt)
   // beginUpdate is called in adderTool
 
   addEvent(evt);
-
+	
   // ends the undoable transition
   endUpdate();
 }
 public void addEvents(int nArgs , FtsAtom args[])
 {
   addEvent( new TrackEvent(getServer(), this, args[0].intValue, "event", args, 1, nArgs));
-
+	
   // ends the undoable transition
   endUpdate();
 }
@@ -972,6 +978,11 @@ private void notifyRestoreEditorState(FtsTrackEditorObject editorObject)
   for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
     ((TrackStateListener) e.nextElement()).restoreEditorState(editorObject);
 }
+private void notifyMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+{
+  for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
+		 ((TrackStateListener) e.nextElement()).hasMarkers(markers, markersSelection);
+}
 /**
 * requires to be notified when the database changes
  */
@@ -1429,17 +1440,35 @@ protected void addFlavor(DataFlavor flavor)
 
 
 /********************************************************
-*  FtsObjectWithEditor
+*  others FtsObjects
 ********************************************************/
+
 public void setFtsTrackEditorObject(int id)
 {	
   editorObject = new FtsTrackEditorObject( JMaxApplication.getFtsServer(), this, id);
 }
+
+public void setMarkersTrack(int nArgs , FtsAtom args[])
+{	
+  markersTrack = new FtsTrackObject( JMaxApplication.getFtsServer(), this, args[0].intValue, "track", args, 1, nArgs);	
+	markersSelection = new SequenceSelection(markersTrack);
+	
+	notifyMarkers( markersTrack, markersSelection);
+}
+
+public FtsTrackObject getMarkersTrack()
+{	
+  return markersTrack;	
+}
+
 public void setSaveEditor(boolean save)
 {
   saveEditor = save;
 }
 
+/********************************************************
+*  FtsObjectWithEditor
+********************************************************/
 public void openEditor(int argc, FtsAtom[] argv)
 {
   if(getEditorFrame() == null)
@@ -1514,6 +1543,8 @@ private String trackName;
 public transient DataFlavor flavors[];
 
 public FtsTrackEditorObject editorObject = null;
+public FtsTrackObject markersTrack = null;
+public SequenceSelection markersSelection = null;
 
 public static transient DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 

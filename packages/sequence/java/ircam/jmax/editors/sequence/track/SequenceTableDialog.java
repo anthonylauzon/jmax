@@ -41,15 +41,31 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     this.frame = frame;
     this.track = trk;
     
-    TrackTableModel tabModel = new TrackTableModel(track.getTrackDataModel());
-    tabPanel = new SequenceTablePanel(tabModel, gc);
+		/* upper section: Events List */
+    TrackTableModel eventsModel = new TrackTableModel(track.getTrackDataModel());
+    eventsPanel = new SequenceTablePanel(eventsModel, gc, gc.getSelection());
     
-    getContentPane().add(tabPanel);
+		/* lower section: Measures List */
+		FtsTrackObject markersTrack = gc.getMarkersTrack();
+		TrackTableModel markersModel = null;
+		if( markersTrack!=null)
+		{
+			markersModel = new TrackTableModel( (TrackDataModel)markersTrack);
+			markersPanel = new SequenceTablePanel(markersModel, gc, gc.getMarkersSelection());
+		
+			splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, eventsPanel, markersPanel);
+			splitPane.setOneTouchExpandable(true);
+			splitPane.setDividerLocation(150);
+			
+			getContentPane().add( splitPane);
+		}
+		else
+			getContentPane().add(eventsPanel);
     
     track.getTrackDataModel().addListener(this);
     
     setLocation(200, 200);
-    Dimension dim = tabPanel.getSize();
+    Dimension dim = eventsPanel.getSize();
     
     if(dim.height+30 > DEFAULT_HEIGHT) dim.height = DEFAULT_HEIGHT;
     else dim.height += 30;
@@ -83,30 +99,30 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   {
     if( !uploading)
       {
-	getContentPane().validate();
-	tabPanel.validate();
-	validate();
+			getContentPane().validate();
+			eventsPanel.validate();
+			validate();
       }
   }
       
   public void objectsAdded(int maxTime) 
   {
     getContentPane().validate();
-    tabPanel.validate();
+    eventsPanel.validate();
     validate();
   }
     
   public void objectDeleted(Object whichObject, int index) 
   {
     getContentPane().validate();
-    tabPanel.validate();
+    eventsPanel.validate();
     validate();
   }
 
   public void trackCleared() 
   {
     getContentPane().validate();
-    tabPanel.validate();
+    eventsPanel.validate();
     validate();
   }
   boolean uploading = false;
@@ -126,13 +142,14 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 
 	public SequenceTablePanel getPanel()
 	{
-		return tabPanel;
+		return eventsPanel;
 	}
 	
   Track track;
-  SequenceTablePanel tabPanel;
+  SequenceTablePanel eventsPanel, markersPanel;
+	JSplitPane splitPane;
   Frame frame;
-	final static int DEFAULT_HEIGHT = 700;
+	final static int DEFAULT_HEIGHT = 600;
 }
 
 

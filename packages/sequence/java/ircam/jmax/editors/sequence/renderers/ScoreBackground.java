@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.beans.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -268,12 +269,25 @@ public void render( Graphics g, int order)
 	
 	if( gc.getGridMode() == TrackEditor.TIME_GRID)
 		drawVerticalGrid(g);
-	else
-		drawMeasures(g);
+	/*else
+		drawMeasures(g);*/
 }
 
 private void drawMeasures(Graphics g)
 {
+	FtsTrackObject markers = gc.getMarkersTrack();
+	if( markers!= null)
+	{
+		TrackEvent evt;
+		Dimension d = gc.getGraphicDestination().getSize();
+		
+    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
+																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		{
+			evt = (TrackEvent) e.nextElement();
+			evt.getRenderer().render( evt, g, false, gc);
+		}
+	}
 }
 
 private void drawVerticalGrid(Graphics g)
@@ -283,7 +297,6 @@ private void drawVerticalGrid(Graphics g)
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep;
-	
 	
 	timeStep = findBestTimeStep(windowTime);
 	

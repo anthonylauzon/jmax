@@ -20,6 +20,7 @@ IntegerTrackEditorFactory.java \
 IntegerValue.java \
 ListContainer.java \
 TrackStateListener.java \
+MarkerValue.java \
 MessageTrackEditor.java \
 MessageTrackEditorFactory.java \
 MessageValue.java \

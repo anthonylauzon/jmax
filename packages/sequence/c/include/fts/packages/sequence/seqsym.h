@@ -85,6 +85,7 @@ extern fts_symbol_t seqsym_table_size;
 extern fts_symbol_t seqsym_save_editor;
 extern fts_symbol_t seqsym_editor_state;
 extern fts_symbol_t seqsym_set_editor;
+extern fts_symbol_t seqsym_markers;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_addTracks;

@@ -184,11 +184,20 @@ public class SequenceGraphicContext extends GraphicContext {
 		return gridMode;
 }
 	
+public FtsTrackObject getMarkersTrack()
+{
+	return ((FtsTrackObject)getFtsObject()).getMarkersTrack();
+}
+
+public SequenceSelection getMarkersSelection()
+{
+	return ((FtsTrackObject)getFtsObject()).markersSelection;
+}
   //---- Fields 
   
   TrackDataModel itsDataModel;
   
-  SequenceSelection itsSelection;
+SequenceSelection itsSelection;
   
   Adapter itsAdapter;
   

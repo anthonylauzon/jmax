@@ -124,7 +124,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     TrackBase track;
 
     int id = args[0].intValue;
-    trackObj = new FtsTrackObject(getServer(), this, id, "track", args, 1, nArgs);
+    trackObj = new FtsTrackObject(getServer(), this, id, "track", args, 1, nArgs); 
     track = new TrackBase(trackObj);
     tracks.addElement(track);
 

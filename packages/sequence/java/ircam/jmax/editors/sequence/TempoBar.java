@@ -50,8 +50,25 @@ public class TempoBar extends JPanel
 		utilityPartitionAdapter = new PartitionAdapter(geometry, null);
     
 		if( !isInSequence)
+		{
 			createDisplayer();
-		
+			
+			gc.getDataModel().addTrackStateListener(new TrackStateListener(){
+				public void lock(boolean lock){}
+				public void active(boolean active){}
+				public void restoreEditorState(FtsTrackEditorObject editorState){};
+				public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+				{
+					markersSelection.addListSelectionListener( new ListSelectionListener(){
+						public void valueChanged(ListSelectionEvent e)
+				    {
+							repaint();
+						}
+					});
+				}
+			});		
+		}
+			
     geometry.addTranspositionListener( new TranspositionListener() {
 			public void transpositionChanged(int newValue)
 		  {
@@ -109,9 +126,42 @@ public void paintComponent(Graphics g)
 
 public void paintMeasures(Graphics g)
 {
-		Rectangle clip = g.getClipBounds();
-		g.setColor( Color.white);
-		g.fillRect( clip.x, clip.y, clip.width, clip.height);
+	Rectangle clip = g.getClipBounds();
+	g.setColor( Color.white);
+	g.fillRect( clip.x, clip.y, clip.width, clip.height);
+	
+	FtsTrackObject markers = gc.getMarkersTrack();
+	if( markers!= null)
+	{
+		TrackEvent evt;		
+		int x;
+		String type;
+		Dimension d = getSize();
+		PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
+		SequenceSelection sel = gc.getMarkersSelection();
+		
+		g.setFont( Displayer.displayFont);
+		
+		for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
+																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		{
+			evt = (TrackEvent) e.nextElement();
+			x = pa.getX(evt);
+			type = (String)(evt.getProperty("type"));
+			
+			if( sel.isInSelection(evt))
+				g.setColor( Color.red);
+			else
+				g.setColor( Color.darkGray);
+
+			g.drawLine( x, 18, x, d.height);
+			if(type.equals("tempo"))
+			{
+				g.drawString("x", x - 8, 18);
+				g.drawString("y", x - 8, 26);
+			}
+		}
+	}
 }
 
 public void paintTimeGrid(Graphics g)

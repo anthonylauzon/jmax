@@ -185,6 +185,51 @@
 			settings = {
 			};
 		};
+		3BFBB6F7066E20EB00C7446F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = AbstractTrackRenderer.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/AbstractTrackRenderer.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BFBB6F8066E20EB00C7446F = {
+			fileRef = 3BFBB6F7066E20EB00C7446F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BFD0F51066CC869009D9668 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MarkerValue.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BFD0F52066CC869009D9668 = {
+			fileRef = 3BFD0F51066CC869009D9668;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BFD0F5D066CC9C7009D9668 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MarkerEventRenderer.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BFD0F5E066CC9C7009D9668 = {
+			fileRef = 3BFD0F5D066CC9C7009D9668;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 //3B0
 //3B1
 //3B2
@@ -9989,6 +10034,9 @@
 				3BD62EDD0621C07400C689DC,
 				3BCA11930624183A008FC824,
 				3B75E8DA06624AD4005BE87F,
+				3BFD0F52066CC869009D9668,
+				3BFD0F5E066CC9C7009D9668,
+				3BFBB6F8066E20EB00C7446F,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18306,6 +18354,7 @@
 		};
 		F85123C0028BEAB301664092 = {
 			children = (
+				3BFBB6F7066E20EB00C7446F,
 				F85123C1028BEAB301664092,
 				F85123C2028BEAB301664092,
 				F85123C3028BEAB301664092,
@@ -18313,6 +18362,7 @@
 				F85123C5028BEAB301664092,
 				F85123C6028BEAB301664092,
 				F85123C7028BEAB301664092,
+				3BFD0F5D066CC9C7009D9668,
 				F85123C8028BEAB301664092,
 				F85123C9028BEAB301664092,
 				F85123CA028BEAB301664092,
@@ -18535,6 +18585,7 @@
 				F8512495028BEBB201664092,
 				F8512496028BEBB201664092,
 				F8512497028BEBB201664092,
+				3BFD0F51066CC869009D9668,
 				F8512498028BEBB201664092,
 				F8512499028BEBB201664092,
 				F851249A028BEBB201664092,

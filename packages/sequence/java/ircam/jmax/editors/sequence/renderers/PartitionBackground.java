@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -290,13 +291,26 @@ public void render( Graphics g, int order)
 	
 	if( gc.getGridMode() == MidiTrackEditor.TIME_GRID)
 		drawVerticalGrid(g);
-	else
-		drawMeasures(g);
+	/*else
+		drawMeasures(g);*/
 }
-
-private void drawMeasures(Graphics g)
+ 
+/*private void drawMeasures(Graphics g)
 {
-}
+	FtsTrackObject markers = gc.getMarkersTrack();
+	if( markers!= null)
+	{
+		TrackEvent evt;
+		Dimension d = gc.getGraphicDestination().getSize();
+		
+    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
+																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		{
+			evt = (TrackEvent) e.nextElement();
+			evt.getRenderer().render( evt, g, false, gc);
+		}
+	}
+}*/
 
 private void drawVerticalGrid(Graphics g)
 {

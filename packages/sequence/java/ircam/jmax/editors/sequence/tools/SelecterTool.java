@@ -22,6 +22,7 @@
 package ircam.jmax.editors.sequence.tools;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.toolkit.*;
 
@@ -82,10 +83,10 @@ public void selectionPointChoosen(int x, int y, int modifiers)
 	{
 		SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 		
-		egc.getTrack().setProperty("selected", Boolean.TRUE);	    
+		egc.getTrack().setProperty("selected", Boolean.TRUE);	    		
+		egc.getGraphicDestination().requestFocus();
 		
-		egc.getGraphicDestination().requestFocus();//???
-			
+		/* search for events */
 		TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
 		if (aTrackEvent != null) 
 		{ //click on event
@@ -94,8 +95,11 @@ public void selectionPointChoosen(int x, int y, int modifiers)
 			if ( !egc.getSelection().isInSelection(aTrackEvent)) 
 			{
 				if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-					egc.getSelection().deselectAll();
-				
+				{
+					egc.getSelection().deselectAll(); 
+					if(egc.getMarkersSelection() != null)
+						egc.getMarkersSelection().deselectAll();
+				}
 				egc.getSelection().select(aTrackEvent);
 			}
 			else
@@ -105,13 +109,32 @@ public void selectionPointChoosen(int x, int y, int modifiers)
 			
 			egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
 		}
-		else
-		{//click on empty
-			if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-				if ( !egc.getSelection().isSelectionEmpty())
+		else 
+		{
+			/* search for markers */
+			TrackEvent marker = (TrackEvent) ((AbstractTrackRenderer)gc.getRenderManager()).firstMarkerContaining(x, y);
+			if (marker != null) 
+			{ //click on marker				
+				if ( !egc.getMarkersSelection().isInSelection( marker)) 
+				{
+					if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+					{
+						egc.getMarkersSelection().deselectAll();
+						egc.getSelection().deselectAll(); 
+					}
+ 					egc.getMarkersSelection().select( marker);
+				}
+			}
+			else	
+			{//click on empty
+				if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+				{
 					egc.getSelection().deselectAll(); 
-			
-			egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+					if( egc.getMarkersSelection() != null)
+						egc.getMarkersSelection().deselectAll();
+				}
+				egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
+			}
 		}
 	}
 }

@@ -154,18 +154,18 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 
   if( !fts_object_has_id((fts_object_t *)track))
   {
-    fts_atom_t a[2];
+		fts_atom_t a[2];
     
     fts_client_register_object((fts_object_t *)track, fts_object_get_client_id((fts_object_t *)this));
 
-    fts_set_int(a, fts_object_get_id((fts_object_t *)track));
+		fts_set_int(a, fts_object_get_id((fts_object_t *)track));
     
     if(track_type != NULL)
       fts_set_symbol(a + 1, fts_class_get_name(track_type));
     else
       fts_set_symbol(a + 1, fts_s_void);     
 
-    fts_client_send_message( (fts_object_t *)this, seqsym_addTracks, 2, a);
+    fts_client_send_message( (fts_object_t *)this, seqsym_addTracks, 2, a);		
   }
 }
 

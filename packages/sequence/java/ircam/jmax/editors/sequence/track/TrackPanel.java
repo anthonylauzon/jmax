@@ -202,6 +202,26 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 				}
 			}
 		});
+		
+		trackData.addTrackStateListener(new TrackStateListener(){
+			public void lock(boolean lock){}
+			public void active(boolean active){}
+			public void restoreEditorState(FtsTrackEditorObject editorState){};
+			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+		  {
+				markersSelection.addListSelectionListener( new ListSelectionListener(){
+					public void valueChanged(ListSelectionEvent e)
+				  {
+						SequenceSelection sel = trackEditor.getGraphicContext().getMarkersSelection();
+						if( sel.size() > 0)
+						{
+							TrackEvent evt = (TrackEvent) sel.getSelected().nextElement();
+							makeVisible(evt);
+						}
+					}
+				});
+			}
+		});		
 	}
 	
   boolean isVisible(int y)

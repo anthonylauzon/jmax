@@ -36,7 +36,7 @@ import ircam.jmax.editors.sequence.*;
  * See the setUpIntegerEditor method in this class for details. */
 class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	
-  SequenceTablePanel(TrackTableModel model, SequenceGraphicContext gc)
+  SequenceTablePanel(TrackTableModel model, SequenceGraphicContext gc, SequenceSelection selection)
   {
     this.tmodel = model;
     this.gc = gc;
@@ -46,7 +46,7 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 		table.setGridColor(ircam.jmax.editors.sequence.renderers.PartitionBackground.horizontalGridLinesColor);
 		table.setShowGrid(true);				
 		/************/
-    if(trackObj.getType() == AmbitusValue.info)
+    if(trackObj.getType() == AmbitusValue.info || trackObj.getType() == MarkerValue.info)
 		{
 			JComboBox combo = new JComboBox( trackObj.getEventTypes());
 			combo.setBackground(Color.white);
@@ -59,15 +59,15 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);
     table.getColumnModel().getColumn(0).setMaxWidth(50);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		/*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);*/
 		
     scrollPane = new JScrollPane(table);
 		
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollPane);
 		
-    table.setSelectionModel(gc.getSelection());
-    gc.getSelection().addListSelectionListener(this);
+    table.setSelectionModel( selection);
+    selection.addListSelectionListener(this);
 		
     trackObj.addHighlightListener(new HighlightListener() {
 			public void highlight(Enumeration hhElements, double time)
@@ -147,7 +147,8 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			public void columnSelectionChanged(ListSelectionEvent e){};
 		});
 		
-		restoreColumnNames();
+		if( trackObj.editorObject!=null)
+			restoreColumnNames();
 }
 
 Vector getTableColumnNames()

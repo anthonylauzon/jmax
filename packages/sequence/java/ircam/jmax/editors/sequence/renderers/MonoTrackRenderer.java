@@ -40,15 +40,14 @@ import ircam.jmax.JMaxApplication;
  * The grid is rendered in the MonoTrackBackground
  * The events are painted by the MonoTrackForeground.
  */
-public class MonoTrackRenderer extends AbstractRenderer{
+public class MonoTrackRenderer extends AbstractTrackRenderer{
   
   /**
    * Constructor.
    */
   public MonoTrackRenderer(SequenceGraphicContext theGc) 
   {  
-    super();
-    gc = theGc;
+    super(theGc);
 
     tempList = new MaxVector();
 
@@ -116,8 +115,6 @@ public class MonoTrackRenderer extends AbstractRenderer{
 
 
   //------------------  Fields
-  SequenceGraphicContext gc;
-
   MonoTrackForeground itsForegroundLayer;
   
   protected MaxVector tempList;

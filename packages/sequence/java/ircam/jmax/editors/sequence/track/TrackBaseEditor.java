@@ -82,7 +82,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				repaint();
 		}
 		});
-		
+				
     track.getTrackDataModel().addListener(this);
     
     track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
@@ -107,6 +107,10 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				setViewMode(editorState.view);				
 				setRangeMode(editorState.rangeMode);
 			};
+			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+		  {
+				markersSelection.addListSelectionListener(TrackBaseEditor.this);
+			}
 		});
 		
     track.getTrackDataModel().addHighlightListener(new HighlightListener(){

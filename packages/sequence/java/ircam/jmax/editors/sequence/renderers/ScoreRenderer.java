@@ -40,15 +40,14 @@ import ircam.jmax.JMaxApplication;
  * The grid is rendered in the ScoreBackground
  * The events are painted by the ScoreForeground.
  */
-public class ScoreRenderer extends AbstractRenderer{
+public class ScoreRenderer extends AbstractTrackRenderer{
   
   /**
 	* Constructor.
    */
   public ScoreRenderer(SequenceGraphicContext theGc) 
-{  
-    super();
-    gc = theGc;
+  {  
+    super( theGc);
     gc.setRenderManager(this);
     {//-- prepares the parameters for the geometry object
 			
@@ -78,14 +77,14 @@ public int getViewMode()
 public void setViewMode(int mode)
 {
   if(viewMode!=mode)
-    {
-      viewMode=mode;
-      itsLayers.removeElementAt(0);
-      if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
-	itsLayers.insertElementAt(scoreBackground, 0);
-      else
-	itsLayers.insertElementAt(partitionBackground, 0);
-    }
+	{
+		viewMode=mode;
+		itsLayers.removeElementAt(0);
+		if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+			itsLayers.insertElementAt(scoreBackground, 0);
+		else
+			itsLayers.insertElementAt(partitionBackground, 0);
+	}
 }
 /**
 * returns its (current) event renderer
@@ -111,11 +110,11 @@ public Enumeration objectsContaining(int x, int y)
   double endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
   
   for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
-    {      
-      aTrackEvent = (TrackEvent) e.nextElement();
-      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	tempList.addElement(aTrackEvent);
-    }
+	{      
+		aTrackEvent = (TrackEvent) e.nextElement();
+		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+			tempList.addElement(aTrackEvent);
+	}
 	
   return tempList.elements();
 }
@@ -132,13 +131,37 @@ public Object firstObjectContaining(int x, int y)
   double startTime = gc.getAdapter().getInvX(x);
   double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
   
+	/* search for events */
   for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-    {      
-      aTrackEvent = (TrackEvent) e.nextElement();
-      
-      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	last = aTrackEvent;
-    }
+	{      
+		aTrackEvent = (TrackEvent) e.nextElement();
+		
+		if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+			last = aTrackEvent;
+	}
+	
+  return last;
+}
+
+public Object firstMarkerContaining(int x, int y)
+{
+  TrackEvent aTrackEvent;
+  TrackEvent last = null;
+  
+  double startTime = gc.getAdapter().getInvX(x);
+  double endTime = gc.getAdapter().getInvX(x+AmbitusEventRenderer.CUE_WIDTH+2);
+
+	/* search for markers */
+	if(gc.getMarkersTrack() != null)
+	{
+		for (Enumeration e = gc.getMarkersTrack().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+		{      
+			aTrackEvent = (TrackEvent) e.nextElement();
+			
+			if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+				last = aTrackEvent;
+		}
+	}
 	
   return last;
 }
@@ -156,19 +179,18 @@ public Enumeration objectsIntersecting(int x, int y, int w, int h)
   double endTime = gc.getAdapter().getInvX(x+w);
   
   for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-    {
-      aTrackEvent = (TrackEvent) e.nextElement();
-      
-      if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
 	{
-	  tempList.addElement(aTrackEvent);
+		aTrackEvent = (TrackEvent) e.nextElement();
+		
+		if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
+		{
+			tempList.addElement(aTrackEvent);
+		}
 	}
-    }
   return tempList.elements();
 }
 
 //------------------  Fields
-SequenceGraphicContext gc;
 int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
 
 TrackDataModel itsTrackDataModel;

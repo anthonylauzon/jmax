@@ -1,5 +1,6 @@
 packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/renderers
 package_JAVA = \
+AbstractTrackRenderer.java \
 AmbitusEventRenderer.java \
 AnythingEventRenderer.java \
 AnythingTrackBackground.java \
@@ -7,6 +8,7 @@ AnythingTrackForeground.java \
 AnythingTrackRenderer.java \
 IntegerEventRenderer.java \
 IntegerTrackRenderer.java \
+MarkerEventRenderer.java \
 MessageEventRenderer.java \
 MonoTrackBackground.java \
 MonoTrackForeground.java \

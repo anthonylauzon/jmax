@@ -29,56 +29,77 @@ import java.awt.*;
 import java.util.Enumeration;
 
 /**
- * The foreground layer of a score representation */
+* The foreground layer of a score representation */
 public class ScoreForeground implements Layer {
-
+	
   public ScoreForeground(SequenceGraphicContext theGc)
-  {
+{
     gc = theGc;
     //itsEventRenderer = new AmbitusEventRenderer(gc);
-  }
+}
 
-  Rectangle tempRect = new Rectangle();
-  /**
-   * render all the visible objects in this layer (all the notes in the window)
-   */
-  public void render(Graphics g, int order) 
-  {   
-    tempRect.setBounds(0,0,gc.getGraphicDestination().getSize().width, 
-		gc.getGraphicDestination().getSize().height);
+Rectangle tempRect = new Rectangle();
+/**
+* render all the visible objects in this layer (all the notes in the window)
+ */
+public void render(Graphics g, int order) 
+{   
+	tempRect.setBounds(0,0,gc.getGraphicDestination().getSize().width, 
+										 gc.getGraphicDestination().getSize().height);
+	
+	render(g, tempRect, order);
+}
 
-    render(g, tempRect, order);
-  }
+/** Layer interface */
+public void render(Graphics g, Rectangle r, int order)
+{
+	TrackEvent temp;
+	
+	Rectangle tempr = (Rectangle) g.getClip();
+	
+	
+	g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
+	
+	
+	for (Enumeration e = gc.getRenderManager().objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
+	{
+		temp = (TrackEvent) e.nextElement();
+		temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
+	}
+	
+	if( gc.getGridMode() == TrackEditor.MEASURES_GRID)
+		renderMeasures(g);
+	
+	g.setClip(tempr);
+}
 
-  /** Layer interface */
-  public void render(Graphics g, Rectangle r, int order)
-  {
-    TrackEvent temp;
+private void renderMeasures(Graphics g)
+{
+	FtsTrackObject markers = gc.getMarkersTrack();
+	if( markers!= null)
+	{
+		TrackEvent evt;
+		Dimension d = gc.getGraphicDestination().getSize();
+		SequenceSelection sel = gc.getMarkersSelection();
+		
+    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
+																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		{
+			evt = (TrackEvent) e.nextElement();
+			evt.getRenderer().render( evt, g, sel.isInSelection(evt), gc);
+		}
+	}
+}
 
-    Rectangle tempr = (Rectangle) g.getClip();
-
-    
-    g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
-
-    
-    for (Enumeration e = gc.getRenderManager().objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
-      {
-	temp = (TrackEvent) e.nextElement();
-	temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
-      }
-
-    g.setClip(tempr);
-  }
-
-  /** Returns the current EventRenderer */
-  public ObjectRenderer getObjectRenderer()
-  {
-      return null;
-  }
+/** Returns the current EventRenderer */
+public ObjectRenderer getObjectRenderer()
+{
+	return null;
+}
 
 
-  //--- Fields
-  SequenceGraphicContext gc;
-  ObjectRenderer itsEventRenderer;
+//--- Fields
+SequenceGraphicContext gc;
+ObjectRenderer itsEventRenderer;
 
 }

@@ -885,6 +885,29 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
   }
 }
 
+static void 
+track_upload_markers(track_t *this)
+{
+	if(this->markers != NULL && !fts_object_has_id((fts_object_t *)this->markers))
+	{
+		fts_atom_t a[2];
+		fts_class_t *markers_type = track_get_type(this->markers);
+		
+		fts_client_register_object((fts_object_t *)this->markers, fts_object_get_client_id((fts_object_t *)this));
+		
+		fts_set_int(a, fts_object_get_id((fts_object_t *)this->markers));
+		
+		if(markers_type != NULL)
+      fts_set_symbol(a + 1, fts_class_get_name(markers_type));
+    else
+      fts_set_symbol(a + 1, fts_s_void);     		
+		
+		fts_client_send_message((fts_object_t *)this, seqsym_markers, 2, &a);
+
+		fts_send_message((fts_object_t *)this->markers, fts_s_upload, 0, NULL);
+	}
+}
+
 static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -920,7 +943,10 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
     event = event_get_next(event);
   }
-
+	
+	if( this->markers != NULL && !fts_object_has_id((fts_object_t *)this->markers))
+		track_upload_markers(this);
+	
   fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);
 
   fts_array_destroy(&temp_array);
@@ -932,7 +958,7 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   track_t *this = (track_t *)o;
   fts_atom_t a;
 	   
-  if(this->type != NULL)
+	if(this->type != NULL)
   {
     fts_set_symbol(&a, fts_class_get_name(this->type));
     fts_client_send_message(o, fts_s_type, 1, &a);
@@ -940,7 +966,7 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	
   if(this->save_editor != 0)
   {
-    fts_set_int(&a, this->save_editor);
+    fts_set_int(&a, this->save_editor); 
     fts_client_send_message(o, seqsym_save_editor, 1, &a);
   }
 	
@@ -1496,7 +1522,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("duration"), _track_get_duration);
   fts_class_message_void(cl, fts_new_symbol("size"), _track_get_size);
   
-  fts_class_message_void(cl, fts_new_symbol("markers"), _track_get_markers);
+  fts_class_message_void(cl, seqsym_markers, _track_get_markers);
   
   fts_class_inlet_thru(cl, 0);
 
