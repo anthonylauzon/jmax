@@ -1,3 +1,16 @@
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
 package ircam.jmax.editors.patcher;
 
 import java.util.*;
@@ -42,13 +55,36 @@ class FpePanel extends JFrame implements WindowListener
 
     addWindowListener(this);
 
-    JLabel label = new JLabel("Objects With Floating Point Exceptions ");
-    label.setHorizontalTextPosition(label.RIGHT);
+    JPanel panel = new JPanel();
+    panel.setBorder( new TitledBorder( "Floating-point errors"));
+    panel.setLayout( new BorderLayout());
 
-    JPanel labelPanel = new JPanel();
-    labelPanel.setLayout( new BorderLayout());
-    labelPanel.setBorder( new EmptyBorder( 1, 1, 1, 1) );
-    labelPanel.add("West", label);
+    JPanel p1 = new JPanel();
+    p1.setBorder( new EmptyBorder( 3, 0, 3, 0));
+    p1.setLayout( new BoxLayout( p1, BoxLayout.Y_AXIS));
+
+    JCheckBox nanCheckBox = new JCheckBox( "Check NaN");
+    nanCheckBox.addItemListener( new ItemListener() {
+      public void itemStateChanged( ItemEvent e)
+	{
+	    if (e.getStateChange() == ItemEvent.DESELECTED)
+	      Fts.getDspController().setCheckNan( false);
+	    else  if (e.getStateChange() == ItemEvent.SELECTED)
+	      Fts.getDspController().setCheckNan( true);
+	}
+    });
+    p1.add( nanCheckBox);
+
+    panel.add( p1, "North");
+
+    objectSetViewer = new ObjectSetViewer();
+
+    panel.add( objectSetViewer, "Center");
+
+    JPanel p3 = new JPanel();
+    p3.setBorder( new EmptyBorder( 3, 0, 3, 0));
+
+    p3.setLayout( new BoxLayout( p3, BoxLayout.X_AXIS));
 
     JButton clearButton = new JButton("Clear");
     clearButton.setMargin( new Insets(2,2,2,2));
@@ -58,22 +94,23 @@ class FpePanel extends JFrame implements WindowListener
 	  Fts.getDspController().clearFpeCollecting();
 	}});
 
-    labelPanel.add("East", clearButton);
+    p3.add( clearButton);
 
-    objectSetViewer = new ObjectSetViewer();
+    p3.add( Box.createGlue());
 
-    JPanel panel = new JPanel();
-    panel.setLayout( new BorderLayout());
-    panel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
-    panel.setAlignmentX( LEFT_ALIGNMENT);
-    //FpePanel.setOpaque( false);
+    JButton closeButton = new JButton( "Close");
+    closeButton.setMargin( new Insets(2,2,2,2));
+    closeButton.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
+	{
+	  setVisible( false);
+	}
+    });
+    p3.add( closeButton);
 
-    panel.add( "North", labelPanel);
-    panel.add( "Center", objectSetViewer);
+    panel.add( p3, "South");
 
-    //setSize( 300, 300);
     getContentPane().add( panel);
-
     pack();
     validate();
 
@@ -97,7 +134,6 @@ class FpePanel extends JFrame implements WindowListener
 	}
     });
     
-    //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
   }
 
   public void windowClosing(WindowEvent e)
@@ -132,7 +168,4 @@ class FpePanel extends JFrame implements WindowListener
   {
   }
 }
-
-
-
 
