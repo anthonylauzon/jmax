@@ -101,6 +101,18 @@ public class DefaultActions
 	ProjectEditor.openProject( container.getFrame());
       }
     };
+  public static EditorAction newPackageAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.newPackage( container.getFrame());
+      }
+    };
+  public static EditorAction editPackageAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.editPackage( container.getFrame());
+      }
+    };
   public static EditorAction editProjectAction    = new EditorAction(){
       public void doAction(EditorContainer container)
       {

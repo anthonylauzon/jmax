@@ -902,6 +902,38 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 }
 
+static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+  fts_package_t* package;
+  fts_atom_t a[1];
+  char message[1024];
+
+  fts_symbol_t package_name = fts_get_symbol( at);
+  fts_symbol_t package_file = fts_get_symbol( at+1);
+  
+  package = fts_package_load_from_file(package_name, package_file);
+
+  if( package->state == fts_package_corrupt) 
+    {
+      sprintf(message, "Invalid package file: \n%s\n", package_file);
+      fts_set_symbol( a, message);
+      fts_client_send_message( o, s_show_message, 1, a);
+    }  
+  else
+    {
+      if (!fts_object_has_id( (fts_object_t *)package))
+	{
+	  client_register_object( this, (fts_object_t *)package, FTS_NO_ID);
+
+	  fts_set_int(a, fts_get_object_id( (fts_object_t *)package));
+	  fts_client_send_message(o, fts_s_package, 1, a);    
+	  fts_send_message( (fts_object_t *)package, fts_SystemInlet, fts_s_upload, 0, 0);
+	}
+      fts_send_message( (fts_object_t *)package, fts_SystemInlet, fts_s_openEditor, 0, 0);
+    }
+}
+
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_sched_halt();
@@ -1029,6 +1061,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load"), client_load_patcher_file);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_project"), client_load_project);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "load_package"), client_load_package);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
 

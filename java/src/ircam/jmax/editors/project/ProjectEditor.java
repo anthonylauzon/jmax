@@ -55,6 +55,20 @@ public class ProjectEditor extends JFrame implements EditorContainer
     else
       projectEditor.update();
     
+    projectEditor.setTitle("Project Editor");
+    projectEditor.setVisible(true);
+    
+    return projectEditor;
+  }
+
+  public static ProjectEditor editPackage( FtsPackage pkg)
+  {    
+    if (projectEditor == null)
+      projectEditor = new ProjectEditor( pkg);
+    else
+      projectEditor.update( pkg);
+    
+    projectEditor.setTitle("Package Editor: "+pkg.getName());
     projectEditor.setVisible(true);
     
     return projectEditor;
@@ -67,11 +81,16 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   protected ProjectEditor()
   {
+    this( JMaxApplication.getProject());
+  }
+
+  protected ProjectEditor(FtsPackage pkg)
+  {
     super( "Project Editor");
 
     makeMenuBar();    
 
-    packagePanel = new ConfigPackagePanel( this, JMaxApplication.getProject());
+    packagePanel = new ConfigPackagePanel( this, pkg);
     getContentPane().add( packagePanel);
     
     validate();
@@ -95,25 +114,30 @@ public class ProjectEditor extends JFrame implements EditorContainer
 
   void update()
   {
-    packagePanel.setPackage( JMaxApplication.getProject());
+    update( JMaxApplication.getProject());
+  } 
+
+  void update( FtsPackage pkg)
+  {
+    packagePanel.setPackage( pkg);
     packagePanel.update();
   } 
 
   public static void newProject( Frame frame)
   {
-    int result = NewProjectDialog.showDialog( frame);
+    int result = NewProjectDialog.showDialog( frame, NewProjectDialog.PROJECT_TYPE);
     if(result == NewProjectDialog.CREATE_OPTION)
       {
 	FtsProject newProject = null;
-	String name = NewProjectDialog.getProjectName();
-	String location = NewProjectDialog.getProjectLocation();
+	String name = NewProjectDialog.getResultName();
+	String location = NewProjectDialog.getResultLocation();
 	
 	try{
 	  newProject = new FtsProject();
 	}
 	catch(IOException e)
 	  {
-	    System.err.println("Error in FtsProject creation!");
+	    System.err.println("[ProjectEditor]: Error in FtsProject creation!");
 	    e.printStackTrace();
 	  }
 	newProject.save( location+name);
@@ -136,6 +160,54 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	catch(IOException e)
 	  {
 	    System.err.println("[ProjectEditor]: I/O error loading project "+project.getAbsolutePath());
+	  }
+      }
+  }
+
+  public static void newPackage( Frame frame)
+  {
+    int result = NewProjectDialog.showDialog( frame, NewProjectDialog.PACKAGE_TYPE);
+    if(result == NewProjectDialog.CREATE_OPTION)
+      {
+	FtsPackage newPackage = null;
+	String name = NewProjectDialog.getResultName();
+	String location = NewProjectDialog.getPackageLocation();
+	
+	try{
+	  newPackage = new FtsPackage();
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("[ProjectEditor]: Error in FtsPackage creation!");
+	    e.printStackTrace();
+	  }
+	newPackage.save( location+name);
+	newPackage.setFileName( location+name);
+	newPackage.setName( name);
+	newPackage.setDir( location);
+	newPackage.requestOpenEditor();
+      }
+  }
+
+  public static void editPackage( Frame frame)
+  {
+    File pkg = MaxFileChooser.chooseFileToOpen( frame);
+    String name = pkg.getName();
+    if(name.endsWith(".jmax"))
+      {
+	int idx = name.indexOf(".jmax"); 
+	name = name.substring( 0, idx-1);
+      }
+
+    if( pkg != null)
+      {
+	try
+	  {	
+	    JMaxApplication.loadPackage( name, pkg.getAbsolutePath());
+	  }
+	catch(IOException e)
+	  {
+	    System.err.println("[ProjectEditor]: I/O error loading package "+pkg.getAbsolutePath());
 	  }
       }
   }

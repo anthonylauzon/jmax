@@ -85,6 +85,14 @@ class ProjectMessageHandler implements FtsMessageHandler {
   }
 }
 
+class PackageMessageHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    if ( args.isInt( 0) )
+      new FtsPackage( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), args.getInt( 0));
+  }
+}
+
 class RootPatcher extends FtsPatcherObject {
   RootPatcher( FtsServer server)
   {
@@ -116,10 +124,21 @@ class JMaxClient extends FtsObject {
     send( FtsSymbol.get("load_project"), args);
   }
 
+  void loadPackage( String name, String fileName) throws IOException
+  {
+    FtsArgs args = new FtsArgs();
+
+    args.addString( name);
+    args.addString( fileName);
+
+    send( FtsSymbol.get("load_package"), args);
+  }
+
   static
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package"), new PackageMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "showMessage"), new FtsMessageHandler() {
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -297,6 +316,11 @@ public class JMaxApplication {
   public static void loadProject( String name) throws IOException
   {
     singleInstance.clientObject.loadProject( name);
+  }
+
+  public static void loadPackage( String name, String fileName) throws IOException
+  {
+    singleInstance.clientObject.loadPackage( name, fileName);
   }
 
   // **********************************************************************

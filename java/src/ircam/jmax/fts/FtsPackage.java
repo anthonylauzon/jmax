@@ -26,6 +26,7 @@ import java.util.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
+import ircam.jmax.editors.project.*;
 
 public class FtsPackage extends FtsObjectWithEditor
 {
@@ -274,7 +275,10 @@ public class FtsPackage extends FtsObjectWithEditor
       FtsHelpPatchTable.addSummary( name.toString()+" summary", dir+"/help/"+name+".summary.jmax");
   }
 
-  public void openEditor(int nArgs, FtsAtom[] args){}
+  public void openEditor(int nArgs, FtsAtom[] args)
+  {
+    ProjectEditor.editPackage( this);
+  }
   public void destroyEditor(){}
   /*************************************/
 

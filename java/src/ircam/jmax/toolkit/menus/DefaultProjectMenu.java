@@ -47,12 +47,18 @@ public class DefaultProjectMenu extends EditorMenu
   {
     super("Project");
 
-    setHorizontalTextPosition(AbstractButton.LEFT);
-    setDefaultNumEntries(5);
+    setHorizontalTextPosition( AbstractButton.LEFT);
+    setDefaultNumEntries( 8);
 
     add(DefaultActions.newProjectAction, "New Project", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_N);
 
     add(DefaultActions.openProjectAction, "Open Project ...", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_O);
+
+    addSeparator();
+
+    add(DefaultActions.newPackageAction, "New Package");
+
+    add(DefaultActions.editPackageAction, "Edit Package ...");
 
     addSeparator();
 

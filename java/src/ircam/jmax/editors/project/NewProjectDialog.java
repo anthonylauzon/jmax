@@ -39,18 +39,19 @@ import ircam.jmax.fts.*;
 
 public class NewProjectDialog extends JDialog 
 {
-  public NewProjectDialog( Frame dw) 
+  public NewProjectDialog( Frame dw, int type) 
   {
-    super(dw, "New Project", true);
+    super(dw, (type == PROJECT_TYPE) ? "New Project" : "New Package", true);
 
     parent = (Frame)dw;
-  
+    this.type = type;
+
     JPanel titlePanel = new JPanel();    
     titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
     JLabel iconLabel = new JLabel( JMaxIcons.jmaxIcon);
     JLabel titleLabel = new JLabel();
     titleLabel.setFont( titleLabel.getFont().deriveFont( (float)36));
-    titleLabel.setText("New Project");
+    titleLabel.setText((type == PROJECT_TYPE) ? "New Project" : "New Package");
     titlePanel.add( iconLabel);
     titlePanel.add( Box.createRigidArea( new Dimension(20, 0)));
     titlePanel.add( titleLabel);
@@ -59,7 +60,8 @@ public class NewProjectDialog extends JDialog
     //Create Project Name section.
     JPanel namePanel = new JPanel();    
     namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.X_AXIS));
-    namePanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), "Project Name"));
+    namePanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), 
+							   (type == PROJECT_TYPE) ? "Project Name" : "Package Name"));
     nameField = new JTextField();
     nameField.addActionListener( new ActionListener(){
 	public void actionPerformed(ActionEvent e)
@@ -161,25 +163,47 @@ public class NewProjectDialog extends JDialog
     createButton.setEnabled( (name!=null)&&(path!=null)&&(!name.equals("")&&(!path.equals(""))));
   }
 
-  public static int showDialog(Frame frame)
+  public static int showDialog(Frame frame, int type)
   {
-    instance = new NewProjectDialog( frame);
+    instance = new NewProjectDialog( frame, type);
     System.gc();
     return instance.returnValue;
   }
-  public static String getProjectName()
+  public static String getResultName()
   {
     String name = instance.nameField.getText();
     if( !name.endsWith(".jmax"))
       name = name.concat(".jmax");
     return name;
   }
-  public static String getProjectLocation()
+  public static String getResultLocation()
   {
     String location = instance.pathField.getText();
      if( !location.endsWith("/"))
       location = location.concat("/");
      return location;
+  }
+
+  public static String getPackageLocation()
+  {
+    String location = instance.pathField.getText();
+    String pkgName = instance.nameField.getText();
+    if( pkgName.endsWith(".jmax"))
+      {
+	int idx = pkgName.indexOf(".jmax"); 
+	pkgName = pkgName.substring( 0, idx-1);
+      }
+
+    if( !location.endsWith("/"))
+      location = location.concat("/");
+    if( !location.endsWith(pkgName+"/"))
+      location = location.concat(pkgName+"/");
+
+    File dir = new File( location);
+    if( !dir.exists())
+      dir.mkdir();
+    
+    return location;
   }
 
   private static NewProjectDialog instance;
@@ -191,6 +215,9 @@ public class NewProjectDialog extends JDialog
   public static final int CANCEL_OPTION = 0;
   public static final int CREATE_OPTION = 1;
   int returnValue = CANCEL_OPTION; 
+  public static final int PROJECT_TYPE = 0;
+  public static final int PACKAGE_TYPE = 1;
+  private int type = PROJECT_TYPE;
 }
 
 
