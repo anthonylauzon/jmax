@@ -187,32 +187,36 @@ macosxmidi_set_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     {
     if(source_name == fts_s_none)
       {
-      fts_midilabel_set_input(label, NULL);
+	fts_midilabel_set_input(label, NULL);
 
-      /* send to client */
+	/* send to client */      
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else if(source_name == fts_s_export)
       {
-      fts_atom_t args[2];
-
-      fts_set_object(args + 0, o);
-      fts_set_symbol(args + 1, fts_midilabel_get_name(label));
-      fts_midilabel_set_input(label, (fts_midiport_t *)fts_object_create(macosxmidi_input_type, 2, args));
-
-      /* send to client */
+	fts_atom_t args[2];
+	
+	fts_set_object(args + 0, o);
+	fts_set_symbol(args + 1, fts_midilabel_get_name(label));
+	fts_midilabel_set_input(label, (fts_midiport_t *)fts_object_create(macosxmidi_input_type, 2, args));
+      
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else if(source_name == fts_s_internal)
       {
       fts_midilabel_set_internal(label);
 
       /* send to client */
+      fts_client_send_message(o, fts_s_input, 2, at);
       }
     else
       {
-      /* get or create MIDI port */
-      /* set input */
+	/* get or create MIDI port */
+	/* set input */
 
-      /* send to client */
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     }
 }
@@ -230,30 +234,35 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     {
     if(destination_name == fts_s_none)
       {
-      fts_midilabel_set_output(label, NULL);
-
-      /* send to client */
+	fts_midilabel_set_output(label, NULL);
+	
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else if(destination_name == fts_s_export)
       {
-      fts_atom_t args[2];
-
-      fts_set_object(args + 0, o);
-      fts_set_symbol(args + 1, fts_midilabel_get_name(label));
-      fts_midilabel_set_output(label, (fts_midiport_t *)fts_object_create(macosxmidi_output_type, 2, args));
+	fts_atom_t args[2];
+	
+	fts_set_object(args + 0, o);
+	fts_set_symbol(args + 1, fts_midilabel_get_name(label));
+	fts_midilabel_set_output(label, (fts_midiport_t *)fts_object_create(macosxmidi_output_type, 2, args));
+	
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else if(destination_name == fts_s_internal)
       {
-      fts_midilabel_set_internal(label);
-
-      /* send to client */
+	fts_midilabel_set_internal(label);
+	
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     else
       {
-      /* get or create MIDI port */
-      /* set output */
-
-      /* send to client */
+	/* get or create MIDI port */
+	/* set output */
+	
+	/* send to client */
+	fts_client_send_message(o, fts_s_input, 2, at);
       }
     }
 }
@@ -268,6 +277,8 @@ macosxmidi_insert_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_midimanager_insert_label_at_index(mm, index, name);
   fts_outlet_send(o, 0, fts_s_insert, 2, at);
+
+  fts_client_send_message(o, fts_s_insert, 2, at);
 }
 
 /* remove <index> */
@@ -280,6 +291,8 @@ macosxmidi_remove_label( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_midimanager_remove_label_at_index(mm, index);
   fts_outlet_send(o, 0, fts_s_remove, 1, at);
+
+  fts_client_send_message(o, fts_s_remove, 1, at);
 }
 
 /* restore <name> <source id> <destination id> */
@@ -373,6 +386,7 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_midilabel_t *label = fts_midimanager_get_labels(mm);
   fts_iterator_t keys, values;
   fts_atom_t k, a;
+  fts_atom_t b[2];
 
   fts_hashtable_get_keys(&this->sources, &keys);
   
@@ -392,6 +406,7 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
   fts_client_add_symbol( o, fts_s_internal); 
   fts_client_add_symbol( o, fts_s_export); 
+  fts_client_add_symbol( o, fts_s_none); 
 
   fts_client_done_message( o);  
 
@@ -408,32 +423,47 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
   fts_client_add_symbol( o, fts_s_internal); 
   fts_client_add_symbol( o, fts_s_export); 
+  fts_client_add_symbol( o, fts_s_none); 
 
   fts_client_done_message( o);  
 
-  /*while(label)
+  int i = 0;
+  while(label)
     {
-    fts_symbol_t name = fts_midilabel_get_name(label);
-    macosxmidiport_t *input = (macosxmidiport_t *)fts_midilabel_get_input(label);
-    macosxmidiport_t *output = (macosxmidiport_t *)fts_midilabel_get_output(label);
-    fts_symbol_t input_name, output_name;
+      fts_symbol_t name = fts_midilabel_get_name(label);
+      macosxmidiport_t *input = (macosxmidiport_t *)fts_midilabel_get_input(label);
+      macosxmidiport_t *output = (macosxmidiport_t *)fts_midilabel_get_output(label);
+      fts_symbol_t input_name, output_name;
     
-    if(input == NULL)
-    input_name = fts_s_none;
-    else if(fts_object_get_metaclass((fts_object_t *)input) == fts_midiport_type)
-    input_name = fts_s_internal;
-    else
-    input_name = macosxmidiport_get_name(input);
+      fts_set_int( b, i);
+      fts_set_symbol( b+1, name);
+      fts_client_send_message(o, fts_s_insert, 2, b);
+
+      if(input == NULL)
+	input_name = fts_s_none;
+      else if(fts_object_get_metaclass((fts_object_t *)input) == fts_midiport_type)
+	input_name = fts_s_internal;
+      else
+	input_name = macosxmidiport_get_name(input);
+
+      fts_set_int( b, i);
+      fts_set_symbol( b+1, input_name);
+      fts_client_send_message(o, fts_s_input, 2, b);
     
-    if(output == NULL)
-    output_name = fts_s_none;
-    else if(fts_object_get_metaclass((fts_object_t *)output) == fts_midiport_type)
-    output_name = fts_s_internal;
-    else
-    output_name = macosxmidiport_get_name(output);
+      if(output == NULL)
+	output_name = fts_s_none;
+      else if(fts_object_get_metaclass((fts_object_t *)output) == fts_midiport_type)
+	output_name = fts_s_internal;
+      else
+	output_name = macosxmidiport_get_name(output);
     
-    label = fts_midilabel_get_next(label);
-    }*/
+      fts_set_int( b, i);
+      fts_set_symbol( b+1, output_name);
+      fts_client_send_message(o, fts_s_output, 2, b);
+
+      label = fts_midilabel_get_next(label);
+      i++;
+    }
 }
 
 
