@@ -134,9 +134,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       
       //------------------ prepares Center Section
       centerSection = new JPanel();			
-      Border border = scrollTracks.getBorder();
       scrollTracks.setBorder(new EtchedBorder());
-      centerSection.setBorder(border);
+      centerSection.setBorder(new EtchedBorder());
       centerSection.setLayout( new BorderLayout());
       centerSection.add( scrollTracks, BorderLayout.CENTER);
       
