@@ -85,7 +85,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     // Number format for controlling the float printed by the float box.
     // essentially used to avoid scientific notation in float.
     
-    formatter = new DecimalFormat("0.####;-0.####");
+    formatter = new DecimalFormat("0.######;-0.######");
     formatter.setGroupingUsed(false);
     formatter.setDecimalSeparatorAlwaysShown(true);
   }
@@ -94,9 +94,9 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     try
       {
-	  Number n = formatter.parse(v); 
+	Number n = formatter.parse(v); 
 
-	  value = n.doubleValue();
+	value = n.doubleValue();
       }
     catch (java.text.ParseException  e1)
       {
@@ -150,7 +150,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	    if(Squeack.isShift(squeack))
 	      value = value + (double)(itsLastY - mouse.y) * increment * 10.;
 	    else
-	      value = value + (double)(itsLastY - mouse.y) * increment;
+	      value = value + (itsLastY - mouse.y) * increment;
 
 	    ((FtsFloatValueObject)ftsObject).setValue( value);
 	    

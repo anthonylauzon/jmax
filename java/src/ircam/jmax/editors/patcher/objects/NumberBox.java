@@ -216,13 +216,16 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       {
 	// Fill the background
 	g.setColor( Color.white);
-	g.fillRect( x+hd2+2, y+1, getIntZoneWidth()-(hd2+2), h-2);
 	
 	if(getIntZoneWidth() > 0)
 	  {
+	    g.fillRect( x+hd2+2, y+1, getIntZoneWidth()-(hd2+2), h-2);
 	    g.setColor( floatColor);
 	    g.fillRect( x+getIntZoneWidth(), y+1, w-getIntZoneWidth()-2, h-2);
 	  }
+	else
+	  g.fillRect( x+hd2+2, y+1, w-(hd2+2)-2, h-2);
+
 	// Get the value
 	aString = getVisibleString(getValueAsText());
       }

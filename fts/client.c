@@ -663,7 +663,7 @@ static void state_next( client_t *client, unsigned char input)
     moveto( q_float3, shift_action);
     break;
   case q_float3:
-    moveto( q_float4, end_float_action);
+    moveto( q_float4, shift_action);
     break;
   case q_float4:
     moveto( q_float5, shift_action);
