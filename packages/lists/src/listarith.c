@@ -11,8 +11,9 @@ typedef struct
 {
   fts_object_t o;
   list_t list;
-  list_t right;
-  fts_atom_t r;
+  list_t right_list;
+  fts_atom_t right_atom;
+  fts_symbol_t right_type;
 } listarith_t;
 
 #define LIST_ALLOC_BLOCK 32
@@ -200,14 +201,26 @@ list_init(list_t *list)
  */
 
 static void
-listarith_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+listarith_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  list_set_size(&(this->right), ac);
-  memcpy((char *)this->right.at, at, ac * sizeof(fts_atom_t)); /* copy incomming list to right */
+  list_set_size(&(this->right_list), ac);
+  memcpy((char *)this->right_list.at, at, ac * sizeof(fts_atom_t)); /* copy incomming list to right */
+
+  this->right_type = fts_s_list;
 }
+
+static void
+listarith_set_right_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  listarith_t *this = (listarith_t *)o;
+
+  this->right_atom = at[0];
+  this->right_type = fts_get_type(at);
+} 
+
 
 static void
 listarith_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -215,14 +228,24 @@ listarith_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  if(this->right.ac < ac)
-    ac = this->right.ac;
+  if(this->right_type == fts_s_list)
+    {
+      if(this->right_list.ac < ac)
+	ac = this->right_list.ac;
+      
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_add(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+    }
+  else
+    {
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+    }
 
-  list_set_size(&(this->list), ac);
-
-  for(i=0; i<ac; i++)
-    atom_add(at + i, &(this->right.at[i]), &(this->list.at[i]));
-  
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
 }
 
@@ -232,13 +255,23 @@ listarith_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  if(this->right.ac < ac)
-    ac = this->right.ac;
-
-  list_set_size(&(this->list), ac);
-
-  for(i=0; i<ac; i++)
-    atom_sub(at + i, &(this->right.at[i]), &(this->list.at[i]));
+  if(this->right_type == fts_s_list)
+    {
+      if(this->right_list.ac < ac)
+	ac = this->right_list.ac;
+      
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_sub(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+    }
+  else
+    {
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+    }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
 }
@@ -249,14 +282,24 @@ listarith_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  if(this->right.ac < ac)
-    ac = this->right.ac;
+  if(this->right_type == fts_s_list)
+    {
+      if(this->right_list.ac < ac)
+	ac = this->right_list.ac;
+      
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_mul(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+    }
+  else
+    {
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+    }
 
-  list_set_size(&(this->list), ac);
-
-  for(i=0; i<ac; i++)
-    atom_mul(at + i, &(this->right.at[i]), &(this->list.at[i]));
-  
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
 }
 
@@ -266,13 +309,23 @@ listarith_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  if(this->right.ac < ac)
-    ac = this->right.ac;
-
-  list_set_size(&(this->list), ac);
-
-  for(i=0; i<ac; i++)
-    atom_div(at + i, &(this->right.at[i]), &(this->list.at[i]));
+  if(this->right_type == fts_s_list)
+    {
+      if(this->right_list.ac < ac)
+	ac = this->right_list.ac;
+      
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_div(at + i, &(this->right_list.at[i]), &(this->list.at[i]));
+    }
+  else
+    {
+      list_set_size(&(this->list), ac);
+      
+      for(i=0; i<ac; i++)
+	atom_add(at + i, &(this->right_atom), &(this->list.at[i]));
+    }
   
   fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
 }
@@ -289,13 +342,16 @@ listarith_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   listarith_t *this = (listarith_t *)o;
 
   list_init(&this->list);
-  list_init(&this->right);
+  list_init(&this->right_list);
 
   list_set_size(&this->list, LIST_ALLOC_BLOCK);
-  list_set_size(&this->right, LIST_ALLOC_BLOCK);
+  list_set_size(&this->right_list, LIST_ALLOC_BLOCK);
 
-  if(ac > 1)
-    listarith_set_right(o, 0, 0, ac-1, at+1);
+  if(ac == 2)
+    listarith_set_right_atom(o, 0, 0, 1, at+1);
+  else
+    listarith_set_right_list(o, 0, 0, ac-1, at+1);
+
 }
 
 static void
@@ -303,8 +359,10 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   listarith_t *this = (listarith_t *)o;
 
-  fts_free(this->list.at);
-  fts_free(this->right.at);
+  if(this->list.at)
+    fts_free(this->list.at);
+  if(this->right_list.at)
+    fts_free(this->right_list.at);
 }
 
 /*********************************************
@@ -327,7 +385,11 @@ listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, listarith_delete, 0, 0);
 
   /* user methods */
-  fts_method_define_varargs(cl, 1, fts_s_list, listarith_set_right);
+  fts_method_define_varargs(cl, 1, fts_s_list, listarith_set_right_list);
+
+  fts_method_define_float(cl, 1, listarith_set_right_atom);
+  fts_method_define_int(cl, 1, listarith_set_right_atom);
+  fts_method_define_symbol(cl, 1, listarith_set_right_atom);
 
   if(class_name == fts_new_symbol("list+"))
     fts_method_define_varargs(cl, 0, fts_s_list, listarith_add);
