@@ -106,10 +106,9 @@ fts_eventfifo_init(fts_eventfifo_t *eventfifo, int size)
 void
 fts_eventfifo_destroy(fts_eventfifo_t *eventfifo, int size)
 {
-  fts_free(eventfifo->fifo.buffer);
+  fts_free((void *)eventfifo->fifo.buffer);
 }
 
-/* read next fifo entry into time base (returns pointer to atom of newly allocated event) */
 fts_fifoevent_t *
 fts_eventfifo_get_read(fts_eventfifo_t *eventfifo)
 {
@@ -144,78 +143,12 @@ fts_eventfifo_get_write(fts_eventfifo_t *eventfifo)
 void
 fts_eventfifo_incr_read(fts_eventfifo_t *eventfifo)
 {
-  fts_fifo_incr_write(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
+  fts_fifo_incr_read(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
 }
 
 void
 fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo)
 {
   fts_fifo_incr_write(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
-}
-
-/***************************************************
-*
-*  call fifo
-*
-*/
-void
-fts_callfifo_init(fts_callfifo_t *callfifo, int size)
-{
-  int bytes = sizeof(fts_fifocall_t) * size;
-
-  fts_fifo_init(&callfifo->fifo, fts_malloc(bytes), bytes);
-
-  callfifo->size = size;
-  callfifo->delta = 0.0;
-}
-
-void
-fts_callfifo_destroy(fts_callfifo_t *callfifo, int size)
-{
-  fts_free(callfifo->fifo.buffer);
-}
-
-/* read next fifo entry into time base (returns pointer to atom of newly allocated call) */
-fts_fifocall_t *
-fts_callfifo_get_read(fts_callfifo_t *callfifo)
-{
-  if(fts_fifo_read_level(&callfifo->fifo) >= sizeof(fts_fifocall_t)) {
-    fts_fifocall_t *call = (fts_fifocall_t *)fts_fifo_read_pointer(&callfifo->fifo);
-    double time = call->time - callfifo->delta;
-    double now = fts_get_time();
-
-    /* resync fifo */
-    if(time < now)
-      callfifo->delta = call->time - now;
-
-    /* adjust call time and return (void value can serve for sync) */
-    if(!fts_is_void(&call->argument)) {
-      call->time = time;
-      return call;
-    }
-  }
-
-  return NULL;
-}
-
-fts_fifocall_t *
-fts_callfifo_get_write(fts_callfifo_t *callfifo)
-{
-  if(fts_fifo_write_level(&callfifo->fifo) >= sizeof(fts_fifocall_t *))
-    return *((fts_fifocall_t **)fts_fifo_write_pointer(&callfifo->fifo));
-  else
-    return NULL;
-}
-
-void
-fts_callfifo_incr_read(fts_callfifo_t *callfifo)
-{
-  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifocall_t *));
-}
-
-void
-fts_callfifo_incr_write(fts_callfifo_t *callfifo)
-{
-  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifocall_t *));
 }
 

@@ -65,6 +65,14 @@ struct fts_timebase_entry
   fts_timebase_entry_t *next; /* next entry in timebase */
 };
 
+#define fts_timebase_entry_get_object(e) (&(e)->object)
+#define fts_timebase_entry_get_method(e) (&(e)->method)
+#define fts_timebase_entry_get_atom(e) (&(e)->atom)
+#define fts_timebase_entry_get_time(e) (&(e)->time)
+
+FTS_API void fts_timebase_entry_reset(fts_timebase_entry_t *entry);
+FTS_API void fts_timebase_entry_set(fts_timebase_entry_t *entry, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time);
+
 struct fts_timebase
 { 
   fts_object_t head;
@@ -152,6 +160,29 @@ FTS_API void fts_timebase_locate(fts_timebase_t *timebase);
  */
 FTS_API double fts_get_time(void);
 FTS_API fts_timebase_t *fts_get_timebase(void);
+
+/**
+* @name timebase fifo
+ */
+/*@{*/
+
+typedef struct fts_timebase_fifo
+{
+  fts_fifo_t data;
+  fts_timebase_t *timebase;
+  int size;
+  double delta;
+} fts_timebase_fifo_t;
+
+#define fts_timebase_fifo_get_entries(f) ((fts_timebase_entry_t **)((f)->data.buffer))
+
+FTS_API void fts_timebase_fifo_init(fts_timebase_fifo_t *timebase_fifo, fts_timebase_t *timebase, int size);
+FTS_API void fts_timebase_fifo_destroy(fts_timebase_fifo_t *timebase_fifo, int size);
+FTS_API fts_timebase_entry_t *fts_timebase_fifo_get_entry(fts_timebase_fifo_t *fifo);
+FTS_API void fts_timebase_fifo_incr(fts_timebase_fifo_t *fifo);
+FTS_API fts_timebase_entry_t *fts_timebase_fifo_next(fts_timebase_fifo_t *fifo);
+  
+/*@}*/ /* timebase fifo */
 
 /** 
  * @name system time

@@ -26,6 +26,7 @@
 #define _MACOCXMIDI_H_
 
 #include <CoreMIDI/MIDIServices.h>
+#include <CoreAudio/HostTime.h>
 
 typedef enum macosxmidi_type {macosxmidi_any = -1, macosxmidi_input = 2, macosxmidi_output = 3} macosxmidi_type_t;
 
@@ -37,6 +38,7 @@ typedef struct _macosxmidi_
   fts_hashtable_t outputs;
   fts_hashtable_t sources;
   fts_hashtable_t destinations;
+  fts_timebase_fifo_t fifo;
 } macosxmidi_t;
 
 typedef struct _macosxmidiport_

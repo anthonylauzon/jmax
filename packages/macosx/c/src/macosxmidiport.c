@@ -45,45 +45,45 @@ fts_metaclass_t *macosxmidi_output_type = NULL;
 static void
 macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
 {
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
+  macosxmidiport_t *this = (macosxmidiport_t *)o;
+  macosxmidi_t *manager = this->manager;
+  fts_midiparser_t *parser = &this->parser;
+  fts_timebase_fifo_t *fifo = &manager->fifo;
   const MIDIPacket *packet = &pktlist->packet[0];
+  fts_timebase_entry_t *entry;
+  fts_midievent_t *event;
   int i, j;
 
-  for(i=0; i<pktlist->numPackets; i++)
-    {
-      for(j=0; j<packet->length; j++)
-        fts_midiparser_byte(parser, packet->data[j]);
-  
+  /* set MIDI parser event to next fifo event */
+  entry = fts_timebase_fifo_get_entry(fifo);
+  event = (fts_midievent_t *)fts_get_object(fts_timebase_entry_get_atom(entry));
+  fts_midiparser_set_event(parser, event);
+
+  for(i=0; i<pktlist->numPackets; i++) {
+    double time = 0.000001 * (double)AudioConvertHostTimeToNanos(packet->timeStamp);
+
+    for(j=0; j<packet->length; j++) {
+      fts_midievent_t *parsed = fts_midiparser_byte(parser, packet->data[j]);
+
+      if(parsed != NULL) {
+        /* set timebase fifo entry (NULL since atom is already set) */
+        fts_timebase_entry_set(entry, o, fts_midiport_input, NULL, time);
+
+        /* finally write fifo */
+        fts_timebase_fifo_incr(fifo);
+
+        /* get next entry from fifo and event from entry to set parser */
+        entry = fts_timebase_fifo_get_entry(fifo);
+        event = (fts_midievent_t *)fts_get_object(fts_timebase_entry_get_atom(entry));
+        fts_midiparser_set_event(parser, event);
+      }
+
       packet = MIDIPacketNext(packet);
     }
-}
-
-static void
-macosxmidiport_fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  /* write to MIDI fifo */
-}
-
-static void
-macosxmidiport_fifo_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  macosxmidiport_t *this = (macosxmidiport_t *)o;
-
-  /* read from MIDI fifo and call listeners */
-
-  /*
-   fts_atom_t a;
-   fts_set_object(&a, event);
-
-   if(time == 0.0)
-    {
-    fts_object_refer(event);
-    fts_midiport_input((fts_object_t *)parser, 0, 0, 1, &a);
-    fts_object_release(event);
-    }
-  else
-    fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)parser, fts_midiport_input, &a, time - fts_get_time());
-*/
+  }
+  
+  /* reset event of parser (entry might be used by another port) */
+  fts_midiparser_reset_event(parser);
 }
 
 static void
@@ -187,7 +187,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
     if(this->ref != NULL) {
       /* create Mac OS X MIDI port */
-      MIDIInputPortCreate(manager->client, CFSTR("jMax port"), macosxmidiport_parse_input, (void *)&this->parser, &this->port);
+      MIDIInputPortCreate(manager->client, CFSTR("jMax port"), macosxmidiport_parse_input, (void *)this, &this->port);
 
       if(this->port != NULL) {
         /* connect port to source */
@@ -207,7 +207,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
   } else {    
     /* create Mac OS virtual MIDI destination */
-    MIDIDestinationCreate(manager->client, CFStringCreateWithCString(NULL, name, CFStringGetSystemEncoding()), macosxmidiport_parse_input, (void *)&this->parser, &this->ref);
+    MIDIDestinationCreate(manager->client, CFStringCreateWithCString(NULL, name, CFStringGetSystemEncoding()), macosxmidiport_parse_input, (void *)this, &this->ref);
 
     if(this->ref != NULL) {
       /* insert into destination hashtable */
@@ -220,8 +220,10 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
   }
 
-  /* init parser and port */
+  /* init MIDI parser  */
   fts_midiparser_init(&this->parser);
+
+  /* init FTS MIDI port  */
   fts_midiport_init((fts_midiport_t *)this);
   fts_midiport_set_input((fts_midiport_t *)this);
 }

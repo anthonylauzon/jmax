@@ -666,6 +666,7 @@ typedef struct _fts_midiparser_
 FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_reset(fts_midiparser_t *parser);
 FTS_API fts_midievent_t *fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
+FTS_API void fts_midiparser_reset_event(fts_midiparser_t *parser);
 
 /*****************************************************
  *

@@ -40,6 +40,24 @@ static fts_heap_t *timebase_entry_heap = 0;
  *
  */
 
+void
+fts_timebase_entry_reset(fts_timebase_entry_t *entry)
+{
+  fts_object_release(entry->object);
+  fts_atom_void(&entry->atom);
+}
+
+void
+fts_timebase_entry_set(fts_timebase_entry_t *entry, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
+{
+  entry->time = time;
+  entry->object = object;
+  entry->method = method;
+
+  if(atom)
+    fts_atom_assign(&entry->atom, atom);
+}
+
 static void
 fts_timebase_entry_init(fts_timebase_entry_t *entry, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
 {
@@ -59,8 +77,7 @@ fts_timebase_entry_init(fts_timebase_entry_t *entry, fts_object_t *object, fts_m
 static void
 fts_timebase_entry_free(fts_timebase_entry_t *entry)
 {
-  fts_object_release(entry->object);
-  fts_atom_void(&entry->atom);
+  fts_timebase_entry_reset(entry);
   fts_heap_free(entry, timebase_entry_heap);
 }
 
@@ -291,15 +308,15 @@ fts_timebase_locate(fts_timebase_t *timebase)
   while(slave)
     {
       fts_timebase_t *next = slave->next;
-
+  
       if(slave->locate)
-	slave->locate((fts_object_t *)slave, 0, 0, 0, 0);
+        slave->locate((fts_object_t *)slave, 0, 0, 0, 0);
       else
-	{
-	  fts_timebase_locate(slave);
-	  fts_timebase_remove_slave(timebase, slave);
-	}
-
+        {
+          fts_timebase_locate(slave);
+          fts_timebase_remove_slave(timebase, slave);
+        }
+  
       slave = next;
     }
 }
@@ -368,6 +385,105 @@ fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object)
       else
 	p = &((*p)->next);
     }
+}
+
+/***************************************************
+ *
+ *  timebase fifo
+ *
+ */
+void
+fts_timebase_fifo_init(fts_timebase_fifo_t *fifo, fts_timebase_t *timebase, int size)
+{
+  int bytes = sizeof(fts_timebase_entry_t *) * size;
+  fts_timebase_entry_t **entries;
+  int i;
+
+  fts_fifo_init(&fifo->data, fts_malloc(bytes), bytes);
+  entries = (fts_timebase_entry_t **)fts_fifo_get_buffer(&fifo->data);
+
+  for(i=0; i<size; i++)
+    entries[i] = fts_heap_zalloc(timebase_entry_heap);
+
+  fifo->timebase = timebase;
+  fifo->delta = 0.0;
+  fifo->size = size;
+}
+
+void
+fts_timebase_fifo_destroy(fts_timebase_fifo_t *fifo, int size)
+{
+  fts_timebase_entry_t **entries = (fts_timebase_entry_t **)fts_fifo_get_buffer(&fifo->data);
+  int i;
+  
+  for(i=0; i<size; i++)
+    fts_heap_free(entries, timebase_entry_heap);
+
+  fts_free((void *)fifo->data.buffer);
+}
+
+/* read next fifo entry into time base (returns pointer to atom of newly allocated entry) */
+fts_timebase_entry_t *
+fts_timebase_fifo_next(fts_timebase_fifo_t *fifo)
+{
+  if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_timebase_entry_t *)) {
+    fts_timebase_entry_t **entry_ptr = (fts_timebase_entry_t **)fts_fifo_write_pointer(&fifo->data);
+    fts_timebase_entry_t *entry = *entry_ptr;
+    double time = entry->time;
+    double now = fts_timebase_get_time(fifo->timebase);
+
+    /* time == 0.0 means: send now */
+    if(time != 0.0) {
+      /* adjust delta time on very first fifo entry */
+      if(fifo->delta == 0.0)
+        fifo->delta = time - now;
+
+      /* translate event time */
+      time -= fifo->delta;
+
+      /* adjust delta time */
+      if(time < now) {
+        time = now;
+        fifo->delta = entry->time - now;
+      }
+
+      /* set entry time and insert to timebase */
+      entry->time = time;
+      timebase_insert_entry(fifo->timebase, entry);
+
+      /* create new entry and put into fifo */
+      *entry_ptr = fts_heap_zalloc(timebase_entry_heap);
+    } else {
+      fts_object_t *object = entry->object;
+      fts_method_t method = entry->method;
+      fts_atom_t *atom = &entry->atom;
+
+      /* call method right away */
+      entry->method(entry->object, 0, 0, 1, &entry->atom);
+
+      /* release object and atom */
+      fts_timebase_entry_reset(entry);
+    }
+    
+    return entry;
+  }
+
+  return NULL;
+}
+
+fts_timebase_entry_t *
+fts_timebase_fifo_get_entry(fts_timebase_fifo_t *fifo)
+{
+  if(fts_fifo_write_level(&fifo->data) >= sizeof(fts_timebase_entry_t *))
+    return *((fts_timebase_entry_t **)fts_fifo_write_pointer(&fifo->data));
+  else
+    return NULL;
+}
+
+void
+fts_timebase_fifo_incr(fts_timebase_fifo_t *fifo)
+{
+  fts_fifo_incr_write(&fifo->data, sizeof(fts_timebase_entry_t *));
 }
 
 /***************************************************

@@ -488,22 +488,29 @@ fts_midiparser_init(fts_midiparser_t *parser)
   parser->mtc_frame = 0;
 }
 
-void
-fts_midiparser_reset(fts_midiparser_t *parser)
-{
-  fts_array_destroy(&parser->system_exclusive);
-
-  if(parser->event != NULL)
-    fts_object_release(parser->event);
-}
-
 static fts_midievent_t *
 midiparser_get_event(fts_midiparser_t *parser)
 {
   if(parser->event == NULL)
     parser->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
-  
+
   return parser->event;
+}
+
+void
+fts_midiparser_reset_event(fts_midiparser_t *parser)
+{
+  if(parser->event != NULL)
+    fts_object_release(parser->event);
+
+  parser->event = NULL;
+}
+
+void
+fts_midiparser_reset(fts_midiparser_t *parser)
+{
+  fts_array_destroy(&parser->system_exclusive);
+  fts_midiparser_reset_event(parser);
 }
 
 fts_midievent_t *
