@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.10 $ IRCAM $Date: 1998/06/04 14:01:19 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:48 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -47,7 +47,7 @@ extern int fts_mess_get_run_time_check(void);
 /* argument macros and functions */
 
 #define fts_get_long_arg(AC, AT, N, DEF)   ((N) < (AC) ? fts_get_long(&(AT)[N]) : (DEF))
-#define fts_get_int_arg(AC, AT, N, DEF)   ((N) < (AC) ? fts_get_int(&(AT)[N]) : (DEF))
+#define fts_get_int_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_int(&(AT)[N]) : (DEF))
 #define fts_get_float_arg(AC, AT, N, DEF)  ((N) < (AC) ? fts_get_float(&(AT)[N]) : (DEF))
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))

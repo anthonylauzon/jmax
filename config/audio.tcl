@@ -52,7 +52,6 @@ if {$jmaxArch == "irix6.2"} {
 
 } elseif {$jmaxArch == "origin"} {
 
-<<<<<<< audio.tcl
 #     one ADAT card
 
 #    puts "    multi: 8/8 (default)"
