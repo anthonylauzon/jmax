@@ -2239,8 +2239,8 @@
 		F746F84603F3D4BE01664058 = {
 			isa = PBXFileReference;
 			name = guilistener.c;
-			path = /Users/borghesi/projects/jmax/packages/guiobj/c/src/guilistener.c;
-			refType = 0;
+			path = ../../packages/guiobj/c/src/guilistener.c;
+			refType = 2;
 		};
 		F746F84703F3D4BE01664058 = {
 			fileRef = F746F84603F3D4BE01664058;
