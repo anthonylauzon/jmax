@@ -123,6 +123,26 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   event_set_at_client(this);
 }
 
+static void
+event_unset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_t *this = (event_t *)o;
+
+  if(fts_is_object(&this->value))
+  {
+    fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+    int i;
+
+    for(i=0; i<ac; i++)
+    {
+      if(fts_is_symbol(at + i))
+        fts_send_message(obj, fts_s_remove, 1, at + i);
+    }
+  }
+
+  event_set_at_client(this);
+}
+
 /**************************************************************
 *
 *  event class
@@ -158,6 +178,7 @@ event_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(event_t), event_init, event_delete);
 
   fts_class_message_varargs(cl, fts_s_set, event_set);
+  fts_class_message_varargs(cl, fts_new_symbol("unset"), event_unset);
 }
 
 /*****************************************************************
