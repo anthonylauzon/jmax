@@ -138,7 +138,10 @@ fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
 
       patcher = (fts_object_t *) fts_get_object(&av[0]);
 
-      fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
+      if (patcher)
+	fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
+      else
+	post_mess("Error in FOS message OPEN PATCHER: null patcher", ac, av);
     }
   else
     post_mess("Error in FOS message OPEN PATCHER: bad args", ac, av);
@@ -166,7 +169,7 @@ fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
       if (patcher)
 	fts_message_send(patcher, fts_SystemInlet, fts_s_close, 0, 0);
       else
-	post_mess("Error in FOS message CLOSE PATCHER: patcher already deleted", ac, av);
+	post_mess("Error in FOS message CLOSE PATCHER: null patcher ", ac, av);
     }
   else
     post_mess("Error in FOS message CLOSE PATCHER: bad args", ac, av);
@@ -192,7 +195,10 @@ fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
 
       patcher = (fts_object_t *) fts_get_object(&av[0]);
 
-      fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
+      if (patcher)
+	fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
+      else
+	post_mess("Error in FOS message PATCHER LOADED: null patcher", ac, av);
     }
   else
     post_mess("Error in FOS message PATCHER LOADED: bad args", ac, av);
