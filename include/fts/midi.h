@@ -256,9 +256,6 @@ FTS_API fts_midievent_t *fts_midievent_pitch_bend_new(int channel, int LSB, int 
 /* system exclusive events */
 #define fts_midievent_is_system_exclusive(e) ((e)->type == midi_system_exclusive)
 
-#define fts_midievent_system_get_type(e) ((e)->id)
-#define fts_midievent_system_set_type(e, x) ((e)->id = (x))
-
 #define fts_midievent_system_exclusive_get_size(e) (fts_array_get_size(&(e)->data.system_exclusive))
 #define fts_midievent_system_exclusive_get_atoms(e) (fts_array_get_atoms(&(e)->data.system_exclusive))
 

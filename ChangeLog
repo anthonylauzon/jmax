@@ -1,3 +1,7 @@
+2002-01-29  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* updated package alsa for ALSA 0.9.0beta10
+
 2001-12-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed unixdtd package compilation errors w.r.t. API changes
