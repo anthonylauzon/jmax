@@ -76,11 +76,51 @@ static void swap_long( unsigned long *p)
 static fts_bmax_file_t bmax_file;
 static fts_symbol_t bmax_file_table[SYMBOL_TABLE_SIZE];
 
-static fts_bmax_file_t *
-fts_open_bmax_file_for_writing(const char *name, int dobackup)
+static fts_bmax_file_t *fts_open_bmax_filedesc_for_writing(FILE *file)
 {
   fts_bmax_file_t *f;
   fts_binary_file_header_t header;
+
+  /* allocate a bmax descriptor, and initialize it */
+
+  f = &bmax_file;
+  f->symbol_table_static = 1;
+  f->symbol_table_size = SYMBOL_TABLE_SIZE;
+  f->symbol_table = bmax_file_table;
+
+  /* Initialize the header */
+
+  f->header.magic_number = FTS_BINARY_FILE_MAGIC;
+  f->header.code_size = 0;
+  f->header.n_symbols = 0;
+
+  f->fd = file;
+
+  /* write the init header to the file */
+
+  header = f->header;
+  if (has_to_swap())
+    {
+      swap_long( &header.magic_number);
+      swap_long( &header.code_size);
+      swap_long( &header.n_symbols);
+    }
+
+  if ( fwrite( &header, sizeof(fts_binary_file_header_t), 1, f->fd) < 1)
+    {
+      perror("fts_open_bmax_filedesc_for_writing: write header ");
+      return 0;
+    }
+
+  /* return the file */
+
+  return f;
+}
+
+static fts_bmax_file_t *
+fts_open_bmax_file_for_writing(const char *name, int dobackup)
+{
+  FILE *file;
 
   if (dobackup)
     {
@@ -100,46 +140,15 @@ fts_open_bmax_file_for_writing(const char *name, int dobackup)
 
   /* allocate a bmax descriptor, and initialize it */
 
-  f = &bmax_file;
-  f->symbol_table_static = 1;
-  f->symbol_table_size = SYMBOL_TABLE_SIZE;
-  f->symbol_table = bmax_file_table;
+  file = fopen(name, "w");
 
-  /* Initialize the header */
-
-  f->header.magic_number = FTS_BINARY_FILE_MAGIC;
-  f->header.code_size = 0;
-  f->header.n_symbols = 0;
-
-  /* Open the file */
-
-  f->fd = fopen(name, "w");
-
-  if (f->fd == 0)
+  if (file == 0)
     {
       post("Cannot save to: %s\n", name);
       return 0;
     }
 
-  /* write the init header to the file */
-
-  header = f->header;
-  if (has_to_swap())
-    {
-      swap_long( &header.magic_number);
-      swap_long( &header.code_size);
-      swap_long( &header.n_symbols);
-    }
-
-  if ( fwrite( &header, sizeof(fts_binary_file_header_t), 1, f->fd) < 1)
-    {
-      perror("fts_open_bmax_file_for_writing: write header ");
-      return 0;
-    }
-
-  /* return the file */
-
-  return f;
+  return fts_open_bmax_filedesc_for_writing(file);
 }
 
 
@@ -202,6 +211,69 @@ fts_close_bmax_file(fts_bmax_file_t *f)
   if (f->symbol_table_static == 0)
       fts_free(f->symbol_table);
 }
+
+
+/* Do not touch the actual file descriptor */
+
+static void
+fts_close_bmax_filedesc(fts_bmax_file_t *f)
+{
+  unsigned int i;
+  char c;
+  fts_binary_file_header_t header;
+
+  /* Write the symbol table */
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Writing symbol table [%d symbols]\n", f->header.n_symbols);
+#endif
+
+  for (i = 0; i < f->header.n_symbols; i++)
+    {
+#ifdef SAVER_DEBUG
+      fprintf(stderr, "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
+#endif
+      fwrite(fts_symbol_name(f->symbol_table[i]), sizeof(char),
+	     strlen(fts_symbol_name(f->symbol_table[i]))+1, f->fd);
+    }
+
+
+  /* Write the ending zero */
+
+  c = '\0';
+  fwrite(&c, sizeof(char), 1, f->fd);
+
+  /* seek to the beginning and rewrite the header */
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Writing header\n");
+#endif
+
+  fseek(f->fd, 0, SEEK_SET);
+
+  header = f->header;
+  if (has_to_swap())
+    {
+      swap_long( &header.magic_number);
+      swap_long( &header.code_size);
+      swap_long( &header.n_symbols);
+    }
+
+  fwrite( &header, sizeof(fts_binary_file_header_t), 1, f->fd);
+
+  /* close the file */
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "End of file\n");
+#endif
+
+  /* free the bmax file descriptor */
+
+  if (f->symbol_table_static == 0)
+      fts_free(f->symbol_table);
+}
+
+
 
 /* Aux functions  for file building */
 
@@ -1147,11 +1219,13 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
   fts_bmax_code_pop_obj_table(f);
 }
 
-void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
+void fts_save_selection_as_bmax(FILE *file, fts_object_t *selection)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(fts_symbol_name(file), 0);
+  fseek(file, 0, SEEK_SET);
+
+  f = fts_open_bmax_filedesc_for_writing(file);
 
   if (f)
     {
@@ -1160,7 +1234,7 @@ void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
       /* code the return command */
 
       fts_bmax_code_return(f);
-      fts_close_bmax_file(f);
+      fts_close_bmax_filedesc(f);
     }
 }
 

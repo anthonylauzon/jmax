@@ -108,7 +108,7 @@ public class Comment extends Editable
 	else
 	  g.setColor(itsSketchPad.getBackground());
 
-	g.fill3DRect( getX(), getY(), getWidth(), getHeight(), true);
+	g.fill3DRect( getX(), getY(), getWidth(), getHeight(), true); // @@@
       }
 
     //text

@@ -11,7 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-#define DEBUG
+
 #include <signal.h>
 
 #include "sys.h"

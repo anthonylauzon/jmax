@@ -117,7 +117,7 @@ public class EditField extends JTextArea
 
     setKeymap(myMap);      
 
-    myMap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+    myMap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),
 				new StopEditAction());
 
     addKeyListener(new EditFieldKeyListener());

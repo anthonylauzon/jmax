@@ -33,7 +33,7 @@ typedef struct
 {
   fts_object_t ob;
 
-  fts_symbol_t file;
+  FILE *file;
 
 } fts_clipboard_t;
 
@@ -58,7 +58,15 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     sprintf(buf, "/tmp/jmax.%s.%d", name, getpid());
 
-  this->file = fts_new_symbol_copy(buf);
+  this->file = fopen(buf, "w+");
+
+  /* Note that according to the UNIX file semantic, the file
+     will not be removed by the next command, just its name
+     is removed; the file will be automatically destroyed after
+     the fclose, at the object destruction, or in case of FTS crash/quit.
+     Note that this will not work on Windows :-> (but who care, anyway) */
+     
+  unlink(buf);
 }
 
 
@@ -67,7 +75,8 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  fts_binary_file_load(fts_symbol_name(this->file), fts_get_object(at), 0, 0, 0);
+  if (this->file)
+    fts_binary_filedesc_load(this->file, fts_get_object(at), 0, 0, 0);
 }
 
 
@@ -76,8 +85,9 @@ static void
 clipboard_copy_selection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
-  
-  fts_save_selection_as_bmax(this->file, fts_get_object(at));
+
+  if (this->file)
+    fts_save_selection_as_bmax(this->file, fts_get_object(at));
 }
 
 
@@ -86,7 +96,7 @@ clipboard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  unlink(fts_symbol_name(this->file));
+  fclose(this->file);
 }
 
 static fts_status_t

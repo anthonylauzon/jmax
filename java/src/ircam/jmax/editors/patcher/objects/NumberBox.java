@@ -173,32 +173,64 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
   {
     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
       {
-	if (e.getKeyCode()== KeyEvent.VK_ENTER)
-	  {
-	    setValueAsText( currentText.toString());
+	// This stuff should be thrown away, and we should use
+	// a real text area for the number boxes !!!
 
+	switch (e.getKeyCode())
+	  {
+	  case KeyEvent.VK_ENTER:
+	    setValueAsText( currentText.toString());
 	    currentText.setLength(0);
 	    valueValid = true;
-
-	    itsSketchPad.setKeyEventClient(null);	    
-	  } 
-	else if ((e.getKeyCode()== KeyEvent.VK_DELETE) ||
-		 (e.getKeyCode()== KeyEvent.VK_BACK_SPACE))
-	  {
-	    /* The test is agains ^H and ^?, the standard backspace
-	       and delete characters */
-
-	    int l = currentText.length();
-
-	    l = ( l > 0 ) ? l - 1 : 0;
-
-	    currentText.setLength( l);
+	    itsSketchPad.setKeyEventClient(null);
+	    break;
+	  case KeyEvent.VK_DELETE:
+	  case KeyEvent.VK_BACK_SPACE:
+	    {
+	      int l = currentText.length();
+	      l = ( l > 0 ) ? l - 1 : 0;
+	      currentText.setLength( l);
+	    }
+	  break;
+	  case KeyEvent.VK_NUMPAD0:
+	    currentText.append('0');
+	    break;
+	  case KeyEvent.VK_NUMPAD1:
+	    currentText.append('1');
+	    break;
+	  case KeyEvent.VK_NUMPAD2:
+	    currentText.append('2');
+	    break;
+	  case KeyEvent.VK_NUMPAD3:
+	    currentText.append('3');
+	    break;
+	  case KeyEvent.VK_NUMPAD4:
+	    currentText.append('4');
+	    break;
+	  case KeyEvent.VK_NUMPAD5:
+	    currentText.append('5');
+	    break;
+	  case KeyEvent.VK_NUMPAD6:
+	    currentText.append('6');
+	    break;
+	  case KeyEvent.VK_NUMPAD7:
+	    currentText.append('7');
+	    break;
+	  case KeyEvent.VK_NUMPAD8:
+	    currentText.append('8');
+	    break;
+	  case KeyEvent.VK_NUMPAD9:
+	    currentText.append('9');
+	    break;
+	  case KeyEvent.VK_DECIMAL:
+	    currentText.append('.');
+	    break;
+	  default:
+	    currentText.append(e.getKeyCode());
+	    break;
 	  }
-	else if (filter.indexOf(e.getKeyCode()) != -1)
-	  currentText.append( (char)e.getKeyCode());
 
 	e.consume();
-
 	redraw();
       }
   }

@@ -287,15 +287,10 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
+      /* If the doctor return null, it means the doctor don't want
+	 to do this particular object, so we just continue */
+
       obj = fts_call_object_doctor(patcher, ac, at);
-
-      if (! obj)
-	{
-	  /* Error in object doctor */
-
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Error in object doctor for %s", fts_symbol_name(fts_get_symbol(&at[0])));
-	}
     }
 
   /* 2- Expression evaluate */
@@ -338,15 +333,10 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
+      /* If the doctor return null, it means the doctor don't want
+	 to do this particular object, so we just continue */
+
       obj = fts_call_object_doctor(patcher, ac, at);
-
-      if (! obj)
-	{
-	  /* Error in object doctor */
-
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Error in object doctor for %s", fts_symbol_name(fts_get_symbol(&at[0])));
-	}
     }
 
   /* 4- explicitly declared template  */

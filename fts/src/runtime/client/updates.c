@@ -52,7 +52,7 @@ static void fts_client_updates_sched(void);
  */
 
 static int fts_updates_per_ticks = 40;
-static int fts_update_period = 20; /* every how many ticks we do an update */
+static int fts_update_period = 10; /* every how many ticks we do an update */
 
 void fts_client_updates_init(void)
 {

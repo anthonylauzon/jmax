@@ -49,7 +49,7 @@ if {[systemProperty "jmaxHostType"] != ""} then {
 	if [info exists jmaxHostTypeTable($jmaxHost)] then {
 	    set jmaxHostType $jmaxHostTypeTable($jmaxHost)
 	} else {
-	    set jmaxHostType "octane"
+	    set jmaxHostType "linuxpc"
 	}
     }
 }

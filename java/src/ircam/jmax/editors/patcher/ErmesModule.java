@@ -16,25 +16,28 @@ import ircam.jmax.editors.patcher.tcl.*;
 
 public class ErmesModule
 {
-  static public void initModule()
+  static public void initModule(boolean active)
   {
-    // Optionally set the syncPaint flag
+    if (active)
+      {
+	// Optionally set the syncPaint flag
 
-    if (MaxApplication.getProperty("syncPaint") != null)
-      ErmesSketchPad.setSyncPaint(true);
+	if (MaxApplication.getProperty("syncPaint") != null)
+	  ErmesSketchPad.setSyncPaint(true);
 
-    // Install the customized Repaint Manager
+	// Install the customized Repaint Manager
 
-    RepaintManager.setCurrentManager(new MaxRepaintManager());
+	RepaintManager.setCurrentManager(new MaxRepaintManager());
 
-    // Install the local mda entities
+	// Install the local mda entities
 
-    Mda.installEditorFactory(new ErmesPatcherFactory());
+	Mda.installEditorFactory(new ErmesPatcherFactory());
 
-    // Register the find panel and the fpe panel
+	// Register the find panel and the fpe panel
 
-    FindPanel.registerFindPanel();
-    FpePanel.registerFpePanel();
+	FindPanel.registerFindPanel();
+	FpePanel.registerFpePanel();
+      }
 
     // Install the tcl commands
 

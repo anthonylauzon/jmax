@@ -45,10 +45,13 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
-  public static Clipboard systemClipboard = new Clipboard("system"); 
+  // public static Clipboard systemClipboard = new Clipboard("system"); 
+
   // (em 13-01-99)  in order to use the real system clipboard
   // instead of a local one, the following declaration would be sufficient:
-  // public static Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+  public static Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
   // Unfortunately, the actual java implementation on Irix (3.1.1) is buggy,
   // and the X11 selection contained in the systemClipboard returns a null
   // array for the list of the MIME types (DataFlavors) supported, and
@@ -291,9 +294,12 @@ public class MaxApplication extends Object
     ircam.jmax.editors.console.ConsoleModule.initModule();
 
     if (getProperty("new") != null)
-     ircam.jmax.editors.patcher.ErmesModule.initModule();
+     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
     else
-      ircam.jmax.editors.ermes.ErmesModule.initModule();
+      {
+	ircam.jmax.editors.patcher.ErmesModule.initModule(false);
+	ircam.jmax.editors.ermes.ErmesModule.initModule();
+      }
 
     ircam.jmax.editors.control.ControlModule.initModule();
 

@@ -96,10 +96,10 @@ class Bang extends GraphicObject implements FtsIntValueListener
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
     g.setColor( itsFlashColor);
-    g.fillOval( getX() + CIRCLE_ORIGIN + 1,
-		getY() + CIRCLE_ORIGIN + 1,
-		getWidth() - 2*(CIRCLE_ORIGIN+1) - 1,
-		getHeight() - 2*(CIRCLE_ORIGIN+1) - 1);
+    g.fillOval( x + CIRCLE_ORIGIN + 1,
+		y + CIRCLE_ORIGIN + 1,
+		w - 2*(CIRCLE_ORIGIN+1) - 1,
+		h - 2*(CIRCLE_ORIGIN+1) - 1);
 
     g.setColor(Color.black);
     g.drawOval( x + CIRCLE_ORIGIN, 

@@ -41,9 +41,8 @@ set jmaxPort 2000
 set jmaxPkgPath "[systemProperty user.home]/jmax"
 
 ## default architecture if not specified for host name
-## just works if server runns on same machine as client
 
-set jmaxArch "irix65r10k"
+set jmaxArch "linuxpc"
 
 ## default "UseIcons" value for Swing File Box
 
@@ -73,5 +72,6 @@ set jmaxSysPkgPath "$jmaxRootDir/packages"
 ##
 
 set jmaxSplashScreen "show"
+
 
 

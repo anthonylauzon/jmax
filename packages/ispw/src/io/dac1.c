@@ -11,6 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,29 +28,29 @@ typedef struct
 } sigdac_t;
 
 
-static void
-sigdac_parse(sigdac_t *this, int ac, const fts_atom_t *av)
+
+static void sigdac_set_channels_args(sigdac_t *this, int ac, const fts_atom_t *av)
 {
-  if (ac == 0)
-    {
-      this->nchans = 2;
-      this->out_index = (int *) fts_malloc(sizeof(int) * this->nchans);
+  int i;
 
-      this->out_index[0] = 0;
-      this->out_index[1] = 1;
-    }
-  else
-    {
-      int i;
+  this->nchans = ac;
+  this->out_index = (int *) fts_malloc(sizeof(int) * this->nchans);
 
-      this->nchans = ac;
-      this->out_index = (int *) fts_malloc(sizeof(int) * this->nchans);
-
-      for(i = 0; i < ac; i++)
-	this->out_index[i] = fts_get_long(&av[i]) - 1; /* for backward compatibility, set the idx from 1 to n */
-    }
+  for(i = 0; i < ac; i++)
+    this->out_index[i] = fts_get_long(&av[i]) - 1; /* for backward compatibility, set the idx from 1 to n */
 }
 
+
+static void sigdac_set_channels_inlets(sigdac_t *this, int nch)
+{
+  int i;
+
+  this->nchans = nch;
+  this->out_index = (int *) fts_malloc(sizeof(int) * nch);
+
+  for(i = 0; i < nch; i++)
+    this->out_index[i] = i;
+}
 
 static void
 dac_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -62,12 +63,22 @@ dac_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   if (fts_get_symbol(at) == fts_new_symbol("dac~"))
     {
       this->ldev = fts_audio_get_output_logical_device((fts_symbol_t )0);
-      sigdac_parse((sigdac_t *)o, ac-1, at+1);
+
+      /* For ISPW compatibility, a dac~ object without arguments is stereo */
+
+      if (ac == 1)
+	sigdac_set_channels_inlets(this, 2);
+      else
+	sigdac_set_channels_args(this, ac-1, at+1);
     }
   else if ((fts_get_symbol(at) == fts_new_symbol("out~")) && fts_is_symbol(at+1))
     {
       this->ldev = fts_audio_get_output_logical_device(fts_get_symbol(at+1));
-      sigdac_parse((sigdac_t *)o, ac - 2, at + 2);
+      
+      if (ac == 1)
+	sigdac_set_channels_inlets(this, fts_audio_get_output_channels(this->ldev));
+      else
+	sigdac_set_channels_args(this, ac-2, at+2);
     }
   else
     {
@@ -308,11 +319,26 @@ dac_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       if (ac <= 1)
 	{
+	  /* Not enough arguments */
+
 	  post("out~: not enough arguments\n");
 	  return &fts_CannotInstantiate;
 	}
+      else if ((ac == 2) && (fts_is_symbol(at+1)))
+	{
+	  /* "out~ device", no channels argument,
+	     put all the available channels in the good order */
+
+	  fts_audio_output_logical_device_t *ldev;
+
+	  ldev = fts_audio_get_output_logical_device(fts_get_symbol(at+1));
+	  ninlets = fts_audio_get_output_channels(ldev);
+	}
       else if (fts_is_symbol(at+1))
-	ninlets = ac - 2;
+	{
+	  /* Standard case, with channels arguments */
+	  ninlets = ac - 2;
+	}
       else
 	{
 	  post("out~: first argument must be a symbol\n");
@@ -336,10 +362,13 @@ dac_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_put, dac_put, 1, a);
 
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("start"), dac_start, 1, a, 0);
+  if (ninlets > 0)
+    {
+      a[0] = fts_s_int;
+      fts_method_define_optargs(cl, 0, fts_new_symbol("start"), dac_start, 1, a, 0);
 
-  fts_method_define(cl, 0, fts_new_symbol("stop"), dac_stop, 0, 0);
+      fts_method_define(cl, 0, fts_new_symbol("stop"), dac_stop, 0, 0);
+    }
 
   /*   fts_class_put_prop(cl, fts_s_dsp_is_sink, fts_true); */
 
@@ -369,30 +398,28 @@ typedef struct
 } sigadc_t;
 
 
-
-static void
-sigadc_parse(sigadc_t *this, int ac, const fts_atom_t *av)
+static void sigadc_set_channels_args(sigadc_t *this, int ac, const fts_atom_t *av)
 {
   int i;
 
-  if (ac == 0)
-    {
-      this->nchans = 2;
-      this->in_index = (int *) fts_malloc(sizeof(int) * this->nchans);
-      this->in_index[0] = 0;
-      this->in_index[1] = 1;
-    }
-  else
-    {
-      this->nchans = ac;
-      this->in_index = (int *) fts_malloc(sizeof(int) * this->nchans);
+  this->nchans = ac;
+  this->in_index = (int *) fts_malloc(sizeof(int) * this->nchans);
 
-      for(i = 0; i < ac; i++)
-	this->in_index[i] = fts_get_long(&av[i]) - 1; /* for backward compatibility, set the idx from 1 to n */
-    }
+  for(i = 0; i < ac; i++)
+    this->in_index[i] = fts_get_long(&av[i]) - 1; /* for backward compatibility, set the idx from 1 to n */
 }
 
 
+static void sigadc_set_channels_outlets(sigadc_t *this, int nch)
+{
+  int i;
+
+  this->nchans = nch;
+  this->in_index = (int *) fts_malloc(sizeof(int) * nch);
+
+  for(i = 0; i < nch; i++)
+    this->in_index[i] = i;
+}
 
 static void
 adc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -404,13 +431,23 @@ adc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if (fts_get_symbol(at) == fts_new_symbol("adc~"))
     {
+      /* For ISPW compatibility, a dac~ object without arguments is stereo */
+
       this->ldev = fts_audio_get_input_logical_device((fts_symbol_t )0);
-      sigadc_parse((sigadc_t *)o, ac-1, at+1);
+
+      if (ac == 1)
+	sigadc_set_channels_outlets(this, 2);
+      else
+	sigadc_set_channels_args(this, ac-1, at+1);
     }
   else if ((fts_get_symbol(at) == fts_new_symbol("in~")) && fts_is_symbol(at+1))
     {
       this->ldev = fts_audio_get_input_logical_device(fts_get_symbol(at+1));
-      sigadc_parse((sigadc_t *)o, ac - 2, at + 2);
+
+      if (ac == 1)
+	sigadc_set_channels_outlets(this, fts_audio_get_input_channels(this->ldev));
+      else
+	sigadc_set_channels_args(this, ac-2, at+2);
     }
   else
     {
@@ -590,7 +627,24 @@ adc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if (fts_get_symbol(at) == fts_new_symbol("in~"))
     {
-      if (fts_is_symbol(at+1))
+      if (ac <= 1)
+	{
+	  /* Not enough arguments */
+
+	  post("out~: not enough arguments\n");
+	  return &fts_CannotInstantiate;
+	}
+      else if ((ac == 2) && (fts_is_symbol(at+1)))
+	{
+	  /* "out~ device", no channels argument,
+	     put all the available channels in the good order */
+
+	  fts_audio_input_logical_device_t *ldev;
+
+	  ldev = fts_audio_get_input_logical_device(fts_get_symbol(at+1));
+	  noutlets = fts_audio_get_input_channels(ldev);
+	}
+      else if (fts_is_symbol(at+1))
 	noutlets = ac - 2;
       else
 	{

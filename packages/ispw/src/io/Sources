@@ -20,5 +20,6 @@ endif
 
 SOURCES = $(ARCH_SOURCES) \
 dac1.c		\
+dac_doctor.c   \
 io.c
 

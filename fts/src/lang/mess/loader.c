@@ -21,9 +21,18 @@
 
 /* #define LOAD_DEBUG  */
 
+/* Converted by MDC to use FILE * instead of file,
+   in order to integrate it better with the loader;
+   in particular, the clipboard will become an unlinked
+   file, never closed until exit, with fseek/fread/fwrite
+   operations on it (to avoid leaving .clipboard file arounds)
+   */
+
+
 /* Private structure */
-typedef struct fts_binary_file_desc_t {
-  int fd;
+
+typedef struct fts_binary_file_desc_t
+{
   unsigned char *code;
   fts_symbol_t *symbols;
 } fts_binary_file_desc_t;
@@ -55,51 +64,17 @@ static void swap_long( unsigned long *p)
   pu->c[2] = tmp;
 }
 
-static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
+static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 {
-  int fd;
   fts_binary_file_header_t header;
-  off_t file_size;
-  unsigned int symbols_size;
-  char *symbuf;
-  int i;
-
-#ifdef LOAD_DEBUG
-  fprintf(stderr, "Reading binary file %s\n", name);
-#endif
-
-  /* open the file */
-  fd = open( name, O_RDONLY);
-  if ( fd < 0)
-    {
-#ifdef LOAD_DEBUG
-      perror( "fts_binary_file_map");
-#endif
-      return fd;
-    }
-
-  /* get file size */
-  {
-    struct stat buf;
-
-    if ( fstat(fd, &buf) < 0)
-      {
-#ifdef LOAD_DEBUG
-	perror( "fts_binary_file_map");
-#endif
-	close(fd);
-	return -1;
-      }
-    file_size = buf.st_size;
-  }
 
   /* read the header */
-  if (read( fd, &header, sizeof( header)) < sizeof( header))
+
+  if (fread( &header, sizeof( header), 1, f) < 1)
     {
 #ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
 #endif
-      close(fd);
       return -1;
     }
 
@@ -111,10 +86,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     }
 
   if (header.magic_number != FTS_BINARY_FILE_MAGIC)
-    {
-      close(fd);
-      return -1;
-    }
+    return -1;
 
   /* allocate code */
 
@@ -124,19 +96,15 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
   desc->code = (unsigned char *)fts_malloc( header.code_size);
   if (!desc->code)
-    {
-      close(fd);
-      return -1;
-    }
+    return -1;
 
   /* read the code */
 
-  if (read( fd, desc->code, header.code_size) < header.code_size)
+  if (fread( desc->code, sizeof(char), header.code_size, f) < header.code_size)
     {
 #ifdef LOAD_DEBUG
       perror( "fts_binary_file_map");
 #endif
-      close(fd);
       return -1;
     }
 
@@ -148,80 +116,47 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 
   if (header.n_symbols > 0)
     {
+      int i = 0;
+      char buf[1024]; /* max  symbol size */
+      int symbolIndex = 0;
+
       desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
 
       /* In case of corrupted file, we initialize the
 	 table with the error symbol, so to have some hope
 	 of opening the result */
 
-      for (i = 0; i < header.n_symbols; i++)
-	desc->symbols[i] = fts_s_error;
+      for (symbolIndex = 0; symbolIndex < header.n_symbols; symbolIndex++)
+	desc->symbols[symbolIndex] = fts_s_error;
 
-      if (!desc->symbols)
+      symbolIndex = 0;
+      while (! feof(f))
 	{
-	  close(fd);
-	  return -1;
-	}
+	  buf[i] = getc(f);
 
-      /* allocate temporary memory for the symbol table */
-      symbols_size = file_size - lseek( fd, 0, SEEK_CUR);
+	  if (buf[i] == 0)
+	    {
+	      if (i == 0)
+		{
+		  /* End of symbols, can return */
 
-      symbuf = (char *) fts_malloc( symbols_size);
-      if ( !symbuf)
-	{
-	  close(fd);
-	  return -1;
-	}
-
-      /* read the symbol table */
-      if (read( fd, symbuf, symbols_size) < symbols_size)
-	{
+		  return 1;
+		}
+	      else	  
+		{
+		  desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
 #ifdef LOAD_DEBUG
-	  perror( "fts_binary_file_map");
+		  fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
 #endif
-	  close(fd);
-	  return -1;
-	}
-
-      /* enter the symbols in the global symbol table */
-      {
-	char *p;
-	int i;
-
-	i = 0;
-	p = symbuf;
-	while (*p)
-	  {
-	    fts_symbol_t symbol;
-
-	    symbol = fts_new_symbol_copy( p);
-
-	    if ( !symbol)
-	      {
-#ifdef LOAD_DEBUG
-		fprintf(stderr, "Reading NULL symbol\n");
-#endif
-		desc->symbols[i] = 0;
-	      }
-	    else
-	      {
-#ifdef LOAD_DEBUG
-		fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(symbol));
-#endif
-		desc->symbols[i] = symbol;
-	      }
+		  symbolIndex++;
+		  i = 0;
+		}
+	    }
+	  else
 	    i++;
-	    
-	    /* advance to next symbol */
-	    while (*p++)
-	      ;
-	  }
-      }
-      
-      fts_free( symbuf);
+	}
     }
 
-  close(fd);
   return 1;
 }
 
@@ -241,14 +176,34 @@ fts_object_t *fts_binary_file_load( const char *name,
 				    int ac, const fts_atom_t *at,
 				    fts_expression_state_t *e)
 {
+  FILE *f;
   fts_object_t *obj;
   fts_binary_file_desc_t desc;
 
-  if (fts_binary_file_map( name, &desc) < 0)
+#ifdef LOAD_DEBUG
+  fprintf(stderr, "Reading binary file %s\n", name);
+#endif
+
+    /* open the file */
+
+  f = fopen( name, "r");
+
+  if ( f == 0)
     {
-      post("fts_binary_file_load: Cannot map bmax file %s\n", name);
+#ifdef LOAD_DEBUG
+      perror( "fts_binary_file_load");
+#endif
       return 0;
     }
+
+  if (fts_binary_file_map(f, &desc) < 0)
+    {
+      fclose(f);
+      post("fts_binary_file_load: Cannot load jMax max file %s\n", name);
+      return 0;
+    }
+
+  fclose(f);
 
   obj = fts_run_mess_vm(parent, desc.code, desc.symbols, ac, at, e);
 
@@ -256,5 +211,38 @@ fts_object_t *fts_binary_file_load( const char *name,
 
   return obj;
 }
+
+
+/* Return the top of the object stack, usually the last object created
+   at top level (again, usually the top level patcher, but can be different
+   for clipboards).
+   */
+
+fts_object_t *fts_binary_filedesc_load(FILE *f,
+				       fts_object_t *parent,
+				       int ac, const fts_atom_t *at,
+				       fts_expression_state_t *e)
+{
+  fts_object_t *obj;
+  fts_binary_file_desc_t desc;
+
+  /* Rewind the file */
+
+  fseek(f, 0, SEEK_SET);
+
+  /* Read it */
+
+  if (fts_binary_file_map(f, &desc) < 0)
+    return 0;
+
+  /* Eval it */
+
+  obj = fts_run_mess_vm(parent, desc.code, desc.symbols, ac, at, e);
+
+  fts_binary_file_dispose( &desc);
+
+  return obj;
+}
+
 
 

@@ -16,7 +16,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class FloatBox extends NumberBox implements FtsFloatValueListener
 {
-  private float itsFloat = (float) 0.0;
+  private float value = (float) 0.0;
 
   private float itsStartingValue;
 
@@ -30,85 +30,69 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 
-    itsFloat = ((FtsFloatValueObject)ftsObject).getValue();
+    value = ((FtsFloatValueObject)ftsObject).getValue();
   }
 
-  public void valueChanged(float value) 
+  public void valueChanged(float v) 
   {
-    itsFloat = value;
-
+    this.value = v;
     updateRedraw();
   }
 
   // ValueAsText property
 
-  void setValueAsText( String value)
-  {
-    try
-      {
-	itsFloat = Float.valueOf( value).floatValue();
-      }
-    catch (NumberFormatException e1)
-      {
-	return;
-      }
-
-    ((FtsFloatValueObject)ftsObject).setValue(itsFloat);
-  }
-
-  static private NumberFormat numberFormat;
+  static private DecimalFormat formatter;
 
   static
   {
     // Number format for controlling the float printed by the float box.
     // essentially used to avoid scientific notation in float.
     
-    numberFormat = NumberFormat.getInstance(Locale.US);
-    numberFormat.setMaximumFractionDigits(6);
-    numberFormat.setMinimumFractionDigits(0);
+    formatter  = new DecimalFormat("0.######;-0.######");
+    formatter.setGroupingUsed(false);
+    formatter.setDecimalSeparatorAlwaysShown(true);
+  }
 
-    if (numberFormat instanceof DecimalFormat)
-      ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(true);
+  void setValueAsText(String v)
+  {
+    try
+      {
+	value = ((Double) formatter.parse(v)).floatValue();
+      }
+    catch (java.text.ParseException  e1)
+      {
+	return;
+      }
 
-    numberFormat.setGroupingUsed(false);
+    ((FtsFloatValueObject)ftsObject).setValue(value);
   }
 
 
   String getValueAsText()
   {
-    return numberFormat.format( itsFloat);
+    return formatter.format( value);
   }
 
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------
 
+  boolean dragged = false;
+
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
       {
+	dragged = false;
 	velocity = 0;
 	previousVelocity = 0;
 	acceleration = 0;
 	previousY = mouse.y;
-	itsSketchPad.setKeyEventClient(this);
-	itsStartingValue = itsFloat;
-	((FtsFloatValueObject)ftsObject).setValue(itsFloat);
-	redraw();
-
-      }
-    else if (Squeack.isUp(squeack))
-      {
-	velocity = 0;
-	previousVelocity = 0;
-	acceleration = 0;
-	
-	((FtsFloatValueObject)ftsObject).updateValue();
-	Fts.sync();
-	redraw();
+	itsStartingValue = value;
       }
     else if (Squeack.isDrag(squeack))
       {
+	dragged = true;
 	previousVelocity = velocity;
 	velocity = (previousY- mouse.y);
 	acceleration = Math.abs(velocity-previousVelocity);
@@ -124,11 +108,20 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	if (Squeack.isShift(squeack))
 	  increment*=10;
 
-	itsFloat += increment;
+	value += increment;
 
-	((FtsFloatValueObject)ftsObject).setValue(itsFloat);
-	redraw();
+	((FtsFloatValueObject)ftsObject).setValue(value);
       }
+    else if (Squeack.isUp(squeack))
+      {
+	if (! dragged)
+	  {
+	    itsSketchPad.setKeyEventClient( this);
+	    valueValid = false;
+	    return;
+	  }
+      }
+
   }
 }
 

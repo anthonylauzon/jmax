@@ -109,6 +109,7 @@ gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj,
 
   this->f = fts_get_float(value);
 
+  fts_object_ui_property_changed(obj, fts_s_value);
   fts_outlet_send(obj, 0, fts_s_float, 1, value);
 }
 

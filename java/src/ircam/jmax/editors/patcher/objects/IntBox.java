@@ -71,29 +71,21 @@ public class IntBox extends NumberBox implements FtsIntValueListener
       {
 	itsFirstY = mouse.y;
 	itsStartingY = itsInteger;
-	((FtsIntValueObject)ftsObject).setValue(itsInteger);
 	dragged = false;
-	redraw();
       }
     else if (Squeack.isDrag(squeack))
       {
-	itsInteger = itsStartingY + (itsFirstY - mouse.y);
-	((FtsIntValueObject)ftsObject).setValue(itsInteger);
-	redraw();
+	((FtsIntValueObject)ftsObject).setValue(itsStartingY + (itsFirstY - mouse.y));
 	dragged = true;
       }
     else if (Squeack.isUp(squeack))
       {
-	Fts.sync();
-
 	if (! dragged)
 	  {
 	    itsSketchPad.setKeyEventClient( this);
 	    valueValid = false;
+	    return;
 	  }
-
-	itsFirstY = mouse.y;
-	redraw();
       }
   }
 }

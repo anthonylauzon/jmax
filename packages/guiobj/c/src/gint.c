@@ -116,8 +116,13 @@ gint_put_value(fts_daemon_action_t action, fts_object_t *obj,
 		 fts_symbol_t property, fts_atom_t *value)
 {
   gint_t *this = (gint_t *)obj;
+  int nn = fts_get_int(value);
 
-  this->n = fts_get_int(value);
+  if (this->n != nn)
+    {
+      this->n = nn;
+      fts_object_ui_property_changed(obj, fts_s_value);
+    }
 
   fts_outlet_send(obj, 0, fts_s_int, 1, value);
 }

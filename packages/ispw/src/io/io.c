@@ -15,6 +15,7 @@
 
 extern void dac_config(void);
 extern void adc_config(void);
+extern void dac_doctor_init(void);
 
 #ifdef HAS_DTD
 extern void disk_config(void);
@@ -25,6 +26,7 @@ io_module_init(void)
 {
   dac_config();
   adc_config();
+  dac_doctor_init();
 
 #ifdef HAS_DTD
   disk_config();
