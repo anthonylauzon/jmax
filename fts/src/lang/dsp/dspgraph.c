@@ -830,6 +830,9 @@ void dsp_chain_poll(void)
 	  dsp_ms_clock = 0.0;
 	  dsp_tick_clock = 0.0;
 
+	  fts_clock_reset(fts_new_symbol("dsp_msec"));
+	  fts_clock_reset(fts_new_symbol("dsp_tick"));
+
 	  please_zero_dsp_time = 0;
 	}
       else

@@ -53,15 +53,22 @@ clock_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   clock_obj_t *x = (clock_obj_t *)o;
 
   *(x->time) = 0.0;
+  fts_clock_reset(x->name);
 }
 
 
 static void
 clock_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  double new_time;
   clock_obj_t *x = (clock_obj_t *)o;
 
-  *(x->time) = fts_get_double_arg(ac, at, 0, 0);
+  new_time = fts_get_double_arg(ac, at, 0, 0);
+
+  if (*(x->time) > new_time)
+    fts_clock_reset(x->name);
+
+  *(x->time) = new_time;
 }
 
 
@@ -72,7 +79,6 @@ clock_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   *(x->time) += fts_get_double_arg(ac, at, 0, 0);
 }
-
 
 /*
    Note that in the current implementation we leak memory (one allocated long)

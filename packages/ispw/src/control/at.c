@@ -40,12 +40,11 @@ static void at_tick(fts_alarm_t *alarm, void *o)
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
-static void
-at_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void at_clock_reset(void *o)
 {
   at_t *x = (at_t *)o;
 
-  fts_alarm_unarm(&x->alarm);
+  fts_alarm_arm(&x->alarm);
 }
 
 
@@ -93,6 +92,8 @@ at_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
   fts_alarm_set_time(&x->alarm, n);
   fts_alarm_arm(&x->alarm);
+
+  fts_clock_add_reset_callback(clock, at_clock_reset, (void *) x);
 }
 
 static void
@@ -101,6 +102,7 @@ at_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   at_t *x = (at_t *)o;
 
   fts_alarm_unarm(&x->alarm);
+  fts_clock_remove_reset_callback(fts_alarm_get_clock(&(x->alarm)), at_clock_reset, (void *) x);
 }
 
 static fts_status_t
@@ -120,10 +122,6 @@ at_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, at_init, 3, a, 1);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, at_delete, 0, 0);
-
-  /* At args */
-
-  fts_method_define(cl, 0, fts_new_symbol("stop"), at_stop, 0, 0);
 
   a[0] = fts_s_int;
   fts_method_define(cl, 0, fts_s_int, at_number, 1, a);

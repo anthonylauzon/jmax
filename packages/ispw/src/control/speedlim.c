@@ -33,7 +33,7 @@ speedlim_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       x->atom = at[0];
     }
-  else if(fts_alarm_is_in_future(&x->alarm))
+  else if (fts_alarm_is_in_future(&x->alarm))
     {
       x->atom = at[0];      
       fts_alarm_arm(&x->alarm);      

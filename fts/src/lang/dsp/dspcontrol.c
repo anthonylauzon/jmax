@@ -125,6 +125,9 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
       fts_set_int(&a, overflow_fpe);
       fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_OVERFLOW_FPE_STATE, 1, &a);
     }
+
+  fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
+  fts_alarm_arm(&(this->poll_alarm));
 }
 
 
@@ -153,7 +156,7 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
   this->prev_overflow_fpe = 0;
 
   fts_alarm_init(&(this->poll_alarm), 0, fts_dsp_control_poll, this);
-  fts_alarm_set_cycle(&(this->poll_alarm), this->poll_interval);
+  fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
   fts_alarm_arm(&(this->poll_alarm));
 
   this->dac_slip_dev = fts_dsp_get_dac_slip_dev();
@@ -236,8 +239,6 @@ static void fts_dsp_control_remote_set_poll_interval( fts_data_t *d, int ac, con
       fts_dsp_control_t *this = (fts_dsp_control_t *)d;
 
       this->poll_interval = fts_get_int(&at[0]);
-
-      fts_alarm_set_cycle( &(this->poll_alarm), this->poll_interval);
     }
 }
 

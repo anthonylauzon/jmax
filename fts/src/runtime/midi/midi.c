@@ -462,13 +462,20 @@ fts_midi_compute_time_code(fts_midi_port_t *port)
 {
   fts_atom_t av[5];
   float total_secs;
+  double new_time;
 
   total_secs = (((port->mtc_hour * 60) + port->mtc_min) * 60) + port->mtc_sec;
 
   /* add two to the frames to compensate the MTC delay */
 
-  port->mtc_time = total_secs * 1000.0 + (((float) port->mtc_frame + 2) *
-					  (1000.0 / (float) (port->mtc_type == 0 ? 24 : (port->mtc_type == 1 ? 25 : 30))));
+  new_time = total_secs * 1000.0 + (((float) port->mtc_frame + 2) *
+				    (1000.0 / (float) (port->mtc_type == 0 ? 24 :
+						       (port->mtc_type == 1 ? 25 : 30))));
+
+  if (new_time < port->mtc_time)
+    fts_clock_reset(fts_new_symbol("mtc"));
+
+  port->mtc_time = new_time;
 
   /* Raise the midi action */
 

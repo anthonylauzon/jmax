@@ -25,6 +25,13 @@ extern fts_module_t fts_time_module;
 
 /* Clock */
 
+struct clock_reset_callback
+{
+  void (* callback) (void *);
+  void *data;
+  struct clock_reset_callback *next;
+};
+
 typedef struct _fts_clock
 {
   fts_symbol_t name;		/* the clock name */
@@ -32,13 +39,13 @@ typedef struct _fts_clock
   double *real_time;		/* the pointer to the real time source */
   double logical_time;		/* the logical time (see above) */
 
+  struct clock_reset_callback *callbacks; /* the reset callbacks */
+
   struct _fts_alarm *alarm_list; /* alarm scheduling list, past and future */
-  struct _fts_alarm *last_alarm; /* last object in the alarm scheduling list (for loop optimization) */
-  struct _fts_alarm *future_alarm_list; /* alarm scheduling list, only future;
-					 actually, an intermediate pointer in the previous list */
 
   int enabled;			/* 1 if enabled, 0 if we don't know it yet or was undefined */
   int protected;	        /* 1 if protected, 0 otherwise; protected clocks cannot be redefined */
+
   struct _fts_clock *next; /* next in the clock list */
 } fts_clock_t;
 
@@ -46,6 +53,11 @@ typedef struct _fts_clock
 extern void  fts_clock_define(fts_symbol_t name, double *clock);
 extern void  fts_clock_define_protected(fts_symbol_t name, double *clock);
 extern void  fts_clock_undefine(fts_symbol_t clock_name);
+
+extern void fts_clock_add_reset_callback(fts_symbol_t clock_name, void (* callback)(void *), void *data);
+extern void fts_clock_remove_reset_callback(fts_symbol_t clock_name, void (* callback)(void *), void *data);
+
+void fts_clock_reset(fts_symbol_t clock_name);
 
 extern void  fts_set_default_clock(fts_symbol_t clock_name); 
 extern int   fts_clock_exists(fts_symbol_t clock_name);
@@ -67,16 +79,8 @@ typedef struct _fts_alarm
   void *arg;			/* the argument to pass to the function */
 
   struct _fts_alarm *next;	/* next alarm for the same clock */
-  struct _fts_alarm *prev;	/* prev alarm for the same clock (or 0 if the first) */
 
   int active;			/* non zero when inserted in a list */
-
-  /* cycled alarms */
-
-  double cycle;			/* the cycle size */
-  double phase;			/* the phase with respect to absolute time 0.0 */
-  double cycle_counter;		/* the number of cycles done after absoute time 0.0 */
-  
   fts_clock_t *clock;		/* a pointer to the clock to use with this alarm */
 } fts_alarm_t;
 
@@ -96,7 +100,6 @@ extern void       fts_alarm_init(fts_alarm_t *alarm, fts_symbol_t clock_name, vo
 
 extern void fts_alarm_set_time(fts_alarm_t *alarm,  double when);
 extern void fts_alarm_set_delay(fts_alarm_t *alarm, double when);
-extern void fts_alarm_set_cycle(fts_alarm_t *alarm, double cycle);
 
 extern void fts_alarm_arm(fts_alarm_t *alarm);
 extern void fts_alarm_unarm(fts_alarm_t *alarm);	
@@ -107,6 +110,8 @@ extern void fts_alarm_unarm(fts_alarm_t *alarm);
 
 extern int  fts_alarm_is_in_future(fts_alarm_t *alarm);
 extern int  fts_alarm_is_armed(fts_alarm_t *alarm);
+
+#define fts_alarm_get_clock(alarm)    ((alarm)->clock->name)
 
 /* timer  */
 

@@ -37,13 +37,13 @@ typedef struct fts_heap fts_heap_t;
 
 extern fts_heap_t *fts_heap_new(unsigned int block_size);
 
-extern char *fts_heap_alloc(fts_heap_t *p);
-extern char *fts_heap_zalloc(fts_heap_t *p);
-extern void  fts_heap_free(char *m, fts_heap_t *p);
+extern void *fts_heap_alloc(fts_heap_t *p);
+extern void *fts_heap_zalloc(fts_heap_t *p);
+extern void  fts_heap_free(void *m, fts_heap_t *p);
 
-extern char *fts_block_alloc(unsigned int size);
-extern char *fts_block_zalloc(unsigned int size);
-extern void  fts_block_free(char *p, unsigned int size);
+extern void *fts_block_alloc(unsigned int size);
+extern void *fts_block_zalloc(unsigned int size);
+extern void  fts_block_free(void *p, unsigned int size);
 
 #endif
 

@@ -233,8 +233,7 @@ fts_heap_new(unsigned int block_size)
 }
 
 
-char *
-fts_heap_alloc(fts_heap_t *p)
+void *fts_heap_alloc(fts_heap_t *p)
 {
 #ifdef HELP_PURIFY
   return fts_malloc(p->block_size);
@@ -253,8 +252,7 @@ fts_heap_alloc(fts_heap_t *p)
 }
 
 
-char *
-fts_heap_zalloc(fts_heap_t *heap)
+void *fts_heap_zalloc(fts_heap_t *heap)
 {
 #ifdef HELP_PURIFY
   return fts_zalloc(heap->block_size);
@@ -271,8 +269,7 @@ fts_heap_zalloc(fts_heap_t *heap)
 }
 
 
-void
-fts_heap_free(char *m, fts_heap_t *p)
+void fts_heap_free(void *m, fts_heap_t *p)
 {
 #ifdef HELP_PURIFY
   fts_free((void *)m);
@@ -296,8 +293,7 @@ fts_heap_free(char *m, fts_heap_t *p)
 
 
 
-char *
-fts_block_alloc(unsigned int size)
+void *fts_block_alloc(unsigned int size)
 {
 #ifdef HELP_PURIFY
   return fts_malloc(size);
@@ -319,8 +315,7 @@ fts_block_alloc(unsigned int size)
 }
 
 
-char *
-fts_block_zalloc(unsigned int size)
+void *fts_block_zalloc(unsigned int size)
 {
 #ifdef HELP_PURIFY
   return fts_zalloc(size);
@@ -342,8 +337,7 @@ fts_block_zalloc(unsigned int size)
 }
 
 
-void
-fts_block_free(char *p, unsigned int size)
+void fts_block_free(void *p, unsigned int size)
 {
 #ifdef HELP_PURIFY
   fts_free(p);
