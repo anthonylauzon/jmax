@@ -140,10 +140,10 @@ abstract class ErmesObjNumberBox extends ErmesObject implements FtsPropertyHandl
       aString = GetVisibleString( getValueAsText());
     else 
       {
-	aString = currentText.toString();
+	aString = GetVisibleString(currentText.toString());
 	g.setColor( Color.red);
       }
-
+    
     g.setColor( Color.black);
     g.setFont( getFont());
     g.drawString( aString, 
