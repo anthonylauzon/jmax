@@ -100,14 +100,22 @@ static void
 vec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  int size = 0;
 
   if(ac > 0 && fts_is_number(at))
     {
-      size = fts_get_number_int(at);
+      int size = fts_get_number_int(at);
       
       if(size >= 0)
-	vec_set_size(this, size);
+	{
+	  int old_size = vec_get_size(this);
+	  int i;
+	  
+	  vec_set_size(this, size);
+
+	  /* set newly allocated region to void */
+	  for(i=old_size; i<size; i++)
+	    fts_set_void(this->data + i);
+	}
     }  
 }
 

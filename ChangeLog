@@ -1,8 +1,10 @@
 2001-10-22  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
+	* bug fixed in class mat method function set_size
 	* removed mess package (classes moved to package data)
 	* changed getlist to generic object without arguments
 	* replaced fts_set/get_list by fts_set/get_array
+	* fixed bug for lists in switch class
 
 2001-10-17  Francois Dechelle  <dechelle@lipari.ircam.fr>
 

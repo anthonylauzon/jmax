@@ -40,8 +40,8 @@ static fts_symbol_t sym_comma = 0;
  *
  */
 
-static void
-set_size(mat_t *mat, int m, int n)
+void
+mat_set_size(mat_t *mat, int m, int n)
 {
   int size = m * n;
   
@@ -76,8 +76,8 @@ set_size(mat_t *mat, int m, int n)
       
       if(size > 0)
 	{
-	  mat->m = size;
-	  mat->n = 1;
+	  mat->m = m;
+	  mat->n = n;
 	}
       else
 	{
@@ -88,49 +88,6 @@ set_size(mat_t *mat, int m, int n)
 }
 
 void
-mat_set_size(mat_t *mat, int m, int n)
-{
-  int size = m * n;
-  
-  if(size > mat->alloc)
-    {
-      int i;
-
-      if(mat->alloc)
-	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
-      else
-	mat->data = fts_malloc(size * sizeof(fts_atom_t));
-
-      /* set newly allocated region to void */
-      for(i=mat->alloc; i<size; i++)
-	fts_set_void(mat->data + i);
-      
-      mat->m = m;
-      mat->n = n;
-      mat->alloc = size;
-    }
-  else
-    {
-      int old_size = mat->m * mat->n;
-      int i;
-
-      if(size <= 0)
-	m = n = size = 0;
-
-      /* void region cut off */
-      for(i=size; i<old_size; i++)
-	{
-	  fts_atom_t *ap = mat->data + i;
-
-	  fts_atom_void(ap);
-	}
-      
-      mat->m = m;
-      mat->n = n;
-    }
-}
-
-extern void
 mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
@@ -138,7 +95,7 @@ mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
   fts_atom_assign(ap, &value);
 }
 
-extern void
+void
 mat_void_element(mat_t *mat, int i, int j)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
@@ -237,7 +194,7 @@ mat_grow(mat_t *mat, int size)
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
 
-  set_size(mat, alloc, 1);
+  mat_set_size(mat, alloc, 1);
 }
 
 int 
@@ -535,6 +492,7 @@ static void
 mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
+  int old_size = mat_get_m(this)* mat_get_n(this);
   int m = 0;
   int n = 0;
   int i;
@@ -545,7 +503,7 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = mat_get_n(this);
       
       if(m >= 0 && n >= 0)
-	set_size(this, m, n);
+	mat_set_size(this, m, n);
     }  
   else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
     {
@@ -553,11 +511,11 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = fts_get_number_int(at + 1);
       
       if(m >= 0 && n >= 0)
-	set_size(this, m, n);
+	mat_set_size(this, m, n);
     }
 
   /* set newly allocated region to void */
-  for(i=this->alloc; i<m*n; i++)
+  for(i=old_size; i<m*n; i++)
     fts_set_void(this->data + i);
 }
 

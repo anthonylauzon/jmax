@@ -61,9 +61,8 @@ static fts_symbol_t sym_insert_client = 0;
 #define ivec_set_editor_close(b) ((b)->opened = 0)
 #define ivec_editor_is_open(b) ((b)->opened)
 
-/* local */
-static void
-set_size(ivec_t *vec, int size)
+void
+ivec_set_size(ivec_t *vec, int size)
 {
   int i;
 
@@ -92,19 +91,6 @@ ivec_set_const(ivec_t *vec, int c)
   
   for(i=0; i<vec->size; i++)
     values[i] = c;
-}
-
-void
-ivec_set_size(ivec_t *vec, int size)
-{
-  int old_size = vec->size;
-  int i;
-
-  set_size(vec, size);
-
-  /* when extending: zero new values */
-  for(i=old_size; i<size; i++)
-    vec->values[i] = 0;
 }
 
 void
@@ -203,7 +189,7 @@ ivec_grow(ivec_t *vec, int size)
   while(!alloc || size > alloc)
     alloc += IVEC_BLOCK_SIZE;
 
-  set_size(vec, alloc);
+  ivec_set_size(vec, alloc);
 }
 
 int 
@@ -640,16 +626,24 @@ ivec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ivec_t *this = (ivec_t *)o;
 
-  if(ac == 1 && fts_is_number(at))
+  if(ac > 0 && fts_is_number(at))
     {
       int size = fts_get_number_int(at);
       
       if(size >= 0)
-	  {
-	      ivec_set_size(this, size);
-	      if(ivec_editor_is_open(this))
-		  fts_client_send_message((fts_object_t *)this, sym_set_size, ac, at);
-	  }
+	{
+	  int old_size = this->size;
+	  int i;
+
+	  ivec_set_size(this, size);
+
+	  /* when extending: zero new values */
+	  for(i=old_size; i<size; i++)
+	    this->values[i] = 0.0;	  
+
+	  if(ivec_editor_is_open(this))
+	    fts_client_send_message((fts_object_t *)this, sym_set_size, ac, at);
+	}
     }
 }
 
@@ -796,13 +790,13 @@ ivec_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   ivec_t *this = (ivec_t *)o;
   int v_size = fts_get_int(at);
-  int pix_size = fts_get_int(at+1);
-  int start = fts_get_int(at+2);
+  int pix_size = fts_get_int(at + 1);
+  int start = fts_get_int(at + 2);
   int copy_size;
   int *ptr;
   int i;
 
-  ivec_copy_by_client_request(o, 0, 0, ac-2, at+2);
+  ivec_copy_by_client_request(o, 0, 0, ac - 2, at + 2);
   copy_size = ivec_get_size(this->copy);
 
   ptr = ivec_get_ptr(this);
@@ -1041,29 +1035,6 @@ ivec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 /* new/delete */
 
 static void
-ivec_alloc(ivec_t *vec, int size)
-{
-  int i;
-
-  if(size > 0)
-    {
-      vec->values = (int *) fts_malloc(size * sizeof(int));
-      vec->size = size;
-
-      /* init to zero */
-      for(i=0; i<size; i++)
-	vec->values[i] = 0;
-    }
-  else
-    {
-      vec->values = 0;
-      vec->size = 0;
-    }
-
-  vec->alloc = size;
-}
-
-static void
 ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
@@ -1071,6 +1042,10 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   /* skip class name */
   ac--;
   at++;
+
+  this->values = 0;
+  this->size = 0;
+  this->alloc = 0;
 
   this->opened = 0; 
   this->vsize = 0; 
@@ -1082,12 +1057,13 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(ac == 0)
     {
-      ivec_alloc(this, 0);
+      ivec_set_size(this, 0);
       this->keep = fts_s_no;
     }
   else if(ac == 1 && fts_is_int(at))
     {
-      ivec_alloc(this, fts_get_int(at));
+      ivec_set_size(this, fts_get_int(at));
+      ivec_set_const(this, 0);
       this->keep = fts_s_no;
     }
   else if(ac == 1 && fts_is_list(at))
@@ -1095,13 +1071,13 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
 
-      ivec_alloc(this, size);
+      ivec_set_size(this, size);
       ivec_set_from_atom_list(this, 0, size, fts_array_get_atoms(aa));
       this->keep = fts_s_args;
     }
   else if(ac > 1)
     {
-      ivec_alloc(this, ac);
+      ivec_set_size(this, ac);
       ivec_set_from_atom_list(this, 0, ac, at);
       this->keep = fts_s_args;
     }

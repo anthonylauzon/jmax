@@ -48,8 +48,8 @@ static fts_symbol_t sym_local = 0;
  *
  */
 
-static void
-fvec_alloc(fvec_t *vec, int size)
+void
+fvec_set_size(fvec_t *vec, int size)
 {
   int alloc = vec->alloc;
   float *values = vec->values;
@@ -96,19 +96,6 @@ fvec_set_const(fvec_t *vec, float c)
   
   for(i=0; i<vec->size; i++)
     values[i] = c;
-}
-
-void
-fvec_set_size(fvec_t *vec, int size)
-{
-  int old_size = vec->size;
-  int i;
-
-  fvec_alloc(vec, size);
-
-  /* when extending: zero new values */
-  for(i=old_size; i<size; i++)
-    vec->values[i] = 0.0;	  
 }
 
 void
@@ -207,7 +194,7 @@ fvec_grow(fvec_t *vec, int size)
   while(!alloc || size > alloc)
     alloc += FVEC_BLOCK_SIZE;
 
-  fvec_alloc(vec, alloc);
+  fvec_set_size(vec, alloc);
 }
 
 int 
@@ -234,7 +221,7 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
 	}
       
       if(n > 0)
-	fvec_alloc(vec, n);
+	fvec_set_size(vec, n);
       
       fts_atom_file_close(file);
     }
@@ -491,7 +478,7 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fvec_t *this = (fvec_t *)o;
 
-  if(ac == 1 && fts_is_number(at))
+  if(ac > 0 && fts_is_number(at))
     {
       int size = fts_get_number_int(at);
       
@@ -500,7 +487,7 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  int old_size = this->size;
 	  int i;
 
-	  fvec_alloc(this, size);
+	  fvec_set_size(this, size);
 
 	  /* when extending: zero new values */
 	  for(i=old_size; i<size; i++)
@@ -612,7 +599,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 		/* get temporary sample rate from file */
 		this->sr = -file_sr;
 
-	      fvec_alloc(this, n_read);
+	      fvec_set_size(this, n_read);
 	      ptr = fvec_get_ptr(this);
 
 	      size = fts_soundfile_read_float(sf, ptr, n_read);
@@ -861,12 +848,12 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(ac == 0)
     {
-      fvec_alloc(this, 0);
+      fvec_set_size(this, 0);
       this->keep = fts_s_no;
     }
   else if(ac == 1 && fts_is_int(at))
     {
-      fvec_alloc(this, fts_get_int(at));
+      fvec_set_size(this, fts_get_int(at));
       fvec_zero(this);
       this->keep = fts_s_no;
     }
@@ -875,7 +862,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
       
-      fvec_alloc(this, size);
+      fvec_set_size(this, size);
       fvec_set_from_atom_list(this, 0, size, fts_array_get_atoms(aa));
       this->keep = fts_s_args;
     }
@@ -898,11 +885,11 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  
 	      size = fts_soundfile_get_size(sf);
 	  
-	      fvec_alloc(this, size);
+	      fvec_set_size(this, size);
 	      ptr = fvec_get_ptr(this);
 	  
 	      size = fts_soundfile_read_float(sf, ptr, size);
-	      fvec_alloc(this, size);
+	      fvec_set_size(this, size);
 
 	      fts_soundfile_close(sf);
 	    }
@@ -915,7 +902,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac > 1)
     {
-      fvec_alloc(this, ac);
+      fvec_set_size(this, ac);
       fvec_set_from_atom_list(this, 0, ac, at);
 
       this->keep = fts_s_args;
