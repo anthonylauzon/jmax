@@ -27,7 +27,7 @@
 
 #include "fts.h"
 #include "wavetab.h"
-#include "osc_ftl.h"
+#include "osc.h"
 
 struct _osc_ftl
 { 
