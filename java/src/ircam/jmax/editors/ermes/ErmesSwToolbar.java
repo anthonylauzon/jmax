@@ -207,21 +207,16 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     String fs = File.separator;
     String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
-    addButton( toolbar, "comment", path + "tool_text.gif");
     addButton( toolbar, "", path + "tool_ext.gif");
+    addButton( toolbar, "messbox", path + "tool_mess.gif");
     addButton( toolbar, "jpatcher",  path + "tool_patcher.gif");
     addButton( toolbar, "inlet -1", path + "tool_in.gif");
     addButton( toolbar, "outlet -1", path + "tool_out.gif");
+    addButton( toolbar, "comment", path + "tool_text.gif");
     addButton( toolbar, "button", path + "tool_bang.gif");
     addButton( toolbar, "toggle", path + "tool_toggle.gif");
     addButton( toolbar, "slider", path + "tool_slider.gif");
     addButton( toolbar, "intbox", path + "tool_int.gif");
     addButton( toolbar, "floatbox", path + "tool_float.gif");
-    addButton( toolbar, "messbox", path + "tool_mess.gif");
   }
 }
-
-
-
-
-
