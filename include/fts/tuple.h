@@ -38,6 +38,10 @@ FTS_API fts_class_t *fts_tuple_class;
 #define fts_tuple_set(t, n, a) (fts_array_set(&(t)->args, (n), (a)))
 
 #define fts_tuple_prepend(t, n, a) (fts_array_prepend(&(t)->args, (n), (a)))
+#define fts_tuple_prepend_int(t, x) (fts_array_prepend_int(&(t)->args, (x)))
+#define fts_tuple_prepend_float(t, x) (fts_array_prepend_float(&(t)->args, (x)))
+#define fts_tuple_prepend_symbol(t, x) (fts_array_prepend_symbol(&(t)->args, (x)))
+
 #define fts_tuple_append(t, n, a) (fts_array_append(&(t)->args, (n), (a)))
 #define fts_tuple_append_int(t, x) (fts_array_append_int(&(t)->args, (x)))
 #define fts_tuple_append_float(t, x) (fts_array_append_float(&(t)->args, (x)))
