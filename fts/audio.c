@@ -29,6 +29,8 @@
 #include <alloca.h>
 #endif
 
+#include <string.h>
+
 #include <ftsprivate/audio.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/audioconfig.h>
@@ -66,6 +68,13 @@ fts_audioport_init( fts_audioport_t *port)
 
   for ( i = 0; i < FTS_AUDIOPORT_MAX_CHANNELS; i++)
     port->mix_buffers[i] = NULL;
+
+  fts_audioport_unset_valid(port, FTS_AUDIO_INPUT);
+  fts_audioport_unset_valid(port, FTS_AUDIO_OUTPUT);
+
+  fts_audioport_unset_open(port, FTS_AUDIO_INPUT);  
+  fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
+
 }
 
 void
@@ -454,6 +463,13 @@ fts_audiomanager_remove_port( fts_symbol_t name)
   fts_hashtable_remove( &audiomanager_table, &k);
 }
 
+static int sort_symbol(const void* a, const void* b)
+{
+  fts_symbol_t* pa = (fts_symbol_t*)a;
+  fts_symbol_t* pb = (fts_symbol_t*)b;
+  return strcmp(*pa, *pb);
+}
+
 static fts_symbol_t *audiomanager_get_names( int direction)
 {
   static int count = -1;
@@ -461,6 +477,7 @@ static fts_symbol_t *audiomanager_get_names( int direction)
   fts_symbol_t *p;
   int n;
   fts_iterator_t keys, values;
+  int n_direction = 0;
 
   n = fts_hashtable_get_size( &audiomanager_table);
 
@@ -482,10 +499,15 @@ static fts_symbol_t *audiomanager_get_names( int direction)
       fts_iterator_next( &values, &v);
 
       if ( fts_audioport_is_direction( (fts_audioport_t *)(fts_get_object( &v)), direction))
+      {
 	*p++ = fts_get_symbol( &k);
+	++n_direction;
+      }
     }
 
   *p = NULL;
+  
+  qsort((void*)names, n_direction, sizeof(fts_symbol_t), sort_symbol);
 
   return names;
 }
@@ -517,7 +539,7 @@ void fts_audio_idle( void)
   at_least_one_io_fun_called = 0;
   for ( port = audioport_list; port; port = port->next)
     {
-      if ( !fts_audioport_is_input( port))
+      if ( !fts_audioport_is_input( port) || !fts_audioport_is_open( port, FTS_AUDIO_INPUT))
 	continue;
 
       (*fts_audioport_get_io_fun( port, FTS_AUDIO_INPUT))( port);
@@ -538,7 +560,7 @@ void fts_audio_idle( void)
 
   for ( port = audioport_list; port; port = port->next)
     {
-      if ( !fts_audioport_is_output( port))
+      if ( !fts_audioport_is_output( port) || !fts_audioport_is_open( port, FTS_AUDIO_OUTPUT))
 	continue;
 
       for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT); channel++)
