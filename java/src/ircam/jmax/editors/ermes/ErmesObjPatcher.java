@@ -40,7 +40,9 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     GetSketchWindow().itsPatcher.watch( "deletedConnection", GetSketchWindow());
 
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
-    itsText.setText( getArgs());
+    
+    // (em) set the text and adjust the size
+    setText( getArgs());
   }
 	
   //--------------------------------------------------------

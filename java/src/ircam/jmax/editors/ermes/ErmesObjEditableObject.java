@@ -79,6 +79,13 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   }
 
 
+  protected void setText( String text)
+  {
+    itsText.setText(text);
+    updateDimensions();
+  }
+
+
   void cleanAll()
   {
     itsText = null;

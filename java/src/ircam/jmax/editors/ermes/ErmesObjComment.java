@@ -33,7 +33,8 @@ class ErmesObjComment extends ErmesObjEditableObject {
   {
     ((FtsCommentObject)itsFtsObject).setComment( text);
 
-    itsText.setText( text);
+    // (em) set the text and adjust the size
+    setText( text);
   }
 
   // ----------------------------------------

@@ -74,7 +74,8 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	System.out.println("Error in redefining object, action cancelled");
       }
 
-    itsText.setText( getArgs());
+    // (em) set the text and adjust the size
+    setText( getArgs());
   }
 
   public void MouseDown_specific( MouseEvent evt,int x, int y) 

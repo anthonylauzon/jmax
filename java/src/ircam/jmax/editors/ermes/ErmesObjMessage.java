@@ -69,7 +69,9 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   {
     ((FtsMessageObject)itsFtsObject).setMessage( text);
 
-    itsText.setText( text);
+    // (em) set the text and adjust the size
+    setText( text);
+
   }
 
   // Set the text; it is a try; the message box object in the
@@ -83,7 +85,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
 	// (fd) To be redone
 	// Should be a nice repaint ??
 
-	itsText.setText( (String) value);
+	// (em) set the text and adjust the size
+	setText( (String) value);
 
 	Graphics g = itsSketchPad.getGraphics();
 	Paint_specific(g);
