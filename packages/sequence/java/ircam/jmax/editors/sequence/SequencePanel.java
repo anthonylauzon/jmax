@@ -414,58 +414,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	resizePanelToTimeWithoutScroll(evtTime);
     }
 
-  ////////////////////////////////////////////////////////////
-  public void Copy()
-  {
-      Track track = mutex.getCurrent();
-      if(track!=null)
-	  ((ClipableData) track.getTrackDataModel()).copy();
-  }
-
-  public void Cut()
-  {
-      Track track = mutex.getCurrent();
-      if(track!=null)
-	  ((ClipableData) track.getTrackDataModel()).cut();
-  }
-
-  public void Paste()
-  {
-      Track track = mutex.getCurrent();
-      if(track!=null)
-	  ((ClipableData) track.getTrackDataModel()).paste();
-  }
-
-  public void Duplicate()
-  {
-    Copy();
-    Paste();
-  }
-
-  public void Undo()
-  {
-      Track track = mutex.getCurrent();
-      if(track!=null)
-	  try 
-	      {
-		  ((UndoableData) track.getTrackDataModel()).undo();
-	      } catch (CannotUndoException e1) {
-		  System.out.println("can't undo");
-	      }
-  }
-
-  public void Redo()
-  {
-      Track track = mutex.getCurrent();
-      if(track!=null)
-	  try 
-	      {
-		  ((UndoableData) track.getTrackDataModel()).redo();
-	      } catch (CannotRedoException e1) {
-		  System.out.println("can't redo");
-	      }
-  }
-
     //******** Merge reintroduction *******************//
     public void Merge(){
 	ValueInfo type;
@@ -542,22 +490,78 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     {
 	return ftsSequenceObject;
     }
+  ////////////////////////////////////////////////////////////
   //------------------- Editor interface ---------------
+  public void copy()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      ((ClipableData) track.getTrackDataModel()).copy();
+  }
+
+  public void cut()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      ((ClipableData) track.getTrackDataModel()).cut();
+  }
+  
+  public void paste()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      ((ClipableData) track.getTrackDataModel()).paste();
+  }
+  
+  public void duplicate()
+  {
+    copy();
+    paste();
+  }
+
+  public void undo()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      try 
+	{
+	  ((UndoableData) track.getTrackDataModel()).undo();
+	} catch (CannotUndoException e1) {
+	  System.out.println("can't undo");
+	}
+  }
+
+  public void redo()
+  {
+    Track track = mutex.getCurrent();
+    if(track!=null)
+      try 
+	{
+	  ((UndoableData) track.getTrackDataModel()).redo();
+	} catch (CannotRedoException e1) {
+	  System.out.println("can't redo");
+	}
+  }
+
   public FtsGraphicObject getFtsObject()
   {
     return ftsSequenceObject;
   }
+
   public EditorToolbar getToolbar()
   {
     return toolbar;
   }
+
   public StatusBar getStatusBar()
   {
     return statusBar;
   }
+
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
+
   public void close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
     ftsSequenceObject.requestDestroyEditor(); 

@@ -35,5 +35,11 @@ public interface SequenceEditor extends Editor
   public EditorToolbar getToolbar();
   public StatusBar getStatusBar();
   public FtsGraphicObject getFtsObject();
+  public void copy();
+  public void cut();
+  public void paste();
+  public void duplicate();
+  public void undo();
+  public void redo();
 }
 

@@ -8970,19 +8970,13 @@
 				F851244E028BEAB401664092,
 				F851244F028BEAB401664092,
 				F8512450028BEAB401664092,
-				F8512451028BEAB401664092,
-				F8512452028BEAB401664092,
-				F8512453028BEAB401664092,
 				F8512454028BEAB401664092,
 				F8512455028BEAB401664092,
 				F8512456028BEAB401664092,
 				F8512457028BEAB401664092,
 				F8512458028BEAB401664092,
 				F8512459028BEAB401664092,
-				F851245A028BEAB401664092,
-				F851245C028BEAB401664092,
 				F851245D028BEAB401664092,
-				F851245E028BEAB401664092,
 				F851245F028BEAB401664092,
 				F8512460028BEAB401664092,
 				F8512461028BEAB401664092,
@@ -9107,19 +9101,13 @@
 		F85123A6028BEAB301664092 = {
 			children = (
 				F85123A7028BEAB301664092,
-				F85123A8028BEAB301664092,
-				F85123A9028BEAB301664092,
-				F85123AA028BEAB301664092,
 				F85123AB028BEAB301664092,
 				F85123AC028BEAB301664092,
 				F85123AD028BEAB301664092,
 				F85123AE028BEAB301664092,
 				F85123AF028BEAB301664092,
 				F85123B0028BEAB301664092,
-				F85123B1028BEAB301664092,
-				F85123B3028BEAB301664092,
 				F85123B4028BEAB301664092,
-				F85123B5028BEAB301664092,
 			);
 			isa = PBXGroup;
 			name = actions;
@@ -9129,24 +9117,6 @@
 			isa = PBXFileReference;
 			name = Actions.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/Actions.java;
-			refType = 2;
-		};
-		F85123A8028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = CopyAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/CopyAction.java;
-			refType = 2;
-		};
-		F85123A9028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = CutAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/CutAction.java;
-			refType = 2;
-		};
-		F85123AA028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = DuplicateAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/DuplicateAction.java;
 			refType = 2;
 		};
 		F85123AB028BEAB301664092 = {
@@ -9185,28 +9155,10 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/MoveMonoTrackToAction.java;
 			refType = 2;
 		};
-		F85123B1028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = PasteAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/PasteAction.java;
-			refType = 2;
-		};
-		F85123B3028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = RedoAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/RedoAction.java;
-			refType = 2;
-		};
 		F85123B4028BEAB301664092 = {
 			isa = PBXFileReference;
 			name = RemoveTrackAction.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/RemoveTrackAction.java;
-			refType = 2;
-		};
-		F85123B5028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = UndoAction.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/actions/UndoAction.java;
 			refType = 2;
 		};
 		F85123B6028BEAB301664092 = {
@@ -10233,24 +10185,6 @@
 			settings = {
 			};
 		};
-		F8512451028BEAB401664092 = {
-			fileRef = F85123A8028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512452028BEAB401664092 = {
-			fileRef = F85123A9028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512453028BEAB401664092 = {
-			fileRef = F85123AA028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8512454028BEAB401664092 = {
 			fileRef = F85123AB028BEAB301664092;
 			isa = PBXBuildFile;
@@ -10287,26 +10221,8 @@
 			settings = {
 			};
 		};
-		F851245A028BEAB401664092 = {
-			fileRef = F85123B1028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851245C028BEAB401664092 = {
-			fileRef = F85123B3028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F851245D028BEAB401664092 = {
 			fileRef = F85123B4028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851245E028BEAB401664092 = {
-			fileRef = F85123B5028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

@@ -286,28 +286,29 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   }
   
   ////////////////////////////////////////////////////////////
-  public void Copy()
+  //------------------- SequenceEditor interface ---------------
+  public void copy()
   {
     ((ClipableData) trackData).copy();
   }
 
-  public void Cut()
+  public void cut()
   {
     ((ClipableData) trackData).cut();
   }
 
-  public void Paste()
+  public void paste()
   {
     ((ClipableData) trackData).paste();
   }
 
-  public void Duplicate()
+  public void duplicate()
   {
-    Copy();
-    Paste();
+    copy();
+    paste();
   }
 
-  public void Undo()
+  public void undo()
   {
     try 
       {
@@ -317,7 +318,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       }
   }
 
-  public void Redo()
+  public void redo()
   {
     try 
       {
@@ -327,7 +328,6 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       }
   }
 
-  //------------------- Editor interface ---------------
   public FtsGraphicObject getFtsObject()
   {
     return ftsTrackObject;
