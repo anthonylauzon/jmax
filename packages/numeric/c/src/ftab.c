@@ -28,6 +28,7 @@ ftab_init_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   ftab_t *this = (ftab_t *)o;
 
   this->vec = (fts_float_vector_t *)fts_get_data(at + 1);
+  fts_set_void(&this->buf);
 }
 
 static void
@@ -37,6 +38,7 @@ ftab_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   int size = fts_get_int_arg(ac, at, 1, 0);
 
   this->vec = fts_float_vector_new(size);
+  fts_set_void(&this->buf);
 }
 
 static void
@@ -104,7 +106,7 @@ ftab_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-ftab_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ftab_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_float_vector_t *vec = (fts_float_vector_t *)((ftab_t *)o)->vec;
   float constant = fts_get_float_arg(ac, at, 0, 0);
@@ -152,7 +154,7 @@ ftab_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  fts_object_blip(o, "<int>: recalled value", n);
 	  break;
 	case 1:
-	  fts_object_blip(o, "<int>: # of messages read from file (= current table size)");
+	  fts_object_blip(o, "<int>: # of values read from file (= current table size)");
 	}
     }
 }
@@ -214,7 +216,7 @@ ftab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_set, ftab_set_from_atom_list);
 
-  fts_method_define(cl, 0, fts_new_symbol("const"), ftab_const, 1, a);
+  fts_method_define(cl, 0, fts_new_symbol("fill"), ftab_fill, 1, a);
   fts_method_define(cl, 0, fts_s_clear, ftab_clear, 0, 0);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("size"), ftab_resize);
