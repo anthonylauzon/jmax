@@ -1534,9 +1534,22 @@ fts_package_new(fts_symbol_t name)
 void 
 fts_package_delete(fts_package_t* pkg)
 {
-  fts_client_send_message( (fts_object_t *)pkg, fts_s_destroyEditor, 0, 0);
+  fts_object_t* pkg_obj = (fts_object_t*)pkg;
+  fts_client_send_message(pkg_obj, fts_s_destroyEditor, 0, 0);
 
-  fts_object_destroy( (fts_object_t*) pkg);
+  /* @@@@@ FIX FOR "Open Project" action @@@@@ */
+  /*
+    if pkg has been created with fts_package_load_from_file,
+    pkg is in root_patcher object list
+  */
+  if (pkg_obj->patcher_data != NULL)
+  {
+    fts_patcher_remove_object(pkg_obj->patcher_data->patcher,pkg_obj);
+  }
+  else
+  {
+    fts_object_release(pkg_obj);
+  }
 }
 
 

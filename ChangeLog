@@ -1,3 +1,7 @@
+2003-02-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* begin to fix "Open Project" FTS crash
+
 2003-02-21  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* cleaned the default project/configuration search
