@@ -159,7 +159,7 @@ do { \
 #define fts_cubic_idefix_interpolate_stride(p, i, s, y) \
   do { \
     fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index_from_idefix(i); \
-      *(y) = fts_cubic_calc((p) + (i).index, ft, (s)); \
+      *(y) = fts_cubic_calc_stride((p) + (s) * (i).index, ft, (s)); \
   } while(0)
 
 #define fts_cubic_intphase_interpolate(p, i, y) \
