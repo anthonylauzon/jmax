@@ -76,7 +76,7 @@ extern void scomark_set_label(scomark_t *self, fts_symbol_t label);
 
 extern void scomark_bar_get_number(scomark_t *self, int *num);
 extern void scomark_bar_set_number(scomark_t *self, int num);
-extern void scomark_bar_set_meter(scomark_t *scomark, fts_symbol_t meter_sym);
+extern void scomark_bar_set_meter(scomark_t *scomark, fts_symbol_t meter_sym, fts_symbol_t *old_meter);
 extern void scomark_bar_get_meter(scomark_t *self, fts_symbol_t *meter);
 extern void scomark_bar_set_meter_quotient(scomark_t *scomark, int meter_num, int meter_den);
 extern void scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den);

@@ -28,6 +28,7 @@ static fts_symbol_t sym_meter_3_4 = NULL;
 static fts_symbol_t sym_meter_4_4 = NULL;
 
 static scomark_t *marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo);
+static scomark_t *marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_symbol_t *meter);
 static void marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload);
 
 /**************************************************************************************
@@ -246,7 +247,7 @@ scomark_bar_get_number(scomark_t *self, int *num)
 }
 
 void 
-scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym)
+scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym, fts_symbol_t *old_meter)
 {
   if(scomark_is_bar(self))
   {
@@ -254,6 +255,12 @@ scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym)
     int den = 0;
     fts_atom_t a;
     
+	track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
+    scomark_bar_get_meter(self, old_meter);
+    
+    if(*old_meter == NULL)
+      marker_track_get_previous_meter(marker_track, self, old_meter);
+	
     scomark_meter_symbol_get_quotient(meter_sym, &num, &den);
     
     if(num > 0 && den > 0)
@@ -285,9 +292,10 @@ scomark_bar_set_meter_quotient(scomark_t *self, int meter_num, int meter_den)
   if(scomark_is_bar(self))
   {
     fts_symbol_t meter = scomark_meter_quotient_get_symbol(meter_num, meter_den);
-    
+    fts_symbol_t old_meter;
+	
     if(meter != NULL)
-      scomark_bar_set_meter(self, meter);
+      scomark_bar_set_meter(self, meter, &old_meter);
   }
 }
 
@@ -345,9 +353,15 @@ static void
 _scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
-  if(ac==1 && fts_is_symbol(at))
+  if( scomark_is_bar(self) && ac==1 && fts_is_symbol(at))
   {
-    scomark_bar_set_meter(self, fts_get_symbol(at));
+	track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));   
+	fts_symbol_t meter = fts_get_symbol(at);
+	fts_symbol_t old_meter = NULL;
+	
+    scomark_bar_set_meter(self, meter, &old_meter);
+	
+	/*marker_track_meter_changed(marker_track, self, old_meter, meter, 1);*/
   }
 }
 static void
@@ -502,6 +516,27 @@ scomark_config(void)
 *  marker track functions
 *
 */
+
+static scomark_t *
+marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_symbol_t *meter)
+{
+  event_t *mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+  event_t *prev = event_get_prev(mark_evt);
+  scomark_t *marker;
+  
+  while(prev != NULL && *meter == NULL)
+  {
+    marker = (scomark_t *)fts_get_object( event_get_value(prev));
+    if(scomark_is_bar(marker))
+		scomark_bar_get_meter(marker, meter);
+    prev = event_get_prev(prev);
+  }
+  
+  if(prev != NULL)
+    return marker;
+  else
+    return NULL;
+}
 
 static void
 marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload)
@@ -783,9 +818,10 @@ marker_track_append_bar(track_t *marker_track)
     if(last_bar == NULL)
     {
       double old_tempo = 0.0;
+	  fts_symbol_t old_meter = NULL;
       /* insert first bar with default metrics and tempo */
       new_bar = marker_track_insert_marker(marker_track, 0.0, seqsym_bar, &new_event);      
-      scomark_bar_set_meter( new_bar, sym_meter_4_4);
+      scomark_bar_set_meter( new_bar, sym_meter_4_4, &old_meter);
       scomark_set_tempo( new_bar, 60, &old_tempo);
       scomark_bar_set_number( new_bar, 0);
     }
