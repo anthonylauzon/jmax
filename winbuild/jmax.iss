@@ -50,6 +50,10 @@ Source: "..\config\default_project.jprj"; DestDir: "{app}\config\"; Flags: ignor
 Source: "..\images\*.gif"; DestDir: "{app}\images\"; Flags: ignoreversion
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Help patches
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Source: "..\help\*.jmax"; DestDir: "{app}\help\"; Flags: ignoreversion
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PACKAGES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -61,12 +65,14 @@ Source: "..\packages\asio\c\asio.dll"; DestDir: "{app}\packages\asio\c\"; Flags:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\control\control.jpkg"; DestDir: "{app}\packages\control\"; Flags: ignoreversion
 Source: "..\packages\control\c\control.dll"; DestDir: "{app}\packages\control\c\"; Flags: ignoreversion
+Source: "..\packages\control\help\*.jmax"; DestDir: "{app}\packages\control\help\"; Flags: ignoreversion
 
 ;; DATA
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\data\data.jpkg"; DestDir: "{app}\packages\data\"; Flags: ignoreversion
 Source: "..\packages\data\c\data.dll"; DestDir: "{app}\packages\data\c\"; Flags: ignoreversion
 Source: "..\packages\data\java\data.jar"; DestDir: "{app}\packages\data\java\"; Flags: ignoreversion
+Source: "..\packages\data\help\*.jmax"; DestDir: "{app}\packages\data\help\"; Flags: ignoreversion
 Source: "..\packages\data\images\*.gif"; DestDir: "{app}\packages\data\images\"; Flags: ignoreversion
 
 ;; DSDEV
@@ -77,28 +83,33 @@ Source: "..\packages\dsdev\c\dsdev.dll"; DestDir: "{app}\packages\dsdev\c\"; Fla
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\guiobj\guiobj.jpkg"; DestDir: "{app}\packages\guiobj\"; Flags: ignoreversion
 Source: "..\packages\guiobj\c\guiobj.dll"; DestDir: "{app}\packages\guiobj\c\"; Flags: ignoreversion
+Source: "..\packages\guiobj\help\*.jmax"; DestDir: "{app}\packages\guiobj\help\"; Flags: ignoreversion
 Source: "..\packages\guiobj\java\guiobj.jar"; DestDir: "{app}\packages\guiobj\java\"; Flags: ignoreversion
 
 ;; IO
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\io\io.jpkg"; DestDir: "{app}\packages\io\"; Flags: ignoreversion
 Source: "..\packages\io\c\io.dll"; DestDir: "{app}\packages\io\c\"; Flags: ignoreversion
+Source: "..\packages\io\help\*.jmax"; DestDir: "{app}\packages\io\help\"; Flags: ignoreversion
 
 ;; ISPW
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\ispw\ispw.jpkg"; DestDir: "{app}\packages\ispw"; Flags: ignoreversion
 Source: "..\packages\ispw\c\ispw.dll"; DestDir: "{app}\packages\ispw\c\"; Flags: ignoreversion
+Source: "..\packages\ispw\help\*.jmax"; DestDir: "{app}\packages\ispw\help\"; Flags: ignoreversion
 Source: "..\packages\ispw\images\*.gif"; DestDir: "{app}\packages\ispw\images"; Flags: ignoreversion
 
 ;; ISPWMATH
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\ispwmath\ispwmath.jpkg"; DestDir: "{app}\packages\ispwmath"; Flags: ignoreversion
 Source: "..\packages\ispwmath\c\ispwmath.dll"; DestDir: "{app}\packages\ispwmath\c\"; Flags: ignoreversion
+Source: "..\packages\ispwmath\help\*.jmax"; DestDir: "{app}\packages\ispwmath\help\"; Flags: ignoreversion
 
 ;; MIDI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\midi\midi.jpkg"; DestDir: "{app}\packages\midi\"; Flags: ignoreversion
 Source: "..\packages\midi\c\midi.dll"; DestDir: "{app}\packages\midi\c\"; Flags: ignoreversion
+Source: "..\packages\midi\help\*.jmax"; DestDir: "{app}\packages\midi\help\"; Flags: ignoreversion
 
 ;; MMIO
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,22 +119,26 @@ Source: "..\packages\mmio\c\mmio.dll"; DestDir: "{app}\packages\mmio\c\"; Flags:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\numeric\numeric.jpkg"; DestDir: "{app}\packages\numeric\"; Flags: ignoreversion
 Source: "..\packages\numeric\c\numeric.dll"; DestDir: "{app}\packages\numeric\c\"; Flags: ignoreversion
+Source: "..\packages\numeric\help\*.jmax"; DestDir: "{app}\packages\numeric\help\"; Flags: ignoreversion
 
 ;; SEQUENCE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\sequence\sequence.jpkg"; DestDir: "{app}\packages\sequence\"; Flags: ignoreversion
 Source: "..\packages\sequence\c\sequence.dll"; DestDir: "{app}\packages\sequence\c\"; Flags: ignoreversion
 Source: "..\packages\sequence\java\sequence.jar"; DestDir: "{app}\packages\sequence\java\"; Flags: ignoreversion
+Source: "..\packages\sequence\help\*.jmax"; DestDir: "{app}\packages\sequence\help\"; Flags: ignoreversion
 Source: "..\packages\sequence\images\*.gif"; DestDir: "{app}\packages\sequence\images\"; Flags: ignoreversion
 ;; SIGNAL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\signal\signal.jpkg"; DestDir: "{app}\packages\signal\"; Flags: ignoreversion
 Source: "..\packages\signal\c\signal.dll"; DestDir: "{app}\packages\signal\c\"; Flags: ignoreversion
+Source: "..\packages\signal\help\*.jmax"; DestDir: "{app}\packages\signal\help\"; Flags: ignoreversion
 
 ;; SYSTEM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Source: "..\packages\system\system.jpkg"; DestDir: "{app}\packages\system\"; Flags: ignoreversion
 Source: "..\packages\system\c\system.dll"; DestDir: "{app}\packages\system\c\"; Flags: ignoreversion
+Source: "..\packages\system\help\*.jmax"; DestDir: "{app}\packages\system\help\"; Flags: ignoreversion
 
 ;; UTILS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
