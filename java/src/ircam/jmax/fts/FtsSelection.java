@@ -22,11 +22,11 @@ public class FtsSelection  extends FtsObject
 
   /** The objects contained in the patcher */
 
-  private Vector objects     = new Vector();
+  private MaxVector objects     = new MaxVector();
 
   /** All the connections between these objects */
 
-  private Vector connections = new Vector();
+  private MaxVector connections = new MaxVector();
 
   /**
    * Create a Fts selection;
@@ -59,7 +59,7 @@ public class FtsSelection  extends FtsObject
 
   /** Get the objects */
 
-  final public Vector getObjects()
+  final public MaxVector getObjects()
   {
     return objects;
   }
@@ -86,7 +86,7 @@ public class FtsSelection  extends FtsObject
 
   /** Get the connections */
 
-  final public Vector getConnections()
+  final public MaxVector getConnections()
   {
     return connections;
   }

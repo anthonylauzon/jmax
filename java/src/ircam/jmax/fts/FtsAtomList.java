@@ -13,7 +13,7 @@ import ircam.jmax.utils.*;
 public class FtsAtomList implements FtsDataObject
 {
   FtsObject object = null; 
-  Vector values = new Vector();
+  MaxVector values = new MaxVector();
 
   public FtsAtomList()
   {
@@ -41,7 +41,7 @@ public class FtsAtomList implements FtsDataObject
     return values.size();
   }
 
-  public Vector getValues()
+  public MaxVector getValues()
   {
     return values;
   }
@@ -72,7 +72,7 @@ public class FtsAtomList implements FtsDataObject
 
 	buffer.append(element.toString());
 
-	if (element.equals(";"))
+	if (element == ";")
 	  {
 	    buffer.append("\n");
 	    addBlank = false;
@@ -97,7 +97,7 @@ public class FtsAtomList implements FtsDataObject
   {
     if (object != null)
       {
-	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
+	Fts.getServer().sendObjectMessage(object, -1, "update", (MaxVector) null);
 	Fts.sync();
       }
   }

@@ -113,6 +113,7 @@ class FtsClientProtocol
 
   static final int fts_put_property_cmd = 'p';
   static final int fts_get_property_cmd = 'g';
+  static final int fts_get_done_cmd     = 'I';
   static final int fts_get_all_property_cmd = 'B';
 
   static final int fts_property_value_cmd = 'P';

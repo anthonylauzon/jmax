@@ -3,6 +3,8 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -11,7 +13,7 @@ import ircam.jmax.fts.*;
 class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
   Dimension preferredSize;
   String itsArgs;
-  Vector itsParsedTextVector = new Vector();
+  MaxVector itsParsedTextVector = new MaxVector();
   public String itsMaxString = "";
   int itsTextRowNumber = 0;  
   final static int TEXT_INSET = 10;

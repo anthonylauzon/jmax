@@ -1,12 +1,13 @@
 package ircam.jmax.tcl;
 
-
-
 import tcl.lang.*;
 
 import java.lang.*;
 import java.io.*;
 import java.util.*;
+
+import ircam.jmax.utils.*;
+
 
 /**
  * A generic "preload class" command.
@@ -14,7 +15,7 @@ import java.util.*;
 
 class MaxPreloadClassCmd implements Command
 {
-  static Vector classVector = new Vector();
+  static MaxVector classVector = new MaxVector();
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 2) {

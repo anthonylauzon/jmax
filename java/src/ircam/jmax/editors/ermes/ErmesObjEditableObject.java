@@ -4,7 +4,12 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
+
+
+
 
 /**
  * The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
@@ -18,7 +23,7 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   Dimension preferredSize = new Dimension(100, 25);//hu-hu 
   Dimension currentMinimumSize = new Dimension();
   String        itsArgs;
-  public Vector itsParsedTextVector = new Vector();
+  public MaxVector itsParsedTextVector = new MaxVector();
   public String itsMaxString = "";
   int itsMaxStringWidth = 0; // (fd)
 
@@ -76,7 +81,7 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
   public void propertyChanged(FtsObject obj, String name, Object value)
   {
-    if (name.equals("ins") || name.equals("outs"))
+    if ((name == "ins") || (name == "outs"))
       update(itsFtsObject);
     //maybe some graphic refresh after this?
     // Yes (mdc) :->

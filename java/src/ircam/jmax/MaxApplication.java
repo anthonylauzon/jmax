@@ -103,26 +103,7 @@ public class MaxApplication extends Object
   public static void main(String args[])
   {
 
-    Vector toOpen = new Vector();
-
-    // Temporary: the look and feel must be metal, in order to use
-    // the nice file chooser !!!
-
-    /*
-      try
-      {
-	UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-      }
-    catch (Exception exc)
-      {
-	System.err.println("Cannot load MotifLookAndFeel");
-      }
-      */
-
-    // Initialize swing to use heavyweight components for
-    // Menus'
-
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    MaxVector toOpen = new MaxVector();
 
     // main function parse the argument line and create the main class...
     //create a new default Properties object

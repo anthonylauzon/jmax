@@ -71,7 +71,10 @@ public class ErmesConnection implements ErmesDrawable
   public void Repaint() {
     Update(itsSketchPad.GetOffGraphics());
     Paint(itsSketchPad.GetOffGraphics());
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+
+    Graphics g = itsSketchPad.getGraphics();
+    itsSketchPad.CopyTheOffScreen(g);
+    g.dispose();
   }
   
   //--------------------------------------------------------
@@ -149,7 +152,7 @@ public class ErmesConnection implements ErmesDrawable
 	
   public void MouseDown(MouseEvent evt,int x, int y) {
     if (!itsSketchPad.itsRunMode){
-      itsSketchPad.ClickOnConnection(evt, x, y);
+      itsSketchPad.ClickOnConnection(this, evt, x, y);
     }
   }
 	
@@ -217,6 +220,7 @@ public class ErmesConnection implements ErmesDrawable
 
     if (aGraphics != null) {	
       Paint(aGraphics);	
+      aGraphics.dispose();
     }
 
     if (itsSketchPad.offScreenPresent)

@@ -3,8 +3,8 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.util.*;
 
-
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 
 
@@ -52,23 +52,23 @@ abstract public class FtsObject
     if (msg.getNumberOfArguments() < 3)
       return new FtsStandardObject(parent, "", "", objId);
 
-    className = (String) msg.getArgument(2);
+    className = ((String) msg.getArgument(2)).intern();
 
-    if (className.equals("qlist"))
+    if (className == "qlist")
       return new FtsQlistObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className.equals("jpatcher"))
+    else if (className == "jpatcher")
       return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
-    else if (className.equals("inlet"))
+    else if (className == "inlet")
       return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
-    else if (className.equals("outlet"))
+    else if (className == "outlet")
       return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
-    else if (className.equals("messbox"))
+    else if (className == "messbox")
       return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
-    else if (className.equals("comment"))
+    else if (className == "comment")
       return new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(3, msg), objId);
-    else if (className.equals("__selection"))
+    else if (className == "__selection")
       return new FtsSelection(parent, className, "__selection", objId);
-    else if (className.equals("__clipboard"))
+    else if (className == "__clipboard")
       return new FtsClipboard(parent, className, "__clipboard", objId);
     else
       return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
@@ -104,7 +104,7 @@ abstract public class FtsObject
 
   class PropertyHandlerTable
   {
-    Vector table = new Vector();
+    MaxVector table = new MaxVector();
 
     class PropertyHandlerEntry
     {
@@ -122,7 +122,7 @@ abstract public class FtsObject
 
       void callHandler(String name, Object value, Object author)
       {
-	if (name.equals(this.name))
+	if (name == this.name)
 	  if ((author == null) || (author != owner))
 	    handler.propertyChanged(FtsObject.this, name, value);
       }
@@ -133,7 +133,7 @@ abstract public class FtsObject
       // Shitty code; actually, the handler table should 
       // not be a vector ... may be a linked list
 
-      Vector toRemove = new Vector();
+      MaxVector toRemove = new MaxVector();
 
       for (int i = 0; i < table.size(); i++)
 	{
@@ -152,7 +152,7 @@ abstract public class FtsObject
       // Shitty code; actually, the handler table should 
       // not be a vector ... may be a linked list
 
-      Vector toRemove = new Vector();
+      MaxVector toRemove = new MaxVector();
 
       for (int i = 0; i < table.size(); i++)
 	{
@@ -206,7 +206,7 @@ abstract public class FtsObject
    * 
    */
 
-  Vector properties = null;
+  MaxVector properties = null;
 
   public void put(String name, int value)
   {
@@ -259,47 +259,6 @@ abstract public class FtsObject
    *         in the property list.
    */
 
-  protected boolean builtinPut(String name, Object value)
-  {
-    if (name.equals("ins"))
-      {
-	this.ninlets = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("outs"))
-      {
-	this.noutlets = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("x"))
-      {
-	x = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("y"))
-      {
-	y = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("w"))
-      {
-	width = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("h"))
-      {
-	height = ((Integer)value).intValue();
-	return true;
-      }
-    else if (name.equals("name"))
-      {
-	// whatever passed, get it as a string
-	setObjectName(value.toString());
-	return true;
-      }
-    else
-      return false;
-  }
 
   /** Check if a property correspond to a Java builtin property
    * (Java bean like) and get it.
@@ -314,19 +273,19 @@ abstract public class FtsObject
 
   protected Object builtinGet(String name)
   {
-    if (name.equals("ins"))
+    if (name == "ins")
       return new Integer(getNumberOfInlets());
-    else if (name.equals("outs"))
+    else if (name == "outs")
       return new Integer(getNumberOfOutlets());
-    else if (name.equals("x"))
+    else if (name == "x")
       return new Integer(x);
-    else if (name.equals("y"))
+    else if (name == "y")
       return new Integer(y);
-    else if (name.equals("w"))
+    else if (name == "w")
       return new Integer(width);
-    else if (name.equals("h"))
+    else if (name == "h")
       return new Integer(height);
-    else if (name.equals("name"))
+    else if (name == "name")
       return getObjectName();
     else
       return null;
@@ -338,7 +297,7 @@ abstract public class FtsObject
    *  then call super.builtinPropertyNames(names).
    */
 
-  protected void builtinPropertyNames(Vector names)
+  protected void builtinPropertyNames(MaxVector names)
   {
     names.addElement("ins");
     names.addElement("outs");
@@ -378,14 +337,31 @@ abstract public class FtsObject
     localPut(name, new Float(value), author);
   }
 
+
   void localPut(String name, Object value, Object author)
   {
-    // local and hardcoded properties
+    // check first hardcoded properties
 
-    if (! builtinPut(name, value))
+    if (name == "ins")
+      this.ninlets = ((Integer)value).intValue();
+    else if (name == "outs")
+      this.noutlets = ((Integer)value).intValue();
+    else if (name == "x")
+      x = ((Integer)value).intValue();
+    else if (name == "y")
+      y = ((Integer)value).intValue();
+    else if (name == "w")
+      width = ((Integer)value).intValue();
+    else if (name == "h")
+      height = ((Integer)value).intValue();
+    else if (name == "name")
+      setObjectName(value.toString());
+    else
       {
+	// local properties
+
 	if (properties == null)
-	  properties = new Vector();
+	  properties = new MaxVector();
 
 	search :
 	  {
@@ -393,7 +369,7 @@ abstract public class FtsObject
 	      {
 		Property p = (Property)(properties.elementAt(i));
 
-		if (p.name.equals(name))
+		if (p.name == name)
 		  {
 		    // property found, change the value
 
@@ -439,7 +415,7 @@ abstract public class FtsObject
 	      {
 		Property p = (Property)(properties.elementAt(i));
 
-		if (p.name.equals(name))
+		if (p.name == name)
 		  return p.value;
 	      }
 	  }
@@ -473,7 +449,7 @@ abstract public class FtsObject
       propertyHandlerTable.removeWatch(name, owner);
   }
 
-  public void getPropertyNames(Vector names)
+  public void getPropertyNames(MaxVector names)
   {
     builtinPropertyNames(names);
 
@@ -535,32 +511,25 @@ abstract public class FtsObject
 
 
 
-  /** The message Handler Table for this object */
-
-  Vector messageTable = null;
-
   /** on screen representation of the Fts Object */
 
   Object representation;
 
-  /** Test: x, y, to cache locally the position */
+  /** x, y, width and height cache locally the geometrical properties, to speed
+    up access; also, to prepare transition to beans model */
 
-  protected int x; 
-  protected int y;
-  protected int width;
-  protected int height;
+  protected int x = -1; 
+  protected int y = -1 ;
+  protected int width = -1;
+  protected int height = -1;
 
-  /** Direct access to geometric properties; recomended when possible */
-  /** They don't fire listener, they should !!! */
+  /** Direct access to geometric properties; recomended when possible;
+   *  availables only on access.
+   */
 
   public final int getX()
   {
     return x;
-  }
-
-  final void setX(int p)
-  {
-    x = p;
   }
 
   public final int getY()
@@ -568,29 +537,14 @@ abstract public class FtsObject
     return y;
   }
 
-  final void setY(int p)
-  {
-    y = p;
-  }
-
   public final int getWidth()
   {
     return width;
   }
 
-  final void setWidth(int p)
-  {
-    width = p;
-  }
-
   public final int getHeight()
   {
     return height;
-  }
-
-  final void setHeight(int p)
-  {
-    height = p;
   }
 
   /*****************************************************************************/
@@ -623,7 +577,7 @@ abstract public class FtsObject
 
   /*****************************************************************************/
   /*                                                                           */
-  /*                               SERVICE LOCAL FUNCTIONS                     */
+  /*                               SERVICE LOCA LFUNCTIONS                     */
   /*                                                                           */
   /*****************************************************************************/
 
@@ -751,34 +705,10 @@ abstract public class FtsObject
 
   /** Send a message to an object (in FTS). */
 
-  public final void sendMessage(int inlet, String selector, Vector args)
+  public final void sendMessage(int inlet, String selector, MaxVector args)
   {
     Fts.getServer().sendObjectMessage(this, inlet, selector, args);
   }
-
-  /**
-   * Install a message handler.
-   * All message handlers receive all the messages
-   * sent from FTS object to the client.
-   */
-
-  public void installMessageHandler(FtsMessageHandler handler)
-  {
-    if (messageTable == null)
-      messageTable = new Vector();
-
-    messageTable.addElement(handler);
-  }
-
-  /** Remove a message handler. */
-
-  public void removeMessageHandler(FtsMessageHandler handler)
-  {
-    if (messageTable != null)
-      while (messageTable.removeElement(handler))
-	;
-  }
-
 
   /** Get the representation of this object in the editor. */
 
@@ -819,20 +749,11 @@ abstract public class FtsObject
 
 
   /** Handle a direct message from an FTS object. 
-   * Call the installed handlers.
+   * Empty by default, subclassed by special objects
    */
 
   void handleMessage(FtsMessage msg)
   {
-    if (messageTable != null)
-      {
-	for (int i = 0; i < messageTable.size(); i++)
-	  {
-	    FtsMessageHandler hnd = (FtsMessageHandler) messageTable.elementAt(i);
-
-	    hnd.handleMessage(msg);
-	  }
-      }
   }
 }
 

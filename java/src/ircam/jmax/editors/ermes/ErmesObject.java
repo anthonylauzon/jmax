@@ -5,7 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 
@@ -28,8 +30,8 @@ abstract public class ErmesObject implements ErmesDrawable {
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
   public FtsObject	itsFtsObject = null;
-  public Vector itsInletList = new Vector();
-  public Vector itsOutletList = new Vector();	
+  public MaxVector itsInletList = new MaxVector();
+  public MaxVector itsOutletList = new MaxVector();	
   final static int PADS_DISTANCE = 12;
   static final int DRAG_DIMENSION = 4;
   boolean	absolutePainting = false;
@@ -55,25 +57,25 @@ abstract public class ErmesObject implements ErmesDrawable {
     ErmesObject aObject;
     String theName = object.getClassName();
 
-    if (theName.equals("messbox"))
+    if (theName == "messbox")
       aObject = new ErmesObjMessage(sketch, object);
-    else if (theName.equals("button"))
+    else if (theName == "button")
       aObject = new ErmesObjBang(sketch, object);
-    else if (theName.equals("toggle"))
+    else if (theName == "toggle")
       aObject = new ErmesObjToggle(sketch, object);
-    else if (theName.equals("intbox"))
+    else if (theName == "intbox")
       aObject = new ErmesObjInt(sketch, object);
-    else if (theName.equals("floatbox"))
+    else if (theName == "floatbox")
       aObject = new ErmesObjFloat(sketch, object);
-    else if (theName.equals("comment"))
+    else if (theName == "comment")
       aObject = new ErmesObjComment(sketch, object);
-    else if (theName.equals("slider"))
+    else if (theName == "slider")
       aObject = new ErmesObjSlider(sketch, object);
-    else if (theName.equals("inlet"))
+    else if (theName == "inlet")
       aObject = new ErmesObjIn(sketch, object);
-    else if (theName.equals("outlet"))
+    else if (theName == "outlet")
       aObject = new ErmesObjOut(sketch, object);
-    else if (theName.equals("jpatcher"))
+    else if (theName == "jpatcher")
       aObject = new ErmesObjPatcher(sketch, object);
     else
       aObject = new ErmesObjExternal(sketch, object);
@@ -231,11 +233,11 @@ abstract public class ErmesObject implements ErmesDrawable {
     
     if (aGraphics != null) {	
       Paint(aGraphics);	
+      aGraphics.dispose();
     }
 
     if (itsSketchPad.offScreenPresent && !itsSketchPad.itsRunMode)
       Paint(itsSketchPad.GetOffGraphics());
-      
   }
 	
   // This method is called during the inits
@@ -396,34 +398,30 @@ abstract public class ErmesObject implements ErmesDrawable {
 
   protected void makeCurrentRect(FtsObject theFtsObject) 
   {
-    int width = 0;
-    int height = 0;
+    int width;
+    int height;
 
-    //setItsX( ((Integer)theFtsObject.get("x")).intValue() );
     // (fd) changed to avoid back-propagation of the property
     // to the application layer and ? to FTS
-    itsX = ((Integer)theFtsObject.get("x")).intValue();
-    //setItsY( ((Integer)theFtsObject.get("y")).intValue() );
+    itsX = theFtsObject.getX();
+
     // idem
-    itsY = ((Integer)theFtsObject.get("y")).intValue();
+    itsY = theFtsObject.getY();
 
-    Integer widthInt = (Integer) theFtsObject.get("w");
-    if (widthInt != null)
-      width  = widthInt.intValue();
-
-    Integer heightInt = (Integer)theFtsObject.get("h");
-    if (heightInt != null)
-      height = heightInt.intValue();
+    width = theFtsObject.getWidth();
+    height = theFtsObject.getHeight();
     
     if ( width < 10)
       {
 	width = getPreferredSize().width;
+	theFtsObject.localPut( "w", width);
 	theFtsObject.put( "w", width);
       }
 
     if ( height < 10)
       {
 	height = getPreferredSize().height;
+	theFtsObject.localPut( "h", height);
 	theFtsObject.put( "h", height);
       }
 
@@ -466,11 +464,11 @@ abstract public class ErmesObject implements ErmesDrawable {
     return itsFont;
   }*/
 
-  public Vector GetOutletList(){
+  public MaxVector GetOutletList(){
     return itsOutletList;
   }
 	
-  public Vector GetInletList(){
+  public MaxVector GetInletList(){
     return itsInletList;
   }
   
@@ -719,6 +717,7 @@ abstract public class ErmesObject implements ErmesDrawable {
 	    g.setColor(Color.black);
 	    g.drawRect(ax - 1, ay - ah - 1, aw + 2, ah + 2);
 	    g.drawString(annotation, ax, ay);
+	    g.dispose();
 	  }
       }
   }

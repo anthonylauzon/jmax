@@ -6,10 +6,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 import com.sun.java.swing.*;
+import com.sun.java.swing.filechooser.*; // tmp !!
 
 // Tmp packages
-import com.sun.java.swing.preview.*;
-import com.sun.java.swing.preview.filechooser.*;
+// import com.sun.java.swing.preview.*;
+// import com.sun.java.swing.preview.filechooser.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;

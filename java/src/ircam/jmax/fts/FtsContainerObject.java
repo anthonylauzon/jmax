@@ -4,7 +4,10 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
+
+import com.sun.java.swing.*;
 
 /** 
  *  This is the super class of all
@@ -27,15 +30,15 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 {
   /** The objects contained in the patcher */
 
-  private Vector objects     = new Vector();
+  private MaxVector objects     = new MaxVector();
 
   /** All the connections between these objects */
 
-  private Vector connections = new Vector();
+  private MaxVector connections = new MaxVector();
 
-  /** True if the patcher is Open in FTS */
+  /** True if the patcher have been already downloaded from FTS */
 
-  protected boolean open = false;
+  protected boolean downloaded = false;
 
   /** True if the patcher content have been downloaded from FTS
    *  or anyway consistent because built in the editor
@@ -78,7 +81,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     // WARNING: doing like that *because* FtsConnection.delete change
     // the connections vector, so the loop would not work.
 
-    Vector toDelete = new Vector();
+    MaxVector toDelete = new MaxVector();
 
     for (int i = 0; i < connections.size() ; i++)
       {
@@ -111,16 +114,11 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     objects.removeElement(obj);
   }
 
-
-
   /** Overwrite the getObjects methods so to download the patcher
     by need */
 
-  public final Vector getObjects()
+  public final MaxVector getObjects()
   {
-    if (! downLoaded)
-      download();
-
     return objects;
   }
 
@@ -147,11 +145,8 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   /** Overwrite the getConnections methods so to download the patcher
     by need */
 
-  public final Vector getConnections()
+  public final MaxVector getConnections()
   {
-    if (! downLoaded)
-      download();
-
     return connections;
   }
 
@@ -159,40 +154,52 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
    * open need to download the patcher if not downloaded.
    */
 
-  public final void open()
+  public final void download()
   {
-    if (! downLoaded)
-      download();
-
-    open = true;
-    Fts.getServer().openPatcher(this);
+    Fts.getServer().sendDownloadPatcher(this);
     Fts.sync();
+    downloaded = true;
   }
+
+  /* The callback is called by the message handler */
+
+  Runnable downloadCallback = null;
+
+  public final void download(Runnable c)
+  {
+    downloadCallback = c;
+    Fts.getServer().sendDownloadPatcher(this);
+    Fts.getServer().getDone(this);
+    downloaded = true;
+  }
+
+  private final void callDownloadCallback()
+  {
+    if (downloadCallback != null)
+      SwingUtilities.invokeLater(downloadCallback);
+
+    downloadCallback = null;
+  }
+
+
+  public boolean isDownloaded()
+  {
+    return downloaded;
+  }
+
+  /** Close tell FTS that this patcher is  "alive". */
+
+  public final void startUpdates()
+  {
+    Fts.getServer().openPatcher(this);
+  }
+
 
   /** Close tell FTS that this patcher is not "alive". */
 
-  public final void close()
+  public final void stopUpdates()
   {
-    open = false;
-
     Fts.getServer().closePatcher(this);
-  }
-
-  /** Check if the patcher is open. */
-
-  public final boolean isOpen()
-  {
-    return open;
-  }
-
-  /** Download the patcher content, if needed */
-
-  private final void download()
-  {
-    if (! downLoaded)
-      Fts.getServer().sendDownloadPatcherAndSync(this);
-
-    downLoaded = true;
   }
 
   /**
@@ -202,18 +209,8 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   final void redownload()
   {
-    Fts.getServer().sendDownloadPatcherAndSync(this);
-    downLoaded = true;
-  }
-
-  /** Call this method to tell the application layer
-    that this object has been created from the editor,
-    and so it is implicitly downloaded (i.e. consistent
-    with FTS */
-
-  public void setDownloaded()
-  {
-    downLoaded = true;
+    Fts.getServer().sendDownloadPatcher(this);
+    Fts.sync();
   }
 
   /**
@@ -277,55 +274,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   }
 
 
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                    Object Naming                                          */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  /** Get an object by name; a name is either a single name or a composed
-   *  name; a composed name is interpreted relatively to this container.
-   */
-
-
-  public FtsObject getObjectByName(String name)
-  {
-    if (name.indexOf('.') == -1)
-      return getObjectBySimpleName(name);
-    else
-      {
-	String rootName;
-	String tailName;
-	FtsObject obj;
-	
-	rootName = name.substring(0, name.indexOf('.'));
-	tailName = name.substring(name.indexOf('.') + 1);
-
-	obj = getObjectBySimpleName(rootName);
-
-	if (obj instanceof FtsContainerObject)
-	  return ((FtsContainerObject) obj).getObjectByName(tailName);
-	else
-	  return null;
-      }
-  }
-
-  final private FtsObject getObjectBySimpleName(String name)
-  {
-    for (int i = 0; i < getObjects().size(); i++)
-      {
-	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
-	String objName  =  (String) obj.get("name");
-
-	if ((objName != null) && (objName.equals(name)))
-	  return obj;
-      }
-
-    return null;
-  }
-
-  /// MaxData implementation
-
   /** The Max Document his container belong to, or null in case
    *  we should ask the parent
    */
@@ -366,6 +314,20 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   public void setData(MaxData data) throws FtsException
   {
     throw new FtsException(new FtsError(FtsError.ILLEGAL_OPERATION, "Cannot set the content of a  patcher"));
+  }
+
+  /** Handle a direct message from an FTS object. 
+   * Containers for the moment only get "open call back messages"
+   */
+
+  void localPut(String name, Object value, Object author)
+  {
+    // check first hardcoded properties
+
+    if (name == "done") 
+      callDownloadCallback();
+    else
+      super.localPut(name, value, author);
   }
 }
 

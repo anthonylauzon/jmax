@@ -53,7 +53,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   // "value" property; it is an hack, should be done more cleanly.
 
   public void propertyChanged(FtsObject obj, String name, Object value) {
-    if (name.equals("value"))
+    if (name == "value")
       {
 	itsArgs = (String) value;
 	ParseText(itsArgs);
@@ -62,7 +62,11 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
 	  itsSketchPad.repaint();
 	}
 	else
-	  Paint(itsSketchPad.getGraphics());
+	  {
+	    Graphics g = itsSketchPad.getGraphics();
+	    Paint(g);
+	    g.dispose();
+	  }
       }
     else
       super.propertyChanged(obj, name, value);
@@ -77,7 +81,10 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     else {
       if (itsFlashing) {
 	itsFlashing = false;
-	Paint_specific(itsSketchPad.getGraphics());
+
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
     }
     return true;
@@ -91,7 +98,10 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
       if (itsFtsObject != null){
 	itsFtsObject.sendMessage(0, "bang", null);
 	itsFlashing = true;
-	Paint_specific(itsSketchPad.getGraphics());
+
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);

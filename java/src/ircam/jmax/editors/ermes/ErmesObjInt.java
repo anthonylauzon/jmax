@@ -76,9 +76,11 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     
     if (itsInteger != temp) {
       itsInteger = temp;
-      Paint_specific(itsSketchPad.getGraphics());
+
+      Graphics g = itsSketchPad.getGraphics();
+      Paint_specific(g);
+      g.dispose();
     }
-    
   }
 
   public void FromDialogValueChanged(int theInt){

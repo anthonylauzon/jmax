@@ -5,6 +5,8 @@ package ircam.jmax;
 
 import tcl.lang.*;
 import java.util.*;
+
+import ircam.jmax.utils.*;
 import ircam.jmax.*;
 
 class MaxWhenHookTable
@@ -33,7 +35,7 @@ class MaxWhenHookTable
     }
   }
 
-  Vector hookList = new Vector();
+  MaxVector hookList = new MaxVector();
 
   MaxWhenHookTable()
   {

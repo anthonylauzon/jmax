@@ -7,6 +7,7 @@ import com.sun.java.swing.*;
 import com.sun.java.swing.border.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
@@ -82,6 +83,9 @@ class FindPanel extends JFrame {
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
 	{
+	  Cursor temp = FindPanel.this.getCursor();
+
+	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 	  try
 	    {
 	      Mda.edit(object.getParent().getData(), object);
@@ -89,6 +93,8 @@ class FindPanel extends JFrame {
 	  catch (MaxDocumentException e)
 	    {
 	    }
+
+	  FindPanel.this.setCursor(temp);
 	}
     });
     
@@ -107,15 +113,16 @@ class FindPanel extends JFrame {
   public void find()
   {
     String query;
-    Vector args;
+    MaxVector args;
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
     query = textField.getText();
-    args = new Vector();
+    args = new MaxVector();
     FtsParse.parseAtoms(query, args);
-    set.find( patcher, args);
+    // set.find( patcher, args);// tmp commented
+    set.find(Fts.getRootObject(), args);
     setCursor(temp);
   }
 
@@ -124,7 +131,8 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    set.findErrors( patcher);
+    // set.findErrors( patcher);// tmp commented
+    set.findErrors(Fts.getRootObject());
     setCursor(temp);
   }
 

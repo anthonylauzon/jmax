@@ -3,10 +3,14 @@ package ircam.jmax.mda;
 import java.util.*;
 import java.io.*;
 import com.sun.java.swing.*;
+import com.sun.java.swing.filechooser.*;
 
 // Tmp packages
-import com.sun.java.swing.preview.*;
-import com.sun.java.swing.preview.filechooser.*;
+
+// import com.sun.java.swing.preview.*;
+// import com.sun.java.swing.preview.filechooser.*;
+
+import ircam.jmax.utils.*;
 
 /** This class provide central registration services
  * and methods that are not tied to specific classes 
@@ -24,7 +28,7 @@ public class Mda
    * by the factory itself, using the method "canEdit"
    */
      
-  private static Vector editorFactoryTable = new Vector();
+  private static MaxVector editorFactoryTable = new MaxVector();
 
   /**
    * Store all the pair data/editor; used for house keeping:
@@ -129,7 +133,7 @@ public class Mda
 
   /** All the instantiated document handlers */
 
-  private static Vector allHandlers = new Vector();
+  private static MaxVector allHandlers = new MaxVector();
 
   /**  handle registration in the global
    * table; note that Document Handlers cannot be deinstalled, once

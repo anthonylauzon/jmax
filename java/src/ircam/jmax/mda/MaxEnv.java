@@ -2,8 +2,11 @@ package ircam.jmax.mda;
 
 import java.io.*;
 import java.util.*;
+
 import tcl.lang.*;
+
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 /**
  * This class represent the environement where a patch is loaded.
@@ -12,7 +15,7 @@ import ircam.jmax.*;
 
 public class MaxEnv
 {
-  static Vector loadedEnvs = new Vector();
+  static MaxVector loadedEnvs = new MaxVector();
 
   static public void loadEnvFileFor(File file)
   {

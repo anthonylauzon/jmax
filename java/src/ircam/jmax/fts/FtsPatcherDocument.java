@@ -29,7 +29,6 @@ public class FtsPatcherDocument extends MaxDocument
     FtsContainerObject patcher;
 
     patcher = (FtsContainerObject) getRootData();
-    patcher.close();
     patcher.delete();
   }
 }

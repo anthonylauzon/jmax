@@ -3,6 +3,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.text.*;
 
+import ircam.jmax.utils.*;
 
 /**
  * This class implement a lexical analizer for object and message box
@@ -558,9 +559,9 @@ public class FtsParse
       }
   }
 
-  /** Parse an list of atoms in a Vector */
+  /** Parse an list of atoms in a MaxVector */
 
-  public static void parseAtoms(String str, Vector values)
+  public static void parseAtoms(String str, MaxVector values)
   {
     FtsParse parser = new FtsParse(str);
 
@@ -612,7 +613,8 @@ public class FtsParse
   }
 
   /* Unparse an object description from a FTS message, starting
-     from the given offset;
+     from the given offset; use == to compare strings because fts
+     strings are always interned.
      */
 
   static private final boolean wantASpaceBefore(Object value)
@@ -624,7 +626,7 @@ public class FtsParse
 			     ">>", ">", "<<", "<=", "<", "?", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals((String) value))
+	  if (keywords[i] == ((String) value))
 	    return true;
 
 	return false;
@@ -642,7 +644,7 @@ public class FtsParse
 
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals((String) value))
+	  if (keywords[i] == ((String) value))
 	    return true;
 
 	return false;
@@ -661,7 +663,7 @@ public class FtsParse
 			      ";" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals((String) value))
+	  if (keywords[i] == ((String) value))
 	    return true;
 
 	return false;
@@ -678,7 +680,7 @@ public class FtsParse
 			      "$", "'" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals((String) value))
+	  if (keywords[i] == ((String) value))
 	    return true;
 
 	return false;
@@ -696,7 +698,7 @@ public class FtsParse
 			  ";", "'" };
     
     for (int i = 0 ; i < keywords.length; i++)
-      if (keywords[i].equals((String) value))
+      if (keywords[i] == ((String) value))
 	return true;
 
     return false;
@@ -768,9 +770,9 @@ public class FtsParse
 	    else
 	      descr.append(value1);
 
-	    if (value1.equals("'"))
+	    if (value1 == "'")
 	      noNewLine = true;
-	    else if (value1.equals(";"))
+	    else if (value1 == ";")
 	      {
 		if (noNewLine)
 		  noNewLine = false;
@@ -847,9 +849,9 @@ public class FtsParse
 
 	    descr.append(value1);
 
-	    if (value1.equals("'"))
+	    if (value1 == "'")
 	      noNewLine = true;
-	    else if (value1.equals(";"))
+	    else if (value1 == ";")
 	      {
 		if (noNewLine)
 		  noNewLine = false;

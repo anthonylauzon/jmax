@@ -38,8 +38,13 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     else itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     //itsOwner.itsInEdit = false;
 
-    if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+    if (itsSketchPad != null)
+      itsOwner.Paint(itsSketchPad.GetOffGraphics());
+
+    Graphics g = itsSketchPad.getGraphics();
+    itsSketchPad.CopyTheOffScreen(g);
+    g.dispose();
+
     itsOwner = null;  
   }
 
@@ -58,13 +63,6 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
     if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
-      /*setVisible(false);
-	setLocation(-200,-200);
-	
-	if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-	itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-	itsOwner = null;	//seems to be crazy but...
-	*/
       AbortEdit();
       return; 
     }

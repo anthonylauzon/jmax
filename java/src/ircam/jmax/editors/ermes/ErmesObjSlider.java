@@ -119,8 +119,15 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
       if (itsThrottle != null) {
 	itsThrottle.Move(itsThrottle.itsX, (int)(getItsY()+getItsHeight()-BOTTOM_OFFSET-2-clippedValue/itsStep));
       }
-      if (itsSketchPad.itsRunMode) Paint_movedThrottle(itsSketchPad.getGraphics());
-      else Paint_specific(itsSketchPad.getGraphics());
+
+      Graphics g = itsSketchPad.getGraphics();
+
+      if (itsSketchPad.itsRunMode)
+	Paint_movedThrottle(g);
+      else
+	Paint_specific(g);
+
+      g.dispose();
     }
     
   }
@@ -160,7 +167,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	  itsThrottle.Move(itsThrottle.itsX, y-2);
 	  itsMovingThrottle = true;
 
-	  Paint_specific(itsSketchPad.getGraphics());
+	  Graphics g = itsSketchPad.getGraphics();
+	  Paint_specific(g);
+	  g.dispose();
 	}
 	else if(getItsY()+getItsHeight()-BOTTOM_OFFSET<y){
 	  itsInteger = itsRangeMin/*0*/;
@@ -168,7 +177,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	  sendValue(new Integer(itsRangeMin));
 	  itsThrottle.Move(itsThrottle.itsX, getItsY()+getItsHeight()-BOTTOM_OFFSET-2);
 
-	  Paint_specific(itsSketchPad.getGraphics());
+	  Graphics g = itsSketchPad.getGraphics();
+	  Paint_specific(g);
+	  g.dispose();
 	}
 	else if(getItsY()+UP_OFFSET>=y){
 	  //Trust(itsRangeMax);
@@ -176,7 +187,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	  itsInteger = itsRangeMax;
 	  itsThrottle.Move(itsThrottle.itsX, getItsY()+UP_OFFSET-2);
 
-	  Paint_specific(itsSketchPad.getGraphics());
+	  Graphics g = itsSketchPad.getGraphics();
+	  Paint_specific(g);
+	  g.dispose();
 	}
 	return ;
       }
@@ -202,7 +215,10 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	sendValue(new Integer(itsInteger+itsRangeMin));
 	
 	itsThrottle.Move(itsThrottle.itsX, y-2);
-	Paint_specific(itsSketchPad.getGraphics());
+
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
       else if(getItsY()+getItsHeight()-BOTTOM_OFFSET<y){
 	
@@ -211,7 +227,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	itsInteger = itsRangeMin;
 	itsThrottle.Move(itsThrottle.itsX, getItsY()+getItsHeight()-BOTTOM_OFFSET-2);
 
-	Paint_specific(itsSketchPad.getGraphics());
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
       else if(getItsY()+UP_OFFSET>y){
 	
@@ -220,7 +238,9 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 	itsInteger = itsRangeMax;
 	itsThrottle.Move(itsThrottle.itsX, getItsY()+UP_OFFSET-2);
 
-	Paint_specific(itsSketchPad.getGraphics());
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
       return true;
     }

@@ -1,12 +1,12 @@
 package ircam.jmax.fts.tcl;
 
-import ircam.jmax.*;
 import tcl.lang.*;
 
 import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -29,7 +29,7 @@ class FtsUcsCmd implements Command
   {
     if (argv.length >  1)
       {
-	Vector args = new Vector();
+	MaxVector args = new MaxVector();
 
 	for (int i = 1; i < argv.length; i++)
 	  {

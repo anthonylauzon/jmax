@@ -68,7 +68,9 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
 	itsFlashColor = bangColors[flash - 1];
       }
 
-    Paint_specific(itsSketchPad.getGraphics());
+    Graphics g = itsSketchPad.getGraphics();
+    Paint_update(g);
+    g.dispose();
   }
 	
 
@@ -76,7 +78,19 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     return true;
   }
 
-	
+
+  private void Paint_update( Graphics g) 
+  {
+    if (itsFlashing)
+      g.setColor( itsFlashColor);
+    else if ( itsSelected) 
+      g.setColor( itsUISelectedColor);
+    else 
+      g.setColor( itsUINormalColor);
+
+    g.fillOval( getItsX() + 5, getItsY() + 5, getItsWidth() - 10, getItsHeight() - 10);
+  }
+
   public void Paint_specific( Graphics g) 
   {
     if ( itsSelected) 
@@ -87,11 +101,7 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     g.fillRect( getItsX() + 1, getItsY() + 1, getItsWidth() - 2,  getItsHeight() - 2);
     g.fill3DRect( getItsX() + 2, getItsY() + 2, getItsWidth() - 4,  getItsHeight() - 4, true);
 
-    if( itsFlashing)
-      {
-	g.setColor( itsFlashColor);
-	g.fillOval( getItsX() + 5, getItsY() + 5, getItsWidth() - 10, getItsHeight() - 10);
-      }
+    Paint_update(g);
 
     g.setColor(Color.black);
     g.drawRect( getItsX(), getItsY(), getItsWidth() - 1, getItsHeight() - 1);

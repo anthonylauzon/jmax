@@ -15,7 +15,7 @@
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
  * Lowercase : c d f g h i m n o p q s u x y w z  
- * Uppercase : A C D E F G H L M N O P Q R S U X Y Z 
+ * Uppercase : A B C D E F G H L M N O P Q R S U X Y Z 
  * 
  */
 
@@ -69,6 +69,7 @@
 
 #define PUTPROP_CODE            'p'
 #define GETPROP_CODE            'g'
+#define GETDONE_CODE            'I'
 #define GETALLPROP_CODE         'B'
 
 #define CLIENTPROP_CODE         'P'

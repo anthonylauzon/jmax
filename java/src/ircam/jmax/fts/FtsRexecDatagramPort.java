@@ -168,15 +168,7 @@ class FtsRexecDatagramPort extends FtsPort
       {
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 
-	try
-	  {
-	    socket.receive(in_packet);
-	  }
-	catch (Exception e)
-	  {
-	    System.err.println("Exception in receive " + e);
-	  }
-
+	socket.receive(in_packet);
 	in_fill_p = 0;
       }
 

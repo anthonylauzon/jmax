@@ -2,7 +2,7 @@
 OPTIMIZE_IT_HOME_DIR=/u/worksta/jmax/OptimizeIt
 LD_LIBRARY_PATH=${OPTIMIZE_IT_HOME_DIR}/lib ; export LD_LIBRARY_PATH
 ROOTDIR=${HOME}/projects/max
-CLASSPATH=.:/usr/LOCAL/jdk1.1.3/lib/classes.zip:${OPTIMIZE_IT_HOME_DIR}/lib/classes.zip:${ROOTDIR}/java/classes:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing-1.0.3/swingall.jar:${ROOTDIR}/java/lib/NetComponents.jar
+CLASSPATH=.:/usr/LOCAL/jdk1.1.3/lib/classes.zip:${OPTIMIZE_IT_HOME_DIR}/lib/classes.zip:${ROOTDIR}/java/classes:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing/swingall.jar:${ROOTDIR}/java/lib/NetComponents.jar
 
 if [ \! $DISPLAY ]
 then

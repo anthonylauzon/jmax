@@ -1,5 +1,6 @@
 SSOURCES = \
 	  ErmesModule.java \
+	  ErmesDataEditor.java \
           ErmesConnection.java \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \

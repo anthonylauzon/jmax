@@ -1,7 +1,9 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+
 import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 
 /**
  * This class export a number of global functionalities
@@ -216,37 +218,6 @@ public class Fts
   }
 
 
-  /** Static function to get an object by name; it get the 
-   *  object by searching it starting from the roots patchers;
-   *  the first object with the good name is returned.
-   */
-
-  public static FtsObject getObject(String name)
-  {
-    if (Fts.getServer() != null)
-      {
-	FtsContainerObject root = Fts.getServer().getRootObject();
-	Vector objects = root.getObjects();
-
-	for (int i = 0; i < objects.size(); i++)
-	  {
-	    FtsObject ret;
-	    FtsObject obj   =  (FtsObject) objects.elementAt(i);
-
-	    if (obj instanceof FtsContainerObject)
-	      {
-
-		ret = ((FtsContainerObject) obj).getObjectByName(name);
-
-		if (ret != null)
-		  return ret;
-	      }
-	  }
-      }
-
-    return null;
-  }
-
   /* Data objects */
 
   public static FtsRemoteData newRemoteData(String name, Object args[])
@@ -340,5 +311,12 @@ public class Fts
   static Class getRemoteDataClass(String name)
   {
     return (Class) remoteDataClassTable.get(name);
+  }
+
+  /* Get the root object */
+
+  public static FtsObject getRootObject()
+  {
+    return server.getRootObject();
   }
 }

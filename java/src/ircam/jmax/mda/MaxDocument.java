@@ -278,7 +278,11 @@ abstract public class MaxDocument
     this.saved = saved;
   }
 
-  /** Disposing this document */
+  /** Disposing this document;
+   * Note that we don't close the editors here; the editors
+   * are closed by the Mda.dispose(MaxData data) method, that
+   * all the MaxData need to call when they are destroyed.
+   */
 
   public void dispose()
   {

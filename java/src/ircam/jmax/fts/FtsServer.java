@@ -1,9 +1,11 @@
 package ircam.jmax.fts;
 
-import ircam.jmax.*;
-import ircam.jmax.utils.*;
 import java.util.*;
 import java.io.*;
+
+import ircam.jmax.*;
+import ircam.jmax.utils.*;
+
 
 /**
  * Represent the FTS server we are connected to. <br>
@@ -41,7 +43,7 @@ public class FtsServer
 
   /** The list of listener of update groups */
   
-  Vector updateGroupListeners;
+  MaxVector updateGroupListeners;
 
   /** If true, put a 10 sec timeout on Sync;
    */
@@ -270,7 +272,7 @@ public class FtsServer
 
   /** Send a "download patcher" messages to FTS and do a sync */
 
-  final void sendDownloadPatcherAndSync(FtsObject patcher)
+  final void sendDownloadPatcher(FtsObject patcher)
   {
     if (! connected)
       return;
@@ -287,14 +289,12 @@ public class FtsServer
     catch (java.io.IOException e)
       {
       }
-
-    syncToFts();
   }
 
 
   /** Send a "download patcher" messages to FTS.*/
 
-  final void sendDownloadPatcherAndSync(int id)
+  final void sendDownloadPatcher(int id)
   {
     if (! connected)
       return;
@@ -311,8 +311,6 @@ public class FtsServer
     catch (java.io.IOException e)
       {
       }
-
-    syncToFts();
   }
 
 
@@ -358,6 +356,26 @@ public class FtsServer
       }
   }
 
+  /** Send a "getDone" messages to FTS.*/
+
+  final void getDone(FtsObject patcher)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("getDone(" + patcher + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_get_done_cmd);
+	port.sendObject(patcher);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
 
   /** Send a "patcher loaded" messages to FTS.*/
 
@@ -578,7 +596,7 @@ public class FtsServer
 
   /** Send an "object message" messages to FTS.*/
 
-  final void sendObjectMessage(FtsObject dst, int inlet, String selector, Vector args)
+  final void sendObjectMessage(FtsObject dst, int inlet, String selector, MaxVector args)
   {
     if (! connected)
       return;
@@ -656,7 +674,7 @@ public class FtsServer
     from a Vector; the vector should only contains String, Floats and Integers, of course.
     */
 
-  final void sendSetMessage(FtsObject dst, Vector values)
+  final void sendSetMessage(FtsObject dst, MaxVector values)
   {
     if (! connected)
       return;
@@ -714,7 +732,7 @@ public class FtsServer
     @deprecated
    */
 
-  final public void sendNamedObjectMessage(String dst, int inlet, String selector, Vector args)
+  final public void sendNamedObjectMessage(String dst, int inlet, String selector, MaxVector args)
   {
     if (! connected)
       return;
@@ -886,7 +904,7 @@ public class FtsServer
 
   /** Send a "ucs" messages to FTS. */
 
-  final public void ucsMessage(Vector args)
+  final public void ucsMessage(MaxVector args)
   {
     if (! connected)
       return;
@@ -1012,7 +1030,7 @@ public class FtsServer
   }
 
 
-  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, Vector args)
+  final void remoteCall( FtsRemoteData data, int  key, FtsObject object, MaxVector args)
   {
     if (! connected)
       return;
@@ -1109,7 +1127,7 @@ public class FtsServer
   public void addUpdateGroupListener(FtsUpdateGroupListener listener)
   {
     if (updateGroupListeners == null)
-      updateGroupListeners = new Vector();
+      updateGroupListeners = new MaxVector();
     
     updateGroupListeners.addElement(listener);
   }
@@ -1131,6 +1149,10 @@ public class FtsServer
    * handling extensible; adding a piece of protocol means to add
    * a piece of code here; this will allow for a more optimized
    * parser (less dynamic allocation ...)
+   * 
+   * Note that given asynchronius operations, an object or data can be delete
+   * while having still messages (usually properties) arriving; for this
+   * reason, messages with null  destinations are simply ignored
    */
 
   void dispatchMessage(FtsMessage msg)
@@ -1146,15 +1168,10 @@ public class FtsServer
  	    {
  	      FtsObject obj;
 
-	      // if (msg.getArgument(1).equals("value"))
-		// probe.mark("Property value in"); // @@@
-
  	      obj = (FtsObject) msg.getArgument(0);
 
- 	      if (obj == null)
- 		System.err.println("Null object in property value message " + msg);
- 	      else
- 		obj.localPut((String) msg.getArgument(1), msg.getArgument(2));
+ 	      if (obj != null)
+ 		obj.localPut(((String) msg.getArgument(1)).intern(), msg.getArgument(2));
 
  	      if (FtsServer.debug)
  		System.err.println("SetPropertyValue " + obj + " " + msg.getArgument(1)
@@ -1170,7 +1187,9 @@ public class FtsServer
 	  FtsObject obj;
 
 	  obj = (FtsObject) msg.getArgument(0);
-	  obj.handleMessage(msg);
+
+	  if (obj != null)
+	    obj.handleMessage(msg);
 
 	  if (FtsServer.debug)
 	    System.err.println("ObjectMessage " + obj + " " + msg);
@@ -1300,20 +1319,17 @@ public class FtsServer
 
 	  FtsRemoteData data = (FtsRemoteData) msg.getArgument(0);
 
-	  if (data == null)
+	  if (data != null)
 	    {
-	      System.err.println( "FtsServer: Unknown data");
-	      return;
+	      int key = ((Integer)  msg.getArgument(1)).intValue();
+
+	      // Args can be big (thousands), so in order to keep 
+	      // call as "primitive" as possible, we just pass
+	      // the msg; it is up to the called object to interpret
+	      // it
+
+	      data.call(key, msg);
 	    }
-
-	  int key = ((Integer)  msg.getArgument(1)).intValue();
-
-	  // Args can be big (thousands), so in order to keep 
-	  // call as "primitive" as possible, we just pass
-	  // the msg; it is up to the called object to interpret
-	  // it
-
-	  data.call(key, msg);
 
 	  break;
 	}
@@ -1390,7 +1406,7 @@ public class FtsServer
 
   /** The object table. Used to map back Ids to objects. */
 
-  private Vector objectTable = new Vector();
+  private MaxVector objectTable = new MaxVector();
 
   /** The max object Id registered */
 
@@ -1513,7 +1529,7 @@ public class FtsServer
 
   /** The connection table. Used to map back Ids to connections. */
 
-  private Vector connectionTable = new Vector();
+  private MaxVector connectionTable = new MaxVector();
 
   /** The max connection Id registered */
 

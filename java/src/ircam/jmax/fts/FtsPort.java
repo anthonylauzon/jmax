@@ -3,6 +3,8 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
+import ircam.jmax.utils.*;
+
 /**
  * This class provide some basic mechanism to handle 
  *  the physical connection to FTS. <br>
@@ -374,7 +376,7 @@ abstract class FtsPort implements Runnable
   }
   
 
-  final void sendVector(Vector args) throws java.io.IOException 
+  final void sendVector(MaxVector args) throws java.io.IOException 
   {
     for (int narg = 0; narg < args.size(); narg++)
       {

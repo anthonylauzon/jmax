@@ -80,6 +80,10 @@ OscillSource:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) OscillSource.java)
 .PHONY: OscillSource
 
+MaxVector:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxVector.java)
+.PHONY: MaxVector
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
 

@@ -74,7 +74,9 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
   {
     itsFloat = ((Float) value).floatValue();
 
-    Paint_specific(itsSketchPad.getGraphics());
+    Graphics g = itsSketchPad.getGraphics();
+    Paint_specific(g);
+    g.dispose();
   }
 	
   public void FromDialogValueChanged(float theFloat){

@@ -10,7 +10,6 @@ import java.awt.*;
 public class ErmesObjOutlet extends ErmesObjInOutlet{
 
   int itsOutletNum;
-  static int debug_count = 1;
   
   //--------------------------------------------------------
   //	CONSTRUCTOR

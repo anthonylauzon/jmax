@@ -48,7 +48,8 @@ SOURCES = \
 	FtsStandardObject.java		\
 	FtsSubProcessPort.java		\
 	FtsSubProcessServer.java	\
-	FtsUpdateGroupListener.java
+	FtsUpdateGroupListener.java    \
+	FtsCallback.java
 
 
 

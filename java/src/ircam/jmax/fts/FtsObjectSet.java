@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import com.sun.java.swing.*;
 
+import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 
 
@@ -25,7 +26,7 @@ public class FtsObjectSet extends FtsRemoteData
   static final int REMOTE_FIND_ERRORS   = 5;
   static final int REMOTE_FIND_FRIENDS  = 6;
 
-  Vector list;
+  MaxVector list;
   ObjectSetListModel model;
 
   class ObjectSetListModel extends AbstractListModel
@@ -50,7 +51,7 @@ public class FtsObjectSet extends FtsRemoteData
   {
     super();
 
-    list = new Vector();
+    list = new MaxVector();
     model = new ObjectSetListModel();
   }
 
@@ -118,7 +119,7 @@ public class FtsObjectSet extends FtsRemoteData
   }
 
 
-  public void find(FtsObject context, Vector values)
+  public void find(FtsObject context, MaxVector values)
   {
     remoteCall(REMOTE_FIND, context, values);
     Fts.sync();
@@ -128,7 +129,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   public void findErrors(FtsObject context)
   {
-    remoteCall(REMOTE_FIND_ERRORS, context, (Vector) null);
+    remoteCall(REMOTE_FIND_ERRORS, context, (MaxVector) null);
     Fts.sync();
     model.listChanged();
   }
@@ -136,7 +137,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   public void findFriends(FtsObject target)
   {
-    remoteCall(REMOTE_FIND_FRIENDS, target, (Vector) null);
+    remoteCall(REMOTE_FIND_FRIENDS, target, (MaxVector) null);
     Fts.sync();
     model.listChanged();
   }

@@ -222,8 +222,7 @@ fts_client_upload_object(fts_object_t *obj)
      fts_object_send_properties(obj);
      */
 
-  if (fts_object_get_patcher(obj))
-    fts_object_send_properties(obj);
+  fts_object_send_properties(obj);
 
   /* Also, send to the object the message upload, in the case
      the object have more data/initialization to do */

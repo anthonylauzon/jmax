@@ -43,7 +43,10 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler{
     boolean temp = (((Integer)value).intValue() == 1);
     if (itsToggled != temp) {
       itsToggled = temp;	
-      Paint_specific(itsSketchPad.getGraphics());
+
+      Graphics g = itsSketchPad.getGraphics();
+      Paint_specific(g);
+      g.dispose();
     }
   }
 

@@ -68,10 +68,7 @@
 
 static void fts_messtile_install_all();
 
-static fts_symbol_t fts_s_open;
 static fts_symbol_t fts_s_download;
-static fts_symbol_t fts_s_close;
-static fts_symbol_t fts_s_outlet;
 static fts_symbol_t fts_s_load_init;
 
 /******************************************************************************/
@@ -92,10 +89,7 @@ fts_messtile_init()
 {
   fts_messtile_install_all();
 
-  fts_s_outlet = fts_new_symbol("outlet");
-  fts_s_open = fts_new_symbol("open");
   fts_s_download = fts_new_symbol("download");
-  fts_s_close = fts_new_symbol("close");
   fts_s_load_init = fts_new_symbol("load_init");
 }
 
@@ -452,7 +446,9 @@ fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
       patcher = (fts_object_t *) fts_get_object(&av[0]);
 
       if (patcher)
-	fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
+	{
+	  fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
+	}
       else
 	post_mess("System Error in FOS message OPEN PATCHER: null patcher", ac, av);
     }
@@ -914,6 +910,39 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
     post_mess("System Error in FOS message GETPROP: bad args", ac, av);
 }
 
+
+/*
+   GETDONE (obj)o 
+
+   Temporary solution to the problem of the soft-synvc
+   (callback based sync).
+   Put the "done" property in an object to 1, and send it back
+   to the client; on the client side, can be used to call a callback
+   after all the other requests have been completed (open, download).
+   */
+
+static void 
+fts_mess_client_get_done(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received get done", ac, av);
+
+  if ((ac == 1) &&
+      fts_is_object(&av[0]))
+    {
+      fts_object_t *obj;
+      fts_atom_t   a;
+
+
+      obj  = fts_get_object(&av[0]);
+      fts_set_int(&a, 1);
+
+      fts_object_put_prop(obj, fts_s_done, &a);
+      fts_object_property_changed(obj, fts_s_done);
+    }
+  else
+    post_mess("System Error in FOS message GETDONE: bad args", ac, av);
+}
+
 /*
    GETALLPROP (obj)o (symbol)name
 
@@ -1021,6 +1050,7 @@ fts_messtile_install_all()
   fts_client_mess_install(NAMED_MESSAGE_CODE, fts_mess_client_nmess);
   fts_client_mess_install(PUTPROP_CODE,  fts_mess_client_put_prop);
   fts_client_mess_install(GETPROP_CODE,  fts_mess_client_get_prop);
+  fts_client_mess_install(GETDONE_CODE,  fts_mess_client_get_done);
   fts_client_mess_install(GETALLPROP_CODE,  fts_mess_client_get_all_prop);
   fts_client_mess_install(REMOTE_CALL_CODE,  fts_mess_client_remote_call);
   fts_client_mess_install(FTS_SHUTDOWN_CODE,  fts_mess_client_shutdown);

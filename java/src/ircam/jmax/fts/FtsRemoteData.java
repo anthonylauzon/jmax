@@ -2,7 +2,9 @@ package ircam.jmax.fts;
 
 import java.lang.*;
 import java.util.*;
+
 import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 
 public abstract class FtsRemoteData implements MaxData {
   
@@ -78,7 +80,7 @@ public abstract class FtsRemoteData implements MaxData {
     Fts.getServer().remoteCall(this, key, obj, args);
   }
 
-  public void remoteCall( int  key, FtsObject obj, Vector args)
+  public void remoteCall( int  key, FtsObject obj, MaxVector args)
   {
     Fts.getServer().remoteCall(this, key, obj, args);
   }

@@ -3,6 +3,7 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.util.*;
 
+import ircam.jmax.utils.*;
 
 /**
  * The abstract base class for (object's) graphic inlet and outlets
@@ -18,7 +19,7 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   protected final int DRAW = 1;
   protected int itsCurrentDrawingMethod = DRAW;
   
-  public Vector itsConnections;
+  public MaxVector itsConnections;
   static Dimension preferredSize;
   boolean itsAlreadyMoveIn = false;
   Rectangle currentBounds = new Rectangle();
@@ -31,16 +32,21 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   //--------------------------------------------------------
   public ErmesObjInOutlet(ErmesObject theOwner, int x_coord, int y_coord){
     
-    itsConnections = new Vector();
+    itsConnections = new MaxVector();
     itsX = x_coord;
     itsY = y_coord;
 
     itsOwner = theOwner;
     selected = false;
     connected = false;
-    if (preferredSize == null) preferredSize = new Dimension(7,9);
-    if (IsInlet()) itsY-=9;
-    else itsY+= itsOwner.getItsHeight();
+    preferredSize = new Dimension(7,9);
+
+    if (IsInlet())
+      itsY-=9;
+    else
+      itsY+= itsOwner.getItsHeight();
+
+    recomputeBounds();
     updateAnchorPoint();
   }
 
@@ -70,7 +76,9 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   void Repaint(boolean paintNow) {
     ErmesSketchPad mySketch = itsOwner.itsSketchPad;
     if (paintNow) {
-      Update(mySketch.getGraphics());
+      Graphics g = mySketch.getGraphics();
+      Update(g);
+      g.dispose();
       Update(mySketch.offGraphics);
       for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
 	((ErmesConnection)e.nextElement()).DoublePaint();
@@ -101,17 +109,23 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   //--------------------------------------------------------
   //	Bounds
   //--------------------------------------------------------
-  public Rectangle Bounds(){
-    currentBounds.setBounds(itsX, itsY, preferredSize.width, preferredSize.height);
+
+  final Rectangle Bounds(){
     return currentBounds;
   }
   
-  public Rectangle getSensibleBounds() {
-    if (IsInlet()) currentSensibleBounds.setBounds(itsX-2, itsY+4, preferredSize.width+4, preferredSize.height);
-    else {
-      currentSensibleBounds.setBounds(itsX-2, itsY-4,preferredSize.width+4, preferredSize.height);
-    }
+  final Rectangle getSensibleBounds() {
     return currentSensibleBounds;
+  }
+
+  private final void recomputeBounds() {
+    if (IsInlet())
+      currentSensibleBounds.setBounds(itsX-2, itsY+4, preferredSize.width+4, preferredSize.height);
+    else 
+      currentSensibleBounds.setBounds(itsX-2, itsY-4,preferredSize.width+4, preferredSize.height);
+
+    currentBounds.setBounds(itsX, itsY, preferredSize.width, preferredSize.height);
+
   }
 
   //--------------------------------------------------------
@@ -156,13 +170,18 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   //--------------------------------------------------------
   //	GetConnections
   //--------------------------------------------------------
-  public Vector GetConnections(){
+  public MaxVector GetConnections(){
     return itsConnections;
   }
   
   //--------------------------------------------------------
   //	IsInlet
   //--------------------------------------------------------
+
+  // This method shoud not exists; differences between inlets
+  // and outlets should not be decided here, but in the
+  // code of the two classes, by specialing methods
+
   abstract boolean IsInlet(); /*{return true;}*/
   
   //--------------------------------------------------------
@@ -190,7 +209,11 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
 
     if (toPaint) {
       //if (paintNow) {
-      Paint(mySketch.getGraphics());
+
+      Graphics g = mySketch.getGraphics();
+      Paint(g);
+      g.dispose();
+
       Paint(mySketch.offGraphics);
       for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
 	((ErmesConnection)e.nextElement()).DoublePaint();	  
@@ -213,6 +236,7 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   
   public void MoveTo(int theX, int theY) {
     itsX=theX; itsY=theY;
+    recomputeBounds();
     updateAnchorPoint();
     itsCurrentDrawingMethod = DRAW;
   }

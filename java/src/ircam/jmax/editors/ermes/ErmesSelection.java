@@ -2,19 +2,21 @@
 package ircam.jmax.editors.ermes;
 
 import java.util.*;
+
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 /**
  * A class representing a selection in Ermes, with its associated FtsSelection
  * object.
  * Some implementation choices:
- * 1) the class does not derives from Vector (the simplest solution) because
+ * 1) the class does not derives from MaxVector (the simplest solution) because
  * of the insertElementAt() problem: public this function is infact "final".
  * 2) This class is then a wrapper (redefinition) of a set of methods of Vector
  */
 public class ErmesSelection {
-  public Vector itsObjects = new Vector();
-  public Vector itsConnections = new Vector();
+  public MaxVector itsObjects = new MaxVector();
+  public MaxVector itsConnections = new MaxVector();
   FtsSelection itsFtsSelection;
 
   public ErmesSelection(FtsSelection theFtsSelection) {

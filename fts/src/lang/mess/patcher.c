@@ -297,7 +297,7 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
    */
 
 
-/*static*/ void
+static void
 patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
@@ -306,11 +306,7 @@ patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->open = 1;
 
   for (p = this->objects; p ; p = p->next_in_patcher)
-      fts_object_send_properties(p);
-
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    if (! fts_object_is_patcher(p))
-      fts_send_message(p, winlet, s, ac, at);
+      fts_object_send_ui_properties(p);
 }
 
 
@@ -331,10 +327,6 @@ patcher_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_object_t *p;
 
   this->open = 0;
-
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    if (! fts_object_is_patcher(p))
-      fts_send_message(p, winlet, s, ac, at);
 }
 
 /* 

@@ -10,7 +10,6 @@ import java.util.*;
 public class ErmesObjInlet extends ErmesObjInOutlet{
 	
   int itsInletNum;
-  static int debug_count = 1;
   
   public ErmesObjInlet(int theInletNum, ErmesObject theOwner, int x_coord, int y_coord) 
   {

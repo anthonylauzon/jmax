@@ -2,6 +2,8 @@ package ircam.jmax.toolkit;
 
 import java.util.*;
 
+import ircam.jmax.utils.*;
+
 /**
  * An abstract base class implementing the selection interface.
  * It takes care of the listener's mechanism.
@@ -14,8 +16,8 @@ public abstract class AbstractSelection implements SelectionHandler {
    */
   public AbstractSelection() 
   {
-    selected = new Vector();
-    listeners = new Vector();
+    selected = new MaxVector();
+    listeners = new MaxVector();
   }
 
   /**
@@ -109,6 +111,6 @@ public abstract class AbstractSelection implements SelectionHandler {
 
   //--- Fields
 
-  protected Vector selected;
-  protected Vector listeners;
+  protected MaxVector selected;
+  protected MaxVector listeners;
 }

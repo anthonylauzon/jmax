@@ -58,7 +58,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
     //handle the "error" property, the only one we're listening at
     // call super for the others
 
-    if (name.equals("error"))
+    if (name == "error")
       {
 	if ((value != null) && (value instanceof Integer))
 	  {

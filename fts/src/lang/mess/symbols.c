@@ -78,6 +78,7 @@ fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_error;
 fts_symbol_t fts_s_error_description;
 fts_symbol_t fts_s_state;
+fts_symbol_t fts_s_done;
 
 /* Symbols related to builtin classes */
 
@@ -188,6 +189,7 @@ fts_predefine_symbols(void)
   fts_s_error_description  = fts_new_symbol("errdesc");
   fts_s_size       = fts_new_symbol("size");
   fts_s_state      = fts_new_symbol("state");
+  fts_s_done       = fts_new_symbol("done");
 
   /* Symbols related to builtin classes */
 

@@ -12,19 +12,6 @@ import ircam.jmax.mda.*;
 
 public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
 {
-  /**
-   * QlistMessageHandler interpret the dedicated messages 
-   * coming from FTS to the qlist object
-   */
-
-  class QlistMessageHandler implements FtsMessageHandler
-  {
-    public void handleMessage(FtsMessage msg)
-    {
-      list.updateFromMessage(msg);
-    }
-  }
-
   FtsAtomList list = new FtsAtomList(this);
 
   /*****************************************************************************/
@@ -40,8 +27,6 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
   FtsQlistObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
-
-    installMessageHandler(new QlistMessageHandler());
   }
 
   // FtsObjectWithData implementation
@@ -70,6 +55,11 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
     list = (FtsAtomList) data;
     list.setObject(this);
     this.list.changed();
+  }
+
+  public void handleMessage(FtsMessage msg)
+  {
+    list.updateFromMessage(msg);
   }
 
   public void delete()
