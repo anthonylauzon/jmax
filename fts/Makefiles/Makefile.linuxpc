@@ -7,34 +7,39 @@
 VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
+
+
+# Standard gcc
 #CC := gcc
+#ARCH_CFLAGS :=  -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+#ARCH_OPT_CFLAGS := -O6 -funroll-all-loops 
 #LD := gcc
-CC := gcc.bak
-LD := gcc.bak
-#CC := pgcc
-#LD := pgcc
+#ARCH_LDFLAGS := -rdynamic  
 
+
+# Pentium gcc
+CC := pentium-gcc
+LD := pentium-gcc
 #ARCH_CFLAGS := -B/usr/lib/gcc-lib/ -idirafter /usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/include/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+ARCH_CFLAGS := -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/ -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
+ARCH_LDFLAGS := -rdynamic -B/usr/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/
+ARCH_OPT_LDFLAGS := 
 
-ARCH_CFLAGS :=  -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
 
-
-ARCH_LDFLAGS := -rdynamic  
+# Common to gcc and Pentium gcc
 LD_ALL_FLAG := --whole-archive
 LD_NONE_FLAG := --no-whole-archive
 CC_ALL_FLAG := -Xlinker --whole-archive
 CC_NONE_FLAG := -Xlinker --no-whole-archive
 
+
+# Portland compiler
+#CC := pgcc
+#LD := pgcc
 #ARCH_CFLAGS := -DLINUX -DLINUXPC
-
-# Pentium gcc special options; you need the compiler on linotte do use this !!!
-#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
-ARCH_OPT_CFLAGS := -O6 -funroll-all-loops 
-#ARCH_OPT_CFLAGS := -O6 -mpentium
 #ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
-
 #ARCH_OPT_LDFLAGS := -v
-ARCH_OPT_LDFLAGS := 
 
 FTS_SYS_LIBS = -lm -ldl
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
