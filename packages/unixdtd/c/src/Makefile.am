@@ -19,3 +19,5 @@ dtddefs.h \
 dtdfifo.h \
 dtdserver.h \
 libtime.h
+
+INCLUDES=-I$(top_srcdir)/include

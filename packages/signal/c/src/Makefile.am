@@ -20,7 +20,7 @@ wave.c \
 wave_ieeewrap.c \
 white.c
 
-INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src -I@top_srcdir@/packages/ispw/c/src
+INCLUDES=-I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src -I$(top_srcdir)/packages/ispw/c/src
 
 noinst_HEADERS=  \
 delay.h \

@@ -26,3 +26,5 @@ sequence.h \
 track.h
 
 libsequence_la_LDFLAGS= -module
+
+INCLUDES=-I$(top_srcdir)/include

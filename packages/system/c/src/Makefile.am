@@ -17,4 +17,5 @@ system.h
 
 libsystem_la_LDFLAGS= -module
 
+INCLUDES=-I$(top_srcdir)/include
 
