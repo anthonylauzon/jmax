@@ -22,6 +22,5 @@ SOURCES = MaxFtsConnectCmd.java\
 	  MaxSysSourceCmd.java      \
 	  MaxSplashCmd.java    \
 	  MaxGetMaxVersionCmd.java \
-          MaxPreloadClassCmd.java \
 	  TclMaxPackage.java
 

@@ -4,18 +4,23 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
 
 //
 // The "comment" graphic object
 //
-public class ErmesObjComment extends ErmesObjEditableObject {
 
+public class ErmesObjComment extends ErmesObjEditableObject
+{
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
+
   ErmesObjComment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
@@ -37,6 +42,22 @@ public class ErmesObjComment extends ErmesObjEditableObject {
     ((FtsCommentObject)ftsObject).setComment( text);
 
     super.redefine(text);
+  }
+
+  protected void computeRenderer()
+  {
+    String args = getArgs();
+    Icon icon = null;
+
+    // Change the renderer if needed
+
+    if (args.charAt(0) == '%')
+      icon = Icons.get(args);
+
+    if (icon != null)
+      renderer = new IconRenderer(this, icon);
+    else if (! (renderer instanceof TextRenderer))
+      renderer = new TextRenderer(this);
   }
 
   // ----------------------------------------

@@ -24,3 +24,13 @@ declareIcon _lock_mode_         $jmaxRootDir/images/tool_lock_mode.gif
 declareIcon _edit_mode_         $jmaxRootDir/images/tool_edit_mode.gif
 declareIcon _up_                $jmaxRootDir/images/tool_up.gif
 
+declareIcon %jmax               $jmaxRootDir/images/jmax_logo_tiny.gif
+declareIcon %new                $jmaxRootDir/images/new.gif
+declareIcon %hot                $jmaxRootDir/images/hot.gif
+declareIcon %stop               $jmaxRootDir/images/stop.gif
+declareIcon %at_work	        $jmaxRootDir/images/at_work.gif
+declareIcon %question     	$jmaxRootDir/images/question.gif
+declareIcon %warning       	$jmaxRootDir/images/warning.gif
+declareIcon %info               $jmaxRootDir/images/info.gif
+declareIcon %linux              $jmaxRootDir/images/linux.gif
+declareIcon %forum              $jmaxRootDir/images/forum.gif

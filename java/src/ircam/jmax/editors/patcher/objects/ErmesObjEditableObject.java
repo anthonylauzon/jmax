@@ -26,22 +26,12 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     super( theSketchPad, theFtsObject);
 
-    Icon icon = Icons.get(ftsObject.getClassName());
+    computeRenderer();
+    renderer.update();
+    updateDimensions();
 
-    if (icon != null)
-      {
-	renderer = new IconRenderer(this, icon);
-	renderer.update();
-	updateDimensions();
-      }
-    else
-      {
-	renderer = new TextRenderer(this);
-	renderer.update();
-
-	if (getWidth() == -1)
-	  setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
-      }
+    if ((renderer instanceof TextRenderer) && (getWidth() == -1))
+      setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
   }
 
   public void updateDimensions()
@@ -57,28 +47,29 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     super.setHeightNoConnections(renderer.getHeight() + getTextHeightOffset());
   }
 
-  public void redefine( String text) 
+  // By default, get an image renderer if there is an icon named as the class name,
+  // otherwise text.
+
+  protected void computeRenderer()
   {
+    Renderer r;
     // Change the renderer if needed
 
     Icon icon = Icons.get(ftsObject.getClassName());
 
     if (icon != null)
-      {
-	redraw();
-	renderer = new IconRenderer(this, icon);
-	renderer.update();
-	redraw();
-      }
+      renderer = new IconRenderer(this, icon);
     else if (! (renderer instanceof TextRenderer))
-      {
-	redraw();
-	renderer = new TextRenderer(this);
-	renderer.update();
-	redraw();
-      }
+      renderer = new TextRenderer(this);
+  }
 
-    
+
+  public void redefine( String text) 
+  {
+    redraw();
+    computeRenderer();
+    renderer.update();
+    redraw();
     updateDimensions();
 
     super.redefine(text);
