@@ -49,7 +49,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   
   //--- Fields
   private static SequenceSelection current;
-    private static MaxVector itsCopy = new MaxVector();
+  private static MaxVector itsCopy = new MaxVector();
 
   public DataFlavor flavors[];
 
@@ -58,6 +58,9 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   private SelectionOwner itsOwner;  
   protected  TrackDataModel itsModel;
   protected TrackEvent lastSelectedEvent = null;
+  private Vector pastedObjects = new Vector();
+
+  boolean pasting = false;
 
   // Implementation notes: 
   // The ListSelectionModel, and then the SequenceSelection, 
@@ -286,17 +289,20 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   public void objectAdded(Object spec, int index) 
   {
-      /*int i;
+    /*int i;
+      
+      if (index > getMaxSelectionIndex()) return;
+      for (i = index+1; i >  getMinSelectionIndex(); i--)
+      {
+      if (isSelectedIndex(i-1))
+      addSelectionInterval(i, i);
+      else removeSelectionInterval(i, i);
+      }*/
+    //deselectAll();
+    select(spec);    
 
-	if (index > getMaxSelectionIndex()) return;
-	for (i = index+1; i >  getMinSelectionIndex(); i--)
-	{
-	if (isSelectedIndex(i-1))
-	addSelectionInterval(i, i);
-	else removeSelectionInterval(i, i);
-	}*/
-      //deselectAll();
-      select(spec);    
+    if( pasting)
+      pastedObjects.add( spec);
   }
   public void objectsAdded(int maxTime) {}
 
@@ -373,6 +379,16 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void endTrackUpload() 
   {
     deselectAll();
+  }
+  public void startPaste() 
+  {
+    pasting = true;
+  }
+  public void endPaste() 
+  {
+    pasting = false;
+    select( pastedObjects.elements());
+    pastedObjects.removeAllElements();
   }
   public void trackNameChanged(String oldName, String newName){}
 

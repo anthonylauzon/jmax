@@ -47,5 +47,7 @@ public interface TrackDataListener {
   abstract public void trackNameChanged(String oldName, String newName);
   abstract public void trackCleared();
   abstract public void endTrackUpload();
+  abstract public void startPaste();
+  abstract public void endPaste();
 }
 

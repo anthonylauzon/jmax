@@ -97,6 +97,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 	//pack();
     }
   public void endTrackUpload(){}    
+  public void startPaste(){}    
+  public void endPaste(){}    
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
   public void trackNameChanged(String oldName, String newName){};

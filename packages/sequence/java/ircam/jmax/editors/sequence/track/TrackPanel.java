@@ -235,6 +235,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void objectDeleted(Object whichObject, int index){}
   public void trackCleared(){}
   public void endTrackUpload(){}
+  public void startPaste(){}
+  public void endPaste(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
   {

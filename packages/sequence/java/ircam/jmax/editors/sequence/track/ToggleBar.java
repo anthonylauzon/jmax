@@ -113,6 +113,8 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	    public void objectDeleted(Object whichObject, int index){}
 	    public void trackCleared(){}
 	    public void endTrackUpload(){}
+	    public void startPaste(){}
+	    public void endPaste(){}
 	    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
 	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
 	    public void trackNameChanged(String oldName, String newName)

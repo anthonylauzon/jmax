@@ -63,6 +63,8 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
 	      AnythingTrackEditor.this.repaint();
 	    }
 	    public void endTrackUpload(){}
+	    public void startPaste(){}
+	    public void endPaste(){}
 	    public void objectAdded(Object whichObject, int index) 
 	    { 
 	      AnythingTrackEditor.this.repaint();

@@ -231,42 +231,44 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
   }
 
   public void endTrackUpload(){}
+  public void startPaste(){}
+  public void endPaste(){}
     
-    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) 
-    {
-	repaint();
-    }
-
-    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) 
+  {
+    repaint();
+  }
+  
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+  
+  public void trackNameChanged(String oldName, String newName) 
+  {
+    track.setProperty("trackName", newName);
+  }
+  
+  /**
+   * ListSelectionListener interface
+   */
     
-    public void trackNameChanged(String oldName, String newName) 
-    {
-	track.setProperty("trackName", newName);
-    }
+  public void valueChanged(ListSelectionEvent e)
+  {
+    repaint();
+  }
 
-    /**
-     * ListSelectionListener interface
-     */
+  /* avoid to paint the white background twice*/   
+  public void update(Graphics g) {}
+  
+  
+  /**
+   * get the lenght (in milliseconds) of the window
+   */
+  public int windowTimeWidth() 
+  {
+    return (int) (gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND)) - 1;
     
-    public void valueChanged(ListSelectionEvent e)
-    {
-	repaint();
-    }
-
-    /* avoid to paint the white background twice*/   
-    public void update(Graphics g) {}
-    
-    
-    /**
-     * get the lenght (in milliseconds) of the window
-     */
-    public int windowTimeWidth() 
-    {
-	return (int) (gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND)) - 1;
-	
-    }
-
-
+  }
+  
+  
   /**
    * from the StatusBarClient interface
    */
@@ -284,46 +286,44 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     return null;
   }
 
-    public SequenceSelection getSelection()
-    {
-	return selection;
-    }
+  public SequenceSelection getSelection()
+  {
+    return selection;
+  }
+  
 
+  public void dispose()
+  {
+    if(listDialog != null)
+      listDialog.dispose();
+  }
+  
 
-    public void dispose()
-    {
-	if(listDialog != null)
-	    listDialog.dispose();
-    }
+  public Component getComponent()
+  {
+    return component;
+  }
+  
+  public void setComponent(Component c)
+  {
+    component = c;
+  }
+  
+  public SequenceGraphicContext getGraphicContext()
+  {
+    return gc;
+  }
 
-
-    public Component getComponent()
-    {
-      return component;
-    }
-
-    public void setComponent(Component c)
-    {
-      component = c;
-    }
-
-    public SequenceGraphicContext getGraphicContext()
-    {
-	return gc;
-    }
-
-    // good old f*****g HTML-style...
-
-    public Dimension getPreferredSize()
-    {
-	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
-    }
-
-    public Track getTrack()
-    {
-	return track;
-    }
-
+  public Dimension getPreferredSize()
+  {
+    return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
+  }
+  
+  public Track getTrack()
+  {
+    return track;
+  }
+  
     public void updateNewObject(Object obj){};
 
     public void setViewMode(int viewType)

@@ -123,6 +123,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	((FtsTrackObject)obj).endUpload();		  
       }
     });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("endPaste"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).endPaste();		  
+      }
+    });
   }
 
   /**
@@ -478,6 +484,18 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     catch(IOException e)
       {
 	System.err.println("FtsTrackObject: I/O Error sending upload Message!");
+	e.printStackTrace(); 
+      }  
+  }
+
+  public void requestEndPaste()
+  {
+    try{
+      send( FtsSymbol.get("endPaste"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsTrackObject: I/O Error sending endPaste Message!");
 	e.printStackTrace(); 
       }  
   }
@@ -863,6 +881,16 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((TrackDataListener) e.nextElement()).endTrackUpload();
   }
+  private void notifyStartPaste()
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TrackDataListener) e.nextElement()).startPaste();
+  }
+ private void notifyEndPaste()
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TrackDataListener) e.nextElement()).endPaste();
+  }
   private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
@@ -975,9 +1003,9 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     if (objectsToPaste != null)
       {
 	Event event;
-				
+	
 	SequenceSelection.getCurrent().deselectAll();
-
+	
 	if(objectsToPaste.hasMoreElements())
 	  {
 	    event = (Event) objectsToPaste.nextElement();
@@ -991,15 +1019,17 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	      }
 
 	    try {
+	      
+	      startPaste();
 
 	      beginUpdate();  //the paste is undoable
 
-
+	      
 	      requestEventCreationWithoutUpload((float)event.getTime(), 
 						event.getValue().getValueInfo().getName(), 
 						event.getValue().getPropertyCount(), 
 						event.getValue().getPropertyValues());
-		    
+	      
 	      while (objectsToPaste.hasMoreElements())
 		{
 		  event = (Event) objectsToPaste.nextElement();
@@ -1010,6 +1040,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 		}
 		    
 	      requestUpload();
+
+	      requestEndPaste();
 	    }
 	    catch (Exception e) {}
 	  }
@@ -1365,9 +1397,24 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     notifyUploadEnd();
   }
 
+  // Paste
+
+  void startPaste()
+  {
+    pasting = true;
+    notifyStartPaste();
+  }
+
+  void endPaste()
+  {
+    pasting = false;
+    notifyEndPaste();
+  }
+
   //---  AbstractSequence fields
   ValueInfo info;
 
+  boolean pasting  = false;
   boolean locked = false;
   int events_size   = 256;	// 
   int events_fill_p  = 0;	// next available position
