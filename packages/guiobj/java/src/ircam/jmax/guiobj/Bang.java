@@ -58,8 +58,20 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
  
     boolean flashing = false;
     boolean isResizing = false;
-    int flashColorIndex = ColorPopUpMenu.getColorIndex("yellow")+1;  
-
+    int flashColorIndex = 1;  
+    Color itsColor = Color.yellow;
+    
+    private static JMenuItem colorItem = new JMenuItem("Change color");
+    static
+    {
+	colorItem.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e)
+		{
+		    Color color = JColorChooser.showDialog(null,"Choose Source Color", Color.yellow);
+		    ((Bang)ObjectPopUp.getPopUpTarget()).setColor(color);
+		}
+	    });
+    }
     public static BangControlPanel controlPanel = new BangControlPanel();
 
     public Bang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
@@ -82,7 +94,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     
 	//don't save images during the resize
 	if(!isResizing)
-	    updateImages(theWidth, flashColorIndex);
+	    updateImages(theWidth, flashColorIndex, itsColor);
 
 	super.setWidth( theWidth);
 	super.setHeight( theWidth);  
@@ -110,41 +122,54 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 
 	//save images at the end of resize
 	if(!isResizing)
-	    updateImages(getWidth(), flashColorIndex);
+	    updateImages(getWidth(), flashColorIndex, itsColor);
     }
 
     public void valueChanged(int value) 
     {
 	int flash = value;
 
-	if (flash <= 0)
+	if (flash == 0)
 	    {
 		itsFlashColor = Settings.sharedInstance().getUIColor();
+		flashColorIndex = 0;
 		flashing = false;
 	    }
 	else
 	    {
-		itsFlashColor = ColorPopUpMenu.getColorByIndex(flash);
-		if(flash!=flashColorIndex)
+		if(flash > 0)//compatibility with old color model
 		    {
-			flashColorIndex = flash;
-			updateFlashingImage(getWidth(), flashColorIndex);	
+			itsColor = Color.yellow;
+			flashColorIndex = itsColor.getRGB();
+			itsFlashColor = itsColor;
+			updateFlashingImage(getWidth(), flashColorIndex, itsColor);	
+		    }
+		else
+		    {
+			if(flash!=flashColorIndex)
+			    {
+				flashColorIndex = flash;
+				itsColor = new Color(flashColorIndex);
+				itsFlashColor = itsColor;
+				updateFlashingImage(getWidth(), flashColorIndex, itsColor);	
+			    }		
 		    }
 		flashing = true;
 	    }
 	updateRedraw();
     }
 
-    //called from the popupmenu
-    public void setColor(int index)
+    //called from the changecolorPanel
+    public void setColor(Color color)
     {
-	flashColorIndex = index;
-	updateFlashingImage(getWidth(), flashColorIndex);	
+	itsColor = color;
+	flashColorIndex = color.getRGB();
+	updateFlashingImage(getWidth(), flashColorIndex, itsColor);	
 	
-	super.setColor(index);
+	super.setColor(flashColorIndex);
     }
     
-    void updateImages(int w, int color)
+    void updateImages(int w, int colorIndex, Color color)
     {
 	BangKey key = new BangKey(w, 0);
 	if(!imageTable.containsKey(key))
@@ -165,12 +190,12 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 		
 		imageTable.put(key, image);	      
 	    }
-	updateFlashingImage(w, color);      
+	updateFlashingImage(w, colorIndex, color);      
     }
 
-    void updateFlashingImage(int w, int color)
+    void updateFlashingImage(int w, int colorId, Color color)
     {
-	BangKey key = new BangKey(w, color);
+	BangKey key = new BangKey(w, colorId);
 	if(!imageTable.containsKey(key))
 	  {
 	      Image image = itsSketchPad.createImage(w-5, w-5);
@@ -183,7 +208,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 				  RenderingHints.VALUE_ANTIALIAS_ON);
 	      g2.setPaint(Settings.sharedInstance().getUIColor());
 	      g2.fill(new Rectangle2D.Double(0, 0, w-5, w-5));
-	      g2.setPaint(ColorPopUpMenu.getColorByIndex(color));
+	      g2.setPaint(color);
 	      Ellipse2D.Double el = new Ellipse2D.Double(1, 1, w-7, w-7);
 	      g2.fill(el);
 	      g2.setPaint(Color.black);
@@ -242,7 +267,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 		if(image!=null)
 		    g.drawImage(image, x+2, y+2, this);
 		else
-		    updateImages(w, flashColorIndex);
+		    updateImages(w, flashColorIndex, itsColor);
 	    }
 
 	super.paint( g);
@@ -264,7 +289,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     if(image!=null)
 	g.drawImage(image, x+2, y+2, this);
     else
-	updateImages(w, flashColorIndex);
+	updateImages(w, flashColorIndex, itsColor);
   }
 
   public ObjectControlPanel getControlPanel()
@@ -277,14 +302,14 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
   {
     super.popUpUpdate(onInlet, onOutlet, area);
     ObjectPopUp.addSeparation();
-    ObjectPopUp.getInstance().add(ColorPopUpMenu.getInstance());    
+    ObjectPopUp.getInstance().add(colorItem);    
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
   }
   public void popUpReset()
   {
     super.popUpReset();
-    ObjectPopUp.getInstance().remove(ColorPopUpMenu.getInstance());
+    ObjectPopUp.getInstance().remove(colorItem);
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     ObjectPopUp.removeSeparation();
   }
@@ -321,6 +346,13 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	}
     }
 }
+
+
+
+
+
+
+
 
 
 
