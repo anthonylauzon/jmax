@@ -341,6 +341,10 @@ public class MaxApplication extends Object
 	System.out.println("TCL error in initialization: " + itsInterp.getResult());
       }
     
+    System.out.println( "\n\nCopyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou");
+    System.out.println( "This is free software with ABSOLUTELY NO WARRANTY.");
+    System.out.println( "See file LICENSE for more details.");
+
     // Splash screen moved to a tcl command
     
     //if there were no connection statements in startup.tcl, ask the user
