@@ -1,2 +1,3 @@
-all	jmax
-all	jmax-make-abstraction-index
+all	all	jmax
+all	all	jmax-make-abstraction-index
+all	all	jmax-make-install
