@@ -27,6 +27,8 @@
 #include <fts/fts.h>
 #include "bpf.h"
 
+#define MAX_DOUBLE ((double)179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.0)
+
 /************************************************************
  *
  *  play
@@ -40,15 +42,15 @@ typedef struct _play_bpf_
   bpf_t *bpf;
   int index; /* current break point index */
 
-  double time; /* current segment time */
-  double incr; /* time increment (speed / sample rate) */
+  double position; /* current segment position */
+  double incr; /* position increment (speed / sample rate) */
   double target; /* target pasition */
 
   double speed; /* play speed */
   double sp; /* sample rate */
 
   enum play_mode {mode_play, mode_loop, mode_repeat} mode;
-  double loop_time;
+  double loop_position;
   
   fts_alarm_t alarm;
 } play_bpf_t;
@@ -63,7 +65,7 @@ static fts_symbol_t sym_end = 0;
  */
 
 static int
-play_bpf_adjust_start(bpf_t *bpf, int index, double time, double direction)
+play_bpf_adjust_start(bpf_t *bpf, int index, double position, double direction)
 {
   if(direction > 0.0 && bpf_get_time(bpf, index + 1) == bpf_get_time(bpf, index + 2))
     return index + 2;
@@ -74,24 +76,24 @@ play_bpf_adjust_start(bpf_t *bpf, int index, double time, double direction)
 }
 
 static int
-play_bpf_advance(bpf_t *bpf, int index, double time)
+play_bpf_advance(bpf_t *bpf, int index, double position)
 {
-  /* time must be > 0.0 */
-  if(time > bpf_get_time(bpf, index + 1))
+  /* position must be > 0.0 */
+  if(position > bpf_get_time(bpf, index + 1))
     {
       index++;
       
-      while(time > bpf_get_time(bpf, index + 1))
+      while(position > bpf_get_time(bpf, index + 1))
 	index++;
     }
-  else if(time < bpf_get_time(bpf, index))
+  else if(position < bpf_get_time(bpf, index))
     {
       index--;
       
-      while(time < bpf_get_time(bpf, index))
+      while(position < bpf_get_time(bpf, index))
 	index--;
     }
-  else if(bpf_get_time(bpf, index) == bpf_get_time(bpf, index + 1))
+  else if(bpf_get_position(bpf, index) == bpf_get_time(bpf, index + 1))
     index++;
 
   return index;
@@ -108,13 +110,9 @@ play_bpf_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   play_bpf_t *this = (play_bpf_t *)o;
   bpf_t *bpf = bpf_atom_get(at);
-  double time = 0.0;
 
   if(this->bpf)
-    {
-      time = this->time;
-      fts_object_release((fts_object_t *)this->bpf);
-    }
+    fts_object_release((fts_object_t *)this->bpf);
 
   this->bpf = bpf;
 
@@ -122,11 +120,11 @@ play_bpf_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-play_bpf_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_bpf_position(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_bpf_t *this = (play_bpf_t *)o;
 
-  this->time = fts_get_number_float(at);
+  this->position = fts_get_number_float(at);
   this->incr = 0.0;
 }
 
@@ -144,8 +142,6 @@ play_bpf_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       if(target < 0.0)
 	target = 0.0;
-      else if(target > duration)
-	target = duration;
 
       if(ac > 2 && fts_is_number(at + 1))
 	{
@@ -153,18 +149,18 @@ play_bpf_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  
 	  if(period > 0.0)
 	    {
-	      double incr = this->sp * (target - this->time) / period;
+	      double incr = this->sp * (target - this->position) / period;
 
 	      this->incr = incr;
 	      this->target = target;	      
 
-	      this->index = play_bpf_adjust_start(this->bpf, this->index, this->time, incr);
+	      this->index = play_bpf_adjust_start(this->bpf, this->index, this->position, incr);
 
 	      return;
 	    }
 	}
       
-      this->time = target;
+      this->position = target;
       this->incr = 0.0; 
     }
 }
@@ -183,18 +179,18 @@ play_bpf_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       if(period > 0.0)
 	{	  
-	  double incr = this->sp * (duration - this->time) / period;
+	  double incr = this->sp * (duration - this->position) / period;
 
 	  this->incr = incr;
-	  this->target = duration;
+	  this->target = MAX_DOUBLE;
 
-	  this->index = play_bpf_adjust_start(this->bpf, this->index, this->time, incr);
+	  this->index = play_bpf_adjust_start(this->bpf, this->index, this->position, incr);
 
 	  return;
 	}
     }
 
-  this->time = duration;
+  this->position = duration;
   this->incr = 0.0;
 }
 
@@ -239,7 +235,7 @@ play_bpf_forward(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->speed = speed;
   this->incr = speed * this->sp;
 
-  this->index = play_bpf_adjust_start(this->bpf, this->index, this->time, 1.0);
+  this->index = play_bpf_adjust_start(this->bpf, this->index, this->position, 1.0);
     
   this->mode = mode_play;
 }
@@ -265,7 +261,7 @@ play_bpf_backward(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->speed = speed;
   this->incr = -speed * this->sp;
 
-  this->index = play_bpf_adjust_start(this->bpf, this->index, this->time, -1.0);
+  this->index = play_bpf_adjust_start(this->bpf, this->index, this->position, -1.0);
     
   this->mode = mode_play;
 }
@@ -275,7 +271,7 @@ play_bpf_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   play_bpf_t *this = (play_bpf_t *)o;
 
-  this->time = 0.0;
+  this->position = 0.0;
   play_bpf_forward(o, 0, 0, 0, 0);
 }
 
@@ -286,7 +282,7 @@ play_bpf_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   bpf_t *bpf = this->bpf;
   double duration = bpf_get_duration(bpf);
   double speed = 1.0;
-  double time = this->time;
+  double position = this->position;
   double start = 0.0;
   double end = duration;
   enum play_mode mode = mode_repeat;
@@ -343,9 +339,9 @@ play_bpf_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(speed == 0.0 || start == end)
     {
       /* stop */
-      this->loop_time = start;
+      this->loop_position = start;
 
-      this->time = start;
+      this->position = start;
 
       this->target = start;
       this->incr = 0.0;
@@ -365,11 +361,11 @@ play_bpf_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   else
     incr = -speed * this->sp;
 
-  this->loop_time = start;
+  this->loop_position = start;
 
   /* jump to beginning when not running towards loop end */
-  if((time > end || start > end || incr <= 0.0) && (time < end || start < end || incr >= 0.0))
-    this->time = start;
+  if((position > end || start > end || incr <= 0.0) && (position < end || start < end || incr >= 0.0))
+    this->position = start;
 
   this->index = play_bpf_adjust_start(this->bpf, this->index, start, incr);
 
@@ -386,7 +382,7 @@ play_bpf_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   bpf_t *bpf = this->bpf;
   int index = this->index;
   double duration = bpf_get_duration(bpf);
-  double time = this->time;
+  double position = this->position;
   double target = 0.0;
   double speed = 1.0;
 
@@ -418,16 +414,16 @@ play_bpf_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       this->speed = speed;
       this->mode = mode_play;
 
-      /* adjust increment to time and target */
-      if(target > time)
+      /* adjust increment to position and target */
+      if(target > position)
 	{
 	  this->incr = speed * this->sp;
-	  this->index = play_bpf_adjust_start(this->bpf, this->index, time, 1.0);
+	  this->index = play_bpf_adjust_start(this->bpf, this->index, position, 1.0);
 	}
-      else if(target < time)
+      else if(target < position)
 	{
 	  this->incr = -speed * this->sp;
-	  this->index = play_bpf_adjust_start(this->bpf, this->index, time, -1.0);
+	  this->index = play_bpf_adjust_start(this->bpf, this->index, position, -1.0);
 	}
       else
 	this->incr = 0.0;
@@ -491,48 +487,48 @@ play_bpf_ftl(fts_word_t *argv)
   bpf_t *bpf = this->bpf;
   int size = bpf_get_size(bpf);
   double duration = bpf_get_duration(bpf);
-  double time = this->time;
+  double position = this->position;
   double incr = this->incr;
   int index;
-  double curr_time, curr_value;
+  double curr_position, curr_value;
   double slope;
   
   if(size < 2)
     {
       incr = 0.0;
 
-      time = 0.0;
+      position = 0.0;
       index = 0;
 
-      curr_time = bpf_get_value(bpf, index);
+      curr_position = bpf_get_time(bpf, index);
       curr_value = bpf_get_value(bpf, index);
 
       slope = 0.0;
     }
   else
     {
-      if(time <= 0.0)
+      if(position <= 0.0)
 	{
-	  time = 0.0;
+	  position = 0.0;
 	  index = 0;
 	}
-      else if(time >= duration)
+      else if(position >= duration)
 	{
-	  time = duration;
+	  position = duration;
 	  index = size - 2;
 	}
       else
-	index = play_bpf_advance(bpf, this->index, time);
+	index = play_bpf_advance(bpf, this->index, position);
       
-      curr_time = bpf_get_time(bpf, index);
+      curr_position = bpf_get_time(bpf, index);
       curr_value = bpf_get_value(bpf, index);
 
-      slope = (bpf_get_value(bpf, index + 1) - curr_value) / (bpf_get_time(bpf, index + 1) - curr_time);
+      slope = (bpf_get_value(bpf, index + 1) - curr_value) / (bpf_get_time(bpf, index + 1) - curr_position);
     }
   
   if(incr == 0.0)
     {
-      float value = curr_value + slope * (time - curr_time);
+      float value = curr_value + slope * (position - curr_position);
       int i;
       
       for(i=0; i<n_tick; i++)
@@ -540,8 +536,8 @@ play_bpf_ftl(fts_word_t *argv)
     }
   else
     {
-      double next_time = bpf_get_time(bpf, index + 1);
-      double end_time = time + incr * n_tick;
+      double next_position = bpf_get_time(bpf, index + 1);
+      double end_position = position + incr * n_tick;
       double target;
 
       if(this->target < duration)
@@ -549,18 +545,18 @@ play_bpf_ftl(fts_word_t *argv)
       else
 	target = duration;
 	
-      if(end_time >= curr_time && end_time <= next_time && (target - end_time) * incr >= 0.0)
+      if(end_position >= curr_position && end_position <= next_position && (target - end_position) * incr >= 0.0)
 	{
-	  double dtime = time - curr_time;
+	  double dposition = position - curr_position;
 	  int i;
 	  
 	  for(i=0; i<n_tick; i++)
 	    {
-	      out[i] = curr_value + slope * dtime;
-	      dtime += incr;
+	      out[i] = curr_value + slope * dposition;
+	      dposition += incr;
 	    }
 	  
-	  time = end_time;
+	  position = end_position;
 	}
       else 
 	{
@@ -569,35 +565,35 @@ play_bpf_ftl(fts_word_t *argv)
       
 	  for(i=0; i<n_tick; i++)
 	    {
-	      out[i] = curr_value + slope * (time - curr_time);
+	      out[i] = curr_value + slope * (position - curr_position);
 	  
 	      if(incr != 0.0)
 		{
 		  /* increment */
-		  time += incr;
+		  position += incr;
 	      
 		  /* check if target reached */
-		  if((time - target) * incr >= 0.0)
+		  if((position - target) * incr >= 0.0)
 		    {
 		      switch (this->mode)
 			{
 			case mode_loop:
 			  {
 			    /* turn and loop back */
-			    double loop_time = this->loop_time;
+			    double loop_position = this->loop_position;
 			
 			    /* turn */
 			    incr = -incr;
-			    time = 2.0 * target - time;
+			    position = 2.0 * target - position;
 
-			    this->loop_time = target;
-			    target = loop_time;			
+			    this->loop_position = target;
+			    target = loop_position;			
 			  }
 			  break;
 		      
 			case mode_repeat:
 			  /* repeat from loop start */
-			  time += this->loop_time - target;
+			  position += this->loop_position - target;
 			  break;
 			
 			default:
@@ -608,19 +604,19 @@ play_bpf_ftl(fts_word_t *argv)
 			    fts_alarm_set_delay(&this->alarm, 0.00001);
 			    fts_alarm_arm(&this->alarm);
 			
-			    time = target;
+			    position = target;
 			  }
 			}
 		    }
 
-		  new_index = play_bpf_advance(bpf, index, time);
+		  new_index = play_bpf_advance(bpf, index, position);
 
 		  if(new_index != index)
 		    {
-		      curr_time = bpf_get_time(bpf, new_index);
+		      curr_position = bpf_get_time(bpf, new_index);
 		      curr_value = bpf_get_value(bpf, new_index);
 		      
-		      slope = (bpf_get_value(bpf, new_index + 1) - curr_value) / (bpf_get_time(bpf, new_index + 1) - curr_time);
+		      slope = (bpf_get_value(bpf, new_index + 1) - curr_value) / (bpf_get_time(bpf, new_index + 1) - curr_position);
 
 		      index = new_index;
 		    }
@@ -632,7 +628,7 @@ play_bpf_ftl(fts_word_t *argv)
     }
 
   this->incr = incr;
-  this->time = time;
+  this->position = position;
   this->index = index;
 }
 
@@ -654,12 +650,12 @@ play_bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   this->index = 0;
 
-  this->time = 0.0;
+  this->position = 0.0;
 
   this->target = 0.0;
   this->incr = 0.0;
 
-  this->loop_time = 0.0;
+  this->loop_position = 0.0;
   this->mode = mode_play;
 
   this->speed = 1.0;
@@ -702,8 +698,8 @@ play_bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("end"), play_bpf_end);
   fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), play_bpf_loop);
   
-  fts_method_define_varargs(cl, 0, fts_s_int, play_bpf_time);
-  fts_method_define_varargs(cl, 0, fts_s_float, play_bpf_time);
+  fts_method_define_varargs(cl, 0, fts_s_int, play_bpf_position);
+  fts_method_define_varargs(cl, 0, fts_s_float, play_bpf_position);
   fts_method_define_varargs(cl, 0, fts_s_list, play_bpf_target);
 
   fts_method_define_varargs(cl, 1, fts_s_int, play_bpf_set_speed);

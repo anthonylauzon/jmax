@@ -138,18 +138,21 @@ append_atom(char *str, const fts_atom_t *a)
 static void
 display_deliver(display_t *this)
 {
-  if(this->gate)
+  if(fts_object_patcher_is_open((fts_object_t *)this))
     {
-      this->pending = 0;
-      this->gate = 0;
-
-      fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
-
-      fts_alarm_set_delay(&this->alarm, this->period);
-      fts_alarm_arm(&this->alarm);
+      if(this->gate)
+	{
+	  this->pending = 0;
+	  this->gate = 0;
+	  
+	  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
+	  
+	  fts_alarm_set_delay(&this->alarm, this->period);
+	  fts_alarm_arm(&this->alarm);
+	}
+      else
+	this->pending = 1;
     }
-  else
-    this->pending = 1;
 }
 
 static void
@@ -157,42 +160,50 @@ display_alarm(fts_alarm_t *alarm, void *o)
 {
   display_t * this = (display_t *)o;
 
-  if(this->dsp)
+  if(fts_object_patcher_is_open((fts_object_t *)this))
     {
-      if(this->absmax == MIN_FLOAT)
+      if(this->dsp)
 	{
-	  this->pending = 0;
-	  this->gate = 1;
-	  this->dsp = 0;
-	}
-      else
-	{
-	  if(this->absmax != this->last)
+	  if(this->absmax == MIN_FLOAT)
 	    {
-	      sprintf(this->string, "~ %g", this->absmax);
-	      this->last = this->absmax;
-	      
-	      fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
+	      this->pending = 0;
+	      this->gate = 1;
+	      this->dsp = 0;
 	    }
-
-	  this->absmax = MIN_FLOAT;
+	  else
+	    {
+	      if(this->absmax != this->last)
+		{
+		  sprintf(this->string, "~ %g", this->absmax);
+		  this->last = this->absmax;
+		  
+		  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
+		}
+	      
+	      this->absmax = MIN_FLOAT;
+	      
+	      fts_alarm_set_delay(&this->alarm, this->period);
+	      fts_alarm_arm(&this->alarm);
+	    }
+	}
+      else if(this->pending)
+	{
+	  this->gate = 0;
+	  this->pending = 0;
+	  
+	  fts_client_send_message(o, fts_s_set, 1, &this->a);
 	  
 	  fts_alarm_set_delay(&this->alarm, this->period);
 	  fts_alarm_arm(&this->alarm);
 	}
-    }
-  else if(this->pending)
-    {
-      this->gate = 0;
-      this->pending = 0;
-
-      fts_client_send_message(o, fts_s_set, 1, &this->a);
-
-      fts_alarm_set_delay(&this->alarm, this->period);
-      fts_alarm_arm(&this->alarm);
+      else
+	this->gate = 1;
     }
   else
-    this->gate = 1;
+    { 
+      this->gate = 1;
+      this->pending = 0;
+    }
 }
 
 /************************************************************

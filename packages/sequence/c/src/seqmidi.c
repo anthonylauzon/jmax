@@ -42,10 +42,41 @@
  *  reading MIDI files
  *
  */
+fts_symbol_t
+get_file_name(fts_symbol_t name)
+{
+  const char *s = fts_symbol_name(name);
+  char name_str[128];
+  int size;
+  int i = strlen(s) - 1;
+
+  while(i > 0 && s[i] != '/' && s[i] != '.')
+    i--;
+
+  if(s[i] == '.')
+    size = i;
+  else
+    size = strlen(s);
+
+  while(i > 0 && s[i - 1] != '/')
+    i--;
+
+  size -= i;
+
+  if(size > 127)
+    size = 127;
+
+  snprintf(name_str, size + 1, "%s", s + i);
+
+  return fts_new_symbol_copy(name_str);
+}
 
 typedef struct _seqmidi_read_data_
 {
   sequence_t *sequence;
+
+  fts_symbol_t file_name;
+  int midi_track_number;
 
   /* for reading notes */
   eventtrk_t *note_track;
@@ -63,13 +94,13 @@ seqmidi_read_track_start(fts_midifile_t *file)
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   int i;
 
+  data->midi_track_number++;
   data->note_track = 0;
   data->control_track = 0;
   data->program_track = 0;
 
   return 1;
 }
-
 
 static int
 seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
@@ -82,10 +113,15 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
     {
       sequence_t *sequence = data->sequence;
       fts_atom_t a[1];
+      char str[128];
 
       /* create new track */
       fts_set_symbol(a, seqsym_note);  
       track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
+
+      /* name track */
+      snprintf(str, 128, "%s%d", fts_symbol_name(data->file_name), data->midi_track_number);
+      track_set_name((track_t *)track, fts_new_symbol_copy(str));
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -162,10 +198,15 @@ seqmidi_read_control_change(fts_midifile_t *file, int chan, int number, int valu
   if(!track)
     {
       sequence_t *sequence = data->sequence;
+      char str[128];
 
       /* create new track */
       fts_set_symbol(a, seqsym_midival);  
       track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
+
+      /* name track */
+      snprintf(str, 128, "%s%dcc", fts_symbol_name(data->file_name), data->midi_track_number);
+      track_set_name((track_t *)track, fts_new_symbol_copy(str));
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -201,10 +242,15 @@ seqmidi_read_program_change(fts_midifile_t *file, int chan, int program)
   if(!track)
     {
       sequence_t *sequence = data->sequence;
+      char str[128];
 
       /* create new track */
       fts_set_symbol(a, seqsym_midival);
       track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
+
+      /* name track */
+      snprintf(str, 128, "%s%dpc", fts_symbol_name(data->file_name), data->midi_track_number);
+      track_set_name((track_t *)track, fts_new_symbol_copy(str));
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -277,6 +323,9 @@ sequence_read_midifile(sequence_t *sequence, fts_symbol_t name)
       fts_midifile_set_read_functions(file, &read);
 
       data.sequence = sequence;
+      data.file_name = get_file_name(name);
+
+      data.midi_track_number = 0;
 
       /* init note track */
       data.note_track = 0;

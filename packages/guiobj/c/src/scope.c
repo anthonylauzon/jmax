@@ -99,7 +99,9 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   scope_reset(data);
 
   fts_set_float(a, this->period_msec);
-  fts_client_send_message(o, sym_set_period, 1, a);
+
+  if(fts_object_has_id(o))
+    fts_client_send_message(o, sym_set_period, 1, a);
 }
 
 static void
@@ -136,7 +138,8 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   scope_reset(data);
   
-  fts_client_send_message(o, sym_set_threshold, 1, a);
+  if(fts_object_has_id(o))
+    fts_client_send_message(o, sym_set_threshold, 1, a);
 }
 
 static void 
@@ -215,8 +218,6 @@ scope_send_to_client(fts_alarm_t *alarm, void *o)
       int tail = index + size - SCOPE_BUFFER_SIZE;
       int i;
       
-      fts_alarm_unarm(alarm);
-      
       if(tail < 0)
 	tail = 0;
       
@@ -250,6 +251,9 @@ scope_send_to_client(fts_alarm_t *alarm, void *o)
 	  index++;
 	}
 
+      data->send = 0;
+      fts_alarm_set_delay(&(data->alarm), this->period_msec);
+      
       fts_client_send_message(o, sym_display, data->size, this->a);
     }
   else

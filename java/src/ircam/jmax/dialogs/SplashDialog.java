@@ -36,9 +36,11 @@ import javax.swing.*;
  * The initial dialog.
  */
 
-public class SplashDialog extends JDialog implements KeyListener, MouseListener, ActionListener {
-  static final int SPLASH_WIDTH = 500;
-  static final int SPLASH_HEIGHT = 280;
+public class SplashDialog extends Dialog implements KeyListener, MouseListener, ActionListener {
+  static final int Y_ONSET = 20;
+  static final int SPLASH_WIDTH = 400;
+  static final int SPLASH_HEIGHT = 300 + Y_ONSET;
+
   String itsVersionString;
 
   Image itsImage;
@@ -53,11 +55,12 @@ public class SplashDialog extends JDialog implements KeyListener, MouseListener,
     addKeyListener(this);
     addMouseListener(this);
     
-    setLocation(200,200);
+    setLocation(200,150);
     pack();
     setVisible(true);
     
-    Timer aTimer = new Timer(2000, this);
+    Timer aTimer = new Timer(4000, this);
+
     aTimer.setRepeats(false);
     aTimer.start();
   }
@@ -107,26 +110,10 @@ public class SplashDialog extends JDialog implements KeyListener, MouseListener,
   //--------------------------------------------------------
   public void paint(Graphics g) {
     Dimension d = getSize();
-    g.setColor(Color.white);
-    g.fillRect(0, 0, d.width, d.height);        
-    g.drawImage(itsImage, 12, 20,this);
+
+    g.drawImage(itsImage, 0, Y_ONSET, this);
+
     g.setColor(Color.black);
-    g.drawString(itsVersionString, 32, d.height-24);
+    g.drawString(itsVersionString, 20, Y_ONSET + 20);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

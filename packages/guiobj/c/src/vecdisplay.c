@@ -59,23 +59,28 @@ static fts_symbol_t sym_bounds = 0;
 static void
 vecdisplay_deliver(vecdisplay_t *this)
 {
-  if(this->gate)
+  if(fts_object_patcher_is_open((fts_object_t *)this))
     {
-      this->pending = 0;
-      this->gate = 0;
-
-      if(this->scroll)
-	fts_client_send_message((fts_object_t *)this, sym_scroll, this->n, this->a);
+      if(this->gate)
+	{
+	  this->pending = 0;
+	  this->gate = 0;
+	  
+	  if(this->scroll)
+	    fts_client_send_message((fts_object_t *)this, sym_scroll, this->n, this->a);
+	  else
+	    fts_client_send_message((fts_object_t *)this, sym_display, this->n, this->a);
+	  
+	  this->n = 0;
+	  
+	  fts_alarm_set_delay(&this->alarm, this->period);
+	  fts_alarm_arm(&this->alarm);
+	}
       else
-	fts_client_send_message((fts_object_t *)this, sym_display, this->n, this->a);
-
-      this->n = 0;
-
-      fts_alarm_set_delay(&this->alarm, this->period);
-      fts_alarm_arm(&this->alarm);
+	this->pending = 1;
     }
   else
-    this->pending = 1;
+    this->pending = 0;
 }
 
 static void
@@ -83,7 +88,7 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
-  if(this->pending)
+  if(fts_object_patcher_is_open((fts_object_t *)this) && this->pending)
     {
       this->gate = 0;
       this->pending = 0;
@@ -92,9 +97,9 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
 	fts_client_send_message(o, sym_scroll, this->n, this->a);
       else
 	fts_client_send_message(o, sym_display, this->n, this->a);
-
+      
       this->n = 0;
-
+      
       fts_alarm_set_delay(&this->alarm, this->period);
       fts_alarm_arm(&this->alarm);
     }

@@ -1,3 +1,9 @@
+2001-06-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added fvec abd bpf player to signal package (to be completed)
+	* new splash screen (adapted Java code)
+	* new icon (images/jmax_icon.gif)
+
 2001-06-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* remove Fts standard error window and move FTS standard error to a
@@ -15,6 +21,13 @@
 
 	* moved all platform specific code to one file per platform (instead of
 	one directory per platform)
+
+2001-05-28  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* java/src/ircam/jmax/fts/FtsParse.java: 
+	   - decimal separator now fixed to '.'
+	   - fixed parsing bug for the instantiation of "==", "!=", etc.
+	   - fixed parsing bug for float starting with "."
 
 2001-04-27  Norbert Schnell  <schnell@ligeti.ircam.fr>
 

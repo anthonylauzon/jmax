@@ -49,7 +49,7 @@ MaxVersion.java: $(ROOTDIR)/VERSION
 	echo 'public class MaxVersion {' >> MaxVersion.java
 	echo ' public static String getMaxVersion()' >> MaxVersion.java
 	echo ' {' >> MaxVersion.java
-	echo '  return "jMax version' `cat $(ROOTDIR)/VERSION` '";' >> MaxVersion.java
+	echo '  return "release' `cat $(ROOTDIR)/VERSION` '";' >> MaxVersion.java
 	echo ' }' >> MaxVersion.java
 	echo '}' >> MaxVersion.java
 

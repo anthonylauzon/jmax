@@ -27,6 +27,8 @@
 #include <fts/fts.h>
 #include "fvec.h"
 
+#define FVEC_NO_ALLOC -1
+
 fts_symbol_t fvec_symbol = 0;
 fts_type_t fvec_type = 0;
 fts_class_t *fvec_class = 0;
@@ -36,25 +38,40 @@ static fts_symbol_t sym_load = 0;
 static fts_symbol_t sym_open_file = 0;
 static fts_symbol_t sym_local = 0;
 
+/* add something to beginning and and of float vector */
+/* for four-point interpolation */
+#define FVEC_MALLOC_ONSET 1
+#define FVEC_MALLOC_OVERHEAD 4
+
 /********************************************************
  *
  *  utility functions
  *
  */
 
-/* local */
 static void
-set_size(fvec_t *vec, int size)
+fvec_alloc(fvec_t *vec, int size)
 {
+  int alloc = vec->alloc;
+  float *values = vec->values;
   int i;
 
-  if(size > vec->alloc)
-    {
-      if(vec->alloc)
-	vec->values = (float *)fts_realloc((void *)vec->values, sizeof(float) * size);
-      else
-	vec->values = (float *)fts_malloc(sizeof(float) * size);
+  if(size < 0)
+    size = 0;
 
+  if(size > alloc)
+    {
+      if(alloc != FVEC_NO_ALLOC)
+	values = (float *)fts_realloc((void *)(vec->values - 1), sizeof(float) * (size + 4)) + 1;
+      else
+	values = (float *)fts_malloc(sizeof(float) * (size + 4)) + 1;
+
+      values[-1] = 0.0;
+      values[size] = 0.0;
+      values[size + 1] = 0.0;
+      values[size + 2] = 0.0;
+
+      vec->values = values;
       vec->alloc = size;
     }
 
@@ -63,6 +80,13 @@ set_size(fvec_t *vec, int size)
     vec->values[i] = 0.0;
 
   vec->size = size;
+}
+
+static void
+fvec_free(fvec_t *vec)
+{
+  if(vec->values)
+    fts_free(vec->values - 1);
 }
 
 void
@@ -81,11 +105,11 @@ fvec_set_size(fvec_t *vec, int size)
   int old_size = vec->size;
   int i;
 
-  set_size(vec, size);
+  fvec_alloc(vec, size);
 
   /* when extending: zero new values */
   for(i=old_size; i<size; i++)
-    vec->values[i] = 0.0;
+    vec->values[i] = 0.0;	  
 }
 
 void
@@ -184,7 +208,7 @@ fvec_grow(fvec_t *vec, int size)
   while(!alloc || size > alloc)
     alloc += FVEC_BLOCK_SIZE;
 
-  set_size(vec, alloc);
+  fvec_alloc(vec, alloc);
 }
 
 int 
@@ -211,7 +235,7 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
 	}
       
       if(n > 0)
-	fvec_set_size(vec, n);
+	fvec_alloc(vec, n);
       
       fts_atom_file_close(file);
     }
@@ -303,7 +327,16 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       int size = fts_get_number_int(at);
       
       if(size >= 0)
-	fvec_set_size(this, size);
+	{
+	  int old_size = this->size;
+	  int i;
+
+	  fvec_alloc(this, size);
+
+	  /* when extending: zero new values */
+	  for(i=old_size; i<size; i++)
+	    this->values[i] = 0.0;	  
+	}
     }
 }
 
@@ -410,7 +443,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 		/* get temporary sample rate from file */
 		this->sr = -file_sr;
 
-	      fvec_set_size(this, n_read);
+	      fvec_alloc(this, n_read);
 	      ptr = fvec_get_ptr(this);
 
 	      size = fts_soundfile_read_float(sf, ptr, n_read);
@@ -615,30 +648,6 @@ fvec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
  *
  */
 static void
-fvec_alloc(fvec_t *vec, int size)
-{
-  int i;
-
-  if(size > 0)
-    {
-      vec->values = (float *) fts_malloc(size * sizeof(float));
-      vec->size = size;
-      fvec_zero(vec);
-
-      /* init to zero */
-      for(i=0; i<size; i++)
-	vec->values[i] = 0.0;
-    }
-  else
-    {
-      vec->values = 0;
-      vec->size = 0;
-    }
-
-  vec->alloc = size;
-}
-
-static void
 fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
@@ -649,7 +658,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   this->values = 0;
   this->size = 0;
-  this->alloc = 0;
+  this->alloc = FVEC_NO_ALLOC;
 
   this->sr = 0.0;
 
@@ -663,6 +672,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(ac == 1 && fts_is_int(at))
     {
       fvec_alloc(this, fts_get_int(at));
+      fvec_zero(this);
       this->keep = fts_s_no;
     }
   else if(ac == 1 && fts_is_list(at))
@@ -693,11 +703,11 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  
 	      size = fts_soundfile_get_size(sf);
 	  
-	      fvec_set_size(this, size);
+	      fvec_alloc(this, size);
 	      ptr = fvec_get_ptr(this);
 	  
 	      size = fts_soundfile_read_float(sf, ptr, size);
-	      fvec_set_size(this, size);
+	      fvec_alloc(this, size);
 
 	      fts_soundfile_close(sf);
 	    }
@@ -723,9 +733,8 @@ static void
 fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
-  
-  if(this->values)
-    fts_free(this->values);
+
+  fvec_free(this);
 }
 
 static fts_status_t
