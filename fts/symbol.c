@@ -51,9 +51,16 @@ static fts_symbol_t symbol_new_aux( const char *name, int copy)
 
   /* Symbol do not exist: copy the string if needed, and make a new symbol descriptor */
   sp = (struct fts_symbol_descr *) fts_heap_alloc(symbol_heap);
-  sp->name = (copy) ? strcpy( fts_malloc( strlen(name)+1 ), name) : name;
   sp->operator = -1;
   sp->cache_index = -1;
+  if (copy)
+    {
+      sp->name = strcpy( fts_malloc( strlen(name)+1 ), name);
+      /* Must copy also the key !!! */
+      fts_set_string( &k, sp->name);
+    }
+  else
+    sp->name = name;
 
   /* Add the new symbol descriptor in the hash table */
   fts_set_ptr( &v, sp);
