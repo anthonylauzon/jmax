@@ -1,6 +1,8 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
+
 import java.util.*;
 import java.awt.Component;
 
@@ -54,14 +56,27 @@ public class DeleteTool extends Tool implements PositionListener {
 
 	if (ExplodeSelection.getSelection().isInSelection(aEvent))
 	  {
-	    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	    Enumeration e;
+	    MaxVector v = new MaxVector();
+
+	    // copy the selected elements in another MaxVector
+	    for ( e = ExplodeSelection.getSelection().getSelected();
+		  e.hasMoreElements();)
 	      {
-		aEvent = (ScrEvent) e.nextElement();
-		egc.getDataModel().removeEvent(aEvent);
+		v.addElement(e.nextElement());
 	      }
+	    
+	    // remove them
+	    for (int i = 0; i< v.size(); i++)
+	      egc.getDataModel().removeEvent((ScrEvent)(v.elementAt(i)));
+
+	    v = null;
 	  }
 	else
-	  egc.getDataModel().removeEvent(aEvent);
+	  {
+	    egc.getDataModel().removeEvent(aEvent);
+	    ExplodeSelection.getSelection().deselectAll();
+	  }
 
 	egc.getDataModel().endUpdate();
       }

@@ -100,7 +100,7 @@ public class ScrEvent extends AbstractUndoableObject {
 
   public final void setTime(int time) 
   {
-
+    if (time < 0) time = 0;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())

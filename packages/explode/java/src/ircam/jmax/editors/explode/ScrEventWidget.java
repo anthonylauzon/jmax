@@ -118,7 +118,6 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
    * null means no objects */
   public void setTarget(ScrEvent e)
   {
-    if (e == target) return;
 
     target = e;
 
