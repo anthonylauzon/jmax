@@ -36,7 +36,7 @@ import javax.swing.event.*;
  * of the SequenceToolManager by the knowledge of the tools */
 public class SequenceTools implements ToolProvider{
 
-  public SequenceTools( boolean complete)
+  public SequenceTools( int type)
   {
     String path = null;
     String fs = File.separator;
@@ -47,19 +47,33 @@ public class SequenceTools implements ToolProvider{
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
     /*************************************************************/
 
-    if( complete)
+    if( type == COMPLETE_TOOLS)
       tools = new Tool[6];
-    else
+    else if( type == SCOOB_TOOLS)
       tools = new Tool[4];
+    else
+      tools = new Tool[5];
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
-    tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
-    tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-    if( complete)
+    
+    if( type == COMPLETE_TOOLS)
       {
+	tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
+	tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
 	tools[4] = new LinerTool(new ImageIcon(path+"liner.gif"));
 	tools[5] = new CombTool(new ImageIcon(path+"comber.gif"));
+      }
+    else if( type == SCOOB_TOOLS)
+      {
+	tools[2] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
+	tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+      }
+    else
+      {
+	tools[2] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+	tools[3] = new LinerTool(new ImageIcon(path+"liner.gif"));
+	tools[4] = new CombTool(new ImageIcon(path+"comber.gif"));
       }
   }
 
@@ -93,8 +107,13 @@ public class SequenceTools implements ToolProvider{
 
   //---
   Tool tools[];
-  public static SequenceTools partialInstance = new SequenceTools( false);
-  public static SequenceTools completeInstance = new SequenceTools( true);
+  public static final int COMPLETE_TOOLS = 0;
+  public static final int SCOOB_TOOLS = 1;
+  public static final int NUMBER_TOOLS = 2;
+
+  public static SequenceTools scoobInstance = new SequenceTools( SCOOB_TOOLS);
+  public static SequenceTools numberInstance = new SequenceTools( NUMBER_TOOLS);
+  public static SequenceTools completeInstance = new SequenceTools( COMPLETE_TOOLS);
 }
 
 

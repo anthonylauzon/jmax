@@ -298,7 +298,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 		if ((itsMovements & VERTICAL_MOVEMENT) != 0)
 		  ((SequenceGraphicContext)gc).getStatusBar().
 		    post(((SequenceGraphicContext)gc).
-			 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY(a.getY(tempEvent)));
+			 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY( a.getY(tempEvent)));
 	      }
 	  }
       }

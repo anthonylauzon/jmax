@@ -33,70 +33,70 @@ import java.beans.*;
  * An adapter that treats the y parameter as a constant*/
 public class FloatAdapter extends IntegerAdapter implements VerticalZoomable, VerticalScrollable{
 
-    public FloatAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
-    {
-	super(geometry, gc, constant);
-	maxValue = 1;
-	yZoomFactor = 1;
-	yTransposition = 0;
-    }
+  public FloatAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
+  {
+    super(geometry, gc, constant);
+    maxValue = 1;
+    yZoomFactor = 1;
+    yTransposition = 0;
+  }
 
     /**
      * inherited from Adapter.
      * it returns the Y value of the event,
      * making the needed cordinate conversions.
      */
-    public int getY(Event e) 
-    {  
-	float value = (FloatMapper.getMapper().get(e)+yTransposition)*yZoomFactor - (float)minValue;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)height/(float)range);
-	
-	return height - (int)(value*step);
-    }
+  public int getY(Event e) 
+  {  
+    float value = (FloatMapper.getMapper().get(e)+yTransposition)*yZoomFactor - (float)minValue;
+    int height = gc.getGraphicDestination().getSize().height;
+    int range = getRange();
+    float step = (float)((float)height/(float)range);
+    
+    return height - (int)(value*step);
+  }
 
     /**
      * it returns the Y graphic value of the event from the y logic value,
      * making the needed cordinate conversions.
      */
-    public int getY(float y) 
-    {  
-	float value = (y+yTransposition)*yZoomFactor - (float)minValue;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)height/(float)range);
-	return height - (int)(value*step);
-    }
+  public int getY(float y) 
+  {  
+    float value = (y+yTransposition)*yZoomFactor - (float)minValue;
+    int height = gc.getGraphicDestination().getSize().height;
+    int range = getRange();
+    float step = (float)((float)height/(float)range);
+    return height - (int)(value*step);
+  }
 
-    public void setY(Event e, int y) 
-    {
-	FloatMapper.getMapper().set(e, getFloatInvY(y));
-    }
+  public void setY(Event e, int y) 
+  {
+    FloatMapper.getMapper().set(e, getFloatInvY(y));
+  }
     
-    //VerticalZoomable interface
-    public void incrYZoom(int delta) 
-    {
-	yZoomFactor = (yZoomFactor*100+delta)/(float)100;
-	if(yZoomFactor<0.01) yZoomFactor = (float)0.01;
-	if(yZoomFactor>10) yZoomFactor = (float)10.0;    	
-    }
-    public void setYZoom(int factor)
-    {
-	yZoomFactor = factor/(float)100;
-    }
-
-    public int getYZoom()
-    {
-	return (int)(yZoomFactor*100);
-    }
-
-    //VarticalScrollable interface
-    public void setYTransposition(float value)
-    {
-	yTransposition = value;
-    }
-    public float getYTransposition()
+  //VerticalZoomable interface
+  public void incrYZoom(int delta) 
+  {
+    yZoomFactor = (yZoomFactor*100+delta)/(float)100;
+    if(yZoomFactor<0.01) yZoomFactor = (float)0.01;
+    if(yZoomFactor>10) yZoomFactor = (float)10.0;    	
+  }
+  public void setYZoom(int factor)
+  {
+    yZoomFactor = factor/(float)100;
+  }
+  
+  public int getYZoom()
+  {
+    return (int)(yZoomFactor*100);
+  }
+  
+  //VerticalScrollable interface
+  public void setYTransposition(float value)
+  {
+    yTransposition = value;
+  }
+  public float getYTransposition()
     {
 	return yTransposition;
     }

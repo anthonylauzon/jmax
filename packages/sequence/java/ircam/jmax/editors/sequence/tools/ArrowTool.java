@@ -168,16 +168,16 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
       }
     if(deltaY!=0)
 	{
-	    ((UndoableData) egc.getDataModel()).beginUpdate();
-	    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	      {
-		aEvent = (TrackEvent) e.nextElement();
-		a.setY(aEvent, a.getY(aEvent)+deltaY);
-	      }    
-	    ((UndoableData) egc.getDataModel()).endUpdate();
-	  }
-	mountIModule(itsSelecter);
-	gc.getGraphicDestination().repaint();    
+	  ((UndoableData) egc.getDataModel()).beginUpdate();
+	  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	    {
+	      aEvent = (TrackEvent) e.nextElement();
+	      a.setY(aEvent, a.getY(aEvent)+deltaY);
+	    }    
+	  ((UndoableData) egc.getDataModel()).endUpdate();
+	}
+    mountIModule(itsSelecter);
+    gc.getGraphicDestination().repaint();    
   }
   
   public void updateStartingPoint(int deltaX, int deltaY)

@@ -100,14 +100,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     
     if( ftsTrackObject.getType().getName().equals( AmbitusValue.AMBITUS_NAME) )
       {
-	manager = new ToolManager( SequenceTools.partialInstance);
+	manager = new ToolManager( SequenceTools.scoobInstance);
 	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
 	toolbar.setSize( 110, 25);    
 	toolbar.setPreferredSize( new Dimension( 110, 25));    
       }    
     else
       {
-	manager = new ToolManager( SequenceTools.completeInstance);
+	manager = new ToolManager( SequenceTools.numberInstance);
 	toolbar = new EditorToolbar( manager, EditorToolbar.HORIZONTAL);
 	toolbar.setSize( 156, 25);    
 	toolbar.setPreferredSize( new Dimension( 156, 25));    

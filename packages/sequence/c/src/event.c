@@ -117,8 +117,8 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       }
     }
   }
-  else if(ac > 0 && fts_atom_same_type(&this->value, at))
-    this->value = at[0];
+  else if(ac > 1 && fts_is_symbol(at) && fts_atom_same_type(&this->value, at+1))
+    this->value = at[1];
 
   event_set_at_client(this);
 }

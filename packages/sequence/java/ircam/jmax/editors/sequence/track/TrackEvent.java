@@ -209,11 +209,12 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   {
     args.clear();
     args.addSymbol( FtsSymbol.get( propName));
+
     if( propValue instanceof String)
       args.addSymbol( FtsSymbol.get( (String)propValue));
     else
       args.add( propValue);
-    
+
     try{
       send( FtsSymbol.get("set"), args);
     }
