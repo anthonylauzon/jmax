@@ -8,5 +8,6 @@ all	all	lib/ARCH/opt/libmidi.so
 all	all	lib/ARCH/opt/libpitch.so
 all	all	lib/ARCH/opt/libsampling.so
 all	all	lib/ARCH/opt/libsignal.so
-all	all	snd
+all	all	sounds
+all	all	templates
 
