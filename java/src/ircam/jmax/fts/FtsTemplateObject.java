@@ -69,11 +69,7 @@ public class FtsTemplateObject extends FtsContainerObject
     loaded();	// activate the post-load init, like loadbangs
 
     if (parent.isOpen())
-      {
-	updated = true;
-
-	FtsServer.getServer().syncToFts();
-      }
+      FtsServer.getServer().syncToFts();
   }
 
 

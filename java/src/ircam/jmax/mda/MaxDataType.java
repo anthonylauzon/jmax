@@ -62,6 +62,10 @@ abstract public class MaxDataType
 
   String name;
 
+  /** a name valid for user interface purposes ONLY */
+
+  String prettyName; 
+
   /** The instance list */
 
   DefaultListModel instanceList = new DefaultListModel();
@@ -90,11 +94,25 @@ abstract public class MaxDataType
   /*                                                                           */
   /*****************************************************************************/
 
-  /** Get the type name, *only* for showing it to the user */
+  /** Get the type name */
 
   public String getName()
   {
     return name;
+  }
+
+  /** Get the type pretty name, valid only for UI purposes */
+
+  public String getPrettyName()
+  {
+    return prettyName;
+  }
+
+  /** Set the pretty printing name */
+
+  public void setPrettyName(String name)
+  {
+    prettyName = name;
   }
 
   /** Set the default editor factory
@@ -111,6 +129,15 @@ abstract public class MaxDataType
   public MaxDataEditorFactory getDefaultEditorFactory() 
   {
     return defaultEditorFactory;
+  }
+
+  /** 
+   * Check if we have an editor factory for this type 
+   */
+
+  public boolean haveEditorFactory()
+  {
+    return defaultEditorFactory != null;
   }
 
   /*****************************************************************************/
@@ -133,9 +160,17 @@ abstract public class MaxDataType
     return false;
   }
 
+  /** Register an instance in the instance table (called by the MaxData 
+    constructor) */
+
+  void registerInstance(MaxData instance)
+  {
+    instanceList.addElement(instance);
+  }
+
   /** private, called when an instance is disposed */
 
-  public void disposeInstance(MaxData instance)
+  void disposeInstance(MaxData instance)
   {
     instanceList.removeElement(instance);
   }

@@ -11,6 +11,8 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
+import com.sun.java.swing.*;
+
 import tcl.lang.*;
  
 public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transferable{
@@ -18,22 +20,39 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   Console itsConsole;
   String itsCopiedText;
 
-  public ConsoleWindow(Console theConsole, String theTitle) {
-    super(theTitle);
-    itsConsole = theConsole;
-    GridBagLayout gridbag = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    getContentPane().setLayout(gridbag);
-    
-    c.weightx = 1.0;
-    c.weighty = 1.0;
-    c.gridwidth = 1;
-    c.gridheight = 1;
-    c.fill = GridBagConstraints.BOTH;
-    c.anchor = GridBagConstraints.NORTHWEST;
-    gridbag.setConstraints(theConsole, c);
-    getContentPane().add(itsConsole);
+  static private ConsoleWindow theConsoleWindow = null;
+
+  static public ConsoleWindow getConsoleWindow()
+  {
+    return theConsoleWindow;
+  }
+
+  public ConsoleWindow() {
+    super("jMax Console");
+
+    itsConsole = new Console(MaxApplication.getTclInterp());
+    itsConsole.Start();
+
+    System.setOut(itsConsole.getPrintStream());
+
+    getContentPane().setLayout(new BorderLayout());
+
+    getContentPane().add("Center", itsConsole);
     itsConsole.SetContainer(this);
+
+    // Register this console window 
+    // as *the* console window
+
+    if (theConsoleWindow != null)
+      theConsoleWindow = this;
+
+    Init();
+
+    validate();
+
+    setLocation(0,0);
+    pack();
+    setVisible(true);
   }
   
 

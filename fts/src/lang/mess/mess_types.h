@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1997/12/09 18:17:20 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1997/12/11 16:44:42 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -249,6 +249,11 @@ struct fts_object
   /* Class pointer  */
 
   fts_class_t *cl;
+
+  /* the object description */
+
+  int argc;
+  fts_atom_t *argv;
 
   /* patcher housekeeping */
 

@@ -6,6 +6,8 @@ import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
 
+import com.sun.java.swing.*;
+
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
@@ -35,7 +37,6 @@ public class MaxApplication extends Object {
   // Static global services
 
   /** Get the unique active TCL interpreter */
-    public static Probe itsProbe = new Probe("MaxApp profile");
 
   public static Interp getTclInterp()
   {
@@ -56,111 +57,6 @@ public class MaxApplication extends Object {
 
   static MaxWhenHookTable  itsHookTable;
 
-  static ConsoleWindow itsConsoleWindow = null;
-
-  static final int SCREENVERT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
-  static final int SCREENHOR = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
-
-
-  /** Method to create a new MaxData of a named type */
-
-  public static MaxData NewFile(String theFileType){
-    
-    // Editor activation starting from the choice of a type.
-    // We use the edit method, that automatically start a new
-    // instance of the default editor for a type, used
-    // the registered default editor factory.
-    // sorry, using names for now...
-
-    MaxData ourData;
-    MaxDataEditor ourEditor;
-    
-    try
-      {
-    	ourData = MaxDataType.getTypeByName(theFileType).newInstance();
-	ourEditor = ourData.edit();
-      }
-    catch (MaxDataException e)
-      {
-	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while creating new "+ theFileType);
-	aErr.setLocation(100, 100);
-	aErr.setVisible(true);
-	return null;
-      }
-
-    return ourData;
-  }
-
-
-  /** Method to create a new MaxData of a named type */
-
-  public static MaxData NewType(MaxDataType type){
-    
-    // Editor activation starting from the choice of a type.
-    // We use the edit method, that automatically start a new
-    // instance of the default editor for a type, used
-    // the registered default editor factory.
-    // sorry, using names for now...
-
-    MaxData ourData;
-    MaxDataEditor ourEditor;
-
-    try
-      {
-    	ourData = type.newInstance();
-	ourEditor = ourData.edit();
-      }
-    catch (MaxDataException e)
-      {
-	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while creating new "+ type.getName());
-	aErr.setLocation(100, 100);
-	aErr.setVisible(true);
-	return null;
-      }
-
-    return ourData;
-  }
-
-
-  /**
-   * Open a file, given its name.
-   * This function choose the type of loading procedure
-   * On the base of the filename (for now)
-   */
-
-  public static MaxData OpenFile(MaxDataSource source)
-  {
-    MaxData ourData;
-    MaxDataEditor ourEditor; 
-    
-    try
-      {
-	ourData = MaxDataHandler.loadDataInstance(source);
-	
-	try
-	  {
-	    ourEditor = ourData.edit();
-	  }
-	catch (MaxDataException e)
-	  {
-	    // Ignore MaxDataException exception in running the editor
-	    // May be an hack, may be is ok; move this stuff to an action
-	    // handler !!
-	  }
-	
-	return ourData;
-      }
-    catch (MaxDataException e)
-      {
-	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + "while opening "+ source);
-	aErr.setLocation(100, 100);
-	aErr.setVisible(true);
-	return null;
-      }
-  }
-  
-
-
 
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
@@ -176,8 +72,8 @@ public class MaxApplication extends Object {
 	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
 
-      if (itsConsoleWindow != null)
-	itsConsoleWindow.AddWindowToMenu(theSketchWindow.getTitle());
+      if (ConsoleWindow.getConsoleWindow() != null)
+	ConsoleWindow.getConsoleWindow().AddWindowToMenu(theSketchWindow.getTitle());
     }
   }
 
@@ -194,8 +90,8 @@ public class MaxApplication extends Object {
 	  aWindow.AddWindowToMenu(theName);
     }
 
-    if (itsConsoleWindow != null)
-      itsConsoleWindow.AddWindowToMenu(theName);
+    if (ConsoleWindow.getConsoleWindow() != null)
+      ConsoleWindow.getConsoleWindow().AddWindowToMenu(theName);
   }
 
   public static void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
@@ -211,8 +107,8 @@ public class MaxApplication extends Object {
       aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
 
-    if (itsConsoleWindow != null)
-      itsConsoleWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
+    if (ConsoleWindow.getConsoleWindow() != null)
+      ConsoleWindow.getConsoleWindow().AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
   }
 
    public static void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
@@ -228,8 +124,8 @@ public class MaxApplication extends Object {
       aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     }
 
-    if (itsConsoleWindow != null)
-      itsConsoleWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
+    if (ConsoleWindow.getConsoleWindow() != null)
+      ConsoleWindow.getConsoleWindow().RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
 
     itsSketchWindowList.removeElement(theSubWindow);
   }
@@ -248,8 +144,8 @@ public class MaxApplication extends Object {
       if(aWindow != theWindow)
 	aWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
-    if (itsConsoleWindow != null)
-      itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetTitle());
+    if (ConsoleWindow.getConsoleWindow() != null)
+      ConsoleWindow.getConsoleWindow().RemoveWindowFromMenu(theWindow.GetTitle());
   }
   
   public static void ChangeWinNameMenus(String theOldName, String theNewName){
@@ -264,118 +160,10 @@ public class MaxApplication extends Object {
       aWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
 
-    if (itsConsoleWindow != null)
-      itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
+    if (ConsoleWindow.getConsoleWindow() != null)
+      ConsoleWindow.getConsoleWindow().ChangeWinNameMenu(theOldName, theNewName);
   }
   
-
-  public static void TileVerticalWindows(){
-    Rectangle aRect = new Rectangle();
-    Frame aWindow;
-    int num = itsSketchWindowList.size()+itsEditorsFrameList.size();
-    if(num!=0){
-      int aWidth = (int)java.lang.Math.floor(SCREENHOR/num);
-      Dimension d = new Dimension(aWidth - 10, SCREENVERT - 35);
-      aRect.x = 7; aRect.y = 5;
-      aRect.width= d.width;
-      aRect.height = d.height;
-      
-      for (int k=0; k<num; k++) {
-	if(k<itsSketchWindowList.size()) aWindow = (Frame)itsSketchWindowList.elementAt(k);
-	else aWindow = (Frame)itsEditorsFrameList.elementAt(k-itsSketchWindowList.size());
-	if(k>0)
-	  aRect.x+=(d.width+7);
-	aWindow.setBounds(aRect.x, aRect.y, aRect.width, aRect.height);
-      }
-    }
-  }
-
-
-  public static void TileWindows(){
-    Rectangle aRect2 = new Rectangle();
-    Rectangle aStartRect = new Rectangle();
-    Dimension d2 = new Dimension();
-    Frame  aWindow;
-    boolean changHor = false;
-    int z, j;
-    int num = itsSketchWindowList.size()+itsEditorsFrameList.size();
-    if(num!=0){
-      z=1;
-      if(num==1)
-	j=1;
-      else
-	j=2;
-      while(z*j<num){
-	z++;
-	if(z*j<num)
-	  j++;
-      }
-      int res = (int)java.lang.Math.floor(SCREENVERT/j);
-      d2.height = res - 35;
-      res = (int)java.lang.Math.floor(SCREENHOR/z);
-      d2.width = res - 10;
-      aRect2.y = 5;aRect2.x = 7;
-      aRect2.height = d2.height;
-      aRect2.width =d2.width;
-      aStartRect.x = aRect2.x;
-      aStartRect.y = aRect2.y;
-      aStartRect.width = aRect2.width;
-      aStartRect.height = aRect2.height;
-      
-      for (int k=0; k<num; k++) {
-	if(k<itsSketchWindowList.size()) aWindow = (Frame) itsSketchWindowList.elementAt(k);
-	else aWindow = (Frame) itsEditorsFrameList.elementAt(k-itsSketchWindowList.size());
-	res = (int)java.lang.Math.floor(k/j);
-	if((res*j) == k)
-	  changHor=false;
-	if((res!=0)&&(!changHor)){
-	  aRect2.x = aStartRect.x + (d2.width+7)*res;
-	  aRect2.y = aStartRect.y;
-	  aRect2.width = aStartRect.width;
-	  aRect2.height = aStartRect.height;
-	  changHor=true;
-	}
-	else
-	  if(k>0)
-	    aRect2.y += d2.height + 25;
-	
-	aWindow.setBounds(aRect2.x, aRect2.y, aRect2.width, aRect2.height);
-      }
-    } 
-  }
-
-
-  public static void StackWindows(){
-    Dimension d;
-    ErmesSketchWindow aSketchWindow;
-    Frame aWindow;
-    Rectangle aRect = new Rectangle();
-
-    if ((itsSketchWindowList.size() == 0) &&(itsEditorsFrameList.size() == 0))
-      return;
-
-    if(itsSketchWindow!=null) d = itsSketchWindow.getPreferredSize();
-    else d = ((Frame)itsWindow).getPreferredSize();
-    aRect.x = 50; aRect.y = 50;
-    aRect.width = d.width;
-    aRect.height = d.height;
-    for (int i=0; i< itsSketchWindowList.size(); i++) {
-      aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(i);
-      //if(aSketchWindow!=itsSketchWindow){
-      aRect.x+=20;aRect.y+=20;
-      aSketchWindow.setBounds(aRect.x, aRect.y, aRect.width, aRect.height);
-      //}
-    }
-    for (int j=0; j< itsEditorsFrameList.size(); j++) {
-      aWindow = (Frame) itsEditorsFrameList.elementAt(j);
-      aRect.x+=20;aRect.y+=20;
-      //aWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
-      aWindow.setLocation(aRect.x, aRect.y);
-    }
-    //aRect.x+=20;aRect.y+=20;
-    //if(itsSketchWindow!=null)itsSketchWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
-    //else ((Frame)itsWindow).reshape(aRect.x, aRect.y, aRect.width, aRect.height);
-  }
 
 
 
@@ -401,10 +189,6 @@ public class MaxApplication extends Object {
     return itsSketchWindow;
   }
 	
-  public static ConsoleWindow GetConsoleWindow() {
-    return itsConsoleWindow;
-  }
-
   /** Functions to add application hooks */
 
   public static void addHook(String name, String code)
@@ -421,11 +205,18 @@ public class MaxApplication extends Object {
 
   /** His majesty the main method */
 
-  public static void main(String args[]) {
+  public static void main(String args[])
+  {
+    // Initialize swing to use heavyweight components for
+    // Menus'
+
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
     // main function parse the argument line and create the main class...
     //create a new default Properties object
+
     jmaxProperties = new Properties(System.getProperties());
-    itsProbe.start();//2003
+
     //start parsing arguments
     // don't check for valid options, so the user can set
     // command line arguments that can be accessed from tcl scripts
@@ -485,7 +276,7 @@ public class MaxApplication extends Object {
 
     if (FtsServer.getServer() == null)
       {
-	new ConnectionDialog(GetConsoleWindow());
+	new ConnectionDialog();
 	MaxApplication.runHooks("start");
       }
 
@@ -494,10 +285,10 @@ public class MaxApplication extends Object {
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
 
-    //Notifier notifier = itsInterp.getNotifier();
+    Notifier notifier = itsInterp.getNotifier();
 
-    // while (true)
-    // notifier.doOneEvent(TCL.ALL_EVENTS);
+    while (true)
+      notifier.doOneEvent(TCL.ALL_EVENTS);
  }
 
   /** This private method build the tcl interpreter, 
@@ -516,37 +307,12 @@ public class MaxApplication extends Object {
 
   }
 
-  /** This method install the console; a part of it should go
-    in the UI classes (why to call awt things like pack here ??),
-    and another part should just become tcl ??? */
-
-  public static void makeMaxConsole()
-  {
-    Console itsConsole;
- 
-    itsConsole = new Console(itsInterp);
-    itsConsole.Start();
-
-    System.setOut(itsConsole.getPrintStream());
-
-    itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
-    //itsConsoleWindow.validate();
-    itsConsoleWindow.Init();
-    itsConsoleWindow.setLocation(0,0);
-    itsConsoleWindow.pack();
-    itsConsoleWindow.setVisible(true);
-  }
-
   public static void Quit()
   {
     MaxEditor aWindow;
     ErmesSketchWindow aSketchWindow;
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
-
-    /*itsProbe.stop();
-      itsProbe.reportToFile("proberesult");
-      itsProbe.report();*/
 
     // First, search if there is anything to save,
 
@@ -566,7 +332,7 @@ public class MaxApplication extends Object {
 
     if (someOneNeedSave)
       {
-	QuitDialog quitDialog = new QuitDialog(itsConsoleWindow);
+	QuitDialog quitDialog = new QuitDialog();
 
 	switch (quitDialog.getAnswer())
 	  {
@@ -612,10 +378,10 @@ public class MaxApplication extends Object {
 	}
       }
 
-    if (itsConsoleWindow != null)
+    if (ConsoleWindow.getConsoleWindow() != null)
       {
-	itsConsoleWindow.setVisible(false);
-	itsConsoleWindow.dispose();
+	ConsoleWindow.getConsoleWindow().setVisible(false);
+	ConsoleWindow.getConsoleWindow().dispose();
       }
 
     if (FtsServer.getServer() != null)

@@ -16,43 +16,12 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
   static final int SPLASH_HEIGHT = 280;
   String itsVersionString;
 
-  /** An inner class that is the thread used for make the splash
-   * dialog go away, after a while.
-   */
-
-  /*2003  class SplashDialogTimeout extends Thread
-    {
-    int time;
-    
-    public SplashDialogTimeout(int time)
-    {
-    super("SplashDialogTimeoutThread");
-    this.time = time;
-    
-    run();
-    }
-    
-    public void run()
-    {
-    try
-    {
-    sleep(time);
-    }
-    catch (InterruptedException e)
-    {
-    }
-    
-    SplashDialog.this.setVisible(false);
-    SplashDialog.this.dispose();
-    }
-    }*/
-  
   Image itsImage;
   //2003SplashDialogTimeout to;
   
 
-  public SplashDialog(Frame dw, String filename, String version) {
-    super(dw, "jMax",/* true*/false);
+  public SplashDialog(String filename, String version) {
+    super(MaxWindowManager.getWindowManager().getAFrame(), "jMax",/* true*/false);
     
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);

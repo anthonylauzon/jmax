@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.event.*;
 import tcl.lang.*;
 
-public class Console extends Panel{
+public class Console extends JPanel{
   StringBuffer itsSbuf = new StringBuffer();
   TextArea itsTextArea;
   Interp itsInterp;
@@ -26,29 +26,12 @@ public class Console extends Panel{
     itsTextArea = new TextArea(40, 40);
     itsInterp = i;
 
-    GridBagLayout gridbag = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    setLayout(gridbag);
-    c.weightx = 1.0;
-    c.weighty = 1.0;
-    c.gridwidth = 1;
-    c.gridheight = 1;
-    c.fill = GridBagConstraints.BOTH;
-    c.anchor = GridBagConstraints.NORTHWEST;
-    gridbag.setConstraints(itsTextArea, c);    
-    add(itsTextArea);
+    setLayout(new BorderLayout());
+    add("Center", itsTextArea);
 
     itsKeyListener = new ConsoleKeyListener(this);
     itsTextArea.addKeyListener(itsKeyListener);
     itsTextArea.addMouseListener(new ConsoleMouseListener(this));
-    /*This was the first trial to see if we could insert swing objects... it worked
-      Panel aPanel = new Panel();
-      aPanel.setLayout(new GridLayout(0, 1));
-      aPanel.add(new JButton("cucu"));
-      aPanel.add(new JButton("reset")); 
-      aPanel.add(new JButton("reload"));
-      aPanel.add(new JButton("start script"));
-      add(aPanel);*/
 
     itsConsoleThread = new ConsoleThread(this);
     /*

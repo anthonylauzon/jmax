@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
 
 
@@ -33,26 +34,35 @@ class MaxOpenCmd implements Command {
   
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 2)
+    try
       {
-	//ProjectWindow aProjectWindow = MaxApplication.itsProjectWindow;
-
-	// Should call MaxApplication.Open, not the project !!!
-
-	try
+	if (argv.length == 2)
 	  {
-	    MaxApplication.OpenFile(MaxDataSource.makeDataSource(argv[1].toString()));
-	  }
-	catch (java.net.MalformedURLException e)
-	  {
-	    throw new TclException(interp, "Malformed URL " + argv[1].toString());
-	  }
+	    MaxDataSource source = MaxDataSource.makeDataSource(argv[1].toString());
 
-	// Should return the document produced !!!
+	    if (source != null)
+	      {
+		try
+		  {
+		    MaxData data;
+
+		    data = MaxDataHandler.loadDataInstance(source);
+		    data.edit();
+		  }
+		catch (MaxDataException e)
+		  {
+		    throw new TclException(interp, e.toString());
+		  }
+	      }
+	  }
+	else
+	  {	
+	    throw new TclNumArgsException(interp, 1, argv, "<filename>");
+	  }
       }
-    else
-      {	
-      	throw new TclNumArgsException(interp, 1, argv, "<filename>");
+    catch (java.net.MalformedURLException e)
+      {
+	throw new TclException(interp, "Malformed URL " + argv[1].toString());
       }
   }
 }

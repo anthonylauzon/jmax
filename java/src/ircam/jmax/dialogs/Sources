@@ -7,8 +7,7 @@ SOURCES = \
 	   MaxFileChooser.java \
            StatisticsDialog.java \
 	   ProgressBarDialog.java \
-	   ProgressBarPanel.java \
-	   NewDialog.java 
+	   ProgressBarPanel.java
 
 
 

@@ -12,17 +12,18 @@ import com.sun.java.swing.*;
 
 abstract public class MaxData
 {
-  private MaxDataHandler handler = null;
-  private MaxDataSource  source  = null;
-  private MaxDataType    type    = null;
+  protected MaxDataHandler handler = null;
+  protected MaxDataSource  source  = null;
+  protected MaxDataType    type    = null;
   private DefaultListModel editors = new DefaultListModel();
-  private String name = null; // name of the instance, for UI purposes
-  private String info = null; // comment field; store and get back, but don't use for semantic purpose
+  protected String name = null; // name of the instance, for UI purposes
+  protected String info = null; // comment field; store and get back, but don't use for semantic purpose
 
   /** A constructor that get only the type */
 
   public MaxData(MaxDataType type)
   {
+    type.registerInstance(this);
     this.type = type;
   }
 
@@ -30,6 +31,7 @@ abstract public class MaxData
 
   public MaxData(MaxDataType type, String name)
   {
+    type.registerInstance(this);
     this.type = type;
     this.name = name;
   }
@@ -68,7 +70,7 @@ abstract public class MaxData
 
   /** Setting the handler */
 
-  public void setDataHandler(MaxDataHandler handler)
+  public  void setDataHandler(MaxDataHandler handler)
   {
     this.handler = handler;
   }
@@ -80,24 +82,24 @@ abstract public class MaxData
     return source;
   }
 
-  /** Setting the source; implicitly get a new Data Handler
+  /**
+   * Bind this data to a new data the source; implicitly get a new Data Handler
+   * it is the public method to call to set a data source.
    */
 
-  public void setDataSource(MaxDataSource source)
+  public void bindToDataSource(MaxDataSource source)
   {
-    this.source = source;
-    this.handler = MaxDataHandler.findDataHandlerFor(source);
-    this.name = source.getName();
+    setDataSource(source);
+    setDataHandler(MaxDataHandler.findDataHandlerFor(source, this));
   }
 
   /** To set both the handler and the source at the same time;
     used in initialization
     */
 
-  void setDataSourceAndHandler(MaxDataSource source, MaxDataHandler handler)
+  public void setDataSource(MaxDataSource source)
   {
     this.source = source;
-    this.handler = handler;
     this.name = source.getName();
   }
 
@@ -177,7 +179,7 @@ abstract public class MaxData
     else if (handler == null)
       return false;
     else
-      return handler.canSaveTo(source);
+      return handler.canSaveTo(source, this);
   }
     
   /** Save the instance to its data source */
@@ -198,6 +200,30 @@ abstract public class MaxData
 
     if (handler == null)
       throw new MaxDataException("No data handler for " + source);
+
+    handler.saveInstance(this);
+  }
+
+
+  /** Save the instance to a given source, without changing the
+   *  original binding of the data 
+   */
+
+  public void saveTo(MaxDataSource source) throws MaxDataException
+  {
+    MaxDataHandler handler = MaxDataHandler.findDataHandlerFor(source, this);
+
+    if (handler == null)
+      throw new MaxDataException("Cannot save to " + source);
+
+    for (int i = 0; i < editors.size() ; i++)
+      {
+	MaxDataEditor editor;
+
+	editor = (MaxDataEditor) editors.elementAt(i);
+
+	editor.syncData();
+      }
 
     handler.saveInstance(this);
   }
@@ -241,14 +267,7 @@ abstract public class MaxData
    */
 
   abstract public Object getContent();
-
-
-  /** Set the MaxData content; the content is the real thing to
-   * Edit, and its type is not specified; used only during loading,
-   * by 
-   */
-
-  abstract protected void setContent(Object content);
 }
+
 
 

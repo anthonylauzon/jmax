@@ -27,9 +27,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     try{
       UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
     }catch (Exception exc) {
-      ErrorDialog aErr = new ErrorDialog(theSketchPad.itsSketchWindow, "Could not load MotifLookAndFeel");
-      aErr.setLocation(100, 100);
-      aErr.show();  
+      new ErrorDialog(theSketchPad.itsSketchWindow, "Could not load MotifLookAndFeel");
     }
     setDoubleBuffered(true);
     itsSketchPad = theSketchPad;

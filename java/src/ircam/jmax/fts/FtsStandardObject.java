@@ -33,10 +33,7 @@ public class FtsStandardObject extends FtsObject
     FtsServer.getServer().newObject(parent, this, description);
 
     if (parent.isOpen())
-      {
-	updated = true;
-	FtsServer.getServer().syncToFts();
-      }
+      FtsServer.getServer().syncToFts();
   }
 
 

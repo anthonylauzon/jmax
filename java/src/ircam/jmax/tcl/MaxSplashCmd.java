@@ -10,12 +10,9 @@
 package ircam.jmax.tcl;
 
 import tcl.lang.*;
-import java.io.*;
-import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
-//#import ircam.jmax.editors.project.*;
 
 
 /**
@@ -42,8 +39,7 @@ class MaxSplashCmd implements Command
     //it's going to become a window instead of a dialog (no assumptions 
     //shoul be made on the presence of a frame on top of which "mount"
     //the splash)
-    new SplashDialog(MaxApplication.GetConsoleWindow()/*itsProjectWindow*/, fileName, Version);    
-
+    new SplashDialog(fileName, Version);    
   }
 }
 

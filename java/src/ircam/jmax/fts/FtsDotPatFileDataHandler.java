@@ -6,48 +6,60 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /** An instance of this data handler can load MaxData from
- *  a tcl file obeyng the "jmax" command conventions
- * 
+ *  a tcl source obeyng the "jmax" command conventions.
+ *  Currently, implemented only for files, not URL.
  * It can be instantiate with a filename extension, so that
  * that extension will be automatically reconized.
  */
 
-public class FtsDotPatFileDataHandler extends MaxFileDataHandler
+public class FtsDotPatFileDataHandler extends MaxDataHandler
 {
+  public FtsDotPatFileDataHandler()
+  {
+  }
+
   /** Check for .pat  files */
 
   /** We can load from a file start with the "max v2" string*/
 
-  protected boolean canLoadFrom(File file)
+  public boolean canLoadFrom(MaxDataSource source)
   {
-    try
+    if ((source instanceof MaxFileDataSource) && super.canLoadFrom(source))
       {
-	FileReader fr = new FileReader(file);
+	File file = ((MaxFileDataSource) source).getFile();
 
-	char buf[] = new char[6];
+	try
+	  {
+	    FileReader fr = new FileReader(file);
+
+	    char buf[] = new char[6];
     
-	fr.read(buf);
-	fr.close();
+	    fr.read(buf);
+	    fr.close();
 
-	if ((new String(buf)).equals("max v2"))
-	  return true;
-	else
-	  return false;
+	    if ((new String(buf)).equals("max v2"))
+	      return true;
+	    else
+	      return false;
+	  }
+	catch (FileNotFoundException e)
+	  {
+	    return false;
+	  }
+	catch (IOException e)
+	  {
+	    return false;
+	  }
       }
-    catch (FileNotFoundException e)
-      {
-	return false;
-      }
-    catch (IOException e)
-      {
-	return false;
-      }
+    else
+      return false;
   }
 
   /** Make the real instance */
 
-  protected MaxData makeInstance(File file) throws MaxDataException
+  protected MaxData loadInstance(MaxDataSource source) throws MaxDataException
   {
+    File file = ((MaxFileDataSource) source).getFile();
     FtsContainerObject patcher;
 
     try
@@ -68,6 +80,8 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
     FtsPatchData obj = new FtsPatchData();
 
     obj.setPatcher(patcher);
+    obj.setDataSource(source);
+    obj.setDataHandler(this);
 
     return obj;
   }
@@ -83,9 +97,8 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
   {
     return false;
   }
-       
 
-  protected boolean canSaveTo(File file)
+  public boolean canSaveTo(MaxDataSource source, MaxData instance)
   {
     return false;
   }

@@ -277,9 +277,7 @@ Rectangle previousResizeRect = new Rectangle();
       setFont(theFont);   
     }
     catch (Exception e) {
-      ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
-      aErr.setLocation(100, 100);
-      aErr.show();  
+      new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
       return;
     }
     sketchFont = theFont;

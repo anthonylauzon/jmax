@@ -15,12 +15,10 @@ abstract public class MaxDataHandler
 
   static Vector allHandlers = new Vector();
 
-  /** Static method to find a Data Handler for a given Data Source;
-   *  Use canSaveTo because in general we cannot load from a data source
-   * that correspond to an empty file ...
+  /** Static method to find a Data Handler for a given Data Source/data pair;
    */
 
-  public static MaxDataHandler findDataHandlerFor(MaxDataSource source)
+  public static MaxDataHandler findDataHandlerFor(MaxDataSource source, MaxData data)
   {
     for (int i = 0; i < allHandlers.size() ; i++)
       {
@@ -28,7 +26,7 @@ abstract public class MaxDataHandler
 
 	dataHandler = (MaxDataHandler) allHandlers.elementAt(i);
 
-	if (dataHandler.canSaveTo(source))
+	if (dataHandler.canSaveTo(source, data))
 	  return dataHandler;
       }
 
@@ -50,11 +48,10 @@ abstract public class MaxDataHandler
 
 	if (dataHandler.canLoadFrom(source))
 	  {
+	    // It is the responsability of the data Handler
+	    // to properly set the source and handler in the data
+
 	    newInstance = dataHandler.loadInstance(source);
-
-	    newInstance.setDataSourceAndHandler(source, dataHandler);
-
-	    // here, raise the new instance event  ??
 
 	    return newInstance;
 	  }
@@ -75,27 +72,41 @@ abstract public class MaxDataHandler
     allHandlers.addElement(handler);
   }
 
-  /** Return true if this Data Handler can load
-    from the given address; by default return false */
+  /** Return true if this Data Handler can load a new instance
+    from the given address; by default return true if the source
+    exists and it is readable */
 
   public boolean canLoadFrom(MaxDataSource source)
   {
-    return false;
+    return source.exists() && source.canRead();
   }
 
 
   /** Return true if this data handler can save 
-    to the given address; by default return false */
+    to the given address; by default return true if the source
+    exists, if it writable, and if we can load from it.
+    */
 
   public boolean canSaveTo(MaxDataSource source)
   {
-    return false;
+    if (source.exists())
+      return source.canWrite() && canLoadFrom(source);
+    else
+      return source.canWrite();
+  }
+
+  /** Return true if this data handler can save a given instance
+    to the given address; by default return false */
+
+  public boolean canSaveTo(MaxDataSource source, MaxData instance)
+  {
+    if (source.exists())
+      return source.canWrite() && canLoadFrom(source);
+    else
+      return source.canWrite();
   }
 
   /** Load an instance from a data source.
-    Do not overwrite this method, use makeInstance instead,
-    in the proper subclass.
-
     If you want to call this, probabily you really want to call
     the static loadDataInstance.
     */
@@ -103,7 +114,6 @@ abstract public class MaxDataHandler
   abstract protected MaxData loadInstance(MaxDataSource source) throws MaxDataException;
 
   abstract public void saveInstance(MaxData instance) throws MaxDataException;
-       
 }
 
 

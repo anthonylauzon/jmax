@@ -13,6 +13,7 @@ public class FtsPatchDataType extends MaxDataType
   public FtsPatchDataType()
   {
     super("patcher");
+    setPrettyName("Patcher");
   }
 
   /** Build an empty instance of FtsPatchData, i.e. an instance

@@ -48,10 +48,6 @@ MaxWhenCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWhenCmd.java)
 .PHONY: MaxWhenCmd
 
-MaxOpenConsoleCmd:	
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxOpenConsoleCmd.java)
-.PHONY: MaxOpenConsoleCmd
-
 MaxSourceCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSourceCmd.java)
 .PHONY: MaxSourceCmd

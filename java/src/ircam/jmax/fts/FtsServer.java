@@ -465,6 +465,33 @@ public class FtsServer
       }
   }
 
+
+  /** Send an "_set" messages to inlet 0 of an FTS object with as arguments elements
+    from an int arrays; and have a special function to avoid building 
+    a big Vector of arguments; special for the Table object, may be sustituted by
+    something more generic in the future.
+    */
+
+  final void sendSetMessage(FtsObject dst, int offset, int[] values, int from, int to)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(dst);
+	port.sendInt(0);
+	port.sendString("_set");
+	port.sendInt(offset);
+
+	if (values != null)
+	  port.sendArray(values, from, to);
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
   /** Send a "named object message" messages to FTS.
     @deprecated
    */

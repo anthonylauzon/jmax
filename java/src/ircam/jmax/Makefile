@@ -22,6 +22,11 @@ all:
 .PHONY: all
 
 
+TestWindow:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -deprecation TestWindow.java)
+.PHONY: TestWindow
+
+
 MaxApplication:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxApplication.java)
 .PHONY: MaxApplication
@@ -33,6 +38,10 @@ MaxEditor:
 MaxWhenHookTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWhenHookTable.java)
 .PHONY: MaxWhenHookTable
+
+MaxWindowManager:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindowManager.java)
+.PHONY: MaxWindowManager
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

@@ -29,7 +29,7 @@ class JMaxCmd implements Command
 	String name;
 	String info;
 	TclObject body;
-	MaxTclData data;
+	MaxData data;
 
 	if (argv.length == 5)
 	  {
@@ -49,20 +49,25 @@ class JMaxCmd implements Command
 
 	// Create a new instance of the type
 
-	data = (MaxTclData) MaxDataType.getTypeByName(docType).newInstance();
+	data = MaxDataType.getTypeByName(docType).newInstance();
 
-	// Set the name and info
+	if (data instanceof MaxTclData)
+	  {
+	    // Set the name and info
 
-	data.setName(name);
-	data.setInfo(info);
+	    data.setName(name);
+	    data.setInfo(info);
 
-	// Eval the body inside the data instance
+	    // Eval the body inside the data instance
 
-	data.eval(interp, body);
+	    ((MaxTclData) data).eval(interp, body);
 
-	// Finally, return the data to the tcl interpreter
+	    // Finally, return the data to the tcl interpreter
     
-	interp.setResult(ReflectObject.newInstance(interp, data));
+	    interp.setResult(ReflectObject.newInstance(interp, data));
+	  }
+	else
+	  new TclException(interp, docType + " is not a tcl based jMax Type");
       }
     else
       throw new TclNumArgsException(interp, 1, argv, "doc-type [version] name info doc-body");

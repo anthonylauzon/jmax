@@ -26,6 +26,7 @@ SOURCES = \
           FtsDeclarationObject.java \
 	  FtsValueObject.java \
           FtsParse.java \
+	  FtsParseToPort.java  \
           FtsPort.java \
           FtsPropertyHandler.java \
           FtsReferenceURLTable.java \
@@ -40,9 +41,12 @@ SOURCES = \
 	  FtsLocator.java  \
 	  FtsDotPatFileDataHandler.java  \
 	  FtsPatchData.java  \
+	  FtsIntegerVectorData.java  \
 	  FtsPatchDataType.java \
+	  FtsIntegerVectorDataType.java \
           FtsUpdateGroupListener.java \
-	  FtsParseToPort.java
+	  FtsIntegerVectorData.java \
+	  FtsIntegerVectorObject.java
 
 
 

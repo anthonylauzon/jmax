@@ -103,7 +103,7 @@ public class FtsPatcherObject extends FtsContainerObject
 						   ninlets,
 						   noutlets);
     if (parent.isOpen())
-      updated = true;
+      FtsServer.getServer().syncToFts();
   }
 
   /**
@@ -125,8 +125,9 @@ public class FtsPatcherObject extends FtsContainerObject
 						   objectName,
 						   ninlets,
 						   noutlets);
+
     if (parent.isOpen())
-      updated = true;
+      FtsServer.getServer().syncToFts();
   }
 
 

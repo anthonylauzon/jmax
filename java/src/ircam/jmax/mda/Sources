@@ -5,20 +5,22 @@ SOURCES =  \
 	  MaxDataHandler.java \
 	  MaxDataSource.java \
 	  MaxDataType.java \
-	  MaxFileDataHandler.java \
+	  FtsDataHandler.java \
 	  MaxTclFileDataHandler.java \
 	  MaxFileDataSource.java \
 	  MaxFtsDataSource.java \
-	  MaxURLDataHandler.java \
 	  MaxURLDataSource.java \
+	  MaxReaderDataSource.java \
+	  MaxWriterDataSource.java \
 	  MaxDataEditor.java    \
 	  MaxDataEditorFactory.java \
 	  MaxTclEditorFactory.java  \
+	  MaxFtsData.java      \
 	  MaxTclData.java      \
           MaxTclInterpreter.java \
 	  MaxStringDataHandler.java \
 	  MaxTclStringDataHandler.java \
-	  MaxStringDataSource.java
+	  MaxTclWriterDataHandler.java
 
 
 

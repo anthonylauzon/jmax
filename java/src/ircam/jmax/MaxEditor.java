@@ -1,5 +1,4 @@
 
-
 package ircam.jmax;
 
 import java.awt.*;
@@ -11,6 +10,7 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.ermes.*; // @@@ !!
+import ircam.jmax.editors.console.*; // @@@ !!
 import com.sun.java.swing.*;
 
 /**
@@ -18,25 +18,48 @@ import com.sun.java.swing.*;
  * such as the Window menu handling, initialisation, and others.
  */
 public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener, ActionListener {
+  MaxDataType editedType;
+
   public Menu itsFileMenu;
   public Menu itsNewFileMenu;
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
 
   Vector itsWindowMenuList;
-  static NewDialog itsNewDialog;
-
 	
+  public MaxEditor(String title, MaxDataType type)
+  {
+    super(title);
+    
+    editedType = type;
+    MaxWindowManager.getWindowManager().addWindow(this);
+  }
+
   public MaxEditor(String title)
   {
     super(title);
+    
+    editedType = null;
+    MaxWindowManager.getWindowManager().addWindow(this);
   }
+
   
+  public MaxEditor(MaxDataType type)
+  {
+    super("");
+
+    editedType = type;
+    MaxWindowManager.getWindowManager().addWindow(this);
+  }
+
   public MaxEditor()
   {
     super("");
+
+    editedType = null;
+    MaxWindowManager.getWindowManager().addWindow(this);
   }
-  
+
   public final void Init()
   {
     itsWindowMenuList = new Vector();
@@ -58,25 +81,58 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   }
 
 
+  /** Use an Action object to do this stuff */
+
+  class NewDataCreator implements ActionListener
+  {
+    MaxDataType type;
+
+    NewDataCreator(MaxDataType type)
+    {
+      this.type = type;
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+      MaxData data;
+
+      try
+	{
+	  data = type.newInstance();
+	  data.edit();
+	}
+      catch (MaxDataException ex)
+	{
+	  new ErrorDialog(MaxEditor.this, "Error " + ex + "while creating new "+ type.getName());
+	}
+    }
+  }
+
+  private MenuItem CreateNewTypeMenu()
+  {
+    MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName() + " Ctrl+N");
+
+    newMenu.addActionListener(new NewDataCreator(editedType));
+
+    return newMenu;
+  }
+
   private Menu CreateNewFileMenu()
   {
     MenuItem aMenuItem;
     String aString;
-    Menu newFileMenu = new Menu("New...  Ctrl+N");
+    Menu newFileMenu = new Menu("New...");
     
     for (Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();)
       {
 	final MaxDataType aDataType = (MaxDataType) e.nextElement();
 
-	if (aDataType.canMakeNewInstance())
+	if (aDataType.canMakeNewInstance() && aDataType.haveEditorFactory())
 	  {
-	    aMenuItem = new MenuItem(aDataType.getName());
+	    aMenuItem = new MenuItem(aDataType.getPrettyName());
 	    newFileMenu.add(aMenuItem); 
 
-	    aMenuItem.addActionListener(new ActionListener()
-					{
-					  public  void actionPerformed(ActionEvent e)
-					    { MaxApplication.NewType(aDataType);}});
+	    aMenuItem.addActionListener(new NewDataCreator(aDataType));
 	  }
       }
 
@@ -89,6 +145,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     MenuItem aMenuItem;
     CheckboxMenuItem aCheckItem;
     Menu fileMenu = new Menu("File");
+
+    if (editedType != null)
+      fileMenu.add(CreateNewTypeMenu());
+
     itsNewFileMenu = CreateNewFileMenu();
 
     fileMenu.add(itsNewFileMenu);
@@ -170,21 +230,21 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
-				    { MaxApplication.StackWindows();}});
+				    { MaxWindowManager.getWindowManager().StackWindows();}});
 
     aMenuItem = new MenuItem("Tile");
     windowsMenu.add(aMenuItem);
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
-				    { MaxApplication.TileWindows();}});
+				    { MaxWindowManager.getWindowManager().TileWindows();}});
 
     aMenuItem = new MenuItem("Tile Vertical");
     windowsMenu.add(aMenuItem);
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
-				    { MaxApplication.TileVerticalWindows();}});
+				    { MaxWindowManager.getWindowManager().TileVerticalWindows();}});
 
     windowsMenu.add(new MenuItem("-"));
 
@@ -193,7 +253,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
-				    { MaxApplication.GetConsoleWindow().toFront();}});
+				    { ConsoleWindow.getConsoleWindow().toFront();}});
 
     AddWindowItems(windowsMenu);
 
@@ -213,39 +273,46 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     MenuItem aMenuItem;
     Menu aMenu;
 
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++)
+    if (MaxApplication.itsSketchWindowList != null)
       {
-	aSketchWindow= (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-	if (!aSketchWindow.isSubPatcher)
+	for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++)
 	  {
-	    if (aSketchWindow.itsSubWindowList.size()==0)
+	    aSketchWindow= (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
+	    if (!aSketchWindow.isSubPatcher)
 	      {
-		theWindowMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
-		aMenuItem.addActionListener(this);
-	      }
-	    else
-	      {
-		aMenu = new Menu(aSketchWindow.getTitle());
-		aMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
-		aMenuItem.addActionListener(this);
-		for (int k=0; k<aSketchWindow.itsSubWindowList.size(); k++ )
+		if (aSketchWindow.itsSubWindowList.size()==0)
 		  {
-		    aSubWindow = (ErmesSketchWindow)aSketchWindow.itsSubWindowList.elementAt(k);
-		    aMenu.add(aMenuItem = new MenuItem(aSubWindow.getTitle()));
+		    theWindowMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
 		    aMenuItem.addActionListener(this);
 		  }
-		theWindowMenu.add(aMenu);
-		itsWindowMenuList.addElement(aMenu);
+		else
+		  {
+		    aMenu = new Menu(aSketchWindow.getTitle());
+		    aMenu.add(aMenuItem = new MenuItem(aSketchWindow.getTitle()));
+		    aMenuItem.addActionListener(this);
+		    for (int k=0; k<aSketchWindow.itsSubWindowList.size(); k++ )
+		      {
+			aSubWindow = (ErmesSketchWindow)aSketchWindow.itsSubWindowList.elementAt(k);
+			aMenu.add(aMenuItem = new MenuItem(aSubWindow.getTitle()));
+			aMenuItem.addActionListener(this);
+		      }
+		    theWindowMenu.add(aMenu);
+		    itsWindowMenuList.addElement(aMenu);
+		  }
 	      }
 	  }
       }
-    for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++)
+
+    if (MaxApplication.itsEditorsFrameList != null)
       {
-	aWindow = (MaxEditor) MaxApplication.itsEditorsFrameList.elementAt(j);
-	if (aWindow!=this)
+	for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++)
 	  {
-	    theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetTitle()));
-	    aMenuItem.addActionListener(this);
+	    aWindow = (MaxEditor) MaxApplication.itsEditorsFrameList.elementAt(j);
+	    if (aWindow!=this)
+	      {
+		theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetTitle()));
+		aMenuItem.addActionListener(this);
+	      }
 	  }
       }
   }
@@ -472,19 +539,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     dispose();
   }
 
-  public void New()
-  {
-    String aNewFileType;
-    if(itsNewDialog==null) itsNewDialog=new NewDialog(this);
-    else itsNewDialog.Init(this);
-    Point aPoint = getLocation();
-    itsNewDialog.setLocation(aPoint.x+100, aPoint.y+100);
-    itsNewDialog.setVisible(true);
-    aNewFileType = itsNewDialog.GetNewFileType();
-    if(!aNewFileType.equals("")) MaxApplication.NewFile(aNewFileType);
-  }
-
-
   protected void Cut(){};
   protected void Copy(){};
   protected void Paste(){};
@@ -542,13 +596,37 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
-  
+
+  /** Use an Action object to do this stuff */
+
   public void Open()
   {
     MaxDataSource source = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
     if (source != null)
-      MaxApplication.OpenFile(source);
+      {
+	try
+	  {
+	    MaxData data;
+
+	    data = MaxDataHandler.loadDataInstance(source);
+	
+	    try
+	      {
+		data.edit();
+	      }
+	    catch (MaxDataException e)
+	      {
+		// Ignore MaxDataException exception in running the editor
+		// May be an hack, may be is ok; move this stuff to an action
+		// handler !!
+	      }
+	  }
+	catch (MaxDataException e)
+	  {
+	    new ErrorDialog(this, "Error " + e + "while opening "+ source);
+	  }
+      }
   }
 
 
@@ -572,9 +650,24 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     int aInt = e.getKeyCode();
     if (e.isControlDown())
       {
-	if (aInt == 74) MaxApplication.GetConsoleWindow().toFront();//j
+	if (aInt == 74) ConsoleWindow.getConsoleWindow().toFront();//j
 	else if (aInt == 67) Copy();//c
-	else if (aInt == 78) New();//n
+	else if (aInt == 78)
+	  {
+	    // Ctrl-N always create a new patcher
+
+	    if (editedType != null)
+	      {
+		try
+		  {
+		    editedType.newInstance().edit();
+		  }
+		catch (MaxDataException ex)
+		  {
+		    // Ingnore exceptions here
+		  }
+	      }
+	  }
 	else if (aInt == 79) Open();//o
 	else if (aInt == 80) Print();//p
 	else if (aInt == 81) MaxApplication.Quit(); //q
@@ -599,47 +692,74 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public MenuItem GetNewMenu()
   {
-    return itsFileMenu.getItem(0);
+    if (editedType != null)
+      return itsFileMenu.getItem(1);
+    else
+      return itsFileMenu.getItem(0);
   }
 
   public MenuItem GetOpenMenu()
   {
-    return itsFileMenu.getItem(1);
+    if (editedType != null)
+      return itsFileMenu.getItem(2);
+    else
+      return itsFileMenu.getItem(1);
   }
 
   public MenuItem GetCloseMenu()
   {
-    return itsFileMenu.getItem(2);
+    if (editedType != null)
+      return itsFileMenu.getItem(3);
+    else
+      return itsFileMenu.getItem(2);
   }
 
   public MenuItem GetOpenWithAutoroutingMenu()
   {
-    return itsFileMenu.getItem(4);
+    if (editedType != null)
+      return itsFileMenu.getItem(4);
+    else
+      return itsFileMenu.getItem(3);
   }
 
   public MenuItem GetSaveMenu()
   {
-    return itsFileMenu.getItem(6);
+    if (editedType != null)
+      return itsFileMenu.getItem(6);
+    else
+      return itsFileMenu.getItem(5);
   }
 
   public MenuItem GetSaveAsMenu()
   {
-    return itsFileMenu.getItem(7);
+    if (editedType != null)
+      return itsFileMenu.getItem(7);
+    else
+      return itsFileMenu.getItem(6);
   }
   
   public MenuItem GetPrintMenu()
   {
-    return itsFileMenu.getItem(9);
+    if (editedType != null)
+      return itsFileMenu.getItem(9);
+    else
+      return itsFileMenu.getItem(8);
   }
 
   public MenuItem GetSystemStatisticsMenu()
   {
-    return itsFileMenu.getItem(10);
+    if (editedType != null)
+      return itsFileMenu.getItem(10);
+    else
+      return itsFileMenu.getItem(9);
   }
 
   public MenuItem GetQuitMenu()
   {
-    return itsFileMenu.getItem(11);
+    if (editedType != null)
+      return itsFileMenu.getItem(11);
+    else
+      return itsFileMenu.getItem(10);
   }
 
   public MenuItem GetCutMenu()

@@ -3,6 +3,8 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
+import ircam.jmax.mda.*;
+
 /**
  * This class provide a registration service for help Patches.
  * The class is filled thru the TCL Command <b>helpPatch</b>.
@@ -30,14 +32,31 @@ public class FtsHelpPatchTable
     return (String) helpTable.get(className);
   }
 
-  /** Access to the help patch for an object. */
-
-  public static File getHelpPatch(FtsObject obj)
+  static public boolean openHelpPatch(FtsObject obj)
   {
     if (exists(obj.getClassName()))
-      return new File(getHelpPatch(obj.getClassName()));
+      {
+	try
+	  {
+	    MaxDataSource source = MaxDataSource.makeDataSource(getHelpPatch(obj.getClassName()));
+	    MaxData data;
+
+	    data = MaxDataHandler.loadDataInstance(source);
+	    data.edit();
+	  }
+	catch (MaxDataException e)
+	  {
+	    return false;
+	  }
+	catch (java.net.MalformedURLException e)
+	  {
+	    return false;
+	  }
+
+	return true;
+      }
     else
-      return null;
+      return false;
   }
 }
 

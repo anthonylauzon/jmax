@@ -28,4 +28,33 @@ class MaxURLDataSource extends MaxDataSource
     name = url.toString();
     return name.substring(0, name.lastIndexOf('.'));
   }
+
+  /** Return a boolean that tell if the source correspond
+      to an actually, phisically, existing source, or it
+      just express an address where a data source can be created.
+      */
+
+  public boolean exists()
+  {
+    // we should know better, may be try to open
+
+    return false;
+  }
+
+  /** Return true if we can write to this source.
+    All URL are readonly for jmax
+    */
+
+  public boolean canWrite()
+  {
+    return false;
+  }
+
+  /** Return true if we can read from this source */
+
+  public boolean canRead()
+  {
+    return true;
+  }
+
 }

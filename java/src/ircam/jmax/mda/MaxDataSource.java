@@ -21,7 +21,7 @@ abstract public class MaxDataSource
 	address.startsWith("file:"))
       return new MaxURLDataSource(new URL(address));
     else if (address.startsWith("fts:"))
-      return new MaxFtsDataSource(new FtsLocator(address));
+      return new MaxFtsDataSource(new FtsLocation(address));
     else 
       return new MaxFileDataSource(new File(address));
   }
@@ -36,13 +36,13 @@ abstract public class MaxDataSource
     return new MaxURLDataSource(url);
   }
 
-  /** This static method produce a MaxDataSource from a FtsLocator object
+  /** This static method produce a MaxDataSource from a FtsLocation object
    *
    */
 
-  public static MaxDataSource makeDataSource(FtsLocator locator)
+  public static MaxDataSource makeDataSource(FtsLocation location)
   {
-    return new MaxFtsDataSource(locator);
+    return new MaxFtsDataSource(location);
   }
 
   /** This static method produce a MaxDataSource from a File object
@@ -56,6 +56,21 @@ abstract public class MaxDataSource
   /** Return a name that can be used as document name */
 
   abstract public String getName();
+
+  /** Return a boolean that tell if the source correspond
+      to an actually, phisically, existing source, or it
+      just express an address where a data source can be created.
+      */
+
+  abstract public boolean exists();
+
+  /** Return true if we can write to this source */
+
+  abstract public boolean canWrite();
+
+  /** Return true if we can read from this source */
+
+  abstract public boolean canRead();
 }
 
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/03/18 19:05:17 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/03/19 17:46:13 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -66,6 +66,7 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
   fts_status_t   status;
   fts_class_t   *cl;
   fts_object_t  *obj;
+  int i;
 
   if (! fts_is_symbol(&at[0]))
     {
@@ -80,7 +81,17 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
-  
+
+  /* Copying the arguments */
+
+  obj->argc = ac;
+  obj->argv = (fts_atom_t *) fts_block_zalloc(ac * sizeof(fts_atom_t));
+
+  for (i = 0; i < ac; i++)
+    obj->argv[i] = at[i];
+
+  /* Other Initializations */
+
   obj->properties = 0;
 
   if (cl->noutlets)

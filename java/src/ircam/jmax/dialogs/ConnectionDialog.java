@@ -41,7 +41,6 @@ import ircam.jmax.utils.*;
  */
 
 public class ConnectionDialog extends Dialog implements KeyListener, ActionListener, ItemListener{
-  Frame parent;
   Button okButton;
   Button cancelButton;
   Choice connectionType;
@@ -54,10 +53,8 @@ public class ConnectionDialog extends Dialog implements KeyListener, ActionListe
   public String hostName = "";
   public String portNo = "";
     
-  public ConnectionDialog(Frame dw) {
-    super(dw, "FTS connection", false);
-
-    parent = dw;
+  public ConnectionDialog() {
+    super(MaxWindowManager.getWindowManager().getAFrame(), "FTS connection", false);
 
     setLayout(new BorderLayout());
 		

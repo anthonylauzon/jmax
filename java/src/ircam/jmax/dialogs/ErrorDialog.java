@@ -34,6 +34,11 @@ public class ErrorDialog extends Dialog implements ActionListener{
 
     //Initialize this dialog to its preferred size.
     pack();
+
+    // locate and Show.
+
+    // setLocation(100, 100);
+    show();  
   }
 
   public void actionPerformed(ActionEvent e){    

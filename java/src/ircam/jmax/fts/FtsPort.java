@@ -359,6 +359,21 @@ abstract class FtsPort implements Runnable
 	  sendValue(o);
       }
   }
+
+
+  final void sendArray(int[] values, int from , int to) throws java.io.IOException 
+  {
+    for (int narg = from; narg < to; narg++)
+      sendInt(values[narg]);
+  }
+
+  final void sendArray(float[] values, int from, int to) throws java.io.IOException 
+  {
+    for (int narg = from; narg < to; narg++)
+      sendFloat(values[narg]);
+  }
+
+
   
   final void sendEom() throws java.io.IOException 
   {

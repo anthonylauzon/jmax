@@ -99,8 +99,11 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     // The check on patcher here is temporary; patchers will move
     // to a specific API as soon as the patcher object is ready.
+    // SHould use an hash table here !
 
-    if (className.equals("patcher"))
+    if (className.equals("table"))
+      return new FtsTableObject(parent, className, description);
+    else if (className.equals("patcher"))
       throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "patcher"));
     else if (className.equals("inlet"))
       throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "inlet"));
@@ -594,14 +597,6 @@ abstract public class FtsObject implements MaxTclInterpreter
   /** The number of outlets of this object */
 
   int noutlets;
-
-  /**
-   * True when the object is ready and kept consistent.
-   * In an open patcher, don't try to keep it consistent if not ready (sync are expensive !!)
-   * ????
-   */
-
-  boolean updated = false;
 
   /**
    * The object string description. 

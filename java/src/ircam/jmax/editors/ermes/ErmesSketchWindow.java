@@ -121,7 +121,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
    * constructor from a MaxData-only (to be used for top-level patchers)
    */
   public ErmesSketchWindow(MaxData theData) {
-    super();
+    super(MaxDataType.getTypeByName("patcher"));
     if (theData.getName()==null) setTitle(GetNewUntitledName());
     else {
       setTitle(theData.getDataSource().toString()); 
@@ -146,9 +146,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return theFtsPatcher.getClassName();
   }
 
-  public ErmesSketchWindow (MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
+  public ErmesSketchWindow(MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
     //super(theData.getName());
-    super(MaxApplication.GetWholeWinName(chooseWindowName(theFtsPatcher)));
+    super(MaxApplication.GetWholeWinName(chooseWindowName(theFtsPatcher)),
+	  MaxDataType.getTypeByName("patcher"));
     itsPatcher = theFtsPatcher;
     itsData = theData;
     CommonInitializations();
@@ -192,7 +193,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     //--------------------------------------------------------    
   public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow, boolean theIsAbstraction)
   {
-    super();
+    super(MaxDataType.getTypeByName("patcher"));
     isSubPatcher = theIsSubPatcher;
     isAbstraction = theIsAbstraction;
     itsTopWindow = theTopWindow;
@@ -761,14 +762,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else if(aInt == 47){//this is a patch to trap the '?'
       //ask help for the selected element...
       ErmesObject aObject = null;
-      File fileToOpen;
+
       for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
 	aObject = (ErmesObject) en.nextElement();
 	
-	fileToOpen = FtsHelpPatchTable.getHelpPatch(aObject.itsFtsObject);
-	
-	if (fileToOpen != null)
-	  MaxApplication.OpenFile(MaxDataSource.makeDataSource(fileToOpen));
+	FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
       }
     } else {
       // Finally, if we don't redefine the key, call the superclass method
@@ -839,9 +837,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       }
     catch (MaxDataException e)
       {
-	ErrorDialog aErr = new ErrorDialog(this, e.getMessage());
-	aErr.setLocation(100, 100);
-	aErr.show();  
+	new ErrorDialog(this, e.getMessage());
 	return false;
       }
 
@@ -873,7 +869,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     if (source == null)
       return;
     else
-      itsData.setDataSource(source);
+      itsData.bindToDataSource(source);
     
     if(SaveBody())
       MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());

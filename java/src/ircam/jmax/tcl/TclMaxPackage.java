@@ -35,10 +35,6 @@ public class TclMaxPackage
     /* browser */
     interp.createCommand("open", new MaxOpenCmd());
 
-    /* console */
-
-    interp.createCommand("openConsole", new MaxOpenConsoleCmd());
-
     /* Splash screen support */
 
     interp.createCommand("splash", new MaxSplashCmd());

@@ -20,6 +20,7 @@ include Sources
 
 all: 
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
+	(cd tcl; $(MAKE) all)
 .PHONY: all
 
 ConsoleModule:
