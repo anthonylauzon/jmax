@@ -50,7 +50,7 @@ struct fts_patcher
   int scope; /* scope flag: non-zero for top level patchers and templates */
 
   /* If this patcher is a template, point to the template definition */
-  fts_template_t *template;
+  fts_template_t *template_definition;
   fts_hashtable_t *definitions;
   fts_symbol_t file_name;
   
@@ -58,7 +58,7 @@ struct fts_patcher
 };    
 
 #define fts_patcher_is_open(p)     ((p)->open)
-FTS_API void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
+FTS_API void fts_patcher_set_dirty(fts_patcher_t *self, int is_dirty);
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 

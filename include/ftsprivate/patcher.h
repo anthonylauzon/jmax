@@ -35,9 +35,9 @@ extern fts_patcher_t *fts_patcher_get_scope(fts_patcher_t *patcher);
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
 
-extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
+extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template_definition);
 
-#define fts_patcher_get_template(p) ((p)->template)
+#define fts_patcher_get_template(p) ((p)->template_definition)
 
 #define fts_patcher_get_file_name(p) ((p)->file_name)
 #define fts_patcher_set_file_name(p, n) ((p)->file_name = (n))
