@@ -1406,7 +1406,9 @@ public class FtsServer implements Runnable
   void dispatchMessage(FtsStream stream)
        throws java.io.InterruptedIOException, FtsQuittedException, java.io.IOException
   {
-    switch (stream.getCommand())
+    int command = stream.getCommand();
+
+    switch (command)
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
@@ -1707,7 +1709,7 @@ public class FtsServer implements Runnable
 	}
 
       default:
-	System.err.println( "!!!!!!!!! Received unknown message from stream " + stream);
+	System.err.println( "Error: received unknown message " + (char)command + " from stream " + stream);
 	break;
       }
   }

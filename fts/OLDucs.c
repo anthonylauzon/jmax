@@ -351,7 +351,7 @@ static fts_status_t fts_ucs_load_module(int argc, const fts_atom_t *argv)
       ret = fts_load_library( file, module_name);
 
       if (ret != fts_Success)
-	post("Error loading module %s: %s (%s)\n", module_name, ret->description, file);
+	post("Error loading module %s: %s\n", module_name, ret->description);
 
       fts_free( name);
     }
@@ -550,7 +550,7 @@ fts_ucs_install_commands()
  *
  */
 
-static void fts_kernel_ucs_init(void)
+void fts_kernel_olducs_init(void)
 {
   fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
   fts_ucs_install_commands();

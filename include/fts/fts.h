@@ -117,6 +117,7 @@ extern "C" {
 #include <fts/bytestream.h>
 
 #include <fts/client.h>
+#include <fts/OLDclient.h>
 
 /*
  * FTS global initialization 

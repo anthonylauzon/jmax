@@ -114,7 +114,7 @@ post_atoms(int ac, const fts_atom_t *at)
     }
 }
 
-#define POST_LINE_MAXLENGTH 512
+#define POST_LINE_MAXLENGTH 2048
 
 void post( const char *format, ...)
 {

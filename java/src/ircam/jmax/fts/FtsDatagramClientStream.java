@@ -74,6 +74,7 @@ class FtsDatagramClientStream extends FtsStream
     // Its content is ignore, is used for startup syncronization
     // and to get the fts port number and address
 
+
     try
       {
 	in_packet  = new DatagramPacket(in_data , in_data.length);
@@ -147,6 +148,27 @@ class FtsDatagramClientStream extends FtsStream
 
 	receivedPacketSize = ((in_data[1] < 0 ? in_data[1] + 256 : in_data[1]) * 256 +
 			      ((in_data[2] < 0 ? in_data[2] + 256 : in_data[2])));
+
+//  	{
+//  	  int i;
+
+//  	  System.err.println( "Received " + receivedPacketSize + " bytes");
+
+//  	  for ( i = 0; i < receivedPacketSize; i++)
+//  	    {
+//  	      if ( i % 8 == 0)
+//  		System.err.print( "[" + i + "]");
+
+//  	      System.err.print( " " + in_data[i]);
+
+//  	      if ( i % 8 == 7)
+//  		System.err.println();
+//  	    }
+
+//  	  if ( i % 8 != 7)
+//  	    System.err.println();
+//  	}
+
 
 	in_fill_p = 3;
       }

@@ -62,13 +62,6 @@
 #include <ftsprivate/template.h>
 
 
-/*
- * TODO:
- * - when to flush the output buffer ?
- * - arguments passing to oldclient_init
- * - instantiation of old client object
- */
-
 
 /***********************************************************************
  *
@@ -193,6 +186,10 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
 
   fts_buffer_init( &this->output_buffer, unsigned char);
+
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
 }
 
 static void
@@ -246,6 +243,7 @@ void fts_oldclient_start( void)
 }
 
 
+#define UDP_PACKET_SIZE 2048
 
 static void oldclient_put_char( oldclient_t *this, unsigned char c)
 {
@@ -253,6 +251,9 @@ static void oldclient_put_char( oldclient_t *this, unsigned char c)
     return;
 
   fts_buffer_append( &this->output_buffer, unsigned char, c);
+
+  if (fts_buffer_get_length( &this->output_buffer) >= UDP_PACKET_SIZE)
+    oldclient_flush( this);
 }
 
 static void oldclient_flush( oldclient_t *this)
@@ -263,24 +264,54 @@ static void oldclient_flush( oldclient_t *this)
   if (!this)
     return;
 
-  p = fts_buffer_get_ptr( &this->output_buffer);
   len = fts_buffer_get_length( &this->output_buffer);
 
-  if (!len)
+  if (len <= 3)
     return;
 
+  p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+
   p[0] = this->sequence;
-  this->sequence = (this->sequence + 1) %128;
+  this->sequence = (this->sequence + 1) % 128;
 
   p[1] = len / 256;
   p[2] = len % 256;
 
+#if 0
+  {
+    int i;
+
+    fprintf( stderr, "Sending %d bytes\n", len);
+
+#define NN 32
+    for ( i = 0; i < len; i++)
+      {
+	if ( i % NN == 0)
+	  fprintf( stderr, "[%03d]", i);
+
+	if (p[i] >= ' ')
+	  fprintf( stderr, " %2c", p[i]);
+	else
+	  fprintf( stderr, " %02x", (int)p[i]);
+
+	if ( i % NN == (NN-1))
+	  fprintf( stderr, "\n");
+      }
+
+    if ( i % NN != (NN-1))
+      fprintf( stderr, "\n");
+  }
+#endif
+
   r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
 
   if ( r != len)
-    fprintf( stderr, "[this] error sending (%s)\n", strerror( errno));
+    fprintf( stderr, "[oldclient] error sending (%s)\n", strerror( errno));
 
   fts_buffer_clear( &this->output_buffer);
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
+  fts_buffer_append( &this->output_buffer, unsigned char, 0);
 }
 
 
@@ -294,11 +325,7 @@ static void oldclient_flush( oldclient_t *this)
  * Defining INCOMING_DEBUG_TRACE will produce a trace
  * of the incoming messages on the standard error
  */
-#undef INCOMING_DEBUG_TRACE
-
-#ifdef INCOMING_DEBUG_TRACE
-extern const char *protocol_printable_cmd( int cmd);
-#endif
+/*  #define INCOMING_DEBUG_TRACE */
 
 static void (* mess_dispatch_table[256])(int, const fts_atom_t *);
 
@@ -391,7 +418,7 @@ static void fts_client_parse_char( char c)
 	if (mess_dispatch_table[ cmd ])
 	  {
 #ifdef INCOMING_DEBUG_TRACE
-	    fprintf( stderr, "Dispatching '%s' ", protocol_printable_cmd( cmd));
+	    fprintf( stderr, "Dispatching '%c' ", cmd);
 	    fprintf_atoms( stderr, ac, at);
 	    fprintf( stderr, "\n");
 #endif
@@ -547,6 +574,12 @@ void fts_client_install(char type, void (* fun) (int, const fts_atom_t *))
    if it need it.
 */
 
+/*
+ * Defining OUTGOING_DEBUG_TRACE will produce a trace
+ * of the outgoing messages on the standard error
+ */
+
+/*  #define OUTGOING_DEBUG_TRACE       */
 
 
 static void fts_client_send_string(const char *msg)
@@ -570,7 +603,7 @@ void fts_client_start_msg( int type)
   oldclient_put_char( oldclient, (char)type);
 
 #ifdef OUTGOING_DEBUG_TRACE      
-  fprintf(stderr, "Sending '%d' ", type);
+  fprintf(stderr, "Sending '%c' ", (char)type);
 #endif
 
 }
@@ -657,6 +690,10 @@ static int cache_symbol( fts_symbol_t s)
 
 void fts_client_add_symbol(fts_symbol_t s)
 {
+#ifdef OUTGOING_DEBUG_TRACE      
+  fprintf( stderr, "%s ", fts_symbol_name(s) );
+#endif
+
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
     {
       oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
@@ -679,6 +716,10 @@ void fts_client_add_symbol(fts_symbol_t s)
 
 void fts_client_add_string(const char *s)
 {
+#ifdef OUTGOING_DEBUG_TRACE      
+  fprintf( stderr, "%s ", s);
+#endif
+
   oldclient_put_char( oldclient, STRING_CODE);
   fts_client_send_string(s);
   oldclient_put_char( oldclient, STRING_END_CODE);

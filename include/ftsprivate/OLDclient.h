@@ -135,8 +135,6 @@ extern void fts_client_redefine_connection(fts_connection_t *c);
 extern void fts_client_release_object(fts_object_t *c);
 extern void fts_client_release_object_data(fts_object_t *obj);
 
-extern void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
-extern void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
 extern void fts_object_reset_changed(fts_object_t *obj);
 
 extern void fts_updates_set_updates_per_ticks(int upt);
