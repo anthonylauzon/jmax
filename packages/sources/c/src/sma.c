@@ -147,7 +147,7 @@ static fts_status_t sma_instantiate(fts_class_t *cl, int ac, const fts_atom_t *a
 
 void sma_config( void)
 {
-  post( "Installing class `.*+~' of package `sources'\n");
+  post( "Installing class `s*+~' of package `sources'\n");
 
   fts_class_install( fts_new_symbol( ".*+~"), sma_instantiate);
 }
