@@ -301,6 +301,8 @@ sub DoSubstitutionsInFiles (\@\%)
 		$new = 'fts_new_symbol';
 		$contents = &DoSubstitutionsInString($contents, $old, $new);
 
+		# Replace "post" with "fts_post"
+		$contents = &DoSubstitutionsInString($contents, 'post', 'fts_post');
 
 		# Replace ivec_atom_get with (ivec_t*)fts_get_object
 		$contents = &DoSubstitutionsInString($contents, "ivec_atom_get", "(ivec_t*)fts_get_object");
