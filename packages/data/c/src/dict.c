@@ -236,7 +236,7 @@ dict_upload_data(dict_t *self)
   atoms = fts_array_get_atoms(&array);
   size = fts_array_get_size(&array);
   
-  data_size = size*2;
+  data_size = size;
   ms = 0;
   ns = 0;
   sent = 0;
@@ -262,7 +262,7 @@ dict_upload_data(dict_t *self)
         fts_memorystream_reset(stream);
         fts_spost_object((fts_bytestream_t *)stream, fts_get_object(d));
         fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-        fts_set_symbol(&a[i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));      
+        fts_set_symbol(&a[2+i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));      
       }
       else
         fts_atom_copy(d, &a[2+i]);
