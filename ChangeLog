@@ -1,3 +1,13 @@
+2003-02-05  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* added debug code in Java client library. Debug code is activated by setting
+	system property "ircam.fts.client.debug" to "true". This can be done by starting
+	Java virtual machine with option -Dircam.fts.client.debug=true
+
+	* added "Save As Default Project" implementation
+
+	* changed fts_get_user_project to create the jMax user directory if it does not exist
+
 2003-02-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* remove platform dependant default project files:

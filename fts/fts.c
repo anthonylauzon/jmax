@@ -135,34 +135,37 @@ fts_symbol_t fts_get_root_directory( void)
 
 void fts_load_project( void)
 {
-  fts_symbol_t project_symbol;
   fts_symbol_t project_file;
   fts_package_t* project = NULL;
 
-  project_symbol = fts_new_symbol( "project");
-  
   /* check if the user specified a project file on the command line  */
-  project_file = fts_cmd_args_get( project_symbol);
+  project_file = fts_cmd_args_get( fts_s_project);
 
   /* check if the user has a project file in the home directory  */
-  if (project_file == NULL) {
-    project_file = fts_get_user_project();
-  }
+  if (project_file == NULL)
+    project_file = fts_get_user_project( 0);
 
   /* check if there's a system wide project */
-  if (project_file == NULL) {
+  if (project_file == NULL)
     project_file = fts_get_system_project();
-  }
+
+  if (project_file)
+    project = fts_project_open(project_file);
 
   /* create an empty project */
-  if (project_file == NULL)
-  {
-    fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
-    project = fts_package_new(project_symbol);
-    fts_project_set(project);
-  }
+  if (project == NULL)
+    {
+      project = fts_package_new( fts_s_project);
+
+      fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
+      post( "Warning: no project found\n");
+    }
   else
-    project = fts_project_open(project_file);
+    {
+      post( "Opened project: %s\n", project_file);
+    }
+
+  fts_project_set( project);
 }
 
 
@@ -179,7 +182,7 @@ void fts_load_config( void)
 
   /* check if the user has a config file in the home directory  */
   if (config_file == NULL) {
-    config_file = fts_get_user_configuration();
+    config_file = fts_get_user_configuration( 0);
   }
 
   /* check if there's a system wide config */

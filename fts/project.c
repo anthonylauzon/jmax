@@ -36,41 +36,7 @@
 #include <ftsprivate/package.h>
 
 static fts_package_t* fts_project = NULL;
-static fts_symbol_t sym_project = NULL;
 static char *loading_project_dir = NULL;
-
-static void
-project_cut_name(const char* filename, char *name)
-{
-  int n = strlen(filename);
-  int i_begin, i_end;
-  int i = n - 1;
-
-  while(i > 0 && filename[i] != '.' && filename[i] != '/')
-    i--;
-
-  if(i == 0)
-    {
-      i_end = n;
-      i_begin = 0;
-    }
-  else if(filename[i] == '/')
-    {
-      i_end = n;
-      i_begin = i + 1;      
-    }
-  else
-    {
-      i_end = i;
-
-      while(i > 0 && filename[i] != '/')
-	i--;
-
-      i_begin = i + 1;
-    }
-
-  snprintf(name, i_end - i_begin + 1, "%s", filename + i_begin);
-}
 
 fts_package_t * 
 fts_project_open(const char* filename)
@@ -78,36 +44,21 @@ fts_project_open(const char* filename)
   fts_symbol_t sym;
   char name[256];
   char *fnm;
+  fts_package_t *package;
 
-  if (fts_project != NULL) {
+  if (fts_project != NULL)
     fts_project_close();
-  }
   
-  if (sym_project == NULL) {
-    sym_project = fts_new_symbol("project");
-  }
-
   fts_log("[project]: Opening project %s\n", filename);
   
   fnm = strcpy( fts_malloc( strlen( filename) + 1), filename);
   loading_project_dir = fts_dirname( fnm);
 
-  project_cut_name(filename, name);
-  sym = fts_new_symbol(name);
-
-  if(sym == fts_new_symbol("config"))
-    post("open default project\n");
-  else
-    post("open project: %s\n", sym);
-
-  fts_project = fts_package_load_from_file(sym, filename);
+  package = fts_package_load_from_file( fts_s_project, filename);
 
   loading_project_dir = NULL;
 
-  /* make the project the current package context */
-  fts_package_push(fts_project);
-
-  return fts_project;
+  return package;
 }
 
 int 
@@ -137,9 +88,8 @@ fts_project_close(void)
 void
 fts_project_set(fts_package_t* p)
 {
-  if (fts_project != NULL) {
+  if (fts_project != NULL)
     fts_project_close();
-  }
 
   fts_project = p;
 

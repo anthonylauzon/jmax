@@ -201,9 +201,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
     tabbedPane.addTab("Data Path", dataPathScrollPane);
     tabbedPane.addTab("Templates", templateScrollPane);         
     tabbedPane.addTab("Help Patches", helpScrollPane);    
-    tabbedPane.addTab("Audio/MIDI", configPanel);    
-    if( !(ftsPkg instanceof FtsPackage)) 
-      tabbedPane.setEnabledAt( 5, false);
+
+    if (ftsPkg instanceof FtsProject)
+      tabbedPane.addTab("Audio/MIDI", configPanel);    
+
     tabbedPane.setSelectedIndex(0);
     
     add( tabbedPane);

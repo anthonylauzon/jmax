@@ -870,6 +870,8 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
   }  
   else
   {
+    fts_project_set( project);
+
     client_register_object( this, (fts_object_t *)project, FTS_NO_ID);
 
     fts_set_int(a, fts_get_object_id( (fts_object_t *)project));

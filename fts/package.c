@@ -169,10 +169,8 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   {
     fts_log("[package]: Failed to load package file %s\n", path);
     
-    /*pkg = fts_package_new(name);
-    pkg->state = fts_package_corrupt;
-    goto graceful_exit;*/
     fts_package_pop(fts_system_package);
+
     return NULL;
   }
 
@@ -182,10 +180,8 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
     fts_patcher_remove_object(fts_get_root_patcher(), obj);
     fts_log("[package]: Invalid package file %s\n", path);
     
-    /*pkg = fts_package_new(name);
-    pkg->state = fts_package_corrupt;
-    goto graceful_exit;*/
     fts_package_pop(fts_system_package);
+
     return NULL;
   }
 
@@ -194,8 +190,6 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   fts_log("[package]: Loaded package definition from file %s\n", filename);  
   
- /*graceful_exit:*/
-
   pkg->name = name;
   pkg->filename = fts_new_symbol(filename);
 
@@ -203,6 +197,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   pkg->dir = fts_new_symbol( fts_dirname( dir));
 
   fts_package_pop(fts_system_package);
+
   return pkg;
 }
 
@@ -225,10 +220,6 @@ fts_package_load(fts_symbol_t name)
       || !fts_is_directory(path))
   {
     fts_log("[package]: Couldn't find package %s\n", name);
-
-    /*pkg = fts_package_new(name);
-    pkg->state = fts_package_corrupt;g
-    goto graceful_exit;*/
 
     return NULL;
   }
@@ -253,8 +244,6 @@ fts_package_load(fts_symbol_t name)
 
     /* load the default files */
     fts_package_load_default_files(pkg);
-
-    /*graceful_exit:*/
 
     /* put the package in the hashtable */
     fts_set_symbol(&n, name);
@@ -1418,6 +1407,15 @@ __fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 static void
+__fts_package_save_as_default(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[1];
+
+  fts_set_symbol( a, fts_get_user_project( 1));
+  __fts_package_save( o, 0, s, 1, a);
+}
+
+static void
 __fts_package_loaded(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *self = (fts_package_t *)o;
@@ -1446,6 +1444,7 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_windows, __fts_package_open_windows);
   fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
   fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
+  fts_class_message_varargs(cl, fts_new_symbol("save_as_default"), __fts_package_save_as_default);
   fts_class_message_varargs(cl, fts_s_config, __fts_package_config);
 
   fts_class_message_varargs(cl, fts_s_loaded, __fts_package_loaded);

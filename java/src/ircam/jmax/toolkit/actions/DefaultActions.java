@@ -105,7 +105,7 @@ public class DefaultActions
   public static EditorAction saveAsDefaultProjectAction    = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	System.err.println( "Not yet implemented");
+	JMaxApplication.getProject().saveAsDefault();
       }
     };
   public static EditorAction newPackageAction     = new EditorAction(){

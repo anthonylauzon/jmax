@@ -46,12 +46,6 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).addTemplatePath( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("abstraction_path"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsPackage)obj).addAbstractionPath( args.getLength(), args.getAtoms());
-	}
-      });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("data_path"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -284,14 +278,6 @@ public class FtsPackage extends FtsObjectWithEditor
       listener.templatePathChanged();
   }
   
-  void addAbstractionPath(int nArgs, FtsAtom[] args)
-  {
-    absPaths.removeAllElements();
-
-    for(int i = 0; i<nArgs; i++)
-      absPaths.addElement( args[i].symbolValue.toString());
-  }
-
   void addDataPath(int nArgs, FtsAtom[] args)
   {
     dataPaths.removeAllElements();
@@ -393,11 +379,6 @@ public class FtsPackage extends FtsObjectWithEditor
   public Enumeration getTemplatePaths()
   {
     return templatePaths.elements();
-  }
-
-  public Enumeration getAbstractionPaths()
-  {
-    return absPaths.elements();
   }
 
   public Enumeration getDataPaths()

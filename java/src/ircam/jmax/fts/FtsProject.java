@@ -94,6 +94,19 @@ public class FtsProject extends FtsPackage
       }
   }
 
+  public void saveAsDefault()
+  {
+    try
+      {
+	send( FtsSymbol.get("save_as_default"));
+      }
+    catch(IOException e)
+      {
+	System.err.println( "FtsProject: I/O Error sending saveAsDefault Message!");
+	e.printStackTrace(); 
+      }
+  }
+
   public void setConfig( String fileName)
   {
     args.clear();

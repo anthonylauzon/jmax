@@ -247,10 +247,10 @@ public class FtsArgs {
   public String toString()
   {
     StringBuffer b = new StringBuffer();
+    FtsAtom[] atoms = getAtoms();
 
-    for ( int i = 0; i < current; i++)
-      b.append( " [" + i + "] " + array[i] + "\n");
-
+    for ( int i = 0; i < getLength(); i++)
+      b.append( atoms[i] + " ");
     return b.toString();
   }
 

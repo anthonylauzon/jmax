@@ -158,6 +158,11 @@ class BinaryProtocolDecoder {
 
   private final void endMessageAction( int input)
   {
+    if (debug)
+      {
+	System.err.println( "[client] message: target " + target + " selector " + selector + " args [" + args + "]");
+      }
+
     FtsObject.invokeMessageHandler( target, selector, args);
 
     args.clear();
@@ -336,6 +341,8 @@ class BinaryProtocolDecoder {
     symbolCache = new SymbolCache();
 
     currentState = qInitial;
+
+    debug = Boolean.getBoolean( "ircam.fts.client.debug");
   }
 
   void decode( byte[] data, int offset, int length) throws FtsClientException
@@ -367,4 +374,5 @@ class BinaryProtocolDecoder {
   private int currentState;
 
   private SymbolCache symbolCache;
+  private boolean debug;
 }
