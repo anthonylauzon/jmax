@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -64,7 +64,7 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
 	itsToggled = !itsToggled;
 	itsFtsObject.put( "value", (itsToggled ? 1 : 0) );
 
-	Repaint();
+	DoublePaint();
       } 
     else
       itsSketchPad.ClickOnObject( this, evt, x, y);

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -123,20 +123,31 @@ class ErmesConnection implements ErmesDrawable {
   // Select
   // select a connection
   //--------------------------------------------------------
-  public void Select()
+  public void Select( boolean paintNow) 
   {
     if ( !itsSelected) 
-      itsSelected = true;
+      {
+	itsSelected = true;
+	if ( paintNow)
+	  DoublePaint();
+	else
+	  itsSketchPad.addToDirtyConnections( this);
+      }
   }
 
   //--------------------------------------------------------
   // Deselect
   // deselect a connection
   //--------------------------------------------------------
-  public void Deselect() 
+  public void Deselect( boolean paintNow) 
   {
     if ( itsSelected) 
-      itsSelected = false;
+      {
+	itsSelected = false;
+	itsSketchPad.markSketchAsDirty();
+	if ( paintNow)
+	  itsSketchPad.paintDirtyList();
+      }
   }
 
   public void MouseDown( MouseEvent evt, int x, int y) 
@@ -213,8 +224,26 @@ class ErmesConnection implements ErmesDrawable {
     return ( ( x2 > x3)&&( x4 > x1));
   }
 
+  void DoublePaint( ) 
+  {
+    //this double paint is usefull when an object schange its state in run mode
+    Graphics aGraphics = itsSketchPad.getGraphics();
+
+    if ( aGraphics != null) 
+      {
+	Paint( aGraphics);
+	aGraphics.dispose();
+      }
+
+    if ( itsSketchPad.offScreenPresent)
+      Paint( itsSketchPad.GetOffGraphics());
+  }
+
   public void Paint( Graphics g) 
   {
+    if ( !itsSketchPad.itsGraphicsOn)
+      return;
+
     Point start = getStartPoint();
     Point end = getEndPoint();
 

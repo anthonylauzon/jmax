@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -81,10 +81,10 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  itsOwner.MoveOutlets();
 
 	// Probably called by redefine
-
 	itsOwner.updateInOutlets();
 
-	itsSketchPad.repaint();
+	itsSketchPad.markSketchAsDirty();
+	itsSketchPad.paintDirtyList();
       } 
 
     setRows( 2);

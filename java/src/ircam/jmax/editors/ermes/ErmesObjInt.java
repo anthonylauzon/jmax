@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -62,7 +62,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     itsInteger = theInt;
 
     itsFtsObject.put("value", theInt);
-    Repaint();
+    DoublePaint();
   }
 
   void ResizeToNewFont(Font theFont) 
@@ -148,7 +148,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     if (itsSketchPad.itsRunMode || evt.isControlDown()) 
       {
 	Fts.sync();
-	Repaint();
+	DoublePaint();
       }
     else
       super.MouseUp(evt, x, y);
@@ -163,7 +163,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
 	itsInteger = itsStartingY + (itsFirstY - y);
 	itsFtsObject.put( "value", new Integer(itsInteger));
-	Repaint();
+	DoublePaint();
 
 	return true;
       } 
@@ -317,7 +317,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	    currentText.setLength( l);
 	  }
 
-	Repaint();
+	DoublePaint();
       }
   }
 
@@ -331,13 +331,13 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
   public void keyInputGained() 
   {
-    Repaint();
+    DoublePaint();
   }
 
   public void keyInputLost() 
   {
     state = 0;
     currentText.setLength(0);
-    Repaint();
+    DoublePaint();
   }
 }

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*; 
 import java.awt.event.*;
@@ -21,7 +21,7 @@ import ircam.jmax.utils.*;
 // offscreen and much, much more...
 // 
 
-class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener {
+class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, FtsUpdateGroupListener {
   // The element list is implemented as a array, whose dimension
   // is doubled on reallocation; two methods are provided to add an element
   // and to remove an element; the access is done directly to the array
@@ -46,6 +46,36 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     return normalizedRect;
   }
   
+  public boolean isInGroup = false;
+  public boolean drawPending = false;
+  public boolean copyPending = false;
+  
+  public void updateGroupStart() 
+  {
+    isInGroup = true;
+  }
+  
+  public void updateGroupEnd() 
+  {
+    isInGroup = false;
+
+    if (drawPending) 
+      {
+	Graphics g = getGraphics();
+	DrawOffScreen( g);
+	g.dispose();
+      }
+    else if (copyPending) 
+      {
+	Graphics g = getGraphics();
+	CopyTheOffScreen( g);
+	g.dispose();
+      }
+    drawPending = false;
+    copyPending = false;
+
+    theToolkit.sync();
+  }
 
   ErmesSketchWindow itsSketchWindow;
   FtsContainerObject itsPatcher;
@@ -81,6 +111,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		
   private int itsDirection = NoDirections;
   boolean itsRunMode = false;
+  private boolean doSnapToGrid = false;
+  boolean itsGraphicsOn = true;
+  private boolean paintForTheFirstTime = true;
   
   private ErmesObjEditField itsEditField = null;
   private ErmesObjTextArea itsTextArea = null;
@@ -103,6 +136,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   private Rectangle currentMovingBigRect;
   private MaxVector itsMovingRectangles;
 
+  //STATIC OFFSCREEN!!!
+  static private ErmesSketchPad lastSketchWithOffScreen = null;
+  boolean offScreenPresent = false;
+  static Graphics offGraphics = null;
+  static private Dimension offDimension;
+  static private Image offImage;
+		
+		
   ErmesSwToolbar itsToolBar;
   private Point itsStartMovingPt;
   private Rectangle itsStartInclusionRect;
@@ -131,7 +172,144 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   private String itsAddObjectDescription;
   boolean itsScrolled = false;
+  private MaxVector dirtyInOutlets;
+  private MaxVector dirtyConnections;
+  private MaxVector dirtyObjects;
+  private boolean dirtySketch = false;
 
+  void addToDirtyInOutlets(ErmesObjInOutlet theInOutlet) 
+  {
+    if (dirtySketch) 
+      return;
+
+    if ( (dirtyInOutlets != null) && ( !dirtyInOutlets.contains( theInOutlet)))
+      dirtyInOutlets.addElement( theInOutlet);
+    else
+      {
+	dirtyInOutlets = new MaxVector();
+	dirtyInOutlets.addElement( theInOutlet);
+      }
+  }
+
+  void addToDirtyConnections( ErmesConnection theConnection) 
+  {
+    if (dirtySketch) 
+      return;
+
+    if ( (dirtyConnections != null) && ( !dirtyConnections.contains( theConnection)))
+      dirtyConnections.addElement( theConnection);
+    else
+      {
+	dirtyConnections = new MaxVector();
+	dirtyConnections.addElement( theConnection);
+      }
+  }
+
+  void addToDirtyObjects( ErmesObject theObject) 
+  {
+    if (dirtySketch) 
+      return;
+
+    if ( (dirtyObjects != null) && ( !dirtyObjects.contains( theObject)))
+      dirtyObjects.addElement( theObject);
+    else
+      {
+	dirtyObjects = new MaxVector();
+	dirtyObjects.addElement( theObject);
+      }
+  }
+
+  void markSketchAsDirty() 
+  {
+    dirtySketch = true;
+  }
+
+  void removeDirtyInOutlet( ErmesObjInOutlet io) 
+  {
+    if (dirtyInOutlets != null)
+      dirtyInOutlets.removeElement( io);
+  }
+
+  private void emptyDirtyLists() 
+  {
+    if (dirtyInOutlets != null)
+      dirtyInOutlets.removeAllElements();
+
+    if (dirtyObjects != null)
+      dirtyObjects.removeAllElements();
+
+    if (dirtyConnections != null)
+      dirtyConnections.removeAllElements();
+
+    dirtySketch = false;
+  }
+
+  //
+  // At this level, we can implement a politic of drawing.
+  // (example, if there are not objects to paint, paint connections and
+  // in/outlets directly, without using CopyTheOffScreen())
+  //
+  void paintDirtyList() 
+  {
+    if (offGraphics == null) 
+      GetOffGraphics();
+
+    if (dirtySketch) 
+      {
+	Graphics g = getGraphics();
+	DrawOffScreen( g);
+	g.dispose();
+
+	emptyDirtyLists();
+	return;
+      }
+
+    if ( dirtyInOutlets != null)
+      {
+	paintList( dirtyInOutlets, offGraphics);
+	dirtyInOutlets.removeAllElements();
+      }
+
+    if ( !itsRunMode) 
+      { //objects UNDER connections 
+
+	if ( dirtyObjects != null)
+	  {
+	    paintList( dirtyObjects, offGraphics);
+	    dirtyObjects.removeAllElements();
+	  }
+
+	if ( dirtyConnections != null)
+	  {
+	    paintList( dirtyConnections, offGraphics);
+	    dirtyConnections.removeAllElements();
+	  }
+      }
+    else  
+      { // connections UNDER objects
+	if ( dirtyConnections != null)
+	  {
+	    paintList( dirtyConnections, offGraphics);
+	    dirtyConnections.removeAllElements();
+	  }
+
+	if ( dirtyObjects != null)
+	  {
+	    paintList( dirtyObjects, offGraphics);
+	    dirtyObjects.removeAllElements();
+	  }
+      }
+
+    Graphics g = getGraphics();
+    if ( g != null)
+      {
+	CopyTheOffScreen( g);
+	g.dispose();
+      }
+
+    //emptyDirtyLists is done in CopyTheOffScreen()
+  }
+  
   private void paintList( MaxVector theList, Graphics theContext) 
   {
     if (theContext == null) 
@@ -272,37 +450,36 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       break;
 
     case DOING_NOTHING:
-      deselectCurrentInOutlet();
+      deselectCurrentInOutlet( false);
       currentSelection.addConnection( connection); 
-      connection.Select();
-      repaint();
+      connection.Select( false);
+      paintDirtyList();
       editStatus = START_SELECT;
       break;
 
     case START_SELECT:
       if ( !evt.isShiftDown()) 
 	{
-	  deselectAll();
+	  deselectAll( false);
 	  currentSelection.addConnection( connection); 
-	  connection.Select();
-	  repaint();
+	  connection.Select( false);
+	  paintDirtyList();
 	}
       else
 	{
 	  if ( !currentSelection.itsConnections.contains( connection))
 	    {
 	      currentSelection.addConnection( connection); 
-	      connection.Select();
-	      repaint();
+	      connection.Select( true);
 	    }	
 	  else 
 	    {
 	      currentSelection.removeConnection( connection);
-	      connection.Deselect();
+	      connection.Deselect( false);
 	  
 	      if ( currentSelection.itsConnections.size() == 0)
 		editStatus = DOING_NOTHING;
-	      repaint();
+	      paintDirtyList();
 	    }
 	}	
       break;	
@@ -318,12 +495,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  break;
 
 	case DOING_NOTHING:
-	  deselectCurrentInOutlet();
+	  deselectCurrentInOutlet( false);
 	  currentSelection.addObject( theObject);
-	  theObject.Select();
+	  theObject.Select( false);
 	  CheckCurrentFont();
 	  MoveSelected( theX,theY);
-	  repaint();
+	  paintDirtyList();
 	  break;
 
 	case START_SELECT:
@@ -332,14 +509,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	      if ( !currentSelection.itsObjects.contains( theObject))
 		{
 		  currentSelection.addObject( theObject);
-		  theObject.Select();
-		  repaint();
+		  theObject.Select( true);
 		  CheckCurrentFont();
 		}
 	      else
 		{
 		  currentSelection.removeObject( theObject);	
-		  theObject.Deselect();
+		  theObject.Deselect( true);
 		  if ( currentSelection.itsObjects.isEmpty()) 
 		    editStatus = DOING_NOTHING;
 		}
@@ -350,9 +526,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    }
 	  else 
 	    { 
-	      deselectAll();
+	      deselectAll( true);
 	      currentSelection.addObject( theObject);
-	      theObject.Select();
+	      theObject.Select( true);
 	      CheckCurrentFont();
 	      MoveSelected( theX,theY);
 	    }
@@ -360,22 +536,107 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	}
 	ChangeObjectPrecedence( theObject);
       }
-
-    repaint();
   }
   
+  static int noOfCopy = 0;
+
+  void CopyTheOffScreen( Graphics g) 
+  {
+    if ( (g != null) && (offScreenPresent) )
+      {
+	if (isInGroup || copyPending) 
+	  {
+	    copyPending = true;
+	  }
+	else 
+	  {
+	    g.drawImage( offImage, 0,0, this);
+	    emptyDirtyLists();
+	  }    
+      }
+  }
 
   final void DoNothing() 
   {
     editStatus = DOING_NOTHING;
   }
   
-  public void paint( Graphics g) 
+  void DrawLinesOffScreen()
   {
-    // Run mode: connections BEFORE objects
+    Graphics g = getGraphics();
+    Object[] objects = currentSelection.itsConnections.getObjectArray();
+    int size = currentSelection.itsConnections.size();
 
+    for ( int i = 0; i < size; i++) 
+      {
+	ErmesConnection aConnection = (ErmesConnection) objects[i];
+      
+	if ( offScreenPresent) 
+	  {
+	    aConnection.Paint( offGraphics);
+	  }
+	else if (g != null)
+	  aConnection.Paint( g);
+      }
+
+    if (offScreenPresent)
+      CopyTheOffScreen( g); 
+
+    g.dispose();
+  }
+  
+  void DrawOffScreen( Graphics g) 
+  {
+    if (drawPending || isInGroup) 
+      {
+	drawPending = true;
+	return;
+      }
+    
+    if (editStatus == AREA_SELECT)
+      return; //we are only painting the selection rect
+
+    Dimension d = getPreferredSize();
+    
+    //Create the offscreen graphics context, if no good one exists.
+    if ( (offGraphics == null))
+      {
+	//first sketch created, allocate the offscreen buffer
+	offDimension = d;
+	offImage = createImage( d.width, d.height);
+
+	if (offImage == null)
+	  System.err.print( "No offImage !!");
+
+	offGraphics = offImage.getGraphics();
+      }
+    else 
+      RequestOffScreen(); //we already created an offscreen. To who it belongs?
+
+    if ( (d.width != offDimension.width) || ( d.height != offDimension.height))
+      {
+	// This code is never executed, because getPreferredSize is a constant.
+	offDimension = d;
+	//creare un nuovo offGraphics con le nuove dimensioni
+	//e copiarci dentro l'immagine del vecchio
+	Image oldOffImage = offImage;
+	offImage = createImage( d.width, d.height);
+	if ( offImage == null)
+	  System.err.print( "No offImage !!");
+	offGraphics = offImage.getGraphics();
+	offGraphics.drawImage( oldOffImage, 0, 0, this);
+      }
+
+    offGraphics.setFont( getFont());
+    offGraphics.setColor( getBackground());
+    offGraphics.fillRect( 0, 0, d.width, d.height);	//prepare the offscreen to be used by me
+    offGraphics.setColor( Color.black);
+
+    // Draw objects and connections
+
+    // Run mode: connections BEFORE objects
     if ( itsRunMode)
-      paintList( itsConnections, g); 
+      paintList( itsConnections, offGraphics); 
 
     Object[] objects = itsElements.getObjectArray();
     int size = itsElements.size();
@@ -384,15 +645,41 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	ErmesObject aObject = (ErmesObject) objects[i];
 
-	aObject.Paint( g);
-	paintList( aObject.GetInletList(), g);
-	paintList( aObject.GetOutletList(), g);
+	aObject.Paint( offGraphics);
+	paintList( aObject.GetInletList(), offGraphics);
+	paintList( aObject.GetOutletList(), offGraphics);
       }
 
     // Edit mode: objects BEFORE connections
-
     if (! itsRunMode)
-      paintList( itsConnections, g); 
+      paintList( itsConnections, offGraphics); 
+
+    CopyTheOffScreen( g);
+  }
+  
+  final Graphics GetOffGraphics()
+  {
+    //Create the offscreen graphics context, if no good one exists.
+    if (offGraphics == null)
+      {
+	//first sketch of the day. We do this even if it doesn't belong
+
+	offDimension = preferredSize;
+
+	offImage = createImage( preferredSize.width, preferredSize.height);
+
+	if (offImage == null)
+	  System.err.print( "No offImage !!");
+
+	if (offImage != null)
+	  {
+	    //this can happen...
+	    offGraphics = offImage.getGraphics();	
+	    RequestOffScreen();	//a call to this function change the offscreen property.
+	  }
+      }
+
+    return offGraphics;
   }
   
   final ErmesSketchWindow GetSketchWindow()
@@ -421,7 +708,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     int minY=0;
 
     numberOfPaste += 1;
-    deselectAll();
+    deselectAll( false);
 
     if (objectVector == null) 
       return;
@@ -463,7 +750,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
        
 	aObject = AddObject( fo);
 	currentSelection.addObject( aObject);
-	aObject.Select();
+	aObject.Select( false);
       }
 
     // chiama tanti AddConnection...
@@ -477,11 +764,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	toObj   = getErmesObjectFor(fc.getTo());
 	aConnection = AddConnection( fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
 	currentSelection.addConnection( aConnection);
-	aConnection.Select( );
+	aConnection.Select( false);
       }
 
     editStatus = START_SELECT;
-    repaint();
+    paintDirtyList();
   }
   
   void InitFromFtsContainer( FtsContainerObject theContainerObject)
@@ -507,6 +794,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	toObj   = getErmesObjectFor(fc.getTo());
 	aConnection = AddConnection( fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
       }
+
+    repaint();
   }
 
   void InletConnect( ErmesObject theObject, ErmesObjInOutlet theRequester) 
@@ -534,10 +823,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  }
 	else 
 	  {
-	    itsConnectingObj.ConnectionAbort( itsConnectingLet);
+	    itsConnectingObj.ConnectionAbort( itsConnectingLet, false);
 	    if (editStatus == START_CONNECT)
 	      {
-		repaint();
+		Graphics g = getGraphics();
+		CopyTheOffScreen( g);
+		g.dispose();
 	      }
 	  }
 
@@ -559,13 +850,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  {
 	    itsConnectingLet.setSelected( false);
 	    theRequester.setSelected( false);
-	    TraceConnection( (ErmesObjOutlet)itsConnectingLet, (ErmesObjInlet)theRequester);
+	    TraceConnection( (ErmesObjOutlet)itsConnectingLet, (ErmesObjInlet)theRequester, false);
 	    ResetConnect();
 	  }
       }
 
     editStatus = DOING_NOTHING;
-    repaint();
+    paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -576,6 +867,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     super();
 
     itsPatcher = thePatcher;
+    Fts.getServer().addUpdateGroupListener( this);
 
     setLayout( null);
 
@@ -614,6 +906,24 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     PrepareOutChoice();
   }
 	
+  void RequestOffScreen() 
+  {
+    if ( lastSketchWithOffScreen == this || offScreenPresent) 
+      return;
+
+    if (lastSketchWithOffScreen != null) 
+      {
+	if (!lastSketchWithOffScreen.itsRunMode)
+	  lastSketchWithOffScreen.deselectAll( true);
+	lastSketchWithOffScreen.offScreenPresent = false;
+      }
+
+    offScreenPresent = true;
+    lastSketchWithOffScreen = this;
+    paintForTheFirstTime = true;
+  }
+  
+
   /* Simplified: size and font are preselected iff there is only
      one object in the selection; the idea was nice, but creating
      two vector, an enumeration and a quadratic algorithm for
@@ -718,6 +1028,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     cleanAnnotations(); // MDC    
     
+    if ( !offScreenPresent)
+      {
+	Graphics g = getGraphics();
+	RequestOffScreen();
+	DrawOffScreen( g);
+	g.dispose();
+      }
+    
     if ( itsRunMode || e.isControlDown()) 
       {
 	// (fd) {
@@ -752,8 +1070,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	if ( itsToolBar.pressed)
 	  itsToolBar.Unlock();
 
-	deselectObjects( currentSelection.itsObjects);
-	deselectConnections( currentSelection.itsConnections);
+	deselectObjects( currentSelection.itsObjects, false);
+	deselectConnections( currentSelection.itsConnections, false);
 	currentSelection.removeAllElements();
 
 	if ( e.isShiftDown())
@@ -774,10 +1092,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	      }
 	    else 
 	      {
-		itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet); 
+		itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet, false); 
 	      }
 	  }
-	repaint();
+	paintDirtyList();
 	return;
       }
 
@@ -815,8 +1133,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       { //DOING_NOTHING, START_SELECT
 	if (!e.isShiftDown()) 
 	  {
-	    deselectAll();
-	    repaint();
+	    deselectAll( true);
 	  }
 
 	editStatus = AREA_SELECT;
@@ -850,6 +1167,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  itsStartDragObject.MouseUp( e, x, y);
 	itsStartDragObject = null;
 
+	//all the modifications done with the control down were not reported
+	//in the offScreen. Do it now!
+	//Optimization: use the dirty lists. Try to avoid to repaint in case
+	//of CTRL click on the sketch when nothing was changed "pseudo run mode" 
+
 	if (!itsRunMode)
 	  repaint();
       }
@@ -870,7 +1192,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		setCursor( Cursor.getDefaultCursor());
 	      }
 	    else
-	      itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet); 
+	      itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet, false); 
 	  }
 	else
 	  {
@@ -879,7 +1201,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    startConnectPoint.setLocation( 0,0);
 	    previousConnectPoint.setLocation( 0,0);
 
-	    repaint();
+	    Graphics g = getGraphics();
+	    CopyTheOffScreen( getGraphics());
+	    g.dispose();
 
 	    editStatus = DOING_NOTHING;
 	  }
@@ -898,7 +1222,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 		if (aObject.getBounds().intersects( aRect))
 		  {
-		    aObject.Select();
+		    aObject.Select( false);
 		    currentSelection.addObject( aObject);
 		  }
 	      }	
@@ -913,13 +1237,15 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 	    if (!aRect.isEmpty())
 	      {
-		repaint();
+		Graphics g = getGraphics();
+		CopyTheOffScreen( g);//a better solution?, repaint maybe ?
+		g.dispose();
 	      }
 	  }
 	else
 	  {
 	    editStatus = START_SELECT;
-	    repaint();
+	    paintDirtyList();
 	  }
       }
     else if (editStatus == MOVING)
@@ -959,14 +1285,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		      {
 			if (clickHappenedOnAnAlreadySelected) 
 			  {
-			    deselectAll();
+			    deselectAll( true);
 			    currentSelection.addObject( itsCurrentObject);
 			    // (fd) Note the elegance of object-oriented programming ...
 			    if (itsCurrentObject instanceof ErmesObjEditableObject) 
 			      ((ErmesObjEditableObject)itsCurrentObject).restartEditing();
 			    else
 			      ((ErmesObjComment)itsCurrentObject).restartEditing();
-			    repaint();
 			  }
 		      }
 		  }
@@ -1124,7 +1449,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	if ( (aConnection.GetSourceObject().itsSelected)
 	     && (aConnection.GetDestObject().itsSelected))
 	  {
-	    aConnection.Select();
+	    aConnection.Select( false);
 	    currentSelection.addConnection( aConnection);
 	  }
       }
@@ -1159,70 +1484,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   private Point startConnectPoint = new Point();
   private Point previousConnectPoint = new Point();
   private Point currentConnectPoint = new Point();
-  private boolean erased = false;
-  private boolean erased1 = false;
-
-  public void moveRectangles()
-  {
-    //faster version
-    Graphics g = getGraphics();
-    Rectangle aRect;
-
-    g.setColor( Color.black);
-    g.setXORMode( sketchColor);
-    int aNumSelected = currentSelection.itsObjects.size();
-
-    if (aNumSelected<MAX_NUM_SELECTED)
-      {
-	if (!erased1)
-	  {
-	    if (itsMovingRectangles != null)
-	      for( Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements(); )
-		{
-		  aRect = (Rectangle)e.nextElement();
-		  g.drawRect( aRect.x,aRect.y, aRect.width, aRect.height);
-		}
-	  }
-
-	if (itsMovingRectangles != null)
-	  for( Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements(); )
-	    {
-	      aRect = (Rectangle)e.nextElement();
-	      aRect.x += (currentMouseX - itsPreviousMouseX);
-	      aRect.y += (currentMouseY - itsPreviousMouseY);
-	      g.drawRect( aRect.x, aRect.y, aRect.width, aRect.height);
-	    }
-	
-	itsPreviousMouseX = currentMouseX;
-	itsPreviousMouseY = currentMouseY;
-	erased1 = false;
-      }
-    else
-      {
-	int oldX, oldY, oldWidth, oldHeight;
-
-	if ( (currentMovingBigRect != null) && !erased)
-	  {
-	    g.drawRect( currentMovingBigRect.x, 
-			currentMovingBigRect.y, 
-			currentMovingBigRect.width, 
-			currentMovingBigRect.height);
-	  }
-
-	currentMovingBigRect = StartMoveInclusionRect();
-	currentMovingBigRect.x += (currentMouseX-itsStartMovingPt.x);
-	currentMovingBigRect.y += (currentMouseY-itsStartMovingPt.y);
-	
-	g.drawRect( currentMovingBigRect.x, 
-		    currentMovingBigRect.y, 
-		    currentMovingBigRect.width, 
-		    currentMovingBigRect.height);
-	erased = false;
-      }
-
-    g.dispose();
-  }
-
 
   public void mouseDragged( MouseEvent e)
   {
@@ -1247,15 +1508,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	currentConnectPoint.setLocation( x, y);
 
 	Graphics g = getGraphics();
-	if (!erased) 
-	  {
-	    g.setColor( Color.black);
-	    g.setXORMode( sketchColor);
-	    g.drawLine( startConnectPoint.x, startConnectPoint.y, previousConnectPoint.x, previousConnectPoint.y);
-	  }
-	g.drawLine( startConnectPoint.x, startConnectPoint.y, currentConnectPoint.x, currentConnectPoint.y);
-	previousConnectPoint.setLocation( currentConnectPoint);
-	erased = false;
+	update( g);
 	g.dispose();
 
 	if ( IsInInOutLet( x, y)) 
@@ -1290,18 +1543,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  currentRect.setBounds( x, y, currentPoint.x - x, currentPoint.y - y);
       
 	Graphics g = getGraphics();
-
-	if (!erased)
-	  {
-	    g.setColor( Color.black);
-	    g.setXORMode( sketchColor);
-	    g.drawRect( previousRect.x, previousRect.y, previousRect.width, previousRect.height);
-	  }
-	//paint new:
-
-	g.drawRect( currentRect.x, currentRect.y, currentRect.width, currentRect.height);
-	previousRect.setBounds( currentRect);
-	erased = false;
+	update( g);
 	g.dispose();
 
 	return;
@@ -1317,17 +1559,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	currentResizeRect.setSize( itsResizingObject.getWidth(), itsResizingObject.getHeight());
 
 	Graphics g = getGraphics();
-
-	if ( !erased)
-	  {
-	    g.setColor( Color.black);
-	    g.setXORMode( sketchColor);
-	    g.drawRect( previousResizeRect.x, previousResizeRect.y, previousResizeRect.width, previousResizeRect.height);
-	  }
-	//paint new:
-	g.drawRect( currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
-	previousResizeRect.setBounds( currentResizeRect);
-	erased = false;
+	update( g);
 	g.dispose();
 
 	return;
@@ -1340,7 +1572,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       if ( itsStartInclusionRect.y + (y - itsStartMovingPt.y) >= 0)
 	currentMouseY = y;
 
-      moveRectangles();
+      repaint();
 
       return;
     }
@@ -1369,7 +1601,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		if ( !itsCurrentInOutlet.GetSelected())
 		  itsCurrentInOutlet.GetOwner().ConnectionRequested( itsCurrentInOutlet);
 		else 
-		  itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet); 
+		  itsCurrentInOutlet.GetOwner().ConnectionAbort( itsCurrentInOutlet, false); 
 	      }
 	    itsCurrentInOutlet.itsAlreadyMoveIn = true;
 	  }
@@ -1444,7 +1676,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	ErmesObject aObject = (ErmesObject) objects[i];
 	currentSelection.addObject( aObject);
-	aObject.Select();
+	aObject.Select( false);
       }
 
     CheckCurrentFont();
@@ -1452,10 +1684,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	ErmesConnection aConnection = (ErmesConnection) e.nextElement();
 	currentSelection.addConnection( aConnection);
-	aConnection.Select();
+	aConnection.Select( false);
       }
 
-    repaint();
+    paintDirtyList();
+    //    repaint();
   }
 
   public void showObject( Object obj)
@@ -1467,14 +1700,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
 	if (aObject != null)
 	  {
-	    deselectAll();
+	    deselectAll( true);
 	    currentSelection.addObject( aObject);
-	    aObject.Select();
+	    aObject.Select( true);
 	    CheckCurrentFont();
 	  }
       }
-
-    repaint();
   }
 
   void OutletConnect( ErmesObject theObject, ErmesObjInOutlet theRequester)
@@ -1502,8 +1733,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  }
 	else 
 	  {
-	    itsConnectingObj.ConnectionAbort( itsConnectingLet);
-	    repaint();
+	    itsConnectingObj.ConnectionAbort( itsConnectingLet, true);
+	    if (editStatus == START_CONNECT)
+	      {
+		Graphics g = getGraphics();
+		CopyTheOffScreen( g); //to erase the pending line update(g);
+		g.dispose();
+	      }
 	  }
 	if ( theRequester!=itsConnectingLet)
 	  {
@@ -1523,7 +1759,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  {
 	    itsConnectingLet.setSelected( false);
 	    theRequester.setSelected( false);
-	    TraceConnection( (ErmesObjOutlet)theRequester, (ErmesObjInlet)itsConnectingLet);
+	    TraceConnection( (ErmesObjOutlet)theRequester, (ErmesObjInlet)itsConnectingLet, true);
 	
 	    ResetConnect();
 	  }
@@ -1578,11 +1814,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		  {
 		    aInlet = ( ErmesObjInlet)e.nextElement();
 		    aInlet.setSelected( false);
-		    TraceConnection( (ErmesObjOutlet)theInOutlet, aInlet);
+		    TraceConnection( (ErmesObjOutlet)theInOutlet, aInlet, false);
 		  }
 		((ErmesObjInlet)theInOutlet).setSelected( false);
 		ResetConnect();
-		repaint();
+		paintDirtyList();
 	      }
 	  }
 	else
@@ -1606,7 +1842,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 		  {
 		    aOutlet = (ErmesObjOutlet)e.nextElement();
 		    aOutlet.setSelected( false);
-		    TraceConnection( aOutlet, (ErmesObjInlet)theInOutlet);
+		    TraceConnection( aOutlet, (ErmesObjInlet)theInOutlet, false);
 		  }
 
 		((ErmesObjInlet)theInOutlet).setSelected( false);
@@ -1615,7 +1851,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  }
       }
 
-    repaint();
+    paintDirtyList();
     return true;
   }
 
@@ -1647,6 +1883,39 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsOutPop.Redefine( itsPatcher.getNumberOfOutlets());
   }
 
+  public void paint( Graphics g)
+  {
+    if (deleted)
+      return;
+
+    if ( itsScrolled)
+      {
+	if (offScreenPresent)
+	  {
+	    if (paintForTheFirstTime)
+	      {
+		DrawOffScreen( g);
+		paintForTheFirstTime = false;
+	      }
+	    else
+	      {
+		erased = true;
+		erased1 = true;
+
+		CopyTheOffScreen( g);
+	      }
+	  }
+	else
+	  {
+	    DrawOffScreen( g);
+	  }
+      }
+    else 
+      {
+	DrawOffScreen( g);
+      }
+  }		
+  
   boolean ResetConnect()
   {
     itsConnectingObj = null;
@@ -1673,8 +1942,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsRunMode = theMode;
     setBackground( theMode ? Color.white : sketchColor);
     if ( theMode)
-      deselectAll();
-    repaint();
+      deselectAll( true);
   }
     
   final boolean GetRunMode()
@@ -1694,9 +1962,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   final void startAdd( String theDescription)
   {
-    // SHOULD DO deselectAll only if the selection is not empty !
-    deselectAll();
-    repaint();
+    deselectAll( true);
     editStatus = START_ADD;
     itsAddObjectDescription = theDescription;
   }
@@ -1737,6 +2003,115 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	aOutlet = (ErmesObjOutlet)e1.nextElement();
 	itsOutletList.removeElement( aOutlet);
       }
+  }
+
+  private boolean erased = false;
+  private boolean erased1 = false;
+
+  public void update( Graphics g)
+  {
+    if (deleted || itsRunMode)
+      return;
+
+    if (editStatus == START_CONNECT) 
+      {
+	if (!erased) 
+	  {
+	    g.setColor( Color.black);
+	    g.setXORMode( sketchColor);
+	    g.drawLine( startConnectPoint.x, startConnectPoint.y, previousConnectPoint.x, previousConnectPoint.y);
+	  }
+	g.drawLine( startConnectPoint.x, startConnectPoint.y, currentConnectPoint.x, currentConnectPoint.y);
+	previousConnectPoint.setLocation( currentConnectPoint);
+	erased = false;
+      }
+    else if (editStatus == AREA_SELECT)
+      {
+	//faster version
+	if (!erased)
+	  {
+	    g.setColor( Color.black);
+	    g.setXORMode( sketchColor);
+	    g.drawRect( previousRect.x, previousRect.y, previousRect.width, previousRect.height);
+	  }
+	//paint new:
+	g.drawRect( currentRect.x, currentRect.y, currentRect.width, currentRect.height);
+	previousRect.setBounds( currentRect);
+	erased = false;
+      }
+    else if ( editStatus == RESIZING_OBJECT)
+      {
+	//faster version
+	if ( !erased)
+	  {
+	    g.setColor( Color.black);
+	    g.setXORMode( sketchColor);
+	    g.drawRect( previousResizeRect.x, previousResizeRect.y, previousResizeRect.width, previousResizeRect.height);
+	  }
+	//paint new:
+	g.drawRect( currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
+	previousResizeRect.setBounds( currentResizeRect);
+	erased = false;
+      }
+    else if (editStatus == MOVING)
+      {
+	//faster version
+	Rectangle aRect;
+	g.setColor( Color.black);
+	g.setXORMode( sketchColor);
+	int aNumSelected = currentSelection.itsObjects.size();
+
+	if (aNumSelected<MAX_NUM_SELECTED)
+	  {
+	    if (!erased1)
+	      {
+		if (itsMovingRectangles != null)
+		  for( Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements(); )
+		    {
+		      aRect = (Rectangle)e.nextElement();
+		      g.drawRect( aRect.x,aRect.y, aRect.width, aRect.height);
+		    }
+	      }
+
+	    if (itsMovingRectangles != null)
+	      for( Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements(); )
+		{
+		  aRect = (Rectangle)e.nextElement();
+		  aRect.x += (currentMouseX - itsPreviousMouseX);
+		  aRect.y += (currentMouseY - itsPreviousMouseY);
+		  g.drawRect( aRect.x, aRect.y, aRect.width, aRect.height);
+		}
+
+	    itsPreviousMouseX = currentMouseX;
+	    itsPreviousMouseY = currentMouseY;
+	    erased1 = false;
+	  }
+	else
+	  {
+	    int oldX, oldY, oldWidth, oldHeight;
+
+	    if ( (currentMovingBigRect != null) && !erased)
+	      {
+		g.drawRect( currentMovingBigRect.x, 
+			    currentMovingBigRect.y, 
+			    currentMovingBigRect.width, 
+			    currentMovingBigRect.height);
+	      }
+
+	    currentMovingBigRect = StartMoveInclusionRect();
+	    currentMovingBigRect.x += (currentMouseX-itsStartMovingPt.x);
+	    currentMovingBigRect.y += (currentMouseY-itsStartMovingPt.y);
+
+	    g.drawRect( currentMovingBigRect.x, 
+			currentMovingBigRect.y, 
+			currentMovingBigRect.width, 
+			currentMovingBigRect.height);
+	    erased = false;
+	  }
+	return;
+      }
+    else
+      paint (g);
   }
 
   int itsCurrentScrollingX;
@@ -1792,7 +2167,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	  }
       }
 
-    repaint();
+    Graphics g = getGraphics();
+    DrawOffScreen( g);//repaint();	  CopyTheOffScreen(g);
+    g.dispose();
   }
   
   int MinYSelected()
@@ -1897,7 +2274,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	delete the object's connections
   //--------------------------------------------------------
 
-  void DeleteObjectConnections( ErmesObject theObject)
+  void DeleteObjectConnections( ErmesObject theObject, boolean paintNow)
   {
     ErmesObjInlet aInlet;
     ErmesObjOutlet aOutlet;
@@ -1909,7 +2286,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	while (!aInlet.GetConnections().isEmpty())
 	  {
 	    aConnection = (ErmesConnection) aInlet.GetConnections().elementAt( 0);
-	    DeleteConnection( aConnection);
+	    DeleteConnection( aConnection, false);
 	  }
       }
 
@@ -1919,9 +2296,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	while (!aOutlet.GetConnections().isEmpty())
 	  {
 	    aConnection = (ErmesConnection) aOutlet.GetConnections().elementAt( 0);
-	    DeleteConnection( aConnection);
+	    DeleteConnection( aConnection, false);
 	  }
       }
+
+    if (paintNow) 
+      paintDirtyList();
   }
   
 
@@ -1929,19 +2309,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
-  void DeleteConnection( ErmesConnection theConnection)
+  void DeleteConnection( ErmesConnection theConnection, boolean paintNow)
   {
     if (theConnection.itsFtsConnection != null)
       theConnection.itsFtsConnection.delete();
 
-    DeleteGraphicConnection( theConnection);
+    DeleteGraphicConnection( theConnection, paintNow);
   }
 
   //--------------------------------------------------------
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
-  void DeleteGraphicConnection( ErmesConnection theConnection)
+  void DeleteGraphicConnection( ErmesConnection theConnection, boolean paintNow)
   {
     ErmesObjOutlet aOutlet = theConnection.GetOutlet();
     ErmesObjInlet aInlet = theConnection.GetInlet();
@@ -1950,6 +2330,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsConnections.removeElement( theConnection);
     aOutlet.GetConnections().removeElement( theConnection);
     aInlet.GetConnections().removeElement( theConnection);
+  
+    markSketchAsDirty();
+
+    if (paintNow)
+      paintDirtyList();
   }
 
 
@@ -1957,16 +2342,16 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteObject
   //	delete one object routine
   //--------------------------------------------------------
-  void DeleteObject( ErmesObject theObject) 
+  void DeleteObject( ErmesObject theObject, boolean paintNow) 
   {
-    DeleteGraphicObject( theObject);
+    DeleteGraphicObject( theObject, paintNow);
     if (theObject.itsFtsObject != null)
       theObject.itsFtsObject.delete();
   }
   
-  void DeleteGraphicObject( ErmesObject theObject) 
+  void DeleteGraphicObject( ErmesObject theObject, boolean paintNow) 
   {
-    DeleteObjectConnections( theObject);
+    DeleteObjectConnections( theObject, false);
 
     //removes theObject from the selected elements list	
     if (theObject instanceof FtsPropertyHandler)
@@ -1978,6 +2363,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     //removes theObject from the element list (delete)
     itsElements.removeElement( theObject);
     RemoveInOutlets( theObject);
+    markSketchAsDirty();
+    
+    if (paintNow)
+      paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -1992,26 +2381,26 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     ErmesObjOutlet aOutlet;
     ErmesObjInlet aInlet;
 
-    if (!DeleteInOutletConnections())
+    if (!DeleteInOutletConnections( false))
       {
 	while ( !currentSelection.itsObjects.isEmpty()) 
 	  {
 	    aObject = (ErmesObject) currentSelection.itsObjects.elementAt( 0);
-	    DeleteObject( aObject);
+	    DeleteObject( aObject, false);
 	  }
       
 	while (!currentSelection.itsConnections.isEmpty())
 	  {
 	    aConnection = (ErmesConnection) currentSelection.itsConnections.elementAt( 0);
-	    DeleteConnection( aConnection);
+	    DeleteConnection( aConnection, false);
 	  }
       }
     
     GetSketchWindow().DeselectionUpdateMenu();
-    repaint();
+    paintDirtyList();
   }
     
-  boolean DeleteInOutletConnections( )
+  boolean DeleteInOutletConnections( boolean paintNow)
   {
     ErmesObjInOutlet aInOutlet;
     boolean ret = false;
@@ -2020,7 +2409,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	if ( itsConnectingLet != null)
 	  {
-	    DeleteThisInOutletConn( itsConnectingLet);
+	    DeleteThisInOutletConn( itsConnectingLet, false);
 	    ResetConnect();
 	    ret = true;
 	  }
@@ -2030,17 +2419,20 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	for (Enumeration e = itsConnectingLetList.elements(); e.hasMoreElements(); )
 	  {
 	    aInOutlet = (ErmesObjInOutlet)e.nextElement();
-	    DeleteThisInOutletConn( aInOutlet);
+	    DeleteThisInOutletConn( aInOutlet, false);
 	  }
 
 	ResetConnect();
 	ret = true;
       }
 
+    if (paintNow)
+      paintDirtyList();
+
     return ret;
   }
 
-  void DeleteThisInOutletConn( ErmesObjInOutlet theInOutlet)
+  void DeleteThisInOutletConn( ErmesObjInOutlet theInOutlet, boolean paintNow)
   {
     ErmesConnection aConnection;
     ErmesObjOutlet aOutlet;
@@ -2049,11 +2441,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     while (theInOutlet.GetConnections().size() != 0) 
       {
 	aConnection = (ErmesConnection)theInOutlet.GetConnections().elementAt( 0);
-	DeleteConnection( aConnection);
+	DeleteConnection( aConnection, false);
       }
       
     theInOutlet.GetConnections().removeAllElements();
     theInOutlet.setSelected( false);
+
+    if (paintNow)
+      paintDirtyList();
   }
 
   //--------------------------------------------------------
@@ -2076,6 +2471,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	    object.GetFtsObject().removeWatch( object);
       }
 
+    Fts.getServer().removeUpdateGroupListener( this);
     removeMouseMotionListener( this); 
     removeMouseListener( this);
     removeKeyListener( itsSketchWindow);
@@ -2084,7 +2480,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     remove( itsOutPop);
     remove( itsEditField);
     remove( itsTextArea);
-    deselectAll();
+    deselectAll( false);
+
+    if (lastSketchWithOffScreen == this)
+      {
+	lastSketchWithOffScreen = null;
+      }
 
     // Clean up to help the gc, and found the bugs.
 
@@ -2104,6 +2505,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsTextArea = null;
     itsConnectingObj = null;
     itsConnectingLet = null;
+    dirtyInOutlets = null;
+    dirtyConnections = null;
+    dirtyObjects = null;
     anOldPastedObject = null;
 
     deleted = true;
@@ -2113,14 +2517,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	deselectObjects
   //	deselect all the objects of a given selection
   //--------------------------------------------------------
-  void deselectObjects( MaxVector theObjects)
+  void deselectObjects( MaxVector theObjects, boolean paintNow)
   {
     ErmesObject aObject;
 
     for ( Enumeration e = theObjects.elements() ; e.hasMoreElements(); ) 
       {
 	aObject = ( ErmesObject) e.nextElement();
-	aObject.Deselect();
+	aObject.Deselect( false);
+      }
+
+    if (paintNow)
+      {
+	paintDirtyList();
       }
   }
   //--------------------------------------------------------
@@ -2128,14 +2537,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	deselect all the connections of a given Selection
   //--------------------------------------------------------
 
-  void deselectConnections( MaxVector theConnections)
+  void deselectConnections( MaxVector theConnections, boolean paintNow)
   {
     ErmesConnection aConnection;
 
     for ( Enumeration e = theConnections.elements() ; e.hasMoreElements(); ) 
       {
 	aConnection = (ErmesConnection) e.nextElement();
-	aConnection.Deselect();
+	aConnection.Deselect( false);
+      }
+
+    if (paintNow) 
+      {
+	paintDirtyList();
       }
   }
 
@@ -2144,7 +2558,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   // (objects, connections, current selected in/outlet).
   // This function handles the Focus change and updates the menus.
   //
-  void deselectAll()
+  void deselectAll( boolean paintNow)
   {
     if (GetEditField() != null && GetEditField().HasFocus())
       {
@@ -2159,11 +2573,16 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if (currentSelection.itsObjects.size() != 0) 
       GetSketchWindow().DeselectionUpdateMenu();
 
-    deselectCurrentInOutlet();
-    deselectObjects( currentSelection.itsObjects);
-    deselectConnections( currentSelection.itsConnections);
+    deselectCurrentInOutlet( false);
+    deselectObjects( currentSelection.itsObjects, false);
+    deselectConnections( currentSelection.itsConnections, false);
     
     currentSelection.removeAllElements();
+
+    if (paintNow)
+      {
+	paintDirtyList();
+      }
 
     if (GetEditField() != null && GetEditField().HasFocus())
       {
@@ -2176,7 +2595,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
   }
 
-  void deselectCurrentInOutlet()
+  void deselectCurrentInOutlet( boolean paintNow)
   {
     ErmesObjInOutlet aInOutlet;
 
@@ -2193,6 +2612,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
 
     ResetConnect();
+    if (paintNow)
+      paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -2418,7 +2839,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //--------------------------------------------------------
   //	TraceConnection
   //--------------------------------------------------------
-  ErmesConnection TraceConnection( ErmesObjOutlet theSourceOutlet, ErmesObjInlet theDestInlet){
+  ErmesConnection TraceConnection( ErmesObjOutlet theSourceOutlet, ErmesObjInlet theDestInlet, boolean paintNow){
     ErmesConnection aConnection;
 
     try
@@ -2433,6 +2854,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     theSourceOutlet.AddConnection( aConnection);
     theDestInlet.AddConnection( aConnection); 
     itsConnections.addElement( aConnection);
+
+    if (paintNow) 
+      aConnection.DoublePaint();
+    else
+      addToDirtyConnections( aConnection);
 
     return aConnection;
   }

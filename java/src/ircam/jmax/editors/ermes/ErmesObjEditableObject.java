@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -167,7 +167,7 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 //     super.MouseUp(evt, x, y);
 //   }
 
-  void RestoreDimensions( ) 
+  void RestoreDimensions( boolean paintNow) 
   {
     int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( "ZOB") + 2*getTextXOffset(),
 			      itsInletList.size()*12,
@@ -181,6 +181,20 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
     resizeBy( aWidthDiff, aHeightDiff);
 
+    if (paintNow) 
+      {
+	if (aHeightDiff < 0 || aWidthDiff < 0)
+	  itsSketchPad.repaint();
+	else
+	  DoublePaint();
+      }
+    else 
+	{
+	  if (aHeightDiff < 0 || aWidthDiff <0)
+	    itsSketchPad.markSketchAsDirty();
+	  else
+	    itsSketchPad.addToDirtyObjects( this);
+        }
   }
 
   int MaxWidth( int uno, int due, int tre) 

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;

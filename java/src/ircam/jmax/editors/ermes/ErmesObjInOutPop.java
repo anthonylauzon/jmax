@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -43,11 +43,11 @@ public class ErmesObjInOutPop extends PopupMenu
 		
   public static void CommunicateChoice(ErmesObject target, int numberChoosen)
   {
-    if (target instanceof ircam.jmax.editors.frobber.ErmesObjIn) 
+    if (target instanceof ircam.jmax.editors.ermes.ErmesObjIn) 
       {
 	((ErmesObjIn) target).ChangeInletNo(numberChoosen);
       }
-    else if (target instanceof ircam.jmax.editors.frobber.ErmesObjOut) 
+    else if (target instanceof ircam.jmax.editors.ermes.ErmesObjOut) 
       {
 	((ErmesObjOut) target).ChangeOutletNo(numberChoosen);
       }  

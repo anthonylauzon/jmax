@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -49,15 +49,15 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
     else if (name == "deletedObject") 
       {
-	itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor((FtsObject)value));
+	itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor((FtsObject)value), false);
       }
     else if (name == "deletedConnection") 
       {
-	itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor((FtsConnection)value));
+	itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor((FtsConnection)value), false);
       }
 
     if (!pasting)
-      itsSketchPad.repaint();
+      itsSketchPad.paintDirtyList();
   }
 
   public void componentResized( ComponentEvent e) 
@@ -209,8 +209,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	p = p.getParent();
       }
 
-    if ((mode instanceof FtsVoid) || mode.equals("run"))
-      setRunMode(true);
+    setRunMode((mode instanceof FtsVoid) || mode.equals("run"));
 
     // Finally, activate the updates
 
@@ -417,6 +416,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
       {
 	itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
+	itsSketchPad.RequestOffScreen();
 	itsSketchPad.repaint();
       }
     setCursor( temp);
@@ -1020,7 +1020,15 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   public void focusGained( FocusEvent e)
   {
-    // ??? 
+    itsSketchPad.RequestOffScreen();
+
+    Graphics g = getGraphics();
+
+    if (g != null)
+      {
+	itsSketchPad.update( g);
+	g.dispose();
+      }
   } 
 
   public void focusLost( FocusEvent e)

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.frobber;
+package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.util.*;
@@ -88,6 +88,9 @@ abstract class ErmesObjInOutlet implements ErmesDrawable {
   protected void DoublePaint()
   {
     Paint( itsOwner.itsSketchPad.getGraphics());
+
+    if (itsOwner.itsSketchPad.offScreenPresent) 
+      Paint( itsOwner.itsSketchPad.GetOffGraphics());
   }
 
   // ----------------------------------------
