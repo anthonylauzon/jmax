@@ -36,7 +36,7 @@ public class FtsAudioLabel extends FtsObject
     FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("label_type"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsAudioLabel)obj).setType( args.getSymbol( 0).toString());
+	  ((FtsAudioLabel)obj).setType( args.getInt( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("input"), new FtsMessageHandler(){
@@ -132,7 +132,7 @@ public class FtsAudioLabel extends FtsObject
   public void requestSetDevType( String type)
   {
     args.clear();    
-    args.addSymbol( FtsSymbol.get( type));
+    args.addInt( type.equals("mono") ? MONO : STEREO);
     
     try
       {
@@ -144,7 +144,7 @@ public class FtsAudioLabel extends FtsObject
 	e.printStackTrace(); 
       }
     /* DEBUG ONLY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! to remove */
-    setType( type);
+    setType( type.equals("mono") ? MONO : STEREO);
   }
   
   public void requestSetInChannel( int ch)
@@ -185,9 +185,9 @@ public class FtsAudioLabel extends FtsObject
     return label;
   }
 
-  public void setType( String type)
+  public void setType( int tp)
   {
-    this.type = type;
+    this.type = ( tp == MONO) ? "mono" : "stereo";
     if( listener != null)
       listener.labelTypeChanged( this);
   }
@@ -251,5 +251,7 @@ public class FtsAudioLabel extends FtsObject
   private String output = null;
   public int inChannel, outChannel; 
   private ircam.jmax.editors.configuration.AudioConfigPanel listener = null;
+  public static final int MONO = 0;
+  public static final int STEREO = 1;
 }
 
