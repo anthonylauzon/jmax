@@ -28,11 +28,25 @@ VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
 
-# *** Standard compiler for FTS ***IS*** Pentium-gcc ***
-# Pentium gcc
-# This name is not standard...
-CC := pentium-gcc
-LD := pentium-gcc
+# Standard compiler for FTS is Pentium-gcc
+#
+# ************************************************************
+# NOTE (francois, dechelle@ircam.fr):
+# It seems there is a problem in the actual (1.1.1) distribution
+# of pgcc: the builtin specs are not coherent with the distributed
+# tar file. The builtin specs read specs from:
+# /usr/local/pgcc/lib/gcc-lib/i586-pc-linux-gnu/pgcc-2.91.60/specs
+# and the tar file contains usr/lib/gcc-lib/i586-pc-linux....
+# So I did the following:
+# $ mkdir /usr/local/pgcc
+# $ cd /usr/local/pgcc
+# $ tar xvzf <SOMEWHERE>/pgcc-1.1.1-linux-x86-glibc.tar.gz 
+# $ mv usr/* .
+# and it worked.
+# ************************************************************
+#
+CC := /usr/local/pgcc/bin/gcc
+LD := /usr/local/pgcc/bin/gcc
 ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC
 ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops
 ARCH_LDFLAGS := -rdynamic
