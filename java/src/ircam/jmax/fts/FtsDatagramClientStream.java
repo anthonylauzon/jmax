@@ -139,6 +139,8 @@ class FtsDatagramClientStream extends FtsStream
 	  {
 	    sequence = (sequence + 1) % 128;
 
+	    // FIXME pH07	    System.out.println("sequence: expecting " + (int) sequence + ", received " + (int) in_data[0]);
+
 	    if (sequence != in_data[0])
 	      {
 		System.out.println("UDP: packet out of sequence, use a client connection !");

@@ -73,7 +73,7 @@ class FtsSocketServerStream extends FtsStream
 	    command = "rsh " + host + " ";
 	  }
 
-	command += ftsDir + "/" + ftsName;
+	command += ftsDir + File.separator + ftsName;
 	command += " --socket --host=" + InetAddress.getLocalHost().getHostAddress() + " --port=" + port;
 	command += " " + ftsOptions;
       }

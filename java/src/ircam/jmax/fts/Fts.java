@@ -112,6 +112,8 @@ public class Fts implements MaxContext
       server = new FtsServer(this, host+":"+port, new FtsDatagramClientStream( port));
     else if (connectionType.equals("client") || connectionType.equals("tcp"))
       server = new FtsServer(this, host, new FtsSocketServerStream( host, ftsDir, ftsName, ftsOptions));
+    else if (connectionType.equals("tcpclient"))
+      server = new FtsServer(this, host, new FtsSocketClientStream( port));
     else if (connectionType.equals("local"))
       server = new FtsServer(this, "fts", new FtsSubProcessStream( ftsDir, ftsName, ftsOptions));
     else
