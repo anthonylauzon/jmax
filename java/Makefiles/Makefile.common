@@ -51,7 +51,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 JAVA_CLASSES_ROOT =  $(ROOTDIR)/java/classes
 JAVA_SRC_ROOT =  $(ROOTDIR)/java/src
-JAVA_LIBS_CLASSPATH = /u/worksta/dececco/tmp/java/
+JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl1.0b1/jacl.jar:$(ROOTDIR)/java/lib/swing-0.7/swing.jar
 
 JAVA_CLASSPATH = $(JAVA_SRC_ROOT):$(JAVA_LIBS_CLASSPATH):$(JAVA_CLASSES_ROOT):$(SYSTEM_CLASSPATH)
 
