@@ -31,6 +31,7 @@
 
 VENDOR := gnu
 OS_TYPE := unix
+PLATFORM := linux-ppc
 
 SYS_PACKAGES=ossdev
 #SYS_PACKAGES=ossdev alsadev
