@@ -164,8 +164,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
-    g.setColor(Color.white);
+    if(!itsSelected) g.setColor(Color.white);
+    else g.setColor(itsLangNormalColor);
     g.fillRect(itsX+8, itsY+2, currentRect.width-(WIDTH_DIFF+4), currentRect.height-HEIGHT_DIFF-4);
+    
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
     

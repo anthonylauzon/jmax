@@ -148,7 +148,10 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
     if(itsFlashing) g.setColor(itsLangSelectedColor);
-    else g.setColor(Color.white);
+    else{
+      if(!itsSelected) g.setColor(Color.white);
+      else g.setColor(itsLangNormalColor);
+    }
     g.fillRect(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-/*6*/2), currentRect.height-HEIGHT_DIFF);
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);

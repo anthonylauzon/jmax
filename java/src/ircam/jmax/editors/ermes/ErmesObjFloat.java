@@ -241,7 +241,8 @@ class ErmesObjFloat extends ErmesObject {
     //draw the white area	
     int xWhitePoints[] = {itsX+3, itsX+currentRect.width-3, itsX+currentRect.width-3, itsX+3, itsX+currentRect.height/2+3};
     int yWhitePoints[] = {itsY+1, itsY+1, itsY+currentRect.height-1,itsY+currentRect.height-1, itsY+currentRect.height/2};
-    g.setColor(Color.white);
+    if(!itsSelected) g.setColor(Color.white);
+    else g.setColor(itsUINormalColor);
     g.fillPolygon(xWhitePoints, yWhitePoints, 5);
 
     //fill the triangle
