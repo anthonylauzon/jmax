@@ -239,7 +239,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (w > 0)
       {
-	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX(w));
+	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX( w));
 	updateInOutlets();
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }

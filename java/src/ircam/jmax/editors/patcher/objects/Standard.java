@@ -233,11 +233,11 @@ public class Standard extends Editable implements FtsObjectErrorListener
     /* draw variable name */
 
     if( varName!= null)
-      {
+      {	  
 	if( isSelected())
-	  g.setColor( Color.yellow.darker());
+	  g.setColor( selVarColor);
 	else
-	  g.setColor( Color.yellow);
+	  g.setColor( varColor);
 
 	g.fillRect( x+w, y+1, varWidth-1, h-2);
 
@@ -276,6 +276,8 @@ public class Standard extends Editable implements FtsObjectErrorListener
     return this.controlPanel;
   }
   public static StandardControlPanel controlPanel = new StandardControlPanel();
+  Color varColor = new Color( 153, 204, 204, 100);
+  Color selVarColor = new Color( 107, 142, 142, 100);
 }
 
 

@@ -48,27 +48,22 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     super();
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    JLabel titleLabel = new JLabel("Set Name", JLabel.CENTER);
+    JLabel titleLabel = new JLabel("Name", JLabel.RIGHT);
     titleLabel.setForeground(Color.black);
 
-    Box labelBox = new Box(BoxLayout.X_AXIS);
-    labelBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-    labelBox.add(titleLabel);    
-    labelBox.add(Box.createHorizontalGlue());    
-
-    add(labelBox);    
-
     nameField = new JTextField();
-    nameField.setPreferredSize(new Dimension(140, 20));
-    nameField.setMaximumSize(new Dimension(140, 20));
+    nameField.setPreferredSize(new Dimension(100, 20));
+    nameField.setMaximumSize(new Dimension(100, 20));
     nameField.addActionListener(this);
 
     JPanel namePanel = new JPanel();
     namePanel.setPreferredSize(new Dimension(150, 20));
     namePanel.setLayout( new BoxLayout( namePanel, BoxLayout.X_AXIS));    
+    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));  
+    namePanel.add(titleLabel);    
     namePanel.add(Box.createRigidArea(new Dimension(5, 0)));    
     namePanel.add( nameField);
-    namePanel.add(Box.createRigidArea(new Dimension(5, 0)));    
+    namePanel.add(Box.createHorizontalGlue());    
 
     add(namePanel);
 
