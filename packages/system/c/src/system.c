@@ -31,7 +31,7 @@ extern void dsp_config(void);
 extern void arch_config(void);
 
 extern void const_config(void);
-extern void argument_init(void);
+extern void argument_config(void);
 
 extern void print_config(void);
 extern void blip_config(void);
@@ -47,7 +47,7 @@ system_module_init(void)
   arch_config();
 
   const_config();
-  argument_init();
+  argument_config();
 
   print_config();
   blip_config();

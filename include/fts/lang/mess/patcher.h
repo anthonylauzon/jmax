@@ -42,6 +42,7 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 #define fts_patcher_is_template(p)       ((p)->type == fts_p_template)
 
 #define fts_patcher_get_env(p)           (&((p)->env))
+#define fts_patcher_get_args(p)           ((p)->args)
 
 #define fts_patcher_being_deleted(p)      ((p)->deleted == 1)
 

@@ -119,7 +119,7 @@ public class FtsObject
 	if(ctr != null)
 	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
 	else if (className == "jpatcher")
-	  obj =  new FtsPatcherObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+	  obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
 	    obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "outlet")
@@ -151,8 +151,10 @@ public class FtsObject
 	else
 	    {
 		String descrpt;
-		if(nArgs==0) descrpt = className;
-		else descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
+		if(nArgs==0) 
+		  descrpt = className;
+		else 
+		  descrpt = className + " " + FtsParse.unparseArguments(nArgs, args);
 		    
 		obj = new FtsObject(fts, parent, variableName, className, descrpt);
 	    }

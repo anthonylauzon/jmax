@@ -58,16 +58,29 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_label_t *this = (fts_label_t *) o;
 
   fts_channel_init(&this->channel);
+  
+  /* add label as its own receive */
+  fts_channel_add_target(&this->channel, (fts_access_t *)this);
+}
+
+static void
+label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_label_t *this = (fts_label_t *)o;
+
+  fts_channel_propagate_input(&this->channel, winlet, s, ac, at);
 }
 
 static fts_status_t
 label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_label_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(fts_label_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, label_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, label_find_friends);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
+
+  fts_class_define_thru(cl, label_propagate_input);
 
   /* sending anything else to lable is like sending to all channel targets */
   fts_method_define_varargs(cl, 0, fts_s_anything, label_send);

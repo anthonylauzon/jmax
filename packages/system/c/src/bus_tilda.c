@@ -605,7 +605,7 @@ bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 {
   bus_tilda_t *this = (bus_tilda_t *)o;
   fts_atom_t a;
-  int n_channels;
+  int n_channels = 0;
   
   ac--;
   at++;

@@ -44,13 +44,13 @@ extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
 typedef struct _send_
 {
   fts_access_t access;
-  fts_label_t *label;
+  fts_channel_t *channel;
 } send_t;
 
 typedef struct _receive_
 {
   fts_access_t access;
-  fts_label_t *label;
+  fts_channel_t *channel;
 } receive_t;
 
 /***************************************************************************
@@ -64,7 +64,7 @@ send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   send_t *this = (send_t *) o;
 
-  fts_label_send(this->label, s, ac, at);
+  fts_channel_output_message_from_targets(this->channel, 0, s, ac, at);
 }
 
 static void
@@ -88,10 +88,8 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       return;
     }
 
-  fts_object_refer((fts_object_t *)label);
   fts_channel_add_origin(fts_label_get_channel(label), (fts_access_t *)this);  
-
-  this->label = label;
+  this->channel = fts_label_get_channel(label);
 }
 
 static void
@@ -99,8 +97,7 @@ send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   send_t *this = (send_t *) o;
 
-  fts_channel_remove_origin(fts_label_get_channel(this->label), (fts_access_t *)this);
-  fts_object_release((fts_object_t *)this->label);
+  fts_channel_remove_origin(this->channel, (fts_access_t *)this);
 }
 
 static void
@@ -108,7 +105,7 @@ send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   send_t *this = (send_t *)o;
 
-  fts_channel_find_friends(fts_label_get_channel(this->label), ac, at);
+  fts_channel_find_friends(this->channel, ac, at);
 }
 
 static void
@@ -116,7 +113,7 @@ send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   send_t *this = (send_t *)o;
 
-  fts_channel_propagate_input(fts_label_get_channel(this->label), winlet, s, ac, at);
+  fts_channel_propagate_input(this->channel, winlet, s, ac, at);
 }
 
 static fts_status_t
@@ -161,10 +158,8 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       return;
     }
 
-  fts_object_refer((fts_object_t *)label);
   fts_channel_add_target(fts_label_get_channel(label), (fts_access_t *)this);
-
-  this->label = label;
+  this->channel = fts_label_get_channel(label);
 }
   
 static void
@@ -172,8 +167,7 @@ receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   receive_t *this = (receive_t *)o;
 
-  fts_channel_remove_target(fts_label_get_channel(this->label), (fts_access_t *)this);
-  fts_object_release((fts_object_t *)this->label);
+  fts_channel_remove_target(this->channel, (fts_access_t *)this);
 }
 
 static fts_status_t

@@ -29,7 +29,7 @@
 
 typedef struct _fts_label_
 {
-  fts_object_t o;
+  fts_access_t access;
   fts_channel_t channel;
 } fts_label_t;
 

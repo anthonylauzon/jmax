@@ -36,7 +36,7 @@
 #include <fts/lang/utils.h>
 
 
-/* #define SAVER_DEBUG  */
+/* #define SAVER_DEBUG */
 
 struct fts_bmax_file
 {
@@ -830,7 +830,7 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    */
 
 #ifdef SAVER_DEBUG 
-  fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->id);
+  fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->head.id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
   fprintf(stderr, "\n");
 #endif
@@ -925,7 +925,7 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    */
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Top Object %lx %d: ", obj,  obj->id);
+  fprintf(stderr, "Saving Top Object %lx %d: ", obj,  obj->head.id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
   fprintf(stderr, "\n");
 #endif
@@ -975,7 +975,7 @@ fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fro
 {
 #ifdef SAVER_DEBUG
   fprintf(stderr, "Saving Connection (%d.%d -> %d.%d)\n",
-	  conn->src->id, conn->woutlet, conn->dst->id, conn->winlet);
+	  conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet);
 #endif
 
 
@@ -1008,7 +1008,7 @@ fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *
 {
 #ifdef SAVER_DEBUG
   fprintf(stderr, "Saving Connection in selection(%d.%d -> %d.%d)\n",
-	  conn->src->id, conn->woutlet, conn->dst->id, conn->winlet);
+	  conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet);
 #endif
 
   /* Push the inlet and outlet (this order) in the evaluation stack */
@@ -1045,7 +1045,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
   fts_object_t *p;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Patcher %d\n", obj->id);
+  fprintf(stderr, "Saving Patcher %d\n", obj->head.id);
 #endif
 
   /* First generate the code to push the patcher in the top of the stack,
@@ -1171,7 +1171,7 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
   fts_selection_t *selection = (fts_selection_t *) obj;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Selection %d\n", obj->id);
+  fprintf(stderr, "Saving Selection %d\n", obj->head.id);
 #endif
 
   /* Allocate a new object table frame of the right dimension */

@@ -24,71 +24,116 @@
  *
  */
 
-/*
-  Argument doctor; expand an "argument i" object to "const $args[i]",
-  where i should be an integer.
- */
-
 #include <fts/fts.h>
 
-static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+static fts_symbol_t sym_argument = 0;
+
+/********************************************************************
+ *
+ *   object
+ *
+ */
+
+typedef struct
 {
-  if ((ac == 2) && fts_is_int(&(at[1])))
+  fts_object_t o;
+  fts_atom_t *arg;
+  fts_atom_t def;
+} argument_t;
+
+static void
+argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  argument_t *this = (argument_t *)o;
+  fts_list_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
+  fts_atom_t *ptr = fts_list_get_ptr(args);
+  int size = fts_list_get_size(args);
+  int index;
+
+  ac--;
+  at++;
+
+  fts_set_void(&this->def);
+
+  index = fts_get_int(at);
+  
+  if(args && index < size)
+    this->arg = ptr + index;
+  else if(ac > 1)
     {
-      fts_object_t *obj;
-      fts_atom_t a[6];
+      this->def = at[1];
+      this->arg = &(this->def);
 
-      /* object: const $args[<value>] */
-
-      fts_set_symbol(&a[0], fts_new_symbol("const"));
-      fts_set_symbol(&a[1], fts_s_dollar);
-      fts_set_symbol(&a[2], fts_s_args);
-      fts_set_symbol(&a[3], fts_s_open_sqpar);
-      a[4] = at[1];
-      fts_set_symbol(&a[5], fts_s_closed_sqpar);
-
-      obj = fts_eval_object_description(patcher, 6, a);
-      fts_object_reset_description(obj);
-      return obj;
-    }
-  else if ((ac >= 3) && fts_is_int(&(at[1])))
-    {
-      int i;
-      fts_object_t *obj;
-      fts_atom_t a[512];
-
-      /* object: const ( _getElement($args, <value2>, ( <values> )) )  */
-
-      fts_set_symbol(&a[0], fts_new_symbol("const"));
-      fts_set_symbol(&a[1], fts_s_open_par);
-      fts_set_symbol(&a[2], fts_new_symbol("_getElement"));
-      fts_set_symbol(&a[3], fts_s_open_par);
-      fts_set_symbol(&a[4], fts_s_dollar);
-      fts_set_symbol(&a[5], fts_s_args);
-      fts_set_symbol(&a[6], fts_s_comma);
-      a[7] = at[1];
-      fts_set_symbol(&a[8], fts_s_comma);
-
-      fts_set_symbol(&a[9], fts_s_open_par);
-
-      for (i = 0; i < ac - 2; i++)
-	a[i + 10] = at[i + 2];
-
-      fts_set_symbol(&a[10 + (ac - 2)], fts_s_closed_par);
-      fts_set_symbol(&a[11 + (ac - 2)], fts_s_closed_par);
-      fts_set_symbol(&a[12 + (ac - 2)], fts_s_closed_par);
-
-      obj = fts_eval_object_description(patcher, 12 + (ac - 2), a);
-      fts_object_reset_description(obj);
-      return obj;
+      if(fts_is_object(&this->def))
+	fts_refer(&this->def);
     }
   else
-    return 0;
+    {
+      fts_object_set_error(o, "Argument %d is not defined for this patcher", index);
+      return;
+    }
+
+  fts_variable_add_user(fts_object_get_patcher(o), fts_s_args, o);
 }
 
-
-void argument_init()
+static void
+argument_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_register_object_doctor(fts_new_symbol("argument"), argument_doctor);
+  argument_t *this = (argument_t *)o;
+
+  if(fts_is_object(&this->def))
+    fts_release(&this->def);
 }
-    
+
+static void
+argument_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  argument_t *this = (argument_t *) o;
+
+  fts_outlet_send(o, 0, fts_get_selector(this->arg), 1, this->arg);
+}
+
+/********************************************************************
+ *
+ *   class
+ *
+ */
+
+/* when defining a variable: daemon for getting the property "state". */
+static void
+argument_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  argument_t *this = (argument_t *) obj;
+
+  *value = *(this->arg);
+}
+
+static fts_status_t
+argument_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  ac--;
+  at++;
+
+  if((ac == 1 || ac == 2) && fts_is_int(at))
+    {
+      fts_class_init(cl, sizeof(argument_t), 1, 1, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, argument_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, argument_delete);
+      
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, argument_get_state);
+      
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;
+}
+
+void
+argument_config(void)
+{
+  sym_argument = fts_new_symbol("argument");
+
+  fts_metaclass_install(sym_argument, argument_instantiate, fts_arg_type_equiv);
+  fts_metaclass_alias(fts_new_symbol("arg"), sym_argument);
+}

@@ -29,12 +29,12 @@
 
 #include <fts/lang/mess/mess_types.h>
 
-typedef struct fts_list
+struct fts_list
 {
   fts_atom_t *atoms;
   int size;	
   int alloc;
-} fts_list_t;
+};
 
 extern fts_symbol_t fts_s_list;
 

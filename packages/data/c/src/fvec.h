@@ -35,11 +35,14 @@ typedef struct _fvec_
   float *values;
   int size;
   int alloc;
+  float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
 } fvec_t;
 
 extern fts_class_t *fvec_class;
 extern fts_symbol_t fvec_symbol;
 extern fts_type_t fvec_type;
+
+#define fvec_get_sr(v) ((((v)->sr) > 0)? ((v)->sr): (-(v)->sr))
 
 #define fvec_get_size(v) ((v)->size)
 extern void fvec_set_size(fvec_t *vector, int size);

@@ -87,6 +87,10 @@ PREDEF_SYMBOL( fts_s_thru_type, "thru_type")
 PREDEF_SYMBOL( fts_s_thru, "thru")
 PREDEF_SYMBOL( fts_s_sig, "sig")
 PREDEF_SYMBOL( fts_s_default, "default")
+PREDEF_SYMBOL( fts_s_export, "export")
+
+/* client messages */
+PREDEF_SYMBOL( fts_s_openFileDialog, "openFileDialog")
 
 /* syntax symbols */
 PREDEF_SYMBOL( fts_s_comma, ",")

@@ -97,10 +97,11 @@ mat_set_size(mat_t *mat, int m, int n)
   if(size > mat->alloc)
     {
       int i;
-      fts_atom_t *data = fts_malloc(size * sizeof(fts_atom_t));
 
       if(mat->alloc)
 	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
+      else
+	mat->data = fts_malloc(size * sizeof(fts_atom_t));
 
       /* set newly allocated region to void */
       for(i=mat->alloc; i<size; i++)

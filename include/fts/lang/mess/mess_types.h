@@ -41,6 +41,7 @@
 typedef const struct fts_symbol_descr *fts_symbol_t;
 typedef union  fts_word fts_word_t;
 typedef struct fts_atom fts_atom_t;
+typedef struct fts_list fts_list_t;
 typedef struct fts_plist fts_plist_t;
 
 typedef void (*fts_fun_t)(void);
@@ -379,7 +380,7 @@ struct fts_patcher
   int load_init_fired;		/* the multiple load init protection flag*/
   int deleted;			/* set to one during content deleting */
 
-  fts_data_t *args;	/* the arguments used for the "args" variable */
+  fts_list_t *args;	/* the arguments used for the "args" variable */
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 

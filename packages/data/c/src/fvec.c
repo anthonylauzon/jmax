@@ -32,6 +32,8 @@ fts_type_t fvec_type = 0;
 fts_class_t *fvec_class = 0;
 
 static fts_symbol_t sym_text = 0;
+static fts_symbol_t sym_load = 0;
+static fts_symbol_t sym_open_file = 0;
 
 /********************************************************
  *
@@ -319,7 +321,9 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     {
       size = fvec_read_atom_file(this, file_name);
       
-      if(size <= 0)
+      if(size > 0)
+	fvec_output(o, 0, 0, 0, 0);
+      else
 	post("fvec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
@@ -352,15 +356,32 @@ static void
 fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
 
-  if(file_name)
+  if(ac > 0 && fts_is_symbol(at))
     {
-      int onset = fts_get_int_arg(ac, at, 1, 0);
-      int n_read = fts_get_int_arg(ac, at, 2, 0);
-      float sr = fts_get_float_arg(ac, at, 3, 0.0f);
-      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
+      fts_symbol_t file_name = fts_get_symbol(at);
+      fts_soundfile_t *sf = 0;
       int size = 0;
+      float sr = 0.0;
+      int onset, n_read;
+
+      if(ac > 1 && fts_is_number(at + 1))
+	onset = fts_get_number_int(at + 1);
+      else
+	onset = 0;
+
+      if(ac > 2 && fts_is_number(at + 2))
+	n_read = fts_get_number_int(at + 2);
+      else
+	n_read = 0;
+
+      if(ac > 3 && fts_is_number(at + 3))
+	sr = fts_get_number_float(at + 3);
+      else if(this->sr > 0.0)
+	/* force sampling rate to given property */
+	sr = this->sr;
+
+      sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
       
       if(sf) /* soundfile successfully opened */
 	{
@@ -370,8 +391,12 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  if(!n_read)
 	    n_read = fts_soundfile_get_size(sf);
 
-	  if(sr < 0.0f && sr != file_sr)
+	  /* make enough space for resampled file */
+	  if(sr > 0.0 && sr != file_sr)
 	    n_read = (int)((float)n_read * sr / file_sr + 0.5f);
+	  else
+	    /* get temporary sample rate from file */
+	    this->sr = -file_sr;
 
 	  fvec_set_size(this, n_read);
 	  ptr = fvec_get_ptr(this);
@@ -380,11 +405,32 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 	  fts_soundfile_close(sf);
 
-	  if(size <= 0)
+	  if(size > 0)
+	    fvec_output(o, 0, 0, 0, 0);
+	  else
 	    post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
 	  
 	  return;
 	}
+      else
+	{
+	  size = fvec_read_atom_file(this, file_name);
+
+	  if(size > 0)
+	    fvec_output(o, 0, 0, 0, 0);
+	  else
+	    post("fvec: can't load from file \"%s\"\n", fts_symbol_name(file_name));	  
+	}
+    }
+  else
+    {
+      fts_atom_t a[4];
+      
+      fts_set_symbol(a, sym_load);
+      fts_set_symbol(a + 1, sym_open_file);
+      fts_set_symbol(a + 2, fts_get_project_dir());
+      fts_set_symbol(a + 3, fts_new_symbol(" "));
+      fts_client_send_message(o, fts_s_openFileDialog, 4, a);
     }
 }
 
@@ -403,7 +449,7 @@ fvec_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t
       int size = 0;
       
       if(sr <= 0.0)
-	sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
+	sr = fts_get_sample_rate();
 
       sf = fts_soundfile_open_write_float(file_name, 0, sr);
 
@@ -533,6 +579,20 @@ fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 }
 
 static void
+fvec_set_sr(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fvec_t *this = (fvec_t *)obj;
+
+  if(fts_is_number(value))
+    {
+      float sr = fts_get_number_float(value);
+      
+      if(sr > 0.0)
+	this->sr = sr;
+    }
+}
+
+static void
 fvec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
@@ -593,6 +653,8 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->values = 0;
   this->size = 0;
   this->alloc = 0;
+
+  this->sr = 0.0;
 
   if(ac == 0)
     fvec_alloc(this, 0);
@@ -663,9 +725,13 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
-  
+
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_load, fvec_load);
+
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
   
@@ -678,7 +744,7 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fvec_import);
   fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fvec_export);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("load"), fvec_load);
+  fts_method_define_varargs(cl, 0, sym_load, fvec_load);
   fts_method_define_varargs(cl, 0, fts_new_symbol("save"), fvec_save);
   
   /* type outlet */
@@ -697,6 +763,9 @@ void
 fvec_config(void)
 {
   sym_text = fts_new_symbol("text");
+  sym_load = fts_new_symbol("load");
+  sym_open_file = fts_new_symbol("open file");
+
   fvec_symbol = fts_new_symbol("fvec");
   fvec_type = fvec_symbol;
 

@@ -534,9 +534,6 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
-  /* take the object away from the update queue (if there) and free it */
-  fts_object_reset_changed(obj);
-
   /* tell the client to release the Java part */
   if (obj->head.id != FTS_NO_ID)
     fts_client_release_object(obj);
@@ -574,6 +571,9 @@ fts_object_destroy(fts_object_t *obj)
   /* send delete message */
   fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
 
+  /* take the object away from the update queue (if there) and free it */
+  fts_object_reset_changed(obj);
+
   /* release all client components */
   fts_object_unclient(obj);
 
@@ -590,6 +590,7 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   /* remove connections */
   fts_object_unconnect(obj);
 
+  /* unreference by hand */
   obj->refcnt--;
 
   /* send delete message */
@@ -599,6 +600,9 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   /* remove from patcher */
   if(obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);
+
+  /* take the object away from the update queue (if there) and free it */
+  fts_object_reset_changed(obj);
 
   /* release all client components (no patcher, no appearance) */
   fts_object_unclient(obj);
@@ -752,6 +756,7 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
   if(old->patcher)
     fts_patcher_remove_object(old->patcher, old);
 
+  fts_object_reset_changed(old);
   fts_object_free(old);
 
   return new;

@@ -76,9 +76,6 @@ static void fts_mess_init( void )
   /* Initialize the .pat parser */
   fts_patparser_init();
 
-  /* Init the loader vm  */
-  fts_vm_init();
-
   /* Create the selection class */
   fts_selection_config();
 

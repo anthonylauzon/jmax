@@ -48,9 +48,9 @@ public class FtsPatcherObject extends FtsObjectWithEditor
    * Create a FtsPatcherObject object
    */
 
-  public FtsPatcherObject(Fts fts, FtsObject parent, String description)
+  public FtsPatcherObject(Fts fts, FtsObject parent, String variableName, String description)
   {
-      super(fts, parent, null, "jpatcher", description);
+      super(fts, parent, variableName, "jpatcher", description);
   }
 
   /**

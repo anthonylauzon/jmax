@@ -451,7 +451,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
-  this->args = (fts_data_t *)fts_list_new(ac, at);
+  this->args = fts_list_new(ac, at);
 
   fts_variable_define(this, fts_s_args);
   fts_set_list(&va, this->args);
@@ -791,7 +791,14 @@ patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symb
 static void
 patcher_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  fts_atom_t *v;
+
+  v = fts_variable_get_value( (fts_patcher_t *)obj, fts_s_export);
+
+  if ( v && !fts_is_void( v))
+    *value = *v;
+  else
+    fts_set_object(value, obj);
 }
 
 /* daemon for setting the number of inlets */
@@ -988,7 +995,7 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
       /* reallocate the atom array */
       fts_list_delete((fts_list_t *)this->args);
 
-      this->args = (fts_data_t *)fts_list_new(ac - 1, at + 1);
+      this->args = fts_list_new(ac - 1, at + 1);
 
       /* set the new variables */
       fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
