@@ -23,16 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-FILES_TO_INSTALL=\
-compiling_jmax.html	\
-control_objects.html	\
-dsp_objects.html	\
-index.html		\
-kernel_reference.html	\
-
 install:
 	$(INSTALL_DIR) $(doc_install_dir)/developer
-	for f in $(FILES_TO_INSTALL) ; do $(INSTALL_DATA) $$f $(doc_install_dir)/developer ; done
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/developer ; done
 .PHONY: install
 
 # remove the files copied by make install ?

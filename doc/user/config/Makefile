@@ -23,14 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-FILES_TO_INSTALL=\
-io.html		\
-system.html	\
-hosttypes.html	\
-
 install:
 	$(INSTALL_DIR) $(doc_install_dir)/user/config
-	for f in $(FILES_TO_INSTALL) ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user/config ; done
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user/config ; done
 .PHONY: install
 
 # remove the files copied by make install ?

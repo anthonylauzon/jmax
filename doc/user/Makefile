@@ -23,19 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-FILES_TO_INSTALL=\
-explode.html		\
-getting_started.html	\
-index.html		\
-installation.html	\
-language.html		\
-packages.html		\
-patcher.html		\
-projects.html		\
-
 install:
 	$(INSTALL_DIR) $(doc_install_dir)/user
-	for f in $(FILES_TO_INSTALL) ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user ; done
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)user ; done
 	(cd config ; $(MAKE) install)
 .PHONY: install
 
