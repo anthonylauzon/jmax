@@ -6,6 +6,8 @@ FtsAtom.h					\
 FtsClientException.h				\
 FtsMessageHandler.h				\
 FtsObject.h					\
+FtsServer.h					\
 FtsServerConnection.h				\
+FtsSocketConnection.h 				\
 FtsSymbol.h					\
 version.h
