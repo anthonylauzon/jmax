@@ -20,4 +20,4 @@
  * 
  */
 
-static const char *version = "@JMAX_VERSION@";
+static const char *version = "version @JMAX_VERSION@";

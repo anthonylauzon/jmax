@@ -42,4 +42,4 @@ dnl Check for platform-specific code
 PLATFORM=linux
 AC_SUBST(PLATFORM)
 
-AC_OUTPUT(Makefile fts/Makefile fts/version.c)
+AC_OUTPUT(Makefile fts/Makefile fts/version.c java/src/ircam/jmax/MaxVersion.java)
