@@ -51,7 +51,17 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   {
   }
 
-  static FtsClipboard ftsClipboard;
+  // Primitive and fast implementation of multi-type clipboard.
+  // Enzo, forgive me ... it will be done as a clipboard provider
+  // later ..
+  
+  static private final int CLIPBOARD_EMPTY = 0;
+  static private final int CLIPBOARD_OBJECTS = 1;
+  static private final int CLIPBOARD_TEXT = 2;
+
+  static private int          clipboardType = CLIPBOARD_EMPTY;
+  static private FtsClipboard ftsClipboard;
+  static private String       textClipboard = null;
 
   static {
     try 
@@ -303,7 +313,11 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   protected void Cut()
   {
     Copy();
-    itsSketchPad.DeleteSelected();
+    
+    if (clipboardType == CLIPBOARD_OBJECTS)
+      itsSketchPad.DeleteSelected();
+    else if (clipboardType == CLIPBOARD_TEXT)
+      itsSketchPad.deleteSelectedText();
   }
 
   private int lastCopyCount;
@@ -312,10 +326,19 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   {
     Cursor temp = getCursor();
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    
-    ftsClipboard.copy( Fts.getSelection());
-    lastCopyCount = ftsClipboard.getCopyCount();
-    itsSketchPad.resetPaste(0);
+
+    if (itsSketchPad.canCopyText())
+      {
+	clipboardType = CLIPBOARD_TEXT;
+	textClipboard = itsSketchPad.getSelectedText(); 
+      }
+    else
+      {
+	clipboardType = CLIPBOARD_OBJECTS;
+	ftsClipboard.copy( Fts.getSelection());
+	lastCopyCount = ftsClipboard.getCopyCount();
+	itsSketchPad.resetPaste(0);
+      }
 
     setCursor( temp);
   }
@@ -331,32 +354,39 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-    pasting = true;
-
-    if (lastCopyCount != ftsClipboard.getCopyCount())
+    if ((clipboardType == CLIPBOARD_TEXT) && (itsSketchPad.canPasteText()))
       {
-	itsSketchPad.resetPaste(-1);
-	lastCopyCount = ftsClipboard.getCopyCount();
+	itsSketchPad.pasteText(textClipboard);
       }
-
-    ftsClipboard.paste( itsPatcher);
-
-    itsPatcherData.update();
-    Fts.sync();
-
-    pasting = false;
-
-    // make the sketch do the graphic job
-
-    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
+    else if (clipboardType == CLIPBOARD_OBJECTS)
       {
-	itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
-	itsSketchPad.RequestOffScreen();
-	itsSketchPad.repaint();
-      }
+	pasting = true;
 
-    ftsObjectsPasted.removeAllElements();
-    ftsConnectionsPasted.removeAllElements();
+	if (lastCopyCount != ftsClipboard.getCopyCount())
+	  {
+	    itsSketchPad.resetPaste(-1);
+	    lastCopyCount = ftsClipboard.getCopyCount();
+	  }
+
+	ftsClipboard.paste( itsPatcher);
+
+	itsPatcherData.update();
+	Fts.sync();
+
+	pasting = false;
+
+	// make the sketch do the graphic job
+
+	if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
+	  {
+	    itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
+	    itsSketchPad.RequestOffScreen();
+	    itsSketchPad.repaint();
+	  }
+
+	ftsObjectsPasted.removeAllElements();
+	ftsConnectionsPasted.removeAllElements();
+      }
 
     setCursor( temp);
   }
@@ -659,7 +689,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	  }
 	else
 	  super.keyPressed( e);
-      } 
+      }
     else if (aInt == 47)
       {
 	//ask help for the selected element...
@@ -669,7 +699,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	  {
 	    aObject = (ErmesObject) en.nextElement();
 	
-	    FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject);
+	    if (! FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject))
+	      new ErrorDialog( this, "Sorry, no help for object " + aObject.itsFtsObject.getClassName());
 	  }
       } 
     else if ( keyEventClient != null)

@@ -1262,15 +1262,7 @@ void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 
 
   if (((fts_object_t *)this)->id != FTS_NO_ID)
-    {
-      /* @@@ */
-      fts_atom_t a;
-
-      fts_object_get_prop((fts_object_t *)this, fts_s_ninlets, &a);
-      
-      fprintf(stderr, "Sending fts_s_ninlets property changed (from %d to %d, prop %d)\n",  old_ninlets,  fts_object_get_inlets_number((fts_object_t *) this), fts_get_int(&a)); /* @@@ */
-      fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
-    }
+    fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
 }
 
 void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)

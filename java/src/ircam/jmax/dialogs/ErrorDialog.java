@@ -17,7 +17,7 @@ public class ErrorDialog extends Dialog implements ActionListener{
   Button okButton;
 
   public ErrorDialog(Frame dw, String theError) {
-    super(dw , "ermes Error", true);
+    super(dw , "Error", true);
     parent = dw;
     itsError = theError;
 

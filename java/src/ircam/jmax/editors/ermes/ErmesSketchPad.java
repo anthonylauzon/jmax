@@ -99,7 +99,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   final static int H_RESIZING_OBJECT = 6;
   final static int V_RESIZING_OBJECT = 60;
   final static int EDITING_OBJECT   = 7;
-  final static int EDITING_COMMENT  = 8;
   final static int FromOutToIn 	    = 1;
   final static int FromInToOut 	    = -1;
   final static int NoDirections     = 0;
@@ -116,7 +115,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   private boolean paintForTheFirstTime = true;
   
   private ErmesObjEditField itsEditField = null;
-  private ErmesObjTextArea itsTextArea = null;
   private int currentMouseX, currentMouseY;	// used during the MOVING status
   private int itsPreviousMouseX, itsPreviousMouseY;// used during the MOVING status
 
@@ -759,12 +757,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsEditField.setVisible( false);
     itsEditField.setLocation( -200,-200);
     
-    itsTextArea = new ErmesObjTextArea( this);
-    add( itsTextArea);
-
-    itsTextArea.setVisible( false);
-    itsTextArea.setLocation( -200,-200);
-
     setBackground( Settings.sharedInstance().getEditBackgroundColor());
     addMouseMotionListener( this); 
     addMouseListener( this);
@@ -1344,12 +1336,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	requestFocus();
       }
 
-    if ( editStatus == EDITING_COMMENT)
-      {
-	itsTextArea.LostFocus();
-	requestFocus();
-      }
-
     ///if we are in a Object
     itsCurrentObject = getObjectContaining( x, y);
 
@@ -1620,11 +1606,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   final ErmesObjEditField GetEditField()
   {
     return itsEditField;
-  }
-  
-  final ErmesObjTextArea GetTextArea()
-  {
-    return itsTextArea;
   }
   
   void MoveSelected( int theX, int theY) 
@@ -2179,7 +2160,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     remove( itsInPop);
     remove( itsOutPop);
     remove( itsEditField);
-    remove( itsTextArea);
 
     if (lastSketchWithOffScreen == this)
       {
@@ -2199,7 +2179,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsInPop = null;
     itsOutPop = null;
     itsEditField = null;
-    itsTextArea = null;
     dirtyConnections = null;
     dirtyObjects = null;
     anOldPastedObject = null;
@@ -2492,5 +2471,39 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   protected final boolean isLocked()
   {
     return locked;
+  }
+
+  /* Temporary support for text cut/pasting; will work only between objects,
+     not in the general case; the general case need to use the real JDK clipboard
+     support, and will be done when the patcher editor will be based on the toolkit.
+     */
+     
+  void pasteText(String text)
+  {
+    if (  editStatus == EDITING_OBJECT)
+      itsEditField.insert(text,  itsEditField.getCaretPosition());
+  }
+
+  boolean canCopyText()
+  {
+    return (editStatus == EDITING_OBJECT);
+  }
+
+  boolean canPasteText()
+  {
+    return (editStatus == EDITING_OBJECT);
+  }
+
+  String getSelectedText()
+  {
+    if (  editStatus == EDITING_OBJECT)
+      return itsEditField.getSelectedText();
+    else
+      return null;
+  }
+
+  void deleteSelectedText()
+  {
+    itsEditField.deleteSelectedText();
   }
 }

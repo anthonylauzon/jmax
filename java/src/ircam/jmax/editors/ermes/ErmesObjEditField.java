@@ -115,8 +115,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   {
     int lenght;
     String s1, s2;
-    int start = getSelectionStart();
-    int end = getSelectionEnd();
     String s = getText();
     FontMetrics fm = getFontMetrics(getFont());
     int aWidth = 0;
@@ -139,35 +137,18 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  } 
 	else 
 	  {
-	    aCurrentLineChars = GetCurrentLineChars(s);
+	    aCurrentLineChars = GetCurrentLineChars();
 	    if (aCurrentLineChars+10 > getColumns())
 	      setColumns(getColumns()+20);
 
 	    char k = e.getKeyChar();
-	    if ( start != end) 
-	      {
-		if (!e.isShiftDown()) 
-		  {
-		    s1 = s.substring(0, start);
-		    s2 = s.substring(end, s.length());
-		    s = s1+s2;
-		  }
-	      }
-	    if (start < s.length()) 
-	      {
-		s1 = s.substring(0, start);
-		s2 = s.substring(start, s.length());
-		s = s1+k+s2;
-	      } 
-	    else
-	      s = s+k;
 
 	    if ( k == Platform.DELETE_KEY 
 		 ||  k == Platform.BACKSPACE_KEY 
 		 || ErmesSketchWindow.isAnArrow(e.getKeyCode()))
 	      return;
 
-	    aCurrentLineWidth = GetCurrentLineWidth( fm, s);
+	    aCurrentLineWidth = GetCurrentLineWidth( fm);
 	    aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
 
 	    if (aCurrentLineWidth >= getSize().width-20) 
@@ -187,8 +168,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       }
   }
 
-  public int GetCurrentLineWidth(FontMetrics fm, String theString) 
+  public int GetCurrentLineWidth(FontMetrics fm) 
   {
+    String theString = getText();
     int aPos = getCaretPosition();
     int aIndex = theString.indexOf("\n");
     int aOldIndex = -1;
@@ -215,8 +197,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       }
   }
 
-  public int GetCurrentLineChars(String theString) 
+  public int GetCurrentLineChars()
   {
+    String theString = getText();
     int aPos = getCaretPosition();
     int aIndex = theString.indexOf("\n");
     int aOldIndex = -1;
@@ -243,11 +226,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       }
   }
 
-//   public void paint(Graphics g) 
-//   {
-//     setBackground(Color.white);
-//   }
-
 
   private Dimension minimumSize = new Dimension();
 
@@ -262,4 +240,12 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     return getMinimumSize();
   }
 
+  // Support for cut editing operations
+
+  void deleteSelectedText()
+  {
+    String s = getText();
+
+    setText(s.substring(0, getSelectionStart()) +  s.substring(getSelectionEnd(), s.length()));
+  }
 }
