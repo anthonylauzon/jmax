@@ -23,9 +23,5 @@
 #ifndef _FTS_PRIVATE_FILE_H_
 #define _FTS_PRIVATE_FILE_H_
 
-/*
- * Find a file on a set of paths.
- */
-extern int fts_file_find_in_path(const char* root, fts_list_t* paths, const char *filename, char* buf, int len);
 
 #endif
