@@ -23,8 +23,11 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#include <ctype.h>
+
 #include "fts.h"
 #include "sequence.h"
+#include "seqobj.h"
 #include "seqnote.h"
 
 #define MAX_MIDI_CHANNELS 16
@@ -250,12 +253,18 @@ seqmidi_read_track_start(fts_midifile_t *file)
   char s[] = "track9999";
   fts_symbol_t name;
   sequence_track_t *track;
-
+  fts_atom_t a[3];
+  
   sprintf(s, "track%d", sequence->n_tracks);
   name = fts_new_symbol_copy(s);
 
-  /*track = sequence_add_track(sequence, name, seqnote_symbol);@@@@*/
-  track = sequence_get_track_by_name(sequence, fts_new_symbol("track0"));
+  fts_set_symbol(a + 0, seqtrack_symbol);
+  fts_set_symbol(a + 1, seqnote_symbol);
+  fts_set_symbol(a + 2, name);
+  /* fts_object_new(0, 3, a, &note); */
+
+  /* track = sequence_add_track(sequence, track); @@@@*/
+  track = sequence_get_first_track(sequence);
 
   data->track = track;
 
@@ -286,8 +295,8 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
     }
   else
     {
-      fts_atom_t a[3];
       fts_object_t *note;
+      fts_atom_t a[3];
 
       fts_set_symbol(a + 0, seqnote_symbol);
       fts_set_int(a + 1, pitch);
