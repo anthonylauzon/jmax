@@ -139,7 +139,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   /**
    * DirectionListener interface
    */
-  public void directionChoosen(int theDirection) 
+  public void directionChoosen(int theDirection, int modifiers) 
   {
     direction = theDirection;
     mountIModule(itsMouseTracker, tempX , tempY);

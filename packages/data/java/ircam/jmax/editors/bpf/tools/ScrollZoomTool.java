@@ -108,7 +108,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
     /**
      * DirectionListener interface
      */
-    public void directionChoosen(int theDirection) 
+    public void directionChoosen(int theDirection, int modifiers) 
     {
 	direction = theDirection;
 	mountIModule(itsMouseTracker, tempX , tempY);

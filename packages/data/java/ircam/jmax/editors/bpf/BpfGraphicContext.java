@@ -132,19 +132,19 @@ public class BpfGraphicContext extends GraphicContext {
       return ((BpfWindow) getFrame()).bpfData;
   }
 
-    public void setScrollManager(ScrollManager manager)
-    {
-	scrollManager = manager;
-    }
-    public ScrollManager getScrollManager()
-    {
-	return scrollManager;
-    }
+  public void setScrollManager(ScrollManager manager)
+  {
+    scrollManager = manager;
+  }
+  public ScrollManager getScrollManager()
+  {
+    return scrollManager;
+  }
 
-    public void display(String text)
-    {
-	display.setText(text);
-    }
+  public void display(String text)
+  {
+    display.setText(text);
+  }
 
   public void displayInfo(String text)
   {
