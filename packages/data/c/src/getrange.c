@@ -1,29 +1,33 @@
 /*
  * jMax
+ * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
- * Copyright (C) 1999 by IRCAM
- * All rights reserved.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * See file LICENSE for further informations on licensing terms.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- * 
- * This program may be used and distributed under the terms of the 
- * accompanying LICENSE.
- *
- * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
- * for DISCLAIMER OF WARRANTY.
- * 
  */
+
+#include <limits.h>
+#include <float.h>
 #include <fts/fts.h>
+
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"
 #include "mat.h"
-
-#define MAXINT 2147483647
-#define MININT -2147483647
-
-#define MAXFLOAT 2147483647
-#define MINFLOAT -2147483647
 
 /******************************************************
  *
@@ -35,8 +39,8 @@ static void
 getrange_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ivec_atom_get(at);
-  int min = MAXINT;
-  int max = MININT;
+  int min = INT_MAX;
+  int max = INT_MIN;
   int size = ivec_get_size(vec);
   int *ptr = ivec_get_ptr(vec);
   int i;
@@ -60,8 +64,8 @@ static void
 getrange_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *vec = fvec_atom_get(at);
-  float min = MAXFLOAT;
-  float max = MINFLOAT;
+  float min = FLT_MAX;
+  float max = FLT_MIN;
   int size = fvec_get_size(vec);
   float *ptr = fvec_get_ptr(vec);
   int i;
