@@ -996,8 +996,3 @@ static void pat_error(const char *description)
 {
   post("Error loading .pat file: %s\n", description);
 }
-
-
-
-
-

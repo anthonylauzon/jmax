@@ -441,6 +441,11 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
       
 	  fts_object_recompute(var->definitions->obj);
 	}
+      else if(! var->definitions)
+	{
+	  /* remove binding when last definition is deleted */
+	  fts_binding_delete(var);
+	}
     }
 }
 
@@ -626,26 +631,28 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
 
   fts_set_void(&value);
 
+  /* get a binding relevant for this scope (in this patcher or its parents) */
   up_v = fts_variable_get_binding(scope, name);
 
+  /* check if there is already a binding in this patcher */
   v = fts_env_get_binding(fts_patcher_get_env(scope), name);
 
   if (v)
     {
-      /* Double definition; just do nothing: next restore will produce the error*/
-
+      /* double definition; just do nothing: next restore will produce the error*/
       return;
     }
   else
     {
+      /* add binding to this patcher */
       v = fts_env_add_binding(fts_patcher_get_env(scope), name, &value);
+
+      /* suspend recursivly all bindings referring to this variable */
       fts_binding_suspend(v);
     }
 
 
-  /* Steal and suspends all the references, in the local scope, to 
-     variables with the same name */
-
+  /* does the new variable (v) shadow a variable from the parent scope (up_v)! */
   if (up_v)
     {
       fts_object_list_t   **u;	/* indirect precursor */
@@ -654,8 +661,8 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
       fprintf(stderr, "Found upper variable for %s\n Stealing: \n", fts_symbol_name(up_v->name));
 #endif      
 
+      /* steal all the references to the varable (users) from parent scope and suspend their references */
       u = &(up_v->users);
-
       while (*u)
 	{
 	  fts_object_t *user = (* u)->obj;
@@ -668,10 +675,12 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
 	      fprintf(stderr, "\n");
 	      fprintf(stderr, " stealed\n");
 #endif
-
+	      
+	      /* remove user from old binding and add to new binding */
 	      fts_binding_remove_user(up_v, user);
 	      fts_binding_add_user(v, user);
 
+	      /* suspend recursivly all variables referring to the users variable */
 	      if (fts_object_get_variable(user))
 		fts_variable_suspend(user->patcher, fts_object_get_variable(user));
 	    }

@@ -168,6 +168,35 @@ static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
   fts_object_put_prop(obj, name, value); 
 }
 
+static int
+fts_object_description_defines_variable(int ac, const fts_atom_t *at)
+{
+  return (ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column);
+}
+
+static fts_symbol_t
+fts_object_description_get_variable_name(int ac, const fts_atom_t *at)
+{
+  return fts_get_symbol(&at[0]);
+}
+
+static void
+fts_object_description_get_var_and_inst(int aoc, const fts_atom_t *aot, fts_symbol_t *var, int *ac, fts_atom_t const **at)
+{
+  if(fts_object_description_defines_variable(aoc, aot))
+    {
+      *var = fts_get_symbol(&aot[0]);
+      *ac = aoc - 2;
+      *at = aot + 2;
+    }
+  else
+    {
+      *var = 0;
+      *ac = aoc;
+      *at = aot;
+    }
+}
+
 /*
   This function create an object in a patcher, appling all the 
   expression/object semantic
@@ -195,13 +224,13 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
 
 
   /* First of all, we check if we are in the case of a object variable definition syntax */
-  if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_column))
+  if (fts_object_description_defines_variable(aoc, aot))
     {
       /* foo : <obj> syntax; extract the variable name */
-      var = fts_get_symbol(&aot[0]);
+      var = fts_object_description_get_variable_name(aoc, aot);
 
       /* If the variable already exists in this local context, make a double definition error object  */
-      if (! fts_variable_can_define(patcher, var))
+      if(! fts_variable_can_define(patcher, var))
 	{
 	  /* Error: redefined variable */
 	  obj = fts_error_object_new(patcher, aoc, aot, "Variable %s doubly defined", fts_symbol_name(var));
@@ -515,8 +544,8 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   do_client = ((old->id != FTS_NO_ID) && (old->id != new_id));
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
-  if ((ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column))
-    var = fts_get_symbol(&at[0]);
+  if (fts_object_description_defines_variable(ac, at))
+    var = fts_object_description_get_variable_name(ac, at);
   else
     var = 0;
 
