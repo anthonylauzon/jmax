@@ -18,10 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #ifndef _FTS_H
@@ -46,17 +42,15 @@
  *
  * FTS includes mainly the following components:
  *
- * \li object system (lang/mess/)
- * \li DSP system (lang/dsp/, lang/ftl/)
- * \li scheduler (runtime/scheduler/)
- * \li timing system (runtime/time/)
- * \li device abstractions (runtime/devices/)
- * \li file handling (runtime/files/)
- * \li client/server communication (runtime/client/, tiles/messtile.*)
- * \li configuration handling: UCS (tiles/ucs.*)
- * \li system utilities: memory management, module sytem, ... (sys/)
- * \li platform dependend components: dynamic loading, memory management, scheduling, ... (non-portable/)
- * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ... (lang/utils/)
+ * \li object system
+ * \li DSP system
+ * \li scheduler
+ * \li timing system
+ * \li file handling
+ * \li client/server communication
+ * \li system utilities: memory management
+ * \li platform dependend components: dynamic loading, memory management, scheduling, ...
+ * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ...
  *
  * This documentation is generated automatically from the comments in the header files of FTS.
  */
@@ -65,10 +59,40 @@
 extern "C" {
 #endif
 
-#include <fts/sys.h>
-#include <fts/lang.h>
-#include <fts/runtime.h>
-#include <fts/tiles/startup.h>
+/* *** The inclusion order is important *** */
+#include <fts/types.h>
+#include <fts/status.h>
+
+#include <fts/mem.h>
+#include <fts/word.h>
+#include <fts/atom.h>
+#include <fts/symbol.h>
+
+#include <fts/array.h>
+#include <fts/iterator.h>
+#include <fts/hashtable.h>
+#include <fts/objectlist.h>
+#include <fts/objectset.h>
+
+#include <fts/connection.h>
+#include <fts/property.h>
+#include <fts/expression.h>
+#include <fts/class.h>
+#include <fts/variable.h>
+#include <fts/object.h>
+#include <fts/patcher.h>
+#include <fts/message.h>
+#include <fts/doctor.h>
+#include <fts/errobj.h>
+#include <fts/inout.h>
+#include <fts/saver.h>
+#include <fts/param.h>
+
+#include <fts/ftl.h>
+#include <fts/ftlmem.h>
+/*  #include <fts/dsp.h> */
+
+#include <fts/fpe.h>
 
 #ifdef __cplusplus
 }
