@@ -1287,7 +1287,7 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   if(help_patch)
     patcher_open_editor((fts_object_t *)help_patch, 0, 0, 0, 0);
   else
-    help_patch = fts_client_load_patcher(file_name, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o));
+    help_patch = fts_client_load_patcher(file_name, fts_get_client_id(o));
 
   if(!help_patch)
     fts_client_send_message(o, sym_noHelp, 1, at); 

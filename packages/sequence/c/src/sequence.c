@@ -206,7 +206,7 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
   if( !fts_object_has_id((fts_object_t *)track))
     {
       ((fts_object_t *)track)->patcher = fts_object_get_patcher((fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)track, -1);
+      fts_client_register_object((fts_object_t *)track, FTS_NO_ID);
     
 
       fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);

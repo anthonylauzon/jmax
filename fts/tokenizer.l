@@ -40,12 +40,11 @@
 
 whites		[ \t\n]
 letter		[A-Za-z_]
-decdigit	[0-9]
+decdigit	-?[0-9]
 hexdigit	[0-9a-fA-F]
 decint		{decdigit}+
 hexint		0x{hexdigit}+
-float		{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
-tilde		~
+float		-?{decdigit}+(\.{decdigit}*)?([eE][+-]?{decdigit}+)?
 dollar		\$
 semi		;
 plus		\+
@@ -73,10 +72,9 @@ smaller		\<
 smaller_equal	\<=
 colon		:
 equal		=
-operator  	({plus})|({minus})|({times})|({div})|({percent})|({shift_left})|({shift_right})|({logical_and})|({logical_or})|({logical_not})|({equal_equal})|({not_equal})|({greater})|({greater_equal})|({smaller})|({smaller_equal})
-stdsymbol	{letter}[^\ ]*({tilde})?
-opsymbol	({operator})*({tilde})
-symbol		({stdsymbol})|({opsymbol})
+/*  symbol		[^ \t\$\;\(\)\[\]\{\}:]+ */
+symbol		({letter}|{decdigit})({letter}|{decdigit}|\+|\-)*
+quoted_symbol	\"[^\"]+\"
 
 %%
 
@@ -111,7 +109,8 @@ symbol		({stdsymbol})|({opsymbol})
 {smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
 {colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
 {equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
-{symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
+{quoted_symbol}	{ SET_SYMBOL( yytext); return 1; }
+{symbol}	{ SET_SYMBOL( yytext); return 1; }
 
 %%
 
@@ -138,3 +137,30 @@ void fts_tokenizer_destroy( fts_tokenizer_t *tokenizer)
 }
 
 
+#ifdef TEST
+static void print_atom( const fts_atom_t *p)
+{
+  if ( fts_is_int( p))
+    printf( "int: %d\n", fts_get_int( p));
+  else if ( fts_is_float( p))
+    printf( "float: %g\n", fts_get_float( p));
+  else if ( fts_is_symbol( p))
+    printf( "symbol: %s\n", fts_get_symbol( p));
+}
+
+int main( int argc, char **argv)
+{
+  fts_atom_t a;
+  fts_tokenizer_t tokenizer;
+
+  fts_tokenizer_init( &tokenizer, argv[1]);
+  while (fts_tokenizer_run( &tokenizer, &a) != 0)
+    {
+      print_atom( &a);
+    }
+  fts_tokenizer_destroy( &tokenizer);
+
+  return 0;
+}
+
+#endif

@@ -41,7 +41,7 @@ public class FtsConsole extends FtsObject {
     
   public FtsConsole( ConsoleArea consoleArea) throws IOException
   {
-    super( JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("console_stream"));
+    super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("console_stream"));
 
     this.consoleArea = consoleArea;
   }

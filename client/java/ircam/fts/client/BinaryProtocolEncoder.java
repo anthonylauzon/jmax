@@ -146,6 +146,13 @@ class BinaryProtocolEncoder {
       write( 0);
   }
 
+  /* This version is used for object that have predefined IDs */
+  void writeObject( int id) throws IOException
+  {
+    outputBuffer.append( BinaryProtocol.OBJECT);
+    write( id);
+  }
+
   void writeAtoms( FtsAtom[] atoms, int offset, int length) throws IOException
   {
     for ( int i = offset; i < length; i++)

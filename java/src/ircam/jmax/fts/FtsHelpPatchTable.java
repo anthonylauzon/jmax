@@ -125,7 +125,7 @@ public class FtsHelpPatchTable
 	String file = getHelpSummaryPatch(name);
 	try
 	  {
-	    JMaxApplication.getFtsServer().getRoot().load( file);
+	    JMaxApplication.load( file);
 	  }
 	catch(IOException e)
 	  {

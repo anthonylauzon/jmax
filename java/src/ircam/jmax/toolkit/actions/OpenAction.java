@@ -73,7 +73,7 @@ public class OpenAction extends EditorAction
 
 	try
 	  {	
-	    JMaxApplication.getFtsServer().getRoot().load(file.getAbsolutePath());
+	    JMaxApplication.load(file.getAbsolutePath());
 	  }
 	catch(IOException e)
 	  {

@@ -109,7 +109,7 @@ public class FtsDspControl extends FtsObject
     
   public FtsDspControl() throws IOException
   {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__dspcontrol"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("__dspcontrol"));
 
     dacSlip         = 0;
     invalidFpe      = 0;

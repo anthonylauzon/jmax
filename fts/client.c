@@ -116,6 +116,9 @@ static fts_symbol_t s_remove_object;
 
 static fts_heap_t *update_heap;
 
+/* Predefined ids */
+#define FTS_CLIENT_ROOT_OBJECT_ID 0
+#define FTS_CLIENT_CLIENT_OBJECT_ID 1
 
 
 /***********************************************************************
@@ -346,14 +349,6 @@ struct _client_t {
 /*----------------------------------------------------------------------
  * Object table
  */
-static void client_put_object( client_t *this, int id, fts_object_t *object)
-{
-  fts_atom_t k, v;
-
-  fts_set_int( &k, id);
-  fts_set_object( &v, object);
-  fts_hashtable_put( &this->object_table, &k, &v);
-}
 
 static fts_object_t *client_get_object( client_t *this, int id)
 {
@@ -377,14 +372,21 @@ static void client_release_object( client_t *this, fts_object_t *object)
   object->head.id = FTS_NO_ID;
 }
 
-static void client_register_object( client_t *this, fts_object_t *object)
+static void client_register_object( client_t *this, fts_object_t *object, int object_id)
 {
   fts_atom_t k, v;
-  int id = this->object_id_count;
 
-  this->object_id_count += 2; 
-  client_put_object( this, id, object);
-  object->head.id = OBJECT_ID( id, this->client_id);
+  if (object_id == FTS_NO_ID)
+    {
+      object_id = this->object_id_count;
+      this->object_id_count += 2; 
+    }
+
+  fts_set_int( &k, object_id);
+  fts_set_object( &v, object);
+  fts_hashtable_put( &this->object_table, &k, &v);
+
+  object->head.id = OBJECT_ID( object_id, this->client_id);
 }
 
 /*----------------------------------------------------------------------
@@ -420,10 +422,6 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
  */
 
 /* Actions */
-
-static void null_action( unsigned char input, client_t *client)
-{
-}
 
 static void clear_action( unsigned char input, client_t *client)
 {
@@ -564,10 +562,8 @@ static void end_message_action( unsigned char input, client_t *client)
   fts_stack_clear( &client->input_args);
 }
 
-static int state_next( int state, unsigned char input, client_t *client)
+static void state_next( client_t *client, unsigned char input)
 {
-  int newstate = 0;
-
 #define q_initial            1
 #define q_int0               2
 #define q_int1               3
@@ -593,99 +589,113 @@ static int state_next( int state, unsigned char input, client_t *client)
 #define q_symbol_cache4      23
 #define q_raw_string         24
 
-#define state_add_transition( INPUT, NEWSTATE, ACTION) if (input == INPUT) { newstate = NEWSTATE; ACTION( input, client); }
-#define state_add_default_transition( NEWSTATE, ACTION) newstate = NEWSTATE; ACTION( input, client);
+#define moveto( NEWSTATE, ACTION) (client->state = NEWSTATE, ACTION( input, client))
 
-  switch( state) {
+  switch( client->state) {
   case 0:
     /* try to skip till end of message */
-    state_add_transition( FTS_PROTOCOL_END_OF_MESSAGE, q_initial, null_action);
+    if ( input == FTS_PROTOCOL_END_OF_MESSAGE)
+      client->state = q_initial;
     break;
   case q_initial:
-    state_add_transition( FTS_PROTOCOL_INT, q_int0, clear_action);
-    state_add_transition( FTS_PROTOCOL_FLOAT, q_float0, clear_action);
-    state_add_transition( FTS_PROTOCOL_SYMBOL_INDEX, q_symbol_index0, clear_action);
-    state_add_transition( FTS_PROTOCOL_SYMBOL_CACHE, q_symbol_cache0, clear_action);
-    state_add_transition( FTS_PROTOCOL_STRING, q_string, clear_action);
-    state_add_transition( FTS_PROTOCOL_RAW_STRING, q_raw_string, clear_action);
-    state_add_transition( FTS_PROTOCOL_OBJECT, q_object0, clear_action);
-    state_add_transition( FTS_PROTOCOL_END_OF_MESSAGE, q_initial, end_message_action);
+    if ( input == FTS_PROTOCOL_INT)
+      moveto( q_int0, clear_action);
+    else if ( input == FTS_PROTOCOL_FLOAT)
+      moveto( q_float0, clear_action);
+    else if ( input == FTS_PROTOCOL_SYMBOL_INDEX)
+      moveto( q_symbol_index0, clear_action);
+    else if ( input == FTS_PROTOCOL_SYMBOL_CACHE)
+      moveto( q_symbol_cache0, clear_action);
+    else if ( input == FTS_PROTOCOL_STRING)
+      moveto( q_string, clear_action);
+    else if ( input == FTS_PROTOCOL_RAW_STRING)
+      moveto( q_raw_string, clear_action);
+    else if ( input == FTS_PROTOCOL_OBJECT)
+      moveto( q_object0, clear_action);
+    else if ( input == FTS_PROTOCOL_END_OF_MESSAGE)
+      moveto( q_initial, end_message_action);
+    else
+      client->state = 0;
     break;
   case q_int0:
-    state_add_default_transition( q_int1, shift_action);
+    moveto( q_int1, shift_action);
     break;
   case q_int1:
-    state_add_default_transition( q_int2, shift_action);
+    moveto( q_int2, shift_action);
     break;
   case q_int2:
-    state_add_default_transition( q_int3, shift_action);
+    moveto( q_int3, shift_action);
     break;
   case q_int3:
-    state_add_default_transition( q_initial, end_int_action);
+    moveto( q_initial, end_int_action);
     break;
   case q_float0:
-    state_add_default_transition( q_float1, shift_action);
+    moveto( q_float1, shift_action);
     break;
   case q_float1:
-    state_add_default_transition( q_float2, shift_action);
+    moveto( q_float2, shift_action);
     break;
   case q_float2:
-    state_add_default_transition( q_float3, shift_action);
+    moveto( q_float3, shift_action);
     break;
   case q_float3:
-    state_add_default_transition( q_initial, end_float_action);
+    moveto( q_initial, end_float_action);
     break;
   case q_symbol_index0:
-    state_add_default_transition( q_symbol_index1, shift_action);
+    moveto( q_symbol_index1, shift_action);
     break;
   case q_symbol_index1:
-    state_add_default_transition( q_symbol_index2, shift_action);
+    moveto( q_symbol_index2, shift_action);
     break;
   case q_symbol_index2:
-    state_add_default_transition( q_symbol_index3, shift_action);
+    moveto( q_symbol_index3, shift_action);
     break;
   case q_symbol_index3:
-    state_add_default_transition( q_initial, end_symbol_index_action);
+    moveto( q_initial, end_symbol_index_action);
     break;
   case q_symbol_cache0:
-    state_add_default_transition( q_symbol_cache1, shift_action);
+    moveto( q_symbol_cache1, shift_action);
     break;
   case q_symbol_cache1:
-    state_add_default_transition( q_symbol_cache2, shift_action);
+    moveto( q_symbol_cache2, shift_action);
     break;
   case q_symbol_cache2:
-    state_add_default_transition( q_symbol_cache3, shift_action);
+    moveto( q_symbol_cache3, shift_action);
     break;
   case q_symbol_cache3:
-    state_add_default_transition( q_symbol_cache4, shift_action);
+    moveto( q_symbol_cache4, shift_action);
     break;
   case q_symbol_cache4:
-    state_add_transition( 0, q_initial, end_symbol_cache_action);
-    state_add_default_transition( q_symbol_cache4, buffer_shift_action);
+    if ( input == 0)
+      moveto( q_initial, end_symbol_cache_action);
+    else
+      moveto( q_symbol_cache4, buffer_shift_action);
     break;
   case q_string:
-    state_add_transition( 0, q_initial, end_string_action);
-    state_add_default_transition( q_string, buffer_shift_action);
+    if ( input == 0)
+      moveto( q_initial, end_string_action);
+    else
+      moveto( q_string, buffer_shift_action);
     break;
   case q_raw_string:
-    state_add_transition( 0, q_initial, end_raw_string_action);
-    state_add_default_transition( q_raw_string, buffer_shift_action);
+    if ( input == 0)
+      moveto( q_initial, end_raw_string_action);
+    else
+      moveto( q_raw_string, buffer_shift_action);
     break;
   case q_object0:
-    state_add_default_transition( q_object1, shift_action);
+    moveto( q_object1, shift_action);
     break;
   case q_object1:
-    state_add_default_transition( q_object2, shift_action);
+    moveto( q_object2, shift_action);
     break;
   case q_object2:
-    state_add_default_transition( q_object3, shift_action);
+    moveto( q_object3, shift_action);
     break;
   case q_object3:
-    state_add_default_transition( q_initial, end_object_action);
+    moveto( q_initial, end_object_action);
     break;
   }
-
-  return newstate;
 }
 
 /*----------------------------------------------------------------------
@@ -711,7 +721,7 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 
   for ( i = 0; i < size; i++)
     {
-      this->state = state_next( this->state, buffer[i], this);
+      state_next( this, buffer[i]);
       if (this->state == 0)
 	fts_log( "[client] protocol error\n");
     }
@@ -743,9 +753,7 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
       return;
     }
 
-  client_put_object( this, id, newobj);
-
-  newobj->head.id = OBJECT_ID( id, this->client_id);
+  client_register_object( this, newobj, id);
 }
 
 static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -805,11 +813,11 @@ static void client_delete_object( fts_object_t *o, int winlet, fts_symbol_t s, i
 static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
-  fts_client_load_patcher( fts_get_symbol( at), fts_get_object( at+1), this->client_id);
+  fts_client_load_patcher( fts_get_symbol( at), this->client_id);
 }
 
 fts_patcher_t *
-fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
+fts_client_load_patcher(fts_symbol_t file_name, int id)
 {
   fts_patcher_t *patcher = 0;
   int type = 1;
@@ -817,11 +825,7 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   int client_id;
   client_t *client;
   char *dir_name;
-
-  if(id == -1)
-    client_id = fts_get_client_id( parent);  
-  else
-    client_id = id;
+  fts_object_t *parent = (fts_object_t *)fts_get_root_patcher();
 
   client = client_table_get(client_id);
 
@@ -865,7 +869,7 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
       return 0;
     }
 
-  client_register_object( client, (fts_object_t *)patcher);
+  client_register_object( client, (fts_object_t *)patcher, FTS_NO_ID);
 
   /* Save the file name, for future autosaves and other services */
   fts_patcher_set_file_name(patcher, file_name);
@@ -931,7 +935,7 @@ static void client_predefine_objects( client_t *this)
   fts_atom_t a[1];
 
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
-  client_put_object( this, 0, (fts_object_t *)fts_get_root_patcher());
+  client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
 #else
   fts_set_symbol( a, fts_s_patcher);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &this->root_patcher);
@@ -944,10 +948,10 @@ static void client_predefine_objects( client_t *this)
 
   fts_object_refer( this->root_patcher);
 
-  client_put_object( this, 0, (fts_object_t *)this->root_patcher);
+  client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
 #endif
 
-  client_put_object( this, 1, (fts_object_t *)this);
+  client_register_object( this, (fts_object_t *)this, FTS_CLIENT_CLIENT_OBJECT_ID);
 }
 
 static void client_update_period( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1461,36 +1465,33 @@ void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, 
   fts_client_done_message( obj);
 }
 
-void fts_client_upload_object(fts_object_t *obj, int id)
+void fts_client_upload_object(fts_object_t *obj, int client_id)
 {
   fts_atom_t a[1];
 
-  fts_client_register_object(obj, id);
+  fts_client_register_object(obj, client_id);
 
   fts_set_object( a, obj);
   fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);  
 }
 
-void fts_client_register_object(fts_object_t *obj, int id)
+void fts_client_register_object(fts_object_t *obj, int client_id)
 {
-  int client_id;
   client_t *client;
   fts_atom_t a[1];
 
-  if(id == -1)
+  if(client_id == FTS_NO_ID)
     client_id = fts_get_client_id((fts_object_t *)fts_object_get_patcher(obj));
-  else
-    client_id = id;
   
   client = client_table_get(client_id);
 
   if ( !client)
     {
-      fts_log("[client] fts_client_upload_object: Cannot upoload object\n");      
+      fts_log("[client] fts_client_upload_object: Cannot upload object\n");      
       return;
     }
 
-  client_register_object( client, obj);
+  client_register_object( client, obj, FTS_NO_ID);
 }
 
 void fts_client_release_object(fts_object_t *obj)

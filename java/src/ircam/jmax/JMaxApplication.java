@@ -38,6 +38,92 @@ import ircam.fts.client.*;
 import ircam.jmax.editors.console.*;
 import ircam.jmax.editors.patcher.*;
 
+class FtsSystemOutConsole extends FtsObject {
+  public FtsSystemOutConsole( FtsServer server, FtsPatcherObject rootPatcher) throws IOException
+  {
+    super( server, rootPatcher, FtsSymbol.get("console_stream"));
+  }
+
+  static
+  {
+    FtsObject.registerMessageHandler( FtsSystemOutConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  System.out.println( args.getString(0)); 
+	}
+      });
+  }
+}
+
+class LoadPackageHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    if ( args.isSymbol( 0) )
+      {
+	System.out.println( "package: " + args.getSymbol(0));
+
+	try
+	  {
+	    JMaxPackageLoader.load( args.getSymbol( 0).toString());
+	  }
+	catch( JMaxPackageLoadingException e)
+	  {
+	    JMaxApplication.reportException( e);
+	  }
+
+	for( int i = 1; i < args.getLength(); i += 2)
+	  FtsHelpPatchTable.addSummary( args.getSymbol( i).toString(), args.getSymbol( i+1).toString());
+      }
+  }
+}
+
+class LoadPatcherMessageHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    if ( args.isInt( 0) )
+      {
+	FtsPatcherObject patcher = new FtsPatcherObject( JMaxApplication.getFtsServer(), 
+							 JMaxApplication.getRootPatcher(), 
+							 args.getInt( 0), "jpatcher", null, 0, 0);
+	ErmesSketchWindow win = new ErmesSketchWindow(patcher);
+	String name =  args.getSymbol( 1).toString();
+	win.setTitle( name);
+	patcher.setEditorFrame( win);
+	patcher.setName( name);
+	patcher.setType( args.getInt( 2));
+      }
+  }
+}
+
+class RootPatcher extends FtsPatcherObject {
+  RootPatcher( FtsServer server)
+  {
+    super( server, null, FtsObject.NO_ID, "jpatcher", null, 0, 0);
+  }
+}
+
+class JMaxClient extends FtsObject {
+  JMaxClient( FtsServer server, FtsPatcherObject rootPatcher)
+  {
+    super( server, rootPatcher, FtsObject.NO_ID);
+  }
+
+  void load( String name) throws IOException
+  {
+    FtsArgs args = new FtsArgs();
+
+    args.addString( name);
+
+    send( FtsSymbol.get("load"), args);
+  }
+
+  static
+  {
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
+  }
+}
+
 // JMaxApplication.getProperty should disappear, and properties stored in the system
 // properties, that can *also* be loaded from a file.
 
@@ -56,7 +142,7 @@ import ircam.jmax.editors.patcher.*;
  * - quit of the application
  */
 
-public class JMaxApplication extends FtsClient {
+public class JMaxApplication {
  
   // **********************************************************************
   // Still ugly
@@ -174,9 +260,8 @@ public class JMaxApplication extends FtsClient {
     if(singleInstance.killFtsOnQuit)
       if ( singleInstance.server != null)
 	try{
-	  singleInstance.server.shutdown();
+	  singleInstance.clientObject.send( FtsSymbol.get( "shutdown"));
 	}
-	catch(FtsClientException e){}
 	catch(IOException e)
 	  {
 	    System.err.println("JMaxApplication: IOEception quitting application "+e);
@@ -197,6 +282,12 @@ public class JMaxApplication extends FtsClient {
 	Runtime.getRuntime().exit(0);
       }
   } 
+
+  public static void load( String name) throws IOException
+  {
+    singleInstance.clientObject.load( name);
+  }
+
   // **********************************************************************
 
 
@@ -209,6 +300,11 @@ public class JMaxApplication extends FtsClient {
   }
 
   // Static accessors
+  public static FtsPatcherObject getRootPatcher()
+  {
+    return singleInstance.rootPatcher;
+  }
+
   public static RecentFileHistory getRecentFileHistory()
   {
     return singleInstance.recentFileHistory;
@@ -286,6 +382,12 @@ public class JMaxApplication extends FtsClient {
     openConsole();
 
     openConnection();
+
+    createPredefinedObjects();
+
+    initConsole();
+
+    startReceive();
 
     // This should be really here, right before we eventually open command line documents
     recentFileHistory.load();
@@ -390,28 +492,7 @@ public class JMaxApplication extends FtsClient {
       });
   }
 
-  private class LoadPackageHandler implements FtsMessageHandler {
-    public void invoke( FtsObject obj, FtsArgs args)
-    {
-      if ( args.isSymbol( 0) )
-	{
-	  System.out.println( "package: " + args.getSymbol(0));
-
-	  try
-	    {
-	      JMaxPackageLoader.load( args.getSymbol( 0).toString());
-	    }
-	  catch( JMaxPackageLoadingException e)
-	    {
-	      JMaxApplication.reportException( e);
-	    }
-
-	  for(int i = 1; i<args.getLength(); i+=2)
-	    FtsHelpPatchTable.addSummary( args.getSymbol( i).toString(), args.getSymbol( i+1).toString());
-	}
-    }
-  }
-
+	
   private void openConnection()
   {
     if (properties.get("jmaxConnection") == null)
@@ -477,31 +558,7 @@ public class JMaxApplication extends FtsClient {
 		connection = new FtsSocketConnection(hostName, port.intValue());
 	  }
 
-	server = new FtsServer( connection, this);
-
-	FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
-	FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "patcher_loaded"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, FtsArgs args)
-	    {
-	      if ( args.isInt( 0) )
-		{
-		  FtsPatcherObject patcher = new FtsPatcherObject( JMaxApplication.getFtsServer(), 
-								   JMaxApplication.getFtsServer().getRoot(), 
-								   args.getInt( 0), "jpatcher", null, 0, 0);
-		  ErmesSketchWindow win = new ErmesSketchWindow(patcher);
-		  String name =  args.getSymbol( 1).toString();
-		  win.setTitle( name);
-		  patcher.setEditorFrame( win);
-		  patcher.setName( name);
-		  patcher.setType( args.getInt( 2));
-		}
-	    }
-	  });
-
-	
-	initConsole();
-
-	send( FtsSymbol.get( "get_packages"));
+	server = new FtsServer( connection);
       }
     catch( Exception e)
       {
@@ -509,23 +566,13 @@ public class JMaxApplication extends FtsClient {
       }
   }
 
-  class FtsSystemOutConsole extends FtsObject {
-    public FtsSystemOutConsole() throws IOException
-    {
-      super( server, server.getRoot(), FtsSymbol.get("console_stream"));
-    }
-  }
-
-  static
+  private void createPredefinedObjects()
   {
-    FtsObject.registerMessageHandler( FtsSystemOutConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  System.out.println( args.getString(0)); 
-	}
-      });
+    rootPatcher = new RootPatcher( server);
+    server.setRootObject( rootPatcher);
+    clientObject = new JMaxClient( server, rootPatcher);
+    server.setClientObject( clientObject);
   }
-    
 
   private void initConsole()
   {
@@ -534,7 +581,7 @@ public class JMaxApplication extends FtsClient {
     try
       {
 	if (noConsole)
-	  ftsConsole = new FtsSystemOutConsole();
+	  ftsConsole = new FtsSystemOutConsole( server, rootPatcher);
 	else
 	  ftsConsole = new FtsConsole( consoleWindow.getConsoleArea());
 
@@ -549,6 +596,19 @@ public class JMaxApplication extends FtsClient {
     consoleWindow.getControlPanel().init();
   }
 
+  private void startReceive()
+  {
+    server.start();
+
+    try
+      {
+	clientObject.send( FtsSymbol.get( "get_packages"));
+      }
+    catch(IOException e)
+      {
+	JMaxApplication.reportException( e);
+      }
+  }
 
   private static void openCommandLineFiles()
   {
@@ -559,7 +619,7 @@ public class JMaxApplication extends FtsClient {
 	for(Enumeration e = singleInstance.toOpen.elements(); e.hasMoreElements(); )
 	  {
 	    fileName = (String)e.nextElement();
-	    JMaxApplication.getFtsServer().getRoot().load(fileName);
+	    JMaxApplication.load(fileName);
 	  }
       }
     catch(IOException e)
@@ -575,4 +635,6 @@ public class JMaxApplication extends FtsClient {
   private MaxVector toOpen;
   private boolean noConsole;
   private boolean killFtsOnQuit;
+  private FtsPatcherObject rootPatcher;
+  private JMaxClient clientObject;
 }

@@ -308,7 +308,7 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(!fts_object_has_id((fts_object_t *)this->atom_list))
   {
     ((fts_object_t *)this->atom_list)->patcher = o->patcher;
-    fts_client_register_object((fts_object_t *)this->atom_list, -1);     
+    fts_client_register_object((fts_object_t *)this->atom_list, FTS_NO_ID);
   }
   
   fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));

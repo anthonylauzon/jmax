@@ -80,7 +80,7 @@ public class FtsObjectSet extends FtsObject implements ListModel
 
   public FtsObjectSet() throws IOException
   {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__objectset"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("__objectset"));
 
     list = new MaxVector();
     dataListeners = new MaxVector();

@@ -590,7 +590,7 @@ public class FtsGraphicObject extends FtsObject {
 
   public boolean isARootPatcher()
   {
-    return (getParent() == getServer().getRoot());
+    return (getParent() == JMaxApplication.getRootPatcher());
   }
 
   public FtsPatcherObject getRootPatcher()

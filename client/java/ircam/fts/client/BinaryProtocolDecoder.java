@@ -147,121 +147,118 @@ class BinaryProtocolDecoder {
     argsCount = 0;
   }
 
-  private int next( int state, int input)
+  private void nextState( int input)
   {
-    int newState = 0;
-
-    switch( state) {
+    switch( currentState) {
     case 0:
       /* try to skip till end of message */
       if ( input == BinaryProtocol.END_OF_MESSAGE)
-	newState = qInitial;
+	currentState = qInitial;
     break;
     case qInitial:
       if ( input == BinaryProtocol.INT)
 	{
-	  newState = qInt0;
+	  currentState = qInt0;
 	  clearAction( input);
 	}
       else if ( input == BinaryProtocol.FLOAT)
 	{
-	  newState = qFloat0;
+	  currentState = qFloat0;
 	  clearAction( input);
 	}
       else if ( input == BinaryProtocol.SYMBOL_INDEX)
 	{
-	  newState = qSymbolIndex0;
+	  currentState = qSymbolIndex0;
 	  clearAction( input);
 	}
       else if ( input == BinaryProtocol.SYMBOL_CACHE)
 	{
-	  newState = qSymbolCache0;
+	  currentState = qSymbolCache0;
 	  clearAllAction( input);
 	}
       else if ( input == BinaryProtocol.STRING)
 	{
-	  newState = qString;
+	  currentState = qString;
 	  bufferClearAction( input);
 	}
       else if ( input == BinaryProtocol.OBJECT)
 	{
-	  newState = qObject0;
+	  currentState = qObject0;
 	  clearAction( input);
 	}
       else if ( input == BinaryProtocol.END_OF_MESSAGE)
-	{
-	  newState = qInitial;
-	  endMessageAction( input);
-	}
+	endMessageAction( input);
+      else
+	currentState = 0;
       break;
     case qInt0:
-      newState = qInt1;
+      currentState = qInt1;
       shiftAction( input);
       break;
     case qInt1:
-      newState = qInt2;
+      currentState = qInt2;
       shiftAction( input);
       break;
     case qInt2:
-      newState = qInt3;
+      currentState = qInt3;
       shiftAction( input);
       break;
     case qInt3:
-      newState = qInitial;
+      currentState = qInitial;
       endIntAction( input);
       break;
     case qFloat0:
-      newState = qFloat1;
+      currentState = qFloat1;
       shiftAction( input);
       break;
     case qFloat1:
-      newState = qFloat2;
+      currentState = qFloat2;
       shiftAction( input);
       break;
     case qFloat2:
-      newState = qFloat3;
+      currentState = qFloat3;
       shiftAction( input);
       break;
     case qFloat3:
-      newState = qInitial;
+      currentState = qInitial;
       endFloatAction( input);
       break;
     case qSymbolIndex0:
-      newState = qSymbolIndex1;
+      currentState = qSymbolIndex1;
       shiftAction( input);
       break;
     case qSymbolIndex1:
-      newState = qSymbolIndex2;
+      currentState = qSymbolIndex2;
       shiftAction( input);
       break;
     case qSymbolIndex2:
-      newState = qSymbolIndex3;
+      currentState = qSymbolIndex3;
       shiftAction( input);
       break;
     case qSymbolIndex3:
-      newState = qInitial;
+      currentState = qInitial;
       endSymbolIndexAction( input);
       break;
     case qSymbolCache0:
-      newState = qSymbolCache1;
+      currentState = qSymbolCache1;
       shiftAction( input);
       break;
     case qSymbolCache1:
-      newState = qSymbolCache2;
+      currentState = qSymbolCache2;
       shiftAction( input);
       break;
     case qSymbolCache2:
-      newState = qSymbolCache3;
+      currentState = qSymbolCache3;
       shiftAction( input);
       break;
     case qSymbolCache3:
-      newState = qSymbolCache4;
+      currentState = qSymbolCache4;
       shiftAction( input);
       break;
     case qSymbolCache4:
       if ( input == 0)
 	{
-	  newState = qInitial;
+	  currentState = qInitial;
 	  endSymbolCacheAction( input);
 	}
       else
@@ -270,31 +267,29 @@ class BinaryProtocolDecoder {
     case qString:
       if ( input == 0)
 	{
-	  newState = qInitial;
+	  currentState = qInitial;
 	  endStringAction( input);
 	}
       else
 	bufferShiftAction( input);
       break;
     case qObject0:
-      newState = qObject1;
+      currentState = qObject1;
       shiftAction( input);
       break;
     case qObject1:
-      newState = qObject2;
+      currentState = qObject2;
       shiftAction( input);
       break;
     case qObject2:
-      newState = qObject3;
+      currentState = qObject3;
       shiftAction( input);
       break;
     case qObject3:
-      newState = qInitial;
+      currentState = qInitial;
       endObjectAction( input);
       break;
     }
-
-    return newState;
   }
 
   BinaryProtocolDecoder( FtsServer server)
@@ -320,7 +315,7 @@ class BinaryProtocolDecoder {
 	if ( c < 0)
 	  c += 256;
 
-	currentState = next( currentState, c);
+	nextState( c);
 
 	if (currentState == 0)
 	  throw new FtsClientException( "Invalid data in protocol : state=" + currentState + " input=" + c);

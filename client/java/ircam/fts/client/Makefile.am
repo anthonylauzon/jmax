@@ -7,7 +7,6 @@ BinaryProtocolEncoder.java			\
 BinaryProtocol.java				\
 FtsArgs.java					\
 FtsAtom.java					\
-FtsClient.java					\
 FtsClientException.java				\
 FtsMessageHandler.java				\
 FtsObject.java					\

@@ -42,12 +42,12 @@ public class FtsErrorFinderObject extends FtsObject {
 
   public FtsErrorFinderObject() throws IOException
   {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__errorfinder"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("__errorfinder"));
   }
   
   public void findErrors(FtsObjectSet set)
   {
-      findErrors(getRoot(), set);
+      findErrors( JMaxApplication.getRootPatcher(), set);
   }
 
   public void findErrors(FtsObject context, FtsObjectSet set)

@@ -178,7 +178,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public boolean isARootPatcher()
   {
-    return (getFtsPatcher().getParent() == getFtsPatcher().getServer().getRoot());
+    return (getFtsPatcher().getParent() == JMaxApplication.getRootPatcher());
   }
 
   public boolean isASubPatcher()

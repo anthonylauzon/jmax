@@ -493,7 +493,7 @@ track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_
   if(!fts_object_has_id((fts_object_t *)event))
     {
       ((fts_object_t *)event)->patcher = fts_object_get_patcher( (fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)event, -1);
+      fts_client_register_object((fts_object_t *)event, FTS_NO_ID);
     }
 
   fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
@@ -511,7 +511,7 @@ track_event_upload(track_t *this, event_t *event)
   if(!fts_object_has_id((fts_object_t *)event))
     {
       ((fts_object_t *)event)->patcher = fts_object_get_patcher( (fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)event, -1);
+      fts_client_register_object((fts_object_t *)event, FTS_NO_ID);
     
 
       fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);

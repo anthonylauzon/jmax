@@ -42,4 +42,17 @@
 
 extern void fts_object_reset_changed(fts_object_t *obj);
 
+/**
+ * Load a patcher from file
+ *
+ * @fn fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, fts_object_t *parent, int client_id)
+ * @param file_name the file name 
+ * @param parent the parent object 
+ * @param client_id the client id 
+ *
+ * @ingroup client
+ */
+extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
+
+
 #endif

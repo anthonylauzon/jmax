@@ -50,6 +50,7 @@ class MessageHandlerEntry {
 
 public class FtsObject implements Serializable
 {
+  public static final int NO_ID = -1;
 
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
@@ -60,7 +61,7 @@ public class FtsObject implements Serializable
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.getClient());
+    encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
     encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
     encoder.writeInt( id);
@@ -77,7 +78,7 @@ public class FtsObject implements Serializable
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.getClient());
+    encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
     encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
     encoder.writeInt( id);
@@ -90,16 +91,12 @@ public class FtsObject implements Serializable
   {
     this.server = server;
     this.parent = parent;
+
     encoder = server.getEncoder();
 
     this.id = id;
-
-    server.putObject( id, this);
-  }
-
-  FtsObject()
-  {
-    id = -1;
+    if ( id != NO_ID)
+      server.putObject( id, this);
   }
 
   public void send( FtsSymbol selector, FtsArgs args) throws IOException
@@ -143,7 +140,7 @@ public class FtsObject implements Serializable
 
   public void sendProperty(FtsArgs args) throws IOException
   {
-    encoder.writeObject( server.getClient());
+    encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
     encoder.writeSymbol( FtsSymbol.get("set_object_property"));
     encoder.writeObject( this);
     encoder.writeArgs( args);
@@ -152,17 +149,8 @@ public class FtsObject implements Serializable
   
   public void delete() throws IOException
   {
-    encoder.writeObject( server.getClient());
+    encoder.writeObject( parent);
     encoder.writeSymbol( sDelObject);
-    encoder.writeObject( this);
-    encoder.flush();
-  }
-
-  public void load( String fileName) throws IOException
-  {
-    encoder.writeObject( server.getClient());
-    encoder.writeSymbol( FtsSymbol.get("load"));    
-    encoder.writeSymbol( FtsSymbol.get(fileName));
     encoder.writeObject( this);
     encoder.flush();
   }
@@ -206,11 +194,6 @@ public class FtsObject implements Serializable
     while (cl != null);
   }
 
-  public FtsObject getRoot()
-  {
-    return server.getRoot();
-  }
-
   public FtsObject getParent()
   {
     return parent;
@@ -219,12 +202,6 @@ public class FtsObject implements Serializable
   public final FtsServer getServer()
   {
     return server;
-  }
-
-  final void setServer( FtsServer server)
-  {
-    this.server = server;
-    encoder = server.getEncoder();
   }
 
   final int getID()

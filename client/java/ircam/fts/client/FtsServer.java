@@ -59,7 +59,7 @@ public class FtsServer {
     private BinaryProtocolDecoder decoder;
   }
 
-  public FtsServer( FtsServerConnection connection, FtsClient client)
+  public FtsServer( FtsServerConnection connection)
   {
     this.connection = connection;
 
@@ -67,13 +67,32 @@ public class FtsServer {
 
     objectTable = new HashMap();
     encoder = new BinaryProtocolEncoder( this.connection);
+  }
 
-    root = new FtsObject( this, null, 0);
-    client.setServer( this);
-    client.setID( 1);
-    putObject( 1, client);
-    this.client = client;
+  static final int ROOT_OBJECT_ID = 0;
+  static final int CLIENT_OBJECT_ID = 1;
 
+  public void setRootObject( FtsObject rootObject)
+  {
+    rootObject.setID( ROOT_OBJECT_ID);
+    putObject( ROOT_OBJECT_ID, rootObject);
+  }
+
+  public void setClientObject( FtsObject clientObject)
+  {
+    clientObject.setID( CLIENT_OBJECT_ID);
+    putObject( CLIENT_OBJECT_ID, clientObject);
+  }
+
+  /**
+   * Start the receive thread
+   *
+   * As soon as this method is called, message handlers will be called.
+   * This implies that the objects that may receive messages must be 
+   * already installed with their message handlers.
+   */
+  public void start()
+  {
     receiveThread = new ReceiveThread( new BinaryProtocolDecoder( this));
     receiveThread.start();
   }
@@ -88,25 +107,6 @@ public class FtsServer {
   {
     connection.close();
   }
-
-  /**
-   * Shutdown the server
-   *
-   * Send a "shutdown" message to remote FTS.
-   * This message will halt the FTS scheduler and make FTS exit.
-   */
-  public void shutdown() throws FtsClientException, IOException
-  {
-    encoder.writeObject( client);
-    encoder.writeSymbol( FtsSymbol.get("shutdown"));    
-    encoder.flush();
-  }
-
-  public FtsObject getRoot()
-  {
-    return root;
-  }
-
 
   int getNewObjectID()
   {
@@ -137,11 +137,6 @@ public class FtsServer {
     return connection;
   }
 
-  FtsClient getClient()
-  {
-    return client;
-  }
-
   // Connection to FTS
   private FtsServerConnection connection;
 
@@ -150,10 +145,6 @@ public class FtsServer {
 
   // Output to FTS
   private BinaryProtocolEncoder encoder;
-
-  // Proxies of remote root and client
-  private FtsObject root;
-  private FtsClient client;
 
   // Objects ID handling
   private int newObjectID;

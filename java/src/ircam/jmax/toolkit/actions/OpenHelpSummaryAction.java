@@ -52,7 +52,7 @@ public class OpenHelpSummaryAction extends EditorAction
   {
      try
       {	
-	JMaxApplication.getFtsServer().getRoot().load( argument);
+	JMaxApplication.load( argument);
       }
     catch(IOException e)
       {
