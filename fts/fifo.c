@@ -161,7 +161,7 @@ fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo)
 void
 fts_callfifo_init(fts_callfifo_t *callfifo, int size)
 {
-  int bytes = sizeof(fts_fifoevent_t) * size;
+  int bytes = sizeof(fts_fifocall_t) * size;
 
   fts_fifo_init(&callfifo->fifo, fts_malloc(bytes), bytes);
 
@@ -175,34 +175,34 @@ fts_callfifo_destroy(fts_callfifo_t *callfifo, int size)
   fts_free(callfifo->fifo.buffer);
 }
 
-/* read next fifo entry into time base (returns pointer to atom of newly allocated event) */
-fts_fifoevent_t *
+/* read next fifo entry into time base (returns pointer to atom of newly allocated call) */
+fts_fifocall_t *
 fts_callfifo_get_read(fts_callfifo_t *callfifo)
 {
-  if(fts_fifo_read_level(&callfifo->fifo) >= sizeof(fts_fifoevent_t)) {
-    fts_fifoevent_t *event = (fts_fifoevent_t *)fts_fifo_read_pointer(&callfifo->fifo);
-    double time = event->time - callfifo->delta;
+  if(fts_fifo_read_level(&callfifo->fifo) >= sizeof(fts_fifocall_t)) {
+    fts_fifocall_t *call = (fts_fifocall_t *)fts_fifo_read_pointer(&callfifo->fifo);
+    double time = call->time - callfifo->delta;
     double now = fts_get_time();
 
     /* resync fifo */
     if(time < now)
-      callfifo->delta = event->time - now;
+      callfifo->delta = call->time - now;
 
-    /* adjust event time and return (void value can serve for sync) */
-    if(!fts_is_void(&event->atom)) {
-      event->time = time;
-      return event;
+    /* adjust call time and return (void value can serve for sync) */
+    if(!fts_is_void(&call->argument)) {
+      call->time = time;
+      return call;
     }
   }
 
   return NULL;
 }
 
-fts_fifoevent_t *
+fts_fifocall_t *
 fts_callfifo_get_write(fts_callfifo_t *callfifo)
 {
-  if(fts_fifo_write_level(&callfifo->fifo) >= sizeof(fts_fifoevent_t *))
-    return *((fts_fifoevent_t **)fts_fifo_write_pointer(&callfifo->fifo));
+  if(fts_fifo_write_level(&callfifo->fifo) >= sizeof(fts_fifocall_t *))
+    return *((fts_fifocall_t **)fts_fifo_write_pointer(&callfifo->fifo));
   else
     return NULL;
 }
@@ -210,12 +210,12 @@ fts_callfifo_get_write(fts_callfifo_t *callfifo)
 void
 fts_callfifo_incr_read(fts_callfifo_t *callfifo)
 {
-  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifoevent_t *));
+  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifocall_t *));
 }
 
 void
 fts_callfifo_incr_write(fts_callfifo_t *callfifo)
 {
-  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifoevent_t *));
+  fts_fifo_incr_write(&callfifo->fifo, sizeof(fts_fifocall_t *));
 }
 
