@@ -77,7 +77,7 @@ int fts_thread_manager_create_thread(fts_thread_worker_t* thread_worker)
     fts_atom_t at;
     
     fts_set_pointer(&at, thread_worker); 
-    fts_send_message((fts_object_t*)manager, fts_system_inlet, thread_manager_s_create_thread, ac, &at);
+    fts_send_message((fts_object_t*)manager, thread_manager_s_create_thread, ac, &at);
     
     return stat;
 }
