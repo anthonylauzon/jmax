@@ -11,9 +11,6 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 SOURCES = \
-numeric.c \
-itab.c \
-ftab.c \
-nsplit.c \
-wrap.c \
-rewrap.c \
+generic.c \
+mat.c \
+

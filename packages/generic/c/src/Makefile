@@ -24,12 +24,12 @@ MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 #MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
 MORESOLIBS=
 
-all: $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
+all: $(LIBDIR)/libgeneric.a $(LIBDIR)/libgeneric.so
 
-$(LIBDIR)/libnumeric.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libnumeric.a $(OBJECTS)
+$(LIBDIR)/libgeneric.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/libgeneric.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
+TOCLEAN = $(LIBDIR)/libgeneric.a $(LIBDIR)/libgeneric.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

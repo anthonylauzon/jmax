@@ -13,9 +13,12 @@
  */
 #include "fts.h"
 
+void mat_config(void);
+
 static void
 generic_init(void)
 {
+  mat_config();
 }
 
 fts_module_t generic_module = {"generic", "generic classes", generic_init};
