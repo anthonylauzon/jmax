@@ -35,6 +35,12 @@ class AddModeInteraction extends Interaction
 	editor.resetMessage();
 	editor.setEditModeInteraction();
 	break;
+
+    case Squeack.POP_UP:
+	editor.setCursor(Cursor.getDefaultCursor());
+	editor.resetMessage();
+	editor.setEditModeInteraction();
+	break;
       }
   }
 }

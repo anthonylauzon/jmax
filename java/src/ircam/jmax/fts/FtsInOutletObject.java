@@ -25,7 +25,7 @@ import ircam.jmax.*;
  * FTS instantiation 
  */
 
-public class FtsInletObject  extends FtsInOutletObject
+public class FtsInOutletObject  extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -33,27 +33,31 @@ public class FtsInletObject  extends FtsInOutletObject
   /*                                                                           */
   /*****************************************************************************/
 
+  int position;
+
   /**
-   * Create a FtsInletObject object.
+   * Create a FtsInOutletObject object.
    */
   
-  public FtsInletObject(FtsObject parent, int position, int objId)
+  public FtsInOutletObject(FtsObject parent, String className, int position, int objId)
   {
-    super(parent, "inlet", position, objId);
+    super(parent, className, null, className + " " + position, objId);
 
-    ninlets = 0;
-    noutlets = 1;
+    this.position = position;
   }
 
-  /** Get the number of inlets of the object 
-    Overwrite the FtsObject method because inlets
-    do not believe to FTS, when it say inlets have
-    inlets.
-   */
-
-  public int getNumberOfInlets()
+  public void setPosition(int i)
   {
-    return 0;
+    position = i;
+    description = className + " " + position;
+
+    Fts.getServer().repositionInletObject(this, position);
+    setDirty();
+  }
+
+  public int getPosition()
+  {
+    return position;
   }
 }
 

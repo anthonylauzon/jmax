@@ -322,11 +322,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   {
     boolean redraw = false;
 
-    totalBounds.x = 0;
-    totalBounds.y = 0;
-    totalBounds.width = 0;
-    totalBounds.height = 0;
-
+    totalBounds.setBounds(0, 0, 0, 0);
     displayList.getBounds(totalBounds);
 
     if ((totalBounds.x < 0) || (totalBounds.y < 0))

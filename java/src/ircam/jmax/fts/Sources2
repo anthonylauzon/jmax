@@ -29,8 +29,9 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsDotPatRemoteDocumentHandler.java		\
 	$(INCLUDE_PATH)/FtsErrorStreamer.java		\
 	$(INCLUDE_PATH)/FtsException.java		\
-	$(INCLUDE_PATH)/FtsQuittedException.java		\
+	$(INCLUDE_PATH)/FtsQuittedException.java	\
 	$(INCLUDE_PATH)/FtsHelpPatchTable.java		\
+	$(INCLUDE_PATH)/FtsInOutletObject.java          \
 	$(INCLUDE_PATH)/FtsInletObject.java		\
 	$(INCLUDE_PATH)/FtsIntegerVector.java		\
 	$(INCLUDE_PATH)/FtsObjectSet.java               \

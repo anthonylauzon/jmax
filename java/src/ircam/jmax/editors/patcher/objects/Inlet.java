@@ -19,13 +19,6 @@ public class Inlet extends InOutlet {
     super(theSketchPad, theFtsObject, ((FtsInletObject) theFtsObject).getPosition());
   }
 
-  public void redefine( String text) 
-  {
-    ((FtsInletObject)ftsObject).setPosition( itsId);
-
-    super.redefine(text);
-  }
-
   public void paint(Graphics g) 
   {
     if (isSelected())

@@ -19,13 +19,6 @@ public class Outlet extends InOutlet
     super(theSketchPad, theFtsObject, ((FtsOutletObject) theFtsObject).getPosition());
   }
 
-  public void redefine( String text) 
-  {
-    ((FtsOutletObject)ftsObject).setPosition( itsId);
-
-    super.redefine(text);
-  }
-  
   public void paint(Graphics g) 
   {
     if (isSelected())

@@ -48,8 +48,12 @@ abstract public class InOutlet extends GraphicObject {
 
   public void changeNo( int n) 
   {
-    if (itsId != n) 
-      itsId = n;
+    if (itsId != n)
+      {
+	itsId = n;
+	((FtsInOutletObject) ftsObject).setPosition(n);
+	updateInOutlets();
+      }
 
     redraw();
   }
