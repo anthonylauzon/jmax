@@ -1,3 +1,10 @@
+2000-06-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fixed ambiguous class name FileFilter in java/src/ircam/jmax/dialogs/MaxFileChooser.java,
+	because of conflicts with JDK 1.2
+
+	* renamed Package.java to JMaxPackage.java, because of conflict with JDK 1.2 java.lang.Package
+
 Fri Jun  9 15:35:11 2000  Norbert Schnell  <schnell@astor.ircam.fr>
 
 	* fts/src/runtime/midi.h: added fts_midiport abstraction to midiport.*

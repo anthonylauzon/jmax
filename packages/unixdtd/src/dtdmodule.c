@@ -20,8 +20,10 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
+ */
+
+/*
+ * This file's authors: Francois Dechelle.
  */
 
 #include <unistd.h>

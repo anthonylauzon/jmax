@@ -29,7 +29,7 @@
  */
 package ircam.jmax.script.pkg;
 
-public class Project extends Package {
+public class Project extends JMaxPackage {
     Project(PackageHandler handler, String name) 
     {
 	super(handler, name, "0.0.0");

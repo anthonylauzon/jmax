@@ -28,6 +28,7 @@
  * An interface for the jMax interpreter. 
  */
 package ircam.jmax.script;
+
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.mda.*;
 import java.awt.event.*;
@@ -89,7 +90,7 @@ public interface Interpreter
      * @param pkg The package to be loaded.
      * @param initfile The initialization file of the package. 
      */
-    public Package loadPackage(Package pkg, File initfile) throws ScriptException; 
+    public JMaxPackage loadPackage(JMaxPackage pkg, File initfile) throws ScriptException; 
 
     /** Load the package using in project script proj. Same thing as
      * (Project)loadScriptedDocument(proj). 
@@ -97,7 +98,7 @@ public interface Interpreter
      * @param context
      * @param proj
      */
-    public Project loadProject(Package context, File proj) throws ScriptException; 
+    public Project loadProject(JMaxPackage context, File proj) throws ScriptException; 
 
     /** Scripted documents are documents written in the script
      * language that produce a new document of any type when
@@ -110,7 +111,7 @@ public interface Interpreter
      * @param context
      * @param script
      */
-    public MaxDocument loadScriptedDocument(Package context, File script) throws ScriptException;
+    public MaxDocument loadScriptedDocument(JMaxPackage context, File script) throws ScriptException;
 
     /**
      * Get the language signature. Returns "scheme" for a Scheme

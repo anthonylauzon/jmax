@@ -69,6 +69,35 @@ class FtsErrorStreamer implements Runnable
     this.in = in;
   }
 
+  private PrintStream getOut()
+  {
+    if (out != null)
+      return out;
+
+    if ( MaxApplication.getProperty("jmaxNoConsole").equals("true"))
+      {
+	out = System.err;
+
+	return out;
+      }
+
+    window = new TextWindow("FTS Standard Error");
+    MaxWindowManager.getWindowManager().addWindow(window);
+    out = window.getPrintStream();
+    window.pack();
+    window.show();
+
+    out.println("Output to this window come from the Fts Standard Error");
+    out.println("In general, it means that you just discovered a jMax bug");
+    out.println("Please, submit a bug report describing");
+    out.println("the situation that generated this output");
+    out.println("For information on how submit a bug for jMax");
+    out.println("please look at http://www.ircam.fr/Bugs/");
+    out.println("");
+
+    return out;
+  }
+
   public void run()
   {
     while (running)
@@ -82,45 +111,19 @@ class FtsErrorStreamer implements Runnable
 	    if ((c == -1) && (! running))
 	      return;
 
-	    if (out == null)
-	      {
-		window = new TextWindow("FTS Standard Error");
-		MaxWindowManager.getWindowManager().addWindow(window);
-		out = window.getPrintStream();
-		window.pack();
-		window.show();
-
-		out.println("Output to this window come from the Fts Standard Error");
-		out.println("In general, it means that you just discovered a jMax bug");
-		out.println("Please, submit a bug report describing");
-		out.println("the situation that generated this output");
-		out.println("For information on how submit a bug for jMax");
-		out.println("please look at http://www.ircam.fr/Bugs/");
-		out.println("");
-	      }
-
 	    if (c == -1)
 	      {
 		running = false;
-		out.println("FTS crashed.\n");
+		getOut().println("FTS crashed.\n");
 	      }
 	    else
 	      {
-		out.write(c);
+		getOut().write(c);
 	      }
 	  }
 	catch (IOException e)
 	  {
-	    if (out == null)
-	      {
-		window = new TextWindow("FTS Standard Error");
-
-		out = window.getPrintStream();
-		window.pack();
-		window.show();
-	      }
-
-	    out.println("Exception in FTS I/O, giving up  !!!\n");
+	    getOut().println("Exception in FTS I/O, giving up  !!!\n");
 
 	    running = false;
 	  }

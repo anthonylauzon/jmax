@@ -20,38 +20,51 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
+ */
+
+/*
+ * This file's authors: Francois Dechelle.
  */
 
 #ifndef _FTS_DTDFIFO_H_
 #define _FTS_DTDFIFO_H_
 
-enum dtdfifo_state {FIFO_ACTIVE, FIFO_EOF, FIFO_INACTIVE};
-
 typedef struct {
+  volatile int read_used;
+  volatile int write_used;
+  volatile int eof;
   volatile int read_index;
   volatile int write_index;
-  volatile enum dtdfifo_state state;
   int buffer_size;
   volatile double buffer[1]; /* double for alignement */
 } dtdfifo_t;
 
 #define dtdfifo_compute_size(BUFFER_SIZE) ( sizeof( dtdfifo_t) - sizeof( double) + (BUFFER_SIZE))
 
-#define dtdfifo_get_buffer(F) ((F)->buffer)
-#define dtdfifo_get_buffer_size(F) ((F)->buffer_size)
-#define dtdfifo_get_read_index(F) ((F)->read_index)
-#define dtdfifo_get_write_index(F) ((F)->write_index)
-#define dtdfifo_get_read_pointer(F) (((volatile char *)((F)->buffer)) + (F)->read_index)
-#define dtdfifo_get_write_pointer(F) (((volatile char *)((F)->buffer)) + (F)->write_index)
-
 extern void dtdfifo_init( dtdfifo_t *fifo);
 
 extern dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size);
 
-extern void dtdfifo_set_state( dtdfifo_t *fifo, enum dtdfifo_state state);
-#define dtdfifo_get_state(F) ((F)->state)
+#define dtdfifo_get_buffer(F) ((F)->buffer)
+#define dtdfifo_get_buffer_size(F) ((F)->buffer_size)
+
+#define dtdfifo_get_read_index(F) ((F)->read_index)
+#define dtdfifo_set_read_index(F,I) ((F)->read_index = (I))
+
+#define dtdfifo_get_write_index(F) ((F)->write_index)
+#define dtdfifo_set_write_index(F,I) ((F)->write_index = (I))
+
+#define dtdfifo_get_read_pointer(F) (((volatile char *)((F)->buffer)) + (F)->read_index)
+#define dtdfifo_get_write_pointer(F) (((volatile char *)((F)->buffer)) + (F)->write_index)
+
+#define dtdfifo_is_read_used(F) ((F)->read_used)
+#define dtdfifo_set_read_used(F,U) ((F)->read_used = (U))
+
+#define dtdfifo_is_write_used(F) ((F)->write_used)
+#define dtdfifo_set_write_used(F,U) ((F)->write_used = (U))
+
+#define dtdfifo_is_eof(F) ((F)->eof)
+#define dtdfifo_set_eof(F,E) ((F)->eof = (E))
 
 extern int dtdfifo_get_read_level( const dtdfifo_t *fifo);
 extern int dtdfifo_get_write_level( const dtdfifo_t *fifo);

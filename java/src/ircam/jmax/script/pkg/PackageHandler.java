@@ -71,9 +71,9 @@ public class PackageHandler {
      *  the table is created. */
     public void provide(String packageName, String version) 
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	JMaxPackage pkg = (JMaxPackage) packageTable.get(packageName);
 	if (pkg == null) {
-	    pkg = new Package(this, packageName, version);
+	    pkg = new JMaxPackage(this, packageName, version);
 	    packageTable.put(packageName, pkg);
 	}
 	pkg.setLoaded(true);
@@ -83,9 +83,9 @@ public class PackageHandler {
      *  package is not marked as being loaded. */
     public void insert(String packageName, String version) 
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	JMaxPackage pkg = (JMaxPackage) packageTable.get(packageName);
 	if (pkg == null) {
-	    pkg = new Package(this, packageName, version);
+	    pkg = new JMaxPackage(this, packageName, version);
 	    packageTable.put(packageName, pkg);
 	}
     }
@@ -117,7 +117,7 @@ public class PackageHandler {
      *  script are used to load the package. */
     public void require(String packageName, String version) throws Exception
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	JMaxPackage pkg = (JMaxPackage) packageTable.get(packageName);
 	File pkgPath = null;
 	try {
 		    

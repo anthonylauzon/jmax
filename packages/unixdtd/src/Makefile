@@ -31,7 +31,9 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
+#SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
+# This is for debug
+SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o
 
 # Note: some $(SERVER_OBJECTS) are not in the SOURCES because they are not added to the .so library
 

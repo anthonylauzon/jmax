@@ -41,10 +41,10 @@ public class PackageClassLoader extends ClassLoader {
     private Hashtable loadedClasses;
 
     /** The package this loader is working for. */
-    protected Package itsPackage;
+    protected JMaxPackage itsPackage;
 
     /** Constructs a new package class loader. */
-    public PackageClassLoader(Package pkg) 
+    public PackageClassLoader( JMaxPackage pkg) 
     {
 	itsPackage = pkg;
 	loadedClasses = new Hashtable();

@@ -66,7 +66,7 @@ defineDevice midi4 { sgi_midi port SerialPort4 } "MIDI on startmidi port SerialP
 when platformStart {
     package require sgidev
     package require unixdtd
-    package require midisgi
+#    package require midisgi
 }
 
 when defaultStart {

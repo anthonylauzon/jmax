@@ -969,6 +969,52 @@ explode_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_stop, 0);
 }
 
+static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explode_t *this = (explode_t *) o;
+  FILE *file;
+  int x, y, w, font_index;
+  evt_t *e;
+  fts_atom_t a;
+  long prevtime;
+
+  file = (FILE *)fts_get_ptr( at);
+
+  fprintf( file, "#N explode");
+
+  if ( this->data.name)
+    fprintf( file, " %s", fts_symbol_name( this->data.name)); 
+
+  fprintf( file, ";\n");
+
+  fprintf( file, "#X restore;\n");
+
+  prevtime = 0;
+  for (e = this->data.evt ; e ; e = e->next)
+    {
+      fprintf( file, "#X %ld %ld %ld %ld %ld 1 0 0;\n", e->time-prevtime, e->pit, e->vel, e->dur, e->chan);
+      prevtime = e->time;
+    }
+
+  fprintf( file, "#X stop;\n");
+
+  fts_object_get_prop( o, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( o, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P newobj %d %d %d %d explode", x, y, w, font_index);
+
+  if ( this->data.name)
+    fprintf( file, " %s", fts_symbol_name( this->data.name)); 
+
+  fprintf( file, ";\n");
+}
+
+
 /*
  * Two fts_data_t functions to add and remove elements from a sequence.
  * No consistency checks in these two functions, we assume the UI
@@ -1192,11 +1238,13 @@ explode_get_data(fts_daemon_action_t action, fts_object_t *obj,
 /****************************************************************************/
 
 
+#define MAXAPPENDARGS 16
 
 static fts_status_t
 explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
+  fts_symbol_t a[MAXAPPENDARGS];
+  int i;
 
   /* initialize the class */
 
@@ -1223,6 +1271,9 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, explode_save_bmax, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, explode_save_dotpat, 1, a); 
 
   /* Explode number methods */
 
@@ -1263,12 +1314,9 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_int;
   fts_method_define_optargs(cl, 0, fts_new_symbol("nth"), explode_nth_mth, 1, a, 0);
 
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
-  a[4] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_append, explode_append_mth, 5, a);
+  for ( i = 0; i < MAXAPPENDARGS; i++)
+    a[i] = fts_s_int;
+  fts_method_define_optargs(cl, 0, fts_s_append, explode_append_mth, MAXAPPENDARGS, a, 5);
 
   fts_method_define(cl, 0, fts_s_clear, explode_clear_mth, 0, 0);
   fts_method_define(cl, 0, fts_s_start, explode_start_mth, 0, 0);

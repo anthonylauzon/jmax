@@ -36,7 +36,7 @@ public interface JavaExtension
 {
     /**
      * The init method will be called when the class is loaded thru
-     * the Package.loadClass mechanism. The class is generally loaded
+     * the MaxPackage.loadClass mechanism. The class is generally loaded
      * after a "(load-class X)" call in the package's init file (.scm).
      *
      * @param interp The interpreter

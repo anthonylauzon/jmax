@@ -24,17 +24,18 @@
 //
 
 package ircam.jmax.script.pkg;
+
 import ircam.jmax.*;
 import ircam.jmax.script.*;
 import java.util.*;
 import java.io.*;
 
 /**
- *  Class Package
+ *  Class JMaxPackage
  * 
  * Dummy class, for future use.
  */
-public class Package {
+public class JMaxPackage {
     /** The name of the package. */
     protected String name;
 
@@ -64,7 +65,7 @@ public class Package {
     protected PackageClassLoader classLoader;
 
     /** Creates a new package with the given name and version. */
-    public Package(PackageHandler handler, String name, String version) 
+    public JMaxPackage(PackageHandler handler, String name, String version) 
     {
 	packageHandler = handler;
 	this.name = name;
@@ -82,7 +83,7 @@ public class Package {
     /** Returns a string representation of this package. */
     public String toString() 
     {
-	return "Package[" + name + ';' + version + ';' + loaded + ']';
+	return "JMaxPackage[" + name + ';' + version + ';' + loaded + ']';
     }
 
     /** Returns the version of the package. */

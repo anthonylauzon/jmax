@@ -20,22 +20,26 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
+ */
+
+/*
+ * This file's authors: Francois Dechelle.
  */
 
 #ifndef _FTS_DTDDEFS_H_
 #define _FTS_DTDDEFS_H_
 
-#define N_FIFOS 4
+#define N_FIFOS 8
 
 #define BLOCK_FRAMES  65536
 #define BLOCK_MAX_CHANNELS  8
-#define BLOCKS_PER_FIFO 8
+#define BLOCKS_PER_FIFO 4
 
-#define PRELOAD_BLOCK_FRAMES  1024
+#define PRELOAD_BLOCK_FRAMES  2048
 
 #define DTD_SERVER_SELECT_TIMEOUT_SEC 0
 #define DTD_SERVER_SELECT_TIMEOUT_USEC 250000
+
+#define DTD_BASE_DIR "/tmp/ftsdtd"
 
 #endif

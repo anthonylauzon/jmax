@@ -137,7 +137,7 @@ pgmout_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   long int n = fts_get_int_arg(ac, at, 0, 0);
 
   fts_midi_send(x->port, x->status);
-  fts_midi_send(x->port, RANGE_VALUE(n - 1));
+  fts_midi_send(x->port, RANGE_VALUE(n));
 }
 
 static void

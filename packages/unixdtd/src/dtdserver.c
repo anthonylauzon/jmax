@@ -20,26 +20,43 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
  */
+
+/*
+ * This file's authors: Francois Dechelle.
+ */
+
+/* #define one of these to get a server that reads commands via udp or on a pipe */
+#define USE_UDP
+#undef USE_PIPE
 
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <signal.h>
+#ifdef USE_UDP
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
 
 #include "fts.h"
 #include "dtddefs.h"
 #include "dtdfifo.h"
 
-static FILE *server_stdin = NULL;
+static int server_pid;
 
-static struct dtd_handle {
-  dtdfifo_t *fifo;
-  int used;
-} dtd_handle_table[N_FIFOS];
+static FILE *server_stdin = NULL;
+static FILE *server_stdout = NULL;
+#ifdef USE_UDP
+static int server_socket = 0;
+static int server_port = 0;
+#endif
+
+static dtdfifo_t *dtd_fifos[N_FIFOS];
 
 static void dtdserver_create_fifos( void)
 {
@@ -47,10 +64,7 @@ static void dtdserver_create_fifos( void)
 
   /* For now, the number of fifos, the block size and the number of blocks are fixed */
   for ( n = 0; n < N_FIFOS; n++)
-    {
-      dtd_handle_table[n].fifo = dtdfifo_new( n, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
-      dtd_handle_table[n].used = 0;
-    }
+    dtd_fifos[n] = dtdfifo_new( n, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
 }
 
 /*
@@ -66,7 +80,6 @@ static void dtdserver_fork( void)
 {
   int to_child_pipe[2];
   int from_child_pipe[2];
-  int child_pid;
 
   if ( pipe( to_child_pipe) < 0)
     {
@@ -80,13 +93,13 @@ static void dtdserver_fork( void)
       exit( 1);
     }
 
-  child_pid = fork();
-  if (child_pid < 0)
+  server_pid = fork();
+  if (server_pid < 0)
     {
       fprintf( stderr, "fork() failed\n");
       exit(1);
     }
-  else if ( !child_pid)
+  else if ( !server_pid)
     {
       char dtdserver_exec_name[256];
       char *argv[2];
@@ -123,39 +136,84 @@ static void dtdserver_fork( void)
     }
 
   server_stdin = fdopen( to_child_pipe[1], "a");
-
-#ifdef DEBUG
-  fprintf( stderr, "[fts] started dtd server (pid = %d)\n", child_pid);
-#endif
+  server_stdout = fdopen( from_child_pipe[0], "r");
 }
 
+
+#ifdef USE_UDP
+static int dtdserver_create_socket( void)
+{
+  int sock;
+
+  if ( (sock = socket( PF_INET, SOCK_DGRAM, 0)) == -1)
+    fprintf( stderr, "Cannot open socket\n");
+
+  return sock;
+}
+#endif
 
 void dtdserver_init( void)
 {
   dtdserver_create_fifos();
   dtdserver_fork();
+
+#ifdef USE_UDP
+  server_socket = dtdserver_create_socket();
+
+  /* Read the port number from server */
+  fscanf( server_stdout, "%d", &server_port);
+#endif
 }
 
 void dtdserver_exit( void)
 {
+  kill( server_pid, SIGKILL);
 }
 
-dtdfifo_t *dtdserver_new( int n_channels)
+#ifdef USE_UDP
+static void dtdserver_send_command( const char *command)
+{
+  int r;
+  struct sockaddr_in my_addr;
+
+  memset( &my_addr, 0, sizeof( my_addr));
+  my_addr.sin_family = AF_INET;
+  my_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
+  my_addr.sin_port = htons( server_port);
+
+  r = sendto( server_socket, command, strlen( command)+1, 0, &my_addr, sizeof(my_addr));
+
+  if ( r < 0)
+    {
+      fprintf( stderr, "[fts] error sending (%d,%s)\n", errno, strerror( errno));
+    }
+}
+#endif
+
+#ifdef USE_PIPE
+static void dtdserver_send_command( const char *command)
+{
+  fprintf( server_stdin, "%s\n", command);
+  fflush( server_stdin);
+}
+#endif
+
+dtdfifo_t *dtdserver_open( const char *filename, const char *path, int n_channels)
 {
   int n;
 
   for ( n = 0; n < N_FIFOS; n++)
     {
-      if ( !dtd_handle_table[n].used )
+      if ( ! dtdfifo_is_read_used( dtd_fifos[n]) && ! dtdfifo_is_write_used( dtd_fifos[n]))
 	{
-	  char buffer[256];
+	  char buffer[1024];
 
-	  dtd_handle_table[n].used = 1;
+	  dtdfifo_set_read_used( dtd_fifos[n], 1);
 
-	  fprintf( server_stdin, "new %d %d\n", n, n_channels);
-	  fflush( server_stdin);
+	  sprintf( buffer, "open %d %s %s %d", n, filename, path, n_channels);
+	  dtdserver_send_command( buffer);
 
-	  return dtd_handle_table[n].fifo;
+	  return dtd_fifos[n];
 	}
     }
 
@@ -168,35 +226,13 @@ static int dtdserver_fifo_get( dtdfifo_t *fifo)
 
   for ( n = 0; n < N_FIFOS; n++)
     {
-      if ( dtd_handle_table[n].fifo == fifo)
+      if ( dtd_fifos[n] == fifo)
 	return n;
     }
 
   assert( n != N_FIFOS);
 
   return -1;
-}
-
-void dtdserver_free( dtdfifo_t *fifo)
-{
-  int n;
-
-  n = dtdserver_fifo_get( fifo);
-
-  dtd_handle_table[n].used = 0;
-
-  /* Server command ? */
-}
-
-void dtdserver_open( dtdfifo_t *fifo, const char *filename, const char *path)
-{
-  int n;
-  char buffer[1024];
-
-  n = dtdserver_fifo_get( fifo);
-
-  fprintf( server_stdin, "open %d %s %s\n", n, filename, path);
-  fflush( server_stdin);
 }
 
 void dtdserver_close( dtdfifo_t *fifo)
@@ -206,9 +242,10 @@ void dtdserver_close( dtdfifo_t *fifo)
 
   n = dtdserver_fifo_get( fifo);
 
-  fprintf( server_stdin, "close %d\n", n);
-  fflush( server_stdin);
-}
+  dtdfifo_set_read_used( dtd_fifos[n], 0);
 
+  sprintf( buffer, "close %d", n);
+  dtdserver_send_command( buffer);
+}
 
 

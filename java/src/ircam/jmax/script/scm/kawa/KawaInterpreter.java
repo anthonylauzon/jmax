@@ -191,12 +191,12 @@ public class KawaInterpreter extends SchemeInterpreter
 	return false;
     }
 
-    public Project loadProject(Package context, File proj) throws ScriptException
+    public Project loadProject(JMaxPackage context, File proj) throws ScriptException
     {
 	throw new ScriptException("Not yet implemented");
     }
 
-    public MaxDocument loadScriptedDocument(Package context, File script) throws ScriptException
+    public MaxDocument loadScriptedDocument(JMaxPackage context, File script) throws ScriptException
     {
 	throw new ScriptException("Not yet implemented");
     }

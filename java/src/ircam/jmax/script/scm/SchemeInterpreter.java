@@ -122,7 +122,7 @@ public abstract class SchemeInterpreter implements Interpreter
 	}
     }
 
-    public Package loadPackage(Package pkg, File initfile) throws ScriptException
+    public JMaxPackage loadPackage( JMaxPackage pkg, File initfile) throws ScriptException
     {
 	Object old_dir = lookup("dir");
 	Object old_pkg = lookup("this-package");

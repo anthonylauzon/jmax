@@ -20,8 +20,10 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
+ */
+
+/*
+ * This file's authors: Francois Dechelle.
  */
 
 #ifndef _FTS_DTDSERVER_H_
@@ -32,12 +34,7 @@
 extern void dtdserver_init( void);
 extern void dtdserver_exit( void);
 
-extern dtdfifo_t *dtdserver_new( int n_channels);
-
-extern void dtdserver_free( dtdfifo_t *fifo);
-
-extern void dtdserver_open( dtdfifo_t *fifo, const char *filename, const char *path);
-
+extern dtdfifo_t *dtdserver_open( const char *filename, const char *path, int n_channels);
 extern void dtdserver_close( dtdfifo_t *fifo);
 
 #endif

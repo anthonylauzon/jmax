@@ -147,7 +147,7 @@ public class MaxFileChooser
 
 	JComboBox cb = (JComboBox) ((JLabel)c).getLabelFor();
 
-	return cb.getItemAt( 0) instanceof FileFilter;
+	return cb.getItemAt( 0) instanceof javax.swing.filechooser.FileFilter;
       }
   }
 
@@ -156,7 +156,8 @@ public class MaxFileChooser
     ComponentMatcher fmatcher = new ComponentMatcher() {
 	public boolean match( Component c)
 	{
-	  return c instanceof JComboBox && ((JComboBox)c).getItemAt(0) instanceof FileFilter;
+	  return c instanceof JComboBox 
+	    && ((JComboBox)c).getItemAt(0) instanceof javax.swing.filechooser.FileFilter;
 	}
       };
 
@@ -178,12 +179,12 @@ public class MaxFileChooser
 
     formatComboBox.setModel( new DefaultComboBoxModel() );
 
-    formatComboBox.addItem( new FileFilter() {
+    formatComboBox.addItem( new javax.swing.filechooser.FileFilter() {
 	public boolean accept( File f) { return true; }
 	public String getDescription() { return ".jmax"; }
       });
 
-    formatComboBox.addItem( new FileFilter() {
+    formatComboBox.addItem( new javax.swing.filechooser.FileFilter() {
 	public boolean accept( File f) { return true; }
 	public String getDescription() { return ".pat"; }
       });

@@ -150,19 +150,19 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 	return null;
     }
 
-    public ircam.jmax.script.pkg.Package loadPackage(ircam.jmax.script.pkg.Package context, File jpk) 
+    public ircam.jmax.script.pkg.JMaxPackage loadPackage(ircam.jmax.script.pkg.JMaxPackage context, File jpk) 
 	throws ScriptException 
     {
 	throw new ScriptException("Not yet implemented");
     }
 
-    public ircam.jmax.script.pkg.Project loadProject(ircam.jmax.script.pkg.Package context, File proj) 
+    public ircam.jmax.script.pkg.Project loadProject(ircam.jmax.script.pkg.JMaxPackage context, File proj) 
 	throws ScriptException
     {
 	throw new ScriptException("Not yet implemented");
     }
 
-    public MaxDocument loadScriptedDocument(ircam.jmax.script.pkg.Package context, File script) 
+    public MaxDocument loadScriptedDocument(ircam.jmax.script.pkg.JMaxPackage context, File script) 
 	throws ScriptException
     {
 	throw new ScriptException("Not yet implemented");

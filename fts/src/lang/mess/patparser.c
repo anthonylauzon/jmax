@@ -506,30 +506,23 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	    }
 	  else if (lastNObjectType == fts_s_explode)
 	    {
+	      fts_symbol_t selector;
+	      int argc;
+	      fts_atom_t args[512];
+
 	      fts_patlex_next_token(in); /*  get the command */
 
 	      if (in->ttype == FTS_LEX_SYMBOL)
-		{
-		  /* restore or stop commands */
-
-		  fts_symbol_t selector;
-
-		  selector = fts_get_symbol(&(in->val));
-
-		  fts_send_message(lastNObject, 0, selector, 0, 0);
-		}
+		selector = fts_get_symbol(&(in->val));
 	      else
 		{
-		  /* append command (without the keyword, sic. !!) */
-
-		  int argc;
-		  fts_atom_t args[512];
-
+		  selector = fts_s_append; /* append command (without the keyword, sic. !!) */
 		  fts_patlex_push_back(in);
-
-		  argc = fts_patparse_read_object_arguments(args, in);
-		  fts_send_message(lastNObject, 0, fts_s_append, argc, args);
 		}
+
+	      argc = fts_patparse_read_object_arguments(args, in);
+
+	      fts_send_message(lastNObject, 0, selector, argc, args);
 
 	      fts_patlex_next_token(in); /* skip ';' ?? */
 	    }

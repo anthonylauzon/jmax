@@ -20,8 +20,10 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle.
- *
+ */
+
+/*
+ * This file's authors: Francois Dechelle.
  */
 
 #include <stdlib.h>
@@ -36,20 +38,16 @@
 #include <sys/stat.h>
 #include <assert.h>
 
+#include "dtddefs.h"
 #include "dtdfifo.h"
-
-#define DTD_BASE_DIR "/tmp/ftsdtd"
 
 void dtdfifo_init( dtdfifo_t *fifo)
 {
+  fifo->read_used = 0;
+  fifo->write_used = 0;
+  fifo->eof = 0;
   fifo->read_index = 0;
   fifo->write_index = 0;
-  fifo->state = FIFO_INACTIVE;
-}
-
-void dtdfifo_set_state( dtdfifo_t *fifo, enum dtdfifo_state state)
-{
-  fifo->state = state;
 }
 
 dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size)
@@ -69,7 +67,7 @@ dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size)
       else
 	{
 	  sprintf( filename, DTD_BASE_DIR);
-	  if ( mkdir( filename, 0755) < 0)
+	  if ( mkdir( filename, 0777) < 0)
 	    {
 	      fprintf( stderr, "Cannot create DTD fifo root directory (%s)\n", strerror( errno));
 	      return NULL;
@@ -118,9 +116,6 @@ int dtdfifo_get_read_level( const dtdfifo_t *fifo)
 
   assert( n >= 0 && n < fifo->buffer_size);
 
-  if ( n < 0 || n >= fifo->buffer_size )
-    return -1;
-
   return n;
 }
 
@@ -134,9 +129,6 @@ int dtdfifo_get_write_level( const dtdfifo_t *fifo)
     n += fifo->buffer_size;
 
   assert( n >= 0 && n < fifo->buffer_size);
-
-  if ( n < 0 || n >= fifo->buffer_size )
-    return -1;
 
   return n;
 }
@@ -170,18 +162,16 @@ void dtdfifo_incr_write_index( dtdfifo_t *fifo, int incr)
 }
 
 #ifdef DEBUG
-static char *dtdfifo_printable_state( dtdfifo_t *fifo)
+static char *dtdfifo_get_printable_state( dtdfifo_t *fifo)
 {
-  switch( fifo->state) {
-  case FIFO_ACTIVE:
-    return "ACT";
-  case FIFO_EOF:
-    return "EOF";
-  case FIFO_INACTIVE:
-    return "INA";
-  }
-
-  return "UNKNOWN";
+  if ( fifo->read_used && fifo->write_used)
+    return "rw";
+  else if (fifo->read_used)
+    return "r";
+  else if (fifo->write_used)
+    return "w";
+  else
+    return "x";
 }
 
 void dtdfifo_debug( dtdfifo_t *fifo, const char *msg)
@@ -197,7 +187,7 @@ void dtdfifo_debug( dtdfifo_t *fifo, const char *msg)
 	   msg, 
 	   (unsigned long)fifo, 
 	   fifo->buffer_size,
-	   dtdfifo_printable_state( fifo),
+	   dtdfifo_get_printable_state( fifo),
 	   read_index, 
 	   write_index,
 	   read_level,

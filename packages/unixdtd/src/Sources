@@ -28,4 +28,5 @@ dtdmodule.c	\
 dtdfifo.c	\
 dtdserver.c	\
 readsf.c	\
+libtime.c	\
 
