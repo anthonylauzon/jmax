@@ -133,6 +133,7 @@ FTS_SOFLAGS = $(MODULE_SOFLAGS) $(MODE_SOFLAGS) $(ARCH_SOFLAGS) $(FTS_ARCH_SOFLA
 FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libClient.a \
 	   $(LIBDIR)/libFiles.a  \
+	   $(LIBDIR)/libSTtools.a  \
 	   $(LIBDIR)/libMidi.a   \
 	   $(LIBDIR)/libTime.a   \
 	   $(LIBDIR)/libDevices.a \
@@ -143,8 +144,11 @@ FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libUtils.a  \
 	   $(LIBDIR)/libDatalib.a  \
 	   $(LIBDIR)/libMess.a   \
-	   $(LIBDIR)/libSTtools.a  \
 	   $(LIBDIR)/libSys.a
+
+
+
+
 
 
 
