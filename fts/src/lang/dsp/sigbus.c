@@ -125,6 +125,8 @@ fts_signal_bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
   fts_signal_bus_reset(o, 0, 0, 0, 0);
 
   this->n_channels = n_channels;
+
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -135,6 +137,8 @@ fts_signal_bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, cons
   ftl_data_free(this->buf[0]);
   ftl_data_free(this->buf[1]);
   ftl_data_free(this->toggle);
+
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
