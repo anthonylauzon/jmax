@@ -1,3 +1,7 @@
+2003-01-09  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* audio output works on Mac OS X (tested with builtin audio and MOTU 828)
+
 2003-01-07  Francois Dechelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* audio in progress on Mac OS X

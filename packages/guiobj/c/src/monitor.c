@@ -29,7 +29,7 @@ typedef struct {
   fts_audiolabel_t *right_label;
 } monitor_t;
 
-static fts_symbol_t monitor_symbol = 0;
+static fts_symbol_t monitor_symbol;
 
 static void
 monitor_ftl( fts_word_t *argv)
@@ -101,14 +101,6 @@ monitor_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-monitor_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  int active = fts_dsp_is_active();
-
-  fts_set_int(value, active);
-}
-
-static void 
 monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   monitor_t *self = (monitor_t *)o;
@@ -141,8 +133,6 @@ monitor_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_update_real_time, monitor_update_real_time); 
 
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);
-
   fts_class_message_varargs(cl, fts_s_put, monitor_put);
 
   fts_class_message_varargs(cl, fts_s_start, monitor_start);
@@ -159,7 +149,9 @@ monitor_instantiate(fts_class_t *cl)
 void 
 monitor_config( void)
 {
-  fts_class_install(fts_new_symbol( "monitor~"), monitor_instantiate);
+  monitor_symbol = fts_new_symbol( "monitor~");
+
+  fts_class_install( monitor_symbol, monitor_instantiate);
 
   fts_dsp_declare_function( monitor_symbol, monitor_ftl);
 }
