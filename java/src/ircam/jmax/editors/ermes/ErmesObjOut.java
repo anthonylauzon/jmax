@@ -22,9 +22,10 @@ class ErmesObjOut extends ErmesObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-
     Dimension d = getPreferredSize();
 
+    // warning.. it seems that when the height is 0, 
+    // the value is null, instead of new Integer(0)
 
     Integer aInteger = ((Integer)theFtsObject.get("size.h"));
     currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
@@ -33,6 +34,7 @@ class ErmesObjOut extends ErmesObject {
 				(aInteger == null)?preferredSize.height:
 				((Integer)theFtsObject.get("size.h")).intValue());
 
+    //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsOutletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsObject); 
@@ -45,9 +47,12 @@ class ErmesObjOut extends ErmesObject {
     //the sketchPad represents a subpatcher. 
     //We need here the information about the maximum number of inlets
   	
-    int temp = theSketchPad.GetSketchWindow().itsDocument.itsPatcher.getNumberOfOutlets();
+    itsSketchPad = theSketchPad;
+
     Dimension d = getPreferredSize();
+
     currentRect = new Rectangle(x, y, d.width, d.height);
+    int temp = GetSketchWindow().itsPatcher.getNumberOfOutlets();
 
     if (theSketchPad.outCount < temp)
       itsId = theSketchPad.outCount++;   //for now no deleting handled

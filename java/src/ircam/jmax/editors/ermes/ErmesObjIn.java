@@ -31,7 +31,8 @@ class ErmesObjIn extends ErmesObject {
 				((Integer)theFtsObject.get("size.w")).intValue(),
 				(aInteger == null)?preferredSize.height:
 				((Integer)theFtsObject.get("size.h")).intValue());
-
+    
+    //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsInletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsObject); 
@@ -45,23 +46,29 @@ class ErmesObjIn extends ErmesObject {
   //the sketchPad represents a subpatcher. 
   //We need here the information about the maximum number of inlets
   	
+    itsSketchPad = theSketchPad;
     Dimension d = getPreferredSize();
+    /*    currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
+	  ((Integer)theFtsObject.get("pos.y")).intValue(),
+	  ((Integer)theFtsObject.get("size.w")).intValue(),
+	  (aInteger == null)?preferredSize.height:
+	  ((Integer)theFtsObject.get("size.h")).intValue());*/
+    
     currentRect = new Rectangle(x, y, d.width, d.height);
-	int temp = theSketchPad.GetSketchWindow().itsDocument.itsPatcher.getNumberOfInlets();
 
-	if (theSketchPad.inCount < temp)
-	  itsId = theSketchPad.inCount++;   //for now no deleting handled
-	else
-	  itsId = temp - 1;
+    int temp = GetSketchWindow().itsPatcher.getNumberOfInlets();
+    
+    if (theSketchPad.inCount < temp)
+      itsId = theSketchPad.inCount++;   //for now no deleting handled
+    else
+      itsId = temp - 1;
+    
 
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
 
-    //if (theSketchPad.itsInChoice == null) {	//first inlet of the day, tell the sketch to prepare
-		theSketchPad.PrepareInChoice();
-    //	theSketchPad.itsInChoice.SetNewOwner(this);
-	//}
-	
+    theSketchPad.PrepareInChoice();
+    
     return true;
   }
 	

@@ -172,55 +172,8 @@ public class MaxApplication extends Object {
   }
 
 
-  /*  public static void Load(File file)
-  {
-    boolean temp = doAutorouting;
 
-    doAutorouting = false;
 
-    // create a new document from skratch
-
-    ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc();
-
-    // invocate the 'Load' method of the document
-    
-    aPatcherDoc.Import(file);
-
-    // create the new SketchWindow based on the Document created....
-
-    itsSketchWindow = new ErmesSketchWindow(false, null, false);
-    itsSketchWindow.Init();
-    itsWindow = itsSketchWindow;
-
-    //itsSketchWindow.addKeyListener(itsSketchWindow);
-    itsSketchWindow.itsSketchPad.GetOffGraphics();
-
-    try
-      {
-	itsSketchWindow.InitFromDocument(aPatcherDoc);
-      }
-    catch (Exception e)
-      {
-	e.printStackTrace(); // temporary, MDC
-	ErrorDialog aErr = new ErrorDialog(GetConsoleWindow(), "Error " + e + " while importing "+ file);
-	aErr.setLocation(100, 100);
-	aErr.setVisible(true);
-	return;
-      }
-
-    itsSketchWindowList.addElement(itsSketchWindow);
-    itsSketchWindow.inAnApplet = false;
-    itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
-    aPatcherDoc.SetWindow(itsSketchWindow);
-
-    AddThisWindowToMenus(itsSketchWindow);
-    itsSketchWindow.setVisible(true);
-
-    // Restore autorouting
-
-    doAutorouting = temp;
-  }*/
-  
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
     MaxWindow aWindow;

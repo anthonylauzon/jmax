@@ -246,13 +246,26 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     public void InitFromContainer(FtsContainerObject patcher) {
 		
       Object aObject;
-      int x, y, width, height;
+      int x=0;
+      int y=0;
+      int width=400;
+      int height=400;
+      Integer x1, y1, width1, height1;
 
-
-      x = ((Integer) patcher.get("win.pos.x")).intValue();
-      y = ((Integer) patcher.get("win.pos.y")).intValue();
-      width  = ((Integer) patcher.get("win.size.w")).intValue();
-      height = ((Integer) patcher.get("win.size.h")).intValue();
+      //double check the existence of the window properties. If there aren't, use defaults
+      
+      x1 = (Integer) patcher.get("win.pos.x");
+      if (x1 == null) patcher.put("win.pos.x", new Integer(x));
+      else  x = x1.intValue();
+      y1 = (Integer) patcher.get("win.pos.y");
+      if (y1 == null) patcher.put("win.pos.y", new Integer(y));
+      else  y = y1.intValue();
+      width1  = (Integer) patcher.get("win.size.w");
+      if (width1 == null) patcher.put("win.size.w", new Integer (width));
+      else  width = width1.intValue();
+      height1 = (Integer) patcher.get("win.size.h");
+      if (height1 == null) patcher.put("win.size.h", new Integer(height));
+      else  height = height1.intValue();
 
       //get the window dimension use it for: reshape to the right dimensions
 

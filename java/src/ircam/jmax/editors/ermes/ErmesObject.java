@@ -76,7 +76,8 @@ public class ErmesObject implements FtsPropertyHandler {
   /*abstract */Dimension getPreferredSize() {return new Dimension(0,0);};
   
   final ErmesSketchWindow GetSketchWindow() {
-  return itsSketchPad.GetSketchWindow();
+
+    return (ErmesSketchWindow)(itsSketchPad.itsSketchWindow);
   }
   //
   public void propertyChanged(FtsObject obj, String name, Object value) {
@@ -143,6 +144,7 @@ public class ErmesObject implements FtsPropertyHandler {
     int aHDist;
     
     // retrieve the inlet, outlet informations
+    itsFtsObject = theFtsObject;//cosi', a occhio
     int n_inlts = theFtsObject.getNumberOfInlets();
     int n_outlts = theFtsObject.getNumberOfOutlets();
     int in_local_distance = PADS_DISTANCE;

@@ -68,18 +68,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	
   public void update(FtsObject theFtsObject) {
     //WARNING: opening an editor associated with an object is hardcoded here.
-    // This is a very weak strategy: we should have a derivation of ErmesObjExternal, ErmesObjectWithEditor
-    // that opens up their favourite editor (the name should be searched in the resources.erm file)
     super.update(theFtsObject);
-    if (iAmPatcher){
+    
+    //don't open an editor, if not required!
+    /*if (iAmPatcher){
       itsSubWindow = MaxApplication.NewDefaultSubPatcher((FtsContainerObject)itsFtsObject);
       itsSketchPad.itsFirstClick = true;//??????
-    }
-
-    /* @@@@@@ Code for "table" and "explode" deleted; since Tabler and Sequencer can be opened
-       on object that are *not* editor, opening an editor on FTS data should *not* be done
-       inside the Patcher editor.
-       */
+      }*/
+    
   }
 
 

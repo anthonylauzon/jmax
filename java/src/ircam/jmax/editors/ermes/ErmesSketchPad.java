@@ -1057,8 +1057,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	x = aPoint.x;
 	y = aPoint.y;
       }
-      boolean isTopPatcher = (!itsSketchWindow.isSubPatcher);
-      if (isTopPatcher && itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut")) {
+
+      boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
+      if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
 	//forbidden to add such objects in a top level patch
 	ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
 	aErr.setLocation(100, 100);
@@ -1068,7 +1069,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       }
       try
 	{
-	  //there was an error "aObject may not have been initialized"
 	  aObject = (ErmesObject) Class.forName(itsAddObjectName).newInstance();
 	}
       catch (ClassNotFoundException e1)
