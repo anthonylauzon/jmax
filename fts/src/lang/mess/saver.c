@@ -127,17 +127,16 @@ fts_bmax_find_objidx_in_selection(fts_object_t *obj, fts_selection_t *sel)
      */
 
   int i, idx;
-  fts_patcher_t *patcher = fts_object_get_patcher(obj);
   fts_object_t  *p;
 
   idx = 0;
 
   for (i = 0; i < sel->objects_size; i++)
     {
-      if (obj == p)
+      if (obj == sel->objects[i])
 	return idx;
       
-      if (obj)
+      if (sel->objects[i])
 	idx++;
     }
 
@@ -810,7 +809,7 @@ fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *
   /* Push the to object, push the from object in the object stack */
 
   fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
-  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
+  fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->src, sel));
 
   /* code the connect command */
 

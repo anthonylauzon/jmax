@@ -75,7 +75,9 @@ selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   int i;
   
   this->objects_count++;
-  selection_object_size_to_fit(this);
+
+  if (this->objects_count > this->objects_size)
+    selection_object_size_to_fit(this);
 
   for (i = 0; i < this->objects_size; i++)
     if (this->objects[i] == 0)
@@ -109,7 +111,9 @@ selection_add_connection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   int i;
   
   this->connections_count++;
-  selection_connection_size_to_fit(this);
+
+  if (this->connections_count > this->connections_size)
+    selection_connection_size_to_fit(this);
 
   for (i = 0; i < this->connections_size; i++)
     if (this->connections[i] == 0)

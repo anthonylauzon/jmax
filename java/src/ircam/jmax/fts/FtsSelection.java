@@ -28,10 +28,6 @@ public class FtsSelection  extends FtsObject
 
   private Vector connections = new Vector();
 
-  /** vector for message arguments */
-
-  private Vector args = new Vector();
-
   /**
    * Create a Fts selection;
    */
@@ -47,9 +43,7 @@ public class FtsSelection  extends FtsObject
   {
     objects.addElement(obj);
 
-    args.removeAllElements();
-    args.addElement(obj);
-    sendMessage(-1, "add_object", args);
+    Fts.getServer().sendObjectMessage(this, -1, "add_object", obj);
   }
 
   /** Remove an object from this container. */
@@ -58,9 +52,7 @@ public class FtsSelection  extends FtsObject
   {
     objects.removeElement(obj);
 
-    args.removeAllElements();
-    args.addElement(obj);
-    sendMessage(-1, "remove_object", args);
+    Fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
   }
 
   /** Get the objects */
@@ -76,9 +68,7 @@ public class FtsSelection  extends FtsObject
   {
     connections.addElement(obj);
 
-    args.removeAllElements();
-    args.addElement(obj);
-    sendMessage(-1, "add_connection", args);
+    Fts.getServer().sendObjectMessage(this, -1, "add_connection", obj);
   }
 
   /** Remove an connection from this container. */
@@ -87,9 +77,7 @@ public class FtsSelection  extends FtsObject
   {
     connections.removeElement(obj);
 
-    args.removeAllElements();
-    args.addElement(obj);
-    sendMessage(-1, "remove_connection", args);
+    Fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
   }
 
   /** Get the connections */

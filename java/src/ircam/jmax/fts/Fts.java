@@ -142,10 +142,6 @@ public class Fts
    *  In case of errors, i.e. if the new object do not exists, we just throw an exception
    *  and do nothing.
    *
-   * @@@@: can we just throw away the FTS part of it and do everything here ?
-   * @@@@: including moving the connections ? It would be more consistent,
-   * @@@@: expecially for property handling
-   *
    * @param obj the object to redefine.
    * @param description  a string containing the description.
    * @return a new object, conforming to the new definition, but with the same FTS

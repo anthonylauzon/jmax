@@ -475,6 +475,12 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
       fts_object_t  *new;
 
       parent = (fts_patcher_t *) fts_get_object(&av[0]);
+
+      if (! parent)
+	{
+	  fprintf(stderr, "Error in object creation, parent not found !!\n");
+	}
+
       id  = fts_get_int(&av[1]);
 
       new = fts_object_new(parent, id, ac - 2, av + 2);

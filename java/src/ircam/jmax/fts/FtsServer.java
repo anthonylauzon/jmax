@@ -21,7 +21,7 @@ import java.io.*;
 
 public class FtsServer 
 {
-  static boolean debug = false;
+  static final boolean debug = false;
 
   /** The FtsPort used to communicate with FTS */
 
@@ -81,9 +81,8 @@ public class FtsServer
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    // root = FtsPatcherObject.makeRootObject(this);
-
     root = new FtsPatcherObject(null, "root", 0, 0, 1);
+    registerObject(root);
   }
 
   /** Stop the server. */
@@ -500,6 +499,27 @@ public class FtsServer
       }
   }
 
+  /** Send an "object message" with a unique FtsConnection argument  to FTS.*/
+
+  final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsConnection arg)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(dst);
+	port.sendInt(inlet);
+	port.sendString(selector);
+	port.sendConnection(arg);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
 
   /** Send set" messages to the system inlet 0 of an FTS object with as arguments elements
     from an int arrays
@@ -784,6 +804,9 @@ public class FtsServer
 
   void dispatchMessage(FtsMessage msg)
   {
+    if (FtsServer.debug)
+      System.err.println("Received message " + msg);
+
     switch (msg.getCommand())
       {
       case FtsClientProtocol.fts_property_value_cmd:

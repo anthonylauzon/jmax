@@ -79,11 +79,11 @@ clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete,  clipboard_delete, 0, 0);
 
-  a[1] = fts_s_object;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("paste"),  clipboard_paste_in, 2, a);
+  a[0] = fts_s_object;
+  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("paste"),  clipboard_paste_in, 1, a);
 
-  a[1] = fts_s_object;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("copy"),  clipboard_copy_selection, 2, a);
+  a[0] = fts_s_object;
+  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("copy"),  clipboard_copy_selection, 1, a);
 
   return fts_Success;
 }

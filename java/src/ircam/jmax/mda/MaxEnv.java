@@ -33,7 +33,12 @@ public class MaxEnv
     if (envFile.exists() && envFile.canRead())
       loadEnvFile(envFile);
     else
-      loadEnvFile(new File(dir, "jmax.env"));
+      {
+	envFile = new File(dir, "jmax.env");
+
+	if (envFile.exists() && envFile.canRead())
+	  loadEnvFile(envFile);
+      }
   }
 
   static private void loadEnvFile(File file)

@@ -50,6 +50,7 @@ public class FtsPatcherDocumentType extends MaxDocumentType
       }
     catch (FtsException e)
       {
+	System.err.println("Fts Exception " + e + "creating Patcher Document ?? ");
 	return null;
       }
   }

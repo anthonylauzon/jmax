@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/04/29 14:44:39 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/05/12 16:46:26 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -205,6 +205,6 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_id(o)     ((o)->id)
 #define fts_connection_get_id(c)     ((c)->id)
 
-
+extern fts_object_t *fts_get_root_patcher();
 
 #endif

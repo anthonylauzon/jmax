@@ -163,14 +163,8 @@ fts_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, const f
 void
 fts_client_upload_object(fts_object_t *obj)
 {
-  /* If an object have an ID it has been already uploaded.
-     Avoiding uploading objects with an ID allow the incremental
-     upload of a patcher content after paste like operations */
-
-  if (obj->id != FTS_NO_ID)
-    return;
-
-  fts_object_table_register(obj);
+  if (obj->id == FTS_NO_ID)
+    fts_object_table_register(obj);
 
   if (fts_object_is_abstraction(obj))
     {
@@ -210,14 +204,8 @@ fts_client_upload_connection(fts_connection_t *c)
 {
   /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
 
-  /* If a  connection have an ID it has been already uploaded.
-     Avoiding uploading connections with an ID allow the incremental
-     upload of a patcher content after paste like operations */
-
-  if (c->id != FTS_NO_ID)
-    return;
-
-  fts_connection_table_register(c);
+  if (c->id == FTS_NO_ID)
+    fts_connection_table_register(c);
 
   fts_client_mess_start_msg(CONNECT_OBJECTS_CODE);
   fts_client_mess_add_long(c->id);
@@ -233,10 +221,14 @@ fts_client_upload_patcher_content(fts_patcher_t *patcher)
 {
   fts_object_t *p;
 
+  /* When uploading a patcher content, we upload only the objects
+     and connections that don't have yet an ID */
+
   /* upload all the objects */
 
   for (p = patcher->objects; p ; p = p->next_in_patcher)
-    fts_client_upload_object(p);
+    if (p->id == FTS_NO_ID)
+      fts_client_upload_object(p);
 
   /* For each object, for each outlet, upload all the connections */
 
@@ -249,7 +241,8 @@ fts_client_upload_patcher_content(fts_patcher_t *patcher)
 	  fts_connection_t *c;
 
 	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    fts_client_upload_connection(c);
+	    if (c->id == FTS_NO_ID)
+	      fts_client_upload_connection(c);
 	}
     }
 }
