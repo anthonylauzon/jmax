@@ -1,45 +1,109 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <HTML>
 <HEAD>
-   <TITLE></TITLE>
-   <META NAME="GENERATOR" CONTENT="Mozilla/3.01SGoldC-SGI (X11; I; IRIX64 6.4 IP27) [Netscape]">
+<TITLE> jMax documentation </TITLE>
 </HEAD>
-<BODY>
 
-<H1 ALIGN=CENTER>jMax vs.Max </H1>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
 
-<H2 ALIGN=CENTER>A little introduction to the jMax patcher editor for Max
-users </H2>
+<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
 
-<H3>First: jMax is not Max. </H3>
+<BR>
+<BR>
 
-<P>The two environments share a common metaphore, part of the graphic appearence,
+<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TR>
+<TD ALIGN=CENTER VALIGN=TOP>
+<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
+</TD>
+
+<TD>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+</TD>
+
+<TD ALIGN=LEFT VALIGN=MIDDLE>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html">Documentation</A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html">User documentation</A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="editors.html">Editors</A>
+<DL>
+<DT> <IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Patch editor</FONT></B>
+</DL>
+</DL>
+</DL>
+</DL>
+</TD>
+
+</TR>
+</TABLE>
+
+
+<HR>
+
+<UL>
+<LI> 
+  <A HREF="#edit/lock mode">edit/lock mode</A>
+<LI> 
+  <A HREF="#toolbar">toolbar</A>
+<LI> 
+  <A HREF="#adding object">adding object</A>
+<LI> 
+  <A HREF="#connecting objects">connecting objects</A>
+<LI> 
+  <A HREF="#selecting object">selecting object</A>
+<LI> 
+  <A HREF="#editing object">editing object</A>
+<LI> 
+  <A HREF="#moving object">moving object</A>
+<LI> 
+  <A HREF="#resizing object">resizing object</A>
+<LI> 
+  <A HREF="#copy/cut/pasting objects">copy/cut/pasting objects</A>
+<LI> 
+  <A HREF="#using key bindings">using key bindings</A>
+<LI> 
+  <A HREF="#changing patcher in/outlets">changing patcher in/outlets</A>
+</UL>
+
+
+
+<HR>
+
+<P>
+As <I>j</I>Max and Max environments share a common metaphore, part of the graphic appearence,
 and of course the same origin in the IRCAM's laboratories. But the common
 elements are often &quot;false friends&quot; for who starts using jMax
 after having used one of the Max flavours before (OpCode Max, Max-MSP,
-or Max-FTS for ISPW or SGI). This little guide will present the main differences
+or Max-FTS for ISPW or SGI). This page will present the main differences
 between the jMax patcher editor and the other environments, from an user
-interface point of view.</P>
+interface point of view.
 
-<H3>1. Editing operations</H3>
 
-<P>The main editor in jMax have a look and feel close to the other versions:
+<P>
+The main editor in jMax have a look and feel close to the other versions:
 the use of colors is mainly intended to differentiate &quot;control objects&quot;
-(blue) from &quot;language objects&quot; (green). </P>
+(blue) from &quot;language objects&quot; (green).
 
-<UL>
-<LI><B>Adding objects</B>: Every icon in the toolbar, except the first,
+
+<A NAME="toolbar"><H2>Toolbar</H2></A>
+
+<A NAME="adding object"><H2>Adding object</H2></A>
+
+<P>
+Every icon in the toolbar, except the first,
 represent a class of objects that can be added in a patcher. Clicking on
-an icon selects the corrisponding object, a subsequent click in the window
+an icon selects the corresponding object, a subsequent click in the window
 area (the &quot;sketchpad&quot;) adds it. The first icon is the lock/edit
 mode button (see <A HREF="#Edit mode and Lock mode">paragraph 2</A> in
 this document). What's different in jMax is that there's no need to drag
 the object in order to add it. A double click on a icon of the toolbar
 &quot;locks&quot; the simbol, so one can add multiple instances without
 reselect. Another click in the toolbar deselect the locked one, as well
-as a click on an object and/or connection in the sketch.</LI>
+as a click on an object and/or connection in the sketch.
 
-<LI><B>New &quot;subpatcher&quot; objects</B>: An important difference
+<P>
+<B>New &quot;subpatcher&quot; objects</B>: An important difference
 in the object's set of jMax is the presence of a subpatcher object, the
 fourth symbol in the toolbar from the left (the third after the hand).
 This object is a local sub patcher, i.e. a subpatcher that does not reside
@@ -49,25 +113,40 @@ object. For the new user interactions related to the inlet/outlet please
 see <A HREF="#Subpatcher inlet and outlets">paragraph 3</A> later in this
 document.</LI>
 
-<LI><B>Editing text inside objects</B>: the procedure of edit the &quot;editable
+<A NAME="editing object"><H2>Editing object</H2></A>
+
+<P>
+
+<B>Editing text inside objects</B>: the procedure of edit the &quot;editable
 objects&quot; (external, message, subpatcher, comment) is a little different
 from the other environment: The object must be selected, and then a click
 on it will open its edit field (warn: not a double click). Writing in an
 editable object dinamically enlarge it to contain the text.</LI>
 
-<LI><B>Resizing</B> can be started from the right or bottom side of the
+
+<A NAME="resizing object"><H2>Resizing object</H2></A>
+
+<P>
+<B>Resizing</B> can be started from the right or bottom side of the
 object, and is always constrained: horizontal only for the editable objects
 and the number/float boxes, both direction togheter for the &quot;squared&quot;
 objects like bang, toggle, inlet and outlet (they always stay squared)
 horizontal OR vertical for the slider, depending on the point of drag.</LI>
 
-<LI><B>Connecting </B>two objects: after a mouse down on an outlet, drag
+
+<A NAME="connecting objects"><H2>Connecting objects</H2></A>
+
+<P>
+<B>Connecting </B>two objects: after a mouse down on an outlet, drag
 the mouse until an inlet and release it. Note that the mouse changes its
 shape when moved over a starting outlet or (dragged over) a destination
 inlet, and that the sensible area where to start (or end) a connection
 is always inside the objects itself, spanning over a greater surface.</LI>
 
-<LI><B>Selecting</B>: since the editing of the text inside an object is
+<A NAME="selecting object"><H2>Selecting object</H2></A>
+
+<P>
+<B>Selecting</B>: since the editing of the text inside an object is
 a two-step process, jMax can disambiguate between the selection of a single
 object (<I>mouse down</I> on an unselected object) and the edit (<I>mouse
 click</I> on an already selected object). The mouse operations with the
@@ -75,12 +154,19 @@ SHIFT key pressed are always related to the extension/reduction of the
 current selection: SHIFT-mouse down on an already selected object deselects
 it. If the object was deselected, its will be selected.</LI>
 
-<LI><B>Moving</B>: the usual click-and-drag behaviour is implemented in
+<A NAME="moving object"><H2>Moving object</H2></A>
+
+<B>Moving</B>: the usual click-and-drag behaviour is implemented in
 jMax</LI>
+
+<A NAME="copy/cut/pasting objects"><H2>Copy/cut/pasting objects</H2></A>
 
 <LI><B>Clipboard</B>: The position of the pasted object(s) is always offsetted
 of 20 points down and right from the original copied object(s). The usual
 keyboard shortcut are implemented (CTRL-C CTRL-X CTRL-V).</LI>
+
+
+<A NAME="using key bindings"><H2>Using key bindings</H2></A>
 
 <LI><B>Arrows</B> shortcuts: A number of geometric operation on objects
 are possible with the arrows on a (group of) selected objects:</LI>
@@ -105,7 +191,7 @@ horizontal size in the selection.</LI>
 connecting, moving) can extend over the limit of the visible sketch. The
 sketch will scroll accordingly.</P>
 
-<H3>2. <A NAME="Edit mode and Lock mode"></A>Edit mode and Lock mode </H3>
+<A NAME="edit/lock mode"><H2>Edit/lock mode</H2></A>
 
 <P>The mouse operation are interpreted differently according to the state
 of the sketch. The state is controlled by the little hand in the toolbar:
@@ -132,8 +218,8 @@ or templates, in both lock and edit mode, opens the corresponding subpatcher.
 External objects that have an associated editor invoke their editor (is
 the case of qlist, table, explode).</P>
 
-<H3>3. <A NAME="Subpatcher inlet and outlets"></A>Subpatcher inlet and
-outlets</H3>
+
+<A NAME="changing patcher in/outlets"><H2>Changing patcher in/outlets</H2></A>
 
 <P>The inlets and outlets of a subpatcher and templates are treated quite
 differently in jMax. For clarity, let's call the inlet/outlet presented
