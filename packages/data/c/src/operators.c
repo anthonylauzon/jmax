@@ -48,7 +48,6 @@ op_recycle_to_float_vector(op_t *op, int size)
       /* make new vector */
       fts_float_vector_t *vector = fts_float_vector_new(size);
       op_set_float_vector(op, vector);
-      op_refer(op);
       return vector;
     }
 }

@@ -34,7 +34,7 @@ typedef struct _op_type
 
 #define op_type_is_primitive(ot) (data_type_id_is_primitive((ot).id))
 
-#define op_type_set(otp, n) (((otp)->name != n)? ((otp)->id = data_type_get_id(n), (otp)->name = (n)): (n))
+#define op_type_set(otp, n) (((otp)->name != n)? ((otp)->id = data_type_get_id_by_name(n), (otp)->name = (n)): (n))
 
 #define op_type_set_int(otp) ((otp)->id = data_type_id_int, (otp)->name = fts_s_int)
 #define op_type_set_float(otp) ((otp)->id = data_type_id_float, (otp)->name = fts_s_float)

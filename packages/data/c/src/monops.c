@@ -72,7 +72,7 @@ monop_declare_fun(fts_symbol_t name, operator_fun_t fun, fts_symbol_t type, fts_
   else
     return;
 
-  id = data_type_get_id(type);
+  id = data_type_get_id_by_name(type);
 
   funs[id] = fun;
 }

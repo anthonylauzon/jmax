@@ -74,8 +74,8 @@ binop_declare_fun(fts_symbol_t name, operator_fun_t fun, fts_symbol_t left_type,
   else
     return;
 
-  left_id = data_type_get_id(left_type);
-  right_id = data_type_get_id(right_type);
+  left_id = data_type_get_id_by_name(left_type);
+  right_id = data_type_get_id_by_name(right_type);
 
   funs[left_id][right_id] = fun;
 }

@@ -20,7 +20,7 @@ static fts_symbol_t data_type_array[MAX_N_DATA_TYPES];
 int n_data_types = 0;
 
 int
-data_type_get_id(fts_symbol_t type)
+data_type_get_id_by_name(fts_symbol_t type)
 {
   fts_atom_t atom;
 
@@ -50,10 +50,10 @@ void
 data_types_init(void)
 {
   fts_hash_table_init(&data_type_id_table);
-  data_type_get_id(fts_s_void); /* void has type id 0 */
-  data_type_get_id(fts_s_int); /* int has type id 1 */
-  data_type_get_id(fts_s_float); /* float has type id 2 */
-  data_type_get_id(fts_s_symbol); /* symbol has type id 3 */
-  data_type_get_id(fts_s_integer_vector); /* integer vector has type id 4 */
-  data_type_get_id(fts_s_float_vector); /* float vector has type id 5 */
+  data_type_get_id_by_name(fts_s_void); /* void has type id 0 */
+  data_type_get_id_by_name(fts_s_int); /* int has type id 1 */
+  data_type_get_id_by_name(fts_s_float); /* float has type id 2 */
+  data_type_get_id_by_name(fts_s_symbol); /* symbol has type id 3 */
+  data_type_get_id_by_name(fts_s_integer_vector); /* integer vector has type id 4 */
+  data_type_get_id_by_name(fts_s_float_vector); /* float vector has type id 5 */
 }

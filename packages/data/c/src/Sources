@@ -17,6 +17,7 @@ atoms.c \
 types.c \
 operators.c \
 utils.c \
+complexvector.c \
 monops.c \
 binops.c \
 binop_arith.c \
@@ -27,4 +28,3 @@ atom_obj.c \
 post.c \
 getelem.c \
 getsize.c \
-
