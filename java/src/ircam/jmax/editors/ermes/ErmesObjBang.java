@@ -57,7 +57,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
       itsFtsObject.sendMessage(0, "bang", null);
-      itsFlashing = true;
+      //itsFlashing = true;
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
