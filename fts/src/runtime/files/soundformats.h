@@ -38,6 +38,7 @@ extern fts_symbol_t fts_s_au;
 extern fts_symbol_t fts_s_bicsf; /* Berkeley/IRCAM/CARL Sound File format */
 extern fts_symbol_t fts_s_sf;
 extern fts_symbol_t fts_s_sdII; /* Sound Designer File Format II */
+extern fts_symbol_t fts_s_wav; /* Microsoft .wav */
 extern fts_symbol_t fts_s_unknown; /* unknown file format */
 
 /* raw format symbols */

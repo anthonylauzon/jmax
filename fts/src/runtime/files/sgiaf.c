@@ -158,7 +158,8 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
   AFfilehandle af_handle;
 
   /* find file in all possible locations */
-  fts_file_get_read_path(path, full_path);
+  if(!fts_file_get_read_path(path, full_path)
+     return 0;
 
   if(format)
     {
@@ -191,7 +192,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
 	  if(n_skip < onset)
 	    {
 	      afCloseFile(af_handle);
-	      post("can not open soundfile %s with onset of %d samples\n", fts_symbol_name(file_name), onset);
+	      post("onset failed: %d samples\n", onset);
 	      return 0;
 	    }
 	}
@@ -223,7 +224,7 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
 	{
 	case AF_FILE_UNKNOWN:
 	  {
-	    post("unknown format (%s) for soundfile %s \n", fts_symbol_name(format_name), fts_symbol_name(file_name));
+	    post("unknown soundfile format: %s\n", fts_symbol_name(format_name));
 	    return 0;
 	  }
 	case AF_FILE_RAWDATA:

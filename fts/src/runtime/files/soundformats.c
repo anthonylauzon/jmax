@@ -27,21 +27,23 @@ fts_symbol_t fts_s_au = 0;
 fts_symbol_t fts_s_bicsf = 0;
 fts_symbol_t fts_s_sf = 0;
 fts_symbol_t fts_s_sdII = 0;
+fts_symbol_t fts_s_wav = 0;
 fts_symbol_t fts_s_signed8 = 0;
 fts_symbol_t fts_s_signed16 = 0;
 fts_symbol_t fts_s_signed24 = 0;
 fts_symbol_t fts_s_signed32 = 0;
 
-static fts_soundfile_format_t format_aiffc = {"extended Audio Interchange File Format (AIFFC)", fts_null};
-static fts_soundfile_format_t format_aiff = {"Audio Interchange File Format (AIFF)", fts_null};
-static fts_soundfile_format_t format_next = {"NeXT .snd and Sun .au", fts_null};
-static fts_soundfile_format_t format_bicsf = {"Berkeley/IRCAM/CARL Sound File format", fts_null};
-static fts_soundfile_format_t format_sdII = {"Sound Designer File Format II", fts_null};
-static fts_soundfile_format_t format_float = {"raw 32 bit floats", fts_null};
-static fts_soundfile_format_t format_signed8 = {"raw 8 bit twos complement integers", fts_null};
-static fts_soundfile_format_t format_signed16 = {"raw 16 bit twos complement integers", fts_null};
-static fts_soundfile_format_t format_signed24 = {"raw 24 bit twos complement integers", fts_null};
-static fts_soundfile_format_t format_signed32 = {"raw 32 bit twos complement integers", fts_null};
+static fts_soundfile_format_t format_aiffc = {"extended Audio Interchange File Format (AIFFC)", FTS_NULL};
+static fts_soundfile_format_t format_aiff = {"Audio Interchange File Format (AIFF)", FTS_NULL};
+static fts_soundfile_format_t format_next = {"NeXT .snd and Sun .au", FTS_NULL};
+static fts_soundfile_format_t format_bicsf = {"Berkeley/IRCAM/CARL Sound File format", FTS_NULL};
+static fts_soundfile_format_t format_sdII = {"Sound Designer File Format II", FTS_NULL};
+static fts_soundfile_format_t format_wav = {"Microsoft RIFF .wav format", FTS_NULL};
+static fts_soundfile_format_t format_float = {"raw 32 bit floats", FTS_NULL};
+static fts_soundfile_format_t format_signed8 = {"raw 8 bit twos complement integers", FTS_NULL};
+static fts_soundfile_format_t format_signed16 = {"raw 16 bit twos complement integers", FTS_NULL};
+static fts_soundfile_format_t format_signed24 = {"raw 24 bit twos complement integers", FTS_NULL};
+static fts_soundfile_format_t format_signed32 = {"raw 32 bit twos complement integers", FTS_NULL};
 
 /************************************************************************
  *
@@ -142,6 +144,7 @@ fts_soundfile_format_init(void)
   fts_s_sf = fts_new_symbol("sf");
   fts_s_bicsf = fts_new_symbol("bicsf");
   fts_s_sdII = fts_new_symbol("sdII");
+  fts_s_wav = fts_new_symbol("wav");
   fts_s_signed8 = fts_new_symbol("signed8");
   fts_s_signed16 = fts_new_symbol("signed16");
   fts_s_signed24 = fts_new_symbol("signed24");
@@ -155,6 +158,7 @@ fts_soundfile_format_init(void)
   fts_soundfile_format_add(fts_s_bicsf, &format_bicsf);
   fts_soundfile_format_add(fts_s_sf, &format_bicsf);
   fts_soundfile_format_add(fts_s_sdII, &format_sdII);
+  fts_soundfile_format_add(fts_s_wav, &format_wav);
   fts_soundfile_format_add(fts_s_float, &format_float);
   fts_soundfile_format_add(fts_s_signed8, &format_signed8);
   fts_soundfile_format_add(fts_s_signed16, &format_signed16);

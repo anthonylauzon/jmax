@@ -11,27 +11,10 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 
-ifeq ($(VENDOR),sgi)
-  ARCH_SOURCES = sgiaf.c
-endif
-
-ifeq ($(VENDOR),gnu)
-  ARCH_SOURCES = sttools.c
-endif
-
-ifeq ($(VENDOR),solaris2)
-  ARCH_SOURCES = sttools.c
-endif
-
 SOURCES = \
-  $(ARCH_SOURCES) \
-  files.c \
-  directories.c \
-  atomfiles.c \
-  post.c \
-  parser.c \
-  soundformats.c
-
-
-
-
+  convert.c \
+  convert_dither.c \
+  sfcodes.c \
+  sfiles.c \
+  aiff.c \
+  wav.c
