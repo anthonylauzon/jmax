@@ -1,3 +1,8 @@
+Mon Mar  2 19:06:57 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
+
+	* Modified:
+	. symbols.[ch] to add fts_s_name
+
 Fri Feb 13 18:27:40 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
 
 	* Modified:
