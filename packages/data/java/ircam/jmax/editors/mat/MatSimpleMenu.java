@@ -59,7 +59,7 @@ public class MatSimpleMenu extends EditorMenu
     		
     if(model.canAppendColumn())
     {
-      add( new EditorAction("Append Column", "append col", KeyEvent.VK_L, KeyEvent.VK_L, true){
+      add( new EditorAction("Append Column", "append col", KeyEvent.VK_L, KeyEvent.VK_C, true){
         public void doAction(EditorContainer container)
         {
           model.requestAppendColumn();

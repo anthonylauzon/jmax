@@ -53,7 +53,7 @@ public class TrackSimpleMenu extends EditorMenu
     this.container = container;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-    setMnemonic(KeyEvent.VK_E);
+    setMnemonic(KeyEvent.VK_T);
     
     add(Actions.undoAction);
     add(Actions.redoAction);

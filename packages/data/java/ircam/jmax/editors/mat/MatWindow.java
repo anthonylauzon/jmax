@@ -142,6 +142,15 @@ public class MatWindow extends JMaxEditor {
     setJMenuBar(mb);
   }
 
+  EditorMenu simpleMenu = null;
+  public EditorMenu getSimpleMenu()
+  {
+    if(simpleMenu == null)
+      simpleMenu = new MatSimpleMenu(this);
+    
+    return simpleMenu; 
+  }  
+  
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsMatPanel;

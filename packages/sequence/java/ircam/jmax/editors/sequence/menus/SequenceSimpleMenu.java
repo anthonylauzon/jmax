@@ -55,7 +55,7 @@ public class SequenceSimpleMenu extends EditorMenu
     this.container = container;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-    setMnemonic(KeyEvent.VK_E);
+    setMnemonic(KeyEvent.VK_S);
     
     add(Actions.undoAction);
     add(Actions.redoAction);
