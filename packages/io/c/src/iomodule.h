@@ -17,36 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
  */
-
-/*
- * This file's authors: Francois Dechelle.
- */
-
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
+#ifndef _IO_H
+#define _IO_H
 
 #include <fts/fts.h>
-#include "dtdserver.h"
 
-extern void dtdserver_config( void);
-extern void dtdobjs_init( void);
+#ifdef WIN32
+#if defined(IO_EXPORTS)
+#define IO_API __declspec(dllexport)
+#else
+#define IO_API __declspec(dllimport)
+#endif
+#else
+#define IO_API extern
+#endif
 
-void unixdtd_config( void)
-{
-  dtdserver_config();
-  dtdobjs_init();
-}
+IO_API void
+io_config(void)
 
-void unixdtd_shutdown( void)
-{
-#error FIXME: add atexit()
-  dtdserver_stop();
-}
-
+#endif /* _IO_H */

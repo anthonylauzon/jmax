@@ -38,8 +38,8 @@ extern void blip_config(void);
 extern void bus_config(void);
 extern void bus_tilda_config(void);
 
-static void
-system_module_init(void)
+void
+system_config(void)
 {
   dsp_config();
   arch_config();
@@ -53,5 +53,3 @@ system_module_init(void)
   bus_config();
   bus_tilda_config();
 }
-
-SYSTEM_API fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};

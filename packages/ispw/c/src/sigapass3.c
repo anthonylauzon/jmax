@@ -147,7 +147,7 @@ ftl_apass3(fts_word_t *argv)
   fts_word_set_ptr(biquad_args + 1, out_sig);
   fts_word_set_ptr(biquad_args + 2, biquad_state);
   fts_word_set_ptr(biquad_args + 3, biquad_coefs);
-  fts_word_set_long(biquad_args + 4, n_tick_half);
+  fts_word_set_int(biquad_args + 4, n_tick_half);
   ftl_biquad_df1(biquad_args);
  
   /* calculate values for second half of vector */

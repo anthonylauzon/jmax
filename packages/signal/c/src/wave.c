@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <utils.h>
 #include "wave.h"
 
 struct wave_ftl_symbols wave_ftl_symbols_ptr = {0, 0};

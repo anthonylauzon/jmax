@@ -26,6 +26,7 @@
 
 
 #include <fts/fts.h>
+#include <utils.h>
 #include "osc.h"
 
 typedef struct osc_data

@@ -581,7 +581,6 @@ void fts_client_install(char type, void (* fun) (int, const fts_atom_t *))
 
 /*  #define OUTGOING_DEBUG_TRACE       */
 
-
 static void fts_client_send_string(const char *msg)
 {
   int i;

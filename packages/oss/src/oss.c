@@ -34,11 +34,9 @@
 
 static void oss_init(void);
 
-fts_module_t oss_module = { "oss", "OSS objects", oss_init, 0, 0};
-
 extern void ossaudioport_config( void);
 
-static void oss_init(void)
+void oss_config(void)
 {
   ossaudioport_config();
 }

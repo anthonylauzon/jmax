@@ -17,14 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#include <fts/fts.h>
+#include "iomodule.h"
 
 extern void fakestream_config(void);
 extern void filestream_config(void);
@@ -39,8 +34,8 @@ extern void udpreceive_config(void);
 extern void udpsend_config(void);
 extern void wacom_config(void);
 
-static void
-fts_io_init(void)
+void
+io_config(void)
 {
   fakestream_config();
   filestream_config();
@@ -55,5 +50,3 @@ fts_io_init(void)
   udpsend_config();
   wacom_config();
 }
-
-fts_module_t io_module = {"io", "I/O objects", fts_io_init, 0, 0};

@@ -17,36 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
  */
 
-/*
- * This file's authors: Francois Dechelle.
- */
-
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
+#ifndef _FTS_SIGBUS_H_
+#define _FTS_SIGBUS_H_
 
 #include <fts/fts.h>
-#include "dtdserver.h"
 
-extern void dtdserver_config( void);
-extern void dtdobjs_init( void);
+#define FTS_SIGNAL_BUS_MAX_CHANNELS 64
 
-void unixdtd_config( void)
+typedef struct _fts_signal_bus_
 {
-  dtdserver_config();
-  dtdobjs_init();
-}
+  fts_object_t o;
+  int n_channels;
+  ftl_data_t buf[2]; 
+  ftl_data_t toggle; /* toggle (0/1) indicating current write buffer (swapping buffers each tick) */
+  int n_tick;
+} fts_signal_bus_t;
 
-void unixdtd_shutdown( void)
-{
-#error FIXME: add atexit()
-  dtdserver_stop();
-}
+fts_symbol_t fts_signal_bus_symbol;
+fts_class_t *fts_signal_bus_class;
 
+
+#define fts_signal_bus_get_size(b) ((b)->n_channels)
+
+#define fts_signal_bus_get_buffer_data(b, i) ((b)->buf[i])
+#define fts_signal_bus_get_toggle_data(b) ((b)->toggle)
+
+#define fts_signal_bus_get_buffer(b, i) ((float *)ftl_data_get_ptr((b)->buf[i]))
+
+#endif

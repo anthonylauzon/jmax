@@ -17,11 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include <fts/fts.h>
@@ -30,11 +25,10 @@ extern void src_integer_config(void);
 extern void src_bangbang_config(void);
 extern void src_sma_config(void);
 
-static void sources_init(void)
+void sources_config(void)
 {
   src_integer_config();
   src_bangbang_config();
   src_sma_config();
 }
 
-fts_module_t sources_module = { "sources", "objects examples with sources", sources_init, 0, 0};

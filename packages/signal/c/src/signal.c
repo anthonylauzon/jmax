@@ -47,8 +47,8 @@ extern void signal_rec_fvec_config(void);
 
 
 
-static void
-signal_init(void)
+void
+signal_config(void)
 {
   signal_tilda_config();
   signal_binop_config();
@@ -69,5 +69,3 @@ signal_init(void)
 
   signal_rec_fvec_config();
 }
-
-SIGNAL_API fts_module_t signal_module = {"signal", "basic signal classes", signal_init, 0, 0};

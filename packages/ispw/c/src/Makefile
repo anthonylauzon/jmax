@@ -26,6 +26,6 @@
 JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libispw.so
-MODULE_CFLAGS=-I../../../data/c/src
+MODULE_CFLAGS=-I../../../data/c/src -I../../../utils/c/src
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

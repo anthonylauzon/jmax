@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include "sigbus.h"
 
 static fts_class_t *bus_tilda_class = 0;
 static fts_symbol_t bus_tilda_symbol = 0;

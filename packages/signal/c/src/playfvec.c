@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <utils.h>
 #include "fvec.h"
 #include "play.h"
 

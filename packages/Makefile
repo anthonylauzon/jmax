@@ -30,22 +30,27 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 # Architecture dependant packages are supposed to be C...
-C_PACKAGES= $(ARCH_PACKAGES) \
-	control \
-	io \
-	ispwmath \
-	lists \
-	math \
-	mess \
-	midi \
-	numeric \
-	signal \
-	sources \
-	system
+#C_PACKAGES= $(ARCH_PACKAGES) \
+#	control \
+#	io \
+#	ispwmath \
+#	lists \
+#	math \
+#	mess \
+#	midi \
+#	numeric \
+#	signal \
+#	sources \
+#	system \
+#	utils
+
+C_PACKAGES= $(ARCH_PACKAGES) control ispwmath lists math mess midi numeric signal sources system utils
+
+#MIXED_PACKAGES=guiobj data ispw explode qlist sequence
+MIXED_PACKAGES=guiobj data ispw sequence
+
 
 JAVA_PACKAGES=''
-
-MIXED_PACKAGES=guiobj data ispw explode qlist sequence
 
 all: all_c all_java
 .PHONY: all

@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <utils.h>
 
 #define M  (unsigned long)714025
 #define M2 (M/2)

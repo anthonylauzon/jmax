@@ -34,12 +34,10 @@
 
 static void alsa_init(void);
 
-fts_module_t alsa_module = { "alsa", "ALSA objects", alsa_init, 0, 0};
-
 extern void alsaaudioport_config( void);
 extern void alsarawmidiport_config( void);
 
-static void alsa_init(void)
+void alsa_config(void)
 {
   alsaaudioport_config();
   alsarawmidiport_config();
