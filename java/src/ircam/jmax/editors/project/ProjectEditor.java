@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.editors.project;
 
@@ -84,7 +80,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
     EditorMenu fileMenu = new DefaultFileMenu();
     fileMenu.setEnabled( false, 7);
     mb.add( fileMenu); 
-    mb.add( new DefaultProjectMenu()); 
+    mb.add( new DefaultProjectMenu( this)); 
     mb.add( new MaxWindowJMenu( "Windows", this));
     mb.add(Box.createHorizontalGlue());
     mb.add( new DefaultHelpMenu());
@@ -310,7 +306,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
       }
   }
 
-  public static void editPackage( Frame frame)
+  public static void openPackage( Frame frame)
   {
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fileChooser.setFileFilter( packageFilter);

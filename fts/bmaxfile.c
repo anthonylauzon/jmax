@@ -38,6 +38,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/connection.h>
+#include <ftsprivate/loader.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/selection.h>
@@ -102,7 +103,12 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
    operations on it (to avoid leaving .clipboard file arounds)
    */
 
-static int fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
+static fts_status_description_t bmax_internal_error_status_description = {
+  "Invalid file format"
+};
+fts_status_t bmax_internal_error = &bmax_internal_error_status_description;
+
+static fts_status_t fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
 {
   fts_binary_file_header_t header;
 
@@ -110,7 +116,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
 
   if (fread( &header, sizeof( header), 1, f) < 1)
     {
-      return -1;
+      return bmax_internal_error;
     }
 
   if (has_to_swap())
@@ -128,21 +134,21 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
     descr->version = 2;
     break;
   default:
-    return -1;
+    return fts_invalid_file_format_error;
   }
 
   /* allocate code */
 
   descr->code = (unsigned char *)fts_malloc( header.code_size);
   if (!descr->code)
-    return -1;
+    return bmax_internal_error;
 
   /* read the code */
 
   if (fread( descr->code, sizeof(char), header.code_size, f) < header.code_size)
     {
       fts_free( descr->code);
-      return -1;
+      return bmax_internal_error;
     }
 
   /* allocate code and read symbols */
@@ -178,7 +184,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_descr_t *descr)
 	}
     }
 
-  return 1;
+  return fts_ok;
 }
 
 static void fts_binary_file_dispose( fts_binary_file_descr_t *descr)
@@ -191,29 +197,30 @@ static void fts_binary_file_dispose( fts_binary_file_descr_t *descr)
    at top level (again, usually the top level patcher, but can be different
    for clipboards).
    */
-fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at)
+fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
+  fts_status_t status;
   FILE *f;
   fts_object_t *obj;
   fts_binary_file_descr_t descr;
 
   if ( !(f = fopen( name, "rb")))
-    return 0;
+    return fts_cannot_open_file_error;
 
   if (fts_binary_file_map(f, &descr) < 0)
     {
       fclose(f);
-      post("fts_binary_file_load: Cannot load jMax max file %s\n", name);
+      post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
       return 0;
     }
 
   fclose(f);
 
-  obj = fts_run_mess_vm(parent, &descr, ac, at);
+  *ret = fts_run_mess_vm(parent, &descr, ac, at);
 
   fts_binary_file_dispose( &descr);
 
-  return obj;
+  return fts_ok;
 }
 
 
@@ -222,7 +229,7 @@ fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int 
    for clipboards).
    */
 
-fts_object_t *fts_binary_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at)
+fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_object_t *obj;
   fts_binary_file_descr_t descr;
@@ -232,17 +239,15 @@ fts_object_t *fts_binary_filedesc_load( FILE *f, fts_object_t *parent, int ac, c
   fseek(f, 0, SEEK_SET);
 
   /* Read it */
-
   if (fts_binary_file_map(f, &descr) < 0)
     return 0;
 
   /* Eval it */
-
-  obj = fts_run_mess_vm(parent, &descr, ac, at);
+  *ret = fts_run_mess_vm(parent, &descr, ac, at);
 
   fts_binary_file_dispose( &descr);
 
-  return obj;
+  return fts_ok;
 }
 
 

@@ -29,6 +29,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
+#include <ftsprivate/loader.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/patfile.h>
 
@@ -85,12 +86,17 @@ typedef struct fts_patlex {
 
 static int unique_count = 3333; /* the unique number generation */
 
+static fts_status_description_t patfile_syntax_error_description = { ".pat file syntax error" };
+static fts_status_description_t patfile_unknown_object_type_error_description = { "unknown object type error" };
+static fts_status_t patfile_syntax_error = &patfile_syntax_error_description;
+static fts_status_t patfile_unknown_object_type_error = &patfile_unknown_object_type_error_description;
+
 static fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
 {
   fts_patlex_t *this;
   FILE *file;
 
-  file  = fopen(filename, "rb");
+  file = fopen(filename, "rb");
 
   if (file == 0)
     return 0;
@@ -604,15 +610,14 @@ typedef struct fts_graphic_description {
 #define  fts_patparse_set_normal_mode(in) ((in)->messbox_mode = 0)
 
 static void fts_patparse_graphic_description_init(fts_graphic_description_t *this);
-static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in);
+static fts_status_t fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in);
 static fts_object_t *fts_get_child(fts_object_t *obj, int idx);
 static void fts_patparse_parse_connection(fts_object_t *parent, fts_patlex_t *in);
 static int fts_patparse_read_object_arguments(fts_atom_t *args, fts_patlex_t *in);
-static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
+static fts_status_t fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 				 fts_object_t *lastNObject, fts_symbol_t  lastNObjectType);
 static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_patlex_t *in, fts_graphic_description_t *g);
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in);
-static void pat_error(const char *description);
 static void pat_warning(const char *description);
 
 /*
@@ -719,25 +724,19 @@ static void fts_patparse_set_square_graphic_properties(fts_graphic_description_t
  *
  */
   
-static void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
+static fts_status_t fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 {
   /* skip the header from the file, */
 
   fts_patlex_next_token(in);
 
   if (! token_sym_equals(in, patlex_sym_max))
-    {
-      pat_error("file not in .pat format (header error)");
-      return;
-    }
+    return fts_invalid_file_format_error;
 
   fts_patlex_next_token(in); 
 
   if (! token_sym_equals(in, patlex_sym_v2))
-    {
-      pat_error("file not in .pat format (header error)");
-      return;
-    }
+    return fts_invalid_file_format_error;
 
   /* Skip possible declarations */
 
@@ -752,7 +751,7 @@ static void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
    * to the "vpatcher" word.
    */
 
-  fts_patparse_parse_patcher(parent, in);
+  return fts_patparse_parse_patcher(parent, in);
 }
 
 
@@ -761,7 +760,7 @@ static void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
  *
  */
 
-static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in) 
+static fts_status_t fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in) 
 {
   fts_object_t *lastNObject = 0;
   fts_symbol_t  lastNObjectType = 0;
@@ -899,7 +898,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 		  fts_patlex_next_token(in);	/* skip ';' */
 		}
 		    
-	      return ;
+	      return fts_ok;
 	    }
 	  else
 	    {
@@ -927,10 +926,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      fts_patlex_next_token(in);/* skip ';' ?? */
 	    }
 	  else
-	    {
-	      pat_error("Syntax error in a #T (table content)");
-	      return;
-	    }
+	    return patfile_syntax_error;
 	}
       else if (token_sym_equals(in, patlex_sym_diesX))
 	{
@@ -994,6 +990,8 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	    fts_patlex_next_token(in);/* skip ';' */
 	}
     }
+
+  return fts_ok;
 }
 
 
@@ -1095,7 +1093,7 @@ static int fts_patparse_read_object_arguments(fts_atom_t *args, fts_patlex_t *in
  */
 
 
-static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
+static fts_status_t fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 				 fts_object_t *lastNObject, fts_symbol_t lastNObjectType)
 {
   fts_object_t *obj;
@@ -1141,8 +1139,6 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	  obj = fts_eval_object_description((fts_patcher_t *) parent, 0, 0);
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, obj);
-
-	  return;
 	}
 
       if (in->ttype == FTS_LEX_SYMBOL)
@@ -1342,7 +1338,9 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
   else
-    pat_error("unknown object type error");
+    return patfile_unknown_object_type_error;
+
+  return fts_ok;
 }
 
 	    
@@ -1444,11 +1442,6 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
   fts_object_put_prop(parent, fts_s_wh, &height);
 }
 
-static void pat_error(const char *description) 
-{
-  post("Error loading .pat file: %s\n", description);
-}
-
 static void pat_warning(const char *description) 
 {
   post("Warning loading .pat file: %s\n", description);
@@ -1466,60 +1459,29 @@ static void pat_warning(const char *description)
  * The patcher is always a top level patcher.
  */
     
-fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filename) 
+fts_status_t fts_pat_file_load( fts_symbol_t filename, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret) 
 {
   fts_patlex_t *in; 
+  fts_atom_t description[1];
+  fts_object_t *patcher;
 
   in = fts_patlex_open(filename, 0, 0);
 
-  if (in != 0)
-    {
-      fts_atom_t description[1];
-      fts_object_t *patcher;
+  if (in == 0)
+    return fts_cannot_open_file_error;
 
-      fts_set_symbol(&description[0], fts_s_jpatcher);
-      patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
+  fts_set_symbol(&description[0], fts_s_jpatcher);
+  patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
-      fts_patparse_parse_patlex(patcher, in);
-      fts_patlex_close(in);
-      fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *) patcher);
+  fts_patparse_parse_patlex(patcher, in);
+  fts_patlex_close(in);
+  fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *) patcher);
 
-      return patcher;
-    }
-  else
-    return 0;
+  *ret = patcher;
+
+  return fts_ok;
 }
 
-int fts_is_dotpat_file(fts_symbol_t filename) 
-{
-  fts_patlex_t *in; 
-  int isdotpat = 1;
-
-  in = fts_patlex_open(filename, 0, 0);
-  if (in != 0)
-    {
-      fts_patlex_next_token(in);
-
-      if (! token_sym_equals(in, patlex_sym_max))
-	{
-	  isdotpat = 0;
-	}
-
-      fts_patlex_next_token(in); 
-
-      if (! token_sym_equals(in, patlex_sym_v2))
-	{
-	  isdotpat = 0;
-	}
-      
-      fts_patlex_close(in);
-    }
-  else
-    isdotpat = 0;
-  
-  return isdotpat;
-}
-  
 /***********************************************************************
  *
  * Initialization

@@ -309,7 +309,6 @@ void fts_kernel_patcher_shutdown(void);
 
 void fts_shutdown( void)
 {
-  fts_log("[fts]: Deleting root patcher\n");
   fts_kernel_patcher_shutdown();
 }
 

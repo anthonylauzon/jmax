@@ -36,6 +36,7 @@
 
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/loader.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/package.h>
@@ -70,11 +71,11 @@ fts_template_redefine(fts_template_t *template, fts_symbol_t filename)
 fts_object_t *
 fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *instance;
+  fts_patcher_t *instance = 0;
 
   fts_package_push(template->package);
 
-  instance = (fts_patcher_t *)fts_binary_file_load( template->filename, (fts_object_t *)patcher, ac, at);
+  fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
 
   fts_package_pop(template->package);
     

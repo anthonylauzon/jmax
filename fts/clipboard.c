@@ -87,9 +87,10 @@ static void
 clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
+  fts_object_t *dummy;
 
   if (this->file)
-    fts_binary_filedesc_load(this->file, fts_get_object(at), 0, 0);
+    fts_bmax_filedesc_load(this->file, fts_get_object(at), 0, 0, &dummy);
 }
 
 

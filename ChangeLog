@@ -1,3 +1,14 @@
+2003-01-30  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* changed all "Authors:..." and "Based on MAX/ISPW" in all files.
+
+	* changed the GUI for project/configuration editing. The configuration editor
+	is now accessed via the "Project" menu, with the same functionalities as the project
+	editor.
+	Added a first ebauch of a generic file loader in FTS. But this requires too much work
+	in order to be able to replace "Open project", "Open configuration" and "Open package"
+	by the "Open" of the file menu.
+
 2003-01-30  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* add load of AUDIO/MIDI configuration file at startup

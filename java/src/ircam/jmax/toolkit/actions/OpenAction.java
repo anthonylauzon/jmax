@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.toolkit.actions;
 
@@ -68,55 +64,16 @@ public class OpenAction extends EditorAction
       {
 	fileName = file.getAbsolutePath();
 	
-	/* open a jmax project*/
-	if( fileName.endsWith("jprj"))
-	  {
-	    ProjectEditor.closeWindowsAndSave();
+	RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
+	recentFileHistory.addFile(file);
 	    
-	    try
-	      {	
-		JMaxApplication.loadProject( fileName);
-	      }
-	    catch(IOException e)
-	      {
-		System.err.println("[OpenAction]: I/O error loading project "+fileName);
-	      }
+	try
+	  {	
+	    JMaxApplication.load(fileName);
 	  }
-	/* open a jmax package*/
-	else if( fileName.endsWith("jpkg"))
+	catch(IOException e)
 	  {
-	    String name = file.getName();
-	    int idx = name.indexOf(".jpkg"); 
-	    name = name.substring( 0, idx);
-	    
-	    try
-	      {	
-		JMaxApplication.loadPackage( name, fileName);
-	      }
-	    catch(IOException e)
-	      {
-		System.err.println("[OpenAction]: I/O error loading package "+fileName);
-	      }
-	  }
-	/* open a jmax configuration*/
-	else if( fileName.endsWith("jcfg"))
-	  {
-	    JMaxApplication.getConfig().load( fileName);
-	  }
-	/* open jmax patch file*/
-	else
-	  {
-	    RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
-	    recentFileHistory.addFile(file);
-	    
-	    try
-	      {	
-		JMaxApplication.load(fileName);
-	      }
-	    catch(IOException e)
-	      {
-		System.err.println("[OpenAction]: I/O error loading file "+fileName);
-	      }
+	    System.err.println("[OpenAction]: I/O error loading file "+fileName);
 	  }
       }
   }

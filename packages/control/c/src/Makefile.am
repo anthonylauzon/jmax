@@ -8,8 +8,6 @@ delay.c \
 demux.c \
 dispatch.c \
 fifo.c \
-invoke.c \
-make.c \
 metro.c \
 oneshot.c \
 retard.c \

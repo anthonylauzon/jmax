@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.toolkit.menus;
 
@@ -36,6 +32,7 @@ import javax.swing.JMenuItem;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.project.*;
+import ircam.jmax.editors.configuration.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -43,27 +40,32 @@ import ircam.jmax.toolkit.actions.*;
 
 public class DefaultProjectMenu extends EditorMenu
 {
-  JMenuItem saveItem, saveAsItem;
   public DefaultProjectMenu()
+  {
+    this( null);
+  }
+
+  public DefaultProjectMenu( EditorContainer editor)
   {
     super("Project");
 
     setHorizontalTextPosition( AbstractButton.LEFT);
     setDefaultNumEntries( 8);
 
-    add(DefaultActions.newProjectAction, "New Project", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_N);
-
-    add(DefaultActions.openProjectAction, "Open Project ...", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_O);
-
+    add(DefaultActions.newProjectAction, "New Project");
+    add(DefaultActions.openProjectAction, "Open Project ...");
+    add(DefaultActions.editCurrentProjectAction, "Edit Current Project");
+    if (editor instanceof ProjectEditor)
+      add(DefaultActions.saveAsDefaultProjectAction, "Save As Default Project");
     addSeparator();
-
     add(DefaultActions.newPackageAction, "New Package");
-
-    add(DefaultActions.editPackageAction, "Edit Package ...");
-
+    add(DefaultActions.openPackageAction, "Open Package ...");
     addSeparator();
-
-    add(DefaultActions.editProjectAction, "Edit Current Project");
+    add(DefaultActions.newConfigurationAction, "New Configuration");
+    add(DefaultActions.openConfigurationAction, "Open Configuration ...");
+    add(DefaultActions.editCurrentConfigurationAction, "Edit Current Configuration");
+    if (editor instanceof ConfigurationEditor)
+      add(DefaultActions.saveAsDefaultConfigurationAction, "Save As Default Configuration");
   }
 }
 

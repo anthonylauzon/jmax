@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.editors.configuration;
 
@@ -42,50 +38,20 @@ import ircam.jmax.toolkit.menus.*;
 
 public class ConfigurationEditor extends JFrame implements EditorContainer
 {    
-  public static void registerConfigEditor()
-  {
-    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
-	public String getToolName() { return "Configuration";}
-	public void open() { ConfigurationEditor.open();}
-      });
-  }
-
-  public static ConfigurationEditor open()
-  {    
-    if (configEditor == null)
-      configEditor = new ConfigurationEditor();
-    else
-      configEditor.update();
-    
-    configEditor.setVisible(true);
-    
-    return configEditor;
-  }
-
-  public static void updateEditor()
-  {    
-    if (configEditor != null && configEditor.isVisible())
-      {
-	configEditor.update();
-	configEditor.validate();
-	configEditor.pack();
-      }
-  }
-    
   public static ConfigurationEditor getInstance()
   {
     return configEditor;
   }
 
-  protected ConfigurationEditor()
+  public ConfigurationEditor( FtsConfig config)
   {
     super( "Configuration Editor");
     getContentPane().setLayout(new BoxLayout( getContentPane(), BoxLayout.Y_AXIS));    
 
     makeMenuBar();    
     
-    midiPanel  = new MidiConfigPanel( this, JMaxApplication.getConfig().getMidiConfig());
-    audioPanel = new AudioConfigPanel( this, JMaxApplication.getConfig().getAudioConfig());
+    midiPanel  = new MidiConfigPanel( this, config.getMidiConfig());
+    audioPanel = new AudioConfigPanel( this, config.getAudioConfig());
 
     tabbedPane = new JTabbedPane();
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
@@ -148,19 +114,13 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     EditorMenu fileMenu = new DefaultFileMenu();
     fileMenu.setEnabled( false, 7);
     mb.add( fileMenu); 
-    mb.add( new DefaultProjectMenu()); 
+    mb.add( new DefaultProjectMenu( this)); 
     mb.add( new MaxWindowJMenu( "Windows", this));
     mb.add(Box.createHorizontalGlue());
     mb.add( new DefaultHelpMenu());
     
     setJMenuBar( mb);
   }
-
-  void update()
-  {
-    midiPanel.update( JMaxApplication.getConfig().getMidiConfig());
-    audioPanel.update( JMaxApplication.getConfig().getAudioConfig());
-  } 
 
   void Add()
   {

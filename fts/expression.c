@@ -41,22 +41,6 @@ struct _fts_expression_t {
   int fp;                       /* frame pointer */
 };
 
-/***********************************************************************
- *
- *  status
- *
- */
-
-fts_status_t
-fts_status_new(fts_symbol_t description)
-{
-  fts_status_description_t *status = (fts_status_description_t *)fts_malloc(sizeof(fts_status_description_t));
-
-  status->description = description;
-
-  return (fts_status_t)status;
-}
-
 static fts_status_description_t empty_expression_error_description = {
   "empty expression"
 };

@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.toolkit.actions;
 
@@ -100,22 +96,52 @@ public class DefaultActions
 	ProjectEditor.openProject( container.getFrame());
       }
     };
+  public static EditorAction editCurrentProjectAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	JMaxApplication.getProject().requestOpenEditor();
+      }
+    };
+  public static EditorAction saveAsDefaultProjectAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	System.err.println( "Not yet implemented");
+      }
+    };
   public static EditorAction newPackageAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
 	ProjectEditor.newPackage( container.getFrame());
       }
     };
-  public static EditorAction editPackageAction     = new EditorAction(){
+  public static EditorAction openPackageAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	ProjectEditor.editPackage( container.getFrame());
+	ProjectEditor.openPackage( container.getFrame());
       }
     };
-  public static EditorAction editProjectAction    = new EditorAction(){
+  public static EditorAction newConfigurationAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	JMaxApplication.getProject().requestOpenEditor();
+	System.err.println( "Not yet implemented");
+      }
+    };
+  public static EditorAction openConfigurationAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	System.err.println( "Not yet implemented");
+      }
+    };
+  public static EditorAction editCurrentConfigurationAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	JMaxApplication.getConfig().requestOpenEditor();
+      }
+    };
+  public static EditorAction saveAsDefaultConfigurationAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	System.err.println( "Not yet implemented");
       }
     };
 }

@@ -56,20 +56,3 @@ FTS_API char *fts_file_find( const char *filename, char *buf, int len);
 FTS_API char fts_file_separator;
 FTS_API char fts_path_separator;
 
-
-
-/** 
- * FIXME: this should be private to FTS
- *
- * Find a file on a set of paths.
- *
- * @fn int fts_file_find_in_path(fts_list_t* paths, const char *filename, char* buf, int len)
- * @param root a root path to prepend to the list of search paths
- * @param paths the list of search paths
- * @param filename the name of the file
- * @param buf the user allocated buffer which will contain the full path
- * @param len the length of the buffer 
- * @returns 0 if the file was not found, 1 if the directory was found 
- */
-FTS_API int fts_file_find_in_path(const char* root, fts_list_t* paths, const char *filename, char* buf, int len);
-

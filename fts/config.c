@@ -31,6 +31,7 @@
 #include <ftsprivate/midi.h> /* require bmaxfile.h */
 
 #include <ftsprivate/client.h> 
+#include <ftsprivate/loader.h> 
 #include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
 
 /****************************************************
@@ -68,7 +69,7 @@ fts_config_open(fts_symbol_t file_name)
 {
   fts_object_t* obj = NULL;
   
-  obj = fts_binary_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0);
+  fts_bmax_file_load(file_name, (fts_object_t*)fts_get_root_patcher(), 0, 0, &obj);
   
   if (obj != NULL && fts_object_get_class(obj) == config_type)
   {
@@ -85,17 +86,17 @@ fts_config_open(fts_symbol_t file_name)
   }
 }
 
-static void
-config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  fts_symbol_t file_name = fts_get_symbol(at);
-  fts_symbol_t project_dir = fts_project_get_dir();
-  fts_object_t* obj = NULL;
-  char path[MAXPATHLEN];
+/* static void */
+/* config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at) */
+/* { */
+/*   fts_symbol_t file_name = fts_get_symbol(at); */
+/*   fts_symbol_t project_dir = fts_project_get_dir(); */
+/*   fts_object_t* obj = NULL; */
+/*   char path[MAXPATHLEN]; */
 
-  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
-  fts_config_open(path);
-}
+/*   fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN); */
+/*   fts_config_open(path); */
+/* } */
 
 static void
 config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -175,6 +176,27 @@ config_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_config_t *this = (fts_config_t *)o;
+
+  this->editor_opened = 1;
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+}
+
+static void
+config_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_config_t *this = (fts_config_t *)o;
+
+  if (this->editor_opened == 1)
+    {
+      this->editor_opened = 0;
+      fts_client_send_message(o, fts_s_closeEditor, 0, 0);
+    }
+}
+
+static void
 config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_config_t *this = (fts_config_t *)o;
@@ -193,7 +215,6 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   fts_set_int( &a, fts_get_object_id( ((fts_object_t *)this->midi_config)));
   fts_client_send_message( o, fts_s_midi_config, 1, &a);
-  
   fts_send_message( ((fts_object_t *)this->midi_config), fts_s_upload, 0, 0);
 
   if( this->file_name != NULL)
@@ -201,8 +222,6 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_set_symbol( &a, this->file_name);
       fts_client_send_message( o, fts_s_name, 1, &a);
     }
-
-  fts_client_send_message( o, fts_s_end_upload, 0, 0);
 }
 
 static void
@@ -248,11 +267,14 @@ config_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(fts_config_t), config_init, config_delete);
 
-  fts_class_message_varargs(cl, fts_s_load, config_load);
+/*   fts_class_message_varargs(cl, fts_s_load, config_load); */
   fts_class_message_varargs(cl, fts_s_save, config_save);
   fts_class_message_varargs(cl, fts_s_midi_config, config_midi_message);
   fts_class_message_varargs(cl, fts_s_audio_config, config_audio_message);
   fts_class_message_varargs(cl, fts_s_upload, config_upload);
+
+  fts_class_message_varargs(cl, fts_s_openEditor, config_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, config_close_editor);
 
   fts_class_message_varargs(cl, fts_s_print, config_print);
 }

@@ -23,7 +23,6 @@
 #ifndef _FTS_PRIVATE_PATFILE_H_
 #define _FTS_PRIVATE_PATFILE_H_
 
-extern fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t name);
-extern int fts_is_dotpat_file(fts_symbol_t name);
+extern fts_status_t fts_pat_file_load( fts_symbol_t filename, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 #endif

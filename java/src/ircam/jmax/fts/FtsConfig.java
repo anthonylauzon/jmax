@@ -28,7 +28,7 @@ import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.configuration.*;
 
-public class FtsConfig extends FtsObject
+public class FtsConfig extends FtsObjectWithEditor
 {
   protected FtsArgs args = new FtsArgs();
 
@@ -60,12 +60,6 @@ public class FtsConfig extends FtsObject
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
 	   ((FtsConfig)obj).setDirty( args.getInt( 0) == 1);
-	 }
-       });
-     FtsObject.registerMessageHandler( FtsConfig.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
-	 public void invoke( FtsObject obj, FtsArgs args)
-	 {
-	   ConfigurationEditor.updateEditor();
 	 }
        });
   }
@@ -128,25 +122,39 @@ public class FtsConfig extends FtsObject
       }
   }
 
-  public void load( String fileName)
+//   public void load( String fileName)
+//   {
+//     args.clear();
+//     args.addSymbol( FtsSymbol.get( fileName));
+//     try
+//       {
+// 	send( FtsSymbol.get("load"), args);
+//       }
+//     catch(IOException e)
+//       {
+// 	System.err.println("FtsConfig: I/O Error sending load Message!");
+// 	e.printStackTrace(); 
+//       }
+//   }
+
+  public void openEditor(int nArgs, FtsAtom[] args)
   {
-    args.clear();
-    args.addSymbol( FtsSymbol.get( fileName));
-    try
-      {
-	send( FtsSymbol.get("load"), args);
-      }
-    catch(IOException e)
-      {
-	System.err.println("FtsConfig: I/O Error sending load Message!");
-	e.printStackTrace(); 
-      }
+    if(getEditorFrame() == null)
+      setEditorFrame( new ConfigurationEditor(this));
+    
+    showEditor();
+  }
+
+  public void destroyEditor()
+  {
+    disposeEditor();
   }
 
   public void setDirty( boolean d)
   {
     isDirty = d;
   }
+
   public boolean isDirty()
   {
     return isDirty;

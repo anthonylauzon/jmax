@@ -39,6 +39,7 @@
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/audio.h>
+#include <ftsprivate/file.h>
 #include <ftsprivate/midi.h>
 #include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
 #include <ftsprivate/config.h> /* requires audioconfig.h and midi.h */
@@ -153,7 +154,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 {
   char path[MAXPATHLEN];
   char *dir;
-  fts_object_t* obj;
+  fts_object_t* obj = 0;
   fts_package_t* pkg = NULL;
 
   /* this is a hack but not a big one: load the patcher in the context
@@ -162,7 +163,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   fts_make_absolute_path(NULL, filename, path, MAXPATHLEN);
 
-  obj = fts_binary_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
+  fts_bmax_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0, &obj);
 
   if (!obj)
   {
@@ -1414,6 +1415,14 @@ __fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 static void
+__fts_package_loaded(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *self = (fts_package_t *)o;
+
+  self->filename = fts_get_symbol( at);
+}
+
+static void
 fts_package_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_package_t), __fts_package_init, __fts_package_delete);
@@ -1435,6 +1444,8 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
   fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
   fts_class_message_varargs(cl, fts_s_config, __fts_package_config);
+
+  fts_class_message_varargs(cl, fts_s_loaded, __fts_package_loaded);
 }
 
 /***********************************************
@@ -1502,7 +1513,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_atom_t a[1];
 
   /* Load the .jmax file */
-  obj = fts_binary_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a);
+  fts_bmax_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a, &obj);
 
   if (!obj)
     {

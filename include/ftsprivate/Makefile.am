@@ -10,8 +10,10 @@ config.h \
 dsp.h \
 dspgraph.h \
 errobj.h \
+file.h \
 fpe.h \
 label.h \
+loader.h \
 message.h \
 midi.h \
 object.h \

@@ -28,6 +28,7 @@ typedef struct {
   fts_symbol_t file_name;
   fts_midiconfig_t* midi_config;
   fts_audioconfig_t* audio_config;
+  int editor_opened;
   int dirty;
 } fts_config_t;
 

@@ -22,9 +22,8 @@
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 /* Define this if you want logs of symbol cache hit */
-/*#define CACHE_REPORT
-  #define CLIENT_LOG
-  #define CLIENT_DEBUG */
+/* #define CACHE_REPORT */
+/* #define CLIENT_LOG */
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
@@ -40,6 +39,7 @@
 #include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
 #include <ftsprivate/midi.h>
 #include <ftsprivate/config.h> /* requires audioconfig.h and midi.h */
+#include <ftsprivate/loader.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -662,18 +662,6 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
 
       return;
     }
-#ifdef CLIENT_DEBUG
-  fts_log("[client] receive a message: \n");
-  log = fopen("/home/tisseran/.fts_log", "a");
-  for (i = 0; i < size; i++)
-  {
-      fprintf(log, "%x ", buffer[i]);
-  }
-  fprintf(log, "\n");
-  fflush(log);
-  fclose(log);
-  fts_log("[client] going to parse message \n");
-#endif /* CLIENT_DEBUG */
 
   for ( i = 0; i < size; i++)
     {
@@ -748,6 +736,59 @@ static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_connection_new(src, src_outlet, dst, dst_inlet, fts_c_anything);
 }
 
+#if 0
+/* (fd)
+   This would be a generic "open", which would be the same to open a patcher, a project, a package,
+   a configuration...
+   But it is too complicated on the client side yet, so I give up..
+*/
+static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+  fts_object_t *object;
+  fts_atom_t a[3];
+  client_t *client;
+  char *dir_name;
+  fts_object_t *parent = (fts_object_t *)fts_get_root_patcher();
+  fts_symbol_t file_name;
+  fts_status_t status;
+
+  file_name = fts_get_symbol( at);
+
+  /*
+   * We change the working directory so that it is the directory of the opened file.
+   */
+  dir_name = (char *)alloca( strlen( file_name) + 1);
+  strcpy( dir_name, file_name);
+  fts_dirname( dir_name);
+  chdir( dir_name);
+
+  if ((status = fts_file_load( file_name, parent, 0, 0, &object)) != fts_ok)
+    {
+      /* FIXME: signal the error */
+      fts_log("[client]: cannot open file %s\n", file_name);
+    }
+
+  /* Inform the object that it has been loaded from a file and tell it the file name */
+  fts_set_symbol( a, file_name);
+  fts_send_message( object, fts_s_loaded, 1, a);
+
+  /* upload the object to the client */
+  client_register_object( this, object, FTS_NO_ID);
+
+/*   fts_set_int(a, fts_get_object_id( object)); */
+/*   fts_set_symbol(a+1, file_name); */
+/*   fts_set_int(a+2, type); */
+/*   fts_client_send_message( (fts_object_t *)this, fts_new_symbol( "patcher_loaded"), 3, a); */
+
+  fts_send_message( object, fts_s_upload, 0, 0);
+
+  /* open the editor */
+  fts_send_message( object, fts_new_symbol("openEditor"), 0, 0);
+}
+#endif
+
+
 static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -769,29 +810,17 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_log("[client]: Load patcher %s\n", file_name);
 
   /*
-    FIXME
-    Hack to get the templates that are in the same directory
-    as the patch we are opening.
-  */
+   * This is to find the templates that are in the same directory
+   * as the patch we are opening.
+   * We change the working directory so that it is the directory of the
+   * opened patch.
+   */
   dir_name = (char *)alloca( strlen( file_name) + 1);
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
-
-  /*
-    We change the working directory so that it is the directory of the
-    opened patch.
-  */
   chdir( dir_name);
 
-
-  type = ! fts_is_dotpat_file( file_name);
-
-  if( type)
-    patcher = (fts_patcher_t *)fts_binary_file_load( file_name, parent, 0, 0);
-  else
-    patcher = (fts_patcher_t *)fts_load_dotpat_patcher( parent, file_name);
-
-  if (patcher == 0)
+  if (fts_bmax_file_load( file_name, parent, 0, 0, (fts_object_t **)&patcher) != fts_ok)
     {
       fts_log("[patcher]: Cannot read file %s\n", file_name);
       return 0;
@@ -815,7 +844,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 
   fts_patcher_set_dirty( patcher, 0);
 
-  fts_send_message( (fts_object_t *)patcher, fts_new_symbol("openEditor"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_s_openEditor, 0, 0);
 
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
@@ -1027,11 +1056,18 @@ static void client_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol( "new_object"), client_new_object);
   fts_class_message_varargs(cl, fts_new_symbol( "set_object_property"), client_set_object_property);
-  fts_class_message_varargs(cl, fts_new_symbol( "connect_object"), client_connect_object);
+
+#if 0
+  fts_class_message_varargs(cl, fts_new_symbol( "open_file"), client_open_file);
+#endif
+
   fts_class_message_varargs(cl, fts_new_symbol( "load"), client_load_patcher_file);
   fts_class_message_varargs(cl, fts_new_symbol( "load_package"), client_load_package);
   fts_class_message_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
   fts_class_message_varargs(cl, fts_new_symbol( "load_summary"), client_load_summary);
+
+  /* why send to the client and not to the patcher ??? */
+  fts_class_message_varargs(cl, fts_new_symbol( "connect_object"), client_connect_object);
 
   fts_class_message_varargs(cl, fts_new_symbol( "shutdown"), client_shutdown);
 }
@@ -1232,19 +1268,6 @@ void fts_client_done_message( fts_object_t *obj)
 
   put_byte( client, FTS_PROTOCOL_END_OF_MESSAGE);
   
-#ifdef CLIENT_DEBUG
-  fts_log("[client] send a message: \n");
-  log = fopen("/home/tisseran/.fts_log", "a");
-  buff = fts_stack_base(&client->output_buffer);
-  for (i = 0; i < fts_stack_size(&client->output_buffer); ++i)
-  {
-      fprintf(log, "%x", buff[i]);
-  }
-  fprintf(log, "\n");
-  fflush(log);
-  fclose(log);
-  fts_log("[client] send message \n");
-#endif /* CLIENT_DEBUG */
   fts_bytestream_output( client->stream, fts_stack_size( &client->output_buffer), fts_stack_base( &client->output_buffer));
 
   fts_stack_clear( &client->output_buffer);

@@ -30,6 +30,7 @@ fts.c \
 hashtable.c \
 label.c \
 list.c \
+loader.c \
 mem.c \
 message.c \
 midi.c \
@@ -49,6 +50,7 @@ sched.c \
 selection.c \
 sigconn.c \
 stack.c \
+status.c \
 symbol.c \
 template.c \
 thread.c \

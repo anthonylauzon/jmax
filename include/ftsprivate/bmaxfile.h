@@ -149,11 +149,11 @@ typedef struct fts_binary_file_header_t {
  *
  */
 
-/* Loads a FTS binary file. Return value is < 0 if an error occured */
-extern fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at);
+/* Loads a bmax (jMax binary format) file. */
+extern fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /* Idem but with a FILE * argument */
-extern fts_object_t *fts_binary_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at);
+extern fts_status_t fts_bmax_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /*
  *

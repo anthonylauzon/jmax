@@ -819,7 +819,15 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   for (p = self->objects; p ; p = fts_object_get_next_in_patcher(p))
     if (!fts_object_is_patcher(p))
       fts_send_message_varargs(p, s, ac, at);
+}
 
+static void
+patcher_loaded(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *self = (fts_patcher_t *) o;
+
+  self->file_name = fts_get_symbol( at);
+  patcher_load_init( o, 0, 0, 0, 0);
 }
 
 static void
@@ -1894,7 +1902,9 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
   fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description);
 
+  fts_class_message_varargs(cl, fts_s_loaded, patcher_loaded);
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), patcher_load_init);
+
   fts_class_message_varargs(cl, fts_new_symbol("open_help_patch"), patcher_open_help_patch);
   fts_class_message_varargs(cl, fts_s_save, patcher_save_from_client);
   fts_class_message_varargs(cl, fts_s_paste, patcher_paste);
