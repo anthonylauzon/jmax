@@ -30,6 +30,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.lang.Math;
+import java.awt.image.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -68,6 +69,9 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public static SliderControlPanel controlPanel = new SliderControlPanel();
 
+  private BufferedImage buff;
+  private Graphics2D buffG;
+
   public Slider(FtsGraphicObject theFtsObject)
   {
     super(theFtsObject);
@@ -84,6 +88,20 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
     if(( orientation != HORIZONTAL_OR)&&( orientation != VERTICAL_OR))
       setOrientation(VERTICAL_OR);
+
+    updateOffScreenBuffer();
+  }
+
+  void updateOffScreenBuffer()
+  {
+    int w = getWidth() - 4;
+    if( w <= 0) w = DEFAULT_WIDTH - 4;
+    
+    int h = getHeight() - 4;
+    if( h <= 0) h = DEFAULT_HEIGHT - 4;
+    
+    buff = new BufferedImage( w, h, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
   }
 
   public void setDefaults()
@@ -140,6 +158,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       w = MINIMUM_DIMENSION;
 
     super.setWidth(w);
+
+    updateOffScreenBuffer();
   }
 
   public void setHeight(int h)
@@ -150,6 +170,14 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       h = MINIMUM_DIMENSION;
 
     super.setHeight(h);
+
+    updateOffScreenBuffer();
+  }
+
+  public void setCurrentBounds( int x, int y, int w, int h)
+  {
+    super.setCurrentBounds( x, y, w, h);
+    updateOffScreenBuffer();
   }
 
   public void setRange(int theMaxInt, int theMinInt)
@@ -171,6 +199,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     orientation = or;
     ((FtsSliderObject)ftsObject).setOrientation(orientation);
+  
+    updateOffScreenBuffer();
   }
 
   public void setCurrentOrientation(int or)
@@ -188,6 +218,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     value = ( v < rangeMin) ? rangeMin: ((v >= rangeMax) ? rangeMax : v);
 
+    drawContent( buffG, 0, 0, getWidth() - 4, getHeight() - 4);
     updateRedraw();
   }
 
@@ -195,15 +226,6 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     setDefaults();
   }
-
-    /*public void inspect()
-      {
-      Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
-      SliderDialog dialog = new SliderDialog(itsSketchPad.getEditorContainer().getFrame(), this);
-      dialog.setBounds( aPoint.x + getX(), aPoint.y + getY() - 25, 200, 100);
-      dialog.setVisible( true);
-      dialog = null;//for the gc
-      }*/
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
@@ -227,66 +249,66 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void paint( Graphics g) 
   {
-      int x = getX();
-      int y = getY();
-      int w = getWidth();
-      int h = getHeight();
-      int range = (rangeMax - rangeMin)/*!=0 ? rangeMax - rangeMin : 1*/;
-      
-      // Paint the box 
-
-      if( !isSelected()) 
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+    int range = (rangeMax - rangeMin)/*!=0 ? rangeMax - rangeMin : 1*/;
+    
+    // Paint the box     
+    if( !isSelected()) 
       g.setColor( Settings.sharedInstance().getUIColor());
-      else
+    else
       g.setColor( Settings.sharedInstance().getUIColor().darker());
-      
-      g.fill3DRect( x+1, y+1, w-2,  h-2, true);
+    
+    g.fill3DRect( x+1, y+1, w-2,  h-2, true);
 
-      // Paint the throttle 
-      g.setColor( Color.black);  
-      int pixels, pos;
-      if(orientation==VERTICAL_OR)
+    // Paint the throttle 
+    g.setColor( Color.black);  
+    int pixels, pos;
+    if(orientation==VERTICAL_OR)
       {
 	pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
 	pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / range;
 	
 	g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
       }
-      else
-	{
-	  pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	  pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
-	  g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
-	}
-      super.paint(g);
+    else
+      {
+	pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
+	g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+      }
+    super.paint(g);
   }
   
   public void updatePaint(Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+    g.drawImage( buff, getX() + 2, getY() + 2, itsSketchPad);  
+  }
+
+  public void drawContent( Graphics g, int x, int y, int w, int h) 
+  {
     int range = rangeMax - rangeMin;
     
     /* Paint the box */ 
     g.setColor( Settings.sharedInstance().getUIColor());
-    g.fillRect( x+2, y+2, w-4,  h-4);
+    g.fillRect( x, y, w, h);
     
     /* Paint the throttle */ 
     g.setColor( Color.black);
     int pixels, pos;
     if(orientation==VERTICAL_OR)
       {
-	pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / range;
-	g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
-	  }
+	pixels = h + 4 - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = y - 2 + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / range;
+	g.drawRect(x - 2 + THROTTLE_LATERAL_OFFSET, pos, w + 4 - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+      }
     else
       {
-	pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-	pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / range;
-	g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+	pixels = w + 4 - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	pos = x - 2 + UP_OFFSET + (pixels * (value-rangeMin)) / range;
+	g.drawRect(pos, y - 2 + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h + 4 - 2*THROTTLE_LATERAL_OFFSET - 1); 
       }
   }
 

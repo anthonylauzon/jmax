@@ -134,7 +134,7 @@ public class Display extends GraphicObject implements FtsMessageListener
     else
       redraw();
   }
-
+  
   public void setWidth( int theWidth) 
   {
   }
