@@ -109,12 +109,19 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
       topCorner.setMaximumSize(new Dimension(38, MatPanel.ROW_HEIGHT));
       topCorner.setBorder(BorderFactory.createEtchedBorder());
       
+      topCorner.addMouseListener(new MouseAdapter(){
+        public void mousePressed(MouseEvent e)
+        {
+          table.selectAll();
+        }
+      });
+      
       JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
       panel.add(topCorner);
       panel.add(rowIndex);
       
-      add(BorderLayout.WEST, /*rowIndex*/panel);
+      add(BorderLayout.WEST, panel);
     }    
   }
   void updateTableModel()

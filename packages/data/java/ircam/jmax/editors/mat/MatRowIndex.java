@@ -28,8 +28,7 @@ import javax.swing.event.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-/**
-* A graphic JPanel that represents a ruler containing time indications */
+
 public class MatRowIndex extends JPanel 
 {
 	
@@ -40,18 +39,28 @@ public class MatRowIndex extends JPanel
     setDoubleBuffered(false);
     this.data = data;
     this.matPanel = panel;
-    //setBorder(BorderFactory.createEtchedBorder());
     rowIndexFont = matPanel.table.getTableHeader().getFont();
       
     setFont( rowIndexFont);
     fm = getFontMetrics( rowIndexFont);
 
-    addMouseListener(new MouseListener(){
-			public void mousePressed(MouseEvent e){}
-			public void mouseClicked(MouseEvent e){}
-			public void mouseReleased(MouseEvent e){}
-			public void mouseEntered(MouseEvent e){}
-			public void mouseExited(MouseEvent e){}
+    addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e)
+      {
+        int rowId = getRowIndex(e.getY());         
+        if((e.getModifiers() & InputEvent.SHIFT_MASK) == 0)
+        {
+          matPanel.table.getSelectionModel().clearSelection();
+          matPanel.table.addRowSelectionInterval(rowId, rowId);
+        }
+        else
+        {
+          if(matPanel.table.getSelectionModel().isSelectedIndex(rowId))
+            matPanel.table.removeRowSelectionInterval(rowId, rowId);
+          else
+            matPanel.table.addRowSelectionInterval(rowId, rowId);
+        }        
+      }
 		});
     
     matPanel.scrollPane.getVerticalScrollBar().addAdjustmentListener( new AdjustmentListener(){
@@ -63,16 +72,22 @@ public class MatRowIndex extends JPanel
     });
 }
 
+int getRowIndex(int y)
+{
+  int id = (y+yTransp)/MatPanel.ROW_HEIGHT;
+  int rows = data.getRows();
+  if( id > rows-1) id =  rows-1;
+  return id;
+}
+
 public void paintComponent(Graphics g)
 {
   Dimension d = getSize();
   int rows = data.getRows();
   g.setColor( MatPanel.rowsIdColor);
   g.fillRect(0, 0, d.width, d.height);
-  /*g.setColor( MatPanel.matGridColor);
-  g.draw3DRect( 1, 1, d.width-1, MatPanel.ROW_HEIGHT-1, true);*/
-  
-  int rectY = /*2**/MatPanel.ROW_HEIGHT - yTransp;
+
+  int rectY = MatPanel.ROW_HEIGHT - yTransp;
   String idxString;
   int strW = 0;
   for(int i = 0; i<rows; i++)
@@ -87,14 +102,8 @@ public void paintComponent(Graphics g)
   }
 }
 
-protected void processMouseEvent(MouseEvent e)
-{
-  super.processMouseEvent(e);
-}
-
 public Dimension getPreferredSize()
 { return rulerDimension; }
-
 
 Dimension rulerDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
 FontMetrics fm;
