@@ -1,6 +1,6 @@
 all	all	dsp.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	dsp.c
 src	all	dspcontrol.c
 src	all	dspgraph.c

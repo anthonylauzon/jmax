@@ -6,8 +6,8 @@ all	all	ramps.h
 all	all	ramp_vectors.h
 all	all	srconv.h
 all	all	units.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	floatfuns.c
 src	all	hashtab.c
 src	all	ramps.c

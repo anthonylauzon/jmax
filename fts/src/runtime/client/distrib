@@ -4,8 +4,8 @@ all	all	outgoing.h
 all	all	protocol.h
 all	all	sync.h
 all	all	updates.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	client.c
 src	all	incoming.c
 src	all	outgoing.c

@@ -1,4 +1,4 @@
 all	all	audio.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	audio.c

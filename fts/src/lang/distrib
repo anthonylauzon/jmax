@@ -10,4 +10,4 @@ all	all	utils
 all	all	utils.h
 all	all	veclib
 all	all	veclib.h
-src	all	Makefile
+all	all	Makefile

@@ -1,4 +1,4 @@
-src	all	Makefile
+all	all	Makefile
 all	all	STtools
 all	all	STtools.h
 all	all	audio

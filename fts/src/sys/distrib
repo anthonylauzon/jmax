@@ -1,5 +1,5 @@
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	gnuhw.c
 all	all	hw.h
 src	all	mem.c

@@ -1,4 +1,4 @@
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	sched.c
 all	all	sched.h

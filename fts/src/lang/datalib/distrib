@@ -3,8 +3,8 @@ all	all	atomlist.h
 all	all	floatvector.h
 all	all	intvec.h
 all	all	objectset.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	atomarray.c
 src	all	atomlist.c
 src	all	datalib.c

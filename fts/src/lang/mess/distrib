@@ -31,8 +31,8 @@ all	all	templates.h
 all	all	variables.h
 all	all	vm.h
 all	all	words.h
-src	all	Makefile
-src	all	Sources
+all	all	Makefile
+all	all	Sources
 src	all	atoms.c
 src	all	classes.c
 src	all	clipboard.c
