@@ -989,7 +989,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
-  
+    
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
   fts_class_set_equals_function(cl, mat_equals);

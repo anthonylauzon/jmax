@@ -776,6 +776,14 @@ bpf_instantiate(fts_class_t *cl)
 
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
+  
+  fts_class_doc(cl, bpf_symbol, "", "bpf of time tagged points");
+  fts_class_doc(cl, fts_s_clear, NULL, "erase all points");
+  fts_class_doc(cl, fts_s_set, "<int: time> <value: float> ...", 
+                "set list of time-value points as bpf content");
+	fts_class_doc(cl, fts_s_append, "<int: time> <value: float> ...", 
+                "append list of time-value points to the bpf content");
+	fts_class_doc(cl, fts_s_print, NULL, "print list of points");
 }
 
 void
