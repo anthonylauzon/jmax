@@ -18,18 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette.
- *
  */
 
 
 #include <fts/fts.h>
-
-typedef struct loadbang_t {
-  fts_object_t _o;
-} loadbang_t;
 
 static void
 loadbang_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -40,7 +32,7 @@ loadbang_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 loadbang_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(loadbang_t), 0, 0);
+  fts_class_init(cl, sizeof(fts_object_t), 0, 0);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), loadbang_load_init);
 

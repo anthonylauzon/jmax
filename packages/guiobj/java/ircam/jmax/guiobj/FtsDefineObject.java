@@ -19,8 +19,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 //
-// Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
-// 
 
 package ircam.jmax.guiobj;
 
