@@ -237,7 +237,7 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	fts_midilabel_set_output(label, NULL);
 	
 	/* send to client */
-	fts_client_send_message(o, fts_s_input, 2, at);
+	fts_client_send_message(o, fts_s_output, 2, at);
       }
     else if(destination_name == fts_s_export)
       {
@@ -247,14 +247,14 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	fts_set_symbol(args + 1, fts_midilabel_get_name(label));
 	fts_midilabel_set_output(label, (fts_midiport_t *)fts_object_create(macosxmidi_output_type, 2, args));
 	
-	fts_client_send_message(o, fts_s_input, 2, at);
+	fts_client_send_message(o, fts_s_output, 2, at);
       }
     else if(destination_name == fts_s_internal)
       {
 	fts_midilabel_set_internal(label);
 	
 	/* send to client */
-	fts_client_send_message(o, fts_s_input, 2, at);
+	fts_client_send_message(o, fts_s_output, 2, at);
       }
     else
       {
@@ -262,7 +262,7 @@ macosxmidi_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	/* set output */
 	
 	/* send to client */
-	fts_client_send_message(o, fts_s_input, 2, at);
+	fts_client_send_message(o, fts_s_output, 2, at);
       }
     }
 }
@@ -387,6 +387,7 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_iterator_t keys, values;
   fts_atom_t k, a;
   fts_atom_t b[2];
+  int i;
 
   fts_hashtable_get_keys(&this->sources, &keys);
   
@@ -427,7 +428,7 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   fts_client_done_message( o);  
 
-  int i = 0;
+  i = 0;
   while(label)
     {
       fts_symbol_t name = fts_midilabel_get_name(label);

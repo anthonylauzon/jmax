@@ -49,8 +49,7 @@ public class FtsMidiManager extends FtsObject
     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("insert"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMidiManager)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString(), 
-					     args.getSymbol( 2).toString(), args.getSymbol( 3).toString());
+	  ((FtsMidiManager)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString());
 	}
       });
      FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
@@ -194,8 +193,6 @@ public class FtsMidiManager extends FtsObject
   }
   void setDestinations(int nArgs, FtsAtom[] args)
   {
-   System.err.println("setSources "+nArgs);
-  
     destinations = new String[ nArgs];
     for(int i = 0; i < nArgs; i++)
       destinations[i] = args[i].symbolValue.toString();
@@ -205,14 +202,15 @@ public class FtsMidiManager extends FtsObject
     return destinations;
   }
 
-  void insertLabel( int index, String label, String input, String output)
+  void insertLabel( int index, String label)
   {
-    labels.insertElementAt( new MidiLabel( label, input, output), index);
+    labels.insertElementAt( new MidiLabel( label, null, null), index);
   }
 
   void removeLabel( int index)
   {
-    labels.remove( index);
+    if( index >0 && index < labels.size())
+        labels.remove( index);	
   }
 
   public Enumeration getLabels()
