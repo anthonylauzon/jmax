@@ -1,0 +1,29 @@
+# Scheme classes
+# 
+# List all the class names that are used to create the Scheme functions
+# 
+ircam.jmax.MaxApplication
+ircam.jmax.script.Interpreter
+ircam.jmax.script.scm.SchemeInterpreter
+ircam.jmax.script.pkg.PackageHandler
+ircam.jmax.script.pkg.Package
+ircam.jmax.fts.Fts
+ircam.jmax.fts.FtsHelpPatchTable
+ircam.jmax.fts.FtsReferenceURLTable
+ircam.jmax.mda.Mda
+ircam.jmax.mda.MaxDocument
+ircam.jmax.toolkit.Icons
+ircam.jmax.utils.MaxVector
+ircam.jmax.editors.patcher.AddPopUp
+ircam.jmax.editors.console.ConsoleWindow
+#ircam.jmax.editors.utils.Oscilloscope
+ircam.jmax.dialogs.SplashDialog
+java.lang.System
+java.lang.Object
+java.lang.String
+java.lang.Number
+java.lang.Float
+java.lang.Integer
+java.lang.Class
+java.io.File
+java.util.Hashtable
