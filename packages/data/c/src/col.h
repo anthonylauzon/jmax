@@ -28,6 +28,7 @@
 #define _DATA_COL_H_
 
 #include "data.h"
+#include "mat.h"
 
 DATA_API fts_type_t col_type;
 DATA_API fts_symbol_t col_symbol;
@@ -40,19 +41,18 @@ typedef struct
   int j; /* column index */
 } col_t;
 
-#define col_get_size(x) ((x)->n)
+#define col_get_size(x) ((x)->mat->n)
 
-DATA_API void col_set_element(col_t *col, int i, fts_atom_t atom);
-#define col_get_element(x, i) ((x)->mat->data[(i) * (x)->mat->n + (x)->(j)])
+#define col_set_element(x, i, v) (mat_set_element((x)->mat, (i), (x)->j, (v)))
+#define col_get_element(x, i) (mat_get_element((x)->mat, (i), (x)->j))
+#define col_void_element(x, i) (mat_void_element((x)->mat, (i), (x)->j))
 
-#define col_check(x) ((x)->j < (x)->mat->n)
-#define col_get_onset(x) 
-#define col_get_step(x) 
+#define col_get_onset(x) ((x)->j)
+#define col_get_step(x) ((x)->mat->m)
 
 DATA_API void col_void(col_t *col);
 DATA_API void col_set_const(col_t *col, fts_atom_t atom);
-
-DATA_API void col_set_from_list(col_t *col, int ac, const fts_atom_t *at);
+DATA_API void col_set_from_atoms(col_t *col, int onset, int ac, const fts_atom_t *at);
 
 /* col atoms */
 #define col_atom_set(ap, x) fts_set_object_with_type((ap), (x), col_type)

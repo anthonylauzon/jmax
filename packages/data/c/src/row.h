@@ -24,54 +24,38 @@
  *
  */
 
-#include <fts/fts.h>
+#ifndef _DATA_ROW_H_
+#define _DATA_ROW_H_
 
-extern void value_config(void);
+#include "data.h"
+#include "mat.h"
 
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void fmat_config(void);
-extern void vec_config(void);
-extern void mat_config(void);
-extern void col_config(void);
-extern void row_config(void);
-extern void bpf_config(void);
+DATA_API fts_type_t row_type;
+DATA_API fts_symbol_t row_symbol;
+DATA_API fts_class_t *row_class;
 
-extern void getval_config(void);
-extern void getinter_config(void);
-extern void getsize_config(void);
-extern void getrange_config(void);
-extern void getlist_config(void);
-
-extern void fill_config(void);
-extern void copy_config(void);
-
-extern void preset_config(void);
-
-static void
-data_init(void)
+typedef struct
 {
-  value_config();
+  fts_object_t head;
+  mat_t *mat; /* matrix */
+  int i; /* row index */
+} row_t;
 
-  ivec_config();
-  fvec_config();
-  fmat_config();
-  vec_config();
-  mat_config();
-  col_config();
-  row_config();
-  bpf_config();
+#define row_get_size(x) ((x)->mat->n)
 
-  getval_config();  
-  getinter_config();  
-  getsize_config();  
-  getrange_config();  
-  getlist_config();  
+#define row_set_element(x, j, v) (mat_set_element((x)->mat, (x)->i, (j), (v)))
+#define row_get_element(x, j) (mat_get_element((x)->mat, (x)->i, (j)))
+#define row_void_element(x, j) (mat_void_element((x)->mat, (x)->i, (j)))
 
-  fill_config();
-  copy_config();
+#define row_get_onset(x) ((x)->i * n)
 
-  preset_config();
-}
+DATA_API void row_void(row_t *col);
+DATA_API void row_set_const(row_t *col, fts_atom_t atom);
+DATA_API void row_set_from_atoms(row_t *col, int onset, int ac, const fts_atom_t *at);
 
-fts_module_t data_module = {"data", "data structures", data_init, 0, 0};
+/* col atoms */
+#define row_atom_set(ap, x) fts_set_object_with_type((ap), (x), row_type)
+#define row_atom_get(ap) ((row_t *)fts_get_object(ap))
+#define row_atom_is(ap) (fts_is_a((ap), row_type))
+
+#endif
