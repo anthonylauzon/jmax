@@ -134,7 +134,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 				if(lastEvent != null)
 					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
 																							 ((Double)lastEvent.getProperty("duration")).intValue()));
-				ftsTrackObject.editorState.setZoom(zoom);
+				ftsTrackObject.editorObject.setZoom(zoom);
 			}
 		});
 		
@@ -147,7 +147,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				int currentTime = e.getValue();
 				geometry.setXTransposition(-currentTime);
-				ftsTrackObject.editorState.setTransposition(-currentTime);
+				ftsTrackObject.editorObject.setTransposition(-currentTime);
 			}
 		});
 		separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
@@ -330,7 +330,6 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void close(boolean doCancel)
   {
     itsContainer.getFrame().setVisible(false);
-		ftsTrackObject.requestSetEditorState();
     ftsTrackObject.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }

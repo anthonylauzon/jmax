@@ -37,6 +37,7 @@
 #endif
 
 typedef struct _track_ track_t;
+typedef struct _track_editor track_editor_t;
 typedef struct _event_ event_t;
 
 typedef struct _sequence_
@@ -52,6 +53,7 @@ typedef struct _sequence_
 #include <fts/packages/sequence/event.h>
 #include <fts/packages/sequence/note.h>
 #include <fts/packages/sequence/track.h>
+#include <fts/packages/sequence/trackeditor.h>
 
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_first_track(s) ((s)->tracks)

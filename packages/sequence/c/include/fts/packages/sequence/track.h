@@ -28,17 +28,6 @@
 
 extern fts_class_t *track_class;
 
-typedef struct editor_state
-{
-  int win_x; /* editor window's bounds */
-  int win_y;
-  int win_w;
-  int win_h;
-  fts_symbol_t label; /* property event label */
-  float zoom; /* editor zoom_factor */
-  int transp; /* editor x_transposition */
-} ed_state_t;
-
 struct _track_
 { 
   fts_object_t o;
@@ -49,7 +38,8 @@ struct _track_
   int active; /* active flag */
   int open; /* flag: is 1 if track editor is open */
 
-  ed_state_t *ed_state;
+  struct _track_editor *editor;
+  int save_editor; /* flag: is 1 if want to save editor state */
   
   fts_class_t *type; /* type of events */
   event_t *first; /* pointer to first event */
@@ -77,6 +67,7 @@ struct _track_
 #define track_get_duration(t) (((t)->last)? (t)->last->time: 0.0)
 
 #define track_is_active(t) ((t)->active != 0)
+#define track_do_save_editor(t) ((t)->save_editor != 0)
 
 #define track_set_active(t) ((t)->active = 1)
 #define track_set_inactive(t) ((t)->active = 0)

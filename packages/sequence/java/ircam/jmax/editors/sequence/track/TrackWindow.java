@@ -70,10 +70,14 @@ public class TrackWindow extends JFrame implements EditorContainer{
     getContentPane().add( trackPanel);
     
     addWindowListener(new WindowListener(){
-			public void windowOpened(WindowEvent e){}
+			public void windowOpened(WindowEvent e)
+		  {
+				Rectangle bounds = TrackWindow.this.getBounds();
+				trackData.editorObject.setSize(bounds.width, bounds.height);
+			}
 			public void windowClosed(WindowEvent e){}
 			public void windowClosing(WindowEvent e)
-		  {
+		  { 
 				trackPanel.close(true);
 		  }
 			public void windowDeiconified(WindowEvent e){}
@@ -82,7 +86,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
 		  {
 				TrackEditor editor = trackPanel.getTrackEditor();
 				SequenceSelection.setCurrent( editor.getSelection());
-	    }
+			}
 			public void windowDeactivated(WindowEvent e){}
 		});
 		
@@ -90,23 +94,23 @@ public class TrackWindow extends JFrame implements EditorContainer{
 			public void componentResized(ComponentEvent e)
 		  {
 				Rectangle bounds = TrackWindow.this.getBounds();
-				trackData.editorState.setSize(bounds.width, bounds.height);
+				trackData.editorObject.setSize(bounds.width, bounds.height);
 		  }
 			public void componentMoved(ComponentEvent e)
 		  {
 				Rectangle bounds = TrackWindow.this.getBounds();
-				trackData.editorState.setLocation(bounds.x, bounds.y);
+				trackData.editorObject.setLocation(bounds.x, bounds.y);
 		  }
 		});
 		
-		if( !trackData.editorState.haveContent())
+		if( !trackData.editorObject.haveContent())
 			pack();
 		
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
 		
     validate();
-		if( !trackData.editorState.haveContent())
+		if( !trackData.editorObject.haveContent())
 			pack();
   }
 	

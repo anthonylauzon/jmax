@@ -46,96 +46,97 @@ public class TrackBasePopupMenu extends JPopupMenu
   boolean isInSequence = false;
   JMenuItem removeItem, nameItem;
   JMenu moveMenu;
+	JCheckBoxMenuItem saveItem;
   int trackCount = 0;
-
+	
   JLabel maxLabel, minLabel;
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
   MoveTrackToAction moveToAction;
   public EditorAction cutAction, copyAction, duplicateAction;
-
+	
   public TrackBasePopupMenu( TrackBaseEditor editor, boolean isInSequence)
   {
     super();
     JMenuItem item;
-
+		
     target = editor;
     this.isInSequence = isInSequence;
-
+		
     addViewMenu();
-
+		
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  target.showListDialog();
-	}
-      });
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.showListDialog();
+		  }
+		});
     add(item);
-
+		
     addSeparator();
-
+		
     if( addRangeMenu())
       addSeparator();
-
+		
     item = new JMenuItem("Select All");
     item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  target.getSelection().selectAll();
-	  target.getGraphicContext().getGraphicDestination().requestFocus();
-	}
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.getSelection().selectAll();
+				target.getGraphicContext().getGraphicDestination().requestFocus();
+			}
     });
     add(item);
-
+		
     if(isInSequence)
-      {
-	addSeparator();
-
-	nameItem = new JMenuItem("Name");
-	nameItem.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
+		{
+			addSeparator();
+			
+			nameItem = new JMenuItem("Name");
+			nameItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+	      {
+					ChangeTrackNameDialog.changeName(target.getTrack(),  
+																					 target.getGraphicContext().getFrame(),
+																					 SwingUtilities.convertPoint(target, x, y,
+																																			 target.getGraphicContext().getFrame()));
+				}
+			});
+			
+			add(nameItem);
+			
+			moveMenu = new JMenu("Move to Position");
+			item = new JMenuItem(""+trackCount);
+			item.addActionListener( moveToAction);
+			moveMenu.add(item);
+			
+			add(moveMenu);
+			
+			addSeparator();
+			
+			addAddTrackMenu();
+			
+			removeItem = new JMenuItem("Remove Track");
+			removeItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
 	    {
-	      ChangeTrackNameDialog.changeName(target.getTrack(),  
-					       target.getGraphicContext().getFrame(),
-					       SwingUtilities.convertPoint(target, x, y,
-									   target.getGraphicContext().getFrame()));
+					((FtsSequenceObject)target.getGraphicContext().getFtsObject()).
+					removeTrack( target.getTrack());
 	    }
-	  });
-	
-	add(nameItem);
-
-	moveMenu = new JMenu("Move to Position");
-	item = new JMenuItem(""+trackCount);
-	item.addActionListener( moveToAction);
-	moveMenu.add(item);
-    
-	add(moveMenu);
-
-	addSeparator();
-
-	addAddTrackMenu();
-
-	removeItem = new JMenuItem("Remove Track");
-	removeItem.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-	      ((FtsSequenceObject)target.getGraphicContext().getFtsObject()).
-		removeTrack( target.getTrack());
-	    }
-	  });
-	add(removeItem);
-      }
-
+			});
+			add(removeItem);
+		}
+		
     if(JMaxApplication.getProperty("no_menus") != null)
     {
       addSeparator();
-
+			
       add( Actions.undoAction);
       add( Actions.redoAction);
-
+			
       addSeparator();
-
+			
       cutAction = new Actions.CutAction();
       copyAction = new Actions.CopyAction();
       duplicateAction = new Actions.DuplicateAction();
@@ -144,22 +145,31 @@ public class TrackBasePopupMenu extends JPopupMenu
       add(Actions.pasteAction);
       add(duplicateAction);
     }
-
+		
     addSeparator();
     item = new JMenuItem("Export Track");
     item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  target.getTrack().getFtsTrack().export();
-	}
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.getTrack().getFtsTrack().export();
+		  }
     });
     add(item);
-
+		
+		saveItem = new JCheckBoxMenuItem("Save Editor State");
+    saveItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.getTrack().getFtsTrack().requestSetSaveEditor(saveItem.getState());
+			}
+		});
+    add(saveItem);    
+		
     moveToAction = new MoveTrackToAction(target);
-
+		
     pack();
   }
-
+	
   void addAddTrackMenu()
   {
     JMenu menu = new JMenu("Add Track");
@@ -168,7 +178,7 @@ public class TrackBasePopupMenu extends JPopupMenu
       menu.add( new AddTrackAction((ValueInfo)e.nextElement(), seq));
     add(menu);
   }
-
+	
   boolean addRangeMenu()
   {
     return false;
@@ -178,22 +188,26 @@ public class TrackBasePopupMenu extends JPopupMenu
     return false;
   }
   void updateViewMenu(){}
-
+	
   public TrackBaseEditor getPopupTarget(){
     return target;
   }
-
+	
   public void update()
   {
     if(isInSequence)
       updateMoveToMenu();
     
     updateViewMenu();
-
+		
     if(JMaxApplication.getProperty("no_menus") != null)
       updateCutCopyPaste();
+		
+		boolean saveEditor = target.getTrack().getFtsTrack().saveEditor;
+		if(saveItem.getState() != saveEditor)
+			saveItem.setState(saveEditor);
   }
-
+	
   void updateMoveToMenu()
   {
     JMenuItem item;
@@ -201,24 +215,23 @@ public class TrackBasePopupMenu extends JPopupMenu
     if(trackCount==count)
       return;
     else
-      {
-	int dif = count-trackCount;
-	
-	if(dif>0)
-	  for(int i=1; i<=dif; i++)
-	    {
-	      item = new JMenuItem(""+(trackCount+i));
-	      item.addActionListener( moveToAction);
-	      moveMenu.add(item);			
-	    }		
-	else
-	  for(int i=0; i<-dif; i++)
-	    moveMenu.remove(moveMenu.getItemCount()-1);
-	trackCount = count;
-      }
+		{
+			int dif = count-trackCount;
+			
+			if(dif>0)
+				for(int i=1; i<=dif; i++)
+				{
+					item = new JMenuItem(""+(trackCount+i));
+					item.addActionListener( moveToAction);
+					moveMenu.add(item);			
+				}		
+					else
+						for(int i=0; i<-dif; i++)
+							moveMenu.remove(moveMenu.getItemCount()-1);
+			trackCount = count;
+		}
   }
-
-
+	
   void updateCutCopyPaste()
   {
     if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
@@ -239,21 +252,21 @@ public class TrackBasePopupMenu extends JPopupMenu
   
   class SetViewAction extends AbstractAction {
     SetViewAction(int viewType, TrackBaseEditor editor)
-    {
+	{
       super("Set View");
       this.viewType = viewType;
       this.editor = editor;
-    }
+	}
     
     public void actionPerformed(ActionEvent e)
-    {
+	{
       editor.setViewMode(viewType);
-    }
-	
+	}
+		
     int viewType;
     TrackBaseEditor editor;
   }  
-
+	
   public void show(Component invoker, int x, int y)
   {
     this.x = x;

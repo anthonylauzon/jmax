@@ -30,7 +30,7 @@ import ircam.jmax.toolkit.*;
 import java.lang.reflect.*;
 
 /**
- * The Sequence selection. This class is implemented on the base of the
+* The Sequence selection. This class is implemented on the base of the
  * Swing's ListSelectionModel, so that it can be used unchanged in
  * the JTable representation of the score.
  * Even if every Sequence track have its own selection, just one of them
@@ -41,23 +41,23 @@ import java.lang.reflect.*;
  * the selected event differently (selected-active / selected-non active...)
  * @see SequenceTablePanel */
 public class SequenceSelection extends DefaultListSelectionModel implements TrackDataListener, Transferable, Cloneable{
-
+	
   
   //--- Fields
   private transient static SequenceSelection current;
   transient static MaxVector itsCopy = new MaxVector();
-
+	
   public transient DataFlavor flavors[];
-
+	
   private transient MaxVector temp = new MaxVector();
-
+	
   private transient SelectionOwner itsOwner;  
   protected  transient TrackDataModel itsModel;
   protected transient TrackEvent lastSelectedEvent = null;
   private transient MaxVector pastedObjects = new MaxVector();
-
+	
   boolean pasting = false;
-
+	
   // Implementation notes: 
   // The ListSelectionModel, and then the SequenceSelection, 
   // are based on indexes, while the identity
@@ -82,13 +82,13 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
       flavors = new DataFlavor[1];
     flavors[0] = SequenceDataFlavor.getInstance();
   }
-
+	
   void initDataFlavors()
   {
     if (flavors == null)
       flavors = new DataFlavor[1];
     flavors[0] = SequenceDataFlavor.getInstance();
-	
+		
     DataFlavor[] trackFlavors = ((FtsTrackObject)itsModel).getDataFlavors();
     for(int i=0; i<trackFlavors.length;i++)
       addFlavor(trackFlavors[i]);
@@ -98,124 +98,124 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   {
     super.addSelectionInterval(index1, index2);
   }
-
+	
   /**
-   * Ownership handling
+		* Ownership handling
    */
   public void setOwner(SelectionOwner so)
   {
     itsOwner = so;
   }
-
+	
   /**
-   * Ownership handling
+		* Ownership handling
    */
   public SelectionOwner getOwner()
   {
     return itsOwner;
   }
-
+	
   /**
-   * Returns the SequenceDataModel this selection refers to */
+		* Returns the SequenceDataModel this selection refers to */
   public TrackDataModel getModel()
   {
     return itsModel;
   }
-
+	
   /**
-   * Sets the TrackDataModel this selection refers to
-  public void setModel(TrackDataModel m)
-  {
-      if (itsModel != m)
-	  deselectAll();
-      if (itsModel != null)
-	  itsModel.removeListener(this);
-      itsModel = m;
-      if (m != null) 
-	  m.addListener(this);
+		* Sets the TrackDataModel this selection refers to
+	 public void setModel(TrackDataModel m)
+	 {
+		 if (itsModel != m)
+			 deselectAll();
+		 if (itsModel != null)
+			 itsModel.removeListener(this);
+		 itsModel = m;
+		 if (m != null) 
+			 m.addListener(this);
 	  }*/
-
+	
   /**
-   * Sets the current active selection. This will send a 
+		* Sets the current active selection. This will send a 
    * selectionActivated message to that selection's owner, and a 
    * selectionDisactivated to the old selection's owner */
   public static void setCurrent(SequenceSelection s)
   {
     if (current != null && current.itsOwner != null)
       current.itsOwner.selectionDisactivated();
-
+		
     current = s;
-
+		
     if (s != null && s.itsOwner != null)
       s.itsOwner.selectionActivated();
-
+		
   }
-
+	
   /** select the given object 
-   */
+		*/
   public void select(Object obj)
   {
     int index = itsModel.indexOf((TrackEvent) obj);
-
+		
     if (!isSelectedIndex(index)) 
-	{
+		{
 	    lastSelectedEvent = (TrackEvent)obj;
 	    addSelectionInterval(index, index);
-	}
+		}
   }
   
   /** Select the given enumeration of objects.
-   * When possible, use this method instead of
-   * selecting single objects. 
-   */
+		* When possible, use this method instead of
+		* selecting single objects. 
+		*/
   public void select(Enumeration e)
   {
     TrackEvent event;
     setValueIsAdjusting(true);
     while(e.hasMoreElements())
-      {
-	event = (TrackEvent)e.nextElement();
-	select(event);
-      }
+		{
+			event = (TrackEvent)e.nextElement();
+			select(event);
+		}
     setValueIsAdjusting(false);
   }
-
+	
   /** remove the given object from the selection
-   */
+		*/
   public void deSelect(Object obj)
   {
     int index = itsModel.indexOf((TrackEvent) obj);
     if(obj == lastSelectedEvent) lastSelectedEvent = null;
     removeSelectionInterval(index, index);
   }
-
-
+	
+	
   /** remove the given enumeration of objects from the selection
-   * When possible, use this method instead of
-   * deselecting single objects.    */
+		* When possible, use this method instead of
+		* deselecting single objects.    */
   public void deSelect(Enumeration e)
   {
     while(e.hasMoreElements())
-      {
-	deSelect(e.nextElement());
-      }
+		{
+			deSelect(e.nextElement());
+		}
   }
-
-
+	
+	
   /** returns true if the object is currently selected
-   */
+		*/
   public boolean isInSelection(Object obj)
   {
     int index = itsModel.indexOf((TrackEvent) obj);
     
     return isSelectedIndex(index);
   }
-
-
+	
+	
   /** Returns an enumeration of all the selected OBJECTS (not indexes).
-   * The enumeration is "delete tollerant": one can remove objects
-   * in a loop based on the result of this method.
-   */
+		* The enumeration is "delete tollerant": one can remove objects
+		* in a loop based on the result of this method.
+		*/
   public Enumeration getSelected()
   {
     // NOTE: a copy must be made because the caller can use the result
@@ -227,23 +227,23 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     return temp.elements(); 
   }
   
-
+	
   /** Returns the number of objects in the selection
-   */
+		*/
   public  int size()
   {
     // unefficient! Alternative solutions welcome.
     int count = 0;
     
     for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++) 
-      {
-	if (isSelectedIndex(i))
-	  count++;
-      }
-
+		{
+			if (isSelectedIndex(i))
+				count++;
+		}
+		
     return count;
   }
-
+	
   public TrackEvent getLastSelectedEvent()
   {
     return lastSelectedEvent;
@@ -252,69 +252,69 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   {
     lastSelectedEvent = last;
   }
-
+	
   /** selects all the objects. 
-   */
+		*/
   public  void selectAll()
   {
     addSelectionInterval(0, itsModel.length()-1);
   }
-
+	
   /** deselects all the objects currently selected
-   */
+		*/
   public  void deselectAll()
   {
     lastSelectedEvent = null;
     clearSelection();
   }
-
-
+	
+	
   /**
-   * returns the (unique) selection
+		* returns the (unique) selection
    */
   public static SequenceSelection getCurrent()
   {
     return current;
   }  
-
+	
   /** TrackDataListener interface*/
-
+	
   
   public void objectChanged(Object spec, String propName, Object propValue) 
   {
   }
-
+	
   public void objectAdded(Object spec, int index) 
   {
     int i;
-
+		
     /* during upload don't select */
     if( !uploading)
-      {    
-	/* shift to right already selected indexes */
-	if ( index <= getMaxSelectionIndex())
-	  {
-	    for ( i = getMaxSelectionIndex(); i >= index ; i--)
+		{    
+			/* shift to right already selected indexes */
+			if ( index <= getMaxSelectionIndex())
+			{
+				for ( i = getMaxSelectionIndex(); i >= index ; i--)
 	      {
-		if ( isSelectedIndex( i))
-		  {
-		    addSelectionInterval( i+1, i+1);
-		    removeSelectionInterval( i, i);
-		  }
+					if ( isSelectedIndex( i))
+					{
+						addSelectionInterval( i+1, i+1);
+						removeSelectionInterval( i, i);
+					}
 	      }
-	  }
-	
-	select(spec);    
-
-	if( pasting)
-	  pastedObjects.addElement( spec);
-      }
+			}
+			
+			select(spec);    
+			
+			if( pasting)
+				pastedObjects.addElement( spec);
+		}
   }
   public void objectsAdded(int maxTime) {}
-
+	
   public void lastObjectMoved(Object o, int oldIndex, int newIndex){}
   /**
-   * TrackDataListener interface: keep the index-based selection consistent. */
+		* TrackDataListener interface: keep the index-based selection consistent. */
   public void objectMoved(Object o, int oldIndex, int newIndex)
   {
     // NOTE: oldIndex is the index where the object WAS before moving,
@@ -323,40 +323,40 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     // between oldIndex and newIndex are shifted by one.
     // The purpose of this routine is to keep the selected/unselected 
     // status of these indexes coherent with the shifts.
-
+		
     boolean wasSelected = isSelectedIndex(oldIndex);
-
+		
     if (oldIndex == newIndex) 
-	return; //no changes in the object's order
-
+			return; //no changes in the object's order
+		
     if (oldIndex < newIndex)
-      {
-	for (int i = oldIndex; i<newIndex; i++)
-	  {
-	    if (isSelectedIndex(i+1))
-		addSelectionInterval(i, i);
-	    else
-		removeSelectionInterval(i,i);
-	  }
-
-      }
+		{
+			for (int i = oldIndex; i<newIndex; i++)
+			{
+				if (isSelectedIndex(i+1))
+					addSelectionInterval(i, i);
+				else
+					removeSelectionInterval(i,i);
+			}
+			
+		}
     else 
-      {
-	for (int i=oldIndex; i>newIndex; i--)
-	  {
-	    if (isSelectedIndex(i-1))
-		addSelectionInterval(i, i);
-	    else
-		removeSelectionInterval(i,i);
-	  } 
-
-      }
-
+		{
+			for (int i=oldIndex; i>newIndex; i--)
+			{
+				if (isSelectedIndex(i-1))
+					addSelectionInterval(i, i);
+				else
+					removeSelectionInterval(i,i);
+			} 
+			
+		}
+		
     if (wasSelected && !isSelectedIndex(newIndex)) 
-	addSelectionInterval(newIndex, newIndex);
+			addSelectionInterval(newIndex, newIndex);
     
   }
-
+	
   /** TrackDataListener interface */
   public void objectDeleted(Object whichObject, int oldIndex) 
   {
@@ -365,22 +365,22 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     // It could also be implemented with a simple clearSelection() call
     
     for (int i = oldIndex; i<=getMaxSelectionIndex(); i++)
-      {
-	if (isSelectedIndex(i+1))
-	  {
-	    addSelectionInterval(i, i);
-	  }
-	else
-	  {
-	    removeSelectionInterval(i,i);
-	  }
-      }
+		{
+			if (isSelectedIndex(i+1))
+			{
+				addSelectionInterval(i, i);
+			}
+			else
+			{
+				removeSelectionInterval(i,i);
+			}
+		}
   }
-
+	
   /** TrackDataListener interface */
   public void trackCleared() 
   {
-      deselectAll();
+		deselectAll();
   }
   boolean uploading = false;
   public void startTrackUpload( TrackDataModel track, int size)
@@ -407,30 +407,30 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     pastedObjects.removeAllElements();
   }
   public void trackNameChanged(String oldName, String newName){}
-
+	
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {
     return itsCopy.elements(); 
   }
-
+	
   /** Transferable interface */
   public boolean isDataFlavorSupported(DataFlavor flavor)
   {
     for (int i = 0; i < Array.getLength(flavors); i++)
-      {
-	if (flavor.equals(flavors[i]))
-	  return true;
-      }
-
+		{
+			if (flavor.equals(flavors[i]))
+				return true;
+		}
+		
     return false;
   }
-
+	
   public DataFlavor[]  getTransferDataFlavors() 
   {
     return flavors;
   }
-
+	
   /** utility function */
   protected void addFlavor(DataFlavor flavor)
   {
@@ -444,134 +444,134 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     temp[dim] = flavor;
     flavors = temp;
   }
-
-    /////////////////////////////////////////////////////////////////
-    /////////////// Operation On the Selection //////////////////////
-
-    public void deleteAll()
-    {
-      if(size()==itsModel.length())
-	{			
-	  deselectAll();
-	  ((FtsTrackObject)itsModel).requestClearTrack();			    
-	}
-      else
-	{
-	  MaxVector v = new MaxVector();		    
-	  for (Enumeration en = getSelected(); en.hasMoreElements();)
-	    v.addElement(en.nextElement());
-
-	  deselectAll();
-	  
-	  itsModel.deleteEvents(v.elements());
-	  v = null;
-	}
-    }
-
-    public void selectNext()
-    {
-	if(itsModel.length()>0)
-	    {
-		if(size()==0)
-		    select(itsModel.getEventAt(0));	
-		else
-		    {
-			int last = getMaxSelectionIndex();
-			if(last < itsModel.length()-1)
-			    {
-				TrackEvent evt = itsModel.getEventAt(last+1); 
-				deselectAll();
-				select(evt);
-			    }
-		    }
-	    }
-    }
-
-    public void selectPrevious()
-    {
-	if(itsModel.length()>0)
-	    {
-		if(size()==0)
-		    select(itsModel.getLastEvent());	
-		else
-		    {
 	
-			int first = getMinSelectionIndex();
-			if(first > 0)
-			    {
-				TrackEvent evt = itsModel.getEventAt(first-1); 
-				deselectAll();
-				select(evt);
-			    }
+	/////////////////////////////////////////////////////////////////
+	/////////////// Operation On the Selection //////////////////////
+	
+	public void deleteAll()
+	{
+		if(size()==itsModel.length())
+		{			
+			deselectAll();
+			((FtsTrackObject)itsModel).requestClearTrack();			    
+		}
+		else
+		{
+			MaxVector v = new MaxVector();		    
+			for (Enumeration en = getSelected(); en.hasMoreElements();)
+				v.addElement(en.nextElement());
+			
+			deselectAll();
+			
+			itsModel.deleteEvents(v.elements());
+			v = null;
+		}
+	}
+	
+	public void selectNext()
+	{
+		if(itsModel.length()>0)
+		{
+			if(size()==0)
+		    select(itsModel.getEventAt(0));	
+			else
+		    {
+				int last = getMaxSelectionIndex();
+				if(last < itsModel.length()-1)
+				{
+					TrackEvent evt = itsModel.getEventAt(last+1); 
+					deselectAll();
+					select(evt);
+				}
 		    }
-	    }
-    }
+		}
+	}
+	
+	public void selectPrevious()
+	{
+		if(itsModel.length()>0)
+		{
+			if(size()==0)
+		    select(itsModel.getLastEvent());	
+			else
+		    {
+				
+				int first = getMinSelectionIndex();
+				if(first > 0)
+				{
+					TrackEvent evt = itsModel.getEventAt(first-1); 
+					deselectAll();
+					select(evt);
+				}
+		    }
+		}
+	}
   /**
-   * An usefull (and fast) class to traverse the selection, to be used
+		* An usefull (and fast) class to traverse the selection, to be used
    * when the objects are not changed in the loop (read only) */
   class ReadOnlyEnum implements Enumeration
   {
-
+		
     ReadOnlyEnum()
-    {
+	{
       current = getMinSelectionIndex();
-    }
-
+	}
+		
     public boolean hasMoreElements()
-    {
+	{
       next = findNext();
       return next != NO_MORE;
-    }
-
-    public Object nextElement()
-    {
-      return itsModel.getEventAt(next);
-    }
-
-    int findNext()
-    {
-      while (current <= getMaxSelectionIndex())
-	{
-	  if (isSelectedIndex(current))
-	    {
-	      current++;
-	      return current-1;
-	    }
-	  else current++;
 	}
+		
+    public Object nextElement()
+	{
+      return itsModel.getEventAt(next);
+	}
+		
+    int findNext()
+	{
+      while (current <= getMaxSelectionIndex())
+			{
+				if (isSelectedIndex(current))
+				{
+					current++;
+					return current-1;
+				}
+				else current++;
+			}
       return NO_MORE;
-    }
-
+	}
+		
     //--- Fields
     int current;
     int next;
     final int NO_MORE = -1;
   }
-
+	
   /**
-   * Function used by clipboard operations.
+		* Function used by clipboard operations.
    * This method makes a clone of the objects currently selected.
    */ 
   public void prepareACopy()
   {
     itsCopy.removeAllElements();
-
+		
     TrackEvent s;
     try {
       
       for (Enumeration e= new ReadOnlyEnum(); e.hasMoreElements();)
-	{
-	  s = (TrackEvent) e.nextElement();
-	  itsCopy.addElement(s.duplicate());
-	}
-
+			{
+				s = (TrackEvent) e.nextElement();
+				itsCopy.addElement(s.duplicate());
+			}
+			
     } catch (Exception ex) {
       System.err.println("error while cloning events");
       Thread.dumpStack();
     }
-
+		
   }
-
+	
   static void discardTheCopy()
   {
     itsCopy.removeAllElements();

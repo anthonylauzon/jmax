@@ -25,6 +25,7 @@
 /* sequence components */
 fts_symbol_t seqsym_sequence = 0;
 fts_symbol_t seqsym_track = 0;
+fts_symbol_t seqsym_track_editor = 0;
 fts_symbol_t seqsym_miditrack = 0;
 fts_symbol_t seqsym_event = 0;
 fts_symbol_t seqsym_segment = 0;
@@ -63,6 +64,13 @@ fts_symbol_t seqsym_dump_mess = 0;
 fts_symbol_t seqsym_properties = 0;
 fts_symbol_t seqsym_get_property_list = 0;
 fts_symbol_t seqsym_append_properties = 0;
+fts_symbol_t seqsym_editor = 0;
+fts_symbol_t seqsym_window = 0;
+fts_symbol_t seqsym_label = 0;
+fts_symbol_t seqsym_zoom = 0;
+fts_symbol_t seqsym_transp = 0;
+fts_symbol_t seqsym_save_editor = 0;
+fts_symbol_t seqsym_editor_state = 0;
 
 /* messages from/to client */
 fts_symbol_t seqsym_addTracks = 0;
@@ -79,8 +87,6 @@ fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
-fts_symbol_t seqsym_editorState = 0;
-fts_symbol_t seqsym_editor_state = 0;
 
 void
 seqsym_config(void)
@@ -89,6 +95,7 @@ seqsym_config(void)
   seqsym_sequence = fts_new_symbol("sequence");
   seqsym_miditrack = fts_new_symbol("miditrack");
   seqsym_track = fts_new_symbol("track");
+  seqsym_track_editor = fts_new_symbol("track_editor");
   seqsym_event = fts_new_symbol("event");
   seqsym_segment = fts_new_symbol("segment");
 
@@ -126,6 +133,12 @@ seqsym_config(void)
   seqsym_properties = fts_new_symbol("properties");
   seqsym_get_property_list = fts_new_symbol("get_property_list");
   seqsym_append_properties = fts_new_symbol("append_properties");
+  seqsym_editor = fts_new_symbol("editor");
+  seqsym_window = fts_new_symbol("window");
+  seqsym_label = fts_new_symbol("label");
+  seqsym_zoom = fts_new_symbol("zoom");
+  seqsym_transp = fts_new_symbol("transp");
+  seqsym_save_editor = fts_new_symbol("save_editor");
 	seqsym_editor_state = fts_new_symbol("editor_state");
 		
   /* messages to client */
@@ -143,5 +156,4 @@ seqsym_config(void)
   seqsym_highlightEventsAndTime = fts_new_symbol("highlightEventsAndTime");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
   seqsym_endPaste = fts_new_symbol("endPaste");
-  seqsym_editorState = fts_new_symbol("editorState");
 }

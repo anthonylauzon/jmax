@@ -28,7 +28,7 @@ public interface TrackStateListener
 {
   public abstract void lock(boolean lock);
   public abstract void active(boolean active);
-	public abstract void restoreEditorState(FtsTrackObject.TrackEditorState editorState);
+	public abstract void restoreEditorState(FtsTrackEditorObject editorState);
 }
 
 

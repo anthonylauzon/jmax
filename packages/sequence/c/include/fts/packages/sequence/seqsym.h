@@ -29,6 +29,7 @@
 extern fts_symbol_t seqsym_sequence;
 extern fts_symbol_t seqsym_miditrack;
 extern fts_symbol_t seqsym_track;
+extern fts_symbol_t seqsym_track_editor;
 extern fts_symbol_t seqsym_event;
 extern fts_symbol_t seqsym_segment;
 
@@ -66,6 +67,12 @@ extern fts_symbol_t seqsym_dump_mess;
 extern fts_symbol_t seqsym_properties;
 extern fts_symbol_t seqsym_get_property_list;
 extern fts_symbol_t seqsym_append_properties;
+extern fts_symbol_t seqsym_editor;
+extern fts_symbol_t seqsym_window;
+extern fts_symbol_t seqsym_label;
+extern fts_symbol_t seqsym_zoom;
+extern fts_symbol_t seqsym_transp;
+extern fts_symbol_t seqsym_save_editor;
 extern fts_symbol_t seqsym_editor_state;
 
 /* messages from/to client */
@@ -83,7 +90,6 @@ extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_highlightEventsAndTime;
 extern fts_symbol_t seqsym_openFileDialog;
 extern fts_symbol_t seqsym_endPaste;
-extern fts_symbol_t seqsym_editorState;
 
 #endif
 

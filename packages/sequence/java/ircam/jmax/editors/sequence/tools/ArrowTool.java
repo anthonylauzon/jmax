@@ -111,9 +111,9 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     egc.getAdapter().setY(aEvent, y);
 
     egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(),
-                                                      value.getValueInfo().getName(),
-                                                      value.getDefinedPropertyCount()*2,
-                                                      value.getDefinedPropertyNamesAndValues());
+																											value.getValueInfo().getName(),
+																											value.getDefinedPropertyCount()*2,
+																											value.getDefinedPropertyNamesAndValues());
   }
 
   /***********************************************************************************************
@@ -240,42 +240,42 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	  if(!a.isHorizontalMovementBounded())
 	    egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
 	  else
-	    {
-	      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 		{
-		  int prevX = 0;
-		  int nextX = 0;
-		  
-		  aEvent = (TrackEvent) e.nextElement();
-		  
-		  FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
-		  TrackEvent next = ftsTrk.getNextEvent(aEvent);
-		  if(next!=null)
-		    nextX = a.getX(next)-1;
-		  TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
-		  if(prev!=null)
-		    prevX = a.getX(prev)+1;
+			for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+			{
+				int prevX = 0;
+				int nextX = 0;
+				
+				aEvent = (TrackEvent) e.nextElement();
+				
+				FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
+				TrackEvent next = ftsTrk.getNextEvent(aEvent);
+				if(next!=null)
+					nextX = a.getX(next)-1;
+				TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
+				if(prev!=null)
+					prevX = a.getX(prev)+1;
 		      
-		  if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
-		    a.setX(aEvent, nextX);
-		  else
-		    if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
-		      a.setX(aEvent, prevX);
+				if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
+					a.setX(aEvent, nextX);
+				else
+					if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
+						a.setX(aEvent, prevX);
 		    else
 		      a.setX(aEvent, a.getX(aEvent) + deltaX);
+			}
 		}
-	    }
       }
-    if(deltaY!=0)
-      {
-	((UndoableData) egc.getDataModel()).beginUpdate();
-	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	if(deltaY!=0)
+	{
+		((UndoableData) egc.getDataModel()).beginUpdate();
+		for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aEvent = (TrackEvent) e.nextElement();
 	    a.setY(aEvent, a.getY(aEvent)+deltaY);
 	  }    
-      }
-    egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
+	}
+	egc.getTrack().getFtsTrack().requestNotifyEndUpdate();
   }
 
   //---Fields

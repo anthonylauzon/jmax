@@ -104,7 +104,7 @@ public class MidiTrackEditor extends TrackBaseEditor
     labelType = type;
     gc.getAdapter().LabelMapper.setLabelType( type);
 		if(!gc.isInSequence())
-			((FtsTrackObject)gc.getDataModel()).editorState.setLabel(labelType);
+			((FtsTrackObject)gc.getDataModel()).editorObject.setLabel(labelType);
 		
     repaint();
   }

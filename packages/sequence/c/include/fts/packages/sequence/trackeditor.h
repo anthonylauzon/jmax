@@ -20,40 +20,30 @@
  * 
  */
 
-#include "internal_sequence.h"
+#ifndef _SEQUENCE_TRACK_EDITOR_H_
+#define _SEQUENCE_TRACK_EDITOR_H_
 
-extern void seqsym_config(void);
+#include <fts/fts.h>
+#include <fts/packages/sequence/sequence.h>
 
-extern void sequence_class_config(void);
-extern void track_config(void);
-extern void track_editor_config(void);
-extern void event_config(void);
+extern fts_class_t *track_editor_class;
 
-extern void scoob_config(void);
-extern void seqmess_config(void);
+struct _track_editor
+{ 
+  fts_object_t o;
 
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void locate_config(void);
+  track_t *track; /* the track */
 
-void
-sequence_config(void)
-{
-  seqsym_config();
+	int win_x; /* editor window's bounds */
+  int win_y;
+  int win_w;
+  int win_h;
+  fts_symbol_t label; /* property event label */
+  float zoom; /* editor zoom_factor */
+  int transp; /* editor x_transposition */	
+};
 
-  sequence_class_config();
-  track_config();
-	track_editor_config();
-  event_config();
+extern void track_editor_upload(track_editor_t *this);
+extern void track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper);
 
-  scoob_config();
-  seqmess_config();
-
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  locate_config();
-}
+#endif

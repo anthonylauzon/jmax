@@ -97,7 +97,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		  {
 				getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		  }
-			public void restoreEditorState(FtsTrackObject.TrackEditorState editorState)
+			public void restoreEditorState(FtsTrackEditorObject editorState)
 		  {
 				geometry.setXZoomFactor(editorState.zoom);
 				gc.getScrollManager().scrollToValue(-editorState.transp);
@@ -129,7 +129,16 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					temp = (TrackEvent) e.nextElement();
 					if(first)
 					{
-						gc.getScrollManager().makeVisible(temp);
+						SwingUtilities.invokeLater(new Runnable(){
+							public void run()
+						  {
+								if(scrollEvent != null)
+								{
+									gc.getScrollManager().makeVisible(scrollEvent);
+									scrollEvent = null;
+								}
+							}
+						});
 						first = false;
 					}
 					temp.setHighlighted(true);
@@ -390,6 +399,7 @@ transient Track track;
 transient AbstractRenderer renderer;
 transient Component component;
 transient SequenceSelection selection;
+transient TrackEvent scrollEvent = null;
 
 transient MaxVector oldElements = new MaxVector();
 transient SequenceTableDialog listDialog = null;
