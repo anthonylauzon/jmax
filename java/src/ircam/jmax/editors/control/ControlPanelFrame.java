@@ -37,6 +37,11 @@ public class ControlPanelFrame extends JFrame
   private IndicatorWithMemory overflowFpeIndicator;
   private JCheckBox dspOnButton;
 
+  // (fd) This lock prevents a "setSelected" ont the dspOnButton to cause
+  // "itemStateChanged" to repropagates the value to FTS
+  private boolean lock = false;
+
+
   class DspControlAdapter implements PropertyChangeListener
   {
     String prop;
@@ -74,7 +79,14 @@ public class ControlPanelFrame extends JFrame
     public void propertyChange(PropertyChangeEvent event)
     {
       if (prop.equals(event.getPropertyName()))
-	b.setSelected(((Boolean) event.getNewValue()).booleanValue());
+	{
+	  synchronized( b)
+	    {
+	      lock = true;
+	      b.setSelected(((Boolean) event.getNewValue()).booleanValue());
+	      lock = false;
+	    }
+	}
     }
   }
 
@@ -172,10 +184,14 @@ public class ControlPanelFrame extends JFrame
 
     dspOnButton.addItemListener(new ItemListener() {
       public void itemStateChanged(ItemEvent e) {
-	if (e.getStateChange() == ItemEvent.DESELECTED)
-	  control.setDspOn(Boolean.FALSE);
-	else  if (e.getStateChange() == ItemEvent.SELECTED)
-	  control.setDspOn(Boolean.TRUE);
+
+	if ( !lock)
+	  {
+	    if (e.getStateChange() == ItemEvent.DESELECTED)
+	      control.setDspOn(Boolean.FALSE);
+	    else  if (e.getStateChange() == ItemEvent.SELECTED)
+	      control.setDspOn(Boolean.TRUE);
+	  }
       }});
 
     optionsPanel.add(dspOnButton);
