@@ -260,7 +260,13 @@ fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl)
   return 0;
 }
 
-void fts_atoms_init(void)
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_atom_init(void)
 {
   fts_hashtable_init( &fts_atom_type_table, 0, FTS_HASHTABLE_MEDIUM);
 }

@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <fts/private/OLDftsdata.h>
+#include <fts/private/OLDclient.h>
 #include <fts/private/OLDpatcherdata.h>
 
 /* Remote call codes */
@@ -266,13 +267,13 @@ static void fts_patcher_data_update( fts_data_t *d, int ac, const fts_atom_t *at
 }
 
 
-/* **********************************************************************
+/***********************************************************************
  *
  * Initialization
  *
  */
 
-void fts_patcher_data_init(void)
+void fts_kernel_oldpatcherdata_init(void)
 {
   patcher_data_heap = fts_heap_new(sizeof( fts_patcher_data_t));
 

@@ -1581,9 +1581,14 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
     return FTS_EXPRESSION_SYNTAX_ERROR;
 }
   
-/* Init function: configure all the tables  */
 
-void fts_expressions_init(void)
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_expression_init(void)
 {
   expr_prop_heap = fts_heap_new(sizeof(fts_expression_assignement_t));
   expr_var_ref_heap = fts_heap_new(sizeof(fts_expr_var_ref_t));

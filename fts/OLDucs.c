@@ -75,6 +75,7 @@
 #include <fts/fts.h>
 #include <fts/private/OLDclient.h>
 #include <fts/private/patparser.h>
+#include <fts/private/platform.h>
 
 /******************************************************************************/
 /*                                                                            */
@@ -333,20 +334,26 @@ fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
+#define MODULE_INIT_FUNCTION_SUFFIX "_config"
 
-static fts_status_t
-fts_ucs_load_module(int argc, const fts_atom_t *argv)
+static fts_status_t fts_ucs_load_module(int argc, const fts_atom_t *argv)
 {
   if ((argc == 2) && fts_is_symbol(&argv[0]) && fts_is_symbol(&argv[1]))
     {
       fts_status_t ret;
-      fts_symbol_t name = fts_get_symbol(argv + 0);
-      fts_symbol_t file = fts_get_symbol(argv + 1);
+      const char *module_name = fts_symbol_name(fts_get_symbol(argv + 0));
+      const char *file = fts_symbol_name(fts_get_symbol(argv + 1));
+      char *name = (char *)fts_malloc( strlen( module_name) + sizeof( MODULE_INIT_FUNCTION_SUFFIX) + 1);
 
-      ret = fts_module_load(fts_symbol_name(name), fts_symbol_name(file));
+      strcpy( name, module_name);
+      strcat( name, MODULE_INIT_FUNCTION_SUFFIX);
+
+      ret = fts_load_library( file, module_name);
 
       if (ret != fts_Success)
-	post("Error loading module %s: %s (%s)\n", fts_symbol_name(name), ret->description, fts_symbol_name(file));
+	post("Error loading module %s: %s (%s)\n", module_name, ret->description, file);
+
+      fts_free( name);
     }
 
   return fts_Success;
@@ -548,4 +555,3 @@ static void fts_kernel_ucs_init(void)
   fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
   fts_ucs_install_commands();
 }
-

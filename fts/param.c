@@ -276,7 +276,13 @@ void fts_param_set_symbol_by(fts_symbol_t name,  fts_symbol_t value, void *autho
 }
 
 
-void fts_params_init()
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_param_init()
 {
   param_heap = fts_heap_new(sizeof(fts_param_t));
   param_listener_heap = fts_heap_new(sizeof(fts_param_listener_t));

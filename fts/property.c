@@ -457,14 +457,15 @@ fts_properties_free(fts_object_t *obj)
 }
 
 
-/* **********************************************************************
+/***********************************************************************
  *
  * Initialization
  *
  */
-void fts_properties_init(void)
+
+void fts_kernel_property_init(void)
 {
-  daemon_heap  = fts_heap_new(sizeof(struct daemon_list));
-  plist_cell_heap   = fts_heap_new(sizeof(struct fts_plist_cell));
-  plist_heap   = fts_heap_new(sizeof(fts_plist_t));
+  daemon_heap = fts_heap_new(sizeof(struct daemon_list));
+  plist_cell_heap = fts_heap_new(sizeof(struct fts_plist_cell));
+  plist_heap = fts_heap_new(sizeof(fts_plist_t));
 }

@@ -447,13 +447,13 @@ void fts_template_file_modified(fts_symbol_t filename)
 }
 
 
-/* **********************************************************************
+/***********************************************************************
  *
  * Initialization
  *
  */
 
-void fts_template_init()
+void fts_kernel_template_init()
 {
   fts_hashtable_init(&template_table, 0, FTS_HASHTABLE_MEDIUM);
   template_heap = fts_heap_new(sizeof(fts_template_t));
@@ -462,4 +462,3 @@ void fts_template_init()
   template_search_path_table = (fts_symbol_t *) fts_malloc(template_search_path_size * sizeof(fts_symbol_t *));
   template_search_path_fill  = 0;
 }
-

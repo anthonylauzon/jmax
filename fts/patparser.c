@@ -1477,13 +1477,13 @@ static void pat_warning(const char *description)
 }
 
 
-/* **********************************************************************
+/***********************************************************************
  *
  * Initialization
  *
  */
 
-void fts_patparser_init()
+void fts_kernel_patparser_init()
 {
   fts_s_max = fts_new_symbol("max");
   fts_s_v2 = fts_new_symbol("v2");

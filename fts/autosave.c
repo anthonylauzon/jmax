@@ -78,7 +78,14 @@ static void autosave_signal_handler(int sig)
   exit(99);
 }
 
-void fts_autosave_init( void)
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_autosave_init( void)
 {
 #ifndef DEBUG 
   /* Standard quit/int signals */
@@ -101,8 +108,3 @@ void fts_autosave_init( void)
   signal(SIGTERM, autosave_signal_handler);
 #endif
 }
-
-
-
-
-

@@ -44,7 +44,7 @@
  * Forward declarations
  *
  */
-static void fts_client_updates_sync(void);
+
 static void fts_client_parse_char( char c);
 
 static int client_dev = 0;
@@ -950,7 +950,7 @@ static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
    under request from the server; it do not touch the alarm.
    */
 
-static void fts_client_updates_sync(void)
+void fts_client_updates_sync(void)
 {
   fts_object_t *obj;
   fts_symbol_t property;

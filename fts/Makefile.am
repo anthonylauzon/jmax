@@ -24,6 +24,7 @@ file.c \
 fpe.c \
 ftl.c \
 ftlmem.c \
+fts.c \
 hashtable.c \
 inout.c \
 loader.c \

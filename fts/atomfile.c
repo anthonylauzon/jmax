@@ -386,6 +386,8 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
       else
 	fts_set_symbol(at, fts_new_symbol_copy(buf));
       break;
+    default:
+      break;
     }
 
   *separator = sep;

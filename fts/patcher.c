@@ -1422,7 +1422,7 @@ fts_patcher_blip(fts_patcher_t *this, const char *msg)
  */
 static fts_patcher_t *fts_root_patcher;
 
-void 
+static void
 fts_create_root_patcher()
 {
   fts_atom_t a[1];
@@ -1433,8 +1433,7 @@ fts_create_root_patcher()
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);
 }
 
-static void 
-fts_delete_root_patcher(void)
+static void fts_delete_root_patcher(void)
 {
   fts_object_destroy((fts_object_t *)fts_root_patcher);
 }
@@ -1501,13 +1500,13 @@ fts_object_get_thru_type(fts_object_t *obj)
 }
 
 
-/* **********************************************************************
+/***********************************************************************
  *
  * Initialization/shutdown
  *
  */
 
-void fts_patcher_init(void)
+void fts_kernel_patcher_init(void)
 {
   fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
 
@@ -1515,10 +1514,11 @@ void fts_patcher_init(void)
 
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
   patcher_class = fts_class_get_by_name(fts_s_patcher);
+
+  fts_create_root_patcher();
 }
 
-void fts_patcher_shutdown(void)
+void fts_kernel_patcher_shutdown(void)
 {
   fts_delete_root_patcher();
 }
-

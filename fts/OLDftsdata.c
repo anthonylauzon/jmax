@@ -429,13 +429,14 @@ fts_data_t *fts_data_id_get( int id)
   return data_table[id];
 }
 
-/* **********************************************************************
+
+/***********************************************************************
  *
  * Initialization
  *
  */
 
-void fts_data_module_init()
+void fts_kernel_oldftsdata_init()
 {
   fts_hashtable_init(&fts_data_class_table, 0, FTS_HASHTABLE_MEDIUM);
   meta_data_init();

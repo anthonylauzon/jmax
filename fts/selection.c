@@ -248,28 +248,14 @@ selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-/* **********************************************************************
+
+/***********************************************************************
  *
  * Initialization
  *
  */
-void fts_selection_init( void)
+
+void fts_kernel_selection_init( void)
 {
   fts_class_install(fts_new_symbol("__selection"), selection_instantiate);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

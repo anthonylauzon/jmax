@@ -39,52 +39,51 @@
 #include <sys/types.h>
 #include <errno.h>
 
-/*  #include <fts/fts.h>  not yet (platform.h) */
 #include "fts/fts.h"
 #include "fts/private/fpe.h"
 #include "fts/private/platform.h"
 
-/* *************************************************************************** */
-/*                                                                             */
-/* Dynamic loader                                                              */
-/*                                                                             */
-/* *************************************************************************** */
+/***********************************************************************
+ *
+ * Dynamic loader
+ * The Linux implementation uses dlopen() and dlsym().
+ *
+ */
 
-/* The Linux implementation uses dlopen() and dlsym(). */
-
-void *fts_dl_open( const char *filename, char *error)
+fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
+  static char error_description[1024];
+  static fts_status_description_t load_library_error = { error_description};
   void *handle;
+  void (*fun)(void);
 
   handle = dlopen( filename, RTLD_NOW | RTLD_GLOBAL);
 
   if (!handle)
-    strcpy( error, dlerror());
-
-  return handle;
-}
-
-int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error)
-{
-  char *dlerr;
-
-  *address = dlsym( handle, symbol);
-
-  dlerr = dlerror();
-  if (dlerr != NULL)
     {
-      strcpy( error, dlerr);
-      return 0;
+      strcpy( error_description, dlerror());
+      return &load_library_error;
     }
 
-  return 1;
+  fun = (void (*)(void))dlsym( handle, symbol);
+
+  if ( fun == NULL)
+    {
+      strcpy( error_description, dlerror());
+      return &load_library_error;
+    }
+
+  (*fun)();
+
+  return fts_Success;
 }
 
-/* *************************************************************************** */
-/*                                                                             */
-/* Floating-point unit                                                         */
-/*                                                                             */
-/* *************************************************************************** */
+
+/***********************************************************************
+ *
+ * Floating-point unit
+ *
+ */
 
 /*
  * #define this if you want denormalized f.p. traps to be reported 
@@ -149,26 +148,7 @@ int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error
 
 static void linux_fpe_signal_handler( int sig)
 {
-  unsigned int s;
-  int which = 0;
-
-  _FPU_GET_SW( s);
-  _FPU_CLR_SW;
-
-  if (s & _FPU_STATUS_ZE)
-    which |= FTS_DIVIDE0_FPE;
-  if (s & _FPU_STATUS_IE)
-    which |= FTS_INVALID_FPE;
-  if (s & _FPU_STATUS_OE)
-    which |= FTS_OVERFLOW_FPE;
-  if (s & _FPU_STATUS_UE)
-    which |= FTS_UNDERFLOW_FPE;
-  if (s & _FPU_STATUS_PE)
-    which |= FTS_INEXACT_FPE;
-  if (s & _FPU_STATUS_DE)
-    which |= FTS_DENORMALIZED_FPE;
-
-  fts_fpe_handler( which);
+  fts_fpe_handler( fts_check_fpe());
 }
 
 void fts_enable_fpe_traps( void)
@@ -222,6 +202,14 @@ unsigned int fts_check_fpe( void)
     which |= FTS_INVALID_FPE;
   if (s & _FPU_STATUS_OE)
     which |= FTS_OVERFLOW_FPE;
+  if (s & _FPU_STATUS_UE)
+    which |= FTS_UNDERFLOW_FPE;
+  if (s & _FPU_STATUS_PE)
+    which |= FTS_INEXACT_FPE;
+#ifdef ENABLE_DENORMALIZED_TRAPS
+  if (s & _FPU_STATUS_DE)
+    which |= FTS_DENORMALIZED_FPE;
+#endif
 
   return which;
 }

@@ -94,7 +94,7 @@ struct _ftl_program_t {
   ftl_subroutine_t *subroutine_tos;
 };
 
-static fts_hashtable_t *ftl_functions_table = 0;
+static fts_hashtable_t ftl_functions_table;
 
 fts_status_description_t ftl_error_uninitialized_program =
 {
@@ -390,16 +390,10 @@ int ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
 {
   fts_atom_t k, v;
 
-  if ( !ftl_functions_table)
-    {
-      ftl_functions_table = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
-      fts_hashtable_init( ftl_functions_table, 0, FTS_HASHTABLE_MEDIUM);
-    }
-
   fts_set_symbol( &k, name);
   fts_set_fun(&v, (fts_fun_t)wrapper);
 
-  return fts_hashtable_put( ftl_functions_table, &k, &v);
+  return fts_hashtable_put( &ftl_functions_table, &k, &v);
 }
 
 ftl_instruction_info_t *ftl_program_get_current_instruction_info( ftl_program_t *prog)
@@ -689,7 +683,7 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
       fts_atom_t data, k;
 
       fts_set_symbol( &k, fts_get_symbol(a));
-      fts_hashtable_get( ftl_functions_table, &k, &data);
+      fts_hashtable_get( &ftl_functions_table, &k, &data);
       fts_word_set_fun( bytecode, fts_get_fun( &data));
       bytecode++;
     }
@@ -1087,5 +1081,17 @@ fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
     return subr->info_table.info[subr->pc].object;
   else
     return 0;
+}
+
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_ftl_init( void)
+{
+  fts_hashtable_init( &ftl_functions_table, 0, FTS_HASHTABLE_MEDIUM);
 }
 

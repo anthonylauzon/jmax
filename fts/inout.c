@@ -587,7 +587,7 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
-void fts_inout_config(void)
+void fts_kernel_inout_init(void)
 {
   fts_metaclass_install(fts_s_inlet, inlet_instantiate, inout_equiv);
   fts_metaclass_install(fts_s_outlet, outlet_instantiate, inout_equiv);

@@ -805,16 +805,16 @@ fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_clas
   return obj;
 }
 
-/* **********************************************************************
+
+/***********************************************************************
  *
  * Initialization
  *
  */
-void fts_variables_init(void)
+
+void fts_kernel_variable_init(void)
 {
   bindings_heap = fts_heap_new(sizeof(fts_binding_t));
   objlist_heap  = fts_heap_new(sizeof(fts_mess_obj_list_t));
   var_refs_heap = fts_heap_new(sizeof(fts_binding_list_t));
 }
-
-

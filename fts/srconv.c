@@ -19,14 +19,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <string.h>
-#include <math.h>
-#include <fts/fts.h>
-#include <fts/private/srconv.h>
-
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <string.h>
+#include <math.h>
+
+#include <fts/fts.h>
+#include <fts/private/srconv.h>
 
 #define FILTER_SIZE 24
 #define FILTER_OVER_BITS 11

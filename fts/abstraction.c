@@ -298,13 +298,13 @@ fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const f
     return 0;
 }
 
-/* **********************************************************************
- * 
+/***********************************************************************
+ *
  * Initialization
  *
  */
 
-void fts_abstraction_init()
+void fts_kernel_abstraction_init()
 {
   fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM);
 
@@ -312,6 +312,3 @@ void fts_abstraction_init()
   search_path_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *));
   search_path_fill  = 0;
 }
-
-
-

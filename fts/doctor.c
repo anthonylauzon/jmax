@@ -59,13 +59,6 @@ typedef struct fts_object_doctor
 
 static fts_hashtable_t fts_doctor_table;
 
-
-void fts_doctor_init()
-{
-  fts_hashtable_init(&fts_doctor_table, 0, FTS_HASHTABLE_MEDIUM);
-}
-
-
 void fts_register_object_doctor(fts_symbol_t class_name,
 				fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at))
 {
@@ -110,3 +103,13 @@ fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_a
     return 0;
 }
 
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_doctor_init()
+{
+  fts_hashtable_init( &fts_doctor_table, 0, FTS_HASHTABLE_MEDIUM);
+}

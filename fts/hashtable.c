@@ -135,12 +135,6 @@ static int get_initial_capacity( int initial_capacity)
 
 void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity)
 {
-  if (! cell_heap)
-    cell_heap = fts_heap_new(sizeof( fts_hashtable_cell_t));
-
-  if ( !iterator_heap)
-    iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
-
   if (!key_type)
     h->key_type = fts_s_symbol;
   else if (key_type == fts_s_int 
@@ -427,3 +421,17 @@ void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
 {
   hashtable_iterator_get( h, i, 0);
 }
+
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_hashtable_init( void)
+{
+  cell_heap = fts_heap_new(sizeof( fts_hashtable_cell_t));
+  iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
+}
+

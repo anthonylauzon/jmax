@@ -370,6 +370,3 @@ void fts_outlet_bang(fts_object_t *o, int woutlet)
     }
 }
 
-
-
-

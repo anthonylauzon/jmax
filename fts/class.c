@@ -28,6 +28,8 @@
 #include <fts/fts.h>
 #include <fts/private/class.h>
 
+const int fts_SystemInlet = -1;
+
 /* Return Status declarations */
 
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
@@ -51,25 +53,6 @@ static fts_class_mess_t *fts_class_mess_create(fts_symbol_t s, fts_method_t mth,
 
 static int fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg);
 
-
-/******************************************************************************/
-/*                                                                            */
-/*                Init                                                        */
-/*                                                                            */
-/******************************************************************************/
-
-/* initialize the class/metaclasses related data structures */
-
-const int fts_SystemInlet = -1;
-
-void fts_classes_init(void)
-{
-  /* Initialize the heaps */
-
-  fts_hashtable_init(&fts_metaclass_table, 0, FTS_HASHTABLE_MEDIUM);
-  fts_hashtable_init(&fts_metaclass_alias_table, 0, FTS_HASHTABLE_MEDIUM);
-  class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
-}
 
 /******************************************************************************/
 /*                                                                            */
@@ -775,3 +758,19 @@ fts_always_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   return 1;
 }
+
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_class_init( void)
+{
+  fts_hashtable_init(&fts_metaclass_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&fts_metaclass_alias_table, 0, FTS_HASHTABLE_MEDIUM);
+
+  class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
+}
+

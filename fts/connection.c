@@ -37,18 +37,6 @@ static fts_heap_t *connection_heap;
 
 /******************************************************************************/
 /*                                                                            */
-/*                  File Init function                                        */
-/*                                                                            */
-/******************************************************************************/
-
-void 
-fts_connections_init()
-{
-  connection_heap = fts_heap_new(sizeof(fts_connection_t));
-}
-
-/******************************************************************************/
-/*                                                                            */
 /*                            Connections                                     */
 /*                                                                            */
 /******************************************************************************/
@@ -415,3 +403,15 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
 	fts_client_redefine_connection(connection);
     }
 }
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_kernel_connection_init()
+{
+  connection_heap = fts_heap_new(sizeof(fts_connection_t));
+}
+
